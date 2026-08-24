@@ -11,6 +11,9 @@ stated branch head, which contains the original alt-rotation planning docs
 `47c9d09f`.
 **Run date:** 2026-08-24 (UTC)
 **Decision:** `PASS_ALT_POINT_IN_TIME_UNIVERSE_FOUNDATION`
+**Human review verdict (superseded):** `PARTIAL_ALT_POINT_IN_TIME_UNIVERSE_FOUNDATION`
+**Repaired by:** `CRYPTO-ALT-DATA-0.1-FOUNDATION-TRUTH-REPAIR` (see
+section 15 appendix; all cited defects repaired and test-verified).
 
 > Data reality only. No alpha, no PnL, no optimization, no execution, no ML,
 > no trading rules were produced in this checkpoint.
@@ -21,21 +24,23 @@ stated branch head, which contains the original alt-rotation planning docs
 
 > For any historical date t: which assets were actually in the historical
 > top-500 at t, which sector did they belong to at t (where verifiable), and
-> which had a mature, liquid perpetual contract actually available at t?
+> which had a sufficiently mature perpetual contract actually available at
+> t? (Liquidity is tracked separately: historical liquidity is NOT
+> verified — see section 15 and `data_0_1/ALT_DATA_0_1_HISTORICAL_LIQUIDITY_PATH.md`.)
 
 **Answer: YES, this is answerable.** The historical top-500 is recoverable
-as a dated snapshot from CMC's web data-api (verified for 5 dates,
-500-deep, PIT by construction, no current-universe dependence). Historical
-perp availability is recoverable from OKX `listTime`, Hyperliquid
-funding-history first timestamps (232/232 coins), and the Binance bulk
-archive (2020-01+, incl. delisted symbols). Delisted-contract recovery is
-demonstrated on two independent paths. Sector classification is
-`HISTORICAL_APPROXIMATION` at best (no free provider offers true PIT
-sectors) and is labeled as such everywhere.
+as a dated snapshot from CMC's web data-api (verified for 8 dates from
+2020-06-01 to 2026-08-20, 500-deep, PIT by construction, no current-
+universe dependence). Historical perp availability is recoverable from
+OKX `listTime`, Hyperliquid funding-history first timestamps (232/232
+coins), and the Binance bulk archive (2020-01+, incl. delisted symbols).
+Delisted-contract recovery is demonstrated on two independent paths.
+Sector classification is `HISTORICAL_APPROXIMATION` at best (no free
+provider offers true PIT sectors) and is labeled as such everywhere.
 
 ---
 
-## 1. What was probed (89 persisted raw samples)
+## 1. What was probed (95 persisted raw samples)
 
 | layer | sources | live status from this environment |
 |---|---|---|
@@ -47,10 +52,17 @@ sectors) and is labeled as such everywhere.
 
 1. **CMC internal data-api returns true PIT ranked snapshots** —
    `data-api/v3/cryptocurrency/listings/historical?date=YYYY-MM-DD` —
-   keyless, 500-deep, plain JSON. BTC at 2024-06-01: $67,706.94, mcap
-   $1.334T (matches history). Fallen coins appear at true PIT ranks
-   (LUNC #115, FTT #138, HOT #163 on 2024-06-01). **This is the PIT rank
-   primary source.**
+   keyless, 500-deep, plain JSON. Verified on 8 dates (2020-06-01 →
+   2026-08-20): BTC at 2024-06-01 $67,706.94 / mcap $1.334T (matches
+   history); BTC at 2020-06-01 $10,167.27 / mcap $186.99B (matches
+   history). Fallen coins appear at true PIT ranks (LUNC #115, FTT #138,
+   HOT #163 on 2024-06-01; BTS #111, XEM #32, BCH #5 on 2020-06-01).
+   **Authority (corrected, see section 15):** this is an INTERNAL WEB
+   endpoint, empirically verified — label
+   `PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT`; OFFICIAL_DOCUMENTATION =
+   NO/UNVERIFIED; STABILITY_RISK = INTERNAL_ENDPOINT; TOS review required
+   for long-term operation. Not the same authority class as an officially
+   documented public API.
 2. **CMC official Pro API is paid** (401 without key); the web page is
    JS-rendered (no embedded table); the internal data-api is the
    machine-collectable path (web-use TOS applies).
@@ -86,48 +98,76 @@ PIT top-500 reconstructed for 5 dates; perp eligibility computed per
 asset × date × venue (HL and OKX live-verified; Binance/Bybit rows marked
 `UNVERIFIABLE_FROM_ENV`).
 
-| date | top-500 | any perp (HL∪OKX) | mature ≥30d | fully eligible (HL∪OKX) |
-|---|---|---|---|---|
-| 2024-06-01 | 500 | 189 | 143 | 143 |
-| 2025-01-01 | 500 | 212 | 164 | 164 |
-| 2025-06-01 | 500 | 223 | 188 | 188 |
-| 2026-01-01 | 500 | 215 | 194 | 194 |
-| 2026-08-20 | 500 | 209 | 203 | 203 |
+| date | top-500 (unique) | any perp (HL∪OKX) | mature ≥30d | ELIGIBLE_EX_LIQUIDITY (HL) | OKX maturity-eligible |
+|---|---|---|---|---|---|
+| 2024-06-01 | 500 | 189 | 143 | 111 | 134 |
+| 2025-01-01 | 500 | 212 | 164 | 134 | 148 |
+| 2025-06-01 | 500 | 223 | 188 | 151 | 170 |
+| 2026-01-01 | 500 | 215 | 194 | 172 | 182 |
+| 2026-08-20 | 500 | 209 | 203 | 181 | 197 |
 
-- Counts are **lower bounds**: Binance (largest perp universe) and Bybit
-  are geo-blocked live; their archive methods are documented and would add
+- Counts are **unique PIT assets per date** (never asset×venue rows) and
+  are **lower bounds**: Binance (largest perp universe) and Bybit are
+  geo-blocked live; their archive methods are documented and would add
   coverage in DATA-1.
+- `ELIGIBLE_EX_LIQUIDITY` = contract existed + mature ≥30d + historical
+  price/funding/volume data available; **historical liquidity is NOT
+  verified** for any venue (terminology corrected; `FULLY_ELIGIBLE` is no
+  longer used). OKX rows reach `CONTRACT_MATURITY_ELIGIBLE` only because
+  OKX historical data retention is PARTIAL (venue-level).
 - **Maturity verdict: `30D_FEASIBLE`.** The 30-day rule removes a modest
   share (e.g., 2024-06-01: 189→143; 2026-08-20: 209→203). The binding
   constraint is venue coverage, not the maturity rule. Not tuned against
   returns (preregistered).
 
-## 4. Coverage by rank band (aggregate, all dates)
+## 4. Coverage by rank band (aggregate, all dates; UNIQUE PIT ASSETS)
 
-| band | n | any perp (HL∪OKX) | mature30 (HL∪OKX) | fully eligible |
-|---|---|---|---|---|
-| 1-10 | 200 | 45 | 44 | 44 |
-| 11-25 | 300 | 60 | 54 | 54 |
-| 26-50 | 500 | 104 | 93 | 93 |
-| 51-100 | 1000 | 189 | 169 | 169 |
-| 101-200 | 2000 | 298 | 268 | 268 |
-| 201-300 | 2000 | 89 | 72 | 72 |
-| 301-500 | 4000 | 263 | 192 | 192 |
+Corrected after DATA-0.1 (denominators are unique assets per date, not
+asset×venue rows; `asset_count_method = UNIQUE_PIT_ASSET` in the CSV).
+Per-date denominators: 10/15/25/50/100/100/200; per-date band sum == 500
+(verified by test).
 
-Top-100 bands are well covered (≈65-80% perp-eligible on HL/OKX). The
-lower half (201-500) is sparse — and diagnosis shows why: CMC ranks
-201-500 are dominated by wrapped/LST/stablecoin assets (stETH, WBETH,
-WBTC, WETH, USDS, USDY, sUSDe, ...) that legitimately have no perps, plus
-genuinely small altcoins with thin perp coverage. Binance/Bybit would lift
-the lower bands, but the honest free-stack answer is:
-**the lower half of top-500 is only partially perp-tradable, and much of
-the 201-500 band is structurally non-tradable (wrapped/stable proxies).**
+| band | unique assets | any perp (HL∪OKX) | mature30 | ELIGIBLE_EX_LIQUIDITY (HL) | OKX maturity-eligible |
+|---|---|---|---|---|---|
+| 1-10 | 50 | 45 (90.0%) | 44 (88.0%) | 39 (78.0%) | 44 (88.0%) |
+| 11-25 | 75 | 60 (80.0%) | 54 (72.0%) | 47 (62.7%) | 53 (70.7%) |
+| 26-50 | 125 | 104 (83.2%) | 93 (74.4%) | 74 (59.2%) | 78 (62.4%) |
+| 51-100 | 250 | 189 (75.6%) | 169 (67.6%) | 135 (54.0%) | 145 (58.0%) |
+| 101-200 | 500 | 298 (59.6%) | 268 (53.6%) | 152 (30.4%) | 249 (49.8%) |
+| 201-300 | 500 | 89 (17.8%) | 72 (14.4%) | 40 (8.0%) | 58 (11.6%) |
+| 301-500 | 1000 | 263 (26.3%) | 192 (19.2%) | 96 (9.6%) | 161 (16.1%) |
+
+Corrected claims (superseding the earlier "≈65-80%" estimate):
+
+- **Top-100 bands: any-perp coverage is 75.6-90.0%** of unique assets
+  (better than previously claimed); mature ≥30d 67.6-88.0%.
+- **101-200: 59.6% any-perp, 53.6% mature.**
+- **Lower half (201-500): sparse** — 17.8% / 26.3% any-perp, and only
+  8.0-9.6% reach ELIGIBLE_EX_LIQUIDITY on HL. Diagnosis unchanged: CMC
+  ranks 201-500 are dominated by wrapped/LST/stablecoin assets (stETH,
+  WBETH, WBTC, WETH, USDS, USDY, sUSDe, ...) that legitimately have no
+  perps, plus genuinely small altcoins with thin perp coverage.
+  Binance/Bybit would lift the lower bands, but the honest free-stack
+  answer is: **the lower half of top-500 is only partially
+  perp-tradable, and much of the 201-500 band is structurally
+  non-tradable (wrapped/stable proxies).**
+- Reconciliation of old vs corrected denominators:
+  `data_0_1/ALT_DATA_0_1_COVERAGE_RECONCILIATION.csv`.
 
 ## 5. Identity mapping (Task 9)
 
 - 949 canonical identities (`identity/canonical_identity_map.csv`),
   anchored on `CMC:<id>`; 915 joined to CoinGecko, 924 to CoinPaprika.
-- **608 symbols flagged for ticker reuse** — never silently joined.
+- **Collision audit (corrected, DATA-0.1):** the earlier "608 ticker-reuse
+  flags" conflated distinct phenomena. Reclassified per
+  `data_0_1/ALT_DATA_0_1_IDENTITY_COLLISION_AUDIT.csv`: only **22
+  TRUE_TICKER_REUSE** (same symbol = genuinely different CMC assets, e.g.
+  LUNA), **450 PROVIDER_SYMBOL_COLLISION** (symbol matches multiple
+  provider candidates but the best name-join resolves the asset), **136
+  UNKNOWN_COLLISION** (must be manually resolved), **341 NO_COLLISION**.
+  Venue-side aliases classified separately: **3 MULTIPLIER_ALIAS**
+  (1000PEPE/SHIB/BONK — Binance archive verified) and **3 VENUE_ALIAS**
+  (HL legacy MATIC/RNDR/MKR == POL/RENDER/SKY).
 - Rules for renames (MATIC→POL, RNDR→RENDER, MKR→SKY), wrapped vs native
   (distinct assets), chain migration, 1000x perp aliases (venue symbol,
   not asset rename) — spec in `ALT_DATA_0_IDENTITY_MAPPING_SPEC.md`.
@@ -148,7 +188,8 @@ the 201-500 band is structurally non-tradable (wrapped/stable proxies).**
   delisted swaps; purged HL coins → 500. Gap documented; archive method
   exists → **no blocking flag**.
 - **Rank:** dated snapshots contain fallen/dead coins at true PIT ranks
-  (LUNC/FTT/HOT/XEM/DGB...) that are absent from today's top-250 →
+  (LUNC/FTT/HOT/XEM/DGB... on 2024-06-01; BTS #111, XEM #32, DGB #42,
+  HOT #74, BCH #5 on 2020-06-01) that are absent from today's top-250 →
   **no current-universe dependence** → no `RANK_UNIVERSE_SURVIVORSHIP_RISK`.
 - **Cross-provider consistency (2026-08-20):** BTC −2.4%, ETH −1.9%,
   HOT −2.1% vs CoinPaprika; LUNC +19.7% and FTT −60.3% flagged as
@@ -190,7 +231,7 @@ returns, BTC/ETH beta, perp availability. **GAP:** historical liquidity
 | delisted contracts unrecoverable | NOT VIOLATED (two proven recovery paths) |
 | symbol-only identity joins | NOT VIOLATED (canonical CMC id anchor; symbol joins flagged) |
 | current-only sectors presented as historical | NOT VIOLATED (HISTORICAL_APPROXIMATION vs CURRENT_ONLY labeled) |
-| missing provenance | NOT VIOLATED (89 probes, SHA256, manifest) |
+| missing provenance | NOT VIOLATED (95 probes, SHA256, manifest) |
 
 ## 12. Blockers
 
@@ -206,11 +247,54 @@ returns, BTC/ETH beta, perp availability. **GAP:** historical liquidity
 
 ## 13. Artifacts
 
-See `ALT_DATA_0_PREREGISTRATION.md` for the fixed list. All 17 required
-artifacts produced; raw probes under `probes/raw/` (89 samples + 232 HL
-funding files); scripts under `scripts/`; tests under `tests/`.
+See `ALT_DATA_0_PREREGISTRATION.md` for the fixed list. All 18 required
+artifacts produced; raw probes under `probes/raw/` (95 samples + 232 HL
+funding files); scripts under `scripts/`; tests under `tests/`; repair
+artifacts under `../data_0_1/`.
 
 ## 14. Next checkpoint
 
 `CRYPTO-ALT-DATA-1-CANONICAL-POINT-IN-TIME-UNIVERSE-AND-MULTISCALE-FEATURE-PANEL`
 — NOT started in this run.
+
+## 15. DATA-0.1 truth-repair appendix
+
+Repair checkpoint: `CRYPTO-ALT-DATA-0.1-FOUNDATION-TRUTH-REPAIR`.
+Full detail in `../data_0_1/ALT_DATA_0_1_REPAIR_REPORT.md`.
+
+1. **Coverage denominators corrected** — rank-band coverage now counts
+   UNIQUE PIT ASSETS per date (10/15/25/50/100/100/200 per date; band
+   sums == 500, test-verified). Previously denominators counted
+   asset×venue rows (4× inflation).
+2. **Coverage claims recomputed** — the old "≈65-80%" estimate is
+   superseded by exact unique-asset percentages (section 4).
+3. **Eligibility prototype regenerated** — canonical 23-column schema
+   (listing/delisting timestamps + authorities, per-dimension data flags,
+   liquidity evidence status); 10,000 rows, non-empty, no duplicate
+   (date, cmc_id, venue, instrument) — test-verified. (Note: the
+   previously committed file was in fact non-empty at 1.9MB / 10,001
+   lines; it was regenerated to the canonical schema and terminology.)
+4. **Liquidity truth separated** — `CONTRACT_EXISTENCE_ELIGIBLE` /
+   `CONTRACT_MATURITY_ELIGIBLE` / `HISTORICAL_DATA_ELIGIBLE` /
+   `HISTORICAL_LIQUIDITY_VERIFIED`; terminal status
+   `ELIGIBLE_EX_LIQUIDITY`; `FULLY_ELIGIBLE` removed.
+5. **Historical liquidity path documented** —
+   `data_0_1/ALT_DATA_0_1_HISTORICAL_LIQUIDITY_PATH.md`; no L2 history
+   exists in the free stack; volume proxies (Binance archive, HL candle
+   volume) usable in DATA-1 under a preregistered rule.
+6. **CMC authority relabeled** — `PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT`
+   with OFFICIAL_DOCUMENTATION=NO/UNVERIFIED, STABILITY_RISK=INTERNAL_ENDPOINT,
+   TOS_REVIEW_REQUIRED_FOR_LONG_TERM_OPERATION=YES (registry + consensus
+   matrix updated).
+7. **Earliest verified rank date** — empirically tested 2022-06-01,
+   2021-06-01, 2020-06-01 (all 200/500 rows). Earliest verified = **2020-06-01**;
+   "any date supported" claim removed (deeper history UNVERIFIED).
+8. **Identity quality audit** — ticker-reuse flags separated into
+   TRUE_TICKER_REUSE (22) / PROVIDER_SYMBOL_COLLISION (450) /
+   UNKNOWN_COLLISION (136) / NO_COLLISION (341) + venue-side
+   MULTIPLIER_ALIAS / VENUE_ALIAS classes.
+9. **Decision recomputed** — all repair criteria satisfied;
+   `PASS_ALT_POINT_IN_TIME_UNIVERSE_FOUNDATION` restored with repair
+   evidence (see `ALT_DATA_0_1_DECISION.json`); residual limitations
+   (geo-blocks, free-tier cross-check gap, HL purged coins, historical
+   liquidity unverified) documented and non-blocking.

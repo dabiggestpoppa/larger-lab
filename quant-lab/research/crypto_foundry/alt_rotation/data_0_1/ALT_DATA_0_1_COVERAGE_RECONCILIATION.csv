@@ -1,0 +1,8 @@
+band,old_denominator_venue_rows,new_denominator_unique_assets,old_unique_any_perp_numerator,new_any_perp_hl_or_okx,any_perp_pct_of_unique,mature_30d_hl_or_okx,mature_30d_pct_of_unique,hl_eligible_ex_liquidity,hl_ex_pct_of_unique,okx_maturity_eligible,okx_mat_pct_of_unique
+1-10,200,50,45,45,90.0,44,88.0,39,78.0,44,88.0
+11-25,300,75,60,60,80.0,54,72.0,47,62.7,53,70.7
+26-50,500,125,104,104,83.2,93,74.4,74,59.2,78,62.4
+51-100,1000,250,189,189,75.6,169,67.6,135,54.0,145,58.0
+101-200,2000,500,298,298,59.6,268,53.6,152,30.4,249,49.8
+201-300,2000,500,89,89,17.8,72,14.4,40,8.0,58,11.6
+301-500,4000,1000,263,263,26.3,192,19.2,96,9.6,161,16.1

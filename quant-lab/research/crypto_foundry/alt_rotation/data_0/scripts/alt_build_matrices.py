@@ -34,10 +34,14 @@ CAPABILITIES = ["historical rank", "historical market cap",
 # capability -> {source -> (status, evidence_note)}
 MATRIX: dict[str, dict[str, tuple[str, str]]] = {
     "historical rank": {
-        "CoinMarketCap": ("PRIMARY_VERIFIED",
+        "CoinMarketCap": ("PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
                           "internal data-api listings/historical returns PIT "
-                          "ranked snapshots; 500 rows verified for 5 dates; "
-                          "web-only, no key; deep pagination untested"),
+                          "ranked snapshots; 500 rows verified for 8 dates "
+                          "(2020-06-01..2026-08-20); web-only, no key; "
+                          "OFFICIAL_DOCUMENTATION=NO/UNVERIFIED; "
+                          "STABILITY_RISK=INTERNAL_ENDPOINT; "
+                          "TOS_REVIEW_REQUIRED_FOR_LONG_TERM_OPERATION=YES; "
+                          "deeper pagination untested"),
         "CoinPaprika": ("PARTIAL",
                         "free plan: 1-year rolling per-coin daily window, NO "
                         "rank in historical rows; deep history PAID (402)"),
@@ -53,9 +57,11 @@ MATRIX: dict[str, dict[str, tuple[str, str]]] = {
         "Nomics": ("ARCHIVE_ONLY", "defunct; not operational"),
     },
     "historical market cap": {
-        "CoinMarketCap": ("PRIMARY_VERIFIED",
+        "CoinMarketCap": ("PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
                           "snapshot quotes.marketCap verified vs known "
-                          "2024-06-01 values (BTC 1.334T)"),
+                          "2024-06-01 (BTC 1.334T) and 2020-06-01 (BTC "
+                          "186.99B) values; internal web endpoint, not an "
+                          "officially documented API"),
         "CoinPaprika": ("PARTIAL", "1yr free window; deep PAID"),
         "CoinGecko": ("PARTIAL", "365d cap; per-coin market_chart"),
         "DexScreener": ("UNUSABLE", "FDV current only; unreachable from env"),
@@ -67,8 +73,10 @@ MATRIX: dict[str, dict[str, tuple[str, str]]] = {
         "Nomics": ("ARCHIVE_ONLY", "defunct"),
     },
     "historical volume": {
-        "CoinMarketCap": ("PRIMARY_VERIFIED",
-                          "snapshot quotes.volume24h at snapshot date"),
+        "CoinMarketCap": ("PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
+                          "snapshot quotes.volume24h at snapshot date; "
+                          "internal web endpoint, not an officially "
+                          "documented API"),
         "CoinPaprika": ("PARTIAL", "volume_24h in 1yr window"),
         "CoinGecko": ("PARTIAL", "total_volumes in 365d window"),
         "DexScreener": ("CURRENT_ONLY", "24h volume current; no history"),
@@ -80,9 +88,10 @@ MATRIX: dict[str, dict[str, tuple[str, str]]] = {
         "Nomics": ("ARCHIVE_ONLY", ""),
     },
     "stable ID": {
-        "CoinMarketCap": ("PRIMARY_VERIFIED",
+        "CoinMarketCap": ("PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
                           "id + slug stable across snapshots; renames keep "
-                          "id (LUNA/LUNC both present)"),
+                          "id (LUNA/LUNC both present); internal web "
+                          "endpoint"),
         "CoinPaprika": ("SECONDARY_VERIFIED",
                         "slug id; renames handled (luna-terra symbol=LUNC)"),
         "CoinGecko": ("SECONDARY_VERIFIED", "id + platforms; registry incl. "
@@ -317,17 +326,28 @@ FREE_PAID = [
      "NOT an operational dependency"),
 ]
 
-# authority rows: provider, capability, class, evidence
+# authority rows: provider, capability, class, evidence,
+# official_documentation, api_key_required, stability_risk, tos_review
 AUTHORITY = [
-    ("CoinMarketCap", "PIT ranked snapshot", "PRIMARY_VERIFIED",
+    ("CoinMarketCap", "PIT ranked snapshot",
+     "PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
      "cmc_dataapi_listings_historical_20240601*: 100 rows probe then "
-     "cmc_snapshot_*_top500.json (5 dates x 500 rows); BTC price 67706.94 / "
-     "mcap 1.334T matches 2024-06-01 history"),
-    ("CoinMarketCap", "PIT rank depth", "PRIMARY_VERIFIED",
-     "limit=500 honored (500 rows per snapshot); deeper pagination untested"),
+     "cmc_snapshot_*_top500.json (8 dates x 500 rows, 2020-06-01.."
+     "2026-08-20); BTC price 67706.94 / mcap 1.334T matches 2024-06-01 "
+     "history; BTC 10167.27 / 186.99B matches 2020-06-01 history",
+     "NO_UNVERIFIED", "NO", "INTERNAL_ENDPOINT",
+     "YES_FOR_LONG_TERM_OPERATION"),
+    ("CoinMarketCap", "PIT rank depth",
+     "PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
+     "limit=500 honored (500 rows per snapshot, 8 dates); deeper pagination "
+     "untested",
+     "NO_UNVERIFIED", "NO", "INTERNAL_ENDPOINT",
+     "YES_FOR_LONG_TERM_OPERATION"),
     ("CoinMarketCap", "tags/sector", "HISTORICAL_APPROXIMATION",
      "cmc_tags_drift_test.json: BTC tags 2024=30 vs 2026=37 — date-varying "
-     "but taxonomy drift unverified"),
+     "but taxonomy drift unverified",
+     "NO_UNVERIFIED", "NO", "INTERNAL_ENDPOINT",
+     "YES_FOR_LONG_TERM_OPERATION"),
     ("CoinMarketCap", "official API", "PAID_REQUIRED",
      "pro-api listings/historical without key -> 401 error 1002 'API key "
      "missing'"),
@@ -471,8 +491,12 @@ def main() -> int:
     with (OUT / "ALT_DATA_0_SOURCE_AUTHORITY_REGISTRY.csv").open(
             "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["provider", "capability", "class", "evidence"])
+        w.writerow(["provider", "capability", "class", "evidence",
+                    "official_documentation", "api_key_required",
+                    "stability_risk", "tos_review_required"])
         for r in AUTHORITY:
+            if len(r) == 4:
+                r = r + ("", "", "", "")
             w.writerow(r)
 
     # multi-horizon
@@ -481,6 +505,10 @@ def main() -> int:
         w = csv.writer(f)
         w.writerow(["source", "feature", "status", "notes"])
         for r in MULTI_HORIZON:
+            if r[0] == "CoinMarketCap data-api":
+                r = list(r)
+                r[3] = r[3] + " (internal web endpoint; TOS review required " \
+                       "for long-term operation)"
             w.writerow(r)
 
     # provenance manifest
@@ -512,10 +540,23 @@ def main() -> int:
                     p.read_bytes()).hexdigest()
             except Exception:  # noqa: BLE001
                 pass
+    # repair-checkpoint artifacts (data_0_1) hashed under the same manifest
+    OUT1 = OUT.parent / "data_0_1"
+    for p in sorted(OUT1.glob("ALT_DATA_0_1_*.csv")) \
+            + sorted(OUT1.glob("ALT_DATA_0_1_*.md")) \
+            + sorted(OUT1.glob("ALT_DATA_0_1_*.json")) \
+            + sorted((OUT1 / "derived").glob("*")):
+        if p.is_file():
+            try:
+                artifacts["data_0_1/" + p.relative_to(OUT1).as_posix()] = \
+                    hashlib.sha256(p.read_bytes()).hexdigest()
+            except Exception:  # noqa: BLE001
+                pass
     manifest = {
         "schema_version": SCHEMA_VERSION,
         "checkpoint": "CRYPTO-ALT-DATA-0-POINT-IN-TIME-RANKING-AND-PERP-"
                       "UNIVERSE-REALITY-AUDIT",
+        "repair_checkpoint": "CRYPTO-ALT-DATA-0.1-FOUNDATION-TRUTH-REPAIR",
         "generated_at": "deterministic",
         "probe_count": len(probes),
         "probes": probes,

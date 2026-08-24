@@ -1,31 +1,37 @@
 {
   "artifact_sha256": {
-    "ALT_DATA_0_COVERAGE_BY_RANK_BAND.csv": "5b8d929deb0a979e17f769809e284ee347d8ebf7c5b5e3aeef14521713192042",
-    "ALT_DATA_0_DECISION.json": "f93326c8113e0bb7cfd0c652cb82d37d444f9279c7dcf239fc27e38f3615d81f",
+    "ALT_DATA_0_COVERAGE_BY_RANK_BAND.csv": "7039594193bc5dd4d03990db6d76b5eb6e76430c437e1de31a559af0fad5a22e",
+    "ALT_DATA_0_DECISION.json": "144d5753103adb26e3a98c98588f489d7d4fffbe802f6e85c6d17aa947c94d01",
     "ALT_DATA_0_DELISTING_SURVIVORSHIP_AUDIT.md": "2d51502969809d103aef3023afa9b14bc3e2d1d43610d78c501a14de7c80d91e",
     "ALT_DATA_0_FREE_VS_PAID_MATRIX.csv": "7b638ff37d972e943a67c720c0dd6e5c484a80a5223f1716448e8d25ebdcb9ee",
     "ALT_DATA_0_HISTORICAL_RANK_AUDIT.md": "1fc120abd28e4dfe6be738d8a9dccd2604e59e598398a6106a735ee3ec60c522",
     "ALT_DATA_0_IDENTITY_MAPPING_SPEC.md": "f20da8b895662a22743029a4285632c3e480618d7a6f5a083d8db1d71321fc70",
-    "ALT_DATA_0_MULTI_HORIZON_READINESS.csv": "aac1eab9a13739edacf37810e7a2185b247ad2e7a460ef6ce71b67839da616d3",
-    "ALT_DATA_0_PERP_ELIGIBILITY_PROTOTYPE.csv": "cf6f246141f0a97be9830aad6b19d18be2a2c406001a7547aab0ba11355f67d0",
+    "ALT_DATA_0_MULTI_HORIZON_READINESS.csv": "f348a993ec67a5f938b3b7c50faf4bc624f1df27ea36c3bc04bbf9d710c3925b",
+    "ALT_DATA_0_PERP_ELIGIBILITY_PROTOTYPE.csv": "0f8c95531f19789d7201ac8d7236c8c43e7d9af610bfa41bf96a63782482cafb",
     "ALT_DATA_0_PERP_LISTING_AUDIT.md": "61095e452e9c3aad3d0f67fc4060f8d08e3b8f158499058df5328a7930ef8e58",
     "ALT_DATA_0_POINT_IN_TIME_RANK_PROTOTYPE.csv": "15d1e4d536fa09e8a9d216c98bba956202b8f4ccb1cdd3f72f814c890bd22e39",
     "ALT_DATA_0_PREREGISTRATION.md": "46b5174ee38a90abfecfef522187a9aa1082f1f84aec17e72c13a39be811f811",
-    "ALT_DATA_0_PROVENANCE_MANIFEST.json": "0886618378bfafb4b2125665b172ff109d9a6ede121a7b2d64cf638eb20ca806",
+    "ALT_DATA_0_PROVENANCE_MANIFEST.json": "16d7b4e5a3501d96488094dc02bc458eceeeb774acea5d1d619e6a96cdc3218a",
     "ALT_DATA_0_RANK_SURVIVORSHIP_AUDIT.md": "304582cb4580d4f9d628f082de985e64c30e4fc9eec4078997f0379de37b0116",
-    "ALT_DATA_0_REPORT.md": "f5bc58a6221fb3230636d2e91d61b61a8d8a985f90053862dc0c3ee32e7201e9",
+    "ALT_DATA_0_REPORT.md": "b941c1a0284bfc1668302ea3f6708c4ced50ae3e7f3603917a3f8bc9d6bb7678",
     "ALT_DATA_0_SECTOR_MAPPING_AUDIT.md": "7347e773dcecae654147dc4e8c583b6e7d17326efcec194008bf1d6440c4e9a8",
-    "ALT_DATA_0_SOURCE_AUTHORITY_REGISTRY.csv": "48309d729a0c6a46fd4219387d0da7a008d64698437968c19a29fa5f79c3fbe1",
-    "ALT_DATA_0_SOURCE_CONSENSUS_MATRIX.csv": "b80f8ddde1b2380e1eaeaf0fd58cf919046e72bea10926f2d862cc1c18121680",
+    "ALT_DATA_0_SOURCE_AUTHORITY_REGISTRY.csv": "a1726132672231733768829b3d5ca9b1cba5f6f90c37fb3756b687c1f48abde2",
+    "ALT_DATA_0_SOURCE_CONSENSUS_MATRIX.csv": "8d1c533463081a019d217cf3c845d5a378f08bc13a59a789c441571b36e32272",
     "ALT_DATA_0_TOPOLOGY_READINESS.md": "69a7f130b14ac42f9a353c3564931c087e1881c4ab50a7fbb37a78059061df92",
+    "data_0_1/ALT_DATA_0_1_COVERAGE_RECONCILIATION.csv": "be55d67becdf82a048a465a654e5e0836d71aa2f8442975cb8977b35fb916c53",
+    "data_0_1/ALT_DATA_0_1_DECISION.json": "b7f843fedc9fccde9d750b377447c6b067a9c531310deb102c1af27063a1e14d",
+    "data_0_1/ALT_DATA_0_1_HISTORICAL_LIQUIDITY_PATH.md": "5e30334b965c552bb4ddcc71e8700ea4b286ac8dbf1344a60490a955e20531e0",
+    "data_0_1/ALT_DATA_0_1_IDENTITY_COLLISION_AUDIT.csv": "3941bc28cf7121bd58d550caee731614a916a8dc8e1f7a4ba610973339ad8307",
+    "data_0_1/ALT_DATA_0_1_REPAIR_REPORT.md": "40f47aac2ba69ef297e741f9ab39d18e519fc686279db07b51003d76a7fe728f",
+    "data_0_1/derived/repair_summary.json": "a2248c36e3423280d84b5e7abc673e91476ff85a8fb89352a289fda1f6d6728f",
     "derived/rank_crosscheck.csv": "6fdaf43a7766fccd43866c2c4599ab31d7a2a64e037c1851e67854930adebc9c",
     "derived/summary_counts.json": "50b8dab1a46b3606b777e9b2ffabc48f65046316ee7c30992cec65aaa87fc71b",
     "identity/canonical_identity_map.csv": "97192016b7f69fd0c39ef05732aa1e280c963be821120185cb35b11a96a3d4bc"
   },
   "checkpoint": "CRYPTO-ALT-DATA-0-POINT-IN-TIME-RANKING-AND-PERP-UNIVERSE-REALITY-AUDIT",
   "generated_at": "deterministic",
-  "manifest_sha256": "88bd3c54094462a24efdc8b2facf336028dd0fbc9987ef1b59a5a2d74cc14e1b",
-  "probe_count": 92,
+  "manifest_sha256": "4019d1480eeb7361b9b59261ccfeece3cdff834b1cc7d9be0acc677d5c8d48b0",
+  "probe_count": 95,
   "probes": [
     {
       "access_class": "",
@@ -474,6 +480,48 @@
       "row_count": 1,
       "sha256": "d33e544464b901efc55d764a75cefd1863fb6d55052b60888c8c54fd57ce271e",
       "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/spotlight"
+    },
+    {
+      "access_class": "WEB_ONLY",
+      "bytes": 275355,
+      "error": null,
+      "http_status": 200,
+      "known_limitations": "internal web endpoint; TOS review required for long-term operation",
+      "notes": "earliest-history probe for 2020-06-01",
+      "ok": true,
+      "probe": "cmc_snapshot_20200601_top500",
+      "retrieved_at": "2026-08-24T15:03:28+00:00",
+      "row_count": null,
+      "sha256": "7bc0e479cd7b897f37da2b0f140e8ee1593b7aca23743a99d1d2a0cdae69b581",
+      "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listings/historical?date=2020-06-01&start=1&limit=500&convertId=2781"
+    },
+    {
+      "access_class": "WEB_ONLY",
+      "bytes": 331073,
+      "error": null,
+      "http_status": 200,
+      "known_limitations": "internal web endpoint; TOS review required for long-term operation",
+      "notes": "earliest-history probe for 2021-06-01",
+      "ok": true,
+      "probe": "cmc_snapshot_20210601_top500",
+      "retrieved_at": "2026-08-24T15:03:26+00:00",
+      "row_count": null,
+      "sha256": "242d6a06bf018d66e49e11e6711ac4744f82c511033b9cecfd42334b0610e71d",
+      "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listings/historical?date=2021-06-01&start=1&limit=500&convertId=2781"
+    },
+    {
+      "access_class": "WEB_ONLY",
+      "bytes": 342108,
+      "error": null,
+      "http_status": 200,
+      "known_limitations": "internal web endpoint; TOS review required for long-term operation",
+      "notes": "earliest-history probe for 2022-06-01",
+      "ok": true,
+      "probe": "cmc_snapshot_20220601_top500",
+      "retrieved_at": "2026-08-24T15:03:25+00:00",
+      "row_count": null,
+      "sha256": "b3c4055771eb7aa82451020739f4fcbb0f2e9e23d30dda489b23b4fe68e7fa08",
+      "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listings/historical?date=2022-06-01&start=1&limit=500&convertId=2781"
     },
     {
       "access_class": "WEB_ONLY",
@@ -1316,5 +1364,6 @@
       "url": "https://www.okx.com/api/v5/public/instruments"
     }
   ],
+  "repair_checkpoint": "CRYPTO-ALT-DATA-0.1-FOUNDATION-TRUTH-REPAIR",
   "schema_version": "1.0.0"
 }
