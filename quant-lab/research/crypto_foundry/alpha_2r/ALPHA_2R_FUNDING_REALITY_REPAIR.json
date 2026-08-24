@@ -1,0 +1,22 @@
+{
+  "old_contract_id": "ALPHA1_1_FUNDING_ACCOUNTING_V1",
+  "old_sign_rule": "LONG receives when funding>0",
+  "old_frequency_rule": "00,08,16 UTC (8h)",
+  "correct_sign_rule": "LONG pays when funding>0 (Hyperliquid: positive funding = long pays short)",
+  "correct_frequency_rule": "hourly settlements using actual Hyperliquid funding observations",
+  "official_source": "https://hyperliquid.gitbook.io/hyperliquid-docs/trading/funding",
+  "source_retrieved_at": "2026-08-24T12:00:00Z",
+  "quoted_convention": "If the contract's price is higher than the oracle price, the premium and hence the funding rate will be positive, and the long position will pay",
+  "implementation_rule": "funding_pnl = -funding_rate * notional (for LONG); funding_pnl = +funding_rate * notional (for SHORT)",
+  "reason": "OBJECTIVE_VENUE_REALITY_ERROR",
+  "strategy_rules_changed": false,
+  "old_results_quarantined": true,
+  "funding_pnl_formula": {
+    "long": "funding_pnl = sum(-rate_i * 1h * notional) for each hourly observation crossed",
+    "short": "funding_pnl = sum(+rate_i * 1h * notional) for each hourly observation crossed"
+  },
+  "boundary_semantics": {
+    "entry_at_funding_timestamp": "NOT accrued (matches old contract intent)",
+    "exit_at_funding_timestamp": "IS accrued (matches old contract intent)"
+  }
+}
