@@ -1,0 +1,13 @@
+rule,count,status,notes
+F1,0,DEFINITIVE,no strategies with trade_count < 20
+F2,2,DEFINITIVE,flagged not auto-falsify: S005 S006
+F3,11,DEFINITIVE,S002 S003 correctly NOT F3 (net_PF > 1.0)
+F4,5,DEFINITIVE,S001 S005 S006 S008 S009
+F5,0,DEFINITIVE,no cost fragility triggered
+F6,7,DEFINITIVE,S002 S003 S005 S007 S011 S012 S013
+F7,8,DEFINITIVE,S002 S003 S005 S006 S007 S011 S012 S013
+F8,AMBIGUOUS,AMBIGUOUS_NON_DECISIVE,frozen contract wording cannot uniquely determine Boolean trigger; retained as descriptive only
+F9,0,DEFINITIVE,no future leakage detected
+F10,4,DEFINITIVE,S001 S003 S011 S012
+F11,0,DEFINITIVE,no causality violations
+F12,1,DEFINITIVE,S001

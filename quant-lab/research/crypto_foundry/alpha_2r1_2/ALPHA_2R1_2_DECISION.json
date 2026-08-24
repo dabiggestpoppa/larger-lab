@@ -1,0 +1,34 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-2R1.2-F8-TRUTH-AND-RESOURCE-ARCHITECTURE-FREEZE",
+  "base_sha": "4a903a7c3d6e5ad357e3ff9f95945462f5d80c23",
+  "part_a_decision": "PASS_F8_EVIDENCE_TRUTH_REPAIR",
+  "part_b_decision": "PASS_CRYPTO_RESOURCE_ARCHITECTURE_FREEZE",
+  "overall_decision": "PASS_ALPHA2_EVIDENCE_AND_RESOURCE_ARCHITECTURE_FREEZE",
+  "timestamp": "2026-08-24T21:00:00Z",
+  "sealed_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "registry_hash_verified": true,
+  "pnl_mutated": false,
+  "gen1_survivors": 0,
+  "gen1_falsified": 13,
+  "f8_semantic_audit": {
+    "frozen_text": "control_net_PF >= strategy_net_PF (CI overlap)",
+    "method": "paired_bootstrap_difference",
+    "ambiguity": "parenthetical (CI overlap) could be conjunction gate, method descriptor, or primary condition",
+    "canonical_status": "AMBIGUOUS_NON_DECISIVE",
+    "pf_comparison_count": 7,
+    "pf_comparison_triggered": ["S005", "S006", "S008", "S009", "S010", "S011", "S012"],
+    "old_script_missed": ["S006", "S008", "S009", "S010"],
+    "old_script_count": 3,
+    "corrected_pf_only_count": 7,
+    "impact_on_classifications": "NONE — all 13 strategies independently falsified by other rules"
+  },
+  "s002_classification": "POSITIVE_NET_BUT_STRUCTURALLY_FALSIFIED",
+  "s003_classification": "POSITIVE_NET_BUT_STRUCTURALLY_FALSIFIED",
+  "resource_architecture": {
+    "defillama": "DOCUMENTED",
+    "boros": "DOCUMENTED",
+    "perpdexlist": "DOCUMENTED",
+    "derivatives_monkey": "DOCUMENTED"
+  },
+  "next_checkpoint": "CRYPTO-ALPHA-3-FAILURE-ANATOMY-AND-NEW-HYPOTHESES"
+}

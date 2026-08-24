@@ -1,0 +1,69 @@
+{
+  "registry_id": "CRYPTO_RESOURCE_REGISTRY_V1",
+  "frozen_at": "2026-08-24T21:00:00Z",
+  "description": "Registry of external data resources for crypto quant research. Authority hierarchy preserved.",
+  "authority_hierarchy": {
+    "LEVEL_1": "NATIVE_VENUE_PROTOCOL_API — canonical venue-specific truth",
+    "LEVEL_2": "HIGH_QUALITY_AGGREGATED_FUNDAMENTAL — e.g. DefiLlama",
+    "LEVEL_3": "SPECIALIZED_ANALYTICS_MARKET_DISCOVERY — e.g. Derivatives Monkey, PERPDEXLIST",
+    "LEVEL_4": "PRIOR_ART_IDEAS_SOCIAL_RESEARCH_DISCOVERY"
+  },
+  "resources": [
+    {
+      "resource": "DefiLlama",
+      "category": "ONCHAIN_DEFII_CAPITAL_FLOW",
+      "authority_class": "LEVEL_2",
+      "canonical_for": "TVL, stablecoin supply, DEX volume, yield pools, fees, revenue, token prices",
+      "not_canonical_for": "execution price, funding, bid/ask, native OI, orderbook state",
+      "access_method": "REST API (api.llama.fi)",
+      "historical_depth_status": "GOOD — TVL/stablecoin data from ~2019, DEX volume from ~2020",
+      "API_status": "FREE_TIER_AVAILABLE",
+      "future_lane": "CRYPTO_CAPITAL_FLOW",
+      "priority": 1,
+      "limitations": "Aggregated data may lag native venues. Rate limits on free tier.",
+      "verification_required": "Cross-check TVL against native dashboards, stablecoin supply against issuers"
+    },
+    {
+      "resource": "Boros by Pendle",
+      "category": "FUNDING_RATES_FIXED_FLOATING_YIELD",
+      "authority_class": "LEVEL_1",
+      "canonical_for": "Yield Units, implied funding APR, fixed-vs-floating funding",
+      "not_canonical_for": "cross-venue price truth (use native venue APIs)",
+      "access_method": "Protocol API / RPC (wallet connection for trading)",
+      "historical_depth_status": "LIMITED — relatively new protocol",
+      "API_status": "PROTOCOL_LIVE",
+      "future_lane": "CRYPTO_RATES",
+      "priority": 2,
+      "limitations": "New protocol, thin liquidity, smart contract risk, limited history",
+      "verification_required": "Verify YU settlement vs actual funding, cross-check implied vs native venue funding"
+    },
+    {
+      "resource": "PERPDEXLIST",
+      "category": "PERP_VENUE_DISCOVERY_CROSS_VENUE",
+      "authority_class": "LEVEL_3",
+      "canonical_for": "venue discovery, market overlap, fee comparison, funding screening",
+      "not_canonical_for": "execution truth, price, depth, contract metadata",
+      "access_method": "Web / API",
+      "historical_depth_status": "LIMITED — primarily current-state",
+      "API_status": "PUBLIC",
+      "future_lane": "GENERAL_CROSS_VENUE",
+      "priority": 5,
+      "limitations": "Data may be stale, not all venues represented, liquidity data unreliable",
+      "verification_required": "Every venue verified via native API before use"
+    },
+    {
+      "resource": "Derivatives Monkey",
+      "category": "OPTIONS_ANALYTICS_CROSS_VENUE_VOL",
+      "authority_class": "LEVEL_3",
+      "canonical_for": "options chain discovery, IV screening, cross-venue vol comparison, flow",
+      "not_canonical_for": "options execution truth (use Deribit/native APIs)",
+      "access_method": "Web / API",
+      "historical_depth_status": "VARIABLE — depends on venue and asset",
+      "API_status": "REGISTRATION_MAY_BE_REQUIRED",
+      "future_lane": "CRYPTO_OPTIONS",
+      "priority": 4,
+      "limitations": "Aggregated data lags native, not all venues fully represented, options less liquid than perps",
+      "verification_required": "Cross-check IV against native Deribit API, verify chain data against exchange"
+    }
+  ]
+}
