@@ -1,0 +1,43 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-2-PREREGISTERED-BACKTEST-AND-FALSIFICATION",
+  "parent": "CRYPTO-ALPHA-1.1-CONTRACT-INTEGRITY-AND-BACKTEST-READINESS-SEAL",
+  "parent_sha": "5a6a4407b042b0ca6013a1c71e0241c6fefae433",
+  "branch_head": "47c9d09f077e387b99740b0d7236f1e7fb3818cf",
+  "registry_hash_verified": true,
+  "sealed_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "decision": "PASS_ALPHA2_FALSIFICATION_COMPLETE",
+  "timestamp": "2026-08-24T15:12:28.149390+00:00",
+  "pnl_observed": true,
+  "data_type": "DEVELOPMENT_RESULT",
+  "strategies_run": 13,
+  "controls_run": 6,
+  "total_raw_trades": 3016,
+  "total_control_trades": 2727,
+  "total_effective_events": 1160,
+  "results": {
+    "SURVIVES_DEVELOPMENT": 0,
+    "WEAK_DEVELOPMENT": 0,
+    "FALSIFIED": 13,
+    "INSUFFICIENT_EVENTS": 0,
+    "CONTROL_EQUIVALENT": 0,
+    "COST_FRAGILE": 0
+  },
+  "falsification_counts": {
+    "F1": 0,
+    "F2": 2,
+    "F3": 11,
+    "F4": 6,
+    "F5": 0,
+    "F6": 7,
+    "F7": 7,
+    "F8": 0,
+    "F9": 0,
+    "F10": 3,
+    "F11": 0,
+    "F12": 1
+  },
+  "forward_candidates": 0,
+  "engine_integrity": "PASS",
+  "future_perturbation": "PASS",
+  "next_checkpoint": "CRYPTO-ALPHA-3-FAILURE-ANATOMY-AND-NEW-HYPOTHESES"
+}

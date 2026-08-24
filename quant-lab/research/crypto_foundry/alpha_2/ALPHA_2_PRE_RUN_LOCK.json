@@ -1,0 +1,68 @@
+{
+  "lock_id": "ALPHA_2_PRE_RUN_LOCK",
+  "lock_timestamp": "2026-08-24T14:10:32.678710+00:00",
+  "hash_algorithm": "SHA-256",
+  "scientific_parent": "5a6a4407b042b0ca6013a1c71e0241c6fefae433",
+  "branch_head": "47c9d09f077e387b99740b0d7236f1e7fb3818cf",
+  "sealed_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "no_results_seen": true,
+  "artifacts": [
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1/ALPHA_1_STRATEGY_CONTRACTS.json",
+      "sha256": "2b32260ebb98a369c3ff73a8442653a59b685d8fff4098c2ed065925c646a1e6"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1/ALPHA_1_STRATEGY_HYPOTHESIS_REGISTRY.csv",
+      "sha256": "40062de21aebe8dbd4024169b381626cf89db3b8a3b760711d66aea284f2936e"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1/ALPHA_1_CONTROL_REGISTRY.csv",
+      "sha256": "166d7f6bf147b4c3af116944c344ac90ac52f9937262f5b5c65d679625daed07"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1/ALPHA_1_FALSIFICATION_RULES.json",
+      "sha256": "2feaf4584921fb6566feb040b7649ba7b57ad2610a130caa0bb5e938e84d3b3e"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1/ALPHA_1_STRATEGY_REGISTRY_HASH.json",
+      "sha256": "2ad3a7eb57929ccb0390a6d06a85afc72c48da35275fa0e5f4695dc4e07bf5d0"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1/ALPHA_1_DATA_SPLIT_CONTRACT.json",
+      "sha256": "bc5a344ec43ed57f37bb53d6f4ddc1103a6ff0d0b1b1d154dddb62dabada7ea6"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1_1/ALPHA_1_1_THRESHOLD_CONTRACT.json",
+      "sha256": "f7428359f3e4c9f4687ddae6a20a41116fef93389ca932d9fc5a90b645ee6f16"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1_1/ALPHA_1_1_CONTROL_SAMPLING_CONTRACT.json",
+      "sha256": "9b5fb5a3567bb73b4d6f60c5a67ead0535612e5be14745afcfc94bcd610c1c94"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1_1/ALPHA_1_1_EXECUTION_CONTRACT.json",
+      "sha256": "35bb74a70b423ffd5a165818da87e576253e90a3b397ce34f27b0d36a6d08414"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1_1/ALPHA_1_1_FUNDING_ACCOUNTING_CONTRACT.json",
+      "sha256": "04cdd01be873dd87cc34cce83f78b30b31ea2245f8b640114126faf467acbeaf"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1_1/ALPHA_1_1_COST_ACCOUNTING_CONTRACT.json",
+      "sha256": "636cad0b223ca79a9dac1896a4e5cec585aca2d0eccff20b3a8be504f922756c"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1_1/ALPHA_1_1_BACKTEST_CONTRACT.json",
+      "sha256": "0a94a66b408fefaf30d784bc4ee5eb229f7acef11ea36a9a0c88ec057939f2cd"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1_1/ALPHA_1_1_STATE_COVERAGE_MATRIX.csv",
+      "sha256": "71afe7e42fe2b623f8ec1374994165fa014130f61a880a5398e42d490f0440f9"
+    },
+    {
+      "file": "quant-lab/research/crypto_foundry/alpha_1_1/ALPHA_1_1_DECISION.json",
+      "sha256": "499b2789a1d7c497cc9623204a072eed7972ef247a4031f97a275648c9bcd4f3"
+    }
+  ],
+  "registry_hash_verified": true
+}
