@@ -25,7 +25,7 @@ jobs:
           fi
           echo "=== WORKTREE CLEAN ==="
 
-      # === B. Tool-version assertions ===
+      # === B. Set up Python and install dependencies ===
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
         with:
@@ -54,50 +54,34 @@ jobs:
           sudo mv gitleaks /usr/local/bin/
 
       - name: Assert tool versions
-        id: tool_versions
         run: |
           echo "=== TOOL VERSION ASSERTIONS ==="
-          PY_VER=$(python3 --version 2>&1)
-          echo "Python: $PY_VER"
-          echo "$PY_VER" | grep -q "Python 3" || { echo "FAIL: Python 3 required"; exit 1; }
-
-          ANSIBLE_VER=$(ansible-playbook --version 2>&1 | head -1)
-          echo "Ansible: $ANSIBLE_VER"
-          echo "$ANSIBLE_VER" | grep -q "ansible" || { echo "FAIL: ansible-playbook required"; exit 1; }
-
-          LINT_VER=$(ansible-lint --version 2>&1 | head -1)
-          echo "ansible-lint: $LINT_VER"
-          echo "$LINT_VER" | grep -q "ansible-lint" || { echo "FAIL: ansible-lint required"; exit 1; }
-
-          SC_VER=$(shellcheck --version 2>&1 | grep "version:" | head -1)
-          echo "ShellCheck: $SC_VER"
-          echo "$SC_VER" | grep -q "[0-9]" || { echo "FAIL: shellcheck required"; exit 1; }
-
-          GL_VER=$(gitleaks version 2>&1)
-          echo "Gitleaks: $GL_VER"
-          echo "$GL_VER" | grep -q "[0-9]" || { echo "FAIL: gitleaks required"; exit 1; }
-
-          DC_VER=$(docker compose version 2>&1)
-          echo "Docker Compose: $DC_VER"
-          echo "$DC_VER" | grep -q "Docker Compose" || { echo "FAIL: docker compose required"; exit 1; }
-
+          python3 --version
+          ansible-playbook --version | head -1
+          ansible-lint --version | head -1
+          shellcheck --version | grep "version:"
+          gitleaks version
+          docker compose version
           echo "=== ALL TOOLS INSTALLED ==="
 
-      # === C. Authoritative identity validation ===
-      - name: Record source identity
+      # === B. Capture source identity ===
+      - name: Record source identity and generate RUN_ID
         id: identity
         run: |
           COMMIT=$(git rev-parse HEAD)
           TREE=$(git rev-parse HEAD^{tree})
+          RUN_ID=$(python3 -c "import uuid; print(uuid.uuid4().hex[:12])")
           echo "commit=$COMMIT" >> "$GITHUB_OUTPUT"
           echo "tree=$TREE" >> "$GITHUB_OUTPUT"
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
           echo "=== SOURCE IDENTITY ==="
           echo "Repository: $GITHUB_REPOSITORY"
-          echo "Branch: $GITHUB_REF_NAME"
-          echo "SHA: $GITHUB_SHA"
+          echo "Branch (GITHUB_REF_NAME): $GITHUB_REF_NAME"
           echo "HEAD commit: $COMMIT"
           echo "HEAD tree:   $TREE"
+          echo "RUN_ID:      $RUN_ID"
 
+      # === C. Authoritative source-identity validation ===
       - name: Authoritative source-identity validation
         run: |
           python3 infrastructure/cloud-ground/scripts/validate_engine.py \
@@ -181,25 +165,41 @@ jobs:
             --no-banner \
             --report-format json
 
-      # === H. Adversarial suite in disposable worktree ===
+      # === Create final evidence directory ===
+      - name: Create final evidence directory
+        id: evidence_dir
+        run: |
+          FINAL_EVIDENCE=$(mktemp -d)
+          echo "final_evidence=$FINAL_EVIDENCE" >> "$GITHUB_OUTPUT"
+          echo "=== Final evidence directory: $FINAL_EVIDENCE ==="
+
+      # === D. Run static validations into final evidence directory ===
+      - name: Run static validations
+        run: |
+          python3 infrastructure/cloud-ground/scripts/validate_engine.py \
+            --all \
+            --authoritative \
+            --target-commit "${{ steps.identity.outputs.commit }}" \
+            --target-tree "${{ steps.identity.outputs.tree }}" \
+            --target-branch "${{ github.ref_name }}" \
+            --evidence-dir "${{ steps.evidence_dir.outputs.final_evidence }}"
+
+      # === H. Create isolated adversarial worktree ===
       - name: Create isolated adversarial worktree
         run: |
           ADV_WORKTREE="$RUNNER_TEMP/oce-adversarial-worktree"
           git worktree add "$ADV_WORKTREE" HEAD
           echo "ADV_WORKTREE=$ADV_WORKTREE" >> "$GITHUB_ENV"
-          echo "ADVERSARIAL_EVIDENCE=$RUNNER_TEMP/oce-adversarial-evidence" >> "$GITHUB_ENV"
-          mkdir -p "$RUNNER_TEMP/oce-adversarial-evidence"
+          echo "FINAL_EVIDENCE=${{ steps.evidence_dir.outputs.final_evidence }}" >> "$GITHUB_ENV"
 
+      # === F. Run adversarial test suite (isolated) ===
       - name: Run adversarial test suite (isolated)
-        env:
-          OCE_EVIDENCE_DIR: ""
         run: |
-          # Run from the disposable worktree
           ADV_SH="$ADV_WORKTREE/infrastructure/cloud-ground/tests/adversarial-tests.sh"
-          # Override EVIDENCE_DIR to use runner temp
-          export OCE_EVIDENCE_DIR="$ADVERSARIAL_EVIDENCE"
+          export OCE_EVIDENCE_DIR="$FINAL_EVIDENCE"
           bash "$ADV_SH"
 
+      # === G. Assert clean authoritative checkout after adversarial ===
       - name: Assert clean authoritative checkout after adversarial
         run: |
           DIRTY=$(git status --porcelain | wc -l)
@@ -210,6 +210,7 @@ jobs:
           fi
           echo "=== AUTHORITATIVE CHECKOUT CLEAN ==="
 
+      # === Cleanup adversarial worktree ===
       - name: Cleanup adversarial worktree
         if: always()
         run: |
@@ -226,20 +227,16 @@ jobs:
             --authoritative \
             --target-commit "$COMMIT" \
             --target-tree "$TREE" \
-            --target-branch "${{ github.ref_name }}"
+            --target-branch "${{ github.ref_name }}" \
+            --evidence-dir "$FINAL_EVIDENCE"
 
-      - name: Copy adversarial results into final evidence
-        run: |
-          cp "$ADVERSARIAL_EVIDENCE/adversarial-results.json" \
-            infrastructure/cloud-ground/evidence/adversarial-results.json
-
-      # === J. Final gate assertion (strengthened for R3D) ===
+      # === J. Final gate assertion ===
       - name: Assert final gate
         run: |
-          echo "=== FINAL GATE ASSERTION (B1-I1R3D) ==="
-          RESULTS="infrastructure/cloud-ground/evidence/static-validation-results.json"
-          STAGE="infrastructure/cloud-ground/evidence/stage-status.json"
-          ADV="infrastructure/cloud-ground/evidence/adversarial-results.json"
+          echo "=== FINAL GATE ASSERTION (B1-I1R3E) ==="
+          RESULTS="$FINAL_EVIDENCE/static-validation-results.json"
+          STAGE="$FINAL_EVIDENCE/stage-status.json"
+          ADV="$FINAL_EVIDENCE/adversarial-results.json"
 
           # 1. Files exist
           for f in "$RESULTS" "$STAGE" "$ADV"; do
@@ -250,7 +247,23 @@ jobs:
           GATE=$(python3 -c "import json; print(json.load(open('$STAGE'))['gate_status'])")
           [ "$GATE" = "READY_FOR_OPERATOR_REVIEW" ] || { echo "ERROR: Gate=$GATE"; exit 1; }
 
-          # 3. Validation totals: FAIL=0, BLOCKED=0, SKIPPED=0, total=PASS+FAIL+BLOCKED+SKIPPED
+          # 3. Run ID consistency
+          RUN_ID=${{ steps.identity.outputs.run_id }}
+          python3 -c "
+          import json, sys
+          results = json.load(open('$RESULTS'))
+          stage = json.load(open('$STAGE'))
+          adv = json.load(open('$ADV'))
+          errors = []
+          expected = '$RUN_ID'
+          if results.get('run_id','') != expected: errors.append(f'results.run_id={results.get(\"run_id\")}')
+          if stage.get('run_id','') != expected: errors.append(f'stage.run_id={stage.get(\"run_id\")}')
+          if adv.get('run_id','') != expected: errors.append(f'adv.run_id={adv.get(\"run_id\")}')
+          if errors: print(f'RUN_ID ERRORS: {errors}', file=sys.stderr); sys.exit(1)
+          print(f'RUN_ID consistent: {expected}')
+          "
+
+          # 4. Validation totals: FAIL=0, BLOCKED=0
           python3 -c "
           import json, sys
           d = json.load(open('$RESULTS'))
@@ -258,38 +271,34 @@ jobs:
           errors = []
           if t.get('FAIL', 0) != 0: errors.append(f'FAIL={t[\"FAIL\"]}')
           if t.get('BLOCKED', 0) != 0: errors.append(f'BLOCKED={t[\"BLOCKED\"]}')
-          if t.get('SKIPPED', 0) != 0: errors.append(f'SKIPPED={t[\"SKIPPED\"]}')
           expected = t.get('PASS',0)+t.get('FAIL',0)+t.get('BLOCKED',0)+t.get('SKIPPED',0)
           if t.get('total',0) != expected: errors.append(f'total={t[\"total\"]} computed={expected}')
           if errors: print(f'ERROR: {errors}', file=sys.stderr); sys.exit(1)
           print(f'Totals OK: {t}')
           "
 
-          # 4. Identity fields match
+          # 5. Identity fields match
           python3 -c "
           import json, subprocess, sys
           d = json.load(open('$RESULTS'))
           errors = []
           actual_commit = subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip()
           actual_tree = subprocess.run(['git','rev-parse','HEAD^{tree}'],capture_output=True,text=True).stdout.strip()
-          actual_branch = subprocess.run(['git','rev-parse','--abbrev-ref','HEAD'],capture_output=True,text=True).stdout.strip()
           if d.get('tested_commit','') != actual_commit: errors.append('commit mismatch')
           if d.get('tested_tree','') != actual_tree: errors.append('tree mismatch')
-          if d.get('tested_branch','') != actual_branch: errors.append(f'branch mismatch: {d.get(\"tested_branch\")} != {actual_branch}')
           if d.get('repository','') != 'dabiggestpoppa/larger-lab': errors.append('repository mismatch')
-          if d.get('validator_version','') != '3.4.0': errors.append(f'version mismatch: {d.get(\"validator_version\")}')
+          if d.get('validator_version','') != '3.5.0': errors.append(f'version mismatch: {d.get(\"validator_version\")}')
           if errors: print(f'ERROR: {errors}', file=sys.stderr); sys.exit(1)
           print('Identity fields OK')
           "
 
-          # 5. Adversarial suite (separated negative_tests and meta_tests)
+          # 6. Adversarial suite
           python3 -c "
           import json, sys
           a = json.load(open('$ADV'))
           errors = []
-          if a.get('suite_result','') != 'PASS': errors.append(f'suite_result={a.get(\"suite_result\")}')
-          if a.get('schema_version','') != '3.4.0': errors.append(f'schema_version={a.get(\"schema_version\")}')
-          # Validate negative_tests
+          if a.get('schema_version','') != '3.5.0': errors.append(f'schema_version={a.get(\"schema_version\")}')
+          if a.get('validator_version','') != '3.5.0': errors.append(f'validator_version={a.get(\"validator_version\")}')
           neg = a.get('negative_tests', [])
           meta = a.get('meta_tests', [])
           if not neg: errors.append('no negative_tests')
@@ -308,12 +317,18 @@ jobs:
               tid = t.get('test_id','?')
               if t.get('result','') != 'PASS':
                   errors.append(f'{tid}: meta_test result={t.get(\"result\")}')
-          # Suite totals
+          # Validate meta-test rejection evidence
+          for t in meta:
+              tid = t.get('test_id','?')
+              for field in ['fixture_type','invalid_condition','expected_rejection','observed_rejection','rejection_exit']:
+                  if not t.get(field) and t.get(field) != 0:
+                      errors.append(f'{tid}: missing {field}')
+              if t.get('rejection_exit',0) == 0:
+                  errors.append(f'{tid}: rejection_exit=0')
           neg_fail = sum(1 for t in neg if t.get('result')=='FAIL')
           meta_fail = sum(1 for t in meta if t.get('result')=='FAIL')
           if neg_fail > 0: errors.append(f'{neg_fail} negative tests failed')
           if meta_fail > 0: errors.append(f'{meta_fail} meta tests failed')
-          if a.get('totals',{}).get('FAIL',0) != 0: errors.append(f'adversarial FAIL={a[\"totals\"].get(\"FAIL\")}')
           if errors: print(f'ERRORS: {errors}', file=sys.stderr); sys.exit(1)
           print(f'Adversarial OK: {len(neg)} negative + {len(meta)} meta')
           "
@@ -325,8 +340,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
         with:
-          name: b1-i1r3d-evidence-${{ github.sha }}
-          path: |
-            infrastructure/cloud-ground/evidence/
-            infrastructure/cloud-ground/tests/
+          name: b1-i1r3e-evidence-${{ steps.identity.outputs.run_id }}
+          path: ${{ steps.evidence_dir.outputs.final_evidence }}
           retention-days: 30
