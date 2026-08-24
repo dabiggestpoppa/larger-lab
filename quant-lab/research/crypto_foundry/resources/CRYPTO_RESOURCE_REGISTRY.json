@@ -3,10 +3,11 @@
   "frozen_at": "2026-08-24T21:00:00Z",
   "description": "Registry of external data resources for crypto quant research. Authority hierarchy preserved.",
   "authority_hierarchy": {
-    "LEVEL_1": "NATIVE_VENUE_PROTOCOL_API — canonical venue-specific truth",
-    "LEVEL_2": "HIGH_QUALITY_AGGREGATED_FUNDAMENTAL — e.g. DefiLlama",
-    "LEVEL_3": "SPECIALIZED_ANALYTICS_MARKET_DISCOVERY — e.g. Derivatives Monkey, PERPDEXLIST",
-    "LEVEL_4": "PRIOR_ART_IDEAS_SOCIAL_RESEARCH_DISCOVERY"
+    "LEVEL_1": "NATIVE_VENUE_PROTOCOL_API \u00e2\u20ac\u201d canonical venue-specific truth",
+    "LEVEL_2": "HIGH_QUALITY_AGGREGATED_FUNDAMENTAL \u00e2\u20ac\u201d e.g. DefiLlama",
+    "LEVEL_3": "SPECIALIZED_ANALYTICS_MARKET_DISCOVERY \u00e2\u20ac\u201d e.g. Derivatives Monkey, PERPDEXLIST",
+    "LEVEL_4": "PRIOR_ART_IDEAS_SOCIAL_RESEARCH_DISCOVERY",
+    "CRYPTO_RWA": "TOKENIZED_REAL_WORLD_ASSET_LANE"
   },
   "resources": [
     {
@@ -16,7 +17,7 @@
       "canonical_for": "TVL, stablecoin supply, DEX volume, yield pools, fees, revenue, token prices",
       "not_canonical_for": "execution price, funding, bid/ask, native OI, orderbook state",
       "access_method": "REST API (api.llama.fi)",
-      "historical_depth_status": "GOOD — TVL/stablecoin data from ~2019, DEX volume from ~2020",
+      "historical_depth_status": "GOOD \u00e2\u20ac\u201d TVL/stablecoin data from ~2019, DEX volume from ~2020",
       "API_status": "FREE_TIER_AVAILABLE",
       "future_lane": "CRYPTO_CAPITAL_FLOW",
       "priority": 1,
@@ -30,7 +31,7 @@
       "canonical_for": "Yield Units, implied funding APR, fixed-vs-floating funding",
       "not_canonical_for": "cross-venue price truth (use native venue APIs)",
       "access_method": "Protocol API / RPC (wallet connection for trading)",
-      "historical_depth_status": "LIMITED — relatively new protocol",
+      "historical_depth_status": "LIMITED \u00e2\u20ac\u201d relatively new protocol",
       "API_status": "PROTOCOL_LIVE",
       "future_lane": "CRYPTO_RATES",
       "priority": 2,
@@ -44,7 +45,7 @@
       "canonical_for": "venue discovery, market overlap, fee comparison, funding screening",
       "not_canonical_for": "execution truth, price, depth, contract metadata",
       "access_method": "Web / API",
-      "historical_depth_status": "LIMITED — primarily current-state",
+      "historical_depth_status": "LIMITED \u00e2\u20ac\u201d primarily current-state",
       "API_status": "PUBLIC",
       "future_lane": "GENERAL_CROSS_VENUE",
       "priority": 5,
@@ -58,12 +59,26 @@
       "canonical_for": "options chain discovery, IV screening, cross-venue vol comparison, flow",
       "not_canonical_for": "options execution truth (use Deribit/native APIs)",
       "access_method": "Web / API",
-      "historical_depth_status": "VARIABLE — depends on venue and asset",
+      "historical_depth_status": "VARIABLE \u00e2\u20ac\u201d depends on venue and asset",
       "API_status": "REGISTRATION_MAY_BE_REQUIRED",
       "future_lane": "CRYPTO_OPTIONS",
       "priority": 4,
       "limitations": "Aggregated data lags native, not all venues fully represented, options less liquid than perps",
       "verification_required": "Cross-check IV against native Deribit API, verify chain data against exchange"
+    },
+    {
+      "resource": "ASX Capital",
+      "category": "RWA_YIELD_TOKENIZED_CASHFLOW",
+      "authority_class": "LEVEL_1",
+      "canonical_for": "ASX-specific instrument structure, on-chain token state",
+      "not_canonical_for": "broad RWA market, realized portfolio returns, external property valuation",
+      "access_method": "Native docs / RPC",
+      "historical_depth_status": "LIMITED",
+      "API_status": "PROTOCOL_LIVE",
+      "future_lane": "CRYPTO_RWA",
+      "priority": 6,
+      "limitations": "New protocol, jurisdiction/eligibility restrictions",
+      "verification_required": "Verify instrument structure against native docs"
     }
   ]
 }
