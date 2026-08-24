@@ -1,0 +1,27 @@
+provider,capability,class,evidence
+CoinMarketCap,PIT ranked snapshot,PRIMARY_VERIFIED,cmc_dataapi_listings_historical_20240601*: 100 rows probe then cmc_snapshot_*_top500.json (5 dates x 500 rows); BTC price 67706.94 / mcap 1.334T matches 2024-06-01 history
+CoinMarketCap,PIT rank depth,PRIMARY_VERIFIED,limit=500 honored (500 rows per snapshot); deeper pagination untested
+CoinMarketCap,tags/sector,HISTORICAL_APPROXIMATION,cmc_tags_drift_test.json: BTC tags 2024=30 vs 2026=37 — date-varying but taxonomy drift unverified
+CoinMarketCap,official API,PAID_REQUIRED,pro-api listings/historical without key -> 401 error 1002 'API key missing'
+CoinPaprika,coin registry incl. inactive,PRIMARY_VERIFIED,"coinpaprika_coins.json: 61,115 rows, is_active flag, type"
+CoinPaprika,historical daily,PARTIAL,tickers/{id}/historical 2024-06-01 -> 402 'before 2025-08-24 not allowed in this plan'; 2026-08-20 -> 200 (1yr window)
+CoinPaprika,historical rank field,NOT_SUPPORTED_FREE,"recent-window response has price/volume_24h/market_cap only, NO rank"
+CoinGecko,registry,SECONDARY_VERIFIED,"coingecko_coins_list.json: 18,656 rows incl. platforms (contract addresses)"
+CoinGecko,historical depth,FREE_LIMITED,market_chart days=max -> 401 error 10012 'limited to querying historical data within the past 365 days'; no-key throttling 429/401
+DexScreener,access from env,UNREACHABLE_FROM_ENV,"api.dexscreener.com read timeouts (45s, 60s)"
+DexPaprika,pool creation,PRIMARY_VERIFIED,dexpaprika_pools_search_weth_v2.json: Uniswap V3 WETH pool created_at=2021-05-05T21:42:11Z + created_at_block_number
+DexPaprika,token added_at semantics,PARTIAL,"dexpaprika_token_weth_v2.json: WETH added_at=2026-05-31 — first-indexed date, NOT contract creation (WETH contract is 2015)"
+Binance,live API access,GEO_BLOCKED_FROM_ENV,fapi/v1/* -> 451 'restricted location'; api.binance.com -> 451; data-api.binance.vision spot klines -> 200
+Binance,archive klines,PRIMARY_VERIFIED_ARCHIVE,data.binance.vision monthly klines: BTCUSDT 2020-01+; delisted SRMUSDT 2022-10 (32 rows) and FTTUSDT 2022-11 (31 rows) recovered
+Binance,archive funding,PRIMARY_VERIFIED_ARCHIVE,"fundingRate monthly files: BTCUSDT 2024-06 (200), SRMUSDT 2022-10 (200)"
+Binance,1000x naming,PRIMARY_VERIFIED_ARCHIVE,1000PEPEUSDT/1000SHIBUSDT/1000BONKUSDT monthly files exist; PEPEUSDT 404
+Bybit,live API access,GEO_BLOCKED_FROM_ENV,v5/market/* -> 403 'CloudFront ... block access from your country'
+Bybit,instrument fields,DOCUMENTED_NOT_LIVE,launchTime/deliveryTime/status/contractType documented in Bybit API docs; live verification blocked
+OKX,SWAP listing,PRIMARY_VERIFIED,"okx_instruments_swap.json: 454 swaps, listTime field, earliest 2018-08-28, 453 live + 1 preopen"
+OKX,delisted recovery,NOT_SUPPORTED,okx_delisted_candidates.json: FTT-USDT-SWAP / SRM-USDT-SWAP -> 200 with empty data (silent omission)
+OKX,candles depth,PARTIAL,history-candles BTC-USDT-SWAP after=2020 -> 200 (2020-09 rows); BTC-USD-SWAP after=2018 -> 200 empty
+OKX,funding depth,PARTIAL,funding-rate-history recent -> 5 rows; before=2023-01-01 -> recent rows (retention window only)
+Hyperliquid,universe,PRIMARY_VERIFIED,hyperliquid_meta.json: 232 coins incl. isDelisted flags
+Hyperliquid,first funding,PRIMARY_VERIFIED,hyperliquid_funding_first_history.json: 232/232 coins; earliest 2023-05-12T00:00:00Z (BTC/ETH/ATOM/...)
+Hyperliquid,delisted recovery,SECONDARY_VERIFIED,"55 delisted coins with funding intervals (FTT 2023-09-25..2023-10-16, JELLY 2025-01-30..2025-02-20, OM 2025-02-16..2025-03-09); purged coins -> HTTP 500"
+Hyperliquid,candles backfill hazard,PARTIAL,candleSnapshot BTC startTime=0 -> first candle 2020-08-18 v=0 n=0 (pre-listing backfill); funding first-ts 2023-05-12 is the honest existence bound

@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "dexpaprika_pools_search_weth",
+  "method": "GET",
+  "url": "https://api.dexpaprika.com/networks/ethereum/pools/search",
+  "request_params": {
+    "token_address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "limit": 5
+  },
+  "request_json": null,
+  "retrieved_at": "2026-08-24T14:11:03+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "d1d01788d5bc59d4d1ed11d51058dd44b1ee7c95e62b3889546d283ba996e2dd",
+  "bytes": 4233,
+  "access_class": "PUBLIC",
+  "notes": "pool search: creation date filter capability + pool addresses",
+  "known_limitations": ""
+}

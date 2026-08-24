@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_lunc_historical_rank",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/tickers/terra-luna/historical",
+  "request_params": {
+    "start": "2022-04-25",
+    "end": "2022-05-15",
+    "interval": "1d"
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:33+00:00",
+  "http_status": 402,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "877fa22e26b066a4b2c9049a373862b03775ddef0732d155404c2cb766dcba88",
+  "bytes": 153,
+  "access_class": "PUBLIC",
+  "historical_date": "2022-05-10",
+  "known_limitations": "id 'terra-luna' vs 'terra-luna-classic' naming",
+  "notes": "DEAD coin daily rank around LUNA crash \u2014 survivorship evidence",
+  "final_url": "https://api.coinpaprika.com/v1/tickers/terra-luna/historical?start=2022-04-25&end=2022-05-15&interval=1d",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:33 GMT",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Content-Length": "153",
+    "Connection": "keep-alive",
+    "vary": "Accept-Encoding, Origin",
+    "h-hap": "01",
+    "cf-cache-status": "BYPASS",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3bc9a964314-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

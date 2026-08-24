@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_archive_1000shibusdt_202406",
+  "http_status": 200,
+  "retrieved_at": "2026-08-24T14:21:58+00:00",
+  "sha256": "a233d54138eef0d2fe1df03381e7555add713831fb7fec2d17fc6087df1b06cf",
+  "bytes": 2009,
+  "request_params": {
+    "url": "https://data.binance.vision/data/futures/um/monthly/klines/1000SHIBUSDT/1d/1000SHIBUSDT-1d-2024-06.zip"
+  }
+}

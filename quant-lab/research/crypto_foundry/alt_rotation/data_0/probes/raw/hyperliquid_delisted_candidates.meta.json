@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_delisted_candidates",
+  "description": "Hyperliquid delisted-coin recovery probe (funding history for coins absent from current meta)",
+  "retrieved_at": "2026-08-24T14:06:59+00:00",
+  "access_class": "PUBLIC",
+  "composite": true,
+  "n_rows": 6
+}

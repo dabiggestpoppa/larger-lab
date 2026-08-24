@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_crosscheck_20260820",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/tickers/{id}/historical",
+  "request_params": {
+    "start": "2026-08-19",
+    "end": "2026-08-21",
+    "interval": "1d"
+  },
+  "retrieved_at": "2026-08-24T14:28:15+00:00",
+  "http_status": 200,
+  "ok": true,
+  "row_count": null,
+  "sha256": "7c5d6498955c16f55e47f42a5d9b53db4132472ee0a86d8062c6e05be01dc51f",
+  "bytes": 2240,
+  "access_class": "PUBLIC",
+  "notes": "derived probe: CoinPaprika in-window daily history at 2026-08-20 for BTC/ETH/LUNC/FTT/HOT",
+  "known_limitations": "meta sidecar added post-hoc at analysis time"
+}

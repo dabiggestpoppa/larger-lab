@@ -1,0 +1,28 @@
+source,feature,status,notes
+CoinMarketCap data-api,market cap,SUPPORTED,per-date snapshots for arbitrary dates; 1D-90D rolling = 90 snapshot calls (batch)
+CoinMarketCap data-api,price,SUPPORTED,snapshot quotes.price
+CoinMarketCap data-api,volume,SUPPORTED,snapshot quotes.volume24h
+CoinMarketCap data-api,rank,SUPPORTED,cmcRank per snapshot
+CoinPaprika,market cap,SUPPORTED,1yr rolling window daily; deeper horizons NOT_SUPPORTED free (paid)
+CoinPaprika,price,SUPPORTED,1yr window
+CoinPaprika,volume,SUPPORTED,1yr window (volume_24h)
+CoinPaprika,rank,NOT_SUPPORTED,no rank in historical rows (free); paid tier required
+CoinGecko,market cap,PARTIAL,365d cap; no-key unstable
+CoinGecko,price,PARTIAL,365d cap
+CoinGecko,volume,PARTIAL,365d cap
+CoinGecko,rank,NOT_SUPPORTED,no rank history
+DexScreener,DEX liquidity,NOT_SUPPORTED,current only; unreachable from env
+DexPaprika,DEX liquidity,PARTIAL,current liquidity + 30d volume window; no deep history
+DexPaprika,DEX pair creation,SUPPORTED,created_at per pool (historical anchor)
+Binance archive,perp price,SUPPORTED,USD-M monthly klines 2020-01+ incl. delisted
+Binance archive,perp volume,SUPPORTED,klines volume fields
+Binance archive,funding,SUPPORTED,fundingRate monthly files 2020-01+ incl. delisted
+Bybit,perp price,NOT_SUPPORTED,403 geo-block from env
+Bybit,perp volume,NOT_SUPPORTED,403 geo-block from env
+Bybit,funding,NOT_SUPPORTED,403 geo-block from env
+OKX,perp price,PARTIAL,history-candles instrument-dependent retention
+OKX,perp volume,PARTIAL,same retention caveat
+OKX,funding,PARTIAL,recent window only
+Hyperliquid,perp price,PARTIAL,candles since 2023-05 but zero-volume backfill pre-listing — filter v>0; 1D-90D within listed lifetime OK
+Hyperliquid,perp volume,SUPPORTED,candles volume since listing (v=0 filter for pre-listing)
+Hyperliquid,funding,SUPPORTED,hourly funding since 2023-05-12; 232/232 coins

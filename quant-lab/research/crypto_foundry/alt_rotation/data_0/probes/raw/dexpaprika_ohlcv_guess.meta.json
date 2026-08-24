@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "dexpaprika_ohlcv_guess",
+  "method": "GET",
+  "url": "https://api.dexpaprika.com/networks/ethereum/pools/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640/ohlcv",
+  "request_params": {
+    "time_start": "2024-06-01T00:00:00Z",
+    "time_end": "2024-06-08T00:00:00Z"
+  },
+  "request_json": null,
+  "retrieved_at": "2026-08-24T14:11:07+00:00",
+  "http_status": 400,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "5b7a943a8756ff43282427043568b1a2a5038a0806e643a6645ca9df332642e7",
+  "bytes": 55,
+  "access_class": "PUBLIC",
+  "notes": "historical OHLCV guess for a pool",
+  "known_limitations": "guess at endpoint shape; may 404"
+}

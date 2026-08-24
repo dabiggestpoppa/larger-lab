@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_archive_srmusdt_funding_202210",
+  "http_status": 200,
+  "retrieved_at": "2026-08-24T14:22:25+00:00",
+  "sha256": "0a23373269051001db65aef260bd34315f1236370c07e2ef6ef2b3c35424523f",
+  "bytes": 912,
+  "request_params": {
+    "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/SRMUSDT/SRMUSDT-fundingRate-2022-10.zip"
+  }
+}

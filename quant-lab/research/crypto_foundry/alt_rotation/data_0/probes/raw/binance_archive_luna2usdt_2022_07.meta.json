@@ -1,0 +1,14 @@
+{
+  "probe": "binance_archive_luna2usdt_2022_07",
+  "method": "GET",
+  "url": "https://data.binance.vision/data/futures/um/monthly/klines/LUNA2USDT/1d/LUNA2USDT-1d-2022-07.zip",
+  "request_params": null,
+  "http_status": 404,
+  "ok": false,
+  "access_class": "PUBLIC",
+  "notes": "renamed-contract LUNA2USDT monthly klines from archive",
+  "known_limitations": "zip body",
+  "sha256": "066e97ccad61dbe30628dd25effb02edffbab62e9564560f6fa9c1afabef22ce",
+  "bytes": 339,
+  "retrieved_at": "2026-08-24T14:14:02+00:00"
+}
