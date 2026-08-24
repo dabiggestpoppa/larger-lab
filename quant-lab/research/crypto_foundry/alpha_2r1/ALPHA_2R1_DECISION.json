@@ -1,0 +1,36 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-2R1-PRICE-PATH-ENGINE-TRUTH-SEAL-AND-FINAL-REPLAY",
+  "base_sha": "e3090083",
+  "decision": "PASS_ALPHA2_FINAL_FALSIFICATION_COMPLETE",
+  "timestamp": "2026-08-24T17:53:50.385094+00:00",
+  "registry_hash_verified": true,
+  "sealed_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "signal_ledger_hash": "5aae7a639c5344e703204d1ff3d284944137bc5e15f8d554eb745bded4c9b96a",
+  "signal_count": 2962,
+  "strategies_run": 13,
+  "controls_run": 6,
+  "total_raw_trades": 2961,
+  "results": {
+    "SURVIVES_DEVELOPMENT": 0,
+    "FALSIFIED": 13
+  },
+  "falsification_counts": {
+    "F1": 0,
+    "F2": 2,
+    "F3": 11,
+    "F4": 5,
+    "F5": 0,
+    "F6": 7,
+    "F7": 8,
+    "F8": 7,
+    "F9": 0,
+    "F10": 4,
+    "F11": 0,
+    "F12": 1
+  },
+  "engine_provenance": {
+    "ALPHA2": "QUARANTINED_ENGINE_ERROR",
+    "ALPHA2R": "QUARANTINED_REPLAY_INTEGRITY",
+    "ALPHA2R1": "PASS_ALPHA2_FINAL_FALSIFICATION_COMPLETE"
+  }
+}

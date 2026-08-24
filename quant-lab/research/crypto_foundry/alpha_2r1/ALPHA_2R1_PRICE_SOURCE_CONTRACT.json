@@ -1,0 +1,24 @@
+{
+  "contract_id": "ALPHA2R1_PRICE_SOURCE_V1",
+  "description": "Strict asset/leg price-source isolation contract",
+  "frozen_at": "2026-08-24T14:00:00Z",
+  "rules": [
+    "Every price lookup must resolve using (strategy_id, asset, execution_object, leg_id, venue/source, timestamp)",
+    "A BTC leg may NEVER read ETH data",
+    "An ETH leg may NEVER read BTC data",
+    "A spot leg may NEVER silently use perp price",
+    "A perp leg may NEVER silently use spot price",
+    "A relative-value strategy must explicitly map each leg",
+    "No fallback to first-available-dataframe or shared mutable state"
+  ],
+  "canonical_keys": {
+    "BTC_PERP": {"asset": "BTC", "market_type": "PERP", "source": "HYPERLIQUID"},
+    "ETH_PERP": {"asset": "ETH", "market_type": "PERP", "source": "HYPERLIQUID"},
+    "BTC_SPOT": {"asset": "BTC", "market_type": "SPOT", "source": "BINANCE"},
+    "ETH_SPOT": {"asset": "ETH", "market_type": "SPOT", "source": "BINANCE"},
+    "BTC_FUNDING": {"asset": "BTC", "market_type": "FUNDING", "source": "HYPERLIQUID"},
+    "ETH_FUNDING": {"asset": "ETH", "market_type": "FUNDING", "source": "HYPERLIQUID"}
+  },
+  "data_unavailability_rule": "BLOCK_DATA_REQUIREMENT — do not substitute another series silently",
+  "implementation": "PriceStore class with typed key access (asset, market_type, source)"
+}
