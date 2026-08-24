@@ -1,0 +1,68 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-2R1.1-FINAL-EVIDENCE-RECONCILIATION-SEAL",
+  "base_sha": "feb2a0250c359a6183404ee113d111c6f063f28b",
+  "decision": "PASS_ALPHA2_FINAL_EVIDENCE_SEAL",
+  "timestamp": "2026-08-24T20:00:00Z",
+  "sealed_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "registry_hash_verified": true,
+  "pnl_mutated": false,
+  "no_optimization": true,
+  "no_strategy_changed": true,
+  "strategies_run": 13,
+  "controls_run": 6,
+  "total_raw_trades": 2961,
+  "results": {
+    "SURVIVES_DEVELOPMENT": 0,
+    "WEAK_DEVELOPMENT": 0,
+    "FALSIFIED": 13,
+    "INSUFFICIENT_EVENTS": 0,
+    "CONTROL_EQUIVALENT": 0,
+    "COST_FRAGILE": 0
+  },
+  "falsification_counts_reconciled": {
+    "F1": 0,
+    "F2": 2,
+    "F3": 11,
+    "F4": 5,
+    "F5": 0,
+    "F6": 7,
+    "F7": 8,
+    "F8_recomputed": 3,
+    "F9": 0,
+    "F10": 4,
+    "F11": 0,
+    "F12": 1,
+    "old_F8_count": 7,
+    "new_F8_count": 3,
+    "F8_change_reason": "paired_bootstrap_replacement_of_simple_PF_comparison"
+  },
+  "f8_recomputation": {
+    "method": "paired_bootstrap_difference",
+    "n_resamples": 10000,
+    "seed": 31082026,
+    "ci_level": 0.95,
+    "old_method": "simple_PF_comparison",
+    "F8_triggered_ids": ["ALPHA1_S005", "ALPHA1_S011", "ALPHA1_S012"],
+    "F8_reduced_from": 7,
+    "F8_reduced_to": 3
+  },
+  "s002_classification": "POSITIVE_NET_BUT_STRUCTURALLY_FALSIFIED",
+  "s002_net_PF": 1.0163,
+  "s002_falsification_flags": ["F6", "F7"],
+  "s003_classification": "POSITIVE_NET_BUT_STRUCTURALLY_FALSIFIED",
+  "s003_net_PF": 1.0093,
+  "s003_falsification_flags": ["F6", "F7", "F10"],
+  "engine_provenance": {
+    "ALPHA2": "QUARANTINED_ENGINE_ERROR",
+    "ALPHA2R": "QUARANTINED_REPLAY_INTEGRITY",
+    "ALPHA2R1": "PASS_PRICE_PATH_TRUTH_SEALED",
+    "ALPHA2R1_1": "PASS_FINAL_EVIDENCE_SEAL"
+  },
+  "root_cause_terminology": {
+    "BUG_A": "EXIT_EXECUTION_CONTRACT_VIOLATION",
+    "BUG_A_description": "current-bar close used instead of next executable open",
+    "AUDIT_B": "PRICE_SOURCE_ISOLATION",
+    "AUDIT_B_description": "(asset, market_type, source) key enforcement"
+  },
+  "next_checkpoint": "CRYPTO-ALPHA-3-FAILURE-ANATOMY-AND-NEW-HYPOTHESES"
+}
