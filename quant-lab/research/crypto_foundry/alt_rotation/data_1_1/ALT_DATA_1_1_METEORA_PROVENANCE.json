@@ -1,0 +1,28 @@
+{
+  "direct_api_status": "UNAVAILABLE",
+  "defillama_proxy_status": "AVAILABLE",
+  "classification": "PARTIAL_HISTORY",
+  "historical_start": "2021-07-06",
+  "notes": [
+    "Direct API https://dlmm-api.meteora.ag/pair/all?page=0&limit=2: HTTP Error 404: Not Found",
+    "Direct API https://app.meteora.ag/clmm-api/pair/all?page=0&limit=2: HTTP Error 404: Not Found",
+    "Direct API https://api.meteora.ag/pair/all?page=0&limit=2: HTTP Error 404: Not Found",
+    "DefiLlama TVL history starts: 2021-07-06",
+    "TVL chart points: 1878",
+    "Built Meteora daily from DefiLlama: 1878 rows"
+  ],
+  "defillama_proxy_hash": "917d198b5915453c9376b69c712886d13522db1ab894191db1395dc2a82c47d3",
+  "tvl_chart_points": 1878,
+  "meteora_asset_daily_rows": 1878,
+  "not_available": [
+    "Pool-level historical volume",
+    "Pool-level historical fees",
+    "Pool-level historical TVL",
+    "Net deposits history",
+    "Trader count history",
+    "Swap count history",
+    "LP count history",
+    "Bin/liquidity distribution",
+    "Contract address mapping (direct API unavailable)"
+  ]
+}

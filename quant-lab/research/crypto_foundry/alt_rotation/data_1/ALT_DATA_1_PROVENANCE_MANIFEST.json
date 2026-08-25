@@ -98,8 +98,8 @@
     },
     {
       "artifact": "ALT_DATA_1_DATA_QUALITY_REPORT.md",
-      "sha256": "377ba87a358ece7373a40de092730d322d8f1ca4ef481d4a3986bc9b65fe4588",
-      "bytes": 6409,
+      "sha256": "31779728e3fdb928ab536ee751aa46a2955927d76a36bef80095de578920e530",
+      "bytes": 6600,
       "generator": "written",
       "parent_hashes": []
     },
@@ -119,15 +119,15 @@
     },
     {
       "artifact": "ALT_DATA_1_REPORT.md",
-      "sha256": "22134f9460da32f80c6f87386ad8af3de623dfa8ec91390126f99f4a27c44c11",
+      "sha256": "bab7ad9b4866b35c261dbb1769c4ea0fa2cf01624b2cf85e1b9b0d8a27399f45",
       "bytes": 4486,
       "generator": "written",
       "parent_hashes": []
     },
     {
       "artifact": "ALT_DATA_1_DECISION.json",
-      "sha256": "2995b0cec11ac539cf54b36a88e5cd395fc1e2d80f4681b1b44f3639515835e2",
-      "bytes": 2117,
+      "sha256": "948c5180ce9c109ac0bb12820a9261475bf3833cd4ccf8f69e7890ad0d9c46af",
+      "bytes": 2630,
       "generator": "written",
       "parent_hashes": []
     }
