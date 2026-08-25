@@ -27,19 +27,36 @@ if [ -z "${OCE_RUN_ID:-}" ]; then
 fi
 RUN_ID="$OCE_RUN_ID"
 
-# Isolated evidence dir (final evidence directory for this run)
-EVIDENCE_DIR="${OCE_EVIDENCE_DIR:-$PROJ_ROOT/.oce-adversarial-evidence}"
+# R3G: Scratch directory for intermediate engine --only payloads. This must
+# NEVER be the final evidence directory — intermediate single-check writes
+# would clobber authoritative artifacts mid-run.
+SCRATCH_DIR="$(mktemp -d "${TMPDIR:-/tmp}/oce-adv-scratch-XXXXXX")"
+
+# Final evidence directory (where adversarial-results.json is written).
+# R3G: in authoritative mode OCE_EVIDENCE_DIR is mandatory — no default
+# inside the repository.
+if [ -n "${OCE_EVIDENCE_DIR:-}" ]; then
+    EVIDENCE_DIR="$OCE_EVIDENCE_DIR"
+elif [ -n "${OCE_ADVERSARIAL_ALLOW_LOCAL_EVIDENCE:-}" ]; then
+    EVIDENCE_DIR="$PROJ_ROOT/.oce-adversarial-evidence"
+else
+    echo "FATAL: OCE_EVIDENCE_DIR is not set. The adversarial suite must write to an externally supplied evidence directory outside the repository." >&2
+    exit 1
+fi
 mkdir -p "$EVIDENCE_DIR"
 EVIDENCE_DIR=$(cd "$EVIDENCE_DIR" && pwd)
 
-# Temp dir for backups
-BACKUP_DIR="$PROJ_ROOT/.oce-adversarial-backups"
-rm -rf "$BACKUP_DIR"
-mkdir -p "$BACKUP_DIR"
+# Temp dirs OUTSIDE the repository (no pollution of the authoritative source).
+BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/oce-adv-backup-XXXXXX")"
+RESULTS_DIR="$SCRATCH_DIR/results"
+mkdir -p "$RESULTS_DIR"
+trap 'rm -rf "$BACKUP_DIR" "$SCRATCH_DIR"' EXIT
 
-# Temp dir for test result files
-RESULTS_DIR=$(mktemp -d "${TMPDIR:-$PROJ_ROOT}/oce-results-XXXXXX")
-trap 'rm -rf "$BACKUP_DIR" "$RESULTS_DIR"' EXIT
+# R3G: single source of truth for versions — ask the engine itself.
+ENGINE_VERSION=$(python3 "$ENGINE" --version-json 2>/dev/null | python3 -c "import json,sys;print(json.load(sys.stdin)['validator_version'])") || {
+    echo "FATAL: cannot resolve validator version from validate_engine.py --version-json" >&2
+    exit 1
+}
 
 PASS_COUNT=0
 FAIL_COUNT=0
@@ -50,18 +67,26 @@ win_path() {
 }
 ENGINE_WIN=$(win_path "$ENGINE")
 EVIDENCE_DIR_WIN=$(win_path "$EVIDENCE_DIR")
-EVIDENCE_FILE="$EVIDENCE_DIR_WIN/static-validation-results.json"
+SCRATCH_DIR_WIN=$(win_path "$SCRATCH_DIR")
+# Intermediate engine --only payloads go to the SCRATCH dir, never to the
+# final evidence directory.
+EVIDENCE_FILE="$SCRATCH_DIR_WIN/static-validation-results.json"
 
 run_check() {
     local check_id="$1"
     local rc=0
-    python3 "$ENGINE_WIN" --only "$check_id" --evidence-dir "$EVIDENCE_DIR_WIN" >/dev/null 2>&1 || rc=$?
+    python3 "$ENGINE_WIN" --only "$check_id" --evidence-dir "$SCRATCH_DIR_WIN" >/dev/null 2>&1 || rc=$?
     _RUN_CHECK_EXIT=$rc
 }
 
 get_result() {
     local check_id="$1"
     python3 -c "import json,sys; d=json.load(open(sys.argv[1])); results=[r['result'] for r in d.get('results',[]) if r['check_id']==sys.argv[2]]; sys.stdout.buffer.write((results[0] if results else 'NOT_FOUND').encode())" "$EVIDENCE_FILE" "$check_id" 2>/dev/null || echo -n ERROR
+}
+
+scratch_path() {
+    # Windows-safe path to a file inside the scratch dir.
+    win_path "$SCRATCH_DIR/$1"
 }
 
 write_result() {
@@ -268,10 +293,10 @@ else
         "$br" "$be" "$mr" "$me" "$pr" "$pe" "$orig_h" "$rest_h" "Not rejected"
 fi
 
-EVIDENCE_FILE_WIN=$(win_path "$EVIDENCE_DIR/static-validation-results.json")
-run_one "EV-02" "Evidence wrong commit" "$EVIDENCE_DIR/static-validation-results.json" "EVIDENCE-CONSISTENCY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['tested_commit']='f41e9c09';json.dump(d,open(p,'w'),indent=2)"
-run_one "EV-03" "Evidence wrong tree" "$EVIDENCE_DIR/static-validation-results.json" "EVIDENCE-CONSISTENCY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['tested_tree']='0'*40;json.dump(d,open(p,'w'),indent=2)"
-run_one "EV-04" "Evidence inconsistent totals" "$EVIDENCE_DIR/static-validation-results.json" "EVIDENCE-CONSISTENCY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['totals']['total']=999;json.dump(d,open(p,'w'),indent=2)"
+EVIDENCE_FILE_WIN=$(win_path "$SCRATCH_DIR/static-validation-results.json")
+run_one "EV-02" "Evidence wrong commit" "$SCRATCH_DIR/static-validation-results.json" "EVIDENCE-CONSISTENCY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['tested_commit']='f41e9c09';json.dump(d,open(p,'w'),indent=2)"
+run_one "EV-03" "Evidence wrong tree" "$SCRATCH_DIR/static-validation-results.json" "EVIDENCE-CONSISTENCY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['tested_tree']='0'*40;json.dump(d,open(p,'w'),indent=2)"
+run_one "EV-04" "Evidence inconsistent totals" "$SCRATCH_DIR/static-validation-results.json" "EVIDENCE-CONSISTENCY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['totals']['total']=999;json.dump(d,open(p,'w'),indent=2)"
 echo ""
 
 # === META TESTS: Gate-rejection tests (prove invalid fixtures are rejected) ===
@@ -283,12 +308,15 @@ run_meta() {
     echo "  [$TOTAL_COUNT] $meta_id: $desc"
     mkdir -p "$BACKUP_DIR"
     echo "$fake_json" > "$BACKUP_DIR/$meta_id-fake.json"
-    cp "$BACKUP_DIR/$meta_id-fake.json" "$EVIDENCE_DIR/adversarial-results.json"
+    # R3G: fake fixtures are evaluated against the SCRATCH dir only —
+    # the real adversarial-results.json in the final evidence directory
+    # is never touched.
+    cp "$BACKUP_DIR/$meta_id-fake.json" "$SCRATCH_DIR/adversarial-results.json"
     local rc=0
-    python3 "$ENGINE_WIN" --only "FAIL-CLOSED" --evidence-dir "$EVIDENCE_DIR_WIN" >/dev/null 2>&1 || rc=$?
+    python3 "$ENGINE_WIN" --only "FAIL-CLOSED" --evidence-dir "$SCRATCH_DIR_WIN" >/dev/null 2>&1 || rc=$?
     local fr
     fr=$(get_result "FAIL-CLOSED")
-    rm -f "$EVIDENCE_DIR/adversarial-results.json"
+    rm -f "$SCRATCH_DIR/adversarial-results.json"
     if [ "$fr" = "FAIL" ] || [ "$fr" = "BLOCKED" ]; then
         echo "    PASS (FAIL-CLOSED=$fr, exit=$rc)"; PASS_COUNT=$((PASS_COUNT + 1))
         write_meta_result "$meta_id" "PASS" "$desc" "$fixture_type" "$invalid_condition" \
@@ -425,7 +453,7 @@ fi
 # CLI-02: Wrong target commit
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-02: Wrong target commit"
-rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit 0000000000000000000000000000000000000000 --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
+rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit 0000000000000000000000000000000000000000 --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-02" "PASS" "Wrong target commit" \
@@ -441,7 +469,7 @@ fi
 # CLI-03: Wrong branch
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-03: Wrong branch"
-rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit "$CC" --target-tree "$CT" --target-branch wrong-branch >/dev/null 2>&1 || rc=$?
+rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "$CT" --target-branch wrong-branch >/dev/null 2>&1 || rc=$?
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-03" "PASS" "Wrong branch" \
@@ -458,7 +486,7 @@ fi
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-04: Wrong repository"
 GR_ORIG="${GITHUB_REPOSITORY:-}"; export GITHUB_REPOSITORY="wrong/repo"
-rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit "$CC" --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
+rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
 if [ -n "$GR_ORIG" ]; then export GITHUB_REPOSITORY="$GR_ORIG"; else unset GITHUB_REPOSITORY; fi
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
@@ -496,12 +524,13 @@ echo ""
 
 echo "--- Block H: State Tests (Meta Tests) ---"
 
-# ST-02: Dirty worktree
+# ST-02: Dirty worktree (modify a TRACKED file so the engine's porcelain
+# check detects it; untracked-only dirt is not authoritative dirt)
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] ST-02: Dirty worktree rejected"
-echo "dirty" > "$PROJ_ROOT/.oce-dirty-test"
-rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit "$CC" --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
-rm -f "$PROJ_ROOT/.oce-dirty-test"
+echo "# oce-dirty-test" >> "$COMPOSE"
+rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
+git -C "$PROJ_ROOT" checkout -- "$COMPOSE" 2>/dev/null || true
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "ST-02" "PASS" "Dirty worktree rejected" \
@@ -517,7 +546,7 @@ fi
 # ST-03: Wrong tree
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] ST-03: Wrong tree rejected"
-rc=0; python3 "$ENGINE_WIN" --authoritative --target-commit "$CC" --target-tree "0000000000000000000000000000000000000000000000000000000000000000" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
+rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "0000000000000000000000000000000000000000000000000000000000000000" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
 if [ "$rc" -ne 0 ]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "ST-03" "PASS" "Wrong tree rejected" \
@@ -554,6 +583,7 @@ from datetime import datetime, timezone
 
 results_dir = sys.argv[1]
 run_id = sys.argv[2]
+engine_version = sys.argv[5]
 negative_tests = []
 meta_tests = []
 
@@ -577,8 +607,8 @@ mp = sum(1 for t in meta_tests if t.get('result') == 'PASS')
 mf = sum(1 for t in meta_tests if t.get('result') == 'FAIL')
 
 r = {
-    'schema_version': '3.6.0',
-    'validator_version': '3.6.0',
+    'schema_version': engine_version,
+    'validator_version': engine_version,
     'run_id': run_id,
     'suite': 'B1-I1R3F-adversarial',
     'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -597,6 +627,6 @@ out_path = sys.argv[4]
 with open(out_path, 'w') as fp:
     json.dump(r, fp, indent=2)
 print(f'Written {len(negative_tests)} negative + {len(meta_tests)} meta tests to {out_path}')
-" "$RESULTS_DIR" "$RUN_ID" "$SUITE_RESULT" "$EVIDENCE_DIR/adversarial-results.json"
+" "$RESULTS_DIR" "$RUN_ID" "$SUITE_RESULT" "$EVIDENCE_DIR/adversarial-results.json" "$ENGINE_VERSION"
 
 [ "$SUITE_RESULT" = "PASS" ] && exit 0 || exit 1

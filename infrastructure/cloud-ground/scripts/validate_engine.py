@@ -114,7 +114,14 @@ class Validator:
         target_branch=None,
         authoritative=False,
         evidence_dir=None,
+        phase=None,
     ):
+        # R3G: explicit phase argument. 'initial' runs without adversarial
+        # evidence checks; 'final' runs everything including them.
+        if phase is not None and phase not in ("initial", "final"):
+            print(f"ERROR: invalid phase '{phase}' (must be 'initial' or 'final')", file=sys.stderr)
+            sys.exit(1)
+        self.phase = phase
         self.results = []
         self.start_time = utc_now()
         self.source_identity_passed = False
@@ -174,6 +181,32 @@ class Validator:
             return True, "OK"
         except Exception as e:
             return False, f"FAIL: {e}"
+
+    def _identity_provenance(self):
+        """R3G: resolve branch identity from OBSERVATIONS only.
+        Never substitute the contract's expected branch into an observed field."""
+        git = get_git_info()
+        observed = git.get("branch", "unknown")
+        detached = observed in ("(detached)", "", "unknown")
+        # R3G: the runner may supply a trusted ref (OCE_TRUSTED_REF) for
+        # detached checkouts, e.g. the disposable adversarial worktree.
+        trusted_ref = (os.environ.get("GITHUB_REF_NAME", "").strip()
+                       or os.environ.get("OCE_TRUSTED_REF", "").strip())
+        ci_mode = os.environ.get("OCE_CI_MODE", "").lower() == "true"
+        prov = {
+            "expected_branch": self._get_expected_branch(),
+            "observed_git_branch": observed,
+            "trusted_ci_ref": trusted_ref or None,
+            "checkout_state": "detached" if detached else "attached",
+            "branch_provenance": "git-symbolic-ref",
+            "identity_branch": observed,
+        }
+        if detached and trusted_ref:
+            prov["branch_provenance"] = "GITHUB_REF_NAME" if ci_mode else "explicit-trusted-ref"
+            prov["identity_branch"] = trusted_ref
+        elif detached:
+            prov["branch_provenance"] = "none"
+        return prov
 
     def _get_expected_branch(self):
         """Return the EXPECTED branch from the contract."""
@@ -235,8 +268,10 @@ class Validator:
 
         if expected_branch and observed_branch and observed_branch != expected_branch:
             if observed_branch == "(detached)":
-                # In CI detached HEAD, the trusted ref comes from GITHUB_REF_NAME
-                gha_ref = os.environ.get("GITHUB_REF_NAME", "")
+                # In CI detached HEAD, the trusted ref comes from GITHUB_REF_NAME;
+                # in a disposable worktree, from OCE_TRUSTED_REF.
+                gha_ref = (os.environ.get("GITHUB_REF_NAME", "")
+                           or os.environ.get("OCE_TRUSTED_REF", ""))
                 if gha_ref and gha_ref == expected_branch:
                     pass  # detached CI with correct trusted ref
                 else:
@@ -281,7 +316,10 @@ class Validator:
 
         # GitHub Actions environment
         gha_repo = os.environ.get("GITHUB_REPOSITORY", "")
-        gha_ref = os.environ.get("GITHUB_REF_NAME", "")
+        # R3G: GITHUB_REF_NAME is authoritative when present; OCE_TRUSTED_REF
+        # covers detached disposable worktrees run by the shared runner.
+        gha_ref = (os.environ.get("GITHUB_REF_NAME", "")
+                   or os.environ.get("OCE_TRUSTED_REF", ""))
         gha_sha = os.environ.get("GITHUB_SHA", "")
         if gha_repo:
             if gha_repo != "dabiggestpoppa/larger-lab":
@@ -1295,7 +1333,13 @@ class Validator:
 
         actual_commit = git.get("commit", "")
         actual_tree = git.get("tree", "")
-        actual_branch = self._get_expected_branch() or git.get("branch", "unknown")
+        # R3G: evidence's tested_branch records the OBSERVED git branch truth
+        # (e.g. "(detached)" inside a disposable worktree); compare against the
+        # observation, never against a resolved/substituted identity.
+        actual_branch = git.get("branch", "unknown")
+        ident = self._identity_provenance()
+        if ident["branch_provenance"] == "none":
+            errors.append("BRANCH_PROVENANCE: detached HEAD with no trusted ref")
 
         try:
             with open(ev_path, "r", encoding="utf-8") as f:
@@ -1340,16 +1384,26 @@ class Validator:
                       "All identity fields match", "Evidence is self-consistent (atomic)")
 
     def _build_results_payload(self, git_info):
-        return {
+        # R3G: record observed truth plus provenance separately.
+        ident = self._identity_provenance()
+        payload = {
             "schema_version": VERSION,
             "run_id": self.run_uid,
             "validator_version": VERSION,
+            "phase": self.phase or "unspecified",
+            "increment": "B1-I1R3G",
             "start_time": self.start_time,
             "end_time": utc_now(),
             "tested_commit": git_info.get("commit", "unknown"),
             "tested_tree": git_info.get("tree", "unknown"),
-            "tested_branch": self._get_expected_branch() or git_info.get("branch", "unknown"),
+            "tested_branch": ident["observed_git_branch"],
+            "expected_branch": ident["expected_branch"],
+            "observed_git_branch": ident["observed_git_branch"],
+            "trusted_ci_ref": ident["trusted_ci_ref"],
+            "checkout_state": ident["checkout_state"],
+            "branch_provenance": ident["branch_provenance"],
             "repository": "dabiggestpoppa/larger-lab",
+            "remote_url": git_info.get("remote_url", "unknown"),
             "command": "validate_engine.py --all",
             "tools": {
                 "python": get_tool_version("python3"),
@@ -1363,6 +1417,7 @@ class Validator:
             "totals": self.compute_totals(),
             "gate": self.determine_gate(self.compute_totals()),
         }
+        return payload
 
     # ===== FULL RUN =====
 
@@ -1439,8 +1494,10 @@ class Validator:
             "META-TEST-EVIDENCE": self.check_meta_test_evidence,
         }
         self.check_source_identity()
-        if not self.source_identity_passed:
-            return
+        # R3G: --only must run the REQUESTED checks even when SOURCE-IDENTITY
+        # fails (e.g. a local clone with a non-accepted origin). Gating the
+        # requested checks on source identity silently turned --only runs into
+        # no-ops, breaking the adversarial suite and regression tests.
         for cid in check_ids:
             if cid == "SOURCE-IDENTITY":
                 continue
@@ -1477,12 +1534,15 @@ class Validator:
         pre_totals["total"] = sum(pre_totals.values())
 
         self.check_totals_consistency(pre_totals)
-        self.check_fail_closed()
-        self.check_meta_test_evidence()
-        self.check_run_id_consistency()
+        if self.phase != "initial":
+            # R3G: adversarial-evidence checks run ONLY in the final phase.
+            self.check_fail_closed()
+            self.check_meta_test_evidence()
+            self.check_run_id_consistency()
 
         payload = self._build_results_payload(git_info)
-        self.check_evidence_consistency()
+        if self.phase != "initial":
+            self.check_evidence_consistency()
 
         payload["results"] = [r.to_dict() for r in self.results]
         payload["totals"] = self.compute_totals()
@@ -1492,8 +1552,43 @@ class Validator:
         self._atomic_write(ev_dir / "static-validation-results.json", results_json)
         self.write_summary_md(git_info, payload["totals"], payload["gate"], ev_dir)
         self.write_stage_status(git_info, payload["totals"], payload["gate"], ev_dir)
+        if self.phase == "final":
+            self.write_evidence_manifest(ev_dir)
 
         return payload["gate"], payload["totals"]
+
+    def write_evidence_manifest(self, ev_dir):
+        """R3G: SHA-256 inventory of required evidence artifacts."""
+        import hashlib
+        required = [
+            "static-validation-results.json",
+            "static-validation-summary.md",
+            "adversarial-results.json",
+            "stage-status.json",
+        ]
+        artifacts = []
+        for name in required:
+            p = Path(ev_dir) / name
+            if not p.exists():
+                continue
+            h = hashlib.sha256()
+            with open(p, "rb") as f:
+                for chunk in iter(lambda: f.read(8192), b""):
+                    h.update(chunk)
+            artifacts.append({"path": name, "sha256": h.hexdigest(),
+                              "size": p.stat().st_size})
+        manifest = {
+            "schema_version": VERSION,
+            "run_id": self.run_uid,
+            "validator_version": VERSION,
+            "increment": "B1-I1R3G",
+            "generated_at": utc_now(),
+            "artifacts": artifacts,
+        }
+        self._atomic_write(
+            Path(ev_dir) / "evidence-manifest.json",
+            json.dumps(manifest, indent=2, ensure_ascii=False),
+        )
 
     def write_evidence_targeted(self, git_info):
         ev_dir = self._evidence_dir()
@@ -1516,7 +1611,7 @@ class Validator:
             "end_time": utc_now(),
             "tested_commit": git_info.get("commit", "unknown"),
             "tested_tree": git_info.get("tree", "unknown"),
-            "tested_branch": self._get_expected_branch() or git_info.get("branch", "unknown"),
+            "tested_branch": self._identity_provenance()["observed_git_branch"],
             "repository": "dabiggestpoppa/larger-lab",
             "command": "validate_engine.py --only",
             "tools": {
@@ -1548,13 +1643,19 @@ class Validator:
 
     def write_summary_md(self, git_info, totals, gate, ev_dir=None):
         ev_dir = ev_dir or self._evidence_dir()
+        ident = self._identity_provenance()
         lines = [
-            f"# B1-I1R3F Static Validation Summary",
+            f"# B1-I1R3G Static Validation Summary",
             "",
             f"- **Run ID:** `{self.run_uid}`",
             f"- **Validator:** v{VERSION}",
+            f"- **Phase:** `{self.phase or 'unspecified'}`",
             f"- **Tested commit:** `{git_info.get('commit', 'unknown')}`",
-            f"- **Tested branch:** `{self._get_expected_branch() or git_info.get('branch', 'unknown')}`",
+            f"- **Observed git branch:** `{ident['observed_git_branch']}`",
+            f"- **Trusted CI ref:** `{ident['trusted_ci_ref'] or 'none'}`",
+            f"- **Checkout state:** `{ident['checkout_state']}`",
+            f"- **Branch provenance:** `{ident['branch_provenance']}`",
+            f"- **Expected branch:** `{ident['expected_branch']}`",
             f"- **Repository:** `dabiggestpoppa/larger-lab`",
             f"- **Start:** {self.start_time}",
             f"- **End:** {utc_now()}",
@@ -1590,16 +1691,20 @@ class Validator:
 
     def write_stage_status(self, git_info, totals, gate, ev_dir=None):
         ev_dir = ev_dir or self._evidence_dir()
+        ident = self._identity_provenance()
         status = {
             "block": "B1",
-            "increment": "B1-I1R3F",
+            "increment": "B1-I1R3G",
             "run_id": self.run_uid,
             "validator_version": VERSION,
+            "phase": self.phase or "unspecified",
             "implementation_commit": git_info.get("commit", "unknown"),
             "implementation_tree": git_info.get("tree", "unknown"),
-            "implementation_branch": self._get_expected_branch() or git_info.get("branch", "unknown"),
-            "observed_branch": self.observed_branch or git_info.get("branch", "unknown"),
-            "checkout_state": "attached" if git_info.get("branch", "") not in ("", "(detached)", "unknown") else "detached",
+            "implementation_branch": ident["identity_branch"],
+            "observed_git_branch": ident["observed_git_branch"],
+            "trusted_ci_ref": ident["trusted_ci_ref"],
+            "branch_provenance": ident["branch_provenance"],
+            "checkout_state": ident["checkout_state"],
             "evidence_commit": None,
             "gate_status": gate,
             "totals": totals,
@@ -1628,13 +1733,23 @@ def main():
     parser.add_argument("--all", action="store_true", help="Run all checks")
     parser.add_argument("--authoritative", action="store_true",
                         help="Authoritative mode: enforce strict identity proof")
+    parser.add_argument("--phase", type=str, choices=["initial", "final"], default=None,
+                        help="R3G: explicit validation phase (mandatory in authoritative mode)")
     parser.add_argument("--target-commit", type=str, help="Expected implementation SHA")
     parser.add_argument("--target-tree", type=str, help="Expected tree SHA")
     parser.add_argument("--target-branch", type=str, help="Expected branch name")
     parser.add_argument("--evidence-dir", type=str, default=None,
                         help="Override evidence output directory")
     parser.add_argument("--only", type=str, help="Comma-separated check IDs to run")
+    parser.add_argument("--version-json", action="store_true",
+                        help="Emit machine-readable version info and exit")
     args = parser.parse_args()
+
+    if args.version_json:
+        print(json.dumps({"validator_version": VERSION,
+                          "supported_schema_versions": [VERSION],
+                          "increment": "B1-I1R3G"}))
+        sys.exit(0)
 
     if args.authoritative:
         missing = []
@@ -1644,6 +1759,10 @@ def main():
             missing.append("--target-tree")
         if not args.target_branch:
             missing.append("--target-branch")
+        if not args.phase:
+            missing.append("--phase initial|final")
+        if not args.evidence_dir:
+            missing.append("--evidence-dir (must be outside the repository)")
         if missing:
             print(f"ERROR: Authoritative mode requires: {', '.join(missing)}")
             sys.exit(1)
@@ -1654,6 +1773,7 @@ def main():
         target_branch=args.target_branch,
         authoritative=args.authoritative,
         evidence_dir=args.evidence_dir,
+        phase=args.phase,
     )
 
     if args.only:
@@ -1673,7 +1793,7 @@ def main():
     gate, totals = validator.write_evidence(git_info)
 
     print(f"\n{'='*50}")
-    print(f"  B1-I1R3F Validation — {gate}")
+    print(f"  B1-I1R3G Validation ({validator.phase or 'unspecified'} phase) — {gate}")
     print(f"{'='*50}")
     print(f"  Run ID:    {validator.run_uid}")
     print(f"  Commit:    {git_info.get('commit', 'unknown')[:12]}")

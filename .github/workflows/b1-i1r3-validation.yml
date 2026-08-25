@@ -1,7 +1,7 @@
 name: b1-i1r3-validation
 on:
   push:
-    branches: [oce/block-1-i1r3-source-identity-ci-closure]
+    branches: [oce/block-1-i1r3g-executable-gate-repair]
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # ═══════════════════════════════════════════════════════════════
-      # Checkout
+      # Checkout (pinned action revision)
       # ═══════════════════════════════════════════════════════════════
       - name: Checkout implementation commit
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
@@ -29,7 +29,7 @@ jobs:
         run: pip install -r infrastructure/cloud-ground/requirements.txt
 
       # ═══════════════════════════════════════════════════════════════
-      # Install mandatory tools
+      # Install mandatory tools (pinned versions)
       # ═══════════════════════════════════════════════════════════════
       - name: Install Ansible and ansible-lint
         run: pip install ansible-core==2.16.0 ansible-lint==6.22.0
@@ -51,21 +51,7 @@ jobs:
           sudo mv gitleaks /usr/local/bin/
 
       # ═══════════════════════════════════════════════════════════════
-      # Assert tool versions
-      # ═══════════════════════════════════════════════════════════════
-      - name: Assert tool versions
-        run: |
-          echo "=== TOOL VERSION ASSERTIONS ==="
-          python3 --version
-          ansible-playbook --version | head -1
-          ansible-lint --version | head -1
-          shellcheck --version | grep "version:"
-          gitleaks version
-          docker compose version
-          echo "=== ALL TOOLS INSTALLED ==="
-
-      # ═══════════════════════════════════════════════════════════════
-      # Generate single authoritative OCE_RUN_ID
+      # Generate single authoritative OCE_RUN_ID — known before validation
       # ═══════════════════════════════════════════════════════════════
       - name: Generate single OCE_RUN_ID
         id: run_id
@@ -75,27 +61,41 @@ jobs:
           echo "=== SINGLE OCE_RUN_ID: $OCE_RUN_ID ==="
 
       # ═══════════════════════════════════════════════════════════════
-      # Invoke shared validation runner
+      # Deterministic evidence directory — known BEFORE validation begins
+      # so failed runs still upload truthful evidence. Outside the repo.
+      # ═══════════════════════════════════════════════════════════════
+      - name: Prepare evidence directory
+        id: evidence
+        run: |
+          EVIDENCE_DIR="$RUNNER_TEMP/oce-evidence-${{ steps.run_id.outputs.oce_run_id }}"
+          mkdir -p "$EVIDENCE_DIR"
+          echo "evidence_dir=$EVIDENCE_DIR" >> "$GITHUB_OUTPUT"
+
+      # ═══════════════════════════════════════════════════════════════
+      # Invoke the shared validation runner EXACTLY ONCE.
+      # Exit code is preserved (no pipe that swallows it).
       # ═══════════════════════════════════════════════════════════════
       - name: Run shared validation runner
         env:
           OCE_RUN_ID: ${{ steps.run_id.outputs.oce_run_id }}
           OCE_CI_MODE: "true"
+          OCE_EVIDENCE_DIR: ${{ steps.evidence.outputs.evidence_dir }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           chmod +x infrastructure/cloud-ground/scripts/run-validation.sh
-          bash infrastructure/cloud-ground/scripts/run-validation.sh 2>&1 | tee /tmp/oce-run.log
-          # Extract final evidence directory from last line
-          EVIDENCE_DIR=$(tail -1 /tmp/oce-run.log | tr -d '[:space:]')
-          echo "final_evidence=$EVIDENCE_DIR" >> "$GITHUB_ENV"
+          bash infrastructure/cloud-ground/scripts/run-validation.sh > /tmp/oce-run.log 2>&1
+          rc=$?
+          cat /tmp/oce-run.log
+          exit $rc
 
       # ═══════════════════════════════════════════════════════════════
-      # Upload evidence artifact
+      # Upload evidence on SUCCESS and FAILURE alike.
       # ═══════════════════════════════════════════════════════════════
       - name: Upload evidence artifact
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
         with:
-          name: b1-i1r3f-evidence-${{ steps.run_id.outputs.oce_run_id }}
-          path: ${{ env.final_evidence }}
+          name: b1-i1r3g-evidence-${{ steps.run_id.outputs.oce_run_id }}
+          path: ${{ steps.evidence.outputs.evidence_dir }}
           retention-days: 30

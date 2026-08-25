@@ -8,6 +8,7 @@ correct configurations. Covers all required scenarios from the R3F spec.
 Version: 3.6.0
 """
 
+import hashlib
 import json
 import os
 import sys
@@ -19,13 +20,49 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = BASE_DIR / "scripts"
 ENGINE = SCRIPTS_DIR / "validate_engine.py"
+FINAL_GATE = SCRIPTS_DIR / "final-gate.sh"
 RUN_VALIDATION = SCRIPTS_DIR / "run-validation.sh"
 VALIDATE_LOCAL = SCRIPTS_DIR / "validate-local"
 VERSION = "3.6.0"
 
+# R3G: contract-derived identity — never hardcode a branch literal.
+CONTRACT = json.loads(
+    (BASE_DIR / "contracts" / "checkpoint-identity-data.json").read_text(encoding="utf-8")
+)
+CONTRACT_BRANCH = CONTRACT.get("authorized_branch", "")
+CONTRACT_REPO = CONTRACT.get("repository", {}).get("full_name", "dabiggestpoppa/larger-lab")
+
 
 def make_run_id():
     return uuid.uuid4().hex[:12]
+
+
+def _find_bash():
+    """Resolve a real bash (Git Bash on Windows; the WSL shim breaks
+    subprocess invocations from Windows Python)."""
+    import shutil
+    candidates = [
+        "C:/Program Files/Git/bin/bash.exe",
+        "C:/Program Files/Git/usr/bin/bash.exe",
+        shutil.which("bash") or "bash",
+    ]
+    for cand in candidates:
+        if cand and os.path.exists(cand):
+            return cand
+    return "bash"
+
+
+def run_gate(evidence_dir, commit=None, tree=None, env=None):
+    """Run the independent final gate; returns (returncode, stdout, stderr)."""
+    cmd = [_find_bash(), str(FINAL_GATE), evidence_dir]
+    if commit and tree:
+        cmd += [commit, tree]
+    merged_env = os.environ.copy()
+    if env:
+        merged_env.update(env)
+    r = subprocess.run(cmd, capture_output=True, text=True, env=merged_env,
+                       cwd=str(BASE_DIR.parent.parent))
+    return r.returncode, r.stdout, r.stderr
 
 
 def run_engine(*args, env=None):
@@ -60,8 +97,9 @@ def test_rejects_missing_run_id_in_authoritative():
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         rc, _, _ = run_engine(
-            "--authoritative", "--target-commit", commit, "--target-tree", tree,
-            "--target-branch", "oce/block-1-i1r3-source-identity-ci-closure",
+            "--authoritative", "--phase", "initial",
+            "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH,
             "--evidence-dir", tmpdir,
             env={"OCE_RUN_ID": ""},  # Explicitly empty
         )
@@ -78,8 +116,9 @@ def test_rejects_empty_run_id_in_authoritative():
         env = os.environ.copy()
         env.pop("OCE_RUN_ID", None)
         rc, _, _ = run_engine(
-            "--authoritative", "--target-commit", commit, "--target-tree", tree,
-            "--target-branch", "oce/block-1-i1r3-source-identity-ci-closure",
+            "--authoritative", "--phase", "initial",
+            "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH,
             "--evidence-dir", tmpdir,
         )
         assert rc != 0, "Engine should reject empty OCE_RUN_ID in authoritative mode"
@@ -123,8 +162,9 @@ def test_engine_does_not_generate_own_run_id():
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         run_engine(
-            "--all", "--authoritative", "--target-commit", commit, "--target-tree", tree,
-            "--target-branch", "oce/block-1-i1r3-source-identity-ci-closure",
+            "--all", "--authoritative", "--phase", "initial",
+            "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH,
             "--evidence-dir", tmpdir,
             env={"OCE_RUN_ID": run_id},
         )
@@ -161,8 +201,9 @@ def test_rejects_wrong_commit():
         wrong_commit = "0" * 40
         tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         rc, _, _ = run_engine(
-            "--authoritative", "--target-commit", wrong_commit, "--target-tree", tree,
-            "--target-branch", "oce/block-1-i1r3-source-identity-ci-closure",
+            "--authoritative", "--phase", "initial",
+            "--target-commit", wrong_commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH,
             "--evidence-dir", tmpdir,
             env={"OCE_RUN_ID": make_run_id()},
         )
@@ -176,8 +217,9 @@ def test_rejects_wrong_tree():
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         wrong_tree = "0" * 40
         rc, _, _ = run_engine(
-            "--authoritative", "--target-commit", commit, "--target-tree", wrong_tree,
-            "--target-branch", "oce/block-1-i1r3-source-identity-ci-closure",
+            "--authoritative", "--phase", "initial",
+            "--target-commit", commit, "--target-tree", wrong_tree,
+            "--target-branch", CONTRACT_BRANCH,
             "--evidence-dir", tmpdir,
             env={"OCE_RUN_ID": make_run_id()},
         )
@@ -191,7 +233,8 @@ def test_rejects_wrong_branch():
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         rc, _, _ = run_engine(
-            "--authoritative", "--target-commit", commit, "--target-tree", tree,
+            "--authoritative", "--phase", "initial",
+            "--target-commit", commit, "--target-tree", tree,
             "--target-branch", "wrong-branch",
             "--evidence-dir", tmpdir,
             env={"OCE_RUN_ID": make_run_id()},
@@ -416,13 +459,16 @@ def test_rejects_dirty_authoritative_source():
         dirty_file.write_text("dirty test")
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(repo_root)).stdout.strip()
         tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], capture_output=True, text=True, cwd=str(repo_root)).stdout.strip()
-        rc, _, _ = run_engine(
-            "--authoritative", "--target-commit", commit, "--target-tree", tree,
-            "--target-branch", "oce/block-1-i1r3-source-identity-ci-closure",
-            env={"OCE_RUN_ID": make_run_id()},
-        )
-        assert rc != 0, "Dirty worktree should cause nonzero exit"
-        print("PASS: Dirty authoritative source rejected")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            rc, _, _ = run_engine(
+                "--authoritative", "--phase", "initial",
+                "--target-commit", commit, "--target-tree", tree,
+                "--target-branch", CONTRACT_BRANCH,
+                "--evidence-dir", tmpdir,
+                env={"OCE_RUN_ID": make_run_id()},
+            )
+            assert rc != 0, "Dirty worktree should cause nonzero exit"
+            print("PASS: Dirty authoritative source rejected")
     finally:
         dirty_file.unlink(missing_ok=True)
 
@@ -473,6 +519,195 @@ def test_run_validation_is_single_runner():
     # Must have proper execution order
     assert "trap" in content, "run-validation.sh must have trap-based cleanup"
     print("PASS: run-validation.sh is the single runner")
+
+
+# ═══════════════════════════════════════════════════════════════════
+# R3G: Phase ordering, version truth, provenance, manifest
+# ═══════════════════════════════════════════════════════════════════
+
+def _git_head():
+    repo_root = str(BASE_DIR.parent.parent)
+    commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=repo_root).stdout.strip()
+    tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], capture_output=True, text=True, cwd=repo_root).stdout.strip()
+    return commit, tree
+
+
+def test_authoritative_requires_explicit_phase():
+    """Regression: authoritative mode without --phase must fail closed."""
+    commit, tree = _git_head()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        rc, out, err = run_engine(
+            "--authoritative", "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH, "--evidence-dir", tmpdir,
+            env={"OCE_RUN_ID": make_run_id()},
+        )
+        combined = (out + err).lower()
+        assert rc != 0 and "phase" in combined, f"Expected phase-missing rejection, got rc={rc} {combined}"
+        print("PASS: Authoritative mode requires explicit --phase")
+
+
+def test_authoritative_requires_evidence_dir():
+    """Regression: authoritative mode without --evidence-dir must fail closed
+    (evidence must never default to a directory inside the repository)."""
+    commit, tree = _git_head()
+    rc, out, err = run_engine(
+        "--authoritative", "--phase", "initial",
+        "--target-commit", commit, "--target-tree", tree,
+        "--target-branch", CONTRACT_BRANCH,
+        env={"OCE_RUN_ID": make_run_id()},
+    )
+    combined = (out + err).lower()
+    assert rc != 0 and "evidence-dir" in combined, f"Expected evidence-dir rejection, got rc={rc} {combined}"
+    print("PASS: Authoritative mode requires --evidence-dir outside the repository")
+
+
+def test_initial_phase_does_not_require_adversarial_evidence():
+    """Regression: the initial phase must succeed without pre-existing
+    adversarial evidence (phase-ordering fix)."""
+    commit, tree = _git_head()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        run_engine(
+            "--all", "--authoritative", "--phase", "initial",
+            "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH, "--evidence-dir", tmpdir,
+            env={"OCE_RUN_ID": make_run_id()},
+        )
+        # FAIL-CLOSED / META-TEST-EVIDENCE must NOT appear in initial phase
+        for cid in ("FAIL-CLOSED", "META-TEST-EVIDENCE", "RUN-ID-CONSISTENCY"):
+            check = get_check_result(tmpdir, cid)
+            assert check is None, f"{cid} must not run in initial phase, got {check}"
+        payload = json.load(open(os.path.join(tmpdir, "static-validation-results.json")))
+        assert payload.get("phase") == "initial", f"phase field wrong: {payload.get('phase')}"
+        print("PASS: Initial phase runs without adversarial evidence")
+
+
+def test_final_phase_requires_adversarial_evidence():
+    """Regression: the final phase must refuse missing adversarial evidence."""
+    commit, tree = _git_head()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        run_engine(
+            "--all", "--authoritative", "--phase", "final",
+            "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH, "--evidence-dir", tmpdir,
+            env={"OCE_RUN_ID": make_run_id()},
+        )
+        check = get_check_result(tmpdir, "FAIL-CLOSED")
+        assert check and check["result"] == "BLOCKED", f"Expected BLOCKED, got {check}"
+        print("PASS: Final phase refuses missing adversarial evidence")
+
+
+def test_rejects_artifact_version_mismatch_3_5_vs_3_6():
+    """Regression: adversarial artifacts at 3.5.0 must be rejected when the
+    engine is at 3.6.0 (the exact R3F defect)."""
+    run_id = make_run_id()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        fake_adv = _make_valid_adv()
+        fake_adv["run_id"] = run_id
+        fake_adv["schema_version"] = "3.5.0"
+        fake_adv["validator_version"] = "3.5.0"
+        with open(os.path.join(tmpdir, "adversarial-results.json"), "w") as f:
+            json.dump(fake_adv, f)
+        run_engine("--only", "FAIL-CLOSED", "--evidence-dir", tmpdir, env={"OCE_RUN_ID": run_id})
+        check = get_check_result(tmpdir, "FAIL-CLOSED")
+        assert check and check["result"] == "FAIL", f"Expected FAIL for 3.5.0 vs 3.6.0, got {check}"
+        print("PASS: Version mismatch (3.5.0 vs 3.6.0) rejected")
+
+
+def test_gate_rejects_artifact_version_mismatch():
+    """Regression: the independent final gate must reject artifacts whose
+    versions disagree, without hardcoded version literals."""
+    commit, tree = _git_head()
+    run_id = make_run_id()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        with open(os.path.join(tmpdir, "adversarial-results.json"), "w") as f:
+            json.dump(_make_valid_meta_adv(rejection_exit=1), f)
+        run_engine(
+            "--all", "--authoritative", "--phase", "final",
+            "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH, "--evidence-dir", tmpdir,
+            env={"OCE_RUN_ID": run_id},
+        )
+        # Mutate ONLY the static results version; refresh manifest hashes so
+        # version disagreement is the sole new defect.
+        results_path = os.path.join(tmpdir, "static-validation-results.json")
+        data = json.load(open(results_path))
+        data["validator_version"] = "3.5.0"
+        data["schema_version"] = "3.5.0"
+        with open(results_path, "w") as f:
+            json.dump(data, f)
+        manifest_path = os.path.join(tmpdir, "evidence-manifest.json")
+        if os.path.exists(manifest_path):
+            manifest = json.load(open(manifest_path))
+            for a in manifest.get("artifacts", []):
+                if a.get("path") == "static-validation-results.json":
+                    h = hashlib.sha256()
+                    with open(results_path, "rb") as f:
+                        h.update(f.read())
+                    a["sha256"] = h.hexdigest()
+            with open(manifest_path, "w") as f:
+                json.dump(manifest, f)
+        rc, out, err = run_gate(tmpdir, commit, tree, env={"OCE_RUN_ID": run_id})
+        combined = out + err
+        assert rc != 0, f"Gate must reject version mismatch, rc={rc}"
+        assert "VERSION-MISMATCH" in combined or "VERSION-" in combined, f"No version error in gate output: {combined}"
+        print("PASS: Independent gate rejects artifact version mismatch")
+
+
+def test_observed_identity_never_substituted():
+    """Regression: evidence must record observed branch truth separately from
+    the expected contract branch; tested_branch must equal the observation."""
+    commit, tree = _git_head()
+    repo_root = str(BASE_DIR.parent.parent)
+    observed = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True,
+                              cwd=repo_root).stdout.strip() or "(detached)"
+    with tempfile.TemporaryDirectory() as tmpdir:
+        run_engine(
+            "--all", "--authoritative", "--phase", "initial",
+            "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH, "--evidence-dir", tmpdir,
+            env={"OCE_RUN_ID": make_run_id()},
+        )
+        payload = json.load(open(os.path.join(tmpdir, "static-validation-results.json")))
+        assert payload.get("observed_git_branch", "") == observed, \
+            f"observed_git_branch {payload.get('observed_git_branch')} != git {observed}"
+        assert payload.get("expected_branch", "") == CONTRACT_BRANCH
+        assert payload.get("tested_branch", "") == payload.get("observed_git_branch", ""), \
+            "tested_branch must reflect the observation, never the expected value"
+        assert "branch_provenance" in payload and payload.get("branch_provenance") in (
+            "git-symbolic-ref", "GITHUB_REF_NAME", "explicit-trusted-ref", "none")
+        print("PASS: Observed identity recorded truthfully; expected never substituted")
+
+
+def test_final_manifest_hashes_match_files():
+    """Regression: evidence-manifest.json must list SHA-256 hashes that match
+    the actual evidence files."""
+    import hashlib as _hashlib
+    commit, tree = _git_head()
+    run_id = make_run_id()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        adv = _make_valid_meta_adv(rejection_exit=1)
+        adv["run_id"] = run_id
+        with open(os.path.join(tmpdir, "adversarial-results.json"), "w") as f:
+            json.dump(adv, f)
+        run_engine(
+            "--all", "--authoritative", "--phase", "final",
+            "--target-commit", commit, "--target-tree", tree,
+            "--target-branch", CONTRACT_BRANCH, "--evidence-dir", tmpdir,
+            env={"OCE_RUN_ID": run_id},
+        )
+        manifest_path = os.path.join(tmpdir, "evidence-manifest.json")
+        assert os.path.exists(manifest_path), "Final phase must write evidence-manifest.json"
+        manifest = json.load(open(manifest_path))
+        artifacts = {a["path"]: a["sha256"] for a in manifest.get("artifacts", [])}
+        for name in ("static-validation-results.json", "adversarial-results.json",
+                     "stage-status.json", "static-validation-summary.md"):
+            p = os.path.join(tmpdir, name)
+            assert os.path.exists(p), f"required artifact missing: {name}"
+            h = _hashlib.sha256()
+            with open(p, "rb") as f:
+                h.update(f.read())
+            assert artifacts.get(name) == h.hexdigest(), f"manifest hash mismatch for {name}"
+        print("PASS: evidence-manifest.json hashes match the evidence files")
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -589,6 +824,17 @@ ALL_TESTS = [
     # Entrypoint Duplication
     ("validate-local is thin wrapper", test_validate_local_is_thin_wrapper),
     ("run-validation.sh is single runner", test_run_validation_is_single_runner),
+    # R3G: Phase ordering
+    ("Authoritative requires explicit phase", test_authoritative_requires_explicit_phase),
+    ("Authoritative requires evidence dir", test_authoritative_requires_evidence_dir),
+    ("Initial phase without adversarial evidence", test_initial_phase_does_not_require_adversarial_evidence),
+    ("Final phase requires adversarial evidence", test_final_phase_requires_adversarial_evidence),
+    # R3G: Version truth
+    ("Artifact version mismatch (3.5 vs 3.6) rejected", test_rejects_artifact_version_mismatch_3_5_vs_3_6),
+    ("Independent gate rejects version mismatch", test_gate_rejects_artifact_version_mismatch),
+    # R3G: Identity truth and manifest
+    ("Observed identity never substituted", test_observed_identity_never_substituted),
+    ("Manifest hashes match evidence files", test_final_manifest_hashes_match_files),
 ]
 
 
@@ -607,7 +853,7 @@ if __name__ == "__main__":
             print(f"FAIL: {name}: {e}")
 
     print(f"\n{'='*50}")
-    print(f"  B1-I1R3F Regression Tests")
+    print(f"  B1-I1R3G Regression Tests (registry-executed)")
     print(f"{'='*50}")
     print(f"  Total:  {passed + failed}")
     print(f"  PASS:   {passed}")

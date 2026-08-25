@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
 # OCE Cloud Ground — Local Validation Entrypoint
-# B1-I1R3F — Thin wrapper around shared runner
+# B1-I1R3G — Thin wrapper around shared runner
 #
 # This script is a thin wrapper. It generates a local OCE_RUN_ID and
 # delegates to the shared runner. It does NOT duplicate any validation logic.
 #
 # Usage:
-#   ./infrastructure/cloud-ground/scripts/validate-local
+#   ./infrastructure/cloud-ground/scripts/validate-local [--evidence-dir PATH]
 #
 set -uo pipefail
 
@@ -23,6 +23,15 @@ if [ ! -x "$SHARED_RUNNER" ]; then
     chmod +x "$SHARED_RUNNER"
 fi
 
+# Optional deterministic evidence directory (machine-readable, outside repo)
+if [ "${1:-}" = "--evidence-dir" ]; then
+    if [ -z "${2:-}" ]; then
+        echo "FATAL: --evidence-dir requires a path" >&2
+        exit 1
+    fi
+    export OCE_EVIDENCE_DIR="$2"
+fi
+
 # Generate local OCE_RUN_ID (caller must provide this)
 if [ -z "${OCE_RUN_ID:-}" ]; then
     export OCE_RUN_ID=$(python3 -c "import secrets; print(secrets.token_hex(6))")
@@ -32,8 +41,9 @@ fi
 export OCE_CI_MODE="false"
 
 echo "════════════════════════════════════════════════════════════════"
-echo "  OCE B1-I1R3F Local Validation (thin wrapper)"
+echo "  OCE B1-I1R3G Local Validation (thin wrapper)"
 echo "  OCE_RUN_ID: $OCE_RUN_ID"
+echo "  EVIDENCE_DIR: ${OCE_EVIDENCE_DIR:-auto}"
 echo "════════════════════════════════════════════════════════════════"
 echo ""
 
