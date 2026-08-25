@@ -1,7 +1,7 @@
 {
-  "checkpoint_id": "B1-I1R3E-SINGLE-RUN-EVIDENCE-CLOSURE",
+  "checkpoint_id": "B1-I1R3F-EXTERNAL-RUN-ID-TRUTH-REPAIR",
   "block": "B1",
-  "increment": "B1-I1R3E",
+  "increment": "B1-I1R3F",
   "repository": {
     "owner": "dabiggestpoppa",
     "name": "larger-lab",
@@ -17,7 +17,7 @@
   "expected_implementation_commit_source": "",
   "expected_tree_sha": "",
   "ci_workflow_name": "b1-i1r3-validation.yml",
-  "evidence_schema_version": "3.5.0",
+  "evidence_schema_version": "3.6.0",
   "constitutional_gates": {
     "no_cloud_provisioning": true,
     "no_purchases": true,
