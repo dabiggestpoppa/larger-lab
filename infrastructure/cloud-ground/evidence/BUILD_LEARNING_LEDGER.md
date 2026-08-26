@@ -102,3 +102,21 @@
 4. **Compose health checks ≠ readiness** — Both must be declared separately
 5. **Policy files document intent** — Enforcement state must be explicitly declared
 6. **No-empty-scaffold rule** — Every file must have substantive content, not just structure
+
+---
+
+## B1-I1 R3 Repair-Cycle Lessons (2026-08-26)
+
+The R3A → R3H repair cycle closed the validation-truth gaps. Lessons promoted to practice:
+
+1. **Expected identity cannot replace observed identity.** Evidence must record the observed git branch (e.g. `(detached)` inside a worktree) and any trusted CI ref separately, then compare through explicit identity rules. Substituting the contract branch into observed fields manufactures truth.
+2. **Authoritative validation needs explicit phases.** Initial validation (source identity, config, security, schema, tools) must run before adversarial evidence exists; final validation additionally requires adversarial evidence, meta-test evidence, evidence consistency, RUN_ID consistency, and gate checks. A loose environment flag is not a phase contract — expose and validate an explicit CLI phase argument.
+3. **Intermediate tests must never overwrite final evidence.** Engine `--only` runs inside the disposable adversarial worktree wrote `static-validation-results.json` with `(detached)` identity into the final evidence directory, failing the final EVIDENCE-CONSISTENCY check. Intermediate payloads go to a scratch directory, never the final evidence dir.
+4. **Evidence paths must be deterministic before execution.** Callers (workflow/operator) must know the evidence directory before validation begins (explicit `--evidence-dir` / `OCE_EVIDENCE_DIR` / path-output file) so failed runs still upload truthful evidence. Never discover it by parsing the runner's last log line.
+5. **Cleanup evidence must exist before the final gate.** `worktree-cleanup.json` (`removed`, `pruned`) is written immediately after worktree removal/prune; the gate treats a missing, malformed, false, or inconsistent cleanup artifact as fatal — not a warning.
+6. **Manifests must be refreshed after mutable log output.** Appending stage-log lines after the engine wrote `evidence-manifest.json` made recorded SHA-256 hashes stale; the runner now refreshes the manifest after every stage-log append, before the gate, and once more after the gate result line.
+7. **CI must preserve exact runner exit codes.** A fail-fast shell must capture the runner's real exit code (`rc=$?`), print the complete log, and exit with that exact status. No pipeline may hide or replace it.
+8. **Commit messages are claims, not execution proof.** Only executed, verified evidence (totals, gate, manifest hashes, artifact identity) proves a checkpoint. Self-authored status fields and commit text are never treated as proof.
+9. **Expiring CI artifacts require durable archival.** GitHub Actions artifacts expire (retention 30 days); the authoritative evidence ZIP is archived byte-identical in `evidence/archive/` with the expanded copy under `evidence/runs/<run_id>/` and a PROVENANCE record, before expiry.
+10. **Pin the full toolchain, not just the headline package.** An unpinned transitive dependency (`ansible-compat` >=4.1.10 resolved to 26.6.0) changed cache behavior and dropped `.ansible/` into the checkout, failing the clean-source check. Pin every dependency that can affect validation behavior.
+
