@@ -23,8 +23,6 @@
 - name: Create monitoring configuration
   ansible.builtin.copy:
     dest: /opt/oce/config/monitoring.yml
-    owner: root
-    group: oce-operator
     content: |
       # OCE Monitoring Configuration
       # B1-I1 — Static skeleton
