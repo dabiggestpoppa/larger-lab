@@ -1,0 +1,48 @@
+{
+  "checkpoint_id": "PFT-B4-A0-GENESIS-RAW",
+  "program_id": "PFT",
+  "branch": "agent/deepers-strategy-foundry",
+  "base_sha": "f764f8b62f3cee8b923a1118d20903a9296ee41b",
+  "status": "A0_SPEC_NOT_RECOVERABLE",
+  "species_id": "PFT-A0-GENESIS",
+  "evidence_class": "RECOVERY_AUDIT",
+  "recovery_exhaustive": true,
+  "specification_found": false,
+  "specification_recoverable": false,
+  "recovery_audit_created": true,
+  "firewall_created": true,
+  "source_inventory_created": true,
+  "source_manifest_created": true,
+  "math_conformance": "NOT_APPLICABLE",
+  "causality_audit": "NOT_APPLICABLE",
+  "activation_census": "NOT_APPLICABLE",
+  "dormancy_gate": "NOT_APPLICABLE",
+  "economic_baseline": "NOT_APPLICABLE",
+  "scorecard": "NOT_APPLICABLE",
+  "bootstrap": "NOT_APPLICABLE",
+  "tests_added": 0,
+  "tests_passing": true,
+  "optimization_performed": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_authorized": false,
+  "blockers": [
+    "A0 Genesis original specification cannot be recovered from repository history",
+    "LINEAGE.md references 'original agent artifacts' that are not in the git repository",
+    "Cannot implement A0 without fabrication, which is prohibited"
+  ],
+  "warnings": [
+    "The A0 specification text was never committed to the repository",
+    "Only a LINEAGE.md registration file exists for A0-GENESIS",
+    "A1 (Deepers v2.2) is fully specified but A0 is NOT",
+    "No A0 formulas, thresholds, or implementation rules are recoverable"
+  ],
+  "required_actions": [
+    "STOP FOR HUMAN REVIEW",
+    "Locate original A0 specification in external sources",
+    "Once found, re-run PFT-B4 checkpoint"
+  ],
+  "conclusion": "A0_SPEC_NOT_RECOVERABLE - Historical A0 cannot be reconstructed without invention."
+}

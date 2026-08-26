@@ -1,0 +1,32 @@
+{
+  "species_id": "PFT-A0-GENESIS",
+  "evidence_class": "RECOVERY_AUDIT",
+  "checkpoint": "PFT-B4-A0-GENESIS-RAW",
+  "recovery_status": "A0_SPEC_NOT_RECOVERABLE",
+  "recovery_date": "2026-08-26",
+  "search_exhaustive": true,
+  "sources_found": [
+    {
+      "path": "quant-lab/research/strategy_foundry/pft/a0_genesis/spec/LINEAGE.md",
+      "commit_sha": "99b696003c6a6518f7c882607112c0b27945c88f",
+      "date": "2026-08-18",
+      "author": "Quant Lab <quant@lab.local>",
+      "content_hash": "77660b11b5f35375272149b78586cb4dcc648495",
+      "relationship_to_a0": "LINEAGE_REGISTRATION",
+      "predates_a1_v2_2": false,
+      "authority_level": "REGISTRATION_ONLY",
+      "contains_specification": false
+    }
+  ],
+  "sources_not_found": [
+    "quant-lab/research/strategy_foundry/pft/a0_genesis/spec/SPEC_A0_GENESIS.json",
+    "quant-lab/research/strategy_foundry/pft/a0_genesis/spec/SPECIFICATION_A0_GENESIS.md",
+    "quant-lab/research/strategy_foundry/pft/a0_genesis/artifacts/*"
+  ],
+  "external_references": [
+    "LINEAGE.md references 'original agent artifacts' not in repository",
+    "Specification text may exist in external conversation history"
+  ],
+  "conclusion": "A0_SPEC_NOT_RECOVERABLE",
+  "reason": "The original A0 Genesis specification was never committed to the repository. Only a LINEAGE.md registration file exists. The specification text referenced in LINEAGE.md as 'original agent artifacts' is not in the git history."
+}

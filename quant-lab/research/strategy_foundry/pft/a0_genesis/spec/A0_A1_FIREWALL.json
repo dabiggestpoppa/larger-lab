@@ -1,0 +1,24 @@
+{
+  "species_id": "PFT-A0-GENESIS",
+  "evidence_class": "RAW",
+  "checkpoint": "PFT-B4-A0-GENESIS-RAW",
+  "firewall_status": "A0_SPEC_NOT_RECOVERABLE",
+  "firewall_imposed": false,
+  "firewall_rationale": "A0 specification not recoverable; firewall irrelevant",
+  "a1_knowledge_known_to_builder": {
+    "K1_activation": 0,
+    "K3_activation": 0,
+    "K4_activation": 0,
+    "K2_activation_rate": 0.226,
+    "overall_dormancy": "A1 RAW full stack dormant"
+  },
+  "contamination_control": {
+    "a0_threshold_choice_influenced_by_a1": false,
+    "a0_mathematical_interpretation_influenced_by_a1": false,
+    "a0_activation_design_influenced_by_a1": false,
+    "a0_execution_design_influenced_by_a1": false
+  },
+  "hard_stop_invoked": true,
+  "hard_stop_reason": "A0 specification cannot be recovered from repository without invention",
+  "decision": "A0_SPEC_NOT_RECOVERABLE"
+}
