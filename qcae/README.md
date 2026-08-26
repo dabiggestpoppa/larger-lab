@@ -31,11 +31,11 @@ QCAE must run independently while OCE upgrades are still in progress. It should 
 
 ## Canon organization
 
-### Book I — QCAE Constitution & Capability Theory
-- Block 0 — Constitution & System Identity
-- Block 1 — Capability Model
+### Book I — QCAE Constitution & Capability Theory — COMPLETE
+- Block 0 — Constitution & System Identity — COMPLETE
+- Block 1 — Capability Model — FROZEN v0.1
 
-### Book II — Discovery & Repository Intelligence
+### Book II — Discovery & Repository Intelligence — NEXT
 - Block 2 — Discovery Intelligence
 - Block 3 — Repository Intelligence / DeepWiki Layer
 - Block 4 — Capability Forensics
@@ -80,6 +80,14 @@ QCAE must run independently while OCE upgrades are still in progress. It should 
 
 ## Canon status
 
-- Overall architecture: v0.1 planned
-- Block 0: full draft included in `books/book-01/block-00-constitution.md`
-- Blocks 1-18: outlined, pending full expansion
+- Overall architecture: v0.1
+- Book I: complete
+- Block 0: complete at `books/book-01/block-00-constitution.md`
+- Block 1: frozen at `books/book-01/block-01/`
+- Book I completion/index: `books/book-01/README.md`
+- Block 1 freeze review: `books/book-01/BLOCK-01-FREEZE-REVIEW.md`
+- Blocks 2-18: outlined, pending full expansion
+
+## History discipline
+
+QCAE canon and implementation work should use narrow milestone commits rather than monolithic chapter/build commits. Each substantive chapter, subsystem, integration review, freeze, and amendment should have its own checkpoint so future agents can bisect design changes, trace regressions, compare code to the exact governing plan, and maintain a usable engineering backlog.
