@@ -1,0 +1,16 @@
+{
+  "n_alt_reached": 75,
+  "n_br_before_alt": 40,
+  "p_alt_reached_30d": 0.6,
+  "p_broad_risk_before_alt": 0.5333,
+  "broad_risk_ttd": 6.0,
+  "alt_ttd": 2.0,
+  "verdict": "UNRESOLVED",
+  "pattern_counts": {
+    "CONC_REENTRY": 52,
+    "CONC_MIXED": 44,
+    "CONC_BROAD_RISK_ONLY": 18,
+    "CONC_DIRECT_ALT": 9,
+    "CONC_DEFENSIVE": 2
+  }
+}
