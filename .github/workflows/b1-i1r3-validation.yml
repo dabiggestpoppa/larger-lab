@@ -16,6 +16,11 @@ jobs:
       # ═══════════════════════════════════════════════════════════════
       - name: Checkout implementation commit
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          # Full history: the engine's BASE_SHA check resolves ancestry via
+          # git merge-base against the contract's authoritative base, which a
+          # shallow (fetch-depth: 1) checkout cannot.
+          fetch-depth: 0
 
       # ═══════════════════════════════════════════════════════════════
       # Install Python and pinned dependencies
