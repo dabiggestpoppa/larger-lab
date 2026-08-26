@@ -31,16 +31,16 @@ QCAE must run independently while OCE upgrades are still in progress. It should 
 
 ## Canon organization
 
-### Book I — QCAE Constitution & Capability Theory — COMPLETE
-- Block 0 — Constitution & System Identity — COMPLETE
-- Block 1 — Capability Model — FROZEN v0.1
+### Book I — QCAE Constitution & Capability Theory — COMPLETE / FROZEN v0.1
+- Block 0 — Constitution & System Identity
+- Block 1 — Capability Model
 
-### Book II — Discovery & Repository Intelligence — NEXT
+### Book II — Discovery & Repository Intelligence — COMPLETE / FROZEN v0.1
 - Block 2 — Discovery Intelligence
 - Block 3 — Repository Intelligence / DeepWiki Layer
 - Block 4 — Capability Forensics
 
-### Book III — Trust, Proof & Quant Validation
+### Book III — Trust, Proof & Quant Validation — NEXT
 - Block 5 — Trust, Security & Legal
 - Block 6 — Proving Lab
 - Block 7 — Quant & Financial Validation
@@ -81,13 +81,15 @@ QCAE must run independently while OCE upgrades are still in progress. It should 
 ## Canon status
 
 - Overall architecture: v0.1
-- Book I: complete
-- Block 0: complete at `books/book-01/block-00-constitution.md`
-- Block 1: frozen at `books/book-01/block-01/`
-- Book I completion/index: `books/book-01/README.md`
-- Block 1 freeze review: `books/book-01/BLOCK-01-FREEZE-REVIEW.md`
-- Blocks 2-18: outlined, pending full expansion
+- Book I: COMPLETE / FROZEN v0.1
+- Book II: COMPLETE / FROZEN v0.1
+- Book II index: `books/book-02/README.md`
+- Block 2 freeze: `books/book-02/BLOCK-02-FREEZE-REVIEW.md`
+- Block 3 freeze: `books/book-02/BLOCK-03-FREEZE-REVIEW.md`
+- Block 4 freeze: `books/book-02/BLOCK-04-FREEZE-REVIEW.md`
+- Book II freeze: `books/book-02/BOOK-02-FREEZE-REVIEW.md`
+- Blocks 5-18: outlined, pending full expansion
 
 ## History discipline
 
-QCAE canon and implementation work should use narrow milestone commits rather than monolithic chapter/build commits. Each substantive chapter, subsystem, integration review, freeze, and amendment should have its own checkpoint so future agents can bisect design changes, trace regressions, compare code to the exact governing plan, and maintain a usable engineering backlog.
+QCAE canon and implementation work uses narrow milestone commits rather than monolithic chapter/build commits. Each substantive chapter, subsystem, integration review, freeze, and amendment receives its own checkpoint so future agents can bisect design changes, trace regressions, compare code to the exact governing plan, and maintain a usable engineering backlog.
