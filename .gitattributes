@@ -2,3 +2,7 @@
 *.py text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
+# Extensionless shell entrypoints: force LF so Windows clones (core.autocrlf)
+# never break shellcheck SC1017 on them.
+infrastructure/cloud-ground/scripts/* text eol=lf
+infrastructure/cloud-ground/scripts/*.py text eol=lf
