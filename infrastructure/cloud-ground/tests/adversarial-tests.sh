@@ -506,7 +506,7 @@ echo "  [$TOTAL_COUNT] CLI-05: FAIL paired with nonzero exit"
 mkdir -p "$BACKUP_DIR"
 cp "$IDENTITY" "$BACKUP_DIR/pre-CLI-05.json"
 python3 -c "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['owner']='bad';json.dump(d,open(p,'w'),indent=2)" "$(win_path "$IDENTITY")"
-rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$EVIDENCE_DIR_WIN" >/dev/null 2>&1 || rc=$?
+rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" >/dev/null 2>&1 || rc=$?
 cp "$BACKUP_DIR/pre-CLI-05.json" "$IDENTITY"
 res=$(get_result "SOURCE-IDENTITY")
 if [ "$res" = "FAIL" ] && [ "$rc" -ne 0 ]; then

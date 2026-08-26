@@ -914,6 +914,29 @@ def test_no_duplicate_authoritative_entrypoint():
     print("PASS: single authoritative validation entrypoint")
 
 
+def test_adversarial_suite_confined_to_scratch_dir():
+    """Regression: every intermediate engine run inside the adversarial
+    suite must target the scratch directory, never the final evidence dir.
+    An engine --only run from inside the detached disposable worktree writes
+    static-validation-results.json whose tested_branch is "(detached)"; if
+    that write lands in the final evidence dir it clobbers the authoritative
+    artifact and the final phase's EVIDENCE-CONSISTENCY check fails with
+    'BRANCH: evidence=(detached) actual=oce'."""
+    adv = BASE_DIR / "tests" / "adversarial-tests.sh"
+    content = adv.read_text(encoding="utf-8")
+    for lineno, line in enumerate(content.splitlines(), 1):
+        if "--only" in line and ("ENGINE_WIN" in line or "validate_engine.py" in line):
+            assert '--evidence-dir "$SCRATCH_DIR_WIN"' in line, (
+                f"adversarial-tests.sh:{lineno}: --only engine run must use the scratch dir "
+                f"(writing from the detached worktree into the final evidence dir would "
+                f"clobber authoritative identity): {line.strip()}"
+            )
+    assert '"$EVIDENCE_DIR_WIN"' not in content, (
+        "adversarial suite must never pass --evidence-dir pointing at the final evidence dir"
+    )
+    print("PASS: adversarial --only engine runs confined to scratch dir")
+
+
 # ═══════════════════════════════════════════════════════════════════
 # Helpers
 # ═══════════════════════════════════════════════════════════════════
@@ -1048,6 +1071,7 @@ ALL_TESTS = [
     ("Workflow preserves runner exit code", test_workflow_preserves_runner_exit_code),
     ("Every registered test executes", test_every_registered_test_executes),
     ("Single authoritative entrypoint", test_no_duplicate_authoritative_entrypoint),
+    ("Adversarial --only runs confined to scratch dir", test_adversarial_suite_confined_to_scratch_dir),
 ]
 
 
