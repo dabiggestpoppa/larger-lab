@@ -937,6 +937,32 @@ def test_adversarial_suite_confined_to_scratch_dir():
     print("PASS: adversarial --only engine runs confined to scratch dir")
 
 
+def test_gate_contract_path_and_manifest_freshness():
+    """Regression: the independent gate runs its Python body from stdin
+    (heredoc), so __file__ is '-' and resolving the contract via
+    os.path.dirname(__file__) points at the caller's cwd — the contract must
+    instead be resolved from the gate script's own directory and passed as an
+    explicit argument. The shared runner must also refresh
+    evidence-manifest.json after every stage-log append so recorded SHA-256
+    hashes match the actual files when the gate verifies them."""
+    gate = FINAL_GATE.read_text(encoding="utf-8")
+    assert 'CONTRACT_PATH="$SCRIPT_DIR/../contracts/checkpoint-identity-data.json"' in gate, \
+        "gate must resolve the contract from its own script directory"
+    assert "contract_path_arg" in gate and "sys.argv[4]" in gate, \
+        "gate must receive the contract path as an explicit argument"
+    assert "os.path.dirname(os.path.abspath(__file__))" not in gate, \
+        "gate must not resolve paths from __file__ (it runs from stdin)"
+    runner = RUN_VALIDATION.read_text(encoding="utf-8").splitlines()
+    def_idx = next(i for i, l in enumerate(runner) if l.strip() == "write_manifest() {")
+    gate_idx = next(i for i, l in enumerate(runner) if 'bash "$GATE"' in l)
+    calls = [i for i, l in enumerate(runner) if l.strip() == "write_manifest"]
+    assert def_idx < gate_idx, "write_manifest must be defined before the gate runs"
+    assert len(calls) >= 2, "runner must refresh the manifest before and after the gate"
+    assert calls[0] < gate_idx < calls[1], \
+        "manifest must be refreshed before the gate verifies hashes and once more after"
+    print("PASS: gate contract path resolved from script dir; manifest refreshed before gate")
+
+
 # ═══════════════════════════════════════════════════════════════════
 # Helpers
 # ═══════════════════════════════════════════════════════════════════
@@ -1072,6 +1098,7 @@ ALL_TESTS = [
     ("Every registered test executes", test_every_registered_test_executes),
     ("Single authoritative entrypoint", test_no_duplicate_authoritative_entrypoint),
     ("Adversarial --only runs confined to scratch dir", test_adversarial_suite_confined_to_scratch_dir),
+    ("Gate contract path and manifest freshness", test_gate_contract_path_and_manifest_freshness),
 ]
 
 

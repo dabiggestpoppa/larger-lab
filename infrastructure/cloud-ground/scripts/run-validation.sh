@@ -189,6 +189,49 @@ record_result() {
     printf '%s\n' "$*" >> "$FINAL_EVIDENCE/stage-log.txt"
 }
 
+write_manifest() {
+    # Regenerate evidence-manifest.json AFTER stage-log appends so the
+    # recorded SHA-256 hashes match the actual files at gate time. Preserves
+    # the identity fields from the engine-generated manifest and only
+    # refreshes artifact hashes/sizes and generated_at.
+    python3 - "$FINAL_EVIDENCE_WIN" <<'PYEOF'
+import hashlib, json, os, sys
+from datetime import datetime, timezone
+
+ev_dir = sys.argv[1]
+man_path = os.path.join(ev_dir, "evidence-manifest.json")
+manifest = {}
+if os.path.exists(man_path):
+    try:
+        with open(man_path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+    except Exception:
+        manifest = {}
+required = [
+    "static-validation-results.json", "static-validation-summary.md",
+    "adversarial-results.json", "stage-status.json", "worktree-cleanup.json",
+    "regression-output.txt", "stage-log.txt",
+]
+artifacts = []
+for name in required:
+    p = os.path.join(ev_dir, name)
+    if not os.path.exists(p):
+        continue
+    h = hashlib.sha256()
+    with open(p, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    artifacts.append({"path": name, "sha256": h.hexdigest(),
+                      "size": os.path.getsize(p)})
+manifest["artifacts"] = artifacts
+manifest["generated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+tmp = man_path + ".tmp"
+with open(tmp, "w", encoding="utf-8") as f:
+    json.dump(manifest, f, indent=2, ensure_ascii=False)
+os.replace(tmp, man_path)
+PYEOF
+}
+
 echo "════════════════════════════════════════════════════════════════"
 echo "  OCE B1-I1R3H Shared Validation Runner"
 echo "════════════════════════════════════════════════════════════════"
@@ -409,6 +452,9 @@ fi
 record_result "STEP l/m: final validation wrote results, summary, manifest"
 echo "  Final phase complete."
 echo ""
+# stage-log.txt just changed — refresh the manifest so recorded hashes
+# match the actual files when the independent gate verifies them.
+write_manifest
 
 # ═══════════════════════════════════════════════════════════════════
 # Step n: Independent final gate
@@ -422,6 +468,9 @@ if [ "$GATE_RC" -ne 0 ]; then
     exit 1
 fi
 record_result "STEP n: independent gate READY_FOR_OPERATOR_REVIEW"
+# The gate result line just changed stage-log.txt — refresh the manifest once
+# more so the uploaded evidence package is internally consistent.
+write_manifest
 echo ""
 
 # ═══════════════════════════════════════════════════════════════════

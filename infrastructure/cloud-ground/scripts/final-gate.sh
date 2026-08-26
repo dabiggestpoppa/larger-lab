@@ -15,12 +15,22 @@ EVIDENCE_DIR="${1:-}"
 EXPECTED_COMMIT="${2:-}"
 EXPECTED_TREE="${3:-}"
 
+# The gate runs its Python body from stdin (heredoc), so __file__ is "-" and
+# os.path.dirname(__file__) resolves against the caller's cwd. Resolve the
+# contract path from THIS script's location and pass it in explicitly.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONTRACT_PATH="$SCRIPT_DIR/../contracts/checkpoint-identity-data.json"
+
 if [ -z "$EVIDENCE_DIR" ] || [ -z "$EXPECTED_COMMIT" ] || [ -z "$EXPECTED_TREE" ]; then
     echo "GATE-FAIL: usage: final-gate.sh <evidence-dir> <expected-commit> <expected-tree>" >&2
     exit 1
 fi
+if [ ! -f "$CONTRACT_PATH" ]; then
+    echo "GATE-FAIL: contract not found at $CONTRACT_PATH" >&2
+    exit 1
+fi
 
-python3 - "$EVIDENCE_DIR" "$EXPECTED_COMMIT" "$EXPECTED_TREE" <<'PYEOF'
+python3 - "$EVIDENCE_DIR" "$EXPECTED_COMMIT" "$EXPECTED_TREE" "$CONTRACT_PATH" <<'PYEOF'
 import hashlib
 import json
 import os
@@ -28,6 +38,7 @@ import subprocess
 import sys
 
 ev_dir, expected_commit, expected_tree = sys.argv[1], sys.argv[2], sys.argv[3]
+contract_path_arg = sys.argv[4]
 errors = []
 warnings = []
 
@@ -125,11 +136,8 @@ if stage.get("implementation_tree", "") != expected_tree:
     errors.append(f"STAGE-TREE mismatch")
 
 # ── Branch identity through explicit rules ──────────────────────
-contract_path = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "..", "contracts",
-    "checkpoint-identity-data.json")
 try:
-    with open(contract_path, "r", encoding="utf-8") as f:
+    with open(contract_path_arg, "r", encoding="utf-8") as f:
         contract = json.load(f)
     expected_branch = contract.get("authorized_branch", "")
 except Exception as e:
