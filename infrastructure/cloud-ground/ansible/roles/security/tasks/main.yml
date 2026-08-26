@@ -41,7 +41,7 @@
     - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
     - { regexp: '^#?ClientAliveInterval', line: 'ClientAliveInterval 300' }
     - { regexp: '^#?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
-  notify: restart ssh
+  notify: Restart ssh
   tags: [security, ssh]
 
 # NOTE: PasswordAuthentication is intentionally NOT disabled here.

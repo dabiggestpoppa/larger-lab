@@ -27,6 +27,9 @@
 - name: Create backup exclusion list
   ansible.builtin.copy:
     dest: /opt/oce/config/backup-excludes.txt
+    owner: root
+    group: oce-operator
+    mode: '0640'
     content: |
       # OCE backup exclusion list
       # Do not backup: secrets, temp files, caches, node_modules

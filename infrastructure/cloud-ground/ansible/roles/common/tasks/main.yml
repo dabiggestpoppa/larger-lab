@@ -31,14 +31,14 @@
 - name: Set timezone to UTC
   community.general.timezone:
     name: UTC
-  notify: restart chrony
+  notify: Restart chrony
   tags: [common, time]
 
 - name: Ensure chrony is installed and running
   ansible.builtin.apt:
     name: chrony
     state: present
-  notify: restart chrony
+  notify: Restart chrony
   tags: [common, time]
 
 - name: Ensure chrony service is enabled
@@ -61,6 +61,7 @@
     path: /etc/apt/apt.conf.d/20auto-upgrades
     regexp: 'APT::Periodic::Update-Package-Lists'
     line: 'APT::Periodic::Update-Package-Lists "1";'
+    mode: "0644"
     create: true
   tags: [common, security]
 

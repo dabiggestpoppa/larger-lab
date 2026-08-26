@@ -52,6 +52,9 @@
 - name: Configure Docker daemon
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
     content: |
       {
         "log-driver": "json-file",
@@ -66,7 +69,7 @@
         "userland-proxy": false
       }
     mode: '0644'
-  notify: restart docker
+  notify: Restart docker
   tags: [docker, config]
 
 - name: Ensure Docker data directory exists

@@ -17,12 +17,15 @@
     path: /etc/default/sysstat
     regexp: 'ENABLED='
     line: 'ENABLED="true"'
-  notify: restart sysstat
+  notify: Restart sysstat
   tags: [monitoring]
 
 - name: Create monitoring configuration
   ansible.builtin.copy:
     dest: /opt/oce/config/monitoring.yml
+    owner: root
+    group: oce-operator
+    mode: '0644'
     content: |
       # OCE Monitoring Configuration
       # B1-I1 — Static skeleton
