@@ -1,0 +1,1523 @@
+[
+  {
+    "cluster": "SECTOR",
+    "name": "1confirmation-portfolio",
+    "share_global": 0.1692,
+    "share_chain_incremental": 0.2475,
+    "share_sector_incremental": 0.001,
+    "share_idio": 0.5823,
+    "n_member_days": 16101
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "2017-2018-alt-season",
+    "share_global": 0.2896,
+    "share_chain_incremental": 0.0242,
+    "share_sector_incremental": 0.0016,
+    "share_idio": 0.6846,
+    "n_member_days": 11271
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "a16z-portfolio",
+    "share_global": 0.1331,
+    "share_chain_incremental": 0.2219,
+    "share_sector_incremental": 0.001,
+    "share_idio": 0.644,
+    "n_member_days": 25022
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "aave-tokens",
+    "share_global": 0.3485,
+    "share_chain_incremental": 0.0166,
+    "share_sector_incremental": 0.0094,
+    "share_idio": 0.6255,
+    "n_member_days": 600
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "account-abstraction",
+    "share_global": 0.14,
+    "share_chain_incremental": 0.1485,
+    "share_sector_incremental": 0.0168,
+    "share_idio": 0.6947,
+    "n_member_days": 3089
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "ai-agent-launchpad",
+    "share_global": 0.3661,
+    "share_chain_incremental": 0.0271,
+    "share_sector_incremental": 0.0659,
+    "share_idio": 0.5408,
+    "n_member_days": 1450
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "ai-agents",
+    "share_global": 0.0708,
+    "share_chain_incremental": 0.0232,
+    "share_sector_incremental": 0.0298,
+    "share_idio": 0.8762,
+    "n_member_days": 4865
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "ai-applications",
+    "share_global": 0.0004,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.0759,
+    "share_idio": 0.9237,
+    "n_member_days": 1751
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "ai-big-data",
+    "share_global": 0.0823,
+    "share_chain_incremental": 0.1644,
+    "share_sector_incremental": 0.0046,
+    "share_idio": 0.7487,
+    "n_member_days": 51299
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "ai-memes",
+    "share_global": 0.1048,
+    "share_chain_incremental": 0.0309,
+    "share_sector_incremental": 0.0808,
+    "share_idio": 0.7836,
+    "n_member_days": 1869
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "alameda-research-portfolio",
+    "share_global": 0.1203,
+    "share_chain_incremental": 0.246,
+    "share_sector_incremental": 0.0003,
+    "share_idio": 0.6334,
+    "n_member_days": 38040
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "algorand-ecosystem",
+    "share_global": 0.0776,
+    "share_chain_incremental": 0.1387,
+    "share_sector_incremental": 0.0552,
+    "share_idio": 0.7285,
+    "n_member_days": 4858
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "algorithmic-stablecoin",
+    "share_global": 0.0015,
+    "share_chain_incremental": 0.0093,
+    "share_sector_incremental": 0.0039,
+    "share_idio": 0.9852,
+    "n_member_days": 7167
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "alleged-sec-securities",
+    "share_global": 0.0615,
+    "share_chain_incremental": 0.09,
+    "share_sector_incremental": 0.0004,
+    "share_idio": 0.8481,
+    "n_member_days": 16676
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "amm",
+    "share_global": 0.0973,
+    "share_chain_incremental": 0.1948,
+    "share_sector_incremental": 0.002,
+    "share_idio": 0.7058,
+    "n_member_days": 20462
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "analytics",
+    "share_global": 0.0252,
+    "share_chain_incremental": 0.1097,
+    "share_sector_incremental": 0.5782,
+    "share_idio": 0.2869,
+    "n_member_days": 777
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "animal-memes",
+    "share_global": 0.1106,
+    "share_chain_incremental": 0.0073,
+    "share_sector_incremental": 0.2014,
+    "share_idio": 0.6807,
+    "n_member_days": 8316
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "animoca-brands-portfolio",
+    "share_global": 0.0649,
+    "share_chain_incremental": 0.2335,
+    "share_sector_incremental": 0.0077,
+    "share_idio": 0.6939,
+    "n_member_days": 15903
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "aptos-ecosystem",
+    "share_global": 0.1492,
+    "share_chain_incremental": 0.3001,
+    "share_sector_incremental": 0.168,
+    "share_idio": 0.3826,
+    "n_member_days": 1987
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "arbitrum-ecosystem",
+    "share_global": 0.2081,
+    "share_chain_incremental": 0.0269,
+    "share_sector_incremental": 0.0003,
+    "share_idio": 0.7647,
+    "n_member_days": 19905
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "arbitrum-ecosytem",
+    "share_global": 0.0516,
+    "share_chain_incremental": 0.2813,
+    "share_sector_incremental": 0.0012,
+    "share_idio": 0.6659,
+    "n_member_days": 19888
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "arrington-xrp-capital",
+    "share_global": 0.1953,
+    "share_chain_incremental": 0.0564,
+    "share_sector_incremental": 0.0061,
+    "share_idio": 0.7423,
+    "n_member_days": 1923
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "arrington-xrp-capital-portfolio",
+    "share_global": 0.0858,
+    "share_chain_incremental": 0.2864,
+    "share_sector_incremental": 0.0003,
+    "share_idio": 0.6275,
+    "n_member_days": 20324
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "art",
+    "share_global": 0.0411,
+    "share_chain_incremental": 0.0657,
+    "share_sector_incremental": 0.5103,
+    "share_idio": 0.3828,
+    "n_member_days": 2016
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "asset-backed-stablecoin",
+    "share_global": 0.0004,
+    "share_chain_incremental": 0.0018,
+    "share_sector_incremental": 0.001,
+    "share_idio": 0.9968,
+    "n_member_days": 16683
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "asset-management",
+    "share_global": 0.0551,
+    "share_chain_incremental": 0.0735,
+    "share_sector_incremental": 0.0263,
+    "share_idio": 0.8452,
+    "n_member_days": 9169
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "atomic-swaps",
+    "share_global": 0.0811,
+    "share_chain_incremental": 0.1198,
+    "share_sector_incremental": 0.471,
+    "share_idio": 0.3281,
+    "n_member_days": 1727
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "aurora-ecosystem",
+    "share_global": 0.5505,
+    "share_chain_incremental": 0.078,
+    "share_sector_incremental": 0.0085,
+    "share_idio": 0.3629,
+    "n_member_days": 546
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "avalanche-ecosystem",
+    "share_global": 0.0928,
+    "share_chain_incremental": 0.1036,
+    "share_sector_incremental": 0.0043,
+    "share_idio": 0.7993,
+    "n_member_days": 10684
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "base-ecosystem",
+    "share_global": 0.0121,
+    "share_chain_incremental": 0.0029,
+    "share_sector_incremental": 0.001,
+    "share_idio": 0.984,
+    "n_member_days": 14632
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "binance-alpha",
+    "share_global": 0.0175,
+    "share_chain_incremental": 0.0037,
+    "share_sector_incremental": 0.0041,
+    "share_idio": 0.9747,
+    "n_member_days": 10266
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "binance-alpha-airdrops",
+    "share_global": 0.1585,
+    "share_chain_incremental": 0.0593,
+    "share_sector_incremental": 0.0108,
+    "share_idio": 0.7715,
+    "n_member_days": 3626
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "binance-chain",
+    "share_global": 0.1155,
+    "share_chain_incremental": 0.104,
+    "share_sector_incremental": 0.0031,
+    "share_idio": 0.7774,
+    "n_member_days": 14142
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "binance-ecosystem",
+    "share_global": 0.2543,
+    "share_chain_incremental": 0.0603,
+    "share_sector_incremental": 0.0025,
+    "share_idio": 0.6829,
+    "n_member_days": 42501
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "binance-labs-portfolio",
+    "share_global": 0.1156,
+    "share_chain_incremental": 0.2273,
+    "share_sector_incremental": 0.0027,
+    "share_idio": 0.6545,
+    "n_member_days": 12225
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "binance-launchpad",
+    "share_global": 0.0023,
+    "share_chain_incremental": 0.0002,
+    "share_sector_incremental": 0.0,
+    "share_idio": 0.9975,
+    "n_member_days": 8849
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "binance-launchpool",
+    "share_global": 0.0775,
+    "share_chain_incremental": 0.3047,
+    "share_sector_incremental": 0.0122,
+    "share_idio": 0.6056,
+    "n_member_days": 10250
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "binance-smart-chain",
+    "share_global": 0.0632,
+    "share_chain_incremental": 0.042,
+    "share_sector_incremental": 0.0012,
+    "share_idio": 0.8936,
+    "n_member_days": 17164
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "bitcoin-ecosystem",
+    "share_global": 0.041,
+    "share_chain_incremental": 0.4294,
+    "share_sector_incremental": 0.0014,
+    "share_idio": 0.5282,
+    "n_member_days": 8972
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "blake256",
+    "share_global": 0.2715,
+    "share_chain_incremental": 0.1974,
+    "share_sector_incremental": 0.1575,
+    "share_idio": 0.3735,
+    "n_member_days": 1170
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "blake2b",
+    "share_global": 0.154,
+    "share_chain_incremental": 0.1878,
+    "share_sector_incremental": 0.1306,
+    "share_idio": 0.5276,
+    "n_member_days": 3364
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "blake2s",
+    "share_global": 0.0466,
+    "share_chain_incremental": 0.1024,
+    "share_sector_incremental": 0.6644,
+    "share_idio": 0.1866,
+    "n_member_days": 936
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "blast-ecosystem",
+    "share_global": 0.0632,
+    "share_chain_incremental": 0.4728,
+    "share_sector_incremental": 0.1138,
+    "share_idio": 0.3502,
+    "n_member_days": 660
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "blockchain-capital-portfolio",
+    "share_global": 0.143,
+    "share_chain_incremental": 0.2015,
+    "share_sector_incremental": 0.0641,
+    "share_idio": 0.5914,
+    "n_member_days": 3572
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "bnb-chain",
+    "share_global": 0.0226,
+    "share_chain_incremental": 0.0074,
+    "share_sector_incremental": 0.0,
+    "share_idio": 0.97,
+    "n_member_days": 30185
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "bnb-chain-ecosystem",
+    "share_global": 0.0698,
+    "share_chain_incremental": 0.0144,
+    "share_sector_incremental": 0.0001,
+    "share_idio": 0.9157,
+    "n_member_days": 11689
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "boostvc-portfolio",
+    "share_global": 0.0945,
+    "share_chain_incremental": 0.1571,
+    "share_sector_incremental": 0.0247,
+    "share_idio": 0.7237,
+    "n_member_days": 4878
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cardano",
+    "share_global": 0.0794,
+    "share_chain_incremental": 0.2512,
+    "share_sector_incremental": 0.1114,
+    "share_idio": 0.558,
+    "n_member_days": 2959
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cardano-ecosystem",
+    "share_global": 0.104,
+    "share_chain_incremental": 0.6359,
+    "share_sector_incremental": 0.0178,
+    "share_idio": 0.2423,
+    "n_member_days": 1736
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cat-themed",
+    "share_global": 0.0486,
+    "share_chain_incremental": 0.2024,
+    "share_sector_incremental": 0.0589,
+    "share_idio": 0.69,
+    "n_member_days": 1023
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "centralized-exchange",
+    "share_global": 0.0918,
+    "share_chain_incremental": 0.0894,
+    "share_sector_incremental": 0.0551,
+    "share_idio": 0.7638,
+    "n_member_days": 13517
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "chromia-ecosystem",
+    "share_global": 0.3985,
+    "share_chain_incremental": 0.0083,
+    "share_sector_incremental": 0.2901,
+    "share_idio": 0.303,
+    "n_member_days": 702
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cmc-crypto-awards-2024",
+    "share_global": 0.1137,
+    "share_chain_incremental": 0.3877,
+    "share_sector_incremental": 0.041,
+    "share_idio": 0.4576,
+    "n_member_days": 755
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cmc-crypto-yearbook-2024-2025",
+    "share_global": 0.431,
+    "share_chain_incremental": 0.0604,
+    "share_sector_incremental": 0.0,
+    "share_idio": 0.5086,
+    "n_member_days": 888
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cms-holdings-portfolio",
+    "share_global": 0.2602,
+    "share_chain_incremental": 0.1404,
+    "share_sector_incremental": 0.217,
+    "share_idio": 0.3824,
+    "n_member_days": 562
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "coinbase-ventures-portfolio",
+    "share_global": 0.0735,
+    "share_chain_incremental": 0.178,
+    "share_sector_incremental": 0.0156,
+    "share_idio": 0.7329,
+    "n_member_days": 7950
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "coinfund-portfolio",
+    "share_global": 0.1157,
+    "share_chain_incremental": 0.0171,
+    "share_sector_incremental": 0.0423,
+    "share_idio": 0.8248,
+    "n_member_days": 1312
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "collectibles-nfts",
+    "share_global": 0.0689,
+    "share_chain_incremental": 0.1478,
+    "share_sector_incremental": 0.0136,
+    "share_idio": 0.7697,
+    "n_member_days": 32479
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "communications-social-media",
+    "share_global": 0.2292,
+    "share_chain_incremental": 0.0248,
+    "share_sector_incremental": 0.3891,
+    "share_idio": 0.3568,
+    "n_member_days": 664
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "content-creation",
+    "share_global": 0.095,
+    "share_chain_incremental": 0.1158,
+    "share_sector_incremental": 0.0037,
+    "share_idio": 0.7855,
+    "n_member_days": 15814
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cosmos-ecosystem",
+    "share_global": 0.1179,
+    "share_chain_incremental": 0.2342,
+    "share_sector_incremental": 0.0044,
+    "share_idio": 0.6435,
+    "n_member_days": 11320
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cronos-ecosystem",
+    "share_global": 0.2612,
+    "share_chain_incremental": 0.028,
+    "share_sector_incremental": 0.3933,
+    "share_idio": 0.3174,
+    "n_member_days": 943
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cross-chain",
+    "share_global": 0.0889,
+    "share_chain_incremental": 0.3654,
+    "share_sector_incremental": 0.1764,
+    "share_idio": 0.3693,
+    "n_member_days": 1311
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "crowdfunding",
+    "share_global": 0.1266,
+    "share_chain_incremental": 0.1251,
+    "share_sector_incremental": 0.1072,
+    "share_idio": 0.641,
+    "n_member_days": 3780
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "cybersecurity",
+    "share_global": 0.1507,
+    "share_chain_incremental": 0.1931,
+    "share_sector_incremental": 0.1766,
+    "share_idio": 0.4795,
+    "n_member_days": 1427
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "dag",
+    "share_global": 0.0926,
+    "share_chain_incremental": 0.2139,
+    "share_sector_incremental": 0.0631,
+    "share_idio": 0.6304,
+    "n_member_days": 5129
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "dao",
+    "share_global": 0.1077,
+    "share_chain_incremental": 0.1361,
+    "share_sector_incremental": 0.0231,
+    "share_idio": 0.7331,
+    "n_member_days": 11709
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "dao-maker",
+    "share_global": 0.0574,
+    "share_chain_incremental": 0.1628,
+    "share_sector_incremental": 0.4692,
+    "share_idio": 0.3106,
+    "n_member_days": 1267
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "dapp",
+    "share_global": 0.0484,
+    "share_chain_incremental": 0.0807,
+    "share_sector_incremental": 0.5993,
+    "share_idio": 0.2717,
+    "n_member_days": 1596
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "data-provenance",
+    "share_global": 0.1728,
+    "share_chain_incremental": 0.259,
+    "share_sector_incremental": 0.0908,
+    "share_idio": 0.4774,
+    "n_member_days": 1958
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "dcg-portfolio",
+    "share_global": 0.1217,
+    "share_chain_incremental": 0.1695,
+    "share_sector_incremental": 0.1868,
+    "share_idio": 0.522,
+    "n_member_days": 2558
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "decentralized-exchange",
+    "share_global": 0.1715,
+    "share_chain_incremental": 0.0479,
+    "share_sector_incremental": 0.0043,
+    "share_idio": 0.7764,
+    "n_member_days": 6405
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "decentralized-exchange-dex-token",
+    "share_global": 0.0524,
+    "share_chain_incremental": 0.3099,
+    "share_sector_incremental": 0.0124,
+    "share_idio": 0.6253,
+    "n_member_days": 3999
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "defi",
+    "share_global": 0.0474,
+    "share_chain_incremental": 0.172,
+    "share_sector_incremental": 0.0079,
+    "share_idio": 0.7727,
+    "n_member_days": 46693
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "depin",
+    "share_global": 0.0834,
+    "share_chain_incremental": 0.2026,
+    "share_sector_incremental": 0.0159,
+    "share_idio": 0.6981,
+    "n_member_days": 5270
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "discount-token",
+    "share_global": 0.2393,
+    "share_chain_incremental": 0.0057,
+    "share_sector_incremental": 0.1595,
+    "share_idio": 0.5955,
+    "n_member_days": 1383
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "distributed-computing",
+    "share_global": 0.1295,
+    "share_chain_incremental": 0.0914,
+    "share_sector_incremental": 0.0065,
+    "share_idio": 0.7725,
+    "n_member_days": 10800
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "doggone-doggerel",
+    "share_global": 0.0467,
+    "share_chain_incremental": 0.136,
+    "share_sector_incremental": 0.2767,
+    "share_idio": 0.5407,
+    "n_member_days": 4700
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "dpos",
+    "share_global": 0.0631,
+    "share_chain_incremental": 0.0743,
+    "share_sector_incremental": 0.0333,
+    "share_idio": 0.8293,
+    "n_member_days": 5051
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "dwf-labs-portfolio",
+    "share_global": 0.0778,
+    "share_chain_incremental": 0.1546,
+    "share_sector_incremental": 0.0037,
+    "share_idio": 0.764,
+    "n_member_days": 9953
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "education",
+    "share_global": 0.0033,
+    "share_chain_incremental": 0.0011,
+    "share_sector_incremental": 0.9878,
+    "share_idio": 0.0078,
+    "n_member_days": 528
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "eigenlayer-ecosystem",
+    "share_global": 0.0479,
+    "share_chain_incremental": 0.4241,
+    "share_sector_incremental": 0.1692,
+    "share_idio": 0.3588,
+    "n_member_days": 959
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "energy",
+    "share_global": 0.0992,
+    "share_chain_incremental": 0.1574,
+    "share_sector_incremental": 0.1135,
+    "share_idio": 0.6299,
+    "n_member_days": 2826
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "enterprise-solutions",
+    "share_global": 0.0874,
+    "share_chain_incremental": 0.1082,
+    "share_sector_incremental": 0.0028,
+    "share_idio": 0.8017,
+    "n_member_days": 17314
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "eth-2-staking",
+    "share_global": 0.1891,
+    "share_chain_incremental": 0.4108,
+    "share_sector_incremental": 0.0654,
+    "share_idio": 0.3348,
+    "n_member_days": 1480
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "ethereum",
+    "share_global": 0.1178,
+    "share_chain_incremental": 0.0273,
+    "share_sector_incremental": 0.0794,
+    "share_idio": 0.7755,
+    "n_member_days": 859
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "ethereum-ecosystem",
+    "share_global": 0.0426,
+    "share_chain_incremental": 0.0617,
+    "share_sector_incremental": 0.0121,
+    "share_idio": 0.8835,
+    "n_member_days": 15181
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "eur-stablecoin",
+    "share_global": 0.0097,
+    "share_chain_incremental": 0.0015,
+    "share_sector_incremental": 0.9699,
+    "share_idio": 0.0189,
+    "n_member_days": 508
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "everscale-ecosystem",
+    "share_global": 0.0189,
+    "share_chain_incremental": 0.3498,
+    "share_sector_incremental": 0.3557,
+    "share_idio": 0.2756,
+    "n_member_days": 1043
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "exnetwork-capital-portfolio",
+    "share_global": 0.1262,
+    "share_chain_incremental": 0.0792,
+    "share_sector_incremental": 0.3307,
+    "share_idio": 0.4638,
+    "n_member_days": 2206
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "fan-token",
+    "share_global": 0.0411,
+    "share_chain_incremental": 0.1813,
+    "share_sector_incremental": 0.3207,
+    "share_idio": 0.4569,
+    "n_member_days": 684
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "fantom-ecosystem",
+    "share_global": 0.1456,
+    "share_chain_incremental": 0.3683,
+    "share_sector_incremental": 0.1201,
+    "share_idio": 0.3659,
+    "n_member_days": 1342
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "filesharing",
+    "share_global": 0.1294,
+    "share_chain_incremental": 0.0847,
+    "share_sector_incremental": 0.1561,
+    "share_idio": 0.6299,
+    "n_member_days": 1695
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "gambling",
+    "share_global": 0.0801,
+    "share_chain_incremental": 0.0764,
+    "share_sector_incremental": 0.3671,
+    "share_idio": 0.4764,
+    "n_member_days": 2040
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "gaming",
+    "share_global": 0.0,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.4995,
+    "share_idio": 0.5004,
+    "n_member_days": 4998
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "governance",
+    "share_global": 0.3107,
+    "share_chain_incremental": 0.0106,
+    "share_sector_incremental": 0.3915,
+    "share_idio": 0.2872,
+    "n_member_days": 509
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "groestl",
+    "share_global": 0.3098,
+    "share_chain_incremental": 0.0241,
+    "share_sector_incremental": 0.3562,
+    "share_idio": 0.3099,
+    "n_member_days": 733
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "hardware",
+    "share_global": 0.108,
+    "share_chain_incremental": 0.1949,
+    "share_sector_incremental": 0.1959,
+    "share_idio": 0.5012,
+    "n_member_days": 2709
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "heco-ecosystem",
+    "share_global": 0.8965,
+    "share_chain_incremental": 0.0008,
+    "share_sector_incremental": 0.0164,
+    "share_idio": 0.0863,
+    "n_member_days": 620
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "huobi-capital-portfolio",
+    "share_global": 0.1238,
+    "share_chain_incremental": 0.392,
+    "share_sector_incremental": 0.147,
+    "share_idio": 0.3372,
+    "n_member_days": 700
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "hybrid-dpow-pow",
+    "share_global": 0.0187,
+    "share_chain_incremental": 0.0093,
+    "share_sector_incremental": 0.9307,
+    "share_idio": 0.0414,
+    "n_member_days": 907
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "hybrid-pow-pos",
+    "share_global": 0.2341,
+    "share_chain_incremental": 0.0104,
+    "share_sector_incremental": 0.4615,
+    "share_idio": 0.294,
+    "n_member_days": 724
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "identity",
+    "share_global": 0.0649,
+    "share_chain_incremental": 0.1127,
+    "share_sector_incremental": 0.5787,
+    "share_idio": 0.2437,
+    "n_member_days": 1174
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "injective-ecosystem",
+    "share_global": 0.4207,
+    "share_chain_incremental": 0.0097,
+    "share_sector_incremental": 0.0929,
+    "share_idio": 0.4767,
+    "n_member_days": 765
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "insurance",
+    "share_global": 0.0871,
+    "share_chain_incremental": 0.1787,
+    "share_sector_incremental": 0.1928,
+    "share_idio": 0.5414,
+    "n_member_days": 897
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "interoperability",
+    "share_global": 0.0491,
+    "share_chain_incremental": 0.0824,
+    "share_sector_incremental": 0.1508,
+    "share_idio": 0.7177,
+    "n_member_days": 3904
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "iot",
+    "share_global": 0.1032,
+    "share_chain_incremental": 0.1183,
+    "share_sector_incremental": 0.0739,
+    "share_idio": 0.7047,
+    "n_member_days": 2506
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "layer-1",
+    "share_global": 0.0493,
+    "share_chain_incremental": 0.2283,
+    "share_sector_incremental": 0.016,
+    "share_idio": 0.7065,
+    "n_member_days": 5098
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "layer-2",
+    "share_global": 0.0817,
+    "share_chain_incremental": 0.4957,
+    "share_sector_incremental": 0.0558,
+    "share_idio": 0.3669,
+    "n_member_days": 1631
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "logistics",
+    "share_global": 0.0874,
+    "share_chain_incremental": 0.1045,
+    "share_sector_incremental": 0.2598,
+    "share_idio": 0.5483,
+    "n_member_days": 1473
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "loyalty",
+    "share_global": 0.0866,
+    "share_chain_incremental": 0.1408,
+    "share_sector_incremental": 0.4195,
+    "share_idio": 0.353,
+    "n_member_days": 2727
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "lpos",
+    "share_global": 0.0959,
+    "share_chain_incremental": 0.179,
+    "share_sector_incremental": 0.4218,
+    "share_idio": 0.3033,
+    "n_member_days": 1076
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "lyra2rev2",
+    "share_global": 0.3639,
+    "share_chain_incremental": 0.0357,
+    "share_sector_incremental": 0.2536,
+    "share_idio": 0.3468,
+    "n_member_days": 605
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "marketplace",
+    "share_global": 0.0656,
+    "share_chain_incremental": 0.0446,
+    "share_sector_incremental": 0.0088,
+    "share_idio": 0.8811,
+    "n_member_days": 6124
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "masternodes",
+    "share_global": 0.0402,
+    "share_chain_incremental": 0.0204,
+    "share_sector_incremental": 0.4714,
+    "share_idio": 0.468,
+    "n_member_days": 1604
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "media",
+    "share_global": 0.1454,
+    "share_chain_incremental": 0.2048,
+    "share_sector_incremental": 0.1361,
+    "share_idio": 0.5137,
+    "n_member_days": 966
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "medium-of-exchange",
+    "share_global": 0.0841,
+    "share_chain_incremental": 0.0986,
+    "share_sector_incremental": 0.0005,
+    "share_idio": 0.8169,
+    "n_member_days": 16689
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "memes",
+    "share_global": 0.0437,
+    "share_chain_incremental": 0.0895,
+    "share_sector_incremental": 0.2409,
+    "share_idio": 0.6259,
+    "n_member_days": 5668
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "mineable",
+    "share_global": 0.0079,
+    "share_chain_incremental": 0.0001,
+    "share_sector_incremental": 0.0041,
+    "share_idio": 0.9879,
+    "n_member_days": 8187
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "okex-blockdream-ventures-portfolio",
+    "share_global": 0.0778,
+    "share_chain_incremental": 0.7118,
+    "share_sector_incremental": 0.0012,
+    "share_idio": 0.2092,
+    "n_member_days": 848
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "ontology-ecosystem",
+    "share_global": 0.1072,
+    "share_chain_incremental": 0.3408,
+    "share_sector_incremental": 0.2177,
+    "share_idio": 0.3343,
+    "n_member_days": 1067
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "oracles",
+    "share_global": 0.0695,
+    "share_chain_incremental": 0.201,
+    "share_sector_incremental": 0.2703,
+    "share_idio": 0.4591,
+    "n_member_days": 627
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "payments",
+    "share_global": 0.048,
+    "share_chain_incremental": 0.0518,
+    "share_sector_incremental": 0.1825,
+    "share_idio": 0.7177,
+    "n_member_days": 2596
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "platform",
+    "share_global": 0.0563,
+    "share_chain_incremental": 0.0359,
+    "share_sector_incremental": 0.072,
+    "share_idio": 0.8359,
+    "n_member_days": 4118
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "polkadot",
+    "share_global": 0.2145,
+    "share_chain_incremental": 0.0494,
+    "share_sector_incremental": 0.2225,
+    "share_idio": 0.5136,
+    "n_member_days": 586
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "polygon-ecosystem",
+    "share_global": 0.1315,
+    "share_chain_incremental": 0.0211,
+    "share_sector_incremental": 0.6322,
+    "share_idio": 0.2152,
+    "n_member_days": 573
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "posplus",
+    "share_global": 0.078,
+    "share_chain_incremental": 0.3287,
+    "share_sector_incremental": 0.2826,
+    "share_idio": 0.3106,
+    "n_member_days": 865
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "pow",
+    "share_global": 0.0765,
+    "share_chain_incremental": 0.3133,
+    "share_sector_incremental": 0.2961,
+    "share_idio": 0.3141,
+    "n_member_days": 973
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "privacy",
+    "share_global": 0.0466,
+    "share_chain_incremental": 0.0853,
+    "share_sector_incremental": 0.7015,
+    "share_idio": 0.1666,
+    "n_member_days": 667
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "real-world-assets",
+    "share_global": 0.0472,
+    "share_chain_incremental": 0.2224,
+    "share_sector_incremental": 0.2867,
+    "share_idio": 0.4437,
+    "n_member_days": 1066
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "services",
+    "share_global": 0.0665,
+    "share_chain_incremental": 0.0992,
+    "share_sector_incremental": 0.0351,
+    "share_idio": 0.7991,
+    "n_member_days": 4504
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "solana-ecosystem",
+    "share_global": 0.0993,
+    "share_chain_incremental": 0.0192,
+    "share_sector_incremental": 0.2902,
+    "share_idio": 0.5912,
+    "n_member_days": 1605
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "stablecoin",
+    "share_global": 0.0031,
+    "share_chain_incremental": 0.0006,
+    "share_sector_incremental": 0.0863,
+    "share_idio": 0.91,
+    "n_member_days": 5353
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "tokenized-gold",
+    "share_global": 0.0028,
+    "share_chain_incremental": 0.0106,
+    "share_sector_incremental": 0.9688,
+    "share_idio": 0.0178,
+    "n_member_days": 941
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "tron-ecosystem",
+    "share_global": 0.0458,
+    "share_chain_incremental": 0.308,
+    "share_sector_incremental": 0.3608,
+    "share_idio": 0.2854,
+    "n_member_days": 1218
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "wallet",
+    "share_global": 0.0909,
+    "share_chain_incremental": 0.009,
+    "share_sector_incremental": 0.3833,
+    "share_idio": 0.5169,
+    "n_member_days": 844
+  },
+  {
+    "cluster": "SECTOR",
+    "name": "web3",
+    "share_global": 0.0124,
+    "share_chain_incremental": 0.0026,
+    "share_sector_incremental": 0.9607,
+    "share_idio": 0.0243,
+    "n_member_days": 671
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "",
+    "share_global": 0.0173,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.8535,
+    "share_idio": 0.1292,
+    "n_member_days": 286977
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "-",
+    "share_global": 0.079,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.143,
+    "share_idio": 0.7781,
+    "n_member_days": 8062
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "ABSTRACT",
+    "share_global": 0.2256,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.3224,
+    "share_idio": 0.452,
+    "n_member_days": 2126
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "ADA",
+    "share_global": 0.4736,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.1807,
+    "share_idio": 0.3456,
+    "n_member_days": 840
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "ASTR",
+    "share_global": 0.0871,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.6275,
+    "share_idio": 0.2853,
+    "n_member_days": 1577
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Arbitrum",
+    "share_global": 0.0745,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.2938,
+    "share_idio": 0.6316,
+    "n_member_days": 4956
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Avalanche",
+    "share_global": 0.1532,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.2598,
+    "share_idio": 0.5871,
+    "n_member_days": 4105
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "BERA",
+    "share_global": 0.2182,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.3947,
+    "share_idio": 0.3871,
+    "n_member_days": 561
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "BLAST",
+    "share_global": 0.1274,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.7186,
+    "share_idio": 0.1539,
+    "n_member_days": 966
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "BNB",
+    "share_global": 0.022,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.0334,
+    "share_idio": 0.9446,
+    "n_member_days": 62336
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Bitcoin",
+    "share_global": 0.0656,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.2076,
+    "share_idio": 0.7267,
+    "n_member_days": 2506
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "CELO",
+    "share_global": 0.0047,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.0,
+    "share_idio": 0.9953,
+    "n_member_days": 1030
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Ethereum",
+    "share_global": 0.0002,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.9948,
+    "share_idio": 0.0049,
+    "n_member_days": 462480
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "GRAM",
+    "share_global": 0.1857,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.0541,
+    "share_idio": 0.7602,
+    "n_member_days": 1146
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "HT",
+    "share_global": 0.0671,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.1336,
+    "share_idio": 0.7992,
+    "n_member_days": 961
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Hyperliquid L1",
+    "share_global": 0.1398,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.0303,
+    "share_idio": 0.8299,
+    "n_member_days": 1341
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "KAIA",
+    "share_global": 0.0161,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.0,
+    "share_idio": 0.9839,
+    "n_member_days": 3734
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "MANTA",
+    "share_global": 0.2061,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.4269,
+    "share_idio": 0.367,
+    "n_member_days": 617
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "MTL",
+    "share_global": 0.1524,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.1048,
+    "share_idio": 0.7429,
+    "n_member_days": 1605
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "NEO",
+    "share_global": 0.11,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.1034,
+    "share_idio": 0.7866,
+    "n_member_days": 2709
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "OKB",
+    "share_global": 0.0857,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.1714,
+    "share_idio": 0.7429,
+    "n_member_days": 2124
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "ONT",
+    "share_global": 0.0961,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.3191,
+    "share_idio": 0.5848,
+    "n_member_days": 1079
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "OP Mainnet",
+    "share_global": 0.0682,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.632,
+    "share_idio": 0.2998,
+    "n_member_days": 1520
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "OSMO",
+    "share_global": 0.0952,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.4174,
+    "share_idio": 0.4874,
+    "n_member_days": 2434
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Polygon",
+    "share_global": 0.0406,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.4961,
+    "share_idio": 0.4633,
+    "n_member_days": 3888
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Solana",
+    "share_global": 0.0721,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.2874,
+    "share_idio": 0.6406,
+    "n_member_days": 42378
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Stellar",
+    "share_global": 0.0254,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.1154,
+    "share_idio": 0.8593,
+    "n_member_days": 800
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Sui",
+    "share_global": 0.2874,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.1058,
+    "share_idio": 0.6068,
+    "n_member_days": 2190
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "TAO",
+    "share_global": 0.1448,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.178,
+    "share_idio": 0.6772,
+    "n_member_days": 1245
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "Tron",
+    "share_global": 0.0027,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.0001,
+    "share_idio": 0.9972,
+    "n_member_days": 10246
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "VET",
+    "share_global": 0.1292,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.7214,
+    "share_idio": 0.1494,
+    "n_member_days": 507
+  },
+  {
+    "cluster": "CHAIN",
+    "name": "ZK",
+    "share_global": 0.0268,
+    "share_chain_incremental": 0.0,
+    "share_sector_incremental": 0.1365,
+    "share_idio": 0.8367,
+    "n_member_days": 2909
+  }
+]
