@@ -1,0 +1,16 @@
+metric,value,description
+alpha_D_median,0.0,Median of alpha_D (oriented lead-lag area)
+alpha_D_p95,1.76e-07,95th percentile of alpha_D
+alpha_D_p99,4.10e-07,99th percentile of alpha_D
+alpha_D_max,1.85e-06,Maximum observed alpha_D
+w_total_raw_median,0.0,Median of continuous w_total before FSM threshold
+w_total_raw_p95,3.51e-05,95th percentile of continuous w_total
+w_total_raw_p99,8.18e-04,99th percentile of continuous w_total
+w_total_raw_max,0.00371,Maximum observed continuous w_total
+fsm_threshold,0.05,RAW FSM activation threshold
+threshold_median_ratio,inf,Threshold / median (median is 0)
+threshold_p95_ratio,1424.5,Threshold / 95th percentile
+threshold_p99_ratio,61.1,Threshold / 99th percentile
+threshold_max_ratio,13.5,Threshold / maximum observed
+max_fraction_of_threshold,0.074,Maximum observed w_total as fraction of threshold
+conclusion,SCALE_MISMATCH,"K4 dormancy caused by alpha_D scale being ~5 orders of magnitude below FSM threshold"

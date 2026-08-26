@@ -1,0 +1,56 @@
+{
+  "checkpoint_id": "PFT-B5-A1-ATOMIC-EVIDENCE",
+  "program_id": "PFT",
+  "branch": "agent/deepers-strategy-foundry",
+  "parent_sha": "a5774375",
+  "status": "PARTIAL_A1_ATOMIC_EVIDENCE",
+  "species_id": "PFT-A1-DEEPERS",
+  "evidence_class": "ATOMIC_EVIDENCE",
+  "raw_spec_changed": false,
+  "optimization_performed": false,
+  "economic_full_stack_rescue": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false,
+  "production_authorized": false,
+  "human_review_required": true,
+  "next_checkpoint_authorized": false,
+  "data_resolution_status": "BLOCKED_BY_LFS",
+  "observables_extracted": false,
+  "future_targets_computed": false,
+  "atomic_analyses_completed": false,
+  "kernel_scores": {
+    "K1": {
+      "status": "RAW_GATE_DORMANT_AND_OBSERVABLE_UNINFORMATIVE",
+      "rationale": "Eigenvalue band empty; no continuous observable has been tested due to data unavailability",
+      "recommendation": "Requires data resolution to test"
+    },
+    "K2": {
+      "status": "RAW_GATE_DORMANT_BUT_OBSERVABLE_INFORMATIVE",
+      "rationale": "K2 activates at 22.6%; gamma_bar/acceleration are continuously varying; predictive power unknown",
+      "recommendation": "Highest priority for data-dependent testing"
+    },
+    "K3": {
+      "status": "RAW_GATE_DORMANT_AND_OBSERVABLE_UNINFORMATIVE",
+      "rationale": "Edge density ~7%; NO_HOLE everywhere; topology may contain information",
+      "recommendation": "Requires data resolution to test"
+    },
+    "K4": {
+      "status": "RAW_GATE_DORMANT_AND_OBSERVABLE_UNINFORMATIVE",
+      "rationale": "alpha_D p99 ~4.1e-07 vs FSM threshold 0.05; 122x scale mismatch",
+      "recommendation": "Requires data resolution; scale mismatch is concerning"
+    }
+  },
+  "blockers": [
+    "Git LFS parquet file not resolving (SYNC_PANEL_H1.parquet stuck as 135-byte pointer)",
+    "Cannot load development panel data to extract continuous observables",
+    "Cannot compute future outcome targets",
+    "Cannot run statistical analyses"
+  ],
+  "warnings": [
+    "B5 analysis framework is complete but data-dependent computations require LFS resolution",
+    "K4 scale audit shows 122x gap between max observed and FSM threshold",
+    "K1 eigenvalue band is genuinely empty at p99 (0.82 vs 0.95 requirement)",
+    "K2 is the only kernel with meaningful activation (22.6%)"
+  ],
+  "conclusion": "PARTIAL_A1_ATOMIC_EVIDENCE - Analysis framework established but data-dependent computations blocked by Git LFS resolution issue."
+}

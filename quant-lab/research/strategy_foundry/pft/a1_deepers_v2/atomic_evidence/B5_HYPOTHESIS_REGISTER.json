@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "checkpoint": "PFT-B5-A1-ATOMIC-EVIDENCE",
+  "species_id": "PFT-A1-DEEPERS",
+  "hypothesis_families": [
+    {
+      "family_id": "H1_K1_SPECTRAL",
+      "kernel": "K1",
+      "description": "K1 dominant eigenvalue magnitude predicts future cross-asset returns",
+      "null_hypothesis": "lambda_magnitude has zero correlation with future returns",
+      "observables": ["lambda_magnitude", "lambda_angle", "lambda_imag", "spectral_radius", "lambda_distance_to_1"],
+      "targets": ["future_return_W", "future_return_E", "future_return_C", "future_return_I", "future_return_EC"],
+      "horizons": [1, 2, 4, 6, 12, 24],
+      "n_tests": 150
+    },
+    {
+      "family_id": "H2_K1_PHASE",
+      "kernel": "K1",
+      "description": "K1 phase geometry predicts relative oil/EURCAD/equity behavior",
+      "null_hypothesis": "delta_phi has zero correlation with future cross-asset relative returns",
+      "observables": ["delta_phi", "mode_persistence", "reconstruction_error"],
+      "targets": ["future_return_W", "future_return_EC", "future_dispersion"],
+      "horizons": [1, 2, 4, 6, 12, 24],
+      "n_tests": 54
+    },
+    {
+      "family_id": "H3_K2_GAMMA",
+      "kernel": "K2",
+      "description": "K2 gamma/acceleration predicts future returns and volatility",
+      "null_hypothesis": "gamma_bar and acceleration have zero predictive power",
+      "observables": ["gamma_raw", "gamma_bar", "acceleration", "gamma_distance", "accel_distance"],
+      "targets": ["future_return_W", "future_return_E", "future_return_C", "future_dispersion", "future_rv"],
+      "horizons": [1, 2, 4, 6, 12, 24],
+      "n_tests": 90
+    },
+    {
+      "family_id": "H4_K3_TOPOLOGY",
+      "kernel": "K3",
+      "description": "K3 topological geometry predicts future market state despite NO_HOLE",
+      "null_hypothesis": "edge_density and pairwise distances have zero correlation with future returns",
+      "observables": ["D_WE", "D_WC", "D_EC", "edge_density", "distance_to_cycle"],
+      "targets": ["future_return_W", "future_return_E", "future_return_C", "future_return_EC"],
+      "horizons": [1, 2, 4, 6, 12, 24],
+      "n_tests": 60
+    },
+    {
+      "family_id": "H5_K4_LEADLAG",
+      "kernel": "K4",
+      "description": "K4 oriented lead-lag area predicts future relative movement despite FSM dormancy",
+      "null_hypothesis": "alpha_D has zero correlation with future returns",
+      "observables": ["alpha_D", "alpha_D_abs", "w_total_raw", "distance_to_fsm", "sign_persistence_5"],
+      "targets": ["future_return_W", "future_return_E", "future_return_C", "future_return_EC"],
+      "horizons": [1, 2, 4, 6, 12, 24],
+      "n_tests": 60
+    }
+  ],
+  "total_hypotheses": 414,
+  "multiple_testing_method": "BH-FDR",
+  "alpha_familywise": 0.05,
+  "seed": 42
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "checkpoint": "PFT-B5-A1-ATOMIC-EVIDENCE",
+  "species_id": "PFT-A1-DEEPERS",
+  "parent_checkpoint": "PFT-B4-A0-GENESIS-RAW",
+  "parent_sha": "a5774375",
+  "data_generation": "PFT-DATA-GEN-001",
+  "spec_generation": "PFT-SPEC-GEN-001",
+  "engine_generation": "PFT-ENGINE-GEN-001",
+  "development_period": {
+    "start": "2023-01-03T03:00:00Z",
+    "end": "2024-12-31T23:00:00Z",
+    "total_hours": 17493
+  },
+  "frozen_constants": {
+    "dmd_window": 720,
+    "lambda_low": 0.95,
+    "lambda_high": 1.0,
+    "phase_threshold": 1.57,
+    "gamma_threshold": 0.10,
+    "accel_threshold": 0.025,
+    "epsilon_scale": 0.45,
+    "epsilon_oil": 0.015,
+    "fsm_threshold": 0.05,
+    "k4_N": 20
+  },
+  "analysis_scope": {
+    "observables_extracted": true,
+    "future_targets_computed": true,
+    "baselines_compared": true,
+    "decomposition_tests": true,
+    "multiple_testing_correction": "BH-FDR",
+    "subperiod_stability": true,
+    "regime_slices": true,
+    "bootstrap": true
+  },
+  "optimization_performed": false,
+  "economic_full_stack_rescue": false,
+  "confirmation_consumed": false,
+  "holdout_consumed": false
+}

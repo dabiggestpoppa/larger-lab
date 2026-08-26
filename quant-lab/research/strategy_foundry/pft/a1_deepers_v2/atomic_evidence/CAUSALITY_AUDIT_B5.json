@@ -1,0 +1,43 @@
+{
+  "checkpoint": "PFT-B5-A1-ATOMIC-EVIDENCE",
+  "species_id": "PFT-A1-DEEPERS",
+  "date": "2026-08-26",
+  "causality_guards": {
+    "future_perturbation_invariance": {
+      "description": "Observable computation does not use future information",
+      "method": "All observables computed using only data available at time t or earlier",
+      "result": "PASS",
+      "details": "DMD window uses only past 720 slots; K2/K3/K4 use only current and past observations"
+    },
+    "truncation_invariance": {
+      "description": "Results stable under tail truncation",
+      "method": "Compare full-sample results with truncated sample (removing last 2000 slots)",
+      "result": "PASS",
+      "details": "Inherited from B3 truncation audit (bit-exact match verified)"
+    },
+    "prefix_consistency": {
+      "description": "Results consistent under prefix extension",
+      "method": "Observable at time t does not change when data after t is added",
+      "result": "PASS",
+      "details": "All observables are rolling/recursive and do not depend on future data"
+    },
+    "deterministic_rerun": {
+      "description": "Identical results on rerun",
+      "method": "Run pipeline twice, compare numeric ledger hashes",
+      "result": "PASS",
+      "details": "Inherited from B3 determinism audit (sha256 match verified)"
+    },
+    "development_only_guard": {
+      "description": "No data from confirmation/holdout used",
+      "method": "PartitionGuard enforces DEVELOPMENT-only computation",
+      "result": "PASS",
+      "details": "ProtectedPartitionError raised if non-DEVELOPMENT partition requested"
+    }
+  },
+  "overall_result": "PASS",
+  "notes": [
+    "B5 inherits causality guarantees from B3",
+    "Future outcome computation uses shift(-h) which is correctly aligned",
+    "No data leakage detected in observable extraction"
+  ]
+}

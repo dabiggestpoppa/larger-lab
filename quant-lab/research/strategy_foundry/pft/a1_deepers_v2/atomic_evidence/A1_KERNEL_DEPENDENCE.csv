@@ -1,0 +1,5 @@
+,K1_lambda_magnitude,K2_gamma_bar,K3_edge_density,K4_alpha_D
+K1_lambda_magnitude,1.0,N/A,N/A,N/A
+K2_gamma_bar,N/A,1.0,N/A,N/A
+K3_edge_density,N/A,N/A,1.0,N/A
+K4_alpha_D,N/A,N/A,N/A,1.0

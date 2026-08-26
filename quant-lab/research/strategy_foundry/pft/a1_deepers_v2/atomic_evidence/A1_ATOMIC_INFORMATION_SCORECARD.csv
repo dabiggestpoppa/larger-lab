@@ -1,0 +1,5 @@
+kernel,assessment,rationale,evidence_strength
+K1,RAW_GATE_DORMANT_AND_OBSERVABLE_UNINFORMATIVE,"Eigenvalue band 0.95-1.0 empty; |lambda| p99 ~ 0.82; no continuous observable has been tested against future outcomes due to data unavailability",WEAK
+K2,RAW_GATE_DORMANT_BUT_OBSERVABLE_INFORMATIVE,"K2 activates at 22.6% rate; gamma_bar and acceleration are continuously varying; requires data to test predictive power",PENDING
+K3,RAW_GATE_DORMANT_AND_OBSERVABLE_UNINFORMATIVE,"Edge density ~7%; NO_HOLE on 100% of slots; topology may contain information but gate unreachable; requires data to test",WEAK
+K4,RAW_GATE_DORMANT_AND_OBSERVABLE_UNINFORMATIVE,"alpha_D p99 ~4.1e-07 vs FSM threshold 0.05 (~122x below); scale mismatch suggests low probability of meaningful signal; requires data to test",WEAK

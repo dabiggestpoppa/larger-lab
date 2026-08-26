@@ -1,0 +1,6 @@
+family_id,family_name,n_tests,method,alpha_familywise
+H1_K1_SPECTRAL,K1 Spectral State,150,BH-FDR,0.05
+H2_K1_PHASE,K1 Phase Geometry,54,BH-FDR,0.05
+H3_K2_GAMMA,K2 Gamma/Acceleration,90,BH-FDR,0.05
+H4_K3_TOPOLOGY,K3 Topological Geometry,60,BH-FDR,0.05
+H5_K4_LEADLAG,K4 Oriented Lead-Lag,60,BH-FDR,0.05

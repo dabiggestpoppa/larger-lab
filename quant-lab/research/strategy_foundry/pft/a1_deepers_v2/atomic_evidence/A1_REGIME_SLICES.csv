@@ -1,0 +1,13 @@
+kernel,observable,regime,regime_value,n,rank_ic,mean_future_return
+K1,lambda_magnitude,volatility_low,low,0,N/A,DATA_REQUIRED
+K1,lambda_magnitude,volatility_mid,mid,0,N/A,DATA_REQUIRED
+K1,lambda_magnitude,volatility_high,high,0,N/A,DATA_REQUIRED
+K2,gamma_bar,volatility_low,low,0,N/A,DATA_REQUIRED
+K2,gamma_bar,volatility_mid,mid,0,N/A,DATA_REQUIRED
+K2,gamma_bar,volatility_high,high,0,N/A,DATA_REQUIRED
+K3,edge_density,volatility_low,low,0,N/A,DATA_REQUIRED
+K3,edge_density,volatility_mid,mid,0,N/A,DATA_REQUIRED
+K3,edge_density,volatility_high,high,0,N/A,DATA_REQUIRED
+K4,alpha_D,volatility_low,low,0,N/A,DATA_REQUIRED
+K4,alpha_D,volatility_mid,mid,0,N/A,DATA_REQUIRED
+K4,alpha_D,volatility_high,high,0,N/A,DATA_REQUIRED

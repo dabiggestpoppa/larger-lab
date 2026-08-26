@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "checkpoint": "PFT-B5-A1-ATOMIC-EVIDENCE",
+  "species_id": "PFT-A1-DEEPERS",
+  "horizons_hours": [1, 2, 4, 6, 12, 24],
+  "outcome_family": {
+    "future_returns": [
+      "future_return_W_h{H}",
+      "future_return_E_h{H}",
+      "future_return_C_h{H}",
+      "future_return_I_h{H}",
+      "future_return_EC_h{H}"
+    ],
+    "future_directions": [
+      "future_direction_W_h{H}",
+      "future_direction_E_h{H}",
+      "future_direction_C_h{H}",
+      "future_direction_I_h{H}",
+      "future_direction_EC_h{H}"
+    ],
+    "future_dispersion": [
+      "future_dispersion_h{H}"
+    ],
+    "future_volatility": [
+      "future_rv_h{H}"
+    ],
+    "future_extreme": [
+      "future_extreme_W_h{H}",
+      "future_extreme_E_h{H}",
+      "future_extreme_C_h{H}",
+      "future_extreme_I_h{H}"
+    ]
+  },
+  "total_outcomes_per_horizon": 16,
+  "total_outcomes": 96,
+  "development_only": true,
+  "confirmation_consumed": false,
+  "holdout_consumed": false,
+  "frozen_before_inspection": true
+}
