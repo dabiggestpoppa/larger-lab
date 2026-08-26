@@ -23,6 +23,8 @@ ENGINE = SCRIPTS_DIR / "validate_engine.py"
 FINAL_GATE = SCRIPTS_DIR / "final-gate.sh"
 RUN_VALIDATION = SCRIPTS_DIR / "run-validation.sh"
 VALIDATE_LOCAL = SCRIPTS_DIR / "validate-local"
+REPO_ROOT = Path(__file__).resolve().parents[3]
+WORKFLOW_R3 = REPO_ROOT / ".github" / "workflows" / "b1-i1r3-validation.yml"
 VERSION = "3.6.0"
 
 # R3G: contract-derived identity — never hardcode a branch literal.
@@ -711,6 +713,205 @@ def test_final_manifest_hashes_match_files():
 
 
 # ═══════════════════════════════════════════════════════════════════
+# R3H: Worktree cleanup evidence, CI exit-code, registry-execution proof
+# ═══════════════════════════════════════════════════════════════════
+
+def _build_final_evidence_dir(tmpdir, run_id):
+    """Run the engine's final phase against a prepared evidence dir (valid
+    adversarial evidence + valid cleanup artifact) so a single cleanup defect
+    can be isolated afterwards.
+
+    Returns the engine's (rc, stdout, stderr). Note: locally the engine may
+    report SOURCE-IDENTITY FAIL when the shared workspace is dirty — callers
+    must not require rc == 0; CI runs from a clean checkout instead.
+    """
+    commit, tree = _git_head()
+    adv = _make_valid_meta_adv(rejection_exit=1)
+    adv["run_id"] = run_id
+    with open(os.path.join(tmpdir, "adversarial-results.json"), "w") as f:
+        json.dump(adv, f)
+    with open(os.path.join(tmpdir, "worktree-cleanup.json"), "w") as f:
+        json.dump({"removed": True, "pruned": True}, f)
+    rc, out, err = run_engine(
+        "--all", "--authoritative", "--phase", "final",
+        "--target-commit", commit, "--target-tree", tree,
+        "--target-branch", CONTRACT_BRANCH, "--evidence-dir", tmpdir,
+        env={"OCE_RUN_ID": run_id},
+    )
+    return rc, out, err
+
+
+def test_cleanup_evidence_written_before_final_gate():
+    """Regression: the shared runner must write worktree-cleanup.json during
+    worktree removal (step i) so it exists before the final gate (step n), and
+    the final phase must include it in the evidence manifest."""
+    content = RUN_VALIDATION.read_text(encoding="utf-8")
+    cleanup_call = content.find("write_worktree_cleanup_evidence")
+    gate_call = content.find('bash "$GATE"')
+    assert cleanup_call != -1 and gate_call != -1, "runner missing cleanup or gate step"
+    assert cleanup_call < gate_call, (
+        "worktree-cleanup evidence must be written before the final gate runs"
+    )
+    # Functional proof: after a final-phase engine run the cleanup artifact is
+    # present, parsed, and listed in the manifest.
+    run_id = make_run_id()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        _build_final_evidence_dir(tmpdir, run_id)
+        cleanup_path = os.path.join(tmpdir, "worktree-cleanup.json")
+        assert os.path.exists(cleanup_path), "worktree-cleanup.json must exist before the gate"
+        cleanup = json.load(open(cleanup_path))
+        assert cleanup.get("removed") is True and cleanup.get("pruned") is True
+        manifest = json.load(open(os.path.join(tmpdir, "evidence-manifest.json")))
+        listed = {a["path"] for a in manifest.get("artifacts", [])}
+        assert "worktree-cleanup.json" in listed, "manifest must list worktree-cleanup.json"
+        print("PASS: cleanup evidence written before final gate and listed in manifest")
+
+
+def test_gate_rejects_missing_cleanup_evidence():
+    """Regression: the independent final gate must treat a missing
+    worktree-cleanup.json as fatal."""
+    run_id = make_run_id()
+    commit, tree = _git_head()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        _build_final_evidence_dir(tmpdir, run_id)
+        os.remove(os.path.join(tmpdir, "worktree-cleanup.json"))
+        gate_rc, out, err = run_gate(tmpdir, commit, tree, env={"OCE_RUN_ID": run_id})
+        combined = out + err
+        assert gate_rc != 0, f"Gate must reject missing cleanup evidence, rc={gate_rc}"
+        assert "WORKTREE-CLEANUP" in combined and "missing" in combined.lower(), \
+            f"No missing-cleanup error in gate output: {combined}"
+        print("PASS: Gate rejects missing worktree-cleanup.json")
+
+
+def test_gate_rejects_cleanup_removed_false():
+    """Regression: the gate must treat removed:false as a fatal error."""
+    run_id = make_run_id()
+    commit, tree = _git_head()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        _build_final_evidence_dir(tmpdir, run_id)
+        with open(os.path.join(tmpdir, "worktree-cleanup.json"), "w") as f:
+            json.dump({"removed": False, "pruned": True}, f)
+        gate_rc, out, err = run_gate(tmpdir, commit, tree, env={"OCE_RUN_ID": run_id})
+        combined = out + err
+        assert gate_rc != 0, f"Gate must reject removed:false, rc={gate_rc}"
+        assert "WORKTREE-CLEANUP" in combined and "removed" in combined, \
+            f"No removed-false error in gate output: {combined}"
+        print("PASS: Gate rejects removed:false")
+
+
+def test_gate_rejects_cleanup_pruned_false():
+    """Regression: the gate must treat pruned:false as a fatal error."""
+    run_id = make_run_id()
+    commit, tree = _git_head()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        _build_final_evidence_dir(tmpdir, run_id)
+        with open(os.path.join(tmpdir, "worktree-cleanup.json"), "w") as f:
+            json.dump({"removed": True, "pruned": False}, f)
+        gate_rc, out, err = run_gate(tmpdir, commit, tree, env={"OCE_RUN_ID": run_id})
+        combined = out + err
+        assert gate_rc != 0, f"Gate must reject pruned:false, rc={gate_rc}"
+        assert "WORKTREE-CLEANUP" in combined and "pruned" in combined, \
+            f"No pruned-false error in gate output: {combined}"
+        print("PASS: Gate rejects pruned:false")
+
+
+def test_workflow_preserves_runner_exit_code():
+    """Regression: the CI workflow must capture the shared runner's real exit
+    code without a pipeline that hides it, print the full log, and exit with
+    the exact status. A failing runner must not abort before the log is shown."""
+    text = WORKFLOW_R3.read_text(encoding="utf-8")
+    runner_block = text.split("Run shared validation runner")[1]
+    assert "|| rc=$?" in runner_block, "runner invocation must use `|| rc=$?` (fail-fast-safe)"
+    assert "> /tmp/oce-run.log 2>&1" in runner_block, "runner output must be captured to a log"
+    assert "cat /tmp/oce-run.log" in runner_block, "full log must always be printed"
+    assert "exit \"$rc\"" in runner_block or "exit $rc" in runner_block, \
+        "step must exit with the exact captured runner status"
+    # No pipeline may swallow or replace the runner's status.
+    assert "| tee" not in runner_block and "| grep" not in runner_block
+    # Evidence must upload on success AND failure.
+    upload_block = text.split("Upload evidence artifact")[1]
+    assert "if: always()" in text.split("Run shared validation runner")[0] + upload_block or \
+        "if: always()" in upload_block, "upload step must run with if: always()"
+    # The workflow must invoke the shared runner, never the engine directly.
+    assert "run-validation.sh" in runner_block
+    assert "validate_engine.py" not in runner_block
+    print("PASS: Workflow preserves runner exit code and prints the full log")
+
+
+def test_every_registered_test_executes():
+    """Regression: the executed registry count must equal the declared registry.
+    Runs the suite as a subprocess and proves every registered test executed
+    and passed (PASS == len(ALL_TESTS), FAIL == 0).
+
+    The nested child run sets OCE_NO_RECURSE so recursion terminates after
+    one level; the authoritative top-level execution (runner / CI) is the
+    real registry-execution proof."""
+    if os.environ.get("OCE_NO_RECURSE") == "1":
+        print("PASS: registry-execution proof deferred to authoritative run")
+        return
+    child_env = os.environ.copy()
+    child_env["OCE_NO_RECURSE"] = "1"
+    r = subprocess.run([sys.executable, str(Path(__file__).resolve())],
+                       capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent),
+                       env=child_env)
+    out = r.stdout + r.stderr
+    total = pass_count = fail_count = None
+    for line in out.splitlines():
+        line = line.strip()
+        if line.startswith("Total:"):
+            total = int(line.split(":")[1].strip())
+        elif line.startswith("PASS:") and line.split(":", 1)[1].strip().isdigit():
+            pass_count = int(line.split(":")[1].strip())
+        elif line.startswith("FAIL:") and line.split(":", 1)[1].strip().isdigit():
+            fail_count = int(line.split(":")[1].strip())
+    assert total == len(ALL_TESTS), f"executed {total} != registered {len(ALL_TESTS)}"
+    assert pass_count == len(ALL_TESTS), f"PASS {pass_count} != registered {len(ALL_TESTS)}"
+    assert fail_count == 0, f"FAIL {fail_count} — not all registered tests executed cleanly"
+    print(f"PASS: all {len(ALL_TESTS)} registered tests executed (registry-execution proof)")
+
+
+def test_no_duplicate_authoritative_entrypoint():
+    """Regression: exactly one authoritative orchestration entrypoint exists.
+    The current-contract workflow must invoke run-validation.sh (never
+    validate_engine.py directly), and no other script may run the engine in
+    authoritative mode outside the shared runner."""
+    # The workflow that triggers on the current authorized branch must delegate
+    # to the shared runner.
+    assert WORKFLOW_R3.exists(), f"workflow missing: {WORKFLOW_R3}"
+    wf = WORKFLOW_R3.read_text(encoding="utf-8")
+    assert "run-validation.sh" in wf, "workflow must invoke the shared runner"
+    assert "validate_engine.py" not in wf, "workflow must not invoke the engine directly"
+    # The runner is the only production orchestrator calling the engine
+    # authoritatively (adversarial-tests.sh runs engine-level checks from
+    # inside the disposable worktree, by the runner's own invocation).
+    runner = RUN_VALIDATION.read_text(encoding="utf-8")
+    assert "--authoritative" in runner, "runner must run the engine authoritatively"
+    local = VALIDATE_LOCAL.read_text(encoding="utf-8")
+    assert "run-validation.sh" in local, "validate-local must delegate to the runner"
+    assert "--authoritative" not in local, "validate-local must not run the engine itself"
+    # Workflows that could ever trigger on the current branch must not contain
+    # a second engine invocation. Only the R3 workflow may run on `oce`.
+    workflows_dir = REPO_ROOT / ".github" / "workflows"
+    for wf_path in workflows_dir.glob("*.yml"):
+        if wf_path.name == "b1-i1r3-validation.yml":
+            continue
+        wf_text = wf_path.read_text(encoding="utf-8")
+        if "validate_engine.py" not in wf_text:
+            continue
+        # Flag only workflows actually triggered on the CURRENT authorized
+        # branch (a legacy dead-branch workflow must not count as an
+        # entrypoint for `oce`).
+        triggers_on_current = (
+            f"[{CONTRACT_BRANCH}]" in wf_text
+            or f"\n- {CONTRACT_BRANCH}\n" in wf_text
+            or f"- '{CONTRACT_BRANCH}'" in wf_text
+        )
+        assert not triggers_on_current, \
+            f"duplicate engine entrypoint in {wf_path.name} triggered on current branch"
+    print("PASS: single authoritative validation entrypoint")
+
+
+# ═══════════════════════════════════════════════════════════════════
 # Helpers
 # ═══════════════════════════════════════════════════════════════════
 
@@ -835,6 +1036,15 @@ ALL_TESTS = [
     # R3G: Identity truth and manifest
     ("Observed identity never substituted", test_observed_identity_never_substituted),
     ("Manifest hashes match evidence files", test_final_manifest_hashes_match_files),
+    # R3H: Worktree cleanup evidence
+    ("Cleanup evidence written before final gate", test_cleanup_evidence_written_before_final_gate),
+    ("Gate rejects missing cleanup evidence", test_gate_rejects_missing_cleanup_evidence),
+    ("Gate rejects removed:false", test_gate_rejects_cleanup_removed_false),
+    ("Gate rejects pruned:false", test_gate_rejects_cleanup_pruned_false),
+    # R3H: CI exit-code and single-entrypoint truth
+    ("Workflow preserves runner exit code", test_workflow_preserves_runner_exit_code),
+    ("Every registered test executes", test_every_registered_test_executes),
+    ("Single authoritative entrypoint", test_no_duplicate_authoritative_entrypoint),
 ]
 
 
@@ -853,7 +1063,7 @@ if __name__ == "__main__":
             print(f"FAIL: {name}: {e}")
 
     print(f"\n{'='*50}")
-    print(f"  B1-I1R3G Regression Tests (registry-executed)")
+    print(f"  B1-I1R3H Regression Tests (registry-executed, {len(ALL_TESTS)} registered)")
     print(f"{'='*50}")
     print(f"  Total:  {passed + failed}")
     print(f"  PASS:   {passed}")

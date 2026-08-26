@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # OCE Cloud Ground — Independent Final Gate
-# B1-I1R3G — Executable Gate Repair
+# B1-I1R3H — Gate Closure
 #
 # Independently verifies the final evidence directory. Never trusts
 # self-authored status fields; recomputes everything from the artifacts.
@@ -56,6 +56,9 @@ required_files = [
     "adversarial-results.json",
     "stage-status.json",
     "evidence-manifest.json",
+    "worktree-cleanup.json",
+    "regression-output.txt",
+    "stage-log.txt",
 ]
 for name in required_files:
     if not os.path.exists(os.path.join(ev_dir, name)):
@@ -265,13 +268,13 @@ st = subprocess.run(["git", "-C", proj_root, "status", "--porcelain"],
 if st.stdout.strip():
     errors.append(f"SOURCE-DIRTY: {len(st.stdout.strip().splitlines())} entries")
 cleanup = load("worktree-cleanup.json")
-if cleanup is not None:
-    if cleanup.get("removed") is not True:
-        errors.append(f"WORKTREE-CLEANUP: removed={cleanup.get('removed')}")
-    if cleanup.get("pruned") is not True:
-        errors.append(f"WORKTREE-CLEANUP: pruned={cleanup.get('pruned')}")
+if cleanup is None:
+    errors.append("WORKTREE-CLEANUP: worktree-cleanup.json missing — cannot prove disposable worktree was removed and pruned")
 else:
-    warnings.append("WORKTREE-CLEANUP: worktree-cleanup.json absent (legacy evidence)")
+    if cleanup.get("removed") is not True:
+        errors.append(f"WORKTREE-CLEANUP: removed={cleanup.get('removed')} — worktree removal not proven")
+    if cleanup.get("pruned") is not True:
+        errors.append(f"WORKTREE-CLEANUP: pruned={cleanup.get('pruned')} — worktree prune not proven")
 
 # ── Gate verdict from stage status must be truthful ──────────────
 gate_status = stage.get("gate_status", "")

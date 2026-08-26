@@ -1,7 +1,7 @@
 name: b1-i1r3-validation
 on:
   push:
-    branches: [oce/block-1-i1r3g-executable-gate-repair]
+    branches: [oce]
   workflow_dispatch:
 
 permissions:
@@ -82,12 +82,16 @@ jobs:
           OCE_EVIDENCE_DIR: ${{ steps.evidence.outputs.evidence_dir }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+        # R3H: the Actions default shell runs `bash -eo pipefail` (fail-fast).
+        # Capture the runner's real exit code with `|| rc=$?` so a failing
+        # runner never aborts before the log is printed, then exit with the
+        # exact captured status. No pipeline may hide or replace it.
+        shell: bash
         run: |
-          chmod +x infrastructure/cloud-ground/scripts/run-validation.sh
-          bash infrastructure/cloud-ground/scripts/run-validation.sh > /tmp/oce-run.log 2>&1
-          rc=$?
+          rc=0
+          bash infrastructure/cloud-ground/scripts/run-validation.sh > /tmp/oce-run.log 2>&1 || rc=$?
           cat /tmp/oce-run.log
-          exit $rc
+          exit "$rc"
 
       # ═══════════════════════════════════════════════════════════════
       # Upload evidence on SUCCESS and FAILURE alike.
@@ -96,6 +100,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
         with:
-          name: b1-i1r3g-evidence-${{ steps.run_id.outputs.oce_run_id }}
+          name: b1-i1r3h-evidence-${{ steps.run_id.outputs.oce_run_id }}
           path: ${{ steps.evidence.outputs.evidence_dir }}
           retention-days: 30

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # OCE Cloud Ground — Shared Validation Runner
-# B1-I1R3G — Executable Gate Repair
+# B1-I1R3H — Gate Closure
 #
 # The sole authoritative orchestration. Both validate-local and GitHub
 # Actions invoke this script exactly once.
@@ -85,8 +85,9 @@ FINAL_EVIDENCE="$(cd "$FINAL_EVIDENCE" && pwd)"
 FINAL_EVIDENCE_WIN=$(WIN "$FINAL_EVIDENCE")
 export OCE_EVIDENCE_DIR="$FINAL_EVIDENCE_WIN"
 
-# Machine-readable path output file (deterministic location next to the dir).    printf '%s\n' "$FINAL_EVIDENCE_WIN" > "$FINAL_EVIDENCE/evidence-dir.path"
-    printf '%s\n' "$FINAL_EVIDENCE_WIN" > "$FINAL_EVIDENCE_WIN/evidence-dir.path" 2>/dev/null || true
+# Machine-readable path output file inside the evidence directory itself,
+# so callers can always resolve the authoritative evidence path.
+printf '%s\n' "$FINAL_EVIDENCE_WIN" > "$FINAL_EVIDENCE_WIN/evidence-dir.path" 2>/dev/null || true
 
 write_failure_context() {
     # Preserve an honest failure evidence package.
@@ -138,7 +139,7 @@ stage_path = os.path.join(ev_dir, "stage-status.json")
 if not os.path.exists(stage_path):
     stage = {
         "block": "B1",
-        "increment": "B1-I1R3G",
+        "increment": "B1-I1R3H",
         "run_id": ctx["run_id"],
         "gate_status": "FAILED",
         "failure_phase": phase,
@@ -153,6 +154,17 @@ if not os.path.exists(stage_path):
 PYF
 }
 
+write_worktree_cleanup_evidence() {
+    # R3H: truthfully record removal and prune results. Called immediately
+    # after successful removal (so the final gate sees it before it runs)
+    # and again from the exit trap for abnormal-failure cleanup.
+    export _WT_REMOVED=$WORKTREE_REMOVED _WT_PRUNED=$WORKTREE_PRUNED
+    printf '{"removed": %s, "pruned": %s}\n' \
+        "$( [ "$WORKTREE_REMOVED" = true ] && echo true || echo false)" \
+        "$( [ "$WORKTREE_PRUNED" = true ] && echo true || echo false)" \
+        > "$FINAL_EVIDENCE/worktree-cleanup.json" 2>/dev/null || true
+}
+
 cleanup() {
     local rc=$?
     if [ "$WORKTREE_REGISTERED" = true ] && [ "$WORKTREE_REMOVED" = false ] && [ -n "$ADV_WORKTREE" ]; then
@@ -165,11 +177,7 @@ cleanup() {
     if git -C "$PROJ_ROOT" worktree prune >/dev/null 2>&1; then
         WORKTREE_PRUNED=true
     fi
-    export _WT_REMOVED=$WORKTREE_REMOVED _WT_PRUNED=$WORKTREE_PRUNED
-    printf '{"removed": %s, "pruned": %s}\n' \
-        "$( [ "$WORKTREE_REMOVED" = true ] && echo true || echo false)" \
-        "$( [ "$WORKTREE_PRUNED" = true ] && echo true || echo false)" \
-        > "$FINAL_EVIDENCE/worktree-cleanup.json" 2>/dev/null || true
+    write_worktree_cleanup_evidence
     if [ -n "$FAILED_PHASE" ] && [ "$rc" -ne 0 ]; then
         write_failure_context "$FAILED_PHASE" "$rc" || true
     fi
@@ -182,7 +190,7 @@ record_result() {
 }
 
 echo "════════════════════════════════════════════════════════════════"
-echo "  OCE B1-I1R3G Shared Validation Runner"
+echo "  OCE B1-I1R3H Shared Validation Runner"
 echo "════════════════════════════════════════════════════════════════"
 echo "  OCE_RUN_ID:      $OCE_RUN_ID"
 echo "  EVIDENCE_DIR:    $FINAL_EVIDENCE"
@@ -344,9 +352,10 @@ WORKTREE_REMOVED=true
 ADV_WORKTREE=""
 git -C "$PROJ_ROOT" worktree prune || true
 WORKTREE_PRUNED=true
+write_worktree_cleanup_evidence
 rm -rf "$ADV_PARENT"
 record_result "STEP i: worktree removed and pruned"
-echo "  Worktree removed and pruned."
+echo "  Worktree removed and pruned; cleanup evidence written."
 echo ""
 
 # ═══════════════════════════════════════════════════════════════════

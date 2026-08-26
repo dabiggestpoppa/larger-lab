@@ -1391,7 +1391,7 @@ class Validator:
             "run_id": self.run_uid,
             "validator_version": VERSION,
             "phase": self.phase or "unspecified",
-            "increment": "B1-I1R3G",
+            "increment": "B1-I1R3H",
             "start_time": self.start_time,
             "end_time": utc_now(),
             "tested_commit": git_info.get("commit", "unknown"),
@@ -1565,6 +1565,9 @@ class Validator:
             "static-validation-summary.md",
             "adversarial-results.json",
             "stage-status.json",
+            "worktree-cleanup.json",
+            "regression-output.txt",
+            "stage-log.txt",
         ]
         artifacts = []
         for name in required:
@@ -1581,7 +1584,7 @@ class Validator:
             "schema_version": VERSION,
             "run_id": self.run_uid,
             "validator_version": VERSION,
-            "increment": "B1-I1R3G",
+            "increment": "B1-I1R3H",
             "generated_at": utc_now(),
             "artifacts": artifacts,
         }
@@ -1645,7 +1648,7 @@ class Validator:
         ev_dir = ev_dir or self._evidence_dir()
         ident = self._identity_provenance()
         lines = [
-            f"# B1-I1R3G Static Validation Summary",
+            f"# B1-I1R3H Static Validation Summary",
             "",
             f"- **Run ID:** `{self.run_uid}`",
             f"- **Validator:** v{VERSION}",
@@ -1694,7 +1697,7 @@ class Validator:
         ident = self._identity_provenance()
         status = {
             "block": "B1",
-            "increment": "B1-I1R3G",
+            "increment": "B1-I1R3H",
             "run_id": self.run_uid,
             "validator_version": VERSION,
             "phase": self.phase or "unspecified",
@@ -1711,7 +1714,7 @@ class Validator:
             "unresolved_blockers": [],
             "cost_impact_usd": 0,
             "cloud_mutations": 0,
-            "next_authorized_action": "Operator review of B1-I1R3F evidence",
+            "next_authorized_action": "Operator review of B1-I1R3H evidence",
         }
         for r in self.results:
             if r.result == "BLOCKED":
@@ -1748,7 +1751,7 @@ def main():
     if args.version_json:
         print(json.dumps({"validator_version": VERSION,
                           "supported_schema_versions": [VERSION],
-                          "increment": "B1-I1R3G"}))
+                          "increment": "B1-I1R3H"}))
         sys.exit(0)
 
     if args.authoritative:
@@ -1793,7 +1796,7 @@ def main():
     gate, totals = validator.write_evidence(git_info)
 
     print(f"\n{'='*50}")
-    print(f"  B1-I1R3G Validation ({validator.phase or 'unspecified'} phase) — {gate}")
+    print(f"  B1-I1R3H Validation ({validator.phase or 'unspecified'} phase) — {gate}")
     print(f"{'='*50}")
     print(f"  Run ID:    {validator.run_uid}")
     print(f"  Commit:    {git_info.get('commit', 'unknown')[:12]}")
