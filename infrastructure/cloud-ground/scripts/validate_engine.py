@@ -373,7 +373,7 @@ class Validator:
             if dirty_lines:
                 errors.append(
                     f"AUTHORITATIVE: worktree not clean — {len(dirty_lines)} dirty file(s) "
-                    f"(tracked or untracked)"
+                    f"(tracked or untracked):\n" + "\n".join(dirty_lines[:25])
                 )
 
         if errors:

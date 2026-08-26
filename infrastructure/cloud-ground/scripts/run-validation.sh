@@ -271,8 +271,11 @@ echo ""
 echo "[STEP e] Run regression suite..."
 export OCE_RUN_ID
 export PYTHONUNBUFFERED=1
+export PYTHONDONTWRITEBYTECODE=1
 # -u keeps the tee'd regression-output.txt current even on long/aborted runs,
 # so partial progress is preserved in the evidence directory.
+# PYTHONDONTWRITEBYTECODE keeps __pycache__ out of the authoritative checkout
+# so the post-suite clean-source check (step j/f) does not see stray files.
 python3 -u "$REGRESSIONS_WIN" 2>&1 | tee "$FINAL_EVIDENCE/regression-output.txt"
 REG_RC=${PIPESTATUS[0]}
 if [ "$REG_RC" -ne 0 ]; then
