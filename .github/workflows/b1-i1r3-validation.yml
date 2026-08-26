@@ -45,10 +45,14 @@ jobs:
           sudo apt-get install -y docker-compose-v2
 
       - name: Install Gitleaks
+        # Extract OUTSIDE the workspace: the release tarball contains its own
+        # README.md and LICENSE, which would clobber the checkout and trip the
+        # runner's clean-source check (step d).
         run: |
-          wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
-          tar xzf gitleaks_8.18.1_linux_x64.tar.gz
-          sudo mv gitleaks /usr/local/bin/
+          mkdir -p "$RUNNER_TEMP/gitleaks"
+          wget -q -O "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
+          tar xzf "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" -C "$RUNNER_TEMP/gitleaks"
+          sudo mv "$RUNNER_TEMP/gitleaks/gitleaks" /usr/local/bin/
 
       # ═══════════════════════════════════════════════════════════════
       # Generate single authoritative OCE_RUN_ID — known before validation
