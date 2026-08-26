@@ -13,6 +13,5 @@ skip_list:
 
 warn_list:
   - experimental
-  - syntax-check
 
 offline: true

@@ -976,7 +976,14 @@ class Validator:
             args = ["ansible-playbook", "--syntax-check", str(site_yml)]
             if hosts_yml.exists():
                 args.extend(["-i", str(hosts_yml)])
-            r = subprocess.run(args, capture_output=True, text=True, timeout=30, cwd=str(BASE_DIR))
+            # Run from ANSIBLE_DIR so ansible.cfg (roles_path, inventory) is
+            # discovered, and pin ANSIBLE_ROLES_PATH explicitly so local roles
+            # resolve regardless of cwd/config-path semantics.
+            env = os.environ.copy()
+            env["ANSIBLE_CONFIG"] = str(ANSIBLE_DIR / "ansible.cfg")
+            env["ANSIBLE_ROLES_PATH"] = str(ANSIBLE_DIR / "roles")
+            r = subprocess.run(args, capture_output=True, text=True, timeout=60,
+                               cwd=str(ANSIBLE_DIR), env=env)
             if r.returncode == 0:
                 self.add("ANSIBLE-SYNTAX", "Ansible playbook syntax valid", True, "PASS",
                           "syntax-check passed", r.stdout[:200])
@@ -991,9 +998,12 @@ class Validator:
 
     def check_ansible_lint(self):
         try:
+            env = os.environ.copy()
+            env["ANSIBLE_CONFIG"] = str(ANSIBLE_DIR / "ansible.cfg")
+            env["ANSIBLE_ROLES_PATH"] = str(ANSIBLE_DIR / "roles")
             r = subprocess.run(
                 ["ansible-lint", str(ANSIBLE_DIR / "playbooks" / "site.yml")],
-                capture_output=True, text=True, timeout=60, cwd=str(ANSIBLE_DIR),
+                capture_output=True, text=True, timeout=120, cwd=str(ANSIBLE_DIR), env=env,
             )
             if r.returncode == 0:
                 self.add("ANSIBLE-LINT", "Ansible lint passes", True, "PASS", "clean", r.stdout[:200])
@@ -1060,8 +1070,13 @@ class Validator:
 
     def check_gitleaks(self):
         try:
+            # --no-git: scan the working tree only. Without it gitleaks walks
+            # the entire git history, which on a full-history checkout (the CI
+            # repo is 3.6 GB) exceeds any sane timeout.
             r = subprocess.run(
-                ["gitleaks", "detect", "--source", str(BASE_DIR), "--no-banner", "--report-format", "json"],
+                ["gitleaks", "detect", "--no-git", "--source", str(BASE_DIR),
+                 "--config", str(BASE_DIR / ".gitleaks.toml"),
+                 "--no-banner", "--report-format", "json"],
                 capture_output=True, text=True, timeout=60,
             )
             if r.returncode == 0:
