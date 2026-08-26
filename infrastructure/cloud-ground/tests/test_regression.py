@@ -1035,6 +1035,224 @@ def _assert_rejected_both(fake_adv, check_id, label):
 
 
 # ═══════════════════════════════════════════════════════════════════
+# B1-I2 - Clean Host Baseline (local-first, host-free)
+# ═══════════════════════════════════════════════════════════════════
+
+B1I2_SCHEMA = BASE_DIR / "contracts" / "b1-i2-clean-host.schema.json"
+B1I2_CONTRACT = BASE_DIR / "contracts" / "b1-i2-clean-host.json"
+B1I2_POLICY = BASE_DIR / "policy" / "host-baseline.yml"
+B1I2_RUNBOOK = BASE_DIR / "runbooks" / "B1-I2-execution.md"
+B1I2_FIXTURES = BASE_DIR / "tests" / "fixtures"
+
+
+def _load_b1i2_schema():
+    import jsonschema
+    with open(B1I2_SCHEMA, "r", encoding="utf-8") as f:
+        return jsonschema.Draft202012Validator(json.load(f))
+
+
+def _load_b1i2_contract():
+    with open(B1I2_CONTRACT, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def test_b1i2_contract_exists_and_schema_valid():
+    import jsonschema
+    validator = _load_b1i2_schema()
+    contract = _load_b1i2_contract()
+    jsonschema.Draft202012Validator.check_schema(contract)
+    errors = list(validator.iter_errors(contract))
+    assert not errors, f"B1-I2 contract invalid: {[e.message for e in errors]}"
+    assert contract["stage"] == "B1-I2"
+    print("PASS: B1-I2 contract parses and satisfies its schema")
+
+
+def test_b1i2_approved_identity():
+    c = _load_b1i2_contract()
+    assert c["repository"]["full_name"] == CONTRACT_REPO, \
+        f"B1-I2 repo {c['repository']['full_name']} != canonical {CONTRACT_REPO}"
+    assert c["approved_provider"] == "netcup"
+    assert c["approved_product"].upper().startswith("RS 4000")
+    print("PASS: B1-I2 approved provider and product frozen (netcup RS 4000 G12)")
+
+
+def test_b1i2_monthly_contract_not_yearly():
+    c = _load_b1i2_contract()
+    assert c["approved_contract_term"].upper() == "MONTHLY"
+    print("PASS: B1-I2 contract term is MONTHLY, not yearly")
+
+
+def test_b1i2_price_ceilings_within_approval():
+    c = _load_b1i2_contract()
+    assert c["approved_ceiling_first_month_usd"] <= 100
+    assert c["approved_ceiling_monthly_usd"] <= 60
+    assert c["approved_ceiling_first_month_usd"] > 0
+    assert c["approved_ceiling_monthly_usd"] > 0
+    print("PASS: B1-I2 spending ceilings respect approval (first<=100, monthly<=60)")
+
+
+def test_b1i2_supported_os():
+    c = _load_b1i2_contract()
+    os_cfg = c["operating_system"]
+    assert os_cfg["distribution"] == "ubuntu"
+    assert os_cfg["version"] == "24.04"
+    assert os_cfg["supported"] is True
+    print("PASS: B1-I2 OS baseline is Ubuntu 24.04 LTS (supported)")
+
+
+def test_b1i2_private_network_and_firewall_posture():
+    c = _load_b1i2_contract()
+    assert c["private_network"] == "tailscale"
+    assert c["firewall_posture"]["default_incoming"] == "deny"
+    assert c["posture"]["public_ingress"] == "deny"
+    print("PASS: B1-I2 private network (tailscale) and default-deny ingress frozen")
+
+
+def test_b1i2_no_b1i3_services_in_scope():
+    c = _load_b1i2_contract()
+    forbidden = set(c["forbidden_services"])
+    assert "postgresql" in forbidden
+    assert "redis" in forbidden
+    assert "observability" in forbidden
+    assert "live-trading" in forbidden
+    print("PASS: B1-I2 forbids deploying B1-I3 and later services")
+
+
+def test_b1i2_required_evidence_manifest_contract():
+    c = _load_b1i2_contract()
+    required = c["required_evidence"]
+    for name in [
+        "purchase-verification.json", "preflight-host-facts.json", "postflight-host-facts.json",
+        "network-exposure-before.json", "network-exposure-after.json", "private-network-verification.json",
+        "ssh-hardening-results.json", "firewall-results.json", "docker-baseline-results.json",
+        "storage-layout-results.json", "ansible-first-run.json", "ansible-second-run.json",
+        "idempotence-results.json", "rollback-readiness.json", "evidence-manifest.json",
+    ]:
+        assert name in required, f"B1-I2 must require evidence: {name}"
+    print("PASS: B1-I2 contract requires the full evidence set")
+
+
+def test_b1i2_schema_rejects_invalid_contracts():
+    validator = _load_b1i2_schema()
+    invalid_dir = B1I2_FIXTURES / "invalid"
+    matched = 0
+    for f in sorted(invalid_dir.glob("b1-i2-clean-host.invalid.*.json")):
+        with open(f, "r", encoding="utf-8") as fh:
+            instance = json.load(fh)
+        errors = list(validator.iter_errors(instance))
+        assert errors, f"Invalid B1-I2 fixture should be rejected: {f.name}"
+        matched += 1
+    assert matched >= 4, f"Expected >=4 invalid fixtures, found {matched}"
+    print(f"PASS: B1-I2 schema rejects {matched} invalid fixtures")
+
+
+def test_b1i2_schema_accepts_valid_contract():
+    validator = _load_b1i2_schema()
+    with open(B1I2_FIXTURES / "valid" / "b1-i2-clean-host.valid.json", "r", encoding="utf-8") as f:
+        instance = json.load(f)
+    errors = list(validator.iter_errors(instance))
+    assert not errors, f"Valid B1-I2 fixture rejected: {[e.message for e in errors]}"
+    print("PASS: B1-I2 valid fixture accepted by schema")
+
+
+def test_b1i2_year_contract_rejected():
+    validator = _load_b1i2_schema()
+    with open(B1I2_FIXTURES / "invalid" / "b1-i2-clean-host.invalid.yearly-contract.json", "r", encoding="utf-8") as f:
+        instance = json.load(f)
+    assert list(validator.iter_errors(instance)), "YEARLY contract must be rejected"
+    print("PASS: B1-I2 rejects a yearly contract")
+
+
+def test_b1i2_unsupported_os_rejected():
+    validator = _load_b1i2_schema()
+    with open(B1I2_FIXTURES / "invalid" / "b1-i2-clean-host.invalid.wrong-os.json", "r", encoding="utf-8") as f:
+        instance = json.load(f)
+    assert list(validator.iter_errors(instance)), "Unsupported OS must be rejected"
+    print("PASS: B1-I2 rejects an unsupported operating system")
+
+
+def test_b1i2_password_ssh_rejected_by_schema():
+    validator = _load_b1i2_schema()
+    with open(B1I2_FIXTURES / "invalid" / "b1-i2-clean-host.invalid.password-ssh.json", "r", encoding="utf-8") as f:
+        instance = json.load(f)
+    assert list(validator.iter_errors(instance)), "Password SSH must be schema-rejected"
+    print("PASS: B1-I2 rejects password-based SSH posture")
+
+
+def test_b1i2_docker_tcp_public_rejected_by_schema():
+    validator = _load_b1i2_schema()
+    with open(B1I2_FIXTURES / "invalid" / "b1-i2-clean-host.invalid.docker-tcp-public.json", "r", encoding="utf-8") as f:
+        instance = json.load(f)
+    assert list(validator.iter_errors(instance)), "Public Docker TCP API must be rejected"
+    print("PASS: B1-I2 rejects public Docker TCP API posture")
+
+
+def test_b1i2_policy_consistent_with_contract():
+    import yaml as _yaml
+    with open(B1I2_POLICY, "r", encoding="utf-8") as f:
+        policy = _yaml.safe_load(f)
+    c = _load_b1i2_contract()
+    assert policy["contract"]["provider"] == c["approved_provider"]
+    assert policy["contract"]["product"] == c["approved_product"]
+    assert policy["contract"]["term"] == "MONTHLY"
+    assert policy["contract"]["ceiling_first_month_usd"] == c["approved_ceiling_first_month_usd"]
+    assert policy["contract"]["ceiling_monthly_usd"] == c["approved_ceiling_monthly_usd"]
+    assert policy["baseline"]["distribution"] == c["operating_system"]["distribution"]
+    assert policy["baseline"]["version"] == c["operating_system"]["version"]
+    assert set(policy["exposure"]["forbidden_services"]) == set(c["forbidden_services"]), "Policy/contract disagree on forbidden services"
+    print("PASS: B1-I2 policy and acceptance contract are consistent")
+
+
+def test_b1i2_no_remote_dependency_in_local_path():
+    policy_lower = (BASE_DIR / "policy" / "host-baseline.yml").read_text(encoding="utf-8").lower()
+    runbook_lower = B1I2_RUNBOOK.read_text(encoding="utf-8").lower()
+    assert "local-first" in runbook_lower
+    assert "without the cloud host" in runbook_lower
+    assert "local development dependency" in policy_lower
+    for bloc in [policy_lower, runbook_lower]:
+        assert "local development must require the cloud host" not in bloc
+    print("PASS: B1-I2 local path declares no mandatory cloud dependency")
+
+
+def test_b1i2_runbook_rollback_and_rebuild():
+    runbook = B1I2_RUNBOOK.read_text(encoding="utf-8")
+    assert "rollback" in runbook.lower() or "rebuild" in runbook.lower()
+    assert "lockout" in runbook.lower()
+    assert "purchase hold" in runbook.lower()
+    print("PASS: B1-I2 runbook documents rollback/rebuild and lockout-safe transition")
+
+
+def test_b1i2_no_real_hosts_or_secrets_in_fixtures():
+    text_blocks = []
+    for f in B1I2_FIXTURES.rglob("b1-i2-clean-host*.json"):
+        text_blocks.append(f.read_text(encoding="utf-8"))
+    text_blocks.append(B1I2_CONTRACT.read_text(encoding="utf-8"))
+    text_blocks.append(B1I2_POLICY.read_text(encoding="utf-8"))
+    joined = "\n".join(text_blocks).lower()
+    secrets = ["begin rsa", "begin private key", "tskey-", "-----begin"]
+    for s in secrets:
+        assert s not in joined, f"Potential secret marker leaked into B1-I2 files: {s}"
+    print("PASS: B1-I2 fixtures/contract/policy contain no secret or real host material")
+
+
+def test_b1i2_rejects_stale_clean_host_evidence():
+    run_id = make_run_id()
+    commit, tree = _git_head()
+    with tempfile.TemporaryDirectory() as tmpdir:
+        _build_final_evidence_dir(tmpdir, run_id)
+        results = os.path.join(tmpdir, "static-validation-results.json")
+        data = json.load(open(results))
+        data["run_id"] = "000000deadbe"
+        with open(results, "w") as f:
+            json.dump(data, f)
+        rc, out, err = run_gate(tmpdir, commit, tree, env={"OCE_RUN_ID": run_id})
+        combined = out + err
+        assert rc != 0, f"Gate must reject mixed RUN_ID clean-host evidence\n{combined}"
+        assert "RUN-ID-MIXED" in combined, f"Expected RUN-ID-MIXED in gate output:\n{combined}"
+        print("PASS: Final gate rejects stale/mixed-RUN_ID clean-host evidence")
+
+
+# ═══════════════════════════════════════════════════════════════════
 # Test Registry
 # ═══════════════════════════════════════════════════════════════════
 
@@ -1099,6 +1317,27 @@ ALL_TESTS = [
     ("Single authoritative entrypoint", test_no_duplicate_authoritative_entrypoint),
     ("Adversarial --only runs confined to scratch dir", test_adversarial_suite_confined_to_scratch_dir),
     ("Gate contract path and manifest freshness", test_gate_contract_path_and_manifest_freshness),
+
+    # -- B1-I2 Clean Host Baseline (local-first, host-free) --
+    ("B1-I2 contract exists and schema-valid", test_b1i2_contract_exists_and_schema_valid),
+    ("B1-I2 approved provider/product frozen", test_b1i2_approved_identity),
+    ("B1-I2 contract term is MONTHLY not yearly", test_b1i2_monthly_contract_not_yearly),
+    ("B1-I2 spending ceilings within approval", test_b1i2_price_ceilings_within_approval),
+    ("B1-I2 supported OS is Ubuntu 24.04", test_b1i2_supported_os),
+    ("B1-I2 private network and deny ingress frozen", test_b1i2_private_network_and_firewall_posture),
+    ("B1-I2 forbids B1-I3 and later services", test_b1i2_no_b1i3_services_in_scope),
+    ("B1-I2 requires full evidence set", test_b1i2_required_evidence_manifest_contract),
+    ("B1-I2 schema rejects all invalid fixtures", test_b1i2_schema_rejects_invalid_contracts),
+    ("B1-I2 schema accepts valid fixture", test_b1i2_schema_accepts_valid_contract),
+    ("B1-I2 rejects yearly contract", test_b1i2_year_contract_rejected),
+    ("B1-I2 rejects unsupported OS", test_b1i2_unsupported_os_rejected),
+    ("B1-I2 rejects password SSH posture", test_b1i2_password_ssh_rejected_by_schema),
+    ("B1-I2 rejects public Docker TCP API", test_b1i2_docker_tcp_public_rejected_by_schema),
+    ("B1-I2 policy consistent with contract", test_b1i2_policy_consistent_with_contract),
+    ("B1-I2 local path has no cloud dependency", test_b1i2_no_remote_dependency_in_local_path),
+    ("B1-I2 runbook documents rollback/rebuild", test_b1i2_runbook_rollback_and_rebuild),
+    ("B1-I2 fixtures contain no real hosts/secrets", test_b1i2_no_real_hosts_or_secrets_in_fixtures),
+    ("B1-I2 final gate rejects stale/mixed-RUN_ID evidence", test_b1i2_rejects_stale_clean_host_evidence),
 ]
 
 
