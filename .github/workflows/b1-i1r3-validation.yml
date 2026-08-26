@@ -43,7 +43,12 @@ jobs:
       # ═══════════════════════════════════════════════════════════════
       - name: Install Ansible and ansible-lint
         run: |
-          pip install ansible-core==2.16.0 ansible-lint==6.22.0
+          # ansible-compat MUST be pinned to the 6.22.0-era 4.1.11. Newer
+          # ansible-compat (>=5) computes an isolated cache dir as
+          # <project_dir>/.ansible, and since ansible-lint 6.22.0 resolves
+          # project_dir to the git root, an unpinned install drops a stray
+          # .ansible/ into the checkout and trips the clean-source check.
+          pip install ansible-core==2.16.0 ansible-lint==6.22.0 ansible-compat==4.1.11
           # Collections required by the playbook roles (community.general,
           # community.docker, ansible.posix) for syntax-check and lint.
           ansible-galaxy collection install -r infrastructure/cloud-ground/ansible/requirements.yml
