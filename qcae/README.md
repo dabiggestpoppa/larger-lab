@@ -45,13 +45,13 @@ QCAE must run independently while OCE upgrades are still in progress. It emits O
 - Block 6 — Proving Lab
 - Block 7 — Quant & Financial Validation
 
-### Book IV — Acquisition, Evidence & Intelligence Memory — NEXT
+### Book IV — Acquisition, Evidence & Intelligence Memory — COMPLETE / FROZEN v0.1
 - Block 8 — Acquisition & Integration
 - Block 9 — Evidence, Receipts & Memory
 - Block 10 — Continuous Capability Intelligence
 - Block 11 — Autonomous Engineering Intelligence
 
-### Book V — Agent & Runtime Architecture
+### Book V — Agent & Runtime Architecture — NEXT
 - Block 12 — Agent Architecture
 - Block 13 — Standalone Runtime
 - Block 14 — OCE Integration Contract
@@ -81,15 +81,14 @@ QCAE must run independently while OCE upgrades are still in progress. It emits O
 ## Canon status
 
 - Overall architecture: v0.1
-- Book I: COMPLETE / FROZEN v0.1
-- Book II: COMPLETE / FROZEN v0.1
-- Book III: COMPLETE / FROZEN v0.1
-- Book III index: `books/book-03/README.md`
-- Block 5 freeze: `books/book-03/BLOCK-05-FREEZE-REVIEW.md`
-- Block 6 freeze: `books/book-03/BLOCK-06-FREEZE-REVIEW.md`
-- Block 7 freeze: `books/book-03/BLOCK-07-FREEZE-REVIEW.md`
-- Book III freeze: `books/book-03/BOOK-03-FREEZE-REVIEW.md`
-- Blocks 8-18: outlined, pending full expansion
+- Books I-IV: COMPLETE / FROZEN v0.1
+- Book IV index: `books/book-04/README.md`
+- Block 8 freeze: `books/book-04/BLOCK-08-FREEZE-REVIEW.md`
+- Block 9 freeze: `books/book-04/BLOCK-09-FREEZE-REVIEW.md`
+- Block 10 freeze: `books/book-04/BLOCK-10-FREEZE-REVIEW.md`
+- Block 11 freeze: `books/book-04/BLOCK-11-FREEZE-REVIEW.md`
+- Book IV freeze: `books/book-04/BOOK-04-FREEZE-REVIEW.md`
+- Blocks 12-18: outlined, pending full expansion
 
 ## History discipline
 
