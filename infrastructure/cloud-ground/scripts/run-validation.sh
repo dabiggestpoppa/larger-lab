@@ -270,7 +270,10 @@ echo ""
 # ═══════════════════════════════════════════════════════════════════
 echo "[STEP e] Run regression suite..."
 export OCE_RUN_ID
-python3 "$REGRESSIONS_WIN" 2>&1 | tee "$FINAL_EVIDENCE/regression-output.txt"
+export PYTHONUNBUFFERED=1
+# -u keeps the tee'd regression-output.txt current even on long/aborted runs,
+# so partial progress is preserved in the evidence directory.
+python3 -u "$REGRESSIONS_WIN" 2>&1 | tee "$FINAL_EVIDENCE/regression-output.txt"
 REG_RC=${PIPESTATUS[0]}
 if [ "$REG_RC" -ne 0 ]; then
     FAILED_PHASE="regressions"

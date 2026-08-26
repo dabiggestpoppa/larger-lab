@@ -10,6 +10,11 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    # The regression suite runs the full check battery (ansible-lint,
+    # ansible-playbook, gitleaks, shellcheck) per --all test, so an
+    # authoritative run legitimately takes ~30-45 min. Bound it anyway so a
+    # genuine hang is killed and the partial evidence is still uploaded.
+    timeout-minutes: 120
     steps:
       # ═══════════════════════════════════════════════════════════════
       # Checkout (pinned action revision)
