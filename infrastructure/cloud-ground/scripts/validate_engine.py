@@ -359,18 +359,21 @@ class Validator:
                     )
                     if r.returncode != 0:
                         errors.append(f"AUTHORITATIVE: HEAD is not descendant of base {expected_base[:12]}")
-            # In authoritative mode, check worktree is clean (tracked files only)
+            # In authoritative mode, check worktree is clean (tracked AND
+            # untracked files — the R3H contract requires both; the shared
+            # runner's step d uses the same `git status --porcelain` count).
             r = subprocess.run(
                 ["git", "-C", str(REPO_ROOT), "status", "--porcelain"],
                 capture_output=True, text=True, timeout=10,
             )
             dirty_lines = [
                 l for l in r.stdout.strip().splitlines()
-                if l.strip() and not l.startswith("??")
+                if l.strip()
             ]
             if dirty_lines:
                 errors.append(
-                    f"AUTHORITATIVE: worktree not clean — {len(dirty_lines)} modified tracked files"
+                    f"AUTHORITATIVE: worktree not clean — {len(dirty_lines)} dirty file(s) "
+                    f"(tracked or untracked)"
                 )
 
         if errors:

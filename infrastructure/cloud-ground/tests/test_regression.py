@@ -114,7 +114,8 @@ def test_rejects_empty_run_id_in_authoritative():
     with tempfile.TemporaryDirectory() as tmpdir:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
-        # Set OCE_RUN_ID to empty
+        # Set OCE_RUN_ID to empty (must be passed so the runner's exported
+        # OCE_RUN_ID cannot leak into the subprocess environment)
         env = os.environ.copy()
         env.pop("OCE_RUN_ID", None)
         rc, _, _ = run_engine(
@@ -122,6 +123,7 @@ def test_rejects_empty_run_id_in_authoritative():
             "--target-commit", commit, "--target-tree", tree,
             "--target-branch", CONTRACT_BRANCH,
             "--evidence-dir", tmpdir,
+            env=env,
         )
         assert rc != 0, "Engine should reject empty OCE_RUN_ID in authoritative mode"
         print("PASS: Empty OCE_RUN_ID rejected in authoritative mode")
