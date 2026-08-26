@@ -114,10 +114,11 @@ def test_rejects_empty_run_id_in_authoritative():
     with tempfile.TemporaryDirectory() as tmpdir:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
         tree = subprocess.run(["git", "rev-parse", "HEAD^{tree}"], capture_output=True, text=True, cwd=str(BASE_DIR.parent.parent)).stdout.strip()
-        # Set OCE_RUN_ID to empty (must be passed so the runner's exported
-        # OCE_RUN_ID cannot leak into the subprocess environment)
+        # Explicitly set OCE_RUN_ID to an empty string. Popping it would not
+        # work: run_engine merges the caller env over os.environ, so a popped
+        # key would let the runner's exported OCE_RUN_ID leak through.
         env = os.environ.copy()
-        env.pop("OCE_RUN_ID", None)
+        env["OCE_RUN_ID"] = ""
         rc, _, _ = run_engine(
             "--authoritative", "--phase", "initial",
             "--target-commit", commit, "--target-tree", tree,
