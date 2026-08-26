@@ -8,7 +8,7 @@ QCAE is Quant Lab's capability-acquisition and engineering-intelligence system. 
 
 **Standalone now. OCE-compatible by contract. OCE-governed later.**
 
-QCAE must run independently while OCE upgrades are still in progress. It should emit OCE-ready artifacts from day one — evidence envelopes, provenance, capability receipts, authority requests, lifecycle states — but use a local authority/policy shim until OCE becomes the governing authority.
+QCAE must run independently while OCE upgrades are still in progress. It emits OCE-ready artifacts from day one — evidence envelopes, provenance, capability receipts, authority requests, lifecycle states — while using a local authority/policy shim until OCE becomes the governing authority.
 
 ## Core doctrine
 
@@ -40,12 +40,12 @@ QCAE must run independently while OCE upgrades are still in progress. It should 
 - Block 3 — Repository Intelligence / DeepWiki Layer
 - Block 4 — Capability Forensics
 
-### Book III — Trust, Proof & Quant Validation — NEXT
+### Book III — Trust, Proof & Quant Validation — COMPLETE / FROZEN v0.1
 - Block 5 — Trust, Security & Legal
 - Block 6 — Proving Lab
 - Block 7 — Quant & Financial Validation
 
-### Book IV — Acquisition, Evidence & Intelligence Memory
+### Book IV — Acquisition, Evidence & Intelligence Memory — NEXT
 - Block 8 — Acquisition & Integration
 - Block 9 — Evidence, Receipts & Memory
 - Block 10 — Continuous Capability Intelligence
@@ -83,12 +83,13 @@ QCAE must run independently while OCE upgrades are still in progress. It should 
 - Overall architecture: v0.1
 - Book I: COMPLETE / FROZEN v0.1
 - Book II: COMPLETE / FROZEN v0.1
-- Book II index: `books/book-02/README.md`
-- Block 2 freeze: `books/book-02/BLOCK-02-FREEZE-REVIEW.md`
-- Block 3 freeze: `books/book-02/BLOCK-03-FREEZE-REVIEW.md`
-- Block 4 freeze: `books/book-02/BLOCK-04-FREEZE-REVIEW.md`
-- Book II freeze: `books/book-02/BOOK-02-FREEZE-REVIEW.md`
-- Blocks 5-18: outlined, pending full expansion
+- Book III: COMPLETE / FROZEN v0.1
+- Book III index: `books/book-03/README.md`
+- Block 5 freeze: `books/book-03/BLOCK-05-FREEZE-REVIEW.md`
+- Block 6 freeze: `books/book-03/BLOCK-06-FREEZE-REVIEW.md`
+- Block 7 freeze: `books/book-03/BLOCK-07-FREEZE-REVIEW.md`
+- Book III freeze: `books/book-03/BOOK-03-FREEZE-REVIEW.md`
+- Blocks 8-18: outlined, pending full expansion
 
 ## History discipline
 
