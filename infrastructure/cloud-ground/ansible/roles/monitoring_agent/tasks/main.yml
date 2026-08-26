@@ -41,7 +41,7 @@
           interval: 30
           timeout: 5
         docker:
-          command: "docker ps --format '{{.Names}}:{{.Status}}'"
+          command: "docker ps -q"
           interval: 60
 
       alerts:

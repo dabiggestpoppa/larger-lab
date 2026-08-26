@@ -50,9 +50,6 @@
 - name: Configure logrotate for OCE logs
   ansible.builtin.copy:
     dest: /etc/logrotate.d/oce
-    owner: root
-    group: root
-    mode: '0644'
     content: |
       /opt/oce/logs/*.log {
           daily
