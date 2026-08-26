@@ -2,13 +2,16 @@
 # Docker role — install Docker Engine and Compose plugin
 # B1-I1R — Uses safer download practices
 
-- name: Add Docker GPG key
-  ansible.builtin.shell: |
-    set -o pipefail
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-    gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+- name: Download Docker GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /tmp/docker-archive-keyring.asc
+    mode: '0644'
+  tags: [docker, install]
+
+- name: Dearmor Docker GPG key
+  ansible.builtin.command: gpg --batch --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg /tmp/docker-archive-keyring.asc
   args:
-    executable: /bin/bash
     creates: /usr/share/keyrings/docker-archive-keyring.gpg
   tags: [docker, install]
 

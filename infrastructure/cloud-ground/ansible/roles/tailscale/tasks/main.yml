@@ -11,11 +11,10 @@
   tags: [tailscale, detect]
 
 - name: Add Tailscale GPG key
-  ansible.builtin.shell: |
-    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/{{ ubuntu_codename }}.noarmor.gpg | \
-    sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg > /dev/null
-  args:
-    creates: /usr/share/keyrings/tailscale-archive-keyring.gpg
+  ansible.builtin.get_url:
+    url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ubuntu_codename }}.noarmor.gpg"
+    dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+    mode: '0644'
   tags: [tailscale, install]
 
 - name: Add Tailscale repository

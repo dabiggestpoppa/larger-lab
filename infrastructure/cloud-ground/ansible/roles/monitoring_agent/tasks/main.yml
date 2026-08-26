@@ -25,7 +25,6 @@
     dest: /opt/oce/config/monitoring.yml
     owner: root
     group: oce-operator
-    mode: '0644'
     content: |
       # OCE Monitoring Configuration
       # B1-I1 — Static skeleton

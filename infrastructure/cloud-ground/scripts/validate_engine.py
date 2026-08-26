@@ -1009,7 +1009,7 @@ class Validator:
                 self.add("ANSIBLE-LINT", "Ansible lint passes", True, "PASS", "clean", r.stdout[:200])
             else:
                 self.add("ANSIBLE-LINT", "Ansible lint passes", True, "FAIL", "found issues",
-                          (r.stdout + r.stderr)[:500])
+                          (r.stdout + r.stderr)[:4000])
         except FileNotFoundError:
             self.add("ANSIBLE-LINT", "Ansible lint passes", True, "BLOCKED", "ansible-lint not installed", "")
         except subprocess.TimeoutExpired:
