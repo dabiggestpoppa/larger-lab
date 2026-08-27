@@ -84,26 +84,37 @@ def canonical_upper_bands():
     """
     can = pd.read_parquet(CANON)
     can = can.sort_values(["cmc_id", "historical_date"]).copy()
-    # PIT rank band under our convention
-    r = can["rank"]
-    can["rb"] = pd.cut(
-        r, bins=[0, 25, 100, 250, 500], labels=["1-25", "26-100", "101-250", "251-500"]
-    )
-    can["rank_band"] = can["rb"].astype(str)
-    can = can[can["rank_band"].isin(["26-100", "101-250", "251-500"])].copy()
-    # causal multi-day returns from price
+    # --- INTEGRITY REPAIR (LOWER-FIELD-2) ---
+    # Multi-day returns MUST use the same exact causal algorithm as the 501-2000
+    # panel (lf_build_panel.add_causal_features): per-group 1D return from price
+    # via group shift, log-space cumulative-sum diff, shifting the CUMSUM (not
+    # the daily log-return). The prior implementation shifted the daily
+    # log-return (_logf) against the cumsum, which is NOT a w-day return and
+    # inflated ret_3d..ret_60d by a factor ~50x.
+    #
+    # Features are computed on the FULL continuous per-asset series (all ranks
+    # 1-500) BEFORE band filtering, so migration across a band boundary keeps
+    # continuity (mirrors LF0 merge_canonical_series). Band is then assigned by
+    # the row's PIT rank.
     g = can.groupby("cmc_id", sort=False)["price_usd"]
-    logp = np.log(can["price_usd"].to_numpy(dtype=float))
-    can["_logf"] = np.append([np.nan], np.diff(logp))
-    can["_logf"] = np.where(np.isfinite(can["_logf"]), can["_logf"], np.nan)
-    can["ret_1d"] = np.expm1(can["_logf"])
-    cs = can.groupby("cmc_id", sort=False)["_logf"].cumsum()
+    can["price_prev"] = g.shift(1)
+    can["ret_1d"] = can["price_usd"] / can["price_prev"] - 1.0
+    ok = can["ret_1d"].notna() & (can["ret_1d"] > -1.0)
+    logf = np.where(ok, np.log1p(can["ret_1d"].clip(lower=-0.9999)), np.nan)
+    can["_logf"] = logf
+    can["_cs"] = can.groupby("cmc_id", sort=False)["_logf"].cumsum()
     for w, col in [(3, "ret_3d"), (7, "ret_7d"), (14, "ret_14d"), (30, "ret_30d")]:
-        cs_shift = can.groupby("cmc_id", sort=False)["_logf"].transform(
+        cs_shift = can.groupby("cmc_id", sort=False)["_cs"].transform(
             lambda s: s.shift(w)
         )
         # cumulative log return at t minus cumulative log return at t-w = w-day log return
-        cs_w = cs - cs_shift
-        can[col] = np.expm1(cs_w)
-    can = can.drop(columns=["rb", "_logf"])
+        can[col] = np.expm1(can["_cs"] - cs_shift)
+    # assign band by PIT rank on the full frame, then filter to comparison bands
+    rb = pd.cut(
+        can["rank"], bins=[0, 25, 100, 250, 500],
+        labels=["1-25", "26-100", "101-250", "251-500"],
+    )
+    can["rank_band"] = rb.astype(str)
+    can = can[can["rank_band"].isin(["26-100", "101-250", "251-500"])].copy()
+    can = can.drop(columns=["price_prev", "_logf", "_cs"])
     return can
