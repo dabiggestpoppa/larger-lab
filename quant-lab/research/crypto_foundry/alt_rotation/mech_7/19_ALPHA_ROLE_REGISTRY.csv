@@ -1,0 +1,7 @@
+statistic,alpha_roles,evidence_level,sample_size,conditionality,known_nulls,data_limits,causal_level,redundancy
+ISOLATED_DOWNSIDE_EXTREME reversal,REVERSAL_CONTEXT;TAIL_PROBABILITY,L1,LF2 n>30k events,rank-dependent,sector/chain residuals,lower-field only,L1,none identified
+COORDINATED_UPSIDE giveback,CONTINUATION_CONTEXT;FAILURE_FILTER,L1,LF2 n>30k events,breadth-dependent,SHMC tail activation,lower-field only,L1,none identified
+BREADTH ROUTE GATE (level),CROSS_FIELD_GATE;STRUCTURAL_STATE,L2,125 upper releases + LF2 daily,state-conditional,volatility incremental,top500 breadth,L2,absorbs accumulation-like
+HIGH_BRD_HIGH_DISP state,TAIL_PROBABILITY;DISTRIBUTION,L1,~600-630 days/band,band-specific,none yet,needs lifecycle audit,L1,breadth level partially
+BREADTH_OSCILLATION,REGIME_FILTER;TEMPORAL_DELIVERY,L1,>=50 episodes (M6),global,direction,micro-state only,L1,none identified
+RANK_DETERIORATION pre-shock,RANK_HEALTH;REVERSAL_CONTEXT,L1,ws9 output,rank-state,TBD,lower-field rank velocity,L1,none identified
