@@ -1,0 +1,29 @@
+{
+  "checkpoint": "TB-R6.6.1-FORWARD-COLLECTION-STATUS",
+  "status": "COLLECTING EVIDENCE",
+  "heartbeat_age_seconds": 8.8,
+  "runtime_head": "ec909fcc9d19eb6f091e2919d0cb2e5531391d49",
+  "last_m5_scored": "2026-08-27 22:15:00+00:00",
+  "mt5_status": "CONNECTED",
+  "account_gate": "PASS",
+  "supervisor_pid": 15352,
+  "worker_pid": 4224,
+  "processes": {
+    "supervisor": {
+      "pid": 15352,
+      "alive": true
+    },
+    "worker": {
+      "pid": 4224,
+      "alive": true
+    },
+    "watcher": {
+      "pid": 18668,
+      "alive": true
+    },
+    "dashboard": {
+      "pid": 16352,
+      "alive": true
+    }
+  }
+}

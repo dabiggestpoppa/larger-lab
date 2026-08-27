@@ -1,0 +1,33 @@
+{
+  "checkpoint": "TB-R6.6.1-PERSISTENT-WINDOWS-FORWARD-RUNTIME-SEAL",
+  "decision": "PARTIAL_RUNTIME_REPAIR_NEEDS_OPERATOR_REBOOT_TEST",
+  "reason": "Scheduled task now has AtStartup+AtLogOn triggers with battery-unrestricted settings, but logoff survival is not yet proven. MT5 Python API requires user-session access. Full logoff test requires operator validation. All runtime reliability features verified.",
+  "artifacts": [
+    "TB_SCHEDULED_TASK_PARITY_AUDIT.json",
+    "TB_WINDOWS_RUNTIME_CONTRACT.json",
+    "TB_POST_BOOT_MT5_RUNTIME_TEST.json",
+    "TB_RUNTIME_FAILURE_DRILLS.csv",
+    "TB_RUNTIME_SOAK.json",
+    "TB_FORWARD_COLLECTION_STATUS.json",
+    "TB_20260827_SIGNAL_REGRESSION.json",
+    "TB_R6_6_1_REPORT.md",
+    "TB_R6_6_1_DECISION.json"
+  ],
+  "verified": {
+    "scheduled_task_parity": "PASS",
+    "mt5_connectivity": "PASS",
+    "worker_crash_restart": "PASS (17s recovery)",
+    "supervisor_restart": "PASS (RestartOnFailure configured)",
+    "watchdog_stale_alarm": "PASS",
+    "signal_regression": "PASS",
+    "soak_5min": "PASS"
+  },
+  "requires_operator_action": [
+    "Reboot machine to verify AtStartup trigger fires automatically",
+    "Log off to test MT5 API session survival",
+    "If logoff kills processes, configure stored credentials"
+  ],
+  "human_review_required": true,
+  "next_checkpoint_authorized": false,
+  "generated_at": "2026-08-27T19:20:11.164424+00:00"
+}

@@ -24,9 +24,9 @@
       "z": -3.536982,
       "session_eligible": true,
       "entry_eligible": true,
-      "GBPAUD_close": null,
-      "GBPNZD_close": null,
-      "AUDNZD_close": null,
+      "GBPAUD_close": 1.88835,
+      "GBPNZD_close": 2.28268,
+      "AUDNZD_close": 1.20817,
       "basis": -0.00053994,
       "rolling_mean": -2.908e-05,
       "rolling_std": 0.00014443

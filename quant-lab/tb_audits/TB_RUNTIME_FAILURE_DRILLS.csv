@@ -1,0 +1,2 @@
+drill,timestamp,target,method,old_pid,expected,new_pid,result,notes
+DRILL_A_WORKER_KILL,2026-08-27T19:12:53Z,worker,"os.kill(pid, 9)",592,supervisor restarted worker,4224,PASS,"new heartbeat 17s after kill, supervisor alive, no duplicates"

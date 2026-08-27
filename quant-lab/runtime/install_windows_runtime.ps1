@@ -1,23 +1,22 @@
-# TB-R6.1 — Install Windows auto-start (logon task) for the TB runtime.
+# TB-R6.6.1 - Install Windows persistent runtime for the TB forward test.
 #
-# Registers a Task Scheduler entry that launches the TB SUPERVISOR at user
-# logon. The task runs as the CURRENT USER (limited privilege) — it inherits
-# the user's own token/ACLs, so it can be removed by the user with:
-#     schtasks /Delete /TN "TB-Runtime-Supervisor" /F
-# or via Task Scheduler UI — no takeown/icacls gymnastics.
+# Registers a Task Scheduler entry that launches the TB SUPERVISOR:
+#   - On system startup (AtStartup) - survives reboot
+#   - On user logon (AtLogOn) - catches manual session start
 #
-# The supervisor honors the durable desired-state flag: if the user ran
-# `tbctl stop`, the task starts the supervisor but the worker, watcher, and
-# dashboard stay stopped until `tbctl start`. With desired-state RUNNING the
-# supervisor brings up the whole stack (worker + basket watcher + dashboard).
+# The task runs as the CURRENT USER with InteractiveToken so the Python
+# MT5 API can connect to the user's running MetaTrader 5 terminal.
 #
-# Run (PowerShell, as the current user):
+# Battery/idle policies are set to NEVER stop the forward test.
+# The task restarts up to 3 times on crash with 1-minute intervals.
+#
+# Run (PowerShell, as the target user):
 #     powershell -ExecutionPolicy Bypass -File .\install_windows_runtime.ps1
 
 $ErrorActionPreference = "Stop"
 
 $TaskName = "TB-Runtime-Supervisor"
-$Repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)   # ...\larger-lab
+$Repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $Supervisor = Join-Path $Repo "quant-lab\runtime\tb_supervisor.py"
 
 if (-not (Test-Path $Supervisor)) {
@@ -34,24 +33,38 @@ if (-not $Py) {
     exit 1
 }
 
-# Resolve python fully (python launcher 'py' may need -3; prefer python.exe)
 if ($Py -like "*py.exe") {
     $Py = "$Py -3"
 }
 
-$Action = New-ScheduledTaskAction -Execute $Py -Argument "-u `"$Supervisor`"" `
+$Action = New-ScheduledTaskAction -Execute "cmd" `
+    -Argument "/c cd /d `"$Repo`" && `"$Py`" -u `"$Supervisor`"" `
     -WorkingDirectory $Repo
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Settings = New-ScheduledTaskSettingsSet -StartWhenAvailable `
+
+$TriggerStartup = New-ScheduledTaskTrigger -AtStartup
+$TriggerLogon   = New-ScheduledTaskTrigger -AtLogOn
+
+$Settings = New-ScheduledTaskSettingsSet `
+    -StartWhenAvailable `
     -ExecutionTimeLimit (New-TimeSpan -Days 0) `
-    -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) `
-    -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+    -RestartCount 3 `
+    -RestartInterval (New-TimeSpan -Minutes 1) `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
+    -MultipleInstances IgnoreNew
+
 $Principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
 
-Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger `
+Register-ScheduledTask -TaskName $TaskName -Action $Action `
+    -Trigger @($TriggerStartup, $TriggerLogon) `
     -Settings $Settings -Principal $Principal -Force | Out-Null
 
-Write-Host "TB runtime logon task installed: $TaskName"
-Write-Host "  python: $Py"
+Write-Host "TB runtime task installed: $TaskName"
+Write-Host "  python:     $Py"
 Write-Host "  supervisor: $Supervisor"
-Write-Host "The supervisor will start at next logon. To start now: tbctl start"
+Write-Host "  triggers:   AtStartup + AtLogOn"
+Write-Host "  identity:   $env:USERNAME (InteractiveToken)"
+Write-Host "  battery:    unrestricted"
+Write-Host "  restart:    3 retries, 1-min interval"
+Write-Host ""
+Write-Host "To start now: python quant-lab/runtime/tbctl.py start"

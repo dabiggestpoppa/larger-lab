@@ -1,0 +1,28 @@
+{
+  "test": "TB_R6_6_1_AUG27_SIGNAL_REGRESSION",
+  "description": "Deterministic regression fixture for the Aug 27 15:25 UTC missed signal",
+  "raw_closes": {
+    "GBPAUD": 1.88835,
+    "GBPNZD": 2.28268,
+    "AUDNZD": 1.20817
+  },
+  "expected": {
+    "basis": -0.0005399412894053213,
+    "rolling_mean": -2.9077952482349096e-05,
+    "rolling_std": 0.00014443481288397105,
+    "z": -3.5369820247793338,
+    "primary_entry_eligible": true,
+    "control_entry_eligible": true,
+    "session_eligible": true,
+    "time_eligible": true,
+    "est_hour": 10,
+    "threshold_crossed_3p0": true,
+    "threshold_crossed_2p5": true
+  },
+  "tolerance": {
+    "z_abs_diff_max": 1e-10,
+    "basis_abs_diff_max": 1e-12
+  },
+  "source": "MetaTrader5.copy_rates_range (OxSecurities-Demo, read-only)",
+  "created_at": "2026-08-27T19:10:00Z"
+}

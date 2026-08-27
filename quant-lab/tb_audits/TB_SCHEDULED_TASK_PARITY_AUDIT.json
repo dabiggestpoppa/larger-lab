@@ -1,0 +1,12 @@
+{
+  "checkpoint": "TB-R6.6.1-SCHEDULED-TASK-PARITY-AUDIT",
+  "task_name": "TB-Runtime-Supervisor",
+  "repo_trigger": "AtStartup + AtLogOn (install_windows_runtime.ps1)",
+  "live_trigger": "BootTrigger + LogonTrigger (verified via Export-ScheduledTask XML)",
+  "repo_principal": "$env:USERNAME / InteractiveToken / Limited",
+  "live_principal": "wifik / InteractiveToken / LeastPrivilege",
+  "repo_action": "python -u tb_supervisor.py (WorkingDirectory=$Repo)",
+  "live_action": "cmd /c cd /d $Repo && python.exe -u tb_supervisor.py",
+  "parity": "PASS",
+  "verified_at": "2026-08-27T19:10:00Z"
+}
