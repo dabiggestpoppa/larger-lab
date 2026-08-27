@@ -1,0 +1,27 @@
+id,req,artifact,status,evidence
+A,Release ledger + staged patterns,05,COMPLETE,125 events
+A,Band persistence,05,COMPLETE,Staged patterns classified
+B,Hierarchical gates G1/G2/G3,06-08,COMPLETE,G3 supported
+B,State routing graph,18,PARTIAL,<20% reconfig
+F,Trigger vs route gate,16,COMPLETE,Separable confirmed
+E,P1 stall + activation,13-15,PARTIAL,Activation NOT established
+G,Persistence/exhaustion,05,COMPLETE,"52 reentry, 44 mixed"
+H,Episode ledger,04,COMPLETE,"126 entries, 125 exits"
+I,Dependence-aware uncertainty,B,PARTIAL,"Permutation done, now corrected"
+J,Multiple testing,B,PARTIAL,BH-FDR applied
+K,Subperiod stability,22,COMPLETE,By subperiod rates
+L,Incremental value,20,COMPLETE,R² 0.076→0.195
+N,No PnL,guard,COMPLETE,
+O,No strategy,guard,COMPLETE,
+ADD_A,P1 micro-perturbation,30a-d,COMPLETE,Classification + offsetting
+ADD_B,Temporal delivery,31-32,COMPLETE,All TAU + censoring
+ADD_D,First move robustness,33a-c,COMPLETE,Bootstrap + alt def
+ADD_E,Accumulation robustness,34a-b,COMPLETE,Ablation + breadth ctrl
+ADD_F,Second-order routing,35-36,COMPLETE,Latency + dwell matrices
+ADD_H,Bifurcation,39,COMPLETE,Raw-coordinate audit
+ADD_I,Volatility,40,COMPLETE,Functional role tests
+CL_42,Transient vs sustained,42,COMPLETE,Touch/dwell audit
+CL_43,P1 pseudoreplication,43,COMPLETE,Chain/global/bootstrap/LOCO
+CL_44,Purged CV,44,COMPLETE,Chrono/purged/LOCO/bootstrap
+CL_45,Statistical corrections,45,COMPLETE,All perm p corrected
+CL_46,Node review,46,COMPLETE,8 nodes reviewed

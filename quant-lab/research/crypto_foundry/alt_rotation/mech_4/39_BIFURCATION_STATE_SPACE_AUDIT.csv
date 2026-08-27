@@ -1,6 +1,16 @@
-pred_prob_bin,n,outcome_rate,mid_pred_prob
-1,25,0.0,0.016
-2,25,0.04,0.042
-3,25,0.12,0.094
-4,25,0.16,0.227
-5,25,0.76,0.681
+pair,n,sharp,ci95_lo,ci95_hi,earned
+feat_btc_ret30 x feat_btc_ret7,125,0.24,0.1657,0.4892,False
+feat_btc_ret30 x feat_top3_share,125,0.32,0.2593,0.5493,True
+feat_btc_ret30 x feat_top3_share_chg7,125,0.28,0.1598,0.4946,True
+feat_btc_ret30 x feat_breadth30,125,0.44,0.2408,0.7132,True
+feat_btc_ret30 x feat_disp30,125,0.2,0.1458,0.4968,False
+feat_btc_ret30 x feat_sc_chg30,125,0.28,0.1722,0.4855,True
+feat_btc_ret30 x feat_eth_rel30,125,0.2,0.1571,0.4968,False
+feat_btc_ret30 x feat_vol_med,125,0.28,0.1696,0.4974,True
+feat_btc_ret30 x feat_chain_tvl_med_chg7,125,0.24,0.1774,0.5055,False
+feat_btc_ret7 x feat_top3_share,125,0.24,0.1296,0.512,False
+feat_btc_ret7 x feat_top3_share_chg7,125,0.16,0.1304,0.4128,False
+feat_btc_ret7 x feat_breadth30,125,0.48,0.2377,0.7144,True
+feat_btc_ret7 x feat_disp30,125,0.16,0.1285,0.4435,False
+feat_btc_ret7 x feat_sc_chg30,125,0.2,0.1257,0.455,False
+feat_btc_ret7 x feat_eth_rel30,125,0.16,0.1285,0.4429,False

@@ -1,0 +1,5 @@
+val,n_test,auc,ll,base_ll,delta,n_cycles,auc_mean,auc_sd,n_boot,auc_se
+CHRONO_70_30,38.0,0.7426,0.2578,0.3365,0.0787,,,,,
+PURGED,18.0,0.625,0.3057,0.3365,0.0308,,,,,
+LOCO,,,,,,4.0,0.7658,0.0981,,
+BOOTSTRAP,,,,,,,0.9067,,500.0,0.0215
