@@ -1,0 +1,2 @@
+status,reason
+DATA_BLOCKED,behavioral/correlation peer histories and lagged peer paths not available in committed cache

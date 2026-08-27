@@ -1,0 +1,7 @@
+result,status,reason
+zero-fill missing returns,NULL_BY_DESIGN,missingness retained
+correlation nearest neighbors,DATA_BLOCKED,trailing causal return matrix unavailable
+future rank-health clock,DATA_BLOCKED,future rank observations unavailable
+true peer contagion direction,DATA_BLOCKED,correlation/state peer aftermath unavailable
+LF3 basket absurd dispersion,DISSOLVED,not reused; finite raw-return methodology used
+LF3 triangle near-one semantics,DISSOLVED,replaced with labeled correlations

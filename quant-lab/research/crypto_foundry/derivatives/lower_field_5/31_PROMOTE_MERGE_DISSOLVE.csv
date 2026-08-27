@@ -1,0 +1,8 @@
+node,verdict,basis
+PIT_SUBSTRATE,PROMOTION_CANDIDATE_WITH_LIMITATIONS,continuous LF2-derived asset-date substrate passes uniqueness/provenance checks
+RANK_PEERS,VALID_WITH_LIMITATIONS,same-date PIT rank neighborhoods reproducible; no out-of-sample behavioral validation
+BEHAVIORAL_PEERS,VALID_WITH_LIMITATIONS,available standardized pre-event coordinates matched same-date; out-of-sample similarity not yet measured
+CORRELATION_PEERS,DATA_BLOCKED,no trailing return matrix implementation in current source cache
+STATE_PEERS,VALID_WITH_LIMITATIONS,same-date state cohort descriptive only
+PRICE_RANK_HEALTH,DATA_BLOCKED,future PIT rank histories absent from LF2-derived cache
+BASKET_TRIANGLE,DESCRIPTIVE_ONLY,finite raw-return rebuild and explicitly labeled correlations
