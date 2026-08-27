@@ -107,6 +107,7 @@ def build_status(rdb: RuntimeDB) -> dict:
         pass
 
     errs = rdb.recent_errors(1)
+    alarm = rdb.runtime_alarm()
     return {
         "engine_status": engine,
         "uptime_s": up_secs,
@@ -134,6 +135,7 @@ def build_status(rdb: RuntimeDB) -> dict:
         "disk_free_gb": (hb["disk_free_gb"] if hb else 0.0),
         "last_error": (errs[0]["message"] if errs else "none"),
         "last_error_ts": (errs[0]["ts"] if errs else ""),
+        "runtime_alarm": alarm or {},
         "read_only": True,
         "server_utc": _now(),
     }
@@ -159,7 +161,7 @@ const E=['engine_status','uptime','last_heartbeat','heartbeat_age','worker_pid',
 'market_open','last_closed_bar','last_signal_time','open_basket',
 'today_tb_pnl','today_tb_pnl_pct','open_basket_pnl',
 'deploy_tb_pnl','deploy_tb_pnl_pct','account_equity',
-'disk_free_gb','last_error'];
+'disk_free_gb','last_error','runtime_alarm'];
 const LBL={engine_status:'ENGINE',uptime:'UPTIME',last_heartbeat:'LAST HEARTBEAT',
 heartbeat_age:'HEARTBEAT',worker_pid:'WORKER PID',worker_state:'WORKER STATE',
 desired_state:'DESIRED',mt5_status:'MT5',account_gate:'ACCOUNT GATE',

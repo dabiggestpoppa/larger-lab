@@ -200,6 +200,16 @@ class Supervisor:
                 # RUNNING
                 worker_pid = self._worker_pid()
                 if not worker_pid:
+                    # A child can exit immediately after Popen. Treat that as
+                    # an attempted restart and retain bounded backoff rather
+                    # than spawning a new worker every poll forever.
+                    if self.worker_proc is not None:
+                        rc = self.worker_proc.poll()
+                        if rc is not None:
+                            self.failures += 1
+                            log.error("worker exited pid=%s rc=%s",
+                                      self.worker_proc.pid, rc)
+                            self.worker_proc = None
                     delay = RESTART_BACKOFF_S[
                         min(self.failures, len(RESTART_BACKOFF_S) - 1)]
                     if time.time() - self.last_spawn_ts >= delay:

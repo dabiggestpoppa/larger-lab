@@ -41,6 +41,7 @@ from pathlib import Path
 QUANT_LAB = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(QUANT_LAB / "runtime"))
 
+from tb_runtime_db import RuntimeDB  # noqa: E402
 from tb_runtime_config import (  # noqa: E402
     STATE_DIR, LOG_MAX_BYTES, LOG_BACKUP_COUNT,
     WATCHER_PID_FILE, WATCHER_LOG,
@@ -49,6 +50,7 @@ from tb_proc import PidLock  # noqa: E402
 from tb_telegram import TelegramNotifier  # noqa: E402
 
 POLL_S = 10.0
+STALE_AFTER_S = 20.0
 WATCH_STATE = STATE_DIR / "tb_basket_watch.json"
 
 RUNTIME_DB = STATE_DIR / "tb_runtime.db"
@@ -142,6 +144,7 @@ def main() -> int:
     prev_open = st.get("open_basket_id") or None
     prev_today = float(st.get("today_pnl", 0.0) or 0.0)
     prev_deploy = float(st.get("deploy_pnl", 0.0) or 0.0)
+    alarmed_stale = bool(st.get("stale_alarm"))
 
     tg = TelegramNotifier()
 
@@ -175,6 +178,33 @@ def main() -> int:
             else:
                 cur_open = prev_open
                 cur_today, cur_deploy = prev_today, prev_deploy
+
+            # 0) independent evidence-collection alarm. This never changes
+            # strategy or execution state; it only records and surfaces stale
+            # heartbeats so a dead forward test cannot remain unnoticed.
+            now_epoch = time.time()
+            stale = bool(hb and (now_epoch -
+                datetime.fromisoformat(hb["ts"].replace("Z", "+00:00")).timestamp()
+                > STALE_AFTER_S)) or hb is None
+            if stale and not alarmed_stale:
+                detail = "no heartbeat for >2 expected heartbeat intervals"
+                rdb_alarm = RuntimeDB()
+                try:
+                    rdb_alarm.record_runtime_alarm("CRITICAL_RUNTIME_STALE", detail)
+                finally:
+                    rdb_alarm.close()
+                log.critical("CRITICAL_RUNTIME_STALE: %s", detail)
+                tg.notify("TB CRITICAL_RUNTIME_STALE" + "\n" + detail)
+                alarmed_stale = True
+            elif not stale and alarmed_stale:
+                rdb_alarm = RuntimeDB()
+                try:
+                    rdb_alarm.record_runtime_alarm("CLEARED", "heartbeat resumed")
+                finally:
+                    rdb_alarm.close()
+                log.info("runtime stale alarm cleared")
+                alarmed_stale = False
+            st["stale_alarm"] = alarmed_stale
 
             # 1) ledger events — durable ground truth
             for ev in events_after(last_seq):

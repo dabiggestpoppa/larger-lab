@@ -1,87 +1,61 @@
 {
-  "window": "2026-08-24 through 2026-08-27T00:20:00+00:00",
-  "runtime_identity": {
-    "expected_head": "3a638653afb82e26eed2483469951cc655b98b44",
-    "runtime_head": "3a638653afb82e26eed2483469951cc655b98b44",
-    "runtime_branch": "tb-forward-engine",
-    "runtime_root": "C:/Users/wifik/Desktop/larger-lab-tb-forward-engine",
-    "worker_python": "C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
-    "worker_command": "unknown (no live process observable from current shell)",
-    "worker_start_time": "2026-08-25T10:55:20.987549+00:00",
-    "r6_4_callbacks_present": true,
-    "deployment_drift": false,
-    "verdict": "RUNTIME_CURRENT"
+  "checkpoint": "TB-R6.6-RUNTIME-RELIABILITY-AND-MISSED-SIGNAL-REPRODUCTION",
+  "final_root_cause": "RUNTIME_DOWNTIME_CAUSED_MISSED_SIGNAL",
+  "evidence": {
+    "all_4_processes_dead": true,
+    "last_heartbeat": "2026-08-26T21:27:24.034699+00:00",
+    "last_supervisor_status": "2026-08-26T21:27:27.069709+00:00",
+    "signal_time": "2026-08-27T15:25:00+00:00",
+    "signal_z": -3.536982,
+    "scheduled_task_trigger": "LogonTrigger (fires on user logon only)",
+    "scheduled_task_account": "wifik (interactive user)",
+    "death_cause": "Windows LogonSession terminated all child processes; LogonTrigger does not re-fire",
+    "system_sleep_or_hibernate": false,
+    "worker_exit_traceback": "NONE (process killed externally)"
   },
-  "runtime_state": {
-    "heartbeat_count": 135,
-    "last_heartbeat": {
-      "id": 76954,
-      "ts": "2026-08-26T21:27:24.034699+00:00",
-      "pid": 25784,
-      "generation": "GEN-20260825T105508",
-      "state": "FLAT",
-      "mt5_connected": 1,
-      "account_gate": 1,
-      "market_open": 1,
-      "last_closed_bar": "2026-08-27 00:20:00+00:00",
-      "last_signal_time": "",
-      "open_basket_id": "",
-      "today_pnl": 0.0,
-      "today_pnl_pct": 0.0,
-      "open_pnl": 0.0,
-      "deploy_pnl": 0.0,
-      "deploy_pnl_pct": 0.0,
-      "account_equity": 25254.35,
-      "disk_free_gb": 27.93061065673828,
-      "last_error": ""
+  "signal_reproduction": {
+    "source": "MetaTrader5.copy_rates_range (read-only)",
+    "15:20_utc": {
+      "z": 0.388964,
+      "session_eligible": true,
+      "entry_eligible": false
     },
-    "states": {
-      "DEGRADED_DISK": 4451,
-      "FLAT": 58235,
-      "ONLINE_MARKET_CLOSED": 14267,
-      "WAITING_FOR_MT5": 1
+    "15:25_utc": {
+      "z": -3.536982,
+      "session_eligible": true,
+      "entry_eligible": true,
+      "GBPAUD_close": null,
+      "GBPNZD_close": null,
+      "AUDNZD_close": null,
+      "basis": -0.00053994,
+      "rolling_mean": -2.908e-05,
+      "rolling_std": 0.00014443
     },
-    "control_events": 0,
-    "control_baskets": 0
+    "15:30_utc": {
+      "z": 0.294988,
+      "session_eligible": true,
+      "exit_eligible": true
+    }
   },
-  "canonical_replay": {
-    "data_source": "MT5 read-only pull via existing auditor; local cache ends 2026-05-29",
-    "primary_expected_entries": 1,
-    "control_expected_entries": 1,
-    "signals": [
-      {
-        "timestamp_utc": "2026-08-27 15:25:00",
-        "z": -3.536982,
-        "basis": -0.00053994,
-        "direction": "LONG",
-        "primary": true,
-        "control": true
-      },
-      {
-        "timestamp_utc": "2026-08-27 15:30:00",
-        "z": 0.294988,
-        "basis": -0.00053994,
-        "primary_exit": true,
-        "control_exit": true
-      }
-    ]
+  "repair_applied": {
+    "scheduled_task_changed_to_startup_trigger": true,
+    "scheduled_task_changed_to_system_account": true,
+    "supervisor_worker_exit_detection": true,
+    "watchdog_stale_alarm": true,
+    "dashboard_alarm_display": true
   },
-  "runtime_recognition": {
-    "primary": 0,
-    "control": 0,
-    "executed": 0,
-    "blocked": 0,
-    "missed": 2
+  "trader_summary": {
+    "was_system_running": "NO - all 4 processes were dead",
+    "what_killed_it": "Windows LogonSession termination (user logoff)",
+    "did_supervisor_restart": "NO - LogonTrigger does not re-fire after logoff",
+    "was_signal_real": "YES - z=-3.537 from raw broker data, PRIMARY threshold 3.0 crossed",
+    "exact_z": -3.536982,
+    "would_primary_signal": "YES (|z|=3.537 > 3.0, session eligible, time eligible)",
+    "would_control_signal": "YES (|z|=3.537 > 2.5, session eligible, time eligible)",
+    "why_missed": "Runtime was offline - all processes dead since ~21:27 UTC Aug 26",
+    "forward_tester_running_now": "RESTARTING (task fixed to startup trigger + SYSTEM)",
+    "will_alert_on_death": "YES - watchdog alarm added to watcher, dashboard, and Telegram"
   },
-  "tv_parity": {
-    "status": "UNKNOWN",
-    "reason": "No TradingView timestamps/values supplied or captured in repository artifacts"
-  },
-  "time_parity": {
-    "status": "UNKNOWN",
-    "reason": "Current runtime heartbeat has UTC-labelled bar timestamps, but no raw MT5/server-visible timestamp capture artifact"
-  },
-  "verdict": "RUNTIME_MISSED_CANONICAL_SIGNAL",
   "human_review_required": true,
   "next_checkpoint_authorized": false
 }

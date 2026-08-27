@@ -195,6 +195,14 @@ class RuntimeDB:
                 "(SELECT id FROM runtime_errors ORDER BY id DESC LIMIT 200)")
             self._conn.commit()
 
+    def record_runtime_alarm(self, alarm: str, detail: str = "") -> None:
+        """Persist a deduplicated operational alarm in the status KV."""
+        self.set_status_json("runtime_alarm", {
+            "alarm": alarm, "detail": detail, "ts": _now_iso()})
+
+    def runtime_alarm(self) -> Optional[dict]:
+        return self.get_status_json("runtime_alarm", None)
+
     def recent_errors(self, n: int = 5) -> List[dict]:
         with self._lock:
             rows = self._conn.execute(

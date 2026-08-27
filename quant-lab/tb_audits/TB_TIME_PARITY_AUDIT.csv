@@ -1,2 +1,4 @@
-timestamp_utc,raw_mt5_timestamp,utc_representation,broker_server_representation,est_hour_input,canonical_research_hour,pine_hour,verdict
-2026-08-27 15:25:00,,,,,,UNKNOWN,UNKNOWN_TIME_DIVERGENCE
+timestamp_utc,raw_mt5_epoch,python_datetime,timezone_info,utc_timestamp,broker_server_timestamp,est_hour_output,canonical_research_hour,session_eligible,verdict
+2026-08-27T15:20:00+00:00,1787844000,2026-08-27T15:20:00+00:00,naive_utc,2026-08-27T15:20:00+00:00,epoch:1787844000,10,10,True,TIME_PARITY_PASS
+2026-08-27T15:25:00+00:00,1787844300,2026-08-27T15:25:00+00:00,naive_utc,2026-08-27T15:25:00+00:00,epoch:1787844300,10,10,True,TIME_PARITY_PASS
+2026-08-27T15:30:00+00:00,1787844600,2026-08-27T15:30:00+00:00,naive_utc,2026-08-27T15:30:00+00:00,epoch:1787844600,10,10,True,TIME_PARITY_PASS

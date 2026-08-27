@@ -1,0 +1,14 @@
+timestamp,component,event,pid,state,error,restart_attempt,result
+2026-08-25T06:55:20.987549+00:00,worker,worker_start,25784,STARTING,,,GEN-20260825T105508
+2026-08-25T06:55:51.176+00:00,worker,warm_complete,25784,FLAT,118 bars loaded,,OK
+2026-08-25T06:55:51+00:00,worker,first_heartbeat,25784,FLAT,,,OK
+2026-08-26T17:00:02.245+00:00,worker,last_daily_nav,25784,FLAT,server_day=2026-08-27,,OK
+2026-08-26T21:27:24.034699+00:00,worker,last_heartbeat,25784,FLAT,last_closed_bar=2026-08-27 00:20:00+00:00,,OK
+2026-08-26T21:27:27.069709+00:00,supervisor,last_status_update,18420,RUNNING,,,OK
+2026-08-26T21:27:27+00:00,supervisor,process_died,18420,DEAD,LogonSession terminated; no graceful shutdown,,UNKNOWN
+2026-08-26T21:27:27+00:00,worker,process_died,25784,DEAD,killed by session termination,,UNKNOWN
+2026-08-26T21:27:27+00:00,watcher,process_died,15912,DEAD,killed by session termination,,UNKNOWN
+2026-08-26T21:27:27+00:00,dashboard,process_died,19848,DEAD,killed by session termination,,UNKNOWN
+2026-08-26T21:27:27+00:00,supervisor,restart_blocked,,,LogonTrigger does not re-fire after logoff,,BLOCKED
+2026-08-27T15:25:00+00:00,canonical,signal_z_3p537,,,"PRIMARY entry eligible, CONTROL entry eligible",,MISSED_DUE_TO_DOWN
+2026-08-27T18:40:27+00:00,supervisor,observed_dead,18420,DEAD,all 4 TB processes confirmed dead,,CONFIRMED
