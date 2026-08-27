@@ -1,0 +1,5 @@
+rank_band,raw_rank_loners,false_loner_n,false_loner_rate,definition
+1001-1500,83,20,0.24096385542168675,rank-only isolated but >=50% rank-neighbor same-sign
+1501-2000,29,6,0.20689655172413793,rank-only isolated but >=50% rank-neighbor same-sign
+501-750,508,189,0.3720472440944882,rank-only isolated but >=50% rank-neighbor same-sign
+751-1000,403,142,0.3523573200992556,rank-only isolated but >=50% rank-neighbor same-sign
