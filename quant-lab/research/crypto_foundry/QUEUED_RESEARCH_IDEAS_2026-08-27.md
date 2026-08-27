@@ -200,7 +200,100 @@ The eventual goal is not to force all crypto assets into one universal life cycl
 
 ---
 
-## 9. Governance
+## 9. Post-MECH7 deepening lanes — PARKED CONTEXT
+
+Preserve these for the next review cycle after Agent-2 local-event work. They are not active authorization.
+
+### 9.1 Isolated-downside prehistory
+
+Push the isolated-downside clock backward beyond -14D using dense checkpoints such as -30/-21/-14/-10/-7/-5/-3/-2/-1/0.
+
+Primary question:
+
+> What was the field doing while the eventual loner was becoming vulnerable?
+
+Specifically test whether rebound-type shocks show rising dispersion inside otherwise healthy/stable field conditions, while continuation-type shocks show dispersion rising alongside field deterioration. Separate BTC level from BTC stability/recovery/acceleration/deceleration.
+
+### 9.2 Breadth x dispersion full state matrix
+
+Deepen the 2x2 BRD_HI/LO x DISP_HI/LO plane into a full transition/state-age map.
+
+Track all state transitions, dwell, state age, return paths, isolated-vs-coordinated event rates, 1s/2s/3s delivery, reversal, continuation, rank recruitment, concentration, BTC/ETH, volatility, and recurrent re-entry.
+
+Do not force lifecycle labels. Candidate early/mature/exhausted distinctions must be earned from state age and path geometry.
+
+### 9.3 Breadth architecture
+
+Breadth level remains dominant, but decompose who creates it: rank, liquidity, age, volatility, rank-health, tail-active vs normal, and future tradability when the mask exists.
+
+Question:
+
+> Can the same breadth level arise from materially different participation architectures with different later behavior?
+
+Do not undermine breadth level by needless feature proliferation; test composition only for incremental or state-defining information.
+
+### 9.4 Rank-health vs price-recovery clocks
+
+Treat short-horizon price rebound and structural rank health as distinct clocks.
+
+For deteriorating-rank isolated shocks, classify:
+- price recovers + rank recovers,
+- price recovers + rank keeps deteriorating,
+- rank recovers before price,
+- neither recovers.
+
+This is a key bridge to future decay/death ecology and temporal delivery. A rebound must not be interpreted as structural health.
+
+### 9.5 SHMC/SHHM narrow follow-up
+
+Do one focused comparison only. SHMC remains dissolved as a high-tail state. Test whether SHMC has a stable reversion-role relative to SHORT_HOT_MEDIUM_HOT continuation-like behavior across breadth, dispersion, rank depth, isolation, and 1s/2s/3s paths. Kill if weak; do not rescue repeatedly.
+
+### 9.6 Volatility provisional role
+
+Park volatility as a possible ignition/intensity/retention coordinate rather than a route/direction selector. Revisit only if it interacts materially with lonely dumps, rank health, 1s timing, or breadth-dispersion states.
+
+### 9.7 HIGH_BREADTH + HIGH_DISPERSION lifecycle
+
+Fully map pre-state -> entry -> dwell/maturation -> exit -> post-state. The state itself is strong; entry/exit choreography is not yet earned.
+
+Track breadth-first vs dispersion-first entry, rank-depth recruitment, tail-share growth, isolated/clustered activity, state age, exit order, reentry, propagation, and post-state behavior. Build a transition lattice rather than force one path.
+
+### 9.8 Lonely-dump neighbor model
+
+A loner is not assumed socially isolated just because same-band same-sign count is one.
+
+Build contextual neighborhoods:
+- rank neighbors,
+- behavioral neighbors,
+- correlation neighbors,
+- state neighbors,
+- sector/chain only descriptively where appropriate.
+
+Measure the loner's residual against its neighborhood and track what the neighbors do after the shock: stay flat, catch down, catch up, cluster later, contagion, or remain disconnected.
+
+The core future real-time research question is:
+
+> How unusual is this shock relative to the asset's correct local neighborhood at that moment?
+
+Potential stack, still non-executable:
+
+**shock isolation x field health x asset/rank health x temporal recovery/delivery**.
+
+### 9.9 Priority order currently parked
+
+1. lonely-dump nearest-neighbor model,
+2. rank-health vs price-recovery split,
+3. breadth-dispersion full transition matrix,
+4. earlier isolated-down pre-event sequence,
+5. HH lifecycle/state-age anatomy,
+6. breadth architecture,
+7. reversal state machine with 1s checkpoints,
+8. SHMC vs SHHM focused recheck,
+9. volatility only if it naturally reconnects.
+
+---
+
+## 10. Governance
 
 These ideas remain queued while current Agent-1 and Agent-2 workstreams are active.
 
