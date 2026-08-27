@@ -111,3 +111,6 @@ argo-ref/
 .po_heartbeat_state.json
 .memory-sync-daemon.status.json
 .git_commit_msg.txt
+# LOWER-FIELD-1 heavy reproducible panels (excluded from git; regenerate via scripts)
+quant-lab/research/crypto_foundry/derivatives/lower_field_1/RESULTS/08_POTENTIAL_REALIZATION_PANEL.parquet
+
