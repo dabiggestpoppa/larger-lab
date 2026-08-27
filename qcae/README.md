@@ -29,66 +29,89 @@ QCAE must run independently while OCE upgrades are still in progress. It emits O
 - awesome-osint-arsenal: capability catalog + registry/schema prior art + selective capability source
 - DeepWiki: repository-comprehension / repository-intelligence layer; explanation is not evidence, code remains authoritative
 
-## Canon organization
+## Canon organization — ALL COMPLETE / FROZEN v0.1
 
-### Book I — QCAE Constitution & Capability Theory — COMPLETE / FROZEN v0.1
+### Book I — QCAE Constitution & Capability Theory
 - Block 0 — Constitution & System Identity
 - Block 1 — Capability Model
 
-### Book II — Discovery & Repository Intelligence — COMPLETE / FROZEN v0.1
+### Book II — Discovery & Repository Intelligence
 - Block 2 — Discovery Intelligence
 - Block 3 — Repository Intelligence / DeepWiki Layer
 - Block 4 — Capability Forensics
 
-### Book III — Trust, Proof & Quant Validation — COMPLETE / FROZEN v0.1
+### Book III — Trust, Proof & Quant Validation
 - Block 5 — Trust, Security & Legal
 - Block 6 — Proving Lab
 - Block 7 — Quant & Financial Validation
 
-### Book IV — Acquisition, Evidence & Intelligence Memory — COMPLETE / FROZEN v0.1
+### Book IV — Acquisition, Evidence & Intelligence Memory
 - Block 8 — Acquisition & Integration
 - Block 9 — Evidence, Receipts & Memory
 - Block 10 — Continuous Capability Intelligence
 - Block 11 — Autonomous Engineering Intelligence
 
-### Book V — Agent & Runtime Architecture — COMPLETE / FROZEN v0.1
+### Book V — Agent & Runtime Architecture
 - Block 12 — Agent Architecture
 - Block 13 — Standalone Runtime
 - Block 14 — OCE Integration Contract
 - Block 15 — Implementation Architecture
 
-### Book VI — Qualification, Operations & Build Plan — NEXT
+### Book VI — Qualification, Operations & Build Plan
 - Block 16 — Testing & Qualification
 - Block 17 — Operating Manual
 - Block 18 — Build Roadmap
 
-## Tentative implementation phases
+## Authoritative implementation phases
 
-0. Constitution + schemas
-1. Capability registry + evidence model
-2. GitHub discovery
-3. Repository intelligence + DeepWiki
-4. Capability forensics
-5. Security/license gates
-6. Sandbox + proving lab
-7. Decision engine
-8. Quant validation
-9. Agent orchestration
-10. Upstream monitoring
-11. Internal Quant Lab reverse-acquisition analysis
-12. OCE adapter
+```text
+P0  Skeleton + Domain Schemas
+P1  Evidence + Registry Spine
+P2  Job Runtime + Local Governance
+P3  Discovery Vertical Slice
+P4  Repository Intelligence
+P5  Capability Forensics + Decision Primitives
+P6  Trust + Sandbox
+P7  Generic Proving Lab
+P8  Acquisition + Integration Workflow
+P9  Quant Validation
+P10 Agent Orchestration
+P11 Monitoring + Reverse Acquisition
+P12 OCE Adapter / Governance Migration
+```
+
+## Release strategy
+
+The first useful release is a **local-first standalone vertical slice** that can normalize a capability request, check internal capability, discover on GitHub, understand source, isolate the reusable unit, screen trust/license, prove behavior in sandbox, recommend an acquisition form, and issue a durable Capability Receipt.
+
+DeepWiki is integrated only after local source-grounded comprehension works. Quant validation follows generic proving. Agent autonomy follows service correctness. OCE integration is the final governance migration and must not become a core dependency.
 
 ## Canon status
 
-- Overall architecture: v0.1
-- Books I-V: COMPLETE / FROZEN v0.1
-- Book V index: `books/book-05/README.md`
-- Block 12 freeze: `books/book-05/BLOCK-12-FREEZE-REVIEW.md`
-- Block 13 freeze: `books/book-05/BLOCK-13-FREEZE-REVIEW.md`
-- Block 14 freeze: `books/book-05/BLOCK-14-FREEZE-REVIEW.md`
-- Block 15 freeze: `books/book-05/BLOCK-15-FREEZE-REVIEW.md`
-- Book V freeze: `books/book-05/BOOK-05-FREEZE-REVIEW.md`
-- Blocks 16-18: outlined, pending full expansion
+- Overall canon: **QCAE v0.1 COMPLETE / FROZEN**
+- Books I–VI: COMPLETE / FROZEN v0.1
+- Blocks 0–18: COMPLETE / FROZEN v0.1
+- Book VI index: `books/book-06/README.md`
+- Block 16 freeze: `books/book-06/BLOCK-16-FREEZE-REVIEW.md`
+- Block 17 freeze: `books/book-06/BLOCK-17-FREEZE-REVIEW.md`
+- Block 18 freeze: `books/book-06/BLOCK-18-FREEZE-REVIEW.md`
+- Book VI freeze: `books/book-06/BOOK-06-FREEZE-REVIEW.md`
+
+## Next artifact
+
+The architecture/planning phase is complete. The next artifact should be the **QCAE implementation master prompt / coding-agent operating contract**. It should instruct the build agent to:
+
+- treat all six books as authoritative;
+- execute P0–P12 sequentially;
+- read the governing chapters before each phase;
+- use narrow subsystem/milestone commits;
+- maintain phase progress/evidence manifests;
+- stop on blocking exit-gate failures;
+- never invent architectural exceptions silently;
+- submit amendments separately when canon changes are necessary;
+- preserve standalone-first operation;
+- defer concrete OCE wiring until P12;
+- report commits, tests, evidence, blockers, and next-step recommendations for flywheel review.
 
 ## History discipline
 
