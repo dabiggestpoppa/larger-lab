@@ -1,0 +1,87 @@
+{
+  "window": "2026-08-24 through 2026-08-27T00:20:00+00:00",
+  "runtime_identity": {
+    "expected_head": "3a638653afb82e26eed2483469951cc655b98b44",
+    "runtime_head": "3a638653afb82e26eed2483469951cc655b98b44",
+    "runtime_branch": "tb-forward-engine",
+    "runtime_root": "C:/Users/wifik/Desktop/larger-lab-tb-forward-engine",
+    "worker_python": "C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+    "worker_command": "unknown (no live process observable from current shell)",
+    "worker_start_time": "2026-08-25T10:55:20.987549+00:00",
+    "r6_4_callbacks_present": true,
+    "deployment_drift": false,
+    "verdict": "RUNTIME_CURRENT"
+  },
+  "runtime_state": {
+    "heartbeat_count": 135,
+    "last_heartbeat": {
+      "id": 76954,
+      "ts": "2026-08-26T21:27:24.034699+00:00",
+      "pid": 25784,
+      "generation": "GEN-20260825T105508",
+      "state": "FLAT",
+      "mt5_connected": 1,
+      "account_gate": 1,
+      "market_open": 1,
+      "last_closed_bar": "2026-08-27 00:20:00+00:00",
+      "last_signal_time": "",
+      "open_basket_id": "",
+      "today_pnl": 0.0,
+      "today_pnl_pct": 0.0,
+      "open_pnl": 0.0,
+      "deploy_pnl": 0.0,
+      "deploy_pnl_pct": 0.0,
+      "account_equity": 25254.35,
+      "disk_free_gb": 27.93061065673828,
+      "last_error": ""
+    },
+    "states": {
+      "DEGRADED_DISK": 4451,
+      "FLAT": 58235,
+      "ONLINE_MARKET_CLOSED": 14267,
+      "WAITING_FOR_MT5": 1
+    },
+    "control_events": 0,
+    "control_baskets": 0
+  },
+  "canonical_replay": {
+    "data_source": "MT5 read-only pull via existing auditor; local cache ends 2026-05-29",
+    "primary_expected_entries": 1,
+    "control_expected_entries": 1,
+    "signals": [
+      {
+        "timestamp_utc": "2026-08-27 15:25:00",
+        "z": -3.536982,
+        "basis": -0.00053994,
+        "direction": "LONG",
+        "primary": true,
+        "control": true
+      },
+      {
+        "timestamp_utc": "2026-08-27 15:30:00",
+        "z": 0.294988,
+        "basis": -0.00053994,
+        "primary_exit": true,
+        "control_exit": true
+      }
+    ]
+  },
+  "runtime_recognition": {
+    "primary": 0,
+    "control": 0,
+    "executed": 0,
+    "blocked": 0,
+    "missed": 2
+  },
+  "tv_parity": {
+    "status": "UNKNOWN",
+    "reason": "No TradingView timestamps/values supplied or captured in repository artifacts"
+  },
+  "time_parity": {
+    "status": "UNKNOWN",
+    "reason": "Current runtime heartbeat has UTC-labelled bar timestamps, but no raw MT5/server-visible timestamp capture artifact"
+  },
+  "verdict": "RUNTIME_MISSED_CANONICAL_SIGNAL",
+  "human_review_required": true,
+  "next_checkpoint_authorized": false
+}

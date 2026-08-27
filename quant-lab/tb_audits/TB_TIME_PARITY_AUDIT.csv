@@ -1,0 +1,2 @@
+timestamp_utc,raw_mt5_timestamp,utc_representation,broker_server_representation,est_hour_input,canonical_research_hour,pine_hour,verdict
+2026-08-27 15:25:00,,,,,,UNKNOWN,UNKNOWN_TIME_DIVERGENCE

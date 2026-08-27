@@ -1,0 +1,12 @@
+{
+  "expected_head": "3a638653afb82e26eed2483469951cc655b98b44",
+  "runtime_head": "3a638653afb82e26eed2483469951cc655b98b44",
+  "runtime_branch": "tb-forward-engine",
+  "runtime_root": "C:/Users/wifik/Desktop/larger-lab-tb-forward-engine",
+  "worker_python": "C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+  "worker_command": "unknown (no live process observable from current shell)",
+  "worker_start_time": "2026-08-25T10:55:20.987549+00:00",
+  "r6_4_callbacks_present": true,
+  "deployment_drift": false,
+  "verdict": "RUNTIME_CURRENT"
+}
