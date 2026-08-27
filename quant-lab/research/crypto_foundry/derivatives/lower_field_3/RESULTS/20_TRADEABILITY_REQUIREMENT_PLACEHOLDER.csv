@@ -1,0 +1,5 @@
+node,statistical_validity,executability_status,theoretical_requirement,note
+deep-rank downside reversal,VALIDATED_DESCRIPTIVE,NOT_YET_AUDITED,UNKNOWN / instrument and shortability audit required,No trade or instrument availability claim
+cross-field breadth gate,VALIDATED_CONDITIONAL_L1,NOT_YET_AUDITED,UNKNOWN,State/context role only
+isolated-down rebound topology,LOCAL_NODE_LIMITED_BY_ISOLATED_N,NOT_YET_AUDITED,UNKNOWN,No directional execution design
+SHHM continuation geometry,DESCRIPTIVE_ONLY,NOT_YET_AUDITED,UNKNOWN,Not an alpha

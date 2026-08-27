@@ -117,3 +117,4 @@ quant-lab/research/crypto_foundry/derivatives/lower_field_1/RESULTS/08_POTENTIAL
 
 # LF2 700MB recomputable feature frame (from lf2_load.py)
 quant-lab/research/crypto_foundry/derivatives/lower_field_2/RESULTS/lf2_feature_frame.parquet
+quant-lab/research/crypto_foundry/derivatives/lower_field_3/RESULTS/_lf3_events_internal.csv
