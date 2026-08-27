@@ -1,0 +1,20 @@
+{
+  "ws1_pre30": "COMPLETE",
+  "ws2_effect_curves": "COMPLETE",
+  "ws2b_sequence_atlas": "COMPLETE",
+  "ws3_transition_matrix": "COMPLETE",
+  "ws4_state_age": "COMPLETE",
+  "ws5_hh_lifecycle": "COMPLETE",
+  "ws6_architecture": "COMPLETE",
+  "ws6b_classes": "COMPLETE",
+  "ws7_level_vs_arch": "COMPLETE",
+  "ws8_price_rank": "COMPLETE",
+  "ws9_stress": "COMPLETE",
+  "ws10_liquidity": "COMPLETE",
+  "ws11_shmc": "COMPLETE",
+  "ws12_vol_parked": "COMPLETE",
+  "ws13_reconcile": "COMPLETE",
+  "ws14_dead_audit": "COMPLETE",
+  "ws15_export": "COMPLETE",
+  "verdict": "PASS_MECH8_FIELD_STATE_DEEPENING"
+}
