@@ -1,0 +1,16 @@
+node,state,state_age,entry_route,delivery_clock,exit_clock,perturbation_response,health_context,valid_region,invalid_region,confidence
+HIGH_BREADTH_HIGH_DISP_ROAD,HIGH_BREADTH_HIGH_DISP,AGE_1..15+,varies,prop7 0.228 by 7D,median exit 2.000D,see WS13/16,PRD cluster per WS6/8,HIGH_BREADTH_HIGH_DISP,outside cell,LOCAL_ROAD
+HIGH_BREADTH_LOW_DISP_ROAD,HIGH_BREADTH_LOW_DISP,AGE_1..15+,varies,prop7 0.217 by 7D,median exit 2.000D,see WS13/16,PRD cluster per WS6/8,HIGH_BREADTH_LOW_DISP,outside cell,LOCAL_ROAD
+LOW_BREADTH_HIGH_DISP_ROAD,LOW_BREADTH_HIGH_DISP,AGE_1..15+,varies,prop7 0.061 by 7D,median exit 2.000D,see WS13/16,PRD cluster per WS6/8,LOW_BREADTH_HIGH_DISP,outside cell,LOCAL_ROAD
+LOW_BREADTH_LOW_DISP_ROAD,LOW_BREADTH_LOW_DISP,AGE_1..15+,varies,prop7 0.117 by 7D,median exit 2.000D,see WS13/16,PRD cluster per WS6/8,LOW_BREADTH_LOW_DISP,outside cell,LOCAL_ROAD
+HH_ROUTE_CONTINUED_HH,HIGH_BREADTH_HIGH_DISP,AGE_15_PLUS,CONTINUED_HH,prop7 0.666,,see WS13,,route=CONTINUED_HH age=AGE_15_PLUS,other routes/ages,LOCAL_ROAD
+HH_ROUTE_CONTINUED_HH,HIGH_BREADTH_HIGH_DISP,AGE_4_7,CONTINUED_HH,prop7 0.376,,see WS13,,route=CONTINUED_HH age=AGE_4_7,other routes/ages,LOCAL_ROAD
+HH_ROUTE_CONTINUED_HH,HIGH_BREADTH_HIGH_DISP,AGE_8_14,CONTINUED_HH,prop7 0.419,,see WS13,,route=CONTINUED_HH age=AGE_8_14,other routes/ages,LOCAL_ROAD
+HH_ROUTE_CONTINUED_HH,HIGH_BREADTH_HIGH_DISP,AGE_2_3,CONTINUED_HH,prop7 0.287,,see WS13,,route=CONTINUED_HH age=AGE_2_3,other routes/ages,LOCAL_ROAD
+HH_ROUTE_FROM_HL,HIGH_BREADTH_HIGH_DISP,AGE_1,FROM_HL,prop7 0.333,,see WS13,,route=FROM_HL age=AGE_1,other routes/ages,LOCAL_ROAD
+HH_brd_jump_AGE_4_7,HIGH_BREADTH_HIGH_DISP,AGE_4_7,any,dprop -0.101,,brd_jump,,HH age=AGE_4_7 brd_jump,other cells,LOCAL_ROAD
+HH_brd_jump_AGE_15_PLUS,HIGH_BREADTH_HIGH_DISP,AGE_15_PLUS,any,dprop 0.072,,brd_jump,,HH age=AGE_15_PLUS brd_jump,other cells,LOCAL_ROAD
+HH_brd_drop_AGE_15_PLUS,HIGH_BREADTH_HIGH_DISP,AGE_15_PLUS,any,dprop -0.163,,brd_drop,,HH age=AGE_15_PLUS brd_drop,other cells,LOCAL_ROAD
+HH_disp_jump_AGE_2_3,HIGH_BREADTH_HIGH_DISP,AGE_2_3,any,dprop 0.133,,disp_jump,,HH age=AGE_2_3 disp_jump,other cells,LOCAL_ROAD
+HH_disp_jump_AGE_15_PLUS,HIGH_BREADTH_HIGH_DISP,AGE_15_PLUS,any,dprop 0.195,,disp_jump,,HH age=AGE_15_PLUS disp_jump,other cells,LOCAL_ROAD
+HH_disp_drop_AGE_15_PLUS,HIGH_BREADTH_HIGH_DISP,AGE_15_PLUS,any,dprop -0.124,,disp_drop,,HH age=AGE_15_PLUS disp_drop,other cells,LOCAL_ROAD
