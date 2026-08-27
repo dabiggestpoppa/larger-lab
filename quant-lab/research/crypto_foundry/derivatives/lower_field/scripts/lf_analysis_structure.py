@@ -76,22 +76,22 @@ def load_canonical_upper() -> pd.DataFrame:
     can["ret_1d"] = can["price_usd"] / can["price_prev"] - 1.0
     can["ret_1d"] = can["ret_1d"].replace([np.inf, -np.inf], np.nan)
 
-    # multi-day returns via log-cumsum
+    # multi-day returns via log-cumsum (correct: shift the cumsum, not raw logf)
     ok = can["ret_1d"].notna() & (can["ret_1d"] > -1.0)
     logf = np.where(ok, np.log1p(can["ret_1d"].clip(lower=-0.9999)), np.nan)
     can["_logf"] = logf
-    cs = can.groupby("cmc_id", sort=False)["_logf"].cumsum()
+    can["_cs"] = can.groupby("cmc_id", sort=False)["_logf"].cumsum()
     for w in HORIZONS:
         if w == 1:
             continue
-        cs_shift = can.groupby("cmc_id", sort=False)["_logf"].transform(
+        cs_shift = can.groupby("cmc_id")["_cs"].transform(
             lambda s: s.shift(w))
-        can[f"ret_{w}d"] = np.expm1(cs - cs_shift)
-    can = can.drop(columns=["_logf"])
+        can[f"ret_{w}d"] = np.expm1(can["_cs"] - cs_shift)
+    can = can.drop(columns=["_logf", "_cs"])
 
-    # rank velocity
+    # rank velocity (must group by cmc_id)
     for w in HORIZONS:
-        can[f"rank_vel_{w}d"] = can["rank"].transform(
+        can[f"rank_vel_{w}d"] = can.groupby("cmc_id")["rank"].transform(
             lambda s: s.shift(w) - s)
 
     # volume acceleration
@@ -214,19 +214,17 @@ def main() -> int:
         bd = bd.sort_values(["cmc_id", "historical_date"])
         g_ = bd.groupby("cmc_id", sort=False)
         bd["fwd_ret_1d"] = g_["ret_1d"].shift(-1)
-        # forward 7d return: log-cumsum approach
+        # forward 7d return: correct cumsum approach
         ok = bd["ret_1d"].notna() & (bd["ret_1d"] > -1.0)
         logf = np.where(ok, np.log1p(bd["ret_1d"].clip(lower=-0.9999)), np.nan)
         bd["_logf"] = logf
-        cs = bd.groupby("cmc_id", sort=False)["_logf"].cumsum()
-        cs_shift7 = bd.groupby("cmc_id", sort=False)["_logf"].transform(
+        bd["_cs"] = bd.groupby("cmc_id", sort=False)["_logf"].cumsum()
+        cs_fwd7 = bd.groupby("cmc_id")['_cs'].transform(
             lambda s: s.shift(-7))
-        cs_f7 = bd.groupby("cmc_id", sort=False)["_logf"].transform(
-            lambda s: s.shift(-7))
-        bd["fwd_ret_7d"] = np.expm1(cs_f7 - bd["_logf"])
-        bd = bd.drop(columns=["_logf"])
+        bd["fwd_ret_7d"] = np.expm1(cs_fwd7 - bd["_cs"])
+        bd = bd.drop(columns=["_logf", "_cs"])
 
-        bd["fwd_rank_vel_7d"] = bd["rank"].transform(
+        bd["fwd_rank_vel_7d"] = bd.groupby("cmc_id")["rank"].transform(
             lambda s: s - s.shift(-7))
         bd["fwd_vol_1d"] = bd["volume_24h_usd"].transform(
             lambda s: s.shift(-1))
@@ -307,12 +305,12 @@ def main() -> int:
         ok = bd["ret_1d"].notna() & (bd["ret_1d"] > -1.0)
         logf = np.where(ok, np.log1p(bd["ret_1d"].clip(lower=-0.9999)), np.nan)
         bd["_logf"] = logf
-        cs = bd.groupby("cmc_id", sort=False)["_logf"].cumsum()
-        cs_f7 = bd.groupby("cmc_id", sort=False)["_logf"].transform(
+        bd["_cs"] = bd.groupby("cmc_id", sort=False)["_logf"].cumsum()
+        cs_fwd7 = bd.groupby("cmc_id")["_cs"].transform(
             lambda s: s.shift(-7))
-        bd["fwd_ret_7d"] = np.expm1(cs_f7 - bd["_logf"])
-        bd = bd.drop(columns=["_logf"])
-        bd["fwd_rank_vel_7d"] = bd["rank"].transform(
+        bd["fwd_ret_7d"] = np.expm1(cs_fwd7 - bd["_cs"])
+        bd = bd.drop(columns=["_logf", "_cs"])
+        bd["fwd_rank_vel_7d"] = bd.groupby("cmc_id")["rank"].transform(
             lambda s: s - s.shift(-7))
         bd["fwd_vol_1d"] = bd["volume_24h_usd"].transform(
             lambda s: s.shift(-1))
@@ -379,13 +377,12 @@ def main() -> int:
     ev["_logf"] = logf
     ev_csid = ev["cmc_id"].values
     ev_dates = ev["historical_date"].values
-    # group-level cumsum
-    cs_ev = ev.groupby("cmc_id", sort=False)["_logf"].cumsum()
-    ev["_cs"] = cs_ev.values
+    # group-level cumsum (correct: shift cumsum, not raw logf)
+    ev["_cs"] = ev.groupby("cmc_id", sort=False)["_logf"].cumsum()
     for w in [1, 3, 7, 14, 30]:
-        cs_sh = ev.groupby("cmc_id", sort=False)["_logf"].transform(
+        cs_sh = ev.groupby("cmc_id")["_cs"].transform(
             lambda s: s.shift(-w))
-        ev[f"fwd_ret_{w}d"] = np.expm1(cs_sh - ev["_logf"])
+        ev[f"fwd_ret_{w}d"] = np.expm1(cs_sh - ev["_cs"])
     ev = ev.drop(columns=["_logf", "_cs"])
 
     # chain confirmation: median same-chain event-day return (causal at t)

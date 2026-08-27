@@ -193,20 +193,19 @@ def add_causal_features(df: pd.DataFrame) -> pd.DataFrame:
     ok = df["ret_1d"].notna() & (df["ret_1d"] > -1.0)
     logf = np.where(ok, np.log1p(df["ret_1d"].clip(lower=-0.9999)), np.nan)
     df["_logf"] = logf
-    cs = df.groupby("cmc_id", sort=False)["_logf"].cumsum()
+    df["_cs"] = df.groupby("cmc_id", sort=False)["_logf"].cumsum()
     for w in HORIZONS:
         if w == 1:
             df["ret_1d_raw"] = df["ret_1d"]
             continue
-        cs_shift = df.groupby("cmc_id", sort=False)["_logf"].transform(
+        cs_shift = df.groupby("cmc_id")["_cs"].transform(
             lambda s: s.shift(w))
-        win_sum = cs - cs_shift
-        df[f"ret_{w}d"] = np.expm1(win_sum)
-    df = df.drop(columns=["_logf"])
+        df[f"ret_{w}d"] = np.expm1(df["_cs"] - cs_shift)
+    df = df.drop(columns=["_logf", "_cs"])
 
     # rank velocity: rank(t-w) - rank(t); positive = improving
     for w in HORIZONS:
-        df[f"rank_vel_{w}d"] = df["rank"].transform(
+        df[f"rank_vel_{w}d"] = df.groupby("cmc_id")["rank"].transform(
             lambda s: s.shift(w) - s)
 
     # volume acceleration: vol(t) / median(vol t-1..t-7)
