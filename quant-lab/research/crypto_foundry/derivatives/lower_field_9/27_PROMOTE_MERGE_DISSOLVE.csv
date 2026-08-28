@@ -1,0 +1,22 @@
+node,type,status,action,note
+continuous_relational_panel,OBJECT,COMPUTED,PROMOTE_AS_PRIMARY_OBJECT,PIT-safe daily carry-forward panel; coverage/freshness flagged; never forced on unsupported days
+relational_state_persistence,OBJECT,RECHECKED,PROMOTE_IF_SURVIVES_CONTINUOUS,exact-calendar 1-60d persistence vs LF8 snapshot-anchored
+topology_vs_role,LENS,COMPUTED,PROMOTE_AS_LOCAL_LENS,verdict=STATE_DEPENDENT
+shock_reorganization_timing,LENS,COMPUTED,PROMOTE_AS_LOCAL_SENSOR,T0 abs shock -> T1 turnover -> T2 state change -> T3 transport; bootstrap CIs; L2 only
+abs_sigma_reorganization_grid,LENS,COMPUTED,KEEP_TIGHT,2D grid incl. sigma<2 band on continuous panel
+volume_liquidity_response,LENS,COMPUTED,KEEP_TIGHT,see 07 verdict row
+global_field_overlay,OVERLAY,COMPUTED,PROMOTE_AS_OVERLAY,16-cell exact + 6-cell candidate + 8-cell reference; relational state NOT in core matrix
+field_modulated_response,TEST,COMPUTED,PROMOTE_IF_MODULATED,verdict=LOCAL_RESPONSE_INVARIANT
+global_local_shock_matrix,TEST,COMPUTED,KEEP_TIGHT,verdict=FIELD_CONDITIONAL_ABSORPTION
+reorg_saturation,LENS,COMPUTED,KEEP_TIGHT,Michaelis-Menten onset / half-sat / ceiling by regime
+relational_transition_lattice,MAP,COMPUTED,KEEP_AS_DESCRIPTIVE_MAP,COMMON/LOCAL/RARE/NEAR_ZERO only
+rejoin_contagion_decoupling_clocks,MAP,COMPUTED,KEEP_AS_DESCRIPTIVE_MAP,competing outcomes at 1/3/7/14/30D post-disturbance
+early_contagion,SUBTYPE,VALIDATED,SURVIVES_PURGED_FDR,"n=81, cycles=5, fdr_q=0.0"
+persistent_decoupling,SUBTYPE,VALIDATED,SURVIVES_PURGED_FDR,"n=70, cycles=5, fdr_q=0.0"
+false_loner_artifact_recheck,QC,RECHECKED,KEEP_AS_QC,"verdict=ARTIFACT_REDUCED, artifact_share=0.4707"
+true_loner_species,ONTOLOGY,COMPUTED,KEEP_AS_ONTOLOGY,verdict=MIXED_OTHER_DOMINANT_NO_FORCED_SPLIT
+directional_asymmetry_replication,TEST,COMPUTED,PROMOTE_IF_ROBUST,verdict=ROBUST_SIGN_ASYMMETRY
+prd_relational_health_validation,SUBTYPE,VALIDATED,PER_SUBTYPE,BETA_RESCUE=DISSOLVE;PEER_RESCUE=DISSOLVE;RELATIVE_DECAY=LOCAL;DELAYED_REHAB=DISSOLVE;TEMPORARY_SPLIT=PROMOTE
+predictive_null_freeze,GATE,FROZEN,HALT_FORECAST_TESTING,final audit complete; description vs prediction separated (24)
+local_transfer_function_drift,TEST,COMPUTED,KEEP_TIGHT,abs_to_turnover=FIELD_CONDITIONAL_DRIFT;abs_to_decoupling=FIELD_CONDITIONAL_DRIFT;abs_to_contagion=FIELD_CONDITIONAL_DRIFT;abs_to_rejoin=FIELD_CONDITIONAL_DRIFT
+local_global_hierarchy,TEST,COMPUTED,PROMOTE_IF_COHERENT,recovery=HIERARCHY_PARTIAL;contagion=HIERARCHY_COHERENT;decoupling=HIERARCHY_PARTIAL

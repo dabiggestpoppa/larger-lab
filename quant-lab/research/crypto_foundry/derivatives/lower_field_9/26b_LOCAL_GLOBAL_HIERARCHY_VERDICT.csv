@@ -1,0 +1,4 @@
+outcome,full_model_auc,monotone_nested_gain,beats_alternatives,hierarchy_verdict
+recovery,0.5054,YES,NO,HIERARCHY_PARTIAL
+contagion,0.5418,YES,YES,HIERARCHY_COHERENT
+decoupling,0.6121,YES,NO,HIERARCHY_PARTIAL
