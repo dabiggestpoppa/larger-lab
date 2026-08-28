@@ -1,0 +1,13 @@
+driver,corr_with_turnover,median_turnover_low,median_turnover_high,n_low,n_high
+rank_vel_7d,-0.0994,0.6667,1.0,323,323
+vol_63d,0.3477,0.6667,1.0,323,323
+vol_30d,0.3076,0.6667,1.0,323,323
+btc_ret_1d,0.0371,0.6667,1.0,323,323
+top500_breadth_30d,-0.0667,0.6667,1.0,323,323
+top500_dispersion_30d,0.0005,0.6667,1.0,323,323
+stablecoin_mcap_share,-0.0933,0.6667,1.0,323,323
+turnover,0.0371,0.6667,1.0,323,323
+CELL_HH,,0.9474,,414,0
+CELL_HL,,0.8889,,226,0
+CELL_LH,,0.9474,,146,0
+CELL_LL,,0.9474,,505,0

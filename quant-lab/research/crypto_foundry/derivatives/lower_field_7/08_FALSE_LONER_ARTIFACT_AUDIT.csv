@@ -1,0 +1,4 @@
+group,n,median_abs_move,median_z1,median_vol_63d,median_vol_30d,median_peer_abs_move,median_absz,median_rank_vel_7d,p_hh_cell,verdict
+FALSE_LONER,163,0.00261,2.415,0.000984,0.001001,0.00266,2.415,-1.0,0.4294,
+TRUE_LONER,1957,0.14463,2.482,0.053673,0.056011,0.02387,2.482,-11.0,0.3485,
+FALSE_ARTIFACT_VERDICT,163,0.00261,2.415,0.000984,,,2.415,,,MIXED
