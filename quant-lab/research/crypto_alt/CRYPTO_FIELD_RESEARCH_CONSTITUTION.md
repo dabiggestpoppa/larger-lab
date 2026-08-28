@@ -4,6 +4,20 @@
 **Status:** Governing research doctrine  
 **Scope:** Top-500 crypto terrain / mechanism research  
 
+## Constitutional Companion
+
+This constitution is paired with:
+
+`quant-lab/research/crypto_foundry/CRYPTO_FIELD_MODELING_BIBLE_v1.0.md`
+
+The constitution governs **scientific discipline, epistemic limits, falsification, compression, and strategy boundaries**.
+
+The Modeling Bible preserves the operator's **reasoning grammar, field ontology, local-vs-global modeling philosophy, timing doctrine, health/peer/basket logic, agent research behavior, and preferred scientific escalation path**.
+
+Future research agents should read **both documents before major checkpoint design**.
+
+If the two ever appear to conflict, this constitution controls scientific integrity and the Modeling Bible controls modeling style / reasoning continuity unless a later human-approved revision explicitly supersedes either document.
+
 ## Core Objective
 
 Find the smallest non-redundant set of observable primitives sufficient to reconstruct the major recurring state transitions of the crypto ecosystem.
