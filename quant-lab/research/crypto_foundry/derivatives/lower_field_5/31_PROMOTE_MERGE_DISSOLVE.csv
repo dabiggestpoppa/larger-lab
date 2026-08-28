@@ -1,8 +1,13 @@
-node,verdict,basis
-PIT_SUBSTRATE,PROMOTION_CANDIDATE_WITH_LIMITATIONS,continuous LF2-derived asset-date substrate passes uniqueness/provenance checks
-RANK_PEERS,VALID_WITH_LIMITATIONS,same-date PIT rank neighborhoods reproducible; no out-of-sample behavioral validation
-BEHAVIORAL_PEERS,VALID_WITH_LIMITATIONS,available standardized pre-event coordinates matched same-date; out-of-sample similarity not yet measured
-CORRELATION_PEERS,DATA_BLOCKED,no trailing return matrix implementation in current source cache
-STATE_PEERS,VALID_WITH_LIMITATIONS,same-date state cohort descriptive only
-PRICE_RANK_HEALTH,DATA_BLOCKED,future PIT rank histories absent from LF2-derived cache
-BASKET_TRIANGLE,DESCRIPTIVE_ONLY,finite raw-return rebuild and explicitly labeled correlations
+output,status,recommendation,requires
+true_false_loner_taxonomy,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,tradability_audit
+pre_event_divergence,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,conditional_models
+post_event_peer_paths,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,classification_validation
+sigma_recovery_clock,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,conditioning_analysis
+price_rank_health_matrix,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,stability_validation
+health_stress_response,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,perturbation_design
+active_liquidity,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,joint_model
+broad_up_down_mirror,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,peer_controlled_recheck
+hh_true_peer_anatomy,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,field_context_integration
+basket_dispersion,DESCRIPTIVE,DESCRIPTIVE,none
+triangle_pilot,COMPUTED,PROMOTE_TO_NEXT_CHECKPOINT,subperiod_validation
+local_sequences,PARTIAL,PARTIAL,purged_fdr_validation

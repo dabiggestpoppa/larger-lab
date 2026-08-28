@@ -1,5 +1,10 @@
-node,role,validity,causal_level,executability_status
-PIT_SUBSTRATE,STRUCTURAL_STATE,PASS_WITH_LIMITATIONS,L0,NOT_YET_AUDITED
-ISOLATED_DOWN_REVERSAL,REVERSAL/DISTRIBUTION,PARENT_REPLICATION_ONLY,L1,NOT_YET_AUDITED
-TOP500_BREADTH_GATE,CROSS_FIELD_GATE,PARENT_REPLICATION_ONLY,L1_CANDIDATE,NOT_YET_AUDITED
-TRUE_PEER_CONTAGION,LOCAL_CLUSTER,DATA_BLOCKED,DATA_BLOCKED,NOT_YET_AUDITED
+role,description,maturity,next_step
+TRUE_LONER_TAXONOMY,Classifies isolated events by true peer isolation,COMPUTED,tradability_audit
+PRE_EVENT_DIVERGENCE,-30D asset vs peer paths,COMPUTED,conditional_models
+POST_EVENT_PEER_PATHS,+1 to +30D trajectories,COMPUTED,classification_validation
+SIGMA_RECOVERY_CLOCK,1σ recovery from shock anchor,COMPUTED,conditioning_analysis
+PRICE_RANK_MATRIX,Cross-state of price x rank health,COMPUTED,stability_validation
+HEALTH_STRESS,Response to favorable perturbations,COMPUTED,perturbation_design
+BASKET_GEOMETRY,Peer basket dispersion,DESCRIPTIVE,none
+TRIANGLE,Breadth-dispersion-tail relation,COMPUTED,subperiod_validation
+SEQUENCE_ATLAS,Repeated event sequences,PARTIAL,purged_fdr_validation
