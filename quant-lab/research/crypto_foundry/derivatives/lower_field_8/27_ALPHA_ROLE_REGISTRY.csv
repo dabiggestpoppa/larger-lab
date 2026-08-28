@@ -1,0 +1,8 @@
+role,description,maturity,next_step
+DYNAMIC_RELATIONAL_STATE,Object-level robustness: relational state outlives peer membership (HYBRID_10 0.56 vs 0.22 same-member at 60d),COMPUTED,continuous_state_series
+MEMBERSHIP_ENTROPY,Stationary neighborhood churn; entropy stable and low-information,COMPUTED,entropy_drift_audit
+REORG_RESPONSE_CURVES,Volume amplitude and absolute shock drive reorganization; sigma does not,COMPUTED,amplitude_conditioning
+SHOCK_TIMING_PRECEDENCE,Absolute shock precedes membership turnover / relational-state change / decoupling,COMPUTED,lead_time_validation
+LONER_DECOMPOSITION,False loners are low-vol normalization artifacts; true loners split into early-contagion / persistent-decoupling,COMPUTED,merge_with_lf6_ontology
+REJOIN_CONTAGION_DECOUPLING_LATTICE,True loners in DECOUPLED state are contagion-heavy (0.45 vs 0.12 not-loner),COMPUTED,purged_fdr_validation
+PRD_RELATIONAL_HEALTH,"PRD as relational health: relative decay / temporary split supported, rescue subtypes not",PARTIAL,peer_forward_validation
