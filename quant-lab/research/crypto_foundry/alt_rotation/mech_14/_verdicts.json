@@ -1,0 +1,21 @@
+{
+  "checkpoint": "MECH-14",
+  "commit": "TBD",
+  "verdict": "PASS_MECH14_PRECISION_DEEPENING_WITH_LIMITATIONS",
+  "state_age": "STATE_AGE_INTERACTION",
+  "lifecycle_phase": "AGE_SUFFICIENT",
+  "entropy_independent": "ENTROPY_INDEPENDENT_COORDINATE",
+  "equifinality": "EQUIFINAL_MULTI_CONFIG",
+  "archetypes": "3 named",
+  "substitution": "REDUNDANT_SENSOR_CLUSTER",
+  "hidden_state": "MULTIPLE_LOCAL_COORDINATES",
+  "waterfall_repair": "ORDERLY_SHALLOW_TO_DEEP n_subperiods=5, NAMED_SUBTYPE",
+  "common_forcing": "COMMON_FORCING_WITH_THRESHOLDS",
+  "forcing_coord": "COMPACT_FORCING_COORDINATE",
+  "spat_temp_recheck": "INDEPENDENT_CONSTRAINT_DIMENSIONS",
+  "directional": "DIRECTION_CONSTRAINED_MOSTLY_AT_STATE + AGE + ENTROPY + BREADTH",
+  "dar": "DAR_FRAMING_COMPARABLE_TO_SHOCK_ALONE",
+  "pot_realization": "DISTINCT_LOCAL_PATHS",
+  "human_review_required": true,
+  "next_checkpoint_authorized": false
+}
