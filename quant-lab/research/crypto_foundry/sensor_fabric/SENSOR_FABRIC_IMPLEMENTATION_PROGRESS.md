@@ -11,7 +11,9 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 1 — CONTRACTS & SEMANTICS FOUNDATION |
-| Current checkpoint | SENSOR-B1-05 (schema export + compatibility suite) — DONE |
+| Current checkpoint | SENSOR-B1-06 (evidence + Bloc 1 decision) — DONE |
+| Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN (see evidence/bloc_01/BLOC_01_DECISION.md) |
+| Operator review state | AWAITING OPERATOR — Bloc 1 complete, stop gate active |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
@@ -29,7 +31,7 @@ that is updated at every staged checkpoint.
 | SENSOR-B1-03 | 23 | 23 | 0 |
 | SENSOR-B1-04 | 25 | 25 | 0 |
 | SENSOR-B1-05 | 14 | 14 | 0 |
-| SENSOR-B1-06 | — | — | — |
+| SENSOR-B1-06 | 0 (evidence only) | — | — |
 
 ## External / provider blockers
 
@@ -54,11 +56,8 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- SENSOR-B1-06: evidence + Bloc 1 decision
-  - schema inventory, provider registry snapshot, equivalence matrix, test evidence,
-    final decision
-  - gate: evidence files complete, no unresolved foundational semantic required
-    by the Bloc 2 probe plan
+- **STOP GATE**: Bloc 2 (Historical Capability Probe Harness) requires operator
+  approval of the Bloc 1 report.  Do not begin until the operator says to continue.
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -77,4 +76,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B1-02 | 957cfc85 | 8 canonical sensor schemas + ProviderEnvelope + PriceLevel, 15 committed fixtures, schema test suite | 86 passed / 0 failed | PASS | none |
 | SENSOR-B1-03 | 3de4cdda | provider_registry.yaml + sensor_priority.yaml, registry loaders, F9 required-runtime validation | 109 passed / 0 failed | PASS | none |
 | SENSOR-B1-04 | 8b2162a1 | semantic_equivalence.yaml + methodology_registry.yaml, equivalence/methodology loaders, pooling rule | 134 passed / 0 failed | PASS | none |
-| SENSOR-B1-05 | (filled at commit) | JSON-schema snapshot export (14 snapshots), versioning/compat suite, regeneration script | 148 passed / 0 failed | PASS | none |
+| SENSOR-B1-05 | daf9257a | JSON-schema snapshot export (14 snapshots), versioning/compat suite, regeneration script | 148 passed / 0 failed | PASS | none |
+| SENSOR-B1-06 | (filled at commit) | evidence package: schema inventory, provider snapshot, equivalence matrix, test evidence, decision | 148 passed / 0 failed (re-run) | PASS | none |
