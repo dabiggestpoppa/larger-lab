@@ -89,6 +89,9 @@ def build_valid_evidence(tmp):
     write_json(ev / "local-after-denied.json", {"exit_code": 0})
     write_json(ev / "source-clean.json", {"pre": True, "post": True, "dirty_pre": 0, "dirty_post": 0})
     write_json(ev / "cleanup.json", {"cleanup": "ok", "disposable_removed": True})
+    write_json(ev / "container-cleanup.json", {
+        "cleanup": "ok", "containers_removed": True,
+        "networks_removed": True, "volumes_removed": True, "disposable_removed": True})
     (ev / "stage-log.txt").write_text("identity captured\n", encoding="utf-8")
     write_json(ev / "stage-status.json", {
         "block": "B1", "stage": "B1-LOCAL-GROUND-CLOSURE", "run_id": RUN_ID,

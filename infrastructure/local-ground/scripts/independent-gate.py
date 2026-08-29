@@ -154,6 +154,8 @@ def main():
     if CI_MODE:
         cb_executed_all = cb.get("executed", 0) == cb.get("collected", 0)
         add("gate-16-container-tests-executed", "container-backed tests execute in CI", cb_executed_all, cb)
+        mode_txt = open(os.path.join(ev, "test-mode.txt"), encoding="utf-8").read().strip()
+        add("gate-16b-authoritative-mode", "CI mode is AUTHORITATIVE_CI", mode_txt == "AUTHORITATIVE_CI", mode_txt)
     else:
         add("gate-16-container-tests-executed", "container-backed tests execute in CI",
             cb.get("executed", 0) >= 0, "local mode: not required")
@@ -227,6 +229,17 @@ def main():
         cleanup_ok = False
         cl = {}
     add("gate-30-cleanup-succeeds", "cleanup succeeds", cleanup_ok, cl)
+    # 30b. In CI, the container lifecycle teardown must verify removal of the
+    # disposable containers, network, and test volumes (missing evidence blocks).
+    if CI_MODE:
+        try:
+            cc = load_json(os.path.join(ev, "container-cleanup.json"))
+            cc_ok = (cc.get("cleanup") == "ok" and cc.get("containers_removed") is True
+                     and cc.get("networks_removed") is True and cc.get("volumes_removed") is True)
+        except Exception:
+            cc_ok = False
+            cc = {}
+        add("gate-30b-container-cleanup-verified", "container cleanup verified in CI", cc_ok, cc)
 
     # 31. Manifest hashes and sizes match final files
     manifest_ok = True

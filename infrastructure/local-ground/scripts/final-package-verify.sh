@@ -65,6 +65,13 @@ if mode == "AUTHORITATIVE_CI":
         errs.append("mandatory skipped tests in CI mode")
     if ts.get("container_backed", {}).get("executed") != ts.get("container_backed", {}).get("collected"):
         errs.append("container-backed tests not all executed in CI mode")
+    tm = open(os.path.join(ev, "test-mode.txt"), encoding="utf-8").read().strip()
+    if tm != "AUTHORITATIVE_CI":
+        errs.append(f"test-mode.txt is {tm!r}, expected AUTHORITATIVE_CI")
+    cc = json.load(open(os.path.join(ev, "container-cleanup.json"), encoding="utf-8"))
+    if not (cc.get("cleanup") == "ok" and cc.get("containers_removed") is True
+            and cc.get("networks_removed") is True and cc.get("volumes_removed") is True):
+        errs.append("container cleanup not verified in CI mode")
 cleanup = json.load(open(os.path.join(ev, "cleanup.json"), encoding="utf-8"))
 if not (cleanup.get("cleanup") == "ok" or (cleanup.get("removed") is True and cleanup.get("pruned") is True)):
     errs.append("cleanup not confirmed")
