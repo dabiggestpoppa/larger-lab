@@ -53,6 +53,37 @@ def run(args, env_extra=None, check=False, cwd=None, target="local", timeout=300
     return r
 
 
+def verify_backup_manifest(backup_dir=None):
+    """Independently verify a BACKUP_MANIFEST.sha256 over the .backup-content
+    that was just produced (before any mutation). Returns the parsed manifest
+    and raises on any hash/size mismatch."""
+    assert backup_dir is not None, "verify_backup_manifest requires an explicit backup dir"
+    d = Path(backup_dir)
+    man = d / "BACKUP_MANIFEST.sha256"
+    content = d / ".backup-content"
+    assert man.is_file(), f"missing manifest: {man}"
+    assert content.is_dir(), f"missing content dir: {content}"
+    entries = {}
+    for line in man.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split(None, 2)
+        if len(parts) != 3:
+            raise AssertionError(f"malformed manifest line: {line!r}")
+        sha, size, rel = parts
+        entries[rel] = (sha, int(size))
+    assert entries, "empty backup manifest"
+    for rel, (sha, size) in entries.items():
+        f = content / rel
+        assert f.is_file(), f"manifest entry missing file: {rel}"
+        actual = hashlib.sha256(f.read_bytes()).hexdigest()
+        abytes = f.stat().st_size
+        assert actual == sha, f"hash mismatch: {rel}"
+        assert abytes == size, f"size mismatch: {rel}"
+    return entries
+
+
 def ctl(*args, check=True, target="local", env_extra=None):
     return run([_BASH, str(SCRIPTS / "oce-ctl")] + list(args), check=check,
                target=target, env_extra=env_extra)
@@ -112,8 +143,77 @@ def wait_healthy(container, timeout_s=90):
     return False
 
 
-def wait_all_healthy(timeout_s=120):
-    return all(wait_healthy(s, timeout_s) for s in ALL_SERVICES)
+def health_snapshot():
+    """One simultaneous Docker health snapshot of every mandatory service."""
+    return {s: health(s) for s in ALL_SERVICES}
+
+
+def converge_snapshot(timeout_s=180, stable=2, interval=3):
+    """Require ALL mandatory services to be healthy in the SAME snapshot, for
+    `stable` consecutive snapshots (a short stability window). Prevents a
+    service briefly `starting` after a transition from being misread as
+    healthy. Returns (ok, last_snapshot)."""
+    deadline = time.time() + timeout_s
+    streak = 0
+    last = {}
+    while time.time() < deadline:
+        last = health_snapshot()
+        if all(v == "healthy" for v in last.values()):
+            streak += 1
+            if streak >= stable:
+                return True, last
+        else:
+            streak = 0
+        time.sleep(interval)
+    return False, last
+
+
+def wait_all_healthy(timeout_s=180, stable=2, interval=3):
+    """Return True only when the whole stack is simultaneously healthy and has
+    held stable for `stable` consecutive snapshots."""
+    ok, _ = converge_snapshot(timeout_s, stable, interval)
+    return ok
+
+
+def write_health_diagnostics(dir_path):
+    """Record a deterministic health snapshot and per-container details into
+    dir_path. Returns the snapshot dict. Never raises."""
+    snap = {}
+    d = Path(dir_path)
+    try:
+        d.mkdir(parents=True, exist_ok=True)
+        snap = health_snapshot()
+        (d / "health-snapshot.json").write_text(
+            json.dumps({"services": snap, "all_healthy": all(v == "healthy" for v in snap.values())},
+                       indent=2), encoding="utf-8")
+        for c in ALL_SERVICES:
+            insp = subprocess.run(["docker", "inspect", c], capture_output=True, text=True)
+            (d / f"{c}.inspect.json").write_text(insp.stdout, encoding="utf-8")
+            st = subprocess.run(["docker", "inspect", "--format", "{{.State.Status}}", c],
+                                capture_output=True, text=True)
+            hs = health(c)
+            (d / f"{c}.state.txt").write_text(f"state={st.stdout.strip()} health={hs}\n", encoding="utf-8")
+            logs = subprocess.run(["docker", "logs", "--tail", "80", c], capture_output=True, text=True)
+            (d / f"{c}.logs.txt").write_text(logs.stdout + logs.stderr, encoding="utf-8")
+    except Exception as e:  # diagnostics must never break the test
+        try:
+            (d / "diagnostics-error.txt").write_text(repr(e), encoding="utf-8")
+        except Exception:
+            pass
+    return snap
+
+
+def assert_stack_converged(timeout_s=180, stable=2, interval=3, evidence_subdir="health-convergence"):
+    """Assert the entire stack becomes simultaneously healthy and stable.
+    On timeout, write health diagnostics and fail with a full snapshot.
+    Used after every full start/restart/down-up transition."""
+    ok, snap = converge_snapshot(timeout_s, stable, interval)
+    if not ok:
+        diag = Path(os.environ["OCE_EVIDENCE_DIR"]) / evidence_subdir\
+            if os.environ.get("OCE_EVIDENCE_DIR") else Path(".") / evidence_subdir
+        write_health_diagnostics(diag)
+        raise AssertionError(f"stack did not reach simultaneous stable health: {snap}")
+    return snap
 
 
 def pg_ready(timeout_s=90, diagnostic_dir=None):
@@ -158,9 +258,10 @@ def pg_ready(timeout_s=90, diagnostic_dir=None):
 
 
 def ensure_stack_healthy():
-    """Bring the stack up (idempotent) and wait for truthful readiness."""
+    """Bring the stack up (idempotent) and wait for truthful simultaneous,
+    stable readiness of ALL mandatory services (not just postgres)."""
     ctl("local", "up", check=True)
-    assert wait_all_healthy(), f"stack not healthy: {[(s, health(s)) for s in ALL_SERVICES]}"
+    assert_stack_converged()
     assert pg_ready(), "postgres not ready"
 
 

@@ -149,6 +149,7 @@ def test_04_postgres_state_survives_service_restart(oce_stack):
                            "INSERT INTO state_probe VALUES('a','1') ON CONFLICT (k) DO UPDATE SET v='1';"])
     subprocess.run(["docker", "restart", oc.POSTGRES], capture_output=True, text=True, check=True)
     assert oc.pg_ready(), "postgres not ready after restart"
+    oc.assert_stack_converged(timeout_s=180, stable=2)
     r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
                                "SELECT v FROM state_probe WHERE k='a';"])
     assert r.stdout.strip() == "1"
@@ -164,6 +165,7 @@ def test_05_postgres_state_survives_compose_restart(oce_stack):
     oc.dcompose("down")
     oc.ctl("local", "up")
     assert oc.pg_ready(), "postgres not ready after compose restart"
+    oc.assert_stack_converged(timeout_s=180, stable=2)
     r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
                                "SELECT v FROM state_probe WHERE k='b';"])
     assert r.stdout.strip() == "2"
@@ -342,10 +344,15 @@ def test_17_missing_telemetry_renders_unknown_not_healthy():
     assert "UNKNOWN" in r.stdout or "BLOCKED" in r.stdout
 
 
-def test_18_local_shutdown_is_safe():
-    """18. Local shutdown is safe (idempotent, clean exit)."""
+@pytest.mark.container
+def test_18_local_shutdown_is_safe(oce_stack):
+    """18. Local shutdown is safe (idempotent, clean exit), then the shared
+    stack is restored to simultaneous stable health so later tests never see a
+    half-started stack."""
     r = ctl("local", "down")
     assert r.returncode == 0
+    oc.ctl("local", "up", check=True)
+    oc.assert_stack_converged(timeout_s=180, stable=2)
 
 
 def test_19_repeated_runs_are_isolated(tmp_path):

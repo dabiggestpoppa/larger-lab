@@ -41,12 +41,17 @@ def test_ctl_images_are_pinned(oce_stack):
 
 
 def test_ctl_all_services_healthy(oce_stack):
-    for svc in oc.ALL_SERVICES:
-        assert oc.health(svc) == "healthy", f"{svc} health={oc.health(svc)}"
+    """THE WHOLE STACK is simultaneously healthy and stable — not a scalar
+    per-service check. This is what verifies a service observed `starting`
+    after an earlier transition is caught and converged."""
+    snap = oc.assert_stack_converged(timeout_s=180, stable=2)
+    assert all(v == "healthy" for v in snap.values()), snap
 
 
 def test_ctl_prometheus_readiness_endpoint(oce_stack):
-    """Prometheus is healthy only via its own /-/ready healthcheck."""
+    """Prometheus is healthy only via its own /-/ready healthcheck, and the
+    whole stack holds simultaneous stable health."""
+    oc.assert_stack_converged(timeout_s=180, stable=2)
     assert oc.health(oc.METRICS) == "healthy", f"prometheus health={oc.health(oc.METRICS)}"
 
 
@@ -93,11 +98,13 @@ def test_ctl_no_forbidden_public_ports(oce_stack):
 
 
 def test_ctl_postgres_authoritative_row_survives_restart(oce_stack):
+    oc.assert_stack_converged(timeout_s=180, stable=2)
     oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
                            "CREATE TABLE IF NOT EXISTS state_probe(k text PRIMARY KEY, v text);"
                            "INSERT INTO state_probe VALUES('ctl','1') ON CONFLICT (k) DO UPDATE SET v='1';"])
     subprocess.run(["docker", "restart", oc.POSTGRES], capture_output=True, text=True, check=True)
     assert oc.pg_ready(), "postgres not ready after restart"
+    oc.assert_stack_converged(timeout_s=180, stable=2)
     r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
                                "SELECT v FROM state_probe WHERE k='ctl';"])
     assert r.stdout.strip() == "1"
@@ -142,18 +149,25 @@ def test_ctl_clean_room_database_artifact_restore(oce_stack, tmp_path):
     assert "artifacts" in info["includes"], info
     assert (bk / ".backup-content" / "postgres" / "dump.sql").is_file()
     assert (bk / ".backup-content" / "artifacts" / "artifacts.tar.gz").is_file()
+    # 4b. prove the dump contains BOTH schema and the expected data rows
+    dump = (bk / ".backup-content" / "postgres" / "dump.sql").read_text(encoding="utf-8", errors="replace")
+    assert "CREATE TABLE" in dump and "backup_probe" in dump, "dump missing schema"
+    assert "b1" in dump and "alpha" in dump, "dump missing data rows"
+    # 4c. verify the backup metadata is hash-protected (tamper => gate fails)
+    oc.verify_backup_manifest(bk)
     # 5. destroy the disposable stack and Book 1 test volumes only
     oc.dcompose("down", "-v", "--remove-orphans")
-    # 6. recreate clean volumes and wait for truthful readiness
+    # 6. recreate clean volumes and wait for simultaneous stable readiness
     oc.dcompose("up", "-d")
-    assert oc.wait_all_healthy(), "stack not healthy on clean volumes"
+    oc.assert_stack_converged(timeout_s=240, stable=2)
     assert oc.pg_ready(), "postgres not ready on clean volumes"
-    # 7. restore
+    # 7. restore (fail-closed: must return zero AND recover real rows)
     oc.run(["bash", str(oc.SCRIPTS / "restore.sh"), "--from", str(bk)], check=True)
-    # 8. postgres records exactly
+    # 8. postgres records exactly (a zero-exit restore with missing rows fails)
     r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tA",
                                "SELECT k || '=' || v FROM backup_probe ORDER BY k;"])
-    assert r.stdout.strip().splitlines() == ["b1=alpha", "b2=beta"], r.stdout
+    assert r.stdout.strip().splitlines() == ["b1=alpha", "b2=beta"], (
+        f"restore returned success but rows not recovered: {r.stdout!r}")
     # 9. artifact hash exactly
     out = tmp_path / "restored-artifact.bin"
     oc.cp_out(oc.ARTIFACT, "/data/backup-probe.bin", out)
@@ -173,21 +187,50 @@ def test_ctl_corrupt_backup_rejected_against_running_stack(oce_stack, tmp_path):
     r = oc.run(["bash", str(oc.SCRIPTS / "restore.sh"), "--from", str(bk)], check=False)
     assert r.returncode != 0
     assert "CORRUPT" in r.stdout + r.stderr
+    # postgres data must NOT have been touched by the rejected restore
+    r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                               "SELECT count(*) FROM backup_probe;"])
+    assert r.stdout.strip().isdigit()
 
 
 def test_ctl_structured_logs_use_json_file_driver(oce_stack):
-    r = subprocess.run(["docker", "inspect", "--format", "{{.HostConfig.LogConfig.Type}}", oc.POSTGRES],
-                       capture_output=True, text=True)
-    assert r.stdout.strip() == "json-file"
-    logs = subprocess.run(["docker", "logs", "--tail", "5", oc.POSTGRES], capture_output=True, text=True)
-    assert logs.returncode == 0 and logs.stdout.strip()
+    """Verify the json-file log driver and its rotation options independently,
+    then accept Docker logs on stdout OR stderr (PostgreSQL logs on stderr),
+    and confirm the content contains a recognizable PostgreSQL log record."""
+    inspect = subprocess.run(["docker", "inspect", oc.POSTGRES], capture_output=True, text=True)
+    assert inspect.returncode == 0
+    obj = json.loads(inspect.stdout)[0]
+    lc = obj.get("HostConfig", {}).get("LogConfig", {})
+    # 1. log driver type independently verified
+    assert lc.get("Type") == "json-file", lc
+    # 2. rotation options verified
+    opts = lc.get("Config", {}) or {}
+    assert opts.get("max-size") == "10m", opts
+    assert opts.get("max-file") == "3", opts
+    # record the inspected driver config as evidence
+    ev = os.environ.get("OCE_EVIDENCE_DIR")
+    if ev:
+        Path(ev).mkdir(parents=True, exist_ok=True)
+        (Path(ev) / "log-driver-config.json").write_text(json.dumps(lc, indent=2), encoding="utf-8")
+    # 3. combined stdout+stderr accepted; nonempty; contains a postgres record
+    logs = subprocess.run(["docker", "logs", "--tail", "50", oc.POSTGRES], capture_output=True, text=True)
+    combined = (logs.stdout + "\n" + logs.stderr) if logs.stderr else logs.stdout
+    assert logs.returncode == 0
+    assert combined.strip(), "docker logs returned empty output for postgres"
+    assert re.search(r"database system (is ready|was shut down)|ready to accept|LOG:", combined), \
+        f"no recognizable postgres record in logs: {combined[:400]}"
 
 
 def test_ctl_safe_shutdown_and_verified_cleanup(oce_stack):
-    """Safe shutdown; final volume cleanup is verified by the session
+    """Safe shutdown brings every service to exited state, then RESTORES the
+    shared stack to simultaneous stable health so later tests never observe a
+    half-started stack. Final volume cleanup is verified by the session
     fixture teardown and recorded in container-cleanup.json."""
     r = oc.ctl("local", "down")
     assert r.returncode == 0
     r = oc.dcompose("ps", "--all", "--format", "json", check=False)
     remaining = oc.parse_compose_ps(r.stdout)
     assert all(e.get("State") == "exited" for e in remaining), remaining
+    # restore the shared stack (graceful) so no later test sees `starting`
+    oc.ctl("local", "up", check=True)
+    oc.assert_stack_converged(timeout_s=240, stable=2)

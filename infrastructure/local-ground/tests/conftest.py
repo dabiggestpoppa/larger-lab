@@ -55,6 +55,9 @@ def _docker_env():
     return dict(os.environ, **oc.TEST_SECRETS)
 
 
+########## Docker helpers (only reached when docker_available() is True) ##########
+
+
 def _remove_stale_resources():
     """Safely remove only Book 1 test resources left by a previous run."""
     for c in oc.ALL_SERVICES:
@@ -105,21 +108,49 @@ def _teardown_stack():
     assert result["cleanup"] == "ok", f"stack cleanup failed: {result}"
 
 
+@pytest.hookimpl(hookwrapper=True, tryfirst=True)
+def pytest_runtest_makereport(item, call):
+    """When a container-backed test fails during its call phase, capture
+    bounded container diagnostics (compose ps, inspect, health, logs,
+    networks, volumes, failing node id / phase / assertion) into
+    OCE_EVIDENCE_DIR/failure-diagnostics BEFORE the session fixture teardown
+    removes the containers. Diagnostics must not mask the original result."""
+    outcome = yield
+    rep = outcome.get_result()
+    if rep.when == "call" and rep.failed and item.get_closest_marker("container") is not None:
+        ev_dir = os.environ.get("OCE_EVIDENCE_DIR")
+        if ev_dir:
+            d = Path(ev_dir) / "failure-diagnostics"
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "failing-nodeid.txt").write_text(item.nodeid, encoding="utf-8")
+            err = rep.longrepr.reprcrash.message if getattr(rep, "longrepr", None) and getattr(rep.longrepr, "reprcrash", None) else str(rep.longrepr)[:4000]
+            (d / "failure-message.txt").write_text(err, encoding="utf-8")
+            ps = subprocess.run(["docker", "compose", "-f", str(oc.COMPOSE_FILE), "ps", "--format", "json"],
+                                cwd=str(oc.COMPOSE), env=_docker_env(), capture_output=True, text=True)
+            (d / "compose-ps.json").write_text(ps.stdout, encoding="utf-8")
+            oc.write_health_diagnostics(d)
+            net = subprocess.run(["docker", "network", "ls", "--format", "{{.Name}}"],
+                                 capture_output=True, text=True)
+            (d / "networks.txt").write_text(net.stdout, encoding="utf-8")
+            vol = subprocess.run(["docker", "volume", "ls", "--format", "{{.Name}}"],
+                                 capture_output=True, text=True)
+            (d / "volumes.txt").write_text(vol.stdout, encoding="utf-8")
+
+
 @pytest.fixture(scope="session")
 def oce_stack():
     """Single session-scoped owner of the Local Ground compose stack.
 
-    Starts the stack once, waits for truthful readiness of every mandatory
-    service, and tears it down (with disposable volumes) on session end.
-    Cleanup runs even when setup/readiness fails before `yield`.
+    Starts the stack once, waits for simultaneous stable readiness of EVERY
+    mandatory service, and tears it down (with disposable volumes) on session
+    end. Cleanup runs even when setup/readiness fails before `yield`.
     """
     if not oc.docker_available():
         pytest.skip("container runtime unavailable (Docker absent)")
     try:
         _remove_stale_resources()
         oc.ctl("local", "up", check=True)
-        assert oc.wait_all_healthy(), "stack failed to become healthy"
-        assert oc.pg_ready(), "postgres failed readiness"
+        oc.assert_stack_converged(timeout_s=240)
         yield
     finally:
         _teardown_stack()
