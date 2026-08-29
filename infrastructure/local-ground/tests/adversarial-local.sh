@@ -58,10 +58,23 @@ check "unauthorized worker rejected" 1 \
   env OCE_RUNTIME_TARGET=local bash "$SCRIPTS/worker-admit.sh" admit "$TMP/bad.json"
 
 # 4. corrupt backup rejected (3).
-bash "$SCRIPTS/backup.sh" --out "$TMP/bk" >> "$LOG" 2>&1
+bash "$SCRIPTS/backup.sh" --scope state-only --out "$TMP/bk" >> "$LOG" 2>&1
 echo '{"tampered":1}' > "$TMP/bk/.backup-content/state.json"
 check "corrupt backup rejected" 3 \
-  env OCE_RUNTIME_TARGET=local bash "$SCRIPTS/restore.sh" --from "$TMP/bk"
+  env OCE_RUNTIME_TARGET=local bash "$SCRIPTS/restore.sh" --mode state-only --from "$TMP/bk"
+
+# 4b. unknown backup scope rejected (2).
+check "unknown backup scope rejected" 2 \
+  env OCE_RUNTIME_TARGET=local bash "$SCRIPTS/backup.sh" --scope bogus --out "$TMP/bk2"
+
+# 4c. full backup blocked when services unavailable (3) — never silent degrade.
+check "full backup blocked without runtime" 3 \
+  env OCE_RUNTIME_TARGET=local bash "$SCRIPTS/backup.sh" --scope full --out "$TMP/bk3"
+
+# 4d. state-only backup cannot be restored full-replace (3).
+bash "$SCRIPTS/backup.sh" --scope state-only --out "$TMP/bk4" >> "$LOG" 2>&1
+check "state-only backup with full-replace rejected" 3 \
+  env OCE_RUNTIME_TARGET=local bash "$SCRIPTS/restore.sh" --mode full-replace --from "$TMP/bk4" --confirm-local-target oce_local
 
 # 5. unknown runtime target rejected (2).
 check "unknown runtime target rejected" 2 \

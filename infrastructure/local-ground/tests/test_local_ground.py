@@ -230,17 +230,20 @@ def test_07_artifact_round_trip_preserves_hashes(tmp_path):
 
 
 def test_08_backup_completes(tmp_path):
-    """8. Backup completes and writes a manifest."""
+    """8. Backup completes and writes a manifest (state-only scope)."""
     (BASE_DIR / "var").mkdir(exist_ok=True)
     (BASE_DIR / "var" / "state.json").write_text('{"a": 1}')
-    r = run(["bash", str(SCRIPTS / "backup.sh"), "--scope", "state-only", "--out", str(tmp_path / "bk")])
+    r = run(["bash", str(SCRIPTS / "backup.sh"), "--scope", "state-only",
+             "--out", str(tmp_path / "bk")])
     assert r.returncode == 0
     assert (tmp_path / "bk" / "BACKUP_MANIFEST.sha256").is_file()
     assert (tmp_path / "bk" / ".backup-content" / "state.json").is_file()
+    info = json.loads((tmp_path / "bk" / ".backup-content" / "backup-info.json").read_text())
+    assert info["scope"] == "state-only" and info["disaster_recovery_capable"] is False
 
 
 def test_09_clean_room_local_restore_succeeds(tmp_path):
-    """9. Clean-room local restore succeeds and reconciles hashes."""
+    """9. Clean-room local restore succeeds and reconciles hashes (state-only)."""
     content = tmp_path / "src"
     content.mkdir()
     (content / "payload.txt").write_text("clean-room payload")
@@ -249,18 +252,20 @@ def test_09_clean_room_local_restore_succeeds(tmp_path):
     assert r.returncode == 0
     # wipe var to simulate clean room
     shutil.rmtree(BASE_DIR / "var", ignore_errors=True)
-    r = run(["bash", str(SCRIPTS / "restore.sh"), "--from", str(bk)])
+    r = run(["bash", str(SCRIPTS / "restore.sh"), "--mode", "state-only", "--from", str(bk)])
     assert r.returncode == 0
     assert (BASE_DIR / "var" / "state.json").is_file()
 
 
 def test_10_restore_meets_declared_recovery_targets():
-    """10. Restore meets declared local recovery targets (deterministic, hash-verified)."""
+    """10. Restore meets declared local recovery targets (state-only, hash-verified)."""
     assert (SCRIPTS / "restore.sh").is_file()
+    assert (SCRIPTS / "backup.sh").is_file()
     r = ctl("backup", "--scope", "state-only",
            "--out", str(BASE_DIR / "var" / "backups" / "recovery-check"))
     assert r.returncode == 0
-    r = ctl("restore", "--from", str(BASE_DIR / "var" / "backups" / "recovery-check"))
+    r = ctl("restore", "--mode", "state-only",
+           "--from", str(BASE_DIR / "var" / "backups" / "recovery-check"))
     assert r.returncode == 0
 
 
@@ -269,7 +274,8 @@ def test_11_corrupt_backup_is_rejected(tmp_path):
     bk = tmp_path / "bk"
     run(["bash", str(SCRIPTS / "backup.sh"), "--scope", "state-only", "--out", str(bk)])
     (bk / ".backup-content" / "state.json").write_text('{"tampered": true}')
-    r = run(["bash", str(SCRIPTS / "restore.sh"), "--from", str(bk)], expect=None)
+    r = run(["bash", str(SCRIPTS / "restore.sh"), "--mode", "state-only",
+             "--from", str(bk)], expect=None)
     assert r.returncode != 0
     assert "CORRUPT" in r.stdout + r.stderr
 
@@ -504,7 +510,7 @@ def test_30_documented_operator_walkthrough_passes(tmp_path):
         (["bash", str(SCRIPTS / "bootstrap-local.sh")], 0),
         (["bash", str(SCRIPTS / "oce-ctl"), "local", "status"], 0),
         (["bash", str(SCRIPTS / "oce-ctl"), "backup", "--scope", "state-only", "--out", str(tmp_path / "walk-bk")], 0),
-        (["bash", str(SCRIPTS / "oce-ctl"), "restore", "--from", str(tmp_path / "walk-bk")], 0),
+        (["bash", str(SCRIPTS / "oce-ctl"), "restore", "--mode", "state-only", "--from", str(tmp_path / "walk-bk")], 0),
         (["bash", str(SCRIPTS / "oce-ctl"), "deploy", "plan", "--target", "cloud"], 0),
     ]
     for args, expect in steps:
