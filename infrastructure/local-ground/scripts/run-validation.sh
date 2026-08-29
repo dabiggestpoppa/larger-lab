@@ -103,11 +103,26 @@ DIRTY=$(git -C "$PROJ_ROOT" status --porcelain | wc -l)
 [ "$DIRTY" -ne 0 ] && fail clean-source-post 1
 record "source clean (post)"
 
-# ── evidence: status + manifest ───────────────────────────────────────────
-python3 - "$EVIDENCE" "$COMMIT" "$TREE" "$BRANCH" <<'PY'
+# ── evidence: status + manifest + independent gate ────────────────────────
+write_status() { # gate_status
+  python3 - "$EVIDENCE/stage-status.json" "$1" <<'PY'
+import json, sys
+p, gs = sys.argv[1], sys.argv[2]
+d = json.load(open(p, encoding="utf-8"))
+d["gate_status"] = gs
+json.dump(d, open(p, "w", encoding="utf-8"), indent=2)
+PY
+}
+write_manifest() { # regenerate AFTER every mutable output is finalized
+  python3 - "$EVIDENCE" "$COMMIT" "$TREE" "$BRANCH" <<'PY'
 import hashlib, json, os, sys
 from datetime import datetime, timezone
 ev, commit, tree, branch = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+old = {}
+try:
+    old = json.load(open(os.path.join(ev, "evidence-manifest.json"), encoding="utf-8"))
+except Exception:
+    pass
 artifacts = []
 for name in sorted(os.listdir(ev)):
     p = os.path.join(ev, name)
@@ -126,27 +141,31 @@ manifest = {
   "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
 }
 json.dump(manifest, open(os.path.join(ev, "evidence-manifest.json"), "w", encoding="utf-8"), indent=2)
+PY
+}
+python3 - "$EVIDENCE" "$COMMIT" "$TREE" "$BRANCH" <<'PY'
+import json, os, sys
+ev, commit, tree, branch = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 status = {
-  "block": "B1", "stage": "B1-LOCAL-GROUND-CLOSURE", "run_id": manifest["run_id"],
+  "block": "B1", "stage": "B1-LOCAL-GROUND-CLOSURE", "run_id": os.environ.get("OCE_RUN_ID", ""),
   "gate_status": "PENDING_FINAL_GATE", "cloud_mutations": 0, "cloud_cost_state": "ZERO",
   "cloud_activation_state": "DEFERRED_BY_OPERATOR", "implementation_commit": commit,
   "implementation_tree": tree, "branch": branch,
 }
 json.dump(status, open(os.path.join(ev, "stage-status.json"), "w", encoding="utf-8"), indent=2)
 PY
+write_manifest
 
 # ── independent final gate ────────────────────────────────────────────────
 bash "$GATE" "$EVIDENCE" "$COMMIT" "$TREE"
 RC=$?
 [ "$RC" -ne 0 ] && fail final-gate "$RC"
-python3 - "$EVIDENCE/stage-status.json" <<'PY'
-import json, sys
-p = sys.argv[1]
-d = json.load(open(p, encoding="utf-8"))
-d["gate_status"] = "LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW"
-json.dump(d, open(p, "w", encoding="utf-8"), indent=2)
-PY
+# Finalize mutable outputs, THEN refresh the manifest so its hashes match the
+# exact files the operator will verify (evidence standard: refresh after
+# mutable outputs are finalized).
+write_status "LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW"
 record "independent gate LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW"
+write_manifest
 echo "=== RUNNER RESULT: LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW ==="
 echo "OCE_RUN_ID: $OCE_RUN_ID | commit ${COMMIT:0:12} | branch $BRANCH"
 echo "evidence: $EVIDENCE"
