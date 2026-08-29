@@ -1,0 +1,12 @@
+{
+  "block": "B1",
+  "stage": "B1-LOCAL-GROUND-CLOSURE",
+  "run_id": "52f60c556f50",
+  "gate_status": "LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW",
+  "cloud_mutations": 0,
+  "cloud_cost_state": "ZERO",
+  "cloud_activation_state": "DEFERRED_BY_OPERATOR",
+  "implementation_commit": "c2b2f515e5ab2bc82b4a55e638cd7de5b16c6c63",
+  "implementation_tree": "859dc367132d5caad87e43feb69516e31b6a4bf3",
+  "branch": "oce-program-build"
+}

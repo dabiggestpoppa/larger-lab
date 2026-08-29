@@ -1,0 +1,38 @@
+{
+  "run_id": "52f60c556f50",
+  "repository": "dabigestpoppa/larger-lab",
+  "branch": "oce-program-build",
+  "implementation_commit": "c2b2f515e5ab2bc82b4a55e638cd7de5b16c6c63",
+  "implementation_tree": "859dc367132d5caad87e43feb69516e31b6a4bf3",
+  "gate_status": "LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW",
+  "cloud_mutations": 0,
+  "cloud_cost_state": "ZERO",
+  "cloud_activation_state": "DEFERRED_BY_OPERATOR",
+  "environment_fingerprint": {
+    "os": "Windows",
+    "platform_release": "10",
+    "machine": "AMD64",
+    "runtime_target": "local",
+    "python": "Python 3.11.9",
+    "git": "git version 2.54.0.windows.1",
+    "docker": null,
+    "docker_compose": null,
+    "ansible": null,
+    "ansible_lint": null,
+    "shellcheck": "ShellCheck - shell script analysis tool",
+    "gitleaks": null
+  },
+  "artifact_hashes": {
+    "acceptance-output.txt": "1af7195ec5e15271a2b36a2fafa059bd6cf99cbfb25c833d1c688d2ea8a2b1bb",
+    "adversarial-output.txt": "5eb30b0d92f32501b958d3b7918ace409914a49bef58cf6281de755ba22e2aca",
+    "cloud-apply-denial.txt": "b1c480359d4d38fb949db72fa7ede2006730a19292d57617345e3ffb483c71ec",
+    "cloud-plan.txt": "c2778288ccce8608d97143d72b00a7ae45b39927248ac490317b2f7c60ed0a19",
+    "environment-fingerprint.json": "67a68ad1e8b0afedd35c70fc5be4339449b31925b969594a881fbd45c930f229",
+    "evidence-dir.path": "5215ac91f4df567823053b200ae1214f7b4c22dd179bb5331e72091e8126a0f4",
+    "identity.json": "97563440008acd08642d5698d20c86845516a00694690830683e28e4796cced3",
+    "stage-log.txt": "f7502de422002526dced260849d8cda7391055723b414adecd0973cc8a012da1",
+    "stage-status.json": "5a7d324f75f90e6838e82923364a541622c13ba2de50ad5b7826ae0ebdc06def"
+  },
+  "evidence_location": "external (outside repository; redacted copy committed)",
+  "redaction_note": "No host identity, credentials, IPs, or secrets appear in this committed copy; raw evidence preserved externally."
+}
