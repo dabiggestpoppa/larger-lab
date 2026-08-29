@@ -22,8 +22,12 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install pytest
-        run: pip install pytest
+      - name: Install pinned Python test dependencies
+        run: pip install -r infrastructure/local-ground/requirements-ci.txt
+
+      - name: Confirm pinned actions/dependencies contract
+        run: |
+          pip show pytest | grep -E '^Version: 9\.0\.3$' || { echo 'pytest version not pinned'; exit 1; }
 
       - name: Generate single OCE_RUN_ID
         id: run_id

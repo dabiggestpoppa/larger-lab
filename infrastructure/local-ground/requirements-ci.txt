@@ -1,0 +1,3 @@
+# OCE Local Ground — pinned CI test dependencies (immutable contract).
+# Do not silently upgrade during the repair cycle; bump deliberately.
+pytest==9.0.3
