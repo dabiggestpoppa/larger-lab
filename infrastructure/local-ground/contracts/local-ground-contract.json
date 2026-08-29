@@ -3,7 +3,7 @@
   "stage": "B1-LOCAL-GROUND-CLOSURE",
   "decision": "LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED",
   "amendment": "OCE-AMEND-A003",
-  "repository": { "full_name": "dabigestpoppa/larger-lab" },
+  "repository": { "full_name": "dabiggestpoppa/larger-lab" },
   "default_runtime_target": "local",
   "runtime_profiles": ["local", "local-test", "local-recovery", "cloud-plan", "cloud"],
   "local_data_contract": {

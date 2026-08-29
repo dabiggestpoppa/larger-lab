@@ -115,3 +115,6 @@ argo-ref/
 # OCE Local Ground runtime state (A-003)
 infrastructure/local-ground/var/
 infrastructure/local-ground/compose/.env
+
+# pytest cache
+.pytest_cache/

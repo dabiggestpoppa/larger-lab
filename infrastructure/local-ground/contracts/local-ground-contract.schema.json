@@ -14,7 +14,7 @@
     "stage": { "const": "B1-LOCAL-GROUND-CLOSURE" },
     "decision": { "const": "LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED" },
     "amendment": { "const": "OCE-AMEND-A003" },
-    "repository": { "type": "object", "properties": { "full_name": { "const": "dabigestpoppa/larger-lab" } }, "required": ["full_name"], "additionalProperties": false },
+    "repository": { "type": "object", "properties": { "full_name": { "const": "dabiggestpoppa/larger-lab" } }, "required": ["full_name"], "additionalProperties": false },
     "default_runtime_target": { "const": "local" },
     "runtime_profiles": { "type": "array", "items": { "enum": ["local", "local-test", "local-recovery", "cloud-plan", "cloud"] }, "uniqueItems": true },
     "local_data_contract": { "type": "object", "additionalProperties": false, "required": ["postgresql_is_authoritative_truth", "redis_is_transient_only", "artifact_storage_is_replaceable", "artifact_storage_adapter_version"], "properties": {
