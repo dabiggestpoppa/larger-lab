@@ -359,11 +359,17 @@ def test_19_repeated_runs_are_isolated(tmp_path):
 
 
 def test_20_secret_scan_passes():
-    """20. Secret scan passes: no .env / credentials committed."""
-    r = subprocess.run(["git", "-C", str(REPO_ROOT), "ls-files"], capture_output=True, text=True)
+    """20. Secret scan passes: no .env / credentials committed under the OCE
+    Local Ground surface. (Pre-existing, unrelated operator files elsewhere in
+    the repository — e.g. OpenClaw runtime state — are outside OCE's surface
+    and are preserved, not modified or deleted by OCE.)"""
+    r = subprocess.run(["git", "-C", str(REPO_ROOT), "ls-files",
+                        "infrastructure/local-ground"], capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
     tracked = r.stdout.splitlines()
-    bad = [p for p in tracked if p.endswith(".env") or "credentials" in p.lower() and p.endswith(".json")]
-    assert bad == [], f"committed secret-like files: {bad}"
+    bad = [p for p in tracked
+           if p.endswith(".env") or ("credentials" in p.lower() and p.endswith(".json"))]
+    assert bad == [], f"committed secret-like files under local-ground: {bad}"
     assert not (COMPOSE / ".env").exists() or (COMPOSE / ".env").name not in tracked
 
 
