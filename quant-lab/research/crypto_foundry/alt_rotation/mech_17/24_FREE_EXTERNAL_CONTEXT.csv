@@ -1,0 +1,9 @@
+source,access_class,local_data,status,note
+SoSoValue,FREE_LIMITED_AUTOMATED,False,DATA_BLOCKED,No local ETF-flow cache (MECH-16 pilot also DATA_BLOCKED)
+Spectre Explorer,FREE_LIMITED_AUTOMATED,False,DATA_BLOCKED,Not integrated this checkpoint
+LI.FI / Jumper,FREE_LIMITED_AUTOMATED,False,DATA_BLOCKED,Quote/sim only; execution not authorized
+Token Terminal,PAID_EXCLUDED,False,DATA_BLOCKED,No free programmatic API
+Polymarket / Falcon,FREE_REFERENCE_ONLY,False,DATA_BLOCKED,$0 API unverified
+Yieldz / protocol-native,FREE_REFERENCE_ONLY,False,DATA_BLOCKED,Use protocol-native free reads later
+Stablecoin capital (local panel),LOCAL_FREE,True,AVAILABLE_LOCAL,stablecoin_change_7d + stablecoin_mcap_share in forcing atlas
+Chain TVL / DEX vol (local panel),LOCAL_FREE,True,AVAILABLE_LOCAL,context only

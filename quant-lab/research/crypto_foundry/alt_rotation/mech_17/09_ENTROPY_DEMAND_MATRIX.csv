@@ -1,0 +1,3 @@
+demand,exit_entropy,n,mean_prop7,mean_reentry7,mean_rank7,dominant_exit_share
+HIGH,HIGH_ENT,1022,0.403,0.3,0.892,0.551
+LOW,HIGH_ENT,1171,0.36,0.226,0.856,0.559
