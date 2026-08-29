@@ -44,6 +44,39 @@ Local static revalidation (RUN `b02d61777638`): gate PASS 34/34, 79 passed /
 0 failed / 0 errors / 16 truthful container skips (no Docker on this host),
 final-package verifier PASS, `LOCAL_STATIC_READY_CI_REQUIRED`.
 
+## Final-runtime closure cycle (2026-08-29)
+
+Authoritative CI run `33269051570` (OCE_RUN_ID `e883791fd22c`) reached the
+Docker-backed acceptance phase (95 executed / 91 passed / 4 failed) and
+failed truthfully on runtime defects now repaired as B1-L7R17..R20,
+B1-L8R3, B1-L8R4:
+
+- **R17 health convergence:** the shared stack must reach simultaneous stable
+  health (bounded deadline + stability window) after every full start, restart
+  or `down`/`up`; no transition test returns while any mandatory service is
+  still `starting`; safe-shutdown test restores the stack afterward.
+- **R18 fail-closed restore:** PostgreSQL dumps applied with `ON_ERROR_STOP`
+  inside a single transaction, readiness verified before restore, restore
+  receipts written; a zero-exit restore that loses rows is now impossible
+  (B1-L7R18).
+- **R19 backup/artifact hardening:** `backup-info.json` is hash-protected
+  inside the manifest; unsafe manifest paths (absolute / `..` / duplicate /
+  missing / malformed) and unsafe artifact tar members (absolute path, OOB
+  links) are rejected before extraction — with 9 dedicated regressions
+  (B1-L7R19).
+- **L8R3 structured logs + pre-teardown diagnostics:** the log test verifies
+  the json-file driver + rotation options independently and accepts combined
+  stdout+stderr (PostgreSQL logs on stderr); a pre-teardown hook captures
+  real container diagnostics before the session fixture removes them.
+- **gate/test reconciliation:** every mandatory container test must execute
+  and pass in CI; hardening suite added to the shared runner.
+
+Local static revalidation (RUN `02ec89b0f012`): gate PASS 42/42, 104
+collected / 87 passed / 0 failed / 0 errors / 17 truthful container skips,
+final-package verifier PASS, `LOCAL_STATIC_READY_CI_REQUIRED`. Full
+readiness requires the authoritative container-backed CI run on the repaired
+implementation, which awaits operator confirmation (private repo).
+
 ## Machine-readable copy
 
 The same fields are enforced by `contracts/local-ground-contract.json`
