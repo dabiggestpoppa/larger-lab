@@ -1,0 +1,107 @@
+# OCE Local Ground — default `local` runtime stack (A-003)
+# Local is the default and authoritative development runtime. This stack uses
+# only local resources and publishes NO public ports. Cloud is deferred.
+#
+# Services:
+#   postgresql       — authoritative durable truth
+#   redis            — transient transport/cache only (never sole truth)
+#   artifact-store   — file-backed S3-compatible artifacts (replaceable adapter)
+#   metrics          — Prometheus host/runtime metrics
+#
+#   docker compose -f compose.yml --profile local up -d
+#   (profile gates the stack so `cloud` runs nothing.)
+
+x-logging: &x-logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
+services:
+  postgresql:
+    image: postgres:16.2-alpine
+    container_name: oce-local-postgresql
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-oce_local}
+      POSTGRES_USER: ${POSTGRES_USER:-oce_local_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [oce_local_internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-oce_local_admin} -d ${POSTGRES_DB:-oce_local} -h localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    logging: *x-logging
+    security_opt: ["no-new-privileges:true"]
+
+  redis:
+    image: redis:7.2.4-alpine
+    container_name: oce-local-redis
+    restart: unless-stopped
+    # TRANSPORT ONLY — RDB/AOF default on, but authoritative truth lives in PostgreSQL.
+    command: ["redis-server", "--maxmemory", "1gb", "--maxmemory-policy", "allkeys-lru", "--save", ""]
+    volumes:
+      - redis_data:/data
+    networks: [oce_local_internal]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+    logging: *x-logging
+    security_opt: ["no-new-privileges:true"]
+
+  artifact-store:
+    image: minio/minio:RELEASE.2024-05-28T17-19-04Z
+    container_name: oce-local-artifact
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${ARTIFACT_ACCESS_KEY:-oce-local-access}
+      MINIO_ROOT_PASSWORD: ${ARTIFACT_SECRET_KEY:?ARTIFACT_SECRET_KEY required}
+    volumes:
+      - artifact_data:/data
+    networks: [oce_local_internal]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    logging: *x-logging
+    security_opt: ["no-new-privileges:true"]
+
+  metrics:
+    image: prom/prometheus:v2.52.0
+    container_name: oce-local-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - metrics_data:/prometheus
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    networks: [oce_local_internal]
+    logging: *x-logging
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  oce_local_internal:
+    driver: bridge
+    internal: true
+    name: oce_local_internal
+
+volumes:
+  postgres_data:
+    driver: local
+    name: oce_local_postgres_data
+  redis_data:
+    driver: local
+    name: oce_local_redis_data
+  artifact_data:
+    driver: local
+    name: oce_local_artifact_data
+  metrics_data:
+    driver: local
+    name: oce_local_metrics_data
