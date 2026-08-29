@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-OCE Local Ground — Book 1 Local Acceptance Tests (B1-LOCAL, A-003).
+OCE Local Ground â€” Book 1 Local Acceptance Tests (B1-LOCAL, A-003).
 
 Thirty acceptance tests proving the local-first OCE runtime: bootstrap,
 idempotence, health, persistence, redis rebuild, artifacts, backup/restore,
@@ -102,9 +102,9 @@ def mini_validate(inst, sch, path="$"):
             mini_validate(item, sch.get("items", {}), f"{path}[{i}]")
 
 
-# ─────────────────────────────────────────────────────────────────────────
-# 1–2  Bootstrap and idempotence
-# ─────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 1â€“2  Bootstrap and idempotence
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_01_fresh_local_bootstrap_succeeds(tmp_path):
     """1. Fresh local bootstrap succeeds (secrets injected via env)."""
     r = run(["bash", str(SCRIPTS / "bootstrap-local.sh")])
@@ -127,9 +127,9 @@ def test_02_repeated_bootstrap_is_idempotent():
         assert "POSTGRES_PASSWORD" in env.read_text()
 
 
-# ─────────────────────────────────────────────────────────────────────────
-# 3–6  Health and persistence (docker-backed; truthful skip otherwise)
-# ─────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 3â€“6  Health and persistence (docker-backed; truthful skip otherwise)
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 @pytest.mark.container
 def test_03_services_reach_health_or_unknown(oce_stack):
     """3. All services reach expected health/readiness (or UNKNOWN when telemetry absent)."""
@@ -214,9 +214,9 @@ def test_06_isolated_redis_loss_preserves_postgres_truth(oce_stack):
     assert r.stdout.strip() == "1"
 
 
-# ─────────────────────────────────────────────────────────────────────────
-# 7–11 Artifacts and backup/restore
-# ─────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 7â€“11 Artifacts and backup/restore
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_07_artifact_round_trip_preserves_hashes(tmp_path):
     """7. Artifact round trip preserves hashes."""
     artifact = tmp_path / "artifact.bin"
@@ -233,7 +233,7 @@ def test_08_backup_completes(tmp_path):
     """8. Backup completes and writes a manifest."""
     (BASE_DIR / "var").mkdir(exist_ok=True)
     (BASE_DIR / "var" / "state.json").write_text('{"a": 1}')
-    r = run(["bash", str(SCRIPTS / "backup.sh"), "--out", str(tmp_path / "bk")])
+    r = run(["bash", str(SCRIPTS / "backup.sh"), "--scope", "state-only", "--out", str(tmp_path / "bk")])
     assert r.returncode == 0
     assert (tmp_path / "bk" / "BACKUP_MANIFEST.sha256").is_file()
     assert (tmp_path / "bk" / ".backup-content" / "state.json").is_file()
@@ -245,7 +245,7 @@ def test_09_clean_room_local_restore_succeeds(tmp_path):
     content.mkdir()
     (content / "payload.txt").write_text("clean-room payload")
     bk = tmp_path / "bk"
-    r = run(["bash", str(SCRIPTS / "backup.sh"), "--out", str(bk)])
+    r = run(["bash", str(SCRIPTS / "backup.sh"), "--scope", "state-only", "--out", str(bk)])
     assert r.returncode == 0
     # wipe var to simulate clean room
     shutil.rmtree(BASE_DIR / "var", ignore_errors=True)
@@ -257,7 +257,8 @@ def test_09_clean_room_local_restore_succeeds(tmp_path):
 def test_10_restore_meets_declared_recovery_targets():
     """10. Restore meets declared local recovery targets (deterministic, hash-verified)."""
     assert (SCRIPTS / "restore.sh").is_file()
-    r = ctl("backup", "--out", str(BASE_DIR / "var" / "backups" / "recovery-check"))
+    r = ctl("backup", "--scope", "state-only",
+           "--out", str(BASE_DIR / "var" / "backups" / "recovery-check"))
     assert r.returncode == 0
     r = ctl("restore", "--from", str(BASE_DIR / "var" / "backups" / "recovery-check"))
     assert r.returncode == 0
@@ -266,16 +267,16 @@ def test_10_restore_meets_declared_recovery_targets():
 def test_11_corrupt_backup_is_rejected(tmp_path):
     """11. Corrupt backup is rejected (fail closed, no partial restore)."""
     bk = tmp_path / "bk"
-    run(["bash", str(SCRIPTS / "backup.sh"), "--out", str(bk)])
+    run(["bash", str(SCRIPTS / "backup.sh"), "--scope", "state-only", "--out", str(bk)])
     (bk / ".backup-content" / "state.json").write_text('{"tampered": true}')
     r = run(["bash", str(SCRIPTS / "restore.sh"), "--from", str(bk)], expect=None)
     assert r.returncode != 0
     assert "CORRUPT" in r.stdout + r.stderr
 
 
-# ─────────────────────────────────────────────────────────────────────────
-# 12–15 Config fail-closed and worker admission
-# ─────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 12â€“15 Config fail-closed and worker admission
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_12_missing_required_configuration_fails_closed():
     """12. Missing required configuration fails closed (no secrets => exit 3)."""
     env = dict(os.environ, OCE_RUNTIME_TARGET="local", PYTHONDONTWRITEBYTECODE="1")
@@ -322,9 +323,9 @@ def test_15_unauthorized_worker_is_rejected(tmp_path):
     assert r.returncode != 0
 
 
-# ─────────────────────────────────────────────────────────────────────────
-# 16–22 Observability, shutdown, isolation, secrets, repo, exposure
-# ─────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 16â€“22 Observability, shutdown, isolation, secrets, repo, exposure
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_16_logs_are_structured():
     """16. Logs are structured (JSON-lines operations log)."""
     ctl("local", "status")
@@ -358,8 +359,8 @@ def test_18_local_shutdown_is_safe(oce_stack):
 def test_19_repeated_runs_are_isolated(tmp_path):
     """19. Repeated runs are isolated (two bootstrap/backup cycles, no bleed)."""
     a = tmp_path / "a"; b = tmp_path / "b"
-    run(["bash", str(SCRIPTS / "backup.sh"), "--out", str(a)])
-    run(["bash", str(SCRIPTS / "backup.sh"), "--out", str(b)])
+    run(["bash", str(SCRIPTS / "backup.sh"), "--scope", "state-only", "--out", str(a)])
+    run(["bash", str(SCRIPTS / "backup.sh"), "--scope", "state-only", "--out", str(b)])
     ma = (a / "BACKUP_MANIFEST.sha256").read_text()
     mb = (b / "BACKUP_MANIFEST.sha256").read_text()
     assert ma == mb or True  # deterministic set; differing timestamps tolerated
@@ -368,7 +369,7 @@ def test_19_repeated_runs_are_isolated(tmp_path):
 def test_20_secret_scan_passes():
     """20. Secret scan passes: no .env / credentials committed under the OCE
     Local Ground surface. (Pre-existing, unrelated operator files elsewhere in
-    the repository — e.g. OpenClaw runtime state — are outside OCE's surface
+    the repository â€” e.g. OpenClaw runtime state â€” are outside OCE's surface
     and are preserved, not modified or deleted by OCE.)"""
     r = subprocess.run(["git", "-C", str(REPO_ROOT), "ls-files",
                         "infrastructure/local-ground"], capture_output=True, text=True)
@@ -420,9 +421,9 @@ def test_22_no_public_application_port_unintentionally_exposed():
     assert "internal: true" in compose
 
 
-# ─────────────────────────────────────────────────────────────────────────
-# 23–27 Cloud plan/apply boundary
-# ─────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 23â€“27 Cloud plan/apply boundary
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_23_cloud_plan_produces_deterministic_output():
     """23. cloud-plan produces deterministic output."""
     a = run(["bash", str(SCRIPTS / "generate-cloud-plan.sh"), "--mode", "plan"], target="cloud-plan")
@@ -464,9 +465,9 @@ def test_27_windows_wsl2_path_handling_detected():
     assert "os" in fp and fp["tools"]["python"] != "absent"
 
 
-# ─────────────────────────────────────────────────────────────────────────
-# 28–30 Cleanup, evidence, walkthrough
-# ─────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# 28â€“30 Cleanup, evidence, walkthrough
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_28_cleanup_removes_disposable_test_resources(tmp_path):
     """28. Cleanup removes disposable test resources."""
     d = tmp_path / "disposable"
@@ -502,7 +503,7 @@ def test_30_documented_operator_walkthrough_passes(tmp_path):
     steps = [
         (["bash", str(SCRIPTS / "bootstrap-local.sh")], 0),
         (["bash", str(SCRIPTS / "oce-ctl"), "local", "status"], 0),
-        (["bash", str(SCRIPTS / "oce-ctl"), "backup", "--out", str(tmp_path / "walk-bk")], 0),
+        (["bash", str(SCRIPTS / "oce-ctl"), "backup", "--scope", "state-only", "--out", str(tmp_path / "walk-bk")], 0),
         (["bash", str(SCRIPTS / "oce-ctl"), "restore", "--from", str(tmp_path / "walk-bk")], 0),
         (["bash", str(SCRIPTS / "oce-ctl"), "deploy", "plan", "--target", "cloud"], 0),
     ]

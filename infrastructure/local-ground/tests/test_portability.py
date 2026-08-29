@@ -40,9 +40,13 @@ def test_ctl_works_from_working_dir_outside_repo(tmp_path):
     import json
     import os
     env = dict(os.environ, OCE_RUNTIME_TARGET="local", PYTHONDONTWRITEBYTECODE="1")
-    r = subprocess.run([_BASH, str(SCRIPTS / "oce-ctl"), "backup", "--out", str(tmp_path / "bk")],
+    # state-only scope: the operator-facing default is full (requires the
+    # runtime), but this portability proof runs without Docker.
+    r = subprocess.run([_BASH, str(SCRIPTS / "oce-ctl"), "backup", "--scope", "state-only",
+                        "--out", str(tmp_path / "bk")],
                        cwd=str(tmp_path), env=env, capture_output=True, text=True, timeout=180)
     assert r.returncode == 0, r.stdout + r.stderr
     assert (tmp_path / "bk" / "BACKUP_MANIFEST.sha256").is_file()
-    info = json.loads((tmp_path / "bk" / "backup-info.json").read_text(encoding="utf-8"))
+    info = json.loads((tmp_path / "bk" / ".backup-content" / "backup-info.json").read_text(encoding="utf-8"))
     assert info["format"] == "oce-local-ground-backup-v1"
+    assert info["scope"] == "state-only" and info["disaster_recovery_capable"] is False
