@@ -91,7 +91,7 @@ else
   # PostgreSQL: custom-format archive via pinned postgres tooling
   mkdir -p "$CONTENT/postgres"
   ARCHIVE="$CONTENT/postgres/archive.dump"
-  if ! docker exec oce-local-postgresql pg_dump --format=custom --no-owner --no-acls \
+  if ! docker exec oce-local-postgresql pg_dump --format=custom --no-owner --no-privileges \
        -U "$PG_USER" -d "$PG_DB" -f /tmp/oce_pg_backup_$BACKUP_ID.dump; then
     echo "BLOCKED: pg_dump (custom) failed" >&2; exit 3
   fi
