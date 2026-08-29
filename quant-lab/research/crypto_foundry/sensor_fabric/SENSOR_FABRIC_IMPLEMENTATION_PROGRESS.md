@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 1 — CONTRACTS & SEMANTICS FOUNDATION |
-| Current checkpoint | SENSOR-B1-02 (canonical mechanical observation schemas) — DONE |
+| Current checkpoint | SENSOR-B1-03 (provider + priority registries) — DONE |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
@@ -26,7 +26,7 @@ that is updated at every staged checkpoint.
 |---|---|---|---|
 | SENSOR-B1-01 | 46 | 46 | 0 |
 | SENSOR-B1-02 | 40 | 40 | 0 |
-| SENSOR-B1-03 | — | — | — |
+| SENSOR-B1-03 | 23 | 23 | 0 |
 | SENSOR-B1-04 | — | — | — |
 | SENSOR-B1-05 | — | — | — |
 | SENSOR-B1-06 | — | — | — |
@@ -54,10 +54,9 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- SENSOR-B1-03: provider + priority registries
-  - free-only provider registry schema/config and sensor priority config
-  - gate: paid/reference/unverified required dependency tests fail closed; all critical
-    sensors have planned redundancy candidates
+- SENSOR-B1-04: semantic equivalence + methodology registries
+  - equivalence and methodology contracts + configs
+  - gate: corroboration-only cannot auto-pool; comparable mappings require methodology
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -73,4 +72,5 @@ that is updated at every staged checkpoint.
 | Checkpoint | SHA | Files changed | Tests | Result | Blockers |
 |---|---|---|---|---|---|
 | SENSOR-B1-01 | 695d0288 | contracts layer, enums, base, access/quality/identity/missingness, test tree, ledger, pyproject/.gitignore | 46 passed / 0 failed | PASS | none |
-| SENSOR-B1-02 | (filled at commit) | 8 canonical sensor schemas + ProviderEnvelope + PriceLevel, 15 committed fixtures, schema test suite | 86 passed / 0 failed | PASS | none |
+| SENSOR-B1-02 | 957cfc85 | 8 canonical sensor schemas + ProviderEnvelope + PriceLevel, 15 committed fixtures, schema test suite | 86 passed / 0 failed | PASS | none |
+| SENSOR-B1-03 | (filled at commit) | provider_registry.yaml + sensor_priority.yaml, registry loaders, F9 required-runtime validation | 109 passed / 0 failed | PASS | none |
