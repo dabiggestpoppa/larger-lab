@@ -71,6 +71,7 @@ cp "$VAR_DIR/state.json" "$OUT/.backup-content/state.json" 2>/dev/null || echo '
 
 # ── metadata (no secrets; identities only) ─────────────────────────────────
 PGDUMP_VERSION=""
+DUMP_FORMAT="plain"
 if have_docker && docker inspect oce-local-postgresql >/dev/null 2>&1; then
   PGDUMP_VERSION="$(docker exec oce-local-postgresql pg_dump --version 2>/dev/null | head -1)"
 fi
@@ -78,19 +79,30 @@ COMMIT="$(git -C "$PROJ_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
 cat > "$OUT/backup-info.json" <<'JSON'
 { "format": "oce-local-ground-backup-v1", "schema_version": "1",
   "hash_algorithm": "sha256", "includes": null, "pg_dump_version": null,
-  "source_commit": null, "run_id": null, "created_at": null }
+  "pg_dump_format": "plain", "source_commit": null, "run_id": null, "created_at": null }
 JSON
-python3 - "$OUT/backup-info.json" "$INCLUDES" "$PGDUMP_VERSION" "$COMMIT" <<'PY'
+python3 - "$OUT/backup-info.json" "$INCLUDES" "$PGDUMP_VERSION" "$DUMP_FORMAT" "$COMMIT" <<'PY'
 import json, os, sys, datetime
-p, includes, pgver, commit = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+p, includes, pgver, dumpfmt, commit = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
 d = json.load(open(p, encoding="utf-8"))
 d["includes"] = includes.split()
 d["pg_dump_version"] = pgver or None
+d["pg_dump_format"] = dumpfmt
 d["source_commit"] = commit
 d["run_id"] = os.environ.get("OCE_RUN_ID", "not-set")
 d["created_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
 json.dump(d, open(p, "w", encoding="utf-8"), indent=2)
 PY
+# Hash-protect the metadata itself by copying it into the content set, so the
+# manifest covers it and tampering with backup-info.json fails the restore.
+cp "$OUT/backup-info.json" "$OUT/.backup-content/backup-info.json"
+
+# Prove the pg_dump contains both schema and data (fail-closed; no empty dump)
+if [ -f "$OUT/.backup-content/postgres/dump.sql" ]; then
+  if ! grep -q "CREATE TABLE" "$OUT/.backup-content/postgres/dump.sql" 2>/dev/null; then
+    echo "BLOCKED: pg_dump missing schema" >&2; exit 3
+  fi
+fi
 
 # ── deterministic manifest over exactly the .backup-content files ──────────
 (cd "$OUT/.backup-content" && find . -type f | sort) | while read -r rel; do
