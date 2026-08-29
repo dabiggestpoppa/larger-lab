@@ -242,4 +242,60 @@ def test_capability_keys_are_controlled():
         "funding",
         "order_flow",
         "order_book",
+        "positioning",
+        "basis",
     )
+
+
+# ---------------------------------------------------------------------------
+# SENSOR-B1-R02 — positioning + basis capability vocabulary
+# ---------------------------------------------------------------------------
+
+
+def test_r02_positioning_capability_accepted():
+    entry = DEFAULT_REGISTRY.providers["GATE_FUTURES"]
+    assert entry.capabilities["positioning"].claimed is True
+    assert entry.capabilities["positioning"].verified is False
+
+
+@pytest.mark.parametrize(
+    "provider, capability",
+    [
+        ("GATE_FUTURES", "positioning"),
+        ("COINALYZE", "positioning"),
+        ("KRAKEN_FUTURES", "basis"),
+    ],
+)
+def test_r02_planned_capabilities_claimed_but_unverified(provider: str, capability: str):
+    entry = DEFAULT_REGISTRY.providers[provider]
+    assert capability in entry.capabilities
+    assert entry.capabilities[capability].claimed is True
+    assert entry.capabilities[capability].verified is False
+
+
+def test_r02_unknown_capability_keys_still_fail():
+    with pytest.raises(ValidationError, match="capability keys"):
+        ProviderEntry.model_validate(
+            {
+                "evidence_class": "FIRST_PARTY_EXCHANGE",
+                "capabilities": {"liquidations": {"claimed": True}, "hack": {"claimed": True}},
+            }
+        )
+
+
+def test_r02_every_sensor_family_representable_without_vocabulary_extension():
+    """Bloc 2 can represent every planned sensor capability using the
+    foundational capability vocabulary (repair SENSOR-B1-R02)."""
+    from crypto_sensor_fabric.contracts.enums import SensorFamily
+    from crypto_sensor_fabric.registry.provider_registry import (
+        SENSOR_FAMILY_CAPABILITY,
+    )
+
+    assert set(SENSOR_FAMILY_CAPABILITY) == {m.value for m in SensorFamily}
+    assert set(SENSOR_FAMILY_CAPABILITY.values()) <= set(CAPABILITY_KEYS)
+
+
+def test_r02_no_provider_marks_positioning_or_basis_verified():
+    for entry in DEFAULT_REGISTRY.providers.values():
+        for capability in entry.capabilities.values():
+            assert capability.verified is False

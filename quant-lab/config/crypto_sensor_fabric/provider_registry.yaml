@@ -48,6 +48,9 @@ providers:
       order_book:
         claimed: true
         verified: false
+      basis:
+        claimed: true
+        verified: false
     fallback_candidates:
       liquidations: [GATE_FUTURES, DERIBIT, COINALYZE, BITFINEX_COMMUNITY_ARCHIVE]
       open_interest: [BYBIT_LINEAR, GATE_FUTURES, BINANCE_USDM, COINALYZE]
@@ -83,6 +86,9 @@ providers:
         claimed: true
         verified: false
       order_flow:
+        claimed: true
+        verified: false
+      positioning:
         claimed: true
         verified: false
     fallback_candidates:
@@ -258,6 +264,9 @@ providers:
         claimed: true
         verified: false
       funding:
+        claimed: true
+        verified: false
+      positioning:
         claimed: true
         verified: false
     fallback_candidates:

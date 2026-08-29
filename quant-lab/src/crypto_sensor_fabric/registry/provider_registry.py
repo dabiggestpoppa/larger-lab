@@ -39,14 +39,34 @@ PROVIDER_IDS: tuple[str, ...] = (
     "BITFINEX_COMMUNITY_ARCHIVE",
 )
 
-#: Canonical capability keys (map to sensor states in sensor_priority.yaml).
+#: Canonical capability keys.  These cover the eight frozen sensor families
+#: (trade -> order_flow, liquidation -> liquidations, open interest ->
+#: open_interest, funding -> funding, book snapshot/metric -> order_book,
+#: positioning -> positioning, basis -> basis).  Capability keys are a
+#: foundational vocabulary: Bloc 2 must be able to represent every planned
+#: sensor capability without extending this set (repair SENSOR-B1-R02).
 CAPABILITY_KEYS: tuple[str, ...] = (
     "liquidations",
     "open_interest",
     "funding",
     "order_flow",
     "order_book",
+    "positioning",
+    "basis",
 )
+
+#: Frozen bijection between canonical sensor families and capability keys.
+#: Used to prove the foundational vocabulary covers every planned sensor.
+SENSOR_FAMILY_CAPABILITY: dict[str, str] = {
+    "MECHANICAL_TRADE": "order_flow",
+    "MECHANICAL_LIQUIDATION": "liquidations",
+    "MECHANICAL_OPEN_INTEREST": "open_interest",
+    "MECHANICAL_FUNDING": "funding",
+    "MECHANICAL_BOOK_SNAPSHOT": "order_book",
+    "MECHANICAL_BOOK_METRIC": "order_book",
+    "MECHANICAL_POSITIONING": "positioning",
+    "MECHANICAL_BASIS": "basis",
+}
 
 
 class ProviderCapability(BaseModel):
