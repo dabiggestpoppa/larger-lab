@@ -58,22 +58,36 @@ def build_valid_evidence(tmp):
     write_json(ev / "environment-fingerprint.json", {"os": "Linux", "runtime_target": "local", "tools": {}})
     (ev / "junit.xml").write_text('<?xml version="1.0"?><testsuite tests="1"><testcase name="x"/></testsuite>', encoding="utf-8")
     (ev / "test-mode.txt").write_text("AUTHORITATIVE_CI\n", encoding="utf-8")
-    container_names = ["test_04_postgres_state_survives_service_restart",
+    # Names the independent gate requires to have passed (all must be present;
+    # container-backed ones are additionally required to EXECUTE in CI mode).
+    container_names = ["test_03_services_reach_health_or_unknown",
+                       "test_04_postgres_state_survives_service_restart",
                        "test_05_postgres_state_survives_compose_restart",
-                       "test_06_isolated_redis_loss_preserves_postgres_truth"]
+                       "test_06_isolated_redis_loss_preserves_postgres_truth",
+                       "test_ctl_all_services_healthy",
+                       "test_ctl_prometheus_readiness_endpoint",
+                       "test_ctl_clean_room_database_artifact_restore",
+                       "test_ctl_corrupt_backup_rejected_against_running_stack",
+                       "test_ctl_structured_logs_use_json_file_driver",
+                       "test_ctl_safe_shutdown_and_verified_cleanup",
+                       "test_ctl_no_forbidden_public_ports"]
+    non_container_names = ["test_07_artifact_round_trip_preserves_hashes",
+                           "test_08_backup_completes",
+                           "test_09_clean_room_local_restore_succeeds",
+                           "test_10_restore_meets_declared_recovery_targets",
+                           "test_11_corrupt_backup_is_rejected"]
     tests = []
     for n in container_names:
         tests.append({"name": n, "nodeid": n, "container_backed": True, "outcome": "passed", "duration_s": 0.1})
-    for n in ["test_07_artifact_round_trip_preserves_hashes", "test_08_backup_completes",
-              "test_09_clean_room_local_restore_succeeds", "test_10_restore_meets_declared_recovery_targets",
-              "test_11_corrupt_backup_is_rejected", "test_ctl_all_services_healthy"]:
-        tests.append({"name": n, "nodeid": n, "container_backed": n.startswith("test_ctl"), "outcome": "passed", "duration_s": 0.1})
+    for n in non_container_names:
+        tests.append({"name": n, "nodeid": n, "container_backed": False, "outcome": "passed", "duration_s": 0.1})
     total = len(tests)
+    cb = len(container_names)
     write_json(ev / "test-summary.json", {
         "format": "oce-test-summary-v1", "totals": {"collected": total, "executed": total,
                                                     "passed": total, "failed": 0, "errors": 0, "skipped": 0,
                                                     "mandatory_skipped": 0},
-        "container_backed": {"collected": 4, "executed": 4, "passed": 4, "failed": 0, "skipped": 0},
+        "container_backed": {"collected": cb, "executed": cb, "passed": cb, "failed": 0, "skipped": 0},
         "mandatory_skipped": 0, "tests": tests})
     write_json(ev / "adversarial-results.json", {
         "format": "oce-adversarial-results-v1",

@@ -28,6 +28,7 @@ LIFECYCLE_TEST="$BASE_DIR/tests/test_container_lifecycle.py"
 GATE_TEST="$BASE_DIR/tests/test_gate_regressions.py"
 COMPOSE_OUT_TEST="$BASE_DIR/tests/test_compose_output.py"
 PORTABILITY_TEST="$BASE_DIR/tests/test_portability.py"
+BACKUP_HARDEN_TEST="$BASE_DIR/tests/test_backup_hardening.py"
 ADV_SH="$BASE_DIR/tests/adversarial-local.sh"
 COMPOSE_DIR="$BASE_DIR/compose"
 EXPECTED_REPO="dabiggestpoppa/larger-lab"
@@ -204,7 +205,7 @@ record "doctor fingerprint captured"
 
 # ── acceptance + contract tests (machine-readable) ────────────────────────
 export PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 OCE_CI_MODE="${OCE_CI_MODE:-false}" OCE_RUNNER_ACTIVE=1
-python3 -m pytest "$TEST_FILE" "$CONTRACT_TEST" "$LIFECYCLE_TEST" "$GATE_TEST" "$COMPOSE_OUT_TEST" "$PORTABILITY_TEST" -v --tb=short \
+python3 -m pytest "$TEST_FILE" "$CONTRACT_TEST" "$LIFECYCLE_TEST" "$GATE_TEST" "$COMPOSE_OUT_TEST" "$PORTABILITY_TEST" "$BACKUP_HARDEN_TEST" -v --tb=short \
   --junitxml="$EVIDENCE/junit.xml" > "$EVIDENCE/acceptance-output.txt" 2>&1
 RC=$?
 tail -25 "$EVIDENCE/acceptance-output.txt"

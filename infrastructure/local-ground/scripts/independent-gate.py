@@ -168,25 +168,38 @@ def main():
     add("gate-17-adversarial-totals-match", "adversarial totals match entries", adv_consistent, adv_totals)
     add("gate-18-adversarial-all-pass", "every adversarial test passes", adv_totals.get("FAIL", 0) == 0, adv_totals)
 
-    # 19-24. Specific executed tests from the registry (machine-parseable)
-    test_outcomes = {r["name"]: r["outcome"] for r in ts.get("tests", [])}
+    # 19-24. Specific executed tests from the registry (machine-parseable).
+    test_entries = {r["name"]: r for r in ts.get("tests", [])}
+    test_outcomes = {name: r["outcome"] for name, r in test_entries.items()}
     must_pass = {
         "test_04_postgres_state_survives_service_restart": "postgres persistence tested",
-        "test_05_postgres_state_survives_compose_restart": "compose restart persistence tested",
+        "test_05_postgres_state_survives_compose_restart": "postgres survives compose restart",
         "test_06_isolated_redis_loss_preserves_postgres_truth": "isolated redis loss preserves postgres truth",
         "test_07_artifact_round_trip_preserves_hashes": "artifact round trip",
         "test_08_backup_completes": "backup executes",
         "test_09_clean_room_local_restore_succeeds": "clean-room restore executes",
         "test_10_restore_meets_declared_recovery_targets": "recovery targets",
         "test_11_corrupt_backup_is_rejected": "corrupt backup rejected",
+        "test_03_services_reach_health_or_unknown": "all services reach health",
+        "test_ctl_all_services_healthy": "entire stack simultaneously healthy",
+        "test_ctl_prometheus_readiness_endpoint": "prometheus /-/ready endurance",
+        "test_ctl_clean_room_database_artifact_restore": "real clean-room database+artifact restore",
+        "test_ctl_corrupt_backup_rejected_against_running_stack": "running-stack corrupt backup rejected",
+        "test_ctl_structured_logs_use_json_file_driver": "structured json-file logs verified",
+        "test_ctl_safe_shutdown_and_verified_cleanup": "safe shutdown + restore + cleanup",
+        "test_ctl_no_forbidden_public_ports": "no forbidden public ports",
     }
     for tname, label in must_pass.items():
         outcome = test_outcomes.get(tname, "missing")
+        entry = test_entries.get(tname, {})
+        is_container = bool(entry.get("container_backed"))
         ok = outcome == "passed"
-        if not CI_MODE and tname.startswith("test_0") and tname in ("test_04_postgres_state_survives_service_restart",
-                                                                    "test_05_postgres_state_survives_compose_restart",
-                                                                    "test_06_isolated_redis_loss_preserves_postgres_truth"):
-            ok = outcome in ("passed", "skipped")  # container tests may skip locally
+        # Locally (no Docker) container-backed tests skip truthfully; CI must
+        # require them to actually execute and pass.
+        if not CI_MODE and is_container:
+            ok = outcome in ("passed", "skipped")
+        if CI_MODE and is_container:
+            ok = outcome == "passed" and entry.get("outcome") == "passed"
         add(f"gate-{tname}", label, ok, outcome)
         if not ok:
             pass  # failures accumulate below
