@@ -57,6 +57,21 @@ bash infrastructure/local-ground/scripts/oce-ctl restore --from var/backups/manu
 Every backup carries `BACKUP_MANIFEST.sha256`; restore verifies size and hash
 for every file and **rejects corrupt backups** without touching the target.
 
+When the running stack is available, a backup also packages **authoritative
+data**, not just `var/`:
+
+- `postgres/dump.sql` — logical backup via `pg_dump` from the pinned image;
+- `artifacts/artifacts.tar.gz` — the artifact volume (MinIO `/data`);
+- `backup-info.json` — format, schema version, includes, created_at, RUN_ID,
+  source commit, and tool versions (no secrets).
+
+Restore applies the PostgreSQL dump and artifact contents into the running
+container; it **fails closed** if the backup contains data but the required
+runtime is unavailable. Redis is deliberately **not** restored — it is
+disposable transport state, never authoritative truth. Clean-room recovery
+destroys only Book 1 test volumes, recreates clean volumes, starts the stack,
+and restores into them.
+
 ## 4. Local workers
 
 ```bash
@@ -88,8 +103,11 @@ bash infrastructure/local-ground/scripts/validate-local --evidence-dir <outside-
 
 The shared runner produces identity, environment fingerprint, acceptance
 output, cloud-plan, cloud-apply-denial, adversarial output, stage log/status,
-and an `evidence-manifest.json` (SHA-256). CI runs the same runner with a
-single `OCE_RUN_ID`.
+`independent-gate.json`, and an `evidence-manifest.json` (SHA-256). On
+failure it preserves diagnostics (compose ps, container inspect, bounded
+logs, networks, volumes) and records a truthful cleanup outcome without
+masking the original exit code. CI runs the same runner with a single
+`OCE_RUN_ID`.
 
 ## 7. Recovery
 

@@ -22,6 +22,28 @@
 | `next_local_book` | BLOCKED_PENDING_B1_REPAIR |
 | `operator_hold_reason` | AUTHORITATIVE_CI_CONFIRMATION_PENDING |
 
+## Runtime repair cycle (2026-08-29)
+
+Failed authoritative CI run `33257653064` (OCE_RUN_ID `f6514d95caed`, phase
+`acceptance-tests`, cleanup `not-run`) exposed runtime defects, repaired as
+B1-L7R10..R16:
+
+- Prometheus `/-/ready` healthcheck; invalid config fails closed;
+- single session-scoped compose stack owner with verified volume cleanup;
+- portable `docker compose ps --format json` parser (array / object / NDJSON);
+- bounded PostgreSQL readiness after every start/restart;
+- isolated Redis-loss test (only Redis container+volume destroyed;
+  PostgreSQL truth and volume identity survive);
+- portable script execution (exec modes `100755`, bash invocation);
+- real clean-room backup/restore of PostgreSQL + artifacts into empty volumes;
+- failure-safe cleanup and diagnostics that never mask the exit code and never
+  mutate evidence after the final manifest;
+- gate/verifier require machine-readable cleanup + AUTHORITATIVE_CI evidence.
+
+Local static revalidation (RUN `b02d61777638`): gate PASS 34/34, 79 passed /
+0 failed / 0 errors / 16 truthful container skips (no Docker on this host),
+final-package verifier PASS, `LOCAL_STATIC_READY_CI_REQUIRED`.
+
 ## Machine-readable copy
 
 The same fields are enforced by `contracts/local-ground-contract.json`
