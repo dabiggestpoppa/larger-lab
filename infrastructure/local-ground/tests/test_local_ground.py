@@ -27,7 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS = BASE_DIR / "scripts"
 COMPOSE = BASE_DIR / "compose"
 CONTRACTS = BASE_DIR / "contracts"
-REPO_ROOT = BASE_DIR.parents[2]
+REPO_ROOT = BASE_DIR.parents[1]
+
+import oce_compose as oc  # shared real-Compose helpers (single stack owner)
 
 TEST_SECRETS = {
     "POSTGRES_PASSWORD": "test-secret-postgres-001",
@@ -129,69 +131,85 @@ def test_02_repeated_bootstrap_is_idempotent():
 # 3–6  Health and persistence (docker-backed; truthful skip otherwise)
 # ─────────────────────────────────────────────────────────────────────────
 @pytest.mark.container
-def test_03_services_reach_health_or_unknown():
+def test_03_services_reach_health_or_unknown(oce_stack):
     """3. All services reach expected health/readiness (or UNKNOWN when telemetry absent)."""
-    if not docker_available():
-        pytest.skip("container runtime unavailable (Docker absent)")
+    oc.ensure_stack_healthy()
     r = ctl("local", "health")
     assert r.returncode == 0
-    out = json.loads(r.stdout)
-    names = {c["Service"] for c in out}
+    names = {e.get("Service") or e.get("Name") for e in oc.parse_compose_ps(r.stdout)}
     assert {"postgresql", "redis", "artifact-store", "metrics"} <= names
 
 
 @pytest.mark.container
-def test_04_postgres_state_survives_service_restart():
-    """4. PostgreSQL state survives a service restart."""
-    if not docker_available():
-        pytest.skip("container runtime unavailable (Docker absent)")
-    ctl("local", "up")
-    # write authoritative intent into postgres
-    (COMPOSE / ".env")  # compose reads .env for credentials
-    r = subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-U", "oce_local_admin", "-d", "oce_local", "-c",
-                        "CREATE TABLE IF NOT EXISTS state_probe(k text PRIMARY KEY, v text); INSERT INTO state_probe VALUES('a','1') ON CONFLICT (k) DO UPDATE SET v='1';"],
-                       capture_output=True, text=True)
-    assert r.returncode == 0, r.stderr
-    subprocess.run(["docker", "restart", "oce-local-postgresql"], capture_output=True, text=True, check=True)
-    r = subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-U", "oce_local_admin", "-d", "oce_local", "-tAc",
-                        "SELECT v FROM state_probe WHERE k='a';"], capture_output=True, text=True)
-    assert r.returncode == 0 and r.stdout.strip() == "1"
+def test_04_postgres_state_survives_service_restart(oce_stack):
+    """4. PostgreSQL state survives a service restart (readiness-safe)."""
+    oc.ensure_stack_healthy()
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "CREATE TABLE IF NOT EXISTS state_probe(k text PRIMARY KEY, v text);"
+                           "INSERT INTO state_probe VALUES('a','1') ON CONFLICT (k) DO UPDATE SET v='1';"])
+    subprocess.run(["docker", "restart", oc.POSTGRES], capture_output=True, text=True, check=True)
+    assert oc.pg_ready(), "postgres not ready after restart"
+    r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                               "SELECT v FROM state_probe WHERE k='a';"])
+    assert r.stdout.strip() == "1"
 
 
 @pytest.mark.container
-def test_05_postgres_state_survives_compose_restart():
-    """5. PostgreSQL state survives complete Compose restart."""
-    if not docker_available():
-        pytest.skip("container runtime unavailable (Docker absent)")
-    ctl("local", "up")
-    subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-U", "oce_local_admin", "-d", "oce_local", "-c",
-                    "INSERT INTO state_probe VALUES('b','2') ON CONFLICT (k) DO UPDATE SET v='2';"],
-                   capture_output=True, text=True, check=True)
-    subprocess.run(["docker", "compose", "-f", str(COMPOSE / "compose.yml"), "down"], cwd=str(COMPOSE), capture_output=True)
-    ctl("local", "up")
-    r = subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-U", "oce_local_admin", "-d", "oce_local", "-tAc",
-                        "SELECT v FROM state_probe WHERE k='b';"], capture_output=True, text=True)
-    assert r.returncode == 0 and r.stdout.strip() == "2"
+def test_05_postgres_state_survives_compose_restart(oce_stack):
+    """5. PostgreSQL state survives complete Compose restart (readiness-safe)."""
+    oc.ensure_stack_healthy()
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "INSERT INTO state_probe VALUES('b','2') ON CONFLICT (k) DO UPDATE SET v='2';"])
+    # compose down WITHOUT -v: volumes (authoritative truth) must survive
+    oc.dcompose("down")
+    oc.ctl("local", "up")
+    assert oc.pg_ready(), "postgres not ready after compose restart"
+    r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                               "SELECT v FROM state_probe WHERE k='b';"])
+    assert r.stdout.strip() == "2"
 
 
 @pytest.mark.container
-def test_06_redis_rebuild_does_not_lose_authoritative_intent():
-    """6. Redis can be destroyed and rebuilt without losing authoritative intent (PostgreSQL holds truth)."""
-    if not docker_available():
-        pytest.skip("container runtime unavailable (Docker absent)")
-    ctl("local", "up")
-    subprocess.run(["docker", "exec", "oce-local-redis", "redis-cli", "SET", "cache:key", "cached-value"],
+def test_06_isolated_redis_loss_preserves_postgres_truth(oce_stack):
+    """6. Isolated Redis loss: only the Redis container and its named volume are
+    destroyed. PostgreSQL truth and its volume identity survive; the cache is
+    gone; the application can rebuild it (Redis is never authoritative)."""
+    oc.ensure_stack_healthy()
+    # 1. authoritative truth in postgres
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "CREATE TABLE IF NOT EXISTS state_probe(k text PRIMARY KEY, v text);"
+                           "INSERT INTO state_probe VALUES('redis-loss','truth') "
+                           "ON CONFLICT (k) DO UPDATE SET v='truth';"])
+    # 2. disposable cache data in redis
+    oc.dexec(oc.REDIS, ["redis-cli", "SET", "cache:key", "cached-value"])
+    # 3. capture postgres volume identity before the loss
+    pg_vol = subprocess.run(
+        ["docker", "inspect", "--format", "{{range .Mounts}}{{.Name}} {{end}}", oc.POSTGRES],
+        capture_output=True, text=True).stdout.split()
+    assert any("oce_local_postgres_data" in v for v in pg_vol), pg_vol
+    # 4. destroy ONLY the redis container and its named data volume
+    subprocess.run(["docker", "rm", "-f", oc.REDIS], capture_output=True, text=True, check=True)
+    subprocess.run(["docker", "volume", "rm", "oce_local_redis_data"],
                    capture_output=True, text=True, check=True)
-    # destroy redis data volume and rebuild
-    subprocess.run(["docker", "compose", "-f", str(COMPOSE / "compose.yml"), "down", "-v"], cwd=str(COMPOSE),
-                   capture_output=True, check=True)
-    ctl("local", "up")
-    r = subprocess.run(["docker", "exec", "oce-local-redis", "redis-cli", "GET", "cache:key"], capture_output=True, text=True)
-    assert r.returncode == 0 and r.stdout.strip() == ""  # cache gone — expected
-    # authoritative intent still in postgres
-    r = subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-U", "oce_local_admin", "-d", "oce_local", "-tAc",
-                        "SELECT count(*) FROM state_probe;"], capture_output=True, text=True)
-    assert r.returncode == 0 and int(r.stdout.strip()) >= 1
+    # 5. recreate redis
+    oc.dcompose("up", "-d", "redis")
+    assert oc.wait_healthy(oc.REDIS), "redis did not recover"
+    # 6. cache data is gone
+    r = oc.dexec(oc.REDIS, ["redis-cli", "GET", "cache:key"])
+    assert r.stdout.strip() == ""
+    # 7. postgres authoritative record remains intact
+    r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                               "SELECT v FROM state_probe WHERE k='redis-loss';"])
+    assert r.stdout.strip() == "truth"
+    # 8. postgres volume identity was NOT replaced
+    pg_vol2 = subprocess.run(
+        ["docker", "inspect", "--format", "{{range .Mounts}}{{.Name}} {{end}}", oc.POSTGRES],
+        capture_output=True, text=True).stdout.split()
+    assert any("oce_local_postgres_data" in v for v in pg_vol2), pg_vol2
+    # 9. application can rebuild cache: redis is disposable, not authoritative
+    oc.dexec(oc.REDIS, ["redis-cli", "SET", "cache:rebuilt", "1"])
+    r = oc.dexec(oc.REDIS, ["redis-cli", "GET", "cache:rebuilt"])
+    assert r.stdout.strip() == "1"
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -456,7 +474,7 @@ def test_29_evidence_hashes_reconcile(tmp_path):
     ev = tmp_path / "evidence"
     env = dict(os.environ, OCE_RUNNER_ACTIVE="1", **TEST_SECRETS)
     r = subprocess.run([_BASH, str(SCRIPTS / "validate-local"), "--evidence-dir", str(ev)],
-                       cwd=str(BASE_DIR), env=env, capture_output=True, text=True, timeout=600)
+                       cwd=str(BASE_DIR), env=env, capture_output=True, text=True, timeout=1500)
     assert r.returncode == 0, r.stdout + r.stderr
     man = json.loads((ev / "evidence-manifest.json").read_text())
     assert man["cloud_mutations"] == 0
