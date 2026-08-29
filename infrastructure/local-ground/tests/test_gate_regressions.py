@@ -60,7 +60,7 @@ def build_valid_evidence(tmp):
     (ev / "test-mode.txt").write_text("AUTHORITATIVE_CI\n", encoding="utf-8")
     container_names = ["test_04_postgres_state_survives_service_restart",
                        "test_05_postgres_state_survives_compose_restart",
-                       "test_06_redis_rebuild_does_not_lose_authoritative_intent"]
+                       "test_06_isolated_redis_loss_preserves_postgres_truth"]
     tests = []
     for n in container_names:
         tests.append({"name": n, "nodeid": n, "container_backed": True, "outcome": "passed", "duration_s": 0.1})

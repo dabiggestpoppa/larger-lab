@@ -173,7 +173,7 @@ def main():
     must_pass = {
         "test_04_postgres_state_survives_service_restart": "postgres persistence tested",
         "test_05_postgres_state_survives_compose_restart": "compose restart persistence tested",
-        "test_06_redis_rebuild_does_not_lose_authoritative_intent": "redis rebuild + intent survives",
+        "test_06_isolated_redis_loss_preserves_postgres_truth": "isolated redis loss preserves postgres truth",
         "test_07_artifact_round_trip_preserves_hashes": "artifact round trip",
         "test_08_backup_completes": "backup executes",
         "test_09_clean_room_local_restore_succeeds": "clean-room restore executes",
@@ -185,7 +185,7 @@ def main():
         ok = outcome == "passed"
         if not CI_MODE and tname.startswith("test_0") and tname in ("test_04_postgres_state_survives_service_restart",
                                                                     "test_05_postgres_state_survives_compose_restart",
-                                                                    "test_06_redis_rebuild_does_not_lose_authoritative_intent"):
+                                                                    "test_06_isolated_redis_loss_preserves_postgres_truth"):
             ok = outcome in ("passed", "skipped")  # container tests may skip locally
         add(f"gate-{tname}", label, ok, outcome)
         if not ok:
