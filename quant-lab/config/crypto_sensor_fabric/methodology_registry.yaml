@@ -1,0 +1,95 @@
+# METHODOLOGY REGISTRY — frozen from bloc_01/02 §16
+#
+# Every non-trivial derived canonical value references one methodology ID.
+# Changing a formula under the same methodology ID is a forbidden silent
+# change (02 §18): bump the version instead.
+#
+# status: PROVISIONAL until Bloc 2/5 verifies actual provider semantics.
+schema_version: "1.0"
+
+methodologies:
+  OI_CONTRACTS_TO_USD_V1:
+    version: "1"
+    kind: NORMALIZATION
+    description: "Convert provider-native contract-count OI to base/quote/USD using contract multiplier and a PIT mark/index price."
+    input_contract: "oi_native + native_unit + multiplier + mark/index price"
+    output_contract: "oi_base / oi_quote / oi_usd"
+    owner_layer: T1
+    status: PROVISIONAL
+    notes: "Provenance of any external price used must be recorded in methodology/source metadata (02 §6 invariant)."
+
+  OI_USD_NATIVE_PASSTHROUGH_V1:
+    version: "1"
+    kind: NORMALIZATION
+    description: "Provider reports OI directly in USD; canonical oi_usd is a representation-equivalent passthrough of oi_native."
+    input_contract: "oi_native with native_unit=USD"
+    output_contract: "oi_usd == oi_native"
+    owner_layer: T1
+    status: PROVISIONAL
+
+  FUNDING_NATIVE_TO_8H_EQUIV_V1:
+    version: "1"
+    kind: NORMALIZATION
+    description: "Scale a native funding rate on its native interval to an 8-hour-equivalent rate without overwriting the native value."
+    input_contract: "funding_rate_native + funding_interval_seconds"
+    output_contract: "funding_rate_8h_equivalent"
+    owner_layer: T1
+    status: PROVISIONAL
+    notes: "Never replaces funding_rate_native (Bloc 1 §3.4)."
+
+  LIQ_USD_NATIVE_PROVIDER_V1:
+    version: "1"
+    kind: NORMALIZATION
+    description: "Provider-reported liquidation USD notionals mapped to canonical liquidation USD fields with provider unit declaration preserved."
+    input_contract: "provider long/short liquidation USD aggregates"
+    output_contract: "source_long_liq_usd / source_short_liq_usd"
+    owner_layer: T1
+    status: PROVISIONAL
+
+  AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1:
+    version: "1"
+    kind: RECONSTRUCTION
+    description: "Derive aggressor side from Binance aggTrade isBuyerMaker flag (aggressive buy when the buyer is the maker)."
+    input_contract: "isBuyerMaker boolean"
+    output_contract: "aggressor_side"
+    owner_layer: T1
+    status: PROVISIONAL
+    notes: "Mapping must be proven by a provider fixture test before trust (Bloc 1 §4 side rule)."
+
+  DERIBIT_TRADE_LIQ_TAG_V1:
+    version: "1"
+    kind: CLASSIFICATION
+    description: "Interpret Deribit liquidation-tagged trades as liquidation observations for corroboration only."
+    input_contract: "Deribit trade with liquidation tag"
+    output_contract: "MechanicalLiquidation TRADE_LEVEL with liquidation_role"
+    owner_layer: T1
+    status: PROVISIONAL
+    notes: "CORROBORATION_ONLY: never pooled numerically with interval aggregates at T1."
+
+  DEPTH_BPS_RECONSTRUCTION_V1:
+    version: "1"
+    kind: RECONSTRUCTION
+    description: "Reconstruct depth-at-bps bands and spread metrics from a book snapshot."
+    input_contract: "MechanicalBookSnapshot"
+    output_contract: "MechanicalBookMetric (DEPTH_*_BPS, SPREAD_BPS, SLIPPAGE_*)"
+    owner_layer: T1
+    status: PROVISIONAL
+
+  PROVIDER_ANALYTICS_PASSTHROUGH_V1:
+    version: "1"
+    kind: NORMALIZATION
+    description: "Provider-calculated book metric accepted with provider methodology declaration; distinct from local reconstruction."
+    input_contract: "provider book analytics metric"
+    output_contract: "MechanicalBookMetric"
+    owner_layer: T1
+    status: PROVISIONAL
+    notes: "Provider-native analytics and locally reconstructed metrics must carry different methodology IDs (02 §9)."
+
+  CVD_SIGNED_NOTIONAL_V1:
+    version: "1"
+    kind: RECONSTRUCTION
+    description: "Cumulative signed notional (CVD) reconstructed from trades; T2 feature, never inside a T1 trade schema."
+    input_contract: "MechanicalTrade sequence"
+    output_contract: "T2 signed-flow observable"
+    owner_layer: T2
+    status: PROVISIONAL
