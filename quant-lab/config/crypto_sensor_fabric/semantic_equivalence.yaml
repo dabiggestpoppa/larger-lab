@@ -51,8 +51,8 @@ mappings:
     methodology_id: AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1
     evidence_reference: BLOC2_PROBE_PENDING
     version: "1"
-    source_definition: "Binance aggTrade isBuyerMaker boolean (buyer is the maker of the trade)."
-    transformation_method: "Aggressive buy when buyer is maker; mapping must be proven by a provider fixture test before trust."
+    source_definition: "Binance aggTrade isBuyerMaker boolean; true = buyer is maker, false = buyer is taker."
+    transformation_method: "isBuyerMaker=true -> aggressor_side=SELL (seller is taker); isBuyerMaker=false -> aggressor_side=BUY (buyer is taker). Frozen direction (SENSOR-B1-R01); mapping must be proven by a provider fixture test before trust (Bloc 2/5)."
 
   - provider: BYBIT_LINEAR
     source_metric: open_interest

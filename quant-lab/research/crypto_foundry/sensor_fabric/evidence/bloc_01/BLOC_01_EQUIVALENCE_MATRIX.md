@@ -15,6 +15,18 @@ No `EXACT_EQUIVALENT` is claimed before probe evidence — enforced by tests.
 | BYBIT_LINEAR | open_interest | MECHANICAL_OPEN_INTEREST | oi_native | NORMALIZABLE_COMPARABLE | OI_CONTRACTS_TO_USD_V1 | 1 |
 | KRAKEN_FUTURES | funding_rate | MECHANICAL_FUNDING | funding_rate_native | NORMALIZABLE_COMPARABLE | FUNDING_NATIVE_TO_8H_EQUIV_V1 | 1 |
 
+## Frozen aggressor direction (repair SENSOR-B1-R01)
+
+BINANCE_USDM `isBuyerMaker` → `MECHANICAL_TRADE.aggressor_side`:
+
+| isBuyerMaker | Economic meaning | aggressor_side |
+|---|---|---|
+| true | buyer is maker; seller is taker/aggressor | SELL |
+| false | buyer is taker/aggressor | BUY |
+
+Machine-readable declaration: `tests/crypto_sensor_fabric/fixtures/binance_is_buyer_maker_semantics.json`
+(regression-tested; mapping remains PROVISIONAL until provider fixture verification in Bloc 2/5).
+
 ## Pooling rule (B1-T42)
 
 Numeric pooling across providers is permitted by default only for

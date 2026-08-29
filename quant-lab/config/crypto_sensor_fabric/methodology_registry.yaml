@@ -49,12 +49,12 @@ methodologies:
   AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1:
     version: "1"
     kind: RECONSTRUCTION
-    description: "Derive aggressor side from Binance aggTrade isBuyerMaker flag (aggressive buy when the buyer is the maker)."
-    input_contract: "isBuyerMaker boolean"
-    output_contract: "aggressor_side"
+    description: "Derive aggressor side from Binance aggTrade isBuyerMaker flag. isBuyerMaker=true means the buyer is the maker, so the seller is the taker/aggressor (SELL); isBuyerMaker=false means the buyer is the taker/aggressor (BUY)."
+    input_contract: "isBuyerMaker boolean (true = buyer is maker, false = buyer is taker)"
+    output_contract: "aggressor_side: true -> SELL, false -> BUY"
     owner_layer: T1
     status: PROVISIONAL
-    notes: "Mapping must be proven by a provider fixture test before trust (Bloc 1 §4 side rule)."
+    notes: "Frozen direction (operator repair SENSOR-B1-R01). Mapping must be proven by a provider fixture test before trust (Bloc 1 §4 side rule)."
 
   DERIBIT_TRADE_LIQ_TAG_V1:
     version: "1"
