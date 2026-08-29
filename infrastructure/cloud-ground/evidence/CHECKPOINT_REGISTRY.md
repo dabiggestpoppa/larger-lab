@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | B1-I1 | RATIFIED / CHECKPOINTED | `3ee31b2a6` | `50bf8fe4` | `e33a841c6eb2` | READY_FOR_OPERATOR_REVIEW |
 | B1-I2 … B1-I9 | LOCKED (historical) | — | — | — | — |
-| B1-LOCAL | BUILDING (A-003) | — | — | — | — |
+| B1-LOCAL | LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW (RUN 52f60c556f50) | 793289c60fd3b02152bee2ec54ce32d2658e12b5 | c2b2f515 | 52f60c556f50 | LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW |
 | B1-CLOUD-ACTIVATION | DEFERRED_BY_OPERATOR | — | — | — | — |
 
 ## B1-I1 Checkpoint Detail
