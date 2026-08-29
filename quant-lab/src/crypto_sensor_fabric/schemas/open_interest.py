@@ -36,7 +36,11 @@ class MechanicalOpenInterest(CanonicalObservationBase):
 
     @model_validator(mode="after")
     def _pin_sensor_family(self) -> MechanicalOpenInterest:
-        self.sensor_family = SensorFamily.MECHANICAL_OPEN_INTEREST
+        if self.sensor_family is not SensorFamily.MECHANICAL_OPEN_INTEREST:
+            raise ValueError(
+                f"sensor_family={self.sensor_family.value!r} does not match "
+                "MechanicalOpenInterest; expected MECHANICAL_OPEN_INTEREST"
+            )
         return self
 
     @model_validator(mode="after")

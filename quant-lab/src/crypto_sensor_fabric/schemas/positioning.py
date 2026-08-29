@@ -26,7 +26,11 @@ class MechanicalPositioning(CanonicalObservationBase):
 
     @model_validator(mode="after")
     def _pin_sensor_family(self) -> MechanicalPositioning:
-        self.sensor_family = SensorFamily.MECHANICAL_POSITIONING
+        if self.sensor_family is not SensorFamily.MECHANICAL_POSITIONING:
+            raise ValueError(
+                f"sensor_family={self.sensor_family.value!r} does not match "
+                "MechanicalPositioning; expected MECHANICAL_POSITIONING"
+            )
         return self
 
     @model_validator(mode="after")

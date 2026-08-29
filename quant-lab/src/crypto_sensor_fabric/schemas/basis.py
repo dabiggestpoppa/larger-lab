@@ -24,5 +24,9 @@ class MechanicalBasis(CanonicalObservationBase):
 
     @model_validator(mode="after")
     def _pin_sensor_family(self) -> MechanicalBasis:
-        self.sensor_family = SensorFamily.MECHANICAL_BASIS
+        if self.sensor_family is not SensorFamily.MECHANICAL_BASIS:
+            raise ValueError(
+                f"sensor_family={self.sensor_family.value!r} does not match "
+                "MechanicalBasis; expected MECHANICAL_BASIS"
+            )
         return self

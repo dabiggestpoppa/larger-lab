@@ -45,5 +45,9 @@ class MechanicalLiquidation(CanonicalObservationBase):
 
     @model_validator(mode="after")
     def _pin_sensor_family(self) -> MechanicalLiquidation:
-        self.sensor_family = SensorFamily.MECHANICAL_LIQUIDATION
+        if self.sensor_family is not SensorFamily.MECHANICAL_LIQUIDATION:
+            raise ValueError(
+                f"sensor_family={self.sensor_family.value!r} does not match "
+                "MechanicalLiquidation; expected MECHANICAL_LIQUIDATION"
+            )
         return self

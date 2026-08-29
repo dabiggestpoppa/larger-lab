@@ -41,7 +41,11 @@ class MechanicalBookSnapshot(CanonicalObservationBase):
 
     @model_validator(mode="after")
     def _pin_sensor_family(self) -> MechanicalBookSnapshot:
-        self.sensor_family = SensorFamily.MECHANICAL_BOOK_SNAPSHOT
+        if self.sensor_family is not SensorFamily.MECHANICAL_BOOK_SNAPSHOT:
+            raise ValueError(
+                f"sensor_family={self.sensor_family.value!r} does not match "
+                "MechanicalBookSnapshot; expected MECHANICAL_BOOK_SNAPSHOT"
+            )
         return self
 
     @model_validator(mode="after")
@@ -68,7 +72,11 @@ class MechanicalBookMetric(CanonicalObservationBase):
 
     @model_validator(mode="after")
     def _pin_sensor_family(self) -> MechanicalBookMetric:
-        self.sensor_family = SensorFamily.MECHANICAL_BOOK_METRIC
+        if self.sensor_family is not SensorFamily.MECHANICAL_BOOK_METRIC:
+            raise ValueError(
+                f"sensor_family={self.sensor_family.value!r} does not match "
+                "MechanicalBookMetric; expected MECHANICAL_BOOK_METRIC"
+            )
         return self
 
     @model_validator(mode="after")

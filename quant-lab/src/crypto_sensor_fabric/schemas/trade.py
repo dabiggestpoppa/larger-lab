@@ -35,5 +35,9 @@ class MechanicalTrade(CanonicalObservationBase):
 
     @model_validator(mode="after")
     def _pin_sensor_family(self) -> MechanicalTrade:
-        self.sensor_family = SensorFamily.MECHANICAL_TRADE
+        if self.sensor_family is not SensorFamily.MECHANICAL_TRADE:
+            raise ValueError(
+                f"sensor_family={self.sensor_family.value!r} does not match "
+                "MechanicalTrade; expected MECHANICAL_TRADE"
+            )
         return self

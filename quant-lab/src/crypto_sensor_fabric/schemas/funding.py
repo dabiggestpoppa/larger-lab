@@ -27,7 +27,11 @@ class MechanicalFunding(CanonicalObservationBase):
 
     @model_validator(mode="after")
     def _pin_sensor_family(self) -> MechanicalFunding:
-        self.sensor_family = SensorFamily.MECHANICAL_FUNDING
+        if self.sensor_family is not SensorFamily.MECHANICAL_FUNDING:
+            raise ValueError(
+                f"sensor_family={self.sensor_family.value!r} does not match "
+                "MechanicalFunding; expected MECHANICAL_FUNDING"
+            )
         return self
 
     @model_validator(mode="after")

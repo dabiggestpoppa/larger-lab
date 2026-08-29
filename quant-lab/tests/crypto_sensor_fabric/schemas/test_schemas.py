@@ -303,3 +303,31 @@ def test_sensor_family_pinned_to_concrete_schema(load_model):
     assert trade.sensor_family.value == "MECHANICAL_TRADE"
     liq = load_model(MechanicalLiquidation, "liquidation_trade_level.json")
     assert liq.sensor_family.value == "MECHANICAL_LIQUIDATION"
+
+
+# ---------------------------------------------------------------------------
+# SENSOR-B1-R04 (optional hardening) — explicit family mismatch fails closed
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "fixture, wrong_family",
+    [
+        ("trade_valid.json", "MECHANICAL_FUNDING"),
+        ("liquidation_trade_level.json", "MECHANICAL_TRADE"),
+        ("oi_contracts_native.json", "MECHANICAL_BOOK_METRIC"),
+        ("funding_8h_native.json", "MECHANICAL_LIQUIDATION"),
+        ("book_snapshot_l2.json", "MECHANICAL_BASIS"),
+        ("book_metric_provider.json", "MECHANICAL_POSITIONING"),
+        ("positioning_top_trader.json", "MECHANICAL_OPEN_INTEREST"),
+        ("basis_valid.json", "MECHANICAL_TRADE"),
+    ],
+)
+def test_r04_explicit_sensor_family_mismatch_fails(fixture, wrong_family, load_fixture):
+    """An explicitly supplied wrong sensor_family fails validation instead of
+    being silently replaced by the subclass's pinned family."""
+    payload = load_fixture(fixture)
+    payload["sensor_family"] = wrong_family
+    model_cls = FIXTURE_MODEL_MAP[fixture]
+    with pytest.raises(ValidationError, match="does not match"):
+        model_cls.model_validate(payload)
