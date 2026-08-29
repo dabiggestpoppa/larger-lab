@@ -154,7 +154,7 @@ AUTHORIZED_FIELDS="AUTHORIZED_STAGE CLOUD_AUTHORIZATION_ENVELOPE CLOUD_PROVIDER 
 
 cmd_deploy_validate() { ensure_state; echo "cloud-plan: VALIDATE (read-only, no provider contact)"; set_field cloud_plan_state "VALIDATED_NO_APPLY"; mkdir -p "$BASE_DIR/var"; "$SCRIPT_DIR/generate-cloud-plan.sh" --mode validate; rc=$?; log_op "deploy validate cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
 
-cmd_deploy_plan() { ensure_state; echo "cloud-plan: PLAN (deterministic, NON-mutating, no provider contact)"; mkdir -p "$BASE_DIR/var"; "$SCRIPT_DIR/generate-cloud-plan.sh" --mode plan > "$BASE_DIR/var/cloud-plan.txt" 2>&1; rc=$?; log_op "deploy plan cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+cmd_deploy_plan() { ensure_state; echo "cloud-plan: PLAN (deterministic, NON-mutating, no provider contact)"; mkdir -p "$BASE_DIR/var"; "$SCRIPT_DIR/generate-cloud-plan.sh" --mode plan 2>&1 | tee "$BASE_DIR/var/cloud-plan.txt"; rc=${PIPESTATUS[0]}; log_op "deploy plan cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
 
 cmd_deploy_apply() {
   ensure_state
