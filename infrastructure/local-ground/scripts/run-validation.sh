@@ -26,7 +26,10 @@ TEST_FILE="$BASE_DIR/tests/test_local_ground.py"
 CONTRACT_TEST="$BASE_DIR/tests/test_contracts.py"
 LIFECYCLE_TEST="$BASE_DIR/tests/test_container_lifecycle.py"
 GATE_TEST="$BASE_DIR/tests/test_gate_regressions.py"
+COMPOSE_OUT_TEST="$BASE_DIR/tests/test_compose_output.py"
+PORTABILITY_TEST="$BASE_DIR/tests/test_portability.py"
 ADV_SH="$BASE_DIR/tests/adversarial-local.sh"
+COMPOSE_DIR="$BASE_DIR/compose"
 EXPECTED_REPO="dabiggestpoppa/larger-lab"
 EXPECTED_BRANCH="oce-program-build"
 
@@ -85,14 +88,68 @@ fail() { # phase rc
   exit "$rc"
 }
 
+have_docker() { command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; }
+
+# Capture bounded machine-readable diagnostics BEFORE cleanup destroys them.
+failure_diagnostics() {
+  if ! have_docker; then return 0; fi
+  local d="$EVIDENCE/failure-diagnostics"
+  mkdir -p "$d"
+  (cd "$COMPOSE_DIR" && docker compose -f compose.yml ps --format json) > "$d/compose-ps.json" 2>&1 || true
+  docker network ls --filter name=oce_local_internal > "$d/networks.txt" 2>&1 || true
+  docker volume ls --filter name=oce_local_ > "$d/volumes.txt" 2>&1 || true
+  for c in oce-local-postgresql oce-local-redis oce-local-artifact oce-local-prometheus; do
+    docker inspect "$c" > "$d/$c.inspect.json" 2>&1 || true
+    docker logs --tail 50 "$c" > "$d/$c.logs.txt" 2>&1 || true
+  done
+  return 0
+}
+
+# Attempt container cleanup on failure; record the truth, never mask rc.
+failure_cleanup() {
+  local result="failed" containers="false" networks="false" volumes="false"
+  if have_docker; then
+    (cd "$COMPOSE_DIR" && docker compose -f compose.yml down -v --remove-orphans >/dev/null 2>&1)
+    local rc=$?
+    local cont net vol
+    cont=$(docker ps -a --format '{{.Names}}' 2>/dev/null || true)
+    net=$(docker network ls --format '{{.Name}}' 2>/dev/null || true)
+    vol=$(docker volume ls --format '{{.Name}}' 2>/dev/null || true)
+    containers="true"
+    for c in oce-local-postgresql oce-local-redis oce-local-artifact oce-local-prometheus; do
+      case "$cont" in *"$c"*) containers="false" ;; esac
+    done
+    case "$net" in *oce_local_internal*) networks="false" ;; *) networks="true" ;; esac
+    if printf '%s\n' "$vol" | grep -q '^oce_local_'; then volumes="false"; else volumes="true"; fi
+    if [ "$rc" -eq 0 ] && [ "$containers" = "true" ] && [ "$networks" = "true" ] && [ "$volumes" = "true" ]; then
+      result="ok"
+    fi
+  else
+    result="ok"; containers="true"; networks="true"; volumes="true"
+  fi
+  python3 - "$EVIDENCE/cleanup.json" "$result" "$containers" "$networks" "$volumes" <<'PY'
+import json, sys
+p, res, c, n, v = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
+json.dump({"cleanup": res, "containers_removed": c == "true", "networks_removed": n == "true",
+           "volumes_removed": v == "true", "disposable_removed": True, "on_failure": True},
+          open(p, "w", encoding="utf-8"), indent=2)
+PY
+  export OCE_CLEANUP_RESULT="$result"
+  return 0
+}
+
 cleanup_trap() {
   local rc=$?
-  # Attempt cleanup without masking the original exit code.
-  rm -rf "${TMP_DISPOSABLE:-}" 2>/dev/null || true
-  echo "{\"cleanup\": \"ok\", \"disposable_removed\": true}" > "$EVIDENCE/cleanup.json" 2>/dev/null || true
-  if [ -n "$FAILED_PHASE" ] && [ "$rc" -ne 0 ]; then
-    write_failure_context "$FAILED_PHASE" "$rc" || true
+  if [ "$rc" -eq 0 ] && [ -z "$FAILED_PHASE" ]; then
+    # Success: the final manifest and read-only verifier already ran against
+    # the exact package. NEVER touch the evidence directory here.
+    exit 0
   fi
+  # Failure/interrupt: collect diagnostics, attempt cleanup, record truth,
+  # then exit with the ORIGINAL code (cleanup must not mask it).
+  failure_diagnostics || true
+  failure_cleanup || true
+  write_failure_context "${FAILED_PHASE:-interrupted}" "$rc" || true
   exit "$rc"
 }
 trap cleanup_trap EXIT INT TERM
@@ -147,7 +204,7 @@ record "doctor fingerprint captured"
 
 # ── acceptance + contract tests (machine-readable) ────────────────────────
 export PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 OCE_CI_MODE="${OCE_CI_MODE:-false}" OCE_RUNNER_ACTIVE=1
-python3 -m pytest "$TEST_FILE" "$CONTRACT_TEST" "$LIFECYCLE_TEST" "$GATE_TEST" -v --tb=short \
+python3 -m pytest "$TEST_FILE" "$CONTRACT_TEST" "$LIFECYCLE_TEST" "$GATE_TEST" "$COMPOSE_OUT_TEST" "$PORTABILITY_TEST" -v --tb=short \
   --junitxml="$EVIDENCE/junit.xml" > "$EVIDENCE/acceptance-output.txt" 2>&1
 RC=$?
 tail -25 "$EVIDENCE/acceptance-output.txt"

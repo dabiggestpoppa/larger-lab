@@ -152,9 +152,9 @@ cmd_local_logs() {
 # ─── fail-closed cloud boundary ─────────────────────────────────────────────
 AUTHORIZED_FIELDS="AUTHORIZED_STAGE CLOUD_AUTHORIZATION_ENVELOPE CLOUD_PROVIDER CLOUD_PROVIDER_IDENTITY CLOUD_COST_APPROVED_USD PUBLIC_EXPOSURE_APPROVED"
 
-cmd_deploy_validate() { ensure_state; echo "cloud-plan: VALIDATE (read-only, no provider contact)"; set_field cloud_plan_state "VALIDATED_NO_APPLY"; mkdir -p "$BASE_DIR/var"; "$SCRIPT_DIR/generate-cloud-plan.sh" --mode validate; rc=$?; log_op "deploy validate cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+cmd_deploy_validate() { ensure_state; echo "cloud-plan: VALIDATE (read-only, no provider contact)"; set_field cloud_plan_state "VALIDATED_NO_APPLY"; mkdir -p "$BASE_DIR/var"; bash "$SCRIPT_DIR/generate-cloud-plan.sh" --mode validate; rc=$?; log_op "deploy validate cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
 
-cmd_deploy_plan() { ensure_state; echo "cloud-plan: PLAN (deterministic, NON-mutating, no provider contact)"; mkdir -p "$BASE_DIR/var"; "$SCRIPT_DIR/generate-cloud-plan.sh" --mode plan 2>&1 | tee "$BASE_DIR/var/cloud-plan.txt"; rc=${PIPESTATUS[0]}; log_op "deploy plan cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+cmd_deploy_plan() { ensure_state; echo "cloud-plan: PLAN (deterministic, NON-mutating, no provider contact)"; mkdir -p "$BASE_DIR/var"; bash "$SCRIPT_DIR/generate-cloud-plan.sh" --mode plan 2>&1 | tee "$BASE_DIR/var/cloud-plan.txt"; rc=${PIPESTATUS[0]}; log_op "deploy plan cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
 
 cmd_deploy_apply() {
   ensure_state
@@ -175,14 +175,14 @@ cmd_deploy_apply() {
 cmd_worker() {
   # Admission gate: authorized workers only. Calls worker-admit.sh
   shift
-  "$SCRIPT_DIR/worker-admit.sh" "$@"
+  bash "$SCRIPT_DIR/worker-admit.sh" "$@"
   rc=$?
   log_op "worker $*" "$([ $rc -eq 0 ] && echo true || echo false)"
   return $rc
 }
 
-cmd_backup() { ensure_state; "$SCRIPT_DIR/backup.sh" "$@"; rc=$?; log_op "backup" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
-cmd_restore() { ensure_state; "$SCRIPT_DIR/restore.sh" "$@"; rc=$?; log_op "restore" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+cmd_backup() { ensure_state; bash "$SCRIPT_DIR/backup.sh" "$@"; rc=$?; log_op "backup" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+cmd_restore() { ensure_state; bash "$SCRIPT_DIR/restore.sh" "$@"; rc=$?; log_op "restore" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
 
 usage() {
   cat <<'US'
