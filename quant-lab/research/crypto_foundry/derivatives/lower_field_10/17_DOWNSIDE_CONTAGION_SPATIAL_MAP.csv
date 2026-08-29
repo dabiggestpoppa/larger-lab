@@ -1,0 +1,12 @@
+layer,metric,value
+SOURCE,n_events,852.0
+SOURCE,med_abs_shock,0.1248
+SOURCE,med_rank_depth,405.0
+IMMEDIATE_PEERS,med_peer_count,10.0
+IMMEDIATE_PEERS,med_peer_touch_frac_1d,0.2
+IMMEDIATE_PEERS,med_peer_neg_frac_1d,0.5
+NEIGHBORHOOD_7D,med_peer_touch_frac_7d,0.3
+NEIGHBORHOOD_7D,med_peer_neg_frac_7d,0.5
+NEIGHBORHOOD_7D,n_secondary_assets_ratio,3.0
+FIELD_BREADTH,med_top500_breadth_30d,0.295
+FIELD_BREADTH,local_vs_field_reach,1.4599

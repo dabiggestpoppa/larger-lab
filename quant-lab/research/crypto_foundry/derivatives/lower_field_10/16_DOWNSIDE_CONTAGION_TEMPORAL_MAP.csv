@@ -1,0 +1,6 @@
+resolution,metric,median_d,p25_d,p75_d,note
+DAILY,t1_first_peer_reaction_d,1.0,1.0,1.0,
+DAILY,t3_peak_contagion_d,3.0,1.0,14.0,
+DAILY,t4_decay_d,30.0,14.0,30.0,
+DAILY,peak_neg_frac,0.725,,,
+DAILY,n_events,852.0,,,daily resolution (no PIT-safe hourly in substrate)
