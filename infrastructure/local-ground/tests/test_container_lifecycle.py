@@ -218,9 +218,11 @@ def test_ctl_full_replace_into_populated_target(oce_stack, tmp_path):
     r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
                                "SELECT v FROM replace_probe WHERE k='keep';"])
     assert r.stdout.strip() == "snapshot"
-    # redis is disposable and rebuilt, never restored
+    # full-replace NEVER touches Redis: the cache written immediately before the
+    # restore must still be present exactly as-is. This proves Redis is not
+    # restored (or rewritten) as authoritative truth, while leaving it usable.
     r = oc.dexec(oc.REDIS, ["redis-cli", "GET", "replace:cache"])
-    assert r.stdout.strip() == "", "redis restored as truth"
+    assert r.stdout.strip() == "cached", "full-replace mutated Redis (must never restore/touch it)"
 
 
 def test_ctl_corrupt_backup_rejected_against_running_stack(oce_stack, tmp_path):
