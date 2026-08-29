@@ -233,7 +233,8 @@ for name in sorted(os.listdir(ev)):
             h.update(chunk)
     artifacts.append({"path": name, "sha256": h.hexdigest(), "size": os.path.getsize(p)})
 manifest = {"block": "B1", "stage": "B1-LOCAL-GROUND-CLOSURE", "run_id": os.environ.get("OCE_RUN_ID", ""),
-            "repository": "$EXPECTED_REPO", "branch": branch, "implementation_commit": commit,
+            "repository": os.environ.get("OCE_EXPECTED_REPO", "dabiggestpoppa/larger-lab"),
+            "branch": branch, "implementation_commit": commit,
             "implementation_tree": tree, "cloud_mutations": 0, "cloud_cost_state": "ZERO",
             "cloud_activation_state": "DEFERRED_BY_OPERATOR", "artifacts": artifacts,
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}

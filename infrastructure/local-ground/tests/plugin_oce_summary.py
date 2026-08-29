@@ -29,7 +29,7 @@ def pytest_sessionfinish(session, exitstatus):
     container_failed = container_skipped = 0
     mandatory_skipped = 0
     totals = {"collected": 0, "executed": 0, "passed": 0, "failed": 0,
-              "errors": 0, "skipped": 0, "mandatory_skipped": 0}
+              "errors": 0, "skipped": 0}
     for item in collected:
         is_container = item.get_closest_marker("container") is not None
         outcome = reports.get(item.nodeid, "not-run")

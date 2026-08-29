@@ -41,6 +41,8 @@ if man.get("implementation_commit") != commit:
     errs.append("manifest commit != tested commit")
 if man.get("implementation_tree") != tree:
     errs.append("manifest tree != tested tree")
+if man.get("repository") != "dabiggestpoppa/larger-lab":
+    errs.append(f"manifest repository != dabiggestpoppa/larger-lab ({man.get('repository')!r})")
 if st.get("cloud_activation_state") != "DEFERRED_BY_OPERATOR":
     errs.append("cloud_activation_state not deferred")
 if st.get("cloud_deployment_state") != "NOT_DEPLOYED":
