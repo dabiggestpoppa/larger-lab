@@ -1,0 +1,8 @@
+shock_family,n,short_auc,mid_auc,roll_3d_auc,best_horizon,n_subperiods,note
+DOWNSIDE,2462,0.4981,0.5071,0.5032,MID(10-30d),5,outcome=propagated
+UPSIDE,1185,0.5064,0.4959,0.542,SHORT(<=7d),5,outcome=propagated
+DEEP_ILLIQ_STRESSED,660,0.495,0.5063,0.4646,MID(10-30d),5,outcome=propagated
+SHALLOW_QUIET,2987,0.5045,0.5104,0.4983,MID(10-30d),5,outcome=propagated
+CONTAGION_EVENT,1021,0.506,0.5001,0.533,SHORT(<=7d),5,outcome=stg_decoupling
+NON_CONTAGIOUS_SHOCK,2626,0.603,0.581,0.5077,SHORT(<=7d),5,outcome=absorbed
+VERDICT,,SPECIES_DEPENDENT,,,,,short memory is a general local law but horizon strength varies by family (downside/contagion > upside/quiet); no universal clock

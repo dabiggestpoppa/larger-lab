@@ -1,0 +1,10 @@
+sensor,registry_sources_found,verified_free_automated,verified_free_limited,status,note
+FUNDING,4,NO,NO,UNVERIFIED / DATA_BLOCKED,"no already-verified FREE_AUTOMATED source for this field in the current project registry; no new source integrated (no scraping, no paid data)"
+OPEN_INTEREST,4,NO,NO,UNVERIFIED / DATA_BLOCKED,"no already-verified FREE_AUTOMATED source for this field in the current project registry; no new source integrated (no scraping, no paid data)"
+LIQUIDATIONS,4,NO,NO,UNVERIFIED / DATA_BLOCKED,"no already-verified FREE_AUTOMATED source for this field in the current project registry; no new source integrated (no scraping, no paid data)"
+ORDER_BOOK_DEPTH,4,NO,NO,UNVERIFIED / DATA_BLOCKED,"no already-verified FREE_AUTOMATED source for this field in the current project registry; no new source integrated (no scraping, no paid data)"
+SPREAD,4,NO,NO,UNVERIFIED / DATA_BLOCKED,"no already-verified FREE_AUTOMATED source for this field in the current project registry; no new source integrated (no scraping, no paid data)"
+ORDER_FLOW_IMBALANCE,4,NO,NO,UNVERIFIED / DATA_BLOCKED,"no already-verified FREE_AUTOMATED source for this field in the current project registry; no new source integrated (no scraping, no paid data)"
+COLLATERAL_MARGIN,4,NO,NO,UNVERIFIED / DATA_BLOCKED,"no already-verified FREE_AUTOMATED source for this field in the current project registry; no new source integrated (no scraping, no paid data)"
+STABLECOIN_FLOWS,4,NO,NO,UNVERIFIED / DATA_BLOCKED,"no already-verified FREE_AUTOMATED source for this field in the current project registry; no new source integrated (no scraping, no paid data)"
+VERDICT,,DATA_BLOCKED_PENDING_SENSORS,,REFERENCE_ONLY,the sign-law question stays DATA_BLOCKED for major mechanical families until a free-only source is independently verified
