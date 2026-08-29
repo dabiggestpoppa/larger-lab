@@ -1,0 +1,7 @@
+subperiod,n_cells,cell_absorption_mean,cell_absorption_std,note
+2020-2021,9,0.0407,0.0646,
+2022,9,0.0529,0.06,
+2023,9,0.0874,0.1165,
+2024,9,0.1154,0.0848,
+2025-2026,9,0.079,0.0743,
+VERDICT,10,COMMON_CAPACITY_GEOMETRY,0.6922,mean cross-subperiod spearman of cell absorption = shape consistency

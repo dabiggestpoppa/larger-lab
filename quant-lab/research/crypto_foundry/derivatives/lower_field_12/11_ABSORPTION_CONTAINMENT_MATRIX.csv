@@ -1,0 +1,5 @@
+absorption,containment,n,share,p_persistent,p_rejoin,med_abs_shock,med_capacity,med_liq,note
+HIGH_ABS,HIGH_CONT,289,0.0792,0.0,0.3253,0.0988,0.6,12.3845,
+LOW_ABS,HIGH_CONT,2337,0.6408,0.3419,0.1288,0.1429,0.3,11.4582,
+LOW_ABS,LOW_CONT,1021,0.28,0.2135,0.1107,0.122,0.3025,11.1978,
+VERDICT,DISTINCT_LOCAL_ENVIRONMENTS,3647,,,,,,,cells differ in persistence (HIGH_ABS mean 0.0 vs LOW_ABS mean 0.2777): absorption-containment combos mark distinct local environments

@@ -1,0 +1,7 @@
+species,n,n_subperiods,meets_support_bar,latency_T1,peak_time_T3,radius_T7,depth_T30,persistence_T30,CONT_SPEED,CONT_DECAY,G1_fraction,G2_fraction,G3_fraction,reactivation,out_decouple,out_rejoin,peer_corr,liq_proxy,silhouette,note
+TEMP_SP0,118,5.0,YES,1.0,3.0,0.6,0.0001,0.5,0.2361,0.2,0.3,0.4,-0.2,1.0,0.0,0.0,-0.0028,11.4758,,
+TEMP_SP1,522,5.0,YES,1.0,1.0,0.2,0.0,0.4,0.0,-0.2,0.6,-0.1,-0.1,1.0,0.0,0.0,-0.0062,11.1993,,
+TEMP_SP2,134,5.0,YES,1.0,30.0,0.3,0.0887,0.8,0.0,0.3,0.4,0.0,0.3,1.0,0.0,0.0,-0.0228,11.291,,
+TEMP_SP3,24,5.0,NO,30.0,30.0,0.1,0.0,0.4,0.0,0.3,0.05,0.1,0.3,1.0,0.0,0.0,0.1714,11.0271,,
+TEMP_SP4,193,5.0,YES,1.0,7.0,0.7,0.1787,0.8,0.0,0.1,0.7,0.1,0.0,1.0,0.0,0.0,-0.0331,11.1236,,
+VERDICT,991,,,,,,,,,,,,,,,,,,0.3592,temporal-species round-2 geometry
