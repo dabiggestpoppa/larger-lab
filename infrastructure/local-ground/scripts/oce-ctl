@@ -83,8 +83,15 @@ cmd_local_up() {
   fi
   require docker
   (cd "$COMPOSE_DIR" || exit 1
-   # shellcheck disable=SC1091
-   [ -f .env ] && set -a && . ./.env && set +a
+   # Env-injected secrets win over .env placeholders (secure local injection).
+   if [ -f .env ]; then
+     while IFS= read -r line; do
+       case "$line" in \#*|"") continue ;; esac
+       k="${line%%=*}"
+       [ -n "$k" ] || continue
+       if [ -z "${!k:-}" ]; then export "$line"; fi
+     done < .env
+   fi
    docker compose -f compose.yml --profile local up -d)
   rc=$?
   log_op "local up" "$([ $rc -eq 0 ] && echo true || echo false)"
