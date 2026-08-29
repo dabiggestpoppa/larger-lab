@@ -303,6 +303,36 @@ def _parse_critic(raw: str) -> dict:
     return {}
 
 
+def _deterministic_violations(text: str, section_id: str, fact_pack,
+                              client_answers, budget, profile) -> dict:
+    """Reuse the global integrity machinery (extract_claims + check_numerics)
+    on a single section so the writer is bound to the governed fact freeze and
+    canonical budget DURING drafting. Deterministic — never delegated to the
+    model's own critic. Returns material claims with no authority and
+    unauthorized dollar figures; the factory already fails closed on these
+    after synthesis, this catches them in the revision loop."""
+    from grant_platform.factory.integrity import (
+        check_numerics, extract_claims)
+    pseudo = type("P", (), {"text": text, "model_ref": None})()
+    draft = type("D", (), {"sections": {section_id: pseudo}})()
+    ledger = extract_claims(draft.sections, fact_pack, client_answers,
+                            budget, profile)
+    bad = [c.claim_text[:160] for c in ledger.unsupported_material()]
+    nums = [n.detail for n in check_numerics(
+        ledger, budget, fact_pack, client_answers)]
+    return {"unsupported_material": bad[:6], "unauthorized_dollars": nums[:6]}
+
+
+def _draft_violation_notes(det: dict) -> list[str]:
+    out = []
+    for t in det.get("unsupported_material", []):
+        out.append(f"UNSUPPORTED MATERIAL CLAIM — remove or ground only to "
+                   f"the governed facts: \"{t}\"")
+    for n in det.get("unauthorized_dollars", []):
+        out.append(f"UNAUTHORIZED NUMERIC CLAIM — remove: {n}")
+    return out
+
+
 def draft_sections_quality(blueprint: ApplicationBlueprint, *,
                            fact_pack,
                            profile,
@@ -314,7 +344,8 @@ def draft_sections_quality(blueprint: ApplicationBlueprint, *,
                            client_answers=(),
                            applicant_status=None,
                            as_of: str = "",
-                           budget_facts=()) -> DraftingReport:
+                           budget_facts=(),
+                           budget=None) -> DraftingReport:
     """Quality drafting: plan -> draft -> critique -> revise per section,
     plus a FACT_CRITIC integrity audit whose findings force revision
     regardless of the writing-critic verdict (mission §30).
@@ -389,13 +420,21 @@ def draft_sections_quality(blueprint: ApplicationBlueprint, *,
             weaknesses = [str(w) for w in verdict.get("weaknesses", [])][:6]
             fact_verdict, fact_violations = _run_fact_critic(text)
             passes += 1
-            # Deterministic integrity outranks the writing critic (§30):
-            # FACT_CRITIC violations force revision regardless of style.
+            # Deterministic integrity outranks the writing critic (§30): the
+            # SAME extract_claims/check_numerics machinery the factory runs
+            # after synthesis also drives the revision loop, so invented
+            # material claims and unauthorized dollar figures force revision
+            # here — never left to the model's own (lenient) critic.
+            det = _deterministic_violations(
+                text, sec.section_id, fact_pack, client_answers,
+                budget, profile)
+            det_notes = _draft_violation_notes(det)
             must_revise = (overall < critic_threshold
                            or bool(fact_violations)
+                           or bool(det_notes)
                            or bool(_length_weakness(text, plan)))
             while (must_revise and revisions < max_revisions):
-                merged = weaknesses + fact_violations + \
+                merged = weaknesses + fact_violations + det_notes + \
                     _length_weakness(text, plan)
                 text = str(model_invoke(_bundle(
                     sec, plan,
@@ -413,8 +452,13 @@ def draft_sections_quality(blueprint: ApplicationBlueprint, *,
                               verdict.get("weaknesses", [])][:6]
                 fact_verdict, fact_violations = _run_fact_critic(text)
                 passes += 1
+                det = _deterministic_violations(
+                    text, sec.section_id, fact_pack, client_answers,
+                    budget, profile)
+                det_notes = _draft_violation_notes(det)
                 must_revise = (overall < critic_threshold
                                or bool(fact_violations)
+                               or bool(det_notes)
                                or bool(_length_weakness(text, plan)))
             model_runs.append({
                 "section": sec.section_id, "status": "OK",
@@ -424,7 +468,8 @@ def draft_sections_quality(blueprint: ApplicationBlueprint, *,
                 "critic_weaknesses": weaknesses,
                 "fact_critic": fact_verdict.get("integrity_verdict",
                                                 "UNKNOWN"),
-                "fact_violations": fact_violations})
+                "fact_violations": fact_violations,
+                "deterministic_violations": det})
         except Exception as exc:  # honest failure, never fake output
             sections[sec.section_id] = SectionDraft(
                 section_id=sec.section_id, title=sec.title,

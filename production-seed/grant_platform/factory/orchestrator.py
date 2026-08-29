@@ -145,7 +145,8 @@ def run_factory(*, project_id: str = "proj-1",
             client_answers=client_answers,
             applicant_status=applicant_status,
             as_of=(as_of.isoformat() if as_of else ""),
-            budget_facts=budget_facts)
+            budget_facts=budget_facts,
+            budget=budget)
     else:
         draft = draft_sections(bp, model_invoke=model_invoke,
                                model_id=model_id)

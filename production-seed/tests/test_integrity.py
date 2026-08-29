@@ -541,6 +541,98 @@ def test_over_length_section_forced_into_revision():
         "revision did not carry a deterministic LENGTH directive")
 
 
+def _run4_budget():
+    from grant_platform.factory.budget import build_budget
+    return build_budget(ceiling="182400.00", client_lines=[
+        ("Member living allowances (8 full-time MSY)", "personnel",
+         "112000.00"),
+        ("Member FICA", "personnel", "8568.00"),
+        ("Member healthcare", "personnel", "4800.00"),
+        ("Program director (0.25 FTE)", "personnel", "15600.00"),
+        ("Member recruitment", "recruitment", "4800.00"),
+        ("Member retention", "retention", "6000.00"),
+        ("Data & eval systems", "evaluation", "7200.00"),
+        ("Member training & curriculum", "training", "4800.00"),
+        ("Indirect costs (10% de minimis)", "indirect", "16377.00"),
+    ])
+
+
+def test_deterministic_draft_bound_to_fact_freeze_and_budget():
+    """G1-RUN4B regression: recycled global integrity machinery drives the
+    drafting revision loop, so a section that invents staff names, invented
+    historical-outcome statistics, or an unauthorized dollar figure is
+    flagged deterministically (never delegated to the same model) and forced
+    into revision — the writer is bound to the fact freeze + canonical budget."""
+    from grant_platform.factory.quality_drafting import (
+        _deterministic_violations)
+    from grant_platform.factory.solicitation import (
+        build_blueprint_from_solicitation)
+    fp = build_mock_fact_pack()
+    budget = _run4_budget()
+    bp = build_blueprint_from_solicitation(AMERICORPS_GA_2026)
+    answers = _answered_critical()
+
+    contaminated = (
+        "Program Director Marcus Ellison, LMSW, contributes 0.25 FTE valued "
+        "at $15,600. The Coalition's 2025 internal evaluation found academic "
+        "gains of 0.4 grade equivalents in reading. The project costs "
+        "$140,545 in federal funds and matches $57,600.")
+    det = _deterministic_violations(contaminated, "cost_effectiveness",
+                                    fp, answers, budget, AMERICORPS_GA_2026)
+    assert any("Marcus Ellison" in c for c in det["unsupported_material"]), \
+        "invented staff name not flagged as unsupported material claim"
+    assert any("2025 internal evaluation" in c
+               for c in det["unsupported_material"]), \
+        "invented historical outcome not flagged"
+    assert any("140,545" in n for n in det["unauthorized_dollars"]), \
+        "unauthorized dollar figure not flagged as numeric conflict"
+    assert not any("15,600" in n for n in det["unauthorized_dollars"]), \
+        "governed budget-line dollar was mis-flagged as unauthorized"
+
+    from grant_platform.factory.quality_drafting import (
+        draft_sections_quality)
+    calls = {"n": 0, "drafts": 0}
+    captured = {}
+    clean = ("The program will serve 32 low-income youth across two "
+             "after-school sites in Douglas County, Georgia. " * 12)
+    critic_ok = ("{\"overall\": 5, \"weaknesses\": [], "
+                 "\"verdict\": \"ACCEPT\"}")
+    fact_ok = ("{\"unsupported_numbers\": [], "
+               "\"temporal_violations\": [], \"status_violations\": [], "
+               "\"invented_entities\": [], \"tense_violations\": [], "
+               "\"integrity_verdict\": \"CLEAN\"}")
+
+    def fake_invoke(bundle):
+        calls["n"] += 1
+        instr = bundle["instructions"]
+        if "federal grant reviewer scoring" in instr:
+            return critic_ok
+        if "FACTUAL INTEGRITY auditor" in instr:
+            return fact_ok
+        n = calls["drafts"]
+        calls["drafts"] = n + 1
+        if "YOUR PREVIOUS DRAFT" in instr:
+            captured["revise_notes"] = instr
+            return clean
+        return contaminated if n == 0 else clean
+
+    rep = draft_sections_quality(
+        bp, fact_pack=fp, profile=AMERICORPS_GA_2026,
+        model_invoke=fake_invoke, model_id="test-model",
+        client_answers=answers,
+        applicant_status=ApplicantStatus("FORMULA_NEW", "mock"),
+        as_of="2026-02-27", budget=budget)
+    assert calls["drafts"] >= 2, ("contaminated draft was not forced into "
+                                   "revision")
+    assert "UNSUPPORTED MATERIAL CLAIM" in captured.get("revise_notes", ""), \
+        "revision directive did not carry the deterministic invention flag"
+    assert "UNAUTHORIZED NUMERIC CLAIM" in captured.get("revise_notes", ""), \
+        "revision directive did not carry the unauthorized-dollar flag"
+    sec = rep.sections["executive_summary"]
+    assert "Marcus Ellison" not in sec.text, (
+        "invented staff name survived into the accepted section")
+
+
 # --- mission §42-§47: adversarial tests --------------------------------------
 
 def test_adversarial_budget_invention_blocked():
