@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/local-ground/runtime-profile.schema.json",
+  "title": "OCE Local Ground — Runtime Profile",
+  "description": "Declares one of the OCE runtime targets (A-003). Enforces that the local profile is the default, and constrains the mutating/authorization posture of cloud-plan and cloud so a dry-run can never mutate and apply can never run without a signed authorization envelope.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile", "default", "mutates_external", "requires_authorization", "contact_provider", "cost"],
+  "properties": {
+    "profile": { "enum": ["local", "local-test", "local-recovery", "cloud-plan", "cloud"] },
+    "default": { "type": "boolean" },
+    "mutates_external": { "type": "boolean" },
+    "requires_authorization": { "type": "boolean" },
+    "contact_provider": { "type": "boolean" },
+    "cost": { "const": "ZERO" }
+  },
+  "if": {
+    "properties": { "profile": { "const": "cloud-plan" } },
+    "required": ["profile"]
+  },
+  "then": {
+    "properties": { "mutates_external": { "const": false }, "requires_authorization": { "const": false }, "contact_provider": { "const": false } }
+  },
+  "else": {
+    "if": {
+      "properties": { "profile": { "const": "cloud" } },
+      "required": ["profile"]
+    },
+    "then": {
+      "properties": { "mutates_external": { "const": true }, "requires_authorization": { "const": true }, "contact_provider": { "const": true } }
+    }
+  }
+}

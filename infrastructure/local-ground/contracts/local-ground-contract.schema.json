@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/local-ground/local-ground-contract.schema.json",
+  "title": "OCE Local Ground — Frozen Acceptance Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id", "stage", "decision", "amendment", "repository", "default_runtime_target",
+    "runtime_profiles", "local_data_contract", "provider_policy", "cloud_activation",
+    "ledger_model", "local_acceptance_tests", "posture"
+  ],
+  "properties": {
+    "contract_id": { "type": "string", "minLength": 1 },
+    "stage": { "const": "B1-LOCAL-GROUND-CLOSURE" },
+    "decision": { "const": "LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED" },
+    "amendment": { "const": "OCE-AMEND-A003" },
+    "repository": { "type": "object", "properties": { "full_name": { "const": "dabigestpoppa/larger-lab" } }, "required": ["full_name"], "additionalProperties": false },
+    "default_runtime_target": { "const": "local" },
+    "runtime_profiles": { "type": "array", "items": { "enum": ["local", "local-test", "local-recovery", "cloud-plan", "cloud"] }, "uniqueItems": true },
+    "local_data_contract": { "type": "object", "additionalProperties": false, "required": ["postgresql_is_authoritative_truth", "redis_is_transient_only", "artifact_storage_is_replaceable", "artifact_storage_adapter_version"], "properties": {
+      "postgresql_is_authoritative_truth": { "const": true },
+      "redis_is_transient_only": { "const": true },
+      "artifact_storage_is_replaceable": { "const": true },
+      "artifact_storage_adapter_version": { "type": "string", "minLength": 1 }
+    } },
+    "provider_policy": { "type": "object", "additionalProperties": false, "required": ["provider_values_in_deployment_adapters_only", "no_provider_hardcoded_in_domain_logic", "approved_future_target_provider", "approved_future_target_product"], "properties": {
+      "provider_values_in_deployment_adapters_only": { "const": true },
+      "no_provider_hardcoded_in_domain_logic": { "const": true },
+      "approved_future_target_provider": { "type": "string", "minLength": 1 },
+      "approved_future_target_product": { "type": "string", "minLength": 1 }
+    } },
+    "cloud_activation": { "type": "object", "additionalProperties": false, "required": ["state", "zero_cost", "zero_mutations", "purchase_decision", "no_false_dry_run_equivalence"], "properties": {
+      "state": { "const": "DEFERRED_BY_OPERATOR" },
+      "zero_cost": { "const": true },
+      "zero_mutations": { "const": true },
+      "purchase_decision": { "enum": ["RESEARCHED_DEFERRED", "RESEARCHED_PURCHASED"] },
+      "no_false_dry_run_equivalence": { "const": true }
+    } },
+    "ledger_model": { "type": "object", "additionalProperties": false, "required": ["local_ground_state", "cloud_plan_state", "cloud_activation_state", "cloud_deployment_state", "cloud_cost_state", "next_local_book", "operator_hold_reason"], "properties": {
+      "local_ground_state": { "enum": ["BUILDING", "VERIFYING", "LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW", "RATIFIED"] },
+      "cloud_plan_state": { "enum": ["NOT_VALIDATED", "VALIDATED_NO_APPLY", "APPLIED"] },
+      "cloud_activation_state": { "const": "DEFERRED_BY_OPERATOR" },
+      "cloud_deployment_state": { "enum": ["NOT_DEPLOYED", "DEPLOYED"] },
+      "cloud_cost_state": { "const": "ZERO" },
+      "next_local_book": { "const": "B2" },
+      "operator_hold_reason": { "enum": ["CLOUD_PURCHASE_DEFERRED", "NONE"] }
+    } },
+    "local_acceptance_tests": { "type": "object", "additionalProperties": false, "required": ["count", "reference"], "properties": {
+      "count": { "const": 30 },
+      "reference": { "type": "string", "minLength": 1 }
+    } },
+    "posture": { "type": "object", "additionalProperties": false, "required": ["statement"], "properties": { "statement": { "type": "string", "minLength": 1 } } }
+  }
+}
