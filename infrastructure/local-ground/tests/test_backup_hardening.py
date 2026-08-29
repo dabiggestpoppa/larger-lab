@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OCE Local Ground â€” backup/restore fail-closed hardening regressions
+"""OCE Local Ground — backup/restore fail-closed hardening regressions
 (B1-LOCAL, A-003; R18/R19).
 
 Rejects missing / absolute / parent-traversal / malformed / duplicate manifest
@@ -161,7 +161,7 @@ def test_restore_rejects_unsafe_artifact_member(tmp_path):
     assert "unsafe tar members" in combo or "corrupt tar" in combo or "failed safe validation" in combo
 
 
-# â”€â”€ recovery-contract state machine (scope/mode) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── recovery-contract state machine (scope/mode) ──────────────────────────
 def test_unknown_backup_scope_fails_closed(tmp_path):
     r = subprocess.run([_BASH, str(SCRIPTS / "backup.sh"), "--scope", "mystery",
                         "--out", str(tmp_path / "bk")], capture_output=True, text=True, timeout=60)
@@ -182,7 +182,7 @@ def test_unknown_restore_mode_fails_closed(tmp_path):
 
 def test_full_backup_blocked_without_docker_or_services():
     """A 'full' backup must BLOCK (never silently degrade) when the runtime
-    services are unavailable â€” it must not produce an incomplete backup."""
+    services are unavailable — it must not produce an incomplete backup."""
     import os
     import tempfile
     with tempfile.TemporaryDirectory() as td:
@@ -246,3 +246,34 @@ def test_incomplete_full_backup_rejected():
         # the tampered full claim lacks postgres+artifacts: full-replace must block
         r2 = _run_restore(bk, mode="full-replace", extra=["--confirm-local-target", "oce_local"])
         assert r2.returncode != 0
+
+
+def _load_pr():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("pg_recovery", str(SCRIPTS / "pg-recovery.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_inventory_verification_pure():
+    """Unit test of pg-recovery verify_inventory pure helper (no Docker)."""
+    pr = _load_pr()
+    inv = pr.parse_inventory(json.dumps({
+        "format": "oce-pg-inventory-v1", "database": "oce_local",
+        "table_count": 2, "tables": [
+            {"name": "public.state_probe", "row_count": 3},
+            {"name": "public.backup_probe", "row_count": 2}]}))
+    ok, probs = pr.verify_inventory(inv, {"public.state_probe": 3, "public.backup_probe": 2},
+                                    pr.parse_probe_spec("public.backup_probe=2"))
+    assert ok and not probs
+    ok2, probs2 = pr.verify_inventory(inv, {"public.state_probe": 3, "public.backup_probe": 9})
+    assert not ok2
+
+
+def test_sha256_file_is_deterministic():
+    """sha256_file returns a 64-char hex digest deterministically."""
+    pr = _load_pr()
+    p = str(BASE_DIR / "requirements-ci.txt")
+    assert len(pr.sha256_file(p)) == 64
+    assert pr.sha256_file(p) == pr.sha256_file(p)
