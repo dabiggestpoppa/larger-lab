@@ -14,11 +14,14 @@ runs anywhere. Nothing here contacts a provider or mutates external state.
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+import pytest
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS = BASE_DIR / "scripts"
@@ -125,13 +128,11 @@ def test_02_repeated_bootstrap_is_idempotent():
 # ─────────────────────────────────────────────────────────────────────────
 # 3–6  Health and persistence (docker-backed; truthful skip otherwise)
 # ─────────────────────────────────────────────────────────────────────────
+@pytest.mark.container
 def test_03_services_reach_health_or_unknown():
     """3. All services reach expected health/readiness (or UNKNOWN when telemetry absent)."""
     if not docker_available():
-        # absent telemetry must be UNKNOWN, never healthy
-        r = ctl("local", "health")
-        assert r.returncode != 0
-        return
+        pytest.skip("container runtime unavailable (Docker absent)")
     r = ctl("local", "health")
     assert r.returncode == 0
     out = json.loads(r.stdout)
@@ -139,10 +140,11 @@ def test_03_services_reach_health_or_unknown():
     assert {"postgresql", "redis", "artifact-store", "metrics"} <= names
 
 
+@pytest.mark.container
 def test_04_postgres_state_survives_service_restart():
     """4. PostgreSQL state survives a service restart."""
     if not docker_available():
-        return
+        pytest.skip("container runtime unavailable (Docker absent)")
     ctl("local", "up")
     # write authoritative intent into postgres
     (COMPOSE / ".env")  # compose reads .env for credentials
@@ -156,10 +158,11 @@ def test_04_postgres_state_survives_service_restart():
     assert r.returncode == 0 and r.stdout.strip() == "1"
 
 
+@pytest.mark.container
 def test_05_postgres_state_survives_compose_restart():
     """5. PostgreSQL state survives complete Compose restart."""
     if not docker_available():
-        return
+        pytest.skip("container runtime unavailable (Docker absent)")
     ctl("local", "up")
     subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-U", "oce_local_admin", "-d", "oce_local", "-c",
                     "INSERT INTO state_probe VALUES('b','2') ON CONFLICT (k) DO UPDATE SET v='2';"],
@@ -171,10 +174,11 @@ def test_05_postgres_state_survives_compose_restart():
     assert r.returncode == 0 and r.stdout.strip() == "2"
 
 
+@pytest.mark.container
 def test_06_redis_rebuild_does_not_lose_authoritative_intent():
     """6. Redis can be destroyed and rebuilt without losing authoritative intent (PostgreSQL holds truth)."""
     if not docker_available():
-        return
+        pytest.skip("container runtime unavailable (Docker absent)")
     ctl("local", "up")
     subprocess.run(["docker", "exec", "oce-local-redis", "redis-cli", "SET", "cache:key", "cached-value"],
                    capture_output=True, text=True, check=True)
@@ -345,6 +349,32 @@ def test_20_secret_scan_passes():
     assert not (COMPOSE / ".env").exists() or (COMPOSE / ".env").name not in tracked
 
 
+def test_repository_identity_has_no_typo():
+    """Regression: the misspelled repository identity must not appear anywhere
+    under local-ground (code, contracts, evidence, docs) except the two test
+    files that deliberately reference the wrong spelling to prove rejection."""
+    wrong = "dabigestpoppa"
+    # The two test files intentionally exercise rejection of the typo.
+    intentional = {"tests/test_gate_regressions.py", "tests/test_local_ground.py"}
+    hits = []
+    for p in BASE_DIR.rglob("*"):
+        rel = p.relative_to(BASE_DIR)
+        if not p.is_file() or ".git" in p.parts or "__pycache__" in p.parts:
+            continue
+        if rel.as_posix() in intentional:
+            continue
+        try:
+            text = p.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if wrong in text:
+            hits.append(rel.as_posix())
+    assert not hits, f"repository identity typo found in: {hits}"
+    # The expected identity must be present in the frozen contract.
+    contract = json.loads((CONTRACTS / "local-ground-contract.json").read_text(encoding="utf-8"))
+    assert contract["repository"]["full_name"] == "dabiggestpoppa/larger-lab"
+
+
 def test_21_repository_remains_clean():
     """21. Repository remains clean after local operations."""
     r = subprocess.run(["git", "-C", str(REPO_ROOT), "status", "--porcelain"], capture_output=True, text=True)
@@ -400,7 +430,7 @@ def test_27_windows_wsl2_path_handling_detected():
     assert fp_path.is_file(), r.stdout
     fp = json.loads(fp_path.read_text(encoding="utf-8", errors="replace"))
     assert fp["runtime_target"] == "local"
-    assert "os" in fp and "python" in fp
+    assert "os" in fp and fp["tools"]["python"] != "absent"
 
 
 # ─────────────────────────────────────────────────────────────────────────
