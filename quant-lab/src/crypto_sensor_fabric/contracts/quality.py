@@ -5,8 +5,12 @@ states (`QualityState`) are a separate, coarser layer consumed by later blocs;
 full `SensorHealth` aggregation arrives in Bloc 6.  This module only provides
 the base contract and the conservative downgrade rules that Bloc 6 will build on.
 
-Hard rule (B1-T53): a record flagged `STALE_SOURCE` must never aggregate to
-`QualityState.GOOD`.
+Hard rules:
+
+- (B1-T53) a record flagged `STALE_SOURCE` must never aggregate to
+  `QualityState.GOOD`.
+- (repair SENSOR-B1-R03) hard blocking flags (`BLOCKING_QUALITY_FLAGS`)
+  dominate every non-blocking downgrade and resolve to `QualityState.BLOCKED`.
 """
 
 from __future__ import annotations
@@ -38,13 +42,17 @@ BLOCKING_QUALITY_FLAGS: frozenset[QualityFlag] = frozenset(
 
 
 def derive_quality_state(flags: Iterable[QualityFlag]) -> QualityState:
-    """Conservative flag→state aggregation (B1-T53).
+    """Conservative flag→state aggregation (B1-T53, SENSOR-B1-R03).
 
-    Returns the most severe downgrade matching any flag, defaulting to GOOD.
+    Hard blocking flags dominate everything and resolve to BLOCKED before any
+    STALE / DEGRADED / PARTIAL / UNVERIFIED downgrade is evaluated.  Otherwise
+    returns the most severe downgrade matching any flag, defaulting to GOOD.
     Downstream layers may only preserve or further downgrade this state — they
     may never upgrade it (global acceptance principle 14).
     """
     flag_set = frozenset(flags)
+    if flag_set & BLOCKING_QUALITY_FLAGS:
+        return QualityState.BLOCKED
     for flag, state in _QUALITY_DOWNGRADES:
         if flag in flag_set:
             return state
