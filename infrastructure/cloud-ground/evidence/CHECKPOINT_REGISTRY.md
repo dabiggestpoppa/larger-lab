@@ -5,7 +5,9 @@
 | Checkpoint | Status | Evidence commit | Implementation SHA | RUN_ID | Gate |
 |---|---|---|---|---|---|
 | B1-I1 | RATIFIED / CHECKPOINTED | `3ee31b2a6` | `50bf8fe4` | `e33a841c6eb2` | READY_FOR_OPERATOR_REVIEW |
-| B1-I2 … B1-I9 | LOCKED | — | — | — | — |
+| B1-I2 … B1-I9 | LOCKED (historical) | — | — | — | — |
+| B1-LOCAL | BUILDING (A-003) | — | — | — | — |
+| B1-CLOUD-ACTIVATION | DEFERRED_BY_OPERATOR | — | — | — | — |
 
 ## B1-I1 Checkpoint Detail
 

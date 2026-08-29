@@ -89,3 +89,23 @@ purchase hold itself. The correct next action is the operator's.
 **BLOCKED** — B1-I2 provisioning is ready to execute the moment the operator
 completes the purchase and returns the sanitized host identity. No further
 agent-side work is authorized or useful until then.
+
+---
+
+## 8. Disposition after OPERATOR DECISION `LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED` (A-003)
+
+This packet is preserved as **historical truth**. Its disposition is updated by
+Amendment A-003 (2026-08-29):
+
+| Fact | Value |
+|---|---|
+| purchase decision | researched |
+| selected target | netcup RS 4000 G12 |
+| purchase | **deferred by operator** |
+| cost incurred | $0 |
+| cloud mutations | 0 |
+| future cloud activation | available through the gated activation contract (`oce-ctl deploy validate/plan/apply`, apply fails closed) |
+
+Block 1 is reclassified into **B1-LOCAL** (active, default local runtime) and
+**B1-CLOUD-ACTIVATION** (deferred, `DEFERRED_BY_OPERATOR`, not required for
+B2–B10 local development). This hold no longer blocks local OCE development.
