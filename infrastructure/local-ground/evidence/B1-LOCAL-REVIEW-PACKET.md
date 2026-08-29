@@ -1,6 +1,13 @@
 # OCE Book 1 — Local Ground Review Packet (B1-LOCAL)
 
-**Date:** 2026-08-29
+> **⚠️ SUPERSEDED 2026-08-29 (repair cycle).** This packet's readiness claim was
+> premature: Docker-backed tests were skipped locally and authoritative CI
+> failed (run `33256476708`, phase `doctor`, `wsl` FileNotFoundError). See
+> `B1-LOCAL-READINESS-CORRECTION.md`. It is preserved as truthful history; a
+> superseding packet will be published after the repair cycle's authoritative
+> CI run.
+
+**Date:** 2026-08-29 (superseded)
 **Branch:** `oce-program-build`
 **Starting SHA:** `871dd82828e2d625610e0d09ede2d04f2b72397d` (B1-I2 purchase-hold checkpoint)
 **Implementation HEAD:** `c2b2f515e5ab2bc82b4a55e638cd7de5b16c6c63`

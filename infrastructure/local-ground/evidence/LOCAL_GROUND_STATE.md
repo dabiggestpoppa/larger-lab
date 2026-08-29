@@ -7,15 +7,20 @@
 
 ## Independent ledger fields
 
-| Field | Value (2026-08-29, RUN `52f60c556f50`) |
+> **CORRECTED 2026-08-29 (repair cycle):** the previous readiness claim was
+> premature (Docker absent locally; authoritative CI failed). See
+> `B1-LOCAL-READINESS-CORRECTION.md`. Active state below until a successful
+> authoritative CI run.
+
+| Field | Value (repair cycle, pre-authoritative-CI) |
 |---|---|
-| `local_ground_state` | LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW |
-| `cloud_plan_state` | VALIDATED_NO_APPLY |
+| `local_ground_state` | VERIFYING |
+| `cloud_plan_state` | NOT_VALIDATED |
 | `cloud_activation_state` | DEFERRED_BY_OPERATOR |
 | `cloud_deployment_state` | NOT_DEPLOYED |
 | `cloud_cost_state` | ZERO |
-| `next_local_book` | B2 |
-| `operator_hold_reason` | CLOUD_PURCHASE_DEFERRED |
+| `next_local_book` | BLOCKED_PENDING_B1_REPAIR |
+| `operator_hold_reason` | AUTHORITATIVE_CI_FAILED |
 
 ## Machine-readable copy
 
@@ -28,8 +33,10 @@ The same fields are enforced by `contracts/local-ground-contract.json`
 - 2026-08-29 — A-003 ratified; Local Ground split from Cloud Activation; cloud
   purchase hold preserved as historical truth; zero cloud cost, zero cloud
   mutations.
-- 2026-08-29 — Local Ground validation passed (37 tests, 5/5 adversarial,
-  cloud apply denied, independent gate LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW,
-  RUN `52f60c556f50`); ledger fields updated to READY_FOR_OPERATOR_REVIEW /
-  VALIDATED_NO_APPLY. Cloud fields remain DEFERRED_BY_OPERATOR / NOT_DEPLOYED /
-  ZERO. Pending operator ratification before B2 begins.
+- 2026-08-29 — Local Ground static validation passed (RUN `52f60c556f50`); a
+  premature READY claim was published (superseded).
+- 2026-08-29 (repair) — Readiness claim corrected after authoritative CI
+  failed (run `33256476708`, phase `doctor`, `wsl` FileNotFoundError): state
+  is VERIFYING / NOT_VALIDATED / BLOCKED_PENDING_B1_REPAIR /
+  AUTHORITATIVE_CI_FAILED. Cloud fields remain DEFERRED_BY_OPERATOR /
+  NOT_DEPLOYED / ZERO.
