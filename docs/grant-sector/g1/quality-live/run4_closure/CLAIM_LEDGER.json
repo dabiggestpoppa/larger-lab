@@ -1,0 +1,184 @@
+{
+  "run_id": "g1-integrity-LIVE-04-2026-08-29T01:41:47.786142+00:00",
+  "summary": {
+    "total": 49,
+    "material": 49,
+    "supported": 28,
+    "unsupported": 21,
+    "by_class": {
+      "FUTURE_TARGET": 5,
+      "SOLICITATION_FACT": 5,
+      "BUDGET_DERIVED": 10,
+      "MODEL_INFERENCE": 21,
+      "CANONICAL_FACT": 3,
+      "CLIENT_ASSERTION": 5
+    },
+    "by_resolution": {
+      "SUPPORTED": 25,
+      "TARGET_ALLOWED": 3,
+      "UNSUPPORTED": 21
+    }
+  },
+  "entries": [
+    {
+      "claim_id": "cl-int-0006",
+      "claim": "Local educators report that students in grades 6 through 12, particularly those disengaging from school because of family caregiving responsibilities, transportation gaps, or limited access to credent",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0007",
+      "claim": "The Coalition's 2025 program report documents that 87 percent of youth attended thirty or more sessions in 2024-25, and that 84 percent of regularly attending youth improved their school engagement sc",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0008",
+      "claim": "The Coalition's three-year internal evaluation of 387 program participants found gains of 0.4 grade equivalents in mathematics and 0.5 in reading, with 91 percent of regularly attending seniors gradua",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0009",
+      "claim": "These results, while encouraging, remain constrained by volunteer tutor capacity and by the absence of a full-time, member-supported service infrastructure that can sustain a 32-week program year acro",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0012",
+      "claim": "Program Director Marcus Ellison, LMSW, contributing 0.25 FTE valued at $15,600 for member supervision and compliance.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0015",
+      "claim": "A youth attending every tutoring session across the full program year would receive 144 hours of direct tutoring; a youth attending the program-design intent of at least 30 sessions would receive 45 h",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0017",
+      "claim": "The summer bridge program runs four weeks at twenty hours per week, totaling 80 hours of intensive academic and enrichment programming at the LaFayette and Rossville sites.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0018",
+      "claim": "Workforce readiness workshops run monthly at each site, for 12 workshops per site and 48 workshops annually, focused on goal setting, financial literacy, professional communication, and postsecondary ",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0022",
+      "claim": "Medium-term outcomes over a one-to-two-year horizon include grade promotion, on-time graduation at a rate of 91 percent or higher among regularly attending seniors, and persistence into postsecondary ",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0023",
+      "claim": "The first is the Coalition's 2025 internal evaluation, a three-year retrospective cohort analysis comparing pre- and post-program academic records of 387 youth who participated across the 2022-23, 202",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0024",
+      "claim": "Findings included academic gains of 0.4 grade equivalents in mathematics and 0.5 in reading, and a graduation-rate advantage of 91 percent among regularly attending seniors against an 78 percent distr",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0025",
+      "claim": "The second is the Coalition's own 2024-25 prior performance measure data, showing 87 percent of youth attended thirty or more sessions and 84 percent of regularly attending youth improved school engag",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0026",
+      "claim": "The proposed program advances a significant Georgia Serves funding priority as described in NOFO A.2.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0027",
+      "claim": "All eight member placements, all four sites, and 100 percent of projected service hours are dedicated to this priority.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0028",
+      "claim": "The Coalition's design also advances an additional A.2 priority by engaging 60 leveraged community volunteers who extend member-led service in rural communities.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0032",
+      "claim": "Executive responsibility sits with Dana Whitfield, MPA, Executive Director, who holds 14 years of youth development leadership and retains ultimate fiduciary and compliance authority for the program.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0034",
+      "claim": "The organization's most recent independent audit, covering FY2025, returned an unqualified opinion.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0036",
+      "claim": "The training sequence is designed to align with the Coalition's existing evidence base, including a 2025 internal evaluation of a three-year pre/post cohort of 387 program participants, which found av",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0046",
+      "claim": "Program Director supervision and compliance is planned at 0.25 FTE ($15,600), a level adequate for eight MSYs across four sites.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    },
+    {
+      "claim_id": "cl-int-0048",
+      "claim": "The 10 percent de minimis indirect cost rate is applied to a modified total direct cost base of $163,768, yielding $16,377 in indirect costs.",
+      "section": null,
+      "evidence_ref": null,
+      "allowed_by": "",
+      "classification": null
+    }
+  ]
+}

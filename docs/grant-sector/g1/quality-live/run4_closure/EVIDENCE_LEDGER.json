@@ -1,0 +1,41 @@
+{
+  "run_id": "g1-integrity-LIVE-04-2026-08-29T01:41:47.786142+00:00",
+  "research_sources": [
+    {
+      "source_id": "census_quickfacts_dade",
+      "publisher": "U.S. Census Bureau",
+      "dataset": "QuickFacts ACS 5-year 2020-2024",
+      "official_url": "https://www.census.gov/quickfacts/dadecountygeorgia",
+      "retrieval_date": "2026-08-28",
+      "observation_period": "2020-2024",
+      "geography": "Dade County, GA",
+      "locator": "INC910224 / PEPTADR",
+      "authority_tier": "OFFICIAL_PRIMARY"
+    },
+    {
+      "source_id": "census_acs5_child_poverty_walker",
+      "publisher": "U.S. Census Bureau (ACS 5-year)",
+      "dataset": "Child poverty rate, under 18",
+      "official_url": "https://www.census.gov/programs-surveys/acs",
+      "retrieval_date": "2026-08-28",
+      "observation_period": "2020-2024",
+      "geography": "Walker County, GA",
+      "locator": "table S1701",
+      "authority_tier": "OFFICIAL_PRIMARY"
+    },
+    {
+      "source_id": "gadoe_grad_rates",
+      "publisher": "Georgia Department of Education",
+      "dataset": "Cohort graduation rates (district comparison baseline)",
+      "official_url": "https://www.gadoe.org",
+      "retrieval_date": "2026-08-28",
+      "observation_period": "2024-25",
+      "geography": "Walker / Dade / Catoosa counties, GA",
+      "locator": "CCRPI graduation data",
+      "authority_tier": "OFFICIAL_PRIMARY"
+    }
+  ],
+  "fact_pack_fact_count": 26,
+  "client_assertion_count": 3,
+  "canonical_quantities": []
+}

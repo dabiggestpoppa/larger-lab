@@ -407,6 +407,59 @@ def test_mr005_empty_first_completion_retries_with_fresh_ids(monkeypatch):
                               f"successful retry, got {calls['n']}")
 
 
+def _fallback_rate_limited_adapter(monkeypatch):
+    """Fake OpenRouter adapter: GLM/Inkling raise 429, MiniMax succeeds.
+    Records requested model ids per call and whether any id was reused."""
+    import prototype.g0.model.adapters as _adapters
+    seen_ids: set = set()
+    calls: list = []
+
+    def fake_init(self, *a, **k):
+        pass
+
+    def fake_invoke(self, *, model_request, credential):
+        mid = model_request["request_id"]
+        calls.append(model_request["model_id"])
+        assert mid not in seen_ids, ("request id reused across "
+                                     "fallback candidates (MR-005 replay)")
+        seen_ids.add(mid)
+        if model_request["model_id"] != "minimax/minimax-m3:free":
+            raise RuntimeError("HTTP 429 rate limited")
+        return {"output_text_or_structured_payload":
+                "The program will serve 32 low-income youth across two "
+                "after-school sites in Douglas County, Georgia. " * 12,
+                "finish_reason": "stop"}
+
+    fake = type("FallbackAdapter", (object,),
+                {"__init__": fake_init, "invoke": fake_invoke})
+    monkeypatch.setattr(_adapters, "OpenRouterAdapter", fake)
+    return calls
+
+
+def test_fallback_candidates_use_distinct_request_ids(monkeypatch):
+    """Regression for G1-routing fallback: when the primary approved model
+    is rate-limited, the fallback candidate must NOT be refused as an
+    MR-005 replay just because the (run, attempt) identity was reused across
+    different candidates. Each candidate needs a distinct request id."""
+    monkeypatch.setenv("OPENROUTER_API_KEY", "sk-test-g1q")
+    seen = _fallback_rate_limited_adapter(monkeypatch)
+
+    from grant_platform.factory.quality_drafting import (
+        build_quality_model_invoke)
+    model_invoke, _gw, _c = build_quality_model_invoke(
+        model_id="z-ai/glm-5.2:free")
+    bundle = {"section_id": "executive_summary",
+              "title": "Executive Summary", "notes": "",
+              "evidence": "", "protected_facts": {},
+              "instructions": "Write the executive summary."}
+    text = model_invoke(bundle).strip()
+    assert text, "fallback candidate should produce prose on rate-limit"
+    assert "minimax/minimax-m3:free" in seen, \
+        "expected fallback to reach MiniMax"
+    assert seen[0] == "z-ai/glm-5.2:free", "GLM should be attempted first"
+    assert seen.count("z-ai/glm-5.2:free") <= 2, "bounded retry on GLM"
+
+
 def test_required_empty_section_fails_qa():
     from grant_platform.factory.qa import run_full_qa
     from grant_platform.factory.solicitation import build_blueprint_from_solicitation

@@ -1,14 +1,6 @@
 {
-  "generated_at": "2026-08-28T15:46:08.636365+00:00",
-  "note": "QUALITY_CANDIDATE_01 (7c668daa) remains the pre-integrity adversarial artifact; run1/run2 are prior integrity candidates, run3 is the integrity-hardened resolved run (mission \u00a71, \u00a736, \u00a750).",
-  "candidate_01_reference": {
-    "commit": "7c668daa",
-    "words": 3023,
-    "pdf_pages": 7,
-    "claims_ledger": 4,
-    "coverage_pct": 100.0,
-    "readiness": "READY_FOR_REVIEW (invalid \u2014 see P0-01..P0-05)"
-  },
+  "generated_at": "2026-08-29T01:49:06.603334+00:00",
+  "note": "RUN1/2/3 are prior integrity evidence; RUN4 is the fresh final closure run under the governed approved free model pool (mission \u00a71-\u00a73).",
   "run1_blocked": {
     "run_id": "g1-integrity-LIVE-01-2026-08-28T12:20:43.523998+00:00",
     "words": 4293,
@@ -68,5 +60,24 @@
     "artifact_label": "DRAFT_BLOCKED",
     "model_calls": 4,
     "revisions": 0
+  },
+  "run4_closure": {
+    "run_id": "g1-integrity-LIVE-04-2026-08-29T01:41:47.786142+00:00",
+    "words": 2933,
+    "pdf_pages": 7,
+    "coverage_pct": 100.0,
+    "claims_total": 49,
+    "claims_material": 49,
+    "claims_supported": 28,
+    "claims_unsupported": 21,
+    "model_inference_material": 21,
+    "critical_gaps": [],
+    "temporal_conflicts": 0,
+    "numeric_conflicts": 4,
+    "budget_conflicts": 4,
+    "readiness": "QA_BLOCKED",
+    "artifact_label": "DRAFT_BLOCKED",
+    "model_calls": 45,
+    "revisions": 11
   }
 }

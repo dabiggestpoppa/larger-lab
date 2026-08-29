@@ -547,13 +547,16 @@ def build_quality_model_invoke(model_id: str =
 
     def build_req(i: int, attempt: int, bundle: dict, requested_model: str | None = None) -> dict:
         """MR-005 fix: each gateway execution attempt carries a FRESH
-        request id. A bounded retry after an empty free-tier completion is a
-        NEW execution attempt, never a replay of the same id. The logical
-        task_id stays stable across attempts so one-shot replay protection
-        still blocks a genuinely repeated id (mission §3)."""
+        request id. The id must distinguish run, section/pass, candidate
+        model, and attempt — a bounded retry or a fallback to another
+        approved model is a NEW execution, never a replay (G1 routing §6).
+        The logical task_id stays stable across attempts so one-shot replay
+        protection still blocks a genuinely repeated id."""
+        req_model = (requested_model or model_id).split("/")[-1]
+        model_slug = re.sub(r"[^A-Za-z0-9]", "-", req_model)[:28]
         return {
-            "model_request_id": f"g1q-m-{i}-a{attempt}",
-            "request_id": f"g1q-r-{i}-a{attempt}",
+            "model_request_id": f"g1q-m-{i}-{model_slug}-a{attempt}",
+            "request_id": f"g1q-r-{i}-{model_slug}-a{attempt}",
             "tenant_id": tenant_id, "project_id": project_id,
             "principal_id": "g1-quality-ceo",
             "task_id": f"task-g1q-{i}",

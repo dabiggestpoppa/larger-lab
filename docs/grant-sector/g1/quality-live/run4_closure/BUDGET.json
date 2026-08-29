@@ -1,0 +1,105 @@
+{
+  "run_id": "g1-integrity-LIVE-04-2026-08-29T01:41:47.786142+00:00",
+  "ceiling": "182400.00",
+  "lines": [
+    {
+      "label": "Member living allowances (8 full-time MSY)",
+      "category": "personnel",
+      "amount": "112000.00"
+    },
+    {
+      "label": "Member FICA (7.65% of allowances)",
+      "category": "personnel",
+      "amount": "8568.00"
+    },
+    {
+      "label": "Member healthcare assistance",
+      "category": "personnel",
+      "amount": "4800.00"
+    },
+    {
+      "label": "Program director (0.25 FTE) \u2014 supervision & compliance",
+      "category": "personnel",
+      "amount": "15600.00"
+    },
+    {
+      "label": "Member recruitment \u2014 advertising, campus visits, screening",
+      "category": "recruitment",
+      "amount": "4800.00"
+    },
+    {
+      "label": "Member retention \u2014 certifications, coaching, recognition",
+      "category": "retention",
+      "amount": "6000.00"
+    },
+    {
+      "label": "Data collection & evaluation systems",
+      "category": "evaluation",
+      "amount": "7200.00"
+    },
+    {
+      "label": "Member training plan & tutoring curriculum",
+      "category": "training",
+      "amount": "4800.00"
+    },
+    {
+      "label": "Indirect costs (10% de minimis)",
+      "category": "indirect",
+      "amount": "16377.00"
+    }
+  ],
+  "match_requirement": "24% grantee match for first three-year funding period (cost reimbursement grants)",
+  "budget_conflicts": [
+    {
+      "kind": "BUDGET_DRIFT",
+      "detail": "dollar figure $140,545 in prose is not a canonical budget amount (unauthorized numeric claim)",
+      "section_a": "cost_effectiveness",
+      "section_b": ""
+    },
+    {
+      "kind": "BUDGET_DRIFT",
+      "detail": "dollar figure $14,000 in prose is not a canonical budget amount (unauthorized numeric claim)",
+      "section_a": "cost_effectiveness",
+      "section_b": ""
+    },
+    {
+      "kind": "BUDGET_DRIFT",
+      "detail": "dollar figure $14,000 in prose is not a canonical budget amount (unauthorized numeric claim)",
+      "section_a": "cost_effectiveness",
+      "section_b": ""
+    },
+    {
+      "kind": "BUDGET_DRIFT",
+      "detail": "dollar figure $163,768, in prose is not a canonical budget amount (unauthorized numeric claim)",
+      "section_a": "cost_effectiveness",
+      "section_b": ""
+    }
+  ],
+  "numeric_conflicts": [
+    {
+      "kind": "BUDGET_DRIFT",
+      "detail": "dollar figure $140,545 in prose is not a canonical budget amount (unauthorized numeric claim)",
+      "section_a": "cost_effectiveness",
+      "section_b": ""
+    },
+    {
+      "kind": "BUDGET_DRIFT",
+      "detail": "dollar figure $14,000 in prose is not a canonical budget amount (unauthorized numeric claim)",
+      "section_a": "cost_effectiveness",
+      "section_b": ""
+    },
+    {
+      "kind": "BUDGET_DRIFT",
+      "detail": "dollar figure $14,000 in prose is not a canonical budget amount (unauthorized numeric claim)",
+      "section_a": "cost_effectiveness",
+      "section_b": ""
+    },
+    {
+      "kind": "BUDGET_DRIFT",
+      "detail": "dollar figure $163,768, in prose is not a canonical budget amount (unauthorized numeric claim)",
+      "section_a": "cost_effectiveness",
+      "section_b": ""
+    }
+  ],
+  "derived_conflicts": []
+}

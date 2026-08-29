@@ -1,0 +1,60 @@
+{
+  "run_id": "g1-integrity-LIVE-04-2026-08-29T01:41:47.786142+00:00",
+  "gates": [
+    {
+      "gate": "all_sections_drafted",
+      "status": "PASS",
+      "detail": "all 5 sections substantive"
+    },
+    {
+      "gate": "word_limits_satisfied",
+      "status": "PASS",
+      "detail": "all 5 sections within per-section limits"
+    },
+    {
+      "gate": "budget_within_ceiling",
+      "status": "PASS",
+      "detail": "total 180145.00 vs ceiling 182400.00"
+    },
+    {
+      "gate": "deadline_correct",
+      "status": "PASS",
+      "detail": "solicitation deadline February 27, 2026 3:00 PM EST bound to blueprint"
+    },
+    {
+      "gate": "revision_correct",
+      "status": "PASS",
+      "detail": "revision ga_dca_nofp_2026 tracked in provenance, not prose"
+    },
+    {
+      "gate": "required_terminology",
+      "status": "PASS",
+      "detail": "all required terminology present"
+    },
+    {
+      "gate": "no_unsupported_material_claims",
+      "status": "PASS",
+      "detail": "0 unresolved material claim(s) remain"
+    },
+    {
+      "gate": "no_fabricated_partnerships",
+      "status": "PASS",
+      "detail": "no partnership assertions without evidence"
+    },
+    {
+      "gate": "submission_disabled",
+      "status": "PASS",
+      "detail": "submission structurally disabled"
+    },
+    {
+      "gate": "numeric_consistency",
+      "status": "FAIL",
+      "detail": "4 numeric contradiction(s)"
+    }
+  ],
+  "readiness": "QA_BLOCKED",
+  "blockers": [
+    "4 numeric contradiction(s)",
+    "20 unsupported/unresolved material claim(s) with no governed authority"
+  ]
+}

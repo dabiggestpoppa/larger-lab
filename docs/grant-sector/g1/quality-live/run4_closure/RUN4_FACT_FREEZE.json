@@ -1,0 +1,271 @@
+{
+  "run_id": "g1-integrity-LIVE-04-2026-08-29T01:41:47.786142+00:00",
+  "as_of": "2026-02-27",
+  "solicitation": {
+    "funder": "Georgia Commission for Service and Volunteerism (Georgia Serves) / AmeriCorps",
+    "title": "Fiscal Year 2026 AmeriCorps State and National \u2014 Georgia Formula Grant",
+    "sha256": "2da45a4c24a5cc483f329e926a70bf5e54fff0bc6c23f9610f282c07d955e8cb",
+    "deadline": "February 27, 2026 3:00 PM EST",
+    "narrative_page_limit": 11
+  },
+  "organization": {
+    "label": "MOCK_EVALUATION_ORGANIZATION",
+    "legal_name": "Rural Georgia Youth Development Coalition, Inc.",
+    "facts": [
+      {
+        "fact_id": "legal_name",
+        "category": "identity",
+        "value": "Rural Georgia Youth Development Coalition, Inc.",
+        "source": "Mock org charter"
+      },
+      {
+        "fact_id": "ein",
+        "category": "identity",
+        "value": "58-2345671",
+        "source": "Mock IRS records"
+      },
+      {
+        "fact_id": "founded",
+        "category": "identity",
+        "value": 2012,
+        "source": "Mock org charter"
+      },
+      {
+        "fact_id": "sam_uei",
+        "category": "identity",
+        "value": "JJ7KQM4XLYY3",
+        "source": "Mock SAM registration"
+      },
+      {
+        "fact_id": "address",
+        "category": "identity",
+        "value": "1420 Elm Street, LaFayette, GA 30728",
+        "source": "Mock org charter"
+      },
+      {
+        "fact_id": "mission",
+        "category": "mission",
+        "value": "To expand educational and economic opportunity for rural Northwest Georgia youth through mentoring, tutoring, and workforce readiness.",
+        "source": "Mock org charter"
+      },
+      {
+        "fact_id": "service_area",
+        "category": "geography",
+        "value": "Walker, Dade, and Catoosa counties in Northwest Georgia",
+        "source": "Mock program records"
+      },
+      {
+        "fact_id": "population",
+        "category": "population",
+        "value": "Students in grades 6-12 in rural Northwest Georgia, with a focus on youth at risk of disengaging from school",
+        "source": "Mock program records"
+      },
+      {
+        "fact_id": "youth_served",
+        "category": "outcomes",
+        "value": 420,
+        "source": "Mock 2025 program report"
+      },
+      {
+        "fact_id": "programs",
+        "category": "programs",
+        "value": [
+          "After-school tutoring in LaFayette and Trenton (4 sites)",
+          "Summer bridge program",
+          "Workforce readiness workshops"
+        ],
+        "source": "Mock program records"
+      },
+      {
+        "fact_id": "staff_ft",
+        "category": "staffing",
+        "value": 7,
+        "source": "Mock payroll"
+      },
+      {
+        "fact_id": "staff_pt",
+        "category": "staffing",
+        "value": 11,
+        "source": "Mock payroll"
+      },
+      {
+        "fact_id": "exec_director",
+        "category": "staffing",
+        "value": "Dana Whitfield, MPA \u2014 14 years youth development leadership",
+        "source": "Mock org records"
+      },
+      {
+        "fact_id": "program_dir",
+        "category": "staffing",
+        "value": "Marcus Ellison, LMSW \u2014 supervises site coordinators and member programming",
+        "source": "Mock org records"
+      },
+      {
+        "fact_id": "finance_controls",
+        "category": "capacity",
+        "value": "Annual independent audit (last: FY2025, unqualified opinion); segregation of duties; board-approved procurement policy; QuickBooks-based grant cost tracking by award",
+        "source": "Mock audit letter"
+      },
+      {
+        "fact_id": "board",
+        "category": "capacity",
+        "value": 13,
+        "source": "Mock board roster"
+      },
+      {
+        "fact_id": "facilities",
+        "category": "capacity",
+        "value": "LaFayette community center HQ plus 3 partner school sites",
+        "source": "Mock facility agreements"
+      },
+      {
+        "fact_id": "budget_annual",
+        "category": "financial",
+        "value": 1150000,
+        "source": "Mock FY2026 board-approved budget"
+      },
+      {
+        "fact_id": "match_ability",
+        "category": "financial",
+        "value": "Board-committed cash match of $39,600/yr plus in-kind space valued at $18,000/yr \u2014 covers 24% match requirement",
+        "source": "Mock board resolution 2025-11-18"
+      },
+      {
+        "fact_id": "funding_history",
+        "category": "financial",
+        "value": [
+          "21st CCLC (2019-2024)",
+          "Schafer Family Foundation (2023-2026)",
+          "United Way of Northwest Georgia (2022-2026)"
+        ],
+        "source": "Mock grant ledger"
+      },
+      {
+        "fact_id": "evidence_study",
+        "category": "outcomes",
+        "value": "2025 internal evaluation: 3-year pre/post cohort (n=387) of program participants \u2014 +0.4 grade equivalents in math, +0.5 in reading; 91% of regularly attending seniors graduated on time vs 78% district comparison",
+        "source": "Mock 2025 evaluation report"
+      },
+      {
+        "fact_id": "prior_outcomes",
+        "category": "outcomes",
+        "value": "2024-25: 87% of youth attended 30+ sessions; 84% of regularly attending youth improved school engagement scores",
+        "source": "Mock 2025 program report"
+      },
+      {
+        "fact_id": "msy_target",
+        "category": "planning",
+        "value": 8,
+        "source": "Board-approved 2026 AmeriCorps plan"
+      },
+      {
+        "fact_id": "member_count",
+        "category": "planning",
+        "value": 8,
+        "source": "Board-approved 2026 AmeriCorps plan"
+      },
+      {
+        "fact_id": "leveraged_volunteers",
+        "category": "planning",
+        "value": 60,
+        "source": "Board-approved 2026 AmeriCorps plan"
+      },
+      {
+        "fact_id": "sites",
+        "category": "planning",
+        "value": "LaFayette HS, Ridgeville MS, Trenton Elementary, Rossville Community Center",
+        "source": "Board-approved 2026 AmeriCorps plan"
+      }
+    ]
+  },
+  "client_assertions": [
+    {
+      "fact_id": "member_dosage",
+      "value": "Each member serves a full-time 1,700-hour term: 32 hours per week delivering 3 tutoring sessions per week of 90 minutes each across a 32-week program year",
+      "label": "MOCK_CLIENT_ASSERTION",
+      "answered_at": "2026-08-29T01:41:47.786142+00:00"
+    },
+    {
+      "fact_id": "activity_schedule",
+      "value": "Tutoring runs 3 afternoons per week per site in 90-minute sessions; summer bridge runs 4 weeks at 20 hours per week; workforce workshops run monthly (12 per year)",
+      "label": "MOCK_CLIENT_ASSERTION",
+      "answered_at": "2026-08-29T01:41:47.786142+00:00"
+    },
+    {
+      "fact_id": "prior_americorps",
+      "value": "NEW \u2014 the organization has never received AmeriCorps or Georgia Serves funding",
+      "label": "MOCK_CLIENT_ASSERTION",
+      "answered_at": "2026-08-29T01:41:47.786142+00:00"
+    }
+  ],
+  "budget_facts": [
+    {
+      "label": "Member living allowances (8 full-time MSY)",
+      "category": "personnel",
+      "amount": "112000.00"
+    },
+    {
+      "label": "Member FICA (7.65% of allowances)",
+      "category": "personnel",
+      "amount": "8568.00"
+    },
+    {
+      "label": "Member healthcare assistance",
+      "category": "personnel",
+      "amount": "4800.00"
+    },
+    {
+      "label": "Program director (0.25 FTE) \u2014 supervision & compliance",
+      "category": "personnel",
+      "amount": "15600.00"
+    },
+    {
+      "label": "Member recruitment \u2014 advertising, campus visits, screening",
+      "category": "recruitment",
+      "amount": "4800.00"
+    },
+    {
+      "label": "Member retention \u2014 certifications, coaching, recognition",
+      "category": "retention",
+      "amount": "6000.00"
+    },
+    {
+      "label": "Data collection & evaluation systems",
+      "category": "evaluation",
+      "amount": "7200.00"
+    },
+    {
+      "label": "Member training plan & tutoring curriculum",
+      "category": "training",
+      "amount": "4800.00"
+    },
+    {
+      "label": "Indirect costs (10% de minimis)",
+      "category": "indirect",
+      "amount": "16377.00"
+    }
+  ],
+  "budget_ceiling": "182400.00",
+  "applicant_status": {
+    "status": "FORMULA_NEW",
+    "basis": "MOCK_CLIENT_ASSERTION: never received AmeriCorps/Georgia Serves funding; new applicants apply via formula funding (NOFO C.1/B.1)"
+  },
+  "research_sources": [
+    {
+      "source_id": "census_quickfacts_dade",
+      "publisher": "U.S. Census Bureau",
+      "dataset": "QuickFacts ACS 5-year 2020-2024"
+    },
+    {
+      "source_id": "census_acs5_child_poverty_walker",
+      "publisher": "U.S. Census Bureau (ACS 5-year)",
+      "dataset": "Child poverty rate, under 18"
+    },
+    {
+      "source_id": "gadoe_grad_rates",
+      "publisher": "Georgia Department of Education",
+      "dataset": "Cohort graduation rates (district comparison baseline)"
+    }
+  ],
+  "_freeze_sha256": "0cc913d9bea1d08d5d976328c3ba8ec2349001dd460e20ab9525c9af17c14c4b"
+}
