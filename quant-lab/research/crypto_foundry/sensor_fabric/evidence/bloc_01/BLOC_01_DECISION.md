@@ -1,6 +1,18 @@
 # BLOC 1 — DECISION
 
-**Status:** `PASS_BLOC_01_REPAIRS_READY_FOR_OPERATOR_REVIEW`
+**Status:** `PASS_BLOC_01_CONTRACTS_FROZEN` — **OPERATOR RATIFIED**
+
+Operator ratification recorded at review head `e61240315314d53d000e4e8ca44566adc11c8cc7`:
+
+    operator_ratified = TRUE
+    human_review_required = TRUE
+    Bloc 2 implementation_authorized = TRUE
+
+Repair history accepted: SENSOR-B1-R01 (`3f4b97da`), R02 (`381b224b`), R03
+(`12750cf1`), R04 (`bc179d53`); revalidation head `e6124031` (177 passed / 0
+failed, Ruff clean, JSON-schema drift clean).  The previous
+`PASS_BLOC_01_REPAIRS_READY_FOR_OPERATOR_REVIEW` status is superseded by this
+ratification.
 
 **Previous decision (superseded by operator review):** `PASS_BLOC_01_CONTRACTS_FROZEN` was
 issued at `eaf7a543`.  The operator review (verdict `PASS_WITH_REQUIRED_AMENDMENTS`,

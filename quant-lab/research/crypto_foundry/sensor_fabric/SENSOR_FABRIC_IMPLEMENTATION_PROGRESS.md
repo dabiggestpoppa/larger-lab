@@ -10,10 +10,12 @@ that is updated at every staged checkpoint.
 
 | Field | Value |
 |---|---|
-| Current Bloc | 1 — CONTRACTS & SEMANTICS FOUNDATION |
-| Current checkpoint | SENSOR-B1-R04 (repairs complete) — DONE |
-| Bloc 1 verdict | PASS_BLOC_01_REPAIRS_READY_FOR_OPERATOR_REVIEW (ratification of PASS_BLOC_01_CONTRACTS_FROZEN pending operator review; see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | AWAITING OPERATOR RATIFICATION — repairs R01-R04 applied, stop gate active, Bloc 2 on hold |
+| Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
+| Current checkpoint | SENSOR-B1-R06 (ratification) — DONE; SENSOR-B2-I01 pending |
+| Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
+| Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
+| human_review_required | TRUE |
+| Bloc 2 implementation_authorized | TRUE |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
@@ -60,9 +62,11 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- **STOP GATE**: Bloc 2 (Historical Capability Probe Harness) requires operator
-  RATIFICATION of Bloc 1 after repairs R01–R04.  Do not begin until the operator
-  says to continue.
+- SENSOR-B2-I01: probe-core-models
+  - CapabilityProbeRequest / CapabilityProbeAttempt / CapabilityProbeEvidence /
+    CapabilityClaim, required enums, failure taxonomy, deterministic
+    serialization, secret redaction
+  - gate: model / access-free-only / failure-basics tests green
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
