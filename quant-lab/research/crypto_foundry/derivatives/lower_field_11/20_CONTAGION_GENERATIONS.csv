@@ -1,0 +1,6 @@
+generation,n,median,mean,p25,p75
+G1_fraction,1021,0.5,0.5085,0.3,0.7
+G2_fraction,1021,0.0,0.0171,-0.2,0.2
+G3_fraction,1021,0.0,-0.0229,-0.2,0.2
+G2_given_G1_HIGH,584,-0.1,,,
+G2_given_G1_LOW,437,0.2,,,

@@ -1,0 +1,4 @@
+coordinate,n,upside_rate,delta,note
+BASELINE,3647,0.1393,,
+PRIOR_REJOIN,345,0.1797,0.0404,
+VERDICT,3647,STATE_LOCAL,,does upside require accumulated permission/recruitment?

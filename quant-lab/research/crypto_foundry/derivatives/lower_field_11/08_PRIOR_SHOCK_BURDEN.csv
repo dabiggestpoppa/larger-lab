@@ -1,0 +1,13 @@
+burden_construct,coordinate,n,abs_spearman,p,purged_auc_absorbed
+count_90d,cnt_prev_90d,1128,0.158,0.0,0.6012
+sumabs_90d,sumabs_prev_90d,1128,0.055,0.066,0.5554
+max_90d,maxabs_prev_90d,1128,-0.002,0.944,0.4846
+days_since_prior,days_since_prior,2226,-0.143,0.0,0.6115
+mem_exp_sum,mem_exp_sum,1874,0.116,0.0,0.5937
+down_only_90d,cnt_down_prev_90d,1128,,,0.5548
+up_only_90d,cnt_up_prev_90d,1128,,,0.5299
+same_dir_90d,cnt_same_prev_90d,1128,,,0.5314
+opp_dir_90d,cnt_opp_prev_90d,1128,,,0.5425
+sumabs_same_90d,sumabs_same_prev_90d,1128,,,0.5107
+sumabs_opp_90d,sumabs_opp_prev_90d,1128,,,0.4894
+VERDICT,days_since_prior,3647,,,

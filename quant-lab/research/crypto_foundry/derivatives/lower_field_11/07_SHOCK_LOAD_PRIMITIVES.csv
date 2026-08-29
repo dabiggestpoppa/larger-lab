@@ -1,0 +1,13 @@
+primitive,value,type,abs_spearman,prop_spearman,p_absorbed,p_propagated,abs_band,sigma_supp_r_absorption,p,n,note
+absolute_magnitude,abs_ret,CONTINUOUS,-0.113,-0.071,,,,,,,
+sigma_surprise,z1,CONTINUOUS,0.011,-0.013,,,,,,,
+duration_proxy,IMPULSE,CATEGORICAL,,,0.0823,0.2846,,,,,
+duration_proxy,MULTI_DAY,CATEGORICAL,,,0.0908,0.2269,,,,,
+duration_proxy,SUSTAINED_1_3D,CATEGORICAL,,,0.0631,0.3088,,,,,
+acceleration,accel_shock,CONTINUOUS,-0.026,-0.033,,,,,,,
+gap_jump,gap_jump,CONTINUOUS,0.011,-0.013,,,,,,,
+liquidity_context,liq_proxy,CONTINUOUS,0.166,-0.1,,,,,,,
+peer_relative_disp,peer_rel_disp,CONTINUOUS,-0.128,-0.005,,,,,,,
+rank_relative_disp,rank_rel_disp,CONTINUOUS,0.004,0.171,,,,,,,
+,,,,,,,5-10%,0.089,0.029,601.0,physical amplitude held fixed
+,,,,,,,10-20%,0.054,0.056,1280.0,physical amplitude held fixed
