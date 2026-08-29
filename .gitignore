@@ -111,3 +111,7 @@ argo-ref/
 .po_heartbeat_state.json
 .memory-sync-daemon.status.json
 .git_commit_msg.txt
+
+# OCE Local Ground runtime state (A-003)
+infrastructure/local-ground/var/
+infrastructure/local-ground/compose/.env
