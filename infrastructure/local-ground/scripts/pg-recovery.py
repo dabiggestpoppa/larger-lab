@@ -172,16 +172,26 @@ def promote_databases(container, user, canonical, quarantine, staging):
                                f'ALTER DATABASE "{staging}" RENAME TO "{canonical}";'])
 
 
+def _observed_payload(inventory, probe, observed):
+    """Collapse observed rows into a compact {table: count} dict for receipts."""
+    return {t: observed.get(t) for t in sorted(set(capture_inventory_rows(inventory)) | set(probe))}
+
+
 def recovery_main(archive, inventory_path, inventory_sha_path, db, user, container,
                   probe_spec=None):
     receipt = {"format": "oce-pg-recovery-receipt-v1",
                "database": db, "source_archive_sha256": "",
                "source_commit": os.environ.get("OCE_COMMIT", "unknown"),
                "run_id": os.environ.get("OCE_RUN_ID", "not-set"),
+               "source_database": db, "target_database": db,
                "staging_database": None, "quarantine_database": None,
+               "postgres_version": "", "inventory_summary": None,
+               "staging_verification": None, "canonical_verification": None,
+               "promotion": "not-attempted",
                "started_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
     stamp = hashlib.sha256(os.urandom(8)).hexdigest()[:12]
     quarantine = f"oce_local_quarantine_{stamp}"
+    receipt["quarantine_database"] = quarantine
     remote = None
     try:
         # 0. confirm the protected inventory hash matches its JSON
@@ -191,11 +201,24 @@ def recovery_main(archive, inventory_path, inventory_sha_path, db, user, contain
             raise RuntimeError("database inventory tampered (SHA mismatch)")
         inventory = parse_inventory(inv_doc)
         probe = parse_probe_spec(probe_spec)
+        inv_row_counts = capture_inventory_rows(inventory)
+        watch = list(set(inv_row_counts) | set(probe))
+        # A full-replace recovery that cannot enumerate truth must fail closed:
+        # an empty inventory cannot prove any row was recovered.
+        if not watch:
+            raise RuntimeError("database inventory lists no tables to verify (incomplete backup)")
         # 1. archive validation + hash
         receipt["source_archive_sha256"] = sha256_file(archive)
         remote = clone_archive_into_container(container, archive)
         validate_archive(container, remote)
         receipt["archive_validated"] = True
+        # 2. postgres version + inventory summary
+        ver = docker_exec(container, ["psql", "-X", "-A", "-t", "-U", user, "-d", db,
+                                      "-c", "SHOW server_version;"])
+        receipt["postgres_version"] = ver.stdout.decode(errors="replace").strip() if ver.returncode == 0 else ""
+        receipt["inventory_summary"] = {"database": inventory.get("database"),
+                                         "table_count": inventory.get("table_count") or len(inv_row_counts),
+                                         "tables": sorted(inv_row_counts)}
         # 3. staging db
         staging = create_staging_db(container, user, db, stamp)
         receipt["staging_database"] = staging
@@ -208,27 +231,39 @@ def recovery_main(archive, inventory_path, inventory_sha_path, db, user, contain
         if r.returncode != 0:
             raise RuntimeError("pg_restore into staging failed: "
                                + r.stderr.decode(errors="replace"))
-        # 5. verify staging
-        obs = collect_observed_rows(container, staging, user, list(
-            set(capture_inventory_rows(inventory)) | set(probe)))
+        # 5. verify staging (non-vacuous: exact row counts per table + probes)
+        obs = collect_observed_rows(container, staging, user, watch)
         ok, problems = verify_inventory(inventory, obs, probe)
+        receipt["staging_verification"] = {"result": "ok" if ok else "failed",
+                                            "tables": _observed_payload(inventory, probe, obs)}
         if not ok:
             raise RuntimeError("staging verification FAILED: " + "; ".join(problems))
-        # 6+7. terminate local target connections, then promote
+        # 6+7. terminate only local target connections, then promote
         psql(container, db, user,
              "SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
              "WHERE datname = current_database() AND pid <> pg_backend_pid();")
         promote_databases(container, user, db, quarantine, staging)
         receipt["promoted"] = True
-        # 8. verify canonical now
-        obs2 = collect_observed_rows(container, db, user, list(
-            set(capture_inventory_rows(inventory)) | set(probe)))
+        receipt["promotion"] = "ok"
+        # 8. verify canonical after promote
+        obs2 = collect_observed_rows(container, db, user, watch)
         ok2, problems2 = verify_inventory(inventory, obs2, probe)
+        receipt["canonical_verification"] = {"result": "ok" if ok2 else "failed",
+                                              "tables": _observed_payload(inventory, probe, obs2)}
         if not ok2:
             raise RuntimeError("canonical target verification FAILED after promote: " + "; ".join(problems2))
         # 9. drop quarantine
         drop_db(container, user, db, quarantine)
         receipt["quarantine_dropped"] = True
+        # 10. FINAL fail-closed re-verification of the canonical target AFTER the
+        # quarantine is removed — exit 0 must mean the rows are still present now.
+        obs3 = collect_observed_rows(container, db, user, watch)
+        ok3, problems3 = verify_inventory(inventory, obs3, probe)
+        receipt["final_verification"] = {"result": "ok" if ok3 else "failed",
+                                          "tables": _observed_payload(inventory, probe, obs3)}
+        if not ok3:
+            raise RuntimeError("final canonical verification FAILED after quarantine drop: "
+                               + "; ".join(problems3))
         receipt["finished_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         receipt["exit_status"] = 0
         receipt["redis_restored"] = False
