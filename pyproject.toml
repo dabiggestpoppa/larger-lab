@@ -58,3 +58,7 @@ dev = [
 [tool.pytest.ini_options]
 pythonpath = ["quant-lab/src"]
 testpaths = ["quant-lab/tests"]
+# Test packages under quant-lab/tests/crypto_sensor_fabric share the src package
+# name; importlib mode keeps sys.path clean so `crypto_sensor_fabric` resolves
+# to quant-lab/src instead of the tests tree.
+addopts = "--import-mode=importlib"
