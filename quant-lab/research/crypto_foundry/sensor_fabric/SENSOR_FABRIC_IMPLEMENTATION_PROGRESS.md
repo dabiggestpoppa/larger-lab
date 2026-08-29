@@ -11,9 +11,9 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 1 — CONTRACTS & SEMANTICS FOUNDATION |
-| Current checkpoint | SENSOR-B1-06 (evidence + Bloc 1 decision) — DONE |
-| Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | AWAITING OPERATOR — Bloc 1 complete, stop gate active |
+| Current checkpoint | SENSOR-B1-R04 (repairs complete) — DONE |
+| Bloc 1 verdict | PASS_BLOC_01_REPAIRS_READY_FOR_OPERATOR_REVIEW (ratification of PASS_BLOC_01_CONTRACTS_FROZEN pending operator review; see evidence/bloc_01/BLOC_01_DECISION.md) |
+| Operator review state | AWAITING OPERATOR RATIFICATION — repairs R01-R04 applied, stop gate active, Bloc 2 on hold |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
@@ -32,6 +32,10 @@ that is updated at every staged checkpoint.
 | SENSOR-B1-04 | 25 | 25 | 0 |
 | SENSOR-B1-05 | 14 | 14 | 0 |
 | SENSOR-B1-06 | 0 (evidence only) | — | — |
+| SENSOR-B1-R01 | 6 | 6 | 0 |
+| SENSOR-B1-R02 | 7 | 7 | 0 |
+| SENSOR-B1-R03 | 8 | 8 | 0 |
+| SENSOR-B1-R04 | 8 | 8 | 0 |
 
 ## External / provider blockers
 
@@ -57,7 +61,8 @@ that is updated at every staged checkpoint.
 ## Next checkpoint
 
 - **STOP GATE**: Bloc 2 (Historical Capability Probe Harness) requires operator
-  approval of the Bloc 1 report.  Do not begin until the operator says to continue.
+  RATIFICATION of Bloc 1 after repairs R01–R04.  Do not begin until the operator
+  says to continue.
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -77,4 +82,9 @@ that is updated at every staged checkpoint.
 | SENSOR-B1-03 | 3de4cdda | provider_registry.yaml + sensor_priority.yaml, registry loaders, F9 required-runtime validation | 109 passed / 0 failed | PASS | none |
 | SENSOR-B1-04 | 8b2162a1 | semantic_equivalence.yaml + methodology_registry.yaml, equivalence/methodology loaders, pooling rule | 134 passed / 0 failed | PASS | none |
 | SENSOR-B1-05 | daf9257a | JSON-schema snapshot export (14 snapshots), versioning/compat suite, regeneration script | 148 passed / 0 failed | PASS | none |
-| SENSOR-B1-06 | ec8d1821 | evidence package: schema inventory, provider snapshot, equivalence matrix, test evidence, decision | 148 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B1-06 | ec8d1821 / eaf7a543 | evidence package: schema inventory, provider snapshot, equivalence matrix, test evidence, decision | 148 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B1-R01 | 3f4b97da | methodology/equivalence yaml, aggressor contract fixture + tests | +6 | 6 passed / 0 failed (narrow) | PASS | none |
+| SENSOR-B1-R02 | 381b224b | capability vocabulary, provider_registry.yaml, tests, provider snapshot | +7 | 61 passed / 0 failed (registry suite) | PASS | none |
+| SENSOR-B1-R03 | 12750cf1 | quality.py + blocking-state tests | +8 | 13 passed / 0 failed (quality suite) | PASS | none |
+| SENSOR-B1-R04 | bc179d53 | schema pin validators + mismatch tests | +8 | 62 passed / 0 failed (schemas+versioning) | PASS | none |
+| repair head | (see below) | complete Bloc 1 suite re-run | 177 passed / 0 failed | PASS | none |

@@ -1,6 +1,24 @@
 # BLOC 1 — DECISION
 
-**Decision:** `PASS_BLOC_01_CONTRACTS_FROZEN`
+**Status:** `PASS_BLOC_01_REPAIRS_READY_FOR_OPERATOR_REVIEW`
+
+**Previous decision (superseded by operator review):** `PASS_BLOC_01_CONTRACTS_FROZEN` was
+issued at `eaf7a543`.  The operator review (verdict `PASS_WITH_REQUIRED_AMENDMENTS`,
+`HOLD_BLOC_02`) required three contract repairs.  All three plus the optional hardening
+are implemented as explicit repair commits (no history rewrite) and revalidated.
+Operator ratification of `PASS_BLOC_01_CONTRACTS_FROZEN` remains pending.
+
+## Operator repairs applied
+
+| Repair | SHA | Change |
+|---|---|---|
+| SENSOR-B1-R01 | 3f4b97da | corrected inverted Binance aggressor semantics (isBuyerMaker=true → SELL, false → BUY) in methodology + equivalence registries; machine-readable contract fixture + regression tests |
+| SENSOR-B1-R02 | 381b224b | capability vocabulary extended with positioning + basis; Kraken basis / Gate positioning / Coinalyze positioning claimed, all verified=false |
+| SENSOR-B1-R03 | 12750cf1 | blocking quality flags resolve fail-closed to QualityState.BLOCKED, dominating STALE/DEGRADED/PARTIAL/UNVERIFIED |
+| SENSOR-B1-R04 | bc179d53 | (optional) explicit sensor-family mismatch now fails validation instead of silent pin |
+
+All repairs keep mappings PROVISIONAL, add no verified capability, add no network
+access, add no T0/T1 ingestion and no Bloc 2 implementation.
 
 ## Rationale
 
@@ -49,13 +67,16 @@ foundational concepts are now frozen, tested and committed:
 ## Next gate
 
 ```
-BLOC 1 PASS (this decision)
+BLOC 1 REPAIRS COMPLETE (this decision)
+      ↓
+OPERATOR RATIFICATION of PASS_BLOC_01_CONTRACTS_FROZEN
       ↓
 BLOC 2 PROBE HARNESS
 ```
 
 No provider adapter implementation may begin before the probe harness verifies
-actual provider behavior (bloc_01/03 §16).  Bloc 2 may rely on Bloc 1 contracts.
+actual provider behavior (bloc_01/03 §16).  Bloc 2 may rely on Bloc 1 contracts
+only after operator ratification.
 
 `human_review_required = TRUE`
-`next_bloc_authorized = FALSE` — awaiting operator approval of Bloc 1.
+`next_bloc_authorized = FALSE` — awaiting operator ratification of Bloc 1 after repairs.

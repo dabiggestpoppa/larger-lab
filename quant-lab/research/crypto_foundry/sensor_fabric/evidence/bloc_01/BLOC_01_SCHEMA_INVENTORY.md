@@ -26,7 +26,7 @@ JSON-schema snapshots: `quant-lab/config/crypto_sensor_fabric/schema_snapshots/`
 | `base.py` | `MissingObservation` | structured missingness object | mandatory MissingReason |
 | `base.py` | canonical serialization helpers | canonical_dump / canonical_bytes / canonical_hash | deterministic under same schema version |
 | `access.py` | `FreeOnlyPolicy` + F9 gate | cost/access contract | cost==0, no payment/stake/transaction, class in {FREE_AUTOMATED, FREE_LIMITED_AUTOMATED} |
-| `quality.py` | `derive_quality_state` / `has_blocking_flag` | conservative flag→state aggregation | STALE_SOURCE never → GOOD |
+| `quality.py` | `derive_quality_state` / `has_blocking_flag` | conservative flag→state aggregation | STALE_SOURCE never → GOOD; blocking flags dominate → BLOCKED (R03) |
 | `identity.py` | `InstrumentIdentity` | economic contract identity | asset ≠ contract; lifecycle fields |
 
 ## 2. Schema layer — `quant-lab/src/crypto_sensor_fabric/schemas/`
@@ -48,7 +48,7 @@ JSON-schema snapshots: `quant-lab/config/crypto_sensor_fabric/schema_snapshots/`
 
 | Module / config | Object | Contents |
 |---|---|---|
-| `provider_registry.py` + `provider_registry.yaml` | `ProviderRegistry` | 8 candidate providers, evidence class, status, FreeOnlyPolicy access, capability claims (all verified=false), fallback candidates |
+| `provider_registry.py` + `provider_registry.yaml` | `ProviderRegistry` | 8 candidate providers, evidence class, status, FreeOnlyPolicy access, capability claims (all verified=false), fallback candidates; controlled capability vocabulary covers all 8 sensor families incl. positioning + basis (R02) |
 | `sensor_priority.py` + `sensor_priority.yaml` | `SensorPriorityRegistry` | 5 critical sensor states with min_preferred_sources=2 and ordered source lists |
 | `semantic_equivalence.py` + `semantic_equivalence.yaml` | `SemanticEquivalenceRegistry` | 6 provisional mappings, all with evidence_reference, versioned |
 | `methodology_registry.py` + `methodology_registry.yaml` | `MethodologyRegistry` | 9 versioned methodologies (normalization/reconstruction/classification), all PROVISIONAL |
