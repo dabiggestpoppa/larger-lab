@@ -12,6 +12,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import pytest
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS = BASE_DIR / "scripts"
 _BASH = shutil.which("bash") or "bash"
@@ -182,9 +184,33 @@ def test_unknown_restore_mode_fails_closed(tmp_path):
 
 def test_full_backup_blocked_without_docker_or_services():
     """A 'full' backup must BLOCK (never silently degrade) when the runtime
-    services are unavailable — it must not produce an incomplete backup."""
+    services are unavailable — it must not produce an incomplete backup.
+    When a live Local Ground stack is present (as in CI) a --scope full
+    backup legitimately succeeds, so this negative path is asserted only
+    where the services are absent; blocking on unavailable services is
+    proven by the dedicated container lifecycle tests."""
     import os
     import tempfile
+
+    def live_stack():
+        """Reuse backup.sh's own health gate (`have_docker` + inspect +
+        pg_isready) to detect a live postgres service."""
+        if shutil.which("docker") is None:
+            return False
+        if subprocess.run(["docker", "compose", "version"], capture_output=True,
+                          text=True).returncode != 0:
+            return False
+        if subprocess.run(["docker", "inspect", "oce-local-postgresql"],
+                          capture_output=True, text=True).returncode != 0:
+            return False
+        return subprocess.run(["docker", "exec", "oce-local-postgresql", "pg_isready",
+                               "-U", "oce_local_admin", "-d", "oce_local", "-h", "localhost"],
+                              capture_output=True, text=True).returncode == 0
+
+    if live_stack():
+        pytest.skip("live Local Ground stack present: --scope full succeeds here; "
+                    "blocking-on-unavailable services is covered by container tests")
+
     with tempfile.TemporaryDirectory() as td:
         env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
         r = subprocess.run([_BASH, str(SCRIPTS / "backup.sh"), "--scope", "full", "--out", td],
