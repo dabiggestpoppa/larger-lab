@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OCE Local Ground — real container lifecycle tests (B1-LOCAL, A-003).
+"""OCE Local Ground â€” real container lifecycle tests (B1-LOCAL, A-003).
 
 Prove the actual Compose stack runs: config validates, images are pinned, all
 services reach truthful health (including Prometheus /-/ready), an invalid
@@ -41,7 +41,7 @@ def test_ctl_images_are_pinned(oce_stack):
 
 
 def test_ctl_all_services_healthy(oce_stack):
-    """THE WHOLE STACK is simultaneously healthy and stable — not a scalar
+    """THE WHOLE STACK is simultaneously healthy and stable â€” not a scalar
     per-service check. This is what verifies a service observed `starting`
     after an earlier transition is caught and converged."""
     snap = oc.assert_stack_converged(timeout_s=180, stable=2)
@@ -122,11 +122,11 @@ def test_ctl_artifact_round_trip_against_live_store(oce_stack, tmp_path):
 
 
 def test_ctl_clean_room_database_artifact_restore(oce_stack, tmp_path):
-    """Real authoritative recovery (R13): known PostgreSQL records and known
-    artifact payloads are backed up, the disposable stack and its volumes are
-    destroyed, clean volumes are recreated, and the backup restores into them
-    with exact hashes. Redis is rebuilt as disposable state, never restored
-    as authoritative truth."""
+    """Real authoritative recovery: known PostgreSQL records and known
+    artifact payloads are backed up FULL, the disposable stack and its volumes
+    are destroyed, clean volumes are recreated, and the full backup restores
+    into them via verified staging promotion with exact hashes. Redis is
+    rebuilt as disposable state, never restored as authoritative truth."""
     # 1. known postgres records
     oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
                            "CREATE TABLE IF NOT EXISTS backup_probe(k text PRIMARY KEY, v text);"
@@ -140,19 +140,18 @@ def test_ctl_clean_room_database_artifact_restore(oce_stack, tmp_path):
     expected_sha = hashlib.sha256(payload.encode()).hexdigest()
     # 3. disposable redis state (must NOT survive restore)
     oc.dexec(oc.REDIS, ["redis-cli", "SET", "pre:backup:key", "cached"])
-    # 4. versioned backup package with authoritative data
+    # 4. versioned FULL backup package with authoritative data
     bk = tmp_path / "bk"
-    oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--out", str(bk)], check=True)
+    oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--scope", "full", "--out", str(bk)], check=True)
     assert (bk / "BACKUP_MANIFEST.sha256").is_file()
-    info = json.loads((bk / "backup-info.json").read_text(encoding="utf-8"))
+    info = json.loads((bk / ".backup-content" / "backup-info.json").read_text(encoding="utf-8"))
+    assert info["scope"] == "full", info
+    assert info["disaster_recovery_capable"] is True, info
     assert "postgres" in info["includes"], info
     assert "artifacts" in info["includes"], info
-    assert (bk / ".backup-content" / "postgres" / "dump.sql").is_file()
+    assert (bk / ".backup-content" / "postgres" / "archive.dump").is_file()
+    assert (bk / ".backup-content" / "postgres" / "inventory.json").is_file()
     assert (bk / ".backup-content" / "artifacts" / "artifacts.tar.gz").is_file()
-    # 4b. prove the dump contains BOTH schema and the expected data rows
-    dump = (bk / ".backup-content" / "postgres" / "dump.sql").read_text(encoding="utf-8", errors="replace")
-    assert "CREATE TABLE" in dump and "backup_probe" in dump, "dump missing schema"
-    assert "b1" in dump and "alpha" in dump, "dump missing data rows"
     # 4c. verify the backup metadata is hash-protected (tamper => gate fails)
     oc.verify_backup_manifest(bk)
     # 5. destroy the disposable stack and Book 1 test volumes only
@@ -161,8 +160,10 @@ def test_ctl_clean_room_database_artifact_restore(oce_stack, tmp_path):
     oc.dcompose("up", "-d")
     oc.assert_stack_converged(timeout_s=240, stable=2)
     assert oc.pg_ready(), "postgres not ready on clean volumes"
-    # 7. restore (fail-closed: must return zero AND recover real rows)
-    oc.run(["bash", str(oc.SCRIPTS / "restore.sh"), "--from", str(bk)], check=True)
+    # 7. restore with EXPLICIT full-replace intent + local target identity
+    oc.run(["bash", str(oc.SCRIPTS / "restore.sh"), "--mode", "full-replace",
+            "--from", str(bk), "--confirm-local-target", oc.PG_DB], check=True)
+    oc.assert_stack_converged(timeout_s=240, stable=2)
     # 8. postgres records exactly (a zero-exit restore with missing rows fails)
     r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tA",
                                "SELECT k || '=' || v FROM backup_probe ORDER BY k;"])
@@ -180,11 +181,54 @@ def test_ctl_clean_room_database_artifact_restore(oce_stack, tmp_path):
     assert r.stdout.strip() == "rebuilt"
 
 
+def test_ctl_full_replace_into_populated_target(oce_stack, tmp_path):
+    """Full-replace must REPLACE (not merge) the authoritative state even when
+    the target DB already holds populated tables. After restore, only the
+    backed-up snapshot rows exist for the probed table; a pre-existing row that
+    was NOT part of the snapshot must be gone (snapshot replacement semantics)."""
+    oc.assert_stack_converged(timeout_s=180, stable=2)
+    # create a marker row that exists only in the pre-restore target and a
+    # recovery table we will populate and back up
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "CREATE TABLE IF NOT EXISTS replace_probe(k text PRIMARY KEY, v text);"
+                           "INSERT INTO replace_probe VALUES('keep','snapshot') "
+                           "ON CONFLICT (k) DO UPDATE SET v='snapshot';"])
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "INSERT INTO replace_probe VALUES('stray','not-in-snapshot') "
+                           "ON CONFLICT (k) DO UPDATE SET v='not-in-snapshot';"])
+    # capture full backup (contains only 'keep' row in replace_probe)
+    bk = tmp_path / "bk"
+    oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--scope", "full", "--out", str(bk)], check=True)
+    oc.verify_backup_manifest(bk)
+    # add a conflicting row into the live target that is NOT in the snapshot; it
+    # must be replaced away because the snapshot replaces the whole DB
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "INSERT INTO replace_probe VALUES('live','post-backup') "
+                           "ON CONFLICT (k) DO UPDATE SET v='post-backup';"])
+    oc.dexec(oc.REDIS, ["redis-cli", "SET", "replace:cache", "cached"])
+    # full-replace into the POPULATED live target
+    oc.run(["bash", str(oc.SCRIPTS / "restore.sh"), "--mode", "full-replace",
+            "--from", str(bk), "--confirm-local-target", oc.PG_DB], check=True)
+    oc.assert_stack_converged(timeout_s=240, stable=2)
+    # the post-backup live row must NOT exist (snapshot replacement)
+    r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                               "SELECT count(*) FROM replace_probe WHERE k='live';"])
+    assert r.stdout.strip() == "0", f"live row survived full-replace: {r.stdout}"
+    # the snapshot row must be present
+    r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                               "SELECT v FROM replace_probe WHERE k='keep';"])
+    assert r.stdout.strip() == "snapshot"
+    # redis is disposable and rebuilt, never restored
+    r = oc.dexec(oc.REDIS, ["redis-cli", "GET", "replace:cache"])
+    assert r.stdout.strip() == "", "redis restored as truth"
+
+
 def test_ctl_corrupt_backup_rejected_against_running_stack(oce_stack, tmp_path):
     bk = tmp_path / "bk2"
-    oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--out", str(bk)], check=True)
+    oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--scope", "full", "--out", str(bk)], check=True)
     (bk / ".backup-content" / "state.json").write_text('{"tampered": true}', encoding="utf-8")
-    r = oc.run(["bash", str(oc.SCRIPTS / "restore.sh"), "--from", str(bk)], check=False)
+    r = oc.run(["bash", str(oc.SCRIPTS / "restore.sh"), "--mode", "full-replace",
+                "--from", str(bk), "--confirm-local-target", oc.PG_DB], check=False)
     assert r.returncode != 0
     assert "CORRUPT" in r.stdout + r.stderr
     # postgres data must NOT have been touched by the rejected restore
