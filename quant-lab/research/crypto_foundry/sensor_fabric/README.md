@@ -1,18 +1,16 @@
-# CRYPTO MECHANICAL SENSOR FABRIC — PLANNING INDEX
+# CRYPTO MECHANICAL SENSOR FABRIC — PLANNING INDEX v0.2
 
-**Status:** architecture/planning only — no provider adapter implementation yet  
+**Status:** architecture/planning only — implementation deferred until all blocs are frozen  
 **Branch:** `agent/crypto-sensor-fabric-plan`  
 **Parent research state:** `agent/crypto-quant-foundry` @ `9243201b4797b4b98cc446d1f13871668907ca79`  
-**Purpose:** turn the newly verified free derivatives/mechanical data sources into a provider-independent L0/L1/L2 sensor fabric before MECH-21 and LOWER-FIELD-14 resume.  
-**Doctrine:** CEREBUS / Crypto Field Modeling Bible / Market OS free-only stack.  
+**Purpose:** turn verified free derivatives/mechanical sources into a provider-independent L0/L1/L2 sensor fabric before MECH-21 and LOWER-FIELD-14 resume.  
+**Doctrine:** CEREBUS / Crypto Field Modeling Bible / Market OS free-only stack.
 
 ---
 
 ## 1. Mission
 
-Build one canonical crypto derivatives/mechanical sensor fabric that continues to function when any individual exchange has historical gaps, schema changes, endpoint outages, symbol differences, rate limits, or partial field coverage.
-
-The system is organized around **canonical sensors**, not vendors.
+Build one canonical crypto derivatives/mechanical sensor fabric that continues to function when an individual exchange has historical gaps, schema changes, endpoint outages, symbol differences, rate limits, partial field coverage, or methodology drift.
 
 ```text
 PROVIDERS
@@ -20,99 +18,106 @@ PROVIDERS
         ↓
 PROVIDER ADAPTERS
         ↓
-T0 IMMUTABLE RAW
+T0 IMMUTABLE RAW EVIDENCE
         ↓
 PIT + IDENTITY + SEMANTIC NORMALIZATION
         ↓
 T1 CANONICAL MECHANICAL OBSERVATIONS
         ↓
-VENUE SENSOR STATES + CROSS-VENUE SYNTHESIS
+QUALITY / REDUNDANCY / PROVIDER DISAGREEMENT
         ↓
 T2 MECHANICAL OBSERVABLE FABRIC
         ↓
-HISTORICAL REPLAY / SHADOW LIVE
+READ-ONLY SENSOR SERVICE
+        ↓
+HISTORICAL REPLAY / MARKET OS BRIDGE
         ↓
 MECH-21 + LOWER-FIELD-14
 ```
 
-Hard rule:
+Hard rules:
 
 > No single exchange is canonical truth. The sensor is canonical; providers are evidence sources.
 
-Second hard rule:
+> Fallback providers may fill economic-sensor coverage, but provider/venue identity is never erased.
 
-> Fallback providers may fill coverage, but provider identity is never erased. Cross-provider disagreement is preserved as information rather than silently averaged away.
-
----
-
-## 2. Scientific reason for the build
-
-LOWER-FIELD-13 localized the strongest unresolved local question to the transition from absorption/reorganization into propagation/containment. Existing field/rank/liquidity covariates leave a material downside-specific residual. Highest-value missing mechanical families are:
-
-1. liquidations / forced deleveraging
-2. order flow / aggressor imbalance
-3. open interest / leverage state
-4. funding / positioning pressure
-5. depth / spread / liquidity withdrawal
-
-MECH-20/21 also benefit because these sensors can condition:
-
-- gain transitions
-- sterile saturation
-- transfer/realization
-- absorptive capacity
-- forcing mixtures
-- recurrent low-gain episodes
-- calendar/seasonal modulation
-
-This infrastructure therefore upgrades the research substrate itself rather than creating a one-off sign-asymmetry dataset.
+> Cross-provider disagreement is preserved as information, not averaged away silently.
 
 ---
 
-## 3. Planned provider roles
+## 2. Scientific reason
 
-Providers remain candidates until capability probes verify real historical access, units, semantics, and zero-cost status.
+LOWER-FIELD-13 localized the strongest unresolved local question to the transition from absorption/reorganization into propagation/containment. Existing field/rank/liquidity covariates leave a downside-specific residual.
 
-| Provider | Planned primary role | Planned secondary role |
+Highest-value missing mechanical families:
+
+1. liquidations / forced deleveraging;
+2. order flow / aggressor imbalance;
+3. open interest / leverage state;
+4. funding / positioning pressure;
+5. depth / spread / liquidity withdrawal.
+
+MECH-21 also benefits through better conditioning of:
+
+- gain transitions;
+- sterile saturation;
+- transfer/realization;
+- absorptive capacity;
+- forcing mixtures;
+- recurrent low-gain episodes;
+- seasonal modulation.
+
+This is therefore a research-substrate upgrade, not a one-off dataset.
+
+---
+
+## 3. Provider candidate roles
+
+Providers remain candidates until capability probes verify actual free access, historical depth, units, semantics and reproducibility.
+
+| Provider | Primary planned role | Secondary role |
 |---|---|---|
 | Kraken Futures | liquidations, OI, funding, aggressor/CVD, spread/liquidity/slippage | basis, orderbook analytics |
-| Gate.io Futures | long/short liquidations, OI, taker flow, funding/positioning | cross-alt breadth |
-| Binance public data | historical trades/aggTrades, OI metrics, funding, taker flow | book-depth reconstruction / backbone history |
-| Bybit | historical OI, funding, trades | independent leverage/flow replication |
-| OKX | historical trades/funding and deeper orderbook modules | historical liquidity-withdrawal research |
+| Gate Futures | long/short liquidations, OI, taker flow, funding/positioning | cross-alt breadth |
+| Binance USD-M | historical trades/aggTrades, OI metrics, funding, taker flow | book-depth reconstruction / backbone history |
+| Bybit Linear | historical OI, funding, trades | independent leverage/flow replication |
+| OKX Swap | historical trades/funding, deeper orderbooks | liquidity-withdrawal research |
 | Deribit | liquidation-tagged trade anatomy, funding/trades | BTC/ETH mechanism microscope |
-| Coinalyze | free aggregate OI/funding/liquidation corroboration | daily long-history / forward intraday corroboration |
-| Bitfinex liquidation archive | independent historical liquidation replication | research validation only |
+| Coinalyze | aggregate OI/funding/liquidation corroboration | daily history / forward intraday corroboration |
+| Bitfinex community archive | historical liquidation replication | research corroboration only |
 
-No provider becomes a required dependency until it passes the free-only and usability gates.
+No provider becomes required until it passes free-only and usability gates.
 
 ---
 
-## 4. Canonical high-value sensor families
+## 4. Canonical sensor families
 
-### 4.1 LiquidationState
+T0/T1 initial families:
 
-Preserve long/short separation, notional, counts, intensity vs OI, acceleration, breadth, and cross-venue dispersion.
+```text
+MECHANICAL_TRADE
+MECHANICAL_LIQUIDATION
+MECHANICAL_OPEN_INTEREST
+MECHANICAL_FUNDING
+MECHANICAL_BOOK_SNAPSHOT
+MECHANICAL_BOOK_METRIC
+MECHANICAL_POSITIONING
+MECHANICAL_BASIS
+```
 
-### 4.2 LeverageState
+T2 later derives:
 
-Preserve OI in native/base/USD units where available, velocity, acceleration, OI×price state, and cross-venue breadth.
+```text
+LiquidationState
+LeverageState
+FundingState
+OrderFlowState
+LiquidityState
+PositioningState
+BasisState
+```
 
-### 4.3 FundingState
-
-Preserve native funding interval/rate as truth plus explicitly derived normalized equivalents.
-
-### 4.4 OrderFlowState
-
-Aggressor buy/sell notional, signed flow, taker imbalance, CVD, persistence, breadth, and venue consensus.
-
-### 4.5 LiquidityState
-
-Spread, depth at economically normalized bps bands, book imbalance, slippage, withdrawal, and recovery.
-
-### 4.6 PositioningState / BasisState
-
-Contextual positioning ratios and basis. These never overwrite OI/funding/order-flow primitives.
+Derived states are sensors/context, not trade signals.
 
 ---
 
@@ -120,38 +125,23 @@ Contextual positioning ratios and basis. These never overwrite OI/funding/order-
 
 ### U0 — Mechanism Core
 
-BTC, ETH, and the most liquid core perpetuals.
+BTC, ETH, highest-liquidity core perpetuals.
 
-Store the richest available data:
-- trades
-- liquidations
-- OI
-- funding
-- books / book metrics
-- positioning / basis where available
+Richest available data: trades, liquidations, OI, funding, books/book metrics, positioning/basis.
 
 ### U1 — Broad Research Universe
 
-Broad actively traded perpetual universe.
+Broad active perp universe.
 
-Store:
-- trades/agg flow where economically reasonable
-- liquidations
-- OI
-- funding
-- coarse book metrics
+Liquidations, OI, funding, trades/agg flow where feasible, coarse book metrics.
 
 ### U2 — Long Tail
 
-All cheaply supported perpetual instruments.
+All cheaply supported perpetuals.
 
-Store primarily:
-- OI
-- funding
-- liquidation statistics
-- coarse activity/positioning
+Primarily OI, funding, liquidation statistics and coarse activity/positioning.
 
-Universe membership must be point-in-time and instrument-lifecycle aware.
+Universe membership is point-in-time and contract-lifecycle aware.
 
 ---
 
@@ -159,150 +149,148 @@ Universe membership must be point-in-time and instrument-lifecycle aware.
 
 Actual historical data does **not** live in Git.
 
-Git stores:
-- plans
-- schemas
-- adapters
-- manifests
-- checksums
-- source registries
-- coverage reports
-- reproducibility commands
-- tests
+Git stores plans, schemas, adapters, manifests/checksums summaries, coverage reports, reproducibility commands and tests.
 
-Data storage target:
+Data target:
 
 ```text
-T0 raw parquet lake
-T1 canonical parquet lake
-T2 observables parquet lake
-DuckDB analytical access
-PostgreSQL operational metadata / manifests / state
+T0 exact raw evidence + lossless raw projections
+T1 canonical PIT Parquet
+T2 observables Parquet
+DuckDB local analytical/discovery access
+PostgreSQL operational metadata/state
 ```
 
-Raw partitions are immutable and restartable.
+Raw evidence is immutable and restartable.
 
 ---
 
-## 7. Full bloc roadmap
+## 7. Revised 12-bloc roadmap
 
-The planning sequence is deliberately built one bloc at a time. All blocs are completed as implementation-grade plans before the execution agent receives one master build prompt.
+### Why roadmap v0.2 changed
+
+The initial planning index split provider adapters into Wave A and Wave B. During Bloc 3 planning, the common adapter protocol, QA, provider books, retry/resume and all eight provider implementations were more coherent as **one adapter architecture bloc**. Splitting the same protocol across two planning blocs would create duplicated contracts and drift.
+
+Therefore Bloc 3 consolidated all provider adapter books. Bloc numbering from Bloc 4 onward is now authoritative under this v0.2 roadmap.
+
+The freed planning slot is used for a dedicated read-only canonical sensor service before historical replay, which strengthens the architecture rather than reducing scope.
 
 ### BLOC 1 — CONTRACTS & SEMANTICS FOUNDATION
 
-Freeze:
-- canonical sensor vocabulary
-- provider/access registry contract
-- equivalence classes
-- observation timestamps/provenance
-- canonical schemas
-- free-only policy
-- fail-closed rules
-- quality-flag vocabulary
-- implementation acceptance gates
+Freeze canonical sensors, provider/access contracts, evidence classes, equivalence, timestamps/provenance, schemas, free-only policy, missingness and quality vocabulary.
 
-**Status:** being completed now.
+**Status:** `PASS_BLOC_01_PLAN_FROZEN`
 
 ### BLOC 2 — HISTORICAL CAPABILITY PROBE HARNESS
 
-Plan the executable discovery system that verifies actual provider historical depth against 2021/2022/2024/2026 dates, field availability, pagination, rate limits, symbols, units, auth and gaps.
+Executable discovery architecture for proving provider history/access/units/pagination/granularity across 2021/2022/2024/2026/recent controls.
 
-### BLOC 3 — PROVIDER ADAPTER WAVE A
+**Status:** `PASS_BLOC_02_PLAN_FROZEN`
 
-Kraken + Gate + Binance + Bybit.
+### BLOC 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE
 
-### BLOC 4 — PROVIDER ADAPTER WAVE B
+Common adapter protocol + provider books for Kraken, Gate, Binance, Bybit, OKX, Deribit, Coinalyze and Bitfinex archive; retry/rate-limit/resume/schema drift/access gates.
 
-OKX + Deribit + Coinalyze + Bitfinex archive.
+**Status:** `PASS_BLOC_03_PLAN_FROZEN`
 
-### BLOC 5 — IMMUTABLE T0 RAW LAKE
+### BLOC 4 — IMMUTABLE T0 RAW EVIDENCE LAKE
 
-Partitioning, manifests, checksums, retry/resume/idempotency and immutable source capture.
+Exact source-byte evidence, content addressing, raw projections, partition manifests, checksums, revisions, atomic writes, durable resume coupling, storage quotas, DuckDB discovery, PostgreSQL metadata, backup/export and raw query boundary.
 
-### BLOC 6 — PIT IDENTITY & SEMANTIC NORMALIZATION
+**Status:** in planning.
 
-Instrument identity, listings/delistings, linear/inverse, quote/settlement assets, contract multipliers, time semantics, unit normalization and no-zero-fill rules.
+### BLOC 5 — PIT IDENTITY & SEMANTIC NORMALIZATION
 
-### BLOC 7 — QUALITY, REDUNDANCY & FAILOVER
+Instrument identity, listing/delisting lifecycle, linear/inverse contracts, quote/settlement assets, multipliers, timestamp semantics, units, OI/liquidation/funding/aggressor normalization, source revisions, no-zero-fill and T1 lineage.
 
-SensorHealth, provider disagreement, stale/degraded modes, cross-source comparison, source-count confidence and fail-closed continuation.
+### BLOC 6 — QUALITY, REDUNDANCY & FAILOVER
 
-### BLOC 8 — HISTORICAL BACKFILL PROGRAM
+SensorHealth, provider disagreement, stale/degraded modes, source-count confidence, cross-source comparison, fail-closed continuation and canonical quality scoring.
 
-2020-06→present backfill by sensor family with resumable shards and coverage matrices.
+### BLOC 7 — HISTORICAL BACKFILL PROGRAM
 
-### BLOC 9 — LIVE BLACK-BOX RECORDER
+2020-06→present backfill by sensor/provider/universe tier with resumable shards, storage estimates, coverage matrices, gap audits and review checkpoints.
 
-Continuous local-first public-feed collector with restart/resume, heartbeat, gap detection and raw archival.
+### BLOC 8 — LIVE BLACK-BOX RECORDER
 
-### BLOC 10 — MECHANICAL OBSERVABLE FABRIC
+Continuous local-first public-feed acquisition with restart/resume, heartbeat, gap detection, connection generations and immutable raw archival.
 
-LiquidationState / LeverageState / FundingState / OrderFlowState / LiquidityState / PositioningState / BasisState plus cross-venue breadth/consensus/dispersion.
+### BLOC 9 — MECHANICAL OBSERVABLE FABRIC
+
+LiquidationState / LeverageState / FundingState / OrderFlowState / LiquidityState / PositioningState / BasisState plus cross-venue breadth, consensus, disagreement and dispersion.
+
+### BLOC 10 — READ-ONLY CANONICAL SENSOR SERVICE
+
+Typed query/service boundary over T1/T2, coverage/provenance APIs, as-of-safe sensor retrieval, bulk research access and provider-independent consumer contracts. No strategy/execution endpoints.
 
 ### BLOC 11 — HISTORICAL REPLAY + MARKET OS BRIDGE
 
-Deterministic `as_of` mechanical snapshot, research event-context bridge, runtime schemas and MECH-21/LF14 handoff.
+Deterministic mechanical `as_of` snapshots, event-context replay, Market OS object bridge and MECH-21/LF14 research adapters.
 
 ### BLOC 12 — FULL VALIDATION / RESEARCH RESTART PACKET
 
-Cost gate, PIT gate, historical coverage, provider redundancy, replay determinism, live smoke, schema compatibility and final research handoff.
+Cost gate, PIT gate, storage/integrity, historical coverage, redundancy, replay determinism, live smoke, schema compatibility, research reproducibility and final MECH-21/LF14 handoff.
 
 ---
 
 ## 8. Global acceptance principles
 
-Every future bloc inherits these:
+Every bloc inherits:
 
-1. **$0 required subscription cost.**
-2. **No payment method/stake/transaction dependency for ingestion.**
-3. **PIT-safe timestamps and symbol lifecycle.**
-4. **Provider identity preserved.**
-5. **No fake cross-venue equivalence.**
-6. **No zero-fill for missing observations.**
-7. **No silent stale substitution.**
-8. **Cross-source disagreement is measured.**
-9. **Raw responses archived before transformation.**
-10. **Every derived value is traceable to source observations and code version.**
-11. **Historical replay must never use data learned after `as_of`.**
-12. **Research agents consume canonical sensors, never provider-specific fields.**
+1. $0 required data-subscription cost.
+2. No payment method/stake/transaction dependency for ingestion.
+3. PIT-safe timestamp and contract lifecycle handling.
+4. Provider identity preserved.
+5. No fake cross-venue equivalence.
+6. No zero-fill for missing observations.
+7. No silent stale substitution.
+8. Cross-source disagreement measured.
+9. Exact raw evidence archived before semantic transformation.
+10. Every derived value traceable to source evidence and code/methodology version.
+11. Historical replay never uses data unavailable under the selected as-of semantics.
+12. Research agents consume canonical sensor interfaces, not provider-native fields.
+13. High-volume optional data may be paused under disk pressure, but raw evidence is not silently destroyed.
+14. Geometry/research conclusions remain separate from ingestion/provider convenience.
 
 ---
 
-## 9. Research pause / restart rule
+## 9. Research pause / restart
 
-MECH-21 and LOWER-FIELD-14 plans remain valid, but execution should wait until the fabric reaches the replay bridge acceptance gate.
-
-Restart sequence:
+MECH-21 and LOWER-FIELD-14 plans remain valid but execution waits until the fabric reaches replay/validation acceptance.
 
 ```text
-Sensor Fabric v1
+Sensor Fabric plans frozen
+→ implementation
 → verified history
-→ canonical PIT panel
-→ mechanical replay
-→ quality audit
+→ T0 evidence
+→ canonical PIT T1
+→ mechanical T2
+→ sensor service
+→ historical replay
+→ full quality audit
 → MECH-21
 → LOWER-FIELD-14
 ```
 
-No strategy, PnL, execution, sizing, leverage or live order placement belongs in this workstream.
+No strategy, PnL, sizing, leverage, deployment or live order placement belongs in this workstream.
 
 ---
 
 ## 10. Planning completion protocol
 
-Each bloc plan must contain:
+Every bloc plan contains:
 
-- objective
-- assumptions
-- in-scope / out-of-scope
-- exact files/modules to build
-- schemas/contracts
-- algorithms/control flow
-- failure modes
-- acceptance tests
-- evidence outputs
-- staged commit sequence
-- stop gate
-- handoff dependencies to the next bloc
+- objective;
+- assumptions;
+- in/out scope;
+- exact modules/files;
+- schemas/contracts;
+- algorithms/control flow;
+- failure modes;
+- acceptance tests;
+- evidence outputs;
+- staged commit sequence;
+- stop gate;
+- handoff dependencies.
 
-After BLOC 12 planning is complete, issue one master implementation prompt instructing the execution agent to build strictly from these plans and commit at every planned checkpoint.
+After Bloc 12 planning is frozen, one master implementation prompt will instruct the execution agent to build strictly from these plans with staged commits and review gates.
