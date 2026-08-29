@@ -1,0 +1,494 @@
+{
+  "$defs": {
+    "AccessClass": {
+      "description": "Free-only access taxonomy (Bloc 1 §7).",
+      "enum": [
+        "FREE_AUTOMATED",
+        "FREE_LIMITED_AUTOMATED",
+        "FREE_REFERENCE_ONLY",
+        "PAID_EXCLUDED",
+        "UNVERIFIED"
+      ],
+      "title": "AccessClass",
+      "type": "string"
+    },
+    "BookMetricName": {
+      "description": "Initial canonical book metric names (02 §9).",
+      "enum": [
+        "SPREAD_BPS",
+        "DEPTH_BID_5BPS",
+        "DEPTH_ASK_5BPS",
+        "DEPTH_BID_10BPS",
+        "DEPTH_ASK_10BPS",
+        "DEPTH_BID_25BPS",
+        "DEPTH_ASK_25BPS",
+        "DEPTH_BID_50BPS",
+        "DEPTH_ASK_50BPS",
+        "BOOK_IMBALANCE_10BPS",
+        "BOOK_IMBALANCE_25BPS",
+        "SLIPPAGE_BUY_10K_USD",
+        "SLIPPAGE_SELL_10K_USD",
+        "SLIPPAGE_BUY_100K_USD",
+        "SLIPPAGE_SELL_100K_USD"
+      ],
+      "title": "BookMetricName",
+      "type": "string"
+    },
+    "BookSide": {
+      "description": "Side qualifier for book metrics (02 §9).",
+      "enum": [
+        "BID",
+        "ASK",
+        "BOTH",
+        "NONE"
+      ],
+      "title": "BookSide",
+      "type": "string"
+    },
+    "ContractType": {
+      "description": "Contract settlement construction (linear vs inverse vs quanto).",
+      "enum": [
+        "LINEAR",
+        "INVERSE",
+        "QUANTO",
+        "OTHER"
+      ],
+      "title": "ContractType",
+      "type": "string"
+    },
+    "EvidenceClass": {
+      "description": "Evidentiary provenance class, independent of cost/access (Bloc 1 §8).",
+      "enum": [
+        "FIRST_PARTY_EXCHANGE",
+        "FIRST_PARTY_AGGREGATOR",
+        "THIRD_PARTY_AGGREGATOR",
+        "COMMUNITY_ARCHIVE",
+        "RECONSTRUCTED_INTERNAL"
+      ],
+      "title": "EvidenceClass",
+      "type": "string"
+    },
+    "MarketType": {
+      "description": "Economic market type (spot / futures / perpetual / option).",
+      "enum": [
+        "SPOT",
+        "FUTURE",
+        "PERPETUAL",
+        "OPTION",
+        "OTHER"
+      ],
+      "title": "MarketType",
+      "type": "string"
+    },
+    "QualityFlag": {
+      "description": "Additive per-record quality flags (Bloc 1 §12). Canonical set.",
+      "enum": [
+        "SOURCE_NATIVE",
+        "SOURCE_AGGREGATED",
+        "SOURCE_COMMUNITY",
+        "RECONSTRUCTED_INTERNAL",
+        "TIMESTAMP_ASSUMED",
+        "TIMESTAMP_COARSE",
+        "UNIT_NATIVE_ONLY",
+        "UNIT_NORMALIZED",
+        "UNIT_NORMALIZATION_UNAVAILABLE",
+        "VENUE_NOT_DECOMPOSABLE",
+        "INSTRUMENT_ID_UNRESOLVED",
+        "WINDOW_SEMANTICS_UNCERTAIN",
+        "PARTIAL_INTERVAL",
+        "DUPLICATE_SOURCE_RECORD",
+        "SOURCE_GAP",
+        "STALE_SOURCE",
+        "PROVIDER_DEGRADED",
+        "CROSS_PROVIDER_DISAGREEMENT",
+        "HISTORICAL_DEPTH_UNVERIFIED",
+        "ACCESS_CLASS_UNVERIFIED",
+        "PIT_RISK"
+      ],
+      "title": "QualityFlag",
+      "type": "string"
+    },
+    "RetrievalMode": {
+      "description": "How raw source content was retrieved (Bloc 1 §6).",
+      "enum": [
+        "REST",
+        "WS",
+        "BULK_FILE",
+        "COMMUNITY_ARCHIVE"
+      ],
+      "title": "RetrievalMode",
+      "type": "string"
+    },
+    "SemanticEquivalence": {
+      "description": "Provider→canonical semantic equivalence class (Bloc 1 §9 / F11).",
+      "enum": [
+        "EXACT_EQUIVALENT",
+        "NORMALIZABLE_COMPARABLE",
+        "CORROBORATION_ONLY",
+        "NOT_COMPARABLE"
+      ],
+      "title": "SemanticEquivalence",
+      "type": "string"
+    },
+    "SensorFamily": {
+      "description": "Canonical sensor families (frozen initial set, Bloc 1 §3 / F2).",
+      "enum": [
+        "MECHANICAL_TRADE",
+        "MECHANICAL_LIQUIDATION",
+        "MECHANICAL_OPEN_INTEREST",
+        "MECHANICAL_FUNDING",
+        "MECHANICAL_BOOK_SNAPSHOT",
+        "MECHANICAL_BOOK_METRIC",
+        "MECHANICAL_POSITIONING",
+        "MECHANICAL_BASIS"
+      ],
+      "title": "SensorFamily",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Economically normalized book measurement (02 §9).\n\nProvider-native analytics and locally reconstructed metrics must carry\ndifferent `methodology_id` values.",
+  "properties": {
+    "access_class": {
+      "$ref": "#/$defs/AccessClass"
+    },
+    "adapter_version": {
+      "minLength": 1,
+      "title": "Adapter Version",
+      "type": "string"
+    },
+    "base_asset": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Base Asset"
+    },
+    "contract_multiplier": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Contract Multiplier"
+    },
+    "contract_type": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ContractType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "distance_bps": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Distance Bps"
+    },
+    "effective_at": {
+      "format": "date-time",
+      "title": "Effective At",
+      "type": "string"
+    },
+    "endpoint_id": {
+      "minLength": 1,
+      "title": "Endpoint Id",
+      "type": "string"
+    },
+    "evidence_class": {
+      "$ref": "#/$defs/EvidenceClass"
+    },
+    "identity_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Identity Version"
+    },
+    "ingested_at": {
+      "format": "date-time",
+      "title": "Ingested At",
+      "type": "string"
+    },
+    "instrument_id_canonical": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Instrument Id Canonical"
+    },
+    "instrument_native": {
+      "minLength": 1,
+      "title": "Instrument Native",
+      "type": "string"
+    },
+    "is_inverse": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Is Inverse"
+    },
+    "market_type": {
+      "$ref": "#/$defs/MarketType"
+    },
+    "methodology_id": {
+      "minLength": 1,
+      "title": "Methodology Id",
+      "type": "string"
+    },
+    "methodology_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Methodology Version"
+    },
+    "metric_name": {
+      "$ref": "#/$defs/BookMetricName"
+    },
+    "metric_unit": {
+      "minLength": 1,
+      "title": "Metric Unit",
+      "type": "string"
+    },
+    "metric_value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Metric Value"
+    },
+    "normalization_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Normalization Version"
+    },
+    "observation_id": {
+      "minLength": 1,
+      "title": "Observation Id",
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "quality_flags": {
+      "items": {
+        "$ref": "#/$defs/QualityFlag"
+      },
+      "title": "Quality Flags",
+      "type": "array"
+    },
+    "quote_asset": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Quote Asset"
+    },
+    "raw_checksum": {
+      "minLength": 1,
+      "title": "Raw Checksum",
+      "type": "string"
+    },
+    "raw_object_uri": {
+      "minLength": 1,
+      "title": "Raw Object Uri",
+      "type": "string"
+    },
+    "retrieval_mode": {
+      "$ref": "#/$defs/RetrievalMode"
+    },
+    "schema_version": {
+      "minLength": 1,
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "semantic_equivalence": {
+      "$ref": "#/$defs/SemanticEquivalence"
+    },
+    "sensor_family": {
+      "$ref": "#/$defs/SensorFamily"
+    },
+    "settlement_asset": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Settlement Asset"
+    },
+    "side": {
+      "$ref": "#/$defs/BookSide",
+      "default": "NONE"
+    },
+    "source_interval": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Interval"
+    },
+    "source_record_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Record Id"
+    },
+    "trade_notional_usd": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Trade Notional Usd"
+    },
+    "venue": {
+      "minLength": 1,
+      "title": "Venue",
+      "type": "string"
+    },
+    "window_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Window End"
+    },
+    "window_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Window Start"
+    }
+  },
+  "required": [
+    "observation_id",
+    "sensor_family",
+    "provider",
+    "venue",
+    "evidence_class",
+    "retrieval_mode",
+    "instrument_native",
+    "market_type",
+    "effective_at",
+    "observed_at",
+    "ingested_at",
+    "endpoint_id",
+    "raw_object_uri",
+    "raw_checksum",
+    "access_class",
+    "semantic_equivalence",
+    "adapter_version",
+    "schema_version",
+    "metric_name",
+    "metric_value",
+    "metric_unit",
+    "methodology_id"
+  ],
+  "title": "MechanicalBookMetric",
+  "type": "object"
+}
