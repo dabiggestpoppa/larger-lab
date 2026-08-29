@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# final-package-verify.sh — READ-ONLY verification of the exact final evidence
+# final-package-verify.sh â€” READ-ONLY verification of the exact final evidence
 # package. It MUST NOT write, move, or modify any evidence file. It re-checks
 # the final manifest (hashes/sizes), final status, independent-gate result,
 # RUN_ID, identities, totals, cleanup, and cloud fields, printing the result
@@ -72,6 +72,15 @@ if mode == "AUTHORITATIVE_CI":
     if not (cc.get("cleanup") == "ok" and cc.get("containers_removed") is True
             and cc.get("networks_removed") is True and cc.get("volumes_removed") is True):
         errs.append("container cleanup not verified in CI mode")
+    # Recovery evidence: verified postgres promotion must have run and succeeded
+    try:
+        rr = json.load(open(os.path.join(ev, "postgres-recovery-receipt.json"), encoding="utf-8"))
+    except Exception:
+        rr = {}
+        errs.append("missing postgres-recovery-receipt.json in CI mode")
+    if rr and (rr.get("exit_status") != 0 or rr.get("promoted") is not True
+               or rr.get("redis_restored") is not False or not rr.get("source_archive_sha256")):
+        errs.append("postgres recovery receipt does not show verified promotion")
 cleanup = json.load(open(os.path.join(ev, "cleanup.json"), encoding="utf-8"))
 if not (cleanup.get("cleanup") == "ok" or (cleanup.get("removed") is True and cleanup.get("pruned") is True)):
     errs.append("cleanup not confirmed")

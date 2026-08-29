@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OCE Local Ground — independent gate and final-package regression tests.
+"""OCE Local Ground â€” independent gate and final-package regression tests.
 
 Builds a synthetic-but-valid evidence package, proves the pristine package
 passes the gate, then tampers one aspect at a time and proves each regression
@@ -97,7 +97,7 @@ def build_valid_evidence(tmp):
     (ev / "cloud-plan.txt").write_text(
         "provider contacts: 0\nresources changed: 0\ncost incurred: ZERO\n", encoding="utf-8")
     (ev / "cloud-apply-denial.txt").write_text(
-        "DENIED: cloud apply blocked — missing required field 'AUTHORIZED_STAGE' (fail-closed).\n", encoding="utf-8")
+        "DENIED: cloud apply blocked â€” missing required field 'AUTHORIZED_STAGE' (fail-closed).\n", encoding="utf-8")
     write_json(ev / "cloud-apply-denial.json", {"exit_code": 5, "expected_nonzero": True})
     write_json(ev / "cloud-plan-deterministic.json", {"deterministic": True})
     write_json(ev / "local-after-denied.json", {"exit_code": 0})
@@ -106,6 +106,12 @@ def build_valid_evidence(tmp):
     write_json(ev / "container-cleanup.json", {
         "cleanup": "ok", "containers_removed": True,
         "networks_removed": True, "volumes_removed": True, "disposable_removed": True})
+    # Recovery evidence required in CI mode: verified postgres promotion receipt
+    write_json(ev / "postgres-recovery-receipt.json", {
+        "format": "oce-pg-recovery-receipt-v1", "database": "oce_local",
+        "source_archive_sha256": "a" * 64, "source_commit": COMMIT, "run_id": RUN_ID,
+        "staging_database": "oce_local_restore_abc", "promoted": True,
+        "exit_status": 0, "redis_restored": False, "tables_verified": True})
     (ev / "stage-log.txt").write_text("identity captured\n", encoding="utf-8")
     write_json(ev / "stage-status.json", {
         "block": "B1", "stage": "B1-LOCAL-GROUND-CLOSURE", "run_id": RUN_ID,
@@ -152,7 +158,7 @@ def run_verify(ev, expect_fail=False):
     return r
 
 
-# ── positive ─────────────────────────────────────────────────────────────
+# â”€â”€ positive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_passes_on_valid_package(tmp_path):
     ev = build_valid_evidence(tmp_path)
     run_gate(ev)
@@ -164,7 +170,7 @@ def test_verify_passes_on_valid_package(tmp_path):
     run_verify(ev)
 
 
-# ── identity / repository regressions ────────────────────────────────────
+# â”€â”€ identity / repository regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_wrong_repository(tmp_path):
     ev = build_valid_evidence(tmp_path)
     d = json.loads((ev / "identity.json").read_text())
@@ -221,7 +227,7 @@ def test_gate_rejects_missing_trusted_ci_identity(tmp_path):
     run_gate(ev, expect_fail=True, env={"GITHUB_REPOSITORY": "wrong/owner"})
 
 
-# ── artifact / parse regressions ─────────────────────────────────────────
+# â”€â”€ artifact / parse regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_malformed_json(tmp_path):
     ev = build_valid_evidence(tmp_path)
     (ev / "identity.json").write_text("{not json", encoding="utf-8")
@@ -256,7 +262,7 @@ def test_gate_rejects_incorrect_size(tmp_path):
     run_gate(ev, expect_fail=True)
 
 
-# ── totals / container / adversarial regressions ─────────────────────────
+# â”€â”€ totals / container / adversarial regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_skipped_mandatory_test_in_ci(tmp_path):
     ev = build_valid_evidence(tmp_path)
     d = json.loads((ev / "test-summary.json").read_text())
@@ -306,7 +312,7 @@ def test_gate_rejects_adversarial_failure(tmp_path):
     run_gate(ev, expect_fail=True)
 
 
-# ── cloud boundary regressions ───────────────────────────────────────────
+# â”€â”€ cloud boundary regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_cloud_apply_zero_exit(tmp_path):
     ev = build_valid_evidence(tmp_path)
     d = json.loads((ev / "cloud-apply-denial.json").read_text())
@@ -350,7 +356,7 @@ def test_gate_rejects_cloud_not_deferred(tmp_path):
     run_gate(ev, expect_fail=True)
 
 
-# ── source / cleanup regressions ─────────────────────────────────────────
+# â”€â”€ source / cleanup regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_dirty_source_before(tmp_path):
     ev = build_valid_evidence(tmp_path)
     d = json.loads((ev / "source-clean.json").read_text())
@@ -376,7 +382,7 @@ def test_gate_rejects_cleanup_failure(tmp_path):
     run_gate(ev, expect_fail=True)
 
 
-# ── final-package verifier regressions ───────────────────────────────────
+# â”€â”€ final-package verifier regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_verify_rejects_post_gate_status_mutation(tmp_path):
     ev = build_valid_evidence(tmp_path)
     run_gate(ev)
@@ -407,7 +413,7 @@ def test_verify_rejects_tampered_final_artifact(tmp_path):
     run_verify(ev, expect_fail=True)
 
 
-# ── CI workflow / dependency regressions ─────────────────────────────────
+# â”€â”€ CI workflow / dependency regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_ci_workflow_uses_shared_runner():
     wf = (BASE_DIR.parents[1] / ".github" / "workflows" / "b1-local-ground.yml").read_text(encoding="utf-8")
     assert "run-validation.sh" in wf, "workflow must use the shared validation runner"

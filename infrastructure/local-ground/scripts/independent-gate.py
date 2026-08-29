@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OCE Local Ground — independent gate (B1-LOCAL, A-003).
+"""OCE Local Ground â€” independent gate (B1-LOCAL, A-003).
 
 Genuinely independent: parses machine-readable evidence outputs only, never
 human-readable log sentences. Enforces the 32 conditions of the B1-LOCAL gate
@@ -253,6 +253,16 @@ def main():
             cc_ok = False
             cc = {}
         add("gate-30b-container-cleanup-verified", "container cleanup verified in CI", cc_ok, cc)
+        # Recovery evidence: a full-replace restore receipt must be present and
+        # must show PostgreSQL promotion succeeded (proving real recovery ran).
+        try:
+            rr = load_json(os.path.join(ev, "postgres-recovery-receipt.json"))
+            rec_ok = (rr.get("exit_status") == 0 and rr.get("promoted") is True
+                      and rr.get("redis_restored") is False and rr.get("source_archive_sha256"))
+        except Exception:
+            rec_ok = False
+            rr = {}
+        add("gate-30c-postgres-recovery-receipt", "verified postgres promotion receipt in CI", rec_ok, rr)
 
     # 31. Manifest hashes and sizes match final files
     manifest_ok = True
@@ -300,7 +310,7 @@ def main():
         json.dump(out, f, indent=2)
     print(f"INDEPENDENT GATE [{mode}]: {result} ({passed_count}/{len(checks)} checks)")
     for c in failed:
-        print(f"  FAIL {c['id']}: {c['name']} — {c['detail']}")
+        print(f"  FAIL {c['id']}: {c['name']} â€” {c['detail']}")
     sys.exit(0 if result == "PASS" else 1)
 
 
