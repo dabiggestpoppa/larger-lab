@@ -132,7 +132,7 @@ echo "  identity: commit=$COMMIT tree=$TREE branch=$BRANCH repo=$REMOTE_REPO"
 DIRTY=$(git -C "$PROJ_ROOT" status --porcelain | wc -l)
 python3 - "$EVIDENCE/source-clean.json" <<PY
 import json, sys
-json.dump({"pre": ${DIRTY} == 0, "dirty_pre": ${DIRTY}, "post": false},
+json.dump({"pre": ${DIRTY} == 0, "dirty_pre": ${DIRTY}, "post": False},
           open(sys.argv[1], "w", encoding="utf-8"), indent=2)
 PY
 if [ "$DIRTY" -ne 0 ]; then
