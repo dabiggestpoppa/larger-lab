@@ -1,0 +1,23 @@
+object,os_role,action,note
+RESPONSE_LAW_GAIN_CEILING,ADAPTIVE_LAW,FREEZE,"gain+ceiling = 2-coordinate response description (anti-coupled r=-0.85, together explain 96% of node motion); unclamped fit only; see 02"
+RESPONSE_GAIN_STATE,ADAPTIVE_LAW,PROMOTE,"CONTINUOUS_GAIN_COORDINATE: autocorr 0.99 (lag1)/0.66 (lag30), near-absorbing tercile states; era-adaptive; see 04"
+CEILING_ROLE,ADAPTIVE_LAW,LOCAL,"regime-local scaling (H4): ceiling varies by era (0.67 pre -> 0.93 2022 -> 1.01 2025-26), anti-coupled with gain, NOT enabler/absorber; see 05"
+SLOPE_X_CEILING_SURFACE,ADAPTIVE_LAW,PROMOTE,distinct environments: HI_GAIN_LO_CEIL delivers 0.40 vs LO_GAIN_HI_CEIL 0.31; see 06
+SATURATION_WITHOUT_DELIVERY,LOCAL_PHYSICS,PROMOTE,"matched (state/gain/ceiling/demand/sat): impaired transfer (-0.08,p<0.05) + lower concentration-release (-0.66) + higher volatility forcing (+0.38), NOT exit structure; see 08"
+SATURATION_FAILURE_TRANSITIONS,LOCAL_PHYSICS,PARK,sterile saturation resolves fast (decays 1-3d; state change 82% @14d; realization 51% @30d); no new mechanism beyond 08; see 09
+SATURATION_TO_DELIVERY,LOCAL_PHYSICS,LOCAL,first-changed variable: threshold 31% / forcing 30% / exit-pressure 27%; transfer rarely first (3%); see 10
+CAPACITY_ROLE,ADAPTIVE_LAW,LOCAL,ABSORPTIVE_CAPACITY: delivery falls monotonically with capacity in every load band (HIGH_LOAD Q1 0.81 -> Q4 0.45); state-structural attribute; see 11-12
+THRESHOLD_X_TRANSFER,ADAPTIVE_LAW,PROMOTE,2x2 repaired: THR_HI_TE_HI 0.79 vs THR_LO_TE_LO 0.12; MI + interaction logit classify SUBSTITUTES with conditional complementarity at high transfer; see 14-15
+REALIZATION_CORE,ADAPTIVE_LAW,PROMOTE,"single-coordinate core = TRANSFER (heldout AUC 0.83); threshold 0.72, capacity 0.69, gain 0.54; extra coords add nothing; see 16"
+REALIZATION_NETWORK,ADAPTIVE_LAW,PROMOTE,"descriptive graph: THRESHOLD~FORCING 0.92, CAPACITY suppresses THRESHOLD/TRANSFER (-0.46/-0.50), EXIT_PRESSURE~ROUTE_DEFORM 0.43; see 17-18"
+REALIZATION_MINIMAL_SETS,ADAPTIVE_LAW,PROMOTE,"DELIVERY: TRANSFER alone 0.73, +THRESHOLD 0.79, +GAIN 0.88; STALL: CAPACITY+NON_SATURATED 0.80; see 19"
+REALIZATION_EQUIFINALITY,ADAPTIVE_LAW,PROMOTE,"MULTIPLE_REALIZATION_PATHS: 62 distinct met-patterns, top <11%; realization equifinality mirrors M14 initiation equifinality; see 20"
+BIRTH_LOAD_RESOLUTION_MISMATCH,ADAPTIVE_LAW,PROMOTE,at INITIATION aborted births: routes OPENING (+0.33) while load rises (+0.15) vs viable routes PRUNING (-0.80) with load falling; resolution_d 1.65; see 22
+BIRTH_RECOVERY_PATH,ADAPTIVE_LAW,LOCAL,first restoration: routes prune 38% / demand cools 35% / threshold normalizes 22%; transfer rarely first; see 24
+THRESHOLD_INVERSION,RESEARCH_ONLY,DEMOTE,materiality audit: activation gaps 0.001-0.03 (5.7% of patch sigma) during thr50 'inversions' -> COMPOSITION_ARTIFACT; mechanism analysis demoted (25-27)
+DEEP_HYSTERESIS,LOCAL_PHYSICS,PARK,final reconciliation: STATE_DOMINANT (state spread 0.040 > depth spread 0.009); 6C_2 strongest (0.12-0.16); depth gradient only inside 6C_0; no global object; see 28-29
+FORCING_FUNCTIONAL_MAP,ADAPTIVE_LAW,PROMOTE,functional dimensions without scalar collapse: VOLATILITY/STABLECOIN/RANK_RECRUITMENT = persistent background fields; PARTICIPATION/CONC_RELEASE/PHYSICAL = impulses; response fns: MOVE_CEILING/MOVE_SL
+FORCING_INTERACTIONS_DEEP,ADAPTIVE_LAW,LOCAL,"supported pairs alter threshold most (PARTICIPATIONxVOLATILITY -0.46, PARTICIPATIONxBTC -0.29); route pressure/transfer/gain mostly additive; see 33"
+2022_RESPONSE_GAIN_ERA,RESEARCH_ONLY,PROMOTE,"H3_MULTIPLE_REGIME_MODULATIONS: 21 monthly gain-regime transitions, 5 LOW runs, 7 HIGH runs; no single era break agreed (SEG finds 2021-12/2022-12/2024-12 collapses); see 34-38"
+SURFACE_VS_LAW_CLOCKS,ADAPTIVE_LAW,LOCAL,"PARTIAL_GENERALIZATION: surface precedes law in first 2 post-2022 excursions only; later excursions law decays at least as fast; 2022-anchored clock, see 39"
+RESPONSELAW_STATE,ADAPTIVE_LAW,PROPOSAL,OS runtime object proposal (gain/ceiling/baseline_version/deviation/changepoint/recovery_status); see 40_RESPONSE_LAW_STATE_PROPOSAL.md

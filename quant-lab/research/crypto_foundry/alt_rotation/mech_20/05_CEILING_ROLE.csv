@@ -1,0 +1,10 @@
+hypothesis,delivery_high_ceil,delivery_low_ceil,diff,prop_high_ceil_high_pres,prop_low_ceil_high_pres,field_act_high_ceil,field_act_low_ceil,subperiod,ceiling_mean,ceiling_std,rho_ceiling_forcing,rho_ceiling_gain,rho_gain_forcing
+H1_ENABLE_MAX_RESPONSE,0.328,0.367,-0.039,,,,,,,,,,
+H2_ABSORPTION,,,,0.342,0.352,,,,,,,,
+H3_SATURATION_BOUNDARY,,,,,,0.462,0.466,,,,,,
+H4_REGIME_SCALING,,,,,,,,2020-2021,0.669,0.157,,,
+H4_REGIME_SCALING,,,,,,,,2022,0.93,0.376,,,
+H4_REGIME_SCALING,,,,,,,,2023,0.841,0.461,,,
+H4_REGIME_SCALING,,,,,,,,2024,0.759,0.402,,,
+H4_REGIME_SCALING,,,,,,,,2025-2026,1.014,0.488,,,
+H5_DOWNSTREAM,,,,,,,,,,,-0.21,-0.848,0.104
