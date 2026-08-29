@@ -202,8 +202,8 @@ def recovery_main(archive, inventory_path, inventory_sha_path, db, user, contain
         # 4. restore into staging with exit-on-error
         with open(archive, "rb") as f:
             data = f.read()
-        r = docker_exec(container, ["pg_restore", "--exit-on-error", "--no-owner",
-                                    "--no-privileges", "--dbname", staging, remote],
+        r = docker_exec(container, ["pg_restore", "-U", user, "--exit-on-error",
+                                    "--no-owner", "--no-privileges", "--dbname", staging, remote],
                         stdin_bytes=data, timeout=1800)
         if r.returncode != 0:
             raise RuntimeError("pg_restore into staging failed: "
