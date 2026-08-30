@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# restore.sh â€” restore a local backup under an explicit, non-ambiguous mode
+# restore.sh — restore a local backup under an explicit, non-ambiguous mode
 # (B1-LOCAL, A-003; recovery contract).
 #
 # Modes:
@@ -11,7 +11,18 @@
 #                        --confirm-local-target <db> (explicit local recovery
 #                        authorization + target identity); REPLACES the local
 #                        PostgreSQL and artifact state with the backup snapshot
-#                        via verified staging promotion. Redis is never restored.
+#                        via verified staging promotion. Redis is never
+#                        restored from backup.
+#
+# PostgreSQL recovery (R25) is an explicit phase-safe state machine:
+#   promote   -> staging restore+verify, canonical->quarantine, promote,
+#                canonical verify; QUARANTINE IS HELD
+#   [external restore-boundary verification]
+#   finalize  -> final canonical re-verification, then quarantine dropped,
+#                removal verified; receipt committed atomically
+#   rollback  -> on any failure after quarantine begins, the ORIGINAL
+#                canonical is restored from quarantine and verified.
+# Quarantine remains available until every fallible verification passes.
 #
 # Integrity is fail-closed: BACKUP_MANIFEST.sha256 must reference existing,
 # hash/size-matching files; every manifest path must be safe (relative, no '..',
@@ -113,7 +124,7 @@ INFO="$CONTENT/backup-info.json"
 SCOPE="$(python3 -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));print(d.get('scope',''))" "$INFO")"
 DCR="$(python3 -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));print(d.get('disaster_recovery_capable',False))" "$INFO")"
 
-# â”€â”€ state-only restore â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── state-only restore ─────────────────────────────────────────────────────
 if [ "$MODE" = "state-only" ]; then
   if [ "$SCOPE" != "state-only" ]; then
     echo "BLOCKED: state-only mode accepts only a state-only backup (got scope=$SCOPE)." >&2
@@ -138,7 +149,7 @@ if [ "$MODE" = "state-only" ]; then
   exit 0
 fi
 
-# â”€â”€ full-replace restore â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── full-replace restore ───────────────────────────────────────────────────
 if [ "$SCOPE" != "full" ]; then
   echo "BLOCKED: full-replace mode requires a 'full' backup (got scope=$SCOPE)." >&2
   echo "         A state-only backup cannot be restored with full-replace." >&2
@@ -189,7 +200,7 @@ mkdir -p "$RECEIPT_DIR"
 EV_DIR="${OCE_EVIDENCE_DIR:-}"
 START_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-# â”€â”€ controlled artifact replacement (R24) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── controlled artifact replacement (R24) ──────────────────────────────────
 ARTIFACT_APPLIED=false
 if [ -f "$CONTENT/artifacts/artifacts.tar.gz" ]; then
   TMP_X="$(mktemp -d)"
@@ -226,41 +237,45 @@ if [ -f "$CONTENT/artifacts/artifacts.tar.gz" ]; then
   ARTIFACT_APPLIED=true
 fi
 
-# â”€â”€ PostgreSQL verified staging promotion (R23) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── PostgreSQL verified staging promotion (R25: phase-safe + rollback) ─────
 export OCE_COMMIT="$(git -C "$PROJ_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+export OCE_TREE="$(git -C "$PROJ_ROOT" rev-parse HEAD^{tree} 2>/dev/null || echo unknown)"
 export OCE_EVIDENCE_DIR="${OCE_EVIDENCE_DIR:-}"
-RECEIPT_OUT="$RECEIPT_DIR/postgres-recovery-receipt.json"
+PROMOTE_RECEIPT="$RECEIPT_DIR/promote-receipt.json"
+ROLLBACK_RECEIPT="$RECEIPT_DIR/rollback-receipt.json"
+RECEIPT_OUT="$RECEIPT_DIR/postgres-recovery-receipt.json"  # finalize receipt
+PG_COMMON=(--inventory "$CONTENT/postgres/inventory.json"
+           --inventory-sha "$CONTENT/postgres/inventory.json.sha256"
+           --db "$PG_DB" --user "$PG_USER" --container oce-local-postgresql)
+save_pg_receipt() { # one or more receipt files -> evidence (never clobbered)
+  local src
+  for src in "$@"; do
+    [ -f "$src" ] || continue
+    if [ -n "$EV_DIR" ]; then
+      cp "$src" "$EV_DIR/$(basename "$src")" 2>/dev/null || true
+      cp "$src" "$EV_DIR/$(basename "$src" .json)-$(date +%s%N).json" 2>/dev/null || true
+    fi
+  done
+}
 if [ -f "$CONTENT/postgres/archive.dump" ] && [ -f "$CONTENT/postgres/inventory.json" ] \
    && [ -f "$CONTENT/postgres/inventory.json.sha256" ]; then
-  python3 "$BIN/pg-recovery.py" \
-    --archive "$CONTENT/postgres/archive.dump" \
-    --inventory "$CONTENT/postgres/inventory.json" \
-    --inventory-sha "$CONTENT/postgres/inventory.json.sha256" \
-    --db "$PG_DB" --user "$PG_USER" --container oce-local-postgresql \
-    --receipt-out "$RECEIPT_OUT"
-  PG_RC=$?
-  if [ -n "$EV_DIR" ] && [ -f "$RECEIPT_OUT" ]; then
-    cp "$RECEIPT_OUT" "$EV_DIR/postgres-recovery-receipt.json" 2>/dev/null || true
-    # preserve each restore's own receipt (a later restore must not clobber evidence)
-    cp "$RECEIPT_OUT" "$EV_DIR/postgres-recovery-receipt-$(date +%s%N).json" 2>/dev/null || true
-  fi
-  if [ "$PG_RC" -ne 0 ]; then
-    echo "BLOCKED: PostgreSQL verified recovery failed" >&2
+  # PHASE 1 — promote: staging restore + verify, canonical->quarantine,
+  # promote, canonical verify. The quarantine (rollback source) is HELD.
+  if ! python3 "$BIN/pg-recovery.py" --phase promote \
+       --archive "$CONTENT/postgres/archive.dump" \
+       "${PG_COMMON[@]}" --receipt-out "$PROMOTE_RECEIPT"; then
+    save_pg_receipt "$PROMOTE_RECEIPT"
+    echo "BLOCKED: PostgreSQL promotion failed (original preserved / rolled back)" >&2
     exit 1
   fi
-elif [ "$SCOPE" = "full" ]; then
-  echo "BLOCKED: full backup is missing required PostgreSQL archive/inventory" >&2
-  exit 3
-fi
+  save_pg_receipt "$PROMOTE_RECEIPT"
 
-# Fail-closed durable canonical verification (Repair-3 phase 8/10): the
-# recovery engine verified the promoted target, but exit 0 must ALSO be
-# independently confirmed against the live canonical right at the restore
-# boundary with a fresh docker exec, and it must be stable (not flicker).
-# If the canonical ever fails to match the protected inventory, BLOCK.
-VERIFY_STABLE=0
-for _pit in 1 2 3 4 5; do
-  if python3 - "$PG_DB" "$PG_USER" "$CONTENT/postgres/inventory.json" <<'PY'
+  # PHASE 2 — external restore-boundary verification: the canonical target is
+  # re-checked by a FRESH, independent process at the restore boundary. The
+  # quarantine stays held until this and every other fallible check passes.
+  VERIFY_STABLE=0
+  for _pit in 1 2 3 4 5; do
+    if python3 - "$PG_DB" "$PG_USER" "$CONTENT/postgres/inventory.json" <<'PY'
 import json, subprocess, sys
 inv = json.load(open(sys.argv[3], encoding="utf-8"))
 expected = {t["name"]: t["row_count"] for t in inv.get("tables", [])}
@@ -282,18 +297,39 @@ if bad:
 print("CANONICAL_VERIFIED")
 sys.exit(0)
 PY
-  then
-    VERIFY_STABLE=$((VERIFY_STABLE+1))
-    [ "$VERIFY_STABLE" -ge 2 ] && break
-  else
-    VERIFY_STABLE=0
-    echo "warning: canonical not yet verified (attempt $_pit)" >&2
+    then
+      VERIFY_STABLE=$((VERIFY_STABLE+1))
+      [ "$VERIFY_STABLE" -ge 2 ] && break
+    else
+      VERIFY_STABLE=0
+      echo "warning: canonical not yet verified (attempt $_pit)" >&2
+    fi
+    sleep 2
+  done
+  if [ "$VERIFY_STABLE" -lt 2 ]; then
+    echo "BLOCKED: canonical target failed independent durable verification after restore" >&2
+    # Roll back: restore the ORIGINAL canonical from the held quarantine.
+    python3 "$BIN/pg-recovery.py" --phase rollback \
+      --receipt-in "$PROMOTE_RECEIPT" "${PG_COMMON[@]}" --receipt-out "$ROLLBACK_RECEIPT" \
+      || echo "WARNING: explicit rollback reported failure; see rollback receipt" >&2
+    save_pg_receipt "$ROLLBACK_RECEIPT"
+    exit 1
   fi
-  sleep 2
-done
-if [ "$VERIFY_STABLE" -lt 2 ]; then
-  echo "BLOCKED: canonical target failed independent durable verification after restore" >&2
-  exit 1
+
+  # PHASE 3 — finalize: FINAL canonical re-verification (quarantine still
+  # held), then quarantine dropped and removal verified. Any failure rolls
+  # the original back from quarantine.
+  if ! python3 "$BIN/pg-recovery.py" --phase finalize \
+       --receipt-in "$PROMOTE_RECEIPT" \
+       "${PG_COMMON[@]}" --receipt-out "$RECEIPT_OUT"; then
+    save_pg_receipt "$RECEIPT_OUT" "$ROLLBACK_RECEIPT"
+    echo "BLOCKED: PostgreSQL finalization failed (rollback attempted)" >&2
+    exit 1
+  fi
+  save_pg_receipt "$RECEIPT_OUT"
+elif [ "$SCOPE" = "full" ]; then
+  echo "BLOCKED: full backup is missing required PostgreSQL archive/inventory" >&2
+  exit 3
 fi
 
 END_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")

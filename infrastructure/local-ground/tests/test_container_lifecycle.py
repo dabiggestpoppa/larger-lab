@@ -225,6 +225,135 @@ def test_ctl_full_replace_into_populated_target(oce_stack, tmp_path):
     assert r.stdout.strip() == "cached", "full-replace mutated Redis (must never restore/touch it)"
 
 
+def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
+    """Real injected post-promotion failure (R25/Repair 8): the recovery
+    engine promotes the candidate with quarantine HELD, a verification
+    failure is injected AFTER promotion but BEFORE finalization, the
+    candidate is rejected, the ORIGINAL canonical database is restored from
+    quarantine, and the protected values are intact. The transient cache is
+    left untouched by the rolled-back recovery."""
+    oc.assert_stack_converged(timeout_s=180, stable=2)
+    # seed protected truth
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "CREATE TABLE IF NOT EXISTS backup_probe(k text PRIMARY KEY, v text);"
+                           "INSERT INTO backup_probe VALUES('b1','alpha'),('b2','beta') "
+                           "ON CONFLICT (k) DO UPDATE SET v=EXCLUDED.v;"])
+    # transient cache written BEFORE recovery must survive a rolled-back run
+    oc.dexec(oc.REDIS, ["redis-cli", "SET", "rollback:cache", "untouched"])
+    # full backup of the seeded truth
+    bk = tmp_path / "bk"
+    oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--scope", "full", "--out", str(bk)], check=True)
+    inv = bk / ".backup-content" / "postgres" / "inventory.json"
+    invsha = bk / ".backup-content" / "postgres" / "inventory.json.sha256"
+    dump = bk / ".backup-content" / "postgres" / "archive.dump"
+    # PHASE 1 — promote (quarantine HELD; canonical replaced by candidate)
+    promote_receipt = tmp_path / "promote.json"
+    r = oc.run(["python3", str(oc.SCRIPTS / "pg-recovery.py"), "--phase", "promote",
+                "--archive", str(dump), "--inventory", str(inv),
+                "--inventory-sha", str(invsha),
+                "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
+                "--receipt-out", str(promote_receipt)], check=False)
+    assert r.returncode == 0, r.stdout + r.stderr
+    pr = json.loads(promote_receipt.read_text(encoding="utf-8"))
+    assert pr.get("promoted") is True, pr
+    assert pr.get("quarantine_held") is True, pr
+    assert pr.get("quarantine_dropped") is False, pr
+    assert pr.get("quarantine_database"), pr
+    # INJECT failure AFTER promotion: alter one protected value in the promoted
+    # canonical so the finalize re-verification must fail.
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "UPDATE backup_probe SET v='evil' WHERE k='b1';"])
+    # PHASE 2 — finalize: canonical re-verification FAILS -> rollback
+    final_receipt = tmp_path / "final.json"
+    r2 = oc.run(["python3", str(oc.SCRIPTS / "pg-recovery.py"), "--phase", "finalize",
+                 "--receipt-in", str(promote_receipt),
+                 "--inventory", str(inv), "--inventory-sha", str(invsha),
+                 "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
+                 "--receipt-out", str(final_receipt)], check=False)
+    assert r2.returncode != 0, "finalize must fail when canonical truth is broken"
+    fr = json.loads(final_receipt.read_text(encoding="utf-8"))
+    assert fr.get("rollback_required") is True, fr
+    assert fr.get("rollback_attempted") is True, fr
+    assert fr.get("rollback_succeeded") is True, fr
+    assert fr.get("original_canonical_restored") is True, fr
+    assert fr.get("promoted_candidate_removed") is True, fr
+    assert fr.get("rollback_verification", {}).get("result") == "ok", fr
+    assert fr.get("exit_status") != 0, "failed recovery must not exit 0"
+    # the ORIGINAL protected values are present after rollback
+    r3 = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                                "SELECT k || '=' || v FROM backup_probe ORDER BY k;"])
+    assert r3.stdout.strip().splitlines() == ["b1=alpha", "b2=beta"], r3.stdout
+    # Redis was NOT invalidated/restored by the rolled-back recovery
+    r4 = oc.dexec(oc.REDIS, ["redis-cli", "GET", "rollback:cache"])
+    assert r4.stdout.strip() == "untouched", "rolled-back recovery mutated Redis"
+    # preserve the rollback receipt as authoritative evidence
+    ev = os.environ.get("OCE_EVIDENCE_DIR")
+    if ev:
+        Path(ev).mkdir(parents=True, exist_ok=True)
+        (Path(ev) / "rollback-receipt.json").write_text(
+            json.dumps(fr, indent=2), encoding="utf-8")
+        (Path(ev) / "rollback-receipt-" + pr.get("stamp", "x") + ".json").write_text(
+            json.dumps(fr, indent=2), encoding="utf-8")
+
+
+def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, tmp_path):
+    """If the rollback source is destroyed (quarantine missing) and the
+    promoted canonical is broken, rollback MUST fail loudly: nonzero exit,
+    actionable evidence, and NO claim of restoration success (Repair 8)."""
+    oc.assert_stack_converged(timeout_s=180, stable=2)
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "CREATE TABLE IF NOT EXISTS backup_probe(k text PRIMARY KEY, v text);"
+                           "INSERT INTO backup_probe VALUES('b1','alpha'),('b2','beta') "
+                           "ON CONFLICT (k) DO UPDATE SET v=EXCLUDED.v;"])
+    bk = tmp_path / "bk"
+    oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--scope", "full", "--out", str(bk)], check=True)
+    inv = bk / ".backup-content" / "postgres" / "inventory.json"
+    invsha = bk / ".backup-content" / "postgres" / "inventory.json.sha256"
+    dump = bk / ".backup-content" / "postgres" / "archive.dump"
+    promote_receipt = tmp_path / "promote.json"
+    r = oc.run(["python3", str(oc.SCRIPTS / "pg-recovery.py"), "--phase", "promote",
+                "--archive", str(dump), "--inventory", str(inv),
+                "--inventory-sha", str(invsha),
+                "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
+                "--receipt-out", str(promote_receipt)], check=False)
+    assert r.returncode == 0, r.stdout + r.stderr
+    pr = json.loads(promote_receipt.read_text(encoding="utf-8"))
+    q = pr.get("quarantine_database")
+    assert q
+    # destroy the rollback source AND break the promoted canonical: rollback
+    # cannot restore the original, so it must fail loudly.
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", "postgres", "-c",
+                           f'DROP DATABASE "{q}" WITH (FORCE);'])
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "UPDATE backup_probe SET v='evil' WHERE k='b1';"])
+    final_receipt = tmp_path / "final.json"
+    r2 = oc.run(["python3", str(oc.SCRIPTS / "pg-recovery.py"), "--phase", "finalize",
+                 "--receipt-in", str(promote_receipt),
+                 "--inventory", str(inv), "--inventory-sha", str(invsha),
+                 "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
+                 "--receipt-out", str(final_receipt)], check=False)
+    assert r2.returncode != 0, "rollback failure must return nonzero"
+    fr = json.loads(final_receipt.read_text(encoding="utf-8"))
+    assert fr.get("rollback_required") is True
+    assert fr.get("rollback_attempted") is True
+    assert fr.get("rollback_succeeded") is False, "must not claim restoration success"
+    assert fr.get("rollback_failed") is True
+    assert fr.get("original_canonical_restored") is False
+    assert fr.get("exit_status") != 0
+    # evidence of the failed rollback is preserved (never hidden)
+    ev = os.environ.get("OCE_EVIDENCE_DIR")
+    if ev:
+        Path(ev).mkdir(parents=True, exist_ok=True)
+        (Path(ev) / "rollback-failure-receipt.json").write_text(
+            json.dumps(fr, indent=2), encoding="utf-8")
+    # leave the shared stack's protected truth intact for later tests
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "UPDATE backup_probe SET v='alpha' WHERE k='b1';"])
+    r5 = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                                "SELECT k || '=' || v FROM backup_probe ORDER BY k;"])
+    assert r5.stdout.strip().splitlines() == ["b1=alpha", "b2=beta"], r5.stdout
+
+
 def test_ctl_corrupt_backup_rejected_against_running_stack(oce_stack, tmp_path):
     bk = tmp_path / "bk2"
     oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--scope", "full", "--out", str(bk)], check=True)

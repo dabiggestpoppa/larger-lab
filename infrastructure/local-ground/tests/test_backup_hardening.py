@@ -303,3 +303,80 @@ def test_sha256_file_is_deterministic():
     p = str(BASE_DIR / "requirements-ci.txt")
     assert len(pr.sha256_file(p)) == 64
     assert pr.sha256_file(p) == pr.sha256_file(p)
+
+
+# ── R25: phase-safe recovery state machine (pure) ─────────────────────────
+def test_pg_recovery_source_has_no_invalid_database_syntax():
+    """PostgreSQL does not support `ALTER DATABASE IF EXISTS`; existence must
+    be proven via the pg_database catalog before ALTER/DROP DATABASE. The
+    recovery engine must never contain the invalid forms."""
+    src = (SCRIPTS / "pg-recovery.py").read_text(encoding="utf-8")
+    assert "ALTER DATABASE IF EXISTS" not in src
+    assert "DROP DATABASE IF EXISTS" not in src
+    assert "pg_database" in src, "catalog-based existence checks must be used"
+
+
+def test_promote_phase_prefix_is_valid():
+    pr = _load_pr()
+    good = ["inventory_validated", "archive_validated", "staging_created",
+            "staging_restored", "staging_verified", "canonical_quarantined",
+            "promoted", "canonical_verified"]
+    assert pr.valid_phase_prefix(good, pr.PHASES_PROMOTE) is True
+    # a prefix (recovery still in progress) is valid
+    assert pr.valid_phase_prefix(good[:4], pr.PHASES_PROMOTE) is True
+    # out-of-order / invented / empty phase lists must be rejected
+    assert pr.valid_phase_prefix(list(reversed(good)), pr.PHASES_PROMOTE) is False
+    assert pr.valid_phase_prefix(["invented_phase"], pr.PHASES_PROMOTE) is False
+    assert pr.valid_phase_prefix([], pr.PHASES_PROMOTE) is False
+
+
+def test_finalize_phase_prefix_is_valid():
+    pr = _load_pr()
+    good = ["final_canonical_verified", "quarantine_dropped",
+            "quarantine_removal_verified"]
+    assert pr.valid_phase_prefix(good, pr.PHASES_FINALIZE) is True
+    assert pr.valid_phase_prefix(good[:1], pr.PHASES_FINALIZE) is True
+    assert pr.valid_phase_prefix(["quarantine_dropped", "final_canonical_verified"],
+                                 pr.PHASES_FINALIZE) is False
+
+
+def test_rollback_receipt_truthfulness_contract():
+    """rollback_truthful: a rollback that was never attempted, or that claims
+    success without restoring the original, is rejected; a truthfully failed
+    rollback (quarantine missing) is reported as rollback_failed."""
+    pr = _load_pr()
+    # never attempted -> not truthful
+    assert pr.rollback_truthful({"rollback_required": True}) is False
+    # attempted + succeeded with original restored + verified -> truthful
+    good = {"rollback_required": True, "rollback_attempted": True,
+            "rollback_succeeded": True, "rollback_failed": False,
+            "original_canonical_restored": True,
+            "rollback_verification": {"result": "ok"}}
+    assert pr.rollback_truthful(good) is True
+    # claims success but original NOT restored -> a lie
+    lie = dict(good, original_canonical_restored=False)
+    assert pr.rollback_truthful(lie) is False
+    # claims success but verification failed -> a lie
+    lie2 = dict(good, rollback_verification={"result": "failed"})
+    assert pr.rollback_truthful(lie2) is False
+    # attempted + truthfully failed (quarantine missing) -> reported as failure
+    failed = {"rollback_required": True, "rollback_attempted": True,
+              "rollback_succeeded": False, "rollback_failed": True,
+              "original_canonical_restored": False}
+    assert pr.rollback_truthful(failed) is True  # truthful ABOUT the failure
+
+
+def test_recovery_succeeded_never_overrides_failed_invariant():
+    """recovery_succeeded: a green exit cannot override a failed rollback or
+    an outstanding rollback — the recovery gate fails closed."""
+    pr = _load_pr()
+    assert pr.recovery_succeeded({"exit_status": 0}) is True
+    # exit 0 but rollback required and never succeeded -> NOT success
+    assert pr.recovery_succeeded({"exit_status": 0, "rollback_required": True,
+                                  "rollback_succeeded": False}) is False
+    assert pr.recovery_succeeded({"exit_status": 0, "rollback_failed": True}) is False
+    # exit 1 can never be success
+    assert pr.recovery_succeeded({"exit_status": 1}) is False
+    # exit 0 + fully successful rollback -> success
+    assert pr.recovery_succeeded({"exit_status": 0, "rollback_required": True,
+                                  "rollback_succeeded": True}) is True
