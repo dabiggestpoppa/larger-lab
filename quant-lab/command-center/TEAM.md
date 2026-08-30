@@ -1,5 +1,8 @@
 # 🦉 OWL Command Center — Team Manifest
 
+> NOTE (CLEANROOM-F02): legacy quant-lab artifacts referenced below (backtests,
+> strategies, reports, results) were removed as abandoned on agent/repo-cleanroom.
+
 > **Operator:** OWL (Research Lead / OCE Operator)
 > **Lead:** MAD (strategic anchor, attractor definer)
 > **Domain:** CEREBUS Quant Trading System — `quant-lab/`

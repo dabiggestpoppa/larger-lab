@@ -1,5 +1,8 @@
 # Quant Lab — Strategy Status
 
+> NOTE (CLEANROOM-F02): backtest/result/insight/finding artifacts referenced below
+> were removed as abandoned legacy P90/CEREBUS material on agent/repo-cleanroom.
+
 > Last updated: 2026-05-17 06:05 (Optimizer v2 results integrated)
 
 ## Validated Results (Nautilus, EUR/USD M5, Jan 2023 – May 2026)

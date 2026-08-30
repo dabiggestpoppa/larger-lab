@@ -4,6 +4,9 @@
 > **Active Sub-Agents:** 0 (max 5)
 > **Current Phase:** Phase 0 ✅ → Phase 1 (P90 Base Port) next
 
+> NOTE (CLEANROOM-F02): source/output artifacts referenced below were removed as
+> abandoned legacy P90/CEREBUS material on agent/repo-cleanroom.
+
 ---
 
 ## 🔴 ACTIVE TASKS
