@@ -118,13 +118,14 @@ def test_submit_inspect_cancel_roundtrip(client):
                                    target="default")
     read = authority.issue_grant(actor_id=READ_ACTOR, action="read",
                                  target="default")
-    cancel = authority.issue_grant(actor_id="po-test01", action="cancel_job",
-                                   target="default")
 
     r = c.post("/api/jobs", json={"job_type": "http_test", "payload": {"n": 1}},
                headers=_headers(submit.grant_id))
     assert r.status_code == 200, r.text
     job_id = r.json()["data"]["job_id"]
+    # cancel/retry grants are targeted at the job id (façade contract)
+    cancel = authority.issue_grant(actor_id="po-test01", action="cancel_job",
+                                   target=job_id)
 
     # read endpoint denied without read grant
     denied = c.get(f"/api/jobs/{job_id}", headers=_headers(submit.grant_id))
