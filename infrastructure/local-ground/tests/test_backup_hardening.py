@@ -12,6 +12,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -504,3 +505,116 @@ def test_inventory_fingerprint_tamper_rejected():
         import pytest as _pytest
         with _pytest.raises(RuntimeError, match="tampered"):
             pr._load_protected_inventory(invp, shap)
+
+
+# ── R8: immutable indexed recovery receipts (pure) ─────────────────────────
+def _ops_add(root, opid, op_type="restore", final="success", rollback="none",
+             receipt=None, extra=None):
+    if receipt is None:
+        receipt = tmpfile_ops_receipt(root)
+    cmd = [sys.executable, str(SCRIPTS / "recovery-ops.py"), "add",
+           "--ops-root", str(root), "--operation-id", opid,
+           "--operation-type", op_type, "--run-id", "aabbccddeeff",
+           "--commit", "c" * 40, "--tree", "t" * 40,
+           "--started-at", "2026-01-01T00:00:00Z", "--finished-at", "2026-01-01T00:00:01Z",
+           "--backup-id", opid, "--backup-scope", "full", "--restore-mode", "full-replace",
+           "--source-database", "oce_local", "--target-database", "oce_local",
+           "--final-result", final, "--rollback-result", rollback,
+           "--cloud-mutations", "0", "--cloud-cost-state", "ZERO",
+           "--receipt", str(receipt)] + list(extra or [])
+    return subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+
+
+def tmpfile_ops_receipt(root):
+    root.mkdir(parents=True, exist_ok=True)
+    p = root / "receipt-src.json"
+    p.write_text(json.dumps({"receipt": True, "phase": "staging"}), encoding="utf-8")
+    return p
+
+
+def test_two_restores_preserve_two_receipt_sets(tmp_path):
+    """Two restore operations produce two preserved, independently indexed
+    receipt sets; neither clobbers the other."""
+    root = tmp_path / "ops"
+    r1 = _ops_add(root, "a" * 16, receipt=tmpfile_ops_receipt(root / "r1"))
+    r2 = _ops_add(root, "b" * 16, receipt=tmpfile_ops_receipt(root / "r2"))
+    assert r1.returncode == 0, r1.stdout + r1.stderr
+    assert r2.returncode == 0, r2.stdout + r2.stderr
+    idx = json.loads((root / "index.json").read_text(encoding="utf-8"))
+    assert len(idx["operations"]) == 2
+    assert (root / "operations" / ("a" * 16) / "receipt-src.json").is_file()
+    assert (root / "operations" / ("b" * 16) / "receipt-src.json").is_file()
+    v = subprocess.run([sys.executable, str(SCRIPTS / "recovery-ops.py"), "verify",
+                        "--ops-root", str(root)], capture_output=True, text=True, timeout=60)
+    assert v.returncode == 0, v.stdout + v.stderr
+
+
+def test_later_operation_cannot_overwrite_earlier_evidence(tmp_path):
+    """Registering a later operation never modifies the earlier operation's
+    receipt set or its indexed hashes."""
+    root = tmp_path / "ops"
+    rec_a = tmpfile_ops_receipt(root / "r1")
+    r1 = _ops_add(root, "a" * 16, receipt=rec_a)
+    assert r1.returncode == 0
+    before = (root / "operations" / ("a" * 16) / "receipt-src.json").read_bytes()
+    # a later (successful) restore registers a second operation
+    r2 = _ops_add(root, "b" * 16, receipt=tmpfile_ops_receipt(root / "r2"))
+    assert r2.returncode == 0
+    after = (root / "operations" / ("a" * 16) / "receipt-src.json").read_bytes()
+    assert before == after, "later operation modified earlier evidence"
+    idx = json.loads((root / "index.json").read_text(encoding="utf-8"))
+    e_a = [op for op in idx["operations"] if op["operation_id"] == "a" * 16][0]
+    # the earlier entry still references its ORIGINAL hash
+    assert e_a["receipts"][0]["sha256"] == hashlib.sha256(before).hexdigest()
+
+
+def test_duplicate_operation_id_fails(tmp_path):
+    """A duplicate operation ID must be rejected — immutable receipts cannot
+    be overwritten or re-indexed."""
+    root = tmp_path / "ops"
+    rec = tmpfile_ops_receipt(root)
+    r1 = _ops_add(root, "a" * 16, receipt=rec)
+    assert r1.returncode == 0
+    r2 = _ops_add(root, "a" * 16, receipt=tmpfile_ops_receipt(root / "dup"))
+    assert r2.returncode != 0
+    assert "DUPLICATE_OPERATION_ID" in r2.stdout + r2.stderr
+    idx = json.loads((root / "index.json").read_text(encoding="utf-8"))
+    assert len(idx["operations"]) == 1, "duplicate op must not be indexed"
+
+
+def test_verify_detects_missing_indexed_receipt(tmp_path):
+    """Deleting an indexed receipt file fails verification (missing indexed
+    receipts must fail the gate)."""
+    root = tmp_path / "ops"
+    assert _ops_add(root, "a" * 16, receipt=tmpfile_ops_receipt(root / "r")).returncode == 0
+    (root / "operations" / ("a" * 16) / "receipt-src.json").unlink()
+    v = subprocess.run([sys.executable, str(SCRIPTS / "recovery-ops.py"), "verify",
+                        "--ops-root", str(root)], capture_output=True, text=True, timeout=60)
+    assert v.returncode != 0
+    assert "missing" in (v.stdout + v.stderr).lower()
+
+
+def test_verify_detects_receipt_hash_mismatch(tmp_path):
+    """Tampering with an indexed receipt file fails verification (receipt
+    hash mismatch must fail the gate)."""
+    root = tmp_path / "ops"
+    assert _ops_add(root, "a" * 16, receipt=tmpfile_ops_receipt(root / "r")).returncode == 0
+    p = root / "operations" / ("a" * 16) / "receipt-src.json"
+    p.write_text('{"tampered": true}', encoding="utf-8")
+    v = subprocess.run([sys.executable, str(SCRIPTS / "recovery-ops.py"), "verify",
+                        "--ops-root", str(root)], capture_output=True, text=True, timeout=60)
+    assert v.returncode != 0
+    assert "mismatch" in (v.stdout + v.stderr).lower()
+
+
+def test_latest_pointer_is_not_authoritative(tmp_path):
+    """A convenience latest.json cannot substitute for the authoritative
+    indexed receipt sets: without an index (or with an empty index) verify
+    must fail."""
+    root = tmp_path / "ops"
+    root.mkdir(parents=True, exist_ok=True)
+    (root / "latest.json").write_text('{"operation_id": "a" * 16}', encoding="utf-8")
+    v = subprocess.run([sys.executable, str(SCRIPTS / "recovery-ops.py"), "verify",
+                        "--ops-root", str(root)], capture_output=True, text=True, timeout=60)
+    assert v.returncode != 0
+    assert "index missing" in (v.stdout + v.stderr).lower()

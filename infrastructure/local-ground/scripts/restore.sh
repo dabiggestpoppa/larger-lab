@@ -200,6 +200,40 @@ mkdir -p "$RECEIPT_DIR"
 EV_DIR="${OCE_EVIDENCE_DIR:-}"
 START_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
+# R8: every restore is ONE immutable, indexed operation. Receipts are copied
+# into operations/<operation-id>/ under the operations root and registered in
+# the append-only index with their hashes; later operations cannot overwrite
+# earlier evidence, and a convenience latest.json is never authoritative.
+OPERATION_ID="$(python3 -c 'import uuid,sys;sys.stdout.write(uuid.uuid4().hex)')"
+OPS_ROOT="${OCE_EVIDENCE_DIR:-$VAR_DIR}/operations"
+BACKUP_ID="$(python3 -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));print(d.get('backup_id',''))" "$INFO" 2>/dev/null || echo unknown)"
+register_op() { # EXIT trap: index this restore operation immutably (idempotent)
+  local rc="$1"
+  [ "$MODE" = "full-replace" ] || return 0
+  local final="success" rollback="none"
+  [ "$rc" -eq 0 ] || final="blocked"
+  if [ -f "$RECEIPT_DIR/rollback-receipt.json" ]; then
+    rollback="$(python3 -c "import json;d=json.load(open(r'$RECEIPT_DIR/rollback-receipt.json',encoding='utf-8'));print('ok' if d.get('rollback_succeeded') is True else 'failed')" 2>/dev/null || echo failed)"
+  fi
+  local op_receipts=()
+  for f in "$RECEIPT_DIR/restore-receipt.json" "$RECEIPT_DIR/postgres-recovery-receipt.json" \
+           "$RECEIPT_DIR/promote-receipt.json" "$RECEIPT_DIR/artifact-recovery-receipt.json" \
+           "$RECEIPT_DIR/redis-invalidation-receipt.json" "$RECEIPT_DIR/rollback-receipt.json"; do
+    [ -f "$f" ] && op_receipts+=(--receipt "$f")
+  done
+  [ "${#op_receipts[@]}" -gt 0 ] || return 0
+  python3 "$BIN/recovery-ops.py" add --ops-root "$OPS_ROOT" \
+    --operation-id "$OPERATION_ID" --operation-type restore \
+    --run-id "${OCE_RUN_ID:-not-set}" --commit "${OCE_COMMIT:-unknown}" --tree "${OCE_TREE:-unknown}" \
+    --started-at "$START_TS" --finished-at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --backup-id "$BACKUP_ID" --backup-scope "$SCOPE" --restore-mode "$MODE" \
+    --source-database "$PG_DB" --target-database "$PG_DB" \
+    --final-result "$final" --rollback-result "$rollback" \
+    --cloud-mutations 0 --cloud-cost-state ZERO \
+    "${op_receipts[@]}" >/dev/null 2>&1 || echo "WARNING: restore operation registration failed" >&2
+}
+trap 'rc=$?; register_op "$rc"; exit "$rc"' EXIT
+
 # ── controlled artifact replacement (R24) ──────────────────────────────────
 ARTIFACT_APPLIED=false
 if [ -f "$CONTENT/artifacts/artifacts.tar.gz" ]; then
@@ -235,6 +269,25 @@ if [ -f "$CONTENT/artifacts/artifacts.tar.gz" ]; then
   rm -rf "$TMP_X"
   docker start oce-local-artifact >/dev/null 2>&1 || true
   ARTIFACT_APPLIED=true
+  # artifact-replacement evidence (R8): archive identity + replace result
+  python3 - "$RECEIPT_DIR/artifact-recovery-receipt.json" "$CONTENT/artifacts/artifacts.tar.gz" "$ARTIFACT_APPLIED" "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" <<'PY'
+import hashlib, json, os, sys
+p, archive, applied, ts = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+h = hashlib.sha256()
+with open(archive, "rb") as f:
+    for chunk in iter(lambda: f.read(8192), b""):
+        h.update(chunk)
+json.dump({"format": "oce-artifact-recovery-receipt-v1",
+           "artifact_archive_sha256": h.hexdigest(),
+           "artifact_archive_size": os.path.getsize(archive),
+           "artifact_replaced": applied == "true",
+           "artifact_verify": "ok" if applied == "true" else "not-applied",
+           "timestamp": ts},
+          open(p, "w", encoding="utf-8"), indent=2)
+PY
+  if [ -n "$EV_DIR" ]; then
+    cp "$RECEIPT_DIR/artifact-recovery-receipt.json" "$EV_DIR/artifact-recovery-receipt.json" 2>/dev/null || true
+  fi
 fi
 
 # ── PostgreSQL verified staging promotion (R25: phase-safe + rollback) ─────

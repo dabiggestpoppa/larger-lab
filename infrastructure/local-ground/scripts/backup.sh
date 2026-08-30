@@ -46,6 +46,7 @@ OUT="${OUT:-$VAR_DIR/backups/$(date +%Y%m%d-%H%M%S)}"
 mkdir -p "$OUT/.backup-content"
 OUT="$(cd "$OUT" && pwd)"
 CONTENT="$OUT/.backup-content"
+START_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 PG_USER="${POSTGRES_USER:-oce_local_admin}"
 PG_DB="${POSTGRES_DB:-oce_local}"
@@ -161,6 +162,23 @@ if [ "$SCOPE" = "full" ]; then
   actual=$(find "$CONTENT" -type f | wc -l)
   [ "$declared" -eq "$actual" ] || { echo "BLOCKED: manifest incomplete (declared=$declared actual=$actual)" >&2; exit 3; }
 fi
+
+# R8: register this backup as ONE immutable, indexed operation. The receipt
+# (hash-protected backup-info.json) is copied into operations/<backup_id>/ and
+# appended to the operation index with its hash; later operations cannot
+# overwrite earlier evidence.
+OPS_ROOT="${OCE_EVIDENCE_DIR:-$VAR_DIR}/operations"
+python3 "$BIN/recovery-ops.py" add --ops-root "$OPS_ROOT" \
+  --operation-id "$BACKUP_ID" --operation-type backup \
+  --run-id "${OCE_RUN_ID:-not-set}" --commit "$COMMIT" \
+  --tree "$(git -C "$PROJ_ROOT" rev-parse HEAD^{tree} 2>/dev/null || echo unknown)" \
+  --started-at "$START_TS" --finished-at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+  --backup-id "$BACKUP_ID" --backup-scope "$SCOPE" --restore-mode "-" \
+  --source-database "$PG_DB" --target-database "-" \
+  --final-result success --rollback-result none \
+  --cloud-mutations 0 --cloud-cost-state ZERO \
+  --receipt "$CONTENT/backup-info.json" \
+  || echo "WARNING: backup operation registration failed" >&2
 
 echo "backup complete -> $OUT"
 echo "scope: $SCOPE | backup_id: $BACKUP_ID | disaster_recovery_capable: $DCR"

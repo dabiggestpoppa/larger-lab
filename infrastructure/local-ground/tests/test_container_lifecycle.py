@@ -289,14 +289,33 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
     # Redis was NOT invalidated/restored by the rolled-back recovery
     r4 = oc.dexec(oc.REDIS, ["redis-cli", "GET", "rollback:cache"])
     assert r4.stdout.strip() == "untouched", "rolled-back recovery mutated Redis"
-    # preserve the rollback receipt as authoritative evidence
+    # preserve the rollback receipt as authoritative, INDEXED evidence (R8):
+    # the injected-failure rollback operation is registered in the immutable
+    # operation index with final_result=failed / rollback_result=ok.
     ev = os.environ.get("OCE_EVIDENCE_DIR")
     if ev:
-        Path(ev).mkdir(parents=True, exist_ok=True)
-        (Path(ev) / "rollback-receipt.json").write_text(
+        evdir = Path(ev)
+        evdir.mkdir(parents=True, exist_ok=True)
+        (evdir / "rollback-receipt.json").write_text(
             json.dumps(fr, indent=2), encoding="utf-8")
-        (Path(ev) / "rollback-receipt-" + pr.get("stamp", "x") + ".json").write_text(
+        (evdir / ("rollback-receipt-" + pr.get("stamp", "x") + ".json")).write_text(
             json.dumps(fr, indent=2), encoding="utf-8")
+        opid = pr.get("stamp", "x")
+        reg = subprocess.run(
+            ["python3", str(oc.SCRIPTS / "recovery-ops.py"), "add",
+             "--ops-root", str(evdir / "operations"),
+             "--operation-id", opid, "--operation-type", "restore",
+             "--run-id", os.environ.get("OCE_RUN_ID", "not-set"),
+             "--commit", os.environ.get("OCE_COMMIT", "unknown"),
+             "--tree", os.environ.get("OCE_TREE", "unknown"),
+             "--started-at", fr.get("started_at", ""), "--finished-at", fr.get("finished_at", ""),
+             "--backup-id", "b" * 32, "--backup-scope", "full", "--restore-mode", "full-replace",
+             "--source-database", oc.PG_DB, "--target-database", oc.PG_DB,
+             "--final-result", "failed", "--rollback-result", "ok",
+             "--cloud-mutations", "0", "--cloud-cost-state", "ZERO",
+             "--receipt", str(final_receipt)],
+            capture_output=True, text=True)
+        assert reg.returncode == 0, reg.stdout + reg.stderr
 
 
 def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, tmp_path):
@@ -343,12 +362,29 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
     assert fr.get("rollback_failed") is True
     assert fr.get("original_canonical_restored") is False
     assert fr.get("exit_status") != 0
-    # evidence of the failed rollback is preserved (never hidden)
+    # evidence of the failed rollback is preserved (never hidden) and INDEXED
     ev = os.environ.get("OCE_EVIDENCE_DIR")
     if ev:
-        Path(ev).mkdir(parents=True, exist_ok=True)
-        (Path(ev) / "rollback-failure-receipt.json").write_text(
+        evdir = Path(ev)
+        evdir.mkdir(parents=True, exist_ok=True)
+        (evdir / "rollback-failure-receipt.json").write_text(
             json.dumps(fr, indent=2), encoding="utf-8")
+        opid = pr.get("stamp", "x")
+        reg = subprocess.run(
+            ["python3", str(oc.SCRIPTS / "recovery-ops.py"), "add",
+             "--ops-root", str(evdir / "operations"),
+             "--operation-id", opid, "--operation-type", "restore",
+             "--run-id", os.environ.get("OCE_RUN_ID", "not-set"),
+             "--commit", os.environ.get("OCE_COMMIT", "unknown"),
+             "--tree", os.environ.get("OCE_TREE", "unknown"),
+             "--started-at", fr.get("started_at", ""), "--finished-at", fr.get("finished_at", ""),
+             "--backup-id", "b" * 32, "--backup-scope", "full", "--restore-mode", "full-replace",
+             "--source-database", oc.PG_DB, "--target-database", oc.PG_DB,
+             "--final-result", "failed", "--rollback-result", "failed",
+             "--cloud-mutations", "0", "--cloud-cost-state", "ZERO",
+             "--receipt", str(final_receipt)],
+            capture_output=True, text=True)
+        assert reg.returncode == 0, reg.stdout + reg.stderr
     # leave the shared stack's protected truth intact for later tests
     oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
                            "UPDATE backup_probe SET v='alpha' WHERE k='b1';"])
