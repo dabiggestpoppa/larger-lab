@@ -218,11 +218,14 @@ def test_ctl_full_replace_into_populated_target(oce_stack, tmp_path):
     r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
                                "SELECT v FROM replace_probe WHERE k='keep';"])
     assert r.stdout.strip() == "snapshot"
-    # full-replace NEVER touches Redis: the cache written immediately before the
-    # restore must still be present exactly as-is. This proves Redis is not
-    # restored (or rewritten) as authoritative truth, while leaving it usable.
+    # R27: Redis is never RESTORED from backup, and after PostgreSQL+artifact
+    # replacement passed final verification the transient cache is INVALIDATED:
+    # the stale pre-restore value must be ABSENT, and Redis remains usable.
     r = oc.dexec(oc.REDIS, ["redis-cli", "GET", "replace:cache"])
-    assert r.stdout.strip() == "cached", "full-replace mutated Redis (must never restore/touch it)"
+    assert r.stdout.strip() == "", f"stale redis cache survived full-replace: {r.stdout!r}"
+    oc.dexec(oc.REDIS, ["redis-cli", "SET", "post:replace:key", "rebuilt"])
+    r = oc.dexec(oc.REDIS, ["redis-cli", "GET", "post:replace:key"])
+    assert r.stdout.strip() == "rebuilt", "redis unusable after full-replace (must be rebuildable)"
 
 
 def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
@@ -352,6 +355,45 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
     r5 = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
                                 "SELECT k || '=' || v FROM backup_probe ORDER BY k;"])
     assert r5.stdout.strip().splitlines() == ["b1=alpha", "b2=beta"], r5.stdout
+
+
+def test_ctl_redis_invalidation_failure_blocks_success(oce_stack, tmp_path):
+    """R27: if transient-cache invalidation fails AFTER PostgreSQL replacement
+    is irreversible, the recovery must NOT report a clean success: nonzero
+    exit, redis_failure recorded, and evidence of PostgreSQL status preserved."""
+    oc.assert_stack_converged(timeout_s=180, stable=2)
+    oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
+                           "CREATE TABLE IF NOT EXISTS backup_probe(k text PRIMARY KEY, v text);"
+                           "INSERT INTO backup_probe VALUES('b1','alpha'),('b2','beta') "
+                           "ON CONFLICT (k) DO UPDATE SET v=EXCLUDED.v;"])
+    bk = tmp_path / "bk"
+    oc.run(["bash", str(oc.SCRIPTS / "backup.sh"), "--scope", "full", "--out", str(bk)], check=True)
+    # make the transient cache unavailable for invalidation (no FLUSHALL)
+    subprocess.run(["docker", "stop", oc.REDIS], capture_output=True, text=True, check=True)
+    try:
+        r = oc.run(["bash", str(oc.SCRIPTS / "restore.sh"), "--mode", "full-replace",
+                    "--from", str(bk), "--confirm-local-target", oc.PG_DB], check=False)
+        assert r.returncode != 0, "restore must not report clean success when redis invalidation fails"
+        combo = r.stdout + r.stderr
+        assert "BLOCKED" in combo and "redis" in combo.lower(), combo
+        # postgres truth is intact (promotion succeeded before the redis step)
+        r2 = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
+                                    "SELECT k || '=' || v FROM backup_probe ORDER BY k;"])
+        assert r2.stdout.strip().splitlines() == ["b1=alpha", "b2=beta"], r2.stdout
+        ev = os.environ.get("OCE_EVIDENCE_DIR")
+        if ev:
+            p = Path(ev) / "redis-invalidation-receipt.json"
+            assert p.is_file(), "redis invalidation failure receipt must be preserved"
+            rr = json.loads(p.read_text(encoding="utf-8"))
+            assert rr.get("redis_invalidation_attempted") is True
+            assert rr.get("redis_invalidated") is False
+            assert rr.get("redis_verification") == "failed"
+            assert rr.get("redis_failure"), rr
+            assert rr.get("redis_restored") is False
+            assert rr.get("postgres_promoted") is True
+    finally:
+        subprocess.run(["docker", "start", oc.REDIS], capture_output=True, text=True, check=True)
+        assert oc.wait_healthy(oc.REDIS), "redis did not recover after invalidation-failure test"
 
 
 def test_ctl_corrupt_backup_rejected_against_running_stack(oce_stack, tmp_path):

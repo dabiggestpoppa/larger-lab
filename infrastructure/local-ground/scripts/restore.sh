@@ -298,7 +298,69 @@ if [ -f "$CONTENT/postgres/archive.dump" ] && [ -f "$CONTENT/postgres/inventory.
     exit 1
   fi
   save_pg_receipt "$RECEIPT_OUT"
-elif [ "$SCOPE" = "full" ]; then
+fi
+
+# ── transient Redis invalidation (R27) ─────────────────────────────────────
+# Redis is transient and non-authoritative: it is NEVER restored from backup,
+# and stale cache must not survive a replacement of PostgreSQL truth. The
+# cache was left untouched while recovery could still roll back; it is now
+# invalidated ONLY after PostgreSQL and artifact replacement passed final
+# verification. Invalidation failure BLOCKS a clean success (nonzero) while
+# preserving evidence of PostgreSQL status and the cache-invalidation failure.
+if [ "$SCOPE" = "full" ] && [ "$MODE" = "full-replace" ]; then
+  REDIS_RECEIPT="$RECEIPT_DIR/redis-invalidation-receipt.json"
+  REDIS_INVALIDATED=false
+  REDIS_VERIFICATION="not-attempted"
+  REDIS_FAILURE=""
+  REDIS_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  if docker inspect oce-local-redis >/dev/null 2>&1; then
+    if docker exec oce-local-redis redis-cli FLUSHALL >/dev/null 2>&1; then
+      DBSIZE=$(docker exec oce-local-redis redis-cli DBSIZE 2>/dev/null | tr -d '[:space:]')
+      if [ "$DBSIZE" = "0" ]; then
+        REDIS_INVALIDATED=true
+        REDIS_VERIFICATION="ok"
+      else
+        REDIS_VERIFICATION="failed"
+        REDIS_FAILURE="redis DBSIZE=$DBSIZE after FLUSHALL"
+      fi
+    else
+      REDIS_VERIFICATION="failed"
+      REDIS_FAILURE="redis-cli FLUSHALL failed (container not running?)"
+    fi
+  else
+    REDIS_VERIFICATION="failed"
+    REDIS_FAILURE="redis container unavailable"
+  fi
+  python3 - "$REDIS_RECEIPT" "$REDIS_START" "$REDIS_INVALIDATED" "$REDIS_VERIFICATION" "$REDIS_FAILURE" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" <<'PY'
+import json, sys
+p, start, invalidated, ver, failure, finish = sys.argv[1:7]
+json.dump({
+  "format": "oce-redis-invalidation-receipt-v1",
+  "redis_restored": False,
+  "redis_invalidation_required": True,
+  "redis_invalidation_attempted": True,
+  "redis_invalidated": invalidated == "true",
+  "redis_verification": ver,
+  "redis_failure": failure or None,
+  "postgres_promoted": True,
+  "postgres_exit_status": 0,
+  "started_at": start, "finished_at": finish,
+}, open(p, "w", encoding="utf-8"), indent=2)
+PY
+  if [ -n "$EV_DIR" ]; then
+    cp "$REDIS_RECEIPT" "$EV_DIR/redis-invalidation-receipt.json" 2>/dev/null || true
+  fi
+  if [ "$REDIS_INVALIDATED" = "true" ] && [ "$REDIS_VERIFICATION" = "ok" ]; then
+    echo "  redis: invalidated (transient cache cleared; never restored from backup)"
+  else
+    echo "BLOCKED: redis invalidation failed (${REDIS_FAILURE:-unknown}) — postgres promoted but recovery NOT clean" >&2
+    exit 1
+  fi
+fi
+
+if [ "$SCOPE" = "full" ] && { [ ! -f "$CONTENT/postgres/archive.dump" ] \
+     || [ ! -f "$CONTENT/postgres/inventory.json" ] \
+     || [ ! -f "$CONTENT/postgres/inventory.json.sha256" ]; }; then
   echo "BLOCKED: full backup is missing required PostgreSQL archive/inventory" >&2
   exit 3
 fi
@@ -309,5 +371,5 @@ if [ -n "$EV_DIR" ]; then
   cp "$RECEIPT_DIR/restore-receipt.json" "$EV_DIR/restore-receipt.json" 2>/dev/null || true
 fi
 echo "full-replace restore complete <- $FROM"
-echo "  postgres: verified staging promotion | artifacts: $ARTIFACT_APPLIED | redis: not restored"
+echo "  postgres: verified staging promotion | artifacts: $ARTIFACT_APPLIED | redis: invalidated (not restored)"
 exit 0
