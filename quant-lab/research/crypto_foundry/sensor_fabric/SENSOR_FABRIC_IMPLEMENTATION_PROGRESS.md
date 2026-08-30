@@ -14,16 +14,17 @@ that is updated at every staged checkpoint.
 | Current checkpoint | SENSOR-B3-I04R2 COMPLETE — FINAL COMMON-FOUNDATION CONFORMANCE CLOSURE |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation authorized and hardened through I04R2 (behaviorally closed); first provider adapter NOT authorized until operator review after I04R2 |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation OPERATOR REVIEWED / ACCEPTED FOR FIRST PROVIDER (I04R2-RATIFY); SENSOR-B3-I05 (Kraken) implementation in progress |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
-| Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2) |
-| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=0 · PROVIDER_PARSER_CONFORMANCE=NOT_YET_APPLICABLE · NETWORK_VALIDATION=NOT_YET_RUN |
+| Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = KRAKEN_FUTURES ONLY |
+| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=0 (Kraken building) · PROVIDER_PARSER_CONFORMANCE=NOT_YET_APPLICABLE · NETWORK_VALIDATION=NOT_YET_RUN |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
-| next_checkpoint_authorized | FALSE (awaiting operator review after SENSOR-B3-I04R2; I05 Kraken NOT authorized) |
+| next_provider_authorized | FALSE beyond Kraken (I05 Kraken ONLY; I06 Gate NOT authorized) |
+| next_checkpoint_authorized | FALSE (I05 in progress; await operator review after) |
 
 ## Test counts (cumulative)
 
@@ -152,6 +153,17 @@ that is updated at every staged checkpoint.
   semantics are characterized on the trade sensor for later T2 derivation.
 
 ## Next checkpoint
+
+- SENSOR-B3-I04R2-RATIFY COMPLETE — operator ACCEPTED the hardened Bloc 3
+  common foundation for first-provider implementation.  provider_adapter
+  implementation authorized = KRAKEN_FUTURES ONLY.  current checkpoint =
+  SENSOR-B3-I05.  next_provider_authorized = FALSE beyond Kraken.  I06 Gate
+  NOT authorized.
+- SENSOR-B3-I05 (Kraken) — IN PROGRESS (offline code + evidence + fixtures;
+  network smoke NOT run; I14 source_promotion_candidates.yaml is the ONLY
+  production capability input list).
+
+## Prior next-checkpoint history
 
 - SENSOR-B2-RATIFY COMPLETE — operator RATIFIED the Bloc 2 provider-role
   decision (PASS_BLOC_02_WITH_SENSOR_GAPS, co-earned
