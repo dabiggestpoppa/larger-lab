@@ -301,6 +301,10 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
         (evdir / ("rollback-receipt-" + pr.get("stamp", "x") + ".json")).write_text(
             json.dumps(fr, indent=2), encoding="utf-8")
         opid = pr.get("stamp", "x")
+        # register the rollback receipt under the gate-expected name so the
+        # indexed entry carries postgres-recovery-receipt.json
+        rb_named = tmp_path / "postgres-recovery-receipt.json"
+        rb_named.write_text(json.dumps(fr, indent=2), encoding="utf-8")
         reg = subprocess.run(
             ["python3", str(oc.SCRIPTS / "recovery-ops.py"), "add",
              "--ops-root", str(evdir / "operations"),
@@ -313,7 +317,7 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
              "--source-database", oc.PG_DB, "--target-database", oc.PG_DB,
              "--final-result", "failed", "--rollback-result", "ok",
              "--cloud-mutations", "0", "--cloud-cost-state", "ZERO",
-             "--receipt", str(final_receipt)],
+             "--receipt", str(rb_named)],
             capture_output=True, text=True)
         assert reg.returncode == 0, reg.stdout + reg.stderr
 
@@ -370,6 +374,8 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
         (evdir / "rollback-failure-receipt.json").write_text(
             json.dumps(fr, indent=2), encoding="utf-8")
         opid = pr.get("stamp", "x")
+        rb_named = tmp_path / "postgres-recovery-receipt.json"
+        rb_named.write_text(json.dumps(fr, indent=2), encoding="utf-8")
         reg = subprocess.run(
             ["python3", str(oc.SCRIPTS / "recovery-ops.py"), "add",
              "--ops-root", str(evdir / "operations"),
@@ -382,7 +388,7 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
              "--source-database", oc.PG_DB, "--target-database", oc.PG_DB,
              "--final-result", "failed", "--rollback-result", "failed",
              "--cloud-mutations", "0", "--cloud-cost-state", "ZERO",
-             "--receipt", str(final_receipt)],
+             "--receipt", str(rb_named)],
             capture_output=True, text=True)
         assert reg.returncode == 0, reg.stdout + reg.stderr
     # leave the shared stack's protected truth intact for later tests
