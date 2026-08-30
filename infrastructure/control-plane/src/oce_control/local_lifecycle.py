@@ -131,6 +131,16 @@ def _pid_alive(pid: int) -> bool:
         # cmdline probe: PowerShell returns empty for a dead pid.
         return process_cmdline(pid) is not None
     try:
+        stat = Path(f"/proc/{pid}/stat").read_text(errors="replace")
+        # state is the field after the parenthesized comm; 'Z' = zombie
+        # (exited, awaiting reap) — treat as dead, since kill(pid, 0)
+        # still succeeds on zombies and would spin the wait loop.
+        after = stat.split(")", 1)[1].split() if ")" in stat else []
+        if after and after[0] == "Z":
+            return False
+    except OSError:
+        pass
+    try:
         os.kill(pid, 0)
         return True
     except ProcessLookupError:
