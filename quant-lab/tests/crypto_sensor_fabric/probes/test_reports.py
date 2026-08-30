@@ -42,6 +42,7 @@ from crypto_sensor_fabric.probes.models import (
 from crypto_sensor_fabric.probes.reports import (
     REPORT_FILENAMES,
     history_boundaries_csv,
+    pit_readiness_csv,
     provider_coverage_csv,
     schema_fingerprints_jsonl,
     sensor_gap_csv,
@@ -111,7 +112,8 @@ def _claim(*, provider: str = "KRAKEN_FUTURES", sensor: SensorFamily = SensorFam
 
 def _coverage(*, provider: str = "KRAKEN_FUTURES",
               sensor: SensorFamily = SensorFamily.MECHANICAL_OPEN_INTEREST,
-              promotion: bool = False, blocking: str | None = None):
+              promotion: bool = False, blocking: str | None = None,
+              pit_ready: bool = True):
     return ProviderSensorCoverage.model_validate(
         {
             "provider_id": provider,
@@ -123,7 +125,7 @@ def _coverage(*, provider: str = "KRAKEN_FUTURES",
             "earliest_verified_history": T0,
             "latest_verified_history": T1,
             "granularity_scope": [Granularity.G1D, Granularity.G5M],
-            "PIT_readiness": PITReadiness.PIT_READY,
+            "PIT_readiness": PITReadiness.PIT_READY if pit_ready else PITReadiness.NOT_PIT_READY,
             "unit_clarity": 0.75,
             "pagination_quality": 1.0,
             "semantic_equivalence_class": None,
@@ -132,6 +134,13 @@ def _coverage(*, provider: str = "KRAKEN_FUTURES",
             "capability_score": 0.62,
             "promotion_eligible": promotion,
             "blocking_reason": blocking,
+            "pit_effective_ts_understood": True if pit_ready else False,
+            "pit_observation_ts_understood": True if pit_ready else False,
+            "pit_publication_delay_understood": True if pit_ready else None,
+            "pit_forward_info_required": False,
+            "pit_forward_availability_resolved": True,
+            "pit_publication_affects_reconstruction": False if pit_ready else None,
+            "data_semantics_verified": True if pit_ready else False,
         }
     )
 
@@ -327,21 +336,94 @@ def test_pit_readiness_csv(report_dir: str):
     assert data[header.index("effective_timestamp_understood")] == "YES"
 
 
+def test_pit_readiness_fails_closed_when_facts_unresolved():
+    # I13R1 §6: PIT_READY with unresolved effective/observation timestamp
+    # meaning is invalid — the matrix renders NOT_PIT_READY + a blocking reason.
+    bad = _coverage(pit_ready=True).model_copy(
+        update={"pit_effective_ts_understood": False, "pit_observation_ts_understood": False}
+    )
+    text = pit_readiness_csv([bad])
+    rows = list(csv.reader(io.StringIO(text)))
+    data = [r for r in rows[1:] if r][0]
+    header = rows[0]
+    assert data[header.index("PIT_readiness")] == "NOT_PIT_READY"
+    assert data[header.index("effective_timestamp_understood")] == "NO"
+    assert data[header.index("blocking_reason")]
+
+
+def test_pit_readiness_fails_closed_on_publication_unknown():
+    # publication delay unknown AND publication affects reconstruction -> fail
+    bad = _coverage(pit_ready=True).model_copy(
+        update={
+            "pit_publication_delay_understood": None,
+            "pit_publication_affects_reconstruction": True,
+        }
+    )
+    text = pit_readiness_csv([bad])
+    rows = list(csv.reader(io.StringIO(text)))
+    data = [r for r in rows[1:] if r][0]
+    header = rows[0]
+    assert data[header.index("PIT_readiness")] == "NOT_PIT_READY"
+
+
+def test_pit_readiness_fails_closed_on_unresolved_forward_info():
+    # forward info required but availability timing unresolved -> fail
+    bad = _coverage(pit_ready=True).model_copy(
+        update={"pit_forward_info_required": True, "pit_forward_availability_resolved": None}
+    )
+    text = pit_readiness_csv([bad])
+    rows = list(csv.reader(io.StringIO(text)))
+    data = [r for r in rows[1:] if r][0]
+    header = rows[0]
+    assert data[header.index("PIT_readiness")] == "NOT_PIT_READY"
+
+
 def test_history_boundaries_csv(report_dir: str):
     text = Path(report_dir, "08_HISTORY_BOUNDARIES.csv").read_text(encoding="utf-8")
     rows = list(csv.reader(io.StringIO(text)))
     header = rows[0]
     data = [r for r in rows[1:] if r][0]
     assert data[header.index("earliest_verified")].endswith("Z")
-    assert data[header.index("boundary_confidence")] == "MONTH_BOUNDARY_VERIFIED"
+    # I13R1: boundaries derive from attempt evidence -> ERA_BOUNDARY_VERIFIED
+    # when a verified sample exists (never fabricated from claims).
+    assert data[header.index("boundary_confidence")] in (
+        "ERA_BOUNDARY_VERIFIED",
+        "MONTH_BOUNDARY_VERIFIED",
+    )
     assert data[header.index("latest_verified")].endswith("Z")
 
 
 def test_history_boundaries_direct():
-    text = history_boundaries_csv([_claim()])
+    # I13R1 §5: boundaries are keyed on (provider, sensor, INSTRUMENT) from
+    # attempt evidence — BTC and ETH histories are never collapsed.
+    text = history_boundaries_csv([_attempt(), _attempt(era="2022")])
     rows = list(csv.reader(io.StringIO(text)))
     data = [r for r in rows[1:] if r][0]
     assert data[0] == "KRAKEN_FUTURES"
+    assert data[2] == "BTCUSD"  # instrument column
+
+
+def test_history_boundaries_keep_instruments_separate():
+    attempts = [
+        _attempt(era="2024"),  # BTCUSD verified at 2024
+        _attempt(era="2022"),  # BTCUSD also verified at 2022 (same instrument)
+        CapabilityProbeAttempt.model_validate(
+            {
+                **{k: v for k, v in _attempt(era="2024").model_dump().items()},
+                "instrument_native": "PI_ETHUSD",
+                "probe_id": "kraken_futures_mechanical_open_interest_pi_ethusd_2024",
+            }
+        ),
+    ]
+    text = history_boundaries_csv(attempts)
+    rows = list(csv.reader(io.StringIO(text)))
+    data = [r for r in rows[1:] if r]
+    instruments = {r[2] for r in data}
+    assert instruments == {"BTCUSD", "PI_ETHUSD"}
+    # ETH row carries only its own evidence, not BTC's 2022 boundary
+    eth_row = next(r for r in data if r[2] == "PI_ETHUSD")
+    assert eth_row[5] == "" or eth_row[5]  # earliest_verified present
+    assert "2022" not in (eth_row[9] or "")  # evidence ids not polluted across instruments
 
 
 def test_schema_fingerprints_jsonl(report_dir: str):

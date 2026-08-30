@@ -267,6 +267,79 @@ def derive_pit_readiness(
     return PITReadiness.NOT_PIT_READY
 
 
+def assess_pit_readiness(
+    *,
+    effective_ts_understood: bool | None,
+    observation_ts_understood: bool | None,
+    publication_delay_understood: bool | None,
+    forward_info_required: bool,
+    forward_availability_resolved: bool | None,
+    publication_affects_reconstruction: bool | None,
+) -> tuple[PITReadiness, str | None]:
+    """Fail-closed PIT assessment from timestamp-semantics facts (I13R1 §6).
+
+    PIT_READY_* is FORBIDDEN unless the justifying facts are understood:
+
+    - effective timestamp meaning must be understood,
+    - observation/event/bucket timestamp meaning must be understood,
+    - a forward-information dependency must have resolved availability timing,
+    - when publication timing affects reconstruction, publication delay must
+      be understood.
+
+    Returns (PITReadiness, blocking_reason).  NOT_PIT_READY is the fail-closed
+    state for any unresolved fact — a sensor is never PIT_READY while its
+    timestamp semantics are unresolved.
+    """
+    if effective_ts_understood is not True:
+        return PITReadiness.NOT_PIT_READY, (
+            "effective timestamp meaning unresolved (PIT requires it)"
+        )
+    if observation_ts_understood is not True:
+        return PITReadiness.NOT_PIT_READY, (
+            "observation/event/bucket timestamp meaning unresolved (PIT requires it)"
+        )
+    if forward_info_required and forward_availability_resolved is not True:
+        return PITReadiness.NOT_PIT_READY, (
+            "forward-information dependency with unresolved availability timing"
+        )
+    if publication_affects_reconstruction is True and publication_delay_understood is not True:
+        return PITReadiness.NOT_PIT_READY, (
+            "publication timing affects reconstruction but publication delay unresolved"
+        )
+    if publication_delay_understood is True and publication_affects_reconstruction is False:
+        # fully characterized, no forward dependency, publication understood
+        return PITReadiness.PIT_READY, None
+    return PITReadiness.PIT_READY_WITH_METHOD_VERSION, None
+
+
+def validate_claims_lineage(
+    claims: Sequence[CapabilityClaim],
+    attempts: Sequence[CapabilityProbeAttempt],
+) -> list[str]:
+    """Return a list of lineage violations (empty when clean) (I13R1 §7).
+
+    Rules:
+    - every claim with evidence_level above E0 must reference at least one
+      evidence_id (no evidence-free E2+ claims),
+    - every evidence_id must resolve to an actual recorded attempt (no
+      dangling / placeholder ids).
+    """
+    known = {a.probe_id for a in attempts}
+    violations: list[str] = []
+    for claim in claims:
+        if claim.evidence_level is not EvidenceLevel.E0_CLAIM_ONLY and not claim.evidence_ids:
+            violations.append(
+                f"{claim.claim_id}: evidence_level={claim.evidence_level.value} "
+                "but evidence_ids is empty"
+            )
+        dangling = [eid for eid in claim.evidence_ids if eid not in known]
+        if dangling:
+            violations.append(
+                f"{claim.claim_id}: dangling evidence_ids {sorted(dangling)}"
+            )
+    return violations
+
+
 def _has(attempts: Sequence[CapabilityProbeAttempt], cls: ProbeFailureClass) -> bool:
     return any(a.error_class is cls for a in attempts)
 
@@ -358,6 +431,7 @@ def synthesize_claim(
         timestamp_semantics_clear=timestamp_semantics_clear,
         unit_semantics_clear=unit_semantics_clear,
     )
+    evidence_ids = [a.probe_id for a in attempts]
     return CapabilityClaim.model_validate(
         {
             "claim_id": claim_id,
@@ -379,7 +453,7 @@ def synthesize_claim(
             # promotes it from access evidence (03 §8 A dimension).
             "known_gaps": list(known_gaps or []),
             "limitations": list(limitations or []),
-            "evidence_ids": [],
+            "evidence_ids": evidence_ids,
             "claim_version": claim_version,
             "supersedes_claim_id": supersedes_claim_id,
         }

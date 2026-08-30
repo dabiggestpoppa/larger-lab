@@ -173,6 +173,21 @@ class CapabilityClaim(BaseModel):
     valid_from: datetime | None = None
     supersedes_claim_id: str | None = None
 
+    #: I13R1 — PIT semantics facts.  Fail closed: a PIT_READY_* state is
+    # forbidden unless the facts that justify it are understood.  `None`
+    # means UNKNOWN and never supports readiness.
+    pit_effective_ts_understood: bool | None = None
+    pit_observation_ts_understood: bool | None = None
+    pit_publication_delay_understood: bool | None = None
+    pit_forward_info_required: bool = False
+    pit_forward_availability_resolved: bool | None = None
+    pit_publication_affects_reconstruction: bool | None = None
+    pit_blocking_reason: str | None = None
+
+    #: I13R1 — a claim counts toward VERIFIED redundancy only when the data
+    # semantics themselves were verified (not just source availability).
+    data_semantics_verified: bool = False
+
     @model_validator(mode="after")
     def _verified_boundaries_ordered(self) -> CapabilityClaim:
         if (
@@ -270,6 +285,16 @@ class ProviderSensorCoverage(BaseModel):
     capability_score: float | None = None
     promotion_eligible: bool = False
     blocking_reason: str | None = None
+
+    #: I13R1 — PIT semantics facts mirroring the claim (fail closed).
+    pit_effective_ts_understood: bool | None = None
+    pit_observation_ts_understood: bool | None = None
+    pit_publication_delay_understood: bool | None = None
+    pit_forward_info_required: bool = False
+    pit_forward_availability_resolved: bool | None = None
+    pit_publication_affects_reconstruction: bool | None = None
+    pit_blocking_reason: str | None = None
+    data_semantics_verified: bool = False
 
     @model_validator(mode="after")
     def _normalize_timestamps(self) -> ProviderSensorCoverage:

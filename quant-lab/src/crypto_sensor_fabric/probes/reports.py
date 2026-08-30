@@ -39,6 +39,7 @@ from typing import Any
 
 from ..contracts.enums import SensorFamily
 from .enums import (
+    HistoricalBoundaryConfidence,
     PITReadiness,
     RedundancyClass,
     ResponseStatusClass,
@@ -182,7 +183,14 @@ def probe_run_manifest(
             f"| {pid} | {len(scopes)} coverage scope(s): {', '.join(sensors)} | "
             f"{claims_n} claim(s) |"
         )
-    lines += ["", "## Evidence trust boundaries", "", "This manifest is live-agnostic until SENSOR-B2-I13."]
+    lines += [
+        "",
+        "## Evidence trust boundaries",
+        "",
+        "This packet now contains SENSOR-B2-I13 observed live evidence (where",
+        "attempted).  It remains PROVISIONAL until the operator freezes provider",
+        "roles at SENSOR-B2-I14 — observed evidence is not a role assignment.",
+    ]
     return "\n".join(lines)
 
 
@@ -395,7 +403,23 @@ def free_only_audit_csv(rows: Sequence[Mapping[str, Any]]) -> str:
 # ---------------------------------------------------------------------------
 
 
+def _ternary(value: bool | None) -> str:
+    if value is True:
+        return "YES"
+    if value is False:
+        return "NO"
+    return "UNKNOWN"
+
+
 def pit_readiness_csv(coverages: Sequence[ProviderSensorCoverage]) -> str:
+    """PIT matrix rendered from the stored timestamp-semantics facts.
+
+    Fail closed (I13R1 §6): the matrix never prints a PIT_READY_* state whose
+    justifying facts are unresolved.  If a coverage carries an inconsistent
+    readiness (e.g. PIT_READY while effective timestamp meaning is NO/UNKNOWN)
+    the matrix prints NOT_PIT_READY with the blocking reason — a sensor is
+    never PIT_READY while its timestamp semantics are unresolved.
+    """
     header = [
         "provider_id",
         "sensor_family",
@@ -407,20 +431,38 @@ def pit_readiness_csv(coverages: Sequence[ProviderSensorCoverage]) -> str:
         "methodology_required",
         "blocking_reason",
     ]
-    rows = [
-        [
-            c.provider_id,
-            c.sensor_family.value,
-            "YES" if c.PIT_readiness is PITReadiness.PIT_READY else "NO",
-            "YES" if c.PIT_readiness is PITReadiness.PIT_READY else "NO",
-            "UNKNOWN",
-            "YES" if c.PIT_readiness in (PITReadiness.PIT_READY_WITH_METHOD_VERSION,) else "NO",
-            c.PIT_readiness.value,
-            "YES" if c.PIT_readiness is PITReadiness.PIT_READY_WITH_METHOD_VERSION else "NO",
-            c.blocking_reason or "",
-        ]
-        for c in coverages
-    ]
+    rows: list[list[Any]] = []
+    for c in coverages:
+        facts_ok = (
+            c.pit_effective_ts_understood is True
+            and c.pit_observation_ts_understood is True
+            and not (c.pit_forward_info_required and c.pit_forward_availability_resolved is not True)
+            and not (
+                c.pit_publication_affects_reconstruction is True
+                and c.pit_publication_delay_understood is not True
+            )
+        )
+        readiness = (
+            c.PIT_readiness
+            if facts_ok and c.PIT_readiness is not PITReadiness.NOT_PIT_READY
+            else PITReadiness.NOT_PIT_READY
+        )
+        blocking = c.pit_blocking_reason or c.blocking_reason
+        if not facts_ok and not blocking:
+            blocking = "timestamp semantics unresolved (PIT requires them)"
+        rows.append(
+            [
+                c.provider_id,
+                c.sensor_family.value,
+                _ternary(c.pit_effective_ts_understood),
+                _ternary(c.pit_observation_ts_understood),
+                _ternary(c.pit_publication_delay_understood),
+                "YES" if c.pit_forward_info_required else "NO",
+                readiness.value,
+                "YES" if readiness is PITReadiness.PIT_READY_WITH_METHOD_VERSION else "NO",
+                blocking or "",
+            ]
+        )
     return _to_csv(header, rows)
 
 
@@ -429,7 +471,13 @@ def pit_readiness_csv(coverages: Sequence[ProviderSensorCoverage]) -> str:
 # ---------------------------------------------------------------------------
 
 
-def history_boundaries_csv(claims: Sequence[CapabilityClaim]) -> str:
+def history_boundaries_csv(attempts: Sequence[CapabilityProbeAttempt]) -> str:
+    """Per-instrument history boundaries from attempt evidence (I13R1 §5).
+
+    Keyed on (provider, sensor, instrument): instrument histories are NEVER
+    collapsed — Kraken BTC OI and ETH OI remain separate rows even when their
+    observed historical support differs.
+    """
     header = [
         "provider_id",
         "sensor_family",
@@ -442,25 +490,35 @@ def history_boundaries_csv(claims: Sequence[CapabilityClaim]) -> str:
         "probe_method",
         "evidence_ids",
     ]
+    by_key: dict[tuple[str, str, str], list[CapabilityProbeAttempt]] = {}
+    for a in attempts:
+        key = (a.provider_id, a.sensor_family.value, a.instrument_native)
+        by_key.setdefault(key, []).append(a)
     rows: list[list[Any]] = []
-    for cl in claims:
-        instrument = "|".join(cl.instrument_scope) or ""
-        granularity = "|".join(g.value for g in cl.granularity_scope) or ""
+    for (provider, sensor_name, instrument), group in sorted(by_key.items()):
+        verified = [
+            a.requested_start
+            for a in group
+            if a.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE
+        ]
+        granularity = "|".join(
+            sorted({a.requested_granularity.value for a in group})
+        )
         probe_method = (
-            "archive" if "ARCHIVE" in cl.access_mode.value else "runtime"
+            "archive" if any("ARCHIVE" in a.access_mode.value for a in group) else "runtime"
         )
         rows.append(
             [
-                cl.provider_id,
-                cl.sensor_family.value,
+                provider,
+                sensor_name,
                 instrument,
                 granularity,
-                _fmt_dt(cl.earliest_claimed_history),
-                _fmt_dt(cl.earliest_verified_history),
-                cl.history_boundary_confidence.value,
-                _fmt_dt(cl.latest_verified_history),
+                "",  # earliest_claimed is claim-level; not per-instrument here
+                _fmt_dt(min(verified)) if verified else "",
+                HistoricalBoundaryConfidence.ERA_BOUNDARY_VERIFIED.value if verified else HistoricalBoundaryConfidence.UNKNOWN.value,
+                _fmt_dt(max(verified)) if verified else "",
                 probe_method,
-                "|".join(cl.evidence_ids),
+                "|".join(sorted({a.probe_id for a in group})),
             ]
         )
     return _to_csv(header, rows)
@@ -547,7 +605,7 @@ def write_reports(
         "05_BLOCKING_CONTRADICTIONS.csv": blocking_contradictions_csv(contradictions),
         "06_FREE_ONLY_AUDIT.csv": free_only_audit_csv(free_only_audit),
         "07_PIT_READINESS_MATRIX.csv": pit_readiness_csv(coverages),
-        "08_HISTORY_BOUNDARIES.csv": history_boundaries_csv(claims),
+        "08_HISTORY_BOUNDARIES.csv": history_boundaries_csv(attempts),
         "09_SCHEMA_FINGERPRINTS.jsonl": schema_fingerprints_jsonl(attempts),
         "10_CAPABILITY_CLAIMS.jsonl": capability_claims_jsonl(claims),
         "11_FAILURES.jsonl": failures_jsonl(failures),

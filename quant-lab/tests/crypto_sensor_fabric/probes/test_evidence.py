@@ -20,11 +20,13 @@ from crypto_sensor_fabric.probes.enums import (
 )
 from crypto_sensor_fabric.probes.evidence import (
     CapabilityProbeEvidence,
+    assess_pit_readiness,
     derive_evidence_level,
     derive_pit_readiness,
     deterministic_json,
     evidence_from_attempts,
     synthesize_claim,
+    validate_claims_lineage,
 )
 from crypto_sensor_fabric.probes.models import CapabilityProbeAttempt
 
@@ -440,6 +442,121 @@ def test_claim_verified_full_scope():
         attempts=attempts,
     )
     assert claim.capability_status is CapabilityStatus.VERIFIED
+
+
+# ---------------------------------------------------------------------------
+# I13R1 — evidence lineage (claims must reference real attempt evidence)
+# ---------------------------------------------------------------------------
+
+
+def test_claim_evidence_ids_populated_from_attempts():
+    attempts = [_verified_era(RECENT, index=1), _verified_era("2022", index=2)]
+    claim = synthesize_claim(
+        claim_id="c1",
+        provider_id="K",
+        sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+        venue_market="K",
+        access_mode=AccessMode.PUBLIC_REST,
+        attempts=attempts,
+    )
+    # I13R1 §7: an E3 claim must reference its actual attempt evidence
+    assert claim.evidence_level is EvidenceLevel.E3_HISTORICAL_CHECKPOINT_VERIFIED
+    assert claim.evidence_ids == ["p-1", "p-2"]
+
+
+def test_lineage_validation_flags_evidence_free_e2_claim():
+    claim = synthesize_claim(
+        claim_id="c1",
+        provider_id="K",
+        sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+        venue_market="K",
+        access_mode=AccessMode.PUBLIC_REST,
+        attempts=[_verified_era(RECENT)],
+    )
+    # strip the ids -> lineage violation (E2+ without evidence)
+    stripped = claim.model_copy(update={"evidence_ids": []})
+    violations = validate_claims_lineage([stripped], [_verified_era(RECENT)])
+    assert any("evidence_ids is empty" in v for v in violations)
+
+
+def test_lineage_validation_flags_dangling_evidence_id():
+    claim = synthesize_claim(
+        claim_id="c1",
+        provider_id="K",
+        sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+        venue_market="K",
+        access_mode=AccessMode.PUBLIC_REST,
+        attempts=[_verified_era(RECENT)],
+    )
+    bad = claim.model_copy(update={"evidence_ids": ["does-not-exist"]})
+    violations = validate_claims_lineage([bad], [_verified_era(RECENT)])
+    assert any("dangling" in v for v in violations)
+
+
+def test_lineage_validation_clean_when_ids_resolve():
+    attempts = [_verified_era(RECENT), _verified_era("2022", index=1)]
+    claim = synthesize_claim(
+        claim_id="c1",
+        provider_id="K",
+        sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+        venue_market="K",
+        access_mode=AccessMode.PUBLIC_REST,
+        attempts=attempts,
+    )
+    assert validate_claims_lineage([claim], attempts) == []
+
+
+# ---------------------------------------------------------------------------
+# I13R1 — PIT readiness FAIL-CLOSED invariants
+# ---------------------------------------------------------------------------
+
+
+def _pit(*, effective=None, observation=None, publication=None, forward=False,
+         forward_resolved=None, affects=None):
+    return assess_pit_readiness(
+        effective_ts_understood=effective,
+        observation_ts_understood=observation,
+        publication_delay_understood=publication,
+        forward_info_required=forward,
+        forward_availability_resolved=forward_resolved,
+        publication_affects_reconstruction=affects,
+    )
+
+
+def test_pit_ready_forbidden_when_effective_timestamp_unresolved():
+    readiness, reason = _pit(effective=False, observation=True, affects=False)
+    assert readiness is PITReadiness.NOT_PIT_READY
+    assert reason
+
+
+def test_pit_ready_forbidden_when_observation_timestamp_unresolved():
+    readiness, _ = _pit(effective=True, observation=False, affects=False)
+    assert readiness is PITReadiness.NOT_PIT_READY
+
+
+def test_pit_ready_forbidden_when_forward_info_availability_unresolved():
+    readiness, _ = _pit(
+        effective=True, observation=True, forward=True, forward_resolved=None, affects=False
+    )
+    assert readiness is PITReadiness.NOT_PIT_READY
+
+
+def test_pit_ready_forbidden_when_publication_unknown_and_affects_reconstruction():
+    readiness, _ = _pit(
+        effective=True, observation=True, publication=None, affects=True
+    )
+    assert readiness is PITReadiness.NOT_PIT_READY
+
+
+def test_pit_ready_with_method_version_when_timestamps_understood():
+    readiness, reason = _pit(effective=True, observation=True, publication=True, affects=False)
+    assert readiness is PITReadiness.PIT_READY
+    assert reason is None
+
+
+def test_pit_limited_path_when_publication_unknown_but_does_not_affect():
+    readiness, _ = _pit(effective=True, observation=True, publication=None, affects=False)
+    assert readiness in (PITReadiness.PIT_READY, PITReadiness.PIT_READY_WITH_METHOD_VERSION)
 
 
 def test_claim_supersede_never_erases_prior_evidence():

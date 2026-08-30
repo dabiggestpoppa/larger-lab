@@ -26,7 +26,10 @@ from .enums import (
     RedundancyClass,
     ResponseStatusClass,
 )
-from .evidence import derive_evidence_level, derive_pit_readiness
+from .evidence import (
+    assess_pit_readiness,
+    derive_evidence_level,
+)
 from .models import (
     CapabilityProbeAttempt,
     ProviderSensorCoverage,
@@ -312,9 +315,22 @@ def synthesize_coverage(
     planned_granularities: Sequence[Granularity] = (),
     planned_instruments: Sequence[str] = (),
     provider_role: ProviderRole = ProviderRole.REFERENCE_ONLY,
+    data_semantics_verified: bool = False,
+    pit_effective_ts_understood: bool | None = None,
+    pit_observation_ts_understood: bool | None = None,
+    pit_publication_delay_understood: bool | None = None,
+    pit_forward_info_required: bool = False,
+    pit_forward_availability_resolved: bool | None = None,
+    pit_publication_affects_reconstruction: bool | None = None,
+    pit_blocking_reason: str | None = None,
 ) -> ProviderSensorCoverage:
     """Build the per-scope coverage row (05 §3).  Triage score attached only
-    as metadata; it never overrides hard blockers (checked at scoring layer)."""
+    as metadata; it never overrides hard blockers (checked at scoring layer).
+
+    I13R1: PIT readiness is assessed FAIL-CLOSED from the timestamp-semantics
+    facts; a PIT_READY_* state is forbidden while any justifying fact is
+    unresolved.  Redundancy counting requires `data_semantics_verified`.
+    """
     verified_dates = [
         a.requested_start
         for a in attempts
@@ -327,6 +343,15 @@ def synthesize_coverage(
         planned_granularities=planned_granularities,
         planned_instruments=planned_instruments,
     )
+    pit_readiness, pit_reason = assess_pit_readiness(
+        effective_ts_understood=pit_effective_ts_understood,
+        observation_ts_understood=pit_observation_ts_understood,
+        publication_delay_understood=pit_publication_delay_understood,
+        forward_info_required=pit_forward_info_required,
+        forward_availability_resolved=pit_forward_availability_resolved,
+        publication_affects_reconstruction=pit_publication_affects_reconstruction,
+    )
+    blocking = pit_reason or pit_blocking_reason
     return ProviderSensorCoverage.model_validate(
         {
             "provider_id": provider_id,
@@ -341,7 +366,7 @@ def synthesize_coverage(
                 {a.requested_granularity for a in attempts},
                 key=lambda g: g.value,
             ),
-            "PIT_readiness": derive_pit_readiness(attempts),
+            "PIT_readiness": pit_readiness,
             "unit_clarity": vector.N,
             "pagination_quality": vector.P,
             "schema_stability": None,
@@ -350,7 +375,15 @@ def synthesize_coverage(
             "provider_role": provider_role,
             "capability_score": None,  # scoring layer computes with hard-block overrides
             "promotion_eligible": False,  # scoring layer decides (fail closed)
-            "blocking_reason": None,
+            "blocking_reason": blocking,
+            "pit_effective_ts_understood": pit_effective_ts_understood,
+            "pit_observation_ts_understood": pit_observation_ts_understood,
+            "pit_publication_delay_understood": pit_publication_delay_understood,
+            "pit_forward_info_required": pit_forward_info_required,
+            "pit_forward_availability_resolved": pit_forward_availability_resolved,
+            "pit_publication_affects_reconstruction": pit_publication_affects_reconstruction,
+            "pit_blocking_reason": pit_reason,
+            "data_semantics_verified": data_semantics_verified,
         }
     )
 
