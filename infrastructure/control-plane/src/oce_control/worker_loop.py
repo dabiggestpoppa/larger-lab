@@ -14,19 +14,24 @@ import argparse
 import os
 import time
 
-DEFAULT_DSN = "postgresql://oce_control_admin:test-secret-b2-pg-001@127.0.0.1:5433/oce_control"
+def _default_dsn() -> str:
+    """Fail-closed DSN: never a predictable default (B2-R7)."""
+    from . import local_secrets
+    return local_secrets.require_runtime_dsn()
 
 
 def main(argv=None) -> None:
     parser = argparse.ArgumentParser(description="OCE B2 runtime worker")
     parser.add_argument("--worker-id", default=os.environ.get("OCE_WORKER_ID", "worker-local01"))
-    parser.add_argument("--token", default=os.environ.get("OCE_WORKER_TOKEN", "worker-local-token"))
-    parser.add_argument("--dsn", default=os.environ.get("POSTGRES_DSN", DEFAULT_DSN))
+    parser.add_argument("--token", default=os.environ.get("OCE_WORKER_TOKEN"))
+    parser.add_argument("--dsn", default=os.environ.get("POSTGRES_DSN") or _default_dsn())
     parser.add_argument("--interval", type=float, default=3.0)
     parser.add_argument("--lease-ttl", type=int, default=60)
     parser.add_argument("--capabilities", default="*")
     parser.add_argument("--max-per-cycle", type=int, default=5)
     args = parser.parse_args(argv)
+    if not args.token:
+        raise SystemExit("worker requires --token or OCE_WORKER_TOKEN (no predictable default, B2-R7)")
 
     import psycopg2
     from .pg_store import PgJobStore

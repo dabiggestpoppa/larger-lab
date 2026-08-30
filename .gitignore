@@ -116,5 +116,8 @@ argo-ref/
 infrastructure/local-ground/var/
 infrastructure/local-ground/compose/.env
 
+# OCE Book 2 local runtime state (B2-R7) — generated secrets, PID files, logs
+infrastructure/control-plane/.runtime/
+
 # pytest cache
 .pytest_cache/

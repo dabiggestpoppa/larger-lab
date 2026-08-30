@@ -32,7 +32,10 @@ from .api import ControlPlaneAPI, APIResponse
 
 CONSOLE_PATH = Path(__file__).resolve().parents[2] / "ui" / "console.html"
 
-DEFAULT_DSN = "postgresql://oce_control_admin:test-secret-b2-pg-001@127.0.0.1:5433/oce_control"
+def _default_dsn() -> str:
+    """Fail-closed DSN: never a predictable default (B2-R7)."""
+    from . import local_secrets
+    return local_secrets.require_runtime_dsn()
 
 # Operator grants issued at durable startup (deterministic ids, printed at boot).
 OPERATOR_ACTIONS = [
@@ -180,7 +183,7 @@ def build_durable_app(*, dsn: Optional[str] = None, scheduler_tick_interval: int
     from .pg_worker import PgWorkerProtocol
     from .health import HealthService
 
-    dsn = dsn or os.environ.get("POSTGRES_DSN", DEFAULT_DSN)
+    dsn = dsn or os.environ.get("POSTGRES_DSN") or _default_dsn()
     conn = psycopg2.connect(dsn)
     conn.autocommit = False
 

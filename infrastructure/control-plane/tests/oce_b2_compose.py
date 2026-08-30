@@ -25,9 +25,21 @@ PG_USER = "oce_control_admin"
 PG_DB = "oce_control"
 REDIS_PORT = 6380
 
-TEST_SECRETS = {"POSTGRES_PASSWORD": "test-secret-b2-pg-001"}
-
 _DSN = "postgresql://{user}:{pw}@{host}:{port}/{db}"
+
+
+def runtime_password() -> str:
+    """POSTGRES_PASSWORD for the compose stack (B2-R7).
+
+    Never a predictable default: either the operator's POSTGRES_PASSWORD
+    env or the generated .runtime secret (0600, gitignored).
+    """
+    from oce_control.local_secrets import ensure_runtime_secret
+    return ensure_runtime_secret()
+
+
+def TEST_SECRETS() -> dict:
+    return {"POSTGRES_PASSWORD": runtime_password()}
 
 
 def docker_available():
@@ -39,7 +51,7 @@ def docker_available():
 
 
 def dsn():
-    return _DSN.format(user=PG_USER, pw=TEST_SECRETS["POSTGRES_PASSWORD"],
+    return _DSN.format(user=PG_USER, pw=runtime_password(),
                        host=PG_HOST, port=PG_PORT, db=PG_DB)
 
 
@@ -48,7 +60,9 @@ def redis_url():
 
 
 def _env():
-    return dict(os.environ, **TEST_SECRETS)
+    env = dict(os.environ)
+    env["POSTGRES_PASSWORD"] = runtime_password()
+    return env
 
 
 def _run_docker(args, timeout=300):
