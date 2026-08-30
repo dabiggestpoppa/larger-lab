@@ -23,9 +23,10 @@
       "note": "frozen head"
     },
     "agent/repo-cleanroom": {
-      "head": "PENDING_FINAL",
+      "head": "c3024856",
       "classification": "KEEP_PROTECTED",
-      "system": "CLEANROOM"
+      "system": "CLEANROOM",
+      "note": "head recorded at manifest write; pin commit follows"
     },
     "grant-sector-g1-production": {
       "head": "3a639d89865188506b8267a433c5bf8464f4ee7b",
