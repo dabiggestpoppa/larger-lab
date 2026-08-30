@@ -11,18 +11,19 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I04R1 COMPLETE — COMMON CONFORMANCE HARDENING + LEDGER RECONCILIATION |
+| Current checkpoint | SENSOR-B3-I04R2 COMPLETE — FINAL COMMON-FOUNDATION CONFORMANCE CLOSURE |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 provider-role decision ratified; Bloc 3 common foundation (I01-I04) authorized; common foundation hardened by I04R1; first provider adapter NOT authorized until operator review after I04R1 |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation authorized and hardened through I04R2 (behaviorally closed); first provider adapter NOT authorized until operator review after I04R2 |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
-| Bloc 3 implementation_authorized | TRUE — common foundation only (SENSOR-B3-I01..I04 + I04R1) |
+| Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2) |
+| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=0 · PROVIDER_PARSER_CONFORMANCE=NOT_YET_APPLICABLE · NETWORK_VALIDATION=NOT_YET_RUN |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
-| next_checkpoint_authorized | FALSE (awaiting operator review after SENSOR-B3-I04; I05 Kraken NOT authorized) |
+| next_checkpoint_authorized | FALSE (awaiting operator review after SENSOR-B3-I04R2; I05 Kraken NOT authorized) |
 
 ## Test counts (cumulative)
 
@@ -64,7 +65,8 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I03 | 25 | 25 | 0 |
 | SENSOR-B3-I04 | 14 | 14 | 0 |
 | SENSOR-B3-I04R1 | f929ae6f | 28 | 0 |
-| cumulative | 636 | 636 | 0 |
+| SENSOR-B3-I04R2 | 48c639ed | 30 | 0 |
+| cumulative | 666 | 666 | 0 |
 
 ## External / provider blockers
 
@@ -173,8 +175,26 @@ that is updated at every staged checkpoint.
   conformance via the I03 classifier, valid-typed adversarial fixtures.
   636 passed / 0 failed, ruff clean, zero network calls, zero provider
   adapters built.  Evidence: `evidence/bloc_03/BLOC_03_I04R1_HARDENING.md`.
+- SENSOR-B3-I04R2 COMPLETE — FINAL COMMON-FOUNDATION CONFORMANCE CLOSURE:
+  empty-valid vs unsupported and provider method dispatch are now BEHAVIORAL
+  (the suite invokes the real adapter's `fetch_*` methods via a new
+  provider-independent `dispatch_fetch` — Issues 1/2); every adversarial
+  fixture is a VALID typed model (model_dump + model_validate, enum members —
+  Issue 3); promotion bounds now bind live_mode/archive_mode/access_path/auth/
+  free_access_status/history_scope and forbid manufacturing an exact native
+  historical_mode from a coarse I14 history label (Issues 4/8/9); the probe
+  evidence ref must RESOLVE (provider+sensor+id all match I14 lineage —
+  Issue 5); promotion-file structure is strict (root/schema_version/candidates
+  shape, provider+sensor required, duplicates fail — Issue 6); the I14
+  access_path is authoritative — `auth_mode_override` removed (Issue 7);
+  geo/access/payment never retried even with budget (Issue 7); schema
+  fail-closed is proven against a fake parser (Issue 10).  666 passed / 0
+  failed, ruff clean, zero network calls, zero provider adapters built,
+  zero Bloc 4 code.  Evidence:
+  `evidence/bloc_03/BLOC_03_I04R2_CONFORMANCE_CLOSURE.md`.
 - `next_checkpoint_authorized = FALSE` — SENSOR-B3-I05 (Kraken) and any
-  provider adapter await OPERATOR REVIEW of the hardened common foundation.
+  provider adapter await OPERATOR REVIEW of the hardened, behaviorally closed
+  common foundation.
   - Full evidence packet: `evidence/bloc_02/` (01-11 evidence; 12-16 decision).
   - Bloc 3 implementation evidence: `evidence/bloc_03/` (added by I01-I04 + I04R1).
 
@@ -234,3 +254,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I04 | 41296e1c | common provider conformance suite (Q0 contract/Q1 parser/Q2 mechanics) + I14 promotion-file capability binding (allowed_role/history_mode/verified_history/PIT bounds); fake adapter passes, degraded adapters fail exact invariants; bloc_03 evidence area; tests | 608 passed / 0 failed | PASS | none |
 | SENSOR-B3-I04R1A | f929ae6f | conformance hardening: full I14 promotion-bound enforcement, PRODUCTION_CANDIDATE/FRAMEWORK_TEST modes (fail closed by default), live-vs-historical mode separation, strict promotion-file parsing, schema-drift classifier (no zero coercion), behavioral empty-valid/schema/retry conformance, valid-typed adversarial fixtures, declared_capabilities removed; tests | 636 passed / 0 failed | PASS | none |
 | SENSOR-B3-I04R1B | (see below) | I04R1 hardening evidence + full ledger reconciliation (current-state, test counts, I04 SHA, I04R1 narrative, next-checkpoint flags) | 636 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I04R2A | 48c639ed | behavioral dispatch + empty-valid/unsupported (Issue 1/2), valid-typed adversarial fixtures (Issue 3/11), full live/archive/access/auth + history-scope surface binding (Issue 4/9), resolving evidence refs (Issue 5), strict promotion-file structure (Issue 6), auth override removed (Issue 7), HistoryScope/no manufactured native mode (Issue 8), geo/access/payment never retried (Issue 7); tests | 666 passed / 0 failed | PASS | none |
+| SENSOR-B3-I04R2B | (see below) | I04R2 closure evidence + full ledger reconciliation (current-state, test counts, commit log) | 666 passed / 0 failed (re-run) | PASS | none |
