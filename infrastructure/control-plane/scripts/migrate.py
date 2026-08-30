@@ -100,8 +100,13 @@ def cmd_up(dsn: str, directory: Path) -> int:
             try:
                 with conn.cursor() as cur:
                     cur.execute(sql)
+                    # Migration files may self-seed their version row with a
+                    # 'seed' marker (0001/0002 do). Upsert replaces the marker
+                    # with the authoritative checksum instead of colliding.
                     cur.execute(
-                        "INSERT INTO schema_migrations (version, checksum) VALUES (%s, %s)",
+                        "INSERT INTO schema_migrations (version, checksum) "
+                        "VALUES (%s, %s) "
+                        "ON CONFLICT (version) DO UPDATE SET checksum = EXCLUDED.checksum",
                         (version, checksum),
                     )
                 conn.commit()
