@@ -21,6 +21,18 @@ cross-venue synthesis or research computation.
 from __future__ import annotations
 
 from .access import AccessDecision, assert_free_only_access, evaluate_access
+from .capabilities import (
+    DEFAULT_PROMOTION_FILE,
+    capabilities_from_promotion,
+    load_promotion_candidates,
+    promotion_provider_ids,
+)
+from .conformance import (
+    AdapterUnderTest,
+    ConformanceResult,
+    run_conformance_suite,
+    summarize_conformance,
+)
 from .enums import (
     ALLOWED_AUTH_MODES,
     HARD_BLOCK_AUTH_MODES,
@@ -84,17 +96,25 @@ __all__ = [
     "ALLOWED_AUTH_MODES",
     "AccessClassViolation",
     "AccessDecision",
+    "AdapterUnderTest",
+    "ConformanceResult",
     "CursorTracker",
+    "DEFAULT_PROMOTION_FILE",
     "RetryPolicy",
     "assert_free_only_access",
     "classify_retryability",
+    "capabilities_from_promotion",
     "completion_from_provider_semantics",
     "evaluate_access",
     "fingerprint_request",
+    "load_promotion_candidates",
     "is_retryable",
     "payload_hash",
+    "promotion_provider_ids",
     "rate_limit_from_headers",
     "resume_token_round_trip",
+    "run_conformance_suite",
+    "summarize_conformance",
     "unknown_rate_limit",
     "AcquisitionError",
     "AcquisitionFailure",

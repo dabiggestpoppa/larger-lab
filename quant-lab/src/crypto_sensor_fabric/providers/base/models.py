@@ -23,6 +23,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ...contracts.base import normalize_utc_datetimes
 from ...contracts.enums import SensorFamily
+from ...probes.enums import PITReadiness, ProviderRole, RedundancyClass
 from .enums import (
     AdapterAuthMode,
     DuplicateAnnotation,
@@ -124,8 +125,44 @@ class SensorCapability(BaseModel):
     known_geo_constraints: list[str] = Field(default_factory=list)
     known_history_start: datetime | None = None
     verified_history_start: datetime | None = None
+    verified_history_end: datetime | None = None
     verified_at: datetime | None = None
     probe_evidence_ref: AdapterEvidenceRef | None = None
+    #: I14 authoritative bounds (source_promotion_candidates.yaml).  A
+    #: capability may NOT be upgraded beyond these during Bloc 3 (I14 §E).
+    allowed_role: ProviderRole | None = None
+    redundancy_class: RedundancyClass | None = None
+    pit_requirement: PITReadiness | None = None
+    methodology_pin: str | None = None
+    known_hazards: list[str] = Field(default_factory=list)
+    evidence_basis: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _verified_history_ordered(self) -> SensorCapability:
+        if (
+            self.verified_history_start is not None
+            and self.verified_history_end is not None
+            and self.verified_history_start > self.verified_history_end
+        ):
+            raise ValueError(
+                "verified_history_start must not exceed verified_history_end"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _pit_requirement_bounds_observed_history(self) -> SensorCapability:
+        # PIT_READY* with an UNRESOLVED/absent verified window is not allowed
+        # to claim verified history it does not have (fail closed, I13R1 §6).
+        if (
+            self.supported
+            and self.pit_requirement is not None
+            and "PIT_READY" in self.pit_requirement.value
+            and self.verified_history_start is None
+        ):
+            raise ValueError(
+                "PIT_READY_* capability requires a verified_history_start bound"
+            )
+        return self
 
     @model_validator(mode="after")
     def _unsupported_cannot_declare_surface(self) -> SensorCapability:

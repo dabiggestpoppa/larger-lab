@@ -149,18 +149,17 @@ that is updated at every staged checkpoint.
 - SENSOR-B2-RATIFY COMPLETE — operator RATIFIED the Bloc 2 provider-role
   decision (PASS_BLOC_02_WITH_SENSOR_GAPS, co-earned
   PASS_BLOC_02_FREE_ONLY_REDUNDANCY).  Bloc 2 = IMPLEMENTATION COMPLETE /
-  OPERATOR RATIFIED.  `bloc_03_implementation_authorized = TRUE` for the
-  common foundation ONLY (SENSOR-B3-I01..I04).
-- SENSOR-B3-I01..I04 = BLOC 3 COMMON FOUNDATION — base models, provider
-  protocol, free-only access gate, request fingerprinting, raw envelope
-  integrity, retry/rate-limit/pagination/resume mechanics, and the common
-  provider conformance suite.  No real provider adapter code yet.
-- Bloc 3 adapter work may consume ONLY `source_promotion_candidates.yaml`
-  (17 evidence-backed candidates across Kraken/Gate/OKX/Deribit) — nothing
-  else promotes a source.  Binance/Bybit/Coinalyze/Bitfinex remain excluded /
-  blocked / corroboration / archive-only per I14.
-- `next_checkpoint_authorized = FALSE` — I05 (Kraken) and any provider
-  adapter await operator review after SENSOR-B3-I04.
+  OPERATOR RATIFIED.
+- SENSOR-B3-I01..I04 COMPLETE — BLOC 3 COMMON FOUNDATION: base models +
+  provider protocol, free-only access gate, request fingerprinting + raw
+  envelope integrity, retry/rate-limit/pagination/resume mechanics, and the
+  common provider conformance suite (fake adapter passes; degraded adapters
+  fail the exact invariant).  I14 promotion-file capability binding in place
+  (source_promotion_candidates.yaml is the ONLY input list).  Status =
+  COMMON_FRAMEWORK_READY; PROVIDER_ADAPTER_READY = NO (zero adapters built).
+  Bloc 3 implementation evidence: `evidence/bloc_03/`.
+- `next_checkpoint_authorized = FALSE` — SENSOR-B3-I05 (Kraken) and any
+  provider adapter await OPERATOR REVIEW of the common foundation.
   - Full evidence packet: `evidence/bloc_02/` (01-11 evidence; 12-16 decision).
   - Bloc 3 implementation evidence: `evidence/bloc_03/` (added by I01-I04).
 
@@ -216,4 +215,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-RATIFY | a0181a92 | operator ratification of Bloc 2 provider-role decision recorded in ledger (governance only) | 525 passed / 0 failed | PASS | none |
 | SENSOR-B3-I01 | 6ce9fb5d | base adapter package (providers/base/): controlled vocabularies, FetchRequest/FetchBatch/RawPayloadEnvelope/ResumeToken models, typed error taxonomy, MechanicalProviderAdapter protocol; Bloc 2 probe base renamed base.py -> probe_base.py; tests | 544 passed / 0 failed | PASS | none |
 | SENSOR-B3-I02 | 28a20272 | free-only access gate (Bloc 1 F9 policy + Bloc 3 auth vocabulary, fail closed, runs before transport), deterministic request fingerprint + raw payload integrity hash; tests | 569 passed / 0 failed | PASS | none |
-| SENSOR-B3-I03 | (see below) | retry classification + bounded exponential backoff (no geo/access retries), normalized rate-limit snapshots (UNKNOWN valid), cursor-loop/non-monotonic protection, deterministic resume-token round-trip, provider-semantics completion; tests | 594 passed / 0 failed | PASS | none |
+| SENSOR-B3-I03 | 45b1683a | retry classification + bounded exponential backoff (no geo/access retries), normalized rate-limit snapshots (UNKNOWN valid), cursor-loop/non-monotonic protection, deterministic resume-token round-trip, provider-semantics completion; tests | 594 passed / 0 failed | PASS | none |
+| SENSOR-B3-I04 | (see below) | common provider conformance suite (Q0 contract/Q1 parser/Q2 mechanics) + I14 promotion-file capability binding (allowed_role/history_mode/verified_history/PIT bounds); fake adapter passes, degraded adapters fail exact invariants; bloc_03 evidence area; tests | 608 passed / 0 failed | PASS | none |
