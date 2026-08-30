@@ -114,13 +114,30 @@ class ControlPlaneAPI:
             return APIResponse(ok=False, status="error",
                               error=str(e), request_id=generate_id())
 
-    def inspect_job(self, job_id: str) -> APIResponse:
-        """Inspect a job."""
+    def _deny(self, action: str, actor_id: str, target: str) -> APIResponse:
+        """Record a denial + audit entry and return the denied response."""
+        denial = self._authority.record_denial(
+            reason_code="missing_authority",
+            actor_id=actor_id,
+            requested_action=action,
+            requested_target=target,
+        )
+        self._audit(action, actor_id, target, False, "denied")
+        return APIResponse(ok=False, status="denied",
+                          data={"denial": denial.to_dict()},
+                          error="missing_authority",
+                          request_id=generate_id())
+
+    def inspect_job(self, *, grant_id: str, actor_id: str, job_id: str) -> APIResponse:
+        """Inspect a job. Read authorization required at the service boundary (gap 9)."""
+        if not self._check_permission(grant_id, "read", "default"):
+            return self._deny("inspect_job", actor_id, job_id)
         job = self._job_store.get_job(job_id)
         if job is None:
             return APIResponse(ok=False, status="not_found",
-                              error=f"Job not found",
+                              error="Job not found",
                               request_id=generate_id())
+        self._audit("inspect_job", actor_id, job_id, True)
         return APIResponse(ok=True, status="success",
                           data=job.to_dict(),
                           request_id=generate_id())
@@ -167,19 +184,30 @@ class ControlPlaneAPI:
             return APIResponse(ok=False, status="error",
                               error=str(e), request_id=generate_id())
 
-    def list_schedules(self) -> APIResponse:
+    def list_schedules(self, *, grant_id: str, actor_id: str) -> APIResponse:
+        """List schedules. Read authorization required (gap 9)."""
+        if not self._check_permission(grant_id, "read", "default"):
+            return self._deny("list_schedules", actor_id, "schedules")
+        self._audit("list_schedules", actor_id, "schedules", True)
         return APIResponse(ok=True, status="success",
                           data={"schedules": {k: v.__dict__ for k, v in self._scheduler.schedules.items()}},
                           request_id=generate_id())
 
-    def list_workers(self) -> APIResponse:
+    def list_workers(self, *, grant_id: str, actor_id: str) -> APIResponse:
+        """List workers. Read authorization required (gap 9)."""
+        if not self._check_permission(grant_id, "read", "default"):
+            return self._deny("list_workers", actor_id, "workers")
+        self._audit("list_workers", actor_id, "workers", True)
         return APIResponse(ok=True, status="success",
                           data={"workers": {k: v.__dict__ for k, v in self._worker_protocol.workers.items()}},
                           request_id=generate_id())
 
-    def system_state(self) -> APIResponse:
-        """System state endpoint."""
+    def system_state(self, *, grant_id: str, actor_id: str) -> APIResponse:
+        """System state endpoint. Read authorization required (gap 9)."""
+        if not self._check_permission(grant_id, "read", "default"):
+            return self._deny("system_state", actor_id, "system")
         health = self._health.check_health()
+        self._audit("system_state", actor_id, "system", True)
         return APIResponse(ok=True, status="success",
                           data={
                               "health": health.to_dict(),
@@ -189,7 +217,11 @@ class ControlPlaneAPI:
                           },
                           request_id=generate_id())
 
-    def audit_history(self) -> APIResponse:
+    def audit_history(self, *, grant_id: str, actor_id: str) -> APIResponse:
+        """Audit history. Read authorization required (gap 9)."""
+        if not self._check_permission(grant_id, "read", "default"):
+            return self._deny("audit_history", actor_id, "audit")
+        self._audit("audit_history", actor_id, "audit", True)
         return APIResponse(ok=True, status="success",
                           data={"audit_log": self._audit_log},
                           request_id=generate_id())

@@ -3,3 +3,6 @@
 pytest==9.0.3
 psycopg2-binary==2.9.12
 redis==4.6.0
+fastapi==0.136.1
+uvicorn==0.47.0
+httpx==0.28.1

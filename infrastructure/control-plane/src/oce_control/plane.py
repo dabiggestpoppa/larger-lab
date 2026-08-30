@@ -108,9 +108,18 @@ class ControlPlane:
         )
         results["job_submit"] = {"ok": job_resp.ok, "status": job_resp.status}
 
-        # 4. Inspect the job
+        # 4. Inspect the job (read authorization at the service boundary)
+        read_grant = self.authority.issue_grant(
+            actor_id="operator-smoke-test",
+            action="read",
+            target="default",
+        )
         if job_resp.ok:
-            inspect = self.api.inspect_job(job_resp.data["job_id"])
+            inspect = self.api.inspect_job(
+                grant_id=read_grant.grant_id,
+                actor_id="operator-smoke-test",
+                job_id=job_resp.data["job_id"],
+            )
             results["job_inspect"] = {"ok": inspect.ok, "status": inspect.status}
 
         # 5. Worker admit and claim
@@ -120,8 +129,11 @@ class ControlPlane:
         )
         results["worker_admit"] = {"ok": True, "worker_id": worker.worker_id}
 
-        # 6. System state
-        state = self.api.system_state()
+        # 6. System state (read authorization)
+        state = self.api.system_state(
+            grant_id=read_grant.grant_id,
+            actor_id="operator-smoke-test",
+        )
         results["system_state"] = {"ok": state.ok, "status": state.status}
 
         return results

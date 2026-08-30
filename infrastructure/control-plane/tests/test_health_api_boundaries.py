@@ -63,14 +63,16 @@ class TestAPIPermissions:
         assert resp.status == "denied"
 
     def test_api_inspect_nonexistent_job(self, plane):
-        resp = plane.api.inspect_job("nonexistent-job")
+        read_grant = plane.authority.issue_grant(actor_id="po-test01", action="read", target="default")
+        resp = plane.api.inspect_job(grant_id=read_grant.grant_id, actor_id="po-test01", job_id="nonexistent-job")
         assert not resp.ok
         assert resp.status == "not_found"
 
     def test_api_audit_history(self, plane):
         grant = plane.authority.issue_grant(actor_id="po-test01", action="submit_job", target="default")
         plane.api.submit_job(grant_id=grant.grant_id, actor_id="po-test01", job_type="test_job", payload={"data": "test"})
-        resp = plane.api.audit_history()
+        read_grant = plane.authority.issue_grant(actor_id="po-test01", action="read", target="default")
+        resp = plane.api.audit_history(grant_id=read_grant.grant_id, actor_id="po-test01")
         assert resp.ok
         assert len(resp.data["audit_log"]) > 0
 

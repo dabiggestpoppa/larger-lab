@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OCE Control Plane — Operator Console</title>
+<style>
+  body { font-family: ui-monospace, Menlo, Consolas, monospace; background: #101418; color: #d7dde3; margin: 0; padding: 24px; }
+  h1 { font-size: 18px; color: #7fd0ff; margin: 0 0 16px; }
+  .bar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  input { background: #1a2128; border: 1px solid #2c3a46; color: #d7dde3; padding: 6px 8px; border-radius: 4px; width: 320px; }
+  button { background: #1f6feb; border: 0; color: #fff; padding: 6px 14px; border-radius: 4px; cursor: pointer; }
+  button:hover { background: #2f7ff5; }
+  .status { font-size: 13px; }
+  .ok { color: #4ade80; } .bad { color: #f87171; } .degraded { color: #fbbf24; }
+  table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 12px; }
+  th, td { border: 1px solid #24313d; padding: 4px 8px; text-align: left; }
+  th { background: #1a2128; color: #9fb3c3; }
+  h2 { font-size: 14px; color: #9fb3c3; margin: 20px 0 8px; }
+</style>
+</head>
+<body>
+<h1>OCE Control Plane — Operator Console <span class="status" id="health"></span></h1>
+<div class="bar">
+  <input id="grant" placeholder="read grant id (printed at API startup)" value="">
+  <button onclick="refreshAll()">Refresh</button>
+</div>
+
+<h2>System</h2>
+<div id="system">—</div>
+
+<h2>Jobs</h2>
+<div id="jobs">—</div>
+
+<h2>Schedules</h2>
+<div id="schedules">—</div>
+
+<h2>Workers</h2>
+<div id="workers">—</div>
+
+<h2>Audit</h2>
+<div id="audit">—</div>
+
+<script>
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function headers() {
+  const g = document.getElementById('grant').value.trim();
+  return g ? {'X-OCE-Grant': g, 'X-OCE-Actor': 'operator-console'} : {};
+}
+function table(obj, cols) {
+  const rows = Object.values(obj || {});
+  if (!rows.length) return '<p>none</p>';
+  let h = '<table><tr>' + cols.map(c => '<th>' + esc(c) + '</th>').join('') + '</tr>';
+  for (const r of rows) {
+    h += '<tr>' + cols.map(c => '<td>' + esc(typeof r[c] === 'object' ? JSON.stringify(r[c]) : r[c]) + '</td>').join('') + '</tr>';
+  }
+  return h + '</table>';
+}
+async function get(path) {
+  const r = await fetch(path, {headers: headers()});
+  const j = await r.json();
+  if (r.status === 401 || r.status === 403) throw new Error('authorization required: ' + (j.error || r.status));
+  if (!j.ok) throw new Error(j.error || ('status ' + r.status));
+  return j;
+}
+async function refreshAll() {
+  try {
+    const h = await (await fetch('/api/health')).json();
+    const hs = h.data && h.data.overall;
+    document.getElementById('health').innerHTML =
+      '<span class="' + (hs === 'healthy' ? 'ok' : 'degraded') + '">' + esc(hs) + '</span> · PG ' + esc(h.data && h.data.postgresql) + ' · Redis ' + esc(h.data && h.data.redis);
+  } catch (e) {
+    document.getElementById('health').innerHTML = '<span class="bad">unreachable</span>';
+  }
+  try {
+    const sys = await get('/api/system');
+    document.getElementById('system').textContent =
+      JSON.stringify(sys.data, null, 2);
+  } catch (e) {
+    document.getElementById('system').textContent = 'system: ' + e.message;
+  }
+  try {
+    const sched = await get('/api/schedules');
+    document.getElementById('schedules').innerHTML = table(sched.data.schedules, ['schedule_id', 'job_type', 'recurring', 'paused', 'next_run_at']);
+  } catch (e) {
+    document.getElementById('schedules').textContent = 'schedules: ' + e.message;
+  }
+  try {
+    const wk = await get('/api/workers');
+    document.getElementById('workers').innerHTML = table(wk.data.workers, ['worker_id', 'trust_zone', 'max_concurrent_jobs']);
+  } catch (e) {
+    document.getElementById('workers').textContent = 'workers: ' + e.message;
+  }
+  try {
+    const au = await get('/api/audit');
+    document.getElementById('audit').innerHTML = table(au.data.audit_log, ['timestamp', 'action', 'actor', 'success']);
+  } catch (e) {
+    document.getElementById('audit').textContent = 'audit: ' + e.message;
+  }
+  try {
+    const s = await get('/api/system');
+    document.getElementById('jobs').textContent =
+      'total jobs: ' + s.data.total_jobs + ' · schedules: ' + s.data.total_schedules + ' · workers: ' + s.data.total_workers;
+  } catch (e) {
+    document.getElementById('jobs').textContent = 'jobs: ' + e.message;
+  }
+}
+refreshAll();
+</script>
+</body>
+</html>

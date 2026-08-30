@@ -28,8 +28,15 @@ def hash_admission_token(token: str) -> str:
 
 
 def capabilities_satisfied(required: list, have: list) -> bool:
-    """True when the worker's declared capabilities cover every required one."""
-    return set(required or []).issubset(set(have or []))
+    """True when the worker's declared capabilities cover every required one.
+
+    The literal "*" in the worker's capabilities matches anything, so
+    generic workers can opt into any job type (B2-R6 runtime worker).
+    """
+    have = set(have or [])
+    if "*" in have:
+        return True
+    return set(required or []).issubset(have)
 
 
 _WORKER_MANIFEST_SCHEMA = None
