@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I10 DONE; SENSOR-B2-I11 (bitfinex archive probe) pending |
+| Current checkpoint | SENSOR-B2-I11 DONE; SENSOR-B2-I12 (report-and-gap-matrix) pending |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -49,7 +49,8 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I08 | 18 | 18 | 0 |
 | SENSOR-B2-I09 | 15 | 15 | 0 |
 | SENSOR-B2-I10 | 12 | 12 | 0 |
-| cumulative | 427 | 427 | 0 |
+| SENSOR-B2-I11 | 20 | 20 | 0 |
+| cumulative | 447 | 447 | 0 |
 
 ## External / provider blockers
 
@@ -79,10 +80,9 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- SENSOR-B2-I11: bitfinex-archive-capability-probe
-  - community archive: license/access, schema, hash/checksum, historical
-    characterization; evidence class COMMUNITY_ARCHIVE
-  - gate: bitfinex archive probe suite green, offline
+- SENSOR-B2-I12: report-and-gap-matrix
+  - generate all required human/machine reports (01-12 evidence packet),
+    provider coverage matrix, sensor gap matrix, provider role recommendations
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -118,4 +118,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I07 | 36263167 | bybit probe module: cursor-paginated OI/funding, numeric-string timestamps, csv.gz trade archive, 9 fixtures + tests | 382 passed / 0 failed | PASS | none |
 | SENSOR-B2-I08 | 122e985a | okx probe module: data envelope, after/before cursor, /books current-only, traderecords archive, 8 fixtures + tests | 400 passed / 0 failed | PASS | none |
 | SENSOR-B2-I09 | d8de59e9 | deribit probe module: trade-level liquidation anatomy, has_more sequence pagination, include_old, narrow universe, 8 fixtures + tests | 415 passed / 0 failed | PASS | none |
-| SENSOR-B2-I10 | (pending) | coinalyze probe module: venue-attributed aggregator symbols, free-key, corroboration semantics, 9 fixtures + tests | 427 passed / 0 failed | PASS | none |
+| SENSOR-B2-I10 | 46686270 | coinalyze probe module: venue-attributed aggregator symbols, free-key, corroboration semantics, 9 fixtures + tests | 427 passed / 0 failed | PASS | none |
+| SENSOR-B2-I11 | __I11_SHA__ | bitfinex community archive probe module: license/checksum semantics, archive-hole detection, COMMUNITY_ARCHIVE evidence class, 6 fixtures + tests | 447 passed / 0 failed | PASS | none |

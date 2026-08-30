@@ -1,0 +1,2 @@
+9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08  liquidations/2022-06-15.csv
+3c0f5f0c9e9cdc0f9c6aadd2e1acefe4e62f2b87f2e1d4c0a96c9c0e0e9f3f9c  liquidations/2022-06-16.csv

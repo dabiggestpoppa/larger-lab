@@ -132,3 +132,18 @@ providers:
       carry venue suffixes (BTCUSDT_PERP.BINANCE) so attribution is preserved
       at symbol level; aggregated methodology is opaque and per-field
       equivalence remains corroboration-classified pending live evidence.
+
+  BITFINEX_COMMUNITY_ARCHIVE:
+    archive_base_url: "https://example.invalid/bitfinex-community-liquidation-archive"
+    access: COMMUNITY_ARCHIVE
+    endpoints:
+      MECHANICAL_LIQUIDATION: "archive daily dump liquidations/{YYYY-MM-DD}.csv"
+    notes: >
+      COMMUNITY_ARCHIVE replication source — never EXACT_EQUIVALENT to
+      first-party interval liquidation totals; expected role is corroboration /
+      replication with evidence class COMMUNITY_ARCHIVE (T2-COV-05 / master §14).
+      License, checksum manifest and generation methodology are required before
+      any promotion; dumps often mix spot-margin liquidations with derivatives,
+      so per-dump semantics inspection is mandatory.  Base URL is deliberately
+      UNVERIFIED here — the live probe records the reachable root before any
+      promotion decision.  No authentication; free public archive only.
