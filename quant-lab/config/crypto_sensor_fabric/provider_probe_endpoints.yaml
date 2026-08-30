@@ -45,13 +45,21 @@ providers:
       MECHANICAL_LIQUIDATION: "/contract_stats"
       MECHANICAL_OPEN_INTEREST: "/contract_stats"
       MECHANICAL_POSITIONING: "/contract_stats"
-      MECHANICAL_FUNDING: "/funding_rates"
+      MECHANICAL_FUNDING: "/funding_rate"
       MECHANICAL_TRADE: "/trades"
       MECHANICAL_BOOK_SNAPSHOT: "/order_book"
     notes: >
       /contract_stats carries interval long/short liquidation sizes AND OI
       (contracts + USD notional) AND market-wide positioning (lsr_taker,
       lsr_account, top_lsr_*, top_long/short_size, long/short_users) (I12R1).
+      I13R1: funding uses the SINGLE-contract GET /funding_rate?contract=...
+      (no auth) — NOT the plural batch POST /funding_rates, which is a POST
+      batch endpoint (probing it under GET-style model produced
+      INVALID_CREDENTIALS = REQUEST_CONTRACT_INVALID, never a provider auth
+      failure).  LIVE-OBSERVED (I13R1): /funding_rate from/to are Unix SECONDS
+      (like contract_stats, NOT ms) and rows are {"r": rate, "t": epoch
+      seconds}; retention is bounded by the same rolling 180-day window
+      ("from time exceeds 180-day limit" for older eras).
       contract_stats contract: `from` is Unix SECONDS (not ms), `interval` is a
       STRING bucket ("5m"/"1h"/"1d", ...) — NOT seconds (live-observed I13:
       seconds returns HTTP 400 INVALID_PARAM_VALUE), `limit` caps records, and

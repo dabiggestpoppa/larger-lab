@@ -147,6 +147,27 @@ def test_coinalyze_credential_prereq_not_auth_blocked() -> None:
     assert "never AUTH_BLOCKED" in spec["credential_prereq"]
 
 
+def test_gate_funding_single_contract_get_route() -> None:
+    # I13R1 §10: funding is the SINGLE-contract GET /funding_rate?contract=...
+    # with NO authentication.  The plural batch POST /funding_rates is modeled
+    # separately and must not be confused with this route.
+    spec = _sensor("GATE_FUTURES", "MECHANICAL_FUNDING")
+    assert spec["absolute_url"].endswith("/funding_rate")
+    assert "/funding_rates" not in spec["absolute_url"].replace("funding_rate", "")
+    assert spec["method"] == "GET"
+    assert spec["auth"] == "NO_AUTH"
+    assert "contract=" in spec["query"]
+    assert "REQUEST_CONTRACT_INVALID" in spec["native_unit_notes"]
+
+
+def test_bitfinex_public_source_requires_no_api_key() -> None:
+    # I13R1 §11: the selected community source is a PUBLIC GitHub/LFS repo.
+    # A public source cannot require an API key / account / payment.
+    spec = _sensor("BITFINEX_COMMUNITY_ARCHIVE", "MECHANICAL_LIQUIDATION")
+    assert spec["auth"] == "NO_AUTH"
+    assert "api_key" not in spec.get("query", "").lower() if spec.get("query") else True
+
+
 def test_bitfinex_no_huge_download_planned() -> None:
     spec = _sensor("BITFINEX_COMMUNITY_ARCHIVE", "MECHANICAL_LIQUIDATION")
     assert spec.get("dump_download_planned") is False

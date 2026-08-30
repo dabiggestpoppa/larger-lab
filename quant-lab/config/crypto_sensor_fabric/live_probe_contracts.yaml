@@ -190,17 +190,35 @@ GATE_FUTURES:
       documentation_last_reviewed: "2026-08-30"
       live_probe_enabled: false
     MECHANICAL_FUNDING:
-      absolute_url: "https://api.gateio.ws/api/v4/futures/usdt/funding_rates"
+      absolute_url: "https://api.gateio.ws/api/v4/futures/usdt/funding_rate"
       method: GET
       auth: NO_AUTH
+      query: "contract={contract}&from={sec}&to={sec}"
       start_param: from
-      start_unit: epoch_milliseconds
+      start_unit: "epoch_seconds (live-observed I13R1 — NOT ms)"
       end_param: to
-      end_unit: epoch_milliseconds
+      end_unit: "epoch_seconds (live-observed I13R1)"
       interval_param: none
-      pagination: from/to window
-      native_unit_notes: decimal fraction per interval; retention to be probed per era
+      pagination: "from/to window; rows {\"r\": rate, \"t\": epoch seconds}"
+      native_unit_notes: single-contract GET funding_rate; decimal fraction per interval. The plural batch POST /funding_rates is modeled SEPARATELY (batch route; probing it under GET-style produced INVALID_CREDENTIALS = REQUEST_CONTRACT_INVALID, not provider auth failure). Rolling 180-day retention boundary (older from -> "from time exceeds 180-day limit").
       historical: true
+      evidence_source_url: "https://www.gate.com/docs/developers/apiv4/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_TRADE:
+      absolute_url: "https://api.gateio.ws/api/v4/futures/usdt/trades"
+      method: GET
+      auth: NO_AUTH
+      query: "contract={contract}&from={sec}&to={sec}&limit=1000"
+      start_param: from
+      start_unit: "epoch_seconds (live-observed I13R1 — ms windows return empty = REQUEST_CONTRACT_INVALID)"
+      end_param: to
+      end_unit: "epoch_seconds (live-observed I13R1)"
+      interval_param: none
+      limit_param: limit (max 1000)
+      pagination: from/to window; recent-only (no documented deep history)
+      native_unit_notes: rows carry signed size (negative=SELL aggressor) + price; create_time float-seconds. Trade-level execution surface.
+      historical: false
       evidence_source_url: "https://www.gate.com/docs/developers/apiv4/"
       documentation_last_reviewed: "2026-08-30"
       live_probe_enabled: false

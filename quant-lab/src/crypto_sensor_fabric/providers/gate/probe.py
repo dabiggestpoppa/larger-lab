@@ -93,9 +93,14 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
         }
     )
     #: from/to (ms) window queries — retention depth must be probed per era.
+    # I13R1: funding uses the SINGLE-contract GET /funding_rate?contract=...
+    # (no auth) — NOT the plural batch POST /funding_rates, which was probed
+    # under a GET-style model and returned INVALID_CREDENTIALS (that attempt
+    # was a REQUEST_CONTRACT_INVALID, not a provider auth failure).  The
+    # plural batch route is modeled separately (batch_funding_rates_url).
     window_query_sensors = frozenset(
         {
-            SensorFamily.MECHANICAL_FUNDING,  # /funding_rates
+            SensorFamily.MECHANICAL_FUNDING,  # GET /funding_rate (single contract)
             SensorFamily.MECHANICAL_TRADE,  # /trades
         }
     )
@@ -155,6 +160,21 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
     def contract_stats_url(self) -> str:
         return f"https://api.gateio.ws/api/v4/futures/{GATE_SETTLE}/contract_stats"
 
+    def funding_rate_url(self) -> str:
+        """Single-contract historical funding GET route (I13R1).
+
+        OBSERVED LIVE (I13R1): /funding_rate?contract=...&from=&to= uses Unix
+        SECONDS for from/to (like contract_stats, NOT ms) and rows are
+        {"r": rate, "t": epoch seconds}.  Retention is bounded ("from time
+        exceeds 180-day limit" for older eras) — same rolling boundary as
+        contract_stats.
+        """
+        return f"https://api.gateio.ws/api/v4/futures/{GATE_SETTLE}/funding_rate"
+
+    def batch_funding_rates_url(self) -> str:
+        """Plural batch POST /funding_rates — modeled separately from the GET."""
+        return f"https://api.gateio.ws/api/v4/futures/{GATE_SETTLE}/funding_rates"
+
     def build_probe_request(self, request: CapabilityProbeRequest) -> dict[str, Any]:
         sensor = request.sensor_family
         params: dict[str, Any] = {"contract": request.instrument_native}
@@ -164,10 +184,17 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             params["interval"] = GATE_CONTRACT_STATS_INTERVAL
             params["limit"] = self.page_limit
         elif sensor in self.window_query_sensors:
-            params["from"] = int(request.requested_start.timestamp() * 1000)
-            params["to"] = int(request.requested_end.timestamp() * 1000)
+            # I13R1 live-observed: BOTH funding_rate and /trades from/to are
+            # Unix SECONDS (ms windows return empty — the old ms probe was a
+            # REQUEST_CONTRACT_INVALID, not a valid empty).  First-party SDK
+            # docs confirm "Specify starting time in Unix seconds".
+            params["from"] = int(request.requested_start.timestamp())
+            params["to"] = int(request.requested_end.timestamp())
         if sensor is SensorFamily.MECHANICAL_BOOK_SNAPSHOT:
             params["limit"] = 100
+        if sensor is SensorFamily.MECHANICAL_FUNDING:
+            # single-contract GET /funding_rate?contract=...&from=&to= (seconds)
+            return {"url": self.funding_rate_url(), "params": params}
         return {"url": self._endpoint_for(sensor), "params": params}
 
     # ------------------------------------------------------------------
@@ -215,6 +242,20 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
         return None
 
     # ------------------------------------------------------------------
+    # funding rows carry {"r": rate, "t": epoch seconds} — expose `t` as a
+    # timestamp field so PIT/characterization see it (I13R1 live-observed).
+    # ------------------------------------------------------------------
+
+    def extract_timestamp_fields(self, body: Any) -> list[str]:
+        fields = super().extract_timestamp_fields(body)
+        if isinstance(body, list) and any(
+            isinstance(row, dict) and "t" in row and "r" in row for row in body[:50]
+        ):
+            if "t" not in fields:
+                fields.append("t")
+        return fields
+
+    # ------------------------------------------------------------------
     # pagination: window coverage (seconds on contract_stats, ms elsewhere)
     # ------------------------------------------------------------------
 
@@ -229,6 +270,15 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             return False, None
         if not rows:
             return True, None  # nothing returned; completeness unresolved
+        # funding_rate rows carry {"t": epoch SECONDS} (I13R1 live-observed);
+        # /trades rows carry create_time_ms; contract_stats rows carry ms `time`.
+        if sensor is SensorFamily.MECHANICAL_FUNDING:
+            last = max(
+                (row.get("t") for row in rows if isinstance(row.get("t"), (int, float))),
+                default=None,
+            )
+            end = int(request.requested_end.timestamp())
+            return True, (last is not None and int(last) >= end)
         if sensor in self.contract_stats_sensors:
             # Request `from` is seconds; rows carry ms `time`.  There is no `to`
             # param — completeness is bounded by from+interval+limit coverage, so
@@ -244,6 +294,7 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
                 or row.get("funding_time")
                 or row.get("create_time_ms")
                 for row in rows
+                if isinstance(row, dict)
             ),
             default=None,
         )

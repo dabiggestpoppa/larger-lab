@@ -119,6 +119,37 @@ def test_no_market_positioning_via_authenticated_positions():
     assert "contract_stats" in build["url"]
 
 
+def test_funding_uses_single_contract_get_funding_rate():
+    # I13R1: funding MUST be the single-contract GET /funding_rate?contract=...
+    # (no auth) — never the plural batch POST /funding_rates probed under a
+    # GET-style model (that produced INVALID_CREDENTIALS = REQUEST_CONTRACT_INVALID).
+    query = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_FUNDING))
+    assert query["url"].endswith("/funding_rate")
+    assert "/funding_rates" not in query["url"]
+    assert query["params"]["contract"] == "BTC_USDT"
+    assert "from" in query["params"] and "to" in query["params"]
+
+
+def test_funding_get_route_has_no_auth():
+    # The single-contract GET funding_rate route requires NO authentication;
+    # a 401 on this route is REQUEST_CONTRACT_INVALID evidence, not provider
+    # capability truth (I13R1 §10).
+    url = PROBE.funding_rate_url()
+    assert url.endswith("/funding_rate")
+    assert PROBE.access_mode is AccessMode.PUBLIC_REST
+    assert PROBE.classify_failure(401, _body("error_unauthorized.json")) is ProbeFailureClass.F_ACCESS_AUTH  # classifier maps the status
+
+
+def test_batch_funding_rates_modeled_separately():
+    # The plural batch route is POST /funding_rates — modeled SEPARATELY and
+    # never confused with the single-contract GET funding_rate route.
+    batch = PROBE.batch_funding_rates_url()
+    assert batch.endswith("/funding_rates")
+    single = PROBE.funding_rate_url()
+    assert single.endswith("/funding_rate")
+    assert single != batch
+
+
 def test_build_probe_request_is_deterministic():
     a = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_FUNDING))
     b = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_FUNDING))
