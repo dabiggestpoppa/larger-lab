@@ -69,6 +69,12 @@ def process_cmdline(pid: int) -> str | None:
     if pid <= 0:
         return None
     try:
+        raw = Path(f"/proc/{pid}/cmdline").read_bytes()
+        if raw:
+            return raw.replace(b"\0", b" ").decode("utf-8", "replace").strip()
+    except OSError:
+        pass
+    try:
         r = subprocess.run(["ps", "-p", str(pid), "-o", "args="],
                            capture_output=True, text=True, timeout=10)
         if r.returncode == 0 and r.stdout.strip():
@@ -118,6 +124,23 @@ def clear_pid(path: Path) -> None:
         pass
 
 
+def _pid_alive(pid: int) -> bool:
+    """Liveness check without /proc/ps dependency for the wait loop."""
+    if os.name == "nt":
+        # os.kill(pid, 0) is a no-op on Windows (never raises), so use the
+        # cmdline probe: PowerShell returns empty for a dead pid.
+        return process_cmdline(pid) is not None
+    try:
+        os.kill(pid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return process_cmdline(pid) is not None
+
+
 def terminate_pid(pid: int, timeout_s: float = 8.0) -> bool:
     """Terminate exactly the given PID. Returns True if it exited."""
     if pid <= 0:
@@ -133,14 +156,16 @@ def terminate_pid(pid: int, timeout_s: float = 8.0) -> bool:
             return False
     deadline = time.time() + timeout_s
     while time.time() < deadline:
-        if process_cmdline(pid) is None:
+        if not _pid_alive(pid):
             return True
         time.sleep(0.2)
-    try:
-        os.kill(pid, signal.SIGKILL)
-    except OSError:
-        pass
-    return process_cmdline(pid) is None
+    sigkill = getattr(signal, "SIGKILL", None)
+    if sigkill is not None:
+        try:
+            os.kill(pid, sigkill)
+        except OSError:
+            pass
+    return not _pid_alive(pid)
 
 
 def stop_runtime_processes() -> list[str]:
@@ -419,9 +444,13 @@ def cloud_credential_hint(environ: dict | None = None) -> list[str]:
     local-only.
     """
     env = environ if environ is not None else os.environ
-    return sorted(k for k in env
-                  if re.search(r"aws|azure|gcp|google_cloud", k, re.I)
-                  and k not in ("PYTHONPATH", "PATH", "HOME"))
+    # Only CREDENTIAL variables count — benign runner noise like
+    # AZURE_EXTENSION_DIR or AZURE_HTTP_USER_AGENT must not trip this.
+    provider = re.compile(r"(aws|azure|gcp|google)", re.I)
+    secret = re.compile(r"(secret|token|password|credential|access_key|key_id|"
+                        r"client_id|client_secret|session_token|tenant_id|"
+                        r"service_account|connection_string)", re.I)
+    return sorted(k for k in env if provider.search(k) and secret.search(k))
 
 
 def _worker_token() -> str:

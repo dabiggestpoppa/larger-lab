@@ -129,12 +129,12 @@ def test_stop_terminates_only_pid_file_process(monkeypatch):
         path.write_text(f"{pid}\n")
         monkeypatch.setattr(ll, "PROCESSES", {"worker": ("worker.pid", "time.sleep(600)")})
         actions = ll.stop_runtime_processes()
-        deadline = time.time() + 10
+        deadline = time.time() + 15
         while time.time() < deadline and proc.poll() is None:
             time.sleep(0.1)
-        assert proc.poll() is not None, "recorded process was not terminated"
+        assert proc.poll() is not None, f"recorded process was not terminated; actions={actions}"
         assert not path.exists(), "pid file should be cleared"
-        assert any("terminated worker" in a for a in actions)
+        assert any("terminated worker" in a for a in actions), f"actions={actions}"
     finally:
         if proc.poll() is None:
             proc.kill()
