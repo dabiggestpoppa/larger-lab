@@ -113,6 +113,22 @@ providers:
       rows carrying a liquidation flag; TRADE_LEVEL anatomy — never
       numerically merged with interval liquidation totals (T2-SEM-06).
       Historical traversal requires include_old=true with start/end timestamp
-      windows and count<=1000; has_more drives pagination.  Funding history is
+      windows and count<=1000; has_more drives pagination.      Funding history is
       hourly with 8h/1h series.  Narrower asset universe recorded explicitly:
       MID_TAIL_CONTROL is NOT mapped.
+
+  COINALYZE:
+    base_url: "https://api.coinalyze.net/v1"
+    access: FREE_API_KEY
+    endpoints:
+      MECHANICAL_OPEN_INTEREST: "/open-interest-history"
+      MECHANICAL_LIQUIDATION: "/liquidations-history"
+      MECHANICAL_FUNDING: "/funding-rate-history"
+      MECHANICAL_POSITIONING: "/long-short-ratio-history"
+    notes: >
+      THIRD_PARTY_AGGREGATOR — never counts as independent venue truth
+      (T2-COV-05).  Free API key required; rate limits and intraday retention
+      must be probed (documented deletion of old intraday data).  Symbols
+      carry venue suffixes (BTCUSDT_PERP.BINANCE) so attribution is preserved
+      at symbol level; aggregated methodology is opaque and per-field
+      equivalence remains corroboration-classified pending live evidence.

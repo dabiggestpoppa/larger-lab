@@ -1,0 +1,9 @@
+[
+  {
+    "symbol": "BTCUSDT_PERP.BINANCE",
+    "data": [
+      {"time": 1655251200000, "amount": 6.42e9},
+      {"time": 1655254800000, "amount": 6.45e9}
+    ]
+  }
+]
