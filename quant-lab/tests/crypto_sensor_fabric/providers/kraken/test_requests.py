@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
+import pytest
+
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.providers.base.enums import Granularity
 from crypto_sensor_fabric.providers.base.fingerprint import fingerprint_request
@@ -60,6 +62,40 @@ class TestRequestContracts:
         rebuilt = FetchRequest.model_validate(data)
         _, params = BUILDER.build(rebuilt)
         assert params["interval"] == 60
+
+    def test_every_supported_granularity_maps_exactly(self) -> None:
+        expected = {
+            Granularity.G1M: 60,
+            Granularity.G5M: 300,
+            Granularity.G15M: 900,
+            Granularity.G1H: 3600,
+            Granularity.G4H: 14400,
+            Granularity.G1D: 86400,
+        }
+        for granularity, interval in expected.items():
+            req = request(SensorFamily.MECHANICAL_FUNDING).model_copy(
+                update={"granularity": granularity}
+            )
+            _, params = BUILDER.build(req)
+            assert params["interval"] == interval, granularity
+
+    def test_unsupported_granularity_fails_typed_not_defaulted(self) -> None:
+        # SENSOR-B3-I05R1: RAW_EVENT / BOOK_SNAPSHOT must NEVER silently
+        # become 1h.
+        from crypto_sensor_fabric.providers.base.errors import UnsupportedGranularity
+
+        for granularity in (Granularity.RAW_EVENT, Granularity.BOOK_SNAPSHOT):
+            req = request(SensorFamily.MECHANICAL_FUNDING).model_copy(
+                update={"granularity": granularity}
+            )
+            with pytest.raises(UnsupportedGranularity):
+                BUILDER.build(req)
+
+    def test_granularity_none_default_is_explicit(self) -> None:
+        req = request(SensorFamily.MECHANICAL_FUNDING)
+        assert req.granularity is None
+        _, params = BUILDER.build(req)
+        assert params["interval"] == 3600  # documented adapter default (1h)
 
     def test_native_symbol_preserved(self) -> None:
         url, _ = BUILDER.build(request(SensorFamily.MECHANICAL_OPEN_INTEREST, "PI_ETHUSD"))

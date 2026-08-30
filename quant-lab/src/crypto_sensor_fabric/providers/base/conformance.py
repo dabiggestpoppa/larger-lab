@@ -311,6 +311,23 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
                         f"{decl.pagination_mode} contradicts evidence grant "
                         f"{evidence.pagination_mode}"
                     )
+                # production symbol scope must be PROVEN by the grant
+                # (SENSOR-B3-I05R1): no probe-only symbols, no second list.
+                if decl.symbol_scope:
+                    if not evidence.instruments:
+                        failures.append(
+                            f"{sensor.value}: symbol_scope declared but evidence "
+                            "grant proves no instruments"
+                        )
+                    else:
+                        unproven = sorted(
+                            set(decl.symbol_scope) - set(evidence.instruments)
+                        )
+                        if unproven:
+                            failures.append(
+                                f"{sensor.value}: symbol_scope {unproven} not "
+                                "proven by the evidence grant"
+                            )
                 bound = promoted.capability_for(sensor)
                 if not bound.supported:
                     failures.append(

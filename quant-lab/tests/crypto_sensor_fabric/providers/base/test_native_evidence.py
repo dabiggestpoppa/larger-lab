@@ -133,6 +133,44 @@ class TestNativeEvidenceUnit:
         assert any("CURRENT_ONLY" in v for v in vio)
 
 
+class TestNativeEvidenceInstrumentScope:
+    """SENSOR-B3-I05R1 — the grant PROVES the production symbol scope."""
+
+    def _bound_with_scope(self, scope: list[str]):
+        return _fund_bound().model_copy(update={"symbol_scope": scope})
+
+    def test_valid_grant_with_instruments_passes(self) -> None:
+        bound = self._bound_with_scope(["PI_XBTUSD"])
+        grant = _grant(instruments=("PI_XBTUSD",))
+        assert native_evidence_violations("KRAKEN_FUTURES", grant, bound) == []
+
+    def test_symbol_scope_without_grant_instruments_fails(self) -> None:
+        bound = self._bound_with_scope(["PI_XBTUSD"])
+        grant = _grant()  # no instruments proven
+        vio = native_evidence_violations("KRAKEN_FUTURES", grant, bound)
+        assert any("proves no instruments" in v for v in vio)
+
+    def test_symbol_scope_not_proven_by_grant_fails(self) -> None:
+        bound = self._bound_with_scope(["PI_XBTUSD", "PI_ETHUSD"])
+        grant = _grant(instruments=("PI_XBTUSD",))
+        vio = native_evidence_violations("KRAKEN_FUTURES", grant, bound)
+        assert any("not proven" in v for v in vio)
+
+    def test_apply_sets_symbol_scope_from_grant(self) -> None:
+        bound = _fund_bound()
+        refined = apply_native_evidence(
+            bound, _grant(instruments=("PI_XBTUSD",)), provider_id="KRAKEN_FUTURES"
+        )
+        assert refined.symbol_scope == ["PI_XBTUSD"]
+
+    def test_apply_rejects_unproven_scope(self) -> None:
+        bound = self._bound_with_scope(["PI_ETHUSD"])
+        with pytest.raises(ValueError):
+            apply_native_evidence(
+                bound, _grant(instruments=("PI_XBTUSD",)), provider_id="KRAKEN_FUTURES"
+            )
+
+
 class TestApplyNativeEvidence:
     def test_valid_refines_mode_and_preserves_bounds(self) -> None:
         bound = _fund_bound()

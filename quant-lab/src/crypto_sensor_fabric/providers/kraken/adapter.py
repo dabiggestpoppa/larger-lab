@@ -32,6 +32,8 @@ from ..base.enums import (
 )
 from ..base.errors import (
     CapabilityUnavailable,
+    InvalidInstrument,
+    ProviderSemanticError,
     ProviderUnavailable,
     SchemaDrift,
 )
@@ -47,7 +49,7 @@ from ..base.models import (
 )
 from ..base.schema import SchemaAssessment
 from .capabilities import (
-    KRAKEN_INSTRUMENT_SCOPE,
+    KRAKEN_PRODUCTION_INSTRUMENT_SCOPE,
     PROVIDER_ID,
     build_kraken_capabilities,
 )
@@ -66,14 +68,6 @@ DEFAULT_FREE_ONLY_POLICY = FreeOnlyPolicy(
 
 #: Transport signature: (url, params) -> (http_status_or_None, parsed_body).
 TransportFn = Callable[[str, dict[str, int]], tuple[int | None, Any]]
-
-
-def _default_free_unavailable_transport(url: str, params: dict[str, int]) -> tuple[int | None, Any]:  # noqa: ANN001, ANN201
-    raise ProviderUnavailable(
-        provider_id=PROVIDER_ID,
-        sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
-        detail="no transport injected; adapter is offline (never fabricates a network path)",
-    )
 
 
 def _epoch_to_dt(value: Any) -> datetime | None:
@@ -110,7 +104,10 @@ class KrakenAdapter:
         adapter_version: str = "kraken-adapter-v1",
         now: Callable[[], datetime] | None = None,
     ) -> None:
-        self._transport = transport or _default_free_unavailable_transport
+        # No transport -> the adapter stays OFFLINE: a fetch with no injected
+        # transport raises typed ProviderUnavailable naming the REQUESTED
+        # sensor (never a hard-coded placeholder sensor).
+        self._transport = transport
         self._policy = free_only_policy or DEFAULT_FREE_ONLY_POLICY
         self._auth_mode = auth_mode
         self._caps = build_kraken_capabilities(promotion_candidates)
@@ -123,11 +120,15 @@ class KrakenAdapter:
         return self._caps
 
     def list_instruments(self, request: InstrumentListRequest) -> InstrumentListResult:
-        # Configured native instrument scope (I05 does not invent a discovery
-        # endpoint; see capabilities.KRAKEN_INSTRUMENT_SCOPE).
+        # Provider identity is part of the request contract (SENSOR-B3-I05R1).
+        if request.provider_id != PROVIDER_ID:
+            self._raise_wrong_provider(request.provider_id)
+        # Configured PRODUCTION evidence scope (evidence-backed union), NOT
+        # live provider discovery and NOT the probe universe: PI_SOLUSD /
+        # PI_DOGEUSD stay probe-only (see capabilities).
         return InstrumentListResult(
             provider_id=self.provider_id,
-            native_instrument_ids=list(KRAKEN_INSTRUMENT_SCOPE),
+            native_instrument_ids=list(KRAKEN_PRODUCTION_INSTRUMENT_SCOPE),
             retrieved_at=self._now(),
         )
 
@@ -138,22 +139,22 @@ class KrakenAdapter:
         self._raise_unsupported(request.sensor_family)
 
     def fetch_liquidations(self, request: FetchRequest) -> FetchBatch:
-        return self._fetch(request)
+        return self._fetch(request, SensorFamily.MECHANICAL_LIQUIDATION)
 
     def fetch_open_interest(self, request: FetchRequest) -> FetchBatch:
-        return self._fetch(request)
+        return self._fetch(request, SensorFamily.MECHANICAL_OPEN_INTEREST)
 
     def fetch_funding(self, request: FetchRequest) -> FetchBatch:
-        return self._fetch(request)
+        return self._fetch(request, SensorFamily.MECHANICAL_FUNDING)
 
     def fetch_basis(self, request: FetchRequest) -> FetchBatch:
-        return self._fetch(request)
+        return self._fetch(request, SensorFamily.MECHANICAL_BASIS)
 
     def fetch_positioning(self, request: FetchRequest) -> FetchBatch:
-        return self._fetch(request)
+        return self._fetch(request, SensorFamily.MECHANICAL_POSITIONING)
 
     def fetch_book_metrics(self, request: FetchRequest) -> FetchBatch:
-        return self._fetch(request)
+        return self._fetch(request, SensorFamily.MECHANICAL_BOOK_METRIC)
 
     # ---- helpers ----------------------------------------------------------
     def _raise_unsupported(self, sensor: SensorFamily) -> NoReturn:
@@ -166,8 +167,44 @@ class KrakenAdapter:
             ),
         )
 
-    def _fetch(self, request: FetchRequest) -> FetchBatch:
+    def _raise_wrong_provider(self, declared: str) -> NoReturn:
+        raise ProviderSemanticError(
+            provider_id=self.provider_id,
+            sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+            detail=(
+                f"request provider_id {declared!r} != adapter provider "
+                f"{PROVIDER_ID!r} (provider identity is part of the request "
+                "contract; rejected before any transport call)"
+            ),
+        )
+
+    def _require_sensor(self, requested: SensorFamily, expected: SensorFamily) -> None:
+        """Named protocol method / request sensor identity (SENSOR-B3-I05R1).
+
+        `fetch_funding` requires a MECHANICAL_FUNDING request, etc.  A mismatch
+        fails typed BEFORE transport — the named method is itself a contract.
+        """
+        if requested is not expected:
+            raise ProviderSemanticError(
+                provider_id=self.provider_id,
+                sensor_family=requested,
+                detail=(
+                    f"method/sensor identity mismatch: {expected.value} fetch "
+                    f"method called with a {requested.value} request (use "
+                    "dispatch_fetch for generic routing)"
+                ),
+            )
+
+    def _fetch(self, request: FetchRequest, expected_sensor: SensorFamily) -> FetchBatch:
+        # 1. named-method / request sensor identity (before anything else).
+        self._require_sensor(request.sensor_family, expected_sensor)
         sensor = request.sensor_family
+
+        # 2. request provider identity MUST match the adapter (R2): a
+        #    KRAKEN_FUTURES adapter never executes a foreign-provider request.
+        if request.provider_id != self.provider_id:
+            self._raise_wrong_provider(request.provider_id)
+
         capability = self._caps.capability_for(sensor)
         if not capability.supported:
             self._raise_unsupported(sensor)
@@ -177,10 +214,36 @@ class KrakenAdapter:
             self.provider_id, self._policy, self._auth_mode, sensor_family=sensor
         )
 
+        # 3. sensor-specific PRODUCTION symbol scope (R1): the sensor is
+        #    supported but this native instrument must be proven for IT.
+        if capability.symbol_scope and request.native_instrument_id not in capability.symbol_scope:
+            raise InvalidInstrument(
+                provider_id=self.provider_id,
+                sensor_family=sensor,
+                detail=(
+                    f"native instrument {request.native_instrument_id!r} is not "
+                    f"evidence-backed for {sensor.value} (symbol_scope="
+                    f"{sorted(capability.symbol_scope)})"
+                ),
+            )
+
+        # 4. request building (may raise UnsupportedGranularity) — still before
+        #    any transport call.
         url, params = self._builder.build(request)
         fp = fingerprint_request(
             request, self._builder.endpoint_family(sensor), params
         )
+
+        # 5. no transport -> typed ProviderUnavailable naming THIS sensor.
+        if self._transport is None:
+            raise ProviderUnavailable(
+                provider_id=self.provider_id,
+                sensor_family=sensor,
+                detail=(
+                    "no transport injected; adapter is offline (never "
+                    "fabricates a network path)"
+                ),
+            )
         status, body = self._transport(url, params)
 
         if status is not None and status not in (200, 201, 204):

@@ -80,6 +80,11 @@ class ProviderNativeCapabilityEvidence:
     evidence_ids: tuple[str, ...] = ()
     methodology_pin: str = ""
     access_path: str = ""
+    #: Provider-native PRODUCTION symbol scope proven by Bloc 2 evidence for
+    #: this provider x sensor x instrument (SENSOR-B3-I05R1).  A production
+    #: capability may only carry symbols the grant proves; probe/control-only
+    #: instruments (e.g. Kraken SOL/DOGE) are never granted this way.
+    instruments: tuple[str, ...] = ()
     verification_head: str | None = None
 
 
@@ -155,6 +160,24 @@ def native_evidence_violations(
             "(methodology cannot change)"
         )
 
+    # ---- production symbol scope must be proven by the grant ----------
+    # A symbol may NOT reach a production capability merely because the Bloc 2
+    # probe universe contains it: every production symbol must resolve to
+    # evidence for this provider x sensor x instrument (SENSOR-B3-I05R1).
+    if bound.symbol_scope:
+        if not evidence.instruments:
+            violations.append(
+                f"{sensor}: symbol_scope declared but native evidence proves "
+                "no instruments"
+            )
+        else:
+            unproven = sorted(set(bound.symbol_scope) - set(evidence.instruments))
+            if unproven:
+                violations.append(
+                    f"{sensor}: symbol_scope {unproven} not proven by native "
+                    "evidence instruments"
+                )
+
     return violations
 
 
@@ -177,4 +200,8 @@ def apply_native_evidence(
     data = capability.model_dump()
     data["historical_mode"] = evidence.historical_mode
     data["pagination_mode"] = evidence.pagination_mode
+    if evidence.instruments:
+        # the grant proves the production symbol scope; never inferred from
+        # the probe universe or any other secondary list
+        data["symbol_scope"] = list(evidence.instruments)
     return SensorCapability.model_validate(data)

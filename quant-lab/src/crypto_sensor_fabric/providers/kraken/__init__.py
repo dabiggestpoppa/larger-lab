@@ -19,12 +19,15 @@ from __future__ import annotations
 from .adapter import DEFAULT_FREE_ONLY_POLICY, KrakenAdapter
 from .capabilities import (
     KRAKEN_ANALYTICS_TYPES,
-    KRAKEN_INSTRUMENT_SCOPE,
+    KRAKEN_PRODUCTION_INSTRUMENT_SCOPE,
+    KRAKEN_PROBE_INSTRUMENT_SCOPE,
     KRAKEN_PROMOTED_SENSORS,
+    KRAKEN_SYMBOL_SCOPES,
     PROVIDER_ID,
     build_kraken_capabilities,
     kraken_endpoint_family,
     kraken_native_evidence,
+    kraken_symbol_scopes_from_evidence,
 )
 from .probe import NATIVE_INSTRUMENTS, KrakenCapabilityProbe
 from .requests import KrakenAnalyticsRequestBuilder
@@ -32,8 +35,10 @@ from .requests import KrakenAnalyticsRequestBuilder
 __all__ = [
     "DEFAULT_FREE_ONLY_POLICY",
     "KRAKEN_ANALYTICS_TYPES",
-    "KRAKEN_INSTRUMENT_SCOPE",
+    "KRAKEN_PRODUCTION_INSTRUMENT_SCOPE",
+    "KRAKEN_PROBE_INSTRUMENT_SCOPE",
     "KRAKEN_PROMOTED_SENSORS",
+    "KRAKEN_SYMBOL_SCOPES",
     "NATIVE_INSTRUMENTS",
     "PROVIDER_ID",
     "KrakenAdapter",
@@ -42,4 +47,5 @@ __all__ = [
     "build_kraken_capabilities",
     "kraken_endpoint_family",
     "kraken_native_evidence",
+    "kraken_symbol_scopes_from_evidence",
 ]

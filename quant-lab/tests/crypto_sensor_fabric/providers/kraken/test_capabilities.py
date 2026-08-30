@@ -19,7 +19,10 @@ from crypto_sensor_fabric.providers.base.enums import (
     PaginationMode,
 )
 from crypto_sensor_fabric.providers.kraken import (
+    KRAKEN_PRODUCTION_INSTRUMENT_SCOPE,
     KRAKEN_PROMOTED_SENSORS,
+    KRAKEN_PROBE_INSTRUMENT_SCOPE,
+    KRAKEN_SYMBOL_SCOPES,
     PROVIDER_ID,
     build_kraken_capabilities,
     kraken_native_evidence,
@@ -134,3 +137,37 @@ class TestNativeModeRefinement:
             assert ref.provider_id == "KRAKEN_FUTURES"
             assert ref.sensor_family is sensor
             assert ref.evidence_id in caps.capability_for(sensor).evidence_basis
+
+    def test_production_scope_separated_from_probe_scope(self) -> None:
+        # SENSOR-B3-I05R1: PI_SOLUSD / PI_DOGEUSD are probe/control targets
+        # only — never production support.
+        assert KRAKEN_PRODUCTION_INSTRUMENT_SCOPE == ["PI_XBTUSD", "PI_ETHUSD"]
+        assert set(KRAKEN_PROBE_INSTRUMENT_SCOPE) >= {
+            "PI_XBTUSD",
+            "PI_ETHUSD",
+            "PI_SOLUSD",
+            "PI_DOGEUSD",
+        }
+        assert "PI_SOLUSD" not in KRAKEN_PRODUCTION_INSTRUMENT_SCOPE
+        assert "PI_DOGEUSD" not in KRAKEN_PRODUCTION_INSTRUMENT_SCOPE
+
+    def test_sensor_specific_symbol_scope_on_capabilities(self) -> None:
+        # OI is evidence-backed for PI_XBTUSD + PI_ETHUSD; the other five are
+        # evidence-backed on PI_XBTUSD only (08_HISTORY_BOUNDARIES.csv).
+        caps = _caps()
+        for sensor in PROMOTED:
+            scope = caps.capability_for(sensor).symbol_scope
+            if sensor is SensorFamily.MECHANICAL_OPEN_INTEREST:
+                assert set(scope) == {"PI_XBTUSD", "PI_ETHUSD"}
+            else:
+                assert scope == ["PI_XBTUSD"]
+        assert set(KRAKEN_SYMBOL_SCOPES) == PROMOTED
+
+    def test_native_evidence_grant_proves_instruments(self) -> None:
+        evidence = kraken_native_evidence()
+        for sensor in PROMOTED:
+            grant = evidence[sensor]
+            assert grant.instruments
+            assert set(grant.instruments) == set(
+                _caps().capability_for(sensor).symbol_scope
+            )

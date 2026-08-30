@@ -1084,6 +1084,63 @@ class TestNativeEvidenceConformanceGate:
             results, "q0_promotion_bounds"
         ).detail
 
+    def test_symbol_scope_declared_without_grant_proof_fails(self) -> None:
+        caps = mutate(
+            promoted_caps(),
+            SensorFamily.MECHANICAL_FUNDING,
+            historical_mode=HistoricalMode.REST_RANGE,
+            pagination_mode=PaginationMode.TIME_RANGE,
+            symbol_scope=["PI_XBTUSD"],
+        )
+        grant = self._funding_grant()  # grant proves NO instruments
+        results = run_conformance_suite(
+            under_test(
+                adapter=FakeKrakenAdapter(caps=caps),
+                native_evidence={SensorFamily.MECHANICAL_FUNDING: grant},
+            )
+        )
+        _assert_this_check_fails(
+            results, "q0_native_mode_evidence", "proves no instruments"
+        )
+
+    def test_symbol_scope_not_proven_by_grant_fails(self) -> None:
+        caps = mutate(
+            promoted_caps(),
+            SensorFamily.MECHANICAL_FUNDING,
+            historical_mode=HistoricalMode.REST_RANGE,
+            pagination_mode=PaginationMode.TIME_RANGE,
+            symbol_scope=["PI_ETHUSD"],  # funding evidence proves XBT only
+        )
+        grant = self._funding_grant(instruments=("PI_XBTUSD",))
+        results = run_conformance_suite(
+            under_test(
+                adapter=FakeKrakenAdapter(caps=caps),
+                native_evidence={SensorFamily.MECHANICAL_FUNDING: grant},
+            )
+        )
+        _assert_this_check_fails(
+            results, "q0_native_mode_evidence", "not proven by the evidence grant"
+        )
+
+    def test_symbol_scope_proven_by_grant_passes(self) -> None:
+        caps = mutate(
+            promoted_caps(),
+            SensorFamily.MECHANICAL_FUNDING,
+            historical_mode=HistoricalMode.REST_RANGE,
+            pagination_mode=PaginationMode.TIME_RANGE,
+            symbol_scope=["PI_XBTUSD"],
+        )
+        grant = self._funding_grant(instruments=("PI_XBTUSD",))
+        results = run_conformance_suite(
+            under_test(
+                adapter=FakeKrakenAdapter(caps=caps),
+                native_evidence={SensorFamily.MECHANICAL_FUNDING: grant},
+            )
+        )
+        assert _check(results, "q0_native_mode_evidence").passed, _check(
+            results, "q0_native_mode_evidence"
+        ).detail
+
 
 def declared_caps(**sensor_overrides: object) -> ProviderCapabilities:
     """A type-valid declared capability set, with validated per-sensor overrides.

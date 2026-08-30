@@ -18,11 +18,14 @@ from __future__ import annotations
 from ...contracts.enums import SensorFamily
 from .capabilities import KRAKEN_ANALYTICS_TYPES, kraken_endpoint_family
 from ..base.enums import Granularity
+from ..base.errors import UnsupportedGranularity
 from ..base.models import FetchRequest
 
 DEFAULT_INTERVAL_SECONDS = 3600
 
-#: Canonical granularity -> Market Analytics interval (seconds) mapping.
+#: Canonical granularity -> Market Analytics interval (seconds) mapping
+#: (SENSOR-B3-I05R1: EXACT mapping only — an explicit unsupported granularity
+#: never silently becomes the default).
 GRANULARITY_SECONDS: dict[Granularity, int] = {
     Granularity.G1M: 60,
     Granularity.G5M: 300,
@@ -31,6 +34,11 @@ GRANULARITY_SECONDS: dict[Granularity, int] = {
     Granularity.G4H: 14400,
     Granularity.G1D: 86400,
 }
+
+#: Kraken Market Analytics documents resolutions the Fabric Granularity enum
+#: cannot represent: 1800 (30m), 43200 (12h), 604800 (1w).  They are a recorded
+#: LIMITATION, not silently mapped or added to the enum (SENSOR-B3-I05R1).
+KRAKEN_INTERVALS_UNREPRESENTABLE: tuple[int, ...] = (1800, 43200, 604800)
 
 
 class KrakenAnalyticsRequestBuilder:
@@ -59,10 +67,33 @@ class KrakenAnalyticsRequestBuilder:
         return kraken_endpoint_family(sensor)
 
     def interval_seconds(self, request: FetchRequest) -> int:
-        """Resolve the analytics `interval` (seconds) for a request."""
-        if request.granularity is not None and request.granularity in GRANULARITY_SECONDS:
-            return GRANULARITY_SECONDS[request.granularity]
-        return DEFAULT_INTERVAL_SECONDS
+        """Resolve the analytics `interval` (seconds) for a request.
+
+        Fail-closed granularity contract (SENSOR-B3-I05R1):
+
+        - request.granularity is None -> DEFAULT_INTERVAL_SECONDS (1h) is the
+          documented adapter default.
+        - request.granularity is one of the supported analytics buckets -> the
+          exact mapping.
+        - request.granularity is explicitly UNSUPPORTED (e.g. RAW_EVENT or
+          BOOK_SNAPSHOT) -> typed `UnsupportedGranularity`, raised BEFORE any
+          transport call; it is never silently mutated to 1h.
+        """
+        if request.granularity is None:
+            return DEFAULT_INTERVAL_SECONDS
+        mapped = GRANULARITY_SECONDS.get(request.granularity)
+        if mapped is None:
+            raise UnsupportedGranularity(
+                provider_id=request.provider_id,
+                sensor_family=request.sensor_family,
+                detail=(
+                    f"Kraken Market Analytics does not support granularity "
+                    f"{request.granularity.value!r} (supported="
+                    + ",".join(sorted(g.value for g in GRANULARITY_SECONDS))
+                    + ")"
+                ),
+            )
+        return mapped
 
     def build_params(self, request: FetchRequest) -> dict[str, int]:
         """Build the Market Analytics query params (epoch-SECOND since/to).

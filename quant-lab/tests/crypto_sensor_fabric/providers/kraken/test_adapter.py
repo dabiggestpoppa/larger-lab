@@ -41,6 +41,7 @@ from crypto_sensor_fabric.providers.base import (
 )
 from crypto_sensor_fabric.providers.base.enums import (
     AdapterAuthMode,
+    Granularity,
     PaginationMode,
     QualityFlagAcquisition,
     Retryability,
@@ -49,9 +50,11 @@ from crypto_sensor_fabric.providers.base.errors import (
     AccessClassViolation,
     CapabilityUnavailable,
     InvalidInstrument,
+    ProviderSemanticError,
     ProviderUnavailable,
     RateLimited,
     SchemaDrift,
+    UnsupportedGranularity,
 )
 from crypto_sensor_fabric.providers.base.models import (
     FetchBatch,
@@ -61,7 +64,9 @@ from crypto_sensor_fabric.providers.base.models import (
 from crypto_sensor_fabric.providers.base.protocol import MechanicalProviderAdapter
 from crypto_sensor_fabric.providers.kraken import (
     DEFAULT_FREE_ONLY_POLICY,
-    KRAKEN_INSTRUMENT_SCOPE,
+    KRAKEN_PRODUCTION_INSTRUMENT_SCOPE,
+    KRAKEN_PROBE_INSTRUMENT_SCOPE,
+    KRAKEN_SYMBOL_SCOPES,
     PROVIDER_ID,
     KrakenAdapter,
     KrakenAnalyticsRequestBuilder,
@@ -111,22 +116,27 @@ class TestProviderIdentityAndProtocol:
         caps = _adapter().capabilities()
         assert caps.provider_id == "KRAKEN_FUTURES"
 
-    def test_list_instruments_is_configured_scope_no_discovery(self) -> None:
+    def test_list_instruments_is_configured_production_scope_no_discovery(self) -> None:
         transport = FakeKrakenTransport()
         adapter = KrakenAdapter(transport=transport)
         result = adapter.list_instruments(
             InstrumentListRequest(provider_id=PROVIDER_ID, request_id="r")
         )
         assert result.provider_id == PROVIDER_ID
-        assert result.native_instrument_ids == list(KRAKEN_INSTRUMENT_SCOPE)
+        # configured PRODUCTION evidence scope only (no discovery endpoint);
+        # probe-only SOL/DOGE are NOT exposed as production support
+        assert result.native_instrument_ids == list(KRAKEN_PRODUCTION_INSTRUMENT_SCOPE)
+        assert "PI_SOLUSD" not in result.native_instrument_ids
+        assert "PI_DOGEUSD" not in result.native_instrument_ids
         # a configured native scope, NOT an invented discovery endpoint: the
         # transport is never consulted.
         assert transport.calls == []
 
     def test_no_transport_is_offline(self) -> None:
         adapter = KrakenAdapter()  # no transport injected
-        with pytest.raises(ProviderUnavailable):
+        with pytest.raises(ProviderUnavailable) as excinfo:
             adapter.fetch_funding(request(SensorFamily.MECHANICAL_FUNDING))
+        assert excinfo.value.sensor_family is SensorFamily.MECHANICAL_FUNDING
 
 
 class TestAccessGateBeforeTransport:
@@ -439,6 +449,185 @@ class TestNativeInstrumentRequired:
                 purpose="PROBE",
                 adapter_semantic_version="0.0.0",
             )
+
+
+class TestInstrumentScopeSeparation:
+    """SENSOR-B3-I05R1 — probe universe vs production instrument support."""
+
+    def test_production_scope_derived_from_evidence(self) -> None:
+        # evidence-backed union (08_HISTORY_BOUNDARIES.csv): PI_XBTUSD for all
+        # six, PI_ETHUSD additionally for OI — never probe-only SOL/DOGE
+        assert KRAKEN_PRODUCTION_INSTRUMENT_SCOPE == ["PI_XBTUSD", "PI_ETHUSD"]
+
+    def test_probe_scope_keeps_probe_universe(self) -> None:
+        assert KRAKEN_PROBE_INSTRUMENT_SCOPE == [
+            "PI_XBTUSD",
+            "PI_ETHUSD",
+            "PI_SOLUSD",
+            "PI_DOGEUSD",
+        ]
+
+    def test_sensor_specific_symbol_scopes_from_evidence(self) -> None:
+        assert KRAKEN_SYMBOL_SCOPES[SensorFamily.MECHANICAL_OPEN_INTEREST] == (
+            "PI_ETHUSD",
+            "PI_XBTUSD",
+        )
+        for sensor in ALL_PROMOTED:
+            if sensor is SensorFamily.MECHANICAL_OPEN_INTEREST:
+                continue
+            assert KRAKEN_SYMBOL_SCOPES[sensor] == ("PI_XBTUSD",)
+
+    def test_capability_symbol_scope_per_sensor(self) -> None:
+        caps = build_kraken_capabilities()
+        oi = caps.capability_for(SensorFamily.MECHANICAL_OPEN_INTEREST)
+        assert set(oi.symbol_scope) == {"PI_XBTUSD", "PI_ETHUSD"}
+        basis = caps.capability_for(SensorFamily.MECHANICAL_BASIS)
+        assert basis.symbol_scope == ["PI_XBTUSD"]
+
+    def test_oi_eth_evidence_backed_passes(self) -> None:
+        adapter = _adapter(routes=HAPPY_ROUTES)
+        batch = adapter.fetch_open_interest(
+            request(SensorFamily.MECHANICAL_OPEN_INTEREST, native_instrument_id="PI_ETHUSD")
+        )
+        assert batch.native_instrument_id == "PI_ETHUSD"
+
+    def test_basis_eth_not_evidence_backed_fails_typed(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        with pytest.raises(InvalidInstrument) as excinfo:
+            adapter.fetch_basis(
+                request(SensorFamily.MECHANICAL_BASIS, native_instrument_id="PI_ETHUSD")
+            )
+        assert excinfo.value.failure_type == "InvalidInstrument"
+        assert transport.calls == []  # fails BEFORE transport
+
+    def test_probe_only_symbols_fail_every_promoted_sensor(self) -> None:
+        for sensor in ALL_PROMOTED:
+            for symbol in ("PI_SOLUSD", "PI_DOGEUSD"):
+                transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+                adapter = KrakenAdapter(transport=transport)
+                with pytest.raises(InvalidInstrument):
+                    dispatch_fetch(adapter, request(sensor, native_instrument_id=symbol))
+                assert transport.calls == []
+
+
+class TestRequestProviderIdentity:
+    """SENSOR-B3-I05R1 — a Kraken adapter never executes foreign requests."""
+
+    def test_fetch_request_wrong_provider_fails_before_transport(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        req = request(SensorFamily.MECHANICAL_FUNDING).model_copy(
+            update={"provider_id": "OKX_SWAP"}
+        )
+        with pytest.raises(ProviderSemanticError) as excinfo:
+            adapter.fetch_funding(req)
+        assert excinfo.value.failure_type == "ProviderSemanticError"
+        assert transport.calls == []
+
+    def test_dispatch_wrong_provider_fails_before_transport(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        req = request(SensorFamily.MECHANICAL_BASIS).model_copy(
+            update={"provider_id": "DERIBIT"}
+        )
+        with pytest.raises(ProviderSemanticError):
+            dispatch_fetch(adapter, req)
+        assert transport.calls == []
+
+    def test_instrument_list_request_wrong_provider_fails(self) -> None:
+        adapter = _adapter()
+        with pytest.raises(ProviderSemanticError):
+            adapter.list_instruments(
+                InstrumentListRequest(provider_id="GATE_FUTURES", request_id="r")
+            )
+
+
+class TestGranularityFailClosed:
+    """SENSOR-B3-I05R1 — explicit unsupported granularity never becomes 1h."""
+
+    SUPPORTED = {
+        Granularity.G1M: 60,
+        Granularity.G5M: 300,
+        Granularity.G15M: 900,
+        Granularity.G1H: 3600,
+        Granularity.G4H: 14400,
+        Granularity.G1D: 86400,
+    }
+    UNSUPPORTED = (Granularity.RAW_EVENT, Granularity.BOOK_SNAPSHOT)
+
+    def test_granularity_none_uses_documented_default(self) -> None:
+        builder = KrakenAnalyticsRequestBuilder()
+        _, params = builder.build(request(SensorFamily.MECHANICAL_FUNDING))
+        assert params["interval"] == 3600  # explicit None -> default 1h
+
+    def test_every_supported_granularity_maps_exactly(self) -> None:
+        builder = KrakenAnalyticsRequestBuilder()
+        for granularity, interval in self.SUPPORTED.items():
+            req = request(SensorFamily.MECHANICAL_FUNDING).model_copy(
+                update={"granularity": granularity}
+            )
+            _, params = builder.build(req)
+            assert params["interval"] == interval, granularity
+
+    def test_every_unsupported_granularity_fails_typed(self) -> None:
+        builder = KrakenAnalyticsRequestBuilder()
+        for granularity in self.UNSUPPORTED:
+            req = request(SensorFamily.MECHANICAL_FUNDING).model_copy(
+                update={"granularity": granularity}
+            )
+            with pytest.raises(UnsupportedGranularity) as excinfo:
+                builder.build(req)
+            assert excinfo.value.sensor_family is SensorFamily.MECHANICAL_FUNDING
+
+    def test_unsupported_granularity_fails_before_transport(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        req = request(SensorFamily.MECHANICAL_FUNDING).model_copy(
+            update={"granularity": Granularity.RAW_EVENT}
+        )
+        with pytest.raises(UnsupportedGranularity):
+            adapter.fetch_funding(req)
+        assert transport.calls == []
+class TestNoTransportSensorIdentity:
+    """SENSOR-B3-I05R1 — no-transport failure names the REQUESTED sensor."""
+
+    def test_all_six_sensors_report_correct_sensor(self) -> None:
+        for sensor in ALL_PROMOTED:
+            adapter = KrakenAdapter()  # no transport
+            with pytest.raises(ProviderUnavailable) as excinfo:
+                dispatch_fetch(adapter, request(sensor))
+            assert excinfo.value.sensor_family is sensor, sensor
+
+
+class TestMethodSensorIdentity:
+    """SENSOR-B3-I05R1 — named fetch methods are themselves a contract."""
+
+    METHODS = {
+        "fetch_funding": SensorFamily.MECHANICAL_FUNDING,
+        "fetch_basis": SensorFamily.MECHANICAL_BASIS,
+        "fetch_liquidations": SensorFamily.MECHANICAL_LIQUIDATION,
+        "fetch_open_interest": SensorFamily.MECHANICAL_OPEN_INTEREST,
+        "fetch_positioning": SensorFamily.MECHANICAL_POSITIONING,
+        "fetch_book_metrics": SensorFamily.MECHANICAL_BOOK_METRIC,
+    }
+
+    def test_mismatched_request_fails_before_transport(self) -> None:
+        for method_name, expected in self.METHODS.items():
+            wrong = next(s for s in ALL_PROMOTED if s is not expected)
+            transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+            adapter = KrakenAdapter(transport=transport)
+            method = getattr(adapter, method_name)
+            with pytest.raises(ProviderSemanticError) as excinfo:
+                method(request(wrong))
+            assert excinfo.value.sensor_family is wrong
+            assert transport.calls == [], f"{method_name} reached transport"
+
+    def test_matching_request_passes(self) -> None:
+        adapter = _adapter(routes=HAPPY_ROUTES)
+        for method_name, expected in self.METHODS.items():
+            batch = getattr(adapter, method_name)(request(expected))
+            assert batch.sensor_family is expected
 
 
 class TestProductionCandidateConformance:
