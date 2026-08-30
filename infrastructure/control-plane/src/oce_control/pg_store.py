@@ -294,6 +294,33 @@ class PgJobStore:
             return False
         return get_clock().now() > row[0]
 
+    def authoritative_lease(self, job_id: str) -> Optional[dict]:
+        """Authoritative lease row for a job. PostgreSQL is truth; Redis
+        only mirrors this (B2-R3). Returns None when no lease exists."""
+        row = self._one(
+            "SELECT lease_id, worker_id, expires_at FROM leases WHERE job_id = %s",
+            (job_id,),
+        )
+        if row is None:
+            return None
+        lease_id, worker_id, expires_at = row
+        return {"job_id": job_id, "lease_id": lease_id,
+                "worker_id": worker_id, "expires_at": expires_at}
+
+    def active_leases(self) -> list[dict]:
+        """All non-expired leases, for Redis mirror reconstruction (B2-R3)."""
+        now = get_clock().now()
+        rows = self._execute(
+            "SELECT job_id, lease_id, worker_id, expires_at FROM leases WHERE expires_at > %s",
+            (now,),
+        )
+        out = []
+        for job_id, lease_id, worker_id, expires_at in rows:
+            ttl = max(1, int((expires_at - now).total_seconds()))
+            out.append({"job_id": job_id, "lease_id": lease_id,
+                        "worker_id": worker_id, "ttl_seconds": ttl})
+        return out
+
     def recover_abandoned_leases(self) -> int:
         """Expire leases past due; retry or fail the job per its policy."""
         clock = get_clock()
