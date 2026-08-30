@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-30
 **Branch:** `oce-program-build`
-**Implementation SHA:** `05702010e8c41ff4950d5a283c9630cd9354d888`
-**Implementation tree:** `2b292afaa4df48ffc800aedba084dd1e53fe1dcb`
+**Implementation SHA:** `79cb0e26`
+**Implementation tree:** `917b8146c9d16eb90bbc8d35c944d9cd1c220eef`
 **Starting SHA:** `ac0e239386aa100349f5dc904acdb52345659090`
 
 ## Book 1 ratification
@@ -20,18 +20,19 @@
 | `b55696e6` | B2-C1R1: repair truncated modules and fix state machine transitions |
 | `ff22aa22` | B2-R2: implement PostgreSQL authoritative control state (store, migrations, compose, 9 container tests) |
 | `05702010` | B2-R3: implement Redis-backed disposable transport (notifications, lease mirrors, heartbeats, rate, cache, quarantine, PG reconstruction) |
+| `79cb0e26` | B2-R4: durable scheduler + authenticated, capability-enforced worker (token admission, capability enforcement, PG-persisted schedules, advisory-lock duplicate prevention, migration 0003, 20 container tests) |
 
 ## Test totals
 
 | Test class | Result |
 |---|---|
-| Unit tests | 86/86 PASS |
+| Unit tests | 90/90 PASS |
 | Schema tests | 10/10 PASS |
 | Control plane tests | 66/66 PASS |
-| Container-backed (PG 9 + Redis 2) | 11/11 mandatory in CI, truthful local skip |
+| Container-backed (PG 9 + Redis 2 + Worker 13 + Scheduler 7) | 31/31 mandatory in CI, truthful local skip |
 | Mandatory FAIL | 0 |
 | Mandatory BLOCKED | 0 |
-| Mandatory SKIPPED | 0 (CI); 11 truthful local skips (no Docker) |
+| Mandatory SKIPPED | 0 (CI); 31 truthful local skips (no Docker) |
 
 ## Gate results
 
@@ -43,6 +44,8 @@
 | Authority engine | PASS (grants, denials, replay detection) |
 | Job store + idempotency | PASS (duplicate submission, conflicting keys) |
 | Redis transport (B2-R3) | PASS (notify queues, lease NX/TTL mirrors, heartbeats, rate limits, cache, quarantine, reconstruct_from_pg) |
+| Worker admission (B2-R4) | PASS (token required, hash-only persistence, wrong-token re-admit denied, revoked refused, lease-token fencing, capability enforcement at claim) |
+| Durable scheduler (B2-R4) | PASS (PG persistence, restart recovery, pause/resume/cancel survive restart, advisory-lock duplicate prevention, concurrency limits) |
 | Worker leases | PASS (stale, expired, wrong worker, renewal, recovery) |
 | Scheduler | PASS (immediate, delayed, recurring, pause/resume, restart recovery) |
 | Evidence system | PASS (manifest, tamper rejection, truth promotion, replay) |
