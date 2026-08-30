@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/control-plane/event-envelope.json",
+  "title": "OCE Event Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "event_type",
+    "schema_version",
+    "actor_id",
+    "authority_grant_id",
+    "causality",
+    "target",
+    "payload_hash",
+    "environment",
+    "timestamp"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{16,64}$"
+    },
+    "event_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "actor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_grant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "causality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_id",
+        "parent_id",
+        "sequence"
+      ],
+      "properties": {
+        "root_id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{16,64}$"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "target": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "environment": {
+      "enum": [
+        "local",
+        "local-test",
+        "local-recovery",
+        "cloud-plan",
+        "cloud"
+      ]
+    },
+    "result": {
+      "type": "object",
+      "properties": {}
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
