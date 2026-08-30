@@ -60,6 +60,7 @@ from crypto_sensor_fabric.providers.base.errors import (
 from crypto_sensor_fabric.providers.base.models import (
     FetchBatch,
     InstrumentListRequest,
+    RawPayloadEnvelope,
     ResumeToken,
 )
 from crypto_sensor_fabric.providers.base.protocol import MechanicalProviderAdapter
@@ -68,6 +69,7 @@ from crypto_sensor_fabric.providers.kraken import (
     KRAKEN_PRODUCTION_INSTRUMENT_SCOPE,
     KRAKEN_PROBE_INSTRUMENT_SCOPE,
     KRAKEN_SYMBOL_SCOPES,
+    NEUTRAL_INSTRUMENT_LIST_SENSOR,
     PROVIDER_ID,
     KrakenAdapter,
     KrakenAnalyticsRequestBuilder,
@@ -537,11 +539,16 @@ class TestRequestProviderIdentity:
         assert transport.calls == []
 
     def test_instrument_list_request_wrong_provider_fails(self) -> None:
+        # instrument discovery carries no requested sensor; the failure uses
+        # the documented neutral provider-level placeholder (never a real
+        # scientific sensor), per SENSOR-B3-I05R2 Repair 1.
         adapter = _adapter()
-        with pytest.raises(ProviderSemanticError):
+        with pytest.raises(ProviderSemanticError) as excinfo:
             adapter.list_instruments(
                 InstrumentListRequest(provider_id="GATE_FUTURES", request_id="r")
             )
+        assert excinfo.value.provider_id == PROVIDER_ID
+        assert excinfo.value.sensor_family is NEUTRAL_INSTRUMENT_LIST_SENSOR
 
 
 class TestGranularityFailClosed:
@@ -747,6 +754,130 @@ class TestMethodSensorIdentity:
         for method_name, expected in self.METHODS.items():
             batch = getattr(adapter, method_name)(request(expected))
             assert batch.sensor_family is expected
+
+
+class TestForeignProviderErrorSensorIdentity:
+    """SENSOR-B3-I05R2 Repair 1 — a foreign FetchRequest reports ITS OWN sensor."""
+
+    def test_all_six_promoted_sensors_report_requested_sensor(self) -> None:
+        for sensor in ALL_PROMOTED:
+            transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+            adapter = KrakenAdapter(transport=transport)
+            req = request(sensor).model_copy(update={"provider_id": "OKX_SWAP"})
+            with pytest.raises(ProviderSemanticError) as excinfo:
+                dispatch_fetch(adapter, req)
+            err = excinfo.value
+            assert err.failure_type == "ProviderSemanticError"
+            assert err.provider_id == PROVIDER_ID
+            assert err.sensor_family is sensor, f"wrong sensor {err.sensor_family} for {sensor.value}"
+            assert transport.calls == [], f"{sensor.value} reached transport"
+
+    def test_foreign_funding_request_reports_funding(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        req = request(SensorFamily.MECHANICAL_FUNDING).model_copy(
+            update={"provider_id": "OKX_SWAP"}
+        )
+        with pytest.raises(ProviderSemanticError) as excinfo:
+            adapter.fetch_funding(req)
+        assert excinfo.value.sensor_family is SensorFamily.MECHANICAL_FUNDING
+        assert transport.calls == []
+
+    def test_foreign_basis_request_reports_basis(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        req = request(SensorFamily.MECHANICAL_BASIS).model_copy(
+            update={"provider_id": "DERIBIT"}
+        )
+        with pytest.raises(ProviderSemanticError) as excinfo:
+            adapter.fetch_basis(req)
+        assert excinfo.value.sensor_family is SensorFamily.MECHANICAL_BASIS
+        assert transport.calls == []
+
+
+class TestUnsupportedMethodIdentity:
+    """SENSOR-B3-I05R2 Repair 2 — unsupported named methods honor METHOD identity."""
+
+    def test_fetch_trades_funding_request_is_mismatch_not_unsupported_funding(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        with pytest.raises(ProviderSemanticError) as excinfo:
+            adapter.fetch_trades(request(SensorFamily.MECHANICAL_FUNDING))
+        assert excinfo.value.failure_type == "ProviderSemanticError"
+        assert excinfo.value.sensor_family is SensorFamily.MECHANICAL_FUNDING
+        assert transport.calls == []  # method/sensor mismatch: never claims funding unsupported
+
+    def test_fetch_trades_trade_request_is_typed_unsupported(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        with pytest.raises(CapabilityUnavailable) as excinfo:
+            adapter.fetch_trades(request(SensorFamily.MECHANICAL_TRADE))
+        assert excinfo.value.failure_type == "CapabilityUnavailable"
+        assert excinfo.value.sensor_family is SensorFamily.MECHANICAL_TRADE
+        assert transport.calls == []
+
+    def test_fetch_book_funding_request_is_mismatch_not_unsupported_funding(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        with pytest.raises(ProviderSemanticError) as excinfo:
+            adapter.fetch_book(request(SensorFamily.MECHANICAL_FUNDING))
+        assert excinfo.value.failure_type == "ProviderSemanticError"
+        assert excinfo.value.sensor_family is SensorFamily.MECHANICAL_FUNDING
+        assert transport.calls == []  # method/sensor mismatch: never claims funding unsupported
+
+    def test_fetch_book_book_snapshot_request_is_typed_unsupported(self) -> None:
+        transport = FakeKrakenTransport(routes=HAPPY_ROUTES)
+        adapter = KrakenAdapter(transport=transport)
+        with pytest.raises(CapabilityUnavailable) as excinfo:
+            adapter.fetch_book(request(SensorFamily.MECHANICAL_BOOK_SNAPSHOT))
+        assert excinfo.value.failure_type == "CapabilityUnavailable"
+        assert excinfo.value.sensor_family is SensorFamily.MECHANICAL_BOOK_SNAPSHOT
+        assert transport.calls == []
+
+
+class TestTimestampSchemaThroughAdapter:
+    """SENSOR-B3-I05R2 Repair 3/4 — invalid timestamps drift with raw envelope."""
+
+    def test_string_timestamp_through_real_adapter_drift_carries_envelope(self) -> None:
+        body = {"errors": [], "result": {"timestamp": ["1755000000"], "data": [["725.3"]], "more": False}}
+        transport = FakeKrakenTransport(routes={"/open-interest": (200, body)})
+        adapter = KrakenAdapter(transport=transport)
+        with pytest.raises(SchemaDrift) as excinfo:
+            adapter.fetch_open_interest(request(SensorFamily.MECHANICAL_OPEN_INTEREST))
+        err = excinfo.value
+        assert err.failure_type == "SchemaDrift"
+        assert err.sensor_family is SensorFamily.MECHANICAL_OPEN_INTEREST
+        envelope = err.raw_payload_envelope
+        assert envelope is not None
+        assert envelope.provider_id == PROVIDER_ID
+        assert envelope.sensor_family is SensorFamily.MECHANICAL_OPEN_INTEREST
+        assert envelope.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+        raw = envelope.raw_body
+        raw_bytes = raw if isinstance(raw, bytes) else raw.encode("utf-8")
+        assert envelope.content_hash == payload_hash(raw_bytes)
+        # evidence ref resolves to the I14 basis for this sensor
+        ref = build_kraken_capabilities().capability_for(
+            SensorFamily.MECHANICAL_OPEN_INTEREST
+        ).probe_evidence_ref
+        assert ref is not None
+        assert envelope.evidence_ref == ref
+
+    def test_invalid_timestamp_reaches_transport_but_drifts_before_resume(self) -> None:
+        # a continuation page whose timestamp list contains a float must drift
+        # BEFORE a ResumeToken could be derived — no int-rescue path on resume.
+        body = {
+            "errors": [],
+            "result": {
+                "timestamp": [1755000000, 1755000000.0],
+                "data": [["700.1"], ["701.0"]],
+                "more": True,
+            },
+        }
+        adapter = _adapter(routes={"/open-interest": (200, body)})
+        with pytest.raises(SchemaDrift) as excinfo:
+            adapter.fetch_open_interest(request(SensorFamily.MECHANICAL_OPEN_INTEREST))
+        assert excinfo.value.raw_payload_envelope is not None
+        assert isinstance(excinfo.value.raw_payload_envelope, RawPayloadEnvelope)
 
 
 class TestProductionCandidateConformance:

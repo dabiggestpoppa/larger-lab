@@ -68,6 +68,20 @@ class ParsedAnalytics:
         )
 
 
+def _timestamps_are_int(timestamps: list[Any]) -> bool:
+    """True when every timestamp member is exactly a Python int (epoch secs).
+
+    `type(ts) is int` (not `isinstance`) rejects bool (a bool is an int in
+    Python but is NOT a valid epoch timestamp).  An empty list is valid
+    (EMPTY_VALID); a non-empty list containing any string/float/bool/None/
+    other member fails closed as a schema break.
+    """
+    for ts in timestamps:
+        if type(ts) is not int:
+            return False
+    return True
+
+
 def _envelope_ok(body: Any) -> tuple[bool, dict[str, Any] | None]:
     if not isinstance(body, dict):
         return False, None
@@ -98,6 +112,28 @@ def parse_kraken_analytics(
     more = bool(result.get("more", False))
     timestamps = result["timestamp"]
     data = result.get("data")
+
+    # TIMESTAMP SCHEMA IS FAIL-CLOSED (SENSOR-B3-I05R2).  The committed Market
+    # Analytics schema fingerprint pins the bucket timestamp as `list[int]` in
+    # EPOCH SECONDS (09_SCHEMA_FINGERPRINTS.jsonl).  Every non-empty member
+    # must be exactly an int — `type(ts) is int` (bool excluded, Python
+    # `isinstance(True, int) is True`).  A string/float/bool/None element (or
+    # mixed types) is a breaking schema change: parsed output is BLOCKED and
+    # the raw payload stays preserved upstream in the failure envelope.  No
+    # silent coercion ("1755000000" -> 1755000000 / float -> int / True -> 1).
+    # An EMPTY timestamp list remains a valid EMPTY_VALID observation.
+    if not _timestamps_are_int(timestamps):
+        breaking_assessment = SchemaAssessment(
+            state=SchemaState.BREAKING_SCHEMA_CHANGE,
+            raw_preserved=True,
+            semantic_output_allowed=False,
+        )
+        return ParsedAnalytics(
+            rows=(),
+            more=more,
+            schema_state=SchemaState.BREAKING_SCHEMA_CHANGE,
+            assessment=breaking_assessment,
+        )
 
     if isinstance(data, dict):
         if sensor not in _DICT_DATA_REQUIRED:

@@ -57,6 +57,21 @@ from .errors import is_kraken_error_body, map_kraken_error
 from .parsers import parse_kraken_analytics
 from .requests import KrakenAnalyticsRequestBuilder
 
+#: Neutral provider-level sensor placeholder for InstrumentListRequest identity
+#: failures ONLY (SENSOR-B3-I05R2 Repair 1).
+#:
+#: Instrument discovery is a provider-level scope, not a SensorFamily, so a
+#: foreign InstrumentListRequest has no requested sensor to report.  The fabric
+#: error model forces a SensorFamily placeholder on every AcquisitionError and
+#: the frozen Bloc 1 schema (contracts/enums.py) defines no provider-level
+#: member (adding one is a schema-breaking change out of scope here).  Per the
+#: operator instruction we therefore RETAIN an explicit neutral placeholder for
+#: this single provider-level case and document that it implies NO scientific
+#: sensor meaning.  A foreign *FetchRequest* NEVER uses this placeholder — it
+#: always reports the REQUESTED sensor.
+NEUTRAL_INSTRUMENT_LIST_SENSOR = SensorFamily.MECHANICAL_OPEN_INTEREST
+
+
 # Default free-only registry policy for KRAKEN_FUTURES (Bloc 1 F9).
 DEFAULT_FREE_ONLY_POLICY = FreeOnlyPolicy(
     access_class=AccessClass.FREE_AUTOMATED,
@@ -121,8 +136,12 @@ class KrakenAdapter:
 
     def list_instruments(self, request: InstrumentListRequest) -> InstrumentListResult:
         # Provider identity is part of the request contract (SENSOR-B3-I05R1).
+        # A foreign InstrumentListRequest has NO requested sensor; it fails with
+        # the neutral provider-level placeholder (never a real sensor).
         if request.provider_id != PROVIDER_ID:
-            self._raise_wrong_provider(request.provider_id)
+            self._raise_wrong_provider(
+                request.provider_id, NEUTRAL_INSTRUMENT_LIST_SENSOR
+            )
         # Configured PRODUCTION evidence scope (evidence-backed union), NOT
         # live provider discovery and NOT the probe universe: PI_SOLUSD /
         # PI_DOGEUSD stay probe-only (see capabilities).
@@ -133,9 +152,21 @@ class KrakenAdapter:
         )
 
     def fetch_trades(self, request: FetchRequest) -> FetchBatch:
+        # Method identity is checked FIRST (SENSOR-B3-I05R2 Repair 2): a
+        # non-TRADE request must NOT be reported as an unsupported surface.
+        # fetch_trades(FUNDING) is a method/sensor mismatch (ProviderSemanticError),
+        # NOT a claim that FUNDING is unsupported.  Only once the request is a
+        # genuine MECHANICAL_TRADE request does the typed CapabilityUnavailable
+        # (TRADE is not promoted) surface.
+        self._require_sensor(request.sensor_family, SensorFamily.MECHANICAL_TRADE)
         self._raise_unsupported(request.sensor_family)
 
     def fetch_book(self, request: FetchRequest) -> FetchBatch:
+        # Same fail-closed method/sensor identity as fetch_trades, for the
+        # BOOK_SNAPSHOT surface.
+        self._require_sensor(
+            request.sensor_family, SensorFamily.MECHANICAL_BOOK_SNAPSHOT
+        )
         self._raise_unsupported(request.sensor_family)
 
     def fetch_liquidations(self, request: FetchRequest) -> FetchBatch:
@@ -167,10 +198,19 @@ class KrakenAdapter:
             ),
         )
 
-    def _raise_wrong_provider(self, declared: str) -> NoReturn:
+    def _raise_wrong_provider(
+        self, declared: str, sensor_family: SensorFamily
+    ) -> NoReturn:
+        """Foreign-provider rejection carrying the ACTUAL requested sensor.
+
+        A rejected `FetchRequest.provider_id != KRAKEN_FUTURES` reports its own
+        `request.sensor_family` so the diagnostic never mis-attributes which
+        surface was requested (SENSOR-B3-I05R2 Repair 1).  Instrument-list
+        discovery passes the documented neutral provider-level placeholder.
+        """
         raise ProviderSemanticError(
             provider_id=self.provider_id,
-            sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+            sensor_family=sensor_family,
             detail=(
                 f"request provider_id {declared!r} != adapter provider "
                 f"{PROVIDER_ID!r} (provider identity is part of the request "
@@ -203,7 +243,7 @@ class KrakenAdapter:
         # 2. request provider identity MUST match the adapter (R2): a
         #    KRAKEN_FUTURES adapter never executes a foreign-provider request.
         if request.provider_id != self.provider_id:
-            self._raise_wrong_provider(request.provider_id)
+            self._raise_wrong_provider(request.provider_id, request.sensor_family)
 
         capability = self._caps.capability_for(sensor)
         if not capability.supported:
@@ -304,7 +344,11 @@ class KrakenAdapter:
         if assessment is not None and assessment.state is SchemaState.ADDITIVE_SCHEMA_CHANGE:
             quality_flags.append(QualityFlagAcquisition.SCHEMA_ADDITIVE)
 
-        numeric_ts = [r["timestamp"] for r in rows if isinstance(r.get("timestamp"), (int, float))]
+        # Row timestamps are already schema-validated to EXACT int epoch
+        # seconds (SENSOR-B3-I05R2).  No silent `int()` rescue / isinstance
+        # filter is needed: every row here is a strict int, so resume/non-
+        # monotonic derive only from already-validated native timestamps.
+        numeric_ts = [r["timestamp"] for r in rows]
         if _is_non_monotonic(numeric_ts):
             quality_flags.append(QualityFlagAcquisition.NON_MONOTONIC_TIMESTAMPS)
 
@@ -313,7 +357,7 @@ class KrakenAdapter:
 
         next_resume: ResumeToken | None = None
         if parsed.more and rows:
-            oldest = min(int(r["timestamp"]) for r in rows if isinstance(r.get("timestamp"), (int, float)))
+            oldest = min(r["timestamp"] for r in rows)
             prior_page = request.resume_token.page_number if request.resume_token else 0
             next_resume = ResumeToken(
                 mode=PaginationMode.TIME_RANGE,

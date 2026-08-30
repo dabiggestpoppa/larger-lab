@@ -16,7 +16,11 @@ sensor/instrument.  No normalization or research compute occurs here.
 
 from __future__ import annotations
 
-from .adapter import DEFAULT_FREE_ONLY_POLICY, KrakenAdapter
+from .adapter import (
+    DEFAULT_FREE_ONLY_POLICY,
+    NEUTRAL_INSTRUMENT_LIST_SENSOR,
+    KrakenAdapter,
+)
 from .capabilities import (
     KRAKEN_ANALYTICS_TYPES,
     KRAKEN_PRODUCTION_INSTRUMENT_SCOPE,
@@ -40,6 +44,7 @@ __all__ = [
     "KRAKEN_PROMOTED_SENSORS",
     "KRAKEN_SYMBOL_SCOPES",
     "NATIVE_INSTRUMENTS",
+    "NEUTRAL_INSTRUMENT_LIST_SENSOR",
     "PROVIDER_ID",
     "KrakenAdapter",
     "KrakenAnalyticsRequestBuilder",

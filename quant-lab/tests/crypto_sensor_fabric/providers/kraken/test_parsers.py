@@ -8,6 +8,10 @@ coercion).  Empty-valid stays a first-class state.
 
 from __future__ import annotations
 
+from typing import Any
+
+import pytest
+
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.providers.base.enums import SchemaState
 from crypto_sensor_fabric.providers.kraken.parsers import parse_kraken_analytics
@@ -131,6 +135,96 @@ class TestCardinalityFailClosed:
         assert parsed.schema_state is SchemaState.KNOWN_SCHEMA
         # row cells are per-bucket values; the provider-declared null survives
         assert parsed.rows[0]["ask"]["slippage1m"] is None
+
+
+class TestTimestampSchema:
+    """SENSOR-B3-I05R2 Repair 3 — bucket timestamps fail closed to int epoch secs.
+
+    The committed Market Analytics fingerprint pins `timestamp` as `list[int]` in
+    epoch seconds.  Every non-empty member must be exactly an int (`type(ts) is
+    int` — bool excluded).  String/float/bool/None/mixed elements are BREAKING
+    (parsed output blocked, raw preserved upstream); an empty list stays a valid
+    EMPTY_VALID observation.  No silent coercion.
+    """
+
+    def _list_body(self, timestamps: list[Any]) -> dict[str, Any]:
+        # open-interest list shape with an equal-length data column
+        n = len(timestamps)
+        return {
+            "errors": [],
+            "result": {
+                "timestamp": timestamps,
+                "data": [["725.3"]] * n,
+                "more": False,
+            },
+        }
+
+    def _dict_body(self, timestamps: list[Any]) -> dict[str, Any]:
+        # basis dict shape with an equal-length basis column
+        n = len(timestamps)
+        return {
+            "errors": [],
+            "result": {
+                "timestamp": timestamps,
+                "data": {"basis": ["0.001"] * n},
+                "more": False,
+            },
+        }
+
+    INVALID: list[tuple[list[Any], str]] = [
+        (["1755000000"], "string"),
+        ([1755000000.0], "float"),
+        ([True], "bool"),
+        ([None], "null"),
+        ([1755000000, "1755003600"], "mixed"),
+    ]
+
+    def test_empty_list_stays_valid_empty_valid(self) -> None:
+        for body, sensor in (
+            (self._list_body([]), SensorFamily.MECHANICAL_OPEN_INTEREST),
+            (self._dict_body([]), SensorFamily.MECHANICAL_BASIS),
+        ):
+            parsed = parse_kraken_analytics(body, sensor)
+            assert parsed.schema_state in (
+                SchemaState.KNOWN_SCHEMA,
+                SchemaState.ADDITIVE_SCHEMA_CHANGE,
+            )
+            assert parsed.semantic_output_allowed is True
+            assert parsed.rows == ()
+
+    def test_valid_int_timestamp_parses(self) -> None:
+        parsed = parse_kraken_analytics(
+            self._dict_body([1755000000]), SensorFamily.MECHANICAL_BASIS
+        )
+        assert parsed.schema_state is SchemaState.KNOWN_SCHEMA
+        assert parsed.rows[0]["timestamp"] == 1755000000
+
+    @pytest.mark.parametrize("bad,label", INVALID)
+    def test_invalid_timestamp_breaks_list_shape(self, bad: list[Any], label: str) -> None:
+        parsed = parse_kraken_analytics(
+            self._list_body(bad), SensorFamily.MECHANICAL_OPEN_INTEREST
+        )
+        assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE, label
+        assert parsed.semantic_output_allowed is False, label
+        assert parsed.rows == (), label
+
+    @pytest.mark.parametrize("bad,label", INVALID)
+    def test_invalid_timestamp_breaks_dict_shape(self, bad: list[Any], label: str) -> None:
+        parsed = parse_kraken_analytics(
+            self._dict_body(bad), SensorFamily.MECHANICAL_BASIS
+        )
+        assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE, label
+        assert parsed.semantic_output_allowed is False, label
+        assert parsed.rows == (), label
+
+    def test_no_silent_coercion(self) -> None:
+        # a string timestamp is never rescued to int; a bool never becomes 1
+        assert parse_kraken_analytics(
+            self._list_body(["1755000000"]), SensorFamily.MECHANICAL_OPEN_INTEREST
+        ).rows == ()
+        assert parse_kraken_analytics(
+            self._list_body([True]), SensorFamily.MECHANICAL_OPEN_INTEREST
+        ).rows == ()
 
 
 class TestSchemaDriftFailClosed:
