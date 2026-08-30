@@ -29,7 +29,7 @@ class FakeGateTransport:
         self.default = default if default is not None else (200, [])
         self.calls: list[tuple[str, dict]] = []
 
-    def __call__(self, url: str, params: dict[str, int]) -> tuple[int | None, Any]:
+    def __call__(self, url: str, params: dict[str, Any]) -> tuple[int | None, Any]:
         self.calls.append((url, params))
         for fragment, response in self.routes.items():
             if fragment in url:

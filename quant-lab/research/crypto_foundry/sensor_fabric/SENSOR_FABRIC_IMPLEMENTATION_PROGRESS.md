@@ -11,21 +11,21 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I06 IN PROGRESS — GATE_FUTURES PRODUCTION ADAPTER (I05R2-RATIFY: Kraken sealed/frozen, Gate implementation authorized) |
+| Current checkpoint | SENSOR-B3-I06 COMPLETE — GATE_FUTURES PRODUCTION ADAPTER (PASS_SENSOR_B3_I06_GATE_ADAPTER_OFFLINE proposed, awaiting operator review) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation OPERATOR REVIEWED / ACCEPTED FOR FIRST PROVIDER (I04R2-RATIFY); SENSOR-B3-I05 (Kraken) IMPLEMENTED OFFLINE + BOUNDARY-HARDENED (I05R1) + OFFILINE SEALED (I05R2) and Kraken OFFLINE IMPLEMENTATION FROZEN (I05R2-RATIFY); provider_adapter_implementation_authorized = GATE_FUTURES ONLY (I06) |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN (I05R2-RATIFY); SENSOR-B3-I06 (Gate) IMPLEMENTED OFFLINE — awaiting operator review of PASS_SENSOR_B3_I06_GATE_ADAPTER_OFFLINE |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = KRAKEN_FUTURES ONLY |
-| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=1 (KRAKEN_FUTURES, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken; PRODUCTION_CANDIDATE mode) · NETWORK_VALIDATION=NOT_YET_RUN |
-| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_boundary_hardened = TRUE (I05R1) · kraken_final_seal = TRUE (I05R2) · kraken_offline_implementation_frozen = TRUE (I05R2-RATIFY) · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = IN_PROGRESS (I06) · gate_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
+| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=2 (KRAKEN_FUTURES + GATE_FUTURES, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate; PRODUCTION_CANDIDATE mode, 0 failed each) · NETWORK_VALIDATION=NOT_YET_RUN |
+| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_boundary_hardened = TRUE · kraken_final_seal = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE (I06) · gate_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
-| next_provider_authorized | FALSE beyond Gate (I06 Gate ONLY; OKX/Deribit NOT authorized) |
-| next_checkpoint_authorized | FALSE beyond I06 (Gate implementation awaiting operator review) |
+| next_provider_authorized | FALSE beyond Gate + Kraken (OKX/Deribit NOT authorized) |
+| next_checkpoint_authorized | FALSE beyond I06 (Gate awaiting operator review; next provider must be replanned against I14) |
 
 ## Test counts (cumulative)
 
@@ -76,7 +76,9 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I05R1B | a1e191ea | 14 | 0 |
 | SENSOR-B3-I05R2A | a737d9e6 | 22 | 0 |
 | SENSOR-B3-I05R2-RATIFY | (governance) | — | — |
-| cumulative | 829 | 829 | 0 |
+| SENSOR-B3-I06A | b30ab5d6 | 15 | 0 |
+| SENSOR-B3-I06B | 4f0ee81b | 88 | 0 |
+| cumulative | 932 | 932 | 0 |
 
 ## External / provider blockers
 
@@ -208,10 +210,26 @@ that is updated at every staged checkpoint.
   (may not be modified again before SENSOR-B3-I14 network smoke).  provider
   adapter implementation authorized = GATE_FUTURES ONLY.  current checkpoint =
   SENSOR-B3-I06.  next_provider_authorized = FALSE beyond Gate.
-- Recommended next checkpoint: **SENSOR-B3-I06 — GATE_FUTURES**, now
-  AUTHORIZED (gate_adapter_implementation_authorized = TRUE).  After I06 the
-  next provider must be replanned against I14 (OKX_SWAP / DERIBIT are the
-  remaining production candidates; Binance/Bybit/Coinalyze/Bitfinex are not).
+- SENSOR-B3-I06 COMPLETE (OFFLINE) — GATE_FUTURES production adapter build on
+  the hardened common foundation.  Exactly four I14-promoted paths (FUNDING /
+  LIQUIDATION / OPEN_INTEREST / POSITIONING) ADAPTER_READY, all SECONDARY,
+  production symbol scope evidence-derived (BTC_USDT; probe keeps ETH/SOL/DOGE).
+  contract_stats native mechanics frozen (from=sec, interval STRING "1h", no
+  invented `to`); funding = single-contract GET /funding_rate (from/to=sec,
+  rows {r,t}).  Request/response timestamp units kept distinct (contract_stats
+  `time` ms, funding `t` sec).  No private /positions, no plural /funding_rates.
+  180-day retention -> HistoricalRangeUnavailable.  PRODUCTION_CANDIDATE
+  conformance 0 failed; 932 passed / 0 failed; ruff clean; FAKE TRANSPORT ONLY
+  — zero network calls; no Bloc 4; no OKX/Deribit production code.  Kraken
+  regression green (unchanged, still frozen).  Evidence:
+  `evidence/bloc_03/BLOC_03_I06_GATE_IMPLEMENTATION_EVIDENCE.md`.
+- STOPS: after I06 the operator reviews `PASS_SENSOR_B3_I06_GATE_ADAPTER_OFFLINE`.
+- Recommended next checkpoint: the next production provider MUST be replanned
+  against I14.  The old staged plan listed I07 Binance / I08 Bybit / I09 OKX:
+  that sequence is superseded — Binance/Bybit/Coinalyze/Bitfinex are NOT current
+  Bloc 3 production candidates.  Remaining production candidates are **OKX_SWAP**
+  and **DERIBIT**; OKX is the natural next provider, but it is NOT authorized
+  (`next_checkpoint_authorized = FALSE`) — stop and await operator review.
 
 ## Prior next-checkpoint history
 
@@ -329,3 +347,6 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I05R2A | a737d9e6 | foreign-provider error carries requested sensor + neutral instrument-list placeholder + unsupported named-method identity guards + timestamp fail-closed to int epoch seconds + resume/no-int-rescue; tests | 829 passed / 0 failed | PASS | none |
 | SENSOR-B3-I05R2C | (this commit) | evidence/README/ledger seal (I05R2 FINAL SEAL) | 829 passed / 0 failed (re-run) | PASS | none |
 | SENSOR-B3-I05R2-RATIFY | (governance) | operator freezes Kraken offline implementation and authorizes Gate implementation (ledger only) | 829 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I06A | b30ab5d6 | Gate capability + native acquisition contract (4 paths, SECONDARY, BTC_USDT scope, contract_stats + funding_rate grants), exact-set tests | 844 passed / 0 failed | PASS | none |
+| SENSOR-B3-I06B | 4f0ee81b | Gate requests/errors/parsers/adapter + fake transport + request/error/parser/adapter tests incl. PRODUCTION_CANDIDATE conformance | 932 passed / 0 failed | PASS | none |
+| SENSOR-B3-I06C | (this commit) | Gate README, implementation evidence, readiness matrix, ledger | 932 passed / 0 failed (re-run) | PASS | none |

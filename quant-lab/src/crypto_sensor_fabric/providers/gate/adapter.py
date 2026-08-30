@@ -80,12 +80,14 @@ DEFAULT_FREE_ONLY_POLICY = FreeOnlyPolicy(
 NEUTRAL_INSTRUMENT_LIST_SENSOR = SensorFamily.MECHANICAL_FUNDING
 
 #: Transport signature: (url, params) -> (http_status_or_None, parsed_body).
-TransportFn = Callable[[str, dict[str, int]], tuple[int | None, Any]]
+#: Gate params mix native strings (contract, interval STRING bucket) and ints
+#: (from/to/limit), so they are typed `dict[str, Any]`.
+TransportFn = Callable[[str, dict[str, Any]], tuple[int | None, Any]]
 
 
-def _dt_seconds(epoch_seconds: int) -> datetime | None:
+def _dt_seconds(epoch_seconds: int | float) -> datetime | None:
     try:
-        return datetime.fromtimestamp(epoch_seconds, tz=UTC)
+        return datetime.fromtimestamp(float(epoch_seconds), tz=UTC)
     except (OverflowError, ValueError, OSError):
         return None
 

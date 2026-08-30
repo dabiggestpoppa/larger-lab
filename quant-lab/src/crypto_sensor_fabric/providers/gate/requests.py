@@ -18,6 +18,8 @@ Granularity is fail-closed: an explicit unsupported Granularity raises typed
 
 from __future__ import annotations
 
+from typing import Any
+
 from ...contracts.enums import SensorFamily
 from ..base.enums import Granularity
 from ..base.errors import UnsupportedGranularity
@@ -93,7 +95,7 @@ class GateRequestBuilder:
             return "gate-futures-funding_rate"
         return "gate-futures-contract_stats"
 
-    def build(self, request: FetchRequest) -> tuple[str, dict[str, int]]:
+    def build(self, request: FetchRequest) -> tuple[str, dict[str, Any]]:
         sensor = request.sensor_family
         if sensor is SensorFamily.MECHANICAL_FUNDING:
             return self._build_funding(request)
@@ -107,9 +109,9 @@ class GateRequestBuilder:
 
     def _build_contract_stats(
         self, request: FetchRequest
-    ) -> tuple[str, dict[str, int]]:
+    ) -> tuple[str, dict[str, Any]]:
         interval = _resolve_contract_stats_interval(request)
-        params: dict[str, int] = {
+        params: dict[str, Any] = {
             "contract": request.native_instrument_id,
             "from": int(request.start_time.timestamp()),
             "interval": interval,
@@ -120,9 +122,9 @@ class GateRequestBuilder:
         url = f"https://{GATE_USDT_BASE}{GATE_CONTRACT_STATS_PATH}"
         return url, params
 
-    def _build_funding(self, request: FetchRequest) -> tuple[str, dict[str, int]]:
+    def _build_funding(self, request: FetchRequest) -> tuple[str, dict[str, Any]]:
         _validate_funding_granularity(request)
-        params: dict[str, int] = {
+        params: dict[str, Any] = {
             "contract": request.native_instrument_id,
             "from": int(request.start_time.timestamp()),
             "to": int(request.end_time.timestamp()),
