@@ -24,7 +24,7 @@ The suite never performs network access.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
@@ -60,6 +60,10 @@ from .models import (
     ProviderCapabilities,
     RawPayloadEnvelope,
     ResumeToken,
+)
+from .native import (
+    ProviderNativeCapabilityEvidence,
+    native_evidence_violations,
 )
 from .retry import RetryPolicy, classify_retryability, is_retryable
 from .schema import assert_no_zero_coercion, assess_schema
@@ -103,6 +107,10 @@ class AdapterUnderTest:
     #: response from the fake provider, used to prove the dispatch path returns
     #: a valid FetchBatch (Issue 2).
     fetch_request: FetchRequest | None = None
+    #: Provider-native acquisition mode evidence (SENSOR-B3-I05).  A production
+    #: adapter may set an exact `historical_mode` on a supported capability ONLY
+    #: when a valid `ProviderNativeCapabilityEvidence` for that sensor is present.
+    native_evidence: dict[SensorFamily, ProviderNativeCapabilityEvidence] = field(default_factory=dict)
     #: Fail-closed default: a PRODUCTION_CANDIDATE run (the only allowed mode
     #: for a real adapter) REQUIRES promotion bounds.  FRAMEWORK_TEST must be
     #: chosen explicitly by internal self-tests.
@@ -207,7 +215,15 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
             bound = promoted.capability_for(sensor)
             if not declared.supported:
                 continue  # only declared-support capabilities are checked
-            violations.extend(promotion_bound_violations(declared, bound))
+            native = adapter_under_test.native_evidence.get(sensor)
+            violations.extend(
+                promotion_bound_violations(
+                    declared,
+                    bound,
+                    native_evidence=native,
+                    provider_id=adapter.provider_id,
+                )
+            )
         if violations:
             return False, "; ".join(violations)
         return True, "adapter capabilities stay within I14 promotion bounds"
@@ -254,6 +270,80 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
         return True, "every supported evidence ref resolves to I14 lineage"
 
     _run_check(results, "q0_evidence_ref_resolves", check_evidence_ref_resolves)
+
+    def check_native_mode_evidence() -> tuple[bool, str]:
+        """I05 seam: an exact native historical_mode is allowed ONLY when a
+        valid ProviderNativeCapabilityEvidence grants it from Bloc 2 evidence.
+
+        - every provided evidence object must be valid against the I14 bound
+        - every supported sensor that declares a concrete `historical_mode`
+          must carry a valid evidence grant for that sensor
+        - a CURRENT_ONLY / ARCHIVE surface can never be given a foreign
+          historical/rest mode
+        """
+        promoted = adapter_under_test.promoted_capabilities
+        evidence_map = adapter_under_test.native_evidence
+        failures: list[str] = []
+
+        if promoted is not None:
+            for sensor, decl in caps.sensors.items():
+                evidence = evidence_map.get(sensor)
+                if not decl.supported or decl.historical_mode is None:
+                    continue
+                if evidence is None:
+                    failures.append(
+                        f"{sensor.value}: native historical_mode declared "
+                        "without a NativeEvidence grant (never infer)"
+                    )
+                    continue
+                # the declared exact mode must MATCH the grant — a grant may
+                # refine the bound, but the capability cannot contradict its
+                # own evidence (SENSOR-B3-I05 adversarial rule).
+                if evidence.historical_mode != decl.historical_mode:
+                    failures.append(
+                        f"{sensor.value}: declared historical_mode "
+                        f"{decl.historical_mode} contradicts evidence grant "
+                        f"{evidence.historical_mode}"
+                    )
+                if evidence.pagination_mode != decl.pagination_mode:
+                    failures.append(
+                        f"{sensor.value}: declared pagination_mode "
+                        f"{decl.pagination_mode} contradicts evidence grant "
+                        f"{evidence.pagination_mode}"
+                    )
+                bound = promoted.capability_for(sensor)
+                if not bound.supported:
+                    failures.append(
+                        f"{sensor.value}: native evidence on an unsupported sensor"
+                    )
+                    continue
+                vio = native_evidence_violations(
+                    adapter.provider_id, evidence, bound
+                )
+                if vio:
+                    failures.append(f"{sensor.value}: " + "; ".join(vio))
+
+        # every provided evidence object must itself be valid / attributable
+        for sensor, evidence in evidence_map.items():
+            if sensor not in caps.sensors or not caps.sensors[sensor].supported:
+                failures.append(
+                    f"{sensor.value}: native evidence attached to a sensor with "
+                    "no supported capability"
+                )
+                continue
+            if promoted is not None:
+                bound = promoted.capability_for(sensor)
+                vio = native_evidence_violations(
+                    adapter.provider_id, evidence, bound
+                )
+                if vio:
+                    failures.append(f"{sensor.value}: " + "; ".join(vio))
+
+        if failures:
+            return False, "; ".join(failures)
+        return True, "every exact native historical_mode is evidence-backed and I14-bounded"
+
+    _run_check(results, "q0_native_mode_evidence", check_native_mode_evidence)
 
     # ---- Q1 PARSER / RAW -------------------------------------------------
     def check_raw_payload_preserved() -> tuple[bool, str]:

@@ -55,10 +55,12 @@ from crypto_sensor_fabric.providers.base.enums import (
     HistoryScope,
     HistoricalMode,
     LiveMode,
+    PaginationMode,
     QualityFlagAcquisition,
     SchemaState,
 )
 from crypto_sensor_fabric.providers.base.errors import CapabilityUnavailable
+from crypto_sensor_fabric.providers.base.native import ProviderNativeCapabilityEvidence
 from crypto_sensor_fabric.providers.base.models import (
     AdapterEvidenceRef,
     FetchBatch,
@@ -949,6 +951,138 @@ class TestRequiredAdversarialProofs:
         assert unknown.state is SchemaState.UNKNOWN_SCHEMA
         assert unknown.raw_preserved is True
         assert unknown.semantic_output_allowed is False
+
+
+# ---------------------------------------------------------------------------
+#  SENSOR-B3-I05 — provider-native acquisition-mode evidence gate (q0_native_mode_evidence)
+# ---------------------------------------------------------------------------
+class TestNativeEvidenceConformanceGate:
+    """Conformance-level adversarial proofs for the I05 native-mode seam.
+
+    An exact native `historical_mode` is accepted ONLY when a valid
+    `ProviderNativeCapabilityEvidence` grant resolves to I14 evidence:
+
+    - exact native mode with NO grant                -> FAIL
+    - declared mode contradicting its own grant      -> FAIL
+    - grant attached to the WRONG sensor             -> FAIL
+    - grant broadening the I14 scope (non-archive    -> FAIL
+      bound switched to archive)
+    - valid evidence-backed native mode              -> PASS
+    """
+
+    FUNDING_EVIDENCE = "kraken_futures_funding_pi_xbtusd_RECENT_CONTROL_1h"
+
+    def _funding_grant(self, **overrides: object) -> ProviderNativeCapabilityEvidence:
+        base = dict(
+            provider_id="KRAKEN_FUTURES",
+            sensor_family=SensorFamily.MECHANICAL_FUNDING,
+            historical_mode=HistoricalMode.REST_RANGE,
+            pagination_mode=PaginationMode.TIME_RANGE,
+            endpoint_family="kraken-market-analytics/funding",
+            start_param="since",
+            start_unit="epoch_seconds",
+            end_param="to",
+            end_unit="epoch_seconds",
+            interval_param="interval",
+            interval_mechanics="seconds; supported {60,300,900,1800,3600,14400,43200,86400,604800}",
+            completion_rule="result.more == false -> complete",
+            resume_mechanic="result.more true -> re-issue since at oldest bucket",
+            evidence_ids=(self.FUNDING_EVIDENCE,),
+            methodology_pin="kraken_futures-funding",
+            access_path="PUBLIC_REST",
+        )
+        base.update(overrides)
+        return ProviderNativeCapabilityEvidence(**base)
+
+    def test_native_mode_without_grant_fails(self) -> None:
+        caps = mutate(
+            promoted_caps(),
+            SensorFamily.MECHANICAL_FUNDING,
+            historical_mode=HistoricalMode.REST_RANGE,
+            pagination_mode=PaginationMode.TIME_RANGE,
+        )
+        results = run_conformance_suite(under_test(adapter=FakeKrakenAdapter(caps=caps)))
+        _assert_this_check_fails(
+            results, "q0_native_mode_evidence", "without a NativeEvidence grant"
+        )
+
+    def test_declared_mode_contradicting_evidence_fails(self) -> None:
+        caps = mutate(
+            promoted_caps(),
+            SensorFamily.MECHANICAL_FUNDING,
+            historical_mode=HistoricalMode.REST_RANGE,
+            pagination_mode=PaginationMode.TIME_RANGE,
+        )
+        grant = self._funding_grant(
+            historical_mode=HistoricalMode.REST_CURSOR,
+            pagination_mode=PaginationMode.CURSOR,
+        )
+        results = run_conformance_suite(
+            under_test(
+                adapter=FakeKrakenAdapter(caps=caps),
+                native_evidence={SensorFamily.MECHANICAL_FUNDING: grant},
+            )
+        )
+        _assert_this_check_fails(
+            results, "q0_native_mode_evidence", "contradicts evidence grant"
+        )
+
+    def test_native_evidence_on_wrong_sensor_fails(self) -> None:
+        caps = mutate(
+            promoted_caps(),
+            SensorFamily.MECHANICAL_BOOK_METRIC,
+            historical_mode=HistoricalMode.REST_RANGE,
+            pagination_mode=PaginationMode.TIME_RANGE,
+        )
+        # grant says FUNDING but is keyed under the BOOK_METRIC capability
+        grant = self._funding_grant()
+        results = run_conformance_suite(
+            under_test(
+                adapter=FakeKrakenAdapter(caps=caps),
+                native_evidence={SensorFamily.MECHANICAL_BOOK_METRIC: grant},
+            )
+        )
+        _assert_this_check_fails(results, "q0_native_mode_evidence", "sensor")
+
+    def test_native_evidence_broadening_scope_fails(self) -> None:
+        caps = mutate(
+            promoted_caps(),
+            SensorFamily.MECHANICAL_FUNDING,
+            historical_mode=HistoricalMode.BULK_ARCHIVE_MONTHLY,
+            pagination_mode=PaginationMode.TIME_RANGE,
+        )
+        grant = self._funding_grant(
+            historical_mode=HistoricalMode.BULK_ARCHIVE_MONTHLY,
+            pagination_mode=PaginationMode.TIME_RANGE,
+        )
+        results = run_conformance_suite(
+            under_test(
+                adapter=FakeKrakenAdapter(caps=caps),
+                native_evidence={SensorFamily.MECHANICAL_FUNDING: grant},
+            )
+        )
+        _assert_this_check_fails(results, "q0_native_mode_evidence", "archive")
+
+    def test_valid_evidence_backed_native_mode_passes(self) -> None:
+        caps = mutate(
+            promoted_caps(),
+            SensorFamily.MECHANICAL_FUNDING,
+            historical_mode=HistoricalMode.REST_RANGE,
+            pagination_mode=PaginationMode.TIME_RANGE,
+        )
+        grant = self._funding_grant()
+        results = run_conformance_suite(
+            under_test(
+                adapter=FakeKrakenAdapter(caps=caps),
+                native_evidence={SensorFamily.MECHANICAL_FUNDING: grant},
+            )
+        )
+        assert _check(results, "q0_native_mode_evidence").passed, _check(
+            results, "q0_native_mode_evidence"
+        ).detail
+        assert _check(results, "q0_promotion_bounds").passed, _check(
+            results, "q0_promotion_bounds"
+        ).detail
 
 
 def declared_caps(**sensor_overrides: object) -> ProviderCapabilities:

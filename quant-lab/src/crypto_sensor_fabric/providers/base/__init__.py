@@ -86,6 +86,11 @@ from .models import (
     ResumeToken,
     SensorCapability,
 )
+from .native import (
+    ProviderNativeCapabilityEvidence,
+    apply_native_evidence,
+    native_evidence_violations,
+)
 from .pagination import (
     CursorTracker,
     completion_from_provider_semantics,
@@ -164,6 +169,7 @@ __all__ = [
     "PaginationMode",
     "ProviderCapabilities",
     "ProviderHealthSignal",
+    "ProviderNativeCapabilityEvidence",
     "ProviderSemanticError",
     "ProviderUnavailable",
     "QualityFlagAcquisition",
@@ -179,7 +185,9 @@ __all__ = [
     "TransportFailure",
     "UnsupportedGranularity",
     "SENSOR_FETCH_METHOD",
+    "apply_native_evidence",
     "dispatch_fetch",
     "ensure_supported",
     "error_from_failure_type",
+    "native_evidence_violations",
 ]

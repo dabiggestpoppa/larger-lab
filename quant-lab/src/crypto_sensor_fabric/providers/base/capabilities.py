@@ -55,6 +55,7 @@ from .enums import (
     LiveMode,
 )
 from .models import AdapterEvidenceRef, ProviderCapabilities, SensorCapability
+from .native import ProviderNativeCapabilityEvidence, native_evidence_violations
 
 DEFAULT_PROMOTION_FILE = (
     QUANT_LAB_ROOT
@@ -390,6 +391,10 @@ def promotion_provider_ids(candidates: list[dict[str, object]]) -> list[str]:
 def promotion_bound_violations(
     declared: SensorCapability,
     bound: SensorCapability,
+    *,
+    native_evidence: ProviderNativeCapabilityEvidence | None = None,
+    provider_id: str | None = None,
+    native_evidence_violation_checked: bool = False,
 ) -> list[str]:
     """Enforce the I14 promotion bounds for ONE provider/sensor (Repair 1).
 
@@ -428,22 +433,47 @@ def promotion_bound_violations(
             f"bound {bound.history_scope}"
         )
 
+    # 4a. pagination_mode on a refined capability must match what the native
+    #     evidence grant proves.
+    if bound.historical_mode is None and declared.historical_mode is not None:
+        if native_evidence is not None and declared.pagination_mode:
+            if declared.pagination_mode != native_evidence.pagination_mode:
+                violations.append(
+                    f"{sensor}: pagination_mode {declared.pagination_mode} != "
+                    f"native evidence {native_evidence.pagination_mode}"
+                )
+
     # 5. exact native historical_mode cannot be manufactured or widened.
     #    If the bound's exact mode is unknown (None), the declared MUST also be
-    #    None — the base layer never invents a native mode from a coarse label
-    #    (Issue 8/9).  If the bound pins a mode, the declared must match it.
-    if bound.historical_mode is None:
-        if declared.historical_mode is not None:
+    #    None unless the provider carries a NativeEvidence grant (I05 seam) that
+    #    legitimately refines it from its own Bloc 2 evidence.  If the bound
+    #    pins a mode, the declared must match it.
+    if bound.historical_mode is not None:
+        if declared.historical_mode != bound.historical_mode:
+            violations.append(
+                f"{sensor}: historical_mode {declared.historical_mode} != "
+                f"bound {bound.historical_mode}"
+            )
+    elif declared.historical_mode is not None:
+        if native_evidence is None:
             violations.append(
                 f"{sensor}: manufactured native historical_mode "
-                f"{declared.historical_mode} from a coarse scope (bound has "
-                "no exact native mode)"
+                f"{declared.historical_mode} from a coarse scope (no "
+                "NativeEvidence grant)"
             )
-    elif declared.historical_mode != bound.historical_mode:
-        violations.append(
-            f"{sensor}: historical_mode {declared.historical_mode} != "
-            f"bound {bound.historical_mode}"
-        )
+        elif provider_id is not None:
+            # The grant may only REFINE; any bound-broadening violation is a
+            # hard failure unless it has already been checked by the conformance
+            # native-mode check (which validates the FULL evidence object).
+            if not native_evidence_violation_checked:
+                grant_violations = native_evidence_violations(
+                    provider_id, native_evidence, bound
+                )
+                if grant_violations:
+                    violations.append(
+                        f"{sensor}: native evidence grant violates I14 bounds: "
+                        + "; ".join(grant_violations)
+                    )
 
     # 6. live mode must match the bound exactly (historical never auto-grants
     #    live; CURRENT_ONLY keeps its live snapshot surface).
