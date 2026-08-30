@@ -213,3 +213,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I13R1D | 9709335b | regenerated I13R1 evidence packet from corrected contracts (34 scopes, 113 attempts) + ledger + full revalidation | 518 passed / 0 failed | PASS | none |
 | SENSOR-B2-I14A | 7d5b4372 | decision.py final-role/redundancy/exclusion/contradiction/promotion adjudication + promote-candidate render + tests | 525 passed / 0 failed | PASS | none |
 | SENSOR-B2-I14B | b149e3e2 | I14 decision generator script + final packet artifacts (12 decision md, 13-16 matrices, source_promotion_candidates.yaml; decision head pinned to I14A) | 525 passed / 0 failed | PASS | none |
+| SENSOR-B2-RATIFY | a0181a92 | operator ratification of Bloc 2 provider-role decision recorded in ledger (governance only) | 525 passed / 0 failed | PASS | none |
+| SENSOR-B3-I01 | (see below) | base adapter package (providers/base/): controlled vocabularies, FetchRequest/FetchBatch/RawPayloadEnvelope/ResumeToken models, typed error taxonomy, MechanicalProviderAdapter protocol; Bloc 2 probe base renamed base.py -> probe_base.py; tests | 544 passed / 0 failed | PASS | none |

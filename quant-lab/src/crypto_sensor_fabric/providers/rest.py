@@ -34,7 +34,7 @@ from ..probes.payload import (
     fingerprint_payload,
     first_last_timestamps,
 )
-from .base import load_endpoint_registry
+from .probe_base import load_endpoint_registry
 
 #: Default page limit for bounded characterization (providers may override).
 DEFAULT_PAGE_LIMIT = 1000

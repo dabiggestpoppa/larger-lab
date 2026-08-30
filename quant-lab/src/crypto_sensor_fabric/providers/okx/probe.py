@@ -25,7 +25,7 @@ from typing import Any, ClassVar
 from ...contracts.enums import SensorFamily
 from ...probes.enums import AccessMode, ProbeFailureClass, ResponseStatusClass
 from ...probes.models import CapabilityProbeAttempt, CapabilityProbeRequest
-from ..base import load_endpoint_registry
+from ..probe_base import load_endpoint_registry
 from ..rest import RestCapabilityProbeBase
 
 PROVIDER_ID = "OKX_SWAP"
