@@ -285,4 +285,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I04R2-RATIFY | 9fb266fd | governance only: operator accepts common foundation for Kraken implementation (I05 authorized, KRAKEN_FUTURES ONLY; I06 Gate NOT authorized) | — | PASS | none |
 | SENSOR-B3-I05A | dc9b71af | base native-evidence seam (ProviderNativeCapabilityEvidence) + q0_native_mode_evidence conformance gate + adversarial tests | 684 passed / 0 failed | PASS | none |
 | SENSOR-B3-I05B | 490cd111 | Kraken package: request builders, provider-native parsers, typed error mapping, KrakenAdapter + fake-transport tests | 762 passed / 0 failed | PASS | none |
-| SENSOR-B3-I05C | (see reconciliation) | Kraken fixtures/manifest, README, implementation evidence, readiness matrix, ledger | 762 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I05C | f5295a8e | Kraken fixtures/manifest, README, implementation evidence, readiness matrix, ledger | 762 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I05R | (reconciliation) | record I05C SHA in ledger + evidence | 762 passed / 0 failed (re-run) | PASS | none |

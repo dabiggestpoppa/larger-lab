@@ -210,5 +210,5 @@ NO new network call was made to obtain any fixture.
 ## Commit SHA
 
 - implementation head: `490cd111` (SENSOR-B3-I05B).
-- evidence/README/readiness/ledger commit: SENSOR-B3-I05C (see ledger commit
-  log; final SHA recorded by reconciliation).
+- evidence/README/readiness/ledger commit: `f5295a8e` (SENSOR-B3-I05C);
+  reconciliation record: SENSOR-B3-I05R.
