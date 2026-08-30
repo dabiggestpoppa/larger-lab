@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I13R1 DONE — live evidence integrity/completion repair: 34/34 scope universe restored, full frozen checkpoint matrix, PIT fail-closed, evidence lineage, verified-only redundancy, Gate funding/trades seconds contract corrected (113 attempts, 78 verified samples); I14 NOT authorized |
+| Current checkpoint | SENSOR-B2-I14 DONE — provider-role decision packet: 34/34 scopes adjudicated, 17 promotion candidates (Kraken/Gate/OKX/Deribit), primary verdict `PASS_BLOC_02_WITH_SENSOR_GAPS` co-earned with `PASS_BLOC_02_FREE_ONLY_REDUNDANCY`; `source_promotion_candidates.yaml` is the ONLY Bloc 3 input list; Bloc 3 NOT authorized; awaiting operator ratification |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -20,9 +20,8 @@ that is updated at every staged checkpoint.
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
-| Operator review state | IN PROGRESS — Bloc 1 |
-| human_review_required | TRUE |
-| next_bloc_authorized | FALSE (waiting on operator after Bloc 1 report) |
+| Operator review state | RATIFIED — Bloc 1; Bloc 2 I13/I13R1/I14 complete; awaiting I14 role ratification |
+| next_bloc_authorized | FALSE (waiting on operator I14 ratification; Bloc 3 NOT authorized) |
 
 ## Test counts (cumulative)
 
@@ -58,7 +57,8 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I13R1A | 21 | 21 | 0 |
 | SENSOR-B2-I13R1B | 4 | 4 | 0 |
 | SENSOR-B2-I13R1C | 2 | 2 | 0 |
-| cumulative | 518 | 518 | 0 |
+| SENSOR-B2-I14A | 7 | 7 | 0 |
+| cumulative | 525 | 525 | 0 |
 
 ## External / provider blockers
 
@@ -83,7 +83,8 @@ that is updated at every staged checkpoint.
   (probe_run_id `bloc02_i13_...`, 47 attempts, 23 verified samples / 14 failed / 6
   empty-valid / 4 not-attempted). Live probe runner: `scripts/bloc_02_i13_live.py`
   (sequential, bounded retry, low concurrency, gitignored raw evidence under
-  `quant-lab/data/`, sanitized packet under `evidence/bloc_02/`). I14 NOT authorized.
+  `quant-lab/data/`, sanitized packet under `evidence/bloc_02/`). Followed by
+  SENSOR-B2-I13R1 repair and SENSOR-B2-I14 role freeze.
 - SENSOR-B2-I13R1 COMPLETE — evidence integrity/completion repair. 113 attempts
   (78 verified / 18 empty-valid / 13 failed / 4 not-attempted), 34/34 canonical
   scopes in reports (registry-driven universe, no scope drops), full frozen
@@ -144,13 +145,13 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- STOP GATE after SENSOR-B2-I12 (I13 live probing NOT authorized):
-  - I13: approved low-rate live capability matrix — MUST NOT start until the
-    operator reviews the generated pre-live packet (probe matrix, source URLs,
-    expected requests, free-only classifications, network plan).
-  - I14: provider-role-decision-packet (freezes claims, roles, exclusions).
-  - Generated evidence packet: `evidence/bloc_02/` (01-11; all cells
-    UNATTEMPTED / E0 / NOT_PIT_READY — nothing verified prior to live probing).
+- SENSOR-B2-I14 COMPLETE — provider-role decision packet frozen (12-16 +
+  `source_promotion_candidates.yaml`).  Bloc 2 is awaiting OPERATOR RATIFICATION
+  of the I14 decision; `bloc_03_implementation_authorized = FALSE` and
+  `next_checkpoint_authorized = FALSE` until then.
+  - Bloc 3 adapter work may consume ONLY `source_promotion_candidates.yaml`
+    (17 evidence-backed candidates) — nothing else promotes a source.
+  - Full evidence packet: `evidence/bloc_02/` (01-11 evidence; 12-16 decision).
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -199,3 +200,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I13R1B | 65d3934d | Gate funding/trades contract correction: single GET /funding_rate + /trades with Unix SECONDS (ms was REQUEST_CONTRACT_INVALID), rows {r,t}/signed-size, 180-day boundary; golden tests; manifest updates | 516 passed / 0 failed | PASS | none |
 | SENSOR-B2-I13R1C | 022ed7bb | restore 34-scope universe + full frozen checkpoint matrix (2021/2022/2024/2026) with short-circuits + Kraken liquidation via analytics + archive merge idempotency + enum members + targeted live probes | 518 passed / 0 failed | PASS | none |
 | SENSOR-B2-I13R1D | 9709335b | regenerated I13R1 evidence packet from corrected contracts (34 scopes, 113 attempts) + ledger + full revalidation | 518 passed / 0 failed | PASS | none |
+| SENSOR-B2-I14A | 7d5b4372 | decision.py final-role/redundancy/exclusion/contradiction/promotion adjudication + promote-candidate render + tests | 525 passed / 0 failed | PASS | none |
+| SENSOR-B2-I14B | b149e3e2 | I14 decision generator script + final packet artifacts (12 decision md, 13-16 matrices, source_promotion_candidates.yaml; decision head pinned to I14A) | 525 passed / 0 failed | PASS | none |
