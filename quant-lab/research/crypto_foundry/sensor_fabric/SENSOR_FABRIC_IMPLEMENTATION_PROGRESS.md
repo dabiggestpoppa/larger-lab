@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I12 DONE (pre-live packet); I13 live probing NOT YET AUTHORIZED — awaiting operator review |
+| Current checkpoint | SENSOR-B2-I12R1 (A–D) DONE (pre-live contract audit, repairs, regenerated packet); I13 live probing NOT YET AUTHORIZED — awaiting operator review |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -52,7 +52,10 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I11 | 20 | 20 | 0 |
 | SENSOR-B2-I11R1 | 21 | 21 | 0 |
 | SENSOR-B2-I12 | 16 | 16 | 0 |
-| cumulative | 464 | 464 | 0 |
+| SENSOR-B2-I12R1A | 6 | 6 | 0 |
+| SENSOR-B2-I12R1B | 7 | 7 | 0 |
+| SENSOR-B2-I12R1C | 14 | 14 | 0 |
+| cumulative | 491 | 491 | 0 |
 
 ## External / provider blockers
 
@@ -72,6 +75,26 @@ that is updated at every staged checkpoint.
 - NOT STARTED — Bloc 2 owns capability probes.
 
 ## Source-contract repairs
+
+- SENSOR-B2-I12R1 (A–D): PRE-LIVE CONTRACT AUDIT — correct provider endpoint/
+  query contracts before I13.  Kraken historical OI now targets Market Analytics
+  `/api/charts/v1/analytics/{symbol}/open-interest` (epoch-SECOND since/to + explicit
+  interval; analytics also routed for funding/future-basis/long-short-ratio/orderbook;
+  trade-level /history anatomy retained; precomputed analytics never marked
+  EXACT_EQUIVALENT).  Gate market-wide positioning uses the PUBLIC
+  `/api/v4/futures/{settle}/contract_stats` (from in Unix SECONDS, interval/limit,
+  no invented `to`); user /positions is PRIVATE_ACCOUNT_DATA / OUT_OF_SCOPE.  Binance
+  OI uses the ABSOLUTE https://fapi.binance.com/futures/data/openInterestHist (NOT
+  /fapi/v1/...); REST retention recorded separately from archive capability.  Bybit OI
+  units are CONTRACT-TYPE dependent (linear = base asset); funding interval not frozen
+  to 8h; funding pagination validated independently of OI.  OKX funding uses
+  /api/v5/public/funding-rate-history (not /market) with fundingTime-keyed pagination
+  and fields fundingRate/realizedRate/fundingTime/formulaType/method preserved.
+  Coinalyze missing local free key classifies CREDENTIAL_NOT_CONFIGURED (run
+  prerequisite, never AUTH_BLOCKED).  New machine-readable manifest
+  config/crypto_sensor_fabric/live_probe_contracts.yaml freezes every planned I13
+  contract; pre-live evidence/bloc_02 packet regenerated (still all UNATTEMPTED / E0 /
+  REFERENCE_ONLY).
 
 - SENSOR-B2-I11R1: Bitfinex community probe re-aligned with the ACTUAL frozen
   source — the public GitHub repo `tradingstrategy-ai/bitfinex-liquidations`,
@@ -142,3 +165,7 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I11 | 2c6b9dcd | bitfinex community archive probe module: license/checksum semantics, archive-hole detection, COMMUNITY_ARCHIVE evidence class, 6 fixtures + tests | 447 passed / 0 failed | PASS | none |
 | SENSOR-B2-I11R1 | 3662b644 | realign Bitfinex probe with tradingstrategy-ai/bitfinex-liquidations Git-LFS DuckDB source; drop daily-CSV+checksums assumptions; LFS OID revision identity; F_REQUIRED_ARTIFACT_MISSING; tests A-J | 448 passed / 0 failed | PASS | none |
 | SENSOR-B2-I12 | c6952503 | reports.py offline evidence-packet generator + 16 tests; generate_bloc_02_packet.py; pre-live evidence/bloc_02 packet (01-11) all UNATTEMPTED/E0 | 464 passed / 0 failed | PASS | none |
+| SENSOR-B2-I12R1A | 4173e980 | Kraken Market Analytics repair + Gate public contract_stats positioning / seconds `from`; per-sensor absolute URLs; golden + negative tests | 470 passed / 0 failed | PASS | none |
+| SENSOR-B2-I12R1B | 414afca3 | Binance OI absolute route / Bybit OI units + funding pagination / OKX funding /public route; golden + negative tests | 477 passed / 0 failed | PASS | none |
+| SENSOR-B2-I12R1C | 40b5cd02 | Deribit/Coinalyze/Bitfinex audit, CREDENTIAL_NOT_CONFIGURED, live_probe_contracts.yaml manifest + validation tests | 491 passed / 0 failed | PASS | none |
+| SENSOR-B2-I12R1D | (head) | regenerated pre-live evidence packet from corrected registry + full revalidation | 491 passed / 0 failed | PASS | none |

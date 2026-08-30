@@ -1,5 +1,6 @@
 sensor_family,verified_provider_count,verified_venues,redundancy_class,first_party_count,aggregator_count,community_count,PIT_ready_provider_count,gap_status,notes
 MECHANICAL_BASIS,0,,R0_NONE,0,0,0,0,UNVERIFIED,no live verification yet
+MECHANICAL_BOOK_METRIC,0,,R0_NONE,0,0,0,0,UNVERIFIED,no live verification yet
 MECHANICAL_BOOK_SNAPSHOT,0,,R0_NONE,0,0,0,0,UNVERIFIED,no live verification yet
 MECHANICAL_FUNDING,0,,R0_NONE,0,0,0,0,UNVERIFIED,no live verification yet
 MECHANICAL_LIQUIDATION,0,,R0_NONE,0,0,0,0,UNVERIFIED,no live verification yet
