@@ -269,8 +269,8 @@ if not expected:
 bad = []
 for name, want in expected.items():
     schema, _, rel = name.partition(".")
-    r = subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-X", "-tAc",
-                        "-U", sys.argv[2], "-d", sys.argv[1],
+    r = subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-X", "-A", "-t",
+                        "-U", sys.argv[2], "-d", sys.argv[1], "-c",
                         'SELECT count(*) FROM "%s"."%s";' % (schema, rel)],
                        capture_output=True, text=True)
     got = r.stdout.strip() if r.returncode == 0 else "-err-"

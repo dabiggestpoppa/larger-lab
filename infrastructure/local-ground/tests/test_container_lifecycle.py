@@ -165,7 +165,7 @@ def test_ctl_clean_room_database_artifact_restore(oce_stack, tmp_path):
             "--from", str(bk), "--confirm-local-target", oc.PG_DB], check=True)
     oc.assert_stack_converged(timeout_s=240, stable=2)
     # 8. postgres records exactly (a zero-exit restore with missing rows fails)
-    r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tA",
+    r = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
                                "SELECT k || '=' || v FROM backup_probe ORDER BY k;"])
     assert r.stdout.strip().splitlines() == ["b1=alpha", "b2=beta"], (
         f"restore returned success but rows not recovered: {r.stdout!r}")
