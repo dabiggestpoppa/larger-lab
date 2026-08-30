@@ -1,0 +1,89 @@
+{
+  "run_id": "2e65b0a9c4e7",
+  "repository": "dabiggestpoppa/larger-lab",
+  "branch": "oce-program-build",
+  "implementation_commit": "22a30401df1ab5b7fd6121c1f5ac9e75246aa4e0",
+  "implementation_tree": "1b0208a0a5f944781ee3c98506c3d6173ebe2756",
+  "main_unchanged_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+  "github_actions_run": 33283003794,
+  "github_actions_url": "https://github.com/dabiggestpoppa/larger-lab/actions/runs/33283003794",
+  "gate_result": "PASS",
+  "gate_mode": "AUTHORITATIVE_CI",
+  "gate_totals": {
+    "PASS": 45,
+    "FAIL": 0,
+    "total": 45
+  },
+  "test_totals": {
+    "collected": 117,
+    "executed": 117,
+    "passed": 116,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "container_backed": {
+    "collected": 18,
+    "executed": 18,
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0
+  },
+  "mandatory_skipped": 0,
+  "adversarial": {
+    "PASS": 8,
+    "FAIL": 0
+  },
+  "final_status": "LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW",
+  "cloud": {
+    "mutations": 0,
+    "cost": "ZERO",
+    "activation": "DEFERRED_BY_OPERATOR",
+    "deployment": "NOT_DEPLOYED"
+  },
+  "source_clean": {
+    "pre": true,
+    "dirty_pre": 0,
+    "post": true,
+    "dirty_post": 0
+  },
+  "cleanup": {
+    "cleanup": "ok",
+    "containers_removed": true,
+    "networks_removed": true,
+    "volumes_removed": true,
+    "disposable_removed": true
+  },
+  "postgres_recovery_receipt": {
+    "promoted": true,
+    "quarantine_dropped": true,
+    "exit_status": 0,
+    "staging_verification": "ok",
+    "canonical_verification": "ok",
+    "final_verification": "ok",
+    "redis_restored": false,
+    "postgres_version": "16.2",
+    "source_archive_sha256": "0628ef3b3bffc0f34fecf18168088d816838ea7eec6d3310a9021897f91bc957"
+  },
+  "artifact": {
+    "name": "b1-local-ground-evidence-2e65b0a9c4e7",
+    "id": 9723589216,
+    "size_bytes": 22031,
+    "zip_sha256": "1706d61fec025cbbeb03927966bc8c554d3caf6b330108831d0c39af6d763425"
+  },
+  "environment_fingerprint": {
+    "os": "Linux",
+    "platform_release": "6.17.0-1022-azure",
+    "machine": "x86_64",
+    "runtime_target": "local",
+    "tools": {
+      "python": "Python 3.12.14",
+      "git": "git version 2.55.0",
+      "docker": "Docker version 28.0.4, build b8034c0",
+      "docker_compose": "Docker Compose version v2.38.2",
+      "shellcheck": "present",
+      "wsl": "absent"
+    }
+  },
+  "archived_at": "2026-08-30T00:30:00Z"
+}
