@@ -16,6 +16,13 @@ Subsystem layout:
 
 from __future__ import annotations
 
+from .coverage import (
+    CoverageVector,
+    VerifiedSource,
+    compute_coverage_vector,
+    compute_sensor_redundancy,
+    synthesize_coverage,
+)
 from .enums import (
     AccessMode,
     AuthMode,
@@ -24,6 +31,7 @@ from .enums import (
     ContradictionResolutionStatus,
     ContradictionSeverity,
     EvidenceLevel,
+    EvidenceSourceClass,
     FreeOnlyStatus,
     Granularity,
     HistoricalBoundaryConfidence,
@@ -35,6 +43,14 @@ from .enums import (
     QueryMode,
     RedundancyClass,
     ResponseStatusClass,
+)
+from .evidence import (
+    CapabilityProbeEvidence,
+    derive_evidence_level,
+    derive_pit_readiness,
+    deterministic_json,
+    evidence_from_attempts,
+    synthesize_claim,
 )
 from .failures import (
     classify_http_status,
@@ -57,6 +73,12 @@ from .models import (
     missingness_to_bloc1_reason,
 )
 from .redaction import redact_mapping, redact_url, redact_value, scrub_secrets
+from .scoring import (
+    capability_score,
+    evaluate_promotion,
+    hard_blockers,
+    is_blocked,
+)
 
 __all__ = [
     "AccessMode",
@@ -64,12 +86,15 @@ __all__ = [
     "CapabilityClaim",
     "CapabilityMissingness",
     "CapabilityProbeAttempt",
+    "CapabilityProbeEvidence",
     "CapabilityProbeRequest",
     "CapabilityStatus",
     "ContradictionResolutionStatus",
     "ContradictionSeverity",
+    "CoverageVector",
     "DocumentationRuntimeContradiction",
     "EvidenceLevel",
+    "EvidenceSourceClass",
     "FailureRecord",
     "FreeOnlyStatus",
     "Granularity",
@@ -86,10 +111,21 @@ __all__ = [
     "RedundancyClass",
     "ResponseStatusClass",
     "SensorRedundancySummary",
+    "VerifiedSource",
+    "capability_score",
     "classify_http_status",
+    "compute_coverage_vector",
+    "compute_sensor_redundancy",
+    "derive_evidence_level",
+    "derive_pit_readiness",
+    "deterministic_json",
+    "evaluate_promotion",
+    "evidence_from_attempts",
     "failure_family",
     "failure_to_bloc1_missing_reason",
     "failure_to_missingness",
+    "hard_blockers",
+    "is_blocked",
     "is_hard_block",
     "is_retryable",
     "missingness_to_bloc1_reason",
@@ -97,4 +133,6 @@ __all__ = [
     "redact_url",
     "redact_value",
     "scrub_secrets",
+    "synthesize_claim",
+    "synthesize_coverage",
 ]

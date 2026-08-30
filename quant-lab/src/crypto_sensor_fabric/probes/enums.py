@@ -63,6 +63,22 @@ class EvidenceLevel(_StrEnum):
     E5_REPRODUCIBLE_COVERAGE_VERIFIED = "E5_REPRODUCIBLE_COVERAGE_VERIFIED"
 
 
+class EvidenceSourceClass(_StrEnum):
+    """Evidence source class (03 §2).
+
+    Determines how strongly a claim may be treated as canonical venue truth.
+    A community archive is never silently counted as first-party venue truth;
+    an aggregator is never counted as an independent venue (T2-COV-05).
+    """
+
+    FIRST_PARTY_RUNTIME = "FIRST_PARTY_RUNTIME"
+    FIRST_PARTY_ARCHIVE = "FIRST_PARTY_ARCHIVE"
+    FIRST_PARTY_DOCUMENTATION = "FIRST_PARTY_DOCUMENTATION"
+    THIRD_PARTY_AGGREGATOR = "THIRD_PARTY_AGGREGATOR"
+    COMMUNITY_RECONSTRUCTION = "COMMUNITY_RECONSTRUCTION"
+    COMMUNITY_ARCHIVE = "COMMUNITY_ARCHIVE"
+
+
 class PITReadiness(_StrEnum):
     """PIT readiness classification (03 §10 / F2.9)."""
 

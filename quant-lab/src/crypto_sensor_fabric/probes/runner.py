@@ -49,6 +49,25 @@ def _last_attempt(attempts: Sequence[CapabilityProbeAttempt]) -> CapabilityProbe
     return attempts[-1]
 
 
+def _stamp_era(
+    attempts: Sequence[CapabilityProbeAttempt], era: str | None
+) -> list[CapabilityProbeAttempt]:
+    """Stamp the checkpoint era into attempts that do not already carry one.
+
+    Evidence synthesis groups attempts by era (RECENT_CONTROL / 2021 / ...),
+    so the runner guarantees the label survives regardless of executor detail.
+    """
+    if era is None:
+        return list(attempts)
+    stamped: list[CapabilityProbeAttempt] = []
+    for attempt in attempts:
+        if attempt.era_hint:
+            stamped.append(attempt)
+        else:
+            stamped.append(attempt.model_copy(update={"era_hint": era}))
+    return stamped
+
+
 def run_plan(
     plan: ProbePlan,
     executor: Executor,
@@ -72,7 +91,7 @@ def run_plan(
 
     # Recent control first.
     for step in plan.recent_control_steps():
-        attempts = _execute_with_retry(step.request, executor, retry_count)
+        attempts = _stamp_era(_execute_with_retry(step.request, executor, retry_count), step.era)
         result.attempts.extend(attempts)
         executed_count += 1
         last = _last_attempt(attempts)
@@ -89,7 +108,7 @@ def run_plan(
         if _scope_key(step.request) in hard_blocked_scopes:
             skipped.append(step.probe_id)
             continue
-        attempts = _execute_with_retry(step.request, executor, retry_count)
+        attempts = _stamp_era(_execute_with_retry(step.request, executor, retry_count), step.era)
         result.attempts.extend(attempts)
         executed_count += 1
         last = _last_attempt(attempts)

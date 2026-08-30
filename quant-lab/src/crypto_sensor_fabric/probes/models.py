@@ -123,6 +123,9 @@ class CapabilityProbeAttempt(BaseModel):
     started_at: datetime | None = None
     finished_at: datetime | None = None
     probe_version: str = Field(min_length=1)
+    #: Checkpoint era label (RECENT_CONTROL / 2021 / ...), stamped by the
+    #: runner from the request so evidence synthesis stays checkpoint-traceable.
+    era_hint: str | None = None
 
     @model_validator(mode="after")
     def _failed_attempt_carries_error_class(self) -> CapabilityProbeAttempt:
@@ -193,6 +196,7 @@ class CapabilityClaim(BaseModel):
             CapabilityStatus.PAYMENT_BLOCKED,
             CapabilityStatus.HISTORY_BLOCKED,
             CapabilityStatus.UNSUPPORTED,
+            CapabilityStatus.SEMANTICALLY_UNUSABLE,  # runtime-derived (failed sample)
         } and self.evidence_level == EvidenceLevel.E0_CLAIM_ONLY:
             raise ValueError(
                 "capability_status requires runtime evidence; "
