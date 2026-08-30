@@ -1,7 +1,55 @@
-"""Gate Futures capability probe (bloc_02/02 §6)."""
+"""Gate Futures — Bloc 2 capability probe + Bloc 3 production adapter.
+
+Split surfaces (I06):
+
+- `probe.py`        — Bloc 2 offline capability characterization probe.
+- `adapter.py`      — Bloc 3 production `GateAdapter` (four I14-promoted
+                      paths; typed unsupported otherwise).
+- `capabilities.py` — I14-bounded capability + native acquisition-mode freeze.
+- `requests.py` / `parsers.py` / `errors.py` — request builders, provider-native
+                      parsers, and failure-envelope mapping.
+
+Gate's FOUR promoted paths are SECONDARY.  OI / LIQUIDATION / POSITIONING
+share the PUBLIC `/contract_stats` surface (same physical payload, separate
+logical sensor contracts — never a combined state); positioning NEVER uses the
+private `/positions` endpoint.  Funding uses the single-contract public
+`GET /funding_rate` (the plural `/funding_rates` batch route is not a
+production path).  A rolling ~180-day retention boundary is mapped to typed
+`HistoricalRangeUnavailable`.  Provider-native units are preserved; no
+normalization or research compute occurs here.
+"""
 
 from __future__ import annotations
 
-from .probe import NATIVE_INSTRUMENTS, PROVIDER_ID, GateCapabilityProbe
+from .capabilities import (
+    GATE_CONTRACT_STATS_PATH,
+    GATE_FUNDING_RATE_PATH,
+    GATE_PRODUCTION_INSTRUMENT_SCOPE,
+    GATE_PROBE_INSTRUMENT_SCOPE,
+    GATE_PROMOTED_SENSORS,
+    GATE_SYMBOL_SCOPES,
+    GATE_USDT_BASE,
+    PROVIDER_ID,
+    build_gate_capabilities,
+    gate_endpoint_family,
+    gate_native_evidence,
+    gate_symbol_scopes_from_evidence,
+)
+from .probe import NATIVE_INSTRUMENTS, GateCapabilityProbe
 
-__all__ = ["NATIVE_INSTRUMENTS", "PROVIDER_ID", "GateCapabilityProbe"]
+__all__ = [
+    "GATE_CONTRACT_STATS_PATH",
+    "GATE_FUNDING_RATE_PATH",
+    "GATE_PRODUCTION_INSTRUMENT_SCOPE",
+    "GATE_PROBE_INSTRUMENT_SCOPE",
+    "GATE_PROMOTED_SENSORS",
+    "GATE_SYMBOL_SCOPES",
+    "GATE_USDT_BASE",
+    "NATIVE_INSTRUMENTS",
+    "PROVIDER_ID",
+    "GateCapabilityProbe",
+    "build_gate_capabilities",
+    "gate_endpoint_family",
+    "gate_native_evidence",
+    "gate_symbol_scopes_from_evidence",
+]
