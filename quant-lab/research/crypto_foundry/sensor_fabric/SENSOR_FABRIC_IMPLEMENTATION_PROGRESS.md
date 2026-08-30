@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I13 DONE — first controlled live capability evidence run (47 attempts, 23 verified samples, 8 hard geo blocks); I14 NOT authorized |
+| Current checkpoint | SENSOR-B2-I13R1 DONE — live evidence integrity/completion repair: 34/34 scope universe restored, full frozen checkpoint matrix, PIT fail-closed, evidence lineage, verified-only redundancy, Gate funding/trades seconds contract corrected (113 attempts, 78 verified samples); I14 NOT authorized |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -55,14 +55,17 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I12R1A | 6 | 6 | 0 |
 | SENSOR-B2-I12R1B | 7 | 7 | 0 |
 | SENSOR-B2-I12R1C | 14 | 14 | 0 |
-| cumulative | 491 | 491 | 0 |
+| SENSOR-B2-I13R1A | 21 | 21 | 0 |
+| SENSOR-B2-I13R1B | 4 | 4 | 0 |
+| SENSOR-B2-I13R1C | 2 | 2 | 0 |
+| cumulative | 518 | 518 | 0 |
 
 ## External / provider blockers
 
 - BINANCE_USDM REST (`fapi.binance.com`): F_ACCESS_GEO from this region (HTTP 451 with "Service unavailable from a restricted location … Eligibility" on all four /fapi/v1 sensors). The public data.binance.vision archive is REACHABLE from the same region (OI + aggTrades history verified at 2022) — proves REST_BLOCKED ≠ ARCHIVE_BLOCKED.
 - BYBIT_LINEAR (`bybit.com` via CloudFront): F_ACCESS_GEO from this region (403 hard block on all four sensors). No bypass attempted.
-- GATE_FUTURES `contract_stats`: no GEO/AUTH issue on the public surface; but historical `from` beyond 180 days is rejected (`INVALID_PARAM_VALUE: from time exceeds 180-day limit`) — recent-only for contract_stats. Funding endpoint returned `INVALID_CREDENTIALS: not authenticated` (F_ACCESS_AUTH) on the `/funding_rates` recent-control sample, contradicting free-public expectation.
-- KRAKEN_FUTURES Market Analytics: reachable; verified live current + 2022/2024 historical buckets (OI/funding/basis at 2022-06-15), but `/history` trade and `/orderbook` book snapshots return F_SCHEMA_CHANGED on the current API surface.
+- GATE_FUTURES `contract_stats`: no GEO/AUTH issue on the public surface; but historical `from` beyond 180 days is rejected (`INVALID_PARAM_VALUE: from time exceeds 180-day limit`) — recent-only (rolling 180-day boundary, proven live at the 2022 checkpoint; older dates synthesized HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY). Funding/trades contract corrected in I13R1: single GET /funding_rate + GET /trades use Unix SECONDS from/to (the earlier INVALID_CREDENTIALS on the plural POST /funding_rates was a REQUEST_CONTRACT_INVALID, not provider auth); rows {r,t} / signed-size trades verified.
+- KRAKEN_FUTURES Market Analytics: reachable; historical reach is RAGGED by sensor/instrument (I13R1): liquidation-volume verified 2021-2026; OI verified 2024/2026 (EMPTY_VALID 2021/2022, BTC+ETH); basis verified 2022+; book-metric 2024+; funding EMPTY_VALID at 2021/2022/2024 but VERIFIED 2026+recent. `/history` trade and `/orderbook` snapshots return F_SCHEMA_CHANGED on the current API surface (analytics family is the healthy path).
 - COINALYZE: no local free API key configured — recorded CREDENTIAL_NOT_CONFIGURED (4 scopes NOT_ATTEMPTED), never AUTH_BLOCKED.
 
 ## Data blockers
@@ -81,6 +84,15 @@ that is updated at every staged checkpoint.
   empty-valid / 4 not-attempted). Live probe runner: `scripts/bloc_02_i13_live.py`
   (sequential, bounded retry, low concurrency, gitignored raw evidence under
   `quant-lab/data/`, sanitized packet under `evidence/bloc_02/`). I14 NOT authorized.
+- SENSOR-B2-I13R1 COMPLETE — evidence integrity/completion repair. 113 attempts
+  (78 verified / 18 empty-valid / 13 failed / 4 not-attempted), 34/34 canonical
+  scopes in reports (registry-driven universe, no scope drops), full frozen
+  checkpoint matrix per scope with short-circuits (CURRENT_ONLY,
+  HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY, surface geo/auth), E2+ claims
+  carry resolving evidence_ids, PIT fail-closed, verified-only redundancy,
+  per-instrument history boundaries, Bitfinex = SOURCE_AVAILABILITY_VERIFIED only,
+  Gate funding/trades corrected to Unix SECONDS (GET /funding_rate verified
+  recent+2026; /trades verified recent). Merge-on-resume runner stays idempotent.
 - Live contract corrections from observed evidence: Gate `contract_stats`
   `interval` is a STRING bucket ("1h"), not seconds; Deribit funding `get_funding_rate_history`
   result is a raw LIST (not `{data:[...]}`); Bybit CloudFront country block is F_ACCESS_GEO,
@@ -183,3 +195,7 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I12R1C | 40b5cd02 | Deribit/Coinalyze/Bitfinex audit, CREDENTIAL_NOT_CONFIGURED, live_probe_contracts.yaml manifest + validation tests | 491 passed / 0 failed | PASS | none |
 | SENSOR-B2-I12R1D | 0b5d6143 | regenerated pre-live evidence packet from corrected registry + full revalidation | 491 passed / 0 failed | PASS | none |
 | SENSOR-B2-I13 | be8ba89b | first controlled live capability evidence run: live probe runner, probe contract fixes from live observation, sanitized evidence packet (01-11) with real CAPABILITY_CLAIMS / FAILURES / contradictions, progress ledger | 491 passed / 0 failed (offline suite unaffected) | PASS_WITH_LIMITATIONS | Binance REST + Bybit geo-blocked; Gate contract_stats 180-day limit; Kraken /history + /orderbook schema drift; Coinalyze no key |
+| SENSOR-B2-I13R1A | 6abd5d66 | evidence lineage (E2+ requires resolving evidence_ids) + PIT fail-closed invariants + verified-only redundancy + per-instrument history boundaries + report synthesis fixes + tests | 512 passed / 0 failed | PASS | none |
+| SENSOR-B2-I13R1B | 65d3934d | Gate funding/trades contract correction: single GET /funding_rate + /trades with Unix SECONDS (ms was REQUEST_CONTRACT_INVALID), rows {r,t}/signed-size, 180-day boundary; golden tests; manifest updates | 516 passed / 0 failed | PASS | none |
+| SENSOR-B2-I13R1C | 022ed7bb | restore 34-scope universe + full frozen checkpoint matrix (2021/2022/2024/2026) with short-circuits + Kraken liquidation via analytics + archive merge idempotency + enum members + targeted live probes | 518 passed / 0 failed | PASS | none |
+| SENSOR-B2-I13R1D | (regen below) | regenerated I13R1 evidence packet from corrected contracts (34 scopes, 113 attempts) + ledger + full revalidation | 518 passed / 0 failed | PASS | none |
