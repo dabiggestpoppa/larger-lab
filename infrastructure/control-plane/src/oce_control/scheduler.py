@@ -47,7 +47,7 @@ class Schedule:
         if self.scheduled_at and not self.recurring:
             # One-shot: no next run after it fires
             scheduled = datetime.fromisoformat(self.scheduled_at)
-            if scheduled > after:
+            if scheduled >= after:
                 return scheduled
             return None
         if self.interval_seconds and self.recurring:

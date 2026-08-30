@@ -232,6 +232,38 @@ class HermesBoundary:
                 req = r
                 break
         if req is None:
-            raise KeyError(f"Request '{request_id}' not found")
+            raise KeyError(f"Request not found")
 
-        # Hermes cannot independently appro
+        # Hermes cannot independently approve PO-only actions
+        if req.risk_class in ("capital", "deployment", "broker"):
+            escalation = self._po.escalate_decision(
+                po_agent_id="hermes-boundary",
+                decision=f"operator_approval_required:{req.risk_class}",
+                context={"request_id": request_id, "sender": req.sender_id},
+            )
+            req.status = "escalated"
+            return escalation
+        return {"routed": "po", "request_id": request_id}
+
+    def check_hermes_boundary(self, action: str) -> bool:
+        """Check if Hermes is attempting a PO-only action."""
+        return action in PO_ONLY_ACTIONS
+
+    def _classify_risk(self, text: str) -> str:
+        """Classify the risk of a request."""
+        text_lower = text.lower()
+        if any(w in text_lower for w in ["capital", "trade", "order", "buy", "sell"]):
+            return "capital"
+        if any(w in text_lower for w in ["deploy", "provision", "cloud"]):
+            return "deployment"
+        if any(w in text_lower for w in ["broker", "execute"]):
+            return "broker"
+        if any(w in text_lower for w in ["message", "send", "notify"]):
+            return "messaging"
+        if any(w in text_lower for w in ["delete", "destroy", "drop"]):
+            return "destructive"
+        return "read"
+
+    @property
+    def requests(self) -> list:
+        return list(self._requests)
