@@ -126,9 +126,14 @@ pre-listing / history unavailable — an empty valid response is an observation.
   Bloc 2 probe fixture and the corrected live probe contract
   (`live_probe_contracts.yaml`).  The I13R1 schema fingerprint
   (09_SCHEMA_FINGERPRINTS.jsonl) pins the type as `int` only; no finer
-  precision is invented.  A value that is not a plausible epoch-second
-  timestamp yields `actual_first/last_timestamp = None` while the raw value
-  remains preserved in the envelope.
+  precision is invented.
+- **Timestamp schema is fail-closed (SENSOR-B3-I05R2 FINAL SEAL):** Market
+  Analytics bucket timestamps are evidence-backed `list[int]` (epoch
+  seconds); a non-integer element (`"1755000000"`, `1755000000.0`, `True`,
+  `None`, or mixed types) is schema drift and fails closed with parsed output
+  blocked and the raw payload preserved in the failure envelope.  An empty
+  `timestamp` list remains a valid `EMPTY_VALID` observation.  No silent
+  coercion (`str->int`, `float->int`, `True->1`).
 - Requests use `[start, end)` with `since`/`to` in epoch seconds.
 - Whether a bucket timestamp is interval open/close/publication is NOT
   resolved by committed Bloc 2 evidence — this is a stated limitation (see

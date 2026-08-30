@@ -1,8 +1,9 @@
 # SENSOR-B3-I05 — Kraken Futures Production Adapter Implementation Evidence
 
 **Checkpoint verdict:** `PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE` (I05) then
-`PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED` (I05R1 repair; pending operator
-review).  **This is NOT a global Bloc 3 PASS.**
+`PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED` (I05R1 repair) and, with the
+I05R2 final seal below, `PASS_SENSOR_B3_I05R2_KRAKEN_SEALED` (proposed).
+**This is NOT a global Bloc 3 PASS.**
 
 **Operator authorization:** `SENSOR-B3-I05 — KRAKEN_FUTURES` only.
 `SENSOR-B3-I06 (Gate) is NOT authorized`.  `provider_adapter_implementation_authorized
@@ -16,7 +17,7 @@ review).  **This is NOT a global Bloc 3 PASS.**
 | adapter_version | `kraken-adapter-v1` |
 | provider | `KRAKEN_FUTURES` |
 | package | `quant-lab/src/crypto_sensor_fabric/providers/kraken/` |
-| implementation head | `490cd111` (SENSOR-B3-I05B) + `17e70035` (SENSOR-B3-I05R1A) + `a1e191ea` (SENSOR-B3-I05R1B) |
+| implementation head | `490cd111` (I05B) + `17e70035`/`a1e191ea` (I05R1A/B) + (I05R2A) |
 | network_smoke_status | `NOT_RUN` (reserved for SENSOR-B3-I14) |
 
 ## Supported sensor paths (exactly six, I14-promoted)
@@ -306,3 +307,46 @@ characterization history but are never exposed as production support.)
 - I05R1: `17e70035` (I05R1A — production request + instrument boundaries),
   `a1e191ea` (I05R1B — raw drift envelope + parser cardinality),
   (I05R1C — evidence/README/readiness/ledger reconciliation).
+- I05R2 (SENSOR-B3-I05R2A — request identity + timestamp schema);
+  (SENSOR-B3-I05R2B — evidence/README/ledger seal).
+
+## SENSOR-B3-I05R2 — KRAKEN OFFLINE FINAL SEAL
+
+Final production-boundary seal applied after operator review (intentionally
+small; neither redesigns the provider system nor broadens I14).
+
+- **Foreign FetchRequest identity (R1):** a rejected
+  `request.provider_id != KRAKEN_FUTURES` raises typed `ProviderSemanticError`
+  carrying the ACTUAL requested `sensor_family` (all six promoted sensors
+  proven; zero transport calls).  Instrument-list discovery has no requested
+  sensor, so its mismatch uses the documented **neutral provider-level
+  placeholder** (`NEUTRAL_INSTRUMENT_LIST_SENSOR`) and never claims a real
+  scientific sensor.
+- **Unsupported named-method identity (R2):** `fetch_trades` and `fetch_book`
+  check method/sensor identity FIRST.  `fetch_trades(FUNDING request)` is a
+  `ProviderSemanticError` mismatch (never a claim that FUNDING is
+  unsupported); `fetch_trades(TRADE request)` is typed `CapabilityUnavailable`.
+  The same holds for `fetch_book` with `MECHANICAL_BOOK_SNAPSHOT`.
+- **Timestamp schema frozen (R3):** Market Analytics bucket timestamps are
+  evidence-backed `list[int]` in **epoch seconds**; each non-empty member must
+  be exactly a Python `int` (`type(ts) is int`, bool excluded).  A
+  string/float/bool/`None`/mixed element classifies as
+  `BREAKING_SCHEMA_CHANGE`: parsed semantic output is blocked and the raw
+  payload is PRESERVED in the `SchemaDrift.raw_payload_envelope`.  No silent
+  coercion (`str->int`, `float->int`, `True->1`).  Empty `timestamp` lists stay
+  `EMPTY_VALID`.
+- **Raw envelope on drift (R3/R4):** invalid-timestamp `SchemaDrift` retains
+  the exact preserved raw envelope (provider, sensor, request fingerprint,
+  raw body, content hash, `BREAKING_SCHEMA_CHANGE`, evidence ref), proven
+  behaviorally through the real adapter.
+- **Resume/non-monotonic (R4):** resume `since` and monotonicity derive only
+  from already-schema-validated int timestamps; the silent `int()` rescue path
+  is removed — an invalid timestamp can never reach resume-token creation.
+- **Production sensor set unchanged:** exactly the six I14-promoted paths;
+  TRADE and BOOK_SNAPSHOT remain typed unsupported.  Production instrument
+  scopes unchanged (OI `{PI_XBTUSD, PI_ETHUSD}`; BASIS / BOOK_METRIC / FUNDING
+  / LIQUIDATION / POSITIONING `{PI_XBTUSD}`).  Probe-only SOL/DOGE stay out of
+  production capability.
+- **Zero network calls** made in I05R2; **network smoke remains NOT_RUN**
+  (reserved for SENSOR-B3-I14).  Full offline regression: 829 passed / 0
+  failed; ruff clean.

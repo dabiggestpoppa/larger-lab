@@ -11,21 +11,21 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I05R1 COMPLETE — KRAKEN BOUNDARY HARDENED (PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE → PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED, pending operator review) |
+| Current checkpoint | SENSOR-B3-I05R2 COMPLETE — KRAKEN FINAL PRODUCTION SEAL (PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE → PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED → proposed PASS_SENSOR_B3_I05R2_KRAKEN_SEALED) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation OPERATOR REVIEWED / ACCEPTED FOR FIRST PROVIDER (I04R2-RATIFY); SENSOR-B3-I05 (Kraken) IMPLEMENTED OFFLINE + BOUNDARY-HARDENED (I05R1) — awaiting operator review of PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation OPERATOR REVIEWED / ACCEPTED FOR FIRST PROVIDER (I04R2-RATIFY); SENSOR-B3-I05 (Kraken) IMPLEMENTED OFFLINE + BOUNDARY-HARDENED (I05R1) + OFFILINE SEALED (I05R2) — awaiting operator review of PASS_SENSOR_B3_I05R2_KRAKEN_SEALED |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = KRAKEN_FUTURES ONLY |
 | Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=1 (KRAKEN_FUTURES, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken; PRODUCTION_CANDIDATE mode) · NETWORK_VALIDATION=NOT_YET_RUN |
-| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_boundary_hardened = TRUE (I05R1) · kraken_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
+| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_boundary_hardened = TRUE (I05R1) · kraken_final_seal = TRUE (I05R2) · kraken_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE beyond Kraken (I05 Kraken ONLY; I06 Gate NOT authorized) |
-| next_checkpoint_authorized | FALSE (I05 complete offline; I06 Gate recommended but NOT authorized — await operator review) |
+| next_checkpoint_authorized | FALSE (I05 + I05R1 + I05R2 complete offline; I06 Gate recommended but NOT authorized — await operator review of PASS_SENSOR_B3_I05R2_KRAKEN_SEALED) |
 
 ## Test counts (cumulative)
 
@@ -74,7 +74,8 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I05C | (evidence only) | — | — |
 | SENSOR-B3-I05R1A | 17e70035 | 31 | 0 |
 | SENSOR-B3-I05R1B | a1e191ea | 14 | 0 |
-| cumulative | 807 | 807 | 0 |
+| SENSOR-B3-I05R2A | a737d9e6 | 22 | 0 |
+| cumulative | 829 | 829 | 0 |
 
 ## External / provider blockers
 
@@ -186,9 +187,25 @@ that is updated at every staged checkpoint.
   BREAKING in both directions.  807 passed / 0 failed; ruff clean; FAKE
   TRANSPORT ONLY — zero network calls; no Bloc 4 code; I14 bounds unchanged.
   Verdict proposed: `PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED`.
+- SENSOR-B3-I05R2 COMPLETE (FINAL PRODUCTION SEAL, intentionally small) —
+  closes the review seams: foreign `FetchRequest` errors now report the
+  ACTUAL requested sensor (instrument-list mismatch uses the documented
+  neutral provider-level placeholder, never a scientific sensor);
+  `fetch_trades`/`fetch_book` check method/sensor identity FIRST so a
+  mismatched request is a typed `ProviderSemanticError`, never a false
+  "surface unsupported"; Kraken Market Analytics bucket timestamps FAIL
+  CLOSED to evidence-backed `list[int]` epoch seconds (string/float/bool/
+  None/mixed → SchemaDrift with parsed output blocked, no silent coercion),
+  an empty list stays EMPTY_VALID, and the invalid-timestamp SchemaDrift
+  preserves the exact raw envelope; resume `since` + non-monotonic now derive
+  only from schema-validated int timestamps (silent `int()` rescue removed).
+  829 passed / 0 failed; ruff clean; FAKE TRANSPORT ONLY — zero network
+  calls; no Bloc 4 code; I14 bounds unchanged.  Verdict proposed:
+  `PASS_SENSOR_B3_I05R2_KRAKEN_SEALED`; Kraken OFFLINE implementation FROZEN
+  until SENSOR-B3-I14 network smoke.
 - Recommended next checkpoint: **SENSOR-B3-I06 — GATE_FUTURES**, but it is
   NOT authorized (`next_checkpoint_authorized = FALSE`); stop and await
-  operator review of PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED.
+  operator review of PASS_SENSOR_B3_I05R2_KRAKEN_SEALED.
 
 ## Prior next-checkpoint history
 
@@ -303,3 +320,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I05R1A | 17e70035 | production/probe scope separation + sensor symbol_scope from evidence + grant-instruments proof in conformance + request provider-identity guard + granularity fail-closed + named-method/sensor identity + no-transport sensor identity; tests | 793 passed / 0 failed | PASS | none |
 | SENSOR-B3-I05R1B | a1e191ea | AcquisitionError.raw_payload_envelope (provider-independent) + adapter materializes raw envelope before parse decision + SchemaDrift carries it + list/dict cardinality BREAKING both directions + per-sensor drift envelope proofs; tests | 807 passed / 0 failed | PASS | none |
 | SENSOR-B3-I05R1C | (this commit) | evidence/README/readiness/ledger reconciliation for I05R1 | 807 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I05R2A | a737d9e6 | foreign-provider error carries requested sensor + neutral instrument-list placeholder + unsupported named-method identity guards + timestamp fail-closed to int epoch seconds + resume/no-int-rescue; tests | 829 passed / 0 failed | PASS | none |
+| SENSOR-B3-I05R2C | (this commit) | evidence/README/ledger seal (I05R2 FINAL SEAL) | 829 passed / 0 failed (re-run) | PASS | none |
