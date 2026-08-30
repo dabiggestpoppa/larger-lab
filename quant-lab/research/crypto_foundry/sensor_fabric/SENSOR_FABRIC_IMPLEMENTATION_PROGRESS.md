@@ -10,18 +10,19 @@ that is updated at every staged checkpoint.
 
 | Field | Value |
 |---|---|
-| Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I14 DONE — provider-role decision packet: 34/34 scopes adjudicated, 17 promotion candidates (Kraken/Gate/OKX/Deribit), primary verdict `PASS_BLOC_02_WITH_SENSOR_GAPS` co-earned with `PASS_BLOC_02_FREE_ONLY_REDUNDANCY`; `source_promotion_candidates.yaml` is the ONLY Bloc 3 input list; Bloc 3 NOT authorized; awaiting operator ratification |
+| Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
+| Current checkpoint | SENSOR-B3-I01 — base models + provider protocol (common foundation) |
+| Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
+| Operator review state | RATIFIED — Bloc 2 provider-role decision ratified; Bloc 3 common foundation (I01-I04) authorized; first provider adapter NOT authorized until operator review after I04 |
 | human_review_required | TRUE |
-| Bloc 2 implementation_authorized | TRUE |
+| Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
+| Bloc 3 implementation_authorized | TRUE — common foundation only (SENSOR-B3-I01..I04) |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
-| Operator review state | RATIFIED — Bloc 1; Bloc 2 I13/I13R1/I14 complete; awaiting I14 role ratification |
-| next_bloc_authorized | FALSE (waiting on operator I14 ratification; Bloc 3 NOT authorized) |
+| next_checkpoint_authorized | FALSE (awaiting operator review after SENSOR-B3-I04; I05 Kraken NOT authorized) |
 
 ## Test counts (cumulative)
 
@@ -145,13 +146,23 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- SENSOR-B2-I14 COMPLETE — provider-role decision packet frozen (12-16 +
-  `source_promotion_candidates.yaml`).  Bloc 2 is awaiting OPERATOR RATIFICATION
-  of the I14 decision; `bloc_03_implementation_authorized = FALSE` and
-  `next_checkpoint_authorized = FALSE` until then.
-  - Bloc 3 adapter work may consume ONLY `source_promotion_candidates.yaml`
-    (17 evidence-backed candidates) — nothing else promotes a source.
+- SENSOR-B2-RATIFY COMPLETE — operator RATIFIED the Bloc 2 provider-role
+  decision (PASS_BLOC_02_WITH_SENSOR_GAPS, co-earned
+  PASS_BLOC_02_FREE_ONLY_REDUNDANCY).  Bloc 2 = IMPLEMENTATION COMPLETE /
+  OPERATOR RATIFIED.  `bloc_03_implementation_authorized = TRUE` for the
+  common foundation ONLY (SENSOR-B3-I01..I04).
+- SENSOR-B3-I01..I04 = BLOC 3 COMMON FOUNDATION — base models, provider
+  protocol, free-only access gate, request fingerprinting, raw envelope
+  integrity, retry/rate-limit/pagination/resume mechanics, and the common
+  provider conformance suite.  No real provider adapter code yet.
+- Bloc 3 adapter work may consume ONLY `source_promotion_candidates.yaml`
+  (17 evidence-backed candidates across Kraken/Gate/OKX/Deribit) — nothing
+  else promotes a source.  Binance/Bybit/Coinalyze/Bitfinex remain excluded /
+  blocked / corroboration / archive-only per I14.
+- `next_checkpoint_authorized = FALSE` — I05 (Kraken) and any provider
+  adapter await operator review after SENSOR-B3-I04.
   - Full evidence packet: `evidence/bloc_02/` (01-11 evidence; 12-16 decision).
+  - Bloc 3 implementation evidence: `evidence/bloc_03/` (added by I01-I04).
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
