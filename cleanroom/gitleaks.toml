@@ -1,0 +1,17 @@
+# Cleanroom gitleaks configuration.
+#
+# Extends gitleaks' default ruleset (no rules removed, none weakened) and
+# allowlists the .gitleaksignore file itself: its entries contain git commit
+# SHAs by design (fingerprint format <commit>:<file>:<rule>:<line>), which the
+# default generic-key rule would otherwise flag. The ignore list is the
+# operator-reviewable record of verified false positives.
+#
+# Every other path in the repository is scanned with the default rules.
+
+title = "cleanroom"
+
+[extend]
+useDefault = true
+
+[allowlist]
+paths = ['''\.gitleaksignore''']

@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "description": "Expected-state contract for the rerunnable cleanroom verifier (cleanroom/verifier.py). All SHAs are the F13 observation snapshot; the verifier compares live state against them and records advances.",
+  "generated_utc": "2026-08-30T14:05:00Z",
+
+  "repository": {
+    "expected_origin_url": "https://github.com/dabiggestpoppa/larger-lab.git",
+    "expected_remote": "origin",
+    "expected_cleanroom_branch": "agent/repo-cleanroom"
+  },
+
+  "subject": {
+    "tested_subject_commit": "0abf7d68c6b81411d85286a29da8a3e15f3bff96",
+    "note": "Pinned at F14 write time. Authoritative CI runs pass --subject <commit> (the F15 implementation commit). Omit --subject to validate current HEAD; the actual tested commit is always recorded in the output.",
+    "subject_source": "CLI --subject | CR_SUBJECT env | expected-state.tested_subject_commit | HEAD"
+  },
+
+  "main": {
+    "expected_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+    "strict_exact_match": true,
+    "note": "main must remain exactly this SHA. If unrelated operator work moves it, this check FAILs and the observation is reported without altering main."
+  },
+
+  "protected_branches": [
+    "oce",
+    "oce-program-build",
+    "oce-full-program-planning-books-2-10",
+    "master",
+    "agent/crypto-quant-foundry",
+    "agent/crypto-sensor-fabric-build",
+    "agent/crypto-sensor-fabric-plan",
+    "grant-sector-g1-production",
+    "qcae-capability-acquisition-engine",
+    "tb-forward-engine"
+  ],
+  "protected_branches_note": "main has its own exact-match check; agent/repo-cleanroom is the worktree branch (subject check). Expected SHAs for these names come from branch-reference-manifest.json remote_heads (F13 observation snapshot).",
+
+  "manifests": {
+    "branch_reference": "cleanroom/evidence/branch-reference-manifest.json",
+    "restored_files": "cleanroom/evidence/restored-file-manifest.json",
+    "cleanup_manifest": "repo_cleanup_branch_manifest.json"
+  },
+
+  "restored_files": {
+    "scope_note": "Files listed in restored-file-manifest.json (50 Quant/CEREBUS/P90 files). Verified against working tree: existence + SHA-256 match + git blob match vs main.",
+    "reference_branch": "main"
+  },
+
+  "trash": [
+    {
+      "path": "C:/Users/wifik/Desktop/projects/.trash-larger-lab-duplicate",
+      "min_size_bytes": 1000000000,
+      "required": true,
+      "note": "duplicate clone held for operator review; permanent deletion requires AUTHORIZED_STAGE=CLEANROOM-PERMANENT-DELETE"
+    },
+    {
+      "path": "C:/Users/wifik/Desktop/projects/.trash-legacy-worktrees",
+      "min_size_bytes": 0,
+      "required": true,
+      "note": "leftover legacy worktree dirs held in trash; contains a broken symlink (data -> /c/C:/...), so byte-count is 0 - existence is the requirement"
+    }
+  ],
+
+  "stash": {
+    "expected_count": 15,
+    "expected_list": [
+      "stash@{0}: On oce: pre-cleanup stash: test_regression.py modification",
+      "stash@{1}: WIP on oce: 64f7c754 B1-I1R3H: confine adversarial --only engine runs to scratch dir",
+      "stash@{2}: WIP on tv-review: 9af94e8e B1-I1R3H: pin ansible-compat==4.1.11 in CI workflow",
+      "stash@{3}: WIP on oce: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+      "stash@{4}: WIP on agent/crypto-quant-foundry: f41e9c09 CRYPTO-DATA-1: canonical collector foundation",
+      "stash@{5}: WIP on oce-recovery: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+      "stash@{6}: WIP on agent/crypto-quant-foundry: f41e9c09 CRYPTO-DATA-1: canonical collector foundation",
+      "stash@{7}: WIP on oce: b517132d B1-I1R2: repair cloud-ground verification integrity",
+      "stash@{8}: WIP on oce/block-1-i1r2-verification-closure: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+      "stash@{9}: WIP on agent/shallow-well-foundry-ctbt-t1: f3c6aca2 SW-CTBT-T4.1-FORWARD-COLLECTOR-AND-TRANSFER-DASHBOARD-ACTIVATION",
+      "stash@{10}: WIP on agent/deepers-strategy-foundry: f764f8b6 PFT-B3: seal mathematical and causality conformance",
+      "stash@{11}: On main: D01 work",
+      "stash@{12}: WIP on main: 2ef20eb5 P0-REPAIR-01: Truthful state repair and fail-closed gates",
+      "stash@{13}: WIP on main: 2ef20eb5 P0-REPAIR-01: Truthful state repair and fail-closed gates",
+      "stash@{14}: On master: Worktree changes before GLX FORGE migration"
+    ],
+    "note": "All stashes retained; zero dropped. Verified read-only via git stash list."
+  },
+
+  "lfs": {
+    "cache_dir_hint": ".git/lfs",
+    "min_cache_size_bytes": 1000000000,
+    "expected_tracked_counts": {
+      "agent/repo-cleanroom": 0,
+      "main": 0,
+      "oce": 0,
+      "agent/crypto-quant-foundry": 82
+    },
+    "prune_forbidden": true,
+    "note": "LFS cache must be retained (no prune). git lfs status / git lfs ls-files are read-only."
+  },
+
+  "gitleaks": {
+    "required": true,
+    "min_version": "8.18.1",
+    "config": "cleanroom/gitleaks.toml",
+    "scan_base": "main",
+    "scan_scope": "cleanroom commits (scan_base..HEAD): answers whether the cleanroom introduced credentials",
+    "binary_paths": [
+      "C:/Users/wifik/Desktop/projects/.cleanroom-tools/gitleaks.exe"
+    ],
+    "note": "Repository CI contract (b1-i1r3-validation.yml on oce lineage) and the cleanroom CI both use gitleaks. Resolution order: GITLEAKS_BIN env, binary_paths, PATH. If the binary is unavailable the check is BLOCKED (mandatory) - a regex fallback scan is recorded separately and is NOT equivalent."
+  },
+
+  "not_run_suites": [
+    { "id": "protected_suites_oce_b1_i1r", "suite": "OCE B1-I1R protected-branch test suites (b1-i1r-validation.yml, b1-i1r3-validation.yml on oce lineage)", "reason": "intentionally NOT run on cleanroom branch; integrity verified by unchanged refs" },
+    { "id": "protected_suites_grant", "suite": "grant-sector-g1-production worktree test suite", "reason": "intentionally NOT run; worktree untouched" },
+    { "id": "protected_suites_crypto", "suite": "agent/crypto-quant-foundry + sensor-fabric test suites", "reason": "intentionally NOT run; branches verified by unchanged refs" },
+    { "id": "protected_suites_tb", "suite": "tb-forward-engine test suite", "reason": "intentionally NOT run; branch verified by unchanged refs" }
+  ],
+
+  "doc_links_scope": {
+    "include_rule": "top-level .md (no '/') + docs/ + cleanroom/ + CLEANROOM_*.md",
+    "skip_link_prefixes": ["http://", "https://", "mailto:", "ftp:", "#"],
+    "skip_absolute_paths": true,
+    "note": "Links beginning with '/' are workspace-runtime framework links (e.g. /reference/AGENTS.default) and are not repo files. Third-party content (.agents/skills, projects/ai-tools) is out of scope."
+  },
+
+  "check_overrides": {
+    "fsck_timeout_seconds": 900,
+    "gitleaks_timeout_seconds": 900,
+    "fsck_note": "git fsck --no-dangling is read-only; on a large local repo it may take ~2 minutes."
+  }
+}

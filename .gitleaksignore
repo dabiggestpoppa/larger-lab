@@ -1,0 +1,8 @@
+# Gitleaks false-positive ignores for the cleanroom evidence.
+# Format: <commit>:<file>:<rule>:<line>
+#
+# b0cac784 (CLEANROOM-F13) branch-reference-manifest.json:
+#   "capital-routing": "43a6473c1bc01bb79efd3b415e482d65640e1226"
+#   The matched value is a git commit SHA (the restored branch's head), not a
+#   credential. Reviewed and classified as a false positive.
+b0cac78400d572b3b8f9c12f9bee9639f6b6f077:cleanroom/evidence/branch-reference-manifest.json:generic-api-key:23
