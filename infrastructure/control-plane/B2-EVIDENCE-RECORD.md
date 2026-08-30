@@ -126,6 +126,23 @@ Earlier history (B2-R5/R6, superseded): `33323109626` FAIL, `33323293374` FAIL, 
 - Book 2 CI is authoritative: `b2-control-plane-validation` on `oce-program-build`, zero skips enforced by the independent gate
 - R10 evidence-only commit: `(see git log — B2-R10: archive authoritative durable control-plane evidence)`
 
+## Book 2 ratification (B3 preamble)
+
+- **Commit:** `(first Book 3 commit — see git log, message `B2: ratify durable control-plane checkpoint`)`
+- **Decision:** `RATIFIED / GATED_COMPLETE`
+- **Frozen contracts:**
+  - PostgreSQL authority contract (pg_store `0001`–`0003`; PG authoritative, Redis transport-only)
+  - Redis transport boundary (disposable, reconstructable from PG, never sole truth)
+  - Migration history (`0001`–`0003`, numbered & reversible)
+  - API contracts (FastAPI loopback-only, auth on all endpoints except health)
+  - Authority and denial behavior (grants, denials, service-boundary checks)
+  - Scheduler semantics (PG-persisted, advisory-lock duplicate prevention, restart recovery)
+  - Local lifecycle (`oce_local` CLI, ephemeral secret, PID-file ownership, durable volume)
+  - Evidence model (23-step runner, JUnit-parsing gate, manifest-`last`, read-only verifier)
+  - PO/Hermes separation
+  - Cloud-dormant posture (mutations 0, cost `$0`)
+- **Nullification constraint:** Book 3 may extend Book 2 but may not silently weaken it.
+
 ## Result: `READY_FOR_OPERATOR_REVIEW`
 
-Book 2 control plane is implemented, hardened, tested, and durably archived. Book 3 has not been started. Cloud remains deferred.
+Book 2 control plane is implemented, hardened, tested, durably archived, and now **RATIFIED**. Book 3 (Worker Fabric) begins from here. Cloud remains deferred.
