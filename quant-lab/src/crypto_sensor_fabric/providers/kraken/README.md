@@ -3,10 +3,11 @@
 Provider package for `KRAKEN_FUTURES` — the FIRST production provider adapter
 built on the Bloc 3 common foundation (SENSOR-B3-I01..I04R2).
 
-**Checkpoint verdict:** `PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE` (pending
-operator review) — production code + offline fixtures + common conformance only.
-**No live network validation occurred in I05** (reserved for the opt-in tiny
-network smoke at SENSOR-B3-I14).
+**Checkpoint verdict:** `PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE` then
+`PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED` (pending operator review) —
+production code + offline fixtures + common conformance only.
+**No live network validation occurred in I05 / I05R1** (reserved for the opt-in
+tiny network smoke at SENSOR-B3-I14).
 
 ## Role
 
@@ -65,9 +66,41 @@ canonical typed `CapabilityUnavailable`.
   account credentials, no signing secrets, no wallet interaction.
 - Registry policy: `DEFAULT_FREE_ONLY_POLICY` (FREE_AUTOMATED, $0, no payment/
   staking/transaction requirement).
-- `list_instruments` returns an explicit **configured** native instrument scope
-  (`PI_XBTUSD`, `PI_ETHUSD`, `PI_SOLUSD`, `PI_DOGEUSD`) from the Bloc 2 probe
-  instrument map — I05 does NOT invent an instrument-discovery endpoint.
+- `list_instruments` returns `KRAKEN_PRODUCTION_INSTRUMENT_SCOPE`
+  (`PI_XBTUSD`, `PI_ETHUSD`) — a **configured production evidence scope**, NOT
+  live provider discovery (no discovery endpoint was invented).
+
+### Production vs probe instrument scope
+
+- **Production** (`KRAKEN_PRODUCTION_INSTRUMENT_SCOPE`): evidence-backed union
+  `{PI_XBTUSD, PI_ETHUSD}` derived from committed Bloc 2 evidence.
+- **Probe** (`KRAKEN_PROBE_INSTRUMENT_SCOPE`): the Bloc 2 probe universe
+  `{PI_XBTUSD, PI_ETHUSD, PI_SOLUSD, PI_DOGEUSD}` — retained for
+  characterization history, never exposed as production support.
+- Sensor-specific `symbol_scope` per capability (from evidence): OI =
+  `{PI_XBTUSD, PI_ETHUSD}`; basis / book_metric / funding / liquidation /
+  positioning = `{PI_XBTUSD}`.  A supported sensor with a symbol outside ITS
+  scope fails typed `InvalidInstrument` BEFORE transport (`OI(PI_ETHUSD)`
+  passes; `BASIS(PI_ETHUSD)` fails).  `PI_SOLUSD` / `PI_DOGEUSD` fail
+  production requests on every promoted sensor.
+
+### Request boundary guards
+
+- `FetchRequest.provider_id != KRAKEN_FUTURES` → typed `ProviderSemanticError`
+  before any transport call (same for `InstrumentListRequest`).
+- Named fetch methods enforce method identity: `fetch_funding` requires
+  `MECHANICAL_FUNDING`, etc.  Mismatch → typed `ProviderSemanticError` before
+  transport; use `dispatch_fetch` for generic routing.
+- `transport=None` → typed `ProviderUnavailable` naming the REQUESTED sensor
+  (never a hard-coded placeholder sensor).
+
+### Granularity
+
+- `request.granularity=None` → documented default 1h (`interval=3600`).
+- Explicit supported member → exact interval mapping
+  {60,300,900,1800,3600,14400,43200,86400,604800} seconds.
+- Explicit unsupported member (e.g. `RAW_EVENT`, `BOOK_SNAPSHOT`) → typed
+  `UnsupportedGranularity` BEFORE transport — never silently mutated to 1h.
 
 ## History
 
@@ -143,8 +176,17 @@ Common fail-closed policy per sensor, grounded in 09_SCHEMA_FINGERPRINTS.jsonl:
 - KNOWN_SCHEMA → parsed native rows allowed.
 - ADDITIVE_SCHEMA_CHANGE → flagged (`SCHEMA_ADDITIVE`), parsed output allowed
   only while required semantics remain intact.
-- BREAKING / UNKNOWN → raw evidence preserved; parsed output BLOCKED
-  (`SchemaDrift`).  Missing fields are never `dict.get(field, 0)`-defaulted.
+- BREAKING / UNKNOWN → parsed output BLOCKED (`SchemaDrift`); the error
+  carries `raw_payload_envelope` — the immutable preserved raw body, content
+  hash, provider, sensor, request fingerprint and retrieval metadata,
+  materialized BEFORE the parse decision (proven per-sensor in tests).
+  Missing fields are never `dict.get(field, 0)`-defaulted.
+- Structural cardinality is fail-closed: list-shaped analytics (OI /
+  positioning / liquidation) with `len(timestamp) != len(data)` are
+  `BREAKING_SCHEMA_CHANGE` in both directions (no None-padding, no
+  truncation); dict-shaped metrics enforce the same per column.  A
+  provider-declared null inside a correctly-sized bucket (e.g. book_metric
+  `slippage1m: [None]`) stays native data.
 
 Fingerprint shapes per path: OI `data: list[list[str]]`; funding
 `data: dict{rate, relativeRate}` (each `list[list[str]]`); basis
@@ -166,10 +208,13 @@ metric lists).
 4. **Liquidation methodology** is `kraken-market-analytics-liquidation-volume`
    (analytics family) — never merged numerically with trade-level `/history`
    `type=liquidation` rows.
-5. **OI instrument scope** — evidence-backed for `PI_XBTUSD` and `PI_ETHUSD`;
-   `PI_SOLUSD` / `PI_DOGEUSD` are the configured probe scope, not promoted
-   claims.
-6. **No live validation** — all I05 behavior is offline (fake transport).
+5. **Instrument scope** — production `{PI_XBTUSD, PI_ETHUSD}` (OI both; the
+   other five sensors `{PI_XBTUSD}`).  `PI_SOLUSD` / `PI_DOGEUSD` remain the
+   probe-only universe, not production support.
+6. **Granularity enum limitation** — provider resolutions the Fabric enum
+   cannot represent (30m / 12h / 1w style buckets) are recorded, not invented.
+7. **No live validation** — all I05 / I05R1 behavior is offline (fake
+   transport).
 
 ## Fixtures
 

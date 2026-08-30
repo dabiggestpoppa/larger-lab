@@ -1,7 +1,8 @@
 # SENSOR-B3-I05 — Kraken Futures Production Adapter Implementation Evidence
 
-**Checkpoint verdict:** `PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE` (pending
-operator review).  **This is NOT a global Bloc 3 PASS.**
+**Checkpoint verdict:** `PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE` (I05) then
+`PASS_SENSOR_B3_I05R1_KRAKEN_BOUNDARY_HARDENED` (I05R1 repair; pending operator
+review).  **This is NOT a global Bloc 3 PASS.**
 
 **Operator authorization:** `SENSOR-B3-I05 — KRAKEN_FUTURES` only.
 `SENSOR-B3-I06 (Gate) is NOT authorized`.  `provider_adapter_implementation_authorized
@@ -15,7 +16,7 @@ operator review).  **This is NOT a global Bloc 3 PASS.**
 | adapter_version | `kraken-adapter-v1` |
 | provider | `KRAKEN_FUTURES` |
 | package | `quant-lab/src/crypto_sensor_fabric/providers/kraken/` |
-| implementation head | `490cd111` (SENSOR-B3-I05B) |
+| implementation head | `490cd111` (SENSOR-B3-I05B) + `17e70035` (SENSOR-B3-I05R1A) + `a1e191ea` (SENSOR-B3-I05R1B) |
 | network_smoke_status | `NOT_RUN` (reserved for SENSOR-B3-I14) |
 
 ## Supported sensor paths (exactly six, I14-promoted)
@@ -80,6 +81,60 @@ Analytics types: OI `open-interest`, funding `funding`, basis `future-basis`,
 positioning `long-short-ratio`, book metric `orderbook`, liquidation
 `liquidation-volume`.
 
+## Production instrument scope (I05R1 — repair 1/8)
+
+Production support derives ONLY from committed promoted evidence.  The Bloc 2
+probe universe (`NATIVE_INSTRUMENTS` incl. `PI_SOLUSD` / `PI_DOGEUSD`) is a
+probe/control scope and is NOT production capability.
+
+| scope | symbols | basis |
+|---|---|---|
+| `KRAKEN_PRODUCTION_INSTRUMENT_SCOPE` | `{PI_XBTUSD, PI_ETHUSD}` | evidence-backed union (08_HISTORY_BOUNDARIES.csv per-sensor rows; 09_SCHEMA_FINGERPRINTS.jsonl; 10_CAPABILITY_CLAIMS.jsonl) |
+| `KRAKEN_PROBE_INSTRUMENT_SCOPE` | `{PI_XBTUSD, PI_ETHUSD, PI_SOLUSD, PI_DOGEUSD}` | Bloc 2 probe universe, retained for characterization only |
+
+### Sensor-specific symbol scopes (from evidence, not one global list)
+
+| sensor | symbol_scope | basis |
+|---|---|---|
+| MECHANICAL_OPEN_INTEREST | `{PI_XBTUSD, PI_ETHUSD}` | OI evidence IDs exist for both (per-instrument history boundaries verified 2024+ for BTC and ETH) |
+| MECHANICAL_BASIS | `{PI_XBTUSD}` | basis evidence IDs observed only for `pi_xbtusd` |
+| MECHANICAL_BOOK_METRIC | `{PI_XBTUSD}` | book-metric evidence IDs observed only for `pi_xbtusd` |
+| MECHANICAL_FUNDING | `{PI_XBTUSD}` | funding evidence IDs observed only for `pi_xbtusd` |
+| MECHANICAL_LIQUIDATION | `{PI_XBTUSD}` | liquidation evidence IDs observed only for `pi_xbtusd` |
+| MECHANICAL_POSITIONING | `{PI_XBTUSD}` | positioning evidence IDs observed only for `pi_xbtusd` |
+
+Each symbol is proven through the sensor's OWN `ProviderNativeCapabilityEvidence`
+grant (`instruments` field), which resolves into the I14 evidence basis.  A
+request for a supported sensor with a symbol NOT in that sensor's scope fails
+typed `InvalidInstrument` BEFORE transport (e.g. `OI(PI_ETHUSD)` passes;
+`BASIS(PI_ETHUSD)` fails typed).  `PI_SOLUSD` / `PI_DOGEUSD` fail production
+requests on every promoted sensor unless evidence proves them.
+
+`list_instruments()` returns `KRAKEN_PRODUCTION_INSTRUMENT_SCOPE` — a
+configured production evidence scope, explicitly NOT live provider discovery
+(no discovery endpoint was invented; documented in README).
+
+## Request boundary guards (I05R1 — repairs 2/6/7)
+
+| guard | behavior |
+|---|---|
+| request provider identity | `FetchRequest.provider_id != KRAKEN_FUTURES` → typed `ProviderSemanticError` BEFORE transport; same for `InstrumentListRequest` |
+| named-method / sensor identity | `fetch_funding` requires `MECHANICAL_FUNDING`, etc.; mismatch → typed `ProviderSemanticError` BEFORE transport; `dispatch_fetch` remains the generic route |
+| no-transport | `transport=None` → typed `ProviderUnavailable` naming the REQUESTED sensor (never a hard-coded placeholder) |
+
+All three fail with zero transport calls.
+
+## Granularity support matrix (I05R1 — repair 3)
+
+`request.granularity=None` → documented default 1h (`interval=3600`).  Explicit
+supported member → exact mapping (60,300,900,1800,3600,14400,43200,86400,604800
+seconds).  Explicit unsupported member (e.g. `RAW_EVENT`, `BOOK_SNAPSHOT`, or
+any future enum member) → typed `UnsupportedGranularity` BEFORE transport;
+never silently mutated to 1h.  Every `Granularity` enum member is covered by
+tests.  Fabric resolutions the provider supports but the enum cannot represent
+(30m / 12h / 1w style buckets) are recorded as a limitation, not added to the
+enum.
+
 ## Methodology pins (frozen per I14, unchanged)
 
 See "Supported sensor paths" above.
@@ -117,10 +172,12 @@ NO new network call was made to obtain any fixture.
 
 - Q0: provider metadata ✓ registry/free-only ✓ capability sensor-specific ✓
   evidence refs resolve ✓ promotion bounds ✓ native-mode evidence ✓
+  symbol-scope gate (declared symbol scope requires grant proof) ✓
   behavioral dispatch ✓
 - Q1: raw payload preserved ✓ empty-valid distinct ✓ schema drift fail-closed ✓
 - Q2: retry classification ✓ resume deterministic ✓ native instrument required ✓
-- **Result: 0 failed** (see `test_adapter.py::TestProductionCandidateConformance`).
+- **Result: 0 failed** (see `test_adapter.py::TestProductionCandidateConformance`;
+  re-run at I05R1 head with all boundary guards enabled).
 - NOT run under FRAMEWORK_TEST mode (forbidden for a real provider adapter).
 
 ## Provider-specific tests
@@ -155,8 +212,38 @@ NO new network call was made to obtain any fixture.
 
 - KNOWN parses; ADDITIVE flagged (`SCHEMA_ADDITIVE`); BREAKING/UNKNOWN block
   (`SchemaDrift`) with raw preserved; no zero coercion anywhere.
-- Adversarial: short metric column blocks; unknown envelope blocks; every
-  drift fixture blocks parsed output per sensor.
+- Adversarial: unknown envelope blocks; every drift fixture blocks parsed
+  output per sensor.
+
+### Schema-drift raw preservation — BEHAVIORAL PROOF (I05R1 — repair 4)
+
+The Kraken adapter now materializes the immutable `RawPayloadEnvelope` BEFORE
+the parse decision.  For every promoted sensor, feeding the BREAKING/UNKNOWN
+fixture:
+
+- raises typed `SchemaDrift`;
+- `SchemaDrift.raw_payload_envelope` is present and carries `provider_id` =
+  `KRAKEN_FUTURES`, the correct `sensor_family`, the exact `request_fingerprint`,
+  `content_hash` matching the preserved raw body (deterministic across runs),
+  `schema_state` BREAKING or UNKNOWN, retrieval metadata and the resolving I14
+  `evidence_ref`;
+- zero parsed semantic rows are emitted.
+
+This is asserted per-sensor in `TestSchemaDriftRawEnvelope`; the common
+`AcquisitionError.raw_payload_envelope` attachment (provider-independent,
+backward compatible, other error types default `None`) is covered by
+`TestRawFailureEnvelope` in the base conformance suite.
+
+### List-cardinality fail-closed (I05R1 — repair 5)
+
+List-shaped analytics (OI / positioning / liquidation): `len(timestamp) !=
+len(data)` is `BREAKING_SCHEMA_CHANGE` in BOTH directions — no `None` padding,
+no truncation, no manufactured buckets.  Dict-shaped metrics (funding / basis /
+book metric) enforce the same symmetric cardinality per metric column.
+Provider-declared null VALUES inside a correctly-sized bucket (e.g.
+book_metric `slippage1m: [None]`) remain native provider data — structural
+absence is not treated as provider null.  Tested per sensor at parser and
+adapter level.
 
 ## Resume result
 
@@ -187,9 +274,13 @@ NO new network call was made to obtain any fixture.
 3. Rate-limit capacity unknown → `RateLimitSnapshot(limit_known=False)`.
 4. Liquidation = analytics `liquidation-volume` methodology; never merged with
    trade-level anatomy.
-5. Instrument scope: `PI_XBTUSD`/`PI_ETHUSD` evidence-backed (OI both);
-   `PI_SOLUSD`/`PI_DOGEUSD` are configured probe scope, not promoted claims.
-6. No live validation; all I05 behavior offline.
+5. Provider resolutions the Fabric `Granularity` enum cannot represent
+   (30m / 12h / 1w style buckets) are recorded, not added to the enum.
+6. No live validation; all I05 / I05R1 behavior offline.
+
+(I05's probe-scope note is superseded by the formal production/probe
+separation above: `PI_SOLUSD` / `PI_DOGEUSD` remain available to Bloc 2
+characterization history but are never exposed as production support.)
 
 ## Promotion / readiness status
 
@@ -211,4 +302,7 @@ NO new network call was made to obtain any fixture.
 
 - implementation head: `490cd111` (SENSOR-B3-I05B).
 - evidence/README/readiness/ledger commit: `f5295a8e` (SENSOR-B3-I05C);
-  reconciliation record: SENSOR-B3-I05R.
+  reconciliation record: SENSOR-B3-I05R (`254716bd`).
+- I05R1: `17e70035` (I05R1A — production request + instrument boundaries),
+  `a1e191ea` (I05R1B — raw drift envelope + parser cardinality),
+  (I05R1C — evidence/README/readiness/ledger reconciliation).
