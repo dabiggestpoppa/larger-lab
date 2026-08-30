@@ -123,6 +123,7 @@ EXPECTED_MEMBERS: dict[str, set[str]] = {
         "F_CLIENT_4XX",
         "F_ENDPOINT_REMOVED",
         "F_ARCHIVE_NOT_FOUND",
+        "F_REQUIRED_ARTIFACT_MISSING",
         "F_SYMBOL_NOT_FOUND",
         "F_PRE_LISTING",
         "F_HISTORY_TRUNCATED",

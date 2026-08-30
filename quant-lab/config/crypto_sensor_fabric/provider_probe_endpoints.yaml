@@ -134,16 +134,23 @@ providers:
       equivalence remains corroboration-classified pending live evidence.
 
   BITFINEX_COMMUNITY_ARCHIVE:
-    archive_base_url: "https://example.invalid/bitfinex-community-liquidation-archive"
+    repository_url: "https://github.com/tradingstrategy-ai/bitfinex-liquidations"
+    repository_api_url: "https://api.github.com/repos/tradingstrategy-ai/bitfinex-liquidations"
+    dump_path: "bitfinex_liquidations.duckdb"
+    dump_storage: GIT_LFS
     access: COMMUNITY_ARCHIVE
     endpoints:
-      MECHANICAL_LIQUIDATION: "archive daily dump liquidations/{YYYY-MM-DD}.csv"
+      MECHANICAL_LIQUIDATION: "Git-LFS DuckDB dump bitfinex_liquidations.duckdb (whole-opaque artifact)"
     notes: >
-      COMMUNITY_ARCHIVE replication source — never EXACT_EQUIVALENT to
-      first-party interval liquidation totals; expected role is corroboration /
-      replication with evidence class COMMUNITY_ARCHIVE (T2-COV-05 / master §14).
-      License, checksum manifest and generation methodology are required before
-      any promotion; dumps often mix spot-margin liquidations with derivatives,
-      so per-dump semantics inspection is mandatory.  Base URL is deliberately
-      UNVERIFIED here — the live probe records the reachable root before any
-      promotion decision.  No authentication; free public archive only.
+      The real community source is the public GitHub replication repository
+      tradingstrategy-ai/bitfinex-liquidations — a single Git-LFS DuckDB dump,
+      NOT a daily CSV tree and NOT Bitfinex first-party.  COMMUNITY_ARCHIVE
+      evidence class; corroboration / replication role, never EXACT_EQUIVALENT
+      to first-party interval liquidation totals (T2-COV-05 / master §14).
+      License (MIT), README methodology, .gitattributes LFS pointer and
+      upstream commit SHA must be recorded before promotion.  The dump mixes
+      spot/margin AND perpetual market types — never label the whole DB
+      PERPETUAL_LIQUIDATIONS.  No upstream checksums.txt exists; integrity
+      evidence is the Git LFS OID + commit SHA + declared size.  No automatic
+      multi-hundred-MB download during probing; the LFS pointer is the fixture.
+      Live access remains UNVERIFIED until SENSOR-B2-I13 evidence.

@@ -1,0 +1,4 @@
+version https://git-lfs.github.com/spec/v1
+oid sha256:90b5d550df057fde1b5a66b5ae9b3de256814ce347bdc5ccc05c7bb9f74e2989
+size 355217408
+# fixture sentinel: not a real LFS object; stands in for the DuckDB artifact
