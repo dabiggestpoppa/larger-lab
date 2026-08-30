@@ -61,9 +61,9 @@ from .models import (
     RawPayloadEnvelope,
     ResumeToken,
 )
-from .retry import RetryPolicy, classify_retryability
+from .retry import RetryPolicy, classify_retryability, is_retryable
 from .schema import assert_no_zero_coercion, assess_schema
-from .protocol import MechanicalProviderAdapter
+from .protocol import MechanicalProviderAdapter, dispatch_fetch
 
 
 @dataclass(frozen=True)
@@ -92,6 +92,17 @@ class AdapterUnderTest:
     registry_policy: FreeOnlyPolicy
     auth_mode: AdapterAuthMode = AdapterAuthMode.NO_AUTH
     promoted_capabilities: ProviderCapabilities | None = None
+    #: Deterministic offline conformance requests used to exercise the REAL
+    #: adapter method-dispatch path (I04R2 Issue 1).  The common suite invokes
+    #: the adapter and asserts behavior; it never fabricates the result itself.
+    empty_valid_request: FetchRequest | None = None
+    #: A request for a sensor the adapter declares UNSUPPORTED — dispatch must
+    #: yield a typed CapabilityUnavailable, never []/0/None/EMPTY_VALID.
+    unsupported_request: FetchRequest | None = None
+    #: A request for a SUPPORTED sensor whose fixture is any normal non-empty
+    #: response from the fake provider, used to prove the dispatch path returns
+    #: a valid FetchBatch (Issue 2).
+    fetch_request: FetchRequest | None = None
     #: Fail-closed default: a PRODUCTION_CANDIDATE run (the only allowed mode
     #: for a real adapter) REQUIRES promotion bounds.  FRAMEWORK_TEST must be
     #: chosen explicitly by internal self-tests.
@@ -171,6 +182,20 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
 
     _run_check(results, "q0_production_promotion_required", check_production_promotion_required)
 
+    def check_promotion_provider_identity() -> tuple[bool, str]:
+        """I04R2 Issue 5: the adapter provider identity must equal the bound."""
+        promoted = adapter_under_test.promoted_capabilities
+        if promoted is None or adapter_under_test.mode is not AdapterConformanceMode.PRODUCTION_CANDIDATE:
+            return True, "no promotion provider to compare (framework/absent)"
+        if promoted.provider_id != adapter.provider_id:
+            return False, (
+                f"promotion bound provider {promoted.provider_id!r} != adapter "
+                f"{adapter.provider_id!r}"
+            )
+        return True, f"promotion provider id matches adapter ({adapter.provider_id})"
+
+    _run_check(results, "q0_promotion_provider_identity", check_promotion_provider_identity)
+
     def check_promotion_bounds() -> tuple[bool, str]:
         promoted = adapter_under_test.promoted_capabilities
         if promoted is None:
@@ -188,6 +213,47 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
         return True, "adapter capabilities stay within I14 promotion bounds"
 
     _run_check(results, "q0_promotion_bounds", check_promotion_bounds)
+
+    def check_evidence_ref_resolves() -> tuple[bool, str]:
+        """I04R2 Issue 5: the probe evidence ref must RESOLVE to I14 evidence.
+
+        Not just non-None and not just 'basis is a superset' — the primary
+        evidence pointer must match the adapter provider + the sensor being
+        declared and its evidence_id must be one of that I14 candidate's
+        evidence_basis IDs.  A correct evidence_basis with an unrelated
+        primary ref must NOT pass.
+        """
+        promoted = adapter_under_test.promoted_capabilities
+        failures: list[str] = []
+        for sensor, declared in caps.sensors.items():
+            if not declared.supported:
+                continue
+            ref = declared.probe_evidence_ref
+            if ref is None:
+                failures.append(f"{sensor.value}: no probe_evidence_ref")
+                continue
+            if ref.provider_id != adapter.provider_id:
+                failures.append(
+                    f"{sensor.value}: evidence ref provider {ref.provider_id!r} != "
+                    f"adapter {adapter.provider_id!r}"
+                )
+            if ref.sensor_family != sensor:
+                failures.append(
+                    f"{sensor.value}: evidence ref sensor {ref.sensor_family} != "
+                    f"declared {sensor}"
+                )
+            if promoted is not None:
+                bound = promoted.capability_for(sensor)
+                if bound.supported and ref.evidence_id not in bound.evidence_basis:
+                    failures.append(
+                        f"{sensor.value}: evidence ref id {ref.evidence_id!r} is "
+                        "not in the I14 evidence_basis for this sensor"
+                    )
+        if failures:
+            return False, "; ".join(failures)
+        return True, "every supported evidence ref resolves to I14 lineage"
+
+    _run_check(results, "q0_evidence_ref_resolves", check_evidence_ref_resolves)
 
     # ---- Q1 PARSER / RAW -------------------------------------------------
     def check_raw_payload_preserved() -> tuple[bool, str]:
@@ -211,47 +277,53 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
 
     _run_check(results, "q1_raw_payload_preserved", check_raw_payload_preserved)
 
-    def check_empty_valid_distinct() -> tuple[bool, str]:
-        """Repair 5: behavioral — SUPPORTED returns explicit EMPTY_VALID,
-        UNSUPPORTED returns a typed CapabilityUnavailable.  Never []/0/None."""
-        supported = SensorFamily.MECHANICAL_FUNDING
-        unsupported = SensorFamily.MECHANICAL_BASIS
-        caps_decl = caps
+    def check_behavioral_dispatch() -> tuple[bool, str]:
+        """I04R2 Issue 2: dispatch via adapter's real fetch method returns a
+        valid FetchBatch for a supported sensor (never a silent substitute)."""
+        request = adapter_under_test.fetch_request
+        if request is None:
+            return False, "conformance requires a fetch_request to exercise dispatch"
+        batch = dispatch_fetch(adapter, request)
+        if not isinstance(batch, FetchBatch):
+            return False, f"dispatch returned {type(batch).__name__}, expected FetchBatch"
+        if batch.provider_id != adapter.provider_id:
+            return False, f"batch provider {batch.provider_id!r} != adapter provider"
+        if batch.sensor_family != request.sensor_family:
+            return False, "batch sensor family != request sensor family"
+        return True, f"dispatch returned a valid {batch.sensor_family.value} FetchBatch"
 
-        found_supported = any(
-            s == supported and sen.supported for s, sen in caps_decl.sensors.items()
-        )
-        # build a trivial supported capability to drive behavior
-        empty_batch = FetchBatch(
-            provider_id=adapter.provider_id or "conformance",
-            sensor_family=supported,
-            native_instrument_id="PI_XBTUSD",
-            request_fingerprint="fp-empty",
-            requested_start=NOW_FIXTURE,
-            requested_end=NOW_FIXTURE.replace(hour=1),
-            row_count=0,
-            quality_flags=[QualityFlagAcquisition.EMPTY_VALID],
-            retrieved_at=NOW_FIXTURE,
-            adapter_version="0.0.0-conformance",
-        )
-        # The suite proves the harness models EMPTY_VALID explicitly and has a
-        # typed CapabilityUnavailable available; a provider returning a silent
-        # [] without the EMPTY_VALID flag is rejected by the model.
-        if empty_batch.row_count != 0:
+    _run_check(results, "q0_behavioral_dispatch", check_behavioral_dispatch)
+
+    def check_empty_valid_distinct() -> tuple[bool, str]:
+        """I04R2 Issue 1: BEHAVIORAL — SUPPORTED + 0 rows => explicit EMPTY_VALID
+        FetchBatch; UNSUPPORTED => typed CapabilityUnavailable (via dispatch).
+        Never []/0/None for unsupported."""
+        empty_request = adapter_under_test.empty_valid_request
+        if empty_request is None:
+            return False, "conformance requires an empty_valid_request"
+        batch = dispatch_fetch(adapter, empty_request)
+        if not isinstance(batch, FetchBatch):
+            return False, f"supported-empty dispatch returned {type(batch).__name__}"
+        if batch.row_count != 0:
             return False, "EMPTY_VALID batch must have zero rows"
-        if QualityFlagAcquisition.EMPTY_VALID not in empty_batch.quality_flags:
-            return False, "EMPTY_VALID requires the explicit flag"
-        typed = CapabilityUnavailable(
-            provider_id=adapter.provider_id or "conformance",
-            sensor_family=unsupported,
-        )
-        if typed.failure_type != "CapabilityUnavailable":
-            return False, "unsupported must raise a typed CapabilityUnavailable"
-        if not found_supported:
-            return False, "conformance fixture expected a supported funding capability"
+        if QualityFlagAcquisition.EMPTY_VALID not in batch.quality_flags:
+            return False, "EMPTY_VALID requires the explicit quality flag"
+
+        unsupported_request = adapter_under_test.unsupported_request
+        if unsupported_request is None:
+            return False, "conformance requires an unsupported_request"
+        try:
+            dispatch_fetch(adapter, unsupported_request)
+        except CapabilityUnavailable:
+            pass
+        else:
+            return False, (
+                "unsupported sensor returned a batch (must raise typed "
+                "CapabilityUnavailable, never []/0/None/EMPTY_VALID)"
+            )
         return True, (
             "supported + 0 rows = explicit EMPTY_VALID; unsupported = typed "
-            "CapabilityUnavailable (never []/0/None)"
+            "CapabilityUnavailable (via real dispatch; never []/0/None)"
         )
 
     _run_check(results, "q1_empty_valid_distinct", check_empty_valid_distinct)
@@ -311,7 +383,23 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
             got = classify_retryability(error)
             if got is not expected:
                 return False, f"{name}: expected {expected}, got {got}"
-        # bounded retry budget and no geo retry
+        # no retry of geo/access/payment/auth and machine-semantic failures
+        # even when retries remain in the budget
+        policy = RetryPolicy(max_attempts=5)
+        terminal_never_retried = {
+            "geo": GeoRestricted,
+            "access_or_payment": AccessClassViolation,
+            "auth": AuthenticationRequired,
+            "instrument": InvalidInstrument,
+            "history": HistoricalRangeUnavailable,
+            "schema": SchemaDrift,
+            "granularity": UnsupportedGranularity,
+        }
+        for name, cls in terminal_never_retried.items():
+            err = cls("P", SensorFamily.MECHANICAL_TRADE)
+            if is_retryable(err, policy):
+                return False, f"{name} was retried as transient (must be terminal)"
+        # bounded retry budget
         policy = RetryPolicy(max_attempts=3)
         if policy.should_retry(3):
             return False, "retry budget not bounded"
@@ -319,7 +407,8 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
             return False, "budget too small for a retry"
         return True, (
             "I03 retry classifier verified: timeout/429/5xx retryable; "
-            "geo/access/auth/instrument/history/schema terminal; bounded budget"
+            "geo/access/payment/auth/instrument/history/schema terminal and "
+            "never retried; bounded budget"
         )
 
     _run_check(results, "q2_retry_classification", check_retry_classification)

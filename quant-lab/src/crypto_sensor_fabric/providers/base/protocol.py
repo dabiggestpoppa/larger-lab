@@ -88,3 +88,49 @@ def ensure_supported(adapter: MechanicalProviderAdapter, sensor: SensorFamily) -
             sensor_family=sensor,
             detail=f"{sensor.value} is not a supported capability of {adapter.provider_id}",
         )
+
+
+#: Sensor family -> protocol fetch method (SENSOR-B3-I04R2, Issue 2).
+SENSOR_FETCH_METHOD: dict[SensorFamily, str] = {
+    SensorFamily.MECHANICAL_TRADE: "fetch_trades",
+    SensorFamily.MECHANICAL_LIQUIDATION: "fetch_liquidations",
+    SensorFamily.MECHANICAL_OPEN_INTEREST: "fetch_open_interest",
+    SensorFamily.MECHANICAL_FUNDING: "fetch_funding",
+    SensorFamily.MECHANICAL_BOOK_SNAPSHOT: "fetch_book",
+    SensorFamily.MECHANICAL_BOOK_METRIC: "fetch_book_metrics",
+    SensorFamily.MECHANICAL_POSITIONING: "fetch_positioning",
+    SensorFamily.MECHANICAL_BASIS: "fetch_basis",
+}
+
+
+def dispatch_fetch(
+    adapter: MechanicalProviderAdapter, request: FetchRequest
+) -> FetchBatch:
+    """Provider-independent dispatch (SENSOR-B3-I04R2, Issue 2).
+
+    Given a `FetchRequest`, invoke the CORRECT protocol fetch method for the
+    request's sensor family.  This is acquisition mechanics only — no economic
+    normalization.  Unknown/unsupported sensors fail TYPED
+    (`CapabilityUnavailable`), never `[]`/`0`/`None`/an EMPTY_VALID batch.
+
+    Dispatch first gates the request on the adapter's declared capability (so
+    a misbehaving adapter cannot leak an unsupported sensor through), then
+    routes to the protocol method.  Conformance uses this exact path so every
+    future provider adapter must implement its fetch methods consistently.
+    """
+    ensure_supported(adapter, request.sensor_family)
+    method_name = SENSOR_FETCH_METHOD.get(request.sensor_family)
+    if method_name is None:
+        raise CapabilityUnavailable(
+            provider_id=adapter.provider_id,
+            sensor_family=request.sensor_family,
+            detail=f"no protocol fetch method for sensor {request.sensor_family.value}",
+        )
+    method = getattr(adapter, method_name, None)
+    if method is None:
+        raise CapabilityUnavailable(
+            provider_id=adapter.provider_id,
+            sensor_family=request.sensor_family,
+            detail=f"adapter of {adapter.provider_id} lacks fetch method {method_name!r}",
+        )
+    return method(request)

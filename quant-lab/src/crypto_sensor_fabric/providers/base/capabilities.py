@@ -1,4 +1,4 @@
-"""I14 evidence integration (SENSOR-B3-I04 / I04R1).
+"""I14 evidence integration (SENSOR-B3-I04 / I04R1 / I04R2).
 
 The common capability layer references I14 evidence through
 `source_promotion_candidates.yaml` — the ONLY input list Bloc 3 adapter work
@@ -15,19 +15,24 @@ A capability may NEVER be upgraded beyond these bounds during Bloc 3:
 - MECHANISM_MICROSCOPE is not interval aggregate truth
 - PIT_READY_WITH_METHOD_VERSION keeps its methodology pin
 
-Parsing is STRICT (I04R1 Repair 4): an unknown or missing controlled value
-that a promoted capability requires FAILS CLOSED with a ValueError rather
-than being silently defaulted to None.  Only fields the frozen contract
-permits to be NULL (e.g. an empty known_hazards list) stay NULL.
+Parsing is STRICT (I04R1 Repair 4 / I04R2 Issue 6): an unknown or missing
+controlled value, or a structurally malformed promotion file, FAILS CLOSED
+with a ValueError.  Nothing is silently filtered or defaulted; the promotion
+file is a control artifact.
 
-Live vs historical separation (I04R1 Repair 3):
+Live vs historical separation (I04R1 Repair 3 / I04R2 Issues 8-9):
 
-- a HISTORICAL-public-REST record sets `historical_mode` to its historical
-  surface and leaves `live_mode = NONE` (historical evidence does NOT
+- `HistoryScope` carries the coarse I14 frozen label (HISTORICAL /
+  CURRENT_ONLY / ARCHIVE_ONLY / THIRD_PARTY_ARCHIVE) unchanged.
+- `SensorCapability.historical_mode` (the EXACT native acquisition mode) is
+  NOT inferred from the coarse label — the base layer never manufactures
+  e.g. REST_RANGE from HISTORICAL.  A provider adapter supplies the exact
+  native mode later from its own Bloc 2 evidence.
+- a HISTORICAL record sets `live_mode = NONE` (historical evidence does NOT
   auto-grant a live-production contract);
-- a CURRENT_ONLY-public-REST record sets `live_mode = LIVE_REST` and leaves
-  `historical_mode = None` (current snapshot surface, no invented history);
-- an ARCHIVE_ONLY / THIRD_PARTY_ARCHIVE record is historical-only and never
+- a CURRENT_ONLY-public-REST record sets `live_mode = LIVE_REST` (current
+  snapshot surface) with no invented historical depth;
+- an ARCHIVE_ONLY / THIRD_PARTY_ARCHIVE record is historical-only, never
   implies REST or live capability.
 """
 
@@ -46,7 +51,7 @@ from .enums import (
     ALLOWED_AUTH_MODES,
     AdapterAuthMode,
     FreeOnlyStatus,
-    HistoricalMode,
+    HistoryScope,
     LiveMode,
 )
 from .models import AdapterEvidenceRef, ProviderCapabilities, SensorCapability
@@ -61,20 +66,24 @@ DEFAULT_PROMOTION_FILE = (
     / "source_promotion_candidates.yaml"
 )
 
-#: history_mode string -> base historical surface.  Unknown modes fail closed.
-_HISTORY_MODE_SURFACE: dict[str, HistoricalMode] = {
-    "HISTORICAL": HistoricalMode.REST_RANGE,
-    "ARCHIVE_ONLY": HistoricalMode.PUBLIC_OBJECT_STORAGE,
-    "THIRD_PARTY_ARCHIVE": HistoricalMode.THIRD_PARTY_ARCHIVE,
+#: Supported promotion-file schema versions.
+_SUPPORTED_SCHEMA_VERSIONS: frozenset[str] = frozenset({"2.0"})
+
+#: coarse I14 history label -> HistoryScope.  Unknown labels fail closed.
+_HISTORY_SCOPE: dict[str, HistoryScope] = {
+    "HISTORICAL": HistoryScope.HISTORICAL,
+    "CURRENT_ONLY": HistoryScope.CURRENT_ONLY,
+    "ARCHIVE_ONLY": HistoryScope.ARCHIVE_ONLY,
+    "THIRD_PARTY_ARCHIVE": HistoryScope.THIRD_PARTY_ARCHIVE,
 }
 
-#: CURRENT_ONLY public surfaces are current/live acquisition paths.
-_CURRENT_ONLY_SURFACES: dict[str, HistoricalMode] = {
-    "CURRENT_ONLY": HistoricalMode.LIVE_REST_ONLY,
-}
+#: coarse scope labels that imply an archive/object-storage acquisition class.
+_ARCHIVE_SCOPES: frozenset[str] = frozenset(
+    {"ARCHIVE_ONLY", "THIRD_PARTY_ARCHIVE"}
+)
 
 #: access_path string -> auth mode.  Unknown access paths cannot prove free
-#: access and FAIL CLOSED unless an explicit auth override is supplied.
+#: access and FAIL CLOSED (I04R2 Issue 7 — no auth override can change this).
 _ACCESS_PATH_AUTH: dict[str, AdapterAuthMode] = {
     "PUBLIC_REST": AdapterAuthMode.NO_AUTH,
     "FREE_API_KEY": AdapterAuthMode.FREE_API_KEY,
@@ -100,7 +109,7 @@ def _parse_datetime_utc(value: str) -> datetime:
 
 
 def _parse_verified_range(value: str | None) -> tuple[datetime | None, datetime | None]:
-    """Parse the ``verified_history`` range ``"START..END"`` (Z = UTC).
+    """Parse the ``verified_history`` range ``\"START..END\"`` (Z = UTC).
 
     Raises on a malformed range — a promoted capability never silently
     discards its verified-history bound (I04R1 Repair 4).
@@ -146,41 +155,86 @@ def _require_str_list(
 def load_promotion_candidates(
     path: Path | None = None,
 ) -> list[dict[str, object]]:
-    """Load the I14 promotion-candidate list (the ONLY Bloc 3 input list)."""
+    """Load + structurally validate the I14 promotion-candidate list.
+
+    The promotion file is a CONTROL ONLY input list.  Structural ambiguity is
+    a HARD failure (I04R2 Issue 6): nothing is silently filtered or repaired.
+    Validates the root mapping, schema version, the candidates list shape, and
+    that every candidate carries provider + sensor.  (Duplicate/detailed field
+    validation happens in `capabilities_from_promotion` post filtering.)
+    """
     config_path = path or DEFAULT_PROMOTION_FILE
     data = yaml.safe_load(config_path.read_text(encoding="utf-8"))
-    candidates = data.get("candidates", [])
+
+    if not isinstance(data, dict):
+        raise ValueError(
+            f"promotion file {config_path} root must be a mapping, got "
+            f"{type(data).__name__}"
+        )
+
+    schema_version = data.get("schema_version")
+    if not isinstance(schema_version, str) or not schema_version:
+        raise ValueError(
+            f"promotion file {config_path} missing required field 'schema_version'"
+        )
+    if schema_version not in _SUPPORTED_SCHEMA_VERSIONS:
+        raise ValueError(
+            f"promotion file {config_path} unsupported schema_version "
+            f"{schema_version!r} (supported={sorted(_SUPPORTED_SCHEMA_VERSIONS)})"
+        )
+
+    candidates = data.get("candidates")
     if not isinstance(candidates, list) or not candidates:
         raise ValueError(
-            f"promotion candidates {config_path} has no candidates list"
+            f"promotion file {config_path} has no non-empty 'candidates' list"
         )
-    return [c for c in candidates if isinstance(c, dict)]
+
+    validated: list[dict[str, object]] = []
+    for index, item in enumerate(candidates):
+        if not isinstance(item, dict):
+            raise ValueError(
+                f"promotion file {config_path} candidate[{index}] is not a mapping "
+                f"({type(item).__name__})"
+            )
+        for field in ("provider", "sensor"):
+            value = item.get(field)
+            if not isinstance(value, str) or not value:
+                raise ValueError(
+                    f"promotion file {config_path} candidate[{index}] missing "
+                    f"required field {field!r}"
+                )
+        validated.append(item)
+    return validated
 
 
 def capabilities_from_promotion(
     provider_id: str,
     candidates: list[dict[str, object]] | None = None,
-    *,
-    auth_mode_override: AdapterAuthMode | None = None,
 ) -> ProviderCapabilities:
     """Build `ProviderCapabilities` for one provider from I14 candidates.
 
     Every declared capability is bound by the I14 fields.  A candidate that
     cannot be strictly mapped fails closed (raises) — it is never silently
-    widened or defaulted.
+    widened or defaulted.  Duplicate provider×sensor candidates (with or
+    without conflicting values) are a structural error — a later row NEVER
+    overwrites an earlier one in the generated capability map.
+
+    No `auth_mode_override` exists here: the I14 `access_path` alone is
+    authoritative for the acquisition auth contract, and that contract may
+    never be changed by a caller (I04R2 Issue 7).
     """
     if candidates is None:
         candidates = load_promotion_candidates()
 
     sensors: dict[SensorFamily, SensorCapability] = {}
+    seen_sensors: set[SensorFamily] = set()
+
     for candidate in candidates:
         provider_candidate = candidate.get("provider")
         if provider_candidate != provider_id:
             continue
 
-        sensor_name = _require_str(
-            candidate, "sensor", "sensor"
-        )
+        sensor_name = _require_str(candidate, "sensor", "sensor")
         try:
             sensor_family = SensorFamily(sensor_name)
         except ValueError:
@@ -188,8 +242,20 @@ def capabilities_from_promotion(
                 f"{provider_id} promotion candidate has unknown sensor {sensor_name!r}"
             ) from None
 
-        history_mode = _require_str(candidate, "history_mode", "history_mode")
+        if sensor_family in seen_sensors:
+            raise ValueError(
+                f"{provider_id} has duplicate promotion candidates for sensor "
+                f"{sensor_name!r} (later rows never overwrite earlier ones)"
+            )
+
+        history_label = _require_str(candidate, "history_mode", "history_mode")
         access_path = _require_str(candidate, "access_path", "access_path")
+        scope = _HISTORY_SCOPE.get(history_label)
+        if scope is None:
+            raise ValueError(
+                f"{provider_id}/{sensor_family.value} has unknown history_mode "
+                f"{history_label!r} (fail closed)"
+            )
 
         # ---- strict controlled-value parsing (Repair 4) -----------------
         allowed_role = _parse_enum(
@@ -206,7 +272,9 @@ def capabilities_from_promotion(
             PITReadiness, "PIT_requirement", candidate, provider_id, sensor_family
         )
 
-        auth = auth_mode_override or _ACCESS_PATH_AUTH.get(access_path)
+        # Access contract derives ONLY from the authoritative I14 access_path
+        # (Issue 7).  Unknown paths cannot prove free-only access -> fail.
+        auth = _ACCESS_PATH_AUTH.get(access_path)
         if auth is None or auth not in ALLOWED_AUTH_MODES:
             raise ValueError(
                 f"{provider_id}/{sensor_family.value} access_path {access_path!r} "
@@ -222,45 +290,42 @@ def capabilities_from_promotion(
         hazards = _require_str_list(
             candidate, "known_hazards", "known_hazards", allow_empty=True
         )
-
         methodology_pin = _require_str(
             candidate, "methodology_pin", "methodology_pin"
         )
 
-        # ---- live/historical separation (Repair 3) ----------------------
-        if history_mode in _HISTORY_MODE_SURFACE:
-            historical_mode: HistoricalMode | None = _HISTORY_MODE_SURFACE[
-                history_mode
-            ]
-            live_mode = LiveMode.NONE
-            archive_mode = history_mode in {"ARCHIVE_ONLY", "THIRD_PARTY_ARCHIVE"}
-        elif history_mode in _CURRENT_ONLY_SURFACES:
-            historical_mode = _CURRENT_ONLY_SURFACES[history_mode]
-            # A CURRENT_ONLY public REST snapshot is a current/live path, with
-            # no invented historical depth.
-            live_mode = (
-                LiveMode.LIVE_REST
-                if auth is AdapterAuthMode.NO_AUTH
-                or auth is AdapterAuthMode.OPTIONAL_PUBLIC_KEY
-                else LiveMode.NONE
-            )
-            archive_mode = False
-        else:
-            raise ValueError(
-                f"{provider_id}/{sensor_family.value} has unknown history_mode "
-                f"{history_mode!r} (fail closed)"
-            )
+        # ---- coarse scope -> live/archive derivation (Issues 8-9) -------
+        # The coarse label survives verbatim as `history_scope`; the exact
+        # native historical_mode is NEVER inferred here (left None for the
+        # provider's own Bloc 2 evidence later).
+        archive_mode = scope in _ARCHIVE_SCOPES
 
         if (
             pit is not None
             and "PIT_READY" in pit.value
             and verified_start is None
-            and history_mode in _HISTORY_MODE_SURFACE
+            and scope is HistoryScope.HISTORICAL
         ):
             raise ValueError(
                 f"{provider_id}/{sensor_family.value} PIT-ready historical "
                 "capability requires a verified_history bound (fail closed)"
             )
+
+        if scope in _ARCHIVE_SCOPES:
+            # archive-only surfaces never imply REST or live capability
+            live_mode = LiveMode.NONE
+        elif scope is HistoryScope.CURRENT_ONLY:
+            # a CURRENT_ONLY public REST snapshot is a current/live path with
+            # no invented historical depth
+            live_mode = (
+                LiveMode.LIVE_REST
+                if auth
+                in (AdapterAuthMode.NO_AUTH, AdapterAuthMode.OPTIONAL_PUBLIC_KEY)
+                else LiveMode.NONE
+            )
+        else:  # HISTORICAL
+            # historical evidence does NOT auto-grant a live-production contract
+            live_mode = LiveMode.NONE
 
         evidence_ref = AdapterEvidenceRef(
             evidence_id=evidence_basis[0],
@@ -272,7 +337,9 @@ def capabilities_from_promotion(
             sensor_family=sensor_family,
             supported=True,
             access_mode=access_path,
-            historical_mode=historical_mode,
+            # exact native historical mode is provider-supplied, not inferred
+            historical_mode=None,
+            history_scope=scope,
             live_mode=live_mode,
             archive_mode=archive_mode,
             auth_requirement=auth,
@@ -288,6 +355,7 @@ def capabilities_from_promotion(
             known_hazards=hazards,
             evidence_basis=evidence_basis,
         )
+        seen_sensors.add(sensor_family)
 
     return ProviderCapabilities(provider_id=provider_id, sensors=sensors)
 
@@ -329,6 +397,11 @@ def promotion_bound_violations(
     conformance when any violation exists — it may not widen or change any
     material I14 capability contract.  No provider-ranking hierarchy is
     invented here: every dimension is compared one-to-one against the bound.
+
+    I04R2 (Issues 4/9) additionally binds live/archive/access/auth surfaces
+    and the coarse history scope, so a provider cannot silently flip surfaces
+    (CURRENT_ONLY->historical, archive->REST, historical->live, non-archive->
+    archive).
     """
     violations: list[str] = []
     sensor = declared.sensor_family.value
@@ -348,14 +421,53 @@ def promotion_bound_violations(
             f"bound {bound.allowed_role}"
         )
 
-    # 4. historical_mode cannot be widened or changed
-    if declared.historical_mode != bound.historical_mode:
+    # 4. coarse history scope cannot change (CURRENT_ONLY->historical, etc.)
+    if declared.history_scope != bound.history_scope:
+        violations.append(
+            f"{sensor}: history_scope {declared.history_scope} != "
+            f"bound {bound.history_scope}"
+        )
+
+    # 5. exact native historical_mode cannot be manufactured or widened.
+    #    If the bound's exact mode is unknown (None), the declared MUST also be
+    #    None — the base layer never invents a native mode from a coarse label
+    #    (Issue 8/9).  If the bound pins a mode, the declared must match it.
+    if bound.historical_mode is None:
+        if declared.historical_mode is not None:
+            violations.append(
+                f"{sensor}: manufactured native historical_mode "
+                f"{declared.historical_mode} from a coarse scope (bound has "
+                "no exact native mode)"
+            )
+    elif declared.historical_mode != bound.historical_mode:
         violations.append(
             f"{sensor}: historical_mode {declared.historical_mode} != "
             f"bound {bound.historical_mode}"
         )
 
-    # 5. verified_history_start cannot move earlier than I14 evidence
+    # 6. live mode must match the bound exactly (historical never auto-grants
+    #    live; CURRENT_ONLY keeps its live snapshot surface).
+    if declared.live_mode != bound.live_mode:
+        violations.append(
+            f"{sensor}: live_mode {declared.live_mode} != bound {bound.live_mode}"
+        )
+
+    # 7. archive mode cannot change (archive-only can't become REST; a
+    #    non-archive surface can't silently become archive).
+    if declared.archive_mode != bound.archive_mode:
+        violations.append(
+            f"{sensor}: archive_mode {declared.archive_mode} != "
+            f"bound {bound.archive_mode}"
+        )
+
+    # 8. the acquisition access path itself is scientific provenance.
+    if declared.access_mode != bound.access_mode:
+        violations.append(
+            f"{sensor}: access_path {declared.access_mode} != "
+            f"bound {bound.access_mode}"
+        )
+
+    # 9. verified_history_start cannot move earlier than I14 evidence
     if (
         declared.verified_history_start is not None
         and bound.verified_history_start is not None
@@ -366,7 +478,7 @@ def promotion_bound_violations(
             f"earlier than bound {bound.verified_history_start}"
         )
 
-    # 6. verified_history_end cannot claim beyond the verified bound
+    # 10. verified_history_end cannot claim beyond the verified bound
     if (
         declared.verified_history_end is not None
         and bound.verified_history_end is not None
@@ -377,57 +489,68 @@ def promotion_bound_violations(
             f"beyond bound {bound.verified_history_end}"
         )
 
-    # 7. PIT requirement cannot be upgraded (fail closed ordering based on
-    #    the frozen rubric: PIT_READY* must not exceed the bound)
+    # 11. PIT requirement cannot be upgraded (bound must never be exceeded)
     if declared.pit_requirement != bound.pit_requirement:
         violations.append(
             f"{sensor}: PIT requirement {declared.pit_requirement} != "
             f"bound {bound.pit_requirement}"
         )
 
-    # 8. methodology_pin must match exactly when I14 requires one
+    # 12. methodology_pin must match exactly when I14 requires one
     if bound.methodology_pin and declared.methodology_pin != bound.methodology_pin:
         violations.append(
             f"{sensor}: methodology_pin {declared.methodology_pin!r} != "
             f"bound {bound.methodology_pin!r}"
         )
 
-    # 9. redundancy_class must match the frozen I14 classification
+    # 13. redundancy_class must match the frozen I14 classification
     if declared.redundancy_class != bound.redundancy_class:
         violations.append(
             f"{sensor}: redundancy_class {declared.redundancy_class} != "
             f"bound {bound.redundancy_class}"
         )
 
-    # 10. access/auth cannot exceed the I14 access contract
+    # 14. auth/access cannot exceed the I14 access contract (Issue 4/7)
+    if declared.auth_requirement != bound.auth_requirement:
+        violations.append(
+            f"{sensor}: auth_requirement {declared.auth_requirement} != "
+            f"bound {bound.auth_requirement}"
+        )
     if declared.auth_requirement not in ALLOWED_AUTH_MODES:
         violations.append(
             f"{sensor}: auth_requirement {declared.auth_requirement} is not free-only"
         )
 
-    # 11. known hazards must not be silently removed
+    # 15. free-only status must stay at least as strict as the bound
+    if declared.free_access_status != bound.free_access_status:
+        violations.append(
+            f"{sensor}: free_access_status {declared.free_access_status} != "
+            f"bound {bound.free_access_status}"
+        )
+
+    # 16. known hazards must not be silently removed
     removed_hazards = set(bound.known_hazards) - set(declared.known_hazards)
     if removed_hazards:
         violations.append(
             f"{sensor}: known hazards removed: {sorted(removed_hazards)}"
         )
 
-    # 12. evidence basis must resolve to I14 evidence
+    # 17. evidence basis must resolve to I14 evidence (not silently replaced)
     if not set(bound.evidence_basis) <= set(declared.evidence_basis):
         violations.append(
             f"{sensor}: evidence basis does not resolve to the promotion file"
         )
 
-    # 13. CURRENT_ONLY must remain CURRENT_ONLY (no invented history)
-    if bound.historical_mode == HistoricalMode.LIVE_REST_ONLY and (
-        declared.historical_mode != HistoricalMode.LIVE_REST_ONLY
+    # 18. CURRENT_ONLY must remain CURRENT_ONLY (no invented history)
+    if bound.history_scope is HistoryScope.CURRENT_ONLY and (
+        declared.history_scope != HistoryScope.CURRENT_ONLY
     ):
         violations.append(
             f"{sensor}: CURRENT_ONLY bound widened to historical "
-            f"{declared.historical_mode}"
+            f"({declared.history_scope})"
         )
 
-    # 14. MECHANISM_MICROSCOPE must not become general aggregate truth
+    # 19. MECHANISM_MICROSCOPE must not become general aggregate truth
     if (
         bound.allowed_role == ProviderRole.MECHANISM_MICROSCOPE
         and declared.allowed_role != ProviderRole.MECHANISM_MICROSCOPE
@@ -437,7 +560,7 @@ def promotion_bound_violations(
             f"{declared.allowed_role}"
         )
 
-    # 15. one provider/sensor may not silently inherit another sensor's role —
+    # 20. one provider/sensor may not silently inherit another sensor's role —
     #     already handled because every declared capability is compared to the
     #     bound for THAT sensor (role equality above).
 

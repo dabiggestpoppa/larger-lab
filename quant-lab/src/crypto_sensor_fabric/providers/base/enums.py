@@ -69,6 +69,24 @@ class LiveMode(_StrEnum):
     NONE = "NONE"
 
 
+class HistoryScope(_StrEnum):
+    """Coarse I14 frozen history label (SENSOR-B3-I04R2, Issue 8).
+
+    This is the AUTHORITATIVE coarse scope recorded in
+    `source_promotion_candidates.yaml` (`history_mode`).  It is deliberately
+    separated from the fine-grained native acquisition surface
+    (`SensorCapability.historical_mode`), which is supplied by each provider
+    adapter from its own Bloc 2 evidence and is NEVER inferred from the coarse
+    label.  The base layer never manufactures a native mode from a coarse
+    label (generic HISTORICAL -> REST_RANGE inference is removed).
+    """
+
+    HISTORICAL = "HISTORICAL"
+    CURRENT_ONLY = "CURRENT_ONLY"
+    ARCHIVE_ONLY = "ARCHIVE_ONLY"
+    THIRD_PARTY_ARCHIVE = "THIRD_PARTY_ARCHIVE"
+
+
 #: Pagination vocabulary — the frozen Bloc 2 QueryMode semantics (01 §15).
 PaginationMode = _QueryMode
 

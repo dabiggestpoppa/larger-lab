@@ -30,6 +30,7 @@ from .enums import (
     FetchPurpose,
     FreeOnlyStatus,
     Granularity,
+    HistoryScope,
     HistoricalMode,
     LiveMode,
     PaginationMode,
@@ -110,6 +111,13 @@ class SensorCapability(BaseModel):
     sensor_family: SensorFamily
     supported: bool = False
     access_mode: str | None = None
+    #: Coarse I14 frozen history label (authoritative from the promotion file).
+    #: NEVER derived from a coarse label is the fine-grained `historical_mode`
+    #: below — the base layer never manufactures a native acquisition mode.
+    history_scope: HistoryScope | None = None
+    #: Exact native historical acquisition surface.  SUPPLIED BY THE PROVIDER
+    #: from its own Bloc 2 evidence (REST_RANGE/CURSOR/PAGE/archive); never
+    #: inferred from the coarse `history_scope` label (I04R2 Issue 8).
     historical_mode: HistoricalMode | None = None
     live_mode: LiveMode = LiveMode.NONE
     min_granularity: Granularity | None = None

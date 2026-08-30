@@ -44,6 +44,7 @@ from .enums import (
     FetchPurpose,
     FreeOnlyStatus,
     Granularity,
+    HistoryScope,
     HistoricalMode,
     LiveMode,
     PaginationMode,
@@ -90,7 +91,12 @@ from .pagination import (
     completion_from_provider_semantics,
     resume_token_round_trip,
 )
-from .protocol import MechanicalProviderAdapter, ensure_supported
+from .protocol import (
+    SENSOR_FETCH_METHOD,
+    MechanicalProviderAdapter,
+    dispatch_fetch,
+    ensure_supported,
+)
 from .rate_limit import rate_limit_from_headers, unknown_rate_limit
 from .retry import RetryPolicy, classify_retryability, is_retryable
 from .schema import (
@@ -146,6 +152,7 @@ __all__ = [
     "GeoRestricted",
     "Granularity",
     "HARD_BLOCK_AUTH_MODES",
+    "HistoryScope",
     "HistoricalMode",
     "HistoricalRangeUnavailable",
     "InstrumentListRequest",
@@ -171,6 +178,8 @@ __all__ = [
     "SensorCapability",
     "TransportFailure",
     "UnsupportedGranularity",
+    "SENSOR_FETCH_METHOD",
+    "dispatch_fetch",
     "ensure_supported",
     "error_from_failure_type",
 ]
