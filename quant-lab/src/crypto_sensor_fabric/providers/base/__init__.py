@@ -25,6 +25,7 @@ from .capabilities import (
     DEFAULT_PROMOTION_FILE,
     capabilities_from_promotion,
     load_promotion_candidates,
+    promotion_bound_violations,
     promotion_provider_ids,
 )
 from .conformance import (
@@ -37,6 +38,7 @@ from .enums import (
     ALLOWED_AUTH_MODES,
     HARD_BLOCK_AUTH_MODES,
     AdapterAuthMode,
+    AdapterConformanceMode,
     AdapterStatus,
     DuplicateAnnotation,
     FetchPurpose,
@@ -91,17 +93,27 @@ from .pagination import (
 from .protocol import MechanicalProviderAdapter, ensure_supported
 from .rate_limit import rate_limit_from_headers, unknown_rate_limit
 from .retry import RetryPolicy, classify_retryability, is_retryable
+from .schema import (
+    SchemaAssessment,
+    assert_no_zero_coercion,
+    assess_schema,
+    parse_fail_closed,
+)
 
 __all__ = [
     "ALLOWED_AUTH_MODES",
     "AccessClassViolation",
     "AccessDecision",
+    "AdapterConformanceMode",
     "AdapterUnderTest",
     "ConformanceResult",
     "CursorTracker",
     "DEFAULT_PROMOTION_FILE",
     "RetryPolicy",
+    "SchemaAssessment",
     "assert_free_only_access",
+    "assert_no_zero_coercion",
+    "assess_schema",
     "classify_retryability",
     "capabilities_from_promotion",
     "completion_from_provider_semantics",
@@ -109,7 +121,9 @@ __all__ = [
     "fingerprint_request",
     "load_promotion_candidates",
     "is_retryable",
+    "parse_fail_closed",
     "payload_hash",
+    "promotion_bound_violations",
     "promotion_provider_ids",
     "rate_limit_from_headers",
     "resume_token_round_trip",

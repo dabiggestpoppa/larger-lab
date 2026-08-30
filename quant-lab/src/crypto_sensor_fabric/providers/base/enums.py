@@ -94,6 +94,20 @@ class AdapterStatus(_StrEnum):
     DATA_BLOCKED = "DATA_BLOCKED"
 
 
+class AdapterConformanceMode(_StrEnum):
+    """Conformance context (SENSOR-B3-I04R1).
+
+    `FRAMEWORK_TEST` is an explicit internal/framework-only mode used to
+    exercise the harness itself.  `PRODUCTION_CANDIDATE` is the ONLY mode an
+    actual provider adapter may run under — it REQUIRES the I14 promotion
+    bounds; missing promotion evidence FAILS CLOSED (never an implicit
+    None-based bypass).
+    """
+
+    FRAMEWORK_TEST = "FRAMEWORK_TEST"
+    PRODUCTION_CANDIDATE = "PRODUCTION_CANDIDATE"
+
+
 class Retryability(_StrEnum):
     """Retry classification of one failure (01 §13 / 03 §10)."""
 

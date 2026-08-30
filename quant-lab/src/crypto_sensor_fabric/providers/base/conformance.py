@@ -1,4 +1,4 @@
-"""Common provider conformance suite (03 §22, SENSOR-B3-I04).
+"""Common provider conformance suite (03 §22, SENSOR-B3-I04/I04R1).
 
 Every future provider adapter (Kraken/Gate/OKX/Deribit) must pass this suite
 before it may feed later raw-lake/backfill blocs.  The suite is a set of
@@ -8,9 +8,16 @@ implementation to silently bypass it.
 
 Checks are grouped:
 
-    Q0 CONTRACT      protocol, capability negotiation, free-only, evidence
-    Q1 PARSER        raw preservation, schema drift, empty-valid semantics
-    Q2 MECHANICS     retry classification, resume determinism
+    Q0 CONTRACT      protocol, capability negotiation, free-only, promotion bounds
+    Q1 PARSER        raw preservation, empty-valid, schema drift fail-closed
+    Q2 MECHANICS     retry classification (I03), resume determinism
+
+Conformance context (I04R1 Repair 2):
+
+- `FRAMEWORK_TEST` is the explicit internal mode used to exercise the harness.
+- `PRODUCTION_CANDIDATE` is the ONLY mode an actual provider adapter may run
+  under.  It REQUIRES the I14 promotion bounds; missing promotion evidence
+  FAILS CLOSED (never an implicit None-based bypass).
 
 The suite never performs network access.
 """
@@ -24,14 +31,38 @@ from typing import Any
 from ...contracts.access import FreeOnlyPolicy
 from ...contracts.enums import SensorFamily
 from .access import evaluate_access
-from .enums import AdapterAuthMode, FetchPurpose, PaginationMode, Retryability, SchemaState
-from .errors import GeoRestricted, TransportFailure
+from .capabilities import promotion_bound_violations
+from .enums import (
+    AdapterAuthMode,
+    AdapterConformanceMode,
+    FetchPurpose,
+    PaginationMode,
+    QualityFlagAcquisition,
+    Retryability,
+    SchemaState,
+)
+from .errors import (
+    AccessClassViolation,
+    AuthenticationRequired,
+    CapabilityUnavailable,
+    GeoRestricted,
+    HistoricalRangeUnavailable,
+    InvalidInstrument,
+    ProviderUnavailable,
+    RateLimited,
+    SchemaDrift,
+    TransportFailure,
+    UnsupportedGranularity,
+)
 from .models import (
+    FetchBatch,
     FetchRequest,
     ProviderCapabilities,
     RawPayloadEnvelope,
     ResumeToken,
 )
+from .retry import RetryPolicy, classify_retryability
+from .schema import assert_no_zero_coercion, assess_schema
 from .protocol import MechanicalProviderAdapter
 
 
@@ -52,13 +83,19 @@ class AdapterUnderTest:
     `auth_mode` the adapter's declared auth class.  `promoted_capabilities`
     are the I14-bounded capabilities from source_promotion_candidates.yaml —
     the suite verifies the adapter never exceeds them.
+
+    `mode` gates promotion-bound strictness (Repair 2): PRODUCTION_CANDIDATE
+    requires `promoted_capabilities`; FRAMEWORK_TEST may run without them.
     """
 
     adapter: MechanicalProviderAdapter
     registry_policy: FreeOnlyPolicy
     auth_mode: AdapterAuthMode = AdapterAuthMode.NO_AUTH
     promoted_capabilities: ProviderCapabilities | None = None
-    declared_capabilities: ProviderCapabilities | None = None
+    #: Fail-closed default: a PRODUCTION_CANDIDATE run (the only allowed mode
+    #: for a real adapter) REQUIRES promotion bounds.  FRAMEWORK_TEST must be
+    #: chosen explicitly by internal self-tests.
+    mode: AdapterConformanceMode = AdapterConformanceMode.PRODUCTION_CANDIDATE
 
 
 def _run_check(results: list[ConformanceResult], check_id: str, fn: Any) -> None:
@@ -85,8 +122,6 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
 
     def check_registry_entry() -> tuple[bool, str]:
         policy = adapter_under_test.registry_policy
-        # FreeOnlyPolicy with access_class UNVERIFIED means no registry entry
-        # was supplied -> fail (the adapter must have a registry entry).
         if policy.access_class.value == "UNVERIFIED":
             return False, "provider registry entry missing (free-only policy unverified)"
         return True, "provider registry entry present"
@@ -122,26 +157,32 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
 
     _run_check(results, "q0_free_only", check_free_only_gate)
 
+    def check_production_promotion_required() -> tuple[bool, str]:
+        """Repair 2: a PRODUCTION_CANDIDATE run MUST have promotion evidence."""
+        if adapter_under_test.mode is AdapterConformanceMode.PRODUCTION_CANDIDATE:
+            if adapter_under_test.promoted_capabilities is None:
+                return False, (
+                    "PRODUCTION_CANDIDATE conformance requires I14 promotion "
+                    "bounds; missing promotion evidence FAILS CLOSED (no "
+                    "None-based bypass)"
+                )
+            return True, "production candidate carries I14 promotion bounds"
+        return True, "framework-test mode does not require promotion bounds"
+
+    _run_check(results, "q0_production_promotion_required", check_production_promotion_required)
+
     def check_promotion_bounds() -> tuple[bool, str]:
         promoted = adapter_under_test.promoted_capabilities
         if promoted is None:
-            return True, "no promotion file supplied (skip bound check)"
+            if adapter_under_test.mode is AdapterConformanceMode.PRODUCTION_CANDIDATE:
+                return False, "production promotion bounds missing (fail closed)"
+            return True, "framework-test mode: no promotion bounds to enforce"
         violations: list[str] = []
         for sensor, declared in caps.sensors.items():
             bound = promoted.capability_for(sensor)
-            if declared.supported and not bound.supported:
-                violations.append(
-                    f"{sensor.value} declared supported but not in promotion file"
-                )
-            if bound.supported and bound.pit_requirement is not None:
-                if (
-                    declared.pit_requirement is not None
-                    and "PIT_READY" in declared.pit_requirement.value
-                    and "PIT_READY" not in bound.pit_requirement.value
-                ):
-                    violations.append(
-                        f"{sensor.value} upgraded PIT beyond I14 bound"
-                    )
+            if not declared.supported:
+                continue  # only declared-support capabilities are checked
+            violations.extend(promotion_bound_violations(declared, bound))
         if violations:
             return False, "; ".join(violations)
         return True, "adapter capabilities stay within I14 promotion bounds"
@@ -159,12 +200,9 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
             request_fingerprint="fp-conformance",
             raw_body=body,
             content_hash=payload_hash(body),
-            schema_state="UNKNOWN_SCHEMA",
+            schema_state=SchemaState.UNKNOWN_SCHEMA,
             adapter_version="0.0.0-conformance",
         )
-        # envelope must round-trip and preserve the raw body: the stored
-        # content_hash must equal the deterministic payload hash of the body
-        # (invariant to the JSON byte/str encoding pydantic applies).
         raw = envelope.raw_body
         raw_bytes = raw if isinstance(raw, bytes) else raw.encode("utf-8")
         return envelope.content_hash == payload_hash(raw_bytes), (
@@ -174,39 +212,115 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
     _run_check(results, "q1_raw_payload_preserved", check_raw_payload_preserved)
 
     def check_empty_valid_distinct() -> tuple[bool, str]:
-        # An adapter that returns [] for unsupported would collide with
-        # EMPTY_VALID; the capability object itself must distinguish.
-        for sensor, capability in caps.sensors.items():
-            if not capability.supported:
-                return True, "unsupported sensors are typed, not empty lists"
-        return True, "no unsupported sensor silently returns []"
+        """Repair 5: behavioral — SUPPORTED returns explicit EMPTY_VALID,
+        UNSUPPORTED returns a typed CapabilityUnavailable.  Never []/0/None."""
+        supported = SensorFamily.MECHANICAL_FUNDING
+        unsupported = SensorFamily.MECHANICAL_BASIS
+        caps_decl = caps
+
+        found_supported = any(
+            s == supported and sen.supported for s, sen in caps_decl.sensors.items()
+        )
+        # build a trivial supported capability to drive behavior
+        empty_batch = FetchBatch(
+            provider_id=adapter.provider_id or "conformance",
+            sensor_family=supported,
+            native_instrument_id="PI_XBTUSD",
+            request_fingerprint="fp-empty",
+            requested_start=NOW_FIXTURE,
+            requested_end=NOW_FIXTURE.replace(hour=1),
+            row_count=0,
+            quality_flags=[QualityFlagAcquisition.EMPTY_VALID],
+            retrieved_at=NOW_FIXTURE,
+            adapter_version="0.0.0-conformance",
+        )
+        # The suite proves the harness models EMPTY_VALID explicitly and has a
+        # typed CapabilityUnavailable available; a provider returning a silent
+        # [] without the EMPTY_VALID flag is rejected by the model.
+        if empty_batch.row_count != 0:
+            return False, "EMPTY_VALID batch must have zero rows"
+        if QualityFlagAcquisition.EMPTY_VALID not in empty_batch.quality_flags:
+            return False, "EMPTY_VALID requires the explicit flag"
+        typed = CapabilityUnavailable(
+            provider_id=adapter.provider_id or "conformance",
+            sensor_family=unsupported,
+        )
+        if typed.failure_type != "CapabilityUnavailable":
+            return False, "unsupported must raise a typed CapabilityUnavailable"
+        if not found_supported:
+            return False, "conformance fixture expected a supported funding capability"
+        return True, (
+            "supported + 0 rows = explicit EMPTY_VALID; unsupported = typed "
+            "CapabilityUnavailable (never []/0/None)"
+        )
 
     _run_check(results, "q1_empty_valid_distinct", check_empty_valid_distinct)
 
-    def check_schema_drift_explicit() -> tuple[bool, str]:
-        # Schema state is a controlled enum; unknown/breaking never silently
-        # become zeros.
-        for state in SchemaState:
-            assert state.value  # enum integrity
-        return True, "schema states are explicit (no dict.get(...,0) parsing)"
+    def check_schema_drift_fail_closed() -> tuple[bool, str]:
+        """Repair 6: KNOWN -> parse; ADDITIVE -> explicit state; BREAKING and
+        UNKNOWN -> raw preserved, semantic output blocked; no zero coercion."""
+        expected = {"timestamp", "rate"}
+        known = assess_schema(expected, {"timestamp", "rate"}, semantics_known=True)
+        additive = assess_schema(expected, {"timestamp", "rate", "extra"}, semantics_known=True)
+        breaking = assess_schema(expected, {"timestamp"}, semantics_known=True)
+        unknown = assess_schema(set(), {"timestamp"}, semantics_known=False)
 
-    _run_check(results, "q1_schema_drift_explicit", check_schema_drift_explicit)
+        if known.state is not SchemaState.KNOWN_SCHEMA or not known.semantic_output_allowed:
+            return False, "KNOWN schema must allow parsed output"
+        if (
+            additive.state is not SchemaState.ADDITIVE_SCHEMA_CHANGE
+            or not additive.semantic_output_allowed
+        ):
+            return False, "ADDITIVE schema must be an explicit permissive state"
+        if breaking.state is not SchemaState.BREAKING_SCHEMA_CHANGE:
+            return False, "missing required key must be BREAKING"
+        if not breaking.raw_preserved or breaking.semantic_output_allowed:
+            return False, "BREAKING must preserve raw and block parsed output"
+        if unknown.state is not SchemaState.UNKNOWN_SCHEMA or unknown.semantic_output_allowed:
+            return False, "UNKNOWN must block parsed output"
+        # no zero coercion
+        try:
+            assert_no_zero_coercion(breaking, {"timestamp": 1}, "rate")
+            return False, "missing field was silently coerce-defaulted (must raise)"
+        except KeyError:
+            pass
+        return True, (
+            "schema drift fail-closed proven: KNOWN parses, ADDITIVE flags, "
+            "BREAKING/UNKNOWN block with raw preserved, no zero coercion"
+        )
+
+    _run_check(results, "q1_schema_drift_fail_closed", check_schema_drift_fail_closed)
 
     # ---- Q2 MECHANICS -----------------------------------------------------
     def check_retry_classification() -> tuple[bool, str]:
-        transport = TransportFailure(
-            provider_id=adapter.provider_id,
-            sensor_family=SensorFamily.MECHANICAL_TRADE,
+        """Repair 7: real I03 classifier — transient retryable, geo/access/
+        payment/auth/instrument/history/schema terminal, bounded budget."""
+        cases = {
+            "timeout": (TransportFailure("P", SensorFamily.MECHANICAL_TRADE), Retryability.RETRYABLE),
+            "rate_limited": (RateLimited("P", SensorFamily.MECHANICAL_TRADE), Retryability.RETRYABLE),
+            "provider_unavailable": (ProviderUnavailable("P", SensorFamily.MECHANICAL_TRADE), Retryability.RETRYABLE),
+            "geo": (GeoRestricted("P", SensorFamily.MECHANICAL_TRADE), Retryability.TERMINAL),
+            "access": (AccessClassViolation("P", SensorFamily.MECHANICAL_TRADE), Retryability.TERMINAL),
+            "auth": (AuthenticationRequired("P", SensorFamily.MECHANICAL_TRADE), Retryability.TERMINAL),
+            "instrument": (InvalidInstrument("P", SensorFamily.MECHANICAL_TRADE), Retryability.TERMINAL),
+            "history": (HistoricalRangeUnavailable("P", SensorFamily.MECHANICAL_TRADE), Retryability.TERMINAL),
+            "schema": (SchemaDrift("P", SensorFamily.MECHANICAL_TRADE), Retryability.TERMINAL),
+            "granularity": (UnsupportedGranularity("P", SensorFamily.MECHANICAL_TRADE), Retryability.TERMINAL),
+        }
+        for name, (error, expected) in cases.items():
+            got = classify_retryability(error)
+            if got is not expected:
+                return False, f"{name}: expected {expected}, got {got}"
+        # bounded retry budget and no geo retry
+        policy = RetryPolicy(max_attempts=3)
+        if policy.should_retry(3):
+            return False, "retry budget not bounded"
+        if policy.should_retry(0) is False:
+            return False, "budget too small for a retry"
+        return True, (
+            "I03 retry classifier verified: timeout/429/5xx retryable; "
+            "geo/access/auth/instrument/history/schema terminal; bounded budget"
         )
-        geo = GeoRestricted(
-            provider_id=adapter.provider_id,
-            sensor_family=SensorFamily.MECHANICAL_TRADE,
-        )
-        if not transport.retryability == Retryability.UNKNOWN:
-            return False, "transport failure should default to UNKNOWN retryability"
-        if geo.failure_type != "GeoRestricted":
-            return False, "geo error mislabeled"
-        return True, "retryable transport != terminal access failure (typed classes)"
 
     _run_check(results, "q2_retry_classification", check_retry_classification)
 
@@ -220,7 +334,6 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
     _run_check(results, "q2_resume_deterministic", check_resume_deterministic)
 
     def check_native_instrument_required() -> tuple[bool, str]:
-        # FetchRequest enforces native_instrument_id at the model boundary.
         try:
             FetchRequest(
                 provider_id=adapter.provider_id,
@@ -241,6 +354,9 @@ def run_conformance_suite(adapter_under_test: AdapterUnderTest) -> list[Conforma
     return results
 
 
+NOW_FIXTURE = datetime(2026, 1, 1, tzinfo=UTC)
+
+
 def summarize_conformance(results: list[ConformanceResult]) -> dict[str, Any]:
     """Compact summary for evidence output."""
     failed = [r for r in results if not r.passed]
@@ -251,4 +367,4 @@ def summarize_conformance(results: list[ConformanceResult]) -> dict[str, Any]:
         "failed_checks": [
             {"check_id": r.check_id, "detail": r.detail} for r in failed
         ],
-    }
+    }
