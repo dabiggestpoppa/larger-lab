@@ -1,0 +1,64 @@
+{
+  "contract_id": "OCE-CP-RUNTIME-CONTRACT-v2.1",
+  "stage": "B2-R1",
+  "status": "BLOCKED_DURABLE_RUNTIME",
+  "supersedes": "OCE-CP-SCHEMA-REGISTRY-v2 (schemas unchanged, interfaces frozen)",
+  "modes": {
+    "in-memory": {
+      "description": "Fast unit-test model. All state lives in Python dicts.",
+      "authoritative": false,
+      "may_report": ["UNIT_TEST_PASS"],
+      "may_never_report": ["PRODUCTION_READY", "AUTHORITATIVE_PASS", "READY_FOR_OPERATOR_REVIEW"]
+    },
+    "durable": {
+      "description": "PostgreSQL authoritative + Redis transport. The only mode allowed to report production readiness.",
+      "authoritative": true,
+      "requires": ["postgresql", "redis", "migrations_applied", "api_server", "worker_protocol"],
+      "may_report": ["PRODUCTION_READY", "AUTHORITATIVE_PASS"]
+    }
+  },
+  "storage": {
+    "authoritative": "postgresql",
+    "adapter_interface": "JobStore / PgJobStore (identical surface)",
+    "in_memory_adapter_status": "NON-AUTHORITATIVE, retained for unit tests only"
+  },
+  "transport": {
+    "service": "redis",
+    "disposable": true,
+    "reconstructable_from": "postgresql",
+    "never_sole_truth": true
+  },
+  "api": {
+    "framework": "fastapi",
+    "bind_default": "127.0.0.1",
+    "public_exposure": "forbidden",
+    "auth_on_all_endpoints": true,
+    "health_unauthenticated": true
+  },
+  "worker": {
+    "authentication": "required (signed admission token)",
+    "capability_matching": "enforced at claim",
+    "lease_identity": "lease token required for renew/commit, not just worker id"
+  },
+  "scheduler": {
+    "state_persistence": "postgresql",
+    "clock": "test-controlled in tests, wall in runtime",
+    "duplicate_firing_prevention": "pg advisory lock per schedule"
+  },
+  "schema_versions": {
+    "control_plane_schema": "2.0.0",
+    "contract_schemas": ["1.0.0"],
+    "migration_format": "NNN_description.sql, numbered, reversible via NNN_down.sql"
+  },
+  "migration_versions": {
+    "supported": ["0001", "0002", "0003"],
+    "runner": "scripts/migrate.py",
+    "fail_closed_on": ["missing migration", "out-of-order version", "checksum mismatch", "partial apply"]
+  },
+  "cloud": {
+    "state": "DEFERRED_BY_OPERATOR",
+    "authoritative": false,
+    "cost": "ZERO",
+    "mutations": 0
+  }
+}
