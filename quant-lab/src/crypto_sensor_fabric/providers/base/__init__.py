@@ -71,16 +71,31 @@ from .models import (
     ResumeToken,
     SensorCapability,
 )
+from .pagination import (
+    CursorTracker,
+    completion_from_provider_semantics,
+    resume_token_round_trip,
+)
 from .protocol import MechanicalProviderAdapter, ensure_supported
+from .rate_limit import rate_limit_from_headers, unknown_rate_limit
+from .retry import RetryPolicy, classify_retryability, is_retryable
 
 __all__ = [
     "ALLOWED_AUTH_MODES",
     "AccessClassViolation",
     "AccessDecision",
+    "CursorTracker",
+    "RetryPolicy",
     "assert_free_only_access",
+    "classify_retryability",
+    "completion_from_provider_semantics",
     "evaluate_access",
     "fingerprint_request",
+    "is_retryable",
     "payload_hash",
+    "rate_limit_from_headers",
+    "resume_token_round_trip",
+    "unknown_rate_limit",
     "AcquisitionError",
     "AcquisitionFailure",
     "AdapterAuthMode",
