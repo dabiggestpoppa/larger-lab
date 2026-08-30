@@ -25,3 +25,22 @@ providers:
       whose `type` field is "liquidation" on /history.  Open interest is
       current-only via /tickers; historical OI is not publicly exposed and
       must be probed as CURRENT_ONLY / HISTORY_BLOCKED, not assumed.
+
+  GATE_FUTURES:
+    base_url: "https://api.gateio.ws/api/v4/futures/usdt"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_LIQUIDATION: "/contract_stats"
+      MECHANICAL_OPEN_INTEREST: "/contract_stats"
+      MECHANICAL_FUNDING: "/funding_rates"
+      MECHANICAL_TRADE: "/trades"
+      MECHANICAL_BOOK_SNAPSHOT: "/order_book"
+      MECHANICAL_POSITIONING: "/positions"
+    notes: >
+      /contract_stats carries interval long/short liquidation sizes AND OI
+      (contracts + USD notional); retention depth for from/to windows must be
+      probed per era.  /trades `taker_side` is the aggressor side directly
+      (no maker-flag inversion needed) and is probed as MECHANICAL_TRADE:
+      order flow is a T2-derived state family, not a frozen T1 sensor.
+      /positions is auth-gated.  Gate is US-region-restricted; forbidden
+      responses are geo evidence, not bypassed.

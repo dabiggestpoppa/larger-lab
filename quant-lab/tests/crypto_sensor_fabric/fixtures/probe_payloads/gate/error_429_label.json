@@ -1,0 +1,4 @@
+{
+  "label": "RATE_LIMIT",
+  "message": "Rate limit exceeded, retry later"
+}

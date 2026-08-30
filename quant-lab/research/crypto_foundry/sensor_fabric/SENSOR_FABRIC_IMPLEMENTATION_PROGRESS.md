@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I04 DONE; SENSOR-B2-I05 (gate probe) pending |
+| Current checkpoint | SENSOR-B2-I05 DONE; SENSOR-B2-I06 (binance probe) pending |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -43,7 +43,8 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I02 | 21 | 21 | 0 |
 | SENSOR-B2-I03 | 61 | 61 | 0 |
 | SENSOR-B2-I04 | 23 | 23 | 0 |
-| cumulative | 314 | 314 | 0 |
+| SENSOR-B2-I05 | 24 | 24 | 0 |
+| cumulative | 338 | 338 | 0 |
 
 ## External / provider blockers
 
@@ -62,15 +63,21 @@ that is updated at every staged checkpoint.
 
 - NOT STARTED — Bloc 2 owns capability probes.
 
-## Unresolved contradictions
+## Unresolved contradictions / plan observations
 
-- None recorded so far.
+- BLOC5_SCHEMA_REFINEMENT_PENDING (informational, not a blocker): the frozen
+  Bloc 1 SensorFamily has no MECHANICAL_ORDER_FLOW member — order flow is a
+  T2-derived state family (master prompt §20), not a T1 sensor.  Provider
+  aggressor/order-flow probing therefore rides on MECHANICAL_TRADE (trades /
+  taker-side flags); Gate's `taker_side` and Kraken's trade `side`/`type`
+  semantics are characterized on the trade sensor for later T2 derivation.
 
 ## Next checkpoint
 
-- SENSOR-B2-I05: gate-capability-probe
-  - minimal Gate Futures probe module + fixtures + tests
-  - gate: gate probe suite green, offline
+- SENSOR-B2-I06: binance-capability-probe
+  - REST/archive characterization, fixtures + tests; preserve the ratified
+    isBuyerMaker contract: true -> SELL aggressor, false -> BUY
+  - gate: binance probe suite green, offline
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -100,4 +107,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I01 | f5254f5a | probes package: enums, core models, failures, redaction + test suite | 209 passed / 0 failed | PASS | none |
 | SENSOR-B2-I02 | 7065a211 | planner + runner + historical_checkpoints.yaml, deterministic planning, recent-control-first suppression | 230 passed / 0 failed | PASS | none |
 | SENSOR-B2-I03 | 23364591 | evidence.py + coverage.py + scoring.py: immutable evidence, evidence ladder, coverage vector, redundancy, promotion gate | 291 passed / 0 failed | PASS | none |
-| SENSOR-B2-I04 | (pending) | kraken probe module + payload characterization helpers + endpoint registry + 10 fixtures + tests | 314 passed / 0 failed | PASS | none |
+| SENSOR-B2-I04 | a19db8a3 | kraken probe module + payload characterization helpers + endpoint registry + 10 fixtures + tests | 314 passed / 0 failed | PASS | none |
+| SENSOR-B2-I05 | (pending) | shared REST probe base (rest.py) + kraken refactor onto it + gate probe module + 12 fixtures + tests | 338 passed / 0 failed | PASS | none |
