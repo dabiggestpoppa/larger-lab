@@ -173,12 +173,17 @@ class Runner:
     def step_tool_versions(self) -> None:
         """Step 7: record tool versions."""
         versions: dict[str, str] = {}
-        for tool, args in (("python", ["python3", "--version"]),
-                           ("pytest", ["python3", "-m", "pytest", "--version"]),
-                           ("docker", ["docker", "--version"]),
-                           ("docker-compose", ["docker", "compose", "version"])):
-            r = self._run(args, timeout=60)
-            versions[tool] = (r.stdout or r.stderr).strip() if r.returncode == 0 else "unavailable"
+        tools = {"python": [sys.executable, "--version"],
+                 "pytest": [sys.executable, "-m", "pytest", "--version"],
+                 "docker": ["docker", "--version"],
+                 "docker-compose": ["docker", "compose", "version"]}
+        for tool, args in tools.items():
+            try:
+                r = self._run(args, timeout=60)
+                versions[tool] = ((r.stdout or r.stderr).strip()
+                                  if r.returncode == 0 else "unavailable")
+            except (FileNotFoundError, OSError):
+                versions[tool] = "unavailable"
         self._write_json("tool-versions.json", {"versions": versions, **self.ctx})
         self.record("tools: " + "; ".join(f"{k}={v[:40]}" for k, v in versions.items()))
 
@@ -330,8 +335,10 @@ class Runner:
             raise Fail(f"FAIL: independent gate rejected the run (rc={self.gate_rc})")
 
     def step_close_logs(self) -> None:
-        """Step 19: close all mutable logs (stage-log is frozen before the manifest)."""
-        pass  # no more record() calls after this point
+        """Step 19: close all mutable logs — stage-log.txt is frozen NOW,
+        before the manifest is generated, so its hash describes the final file."""
+        (self.evidence / "stage-log.txt").write_text(
+            "\n".join(self.log) + "\n", encoding="utf-8")
 
     def step_stage_status(self) -> None:
         """Step 20: final stage status reflecting the actual result."""
@@ -386,8 +393,6 @@ class Runner:
 
     def step_manifest(self) -> None:
         """Step 21: final evidence manifest GENERATED LAST (after stage-log closes)."""
-        stage_log = "\n".join(self.log) + "\n"
-        (self.evidence / "stage-log.txt").write_text(stage_log, encoding="utf-8")
         manifest = {
             "manifest_version": "1.0.0",
             "schema_version": SCHEMA_VERSION,
@@ -403,11 +408,12 @@ class Runner:
                 "size": (self.evidence / name).stat().st_size,
             }
         self._write_json("evidence-manifest.json", manifest)
-        self.record("manifest: generated last, hashing all final files")
+        print("manifest: generated last, hashing all final files")
 
     def step_final_verify(self) -> None:
-        """Steps 22-23: read-only final package verifier (gate --final)."""
-        self.record("final: read-only package verifier (gate --final)")
+        """Steps 22-23: read-only final package verifier (gate --final).
+        NOTE: no record() here — the stage log was closed in step 19 and
+        the manifest was generated in step 21; nothing mutable may follow."""
         r = self._run([sys.executable, str(BASE_DIR / "scripts" / "independent-gate-b2.py"),
                        "--final", str(self.evidence), str(self.pytest_rc)])
         sys.stdout.write(r.stdout or "")
@@ -438,7 +444,6 @@ class Runner:
             self.record(f"[{step.__name__}]")
             step()
         self.completed_normally = True
-        self.record("RESULT: PASS — B2 control-plane validation succeeded")
         print(f"GATE PASS: {self.run_id} — B2 validation succeeded, evidence in {self.evidence}")
         return 0
 

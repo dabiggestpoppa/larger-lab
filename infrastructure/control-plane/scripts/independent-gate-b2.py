@@ -229,10 +229,13 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
                 f"expected={cdata.get('expected')} executed={cdata.get('executed')}")
 
     # ------------------------------------------------------------------ artifacts
-    # independent-gate.json is the gate's OWN output — written at the end of
-    # pass A; the --final phase requires the complete set including it.
-    pass_a_required = [a for a in REQUIRED_ARTIFACTS
-                       if a not in LATE_ARTIFACTS and a != "independent-gate.json"]
+    # Excluded from pass A (produced after the gate runs, or by the gate
+    # itself): independent-gate.json (gate's own output), stage-log.txt +
+    # validation-summary.md (written by the runner after pass A, before the
+    # manifest). The --final phase requires the COMPLETE set via the manifest.
+    post_gate = LATE_ARTIFACTS | {"independent-gate.json", "stage-log.txt",
+                                  "validation-summary.md"}
+    pass_a_required = [a for a in REQUIRED_ARTIFACTS if a not in post_gate]
     missing_artifacts = [a for a in pass_a_required if not (evidence / a).exists()]
     add("artifacts-complete", "required evidence artifacts present (pre-manifest)",
         not missing_artifacts, f"missing={missing_artifacts}")
