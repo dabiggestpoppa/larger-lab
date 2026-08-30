@@ -75,6 +75,64 @@ class TestEmptyValid:
         assert parsed.rows == ()
 
 
+class TestCardinalityFailClosed:
+    """SENSOR-B3-I05R1 — structural list/dict cardinality mismatch is BREAKING."""
+
+    LIST_SENSORS = {
+        "open_interest": SensorFamily.MECHANICAL_OPEN_INTEREST,
+        "positioning": SensorFamily.MECHANICAL_POSITIONING,
+        "liquidation": SensorFamily.MECHANICAL_LIQUIDATION,
+    }
+
+    def _list_body(self, timestamps: list, data: list) -> dict:
+        return {"errors": [], "result": {"timestamp": timestamps, "data": data, "more": False}}
+
+    def test_list_data_shorter_than_timestamps_breaking(self) -> None:
+        for sensor in self.LIST_SENSORS.values():
+            parsed = parse_kraken_analytics(
+                self._list_body([1755000000, 1755003600], [["1"]]), sensor
+            )
+            assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+            assert parsed.rows == ()
+            assert parsed.semantic_output_allowed is False
+
+    def test_list_data_longer_than_timestamps_breaking(self) -> None:
+        for sensor in self.LIST_SENSORS.values():
+            parsed = parse_kraken_analytics(
+                self._list_body([1755000000], [["1"], ["2"]]), sensor
+            )
+            assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+            assert parsed.rows == ()
+
+    def test_list_equal_length_still_known(self) -> None:
+        parsed = parse_kraken_analytics(
+            self._list_body([1755000000], [["725.3"]]),
+            SensorFamily.MECHANICAL_OPEN_INTEREST,
+        )
+        assert parsed.schema_state is SchemaState.KNOWN_SCHEMA
+        assert parsed.rows[0]["value"] == ["725.3"]
+
+    def test_dict_metric_column_longer_than_timestamps_breaking(self) -> None:
+        body = {
+            "errors": [],
+            "result": {"timestamp": [1755000000], "data": {"basis": ["0.001", "0.002"]}, "more": False},
+        }
+        parsed = parse_kraken_analytics(body, SensorFamily.MECHANICAL_BASIS)
+        assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+        assert parsed.rows == ()
+
+    def test_provider_declared_null_not_a_mismatch(self) -> None:
+        # a correctly-sized column with a legitimate provider null value stays
+        # native data (book_metric slippage1m: [None]) — structural absence
+        # != provider-declared null
+        parsed = parse_kraken_analytics(
+            FX.HAPPY["book_metric"][1], SensorFamily.MECHANICAL_BOOK_METRIC
+        )
+        assert parsed.schema_state is SchemaState.KNOWN_SCHEMA
+        # row cells are per-bucket values; the provider-declared null survives
+        assert parsed.rows[0]["ask"]["slippage1m"] is None
+
+
 class TestSchemaDriftFailClosed:
     def test_open_interest_wrong_data_type_unknown(self) -> None:
         parsed = parse_kraken_analytics(FX.DRIFT["open_interest"][1], SensorFamily.MECHANICAL_OPEN_INTEREST)

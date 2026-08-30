@@ -45,6 +45,7 @@ from crypto_sensor_fabric.providers.base.enums import (
     PaginationMode,
     QualityFlagAcquisition,
     Retryability,
+    SchemaState,
 )
 from crypto_sensor_fabric.providers.base.errors import (
     AccessClassViolation,
@@ -589,6 +590,124 @@ class TestGranularityFailClosed:
         with pytest.raises(UnsupportedGranularity):
             adapter.fetch_funding(req)
         assert transport.calls == []
+
+
+class TestSchemaDriftRawEnvelope:
+    """SENSOR-B3-I05R1 — SchemaDrift carries the exact preserved raw envelope."""
+
+    def _drift_routes(self) -> dict[str, Any]:
+        return {
+            "/open-interest": FX.DRIFT["open_interest"],
+            "/funding": FX.DRIFT["funding"],
+            "/future-basis": FX.DRIFT["basis"],
+            "/long-short-ratio": FX.DRIFT["positioning"],
+            "/liquidation-volume": FX.DRIFT["liquidation"],
+            "/orderbook": FX.DRIFT["book_metric"],
+        }
+
+    def test_each_promoted_sensor_drift_carries_raw_envelope(self) -> None:
+        adapter = _adapter(routes=self._drift_routes())
+        for sensor in ALL_PROMOTED:
+            with pytest.raises(SchemaDrift) as excinfo:
+                dispatch_fetch(adapter, request(sensor))
+            err = excinfo.value
+            assert err.failure_type == "SchemaDrift"
+            envelope = err.raw_payload_envelope
+            assert envelope is not None, f"{sensor.value} drift lost the raw envelope"
+            assert envelope.provider_id == PROVIDER_ID
+            assert envelope.sensor_family is sensor
+            assert envelope.request_fingerprint
+            assert envelope.schema_state in (
+                SchemaState.BREAKING_SCHEMA_CHANGE,
+                SchemaState.UNKNOWN_SCHEMA,
+            )
+            # hash matches the preserved raw body; evidence ref resolves to I14
+            raw = envelope.raw_body
+            raw_bytes = raw if isinstance(raw, bytes) else raw.encode("utf-8")
+            assert envelope.content_hash == payload_hash(raw_bytes)
+            caps = build_kraken_capabilities()
+            ref = caps.capability_for(sensor).probe_evidence_ref
+            assert ref is not None
+            assert envelope.evidence_ref == ref
+            assert ref.evidence_id in caps.capability_for(sensor).evidence_basis
+
+    def test_drift_envelope_hash_deterministic(self) -> None:
+        first = _adapter(routes=self._drift_routes())
+        second = _adapter(routes=self._drift_routes())
+        with pytest.raises(SchemaDrift) as a:
+            first.fetch_funding(request(SensorFamily.MECHANICAL_FUNDING))
+        with pytest.raises(SchemaDrift) as b:
+            second.fetch_funding(request(SensorFamily.MECHANICAL_FUNDING))
+        assert a.value.raw_payload_envelope is not None
+        assert b.value.raw_payload_envelope is not None
+        assert a.value.raw_payload_envelope.content_hash == b.value.raw_payload_envelope.content_hash
+        assert a.value.raw_payload_envelope.raw_body == b.value.raw_payload_envelope.raw_body
+
+
+class TestListCardinalityFailClosed:
+    """SENSOR-B3-I05R1 — structural list/dict cardinality mismatch is BREAKING."""
+
+    LIST_SENSORS = (
+        SensorFamily.MECHANICAL_OPEN_INTEREST,
+        SensorFamily.MECHANICAL_POSITIONING,
+        SensorFamily.MECHANICAL_LIQUIDATION,
+    )
+    FRAGMENT = {
+        SensorFamily.MECHANICAL_OPEN_INTEREST: "/open-interest",
+        SensorFamily.MECHANICAL_POSITIONING: "/long-short-ratio",
+        SensorFamily.MECHANICAL_LIQUIDATION: "/liquidation-volume",
+    }
+
+    def test_list_data_shorter_than_timestamps_breaks(self) -> None:
+        for sensor in self.LIST_SENSORS:
+            body = {
+                "errors": [],
+                "result": {
+                    "timestamp": [1755000000, 1755003600, 1755007200],
+                    "data": [["1"], ["2"]],
+                    "more": False,
+                },
+            }
+            adapter = _adapter(routes={self.FRAGMENT[sensor]: (200, body)})
+            with pytest.raises(SchemaDrift):
+                dispatch_fetch(adapter, request(sensor))
+
+    def test_list_data_longer_than_timestamps_breaks(self) -> None:
+        for sensor in self.LIST_SENSORS:
+            body = {
+                "errors": [],
+                "result": {
+                    "timestamp": [1755000000],
+                    "data": [["1"], ["2"]],
+                    "more": False,
+                },
+            }
+            adapter = _adapter(routes={self.FRAGMENT[sensor]: (200, body)})
+            with pytest.raises(SchemaDrift):
+                dispatch_fetch(adapter, request(sensor))
+
+    def test_dict_metric_column_longer_than_timestamps_breaks(self) -> None:
+        body = {
+            "errors": [],
+            "result": {
+                "timestamp": [1755000000],
+                "data": {"basis": ["0.001", "0.002"]},
+                "more": False,
+            },
+        }
+        adapter = _adapter(routes={"/future-basis": (200, body)})
+        with pytest.raises(SchemaDrift):
+            adapter.fetch_basis(request(SensorFamily.MECHANICAL_BASIS))
+
+    def test_legitimate_provider_null_still_preserved(self) -> None:
+        # a correctly-sized column containing a provider-declared null is
+        # native data, NOT a structural mismatch (book_metric slippage1m)
+        batch = _adapter(routes=HAPPY_ROUTES).fetch_book_metrics(
+            request(SensorFamily.MECHANICAL_BOOK_METRIC)
+        )
+        assert batch.row_count >= 1
+
+
 class TestNoTransportSensorIdentity:
     """SENSOR-B3-I05R1 — no-transport failure names the REQUESTED sensor."""
 

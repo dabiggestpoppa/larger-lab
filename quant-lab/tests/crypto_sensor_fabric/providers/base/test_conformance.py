@@ -59,7 +59,13 @@ from crypto_sensor_fabric.providers.base.enums import (
     QualityFlagAcquisition,
     SchemaState,
 )
-from crypto_sensor_fabric.providers.base.errors import CapabilityUnavailable
+from crypto_sensor_fabric.providers.base.errors import (
+    CapabilityUnavailable,
+    ProviderUnavailable,
+    SchemaDrift,
+)
+from crypto_sensor_fabric.providers.base.fingerprint import payload_hash
+from crypto_sensor_fabric.providers.base.models import RawPayloadEnvelope
 from crypto_sensor_fabric.providers.base.native import ProviderNativeCapabilityEvidence
 from crypto_sensor_fabric.providers.base.models import (
     AdapterEvidenceRef,
@@ -1140,6 +1146,56 @@ class TestNativeEvidenceConformanceGate:
         assert _check(results, "q0_native_mode_evidence").passed, _check(
             results, "q0_native_mode_evidence"
         ).detail
+
+
+# ---------------------------------------------------------------------------
+#  SENSOR-B3-I05R1 — typed failure carries the preserved raw envelope
+# ---------------------------------------------------------------------------
+class TestRawFailureEnvelope:
+    """Common AcquisitionError.raw_payload_envelope attachment.
+
+    SchemaDrift is the first consumer: the immutable RawPayloadEnvelope exists
+    on the failure path so raw body/hash/provider/sensor/fingerprint/metadata
+    are recoverable.  Other error types leave it None.
+    """
+
+    def _envelope(self) -> RawPayloadEnvelope:
+        body = b'{"rate": "0.0001"}'
+        return RawPayloadEnvelope(
+            provider_id="KRAKEN_FUTURES",
+            sensor_family=SensorFamily.MECHANICAL_FUNDING,
+            request_fingerprint="fp-test",
+            raw_body=body,
+            content_hash=payload_hash(body),
+            schema_state=SchemaState.BREAKING_SCHEMA_CHANGE,
+            adapter_version="0.0.0-test",
+        )
+
+    def test_other_error_types_default_none(self) -> None:
+        err = ProviderUnavailable("P", SensorFamily.MECHANICAL_TRADE)
+        assert err.raw_payload_envelope is None
+
+    def test_schema_drift_carries_envelope(self) -> None:
+        envelope = self._envelope()
+        err = SchemaDrift(
+            "KRAKEN_FUTURES",
+            SensorFamily.MECHANICAL_FUNDING,
+            raw_payload_envelope=envelope,
+        )
+        assert err.raw_payload_envelope == envelope
+
+    def test_error_from_failure_type_round_trips_envelope(self) -> None:
+        from crypto_sensor_fabric.providers.base.errors import error_from_failure_type
+
+        envelope = self._envelope()
+        rebuilt = error_from_failure_type(
+            "SchemaDrift",
+            "KRAKEN_FUTURES",
+            SensorFamily.MECHANICAL_FUNDING,
+            raw_payload_envelope=envelope,
+        )
+        assert rebuilt.raw_payload_envelope == envelope
+        assert rebuilt.raw_payload_envelope.content_hash == payload_hash(b'{"rate": "0.0001"}')
 
 
 def declared_caps(**sensor_overrides: object) -> ProviderCapabilities:

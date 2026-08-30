@@ -112,9 +112,10 @@ def parse_kraken_analytics(
             return ParsedAnalytics(
                 rows=(), more=more, schema_state=assessment.state, assessment=assessment
             )
-        # fail closed: a metric column shorter than the timestamp column is a
-        # schema break (never zero-pad / silently truncate)
-        if _any_short_column(data, timestamps):
+        # fail closed: a metric column whose cardinality mismatches the
+        # timestamp column (shorter OR longer) is a schema break (never
+        # zero-pad / silently truncate / manufacture buckets)
+        if _any_mismatched_column(data, timestamps):
             short_assessment = SchemaAssessment(
                 state=SchemaState.BREAKING_SCHEMA_CHANGE,
                 raw_preserved=True,
@@ -136,9 +137,28 @@ def parse_kraken_analytics(
     if isinstance(data, list):
         # list-of-buckets shape (OI / positioning / liquidation-volume);
         # an empty `data` + empty `timestamp` is a valid EMPTY_VALID response.
+        #
+        # Structural cardinality is fail-closed (SENSOR-B3-I05R1):
+        # len(timestamp) != len(data) is a BREAKING schema change in BOTH
+        # directions — never pad with None, never truncate, never manufacture
+        # buckets.  Provider-declared null VALUES inside a bucket remain
+        # native provider data and are preserved as-is; this guard targets
+        # structural absence, not data content.
+        if len(timestamps) != len(data):
+            cardinality_assessment = SchemaAssessment(
+                state=SchemaState.BREAKING_SCHEMA_CHANGE,
+                raw_preserved=True,
+                semantic_output_allowed=False,
+            )
+            return ParsedAnalytics(
+                rows=(),
+                more=more,
+                schema_state=SchemaState.BREAKING_SCHEMA_CHANGE,
+                assessment=cardinality_assessment,
+            )
         rows: list[dict[str, Any]] = []
         for i, ts in enumerate(timestamps):
-            datum = data[i] if i < len(data) else None
+            datum = data[i]
             row: dict[str, Any] = {"timestamp": ts}
             if isinstance(datum, list):
                 row["value"] = datum  # native multi-value bucket array
@@ -155,17 +175,20 @@ def parse_kraken_analytics(
     )
 
 
-def _column_is_short(column: Any, n: int) -> bool:
-    """A metric column is short when it is not a list of length >= n.
+def _column_is_mismatched(column: Any, n: int) -> bool:
+    """A metric column cardinality-mismatches the timestamp column.
 
-    Handles both flat metric lists (funding `rate`) and nested side-sub-maps
+    Structural mismatch is symmetric (SENSOR-B3-I05R1): a column shorter
+    THAN the timestamp column AND one longer than it are both schema breaks
+    (never zero-pad, never truncate, never manufacture buckets).  Handles
+    both flat metric lists (funding `rate`) and nested side-sub-maps
     (book_metric `ask` / `bid`, where each leaf is a list parallel to ts).
     """
     if isinstance(column, list):
-        return len(column) < n
+        return len(column) != n
     if isinstance(column, dict):
         return not column or any(
-            not isinstance(leaf, list) or len(leaf) < n for leaf in column.values()
+            not isinstance(leaf, list) or len(leaf) != n for leaf in column.values()
         )
     return True
 
@@ -179,9 +202,9 @@ def _column_value(column: Any, i: int) -> Any:
     raise ValueError("unexpected non-list metric column")
 
 
-def _any_short_column(data: dict[str, Any], timestamps: list[Any]) -> bool:
-    """True when any metric column is shorter than the timestamp column."""
-    return any(_column_is_short(col, len(timestamps)) for col in data.values())
+def _any_mismatched_column(data: dict[str, Any], timestamps: list[Any]) -> bool:
+    """True when any metric column cardinality-mismatches the timestamps."""
+    return any(_column_is_mismatched(col, len(timestamps)) for col in data.values())
 
 
 def _build_dict_rows(

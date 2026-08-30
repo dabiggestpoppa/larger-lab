@@ -12,7 +12,7 @@ from typing import Any
 
 from ...contracts.enums import SensorFamily
 from .enums import Retryability
-from .models import AdapterEvidenceRef
+from .models import AdapterEvidenceRef, RawPayloadEnvelope
 
 
 class AcquisitionError(Exception):
@@ -29,6 +29,7 @@ class AcquisitionError(Exception):
         retryability: Retryability = Retryability.UNKNOWN,
         provider_native_context_redacted: dict[str, Any] | None = None,
         evidence_ref: AdapterEvidenceRef | None = None,
+        raw_payload_envelope: RawPayloadEnvelope | None = None,
         detail: str | None = None,
     ) -> None:
         self.provider_id = provider_id
@@ -37,6 +38,7 @@ class AcquisitionError(Exception):
         self.retryability = retryability
         self.provider_native_context_redacted = provider_native_context_redacted or {}
         self.evidence_ref = evidence_ref
+        self.raw_payload_envelope = raw_payload_envelope
         self.detail = detail
         super().__init__(detail or self.failure_type)
 
@@ -120,7 +122,13 @@ class ArchiveIntegrityFailure(AcquisitionError):
 
 
 class SchemaDrift(AcquisitionError):
-    """Breaking/unknown schema — raw payload archived, parsed output fails closed."""
+    """Breaking/unknown schema — raw payload archived, parsed output fails closed.
+
+    `raw_payload_envelope` carries the exact preserved raw acquisition artifact
+    (body + integrity hash + provider/sensor/fingerprint/retrieval metadata) so
+    the failure path itself is evidence-bearing.  Other error types leave the
+    attachment None by default.
+    """
 
     failure_type = "SchemaDrift"
 

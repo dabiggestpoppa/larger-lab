@@ -260,24 +260,13 @@ class KrakenAdapter:
         assessment: SchemaAssessment | None = parsed.assessment
         semantic_ok = parsed.semantic_output_allowed
 
+        # MATERIALIZE the immutable raw acquisition artifact BEFORE the parse
+        # decision (SENSOR-B3-I05R1): the envelope exists even when the schema
+        # is BREAKING/UNKNOWN, so the failure path carries the exact preserved
+        # raw body, hash, provider, sensor, fingerprint and retrieval metadata.
         raw_text = json.dumps(body, separators=(",", ":"), ensure_ascii=False)
         raw_bytes = raw_text.encode("utf-8")
         content_hash = payload_hash(raw_bytes)
-
-        if not semantic_ok:
-            # BREAKING / UNKNOWN: raw evidence conceptually preserved upstream;
-            # parsed semantic output BLOCKED (fail closed, no zero coercion).
-            raise SchemaDrift(
-                provider_id=self.provider_id,
-                sensor_family=sensor,
-                request_fingerprint=fp,
-                evidence_ref=capability.probe_evidence_ref,
-                detail=(
-                    f"Kraken {sensor.value} analytics schema state "
-                    f"{parsed.schema_state.value} blocks parsed output"
-                ),
-            )
-
         envelope = RawPayloadEnvelope(
             provider_id=self.provider_id,
             sensor_family=sensor,
@@ -291,6 +280,22 @@ class KrakenAdapter:
             evidence_ref=capability.probe_evidence_ref,
             adapter_version=self.adapter_version,
         )
+
+        if not semantic_ok:
+            # BREAKING / UNKNOWN: raw evidence is PRESERVED (typed envelope
+            # attachment on the failure); parsed semantic output BLOCKED.
+            raise SchemaDrift(
+                provider_id=self.provider_id,
+                sensor_family=sensor,
+                request_fingerprint=fp,
+                evidence_ref=capability.probe_evidence_ref,
+                raw_payload_envelope=envelope,
+                detail=(
+                    f"Kraken {sensor.value} analytics schema state "
+                    f"{parsed.schema_state.value} blocks parsed output; raw "
+                    "payload preserved in the failure envelope"
+                ),
+            )
 
         rows = list(parsed.rows)
         quality_flags: list[QualityFlagAcquisition] = []
