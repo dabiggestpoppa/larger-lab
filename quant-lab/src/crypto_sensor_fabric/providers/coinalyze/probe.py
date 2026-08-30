@@ -44,6 +44,21 @@ NATIVE_INSTRUMENTS: ClassVar[dict[str, str]] = {
 HISTORY_INTERVALS: tuple[str, ...] = ("1h", "1d")
 
 
+def free_key_prereq_status(configured: bool) -> str:
+    """Local-run prerequisite check for the free aggregator API key (I12R1).
+
+    A missing local key is a LOCAL run prerequisite classified
+    `CREDENTIAL_NOT_CONFIGURED` — it is NEVER treated as a provider failure and
+    is NEVER called AUTH_BLOCKED, because only an actual provider response can
+    establish AUTH_BLOCKED.
+    """
+    if configured:
+        return "READY"
+    from ...probes.enums import CapabilityStatus
+
+    return CapabilityStatus.CREDENTIAL_NOT_CONFIGURED.value
+
+
 class CoinalyzeCapabilityProbe(RestCapabilityProbeBase):
     """Coinalyze v1 free-key aggregator characterization (offline)."""
 

@@ -39,6 +39,11 @@ class CapabilityStatus(_StrEnum):
     HISTORY_BLOCKED = "HISTORY_BLOCKED"
     SEMANTICALLY_UNUSABLE = "SEMANTICALLY_UNUSABLE"
     TRANSIENT_FAILURE = "TRANSIENT_FAILURE"
+    #: LOCAL run prerequisite missing (e.g. free API key not configured).  This
+    # is NOT a provider failure and NOT AUTH_BLOCKED — a local prerequisite
+    # that blocks the attempt before any provider response exists.  Only an
+    # actual provider response can establish AUTH_BLOCKED (I12R1 audit).
+    CREDENTIAL_NOT_CONFIGURED = "CREDENTIAL_NOT_CONFIGURED"
     UNVERIFIED = "UNVERIFIED"
 
 

@@ -24,6 +24,7 @@ from crypto_sensor_fabric.probes.payload import fingerprint_payload
 from crypto_sensor_fabric.providers.coinalyze import (
     NATIVE_INSTRUMENTS,
     CoinalyzeCapabilityProbe,
+    free_key_prereq_status,
 )
 
 FIXTURES = (
@@ -78,6 +79,15 @@ def test_native_instruments_are_venue_attributed():
 
 def test_probe_is_free_api_key_mode():
     assert PROBE.access_mode is AccessMode.FREE_API_KEY
+
+
+def test_missing_local_key_is_credential_not_configured():
+    # A missing FREE_KEY locally is a LOCAL run prerequisite, never a provider
+    # failure and never AUTH_BLOCKED without an actual provider response (I12R1).
+    assert free_key_prereq_status(configured=False) == "CREDENTIAL_NOT_CONFIGURED"
+    assert free_key_prereq_status(configured=True) == "READY"
+
+
 
 
 def test_build_probe_request_never_embeds_apikey():

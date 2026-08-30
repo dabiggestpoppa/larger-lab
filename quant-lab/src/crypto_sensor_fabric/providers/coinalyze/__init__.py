@@ -7,6 +7,13 @@ from .probe import (
     NATIVE_INSTRUMENTS,
     PROVIDER_ID,
     CoinalyzeCapabilityProbe,
+    free_key_prereq_status,
 )
 
-__all__ = ["HISTORY_INTERVALS", "NATIVE_INSTRUMENTS", "PROVIDER_ID", "CoinalyzeCapabilityProbe"]
+__all__ = [
+    "HISTORY_INTERVALS",
+    "NATIVE_INSTRUMENTS",
+    "PROVIDER_ID",
+    "CoinalyzeCapabilityProbe",
+    "free_key_prereq_status",
+]

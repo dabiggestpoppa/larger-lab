@@ -38,6 +38,7 @@ EXPECTED_MEMBERS: dict[str, set[str]] = {
         "HISTORY_BLOCKED",
         "SEMANTICALLY_UNUSABLE",
         "TRANSIENT_FAILURE",
+        "CREDENTIAL_NOT_CONFIGURED",  # I12R1: local run prerequisite, not a provider failure
         "UNVERIFIED",
     },
     "ProbeRunStatus": {
@@ -225,3 +226,15 @@ def test_probe_enum_values_equal_names():
             continue
         for member in enum_cls:
             assert member.value == member.name, enum_cls.__name__
+
+
+def test_credential_not_configured_is_local_prereq_not_auth_blocked():
+    # I12R1: a missing free key locally is a run prerequisite, never a provider
+    # failure and never AUTH_BLOCKED without a real provider response.
+    assert (
+        CapabilityStatus.CREDENTIAL_NOT_CONFIGURED
+        is not CapabilityStatus.AUTH_BLOCKED
+    )
+    assert CapabilityStatus.CREDENTIAL_NOT_CONFIGURED.value == (
+        "CREDENTIAL_NOT_CONFIGURED"
+    )

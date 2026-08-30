@@ -1,0 +1,561 @@
+# LIVE-PROBE CONTRACT MANIFEST — SENSOR-B2-I12R1C
+#
+# Operator-readable plan for SENSOR-B2-I13 live probing.  It records, for every
+# planned provider/sensor pair, the DOCUMENTED endpoint/query contract that the
+# live probe MUST respect so a wrong URL/unit/timestamp/pagination/access
+# assumption can never masquerade as provider capability evidence.
+#
+# Source authority order (per provider/sensor):
+#   1. frozen Bloc 2 provider playbook (bloc_02/02_PROVIDER_PROBE_PLAYBOOK.md)
+#   2. current first-party provider documentation (evidence_url below)
+#   3. lightweight endpoint smoke ONLY after this manifest is reviewed
+#   4. secondary/community material only where explicitly allowed
+#
+# `live_probe_enabled` is FALSE for every row: I13 is NOT authorized yet.  Docs
+# verification is NOT live verification and nothing here is promoted.
+
+schema_version: "1.0"
+generated_at_checkpoint: SENSOR-B2-I12R1C
+documentation_reviewed_on: "2026-08-30"
+primary_rule: >
+  WRONG REQUEST != PROVIDER UNSUPPORTED.  An incorrect URL, unit, timestamp,
+  pagination rule or access assumption must never create provider evidence.
+  Only an actual provider response can establish AUTH_BLOCKED or a capability;
+  a missing LOCAL free key is classified CREDENTIAL_NOT_CONFIGURED (a run
+  prerequisite), never a provider failure.
+
+# ---------------------------------------------------------------------------
+# KRAKEN_FUTURES
+# ---------------------------------------------------------------------------
+KRAKEN_FUTURES:
+  venue: KRAKEN_FUTURES
+  evidence_source_class: FIRST_PARTY_EXCHANGE
+  analytics_base_url: "https://futures.kraken.com/api/charts/v1/analytics"
+  analytics_doc_url: "https://docs.kraken.com/api-reference/analytics/market-analytics"
+  sensors:
+    MECHANICAL_OPEN_INTEREST:
+      absolute_url: "https://futures.kraken.com/api/charts/v1/analytics/{symbol}/open-interest"
+      method: GET
+      auth: NO_AUTH
+      start_param: since
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      interval_param: interval
+      interval_unit: seconds (60,300,900,1800,3600,14400,43200,86400,604800)
+      pagination: result.more -> re-issue since at oldest bucket
+      response_envelope: '{"result":{"timestamp":[],"data":[],"more":bool},"errors":[]}'
+      native_unit_notes: provider-precomputed bucketed OI; never EXACT_EQUIVALENT to Fabric-derived OI
+      historical: true
+      evidence_source_url: "https://docs.kraken.com/api-reference/analytics/market-analytics"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_FUNDING:
+      absolute_url: "https://futures.kraken.com/api/charts/v1/analytics/{symbol}/funding"
+      method: GET
+      auth: NO_AUTH
+      start_param: since
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      interval_param: interval
+      interval_unit: seconds
+      pagination: result.more
+      response_envelope: '{"result":{"timestamp":[],"data":[],"more":bool},"errors":[]}'
+      native_unit_notes: provider-precomputed bucketed funding
+      historical: true
+      evidence_source_url: "https://docs.kraken.com/api-reference/analytics/market-analytics"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_BASIS:
+      absolute_url: "https://futures.kraken.com/api/charts/v1/analytics/{symbol}/future-basis"
+      method: GET
+      auth: NO_AUTH
+      start_param: since
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      interval_param: interval
+      interval_unit: seconds
+      pagination: result.more
+      native_unit_notes: provider-precomputed future basis
+      historical: true
+      evidence_source_url: "https://docs.kraken.com/api-reference/analytics/market-analytics"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_POSITIONING:
+      absolute_url: "https://futures.kraken.com/api/charts/v1/analytics/{symbol}/long-short-ratio"
+      method: GET
+      auth: NO_AUTH
+      start_param: since
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      interval_param: interval
+      interval_unit: seconds
+      pagination: result.more
+      native_unit_notes: gating population (GLOBAL_LONG_SHORT_RATIO / TOP_TRADER_*) not equated
+      historical: true
+      evidence_source_url: "https://docs.kraken.com/api-reference/analytics/market-analytics"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_BOOK_METRIC:
+      absolute_url: "https://futures.kraken.com/api/charts/v1/analytics/{symbol}/orderbook"
+      method: GET
+      auth: NO_AUTH
+      start_param: since
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      interval_param: interval
+      interval_unit: seconds
+      pagination: result.more
+      native_unit_notes: precomputed book metric (orderbook; spreads/liquidity/slippage candidates)
+      historical: true
+      evidence_source_url: "https://docs.kraken.com/api-reference/analytics/market-analytics"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_TRADE:
+      absolute_url: "https://futures.kraken.com/derivatives/api/v3/history"
+      method: GET
+      auth: NO_AUTH
+      start_param: since
+      start_unit: epoch_milliseconds
+      end_param: none
+      end_unit: "n/a (since-only backward traversal)"
+      interval_param: none
+      pagination: since cursor backwards
+      native_unit_notes: trade-level execution anatomy (type=fill/liquidation/settlement)
+      historical: true
+      evidence_source_url: "https://docs.kraken.com/api-reference/futures/rest-api/get-trade-history"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+# ---------------------------------------------------------------------------
+# GATE_FUTURES
+# ---------------------------------------------------------------------------
+GATE_FUTURES:
+  venue: GATE_FUTURES
+  evidence_source_class: FIRST_PARTY_EXCHANGE
+  base_url: "https://api.gateio.ws/api/v4/futures/usdt"
+  sensors:
+    MECHANICAL_POSITIONING:
+      absolute_url: "https://api.gateio.ws/api/v4/futures/usdt/contract_stats"
+      method: GET
+      auth: NO_AUTH
+      start_param: from
+      start_unit: epoch_seconds
+      end_param: "none (NOT invented)"
+      end_unit: "n/a (no `to`; characterized via from/interval/limit)"
+      interval_param: interval
+      interval_unit: seconds
+      limit_param: limit
+      pagination: from/interval/limit bounded traversal (provider actual behavior)
+      native_unit_notes: PUBLIC market-wide positioning (lsr_taker, lsr_account, top_lsr_*, top_long/short_size, long_users, short_users). /positions is PRIVATE_ACCOUNT_DATA OUT_OF_SCOPE.
+      historical: true
+      evidence_source_url: "https://www.gate.com/docs/developers/apiv4/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_OPEN_INTEREST:
+      absolute_url: "https://api.gateio.ws/api/v4/futures/usdt/contract_stats"
+      method: GET
+      auth: NO_AUTH
+      start_param: from
+      start_unit: epoch_seconds
+      end_param: "none (NOT invented)"
+      end_unit: "n/a (no `to`; from/interval/limit)"
+      interval_param: interval
+      interval_unit: seconds
+      limit_param: limit
+      pagination: from/interval/limit bounded traversal
+      native_unit_notes: interval OI (contracts + USD notional)
+      historical: true
+      evidence_source_url: "https://www.gate.com/docs/developers/apiv4/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_LIQUIDATION:
+      absolute_url: "https://api.gateio.ws/api/v4/futures/usdt/contract_stats"
+      method: GET
+      auth: NO_AUTH
+      start_param: from
+      start_unit: epoch_seconds
+      end_param: "none (NOT invented)"
+      end_unit: "n/a (no `to`; from/interval/limit)"
+      interval_param: interval
+      interval_unit: seconds
+      limit_param: limit
+      pagination: from/interval/limit bounded traversal
+      native_unit_notes: interval long/short liquidation sizes + USD notional
+      historical: true
+      evidence_source_url: "https://www.gate.com/docs/developers/apiv4/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_FUNDING:
+      absolute_url: "https://api.gateio.ws/api/v4/futures/usdt/funding_rates"
+      method: GET
+      auth: NO_AUTH
+      start_param: from
+      start_unit: epoch_milliseconds
+      end_param: to
+      end_unit: epoch_milliseconds
+      interval_param: none
+      pagination: from/to window
+      native_unit_notes: decimal fraction per interval; retention to be probed per era
+      historical: true
+      evidence_source_url: "https://www.gate.com/docs/developers/apiv4/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+# ---------------------------------------------------------------------------
+# BINANCE_USDM
+# ---------------------------------------------------------------------------
+BINANCE_USDM:
+  venue: BINANCE_USDM
+  evidence_source_class: FIRST_PARTY_EXCHANGE
+  base_url: "https://fapi.binance.com/fapi/v1"
+  archive_base_url: "https://data.binance.vision/data/futures/um/daily"
+  sensors:
+    MECHANICAL_OPEN_INTEREST:
+      absolute_url: "https://fapi.binance.com/futures/data/openInterestHist"
+      method: GET
+      auth: NO_AUTH
+      start_param: startTime
+      start_unit: epoch_milliseconds
+      end_param: endTime
+      end_unit: epoch_milliseconds
+      bucket_param: period (5m,15m,30m,1h,4h,1d)
+      limit_param: limit (max 500)
+      pagination: bounded window (max 500 records); deep history is archive-only
+      native_unit_notes: sumOpenInterest (contracts) + sumOpenInterestValue (USD). REST retention limit != archive retention.
+      historical: true
+      rest_is_recent_only: true
+      archive_kinds: [aggTrades, trades, bookDepth, metrics, fundingRate]
+      evidence_source_url: "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_TRADE:
+      absolute_url: "https://fapi.binance.com/fapi/v1/aggTrades"
+      method: GET
+      auth: NO_AUTH
+      start_param: startTime
+      start_unit: epoch_milliseconds
+      end_param: endTime
+      end_unit: epoch_milliseconds
+      limit_param: limit (max 1000)
+      pagination: bounded recent window; deep aggTrades/trades history is archive-only (vision zips)
+      native_unit_notes: isBuyerMaker aggressor contract (true->SELL, false->BUY, R01 PROVISIONAL)
+      historical: false
+      rest_is_recent_only: true
+      archive_kinds: [aggTrades, trades]
+      evidence_source_url: "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_FUNDING:
+      absolute_url: "https://fapi.binance.com/fapi/v1/fundingRate"
+      method: GET
+      auth: NO_AUTH
+      start_param: startTime
+      start_unit: epoch_milliseconds
+      end_param: endTime
+      end_unit: epoch_milliseconds
+      limit_param: limit
+      pagination: bounded recent window; deep funding history is archive-only (fundingRate zips)
+      native_unit_notes: decimal fraction per funding interval
+      historical: false
+      rest_is_recent_only: true
+      archive_kinds: [fundingRate]
+      evidence_source_url: "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_BOOK_SNAPSHOT:
+      absolute_url: "https://fapi.binance.com/fapi/v1/depth"
+      method: GET
+      auth: NO_AUTH
+      start_param: none
+      start_unit: n/a
+      end_param: n/a
+      end_unit: n/a
+      limit_param: limit
+      pagination: none (current snapshot)
+      native_unit_notes: L2 book levels [price USD, qty base]
+      historical: false
+      evidence_source_url: "https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+# ---------------------------------------------------------------------------
+# BYBIT_LINEAR
+# ---------------------------------------------------------------------------
+BYBIT_LINEAR:
+  venue: BYBIT_LINEAR
+  evidence_source_class: FIRST_PARTY_EXCHANGE
+  base_url: "https://api.bybit.com/v5/market"
+  sensors:
+    MECHANICAL_OPEN_INTEREST:
+      absolute_url: "https://api.bybit.com/v5/market/open-interest"
+      method: GET
+      auth: NO_AUTH
+      query: "category=linear&symbol={symbol}&intervalTime=1h&startTime=&endTime=&limit=200"
+      start_param: startTime
+      start_unit: epoch_milliseconds (string)
+      end_param: endTime
+      end_unit: epoch_milliseconds (string)
+      interval_param: intervalTime (5min..1d)
+      limit_param: limit
+      pagination: nextPageCursor cursor traversal (OI endpoint)
+      native_unit_notes: CONTRACT-TYPE dependent unit — BYBIT_LINEAR => base asset (BTC); inverse => USD (future contract-aware)
+      historical: true
+      evidence_source_url: "https://bybit-exchange.github.io/docs/v5/market/mark-price-kline"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_FUNDING:
+      absolute_url: "https://api.bybit.com/v5/market/funding/history"
+      method: GET
+      auth: NO_AUTH
+      query: "category=linear&symbol={symbol}&startTime=&endTime=&limit=200"
+      start_param: startTime
+      start_unit: epoch_milliseconds (string)
+      end_param: endTime
+      end_unit: epoch_milliseconds (string)
+      limit_param: limit
+      pagination: nextPageCursor cursor traversal (VALIDATED independently of OI)
+      native_unit_notes: funding interval is NOT frozen to 8h — symbol-dependent; probe from consecutive fundingTime / instrument metadata
+      historical: true
+      evidence_source_url: "https://bybit-exchange.github.io/docs/v5/market/funding-history"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_TRADE:
+      absolute_url: "https://api.bybit.com/v5/market/recent-trade"
+      method: GET
+      auth: NO_AUTH
+      start_param: none
+      start_unit: n/a
+      end_param: n/a
+      end_unit: n/a
+      pagination: none (latest-only); deep trades live in public.bybit.com daily csv.gz archive
+      native_unit_notes: side is aggressor directly
+      historical: false
+      evidence_source_url: "https://bybit-exchange.github.io/docs/v5/market/recent-trade"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+# ---------------------------------------------------------------------------
+# OKX_SWAP
+# ---------------------------------------------------------------------------
+OKX_SWAP:
+  venue: OKX_SWAP
+  evidence_source_class: FIRST_PARTY_EXCHANGE
+  base_url: "https://www.okx.com/api/v5/market"
+  sensors:
+    MECHANICAL_FUNDING:
+      absolute_url: "https://www.okx.com/api/v5/public/funding-rate-history"
+      method: GET
+      auth: NO_AUTH
+      query: "instId={instId}&limit=100"
+      start_param: after
+      start_unit: "epoch_milliseconds (fundingTime keyed)"
+      end_param: before
+      end_unit: "epoch_milliseconds (fundingTime keyed)"
+      pagination: after/before keyed around fundingTime timestamps (NOT trade ids)
+      native_unit_notes: preserve fundingRate / realizedRate / fundingTime / formulaType / method; interval NOT frozen to 8h
+      historical: true
+      evidence_source_url: "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-funding-rate-history"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_TRADE:
+      absolute_url: "https://www.okx.com/api/v5/market/history-trades"
+      method: GET
+      auth: NO_AUTH
+      query: "instId={instId}&limit=100"
+      start_param: after
+      start_unit: "trade-id based cursor"
+      end_param: before
+      end_unit: "trade-id based cursor"
+      pagination: trade-oriented after/before (trade ids) — separate from funding
+      native_unit_notes: px USD, sz base asset, side aggressor directly
+      historical: true
+      evidence_source_url: "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-trades-history"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_BOOK_SNAPSHOT:
+      absolute_url: "https://www.okx.com/api/v5/market/books"
+      method: GET
+      auth: NO_AUTH
+      query: "instId={instId}&sz=400"
+      start_param: none
+      start_unit: n/a
+      end_param: n/a
+      end_unit: n/a
+      pagination: none (current snapshot); deep book history UNVERIFIED
+      native_unit_notes: L2/400-level current snapshot only
+      historical: false
+      evidence_source_url: "https://www.okx.com/docs-v5/en/#public-data-rest-api-get-order-book"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+# ---------------------------------------------------------------------------
+# DERIBIT
+# ---------------------------------------------------------------------------
+DERIBIT:
+  venue: DERIBIT
+  evidence_source_class: FIRST_PARTY_EXCHANGE
+  base_url: "https://www.deribit.com/api/v2/public"
+  sensors:
+    MECHANICAL_TRADE:
+      absolute_url: "https://www.deribit.com/api/v2/public/get_last_trades_by_instrument"
+      method: GET
+      auth: NO_AUTH
+      query: "instrument_name={instrument}&start_timestamp={ms}&end_timestamp={ms}&count=1000&include_old=true"
+      start_param: start_timestamp
+      start_unit: epoch_milliseconds
+      end_param: end_timestamp
+      end_unit: epoch_milliseconds
+      count_bound: <= 1000
+      pagination: has_more flag; include_old=true REQUIRED for historical depth
+      native_unit_notes: trade-level anatomy; direction=taker/aggressor; liquidation flag field
+      historical: true
+      evidence_source_url: "https://docs.deribit.com/api-reference/market-data/public-get_last_trades_by_instrument"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_LIQUIDATION:
+      absolute_url: "https://www.deribit.com/api/v2/public/get_last_trades_by_instrument"
+      method: GET
+      auth: NO_AUTH
+      query: "instrument_name={instrument}&start_timestamp={ms}&end_timestamp={ms}&count=1000&include_old=true"
+      start_param: start_timestamp
+      start_unit: epoch_milliseconds
+      end_param: end_timestamp
+      end_unit: epoch_milliseconds
+      count_bound: <= 1000
+      pagination: has_more; liquidation tag NOT numerically merged with interval totals (T2-SEM-06)
+      native_unit_notes: TRADE_LEVEL anatomy via liquidation flag on trades
+      historical: true
+      evidence_source_url: "https://docs.deribit.com/api-reference/market-data/public-get_last_trades_by_instrument"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_FUNDING:
+      absolute_url: "https://www.deribit.com/api/v2/public/get_funding_rate_history"
+      method: GET
+      auth: NO_AUTH
+      query: "instrument_name={instrument}&start_timestamp={ms}&end_timestamp={ms}&count=1000"
+      start_param: start_timestamp
+      start_unit: epoch_milliseconds
+      end_param: end_timestamp
+      end_unit: epoch_milliseconds
+      count_bound: <= 1000
+      pagination: window bounded; funding 1h/8h series
+      native_unit_notes: funding_rate per interval
+      historical: true
+      evidence_source_url: "https://docs.deribit.com/api-reference/market-data/public-get_funding_rate_history"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_BOOK_SNAPSHOT:
+      absolute_url: "https://www.deribit.com/api/v2/public/get_order_book"
+      method: GET
+      auth: NO_AUTH
+      query: "instrument_name={instrument}&depth=25"
+      start_param: none
+      start_unit: n/a
+      end_param: n/a
+      end_unit: n/a
+      pagination: none (current snapshot)
+      native_unit_notes: BTC/ETH-narrow universe (SOL present; MID_TAIL_CONTROL NOT mapped)
+      historical: false
+      evidence_source_url: "https://docs.deribit.com/api-reference/market-data/public-get_order_book"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+# ---------------------------------------------------------------------------
+# COINALYZE
+# ---------------------------------------------------------------------------
+COINALYZE:
+  venue: COINALYZE
+  evidence_source_class: THIRD_PARTY_AGGREGATOR
+  base_url: "https://api.coinalyze.net/v1"
+  free_api_key_required: true
+  rate_limit_note: "40 API calls/min/key; 429 on excess (api.coinalyze.net/v1/doc/)"
+  sensors:
+    MECHANICAL_OPEN_INTEREST:
+      absolute_url: "https://api.coinalyze.net/v1/open-interest-history"
+      method: GET
+      auth: FREE_API_KEY
+      query: "symbols={venue_symbol}&interval=1h&from={sec}&to={sec}"
+      start_param: from
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      pagination: single windowed response (from/to + interval bucket); no cursor
+      native_unit_notes: aggregated USD OI; venue-attributed symbols (BTCUSDT_PERP.BINANCE); corroboration only
+      historical: true
+      credential_prereq: CREDENTIAL_NOT_CONFIGURED if no local key (never AUTH_BLOCKED)
+      evidence_source_url: "https://api.coinalyze.net/v1/doc/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_LIQUIDATION:
+      absolute_url: "https://api.coinalyze.net/v1/liquidations-history"
+      method: GET
+      auth: FREE_API_KEY
+      query: "symbols={venue_symbol}&interval=1h&from={sec}&to={sec}"
+      start_param: from
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      pagination: single windowed response; no cursor
+      native_unit_notes: aggregated USD liquidations; intraday retention shallow (doc'd delete old intraday)
+      historical: true
+      credential_prereq: CREDENTIAL_NOT_CONFIGURED if no local key
+      evidence_source_url: "https://api.coinalyze.net/v1/doc/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_FUNDING:
+      absolute_url: "https://api.coinalyze.net/v1/funding-rate-history"
+      method: GET
+      auth: FREE_API_KEY
+      query: "symbols={venue_symbol}&interval=1h&from={sec}&to={sec}"
+      start_param: from
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      pagination: single windowed response; no cursor
+      native_unit_notes: aggregated funding rate; corroboration only
+      historical: true
+      credential_prereq: CREDENTIAL_NOT_CONFIGURED if no local key
+      evidence_source_url: "https://api.coinalyze.net/v1/doc/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+    MECHANICAL_POSITIONING:
+      absolute_url: "https://api.coinalyze.net/v1/long-short-ratio-history"
+      method: GET
+      auth: FREE_API_KEY
+      query: "symbols={venue_symbol}&interval=1h&from={sec}&to={sec}"
+      start_param: from
+      start_unit: epoch_seconds
+      end_param: to
+      end_unit: epoch_seconds
+      pagination: single windowed response; no cursor
+      native_unit_notes: aggregated long/short ratio (aggregator methodology opaque)
+      historical: true
+      credential_prereq: CREDENTIAL_NOT_CONFIGURED if no local key
+      evidence_source_url: "https://api.coinalyze.net/v1/doc/"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
+# ---------------------------------------------------------------------------
+# BITFINEX_COMMUNITY_ARCHIVE
+# ---------------------------------------------------------------------------
+BITFINEX_COMMUNITY_ARCHIVE:
+  venue: BITFINEX
+  evidence_source_class: COMMUNITY_ARCHIVE
+  repository_url: "https://github.com/tradingstrategy-ai/bitfinex-liquidations"
+  repository_api_url: "https://api.github.com/repos/tradingstrategy-ai/bitfinex-liquidations"
+  sensors:
+    MECHANICAL_LIQUIDATION:
+      absolute_url: "https://github.com/tradingstrategy-ai/bitfinex-liquidations (Git-LFS DuckDB dump bitfinex_liquidations.duckdb)"
+      method: GET
+      auth: NO_AUTH
+      start_param: "n/a (whole-artifact stream; no from/to)"
+      start_unit: n/a
+      end_param: n/a
+      end_unit: n/a
+      interval_param: n/a
+      pagination: n/a
+      native_unit_notes: community-reconstructed liquidation records (amount-sign direction); spot/margin + perpetual mixed — never whole-db PERPETUAL_LIQUIDATIONS
+      historical: true
+      dump_download_planned: false
+      no_download_gt100mb_note: "355217408-byte LFS artifact is NOT downloaded during probing; Git LFS OID (SHA-256) + upstream commit SHA + declared size are the integrity evidence"
+      evidence_source_url: "https://github.com/tradingstrategy-ai/bitfinex-liquidations"
+      documentation_last_reviewed: "2026-08-30"
+      live_probe_enabled: false
