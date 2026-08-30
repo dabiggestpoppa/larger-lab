@@ -99,3 +99,20 @@ providers:
       download route; link expiry and async archive generation must be
       probed.  OI: no official free historical route is assumed; current OI
       is never substituted for history.
+
+  DERIBIT:
+    base_url: "https://www.deribit.com/api/v2/public"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_TRADE: "/get_last_trades_by_instrument"
+      MECHANICAL_LIQUIDATION: "/get_last_trades_by_instrument"
+      MECHANICAL_FUNDING: "/get_funding_rate_history"
+      MECHANICAL_BOOK_SNAPSHOT: "/get_order_book"
+    notes: >
+      Mechanism microscope (BTC/ETH-heavy).  Liquidations appear as trade
+      rows carrying a liquidation flag; TRADE_LEVEL anatomy — never
+      numerically merged with interval liquidation totals (T2-SEM-06).
+      Historical traversal requires include_old=true with start/end timestamp
+      windows and count<=1000; has_more drives pagination.  Funding history is
+      hourly with 8h/1h series.  Narrower asset universe recorded explicitly:
+      MID_TAIL_CONTROL is NOT mapped.

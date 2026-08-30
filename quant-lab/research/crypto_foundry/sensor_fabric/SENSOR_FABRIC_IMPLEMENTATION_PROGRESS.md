@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I08 DONE; SENSOR-B2-I09 (deribit probe) pending |
+| Current checkpoint | SENSOR-B2-I09 DONE; SENSOR-B2-I10 (coinalyze probe) pending |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -47,7 +47,8 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I06 | 24 | 24 | 0 |
 | SENSOR-B2-I07 | 20 | 20 | 0 |
 | SENSOR-B2-I08 | 18 | 18 | 0 |
-| cumulative | 400 | 400 | 0 |
+| SENSOR-B2-I09 | 15 | 15 | 0 |
+| cumulative | 415 | 415 | 0 |
 
 ## External / provider blockers
 
@@ -77,9 +78,10 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- SENSOR-B2-I09: deribit-capability-probe
-  - timestamp/sequence behavior, liquidation semantic fixtures; tests
-  - gate: deribit probe suite green, offline
+- SENSOR-B2-I10: coinalyze-capability-probe
+  - free-key/access/retention characterization; aggregator evidence class;
+    fixtures + tests; never counts as independent venue truth
+  - gate: coinalyze probe suite green, offline
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -113,4 +115,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I05 | 22714a17 | shared REST probe base (rest.py) + kraken refactor onto it + gate probe module + 12 fixtures + tests | 338 passed / 0 failed | PASS | none |
 | SENSOR-B2-I06 | d3df21a9 | binance REST + archive probe module, ratified isBuyerMaker aggressor function, 11 fixtures + tests | 362 passed / 0 failed | PASS | none |
 | SENSOR-B2-I07 | 36263167 | bybit probe module: cursor-paginated OI/funding, numeric-string timestamps, csv.gz trade archive, 9 fixtures + tests | 382 passed / 0 failed | PASS | none |
-| SENSOR-B2-I08 | (pending) | okx probe module: data envelope, after/before cursor, /books current-only, traderecords archive, 8 fixtures + tests | 400 passed / 0 failed | PASS | none |
+| SENSOR-B2-I08 | 122e985a | okx probe module: data envelope, after/before cursor, /books current-only, traderecords archive, 8 fixtures + tests | 400 passed / 0 failed | PASS | none |
+| SENSOR-B2-I09 | (pending) | deribit probe module: trade-level liquidation anatomy, has_more sequence pagination, include_old, narrow universe, 8 fixtures + tests | 415 passed / 0 failed | PASS | none |
