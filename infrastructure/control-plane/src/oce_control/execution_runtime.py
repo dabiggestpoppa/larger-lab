@@ -188,16 +188,33 @@ class BoundedRunner:
     def _apply_posix_limits(self, envelope: JobResourceEnvelope) -> callable:
         import resource
 
-        def _pre(child_argv):
-            resource.setrlimit(resource.RLIMIT_CPU,
-                               (int(envelope.cpu_limit * 2) + 2,
-                                int(envelope.cpu_limit * 2) + 2))
-            resource.setrlimit(resource.RLIMIT_AS,
-                               (envelope.memory_bytes, envelope.memory_bytes))
-            resource.setrlimit(resource.RLIMIT_FSIZE,
-                               (envelope.max_output_bytes, envelope.max_output_bytes))
-            # process group isolation so the whole tree is terminable
-            os.setsid()
+        def _pre():
+            # Best-effort hard limits. If a host refuses a particular rlimit,
+            # we degrade truthfully (the watchdog + output-size check still
+            # enforce the boundary) rather than fail the spawn — an unbounded
+            # runner must never be the cost of an unraisable limit.
+            try:
+                cpus = int(envelope.cpu_limit * 2) + 2
+                hard = resource.getrlimit(resource.RLIMIT_CPU)[1]
+                resource.setrlimit(resource.RLIMIT_CPU, (min(cpus, hard), hard))
+            except (OSError, ValueError):
+                pass
+            try:
+                hard = resource.getrlimit(resource.RLIMIT_AS)[1]
+                want = max(envelope.memory_bytes, 64 * 1024 * 1024)
+                resource.setrlimit(resource.RLIMIT_AS, (min(want, hard), hard))
+            except (OSError, ValueError):
+                pass
+            try:
+                resource.setrlimit(resource.RLIMIT_FSIZE,
+                                   (envelope.max_output_bytes,
+                                    envelope.max_output_bytes))
+            except (OSError, ValueError):
+                pass
+            try:
+                os.setsid()   # process-group isolation → tree terminable
+            except OSError:
+                pass
         return _pre
 
     def run(self, argv: list[str], *, envelope: JobResourceEnvelope,
