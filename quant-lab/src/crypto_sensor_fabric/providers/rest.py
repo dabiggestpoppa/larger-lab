@@ -63,6 +63,10 @@ class RestCapabilityProbeBase:
     result_key_sensors: ClassVar[dict[SensorFamily, str]] = {}
     #: sensors whose book dict IS the result envelope (bids/asks directly under result)
     book_in_result_sensors: ClassVar[frozenset[SensorFamily]] = frozenset()
+    #: envelope key holding the payload ("result" by default; OKX uses "data")
+    envelope_key: ClassVar[str] = "result"
+    #: sensors whose envelope content IS the row list (no sub-key)
+    envelope_is_list_sensors: ClassVar[frozenset[SensorFamily]] = frozenset()
     #: sensors queried with a `since` (ms) cursor
     cursor_paginated_sensors: ClassVar[frozenset[SensorFamily]] = frozenset()
     #: sensors that return only the latest snapshot (no historical window)
@@ -168,13 +172,20 @@ class RestCapabilityProbeBase:
             if not isinstance(body, dict) or "bids" not in body or "asks" not in body:
                 raise ValueError(f"{self.provider_id} payload is not a top-level book")
             return self._flatten_book(body)
-        if not isinstance(body, dict) or "result" not in body:
-            raise ValueError(f"{self.provider_id} payload missing 'result' envelope")
-        result = body["result"]
+        if not isinstance(body, dict) or self.envelope_key not in body:
+            raise ValueError(
+                f"{self.provider_id} payload missing '{self.envelope_key}' envelope"
+            )
+        result = body[self.envelope_key]
+        if sensor in self.envelope_is_list_sensors:
+            if not isinstance(result, list):
+                raise ValueError(f"{self.provider_id} envelope is not a row list")
+            return [row for row in result if isinstance(row, dict)]
         if sensor in self.book_in_result_sensors:
-            if not isinstance(result, dict) or "bids" not in result or "asks" not in result:
+            book = result[0] if isinstance(result, list) and result else result
+            if not isinstance(book, dict) or "bids" not in book or "asks" not in book:
                 raise ValueError(f"{self.provider_id} result is not a book dict")
-            return self._flatten_book(result)
+            return self._flatten_book(book)
         key = self.result_key_sensors[sensor]
         if key not in result:
             raise ValueError(f"{self.provider_id} result missing '{key}' for {sensor.value}")

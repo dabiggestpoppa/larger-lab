@@ -81,3 +81,21 @@ providers:
       liquidation surface; do not infer one from current streams.  Historical
       trades live in the public.bybit.com daily {SYMBOL}{YYYY-MM-DD}.csv.gz
       archive (no published checksums).
+
+  OKX_SWAP:
+    base_url: "https://www.okx.com/api/v5/market"
+    archive_base_url: "https://www.okx.com/cdn/okex/traderecords"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_TRADE: "/history-trades"
+      MECHANICAL_FUNDING: "/funding-rate-history"
+      MECHANICAL_BOOK_SNAPSHOT: "/books"
+    notes: >
+      history-trades and funding-rate-history page backward via after/before
+      (trade ids, not timestamps); cursor traversal must prove depth.
+      /books is a CURRENT snapshot (sz levels) — DEEP BOOK HISTORY is
+      UNVERIFIED pending live probe, never claimed.  The traderecords daily
+      zip archive {instId}/{YYYYMMDD}.zip is the public trade-history
+      download route; link expiry and async archive generation must be
+      probed.  OI: no official free historical route is assumed; current OI
+      is never substituted for history.
