@@ -153,6 +153,7 @@ class KrakenCapabilityProbe(RestCapabilityProbeBase):
         request: CapabilityProbeRequest,
         rows: list[dict[str, Any]],
         sensor: SensorFamily,
+        body: Any = None,
     ) -> tuple[bool, bool | None]:
         if sensor not in self.cursor_paginated_sensors:
             return False, None

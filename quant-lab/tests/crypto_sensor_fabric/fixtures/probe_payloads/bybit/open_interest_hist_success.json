@@ -1,0 +1,14 @@
+{
+  "retCode": 0,
+  "retMsg": "OK",
+  "result": {
+    "category": "linear",
+    "symbol": "BTCUSDT",
+    "list": [
+      {"openInterest": "218.003", "timestamp": "1655251200000"},
+      {"openInterest": "220.400", "timestamp": "1655254800000"},
+      {"openInterest": "221.900", "timestamp": "1655258400000"}
+    ],
+    "nextPageCursor": "cursor-abc-123"
+  }
+}

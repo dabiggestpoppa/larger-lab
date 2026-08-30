@@ -61,6 +61,8 @@ class RestCapabilityProbeBase:
     top_level_book_sensors: ClassVar[frozenset[SensorFamily]] = frozenset()
     #: sensors reached via body["result"][key]
     result_key_sensors: ClassVar[dict[SensorFamily, str]] = {}
+    #: sensors whose book dict IS the result envelope (bids/asks directly under result)
+    book_in_result_sensors: ClassVar[frozenset[SensorFamily]] = frozenset()
     #: sensors queried with a `since` (ms) cursor
     cursor_paginated_sensors: ClassVar[frozenset[SensorFamily]] = frozenset()
     #: sensors that return only the latest snapshot (no historical window)
@@ -169,6 +171,10 @@ class RestCapabilityProbeBase:
         if not isinstance(body, dict) or "result" not in body:
             raise ValueError(f"{self.provider_id} payload missing 'result' envelope")
         result = body["result"]
+        if sensor in self.book_in_result_sensors:
+            if not isinstance(result, dict) or "bids" not in result or "asks" not in result:
+                raise ValueError(f"{self.provider_id} result is not a book dict")
+            return self._flatten_book(result)
         key = self.result_key_sensors[sensor]
         if key not in result:
             raise ValueError(f"{self.provider_id} result missing '{key}' for {sensor.value}")
@@ -204,8 +210,13 @@ class RestCapabilityProbeBase:
         request: CapabilityProbeRequest,
         rows: list[dict[str, Any]],
         sensor: SensorFamily,
+        body: Any = None,
     ) -> tuple[bool, bool | None]:
-        """(pagination_detected, pagination_complete).  Override per provider."""
+        """(pagination_detected, pagination_complete).  Override per provider.
+
+        `body` is the full payload, available to providers whose cursor state
+        lives in the envelope (e.g. Bybit nextPageCursor).
+        """
         return False, None
 
     # ------------------------------------------------------------------
@@ -298,7 +309,7 @@ class RestCapabilityProbeBase:
 
         first_ts, last_ts = first_last_timestamps(rows)
         pagination_detected, pagination_complete = self._pagination_state(
-            request, rows, sensor
+            request, rows, sensor, body
         )
         status = (
             ResponseStatusClass.VERIFIED_SAMPLE

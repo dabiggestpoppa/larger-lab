@@ -191,6 +191,7 @@ class BinanceCapabilityProbe(RestCapabilityProbeBase):
         request: CapabilityProbeRequest,
         rows: list[dict[str, Any]],
         sensor: SensorFamily,
+        body: Any = None,
     ) -> tuple[bool, bool | None]:
         if sensor not in self.window_query_sensors:
             return False, None

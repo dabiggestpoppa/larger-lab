@@ -63,3 +63,21 @@ providers:
       must be detected per symbol/kind, never assumed continuous.  The
       ratified isBuyerMaker contract: true -> SELL aggressor, false -> BUY
       (R01, PROVISIONAL until fixture verification).
+
+  BYBIT_LINEAR:
+    base_url: "https://api.bybit.com/v5/market"
+    archive_base_url: "https://public.bybit.com/trading"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_OPEN_INTEREST: "/open-interest"
+      MECHANICAL_FUNDING: "/funding/history"
+      MECHANICAL_TRADE: "/recent-trade"
+      MECHANICAL_BOOK_SNAPSHOT: "/orderbook"
+    notes: >
+      OI/funding rows carry numeric strings; OI units are contracts (linear)
+      and must be verified per contract type.  nextPageCursor cursor
+      pagination must be traversed to prove symbol-launch-depth history —
+      documentation claims alone do not establish it.  No public historical
+      liquidation surface; do not infer one from current streams.  Historical
+      trades live in the public.bybit.com daily {SYMBOL}{YYYY-MM-DD}.csv.gz
+      archive (no published checksums).

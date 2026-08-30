@@ -116,6 +116,15 @@ def _to_datetime(value: Any) -> datetime | None:
         try:
             return datetime.fromisoformat(value)  # py3.11+ accepts trailing Z
         except ValueError:
+            pass
+        try:
+            numeric = float(value)
+        except ValueError:
+            return None
+        seconds = numeric / 1000.0 if numeric > 10_000_000_000 else numeric
+        try:
+            return datetime.fromtimestamp(seconds, tz=UTC)
+        except (OverflowError, OSError, ValueError):
             return None
     return None
 
