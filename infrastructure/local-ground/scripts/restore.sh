@@ -241,6 +241,8 @@ if [ -f "$CONTENT/postgres/archive.dump" ] && [ -f "$CONTENT/postgres/inventory.
   PG_RC=$?
   if [ -n "$EV_DIR" ] && [ -f "$RECEIPT_OUT" ]; then
     cp "$RECEIPT_OUT" "$EV_DIR/postgres-recovery-receipt.json" 2>/dev/null || true
+    # preserve each restore's own receipt (a later restore must not clobber evidence)
+    cp "$RECEIPT_OUT" "$EV_DIR/postgres-recovery-receipt-$(date +%s%N).json" 2>/dev/null || true
   fi
   if [ "$PG_RC" -ne 0 ]; then
     echo "BLOCKED: PostgreSQL verified recovery failed" >&2
@@ -249,6 +251,49 @@ if [ -f "$CONTENT/postgres/archive.dump" ] && [ -f "$CONTENT/postgres/inventory.
 elif [ "$SCOPE" = "full" ]; then
   echo "BLOCKED: full backup is missing required PostgreSQL archive/inventory" >&2
   exit 3
+fi
+
+# Fail-closed durable canonical verification (Repair-3 phase 8/10): the
+# recovery engine verified the promoted target, but exit 0 must ALSO be
+# independently confirmed against the live canonical right at the restore
+# boundary with a fresh docker exec, and it must be stable (not flicker).
+# If the canonical ever fails to match the protected inventory, BLOCK.
+VERIFY_STABLE=0
+for _pit in 1 2 3 4 5; do
+  if python3 - "$PG_DB" "$PG_USER" "$CONTENT/postgres/inventory.json" <<'PY'
+import json, subprocess, sys
+inv = json.load(open(sys.argv[3], encoding="utf-8"))
+expected = {t["name"]: t["row_count"] for t in inv.get("tables", [])}
+if not expected:
+    print("UNVERIFIED: inventory lists no tables"); sys.exit(1)
+bad = []
+for name, want in expected.items():
+    schema, _, rel = name.partition(".")
+    r = subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-X", "-tAc",
+                        "-U", sys.argv[2], "-d", sys.argv[1],
+                        'SELECT count(*) FROM "%s"."%s";' % (schema, rel)],
+                       capture_output=True, text=True)
+    got = r.stdout.strip() if r.returncode == 0 else "-err-"
+    if got != str(want):
+        bad.append(f"{name}=got {got}, want {want}")
+if bad:
+    print("UNVERIFIED: " + "; ".join(bad), file=sys.stderr)
+    sys.exit(1)
+print("CANONICAL_VERIFIED")
+sys.exit(0)
+PY
+  then
+    VERIFY_STABLE=$((VERIFY_STABLE+1))
+    [ "$VERIFY_STABLE" -ge 2 ] && break
+  else
+    VERIFY_STABLE=0
+    echo "warning: canonical not yet verified (attempt $_pit)" >&2
+  fi
+  sleep 2
+done
+if [ "$VERIFY_STABLE" -lt 2 ]; then
+  echo "BLOCKED: canonical target failed independent durable verification after restore" >&2
+  exit 1
 fi
 
 END_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
