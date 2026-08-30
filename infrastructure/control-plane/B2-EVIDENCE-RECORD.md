@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-30
 **Branch:** `oce-program-build`
-**Implementation SHA:** `79cb0e26`
-**Implementation tree:** `917b8146c9d16eb90bbc8d35c944d9cd1c220eef`
+**Implementation SHA:** `c129d1f4`
+**Implementation tree:** `451c5050d693ca18761fcead17e75fffc265b65e`
 **Starting SHA:** `ac0e239386aa100349f5dc904acdb52345659090`
 
 ## Book 1 ratification
@@ -21,6 +21,9 @@
 | `ff22aa22` | B2-R2: implement PostgreSQL authoritative control state (store, migrations, compose, 9 container tests) |
 | `05702010` | B2-R3: implement Redis-backed disposable transport (notifications, lease mirrors, heartbeats, rate, cache, quarantine, PG reconstruction) |
 | `79cb0e26` | B2-R4: durable scheduler + authenticated, capability-enforced worker (token admission, capability enforcement, PG-persisted schedules, advisory-lock duplicate prevention, migration 0003, 20 container tests) |
+| `f063ae24` | B2-R5: wire Book 2 control-plane CI (workflow, validation runner, independent gate with zero-skips rule, pinned requirements) |
+| `9a24311e` | B2-R5R1: fix migration runner duplicate-key on self-seeded version rows |
+| `c129d1f4` | B2-R5R2: fix state machine lease-surrender (leased → pending) and shared-conn poisoning in pg tests |
 
 ## Test totals
 
@@ -29,16 +32,18 @@
 | Unit tests | 90/90 PASS |
 | Schema tests | 10/10 PASS |
 | Control plane tests | 66/66 PASS |
-| Container-backed (PG 9 + Redis 2 + Worker 13 + Scheduler 7) | 31/31 mandatory in CI, truthful local skip |
+| Container-backed (PG 9 + Redis 2 + Worker 13 + Scheduler 7) | 31/31 PASS in CI (real compose stack) |
 | Mandatory FAIL | 0 |
 | Mandatory BLOCKED | 0 |
-| Mandatory SKIPPED | 0 (CI); 31 truthful local skips (no Docker) |
+| Mandatory SKIPPED | 0 in CI (gate-enforced); truthful local skips without Docker |
+| **CI total (run `33323666233`)** | **121/121 PASS, 0 skipped, 0 failed** |
 
 ## Gate results
 
 | Gate | Result |
 |---|---|
-| Local gate | PASS (76/76) |
+| Local gate | PASS (90/90) |
+| **CI gate (B2-R5)** | PASS — workflow `b2-control-plane-validation` run `33323666233` (OCE_RUN_ID `1c3c051d5741`), gate `independent-gate-b2.py` 9/9 conditions, 121 passed / 0 skipped / 0 failed, artifact `b2-control-plane-evidence-1c3c051d5741` |
 | Schema validation | PASS (all 9 contract schemas) |
 | State machine transitions | PASS (legal/illegal/terminal) |
 | Authority engine | PASS (grants, denials, replay detection) |
@@ -66,6 +71,14 @@
 - `cloud_deployment_state: NOT_DEPLOYED`
 - Recurring cloud cost: `$0`
 
+## CI history (audit gaps 17/18 closure)
+
+| Run | Commit | Result | What it proved |
+|---|---|---|---|
+| `33323109626` | `f063ae24` | FAIL | Runner + gate worked; exposed migration runner duplicate-key: 0001/0002 self-seed `schema_migrations` and `cmd_up`'s INSERT collided → all 31 container tests errored at setup (latent since B2-R2; never seen because B2 container tests never ran) |
+| `33323293374` | `9a24311e` | FAIL | Migration fix worked (119 passed, 0 skips); exposed two more latent bugs: `leased → pending` missing from `JOB_TRANSITIONS` (both surrender paths relied on it), and `test_pg_unavailable_fails_closed` closing the module-shared connection |
+| `33323666233` | `c129d1f4` | **PASS** | Genuinely green: 121/121, 0 skipped, 0 failed, gate 9/9. All 31 container-backed tests executed against the real compose stack (PostgreSQL 16 + Redis 7) |
+
 ## Confirmation
 
 - `main` untouched at `7e7ef722`
@@ -74,6 +87,7 @@
 - PostgreSQL is authoritative truth; Redis is transient transport only
 - Local is the default and authoritative runtime
 - All permission checks at the service boundary
+- Book 2 CI is authoritative: `b2-control-plane-validation` on `oce-program-build`, zero skips enforced by the independent gate
 
 ## Result: `READY_FOR_OPERATOR_REVIEW`
 
