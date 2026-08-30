@@ -1,0 +1,149 @@
+PART 3 CASCADE METHODOLOGY & OPERATIONAL PROTOCOL Session
+Bias Logic • Daily Workflow • Reversal Logic • Target Trimming
+SESSION BIAS PROTOCOL
+SESSION BIAS PROTOCOL — DIRECTION OF CONSTRAINT RESOLUTION [3]
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+STEP 1: First P90 in 2-6 AM EST Window
+  → Sets direction of constraint resolution [3] for ENTIRE session
+  → Example: 2:30 AM P90 LONG → Constraint Resolution Direction = LONG all day
+STEP 2: Trade ALL Subsequent P90s in SAME Direction
+  → Any P90 LONG after 2:30 AM = VALID activation [9]
+  → Any P90 SHORT after 2:30 AM = IGNORED (opposite direction = noise)
+  → Continue until 12 PM EST OR targets hit
+STEP 3: Exit Conditions
+  → Hard Exit: 12 PM EST (close ALL — constraint resolution window ends)
+  → Target Exit: Asian -50% OR Daily -50% constraint deficit satisfied
+  → Kill-Switch Exit: 132% Kill-Switch State [10] triggered
+CASCADE TIMING WINDOWS (From Initial P90 Activation)
+Time After Initial P90
+Window Name
+Win Rate
+Position Size
+Recommendation
+0-30 min
+Too Early
+82.4%
+50%
+Wait — resolution not yet confirmed
+30-90 min
+OPTIMAL
+87.8%
+100%
+FULL SIZE — peak resolution momentum
+90-180 min
+Good
+84.2%
+75%
+REDUCED SIZE
+180-300 min
+Late
+76-80%
+50%
+HALF SIZE
+300+ min
+Too Late
+<75%
+0%
+SKIP
+After 11 AM
+NO-GO
+<70%
+0%
+SKIP — resolution window closing
+PRACTICAL IMPLEMENTATION — DAILY WORKFLOW
+
+
+=== PAGE 17 ===
+DAILY CONSTRAINT-RESOLUTION WORKFLOW
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+1:45 AM EST — Pre-Session (Constraint Deficit Assessment):
+  I Check Asian Range (constraint deficit [11] — should be <45 pips)
+  I Confirm no major news within 4 hours
+  I Set alerts for P90 thresholds by window
+2:00-6:00 AM EST — Initial Bias Window (First Resolution Signal):
+  I Wait for FIRST P90 candle >= threshold
+  I Example: 2:30 AM P90 LONG (4.2 pips)
+  I Activate Signal 1 + 2 (40% + 40% = 80% size)
+  I Set Boundary: 80% Fib of P90 body
+  I Set Target: Asian -50% extension
+  I Record: Constraint Resolution Direction = LONG, Time = 2:30 AM
+3:00-4:00 AM EST — Optimal Cascade Window:
+  I Watch for additional P90 LONG candles (same resolution direction)
+  I Example: 3:15 AM P90 LONG (5.1 pips) | Time elapsed: 45 min (OPTIMAL)
+  I Activate Cascade: 100% size
+4:00-5:30 AM EST — Degraded Cascade Window:
+  I Time elapsed: 90-180 min | Activate Cascade: 75% size
+5:30-11:00 AM EST — Late Cascade Window:
+  I Time elapsed: 180-300+ min | Activate Cascade: 50% size
+8:45 AM EST — Regime Shift Check:
+  I Calculate: Daily Range ÷ Asian Range (constraint expansion ratio)
+  I If ratio >=1.5 → Expansion confirmed (hold runners — deficit resolving fully)
+  I If ratio <1.5 → Compression (take profits early — deficit not resolving fully)
+11:00 AM EST — Last Activation Cutoff:
+  I NO NEW ACTIVATIONS after this time
+  I Close any late cascades by 11:30 AM
+12:00 PM EST — Hard Exit (Resolution Window Closes):
+  I Close ALL positions — 82% of daily constraint resolution typically complete
+OPPOSITE DIRECTION P90 — REVERSAL LOGIC
+
+
+=== PAGE 18 ===
+REVERSAL SCENARIO — WHEN OPPOSITE DIRECTION P90 PRINTS
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+Initial Direction of Constraint Resolution: 2:30 AM LONG
+New Signal: 6:00 AM P90 SHORT
+DEFAULT ACTION: IGNORE
+  → Stay with original direction of constraint resolution (LONG)
+  → Opposite P90 = noise, not a resolution direction change
+  → Win rate on reversals without confirmation: only 52.4%
+EXCEPTION — VALID DIRECTION REVERSAL (BOTH must be true):
+  1. Resolution output CLOSES beyond 200% Deep State [10] of Initial P90
+  2. 132% Kill-Switch State [10] ALSO triggered
+If BOTH are true:
+  → Close ALL LONG positions (constraint set invalidated)
+  → NEW Constraint Resolution Direction = SHORT
+  → Restart cascade count (max 3 more activations)
+  → Win rate on valid reversals: 68.2%
+Frequency: Only 1.4% of sessions qualify for direction reversal
+Recommendation: Wait for next day 99% of the time
+TARGET TRIMMING PROTOCOL
+TARGET TRIMMING MATRIX — CONSTRAINT DEFICIT RESOLUTION SCHEDULE
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+Asian Range <20 pips (Tier 1 — Gold, tight constraint deficit):
+  TP1 (Asian -25%): ~5 pips → Trim 20%
+  TP2 (Asian -50%): ~10 pips → Trim 50%
+  TP3 (Daily -50%): ~36 pips → Trim 25%
+  Runner (Daily -100%): ~72 pips → Hold 5%
+Asian Range 20-30 pips (Tier 2 — Standard):
+  TP1 (Asian -25%): ~6 pips → Trim 20%
+  TP2 (Asian -50%): ~12 pips → Trim 50%
+  TP3 (Daily -50%): ~29 pips → Trim 30%
+  Runner: Skip (edge thin — constraint deficit mostly satisfied)
+Asian Range 30-45 pips (Tier 3 — Caution, wide constraint deficit):
+  TP1 (Asian -25%): ~9 pips → Trim 30%
+  TP2 (Asian -50%): ~18 pips → Trim 70%
+  TP3+: Skip entirely
+Hard Exit: 12 PM EST (close ALL remaining — resolution window ends)
+Question
+Answer
+
+
+=== PAGE 19 ===
+Session Bias
+First P90 in 2-6 AM EST sets constraint resolution direction for ENTIRE day
+Cascade Window
+30-90 min from INITIAL only (optimal 45-60 min — peak momentum)
+After 90 min
+Still valid until 11 AM, but reduce size (resolution momentum degrading)
+6:00 AM Example
+VALID (if same constraint resolution direction), but use 50% size
+Opposite P90
+IGNORE unless Deep State (200%) + Kill-Switch (132%) BOTH triggered
+Targets
+Asian -50% primary; Daily -50% for runners (full deficit resolution)
+Hard Exit
+12 PM EST — all positions closed, constraint resolution window ends
+End of Part 3 | CEREBUS Operational Protocol v18.2.18 | March 2026
+
+
+=== PAGE 20 ===

@@ -1,7 +1,8 @@
 # 🦉 OWL Command Center — Team Manifest
 
-> NOTE (CLEANROOM-F02): legacy quant-lab artifacts referenced below (backtests,
-> strategies, reports, results) were removed as abandoned on agent/repo-cleanroom.
+> NOTE (CLEANROOM-F02/F10): legacy quant-lab artifacts referenced below (backtests,
+> strategies, reports, results) were removed in F02, then RESTORED in CLEANROOM-F10
+> after review. See the F10 deletion matrix.
 
 > **Operator:** OWL (Research Lead / OCE Operator)
 > **Lead:** MAD (strategic anchor, attractor definer)

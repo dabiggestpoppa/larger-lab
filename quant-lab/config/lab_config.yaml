@@ -1,8 +1,10 @@
 # Quant Lab Configuration
 # CEREBUS FX Strategy Lab — Nautilus Trader Backend
 #
-# NOTE (CLEANROOM-F02): legacy P90/CEREBUS strategy material this config
-# described (backtests, strategies, reports, results) was removed as abandoned.
+# NOTE (CLEANROOM-F02/F10): legacy P90/CEREBUS strategy material this config
+# describes (backtests, strategies, reports, results) was removed in F02, then
+# RESTORED in CLEANROOM-F10 after review found user-authored research + strategy
+# logic. Deletion was not retained.
 
 lab:
   name: "CEREBUS Quant Lab"

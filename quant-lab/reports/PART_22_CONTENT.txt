@@ -1,0 +1,364 @@
+PART 7 MONDAY ASIAN RANGE FLOAT MECHANISM Intra-Week Constraint
+Distribution Analysis EUR/USD M5 | Jan 2022 – Jan 2026 | 201 Weeks
+Analyzed
+Pattern: Monday Asian Range acts as a weekly constraint boundary — quantified below.
+PATTERN TESTED After Monday Asian session closes (3 AM EST), price breaks out of the constraint band. This
+analysis quantifies: (1) how often that band is never retested for 24-48h — the weekly float; (2) which Fibonacci
+states the weekly extreme stalls at; (3) the temporal distribution of the mid-week shift (counter-trend extreme
+timing).
+Metric
+Value
+Notes
+Total weeks analyzed
+201
+Jan 2022 – Jan 2026
+Tradeable weeks (Tier 1-3)
+156
+Mon Asian range 3-45 pips
+True 24h float rate
+29.5%
+Tue full day stays outside Mon range
+48h float rate
+21.8%
+Both Tue AND Wed full day float
+Tue Asian float rate (T1/T2)
+52.6-71.1%
+Tue Asian session never tests Mon range
+Weekly expansion (mean)
+6.62x
+Full week range ÷ Monday Asian range
+Weekly expansion (median)
+5.95x
+More robust central tendency
+TEST 1: FLOAT FREQUENCY — HOW OFTEN DOES THE BAND HOLD?
+Float Type
+Count
+Rate
+Interpretation
+24h: Tue Asian session floats
+82 / 156
+52.6%
+More than half of Tier 1-2 weeks — Tue Asia never tests
+Mon range
+24h: Tue FULL day float (TRUE)
+46 / 156
+29.5%
+~3 in 10 weeks — strong structural hold
+48h: Tue + Wed full day float
+34 / 156
+21.8%
+~2 in 10 weeks — extended 48h constraint hold
+Tier
+Asian Range
+n Weeks
+Tue Asian Float
+True 24h Float
+48h Float
+Tier 1
+< 20 pips
+45
+71.1%
+33.3%
+26.7%
+Tier 2
+20-30 pips
+66
+54.5%
+37.9%
+25.8%
+Tier 3
+30-45 pips
+45
+31.1%
+13.3%
+11.1%
+
+
+=== PAGE 39 ===
+KEY FINDINGS — FLOAT RATE BY TIER:
+  Tier 1 (<20p):  71.1% chance Tuesday Asian never tests Monday range
+                  33.3% full-day float (strong for small constraint deficits)
+  Tier 2 (20-30p): 54.5% Tue Asian float | 37.9% full-day float ← HIGHEST full-day rate
+  Tier 3 (30-45p): 31.1% Tue float | 13.3% full-day float — too rare to trade
+  BIAS NOTE: Weekly directional bias (bull vs bear) has almost NO effect on float rate.
+  Float is a structural phenomenon driven by constraint deficit size, not direction.
+TEST 2: RETEST TIMING — FLOAT CONTEXT
+IMPORTANT CONTEXT ON RETEST TIMING:
+  Monday 08:00 UTC = London Open → Price frequently tests the Asian band immediately.
+  This is normal London session behavior — not the float signal.
+  The TRUE float signal is whether the SUBSEQUENT Asian session (Tuesday 00:00-08:00 UTC)
+  tests the Monday band. That requires price to have stayed outside through:
+    → Mon London session  → Mon NY session  → Mon close  → Tue Asian open
+  That is a genuine ~17-20h sustained directional move — a weekly constraint float.
+  Tier 1-2 Float Rates:
+    T1: 71.1% of Tue Asian sessions never test Monday range
+    T2: 54.5% — both confirm the float as a real weekly structural phenomenon
+TEST 3: FIB STALL ZONES — WHERE DOES THE WEEKLY EXTREME FORM?
+Fib Level (from Mon Asian HIGH)
+Tight Hits (<=5p)
+% of Weeks
+Avg Dist
+State
+100% (Asian High itself)
+10
+6.4%
+1.5p
+Constraint boundary retest
+127% Extension
+5
+3.2%
+2.1p
+Minor stall state
+162% Extension
+5
+3.2%
+0.5p
+TIGHTEST — avg 0.5p
+168% Extension (Stall Zone [10])
+6
+3.8%
+1.9p
+Intraday stall level — weekly too
+200% Extension (Deep State [10])
+9
+5.8%
+2.5p
+High frequency weekly stall
+261% Extension
+8
+5.1%
+1.5p
+Major weekly target
+Fib Level (from Mon Asian LOW)
+Tight Hits (<=5p)
+% of Weeks
+Avg Dist
+State
+0% (Asian Low itself)
+7
+4.5%
+2.5p
+Constraint boundary retest
+-68% Extension
+7
+4.5%
+0.9p
+TIGHTEST bear side
+-100% Extension
+9
+5.8%
+2.6p
+High frequency bear stall
+-161% Extension
+8
+5.1%
+1.9p
+Major weekly bear target
+
+
+=== PAGE 40 ===
+KEY FINDING — DOMINANT WEEKLY STALL ZONES:
+  Most weekly highs reach 261% (64.7%) or lows reach -161% (62.2%) of Monday Asian range
+  — the field resolves the weekly constraint deficit FAR beyond the Monday band.
+  PRECISION STALL ZONES (tightest hits, best for weekly targets):
+    162%: avg 0.5p  |  -68%: avg 0.9p  |  168%: avg 1.9p  |  200%/-100%: avg 2.5-2.6p
+  MOST TRADEABLE (highest frequency + tight):
+    200% extension: 5.8% of weeks, avg 2.5p
+    -100% mirror:   5.8% of weeks, avg 2.6p
+    100% level:     6.4% of weeks, avg 1.5p
+TEST 4: TEMPORAL — WHEN DOES THE WEEKLY EXTREME FORM?
+Extreme
+Mean Hours from Mon Asian Close
+Median Hours
+Notes
+Weekly HIGH
+53.2h
+57.5h
+~2.4 days — late Tue / early Wed
+Weekly LOW
+58.0h
+59.3h
+~2.5 days — similar, slight Fri skew
+Bull LOW (counter-trend pullback)
+33.4h
+26.8h
+Mon/Tue mostly (65-66% of extremes)
+Bear HIGH (counter-trend bounce)
+33.5h
+26.3h
+Mon/Tue mostly (64-65% of extremes)
+Week Type
+Counter-Trend Extreme
+Mon
+Tue
+Wed
+Thu
+Fri
+BULL (n=77)
+Low (pullback)
+44.2%
+22.1%
+11.7%
+15.6%
+6.5%
+BEAR (n=79)
+High (bounce)
+43.0%
+21.5%
+13.9%
+13.9%
+7.6%
+KEY FINDING — TIMING:
+  Counter-trend extreme (pullback in bull weeks, bounce in bear) forms at median 26-27h.
+  Calendar: Mon Asian closes 08:00 UTC + 27h = Tue 11:00 UTC → Tuesday mid-morning European.
+  Mon + Tue combined = 65-66% of all counter-trend extremes already formed.
+  The "mid-week shift" in the charts is the CONTINUATION off that Mon/Tue extreme.
+  Weekly extreme (full high/low): median ~58h → Thu Asian / early London.
+  This is when the field completes its weekly constraint deficit resolution.
+TEST 5: FLOAT WEEKS vs NON-FLOAT — MID-WEEK SHIFT COMPARISON
+Group
+Count
+Counter-Trend Mean
+Counter-Trend Median
+Std Dev
+FLOAT weeks (Tue full day out)
+46
+27.1 hours
+7.0 hours
+37.1h
+NON-FLOAT weeks
+110
+36.1 hours
+30.0 hours
+30.1h
+0-12h (Mon same day)
+63.0% 29 wks
+12-24h (Mon late)
+2.2% 1 wk
+
+
+=== PAGE 41 ===
+24-36h (~Tue morning)
+10.9% 5 wks
+48-72h (~Wed)
+4.4% 2 wks
+72-96h (~Thu)
+8.7% 4 wks
+96h+ (~Fri)
+10.9% 5 wks
+KEY FINDING — FLOAT WEEK STRUCTURE:
+  In TRUE float weeks (Tue full day outside Mon range):
+  63.0% of counter-trend extremes ALREADY FORMED ON MONDAY.
+  The market made its pullback/bounce during Mon London/NY session — before Tue opened.
+  Then price resumes the directional move with no Tue Asian retest.
+  The mid-week test in the charts = price returning to Mon range after 48h+ of float.
+  FLOAT vs NON-FLOAT timing difference:
+    Float weeks:     counter-trend extreme at 7h median (Monday itself)
+    Non-float weeks: counter-trend extreme at 30h median (Tue morning/afternoon)
+  This bimodal behavior IS the float mechanism — float weeks exhaust their counter-trend
+  on Monday, then run cleanly for 48-72h toward 161-261% weekly targets.
+TEST 6: WEEKLY EXPANSION RATIO
+Tier
+n Weeks
+Weekly Range Mean
+Median
+Expansion Mean
+Expansion Median
+Tier 1 (<20p)
+45
+148.3 pips
+132.9 pips
+8.80x
+7.94x
+Tier 2 (20-30p)
+66
+158.1 pips
+144.1 pips
+6.52x
+5.65x
+Tier 3 (30-45p)
+45
+167.0 pips
+165.5 pips
+4.59x
+4.39x
+All Tiers 1-3
+156
+157.8 pips
+143.7 pips
+6.62x
+5.95x
+2.0-2.5x
+1.3% 2 wks
+2.5-3.0x
+5.1% 8 wks
+3.0-4.0x
+10.9% 17 wks
+4.0-6.0x
+34.0% 53 wks
+6.0x+
+48.7% 76 wks
+OPERATIONAL FRAMEWORK — MONDAY FLOAT
+
+
+=== PAGE 42 ===
+WEEKLY FLOAT OPERATIONAL FRAMEWORK
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+MONDAY PRE-SESSION (1:45 AM EST):
+  1. Measure Monday Asian Range → Classify Tier (T1/T2/T3/T4)
+  2. Mark Monday Asian HIGH and LOW as WEEKLY STRUCTURAL CONSTRAINT BOUNDARIES
+  3. Float probability: T1=71% | T2=55% | T3=31% | T4=skip
+  4. Mark fib extension states from Mon Asian range:
+       Bull targets: 100%, 162%, 168%, 200%, 261% above Mon Asian High
+       Bear targets: -68%, -100%, -161% below Mon Asian Low
+MONDAY SESSION WATCH (3 AM – 12 PM EST):
+  London open breaks out of Asian constraint band.
+  Watch: does the counter-trend partial rebalancing happen on Monday?
+    → 43-44% of counter-trend extremes form ON MONDAY itself
+    → In float weeks: 63% form within first 12h (Mon session)
+    → The low/high that forms on Monday = key constraint support/resistance all week
+FLOAT CONFIRMATION (Tuesday Asian 00:00-08:00 UTC):
+  If Tuesday Asian session does NOT overlap Monday Asian band → FLOAT CONFIRMED
+  → Occurs 52.6% of Tier 1-2 weeks
+  → Hold directional bias | Target 161-261% fib states
+  → Expected weekly range: 5-9x Monday Asian range (tier dependent)
+MID-WEEK RETEST EXPECTATION:
+  Weekly constraint deficit fully resolves at median ~58h from Mon Asian close
+  → Thursday Asian / early London
+  → The mid-week charts show price returning to Mon range from outside
+  → Either: bounces back (continuation, more common on 48h float)
+  → Or:     breaks back through (less common, T3 weeks mostly)
+Tier
+Range
+Tue Asian Float
+True 24h Float
+48h Float
+Action
+T1
+<20p
+71.1%
+33.3%
+26.7%
+Strong float — hold directional bias all week
+T2
+20-30p
+54.5%
+37.9%
+25.8%
+Strong float — T2 has HIGHEST true float rate
+T3
+30-45p
+31.1%
+13.3%
+11.1%
+Weak signal — expect retest by Tuesday
+T4
+>45p
+N/A
+N/A
+N/A
+NO-GO — constraint deficit too wide
+End of Part 7 | Monday Asian Float Mechanism | April 2026 | 201 Weeks
+
+
+=== PAGE 43 ===

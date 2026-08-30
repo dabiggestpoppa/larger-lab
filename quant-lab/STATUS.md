@@ -1,7 +1,8 @@
 # Quant Lab — Strategy Status
 
-> NOTE (CLEANROOM-F02): backtest/result/insight/finding artifacts referenced below
-> were removed as abandoned legacy P90/CEREBUS material on agent/repo-cleanroom.
+> NOTE (CLEANROOM-F02/F10): backtest/result/insight/finding artifacts referenced below
+> were removed in F02, then RESTORED in CLEANROOM-F10 after review confirmed
+> user-authored research/strategy content. See the F10 deletion matrix.
 
 > Last updated: 2026-05-17 06:05 (Optimizer v2 results integrated)
 
