@@ -1,0 +1,267 @@
+"""OCE Book 2 — mandatory test registry (B2-R8).
+
+Single source of truth for the mandatory test registry, category
+assignment, expected per-category totals, and the required evidence
+artifact list. The validation runner and the independent gate both
+import this module, so they can never drift apart.
+
+Rules:
+  * Adding a test requires a deliberate registry bump in the same
+    commit — the gate fails if the collected total != registry total.
+  * Every mandatory test node ID must execute with zero skips in CI.
+  * Categories are disjoint and cover every mandatory test.
+"""
+
+SCHEMA_VERSION = "2.0.0"
+VALIDATOR_VERSION = "2.0.0"
+EXPECTED_REPO = "dabiggestpoppa/larger-lab"
+EXPECTED_BRANCH = "oce-program-build"
+
+REQUIRED_ARTIFACTS = [
+  "source-identity.json",
+  "tool-versions.json",
+  "migration-results.json",
+  "test-registry.json",
+  "junit.xml",
+  "pytest-output.txt",
+  "unit-results.json",
+  "postgres-integration-results.json",
+  "redis-integration-results.json",
+  "scheduler-results.json",
+  "worker-results.json",
+  "api-results.json",
+  "po-hermes-boundary-results.json",
+  "adversarial-results.json",
+  "local-lifecycle-results.json",
+  "source-cleanliness.json",
+  "cleanup-results.json",
+  "independent-gate.json",
+  "stage-status.json",
+  "stage-log.txt",
+  "evidence-manifest.json",
+  "validation-summary.md"
+]
+
+ARTIFACT_CATEGORY_FILE = {
+  "unit": "unit-results.json",
+  "postgres": "postgres-integration-results.json",
+  "redis": "redis-integration-results.json",
+  "scheduler": "scheduler-results.json",
+  "worker": "worker-results.json",
+  "api": "api-results.json",
+  "po-hermes-boundary": "po-hermes-boundary-results.json",
+  "adversarial": "adversarial-results.json",
+  "local-lifecycle": "local-lifecycle-results.json",
+  "validation-regression": "validation-regression-results.json"
+}
+
+MANDATORY_TEST_IDS = [
+  "infrastructure.control-plane.tests.test_api_read_auth::test_health_and_readiness_need_no_grant",
+  "infrastructure.control-plane.tests.test_api_read_auth::test_inspect_requires_read_grant_after_submit",
+  "infrastructure.control-plane.tests.test_api_read_auth::test_read_denials_are_recorded",
+  "infrastructure.control-plane.tests.test_api_read_auth::test_read_endpoints_allowed_with_read_grant",
+  "infrastructure.control-plane.tests.test_api_read_auth::test_read_endpoints_denied_without_grant",
+  "infrastructure.control-plane.tests.test_api_read_auth::test_submit_grant_does_not_authorize_reads",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_denial_recorded",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_expired_grant_denied",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_hermes_blocked_from_po_actions",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_high_risk_requires_approval",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_idempotency_replay_detected",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_issue_grant_succeeds",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_missing_grant_denied",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_revoked_grant_denied",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_self_approval_blocked",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_verify_grant_succeeds",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_wrong_action_denied",
+  "infrastructure.control-plane.tests.test_control_plane::TestAuthorityEngine::test_wrong_target_denied",
+  "infrastructure.control-plane.tests.test_control_plane::TestJobStore::test_conflicting_idempotency_keys",
+  "infrastructure.control-plane.tests.test_control_plane::TestJobStore::test_duplicate_job_submission_idempotent",
+  "infrastructure.control-plane.tests.test_control_plane::TestJobStore::test_invalid_lifecycle_transition_denied",
+  "infrastructure.control-plane.tests.test_control_plane::TestJobStore::test_job_transition_legal",
+  "infrastructure.control-plane.tests.test_control_plane::TestJobStore::test_submit_job_succeeds",
+  "infrastructure.control-plane.tests.test_control_plane::TestJobStore::test_unauthorized_job_submission_denied",
+  "infrastructure.control-plane.tests.test_control_plane::TestStateMachines::test_artifact_transitions",
+  "infrastructure.control-plane.tests.test_control_plane::TestStateMachines::test_grant_transitions",
+  "infrastructure.control-plane.tests.test_control_plane::TestStateMachines::test_illegal_transition_raises",
+  "infrastructure.control-plane.tests.test_control_plane::TestStateMachines::test_job_transitions_illegal",
+  "infrastructure.control-plane.tests.test_control_plane::TestStateMachines::test_job_transitions_legal",
+  "infrastructure.control-plane.tests.test_control_plane::TestStateMachines::test_terminal_states",
+  "infrastructure.control-plane.tests.test_control_plane::TestWorkerLeases::test_abandoned_work_recovered",
+  "infrastructure.control-plane.tests.test_control_plane::TestWorkerLeases::test_duplicate_delivery_protection",
+  "infrastructure.control-plane.tests.test_control_plane::TestWorkerLeases::test_expired_lease_blocks_result",
+  "infrastructure.control-plane.tests.test_control_plane::TestWorkerLeases::test_lease_renewal",
+  "infrastructure.control-plane.tests.test_control_plane::TestWorkerLeases::test_stale_worker_cannot_commit",
+  "infrastructure.control-plane.tests.test_control_plane::TestWorkerLeases::test_worker_admit_and_claim",
+  "infrastructure.control-plane.tests.test_control_plane::TestWorkerLeases::test_wrong_worker_cannot_complete",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestAPIPermissions::test_api_audit_history",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestAPIPermissions::test_api_inspect_nonexistent_job",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestAPIPermissions::test_api_submit_with_permission",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestAPIPermissions::test_api_submit_without_permission_denied",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestAPIPermissions::test_direct_api_permission_bypass_blocked",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHealthAndRecovery::test_health_check_healthy",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHealthAndRecovery::test_no_duplicate_effects_after_recovery",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHealthAndRecovery::test_pg_unavailable_blocks",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHealthAndRecovery::test_pg_unavailable_fail_closed",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHealthAndRecovery::test_recovery_after_restart",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHealthAndRecovery::test_redis_loss_reconciled",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHealthAndRecovery::test_redis_unavailable_degraded",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHermesBoundary::test_hermes_cannot_perform_po_actions",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHermesBoundary::test_hermes_escalates_capital_request",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHermesBoundary::test_hermes_rate_limiting",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHermesBoundary::test_hermes_receive_request",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestHermesBoundary::test_hermes_routes_to_po_for_oce",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestPOBoundary::test_po_cannot_bypass_environment_lock",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestPOBoundary::test_po_create_work_plan",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestPOBoundary::test_po_escalate_decision",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestPOBoundary::test_po_high_risk_requires_approval",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestPOBoundary::test_po_spawn_subagent",
+  "infrastructure.control-plane.tests.test_health_api_boundaries::TestPOBoundary::test_po_submit_permitted_job",
+  "infrastructure.control-plane.tests.test_http_api_integration::test_console_served",
+  "infrastructure.control-plane.tests.test_http_api_integration::test_every_endpoint_requires_grant",
+  "infrastructure.control-plane.tests.test_http_api_integration::test_health_and_readiness_unauthenticated",
+  "infrastructure.control-plane.tests.test_http_api_integration::test_invalid_grant_denied_403",
+  "infrastructure.control-plane.tests.test_http_api_integration::test_read_endpoints_with_grant",
+  "infrastructure.control-plane.tests.test_http_api_integration::test_submit_inspect_cancel_roundtrip",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_bare_port_binding_rejected",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_cloud_credential_hint_detects_cloud_env",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_configure_writes_compose_env_with_secret",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_destroy_removes_volume_only_with_yes",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_destroy_requires_confirmation",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_doctor_reports_cloud_free_when_clean",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_lifecycle_module_never_uses_pkill",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_pid_file_with_garbage_ignored",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_public_bind_rejected",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_real_compose_ports_are_loopback_only",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_require_runtime_dsn_fails_closed_without_secret",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_require_runtime_dsn_prefers_environment",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_secret_file_restrictive_permissions",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_secret_generated_ephemeral_no_predictable_default",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_secret_honors_operator_env",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_stale_dead_pid_cleared_not_signalled",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_start_fails_closed_without_docker",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_stop_terminates_only_pid_file_process",
+  "infrastructure.control-plane.tests.test_local_lifecycle::test_unrelated_process_never_signalled",
+  "infrastructure.control-plane.tests.test_pg_integration::test_cancel_and_quarantine_persist",
+  "infrastructure.control-plane.tests.test_pg_integration::test_exact_replay_returns_same_job",
+  "infrastructure.control-plane.tests.test_pg_integration::test_idempotency_key_reuse_by_other_actor_rejected",
+  "infrastructure.control-plane.tests.test_pg_integration::test_idempotency_key_reuse_with_changed_payload_rejected",
+  "infrastructure.control-plane.tests.test_pg_integration::test_job_persists_and_survives_reconnect",
+  "infrastructure.control-plane.tests.test_pg_integration::test_migration_checksum_mismatch_detected",
+  "infrastructure.control-plane.tests.test_pg_integration::test_migrations_from_empty_db",
+  "infrastructure.control-plane.tests.test_pg_integration::test_pg_unavailable_fails_closed",
+  "infrastructure.control-plane.tests.test_pg_integration::test_stale_lease_fenced_on_commit",
+  "infrastructure.control-plane.tests.test_pg_integration::test_wrong_lease_token_fenced",
+  "infrastructure.control-plane.tests.test_pg_scheduler_integration::test_advisory_lock_prevents_duplicate_firing",
+  "infrastructure.control-plane.tests.test_pg_scheduler_integration::test_cancel_removes_schedule_from_pg",
+  "infrastructure.control-plane.tests.test_pg_scheduler_integration::test_concurrency_limit_respected",
+  "infrastructure.control-plane.tests.test_pg_scheduler_integration::test_delayed_job_fires_after_restart_when_due",
+  "infrastructure.control-plane.tests.test_pg_scheduler_integration::test_pause_resume_survive_restart",
+  "infrastructure.control-plane.tests.test_pg_scheduler_integration::test_restart_recovery_recomputes_recurring_next_run",
+  "infrastructure.control-plane.tests.test_pg_scheduler_integration::test_schedules_persist_and_survive_restart",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_admission_persists_token_hash_not_token",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_admission_requires_token",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_claim_allows_matching_capabilities",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_claim_enforces_required_capabilities",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_claim_requires_valid_token",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_claim_without_required_capabilities_any_worker",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_lease_token_fencing_on_commit",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_reauthmit_with_different_token_rejected",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_recover_abandoned_lease_returns_job_to_pending",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_renew_and_complete_roundtrip",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_revoked_worker_refused_everywhere",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_stale_lease_fenced_on_commit",
+  "infrastructure.control-plane.tests.test_pg_worker_integration::test_surrender_then_reclaim",
+  "infrastructure.control-plane.tests.test_redis_integration::test_real_redis_notify_and_lease_mirror",
+  "infrastructure.control-plane.tests.test_redis_integration::test_reconstruct_from_real_pg",
+  "infrastructure.control-plane.tests.test_redis_transport::test_ephemeral_cache_roundtrip",
+  "infrastructure.control-plane.tests.test_redis_transport::test_heartbeat_and_worker_alive",
+  "infrastructure.control-plane.tests.test_redis_transport::test_lease_mirror_nx_and_ttl",
+  "infrastructure.control-plane.tests.test_redis_transport::test_notify_receive_roundtrip",
+  "infrastructure.control-plane.tests.test_redis_transport::test_quarantine_roundtrip",
+  "infrastructure.control-plane.tests.test_redis_transport::test_rate_check_limit",
+  "infrastructure.control-plane.tests.test_redis_transport::test_reconstruct_from_pg_rebuilds_and_quarantines",
+  "infrastructure.control-plane.tests.test_redis_transport::test_reconstruct_reports_failure_without_raising",
+  "infrastructure.control-plane.tests.test_redis_transport::test_scheduler_wakeup",
+  "infrastructure.control-plane.tests.test_redis_transport::test_transport_unavailable_on_downstream_failure",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestEvidenceSystem::test_manifest_built_and_verified",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestEvidenceSystem::test_manifest_tamper_rejected",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestEvidenceSystem::test_missing_artifact_rejected",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestEvidenceSystem::test_replay_reconstructs",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestEvidenceSystem::test_truth_promotion",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestEvidenceSystem::test_truth_promotion_blocked_downward",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestScheduler::test_delayed_job_not_ready",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestScheduler::test_delayed_job_ready_after_advance",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestScheduler::test_duplicate_prevention_same_tick",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestScheduler::test_immediate_job_scheduled",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestScheduler::test_pause_resume",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestScheduler::test_recurring_job",
+  "infrastructure.control-plane.tests.test_scheduler_evidence::TestScheduler::test_scheduler_restart_recovery",
+  "infrastructure.control-plane.tests.test_schema_validation::test_agent_identity_rejects_wrong_type",
+  "infrastructure.control-plane.tests.test_schema_validation::test_agent_identity_validates",
+  "infrastructure.control-plane.tests.test_schema_validation::test_capability_grant_validates",
+  "infrastructure.control-plane.tests.test_schema_validation::test_denial_envelope_rejects_invalid_reason",
+  "infrastructure.control-plane.tests.test_schema_validation::test_denial_envelope_validates",
+  "infrastructure.control-plane.tests.test_schema_validation::test_event_envelope_validates",
+  "infrastructure.control-plane.tests.test_schema_validation::test_job_envelope_validates",
+  "infrastructure.control-plane.tests.test_schema_validation::test_schema_registry_rejects_unknown",
+  "infrastructure.control-plane.tests.test_schema_validation::test_schema_registry_validates",
+  "infrastructure.control-plane.tests.test_worker_admission_units::test_admission_token_hash_is_deterministic",
+  "infrastructure.control-plane.tests.test_worker_admission_units::test_capabilities_satisfied",
+  "infrastructure.control-plane.tests.test_worker_admission_units::test_invalid_capability_manifest_rejected",
+  "infrastructure.control-plane.tests.test_worker_admission_units::test_valid_capability_manifest_passes"
+]
+
+_ADVERSARIAL_SUFFIXES = tuple([
+  "::test_manifest_tamper_rejected",
+  "::test_missing_artifact_rejected",
+  "::test_truth_promotion_blocked_downward",
+  "::test_idempotency_replay_detected",
+  "::test_pg_unavailable_fail_closed",
+  "::test_direct_api_permission_bypass_blocked"
+])
+
+def category_of(node_id):
+    """Deterministic category for a canonical (junit-form) node id."""
+    if node_id.startswith("infrastructure.control-plane.tests.test_pg_integration::"):
+        return "postgres"
+    if node_id.startswith("infrastructure.control-plane.tests.test_redis_integration::"):
+        return "redis"
+    if node_id.startswith("infrastructure.control-plane.tests.test_pg_scheduler_integration::"):
+        return "scheduler"
+    if node_id.startswith("infrastructure.control-plane.tests.test_pg_worker_integration::"):
+        return "worker"
+    if node_id.startswith("infrastructure.control-plane.tests.test_http_api_integration::"):
+        return "api"
+    if "::TestPOBoundary::" in node_id or "::TestHermesBoundary::" in node_id:
+        return "po-hermes-boundary"
+    if node_id.startswith("infrastructure.control-plane.tests.test_local_lifecycle::"):
+        return "local-lifecycle"
+    if node_id.startswith("infrastructure.control-plane.tests.test_validation_gate_regressions::"):
+        return "validation-regression"
+    if node_id.endswith(_ADVERSARIAL_SUFFIXES):
+        return "adversarial"
+    return "unit"
+
+
+def expected_counts():
+    """Expected per-category totals derived from the mandatory registry."""
+    counts = {}
+    for nid in MANDATORY_TEST_IDS:
+        counts[category_of(nid)] = counts.get(category_of(nid), 0) + 1
+    return counts
+
+
+def validate_registry():
+    """Fail closed if the registry is malformed (duplicates/unassignable)."""
+    from collections import Counter
+    dupes = [n for n, c in Counter(MANDATORY_TEST_IDS).items() if c > 1]
+    if dupes:
+        raise AssertionError(f"duplicate mandatory ids: {dupes}")
+    return expected_counts()
+
+
+if __name__ == "__main__":
+    counts = validate_registry()
+    print(f"registry OK: {sum(counts.values())} mandatory tests, {len(counts)} categories")
+    for c in sorted(counts):
+        print(f"  {c:24s} {counts[c]}")

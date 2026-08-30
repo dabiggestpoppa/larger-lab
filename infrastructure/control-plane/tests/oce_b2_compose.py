@@ -8,10 +8,17 @@ authorization — see B2-R7).
 """
 import os
 import subprocess
+import sys
 import time
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Self-sufficient import: this helper is used by both the validation runner
+# (which sets PYTHONPATH) and bare heredocs/scripts that may not. The runtime
+# secret import must never depend on the caller's sys.path (B2-R7R1).
+_SRC = str(BASE_DIR / "src")
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
 COMPOSE = BASE_DIR / "compose"
 COMPOSE_FILE = COMPOSE / "compose.yml"
 
