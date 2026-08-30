@@ -184,42 +184,89 @@ def test_unknown_restore_mode_fails_closed(tmp_path):
     assert r.returncode != 0 and "unknown --mode" in (r.stdout + r.stderr).lower()
 
 
-def test_full_backup_blocked_without_docker_or_services():
-    """A 'full' backup must BLOCK (never silently degrade) when the runtime
-    services are unavailable — it must not produce an incomplete backup.
-    When a live Local Ground stack is present (as in CI) a --scope full
-    backup legitimately succeeds, so this negative path is asserted only
-    where the services are absent; blocking on unavailable services is
-    proven by the dedicated container lifecycle tests."""
-    import os
-    import tempfile
+def _fake_docker(tmp_path, mode):
+    """Build a controlled fake `docker` command environment so the
+    unavailable-service path is tested DETERMINISTICALLY without stopping or
+    damaging any live Local Ground stack.
 
-    def live_stack():
-        """Reuse backup.sh's own health gate (`have_docker` + inspect +
-        pg_isready) to detect a live postgres service."""
-        if shutil.which("docker") is None:
-            return False
-        if subprocess.run(["docker", "compose", "version"], capture_output=True,
-                          text=True).returncode != 0:
-            return False
-        if subprocess.run(["docker", "inspect", "oce-local-postgresql"],
-                          capture_output=True, text=True).returncode != 0:
-            return False
-        return subprocess.run(["docker", "exec", "oce-local-postgresql", "pg_isready",
-                               "-U", "oce_local_admin", "-d", "oce_local", "-h", "localhost"],
-                              capture_output=True, text=True).returncode == 0
+    mode: no-docker    — docker CLI present but non-functional (exit 127)
+          no-postgres  — compose works, postgres inspect/exec fail
+          no-artifact  — compose+postgres work, artifact inspect fails
+    Returns the fake bin dir to prepend to PATH."""
+    d = tmp_path / "fakebin"
+    d.mkdir(exist_ok=True)
+    lines = ["#!/usr/bin/env bash"]
+    if mode == "no-docker":
+        lines.append("exit 127")
+    else:
+        lines.append('if [ "$1" = "compose" ] && [ "$2" = "version" ]; then exit 0; fi')
+        lines.append('if [ "$1" = "inspect" ] && [ "$2" = "oce-local-postgresql" ]; then exit 0; fi')
+        if mode == "no-artifact":
+            lines.append('if [ "$1" = "exec" ] && [ "$2" = "oce-local-postgresql" ]; then exit 0; fi')
+        lines.append("exit 1")
+    (d / "docker").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (d / "docker").chmod(0o755)
+    return d
 
-    if live_stack():
-        pytest.skip("live Local Ground stack present: --scope full succeeds here; "
-                    "blocking-on-unavailable services is covered by container tests")
 
-    with tempfile.TemporaryDirectory() as td:
-        env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1")
-        r = subprocess.run([_BASH, str(SCRIPTS / "backup.sh"), "--scope", "full", "--out", td],
-                           capture_output=True, text=True, timeout=120, env=env)
-        assert r.returncode != 0
-        combo = (r.stdout + r.stderr).lower()
-        assert "blocked" in combo and "full" in combo
+def _run_full_backup_with_fake_docker(tmp_path, mode):
+    fake = _fake_docker(tmp_path, mode)
+    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1",
+               PATH=str(fake) + os.pathsep + os.environ.get("PATH", ""))
+    out = tmp_path / "out"
+    r = subprocess.run([_BASH, str(SCRIPTS / "backup.sh"), "--scope", "full", "--out", str(out)],
+                       capture_output=True, text=True, timeout=120, env=env)
+    return r
+
+
+def test_full_backup_blocked_without_docker_or_services(tmp_path):
+    """A 'full' backup must BLOCK (never silently degrade) when the runtime is
+    unavailable, even in an environment where a real live stack exists. The
+    unavailable-service path is executed in an isolated fake command
+    environment (dependency injection) — the shared CI stack is never
+    stopped or damaged, and this regression NEVER skips."""
+    r = _run_full_backup_with_fake_docker(tmp_path, "no-docker")
+    assert r.returncode != 0, "full backup must block when the docker runtime is unavailable"
+    combo = (r.stdout + r.stderr).lower()
+    assert "blocked" in combo and "full" in combo
+    assert "docker" in combo
+
+
+def test_full_backup_blocked_when_postgres_unavailable(tmp_path):
+    """A 'full' backup must BLOCK when PostgreSQL is unavailable even though
+    the docker runtime is present (no silent degradation to an incomplete
+    backup). Executed against a fake command environment."""
+    r = _run_full_backup_with_fake_docker(tmp_path, "no-postgres")
+    assert r.returncode != 0
+    combo = (r.stdout + r.stderr).lower()
+    assert "blocked" in combo
+    assert "postgresql" in combo, combo
+
+
+def test_full_backup_blocked_when_artifact_store_unavailable(tmp_path):
+    """A 'full' backup must BLOCK when the artifact store is unavailable even
+    though docker and PostgreSQL are present. Executed against a fake command
+    environment."""
+    r = _run_full_backup_with_fake_docker(tmp_path, "no-artifact")
+    assert r.returncode != 0
+    combo = (r.stdout + r.stderr).lower()
+    assert "blocked" in combo
+    assert "artifact" in combo, combo
+
+
+def test_state_only_backup_still_works_without_docker(tmp_path):
+    """state-only backups must remain deterministic when the runtime is
+    unavailable (they never require docker) — R7 keeps local capability."""
+    fake = _fake_docker(tmp_path, "no-docker")
+    env = dict(os.environ, PYTHONDONTWRITEBYTECODE="1",
+               PATH=str(fake) + os.pathsep + os.environ.get("PATH", ""))
+    out = tmp_path / "out"
+    r = subprocess.run([_BASH, str(SCRIPTS / "backup.sh"), "--scope", "state-only", "--out", str(out)],
+                       capture_output=True, text=True, timeout=120, env=env)
+    assert r.returncode == 0, r.stdout + r.stderr
+    info = json.loads((out / ".backup-content" / "backup-info.json").read_text(encoding="utf-8"))
+    assert info["scope"] == "state-only"
+    assert info["disaster_recovery_capable"] is False
 
 
 def test_state_only_backup_never_claims_disaster_recovery(tmp_path):
