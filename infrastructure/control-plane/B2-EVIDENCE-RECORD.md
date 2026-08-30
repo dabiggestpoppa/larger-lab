@@ -2,8 +2,8 @@
 
 **Date:** 2026-08-30
 **Branch:** `oce-program-build`
-**Implementation SHA:** `b55696e6de66fef881fba0f23a20c8c3b7d31d28`
-**Implementation tree:** `5d7ea912ed5d65d21572827ed5d0883243df6a8d`
+**Implementation SHA:** `05702010e8c41ff4950d5a283c9630cd9354d888`
+**Implementation tree:** `2b292afaa4df48ffc800aedba084dd1e53fe1dcb`
 **Starting SHA:** `ac0e239386aa100349f5dc904acdb52345659090`
 
 ## Book 1 ratification
@@ -18,17 +18,20 @@
 |---|---|
 | `dbf12836` | B2-C1: build control plane canonical contracts and schemas |
 | `b55696e6` | B2-C1R1: repair truncated modules and fix state machine transitions |
+| `ff22aa22` | B2-R2: implement PostgreSQL authoritative control state (store, migrations, compose, 9 container tests) |
+| `05702010` | B2-R3: implement Redis-backed disposable transport (notifications, lease mirrors, heartbeats, rate, cache, quarantine, PG reconstruction) |
 
 ## Test totals
 
 | Test class | Result |
 |---|---|
-| Unit tests | 76/76 PASS |
+| Unit tests | 86/86 PASS |
 | Schema tests | 10/10 PASS |
 | Control plane tests | 66/66 PASS |
+| Container-backed (PG 9 + Redis 2) | 11/11 mandatory in CI, truthful local skip |
 | Mandatory FAIL | 0 |
 | Mandatory BLOCKED | 0 |
-| Mandatory SKIPPED | 0 |
+| Mandatory SKIPPED | 0 (CI); 11 truthful local skips (no Docker) |
 
 ## Gate results
 
@@ -39,6 +42,7 @@
 | State machine transitions | PASS (legal/illegal/terminal) |
 | Authority engine | PASS (grants, denials, replay detection) |
 | Job store + idempotency | PASS (duplicate submission, conflicting keys) |
+| Redis transport (B2-R3) | PASS (notify queues, lease NX/TTL mirrors, heartbeats, rate limits, cache, quarantine, reconstruct_from_pg) |
 | Worker leases | PASS (stale, expired, wrong worker, renewal, recovery) |
 | Scheduler | PASS (immediate, delayed, recurring, pause/resume, restart recovery) |
 | Evidence system | PASS (manifest, tamper rejection, truth promotion, replay) |
