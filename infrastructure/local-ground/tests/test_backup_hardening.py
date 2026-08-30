@@ -7,7 +7,9 @@ paths; requires the backup metadata to be hash-protected inside the manifest;
 rejects unsafe artefact tar members. These run anywhere (no Docker): restore.sh
 must fail fast on integrity problems before touching any data.
 """
+import hashlib
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -380,3 +382,78 @@ def test_recovery_succeeded_never_overrides_failed_invariant():
     # exit 0 + fully successful rollback -> success
     assert pr.recovery_succeeded({"exit_status": 0, "rollback_required": True,
                                   "rollback_succeeded": True}) is True
+
+
+# ── R26: protected recovery values and fingerprints (pure) ────────────────
+def _fingerprinted_inventory(rows):
+    return json.dumps({
+        "format": "oce-pg-inventory-v1", "database": "oce_local", "table_count": len(rows),
+        "fingerprint_algorithm": "md5-of-sorted-row-json",
+        "fingerprinted_tables": list(rows),
+        "tables": [{"name": n, "row_count": r, "fingerprint": f"fp-{n}"}
+                   for n, r in rows.items()]})
+
+
+def test_fingerprint_mismatch_rejected_despite_matching_counts():
+    """Row counts are NOT content proof: identical counts with different
+    values must fail closed via the protected value fingerprints."""
+    pr = _load_pr()
+    inv = pr.parse_inventory(_fingerprinted_inventory({"public.backup_probe": 2}))
+    # counts match, fingerprints differ -> verification must fail
+    ok, probs = pr.verify_inventory(inv, {"public.backup_probe": 2}, None,
+                                    {"public.backup_probe": "different-fingerprint"})
+    assert not ok
+    assert any("fingerprint" in p for p in probs)
+
+
+def test_value_altered_after_staging_verification_is_caught():
+    """A value altered AFTER staging verification (e.g. in the promoted
+    canonical) changes the fingerprint even when the row count is identical.
+    Re-verification must fail closed."""
+    pr = _load_pr()
+    inv = pr.parse_inventory(_fingerprinted_inventory({"public.backup_probe": 2}))
+    # staging verified clean
+    ok1, _ = pr.verify_inventory(inv, {"public.backup_probe": 2}, None,
+                                 {"public.backup_probe": "fp-public.backup_probe"})
+    assert ok1
+    # one value altered after staging verification: count unchanged, fp changed
+    ok2, probs2 = pr.verify_inventory(inv, {"public.backup_probe": 2}, None,
+                                      {"public.backup_probe": "tampered-fingerprint"})
+    assert not ok2
+    assert any("fingerprint mismatch" in p for p in probs2)
+
+
+def test_row_count_only_receipt_is_rejected():
+    """A receipt that proves only row counts (no fingerprint evidence) cannot
+    prove values and must be rejected — a false row-count-only receipt fails
+    closed."""
+    pr = _load_pr()
+    inv = pr.parse_inventory(_fingerprinted_inventory({"public.backup_probe": 2}))
+    ok, probs = pr.verify_inventory(inv, {"public.backup_probe": 2}, None, None)
+    assert not ok
+    assert any("missing fingerprint evidence" in p for p in probs)
+
+
+def test_inventory_fingerprint_tamper_rejected():
+    """Tampering with the protected inventory (e.g. replacing a fingerprint)
+    breaks the inventory SHA and must be rejected before any recovery."""
+    pr = _load_pr()
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        invp = os.path.join(td, "inventory.json")
+        shap = os.path.join(td, "inventory.json.sha256")
+        doc = _fingerprinted_inventory({"public.backup_probe": 2})
+        with open(invp, "w", encoding="utf-8") as f:
+            f.write(doc)
+        with open(shap, "w", encoding="utf-8") as f:
+            f.write(hashlib.sha256(doc.encode()).hexdigest() + "\n")
+        # load is fine before tampering
+        inv = pr._load_protected_inventory(invp, shap)
+        assert "public.backup_probe" in inv["tables"]
+        # tamper one fingerprint value -> SHA mismatch -> RuntimeError
+        tampered = doc.replace("fp-public.backup_probe", "fp-evil")
+        with open(invp, "w", encoding="utf-8") as f:
+            f.write(tampered)
+        import pytest as _pytest
+        with _pytest.raises(RuntimeError, match="tampered"):
+            pr._load_protected_inventory(invp, shap)

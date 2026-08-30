@@ -271,42 +271,13 @@ if [ -f "$CONTENT/postgres/archive.dump" ] && [ -f "$CONTENT/postgres/inventory.
   save_pg_receipt "$PROMOTE_RECEIPT"
 
   # PHASE 2 — external restore-boundary verification: the canonical target is
-  # re-checked by a FRESH, independent process at the restore boundary. The
+  # re-checked by a FRESH, independent process (pg-verify.py) against the
+  # hash-protected inventory — exact row counts AND value fingerprints. The
   # quarantine stays held until this and every other fallible check passes.
-  VERIFY_STABLE=0
-  for _pit in 1 2 3 4 5; do
-    if python3 - "$PG_DB" "$PG_USER" "$CONTENT/postgres/inventory.json" <<'PY'
-import json, subprocess, sys
-inv = json.load(open(sys.argv[3], encoding="utf-8"))
-expected = {t["name"]: t["row_count"] for t in inv.get("tables", [])}
-if not expected:
-    print("UNVERIFIED: inventory lists no tables"); sys.exit(1)
-bad = []
-for name, want in expected.items():
-    schema, _, rel = name.partition(".")
-    r = subprocess.run(["docker", "exec", "oce-local-postgresql", "psql", "-X", "-A", "-t",
-                        "-U", sys.argv[2], "-d", sys.argv[1], "-c",
-                        'SELECT count(*) FROM "%s"."%s";' % (schema, rel)],
-                       capture_output=True, text=True)
-    got = r.stdout.strip() if r.returncode == 0 else "-err-"
-    if got != str(want):
-        bad.append(f"{name}=got {got}, want {want}")
-if bad:
-    print("UNVERIFIED: " + "; ".join(bad), file=sys.stderr)
-    sys.exit(1)
-print("CANONICAL_VERIFIED")
-sys.exit(0)
-PY
-    then
-      VERIFY_STABLE=$((VERIFY_STABLE+1))
-      [ "$VERIFY_STABLE" -ge 2 ] && break
-    else
-      VERIFY_STABLE=0
-      echo "warning: canonical not yet verified (attempt $_pit)" >&2
-    fi
-    sleep 2
-  done
-  if [ "$VERIFY_STABLE" -lt 2 ]; then
+  if ! python3 "$BIN/pg-verify.py" --inventory "$CONTENT/postgres/inventory.json" \
+       --inventory-sha "$CONTENT/postgres/inventory.json.sha256" \
+       --db "$PG_DB" --user "$PG_USER" --container oce-local-postgresql --stable 2; then
+    echo "UNVERIFIED: canonical target failed independent durable verification (counts+fingerprints)" >&2
     echo "BLOCKED: canonical target failed independent durable verification after restore" >&2
     # Roll back: restore the ORIGINAL canonical from the held quarantine.
     python3 "$BIN/pg-recovery.py" --phase rollback \
