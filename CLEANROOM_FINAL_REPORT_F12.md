@@ -1,5 +1,13 @@
 # CLEANROOM FINAL REPORT (CORRECTED) — F12
 
+> **SUPERSEDED by CLEANROOM_FINAL_REPORT_F13.md.** F13 corrects this report's
+> staged-commit table (F11/F12/F12b missing), validation totals (NOT_RUN was
+> reported as 0 while suites were listed as not executed), cleanroom head
+> claims (self-referential F12b pin), the stale `oce-program-build`
+> observation (`f79e5ed0` → now `ac0e2393`), and branch-divergence figures
+> (capital-routing and the archive branches are DISCONNECTED from main;
+> ahead/behind were undefined; cerebus/execution were also behind main).
+
 Date: 2026-08-30
 Stage: CLEANROOM-RECOVERY-AND-FINAL-REVIEW
 Branch: agent/repo-cleanroom

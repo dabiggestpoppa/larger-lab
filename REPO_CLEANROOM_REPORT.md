@@ -1,5 +1,9 @@
 # LARGER-LAB CLEANROOM REPORT
 
+> **SUPERSEDED by CLEANROOM_FINAL_REPORT_F13.md** (and its referenced
+> manifests). Historical record only; several branch/head claims here are
+> stale (restored branches, archive refs, remote head count).
+
 **Generated:** 2026-08-29
 **Authoritative Repo:** `C:\Users\wifik\Desktop\larger-lab` (workspace root)
 **Status:** PROTECTION APPLIED — All OCE / QCAE / Grant / Crypto / TB / baseline branches verified intact.

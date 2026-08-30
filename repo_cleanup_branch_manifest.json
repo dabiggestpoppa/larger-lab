@@ -1,235 +1,197 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
+  "manifest_type": "repo-cleanup-branch-manifest",
   "stage": "CLEANROOM-RECOVERY-AND-FINAL-REVIEW",
-  "generated": "2026-08-30",
-  "note": "Corrected manifest. Supersedes v1 (which classified branches SAFE_DELETE before independent review). Current observed truth only.",
-  "main_unchanged": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+  "generated_utc": "2026-08-30T13:54:00Z",
+  "note": "Corrected manifest v3. Supersedes v2 (self-referential cleanroom head pin, stale oce-program-build SHA, no divergence recomputation) and v1 (SAFE_DELETE classifications made before independent review). Every fact below was recomputed from Git at observation time; nothing is copied from commit-message descriptions.",
+  "repository": "dabiggestpoppa/larger-lab",
+  "origin_url": "https://github.com/dabiggestpoppa/larger-lab.git",
+  "cleanroom_branch": "agent/repo-cleanroom",
+
+  "snapshot_semantics": {
+    "observed_at_utc": "2026-08-30T13:54:00Z",
+    "observed_branch_sha": "0abf7d68c6b81411d85286a29da8a3e15f3bff96",
+    "observed_branch_note": "agent/repo-cleanroom head at observation time (the parent of the F13 commit carrying this manifest). This manifest deliberately does NOT claim to contain its own final commit SHA.",
+    "tested_subject_commit": "0abf7d68c6b81411d85286a29da8a3e15f3bff96",
+    "tested_subject_note": "Subject validated by the local checks recorded in section 'validation'; the authoritative CI subject is the F15 implementation commit, recorded in the F16 evidence commit.",
+    "evidence_commit": "PENDING_F16 (evidence-only commit placed after authoritative CI success)",
+    "current_live_branch_state": {
+      "checked_at_utc": "2026-08-30T13:53:58Z",
+      "agent/repo-cleanroom": "0abf7d68c6b81411d85286a29da8a3e15f3bff96 (unchanged since observation)"
+    },
+    "branch_advanced_after_observation": []
+  },
+
+  "main": {
+    "expected_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+    "observed_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+    "unchanged": true,
+    "modified_by_cleanroom": false
+  },
+
+  "oce_program_build": {
+    "mission_reference_sha": "ac0e239386aa100349f5dc904acdb52345659090",
+    "observed_sha_local_and_remote": "ac0e239386aa100349f5dc904acdb52345659090",
+    "state": "EXACT_MATCH_WITH_MISSION_REFERENCE",
+    "note": "Previous F12-era observation f79e5ed0 advanced externally (active oce-program-build worktree). Current observation ac0e2393 equals the OCE checkpoint SHA supplied in the mission.",
+    "advanced_externally": true
+  },
+
   "remote_branches": {
-    "agent/crypto-quant-foundry": {
-      "head": "9243201b4797b4b98cc446d1f13871668907ca79",
-      "classification": "KEEP_PROTECTED",
-      "system": "CRYPTO"
-    },
-    "agent/crypto-sensor-fabric-build": {
-      "head": "aadbc3763304f6ac26acb2e121626edc9c155d90",
-      "classification": "KEEP_PROTECTED",
-      "system": "CRYPTO",
-      "note": "advanced externally during run (active worktree)"
-    },
-    "agent/crypto-sensor-fabric-plan": {
-      "head": "4bb677f9e0266f4dc48405181696019f359ae49f",
-      "classification": "KEEP_PROTECTED",
-      "system": "CRYPTO",
-      "note": "frozen head"
-    },
-    "agent/repo-cleanroom": {
-      "head": "c3024856",
-      "classification": "KEEP_PROTECTED",
-      "system": "CLEANROOM",
-      "note": "head recorded at manifest write; pin commit follows"
-    },
-    "grant-sector-g1-production": {
-      "head": "3a639d89865188506b8267a433c5bf8464f4ee7b",
-      "classification": "KEEP_PROTECTED",
-      "system": "GRANT"
-    },
-    "main": {
-      "head": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
-      "classification": "KEEP_PROTECTED",
-      "system": "BASELINE"
-    },
-    "master": {
-      "head": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
-      "classification": "KEEP_PROTECTED",
-      "system": "BASELINE"
-    },
-    "oce": {
-      "head": "d3df9eb45aeddd8a3dd40ced24a7f2e1d2f0ff41",
-      "classification": "KEEP_PROTECTED",
-      "system": "OCE"
-    },
-    "oce-full-program-planning-books-2-10": {
-      "head": "028fcdddd90f25c44996510426bd0c0e68bc54f5",
-      "classification": "KEEP_PROTECTED",
-      "system": "OCE"
-    },
-    "oce-program-build": {
-      "head": "f79e5ed0bf6287e043a7cbcd58c60109048b3529",
-      "classification": "KEEP_PROTECTED",
-      "system": "OCE",
-      "note": "advanced externally during run (active worktree)"
-    },
-    "qcae-capability-acquisition-engine": {
-      "head": "c4e5df830b541ce6917ddf9622c41cfe09629185",
-      "classification": "KEEP_PROTECTED",
-      "system": "OCE_FUTURE_INTEGRATION"
-    },
-    "tb-forward-engine": {
-      "head": "49930215addd388fa183cc452fb64b56bf9a2856",
-      "classification": "KEEP_PROTECTED",
-      "system": "ENGINE"
-    },
-    "capital-routing": {
-      "head": "43a6473c1bc01bb79efd3b415e482d65640e1226",
-      "classification": "KEEP_PROTECTED",
-      "system": "CAPITAL",
-      "restored": true,
-      "reason": "unique MT5 physical-profile + capital-risk work; not absorbed"
-    },
-    "cerebus-mve-implementation": {
-      "head": "30359692ccd4c1ce0c7a52096cd64ec4902520ee",
-      "classification": "KEEP_PROTECTED",
-      "system": "MVE",
-      "restored": true,
-      "reason": "active CEREBUS MVE lineage; 991 unique commits vs main"
-    },
-    "hermes-set-up": {
-      "head": "b4ef87b7af9b9fafdd9f050e0b90319f76c1e0ff",
-      "classification": "KEEP_PROTECTED",
-      "system": "OCE",
-      "restored": true,
-      "reason": "OCE Hermes Telegram Operator, MCP facade, runbooks"
-    },
-    "execution-runtime-foundation": {
-      "head": "03eb68f8d4c684c4ccaf7b4f93b3fc4e1127a1ee",
-      "classification": "KEEP_PROTECTED",
-      "system": "EXEC",
-      "restored": true,
-      "reason": "unique TradeLocker demo read-only integration"
-    },
-    "tv-review": {
-      "head": "1a53cbb1d400bec5b77b0b3b6816d707050df1c6",
-      "classification": "KEEP_PROTECTED",
-      "system": "OCE",
-      "restored": true,
-      "reason": "OCE B1-I1R cloud-ground infra lineage; ancestor of oce"
-    },
-    "archive/cerebus-local-extra": {
-      "head": "133364c9cb1cd2127b48421babc14a8d57e1d99a",
-      "classification": "KEEP_PROTECTED",
-      "system": "ARCHIVE",
-      "restored": true
-    },
-    "archive/content-oc2": {
-      "head": "aeb3afdde9f0f3478e82083d85431d8722b4c0ea",
-      "classification": "KEEP_PROTECTED",
-      "system": "ARCHIVE",
-      "restored": true
-    },
-    "archive/hermes-02e51f11": {
-      "head": "d4be1f2302111ea477ffca12529afb669825eadc",
-      "classification": "KEEP_PROTECTED",
-      "system": "ARCHIVE",
-      "restored": true
-    },
-    "archive/hermes-262c2f34": {
-      "head": "217f48c297be151fa7987cafc432824bb2de0d34",
-      "classification": "KEEP_PROTECTED",
-      "system": "ARCHIVE",
-      "restored": true
-    },
-    "archive/hermes-cde01a2a": {
-      "head": "63474e77b4acd9f0a93da153675c20d3977ebeab",
-      "classification": "KEEP_PROTECTED",
-      "system": "ARCHIVE",
-      "restored": true
-    },
-    "archive/pruned-master-2026-08-15": {
-      "head": "6922c0838202cd4e00c9233596501892e5df563d",
-      "classification": "KEEP_PROTECTED",
-      "system": "ARCHIVE",
-      "restored": true
-    },
-    "archive/pruned-snapshot-vtuber": {
-      "head": "d7cb598a8681d6a238287ab5a56f555c0da0d74c",
-      "classification": "KEEP_PROTECTED",
-      "system": "ARCHIVE",
-      "restored": true
-    },
-    "archive/review-branch": {
-      "head": "c79023263bc00e9e1775c603036832c615c39f2b",
-      "classification": "KEEP_PROTECTED",
-      "system": "ARCHIVE",
-      "restored": true,
-      "reason": "1054 unique commits vs main; triangular-basis research snapshot; not proven absorbed"
-    }
+    "agent/crypto-quant-foundry": { "head": "9243201b4797b4b98cc446d1f13871668907ca79", "classification": "KEEP_PROTECTED", "system": "CRYPTO" },
+    "agent/crypto-sensor-fabric-build": { "head": "aadbc3763304f6ac26acb2e121626edc9c155d90", "classification": "KEEP_PROTECTED", "system": "CRYPTO" },
+    "agent/crypto-sensor-fabric-plan": { "head": "4bb677f9e0266f4dc48405181696019f359ae49f", "classification": "KEEP_PROTECTED", "system": "CRYPTO", "note": "frozen head" },
+    "agent/repo-cleanroom": { "head": "0abf7d68c6b81411d85286a29da8a3e15f3bff96", "classification": "KEEP_PROTECTED", "system": "CLEANROOM", "note": "head at observation; F13 commit follows and becomes new tip (not self-referenced)" },
+    "archive/cerebus-local-extra": { "head": "133364c9cb1cd2127b48421babc14a8d57e1d99a", "classification": "KEEP_PROTECTED", "system": "ARCHIVE", "restored": true },
+    "archive/content-oc2": { "head": "aeb3afdde9f0f3478e82083d85431d8722b4c0ea", "classification": "KEEP_PROTECTED", "system": "ARCHIVE", "restored": true },
+    "archive/hermes-02e51f11": { "head": "d4be1f2302111ea477ffca12529afb669825eadc", "classification": "KEEP_PROTECTED", "system": "ARCHIVE", "restored": true },
+    "archive/hermes-262c2f34": { "head": "217f48c297be151fa7987cafc432824bb2de0d34", "classification": "KEEP_PROTECTED", "system": "ARCHIVE", "restored": true },
+    "archive/hermes-cde01a2a": { "head": "63474e77b4acd9f0a93da153675c20d3977ebeab", "classification": "KEEP_PROTECTED", "system": "ARCHIVE", "restored": true },
+    "archive/pruned-master-2026-08-15": { "head": "6922c0838202cd4e00c9233596501892e5df563d", "classification": "KEEP_PROTECTED", "system": "ARCHIVE", "restored": true },
+    "archive/pruned-snapshot-vtuber": { "head": "d7cb598a8681d6a238287ab5a56f555c0da0d74c", "classification": "KEEP_PROTECTED", "system": "ARCHIVE", "restored": true },
+    "archive/review-branch": { "head": "c79023263bc00e9e1775c603036832c615c39f2b", "classification": "KEEP_PROTECTED", "system": "ARCHIVE", "restored": true },
+    "capital-routing": { "head": "43a6473c1bc01bb79efd3b415e482d65640e1226", "classification": "KEEP_PROTECTED", "system": "CAPITAL", "restored": true },
+    "cerebus-mve-implementation": { "head": "30359692ccd4c1ce0c7a52096cd64ec4902520ee", "classification": "KEEP_PROTECTED", "system": "MVE", "restored": true },
+    "execution-runtime-foundation": { "head": "03eb68f8d4c684c4ccaf7b4f93b3fc4e1127a1ee", "classification": "KEEP_PROTECTED", "system": "EXEC", "restored": true },
+    "grant-sector-g1-production": { "head": "3a639d89865188506b8267a433c5bf8464f4ee7b", "classification": "KEEP_PROTECTED", "system": "GRANT" },
+    "hermes-set-up": { "head": "b4ef87b7af9b9fafdd9f050e0b90319f76c1e0ff", "classification": "KEEP_PROTECTED", "system": "OCE", "restored": true },
+    "main": { "head": "7e7ef7222c4ecdea568b34583fd81406165cc9b6", "classification": "KEEP_PROTECTED", "system": "BASELINE" },
+    "master": { "head": "6769ad31ac737946dae54e3660e22cb36f72e2b7", "classification": "KEEP_PROTECTED", "system": "BASELINE" },
+    "oce": { "head": "d3df9eb45aeddd8a3dd40ced24a7f2e1d2f0ff41", "classification": "KEEP_PROTECTED", "system": "OCE" },
+    "oce-full-program-planning-books-2-10": { "head": "028fcdddd90f25c44996510426bd0c0e68bc54f5", "classification": "KEEP_PROTECTED", "system": "OCE", "restored": true },
+    "oce-program-build": { "head": "ac0e239386aa100349f5dc904acdb52345659090", "classification": "KEEP_PROTECTED", "system": "OCE" },
+    "qcae-capability-acquisition-engine": { "head": "c4e5df830b541ce6917ddf9622c41cfe09629185", "classification": "KEEP_PROTECTED", "system": "OCE_FUTURE_INTEGRATION" },
+    "tb-forward-engine": { "head": "49930215addd388fa183cc452fb64b56bf9a2856", "classification": "KEEP_PROTECTED", "system": "ENGINE" },
+    "tv-review": { "head": "1a53cbb1d400bec5b77b0b3b6816d707050df1c6", "classification": "KEEP_PROTECTED", "system": "OCE", "restored": true }
   },
-  "deleted_branches_reviewed": [
-    {
-      "branch": "agent/crypto-data-1.1",
-      "former_head": "1d9607525d13a39f5229837c7513ecf8a7d42c07",
-      "classification": "ABSORBED_VERIFIED",
-      "proof": "merge-base --is-ancestor vs agent/crypto-quant-foundry = ANCESTOR"
-    },
-    {
-      "branch": "tb-forward-engine-plan-anchor-temp",
-      "former_head": "223fd024418db2e1bb2c6ed9ac7334488f263f5b",
-      "classification": "ABSORBED_VERIFIED",
-      "proof": "merge-base --is-ancestor vs tb-forward-engine = ANCESTOR"
-    },
-    {
-      "branch": "agent/asia-triangle-foundry",
-      "former_head": "8f84243f401fc1df5cb0b45d8120444d2ef0a9b3",
-      "classification": "ARCHIVE_REF_REQUIRED",
-      "proof": "16 unique commits; archive tag pushed"
-    },
-    {
-      "branch": "agent/atomic-structure-foundry",
-      "former_head": "efe025a1dbf675e5e819c981c00c6125e95132e1",
-      "classification": "ARCHIVE_REF_REQUIRED",
-      "proof": "7 unique commits; archive tag pushed"
-    },
-    {
-      "branch": "agent/deepers-strategy-foundry",
-      "former_head": "b4ab46208ea0deb811eb9b7a8dc15a198861082f",
-      "classification": "ARCHIVE_REF_REQUIRED",
-      "proof": "8 unique commits; archive tag pushed"
-    },
-    {
-      "branch": "agent/shallow-well-foundry",
-      "former_head": "39cb980e7e74945627f6a8f9cf85df5999336bdc",
-      "classification": "ARCHIVE_REF_REQUIRED",
-      "proof": "14 unique commits; archive tag pushed"
-    },
-    {
-      "branch": "agent/obb-01-book-01-reality-audit",
-      "former_head": "48a7c0aeebea1a5ba86e17583e0a9bf96437f0f9",
-      "classification": "ARCHIVE_REF_REQUIRED",
-      "proof": "1 unique commit; archive tag pushed"
-    },
-    {
-      "branch": "agent/openbb-forge-obb-01-02-docs",
-      "former_head": "d8ee6b4785bc00ba627a288addc2333a8d854166",
-      "classification": "ARCHIVE_REF_REQUIRED",
-      "proof": "15 unique commits; archive tag pushed"
-    }
-  ],
-  "archive_tags_pushed": [
-    "archive/agent/asia-triangle-foundry@8f84243f",
-    "archive/agent/atomic-structure-foundry@efe025a1",
-    "archive/agent/deepers-strategy-foundry@b4ab4620",
-    "archive/agent/obb-01-book-01-reality-audit@48a7c0ae",
-    "archive/agent/openbb-forge-obb-01-02-docs@d8ee6b47",
-    "archive/agent/shallow-well-foundry@39cb980e"
-  ],
-  "tracked_file_deletion_matrix": {
-    "decision": "ALL 50 FILES RESTORED in CLEANROOM-F10 from main (byte-identical). No deletion retained.",
-    "rationale": "All 50 are user-authored CEREBUS/P90 research: Pine strategy source, extracted manuals, analysis docs, backtest scripts, results. No verified canonical successor; historical mentions not proof of absorption; negative results are valuable evidence.",
+  "remote_head_count": 25,
+
+  "branch_divergence": {
+    "method": "All counts computed with git rev-list / merge-base / merge-base --is-ancestor against main (7e7ef7222c4ecdea568b34583fd81406165cc9b6) and the protected set. NOT derived from commit messages. Full per-branch evidence in cleanroom/evidence/branch-reference-manifest.json.",
+    "corrections": [
+      "capital-routing: history is DISCONNECTED from main (no merge base). '58 unique commits vs main' in F09 was actually its total commit count; all 58 commits are unique because there is no shared history. ahead/behind are undefined.",
+      "cerebus-mve-implementation: merge base 532b5abcf9 with main; ahead=991, behind=32. F09/F12 '991 unique commits vs main' is correct as an AHEAD count but omitted the behind=32.",
+      "execution-runtime-foundation: merge base 532b5abcf9; ahead=1018, behind=32. F09 '1018 unique' omitted behind=32.",
+      "hermes-set-up: direct child of main (merge base = main); ahead=1, behind=0. F09 '1 unique commit' correct.",
+      "tv-review: direct child of main; ahead=18, behind=0; proven ancestor of oce, oce-program-build and oce-full-program-planning-books-2-10. Changed files are exclusively infrastructure/cloud-ground/*, .github/workflows/b1-i1r*.yml, .gitattributes and tv_vm_audit/*. OCE B1-I1R cloud-ground lineage: PROVEN by ancestry AND content.",
+      "archive/review-branch: history DISCONNECTED from main (no merge base). F09 '1054 unique commits vs main' was its total commit count (1054), not an ahead count.",
+      "archive/hermes-02e51f11 (280), archive/hermes-262c2f34 (278), archive/hermes-cde01a2a (279), archive/pruned-master-2026-08-15 (1036), archive/pruned-snapshot-vtuber (1055): disconnected from main; totals recorded, ahead/behind undefined."
+    ]
+  },
+
+  "archive_tags": {
+    "count": 15,
+    "all_annotated": true,
+    "all_remote_targets_match_local": true,
+    "detail": "See cleanroom/evidence/branch-reference-manifest.json 'archive_tags'. 8 archive-branch/* tags target the 8 restored archive/* branch heads; 6 archive/agent/* tags target former heads of archived agent branches; archive/tb-forward-r6.6.1 targets tb-forward-engine head 49930215. All verified on origin via git ls-remote --tags."
+  },
+
+  "restored_files": {
     "count": 50,
-    "lines": 51536,
-    "restored_commit": "69c47b4b"
+    "all_byte_identical_to_main": true,
+    "method": "git rev-parse main:<path> == git hash-object <worktree path> for all 50 files; plus SHA-256 recorded in cleanroom/evidence/restored-file-manifest.json.",
+    "note": "CLEANROOM-F10 (69c47b4b) restored all 50 files removed by CLEANROOM-F02 byte-identical from main. 4 other quant-lab files (STATUS.md, command-center/TASKS.md, command-center/TEAM.md, config/lab_config.yaml) carry reference notes and differ from main by design."
   },
-  "f02_deleted_file_categories": {
-    "backtests": 10,
-    "findings": 1,
-    "insights": 1,
-    "reports": 32,
-    "research": 2,
-    "results": 1,
-    "strategies": 3
+
+  "stashes": {
+    "count": 15,
+    "retained": true,
+    "dropped": 0,
+    "inventory": [
+      "stash@{0}: On oce: pre-cleanup stash: test_regression.py modification",
+      "stash@{1}: WIP on oce: 64f7c754 B1-I1R3H: confine adversarial --only engine runs to scratch dir",
+      "stash@{2}: WIP on tv-review: 9af94e8e B1-I1R3H: pin ansible-compat==4.1.11 in CI workflow",
+      "stash@{3}: WIP on oce: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+      "stash@{4}: WIP on agent/crypto-quant-foundry: f41e9c09 CRYPTO-DATA-1: canonical collector foundation",
+      "stash@{5}: WIP on oce-recovery: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+      "stash@{6}: WIP on agent/crypto-quant-foundry: f41e9c09 CRYPTO-DATA-1: canonical collector foundation",
+      "stash@{7}: WIP on oce: b517132d B1-I1R2: repair cloud-ground verification integrity",
+      "stash@{8}: WIP on oce/block-1-i1r2-verification-closure: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+      "stash@{9}: WIP on agent/shallow-well-foundry-ctbt-t1: f3c6aca2 SW-CTBT-T4.1-FORWARD-COLLECTOR-AND-TRANSFER-DASHBOARD-ACTIVATION",
+      "stash@{10}: WIP on agent/deepers-strategy-foundry: f764f8b6 PFT-B3: seal mathematical and causality conformance",
+      "stash@{11}: On main: D01 work",
+      "stash@{12}: WIP on main: 2ef20eb5 P0-REPAIR-01: Truthful state repair and fail-closed gates",
+      "stash@{13}: WIP on main: 2ef20eb5 P0-REPAIR-01: Truthful state repair and fail-closed gates",
+      "stash@{14}: On master: Worktree changes before GLX FORGE migration"
+    ]
   },
-  "protected_heads_unchanged_by_cleanup": "All CHANGED_BY_CLEANUP = none; oce-program-build + crypto-sensor-fabric-build advanced externally (active worktrees)",
-  "permanent_deletions_performed": 0,
+
+  "trash": {
+    "retained": true,
+    "permanent_deletion_authorized": false,
+    "required_authorization_stage": "CLEANROOM-PERMANENT-DELETE",
+    "items": [
+      { "path": "C:/Users/wifik/Desktop/projects/.trash-larger-lab-duplicate", "size": "20G", "contents": "duplicate clone of larger-lab (recovery source for deleted-branch former heads)", "recoverable": true },
+      { "path": "C:/Users/wifik/Desktop/projects/.trash-legacy-worktrees", "size": "32K", "contents": "leftover legacy worktree dirs (asia-jpy, ctbt)", "recoverable": true }
+    ],
+    "workspace_preserve_dir": { "path": "C:/Users/wifik/Desktop/larger-lab/.bu_tmp", "note": "preflight preserve + m14 scratch held under workspace .bu_tmp; retained, not deleted" }
+  },
+
+  "lfs": {
+    "cache_dir": "C:/Users/wifik/Desktop/larger-lab/.git/lfs",
+    "cache_size": "7.2G",
+    "cache_object_files": 284,
+    "pruned": false,
+    "note": "LFS cache retained per operator decision; no prune performed.",
+    "objects_tracked": {
+      "cleanroom_branch": 0,
+      "main": 0,
+      "oce": 0,
+      "agent/crypto-quant-foundry": 82
+    }
+  },
+
+  "validation": {
+    "scope": "Checks executed at F13 write time on the cleanroom worktree (0abf7d68). The canonical rerunnable verifier (F14) supersedes this section.",
+    "totals": { "PASS": 8, "FAIL": 0, "BLOCKED": 0, "SKIPPED": 0, "NOT_RUN": 5 },
+    "executed": [
+      { "check": "clean worktree (cleanroom)", "result": "PASS" },
+      { "check": "python compile (10 tracked quant-lab .py)", "result": "PASS" },
+      { "check": "json parse (4 tracked quant-lab .json)", "result": "PASS" },
+      { "check": "yaml parse (11 tracked .yaml/.yml)", "result": "PASS" },
+      { "check": "git fsck --no-dangling", "result": "PASS" },
+      { "check": "regex secret scan (68 cleanroom-scope files)", "result": "PASS" },
+      { "check": "import/dependency scan (435 non-quant-lab sources)", "result": "PASS" },
+      { "check": "internal doc link check (25 docs, 6 framework-absolute links excluded)", "result": "PASS" }
+    ],
+    "not_run": [
+      { "suite": "OCE B1-I1R protected-branch test suites (b1-i1r-validation.yml, b1-i1r3-validation.yml on oce lineage)", "reason": "intentionally NOT run on cleanroom branch; branch integrity verified by unchanged refs", "result": "NOT_RUN" },
+      { "suite": "grant-sector-g1-production worktree test suite", "reason": "intentionally NOT run; worktree untouched (2 unpushed commits, 14 modified, 9 untracked)", "result": "NOT_RUN" },
+      { "suite": "agent/crypto-quant-foundry + sensor-fabric test suites", "reason": "intentionally NOT run; branches verified by unchanged refs", "result": "NOT_RUN" },
+      { "suite": "tb-forward-engine test suite", "reason": "intentionally NOT run; branch verified by unchanged refs", "result": "NOT_RUN" },
+      { "suite": "gitleaks secret scan", "reason": "NOT_RUN at F13 write time (gitleaks binary not yet installed locally); regex scan above is a non-authoritative fallback and is NOT equivalent to gitleaks. gitleaks is run from F14 onward (installed locally and in CI).", "result": "NOT_RUN" }
+    ]
+  },
+
+  "deleted_legacy_branches_classification": {
+    "ABSORBED_VERIFIED": [
+      { "branch": "agent/crypto-data-1.1", "former_head": "1d9607525d13a39f5229837c7513ecf8a7d42c07", "proof": "git merge-base --is-ancestor 1d960752 agent/crypto-quant-foundry = ancestor; local branch ref retained" },
+      { "branch": "tb-forward-engine-plan-anchor-temp", "former_head": "223fd024418db2e1bb2c6ed9ac7334488f263f5b", "proof": "git merge-base --is-ancestor 223fd024 tb-forward-engine = ancestor" }
+    ],
+    "ARCHIVE_REF_REQUIRED": [
+      "agent/asia-triangle-foundry@8f84243f (16 unique commits)",
+      "agent/atomic-structure-foundry@efe025a1 (7 unique commits)",
+      "agent/deepers-strategy-foundry@b4ab4620 (8 unique commits)",
+      "agent/shallow-well-foundry@39cb980e (14 unique commits)",
+      "agent/obb-01-book-01-reality-audit@48a7c0ae (1 unique commit)",
+      "agent/openbb-forge-obb-01-02-docs@d8ee6b47 (15 unique commits)"
+    ],
+    "note": "Each ARCHIVE_REF_REQUIRED branch preserved as an annotated archive/agent/* tag on origin (verified, see archive_tags)."
+  },
+
+  "permanent_deletion_actions": 0,
   "cloud_mutations": 0,
-  "lfs_pruned": false
+  "purchases": 0,
+  "deployments": 0,
+  "recurring_cloud_cost": "$0",
+
+  "hermes_files_changed": false,
+  "oce_book1_evidence_changed": false,
+  "main_modified": false,
+
+  "references": {
+    "branch_reference_manifest": "cleanroom/evidence/branch-reference-manifest.json",
+    "restored_file_manifest": "cleanroom/evidence/restored-file-manifest.json",
+    "final_report": "CLEANROOM_FINAL_REPORT_F13.md"
+  }
 }

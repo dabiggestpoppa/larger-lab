@@ -1,5 +1,8 @@
 # CLEANROOM PHASE 2 REPORT
 
+> **SUPERSEDED by CLEANROOM_FINAL_REPORT_F13.md.** Historical record of the
+> phase-2 cleanup only; it predates the F08/F10 branch and file restorations.
+
 **Date:** 2026-08-29
 **Authoritative repo:** `C:\Users\wifik\Desktop\larger-lab` (workspace root, on `oce`)
 **Cleanroom branch:** `agent/repo-cleanroom` (from `origin/main` @ `7e7ef722`)
