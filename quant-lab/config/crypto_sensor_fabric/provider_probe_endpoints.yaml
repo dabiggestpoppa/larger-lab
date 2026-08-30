@@ -44,3 +44,22 @@ providers:
       order flow is a T2-derived state family, not a frozen T1 sensor.
       /positions is auth-gated.  Gate is US-region-restricted; forbidden
       responses are geo evidence, not bypassed.
+
+  BINANCE_USDM:
+    base_url: "https://fapi.binance.com/fapi/v1"
+    archive_base_url: "https://data.binance.vision/data/futures/um/daily"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_TRADE: "/aggTrades"
+      MECHANICAL_OPEN_INTEREST: "/futures/data/openInterestHist"
+      MECHANICAL_FUNDING: "/fundingRate"
+      MECHANICAL_BOOK_SNAPSHOT: "/depth"
+    notes: >
+      No public historical liquidation endpoint — liquidation starts as
+      UNVERIFIED_OR_UNAVAILABLE, never assumed (bloc_01/02 §13).  REST surface
+      fapi.binance.com is US-geo-restricted (HTTP 451); the data.binance.vision
+      archive is generally accessible.  Archive files are deterministic
+      {SYMBOL}-{kind}-{YYYY-MM-DD}.zip with .CHECKSUM siblings; archive holes
+      must be detected per symbol/kind, never assumed continuous.  The
+      ratified isBuyerMaker contract: true -> SELL aggressor, false -> BUY
+      (R01, PROVISIONAL until fixture verification).

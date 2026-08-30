@@ -1,0 +1,5 @@
+[
+  {"id": 400001, "price": "29510.5", "qty": "0.0089", "quoteQty": "262.64345", "time": 1655251200000, "isBuyerMaker": false, "isBestMatch": true},
+  {"id": 400002, "price": "29512.0", "qty": "0.0021", "quoteQty": "61.9752", "time": 1655251265000, "isBuyerMaker": true, "isBestMatch": true},
+  {"id": 400003, "price": "29508.2", "qty": "0.015", "quoteQty": "442.623", "time": 1655251330000, "isBuyerMaker": true, "isBestMatch": true}
+]

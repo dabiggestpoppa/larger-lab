@@ -1,0 +1,4 @@
+[
+  {"id": 400001, "price": "29510.5", "amount": "0.0089", "time": "2022-06-15T00:00:00.000Z", "isBuyerMaker": "false", "isBestMatch": true},
+  {"id": 400002, "price": "29512.0", "amount": "0.0021", "time": "2022-06-15T00:01:05.000Z", "isBuyerMaker": "true", "isBestMatch": true}
+]

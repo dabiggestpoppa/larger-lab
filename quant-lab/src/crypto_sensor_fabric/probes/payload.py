@@ -21,6 +21,10 @@ TIMESTAMP_KEYS: tuple[str, ...] = (
     "timestamp",
     "ts",
     "lastTime",
+    "fundingTime",
+    "funding_time",
+    "create_time_ms",
+    "create_time",
     "createdAt",
     "updatedAt",
 )
