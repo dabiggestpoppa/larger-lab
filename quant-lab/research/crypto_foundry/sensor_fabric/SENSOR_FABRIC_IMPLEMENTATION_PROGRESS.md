@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I11 DONE; SENSOR-B2-I12 (report-and-gap-matrix) pending |
+| Current checkpoint | SENSOR-B2-I12 DONE (pre-live packet); I13 live probing NOT YET AUTHORIZED — awaiting operator review |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -50,7 +50,9 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I09 | 15 | 15 | 0 |
 | SENSOR-B2-I10 | 12 | 12 | 0 |
 | SENSOR-B2-I11 | 20 | 20 | 0 |
-| cumulative | 447 | 447 | 0 |
+| SENSOR-B2-I11R1 | 21 | 21 | 0 |
+| SENSOR-B2-I12 | 16 | 16 | 0 |
+| cumulative | 464 | 464 | 0 |
 
 ## External / provider blockers
 
@@ -69,6 +71,20 @@ that is updated at every staged checkpoint.
 
 - NOT STARTED — Bloc 2 owns capability probes.
 
+## Source-contract repairs
+
+- SENSOR-B2-I11R1: Bitfinex community probe re-aligned with the ACTUAL frozen
+  source — the public GitHub repo `tradingstrategy-ai/bitfinex-liquidations`,
+  a single Git-LFS DuckDB dump (`bitfinex_liquidations.duckdb`).  Removed the
+  invented daily-CSV `liquidations/{YYYY-MM-DD}.csv` tree and the fictitious
+  `checksums.txt`.  Integrity evidence is now the Git LFS OID (SHA-256) +
+  upstream commit SHA + declared size.  Evidence class stays COMMUNITY_ARCHIVE;
+  mixed spot/margin + perpetual market types stay explicit (never whole-db
+  PERPETUAL_LIQUIDATIONS).  No automatic multi-hundred-MB download; the DuckDB
+  fixture is the small LFS pointer text.  ProbeFailureClass grew
+  F_REQUIRED_ARTIFACT_MISSING (license / methodology missing) — confirms-at
+  `test_probe_enum_member_sets_are_frozen` snapshot.
+
 ## Unresolved contradictions / plan observations
 
 - BLOC5_SCHEMA_REFINEMENT_PENDING (informational, not a blocker): the frozen
@@ -80,9 +96,13 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- SENSOR-B2-I12: report-and-gap-matrix
-  - generate all required human/machine reports (01-12 evidence packet),
-    provider coverage matrix, sensor gap matrix, provider role recommendations
+- STOP GATE after SENSOR-B2-I12 (I13 live probing NOT authorized):
+  - I13: approved low-rate live capability matrix — MUST NOT start until the
+    operator reviews the generated pre-live packet (probe matrix, source URLs,
+    expected requests, free-only classifications, network plan).
+  - I14: provider-role-decision-packet (freezes claims, roles, exclusions).
+  - Generated evidence packet: `evidence/bloc_02/` (01-11; all cells
+    UNATTEMPTED / E0 / NOT_PIT_READY — nothing verified prior to live probing).
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -120,3 +140,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I09 | d8de59e9 | deribit probe module: trade-level liquidation anatomy, has_more sequence pagination, include_old, narrow universe, 8 fixtures + tests | 415 passed / 0 failed | PASS | none |
 | SENSOR-B2-I10 | 46686270 | coinalyze probe module: venue-attributed aggregator symbols, free-key, corroboration semantics, 9 fixtures + tests | 427 passed / 0 failed | PASS | none |
 | SENSOR-B2-I11 | 2c6b9dcd | bitfinex community archive probe module: license/checksum semantics, archive-hole detection, COMMUNITY_ARCHIVE evidence class, 6 fixtures + tests | 447 passed / 0 failed | PASS | none |
+| SENSOR-B2-I11R1 | __I11R1_SHA__ | realign Bitfinex probe with tradingstrategy-ai/bitfinex-liquidations Git-LFS DuckDB source; drop daily-CSV+checksums assumptions; LFS OID revision identity; F_REQUIRED_ARTIFACT_MISSING; tests A-J | 448 passed / 0 failed | PASS | none |
+| SENSOR-B2-I12 | __I12_SHA__ | reports.py offline evidence-packet generator + 16 tests; generate_bloc_02_packet.py; pre-live evidence/bloc_02 packet (01-11) all UNATTEMPTED/E0 | 464 passed / 0 failed | PASS | none |
