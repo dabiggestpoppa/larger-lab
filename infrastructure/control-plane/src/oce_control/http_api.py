@@ -30,7 +30,7 @@ except ImportError:  # pragma: no cover — only needed where the service runs
 
 from .api import ControlPlaneAPI, APIResponse
 
-CONSOLE_PATH = Path(__file__).resolve().parent.parent / "ui" / "console.html"
+CONSOLE_PATH = Path(__file__).resolve().parents[2] / "ui" / "console.html"
 
 DEFAULT_DSN = "postgresql://oce_control_admin:test-secret-b2-pg-001@127.0.0.1:5433/oce_control"
 

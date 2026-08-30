@@ -162,6 +162,29 @@ def test_pg_unavailable_fails_closed(pg):
         )
 
 
+def test_cancel_and_quarantine_persist(pg):
+    """cancel_job / quarantine_job must not blow up on real PG (B2-R6R2
+    regression: both referenced an undefined `clock`, surfacing as a 400 on
+    the HTTP cancel endpoint in CI)."""
+    from oce_control.pg_store import PgJobStore
+    store = PgJobStore(pg)
+    job = store.submit_job(
+        job_type="unit_test", submitting_actor="po-test01",
+        grant_id="g", payload={"n": 6},
+    )
+    cancelled = store.cancel_job(job.job_id)
+    assert cancelled.status == "cancelled"
+    assert store.get_job(job.job_id).status == "cancelled"
+
+    job2 = store.submit_job(
+        job_type="unit_test", submitting_actor="po-test01",
+        grant_id="g", payload={"n": 7},
+    )
+    quarantined = store.quarantine_job(job2.job_id, "regression test")
+    assert quarantined.status == "quarantined"
+    assert store.get_job(job2.job_id).status == "quarantined"
+
+
 def test_migration_checksum_mismatch_detected(pg):
     """Tampering with an applied migration's recorded checksum must fail closed."""
     import migrate

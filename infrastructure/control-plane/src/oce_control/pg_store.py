@@ -400,6 +400,7 @@ class PgJobStore:
         return self.get_job(job_id)  # type: ignore[return-value]
 
     def cancel_job(self, job_id: str) -> JobEnvelope:
+        clock = get_clock()
         job = self.get_job(job_id)
         if job is None:
             raise KeyError("Job not found")
@@ -420,6 +421,7 @@ class PgJobStore:
         return self.get_job(job_id)  # type: ignore[return-value]
 
     def quarantine_job(self, job_id: str, reason: str) -> JobEnvelope:
+        clock = get_clock()
         job = self.get_job(job_id)
         if job is None:
             raise KeyError("Job not found")
