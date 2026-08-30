@@ -14,23 +14,30 @@
 > See `B1-LOCAL-FINAL-TRUTH-CORRECTION.md`. No evidence was falsified or
 > discarded; the prior packet
 > `B1-LOCAL-REVIEW-PACKET-FINAL-2e65b0a9c4e7.md` is superseded, not deleted.
+>
+> **RESOLVED 2026-08-30:** the repaired authoritative run **`33311614613`**
+> (OCE_RUN_ID **`f767fadd3d67`**, tested HEAD `7e5e91c1`) concluded **success**
+> (150/150 passed, 0 skipped, gate 60/60 AUTHORITATIVE_CI) and is the sole
+> basis for the current readiness claim. The corrected packet is
+> `B1-LOCAL-REVIEW-PACKET-FINAL-f767fadd3d67.md`.
 
 ## Independent ledger fields
 
-| Field | Value (2026-08-30, final truth repair) |
+| Field | Value (2026-08-30, after repaired authoritative CI success) |
 |---|---|
-| `local_ground_state` | VERIFYING |
+| `local_ground_state` | READY_FOR_OPERATOR_REVIEW |
 | `cloud_plan_state` | VALIDATED_NO_APPLY |
 | `cloud_activation_state` | DEFERRED_BY_OPERATOR |
 | `cloud_deployment_state` | NOT_DEPLOYED |
 | `cloud_cost_state` | ZERO |
-| `next_local_book` | BLOCKED_PENDING_B1_REPAIR |
-| `operator_hold_reason` | RECOVERY_TRUTH_GAPS |
+| `next_local_book` | BLOCKED_PENDING_OPERATOR_RATIFICATION |
+| `operator_hold_reason` | OPERATOR_RATIFICATION_REQUIRED |
 
-No readiness claim is published until the repaired authoritative CI run
-succeeds and its downloaded artifact independently reconciles. Book 2 stays
-locked. Cloud remains `DEFERRED_BY_OPERATOR` / `NOT_DEPLOYED` / `ZERO`,
-0 mutations, $0 cost.
+Readiness is published only because the repaired authoritative CI run
+`33311614613` succeeded and its downloaded artifact independently
+reconciled (150/150 passed, 0 skipped, gate 60/60 AUTHORITATIVE_CI). Book 2
+stays locked pending separate operator ratification. Cloud remains
+`DEFERRED_BY_OPERATOR` / `NOT_DEPLOYED` / `ZERO`, 0 mutations, $0 cost.
 
 ## Recovery-contract correction (2026-08-29)
 
@@ -191,6 +198,38 @@ rejections), portability/compose/contract suites green. The authoritative
 container-backed CI run on the repaired implementation is pending and is the
 sole basis for the next readiness claim.
 
+## Final truth repair closure (2026-08-30)
+
+Authoritative CI run **`33311614613`** (workflow `b1-local-ground-validation`,
+push, OCE_RUN_ID **`f767fadd3d67`**) on tested HEAD
+`7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f` / tree
+`85cb2379f614dde118670194dc6a08c59b1f3f54` concluded **success**:
+
+- **150 collected / 150 executed / 150 passed / 0 failed / 0 errors /
+  0 skipped** — zero skips; `mandatory_skipped: 0`.
+- Container-backed: **21 / 21 executed, 21 passed**, 0 skipped — including
+  the new post-promotion injected-failure rollback, rollback-failure
+  regression, and Redis-invalidation-failure blocking tests.
+- Unavailable-service negative tests **executed and passed** in CI (fake
+  command environment; no skips).
+- Independent gate: **PASS 60/60** (`AUTHORITATIVE_CI`); source-clean pre/post
+  `true`; cleanup verified; adversarial 8/8; operation index **23 operations
+  hash-verified**; success ops prove fingerprints + quarantine
+  held-then-dropped + Redis invalidation; rollback regression executed;
+  invalid rollback SQL absent; cloud `0` mutations / `ZERO` /
+  `DEFERRED_BY_OPERATOR` / `NOT_DEPLOYED`.
+- Artifact `b1-local-ground-evidence-f767fadd3d67` (id `9732205709`), zip
+  SHA-256 `ea65df1ba5c7cfae1cdc67ef2df247bf2b495e57926e2ba9d076c54a69af0b41`,
+  downloaded and independently reconciled (evidence-manifest 37/37 match;
+  recovery-ops verify ok).
+
+Evidence archived in `evidence/runs/f767fadd3d67/` (exact zip byte-for-byte +
+complete expanded artifact + per-file hashes); the corrected packet is
+`B1-LOCAL-REVIEW-PACKET-FINAL-f767fadd3d67.md`. The prior successful run
+`33283003794`, all failed runs, and every prior packet remain preserved. **No
+claim of `BOOK_1_COMPLETE`, `GATED_COMPLETE`, `BOOK_2_AUTHORIZED`, or
+`CLOUD_DEPLOYED` is made** — the operator must ratify.
+
 ## Machine-readable copy
 
 The same fields are enforced by `contracts/local-ground-contract.json`
@@ -236,3 +275,14 @@ The same fields are enforced by `contracts/local-ground-contract.json`
   operator_hold_reason=RECOVERY_TRUTH_GAPS. Cloud unchanged
   (DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0). `main`
   untouched.
+- 2026-08-30 (final truth repair, resolved) — The repaired authoritative run
+  `33311614613` (OCE_RUN_ID `f767fadd3d67`, HEAD `7e5e91c1`) succeeded after
+  the bytes-stdout decode fix (`7e5e91c1`): 150/150 passed, 0 skipped, gate
+  60/60 AUTHORITATIVE_CI, container-backed 21/21, operation index 23 ops
+  verified. Active state updated to READY_FOR_OPERATOR_REVIEW pending
+  separate operator ratification; next_local_book=
+  BLOCKED_PENDING_OPERATOR_RATIFICATION. Evidence archived in
+  `evidence/runs/f767fadd3d67/`; corrected packet
+  `B1-LOCAL-REVIEW-PACKET-FINAL-f767fadd3d67.md`. Cloud unchanged
+  (DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0). `main`
+  untouched at `7e7ef722`.

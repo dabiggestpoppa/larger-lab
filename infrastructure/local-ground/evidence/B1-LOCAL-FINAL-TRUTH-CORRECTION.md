@@ -63,6 +63,24 @@
   fingerprints, Redis invalidation, phase ordering, zero skips, receipt
   index; a green test count cannot override a failed invariant).
 
+## Resolved (2026-08-30) — repaired authoritative execution succeeded
+
+The repaired authoritative CI run **`33311614613`** (OCE_RUN_ID
+`f767fadd3d67`, tested HEAD `7e5e91c1`) concluded **success**: 150 collected /
+150 executed / **150 passed / 0 failed / 0 errors / 0 skipped**;
+container-backed 21/21; unavailable-service negative tests executed and
+passed (no skips); independent gate **PASS 60/60 AUTHORITATIVE_CI**;
+operation index 23 operations hash-verified; success ops prove protected
+value fingerprints, quarantine held-then-dropped, and Redis invalidation;
+the post-promotion rollback regression executed with a verified rollback;
+invalid rollback SQL absent; source clean pre/post; cleanup verified; cloud 0
+mutations / ZERO / deferred / not deployed.
+
+The withdrawal recorded above is therefore **resolved** by this run. The
+corrected packet is `B1-LOCAL-REVIEW-PACKET-FINAL-f767fadd3d67.md`; the
+durable archive is `evidence/runs/f767fadd3d67/`. The prior packet and all
+run history remain preserved.
+
 ## Not changed
 
 - A-003 architecture; local-first posture; cloud deferred/not deployed/zero
