@@ -1,6 +1,6 @@
 # OCE Local Ground â€” State Ledger (B1-LOCAL, A-003)
 
-**Updated:** 2026-08-29
+**Updated:** 2026-08-30
 **Branch:** `oce-program-build`
 **Decision:** `LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED`
 **Amendment:** OCE-AMEND-A003
@@ -9,18 +9,20 @@
 
 > **CORRECTED 2026-08-29 (repair cycle):** the previous readiness claim was
 > premature (Docker absent locally; authoritative CI failed). See
-> `B1-LOCAL-READINESS-CORRECTION.md`. Active state below until a successful
-> authoritative CI run is operator-confirmed.
+> `B1-LOCAL-READINESS-CORRECTION.md`. The active state below reflects the
+> **successful authoritative CI run `33283003794`** (OCE_RUN_ID
+> `2e65b0a9c4e7`) and remains pending **separate operator ratification** —
+> Book 1 is not self-completing and Book 2 stays locked.
 
-| Field | Value (repair cycle, after local static revalidation) |
+| Field | Value (2026-08-30, after authoritative CI success) |
 |---|---|
-| `local_ground_state` | VERIFYING |
+| `local_ground_state` | READY_FOR_OPERATOR_REVIEW |
 | `cloud_plan_state` | VALIDATED_NO_APPLY |
 | `cloud_activation_state` | DEFERRED_BY_OPERATOR |
 | `cloud_deployment_state` | NOT_DEPLOYED |
 | `cloud_cost_state` | ZERO |
-| `next_local_book` | BLOCKED_PENDING_B1_REPAIR |
-| `operator_hold_reason` | RECOVERY_CONTRACT_UNDER_REPAIR |
+| `next_local_book` | BLOCKED_PENDING_OPERATOR_RATIFICATION |
+| `operator_hold_reason` | OPERATOR_RATIFICATION_REQUIRED |
 
 ## Recovery-contract correction (2026-08-29)
 
@@ -102,6 +104,38 @@ final-package verifier PASS, `LOCAL_STATIC_READY_CI_REQUIRED`. Full
 readiness requires the authoritative container-backed CI run on the repaired
 implementation, which awaits operator confirmation (private repo).
 
+## Authoritative closure cycle (2026-08-30)
+
+Authoritative CI run **`33283003794`** (workflow `b1-local-ground-validation`,
+push, OCE_RUN_ID **`2e65b0a9c4e7`**) on tested HEAD
+`22a30401df1ab5b7fd6121c1f5ac9e75246aa4e0` / tree
+`1b0208a0a5f944781ee3c98506c3d6173ebe2756` concluded **success**:
+
+- **117 collected / 117 executed / 116 passed / 0 failed / 0 errors / 1
+  skipped** (the single skip is the live-stack-aware block regression,
+  `mandatory_skipped: 0`).
+- Container-backed: **18 / 18 executed, 18 passed**, 0 skipped — real
+  clean-room DB+artifact restore, populated-target full replacement,
+  corrupt-backup rejection, persistence/restart, Redis-loss, structured
+  logs, safe shutdown and verified cleanup.
+- Independent gate: **PASS 45/45** (`AUTHORITATIVE_CI`); source-clean pre
+  and post `true`; cleanup verified (containers/network/volumes removed);
+  adversarial 8/8; cloud `0` mutations / `ZERO` / `DEFERRED_BY_OPERATOR` /
+  `NOT_DEPLOYED`.
+- PostgreSQL promotion receipt in CI: staging/canonical/final verification
+  all `ok` (`backup_probe 2, replace_probe 2, state_probe 4`), `promoted`,
+  `quarantine_dropped`, `exit_status 0`, `redis_restored false`, PG 16.2.
+- Artifact `b1-local-ground-evidence-2e65b0a9c4e7` (id `9723589216`), zip
+  SHA-256 `1706d61fec025cbbeb03927966bc8c554d3caf6b330108831d0c39af6d763425`.
+
+Evidence archived in `evidence/runs/2e65b0a9c4e7/` (PROVENANCE.json +
+stage-status.json); the superseding review packet is
+`B1-LOCAL-REVIEW-PACKET-FINAL-2e65b0a9c4e7.md`. The failed-run history
+(including `33277742603`, `33280331533`, `33280678356`, `33281049669`,
+`33282094530`, `33282648769`) is preserved, not rewritten. **No claim of
+`BOOK_1_COMPLETE`, `GATED_COMPLETE`, `BOOK_2_AUTHORIZED`, or
+`CLOUD_DEPLOYED` is made** — the operator must ratify.
+
 ## Machine-readable copy
 
 The same fields are enforced by `contracts/local-ground-contract.json`
@@ -130,3 +164,10 @@ The same fields are enforced by `contracts/local-ground-contract.json`
   VALIDATED_NO_APPLY (revalidated), next_local_book=BLOCKED_PENDING_B1_REPAIR,
   operator_hold_reason=AUTHORITATIVE_CI_CONFIRMATION_PENDING. Cloud fields
   remain DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0 cost.
+- 2026-08-29/30 â€” Recovery-contract repair series B1-L7R21..R24 + B1-L8R5..R6
+  pushed from `d3df9eb4` and iterated to green: authoritative run
+  `33283003794` succeeded (116 passed / 0 failed, 18/18 container-backed,
+  gate 45/45 AUTHORITATIVE_CI). Active state updated to
+  READY_FOR_OPERATOR_REVIEW pending separate operator ratification;
+  next_local_book=BLOCKED_PENDING_OPERATOR_RATIFICATION. Cloud unchanged
+  (DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0).
