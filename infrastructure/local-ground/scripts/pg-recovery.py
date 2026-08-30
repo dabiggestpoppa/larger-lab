@@ -236,7 +236,7 @@ def collect_observed_rows(container, db, user, tables):
         if r.returncode != 0:
             observed[name] = -1
         else:
-            txt = r.stdout.strip()
+            txt = r.stdout.decode(errors="replace").strip()
             observed[name] = int(txt) if txt.isdigit() else -1
     return observed
 
@@ -258,7 +258,7 @@ def collect_observed_fingerprints(container, db, user, tables):
         if r.returncode != 0:
             observed[name] = "-err-"
         else:
-            observed[name] = r.stdout.strip()
+            observed[name] = r.stdout.decode(errors="replace").strip()
     return observed
 
 

@@ -607,6 +607,47 @@ def test_verify_detects_receipt_hash_mismatch(tmp_path):
     assert "mismatch" in (v.stdout + v.stderr).lower()
 
 
+def test_collect_observed_fingerprints_decodes_bytes_stdout():
+    """psql returns BYTES stdout (docker exec without text=True); the
+    observed fingerprints must be decoded strings so they are JSON-
+    serializable in the receipt and comparable to the inventory. This is the
+    regression for the authoritative CI bytes-in-receipt failure."""
+    pr = _load_pr()
+    import types
+
+    class FakeR:
+        returncode = 0
+        stdout = b"fp-public.backup_probe"
+        stderr = b""
+
+    def fake_psql(container, db, user, sql, stdin_bytes=None):
+        return FakeR()
+
+    pr.psql = fake_psql
+    fps = pr.collect_observed_fingerprints("c", "d", "u", ["public.backup_probe"])
+    assert fps == {"public.backup_probe": "fp-public.backup_probe"}
+    assert isinstance(fps["public.backup_probe"], str)
+    json.dumps({"fingerprints": fps})  # must be JSON-serializable (no bytes)
+    # and comparable to a str inventory fingerprint (no false mismatch)
+    inv = pr.parse_inventory(_fingerprinted_inventory({"public.backup_probe": 2}))
+    ok, probs = pr.verify_inventory(inv, {"public.backup_probe": 2}, None, fps)
+    assert ok, probs
+
+
+def test_collect_observed_rows_decodes_bytes_stdout():
+    pr = _load_pr()
+
+    class FakeR:
+        returncode = 0
+        stdout = b"2"
+        stderr = b""
+
+    pr.psql = lambda container, db, user, sql, stdin_bytes=None: FakeR()
+    rows = pr.collect_observed_rows("c", "d", "u", ["public.backup_probe"])
+    assert rows == {"public.backup_probe": 2}
+    assert isinstance(rows["public.backup_probe"], int)
+
+
 def test_latest_pointer_is_not_authoritative(tmp_path):
     """A convenience latest.json cannot substitute for the authoritative
     indexed receipt sets: without an index (or with an empty index) verify
