@@ -96,3 +96,9 @@ OCE/TB/tbx/crypto-related or unverified local-only; left intact.
 main. Remaining decisions: whether to permanently delete the trashed duplicate
 clone (~20GB) and the trashed legacy worktree dirs once you've confirmed they're
 not needed, and whether you want the LFS cache/prune cycle at a later date.
+
+---
+
+## SUPERSEDED BY CLEANROOM-F12 (2026-08-30)
+
+This report is superseded by CLEANROOM_FINAL_REPORT_F12.md and the corrected repo_cleanup_branch_manifest.json (v2). Later independent review discovered the earlier pass contained incomplete classification and unexecuted validation: valuable branches were deleted under a legacy label (since restored), 50 tracked Quant Lab files were removed without executed validation (since restored in F10), and recorded branch heads went stale (oce-program-build and agent/crypto-sensor-fabric-build advanced concurrently via active worktrees). See the F12 report for current observed truth.

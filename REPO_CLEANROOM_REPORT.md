@@ -145,3 +145,9 @@ LFS cache is deferred to the same single-clone consolidation decision.
 4. **Continue tracked-file (quant-lab legacy) cleanup on a dedicated
    `agent/repo-cleanroom` branch?** — only for material verified unrelated to
    OCE/QCAE/Grant/Crypto/TB.
+
+---
+
+## SUPERSEDED BY CLEANROOM-F12 (2026-08-30)
+
+This report is superseded by CLEANROOM_FINAL_REPORT_F12.md and the corrected repo_cleanup_branch_manifest.json (v2). Later independent review discovered the earlier pass contained incomplete classification and unexecuted validation: valuable branches were deleted under a legacy label (since restored), 50 tracked Quant Lab files were removed without executed validation (since restored in F10), and recorded branch heads went stale (oce-program-build and agent/crypto-sensor-fabric-build advanced concurrently via active worktrees). See the F12 report for current observed truth.

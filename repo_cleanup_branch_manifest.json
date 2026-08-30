@@ -1,180 +1,234 @@
 {
-  "generated": "2026-08-29 (updated after OCE/QCAE/Grant protection override)",
-  "repository": "dabiggestpoppa/larger-lab",
-  "authoritative_repo": "C:\\Users\\wifik\\Desktop\\larger-lab",
-  "protection_override": {
-    "active": true,
-    "text": "All OCE lineage, QCAE, Grant, Crypto-canonical, TB engine, and main/master are KEEP_PROTECTED. Do NOT delete/archive/rename/rebase/squash/merge-away or history-rewrite them. Do NOT classify old OCE branches as SAFE_DELETE."
-  },
-  "cache_recovery": {
-    "oce_branch_restored_after_deletion": {
-      "branch": "oce-full-program-planning-books-2-10",
-      "head_sha": "028fcdddd90f25c44996510426bd0c0e68bc54f5",
-      "note": "Deleted before override, restored from local object store commit 028fcdd which still existed. Pushed back to origin. Recovered — no data lost."
+  "manifest_version": 2,
+  "stage": "CLEANROOM-RECOVERY-AND-FINAL-REVIEW",
+  "generated": "2026-08-30",
+  "note": "Corrected manifest. Supersedes v1 (which classified branches SAFE_DELETE before independent review). Current observed truth only.",
+  "main_unchanged": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+  "remote_branches": {
+    "agent/crypto-quant-foundry": {
+      "head": "9243201b4797b4b98cc446d1f13871668907ca79",
+      "classification": "KEEP_PROTECTED",
+      "system": "CRYPTO"
+    },
+    "agent/crypto-sensor-fabric-build": {
+      "head": "aadbc3763304f6ac26acb2e121626edc9c155d90",
+      "classification": "KEEP_PROTECTED",
+      "system": "CRYPTO",
+      "note": "advanced externally during run (active worktree)"
+    },
+    "agent/crypto-sensor-fabric-plan": {
+      "head": "4bb677f9e0266f4dc48405181696019f359ae49f",
+      "classification": "KEEP_PROTECTED",
+      "system": "CRYPTO",
+      "note": "frozen head"
+    },
+    "agent/repo-cleanroom": {
+      "head": "PENDING_FINAL",
+      "classification": "KEEP_PROTECTED",
+      "system": "CLEANROOM"
+    },
+    "grant-sector-g1-production": {
+      "head": "3a639d89865188506b8267a433c5bf8464f4ee7b",
+      "classification": "KEEP_PROTECTED",
+      "system": "GRANT"
+    },
+    "main": {
+      "head": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+      "classification": "KEEP_PROTECTED",
+      "system": "BASELINE"
+    },
+    "master": {
+      "head": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
+      "classification": "KEEP_PROTECTED",
+      "system": "BASELINE"
+    },
+    "oce": {
+      "head": "d3df9eb45aeddd8a3dd40ced24a7f2e1d2f0ff41",
+      "classification": "KEEP_PROTECTED",
+      "system": "OCE"
+    },
+    "oce-full-program-planning-books-2-10": {
+      "head": "028fcdddd90f25c44996510426bd0c0e68bc54f5",
+      "classification": "KEEP_PROTECTED",
+      "system": "OCE"
+    },
+    "oce-program-build": {
+      "head": "f79e5ed0bf6287e043a7cbcd58c60109048b3529",
+      "classification": "KEEP_PROTECTED",
+      "system": "OCE",
+      "note": "advanced externally during run (active worktree)"
+    },
+    "qcae-capability-acquisition-engine": {
+      "head": "c4e5df830b541ce6917ddf9622c41cfe09629185",
+      "classification": "KEEP_PROTECTED",
+      "system": "OCE_FUTURE_INTEGRATION"
+    },
+    "tb-forward-engine": {
+      "head": "49930215addd388fa183cc452fb64b56bf9a2856",
+      "classification": "KEEP_PROTECTED",
+      "system": "ENGINE"
+    },
+    "capital-routing": {
+      "head": "43a6473c1bc01bb79efd3b415e482d65640e1226",
+      "classification": "KEEP_PROTECTED",
+      "system": "CAPITAL",
+      "restored": true,
+      "reason": "unique MT5 physical-profile + capital-risk work; not absorbed"
+    },
+    "cerebus-mve-implementation": {
+      "head": "30359692ccd4c1ce0c7a52096cd64ec4902520ee",
+      "classification": "KEEP_PROTECTED",
+      "system": "MVE",
+      "restored": true,
+      "reason": "active CEREBUS MVE lineage; 991 unique commits vs main"
+    },
+    "hermes-set-up": {
+      "head": "b4ef87b7af9b9fafdd9f050e0b90319f76c1e0ff",
+      "classification": "KEEP_PROTECTED",
+      "system": "OCE",
+      "restored": true,
+      "reason": "OCE Hermes Telegram Operator, MCP facade, runbooks"
+    },
+    "execution-runtime-foundation": {
+      "head": "03eb68f8d4c684c4ccaf7b4f93b3fc4e1127a1ee",
+      "classification": "KEEP_PROTECTED",
+      "system": "EXEC",
+      "restored": true,
+      "reason": "unique TradeLocker demo read-only integration"
+    },
+    "tv-review": {
+      "head": "1a53cbb1d400bec5b77b0b3b6816d707050df1c6",
+      "classification": "KEEP_PROTECTED",
+      "system": "OCE",
+      "restored": true,
+      "reason": "OCE B1-I1R cloud-ground infra lineage; ancestor of oce"
+    },
+    "archive/cerebus-local-extra": {
+      "head": "133364c9cb1cd2127b48421babc14a8d57e1d99a",
+      "classification": "KEEP_PROTECTED",
+      "system": "ARCHIVE",
+      "restored": true
+    },
+    "archive/content-oc2": {
+      "head": "aeb3afdde9f0f3478e82083d85431d8722b4c0ea",
+      "classification": "KEEP_PROTECTED",
+      "system": "ARCHIVE",
+      "restored": true
+    },
+    "archive/hermes-02e51f11": {
+      "head": "d4be1f2302111ea477ffca12529afb669825eadc",
+      "classification": "KEEP_PROTECTED",
+      "system": "ARCHIVE",
+      "restored": true
+    },
+    "archive/hermes-262c2f34": {
+      "head": "217f48c297be151fa7987cafc432824bb2de0d34",
+      "classification": "KEEP_PROTECTED",
+      "system": "ARCHIVE",
+      "restored": true
+    },
+    "archive/hermes-cde01a2a": {
+      "head": "63474e77b4acd9f0a93da153675c20d3977ebeab",
+      "classification": "KEEP_PROTECTED",
+      "system": "ARCHIVE",
+      "restored": true
+    },
+    "archive/pruned-master-2026-08-15": {
+      "head": "6922c0838202cd4e00c9233596501892e5df563d",
+      "classification": "KEEP_PROTECTED",
+      "system": "ARCHIVE",
+      "restored": true
+    },
+    "archive/pruned-snapshot-vtuber": {
+      "head": "d7cb598a8681d6a238287ab5a56f555c0da0d74c",
+      "classification": "KEEP_PROTECTED",
+      "system": "ARCHIVE",
+      "restored": true
+    },
+    "archive/review-branch": {
+      "head": "c79023263bc00e9e1775c603036832c615c39f2b",
+      "classification": "KEEP_PROTECTED",
+      "system": "ARCHIVE",
+      "restored": true,
+      "reason": "1054 unique commits vs main; triangular-basis research snapshot; not proven absorbed"
     }
   },
-  "lfs_cache": {
-    "total_files": 82,
-    "total_size_human": "5.8GB",
-    "content": "ALL parquet files from quant-lab/research/crypto_foundry/ (alt_rotation + derivatives lower_field)",
-    "on_active_branches": true,
-    "safe_to_prune": true,
-    "pruned": false,
-    "note": "Committed to GitHub via LFS. Prune would only remove local copies (re-fetched on demand). Left intact pending single-clone consolidation decision."
-  },
-  "edge_browser_files": "NONE FOUND",
-  "tbx_files": "NONE FOUND",
-  "branches": [
+  "deleted_branches_reviewed": [
     {
-      "branch": "agent/crypto-quant-foundry",
-      "head_sha": "9243201b4797b4b98cc446d1f13871668907ca79",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "CRYPTO canonical — current crypto mechanism/field-model research"
+      "branch": "agent/crypto-data-1.1",
+      "former_head": "1d9607525d13a39f5229837c7513ecf8a7d42c07",
+      "classification": "ABSORBED_VERIFIED",
+      "proof": "merge-base --is-ancestor vs agent/crypto-quant-foundry = ANCESTOR"
     },
     {
-      "branch": "agent/crypto-sensor-fabric-build",
-      "head_sha": "e61240315314d53d000e4e8ca44566adc11c8cc7",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "CRYPTO canonical — 12-Bloc sensor fabric implementation"
+      "branch": "tb-forward-engine-plan-anchor-temp",
+      "former_head": "223fd024418db2e1bb2c6ed9ac7334488f263f5b",
+      "classification": "ABSORBED_VERIFIED",
+      "proof": "merge-base --is-ancestor vs tb-forward-engine = ANCESTOR"
     },
-    {
-      "branch": "agent/crypto-sensor-fabric-plan",
-      "head_sha": "4bb677f9e0266f4dc48405181696019f359ae49f",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "CRYPTO canonical — frozen 12-Bloc architecture record (frozen head matches spec 4bb677f9)"
-    },
-    {
-      "branch": "grant-sector-g1-production",
-      "head_sha": "3a639d89865188506b8267a433c5bf8464f4ee7b",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "GRANT — user override: ALL grant work protected. DO NOT touch."
-    },
-    {
-      "branch": "main",
-      "head_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "BASELINE"
-    },
-    {
-      "branch": "master",
-      "head_sha": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "BASELINE"
-    },
-    {
-      "branch": "oce",
-      "head_sha": "d3df9eb45aeddd8a3dd40ced24a7f2e1d2f0ff41",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "OCE canonical — head EXACTLY matches expected spec head d3df9eb. All OCE lineage protected."
-    },
-    {
-      "branch": "oce-full-program-planning-books-2-10",
-      "head_sha": "028fcdddd90f25c44996510426bd0c0e68bc54f5",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "OCE lineage — RESTORED after prior deletion. Protected."
-    },
-    {
-      "branch": "oce-program-build",
-      "head_sha": "b5d814077cc1b05e8de0e3567e50816069c4d0d6",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "OCE lineage — protected."
-    },
-    {
-      "branch": "qcae-capability-acquisition-engine",
-      "head_sha": "c4e5df830b541ce6917ddf9622c41cfe09629185",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "QCAE — future OCE integration. NOT junk. Protected until independent review."
-    },
-    {
-      "branch": "tb-forward-engine",
-      "head_sha": "49930215addd388fa183cc452fb64b56bf9a2856",
-      "classification": "KEEP_PROTECTED",
-      "canonical_successor": null,
-      "unique_commit_count": null,
-      "reason": "TB runtime reference architecture."
-    }
-  ],
-  "deleted_legacy_branches": [
     {
       "branch": "agent/asia-triangle-foundry",
-      "former_head": "8f84243f",
-      "reason": "Legacy agent branch, unrelated to protected systems, fully committed to GitHub before deletion"
+      "former_head": "8f84243f401fc1df5cb0b45d8120444d2ef0a9b3",
+      "classification": "ARCHIVE_REF_REQUIRED",
+      "proof": "16 unique commits; archive tag pushed"
     },
     {
       "branch": "agent/atomic-structure-foundry",
-      "former_head": "efe025a1",
-      "reason": "Legacy agent branch"
-    },
-    {
-      "branch": "agent/crypto-data-1.1",
-      "former_head": "1d960752",
-      "reason": "Legacy, ancestor of crypto-quant-foundry lineage, fully absorbed"
+      "former_head": "efe025a1dbf675e5e819c981c00c6125e95132e1",
+      "classification": "ARCHIVE_REF_REQUIRED",
+      "proof": "7 unique commits; archive tag pushed"
     },
     {
       "branch": "agent/deepers-strategy-foundry",
-      "former_head": "b4ab4620",
-      "reason": "Legacy agent branch"
+      "former_head": "b4ab46208ea0deb811eb9b7a8dc15a198861082f",
+      "classification": "ARCHIVE_REF_REQUIRED",
+      "proof": "8 unique commits; archive tag pushed"
     },
     {
       "branch": "agent/shallow-well-foundry",
-      "former_head": "39cb980e",
-      "reason": "Legacy agent branch"
+      "former_head": "39cb980e7e74945627f6a8f9cf85df5999336bdc",
+      "classification": "ARCHIVE_REF_REQUIRED",
+      "proof": "14 unique commits; archive tag pushed"
     },
     {
-      "branch": "capital-routing",
-      "former_head": "43a6473c",
-      "reason": "Legacy, unrelated to protected systems"
+      "branch": "agent/obb-01-book-01-reality-audit",
+      "former_head": "48a7c0aeebea1a5ba86e17583e0a9bf96437f0f9",
+      "classification": "ARCHIVE_REF_REQUIRED",
+      "proof": "1 unique commit; archive tag pushed"
     },
     {
-      "branch": "cerebus-mve-implementation",
-      "former_head": "30359692",
-      "reason": "Legacy CEREBUS strategy, unrelated to protected systems"
-    },
-    {
-      "branch": "execution-runtime-foundation",
-      "former_head": "03eb68f8",
-      "reason": "Legacy runtime work, superseded by tb-forward-engine (which is protected and retained)"
-    },
-    {
-      "branch": "hermes-set-up",
-      "former_head": "b4ef87b7",
-      "reason": "Legacy Hermes setup, unrelated to protected systems"
-    },
-    {
-      "branch": "tv-review",
-      "former_head": "1a53cbb1",
-      "reason": "Legacy, unrelated to protected systems"
+      "branch": "agent/openbb-forge-obb-01-02-docs",
+      "former_head": "d8ee6b4785bc00ba627a288addc2333a8d854166",
+      "classification": "ARCHIVE_REF_REQUIRED",
+      "proof": "15 unique commits; archive tag pushed"
     }
   ],
-  "already_absent_server_side": [
-    "agent/obb-01-book-01-reality-audit",
-    "agent/openbb-forge-obb-01-02-docs",
-    "tb-forward-engine-plan-anchor-temp"
+  "archive_tags_pushed": [
+    "archive/agent/asia-triangle-foundry@8f84243f",
+    "archive/agent/atomic-structure-foundry@efe025a1",
+    "archive/agent/deepers-strategy-foundry@b4ab4620",
+    "archive/agent/obb-01-book-01-reality-audit@48a7c0ae",
+    "archive/agent/openbb-forge-obb-01-02-docs@d8ee6b47",
+    "archive/agent/shallow-well-foundry@39cb980e"
   ],
-  "summary": {
-    "server_remote_branches_total": 11,
-    "keep_protected": 11,
-    "deleted_legacy": 10,
-    "oce_branch_restored": true
-  }
+  "tracked_file_deletion_matrix": {
+    "decision": "ALL 50 FILES RESTORED in CLEANROOM-F10 from main (byte-identical). No deletion retained.",
+    "rationale": "All 50 are user-authored CEREBUS/P90 research: Pine strategy source, extracted manuals, analysis docs, backtest scripts, results. No verified canonical successor; historical mentions not proof of absorption; negative results are valuable evidence.",
+    "count": 50,
+    "lines": 51536,
+    "restored_commit": "69c47b4b"
+  },
+  "f02_deleted_file_categories": {
+    "backtests": 10,
+    "findings": 1,
+    "insights": 1,
+    "reports": 32,
+    "research": 2,
+    "results": 1,
+    "strategies": 3
+  },
+  "protected_heads_unchanged_by_cleanup": "All CHANGED_BY_CLEANUP = none; oce-program-build + crypto-sensor-fabric-build advanced externally (active worktrees)",
+  "permanent_deletions_performed": 0,
+  "cloud_mutations": 0,
+  "lfs_pruned": false
 }
