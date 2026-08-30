@@ -12,10 +12,11 @@ set -uo pipefail
 EVIDENCE="${1:?evidence dir}"
 COMMIT="${2:?commit}"
 TREE="${3:?tree}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-python3 - "$EVIDENCE" "$COMMIT" "$TREE" <<'PY'
-import hashlib, json, os, sys
-ev, commit, tree = sys.argv[1], sys.argv[2], sys.argv[3]
+python3 - "$EVIDENCE" "$COMMIT" "$TREE" "$SCRIPT_DIR" <<'PY'
+import hashlib, json, os, subprocess, sys
+ev, commit, tree, script_dir = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 errs = []
 def sha(p):
     h = hashlib.sha256()
@@ -84,6 +85,17 @@ if mode == "AUTHORITATIVE_CI":
 cleanup = json.load(open(os.path.join(ev, "cleanup.json"), encoding="utf-8"))
 if not (cleanup.get("cleanup") == "ok" or (cleanup.get("removed") is True and cleanup.get("pruned") is True)):
     errs.append("cleanup not confirmed")
+# R8/R9: the immutable operation index is the authoritative recovery record.
+ops_root = os.path.join(ev, "operations")
+if not os.path.isfile(os.path.join(ops_root, "index.json")):
+    errs.append("missing operations/index.json (immutable operation index)")
+else:
+    r = subprocess.run([sys.executable,
+                        os.path.join(script_dir, "recovery-ops.py"),
+                        "verify", "--ops-root", ops_root],
+                       capture_output=True, text=True, timeout=60)
+    if r.returncode != 0:
+        errs.append("operation index verification failed: " + (r.stdout + r.stderr).strip())
 
 print("FINAL PACKAGE VERIFIER (read-only): " + ("PASS" if not errs else "FAIL"))
 for e in errs:

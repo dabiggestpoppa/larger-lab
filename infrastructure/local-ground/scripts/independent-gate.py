@@ -11,8 +11,10 @@ Env:   OCE_RUN_ID, OCE_CI_MODE (true|false), OCE_EXPECTED_REPO,
        OCE_EXPECTED_BRANCH, GITHUB_REPOSITORY, GITHUB_REF_NAME
 """
 import hashlib
+import importlib.util
 import json
 import os
+import subprocess
 import sys
 
 EXPECTED_REPO = os.environ.get("OCE_EXPECTED_REPO", "dabiggestpoppa/larger-lab")
@@ -52,6 +54,60 @@ def sha256(path):
 
 def size(path):
     return os.path.getsize(path)
+
+
+def _load_pg_recovery():
+    """Import the recovery engine's pure helpers (phase order, truthfulness)."""
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pg-recovery.py")
+    spec = importlib.util.spec_from_file_location("pg_recovery", p)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _pg_recovery_source():
+    """Path of the recovery engine source (env-overridable for regressions)."""
+    return os.environ.get("OCE_PG_RECOVERY_SRC",
+                          os.path.join(os.path.dirname(os.path.abspath(__file__)), "pg-recovery.py"))
+
+
+def _ops_index(ev):
+    """Load the authoritative operation index from the evidence package.
+    Returns (ok, idx, problem)."""
+    p = os.path.join(ev, "operations", "index.json")
+    if not os.path.isfile(p):
+        return False, {}, "operation index missing (operations/index.json)"
+    try:
+        with open(p, encoding="utf-8") as f:
+            idx = json.load(f)
+    except Exception as e:
+        return False, {}, f"operation index unreadable: {e}"
+    return True, idx, ""
+
+
+def _ops_verify(ev):
+    """Run recovery-ops verify over the evidence package's operations root."""
+    ops_root = os.path.join(ev, "operations")
+    rops = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recovery-ops.py")
+    r = subprocess.run([sys.executable, rops, "verify", "--ops-root", ops_root],
+                       capture_output=True, text=True, timeout=60)
+    return r.returncode == 0, (r.stdout + r.stderr).strip()
+
+
+def _op_receipt(ev, op, name):
+    """Load one named receipt file of an operation entry (None if absent).
+    Receipt paths in the index are relative to the operations root
+    (evidence/operations), so resolve against that root."""
+    for rec in op.get("receipts", []):
+        if os.path.basename(rec["path"]) == name:
+            p = os.path.join(ev, "operations", rec["path"])
+            if os.path.isfile(p):
+                try:
+                    with open(p, encoding="utf-8") as f:
+                        return json.load(f)
+                except Exception:
+                    return None
+    return None
 
 
 def main():
@@ -263,6 +319,129 @@ def main():
             rec_ok = False
             rr = {}
         add("gate-30c-postgres-recovery-receipt", "verified postgres promotion receipt in CI", rec_ok, rr)
+
+    # ── R9: final recovery truth in the independent gate (CI mode) ──────────
+    if CI_MODE:
+        # 33. Unavailable-service negative path must EXECUTE and PASS (R7):
+        # a green test count cannot hide a skipped negative regression.
+        for tname in ("test_full_backup_blocked_without_docker_or_services",
+                      "test_full_backup_blocked_when_postgres_unavailable",
+                      "test_full_backup_blocked_when_artifact_store_unavailable",
+                      "test_state_only_backup_still_works_without_docker"):
+            outcome = test_outcomes.get(tname, "missing")
+            add(f"gate-33-{tname}", "unavailable-service negative path executed and passed",
+                outcome == "passed", outcome)
+
+        # 34. Immutable operation index present, unique, and hash-consistent
+        idx_ok, idx, idx_problem = _ops_index(ev)
+        ops = idx.get("operations", []) if idx_ok else []
+        opids = [o.get("operation_id", "") for o in ops]
+        unique_opids = bool(opids) and len(opids) == len(set(opids)) and all(opids)
+        add("gate-34-operation-index", "immutable operation index present with unique IDs",
+            idx_ok and unique_opids, idx_problem or f"ops={len(opids)}")
+        v_ok, v_out = _ops_verify(ev)
+        add("gate-34b-operation-index-verified", "indexed receipts exist and hash-match",
+            v_ok, v_out)
+
+        def find_op(pred):
+            for op in ops:
+                if pred(op):
+                    return op
+            return None
+
+        def receipt_field(rcpt, field):
+            return (rcpt or {}).get(field)
+
+        # 35. A full-replace SUCCESS operation proves the full recovery truth:
+        # promotion, fingerprints, quarantine held-then-dropped, artifacts, and
+        # Redis invalidation. A green test count cannot override these.
+        succ = find_op(lambda o: (o.get("operation_type") == "restore"
+                                  and o.get("restore_mode") == "full-replace"
+                                  and o.get("final_result") == "success"
+                                  and o.get("rollback_result") == "none"))
+        add("gate-35-success-full-replace-op", "successful full-replace operation indexed",
+            succ is not None, "none found" if succ is None else succ.get("operation_id", ""))
+        promote = _op_receipt(ev, succ, "promote-receipt.json") if succ else None
+        finalize = _op_receipt(ev, succ, "postgres-recovery-receipt.json") if succ else None
+        redis_rcpt = _op_receipt(ev, succ, "redis-invalidation-receipt.json") if succ else None
+        artifact_rcpt = _op_receipt(ev, succ, "artifact-recovery-receipt.json") if succ else None
+        prom_ok = (bool(promote) and promote.get("quarantine_held") is True
+                   and (promote.get("staging_verification") or {}).get("result") == "ok"
+                   and (promote.get("canonical_verification") or {}).get("result") == "ok"
+                   and bool((promote.get("staging_verification") or {}).get("fingerprints"))
+                   and bool((promote.get("canonical_verification") or {}).get("fingerprints")))
+        add("gate-35a-promote-quarantine-held-fingerprints",
+            "promotion held quarantine and verified protected fingerprints", prom_ok,
+            (promote or {}).get("staging_verification") or {})
+        final_ok = (bool(finalize) and finalize.get("promoted") is True
+                    and finalize.get("exit_status") == 0
+                    and (finalize.get("final_verification") or {}).get("result") == "ok"
+                    and bool((finalize.get("final_verification") or {}).get("fingerprints"))
+                    and finalize.get("quarantine_dropped") is True
+                    and finalize.get("quarantine_removal_verified") is True
+                    and finalize.get("redis_restored") is False)
+        add("gate-35b-finalize-quarantine-dropped-after-verification",
+            "quarantine dropped only after final verification (fingerprints ok)", final_ok,
+            {k: (finalize or {}).get(k) for k in ("promoted", "exit_status",
+                                                  "quarantine_dropped", "quarantine_removal_verified")})
+        # quarantine retained until final verification: the promote receipt must
+        # show quarantine_held and the finalize receipt must NOT drop it before
+        # final_verification ok (checked above via phase order below).
+        pr_phases = (promote or {}).get("phases", [])
+        fz_phases = (finalize or {}).get("phases", [])
+        try:
+            pg_mod = _load_pg_recovery()
+            phase_ok = (pg_mod.valid_phase_prefix(pr_phases, pg_mod.PHASES_PROMOTE)
+                        and pg_mod.valid_phase_prefix(fz_phases, pg_mod.PHASES_FINALIZE))
+        except Exception as e:
+            phase_ok = False
+        add("gate-35c-phase-ordering-valid", "promotion/finalize phase ordering is valid",
+            phase_ok, f"promote={pr_phases} finalize={fz_phases}")
+        redis_ok = (bool(redis_rcpt) and redis_rcpt.get("redis_restored") is False
+                    and redis_rcpt.get("redis_invalidation_required") is True
+                    and redis_rcpt.get("redis_invalidation_attempted") is True
+                    and redis_rcpt.get("redis_invalidated") is True
+                    and redis_rcpt.get("redis_verification") == "ok")
+        add("gate-35d-redis-invalidated-not-restored",
+            "Redis not restored and invalidated after successful full replacement", redis_ok,
+            redis_rcpt or {})
+        artifact_ok = bool(artifact_rcpt) and artifact_rcpt.get("artifact_replaced") is True
+        add("gate-35e-artifact-replaced", "artifact snapshot replaced and receipted",
+            artifact_ok, artifact_rcpt or {})
+
+        # 36. The post-promotion rollback regression genuinely executed: an
+        # indexed operation reports rollback_result=ok with the injected
+        # failure rolled back truthfully (original restored + verified).
+        rb = find_op(lambda o: o.get("rollback_result") == "ok")
+        rb_rcpt = _op_receipt(ev, rb, "postgres-recovery-receipt.json") if rb else None
+        rb_ok = (bool(rb) and rb.get("final_result") == "failed"
+                 and bool(rb_rcpt) and rb_rcpt.get("rollback_required") is True
+                 and rb_rcpt.get("rollback_attempted") is True
+                 and rb_rcpt.get("rollback_succeeded") is True
+                 and rb_rcpt.get("original_canonical_restored") is True
+                 and (rb_rcpt.get("rollback_verification") or {}).get("result") == "ok"
+                 and rb_rcpt.get("exit_status") != 0)
+        add("gate-36-rollback-regression-executed",
+            "post-promotion rollback regression executed with verified rollback", rb_ok,
+            "none" if rb is None else ((rb_rcpt or {}).get("rollback_verification") or {}))
+
+        # 37. Invalid rollback SQL syntax cannot reappear in the recovery engine.
+        try:
+            pg_src = open(_pg_recovery_source(), encoding="utf-8").read()
+            sql_ok = ("ALTER DATABASE IF EXISTS" not in pg_src
+                      and "DROP DATABASE IF EXISTS" not in pg_src
+                      and "pg_database" in pg_src)
+        except Exception as e:
+            sql_ok = False
+        add("gate-37-no-invalid-rollback-syntax",
+            "invalid ALTER/DROP DATABASE IF EXISTS syntax absent (catalog checks used)",
+            sql_ok, "source scan of pg-recovery.py")
+
+        # 41. Zero skipped tests in CI, collected == executed (R7: the
+        # unavailable-service negative path executes, nothing hides behind skips).
+        add("gate-41-ci-zero-skips", "zero skipped tests in CI (collected==executed)",
+            skipped == 0 and executed == collected,
+            {"skipped": skipped, "executed": executed, "collected": collected})
 
     # 31. Manifest hashes and sizes match final files
     manifest_ok = True
