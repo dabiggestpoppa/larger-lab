@@ -1,3 +1,12 @@
+> **SUPERSEDED (2026-08-30, final truth repair).** The `READY_FOR_OPERATOR_REVIEW`
+> recommendation in this packet was withdrawn pending repaired authoritative
+> execution. Run `33283003794` genuinely passed the checks that existed; a
+> later source review found recovery-truth gaps (rollback semantics, exact-value
+> proof, transient Redis invalidation, unavailable-service execution, receipt
+> preservation, archival completeness). See `B1-LOCAL-FINAL-TRUTH-CORRECTION.md`
+> and the corrected `LOCAL_GROUND_STATE.md`. This packet is preserved as
+> historical truth, not deleted or rewritten.
+
 # OCE Book 1 — Local Ground Final Review Packet (B1-LOCAL, authoritative closure)
 
 **Date:** 2026-08-30

@@ -1,33 +1,41 @@
-# OCE Local Ground â€” State Ledger (B1-LOCAL, A-003)
+# OCE Local Ground — State Ledger (B1-LOCAL, A-003)
 
-**Updated:** 2026-08-30
+**Updated:** 2026-08-30 (final truth repair)
 **Branch:** `oce-program-build`
 **Decision:** `LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED`
 **Amendment:** OCE-AMEND-A003
 
+> **CORRECTED 2026-08-30 (final truth repair):** the `READY_FOR_OPERATOR_REVIEW`
+> recommendation published after the successful run `33283003794` (OCE_RUN_ID
+> `2e65b0a9c4e7`) was **withdrawn pending repaired authoritative execution**.
+> That run genuinely passed the checks that existed; a later source review
+> found recovery-truth gaps (rollback, exact-value proof, Redis invalidation,
+> unavailable-service execution, receipt preservation, archival completeness).
+> See `B1-LOCAL-FINAL-TRUTH-CORRECTION.md`. No evidence was falsified or
+> discarded; the prior packet
+> `B1-LOCAL-REVIEW-PACKET-FINAL-2e65b0a9c4e7.md` is superseded, not deleted.
+
 ## Independent ledger fields
 
-> **CORRECTED 2026-08-29 (repair cycle):** the previous readiness claim was
-> premature (Docker absent locally; authoritative CI failed). See
-> `B1-LOCAL-READINESS-CORRECTION.md`. The active state below reflects the
-> **successful authoritative CI run `33283003794`** (OCE_RUN_ID
-> `2e65b0a9c4e7`) and remains pending **separate operator ratification** —
-> Book 1 is not self-completing and Book 2 stays locked.
-
-| Field | Value (2026-08-30, after authoritative CI success) |
+| Field | Value (2026-08-30, final truth repair) |
 |---|---|
-| `local_ground_state` | READY_FOR_OPERATOR_REVIEW |
+| `local_ground_state` | VERIFYING |
 | `cloud_plan_state` | VALIDATED_NO_APPLY |
 | `cloud_activation_state` | DEFERRED_BY_OPERATOR |
 | `cloud_deployment_state` | NOT_DEPLOYED |
 | `cloud_cost_state` | ZERO |
-| `next_local_book` | BLOCKED_PENDING_OPERATOR_RATIFICATION |
-| `operator_hold_reason` | OPERATOR_RATIFICATION_REQUIRED |
+| `next_local_book` | BLOCKED_PENDING_B1_REPAIR |
+| `operator_hold_reason` | RECOVERY_TRUTH_GAPS |
+
+No readiness claim is published until the repaired authoritative CI run
+succeeds and its downloaded artifact independently reconciles. Book 2 stays
+locked. Cloud remains `DEFERRED_BY_OPERATOR` / `NOT_DEPLOYED` / `ZERO`,
+0 mutations, $0 cost.
 
 ## Recovery-contract correction (2026-08-29)
 
-> The earlier ledger claim â€” *"a zero-exit restore with missing rows is now
-> impossible"* â€” is **superseded by execution evidence**. Authoritative CI run
+> The earlier ledger claim — *"a zero-exit restore with missing rows is now
+> impossible"* — is **superseded by execution evidence**. Authoritative CI run
 > `33277742603` (OCE_RUN_ID `be4d71f601b6`) reached the Docker acceptance
 > phase (104 executed / 100 passed / 4 failed) and failed truthfully on four
 > recovery-contract defects:
@@ -89,7 +97,7 @@ B1-L8R3, B1-L8R4:
 - **R19 backup/artifact hardening:** `backup-info.json` is hash-protected
   inside the manifest; unsafe manifest paths (absolute / `..` / duplicate /
   missing / malformed) and unsafe artifact tar members (absolute path, OOB
-  links) are rejected before extraction â€” with 9 dedicated regressions
+  links) are rejected before extraction — with 9 dedicated regressions
   (B1-L7R19).
 - **L8R3 structured logs + pre-teardown diagnostics:** the log test verifies
   the json-file driver + rotation options independently and accepts combined
@@ -105,6 +113,12 @@ readiness requires the authoritative container-backed CI run on the repaired
 implementation, which awaits operator confirmation (private repo).
 
 ## Authoritative closure cycle (2026-08-30)
+
+> **SUPERSEDED pending final truth repair (2026-08-30).** Run `33283003794`
+> genuinely passed the checks that existed. The `READY_FOR_OPERATOR_REVIEW`
+> recommendation it supported was withdrawn after a source review found
+> recovery-truth gaps (see `B1-LOCAL-FINAL-TRUTH-CORRECTION.md`). The run's
+> evidence remains valid historical truth; it is not deleted or rewritten.
 
 Authoritative CI run **`33283003794`** (workflow `b1-local-ground-validation`,
 push, OCE_RUN_ID **`2e65b0a9c4e7`**) on tested HEAD
@@ -129,12 +143,53 @@ push, OCE_RUN_ID **`2e65b0a9c4e7`**) on tested HEAD
   SHA-256 `1706d61fec025cbbeb03927966bc8c554d3caf6b330108831d0c39af6d763425`.
 
 Evidence archived in `evidence/runs/2e65b0a9c4e7/` (PROVENANCE.json +
-stage-status.json); the superseding review packet is
-`B1-LOCAL-REVIEW-PACKET-FINAL-2e65b0a9c4e7.md`. The failed-run history
-(including `33277742603`, `33280331533`, `33280678356`, `33281049669`,
-`33282094530`, `33282648769`) is preserved, not rewritten. **No claim of
-`BOOK_1_COMPLETE`, `GATED_COMPLETE`, `BOOK_2_AUTHORIZED`, or
-`CLOUD_DEPLOYED` is made** — the operator must ratify.
+stage-status.json); the superseding review packet was
+`B1-LOCAL-REVIEW-PACKET-FINAL-2e65b0a9c4e7.md` (now superseded pending this
+final repair). The failed-run history (including `33277742603`, `33280331533`,
+`33280678356`, `33281049669`, `33282094530`, `33282648769`) is preserved, not
+rewritten. **No claim of `BOOK_1_COMPLETE`, `GATED_COMPLETE`,
+`BOOK_2_AUTHORIZED`, or `CLOUD_DEPLOYED` is made** — the operator must ratify.
+
+## Final truth repair cycle (2026-08-30)
+
+A source review of the recovery contract found gaps the existing gate did not
+cover (rollback semantics, exact-value proof, transient Redis invalidation,
+unavailable-service execution, receipt preservation, archival completeness).
+Repaired as B1-L7R25..R27 + B1-L8R7..R9 (see
+`B1-LOCAL-FINAL-TRUTH-CORRECTION.md` for the full sequence):
+
+- **R25 phase-safe recovery rollback:** explicit promote/finalize/rollback
+  state machine; quarantine held until every fallible verification passes;
+  rollback driven by actual phase (not the inverse of `promoted`); existence
+  proven via the `pg_database` catalog before any ALTER/DROP DATABASE; invalid
+  `ALTER DATABASE IF EXISTS` syntax removed; truthful rollback receipt fields;
+  injected-failure rollback container tests.
+- **R26 protected values and fingerprints:** deterministic per-table value
+  fingerprints (md5 over sorted canonical row-JSON) in the protected
+  inventory; staging/canonical/external-boundary/rollback verifiers compare
+  fingerprints, so identical counts with different values fail closed.
+- **R27 transient Redis invalidation:** after PostgreSQL and artifact
+  replacement pass final verification, the local cache is invalidated and
+  verified; Redis is never restored; invalidation failure blocks success with
+  a preserved receipt; stale cache never survives replacement of truth.
+- **L8R7 unavailable-service execution:** the full-backup-block regression
+  (and postgres/artifact-unavailable variants) execute in CI via a controlled
+  fake command environment — never skipping, never touching the shared stack.
+- **L8R8 immutable indexed receipts:** every operation gets one unique ID and
+  an append-only index entry; receipts live in `operations/<operation-id>/`
+  with recorded hashes; duplicates fail; a `latest.json` pointer is not
+  authoritative.
+- **L8R9 final recovery truth in the gate:** the independent gate requires
+  the negative tests to execute, the rollback regression to genuinely run, the
+  success operation to prove fingerprints + quarantine-held-then-dropped +
+  Redis invalidation, valid phase ordering, zero skips in CI, and hash-verified
+  operation receipts — a green test count cannot override a failed invariant.
+
+Local static revalidation on the repaired implementation: hardening 39
+passed, gate regressions 43 passed (including the new recovery-truth
+rejections), portability/compose/contract suites green. The authoritative
+container-backed CI run on the repaired implementation is pending and is the
+sole basis for the next readiness claim.
 
 ## Machine-readable copy
 
@@ -144,30 +199,40 @@ The same fields are enforced by `contracts/local-ground-contract.json`
 
 ## Change record
 
-- 2026-08-29 â€” A-003 ratified; Local Ground split from Cloud Activation; cloud
+- 2026-08-29 — A-003 ratified; Local Ground split from Cloud Activation; cloud
   purchase hold preserved as historical truth; zero cloud cost, zero cloud
   mutations.
-- 2026-08-29 â€” Local Ground static validation passed (RUN `52f60c556f50`); a
+- 2026-08-29 — Local Ground static validation passed (RUN `52f60c556f50`); a
   premature READY claim was published (superseded).
-- 2026-08-29 (repair) â€” Readiness claim corrected after authoritative CI
+- 2026-08-29 (repair) — Readiness claim corrected after authoritative CI
   failed (run `33256476708`, phase `doctor`, `wsl` FileNotFoundError): state
   is VERIFYING / BLOCKED_PENDING_B1_REPAIR / AUTHORITATIVE_CI_FAILED.
-- 2026-08-29 (repair) â€” Repairs B1-L7R3..R9 + R6R1..R6R3 pushed; local static
+- 2026-08-29 (repair) — Repairs B1-L7R3..R9 + R6R1..R6R3 pushed; local static
   suite revalidated on the repaired implementation (RUN `316637514bfa`):
   67 passed / 0 failed / 0 errors / 14 truthful container skips (Docker
   absent on this host), independent gate 34/34 PASS (LOCAL_STATIC mode),
   final-package verifier PASS, cloud plan deterministic + zero mutation,
-  cloud apply denied rc 5. Result `LOCAL_STATIC_READY_CI_REQUIRED` â€” full
+  cloud apply denied rc 5. Result `LOCAL_STATIC_READY_CI_REQUIRED` — full
   readiness requires the authoritative container-backed CI run, which the
   operator must confirm (repo is private; the agent cannot read Actions).
   Active state: local_ground_state=VERIFYING, cloud_plan_state=
   VALIDATED_NO_APPLY (revalidated), next_local_book=BLOCKED_PENDING_B1_REPAIR,
   operator_hold_reason=AUTHORITATIVE_CI_CONFIRMATION_PENDING. Cloud fields
   remain DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0 cost.
-- 2026-08-29/30 â€” Recovery-contract repair series B1-L7R21..R24 + B1-L8R5..R6
+- 2026-08-29/30 — Recovery-contract repair series B1-L7R21..R24 + B1-L8R5..R6
   pushed from `d3df9eb4` and iterated to green: authoritative run
   `33283003794` succeeded (116 passed / 0 failed, 18/18 container-backed,
   gate 45/45 AUTHORITATIVE_CI). Active state updated to
   READY_FOR_OPERATOR_REVIEW pending separate operator ratification;
   next_local_book=BLOCKED_PENDING_OPERATOR_RATIFICATION. Cloud unchanged
   (DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0).
+- 2026-08-30 (final truth repair) — Source review found recovery-truth gaps in
+  the `33283003794` gate coverage (rollback, exact-value proof, Redis
+  invalidation, unavailable-service execution, receipt preservation, archival
+  completeness). The READY_FOR_OPERATOR_REVIEW recommendation was withdrawn
+  pending repaired authoritative execution; repair series B1-L7R25..R27 +
+  B1-L8R7..R9 pushed from `f79e5ed0`. Active state:
+  local_ground_state=VERIFYING, next_local_book=BLOCKED_PENDING_B1_REPAIR,
+  operator_hold_reason=RECOVERY_TRUTH_GAPS. Cloud unchanged
+  (DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0). `main`
+  untouched.
