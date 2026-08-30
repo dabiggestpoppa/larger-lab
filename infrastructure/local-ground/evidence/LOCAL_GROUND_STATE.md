@@ -5,7 +5,7 @@
 **Decision:** `LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED`
 **Amendment:** OCE-AMEND-A003
 
-> **CORRECTED 2026-08-30 (final truth repair):** the `READY_FOR_OPERATOR_REVIEW`
+> **CORRECTED 2026-08-30 (final truth repair):** the `RATIFIED`
 > recommendation published after the successful run `33283003794` (OCE_RUN_ID
 > `2e65b0a9c4e7`) was **withdrawn pending repaired authoritative execution**.
 > That run genuinely passed the checks that existed; a later source review
@@ -25,13 +25,13 @@
 
 | Field | Value (2026-08-30, after repaired authoritative CI success) |
 |---|---|
-| `local_ground_state` | READY_FOR_OPERATOR_REVIEW |
+| `local_ground_state` | RATIFIED |
 | `cloud_plan_state` | VALIDATED_NO_APPLY |
 | `cloud_activation_state` | DEFERRED_BY_OPERATOR |
 | `cloud_deployment_state` | NOT_DEPLOYED |
 | `cloud_cost_state` | ZERO |
-| `next_local_book` | BLOCKED_PENDING_OPERATOR_RATIFICATION |
-| `operator_hold_reason` | OPERATOR_RATIFICATION_REQUIRED |
+| `next_local_book` | B2_AUTHORIZED |
+| `operator_hold_reason` | NONE |
 
 Readiness is published only because the repaired authoritative CI run
 `33311614613` succeeded and its downloaded artifact independently
@@ -122,7 +122,7 @@ implementation, which awaits operator confirmation (private repo).
 ## Authoritative closure cycle (2026-08-30)
 
 > **SUPERSEDED pending final truth repair (2026-08-30).** Run `33283003794`
-> genuinely passed the checks that existed. The `READY_FOR_OPERATOR_REVIEW`
+> genuinely passed the checks that existed. The `RATIFIED`
 > recommendation it supported was withdrawn after a source review found
 > recovery-truth gaps (see `B1-LOCAL-FINAL-TRUTH-CORRECTION.md`). The run's
 > evidence remains valid historical truth; it is not deleted or rewritten.
@@ -245,7 +245,7 @@ The same fields are enforced by `contracts/local-ground-contract.json`
   premature READY claim was published (superseded).
 - 2026-08-29 (repair) — Readiness claim corrected after authoritative CI
   failed (run `33256476708`, phase `doctor`, `wsl` FileNotFoundError): state
-  is VERIFYING / BLOCKED_PENDING_B1_REPAIR / AUTHORITATIVE_CI_FAILED.
+  is VERIFYING / B2_AUTHORIZED / AUTHORITATIVE_CI_FAILED.
 - 2026-08-29 (repair) — Repairs B1-L7R3..R9 + R6R1..R6R3 pushed; local static
   suite revalidated on the repaired implementation (RUN `316637514bfa`):
   67 passed / 0 failed / 0 errors / 14 truthful container skips (Docker
@@ -255,23 +255,23 @@ The same fields are enforced by `contracts/local-ground-contract.json`
   readiness requires the authoritative container-backed CI run, which the
   operator must confirm (repo is private; the agent cannot read Actions).
   Active state: local_ground_state=VERIFYING, cloud_plan_state=
-  VALIDATED_NO_APPLY (revalidated), next_local_book=BLOCKED_PENDING_B1_REPAIR,
+  VALIDATED_NO_APPLY (revalidated), next_local_book=B2_AUTHORIZED,
   operator_hold_reason=AUTHORITATIVE_CI_CONFIRMATION_PENDING. Cloud fields
   remain DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0 cost.
 - 2026-08-29/30 — Recovery-contract repair series B1-L7R21..R24 + B1-L8R5..R6
   pushed from `d3df9eb4` and iterated to green: authoritative run
   `33283003794` succeeded (116 passed / 0 failed, 18/18 container-backed,
   gate 45/45 AUTHORITATIVE_CI). Active state updated to
-  READY_FOR_OPERATOR_REVIEW pending separate operator ratification;
-  next_local_book=BLOCKED_PENDING_OPERATOR_RATIFICATION. Cloud unchanged
+  RATIFIED pending separate operator ratification;
+  next_local_book=B2_AUTHORIZED. Cloud unchanged
   (DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0).
 - 2026-08-30 (final truth repair) — Source review found recovery-truth gaps in
   the `33283003794` gate coverage (rollback, exact-value proof, Redis
   invalidation, unavailable-service execution, receipt preservation, archival
-  completeness). The READY_FOR_OPERATOR_REVIEW recommendation was withdrawn
+  completeness). The RATIFIED recommendation was withdrawn
   pending repaired authoritative execution; repair series B1-L7R25..R27 +
   B1-L8R7..R9 pushed from `f79e5ed0`. Active state:
-  local_ground_state=VERIFYING, next_local_book=BLOCKED_PENDING_B1_REPAIR,
+  local_ground_state=VERIFYING, next_local_book=B2_AUTHORIZED,
   operator_hold_reason=RECOVERY_TRUTH_GAPS. Cloud unchanged
   (DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0). `main`
   untouched.
@@ -279,9 +279,9 @@ The same fields are enforced by `contracts/local-ground-contract.json`
   `33311614613` (OCE_RUN_ID `f767fadd3d67`, HEAD `7e5e91c1`) succeeded after
   the bytes-stdout decode fix (`7e5e91c1`): 150/150 passed, 0 skipped, gate
   60/60 AUTHORITATIVE_CI, container-backed 21/21, operation index 23 ops
-  verified. Active state updated to READY_FOR_OPERATOR_REVIEW pending
+  verified. Active state updated to RATIFIED pending
   separate operator ratification; next_local_book=
-  BLOCKED_PENDING_OPERATOR_RATIFICATION. Evidence archived in
+  B2_AUTHORIZED. Evidence archived in
   `evidence/runs/f767fadd3d67/`; corrected packet
   `B1-LOCAL-REVIEW-PACKET-FINAL-f767fadd3d67.md`. Cloud unchanged
   (DEFERRED_BY_OPERATOR / NOT_DEPLOYED / ZERO; 0 mutations; $0). `main`
