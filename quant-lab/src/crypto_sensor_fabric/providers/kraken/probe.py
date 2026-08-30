@@ -234,16 +234,36 @@ class KrakenCapabilityProbe(RestCapabilityProbeBase):
     # use Market Analytics with epoch-SECONDS since/to and an explicit interval.
     # ------------------------------------------------------------------
 
-    def _analytics_url(self, sensor: SensorFamily, symbol: str) -> str:
-        analytics_type = ANALYTICS_SENSORS[sensor]
+    def _analytics_type_for(self, request: CapabilityProbeRequest) -> str:
+        """Analytics type for a request: explicit hint wins, else primary.
+
+        The live runner stamps `analytics_type` in provider_hints when probing
+        a candidate type (e.g. `liquidation-volume` for MECHANICAL_LIQUIDATION)
+        while the offline default stays trade-level /history anatomy (I13R1 §3).
+        """
+        hint = request.provider_hints.get("analytics_type")
+        if isinstance(hint, str) and hint in ANALYTICS_TYPE_TO_SENSOR:
+            return hint
+        if request.sensor_family in ANALYTICS_SENSORS:
+            return ANALYTICS_SENSORS[request.sensor_family]
+        raise ValueError(
+            f"{request.sensor_family.value} has no Market Analytics type for this request"
+        )
+
+    def _analytics_url(self, sensor: SensorFamily, symbol: str, analytics_type: str) -> str:
         return f"{ANALYTICS_BASE_URL}/{symbol}/{analytics_type}"
 
     def build_probe_request(self, request: CapabilityProbeRequest) -> dict[str, Any]:
         sensor = request.sensor_family
-        if sensor in ANALYTICS_SENSORS:
+        analytics_type = request.provider_hints.get("analytics_type")
+        uses_analytics = sensor in ANALYTICS_SENSORS or (
+            isinstance(analytics_type, str) and analytics_type in ANALYTICS_TYPE_TO_SENSOR
+        )
+        if uses_analytics:
             # Market Analytics contract: since/to in SECONDS, interval explicit.
+            analytics_type = self._analytics_type_for(request)
             return {
-                "url": self._analytics_url(sensor, request.instrument_native),
+                "url": self._analytics_url(sensor, request.instrument_native, analytics_type),
                 "params": {
                     "since": int(request.requested_start.timestamp()),
                     "to": int(request.requested_end.timestamp()),
@@ -263,9 +283,20 @@ class KrakenCapabilityProbe(RestCapabilityProbeBase):
     # ------------------------------------------------------------------
 
     def _extract_rows(self, body: Any, sensor: SensorFamily) -> list[dict[str, Any]]:
-        if sensor in ANALYTICS_SENSORS:
+        # Shape-based detection of the Market Analytics envelope
+        # ({"result": {"timestamp": [...], "data": [...], "more": bool}}):
+        # applies even when the sensor is not in the default ANALYTICS_SENSORS
+        # map (e.g. MECHANICAL_LIQUIDATION probed via `liquidation-volume`).
+        if sensor in ANALYTICS_SENSORS or self._is_analytics_envelope(body):
             return self._extract_analytics_rows(body, sensor)
         return super()._extract_rows(body, sensor)
+
+    @staticmethod
+    def _is_analytics_envelope(body: Any) -> bool:
+        if not isinstance(body, dict) or not isinstance(body.get("result"), dict):
+            return False
+        result = body["result"]
+        return isinstance(result.get("timestamp"), list) and "data" in result
 
     def _extract_analytics_rows(
         self, body: Any, sensor: SensorFamily
@@ -368,7 +399,7 @@ class KrakenCapabilityProbe(RestCapabilityProbeBase):
         sensor: SensorFamily,
         body: Any = None,
     ) -> tuple[bool, bool | None]:
-        if sensor in ANALYTICS_SENSORS:
+        if sensor in ANALYTICS_SENSORS or self._is_analytics_envelope(body):
             more = False
             if isinstance(body, dict) and isinstance(body.get("result"), dict):
                 more = bool(body["result"].get("more"))

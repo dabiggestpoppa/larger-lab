@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from datetime import UTC, datetime, timedelta
@@ -138,29 +139,86 @@ SENSOR_SPEC: dict[str, tuple[Granularity, QueryMode]] = {
 
 ERAS = ("RECENT_CONTROL", "2021", "2022", "2024", "2026")
 
-# ---------------------------------------------------------------------------
-# SCOPE — lightweight capability matrix (BTC primary, ETH where breadth matters)
-# ---------------------------------------------------------------------------
+#: Provider/sensor scopes that are CURRENT-ONLY surfaces (book snapshots,
+# latest-only recent-trade): historical checkpoints are NOT attempted for
+# these and their era cells read CURRENT_ONLY (I13R1 §4).  Trade scopes with
+# documented historical routes (OKX history-trades, Deribit include_old,
+# Kraken /history) are NOT current-only.
+CURRENT_ONLY_SCOPES = frozenset(
+    {
+        ("KRAKEN_FUTURES", "MECHANICAL_BOOK_SNAPSHOT"),
+        ("GATE_FUTURES", "MECHANICAL_BOOK_SNAPSHOT"),
+        ("GATE_FUTURES", "MECHANICAL_TRADE"),
+        ("BYBIT_LINEAR", "MECHANICAL_BOOK_SNAPSHOT"),
+        ("BYBIT_LINEAR", "MECHANICAL_TRADE"),
+        ("BINANCE_USDM", "MECHANICAL_BOOK_SNAPSHOT"),
+        ("BINANCE_USDM", "MECHANICAL_TRADE"),
+        ("OKX_SWAP", "MECHANICAL_BOOK_SNAPSHOT"),
+        ("DERIBIT", "MECHANICAL_BOOK_SNAPSHOT"),
+    }
+)
+
+#: Provider/sensor pairs whose HISTORICAL window is already proven bounded by a
+# VERIFIED retention boundary (Gate contract_stats 180-day limit observed at
+# the 2022 checkpoint: "from time exceeds 180-day limit").  Older dates are
+# synthesized as HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY, never probed
+# or shown UNATTEMPTED (I13R1 §4).
+VERIFIED_RETENTION_BOUNDARY_SCOPES = frozenset(
+    {
+        ("GATE_FUTURES", "MECHANICAL_OPEN_INTEREST"),
+        ("GATE_FUTURES", "MECHANICAL_LIQUIDATION"),
+        ("GATE_FUTURES", "MECHANICAL_POSITIONING"),
+        # funding_rate shares the rolling 180-day boundary (live-observed: older
+        # `from` -> "from time exceeds 180-day limit"; 2026-06-15 works in seconds)
+        ("GATE_FUTURES", "MECHANICAL_FUNDING"),
+    }
+)
+
+#: Provider/sensor pairs whose RECENT control already hard-blocked the whole
+# surface (geo/auth): older eras are NOT reattempted and are synthesized with
+# the same surface-level status, not UNATTEMPTED (I13R1 §4).
+SURFACE_BLOCKED_RECENT_SCOPES = frozenset(
+    {
+        ("BINANCE_USDM", "MECHANICAL_OPEN_INTEREST"),
+        ("BINANCE_USDM", "MECHANICAL_TRADE"),
+        ("BINANCE_USDM", "MECHANICAL_FUNDING"),
+        ("BINANCE_USDM", "MECHANICAL_BOOK_SNAPSHOT"),
+        ("BYBIT_LINEAR", "MECHANICAL_OPEN_INTEREST"),
+        ("BYBIT_LINEAR", "MECHANICAL_TRADE"),
+        ("BYBIT_LINEAR", "MECHANICAL_FUNDING"),
+        ("BYBIT_LINEAR", "MECHANICAL_BOOK_SNAPSHOT"),
+    }
+)
+
+#: FULL frozen checkpoint matrix per scope (I13R1 §4): RECENT + 2021 + 2022 +
+# 2024 + 2026 for every provider/sensor where recent control succeeds AND the
+# source claims/supports historical querying.  Short-circuits: current-only
+# sensors probe RECENT only; retention-boundary scopes probe RECENT + the era
+# inside the rolling window (2026) and synthesize older dates as the verified
+# boundary; geo/auth surface-blocked REST probes RECENT only (archive routes
+# are planned independently).
 SCOPE: dict[str, list[dict[str, Any]]] = {
     "KRAKEN_FUTURES": [
-        {"sensor": "MECHANICAL_OPEN_INTEREST", "assets": ("BTC", "ETH"), "eras": ("RECENT_CONTROL", "2022", "2024")},
-        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022", "2024")},
-        {"sensor": "MECHANICAL_BASIS", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
-        {"sensor": "MECHANICAL_POSITIONING", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
-        {"sensor": "MECHANICAL_BOOK_METRIC", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
+        {"sensor": "MECHANICAL_OPEN_INTEREST", "assets": ("BTC", "ETH"), "eras": ERAS},
+        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ERAS},
+        {"sensor": "MECHANICAL_BASIS", "assets": ("BTC",), "eras": ERAS},
+        {"sensor": "MECHANICAL_POSITIONING", "assets": ("BTC",), "eras": ERAS},
+        {"sensor": "MECHANICAL_BOOK_METRIC", "assets": ("BTC",), "eras": ERAS},
+        {"sensor": "MECHANICAL_LIQUIDATION", "assets": ("BTC",), "eras": ERAS, "analytics_type": "liquidation-volume"},
         {"sensor": "MECHANICAL_TRADE", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
         {"sensor": "MECHANICAL_BOOK_SNAPSHOT", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
     ],
     "GATE_FUTURES": [
-        {"sensor": "MECHANICAL_OPEN_INTEREST", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
-        {"sensor": "MECHANICAL_LIQUIDATION", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
-        {"sensor": "MECHANICAL_POSITIONING", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
-        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
+        {"sensor": "MECHANICAL_OPEN_INTEREST", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2026")},
+        {"sensor": "MECHANICAL_LIQUIDATION", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2026")},
+        {"sensor": "MECHANICAL_POSITIONING", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2026")},
+        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2026")},
         {"sensor": "MECHANICAL_TRADE", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
+        {"sensor": "MECHANICAL_BOOK_SNAPSHOT", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
     ],
     "BYBIT_LINEAR": [
-        {"sensor": "MECHANICAL_OPEN_INTEREST", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
-        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
+        {"sensor": "MECHANICAL_OPEN_INTEREST", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
+        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
         {"sensor": "MECHANICAL_TRADE", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
         {"sensor": "MECHANICAL_BOOK_SNAPSHOT", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
     ],
@@ -169,18 +227,18 @@ SCOPE: dict[str, list[dict[str, Any]]] = {
         {"sensor": "MECHANICAL_TRADE", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
         {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
         {"sensor": "MECHANICAL_BOOK_SNAPSHOT", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
-        {"sensor": "ARCHIVE_METRICS", "assets": ("BTC",), "eras": ("2022",)},
-        {"sensor": "ARCHIVE_AGGTRADES", "assets": ("BTC",), "eras": ("2022",)},
+        {"sensor": "ARCHIVE_METRICS", "assets": ("BTC",), "eras": ("2021", "2022", "2024", "2026")},
+        {"sensor": "ARCHIVE_AGGTRADES", "assets": ("BTC",), "eras": ("2021", "2022", "2024", "2026")},
     ],
     "OKX_SWAP": [
-        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
-        {"sensor": "MECHANICAL_TRADE", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
+        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ERAS},
+        {"sensor": "MECHANICAL_TRADE", "assets": ("BTC",), "eras": ERAS},
         {"sensor": "MECHANICAL_BOOK_SNAPSHOT", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
     ],
     "DERIBIT": [
-        {"sensor": "MECHANICAL_TRADE", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
-        {"sensor": "MECHANICAL_LIQUIDATION", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
-        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
+        {"sensor": "MECHANICAL_TRADE", "assets": ("BTC",), "eras": ERAS},
+        {"sensor": "MECHANICAL_LIQUIDATION", "assets": ("BTC",), "eras": ("RECENT_CONTROL", "2022")},
+        {"sensor": "MECHANICAL_FUNDING", "assets": ("BTC",), "eras": ERAS},
         {"sensor": "MECHANICAL_BOOK_SNAPSHOT", "assets": ("BTC",), "eras": ("RECENT_CONTROL",)},
     ],
     "COINALYZE": [
@@ -265,20 +323,26 @@ def build_request(
     else:
         start = CHECKPOINT_DATES.get(era, datetime.now(UTC))
         requested_end = start + window
+    hints: dict[str, Any] = {"era": era}
+    # I13R1: Kraken liquidation probes the bucketed `liquidation-volume`
+    # Market Analytics surface (analytics_type hint) while the offline default
+    # stays trade-level /history anatomy.
+    if provider_id == "KRAKEN_FUTURES" and sensor is SensorFamily.MECHANICAL_LIQUIDATION:
+        hints["analytics_type"] = "liquidation-volume"
     return CapabilityProbeRequest.model_validate(
-    {
-        "provider_id": provider_id,
-        "sensor_family": sensor,
-        "venue_market": provider_id,
-        "instrument_native": instrument_native,
-        "canonical_asset_hint": asset,
-        "requested_start": start,
-        "requested_end": requested_end,
+        {
+            "provider_id": provider_id,
+            "sensor_family": sensor,
+            "venue_market": provider_id,
+            "instrument_native": instrument_native,
+            "canonical_asset_hint": asset,
+            "requested_start": start,
+            "requested_end": requested_end,
             "requested_granularity": gran,
             "access_mode": ACCESS[provider_id],
             "query_mode": qmode,
             "probe_run_id": probe_run_id,
-            "provider_hints": {"era": era},
+            "provider_hints": hints,
         }
     )
 
@@ -468,60 +532,285 @@ def read_url_if_ok(session: requests.Session, url: str) -> str | None:
 # ---------------------------------------------------------------------------
 # evidence synthesis (claims / coverages / failures / contradictions)
 # ---------------------------------------------------------------------------
+#: PIT timestamp-semantics facts per (provider, sensor) for verified scopes
+# (I13R1 §6).  Values are the DOCUMENTED/OBSERVED semantics for scopes whose
+# data semantics were verified live; everything defaults to unresolved
+# (fail closed).  A scope only becomes PIT_READY_* when its facts are True.
+#
+# Keys: effective_ts, observation_ts, publication_delay (True/None),
+# forward_info, forward_resolved, publication_affects_reconstruction.
+_PIT_FACTS: dict[tuple[str, str], dict[str, Any]] = {
+    ("KRAKEN_FUTURES", "MECHANICAL_OPEN_INTEREST"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("KRAKEN_FUTURES", "MECHANICAL_FUNDING"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("KRAKEN_FUTURES", "MECHANICAL_BASIS"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("KRAKEN_FUTURES", "MECHANICAL_POSITIONING"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("KRAKEN_FUTURES", "MECHANICAL_BOOK_METRIC"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("KRAKEN_FUTURES", "MECHANICAL_LIQUIDATION"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("GATE_FUTURES", "MECHANICAL_OPEN_INTEREST"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("GATE_FUTURES", "MECHANICAL_LIQUIDATION"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("GATE_FUTURES", "MECHANICAL_POSITIONING"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("GATE_FUTURES", "MECHANICAL_FUNDING"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("OKX_SWAP", "MECHANICAL_FUNDING"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("OKX_SWAP", "MECHANICAL_TRADE"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("OKX_SWAP", "MECHANICAL_BOOK_SNAPSHOT"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("DERIBIT", "MECHANICAL_TRADE"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("DERIBIT", "MECHANICAL_LIQUIDATION"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("DERIBIT", "MECHANICAL_FUNDING"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+    ("DERIBIT", "MECHANICAL_BOOK_SNAPSHOT"): {
+        "effective_ts": True, "observation_ts": True, "publication_delay": None,
+        "forward_info": False, "forward_resolved": True, "pub_affects": False,
+    },
+}
+
+
+#: Scopes whose data semantics were NOT verified live (metadata/existence only)
+#: — never count toward verified redundancy, never PIT-ready (I13R1 §8-9).
+METADATA_ONLY_SCOPES = frozenset(
+    {
+        ("BITFINEX_COMMUNITY_ARCHIVE", "MECHANICAL_LIQUIDATION"),
+        ("BINANCE_USDM", "MECHANICAL_OPEN_INTEREST"),  # archive existence only
+        ("BINANCE_USDM", "MECHANICAL_TRADE"),  # archive existence only
+    }
+)
+
+
+#: Canonical scope universe = the frozen provider_probe_endpoints.yaml registry
+# (34 provider/sensor scopes, I13R1 §3).  A scope with NO attempts still
+# appears in every report as UNATTEMPTED/E0 — NO ATTEMPT != NO CAPABILITY NODE.
+def canonical_scope_universe() -> list[tuple[str, SensorFamily]]:
+    from crypto_sensor_fabric._paths import CONFIG_DIR
+
+    data = yaml.safe_load(
+        (CONFIG_DIR / "provider_probe_endpoints.yaml").read_text(encoding="utf-8")
+    )
+    out: list[tuple[str, SensorFamily]] = []
+    for pid, entry in data["providers"].items():
+        for sensor_name in entry.get("endpoints", {}):
+            out.append((pid, SensorFamily(sensor_name)))
+    return out
+
+
+def _pit_facts_for(pid: str, sensor: SensorFamily) -> dict[str, Any]:
+    return _PIT_FACTS.get((pid, sensor.value), {})
+
+
+def _scope_blocking_reason(
+    pid: str, sensor: SensorFamily, verified_dates: list, recent_status: CapabilityStatus | None
+) -> str | None:
+    if verified_dates:
+        return None
+    if (pid, sensor.value) in CURRENT_ONLY_SCOPES:
+        return "CURRENT_ONLY surface (no historical window to verify)"
+    if recent_status is CapabilityStatus.GEO_BLOCKED:
+        return "surface geo-blocked from operator region (no bypass)"
+    if recent_status is CapabilityStatus.AUTH_BLOCKED:
+        return "auth-gated surface (no credentials required for Sensor Fabric)"
+    if (pid, sensor.value) in VERIFIED_RETENTION_BOUNDARY_SCOPES:
+        return "verified retention boundary (rolling window); older dates not probed"
+    if pid == "COINALYZE":
+        return "CREDENTIAL_NOT_CONFIGURED (free key not configured locally)"
+    return "no live verified sample yet (E0/UNVERIFIED or blocked)"
+
+
+def _era_status_for_scope(
+    pid: str,
+    sensor: SensorFamily,
+    group: list[CapabilityProbeAttempt],
+) -> dict[str, CapabilityStatus]:
+    """Per-era status across the FULL frozen matrix (RECENT + 2021-2026).
+
+    Every canonical scope carries all five era cells (I13R1 §4): never fewer
+    rows because an era was not attempted.  Short-circuits:
+    - CURRENT_ONLY scopes: historical cells read CURRENT_ONLY (not attempted).
+    - VERIFIED retention-boundary scopes: older cells read
+      HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY.
+    - surface-blocked (geo/auth) scopes: all historical cells read the same
+      surface status (not UNATTEMPTED — the block is region/surface-wide).
+    - otherwise unattempted cells read UNATTEMPTED.
+    """
+    attempt_by_era: dict[str, list[CapabilityProbeAttempt]] = {}
+    for a in group:
+        attempt_by_era.setdefault(a.era_hint or "RECENT_CONTROL", []).append(a)
+    recent_status = (
+        _attempt_status(attempt_by_era["RECENT_CONTROL"][-1])
+        if attempt_by_era.get("RECENT_CONTROL")
+        else None
+    )
+    surface_status = None
+    if recent_status in (CapabilityStatus.GEO_BLOCKED, CapabilityStatus.AUTH_BLOCKED):
+        surface_status = recent_status
+    out: dict[str, CapabilityStatus] = {}
+    for era in list(ERAS):
+        if attempt_by_era.get(era):
+            if (
+                (pid, sensor.value) in VERIFIED_RETENTION_BOUNDARY_SCOPES
+                and all(_is_retention_boundary_evidence(a) for a in attempt_by_era[era])
+            ):
+                # the provider itself proved the rolling boundary at this date
+                out[era] = CapabilityStatus.HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY
+            else:
+                out[era] = _attempt_status(attempt_by_era[era][-1])
+            continue
+        if era == "RECENT_CONTROL":
+            out[era] = CapabilityStatus.UNATTEMPTED
+            continue
+        if (pid, sensor.value) in CURRENT_ONLY_SCOPES:
+            out[era] = CapabilityStatus.CURRENT_ONLY
+        elif (pid, sensor.value) in VERIFIED_RETENTION_BOUNDARY_SCOPES:
+            out[era] = CapabilityStatus.HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY
+        elif surface_status is not None:
+            out[era] = surface_status
+        else:
+            out[era] = CapabilityStatus.UNATTEMPTED
+    return out
+
+
 def attempts_to_records(
     attempts: list[CapabilityProbeAttempt],
 ) -> tuple[list[CapabilityClaim], list[ProviderSensorCoverage], list[FailureRecord]]:
+    """Synthesize claims/coverages over the CANONICAL 34-scope universe.
+
+    The universe comes from the frozen registry; observed attempts overlay it.
+    A scope with no attempts stays UNATTEMPTED/E0 and never disappears from the
+    reports (I13R1 §3).  Claims E2+ carry their attempt evidence_ids (I13R1 §7).
+    """
     claims: list[CapabilityClaim] = []
     coverages: list[ProviderSensorCoverage] = []
     failures: list[FailureRecord] = []
     by_scope: dict[tuple[str, str], list[CapabilityProbeAttempt]] = {}
     for a in attempts:
         by_scope.setdefault((a.provider_id, a.sensor_family.value), []).append(a)
-    idx = 0
-    for (pid, sensor_name), group in sorted(by_scope.items()):
-        sensor = SensorFamily(sensor_name)
-        idx += 1
+    universe = canonical_scope_universe()
+    for idx, (pid, sensor) in enumerate(sorted(universe), start=1):
+        group = by_scope.get((pid, sensor.value), [])
         claim = synthesize_claim(
             claim_id=f"claim_bloc2_{pid.lower()}_{sensor.value.lower()}_{idx:03d}_live",
             provider_id=pid,
             sensor_family=sensor,
             venue_market=pid,
-            access_mode=group[0].access_mode,
+            access_mode=ACCESS[pid],
             attempts=group,
         )
-        claims.append(claim)
-        era_status: dict[str, CapabilityStatus] = {}
-        for a in group:
-            era = a.era_hint or "RECENT_CONTROL"
-            era_status[era] = _attempt_status(a)
+        era_status = _era_status_for_scope(pid, sensor, group)
         verified_dates = [
             a.requested_start
             for a in group
             if a.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE
         ]
-        coverages.append(
-            ProviderSensorCoverage.model_validate(
-                {
-                    "provider_id": pid,
-                    "sensor_family": sensor,
-                    "venue_market": pid,
-                    "instrument_scope": sorted({a.instrument_native for a in group}),
-                    "access_mode": group[0].access_mode,
-                    "era_status": era_status,
-                    "earliest_verified_history": min(verified_dates) if verified_dates else None,
-                    "latest_verified_history": max(verified_dates) if verified_dates else None,
-                    "PIT_readiness": claim.PIT_readiness,
-                    "evidence_level": claim.evidence_level,
-                    "provider_role": ProviderRole.REFERENCE_ONLY,
-                    "promotion_eligible": False,
-                    "blocking_reason": (
-                        None
-                        if verified_dates
-                        else "no live verified sample yet (E0/UNVERIFIED or blocked)"
-                    ),
-                }
-            )
+        facts = _pit_facts_for(pid, sensor)
+        effective_ts = facts.get("effective_ts")
+        observation_ts = facts.get("observation_ts")
+        metadata_only = (pid, sensor.value) in METADATA_ONLY_SCOPES
+        data_semantics_verified = bool(verified_dates) and not metadata_only
+        if metadata_only or not verified_dates:
+            effective_ts = False
+            observation_ts = False
+        from crypto_sensor_fabric.probes.evidence import assess_pit_readiness
+
+        pit_readiness, pit_reason = assess_pit_readiness(
+            effective_ts_understood=effective_ts,
+            observation_ts_understood=observation_ts,
+            publication_delay_understood=facts.get("publication_delay"),
+            forward_info_required=bool(facts.get("forward_info")),
+            forward_availability_resolved=facts.get("forward_resolved"),
+            publication_affects_reconstruction=facts.get("pub_affects"),
         )
+        recent_status = era_status.get("RECENT_CONTROL")
+        blocking = _scope_blocking_reason(pid, sensor, verified_dates, recent_status)
+        coverage = ProviderSensorCoverage.model_validate(
+            {
+                "provider_id": pid,
+                "sensor_family": sensor,
+                "venue_market": pid,
+                "instrument_scope": sorted({a.instrument_native for a in group}) or [],
+                "access_mode": ACCESS[pid],
+                "era_status": era_status,
+                "earliest_verified_history": min(verified_dates) if verified_dates else None,
+                "latest_verified_history": max(verified_dates) if verified_dates else None,
+                "granularity_scope": sorted(
+                    {a.requested_granularity for a in group}, key=lambda g: g.value
+                ),
+                "PIT_readiness": pit_readiness,
+                "evidence_level": claim.evidence_level,
+                "provider_role": ProviderRole.REFERENCE_ONLY,
+                "promotion_eligible": False,
+                "blocking_reason": blocking,
+                "pit_effective_ts_understood": effective_ts,
+                "pit_observation_ts_understood": observation_ts,
+                "pit_publication_delay_understood": facts.get("publication_delay"),
+                "pit_forward_info_required": bool(facts.get("forward_info")),
+                "pit_forward_availability_resolved": facts.get("forward_resolved"),
+                "pit_publication_affects_reconstruction": facts.get("pub_affects"),
+                "pit_blocking_reason": pit_reason,
+                "data_semantics_verified": data_semantics_verified,
+            }
+        )
+        # keep claim PIT + data-semantics consistent with the coverage
+        claim = claim.model_copy(
+            update={
+                "PIT_readiness": pit_readiness,
+                "pit_effective_ts_understood": effective_ts,
+                "pit_observation_ts_understood": observation_ts,
+                "pit_publication_delay_understood": facts.get("publication_delay"),
+                "pit_forward_info_required": bool(facts.get("forward_info")),
+                "pit_forward_availability_resolved": facts.get("forward_resolved"),
+                "pit_publication_affects_reconstruction": facts.get("pub_affects"),
+                "pit_blocking_reason": pit_reason,
+                "data_semantics_verified": data_semantics_verified,
+                "known_gaps": _known_gaps(pid, sensor, group, era_status),
+                "limitations": _limitations(pid, sensor, group, era_status),
+            }
+        )
+        claims.append(claim)
+        coverages.append(coverage)
         for a in group:
             if a.error_class is not None:
                 failures.append(
@@ -542,6 +831,81 @@ def attempts_to_records(
     return claims, coverages, failures
 
 
+def _known_gaps(
+    pid: str,
+    sensor: SensorFamily,
+    group: list[CapabilityProbeAttempt],
+    era_status: dict[str, CapabilityStatus],
+) -> list[str]:
+    gaps: list[str] = []
+    for era in ("2021", "2022", "2024", "2026"):
+        if era_status.get(era) is CapabilityStatus.HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY:
+            gaps.append(f"{era} beyond verified {pid} retention boundary (rolling window)")
+        elif era_status.get(era) in (CapabilityStatus.UNATTEMPTED, CapabilityStatus.CURRENT_ONLY):
+            gaps.append(f"{era} not attempted ({era_status[era].value})")
+    empty_eras = sorted(
+        {
+            (a.era_hint or "RECENT_CONTROL")
+            for a in group
+            if a.response_status_class is ResponseStatusClass.EMPTY_VALID
+        }
+    )
+    if empty_eras:
+        gaps.append(f"EMPTY_VALID at {', '.join(empty_eras)} (valid request, no rows)")
+    return gaps
+
+
+def _limitations(
+    pid: str,
+    sensor: SensorFamily,
+    group: list[CapabilityProbeAttempt],
+    era_status: dict[str, CapabilityStatus],
+) -> list[str]:
+    limitations: list[str] = []
+    if (pid, sensor.value) in METADATA_ONLY_SCOPES and any(
+        a.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE for a in group
+    ):
+        limitations.append(
+            "SOURCE_AVAILABILITY_VERIFIED only — row timestamps/schema not "
+            "inspected (metadata/existence evidence)"
+        )
+    if pid == "COINALYZE":
+        limitations.append("CREDENTIAL_NOT_CONFIGURED (no local free key)")
+    return limitations
+
+
+def _attempt_key(a: CapabilityProbeAttempt) -> tuple[str, str, str, str]:
+    """Stable merge key: (provider, sensor, asset, era).
+
+    Binance archive attempts record the mechanical sensor they characterize
+    (MECHANICAL_OPEN_INTEREST / MECHANICAL_TRADE) but plan under
+    ARCHIVE_METRICS / ARCHIVE_AGGTRADES — normalize via the recorded
+    `archive_kind` so merge-on-resume does not re-execute archive probes.
+    """
+    sensor = a.sensor_family.value
+    if a.provider_id == "BINANCE_USDM" and a.access_mode is AccessMode.PUBLIC_ARCHIVE:
+        kind = (a.native_units_summary or {}).get("archive_kind")
+        if kind == "metrics":
+            sensor = "ARCHIVE_METRICS"
+        elif kind == "aggTrades":
+            sensor = "ARCHIVE_AGGTRADES"
+    return (
+        a.provider_id,
+        sensor,
+        a.canonical_asset_hint or a.instrument_native,
+        a.era_hint or "RECENT_CONTROL",
+    )
+
+
+def _plan_count() -> int:
+    """Total planned probe count from SCOPE (dry-run / summary)."""
+    return sum(
+        len(scope["assets"]) * len(scope["eras"])
+        for scopes in SCOPE.values()
+        for scope in scopes
+    )
+
+
 def _attempt_status(a: CapabilityProbeAttempt) -> CapabilityStatus:
     if a.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE:
         return CapabilityStatus.VERIFIED
@@ -557,46 +921,80 @@ def _attempt_status(a: CapabilityProbeAttempt) -> CapabilityStatus:
         return CapabilityStatus.ACCESS_BLOCKED
     if a.error_class is ProbeFailureClass.F_UNSUPPORTED_SENSOR:
         return CapabilityStatus.UNSUPPORTED
+    if a.error_class is ProbeFailureClass.F_CLIENT_4XX:
+        # deterministic client error (e.g. wrong units / retention rejection) —
+        # never a transient failure
+        return CapabilityStatus.UNVERIFIED
     if a.response_status_class is ResponseStatusClass.FAILED:
         return CapabilityStatus.TRANSIENT_FAILURE
     return CapabilityStatus.UNVERIFIED
 
 
-def redundancy_summaries(coverages: list[ProviderSensorCoverage]) -> list[SensorRedundancySummary]:
+def _is_retention_boundary_evidence(a: CapabilityProbeAttempt) -> bool:
+    """True when a failed attempt is explicit provider retention-boundary
+    evidence (e.g. Gate "from time exceeds 180-day limit"), which the operator
+    directive maps to HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY (§4)."""
+    if a.error_class is not ProbeFailureClass.F_CLIENT_4XX:
+        return False
+    detail = (a.error_detail_redacted or "").lower()
+    return any(k in detail for k in ("limit", "retention", "range")) and any(
+        k in detail for k in ("exceeds", "180", "beyond", "too far", "outside")
+    )
+
+
+def redundancy_summaries(
+    coverages: list[ProviderSensorCoverage],
+    claims: list[CapabilityClaim],
+) -> list[SensorRedundancySummary]:
+    """Verified-only, evidence-aware redundancy (I13R1 §8).
+
+    A provider counts toward VERIFIED redundancy only when its claim is at
+    least E2_LIVE_RECENT_VERIFIED AND its data semantics were verified.  E0,
+    blocked, unattempted, schema-unusable and EMPTY_VALID-only scopes NEVER
+    count.  Community/aggregator sources stay correctly typed (diversity only).
+    """
     from crypto_sensor_fabric.contracts.enums import SensorFamily
 
+    from crypto_sensor_fabric.probes.enums import EvidenceLevel as EvL
+
+    claim_by_scope = {(c.provider_id, c.sensor_family.value): c for c in claims}
     by_sensor: dict[str, list[ProviderSensorCoverage]] = {}
     for c in coverages:
-        verified = any(
-            v in (CapabilityStatus.VERIFIED, CapabilityStatus.VERIFIED_LIMITED)
-            for v in c.era_status.values()
+        claim = claim_by_scope.get((c.provider_id, c.sensor_family.value))
+        if claim is None:
+            continue
+        verified_enough = (
+            claim.evidence_level
+            in (EvL.E2_LIVE_RECENT_VERIFIED, EvL.E3_HISTORICAL_CHECKPOINT_VERIFIED, EvL.E4_MULTI_ERA_VERIFIED, EvL.E5_REPRODUCIBLE_COVERAGE_VERIFIED)
+            and claim.data_semantics_verified
         )
-        if verified:
+        if verified_enough:
             by_sensor.setdefault(c.sensor_family.value, []).append(c)
     out: list[SensorRedundancySummary] = []
     for sensor in sorted(by_sensor):
         rows = by_sensor[sensor]
-        if len(rows) >= 3:
+        first_party_rows = [
+            r
+            for r in rows
+            if r.access_mode not in (AccessMode.FREE_API_KEY, AccessMode.COMMUNITY_ARCHIVE)
+        ]
+        independent_venues = {r.venue_market for r in first_party_rows}
+        if len(independent_venues) >= 3:
             _class = RedundancyClass.R3_THREE_PLUS_INDEPENDENT
-        elif len(rows) == 2:
+        elif len(independent_venues) == 2:
             _class = RedundancyClass.R2_TWO_INDEPENDENT
-        else:
+        elif len(independent_venues) == 1:
             _class = RedundancyClass.R1_SINGLE_INDEPENDENT
+        else:
+            _class = RedundancyClass.R0_NONE
         out.append(
             SensorRedundancySummary.model_validate(
                 {
                     "sensor_family": SensorFamily(sensor),
                     "verified_provider_count": len(rows),
-                    "verified_venues": sorted({r.provider_id for r in rows}),
+                    "verified_venues": sorted({r.venue_market for r in rows}),
                     "redundancy_class": _class,
-                    "first_party_count": len(
-                        [
-                            r
-                            for r in rows
-                            if r.access_mode != AccessMode.FREE_API_KEY
-                            and r.access_mode != AccessMode.COMMUNITY_ARCHIVE
-                        ]
-                    ),
+                    "first_party_count": len(first_party_rows),
                     "aggregator_count": len(
                         [r for r in rows if r.access_mode == AccessMode.FREE_API_KEY]
                     ),
@@ -611,8 +1009,8 @@ def redundancy_summaries(coverages: list[ProviderSensorCoverage]) -> list[Sensor
                             in (PITReadiness.PIT_READY, PITReadiness.PIT_READY_WITH_METHOD_VERSION)
                         ]
                     ),
-                    "gap_status": "PARTIAL" if rows else "UNVERIFIED",
-                    "notes": "live-verified during SENSOR-B2-I13 (roles not frozen)",
+                    "gap_status": "ADEQUATE" if len(independent_venues) >= 2 else ("SINGLE_SOURCE" if len(independent_venues) == 1 else "INSUFFICIENT"),
+                    "notes": "verified data-semantics only (I13R1); roles not frozen",
                 }
             )
         )
@@ -620,19 +1018,24 @@ def redundancy_summaries(coverages: list[ProviderSensorCoverage]) -> list[Sensor
 
 
 def free_only_rows() -> list[dict[str, Any]]:
+    """Free-only audit from the registry + live evidence (I13R1 §11).
+
+    Bitfinex community GitHub/LFS source is PUBLIC: no API key, no account, no
+    payment.  Only FREE_API_KEY providers (Coinalyze) require a key.
+    """
     from crypto_sensor_fabric._paths import CONFIG_DIR
 
     data = yaml.safe_load((CONFIG_DIR / "provider_probe_endpoints.yaml").read_text(encoding="utf-8"))
     rows = []
     for pid, entry in data["providers"].items():
         access = entry.get("access", "")
-        keyed = access in ("FREE_API_KEY", "COMMUNITY_ARCHIVE")
+        api_key_required = access == "FREE_API_KEY"
         rows.append(
             {
                 "provider_id": pid,
                 "sensor_family": "|".join(sorted(entry.get("endpoints", {}))) or "",
                 "access_mode": access,
-                "api_key_required": bool(keyed),
+                "api_key_required": api_key_required,
                 "account_required": False,
                 "payment_method_required": False,
                 "paid_subscription_required": False,
@@ -662,30 +1065,57 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     attempts_path = out_dir / "attempts.jsonl"
+    all_attempts: list[CapabilityProbeAttempt] = []
     if attempts_path.exists() and not args.force:
-        print(f"resuming from {attempts_path} (use --force to re-run live)")
+        # MERGE-ON-RESUME (I13R1): keep prior attempts and execute ONLY the
+        # newly planned probes (restored scopes + full frozen checkpoint
+        # matrix).  No blind re-hit of already-recorded requests.
+        print(f"merging with existing {attempts_path} (use --force to re-run live)")
         all_attempts = [
             CapabilityProbeAttempt.model_validate(json.loads(line))
             for line in attempts_path.read_text(encoding="utf-8").splitlines()
             if line.strip()
         ]
-        _finish(
-            all_attempts,
-            run_id,
-            probe_run_id,
-            len(all_attempts),
-            len(all_attempts),
-            hard_blocked=set(),
-        )
-        return 0
+        # I13R1 §10: supersede ONLY attempts made under a REQUEST_CONTRACT_INVALID
+        # contract (Gate funding probed on the plural batch POST /funding_rates
+        # under a GET-style model -> INVALID_CREDENTIALS; then funding+trades on
+        # the single GET with ms from/to -> EMPTY; live smoke + first-party docs
+        # proved from/to are Unix SECONDS).  Attempts already recorded under the
+        # corrected seconds contract are NOT superseded — merges stay idempotent.
+        superseded: list[CapabilityProbeAttempt] = []
+        for a in all_attempts:
+            if a.provider_id != "GATE_FUTURES" or a.sensor_family not in (
+                SensorFamily.MECHANICAL_FUNDING,
+                SensorFamily.MECHANICAL_TRADE,
+            ):
+                continue
+            fp = a.request_fingerprint or ""
+            plural_batch = "/funding_rates" in fp
+            ms_window = bool(
+                re.search(r"from=[0-9]{13}", fp) or re.search(r"to=[0-9]{13}", fp)
+            )
+            if plural_batch or ms_window:
+                superseded.append(a)
+        if superseded:
+            print(
+                f"  superseding {len(superseded)} Gate funding/trade attempt(s) under an "
+                "obsolete request contract (REQUEST_CONTRACT_INVALID: plural batch "
+                "route or ms from/to; live + docs prove Unix SECONDS) "
+                "-> corrected seconds-based requests will be probed"
+            )
+            all_attempts = [a for a in all_attempts if a not in superseded]
+        if args.dry_run:
+            planned = _plan_count()
+            print(f"merge-mode dry run: existing={len(all_attempts)} planned={planned}")
+            return 0
 
     session = requests.Session()
     session.headers.update({"User-Agent": "codebuff-crypto-sensor-fabric-bloc2-i13/1.0 (capability characterization)"})
 
-    all_attempts: list[CapabilityProbeAttempt] = []
-    planned = 0
     executed = 0
+    skipped_merged = 0
     hard_blocked: set[tuple[str, str]] = set()
+    existing_keys = {_attempt_key(a) for a in all_attempts}
 
     for pid in PROVIDER_PRIORITY:
         if pid not in PROVIDER_PRIORITY:
@@ -698,17 +1128,20 @@ def main() -> int:
             sensor = SensorFamily(scope["sensor"]) if not scope["sensor"].startswith("ARCHIVE_") else scope["sensor"]
             for asset in scope["assets"]:
                 for era in scope["eras"]:
+                    key = (pid, scope["sensor"], asset, era)
+                    if key in existing_keys:
+                        skipped_merged += 1
+                        continue
                     if (pid, scope["sensor"]) in hard_blocked and era != "RECENT_CONTROL":
                         print(f"  skip {scope['sensor']}/{asset}/{era} (recent hard-blocked)")
                         continue
-                    planned += 1
                     if args.dry_run:
                         continue
                     sr = scope["sensor"]
                     if sr.startswith("ARCHIVE_"):
                         kind = "metrics" if sr == "ARCHIVE_METRICS" else "aggTrades"
                         req = build_request(probe, pid, SensorFamily.MECHANICAL_OPEN_INTEREST if sr == "ARCHIVE_METRICS" else SensorFamily.MECHANICAL_TRADE, asset, era, probe_run_id)
-                        date = "2022-06-15"
+                        date = CHECKPOINT_DATES[era].date().isoformat()
                         try:
                             attempt = binance_archive_attempt(probe, req, session, kind=kind, date=date)
                             all_attempts.append(attempt)
@@ -736,7 +1169,8 @@ def main() -> int:
                         if last.error_class is not None and last.error_class in HARD_BLOCKS and era == "RECENT_CONTROL":
                             hard_blocked.add((pid, sr))
 
-    print(f"\nplanned={planned} executed={executed} attempts={len(all_attempts)}")
+    planned = _plan_count()
+    print(f"\nplanned={planned} executed_new={executed} merged_skipped={skipped_merged} attempts={len(all_attempts)}")
 
     if args.dry_run:
         return 0
@@ -790,13 +1224,20 @@ def _finish(
         SensorFamily.MECHANICAL_POSITIONING,
         SensorFamily.MECHANICAL_BASIS,
     ]
+    from crypto_sensor_fabric.probes.evidence import validate_claims_lineage
+
+    violations = validate_claims_lineage(claims, all_attempts)
+    if violations:
+        raise SystemExit(
+            "evidence lineage violations (I13R1 §7):\n  " + "\n  ".join(violations)
+        )
     written = write_reports(
         output_dir=str(PACKET_DIR),
         run=run,
         attempts=all_attempts,
         claims=claims,
         coverages=coverages,
-        redundancies=redundancy_summaries(coverages),
+        redundancies=redundancy_summaries(coverages, claims),
         contradictions=i13_findings_contradictions(),
         free_only_audit=free_only_rows(),
         failures=failures,
@@ -829,6 +1270,24 @@ def i13_findings_contradictions() -> list[DocumentationRuntimeContradiction]:
                 "severity": "MATERIAL",
                 "resolution_status": "RESOLVED",
                 "notes": "contract corrected during I13 run",
+            }
+        ),
+        DocumentationRuntimeContradiction.model_validate(
+            {
+                "contradiction_id": "contr_i13_gate_funding_plural_route_auth",
+                "provider_id": "GATE_FUTURES",
+                "sensor_family": SensorFamily.MECHANICAL_FUNDING,
+                "documentation_claim": "funding history is a public no-auth route",
+                "documentation_source_ref": "live_probe_contracts.yaml + gate docs (funding_rate single-contract GET)",
+                "runtime_observation": (
+                    "The previous probe used the PLURAL batch POST /funding_rates under a "
+                    "GET-style model -> HTTP 401 INVALID_CREDENTIALS.  That attempt is a "
+                    "REQUEST_CONTRACT_INVALID, NOT a provider auth failure.  Corrected to "
+                    "single-contract GET /funding_rate?contract=... (no auth) (I13R1 §10)."
+                ),
+                "severity": "MATERIAL",
+                "resolution_status": "RESOLVED",
+                "notes": "funding contract corrected during I13R1; old F_ACCESS_AUTH not preserved as capability truth",
             }
         ),
         DocumentationRuntimeContradiction.model_validate(

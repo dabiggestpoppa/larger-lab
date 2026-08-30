@@ -31,12 +31,22 @@ class CapabilityStatus(_StrEnum):
     VERIFIED_LIMITED = "VERIFIED_LIMITED"
     VERIFIED_CURRENT_ONLY = "VERIFIED_CURRENT_ONLY"
     VERIFIED_ARCHIVE_ONLY = "VERIFIED_ARCHIVE_ONLY"
+    #: Current-only surface (book snapshots / latest-only trade windows):
+    # historical checkpoints are NOT applicable/attempted (I13R1 §4).
+    CURRENT_ONLY = "CURRENT_ONLY"
     UNSUPPORTED = "UNSUPPORTED"
     ACCESS_BLOCKED = "ACCESS_BLOCKED"
     GEO_BLOCKED = "GEO_BLOCKED"
     AUTH_BLOCKED = "AUTH_BLOCKED"
     PAYMENT_BLOCKED = "PAYMENT_BLOCKED"
     HISTORY_BLOCKED = "HISTORY_BLOCKED"
+    #: Older dates are NOT probed because a VERIFIED retention boundary was
+    # established (e.g. Gate contract_stats rolling 180-day window).  This is
+    # distinct from HISTORY_BLOCKED (a failed attempt) and from UNATTEMPTED
+    # (nothing attempted): the boundary itself is evidence (I13R1 §4).
+    HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY = (
+        "HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY"
+    )
     SEMANTICALLY_UNUSABLE = "SEMANTICALLY_UNUSABLE"
     TRANSIENT_FAILURE = "TRANSIENT_FAILURE"
     #: LOCAL run prerequisite missing (e.g. free API key not configured).  This
@@ -44,6 +54,9 @@ class CapabilityStatus(_StrEnum):
     # that blocks the attempt before any provider response exists.  Only an
     # actual provider response can establish AUTH_BLOCKED (I12R1 audit).
     CREDENTIAL_NOT_CONFIGURED = "CREDENTIAL_NOT_CONFIGURED"
+    #: No attempt recorded for this scope/era (never equated to unsupported;
+    # NO ATTEMPT != NO CAPABILITY NODE — the scope stays in every report).
+    UNATTEMPTED = "UNATTEMPTED"
     UNVERIFIED = "UNVERIFIED"
 
 

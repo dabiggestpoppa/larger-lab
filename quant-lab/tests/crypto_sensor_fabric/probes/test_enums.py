@@ -30,15 +30,18 @@ EXPECTED_MEMBERS: dict[str, set[str]] = {
         "VERIFIED_LIMITED",
         "VERIFIED_CURRENT_ONLY",
         "VERIFIED_ARCHIVE_ONLY",
+        "CURRENT_ONLY",  # I13R1: current-only surface, historical cells n/a
         "UNSUPPORTED",
         "ACCESS_BLOCKED",
         "GEO_BLOCKED",
         "AUTH_BLOCKED",
         "PAYMENT_BLOCKED",
         "HISTORY_BLOCKED",
+        "HISTORY_BLOCKED_BY_VERIFIED_RETENTION_BOUNDARY",  # I13R1: verified retention boundary, not an unattempted cell
         "SEMANTICALLY_UNUSABLE",
         "TRANSIENT_FAILURE",
         "CREDENTIAL_NOT_CONFIGURED",  # I12R1: local run prerequisite, not a provider failure
+        "UNATTEMPTED",  # I13R1: scope/era with no attempt — never unsupported
         "UNVERIFIED",
     },
     "ProbeRunStatus": {

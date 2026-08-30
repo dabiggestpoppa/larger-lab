@@ -237,6 +237,21 @@ def test_characterize_liquidation_uses_trade_history_with_type_flag():
     assert "liquidation" in attempt.native_units_summary["type"]
 
 
+def test_characterize_liquidation_via_analytics_hint():
+    # I13R1: the live runner can stamp an analytics_type hint so liquidation
+    # probes the bucketed `liquidation-volume` Market Analytics surface while
+    # the offline default stays trade-level /history anatomy (both preserved).
+    request = _request(SensorFamily.MECHANICAL_LIQUIDATION, era="2022")
+    request = request.model_copy(update={"provider_hints": {"analytics_type": "liquidation-volume"}})
+    query = PROBE.build_probe_request(request)
+    assert query["url"].endswith("/liquidation-volume")
+    assert query["params"]["since"] < 10_000_000_000  # epoch seconds
+    attempt = PROBE.characterize(request, 200, _body("liquidation_volume_analytics_success.json"))
+    assert attempt.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE
+    assert "liquidation-volume" in attempt.native_units_summary["source"]
+    assert attempt.pagination_detected is True
+
+
 def test_characterize_funding_analytics_success():
     request = _request(SensorFamily.MECHANICAL_FUNDING)
     attempt = PROBE.characterize(request, 200, _body("funding_analytics_success.json"))
