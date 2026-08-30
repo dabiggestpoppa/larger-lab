@@ -569,6 +569,8 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
     receipt["original_canonical_restored"] = False
     receipt["promoted_candidate_removed"] = False
     receipt["quarantine_retained"] = False
+    inventory = None
+    probe = {}
     try:
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
         probe = parse_probe_spec(probe_spec)
@@ -599,20 +601,28 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
         receipt["error"] = str(e)
         if receipt.get("quarantine_dropped") is not True:
             # Fallible verification failed before quarantine removal: ROLL BACK.
-            try:
-                ok_rb, rb_problems, rb_detail = rollback_recovery(
-                    container, user, db, quarantine, inventory, probe)
-                receipt["rollback_required"] = True
-                receipt["rollback_attempted"] = True
-                receipt.update(rb_detail)
-                if not ok_rb:
-                    receipt["rollback_error"] = "; ".join(rb_problems)
-            except Exception as e2:
-                receipt["rollback_required"] = True
+            receipt["rollback_required"] = True
+            if inventory is None:
+                # Without the protected inventory the rollback cannot be
+                # VERIFIED: fail loudly, never claim restoration succeeded.
                 receipt["rollback_attempted"] = True
                 receipt["rollback_succeeded"] = False
                 receipt["rollback_failed"] = True
-                receipt["rollback_error"] = f"rollback raised: {e2}"
+                receipt["original_canonical_restored"] = False
+                receipt["rollback_error"] = (f"cannot verify rollback: inventory unavailable ({e})")
+            else:
+                try:
+                    ok_rb, rb_problems, rb_detail = rollback_recovery(
+                        container, user, db, quarantine, inventory, probe)
+                    receipt["rollback_attempted"] = True
+                    receipt.update(rb_detail)
+                    if not ok_rb:
+                        receipt["rollback_error"] = "; ".join(rb_problems)
+                except Exception as e2:
+                    receipt["rollback_attempted"] = True
+                    receipt["rollback_succeeded"] = False
+                    receipt["rollback_failed"] = True
+                    receipt["rollback_error"] = f"rollback raised: {e2}"
         else:
             # Quarantine already dropped; data is promoted+verified. This is a
             # cleanup/evidence failure, not a data failure — still nonzero.
@@ -634,6 +644,8 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
     receipt["stamp"] = promote.get("stamp")
     receipt["quarantine_database"] = quarantine
     receipt["rollback_required"] = True
+    inventory = None
+    probe = {}
     try:
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
         probe = parse_probe_spec(probe_spec)
