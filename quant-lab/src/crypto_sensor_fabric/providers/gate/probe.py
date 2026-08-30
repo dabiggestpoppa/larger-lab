@@ -1,17 +1,31 @@
-"""Gate Futures capability probe (bloc_02/02 §6 / 04 §6).
+"""Gate Futures capability probe (bloc_02/02 §6 / 04 §6, SENSOR-B2-I12R1).
 
 Minimal characterization module — NOT a production adapter.  Gate is the
 primary candidate for interval-level liquidation + OI + taker-flow statistics:
 
 - `/contract_stats` carries long/short liquidation sizes AND OI (contracts +
-  USD notional) per interval (probe priorities §6.2-6.4),
+  USD notional) AND market-wide positioning fields (lsr_taker, lsr_account,
+  top_lsr_*, top_long_size, top_short_size, long_users, short_users) per
+  interval,
 - `/trades` rows carry `taker_side` — the aggressor side directly, so no
   isBuyerMaker inversion is needed for Gate,
 - `/funding_rates` and `/trades` accept from/to (ms) windows; retention caps
-  must be PROBED, not assumed (§6.6),
-- `/liquidation_orders` is recent-only,
-- `/positions` is auth-gated (characterized as requires_auth; free accounts
-  may still qualify under free-only rules if a free key is acceptable).
+  must be PROBED, not assumed (§6.6).
+
+WARNING (operator repair SENSOR-B2-I12R1): market-wide positioning MUST come
+from the PUBLIC `/contract_stats` surface.  User `/positions` is
+account-authenticated PRIVATE_ACCOUNT_DATA and is OUT_OF_SCOPE for the
+required Sensor Fabric runtime — the Sensor Fabric never requires exchange
+account credentials for market positioning.
+
+contract_stats query contract (from first-party docs, observed 2026-08-30):
+    GET /api/v4/futures/{settle}/contract_stats
+    contract  = futures contract (required)
+    from      = Unix SECONDS (NOT milliseconds)
+    interval  = seconds between interval points (e.g. 5m=300, 1h=3600, 1d=86400)
+    limit     = max records per response
+    `to` is NOT invented — historical traversal is characterized via the
+    provider's actual from/interval/limit behavior.
 
 All characterization logic is offline; fetching belongs to SENSOR-B2-I13.
 """
@@ -35,6 +49,12 @@ NATIVE_INSTRUMENTS: ClassVar[dict[str, str]] = {
     "MID_TAIL_CONTROL": "DOGE_USDT",
 }
 
+#: Settlement suffix for the USD-settled futures family probed.
+GATE_SETTLE = "usdt"
+
+#: Default interval (seconds) used to bucket /contract_stats probe windows.
+GATE_CONTRACT_STATS_INTERVAL_SECONDS = 3600  # 1h
+
 
 class GateCapabilityProbe(RestCapabilityProbeBase):
     """Gate Futures v4 REST capability characterization (offline)."""
@@ -43,46 +63,44 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
     venue_market = "GATE_FUTURES"
     access_mode = AccessMode.PUBLIC_REST
     base_url = "https://api.gateio.ws/api/v4/futures/usdt"
-    probe_version = "gate-probe-v1"
+    probe_version = "gate-probe-v2"
 
     native_instruments = NATIVE_INSTRUMENTS
 
     #: sensors whose payload is a bare top-level list.
-    #: Aggressor/order-flow probing rides on MECHANICAL_TRADE: the frozen
-    #: Bloc 1 SensorFamily has no ORDER_FLOW member — order flow is a T2
-    #: derived state family (master §20), so /trades is probed as the raw
-    #: trade surface and taker_side aggressor semantics are characterized here
-    #: for later T2 derivation (BLOC5_SCHEMA_REFINEMENT_PENDING note).
     top_level_list_sensors = frozenset(
         {
             SensorFamily.MECHANICAL_OPEN_INTEREST,  # /contract_stats
+            SensorFamily.MECHANICAL_LIQUIDATION,  # /contract_stats
+            SensorFamily.MECHANICAL_POSITIONING,  # /contract_stats (public)
             SensorFamily.MECHANICAL_FUNDING,  # /funding_rates
             SensorFamily.MECHANICAL_TRADE,  # /trades (aggressor flow surface)
-            SensorFamily.MECHANICAL_LIQUIDATION,  # /liquidation_orders (recent)
-            SensorFamily.MECHANICAL_POSITIONING,  # /positions (auth-gated)
         }
     )
     #: sensors whose payload is a top-level book dict
     top_level_book_sensors = frozenset({SensorFamily.MECHANICAL_BOOK_SNAPSHOT})
 
-    #: from/to (ms) window queries — retention depth must be probed per era.
-    #: Liquidations probe /contract_stats interval totals (long/short), the
-    #: historical route; the /liquidation_orders stream is recent-only and is
-    #: not the research target for interval liquidation totals.
-    window_query_sensors = frozenset(
+    #: sensors on /contract_stats with epoch-SECOND `from` + `interval` + `limit`
+    # (no invented `to`).  Positioning rides here via the PUBLIC statistics.
+    contract_stats_sensors = frozenset(
         {
             SensorFamily.MECHANICAL_OPEN_INTEREST,
-            SensorFamily.MECHANICAL_FUNDING,
-            SensorFamily.MECHANICAL_TRADE,
             SensorFamily.MECHANICAL_LIQUIDATION,
+            SensorFamily.MECHANICAL_POSITIONING,
         }
     )
-    #: recent/latest-only surfaces (no historical window)
-    latest_only_sensors = frozenset({SensorFamily.MECHANICAL_POSITIONING})
+    #: from/to (ms) window queries — retention depth must be probed per era.
+    window_query_sensors = frozenset(
+        {
+            SensorFamily.MECHANICAL_FUNDING,  # /funding_rates
+            SensorFamily.MECHANICAL_TRADE,  # /trades
+        }
+    )
 
     #: sensor -> native unit semantics (characterization knowledge)
     sensor_units: ClassVar[dict[SensorFamily, dict[str, str]]] = {
         SensorFamily.MECHANICAL_LIQUIDATION: {
+            "source": "interval-long/short liquidation sizes + USD notional via /contract_stats",
             "long_liq_size": "contracts (long liquidations)",
             "short_liq_size": "contracts (short liquidations)",
             "long_liq_usd": "USD notional",
@@ -90,10 +108,26 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             "time": "ms epoch (interval)",
         },
         SensorFamily.MECHANICAL_OPEN_INTEREST: {
+            "source": "interval OI (contracts + USD notional) via /contract_stats",
             "open_interest": "contracts",
             "open_interest_usd": "USD notional",
             "lsr_taker": "long/short ratio (taker)",
             "lsr_account": "long/short ratio (account)",
+        },
+        SensorFamily.MECHANICAL_POSITIONING: {
+            "source": "PUBLIC market-wide /contract_stats (never user /positions)",
+            "lsr_taker": "long/short ratio (taker)",
+            "lsr_account": "long/short ratio (account)",
+            "top_lsr_account": "top-account long/short ratio",
+            "top_lsr_size": "top long/short size",
+            "top_long_size": "top long size",
+            "top_short_size": "top short size",
+            "long_users": "long user count",
+            "short_users": "short user count",
+            "private_positions": (
+                "OUT_OF_SCOPE — /positions is PRIVATE_ACCOUNT_DATA; credentials "
+                "are never required for market positioning"
+            ),
         },
         SensorFamily.MECHANICAL_FUNDING: {
             "funding_rate": "decimal fraction per interval",
@@ -109,31 +143,32 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
         SensorFamily.MECHANICAL_BOOK_SNAPSHOT: {
             "bids/asks": "[[price USD, size contracts]]",
         },
-        SensorFamily.MECHANICAL_POSITIONING: {
-            "size": "contracts",
-            "leverage": "multiplier",
-            "value": "USD notional",
-        },
     }
 
     # ------------------------------------------------------------------
-    # query construction — Gate uses `contract`, not `symbol`
+    # query construction — Gate uses `contract` (not `symbol`)
     # ------------------------------------------------------------------
+
+    def contract_stats_url(self) -> str:
+        return f"https://api.gateio.ws/api/v4/futures/{GATE_SETTLE}/contract_stats"
 
     def build_probe_request(self, request: CapabilityProbeRequest) -> dict[str, Any]:
         sensor = request.sensor_family
         params: dict[str, Any] = {"contract": request.instrument_native}
-        if sensor in self.window_query_sensors:
+        if sensor in self.contract_stats_sensors:
+            # epoch SECONDS `from`, explicit interval, limit; no invented `to`.
+            params["from"] = int(request.requested_start.timestamp())
+            params["interval"] = GATE_CONTRACT_STATS_INTERVAL_SECONDS
+            params["limit"] = self.page_limit
+        elif sensor in self.window_query_sensors:
             params["from"] = int(request.requested_start.timestamp() * 1000)
             params["to"] = int(request.requested_end.timestamp() * 1000)
         if sensor is SensorFamily.MECHANICAL_BOOK_SNAPSHOT:
             params["limit"] = 100
-        elif sensor not in self.latest_only_sensors:
-            params["limit"] = self.page_limit
         return {"url": self._endpoint_for(sensor), "params": params}
 
     # ------------------------------------------------------------------
-    # error envelopes: {"label": "...", "message": "..."}
+    # error envelopes: {\"label\": \"...\", \"message\": \"...\"}
     # ------------------------------------------------------------------
 
     def classify_failure(
@@ -177,7 +212,7 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
         return None
 
     # ------------------------------------------------------------------
-    # pagination: from/to window coverage
+    # pagination: window coverage (seconds on contract_stats, ms elsewhere)
     # ------------------------------------------------------------------
 
     def _pagination_state(
@@ -187,14 +222,22 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
         sensor: SensorFamily,
         body: Any = None,
     ) -> tuple[bool, bool | None]:
-        if sensor not in self.window_query_sensors:
+        if sensor not in self.contract_stats_sensors and sensor not in self.window_query_sensors:
             return False, None
         if not rows:
             return True, None  # nothing returned; completeness unresolved
-        to_ms = int(request.requested_end.timestamp() * 1000)
+        if sensor in self.contract_stats_sensors:
+            # Request `from` is seconds; rows carry ms `time`.  There is no `to`
+            # param — completeness is bounded by from+interval+limit coverage, so
+            # signal coverage against the requested window end in ms.
+            end_ms = int(request.requested_end.timestamp() * 1000)
+            key = "time"
+        else:
+            end_ms = int(request.requested_end.timestamp() * 1000)
+            key = "time"
         last = max(
             (
-                row.get("time")
+                row.get(key)
                 or row.get("funding_time")
                 or row.get("create_time_ms")
                 for row in rows
@@ -202,5 +245,5 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             default=None,
         )
         if isinstance(last, (int, float)):
-            return True, int(last) >= to_ms
+            return True, int(last) >= end_ms
         return True, None

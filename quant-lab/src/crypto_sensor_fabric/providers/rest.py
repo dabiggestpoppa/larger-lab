@@ -51,6 +51,13 @@ class RestCapabilityProbeBase:
 
     #: sensor -> endpoint path (relative to base_url)
     endpoint_paths: ClassVar[dict[SensorFamily, str]] = {}
+    #: sensor -> ABSOLUTE endpoint URL (providers whose sensor routes sit on
+    #: a different base/route family than `base_url`, e.g. Binance
+    #: `/futures/data/...` which is NOT beneath `/fapi/v1`, or Kraken Market
+    #: Analytics).  Prefer this over `base_url + endpoint_paths[sensor]` when
+    #: set — the one-size-fits-all concatenation is only valid where the
+    #: provider really shares one base.
+    endpoint_urls: ClassVar[dict[SensorFamily, str]] = {}
     #: sensor -> native unit semantics (characterization knowledge)
     sensor_units: ClassVar[dict[SensorFamily, dict[str, str]]] = {}
     #: playbook asset hint -> native instrument
@@ -109,6 +116,9 @@ class RestCapabilityProbeBase:
     # ------------------------------------------------------------------
 
     def _endpoint_for(self, sensor: SensorFamily) -> str:
+        absolute = self.endpoint_urls.get(sensor)
+        if absolute:
+            return absolute
         path = self.endpoint_paths.get(sensor)
         if path is None:
             raise ValueError(f"{self.provider_id} probe has no endpoint for {sensor.value}")

@@ -85,18 +85,37 @@ def test_native_instrument_unknown_asset_raises():
         PROBE.native_instrument("NOPE")
 
 
-def test_build_probe_request_contract_stats_uses_window():
+def test_build_probe_request_contract_stats_seconds_from_interval_limit():
+    # contract_stats contract: `from` is Unix SECONDS (not ms), `interval` in
+    # seconds, `limit` caps records, and `to` is NOT invented.
     query = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_OPEN_INTEREST))
-    assert query["url"].endswith("/contract_stats")
+    assert (
+        "https://api.gateio.ws/api/v4/futures/usdt/contract_stats" == query["url"]
+    )
     assert query["params"]["contract"] == "BTC_USDT"
-    assert query["params"]["from"] == 1655251200000
-    assert query["params"]["to"] == 1655337600000  # 2022-06-16T00:00:00Z
+    assert query["params"]["from"] == 1655251200  # 10-digit-ish epoch seconds
+    assert query["params"]["from"] < 10_000_000_000  # never 13-digit ms
+    assert query["params"]["interval"] == 3600
+    assert "limit" in query["params"]
+    assert "to" not in query["params"]
 
 
-def test_build_probe_request_positions_is_auth_gated():
+def test_build_probe_request_positions_via_public_contract_stats():
+    # Market-wide positioning MUST come from PUBLIC /contract_stats, never user
+    # /positions (private account data, OUT_OF_SCOPE).
     query = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_POSITIONING))
-    assert query["url"].endswith("/positions")
-    assert query["params"] == {"contract": "BTC_USDT"}
+    assert query["url"].endswith("/contract_stats")
+    assert "/positions" not in query["url"]
+    assert query["params"]["contract"] == "BTC_USDT"
+    assert query["params"]["from"] < 10_000_000_000
+
+
+def test_no_market_positioning_via_authenticated_positions():
+    # Negative: the canonical market positioning candidate must not route to
+    # the auth-gated user /positions surface.
+    build = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_POSITIONING))
+    assert "/positions" not in build["url"]
+    assert "contract_stats" in build["url"]
 
 
 def test_build_probe_request_is_deterministic():

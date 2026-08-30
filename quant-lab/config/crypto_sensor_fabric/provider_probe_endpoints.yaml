@@ -12,19 +12,31 @@ schema_version: "1.0"
 providers:
   KRAKEN_FUTURES:
     base_url: "https://futures.kraken.com/derivatives/api/v3"
+    analytics_base_url: "https://futures.kraken.com/api/charts/v1/analytics"
     access: FREE_PUBLIC
     endpoints:
+      # trade-level execution/liquidation anatomy (raw v3 surface)
       MECHANICAL_TRADE: "/history"
       MECHANICAL_LIQUIDATION: "/history"
-      MECHANICAL_OPEN_INTEREST: "/tickers"
-      MECHANICAL_FUNDING: "/fundingrates"
       MECHANICAL_BOOK_SNAPSHOT: "/orderbook"
-      MECHANICAL_BASIS: "/tickers"
+      # bucketed Market Analytics (historical mechanical source)
+      MECHANICAL_OPEN_INTEREST: "/api/charts/v1/analytics/{symbol}/open-interest"
+      MECHANICAL_FUNDING: "/api/charts/v1/analytics/{symbol}/funding"
+      MECHANICAL_BASIS: "/api/charts/v1/analytics/{symbol}/future-basis"
+      MECHANICAL_POSITIONING: "/api/charts/v1/analytics/{symbol}/long-short-ratio"
+      MECHANICAL_BOOK_METRIC: "/api/charts/v1/analytics/{symbol}/orderbook"
     notes: >
-      Liquidations are NOT a dedicated endpoint: they appear as trade rows
-      whose `type` field is "liquidation" on /history.  Open interest is
-      current-only via /tickers; historical OI is not publicly exposed and
-      must be probed as CURRENT_ONLY / HISTORY_BLOCKED, not assumed.
+      Two surfaces are kept SEPARATE (I12R1).  trade-level: /history rows carry
+      `type` "liquidation" for liquidation anatomy.  bucketed: /api/charts/v1/
+      analytics/{symbol}/{analytics_type} is the selected HISTORICAL source for
+      open-interest / funding / future-basis / long-short-ratio / orderbook
+      (+candidates liquidation-volume, top-traders, long-short-info, spreads,
+      liquidity, slippage, aggressor-differential, cvd).  Query contract: since
+      and to are epoch SECONDS, interval is one supported resolution in seconds
+      (60..604800); envelope {"result":{"timestamp":[],"data":[],"more":bool}}.  Do
+      NOT characterize historical OI via current-only /tickers.  Precomputed
+      analytics are never assumed EXACT_EQUIVALENT to Fabric-derived metrics
+      without later live evidence.
 
   GATE_FUTURES:
     base_url: "https://api.gateio.ws/api/v4/futures/usdt"
@@ -32,18 +44,24 @@ providers:
     endpoints:
       MECHANICAL_LIQUIDATION: "/contract_stats"
       MECHANICAL_OPEN_INTEREST: "/contract_stats"
+      MECHANICAL_POSITIONING: "/contract_stats"
       MECHANICAL_FUNDING: "/funding_rates"
       MECHANICAL_TRADE: "/trades"
       MECHANICAL_BOOK_SNAPSHOT: "/order_book"
-      MECHANICAL_POSITIONING: "/positions"
     notes: >
       /contract_stats carries interval long/short liquidation sizes AND OI
-      (contracts + USD notional); retention depth for from/to windows must be
-      probed per era.  /trades `taker_side` is the aggressor side directly
-      (no maker-flag inversion needed) and is probed as MECHANICAL_TRADE:
-      order flow is a T2-derived state family, not a frozen T1 sensor.
-      /positions is auth-gated.  Gate is US-region-restricted; forbidden
-      responses are geo evidence, not bypassed.
+      (contracts + USD notional) AND market-wide positioning (lsr_taker,
+      lsr_account, top_lsr_*, top_long/short_size, long/short_users) (I12R1).
+      contract_stats contract: `from` is Unix SECONDS (not ms), `interval` is
+      seconds, `limit` caps records, and `to` is NOT invented — historical
+      traversal is characterized via from/interval/limit.  Market positioning
+      MUST use the PUBLIC /contract_stats; user /positions is
+      PRIVATE_ACCOUNT_DATA and OUT_OF_SCOPE for the Sensor Fabric runtime (no
+      exchange credentials required).  /funding_rates and /trades accept
+      from/to (ms) windows; retention caps probed per era.  /trades `taker_side`
+      is the aggressor side directly (order flow is a T2-derived family).  Gate
+      is US-region-restricted; forbidden responses are geo evidence, never
+      bypassed.
 
   BINANCE_USDM:
     base_url: "https://fapi.binance.com/fapi/v1"

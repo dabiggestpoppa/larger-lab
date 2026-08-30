@@ -89,13 +89,13 @@ def test_native_instrument_unknown_asset_raises():
 # ---------------------------------------------------------------------------
 
 
-def test_build_probe_request_funding_uses_from_to():
+def test_build_probe_request_funding_analytics_seconds_units():
     request = _request(SensorFamily.MECHANICAL_FUNDING)
     query = PROBE.build_probe_request(request)
-    assert query["url"].endswith("/fundingrates")
-    assert query["params"]["symbol"] == "PI_XBTUSD"
-    assert query["params"]["from"] == 1655251200000
-    assert query["params"]["to"] == 1655251200000
+    assert query["url"].endswith("/api/charts/v1/analytics/PI_XBTUSD/funding")
+    assert query["params"]["since"] == 1655251200  # epoch seconds, NOT ms
+    assert query["params"]["to"] == 1655251200
+    assert query["params"]["interval"] == 3600
 
 
 def test_build_probe_request_trades_uses_since_cursor():
@@ -106,11 +106,70 @@ def test_build_probe_request_trades_uses_since_cursor():
     assert query["params"]["since"] == 1655251200000
 
 
-def test_build_probe_request_tickers_is_latest_only():
-    request = _request(SensorFamily.MECHANICAL_OPEN_INTEREST)
+def test_build_probe_request_oi_analytics_open_interest():
+    # Historical OI MUST target Market Analytics open-interest, not /tickers.
+    request = _request(SensorFamily.MECHANICAL_OPEN_INTEREST, era="2022")
     query = PROBE.build_probe_request(request)
-    assert query["url"].endswith("/tickers")
-    assert query["params"] == {"symbol": "PI_XBTUSD"}
+    assert (
+        "https://futures.kraken.com/api/charts/v1/analytics/PI_XBTUSD/open-interest"
+        == query["url"]
+    )
+    assert "open-interest" in query["url"]
+    assert "/tickers" not in query["url"]
+    assert query["params"]["since"] == 1655251200  # seconds
+    assert query["params"]["to"] == 1655251200
+    assert query["params"]["interval"] == 3600
+
+
+def test_build_probe_request_oi_analytics_since_to_in_seconds():
+    start = datetime(2022, 6, 15, tzinfo=UTC)
+    end = datetime(2022, 6, 16, tzinfo=UTC)
+    request = _request(
+        SensorFamily.MECHANICAL_OPEN_INTEREST,
+        era="2022",
+        start=start,
+    )
+    request = CapabilityProbeRequest.model_validate(
+        {
+            **request.model_dump(),
+            "requested_end": end,
+            "probe_run_id": "run_kraken_001",
+        }
+    )
+    query = PROBE.build_probe_request(request)
+    assert query["params"]["since"] == 1655251200
+    assert query["params"]["to"] == 1655337600
+    # 13-digit ms must never appear
+    assert query["params"]["since"] < 10_000_000_000
+    assert query["params"]["to"] < 10_000_000_000
+
+
+def test_historical_oi_not_via_current_tickers_only():
+    # Negative: historical OI must not be characterized through current /tickers.
+    query = PROBE.build_probe_request(
+        _request(SensorFamily.MECHANICAL_OPEN_INTEREST, era="2021")
+    )
+    assert "open-interest" in query["url"]
+    assert "/tickers" not in query["url"]
+
+
+def test_build_probe_request_positioning_analytics_long_short_ratio():
+    query = PROBE.build_probe_request(
+        _request(SensorFamily.MECHANICAL_POSITIONING, era="2024")
+    )
+    assert (
+        "https://futures.kraken.com/api/charts/v1/analytics/PI_XBTUSD/long-short-ratio"
+        == query["url"]
+    )
+    assert query["params"]["since"] == 1655251200
+
+
+def test_build_probe_request_book_metric_analytics_orderbook():
+    query = PROBE.build_probe_request(
+        _request(SensorFamily.MECHANICAL_BOOK_METRIC, era="2024")
+    )
+    assert query["url"].endswith("/analytics/PI_XBTUSD/orderbook")
+    assert query["params"]["interval"] == 3600
 
 
 def test_build_probe_request_is_deterministic():
@@ -178,21 +237,38 @@ def test_characterize_liquidation_uses_trade_history_with_type_flag():
     assert "liquidation" in attempt.native_units_summary["type"]
 
 
-def test_characterize_funding_success():
+def test_characterize_funding_analytics_success():
     request = _request(SensorFamily.MECHANICAL_FUNDING)
-    attempt = PROBE.characterize(request, 200, _body("fundingrates_success.json"))
+    attempt = PROBE.characterize(request, 200, _body("funding_analytics_success.json"))
     assert attempt.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE
     assert attempt.rows_returned == 3
     assert "fundingRate" in attempt.native_units_summary
-    assert attempt.last_timestamp_returned == datetime(2022, 6, 15, 16, 0, tzinfo=UTC)
+    assert attempt.last_timestamp_returned == datetime(2022, 6, 15, 2, 0, tzinfo=UTC)
+    assert attempt.pagination_detected is True
+    assert attempt.pagination_complete is True  # more=false -> terminal page
 
 
-def test_characterize_oi_ticker_is_current_only_shape():
-    request = _request(SensorFamily.MECHANICAL_OPEN_INTEREST, era="RECENT_CONTROL")
-    attempt = PROBE.characterize(request, 200, _body("tickers_oi_success.json"))
+def test_characterize_oi_analytics_success():
+    request = _request(SensorFamily.MECHANICAL_OPEN_INTEREST, era="2022")
+    attempt = PROBE.characterize(request, 200, _body("open_interest_analytics_success.json"))
     assert attempt.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE
-    assert attempt.rows_returned == 1
+    assert attempt.rows_returned == 3
     assert "openInterest" in attempt.native_units_summary
+    assert "not assumed" in attempt.native_units_summary["exact_equivalent"]
+    assert attempt.first_timestamp_returned == datetime(2022, 6, 15, tzinfo=UTC)
+    # analytics envelope carries a `more` flag -> pagination detected, not complete
+    assert attempt.pagination_detected is True
+    assert attempt.pagination_complete is False
+
+
+def test_characterize_positioning_analytics_long_short_ratio():
+    request = _request(SensorFamily.MECHANICAL_POSITIONING, era="2024")
+    attempt = PROBE.characterize(
+        request, 200, _body("long_short_ratio_analytics_success.json")
+    )
+    assert attempt.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE
+    assert attempt.rows_returned == 3
+    assert "long-short-ratio" in attempt.native_units_summary["source"]
 
 
 def test_characterize_orderbook_flattens_levels():

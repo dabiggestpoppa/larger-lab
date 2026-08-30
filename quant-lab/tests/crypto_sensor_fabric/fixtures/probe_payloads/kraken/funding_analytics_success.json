@@ -1,0 +1,12 @@
+{
+  "result": {
+    "timestamp": [1655251200, 1655254800, 1655258400],
+    "data": [
+      {"fundingRate": 0.000075},
+      {"fundingRate": 0.000101},
+      {"fundingRate": 0.000043}
+    ],
+    "more": false
+  },
+  "errors": []
+}
