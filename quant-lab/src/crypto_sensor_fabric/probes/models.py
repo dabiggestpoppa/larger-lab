@@ -73,6 +73,12 @@ class CapabilityProbeRequest(BaseModel):
     def _normalize_timestamps(self) -> CapabilityProbeRequest:
         return normalize_utc_datetimes(self)  # type: ignore[return-value]
 
+    @property
+    def era_hint(self) -> str | None:
+        """Era label stamped by the planner (RECENT_CONTROL / 2021 / ...)."""
+        value = self.provider_hints.get("era")
+        return value if isinstance(value, str) else None
+
 
 class CapabilityProbeAttempt(BaseModel):
     """Immutable evidence record for one probe attempt (01 §8 / 05 §1).
