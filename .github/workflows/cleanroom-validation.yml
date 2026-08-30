@@ -1,0 +1,120 @@
+# Authoritative cleanroom CI validation for agent/repo-cleanroom.
+#
+# Scope: runs ONLY the canonical cleanroom verifier (cleanroom/verifier.py)
+# against the exact pushed commit. It performs no branch, tag, stash, trash,
+# LFS, deployment, or cloud mutations: fetch/installs touch only the CI
+# runner's own clone, and the verifier is read-only and writes all outputs
+# outside the checkout ($RUNNER_TEMP).
+#
+# The verifier's exact exit code is preserved: the verifier step fails
+# natively with that code, and the final step re-exits with the recorded
+# code from cleanroom-verification.json. Evidence (including failed/BLOCKED
+# evidence) is always uploaded.
+
+name: cleanroom-validation
+
+on:
+  push:
+    branches: [agent/repo-cleanroom]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1 (same pin as repo OCE CI)
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      # Read-only fetch of all heads + tags into the CI clone so protected /
+      # restored refs and tag targets can be verified locally as well as via
+      # ls-remote. This mutates only the CI runner's clone, never the remote.
+      - name: Fetch all refs (CI clone only)
+        run: |
+          git fetch --no-tags --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          git fetch --prune origin '+refs/tags/*:refs/tags/*'
+
+      - name: Install pinned gitleaks (v8.18.1)
+        # Extracted OUTSIDE the workspace (the tarball contains its own
+        # README.md/LICENSE that must not clobber the checkout).
+        run: |
+          mkdir -p "$RUNNER_TEMP/gitleaks"
+          wget -q -O "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
+          tar xzf "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" -C "$RUNNER_TEMP/gitleaks"
+          sudo mv "$RUNNER_TEMP/gitleaks/gitleaks" /usr/local/bin/
+          gitleaks version
+
+      - name: Install PyYAML (verifier dependency)
+        run: python3 -m pip install --quiet --user pyyaml
+
+      - name: Prepare evidence directory (outside checkout)
+        run: |
+          mkdir -p "$RUNNER_TEMP/cleanroom-evidence"
+          echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) stage=checkout-ready" >> "$RUNNER_TEMP/cleanroom-evidence/stage-log.txt"
+
+      - name: Run canonical cleanroom verifier
+        id: verifier
+        # The verifier's exit code (0/1/2/3) is this step's exit code.
+        run: |
+          python3 cleanroom/verifier.py \
+            --repo-root "$GITHUB_WORKSPACE" \
+            --output-dir "$RUNNER_TEMP/cleanroom-evidence" \
+            --subject "${{ github.sha }}"
+        env:
+          GITLEAKS_BIN: /usr/local/bin/gitleaks
+
+      - name: Write evidence manifest
+        if: always()
+        run: |
+          python3 - "${{ github.run_id }}" "${{ github.run_number }}" "${{ github.run_attempt }}" "${{ github.sha }}" "${{ github.ref_name }}" <<'PYEOF'
+          import datetime, json, os, sys
+          run_id, run_number, attempt, sha, branch = sys.argv[1:6]
+          manifest = {
+              "manifest_type": "evidence-manifest",
+              "repository": "dabiggestpoppa/larger-lab",
+              "workflow": "cleanroom-validation",
+              "branch": branch,
+              "tested_subject_commit": sha,
+              "ci_run_id": run_id,
+              "ci_run_number": run_number,
+              "ci_run_attempt": attempt,
+              "ci_run_url": "https://github.com/dabiggestpoppa/larger-lab/actions/runs/%s" % run_id,
+              "artifact_name": "cleanroom-evidence",
+              "artifact_id": "assigned after upload; recorded in the F16 evidence commit",
+              "generated_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+          }
+          out = os.path.join(os.environ["RUNNER_TEMP"], "cleanroom-evidence", "evidence-manifest.json")
+          with open(out, "w", encoding="utf-8") as fh:
+              json.dump(manifest, fh, indent=2, sort_keys=True)
+          print("evidence manifest written:", out)
+          PYEOF
+
+      - name: Record stage log (verifier result)
+        if: always()
+        run: |
+          code=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['exit_code'])" "$RUNNER_TEMP/cleanroom-evidence/cleanroom-verification.json" 2>/dev/null || echo unknown)
+          echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) stage=verify verifier_exit=$code" >> "$RUNNER_TEMP/cleanroom-evidence/stage-log.txt"
+          echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) stage=evidence-ready" >> "$RUNNER_TEMP/cleanroom-evidence/stage-log.txt"
+
+      - name: Upload evidence (always, including failed/BLOCKED)
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3 (same pin as repo OCE CI)
+        with:
+          name: cleanroom-evidence
+          path: ${{ runner.temp }}/cleanroom-evidence/
+          if-no-files-found: error
+
+      - name: Preserve verifier exit code
+        if: always()
+        run: |
+          code=3
+          if [ -f "$RUNNER_TEMP/cleanroom-evidence/cleanroom-verification.json" ]; then
+            code=$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['exit_code'])" "$RUNNER_TEMP/cleanroom-evidence/cleanroom-verification.json" 2>/dev/null || echo 3)
+          fi
+          echo "cleanroom verifier exit code: $code"
+          exit "$code"
