@@ -4,309 +4,409 @@
   "cleanroom_branch": "agent/repo-cleanroom",
   "reference_branch": "main",
   "reference_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
-  "generated_utc": "2026-08-30T13:52:21Z",
+  "generated_utc": "2026-08-30T15:01:05Z",
   "restored_file_count": 50,
   "all_byte_identical_to_main": true,
   "files": {
     "quant-lab/backtests/debug_jan3.py": {
-      "sha256": "941046d17e059e1d56e6f5f268c4ef77475e7ac93cd9c12e2ac2603558526d9c",
+      "sha256": "45127fc07c244a7adfc98f11222c12d8e108a03207c68710e985ad5f660e13fc",
       "git_blob_main": "e521dfc537642fcda876da732006cd5ce1338114",
       "git_blob_worktree": "e521dfc537642fcda876da732006cd5ce1338114",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "941046d17e059e1d56e6f5f268c4ef77475e7ac93cd9c12e2ac2603558526d9c",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/debug_test.py": {
-      "sha256": "2bd525cdcac1693af9d798fe5428a7dfc0fca76f79f6a5ce4352c41532459c63",
+      "sha256": "20353d754a9ab010f1483f6905b1fda79d084815a1c5c73dfae3252a9e2e8b68",
       "git_blob_main": "c127565b837bf727da0fe542576bb920d3c7db0b",
       "git_blob_worktree": "c127565b837bf727da0fe542576bb920d3c7db0b",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "2bd525cdcac1693af9d798fe5428a7dfc0fca76f79f6a5ce4352c41532459c63",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/debug_test2.py": {
-      "sha256": "8c16f2e42d3afdf85558f314bab54eb245f8ee38c0d3a11368a37cbbd850e862",
+      "sha256": "95efe5674ac8f4e31f8b0f64d8de813b3df219ec6606c3fb96bf9eb3238d0dbb",
       "git_blob_main": "a894f10079b861e42395029ae36b4bca01c03026",
       "git_blob_worktree": "a894f10079b861e42395029ae36b4bca01c03026",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "8c16f2e42d3afdf85558f314bab54eb245f8ee38c0d3a11368a37cbbd850e862",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/debug_test3.py": {
-      "sha256": "5c4743462943e6a407bd977b42635a17d8312672ca197dd78f7e51edc3e39c38",
+      "sha256": "bb109cfbff84b86a9b2c35220ddb44bff358a7789524f56c6c43dff2df064a64",
       "git_blob_main": "ad1859e406e487fa889c7fe9ee22816678732f86",
       "git_blob_worktree": "ad1859e406e487fa889c7fe9ee22816678732f86",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "5c4743462943e6a407bd977b42635a17d8312672ca197dd78f7e51edc3e39c38",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/p90_cascade_activation_20260517_010329.json": {
-      "sha256": "b211207d82dc0d548d6be61503cafcb0681e958b09b63c9196eec62b7c4e71dd",
+      "sha256": "e39cd6c926924b02fe4d48869a10a5af07e61d5fc5425511f68eaf2414b378f9",
       "git_blob_main": "c41501e776aafc64daaee08d4f91a34b624648eb",
       "git_blob_worktree": "c41501e776aafc64daaee08d4f91a34b624648eb",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "b211207d82dc0d548d6be61503cafcb0681e958b09b63c9196eec62b7c4e71dd",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/p90_cascade_activation_20260517_012625.json": {
-      "sha256": "1cd129a5b81ad2673920202bacd39b12a755092116907f0fcdb29265c5329d80",
+      "sha256": "3b8f82e1038b27d8c7ffa9c8e277955a799b8a9963cbe0e449155ca6cee286dd",
       "git_blob_main": "c92c840aaf4a356deaad548c41a1bde040bd56b6",
       "git_blob_worktree": "c92c840aaf4a356deaad548c41a1bde040bd56b6",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "1cd129a5b81ad2673920202bacd39b12a755092116907f0fcdb29265c5329d80",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/p90_cascade_results.json": {
-      "sha256": "892299773a5ce656db80ab236e68ef106407ef511819f86a097b9327711d3e84",
+      "sha256": "fb53973f6bfa74f5c083bb4a1fc7b7db1c48a37c83c4ca53796ff361fb2e148f",
       "git_blob_main": "c3429e2535846782160766483c2abb0029f88602",
       "git_blob_worktree": "c3429e2535846782160766483c2abb0029f88602",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "892299773a5ce656db80ab236e68ef106407ef511819f86a097b9327711d3e84",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/run_cascade_backtest.py": {
-      "sha256": "3111e6439e6a76559767c9dc7d0e8d42a0b5ff57841b31cff8d219caabca9276",
+      "sha256": "687f2a2ccc22ab36a3b5ada64cc40879dad5ee58ca46ae3f6316d0df90f76369",
       "git_blob_main": "a89fb12aa60311fee3bb9565fd4779ae25f00121",
       "git_blob_worktree": "a89fb12aa60311fee3bb9565fd4779ae25f00121",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "3111e6439e6a76559767c9dc7d0e8d42a0b5ff57841b31cff8d219caabca9276",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/run_full_backtest.py": {
-      "sha256": "00d44eef796042e5b42130cc97be1843ac5e439df9a140c24350cb370f7fe64b",
+      "sha256": "afc144549cd246e56fe1116ab7bc0d96090148522016e1781bceb144eaf63b61",
       "git_blob_main": "70f0a700cc11f4f104c9518259916e4c23b98a48",
       "git_blob_worktree": "70f0a700cc11f4f104c9518259916e4c23b98a48",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "00d44eef796042e5b42130cc97be1843ac5e439df9a140c24350cb370f7fe64b",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/backtests/test_cascade.py": {
-      "sha256": "d77c350cd71f94411a983de58c14fa67b02346b877ab01f298dc85834a26f0fc",
+      "sha256": "af5ce23ccab903453b4c80f7cc2b8d3dc125a5a7c54b055e9b36d7b354c992a6",
       "git_blob_main": "48b91380b31f9a24566edfd651f8206522f26c93",
       "git_blob_worktree": "48b91380b31f9a24566edfd651f8206522f26c93",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "d77c350cd71f94411a983de58c14fa67b02346b877ab01f298dc85834a26f0fc",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/findings/researcher-2026-05-17.md": {
-      "sha256": "eb496c7b69d9cdc21f51e763384801dbaef686a3551862b77dcf9070707f9e9e",
+      "sha256": "6b757e7d57aa0b2ca101f2d91f1fc2ec05abb89e137aaf88f14f32d8eeb4d72b",
       "git_blob_main": "79cf908bb3a554980053fd2daa54487e5a0c5963",
       "git_blob_worktree": "79cf908bb3a554980053fd2daa54487e5a0c5963",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "eb496c7b69d9cdc21f51e763384801dbaef686a3551862b77dcf9070707f9e9e",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/insights/optimizer-2026-05-17.md": {
-      "sha256": "b8b32de7f14ffc824093f1baa8ecd161a56c70fb296f2b7c3d07b61709b4a110",
+      "sha256": "0576e58a5312ed0e69cd1695c91cad033039fa4d29cd6ab283952464f0ddeaaf",
       "git_blob_main": "3d0fbe3ae9ac3f1d33a47b718c5232a835faabc0",
       "git_blob_worktree": "3d0fbe3ae9ac3f1d33a47b718c5232a835faabc0",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "b8b32de7f14ffc824093f1baa8ecd161a56c70fb296f2b7c3d07b61709b4a110",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/ATOMIC_STRUCTURE.txt": {
-      "sha256": "5b677d259221f3ce12880c6ec54d916e6b4d05a62b7d2f60b11fc1f804a77087",
+      "sha256": "c66af505121277b7c33905d254dcc0b4d47d7015013f58dd69d1b9ad8ce37c62",
       "git_blob_main": "0bc433c8a0a75685626de823c5bbfcb220e9e86e",
       "git_blob_worktree": "0bc433c8a0a75685626de823c5bbfcb220e9e86e",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "5b677d259221f3ce12880c6ec54d916e6b4d05a62b7d2f60b11fc1f804a77087",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/CEREBUS_ATOMIC_STRUCTURE.txt": {
-      "sha256": "ac58b017515727516a732d47e3c51abd724798709308454f1d68fe89faa743dd",
+      "sha256": "a6970b470b0d9e2363c4ec1ccb5fbdb23bd60ee0ac1eff71e1056e04b80c9371",
       "git_blob_main": "f0741885351a2f09d81bf59e38e5fa542a310f7a",
       "git_blob_worktree": "f0741885351a2f09d81bf59e38e5fa542a310f7a",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "ac58b017515727516a732d47e3c51abd724798709308454f1d68fe89faa743dd",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/CEREBUS_P1-5_P90_CORE.txt": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "git_blob_main": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
       "git_blob_worktree": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/CEREBUS_P11-15_META.txt": {
-      "sha256": "5483eb9995454d293013e09c29e6988540dd81ac3cdbc048eb77434979b69681",
+      "sha256": "aee9db5b0490a9fe3074dd108667392114740e76b059b7dfa003c49ab29d5670",
       "git_blob_main": "7f991cbbbb265d8906c1ca7fb82edb31d98532b1",
       "git_blob_worktree": "7f991cbbbb265d8906c1ca7fb82edb31d98532b1",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "5483eb9995454d293013e09c29e6988540dd81ac3cdbc048eb77434979b69681",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/CEREBUS_P6-10_ADVANCED.txt": {
-      "sha256": "b4933d198e5f373c742b550190c51810706eb861c8c4d5da3bce0f857b9c7272",
+      "sha256": "5e1e6022e474f1c7ccaa7ae387bbf61cdd75a5b87a227a6ba55a9a10fb02c64f",
       "git_blob_main": "c518c287d4b94e7728e448349ee30f0ce35fb144",
       "git_blob_worktree": "c518c287d4b94e7728e448349ee30f0ce35fb144",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "b4933d198e5f373c742b550190c51810706eb861c8c4d5da3bce0f857b9c7272",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt": {
-      "sha256": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+      "sha256": "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb",
       "git_blob_main": "9c5029aa066cf34b30e3612a4b36629ecc72a05b",
       "git_blob_worktree": "9c5029aa066cf34b30e3612a4b36629ecc72a05b",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/LAB_PLAN.md": {
-      "sha256": "73bfb984dbd88d92426a57d9979d058e78a9fd7d5359966025118990285229c6",
+      "sha256": "fac0b1fb6a0ade440427ec52d3f931136215cc469f0fe6166c4754936b422579",
       "git_blob_main": "fd9e311749840681c25fde8fb1e8e939a3050e19",
       "git_blob_worktree": "fd9e311749840681c25fde8fb1e8e939a3050e19",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "73bfb984dbd88d92426a57d9979d058e78a9fd7d5359966025118990285229c6",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/P90_STRATEGY_GUIDE.md": {
-      "sha256": "78a5306b5172d7ad4c4351e0d717652d912f233f55d9e510d1c7857c43591d79",
+      "sha256": "adf693ce0ca28c2e3a046dc48f641a7ebe7329c8c246946fb59f65f5b2d123ca",
       "git_blob_main": "e50a81987e6417a14fb210d10542e7e0019e2b52",
       "git_blob_worktree": "e50a81987e6417a14fb210d10542e7e0019e2b52",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "78a5306b5172d7ad4c4351e0d717652d912f233f55d9e510d1c7857c43591d79",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_16_CONTENT.txt": {
-      "sha256": "d82934a1f5bab5b6d528cb93a35c23050a7a6353ef7cb56185fe1b6ebbb2dcd5",
+      "sha256": "07c8edff0f0f3020462f0f15dd1c6ff53bf5de0dc866009cac954248474727b1",
       "git_blob_main": "d9c8f4b76fb391212f6f9495c5b9889e0b166b69",
       "git_blob_worktree": "d9c8f4b76fb391212f6f9495c5b9889e0b166b69",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "d82934a1f5bab5b6d528cb93a35c23050a7a6353ef7cb56185fe1b6ebbb2dcd5",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_17_CONTENT.txt": {
-      "sha256": "e852170acec10c30728ec3b605724f3ecd29f9aa591b0d1e5b6bebf8a696d03b",
+      "sha256": "64c9be132430e472b53898e9b5efef4a8e1d61f05ece7c1a319f9d5e3986db6c",
       "git_blob_main": "f177f74821e4289af76ddf8fbdf89d3923f1a9ca",
       "git_blob_worktree": "f177f74821e4289af76ddf8fbdf89d3923f1a9ca",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "e852170acec10c30728ec3b605724f3ecd29f9aa591b0d1e5b6bebf8a696d03b",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_18_CONTENT.txt": {
-      "sha256": "0467f4277fc748d6eff9e36ae1a431329bc3838d98e5a1174e96edfe348502c1",
+      "sha256": "52d24aecc190b6683cfea874c6247fd5c9f2d680ccd3b96e112125a342b1fe99",
       "git_blob_main": "c8661ba0a230510eb6442f8536dc607af522a819",
       "git_blob_worktree": "c8661ba0a230510eb6442f8536dc607af522a819",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "0467f4277fc748d6eff9e36ae1a431329bc3838d98e5a1174e96edfe348502c1",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_19_CONTENT.txt": {
-      "sha256": "7a0fe90b140fdb22ed9fbea49cc66232dd5e530ec54cb2957e601c736f009f43",
+      "sha256": "64c03c04eb8217eeae987035b4a8c09d16f946ade727e5547ff808b136206400",
       "git_blob_main": "a595dd64a64c301de821f09388b666400ff72fff",
       "git_blob_worktree": "a595dd64a64c301de821f09388b666400ff72fff",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "7a0fe90b140fdb22ed9fbea49cc66232dd5e530ec54cb2957e601c736f009f43",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_1___Core_Manual.txt": {
-      "sha256": "d82934a1f5bab5b6d528cb93a35c23050a7a6353ef7cb56185fe1b6ebbb2dcd5",
+      "sha256": "07c8edff0f0f3020462f0f15dd1c6ff53bf5de0dc866009cac954248474727b1",
       "git_blob_main": "d9c8f4b76fb391212f6f9495c5b9889e0b166b69",
       "git_blob_worktree": "d9c8f4b76fb391212f6f9495c5b9889e0b166b69",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "d82934a1f5bab5b6d528cb93a35c23050a7a6353ef7cb56185fe1b6ebbb2dcd5",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_20_CONTENT.txt": {
-      "sha256": "2db83c470b9f28a19b12078d319c3fc6524da3a6f61de78cbccd17aea27ddb4f",
+      "sha256": "c0e3bf09b67a9e80bf47d1b894efd5f344ffa25c0ce92d0464a6a7542e025ba2",
       "git_blob_main": "192e870bde5cb60841ac82a979de20ae8dbf4917",
       "git_blob_worktree": "192e870bde5cb60841ac82a979de20ae8dbf4917",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "2db83c470b9f28a19b12078d319c3fc6524da3a6f61de78cbccd17aea27ddb4f",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_21_CONTENT.txt": {
-      "sha256": "475d6137d7ab10c7d0e052b4bb370dc25d3db3484e731f3e788a9b10b37d1e06",
+      "sha256": "09f0e5b14e93d3a131c63f5c5579abc282e51adbabc025025f0a9a76e1078c48",
       "git_blob_main": "3bd56c1b6f56018c1b46dd88b84f7d2eed785a6a",
       "git_blob_worktree": "3bd56c1b6f56018c1b46dd88b84f7d2eed785a6a",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "475d6137d7ab10c7d0e052b4bb370dc25d3db3484e731f3e788a9b10b37d1e06",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_22_CONTENT.txt": {
-      "sha256": "749e24b65483e9debb72786276b75f230078f7258013ce917e184556c6859f28",
+      "sha256": "24830d0fd3580ed9b1a031fdb5deb5db16dc1e4e56c1b25c55ae66fddcfd2abb",
       "git_blob_main": "246803bd0088007407bbd994742d6a52e48d7630",
       "git_blob_worktree": "246803bd0088007407bbd994742d6a52e48d7630",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "749e24b65483e9debb72786276b75f230078f7258013ce917e184556c6859f28",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_23_CONTENT.txt": {
-      "sha256": "42b3949ec3f147438e48dd2da1e3333003000fcc7cf2aea1406e010de159c1e9",
+      "sha256": "2e236055415e96bc9d85f0be221d3373cde855ececb0dffa45b4bfe76f0e66d9",
       "git_blob_main": "b8410969098481f071f753c574c3f5d61eeda137",
       "git_blob_worktree": "b8410969098481f071f753c574c3f5d61eeda137",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "42b3949ec3f147438e48dd2da1e3333003000fcc7cf2aea1406e010de159c1e9",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_24_CONTENT.txt": {
-      "sha256": "0f6eb3c8fd32b44b1365ad3f97c09ba4d49d38743e4d79b08d37bec01ecaa2c8",
+      "sha256": "579b41fc6ea835beeb6906315ecfcd7e811d30a52abca349419f35e73224f3ca",
       "git_blob_main": "163142046601a1f97d0b5ee3a116bf8e9376f4d2",
       "git_blob_worktree": "163142046601a1f97d0b5ee3a116bf8e9376f4d2",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "0f6eb3c8fd32b44b1365ad3f97c09ba4d49d38743e4d79b08d37bec01ecaa2c8",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_25_CONTENT.txt": {
-      "sha256": "e7c71af11a24ba7675dcb4d1f41d7def5dcb7b7a68eb11ef6f2934078a10af83",
+      "sha256": "0176e3658de5f4ab9daf38ffff9daabb30e20dd14a5dc5cf96627b233de77c11",
       "git_blob_main": "9285ec4b81329d2a53c4416a54b34bc3a3f01221",
       "git_blob_worktree": "9285ec4b81329d2a53c4416a54b34bc3a3f01221",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "e7c71af11a24ba7675dcb4d1f41d7def5dcb7b7a68eb11ef6f2934078a10af83",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_26_CONTENT.txt": {
-      "sha256": "92530501bfb5e8dc6b4f6eabcc59c3b0d9b227851b2ed8004318c47fff925e20",
+      "sha256": "5d720c3014ffd2792be99b225e80743dd3d2c2905aa72aa98400c0b69fceb153",
       "git_blob_main": "4d00653408c328f43ea5aa1a1b22039616a24032",
       "git_blob_worktree": "4d00653408c328f43ea5aa1a1b22039616a24032",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "92530501bfb5e8dc6b4f6eabcc59c3b0d9b227851b2ed8004318c47fff925e20",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_27_CONTENT.txt": {
-      "sha256": "b1fd4fb9d2b856c863820c888353197fd2293c6b1ab6e30c445604c83bb2452b",
+      "sha256": "5bc36224ceb2ce9568ea088522031ecf5bcf9a9b4bcac08a8ad9b50036f5fd47",
       "git_blob_main": "09b4a99d8d3ce2243c0da2611826eb25ceacf3a9",
       "git_blob_worktree": "09b4a99d8d3ce2243c0da2611826eb25ceacf3a9",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "b1fd4fb9d2b856c863820c888353197fd2293c6b1ab6e30c445604c83bb2452b",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_28_CONTENT.txt": {
-      "sha256": "f1b9b99e1c39ee5c05c2bfb33dbd15b848824526b306537b1905a73051ccae6f",
+      "sha256": "cb51c0a521f6abc0f1ae901bedd38d700b769d5f3c2898cdd88fcc8e988c9e18",
       "git_blob_main": "72e4150dd79ea8db90367dacda5d8902a467d92d",
       "git_blob_worktree": "72e4150dd79ea8db90367dacda5d8902a467d92d",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "f1b9b99e1c39ee5c05c2bfb33dbd15b848824526b306537b1905a73051ccae6f",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_29_CONTENT.txt": {
-      "sha256": "3d80788ed402910ba96a20564d084a99e5b6a420c65bb4d8df5f00d8e0877df4",
+      "sha256": "0addf43d1288dd8ac441b2ed82744b76ae81c5110513383e693bf6083cce16b1",
       "git_blob_main": "9a21c83151e04c2e54a6d56c9dd8f4db7c1c66ad",
       "git_blob_worktree": "9a21c83151e04c2e54a6d56c9dd8f4db7c1c66ad",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "3d80788ed402910ba96a20564d084a99e5b6a420c65bb4d8df5f00d8e0877df4",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_2___Cascade_Activation_Analysis.txt": {
-      "sha256": "e852170acec10c30728ec3b605724f3ecd29f9aa591b0d1e5b6bebf8a696d03b",
+      "sha256": "64c9be132430e472b53898e9b5efef4a8e1d61f05ece7c1a319f9d5e3986db6c",
       "git_blob_main": "f177f74821e4289af76ddf8fbdf89d3923f1a9ca",
       "git_blob_worktree": "f177f74821e4289af76ddf8fbdf89d3923f1a9ca",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "e852170acec10c30728ec3b605724f3ecd29f9aa591b0d1e5b6bebf8a696d03b",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_30_CONTENT.txt": {
-      "sha256": "d45acbe97dd1dde779e8934b7872cb9d2d21f883ff47585ec2ea368d36d3e955",
+      "sha256": "f6b4e731784bf87a24cf831f629598b4d27f6b72d5100b91e14ec5738cc8c1d9",
       "git_blob_main": "2c45a76d5bcc171e0e847dcac3ee158e4337546e",
       "git_blob_worktree": "2c45a76d5bcc171e0e847dcac3ee158e4337546e",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "d45acbe97dd1dde779e8934b7872cb9d2d21f883ff47585ec2ea368d36d3e955",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_31_CONTENT.txt": {
-      "sha256": "574ecb46e749aa2ebce6ab72458b5c5870ff92231572fd8a2076cb21295dc071",
+      "sha256": "a8ec34a98a3073dbd68d1a9a8918879066e8abea9ed7680363fcb110e52d4468",
       "git_blob_main": "e4a3ffa843750f059a644038634c8c02aabd2de1",
       "git_blob_worktree": "e4a3ffa843750f059a644038634c8c02aabd2de1",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "574ecb46e749aa2ebce6ab72458b5c5870ff92231572fd8a2076cb21295dc071",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_32_CONTENT.txt": {
-      "sha256": "5999bf5f5b047c1eca84ab5713c1fdfa5e4adea389cfda610ce5989dcd9c66d9",
+      "sha256": "3cadee4af9bc432fddc95a72c2172f39e3c399034e0ce6f25e6370698d55855f",
       "git_blob_main": "d337ab75cac60a605ad7dc7e47ee3bf70bab1202",
       "git_blob_worktree": "d337ab75cac60a605ad7dc7e47ee3bf70bab1202",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "5999bf5f5b047c1eca84ab5713c1fdfa5e4adea389cfda610ce5989dcd9c66d9",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_3___Cascade_Methodology.txt": {
-      "sha256": "0467f4277fc748d6eff9e36ae1a431329bc3838d98e5a1174e96edfe348502c1",
+      "sha256": "52d24aecc190b6683cfea874c6247fd5c9f2d680ccd3b96e112125a342b1fe99",
       "git_blob_main": "c8661ba0a230510eb6442f8536dc607af522a819",
       "git_blob_worktree": "c8661ba0a230510eb6442f8536dc607af522a819",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "0467f4277fc748d6eff9e36ae1a431329bc3838d98e5a1174e96edfe348502c1",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_4___Stall_Harvest.txt": {
-      "sha256": "7a0fe90b140fdb22ed9fbea49cc66232dd5e530ec54cb2957e601c736f009f43",
+      "sha256": "64c03c04eb8217eeae987035b4a8c09d16f946ade727e5547ff808b136206400",
       "git_blob_main": "a595dd64a64c301de821f09388b666400ff72fff",
       "git_blob_worktree": "a595dd64a64c301de821f09388b666400ff72fff",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "7a0fe90b140fdb22ed9fbea49cc66232dd5e530ec54cb2957e601c736f009f43",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/PART_5___P90P_Distribution_Tracker.txt": {
-      "sha256": "2db83c470b9f28a19b12078d319c3fc6524da3a6f61de78cbccd17aea27ddb4f",
+      "sha256": "c0e3bf09b67a9e80bf47d1b894efd5f344ffa25c0ce92d0464a6a7542e025ba2",
       "git_blob_main": "192e870bde5cb60841ac82a979de20ae8dbf4917",
       "git_blob_worktree": "192e870bde5cb60841ac82a979de20ae8dbf4917",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "2db83c470b9f28a19b12078d319c3fc6524da3a6f61de78cbccd17aea27ddb4f",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/STRATEGY_GAP_ANALYSIS.md": {
-      "sha256": "85d87b8aea41ae32ddfb90886abe1d8896d82b048794b23ea02b3730961d82f8",
+      "sha256": "9a2e8cc396427ba0abea460d8a574756f0db63154bf30fb2b72b523142f890cf",
       "git_blob_main": "25c7f364cc07eca4649c78b82e1543c167ecceb5",
       "git_blob_worktree": "25c7f364cc07eca4649c78b82e1543c167ecceb5",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "85d87b8aea41ae32ddfb90886abe1d8896d82b048794b23ea02b3730961d82f8",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/reports/STRATEGY_TRACKER.md": {
-      "sha256": "d5126c24a54d4a15958eace2446a4de083088514f20ea9ccff895121a689a1d0",
+      "sha256": "2d81da4ca2360f3000c22fffade4c03e402486c0aae3b96a3abac893c8673b5c",
       "git_blob_main": "26383fedebb815031fb4b2b83aeba35541de2a44",
       "git_blob_worktree": "26383fedebb815031fb4b2b83aeba35541de2a44",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "d5126c24a54d4a15958eace2446a4de083088514f20ea9ccff895121a689a1d0",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/research/CEREBUS_STRATEGY_ANALYSIS.md": {
-      "sha256": "2f692d6c63566ffb43fcba6ac595bc863ead3312307dda7b6b7df59282a66b49",
+      "sha256": "6f101882d8300f2ecf7cc305d6975e3201f6eb0ac9231256b037f63487a5e0e7",
       "git_blob_main": "dc15cbd6263882567bc56c1a9bc97bb58941e2bd",
       "git_blob_worktree": "dc15cbd6263882567bc56c1a9bc97bb58941e2bd",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "2f692d6c63566ffb43fcba6ac595bc863ead3312307dda7b6b7df59282a66b49",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/research/P90_DEEP_DIVE.md": {
-      "sha256": "97de04f8669c69839d47b5a9bf5d80d11d605215d93207de017e9fc60f35dc0c",
+      "sha256": "f24a0d3e73c65707e9703b8686d092afd66479a5b74792cd950d714dcb1eae09",
       "git_blob_main": "fc138ab136daac0c83820696e00f6665d814fff9",
       "git_blob_worktree": "fc138ab136daac0c83820696e00f6665d814fff9",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "97de04f8669c69839d47b5a9bf5d80d11d605215d93207de017e9fc60f35dc0c",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/results/optimizer_v2_20260517_060543.json": {
-      "sha256": "63da84c537f4d0cbb0e1acecde4e1efaa7416f3fc1d439b0e57fe38f5cead015",
+      "sha256": "d248af5e38de329a3c32df7bd945d8a8d3513acfb961788e199e9df217970847",
       "git_blob_main": "5ffc692845a6efd29f066bcd5290d6b69e13574e",
       "git_blob_worktree": "5ffc692845a6efd29f066bcd5290d6b69e13574e",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "63da84c537f4d0cbb0e1acecde4e1efaa7416f3fc1d439b0e57fe38f5cead015",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/strategies/CEREBUS_V5_LIVE_PERFECT_FORM.pine": {
-      "sha256": "331d9834ab151bf875fbb4989d9b60bbb3a6a8062f5c5128333788d16079a7cf",
+      "sha256": "164d7d966ab4623fa5204ce3c1f315022ea39866d1ab8e878dabd0d240109d67",
       "git_blob_main": "0e351a33dcd0d0d601a4ae4de6cafbd60b477c17",
       "git_blob_worktree": "0e351a33dcd0d0d601a4ae4de6cafbd60b477c17",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "331d9834ab151bf875fbb4989d9b60bbb3a6a8062f5c5128333788d16079a7cf",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/strategies/__init__.py": {
-      "sha256": "ed7020feb2a7bf6cae9e51bec057e790aa9160e74f81af553d6a11b443a684a9",
+      "sha256": "97fa75c499180121339151c45dd63f1245a85472073080d684e592b0f520816e",
       "git_blob_main": "ebb140af4a2b0c83548e35462a6e64800f914442",
       "git_blob_worktree": "ebb140af4a2b0c83548e35462a6e64800f914442",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "ed7020feb2a7bf6cae9e51bec057e790aa9160e74f81af553d6a11b443a684a9",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     },
     "quant-lab/strategies/p90_cascade_activation.py": {
-      "sha256": "03051f6770b443917206bb474ee0f898ecdb720daaae35d5081db75f4f5ce8dd",
+      "sha256": "a0b6676707b0cc09ab726df7b75e61ec0c4ff6d7c3bacaab4e0fec01561f8e20",
       "git_blob_main": "f7ccfccfa0a0badcb99c14018ac415d4b18e55a9",
       "git_blob_worktree": "f7ccfccfa0a0badcb99c14018ac415d4b18e55a9",
-      "byte_identical_to_main": true
+      "byte_identical_to_main": true,
+      "sha256_previous_worktree_crlf": "03051f6770b443917206bb474ee0f898ecdb720daaae35d5081db75f4f5ce8dd",
+      "sha256_note": "canonical hash of content as stored in git (LF, platform-independent)"
     }
-  }
+  },
+  "sha256_semantics": "canonical SHA-256 of the git blob content (as stored, LF); platform-independent. Previous values were computed from a Windows CRLF checkout and are retained per-file as sha256_previous_worktree_crlf."
 }

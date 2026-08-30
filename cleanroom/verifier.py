@@ -164,8 +164,26 @@ class Verifier:
         return out.strip()
 
     def current_branch(self):
+        # In CI the checkout is detached at the pushed SHA; the branch is
+        # conveyed by GITHUB_REF_NAME.
+        ref_name = os.environ.get("GITHUB_REF_NAME")
+        if ref_name:
+            return ref_name.strip()
         _, out, _ = self.git("rev-parse", "--abbrev-ref", "HEAD")
-        return out.strip()
+        branch = out.strip()
+        if branch == "HEAD":
+            return ref_name or branch
+        return branch
+
+    def resolve_ref(self, name):
+        """Return the full ref name that resolves to `name` (local first, then
+        origin remote-tracking), or None. Detached/CI clones have no local
+        branch refs, only refs/remotes/origin/*."""
+        for cand in ("refs/heads/" + name, "refs/remotes/origin/" + name):
+            _, out, _ = self.git("rev-parse", "--verify", "--quiet", cand)
+            if out.strip():
+                return cand
+        return None
 
     def is_ancestor(self, ancestor, descendant):
         rc, _, _ = self.git("merge-base", "--is-ancestor", ancestor, descendant)
@@ -180,11 +198,16 @@ class Verifier:
     def check_repo_identity(self):
         _, out, _ = self.git("remote", "get-url", self.expected["repository"]["expected_remote"])
         url = out.strip()
-        ok = url == self.expected["repository"]["expected_origin_url"]
+        expected = self.expected["repository"]["expected_origin_url"]
+        # Normalize trailing '/' and '.git' (actions/checkout stores the URL
+        # without the .git suffix).
+        def norm(u):
+            u = u.rstrip("/")
+            return u[:-4] if u.endswith(".git") else u
+        ok = url != "" and norm(url) == norm(expected)
         self.record("repo_identity", "origin remote URL matches expected repository identity",
                     STATUS_PASS if ok else STATUS_FAIL,
-                    {"expected": self.expected["repository"]["expected_origin_url"],
-                     "observed": url or "(none)"})
+                    {"expected": expected, "observed": url or "(none)"})
 
     def check_cleanroom_branch(self):
         branch = self.current_branch()
@@ -218,13 +241,17 @@ class Verifier:
                     {"dirty_entries": dirty[:50], "dirty_count": len(dirty), "rc": rc})
 
     def check_main_unchanged(self):
-        _, out, _ = self.git("rev-parse", "refs/heads/main")
-        observed = out.strip()
+        ref = self.resolve_ref("main")
+        observed = ""
+        if ref:
+            _, out, _ = self.git("rev-parse", "--verify", ref)
+            observed = out.strip()
         expected = self.expected["main"]["expected_sha"]
         ok = observed == expected
         self.record("main_unchanged", "main branch remains at expected SHA",
                     STATUS_PASS if ok else STATUS_FAIL,
-                    {"expected": expected, "observed": observed or "(no local main ref)",
+                    {"expected": expected, "observed": observed or "(no main ref found)",
+                     "resolved_ref": ref,
                      "note": "reported without altering main if it moved"})
 
     def _ref_check(self, cid, desc, names, exact_required, protected):
@@ -369,10 +396,27 @@ class Verifier:
                 entry["error"] = "unreadable: %s" % exc
                 failures.append(entry)
                 continue
-            entry["sha256_match"] = digest == info.get("sha256")
             rc, blob, _ = self.git("hash-object", path)
             entry["git_blob"] = blob.strip() if rc == 0 else None
-            entry["blob_matches_main"] = (blob.strip() == info.get("git_blob_main"))
+            entry["blob_matches_main"] = (entry["git_blob"] == info.get("git_blob_main"))
+            # The manifest sha256 is the CANONICAL hash (content as stored in
+            # git, LF). Checkouts may normalize line endings per platform
+            # (core.autocrlf), so accept the working-file hash OR the
+            # canonical blob hash. Byte-identity vs main is the authoritative
+            # invariant (git_blob_main == worktree blob).
+            canonical_digest = None
+            if entry["git_blob"]:
+                try:
+                    proc = subprocess.run(["git", "-C", self.repo_root, "cat-file", "blob",
+                                           entry["git_blob"]], capture_output=True)
+                    if proc.returncode == 0:
+                        canonical_digest = hashlib.sha256(proc.stdout).hexdigest()
+                except Exception:
+                    canonical_digest = None
+            entry["sha256_match"] = (digest == info.get("sha256")
+                                      or canonical_digest == info.get("sha256"))
+            entry["sha256_worktree"] = digest
+            entry["sha256_canonical"] = canonical_digest
             if not (entry["sha256_match"] and entry["blob_matches_main"]):
                 failures.append(entry)
             results[path] = entry
@@ -452,7 +496,12 @@ class Verifier:
             problems.append("LFS cache below expected minimum size")
         tracked_counts = {}
         for ref, expected_count in self.expected["lfs"]["expected_tracked_counts"].items():
-            rc, out, _ = self.git("lfs", "ls-files", ref)
+            full_ref = self.resolve_ref(ref)
+            if full_ref is None:
+                problems.append("cannot resolve ref for lfs ls-files: %s" % ref)
+                tracked_counts[ref] = {"expected": expected_count, "observed": None}
+                continue
+            rc, out, _ = self.git("lfs", "ls-files", full_ref)
             if rc != 0:
                 problems.append("git lfs ls-files failed for %s" % ref)
                 tracked_counts[ref] = {"expected": expected_count, "observed": None}
@@ -541,11 +590,19 @@ class Verifier:
         # check answers "did the cleanroom introduce credentials". The
         # repo-wide historical result is documented separately in the report.
         scan_base = cfg.get("scan_base", "main")
+        resolved_base = self.resolve_ref(scan_base)
+        if resolved_base is None:
+            self.record("gitleaks_secret_scan",
+                        "gitleaks secret scan of cleanroom commits (authoritative, scoped %s..HEAD)" % scan_base,
+                        STATUS_BLOCKED,
+                        {"reason": "cannot resolve scan base ref %s" % scan_base,
+                         "note": "a regex scan is NOT equivalent to gitleaks"})
+            return
         tmp_report = os.path.join(tempfile.gettempdir(), "gitleaks-report-cleanroom.json")
         if os.path.exists(tmp_report):
             os.remove(tmp_report)
         cmd = [binary, "detect", "--no-banner", "--source", self.repo_root,
-               "--log-opts=%s..HEAD" % scan_base,
+               "--log-opts=%s..HEAD" % resolved_base,
                "--report-format", "json", "--report-path", tmp_report]
         cfg_path = cfg.get("config")
         if cfg_path:
