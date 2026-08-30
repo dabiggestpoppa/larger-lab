@@ -16,7 +16,9 @@ JOB_STATES = [
 JOB_TRANSITIONS = {
     "pending": ["scheduled", "cancelled", "expired"],
     "scheduled": ["leased", "cancelled", "expired"],
-    "leased": ["running", "leased", "succeeded", "failed", "cancelled", "expired"],
+    # leased -> pending: surrender/abandon returns the job for re-claim
+    # (JobStore/PgJobStore surrender_lease and recover_abandoned_leases rely on it)
+    "leased": ["pending", "running", "leased", "succeeded", "failed", "cancelled", "expired"],
     "running": ["succeeded", "failed", "cancelled", "quarantined"],
     "succeeded": [],
     "failed": ["pending", "cancelled", "quarantined"],

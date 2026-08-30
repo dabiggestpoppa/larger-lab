@@ -146,10 +146,15 @@ def test_wrong_lease_token_fenced(pg):
 
 
 def test_pg_unavailable_fails_closed(pg):
+    # Use a DEDICATED connection so the module-shared `pg` fixture survives
+    # for the following tests (closing it poisoned _clean_db at setup).
+    import psycopg2
     from oce_control.pg_store import PgJobStore
-    store = PgJobStore(pg)
-    # simulate real service failure: terminate the connection
-    pg.close()
+    conn2 = psycopg2.connect(oc.dsn())
+    conn2.autocommit = False
+    store = PgJobStore(conn2)
+    # simulate real service failure: terminate this connection
+    conn2.close()
     with pytest.raises(Exception):
         store.submit_job(
             job_type="unit_test", submitting_actor="po-test01",
