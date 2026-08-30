@@ -11,13 +11,13 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I01 — base models + provider protocol (common foundation) |
+| Current checkpoint | SENSOR-B3-I04R1 COMPLETE — COMMON CONFORMANCE HARDENING + LEDGER RECONCILIATION |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 provider-role decision ratified; Bloc 3 common foundation (I01-I04) authorized; first provider adapter NOT authorized until operator review after I04 |
+| Operator review state | RATIFIED — Bloc 2 provider-role decision ratified; Bloc 3 common foundation (I01-I04) authorized; common foundation hardened by I04R1; first provider adapter NOT authorized until operator review after I04R1 |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
-| Bloc 3 implementation_authorized | TRUE — common foundation only (SENSOR-B3-I01..I04) |
+| Bloc 3 implementation_authorized | TRUE — common foundation only (SENSOR-B3-I01..I04 + I04R1) |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
@@ -59,7 +59,12 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I13R1B | 4 | 4 | 0 |
 | SENSOR-B2-I13R1C | 2 | 2 | 0 |
 | SENSOR-B2-I14A | 7 | 7 | 0 |
-| cumulative | 525 | 525 | 0 |
+| SENSOR-B3-I01 | 19 | 19 | 0 |
+| SENSOR-B3-I02 | 25 | 25 | 0 |
+| SENSOR-B3-I03 | 25 | 25 | 0 |
+| SENSOR-B3-I04 | 14 | 14 | 0 |
+| SENSOR-B3-I04R1 | f929ae6f | 28 | 0 |
+| cumulative | 636 | 636 | 0 |
 
 ## External / provider blockers
 
@@ -158,10 +163,20 @@ that is updated at every staged checkpoint.
   (source_promotion_candidates.yaml is the ONLY input list).  Status =
   COMMON_FRAMEWORK_READY; PROVIDER_ADAPTER_READY = NO (zero adapters built).
   Bloc 3 implementation evidence: `evidence/bloc_03/`.
+- SENSOR-B3-I04R1 COMPLETE — COMMON CONFORMANCE HARDENING: strict full-I14
+  promotion-bound enforcement (sensor/role/history/PIT/pin/redundancy/access/
+  hazards/evidence), fail-closed PRODUCTION_CANDIDATE vs FRAMEWORK_TEST mode,
+  live-vs-historical mode separation (CURRENT_ONLY -> live, no auto-granted
+  live from historical; HISTORICAL -> live NONE), strict promotion-file
+  parsing (unknown/missing required values fail closed), real behavioral
+  empty-valid vs unsupported + schema-drift fail-closed + retry-classifier
+  conformance via the I03 classifier, valid-typed adversarial fixtures.
+  636 passed / 0 failed, ruff clean, zero network calls, zero provider
+  adapters built.  Evidence: `evidence/bloc_03/BLOC_03_I04R1_HARDENING.md`.
 - `next_checkpoint_authorized = FALSE` — SENSOR-B3-I05 (Kraken) and any
-  provider adapter await OPERATOR REVIEW of the common foundation.
+  provider adapter await OPERATOR REVIEW of the hardened common foundation.
   - Full evidence packet: `evidence/bloc_02/` (01-11 evidence; 12-16 decision).
-  - Bloc 3 implementation evidence: `evidence/bloc_03/` (added by I01-I04).
+  - Bloc 3 implementation evidence: `evidence/bloc_03/` (added by I01-I04 + I04R1).
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -216,4 +231,6 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I01 | 6ce9fb5d | base adapter package (providers/base/): controlled vocabularies, FetchRequest/FetchBatch/RawPayloadEnvelope/ResumeToken models, typed error taxonomy, MechanicalProviderAdapter protocol; Bloc 2 probe base renamed base.py -> probe_base.py; tests | 544 passed / 0 failed | PASS | none |
 | SENSOR-B3-I02 | 28a20272 | free-only access gate (Bloc 1 F9 policy + Bloc 3 auth vocabulary, fail closed, runs before transport), deterministic request fingerprint + raw payload integrity hash; tests | 569 passed / 0 failed | PASS | none |
 | SENSOR-B3-I03 | 45b1683a | retry classification + bounded exponential backoff (no geo/access retries), normalized rate-limit snapshots (UNKNOWN valid), cursor-loop/non-monotonic protection, deterministic resume-token round-trip, provider-semantics completion; tests | 594 passed / 0 failed | PASS | none |
-| SENSOR-B3-I04 | (see below) | common provider conformance suite (Q0 contract/Q1 parser/Q2 mechanics) + I14 promotion-file capability binding (allowed_role/history_mode/verified_history/PIT bounds); fake adapter passes, degraded adapters fail exact invariants; bloc_03 evidence area; tests | 608 passed / 0 failed | PASS | none |
+| SENSOR-B3-I04 | 41296e1c | common provider conformance suite (Q0 contract/Q1 parser/Q2 mechanics) + I14 promotion-file capability binding (allowed_role/history_mode/verified_history/PIT bounds); fake adapter passes, degraded adapters fail exact invariants; bloc_03 evidence area; tests | 608 passed / 0 failed | PASS | none |
+| SENSOR-B3-I04R1A | f929ae6f | conformance hardening: full I14 promotion-bound enforcement, PRODUCTION_CANDIDATE/FRAMEWORK_TEST modes (fail closed by default), live-vs-historical mode separation, strict promotion-file parsing, schema-drift classifier (no zero coercion), behavioral empty-valid/schema/retry conformance, valid-typed adversarial fixtures, declared_capabilities removed; tests | 636 passed / 0 failed | PASS | none |
+| SENSOR-B3-I04R1B | (see below) | I04R1 hardening evidence + full ledger reconciliation (current-state, test counts, I04 SHA, I04R1 narrative, next-checkpoint flags) | 636 passed / 0 failed (re-run) | PASS | none |
