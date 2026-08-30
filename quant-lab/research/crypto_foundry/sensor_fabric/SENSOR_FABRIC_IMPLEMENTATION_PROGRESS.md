@@ -11,20 +11,21 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I04R2 COMPLETE — FINAL COMMON-FOUNDATION CONFORMANCE CLOSURE |
+| Current checkpoint | SENSOR-B3-I05 COMPLETE — KRAKEN_FUTURES ADAPTER OFFLINE (PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE, pending operator review) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation OPERATOR REVIEWED / ACCEPTED FOR FIRST PROVIDER (I04R2-RATIFY); SENSOR-B3-I05 (Kraken) implementation in progress |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation OPERATOR REVIEWED / ACCEPTED FOR FIRST PROVIDER (I04R2-RATIFY); SENSOR-B3-I05 (Kraken) IMPLEMENTED OFFLINE — awaiting operator review of PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = KRAKEN_FUTURES ONLY |
-| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=0 (Kraken building) · PROVIDER_PARSER_CONFORMANCE=NOT_YET_APPLICABLE · NETWORK_VALIDATION=NOT_YET_RUN |
+| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=1 (KRAKEN_FUTURES, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken; PRODUCTION_CANDIDATE mode) · NETWORK_VALIDATION=NOT_YET_RUN |
+| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE beyond Kraken (I05 Kraken ONLY; I06 Gate NOT authorized) |
-| next_checkpoint_authorized | FALSE (I05 in progress; await operator review after) |
+| next_checkpoint_authorized | FALSE (I05 complete offline; I06 Gate recommended but NOT authorized — await operator review) |
 
 ## Test counts (cumulative)
 
@@ -67,7 +68,11 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I04 | 14 | 14 | 0 |
 | SENSOR-B3-I04R1 | f929ae6f | 28 | 0 |
 | SENSOR-B3-I04R2 | 48c639ed | 30 | 0 |
-| cumulative | 666 | 666 | 0 |
+| SENSOR-B3-I04R2-RATIFY | 0 (governance) | — | — |
+| SENSOR-B3-I05A | dc9b71af | 18 | 0 |
+| SENSOR-B3-I05B | 490cd111 | 78 | 0 |
+| SENSOR-B3-I05C | (evidence only) | — | — |
+| cumulative | 762 | 762 | 0 |
 
 ## External / provider blockers
 
@@ -159,9 +164,18 @@ that is updated at every staged checkpoint.
   implementation authorized = KRAKEN_FUTURES ONLY.  current checkpoint =
   SENSOR-B3-I05.  next_provider_authorized = FALSE beyond Kraken.  I06 Gate
   NOT authorized.
-- SENSOR-B3-I05 (Kraken) — IN PROGRESS (offline code + evidence + fixtures;
-  network smoke NOT run; I14 source_promotion_candidates.yaml is the ONLY
-  production capability input list).
+- SENSOR-B3-I05 COMPLETE (OFFLINE) — KRAKEN_FUTURES production adapter
+  implemented on the common foundation with evidence-backed native acquisition
+  modes (Market Analytics REST_RANGE / TIME_RANGE, epoch-second since/to,
+  interval in seconds, result.more resume) grounded in the I14 promotion set
+  and Bloc 2 I13R1 evidence.  Exactly six promoted paths ADAPTER_READY;
+  MECHANICAL_TRADE + MECHANICAL_BOOK_SNAPSHOT stay typed unsupported.
+  PRODUCTION_CANDIDATE conformance 0 failed; 762 passed / 0 failed; ruff
+  clean; FAKE TRANSPORT ONLY — zero network calls; no Bloc 4 code.
+  Evidence: `evidence/bloc_03/BLOC_03_I05_KRAKEN_IMPLEMENTATION_EVIDENCE.md`.
+- Recommended next checkpoint: **SENSOR-B3-I06 — GATE_FUTURES**, but it is
+  NOT authorized (`next_checkpoint_authorized = FALSE`); stop and await
+  operator review of PASS_SENSOR_B3_I05_KRAKEN_ADAPTER_OFFLINE.
 
 ## Prior next-checkpoint history
 
@@ -268,3 +282,7 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I04R1B | (see below) | I04R1 hardening evidence + full ledger reconciliation (current-state, test counts, I04 SHA, I04R1 narrative, next-checkpoint flags) | 636 passed / 0 failed (re-run) | PASS | none |
 | SENSOR-B3-I04R2A | 48c639ed | behavioral dispatch + empty-valid/unsupported (Issue 1/2), valid-typed adversarial fixtures (Issue 3/11), full live/archive/access/auth + history-scope surface binding (Issue 4/9), resolving evidence refs (Issue 5), strict promotion-file structure (Issue 6), auth override removed (Issue 7), HistoryScope/no manufactured native mode (Issue 8), geo/access/payment never retried (Issue 7); tests | 666 passed / 0 failed | PASS | none |
 | SENSOR-B3-I04R2B | 7011c544 | I04R2 closure evidence + full ledger reconciliation (current-state, test counts, commit log) | 666 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I04R2-RATIFY | 9fb266fd | governance only: operator accepts common foundation for Kraken implementation (I05 authorized, KRAKEN_FUTURES ONLY; I06 Gate NOT authorized) | — | PASS | none |
+| SENSOR-B3-I05A | dc9b71af | base native-evidence seam (ProviderNativeCapabilityEvidence) + q0_native_mode_evidence conformance gate + adversarial tests | 684 passed / 0 failed | PASS | none |
+| SENSOR-B3-I05B | 490cd111 | Kraken package: request builders, provider-native parsers, typed error mapping, KrakenAdapter + fake-transport tests | 762 passed / 0 failed | PASS | none |
+| SENSOR-B3-I05C | (see reconciliation) | Kraken fixtures/manifest, README, implementation evidence, readiness matrix, ledger | 762 passed / 0 failed (re-run) | PASS | none |
