@@ -114,7 +114,10 @@ def _to_datetime(value: Any) -> datetime | None:
             return None
     if isinstance(value, str):
         try:
-            return datetime.fromisoformat(value)  # py3.11+ accepts trailing Z
+            dt = datetime.fromisoformat(value)  # py3.11+ accepts trailing Z
+            if dt.tzinfo is None:  # normalize naive ISO to UTC-aware (no tz-mixing)
+                dt = dt.replace(tzinfo=UTC)
+            return dt
         except ValueError:
             pass
         try:

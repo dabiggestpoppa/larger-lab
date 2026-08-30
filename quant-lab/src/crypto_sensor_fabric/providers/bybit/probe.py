@@ -154,6 +154,14 @@ class BybitCapabilityProbe(RestCapabilityProbeBase):
     def classify_failure(
         self, http_status: int | None, body: Any
     ) -> ProbeFailureClass:
+        # OBSERVED LIVE (SENSOR-B2-I13): Bybit market endpoints are served via
+        # Amazon CloudFront which returns HTTP 403 with a country-block message
+        # for restricted regions — geo evidence, never treated as an auth failure.
+        if http_status is not None and http_status >= 400:
+            text = str(body)
+            low = text.lower()
+            if "cloudfront" in low or "blocked access from your country" in low:
+                return ProbeFailureClass.F_ACCESS_GEO
         ret = self._error_label_class(body)
         if ret is not None:
             return ret

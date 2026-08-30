@@ -59,13 +59,15 @@ class DeribitCapabilityProbe(RestCapabilityProbeBase):
 
     native_instruments = NATIVE_INSTRUMENTS
 
-    #: rows sit under result.trades / result.data; the book is the result dict
+    #: rows sit under result.trades; funding history result IS a raw list
+    # (observed LIVE: get_funding_rate_history returns result as a list, not
+    # {data: [...]}) [SENSOR-B2-I13].  The book is the result dict.
     result_key_sensors: ClassVar[dict[SensorFamily, str]] = {
         SensorFamily.MECHANICAL_TRADE: "trades",
         SensorFamily.MECHANICAL_LIQUIDATION: "trades",
-        SensorFamily.MECHANICAL_FUNDING: "data",
     }
     book_in_result_sensors = frozenset({SensorFamily.MECHANICAL_BOOK_SNAPSHOT})
+    envelope_is_list_sensors = frozenset({SensorFamily.MECHANICAL_FUNDING})
 
     #: timestamp-window + has_more pagination
     cursor_paginated_sensors = frozenset(

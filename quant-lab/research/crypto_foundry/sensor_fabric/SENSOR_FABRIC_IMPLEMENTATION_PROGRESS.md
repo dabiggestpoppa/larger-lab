@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I12R1 (A–D) DONE (pre-live contract audit, repairs, regenerated packet); I13 live probing NOT YET AUTHORIZED — awaiting operator review |
+| Current checkpoint | SENSOR-B2-I13 DONE — first controlled live capability evidence run (47 attempts, 23 verified samples, 8 hard geo blocks); I14 NOT authorized |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -59,7 +59,11 @@ that is updated at every staged checkpoint.
 
 ## External / provider blockers
 
-- None yet — Bloc 1 makes no external calls by design.
+- BINANCE_USDM REST (`fapi.binance.com`): F_ACCESS_GEO from this region (HTTP 451 with "Service unavailable from a restricted location … Eligibility" on all four /fapi/v1 sensors). The public data.binance.vision archive is REACHABLE from the same region (OI + aggTrades history verified at 2022) — proves REST_BLOCKED ≠ ARCHIVE_BLOCKED.
+- BYBIT_LINEAR (`bybit.com` via CloudFront): F_ACCESS_GEO from this region (403 hard block on all four sensors). No bypass attempted.
+- GATE_FUTURES `contract_stats`: no GEO/AUTH issue on the public surface; but historical `from` beyond 180 days is rejected (`INVALID_PARAM_VALUE: from time exceeds 180-day limit`) — recent-only for contract_stats. Funding endpoint returned `INVALID_CREDENTIALS: not authenticated` (F_ACCESS_AUTH) on the `/funding_rates` recent-control sample, contradicting free-public expectation.
+- KRAKEN_FUTURES Market Analytics: reachable; verified live current + 2022/2024 historical buckets (OI/funding/basis at 2022-06-15), but `/history` trade and `/orderbook` book snapshots return F_SCHEMA_CHANGED on the current API surface.
+- COINALYZE: no local free API key configured — recorded CREDENTIAL_NOT_CONFIGURED (4 scopes NOT_ATTEMPTED), never AUTH_BLOCKED.
 
 ## Data blockers
 
@@ -72,7 +76,16 @@ that is updated at every staged checkpoint.
 
 ## Live probe status
 
-- NOT STARTED — Bloc 2 owns capability probes.
+- SENSOR-B2-I13 COMPLETE — first controlled live capability evidence run executed
+  (probe_run_id `bloc02_i13_...`, 47 attempts, 23 verified samples / 14 failed / 6
+  empty-valid / 4 not-attempted). Live probe runner: `scripts/bloc_02_i13_live.py`
+  (sequential, bounded retry, low concurrency, gitignored raw evidence under
+  `quant-lab/data/`, sanitized packet under `evidence/bloc_02/`). I14 NOT authorized.
+- Live contract corrections from observed evidence: Gate `contract_stats`
+  `interval` is a STRING bucket ("1h"), not seconds; Deribit funding `get_funding_rate_history`
+  result is a raw LIST (not `{data:[...]}`); Bybit CloudFront country block is F_ACCESS_GEO,
+  not auth; Kraken analytics `data` may be a dict-of-lists for some types. Each recorded in
+  the probe module + contradiction files.
 
 ## Source-contract repairs
 
@@ -168,4 +181,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I12R1A | 4173e980 | Kraken Market Analytics repair + Gate public contract_stats positioning / seconds `from`; per-sensor absolute URLs; golden + negative tests | 470 passed / 0 failed | PASS | none |
 | SENSOR-B2-I12R1B | 414afca3 | Binance OI absolute route / Bybit OI units + funding pagination / OKX funding /public route; golden + negative tests | 477 passed / 0 failed | PASS | none |
 | SENSOR-B2-I12R1C | 40b5cd02 | Deribit/Coinalyze/Bitfinex audit, CREDENTIAL_NOT_CONFIGURED, live_probe_contracts.yaml manifest + validation tests | 491 passed / 0 failed | PASS | none |
-| SENSOR-B2-I12R1D | (head) | regenerated pre-live evidence packet from corrected registry + full revalidation | 491 passed / 0 failed | PASS | none |
+| SENSOR-B2-I12R1D | 0b5d6143 | regenerated pre-live evidence packet from corrected registry + full revalidation | 491 passed / 0 failed | PASS | none |
+| SENSOR-B2-I13 | (head) | first controlled live capability evidence run: live probe runner, probe contract fixes from live observation, sanitized evidence packet (01-11) with real CAPABILITY_CLAIMS / FAILURES / contradictions, progress ledger | 491 passed / 0 failed (offline suite unaffected) | PASS_WITH_LIMITATIONS | Binance REST + Bybit geo-blocked; Gate contract_stats 180-day limit; Kraken /history + /orderbook schema drift; Coinalyze no key |

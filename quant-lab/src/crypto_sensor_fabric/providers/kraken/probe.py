@@ -271,26 +271,43 @@ class KrakenCapabilityProbe(RestCapabilityProbeBase):
         self, body: Any, sensor: SensorFamily
     ) -> list[dict[str, Any]]:
         # {"result": {"timestamp": [...], "data": [...], "more": bool}, "errors": [...]}
+        #
+        # OBSERVED (SENSOR-B2-I13): `data` is a per-type list for some analytics
+        # (e.g. open-interest) but a DICT of per-metric lists parallel to
+        # `timestamp` for others (e.g. funding -> {"rate": [...],
+        # "relativeRate": [...]}).  Both shapes are flattened here.  `timestamp`
+        # is epoch seconds for most analytics types and epoch ms for funding.
         if not isinstance(body, dict) or not isinstance(body.get("result"), dict):
             raise ValueError(  # noqa: TRY004 — type guard feeds F_SCHEMA_CHANGED
                 f"{self.provider_id} analytics payload missing 'result'"
             )
         result = body["result"]
         data = result.get("data")
-        timestamps = result.get("timestamp")
-        if not isinstance(data, list):
-            raise ValueError(  # noqa: TRY004 — type guard feeds F_SCHEMA_CHANGED
-                f"{self.provider_id} analytics result has no data list"
-            )
+        timestamps = result.get("timestamp") or []
         rows: list[dict[str, Any]] = []
-        for i, datum in enumerate(data):
-            if not isinstance(datum, dict):
-                continue
-            row = dict(datum)
-            if isinstance(timestamps, list) and i < len(timestamps):
-                row["timestamp"] = timestamps[i]
-            rows.append(row)
-        return rows
+        if isinstance(data, list):
+            for i, datum in enumerate(data):
+                row: dict[str, Any] = (
+                    dict(datum) if isinstance(datum, dict) else {"value": datum}
+                )
+                if i < len(timestamps):
+                    row["timestamp"] = timestamps[i]
+                rows.append(row)
+            return rows
+        if isinstance(data, dict):
+            # metric -> list of values parallel to `timestamp`
+            metrics = list(data)
+            for i in range(len(timestamps)):
+                row = {"timestamp": timestamps[i]}
+                for metric in metrics:
+                    values = data[metric]
+                    if isinstance(values, list) and i < len(values):
+                        row[metric] = values[i]
+                rows.append(row)
+            return rows
+        raise ValueError(  # noqa: TRY004 — type guard feeds F_SCHEMA_CHANGED
+            f"{self.provider_id} analytics result 'data' has unexpected shape"
+        )
 
     # ------------------------------------------------------------------
     # error envelopes

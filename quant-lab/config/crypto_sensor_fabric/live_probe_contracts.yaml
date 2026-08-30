@@ -147,7 +147,7 @@ GATE_FUTURES:
       end_param: "none (NOT invented)"
       end_unit: "n/a (no `to`; characterized via from/interval/limit)"
       interval_param: interval
-      interval_unit: seconds
+      interval_unit: "string bucket (5m/1h/1d...) — NOT seconds (live-observed I13)"
       limit_param: limit
       pagination: from/interval/limit bounded traversal (provider actual behavior)
       native_unit_notes: PUBLIC market-wide positioning (lsr_taker, lsr_account, top_lsr_*, top_long/short_size, long_users, short_users). /positions is PRIVATE_ACCOUNT_DATA OUT_OF_SCOPE.
@@ -164,7 +164,7 @@ GATE_FUTURES:
       end_param: "none (NOT invented)"
       end_unit: "n/a (no `to`; from/interval/limit)"
       interval_param: interval
-      interval_unit: seconds
+      interval_unit: "string bucket (5m/1h/1d...) — NOT seconds (I13 live-observed)"
       limit_param: limit
       pagination: from/interval/limit bounded traversal
       native_unit_notes: interval OI (contracts + USD notional)
@@ -181,7 +181,7 @@ GATE_FUTURES:
       end_param: "none (NOT invented)"
       end_unit: "n/a (no `to`; from/interval/limit)"
       interval_param: interval
-      interval_unit: seconds
+      interval_unit: "string bucket (5m/1h/1d...) — NOT seconds (I13 live-observed)"
       limit_param: limit
       pagination: from/interval/limit bounded traversal
       native_unit_notes: interval long/short liquidation sizes + USD notional

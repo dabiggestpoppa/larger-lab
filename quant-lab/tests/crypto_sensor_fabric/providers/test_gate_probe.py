@@ -95,7 +95,8 @@ def test_build_probe_request_contract_stats_seconds_from_interval_limit():
     assert query["params"]["contract"] == "BTC_USDT"
     assert query["params"]["from"] == 1655251200  # 10-digit-ish epoch seconds
     assert query["params"]["from"] < 10_000_000_000  # never 13-digit ms
-    assert query["params"]["interval"] == 3600
+    # LIVE OBSERVED (I13): interval is a STRING bucket, not seconds
+    assert query["params"]["interval"] == "1h"
     assert "limit" in query["params"]
     assert "to" not in query["params"]
 

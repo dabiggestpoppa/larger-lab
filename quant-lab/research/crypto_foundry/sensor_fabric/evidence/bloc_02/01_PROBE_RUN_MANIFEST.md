@@ -1,9 +1,9 @@
 # Probe Run Manifest
 
 - fabric_version: `sensor-fabric-v1`
-- probe_version: `sensor-probe-v1`
-- probe_run_id: `bloc02_prelive_claims`
-- run_status: `PARTIAL`
+- probe_version: `sensor-probe-v1-live`
+- probe_run_id: `bloc02_i13_20260830T145503Z`
+- run_status: `COMPLETE_WITH_LIMITATIONS`
 
 ## Status vocabulary (claimed / fixture / live / historical / blocked / unattempted)
 
@@ -20,11 +20,11 @@ Claims are promoted across a category ONLY when supporting observation exists.
 
 ## Attempt ledger
 
-- attempts recorded: 0
-- verified samples: 0
-- failed samples: 0
-- coverage scopes synthesized: 34
-- capability claims: 34
+- attempts recorded: 47
+- verified samples: 23
+- failed samples: 14
+- coverage scopes synthesized: 32
+- capability claims: 32
 
 ## Providers characterized
 
@@ -35,8 +35,8 @@ Claims are promoted across a category ONLY when supporting observation exists.
 | BYBIT_LINEAR | 4 coverage scope(s): MECHANICAL_BOOK_SNAPSHOT, MECHANICAL_FUNDING, MECHANICAL_OPEN_INTEREST, MECHANICAL_TRADE | 4 claim(s) |
 | COINALYZE | 4 coverage scope(s): MECHANICAL_FUNDING, MECHANICAL_LIQUIDATION, MECHANICAL_OPEN_INTEREST, MECHANICAL_POSITIONING | 4 claim(s) |
 | DERIBIT | 4 coverage scope(s): MECHANICAL_BOOK_SNAPSHOT, MECHANICAL_FUNDING, MECHANICAL_LIQUIDATION, MECHANICAL_TRADE | 4 claim(s) |
-| GATE_FUTURES | 6 coverage scope(s): MECHANICAL_BOOK_SNAPSHOT, MECHANICAL_FUNDING, MECHANICAL_LIQUIDATION, MECHANICAL_OPEN_INTEREST, MECHANICAL_POSITIONING, MECHANICAL_TRADE | 6 claim(s) |
-| KRAKEN_FUTURES | 8 coverage scope(s): MECHANICAL_BASIS, MECHANICAL_BOOK_METRIC, MECHANICAL_BOOK_SNAPSHOT, MECHANICAL_FUNDING, MECHANICAL_LIQUIDATION, MECHANICAL_OPEN_INTEREST, MECHANICAL_POSITIONING, MECHANICAL_TRADE | 8 claim(s) |
+| GATE_FUTURES | 5 coverage scope(s): MECHANICAL_FUNDING, MECHANICAL_LIQUIDATION, MECHANICAL_OPEN_INTEREST, MECHANICAL_POSITIONING, MECHANICAL_TRADE | 5 claim(s) |
+| KRAKEN_FUTURES | 7 coverage scope(s): MECHANICAL_BASIS, MECHANICAL_BOOK_METRIC, MECHANICAL_BOOK_SNAPSHOT, MECHANICAL_FUNDING, MECHANICAL_OPEN_INTEREST, MECHANICAL_POSITIONING, MECHANICAL_TRADE | 7 claim(s) |
 | OKX_SWAP | 3 coverage scope(s): MECHANICAL_BOOK_SNAPSHOT, MECHANICAL_FUNDING, MECHANICAL_TRADE | 3 claim(s) |
 
 ## Evidence trust boundaries

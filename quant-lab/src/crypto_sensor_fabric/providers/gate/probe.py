@@ -52,8 +52,11 @@ NATIVE_INSTRUMENTS: ClassVar[dict[str, str]] = {
 #: Settlement suffix for the USD-settled futures family probed.
 GATE_SETTLE = "usdt"
 
-#: Default interval (seconds) used to bucket /contract_stats probe windows.
-GATE_CONTRACT_STATS_INTERVAL_SECONDS = 3600  # 1h
+#: Default interval bucket used for /contract_stats probe windows.
+#: OBSERVED LIVE (SENSOR-B2-I13): interval is a STRING bucket ("5m"/"1h"/
+#: "1d", ...), NOT epoch seconds — passing seconds returns HTTP 400
+#: INVALID_PARAM_VALUE.  `from` remains Unix SECONDS.
+GATE_CONTRACT_STATS_INTERVAL = "1h"
 
 
 class GateCapabilityProbe(RestCapabilityProbeBase):
@@ -156,9 +159,9 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
         sensor = request.sensor_family
         params: dict[str, Any] = {"contract": request.instrument_native}
         if sensor in self.contract_stats_sensors:
-            # epoch SECONDS `from`, explicit interval, limit; no invented `to`.
+            # epoch SECONDS `from`, STRING interval bucket, limit; no `to`.
             params["from"] = int(request.requested_start.timestamp())
-            params["interval"] = GATE_CONTRACT_STATS_INTERVAL_SECONDS
+            params["interval"] = GATE_CONTRACT_STATS_INTERVAL
             params["limit"] = self.page_limit
         elif sensor in self.window_query_sensors:
             params["from"] = int(request.requested_start.timestamp() * 1000)
