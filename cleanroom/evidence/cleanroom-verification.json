@@ -1,0 +1,944 @@
+{
+  "artifact": "cleanroom-verification",
+  "checks": [
+    {
+      "check_id": "repo_identity",
+      "description": "origin remote URL matches expected repository identity",
+      "details": {
+        "expected": "https://github.com/dabiggestpoppa/larger-lab.git",
+        "observed": "https://github.com/dabiggestpoppa/larger-lab"
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "cleanroom_branch",
+      "description": "current branch is the cleanroom branch",
+      "details": {
+        "expected": "agent/repo-cleanroom",
+        "observed": "agent/repo-cleanroom"
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "tested_subject",
+      "description": "HEAD is the tested subject commit",
+      "details": {
+        "expected_subject": "79886c12ae3aa1bf0e375944936304c33bf71a39",
+        "observed_head": "79886c12ae3aa1bf0e375944936304c33bf71a39"
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "clean_worktree",
+      "description": "working tree clean (no tracked modifications, no untracked files)",
+      "details": {
+        "dirty_count": 0,
+        "dirty_entries": [],
+        "rc": 0
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "main_unchanged",
+      "description": "main branch remains at expected SHA",
+      "details": {
+        "expected": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+        "note": "reported without altering main if it moved",
+        "observed": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+        "resolved_ref": "refs/remotes/origin/main"
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "protected_branches",
+      "description": "protected branches exist on origin at expected SHAs (advance tolerated, rewinds fail)",
+      "details": {
+        "advanced_after_observation": [
+          "oce-program-build",
+          "agent/crypto-sensor-fabric-build"
+        ],
+        "failures": [],
+        "results": {
+          "agent/crypto-quant-foundry": {
+            "expected": "9243201b4797b4b98cc446d1f13871668907ca79",
+            "remote": "9243201b4797b4b98cc446d1f13871668907ca79",
+            "status": "EXACT"
+          },
+          "agent/crypto-sensor-fabric-build": {
+            "expected": "aadbc3763304f6ac26acb2e121626edc9c155d90",
+            "remote": "2640a3d190c0e351f08ccf1676621c4b5d31dcd1",
+            "status": "ADVANCED"
+          },
+          "agent/crypto-sensor-fabric-plan": {
+            "expected": "4bb677f9e0266f4dc48405181696019f359ae49f",
+            "remote": "4bb677f9e0266f4dc48405181696019f359ae49f",
+            "status": "EXACT"
+          },
+          "grant-sector-g1-production": {
+            "expected": "3a639d89865188506b8267a433c5bf8464f4ee7b",
+            "remote": "3a639d89865188506b8267a433c5bf8464f4ee7b",
+            "status": "EXACT"
+          },
+          "master": {
+            "expected": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
+            "remote": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
+            "status": "EXACT"
+          },
+          "oce": {
+            "expected": "d3df9eb45aeddd8a3dd40ced24a7f2e1d2f0ff41",
+            "remote": "d3df9eb45aeddd8a3dd40ced24a7f2e1d2f0ff41",
+            "status": "EXACT"
+          },
+          "oce-full-program-planning-books-2-10": {
+            "expected": "028fcdddd90f25c44996510426bd0c0e68bc54f5",
+            "remote": "028fcdddd90f25c44996510426bd0c0e68bc54f5",
+            "status": "EXACT"
+          },
+          "oce-program-build": {
+            "expected": "ac0e239386aa100349f5dc904acdb52345659090",
+            "remote": "da7ba90f02bed23351b65ed4f8c49cb19a916c32",
+            "status": "ADVANCED"
+          },
+          "qcae-capability-acquisition-engine": {
+            "expected": "c4e5df830b541ce6917ddf9622c41cfe09629185",
+            "remote": "c4e5df830b541ce6917ddf9622c41cfe09629185",
+            "status": "EXACT"
+          },
+          "tb-forward-engine": {
+            "expected": "49930215addd388fa183cc452fb64b56bf9a2856",
+            "remote": "49930215addd388fa183cc452fb64b56bf9a2856",
+            "status": "EXACT"
+          }
+        }
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "restored_branches",
+      "description": "restored branches exist on origin at exact expected SHAs",
+      "details": {
+        "advanced_after_observation": [],
+        "failures": [],
+        "results": {
+          "archive/cerebus-local-extra": {
+            "expected": "133364c9cb1cd2127b48421babc14a8d57e1d99a",
+            "remote": "133364c9cb1cd2127b48421babc14a8d57e1d99a",
+            "status": "EXACT"
+          },
+          "archive/content-oc2": {
+            "expected": "aeb3afdde9f0f3478e82083d85431d8722b4c0ea",
+            "remote": "aeb3afdde9f0f3478e82083d85431d8722b4c0ea",
+            "status": "EXACT"
+          },
+          "archive/hermes-02e51f11": {
+            "expected": "d4be1f2302111ea477ffca12529afb669825eadc",
+            "remote": "d4be1f2302111ea477ffca12529afb669825eadc",
+            "status": "EXACT"
+          },
+          "archive/hermes-262c2f34": {
+            "expected": "217f48c297be151fa7987cafc432824bb2de0d34",
+            "remote": "217f48c297be151fa7987cafc432824bb2de0d34",
+            "status": "EXACT"
+          },
+          "archive/hermes-cde01a2a": {
+            "expected": "63474e77b4acd9f0a93da153675c20d3977ebeab",
+            "remote": "63474e77b4acd9f0a93da153675c20d3977ebeab",
+            "status": "EXACT"
+          },
+          "archive/pruned-master-2026-08-15": {
+            "expected": "6922c0838202cd4e00c9233596501892e5df563d",
+            "remote": "6922c0838202cd4e00c9233596501892e5df563d",
+            "status": "EXACT"
+          },
+          "archive/pruned-snapshot-vtuber": {
+            "expected": "d7cb598a8681d6a238287ab5a56f555c0da0d74c",
+            "remote": "d7cb598a8681d6a238287ab5a56f555c0da0d74c",
+            "status": "EXACT"
+          },
+          "archive/review-branch": {
+            "expected": "c79023263bc00e9e1775c603036832c615c39f2b",
+            "remote": "c79023263bc00e9e1775c603036832c615c39f2b",
+            "status": "EXACT"
+          },
+          "capital-routing": {
+            "expected": "43a6473c1bc01bb79efd3b415e482d65640e1226",
+            "remote": "43a6473c1bc01bb79efd3b415e482d65640e1226",
+            "status": "EXACT"
+          },
+          "cerebus-mve-implementation": {
+            "expected": "30359692ccd4c1ce0c7a52096cd64ec4902520ee",
+            "remote": "30359692ccd4c1ce0c7a52096cd64ec4902520ee",
+            "status": "EXACT"
+          },
+          "execution-runtime-foundation": {
+            "expected": "03eb68f8d4c684c4ccaf7b4f93b3fc4e1127a1ee",
+            "remote": "03eb68f8d4c684c4ccaf7b4f93b3fc4e1127a1ee",
+            "status": "EXACT"
+          },
+          "hermes-set-up": {
+            "expected": "b4ef87b7af9b9fafdd9f050e0b90319f76c1e0ff",
+            "remote": "b4ef87b7af9b9fafdd9f050e0b90319f76c1e0ff",
+            "status": "EXACT"
+          },
+          "oce-full-program-planning-books-2-10": {
+            "expected": "028fcdddd90f25c44996510426bd0c0e68bc54f5",
+            "remote": "028fcdddd90f25c44996510426bd0c0e68bc54f5",
+            "status": "EXACT"
+          },
+          "tv-review": {
+            "expected": "1a53cbb1d400bec5b77b0b3b6816d707050df1c6",
+            "remote": "1a53cbb1d400bec5b77b0b3b6816d707050df1c6",
+            "status": "EXACT"
+          }
+        }
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "archive_tags",
+      "description": "annotated archive tags exist on origin with matching targets",
+      "details": {
+        "failures": [],
+        "results": {
+          "archive-branch/cerebus-local-extra": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "133364c9cb1cd2127b48421babc14a8d57e1d99a",
+            "local_target": "133364c9cb1cd2127b48421babc14a8d57e1d99a",
+            "ok": true,
+            "remote_target": "133364c9cb1cd2127b48421babc14a8d57e1d99a"
+          },
+          "archive-branch/content-oc2": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "aeb3afdde9f0f3478e82083d85431d8722b4c0ea",
+            "local_target": "aeb3afdde9f0f3478e82083d85431d8722b4c0ea",
+            "ok": true,
+            "remote_target": "aeb3afdde9f0f3478e82083d85431d8722b4c0ea"
+          },
+          "archive-branch/hermes-02e51f11": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "d4be1f2302111ea477ffca12529afb669825eadc",
+            "local_target": "d4be1f2302111ea477ffca12529afb669825eadc",
+            "ok": true,
+            "remote_target": "d4be1f2302111ea477ffca12529afb669825eadc"
+          },
+          "archive-branch/hermes-262c2f34": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "217f48c297be151fa7987cafc432824bb2de0d34",
+            "local_target": "217f48c297be151fa7987cafc432824bb2de0d34",
+            "ok": true,
+            "remote_target": "217f48c297be151fa7987cafc432824bb2de0d34"
+          },
+          "archive-branch/hermes-cde01a2a": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "63474e77b4acd9f0a93da153675c20d3977ebeab",
+            "local_target": "63474e77b4acd9f0a93da153675c20d3977ebeab",
+            "ok": true,
+            "remote_target": "63474e77b4acd9f0a93da153675c20d3977ebeab"
+          },
+          "archive-branch/pruned-master-2026-08-15": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "6922c0838202cd4e00c9233596501892e5df563d",
+            "local_target": "6922c0838202cd4e00c9233596501892e5df563d",
+            "ok": true,
+            "remote_target": "6922c0838202cd4e00c9233596501892e5df563d"
+          },
+          "archive-branch/pruned-snapshot-vtuber": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "d7cb598a8681d6a238287ab5a56f555c0da0d74c",
+            "local_target": "d7cb598a8681d6a238287ab5a56f555c0da0d74c",
+            "ok": true,
+            "remote_target": "d7cb598a8681d6a238287ab5a56f555c0da0d74c"
+          },
+          "archive-branch/review-branch": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "c79023263bc00e9e1775c603036832c615c39f2b",
+            "local_target": "c79023263bc00e9e1775c603036832c615c39f2b",
+            "ok": true,
+            "remote_target": "c79023263bc00e9e1775c603036832c615c39f2b"
+          },
+          "archive/agent/asia-triangle-foundry@8f84243f": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "8f84243f401fc1df5cb0b45d8120444d2ef0a9b3",
+            "local_target": "8f84243f401fc1df5cb0b45d8120444d2ef0a9b3",
+            "ok": true,
+            "remote_target": "8f84243f401fc1df5cb0b45d8120444d2ef0a9b3"
+          },
+          "archive/agent/atomic-structure-foundry@efe025a1": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "efe025a1dbf675e5e819c981c00c6125e95132e1",
+            "local_target": "efe025a1dbf675e5e819c981c00c6125e95132e1",
+            "ok": true,
+            "remote_target": "efe025a1dbf675e5e819c981c00c6125e95132e1"
+          },
+          "archive/agent/deepers-strategy-foundry@b4ab4620": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "b4ab46208ea0deb811eb9b7a8dc15a198861082f",
+            "local_target": "b4ab46208ea0deb811eb9b7a8dc15a198861082f",
+            "ok": true,
+            "remote_target": "b4ab46208ea0deb811eb9b7a8dc15a198861082f"
+          },
+          "archive/agent/obb-01-book-01-reality-audit@48a7c0ae": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "48a7c0aeebea1a5ba86e17583e0a9bf96437f0f9",
+            "local_target": "48a7c0aeebea1a5ba86e17583e0a9bf96437f0f9",
+            "ok": true,
+            "remote_target": "48a7c0aeebea1a5ba86e17583e0a9bf96437f0f9"
+          },
+          "archive/agent/openbb-forge-obb-01-02-docs@d8ee6b47": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "d8ee6b4785bc00ba627a288addc2333a8d854166",
+            "local_target": "d8ee6b4785bc00ba627a288addc2333a8d854166",
+            "ok": true,
+            "remote_target": "d8ee6b4785bc00ba627a288addc2333a8d854166"
+          },
+          "archive/agent/shallow-well-foundry@39cb980e": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "39cb980e7e74945627f6a8f9cf85df5999336bdc",
+            "local_target": "39cb980e7e74945627f6a8f9cf85df5999336bdc",
+            "ok": true,
+            "remote_target": "39cb980e7e74945627f6a8f9cf85df5999336bdc"
+          },
+          "archive/tb-forward-r6.6.1": {
+            "annotated_local": true,
+            "annotated_remote": true,
+            "expected_target": "49930215addd388fa183cc452fb64b56bf9a2856",
+            "local_target": "49930215addd388fa183cc452fb64b56bf9a2856",
+            "ok": true,
+            "remote_target": "49930215addd388fa183cc452fb64b56bf9a2856"
+          }
+        }
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "manifest_consistency",
+      "description": "manifests parse and are internally consistent",
+      "details": {
+        "problems": []
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "restored_files",
+      "description": "all 50 restored files present with matching SHA-256 and byte-identity to main",
+      "details": {
+        "failures": [],
+        "files_checked": 50,
+        "results": {
+          "quant-lab/backtests/debug_jan3.py": {
+            "blob_matches_main": true,
+            "git_blob": "e521dfc537642fcda876da732006cd5ce1338114",
+            "path": "quant-lab/backtests/debug_jan3.py",
+            "sha256_canonical": "45127fc07c244a7adfc98f11222c12d8e108a03207c68710e985ad5f660e13fc",
+            "sha256_match": true,
+            "sha256_worktree": "45127fc07c244a7adfc98f11222c12d8e108a03207c68710e985ad5f660e13fc"
+          },
+          "quant-lab/backtests/debug_test.py": {
+            "blob_matches_main": true,
+            "git_blob": "c127565b837bf727da0fe542576bb920d3c7db0b",
+            "path": "quant-lab/backtests/debug_test.py",
+            "sha256_canonical": "20353d754a9ab010f1483f6905b1fda79d084815a1c5c73dfae3252a9e2e8b68",
+            "sha256_match": true,
+            "sha256_worktree": "20353d754a9ab010f1483f6905b1fda79d084815a1c5c73dfae3252a9e2e8b68"
+          },
+          "quant-lab/backtests/debug_test2.py": {
+            "blob_matches_main": true,
+            "git_blob": "a894f10079b861e42395029ae36b4bca01c03026",
+            "path": "quant-lab/backtests/debug_test2.py",
+            "sha256_canonical": "95efe5674ac8f4e31f8b0f64d8de813b3df219ec6606c3fb96bf9eb3238d0dbb",
+            "sha256_match": true,
+            "sha256_worktree": "95efe5674ac8f4e31f8b0f64d8de813b3df219ec6606c3fb96bf9eb3238d0dbb"
+          },
+          "quant-lab/backtests/debug_test3.py": {
+            "blob_matches_main": true,
+            "git_blob": "ad1859e406e487fa889c7fe9ee22816678732f86",
+            "path": "quant-lab/backtests/debug_test3.py",
+            "sha256_canonical": "bb109cfbff84b86a9b2c35220ddb44bff358a7789524f56c6c43dff2df064a64",
+            "sha256_match": true,
+            "sha256_worktree": "bb109cfbff84b86a9b2c35220ddb44bff358a7789524f56c6c43dff2df064a64"
+          },
+          "quant-lab/backtests/p90_cascade_activation_20260517_010329.json": {
+            "blob_matches_main": true,
+            "git_blob": "c41501e776aafc64daaee08d4f91a34b624648eb",
+            "path": "quant-lab/backtests/p90_cascade_activation_20260517_010329.json",
+            "sha256_canonical": "e39cd6c926924b02fe4d48869a10a5af07e61d5fc5425511f68eaf2414b378f9",
+            "sha256_match": true,
+            "sha256_worktree": "e39cd6c926924b02fe4d48869a10a5af07e61d5fc5425511f68eaf2414b378f9"
+          },
+          "quant-lab/backtests/p90_cascade_activation_20260517_012625.json": {
+            "blob_matches_main": true,
+            "git_blob": "c92c840aaf4a356deaad548c41a1bde040bd56b6",
+            "path": "quant-lab/backtests/p90_cascade_activation_20260517_012625.json",
+            "sha256_canonical": "3b8f82e1038b27d8c7ffa9c8e277955a799b8a9963cbe0e449155ca6cee286dd",
+            "sha256_match": true,
+            "sha256_worktree": "3b8f82e1038b27d8c7ffa9c8e277955a799b8a9963cbe0e449155ca6cee286dd"
+          },
+          "quant-lab/backtests/p90_cascade_results.json": {
+            "blob_matches_main": true,
+            "git_blob": "c3429e2535846782160766483c2abb0029f88602",
+            "path": "quant-lab/backtests/p90_cascade_results.json",
+            "sha256_canonical": "fb53973f6bfa74f5c083bb4a1fc7b7db1c48a37c83c4ca53796ff361fb2e148f",
+            "sha256_match": true,
+            "sha256_worktree": "fb53973f6bfa74f5c083bb4a1fc7b7db1c48a37c83c4ca53796ff361fb2e148f"
+          },
+          "quant-lab/backtests/run_cascade_backtest.py": {
+            "blob_matches_main": true,
+            "git_blob": "a89fb12aa60311fee3bb9565fd4779ae25f00121",
+            "path": "quant-lab/backtests/run_cascade_backtest.py",
+            "sha256_canonical": "687f2a2ccc22ab36a3b5ada64cc40879dad5ee58ca46ae3f6316d0df90f76369",
+            "sha256_match": true,
+            "sha256_worktree": "687f2a2ccc22ab36a3b5ada64cc40879dad5ee58ca46ae3f6316d0df90f76369"
+          },
+          "quant-lab/backtests/run_full_backtest.py": {
+            "blob_matches_main": true,
+            "git_blob": "70f0a700cc11f4f104c9518259916e4c23b98a48",
+            "path": "quant-lab/backtests/run_full_backtest.py",
+            "sha256_canonical": "afc144549cd246e56fe1116ab7bc0d96090148522016e1781bceb144eaf63b61",
+            "sha256_match": true,
+            "sha256_worktree": "afc144549cd246e56fe1116ab7bc0d96090148522016e1781bceb144eaf63b61"
+          },
+          "quant-lab/backtests/test_cascade.py": {
+            "blob_matches_main": true,
+            "git_blob": "48b91380b31f9a24566edfd651f8206522f26c93",
+            "path": "quant-lab/backtests/test_cascade.py",
+            "sha256_canonical": "af5ce23ccab903453b4c80f7cc2b8d3dc125a5a7c54b055e9b36d7b354c992a6",
+            "sha256_match": true,
+            "sha256_worktree": "af5ce23ccab903453b4c80f7cc2b8d3dc125a5a7c54b055e9b36d7b354c992a6"
+          },
+          "quant-lab/findings/researcher-2026-05-17.md": {
+            "blob_matches_main": true,
+            "git_blob": "79cf908bb3a554980053fd2daa54487e5a0c5963",
+            "path": "quant-lab/findings/researcher-2026-05-17.md",
+            "sha256_canonical": "6b757e7d57aa0b2ca101f2d91f1fc2ec05abb89e137aaf88f14f32d8eeb4d72b",
+            "sha256_match": true,
+            "sha256_worktree": "6b757e7d57aa0b2ca101f2d91f1fc2ec05abb89e137aaf88f14f32d8eeb4d72b"
+          },
+          "quant-lab/insights/optimizer-2026-05-17.md": {
+            "blob_matches_main": true,
+            "git_blob": "3d0fbe3ae9ac3f1d33a47b718c5232a835faabc0",
+            "path": "quant-lab/insights/optimizer-2026-05-17.md",
+            "sha256_canonical": "0576e58a5312ed0e69cd1695c91cad033039fa4d29cd6ab283952464f0ddeaaf",
+            "sha256_match": true,
+            "sha256_worktree": "0576e58a5312ed0e69cd1695c91cad033039fa4d29cd6ab283952464f0ddeaaf"
+          },
+          "quant-lab/reports/ATOMIC_STRUCTURE.txt": {
+            "blob_matches_main": true,
+            "git_blob": "0bc433c8a0a75685626de823c5bbfcb220e9e86e",
+            "path": "quant-lab/reports/ATOMIC_STRUCTURE.txt",
+            "sha256_canonical": "c66af505121277b7c33905d254dcc0b4d47d7015013f58dd69d1b9ad8ce37c62",
+            "sha256_match": true,
+            "sha256_worktree": "c66af505121277b7c33905d254dcc0b4d47d7015013f58dd69d1b9ad8ce37c62"
+          },
+          "quant-lab/reports/CEREBUS_ATOMIC_STRUCTURE.txt": {
+            "blob_matches_main": true,
+            "git_blob": "f0741885351a2f09d81bf59e38e5fa542a310f7a",
+            "path": "quant-lab/reports/CEREBUS_ATOMIC_STRUCTURE.txt",
+            "sha256_canonical": "a6970b470b0d9e2363c4ec1ccb5fbdb23bd60ee0ac1eff71e1056e04b80c9371",
+            "sha256_match": true,
+            "sha256_worktree": "a6970b470b0d9e2363c4ec1ccb5fbdb23bd60ee0ac1eff71e1056e04b80c9371"
+          },
+          "quant-lab/reports/CEREBUS_P1-5_P90_CORE.txt": {
+            "blob_matches_main": true,
+            "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "path": "quant-lab/reports/CEREBUS_P1-5_P90_CORE.txt",
+            "sha256_canonical": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sha256_match": true,
+            "sha256_worktree": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "quant-lab/reports/CEREBUS_P11-15_META.txt": {
+            "blob_matches_main": true,
+            "git_blob": "7f991cbbbb265d8906c1ca7fb82edb31d98532b1",
+            "path": "quant-lab/reports/CEREBUS_P11-15_META.txt",
+            "sha256_canonical": "aee9db5b0490a9fe3074dd108667392114740e76b059b7dfa003c49ab29d5670",
+            "sha256_match": true,
+            "sha256_worktree": "aee9db5b0490a9fe3074dd108667392114740e76b059b7dfa003c49ab29d5670"
+          },
+          "quant-lab/reports/CEREBUS_P6-10_ADVANCED.txt": {
+            "blob_matches_main": true,
+            "git_blob": "c518c287d4b94e7728e448349ee30f0ce35fb144",
+            "path": "quant-lab/reports/CEREBUS_P6-10_ADVANCED.txt",
+            "sha256_canonical": "5e1e6022e474f1c7ccaa7ae387bbf61cdd75a5b87a227a6ba55a9a10fb02c64f",
+            "sha256_match": true,
+            "sha256_worktree": "5e1e6022e474f1c7ccaa7ae387bbf61cdd75a5b87a227a6ba55a9a10fb02c64f"
+          },
+          "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt": {
+            "blob_matches_main": true,
+            "git_blob": "9c5029aa066cf34b30e3612a4b36629ecc72a05b",
+            "path": "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt",
+            "sha256_canonical": "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb",
+            "sha256_match": true,
+            "sha256_worktree": "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb"
+          },
+          "quant-lab/reports/LAB_PLAN.md": {
+            "blob_matches_main": true,
+            "git_blob": "fd9e311749840681c25fde8fb1e8e939a3050e19",
+            "path": "quant-lab/reports/LAB_PLAN.md",
+            "sha256_canonical": "fac0b1fb6a0ade440427ec52d3f931136215cc469f0fe6166c4754936b422579",
+            "sha256_match": true,
+            "sha256_worktree": "fac0b1fb6a0ade440427ec52d3f931136215cc469f0fe6166c4754936b422579"
+          },
+          "quant-lab/reports/P90_STRATEGY_GUIDE.md": {
+            "blob_matches_main": true,
+            "git_blob": "e50a81987e6417a14fb210d10542e7e0019e2b52",
+            "path": "quant-lab/reports/P90_STRATEGY_GUIDE.md",
+            "sha256_canonical": "adf693ce0ca28c2e3a046dc48f641a7ebe7329c8c246946fb59f65f5b2d123ca",
+            "sha256_match": true,
+            "sha256_worktree": "adf693ce0ca28c2e3a046dc48f641a7ebe7329c8c246946fb59f65f5b2d123ca"
+          },
+          "quant-lab/reports/PART_16_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "d9c8f4b76fb391212f6f9495c5b9889e0b166b69",
+            "path": "quant-lab/reports/PART_16_CONTENT.txt",
+            "sha256_canonical": "07c8edff0f0f3020462f0f15dd1c6ff53bf5de0dc866009cac954248474727b1",
+            "sha256_match": true,
+            "sha256_worktree": "07c8edff0f0f3020462f0f15dd1c6ff53bf5de0dc866009cac954248474727b1"
+          },
+          "quant-lab/reports/PART_17_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "f177f74821e4289af76ddf8fbdf89d3923f1a9ca",
+            "path": "quant-lab/reports/PART_17_CONTENT.txt",
+            "sha256_canonical": "64c9be132430e472b53898e9b5efef4a8e1d61f05ece7c1a319f9d5e3986db6c",
+            "sha256_match": true,
+            "sha256_worktree": "64c9be132430e472b53898e9b5efef4a8e1d61f05ece7c1a319f9d5e3986db6c"
+          },
+          "quant-lab/reports/PART_18_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "c8661ba0a230510eb6442f8536dc607af522a819",
+            "path": "quant-lab/reports/PART_18_CONTENT.txt",
+            "sha256_canonical": "52d24aecc190b6683cfea874c6247fd5c9f2d680ccd3b96e112125a342b1fe99",
+            "sha256_match": true,
+            "sha256_worktree": "52d24aecc190b6683cfea874c6247fd5c9f2d680ccd3b96e112125a342b1fe99"
+          },
+          "quant-lab/reports/PART_19_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "a595dd64a64c301de821f09388b666400ff72fff",
+            "path": "quant-lab/reports/PART_19_CONTENT.txt",
+            "sha256_canonical": "64c03c04eb8217eeae987035b4a8c09d16f946ade727e5547ff808b136206400",
+            "sha256_match": true,
+            "sha256_worktree": "64c03c04eb8217eeae987035b4a8c09d16f946ade727e5547ff808b136206400"
+          },
+          "quant-lab/reports/PART_1___Core_Manual.txt": {
+            "blob_matches_main": true,
+            "git_blob": "d9c8f4b76fb391212f6f9495c5b9889e0b166b69",
+            "path": "quant-lab/reports/PART_1___Core_Manual.txt",
+            "sha256_canonical": "07c8edff0f0f3020462f0f15dd1c6ff53bf5de0dc866009cac954248474727b1",
+            "sha256_match": true,
+            "sha256_worktree": "07c8edff0f0f3020462f0f15dd1c6ff53bf5de0dc866009cac954248474727b1"
+          },
+          "quant-lab/reports/PART_20_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "192e870bde5cb60841ac82a979de20ae8dbf4917",
+            "path": "quant-lab/reports/PART_20_CONTENT.txt",
+            "sha256_canonical": "c0e3bf09b67a9e80bf47d1b894efd5f344ffa25c0ce92d0464a6a7542e025ba2",
+            "sha256_match": true,
+            "sha256_worktree": "c0e3bf09b67a9e80bf47d1b894efd5f344ffa25c0ce92d0464a6a7542e025ba2"
+          },
+          "quant-lab/reports/PART_21_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "3bd56c1b6f56018c1b46dd88b84f7d2eed785a6a",
+            "path": "quant-lab/reports/PART_21_CONTENT.txt",
+            "sha256_canonical": "09f0e5b14e93d3a131c63f5c5579abc282e51adbabc025025f0a9a76e1078c48",
+            "sha256_match": true,
+            "sha256_worktree": "09f0e5b14e93d3a131c63f5c5579abc282e51adbabc025025f0a9a76e1078c48"
+          },
+          "quant-lab/reports/PART_22_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "246803bd0088007407bbd994742d6a52e48d7630",
+            "path": "quant-lab/reports/PART_22_CONTENT.txt",
+            "sha256_canonical": "24830d0fd3580ed9b1a031fdb5deb5db16dc1e4e56c1b25c55ae66fddcfd2abb",
+            "sha256_match": true,
+            "sha256_worktree": "24830d0fd3580ed9b1a031fdb5deb5db16dc1e4e56c1b25c55ae66fddcfd2abb"
+          },
+          "quant-lab/reports/PART_23_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "b8410969098481f071f753c574c3f5d61eeda137",
+            "path": "quant-lab/reports/PART_23_CONTENT.txt",
+            "sha256_canonical": "2e236055415e96bc9d85f0be221d3373cde855ececb0dffa45b4bfe76f0e66d9",
+            "sha256_match": true,
+            "sha256_worktree": "2e236055415e96bc9d85f0be221d3373cde855ececb0dffa45b4bfe76f0e66d9"
+          },
+          "quant-lab/reports/PART_24_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "163142046601a1f97d0b5ee3a116bf8e9376f4d2",
+            "path": "quant-lab/reports/PART_24_CONTENT.txt",
+            "sha256_canonical": "579b41fc6ea835beeb6906315ecfcd7e811d30a52abca349419f35e73224f3ca",
+            "sha256_match": true,
+            "sha256_worktree": "579b41fc6ea835beeb6906315ecfcd7e811d30a52abca349419f35e73224f3ca"
+          },
+          "quant-lab/reports/PART_25_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "9285ec4b81329d2a53c4416a54b34bc3a3f01221",
+            "path": "quant-lab/reports/PART_25_CONTENT.txt",
+            "sha256_canonical": "0176e3658de5f4ab9daf38ffff9daabb30e20dd14a5dc5cf96627b233de77c11",
+            "sha256_match": true,
+            "sha256_worktree": "0176e3658de5f4ab9daf38ffff9daabb30e20dd14a5dc5cf96627b233de77c11"
+          },
+          "quant-lab/reports/PART_26_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "4d00653408c328f43ea5aa1a1b22039616a24032",
+            "path": "quant-lab/reports/PART_26_CONTENT.txt",
+            "sha256_canonical": "5d720c3014ffd2792be99b225e80743dd3d2c2905aa72aa98400c0b69fceb153",
+            "sha256_match": true,
+            "sha256_worktree": "5d720c3014ffd2792be99b225e80743dd3d2c2905aa72aa98400c0b69fceb153"
+          },
+          "quant-lab/reports/PART_27_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "09b4a99d8d3ce2243c0da2611826eb25ceacf3a9",
+            "path": "quant-lab/reports/PART_27_CONTENT.txt",
+            "sha256_canonical": "5bc36224ceb2ce9568ea088522031ecf5bcf9a9b4bcac08a8ad9b50036f5fd47",
+            "sha256_match": true,
+            "sha256_worktree": "5bc36224ceb2ce9568ea088522031ecf5bcf9a9b4bcac08a8ad9b50036f5fd47"
+          },
+          "quant-lab/reports/PART_28_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "72e4150dd79ea8db90367dacda5d8902a467d92d",
+            "path": "quant-lab/reports/PART_28_CONTENT.txt",
+            "sha256_canonical": "cb51c0a521f6abc0f1ae901bedd38d700b769d5f3c2898cdd88fcc8e988c9e18",
+            "sha256_match": true,
+            "sha256_worktree": "cb51c0a521f6abc0f1ae901bedd38d700b769d5f3c2898cdd88fcc8e988c9e18"
+          },
+          "quant-lab/reports/PART_29_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "9a21c83151e04c2e54a6d56c9dd8f4db7c1c66ad",
+            "path": "quant-lab/reports/PART_29_CONTENT.txt",
+            "sha256_canonical": "0addf43d1288dd8ac441b2ed82744b76ae81c5110513383e693bf6083cce16b1",
+            "sha256_match": true,
+            "sha256_worktree": "0addf43d1288dd8ac441b2ed82744b76ae81c5110513383e693bf6083cce16b1"
+          },
+          "quant-lab/reports/PART_2___Cascade_Activation_Analysis.txt": {
+            "blob_matches_main": true,
+            "git_blob": "f177f74821e4289af76ddf8fbdf89d3923f1a9ca",
+            "path": "quant-lab/reports/PART_2___Cascade_Activation_Analysis.txt",
+            "sha256_canonical": "64c9be132430e472b53898e9b5efef4a8e1d61f05ece7c1a319f9d5e3986db6c",
+            "sha256_match": true,
+            "sha256_worktree": "64c9be132430e472b53898e9b5efef4a8e1d61f05ece7c1a319f9d5e3986db6c"
+          },
+          "quant-lab/reports/PART_30_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "2c45a76d5bcc171e0e847dcac3ee158e4337546e",
+            "path": "quant-lab/reports/PART_30_CONTENT.txt",
+            "sha256_canonical": "f6b4e731784bf87a24cf831f629598b4d27f6b72d5100b91e14ec5738cc8c1d9",
+            "sha256_match": true,
+            "sha256_worktree": "f6b4e731784bf87a24cf831f629598b4d27f6b72d5100b91e14ec5738cc8c1d9"
+          },
+          "quant-lab/reports/PART_31_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "e4a3ffa843750f059a644038634c8c02aabd2de1",
+            "path": "quant-lab/reports/PART_31_CONTENT.txt",
+            "sha256_canonical": "a8ec34a98a3073dbd68d1a9a8918879066e8abea9ed7680363fcb110e52d4468",
+            "sha256_match": true,
+            "sha256_worktree": "a8ec34a98a3073dbd68d1a9a8918879066e8abea9ed7680363fcb110e52d4468"
+          },
+          "quant-lab/reports/PART_32_CONTENT.txt": {
+            "blob_matches_main": true,
+            "git_blob": "d337ab75cac60a605ad7dc7e47ee3bf70bab1202",
+            "path": "quant-lab/reports/PART_32_CONTENT.txt",
+            "sha256_canonical": "3cadee4af9bc432fddc95a72c2172f39e3c399034e0ce6f25e6370698d55855f",
+            "sha256_match": true,
+            "sha256_worktree": "3cadee4af9bc432fddc95a72c2172f39e3c399034e0ce6f25e6370698d55855f"
+          },
+          "quant-lab/reports/PART_3___Cascade_Methodology.txt": {
+            "blob_matches_main": true,
+            "git_blob": "c8661ba0a230510eb6442f8536dc607af522a819",
+            "path": "quant-lab/reports/PART_3___Cascade_Methodology.txt",
+            "sha256_canonical": "52d24aecc190b6683cfea874c6247fd5c9f2d680ccd3b96e112125a342b1fe99",
+            "sha256_match": true,
+            "sha256_worktree": "52d24aecc190b6683cfea874c6247fd5c9f2d680ccd3b96e112125a342b1fe99"
+          },
+          "quant-lab/reports/PART_4___Stall_Harvest.txt": {
+            "blob_matches_main": true,
+            "git_blob": "a595dd64a64c301de821f09388b666400ff72fff",
+            "path": "quant-lab/reports/PART_4___Stall_Harvest.txt",
+            "sha256_canonical": "64c03c04eb8217eeae987035b4a8c09d16f946ade727e5547ff808b136206400",
+            "sha256_match": true,
+            "sha256_worktree": "64c03c04eb8217eeae987035b4a8c09d16f946ade727e5547ff808b136206400"
+          },
+          "quant-lab/reports/PART_5___P90P_Distribution_Tracker.txt": {
+            "blob_matches_main": true,
+            "git_blob": "192e870bde5cb60841ac82a979de20ae8dbf4917",
+            "path": "quant-lab/reports/PART_5___P90P_Distribution_Tracker.txt",
+            "sha256_canonical": "c0e3bf09b67a9e80bf47d1b894efd5f344ffa25c0ce92d0464a6a7542e025ba2",
+            "sha256_match": true,
+            "sha256_worktree": "c0e3bf09b67a9e80bf47d1b894efd5f344ffa25c0ce92d0464a6a7542e025ba2"
+          },
+          "quant-lab/reports/STRATEGY_GAP_ANALYSIS.md": {
+            "blob_matches_main": true,
+            "git_blob": "25c7f364cc07eca4649c78b82e1543c167ecceb5",
+            "path": "quant-lab/reports/STRATEGY_GAP_ANALYSIS.md",
+            "sha256_canonical": "9a2e8cc396427ba0abea460d8a574756f0db63154bf30fb2b72b523142f890cf",
+            "sha256_match": true,
+            "sha256_worktree": "9a2e8cc396427ba0abea460d8a574756f0db63154bf30fb2b72b523142f890cf"
+          },
+          "quant-lab/reports/STRATEGY_TRACKER.md": {
+            "blob_matches_main": true,
+            "git_blob": "26383fedebb815031fb4b2b83aeba35541de2a44",
+            "path": "quant-lab/reports/STRATEGY_TRACKER.md",
+            "sha256_canonical": "2d81da4ca2360f3000c22fffade4c03e402486c0aae3b96a3abac893c8673b5c",
+            "sha256_match": true,
+            "sha256_worktree": "2d81da4ca2360f3000c22fffade4c03e402486c0aae3b96a3abac893c8673b5c"
+          },
+          "quant-lab/research/CEREBUS_STRATEGY_ANALYSIS.md": {
+            "blob_matches_main": true,
+            "git_blob": "dc15cbd6263882567bc56c1a9bc97bb58941e2bd",
+            "path": "quant-lab/research/CEREBUS_STRATEGY_ANALYSIS.md",
+            "sha256_canonical": "6f101882d8300f2ecf7cc305d6975e3201f6eb0ac9231256b037f63487a5e0e7",
+            "sha256_match": true,
+            "sha256_worktree": "6f101882d8300f2ecf7cc305d6975e3201f6eb0ac9231256b037f63487a5e0e7"
+          },
+          "quant-lab/research/P90_DEEP_DIVE.md": {
+            "blob_matches_main": true,
+            "git_blob": "fc138ab136daac0c83820696e00f6665d814fff9",
+            "path": "quant-lab/research/P90_DEEP_DIVE.md",
+            "sha256_canonical": "f24a0d3e73c65707e9703b8686d092afd66479a5b74792cd950d714dcb1eae09",
+            "sha256_match": true,
+            "sha256_worktree": "f24a0d3e73c65707e9703b8686d092afd66479a5b74792cd950d714dcb1eae09"
+          },
+          "quant-lab/results/optimizer_v2_20260517_060543.json": {
+            "blob_matches_main": true,
+            "git_blob": "5ffc692845a6efd29f066bcd5290d6b69e13574e",
+            "path": "quant-lab/results/optimizer_v2_20260517_060543.json",
+            "sha256_canonical": "d248af5e38de329a3c32df7bd945d8a8d3513acfb961788e199e9df217970847",
+            "sha256_match": true,
+            "sha256_worktree": "d248af5e38de329a3c32df7bd945d8a8d3513acfb961788e199e9df217970847"
+          },
+          "quant-lab/strategies/CEREBUS_V5_LIVE_PERFECT_FORM.pine": {
+            "blob_matches_main": true,
+            "git_blob": "0e351a33dcd0d0d601a4ae4de6cafbd60b477c17",
+            "path": "quant-lab/strategies/CEREBUS_V5_LIVE_PERFECT_FORM.pine",
+            "sha256_canonical": "164d7d966ab4623fa5204ce3c1f315022ea39866d1ab8e878dabd0d240109d67",
+            "sha256_match": true,
+            "sha256_worktree": "164d7d966ab4623fa5204ce3c1f315022ea39866d1ab8e878dabd0d240109d67"
+          },
+          "quant-lab/strategies/__init__.py": {
+            "blob_matches_main": true,
+            "git_blob": "ebb140af4a2b0c83548e35462a6e64800f914442",
+            "path": "quant-lab/strategies/__init__.py",
+            "sha256_canonical": "97fa75c499180121339151c45dd63f1245a85472073080d684e592b0f520816e",
+            "sha256_match": true,
+            "sha256_worktree": "97fa75c499180121339151c45dd63f1245a85472073080d684e592b0f520816e"
+          },
+          "quant-lab/strategies/p90_cascade_activation.py": {
+            "blob_matches_main": true,
+            "git_blob": "f7ccfccfa0a0badcb99c14018ac415d4b18e55a9",
+            "path": "quant-lab/strategies/p90_cascade_activation.py",
+            "sha256_canonical": "a0b6676707b0cc09ab726df7b75e61ec0c4ff6d7c3bacaab4e0fec01561f8e20",
+            "sha256_match": true,
+            "sha256_worktree": "a0b6676707b0cc09ab726df7b75e61ec0c4ff6d7c3bacaab4e0fec01561f8e20"
+          }
+        }
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "trash_inventory",
+      "description": "trash holding area retained (local-only state)",
+      "details": {
+        "reason": "local-only operator-machine state; not present in CI clone"
+      },
+      "mandatory": false,
+      "status": "SKIPPED"
+    },
+    {
+      "check_id": "lfs_status",
+      "description": "Git LFS cache retained and object tracking matches expectation",
+      "details": {
+        "cache_dir": "/home/runner/work/larger-lab/larger-lab/.git/lfs/objects",
+        "cache_facet": "SKIPPED (local-only)",
+        "cache_size_bytes": 0,
+        "cache_size_note": "LFS cache directory is local-only state; not assessed in CI",
+        "min_cache_size_bytes": 1000000000,
+        "tracked_counts": {
+          "agent/crypto-quant-foundry": {
+            "expected": 82,
+            "observed": 82
+          },
+          "agent/repo-cleanroom": {
+            "expected": 0,
+            "observed": 0
+          },
+          "main": {
+            "expected": 0,
+            "observed": 0
+          },
+          "oce": {
+            "expected": 0,
+            "observed": 0
+          }
+        }
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "stash_inventory",
+      "description": "stash inventory retained (local-only state)",
+      "details": {
+        "reason": "local-only operator-machine state; not present in CI clone"
+      },
+      "mandatory": false,
+      "status": "SKIPPED"
+    },
+    {
+      "check_id": "gitleaks_secret_scan",
+      "description": "gitleaks secret scan of cleanroom commits (authoritative, scoped main..HEAD)",
+      "details": {
+        "binary": "/usr/local/bin/gitleaks",
+        "exit_code": 0,
+        "finding_list": [],
+        "findings": 0,
+        "note": "full-history repo scan is documented in the report; this check is scoped to the cleanroom's own commits",
+        "reason": "no leaks found in cleanroom commits"
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "regex_secret_scan",
+      "description": "regex secret scan (INFORMATIONAL FALLBACK - not equivalent to gitleaks)",
+      "details": {
+        "files_scanned": 75,
+        "hit_count": 0,
+        "hits": [],
+        "note": "non-authoritative; gitleaks is the authoritative scan"
+      },
+      "mandatory": false,
+      "status": "PASS"
+    },
+    {
+      "check_id": "json_parse",
+      "description": "tracked JSON files parse (8 files)",
+      "details": {
+        "failures": [],
+        "files_parsed": 8
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "yaml_parse",
+      "description": "tracked YAML files parse (2 files)",
+      "details": {
+        "failures": [],
+        "files_parsed": 2
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "python_compile",
+      "description": "tracked Python under quant-lab/ and cleanroom/ compiles (11 files)",
+      "details": {
+        "failures": [],
+        "files_compiled": 11
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "doc_links",
+      "description": "internal documentation links resolve (0 links, 27 docs)",
+      "details": {
+        "broken": [],
+        "broken_count": 0,
+        "links_checked": 0
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "git_object_integrity",
+      "description": "git fsck --no-dangling passes (read-only)",
+      "details": {
+        "exit_code": 0,
+        "output_tail": ""
+      },
+      "mandatory": true,
+      "status": "PASS"
+    },
+    {
+      "check_id": "not_run:protected_suites_oce_b1_i1r",
+      "description": "OCE B1-I1R protected-branch test suites (b1-i1r-validation.yml, b1-i1r3-validation.yml on oce lineage)",
+      "details": {
+        "reason": "intentionally NOT run on cleanroom branch; integrity verified by unchanged refs"
+      },
+      "mandatory": false,
+      "status": "NOT_RUN"
+    },
+    {
+      "check_id": "not_run:protected_suites_grant",
+      "description": "grant-sector-g1-production worktree test suite",
+      "details": {
+        "reason": "intentionally NOT run; worktree untouched"
+      },
+      "mandatory": false,
+      "status": "NOT_RUN"
+    },
+    {
+      "check_id": "not_run:protected_suites_crypto",
+      "description": "agent/crypto-quant-foundry + sensor-fabric test suites",
+      "details": {
+        "reason": "intentionally NOT run; branches verified by unchanged refs"
+      },
+      "mandatory": false,
+      "status": "NOT_RUN"
+    },
+    {
+      "check_id": "not_run:protected_suites_tb",
+      "description": "tb-forward-engine test suite",
+      "details": {
+        "reason": "intentionally NOT run; branch verified by unchanged refs"
+      },
+      "mandatory": false,
+      "status": "NOT_RUN"
+    }
+  ],
+  "cleanroom_branch": "agent/repo-cleanroom",
+  "exit_code": 0,
+  "main_observed": "refs/heads/main",
+  "overall_status": "PASS",
+  "repository": "https://github.com/dabiggestpoppa/larger-lab.git",
+  "snapshot": {
+    "branch_advanced_after_observation": [
+      "agent/crypto-sensor-fabric-build",
+      "oce-program-build"
+    ],
+    "current_live_branch_state": {
+      "agent/repo-cleanroom": "79886c12ae3aa1bf0e375944936304c33bf71a39"
+    },
+    "evidence_commit": null,
+    "observed_at_utc": "2026-08-30T15:06:26Z",
+    "observed_branch_sha": "79886c12ae3aa1bf0e375944936304c33bf71a39",
+    "tested_subject_commit": "79886c12ae3aa1bf0e375944936304c33bf71a39"
+  },
+  "totals": {
+    "BLOCKED": 0,
+    "FAIL": 0,
+    "NOT_RUN": 4,
+    "PASS": 18,
+    "SKIPPED": 2
+  }
+}

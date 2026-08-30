@@ -1,0 +1,120 @@
+{
+  "manifest_type": "evidence-manifest",
+  "manifest_version": 1,
+  "repository": "dabiggestpoppa/larger-lab",
+  "origin_url": "https://github.com/dabiggestpoppa/larger-lab.git",
+  "cleanroom_branch": "agent/repo-cleanroom",
+  "stage": "CLEANROOM-EVIDENCE-CLOSURE",
+  "generated_utc": "2026-08-30T15:15:00Z",
+
+  "tested_subject": {
+    "commit_sha": "79886c12ae3aa1bf0e375944936304c33bf71a39",
+    "commit_title": "CLEANROOM-F15b: fix verifier for CI environment and canonical file hashes",
+    "tree_sha": "dcc3ab96857c9d8f721881aaa779ea73cc14c5c0"
+  },
+
+  "evidence_commit": {
+    "note": "This manifest is carried by the F16 evidence-only commit (CLEANROOM-F16: archive authoritative cleanroom evidence), which is the new branch tip. Its exact SHA is reported in CLEANROOM_FINAL_REPORT_F16.md and the operator response; it is not self-referenced here. The tested subject recorded above is the commit whose CI run produced this evidence."
+  },
+
+  "authoritative_ci": {
+    "workflow": "cleanroom-validation",
+    "run_id": "33318660150",
+    "run_number": "2",
+    "run_attempt": 1,
+    "run_url": "https://github.com/dabiggestpoppa/larger-lab/actions/runs/33318660150",
+    "conclusion": "success",
+    "tested_subject_commit": "79886c12ae3aa1bf0e375944936304c33bf71a39",
+    "evidence_artifact": {
+      "name": "cleanroom-evidence",
+      "id": 9734247254,
+      "download_url": "https://github.com/dabiggestpoppa/larger-lab/actions/runs/33318660150/artifacts/9734247254",
+      "outer_artifact_sha256": "cb34ad69b925d087b2b25a9334e1a3b60604d22f54cb7bd6bad518b1b4843647",
+      "size_bytes": 11640
+    }
+  },
+
+  "validation_totals": {
+    "authoritative_ci": { "PASS": 18, "FAIL": 0, "BLOCKED": 0, "SKIPPED": 2, "NOT_RUN": 4, "exit_code": 0 },
+    "local_operator_machine": { "PASS": 20, "FAIL": 0, "BLOCKED": 0, "SKIPPED": 0, "NOT_RUN": 4, "exit_code": 0 },
+    "not_run": [
+      "OCE B1-I1R protected-branch test suites (intentionally not run; integrity via unchanged refs)",
+      "grant-sector-g1-production worktree test suite (intentionally not run; worktree untouched)",
+      "agent/crypto-quant-foundry + sensor-fabric test suites (intentionally not run; refs verified)",
+      "tb-forward-engine test suite (intentionally not run; refs verified)"
+    ],
+    "note": "SKIPPED in CI = local-only operator-machine state (trash, stash) not present in the CI clone; they are PASS in the local run."
+  },
+
+  "snapshot": {
+    "observed_at_utc": "2026-08-30T15:14:52Z",
+    "observed_branch_sha": "79886c12ae3aa1bf0e375944936304c33bf71a39",
+    "tested_subject_commit": "79886c12ae3aa1bf0e375944936304c33bf71a39",
+    "evidence_commit": "F16 commit (see note above)",
+    "current_live_branch_state_checked_at_utc": "2026-08-30T15:14:52Z",
+    "current_live_branch_state": {
+      "agent/repo-cleanroom": "79886c12ae3aa1bf0e375944936304c33bf71a39",
+      "main": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+      "oce": "d3df9eb45aeddd8a3dd40ced24a7f2e1d2f0ff41",
+      "master": "6769ad31ac737946dae54e3660e22cb36f72e2b7",
+      "oce-program-build": "da7ba90f02bed23351b65ed4f8c49cb19a916c32 (descends from ac0e239386aa100349f5dc904acdb52345659090)",
+      "agent/crypto-sensor-fabric-build": "2640a3d190c0e351f08ccf1676621c4b5d31dcd1"
+    },
+    "branch_advanced_after_observation": ["agent/crypto-sensor-fabric-build", "oce-program-build"],
+    "note": "oce-program-build and agent/crypto-sensor-fabric-build advanced repeatedly during this run via concurrent external worktrees. Both remain descendants of their protected bases; neither was modified or rewound by cleanroom work. main and oce unchanged."
+  },
+
+  "branch_reference_snapshot": {
+    "remote_head_count": 25,
+    "source": "cleanroom/evidence/branch-reference-manifest.json (F13 observation snapshot; live verification in cleanroom-verification.json)",
+    "summary": "All 25 remote heads archived. 14 restored/protected-OCE refs verified on origin at exact SHAs; 15 annotated archive tags verified on origin with matching targets. No missing or mismatched reference."
+  },
+
+  "restored_file_verification": {
+    "count": 50,
+    "byte_identical_to_main": true,
+    "source": "cleanroom/evidence/restored-file-manifest.json (canonical SHA-256 + git blob identity)",
+    "check_result": "restored_files = PASS (local and CI)"
+  },
+
+  "main": {
+    "expected_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+    "observed_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+    "unchanged": true
+  },
+
+  "oce_program_build": {
+    "mission_reference_sha": "ac0e239386aa100349f5dc904acdb52345659090",
+    "observation": "descends from ac0e2393 (local worktree ac0e2393; remote da7ba90f); not rewound; OCE Book 1 evidence untouched"
+  },
+
+  "counters": {
+    "destructive_actions": 0,
+    "permanent_deletions": 0,
+    "lfs_prunes": 0,
+    "history_rewrites": 0,
+    "cloud_mutations": 0,
+    "deployments": 0,
+    "purchases": 0,
+    "recurring_cloud_cost": "$0"
+  },
+
+  "retained": {
+    "trash": "C:/Users/wifik/Desktop/projects/.trash-larger-lab-duplicate (20G) + .trash-legacy-worktrees retained; permanent deletion NOT authorized (requires CLEANROOM-PERMANENT-DELETE)",
+    "lfs_cache": "C:/Users/wifik/Desktop/larger-lab/.git/lfs (7.2G) retained; no prune",
+    "stashes": 15,
+    "stashes_dropped": 0
+  },
+
+  "artifacts_in_this_evidence_set": {
+    "cleanroom-verification.json": "authoritative CI run verification (checks + totals + snapshot + exit code)",
+    "cleanroom-verification-summary.md": "authoritative CI run human-readable summary",
+    "branch-reference-manifest.json": "expected reference snapshot with divergence facts (committed F13)",
+    "restored-file-manifest.json": "50 restored files with canonical SHA-256 (committed F13, hashes corrected F15b)",
+    "trash-inventory.json": "local operator-machine trash inventory",
+    "stash-inventory.json": "local operator-machine stash inventory",
+    "tool-versions.json": "observed tool versions",
+    "evidence-manifest.json": "this manifest",
+    "stage-log.txt": "stage log"
+  }
+}

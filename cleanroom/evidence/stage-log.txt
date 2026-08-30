@@ -1,0 +1,20 @@
+cleanroom evidence closure stage log (agent/repo-cleanroom) — all times UTC
+===
+
+2026-08-30T13:54:00Z stage=f13 observed starting sha 0abf7d68; branch/reference facts recomputed from git
+2026-08-30T13:54:00Z stage=f13 remote verified 14 restored refs + 15 annotated archive tags on origin
+2026-08-30T13:54:00Z stage=f13 confirmed all 50 restored Quant/CEREBUS/P90 files byte-identical to main
+2026-08-30T14:05:00Z stage=f14 verifier + expected-state written
+2026-08-30T14:49:12Z stage=local-verify subject=12f270e3 - PASS 20 / FAIL 0 / BLOCKED 0 / NOT_RUN 4 (exit 0)
+2026-08-30T14:54:10Z stage=push branches F13 b0cac784, F14 12f270e3, F15 ccfa0fe4 pushed (0abf7d68..ccfa0fe4)
+2026-08-30T14:55:10Z stage=ci-run 33318135513 (first F15 attempt) - FAIL 6 (CI ref-resolution + CRLF hash bugs)
+2026-08-30T15:05:36Z stage=push branches F15b 79886c12 pushed (ccfa0fe4..79886c12) with verifier fixes
+2026-08-30T15:07:15Z stage=ci-run 33318660150 (F15b) - SUCCESS: PASS 18 / FAIL 0 / BLOCKED 0 / SKIPPED 2 / NOT_RUN 4, exit 0
+2026-08-30T15:09:36Z stage=local-verify subject=79886c12 - PASS 20 / FAIL 0 / BLOCKED 0 / SKIPPED 0 / NOT_RUN 4 (exit 0)
+2026-08-30T15:14:52Z stage=f16 live snapshot: main 7e7ef722 unchanged; oce-program-build da7ba90f (descends ac0e2393); crypto-sensor-fabric-build 2640a3d1
+2026-08-30T15:15:00Z stage=f16 evidence-manifest assembled; evidence-only commit pending
+---
+authoritative CI run stage log (from cleanroom-evidence artifact 9734247254, run 33318660150):
+2026-08-30T15:06:26Z stage=checkout-ready
+2026-08-30T15:07:15Z stage=verify verifier_exit=0
+2026-08-30T15:07:15Z stage=evidence-ready

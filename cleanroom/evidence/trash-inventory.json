@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "exists": true,
+      "min_size_bytes": 1000000000,
+      "path": "C:/Users/wifik/Desktop/projects/.trash-larger-lab-duplicate",
+      "required": true,
+      "size_bytes": 20564839384
+    },
+    {
+      "exists": true,
+      "min_size_bytes": 0,
+      "path": "C:/Users/wifik/Desktop/projects/.trash-legacy-worktrees",
+      "required": true,
+      "size_bytes": 0
+    }
+  ],
+  "observed_at_utc": "2026-08-30T15:09:36Z",
+  "permanent_deletion_authorized": false,
+  "required_authorization_stage": "CLEANROOM-PERMANENT-DELETE"
+}

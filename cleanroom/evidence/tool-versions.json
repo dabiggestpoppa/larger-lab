@@ -1,0 +1,10 @@
+{
+  "git": "git version 2.54.0.windows.1",
+  "git-lfs": "git-lfs/3.7.1 (GitHub; windows amd64; go 1.25.1; git b84b3384)",
+  "gitleaks": "8.18.1",
+  "gitleaks_binary": "C:/Users/wifik/Desktop/projects/.cleanroom-tools/gitleaks.exe",
+  "observed_at_utc": "2026-08-30T15:09:36Z",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "python": "3.11.9",
+  "pyyaml": "6.0.3"
+}

@@ -1,0 +1,23 @@
+{
+  "count": 15,
+  "dropped": 0,
+  "entries": [
+    "stash@{0}: On oce: pre-cleanup stash: test_regression.py modification",
+    "stash@{1}: WIP on oce: 64f7c754 B1-I1R3H: confine adversarial --only engine runs to scratch dir",
+    "stash@{2}: WIP on tv-review: 9af94e8e B1-I1R3H: pin ansible-compat==4.1.11 in CI workflow",
+    "stash@{3}: WIP on oce: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+    "stash@{4}: WIP on agent/crypto-quant-foundry: f41e9c09 CRYPTO-DATA-1: canonical collector foundation",
+    "stash@{5}: WIP on oce-recovery: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+    "stash@{6}: WIP on agent/crypto-quant-foundry: f41e9c09 CRYPTO-DATA-1: canonical collector foundation",
+    "stash@{7}: WIP on oce: b517132d B1-I1R2: repair cloud-ground verification integrity",
+    "stash@{8}: WIP on oce/block-1-i1r2-verification-closure: dd376a4b B1-I1R: record validation evidence for 329434caf4b3",
+    "stash@{9}: WIP on agent/shallow-well-foundry-ctbt-t1: f3c6aca2 SW-CTBT-T4.1-FORWARD-COLLECTOR-AND-TRANSFER-DASHBOARD-ACTIVATION",
+    "stash@{10}: WIP on agent/deepers-strategy-foundry: f764f8b6 PFT-B3: seal mathematical and causality conformance",
+    "stash@{11}: On main: D01 work",
+    "stash@{12}: WIP on main: 2ef20eb5 P0-REPAIR-01: Truthful state repair and fail-closed gates",
+    "stash@{13}: WIP on main: 2ef20eb5 P0-REPAIR-01: Truthful state repair and fail-closed gates",
+    "stash@{14}: On master: Worktree changes before GLX FORGE migration"
+  ],
+  "observed_at_utc": "2026-08-30T15:09:36Z",
+  "retained": true
+}
