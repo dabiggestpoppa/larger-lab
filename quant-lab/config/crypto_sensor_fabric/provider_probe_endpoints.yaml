@@ -1,0 +1,27 @@
+# PROVIDER PROBE ENDPOINT REGISTRY — free, public, unauthenticated surfaces
+# for Bloc 2 capability characterization (bloc_02/02 provider playbooks).
+#
+# These are probe-time endpoint hints, NOT a production adapter contract.
+# Each provider probe module loads this registry and may fall back to its own
+# documented defaults.  Verification of every URL happens during live probes
+# (SENSOR-B2-I13); nothing here is marked verified.
+#
+# Status vocabulary for `access`: UNVERIFIED | FREE_PUBLIC | FREE_API_KEY
+schema_version: "1.0"
+
+providers:
+  KRAKEN_FUTURES:
+    base_url: "https://futures.kraken.com/derivatives/api/v3"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_TRADE: "/history"
+      MECHANICAL_LIQUIDATION: "/history"
+      MECHANICAL_OPEN_INTEREST: "/tickers"
+      MECHANICAL_FUNDING: "/fundingrates"
+      MECHANICAL_BOOK_SNAPSHOT: "/orderbook"
+      MECHANICAL_BASIS: "/tickers"
+    notes: >
+      Liquidations are NOT a dedicated endpoint: they appear as trade rows
+      whose `type` field is "liquidation" on /history.  Open interest is
+      current-only via /tickers; historical OI is not publicly exposed and
+      must be probed as CURRENT_ONLY / HISTORY_BLOCKED, not assumed.

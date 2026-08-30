@@ -1,0 +1,10 @@
+{
+  "result": {
+    "history": [
+      {"time": 1655251200000, "trade_id": 371498033, "price": "29510.5", "size": 0.0089, "side": "sell", "type": "liquidation"},
+      {"time": 1655251265000, "trade_id": 371498034, "price": "29512.0", "size": 0.0021, "side": "buy", "type": "fill"},
+      {"time": 1655251330000, "trade_id": 371498035, "price": "29508.2", "size": 0.015, "side": "sell", "type": "fill"}
+    ],
+    "lastTime": 1655251330000
+  }
+}

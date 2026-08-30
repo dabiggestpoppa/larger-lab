@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 2 — HISTORICAL CAPABILITY PROBE HARNESS |
-| Current checkpoint | SENSOR-B2-I03 DONE; SENSOR-B2-I04 (kraken probe) pending |
+| Current checkpoint | SENSOR-B2-I04 DONE; SENSOR-B2-I05 (gate probe) pending |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 implementation_authorized = TRUE |
 | human_review_required | TRUE |
@@ -42,7 +42,8 @@ that is updated at every staged checkpoint.
 | SENSOR-B2-I01 | 32 | 32 | 0 |
 | SENSOR-B2-I02 | 21 | 21 | 0 |
 | SENSOR-B2-I03 | 61 | 61 | 0 |
-| cumulative | 291 | 291 | 0 |
+| SENSOR-B2-I04 | 23 | 23 | 0 |
+| cumulative | 314 | 314 | 0 |
 
 ## External / provider blockers
 
@@ -67,11 +68,9 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
-- SENSOR-B2-I04: kraken-capability-probe
-  - minimal Kraken probe module (REST characterization, bounded pagination,
-    payload summary, schema fingerprint, timestamp/unit extraction)
-  - fixtures + tests; no production adapter
-  - gate: kraken probe suite green, offline
+- SENSOR-B2-I05: gate-capability-probe
+  - minimal Gate Futures probe module + fixtures + tests
+  - gate: gate probe suite green, offline
 
 ## Staged commit plan (Bloc 1, from `bloc_01/03`)
 
@@ -100,4 +99,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B1-R06 | 961bdcc8 | operator ratification recorded in ledger + decision evidence | — | PASS | none |
 | SENSOR-B2-I01 | f5254f5a | probes package: enums, core models, failures, redaction + test suite | 209 passed / 0 failed | PASS | none |
 | SENSOR-B2-I02 | 7065a211 | planner + runner + historical_checkpoints.yaml, deterministic planning, recent-control-first suppression | 230 passed / 0 failed | PASS | none |
-| SENSOR-B2-I03 | (pending) | evidence.py + coverage.py + scoring.py: immutable evidence, evidence ladder, coverage vector, redundancy, promotion gate | 291 passed / 0 failed | PASS | none |
+| SENSOR-B2-I03 | 23364591 | evidence.py + coverage.py + scoring.py: immutable evidence, evidence ladder, coverage vector, redundancy, promotion gate | 291 passed / 0 failed | PASS | none |
+| SENSOR-B2-I04 | (pending) | kraken probe module + payload characterization helpers + endpoint registry + 10 fixtures + tests | 314 passed / 0 failed | PASS | none |
