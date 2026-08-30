@@ -1,4 +1,8 @@
 name: b2-control-plane-validation
+# Dedicated Book 2 evidence workflow (B2-R5/R9). Book 1 evidence comes
+# from its OWN workflow (b1-local-ground-validation); this one is the only
+# source of Book 2 control-plane evidence, and the runner's identity gate
+# rejects any other repository/branch. Never confuse the two.
 on:
   push:
     branches: [oce-program-build]
@@ -7,10 +11,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: b2-control-plane-validation
+  cancel-in-progress: false
+
 jobs:
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    # Machine-readable run id so downstream consumers can fetch this run.
+    outputs:
+      oce_run_id: ${{ steps.run_id.outputs.oce_run_id }}
     steps:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
@@ -42,22 +53,36 @@ jobs:
           EVIDENCE_DIR="$RUNNER_TEMP/oce-b2-evidence-${{ steps.run_id.outputs.oce_run_id }}"
           mkdir -p "$EVIDENCE_DIR"
           echo "evidence_dir=$EVIDENCE_DIR" >> "$GITHUB_OUTPUT"
+          # provenance marker: this evidence belongs to the Book 2 workflow,
+          # never the Book 1 local-ground workflow
+          printf 'workflow=%s\nrepository=%s\nref=%s\nsha=%s\n' \
+            b2-control-plane-validation "${{ github.repository }}" \
+            "${{ github.ref_name }}" "${{ github.sha }}" \
+            > "$EVIDENCE_DIR/workflow-provenance.txt"
 
-      - name: Run Book 2 control-plane validation runner
+      - name: Run Book 2 control-plane validation runner (exactly once)
         env:
           OCE_RUN_ID: ${{ steps.run_id.outputs.oce_run_id }}
           OCE_EVIDENCE_DIR: ${{ steps.evidence.outputs.evidence_dir }}
           OCE_CI_MODE: "true"
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          OCE_EXPECTED_COMMIT: ${{ github.sha }}
+          OCE_EXPECTED_BRANCH: oce-program-build
+          OCE_EXPECTED_REPO: dabiggestpoppa/larger-lab
         shell: bash
         run: |
+          # The shared runner is invoked EXACTLY ONCE; its exit code is
+          # preserved verbatim (0=PASS, 1=FAIL, 2=BLOCKED). It performs no
+          # cloud mutation (contents: read only) and enforces zero skips.
           rc=0
           bash infrastructure/control-plane/scripts/run-b2-validation.sh > /tmp/oce-b2-validation.log 2>&1 || rc=$?
           cat /tmp/oce-b2-validation.log
           exit "$rc"
 
-      - name: Upload evidence artifact
+      - name: Upload evidence artifact (PASS, FAIL, and BLOCKED alike)
+        # if: always() — failure evidence must remain uploadable; the
+        # stage-status.json inside the artifact distinguishes the outcome.
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
         with:
