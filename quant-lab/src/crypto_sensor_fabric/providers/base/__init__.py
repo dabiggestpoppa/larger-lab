@@ -20,6 +20,7 @@ cross-venue synthesis or research computation.
 
 from __future__ import annotations
 
+from .access import AccessDecision, assert_free_only_access, evaluate_access
 from .enums import (
     ALLOWED_AUTH_MODES,
     HARD_BLOCK_AUTH_MODES,
@@ -55,6 +56,7 @@ from .errors import (
     UnsupportedGranularity,
     error_from_failure_type,
 )
+from .fingerprint import fingerprint_request, payload_hash
 from .models import (
     AcquisitionFailure,
     AdapterEvidenceRef,
@@ -74,6 +76,11 @@ from .protocol import MechanicalProviderAdapter, ensure_supported
 __all__ = [
     "ALLOWED_AUTH_MODES",
     "AccessClassViolation",
+    "AccessDecision",
+    "assert_free_only_access",
+    "evaluate_access",
+    "fingerprint_request",
+    "payload_hash",
     "AcquisitionError",
     "AcquisitionFailure",
     "AdapterAuthMode",
