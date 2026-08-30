@@ -1,0 +1,8 @@
+{ "format": "oce-local-ground-backup-v1", "schema_version": "2",
+  "hash_algorithm": "sha256", "scope": "state-only", "backup_id": "94e3f863683a4c179fae6132417fd317",
+  "disaster_recovery_capable": false, "includes": "state",
+  "database": "oce_local", "pg_dump_version": "null",
+  "pg_dump_format": "null",
+  "pg_version_num": "null",
+  "source_commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f", "run_id": "f767fadd3d67",
+  "created_at": "2026-08-30T12:31:33Z" }
