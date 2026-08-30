@@ -83,6 +83,22 @@ def test_build_probe_request_history_trades():
     assert query["params"] == {"instId": "BTC-USDT-SWAP", "limit": 100}
 
 
+def test_build_probe_request_funding_public_route():
+    # Funding-rate history is in the /public namespace, NOT under /api/v5/market.
+    query = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_FUNDING))
+    assert (
+        query["url"] == "https://www.okx.com/api/v5/public/funding-rate-history"
+    )
+    assert "public/funding-rate-history" in query["url"]
+    assert query["params"] == {"instId": "BTC-USDT-SWAP", "limit": 100}
+
+
+def test_no_funding_via_market_route():
+    # Negative: funding must never be composed as /api/v5/market/funding-rate-history.
+    query = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_FUNDING))
+    assert "/api/v5/market/funding-rate-history" not in query["url"]
+
+
 def test_build_probe_request_books_is_current_snapshot():
     query = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_BOOK_SNAPSHOT))
     assert query["url"].endswith("/books")
@@ -136,6 +152,12 @@ def test_characterize_funding_history():
     assert attempt.rows_returned == 3
     assert "fundingRate" in attempt.native_units_summary
     assert "realizedRate" in attempt.native_units_summary
+    # funding fields preserved (PIT/revision semantics), interval not frozen to 8h
+    assert "fundingTime" in attempt.native_units_summary
+    assert "formulaType" in attempt.native_units_summary
+    assert "method" in attempt.native_units_summary
+    assert "NOT frozen to 8h" in attempt.native_units_summary["fundingRate"]
+    assert "fundingTime timestamps (NOT trade ids)" in attempt.native_units_summary["pagination"]
 
 
 def test_characterize_books_snapshot_current_only():

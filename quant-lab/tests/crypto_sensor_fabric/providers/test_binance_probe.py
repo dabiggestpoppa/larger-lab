@@ -123,6 +123,27 @@ def test_build_probe_request_depth_is_current_snapshot():
     assert query["params"] == {"symbol": "BTCUSDT", "limit": 100}
 
 
+def test_build_probe_request_oi_absolute_route():
+    # OI statistics route is https://fapi.binance.com/futures/data/openInterestHist
+    # (NOT beneath /fapi/v1), bucketed by `period` and capped at 500/window.
+    query = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_OPEN_INTEREST))
+    assert (
+        query["url"] == "https://fapi.binance.com/futures/data/openInterestHist"
+    )
+    assert query["params"]["symbol"] == "BTCUSDT"
+    assert query["params"]["startTime"] == 1655251200000
+    assert query["params"]["endTime"] == 1655337600000
+    assert query["params"]["period"] == "1h"
+    assert query["params"]["limit"] == 500
+
+
+def test_no_oi_route_beneath_fapi_v1():
+    # Negative: the OI stats endpoint must not be composed as /fapi/v1/futures/...
+    query = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_OPEN_INTEREST))
+    assert "/fapi/v1/futures/data/openInterestHist" not in query["url"]
+    assert "futures/data/openInterestHist" in query["url"]
+
+
 # ---------------------------------------------------------------------------
 # failure classification (code-based)
 # ---------------------------------------------------------------------------
@@ -185,8 +206,11 @@ def test_characterize_oi_history_success():
     assert attempt.response_status_class is ResponseStatusClass.VERIFIED_SAMPLE
     assert attempt.rows_returned == 3
     units = attempt.native_units_summary
-    assert units["sumOpenInterest"] == "contracts"
+    assert "contracts" in units["sumOpenInterest"]
     assert units["sumOpenInterestValue"] == "USD notional"
+    assert (
+        units["route"] == "https://fapi.binance.com/futures/data/openInterestHist"
+    )
 
 
 def test_characterize_depth_flattens_levels():

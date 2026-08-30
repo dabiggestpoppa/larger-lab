@@ -63,10 +63,18 @@ class OkxCapabilityProbe(RestCapabilityProbeBase):
     venue_market = "OKX_SWAP"
     access_mode = AccessMode.PUBLIC_REST
     base_url = "https://www.okx.com/api/v5/market"
-    probe_version = "okx-probe-v1"
+    probe_version = "okx-probe-v2"
 
     native_instruments = NATIVE_INSTRUMENTS
     envelope_key = "data"
+
+    #: Funding-rate history lives in the /public namespace, NOT under
+    # /api/v5/market (I12R1).  Per-sensor absolute URL.
+    endpoint_urls: ClassVar[dict[SensorFamily, str]] = {
+        SensorFamily.MECHANICAL_FUNDING: (
+            "https://www.okx.com/api/v5/public/funding-rate-history"
+        ),
+    }
 
     #: history rows ARE the data envelope content; the book's data is a list
     #: holding one book dict
@@ -91,10 +99,17 @@ class OkxCapabilityProbe(RestCapabilityProbeBase):
             "ts": "ms epoch (string) — event time",
         },
         SensorFamily.MECHANICAL_FUNDING: {
-            "fundingRate": "decimal fraction per 8h interval",
-            "realizedRate": "decimal fraction (realized)",
+            "route": "https://www.okx.com/api/v5/public/funding-rate-history",
+            "fundingRate": "decimal fraction per payment — interval is NOT frozen "
+            "to 8h; frequency may differ by instrument/regime and provider "
+            "methodology has changed over time",
+            "realizedRate": "decimal fraction (realized, may differ from fundingRate "
+            "for PIT/revision semantics)",
             "fundingTime": "ms epoch (string) — effective at",
             "markPrice": "USD",
+            "formulaType": "funding method identifier (select symbols differ) — preserve",
+            "method": "rarely-changed funding-method codepoint — preserve for PIT",
+            "pagination": "after/before keyed around fundingTime timestamps (NOT trade ids)",
         },
         SensorFamily.MECHANICAL_BOOK_SNAPSHOT: {
             "bids/asks": "[[px USD, sz base asset, ...]]",

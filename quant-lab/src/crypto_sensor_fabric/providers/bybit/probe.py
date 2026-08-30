@@ -89,14 +89,25 @@ class BybitCapabilityProbe(RestCapabilityProbeBase):
     #: sensor -> native unit semantics (characterization knowledge)
     sensor_units: ClassVar[dict[SensorFamily, dict[str, str]]] = {
         SensorFamily.MECHANICAL_OPEN_INTEREST: {
-            "openInterest": "contracts (linear) — verify per contract type",
+            "openInterest": (
+                "CONTRACT-TYPE dependent: linear = base asset (e.g. BTC for "
+                "BTCUSDT); inverse = USD.  This branch is BYBIT_LINEAR so linear "
+                "(base asset) is recorded; future inverse handling stays "
+                "contract-aware, never frozen to a universal unit."
+            ),
             "timestamp": "ms epoch (string) — period start",
             "intervalTime": "5min|15min|30min|1h|4h|1d",
+            "pagination": "nextPageCursor cursor traversal (frozen per OI endpoint)",
         },
         SensorFamily.MECHANICAL_FUNDING: {
-            "fundingRate": "decimal fraction per 8h interval",
+            "fundingRate": "decimal fraction per payment — interval is NOT frozen "
+            "to 8h; probe interval from consecutive fundingTime / instrument "
+            "metadata (symbol-dependent)",
             "fundingTime": "ms epoch (string) — effective at",
+            "nextFundingTime": "ms epoch (string) — next scheduled payment",
             "markPrice": "USD",
+            "pagination": "nextPageCursor cursor traversal (validated independently "
+            "of OI — do NOT inherit OI pagination by assumption)",
         },
         SensorFamily.MECHANICAL_TRADE: {
             "price": "USD",

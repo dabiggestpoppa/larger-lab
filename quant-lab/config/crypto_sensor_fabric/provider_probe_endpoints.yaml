@@ -69,18 +69,23 @@ providers:
     access: FREE_PUBLIC
     endpoints:
       MECHANICAL_TRADE: "/aggTrades"
-      MECHANICAL_OPEN_INTEREST: "/futures/data/openInterestHist"
+      MECHANICAL_OPEN_INTEREST: "https://fapi.binance.com/futures/data/openInterestHist"
       MECHANICAL_FUNDING: "/fundingRate"
       MECHANICAL_BOOK_SNAPSHOT: "/depth"
     notes: >
-      No public historical liquidation endpoint — liquidation starts as
-      UNVERIFIED_OR_UNAVAILABLE, never assumed (bloc_01/02 §13).  REST surface
-      fapi.binance.com is US-geo-restricted (HTTP 451); the data.binance.vision
-      archive is generally accessible.  Archive files are deterministic
-      {SYMBOL}-{kind}-{YYYY-MM-DD}.zip with .CHECKSUM siblings; archive holes
-      must be detected per symbol/kind, never assumed continuous.  The
-      ratified isBuyerMaker contract: true -> SELL aggressor, false -> BUY
-      (R01, PROVISIONAL until fixture verification).
+      ROUTE FAMILIES ARE PER-SENSOR (I12R1): aggTrades/fundingRate/depth live
+      under /fapi/v1 on fapi.binance.com, but OI statistics live at the ABSOLUTE
+      https://fapi.binance.com/futures/data/openInterestHist (NOT beneath
+      /fapi/v1).  openInterestHist is bucketed by `period` (5m..1d) and caps at
+      500 records/window.  aggTrades REST is a bounded RECENT window; deep
+      trade/aggTrades/funding/bookDepth/metrics history is archive-only
+      (data.binance.vision deterministic {SYMBOL}-{kind}-{YYYY-MM-DD}.zip +
+      .CHECKSUM).  REST retention limits are recorded SEPARATELY from archive
+      capability — never conflated.  No public historical liquidation endpoint;
+      liquidation starts UNVERIFIED_OR_UNAVAILABLE.  fapi.binance.com is
+      US-geo-restricted (HTTP 451); the vision archive is generally reachable.
+      isBuyerMaker contract: true -> SELL aggressor, false -> BUY (R01
+      PROVISIONAL until fixture verification).
 
   BYBIT_LINEAR:
     base_url: "https://api.bybit.com/v5/market"
@@ -106,17 +111,22 @@ providers:
     access: FREE_PUBLIC
     endpoints:
       MECHANICAL_TRADE: "/history-trades"
-      MECHANICAL_FUNDING: "/funding-rate-history"
+      MECHANICAL_FUNDING: "https://www.okx.com/api/v5/public/funding-rate-history"
       MECHANICAL_BOOK_SNAPSHOT: "/books"
     notes: >
-      history-trades and funding-rate-history page backward via after/before
-      (trade ids, not timestamps); cursor traversal must prove depth.
-      /books is a CURRENT snapshot (sz levels) — DEEP BOOK HISTORY is
-      UNVERIFIED pending live probe, never claimed.  The traderecords daily
-      zip archive {instId}/{YYYYMMDD}.zip is the public trade-history
-      download route; link expiry and async archive generation must be
-      probed.  OI: no official free historical route is assumed; current OI
-      is never substituted for history.
+      ENDPOINT NAMESPACES ARE SEPARATED (I12R1): trades/books live in
+      /api/v5/market, but funding-rate history is in the /public namespace at
+      https://www.okx.com/api/v5/public/funding-rate-history (NEVER composed
+      as /api/v5/market/funding-rate-history).  Pagination semantics are
+      separated too: trades page via trade-oriented after/before (trade ids),
+      funding pages via after/before keyed around fundingTime timestamps — one
+      shared "trade id" explanation must not cover both.  Preserve funding
+      fields fundingRate / realizedRate / fundingTime / formulaType / method;
+      funding interval is NOT frozen to 8h (may differ by instrument/regime;
+      provider methodology has changed over time).  /books is a CURRENT
+      snapshot — DEEP BOOK HISTORY stays UNVERIFIED.  traderecords daily zip
+      {instId}/{YYYYMMDD}.zip is the public trade-history route; link expiry
+      and async generation probed.  OI: no assumed free historical route.
 
   DERIBIT:
     base_url: "https://www.deribit.com/api/v2/public"

@@ -41,6 +41,9 @@ NATIVE_INSTRUMENTS: ClassVar[dict[str, str]] = {
     "MID_TAIL_CONTROL": "DOGEUSDT",
 }
 
+#: OI statistics aggregation bucket used for windowed probe calls.
+OI_PERIOD = "1h"
+
 #: Public archive daily base (data.binance.vision).
 ARCHIVE_BASE_URL = "https://data.binance.vision/data/futures/um/daily"
 
@@ -75,9 +78,18 @@ class BinanceCapabilityProbe(RestCapabilityProbeBase):
     venue_market = "BINANCE_USDM"
     access_mode = AccessMode.PUBLIC_REST
     base_url = "https://fapi.binance.com/fapi/v1"
-    probe_version = "binance-probe-v1"
+    probe_version = "binance-probe-v2"
 
     native_instruments = NATIVE_INSTRUMENTS
+
+    #: OI statistics live on a DIFFERENT base than /fapi/v1 — the correct route
+    # is https://fapi.binance.com/futures/data/openInterestHist, NOT
+    # /fapi/v1/futures/data/openInterestHist (I12R1).  Per-sensor absolute URL.
+    endpoint_urls: ClassVar[dict[SensorFamily, str]] = {
+        SensorFamily.MECHANICAL_OPEN_INTEREST: (
+            "https://fapi.binance.com/futures/data/openInterestHist"
+        ),
+    }
 
     #: REST sensors whose payload is a bare top-level list
     top_level_list_sensors = frozenset(
@@ -90,7 +102,10 @@ class BinanceCapabilityProbe(RestCapabilityProbeBase):
     #: REST sensors whose payload is a top-level book dict
     top_level_book_sensors = frozenset({SensorFamily.MECHANICAL_BOOK_SNAPSHOT})
 
-    #: REST sensors queried with startTime/endTime (ms) windows
+    #: REST sensors queried with startTime/endTime (ms) windows.  REST is a
+    # RECENT-control surface only for aggTrades/funding (window/deep history
+    # comes from the data.binance.vision archive) — a REST retention limit is
+    # never interpreted as archive retention.
     window_query_sensors = frozenset(
         {
             SensorFamily.MECHANICAL_TRADE,
@@ -110,17 +125,25 @@ class BinanceCapabilityProbe(RestCapabilityProbeBase):
                 "(R01 PROVISIONAL contract)"
             ),
             "time": "ms epoch (event time)",
+            "rest_recency": "aggTrades REST returns a bounded recent window; "
+            "deep history is archive-only (recorded separately, never conflated)",
         },
         SensorFamily.MECHANICAL_FUNDING: {
-            "fundingRate": "decimal fraction per 8h interval",
+            "fundingRate": "decimal fraction per funding interval",
             "fundingTime": "ms epoch (effective at)",
             "markPrice": "USD",
+            "rest_recency": "fundingRate REST returns a bounded recent window; "
+            "deep funding history is archive-only (recorded separately)",
         },
         SensorFamily.MECHANICAL_OPEN_INTEREST: {
-            "sumOpenInterest": "contracts",
+            "route": "https://fapi.binance.com/futures/data/openInterestHist",
+            "sumOpenInterest": "contracts (per period bucket)",
             "sumOpenInterestValue": "USD notional",
             "timestamp": "ms epoch (period start)",
             "period": "5m|15m|30m|1h|4h|1d",
+            "rest_recency": "openInterestHist returns up to 500 records per window; "
+            "rolling 30d CSV archive + data.binance.vision metrics are the deep "
+            "historical route (recorded separately, never conflated)",
         },
         SensorFamily.MECHANICAL_BOOK_SNAPSHOT: {
             "bids/asks": "[[price USD, qty base asset]]",
@@ -145,6 +168,11 @@ class BinanceCapabilityProbe(RestCapabilityProbeBase):
             params["startTime"] = int(request.requested_start.timestamp() * 1000)
             params["endTime"] = int(request.requested_end.timestamp() * 1000)
             params["limit"] = 1000
+            if sensor is SensorFamily.MECHANICAL_OPEN_INTEREST:
+                # openInterestHist requires an explicit aggregation `period`;
+                # its own doc cap is 500 records per call.
+                params["period"] = OI_PERIOD
+                params["limit"] = 500
         elif sensor is SensorFamily.MECHANICAL_BOOK_SNAPSHOT:
             params["limit"] = 100
         return {"url": self._endpoint_for(sensor), "params": params}

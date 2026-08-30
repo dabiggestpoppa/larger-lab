@@ -132,7 +132,19 @@ def test_characterize_oi_history_numeric_string_timestamps():
     # ms-epoch strings must parse to real datetimes
     assert attempt.first_timestamp_returned == datetime(2022, 6, 15, tzinfo=UTC)
     assert "openInterest" in attempt.native_units_summary
-    assert "contracts (linear)" in attempt.native_units_summary["openInterest"]
+    # branch is BYBIT_LINEAR -> OI recorded as base asset, contract-type aware
+    assert "base asset" in attempt.native_units_summary["openInterest"]
+    assert "BYBIT_LINEAR" in attempt.native_units_summary["openInterest"]
+
+
+def test_oi_units_not_frozen_to_universal_contracts():
+    # The audit forbids freezing "contracts (linear)" as universal Bybit OI
+    # semantics — units must stay CONTRACT-TYPE dependent.
+    request = _request(SensorFamily.MECHANICAL_OPEN_INTEREST)
+    attempt = PROBE.characterize(request, 200, _body("open_interest_hist_success.json"))
+    units = attempt.native_units_summary["openInterest"]
+    assert "CONTRACT-TYPE dependent" in units
+    assert "inverse = USD" in units  # future inverse handled contract-aware
 
 
 def test_characterize_funding_history():
@@ -191,6 +203,28 @@ def test_cursor_pagination_terminal_when_cursor_absent():
     attempt = PROBE.characterize(request, 200, _body("funding_history_success.json"))
     assert attempt.pagination_detected is True
     assert attempt.pagination_complete is True
+
+
+def test_funding_pagination_frozen_independently_of_oi():
+    # Funding pagination must be validated on its OWN documented interface, not
+    # inherited from OI nextPageCursor by assumption.
+    request = _request(SensorFamily.MECHANICAL_FUNDING)
+    attempt = PROBE.characterize(request, 200, _body("funding_history_success.json"))
+    units = attempt.native_units_summary
+    assert "fundingTime" in units
+    assert "validated independently of OI" in units["pagination"]
+    assert "do NOT inherit OI pagination by assumption" in units["pagination"]
+    # funding request never carries the OI-only intervalTime bucket
+    q = PROBE.build_probe_request(_request(SensorFamily.MECHANICAL_FUNDING))
+    assert "intervalTime" not in q["params"]
+
+
+def test_funding_interval_not_frozen_to_8h():
+    request = _request(SensorFamily.MECHANICAL_FUNDING)
+    attempt = PROBE.characterize(request, 200, _body("funding_history_success.json"))
+    units = attempt.native_units_summary
+    assert "interval is NOT frozen to 8h" in units["fundingRate"]
+    assert "symbol-dependent" in units["fundingRate"]
 
 
 def test_recent_trade_has_no_pagination():
