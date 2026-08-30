@@ -28,31 +28,30 @@ SAFE_JOBS = [
 ]
 
 
-@pytest.mark.parametrize("job_type,params,out_rel,needles", SAFE_JOBS)
-def test_representative_safe_job_full_path(tmp_path, job_type, params, out_rel, needles):
+def test_representative_safe_job_full_path(tmp_path):
     from oce_control.representative_jobs import program_for, prepare_workspace
-    from oce_control.execution_runtime import BoundedRunner, JobResourceEnvelope
+    from oce_control.execution_runtime import BoundedRunner, ArtifactStore
 
     env = JobResourceEnvelope(timeout_s=30)
     runner = BoundedRunner(workspace_base=tmp_path, policy=SandboxPolicy())
-    prepare_workspace(tmp_path / "attempt-1", job_type, params)
-    result = runner.run(["python", "-c", program_for(job_type)],
-                        envelope=env, workspace=tmp_path / "attempt-1")
-    assert result.ok, result.stderr
-    out_file = tmp_path / "attempt-1" / out_rel
-    assert out_file.exists()
-    text = out_file.read_text(encoding="utf-8")
-    for n in needles:
-        assert n in text
+    for job_type, params, out_rel, needles in SAFE_JOBS:
+        prepare_workspace(tmp_path / "attempt-1", job_type, params)
+        result = runner.run(["python", "-c", program_for(job_type)],
+                            envelope=env, workspace=tmp_path / "attempt-1")
+        assert result.ok, result.stderr
+        out_file = tmp_path / "attempt-1" / out_rel
+        assert out_file.exists()
+        text = out_file.read_text(encoding="utf-8")
+        for n in needles:
+            assert n in text
 
-    # immutable publication through the content-addressed store + verify
-    from oce_control.execution_runtime import ArtifactStore
-    store = ArtifactStore(tmp_path / "artifact-store")
-    manifest = store.create_manifest(
-        job_id=f"rep-{job_type}", attempt=1, producer_identity="operator:po",
-        worker_id="local-worker", artifact_paths={out_rel: out_file})
-    assert store.verify_reference(manifest["manifest_id"])
-    assert store.read_artifact(out_rel, manifest["manifest_id"]) == out_file.read_bytes()
+        # immutable publication through the content-addressed store + verify
+        store = ArtifactStore(tmp_path / "artifact-store")
+        manifest = store.create_manifest(
+            job_id=f"rep-{job_type}", attempt=1, producer_identity="operator:po",
+            worker_id="local-worker", artifact_paths={out_rel: out_file})
+        assert store.verify_reference(manifest["manifest_id"])
+        assert store.read_artifact(out_rel, manifest["manifest_id"]) == out_file.read_bytes()
 
 
 def test_cancellation_during_execution(tmp_path):
