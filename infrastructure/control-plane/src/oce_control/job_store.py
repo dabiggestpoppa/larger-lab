@@ -46,6 +46,7 @@ class JobEnvelope:
     failure_envelope: dict = field(default_factory=dict)
     evidence_refs: list = field(default_factory=list)
     payload: dict = field(default_factory=dict)  # The actual job payload
+    required_capabilities: list = field(default_factory=list)  # enforced at claim (B2-R4)
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -71,7 +72,8 @@ class JobStore:
                    scheduled_at: Optional[str] = None,
                    parent_job_id: Optional[str] = None,
                    timeout: int = 300,
-                   retry_policy: Optional[dict] = None) -> JobEnvelope:
+                   retry_policy: Optional[dict] = None,
+                   required_capabilities: Optional[list] = None) -> JobEnvelope:
         """Submit a typed job. Validates authority, idempotency, and payload hash."""
         clock = get_clock()
         now = clock.now()
@@ -126,6 +128,7 @@ class JobStore:
             correlation_id=correlation_id,
             parent_job_id=parent_job_id,
             payload=payload,
+            required_capabilities=required_capabilities or [],
         )
 
         self._jobs[job.job_id] = job

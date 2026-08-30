@@ -57,11 +57,13 @@ class PgJobStore:
 
     @staticmethod
     def _row_to_job(row: tuple) -> JobEnvelope:
+        # Column order follows CREATE TABLE jobs + ALTER-added columns (0003).
         (job_id, job_type, schema_version, submitting_actor, authority_context,
          resource_scope, environment, priority, idempotency_key, payload_hash,
          payload, created_at, scheduled_at, attempt_number, retry_policy,
          timeout_seconds, correlation_id, parent_job_id, status, result,
-         failure_envelope, evidence_refs) = row
+         failure_envelope, evidence_refs, updated_at,
+         required_capabilities) = row
         return JobEnvelope(
             job_id=job_id, job_type=job_type, schema_version=schema_version,
             submitting_actor=submitting_actor,
@@ -78,6 +80,7 @@ class PgJobStore:
             status=status, result=result or {},
             failure_envelope=failure_envelope or {},
             evidence_refs=evidence_refs or [],
+            required_capabilities=required_capabilities or [],
         )
 
     # -- submission ----------------------------------------------------------
@@ -90,7 +93,8 @@ class PgJobStore:
                    parent_job_id: Optional[str] = None,
                    timeout: int = 300,
                    retry_policy: Optional[dict] = None,
-                   schema_version: str = "2.0.0") -> JobEnvelope:
+                   schema_version: str = "2.0.0",
+                   required_capabilities: Optional[list] = None) -> JobEnvelope:
         clock = get_clock()
         now = clock.now()
         if idempotency_key is None:
@@ -137,15 +141,16 @@ class PgJobStore:
                          environment, priority, idempotency_key, payload_hash,
                          payload, created_at, scheduled_at, attempt_number,
                          retry_policy, timeout_seconds, correlation_id,
-                         parent_job_id, status)
-                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,0,%s,%s,%s,%s,'pending')""",
+                         parent_job_id, status, required_capabilities)
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,0,%s,%s,%s,%s,'pending',%s)""",
                     (job_id, job_type, schema_version, submitting_actor,
                      __import__("json").dumps(authority_context), resource_scope,
                      environment, priority, idempotency_key, p_hash,
                      __import__("json").dumps(payload), now,
                      scheduled_at or now,
                      __import__("json").dumps(retry_policy or {"max_attempts": 3, "backoff_strategy": "exponential"}),
-                     timeout, correlation_id, parent_job_id),
+                     timeout, correlation_id, parent_job_id,
+                     __import__("json").dumps(required_capabilities or [])),
                 )
                 cur.execute(
                     """INSERT INTO idempotency (idempotency_key, actor_id, action,
@@ -198,6 +203,13 @@ class PgJobStore:
     def jobs_by_correlation(self, correlation_id: str) -> list[JobEnvelope]:
         rows = self._execute("SELECT * FROM jobs WHERE correlation_id = %s", (correlation_id,))
         return [self._row_to_job(r) for r in rows]
+
+    def running_counts_by_type(self) -> dict[str, int]:
+        """Running/leased job counts per job type, for scheduler concurrency (B2-R4)."""
+        rows = self._execute(
+            "SELECT job_type, COUNT(*) FROM jobs WHERE status IN ('leased','running') GROUP BY job_type"
+        )
+        return {r[0]: r[1] for r in rows}
 
     def transition(self, job_id: str, to_state: str, actor_id: str = "") -> JobEnvelope:
         job = self.get_job(job_id)
