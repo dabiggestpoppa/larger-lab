@@ -76,9 +76,12 @@ class WorkerProtocolServer:
     """
 
     def __init__(self, store: PgWorkerFabricStore,
-                 scheduler: Optional[FabricScheduler] = None):
+                 scheduler: Optional[FabricScheduler] = None,
+                 job_store=None):
         self._store = store
         self._scheduler = scheduler or FabricScheduler(store=store)
+        self._job_store = job_store          # PgJobStore (authoritative job rows)
+        self._redis = None                   # optional RedisTransport (notification)
         self._session_ttl = SESSION_TTL_S
 
     # -- hello / respond -----------------------------------------------------
@@ -174,13 +177,69 @@ class WorkerProtocolServer:
         return {"worker_id": sess["worker_id"],
                 "capabilities": sess["capabilities"]}
 
-    def eligible_jobs(self, session_id: str, signature: str) -> list[str]:
+    def set_transport(self, redis=None) -> None:
+        """Attach the disposable Redis transport for job notification. Redis is
+        transport-only: eligibility still reads authoritative PostgreSQL."""
+        self._redis = redis
+
+    def notify_job(self, job_id: str, queue: str = "default") -> int:
+        """Announce available work through the disposable transport. Returns
+        the queue depth (0 when no Redis is attached — never authoritative)."""
+        if self._redis is None:
+            return 0
+        try:
+            return self._redis.notify_job(job_id, queue=queue)
+        except Exception:
+            return 0
+
+    def eligible_jobs(self, session_id: str, signature: str,
+                      queue: str = "default") -> list[str]:
+        """Return job ids this authenticated worker may run today.
+
+        Authoritative source is PostgreSQL: pending jobs whose required
+        capabilities the worker holds. The Redis notification is a transport
+        hint used to order candidates (Redis stays disposable; if it is
+        unavailable we still return PG truth, the worker can still claim).
+        """
         sess = self._auth(session_id, signature, "eligible")
         worker_caps = set(sess["capabilities"] or ())
-        # Jobs the store/production gate has already admitted but not yet
-        # executed are matched by required capabilities on claim. For the
-        # protocol we return a signal the worker may poll for work.
-        return []
+        order = []
+        if self._redis is not None:
+            try:
+                order = [j for j in self._redis.drain_queue(queue) if j]
+            except Exception:
+                order = []
+        eligible = []
+        if self._job_store is not None:
+            for job in self._job_store.jobs_by_status("pending"):
+                required = set(job.required_capabilities or [])
+                if required.issubset(worker_caps):
+                    eligible.append(job.job_id)
+        # notifications (transport hint) first, then remaining PG truth
+        seen: set[str] = set()
+        out: list[str] = []
+        for jid in order + eligible:
+            if jid not in seen:
+                seen.add(jid)
+                out.append(jid)
+        return out
+
+    def fetch_job(self, session_id: str, signature: str, job_id: str) -> dict:
+        """Authenticated worker fetches the job detail it is about to run."""
+        sess = self._auth(session_id, signature, "fetch_job")
+        if self._job_store is None:
+            raise SessionGone("no authoritative job store wired")
+        job = self._job_store.get_job(job_id)
+        if job is None:
+            raise SessionGone(f"unknown job '{job_id}'")
+        required = set(job.required_capabilities or [])
+        worker_caps = set(sess["capabilities"] or [])
+        if not required.issubset(worker_caps):
+            raise CapabilityEscalation(
+                f"worker '{sess['worker_id']}' lacks capabilities for job '{job_id}'")
+        if sess["trust_zone"] != "worker-local":
+            raise WrongTrustZone("fetch_job denied outside worker-local trust zone")
+        return job.to_dict()
 
     def claim(self, session_id: str, signature: str, job: dict) -> dict:
         sess = self._auth(session_id, signature, "claim")

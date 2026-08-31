@@ -110,6 +110,18 @@ class OutboundWorkerClient:
                           {"session_id": sid,
                            "signature": self._sig(sid, "advertise_capabilities")})
 
+    def eligible_jobs(self, session_id=None) -> list:
+        sid = session_id or self._session_id or "?"
+        return self._post("/api/worker/eligible",
+                          {"session_id": sid,
+                           "signature": self._sig(sid, "eligible")}).get("jobs", [])
+
+    def fetch_job(self, job_id, session_id=None) -> dict:
+        sid = session_id or self._session_id or "?"
+        return self._post("/api/worker/fetch_job",
+                          {"session_id": sid, "signature": self._sig(sid, "fetch_job"),
+                           "job_id": job_id})
+
     def claim(self, job: dict, session_id=None) -> dict:
         sid = session_id or self._session_id or "?"
         return self._post("/api/worker/claim",

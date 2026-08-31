@@ -210,6 +210,26 @@ def create_app(api: ControlPlaneAPI, scheduler=None,
             except WorkerProtocolError as e:
                 raise HTTPException(status_code=_proto_status(e), detail=str(e))
 
+        @app.post("/api/worker/eligible")
+        def worker_eligible(body: dict):
+            from fastapi import Query as _Q
+            try:
+                jobs = worker_protocol_server.eligible_jobs(
+                    session_id=body["session_id"], signature=body["signature"],
+                    queue=body.get("queue", "default"))
+                return {"jobs": jobs}
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/fetch_job")
+        def worker_fetch_job(body: dict):
+            try:
+                return worker_protocol_server.fetch_job(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job_id=body["job_id"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
         @app.post("/api/worker/capabilities")
         def worker_capabilities(body: dict):
             try:
