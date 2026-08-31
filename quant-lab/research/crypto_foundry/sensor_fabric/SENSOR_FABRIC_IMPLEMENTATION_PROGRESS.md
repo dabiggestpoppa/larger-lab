@@ -11,21 +11,21 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I08R1 COMPLETE — DERIBIT COMPLETION + QUALITY SEMANTICS SEAL (PASS_SENSOR_B3_I08R1_DERIBIT_SEALED proposed, awaiting operator review) |
+| Current checkpoint | SENSOR-B3-I08R1-RATIFY COMPLETE (governance) — operator ACCEPTED PASS_SENSOR_B3_I08R1_DERIBIT_SEALED; all four providers OFFLINE_FROZEN; SENSOR-B3-I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE AUTHORIZED (IN PROGRESS) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY); DERIBIT I08 HELD pending I08R1 (completion-truth seal: COMPLETE/PARTIAL exclusivity, funding terminal demotion, liquidation source coverage) — I08R1 COMPLETE, PASS_SENSOR_B3_I08R1_DERIBIT_SEALED proposed, awaiting operator review; I09 NOT AUTHORIZED |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY); DERIBIT I08 HELD pending I08R1 (completion-truth seal: COMPLETE/PARTIAL exclusivity, funding terminal demotion, liquidation source coverage) ; I08R1 COMPLETE, PASS_SENSOR_B3_I08R1_DERIBIT_SEALED ACCEPTED (I08R1-RATIFY); DERIBIT OFFLINE_FROZEN; I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE AUTHORIZED (IN PROGRESS) |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
 | Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=4 (KRAKEN_FUTURES + GATE_FUTURES + OKX_SWAP + DERIBIT, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate + OKX + Deribit; PRODUCTION_CANDIDATE mode, 0 failed each) · I14 PRODUCTION-ADAPTER INVENTORY = 17/17 provider×sensor candidates implemented OFFLINE (4 providers × I14 sets) · NETWORK_VALIDATION=NOT_YET_RUN |
-| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE · okx_offline_sealed = TRUE · okx_implementation_frozen = TRUE · okx_network_smoke = NOT_RUN · deribit_adapter_implemented = TRUE (I08) · deribit_completion_truth_sealed = TRUE (I08R1: COMPLETE never PARTIAL; funding completion_proof LIMITED; liquidation completion from source coverage) · deribit_offline_sealed = TRUE (I08R1) · deribit_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
+| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE · okx_offline_sealed = TRUE · okx_implementation_frozen = TRUE · okx_network_smoke = NOT_RUN · deribit_adapter_implemented = TRUE (I08) · deribit_completion_truth_sealed = TRUE (I08R1: COMPLETE never PARTIAL; funding completion_proof LIMITED; liquidation completion from source coverage) · deribit_offline_sealed = TRUE (I08R1) · deribit_offline_implementation_frozen = TRUE (I08R1-RATIFY) · deribit_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE · cross_provider_offline_closure = IN_PROGRESS (SENSOR-B3-I09) |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE — recommended next: SENSOR-B3-I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE (await operator review of PASS_SENSOR_B3_I08R1_DERIBIT_SEALED) |
+| next_checkpoint_authorized | TRUE — SENSOR-B3-I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE (authorized by I08R1-RATIFY; IN PROGRESS); production-adapter network smoke / Bloc 4 NOT authorized |
 
 ## Test counts (cumulative)
 
@@ -180,6 +180,15 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B3-I08R1-RATIFY COMPLETE (governance) — operator ACCEPTED
+  PASS_SENSOR_B3_I08R1_DERIBIT_SEALED.  All four current production adapters
+  recorded OFFLINE_FROZEN (KRAKEN_FUTURES, GATE_FUTURES, OKX_SWAP, DERIBIT)
+  with network_smoke = NOT_RUN each.  Authorization = SENSOR-B3-I09
+  CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE ONLY.  NOT authorized:
+  production-adapter network smoke, Bloc 4, any other provider, adapter
+  matrix, source expansion.  REAL_PROVIDER_ADAPTERS = 4;
+  I14_PRODUCTION_PATHS_IMPLEMENTED_OFFLINE = 17 / 17.  No provider
+  implementation code was modified in this governance commit.
 - SENSOR-B3-I08R1 COMPLETE — DERIBIT COMPLETION + QUALITY SEMANTICS SEAL
   (repair after HOLD_PASS_SENSOR_B3_I08_DERIBIT_ADAPTER_OFFLINE_PENDING_
   I08R1_COMPLETION_SEAL).  Three defects fixed: (A) COMPLETE never carries
