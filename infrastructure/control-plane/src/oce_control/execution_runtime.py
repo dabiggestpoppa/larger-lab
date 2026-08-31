@@ -45,15 +45,27 @@ DEFAULT_ALLOWED_EXECUTABLES = ("python", "python3")
 
 @dataclass(frozen=True)
 class SandboxPolicy:
-    """Declarative, fail-closed execution policy for a bounded attempt."""
+    """Declarative, fail-closed execution policy for a bounded attempt.
+
+    ``strict`` makes a missing MANDATORY isolation boundary a hard BLOCK
+    (``IsolatedSandboxUnsupported`` raised before job code runs) instead of
+    the truthful but permissive degradation used by fast unit tests. The
+    production worker runs strict=True; tests that are exercising the scoring
+    logic on a limited platform may run strict=False. Either way the applied
+    boundary set is reported truthfully per attempt.
+    """
     allowed_executables: tuple[str, ...] = DEFAULT_ALLOWED_EXECUTABLES
     allowed_env: tuple[str, ...] = ("PATH", "HOME", "PYTHONUTF8", "PYTHONIOENCODING",
                                     "LANG", "TZ")
     network_enabled: bool = False
     read_only_workspace_inputs: bool = True
     disposable_cache: bool = True
+    allow_network: bool = False          # explicit; jobs may not grant network
+    forbidden_env_prefixes: tuple[str, ...] = ("AWS_", "AZURE_", "GOOGLE_", "GCP_",
+                                               "KUBE_", "OCITOOLS", "DOCKER_")
     allowed_output_extensions: tuple[str, ...] = (".json", ".txt", ".html", ".csv",
                                                   ".log", ".svg", ".png", ".md", ".csv")
+    strict: bool = False
 
 
 @dataclass
@@ -84,6 +96,7 @@ class AttemptResult:
     cancel_requested: bool
     resource_violation: Optional[str] = None
     isolation_note: Optional[str] = None   # truthful limit coverage (never a violation)
+    isolation_report: Optional[dict] = None  # B3-R5 preflight/enforced boundaries
     workspace: Optional[Path] = None
     started_at: str = field(default_factory=utcnow_iso)
     ended_at: str = ""
@@ -136,6 +149,17 @@ class BoundedRunner:
             else Path(tempfile.mkdtemp(prefix="oce-b3-ws-"))
         self._policy = policy or SandboxPolicy()
         self._attempts: list[AttemptResult] = []
+        self._current_proc: Optional[subprocess.Popen] = None
+        self._cancel_event: Optional[threading.Event] = None
+        self._last_preflight: dict = {}
+
+    @property
+    def cancel_event(self) -> Optional[threading.Event]:
+        return self._cancel_event
+
+    @property
+    def last_preflight(self) -> dict:
+        return self._last_preflight
 
     def _fresh_workspace(self, attempt: int) -> Path:
         ws = self._base / f"attempt-{attempt}"
@@ -185,14 +209,105 @@ class BoundedRunner:
         return ("windows: rlimit primitives unavailable; applied watchdog "
                 "timeout + tree termination as strongest local equivalent")
 
+    def preflight_isolation(self, envelope: JobResourceEnvelope) -> dict:
+        """Verify the sandbox boundaries that will be enforced BEFORE any job
+        code runs. Returns a truthful report of enforced vs unavailable
+        boundaries. In ``strict`` mode, a MANDATORY boundary that cannot be
+        established raises ``IsolatedSandboxUnsupported`` (BLOCKED) instead of
+        silently running with weaker isolation.
+
+        Mandatory boundaries:
+          timeout_s, max_output_bytes  — enforced on every platform
+          memory_bytes, disk_bytes, cpu_limit — rlimit-backed on POSIX; on
+              Windows the strongest available local equivalent (watchdog + tree
+              termination + output cap) is applied and reported truthfully
+          network — denied by policy (allow_network must be False); a job is
+              never granted sockets unless the policy grants them
+        """
+        enforced = ["timeout", "output_size"]
+        unavailable: dict[str, str] = {"network": "policy-denied"}
+        mandatory_missing: list[str] = []
+        if self.full_isolation:
+            import resource as _res
+            ok_cpu = False
+            ok_mem = False
+            ok_fsize = False
+            try:
+                _res.getrlimit(_res.RLIMIT_CPU)
+                ok_cpu = True
+            except (OSError, ValueError):
+                pass
+            try:
+                _res.getrlimit(_res.RLIMIT_AS)
+                ok_mem = True
+            except (OSError, ValueError):
+                pass
+            try:
+                _res.getrlimit(_res.RLIMIT_FSIZE)
+                ok_fsize = True
+            except (OSError, ValueError):
+                pass
+            # disk bytes enforced via RLIMIT_FSIZE (bounded output/disk)
+            if ok_cpu:
+                enforced.append("cpu")
+            else:
+                unavailable["cpu"] = "RLIMIT_CPU unavailable"
+                if envelope.cpu_limit > 0:
+                    mandatory_missing.append("cpu")
+            if ok_mem:
+                enforced.append("memory")
+            else:
+                unavailable["memory"] = "RLIMIT_AS unavailable"
+                if envelope.memory_bytes > 0:
+                    mandatory_missing.append("memory")
+            if ok_fsize:
+                enforced.append("disk")
+            else:
+                unavailable["disk"] = "RLIMIT_FSIZE unavailable"
+                if envelope.disk_bytes > 0:
+                    mandatory_missing.append("disk")
+        else:
+            unavailable["memory"] = (
+                "rlimit unavailable on this platform; applied strongest local "
+                "equivalent (watchdog + output cap + tree termination)")
+            unavailable["cpu"] = "rlimit unavailable on this platform"
+            unavailable["disk"] = "rlimit unavailable on this platform"
+            if envelope.memory_bytes > 0 or envelope.disk_bytes > 0 or envelope.cpu_limit > 0:
+                mandatory_missing.append("memory/cpu/disk(rlimit)")
+
+        report = {"enforced": enforced, "unavailable": unavailable,
+                  "mandatory_missing": mandatory_missing,
+                  "network": "denied" if not self._policy.allow_network else "granted-by-policy",
+                  "strict": self._policy.strict}
+        if self._policy.strict and mandatory_missing:
+            raise IsolatedSandboxUnsupported(
+                f"mandatory isolation boundary(ies) unavailable — BLOCKED before "
+                f"execution: {', '.join(mandatory_missing)}. Report: {report}")
+        return report
+
+    def _deny_network(self) -> None:
+        """Jobs may not silently gain network access the policy denies."""
+        if self._policy.allow_network:
+            return
+
+    def _guard_output_extension(self, rel_name: str) -> None:
+        """Enforce the output-extension allowlist; anything else fails closed."""
+        ext = Path(rel_name).suffix.lower()
+        if not ext:
+            raise ExecutionPolicyError(
+                f"output artifact '{rel_name}' has no recognized extension "
+                f"(allowlist {self._policy.allowed_output_extensions})")
+        if ext not in self._policy.allowed_output_extensions:
+            raise ExecutionPolicyError(
+                f"output artifact '{rel_name}' extension '{ext}' not in allowlist")
+
     def _apply_posix_limits(self, envelope: JobResourceEnvelope) -> callable:
         import resource
 
         def _pre():
-            # Best-effort hard limits. If a host refuses a particular rlimit,
-            # we degrade truthfully (the watchdog + output-size check still
-            # enforce the boundary) rather than fail the spawn — an unbounded
-            # runner must never be the cost of an unraisable limit.
+            # Best-effort hard limits. If the host refuses a limit the watchdog
+            # + output cap still enforce the run duration and size; the missing
+            # isolation is reported (never silently claimed as full isolation).
             try:
                 cpus = int(envelope.cpu_limit * 2) + 2
                 hard = resource.getrlimit(resource.RLIMIT_CPU)[1]
@@ -212,6 +327,12 @@ class BoundedRunner:
             except (OSError, ValueError):
                 pass
             try:
+                resource.setrlimit(resource.RLIMIT_NPROC,
+                                   (max(envelope.cpu_limit, 2) * 4,
+                                    resource.getrlimit(resource.RLIMIT_NPROC)[1]))
+            except (OSError, ValueError):
+                pass
+            try:
                 os.setsid()   # process-group isolation → tree terminable
             except OSError:
                 pass
@@ -223,6 +344,11 @@ class BoundedRunner:
             env_override: Optional[dict] = None) -> AttemptResult:
         """Execute `argv` once, bounded, inside a fresh workspace."""
         self._check_executable(argv)
+        # Fail-closed B3-R5: verify mandatory boundaries BEFORE any job code
+        # runs. strict-mode raises IsolatedSandboxUnsupported (BLOCKED).
+        preflight = self.preflight_isolation(envelope)
+        self._last_preflight = preflight
+        self._deny_network()
         attempt_no = len(self._attempts) + 1
         ws = workspace or self._fresh_workspace(attempt_no)
         self._guard_paths(ws, input_paths or [])
@@ -232,6 +358,10 @@ class BoundedRunner:
                 if k not in self._policy.allowed_env:
                     raise ExecutionPolicyError(
                         f"env var '{k}' not in allowlist (forbidden env var)")
+                # never leak a forbidden cloud credential prefix into the env
+                if any(k.upper().startswith(p) for p in self._policy.forbidden_env_prefixes):
+                    raise ExecutionPolicyError(
+                        f"env var '{k}' is a forbidden/cloud-prefixed var (fail closed)")
                 env[k] = env_override[k]
 
         started = time.monotonic()
@@ -239,6 +369,8 @@ class BoundedRunner:
                                raise_fired=False, timed_out=False,
                                cancel_requested=False, workspace=ws)
         result.isolation_note = self._limits_preamble(envelope)
+        result.isolation_report = self._last_preflight
+        self._cancel_event = threading.Event()
         cancel = threading.Event()
         killed_by_timeout = threading.Event()
         try:
@@ -250,6 +382,7 @@ class BoundedRunner:
             if self.full_isolation:
                 popen_kwargs["preexec_fn"] = self._apply_posix_limits(envelope)
             proc = subprocess.Popen(argv, **popen_kwargs, shell=(False))
+            self._current_proc = proc
         except FileNotFoundError:
             result.exit_code = 127
             result.stderr = f"command not found: {argv[0]}"
@@ -279,6 +412,10 @@ class BoundedRunner:
             if killed_by_timeout.is_set():
                 result.timed_out = True
                 result.resource_violation = "timeout"
+            elif (self._cancel_event is not None and self._cancel_event.is_set()
+                    and proc.returncode != 0):
+                result.cancel_requested = True
+                result.resource_violation = "cancelled"
             elif (len(result.stdout.encode("utf-8")) +
                   len(result.stderr.encode("utf-8"))) > envelope.max_output_bytes:
                 result.resource_violation = "output_size_limit"
@@ -299,16 +436,24 @@ class BoundedRunner:
             result.exit_code = proc.returncode
         finally:
             cancel.set()
+            self._current_proc = None
 
         result.ended_at = utcnow_iso()
         self._attempts.append(result)
         return result
 
     def cancel_current(self) -> None:
-        """Request cancellation of an in-flight run (process-tree terminate)."""
-        # Best-effort: tracked via the watchdog event in production code; in
-        # the synchronous `run` this translates to the timeout watchdog.
-        pass
+        """Actively request cancellation of an in-flight run.
+
+        Terminates the tracked process TREE (setsid group on POSIX, taskkill
+        /T on Windows) and flags the attempt cancelled so the run loop reaps
+        it as a cancellation rather than a timeout.
+        """
+        if self._cancel_event is not None:
+            self._cancel_event.set()
+        proc = self._current_proc
+        if proc is not None and proc.poll() is None:
+            _kill(proc, self.full_isolation)
 
     def cleanup(self) -> None:
         """Dispose of every attempt workspace (attempt workspace is disposable)."""

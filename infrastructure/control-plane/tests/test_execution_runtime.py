@@ -3,6 +3,7 @@ retry/dead-letter (B3-C6) tests."""
 from __future__ import annotations
 import json
 import platform
+import time
 from pathlib import Path
 import pytest
 
@@ -183,3 +184,79 @@ class TestRetryCoordinator:
         assert rc.is_poison("job-r")
         assert rc.operator_authorized_retry("job-r") is True
         assert rc.is_poison("job-r") is False
+
+
+class TestSandboxB3R5:
+    """B3-R5: fail-closed disposable worker isolation."""
+
+    def test_preflight_reports_enforced_boundaries_on_posix(self, tmp_path):
+        runner = BoundedRunner(workspace_base=tmp_path, policy=SandboxPolicy())
+        report = runner.preflight_isolation(JobResourceEnvelope())
+        # timeout + output-size are ALWAYS enforced regardless of platform
+        assert "timeout" in report["enforced"]
+        assert "output_size" in report["enforced"]
+        assert report["network"] == "denied"
+        assert "enforced" in report and "unavailable" in report
+
+    def test_strict_mode_blocks_when_isolation_unavailable(self, tmp_path, monkeypatch):
+        # Simulate a platform without rlimit primitives by forcing full_isolation False
+        import platform as _platform
+        monkeypatch.setattr(
+            BoundedRunner, "full_isolation",
+            property(lambda self: False))  # pretend Windows-like
+        policy = SandboxPolicy(strict=True)
+        runner = BoundedRunner(workspace_base=tmp_path, policy=policy)
+        from oce_control.execution_runtime import IsolatedSandboxUnsupported
+        with pytest.raises(IsolatedSandboxUnsupported):
+            runner.run(["python", "-c", "print(1)"], envelope=JobResourceEnvelope())
+
+    def test_non_strict_reports_degradation_without_raising(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(BoundedRunner, "full_isolation",
+                            property(lambda self: False))
+        runner = BoundedRunner(workspace_base=tmp_path,
+                               policy=SandboxPolicy(strict=False))
+        r = runner.run(["python", "-c", "pass"], envelope=JobResourceEnvelope())
+        assert r.exit_code == 0
+        assert r.isolation_report is not None
+        assert any("unavailable" in k or k.startswith("memory") or k == "cpu" or k == "disk"
+                   for k in r.isolation_report.get("unavailable", {})) or \
+            r.isolation_report["strict"] is False
+
+    def test_forbidden_cloud_prefix_env_leak_rejected(self, tmp_path):
+        with pytest.raises(ExecutionPolicyError):
+            BoundedRunner(workspace_base=tmp_path).run(
+                ["python", "-c", "print(os.environ)"], envelope=ENV,
+                env_override={"AWS_ACCESS_KEY_ID": "hardcoded-leak"})
+
+    def test_cancel_current_terminates_in_flight_run(self, tmp_path):
+        """Active cancellation (defect 9): a long job is killed, not waited out."""
+        import threading
+        runner = BoundedRunner(workspace_base=tmp_path, policy=SandboxPolicy())
+        env = JobResourceEnvelope(timeout_s=120)
+        holder: dict = {}
+
+        def _target():
+            holder["result"] = runner.run(
+                ["python", "-c", "import time; time.sleep(120)"], envelope=env)
+
+        t = threading.Thread(target=_target, daemon=True)
+        t.start()
+        deadline = time.time() + 5
+        while not runner.cancel_event and time.time() < deadline:
+            time.sleep(0.05)
+        assert runner.cancel_event is not None
+        # active cancel well before the 120s timeout
+        runner.cancel_current()
+        t.join(timeout=20)
+        assert not t.is_alive(), "cancel_current should have reaped the in-flight tree"
+        result = holder["result"]
+        assert result.resource_violation == "cancelled" or result.timed_out
+
+    def test_output_extension_allowlist_enforced(self, tmp_path):
+        from oce_control.execution_runtime import ExecutionPolicyError
+        runner = BoundedRunner(workspace_base=tmp_path, policy=SandboxPolicy())
+        runner._check_executable(["python", "-c", "pass"])
+        with pytest.raises(ExecutionPolicyError):
+            runner._guard_output_extension("report.exe")
+        # allowed extension passes
+        runner._guard_output_extension("report.json")

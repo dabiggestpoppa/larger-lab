@@ -62,7 +62,7 @@ def main() -> int:
         fence_id = lease_id[:8]
         runner = BoundedRunner(workspace_base=Path(os.environ.get(
             "OCE_WS_BASE", str(Path.cwd() / "b3-workspace"))),
-            policy=SandboxPolicy())
+            policy=SandboxPolicy(strict=True))   # B3-R5: fail closed on missing isolation
         ws = Path(os.environ.get("OCE_ATTEMPT_WS",
                                  str(Path.cwd() / f"attempt-{fence_id}")))
         prepare_workspace(ws, spec["job_type"], params)
