@@ -20,6 +20,7 @@ from .epoch import EpochManifest
 from .outcome import OutcomePacket, ResumeCapsule
 from .truth import CapabilityStatus, TruthRegistry
 from .forbidden import ForbiddenTransitionValidator
+from .governed import GovernedTransitionExecutor, TraceEntry
 from .replay import DeterministicReplay, ReplayEvent, ReplayResult
 from .fixtures import StressScenarioSpec, spec_to_replay_events, load_spec
 
@@ -36,6 +37,7 @@ __all__ = [
     "AffectedSurface", "ConstraintField", "PhaseEvaluationContract",
     "TransformationWindowSpec", "EpochManifest", "OutcomePacket", "ResumeCapsule",
     "CapabilityStatus", "TruthRegistry", "ForbiddenTransitionValidator",
+    "GovernedTransitionExecutor", "TraceEntry",
     "DeterministicReplay", "ReplayEvent", "ReplayResult",
     "StressScenarioSpec", "spec_to_replay_events", "load_spec",
 ]

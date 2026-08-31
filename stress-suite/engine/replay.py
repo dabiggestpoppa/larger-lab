@@ -1,9 +1,16 @@
-"""Deterministic replay (G1 §15). initial state + ordered event stream +
-versioned contracts -> terminal state + transition trace.
+"""Deterministic replay (G1 §15; HARDENED G1R-03/04/07).
 
-Same inputs and same contract versions must produce identical output — no model
-call, no wall-clock dependence. Timestamps are injected via ReplayClock or
-derived from ordering (seq).
+initial state + ordered event stream + versioned contracts -> terminal state +
+transition trace, all routed through the GovernedTransitionExecutor so
+constitutional cross-cutting rules cannot be bypassed via a lower API.
+
+Contract-version policy (G1R-04, documented):
+  * If a ReplayEvent supplies `contract_version`, the active machine edge
+    contract MUST match; otherwise the event FAILS CLOSED and is recorded as a
+    deterministic invalid event (CONTRACT_VERSION_MISMATCH) with no state change.
+  * A blank ``""``/None version means "use the active contract" — permitted for
+    smoke fixtures ONLY.
+Historical traces never silently execute under a different edge contract.
 """
 from __future__ import annotations
 
@@ -12,8 +19,10 @@ from dataclasses import dataclass, field, asdict
 from typing import Any, Dict, List, Optional, Sequence
 
 from .base import ReplayClock
+from .governed import GovernedTransitionExecutor, TraceEntry
 from .lifecycle import KnowledgeRecord, LifecycleEngine, LifecycleEdgeTable
 from .phase import PhaseStateMachine, PhaseEdgeTable
+from .authority import AuthorityState
 
 
 class ReplayInputError(ValueError):
@@ -23,8 +32,8 @@ class ReplayInputError(ValueError):
 @dataclass(frozen=True)
 class ReplayEvent:
     seq: int
-    event_type: str                # "phase_step" | "lifecycle_step"
-    machine: str                   # "phase" | "lifecycle"
+    event_type: str                # e.g. "phase_step" | "lifecycle_step"
+    machine: str                   # "phase" | "lifecycle" | "authority" | "evidence" | "policy"
     actor: str
     target: str                    # institution ("@INST") or knowledge record_id
     payload: Dict[str, Any]
@@ -43,9 +52,10 @@ class ReplayResult:
 
 
 class DeterministicReplay:
-    """Runs an event stream against fresh machine instances and returns a stable
+    """Runs an event stream against a governed executor and returns a stable
     fingerprint. Events are applied in strict seq order; out-of-order or duplicate
-    seq detection makes malformed streams fail closed."""
+    seq detection makes malformed streams fail closed. No model call, no
+    wall-clock dependence."""
 
     def __init__(
         self,
@@ -53,50 +63,29 @@ class DeterministicReplay:
         lifecycle_table: Optional[LifecycleEdgeTable] = None,
         clock: Optional[ReplayClock] = None,
         seed_records: Optional[Sequence[KnowledgeRecord]] = None,
+        authority: Optional[AuthorityState] = None,
     ):
         self.phase = PhaseStateMachine(edge_table=phase_graph or PhaseEdgeTable.default(), initial="STABLE")
         self.lifecycle = LifecycleEngine(edge_table=lifecycle_table or LifecycleEdgeTable.default())
+        self.authority = authority or AuthorityState()
         for r in seed_records or []:
             self.lifecycle.add(r)
         self.clock = clock or ReplayClock()
+        self.executor = GovernedTransitionExecutor(self.phase, self.lifecycle, self.authority)
 
     def run(self, events: Sequence[ReplayEvent]) -> ReplayResult:
-        trace: List[dict] = []
-        # deterministic replay preserves the GIVEN order; enforce strict seq growth
+        if not isinstance(events, (list, tuple)):
+            events = list(events)
         prev = -1
         for ev in events:
             if ev.seq <= prev:
                 raise ReplayInputError(f"out-of-order seq {ev.seq} after {prev}")
             prev = ev.seq
 
+        trace: List[dict] = []
         for ev in events:
-            ts = self.clock.stamp(ev.seq)
-            if ev.machine == "phase":
-                decision = self.phase.attempt(
-                    seq=ev.seq, actor=ev.actor, to_state=ev.payload.get("to_state", ""),
-                    evidence_vector=ev.payload.get("evidence_vector", {}), authority_level=ev.payload.get("authority_level", "OBSERVER"),
-                    mutation_class=ev.payload.get("mutation_class", "READ_ONLY"),
-                    operator_required=ev.payload.get("operator_required", False),
-                    evidence_refs=ev.payload.get("evidence_refs", []),
-                    reason=ev.payload.get("reason", ""), timestamp=ts,
-                )
-                trace.append({"seq": ev.seq, "machine": "phase", "allowed": decision.allowed,
-                              "from": decision.phase_from, "to": decision.phase_to, "rationale": decision.rationale})
-            elif ev.machine == "lifecycle":
-                rec = self.lifecycle.get(ev.target)
-                if rec is None:
-                    trace.append({"seq": ev.seq, "machine": "lifecycle", "allowed": False,
-                                  "from": "?", "to": ev.payload.get("to_state", ""), "rationale": "unknown record"})
-                    continue
-                tr = rec.transition(
-                    seq=ev.seq, to_state=ev.payload.get("to_state", ""), actor=ev.actor,
-                    authority_basis=ev.payload.get("authority_basis", ""), authority_level=ev.payload.get("authority_level", "OBSERVER"),
-                    reason=ev.payload.get("reason", ""), evidence_refs=ev.payload.get("evidence_refs", []), timestamp=ts,
-                )
-                trace.append({"seq": ev.seq, "machine": "lifecycle", "allowed": (rec.state == tr.to_state),
-                              "from": tr.from_state, "to": tr.to_state, "rationale": tr.reason})
-            else:
-                raise ReplayInputError(f"unknown machine {ev.machine}")
+            entry = self.executor.execute(ev)
+            trace.append(entry.to_dict())
 
         terminal_lifecycle = {rid: r.state for rid, r in self.lifecycle.records.items()}
         fp = deterministic_fp(self.phase.state, terminal_lifecycle, trace)
@@ -106,6 +95,16 @@ class DeterministicReplay:
             trace=trace,
             fingerprint=fp,
         )
+
+    def ledger_trace(self) -> List[dict]:
+        """Raw machine ledger (decisions/transitions) — for forensic audit."""
+        out = []
+        for d in self.phase.decisions:
+            out.append(d.to_dict())
+        for rid, rec in self.lifecycle.records.items():
+            for t in rec.transitions:
+                out.append(t.to_dict())
+        return out
 
 
 def deterministic_fp(phase: str, lifecycle: Dict[str, str], trace: List[dict]) -> str:
