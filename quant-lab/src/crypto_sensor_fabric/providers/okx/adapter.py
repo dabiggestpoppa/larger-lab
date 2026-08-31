@@ -382,18 +382,40 @@ class OkxAdapter:
             # completeness: UNKNOWN continuation != complete acquisition.
             # No invented continuation token is emitted; the returned page is
             # preserved as partial evidence with truthful quality flags
-            # (rows overlap the requested window -> PARTIAL_INTERVAL, rows
-            # entirely outside it -> GAP_DETECTED).  Requested and actual
-            # boundaries stay separate on the FetchBatch.
+            # (any validated returned row inside the requested window ->
+            # PARTIAL_INTERVAL, rows entirely outside it -> GAP_DETECTED).
+            # Requested and actual boundaries stay separate on the FetchBatch.
             is_complete = False
-            if rows and actual_first is not None and actual_last is not None:
-                overlaps = (
-                    actual_first < request.end_time
-                    and actual_last >= request.start_time
+            if rows:
+                # Overlap truth comes from the ACTUAL VALIDATED ROW TIMESTAMPS,
+                # never from first/last row ordering: OKX trade history can be
+                # returned in descending order (rows[0] = newest), so a range
+                # test on actual_first/actual_last could misclassify a page
+                # containing a valid in-window row as GAP_DETECTED
+                # (SENSOR-B3-I07R2).  Every semantic row was schema-validated
+                # upstream (ms-epoch string); a row that still fails to produce
+                # a convenience datetime is an internal invariant violation and
+                # FAILS CLOSED rather than being silently classified as GAP.
+                row_datetimes = [self._row_dt(r, sensor) for r in rows]
+                if any(dt is None for dt in row_datetimes):
+                    raise ProviderSemanticError(
+                        provider_id=self.provider_id,
+                        sensor_family=sensor,
+                        request_fingerprint=fp,
+                        detail=(
+                            "internal invariant violation: a schema-validated "
+                            "historical row produced no convenience datetime; "
+                            "refusing to classify window overlap"
+                        ),
+                    )
+                has_in_window = any(
+                    request.start_time <= dt < request.end_time
+                    for dt in row_datetimes
+                    if dt is not None
                 )
                 quality_flags.append(
                     QualityFlagAcquisition.PARTIAL_INTERVAL
-                    if overlaps
+                    if has_in_window
                     else QualityFlagAcquisition.GAP_DETECTED
                 )
 

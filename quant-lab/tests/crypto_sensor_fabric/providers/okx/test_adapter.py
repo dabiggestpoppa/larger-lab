@@ -341,6 +341,104 @@ class TestWindowTruth:
         assert batch.is_complete is True
 
 
+class TestWindowTruthOrderInvariant:
+    """SENSOR-B3-I07R2 — PARTIAL/GAP classification is ORDER INVARIANT.
+
+    OKX trade history can be returned in descending time order (rows[0] =
+    newest, rows[-1] = oldest), so overlap must be decided from ANY validated
+    row timestamp inside the requested [start, end) window — never from a
+    range test on actual_first/actual_last (first/last RETURNED rows).  A page
+    containing a valid in-window row is always PARTIAL_INTERVAL; a page with
+    no in-window row is GAP_DETECTED; the two flags are mutually exclusive.
+    """
+
+    @staticmethod
+    def _dt(ts_ms: int) -> datetime:
+        return datetime.fromtimestamp(ts_ms / 1000, tz=UTC)
+
+    @staticmethod
+    def _window(center_dt: datetime) -> tuple[datetime, datetime]:
+        half = timedelta(minutes=5)
+        return center_dt - half, center_dt + half
+
+    def _fetch_descending(self, start: datetime, end: datetime) -> FetchBatch:
+        adapter = _adapter(routes={"/history-trades": (200, FX.TRADE_DESCENDING)})
+        return adapter.fetch_trades(request(TRADE, start=start, end=end))
+
+    @staticmethod
+    def _assert_partial(batch: FetchBatch) -> None:
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+    @staticmethod
+    def _assert_gap(batch: FetchBatch) -> None:
+        assert QualityFlagAcquisition.GAP_DETECTED in batch.quality_flags
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL not in batch.quality_flags
+
+    def test_descending_page_oldest_row_only_in_window(self) -> None:
+        # requested window contains ONLY t1 (the oldest, last-returned row) —
+        # the pre-I07R2 first/last range test could misclassify this as GAP.
+        s, e = self._window(self._dt(FX.TRADE_T1))
+        batch = self._fetch_descending(s, e)
+        self._assert_partial(batch)
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+
+    def test_descending_page_newest_row_only_in_window(self) -> None:
+        s, e = self._window(self._dt(FX.TRADE_T3))
+        batch = self._fetch_descending(s, e)
+        self._assert_partial(batch)
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+
+    def test_descending_page_middle_row_only_in_window(self) -> None:
+        s, e = self._window(self._dt(FX.TRADE_T2))
+        batch = self._fetch_descending(s, e)
+        self._assert_partial(batch)
+        assert batch.is_complete is False
+
+    def test_descending_page_no_row_in_window_is_gap(self) -> None:
+        t1 = self._dt(FX.TRADE_T1)
+        s, e = t1 - timedelta(hours=2), t1 - timedelta(hours=1)
+        batch = self._fetch_descending(s, e)
+        self._assert_gap(batch)
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+
+    def test_scrambled_non_monotonic_page_any_in_window_is_partial(self) -> None:
+        # intentionally scrambled row order; t3 is inside the requested window.
+        s, e = self._window(self._dt(FX.TRADE_T3))
+        adapter = _adapter(routes={"/history-trades": (200, FX.TRADE_SCRAMBLED)})
+        batch = adapter.fetch_trades(request(TRADE, start=s, end=e))
+        self._assert_partial(batch)
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+
+    def test_descending_page_actual_boundaries_preserve_returned_row_order(self) -> None:
+        # actual_first/actual_last keep their meaning (first/last RETURNED
+        # provider rows), NOT chronological min/max: on a descending page the
+        # first row is the newest and the last is the oldest.
+        s, e = self._window(self._dt(FX.TRADE_T1))
+        batch = self._fetch_descending(s, e)
+        assert batch.actual_first_timestamp == self._dt(FX.TRADE_T3)
+        assert batch.actual_last_timestamp == self._dt(FX.TRADE_T1)
+        assert batch.actual_first_timestamp > batch.actual_last_timestamp
+
+    def test_ascending_funding_regression_exclusivity(self) -> None:
+        # ascending funding page: in-window row -> PARTIAL only; no in-window
+        # row -> GAP only (existing I07R1 behavior preserved).
+        row_dt = datetime.fromtimestamp(1755000000000 / 1000, tz=UTC)
+        s, e = self._window(row_dt)
+        adapter = _adapter(routes={"/funding-rate-history": HAPPY_ROUTES["/funding-rate-history"]})
+        batch = adapter.fetch_funding(request(FUNDING, start=s, end=e))
+        self._assert_partial(batch)
+        assert batch.is_complete is False
+        old_start = datetime(2021, 1, 1, tzinfo=UTC)
+        gap = adapter.fetch_funding(request(FUNDING, start=old_start))
+        self._assert_gap(gap)
+        assert gap.is_complete is False
+
+
 class TestTimestampUnits:
     def test_funding_convenience_dt_from_ms_string(self) -> None:
         batch = _adapter(

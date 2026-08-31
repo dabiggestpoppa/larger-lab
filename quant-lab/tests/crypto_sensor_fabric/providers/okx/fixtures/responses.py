@@ -104,6 +104,42 @@ TRADE_MISSING_SIDE = _ok([
 ])
 TRADE_DRIFT = {"label": "INVALID", "message": "not data"}
 
+#: descending-order trade page (newest first): OKX history can be returned in
+#: descending time order, so PARTIAL/GAP classification must NOT depend on
+#: first/last row ordering (SENSOR-B3-I07R2).  t3 newest, t2, t1 oldest.
+TRADE_T3 = 1755000000000  # 2025-08-12T22:40:00Z
+TRADE_T2 = 1754999400000  # 2025-08-12T22:30:00Z
+TRADE_T1 = 1754998800000  # 2025-08-12T22:20:00Z
+
+
+def trade_row(ts_ms: int, trade_id: str = "500001", side: str = "sell") -> dict[str, Any]:
+    return {
+        "instId": SYMBOL,
+        "tradeId": trade_id,
+        "px": "29510.0",
+        "sz": "1.1",
+        "side": side,
+        "ts": str(ts_ms),
+        "source": "a",
+    }
+
+
+TRADE_DESCENDING = _ok(
+    [
+        trade_row(TRADE_T3, trade_id="500003"),
+        trade_row(TRADE_T2, trade_id="500002", side="buy"),
+        trade_row(TRADE_T1, trade_id="500001"),
+    ]
+)
+#: scrambled (non-monotonic) trade page: still contains a valid in-window row.
+TRADE_SCRAMBLED = _ok(
+    [
+        trade_row(TRADE_T2, trade_id="500002", side="buy"),
+        trade_row(TRADE_T3, trade_id="500003"),
+        trade_row(TRADE_T1, trade_id="500001"),
+    ]
+)
+
 # --------------------------------------------------------------------------- #
 # BOOK (CURRENT_ONLY)
 # --------------------------------------------------------------------------- #
