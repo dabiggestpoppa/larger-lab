@@ -162,16 +162,27 @@ imbalance/spread/depth/slippage derivation.
 
 ## 14. Completion semantics (window truth)
 
-The Deribit history request carries the window directly.  `is_complete=True`
-ONLY when the returned rows are non-empty, every row timestamp lies inside the
-requested `[start_time, end_time)` window, AND the provider-native terminal
-condition holds (FUNDING: page under count cap 1000; TRADE/LIQUIDATION:
-`has_more == false`).  Otherwise `is_complete=False` with truthful
-`PARTIAL_INTERVAL` / `GAP_DETECTED` flags (order-invariant: overlap from ANY
-validated row timestamp, never from first/last returned rows).  Empty pages →
-`EMPTY_VALID`, completeness UNKNOWN.  BOOK_SNAPSHOT = complete per current
-snapshot unit.  Requested vs actual boundaries stay separate on the
-`FetchBatch`.
+**CORRECTED by SENSOR-B3-I08R1** (see
+`BLOC_03_I08R1_DERIBIT_COMPLETION_SEAL_EVIDENCE.md`):
+
+- COMPLETE never carries `PARTIAL_INTERVAL` (flags are assigned AFTER the
+  completion decision; PARTIAL/GAP mutually exclusive; empty page =
+  `EMPTY_VALID` only).
+- Coverage truth comes from the FULL schema-validated SOURCE page, never the
+  filtered liquidation projection (a projection cannot manufacture
+  completeness).
+- FUNDING is never certified complete: the "short page under count cap 1000
+  is exhaustive" rule is only a characterization heuristic, not a proven
+  provider contract (`completion_proof = LIMITED`).
+- TRADE/LIQUIDATION are complete only when semantic output is non-empty,
+  every source-page row lies inside the requested `[start_time, end_time)`
+  window, and `has_more == false`.
+
+Superseded I08 wording: "...terminal condition holds (FUNDING: page under
+count cap 1000; ...)" — the funding clause was demoted; the rest of the
+window-truth doctrine (requested vs actual boundaries stay separate;
+order-invariant overlap from ANY validated row timestamp; BOOK_SNAPSHOT
+complete per snapshot unit) stands unchanged.
 
 ## 15. Pagination / resume
 
@@ -250,6 +261,8 @@ error typing, method identity all pass.  Common suite unchanged.
 
 - Trade/liquidation/funding continuation beyond one evidence-backed request
   window: UNRESOLVED → LIMITED, no invented resume.
+- Funding completion proof: LIMITED (short-page-under-cap rule lacks a proven
+  provider contract; never certified complete).
 - LIQUIDATION/TRADE verified history is a single I14 timestamp (literal); no
   deep-history claim despite older probe evidence ids.
 - `funding_rate`/`funding_1h`/`funding_8h` unverified-additive.

@@ -98,20 +98,29 @@ committed I13 evidence** — no `next_resume_token` is ever invented
 
 ## Completion semantics
 
-A single evidence-backed request window is certified complete (`is_complete`)
-ONLY when:
+Completion is decided FIRST; quality flags are assigned AFTER, so a
+`COMPLETE` batch never carries `PARTIAL_INTERVAL` (PARTIAL means partial,
+COMPLETE means complete; PARTIAL/GAP are mutually exclusive).
 
-1. the returned rows are non-empty,
-2. every row timestamp lies inside the requested `[start_time, end_time)`
-   window, and
-3. the provider-native terminal condition holds:
-   - FUNDING: page under the count cap (1000);
-   - TRADE/LIQUIDATION: `has_more == false`.
+Coverage truth comes from the FULL SOURCE page (schema-validated source-row
+timestamps), never from a filtered projection: for LIQUIDATION the semantic
+view (only forced-liquidation events) can be narrower than the acquisition
+surface, and a projection can never manufacture completeness.
 
-Anything else is returned truthfully as UNKNOWN/PARTIAL with
-`PARTIAL_INTERVAL` / `GAP_DETECTED` quality flags and `is_complete=False`.
-BOOK_SNAPSHOT is complete per current-snapshot acquisition unit.  Unknown
-continuation != complete acquisition.
+- **BOOK_SNAPSHOT** (CURRENT_ONLY): complete per current-snapshot unit.
+- **TRADE / LIQUIDATION**: `is_complete=True` ONLY when the semantic output
+  is non-empty, EVERY source-page row lies inside the requested
+  `[start_time, end_time)` window, and `has_more == false` (provider-native
+  terminal flag for the current request window).
+- **FUNDING**: **never** certified complete.  The "short page under the count
+  cap is exhaustive" rule is only a characterization heuristic; committed
+  evidence does not prove `get_funding_rate_history` returns ALL window
+  records whenever `len(result) < count` (`completion_proof = LIMITED`).
+
+Incomplete non-empty pages are returned truthfully with `PARTIAL_INTERVAL`
+(in-window coverage) or `GAP_DETECTED` (no in-window coverage); empty pages
+are `EMPTY_VALID` with `is_complete=False` (never GAP from an empty
+response).  Unknown continuation != complete acquisition.
 
 ## Endpoints
 
@@ -159,6 +168,8 @@ symbol support, cursor direction, or field existence.
 
 - Trade/liquidation/funding continuation beyond a single request window:
   UNRESOLVED by committed evidence → LIMITED, no invented resume.
+- Funding completion proof: LIMITED — funding is never certified complete
+  because the short-page-under-cap rule lacks a proven provider contract.
 - Verified history bounds are literal I14 values (single timestamps for
   trade/liquidation); no deep-history claim.
 - `funding_rate`/`funding_1h`/`funding_8h` are unverified additive fields.
