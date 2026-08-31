@@ -65,7 +65,7 @@ def test_epoch_roundtrip(schemas_dir):
 
 def test_eval_contract_roundtrip(schemas_dir):
     c = PhaseEvaluationContract.make(11, version_tag="V1")
-    jsonschema.validate(asdict(c), _load(schemas_dir, "phase-evaluation-contract.schema.json"))
+    jsonschema.validate(c.to_dict(), _load(schemas_dir, "phase-evaluation-contract.schema.json"))
 
 
 def test_scenario_spec_roundtrip(schemas_dir):
