@@ -23,7 +23,7 @@ from __future__ import annotations
 import importlib.util
 from dataclasses import replace
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
@@ -265,7 +265,8 @@ class TestEvidenceAndScope:
         candidates = load_promotion_candidates()
         basis_by_key = {
             (str(c["provider"]), SensorFamily(str(c["sensor"]))): set(
-                str(e) for e in c.get("evidence_basis", [])
+                str(e)
+                for e in cast(list[object], c.get("evidence_basis", []))
             )
             for c in candidates
         }

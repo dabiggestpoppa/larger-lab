@@ -11,15 +11,15 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I09 COMPLETE — CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE (PASS_SENSOR_B3_I09_CROSS_PROVIDER_OFFLINE_CLOSURE proposed, awaiting operator review; I10 network smoke NOT authorized) |
+| Current checkpoint | SENSOR-B3-I09R1 COMPLETE — CROSS-PROVIDER AUTHORITY BOUNDARY MICROSEAL (PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED proposed, awaiting operator review; I10 network smoke NOT authorized) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY); DERIBIT I08 HELD pending I08R1 (completion-truth seal: COMPLETE/PARTIAL exclusivity, funding terminal demotion, liquidation source coverage) ; I08R1 COMPLETE, PASS_SENSOR_B3_I08R1_DERIBIT_SEALED ACCEPTED (I08R1-RATIFY); DERIBIT OFFLINE_FROZEN; I08R1-RATIFY complete, I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE COMPLETE (deterministic 17-path production inventory generated from I14 + adapter code; PASS proposed, awaiting operator review); I10 (network smoke) NOT AUTHORIZED |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY); DERIBIT I08 HELD pending I08R1 (completion-truth seal) ; I08R1 COMPLETE, PASS_SENSOR_B3_I08R1_DERIBIT_SEALED ACCEPTED (I08R1-RATIFY); DERIBIT OFFLINE_FROZEN; I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE COMPLETE (PASS proposed, awaiting operator review); I09R1 AUTHORITY-BOUNDARY MICROSEAL COMPLETE (duplicate I14 promotion + duplicate human readiness rows now fail closed; explicit complete verification coverage required; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN pre-I10; PASS proposed, awaiting operator review); I10 (network smoke) NOT AUTHORIZED |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
-| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=4 (KRAKEN_FUTURES + GATE_FUTURES + OKX_SWAP + DERIBIT, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate + OKX + Deribit; PRODUCTION_CANDIDATE mode, 0 failed each) · I14 PRODUCTION-ADAPTER INVENTORY = 17/17 provider×sensor candidates implemented OFFLINE (4 providers × I14 sets) · CROSS_PROVIDER_OFFLINE_CLOSURE=TRUE (SENSOR-B3-I09; deterministic PRODUCTION_ADAPTER_MATRIX.csv/.json derived from I14 + adapter code; exact-set 3-level equality proven) · NETWORK_VALIDATION=NOT_YET_RUN |
-| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE · okx_offline_sealed = TRUE · okx_implementation_frozen = TRUE · okx_network_smoke = NOT_RUN · deribit_adapter_implemented = TRUE (I08) · deribit_completion_truth_sealed = TRUE (I08R1: COMPLETE never PARTIAL; funding completion_proof LIMITED; liquidation completion from source coverage) · deribit_offline_sealed = TRUE (I08R1) · deribit_offline_implementation_frozen = TRUE (I08R1-RATIFY) · deribit_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE · cross_provider_offline_closure = TRUE (SENSOR-B3-I09 COMPLETE; deterministic 17-path production inventory + exact-set equality + evidence-ref/scope/role audits; matrix generated, NOT hand-declared) |
+| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=4 (KRAKEN_FUTURES + GATE_FUTURES + OKX_SWAP + DERIBIT, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate + OKX + Deribit; PRODUCTION_CANDIDATE mode, 0 failed each) · I14 PRODUCTION-ADAPTER INVENTORY = 17/17 provider×sensor candidates implemented OFFLINE (4 providers × I14 sets) · CROSS_PROVIDER_OFFLINE_CLOSURE=TRUE (SENSOR-B3-I09; deterministic PRODUCTION_ADAPTER_MATRIX.csv/.json derived from I14 + adapter code; exact-set 3-level equality proven) · AUTHORITY_DUPLICATE_GUARD=TRUE (I09R1: duplicate I14 promotion + duplicate human readiness keys fail closed) · VERIFICATION_COVERAGE_GUARD=TRUE (I09R1: explicit complete verification required; missing != explicit False; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN) · NETWORK_VALIDATION=NOT_YET_RUN |
+| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE · okx_offline_sealed = TRUE · okx_implementation_frozen = TRUE · okx_network_smoke = NOT_RUN · deribit_adapter_implemented = TRUE (I08) · deribit_completion_truth_sealed = TRUE (I08R1) · deribit_offline_sealed = TRUE (I08R1) · deribit_offline_implementation_frozen = TRUE (I08R1-RATIFY) · deribit_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE · cross_provider_offline_closure = TRUE (SENSOR-B3-I09 COMPLETE; deterministic 17-path production inventory + exact-set equality + evidence-ref/scope/role audits; matrix generated, NOT hand-declared) · cross_provider_authority_sealed = TRUE (SENSOR-B3-I09R1; duplicate authority + verification-coverage guards; matrix regeneration byte-identical) |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
@@ -97,7 +97,10 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09A | dffe18f6 | 0 (code) | — |
 | SENSOR-B3-I09B | d299cdd2 | 42 | 0 |
 | SENSOR-B3-I09C | 08559207 | 0 (generated matrix) | — |
-| cumulative | 1294 | 1294 | 0 |
+| SENSOR-B3-I09R1A | b3e26cef | 0 (code) | — |
+| SENSOR-B3-I09R1B | 17636a78 | 15 | 0 |
+| SENSOR-B3-I09R1C | (this) | 0 (evidence/ledger) | — |
+| cumulative | 1309 | 1309 | 0 |
 
 ## External / provider blockers
 
@@ -184,6 +187,31 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B3-I09R1 COMPLETE — CROSS-PROVIDER AUTHORITY BOUNDARY MICROSEAL
+  (proposed `PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED`,
+  awaiting operator review; NOT `PASS_BLOC_03`).  Three fail-closed authority
+  seams repaired in `providers/readiness.py` + `test_production_matrix.py`
+  (+15 tests; cumulative 1309):  (A) I14 promotion authority is validated
+  structurally unique by `validate_promotion_candidate_uniqueness`
+  (raw=17, unique=17, duplicates=0) BEFORE any set/dict conversion, wired into
+  every authority consumer — `build_readiness_records`, `compute_exact_sets`,
+  `evidence_ref_audit`, `validate_record_bound`; an exact OR conflicting
+  duplicate row fails closed on every path.  (B) `load_human_readiness_matrix`
+  rejects duplicate nonempty (provider, sensor) rows — identical or
+  conflicting, no last-write-wins.  (C) `build_readiness_records` requires
+  explicit, COMPLETE verification coverage for every I14 key (verbatim
+  `verification` dict or complete `conformance_pass`+`schema_pass` maps);
+  missing != explicit False; explicit False with a truthful non-ready status is
+  allowed as data; `ADAPTER_READY` cannot coexist with a failed
+  conformance/schema flag; `network_smoke_status` is hard-locked to `NOT_RUN`
+  pre-I10.  Canonical `PRODUCTION_ADAPTER_MATRIX.csv/.json` regenerated
+  byte-for-byte identical (17 rows; semantic content unchanged).  Exact
+  17-path equality, roles, symbols, LIMITED states, CURRENT_ONLY and Deribit
+  mechanism-microscope semantics all preserved.  Full suite green
+  (1309 passed / 0 failed); ruff clean; changed-scope mypy clean; ZERO network;
+  Kraken/Gate/OKX/Deribit regressions green; frozen provider code untouched;
+  no I10 (network smoke); no Bloc 4.  Evidence:
+  `evidence/bloc_03/BLOC_03_I09R1_AUTHORITY_SEAL_EVIDENCE.md`.
 - SENSOR-B3-I09 COMPLETE — CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE
   (proposed `PASS_SENSOR_B3_I09_CROSS_PROVIDER_OFFLINE_CLOSURE`, awaiting
   operator review; NOT `PASS_BLOC_03`).  Proves the four production adapters
@@ -529,3 +557,6 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09B | d299cdd2 | cross-provider closure tests (42): registry topology, 17-path exact-set equality, evidence-ref resolution, symbol scope, bound-drift, semantic firewall, determinism, human-matrix reconcile, real-adapter protocol coherence | 1294 passed / 0 failed | PASS | none |
 | SENSOR-B3-I09C | 08559207 | generate canonical PRODUCTION_ADAPTER_MATRIX.csv/.json (17 rows) + reconcile human readiness matrix | 1294 passed / 0 failed (re-run) | PASS | none |
 | SENSOR-B3-I09D | 4d4c62a4 | closure evidence + ledger reconciliation for I09 | 1294 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I09R1A | b3e26cef | fail closed on duplicate I14 promotion + duplicate human readiness rows; require explicit complete verification coverage (missing != explicit False; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN pre-I10) | 1294 passed / 0 failed | PASS | none |
+| SENSOR-B3-I09R1B | 17636a78 | authority-seal adversarial tests (15): duplicate I14 exact + conflicting, every-consumer reject, human duplicate identical + conflicting, missing conformance/schema/verification, explicit-False-vs-missing, ADAPTER_READY+failed-flag rejected, network upgrade rejected, raw/unique I14 counts | 1309 passed / 0 failed | PASS | none |
+| SENSOR-B3-I09R1C | (this) | authority-seal evidence + ledger reconciliation for I09R1; matrix regeneration byte-identical | 1309 passed / 0 failed (re-run) | PASS | none |
