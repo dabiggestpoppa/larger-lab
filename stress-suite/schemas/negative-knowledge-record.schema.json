@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/negative-knowledge-record.json",
+  "title": "OCE Stress Suite NegativeKnowledgeRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_id","schema_version","claim_rejected","exact_scope","rejection_reason","current_lifecycle_state"],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string"},
+    "claim_rejected": {"type": "string"},
+    "exact_scope": {"type": "string"},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "rejection_reason": {"type": "string"},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "blockers": {"type": "array", "items": {"type": "string"}},
+    "reopen_conditions": {"type": "array", "items": {"type": "string"}},
+    "provenance": {"type": ["object", "null"]},
+    "author_actor": {"type": "string"},
+    "authority_basis": {"type": "string"},
+    "current_lifecycle_state": {"type": "string"},
+    "seq": {"type": "integer", "minimum": 0},
+    "permanent_by_operator_authority": {"type": ["string","null"]}
+  }
+}

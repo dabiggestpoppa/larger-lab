@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/epoch-manifest.json",
+  "title": "OCE Stress Suite EpochManifest (A-010 §14)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["epoch_id","schema_version"],
+  "properties": {
+    "epoch_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string"},
+    "start_cause": {"type": "string"},
+    "predecessor_epoch": {"type": ["string","null"]},
+    "governing_architecture_versions": {"type": "array", "items": {"type": "string"}},
+    "evaluation_contract_version": {"type": "string"},
+    "active_ontology_versions": {"type": "array", "items": {"type": "string"}},
+    "high_dependency_assumptions": {"type": "array", "items": {"type": "string"}},
+    "active_runtime_certifications": {"type": "array", "items": {"type": "string"}},
+    "major_capabilities": {"type": "array", "items": {"type": "string"}},
+    "known_tensions": {"type": "array", "items": {"type": "string"}},
+    "unresolved_pattern_refs": {"type": "array", "items": {"type": "string"}},
+    "active_knowledge_projection": {"type": "array", "items": {"type": "string"}},
+    "dormant_knowledge_projection": {"type": "array", "items": {"type": "string"}},
+    "validation_rules": {"type": "array", "items": {"type": "string"}},
+    "authority_state_snapshot": {"type": "object"},
+    "operator_ratifications": {"type": "array", "items": {"type": "string"}},
+    "transformation_evidence": {"type": "array", "items": {"type": "string"}},
+    "challenge_conditions": {"type": "array", "items": {"type": "string"}}
+  }
+}

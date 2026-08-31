@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/transition-record.json",
+  "title": "OCE Stress Suite TransitionRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["transition_id","machine","from_state","to_state","reason","actor","authority_basis","authority_level","contract_version","seq"],
+  "properties": {
+    "transition_id": {"type": "string", "minLength": 1},
+    "machine": {"enum": ["phase","lifecycle"]},
+    "object_id": {"type": ["string","null"]},
+    "from_state": {"type": "string"},
+    "to_state": {"type": "string"},
+    "reason": {"type": "string"},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "actor": {"type": "string"},
+    "authority_basis": {"type": "string"},
+    "authority_level": {"enum": ["OBSERVER","WORKER","PO","GOVERNOR","OPERATOR"]},
+    "contract_version": {"type": "string"},
+    "seq": {"type": "integer", "minimum": 0},
+    "timestamp": {"type": "string"},
+    "cycle": {"type": ["string","null"]}
+  }
+}

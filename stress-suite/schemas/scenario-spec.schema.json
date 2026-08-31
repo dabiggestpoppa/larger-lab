@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/scenario-spec.json",
+  "title": "OCE Stress Suite StressScenarioSpec (G1 §16)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scenario_id", "scenario_version"],
+  "properties": {
+    "scenario_id": {"type": "string", "minLength": 1},
+    "scenario_version": {"type": "string"},
+    "threat_class": {"enum": ["DETERMINISTIC_CONSTITUTIONAL","COGNITIVE_ECOLOGY","DOMAIN_RESEARCH_SIM"]},
+    "institutional_scope": {"type": "string"},
+    "initial_epoch": {"type": "string"},
+    "initial_authority_state": {"type": "object"},
+    "initial_knowledge": {"type": "array", "items": {"type": "object"}},
+    "initial_phase": {"type": "string"},
+    "stimulus_events": {"type": "array", "items": {"type": "object"}},
+    "observable_evidence": {"type": "array", "items": {"type": "string"}},
+    "correlation_structure": {"type": "object"},
+    "expected_phase_path": {"type": "array", "items": {"type": "string"}},
+    "expected_terminal_knowledge": {"type": "object"},
+    "allowed_actions": {"type": "array", "items": {"type": "string"}},
+    "forbidden_actions": {"type": "array", "items": {"type": "string"}},
+    "required_roles": {"type": "array", "items": {"type": "string"}},
+    "operator_required_at": {"type": "array", "items": {"type": "string"}},
+    "terminal_states": {"type": "array", "items": {"type": "string"}},
+    "evaluation_contract": {"type": ["object","null"]},
+    "hidden_ground_truth": {"type": ["object","null"]},
+    "seq": {"type": "integer", "minimum": 0}
+  }
+}
