@@ -1,16 +1,24 @@
 """M5 — Governor phase machine (A-010 §3 plus Book §5 holding/terminal states).
 
 Owns INSTITUTIONAL PHASE ONLY. It does NOT own knowledge truth status (M4) and
-must not merge capability verification (M1) into it. See G0-pack AMB-01/AMB-07.
+must not merge capability verification (M1) into it. See G0 AMB-01/AMB-07.
 
-The default edge table is a PROVISIONAL_TEST_CONTRACT (like the M4 lifecycle
-edge map) because A-010 leaves some edges unspecified. Scenarios may override it
-via a scenario spec, but the historical trace is never rewritten.
+HARDENING (G1R-01 / G1R-06):
+  * PhaseDecisionRecord is a real dataclass with deterministic serialization.
+  * The machine computes a decision *then* applies it. `decision.allowed` always
+    equals whether the transition was actually authorized for application, and if
+    `allowed is False` the state never changes.
+  * No local flag is flipped after the decision object is produced. Invalid
+    authority raises BEFORE any decision/ledger mutation (documented policy).
+  * The phase machine can never grant capital: any CAPITAL_MUTATION attempt is
+    denied here regardless of the (otherwise legal) edge. Cross-cutting forbidden
+    policy (e.g. WATCH -> architecture mutation) lives in engine.governed and is
+    composed at the governed-execution layer, keeping this machine pure topology.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
-from typing import AbstractSet, Dict, FrozenSet, List, Mapping, Optional, Sequence, Tuple
+from dataclasses import dataclass, field, asdict, replace
+from typing import AbstractSet, Dict, FrozenSet, List, Mapping, Optional, Sequence, Tuple, Any
 
 from .base import (
     PHASE_EDGE_TABLE_CONTRACT,
@@ -18,63 +26,37 @@ from .base import (
     AuthorityLevel,
     MutationClass,
     PhaseState,
-    TransitionRecord,
     deterministic_hex,
 )
 
-# Key instruments
-#: legal source -> targets
+#: legal source -> targets (PROVISIONAL_TEST_CONTRACT; see module docstring)
 DEFAULT_PHASE_EDGES: Dict[str, FrozenSet[str]] = {
-    # Ordinary escalation chain (A-010 §3)
     "STABLE": frozenset(["WATCH", "DATA_BLOCKED"]),
     "WATCH": frozenset(["ESCALATION_REVIEW", "STABLE", "DATA_BLOCKED"]),
     "ESCALATION_REVIEW": frozenset([
-        "HOMEOSTATIC_REPAIR",
-        "TRANSFORMATION_CANDIDATE",
-        "NO_CHANGE",
-        "OPERATOR_HOLD",
-        "AUTHORITY_BLOCKED",
+        "HOMEOSTATIC_REPAIR", "TRANSFORMATION_CANDIDATE", "NO_CHANGE",
+        "OPERATOR_HOLD", "AUTHORITY_BLOCKED",
     ]),
     "HOMEOSTATIC_REPAIR": frozenset(["STABLE", "WATCH"]),
     "TRANSFORMATION_CANDIDATE": frozenset([
-        "TRANSFORMATION_WINDOW",
-        "NO_CHANGE",
-        "OPERATOR_HOLD",
-        "AUTHORITY_BLOCKED",
+        "TRANSFORMATION_WINDOW", "NO_CHANGE", "OPERATOR_HOLD", "AUTHORITY_BLOCKED",
     ]),
     "TRANSFORMATION_WINDOW": frozenset([
-        "RECONSOLIDATION",
-        "NO_CHANGE",
-        "UNRESOLVED",
-        "OPERATOR_HOLD",
-        "AUTHORITY_BLOCKED",
+        "RECONSOLIDATION", "NO_CHANGE", "UNRESOLVED", "OPERATOR_HOLD", "AUTHORITY_BLOCKED",
     ]),
     "RECONSOLIDATION": frozenset([
-        "NEW_STABLE",
-        "ROLLBACK",
-        "NO_CHANGE",
-        "PLURAL_MODEL_STATE",
-        "UNRESOLVED",
+        "NEW_STABLE", "ROLLBACK", "NO_CHANGE", "PLURAL_MODEL_STATE", "UNRESOLVED",
     ]),
-    # Outcome / holding states with optional return into stable operation
     "NEW_STABLE": frozenset(["STABLE"]),
     "ROLLBACK": frozenset(["STABLE"]),
     "NO_CHANGE": frozenset(["STABLE"]),
     "PLURAL_MODEL_STATE": frozenset(["STABLE"]),
     "UNRESOLVED": frozenset(["STABLE"]),
-    "OPERATOR_HOLD": frozenset([
-        "ESCALATION_REVIEW",
-        "TRANSFORMATION_CANDIDATE",
-        "WATCH",
-        "STABLE",
-    ]),
+    "OPERATOR_HOLD": frozenset(["ESCALATION_REVIEW", "TRANSFORMATION_CANDIDATE", "WATCH", "STABLE"]),
     "DATA_BLOCKED": frozenset(["STABLE", "WATCH"]),
     "AUTHORITY_BLOCKED": frozenset(["ESCALATION_REVIEW", "TRANSFORMATION_CANDIDATE", "STABLE"]),
 }
 
-PROVISIONAL_PHASE_UNREACHABLE_SOURCES = {"STABLE", "WATCH", "ESCALATION_REVIEW"}
-
-#: boundaries where an attempted jump is a forbidden shortcut
 FORBIDDEN_PHASE_EDGES: Dict[Tuple[str, str], str] = {
     ("STABLE", "NEW_STABLE"): "must pass review/evidence path before a new stable epoch",
     ("WATCH", "HOMEOSTATIC_REPAIR"): "repair requires escalation review",
@@ -107,54 +89,40 @@ class PhaseDecisionError(ValueError):
     pass
 
 
+@dataclass(frozen=True)
 class PhaseDecisionRecord:
-    """A-010 decision for one attempted phase step. Preserves the evidence-channel
-    vector; NO scalar may possess transition authority (G1 requirement §7)."""
+    """A-010 decision for one attempted phase step. A dataclass (G1R-01) with
+    deterministic serialization. Preserves the evidence-channel vector; NO scalar
+    may possess transition authority. `allowed` ALWAYS equals application truth."""
 
-    def __init__(
-        self,
-        decision_id: str,
-        seq: int,
-        phase_from: str,
-        phase_to: str,
-        allowed: bool,
-        evidence_vector: Mapping[str, str],
-        evidence_refs: List[str],
-        authority_level: str,
-        operator_required: bool,
-        rationale: str,
-        mutation_class: str,
-        contract_version: str,
-    ):
-        self.decision_id = decision_id
-        self.seq = seq
-        self.phase_from = phase_from
-        self.phase_to = phase_to
-        self.allowed = allowed
-        self.evidence_vector = dict(evidence_vector)
-        self.evidence_refs = list(evidence_refs)
-        self.authority_level = authority_level
-        self.operator_required = operator_required
-        self.rationale = rationale
-        self.mutation_class = mutation_class
-        self.contract_version = contract_version
+    decision_id: str
+    seq: int
+    phase_from: str
+    phase_to: str
+    allowed: bool
+    evidence_vector: Mapping[str, str]
+    evidence_refs: List[str]
+    authority_level: str
+    operator_required: bool
+    rationale: str
+    mutation_class: str
+    contract_version: str
+    rule_ids: List[str] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
     # a scalar is never authoritative in G1; this is an operator-view summary only
     def operator_scalar_summary(self) -> float:
-        """EXPERIMENTAL / NON-AUTHORITATIVE. Never used for phase transitions."""
         raise PhaseDecisionError("no scalar may possess transition authority in G1")
 
 
 class PhaseStateMachine:
-    """Owns current phase state and validates transitions against an edge table.
+    """Pure topology phase machine. evaluate() computes, record() logs,
+    apply() mutates. attempt() = evaluate + record + apply for low-level tests.
 
-    The machine is a pure state holder + legality checker. It does not decide
-    WHY a transition is warranted — callees supply the evidence vector — and it
-    never writes authority or knowledge states.
-    """
+    The machine never decides WHY a transition is warranted and never grants
+    capital or authority; those are composed by the governed executor."""
 
     def __init__(self, edge_table: Optional[PhaseEdgeTable] = None, initial: str = "STABLE"):
         self.edge_table = edge_table or PhaseEdgeTable.default()
@@ -167,7 +135,10 @@ class PhaseStateMachine:
     def can_transition(self, to_state: str) -> bool:
         return to_state in self.legal_transitions()
 
-    def attempt(
+    # ------------------------------------------------------------------ #
+    # pure evaluation: no ledger, no state change
+    # ------------------------------------------------------------------ #
+    def evaluate(
         self,
         seq: int,
         actor: str,
@@ -180,57 +151,60 @@ class PhaseStateMachine:
         reason: str = "",
         timestamp: Optional[str] = None,
         allowed_edges_override: Optional[Mapping[str, FrozenSet[str]]] = None,
+        decision_id: Optional[str] = None,
     ) -> PhaseDecisionRecord:
-        """Validate + record one phase step. Returns the decision; applies only
-        if allowed. `allowed_edges_override` is scoped to the caller's evaluation
-        contract (G1 eval-contract freeze)."""
-        edge_set = allowed_edges_override or self.edge_table.legal_edges
         from_state = self.state
-        from_set = edge_set.get(from_state, frozenset())
-        legal = to_state in from_set
 
-        forbidden_reason = None
-        if not legal:
-            forbidden_reason = FORBIDDEN_PHASE_EDGES.get((from_state, to_state)) or "edge absent from phase graph"
-        elif self._is_capital_shortcut(from_state, to_state, mutation_class):
-            legal = False
-            forbidden_reason = "TRANSFORMATION_WINDOW -> capital authority is forbidden"
+        # Policy G1R-06: invalid authority raises BEFORE any ledger mutation so an
+        # ambiguous partially-committed decision can never exist.
+        if authority_level not in AuthorityLevel.__members__:
+            raise PhaseDecisionError(f"unknown authority level: {authority_level}")
 
-        decision = PhaseDecisionRecord(
-            decision_id=deterministic_hex("phase", from_state, to_state, seq),
+        from_set = allowed_edges_override or self.edge_table.legal_edges
+        legal_edge = to_state in from_set.get(from_state, frozenset())
+        capital_bad = mutation_class == MutationClass.CAPITAL_MUTATION.value
+        allowed = legal_edge and not capital_bad
+
+        if not legal_edge:
+            why = FORBIDDEN_PHASE_EDGES.get((from_state, to_state)) or "edge absent from phase graph"
+        elif capital_bad:
+            why = "capital mutation is never implied by a phase transition"
+        else:
+            why = reason
+
+        return PhaseDecisionRecord(
+            decision_id=decision_id or deterministic_hex("phase", from_state, to_state, seq),
             seq=seq,
             phase_from=from_state,
             phase_to=to_state,
-            allowed=legal,
-            evidence_vector=evidence_vector,
-            evidence_refs=evidence_refs or [],
+            allowed=allowed,
+            evidence_vector=dict(evidence_vector),
+            evidence_refs=list(evidence_refs or []),
             authority_level=authority_level,
             operator_required=operator_required,
-            rationale=reason or ("" if legal else (forbidden_reason or "forbidden")),
+            rationale=why,
             mutation_class=mutation_class,
             contract_version=self.edge_table.contract_version,
         )
+
+    def record(self, decision: PhaseDecisionRecord) -> None:
         self.decisions.append(decision)
-        if legal:
-            if authority_level not in AuthorityLevel.__members__:
-                raise PhaseDecisionError(f"unknown authority level: {authority_level}")
-            if mutation_class == MutationClass.CAPITAL_MUTATION.value:
-                # even in a legal phase target, capital is a separate authority gate
-                legal = False
-                decision.rationale = "capital mutation requires separate authority gate (never implied by phase)"
-        if legal:
-            self.state = to_state
+
+    def apply(self, decision: PhaseDecisionRecord) -> None:
+        if decision.allowed:
+            self.state = decision.phase_to
+
+    def attempt(self, **kw) -> PhaseDecisionRecord:
+        """Low-level convenience: evaluate + record + apply. Kept for unit tests
+        of the pure machine; the governed replay path uses evaluate/record/apply."""
+        decision = self.evaluate(**kw)
+        self.record(decision)
+        self.apply(decision)
         return decision
 
-    @staticmethod
-    def _is_capital_shortcut(from_state: str, to_state: str, mutation_class: str) -> bool:
-        if mutation_class == MutationClass.CAPITAL_MUTATION.value:
-            if from_state in ("STABLE", "WATCH", "TRANSFORMATION_WINDOW", "TRANSFORMATION_CANDIDATE"):
-                return True
-        return False
-
-
-# Falsification note: M5 is intentionally agnostic to "architecture mutation"
-# legality; that is the job of the ForbiddenTransitionValidator (engine.forbidden)
-# and the authority firewall, not the phase graph. This keeps phase legality a
-# pure topology property while mutation/authority semantics stay separated.
+    def apply_authoritative(self, decision: PhaseDecisionRecord) -> None:
+        """Governed-executor path: record the FINAL decision (which may carry
+        rule_ids and a flipped allowed flag decided above this machine) then apply
+        exactly according to decision.allowed."""
+        self.record(decision)
+        self.apply(decision)

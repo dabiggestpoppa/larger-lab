@@ -176,7 +176,12 @@ class Provenance:
 @dataclass(frozen=True)
 class TransitionRecord:
     """One attributed state transition. Shared by M4 and M5 (identical shape,
-    but each machine owns its own records — see separation tests)."""
+    but each machine owns its own records — see separation tests).
+
+    G1R-05: legality is carried EXPLICITLY (allowed / applied / violation) so an
+    illegal attempted self-transition can never be misread as allowed by
+    comparing final to initial state.
+    """
     transition_id: str
     machine: str                # "phase" | "lifecycle"
     object_id: Optional[str]
@@ -190,6 +195,9 @@ class TransitionRecord:
     contract_version: str
     seq: int
     timestamp: str
+    allowed: bool = True
+    applied: bool = True
+    violation: Optional[str] = None
     cycle: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:

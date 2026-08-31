@@ -117,23 +117,27 @@ class KnowledgeRecord:
         timestamp: Optional[str] = None,
         edge_table: Optional[LifecycleEdgeTable] = None,
     ) -> TransitionRecord:
+        """One attributed lifecycle step. Legality is EXPLICIT (G1R-05): the
+        returned TransitionRecord carries allowed/applied/violation, never
+        inferred from final-state equality. The attempt is always preserved in
+        the trace even when rejected."""
         table = edge_table or LifecycleEdgeTable.default()
         from_state = self.state
         from_set = table.legal_edges.get(from_state, frozenset())
         legal = to_state in from_set
-        mess = None
+        violation: Optional[str] = None
         if not legal:
-            mess = f"{from_state} -> {to_state} absent from lifecycle edge table"
+            violation = f"{from_state} -> {to_state} absent from lifecycle edge table"
         elif not self._provenance_survives(to_state):
             legal = False
-            mess = "lifecycle transition must never delete provenance"
-        elif to_state in from_set and (from_state, to_state) in FORBIDDEN_LIFECYCLE_EDGES:
+            violation = "lifecycle transition must never delete provenance"
+        elif (from_state, to_state) in FORBIDDEN_LIFECYCLE_EDGES:
             legal = False
-            mess = FORBIDDEN_LIFECYCLE_EDGES[(from_state, to_state)]
+            violation = FORBIDDEN_LIFECYCLE_EDGES[(from_state, to_state)]
 
         if self.forever_lineage_locked:
             legal = False
-            mess = mess or "record lineage locked by operator (PERMANENT_BY_OPERATOR_AUTHORITY)"
+            violation = violation or "record lineage locked by operator (PERMANENT_BY_OPERATOR_AUTHORITY)"
 
         tr = TransitionRecord(
             transition_id=deterministic_hex("lifecycle", self.record_id, from_state, to_state, seq),
@@ -149,12 +153,15 @@ class KnowledgeRecord:
             contract_version=table.contract_version,
             seq=seq,
             timestamp=timestamp or deterministic_timestamp(seq),
+            allowed=legal,
+            applied=legal,
+            violation=violation,
         )
         self.transitions.append(tr)
         if legal:
             self.state = to_state
         else:
-            self._last_error = mess
+            self._last_error = violation
         return tr
 
     def last_error(self) -> Optional[str]:
