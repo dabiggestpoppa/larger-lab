@@ -106,6 +106,25 @@ class PgWorkerFabricStore(InMemoryLeaseStore):
                          runtime_class: str, trust_zone: str,
                          sandbox_profile: str, capabilities: list[str],
                          credential_verifier: str, actor: str) -> None:
+        # The fabric FKs (`worker_fabric_instances`, `worker_sessions`,
+        # `b3_fabric_leases`, `b3_artifacts`, `b3_dead_letters`) all reference
+        # the authoritative Book 2 `workers` table. Admission must therefore
+        # materialise the authoritative `workers` parent row first; without it
+        # every subsequent fabric write fails the FK and no worker could ever be
+        # admitted against real PostgreSQL. The verifier (hashed secret, at
+        # rest) doubles as the admission-token hash so only hashes persist.
+        self._execute(
+            """INSERT INTO workers
+                 (worker_id, capabilities, trust_zone, admission_token_hash,
+                  max_concurrent_jobs)
+               VALUES (%s,%s,%s,%s,1)
+               ON CONFLICT (worker_id) DO UPDATE SET
+                 capabilities = EXCLUDED.capabilities,
+                 trust_zone = EXCLUDED.trust_zone,
+                 last_heartbeat = now()
+                 -- keep existing admission_token_hash; do not clobber on re-admit""",
+            (worker_id, _json(capabilities), trust_zone, credential_verifier or ""),
+        )
         self._execute(
             """INSERT INTO worker_fabric_instances
                  (worker_id, protocol_version, worker_version, host_os_class,

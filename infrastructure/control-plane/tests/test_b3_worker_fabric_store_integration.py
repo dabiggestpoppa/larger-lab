@@ -74,6 +74,40 @@ def fresh(pg):
     return PgWorkerFabricStore(pg)
 
 
+def _admit(fresh, worker_id: str = "w1") -> None:
+    """Admit a fabric worker the authoritative way (persist_identity), which
+    also materialises the Book 2 `workers` parent row every fabric FK targets.
+    Also admit the capability the worker will carry."""
+    fresh.admit_capability("hash", "operator:po")
+    fresh.persist_identity(
+        worker_id=worker_id, protocol_version="1.0", worker_version="1.0",
+        host_os_class="linux", runtime_class="python", trust_zone="worker-local",
+        sandbox_profile="default", capabilities=["hash"],
+        credential_verifier=_verifier("s"), actor="operator:po")
+
+
+def _job(pg, job_id: str) -> str:
+    """Create a REAL authoritative `jobs` parent row at a known job_id and
+    return it. b3_artifacts / b3_dead_letters reference jobs(job_id), so the
+    job must exist before those fabric rows can be persisted. Insert directly
+    so no FK child rows (`idempotency`, `job_transitions`) accompany it, which
+    would otherwise need rewriting when the job id is pinned."""
+    import json as _json
+    with pg.cursor() as cur:
+        cur.execute(
+            """INSERT INTO jobs
+                 (job_id, job_type, schema_version, submitting_actor,
+                  authority_context, resource_scope, environment,
+                  idempotency_key, payload_hash, payload, correlation_id)
+               VALUES (%s,'hash','2.0.0','operator:po',
+                 %s,'default','local',%s,%s,'{}',%s)""",
+            (job_id, _json.dumps({"actor_id": "operator:po"}),
+             "idem-" + job_id, "p" + job_id, "corr-" + job_id),
+        )
+    pg.commit()
+    return job_id
+
+
 def test_capability_admission_is_persisted_and_per_operator(pg, fresh):
     fresh.admit_capability("hash", "operator:po")
     assert fresh.admitted_capabilities() == ["hash"]
@@ -110,6 +144,7 @@ def test_revoked_identity_refused(pg, fresh):
 
 
 def test_session_created_and_heartbeated(pg, fresh):
+    _admit(fresh)
     fresh.create_session(
         worker_id="w1", session_id="sess-1", protocol_version="1.0",
         trust_zone="worker-local", capabilities=["hash"],
@@ -124,6 +159,7 @@ def test_session_created_and_heartbeated(pg, fresh):
 
 
 def test_drain_rejects_new_work_through_store(pg, fresh):
+    _admit(fresh)
     fresh.create_session(
         worker_id="w1", session_id="sess-1", protocol_version="1.0",
         trust_zone="worker-local", capabilities=["hash"],
@@ -134,6 +170,7 @@ def test_drain_rejects_new_work_through_store(pg, fresh):
 
 
 def test_lease_claim_fence_and_reclaim(pg, fresh):
+    _admit(fresh)
     fresh.claim("job-1", "w1", "lease-tok-111", 1, 60)
     head = fresh.fetch_fence("job-1")
     assert head["lease_id"] == "lease-tok-111"
@@ -145,6 +182,8 @@ def test_lease_claim_fence_and_reclaim(pg, fresh):
 
 
 def test_monotonic_fence_generation_after_reclaim(pg, fresh):
+    _admit(fresh, "w1")
+    _admit(fresh, "w2")
     fresh.claim("job-x", "w1", "lease-tok-A", 1, 60)
     fresh.surrender("job-x", "lease-tok-A", 1)
     # second claim bumps fence
@@ -157,6 +196,7 @@ def test_monotonic_fence_generation_after_reclaim(pg, fresh):
 
 
 def test_expired_lease_reclaimed(pg, fresh):
+    _admit(fresh)
     fresh.claim("job-e", "w1", "lease-tok-E", 1, 1)
     import time
     time.sleep(1.2)  # ttl 1s
@@ -169,6 +209,7 @@ def test_expired_lease_reclaimed(pg, fresh):
 
 
 def test_effect_registered_once(pg, fresh):
+    _admit(fresh)
     fresh.claim("job-1", "w1", "lease-tok-111", 1, 60)
     assert fresh.register_effect(job_id="job-1", lease_id="lease-tok-111",
                                  fence=1, effect_key="eff-1",
@@ -185,6 +226,7 @@ def test_effect_registered_once(pg, fresh):
 
 
 def test_late_result_quarantined_durably(pg, fresh):
+    _admit(fresh)
     fresh.claim("job-l", "w1", "lease-tok-L", 1, 60)
     fresh.surrender("job-l", "lease-tok-L", 1)
     fresh.quarantine_late(job_id="job-l", lease_id="lease-tok-L", fence=1,
@@ -196,6 +238,8 @@ def test_late_result_quarantined_durably(pg, fresh):
 
 
 def test_manifest_persisted_and_reloaded_on_restart(pg, fresh):
+    _admit(fresh)
+    _job(pg, "job-a")
     manifest = {
         "manifest_id": "m-1", "job_id": "job-a", "attempt": 1,
         "worker_id": "w1", "producer_identity": "operator:po",
@@ -211,6 +255,8 @@ def test_manifest_persisted_and_reloaded_on_restart(pg, fresh):
 
 
 def test_retry_state_dead_letter_and_po_authorized_retry(pg, fresh):
+    _admit(fresh)
+    _job(pg, "job-r")
     fresh.record_retry_state(job_id="job-r", attempts=3, max_retries=3,
                              classified="retryable", last_reason="exit=None",
                              exhausted=True, poison=True)

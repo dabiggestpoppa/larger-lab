@@ -371,7 +371,7 @@ class BoundedRunner:
         result.isolation_note = self._limits_preamble(envelope)
         result.isolation_report = self._last_preflight
         self._cancel_event = threading.Event()
-        cancel = threading.Event()
+        cancel = self._cancel_event   # single cancellation signal (B3-R5)
         killed_by_timeout = threading.Event()
         try:
             popen_kwargs = {
@@ -398,7 +398,10 @@ class BoundedRunner:
         # watchdog for timeout / cancellation
         def _watch():
             if cancel.wait(envelope.timeout_s):
-                return  # cancellation handled below
+                # cancellation requested -> actively kill the tree so the run
+                # is reaped as a cancellation, never waited out (defect 9).
+                _kill(proc, self.full_isolation)
+                return
             killed_by_timeout.set()
             _kill(proc, self.full_isolation)
 
@@ -471,12 +474,17 @@ def _kill(proc: subprocess.Popen, full_isolation: bool) -> None:
     if proc.poll() is not None:
         return
     try:
-        if full_isolation:
-            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-        else:
+        if os.name == "nt":
+            # Windows: terminate the entire process tree via taskkill /T.
             subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)],
                            capture_output=True)
-            return
+        else:
+            # POSIX: SIGKILL the whole process group (setsid-backed tree when
+            # isolating) so a child can never outlive its bounded attempt.
+            try:
+                os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+            except (ProcessLookupError, PermissionError, OSError):
+                proc.kill()
     except (ProcessLookupError, PermissionError, OSError):
         pass
     try:
