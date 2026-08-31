@@ -250,6 +250,101 @@ def default_verification(
 # ---------------------------------------------------------------------------
 
 
+def _check_ready_consistency(
+    key: tuple[str, SensorFamily], v: ReadinessVerification
+) -> None:
+    """Fail-closed consistency for an explicit verification record.
+
+    - ADAPTER_READY may NOT coexist with a failed conformance/schema flag
+      (never invent readiness from a failed validation result).
+    - network_smoke_status must stay NOT_RUN while I09/I09R1 is OFFLINE (before
+      I10); a caller cannot prematurely upgrade network state.
+    """
+    if v.adapter_status == "ADAPTER_READY":
+        if not v.offline_conformance_pass or not v.schema_pass:
+            raise ValueError(
+                f"{key}: ADAPTER_READY cannot coexist with "
+                f"offline_conformance_pass={v.offline_conformance_pass}, "
+                f"schema_pass={v.schema_pass} (fail closed)"
+            )
+    if v.network_smoke_status != "NOT_RUN":
+        raise ValueError(
+            f"{key}: network_smoke_status {v.network_smoke_status!r} != NOT_RUN "
+            "while I09 is OFFLINE (network smoke not authorized before I10)"
+        )
+
+
+def _resolve_explicit_verification(
+    i14_pairs: set[tuple[str, SensorFamily]],
+    verification: dict[tuple[str, SensorFamily], ReadinessVerification] | None,
+    conformance_pass: dict[tuple[str, SensorFamily], bool] | None,
+    schema_pass: dict[tuple[str, SensorFamily], bool] | None,
+) -> dict[tuple[str, SensorFamily], ReadinessVerification]:
+    """Resolve verification for every I14 path with EXPLICIT full coverage.
+
+    Missing validation evidence != failed validation evidence.  Three
+    acceptable sources:
+      A) an explicit `verification` dict covering every I14 key;
+      B) complete `conformance_pass` AND `schema_pass` maps covering every key;
+    Absence of ANY key raises.  No defaulting of a missing key to False.
+    """
+    resolved: dict[tuple[str, SensorFamily], ReadinessVerification] = {}
+
+    if verification is not None:
+        missing = sorted(
+            (p, s.value) for (p, s) in i14_pairs if (p, s) not in verification
+        )
+        if missing:
+            raise ValueError(
+                "missing ReadinessVerification for "
+                + str(len(missing))
+                + " I14 path(s) (missing validation evidence != failed "
+                f"validation): {missing}"
+            )
+        for key in i14_pairs:
+            v = verification[key]
+            _check_ready_consistency(key, v)
+            resolved[key] = v
+        return resolved
+
+    if conformance_pass is None and schema_pass is None:
+        raise ValueError(
+            "no verification input supplied (missing validation evidence is not "
+            "a validation result; every I14 path requires explicit coverage)"
+        )
+    cf = conformance_pass if conformance_pass is not None else {}
+    sf = schema_pass if schema_pass is not None else {}
+    missing_c = sorted(
+        (p, s.value) for (p, s) in i14_pairs if (p, s) not in cf
+    )
+    missing_s = sorted(
+        (p, s.value) for (p, s) in i14_pairs if (p, s) not in sf
+    )
+    if missing_c or missing_s:
+        raise ValueError(
+            "verification coverage incomplete: "
+            + str(len(missing_c))
+            + " missing conformance key(s), "
+            + str(len(missing_s))
+            + " missing schema key(s); every I14 path needs explicit coverage "
+            "(missing != explicit False): conformance="
+            + str(missing_c)
+            + ", schema="
+            + str(missing_s)
+        )
+    for key in i14_pairs:
+        provider_id, sensor = key
+        v = default_verification(
+            provider_id,
+            sensor,
+            offline_conformance_pass=cf[key],
+            schema_pass=sf[key],
+        )
+        _check_ready_consistency(key, v)
+        resolved[key] = v
+    return resolved
+
+
 def _free_only_pass(cap: SensorCapability) -> bool:
     return (
         cap.auth_requirement in ALLOWED_AUTH_MODES
@@ -268,16 +363,19 @@ def build_readiness_records(
     """Build the deterministic production inventory from I14 + adapter code.
 
     Fail-closed rules:
+    - I14 promotion authority must be structurally unique (no duplicate
+      provider x sensor rows, identical or conflicting) BEFORE any set/dict
+      conversion;
     - the registry provider set must EXACTLY equal the I14 production provider
       set (no fifth provider, no missing provider);
     - every I14 promoted path must be declared `implemented` by its adapter;
-    - every promoted path requires a `ReadinessVerification` (a missing path
-      FAILS CLOSED rather than defaulting to a fabricated readiness);
+    - every promoted path requires EXPLICIT verification coverage: either a
+      `verification` dict or complete `conformance_pass` + `schema_pass` maps
+      covering ALL 17 keys (a missing key FAILS CLOSED — missing validation
+      evidence != explicit False);
+    - ADAPTER_READY may not coexist with a failed conformance/schema flag;
+    - network_smoke_status must stay NOT_RUN while I09 is OFFLINE (pre-I10);
     - a registry key must match the adapter's own `provider_id`.
-
-    `conformance_pass` / `schema_pass` (keyed by (provider, sensor)) may be
-    supplied as a short-circuit for the verification flags; if a path has no
-    explicit `verification` entry it defaults through `default_verification`.
     """
     providers = (
         registry
@@ -288,6 +386,7 @@ def build_readiness_records(
         candidates = load_promotion_candidates()
 
     _validate_registry(providers)
+    validate_promotion_candidate_uniqueness(candidates)
 
     # Adapter capabilities (real adapter code + evidence-derived symbols).
     caps_by_provider: dict[str, ProviderCapabilities] = {
@@ -298,6 +397,12 @@ def build_readiness_records(
         (str(c["provider"]), SensorFamily(str(c["sensor"]))) for c in candidates
     }
     _validate_registry_provider_set(providers, i14_pairs)
+
+    # Every I14 path must have EXPLICIT verification coverage (missing evidence
+    # of validation != explicit validation failure).  Fails closed otherwise.
+    verification_map = _resolve_explicit_verification(
+        i14_pairs, verification, conformance_pass, schema_pass
+    )
 
     records: list[AdapterReadinessRecord] = []
     for (provider_id, sensor) in sorted(i14_pairs, key=lambda k: (k[0], k[1].value)):
@@ -319,20 +424,7 @@ def build_readiness_records(
             )
 
         key = (provider_id, sensor)
-        conf_flag = bool(
-            (conformance_pass or {}).get(key)
-            if conformance_pass is not None and key in conformance_pass
-            else False
-        )
-        if verification is None or key not in verification:
-            v = default_verification(
-                provider_id,
-                sensor,
-                offline_conformance_pass=conf_flag,
-                schema_pass=bool((schema_pass or {}).get(key, False)),
-            )
-        else:
-            v = verification[key]
+        v = verification_map[key]
 
         records.append(
             AdapterReadinessRecord(
@@ -470,6 +562,7 @@ def validate_record_bound(
         candidates = load_promotion_candidates()
     bound_set = capabilities_from_promotion(record.provider_id, candidates)
     bound = bound_set.capability_for(record.sensor_family)
+    validate_promotion_candidate_uniqueness(candidates)
     violations: list[str] = []
     sensor = record.sensor_family.value
 
@@ -519,6 +612,52 @@ def validate_record_bound(
     return violations
 
 
+def promotion_authority_stats(
+    candidates: list[dict[str, object]] | None = None,
+) -> dict[str, int]:
+    """Raw / unique / duplicate counts of I14 promotion candidate rows.
+
+    `raw_candidate_count` counts every promotion row verbatim; a duplicated
+    OKX_SWAP/MECHANICAL_FUNDING row (identical or conflicting) shows up as
+    raw=18 / unique=17 / duplicate_count=1.  Both raw and unique must be 17 for
+    a valid CURRENT I14 authority when they are equal.
+    """
+    if candidates is None:
+        candidates = load_promotion_candidates()
+    keys = [
+        (str(c["provider"]), SensorFamily(str(c["sensor"]))) for c in candidates
+    ]
+    raw = len(keys)
+    unique = len(set(keys))
+    return {
+        "raw_candidate_count": raw,
+        "unique_candidate_count": unique,
+        "duplicate_count": raw - unique,
+    }
+
+
+def validate_promotion_candidate_uniqueness(
+    candidates: list[dict[str, object]] | None = None,
+) -> None:
+    """Fail closed on ANY duplicate I14 provider x sensor promotion row.
+
+    Promotion authority must be structurally unique BEFORE any set/dict
+    conversion (a set silently drops a second row; a dict silently picks a
+    winner).  Both an exact duplicate and a same-key/different-role-or-pin row
+    are authority contradictions and must raise.  Callers never silently keep
+    first/last or merge evidence_basis.
+    """
+    stats = promotion_authority_stats(candidates)
+    if stats["duplicate_count"]:
+        raise ValueError(
+            "I14 promotion authority contains "
+            f"{stats['duplicate_count']} duplicate provider x sensor row(s) "
+            f"(raw={stats['raw_candidate_count']}, "
+            f"unique={stats['unique_candidate_count']}); authority must be "
+            "structurally unique before any set/dict conversion (fail closed)"
+        )
+
+
 def compute_exact_sets(
     records: list[AdapterReadinessRecord],
     candidates: list[dict[str, object]] | None = None,
@@ -526,6 +665,7 @@ def compute_exact_sets(
     """Three-level exact-set equality: I14 vs adapter-supported vs matrix."""
     if candidates is None:
         candidates = load_promotion_candidates()
+    validate_promotion_candidate_uniqueness(candidates)
     i14_pairs = {
         (str(c["provider"]), SensorFamily(str(c["sensor"]))) for c in candidates
     }
@@ -600,6 +740,7 @@ def evidence_ref_audit(
         candidates = load_promotion_candidates()
     violations: list[str] = []
 
+    validate_promotion_candidate_uniqueness(candidates)
     evidence_basis_by_key: dict[tuple[str, SensorFamily], set[str]] = {}
     for c in candidates:
         provider_id = str(c["provider"])
@@ -814,17 +955,29 @@ def load_matrix_records(csv_path: Path) -> list[dict[str, str]]:
 
 
 def load_human_readiness_matrix(path: Path) -> dict[tuple[str, str], dict[str, str]]:
-    """Load ADAPTER_READINESS_MATRIX.csv keyed by (provider_id, sensor_family)."""
+    """Load ADAPTER_READINESS_MATRIX.csv keyed by (provider_id, sensor_family).
+
+    Duplicate nonempty (provider_id, sensor_family) rows are a contradiction
+    and fail closed (no last-write-wins / silent overwrite / dedupe).  The
+    human matrix is not authority, but contradictory duplicate rows must never
+    be accepted as a clean reconciled artifact.
+    """
     result: dict[tuple[str, str], dict[str, str]] = {}
+    seen_keys: set[tuple[str, str]] = set()
     with path.open(encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
         for row in reader:
             provider = (row.get("provider_id") or "").strip()
             sensor = (row.get("sensor_family") or "").strip()
             if provider and sensor:
-                result[(provider, sensor)] = {
-                    k: (v or "").strip() for k, v in row.items()
-                }
+                key = (provider, sensor)
+                if key in seen_keys:
+                    raise ValueError(
+                        f"duplicate nonempty (provider_id, sensor_family) row in "
+                        f"human readiness matrix: {key} (fail closed)"
+                    )
+                seen_keys.add(key)
+                result[key] = {k: (v or "").strip() for k, v in row.items()}
     return result
 
 
@@ -912,11 +1065,13 @@ __all__ = [
     "load_human_readiness_matrix",
     "load_matrix_records",
     "provider_path_counts",
+    "promotion_authority_stats",
     "reconcile_human_matrix",
     "render_inventory_csv",
     "render_inventory_json",
     "role_counts",
     "sensor_coverage",
+    "validate_promotion_candidate_uniqueness",
     "validate_record_bound",
     "write_matrix_files",
 ]
