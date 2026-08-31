@@ -1,33 +1,45 @@
-"""Book 3 — local worker supervisor and operator controls (B3-C7).
+"""Book 3 — persistent local worker supervisor (B3-C7, B3-R4).
 
 A supervisor is the operator's handle on the local worker fabric: it
-admit/start/drain/status/pause/resume/restart/revoke/stop workers, runs a
-doctor, and cleans up disposable state — preserving durable accepted
-artifacts and PostgreSQL state during ordinary cleanup.
+configure/admit/start/drain/status/pause/resume/restart/revoke/stop/doctor/
+cleanup workers and exposes an operator console view.
 
-Process ownership uses RUNTIME-OWNED PID files, never broad ``pkill -f``:
-the supervisor only ever terminates PIDs that it itself recorded. Stale PID
-files are detected (the recorded PID is no longer running) and cleaned.
+B3-R4 — PERSISTENT across CLI process invocations:
+
+* configuration and admission are written to a state file under the runtime
+  dir (JSON, 0600) and reloaded on every fresh supervisor, so
+  ``worker configure`` in one invocation is visible to ``worker admit``,
+  ``worker start``, ``worker status``, etc. in later invocations.
+* the operator-admitted capability catalogue and every admitted worker
+  identity survive a supervisor/CLI restart.
+* a stale PID file (recorded pid no longer runs, or the pid was reused by an
+  unrelated process) is detected and cleaned without ever signalling the new
+  owner.
+
+Process ownership is runtime-owned PID files ONLY — never broad ``pkill``.
+Ordinary cleanup preserves durable accepted artifacts, PostgreSQL state, and
+the required configuration.
 """
 from __future__ import annotations
+import json
 import os
 import signal
 import subprocess
 import sys
-import threading
-import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
 from .worker_contracts import utcnow_iso
-from .worker_identity import WorkerAuthority, AdmissionRequest, WorkerIdentity
-from .worker_sessions import SessionHost, SessionRevoked, WorkerDraining
+from .worker_identity import WorkerAuthority, AdmissionRequest, \
+    WorkerIdentity, CapabilityRegistry
+from .worker_sessions import SessionHost
 
 # Capabilities the local operator bootstraps for the local worker (Po-admitted).
 BOOTSTRAP_CAPABILITIES = ("hash", "compute-python", "repo-inventory",
                           "backtest-synthetic", "analysis-artifact",
                           "file-read", "report-html")
+
 
 @dataclass
 class WorkerRecord:
@@ -45,21 +57,84 @@ class WorkerRecord:
             "command": list(self.command),
         }
 
+    @classmethod
+    def from_dict(cls, d: dict) -> "WorkerRecord":
+        return cls(
+            worker_id=d["worker_id"], command=list(d.get("command", [])),
+            pid=d.get("pid"), state=d.get("state", "configured"),
+            started_at=d.get("started_at", utcnow_iso()),
+            capabilities=list(d.get("capabilities", [])),
+        )
+
 
 class WorkerSupervisor:
-    """Owns local worker processes and their runtime-pid registry."""
+    """Owns local worker processes, their runtime-pid registry, and the
+    persisted operator configuration/admission catalogue."""
+
+    STATE_FILE = "state.json"
 
     def __init__(self, runtime_dir: Path, authority: WorkerAuthority,
                  host: Optional[SessionHost] = None):
         self._dir = Path(runtime_dir)
         self._pid_dir = self._dir / "pids"
         self._pid_dir.mkdir(parents=True, exist_ok=True)
+        self._state_file = self._dir / self.STATE_FILE
         self._authority = authority
         self._host = host or SessionHost()
         self._workers: dict[str, WorkerRecord] = {}
         self._procs: dict[str, subprocess.Popen] = {}
         self._admitted: set[str] = set()
-        self._load_existing()
+        self._load_state()          # durable config/admission across processes
+        self._load_existing_pids()
+
+    # -- persistence (B3-R4: state survives CLI process boundaries) -----------
+
+    def _load_state(self) -> None:
+        if not self._state_file.exists():
+            return
+        try:
+            data = json.loads(self._state_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return
+        for rec in data.get("workers", []):
+            wr = WorkerRecord.from_dict(rec)
+            # pid is not authoritative across processes; recompute on status.
+            wr.pid = None
+            self._workers[wr.worker_id] = wr
+        for wid in data.get("admitted", []):
+            self._admitted.add(wid)
+            # rebuild the admitted identity so the authority carries it
+            rec = self._workers.get(wid)
+            caps = rec.capabilities if rec else list(data.get("capabilities", []))
+            ident = WorkerIdentity(
+                worker_id=wid, admission_nonce=("adm-" + wid).ljust(16, "0"),
+                protocol_version="1.0", host_os_class=_os_class(),
+                runtime_class="python", trust_zone="worker-local",
+                worker_version="1.0", capabilities=tuple(caps),
+                sandbox_profile="default",
+            )
+            self._authority._identities[wid] = ident  # adopted identity
+        for cap in data.get("capabilities", []):
+            try:
+                self._authority.registry.admit_capability(cap, "operator:po")
+            except Exception:
+                pass
+
+    def _save_state(self) -> None:
+        self._dir.mkdir(parents=True, exist_ok=True)
+        data = {
+            "workers": [w.to_dict() for w in self._workers.values()],
+            "admitted": sorted(self._admitted),
+            "capabilities": self._authority.registry.admitted(),
+            "saved_at": utcnow_iso(),
+        }
+        tmp = self._state_file.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+        tmp.replace(self._state_file)
+        try:
+            self._state_file.chmod(0o600)
+        except OSError:
+            pass
 
     # -- filesystem helpers -----------------------------------------------------
 
@@ -87,14 +162,23 @@ class WorkerSupervisor:
     def _process_alive(self, pid: Optional[int]) -> bool:
         if not pid:
             return False
+        if os.name == "nt":
+            # os.kill(pid, 0) is a no-op/wrong on Windows (SystemError for a
+            # dead pid). Probe the command line: empty -> not alive.
+            try:
+                return bool(_cmdline(pid))
+            except Exception:
+                return False
         try:
-            os.kill(pid, 0)     # liveness probe (no kill)
+            os.kill(pid, 0)
             return True
         except ProcessLookupError:
             return False
         except PermissionError:
             return True
         except OSError:
+            return False
+        except Exception:
             return False
 
     def _stale_pids(self) -> list[str]:
@@ -105,7 +189,14 @@ class WorkerSupervisor:
             except (ValueError, OSError):
                 stale.append(pf.stem)
                 continue
+            rec = self._workers.get(pf.stem)
+            expected = rec.command[0] if rec and rec.command else ""
+            # PID reuse protection: if this pid is alive but does not belong to
+            # our expected interpreter, treat the file as stale (never signal).
             if not self._process_alive(pid):
+                stale.append(pf.stem)
+                continue
+            if expected and expected not in _cmdline(pid):
                 stale.append(pf.stem)
         return stale
 
@@ -118,29 +209,42 @@ class WorkerSupervisor:
         if stale:
             reports["ok"] = False
         reports["admitted_workers"] = sorted(self._admitted)
+        reports["configured_workers"] = sorted(self._workers)
         reports["warnings"] = []
-        if not self._authority.identities():
+        if not self._admitted:
             reports["warnings"].append("no workers admitted yet; run worker admit")
+        if not self._workers:
+            reports["warnings"].append("no workers configured; run worker configure")
         return reports
 
     def configure(self, worker_id: str, command: list[str],
-                  capabilities: Optional[list[str]] = None) -> WorkerRecord:
-        rec = WorkerRecord(worker_id=worker_id, command=command,
-                           capabilities=list(capabilities or BOOTSTRAP_CAPABILITIES))
+                  capabilities: Optional[list[str]] = None, actor: str = "operator:po") -> WorkerRecord:
+        caps = list(capabilities or BOOTSTRAP_CAPABILITIES)
+        rec = WorkerRecord(worker_id=worker_id, command=command, capabilities=caps)
         self._workers[worker_id] = rec
+        # Configuration alone does not admit; admission is a PO action.
+        self._save_state()
         return rec
 
     def admit(self, worker_id: str, requested: Optional[list[str]] = None,
               actor: str = "operator:po") -> WorkerIdentity:
         """PO-authorized admission. A worker cannot self-authorize."""
+        if actor != "operator:po":
+            raise PermissionError(
+                f"actor '{actor}' cannot admit workers — only operator:po (or a "
+                f"permitted PO proxy) may admit a worker")
         rec = self._workers.get(worker_id)
-        caps = (requested or (rec.capabilities if rec else []))
+        caps = list(requested or (rec.capabilities if rec else []))
+        # unknown/unadmitted capabilities fail closed
+        for cap in caps:
+            if not self._authority.registry.is_admitted(cap):
+                raise PermissionError(f"capability '{cap}' is not operator-admitted")
         req = AdmissionRequest(
             worker_id=worker_id,
             public_key_or_nonce=("adm-" + worker_id).ljust(16, "0"),
             requested_capabilities=caps,
             protocol_version="1.0",
-            host_os_class={"nt": "windows", "posix": "linux"}.get(os.name, os.name),
+            host_os_class=_os_class(),
             runtime_class="python", trust_zone="worker-local", worker_version="1.0",
         )
         ident = self._authority.approve(req, actor)
@@ -148,6 +252,8 @@ class WorkerSupervisor:
         if rec:
             rec.state = "admitted"
             rec.capabilities = caps
+            rec.command = rec.command or [sys.executable]
+        self._save_state()
         return ident
 
     def _authorize(self, worker_id: str) -> WorkerRecord:
@@ -162,16 +268,15 @@ class WorkerSupervisor:
         rec = self._authorize(worker_id)
         if rec.state == "running" and self._process_alive(rec.pid):
             return rec
-        # runtime-owned PID: launch the worker command ourselves
         env = dict(os.environ)
-        proc = subprocess.Popen(rec.command, cwd=str(self._dir),
-                                env=env, stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL)
+        proc = subprocess.Popen(rec.command, cwd=str(self._dir), env=env,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self._procs[worker_id] = proc
         self._write_pid(worker_id, proc.pid)
         rec.pid = proc.pid
         rec.state = "running"
         rec.started_at = utcnow_iso()
+        self._save_state()
         return rec
 
     def status(self, worker_id: Optional[str] = None) -> object:
@@ -195,26 +300,32 @@ class WorkerSupervisor:
         rec = self._authorize(worker_id)
         if rec.state in ("running", "paused"):
             rec.state = "paused"
+            self._save_state()
         return rec
 
     def resume(self, worker_id: str) -> WorkerRecord:
         rec = self._authorize(worker_id)
         if rec.state == "paused":
             rec.state = "running" if self._process_alive(rec.pid) else "stopped"
+            self._save_state()
         return rec
 
     def drain(self, worker_id: str) -> WorkerRecord:
         rec = self._authorize(worker_id)
         rec.state = "draining"
         self._host.set_draining(worker_id, True)
+        self._save_state()
         return rec
 
-    def revoke(self, worker_id: str) -> WorkerRecord:
+    def revoke(self, worker_id: str, actor: str = "operator:po") -> WorkerRecord:
+        if actor != "operator:po":
+            raise PermissionError(f"actor '{actor}' cannot revoke workers")
         rec = self._authorize(worker_id)
         self._host.revoke(worker_id)
         self._admitted.discard(worker_id)
-        self._authority.revoke_identity(worker_id, "operator:po")
+        self._authority.revoke_identity(worker_id, actor)
         rec.state = "stopped"
+        self._save_state()
         return rec
 
     def stop(self, worker_id: str) -> WorkerRecord:
@@ -231,6 +342,7 @@ class WorkerSupervisor:
         self._clear_pid(worker_id)
         rec.pid = None
         rec.state = "stopped"
+        self._save_state()
         return rec
 
     def restart(self, worker_id: str) -> WorkerRecord:
@@ -250,10 +362,14 @@ class WorkerSupervisor:
             pf.unlink(missing_ok=True)
             removed.append(pf.name)
         return {"cleanup": True, "removed_pid_files": removed,
-                "artifacts_preserved": True}
+                "artifacts_preserved": True, "state_preserved": True}
 
     def workers(self):
         return dict(self.status())
+
+    def up(self, worker_id: str) -> WorkerRecord:
+        """Start a not-yet-admitted configured worker after admission smoke."""
+        return self.start(worker_id)
 
     # -- console views (B3-C7 operator console) --------------------------------
 
@@ -264,14 +380,54 @@ class WorkerSupervisor:
             "sessions": [s for w in self._admitted for s in self._host.sessions(w)],
             "workers": self.status(),
             "doctor": self.doctor(),
+            "state_file": str(self._state_file),
             "cloud": "dormant",
         }
 
-    def _load_existing(self) -> None:
-        # adopt our own recorded pids as the running set on restart
+    def _load_existing_pids(self) -> None:
+        # adopt our own recorded pids as the running set on restart, but only
+        # if the pid truly belongs to our expected interpreter (PID reuse safe)
         for pf in self._pid_dir.glob("*.pid"):
             pid = self._read_pid(pf.stem)
-            if pid and self._process_alive(pid):
-                rec = WorkerRecord(worker_id=pf.stem, command=[],
-                                   pid=pid, state="running")
-                self._workers[pf.stem] = rec
+            rej = self._workers.get(pf.stem)
+            expected = rej.command[0] if rej and rej.command else ""
+            if pid and self._process_alive(pid) and (not expected or expected in _cmdline(pid)):
+                rec = self._workers.get(pf.stem)
+                if rec is None:
+                    rec = WorkerRecord(worker_id=pf.stem, command=[], pid=pid,
+                                       state="running")
+                    self._workers[pf.stem] = rec
+                else:
+                    rec.pid = pid
+                    rec.state = "running"
+
+
+def _os_class() -> str:
+    return {"nt": "windows", "posix": "linux"}.get(os.name, os.name)
+
+
+def _cmdline(pid: int) -> str:
+    """Best-effort command-line for PID-reuse safety. Empty on unknown."""
+    try:
+        raw = Path(f"/proc/{pid}/cmdline").read_bytes()
+        if raw:
+            return raw.replace(b"\0", b" ").decode("utf-8", "replace")
+    except OSError:
+        pass
+    try:
+        r = subprocess.run(["ps", "-p", str(pid), "-o", "args="],
+                           capture_output=True, text=True, timeout=10)
+        if r.returncode == 0 and r.stdout.strip():
+            return r.stdout.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    try:
+        r = subprocess.run(
+            ["powershell", "-NoProfile", "-Command",
+             f"(Get-CimInstance Win32_Process -Filter \"ProcessId={pid}\").CommandLine"],
+            capture_output=True, text=True, timeout=15)
+        if r.returncode == 0 and r.stdout.strip():
+            return r.stdout.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    return ""
