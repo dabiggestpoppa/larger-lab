@@ -197,6 +197,7 @@ def test_monotonic_fence_generation_after_reclaim(pg, fresh):
 
 def test_expired_lease_reclaimed(pg, fresh):
     _admit(fresh)
+    _admit(fresh, "w2")
     fresh.claim("job-e", "w1", "lease-tok-E", 1, 1)
     import time
     time.sleep(1.2)  # ttl 1s

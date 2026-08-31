@@ -292,13 +292,15 @@ class PgWorkerFabricStore(InMemoryLeaseStore):
 
     def fetch_fence(self, job_id: str) -> dict:
         row = self._one(
-            "SELECT lease_id, fence, status FROM b3_fabric_leases "
+            "SELECT lease_id, fence, status, worker_id FROM b3_fabric_leases "
             "WHERE job_id = %s FOR UPDATE",
             (job_id,),
         )
         if row is None:
-            return {"fence": 0, "lease_id": None, "status": "available"}
-        return {"lease_id": row[0], "fence": row[1], "status": row[2]}
+            return {"fence": 0, "lease_id": None, "status": "available",
+                    "worker_id": None}
+        return {"lease_id": row[0], "fence": row[1], "status": row[2],
+                "worker_id": row[3]}
 
     def claim(self, job_id: str, worker_id: str, lease_id: str,
               fence: int, ttl_s: int) -> bool:

@@ -158,14 +158,17 @@ def _uvicorn(app, port):
     uvicorn.run(app, host="127.0.0.1", port=port, log_level="warning")
 
 
+ALL_CAPS = ("hash", "compute-python", "repo-inventory",
+            "backtest-synthetic", "analysis-artifact")
+
+
 def _admit(fabric) -> None:
-    for cap in ("hash", "compute-python", "repo-inventory",
-                "backtest-synthetic", "analysis-artifact"):
+    for cap in ALL_CAPS:
         fabric.admit_capability(cap, "operator:po")
     fabric.persist_identity(
         worker_id=WORKER_ID, protocol_version="1.0", worker_version="1.0",
         host_os_class="linux", runtime_class="python", trust_zone="worker-local",
-        sandbox_profile="default", capabilities=list(JOBS.keys()),
+        sandbox_profile="default", capabilities=list(ALL_CAPS),
         credential_verifier=_verifier(SECRET), actor="operator:po")
 
 
@@ -243,18 +246,26 @@ def test_duplicate_delivery_one_material_effect(pg, fabric, jstore, service):
     job_id = job.job_id
     server._store.claim(job_id, WORKER_ID, "tok-DUP-0001", 1, 120)
     from oce_control.worker_protocol import SessionGone, WorkerProtocolError
-    # first delivery accepted
+    from oce_control.worker_client import OutboundWorkerClient, _hmac
+    # A REAL authenticated outbound session (challenge/response over the shared
+    # secret) is required before any result may be delivered.
+    cli = OutboundWorkerClient(url, WORKER_ID, SECRET)
+    cli.connect()
+    sess_id = cli._session_id
+    sig = _hmac(cli._key, f"{sess_id}:deliver_result")
+    # first delivery accepted under the current fence
     result = server.deliver_result(
-        session_id="sess-e2e", signature="sig", job_id=job_id,
+        session_id=sess_id, signature=sig, job_id=job_id,
         lease_id="tok-DUP-0001", fence=1, effect_key=f"{job_id}::dup::effect",
         success=True)
     assert result["delivered"] is True
     # a duplicate delivery under a stale/forked lease must not create a 2nd effect
     with pytest.raises((SessionGone, WorkerProtocolError)):
         server.deliver_result(
-            session_id="sess-e2e", signature="sig", job_id=job_id,
+            session_id=sess_id, signature=sig, job_id=job_id,
             lease_id="tok-FORGED", fence=9, effect_key=f"{job_id}::dup::effect",
             success=True)
+    cli.close()
     with pg.cursor() as cur:
         cur.execute("SELECT COUNT(*) FROM b3_effects WHERE job_id=%s", (job_id,))
         assert cur.fetchone()[0] == 1
