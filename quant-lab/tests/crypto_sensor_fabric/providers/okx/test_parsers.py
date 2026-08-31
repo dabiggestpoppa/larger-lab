@@ -1,11 +1,16 @@
-"""SENSOR-B3-I07C — OKX provider-native parser tests.
+"""SENSOR-B3-I07C/R1 — OKX provider-native parser tests.
 
 Proves timestamp schema (ms-epoch STRING strictness: None/bool/int/float fail
 closed, no silent coercion), per-sensor native field preservation, additive vs
-breaking drift, and that parsers NEVER emit canonical/research fields.
+breaking drift, closed-record required-field strictness (I07R1), exact int
+`seqId` typing (bool rejected), book-level minimum [price, size] cardinality,
+markPrice additive-only treatment, and that parsers NEVER emit
+canonical/research fields.
 """
 
 from __future__ import annotations
+
+import pytest
 
 from crypto_sensor_fabric.providers.base.enums import SchemaState
 from crypto_sensor_fabric.providers.okx.parsers import (
@@ -16,6 +21,28 @@ from crypto_sensor_fabric.providers.okx.parsers import (
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 
 from .fixtures import responses as FX
+
+
+def _drop_field(rows: list[dict], field: str) -> dict:
+    """Synthetic envelope with one field removed from every row."""
+    return {
+        "code": "0",
+        "msg": "",
+        "data": [{k: v for k, v in row.items() if k != field} for row in rows],
+    }
+
+
+FUNDING_FINGERPRINT_FIELDS = (
+    "formulaType",
+    "fundingRate",
+    "fundingTime",
+    "instId",
+    "instType",
+    "method",
+    "realizedRate",
+)
+TRADE_FINGERPRINT_FIELDS = ("instId", "px", "side", "source", "sz", "tradeId", "ts")
+BOOK_FINGERPRINT_FIELDS = ("asks", "bids", "seqId", "ts")
 
 
 class TestFundingParser:
@@ -30,6 +57,24 @@ class TestFundingParser:
         assert "realizedRate" in row
         assert "formulaType" in row
         assert "method" in row
+        assert "markPrice" not in row  # not in the runtime fingerprint
+
+    @pytest.mark.parametrize("field", FUNDING_FINGERPRINT_FIELDS)
+    def test_missing_each_structural_funding_field_breaks(self, field) -> None:
+        # closed seven-field record: every fingerprint field is structurally
+        # required (I07R1 Repair 2) — no silent defaulting.
+        parsed = parse_okx_funding(_drop_field([FX.funding_row()], field))
+        assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+        assert parsed.rows == ()
+
+    def test_markprice_is_additive_unverified_not_required(self) -> None:
+        # markPrice is probe-fixture-only: present -> ADDITIVE + preserved,
+        # absent -> still KNOWN (never required).  I07R1 Repair 5.
+        with_additive = parse_okx_funding(FX.FUNDING_MARKPRICE_ADDITIVE)
+        assert with_additive.schema_state is SchemaState.ADDITIVE_SCHEMA_CHANGE
+        assert with_additive.semantic_output_allowed is True
+        assert with_additive.rows[0]["markPrice"] == "29510.5"
+        assert parse_okx_funding(FX.FUNDING_HAPPY).schema_state is SchemaState.KNOWN_SCHEMA
 
     def test_empty_is_empty_valid(self) -> None:
         parsed = parse_okx_funding(FX.FUNDING_EMPTY)
@@ -76,6 +121,14 @@ class TestTradeParser:
         assert row["side"] == "sell"  # native aggressor side preserved verbatim
         assert isinstance(row["ts"], str)
         assert "source" in row
+        assert "instId" in row
+
+    @pytest.mark.parametrize("field", TRADE_FINGERPRINT_FIELDS)
+    def test_missing_each_structural_trade_field_breaks(self, field) -> None:
+        # closed seven-field record (instId/source structural per fingerprint).
+        parsed = parse_okx_trades(_drop_field(FX.TRADE_HAPPY["data"], field))
+        assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+        assert parsed.rows == ()
 
     def test_side_never_reinterpreted(self) -> None:
         parsed = parse_okx_trades(FX.TRADE_HAPPY)
@@ -114,6 +167,32 @@ class TestBookParser:
         assert book["bids"][0][0] == "29498.0"  # native [px, sz, ...]
         assert isinstance(book["ts"], str)
         assert book["seqId"] == 1001
+
+    @pytest.mark.parametrize("field", BOOK_FINGERPRINT_FIELDS)
+    def test_missing_each_structural_book_field_breaks(self, field) -> None:
+        # seqId is structural per the closed fingerprint (I07R1 Repair 2).
+        parsed = parse_okx_book(_drop_field(FX.BOOK_HAPPY["data"], field))
+        assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+        assert parsed.rows == ()
+
+    def test_seqid_exact_int_type_bool_rejected(self) -> None:
+        # bool subclasses int; a bool must NOT pass as the snapshot sequence id.
+        for fx in (FX.BOOK_SEQID_BOOL_TRUE, FX.BOOK_SEQID_BOOL_FALSE):
+            parsed = parse_okx_book(fx)
+            assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+            assert parsed.rows == ()
+        assert parse_okx_book(FX.BOOK_HAPPY).schema_state is SchemaState.KNOWN_SCHEMA
+
+    def test_level_requires_price_and_size(self) -> None:
+        # at minimum [price, size]; optional trailing provider fields allowed.
+        one = parse_okx_book(FX.BOOK_LEVEL_ONE_ELEMENT)
+        assert one.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+        empty = parse_okx_book(FX.BOOK_LEVEL_EMPTY)
+        assert empty.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+        minimal = parse_okx_book(FX.BOOK_LEVEL_MINIMAL)
+        assert minimal.schema_state is SchemaState.KNOWN_SCHEMA
+        assert minimal.rows[0]["bids"] == [["29498.0", "1.2"]]
+        # full evidenced four-element row stays valid (already covered by happy)
 
     def test_empty_is_empty_valid(self) -> None:
         parsed = parse_okx_book(FX.BOOK_EMPTY)

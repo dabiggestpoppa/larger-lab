@@ -7,7 +7,9 @@ shapes (`tests/.../probe_payloads/okx/*.json`):
 
 - FUNDING: `{code, msg, data:[{formulaType, fundingRate, fundingTime, instId,
   instType, method, realizedRate}]}` — `fundingTime` is a millisecond-epoch
-  STRING.
+  STRING.  This is the closed SEVEN-field runtime fingerprint; `markPrice` is
+  probe-fixture-only and modeled as an optional/unverified ADDITIVE field
+  (`FUNDING_MARKPRICE_ADDITIVE`), never a required evidence-backed field.
 - TRADE:   `{code, msg, data:[{instId, px, side, source, sz, tradeId, ts}]}` —
   `ts` is a millisecond-epoch STRING; `side` is the native aggressor side.
 - BOOK:    `{code, msg, data:[{asks, bids, seqId, ts}]}` — bids/asks are
@@ -33,12 +35,15 @@ def _ok(data: Any) -> dict[str, Any]:
 
 
 def funding_row(ts_ms: int = 1755000000000) -> dict[str, Any]:
+    # EXACTLY the closed SEVEN-field funding record of the committed
+    # 09_SCHEMA_FINGERPRINTS.jsonl fingerprint.  markPrice is NOT part of the
+    # runtime fingerprint (probe fixture only) and lives in
+    # FUNDING_MARKPRICE_ADDITIVE as an optional/unverified additive field.
     return {
         "instId": SYMBOL,
         "fundingRate": "0.000075",
         "realizedRate": "0.000075",
         "fundingTime": str(ts_ms),
-        "markPrice": "29510.5",
         "formulaType": "A",
         "instType": "SWAP",
         "method": "ma",
@@ -54,6 +59,12 @@ FUNDING_HAPPY = _ok(
 FUNDING_EMPTY = _ok([])
 FUNDING_ADDITIVE = _ok(
     [{**funding_row(), "extraProviderField": "x"}]
+)
+#: markPrice is a probe-fixture-only field (NOT in the 09 runtime fingerprint):
+#: it must be modeled as an OPTIONAL/UNVERIFIED additive field — preserved when
+#: present, flagged ADDITIVE, NEVER required (SENSOR-B3-I07R1 Repair 5).
+FUNDING_MARKPRICE_ADDITIVE = _ok(
+    [{**funding_row(), "markPrice": "29510.5"}]
 )
 #: malformed fundingTime (float-like string) -> BREAKING.
 FUNDING_BAD_TIMESTAMP = _ok([{**funding_row(), "fundingTime": "1755000000.0"}])
@@ -81,7 +92,7 @@ TRADE_HAPPY = _ok(
 TRADE_EMPTY = _ok([])
 TRADE_ADDITIVE = _ok(
     [{"instId": SYMBOL, "tradeId": "500001", "px": "29510.0", "sz": "1.1",
-     "side": "sell", "ts": "1754998800000", "extra": "z"}]
+     "side": "sell", "ts": "1754998800000", "source": "a", "extra": "z"}]
 )
 TRADE_BAD_TIMESTAMP = _ok([
     {"instId": SYMBOL, "tradeId": "500001", "px": "29510.0", "sz": "1.1",
@@ -112,6 +123,18 @@ BOOK_BAD_TIMESTAMP = _ok([{**_book(), "ts": 1755000000000}])  # int not str
 BOOK_NONE_TIMESTAMP = _ok([{**_book(), "ts": None}])
 BOOK_MISSING_BIDS = _ok([{k: v for k, v in _book().items() if k != "bids"}])
 BOOK_BAD_LEVEL = _ok([{**_book(), "bids": [["29498.0", 1.2]]}])  # non-str level
+#: one-element price-only level (missing size) -> BREAKING (I07R1 Repair 4).
+BOOK_LEVEL_ONE_ELEMENT = _ok([{**_book(), "bids": [["29498.0"]], "asks": [["29512.0"]]}])
+#: zero-element level -> BREAKING.
+BOOK_LEVEL_EMPTY = _ok([{**_book(), "bids": [[]]}])
+#: minimal valid [price, size] two-element level -> PASS (evidence allows
+#: optional trailing native fields, so 4-element rows stay valid).
+BOOK_LEVEL_MINIMAL = _ok(
+    [{**_book(), "bids": [["29498.0", "1.2"]], "asks": [["29512.0", "0.5"]]}]
+)
+#: bool must NOT pass as the int seqId (bool subclasses int) -> BREAKING.
+BOOK_SEQID_BOOL_TRUE = _ok([{**_book(), "seqId": True}])
+BOOK_SEQID_BOOL_FALSE = _ok([{**_book(), "seqId": False}])
 BOOK_DRIFT = {"code": "0", "data": {"not": "a list"}}
 
 # --------------------------------------------------------------------------- #

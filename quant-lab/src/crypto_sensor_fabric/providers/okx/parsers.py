@@ -10,13 +10,20 @@ Schema reality (Bloc 2 I13 fingerprints, 09_SCHEMA_FINGERPRINTS.jsonl):
 
 - FUNDING: envelope `{code:str, data:[{formulaType, fundingRate, fundingTime,
   instId, instType, method, realizedRate}], msg}` — `fundingTime` is a
-  millisecond-epoch STRING.
+  millisecond-epoch STRING.  The committed fingerprint is a closed SEVEN-field
+  row record: all seven fields are structurally required.  `markPrice` is NOT
+  part of the committed runtime fingerprint (it appears only in a probe/synthetic
+  fixture), so it is modeled as an OPTIONAL / UNVERIFIED additive field: it is
+  never required, and when present it flags ADDITIVE_SCHEMA_CHANGE while being
+  preserved under its native name.
 - TRADE:   envelope `{code:str, data:[{instId, px, side, source, sz, tradeId,
   ts}], msg}` — `ts` is a millisecond-epoch STRING; `side` is the provider
-  native aggressor side preserved verbatim.
+  native aggressor side preserved verbatim.  All seven fields are structurally
+  required per the closed fingerprint.
 - BOOK:    envelope `{code:str, data:[{asks:list[list[str]], bids:list[list[str]],
   seqId:int, ts:str}], msg}` — `bids`/`asks` are native list-of-list price/size
-  rows, `ts` is a millisecond-epoch STRING, `seqId` is an int.
+  rows (`[px, sz, ...]`, at minimum price + size, all string parts), `ts` is a
+  millisecond-epoch STRING, `seqId` is an EXACT int (bool is rejected).
 
 Timestamps are validated strictly as provider-native ms-epoch STRINGS:
 `type(v) is str` plus a numeric-string check.  `None` / bool / int / float are
@@ -43,20 +50,30 @@ _MS_EPOCH_STR = re.compile(r"\A\d+\Z")
 # --------------------------------------------------------------------------- #
 # per-sensor native field contracts
 # --------------------------------------------------------------------------- #
-#: FUNDING required semantic fields (type str for the record scalars).
+#: FUNDING required semantic fields — the closed SEVEN-field record of the
+#: committed 09_SCHEMA_FINGERPRINTS.jsonl funding fingerprint.  `markPrice` is
+#: deliberately NOT required: it is not in the runtime fingerprint (probe/
+#: synthetic fixture only), so it is an optional/unverified additive field.
 _FUNDING_REQUIRED: frozenset[str] = frozenset(
-    {"fundingRate", "fundingTime", "realizedRate"}
-)
-_FUNDING_KNOWN: frozenset[str] = frozenset(
     {
+        "formulaType",
         "fundingRate",
         "fundingTime",
-        "realizedRate",
-        "formulaType",
         "instId",
         "instType",
         "method",
-        "markPrice",  # present in committed fixture (I13 evidence)
+        "realizedRate",
+    }
+)
+_FUNDING_KNOWN: frozenset[str] = frozenset(
+    {
+        "formulaType",
+        "fundingRate",
+        "fundingTime",
+        "instId",
+        "instType",
+        "method",
+        "realizedRate",
     }
 )
 _FUNDING_PROJECTION: frozenset[str] = frozenset(
@@ -68,12 +85,15 @@ _FUNDING_PROJECTION: frozenset[str] = frozenset(
         "instId",
         "instType",
         "method",
-        "markPrice",
+        "markPrice",  # optional/unverified additive (preserved when present)
     }
 )
 
-#: TRADE required semantic fields (all str).
-_TRADE_REQUIRED: frozenset[str] = frozenset({"px", "side", "sz", "tradeId", "ts"})
+#: TRADE required semantic fields — the closed SEVEN-field record of the
+#: committed trade fingerprint (instId + source are structural, not optional).
+_TRADE_REQUIRED: frozenset[str] = frozenset(
+    {"instId", "px", "side", "source", "sz", "tradeId", "ts"}
+)
 _TRADE_KNOWN: frozenset[str] = frozenset(
     {"instId", "px", "side", "source", "sz", "tradeId", "ts"}
 )
@@ -81,9 +101,10 @@ _TRADE_PROJECTION: frozenset[str] = frozenset(
     {"instId", "px", "side", "source", "sz", "tradeId", "ts"}
 )
 
-#: BOOK required semantic fields (bids/asks list-of-list, ts string).
-_BOOK_REQUIRED: frozenset[str] = frozenset({"asks", "bids", "ts"})
-_BOOK_KNOWN: frozenset[str] = frozenset({"asks", "bids", "ts", "seqId"})
+#: BOOK required semantic fields — closed FOUR-field fingerprint record
+#: (seqId is structural: int snapshot identity/order semantics).
+_BOOK_REQUIRED: frozenset[str] = frozenset({"asks", "bids", "seqId", "ts"})
+_BOOK_KNOWN: frozenset[str] = frozenset({"asks", "bids", "seqId", "ts"})
 _BOOK_PROJECTION: frozenset[str] = frozenset({"ts", "asks", "bids", "seqId"})
 
 
@@ -148,9 +169,17 @@ def _envelope_data(body: Any, sensor: SensorFamily) -> tuple[tuple[SchemaState, 
 
 
 def _validate_funding_row(row: dict[str, Any]) -> str | None:
+    """All seven fingerprint scalars are provider-native strings."""
     if "fundingTime" in row and not _is_ms_epoch_str(row["fundingTime"]):
         return "fundingTime malformed (expected ms-epoch numeric string)"
-    for field in ("fundingRate", "realizedRate"):
+    for field in (
+        "fundingRate",
+        "realizedRate",
+        "formulaType",
+        "instId",
+        "instType",
+        "method",
+    ):
         if field in row and not isinstance(row[field], str):
             return f"{field} malformed (expected provider string)"
     return None
@@ -198,7 +227,8 @@ def parse_okx_trades(body: Any) -> ParsedOkx:
         observed |= set(row)
         if "ts" in row and not _is_ms_epoch_str(row["ts"]):
             return ParsedOkx(rows=(), schema_state=SchemaState.BREAKING_SCHEMA_CHANGE, assessment=_breaking())
-        for field in ("tradeId", "px", "sz", "side"):
+        # all seven fingerprint scalars are provider-native strings
+        for field in ("tradeId", "px", "sz", "side", "instId", "source"):
             if field in row and not isinstance(row[field], str):
                 return ParsedOkx(rows=(), schema_state=SchemaState.BREAKING_SCHEMA_CHANGE, assessment=_breaking())
     st = _assess(observed, _TRADE_KNOWN, _TRADE_REQUIRED)
@@ -211,9 +241,13 @@ def parse_okx_trades(body: Any) -> ParsedOkx:
 
 
 def _level_ok(level: Any) -> bool:
+    """Provider-native book level: at minimum [price, size] (evidence: book
+    levels contain price + size plus optional trailing native fields).
+    All parts are provider-native strings; nothing is converted to float.
+    """
     if not isinstance(level, list):
         return False
-    if not level:
+    if len(level) < 2:
         return False
     return all(isinstance(part, str) for part in level)
 
@@ -235,7 +269,9 @@ def parse_okx_book(body: Any) -> ParsedOkx:
         observed |= set(book)
         if "ts" in book and not _is_ms_epoch_str(book["ts"]):
             return ParsedOkx(rows=(), schema_state=SchemaState.BREAKING_SCHEMA_CHANGE, assessment=_breaking())
-        if "seqId" in book and not isinstance(book["seqId"], int):
+        if "seqId" in book and type(book["seqId"]) is not int:
+            # exact type check: bool subclasses int and must NOT pass as a
+            # snapshot sequence id (SENSOR-B3-I07R1 Repair 3).
             return ParsedOkx(rows=(), schema_state=SchemaState.BREAKING_SCHEMA_CHANGE, assessment=_breaking())
         for side in ("bids", "asks"):
             if side in book and not isinstance(book[side], list):
