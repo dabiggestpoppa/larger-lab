@@ -399,13 +399,24 @@ def doctor() -> dict:
     chk("durable postgres volume present", vol.returncode == 0)
     cloud_hint = cloud_credential_hint()
     chk("no cloud credentials required", not cloud_hint, "; ".join(cloud_hint) or "local-only")
+    # Book 4 surface C: effective config posture gate.
+    from oce_control.config_startup import validate_startup
+    cfg = validate_startup()
+    chk("config spine effective config valid (fail-closed)",
+        cfg["ok"], cfg["error"] or "valid")
     return {"checks": checks, "ok": all(c["ok"] for c in checks)}
 
 
 def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
+    # Book 4 surface C: validate the effective configuration before activating.
+    # Fail closed on malformed / incomplete / forbidden config.
+    from oce_control.config_startup import require_startable
+
+    require_startable()
     actions: list[str] = []
     report = configure()
     actions.append(f"configured secret ({report['secret_source']})")
+    actions.append("config spine: effective config validated (fail-closed)")
     if not docker_available():
         raise RuntimeError("Docker is unavailable — the local runtime requires Docker "
                            "(PostgreSQL + Redis run as local containers on loopback)")

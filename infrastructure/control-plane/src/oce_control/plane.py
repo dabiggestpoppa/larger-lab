@@ -62,8 +62,28 @@ class ControlPlane:
         self.truth_ledger = TruthPromotionLedger()
         self.replay = ReplayHarness(self.job_store)
 
-    def startup(self) -> dict:
-        """Start the control plane. Returns startup status."""
+    def startup(self, environ: Optional[dict] = None) -> dict:
+        """Start the control plane. Returns startup status.
+
+        Before activating, the effective configuration is validated fail-closed
+        (Book 4 surface C). A malformed / incomplete / forbidden effective
+        config refuses to start and returns a BLOCKED status with an
+        operator-legible, secret-free message instead of {"status": "started"}.
+        """
+        from .config_startup import require_startable, startup_report
+
+        report = None
+        try:
+            require_startable(environ)
+        except SystemExit as exc:
+            report = str(exc) or startup_report(environ)
+        if report:
+            return {
+                "status": "blocked",
+                "reason": report,
+                "health": None,
+                "components": [],
+            }
         health = self.health_service.check_health()
         return {
             "status": "started",
