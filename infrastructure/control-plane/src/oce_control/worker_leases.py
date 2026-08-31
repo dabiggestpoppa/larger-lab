@@ -141,6 +141,7 @@ class FabricScheduler:
         self._authority = authority or WorkerAuthority()
         self._host = host or SessionHost()
         self._store = store or InMemoryLeaseStore()
+        self.default_ttl = default_ttl
         self.quarantined_late: list[dict] = []
 
     # -- capability-aware matching -------------------------------------------

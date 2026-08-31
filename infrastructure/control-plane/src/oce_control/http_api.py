@@ -63,11 +63,15 @@ def _status_code(resp: APIResponse) -> int:
 
 
 def create_app(api: ControlPlaneAPI, scheduler=None,
-               scheduler_tick_interval: int = 0) -> FastAPI:
+               scheduler_tick_interval: int = 0,
+               worker_protocol_server=None) -> FastAPI:
     """Build the FastAPI app over a ControlPlaneAPI boundary.
 
     scheduler_tick_interval > 0 starts a background tick loop (durable
-    runtime). Tests pass 0 for deterministic, single-threaded behavior.
+    runtime). worker_protocol_server optionally exposes the Book 3
+    authenticated outbound worker fabric endpoints (loopback only); when
+    None (default) those endpoints are absent, matching the Book 2 service.
+    Tests pass 0 for deterministic, single-threaded behavior.
     """
     if FastAPI is None:
         raise RuntimeError("fastapi is not installed — required to run the HTTP service")
@@ -157,6 +161,115 @@ def create_app(api: ControlPlaneAPI, scheduler=None,
     def audit_history(auth=Depends(_auth)):
         grant, actor = auth
         return _emit(api.audit_history(grant_id=grant, actor_id=actor))
+
+    # -- Book 3 outbound authenticated worker fabric (loopback only) --------
+    # Workers dial OUT to these endpoints; there is no worker public inbound
+    # port. Every fabric endpoint authenticates (challenge/response + HMAC
+    # signature over the derived wire key). Present only when a
+    # worker_protocol_server is wired in.
+    proto_errors = None
+    if worker_protocol_server is not None:
+        from .worker_protocol import (
+            WorkerProtocolError, UnknownWorker, ForgedProof, SessionGone,
+            CapabilityEscalation, WrongTrustZone)
+        proto_errors = (WorkerProtocolError,)
+
+        def _proto_status(e: Exception) -> int:
+            if isinstance(e, (ForgedProof, CapabilityEscalation, WrongTrustZone,
+                              UnknownWorker)):
+                return 403
+            if isinstance(e, SessionGone):
+                return 410
+            return 400
+
+        @app.post("/api/worker/hello")
+        def worker_hello(body: dict):
+            try:
+                return worker_protocol_server.hello(
+                    worker_id=body.get("worker_id", ""),
+                    proof=body.get("proof", ""))
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e),
+                                    detail=str(e))
+
+        @app.post("/api/worker/respond")
+        def worker_respond(body: dict):
+            try:
+                return worker_protocol_server.respond(
+                    session_id=body.get("session_id", ""),
+                    response=body.get("response", ""))
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e),
+                                    detail=str(e))
+
+        @app.post("/api/worker/heartbeat")
+        def worker_heartbeat(body: dict):
+            try:
+                return worker_protocol_server.heartbeat(
+                    session_id=body["session_id"], signature=body["signature"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/capabilities")
+        def worker_capabilities(body: dict):
+            try:
+                return worker_protocol_server.advertise_capabilities(
+                    session_id=body["session_id"], signature=body["signature"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/claim")
+        def worker_claim(body: dict):
+            try:
+                return worker_protocol_server.claim(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job=body.get("job", {}))
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/renew")
+        def worker_renew(body: dict):
+            try:
+                return worker_protocol_server.renew(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job_id=body["job_id"], lease_id=body["lease_id"],
+                    fence=body["fence"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/result")
+        def worker_result(body: dict):
+            try:
+                return worker_protocol_server.deliver_result(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job_id=body["job_id"], lease_id=body["lease_id"],
+                    fence=body["fence"], effect_key=body["effect_key"],
+                    manifest=body.get("manifest"),
+                    success=body.get("success", True))
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/surrender")
+        def worker_surrender(body: dict):
+            try:
+                return worker_protocol_server.surrender(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job_id=body["job_id"], lease_id=body["lease_id"],
+                    fence=body["fence"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/revoke")
+        def worker_revoke(body: dict):
+            from fastapi import Header as _H
+            actor = body.get("actor", "")
+            try:
+                worker_protocol_server.revoke_worker(
+                    actor=actor, worker_id=body.get("worker_id", ""))
+                return {"revoked": True, "worker_id": body.get("worker_id"),
+                        "actor": actor}
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=403, detail=str(e))
 
     @app.get("/", include_in_schema=False)
     def root():
