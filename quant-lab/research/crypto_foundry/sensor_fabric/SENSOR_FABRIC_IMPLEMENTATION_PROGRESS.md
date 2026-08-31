@@ -11,21 +11,21 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I07R2-RATIFY COMPLETE — operator ACCEPTED PASS_SENSOR_B3_I07R2_OKX_SEALED; OKX OFFLINE FROZEN; SENSOR-B3-I08 DERIBIT AUTHORIZED |
+| Current checkpoint | SENSOR-B3-I08 COMPLETE (OFFLINE) — DERIBIT PRODUCTION ADAPTER (PASS_SENSOR_B3_I08_DERIBIT_ADAPTER_OFFLINE proposed, awaiting operator review) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY: PASS_SENSOR_B3_I07R2_OKX_SEALED accepted); DERIBIT AUTHORIZED = SENSOR-B3-I08 ONLY |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY); DERIBIT I08 COMPLETE OFFLINE — PASS_SENSOR_B3_I08_DERIBIT_ADAPTER_OFFLINE proposed, awaiting operator review |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
-| Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = DERIBIT / SENSOR-B3-I08 ONLY (Kraken + Gate + OKX frozen; no other provider, no adapter matrix, no network smoke, no Bloc 4) |
-| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=3 (KRAKEN_FUTURES + GATE_FUTURES + OKX_SWAP, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate + OKX; PRODUCTION_CANDIDATE mode, 0 failed each) · NETWORK_VALIDATION=NOT_YET_RUN |
-| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE (I07) · okx_boundary_hardened = TRUE (I07R1) · okx_offline_sealed = TRUE (I07R2) · okx_implementation_frozen = TRUE (I07R2-RATIFY) · okx_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
+| Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
+| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=4 (KRAKEN_FUTURES + GATE_FUTURES + OKX_SWAP + DERIBIT, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate + OKX + Deribit; PRODUCTION_CANDIDATE mode, 0 failed each) · I14 PRODUCTION-ADAPTER INVENTORY = 17/17 provider×sensor candidates implemented OFFLINE (4 providers × I14 sets) · NETWORK_VALIDATION=NOT_YET_RUN |
+| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE · okx_offline_sealed = TRUE · okx_implementation_frozen = TRUE · okx_network_smoke = NOT_RUN · deribit_adapter_implemented = TRUE (I08) · deribit_offline_pass = TRUE (168 tests; PRODUCTION_CANDIDATE 0 failed) · deribit_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
-| next_provider_authorized | FALSE beyond Deribit (I08 DERIBIT ONLY; OKX/Kraken/Gate frozen; no OKX beyond Deribit, no adapter matrix, no network smoke) |
-| next_checkpoint_authorized | TRUE for SENSOR-B3-I08 DERIBIT ONLY — FALSE beyond I08 (await operator review of PASS_SENSOR_B3_I08_DERIBIT_ADAPTER_OFFLINE) |
+| next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
+| next_checkpoint_authorized | FALSE — recommended next: SENSOR-B3-I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE (await operator review of PASS_SENSOR_B3_I08_DERIBIT_ADAPTER_OFFLINE) |
 
 ## Test counts (cumulative)
 
@@ -89,7 +89,9 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I07R2A | cf269288 | 7 | 0 |
 | SENSOR-B3-I07R2B | (evidence/ledger) | — | — |
 | SENSOR-B3-I07R2-RATIFY | (governance) | — | — |
-| cumulative | 1074 | 1074 | 0 |
+| SENSOR-B3-I08A | f6acec7e | 20 | 0 |
+| SENSOR-B3-I08B+C | 82e23c52 | 148 | 0 |
+| cumulative | 1242 | 1242 | 0 |
 
 ## External / provider blockers
 
@@ -176,6 +178,29 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B3-I08 COMPLETE (OFFLINE) — DERIBIT PRODUCTION ADAPTER on the
+  hardened common foundation.  Exactly four I14-promoted paths ADAPTER_READY:
+  BOOK_SNAPSHOT CURRENT_ONLY, FUNDING SECONDARY historical, LIQUIDATION +
+  TRADE MECHANISM_MICROSCOPE historical.  Production symbol scope
+  evidence-derived (BTC-PERPETUAL only; probe keeps ETH/SOL).  Trade +
+  liquidation share get_last_trades_by_instrument (start/end epoch-ms,
+  count<=1000, include_old=true); funding result is a RAW LIST (observed
+  LIVE); book is the current-only get_order_book snapshot (depth=25).
+  JSON-RPC errors typed (40400 invalid instrument, 10001 rate limit, 10000/
+  10002 auth, -32601/-32602 semantic; HTTP200 errors never EMPTY_VALID).
+  Parser seal per 09 fingerprints (trade 13-field closed record, funding
+  5-field closed record with funding_rate/1h/8h unverified-additive, book
+  core timestamp/instrument_name/bids/asks); epoch-ms INT timestamps strict
+  (bool rejected).  Liquidation microscope projects ONLY rows flagged
+  "liquidation" (never interval totals; zero events -> EMPTY_VALID with raw
+  preserved).  Completion truth: single window complete only when non-empty,
+  all rows in-window and terminal (funding under count cap; trade/liq
+  has_more=false); no invented resume token (continuation LIMITED).
+  PRODUCTION_CANDIDATE conformance 0 failed; 1242 passed / 0 failed; ruff
+  clean; mypy clean on changed modules; FAKE TRANSPORT ONLY — zero network
+  calls; Kraken + Gate + OKX regression green (frozen); no Bloc 4; no other
+  provider.  Evidence:
+  `evidence/bloc_03/BLOC_03_I08_DERIBIT_IMPLEMENTATION_EVIDENCE.md`.
 - SENSOR-B3-I07R2-RATIFY COMPLETE (governance) — operator ACCEPTED
   PASS_SENSOR_B3_I07R2_OKX_SEALED; OKX recorded OFFLINE_FROZEN
   (adapter_implemented = boundary_hardened = offline_sealed =
@@ -439,3 +464,5 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I07R2A | cf269288 | OKX order-invariant overlap: PARTIAL/GAP from ANY validated row timestamp in window (descending/scrambled pages can no longer cause false GAP); invariant violation fails closed; PARTIAL/GAP exclusive; descending + scrambled + true-gap + funding regression tests | 1074 passed / 0 failed | PASS | none |
 | SENSOR-B3-I07R2B | (this commit) | OKX microseal evidence (BLOC_03_I07R2_OKX_MICROSEAL_EVIDENCE.md), ledger | 1074 passed / 0 failed (re-run) | PASS | none |
 | SENSOR-B3-I07R2-RATIFY | (governance) | operator accepts PASS_SENSOR_B3_I07R2_OKX_SEALED, freezes OKX offline implementation, authorizes Deribit I08 only (no adapter matrix / network smoke / other providers / Bloc 4) | 1074 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I08A | f6acec7e | Deribit capability + native acquisition contract (4 paths, roles, BTC-PERPETUAL scope, REST_RANGE/TIME_RANGE grants, exact-set tests) | 1094 passed / 0 failed | PASS | none |
+| SENSOR-B3-I08B+C | 82e23c52 | Deribit requests/errors/parsers/adapter + fixtures + tests (trade/liq shared surface, funding raw-list envelope, book current-only, epoch-ms INT timestamps, liquidation microscope filter, typed JSON-RPC errors, completion truth, PRODUCTION_CANDIDATE conformance) | 1242 passed / 0 failed | PASS | none |
