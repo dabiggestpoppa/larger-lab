@@ -90,15 +90,40 @@ class AuthorityRegistry:
 
 
 class AuthorityState:
-    """Operational authority projection for a scenario: actor -> level + grants."""
+    """Operational authority projection for a scenario: actor -> level + grants.
+
+    G1R-09: initialization and governed change are explicit two phases.
+      - seed_level() may only be used BEFORE freeze_initialization().
+      - after freeze, the ONLY legal path to alter an actor's level/grants is a
+        governed, ratified change (propose + ratify).
+    set_level() is kept as an alias for the seeder so existing fixture init reads
+    naturally, but it is equally blocked once initialization is frozen.
+    """
 
     def __init__(self) -> None:
         self.actors: Dict[str, str] = {}          # actor -> AuthorityLevel
         self.registry = AuthorityRegistry()
         self._ratifications: List[Tuple[str, str, str]] = []  # (proposer, target, authority_basis)
+        self._initialization_frozen = False
+
+    def freeze_initialization(self) -> None:
+        self._initialization_frozen = True
+
+    @property
+    def initialization_frozen(self) -> bool:
+        return self._initialization_frozen
+
+    def seed_level(self, actor: str, level: str) -> None:
+        """Fixture-initialization seeding. Forbidden after initialization freeze."""
+        if self._initialization_frozen:
+            raise AuthorityViolation(
+                "authority initialization is frozen; use the governed ratify/propose path"
+            )
+        self.actors[actor] = level
 
     def set_level(self, actor: str, level: str) -> None:
-        self.actors[actor] = level
+        # alias retained for readable fixture init; shares the freeze guard
+        self.seed_level(actor, level)
 
     def level(self, actor: str) -> str:
         return self.actors.get(actor, AuthorityLevel.OBSERVER.value)
