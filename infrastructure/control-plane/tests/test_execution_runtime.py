@@ -127,6 +127,25 @@ class TestArtifactStore:
         # identical content → same content-addressed manifest ref
         assert m1["manifest_id"] == m2["manifest_id"]
 
+    def test_restart_safe_manifest_reload(self, tmp_path):
+        """B3-R6 (defect 8): a sealed manifest is reloaded after restart from
+        the durable meta directory; CAS blobs stay hash-verifiable."""
+        base = tmp_path / "artifacts"
+        st = ArtifactStore(base)
+        out = tmp_path / "a.json"
+        out.write_text('{"k": "v"}', encoding="utf-8")
+        m = st.create_manifest(job_id="jr", attempt=1, producer_identity="po",
+                               worker_id="w", artifact_paths={"a.json": out})
+        mid = m["manifest_id"]
+        # ``restart`` = a brand-new store object over the same base dir
+        again = ArtifactStore(base)
+        assert again.has_manifest(mid)
+        loaded = again.get(mid)
+        assert loaded["job_id"] == "jr"
+        # blobs remain hash-verifiable after the restart
+        assert again.verify_reference(mid) is True
+        assert again.read_artifact("a.json", mid) == out.read_bytes()
+
 
 class TestRetryCoordinator:
     def test_classification(self):

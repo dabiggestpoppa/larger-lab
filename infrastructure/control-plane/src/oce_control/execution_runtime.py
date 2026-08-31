@@ -506,8 +506,24 @@ class ArtifactStore:
         for d in (self._cas, self._tmp, self._meta):
             d.mkdir(parents=True, exist_ok=True)
         self._max = max_artifact_bytes
-        # manifest_id -> manifest dict
+        # manifest_id -> manifest dict — RESTART-SAFE (B3-R6): reload every
+        # durable sealed manifest from the meta directory on construction so
+        # a supervisor/worker/control-plane restart never loses references.
         self._manifests: dict[str, dict] = {}
+        self._reload_manifests()
+
+    def _reload_manifests(self) -> None:
+        """Re-seal all manifests persisted under meta/ (restart-safe)."""
+        for mfile in sorted(self._meta.glob("*.json")):
+            if mfile.name.endswith(".tmp"):
+                continue
+            try:
+                m = json.loads(mfile.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                continue          # ignore a torn meta file (partial write, not sealed)
+            mid = m.get("manifest_id")
+            if mid:
+                self._manifests[mid] = m
 
     def publish_blob(self, data: bytes) -> str:
         """Store bytes content-addressed. Returns the digest."""
@@ -698,13 +714,40 @@ class DeadLetterEntry:
 
 
 class RetryCoordinator:
-    """Durable-in-process retry/recovery orchestrator with dead letters."""
+    """Durable retry/recovery orchestrator with dead letters (B3-C6).
 
-    def __init__(self, policy: Optional[RetryPolicy] = None):
+    ``store`` is an optional durable backend (a ``PgWorkerFabricStore`` or any
+    object exposing ``record_retry_state``, ``dead_letter``, ``resolve_dead_letter``,
+    and ``authorized_retry``). When provided, every retry/dead-letter/poison
+    decision is mirrored there, so truth survives a restart (B3-R6) rather
+    than living only in memory.
+    """
+
+    def __init__(self, policy: Optional[RetryPolicy] = None, store=None):
         self._policy = policy or RetryPolicy()
+        self._store = store
         self._dead_letters: dict[str, DeadLetterEntry] = {}
         self._results: dict[str, dict] = {}
         self._poison: set[str] = set()
+        if store is not None:
+            self._load_durable()
+
+    def _load_durable(self) -> None:
+        """Rehydrate dead letters and retry state after a restart."""
+        try:
+            for dl in self._store.list_dead_letters():
+                if dl:
+                    e = DeadLetterEntry(
+                        job_id=dl["job_id"], attempt=dl["attempt"],
+                        worker_id=dl["worker_id"], reason=dl["reason"],
+                        detail=dl.get("detail", ""),
+                        created_at=dl.get("created_at"),
+                        idempotency_key=dl.get("idempotency_key") or dl["job_id"])
+                    self._dead_letters[dl["job_id"]] = e
+                    if dl.get("poison"):
+                        self._poison.add(dl["job_id"])
+        except Exception:
+            pass
 
     def run_with_retry(self, job_id: str, worker_id: str,
                        run_once: callable,
@@ -729,6 +772,18 @@ class RetryCoordinator:
             else:
                 classified = "ok"
                 reason = None
+            # every attempt is mirrored durably (B3-R6: retry truth persists)
+            if self._store is not None:
+                try:
+                    self._store.record_retry_state(
+                        job_id=job_id, attempts=attempt,
+                        max_retries=self._policy.max_retries,
+                        classified=classified, last_reason=reason or "",
+                        exhausted=classified == TERMINAL,
+                        poison=classified in (RETRYABLE, TERMINAL) and
+                        attempt >= self._policy.max_retries)
+                except Exception:
+                    pass
             if classified == "ok":
                 if effect_committer:
                     effect_committer(job_id)
@@ -753,6 +808,14 @@ class RetryCoordinator:
             self._poison.add(job_id)
             outcome["backoff_trace"] = lines
             self._results[job_id] = outcome
+            if self._store is not None:
+                try:
+                    self._store.dead_letter(
+                        job_id=job_id, attempt=attempt, worker_id=worker_id,
+                        reason=dl_reason, detail=reason or "terminal failure",
+                        idempotency_key=job_id, poison=True)
+                except Exception:
+                    pass
             return outcome
         # retries exhausted
         entry = DeadLetterEntry(
