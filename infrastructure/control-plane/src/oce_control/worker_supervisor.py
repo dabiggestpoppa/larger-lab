@@ -333,7 +333,12 @@ class WorkerSupervisor:
         if rec is None:
             raise KeyError(f"no worker '{worker_id}'")
         pid = self._read_pid(worker_id) or rec.pid
-        if pid and self._process_alive(pid):
+        # PID-reuse safety: only signal a live pid whose command line matches
+        # this worker's expected interpreter. Never signal an unrelated process
+        # that happened to reuse the pid.
+        expected = rec.command[0] if rec.command else ""
+        if (pid and self._process_alive(pid)
+                and (not expected or expected in _cmdline(pid))):
             try:
                 os.kill(pid, signal.SIGTERM)
             except (ProcessLookupError, PermissionError, OSError):
@@ -385,21 +390,23 @@ class WorkerSupervisor:
         }
 
     def _load_existing_pids(self) -> None:
-        # adopt our own recorded pids as the running set on restart, but only
-        # if the pid truly belongs to our expected interpreter (PID reuse safe)
+        # Adopt our own recorded pids as the running set on restart, but ONLY
+        # when the pid file belongs to a CONFIGURED worker AND the live pid
+        # truly matches our expected interpreter command line (PID-reuse /
+        # alien-pid safe). A pid file with no configured worker must never be
+        # adopted: adoption would later let stop()/cleanup() signal an
+        # unrelated process. It is stale and handled by cleanup().
         for pf in self._pid_dir.glob("*.pid"):
             pid = self._read_pid(pf.stem)
             rej = self._workers.get(pf.stem)
-            expected = rej.command[0] if rej and rej.command else ""
-            if pid and self._process_alive(pid) and (not expected or expected in _cmdline(pid)):
-                rec = self._workers.get(pf.stem)
-                if rec is None:
-                    rec = WorkerRecord(worker_id=pf.stem, command=[], pid=pid,
-                                       state="running")
-                    self._workers[pf.stem] = rec
-                else:
-                    rec.pid = pid
-                    rec.state = "running"
+            if rej is None or not rej.command:
+                continue
+            expected = rej.command[0]
+            if (pid and self._process_alive(pid)
+                    and expected in _cmdline(pid)):
+                rec = self._workers[pf.stem]
+                rec.pid = pid
+                rec.state = "running"
 
 
 def _os_class() -> str:

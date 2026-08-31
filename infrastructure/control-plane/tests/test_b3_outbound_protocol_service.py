@@ -84,10 +84,23 @@ def app_and_server(pg, store):
     from oce_control.worker_protocol import WorkerProtocolServer
     from oce_control import http_api
     server = WorkerProtocolServer(store)
-    # airtight empty API boundary — fabric endpoints alone under test
+    # Real durable control-plane boundary (fabric endpoints + API) — the
+    # container-backed stack is authoritative PostgreSQL behind the service.
     from oce_control.api import ControlPlaneAPI
     from oce_control.authority import AuthorityEngine
-    api = ControlPlaneAPI(authority=AuthorityEngine())
+    from oce_control.health import HealthService
+    from oce_control.pg_scheduler import PgScheduler
+    from oce_control.pg_store import PgJobStore
+    from oce_control.pg_worker import PgWorkerProtocol
+    jstore = PgJobStore(pg)
+    scheduler = PgScheduler(pg, jstore)
+    worker = PgWorkerProtocol(jstore, pg)
+    health = HealthService(job_store=jstore, scheduler=scheduler,
+                           worker_protocol=worker)
+    health.set_pg_available(True)
+    api = ControlPlaneAPI(authority=AuthorityEngine(), job_store=jstore,
+                          scheduler=scheduler, worker_protocol=worker,
+                          health_service=health)
     return http_api.create_app(api, worker_protocol_server=server), server
 
 

@@ -115,6 +115,9 @@ def _stack(pg, fabric, redis_url):
     from oce_control.authority import AuthorityEngine
     from oce_control import http_api
     from oce_control.api import ControlPlaneAPI
+    from oce_control.health import HealthService
+    from oce_control.pg_scheduler import PgScheduler
+    from oce_control.pg_worker import PgWorkerProtocol
     jstore = PgJobStore(pg)
     server = WorkerProtocolServer(fabric, job_store=jstore)
     try:
@@ -122,8 +125,17 @@ def _stack(pg, fabric, redis_url):
         server.set_transport(rt)
     except Exception:
         pass  # Redis optional in the transport layer; PG remains truth
-    api = ControlPlaneAPI(authority=AuthorityEngine())
-    app = http_api.create_app(api, worker_protocol_server=server)
+    scheduler = PgScheduler(pg, jstore)
+    worker = PgWorkerProtocol(jstore, pg)
+    health = HealthService(job_store=jstore, scheduler=scheduler,
+                           worker_protocol=worker)
+    health.set_pg_available(True)
+    api = ControlPlaneAPI(authority=AuthorityEngine(), job_store=jstore,
+                          scheduler=scheduler, worker_protocol=worker,
+                          health_service=health)
+    app = http_api.create_app(api, scheduler=scheduler,
+                              scheduler_tick_interval=0,
+                              worker_protocol_server=server)
     return app, server, jstore
 
 
