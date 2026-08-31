@@ -39,18 +39,21 @@ from crypto_sensor_fabric.providers.base import (
 from crypto_sensor_fabric.providers.readiness import (
     EXCLUDED_PRODUCTION_PROVIDERS,
     PRODUCTION_PROVIDER_REGISTRY,
+    ReadinessVerification,
     build_readiness_records,
     compute_exact_sets,
     deterministic_identity,
     evidence_ref_audit,
     load_human_readiness_matrix,
     load_matrix_records,
+    promotion_authority_stats,
     provider_path_counts,
     reconcile_human_matrix,
     render_inventory_csv,
     render_inventory_json,
     role_counts,
     sensor_coverage,
+    validate_promotion_candidate_uniqueness,
     validate_record_bound,
     write_matrix_files,
 )
@@ -123,6 +126,16 @@ def _records() -> list[Any]:
         conformance_pass=pass_map,
         schema_pass=pass_map,
     )
+
+
+def _verification_map(
+    override: dict[tuple[str, SensorFamily], ReadinessVerification] | None = None,
+) -> dict[tuple[str, SensorFamily], ReadinessVerification]:
+    """A complete explicit verification map (one entry per I14 key)."""
+    result = {key: ReadinessVerification(True, True) for key in _candidate_keys()}
+    if override:
+        result.update(override)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -483,6 +496,223 @@ class TestHumanMatrixReconciliation:
         violations = reconcile_human_matrix(records, tampered)
         assert violations
 
+
+# ---------------------------------------------------------------------------
+# I09R1 authority boundary seal
+# ---------------------------------------------------------------------------
+
+
+def _write_human_csv(tmp_path: Path, rows: list[tuple[str, str]]) -> Path:
+    """Write a temporary human readiness CSV with the given (pid, sensor) rows."""
+    path = tmp_path / "duplicate_human.csv"
+    path.write_text(
+        "provider_id,sensor_family\n"
+        + "".join(f"{p},{s}\n" for p, s in rows),
+        encoding="utf-8",
+    )
+    return path
+
+
+class TestAuthorityDuplicates:
+    def test_exact_duplicate_i14_row_fails_closed(self) -> None:
+        candidates = list(load_promotion_candidates())
+        okx_funding = next(
+            c
+            for c in candidates
+            if str(c["provider"]) == "OKX_SWAP"
+            and str(c["sensor"]) == "MECHANICAL_FUNDING"
+        )
+        with pytest.raises(ValueError):
+            validate_promotion_candidate_uniqueness(
+                [*candidates, dict(okx_funding)]
+            )
+
+    def test_conflicting_duplicate_i14_row_fails_closed(self) -> None:
+        # Same provider/sensor but changed role/pin: a dict/set must never pick
+        # which authority row wins.
+        candidates = list(load_promotion_candidates())
+        okx_funding = next(
+            c
+            for c in candidates
+            if str(c["provider"]) == "OKX_SWAP"
+            and str(c["sensor"]) == "MECHANICAL_FUNDING"
+        )
+        conflicting = dict(okx_funding)
+        conflicting["role"] = "PRIMARY"
+        conflicting["methodology_pin"] = "other-pin"
+        with pytest.raises(ValueError):
+            validate_promotion_candidate_uniqueness([*candidates, conflicting])
+
+    def test_duplicate_i14_fails_every_consumer_by_default(self) -> None:
+        # Authority uniqueness must hold before ANY I09 function that builds a
+        # provider x sensor map from candidates; every consumer must reject the
+        # same duplicate packet (one authoritative validation helper, reused).
+        candidates = list(load_promotion_candidates())
+        okx_funding = next(
+            c
+            for c in candidates
+            if str(c["provider"]) == "OKX_SWAP"
+            and str(c["sensor"]) == "MECHANICAL_FUNDING"
+        )
+        pass_map = _pass_map()
+        outcomes = _validate_all_with_dupes(
+            i14_candidates=[*candidates, dict(okx_funding)],
+            pass_map=pass_map,
+        )
+        assert outcomes == [True] * len(outcomes), (
+            "duplicate I14 packets must fail closed on EVERY authority consumer"
+        )
+
+    def test_duplicate_human_row_identical_fails_closed(self, tmp_path: Path) -> None:
+        path = _write_human_csv(
+            tmp_path,
+            [
+                ("OKX_SWAP", "MECHANICAL_FUNDING"),
+                ("OKX_SWAP", "MECHANICAL_FUNDING"),
+            ],
+        )
+        with pytest.raises(ValueError):
+            load_human_readiness_matrix(path)
+
+    def test_duplicate_human_row_conflicting_fails_closed(self, tmp_path: Path) -> None:
+        # Same key repeated with conflicting adapter_status/promoted: no
+        # last-write-wins; loader must fail closed.
+        path = _write_human_csv(
+            tmp_path,
+            [
+                ("OKX_SWAP", "MECHANICAL_FUNDING"),
+                ("OKX_SWAP", "MECHANICAL_FUNDING"),
+            ],
+        )
+        with pytest.raises(ValueError):
+            load_human_readiness_matrix(path)
+
+    def test_healthy_i14_has_zero_duplicates(self) -> None:
+        stats = promotion_authority_stats()
+        assert stats == {
+            "raw_candidate_count": 17,
+            "unique_candidate_count": 17,
+            "duplicate_count": 0,
+        }
+
+
+class TestVerificationCompleteness:
+    def test_missing_conformance_key_fails_closed(self) -> None:
+        schema_pass = _pass_map()
+        conformance_pass = dict(schema_pass)
+        conformance_pass.pop(next(iter(conformance_pass)))
+        with pytest.raises(ValueError):
+            build_readiness_records(
+                conformance_pass=conformance_pass,
+                schema_pass=schema_pass,
+            )
+
+    def test_missing_schema_key_fails_closed(self) -> None:
+        conformance_pass = _pass_map()
+        schema_pass = dict(conformance_pass)
+        schema_pass.pop(next(iter(schema_pass)))
+        with pytest.raises(ValueError):
+            build_readiness_records(
+                conformance_pass=conformance_pass,
+                schema_pass=schema_pass,
+            )
+
+    def test_no_verification_input_fails_closed(self) -> None:
+        with pytest.raises(ValueError):
+            build_readiness_records()
+
+    def test_missing_verification_key_fails_closed(self) -> None:
+        full = _verification_map()
+        dropped = {k: v for k, v in full.items()}
+        dropped.pop(next(iter(dropped)))
+        with pytest.raises(ValueError):
+            build_readiness_records(verification=dropped)
+
+    def test_explicit_false_distinguishable_from_missing(self) -> None:
+        # A present key with offline_conformance_pass=False and a truthful
+        # non-ready status is allowed and emitted as data (not silently defaulted
+        # and not rejected as if it were an ADAPTER_READY contradiction).
+        key = next(iter(_candidate_keys()))
+        override = {
+            key: ReadinessVerification(
+                offline_conformance_pass=False,
+                schema_pass=True,
+                adapter_status="VALIDATION_FAILED",
+            )
+        }
+        records = build_readiness_records(verification=_verification_map(override))
+        target = next(r for r in records if (r.provider_id, r.sensor_family) == key)
+        assert target.offline_conformance_pass is False
+        assert target.adapter_status == "VALIDATION_FAILED"
+
+    def test_adapter_ready_with_conformance_false_rejected(self) -> None:
+        key = next(iter(_candidate_keys()))
+        override = {
+            key: ReadinessVerification(
+                offline_conformance_pass=False,
+                schema_pass=True,
+                adapter_status="ADAPTER_READY",
+            )
+        }
+        with pytest.raises(ValueError):
+            build_readiness_records(verification=_verification_map(override))
+
+    def test_adapter_ready_with_schema_false_rejected(self) -> None:
+        key = next(iter(_candidate_keys()))
+        override = {
+            key: ReadinessVerification(
+                offline_conformance_pass=True,
+                schema_pass=False,
+                adapter_status="ADAPTER_READY",
+            )
+        }
+        with pytest.raises(ValueError):
+            build_readiness_records(verification=_verification_map(override))
+
+    def test_network_smoke_cannot_upgrade_before_i10(self) -> None:
+        key = next(iter(_candidate_keys()))
+        override = {
+            key: ReadinessVerification(
+                offline_conformance_pass=True,
+                schema_pass=True,
+                network_smoke_status="PASS",
+            )
+        }
+        with pytest.raises(ValueError):
+            build_readiness_records(verification=_verification_map(override))
+
+    def test_every_i14_path_has_explicit_conformance_and_schema(self) -> None:
+        records = _records()
+        assert len(records) == 17
+        for r in records:
+            assert r.offline_conformance_pass is True, r.key
+            assert r.schema_pass is True, r.key
+            assert r.network_smoke_status == "NOT_RUN", r.key
+
+
+def _validate_all_with_dupes(
+    i14_candidates: list[dict[str, object]],
+    pass_map: dict[tuple[str, SensorFamily], bool],
+) -> list[bool]:
+    """Every authority path must reject a duplicate promotion packet."""
+    outcomes: list[bool] = []
+    for call in (
+        lambda: validate_promotion_candidate_uniqueness(i14_candidates),
+        lambda: compute_exact_sets(_records(), candidates=i14_candidates),
+        lambda: evidence_ref_audit(_records(), candidates=i14_candidates),
+        lambda: validate_record_bound(_records()[0], candidates=i14_candidates),
+        lambda: build_readiness_records(
+            candidates=i14_candidates,
+            conformance_pass=pass_map,
+            schema_pass=pass_map,
+        ),
+    ):
+        try:
+            call()
+            outcomes.append(False)
+        except ValueError:
+            outcomes.append(True)
+    return outcomes
 
 # ---------------------------------------------------------------------------
 # Real-adapter protocol coherence across providers (no network, FAKE transport)
