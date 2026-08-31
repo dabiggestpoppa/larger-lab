@@ -349,8 +349,11 @@ class OkxAdapter:
         else:
             # Annotate, never destructively remove, a repeated native cursor/
             # timestamp edge or exact duplicate within one page (raw preserved).
-            timestamps = [self._row_dt(r, sensor).timestamp() for r in rows]
-            timestamps = [t for t in timestamps if t is not None]
+            timestamps = [
+                dt.timestamp()
+                for r in rows
+                if (dt := self._row_dt(r, sensor)) is not None
+            ]
             if len(timestamps) != len({round(t, 6) for t in timestamps}):
                 quality_flags.append(QualityFlagAcquisition.DUPLICATE_EDGE)
 
