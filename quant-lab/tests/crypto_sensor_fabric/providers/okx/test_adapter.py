@@ -21,6 +21,7 @@ offline `FakeOkxTransport`; a no-transport adapter raises `ProviderUnavailable`.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest
@@ -217,11 +218,26 @@ class TestHappyFetchPerPromotedSensor:
             assert batch.sensor_family is sensor
             assert batch.native_instrument_id == "BTC-USDT-SWAP"
             assert batch.row_count >= 1
-            assert batch.is_complete is True
             assert batch.http_status == 200
             assert batch.raw_payloads, f"{sensor.value} must preserve raw evidence"
             ref = batch.raw_payloads[0].evidence_ref
             assert ref is not None and ref.evidence_id
+            if sensor is BOOK:
+                # CURRENT_ONLY snapshot: the single acquisition unit is complete.
+                assert batch.is_complete is True
+            else:
+                # HISTORICAL funding/trade: continuation direction UNRESOLVED,
+                # so a single page can never certify the requested window
+                # complete (SENSOR-B3-I07R1 window-truth invariant).
+                assert batch.is_complete is False
+                assert batch.next_resume_token is None
+                assert any(
+                    flag in batch.quality_flags
+                    for flag in (
+                        QualityFlagAcquisition.PARTIAL_INTERVAL,
+                        QualityFlagAcquisition.GAP_DETECTED,
+                    )
+                )
 
     def test_book_batch_is_current_only(self) -> None:
         batch = _adapter(routes={"/books": HAPPY_ROUTES["/books"]}).fetch_book(request(BOOK))
@@ -229,6 +245,100 @@ class TestHappyFetchPerPromotedSensor:
         # no next_resume_token (CURRENT_ONLY, no continuation)
         assert batch.next_resume_token is None
         assert batch.row_count >= 1
+
+
+class TestWindowTruth:
+    """SENSOR-B3-I07R1 Repair 1 — acquisition completeness is never invented.
+
+    A historical funding/trade request whose returned page cannot be proven to
+    satisfy the requested [start, end) window must NOT be marked complete; the
+    page is returned as partial evidence with truthful flags and NO invented
+    continuation token.  Requested and actual boundaries stay separate.
+    """
+
+    #: default fixture row ts (ms) -> 2025-08-12 (UTC)
+    ROW_TS_MS = 1755000000000
+
+    def _row_dt(self) -> datetime:
+        return datetime.fromtimestamp(self.ROW_TS_MS / 1000, tz=UTC)
+
+    @pytest.mark.parametrize(
+        "sensor,route",
+        [
+            (FUNDING, "/funding-rate-history"),
+            (TRADE, "/history-trades"),
+        ],
+    )
+    def test_old_requested_window_cannot_be_marked_complete(self, sensor, route) -> None:
+        # 2021 requested window + an arbitrary recent returned page (rows at
+        # 2025-08-12): the page does NOT satisfy the request and completion is
+        # UNPROVEN -> is_complete MUST be False (I07R1 blocker).
+        old_start = datetime(2021, 1, 1, tzinfo=UTC)
+        adapter = _adapter(routes={route: HAPPY_ROUTES[route]})
+        batch = dispatch_fetch(adapter, request(sensor, start=old_start))
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None  # no invented continuation
+        assert batch.requested_start == old_start
+        assert batch.requested_end == old_start.replace(hour=1)
+        assert batch.actual_first_timestamp is not None
+        assert batch.actual_last_timestamp is not None
+        # actual boundaries describe ONLY the returned provider data
+        assert batch.actual_last_timestamp.year == 2025
+        # rows entirely outside the requested window -> GAP_DETECTED
+        assert QualityFlagAcquisition.GAP_DETECTED in batch.quality_flags
+
+    @pytest.mark.parametrize(
+        "sensor,route",
+        [
+            (FUNDING, "/funding-rate-history"),
+            (TRADE, "/history-trades"),
+        ],
+    )
+    def test_overlapping_window_is_partial_never_complete(self, sensor, route) -> None:
+        row_dt = self._row_dt()
+        start = row_dt.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
+        end = start + timedelta(hours=2)
+        adapter = _adapter(routes={route: HAPPY_ROUTES[route]})
+        batch = dispatch_fetch(adapter, request(sensor, start=start, end=end))
+        assert batch.is_complete is False  # overlap does NOT prove completeness
+        assert batch.next_resume_token is None
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL in batch.quality_flags
+        assert batch.actual_first_timestamp is not None
+        assert start <= batch.actual_first_timestamp < end
+
+    def test_requested_and_actual_boundaries_stay_separate(self) -> None:
+        old_start = datetime(2021, 1, 1, tzinfo=UTC)
+        batch = _adapter(
+            routes={"/history-trades": HAPPY_ROUTES["/history-trades"]}
+        ).fetch_trades(request(TRADE, start=old_start))
+        assert batch.requested_start == old_start
+        assert batch.requested_end == old_start.replace(hour=1)
+        # actual timestamps come from the returned rows, never echoed bounds
+        assert batch.actual_first_timestamp is not None
+        assert batch.actual_first_timestamp != old_start
+
+    def test_no_invented_continuation_token(self) -> None:
+        cases = (
+            ("fetch_trades", TRADE, "/history-trades"),
+            ("fetch_funding", FUNDING, "/funding-rate-history"),
+        )
+        for method, sensor, route in cases:
+            adapter = _adapter(routes={route: HAPPY_ROUTES[route]})
+            batch = getattr(adapter, method)(request(sensor))
+            assert batch.next_resume_token is None, method
+
+    def test_empty_historical_page_is_not_complete(self) -> None:
+        # a valid empty DEFAULT page does not prove the requested historical
+        # window is empty either: EMPTY_VALID page, completeness UNPROVEN.
+        batch = _adapter().fetch_funding(request(FUNDING))
+        assert batch.row_count == 0
+        assert QualityFlagAcquisition.EMPTY_VALID in batch.quality_flags
+        assert batch.is_complete is False
+
+    def test_book_snapshot_remains_complete_per_unit(self) -> None:
+        # CURRENT_ONLY: window rules do not apply to the snapshot acquisition.
+        batch = _adapter(routes={"/books": HAPPY_ROUTES["/books"]}).fetch_book(request(BOOK))
+        assert batch.is_complete is True
 
 
 class TestTimestampUnits:

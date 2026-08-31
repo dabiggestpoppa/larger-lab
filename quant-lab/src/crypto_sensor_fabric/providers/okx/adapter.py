@@ -37,6 +37,13 @@ Transport is injected (dependency injection) — standard tests use a FAKE
 transport; NO network calls are made.  The free-only access gate runs BEFORE
 any transport call.  OKX v5 timestamps are millisecond-epoch STRINGS; they are
 validated strictly (no silent coercion) and preserved natively.
+
+Completion truth (SENSOR-B3-I07R1): a HISTORICAL funding/trade request is
+NEVER certified complete when the committed evidence cannot prove the returned
+page satisfies the requested [start_time, end_time) window — the single
+page is returned with `is_complete=False`, no invented resume token, and a
+truthful PARTIAL_INTERVAL / GAP_DETECTED quality flag.  Only the CURRENT_ONLY
+book snapshot is complete per acquisition unit.
 """
 
 from __future__ import annotations
@@ -360,11 +367,35 @@ class OkxAdapter:
         actual_first = self._row_dt(rows[0], sensor) if rows else None
         actual_last = self._row_dt(rows[-1], sensor) if rows else None
 
-        # Single evidence-backed production request window (instId+limit /
-        # instId+sz).  Deeper after/before cursor traversal is UNRESOLVED by
-        # committed I13 evidence (direction not proven), so no invented
-        # continuation cursor is emitted — completion semantics are honest.
-        is_complete = True
+        # ---- acquisition-completion truth (SENSOR-B3-I07R1) ----------------
+        # BOOK_SNAPSHOT is CURRENT_ONLY: a single current-snapshot acquisition
+        # unit is complete by definition — the request never promises a
+        # historical window, so the snapshot page satisfies it.
+        if sensor is SensorFamily.MECHANICAL_BOOK_SNAPSHOT:
+            is_complete = True
+        else:
+            # FUNDING / TRADE are HISTORICAL surfaces whose after/before
+            # continuation DIRECTION is UNRESOLVED by committed I13 evidence.
+            # The adapter issues one evidence-backed page (instId + limit) and
+            # can NEVER prove that page satisfies the requested
+            # [start_time, end_time) window, so it MUST NOT certify
+            # completeness: UNKNOWN continuation != complete acquisition.
+            # No invented continuation token is emitted; the returned page is
+            # preserved as partial evidence with truthful quality flags
+            # (rows overlap the requested window -> PARTIAL_INTERVAL, rows
+            # entirely outside it -> GAP_DETECTED).  Requested and actual
+            # boundaries stay separate on the FetchBatch.
+            is_complete = False
+            if rows and actual_first is not None and actual_last is not None:
+                overlaps = (
+                    actual_first < request.end_time
+                    and actual_last >= request.start_time
+                )
+                quality_flags.append(
+                    QualityFlagAcquisition.PARTIAL_INTERVAL
+                    if overlaps
+                    else QualityFlagAcquisition.GAP_DETECTED
+                )
 
         return FetchBatch(
             provider_id=self.provider_id,
