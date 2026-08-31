@@ -51,6 +51,22 @@ from b2_registry import (  # noqa: E402
 COMPOSE_FILE = BASE_DIR / "compose" / "compose.yml"
 RUN_ID_RE = re.compile(r"^[0-9a-f]{12,}$")
 
+# Truthful stage identity. Book 2's workflow leaves these as-is; the Book 3
+# worker-fabric workflow sets OCE_BLOCK_LABEL=B3 and
+# OCE_STAGE_LABEL=B3-WORKER-FABRIC-CLOSURE (+ OCE_BOOK_LABEL="Book 3") so the
+# evidence is reported under the CORRECT book (defect 15: no B3 evidence is
+# falsely labeled Book 2, and vice-versa).
+def stage_label() -> str:
+    return os.environ.get("OCE_STAGE_LABEL", "B2-CONTROL-PLANE-CLOSURE")
+
+
+def block_label() -> str:
+    return os.environ.get("OCE_BLOCK_LABEL", "B2")
+
+
+def book_label() -> str:
+    return os.environ.get("OCE_BOOK_LABEL", "Book 2")
+
 
 class Fail(Exception):
     """Raised to fail the run with an explicit reason (FAIL/BLOCKED)."""
@@ -345,8 +361,8 @@ class Runner:
         gate = json.loads((self.evidence / "independent-gate.json").read_text())
         status = "PASS" if gate.get("gate") == "PASS" else "FAIL"
         self._write_json("stage-status.json", {
-            "block": "B2",
-            "stage": "B2-CONTROL-PLANE-CLOSURE",
+            "block": block_label(),
+            "stage": stage_label(),
             "stage_status": status,
             "gate_status": status,
             "pytest_exit": self.pytest_rc,
@@ -366,7 +382,7 @@ class Runner:
         stage = json.loads((self.evidence / "stage-status.json").read_text())
         cleanup = json.loads((self.evidence / "cleanup-results.json").read_text())
         lines = [
-            "# OCE Book 2 — Validation Summary",
+            f"# OCE {book_label()} — Validation Summary",
             "",
             f"- Run ID: `{self.run_id}`",
             f"- Repository: `{self.repo or EXPECTED_REPO}`",
@@ -444,7 +460,8 @@ class Runner:
             self.record(f"[{step.__name__}]")
             step()
         self.completed_normally = True
-        print(f"GATE PASS: {self.run_id} — B2 validation succeeded, evidence in {self.evidence}")
+        print(f"GATE PASS: {self.run_id} — {book_label()} validation succeeded, "
+              f"evidence in {self.evidence}")
         return 0
 
 
@@ -456,8 +473,8 @@ def write_failure_evidence(evidence: Path, run_id: str, ctx: dict, reason: str,
                                             encoding="utf-8")
     status = "BLOCKED" if rc == 2 else "FAIL"
     stage = {
-        "block": "B2",
-        "stage": "B2-CONTROL-PLANE-CLOSURE",
+        "block": block_label(),
+        "stage": stage_label(),
         "stage_status": status,
         "gate_status": status,
         "failure": reason,

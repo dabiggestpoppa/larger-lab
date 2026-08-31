@@ -1,15 +1,8 @@
-"""OCE Book 2+3 — mandatory test registry (B2-R8, extended for B3).
+"""OCE mandatory test registry (B2-R8, extended for B3).
 
 Single source of truth for the mandatory test registry, category
 assignment, expected per-category totals, and the required evidence
-artifact list. The validation runner and the independent gate both
-import this module, so they can never drift apart.
-
-Rules:
-  * Adding a test requires a deliberate registry bump in the same
-    commit - the gate fails if the collected total != registry total.
-  * Every mandatory test node ID must execute with zero skips in CI.
-  * Categories are disjoint and cover every mandatory test.
+artifact list. Generated from ACTUAL pytest collection (B3-R8).
 """
 
 SCHEMA_VERSION = "2.1.0"
@@ -38,6 +31,10 @@ REQUIRED_ARTIFACTS = [
     "worker-supervisor-results.json",
     "sandbox-resource-results.json",
     "representative-job-results.json",
+    "cli-lifecycle-results.json",
+    "outbound-session-results.json",
+    "end-to-end-job-results.json",
+    "fabric-pg-results.json",
     "source-cleanliness.json",
     "cleanup-results.json",
     "independent-gate.json",
@@ -62,6 +59,10 @@ ARTIFACT_CATEGORY_FILE = {
     "worker-supervisor": "worker-supervisor-results.json",
     "sandbox-resource": "sandbox-resource-results.json",
     "representative-job": "representative-job-results.json",
+    "cli-lifecycle": "cli-lifecycle-results.json",
+    "outbound-session": "outbound-session-results.json",
+    "end-to-end-job": "end-to-end-job-results.json",
+    "fabric-pg": "fabric-pg-results.json",
 }
 
 MANDATORY_TEST_IDS = [
@@ -92,8 +93,40 @@ MANDATORY_TEST_IDS = [
     "infrastructure.control-plane.tests.test_b3_adversarial.TestAdversarialFabric::test_unsupported_protocol_rejected",
     "infrastructure.control-plane.tests.test_b3_adversarial.TestAdversarialFabric::test_wrong_credential_rejected",
     "infrastructure.control-plane.tests.test_b3_adversarial.TestAdversarialFabric::test_wrong_trust_zone_fails_closed",
+    "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_artifacts_survive_control_plane_restart",
+    "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_duplicate_delivery_one_material_effect",
+    "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_end_to_end_representative_jobs",
+    "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_lease_expiry_and_reclaim",
+    "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_po_authorized_retry_records_audit_and_hermes_denied",
+    "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_revoked_worker_refused",
+    "infrastructure.control-plane.tests.test_b3_outbound_protocol_service::test_capability_escalation_rejected",
+    "infrastructure.control-plane.tests.test_b3_outbound_protocol_service::test_full_outbound_path_with_separate_worker_process",
+    "infrastructure.control-plane.tests.test_b3_outbound_protocol_service::test_revoked_worker_rejected",
+    "infrastructure.control-plane.tests.test_b3_outbound_protocol_units::test_action_signature_scoped_to_session_and_action",
+    "infrastructure.control-plane.tests.test_b3_outbound_protocol_units::test_client_and_server_proof_are_identical",
+    "infrastructure.control-plane.tests.test_b3_outbound_protocol_units::test_wire_key_is_double_hash_not_identity_verifier",
+    "infrastructure.control-plane.tests.test_b3_outbound_protocol_units::test_wrong_secret_proof_never_matches",
     "infrastructure.control-plane.tests.test_b3_representative_jobs::test_cancellation_during_execution",
     "infrastructure.control-plane.tests.test_b3_representative_jobs::test_representative_safe_job_full_path",
+    "infrastructure.control-plane.tests.test_b3_worker_cli_lifecycle.TestCliLifecycle::test_admission_is_po_only",
+    "infrastructure.control-plane.tests.test_b3_worker_cli_lifecycle.TestCliLifecycle::test_cleanup_preserves_configuration",
+    "infrastructure.control-plane.tests.test_b3_worker_cli_lifecycle.TestCliLifecycle::test_configure_does_not_admit",
+    "infrastructure.control-plane.tests.test_b3_worker_cli_lifecycle.TestCliLifecycle::test_configure_then_admit_then_start_across_processes",
+    "infrastructure.control-plane.tests.test_b3_worker_cli_lifecycle.TestCliLifecycle::test_repeated_cap_parsed_as_list",
+    "infrastructure.control-plane.tests.test_b3_worker_cli_lifecycle.TestCliLifecycle::test_revocation_persists_across_processes",
+    "infrastructure.control-plane.tests.test_b3_worker_cli_lifecycle.TestCliLifecycle::test_stale_pid_detected_never_signalled",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_capability_admission_is_persisted_and_per_operator",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_drain_rejects_new_work_through_store",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_effect_registered_once",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_expired_lease_reclaimed",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_identity_persisted_and_verifier_hashed",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_late_result_quarantined_durably",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_lease_claim_fence_and_reclaim",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_manifest_persisted_and_reloaded_on_restart",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_monotonic_fence_generation_after_reclaim",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_retry_state_dead_letter_and_po_authorized_retry",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_revoked_identity_refused",
+    "infrastructure.control-plane.tests.test_b3_worker_fabric_store_integration::test_session_created_and_heartbeated",
     "infrastructure.control-plane.tests.test_control_plane.TestAuthorityEngine::test_denial_recorded",
     "infrastructure.control-plane.tests.test_control_plane.TestAuthorityEngine::test_expired_grant_denied",
     "infrastructure.control-plane.tests.test_control_plane.TestAuthorityEngine::test_hermes_blocked_from_po_actions",
@@ -129,6 +162,7 @@ MANDATORY_TEST_IDS = [
     "infrastructure.control-plane.tests.test_execution_runtime.TestArtifactStore::test_duplicate_result_single_provenance",
     "infrastructure.control-plane.tests.test_execution_runtime.TestArtifactStore::test_manifest_verify_and_read",
     "infrastructure.control-plane.tests.test_execution_runtime.TestArtifactStore::test_partial_upload_tmp_cleaned",
+    "infrastructure.control-plane.tests.test_execution_runtime.TestArtifactStore::test_restart_safe_manifest_reload",
     "infrastructure.control-plane.tests.test_execution_runtime.TestArtifactStore::test_size_enforcement",
     "infrastructure.control-plane.tests.test_execution_runtime.TestArtifactStore::test_tampered_artifact_detected",
     "infrastructure.control-plane.tests.test_execution_runtime.TestBoundedRunner::test_allowed_executable_ok",
@@ -145,6 +179,12 @@ MANDATORY_TEST_IDS = [
     "infrastructure.control-plane.tests.test_execution_runtime.TestRetryCoordinator::test_retry_exhaustion",
     "infrastructure.control-plane.tests.test_execution_runtime.TestRetryCoordinator::test_success_has_one_material_effect",
     "infrastructure.control-plane.tests.test_execution_runtime.TestRetryCoordinator::test_terminal_no_retry_and_dead_letter",
+    "infrastructure.control-plane.tests.test_execution_runtime.TestSandboxB3R5::test_cancel_current_terminates_in_flight_run",
+    "infrastructure.control-plane.tests.test_execution_runtime.TestSandboxB3R5::test_forbidden_cloud_prefix_env_leak_rejected",
+    "infrastructure.control-plane.tests.test_execution_runtime.TestSandboxB3R5::test_non_strict_reports_degradation_without_raising",
+    "infrastructure.control-plane.tests.test_execution_runtime.TestSandboxB3R5::test_output_extension_allowlist_enforced",
+    "infrastructure.control-plane.tests.test_execution_runtime.TestSandboxB3R5::test_preflight_reports_enforced_boundaries_on_posix",
+    "infrastructure.control-plane.tests.test_execution_runtime.TestSandboxB3R5::test_strict_mode_blocks_when_isolation_unavailable",
     "infrastructure.control-plane.tests.test_health_api_boundaries.TestAPIPermissions::test_api_audit_history",
     "infrastructure.control-plane.tests.test_health_api_boundaries.TestAPIPermissions::test_api_inspect_nonexistent_job",
     "infrastructure.control-plane.tests.test_health_api_boundaries.TestAPIPermissions::test_api_submit_with_permission",
@@ -307,28 +347,24 @@ MANDATORY_TEST_IDS = [
     "infrastructure.control-plane.tests.test_worker_supervisor.TestSupervisor::test_worker_cannot_self_authorize",
 ]
 
-_ADVERSARIAL_SUFFIXES = tuple([
-    "::test_manifest_tamper_rejected",
-    "::test_missing_artifact_rejected",
-    "::test_truth_promotion_blocked_downward",
-    "::test_idempotency_replay_detected",
-    "::test_pg_unavailable_fail_closed",
-    "::test_direct_api_permission_bypass_blocked",
-])
-
 _CATEGORY_RULES = [
-    ("infrastructure.control-plane.tests.test_pg_integration", "postgres"),
-    ("infrastructure.control-plane.tests.test_redis_integration", "redis"),
-    ("infrastructure.control-plane.tests.test_pg_scheduler_integration", "scheduler"),
-    ("infrastructure.control-plane.tests.test_pg_worker_integration", "worker"),
-    ("infrastructure.control-plane.tests.test_http_api_integration", "api"),
-    ("infrastructure.control-plane.tests.test_b3_adversarial", "adversarial"),
-    ("infrastructure.control-plane.tests.test_b3_representative_jobs", "representative-job"),
-    ("infrastructure.control-plane.tests.test_execution_runtime", "sandbox-resource"),
-    ("infrastructure.control-plane.tests.test_worker_fabric", "worker-fabric-core"),
-    ("infrastructure.control-plane.tests.test_worker_supervisor", "worker-supervisor"),
-    ("infrastructure.control-plane.tests.test_local_lifecycle", "local-lifecycle"),
-    ("infrastructure.control-plane.tests.test_validation_gate_regressions", "validation-regression"),
+    ("test_pg_integration", "postgres"),
+    ("test_redis_integration", "redis"),
+    ("test_pg_scheduler_integration", "scheduler"),
+    ("test_pg_worker_integration", "worker"),
+    ("test_http_api_integration", "api"),
+    ("test_b3_adversarial", "adversarial"),
+    ("test_b3_representative_jobs", "representative-job"),
+    ("test_execution_runtime", "sandbox-resource"),
+    ("test_worker_fabric", "worker-fabric-core"),
+    ("test_worker_supervisor", "worker-supervisor"),
+    ("test_local_lifecycle", "local-lifecycle"),
+    ("test_validation_gate_regressions", "validation-regression"),
+    ("test_b3_worker_cli_lifecycle", "cli-lifecycle"),
+    ("test_b3_outbound_protocol_units", "outbound-session"),
+    ("test_b3_outbound_protocol_service", "outbound-session"),
+    ("test_b3_end_to_end_jobs", "end-to-end-job"),
+    ("test_b3_worker_fabric_store_integration", "fabric-pg"),
     (".TestPOBoundary::", "po-hermes-boundary"),
     (".TestHermesBoundary::", "po-hermes-boundary"),
 ]
@@ -338,8 +374,6 @@ def category_of(node_id):
     for sub, cat in _CATEGORY_RULES:
         if sub in node_id:
             return cat
-    if node_id.endswith(_ADVERSARIAL_SUFFIXES):
-        return "adversarial"
     return "unit"
 
 def expected_counts():
@@ -357,7 +391,7 @@ def validate_registry():
         raise AssertionError('duplicate mandatory ids: %s' % dupes)
     unknown = {c for c in expected_counts() if c not in ARTIFACT_CATEGORY_FILE}
     if unknown:
-        raise AssertionError('categories missing results file: %s' % sorted(unknown))
+        raise AssertionError("categories missing results file: %s" % sorted(unknown))
     return expected_counts()
 
 if __name__ == "__main__":
@@ -365,3 +399,4 @@ if __name__ == "__main__":
     print("registry OK: %d mandatory tests, %d categories" % (sum(counts.values()), len(counts)))
     for c in sorted(counts):
         print("  %-24s %d" % (c, counts[c]))
+

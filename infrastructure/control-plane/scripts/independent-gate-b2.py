@@ -57,6 +57,16 @@ RUN_ID_RE = re.compile(r"^[0-9a-f]{12,}$")
 # Artifacts produced AFTER pass A (stage status + manifest) — verified in pass B.
 LATE_ARTIFACTS = {"stage-status.json", "evidence-manifest.json"}
 
+# Truthful stage identity — same env contract as the runner (defect 15). When
+# a Book 3 workflow sets OCE_BLOCK_LABEL/OCE_STAGE_LABEL, the gate labels the
+# run's evidence under the correct book.
+def stage_label() -> str:
+    return os.environ.get("OCE_STAGE_LABEL", "B2-CONTROL-PLANE-CLOSURE")
+
+
+def block_label() -> str:
+    return os.environ.get("OCE_BLOCK_LABEL", "B2")
+
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -360,8 +370,8 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
                   "errors": len(junit["errors"]), "skipped": len(junit["skipped"])}
     result = {
         "gate": "PASS" if ok else "FAIL",
-        "block": "B2",
-        "stage": "B2-CONTROL-PLANE-CLOSURE",
+        "block": block_label(),
+        "stage": stage_label(),
         "run_id": run_id,
         "schema_version": SCHEMA_VERSION,
         "validator_version": VALIDATOR_VERSION,
