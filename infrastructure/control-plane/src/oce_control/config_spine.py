@@ -264,10 +264,17 @@ def build_default_registry() -> SettingsRegistry:
                 validation_rule="denied by default; cannot be activated",
                 mutability="restart", tags=("network", "deny-by-default")))
     reg(Setting(name="postgres.host", value_type="str", owner="operator",
-                default="127.0.0.1", mutability="restart", tags=("database",)))
+                default="127.0.0.1", mutability="restart",
+                validation_rule="local database bind", tags=("database",)))
+    def _valid_secret_ref(v) -> None:
+        if not isinstance(v, str) or not SECRET_REF_RE.match(v):
+            raise ValidationError(
+                "postgres.password_ref must be a secret:reference "
+                "(never a plain value)")
+
     reg(Setting(name="postgres.password_ref", value_type="str",
                 owner="operator", has_default=False,
-                validate=lambda v: bool(SECRET_REF_RE.match(v or "")),
+                validate=_valid_secret_ref,
                 validation_rule="secret:reference (no plain value)",
                 mutability="restart", sensitive=True, tags=("secret",)))
 
@@ -286,9 +293,11 @@ def build_default_registry() -> SettingsRegistry:
                 mutability="immutable", tags=("sandbox",)))
     reg(Setting(name="sandbox.process_tree_termination", value_type="bool",
                 owner="policy", default=True, mutability="immutable",
+                validation_rule="complete process-tree termination",
                 tags=("sandbox",)))
     reg(Setting(name="sessions.auth_required", value_type="bool",
                 owner="policy", default=True, mutability="immutable",
+                validation_rule="authenticated outbound sessions mandatory",
                 tags=("session", "authorization")))
 
     # ---- execution / capital denial (policy-owned, immutable) ----
@@ -306,6 +315,7 @@ def build_default_registry() -> SettingsRegistry:
                 mutability="immutable", tags=("live", "deny-by-default")))
     reg(Setting(name="capital.authority", value_type="enum", owner="operator(po)",
                 enum=("none", "approved"), default="none",
+                validation_rule="denies live-capital by default",
                 mutability="immutable", tags=("capital",)))
 
     # ---- billable cloud gates (policy-owned, immutable, deny-by-default) ----
@@ -325,12 +335,15 @@ def build_default_registry() -> SettingsRegistry:
                 validation_rule="0 means no authorized spend",
                 mutability="immutable", tags=("cloud", "billable")))
 
+
     # ---- observability / redaction (policy-owned) ----
     reg(Setting(name="logging.redact_secrets", value_type="bool",
                 owner="policy", default=True, mutability="reload",
+                validation_rule="redact secrets from structured logs",
                 tags=("observability", "security")))
     reg(Setting(name="logging.redact_cli", value_type="bool",
                 owner="policy", default=True, mutability="reload",
+                validation_rule="redact secrets from CLI output",
                 tags=("observability", "security")))
     return r
 
@@ -453,10 +466,15 @@ class ConfigResolver:
     def resolve(self, sources: dict[str, dict], cli: dict | None = None) -> EffectiveConfig:
         """*sources* maps source_level -> {name: raw_value}.
 
+        *cli* is merged into the ``cli`` source tier (the highest priority).
         Sources are only consulted if the setting allows them (allowed_sources)
         and the source is not forbidden for that setting. Unknown settings and
         disallowed-source overrides fail closed.
         """
+        if cli is not None:
+            merged = dict(sources or {})
+            merged[SOURCE_CLI] = {**merged.get(SOURCE_CLI, {}), **cli}
+            sources = merged
         # 1) gather candidate values per canonical setting per allowed source
         candidates: dict[str, dict[str, object]] = {}
         for level, source_level in enumerate(self._order):

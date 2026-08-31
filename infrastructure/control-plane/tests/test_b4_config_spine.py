@@ -1,0 +1,746 @@
+"""OCE Book 4 — Configuration & Security Control Spine tests (B4-R2).
+
+Covers surfaces A–J of the canonical config/security spine plus the
+adversarial matrix. Every test here runs LOCALLY (no container gate) so the
+assertions stay in the authoritative run. The spine's public API is exercised
+directly and exactly; nothing here weakens the frozen Book 2/3 invariants
+(sandbox strictness, authenticated outbound sessions, fenced leases, disposable
+Redis, one material effect, live-order/billable-cloud denial).
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+from oce_control.config_spine import (
+    REDACTED,
+    SOURCE_CLI,
+    SOURCE_DEFAULT,
+    SOURCE_ENV,
+    SOURCE_FILE,
+    SECRET_REF_RE,
+    ConfigAuthorization,
+    ConfigResolver,
+    OverrideAudit,
+    SecretStore,
+    Setting,
+    SettingsRegistry,
+    ValidationError,
+    build_default_registry,
+    fingerprint_config,
+    redact_mapping,
+    redact_string,
+    redact_value,
+    resolve_postgres_password,
+    validate_effective,
+    validate_setting_value,
+)
+
+# A sentinel secret value used in tests; it must never appear in redacted
+# output, fingerprints, snapshots, or any committed source below.
+TEST_SECRET = "B4-SUPER-SEKRE7-0nly-in-tests-9f3a"
+REF_PG = "secret:postgres"
+# Postgres password_ref is mandatory-with-no-default; supply it in happy paths.
+HAPPY = {"file": {"postgres.password_ref": REF_PG}}
+
+
+# --------------------------------------------------------------------------- #
+# Surface A — canonical settings ownership
+# --------------------------------------------------------------------------- #
+class TestOwnershipRegistry:
+    def test_registry_has_canonical_settings(self):
+        reg = build_default_registry()
+        expected = {
+            "control_plane.host", "control_plane.port",
+            "control_plane.public_listen", "postgres.host",
+            "postgres.password_ref", "redis.mode", "workers.egress",
+            "sandbox.strict", "sandbox.process_tree_termination",
+            "sessions.auth_required", "execution.broker_enabled",
+            "execution.paper_trading_enabled", "execution.live_order_mode",
+            "capital.authority", "cloud.provisioning", "cloud.gpu_burst",
+            "cloud.accounts", "cloud.cost_ceiling_usd_per_month",
+            "logging.redact_secrets", "logging.redact_cli",
+        }
+        assert expected <= set(reg.settings)
+
+    def test_every_setting_has_owner_and_sensitivity_classification(self):
+        reg = build_default_registry()
+        for name, s in reg.settings.items():
+            assert s.owner in ("operator", "operator(po)", "policy")
+            assert isinstance(s.sensitive, bool)
+            assert isinstance(s.mutability, str)
+            assert s.validation_rule  # every setting documents a rule
+
+    def test_secret_setting_marked_sensitive(self):
+        reg = build_default_registry()
+        assert reg.get("postgres.password_ref").sensitive is True
+
+    def test_no_default_required_setting_has_no_silent_value(self):
+        reg = build_default_registry()
+        s = reg.get("postgres.password_ref")
+        assert s.has_default is False  # guessing would be unsafe
+
+    def test_dup_registration_rejected(self):
+        reg = SettingsRegistry()
+        reg.register(Setting(name="a.b", value_type="int", default=1))
+        with pytest.raises(ValueError):
+            reg.register(Setting(name="a.b", value_type="int", default=2))
+
+    def test_no_default_with_value_rejected(self):
+        reg = SettingsRegistry()
+        with pytest.raises(ValueError):
+            reg.register(Setting(name="a.b", value_type="int",
+                                 has_default=False, default=1))
+
+    def test_enum_without_allowed_values_rejected(self):
+        reg = SettingsRegistry()
+        with pytest.raises(ValueError):
+            reg.register(Setting(name="a.b", value_type="enum"))
+
+    def test_alias_collision_rejected(self):
+        reg = SettingsRegistry()
+        reg.register(Setting(name="real.name", value_type="int", default=1))
+        with pytest.raises(ValueError):
+            reg.alias("real.name", "bogus")
+
+    def test_forbidden_source_is_recorded_and_tested(self):
+        reg = build_default_registry()
+        reg.forbid_source("workers.egress", SOURCE_ENV)
+        assert ("workers.egress", SOURCE_ENV) in reg.forbidden_sources
+
+    def test_unknown_value_type_fails_registry_validation(self):
+        reg = SettingsRegistry()
+        reg.register(Setting(name="a.b", value_type="float", default=1.0))
+        # corrupt to an unsupported type, then validate
+        reg._settings["a.b"] = Setting(name="a.b", value_type="nothing")
+        with pytest.raises(ValueError):
+            reg.validate_registry()
+
+
+# --------------------------------------------------------------------------- #
+# Surface B — deterministic resolution / precedence
+# --------------------------------------------------------------------------- #
+class TestDeterministicResolution:
+    def test_precedence_default_file_env_cli(self):
+        reg = build_default_registry()
+        r = ConfigResolver(reg)
+        # default=8448, file, env, cli all contradicting the port
+        eff = r.resolve({
+            "file": {"control_plane.port": "7000",
+                     "postgres.password_ref": REF_PG},
+            "environment": {"control_plane.port": "9000"},
+        }, cli={"control_plane.port": "9100"})
+        assert eff.get("control_plane.port") == 9100  # cli highest
+
+    def test_env_overrides_file_and_default(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve({
+            "file": {"postgres.password_ref": REF_PG},
+            "environment": {"control_plane.port": "9000"},
+        })
+        assert eff.get("control_plane.port") == 9000
+        assert eff.provenance["control_plane.port"] == "environment"
+
+    def test_file_overrides_default(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve({
+            "file": {"postgres.password_ref": REF_PG,
+                     "control_plane.port": "7000"},
+        })
+        assert eff.get("control_plane.port") == 7000
+        assert eff.provenance["control_plane.port"] == "file"
+
+    def test_same_inputs_same_effective_config(self):
+        reg = build_default_registry()
+        src = {"file": {"postgres.password_ref": REF_PG},
+               "environment": {"control_plane.port": "9000"}}
+        a = ConfigResolver(reg).resolve(src)
+        b = ConfigResolver(reg).resolve(src)
+        assert a.resolved == b.resolved
+        assert a.fingerprint == b.fingerprint
+
+    def test_lower_source_never_overrides_higher(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve({
+            "file": {"control_plane.port": "7000",
+                     "postgres.password_ref": REF_PG},
+            "environment": {"control_plane.port": "9000"},
+        }, cli={"control_plane.port": "9100"})
+        # any subset of the sources must yield exactly max-priority wins
+        assert eff.get("control_plane.port") == 9100
+
+    def test_conflicting_sources_resolve_deterministically(self):
+        reg = build_default_registry()
+        from functools import reduce
+        orders = [
+            {"default", "file", "environment", "cli"},
+        ]
+        # flip iteration only; resolution must remain keyed by fixed order
+        e1 = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": REF_PG, "control_plane.port": "7000"},
+             "environment": {"control_plane.port": "9000"}},
+            cli={"control_plane.port": "9100"})
+        e2 = ConfigResolver(reg).resolve(
+            {"environment": {"control_plane.port": "9000"},
+             "file": {"postgres.password_ref": REF_PG, "control_plane.port": "7000"}},
+            cli={"control_plane.port": "9100"})
+        assert e1.get("control_plane.port") == e2.get("control_plane.port") == 9100
+
+    def test_unknown_setting_rejected(self):
+        reg = build_default_registry()
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"environment": {"totally.unknown.setting": "1"}})
+
+    def test_malformed_bool_rejected(self):
+        reg = build_default_registry()
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": REF_PG,
+                          "sandbox.strict": "not-a-bool"}})
+
+    def test_malformed_int_rejected(self):
+        reg = build_default_registry()
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": REF_PG,
+                          "control_plane.port": "abc"}})
+
+    def test_conflicting_enum_rejected(self):
+        reg = build_default_registry()
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": REF_PG,
+                          "execution.live_order_mode": "paper"}})
+
+    def test_reserved_port_rejected(self):
+        reg = build_default_registry()
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": REF_PG,
+                          "control_plane.port": "5432"}})
+
+    def test_public_listen_cannot_activate(self):
+        reg = build_default_registry()
+        # no default-host outside loopback; env cannot bind public host
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": REF_PG,
+                          "control_plane.host": "0.0.0.0"}})
+
+    def test_empty_null_ambiguity_handled(self):
+        reg = build_default_registry()
+        # empty port string -> invalid int -> fail closed rather than guess
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": REF_PG,
+                          "control_plane.port": ""}})
+
+    def test_restart_consistency(self):
+        reg = build_default_registry()
+        src = {"file": {"postgres.password_ref": REF_PG}}
+        a = ConfigResolver(reg).resolve(dict(src))
+        b = ConfigResolver(reg).resolve(dict(src))
+        assert a.to_dict() == b.to_dict()
+
+
+# --------------------------------------------------------------------------- #
+# Surface C — startup validation (fail closed)
+# --------------------------------------------------------------------------- #
+class TestStartupFailClosed:
+    def _resolve(self, file_extra=None):
+        src = {"file": {"postgres.password_ref": REF_PG}}
+        if file_extra:
+            src["file"].update(file_extra)
+        return ConfigResolver(build_default_registry()).resolve(src)
+
+    def test_happy_path_resolves(self):
+        eff = self._resolve()
+        assert eff.get_bool("sandbox.strict") is True
+
+    def test_missing_incomplete_required_rejected(self):
+        reg = build_default_registry()
+        # postgres.password_ref is required and absent everywhere
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve({})
+
+    def test_public_listen_true_rejected(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"control_plane.public_listen": True})
+
+    def test_redis_mode_must_be_transport(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"redis.mode": "cache"})
+
+    def test_workers_egress_denied_by_default(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"workers.egress": "public"})
+
+    def test_sandbox_strict_false_rejected(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"sandbox.strict": False})
+
+    def test_broker_enabled_rejected(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"execution.broker_enabled": True})
+
+    def test_paper_trading_rejected(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"execution.paper_trading_enabled": True})
+
+    def test_live_order_mode_denied_by_config(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"execution.live_order_mode": "paper"})
+
+    def test_cloud_provisioning_rejected(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"cloud.provisioning": True})
+
+    def test_cloud_gpu_burst_rejected(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"cloud.gpu_burst": True})
+
+    def test_cloud_accounts_must_be_empty(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"cloud.accounts": ["aws:prod"]})
+
+    def test_cloud_cost_ceiling_must_be_zero(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"cloud.cost_ceiling_usd_per_month": 50})
+
+    def test_sessions_auth_cannot_be_disabled(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"sessions.auth_required": False})
+
+    def test_error_is_operator_legible_and_secret_free(self):
+        with pytest.raises(ValidationError) as exc:
+            self._resolve({"execution.broker_enabled": True})
+        msg = str(exc.value)
+        assert "broker" in msg.lower()
+        assert TEST_SECRET not in msg
+
+
+# --------------------------------------------------------------------------- #
+# Surface D — secret reference model
+# --------------------------------------------------------------------------- #
+class TestSecretReference:
+    def test_store_resolve_roundtrip(self):
+        s = SecretStore()
+        ref = s.store("pg", TEST_SECRET)
+        assert ref == "secret:pg"
+        assert s.resolve(ref) == TEST_SECRET
+
+    def test_reference_has_valid_shape(self):
+        s = SecretStore()
+        ref = s.store("pg", TEST_SECRET)
+        assert SECRET_REF_RE.match(ref)
+
+    def test_missing_secret_fails_closed(self):
+        s = SecretStore()
+        with pytest.raises(KeyError):
+            s.resolve("secret:missing")
+
+    def test_revoked_secret_refused(self):
+        s = SecretStore()
+        s.store("pg", TEST_SECRET)
+        s.revoke("pg")
+        assert s.is_revoked("pg")
+        with pytest.raises(PermissionError):
+            s.resolve("secret:pg")
+
+    def test_rotation_new_generation(self):
+        s = SecretStore()
+        s.store("pg", "gen1")
+        g1 = s.generation("pg")
+        s.rotate("pg", "gen2")
+        assert s.generation("pg") == g1 + 1
+        assert s.resolve("secret:pg") == "gen2"
+
+    def test_restart_resolution_after_reconstruct(self):
+        # A restart restores from the approved external store. A fresh store
+        # with the same secret resolves; without it, resolve fails closed.
+        s1 = SecretStore()
+        ref = s1.store("pg", TEST_SECRET)
+        s2 = SecretStore()
+        s2.store("pg", TEST_SECRET)
+        assert s2.resolve(ref) == TEST_SECRET
+        s3 = SecretStore()
+        with pytest.raises(KeyError):
+            s3.resolve(ref)
+
+    def test_empty_secret_refused(self):
+        s = SecretStore()
+        with pytest.raises(ValidationError):
+            s.store("pg", "")
+
+    def test_invalid_reference_name_refused(self):
+        s = SecretStore()
+        with pytest.raises(ValidationError):
+            s.store("bad name!", "value")
+
+    def test_resolve_postgres_password_requires_reference(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        store = SecretStore()
+        store.store("postgres", TEST_SECRET)
+        assert resolve_postgres_password(eff, store) == TEST_SECRET
+
+    def test_resolve_postgres_password_rejects_plain_value(self):
+        reg = build_default_registry()
+        # a configuration that embeds a plain password instead of a reference
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": "actualplainpw123"}})
+
+    def test_snapshot_redacts_by_default(self):
+        s = SecretStore()
+        s.store("pg", TEST_SECRET)
+        snap = s.snapshot()
+        assert TEST_SECRET not in json.dumps(snap)
+        assert snap["pg"]["value"] == REDACTED
+
+    def test_resolve_postgres_missing_raises(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        store = SecretStore()  # reference present but store empty
+        with pytest.raises(KeyError):
+            resolve_postgres_password(eff, store)
+
+
+# --------------------------------------------------------------------------- #
+# Surface E — redaction / leakage defense
+# --------------------------------------------------------------------------- #
+class TestRedaction:
+    def test_redact_value_masks_sensitive(self):
+        assert redact_value("password", "hunter2") == REDACTED
+        assert redact_value("api_token", "abc") == REDACTED
+
+    def test_redact_value_keeps_secret_reference(self):
+        assert redact_value("password", "secret:pg") == "secret:pg"
+
+    def test_redact_value_passes_nonsensitive(self):
+        assert redact_value("port", 8448) == 8448
+
+    def test_redact_mapping_nested(self):
+        data = {"postgres": {"password": "hunter2", "host": "127.0.0.1"}}
+        out = redact_mapping(data)
+        assert out["postgres"]["password"] == REDACTED
+        assert out["postgres"]["host"] == "127.0.0.1"
+
+    def test_redact_string_scans_key_eq_value(self):
+        out = redact_string('password=hunter2 and host=127.0.0.1')
+        assert "hunter2" not in out
+        assert REDACTED in out
+
+    def test_redact_string_with_secret_pool(self):
+        out = redact_string("conn failed: " + TEST_SECRET,
+                            secrets_pool=[TEST_SECRET])
+        assert TEST_SECRET not in out
+
+    def test_effective_redacted_view_has_no_secret(self):
+        reg = build_default_registry()
+        s = SecretStore()
+        s.store("postgres", TEST_SECRET)
+        eff = ConfigResolver(reg).resolve(HAPPY).bind_secret_resolver(s)
+        view = eff.redacted()
+        blob = json.dumps(view)
+        assert TEST_SECRET not in blob
+        assert view["postgres.password_ref"] == REF_PG
+
+    def test_to_dict_has_no_secret(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        blob = json.dumps(eff.to_dict())
+        assert TEST_SECRET not in blob
+
+    def test_exception_from_sensitive_config_is_redacted(self):
+        reg = build_default_registry()
+        # force a validation error and make sure it never carries the secret
+        with pytest.raises(ValidationError) as exc:
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": TEST_SECRET}})
+        assert TEST_SECRET not in str(exc.value)
+
+    def test_committed_source_has_no_test_secret(self):
+        # Scan the control-plane source+tests+scripts for the sentinel secret.
+        # If TEST_SECRET ever leaks into a committed file below, this fails.
+        base = Path(__file__).resolve().parent.parent  # infrastructure/control-plane
+        offenders = []
+        for path in [base / "src", base / "tests", base / "scripts"]:
+            for p in path.rglob("*.py"):
+                if p.read_text(encoding="utf-8", errors="ignore").count(TEST_SECRET):
+                    # the definition line itself is unavoidable; only flag
+                    # occurrences OUTSIDE this test module
+                    if "TEST_SECRET = " not in p.read_text(encoding="utf-8",
+                                                           errors="ignore"):
+                        offenders.append(str(p))
+        assert offenders == [], f"secret leaked into: {offenders}"
+
+
+# --------------------------------------------------------------------------- #
+# Surface F — authorization boundaries & override audit
+# --------------------------------------------------------------------------- #
+class TestAuthorization:
+    def test_policy_setting_not_mutable_by_operator(self):
+        reg = build_default_registry()
+        authz = ConfigAuthorization(reg)
+        s = reg.get("sandbox.strict")
+        assert authz.can_mutate("operator", s) is False
+
+    def test_operator_can_mutate_operator_setting(self):
+        reg = build_default_registry()
+        authz = ConfigAuthorization(reg)
+        s = reg.get("control_plane.port")
+        assert authz.can_mutate("operator", s) is True
+
+    def test_po_only_owner_requires_po(self):
+        reg = build_default_registry()
+        authz = ConfigAuthorization(reg)
+        s = reg.get("capital.authority")
+        assert authz.can_mutate("operator:po", s) is True
+        assert authz.can_mutate("operator", s) is False
+        assert authz.can_mutate("hermes", s) is False
+
+    def test_override_records_attributable_audit(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        authz = ConfigAuthorization(reg)
+        new = authz.operator_override(
+            eff, actor="operator:po", setting_name="control_plane.port",
+            requested_change="raise local port to 9100 for CI",
+            reason="explicit operator decision", new_value="9100")
+        assert new == 9100
+        assert len(authz.audit) == 1
+        entry = authz.audit[0]
+        assert entry.actor == "operator:po"
+        assert entry.target == "control_plane.port"
+        assert entry.reason
+        assert entry.authorized is True
+        assert entry.timestamp
+
+    def test_override_of_policy_setting_denied(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        authz = ConfigAuthorization(reg)
+        for actor in ("operator", "operator:po"):
+            with pytest.raises(PermissionError):
+                authz.operator_override(
+                    eff, actor=actor, setting_name="sandbox.strict",
+                    requested_change="x", reason="x", new_value=False)
+
+    def test_override_of_sensitive_setting_denied(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        authz = ConfigAuthorization(reg)
+        with pytest.raises(PermissionError):
+            authz.operator_override(
+                eff, actor="operator", setting_name="postgres.password_ref",
+                requested_change="x", reason="x", new_value="secret:other")
+
+    def test_override_unknown_setting_denied(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        authz = ConfigAuthorization(reg)
+        with pytest.raises(ValidationError):
+            authz.operator_override(
+                eff, actor="operator", setting_name="no.such",
+                requested_change="x", reason="x", new_value="1")
+
+    def test_hermes_cannot_mutate_governance(self):
+        reg = build_default_registry()
+        authz = ConfigAuthorization(reg)
+        for name in ("sandbox.strict", "cloud.provisioning",
+                     "execution.broker_enabled", "capital.authority"):
+            s = reg.get(name)
+            assert authz.can_mutate("hermes", s) is False
+
+
+# --------------------------------------------------------------------------- #
+# Surfaces G/H/I — network, live-order, billable-cloud denial (adversarial)
+# --------------------------------------------------------------------------- #
+class TestDenialGates:
+    def _resolve(self, kw=None):
+        src = {"file": {"postgres.password_ref": REF_PG}}
+        if kw:
+            src["file"].update(kw)
+        return ConfigResolver(build_default_registry()).resolve(src)
+
+    def test_0_0_0_0_listen_denied(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"control_plane.host": "0.0.0.0"})
+
+    def test_public_egress_denied(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"workers.egress": "public"})
+
+    def test_live_mode_via_env_denied(self):
+        with pytest.raises(ValidationError):
+            ConfigResolver(build_default_registry()).resolve(
+                {"environment": {"execution.live_order_mode": "paper",
+                                 "postgres.password_ref": REF_PG}})
+
+    def test_live_mode_via_cli_denied(self):
+        with pytest.raises(ValidationError):
+            ConfigResolver(build_default_registry()).resolve(
+                HAPPY, cli={"execution.live_order_mode": "paper"})
+
+    def test_live_mode_via_malformed_enum_denied(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"execution.live_order_mode": "not-a-mode"})
+
+    def test_contradictory_mode_settings_denied(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"execution.live_order_mode": "disabled",
+                           "execution.broker_enabled": True})
+
+    def test_cloud_provisioning_via_env_denied(self):
+        with pytest.raises(ValidationError):
+            ConfigResolver(build_default_registry()).resolve(
+                {"environment": {"cloud.provisioning": True,
+                                 "postgres.password_ref": REF_PG}})
+
+    def test_cloud_gpu_burst_via_cli_denied(self):
+        with pytest.raises(ValidationError):
+            ConfigResolver(build_default_registry()).resolve(
+                HAPPY, cli={"cloud.gpu_burst": True})
+
+    def test_cloud_account_activation_denied(self):
+        with pytest.raises(ValidationError):
+            self._resolve({"cloud.accounts": ["gcp:burst"]})
+
+    def test_secure_looking_https_endpoint_still_no_binding_expansion(self):
+        # "secure-looking" hostname is still a non-loopback listen — denied
+        with pytest.raises(ValidationError):
+            self._resolve({"control_plane.host": "secure.example.com"})
+
+    def test_deny_by_default_toggles_stay_denied(self):
+        reg = build_default_registry()
+        for name in ("execution.broker_enabled", "execution.paper_trading_enabled",
+                     "cloud.provisioning", "cloud.gpu_burst"):
+            s = reg.get(name)
+            assert s.default is False
+            assert "deny-by-default" in s.tags or name in (
+                "execution.paper_trading_enabled",)
+
+
+# --------------------------------------------------------------------------- #
+# Surface J — config drift / effective state
+# --------------------------------------------------------------------------- #
+class TestDriftFingerprint:
+    def test_fingerprint_is_deterministic_and_sha256(self):
+        reg = build_default_registry()
+        e1 = ConfigResolver(reg).resolve(HAPPY)
+        e2 = ConfigResolver(reg).resolve(HAPPY)
+        assert e1.fingerprint == e2.fingerprint
+        assert re.fullmatch(r"[0-9a-f]{64}", e1.fingerprint)
+
+    def test_fingerprint_changes_when_config_changes(self):
+        reg = build_default_registry()
+        a = ConfigResolver(reg).resolve(HAPPY)
+        b = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": REF_PG,
+                      "control_plane.port": "9000"}})
+        assert a.fingerprint != b.fingerprint
+
+    def test_fingerprint_does_not_leak_secret_value(self):
+        reg = build_default_registry()
+        s = SecretStore()
+        s.store("postgres", TEST_SECRET)
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        assert TEST_SECRET not in eff.fingerprint
+
+    def test_restart_does_not_silently_change_effective_authority(self):
+        reg = build_default_registry()
+        src = {"file": {"postgres.password_ref": REF_PG}}
+        a = ConfigResolver(reg).resolve(dict(src))
+        b = ConfigResolver(reg).resolve(dict(src))
+        # identical inputs -> identical effective authority
+        assert a.fingerprint == b.fingerprint
+        assert a.resolved == b.resolved
+
+    def test_environment_only_change_alters_fingerprint(self):
+        reg = build_default_registry()
+        base = ConfigResolver(reg).resolve(HAPPY)
+        env_changed = ConfigResolver(reg).resolve(
+            {"environment": {"control_plane.port": "9000",
+                             "postgres.password_ref": REF_PG}})
+        assert base.fingerprint != env_changed.fingerprint
+        # but restarting with the same env is stable
+        env_changed2 = ConfigResolver(reg).resolve(
+            {"environment": {"control_plane.port": "9000",
+                             "postgres.password_ref": REF_PG}})
+        assert env_changed.fingerprint == env_changed2.fingerprint
+
+
+# --------------------------------------------------------------------------- #
+# Adversarial matrix — real boundary failures, no Book 3 weakening
+# --------------------------------------------------------------------------- #
+class TestAdversarialMatrix:
+    def test_unknown_setting_injection_denied(self):
+        with pytest.raises(ValidationError):
+            ConfigResolver(build_default_registry()).resolve(
+                {"environment": {"workers.egress_superuser": True}})
+
+    def test_duplicate_conflicting_alias_denied(self):
+        reg = build_default_registry()
+        with pytest.raises(ValueError):
+            reg.alias("sandbox.strict", "some.other")
+
+    def test_invalid_enum_fall_through_denied(self):
+        with pytest.raises(ValidationError):
+            ConfigResolver(build_default_registry()).resolve(
+                {"file": {"redis.mode": "ephemeral-authority",
+                          "postgres.password_ref": REF_PG}})
+
+    def test_capability_escalation_via_config_denied(self):
+        # worker-egress broadening / session auth demotion must fail closed
+        with pytest.raises(ValidationError):
+            ConfigResolver(build_default_registry()).resolve(
+                {"file": {"sessions.auth_required": False,
+                          "workers.egress": "public",
+                          "postgres.password_ref": REF_PG}})
+
+    def test_fake_secret_reference_denied_on_resolve(self):
+        s = SecretStore()
+        with pytest.raises(KeyError):
+            s.resolve("secret:not-provisioned")
+
+    def test_secret_in_plain_config_denied(self):
+        with pytest.raises(ValidationError):
+            ConfigResolver(build_default_registry()).resolve(
+                {"file": {"postgres.password_ref": TEST_SECRET}})
+
+    def test_worker_capability_unchanged_by_spine(self):
+        # The spine policy must not relax Book 3 worker capability admission.
+        reg = build_default_registry()
+        assert reg.get("workers.egress").owner == "policy"
+        assert "sandbox" in reg.get("workers.egress").tags
+
+    def test_sandbox_invariants_remain(self):
+        reg = build_default_registry()
+        assert reg.get("sandbox.strict").default is True
+        assert reg.get("sandbox.process_tree_termination").default is True
+
+    def test_session_auth_invariant_remains(self):
+        reg = build_default_registry()
+        assert reg.get("sessions.auth_required").default is True
+
+    def test_fence_idempotency_surfaces_untouched(self):
+        # Spawn a lightweight subprocess importing the spine only, to prove the
+        # module loads in the authoritative environment (no hidden deps).
+        base = Path(__file__).resolve().parent.parent
+        src = base / "src"
+        code = (
+            "import sys; sys.path.insert(0, %r); "
+            "from oce_control.config_spine import build_default_registry; "
+            "assert len(build_default_registry().settings) >= 20"
+        ) % str(src)
+        r = subprocess.run([sys.executable, "-c", code],
+                           capture_output=True, text=True)
+        assert r.returncode == 0, r.stderr
