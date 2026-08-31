@@ -44,16 +44,21 @@ any transport call.  Deribit event/history timestamps are provider-native
 epoch MILLISECOND INTEGERS (strict `type(x) is int`, bool rejected), validated
 before any convenience datetime is derived.
 
-Completion truth: the Deribit history surfaces carry the requested window
-directly (`start_timestamp`/`end_timestamp` in the request).  A single
-evidence-backed request window is certified complete ONLY when the returned
-rows are non-empty, every row timestamp lies inside the requested
-[start_time, end_time) window, and the provider-native terminal condition is
-met (funding: page under the count cap; trade/liquidation: `has_more=false`).
-Continuation beyond the evidenced single window (window shifting / deep
-traversal) is NOT proven by committed I13 evidence, so no `next_resume_token`
-is ever invented (pagination/resume = LIMITED) and incomplete windows are
-returned truthfully with PARTIAL_INTERVAL / GAP_DETECTED quality flags.
+Completion truth (I08R1 seal): the Deribit history surfaces carry the
+requested window directly (`start_timestamp`/`end_timestamp` in the request).
+A single evidence-backed request window is certified complete ONLY when the
+semantic output is non-empty, the FULL SOURCE-PAGE coverage (every
+schema-validated source row, not the filtered projection) lies inside the
+requested [start_time, end_time) window, and the provider-native terminal
+condition is met.  Trade/liquidation terminal = `has_more=false` (current
+request window); FUNDING terminal/exhaustive semantics are NOT established by
+committed evidence, so funding is NEVER certified complete (completion_proof =
+LIMITED).  COMPLETE never carries PARTIAL_INTERVAL (mutually exclusive; PARTIAL
+means partial, COMPLETE means complete).  Continuation beyond the evidenced
+single window (window shifting / deep traversal) is NOT proven by committed
+I13 evidence, so no `next_resume_token` is ever invented (pagination/resume =
+LIMITED) and incomplete windows are returned truthfully with
+PARTIAL_INTERVAL / GAP_DETECTED quality flags.
 """
 
 from __future__ import annotations
@@ -83,7 +88,6 @@ from ..base.models import (
     RawPayloadEnvelope,
 )
 from .capabilities import (
-    DERIBIT_PAGE_LIMIT,
     DERIBIT_PRODUCTION_INSTRUMENT_SCOPE,
     PROVIDER_ID,
     build_deribit_capabilities,
@@ -388,63 +392,81 @@ class DeribitAdapter:
         actual_first = self._row_dt(rows[0], sensor) if rows else None
         actual_last = self._row_dt(rows[-1], sensor) if rows else None
 
-        # ---- acquisition-completion truth (I07R1 doctrine applied to I08) --
+        # ---- acquisition-completion truth (I07R1 doctrine + I08R1 seal) ----
         # BOOK_SNAPSHOT is CURRENT_ONLY: a single current-snapshot acquisition
         # unit is complete by definition — the request never promises a
         # historical window, so the snapshot page satisfies it.
         if sensor is SensorFamily.MECHANICAL_BOOK_SNAPSHOT:
             is_complete = True
         else:
-            # FUNDING / TRADE / LIQUIDATION are HISTORICAL surfaces whose
-            # request carries the requested window directly
-            # (start_timestamp/end_timestamp epoch ms).  Every semantic row was
-            # schema-validated upstream (epoch-ms int); a row that still fails
-            # to produce a convenience datetime is an internal invariant
-            # violation and FAILS CLOSED rather than being silently classified.
-            row_datetimes = [self._row_dt(r, sensor) for r in rows]
-            if any(dt is None for dt in row_datetimes):
+            # COVERAGE truth comes from the schema-validated SOURCE-page
+            # timestamps (`parsed.coverage_timestamps`), NOT from the projected
+            # semantic rows (I08R1 Defect C): for LIQUIDATION the semantic view
+            # is a filtered subset (only forced-liquidation events), and a
+            # filtered subset must never manufacture completeness from a
+            # narrower projection than the acquisition surface used to prove
+            # it.  Coverage timestamps are validated exact epoch-ms ints; a
+            # member that still fails to convert is an internal invariant
+            # violation and FAILS CLOSED.
+            coverage_datetimes = [
+                dt
+                for ts in parsed.coverage_timestamps
+                if (dt := _ms_int_to_dt(ts)) is not None
+            ]
+            if len(coverage_datetimes) != len(parsed.coverage_timestamps):
                 raise ProviderSemanticError(
                     provider_id=self.provider_id,
                     sensor_family=sensor,
                     request_fingerprint=fp,
                     detail=(
                         "internal invariant violation: a schema-validated "
-                        "historical row produced no convenience datetime; "
+                        "source timestamp produced no convenience datetime; "
                         "refusing to classify window completion"
                     ),
                 )
-            in_window = [dt for dt in row_datetimes if dt is not None]
             has_in_window = any(
-                request.start_time <= dt < request.end_time for dt in in_window
+                request.start_time <= dt < request.end_time
+                for dt in coverage_datetimes
             )
             all_in_window = all(
-                request.start_time <= dt < request.end_time for dt in in_window
+                request.start_time <= dt < request.end_time
+                for dt in coverage_datetimes
             )
 
-            # Provider-native terminal condition per surface:
-            # - funding: page under the count cap (characterization completion
-            #   rule — a windowed hourly series below 1000 rows is exhaustive);
-            # - trade/liquidation: result envelope `has_more == false`.
             if sensor is SensorFamily.MECHANICAL_FUNDING:
-                terminal = len(rows) < DERIBIT_PAGE_LIMIT
+                # FUNDING terminal/exhaustive semantics are NOT established by
+                # committed evidence (I08R1 Defect B): the "short page under
+                # the count cap is exhaustive" rule exists only as a
+                # characterization heuristic (probe._pagination_state) and no
+                # committed artifact proves get_funding_rate_history returns
+                # ALL window records whenever len(result) < count.  Fail
+                # closed: completion_proof = LIMITED, funding is NEVER
+                # certified complete here.
+                is_complete = False
             else:
+                # TRADE / LIQUIDATION: `has_more == false` is the provider-
+                # native terminal flag for the CURRENT REQUEST WINDOW
+                # (characterization pagination contract + committed result
+                # envelope).  Completion additionally requires non-empty
+                # semantic output, at least one coverage row in-window, and
+                # FULL source coverage inside the requested window.
                 terminal = parsed.has_more is False
+                is_complete = bool(
+                    rows
+                    and has_in_window
+                    and all_in_window
+                    and terminal
+                )
 
-            if rows and has_in_window:
-                quality_flags.append(QualityFlagAcquisition.PARTIAL_INTERVAL)
-            elif rows:
-                quality_flags.append(QualityFlagAcquisition.GAP_DETECTED)
-
-            # A single evidence-backed window is certified complete ONLY when
-            # the returned rows are non-empty, every row lies inside the
-            # requested window, and the provider-native terminal condition is
-            # met.  Anything else is UNKNOWN/PARTIAL: never false completeness.
-            is_complete = bool(
-                rows
-                and has_in_window
-                and all_in_window
-                and terminal
-            )
+            # COMPLETE can never also be PARTIAL (I08R1 Defect A): quality
+            # flags are assigned AFTER the completion decision.  PARTIAL and
+            # GAP remain mutually exclusive; an empty page is EMPTY_VALID
+            # (never GAP merely from an empty default response).
+            if rows and not is_complete:
+                if has_in_window:
+                    quality_flags.append(QualityFlagAcquisition.PARTIAL_INTERVAL)
+                else:
+                    quality_flags.append(QualityFlagAcquisition.GAP_DETECTED)
 
         return FetchBatch(
             provider_id=self.provider_id,

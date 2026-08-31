@@ -279,6 +279,15 @@ class ParsedDeribit:
     #: `has_more` bool, or None when the surface does not carry it (funding /
     #: book) or the envelope was structurally broken.
     has_more: bool | None = None
+    #: Schema-validated epoch-ms timestamps of the FULL SOURCE page (I08R1
+    #: coverage seam).  For TRADE this equals the semantic rows; for
+    #: LIQUIDATION it is EVERY validated trade row (ordinary + forced
+    #: liquidation) — the acquisition-coverage surface completion must be
+    #: judged against, never against the narrower filtered projection.  For
+    #: FUNDING it is every funding row (semantic == source).  Book snapshots
+    #: do not use it.  Every member is an exact int (already schema-validated;
+    #: no unvalidated raw timestamps reach the adapter).
+    coverage_timestamps: tuple[int, ...] = ()
 
     @property
     def semantic_output_allowed(self) -> bool:
@@ -342,6 +351,12 @@ def _parse_trade_like(
     if state is SchemaState.BREAKING_SCHEMA_CHANGE:
         return ParsedDeribit(rows=(), schema_state=state, assessment=_breaking())
 
+    # SOURCE-page coverage timestamps: every schema-validated trade row
+    # (ordinary + forced liquidation) — the acquisition-coverage surface for
+    # completion truth (I08R1 Defect C).  `timestamp` is already validated as
+    # an exact int; no coercion here.
+    coverage = tuple(int(row["timestamp"]) for row in trades)
+
     if liquidation_only:
         # Mechanism-microscope projection: retain ONLY rows whose
         # characterization-backed flag marks a forced liquidation.  Rows
@@ -354,9 +369,13 @@ def _parse_trade_like(
 
     if state is SchemaState.ADDITIVE_SCHEMA_CHANGE:
         return ParsedDeribit(
-            rows=tuple(rows), schema_state=state, assessment=_additive(), has_more=has_more
+            rows=tuple(rows), schema_state=state, assessment=_additive(),
+            has_more=has_more, coverage_timestamps=coverage,
         )
-    return ParsedDeribit(rows=tuple(rows), schema_state=state, has_more=has_more)
+    return ParsedDeribit(
+        rows=tuple(rows), schema_state=state, has_more=has_more,
+        coverage_timestamps=coverage,
+    )
 
 
 def parse_deribit_trades(body: Any) -> ParsedDeribit:
@@ -407,10 +426,18 @@ def parse_deribit_funding(body: Any) -> ParsedDeribit:
     state = _assess(observed, _FUNDING_KNOWN, _FUNDING_REQUIRED)
     if state is SchemaState.BREAKING_SCHEMA_CHANGE:
         return ParsedDeribit(rows=(), schema_state=state, assessment=_breaking())
+    # Semantic rows == source rows for funding (no projection), so coverage is
+    # the same validated timestamp set (I08R1 coverage seam).
+    coverage = tuple(int(row["timestamp"]) for row in result)
     rows = [dict(row) for row in result]
     if state is SchemaState.ADDITIVE_SCHEMA_CHANGE:
-        return ParsedDeribit(rows=tuple(rows), schema_state=state, assessment=_additive())
-    return ParsedDeribit(rows=tuple(rows), schema_state=state)
+        return ParsedDeribit(
+            rows=tuple(rows), schema_state=state, assessment=_additive(),
+            coverage_timestamps=coverage,
+        )
+    return ParsedDeribit(
+        rows=tuple(rows), schema_state=state, coverage_timestamps=coverage
+    )
 
 
 def parse_deribit_book(body: Any) -> ParsedDeribit:
