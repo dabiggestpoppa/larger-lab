@@ -33,7 +33,7 @@ import json
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from .._paths import QUANT_LAB_ROOT
 from ..contracts.enums import SensorFamily
@@ -607,7 +607,9 @@ def evidence_ref_audit(
             sensor = SensorFamily(str(c["sensor"]))
         except ValueError:
             continue
-        basis = set(str(e) for e in c.get("evidence_basis", []))
+        basis = set(
+            str(e) for e in cast(list[object], c.get("evidence_basis", []))
+        )
         evidence_basis_by_key[(provider_id, sensor)] = basis
 
     search_root = bloc_02_dir or (
