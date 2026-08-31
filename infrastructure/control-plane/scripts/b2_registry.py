@@ -2,7 +2,10 @@
 
 Single source of truth for the mandatory test registry, category
 assignment, expected per-category totals, and the required evidence
-artifact list. Generated from ACTUAL pytest collection (B3-R8).
+artifact list. Generated from ACTUAL pytest collection by
+scripts/gen_mandatory_registry.py (B3-R8). The gate fails if the
+collected total differs from this registry — adding a test requires
+a deliberate regeneration in the same change.
 """
 
 SCHEMA_VERSION = "2.1.0"
@@ -93,6 +96,15 @@ MANDATORY_TEST_IDS = [
     "infrastructure.control-plane.tests.test_b3_adversarial.TestAdversarialFabric::test_unsupported_protocol_rejected",
     "infrastructure.control-plane.tests.test_b3_adversarial.TestAdversarialFabric::test_wrong_credential_rejected",
     "infrastructure.control-plane.tests.test_b3_adversarial.TestAdversarialFabric::test_wrong_trust_zone_fails_closed",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestFabricAdversarialClosure::test_forbidden_exec_env_path",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestFabricAdversarialClosure::test_forged_fence_and_late_result",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestFabricAdversarialClosure::test_mismatched_hash_and_oversized_partial",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestFailureEvidencePropagation::test_run_id_guard_and_expected_repo",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestFailureEvidencePropagation::test_runner_steps_capture_cleanliness_and_source",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestFailureEvidencePropagation::test_write_failure_evidence_hashes_all_files",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestHermesBoundaryReal::test_hermes_cannot_authorized_retry_dead_letter",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestHermesBoundaryReal::test_hermes_is_not_operator_po",
+    "infrastructure.control-plane.tests.test_b3_adversarial_closure.TestHermesBoundaryReal::test_retry_coordinator_persists_durable_dead_letter",
     "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_artifacts_survive_control_plane_restart",
     "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_duplicate_delivery_one_material_effect",
     "infrastructure.control-plane.tests.test_b3_end_to_end_jobs::test_end_to_end_representative_jobs",
@@ -354,6 +366,7 @@ _CATEGORY_RULES = [
     ("test_pg_worker_integration", "worker"),
     ("test_http_api_integration", "api"),
     ("test_b3_adversarial", "adversarial"),
+    ("test_b3_adversarial_closure", "adversarial"),
     ("test_b3_representative_jobs", "representative-job"),
     ("test_execution_runtime", "sandbox-resource"),
     ("test_worker_fabric", "worker-fabric-core"),
