@@ -236,14 +236,18 @@ class TestHappyFetchPerPromotedSensor:
         assert batch.next_resume_token is None
         assert batch.row_count >= 1
 
-    def test_funding_window_served_is_complete(self) -> None:
-        # in-window rows under the count cap -> the requested window was
-        # exhaustively served (characterization completion rule).
+    def test_funding_window_served_completion_limited(self) -> None:
+        # I08R1 Defect B: the "short page under the count cap is exhaustive"
+        # rule is a characterization heuristic, NOT a proven provider
+        # contract — funding is NEVER certified complete (completion_proof =
+        # LIMITED) even when every row lies inside the requested window.
         batch = _adapter(
             routes={"/get_funding_rate_history": HAPPY_ROUTES["/get_funding_rate_history"]}
         ).fetch_funding(request(FUNDING))
-        assert batch.is_complete is True
+        assert batch.is_complete is False
         assert batch.next_resume_token is None
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
 
     def test_trade_terminal_page_is_complete(self) -> None:
         # has_more=false + non-empty + all rows in-window -> window served.
@@ -456,6 +460,115 @@ class TestWindowOrderInvariant:
         gap = adapter.fetch_funding(request(FUNDING, start=old, end=old + timedelta(days=1)))
         self._assert_gap(gap)
         assert gap.is_complete is False
+
+
+class TestQualityFlagMatrix:
+    """I08R1 Defect A — COMPLETE can never carry PARTIAL_INTERVAL.
+
+    Quality flags are assigned AFTER the completion decision: a proven-complete
+    batch has NO PARTIAL/GAP flag; PARTIAL and GAP stay mutually exclusive;
+    an empty page is EMPTY_VALID (never GAP merely from an empty response).
+    """
+
+    def test_a_complete_trade_has_no_partial_flag(self) -> None:
+        # fully in-window + has_more=false -> COMPLETE, clean flags.
+        batch = _adapter(routes={"/get_last_trades_by_instrument": HAPPY_ROUTES["/get_last_trades_by_instrument"]}).fetch_trades(request(TRADE))
+        assert batch.is_complete is True
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL not in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+    def test_b_complete_liquidation_source_page_clean(self) -> None:
+        # source page fully in-window + terminal + forced event present.
+        batch = _adapter(routes={"/get_last_trades_by_instrument": (200, FX.LIQ_HAPPY)}).fetch_liquidations(request(LIQUIDATION))
+        assert batch.is_complete is True
+        assert batch.row_count == 1
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL not in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+    def test_c_partial_trade_has_more(self) -> None:
+        # some rows in-window, terminal NOT proven (has_more=true).
+        batch = _adapter(routes={"/get_last_trades_by_instrument": (200, FX.TRADE_HAS_MORE_TRUE)}).fetch_trades(request(TRADE))
+        assert batch.is_complete is False
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+    def test_d_gap_trade_no_row_in_window(self) -> None:
+        old = datetime(2020, 1, 1, tzinfo=UTC)
+        batch = _adapter(routes={"/get_last_trades_by_instrument": HAPPY_ROUTES["/get_last_trades_by_instrument"]}).fetch_trades(request(TRADE, start=old))
+        assert batch.is_complete is False
+        assert QualityFlagAcquisition.GAP_DETECTED in batch.quality_flags
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL not in batch.quality_flags
+
+    def test_e_liquidation_filter_trap_source_leak_never_complete(self) -> None:
+        # raw source: ordinary trade OUTSIDE window + liquidation INSIDE window
+        # + has_more=false.  Semantic output = the liquidation row only, but
+        # SOURCE-PAGE coverage leaks outside the requested window -> the
+        # filtered projection must NOT manufacture completeness (I08R1 Defect
+        # C: projection is not coverage).
+        adapter = _adapter(routes={"/get_last_trades_by_instrument": (200, FX.LIQ_TRAP)})
+        batch = adapter.fetch_liquidations(request(LIQUIDATION))
+        assert batch.row_count == 1  # forced-liquidation row only
+        assert batch.is_complete is False  # source coverage not wholly in-window
+        assert batch.next_resume_token is None
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+    def test_f_liquidation_ordinary_rows_never_leak(self) -> None:
+        batch = _adapter(routes={"/get_last_trades_by_instrument": (200, FX.LIQ_TRAP)}).fetch_liquidations(request(LIQUIDATION))
+        raw = json.loads(batch.raw_payloads[0].raw_body.decode("utf-8"))
+        # semantic row_count is the forced-liquidation subset only
+        flagged = [r for r in raw["result"]["trades"] if r["liquidation"] == "liquidation"]
+        assert batch.row_count == len(flagged) == 1
+
+    def test_g_empty_liquidation_conservative(self) -> None:
+        # nonempty source page with zero forced-liquidation rows -> EMPTY_VALID,
+        # raw preserved, completion conservative (UNKNOWN).
+        batch = _adapter(routes={"/get_last_trades_by_instrument": (200, FX.LIQ_NO_EVENTS)}).fetch_liquidations(request(LIQUIDATION))
+        assert batch.row_count == 0
+        assert QualityFlagAcquisition.EMPTY_VALID in batch.quality_flags
+        assert batch.raw_payloads  # nonempty raw payload preserved
+        assert batch.is_complete is False
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+
+class TestFundingCompletionLimited:
+    """I08R1 Defect B — funding terminal/exhaustive proof is NOT established.
+
+    The short-page-under-cap rule is only a characterization heuristic; no
+    committed artifact proves get_funding_rate_history returns ALL window
+    records whenever len(result) < count.  Funding is therefore NEVER
+    certified complete (completion_proof = LIMITED) — a short page is not
+    terminal merely because it is short.
+    """
+
+    def test_funding_never_complete_even_under_cap(self) -> None:
+        adapter = _adapter(routes={"/get_funding_rate_history": HAPPY_ROUTES["/get_funding_rate_history"]})
+        batch = adapter.fetch_funding(request(FUNDING))
+        assert batch.row_count == 3  # well under the 1000 cap
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+    def test_funding_count_cap_page_never_complete(self) -> None:
+        # a page AT the count cap (1000 rows) is never complete — no terminal
+        # proof exists for funding regardless of page size.
+        rows = [FX.funding_row(FX.T1 + i * 3_600_000) for i in range(1000)]
+        body = FX._ok_result(rows)
+        adapter = _adapter(routes={"/get_funding_rate_history": (200, body)})
+        batch = adapter.fetch_funding(request(FUNDING))
+        assert batch.row_count == 1000
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+
+    def test_funding_outside_window_never_complete(self) -> None:
+        old = datetime(2020, 1, 1, tzinfo=UTC)
+        batch = _adapter(routes={"/get_funding_rate_history": HAPPY_ROUTES["/get_funding_rate_history"]}).fetch_funding(
+            request(FUNDING, start=old, end=old + timedelta(days=1))
+        )
+        assert batch.is_complete is False
+        assert QualityFlagAcquisition.GAP_DETECTED in batch.quality_flags
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL not in batch.quality_flags
 
 
 class TestTimestampUnits:

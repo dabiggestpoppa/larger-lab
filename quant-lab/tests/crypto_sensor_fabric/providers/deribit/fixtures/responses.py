@@ -205,6 +205,22 @@ LIQ_MISSING_REQUIRED = _ok_result(
     )
 )
 LIQ_EMPTY = _ok_result(_trades_result([], has_more=False))
+#: LIQUIDATION FILTER TRAP (I08R1 Defect C): the raw source page contains an
+#: ordinary trade OUTSIDE the requested window (1 day earlier) plus a forced
+#: liquidation INSIDE the window, with has_more=false.  The liquidation
+#: SEMANTIC output is the in-window forced-liquidation row only, but SOURCE-
+#: PAGE coverage leaks outside the window -> completion must NOT be certified.
+LIQ_TRAP = _ok_result(
+    _trades_result(
+        [
+            trade_row(T1 - 86400000, trade_id="9990000", direction="buy",
+                     liquidation="taker", trade_seq=1),
+            trade_row(T1, trade_id="9990001", direction="sell",
+                     liquidation="liquidation", trade_seq=2),
+        ],
+        has_more=False,
+    )
+)
 
 # --------------------------------------------------------------------------- #
 # FUNDING (result is a RAW LIST — observed LIVE)
