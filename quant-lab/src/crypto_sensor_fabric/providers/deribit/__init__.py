@@ -7,7 +7,7 @@ Split surfaces (SENSOR-B3-I08):
                       paths; typed `CapabilityUnavailable` otherwise).
 - `capabilities.py` — I14-bounded capability + native acquisition-mode freeze.
 - `requests.py` / `parsers.py` / `errors.py` — request builders, provider-native
-                      parsers, and failure-envelope mapping.
+                      parsers, and JSON-RPC failure-envelope mapping.
 
 I14 promotes EXACTLY FOUR DERIBIT production paths:
 
@@ -23,13 +23,19 @@ Deribit is the mechanism microscope: trade/liquidation is TRADE-LEVEL anatomy
 and is NEVER numerically merged with interval liquidation totals.  The same
 physical `get_last_trades_by_instrument` endpoint supports two logical sensor
 views; the raw payload is preserved before any sensor-specific projection.
-Continuation beyond the evidenced single request window is NOT proven by
-committed I13 evidence, so production issues a single evidence-backed request
-window with truthful completion semantics.
+Funding `result` is a raw LIST (observed LIVE).  Continuation beyond the
+evidenced single request window is NOT proven by committed I13 evidence, so
+production issues a single evidence-backed request window with truthful
+completion semantics and no invented resume token.
 """
 
 from __future__ import annotations
 
+from .adapter import (
+    DEFAULT_FREE_ONLY_POLICY,
+    NEUTRAL_INSTRUMENT_LIST_SENSOR,
+    DeribitAdapter,
+)
 from .capabilities import (
     DERIBIT_BOOK_DEPTH,
     DERIBIT_FUNDING_RATE_HISTORY_PATH,
@@ -47,9 +53,21 @@ from .capabilities import (
     deribit_native_evidence,
     deribit_symbol_scopes_from_evidence,
 )
+from .errors import (
+    AUTH_CODES,
+    ENDPOINT_REMOVED_CODES,
+    INVALID_INSTRUMENT_CODES,
+    RATE_LIMIT_CODES,
+    deribit_error_code,
+    is_deribit_error_body,
+    map_deribit_error,
+)
 from .probe import NATIVE_INSTRUMENTS, DeribitCapabilityProbe
+from .requests import DeribitRequestBuilder
 
 __all__ = [
+    "AUTH_CODES",
+    "DEFAULT_FREE_ONLY_POLICY",
     "DERIBIT_BOOK_DEPTH",
     "DERIBIT_FUNDING_RATE_HISTORY_PATH",
     "DERIBIT_LAST_TRADES_PATH",
@@ -60,11 +78,20 @@ __all__ = [
     "DERIBIT_PROMOTED_SENSORS",
     "DERIBIT_REST_BASE",
     "DERIBIT_SYMBOL_SCOPES",
+    "ENDPOINT_REMOVED_CODES",
+    "INVALID_INSTRUMENT_CODES",
     "NATIVE_INSTRUMENTS",
+    "NEUTRAL_INSTRUMENT_LIST_SENSOR",
     "PROVIDER_ID",
+    "RATE_LIMIT_CODES",
+    "DeribitAdapter",
     "DeribitCapabilityProbe",
+    "DeribitRequestBuilder",
     "build_deribit_capabilities",
     "deribit_endpoint_family",
+    "deribit_error_code",
     "deribit_native_evidence",
     "deribit_symbol_scopes_from_evidence",
+    "is_deribit_error_body",
+    "map_deribit_error",
 ]
