@@ -1,0 +1,60 @@
+{
+  "scenario_id": "knowledge_reactivation_smoke",
+  "scenario_version": "1.0.0",
+  "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
+  "institutional_scope": "generic knowledge-lifecycle smoke (no S10 logic)",
+  "initial_phase": "STABLE",
+  "initial_knowledge": [
+    {
+      "record_id": "@K",
+      "state": "DEMOTED",
+      "claim": "a mechanism demoted when its regime disappeared",
+      "provenance_source_kind": "FIXTURE",
+      "provenance_source_label": "smoke-demoted"
+    }
+  ],
+  "stimulus_events": [
+    {
+      "seq": 1,
+      "machine": "lifecycle",
+      "actor": "PO",
+      "target": "@K",
+      "payload": {
+        "to_state": "DORMANT",
+        "authority_level": "PO",
+        "authority_basis": "demotion",
+        "reason": "demoted knowledge parked as dormant until reopen"
+      }
+    },
+    {
+      "seq": 2,
+      "machine": "lifecycle",
+      "actor": "PO",
+      "target": "@K",
+      "payload": {
+        "to_state": "ACTIVE",
+        "authority_level": "PO",
+        "authority_basis": "none",
+        "reason": "attempt to auto-promote on reopen (must be rejected)"
+      }
+    },
+    {
+      "seq": 3,
+      "machine": "lifecycle",
+      "actor": "PO",
+      "target": "@K",
+      "payload": {
+        "to_state": "CANDIDATE",
+        "authority_level": "PO",
+        "authority_basis": "reopen_condition_met",
+        "reason": "reopen condition active: reactivate as candidate for revalidation"
+      }
+    }
+  ],
+  "expected_phase_path": ["STABLE"],
+  "expected_terminal_knowledge": {
+    "@K": "CANDIDATE"
+  },
+  "terminal_states": ["STABLE", "CANDIDATE"],
+  "hidden_ground_truth": null
+}
