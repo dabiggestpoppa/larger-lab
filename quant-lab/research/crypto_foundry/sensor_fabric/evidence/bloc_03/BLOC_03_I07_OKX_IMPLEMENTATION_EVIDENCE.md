@@ -1,8 +1,15 @@
 # SENSOR-B3-I07 — OKX Swap Production Adapter Implementation Evidence
 
-**Checkpoint verdict:** `PASS_SENSOR_B3_I07_OKX_ADAPTER_OFFLINE` (proposed).
+**Checkpoint verdict:** `HOLD_PASS_SENSOR_B3_I07_OKX_ADAPTER_OFFLINE_PENDING_I07R1`.
 Kraken + Gate were frozen; this is the THIRD hard real provider adapter built on
 the hardened common foundation.  **This is NOT a global Bloc 3 PASS.**
+
+**I07R1 repair:** see `BLOC_03_I07R1_OKX_SEAL_EVIDENCE.md` — historical
+funding/trade fetches are now never certified complete (window-truth
+invariant), parser required-field sets were sealed to the closed schema
+fingerprints, `seqId` uses exact int typing, book levels require at least
+`[price, size]`, and the `markPrice` claim was reconciled (additive/unverified,
+not evidence-backed).
 
 **Operator authorization:** `SENSOR-B3-I07 — OKX_SWAP` only, granted by
 `SENSOR-B3-I06-RATIFY` (which froze Gate offline implementation and repaired the
@@ -108,21 +115,28 @@ to int).
 - BOOK: envelope `dict{code:str,data:[{asks:list[list[str]],bids:list[list[str]],
   seqId:int,ts:str}],msg}`.
 
-## Schema contracts / parser fields preserved by sensor
+## Schema contracts / parser fields preserved by sensor (I07R1-sealed)
 
-- FUNDING: `fundingTime`, `fundingRate`, `realizedRate`, `formulaType`,
-  `instId`, `instType`, `method`, `markPrice` (present in committed fixture).
-  fundingRate vs realizedRate stay distinguishable; interval NOT frozen to 8h.
-- TRADE: `instId`, `tradeId`, `px`, `sz`, `side`, `ts`, `source`.  `side` is the
-  provider-native aggressor side preserved verbatim (never reinterpreted into
-  strategy direction; no CVD / buy-sell pressure / order-flow state).
-- BOOK: `ts`, `bids`, `asks` (list-of-list `[px, sz, ...]`), `seqId` (int).  No
-  imbalance / slippage / spread / depth score / book health is derived.
+- FUNDING: closed SEVEN-field record — `fundingTime`, `fundingRate`,
+  `realizedRate`, `formulaType`, `instId`, `instType`, `method` are all
+  structurally required per the 09 fingerprint.  `markPrice` is NOT in the
+  committed runtime fingerprint (probe fixture only): it is an
+  OPTIONAL/UNVERIFIED additive field — preserved when present (ADDITIVE),
+  never required.  fundingRate vs realizedRate stay distinguishable; interval
+  NOT frozen to 8h.
+- TRADE: closed SEVEN-field record — `instId`, `tradeId`, `px`, `sz`, `side`,
+  `ts`, `source` all structurally required.  `side` is the provider-native
+  aggressor side preserved verbatim (never reinterpreted into strategy
+  direction; no CVD / buy-sell pressure / order-flow state).
+- BOOK: closed FOUR-field record — `ts`, `bids`, `asks` (list-of-list
+  `[px, sz, ...]`, at minimum `[price, size]`), `seqId` (EXACT int; bool
+  rejected).  No imbalance / slippage / spread / depth score / book health is
+  derived.
 
 Structural fail-closed: missing required field / wrong timestamp type /
-bad level shape => BREAKING/UNKNOWN (raw preserved, parsed blocked); extra
-field => ADDITIVE (flagged, parsed); missing required fields never default to
-zero.
+bad level shape / malformed seqId => BREAKING/UNKNOWN (raw preserved, parsed
+blocked); extra field => ADDITIVE (flagged, parsed); missing required fields
+never default to zero.
 
 ## OKX v5 error model
 
@@ -192,15 +206,20 @@ Pass — public REST, NO_AUTH, $0; DEFAULT_FREE_ONLY_POLICY (FREE_AUTOMATED, cos
 Retry classification: rate-limit / provider-unavailable retryable; instrument /
 auth / access / schema terminal (asserted via `classify_retryability`).
 
-## Pagination / resume status
+## Pagination / resume status (I07R1 window-truth correction)
 
 Trade and funding are REST_CURSOR surfaces with sensor-specific `after`/`before`
 cursor meanings, but their continuation **direction is UNRESOLVED by committed
 I13 evidence** — production issues a single evidence-backed request window
-(`instId` + `limit`) and does NOT invent a continuation cursor
-(`is_complete=True`, no resume token).  Resume-token determinism (round-trip)
-itself still passes via the common suite.  The CURRENT_ONLY book has no
-pagination.
+(`instId` + `limit`) and does NOT invent a continuation cursor.  Because the
+returned page can never be proven to satisfy an arbitrary requested
+`[start_time, end_time)` window, a HISTORICAL funding/trade fetch is NEVER
+certified complete: `is_complete=False`, `next_resume_token=None`, and a
+truthful `PARTIAL_INTERVAL` / `GAP_DETECTED` quality flag (see
+`BLOC_03_I07R1_OKX_SEAL_EVIDENCE.md`).  Requested vs actual boundaries stay
+separate.  The CURRENT_ONLY book is complete per snapshot unit and has no
+pagination.  Resume-token determinism (round-trip) itself still passes via the
+common suite.
 
 ## Known limitations
 

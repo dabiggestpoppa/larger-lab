@@ -64,7 +64,11 @@ Unchanged provider-native: funding `fundingRate`/`realizedRate` (decimal
 fraction — the interval is NOT frozen to "8h") + `formulaType`/`method`
 (PIT-relevant, preserved when present); trade `px` (USD) / `sz` (base asset) /
 `side` (aggressor, preserved verbatim) / `tradeId` / `ts`; book `bids`/`asks`
-(native `[px, sz, ...]` lists). No canonical conversion in Bloc 3.
+(native `[px, sz, ...]` lists — at minimum `[price, size]` per level). No
+canonical conversion in Bloc 3.  Schema handling is fail-closed: the funding
+and trade rows are closed fingerprint records (every structural field
+required), `seqId` must be an exact int (bool rejected), and a malformed or
+non-integer timestamp is SchemaDrift.
 
 ## Pagination
 
@@ -72,17 +76,38 @@ The two HISTORICAL surfaces (`history-trades`, `funding-rate-history`) are
 provider-cursor surfaces (`after`/`before`) with **sensor-specific cursor
 meanings**: trade keys around provider trade ids; funding keys around
 `fundingTime`. Their continuation **direction is UNRESOLVED by committed I13
-evidence**, so I07 production issues a single evidence-backed request window
+evidence**, so production issues a single evidence-backed request window
 (`instId` + `limit`) and does NOT invent a continuation cursor. Deeper
 multi-window after/before traversal is recorded as UNRESOLVED. The CURRENT_ONLY
 book has no pagination.
 
+### Completion truth (SENSOR-B3-I07R1)
+
+`is_complete=True` means the adapter has evidence-backed grounds that the
+requested acquisition unit is complete — it does NOT mean merely that transport
+succeeded or that a page had few rows.  For HISTORICAL funding/trade fetches
+this checkpoint NEVER certifies completeness: the single returned page is
+returned with `is_complete=False`, no `next_resume_token`, and a truthful
+`PARTIAL_INTERVAL` (rows overlap the requested window) or `GAP_DETECTED` (rows
+entirely outside it) quality flag.  Requested `start_time`/`end_time` are
+preserved separately from the actual returned timestamps.  **Arbitrary-range
+historical replay is therefore NOT fully satisfiable yet** — an old requested
+window cannot be honored as a complete replay while continuation direction is
+unresolved.  The CURRENT_ONLY book snapshot is complete per acquisition unit
+(it makes no window promise).
+
 ## Known Issues
 
 - Funding/trade multi-window cursor continuation is UNRESOLVED (evidence does
-  not pin `after`/`before` direction) — constrained to a single window.
-- No live network validation occurred in I07 (network smoke is reserved for
-  SENSOR-B3-I14).
+  not pin `after`/`before` direction) — constrained to a single window; a
+  historical fetch is never certified complete (I07R1 window-truth invariant).
+- Arbitrary historical-window replay is LIMITED until continuation semantics
+  are evidenced (I14 network smoke is the natural characterization point).
+- `markPrice` on funding rows is an OPTIONAL/UNVERIFIED additive field (probe
+  fixture only; not in the committed schema fingerprint) — preserved when
+  present, never required.
+- No live network validation occurred in I07/I07R1 (network smoke is reserved
+  for SENSOR-B3-I14).
 
 ## Fixtures
 

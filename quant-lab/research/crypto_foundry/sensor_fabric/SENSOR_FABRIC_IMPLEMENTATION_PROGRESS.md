@@ -11,21 +11,21 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I07 COMPLETE — OKX_SWAP PRODUCTION ADAPTER (PASS_SENSOR_B3_I07_OKX_ADAPTER_OFFLINE proposed, awaiting operator review) |
+| Current checkpoint | SENSOR-B3-I07R1 COMPLETE — OKX ACQUISITION-TRUTH + SCHEMA-BOUNDARY SEAL (PASS_SENSOR_B3_I07R1_OKX_SEALED proposed, awaiting operator review) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); SENSOR-B3-I07 (OKX) IMPLEMENTED OFFLINE — awaiting operator review of PASS_SENSOR_B3_I07_OKX_ADAPTER_OFFLINE; Deribit NOT AUTHORIZED |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); SENSOR-B3-I07 (OKX) IMPLEMENTED OFFLINE; I07 HELD pending I07R1 (window-truth + schema-boundary repair) — I07R1 COMPLETE, PASS_SENSOR_B3_I07R1_OKX_SEALED proposed, awaiting operator review; Deribit NOT AUTHORIZED |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = OKX_SWAP ONLY (Kraken + Gate frozen; DERIBIT NOT AUTHORIZED YET) |
 | Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=3 (KRAKEN_FUTURES + GATE_FUTURES + OKX_SWAP, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate + OKX; PRODUCTION_CANDIDATE mode, 0 failed each) · NETWORK_VALIDATION=NOT_YET_RUN |
-| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE (I07) · okx_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
+| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE (I07) · okx_boundary_hardened = TRUE (I07R1: window-truth completion, sealed schema, exact seqId int, book level cardinality, markPrice reconciled) · okx_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (Deribit NOT AUTHORIZED — requires explicit operator authorization) |
-| next_checkpoint_authorized | FALSE (SENSOR-B3-I08 DERIBIT is the recommended next, but NOT AUTHORIZED — await operator review of PASS_SENSOR_B3_I07_OKX_ADAPTER_OFFLINE) |
+| next_checkpoint_authorized | FALSE (SENSOR-B3-I08 DERIBIT is the recommended next, but NOT AUTHORIZED — await operator review of PASS_SENSOR_B3_I07R1_OKX_SEALED) |
 
 ## Test counts (cumulative)
 
@@ -83,7 +83,10 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I07A | be075378 | 17 | 0 |
 | SENSOR-B3-I07B+C | 699a2ede | 89 | 0 |
 | SENSOR-B3-I07C | (evidence only) | — | — |
-| cumulative | 1038 | 1038 | 0 |
+| SENSOR-B3-I07R1A | ffbdfdfd | 8 | 0 |
+| SENSOR-B3-I07R1B | 820feca4 | 21 | 0 |
+| SENSOR-B3-I07R1C | (evidence/readiness/ledger) | — | — |
+| cumulative | 1067 | 1067 | 0 |
 
 ## External / provider blockers
 
@@ -170,6 +173,23 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B3-I07R1 COMPLETE — OKX ACQUISITION-TRUTH + SCHEMA-BOUNDARY SEAL
+  (repair after HOLD_PASS_SENSOR_B3_I07_OKX_ADAPTER_OFFLINE_PENDING_I07R1).
+  I14 sensor set, roles, BTC-USDT-SWAP scope, access, PIT, methodology pins,
+  history bounds and CURRENT_ONLY book classification UNCHANGED.  Repairs:
+  (1) window truth — historical funding/trade fetches are NEVER certified
+  complete (continuation direction UNRESOLVED; single page returned with
+  is_complete=False, no invented resume token, PARTIAL_INTERVAL / GAP_DETECTED
+  flag; requested vs actual boundaries separate); book snapshot stays complete
+  per unit; (2) parser required fields sealed to the closed 09 fingerprints
+  (funding 7, trade 7, book 4 — every structural field required);
+  (3) seqId exact-int typing (bool rejected); (4) book levels require at least
+  [price, size]; (5) markPrice reconciled to optional/unverified additive
+  (probe fixture only, NOT in the committed runtime fingerprint).
+  PRODUCTION_CANDIDATE conformance 0 failed; 1067 passed / 0 failed; ruff
+  clean; FAKE TRANSPORT ONLY — zero network calls; Kraken + Gate regression
+  green (frozen, unchanged); no Deribit; no Bloc 4.  Evidence:
+  `evidence/bloc_03/BLOC_03_I07R1_OKX_SEAL_EVIDENCE.md`.
 - SENSOR-B3-I07 COMPLETE (OFFLINE) — OKX_SWAP production adapter on the
   hardened common foundation.  Exactly three I14-promoted paths (BOOK_SNAPSHOT
   CURRENT_ONLY, FUNDING + TRADE PRIMARY historical) ADAPTER_READY, production
@@ -381,3 +401,6 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I07A | be075378 | OKX capability + native acquisition contract (3 paths, roles, BTC-USDT-SWAP scope, REST_CURSOR grants, exact-set test) | 949 passed / 0 failed | PASS | none |
 | SENSOR-B3-I07B+C | 699a2ede | OKX requests/errors/parsers/adapter + fixtures + tests (funding PUBLIC namespace, trade history-trades, book current-only, ms-string timestamps, raw envelope dry schema drift, typed errors, PRODUCTION_CANDIDATE conformance) | 1038 passed / 0 failed | PASS | none |
 | SENSOR-B3-I07C | (this commit) | OKX README, implementation evidence, readiness matrix, ledger | 1038 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I07R1A | ffbdfdfd | OKX window-truth: historical funding/trade never certified complete (is_complete=False, no invented resume, PARTIAL_INTERVAL/GAP_DETECTED flags, requested vs actual boundaries separate; book CURRENT_ONLY unchanged) + window-truth tests | 1067 passed / 0 failed | PASS | none |
+| SENSOR-B3-I07R1B | 820feca4 | OKX parser seal: required fields to closed fingerprints (funding 7, trade 7, book 4), exact-int seqId (bool rejected), book level >= [price, size], markPrice additive-only; per-field/seqId/level/markPrice tests | 1067 passed / 0 failed | PASS | none |
+| SENSOR-B3-I07R1C | (this commit) | OKX seal evidence (BLOC_03_I07R1_OKX_SEAL_EVIDENCE.md), README completion-truth, I07 evidence corrections, ledger | 1067 passed / 0 failed (re-run) | PASS | none |
