@@ -528,3 +528,4 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09A-fix | 97450123 | type-cast evidence_basis iteration in readiness.py (mypy clean) | 1294 passed / 0 failed | PASS | none |
 | SENSOR-B3-I09B | d299cdd2 | cross-provider closure tests (42): registry topology, 17-path exact-set equality, evidence-ref resolution, symbol scope, bound-drift, semantic firewall, determinism, human-matrix reconcile, real-adapter protocol coherence | 1294 passed / 0 failed | PASS | none |
 | SENSOR-B3-I09C | 08559207 | generate canonical PRODUCTION_ADAPTER_MATRIX.csv/.json (17 rows) + reconcile human readiness matrix | 1294 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I09D | 4d4c62a4 | closure evidence + ledger reconciliation for I09 | 1294 passed / 0 failed (re-run) | PASS | none |
