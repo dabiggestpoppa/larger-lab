@@ -14,8 +14,8 @@ architecture and the 17-path inventory are otherwise untouched.
 | Starting SHA | `7e6ae53f2d265455df903c7cf6241046788220c3` (branch `agent/crypto-sensor-fabric-build`) |
 | I09R1A | `b3e26cef` — duplicate authority + explicit verification coverage guards |
 | I09R1B | `17636a78` — authority-seal adversarial tests |
-| I09R1C | (this commit) — seal evidence + ledger |
-| Final SHA | see ledger / `git log` |
+| I09R1C | `1dd03835` — seal evidence + ledger; mypy-clean test cast |
+| Final SHA | `1dd03835` (see ledger / `git log`) |
 | Review hold | `HOLD_PASS_SENSOR_B3_I09_CROSS_PROVIDER_OFFLINE_CLOSURE_PENDING_I09R1_AUTHORITY_SEAL` |
 | Proposed verdict | `PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED` |
 

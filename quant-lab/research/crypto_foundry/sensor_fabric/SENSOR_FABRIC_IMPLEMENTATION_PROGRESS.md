@@ -99,7 +99,7 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09C | 08559207 | 0 (generated matrix) | — |
 | SENSOR-B3-I09R1A | b3e26cef | 0 (code) | — |
 | SENSOR-B3-I09R1B | 17636a78 | 15 | 0 |
-| SENSOR-B3-I09R1C | (this) | 0 (evidence/ledger) | — |
+| SENSOR-B3-I09R1C | 1dd03835 | 0 (evidence/ledger) | — |
 | cumulative | 1309 | 1309 | 0 |
 
 ## External / provider blockers
@@ -559,4 +559,4 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09D | 4d4c62a4 | closure evidence + ledger reconciliation for I09 | 1294 passed / 0 failed (re-run) | PASS | none |
 | SENSOR-B3-I09R1A | b3e26cef | fail closed on duplicate I14 promotion + duplicate human readiness rows; require explicit complete verification coverage (missing != explicit False; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN pre-I10) | 1294 passed / 0 failed | PASS | none |
 | SENSOR-B3-I09R1B | 17636a78 | authority-seal adversarial tests (15): duplicate I14 exact + conflicting, every-consumer reject, human duplicate identical + conflicting, missing conformance/schema/verification, explicit-False-vs-missing, ADAPTER_READY+failed-flag rejected, network upgrade rejected, raw/unique I14 counts | 1309 passed / 0 failed | PASS | none |
-| SENSOR-B3-I09R1C | (this) | authority-seal evidence + ledger reconciliation for I09R1; matrix regeneration byte-identical | 1309 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I09R1C | 1dd03835 | authority-seal evidence + ledger reconciliation for I09R1; matrix regeneration byte-identical | 1309 passed / 0 failed (re-run) | PASS | none |
