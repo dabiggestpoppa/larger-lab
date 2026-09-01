@@ -417,3 +417,40 @@ independently downloaded and re-verified.
 - The source tree was clean before and after the authoritative run; cleanup
   removed containers and networks while preserving the durable PostgreSQL
   volume.
+
+---
+
+## B4-CXR6 — POST-CLOSURE AUTHORITY REPAIR (supersedes the CXR5 closure)
+
+Independent POST-CLOSURE source review found authority paths the CXR5-registered
+suite did not attack: the activation envelope was forgeable (plain JSON in an
+ambient env var with a recomputable plain-SHA identity), OCE_CI_MODE was an
+environment-unlocked test seam, audit request-id reuse could authorize an
+unaudited change, and ordinary start still re-entered initialization.
+
+```
+B4-CXR5:
+    VALID HISTORICAL EVIDENCE FOR THE 596-TEST REGISTERED SUITE
+    SUPERSEDED BY POST-CLOSURE CXR6 SOURCE REVIEW
+```
+
+The CXR5 CI run (33537592969) and artifact (9812328456) were REAL; their
+adversarial model did not cover recomputable-envelope forgery,
+environment-created test authority, or divergent audit-ID reuse. The CXR5
+evidence record above is preserved intact and is never rewritten.
+
+### Ordered repair commits (all pushed, `oce-program-build`)
+
+| Commit | Message | CXR6 defect |
+|---|---|---|
+| `e114c496` | B4-CXR6R1: authenticate and re-derive child activation authority | CXR6-01 |
+| `0462f1e5` | B4-CXR6R2: remove environment-unlocked test authority | CXR6-02 |
+| `066a7879` | B4-CXR6R3: make audit idempotency exact and collision-safe | CXR6-03 |
+| `cf8ca8d7` | B4-CXR6R4: make ordinary activation read-only over secret authority | CXR6-04 |
+| *(pending)* | B4-CXR6R5: correct authority inventory and closure truth labels | CXR6-05 |
+| *(pending)* | B4-CXR6R6: adversarial closure and registry regeneration | CXR6-06 |
+
+The final authoritative CXR6 evidence (run ID, OCE_RUN_ID, artifact, totals,
+category counts, manifest verification, and the full proof matrix) is recorded
+after the authoritative `b4-config-spine-validation` run in the final
+B4-CXR6-EVIDENCE commit (documentation/evidence only).

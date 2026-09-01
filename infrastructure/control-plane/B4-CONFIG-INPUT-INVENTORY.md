@@ -21,9 +21,19 @@ Disposition classes:
 - `INIT_ONLY` — consumed exclusively by the explicit initialization path
   (`configure` / first governed start / CI runner / test stack); runtime read
   paths never materialize from it (B4-CXR3R1).
-- `TEST_ONLY` — reachable ONLY under the authenticated CI/test seam
-  (`OCE_CI_MODE=true`); a production runtime rejects it before any
-  job/workspace/process activity (B4-CXR5R6).
+- `TEST_ONLY` — reachable ONLY through the explicit private dependency
+  object/function seam supplied by test code; an environment string (incl.
+  `OCE_CI_MODE=true`) can NEVER unlock it, and the production CLI and
+  environment construction cannot instantiate it (B4-CXR6R2).
+- `VERIFIED_INTERNAL_CAPABILITY` — carries runtime authority ONLY after
+  cryptographic verification (HMAC-SHA-256 with the dedicated 0600
+  activation-handoff key, role binding, single use, freshness, expiry, and
+  canonical re-derivation). Plain JSON in an ambient environment variable is
+  NEVER authoritative (B4-CXR6R1).
+- `OPERATIONAL_IDENTITY_ONLY` — evidence/run identity only; changing it has
+  ZERO effect on credentials, job source, execution content, workspace,
+  artifact destination, database, network, process launch, or secret
+  authority (B4-CXR6R2).
 - `DEPRECATED_AND_REJECTED` — known to the governed namespace but refused
   outright; the authority it used to carry lives in the approved secret store
   (B4-CXR5R6).
@@ -43,7 +53,8 @@ Disposition classes:
 | `POSTGRES_DSN` | require_runtime_dsn (runtime) | DB connection | — (derived from secret ref) | legacy | accepted ONLY when equal to the governed derivation (internal propagation) | DEPRECATED_AND_REJECTED as a bypass (divergent DSN fails; ambient password cannot self-legitimate, B4-CXR3R1) |
 | `worker_loop --dsn` | worker_loop | DB connection | — (governed derivation) | removed | none | DEPRECATED_AND_REJECTED (CLI argument removed, B4-CXR3R2 — unrecognized args fail at argparse) |
 | `build_durable_app(dsn=...)` | http_api durable wiring | DB connection | — (governed derivation) | removed | none | DEPRECATED_AND_REJECTED (parameter removed, B4-CXR3R2 — TypeError) |
-| `migrate --db` | scripts/migrate.py | DB migration target | — (governed derivation) | required CLI | loopback hosts only | CANONICAL-GUARDED (B4-CXR3R2: --db required, non-loopback host rejected before any connection) |
+| `migrate --db` | scripts/migrate.py | DB migration target | — (governed derivation) | removed | none | DEPRECATED_AND_REJECTED (B4-CXR5R1: the production `--db` interface is REMOVED — a password-bearing DSN can never appear in process argv, /proc/<pid>/cmdline, command capture, or diagnostics; the governed connection is resolved internally from the pinned activation authority) |
+| `migrate --dir` | scripts/migrate.py | SQL source selection | — (repository-owned canonical `migrations/`) | removed | none | DEPRECATED_AND_REJECTED (B4-CXR5R2/CXR6R5: an operator-controlled directory can never select the SQL executed against the governed database — symlink escape, alternate directories, non-regular files, duplicate versions, and unrecognized forms are rejected; only the canonical migration program mutates the governed DB) |
 | `OCE_REDIS_MODE` | spine | transport truth | `redis.mode` | canonical | env | CANONICAL (transport only) |
 | `OCE_WORKERS_EGRESS` | execution_runtime | network policy | `workers.egress` | canonical | env | CANONICAL (deny/loopback only) |
 | `OCE_SANDBOX_STRICT` | execution_runtime | isolation | `sandbox.strict` | canonical | env | CANONICAL (False = rejected) |
@@ -61,11 +72,12 @@ Disposition classes:
 | `OCE_LOG_REDACT_CLI` | CLI | leakage | `logging.redact_cli` | canonical | env | CANONICAL |
 | `.runtime/secrets.json` | local_secrets, spine backend | secret store | — (approved local secret backend) | durable | runtime dir 0600 | INTERNAL_RUNTIME_DERIVED (untracked) |
 | `.runtime/compose.env` | docker compose | secret carrier | — | derived | runtime dir 0600 | INTERNAL_RUNTIME_DERIVED (untracked) |
+| `.runtime/activation_handoff_key` | activation capability MAC | activation-handoff key | — (dedicated authority) | derived | runtime dir 0600 | INTERNAL_RUNTIME_DERIVED (B4-CXR6R1: high-entropy 256-bit key initialized ONCE by `configure`, read-only at runtime; domain-separated from the PostgreSQL password and worker token; never in env/argv/logs/evidence/repository) |
 | `OCE_WORKER_ID` | worker_loop, oce_b3_worker | worker identity | — | verified | env | VERIFIED_COMPATIBILITY_ASSERTION (reconciled against the admitted identity at the challenge/response handshake — a mismatch fails closed before any job activity, B4-CXR5R6) |
 | `OCE_WORKER_TOKEN` | — (none; authority moved to the approved store) | worker auth | — | removed | none | DEPRECATED_AND_REJECTED (B4-CXR5R6: the worker token lives ONLY in `.runtime/secrets.json` via `initialize_worker_token`/`read_worker_token`; ambient presence refused by the governed-namespace check) |
-| `OCE_WORKER_SECRET` | oce_b3_worker | worker auth | — | test seam | env, only under `OCE_CI_MODE=true` | TEST_ONLY (B4-CXR5R6: the approved store `worker_token` is the production authority; an ambient value can never self-authorize) |
+| `OCE_WORKER_SECRET` | oce_b3_worker | worker auth | — | rejected | none | DEPRECATED_AND_REJECTED at the production entrypoint (B4-CXR6R2: the ambient value is NEVER consumed — the approved store `worker_token` is the only worker-credential authority; test injection exists only through the private `TestWorkerDependencies` object seam, never an environment string) |
 | `OCE_CP_URL` | oce_b3_worker | outbound worker target | — (canonical loopback endpoint) | compatibility assertion | env | VERIFIED_COMPATIBILITY_ASSERTION (B4-CXR3R3: gate always runs first; URL must equal canonical `control_plane.host:port` — external hosts, noncanonical ports, credentials, and redirects fail closed before any socket) |
-| `OCE_JOB_FILE` | oce_b3_worker | job source | — | test seam | env, only under `OCE_CI_MODE=true` | TEST_ONLY (B4-CXR5R6: production workers must fetch authoritative job detail from the control plane; a local file is rejected before any job/workspace/process activity and can never replace job type/params/resource envelope/trust zone/required capabilities) |
+| `OCE_JOB_FILE` | oce_b3_worker | job source | — | rejected | none | DEPRECATED_AND_REJECTED at the production entrypoint (B4-CXR6R2: production workers must fetch authoritative job detail from the control plane; a local file is rejected before any job/workspace/process/socket activity and can never replace job type/params/resource envelope/trust zone/required capabilities; test injection exists only through the private `TestWorkerDependencies` object seam) |
 | `OCE_RUN_ID` | CI runner/evidence | run identity | — | operational | env | OPERATIONAL |
 | `OCE_STAGE_LABEL` / `OCE_BLOCK_LABEL` / `OCE_BOOK_LABEL` | CI runner/gate | evidence identity | — | operational | env | OPERATIONAL |
 | `OCE_EVIDENCE_DIR` | CI runner/gate | evidence identity (CI output dir) | — | operational | env | OPERATIONAL (identity only — CI-runner-owned evidence path, no execution/storage authority) |
@@ -73,7 +85,25 @@ Disposition classes:
 | `OCE_RUNTIME_DIR` | oce_worker CLI | persistent worker state | — | constrained | env/CLI | INTERNAL_DERIVED + containment (B4-CXR5R6: canonical default or relative-under-root only; cannot redirect durable authority) |
 | `OCE_EXPECTED_REPO/BRANCH/COMMIT/TREE` | CI runner/gate | identity verification | — | operational | env | OPERATIONAL |
 | `OCE_WS_BASE` / `OCE_ATTEMPT_WS` | oce_b3_worker | workspace/execution destination | — | constrained | env | INTERNAL_DERIVED + containment (B4-CXR5R6: must stay beneath the working root; traversal/symlink-escape/absolute-external/repo-overwrite/secret-store-overlap rejected) |
-| `OCE_CI_MODE` | CI runner | test-mode toggle | — | operational | env | OPERATIONAL |
+| `OCE_CI_MODE` | CI runner | evidence labeling | — | operational identity | env | OPERATIONAL_IDENTITY_ONLY (B4-CXR6R2: carries ZERO credential/job/execution/storage/database/network/process/secret authority — production code never unlocks anything because `OCE_CI_MODE=true` exists) |
+| `OCE_ACTIVATION_ENVELOPE` | child processes (API/worker/migration/outbound worker) | activation lineage | — (verified internal capability) | internal | env (MAC-authenticated carrier) | VERIFIED_INTERNAL_CAPABILITY (B4-CXR6R1: NEVER OPERATIONAL — plain JSON is never authoritative; authority exists only after HMAC-SHA-256 verification with the dedicated 0600 handoff key, role binding, single use, freshness, expiry, and canonical re-derivation; direct ambient injection without a valid protected proof fails before any socket/database/migration/workspace/process activity) |
+
+## CXR6 corrections (supersede the rows above)
+
+- `migrate --db` was previously listed as a required loopback-guarded CLI input;
+  CXR5 removed it and this inventory now records it DEPRECATED_AND_REJECTED.
+- `migrate --dir` is added and DEPRECATED_AND_REJECTED.
+- `OCE_ACTIVATION_ENVELOPE` was previously unlisted while carrying runtime
+  authority; it is now VERIFIED_INTERNAL_CAPABILITY (never OPERATIONAL).
+- `OCE_CI_MODE` was described as operational while it unlocked job/credential
+  behavior; it is now OPERATIONAL_IDENTITY_ONLY with zero runtime authority.
+- `OCE_JOB_FILE` / `OCE_WORKER_SECRET` were described as "test seam under
+  OCE_CI_MODE=true"; they are now DEPRECATED_AND_REJECTED at the production
+  entrypoint, with test injection available ONLY through the private
+  `TestWorkerDependencies` object seam.
+- Claims like "authenticated test seam" and "forged envelope refused" that
+  were stronger than the implementation supported are corrected to the
+  VERIFIED_INTERNAL_CAPABILITY and OPERATIONAL_IDENTITY_ONLY truths above.
 
 ## Governed-namespace rule (B4-R3R1)
 
