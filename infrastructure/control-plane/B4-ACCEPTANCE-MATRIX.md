@@ -84,3 +84,43 @@ never infer completed scope from commit labels alone.*
      across the R3R sequence) before the authoritative CI run.
   5. Final acceptance re-check: source cleanliness, cleanup evidence, cloud
      mutations=0, cost=$0, main=7e7ef722 untouched.
+
+---
+
+## SUPERSEDING LEDGER — B4-CXR3 / B4-R3R8 (authority-escape repair closure)
+
+*Independent review of the B4-R3R closure found the suite green but still
+untrue to the core invariants: a runtime input could modify the authority
+that validates it (secret self-legitimation), and passing the gate did not
+prove the process used that same authorized configuration. The CXR3 repair
+sequence below closes those escape paths. Book 4 is closed after this
+sequence; see `B4-EVIDENCE-RECORD.md`.*
+
+| Repair | Commit | Scope | CXR3 defect | Evidence |
+|---|---|---|---|---|
+| B4-CXR3R1 | `0e44617c` | secret init vs runtime read authority (`initialize_runtime_secret` / `read_runtime_secret` / `derive_runtime_dsn`; no ambient self-legitimation; compose env read-only) | CXR3-01 | lifecycle + spine tests, store-snapshot invariance |
+| B4-CXR3R2 | `c17b7142` | remove runtime DSN injection (worker `--dsn` removed; `build_durable_app` no DSN override; `migrate()` no DSN param; `migrate.py --db` required + loopback-guarded) | CXR3-02 | startup-gate subprocess proofs |
+| B4-CXR3R3 | `1cb9a8d7` | outbound worker CP target canonicalized (`outbound_cp_url` gate-first + verified assertion); `postgres.host` loopback-only enum | CXR3-03 / CXR3-04 | worker-target + DB-host adversarial proofs |
+| B4-CXR3R4 | `c508212c` | ownership enforced in the real resolver: policy/operator(po) settings reject non-default sources | CXR3-05 | full weakening matrix (env/file/cli) |
+| B4-CXR3R5 | `8ff074cd` | capital authority locked to `none` (validate_effective + override guard) | CXR3-06 | capital lock proofs incl. PO |
+| B4-CXR3R6 | `888a6adc` | override-audit truth label (in-process audit NON-AUTHORITATIVE; append-only durable sink seam) | CXR3-07 | audit-truth proofs |
+| B4-CXR3R7 | `07314b43` | unified startup truth (`validate_configuration` vs `validate_runtime_readiness` vs `require_runtime_startable`; doctor readiness) | CXR3-08 | no start=True+secret_ok=False; doctor proofs |
+| B4-CXR3R8 | `780f7ceb` | config-input inventory refresh (VERIFIED_COMPATIBILITY_ASSERTION / INIT_ONLY / DEPRECATED_AND_REJECTED dispositions); doctor custom/revoked ref; aggregate denial side-effect invariance; registry regenerated to 510 | CXR3-09 / CXR3-10 | inventory doc + adversarial closure |
+
+### Authoritative closure (B4-CXR3, verified from junit + gate + artifact)
+
+- **Run:** `33505225957` on `780f7ceb` — `b4-config-spine-validation` **success**
+- **OCE_RUN_ID:** `c4ca8bfc70cb`; **artifact:** `b4-config-spine-evidence-c4ca8bfc70cb` (id `9799398331`)
+- **JUnit:** 510 collected / 510 executed / 510 passed / 0 failed / 0 errors / 0 skipped
+- **Independent gate:** PASS (137 checks); **final package verifier:** PASS
+- **Manifest:** 33/33 entries hash+size verified; **outer ZIP SHA-256:** `dcf290aab6485e34aad3a30b4f4b93f5d54fe5ab330b80602f3ab25e394a9daa`
+- **Source clean before + after; cleanup removed=True (PG volume preserved); cloud mutations 0; cost $0**
+- **Archive:** `~/Desktop/oce-b4-archive/run-33505225957/`
+
+### Previously superseded (preserved, not closure proof)
+
+- Run `33461183563` / `27a21c9a` (B4-CXR2 head) — prior green run, superseded
+  by the CXR3 sequence.
+- Runs `33460848791`..`33504839138` — intermediate CXR3 commits failed the
+  exact-count gate until the registry was regenerated at B4-CXR3R8; each
+  preserved as truthful historical evidence.
