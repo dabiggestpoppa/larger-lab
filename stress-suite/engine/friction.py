@@ -101,6 +101,35 @@ class FrictionContract:
                                  self.consequence_classes, length=24)
 
 
+@dataclass(frozen=True)
+class EpistemicFrictionProtocol:
+    """§9 protocol surface — semi-permeable cognition and staged reveal.
+
+    Bundles a FrictionContract with its trigger/run semantics. Friction is
+    triggered ONLY by a test contract (consequence class, correlation risk,
+    premature convergence), never by disagreement alone, and always within a
+    bounded budget. This is the named surface the module docstring promises.
+    """
+
+    contract: FrictionContract
+
+    def trigger(self, facts: EcologyFacts) -> FrictionTrigger:
+        return friction_trigger(facts, self.contract)
+
+    def run(
+        self,
+        trigger: FrictionTrigger,
+        reviewers: Sequence[ReviewerIndependenceProfile],
+        conclusions_by_exposure: Mapping[str, Mapping[str, str]],
+        incumbent_conclusion: str,
+        cost_per_reconstruction: int = 5,
+    ) -> FrictionResult:
+        return run_friction(
+            trigger, reviewers, conclusions_by_exposure, incumbent_conclusion,
+            trigger.budget, cost_per_reconstruction,
+        )
+
+
 def friction_trigger(facts: EcologyFacts, contract: FrictionContract) -> FrictionTrigger:
     """Test-contract trigger — NOT disagreement-driven. High consequence with
     correlation risk (source/model/retrieval concentration, prior-conclusion
