@@ -46,6 +46,7 @@ CATEGORY_FILES = {
     "outbound-session": "outbound-session-results.json",
     "end-to-end-job": "end-to-end-job-results.json",
     "fabric-pg": "fabric-pg-results.json",
+    "config-spine": "config-spine-results.json",
 }
 
 # module-substring -> category (caught BEFORE the class-based PO/Hermes rules)
@@ -68,6 +69,8 @@ CATEGORY_RULES = [
     ("test_b3_outbound_protocol_service", "outbound-session"),
     ("test_b3_end_to_end_jobs", "end-to-end-job"),
     ("test_b3_worker_fabric_store_integration", "fabric-pg"),
+    ("test_b4_config_spine", "config-spine"),
+    ("test_b4_startup_gate", "config-spine"),
     (".TestPOBoundary::", "po-hermes-boundary"),
     (".TestHermesBoundary::", "po-hermes-boundary"),
 ]
@@ -84,6 +87,7 @@ REQUIRED_ARTIFACTS = [
     "sandbox-resource-results.json", "representative-job-results.json",
     "cli-lifecycle-results.json", "outbound-session-results.json",
     "end-to-end-job-results.json", "fabric-pg-results.json",
+    "config-spine-results.json",
     "source-cleanliness.json", "cleanup-results.json", "independent-gate.json",
     "stage-status.json", "stage-log.txt", "evidence-manifest.json",
     "validation-summary.md",

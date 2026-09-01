@@ -1,0 +1,93 @@
+name: b4-config-spine-validation
+# Dedicated Book 4 Config & Security Spine evidence workflow (B4-R4). This is
+# the ONLY authoritative source of Book 4 config-spine closure evidence. It
+# reuses the shared hardened runner + independent gate (same as B2/B3) but
+# labels every artifact under the Book 4 stage (B4-CONFIG-SPINE-CLOSURE), names
+# its artifact b4-config-spine-evidence-*, and invokes the runner EXACTLY ONCE
+# with its exit code preserved. Book 4 is never reported through Book 2/3
+# identity.
+on:
+  push:
+    branches: [oce-program-build]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: b4-config-spine-validation
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    outputs:
+      oce_run_id: ${{ steps.run_id.outputs.oce_run_id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned Python test dependencies
+        run: pip install -r infrastructure/control-plane/requirements-ci.txt
+
+      - name: Confirm pinned actions/dependencies contract
+        run: |
+          pip show pytest | grep -E '^Version: 9\\.0\\.3$' || { echo 'pytest version not pinned'; exit 1; }
+
+      - name: Generate single OCE_RUN_ID
+        id: run_id
+        run: |
+          OCE_RUN_ID=$(python3 -c "import secrets; print(secrets.token_hex(6))")
+          echo "oce_run_id=$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "=== SINGLE OCE_RUN_ID: $OCE_RUN_ID ==="
+
+      - name: Prepare evidence directory (outside repo, Book 4)
+        id: evidence
+        run: |
+          EVIDENCE_DIR="$RUNNER_TEMP/oce-b4-evidence-${{ steps.run_id.outputs.oce_run_id }}"
+          mkdir -p "$EVIDENCE_DIR"
+          echo "evidence_dir=$EVIDENCE_DIR" >> "$GITHUB_OUTPUT"
+          printf 'workflow=%s\nrepository=%s\nref=%s\nsha=%s\nbook=%s\n' \
+            b4-config-spine-validation "${{ github.repository }}" \
+            "${{ github.ref_name }}" "${{ github.sha }}" Book4 \
+            > "$EVIDENCE_DIR/workflow-provenance.txt"
+
+      - name: Run Book 4 Config Spine validation (exactly once)
+        env:
+          OCE_RUN_ID: ${{ steps.run_id.outputs.oce_run_id }}
+          OCE_EVIDENCE_DIR: ${{ steps.evidence.outputs.evidence_dir }}
+          OCE_CI_MODE: "true"
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          OCE_EXPECTED_COMMIT: ${{ github.sha }}
+          OCE_EXPECTED_BRANCH: oce-program-build
+          OCE_EXPECTED_REPO: dabiggestpoppa/larger-lab
+          OCE_BLOCK_LABEL: B4
+          OCE_STAGE_LABEL: B4-CONFIG-SPINE-CLOSURE
+          OCE_BOOK_LABEL: "Book 4"
+        shell: bash
+        run: |
+          # Shared hardened runner invoked EXACTLY ONCE; exit code preserved
+          # (0=PASS, 1=FAIL, 2=BLOCKED). Performs no cloud mutation.
+          rc=0
+          PYTHONPATH="infrastructure/control-plane/scripts:infrastructure/control-plane/src:infrastructure/control-plane/tests" \
+            python infrastructure/control-plane/scripts/run_b2_validation.py \
+            > /tmp/oce-b4-validation.log 2>&1 || rc=$?
+          cat /tmp/oce-b4-validation.log
+          exit "$rc"
+
+      - name: Upload evidence artifact (PASS, FAIL, and BLOCKED alike)
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
+        with:
+          name: b4-config-spine-evidence-${{ steps.run_id.outputs.oce_run_id }}
+          path: ${{ steps.evidence.outputs.evidence_dir }}
+          retention-days: 30
