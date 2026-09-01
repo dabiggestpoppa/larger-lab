@@ -1,8 +1,8 @@
 {
   "policy_id": "G4_MEMORY_AND_REACTIVATION_POLICY",
-  "version_tag": "V1",
+  "version_tag": "V2",
   "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
-  "authority_basis": "ONE shared, scenario-agnostic memory/reactivation policy drives the entire G4 scenario family (S10-S13). Rules inspect ONLY generic memory dimensions: lifecycle state, memory tier, reopen-condition state, blocker state, evidence freshness, task relevance, dependency centrality, authority status, current epoch, retrieval/context budget. No scenario id, no knowledge literals, no expected outcomes. Dispositions are test-only: reopening means ELIGIBLE FOR RENEWED EVALUATION, never promotion; memory never changes authority, never makes negative knowledge permanent, never promotes CANDIDATE directly to ACTIVE, never rewrites sealed epochs. PROVISIONAL_SCENARIO_TEST_POLICY — never constitutional truth.",
+  "authority_basis": "ONE shared, scenario-agnostic memory/reactivation policy drives the entire G4 scenario family (S10-S13) AND actually governs execution (G4R-01): the runners resolve REOPEN / ACTIVATION / SUPPRESSION dispositions through these rules and record the fired rule in the run trace. Rules inspect ONLY generic memory dimensions: lifecycle state, memory tier, reopen-condition state, blocker state, evidence freshness, task relevance, dependency centrality, authority status, current epoch, retrieval/context budget. No scenario id, no knowledge literals, no expected outcomes. Dispositions are test-only: reopening means ELIGIBLE FOR RENEWED EVALUATION, never promotion; memory never changes authority, never makes negative knowledge permanent, never promotes CANDIDATE directly to ACTIVE, never rewrites sealed epochs. PROVISIONAL_SCENARIO_TEST_POLICY — never constitutional truth.",
   "rules": [
     {"rule_id": "mem.reopen.operator_permanent", "kind": "reopen",
      "when": {"permanent_operator_authority": true},
