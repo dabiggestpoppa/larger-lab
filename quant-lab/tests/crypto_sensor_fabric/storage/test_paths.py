@@ -9,7 +9,7 @@ containment with zero filesystem mutation; OS-independent canonical keys.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, ClassVar
 
 import pytest
 
@@ -345,3 +345,106 @@ class TestPathAdversarial:
         encoded = escape_path_segment(value)
         assert unescape_path_segment(encoded) == value
         assert "/" not in encoded
+
+
+# ---------------------------------------------------------------------------
+# SENSOR-B4-I02R1 — canonical decoding + bijection (defect A)
+# ---------------------------------------------------------------------------
+
+
+class TestCanonicalDecoding:
+    """One native identity gets ONE canonical encoding (I02R1 §3-§5)."""
+
+    def test_plain_safe_chars_decode(self) -> None:
+        assert unescape_path_segment("A") == "A"
+        assert unescape_path_segment("abc_XYZ-123") == "abc_XYZ-123"
+
+    def test_canonical_escapes_decode(self) -> None:
+        assert unescape_path_segment("%2F") == "/"
+        assert unescape_path_segment("%25") == "%"
+        assert unescape_path_segment("%2E") == "."
+        assert unescape_path_segment("%20") == " "
+        assert unescape_path_segment("a%2Fb") == "a/b"
+
+    @pytest.mark.parametrize("over_escaped", ["%41", "%61", "%30", "%5F", "%2D"])
+    def test_over_escaped_safe_char_rejected(self, over_escaped: str) -> None:
+        # A/a/0/_/- must appear literally; escaping them creates a second
+        # canonical encoding for the same native string.
+        with pytest.raises(ValueError):
+            unescape_path_segment(over_escaped)
+
+    def test_over_escaped_inside_segment_rejected(self) -> None:
+        with pytest.raises(ValueError):
+            unescape_path_segment("BTC%2DUSDT")  # "-" must be literal
+
+    def test_lowercase_escape_rejected(self) -> None:
+        with pytest.raises(ValueError):
+            unescape_path_segment("%2f")
+
+    def test_mixed_case_escape_rejected(self) -> None:
+        with pytest.raises(ValueError):
+            unescape_path_segment("%2F%4a")
+
+    def test_truncated_escape_rejected(self) -> None:
+        with pytest.raises(ValueError):
+            unescape_path_segment("%2")
+
+    def test_invalid_hex_rejected(self) -> None:
+        with pytest.raises(ValueError):
+            unescape_path_segment("%GG")
+
+    def test_raw_slash_rejected(self) -> None:
+        with pytest.raises(ValueError):
+            unescape_path_segment("a/b")
+
+    def test_raw_space_rejected(self) -> None:
+        with pytest.raises(ValueError):
+            unescape_path_segment("a b")
+
+    def test_raw_unicode_rejected(self) -> None:
+        with pytest.raises(ValueError):
+            unescape_path_segment("é")
+
+    def test_nul_only_via_canonical_form(self) -> None:
+        assert unescape_path_segment("%00") == "\x00"
+
+
+class TestBijection:
+    """decode(encode(x)) == x AND encode(decode(E)) == E for canonical E."""
+
+    CORPUS: ClassVar[list[str]] = [
+        "A", "a", "0", "_", "-",
+        "BTC/USDT", "BTC-USDT", "btc-usdt", "BTC USDT",
+        "PI_XBTUSD", "1h", "liquidation_volume",
+        "%literal", "50%", "a.b", "a..b",
+        "héllo", "世界", "emoji-🚀", "nul\x00byte",
+        "café", "İstanbul", "ﬁ", "Ⅻ",
+        "", "-", "--", "___",
+    ]
+
+    def test_decode_encode_roundtrip(self) -> None:
+        for value in self.CORPUS:
+            assert unescape_path_segment(escape_path_segment(value)) == value, value
+
+    def test_encode_decode_canonical(self) -> None:
+        for value in self.CORPUS:
+            encoded = escape_path_segment(value)
+            assert escape_path_segment(unescape_path_segment(encoded)) == encoded, value
+
+    def test_no_two_encodings_for_one_identity(self) -> None:
+        # For the single-letter corpus values the over-escaped form (%41/%61/
+        # %30/%5F/%2D) decodes to the same native string — it must be REJECTED
+        # so exactly one canonical encoding survives per identity.
+        pairs = [("A", "%41"), ("a", "%61"), ("0", "%30"), ("_", "%5F"), ("-", "%2D")]
+        for literal, over_escaped in pairs:
+            assert unescape_path_segment(literal) == literal
+            with pytest.raises(ValueError):
+                unescape_path_segment(over_escaped)
+
+    def test_unicode_normalization_still_absent(self) -> None:
+        # NFC and NFD remain DISTINCT identities (no normalization anywhere).
+        nfc = "é"          # U+00E9
+        nfd = "e\u0301"    # e + combining acute
+        assert escape_path_segment(nfc) != escape_path_segment(nfd)
+        assert unescape_path_segment(escape_path_segment(nfc)) == nfc
+        assert unescape_path_segment(escape_path_segment(nfd)) == nfd

@@ -79,12 +79,20 @@ def escape_path_segment(value: str) -> str:
 
 
 def unescape_path_segment(encoded: str) -> str:
-    """Reversible inverse of :func:`escape_path_segment`.
+    """CANONICAL inverse of :func:`escape_path_segment` (I02R1 defect A).
 
-    Only the CANONICAL uppercase ``%HH`` form is accepted: lowercase/mixed
-    percent escapes, raw non-safe characters, malformed ``%`` sequences and
-    non-UTF-8 byte sequences are rejected (accepting variants would create
-    multiple canonical encodings for one native identity).
+    One native identity gets ONE canonical encoding.  A segment is canonical
+    iff ``escape_path_segment(unescape_path_segment(E)) == E``; anything else
+    fails closed.  Concretely rejected:
+
+    - OVER-ESCAPED safe characters: ``%41``/``%61``/``%30``/``%5F``/``%2D``
+      (``A``/``a``/``0``/``_``/``-`` must appear literally, never escaped);
+    - lowercase/mixed-case escapes (``%hh``, ``%Hh``);
+    - truncated ``%`` / invalid hex;
+    - raw non-safe characters (space, ``/``, ``\\``, Unicode, control);
+    - non-UTF-8 byte sequences.
+
+    NUL remains round-trippable only through its canonical ``%00`` form.
     """
     if not isinstance(encoded, str):
         raise TypeError(
@@ -106,7 +114,16 @@ def unescape_path_segment(encoded: str) -> str:
                     f"malformed percent encoding at offset {i} "
                     f"({encoded[i:i + 3]!r}; only canonical uppercase %HH accepted)"
                 )
-            out.append(int(encoded[i + 1 : i + 3], 16))
+            byte = int(encoded[i + 1 : i + 3], 16)
+            if chr(byte) in _SAFE_SEGMENT_CHARS:
+                # I02R1 defect A: a safe character must appear LITERALLY.
+                # %41/%61/%30/%5F/%2D (A/a/0/_/-) are over-escaped and would
+                # give two canonical encodings for one native identity.
+                raise ValueError(
+                    f"over-escaped safe character {encoded[i:i + 3]!r} at offset {i}: "
+                    f"{chr(byte)!r} must appear literally in a canonical segment"
+                )
+            out.append(byte)
             i += 3
         elif char in _SAFE_SEGMENT_CHARS:
             out.append(ord(char))
