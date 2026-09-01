@@ -34,7 +34,9 @@ from .cognitive_ecology import (
     ConsensusRecord,
     DependencyGraph,
     EcologyFacts,
+    ProvenanceConflict,
     ReviewerIndependenceProfile,
+    ReviewerProvenanceRegistry,
     independent_confirmation_satisfied,
 )
 from .ecology_policy import EcologyPolicy, EcologyRule
@@ -76,6 +78,7 @@ class G3ScenarioPack:
     counter_attractor_findings: List[Mapping[str, Any]] = field(default_factory=list)
     independent_replication_count: int = 0
     allocation_provenance: Mapping[str, Any] = field(default_factory=dict)
+    registered_provenance: Optional[List[Mapping[str, Any]]] = None   # G3R-07 governed registry
     expected_disposition: str = ""            # SEALED — stripped before run
     hidden_ground_truth: Optional[dict] = None  # SEALED
 
@@ -108,6 +111,9 @@ def load_g3_pack(pack_dir: Path) -> G3ScenarioPack:
     counter = None
     if spec.get("counter_attractor_ref"):
         counter = json.loads((root / spec["counter_attractor_ref"]).read_text(encoding="utf-8"))
+    registered = None
+    if spec.get("registered_provenance_ref"):
+        registered = json.loads((root / spec["registered_provenance_ref"]).read_text(encoding="utf-8"))
     return G3ScenarioPack(
         scenario_id=str(spec["scenario_id"]),
         scenario_version=str(spec.get("scenario_version", "1.0.0")),
@@ -125,6 +131,7 @@ def load_g3_pack(pack_dir: Path) -> G3ScenarioPack:
         counter_attractor_findings=list((counter or {}).get("findings", [])),
         independent_replication_count=int(spec.get("independent_replication_count", 0)),
         allocation_provenance=dict(spec.get("allocation_provenance", {})),
+        registered_provenance=list(registered) if registered is not None else None,
         expected_disposition=str(spec.get("expected_disposition", "")),
         hidden_ground_truth=spec.get("hidden_ground_truth"),
     )
@@ -146,15 +153,21 @@ def _relations_fingerprint(profiles: Sequence[ReviewerIndependenceProfile]) -> s
 def _friction_relations(fr: Optional[FrictionResult]) -> Tuple[Any, ...]:
     if fr is None:
         return ()
+    # actions are included reviewer-id-free (method + result only) so method
+    # governance is part of behavior identity while reviewer renames stay inert
+    actions = tuple(sorted((a.method, a.result) for a in fr.actions))
     return (fr.triggered, fr.budget_used, tuple(sorted(fr.surfaced_alternatives)),
-            fr.information_gain, fr.evidence_gap, fr.cost_units)
+            fr.information_gain, fr.evidence_gap, fr.cost_units, actions)
 
 
 def _counter_relations(cr: Optional[CounterAttractorReview]) -> Tuple[Any, ...]:
     if cr is None:
         return ()
+    non_admissible = tuple(sorted(
+        f.get("method", "") for f in cr.non_admissible_findings))
     return (cr.terminal_result, cr.discriminating_contradiction_found, cr.budget_used,
-            cr.review_budget, tuple(cr.allowed_methods), tuple(sorted(cr.evidence_produced)))
+            cr.review_budget, tuple(cr.allowed_methods), tuple(sorted(cr.evidence_produced)),
+            non_admissible)
 
 
 def _topology_relations(td: Optional[ReviewTopologyDecision]) -> Tuple[Any, ...]:
@@ -176,14 +189,22 @@ def run_g3_scenario(
     if pack.expected_disposition or pack.hidden_ground_truth is not None:
         raise ValueError("run_g3_scenario refuses sealed fields: pass pack.decision_grade()")
 
-    # ---- build profiles from sealed fixture provenance --------------------- #
-    profiles = [ReviewerIndependenceProfile.from_reviewer_fixture(r) for r in pack.reviewers]
-    if not profiles:
+    # ---- build profiles: CLAIMED fixture fields bound to governed registry --- #
+    # G3R-07: when a governed provenance registry exists, registered truth wins
+    # over self-reported claims; conflicts are recorded. Without a registry file
+    # the fixture itself IS the registered truth (identity binding, no conflicts).
+    registry_src = pack.registered_provenance if pack.registered_provenance is not None \
+        else pack.reviewers
+    registry = ReviewerProvenanceRegistry.from_fixtures(registry_src)
+    claimed = [ReviewerIndependenceProfile.from_reviewer_fixture(r) for r in pack.reviewers]
+    if not claimed:
         raise ValueError("G3 scenario requires at least one reviewer")
+    profiles, provenance_conflicts = registry.bind_all(claimed)
 
     # ---- consensus + facts ------------------------------------------------- #
     graph = DependencyGraph.build(profiles)
     consensus = ConsensusRecord.build(pack.claim_id, profiles, graph)
+    conflict_tuples: Tuple[ProvenanceConflict, ...] = provenance_conflicts
     facts = EcologyFacts.from_consensus(
         consensus,
         consequence_class=pack.consequence_class,
@@ -226,6 +247,8 @@ def run_g3_scenario(
                 cost_units=int(spec.get("cost_units", 0)),
                 latency_units=int(spec.get("latency_units", 0)),
                 fresh_context_count=sum(1 for p in topo_profiles if p.fresh_context),
+                independently_originated_design_count=sum(
+                    1 for p in topo_profiles if p.independently_originated_design),
                 counter_attractor_budget=int(spec.get("counter_attractor_budget", 0)),
                 stop_conditions=tuple(spec.get("stop_conditions", [])),
             ))
@@ -304,6 +327,11 @@ def run_g3_scenario(
         "friction_triggered": bool(friction_result and friction_result.triggered),
         "counter_attractor_rule": counter_rule.rule_id if counter_rule else "",
         "topology_decision": topology_decision.to_dict() if topology_decision else None,
+        "topology_execution_status": (topology_decision.execution_status
+                                       if topology_decision else None),
+        "evidence_obtained_from_executed_topology": bool(
+            topology_decision and topology_decision.evidence_obtained),
+        "provenance_conflicts": [c.to_dict() for c in conflict_tuples],
         "friction_result": friction_result.to_dict() if friction_result else None,
         "counter_attractor_result": counter_result.to_dict() if counter_result else None,
         "health_record": health.to_dict(),

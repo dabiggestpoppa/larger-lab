@@ -33,6 +33,8 @@ from .scenariolib import ScenarioPack, load_scenario_pack, load_all_packs, SCENA
 from .cognitive_ecology import (
     ReviewerIndependenceProfile, DependencyGraph, ConsensusRecord, EcologyFacts,
     CognitiveEcologyHealthRecord, CorrelatedFailureRecord, AllocationProvenance,
+    RegisteredReviewerProvenance, ProvenanceConflict, ReviewerProvenanceRegistry,
+    SAME, DIFFERENT,
     independent_confirmation_satisfied, receipt_lineage, EXPOSURE_MODES, PAIRWISE_AXES,
 )
 from .ecology_policy import EcologyPolicy, EcologyRule, EcologyPolicyError
@@ -42,7 +44,7 @@ from .review_topology import (
 )
 from .friction import (
     EpistemicFrictionProtocol, FrictionContract, FrictionResult, FrictionTrigger,
-    CounterAttractorReview, CounterAttractorSpec,
+    FrictionAction, CounterAttractorReview, CounterAttractorSpec,
 )
 from .g3_runner import G3ScenarioPack, G3RunResult, load_g3_pack, run_g3_scenario, evaluate_g3_expectation
 
@@ -64,12 +66,14 @@ __all__ = [
     "StressScenarioSpec", "spec_to_replay_events", "load_spec",
     "ReviewerIndependenceProfile", "DependencyGraph", "ConsensusRecord", "EcologyFacts",
     "CognitiveEcologyHealthRecord", "CorrelatedFailureRecord", "AllocationProvenance",
+    "RegisteredReviewerProvenance", "ProvenanceConflict", "ReviewerProvenanceRegistry",
+    "SAME", "DIFFERENT",
     "independent_confirmation_satisfied", "receipt_lineage", "EXPOSURE_MODES", "PAIRWISE_AXES",
     "EcologyPolicy", "EcologyRule", "EcologyPolicyError",
     "ReviewTopology", "ReviewTopologyDecision", "TopologyConstraintContract",
     "route_review_topology",
     "EpistemicFrictionProtocol", "FrictionContract", "FrictionResult", "FrictionTrigger",
-    "CounterAttractorReview", "CounterAttractorSpec",
+    "FrictionAction", "CounterAttractorReview", "CounterAttractorSpec",
     "G3ScenarioPack", "G3RunResult", "load_g3_pack", "run_g3_scenario",
     "evaluate_g3_expectation",
 ]
