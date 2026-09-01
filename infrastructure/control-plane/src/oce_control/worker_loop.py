@@ -14,17 +14,11 @@ import argparse
 import os
 import time
 
-def _default_dsn() -> str:
-    """Fail-closed DSN: never a predictable default (B2-R7)."""
-    from .config_startup import governed_runtime_dsn
-    return governed_runtime_dsn()
-
 
 def main(argv=None) -> None:
     parser = argparse.ArgumentParser(description="OCE B2 runtime worker")
     parser.add_argument("--worker-id", default=os.environ.get("OCE_WORKER_ID", "worker-local01"))
     parser.add_argument("--token", default=os.environ.get("OCE_WORKER_TOKEN"))
-    parser.add_argument("--dsn", default=_default_dsn())
     parser.add_argument("--interval", type=float, default=3.0)
     parser.add_argument("--lease-ttl", type=int, default=60)
     parser.add_argument("--capabilities", default="*")
@@ -35,7 +29,16 @@ def main(argv=None) -> None:
     # bypass Book 4 by launching this module directly — no worker session
     # starts under a malformed / incomplete / forbidden effective config, and
     # no worker connects to PostgreSQL through an unbacked secret reference.
-    from .config_startup import require_startable, require_secret_resolvable
+    #
+    # B4-CXR3R2: there is NO public --dsn argument. The database target is
+    # always derived from the governed secret boundary (EffectiveConfig ->>
+    # postgres.password_ref -> approved store -> ephemeral DSN); an arbitrary
+    # DSN can never redirect this worker's connection elsewhere.
+    from .config_startup import (
+        governed_runtime_dsn,
+        require_secret_resolvable,
+        require_startable,
+    )
     require_startable()
     require_secret_resolvable()
     if not args.token:
@@ -45,7 +48,7 @@ def main(argv=None) -> None:
     from .pg_store import PgJobStore
     from .pg_worker import PgWorkerProtocol
 
-    conn = psycopg2.connect(args.dsn)
+    conn = psycopg2.connect(governed_runtime_dsn())
     conn.autocommit = False
     store = PgJobStore(conn)
     worker = PgWorkerProtocol(store, conn)

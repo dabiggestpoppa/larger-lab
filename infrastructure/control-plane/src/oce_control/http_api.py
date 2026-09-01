@@ -325,12 +325,17 @@ def runtime_scheduler_interval(environ: Optional[dict] = None) -> int:
     return int(require_startable(environ).get("control_plane.scheduler_interval"))
 
 
-def build_durable_app(*, dsn: Optional[str] = None, scheduler_tick_interval: int = 5) -> FastAPI:
+def build_durable_app(*, scheduler_tick_interval: int = 5) -> FastAPI:
     """Wire the durable components (PG store, PG scheduler, PG worker
     protocol, health) into the API and return a ready FastAPI app.
 
     Operator grants are issued deterministically at startup and printed;
     the console uses the `read` grant id.
+
+    B4-CXR3R2: there is NO public DSN override. The durable database path
+    always derives from the governed secret boundary (EffectiveConfig ->>
+    postgres.password_ref -> approved store -> ephemeral DSN); an arbitrary
+    DSN can never activate this API against a different database.
     """
     import psycopg2
     from .authority import AuthorityEngine
@@ -339,14 +344,13 @@ def build_durable_app(*, dsn: Optional[str] = None, scheduler_tick_interval: int
     from .pg_worker import PgWorkerProtocol
     from .health import HealthService
 
-    # B4-R3R4: the durable database path derives from the governed secret
-    # boundary (postgres.password_ref -> approved store -> ephemeral DSN). An
-    # ambient POSTGRES_DSN/POSTGRES_PASSWORD can no longer redirect the
+    # B4-R3R4/CXR3R2: the durable database path derives from the governed
+    # secret boundary (postgres.password_ref -> approved store -> ephemeral
+    # DSN). Ambient POSTGRES_DSN/POSTGRES_PASSWORD can no longer redirect the
     # connection away from the spine-validated secret.
     from .config_startup import governed_runtime_dsn, require_secret_resolvable
-    if dsn is None:
-        require_secret_resolvable()
-        dsn = governed_runtime_dsn()
+    require_secret_resolvable()
+    dsn = governed_runtime_dsn()
     conn = psycopg2.connect(dsn)
     conn.autocommit = False
 

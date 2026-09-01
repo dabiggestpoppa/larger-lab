@@ -379,6 +379,71 @@ class TestR3R2RuntimeBind:
 
 
 # --------------------------------------------------------------------------- #
+# B4-CXR3R2 — no arbitrary runtime DSN injection: worker --dsn removed,
+# build_durable_app has no DSN override, migrations cannot redirect outside
+# the governed loopback database.
+# --------------------------------------------------------------------------- #
+class TestCXR3R2DsnEscapeRemoved:
+    def _env(self) -> dict:
+        env = dict(os.environ)
+        from pathlib import Path as _P
+        env["PYTHONPATH"] = str(_P(__file__).resolve().parent.parent / "src") \
+            + os.pathsep + env.get("PYTHONPATH", "")
+        return env
+
+    def test_worker_loop_has_no_dsn_argument(self):
+        # D: `python -m oce_control.worker_loop --dsn <external>` must fail at
+        # the CLI (unrecognized argument) — no gate, no DB connection possible.
+        import subprocess
+        import sys
+        r = subprocess.run(
+            [sys.executable, "-m", "oce_control.worker_loop",
+             "--dsn", "postgresql://u:p@10.0.0.9:5432/other", "--token", "t"],
+            env=self._env(), capture_output=True, text=True, timeout=60)
+        assert r.returncode != 0
+        assert "unrecognized arguments" in (r.stderr + r.stdout).lower()
+        assert "connect" not in r.stderr.lower()  # never reached a connection
+
+    def test_build_durable_app_accepts_no_dsn_override(self):
+        # E: the durable API cannot activate against an arbitrary DSN
+        from oce_control.http_api import build_durable_app
+        with pytest.raises(TypeError):
+            build_durable_app(dsn="postgresql://u:p@10.0.0.9:5432/other")  # type: ignore
+
+    def test_lifecycle_migrate_accepts_no_dsn_override(self):
+        # F(part 1): the lifecycle migrate() has no public DSN parameter
+        from oce_control import local_lifecycle as ll
+        with pytest.raises(TypeError):
+            ll.migrate(dsn="postgresql://u:p@10.0.0.9:5432/other")  # type: ignore
+
+    def test_migrate_cli_rejects_external_db(self):
+        # F(part 2): migrate.py --db external is rejected BEFORE connecting
+        import subprocess
+        import sys
+        from pathlib import Path as _P
+        script = str(_P(__file__).resolve().parent.parent / "scripts" / "migrate.py")
+        r = subprocess.run(
+            [sys.executable, script, "up",
+             "--db", "postgresql://u:p@10.0.0.9:5432/other"],
+            env=self._env(), capture_output=True, text=True, timeout=60)
+        assert r.returncode == 2
+        assert "loopback" in (r.stderr + r.stdout).lower()
+        assert "10.0.0.9" not in r.stdout  # target never echoed
+
+    def test_migrate_cli_requires_db(self):
+        # no predictable default DSN: --db is mandatory
+        import subprocess
+        import sys
+        from pathlib import Path as _P
+        script = str(_P(__file__).resolve().parent.parent / "scripts" / "migrate.py")
+        r = subprocess.run([sys.executable, script, "up"],
+                           env=self._env(), capture_output=True, text=True,
+                           timeout=60)
+        assert r.returncode == 2
+        assert "--db" in r.stderr
+
+
+# --------------------------------------------------------------------------- #
 # B4-R3R1 — governed OCE_* namespace (fail closed on unknown/typoed)
 # --------------------------------------------------------------------------- #
 class TestGovernedNamespace:

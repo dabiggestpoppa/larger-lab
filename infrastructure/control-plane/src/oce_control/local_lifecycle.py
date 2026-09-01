@@ -318,10 +318,16 @@ def wait_ready(timeout_s: int = 120) -> bool:
     return False
 
 
-def migrate(dsn: str | None = None) -> subprocess.CompletedProcess:
+def migrate() -> subprocess.CompletedProcess:
+    """Apply migrations against the GOVERNED database (B4-CXR3R2).
+
+    No public DSN parameter: the migration target is always derived from the
+    governed secret boundary (ls.postgres_dsn() — read-only, fail closed).
+    An arbitrary DSN can never redirect migrations to another database.
+    """
     env = ls.compose_environment()
     cmd = [PYTHON, str(BASE_DIR / "scripts" / "migrate.py"), "up", "--db",
-           dsn or ls.postgres_dsn()]
+           ls.postgres_dsn()]
     return subprocess.run(cmd, cwd=str(BASE_DIR), env=env, capture_output=True,
                           text=True, timeout=300)
 

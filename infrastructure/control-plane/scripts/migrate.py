@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""OCE Control Plane migration runner (B2-R2).
+"""OCE Control Plane migration runner (B2-R2 / B4-CXR3R2).
 
 Numbered, reversible migrations against PostgreSQL. Fail-closed on:
 missing migration, out-of-order version, checksum mismatch, partial apply.
 
+B4-CXR3R2: ``--db`` is REQUIRED and must target the governed loopback
+PostgreSQL (127.0.0.1/localhost only). There is no predictable default
+DSN and migrations can never be redirected to an external database.
+
 Usage:
-  migrate.py up     [--db DSN] [--dir DIR]
-  migrate.py down   [--db DSN] [--dir DIR]   # rollback latest applied
-  migrate.py status [--db DSN] [--dir DIR]
+  migrate.py up     --db DSN [--dir DIR]
+  migrate.py down   --db DSN [--dir DIR]   # rollback latest applied
+  migrate.py status --db DSN [--dir DIR]
 """
 from __future__ import annotations
 import argparse
@@ -21,8 +25,10 @@ try:
 except ImportError:  # pragma: no cover
     psycopg2 = None  # type: ignore[assignment]
 
-DEFAULT_DSN = "postgresql://oce_local_admin@localhost:5432/oce_local"
 MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "migrations"
+# B4-CXR3R2: migrations must target the governed loopback PostgreSQL only.
+# There is deliberately no predictable default DSN and no external-DB escape.
+LOOPBACK_HOSTS = ("127.0.0.1", "localhost")
 VERSION_RE = re.compile(r"^(\d{4})_.+\.sql$")
 
 
@@ -165,12 +171,29 @@ def cmd_status(dsn: str, directory: Path) -> int:
         conn.close()
 
 
+def _dsn_host(dsn: str) -> str:
+    """Extract the host from a postgresql:// DSN (userinfo ignored)."""
+    rest = dsn.split("://", 1)[1] if "://" in dsn else dsn
+    rest = rest.split("/", 1)[0]          # drop the database path
+    hostport = rest.rsplit("@", 1)[-1]    # drop userinfo (last @ wins)
+    return hostport.rsplit(":", 1)[0] if ":" in hostport else hostport
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="OCE control-plane migrations")
     parser.add_argument("command", choices=["up", "down", "status"])
-    parser.add_argument("--db", default=DEFAULT_DSN, help="PostgreSQL DSN")
+    parser.add_argument("--db", required=True,
+                        help="PostgreSQL DSN (governed, loopback-only)")
     parser.add_argument("--dir", type=Path, default=MIGRATIONS_DIR)
     args = parser.parse_args()
+    # B4-CXR3R2: fail closed before ANY connection when --db targets a
+    # non-loopback host — migrations can never be redirected outside the
+    # governed local database.
+    if _dsn_host(args.db) not in LOOPBACK_HOSTS:
+        print("FAIL: --db must target the governed loopback PostgreSQL "
+              "(127.0.0.1/localhost only); external DB redirection is "
+              "rejected (B4-CXR3R2)", file=sys.stderr)
+        return 2
     if args.command == "up":
         return cmd_up(args.db, args.dir)
     if args.command == "down":
