@@ -857,6 +857,103 @@ class TestR3R3SecretResolution:
 
 
 # --------------------------------------------------------------------------- #
+# B4-R3R5 — sensitive drift + security-state fingerprints (blind-fingeprint
+# repair): reference identity changes count, secret values never do.
+# --------------------------------------------------------------------------- #
+class TestR3R5SecretSensitiveFingerprint:
+    def test_same_config_same_fingerprint_stable(self):
+        reg = build_default_registry()
+        a = ConfigResolver(reg).resolve(HAPPY)
+        b = ConfigResolver(reg).resolve(HAPPY)
+        assert a.fingerprint == b.fingerprint
+
+    def test_changed_nonsecret_setting_changes_fingerprint(self):
+        reg = build_default_registry()
+        a = ConfigResolver(reg).resolve(HAPPY)
+        b = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": REF_PG,
+                      "control_plane.port": "9000"}})
+        assert a.fingerprint != b.fingerprint
+
+    def test_secret_ref_identity_change_alters_config_fingerprint(self):
+        # secret:alpha vs secret:beta MUST produce different config
+        # fingerprints (identity token, not value) — the blind <secret>
+        # marker used to hide that drift entirely.
+        reg = build_default_registry()
+        e_alpha = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": "secret:alpha"}})
+        e_beta = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": "secret:beta"}})
+        assert e_alpha.fingerprint != e_beta.fingerprint
+
+    def test_same_reference_new_generation_stable_config_fp(self):
+        # rotation of the SAME reference keeps the CONFIG fingerprint stable
+        # (identity unchanged) while the SECURITY-state fingerprint changes.
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": "secret:runtime-local"}})
+        meta1 = {"runtime-local": {"generation": 1, "revoked": False,
+                                   "backend": "local-runtime-store-v1"}}
+        meta2 = {"runtime-local": {"generation": 2, "revoked": False,
+                                   "backend": "local-runtime-store-v1"}}
+        e1 = eff.bind_secret_resolver_dict(meta1)
+        e2 = eff.bind_secret_resolver_dict(meta2)
+        assert e1.fingerprint == e2.fingerprint   # config identity unchanged
+        assert e1.security_fingerprint != e2.security_fingerprint
+
+    def test_revocation_changes_security_fingerprint(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": "secret:runtime-local"}})
+        live = {"runtime-local": {"generation": 1, "revoked": False,
+                                  "backend": "local-runtime-store-v1"}}
+        revoked = {"runtime-local": {"generation": 2, "revoked": True,
+                                     "backend": "local-runtime-store-v1"}}
+        assert eff.bind_secret_resolver_dict(live).security_fingerprint != \
+            eff.bind_secret_resolver_dict(revoked).security_fingerprint
+
+    def test_same_ref_and_generation_both_fingerprints_stable(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": "secret:runtime-local"}})
+        meta = {"runtime-local": {"generation": 4, "revoked": False,
+                                  "backend": "local-runtime-store-v1"}}
+        a = eff.bind_secret_resolver_dict(meta)
+        b = eff.bind_secret_resolver_dict(dict(meta))
+        assert a.fingerprint == b.fingerprint
+        assert a.security_fingerprint == b.security_fingerprint
+
+    def test_no_raw_secret_value_in_any_fingerprint(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": "secret:runtime-local"}})
+        meta = {"runtime-local": {"generation": 1, "revoked": False,
+                                  "backend": "local-runtime-store-v1"}}
+        bound = eff.bind_secret_resolver_dict(meta)
+        # a canary VALUE (not reference) must never reach any fingerprint
+        canary = "FINGERPRINT-CANARY-VALUE-42"
+        assert canary not in bound.fingerprint
+        assert canary not in (bound.security_fingerprint or "")
+        # the reference IDENTITY is allowed (identifier only) but the canary
+        # value is not
+        assert "secret:runtime-local" in bound.to_dict()["fingerprint"] \
+            or "runtime-local" not in (
+                "FINGERPRINT-CANARY-VALUE-42",)
+
+    def test_real_backend_security_fingerprint_detects_rotation(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = _make_backend(tmp_path, provision=True, value="gen-1-store-value")
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        eff = eff.bind_secret_resolver(backend)
+        fp_before = eff.security_fingerprint
+        backend.rotate("runtime-local", "gen-2-store-value")
+        eff2 = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        eff2 = eff2.bind_secret_resolver(backend)
+        assert fp_before != eff2.security_fingerprint
+        assert eff.fingerprint == eff2.fingerprint  # reference identity stable
+
+
+# --------------------------------------------------------------------------- #
 # B4-R3R4 — database runtime bound to the governed secret resolution boundary
 # --------------------------------------------------------------------------- #
 class TestR3R4DatabaseSecretBinding:

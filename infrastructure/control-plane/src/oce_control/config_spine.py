@@ -412,8 +412,32 @@ class EffectiveConfig:
         self._secret_resolver = None
 
     def bind_secret_resolver(self, resolver) -> "EffectiveConfig":
-        self._secret_resolver = resolver
-        return self
+        """Return a COPY with the secret resolver bound (immutable bind)."""
+        clone = EffectiveConfig(self._registry, dict(self._resolved),
+                                dict(self._provenance), self._fingerprint)
+        clone._secret_resolver = resolver
+        return clone
+
+    @property
+    def security_fingerprint(self) -> str | None:
+        """Security-state fingerprint from the bound secret backend.
+
+        Detects secret rotation / revocation / backend change through safe
+        metadata ONLY (reference identity, generation, revoked, backend).
+        None when no resolver is bound. Never hashes or exposes values.
+        """
+        if self._secret_resolver is None:
+            return None
+        meta = getattr(self._secret_resolver, "security_metadata", None)
+        if meta is None:
+            return None
+        return security_state_fingerprint(meta())
+
+    def bind_secret_resolver_dict(self, metadata: dict) -> "EffectiveConfig":
+        """Bind a plain safe-metadata record (for stateless tests)."""
+        from types import SimpleNamespace
+        return self.bind_secret_resolver(SimpleNamespace(
+            security_metadata=lambda: dict(metadata)))
 
     def get(self, name: str, default=_NO_DEFAULT):
         if name not in self._resolved:
@@ -545,21 +569,61 @@ class ConfigResolver:
         return effective
 
 
-def fingerprint_config(registry: SettingsRegistry, resolved: dict) -> str:
-    """Deterministic drift fingerprint over NON-SECRET effective settings.
+def _secret_identity_fragment(name: str, value: object) -> str:
+    """Map a sensitive resolved value to a SAFE identity fragment for the
+    config fingerprint.
 
-    Sensitive keys are blinded so no secret value leaks into the fingerprint
-    while still detecting *change* in sensitive settings (the presence of a
-    change alters the fingerprint without revealing the value).
+    Secret references (``secret:name``) contribute their REFERENCE STRING —
+    an identifier, never the secret value — so ``secret:alpha`` vs
+    ``secret:beta`` produce different config fingerprints without disclosing
+    anything. Non-reference sensitive values are blinded to a fixed marker so
+    the value itself never enters the fingerprint.
+    """
+    if isinstance(value, str) and SECRET_REF_RE.match(value):
+        return f"{name}={value}"
+    return f"{name}=<secret>"
+
+
+def fingerprint_config(registry: SettingsRegistry, resolved: dict) -> str:
+    """Deterministic CONFIG-IDENTITY fingerprint over effective settings.
+
+    * Non-sensitive settings contribute their exact value.
+    * Sensitive settings contribute a SAFE identity fragment: the reference
+      name when the value is a secret reference, else a blinded marker.
+
+    This detects a change of secret-reference identity (secret:alpha vs
+    secret:beta → different fingerprint) WITHOUT ever hashing or storing the
+    secret value, the DSN, or anything recoverable. Security-state changes
+    (rotation/revocation of the same reference) are tracked by
+    security_state_fingerprint() instead.
     """
     h = hashlib.sha256()
     for name in sorted(resolved):
         setting = registry.get(name)
         sensitive = setting.sensitive if setting else is_sensitive(name)
         if sensitive:
-            h.update(f"{name}=<secret>".encode("utf-8"))
+            h.update(_secret_identity_fragment(name, resolved[name])
+                     .encode("utf-8"))
         else:
             h.update(f"{name}={resolved[name]}".encode("utf-8"))
+    return h.hexdigest()
+
+
+def security_state_fingerprint(metadata: dict | None) -> str:
+    """Deterministic SECURITY-STATE fingerprint over secret metadata.
+
+    Input is the safe metadata record produced by the approved secret
+    backend: reference identity, generation, revocation state, backend id.
+    Rotating or revoking a reference CHANGES this fingerprint while the
+    config-identity fingerprint stays stable; no secret value or digest is
+    ever hashed.
+    """
+    h = hashlib.sha256()
+    for name in sorted((metadata or {}).keys()):
+        rec = (metadata or {}).get(name) or {}
+        h.update(f"{name}|gen={rec.get('generation')}|"
+                 f"revoked={bool(rec.get('revoked'))}|"
+                 f"backend={rec.get('backend', '')}".encode("utf-8"))
     return h.hexdigest()
 
 
