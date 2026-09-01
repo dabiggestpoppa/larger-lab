@@ -69,11 +69,14 @@ context.  No historical coverage is fabricated beyond I14.
 - `contract_stats` request **`from` = epoch SECONDS**; provider `interval` is a
   STRING bucket (`"1h"`) — never integer seconds; NO `to` is invented.
 - `contract_stats` response row **`time` = native epoch SECONDS** (current
-  contract, live-verified I10R1 with exact hourly bucket alignment).  The
-  I05-era probe sample (2022) recorded epoch MILLISECONDS — a provider
-  semantic transition adjudicated in `BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json`;
-  old-millisecond rows are NOT magnitude-rescued (convenience datetime is
-  un-derivable and the smoke temporal guard flags them).
+  contract, live-verified I10/I10R1 with exact hourly bucket alignment).  The
+  I05-era probe sample (2022) carried epoch MILLISECONDS but is a
+  SYNTHETIC_SCHEMA_FIXTURE, NOT a real provider observation — the historical
+  real provider unit is UNIDENTIFIED (final adjudication
+  `A_PRIOR_CHARACTERIZATION_ERROR_WITH_UNIDENTIFIED_HISTORICAL_UNIT`, see
+  `BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json`).  No provider drift is claimed;
+  out-of-validity (e.g. 13-digit) rows are NOT magnitude-rescued (convenience
+  datetime is un-derivable and the smoke temporal guard flags them).
 - `funding_rate` request **`from` / `to` = epoch SECONDS**; response row
   **`t` = epoch SECONDS**; `r` is a provider-native decimal string.
 - Request-unit and response-unit semantics are DIFFERENT and kept distinct; a
@@ -98,19 +101,24 @@ No invented pagination.  `contract_stats` traversal is the evidence-backed
 single `from` / `interval` / `limit` window; `funding_rate` is a bounded `from`
 / `to` window.  Multi-window traversal / resume mechanics are **UNRESOLVED**
 (no invented `from + interval` advancement, no cursor).  Each buffer returns a
-single request window (`is_complete=True`, no resume token) and the limitation
-is recorded in the implementation evidence.  Funding likewise returns a bounded
-window.
+single request window (`is_complete=False`, `next_resume_token=None`) and the
+limitation is recorded in the implementation evidence — runtime completion
+matches the frozen I09 matrix authority (`LIMITED`/`LIMITED`).  A nonempty page
+carries `PARTIAL_INTERVAL` when rows intersect the requested window and
+`GAP_DETECTED` when entirely outside; an empty page is `EMPTY_VALID`.  Funding
+likewise returns a bounded window with the same LIMITED completion.
 
 ## Known Issues
 
 - Deeper contract_stats windowed traversal resume semantics are UNRESOLVED
-  from committed evidence (single-request window only).
+  from committed evidence (single-request window only; `is_complete=False`).
+- funding_rate from/to coverage is not proven exhaustive; completion stays
+  LIMITED (`is_complete=False`) per the frozen I09 matrix authority.
 - Exact interval-close vs publication timestamp semantics are not evidenced.
 - ~180-day rolling retention caps request depth (typed
   `HistoricalRangeUnavailable`); the I14 verified range remains the authority.
-- No network validation occurred in I06 (offline only; network smoke reserved
-  for SENSOR-B3-I14).
+- Live network validation: I10/I10R1 network smoke + I10R2 semantic seal
+  (SENSOR-B3-I10 / I10R1 / I10R2 evidence in `evidence/bloc_03/`).
 
 ## Fixtures
 
@@ -139,7 +147,7 @@ req = FetchRequest(
     end_time=...,
     request_id="r1",
     purpose=FetchPurpose.BACKFILL,
-    adapter_semantic_version="gate-adapter-v1",
+    adapter_semantic_version="gate-adapter-v2",
 )
 batch = adapter.fetch_open_interest(req)   # or dispatch_fetch(adapter, req)
 ```

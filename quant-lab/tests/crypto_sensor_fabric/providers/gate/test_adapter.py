@@ -6,8 +6,8 @@ Covers the provider-specific minimum at the REAL `GateAdapter` boundary:
 - MECHANICAL_TRADE / MECHANICAL_BOOK_SNAPSHOT stay typed `CapabilityUnavailable`
 - four promoted paths fetch happy fixtures end-to-end (all SECONDARY)
 - request/response timestamp units stay distinct (contract_stats `time` epoch
-  SECONDS current contract — I05-era sample was ms (I10R1 transition); funding
-  `t` / from-to seconds)
+  SECONDS current contract — I05-era ms sample was synthetic (prior
+  characterization error, I10R2); funding `t` / from-to seconds)
 - EMPTY_VALID distinct from unsupported / retention
 - 180-day retention maps to `HistoricalRangeUnavailable` (never EMPTY_VALID)
 - raw payload hash deterministic; SchemaDrift carries RawPayloadEnvelope
@@ -188,7 +188,11 @@ class TestHappyFetchPerPromotedSensor:
             assert batch.sensor_family is sensor
             assert batch.native_instrument_id == "BTC_USDT"
             assert batch.row_count >= 1
-            assert batch.is_complete is True
+            # Completion is LIMITED for every Gate path (frozen I09 matrix
+            # authority): runtime never manufactures is_complete=True and never
+            # invents a resume token (SENSOR-B3-I10R2).
+            assert batch.is_complete is False
+            assert batch.next_resume_token is None
             assert batch.http_status == 200
             assert batch.raw_payloads, f"{sensor.value} must preserve raw evidence"
             ref = batch.raw_payloads[0].evidence_ref
@@ -429,6 +433,82 @@ class TestNoForbiddenRawPaths:
         builder = GateRequestBuilder()
         url, _ = builder.build(request(SensorFamily.MECHANICAL_FUNDING))
         assert "funding_rates" not in url  # only single GET /funding_rate
+
+
+class TestLimitedCompletion:
+    """Gate completion truth (SENSOR-B3-I10R2): runtime matches the frozen
+    I09 LIMITED/LIMITED authority.
+
+    is_complete is ALWAYS False (never manufactured), next_resume_token is
+    always None, and nonempty pages carry truthful overlap flags —
+    PARTIAL_INTERVAL when rows intersect [start, end), GAP_DETECTED when
+    entirely outside, EMPTY_VALID on empty (mirrors the OKX/Deribit pattern).
+    """
+
+    #: Fixture rows sit at 2025-08-12T12:00:00Z and 13:00:00Z (1755000000 /
+    #: 1755003600 epoch seconds).
+    _WINDOW_START = datetime(2025, 8, 12, 11, 0, tzinfo=UTC)
+    _WINDOW_END = datetime(2025, 8, 12, 14, 0, tzinfo=UTC)
+
+    def test_contract_stats_overlap_is_partial_interval(self) -> None:
+        adapter = _adapter(routes={"/contract_stats": HAPPY_ROUTES["/contract_stats"]})
+        batch = adapter.fetch_open_interest(
+            request(
+                SensorFamily.MECHANICAL_OPEN_INTEREST,
+                start=self._WINDOW_START,
+                end=self._WINDOW_END,
+            )
+        )
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+        assert batch.row_count == 2
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+    def test_contract_stats_rows_outside_request_is_gap_detected(self) -> None:
+        # Default request window 2026-01-01T00:00..01:00; fixture rows are
+        # 2025-08-12 — entirely outside the requested window.
+        adapter = _adapter(routes={"/contract_stats": HAPPY_ROUTES["/contract_stats"]})
+        batch = adapter.fetch_open_interest(request(SensorFamily.MECHANICAL_OPEN_INTEREST))
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+        assert batch.row_count == 2
+        assert QualityFlagAcquisition.GAP_DETECTED in batch.quality_flags
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL not in batch.quality_flags
+
+    def test_contract_stats_empty_is_empty_valid_not_complete(self) -> None:
+        adapter = _adapter(
+            routes={"/contract_stats": FX.CONTRACT_STATS_SCENARIOS["open_interest"]["empty"]}
+        )
+        batch = adapter.fetch_open_interest(request(SensorFamily.MECHANICAL_OPEN_INTEREST))
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+        assert batch.row_count == 0
+        assert QualityFlagAcquisition.EMPTY_VALID in batch.quality_flags
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL not in batch.quality_flags
+        assert QualityFlagAcquisition.GAP_DETECTED not in batch.quality_flags
+
+    def test_funding_overlap_is_partial_interval_not_complete(self) -> None:
+        adapter = _adapter(routes={"/funding_rate": FX.FUNDING_SCENARIOS["happy"]})
+        batch = adapter.fetch_funding(
+            request(
+                SensorFamily.MECHANICAL_FUNDING,
+                start=self._WINDOW_START,
+                end=self._WINDOW_END,
+            )
+        )
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+        assert batch.row_count == 1
+        assert QualityFlagAcquisition.PARTIAL_INTERVAL in batch.quality_flags
+
+    def test_funding_empty_is_empty_valid_not_complete(self) -> None:
+        adapter = _adapter(routes={"/funding_rate": FX.FUNDING_SCENARIOS["empty"]})
+        batch = adapter.fetch_funding(request(SensorFamily.MECHANICAL_FUNDING))
+        assert batch.is_complete is False
+        assert batch.next_resume_token is None
+        assert batch.row_count == 0
+        assert QualityFlagAcquisition.EMPTY_VALID in batch.quality_flags
 
 
 class TestProductionCandidateConformance:

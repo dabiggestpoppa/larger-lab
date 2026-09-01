@@ -8,8 +8,9 @@ corrected live_probe_contracts.yaml):
   dicts carrying one physical `dict{last_funding_rate, long_liq_*, short_liq_*,
   lsr_*, mark_price, open_interest, open_interest_usd, time, top_*}` row.  The
   union allows int/float NUMERIC SEMANTIC FAMILY variation; `time` is strict
-  int native epoch SECONDS (current contract — the I05-era sample was epoch ms,
-  a provider transition adjudicated in BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json).
+  int native epoch SECONDS (current contract — the I05-era ms sample was a
+  SYNTHETIC fixture; final adjudication A_PRIOR_CHARACTERIZATION_ERROR, see
+  BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json).
 - funding_rate: a TOP-LEVEL LIST of `dict{r: str, t: int}` (t = epoch SECONDS).
 
 Retention (older `from`) returns `dict{label, message}` with
@@ -26,9 +27,10 @@ FIXTURE_LABEL = "SYNTHETIC_SCHEMA_FIXTURE"
 
 #: One canonical physical contract_stats row matching the union fingerprint.
 #: `time` is native epoch SECONDS for the current contract (1755000000 s =
-#: 2025-08-12T20:00:00Z).  The I05-era probe sample was epoch MILLISECONDS — a
-#: provider semantic transition adjudicated in
-#: BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json (no magnitude rescue).
+#: 2025-08-12T12:00:00Z).  The I05-era probe sample carried epoch
+#: MILLISECONDS but is a SYNTHETIC_SCHEMA_FIXTURE, not a real provider
+#: observation (final adjudication A_PRIOR_CHARACTERIZATION_ERROR, see
+#: BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json; no magnitude rescue).
 def contract_stats_row(time_s: int = 1755000000) -> dict[str, Any]:
     return {
         "last_funding_rate": "0.000100",

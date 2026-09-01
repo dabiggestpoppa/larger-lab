@@ -325,10 +325,38 @@ class GateAdapter:
         actual_first = self._row_dt(rows[0], sensor) if rows else None
         actual_last = self._row_dt(rows[-1], sensor) if rows else None
 
-        # Single evidenced request window (contract_stats: from/interval/limit;
-        # funding: from/to).  Multi-window traversal resume semantics are
-        # UNRESOLVED (no invented from+interval advancement or cursor).
-        is_complete = True
+        # Completion is LIMITED for ALL four Gate paths (frozen I09 matrix:
+        # resume=LIMITED, completion=LIMITED).  contract_stats has
+        # from/interval/limit and NO `to` — deep traversal is UNRESOLVED;
+        # funding_rate from/to has NO committed evidence of exhaustive
+        # requested-window coverage.  Runtime must NOT manufacture stronger
+        # completion than the frozen readiness authority, so is_complete is
+        # always False with no invented resume token.  A truthful partial page
+        # remains valid evidence: rows intersecting [start, end) carry
+        # PARTIAL_INTERVAL, rows entirely outside it carry GAP_DETECTED, an
+        # empty page is EMPTY_VALID (mirrors the OKX/Deribit LIMITED pattern).
+        is_complete = False
+        if rows:
+            # Overlap truth comes from ACTUAL VALIDATED ROW TIMESTAMPS, never
+            # from first/last ordering assumptions.  If ANY row yields no
+            # convenience datetime (e.g. an out-of-validity unit like a
+            # 13-digit ms value under the seconds contract), overlap cannot be
+            # truthfully classified: no PARTIAL/GAP flag is added (the batch
+            # keeps its raw native values and None conveniences, and the SMOKE
+            # temporal-plausibility guard flags it — the adapter never invents
+            # a unit or rescues a value).
+            row_datetimes = [self._row_dt(r, sensor) for r in rows]
+            if all(dt is not None for dt in row_datetimes):
+                has_in_window = any(
+                    request.start_time <= dt < request.end_time
+                    for dt in row_datetimes
+                    if dt is not None
+                )
+                quality_flags.append(
+                    QualityFlagAcquisition.PARTIAL_INTERVAL
+                    if has_in_window
+                    else QualityFlagAcquisition.GAP_DETECTED
+                )
 
         return FetchBatch(
             provider_id=self.provider_id,
@@ -354,11 +382,12 @@ class GateAdapter:
 
         Units are endpoint-specific (request/response units are DIFFERENT):
         `contract_stats` rows carry `time` in native epoch SECONDS (current
-        contract, live-verified I10R1; the I05-era sample was epoch MILLISECONDS
-        — a provider semantic transition, see
-        BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json); `funding_rate` rows carry
-        `t` in native epoch SECONDS.  The parsed native field is never
-        replaced and NO magnitude heuristic rescues an out-of-validity value.
+        contract, live-verified I10/I10R1; the I05-era ms sample was a SYNTHETIC
+        fixture — final adjudication A_PRIOR_CHARACTERIZATION_ERROR, historical
+        real unit UNIDENTIFIED, see BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json);
+        `funding_rate` rows carry `t` in native epoch SECONDS.  The parsed
+        native field is never replaced and NO magnitude heuristic rescues an
+        out-of-validity value.
         """
         if sensor is SensorFamily.MECHANICAL_FUNDING:
             ts = row.get("t")

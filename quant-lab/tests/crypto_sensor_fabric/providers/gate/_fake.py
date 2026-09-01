@@ -43,6 +43,7 @@ def request(
     sensor: SensorFamily,
     native_instrument_id: str = "BTC_USDT",
     start: datetime | None = None,
+    end: datetime | None = None,
     request_id: str = "r1",
     adapter_version: str = "0.0.0-test",
 ) -> FetchRequest:
@@ -52,7 +53,7 @@ def request(
         sensor_family=sensor,
         native_instrument_id=native_instrument_id,
         start_time=s,
-        end_time=s.replace(hour=1),
+        end_time=end if end is not None else s.replace(hour=1),
         request_id=request_id,
         purpose=FetchPurpose.PROBE,
         adapter_semantic_version=adapter_version,
