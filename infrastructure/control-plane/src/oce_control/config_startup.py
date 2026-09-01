@@ -30,6 +30,7 @@ import os
 import sys
 
 from oce_control.config_spine import (
+    CANONICAL_PASSWORD_REF,
     ConfigResolver,
     EffectiveConfig,
     SOURCE_ENV,
@@ -97,7 +98,9 @@ OPERATIONAL_OCE_VARS = frozenset({
 # reference is defaulted at the CONFIGURATION layer (source = default); a
 # runtime START additionally requires the reference to RESOLVE to a real
 # materialized secret in the approved local secret store (see B4-R3R3).
-DEFAULT_PASSWORD_REF = "secret:runtime-local"
+# B4-CXR4R2: this is the ONE legal reference — the spine locks any alternate
+# reference out at config validation (future-locked).
+DEFAULT_PASSWORD_REF = CANONICAL_PASSWORD_REF
 
 
 _KNOWN_OCE_VARS = None

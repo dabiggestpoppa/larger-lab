@@ -39,6 +39,13 @@ from datetime import datetime, timezone
 SECRET_REF_PREFIX = "secret:"          # e.g. secret:postgres_password
 SECRET_REF_RE = re.compile(r"^secret:[A-Za-z0-9_.-]+$")
 
+# Canonical local runtime PostgreSQL secret reference (B4-CXR4R2): Book 4
+# permits exactly ONE secret authority — the local runtime store. Alternate
+# references are future-locked: a resolvable secret:other fails closed at
+# config validation so compose/migration/API/worker/readiness can never split
+# between two secret authorities.
+CANONICAL_PASSWORD_REF = "secret:runtime-local"
+
 # Values that must never appear unredacted in any output path.
 SENSITIVE_SUFFIXES = (
     "password", "secret", "token", "apikey", "api_key", "key", "credential",
@@ -729,6 +736,18 @@ def validate_effective(effective: EffectiveConfig) -> None:
             "postgres.host must be 127.0.0.1 (loopback only) under the "
             "local-first Book 4 contract — remote database redirection is "
             "not authorized")
+
+    # single secret-reference authority (CXR4-02): the canonical local runtime
+    # reference is the ONLY legal postgres.password_ref in Book 4. Alternate
+    # references are future-locked — a resolvable secret:other is BLOCKED at
+    # config validation, never merely deferred to readiness, so every
+    # database consumer (compose, migration, API, worker, doctor, recovery)
+    # derives from the exact same secret authority.
+    if effective.get("postgres.password_ref") != CANONICAL_PASSWORD_REF:
+        raise ValidationError(
+            "postgres.password_ref must be exactly secret:runtime-local for "
+            "the local-first Book 4 contract — alternate references are "
+            "future-locked and fail closed even when resolvable")
 
 
 # --------------------------------------------------------------------------- #

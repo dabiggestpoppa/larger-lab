@@ -230,7 +230,7 @@ class TestR3RXAdversarialClosure:
         from oce_control.config_spine import ConfigResolver
         r = ConfigResolver(reg)
         eff = r.resolve({
-            "file": {"postgres.password_ref": "secret:postgres",
+            "file": {"postgres.password_ref": "secret:runtime-local",
                      "control_plane.port": "7000"},
             "environment": {"control_plane.port": "8455"},
         }, cli={"control_plane.port": "8456"})
@@ -242,12 +242,12 @@ class TestR3RXAdversarialClosure:
         reg = build_default_registry()
         from oce_control.config_spine import ConfigResolver
         a = ConfigResolver(reg).resolve({
-            "file": {"postgres.password_ref": "secret:postgres",
+            "file": {"postgres.password_ref": "secret:runtime-local",
                      "control_plane.port": "7000"},
             "environment": {"control_plane.port": "8455"}})
         b = ConfigResolver(reg).resolve({
             "environment": {"control_plane.port": "8455"},
-            "file": {"postgres.password_ref": "secret:postgres",
+            "file": {"postgres.password_ref": "secret:runtime-local",
                      "control_plane.port": "7000"}})
         assert a.resolved == b.resolved
         assert a.provenance == b.provenance
@@ -405,17 +405,19 @@ class TestR3R2RuntimeBind:
 # aggregate denial-side-effect invariance (denial never mutates the store).
 # --------------------------------------------------------------------------- #
 class TestCXR3R8AdversarialClosure:
-    def test_doctor_fails_on_unresolved_custom_reference(self, tmp_path, monkeypatch):
-        # N: an unresolved CUSTOM password ref must fail doctor readiness
+    def test_doctor_fails_on_custom_reference_future_lock(self, tmp_path, monkeypatch):
+        # N + CXR4-02: a CUSTOM password ref is future-locked — even when the
+        # store could resolve it, doctor fails at the CONFIG gate so the spine
+        # never validates one secret authority while the runtime uses another.
         from oce_control import local_secrets as ls
         store = tmp_path / "custom-store.json"
-        store.write_text(json.dumps({"other_secret": "x" * 40}), encoding="utf-8")
+        store.write_text(json.dumps({"custom-db": "x" * 40}), encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
         monkeypatch.setenv("OCE_POSTGRES_PASSWORD_REF", "secret:custom-db")
         ll = _doctor_env(monkeypatch, tmp_path, store)
         result = ll.doctor()
         checks = {c["check"]: c["ok"] for c in result["checks"]}
-        assert checks["config spine effective config valid (fail-closed)"] is True
+        assert checks["config spine effective config valid (fail-closed)"] is False
         assert checks["configured secret reference resolves (runtime readiness)"] \
             is False
 
@@ -625,14 +627,14 @@ class TestCXR3R3WorkerTargetAndDbHost:
         with pytest.raises(ValidationError):
             ConfigResolver(reg).resolve({
                 "file": {"postgres.host": "10.0.0.9",
-                         "postgres.password_ref": "secret:x"}})
+                         "postgres.password_ref": "secret:runtime-local"}})
         with pytest.raises(ValidationError):
             ConfigResolver(reg).resolve(
-                {"file": {"postgres.password_ref": "secret:x"}},
+                {"file": {"postgres.password_ref": "secret:runtime-local"}},
                 cli={"postgres.host": "external.example"})
         # canonical still resolves
         eff = ConfigResolver(reg).resolve({
-            "file": {"postgres.password_ref": "secret:x"}})
+            "file": {"postgres.password_ref": "secret:runtime-local"}})
         assert eff.get("postgres.host") == "127.0.0.1"
 
 

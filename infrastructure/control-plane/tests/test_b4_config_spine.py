@@ -45,7 +45,9 @@ from oce_control.config_spine import (
 # A sentinel secret value used in tests; it must never appear in redacted
 # output, fingerprints, snapshots, or any committed source below.
 TEST_SECRET = "B4-SUPER-SEKRE7-0nly-in-tests-9f3a"
-REF_PG = "secret:postgres"
+# CXR4-02: Book 4 has exactly ONE legal secret reference (secret:runtime-local);
+# resolver/fingerprint tests model runtime configs with the canonical ref.
+REF_PG = "secret:runtime-local"
 # Postgres password_ref is mandatory-with-no-default; supply it in happy paths.
 HAPPY = {"file": {"postgres.password_ref": REF_PG}}
 
@@ -388,7 +390,7 @@ class TestSecretReference:
         reg = build_default_registry()
         eff = ConfigResolver(reg).resolve(HAPPY)
         store = SecretStore()
-        store.store("postgres", TEST_SECRET)
+        store.store("runtime-local", TEST_SECRET)
         assert resolve_postgres_password(eff, store) == TEST_SECRET
 
     def test_resolve_postgres_password_rejects_plain_value(self):
@@ -446,7 +448,7 @@ class TestRedaction:
     def test_effective_redacted_view_has_no_secret(self):
         reg = build_default_registry()
         s = SecretStore()
-        s.store("postgres", TEST_SECRET)
+        s.store("runtime-local", TEST_SECRET)
         eff = ConfigResolver(reg).resolve(HAPPY).bind_secret_resolver(s)
         view = eff.redacted()
         blob = json.dumps(view)
@@ -651,7 +653,7 @@ class TestDriftFingerprint:
     def test_fingerprint_does_not_leak_secret_value(self):
         reg = build_default_registry()
         s = SecretStore()
-        s.store("postgres", TEST_SECRET)
+        s.store("runtime-local", TEST_SECRET)
         eff = ConfigResolver(reg).resolve(HAPPY)
         assert TEST_SECRET not in eff.fingerprint
 
@@ -785,9 +787,28 @@ class TestR3R3SecretResolution:
     def test_valid_reference_absent_secret_fails_closed(self, tmp_path):
         import oce_control.config_startup as cs
         backend = self._backend(tmp_path, provision=False)
-        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:other-name"})
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
         with pytest.raises(SystemExit):
             cs.require_secret_resolvable(environ=None, backend=backend, eff=eff)
+
+    def test_custom_reference_is_future_locked_even_when_resolvable(self, tmp_path):
+        # CXR4-02: a custom reference is BLOCKED at CONFIG validation even
+        # when it would resolve — Book 4 has exactly ONE secret authority
+        # (secret:runtime-local), so no runtime consumer can split between
+        # two secret sources.
+        import oce_control.config_startup as cs
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({
+            "postgres_password": "genuine-secret-abc123",
+            "other-secret": "custom-secret-value-9876543210",
+        }), encoding="utf-8")
+        backend = ls.RuntimeSecretBackend(store)
+        assert backend.resolve("secret:other-secret") == "custom-secret-value-9876543210"
+        env = {"PATH": "/usr/bin", "OCE_POSTGRES_PASSWORD_REF": "secret:other-secret"}
+        # resolvable, but the BOOK 4 contract has ONE secret authority:
+        with pytest.raises(ValidationError, match="future-locked"):
+            cs.effective_from_env(env)
 
     def test_revoked_secret_fails_closed(self, tmp_path):
         import oce_control.config_startup as cs
@@ -813,11 +834,12 @@ class TestR3R3SecretResolution:
             cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "plain-password-123"})
 
     def test_malformed_reference_fails_closed(self, tmp_path):
+        # A non-canonical reference (regex-valid but not secret:runtime-local)
+        # fails at the CONFIG gate now — never deferred to readiness (CXR4-02).
         import oce_control.config_startup as cs
         backend = self._backend(tmp_path, provision=True)
-        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:bad..name"})
-        with pytest.raises(SystemExit):
-            cs.require_secret_resolvable(environ=None, backend=backend, eff=eff)
+        with pytest.raises(ValidationError):
+            cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:bad..name"})
 
     def test_unbacked_reference_fails_readiness_not_contradictory(self, tmp_path):
         # B4-CXR3R7: validate_startup is the CONFIG gate (no secret state);
@@ -945,16 +967,24 @@ class TestR3R5SecretSensitiveFingerprint:
                       "control_plane.port": "9000"}})
         assert a.fingerprint != b.fingerprint
 
-    def test_secret_ref_identity_change_alters_config_fingerprint(self):
-        # secret:alpha vs secret:beta MUST produce different config
-        # fingerprints (identity token, not value) — the blind <secret>
-        # marker used to hide that drift entirely.
+    def test_secret_ref_identity_change_is_locked_or_observable(self):
+        # CXR4-02: alternate reference identities are FUTURE-LOCKED at the
+        # config surface (a second secret authority is rejected, never
+        # silently adopted), and the security-state fingerprint still
+        # distinguishes reference identity metadata without hashing the
+        # secret value — identity drift stays observable even in depth.
         reg = build_default_registry()
-        e_alpha = ConfigResolver(reg).resolve(
-            {"file": {"postgres.password_ref": "secret:alpha"}})
-        e_beta = ConfigResolver(reg).resolve(
-            {"file": {"postgres.password_ref": "secret:beta"}})
-        assert e_alpha.fingerprint != e_beta.fingerprint
+        with pytest.raises(ValidationError, match="future-locked"):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": "secret:alpha"}})
+        eff = ConfigResolver(reg).resolve(
+            {"file": {"postgres.password_ref": "secret:runtime-local"}})
+        meta_a = {"alpha": {"generation": 1, "revoked": False,
+                            "backend": "local-runtime-store-v1"}}
+        meta_b = {"beta": {"generation": 1, "revoked": False,
+                           "backend": "local-runtime-store-v1"}}
+        assert eff.bind_secret_resolver_dict(meta_a).security_fingerprint != \
+            eff.bind_secret_resolver_dict(meta_b).security_fingerprint
 
     def test_same_reference_new_generation_stable_config_fp(self):
         # rotation of the SAME reference keeps the CONFIG fingerprint stable
