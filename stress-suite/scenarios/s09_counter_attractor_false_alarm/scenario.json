@@ -1,0 +1,25 @@
+{
+  "scenario_id": "S09",
+  "scenario_version": "1.0.0",
+  "threat_class": "CONTRARIAN_ATTRACTOR_NOVELTY_THEATER",
+  "claim_id": "C_S09",
+  "claim": "regime A regime dynamics persist",
+  "consequence_class": "HIGH",
+  "policy_ref": "scenarios/policies/G3_COGNITIVE_ECOLOGY_POLICY.json",
+  "reviewers_ref": "reviewers.json",
+  "counter_attractor_ref": "counter_attractor.json",
+  "independent_replication_count": 3,
+  "allocation_provenance": {
+    "claim_id": "C_S09",
+    "reviewer_selector": "GOVERNOR",
+    "source_bundle_selector": "GOVERNOR",
+    "fresh_context_decider": "GOVERNOR",
+    "experiment_design_selector": "GOVERNOR"
+  },
+  "expected_disposition": "INDEPENDENTLY_SUPPORTED",
+  "hidden_ground_truth": {
+    "true_regime": "REGIME_A",
+    "no_discriminating_contradiction_exists": true,
+    "consensus_is_well_supported": true
+  }
+}
