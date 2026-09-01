@@ -83,16 +83,20 @@ def store(pg):
 def app_and_server(pg, store):
     from oce_control.worker_protocol import WorkerProtocolServer
     from oce_control import http_api
-    server = WorkerProtocolServer(store)
+    # B4-CXR6X1: the CXR6R2 worker fetches the AUTHORITATIVE job detail from
+    # the control plane (eligible_jobs -> fetch_job), so the fabric server
+    # must be wired to the real PgJobStore — without it eligible_jobs returns
+    # empty and the worker exits 3 before running the governed job.
+    from oce_control.pg_store import PgJobStore
+    jstore = PgJobStore(pg)
+    server = WorkerProtocolServer(store, job_store=jstore)
     # Real durable control-plane boundary (fabric endpoints + API) — the
     # container-backed stack is authoritative PostgreSQL behind the service.
     from oce_control.api import ControlPlaneAPI
     from oce_control.authority import AuthorityEngine
     from oce_control.health import HealthService
     from oce_control.pg_scheduler import PgScheduler
-    from oce_control.pg_store import PgJobStore
     from oce_control.pg_worker import PgWorkerProtocol
-    jstore = PgJobStore(pg)
     scheduler = PgScheduler(pg, jstore)
     worker = PgWorkerProtocol(jstore, pg)
     health = HealthService(job_store=jstore, scheduler=scheduler,

@@ -235,11 +235,15 @@ def test_cxr4r1_a_start_never_rewrites_existing_store(monkeypatch):
     # A (B4-CXR6R4): existing store + ambient POSTGRES_PASSWORD + start() —
     # ordinary start is READ-ONLY over secret authority: the ambient value is
     # NEVER consulted (no rotation path is even reachable) and the store hash
-    # BEFORE == AFTER. With no docker mock the run fails at the docker
-    # preflight; the store is untouched.
+    # BEFORE == AFTER. B4-CXR6X1: docker is mocked UNAVAILABLE so the denial
+    # point is deterministic in every environment (the docker preflight) — on
+    # a Docker-present machine start() would otherwise proceed into compose /
+    # a migration subprocess that cannot see this test's isolated .runtime;
+    # the assertion under test is the store-invariance, not the environment.
     _seed_initialized_store()
     before = _store_snapshot()
     monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-differs-9876543210")
+    monkeypatch.setattr(ll, "docker_available", lambda: False)
     with pytest.raises(RuntimeError, match="Docker is unavailable"):
         ll.start()
     assert _store_snapshot() == before
