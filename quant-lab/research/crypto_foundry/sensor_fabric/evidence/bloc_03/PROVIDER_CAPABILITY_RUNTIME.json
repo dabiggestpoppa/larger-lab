@@ -39,7 +39,7 @@
         "deribit_funding_btc-perpetual_2026_1h"
       ],
       "history_scope": "HISTORICAL",
-      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
+      "limitations": "funding continuation LIMITED (I08R1); funding never certified complete",
       "live_validation_refs": [
         "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
@@ -65,7 +65,7 @@
         "deribit_liquidation_btc-perpetual_2022_1h"
       ],
       "history_scope": "HISTORICAL",
-      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
+      "limitations": "trade-level forced-liquidation microscope projected from the native trade-event surface; source-page coverage semantics; resume LIMITED; never aggregated numerically with Gate/Kraken interval totals",
       "live_validation_refs": [
         "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
@@ -94,7 +94,7 @@
         "deribit_trade_btc-perpetual_2026_raw_event"
       ],
       "history_scope": "HISTORICAL",
-      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
+      "limitations": "native trade-event surface; source-page coverage semantics; resume LIMITED",
       "live_validation_refs": [
         "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],

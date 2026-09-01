@@ -54,7 +54,7 @@ handoff matrix == **17**.  Physical production-symbol scope = **18**
 |---|---|
 | KRAKEN_FUTURES | 6 — BASIS(PRIMARY), BOOK_METRIC(PRIMARY), FUNDING(SECONDARY), LIQUIDATION(PRIMARY), OPEN_INTEREST(PRIMARY), POSITIONING(PRIMARY) |
 | GATE_FUTURES | 4 — FUNDING(SECONDARY), LIQUIDATION(SECONDARY), OPEN_INTEREST(SECONDARY), POSITIONING(SECONDARY) |
-| OKX_SWAP | 3 — BOOK_SNAPSHOT(CURRENT_ONLY), FUNDING(SECONDARY), TRADE(SECONDARY) |
+| OKX_SWAP | 3 — BOOK_SNAPSHOT(CURRENT_ONLY), FUNDING(PRIMARY), TRADE(PRIMARY) |
 | DERIBIT | 4 — BOOK_SNAPSHOT(CURRENT_ONLY), FUNDING(SECONDARY), LIQUIDATION(MECHANISM_MICROSCOPE), TRADE(MECHANISM_MICROSCOPE) |
 
 Role counts: PRIMARY=7, SECONDARY=6, CURRENT_ONLY=2, MECHANISM_MICROSCOPE=2.
@@ -96,7 +96,8 @@ resume/completion, limitations) and `PROVIDER_CAPABILITY_RUNTIME.json`.
 | I10R1E (recheck) | 1354 passed / 0 failed |
 | I10R2C (versions/firewall) | 1360 passed / 0 failed |
 | I10R2D (recheck) | 1360 passed / 0 failed |
-| **I11 final (this checkpoint)** | **1360+ passed / 0 failed** (see OFFLINE_TEST_REPORT) |
+| I11 (final validation; incl. 7 handoff-integrity tests) | 1367 passed / 0 failed |
+| **I11R1 (this checkpoint; +12 semantic-consistency tests)** | **1379 passed / 0 failed** (1 skipped = env-gated live smoke; see OFFLINE_TEST_REPORT) |
 
 ## 8. Network validation chronology
 

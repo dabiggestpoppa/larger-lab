@@ -36,7 +36,7 @@
       "completion_status": "LIMITED",
       "current_only": false,
       "history_scope": "HISTORICAL",
-      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
+      "limitations": "funding continuation LIMITED (I08R1); funding never certified complete",
       "live_validation_refs": [
         "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
@@ -51,7 +51,7 @@
       "completion_status": "LIMITED",
       "current_only": false,
       "history_scope": "HISTORICAL",
-      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
+      "limitations": "trade-level forced-liquidation microscope projected from the native trade-event surface; source-page coverage semantics; resume LIMITED; never aggregated numerically with Gate/Kraken interval totals",
       "live_validation_refs": [
         "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
@@ -66,7 +66,7 @@
       "completion_status": "LIMITED",
       "current_only": false,
       "history_scope": "HISTORICAL",
-      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
+      "limitations": "native trade-event surface; source-page coverage semantics; resume LIMITED",
       "live_validation_refs": [
         "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],

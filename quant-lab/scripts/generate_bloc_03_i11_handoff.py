@@ -173,11 +173,23 @@ def _limitations(provider_id: str, sensor: SensorFamily, history_scope: str) -> 
     if provider_id == "OKX_SWAP":
         return "LIMITED continuation (I09); no multi-window traversal proven"
     if provider_id == "DERIBIT":
-        return (
-            "funding continuation LIMITED (I08R1); trade/liq completion from "
-            "source coverage; liquidation = trade-level microscope (never "
-            "aggregated numerically with Gate/Kraken totals)"
-        )
+        if sensor is SensorFamily.MECHANICAL_FUNDING:
+            return (
+                "funding continuation LIMITED (I08R1); funding never certified "
+                "complete"
+            )
+        if sensor is SensorFamily.MECHANICAL_LIQUIDATION:
+            return (
+                "trade-level forced-liquidation microscope projected from the "
+                "native trade-event surface; source-page coverage semantics; "
+                "resume LIMITED; never aggregated numerically with "
+                "Gate/Kraken interval totals"
+            )
+        if sensor is SensorFamily.MECHANICAL_TRADE:
+            return (
+                "native trade-event surface; source-page coverage semantics; "
+                "resume LIMITED"
+            )
     return "none"
 
 
