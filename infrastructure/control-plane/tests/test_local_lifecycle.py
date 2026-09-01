@@ -100,6 +100,93 @@ def test_require_runtime_dsn_accepts_governed_propagation(monkeypatch):
 
 
 # --------------------------------------------------------------------------
+# B4-CXR3R1 — init vs runtime authority: an ambient POSTGRES_PASSWORD must
+# never mutate the approved store through a runtime read path.
+# --------------------------------------------------------------------------
+
+def _store_snapshot() -> dict:
+    """Hash/snapshot of the approved secret store (for denial side-effect
+    proofs: DENIAL MUST HAVE ZERO AUTHORITY-SIDE EFFECTS)."""
+    import hashlib
+    if not ls.SECRETS_FILE.exists():
+        return {"exists": False}
+    return {
+        "exists": True,
+        "sha256": hashlib.sha256(ls.SECRETS_FILE.read_bytes()).hexdigest(),
+        "content": ls.SECRETS_FILE.read_text(encoding="utf-8"),
+    }
+
+
+def test_runtime_password_cannot_materialize_missing_store(monkeypatch):
+    # ambient POSTGRES_PASSWORD must NEVER create a store through a runtime
+    # read path (CXR3-01-C: runtime password tries to materialize absent store)
+    monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-password-123")
+    before = _store_snapshot()
+    with pytest.raises(RuntimeError, match="configure"):
+        ls.require_runtime_dsn()
+    with pytest.raises(RuntimeError, match="configure"):
+        ls.derive_runtime_dsn()
+    assert _store_snapshot() == before  # zero authority-side effects
+    assert not ls.SECRETS_FILE.exists()
+
+
+def test_runtime_password_cannot_rewrite_existing_store(monkeypatch):
+    # CXR3-01-B: a runtime password must not overwrite an existing approved store
+    ls.initialize_runtime_secret()
+    governed = ls.read_runtime_secret()
+    before = _store_snapshot()
+    monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-overwrite-attempt-123456")
+    dsn = ls.require_runtime_dsn()
+    assert governed in dsn
+    assert "ambient-overwrite-attempt-123456" not in dsn
+    assert ls.read_runtime_secret() == governed  # store value unchanged
+    assert _store_snapshot() == before  # zero authority-side effects
+
+
+def test_matching_ambient_password_and_dsn_cannot_self_legitimate(monkeypatch):
+    # CXR3-01-A: supply password X + a DSN containing X with NO store. The
+    # runtime must fail closed and must NOT persist X (self-legitimation).
+    monkeypatch.setenv("POSTGRES_PASSWORD", "selflegit-X-9876543210")
+    dsn_attack = ("postgresql://oce_control_admin:selflegit-X-9876543210"
+                  "@127.0.0.1:5433/oce_control")
+    monkeypatch.setenv("POSTGRES_DSN", dsn_attack)
+    before = _store_snapshot()
+    with pytest.raises(RuntimeError, match="configure"):
+        ls.require_runtime_dsn()
+    assert _store_snapshot() == before  # DENIAL HAS ZERO AUTHORITY-SIDE EFFECTS
+    assert not ls.SECRETS_FILE.exists()
+
+
+def test_compose_environment_reads_without_materializing(monkeypatch):
+    # compose env is a RUNTIME read: no store -> no secret vars, no store
+    # created (ambient values never flow to a subprocess); after governed
+    # init, the vars come from the STORE, never a stale ambient value
+    monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-compose-1234567890")
+    monkeypatch.setenv("POSTGRES_DSN", "postgresql://u:p@127.0.0.1:5432/x")
+    env = ls.compose_environment()
+    assert "POSTGRES_PASSWORD" not in env
+    assert "POSTGRES_DSN" not in env
+    assert not ls.SECRETS_FILE.exists()
+    # governed init: the INIT path explicitly honors the operator password
+    monkeypatch.setenv("POSTGRES_PASSWORD", "governed-operator-pw-123456789")
+    ls.initialize_runtime_secret()
+    governed = ls.read_runtime_secret()
+    assert governed == "governed-operator-pw-123456789"
+    env2 = ls.compose_environment()
+    assert env2["POSTGRES_PASSWORD"] == governed
+    assert "ambient-compose-1234567890" not in env2["POSTGRES_PASSWORD"]
+
+
+def test_restart_uses_same_governed_secret():
+    # CXR3-01-Q: restart after clean initialization uses the SAME secret
+    ls.initialize_runtime_secret()
+    first = ls.read_runtime_secret()
+    assert ls.initialize_runtime_secret() == first  # init keeps existing
+    assert ls.read_runtime_secret() == first
+    assert ls.require_runtime_dsn() == ls.postgres_dsn() == ls.derive_runtime_dsn()
+
+
+# --------------------------------------------------------------------------
 # Ports — loopback only
 # --------------------------------------------------------------------------
 

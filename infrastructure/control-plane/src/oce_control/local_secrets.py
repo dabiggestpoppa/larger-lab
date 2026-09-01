@@ -1,4 +1,4 @@
-"""OCE Book 2 — local runtime secrets (B2-R7).
+"""OCE Book 2 — local runtime secrets (B2-R7 / B4-CXR3R1).
 
 There is NO predictable default PostgreSQL password anywhere in the
 runtime. The operator either supplies POSTGRES_PASSWORD explicitly or the
@@ -13,6 +13,18 @@ first `configure`/`start` generates an ephemeral secret with
 
 .runtime/ is gitignored (see repo .gitignore) and created with 0700;
 generated secrets are 0600 and never committed.
+
+INITIALIZATION vs RUNTIME (B4-CXR3R1 — no self-legitimation):
+
+* INITIALIZATION path (``initialize_runtime_secret`` / ``ensure_runtime_secret``,
+  called only by explicit `configure`/first governed start, the CI runner, and
+  the test stack helper) MAY accept an operator POSTGRES_PASSWORD or generate
+  a strong random secret, and persists it in the approved untracked store.
+* RUNTIME path (``read_runtime_secret`` / ``derive_runtime_dsn`` /
+  ``require_runtime_dsn`` / ``compose_environment``) NEVER materializes or
+  overwrites a secret. An ambient POSTGRES_PASSWORD therefore cannot rewrite
+  an existing store, cannot materialize a missing store, and cannot
+  self-legitimate a matching ambient POSTGRES_DSN.
 """
 from __future__ import annotations
 
@@ -45,14 +57,19 @@ def _chmod(path: Path, mode: int) -> None:
         pass
 
 
-def ensure_runtime_secret() -> str:
-    """Return the operator's or generated POSTGRES_PASSWORD (fail closed).
+def initialize_runtime_secret(environ: dict | None = None) -> str:
+    """INITIALIZATION path ONLY (explicit `configure` / first governed start).
 
-    If POSTGRES_PASSWORD is set in the environment it wins and is
-    persisted so later invocations agree. Otherwise an ephemeral secret is
-    generated and stored under .runtime/secrets.json (0600).
+    May accept an operator-supplied POSTGRES_PASSWORD (from *environ*) or
+    generate a strong ephemeral secret, and PERSISTS the result in the
+    approved untracked store (.runtime/secrets.json, 0600). Runtime read
+    paths (read_runtime_secret / derive_runtime_dsn / require_runtime_dsn /
+    compose_environment) never call this — an ambient POSTGRES_PASSWORD can
+    therefore never mutate secret authority while the runtime is running
+    (B4-CXR3R1).
     """
-    env_pw = os.environ.get("POSTGRES_PASSWORD")
+    env = environ if environ is not None else os.environ
+    env_pw = env.get("POSTGRES_PASSWORD")
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     _chmod(RUNTIME_DIR, 0o700)
     if env_pw:
@@ -68,6 +85,15 @@ def ensure_runtime_secret() -> str:
     return data["postgres_password"]
 
 
+def ensure_runtime_secret(environ: dict | None = None) -> str:
+    """INITIALIZATION alias kept for lifecycle/test callers (B4-CXR3R1).
+
+    Same contract as initialize_runtime_secret — INIT ONLY. Never call this
+    from a runtime read path; use read_runtime_secret() / derive_runtime_dsn().
+    """
+    return initialize_runtime_secret(environ)
+
+
 def load_runtime_secret() -> str | None:
     """Read the persisted runtime secret, or None if not configured yet."""
     if not SECRETS_FILE.exists():
@@ -78,9 +104,18 @@ def load_runtime_secret() -> str | None:
         return None
 
 
+def read_runtime_secret() -> str | None:
+    """RUNTIME read path — NEVER materializes or overwrites a secret.
+
+    Returns the persisted postgres password or None when the store is
+    absent. Safe to call from any runtime path (zero side effects).
+    """
+    return load_runtime_secret()
+
+
 def write_compose_env() -> Path:
     """Persist .runtime/compose.env (0600) for `docker compose` invocations."""
-    pw = ensure_runtime_secret()
+    pw = initialize_runtime_secret()
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     _chmod(RUNTIME_DIR, 0o700)
     COMPOSE_ENV_FILE.write_text(f"POSTGRES_PASSWORD={pw}\n", encoding="utf-8")
@@ -89,47 +124,74 @@ def write_compose_env() -> Path:
 
 
 def compose_environment() -> dict[str, str]:
-    """Env dict for docker compose / migrate / api / worker (never defaults pw)."""
+    """Env dict for docker compose / migrate / api / worker (RUNTIME, read-only).
+
+    Reads the approved store WITHOUT materializing: POSTGRES_PASSWORD and
+    POSTGRES_DSN are set only when a governed secret already exists. When the
+    store is absent, teardown commands still run (empty substitution) while
+    any activation that needs the secret fails closed at its own gate — an
+    ambient runtime value can never create secret authority (B4-CXR3R1).
+    """
     env = dict(os.environ)
-    env["POSTGRES_PASSWORD"] = ensure_runtime_secret()
-    env["POSTGRES_DSN"] = postgres_dsn()
+    pw = read_runtime_secret()
+    if pw:
+        env["POSTGRES_PASSWORD"] = pw
+        env["POSTGRES_DSN"] = derive_runtime_dsn()
+    else:
+        # never pass an ambient password/DSN to a subprocess — only the
+        # governed store may supply secret authority
+        env.pop("POSTGRES_PASSWORD", None)
+        env.pop("POSTGRES_DSN", None)
     return env
 
 
-def postgres_dsn() -> str:
-    pw = ensure_runtime_secret()
+def derive_runtime_dsn() -> str:
+    """RUNTIME DSN derivation — read-only, fails closed when the store is absent.
+
+    Never materializes from ambient POSTGRES_PASSWORD and never consults an
+    ambient POSTGRES_DSN: the DSN is derived from the approved store. An
+    absent store raises with a remediation hint (B4-CXR3R1).
+    """
+    pw = read_runtime_secret()
+    if not pw:
+        raise RuntimeError(
+            "no governed PostgreSQL secret configured — run "
+            "`python scripts/oce_local.py configure` to materialize the local "
+            "runtime secret (runtime reads never materialize one)")
     return f"postgresql://{PG_USER}:{pw}@{PG_HOST}:{PG_PORT}/{PG_DB}"
 
 
+def postgres_dsn() -> str:
+    """Alias of derive_runtime_dsn() (read-only, fail closed)."""
+    return derive_runtime_dsn()
+
+
 def require_runtime_dsn(environ: dict | None = None) -> str:
-    """Fail-closed DSN for API/worker entrypoints (B4-R3R4).
+    """Fail-closed DSN for API/worker entrypoints (B4-R3R4 / B4-CXR3R1).
 
     The DSN is DERIVED from the governed secret store boundary — never from
-    an ambient POSTGRES_DSN that could bypass Book 4 secret validation.
+    an ambient POSTGRES_DSN that could bypass Book 4 secret validation, and
+    never materialized from ambient POSTGRES_PASSWORD.
 
     A caller-supplied POSTGRES_DSN is accepted ONLY when it equals the
-    governed derivation (i.e. it is the runtime's own internal propagation,
-    e.g. compose_environment()); a DSN that diverges from the governed
-    secret reference is REJECTED as a bypass. Raises with a clear
-    remediation hint when the store is absent — no predictable fallback.
+    governed derivation (internal runtime propagation, e.g.
+    compose_environment()); a DSN that diverges from the governed secret
+    reference is REJECTED as a bypass. An ambient POSTGRES_PASSWORD is never
+    consulted: it cannot rewrite an existing store, cannot materialize a
+    missing store, and cannot self-legitimate a matching DSN. Raises with a
+    clear remediation hint when the store is absent — no predictable fallback.
     """
     env = environ if environ is not None else os.environ
+    governed = derive_runtime_dsn()  # read-only; raises "configure" when absent
     env_dsn = env.get("POSTGRES_DSN")
     if env_dsn:
-        governed = postgres_dsn()
         if env_dsn == governed:
             return env_dsn  # internal runtime propagation, matches the store
         raise RuntimeError(
             "POSTGRES_DSN conflicts with the governed secret-derived DSN — "
             "set the secret reference (OCE_POSTGRES_PASSWORD_REF) and let OCE "
             "derive the DSN (B4-R3R4); external DSN bypasses are rejected")
-    if SECRETS_FILE.exists() or os.environ.get("POSTGRES_PASSWORD"):
-        return postgres_dsn()
-    raise RuntimeError(
-        "no PostgreSQL DSN configured: run "
-        "`python scripts/oce_local.py configure` to materialize the local "
-        "runtime secret"
-    )
+    return governed
 
 
 # --------------------------------------------------------------------------- #
