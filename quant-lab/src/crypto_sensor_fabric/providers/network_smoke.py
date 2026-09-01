@@ -634,17 +634,26 @@ def extract_native_time_samples(body: Any, *, cap: int = 4) -> list[int] | None:
     found: list[int] = []
     seen: set[int] = set()
 
+    def _add(value: int) -> None:
+        if value not in seen:
+            seen.add(value)
+            found.append(value)
+
     def walk(node: Any) -> None:
         if isinstance(node, dict):
             for key, value in node.items():
-                if (
-                    key in _NATIVE_TIME_KEYS
-                    and isinstance(value, int)
-                    and not isinstance(value, bool)
-                ):
-                    if value not in seen:
-                        seen.add(value)
-                        found.append(value)
+                if key in _NATIVE_TIME_KEYS:
+                    if isinstance(value, int) and not isinstance(value, bool):
+                        _add(value)
+                    elif isinstance(value, list):
+                        # Provider time members are sometimes list-typed
+                        # (e.g. Kraken analytics `result.timestamp: list[int]`
+                        # hour grid) rather than per-row scalars.
+                        for item in value:
+                            if isinstance(item, int) and not isinstance(item, bool):
+                                _add(item)
+                    else:
+                        walk(value)
                 else:
                     walk(value)
         elif isinstance(node, list):

@@ -664,6 +664,21 @@ class TestTemporalPlausibilityGuard:
         }
         assert extract_native_time_samples(body) == [1788134400]
 
+    def test_native_time_sample_list_typed_timestamp_member(self) -> None:
+        # Kraken analytics carry `result.timestamp: list[int]` (hour grid)
+        # rather than per-row scalars — the walker must collect list members.
+        body = {
+            "result": {
+                "timestamp": [1788166800000, 1788170400000, 1788174000000],
+                "data": {"rate": [1, 2, 3]},
+            }
+        }
+        samples = extract_native_time_samples(body)
+        assert samples is not None
+        assert samples[0] == 1788166800000
+        assert min(samples) == 1788166800000
+        assert max(samples) == 1788174000000
+
     def test_smoke_one_redirects_1970_batch_to_temporal_review(self) -> None:
         # OKX funding rows stamped near the epoch: schema KNOWN, rows > 0 — the
         # exact combination that wrongly passed before I10R1.  The guard must
