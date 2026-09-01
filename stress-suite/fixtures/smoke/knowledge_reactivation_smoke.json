@@ -4,6 +4,9 @@
   "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
   "institutional_scope": "generic knowledge-lifecycle smoke (no S10 logic)",
   "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "PO": "PO"
+  },
   "initial_knowledge": [
     {
       "record_id": "@K",

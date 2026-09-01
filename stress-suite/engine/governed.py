@@ -86,13 +86,46 @@ class GovernedTransitionExecutor:
         )
 
     # ------------------------------------------------------------------ #
+    # actor / authority identity binding (G2-P0-A / P0-B)
+    # ------------------------------------------------------------------ #
+    def _bind(self, event, declared_level=None):
+        """Validate that a governed action is driven by a REGISTERED actor whose
+        claimed authority level matches AuthorityState. Returns
+        (registered_level, None) on success, or (None, TraceEntry) on a
+        fail-closed rejection.
+
+        Policy (chosen, documented): governed phase/lifecycle/authority actions
+        are attributed to event.actor. A payload `authority_level` claim must
+        EXACTLY equal AuthorityState.level(actor) or be omitted (then derived
+        from AuthorityState). The payload authority level is NEVER trusted
+        independently — a WORKER cannot self-declare GOVERNOR. Unknown actors
+        cannot drive governed actions at all.
+        """
+        actor = event.actor
+        if actor not in self.authority.actors:
+            return None, TraceEntry(
+                event.seq, event.machine, event.event_type, "", "",
+                False, False, ("AUTHORITY_ACTOR_UNKNOWN",),
+                f"actor {actor!r} is not registered in AuthorityState; governed action rejected",
+                "AUTHORITY_INVALID",
+            )
+        registered = self.authority.level(actor)
+        if declared_level is not None and declared_level != registered:
+            return None, TraceEntry(
+                event.seq, event.machine, event.event_type, "", "",
+                False, False, ("AUTHORITY_LEVEL_MISMATCH",),
+                f"actor {actor!r} is registered as {registered} but claimed {declared_level}",
+                "AUTHORITY_INVALID",
+            )
+        return registered, None
+
+    # ------------------------------------------------------------------ #
     # phase
     # ------------------------------------------------------------------ #
     def _run_phase(self, event) -> TraceEntry:
         p = event.payload or {}
         to_state = p.get("to_state", "")
         mutation_class = p.get("mutation_class", MutationClass.READ_ONLY.value)
-        level = p.get("authority_level", "OBSERVER")
         from_state = self.phase.state
 
         # 1) contract version must match active phase edge contract (fail closed)
@@ -104,7 +137,15 @@ class GovernedTransitionExecutor:
                 "CONTRACT_VERSION_MISMATCH",
             )
 
-        # 2) authority validity: exception BEFORE ledger mutation (documented policy),
+        # 2) G2-P0-A identity binding: a governed phase step is attributed to
+        #    event.actor; a payload authority_level claim must exactly equal the
+        #    actor's registered level (or be omitted and derived).
+        bound, entry = self._bind(event, p.get("authority_level"))
+        if entry is not None:
+            return entry
+        level = bound
+
+        # 3) authority validity: exception BEFORE ledger mutation (documented policy),
         #    converted to a deterministic invalid replay event here.
         try:
             provisional = self.phase.evaluate(
@@ -158,6 +199,13 @@ class GovernedTransitionExecutor:
                 "CONTRACT_VERSION_MISMATCH",
             )
 
+        # G2-P0-A: lifecycle state changes are attributed to a registered actor
+        # whose claimed level matches AuthorityState.
+        bound, entry = self._bind(event, p.get("authority_level"))
+        if entry is not None:
+            return entry
+        level = bound
+
         action = p.get("action")
         # cross-cutting policy rejections for knowledge/ontology actions
         if action == "PROMOTE_ONTOLOGY":
@@ -178,7 +226,7 @@ class GovernedTransitionExecutor:
         if rule10.violation:
             tr = self.lifecycle.records[record_id].transition(
                 seq=event.seq, to_state=to_state, actor=event.actor,
-                authority_basis=p.get("authority_basis", ""), authority_level=p.get("authority_level", "OBSERVER"),
+                authority_basis=p.get("authority_basis", ""), authority_level=level,
                 reason=p.get("reason", ""), evidence_refs=p.get("evidence_refs", []),
             )  # records the refused attempt with explicit violation, no state change
             return TraceEntry(event.seq, "lifecycle", event.event_type, current, to_state,
@@ -186,7 +234,7 @@ class GovernedTransitionExecutor:
 
         tr = self.lifecycle.transition(
             record_id, seq=event.seq, to_state=to_state, actor=event.actor,
-            authority_basis=p.get("authority_basis", ""), authority_level=p.get("authority_level", "OBSERVER"),
+            authority_basis=p.get("authority_basis", ""), authority_level=level,
             reason=p.get("reason", ""), evidence_refs=p.get("evidence_refs", []),
         )
         kind = "OK" if tr.allowed else "TOPOLOGY_DENIED"
@@ -200,25 +248,44 @@ class GovernedTransitionExecutor:
         p = event.payload or {}
         action = p.get("action", "REQUEST_AUTHORITY")
         if action == "REQUEST_AUTHORITY":
+            # G2-P0-A: the requesting actor must be registered.
+            _bound, entry = self._bind(event)
+            if entry is not None:
+                return entry
             # RULE-06: capability gain must not self-expand authority (S21)
             rule = self._f.capability_to_authority(
                 capability_gain=p.get("capability_gain", False),
                 authority_gain=p.get("authority_gain", False),
             )
             if rule.violation:
-                return self._policy_result(event, rule, from_state=p.get("actor", ""))
+                return self._policy_result(event, rule, from_state=event.actor)
             # a proposal is representable; ratification is governed separately
             try:
-                self.authority.propose_authority_change(p.get("actor", "?"), p.get("target", p.get("actor", "?")),
+                self.authority.propose_authority_change(event.actor, p.get("target", event.actor),
                                                         _dummy_grant(event))
-                return TraceEntry(event.seq, "authority", event.event_type, p.get("actor", ""),
+                return TraceEntry(event.seq, "authority", event.event_type, event.actor,
                                   "proposed", True, True, (), "authority change proposed (not ratified)", "OK")
             except AuthorityViolation as exc:
-                return TraceEntry(event.seq, "authority", event.event_type, p.get("actor", ""),
+                return TraceEntry(event.seq, "authority", event.event_type, event.actor,
                                   "rejected", False, False, ("AUTHORITY_FIREWALL",), str(exc), "FORBIDDEN")
         elif action == "RATIFY":
+            # G2-P0-A: the ratifier must be a registered actor.
+            _bound, entry = self._bind(event)
+            if entry is not None:
+                return entry
+            # G2-P0-B: ratifier identity is bound to event.actor — a worker cannot
+            # submit event.actor=WORKER_1 with payload.ratifier=OPERATOR.
+            ratifier = event.actor
+            declared_ratifier = p.get("ratifier", ratifier)
+            if declared_ratifier != ratifier:
+                return TraceEntry(
+                    event.seq, "authority", event.event_type, p.get("target", ""),
+                    "rejected", False, False, ("AUTHORITY_RATIFIER_MISMATCH",),
+                    f"declared ratifier {declared_ratifier!r} != event.actor {ratifier!r}",
+                    "AUTHORITY_INVALID",
+                )
             try:
-                self.authority.ratify_authority_change(p.get("ratifier", ""), p.get("proposer", ""),
+                self.authority.ratify_authority_change(ratifier, p.get("proposer", ""),
                                                        p.get("target", ""), _dummy_grant(event))
                 return TraceEntry(event.seq, "authority", event.event_type, p.get("target", ""),
                                   "ratified", True, True, (), "ratified", "OK")
@@ -285,5 +352,5 @@ def _dummy_grant(event):
         target=p.get("target_scope", "local-test"),
         environment="local-test",
         risk_class=p.get("risk_class", "read"),
-        issued_by=p.get("ratifier", p.get("proposer", "?")),
+        issued_by=p.get("ratifier", event.actor),
     )

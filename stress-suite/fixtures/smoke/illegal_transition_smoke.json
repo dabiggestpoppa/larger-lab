@@ -4,6 +4,10 @@
   "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
   "institutional_scope": "generic forbidden-transition smoke (no S01-S24 logic)",
   "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "PO": "PO",
+    "WORKER": "WORKER"
+  },
   "initial_knowledge": [
     {
       "record_id": "@K_DORM",

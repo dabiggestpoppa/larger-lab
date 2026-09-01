@@ -4,6 +4,10 @@
   "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
   "institutional_scope": "generic phase-machine smoke (no S01-S24 logic)",
   "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "SENTINEL": "GOVERNOR",
+    "GOVERNOR": "GOVERNOR"
+  },
   "initial_knowledge": [],
   "stimulus_events": [
     {

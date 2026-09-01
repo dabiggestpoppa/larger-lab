@@ -8,6 +8,17 @@ import pytest
 from engine.replay import DeterministicReplay, ReplayEvent
 from engine.fixtures import load_spec, spec_to_replay_events, run_smoke, StressScenarioSpec
 from engine.replay import ReplayInputError
+from engine.authority import AuthorityState
+
+
+def _auth(**seeds) -> AuthorityState:
+    """G2-P0: governed replay runs require registered actors whose claims match
+    AuthorityState. Seeds+freezes the fixture authority projection."""
+    auth = AuthorityState()
+    for a, l in ({"SENTINEL": "GOVERNOR", "GOVERNOR": "GOVERNOR", **seeds}).items():
+        auth.seed_level(a, l)
+    auth.freeze_initialization()
+    return auth
 
 
 def _events():
@@ -32,8 +43,8 @@ def _events():
 
 
 def test_same_inputs_same_output():
-    a = DeterministicReplay().run(_events())
-    b = DeterministicReplay().run(_events())
+    a = DeterministicReplay(authority=_auth()).run(_events())
+    b = DeterministicReplay(authority=_auth()).run(_events())
     assert a.fingerprint == b.fingerprint
     assert a.terminal_phase == "STABLE"
     assert len(a.trace) == 4
@@ -45,7 +56,7 @@ def test_out_of_order_rejected():
     evs[2] = ReplayEvent(seq=-1, event_type="phase_step", machine="phase", actor="X",
                          target="@INST", payload={})
     with pytest.raises(ReplayInputError):
-        DeterministicReplay().run(evs)
+        DeterministicReplay(authority=_auth()).run(evs)
 
 
 def test_illegal_events_recorded_not_applied():
@@ -57,7 +68,9 @@ def test_illegal_events_recorded_not_applied():
                     target="@INST", payload={"to_state": "WATCH", "evidence_vector": {},
                                              "authority_level": "GOVERNOR", "mutation_class": "READ_ONLY", "reason": ""}),
     ]
-    res = DeterministicReplay().run(evs)
+    # actor X is registered as GOVERNOR; its first (PO-claimed) attempt fails
+    # identity binding, its second (GOVERNOR-claimed) matches and is legal
+    res = DeterministicReplay(authority=_auth(X="GOVERNOR")).run(evs)
     assert res.trace[0]["allowed"] is False
     assert res.trace[1]["allowed"] is True
     assert res.terminal_phase == "WATCH"

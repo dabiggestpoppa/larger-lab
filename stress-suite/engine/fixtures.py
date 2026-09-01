@@ -93,9 +93,20 @@ def build_seed_records(spec: StressScenarioSpec) -> List[Any]:
 
 
 def run_smoke(spec: StressScenarioSpec, seed_records=None) -> Any:
-    """Small helper used by smoke fixtures: build a replay from a spec and run it."""
+    """Small helper used by smoke fixtures: build a replay from a spec and run it.
+
+    G2-P0: seeds AuthorityState from the spec's `initial_authority_state` and
+    freezes initialization BEFORE the first event, so governed actions are bound
+    to registered actors. Unknown authoritative roles in the fixture fail closed
+    at seeding (ontology-bounded setup).
+    """
+    from .authority import AuthorityState
     seeds = seed_records if seed_records is not None else build_seed_records(spec)
-    replay = DeterministicReplay(seed_records=seeds)
+    auth = AuthorityState()
+    for actor, level in (spec.initial_authority_state or {}).items():
+        auth.seed_level(actor, level)
+    auth.freeze_initialization()
+    replay = DeterministicReplay(seed_records=seeds, authority=auth)
     return replay.run(spec_to_replay_events(spec))
 
 

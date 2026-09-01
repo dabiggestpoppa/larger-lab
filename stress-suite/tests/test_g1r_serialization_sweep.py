@@ -18,6 +18,7 @@ from engine.epoch import EpochManifest
 from engine.evalcontract import PhaseEvaluationContract
 from engine.replay import DeterministicReplay, ReplayEvent
 from engine.base import Provenance
+from engine.authority import AuthorityState
 
 
 def _stable_dumps(obj) -> str:
@@ -73,7 +74,11 @@ def _replay_result():
            ReplayEvent(2, "phase_step", "phase", "G", "@INST",
                        {"to_state": "STABLE", "evidence_vector": {}, "authority_level": "GOVERNOR",
                         "mutation_class": "READ_ONLY"})]
-    return DeterministicReplay().run(evs)
+    auth = AuthorityState()
+    for a in ("S", "G"):
+        auth.seed_level(a, "GOVERNOR")
+    auth.freeze_initialization()
+    return DeterministicReplay(authority=auth).run(evs)
 
 
 _CASES = [

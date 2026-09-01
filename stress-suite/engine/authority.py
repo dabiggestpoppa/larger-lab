@@ -26,6 +26,21 @@ class AuthorityViolation(ValueError):
     pass
 
 
+#: Canonical risk-class vocabulary — mirrors control-plane
+#: capability-grant.schema.json ("risk_class" enum): read / local-write /
+#: external-write / deployment / destructive / messaging / broker / capital.
+#: G2-P0-D: ANY risk_class outside this vocabulary fails closed. Unknown classes
+#: must never silently bypass the authority-bearing guard by not matching a
+#: hardcoded tuple.
+RISK_CLASSES = frozenset({
+    "read", "local-write", "external-write", "deployment",
+    "destructive", "messaging", "broker", "capital",
+})
+
+#: classes whose issue/ratification itself vests authority (no self-ratification)
+AUTHORITY_BEARING_RISK_CLASSES = frozenset({"deployment", "destructive", "broker", "capital"})
+
+
 @dataclass(frozen=True)
 class CapabilityGrant:
     grant_id: str
@@ -36,6 +51,14 @@ class CapabilityGrant:
     risk_class: str                     # matches control-plane capability-grant.schema.json
     issued_by: str                      # issuing/ratifying actor
     status: str = "active"
+
+    def __post_init__(self) -> None:
+        # G2-P0-D: fail closed at construction — an unknown risk class must not
+        # exist as a grant, so no later guard can be bypassed by an unknown label.
+        if self.risk_class not in RISK_CLASSES:
+            raise AuthorityViolation(
+                f"unknown risk_class {self.risk_class!r}; canonical vocabulary: {sorted(RISK_CLASSES)}"
+            )
 
     @classmethod
     def make(cls, seq, actor, action, target, issued_by, risk_class="read", environment="local-test"):
@@ -62,8 +85,15 @@ class AuthorityRegistry:
 
     def issue(self, grant: CapabilityGrant, ratified_by: str) -> None:
         """Ratified_by must differ from the grant recipient for any grant whose
-        risk_class implies authority (deny-by-default, no self-ratification)."""
-        if grant.risk_class in ("authority", "deployment", "destructive", "broker", "capital"):
+        risk_class implies authority (deny-by-default, no self-ratification).
+
+        G2-P0-D: risk_class outside the canonical vocabulary fails closed here
+        too (belt), even if the grant object was produced elsewhere."""
+        if grant.risk_class not in RISK_CLASSES:
+            raise AuthorityViolation(
+                f"unknown risk_class {grant.risk_class!r}; canonical vocabulary: {sorted(RISK_CLASSES)}"
+            )
+        if grant.risk_class in AUTHORITY_BEARING_RISK_CLASSES:
             if ratified_by == grant.actor:
                 raise AuthorityViolation("an actor may not self-ratify an authority-bearing grant")
         self._grants[grant.grant_id] = grant
@@ -72,7 +102,7 @@ class AuthorityRegistry:
 
     def revoke(self, grant_id: str, actor: str) -> None:
         g = self._grants.get(grant_id)
-        if g and g.actor == actor and g.risk_class in ("authority", "capital"):
+        if g and g.actor == actor and g.risk_class == "capital":
             raise AuthorityViolation("an actor may not self-revoke an authority/capital grant")
         if grant_id in self._grants:
             self._grants[grant_id] = CapabilityGrant(
@@ -114,15 +144,25 @@ class AuthorityState:
         return self._initialization_frozen
 
     def seed_level(self, actor: str, level: str) -> None:
-        """Fixture-initialization seeding. Forbidden after initialization freeze."""
+        """Fixture-initialization seeding. Forbidden after initialization freeze.
+
+        G2-P0-C: seeding is privileged for SETUP only, not an ontology bypass —
+        unknown authority levels are rejected here ("SUPREME_OVERLORD" fails).
+        """
         if self._initialization_frozen:
             raise AuthorityViolation(
                 "authority initialization is frozen; use the governed ratify/propose path"
             )
+        if isinstance(level, AuthorityLevel):
+            level = level.value
+        if level not in {m.value for m in AuthorityLevel}:
+            raise AuthorityViolation(
+                f"unknown authority level {level!r}; canonical: {sorted(m.value for m in AuthorityLevel)}"
+            )
         self.actors[actor] = level
 
     def set_level(self, actor: str, level: str) -> None:
-        # alias retained for readable fixture init; shares the freeze guard
+        # alias retained for readable fixture init; shares the freeze + enum guards
         self.seed_level(actor, level)
 
     def level(self, actor: str) -> str:
@@ -150,7 +190,7 @@ class AuthorityState:
         """Only an actor with OPERATOR (or explicit governor mandate) may ratify."""
         if ratifier == target_actor:
             raise AuthorityViolation("self-ratification of authority change is forbidden")
-        if self.level(ratifier) not in (AuthorityLevel.OPERATOR.value,) and grant.risk_class in ("authority", "capital", "deployment", "destructive"):
+        if self.level(ratifier) not in (AuthorityLevel.OPERATOR.value,) and grant.risk_class in ("capital", "deployment", "destructive"):
             raise AuthorityViolation(f"{ratifier} lacks authority to ratify a {grant.risk_class} change")
         # ratification is recorded; the registry only issues AFTER ratification
         self.registry.issue(grant, ratified_by=ratifier)

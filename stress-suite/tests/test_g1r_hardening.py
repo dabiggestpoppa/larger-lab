@@ -124,8 +124,16 @@ def test_invalid_authority_no_ledger_mutation():
 # --------------------------------------------------------------------------- #
 # G1R-07 — governed executor cannot be bypassed by scenario replay
 # --------------------------------------------------------------------------- #
-def _replay(events):
-    return DeterministicReplay().run(events)
+def _replay(events, actors=None):
+    """Run a governed replay with a registered-actor authority projection
+    (G2-P0: governed actions are bound to AuthorityState)."""
+    auth = AuthorityState()
+    seeds = {"SENTINEL": "GOVERNOR", "GOVERNOR": "GOVERNOR", "PO": "PO"}
+    seeds.update(actors or {})
+    for a, l in seeds.items():
+        auth.seed_level(a, l)
+    auth.freeze_initialization()
+    return DeterministicReplay(authority=auth).run(events)
 
 
 def test_replay_cannot_bypass_watch_architecture_mutation_rule():
@@ -146,7 +154,7 @@ def test_replay_cannot_bypass_capability_to_authority_rule():
                     {"action": "REQUEST_AUTHORITY", "capability_gain": True, "authority_gain": True,
                      "actor": "WORKER_1", "target": "WORKER_1", "risk_class": "authority"}),
     ]
-    res = _replay(evs)
+    res = _replay(evs, actors={"WORKER_1": "WORKER"})
     assert res.trace[0]["allowed"] is False
     assert "RULE-06" in res.trace[0]["rule_ids"]
 
@@ -175,7 +183,10 @@ def test_replay_cannot_bypass_agent_confidence_confirmation_rule():
 def test_governed_executor_records_rule_id_on_rejection():
     phase = PhaseStateMachine()
     lifecycle = LifecycleEngine()
-    ex = GovernedTransitionExecutor(phase, lifecycle)
+    auth = AuthorityState()
+    auth.seed_level("X", "GOVERNOR")
+    auth.freeze_initialization()
+    ex = GovernedTransitionExecutor(phase, lifecycle, auth)
     ev = ReplayEvent(1, "phase_step", "phase", "X", "@INST",
                      {"to_state": "ESCALATION_REVIEW", "evidence_vector": {},
                       "authority_level": "GOVERNOR", "mutation_class": "ARCHITECTURE_MUTATION"})
