@@ -1,0 +1,90 @@
+{
+  "affected_surface_consequence": "HIGH",
+  "authority_after": "NONE",
+  "authority_before": "NONE",
+  "authority_changes": "NONE",
+  "behavior_fingerprint": "15c985382e7cb4f83be2362627baabce",
+  "capital_mutations": 0,
+  "claim_id": "C_S06",
+  "cloud_mutations": 0,
+  "consequence_class": "HIGH",
+  "cost_units": 5,
+  "counter_attractor_invocations": 0,
+  "counter_attractor_result": null,
+  "dependency_graph_fingerprint": "ca44e3ac430346d2667b1068",
+  "disposition": "SUPPORTED_BUT_CORRELATED",
+  "disposition_rule": "eco.disposition.correlated",
+  "evidence_refs": [
+    "E_S06_1",
+    "E_S06_10",
+    "E_S06_2",
+    "E_S06_3",
+    "E_S06_4",
+    "E_S06_5",
+    "E_S06_6",
+    "E_S06_7",
+    "E_S06_8",
+    "E_S06_9"
+  ],
+  "expected_accessed_during_run": false,
+  "expected_disposition": "SUPPORTED_BUT_CORRELATED",
+  "facts": {
+    "challenge_budget_exhausted": false,
+    "consequence_class": "HIGH",
+    "counter_attractor_attempted": false,
+    "disagreement_count": 1,
+    "discriminating_contradiction_found": false,
+    "distinct_allocator_count": 1,
+    "distinct_experiment_design_count": 1,
+    "distinct_model_family_count": 1,
+    "distinct_retrieval_bundle_count": 1,
+    "distinct_runtime_lineage_count": 1,
+    "distinct_source_lineages": 1,
+    "fresh_context_count": 0,
+    "independent_replication_count": 0,
+    "model_family_concentration": 1.0,
+    "prior_conclusion_exposure_ratio": 1.0,
+    "raw_reviewer_count": 10,
+    "retrieval_concentration": 1.0,
+    "source_concentration": 1.0,
+    "unknown_dimension_count": 0
+  },
+  "failures": [],
+  "fresh_context_paths": 0,
+  "friction_result": {
+    "budget_used": 1,
+    "cost_units": 5,
+    "evidence_gap": null,
+    "fresh_context_reviewers": [
+      "R_FRESH_S06"
+    ],
+    "information_gain": false,
+    "rationale": "bounded fresh-context reconstruction completed",
+    "record_id": "7eb3d8a15f734374",
+    "surfaced_alternatives": [],
+    "triggered": true
+  },
+  "friction_triggered": true,
+  "hidden_ground_truth_accessed": false,
+  "independence_profile_refs": [
+    "ca44e3ac430346d2667b1068"
+  ],
+  "independent_confirmation_satisfied": false,
+  "information_exposure_modes": [
+    "FULL_SHARED_CONTEXT"
+  ],
+  "latency_units": 0,
+  "pass": true,
+  "policy_fingerprint": "697238f5fc0e8428548fe5be",
+  "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
+  "production_mutations": 0,
+  "raw_reviewer_count": 10,
+  "raw_vote_distribution": {
+    "ALPHA": 10
+  },
+  "review_topology_id": "",
+  "run_identity_fingerprint": "54c333f6e616fbd14e295528c6a3767c",
+  "scenario_id": "S06",
+  "scenario_version": "1.0.0",
+  "topology_decision": null
+}
