@@ -96,10 +96,17 @@ def _nk(seq, scope="scope-X", reopen_conditions=None, permanent=False):
 
 
 def _condition(seq, field="sensor_online", operator="EQ", expected_value=True,
-               evidence_required=False, **kw):
+               evidence_required=False, subject_ref="", scope="", evidence_refs=(), **kw):
+    """G4R-02/03/05 documented upgrade: conditions are now SUBJECT- and
+    SCOPE-bound and evidence_required conditions must cite SPECIFIC evidence
+    ids. Old helper built unbound conditions; those could not express which
+    object/scope they governed and are replaced here (and in the scenario
+    packs) with explicitly bound conditions."""
     return ReopenCondition.make(seq, field=field, operator=operator,
                                 expected_value=expected_value,
-                                evidence_required=evidence_required, **kw)
+                                evidence_required=evidence_required,
+                                subject_ref=subject_ref, scope=scope,
+                                evidence_refs=evidence_refs, **kw)
 
 
 # --------------------------------------------------------------------------- #
@@ -331,7 +338,8 @@ def test_reopen_contract_version_retained():
 # S10 — dormant knowledge becomes valid again
 # --------------------------------------------------------------------------- #
 def _s10_pack(conditions_satisfied=True):
-    facts = {"sensor_online": True} if conditions_satisfied else {"sensor_online": False}
+    facts = {"sensor_online": True, "evidence_refs": ["EVID-S10"]} if conditions_satisfied \
+        else {"sensor_online": False}
     return G4ScenarioPack(
         scenario_id="S10",
         knowledge=[{"record_id": "M_OLD", "claim": "old regime valid",
@@ -341,7 +349,12 @@ def _s10_pack(conditions_satisfied=True):
                     "reconstruction_pointer": "recon://M_OLD",
                     "dependency_refs": [], "source_label": "S10"}],
         reopen_conditions=[{"field": "sensor_online", "operator": "EQ",
-                            "expected_value": True}],
+                            "expected_value": True,
+                            "subject_ref": "M_OLD", "scope": "regime-alpha",
+                            "evidence_required": True,
+                            "evidence_refs": ["EVID-S10"]}],
+        evidence=[{"record_id": "EVID-S10", "kind": "OBSERVATION",
+                   "claim": "sensor online", "lineage": "S10_SENSOR", "seq": 0}],
         current_facts=facts,
         epochs=[{"epoch_id": "E1"}],
         expected_outcome="REOPEN_CANDIDATE" if conditions_satisfied else "NO_REOPEN",
@@ -445,6 +458,11 @@ def _s11_pack(blocker_resolved=True, with_evidence=True, operator_permanent=Fals
             {"resolved_blockers": []}
     if with_evidence:
         facts["evidence_refs"] = ["EVID-1"]
+        facts["blocker_resolutions"] = [{
+            "resolution_id": "RESOLVE-1", "blocker": "TIMESTAMP_LEAKAGE",
+            "subject": "NK-1", "scope": "FX EURUSD",
+            "evidence_refs": ["EVID-1"], "resolution_method": "clean estimator",
+            "provenance": "fixture", "contract_version": "1.0.0"}]
     return G4ScenarioPack(
         scenario_id="S11",
         negative_knowledge=[{
@@ -455,7 +473,11 @@ def _s11_pack(blocker_resolved=True, with_evidence=True, operator_permanent=Fals
         }],
         reopen_conditions=[{"condition_type": "BLOCKER_RESOLVED",
                             "operator": "BLOCKER_RESOLVED", "expected_value": "TIMESTAMP_LEAKAGE",
-                            "evidence_required": True}],
+                            "evidence_required": True,
+                            "subject_ref": "NK-1", "scope": "FX EURUSD",
+                            "evidence_refs": ["EVID-1"]}],
+        evidence=[{"record_id": "EVID-1", "kind": "OBSERVATION",
+                   "claim": "clean estimator validated", "lineage": "S11_LAB", "seq": 0}],
         current_facts=facts,
         expected_outcome="STOP_SUPPRESSION" if (blocker_resolved and with_evidence
                                                 and not operator_permanent)
@@ -497,13 +519,21 @@ def test_negative_knowledge_record_retained_after_reopen():
 
 
 def test_suppression_ends_only_for_exact_scope():
-    """A different scope whose reopen condition is not satisfied stays
-    suppressed — each record governs only its own exact scope."""
+    """Each record governs only its own exact scope; conditions are SUBJECT-
+    bound (G4R-02) and SCOPE-bound (G4R-03). The documented upgrade binds each
+    condition to its own record id + scope; the old unbound conditions could
+    not express which object/scope they governed."""
+    from engine.registry import EvidenceRegistry
     nk1 = _nk(1, scope="FX EURUSD", reopen_conditions=["c1"])
     nk2 = _nk(2, scope="OTHER SCOPE", reopen_conditions=["c2"])
-    c1 = _condition(1, field="sensor_online", expected_value=True, evidence_required=True)
-    c2 = _condition(2, field="sensor_online", expected_value=False, evidence_required=True)
-    evaluator = ReopenEvaluator(conditions=[c1, c2])
+    c1 = _condition(1, field="sensor_online", expected_value=True, evidence_required=True,
+                    subject_ref=nk1.record_id, scope="FX EURUSD", evidence_refs=["EVID-1"])
+    c2 = _condition(2, field="sensor_online", expected_value=False, evidence_required=True,
+                    subject_ref=nk2.record_id, scope="OTHER SCOPE", evidence_refs=["EVID-1"])
+    reg = EvidenceRegistry()
+    from engine.evidence import EvidenceRecord
+    reg.register(EvidenceRecord(record_id="EVID-1", kind="OBSERVATION", claim="x", seq=0))
+    evaluator = ReopenEvaluator(conditions=[c1, c2], evidence_registry=reg)
     facts = {"sensor_online": True, "evidence_refs": ["EVID-1"]}
     d1 = decide_suppression(nk1, evaluator, facts, conditions=[c1])
     d2 = decide_suppression(nk2, evaluator, facts, conditions=[c2])
@@ -511,6 +541,24 @@ def test_suppression_ends_only_for_exact_scope():
     assert d2.next_action == "CONTINUE_SUPPRESSION"
     assert d1.scope == "FX EURUSD"
     assert d2.scope == "OTHER SCOPE"
+
+
+def test_cross_scope_condition_fails_closed():
+    """G4R-03: a condition scoped to one domain can never stop suppression of
+    a record in a different domain."""
+    from engine.registry import EvidenceRegistry
+    from engine.evidence import EvidenceRecord
+    nk = _nk(3, scope="FX EURUSD", reopen_conditions=["c3"])
+    wrong = _condition(3, field="sensor_online", expected_value=True,
+                       evidence_required=True, subject_ref=nk.record_id,
+                       scope="CRYPTO/FUNDING", evidence_refs=["EVID-1"])
+    reg = EvidenceRegistry()
+    reg.register(EvidenceRecord(record_id="EVID-1", kind="OBSERVATION", claim="x", seq=0))
+    evaluator = ReopenEvaluator(conditions=[wrong], evidence_registry=reg)
+    facts = {"sensor_online": True, "evidence_refs": ["EVID-1"]}
+    d = decide_suppression(nk, evaluator, facts, conditions=[wrong])
+    assert d.next_action == "CONTINUE_SUPPRESSION"
+    assert d.currently_suppressed is True
 
 
 def test_operator_permanent_record_does_not_auto_reopen():
@@ -593,7 +641,10 @@ def test_context_scaling_metamorphic():
 
 def test_dormant_record_reactivates_via_reopen_despite_absence():
     """G4 §13: archive is not memory. A dormant record absent from default
-    active context is retrieved when its reopen condition fires."""
+    active context is retrieved when its GOVERNED ReopenEvaluation returns
+    REOPEN_CANDIDATE (G4R-19 documented upgrade: raw boolean reopen_facts are
+    replaced by evaluator-produced evaluations)."""
+    from engine.reopen import ReopenEvaluation
     index = MemoryIndex()
     for i in range(100):
         index.add(MemoryObject(object_id=f"HIST_{i}", kind="KNOWLEDGE", tags=(),
@@ -604,7 +655,9 @@ def test_dormant_record_reactivates_via_reopen_despite_absence():
                            memory_tier="DORMANT_STORE", m4_state="DORMANT",
                            reopen_condition_ids=("c1",), summary="dormant relevant",
                            provenance_pointer="p://dormant", reconstruction_pointer="r://dormant"))
-    retriever = MemoryRetriever(index, reopen_facts={"c1": True})
+    ev = ReopenEvaluation(outcome="REOPEN_CANDIDATE", condition_results=(),
+                          rationale="condition satisfied")
+    retriever = MemoryRetriever(index, reopen_evaluations={"DORMANT_1": ev})
     bundle = retriever.build_context("task-x", required_refs=["DORMANT_1"])
     assert "DORMANT_1" in bundle.selected_active_objects
     why = [w for w in bundle.retrieval_trace if w.object_id == "DORMANT_1"]
@@ -613,12 +666,15 @@ def test_dormant_record_reactivates_via_reopen_despite_absence():
 
 
 def test_archival_object_reconstructs_explicitly():
+    from engine.reopen import ReopenEvaluation
     index = MemoryIndex()
     index.add(MemoryObject(object_id="ARCH_1", kind="EVIDENCE", tags=("task-y",),
                            memory_tier="ARCHIVAL_STORE", m4_state="DEMOTED",
                            reopen_condition_ids=("c2",), summary="archival evidence",
                            provenance_pointer="p://arch", reconstruction_pointer="r://arch"))
-    retriever = MemoryRetriever(index, reopen_facts={"c2": True})
+    ev = ReopenEvaluation(outcome="REOPEN_CANDIDATE", condition_results=(),
+                          rationale="condition satisfied")
+    retriever = MemoryRetriever(index, reopen_evaluations={"ARCH_1": ev})
     bundle = retriever.build_context("task-y", required_refs=["ARCH_1"],
                                      activation_rules={"allow_archival_reconstruct": True})
     assert "ARCH_1" in bundle.selected_active_objects
@@ -674,12 +730,13 @@ def test_m4_state_legal_with_archival_tier():
 # --------------------------------------------------------------------------- #
 # S13 — total runtime replacement / epoch reconstruction
 # --------------------------------------------------------------------------- #
-def _s13_pack(with_authority=True, with_lifecycle=True, with_projection=True,
-              with_negative=True, with_unresolved=True):
-    epochs = [{
-        "epoch_id": "E17", "predecessor_epoch": None, "schema_version": "1.0.0",
+def _s13_epoch(with_authority=True, with_projection=True, with_negative=True,
+               with_unresolved=True):
+    return {
+        "epoch_id": "E17", "predecessor_epoch": None, "schema_version": "1.1.0",
         "governing_architecture_versions": ["A-009:1.0", "A-010:1.0"],
-        "evaluation_contract_version": "EVAL-1.0",
+        "evaluation_contract_version": "EVAL:1.0",
+        "lifecycle_contract_version": "LC:1.0",
         "active_ontology_versions": ["ONT-1"],
         "high_dependency_assumptions": ["assumption-A"],
         "active_runtime_certifications": ["Hermes", "OpenClaw"],
@@ -688,13 +745,53 @@ def _s13_pack(with_authority=True, with_lifecycle=True, with_projection=True,
         "unresolved_pattern_refs": ["UP-1"] if with_unresolved else [],
         "active_knowledge_projection": ["K-ACTIVE"] if with_projection else [],
         "dormant_knowledge_projection": ["K-DORMANT"],
+        "negative_knowledge_refs": ["NK-1"] if with_negative else [],
         "validation_rules": ["rule-1"],
         "authority_state_snapshot": {"GOVERNOR": "GOVERNOR"} if with_authority else {},
+        "authority_snapshot_ref": "AUTH_SNAP:E17",
         "operator_ratifications": ["RAT-1"],
         "transformation_evidence": ["T-EVID-1"],
         "challenge_conditions": ["challenge-1"],
-    }]
-    return G4ScenarioPack(scenario_id="S13", epochs=epochs,
+    }
+
+
+def _s13_artifacts():
+    """G4R-11 documented upgrade: reconstruction now resolves every external
+    surface from PRE-EXISTING canonical artifacts. The old test pack relied on
+    from_epoch_manifest synthesizing evaluation/negative-knowledge surfaces;
+    the replacement registers actual artifacts and fails closed when absent."""
+    return [
+        {"kind": "EVALUATION_CONTRACT", "artifact_id": "EVAL:1.0",
+         "content": {"contract_id": "EVAL", "version": "1.0"}},
+        {"kind": "LIFECYCLE_CONTRACT", "artifact_id": "LC:1.0",
+         "content": {"contract_id": "LC", "version": "1.0"}},
+        {"kind": "ONTOLOGY", "artifact_id": "ONT-1", "content": {"artifact_id": "ONT-1"}},
+        {"kind": "HIGH_DEPENDENCY_ASSUMPTION", "artifact_id": "assumption-A",
+         "content": {"artifact_id": "assumption-A"}},
+        {"kind": "RUNTIME_CERTIFICATION", "artifact_id": "Hermes", "content": {"artifact_id": "Hermes"}},
+        {"kind": "RUNTIME_CERTIFICATION", "artifact_id": "OpenClaw", "content": {"artifact_id": "OpenClaw"}},
+        {"kind": "CAPABILITY_CERTIFICATION", "artifact_id": "CAP-A", "content": {"artifact_id": "CAP-A"}},
+        {"kind": "KNOWLEDGE_RECORD", "artifact_id": "K-ACTIVE", "content": {"record_id": "K-ACTIVE"}},
+        {"kind": "KNOWLEDGE_RECORD", "artifact_id": "K-DORMANT", "content": {"record_id": "K-DORMANT"}},
+        {"kind": "NEGATIVE_KNOWLEDGE", "artifact_id": "NK-1",
+         "content": {"record_id": "NK-1", "claim_rejected": "family-X"}},
+        {"kind": "UNRESOLVED_PATTERN", "artifact_id": "UP-1", "content": {"artifact_id": "UP-1"}},
+        {"kind": "VALIDATION_RULE", "artifact_id": "rule-1", "content": {"artifact_id": "rule-1"}},
+        {"kind": "OPERATOR_RATIFICATION", "artifact_id": "RAT-1",
+         "content": {"ratification_ref": "RAT-1"}},
+        {"kind": "TRANSFORMATION_EVIDENCE", "artifact_id": "T-EVID-1",
+         "content": {"evidence_id": "T-EVID-1"}},
+        {"kind": "REOPEN_CONDITION", "artifact_id": "challenge-1",
+         "content": {"condition_id": "challenge-1"}},
+    ]
+
+
+def _s13_pack(with_authority=True, with_lifecycle=True, with_projection=True,
+              with_negative=True, with_unresolved=True):
+    epoch = _s13_epoch(with_authority, with_projection, with_negative, with_unresolved)
+    if not with_lifecycle:
+        epoch["lifecycle_contract_version"] = ""
+    return G4ScenarioPack(scenario_id="S13", epochs=[epoch], artifacts=_s13_artifacts(),
                           expected_outcome="RECONSTRUCTED")
 
 
@@ -708,13 +805,18 @@ def test_sealed_epoch_reconstructs_from_canonical_artifacts():
 
 
 def test_replacement_runtime_has_zero_private_memory():
-    """A mock replacement runtime with zero runtime-native memory reconstructs
-    the epoch state from canonical artifacts only."""
+    """A mock replacement runtime reconstructs the epoch state from canonical
+    artifacts only. G4R-15 documented upgrade: a run that used runtime-native
+    memory still produces a DIAGNOSTIC report (success can be True), but
+    reconstruction_evidence_qualified is False — it never counts as evidence
+    for the runtime-neutral reconstruction pass. Old assertion trusted
+    `success` alone; that could let hidden runtime state certify the pass."""
     pack = _s13_pack().decision_grade()
     res = run_g4_scenario(pack, POLICY, current_runtime="RECONSTRUCTOR_0",
                           runtime_native_memory=True)
-    assert res.artifacts["reports"][0]["success"] is True
+    assert res.artifacts["reports"][0]["success"] is True        # diagnostic report
     assert res.artifacts["reports"][0]["runtime_native_memory_used"] is True
+    assert res.artifacts["reports"][0]["reconstruction_evidence_qualified"] is False
 
 
 def test_runtime_rename_does_not_alter_semantic_fingerprint():
@@ -737,35 +839,14 @@ def test_missing_required_artifact_fails_closed():
 
 
 def test_missing_negative_knowledge_fails_closed():
-    pack = _s13_pack().decision_grade()
+    """G4R-12 documented upgrade: the manifest alone cannot synthesize missing
+    surfaces — negative-knowledge refs must resolve to REGISTERED canonical
+    artifacts or reconstruction fails closed."""
+    pack = _s13_pack(with_negative=False).decision_grade()
     res = run_g4_scenario(pack, POLICY)
-    # bundle-level: strip the negative-knowledge ref and reconstruct directly
-    from engine.epoch import EpochManifest
-    m = EpochManifest(**pack.epochs[0])
-    m.seal()
-    bundle = EpochReconstructionBundle.from_epoch_manifest(m)
-    bundle = EpochReconstructionBundle(
-        epoch_id=m.epoch_id, sealed_epoch_manifest=m,
-        governing_architecture_versions=tuple(m.governing_architecture_versions),
-        evaluation_contract={"contract_id": "G4-EVAL", "version": m.evaluation_contract_version},
-        lifecycle_contract_version=m.evaluation_contract_version,
-        active_ontology_versions=tuple(m.active_ontology_versions),
-        high_dependency_assumptions=tuple(m.high_dependency_assumptions),
-        active_capability_certifications=tuple(m.major_capabilities),
-        authority_state_snapshot=dict(m.authority_state_snapshot),
-        active_knowledge_projection=tuple(m.active_knowledge_projection),
-        dormant_knowledge_projection=tuple(m.dormant_knowledge_projection),
-        negative_knowledge_refs=(),          # removed
-        unresolved_pattern_refs=tuple(m.unresolved_pattern_refs),
-        known_tensions=tuple(m.known_tensions),
-        validation_rules=tuple(m.validation_rules),
-        operator_ratifications=tuple(m.operator_ratifications),
-        transformation_evidence=tuple(m.transformation_evidence),
-        challenge_reopen_conditions=tuple(m.challenge_conditions),
-    )
-    report = reconstruct_epoch(bundle, "RECONSTRUCTOR")
-    assert report.success is False
-    assert "negative_knowledge_refs" in report.missing_surfaces
+    report = res.artifacts["reports"][0]
+    assert report["success"] is False
+    assert "negative_knowledge_refs" in report["missing_surfaces"]
 
 
 def test_historical_runtime_certifications_retained():
@@ -780,12 +861,16 @@ def test_historical_runtime_certifications_retained():
 def test_current_runtime_does_not_overwrite_historical_identity():
     """Reconstruction never writes the current runtime into the sealed
     historical manifest (it remains immutable)."""
-    pack = _s13_pack().decision_grade()
     from engine.epoch import EpochManifest
-    m = EpochManifest(**pack.epochs[0])
+    from engine.reconstruction import CanonicalArtifactRegistry, reconstruct_epoch
+    m = EpochManifest(**_s13_epoch())
     m.seal()
-    bundle = EpochReconstructionBundle.from_epoch_manifest(m)
-    reconstruct_epoch(bundle, "NEW_RUNTIME")
+    reg = CanonicalArtifactRegistry()
+    for data in _s13_artifacts():
+        reg.register_fixture(data)
+    reg.register_manifest(m)
+    bundle = EpochReconstructionBundle.for_manifest(m)
+    reconstruct_epoch(bundle, reg, "NEW_RUNTIME")
     # manifest unchanged: no current-runtime field, still sealed
     assert m.active_runtime_certifications == ["Hermes", "OpenClaw"]
     assert m.sealed
