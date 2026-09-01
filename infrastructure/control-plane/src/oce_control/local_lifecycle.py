@@ -296,6 +296,7 @@ def configure() -> dict:
     """
     ls.write_compose_env()
     ls.initialize_worker_token()  # one-time init; existing token preserved
+    ls.initialize_activation_handoff_key()  # B4-CXR6R1 dedicated capability key
     source = "unset"
     if ls.SECRETS_FILE.exists():
         try:
@@ -371,7 +372,11 @@ def migrate(ctx=None, env=None) -> subprocess.CompletedProcess:
         from oce_control.config_startup import create_activation_context
         ctx = create_activation_context()
     if env is None:
+        # B4-CXR6R1: the migration child is role-bound to 'migration' — the
+        # authenticated capability it consumes can never authorize an API or
+        # worker.
         env = ctx.child_environment(
+            child_role="migration",
             migration_set_identity=_migration_set_identity())
     cmd = [PYTHON, str(BASE_DIR / "scripts" / "migrate.py"), "up"]
     return subprocess.run(cmd, cwd=str(BASE_DIR), env=env, capture_output=True,
@@ -516,10 +521,15 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     # every downstream step consumes the PINNED authority.
     ctx = create_activation_context(environ=snapshot, eff=eff)
     actions.append("activation context pinned (one resolution; immutable effective config + secret identity)")
-    # B4-CXR5R3: the SANITIZED child environment carries the safe activation
-    # envelope — children prove the same lineage instead of re-reading
-    # ambient authority.
-    child_env = ctx.child_environment(
+    # B4-CXR5R3/CXR6R1: each SANITIZED child environment carries an
+    # AUTHENTICATED, role-bound activation capability — the worker child is
+    # bound to 'worker' and the API child to 'api'; a child proves the same
+    # lineage instead of re-reading ambient authority.
+    worker_env = ctx.child_environment(
+        child_role="worker",
+        migration_set_identity=_migration_set_identity())
+    api_env = ctx.child_environment(
+        child_role="api",
         migration_set_identity=_migration_set_identity())
     if not docker_available():
         raise RuntimeError("Docker is unavailable — the local runtime requires Docker "
@@ -533,7 +543,12 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
         raise RuntimeError("postgres/redis did not become healthy")
     actions.append("postgres + redis healthy")
     if migrate_now:
-        r = migrate(ctx, env=child_env)
+        # B4-CXR6R1: the migration child consumes a role-bound 'migration'
+        # capability under the parent's pinned lineage.
+        migration_env = ctx.child_environment(
+            child_role="migration",
+            migration_set_identity=_migration_set_identity())
+        r = migrate(ctx, env=migration_env)
         if r.returncode != 0:
             raise RuntimeError(f"migrations failed:\n{r.stdout}\n{r.stderr}")
         actions.append("migrations applied")
@@ -541,9 +556,9 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     # argv — the worker reads its token from the approved store (initialized
     # once in configure(); read-only during start/restart/recover).
     start_process("worker", [PYTHON, "-m", "oce_control.worker_loop",
-                             "--worker-id", "worker-local01"], env=child_env)
+                             "--worker-id", "worker-local01"], env=worker_env)
     actions.append("worker started (pid-file owned, token from approved store)")
-    start_process("api", [PYTHON, "-m", "oce_control.http_api"], env=child_env)
+    start_process("api", [PYTHON, "-m", "oce_control.http_api"], env=api_env)
     actions.append("api started (pid-file owned, pinned activation lineage)")
     if not wait_for_http(timeout_s, port=ctx.control_plane_port):
         raise RuntimeError("API did not answer on 127.0.0.1")
@@ -612,7 +627,10 @@ def recover() -> list[str]:
     actions.append("migrations up-to-date")
     for name, (pidfile, marker) in PROCESSES.items():
         if pid_state(pid_file(name), marker)[0] != "live":
+            # B4-CXR6R1: each restarted child consumes a role-bound capability
+            child_role = "worker" if name == "worker" else "api"
             child_env = ctx.child_environment(
+                child_role=child_role,
                 migration_set_identity=_migration_set_identity())
             if name == "worker":
                 start_process("worker", [PYTHON, "-m", "oce_control.worker_loop",

@@ -394,7 +394,7 @@ def build_durable_app(*, scheduler_tick_interval: int = 5, ctx=None) -> FastAPI:
                 "production activation requires a pinned ActivationContext — "
                 "build_durable_app(ctx=None) is unreachable in a "
                 "lifecycle-launched process (B4-CXR5R3)")
-        ctx = create_activation_context()  # resolve ONCE, pin
+        ctx = create_activation_context(role="api")  # resolve ONCE, pin
         dsn = ctx.runtime_dsn()
     conn = psycopg2.connect(dsn)
     conn.autocommit = False
@@ -458,7 +458,9 @@ if __name__ == "__main__":
     # the configuration that passes the gate is the configuration the runtime
     # actually uses, and later environment mutation cannot alter it.
     from .config_startup import create_activation_context
-    ctx = create_activation_context()
+    # B4-CXR6R1: direct API launch declares the API role; a lifecycle child
+    # must present an authenticated capability bound to 'api'.
+    ctx = create_activation_context(role="api")
     host, port = runtime_bind(ctx=ctx)
     interval = runtime_scheduler_interval(ctx=ctx)
     app = build_durable_app(scheduler_tick_interval=interval, ctx=ctx)

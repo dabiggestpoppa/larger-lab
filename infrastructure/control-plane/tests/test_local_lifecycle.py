@@ -213,6 +213,7 @@ def _seed_initialized_store() -> dict:
     }
     ls.SECRETS_FILE.parent.mkdir(parents=True, exist_ok=True)
     ls.SECRETS_FILE.write_text(json.dumps(data), encoding="utf-8")
+    ls.initialize_activation_handoff_key()  # B4-CXR6R1 dedicated capability key
     return data
 
 

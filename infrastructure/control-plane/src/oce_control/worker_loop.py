@@ -78,7 +78,10 @@ def main(argv=None) -> None:
     # uninitialized store fails closed (never materializes on the fly).
     from .config_startup import create_activation_context
     from . import local_secrets as ls
-    ctx = create_activation_context()
+    # B4-CXR6R1: this process declares the WORKER role; when launched as a
+    # lifecycle child the activation capability must be role-bound to
+    # 'worker' or activation is refused before any connection.
+    ctx = create_activation_context(role="worker")
     token = ls.read_worker_token()  # read-only; raises when not initialized
 
     import psycopg2

@@ -39,6 +39,135 @@ SECRETS_FILE = RUNTIME_DIR / "secrets.json"
 COMPOSE_ENV_FILE = RUNTIME_DIR / "compose.env"
 LOGS_DIR = RUNTIME_DIR / "logs"
 
+# B4-CXR6R1: DEDICATED activation-handoff authority. The activation
+# capability (OCE_ACTIVATION_ENVELOPE) is MACed with this key so an ambient
+# environment can never forge or self-sign a child activation. The key is
+# high-entropy (256-bit), DOMAIN-SEPARATED from the PostgreSQL password and
+# the worker token (never derived from either), initialized ONCE by the
+# explicit configure phase, and read-only at runtime. It never appears in
+# environment, argv, process title, logs, evidence, diagnostics, or the
+# repository — only in this 0600 file.
+ACTIVATION_KEY_FILE_NAME = "activation_handoff_key"
+# Consumed-capability nonce ledger (single-use replay protection). Written
+# ONLY after a capability verifies successfully; never on a denied path.
+CONSUMED_NONCES_FILE_NAME = "consumed_activation_nonces.json"
+# Capability lifetime (seconds). The envelope is consumed at child startup;
+# the window exists so a launched child can always verify before starting
+# work, while a replayed/stale capability fails closed.
+CAPABILITY_TTL_SECONDS = 900
+
+
+def activation_key_file() -> Path:
+    return RUNTIME_DIR / ACTIVATION_KEY_FILE_NAME
+
+
+def consumed_nonces_file() -> Path:
+    return RUNTIME_DIR / CONSUMED_NONCES_FILE_NAME
+
+
+def initialize_activation_handoff_key() -> str:
+    """INITIALIZATION path (B4-CXR6R1) — materialize the dedicated
+    activation-handoff key ONCE.
+
+    Called only by the explicit init phase (`oce_local configure`).
+    Generates a strong 256-bit random key when absent and PRESERVES the
+    existing key on later invocations — an ordinary start/restart/recover
+    never creates or replaces it. Atomic write with restrictive permissions
+    at creation. The key is domain-separated: it is generated independently
+    and is never derived from the PostgreSQL password or worker token.
+    """
+    path = activation_key_file()
+    if path.exists():
+        key = read_activation_handoff_key()  # validates + preserves
+        return key
+    key = secrets.token_hex(32)  # 256-bit entropy
+    _atomic_write_text(path, key + "\n", mode=0o600)
+    return key
+
+
+def read_activation_handoff_key() -> str:
+    """RUNTIME read path (B4-CXR6R1) — read-only, fails closed when absent.
+
+    The activation-handoff key lives ONLY in the approved 0600 runtime file;
+    it is never read from the environment and never emitted. A missing or
+    malformed key fails closed with a `configure` remediation hint — runtime
+    paths never materialize one.
+    """
+    path = activation_key_file()
+    if not path.exists():
+        raise RuntimeError(
+            "activation handoff key not configured — run `oce_local "
+            "configure` to initialize it (runtime reads never materialize "
+            "one; B4-CXR6R1)")
+    try:
+        key = path.read_text(encoding="utf-8").strip()
+    except OSError as exc:
+        raise RuntimeError(
+            f"activation handoff key unreadable: {exc} — manual remediation "
+            "required; OCE never recreates it (B4-CXR6R1)") from exc
+    if not key or len(key) < 64 or not all(c in "0123456789abcdef" for c in key):
+        raise RuntimeError(
+            "activation handoff key is malformed — manual remediation "
+            "required; OCE never recreates it (B4-CXR6R1)")
+    return key
+
+
+def _load_consumed_nonces() -> set[str]:
+    """Read the consumed-capability nonce ledger (read-only)."""
+    path = consumed_nonces_file()
+    if not path.exists():
+        return set()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return set()
+    if not isinstance(data, dict):
+        return set()
+    return {k for k, v in data.items()
+            if isinstance(k, str) and isinstance(v, (int, float))}
+
+
+def mark_capability_consumed(nonce: str) -> None:
+    """Record *nonce* as consumed (B4-CXR6R1 single-use replay protection).
+
+    Called ONLY after a capability verifies successfully. Locked atomic
+    read-modify-write: concurrent consumers cannot lose entries. Old nonces
+    are pruned so the ledger stays bounded (a replayed old capability is
+    already rejected by its expiry + parent binding; the ledger guards the
+    launch window).
+    """
+    if not isinstance(nonce, str) or not nonce:
+        raise RuntimeError("refusing to consume a malformed capability nonce")
+    path = consumed_nonces_file()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = path.parent / f".{path.name}.lock"
+    import time
+    now = time.time()
+    with open(lock_path, "a+b") as lf:
+        _exclusive_lock(lf)
+        try:
+            data = {}
+            try:
+                parsed = json.loads(path.read_text(encoding="utf-8"))
+                if isinstance(parsed, dict):
+                    data = parsed
+            except (json.JSONDecodeError, OSError):
+                pass
+            data[nonce] = now
+            # bound the ledger: drop entries older than 24h (their expiry +
+            # freshness checks already fail closed long before this window)
+            cutoff = now - 24 * 3600
+            pruned = {k: v for k, v in data.items()
+                      if isinstance(v, (int, float)) and v >= cutoff}
+            _atomic_write_json(path, pruned)
+        finally:
+            _unlock(lf)
+
+
+def is_capability_consumed(nonce: str) -> bool:
+    """True when *nonce* was already consumed (replay guard, read-only)."""
+    return nonce in _load_consumed_nonces()
+
 # Local-only defaults that are NOT secrets (the password is never defaulted).
 PG_USER = "oce_control_admin"
 PG_DB = "oce_control"

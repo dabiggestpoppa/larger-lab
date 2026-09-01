@@ -839,12 +839,15 @@ class TestGovernedNamespace:
 # makes the context STALE and every consumer fails closed (no silent adoption).
 # --------------------------------------------------------------------------- #
 class TestCXR4R3ImmutableActivationContext:
-    def _ctx(self, tmp_path, env=None):
+    def _ctx(self, tmp_path, env=None, monkeypatch=None):
         import hashlib
         from oce_control import local_secrets as ls
         store = tmp_path / "secrets.json"
         store.write_text(json.dumps({"postgres_password": "k" * 40}),
                          encoding="utf-8")
+        if monkeypatch is not None:
+            monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path)
+        ls.initialize_activation_handoff_key()  # dedicated capability key
         # test_seam=True: rotate() is a TEST-ONLY metadata seam (B4-CXR5R4)
         backend = ls.RuntimeSecretBackend(store, test_seam=True)
         ctx = cs.create_activation_context(environ=env or CLEAN_ENV, backend=backend)
@@ -1343,11 +1346,14 @@ class TestCXR5R2CanonicalMigrationProgram:
 # freshness (stale/forged/revoked lineage fails closed before activity).
 # --------------------------------------------------------------------------- #
 class TestCXR5R3ActivationLineage:
-    def _ctx(self, tmp_path, env=None):
+    def _ctx(self, tmp_path, env=None, monkeypatch=None):
         from oce_control import local_secrets as ls
         store = tmp_path / "secrets.json"
         store.write_text(json.dumps({"postgres_password": "k" * 40}),
                          encoding="utf-8")
+        if monkeypatch is not None:
+            monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path)
+        ls.initialize_activation_handoff_key()  # dedicated capability key
         # test_seam=True: rotate() is a TEST-ONLY metadata seam (B4-CXR5R4)
         backend = ls.RuntimeSecretBackend(store, test_seam=True)
         ctx = cs.create_activation_context(
@@ -1359,11 +1365,13 @@ class TestCXR5R3ActivationLineage:
         import oce_control.local_lifecycle as ll
         from oce_control import local_secrets as ls
         store = tmp_path / "secrets.json"
-        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+        store.write_text(json.dumps({"postgres_password": "k" * 40,
+                                     "worker_token": "w" * 40}),
                          encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
         monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
         monkeypatch.setattr(ls, "COMPOSE_ENV_FILE", tmp_path / "runtime" / "compose.env")
+        ls.initialize_activation_handoff_key()  # dedicated capability key
         # B4-CXR5X1: the CI runner injects ambient POSTGRES_PASSWORD/DSN into
         # the pytest environment; the isolated test store is the sole authority
         # here (the ambient value must not trigger a fail-closed mismatch).
@@ -1402,11 +1410,12 @@ class TestCXR5R3ActivationLineage:
                "OCE_SCHEDULER_INTERVAL": "9"}
         ctx, backend, _ = self._ctx(tmp_path, env=env)
         assert ctx.control_plane_port == 8455 and ctx.scheduler_interval == 9
-        child_env = ctx.child_environment()
+        child_env = ctx.child_environment(child_role="api")
         # mutate ambient authority AFTER parent creation — must not move child
         child_env["OCE_CONTROL_PLANE_PORT"] = "9999"
         child_env["POSTGRES_PASSWORD"] = "ambient-attack-1234567890"
-        child = cs.create_activation_context(environ=child_env, backend=backend)
+        child = cs.create_activation_context(environ=child_env, backend=backend,
+                                             role="api")
         assert child.context_id == ctx.context_id       # same lineage
         assert child.control_plane_port == 8455          # pinned
         assert child.scheduler_interval == 9
@@ -1414,9 +1423,10 @@ class TestCXR5R3ActivationLineage:
 
     def test_child_environment_is_sanitized(self, tmp_path):
         # 5 (CXR5-03): child env carries NO ambient OCE_* authority or secret
-        # — only the safe envelope — and the envelope has no secret material
+        # — only the authenticated capability — and the carrier has no secret
+        # material (no password, DSN, token, or handoff key)
         ctx, backend, store = self._ctx(tmp_path)
-        env = ctx.child_environment()
+        env = ctx.child_environment(child_role="api")
         for key in env:
             assert not key.startswith("OCE_") or key == "OCE_ACTIVATION_ENVELOPE", key
         assert "POSTGRES_PASSWORD" not in env and "POSTGRES_DSN" not in env
@@ -1427,39 +1437,49 @@ class TestCXR5R3ActivationLineage:
         assert "worker_token" not in blob
         assert "secret_generation" in blob     # safe metadata IS present
         assert "config_fingerprint" in blob
+        import oce_control.local_secrets as ls
+        assert ls.read_activation_handoff_key() not in blob  # key never leaves
 
     def test_child_rejects_stale_generation(self, tmp_path):
         # L: secret rotates AFTER parent activation -> child lineage STALE,
         # fails closed before any activity; new generation never adopted
         ctx, backend, _ = self._ctx(tmp_path)
-        child_env = ctx.child_environment()
+        child_env = ctx.child_environment(child_role="api")
         backend.rotate("runtime-local", "rotated-after-parent-9876543210")
         with pytest.raises(SystemExit, match="STALE"):
-            cs.create_activation_context(environ=child_env, backend=backend)
+            cs.create_activation_context(environ=child_env, backend=backend,
+                                         role="api")
 
     def test_child_rejects_revoked_secret(self, tmp_path):
         ctx, backend, _ = self._ctx(tmp_path)
-        child_env = ctx.child_environment()
+        child_env = ctx.child_environment(child_role="api")
         backend.revoke("runtime-local")
         with pytest.raises(SystemExit, match="STALE"):
-            cs.create_activation_context(environ=child_env, backend=backend)
+            cs.create_activation_context(environ=child_env, backend=backend,
+                                         role="api")
 
     def test_child_rejects_forged_identity(self, tmp_path):
-        # K: a forged/inconsistent envelope identity fails closed
+        # K (CXR6-01): any forged field breaks the MAC — a recomputable
+        # plain-SHA self-consistency check is no longer the gate
         ctx, backend, _ = self._ctx(tmp_path)
-        child_env = ctx.child_environment()
+        child_env = ctx.child_environment(child_role="api")
         forged = json.loads(child_env["OCE_ACTIVATION_ENVELOPE"])
-        forged["context_id"] = "0" * 64
+        payload = json.loads(forged["payload"])
+        payload["context_id"] = "0" * 64
+        forged["payload"] = json.dumps(payload, sort_keys=True,
+                                        separators=(",", ":"))
         child_env["OCE_ACTIVATION_ENVELOPE"] = json.dumps(forged)
-        with pytest.raises(SystemExit, match="forged|inconsistent"):
-            cs.create_activation_context(environ=child_env, backend=backend)
+        with pytest.raises(SystemExit, match="MAC verification FAILED"):
+            cs.create_activation_context(environ=child_env, backend=backend,
+                                         role="api")
 
     def test_child_rejects_malformed_envelope(self, tmp_path):
         ctx, backend, _ = self._ctx(tmp_path)
-        child_env = ctx.child_environment()
+        child_env = ctx.child_environment(child_role="api")
         child_env["OCE_ACTIVATION_ENVELOPE"] = "{not json"
         with pytest.raises(SystemExit, match="malformed"):
-            cs.create_activation_context(environ=child_env, backend=backend)
+            cs.create_activation_context(environ=child_env, backend=backend,
+                                         role="api")
 
     def test_require_runtime_startable_resolves_once(self, monkeypatch, tmp_path):
         # M: require_runtime_startable resolves the environment exactly once
@@ -1486,8 +1506,8 @@ class TestCXR5R3ActivationLineage:
         # the ctx=None compatibility fallbacks fail closed
         from oce_control import local_secrets as ls
         from oce_control import http_api as api
-        ctx, backend, _ = self._ctx(tmp_path)
-        child_env = ctx.child_environment()
+        ctx, backend, _ = self._ctx(tmp_path, monkeypatch=monkeypatch)
+        child_env = ctx.child_environment(child_role="api")
         with pytest.raises(SystemExit, match="pinned ActivationContext"):
             api.runtime_bind(environ=child_env)
         with pytest.raises(SystemExit, match="pinned ActivationContext"):
@@ -1508,8 +1528,9 @@ class TestCXR5R3ActivationLineage:
         store.write_text(json.dumps({"postgres_password": "k" * 40}),
                          encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
-        ctx, backend, _ = self._ctx(tmp_path)
+        ctx, backend, _ = self._ctx(tmp_path, monkeypatch=monkeypatch)
         child_env = ctx.child_environment(
+            child_role="migration",
             migration_set_identity={"manifest_sha256": "0" * 64})
         monkeypatch.setenv("OCE_ACTIVATION_ENVELOPE",
                            child_env["OCE_ACTIVATION_ENVELOPE"])
@@ -1529,9 +1550,10 @@ class TestCXR5R3ActivationLineage:
         store.write_text(json.dumps({"postgres_password": "k" * 40}),
                          encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
-        ctx, backend, _ = self._ctx(tmp_path)
+        ctx, backend, _ = self._ctx(tmp_path, monkeypatch=monkeypatch)
         identity = mig.migration_set_identity()
-        child_env = ctx.child_environment(migration_set_identity=identity)
+        child_env = ctx.child_environment(
+            child_role="migration", migration_set_identity=identity)
         monkeypatch.setenv("OCE_ACTIVATION_ENVELOPE",
                            child_env["OCE_ACTIVATION_ENVELOPE"])
         seen = []

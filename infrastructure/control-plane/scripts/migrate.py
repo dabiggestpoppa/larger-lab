@@ -411,7 +411,11 @@ def main(argv: list[str] | None = None) -> int:
     # config or an unresolvable secret reference. The DSN is derived here,
     # in process memory, from the pinned context; it is never echoed.
     from oce_control.config_startup import create_activation_context
-    ctx = create_activation_context()
+    # B4-CXR6R1: the migration program declares the MIGRATION role; when
+    # launched as a lifecycle child the activation capability must be
+    # role-bound to 'migration' or database mutation is refused before any
+    # connection.
+    ctx = create_activation_context(role="migration")
     dsn = ctx.runtime_dsn()
     # Invariant guard (defense in depth): the governed derivation MUST be the
     # exact governed identity — host/port/db/user (+ credential authority).
