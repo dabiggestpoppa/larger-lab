@@ -46,6 +46,27 @@ def _plane():
         reset_clock()
 
 
+def _doctor_env(monkeypatch, tmp_path, secrets_file):
+    """Hermetic doctor harness (no docker/ps dependency), returns ll."""
+    import oce_control.local_lifecycle as ll
+    from oce_control import local_secrets as ls
+    monkeypatch.setattr(ls, "SECRETS_FILE", secrets_file)
+    monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+    (tmp_path / "runtime").mkdir(exist_ok=True)
+    monkeypatch.setattr(ll, "docker_available", lambda: True)
+    monkeypatch.setattr(ll, "published_ports_from_compose", lambda: [])
+    monkeypatch.setattr(ll, "process_cmdline", lambda pid: None)
+    import subprocess as _sp
+
+    class _FakeComp:
+        returncode = 0
+        stdout = ""
+        stderr = ""
+
+    monkeypatch.setattr(_sp, "run", lambda *a, **k: _FakeComp())
+    return ll
+
+
 # --------------------------------------------------------------------------- #
 # Effective config loading / validation primitives
 # --------------------------------------------------------------------------- #
@@ -379,6 +400,79 @@ class TestR3R2RuntimeBind:
 
 
 # --------------------------------------------------------------------------- #
+# B4-CXR3R8 (CXR3-09/CXR3-10) — adversarial closure for the remaining escape
+# paths: unresolved custom reference + doctor, revoked reference + doctor, and
+# aggregate denial-side-effect invariance (denial never mutates the store).
+# --------------------------------------------------------------------------- #
+class TestCXR3R8AdversarialClosure:
+    def test_doctor_fails_on_unresolved_custom_reference(self, tmp_path, monkeypatch):
+        # N: an unresolved CUSTOM password ref must fail doctor readiness
+        from oce_control import local_secrets as ls
+        store = tmp_path / "custom-store.json"
+        store.write_text(json.dumps({"other_secret": "x" * 40}), encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        monkeypatch.setenv("OCE_POSTGRES_PASSWORD_REF", "secret:custom-db")
+        ll = _doctor_env(monkeypatch, tmp_path, store)
+        result = ll.doctor()
+        checks = {c["check"]: c["ok"] for c in result["checks"]}
+        assert checks["config spine effective config valid (fail-closed)"] is True
+        assert checks["configured secret reference resolves (runtime readiness)"] \
+            is False
+
+    def test_doctor_fails_on_revoked_reference(self, tmp_path, monkeypatch):
+        # O: a REVOKED reference must fail doctor readiness
+        from oce_control import local_secrets as ls
+        store = tmp_path / "revoked-store.json"
+        store.write_text(json.dumps({
+            "postgres_password": "x" * 40,
+            "b4_meta": {"runtime-local": {"revoked": True, "generation": 2}},
+        }), encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        ll = _doctor_env(monkeypatch, tmp_path, store)
+        result = ll.doctor()
+        checks = {c["check"]: c["ok"] for c in result["checks"]}
+        assert checks["configured secret reference resolves (runtime readiness)"] \
+            is False
+
+    def test_config_denials_never_mutate_secret_store(self, tmp_path, monkeypatch):
+        # R: DENIAL HAS ZERO AUTHORITY-SIDE EFFECTS across every denial path
+        import hashlib
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        before = hashlib.sha256(store.read_bytes()).hexdigest()
+        deny_envs = [
+            {"OCE_EXECUTION_BROKER_ENABLED": "true"},
+            {"OCE_CAPITAL_AUTHORITY": "approved"},
+            {"OCE_LOG_REDACT_SECRETS": "false"},
+            {"OCE_SANDBOX_PROCESS_TREE_TERMINATION": "false"},
+            {"OCE_CONTROL_PLANE_PORT": "not-a-port"},
+            {"OCE_POSTGRES_HOST": "10.0.0.9"},
+            {"OCE_CP_URL": "http://10.0.0.9:8448"},
+        ]
+        for extra in deny_envs:
+            env = {"PATH": "/usr/bin",
+                   "OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local",
+                   **extra}
+            if "OCE_CP_URL" not in extra:
+                with pytest.raises(ValidationError):
+                    cs.effective_from_env(env)
+            with pytest.raises(SystemExit):
+                cs.outbound_cp_url(env)  # URL/config denials at the gate
+        monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-9876543210")
+        monkeypatch.setenv("POSTGRES_DSN",
+                           "postgresql://oce_control_admin:ambient-attack-9876543210"
+                           "@127.0.0.1:5433/oce_control")
+        with pytest.raises(RuntimeError, match="bypass"):
+            ls.require_runtime_dsn()
+        after = hashlib.sha256(store.read_bytes()).hexdigest()
+        assert before == after
+        assert ls.load_runtime_secret() == "k" * 40  # store value unchanged
+
+
+# --------------------------------------------------------------------------- #
 # B4-CXR3R7 (CXR3-08) — unified startup-truth semantics: validate_startup is
 # the config gate; validate_runtime_readiness / require_runtime_startable are
 # the complete runtime-start contract (config + secret resolution). No
@@ -426,29 +520,9 @@ class TestCXR3R7StartupTruthSemantics:
                      "secret:runtime-local"}, backend=backend)
         assert eff.get_bool("sandbox.strict") is True
 
-    def _doctor_env(self, monkeypatch, tmp_path, secrets_file: Path):
-        """Mirror the lifecycle doctor-test harness: no docker/ps dependency."""
-        import oce_control.local_lifecycle as ll
-        from oce_control import local_secrets as ls
-        monkeypatch.setattr(ls, "SECRETS_FILE", secrets_file)
-        monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
-        (tmp_path / "runtime").mkdir(exist_ok=True)
-        monkeypatch.setattr(ll, "docker_available", lambda: True)
-        monkeypatch.setattr(ll, "published_ports_from_compose", lambda: [])
-        monkeypatch.setattr(ll, "process_cmdline", lambda pid: None)
-        import subprocess as _sp
-
-        class _FakeComp:
-            returncode = 0
-            stdout = ""
-            stderr = ""
-
-        monkeypatch.setattr(_sp, "run", lambda *a, **k: _FakeComp())
-        return ll
-
     def test_doctor_fails_on_unresolved_secret(self, tmp_path, monkeypatch):
         # doctor must FAIL when the configured reference does not resolve
-        ll = self._doctor_env(monkeypatch, tmp_path, tmp_path / "absent-doctor.json")
+        ll = _doctor_env(monkeypatch, tmp_path, tmp_path / "absent-doctor.json")
         result = ll.doctor()
         checks = {c["check"]: c["ok"] for c in result["checks"]}
         assert checks["config spine effective config valid (fail-closed)"] is True
@@ -460,7 +534,7 @@ class TestCXR3R7StartupTruthSemantics:
         f = tmp_path / "doctor-secrets.json"
         f.write_text(json.dumps({"postgres_password": "z" * 40}),
                      encoding="utf-8")
-        ll = self._doctor_env(monkeypatch, tmp_path, f)
+        ll = _doctor_env(monkeypatch, tmp_path, f)
         result = ll.doctor()
         checks = {c["check"]: c["ok"] for c in result["checks"]}
         assert checks["configured secret reference resolves (runtime readiness)"] \
