@@ -27,7 +27,8 @@ from .adjudicate import (
     EvidenceAdjudicator, AdjudicatorPolicy, AdjudicatorRule, PredicateGate,
     EvidenceObservation, PhaseProposal, PolicyError,
 )
-from .scenario import run_scenario, evaluate_expectation, decision_view, ScenarioRunResult
+from .scenario import run_scenario, evaluate_expectation, decision_view, explain_transition, ScenarioRunResult
+from .registry import EvidenceRegistry, LineageSummary, UnknownEvidenceRef, DuplicateEvidenceError
 from .scenariolib import ScenarioPack, load_scenario_pack, load_all_packs, SCENARIO_DIRS
 
 __all__ = [
