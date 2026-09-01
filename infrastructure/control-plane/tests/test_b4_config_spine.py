@@ -41,6 +41,7 @@ from oce_control.config_spine import (
     validate_effective,
     validate_setting_value,
 )
+from oce_control.audit_sink import PostgresAuditSink, REQUIRED_COLUMNS
 
 # A sentinel secret value used in tests; it must never appear in redacted
 # output, fingerprints, snapshots, or any committed source below.
@@ -509,10 +510,14 @@ class TestAuthorization:
         assert authz.can_mutate("operator", s) is False
         assert authz.can_mutate("hermes", s) is False
 
+    def _proven(self, reg):
+        # PROVEN durable sink (unit-level fake) for the canonical apply path
+        return ConfigAuthorization(reg, durable_sink=PostgresAuditSink(_FakeConn()))
+
     def test_override_records_attributable_audit(self):
         reg = build_default_registry()
         eff = ConfigResolver(reg).resolve(HAPPY)
-        authz = ConfigAuthorization(reg)
+        authz = self._proven(reg)
         new = authz.operator_override(
             eff, actor="operator:po", setting_name="control_plane.port",
             requested_change="raise local port to 9100 for CI",
@@ -525,14 +530,22 @@ class TestAuthorization:
         assert entry.reason
         assert entry.authorized is True
         assert entry.timestamp
+        # B4-CXR5R5: idempotent request id + config fingerprints recorded
+        assert entry.request_id
+        assert entry.fingerprint_before == eff.fingerprint
+        assert entry.fingerprint_after != entry.fingerprint_before
 
     def test_override_of_policy_setting_denied(self):
         reg = build_default_registry()
         eff = ConfigResolver(reg).resolve(HAPPY)
         authz = ConfigAuthorization(reg)
         for actor in ("operator", "operator:po"):
+            p = authz.evaluate_override_preview(
+                eff, actor=actor, setting_name="sandbox.strict",
+                requested_change="x", reason="x", new_value=False)
+            assert p.authorized is False and p.decision == "denied"
             with pytest.raises(PermissionError):
-                authz.operator_override(
+                self._proven(reg).operator_override(
                     eff, actor=actor, setting_name="sandbox.strict",
                     requested_change="x", reason="x", new_value=False)
 
@@ -540,8 +553,12 @@ class TestAuthorization:
         reg = build_default_registry()
         eff = ConfigResolver(reg).resolve(HAPPY)
         authz = ConfigAuthorization(reg)
+        p = authz.evaluate_override_preview(
+            eff, actor="operator", setting_name="postgres.password_ref",
+            requested_change="x", reason="x", new_value="secret:other")
+        assert p.authorized is False
         with pytest.raises(PermissionError):
-            authz.operator_override(
+            self._proven(reg).operator_override(
                 eff, actor="operator", setting_name="postgres.password_ref",
                 requested_change="x", reason="x", new_value="secret:other")
 
@@ -549,8 +566,12 @@ class TestAuthorization:
         reg = build_default_registry()
         eff = ConfigResolver(reg).resolve(HAPPY)
         authz = ConfigAuthorization(reg)
+        p = authz.evaluate_override_preview(
+            eff, actor="operator", setting_name="no.such",
+            requested_change="x", reason="x", new_value="1")
+        assert p.authorized is False
         with pytest.raises(ValidationError):
-            authz.operator_override(
+            self._proven(reg).operator_override(
                 eff, actor="operator", setting_name="no.such",
                 requested_change="x", reason="x", new_value="1")
 
@@ -1135,52 +1156,66 @@ class TestR3R4DatabaseSecretBinding:
 # --------------------------------------------------------------------------- #
 class TestCXR3R6OverrideAuditTruth:
     def test_default_audit_is_explicitly_non_authoritative(self):
+        # CXR5R5: WITHOUT a proven durable sink the canonical override is
+        # BLOCKED — no in-memory record may ever claim durability or return
+        # an applicable value. The preview reports would_be_durable=False.
         reg = build_default_registry()
         authz = ConfigAuthorization(reg)
         assert authz.audit_durable is False
         eff = ConfigResolver(reg).resolve(HAPPY)
-        authz.operator_override(
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9123")
+        assert authz.audit == []  # nothing applied, nothing recorded
+        p = authz.evaluate_override_preview(
             eff, actor="operator:po", setting_name="control_plane.port",
             requested_change="x", reason="r", new_value="9123")
-        assert len(authz.audit) == 1
-        # no durable truth is claimed for the in-process helper
-        assert authz.audit[0].durable is False
+        assert p.authorized is True and p.would_be_durable is False
 
     def test_list_sink_is_not_durable(self):
-        # CXR4R5 truth repair: a Python list with .append() is NOT a durable
-        # sink — audit_durable stays False and no durable truth is claimed.
+        # CXR4R5/CXR5R5 truth repair: a Python list with .append() is NOT a
+        # durable sink — audit_durable stays False and the canonical override
+        # BLOCKS (a list can never return an applicable override).
         reg = build_default_registry()
         sink: list[dict] = []
         authz = ConfigAuthorization(reg, durable_sink=sink)
         assert authz.audit_durable is False
         eff = ConfigResolver(reg).resolve(HAPPY)
-        authz.operator_override(
-            eff, actor="operator:po", setting_name="control_plane.port",
-            requested_change="x", reason="r", new_value="9124")
-        assert authz.audit[0].durable is False
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9124")
+        assert authz.audit == []
         assert sink == []  # nothing was claimed/persisted as durable
 
     def test_durable_sink_never_contains_secret_values(self):
         reg = build_default_registry()
-        sink: list[dict] = []
-        authz = ConfigAuthorization(reg, durable_sink=sink)
+        conn = _FakeConn()
+        authz = ConfigAuthorization(reg,
+                                    durable_sink=PostgresAuditSink(conn))
         eff = ConfigResolver(reg).resolve(HAPPY)
         with pytest.raises(PermissionError):
             authz.operator_override(
                 eff, actor="operator", setting_name="postgres.password_ref",
                 requested_change="x", reason="x", new_value="secret:other")
-        assert sink == [] and authz.audit == []
+        assert not any("INSERT INTO config_override_audit" in sql
+                       for sql, _ in conn.executes)
+        assert authz.audit == []
 
     def test_denied_override_writes_no_record(self):
         reg = build_default_registry()
-        sink: list[dict] = []
-        authz = ConfigAuthorization(reg, durable_sink=sink)
+        conn = _FakeConn()
+        authz = ConfigAuthorization(reg,
+                                    durable_sink=PostgresAuditSink(conn))
         eff = ConfigResolver(reg).resolve(HAPPY)
         with pytest.raises(PermissionError):
             authz.operator_override(
                 eff, actor="hermes", setting_name="control_plane.port",
                 requested_change="x", reason="x", new_value="9999")
-        assert sink == [] and authz.audit == []
+        assert not any("INSERT INTO config_override_audit" in sql
+                       for sql, _ in conn.executes)
+        assert authz.audit == []
 
 
 # --------------------------------------------------------------------------- #
@@ -1223,10 +1258,10 @@ class TestCXR3R5CapitalAuthorityLocked:
         assert authz.can_mutate("hermes", s) is False
         assert authz.can_mutate("operator", s) is False
         for actor in ("hermes", "operator"):
-            with pytest.raises(PermissionError):
-                authz.operator_override(
-                    eff, actor=actor, setting_name="capital.authority",
-                    requested_change="x", reason="x", new_value="approved")
+            p = authz.evaluate_override_preview(
+                eff, actor=actor, setting_name="capital.authority",
+                requested_change="x", reason="x", new_value="approved")
+            assert p.authorized is False and p.decision == "denied"
 
     def test_po_override_still_blocked_in_book4(self):
         # operator:po is the CEO-level actor, but even PO cannot activate
@@ -1234,8 +1269,13 @@ class TestCXR3R5CapitalAuthorityLocked:
         reg = build_default_registry()
         authz = ConfigAuthorization(reg)
         eff = ConfigResolver(reg).resolve(HAPPY)
+        p = authz.evaluate_override_preview(
+            eff, actor="operator:po", setting_name="capital.authority",
+            requested_change="activate capital", reason="po decision",
+            new_value="approved")
+        assert p.authorized is False and "locked to 'none'" in p.reason_code
         with pytest.raises(PermissionError, match="locked to 'none'"):
-            authz.operator_override(
+            TestCXR3R5CapitalAuthorityLocked._proven(reg).operator_override(
                 eff, actor="operator:po", setting_name="capital.authority",
                 requested_change="activate capital", reason="po decision",
                 new_value="approved")
@@ -1243,13 +1283,20 @@ class TestCXR3R5CapitalAuthorityLocked:
     def test_po_can_override_none_value_records_audit(self):
         # the lock allows the (no-op) 'none' value; attribution still records
         reg = build_default_registry()
-        authz = ConfigAuthorization(reg)
+        authz = self._proven(reg)
         eff = ConfigResolver(reg).resolve(HAPPY)
         new = authz.operator_override(
             eff, actor="operator:po", setting_name="capital.authority",
             requested_change="confirm no capital authority",
-            reason="explicit operator decision", new_value="none")
+            reason="explicit operator decision", new_value="none",
+            request_id="cap-none-req-0001")
         assert new == "none"
+        assert authz.audit[0].request_id == "cap-none-req-0001"
+
+    @staticmethod
+    def _proven(reg):
+        return ConfigAuthorization(reg,
+                                   durable_sink=PostgresAuditSink(_FakeConn()))
 
 
 # --------------------------------------------------------------------------- #
@@ -1426,9 +1473,17 @@ class _FakeCursor:
         self._conn.executes.append((sql, params))
 
     def fetchone(self):
-        return (1,) if self._conn.rows is None else (self._conn.rows[0] if self._conn.rows else None)
+        sql = self._conn.executes[-1][0] if self._conn.executes else ""
+        if "to_regclass" in sql:
+            return (True,)
+        if sql.strip().startswith("SELECT 1 FROM config_override_audit"):
+            return (1,) if self._conn.rows else None
+        return (self._conn.rows[0] if self._conn.rows else None)
 
     def fetchall(self):
+        sql = self._conn.executes[-1][0] if self._conn.executes else ""
+        if "information_schema.columns" in sql:
+            return [(c,) for c in sorted(REQUIRED_COLUMNS)]
         return list(self._conn.rows or [])
 
 
@@ -1440,17 +1495,24 @@ class _FakeConn:
         self.committed = 0
         self.fail_commit = fail_commit
         self.rows = rows
+        self.tx_status = 0  # TRANSACTION_STATUS_IDLE
+        self.rolled_back = 0
 
     def cursor(self):
         return _FakeCursor(self)
+
+    def get_transaction_status(self):
+        return self.tx_status
 
     def commit(self):
         if self.fail_commit:
             raise RuntimeError("commit failed")
         self.committed += 1
+        self.tx_status = 0
 
     def rollback(self):
-        pass
+        self.rolled_back += 1
+        self.tx_status = 0
 
 
 class TestCXR4R5ProvenAuditDurability:
@@ -1469,30 +1531,35 @@ class TestCXR4R5ProvenAuditDurability:
         assert authz.audit_durable is False  # duck-typed append != durability
 
     def test_proven_postgres_sink_marks_entries_durable(self):
-        from oce_control.audit_sink import PostgresAuditSink
         conn = _FakeConn()
         sink = PostgresAuditSink(conn)
         authz = self._authz(sink)
-        assert authz.audit_durable is True  # isinstance + proven()
+        assert authz.audit_durable is True  # type-exact + proven()
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         authz.operator_override(
             eff, actor="operator:po", setting_name="control_plane.port",
             requested_change="x", reason="r", new_value="9124")
         assert authz.audit[0].durable is True
         assert conn.committed >= 1  # transaction commit confirmation
-        assert any("config_override_audit" in sql for sql, _ in conn.executes)
+        insert = next((params for sql, params in conn.executes
+                       if sql.strip().startswith("INSERT INTO")), None)
+        assert insert is not None
+        # B4-CXR5R5: idempotent audit_id + request_id + fingerprints recorded
+        assert insert[0] == insert[1]  # audit_id == request_id
+        assert insert[10] and insert[11]  # fingerprint_before/after present
+        assert any("ON CONFLICT" in sql for sql, _ in conn.executes)
 
     def test_canonical_durable_override_blocked_without_proven_sink(self):
         reg = build_default_registry()
         eff = ConfigResolver(reg).resolve(HAPPY)
         # no sink at all
         with pytest.raises(RuntimeError, match="BLOCKED"):
-            self._authz(None).operator_override_durable(
+            self._authz(None).operator_override(
                 eff, actor="operator:po", setting_name="control_plane.port",
                 requested_change="x", reason="r", new_value="9125")
         # a LIST is still not a proven durable sink
         with pytest.raises(RuntimeError, match="BLOCKED"):
-            self._authz([]).operator_override_durable(
+            self._authz([]).operator_override(
                 eff, actor="operator:po", setting_name="control_plane.port",
                 requested_change="x", reason="r", new_value="9125")
         # a duck-typed append object is still not proven
@@ -1501,33 +1568,50 @@ class TestCXR4R5ProvenAuditDurability:
                 pass
 
         with pytest.raises(RuntimeError, match="BLOCKED"):
-            self._authz(FakeAppend()).operator_override_durable(
+            self._authz(FakeAppend()).operator_override(
                 eff, actor="operator:po", setting_name="control_plane.port",
                 requested_change="x", reason="r", new_value="9125")
 
+    def test_subclass_cannot_self_report_durable(self):
+        # CXR5R5 #15: a generic subclass or fake cannot become authoritative
+        # merely by self-reporting proven=True — the gate is TYPE-EXACT.
+        class LyingSubclass(PostgresAuditSink):
+            def proven(self):
+                return True
+
+            def append(self, record):
+                return "fake"
+
+        authz = self._authz(LyingSubclass(_FakeConn()))
+        assert authz.audit_durable is False
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9128")
+
     def test_durable_commit_failure_fails_override_closed(self):
-        from oce_control.audit_sink import PostgresAuditSink
         conn = _FakeConn(fail_commit=True)
         sink = PostgresAuditSink(conn)
         authz = self._authz(sink)
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         with pytest.raises(RuntimeError, match="FAILED"):
-            authz.operator_override_durable(
+            authz.operator_override(
                 eff, actor="operator:po", setting_name="control_plane.port",
                 requested_change="x", reason="r", new_value="9126")
         assert authz.audit == []  # no record — not even in-memory
+        assert conn.rolled_back >= 1  # failed append rolled back, applied nothing
 
     def test_denied_and_sensitive_overrides_write_zero_durable_records(self):
-        from oce_control.audit_sink import PostgresAuditSink
         conn = _FakeConn()
         authz = self._authz(PostgresAuditSink(conn))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         with pytest.raises(PermissionError):
-            authz.operator_override_durable(
+            authz.operator_override(
                 eff, actor="hermes", setting_name="control_plane.port",
                 requested_change="x", reason="r", new_value="9127")
         with pytest.raises(PermissionError):
-            authz.operator_override_durable(
+            authz.operator_override(
                 eff, actor="operator", setting_name="postgres.password_ref",
                 requested_change="x", reason="r", new_value="secret:other")
         assert not any("INSERT INTO config_override_audit" in sql
@@ -1538,8 +1622,9 @@ class TestCXR4R5ProvenAuditDurability:
         # reload/read-back: a fresh sink over the same connection returns the
         # committed ledger (container CI proves real PostgreSQL persistence)
         from oce_control.audit_sink import PostgresAuditSink
-        row = ("a1", "operator:po", "control_plane.port", "x", "r",
-               "8448", "9124", "granted", True, "2026-01-01T00:00:00Z")
+        row = ("a1", "a1", "operator:po", "control_plane.port", "x", "r",
+               "8448", "9124", "granted", True, "fp-before", "fp-after",
+               "postgres:config_override_audit", "2026-01-01T00:00:00Z")
         conn = _FakeConn(rows=[row])
         sink = PostgresAuditSink(conn)
         back = sink.read_back()
@@ -1547,3 +1632,106 @@ class TestCXR4R5ProvenAuditDurability:
         assert back[0]["actor"] == "operator:po"
         assert back[0]["setting"] == "control_plane.port"
         assert back[0]["authorized"] is True
+        assert back[0]["request_id"] == "a1"
+        assert back[0]["fingerprint_before"] == "fp-before"
+        assert back[0]["fingerprint_after"] == "fp-after"
+        assert back[0]["backend_identity"] == "postgres:config_override_audit"
+
+    # ------------------------------------------------------------------ #
+    # B4-CXR5R5: secret-smuggling refusal + transaction isolation +        #
+    # idempotent request reconciliation (proofs S/T/U from the CXR5-05     #
+    # adversarial closure).                                              #
+    # ------------------------------------------------------------------ #
+
+    def test_secret_canary_in_reason_rejected(self):
+        # CXR5-05 #11-12 / proof S: reason must never become a secret
+        # smuggling channel. A password-bearing DSN in the reason field is
+        # refused BEFORE any INSERT and zero secret bytes ever reach the
+        # connection surface.
+        conn = _FakeConn()
+        authz = self._authz(PostgresAuditSink(conn))
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        dsn_canary = "postgresql://bob:supersecret-dsn-pw@db:5432/oce"
+        with pytest.raises(PermissionError, match="secret material"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="raise port", reason=dsn_canary,
+                new_value="9101")
+        # only the proven()-probe SELECTs may have touched the connection —
+        # NO INSERT, and the canary never appears in any executed SQL/params
+        assert not any("INSERT INTO config_override_audit" in sql
+                       for sql, _ in conn.executes)
+        assert all(dsn_canary not in str(params)
+                   for _, params in conn.executes)
+        assert authz.audit == []            # nothing recorded
+
+    def test_secret_canary_in_requested_change_rejected(self):
+        conn = _FakeConn()
+        authz = self._authz(PostgresAuditSink(conn))
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        token_canary = "ghp_" + "A" * 20
+        with pytest.raises(PermissionError, match="secret material"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change=f"rotate using {token_canary}", reason="r",
+                new_value="9102")
+        assert not any("INSERT INTO config_override_audit" in sql
+                       for sql, _ in conn.executes)
+        assert all(token_canary not in str(params)
+                   for _, params in conn.executes)
+        assert authz.audit == []
+
+    def test_control_characters_in_audit_text_rejected(self):
+        # multiline/control-character content could forge extra ledger rows
+        # or break a row-based carrier — refused (CXR5-05 #12).
+        conn = _FakeConn()
+        authz = self._authz(PostgresAuditSink(conn))
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        with pytest.raises(PermissionError, match="control characters"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x\nINSERT INTO config_override_audit ...",
+                reason="r", new_value="9103")
+        assert not any("INSERT INTO config_override_audit" in sql
+                       for sql, _ in conn.executes)
+        assert authz.audit == []
+
+    def test_audit_append_refuses_pending_transaction(self):
+        # CXR5-05 #6-7 / proof T: the audit connection is DEDICATED — an
+        # append must never commit unrelated application work. A connection
+        # already inside a transaction refuses before any INSERT.
+        conn = _FakeConn()
+        sink = PostgresAuditSink(conn)
+        conn.tx_status = 1  # TRANSACTION_STATUS_INTRANS (unrelated work open)
+        with pytest.raises(RuntimeError, match="pending transaction"):
+            sink.append({"actor": "operator:po", "setting": "x",
+                         "requested_change": "r", "reason": "r",
+                         "new": "1"})
+        assert not any("INSERT INTO config_override_audit" in sql
+                       for sql, _ in conn.executes)
+        assert conn.committed == 0  # nothing was committed
+
+    def test_idempotent_request_id_reconciliation(self):
+        # CXR5-05 #9: an uncertain commit can be reconciled by retrying with
+        # the SAME request/correlation id — every retry targets the same
+        # audit_id and the DB dedups (ON CONFLICT DO NOTHING).
+        conn = _FakeConn()
+        authz = self._authz(PostgresAuditSink(conn))
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        rid = "override-req-0007"
+        first = authz.operator_override(
+            eff, actor="operator:po", setting_name="control_plane.port",
+            requested_change="x", reason="r", new_value="9104",
+            request_id=rid)
+        second = authz.operator_override(
+            eff, actor="operator:po", setting_name="control_plane.port",
+            requested_change="x", reason="r", new_value="9105",
+            request_id=rid)
+        assert first == 9104 and second == 9105  # both applied, both same id
+        inserts = [(params[0], params[1]) for sql, params in conn.executes
+                   if sql.strip().startswith("INSERT INTO")]
+        assert len(inserts) == 2
+        assert all(audit_id == rid for audit_id, request_id in inserts)
+        assert all(audit_id == request_id for audit_id, request_id in inserts)
+        assert any("ON CONFLICT (audit_id) DO NOTHING" in sql
+                   for sql, _ in conn.executes)

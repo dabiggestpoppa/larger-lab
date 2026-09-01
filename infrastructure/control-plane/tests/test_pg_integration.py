@@ -44,7 +44,7 @@ def _clean_db(pg):
         cur.execute(
             "DROP TABLE IF EXISTS schema_migrations, evidence_refs, audit_log, events, "
             "workers, schedules, leases, idempotency, job_transitions, jobs, denials, "
-            "capability_grants, actors CASCADE"
+            "capability_grants, actors, config_override_audit CASCADE"
         )
     pg.commit()
     rc = migrate.cmd_up(oc.dsn(), migrate.MIGRATIONS_DIR)
@@ -193,3 +193,94 @@ def test_migration_checksum_mismatch_detected(pg):
     pg.commit()
     rc = migrate.cmd_up(oc.dsn(), migrate.MIGRATIONS_DIR)
     assert rc == 2, "checksum mismatch must return nonzero"
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR5R5: durable override audit — append-only ledger + reloadable          #
+# persistence through a FRESH connection (real PostgreSQL, mandatory in CI).   #
+# --------------------------------------------------------------------------- #
+
+
+def _audit_insert(pg, *, audit_id: str, request_id: str = "", actor: str = "operator:po",
+                  setting: str = "control_plane.port", requested_change: str = "x",
+                  reason: str = "r", previous: str = "8448", new: str = "9124",
+                  decision: str = "granted", authorized: bool = True,
+                  fingerprint_before: str = "fp-before",
+                  fingerprint_after: str = "fp-after",
+                  backend_identity: str = "postgres:config_override_audit") -> None:
+    with pg.cursor() as cur:
+        cur.execute(
+            "INSERT INTO config_override_audit "
+            "(audit_id, request_id, actor, setting, requested_change, reason, "
+            " previous, new, decision, authorized, fingerprint_before, "
+            " fingerprint_after, backend_identity) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (audit_id, request_id or audit_id, actor, setting, requested_change,
+             reason, previous, new, decision, authorized, fingerprint_before,
+             fingerprint_after, backend_identity))
+    pg.commit()
+
+
+def test_audit_ledger_append_only_update_and_delete_refused(pg):
+    """CXR5-05 #13 / proof V: UPDATE and DELETE on the committed override
+    ledger are REFUSED IN THE DATABASE (migration 0007 trigger) — an
+    accidental rewrite or a forged record can never be introduced through SQL.
+    """
+    _audit_insert(pg, audit_id="aud-append-only-1")
+    for stmt in (
+        "UPDATE config_override_audit SET reason='forged' "
+        "WHERE audit_id='aud-append-only-1'",
+        "DELETE FROM config_override_audit "
+        "WHERE audit_id='aud-append-only-1'",
+    ):
+        try:
+            with pg.cursor() as cur:
+                cur.execute(stmt)
+            pg.commit()
+            raise AssertionError(
+                f"statement must be refused by the append-only trigger: {stmt}")
+        except Exception as exc:
+            pg.rollback()  # aborted transaction after trigger RAISE
+            assert "APPEND-ONLY" in str(exc)
+    with pg.cursor() as cur:
+        cur.execute("SELECT reason FROM config_override_audit "
+                    "WHERE audit_id='aud-append-only-1'")
+        assert cur.fetchone()[0] == "r"  # original row unchanged
+
+
+def test_audit_record_reloadable_via_fresh_connection(pg):
+    """CXR5-05 #13 / proof U+reload: a committed audit record is readable
+    through a FRESH connection (restart-persistence proof) with every
+    durable-record field intact.
+    """
+    import psycopg2
+    from oce_control.audit_sink import PostgresAuditSink
+    _audit_insert(pg, audit_id="aud-fresh-conn-1", request_id="req-fresh-1",
+                  fingerprint_before="fp-b", fingerprint_after="fp-a")
+    conn2 = psycopg2.connect(oc.dsn())
+    try:
+        back = PostgresAuditSink(conn2).read_back()
+        rows = [r for r in back if r["audit_id"] == "aud-fresh-conn-1"]
+        assert len(rows) == 1
+        row = rows[0]
+        assert row["request_id"] == "req-fresh-1"
+        assert row["actor"] == "operator:po"
+        assert row["fingerprint_before"] == "fp-b"
+        assert row["fingerprint_after"] == "fp-a"
+        assert row["backend_identity"] == "postgres:config_override_audit"
+        assert row["recorded_at"] is not None
+    finally:
+        conn2.close()
+
+
+def test_audit_append_idempotent_on_conflict(pg):
+    """CXR5-05 #9: retrying the same request/correlation id yields exactly
+    one ledger row (ON CONFLICT DO NOTHING) — an uncertain commit can be
+    reconciled safely without duplicate decisions.
+    """
+    _audit_insert(pg, audit_id="aud-idem-1", request_id="req-idem-1")
+    _audit_insert(pg, audit_id="aud-idem-1", request_id="req-idem-1")
+    with pg.cursor() as cur:
+        cur.execute("SELECT count(*) FROM config_override_audit "
+                    "WHERE audit_id='aud-idem-1'")
+        assert cur.fetchone()[0] == 1
