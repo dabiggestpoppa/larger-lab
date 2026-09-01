@@ -1,0 +1,20 @@
+{
+  "scenario_id": "S01_WEAK",
+  "scenario_version": "1.0.0",
+  "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
+  "institutional_scope": "S01 sensitivity: SAME CORE centrality, weak/non-persistent contradiction — no transformation",
+  "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "PO": "PO"
+  },
+  "initial_knowledge": [
+    {
+      "record_id": "@M_A",
+      "state": "ACTIVE",
+      "claim": "M_A: same mechanism as S01 (CORE dependency, weak contradiction regime)",
+      "provenance_source_kind": "FIXTURE",
+      "provenance_source_label": "S01W-seed",
+      "producing_actor": "PO"
+    }
+  ]
+}
