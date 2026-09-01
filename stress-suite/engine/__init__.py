@@ -67,6 +67,18 @@ from .reconstruction import (
 )
 from .memory_policy import MemoryPolicy, MemoryRule, MemoryPolicyError
 from .g4_runner import G4ScenarioPack, G4RunResult, load_g4_pack, run_g4_scenario, evaluate_g4_expectation
+from .domain import (
+    B7ValidationGate, B7ValidationResult, StrategyCandidate, PerformanceReport,
+    FailureAtom, UnresolvedPatternRecord, MechanismCard, FrozenExperimentProtocol,
+    DoctrineClaimRecord, ReproductionRecord, DoctrineContradictionRecord,
+    AmendmentProposal, ProviderObservation, ProviderSemanticsRecord,
+    SourceDiagnosisResult, SourceDisagreementRecord, SensorRequirement,
+    DataAvailabilityRecord, SearchDemand, DomainTransferHypothesis,
+    TransferInvariantMap, ResearchPriorityRecord, PromotionDecision,
+    DomainClaimRecord, diagnose_provider_disagreement,
+)
+from .domain_policy import G5DomainPolicy, G5Rule, G5PolicyError, g5_policy_outcome
+from .g5_runner import G5ScenarioPack, G5RunResult, load_g5_pack, run_g5_scenario, evaluate_g5_expectation
 
 __all__ = [
     "HARNESS_VERSION",
@@ -111,4 +123,15 @@ __all__ = [
     "MemoryPolicy", "MemoryRule", "MemoryPolicyError",
     "G4ScenarioPack", "G4RunResult", "load_g4_pack", "run_g4_scenario",
     "evaluate_g4_expectation",
+    "B7ValidationGate", "B7ValidationResult", "StrategyCandidate", "PerformanceReport",
+    "FailureAtom", "UnresolvedPatternRecord", "MechanismCard", "FrozenExperimentProtocol",
+    "DoctrineClaimRecord", "ReproductionRecord", "DoctrineContradictionRecord",
+    "AmendmentProposal", "ProviderObservation", "ProviderSemanticsRecord",
+    "SourceDiagnosisResult", "SourceDisagreementRecord", "SensorRequirement",
+    "DataAvailabilityRecord", "SearchDemand", "DomainTransferHypothesis",
+    "TransferInvariantMap", "ResearchPriorityRecord", "PromotionDecision",
+    "DomainClaimRecord", "diagnose_provider_disagreement",
+    "G5DomainPolicy", "G5Rule", "G5PolicyError", "g5_policy_outcome",
+    "G5ScenarioPack", "G5RunResult", "load_g5_pack", "run_g5_scenario",
+    "evaluate_g5_expectation",
 ]

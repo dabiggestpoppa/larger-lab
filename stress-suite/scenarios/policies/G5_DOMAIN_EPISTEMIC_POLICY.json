@@ -1,0 +1,244 @@
+{
+  "policy_id": "G5_DOMAIN_EPISTEMIC_POLICY",
+  "version_tag": "V1",
+  "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+  "authority_basis": "ONE shared, scenario-agnostic domain epistemic policy drives the primary dispositions of the CLASS C domain family (S14-S19). Rules inspect ONLY generic dimensions: domain, claim_type, authority_class, data availability/quality, PIT integrity, execution realism, cost sensitivity, OOS status, mechanism status, independence status, source disagreement, sensor resolution, domain transfer status, manual authority, reproduction quality, validation gate state, economic value class, affected surface. No scenario id, no literal strategy/provider/concept names, no expected outcomes, no hidden truth. TEST-ONLY dispositions map onto existing M4/M5 semantics and are NOT constitutional states. PnL may change RESEARCH PRIORITY only; it can never weaken B7 gates, PIT/execution realism, OOS/WF requirements, evidence independence, authority, manual doctrine or source semantics. When a policy is required and no rule matches the disposition is POLICY_HOLD (G5-P0-A discipline).",
+  "rules": [
+    {
+      "rule_id": "g5.priority.high",
+      "kind": "research_priority",
+      "when": {
+        "economic_value_class": {"in": ["EXTREME", "HIGH"]}
+      },
+      "then": {
+        "disposition": "PRIORITY_HIGH"
+      },
+      "rationale": "high apparent economic value raises research priority only - it never purchases epistemic promotion (PROFIT != VALIDATION)"
+    },
+    {
+      "rule_id": "g5.priority.normal",
+      "kind": "research_priority",
+      "when": {
+        "economic_value_class": {"in": ["MODERATE", "LOW"]}
+      },
+      "then": {
+        "disposition": "PRIORITY_NORMAL"
+      },
+      "rationale": "moderate/low value keeps normal priority"
+    },
+    {
+      "rule_id": "g5.claim.rejected_on_material_gates",
+      "kind": "claim_disposition",
+      "when": {
+        "validation_gate_terminal": "REJECTED",
+        "pit_integrity": {"in": ["BAD", "UNKNOWN"]}
+      },
+      "then": {
+        "disposition": "REJECTED_NEGATIVE_KNOWLEDGE"
+      },
+      "rationale": "a material PIT hard failure rejects the candidate regardless of reported PnL; the rejection becomes preserved negative knowledge with reopen conditions"
+    },
+    {
+      "rule_id": "g5.claim.rejected_on_execution",
+      "kind": "claim_disposition",
+      "when": {
+        "validation_gate_terminal": "REJECTED",
+        "execution_realism": {"in": ["BAD", "UNKNOWN"]}
+      },
+      "then": {
+        "disposition": "REJECTED_NEGATIVE_KNOWLEDGE"
+      },
+      "rationale": "impossible fills reject the candidate even after PIT repair - realistic execution cannot be purchased by PnL"
+    },
+    {
+      "rule_id": "g5.claim.data_blocked",
+      "kind": "claim_disposition",
+      "when": {
+        "data_availability": {"in": ["UNAVAILABLE", "CURRENT_ONLY", "PARTIAL", "HISTORICAL_LIMITED", "UNKNOWN"]}
+      },
+      "then": {
+        "disposition": "DATA_BLOCKED"
+      },
+      "rationale": "current observational resolution cannot adjudicate the claim: DATA_BLOCKED is a valid answer, not failure and not falsification (MISSING DATA != NEGATIVE EVIDENCE)"
+    },
+    {
+      "rule_id": "g5.claim.ontology_exploration",
+      "kind": "claim_disposition",
+      "when": {
+        "claim_type": "MECHANISM_HYPOTHESIS",
+        "mechanism_status": "UNKNOWN_FAMILY",
+        "data_quality": "CLEAN",
+        "independence_status": {"in": ["CONFIRMED", "SUPPORTED"]}
+      },
+      "then": {
+        "disposition": "ONTOLOGY_EXPLORATION_CANDIDATE"
+      },
+      "rationale": "a residual with clean independent evidence and no known family may be explored as a new mechanism, NOT classified into the nearest known family"
+    },
+    {
+      "rule_id": "g5.claim.unresolved_on_quality",
+      "kind": "claim_disposition",
+      "when": {
+        "claim_type": "MECHANISM_HYPOTHESIS",
+        "data_quality": "FAILED"
+      },
+      "then": {
+        "disposition": "UNRESOLVED_PATTERN"
+      },
+      "rationale": "a residual that disappears after data-quality correction yields no new family (CONTROL A)"
+    },
+    {
+      "rule_id": "g5.claim.unresolved_pattern",
+      "kind": "claim_disposition",
+      "when": {
+        "claim_type": "MECHANISM_HYPOTHESIS",
+        "mechanism_status": "UNRESOLVED"
+      },
+      "then": {
+        "disposition": "UNRESOLVED_PATTERN"
+      },
+      "rationale": "insufficient independence or missing sensor keeps the pattern UNRESOLVED; UNRESOLVED_PATTERN is not a strategy"
+    },
+    {
+      "rule_id": "g5.claim.validation_required",
+      "kind": "claim_disposition",
+      "when": {
+        "validation_gate_terminal": "VALIDATION_PASS",
+        "mechanism_status": {"in": ["PRESENT", "UNKNOWN_FAMILY"]},
+        "data_availability": "AVAILABLE"
+      },
+      "then": {
+        "disposition": "VALIDATION_REQUIRED"
+      },
+      "rationale": "clean gates do not promote; they route to governed validation with a frozen protocol"
+    },
+    {
+      "rule_id": "g5.doctrine.flawed_reproduction",
+      "kind": "doctrine",
+      "when": {
+        "reproduction_quality": "FLAWED"
+      },
+      "then": {
+        "disposition": "REPRODUCTION_REJECTED"
+      },
+      "rationale": "a reproduction with documented protocol deviations cannot challenge doctrine; the manual stays preserved"
+    },
+    {
+      "rule_id": "g5.doctrine.contradiction_open",
+      "kind": "doctrine",
+      "when": {
+        "contradiction_present": true
+      },
+      "then": {
+        "disposition": "CONTRADICTION_OPEN"
+      },
+      "rationale": "a high-quality reproduction that repeatedly contradicts the manual under exact governed conditions opens an explicit contradiction: MANUAL_PRESERVED + CONTRADICTION_OPEN, amendment requires OPERATOR"
+    },
+    {
+      "rule_id": "g5.doctrine.manual_preserved",
+      "kind": "doctrine",
+      "when": {
+        "manual_authority": "CEREBUS_MANUAL"
+      },
+      "then": {
+        "disposition": "MANUAL_PRESERVED"
+      },
+      "rationale": "the authoritative manual remains canonical until explicit operator-amendment ratification; evidence cannot silently change authority"
+    },
+    {
+      "rule_id": "g5.source.diagnostic_required",
+      "kind": "source_disagreement",
+      "when": {
+        "source_disagreement": "PRESENT",
+        "diagnosis_complete": false
+      },
+      "then": {
+        "disposition": "SOURCE_DIAGNOSTIC_REQUIRED"
+      },
+      "rationale": "provider disagreement begins diagnosis at source semantics; market-field interpretation cannot be challenged until source layers are adjudicated"
+    },
+    {
+      "rule_id": "g5.source.disagreement_preserved",
+      "kind": "source_disagreement",
+      "when": {
+        "source_disagreement": "PRESENT",
+        "diagnosis_complete": true
+      },
+      "then": {
+        "disposition": "SOURCE_DISAGREEMENT_PRESERVED"
+      },
+      "rationale": "genuine provider disagreement after clean semantics is PRESERVED, never averaged into consensus"
+    },
+    {
+      "rule_id": "g5.availability.blocked",
+      "kind": "availability",
+      "when": {
+        "data_availability": {"in": ["UNAVAILABLE", "CURRENT_ONLY", "PARTIAL", "HISTORICAL_LIMITED", "UNKNOWN"]}
+      },
+      "then": {
+        "disposition": "DATA_BLOCKED"
+      },
+      "rationale": "required observable absent at needed resolution/history blocks the claim and emits a SearchDemand; no synthetic backfill (S18)"
+    },
+    {
+      "rule_id": "g5.transfer.analogy_only",
+      "kind": "transfer",
+      "when": {
+        "domain_transfer_status": "ANALOGY"
+      },
+      "then": {
+        "disposition": "ANALOGY_ONLY"
+      },
+      "rationale": "a same-name concept with different observable mechanics is analogy, not transfer (ANALOGY != TRANSFER)"
+    },
+    {
+      "rule_id": "g5.transfer.rejected_broken",
+      "kind": "transfer",
+      "when": {
+        "domain_transfer_status": "BROKEN_MAPPING"
+      },
+      "then": {
+        "disposition": "TRANSFER_REJECTED"
+      },
+      "rationale": "a broken structural assumption in the invariant map rejects the transfer"
+    },
+    {
+      "rule_id": "g5.transfer.data_blocked",
+      "kind": "transfer",
+      "when": {
+        "domain_transfer_status": "HYPOTHESIS",
+        "target_data_availability": {"in": ["UNAVAILABLE", "UNKNOWN", "CURRENT_ONLY", "PARTIAL"]}
+      },
+      "then": {
+        "disposition": "DATA_BLOCKED"
+      },
+      "rationale": "missing target-domain observables block the transfer test - source-domain evidence alone cannot count as target validation"
+    },
+    {
+      "rule_id": "g5.transfer.validation_required",
+      "kind": "transfer",
+      "when": {
+        "domain_transfer_status": "HYPOTHESIS",
+        "target_data_availability": "AVAILABLE",
+        "protocol_frozen": true
+      },
+      "then": {
+        "disposition": "DOMAIN_VALIDATION_REQUIRED"
+      },
+      "rationale": "a structurally mapped transfer with target data may only be tested under a frozen target-domain protocol"
+    },
+    {
+      "rule_id": "g5.transfer.validation_only_from_target_evidence",
+      "kind": "transfer",
+      "when": {
+        "domain_transfer_status": "HYPOTHESIS",
+        "target_data_availability": "AVAILABLE",
+        "protocol_frozen": false
+      },
+      "then": {
+        "disposition": "TRANSFER_HYPOTHESIS_ONLY"
+      },
+      "rationale": "without a frozen target-domain protocol the transfer stays a hypothesis; no FX validation from crypto evidence"
+    }
+  ]
+}
