@@ -57,7 +57,6 @@ BLOC_02_EVID = EVID.parent / "bloc_02"
 
 from crypto_sensor_fabric.contracts.enums import SensorFamily  # noqa: E402
 from crypto_sensor_fabric.providers.readiness import (  # noqa: E402
-    PRODUCTION_PROVIDER_REGISTRY,
     build_readiness_records,
     compute_exact_sets,
     evidence_ref_audit,
@@ -246,7 +245,7 @@ def _scenario_keys_from_module(path: Path) -> dict[str, dict[str, Any]]:
     tree = ast.parse(source)
     out: dict[str, dict[str, Any]] = {}
     for node in ast.walk(tree):
-        value: ast.expr | None = None
+        value: ast.Dict | None = None
         names: list[str] = []
         if isinstance(node, ast.Assign) and isinstance(node.value, ast.Dict):
             value = node.value
@@ -261,18 +260,21 @@ def _scenario_keys_from_module(path: Path) -> dict[str, dict[str, Any]]:
                 continue
             flat: set[str] = set()
             nested: dict[str, set[str]] = {}
-            for key, value in zip(node.value.keys, node.value.values):
-                if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
+            for sub_key, sub_value in zip(value.keys, value.values):
+                if not (
+                    isinstance(sub_key, ast.Constant)
+                    and isinstance(sub_key.value, str)
+                ):
                     continue
-                if isinstance(value, ast.Dict):
+                if isinstance(sub_value, ast.Dict):
                     sub = {
                         ast.literal_eval(k2)
-                        for k2 in value.keys
+                        for k2 in sub_value.keys
                         if isinstance(k2, ast.Constant) and isinstance(k2.value, str)
                     }
-                    nested[str(key.value)] = sub
+                    nested[str(sub_key.value)] = sub
                 else:
-                    flat.add(str(key.value))
+                    flat.add(str(sub_key.value))
             out[name] = {"flat": flat, "nested": nested}
     return out
 
@@ -544,16 +546,16 @@ def main() -> None:
 
     # ---- fixture coverage report
     fixture_cov = _fixture_coverage()
-    fixture_report = {
+    fixture_report: dict[str, Any] = {
         "artifact": "FIXTURE_COVERAGE_REPORT.json",
         "method": "AST-derived from committed test fixture modules (scenario dict keys -> QA categories)",
         "note": "categories: happy, empty, additive, drift, malformed, provider_error, resume_completion; missing = no committed fixture for that category on that path",
         "paths": {},
     }
     for row in final_rows:
-        key = f"{row['provider_id']}|{row['sensor_family']}"
-        cov = fixture_cov.get(key, {"scenario_keys": [], "categories": []})
-        fixture_report["paths"][key] = cov
+        cov_key = f"{row['provider_id']}|{row['sensor_family']}"
+        cov = fixture_cov.get(cov_key, {"scenario_keys": [], "categories": []})
+        fixture_report["paths"][cov_key] = cov
 
     # ---- write (deterministic; LF; no timestamps inside canonical content)
     def write(name: str, payload: Any) -> None:
