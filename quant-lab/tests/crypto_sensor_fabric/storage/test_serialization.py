@@ -28,6 +28,7 @@ from crypto_sensor_fabric.storage.models import (
     EvidenceBlob,
     PartitionManifest,
     RawEvidenceQuery,
+    RawProjectionArtifact,
     canonical_json_bytes,
 )
 
@@ -195,3 +196,58 @@ class TestBloc3HandoffBridge:
         q = RawEvidenceQuery()
         assert q.revision_policy is RevisionPolicy.ERROR_ON_AMBIGUITY
         assert q.include_t0a is True
+
+
+class TestI01R1SemverSerialization:
+    """I01R1 — projection schema semver serialization stays deterministic."""
+
+    def _projection(self, version: str) -> RawProjectionArtifact:
+        return RawProjectionArtifact(
+            projection_id="proj-1",
+            source_blob_sha256=[SHA],
+            projection_schema_id="deribit-trade-v1",
+            projection_schema_version=version,
+            parser_version="deribit-adapter-v1",
+            row_count=1,
+            partition_key="k",
+            projection_uri="t0://projections/p.parquet",
+            projection_sha256=SHA,
+        )
+
+    def test_semver_serialized_as_string(self) -> None:
+        text = canonical_json_bytes(self._projection("1.0.0")).decode("utf-8")
+        assert '"projection_schema_version":"1.0.0"' in text
+
+    def test_same_semver_byte_identical(self) -> None:
+        a = canonical_json_bytes(self._projection("1.1.0"))
+        b = canonical_json_bytes(self._projection("1.1.0"))
+        assert a == b
+
+    def test_different_semver_different_bytes(self) -> None:
+        a = canonical_json_bytes(self._projection("1.1.0"))
+        b = canonical_json_bytes(self._projection("2.0.0"))
+        assert a != b
+
+    def test_date_basis_unknown_serialized_explicitly(self) -> None:
+        from crypto_sensor_fabric.storage.models import PartitionManifest
+
+        m = PartitionManifest(
+            partition_manifest_id="pm-1",
+            partition_key="k",
+            manifest_version=1,
+            provider="GATE_FUTURES",
+            venue="GATE_FUTURES",
+            sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+            native_instrument="BTC_USDT",
+            source_granularity=Granularity.G1H,
+            logical_date_start=UTC_NOW,
+            logical_date_end=UTC_NOW,
+            blob_refs=[SHA],
+            coverage_state=CoverageState.PARTIAL,
+            integrity_state=IntegrityState.LOCAL_HASH_VERIFIED,
+            row_count=24,
+            revision_count=1,
+            created_at=UTC_NOW,
+        )
+        text = canonical_json_bytes(m).decode("utf-8")
+        assert '"date_basis":"UNKNOWN"' in text

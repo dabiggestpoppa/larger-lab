@@ -18,6 +18,7 @@ from crypto_sensor_fabric.providers.base.enums import Granularity
 from crypto_sensor_fabric.storage.enums import (
     BackupClass,
     CoverageState,
+    DateBasis,
     DiskPressure,
     IntegrityState,
     ProjectionState,
@@ -159,7 +160,7 @@ class TestRawProjectionArtifact:
             "projection_id": "proj-1",
             "source_blob_sha256": [SHA],
             "projection_schema_id": "deribit-trade-v1",
-            "projection_schema_version": 1,
+            "projection_schema_version": "1.0.0",
             "parser_version": "deribit-adapter-v1",
             "row_count": 10,
             "min_provider_time": UTC_NOW,
@@ -386,7 +387,7 @@ class TestRawNormalizationBatch:
             sensor_family=SensorFamily.MECHANICAL_TRADE,
             native_instrument="BTC-PERPETUAL",
             projection_schema_id="deribit-trade-v1",
-            projection_schema_version=1,
+            projection_schema_version="1.0.0",
             parser_version="deribit-adapter-v1",
             raw_rows_or_reader="reader://projections/proj-1.parquet",
             source_blob_refs=[SHA],
@@ -586,3 +587,339 @@ class TestProjectionLineage:
             for i in range(3)
         ]
         assert len(records) == 3
+
+
+class TestI01R1SemverContract:
+    """I01R1 defect A — projection_schema_version is a semantic version."""
+
+    def test_semver_100_accepted(self) -> None:
+        p = RawProjectionArtifact(
+            projection_id="proj-1",
+            source_blob_sha256=[SHA],
+            projection_schema_id="deribit-trade-v1",
+            projection_schema_version="1.0.0",
+            parser_version="deribit-adapter-v1",
+            row_count=1,
+            partition_key="k",
+            projection_uri="t0://projections/p.parquet",
+            projection_sha256=SHA,
+        )
+        assert p.projection_schema_version == "1.0.0"
+
+    def test_semver_234_accepted(self) -> None:
+        p = RawProjectionArtifact(
+            projection_id="proj-1",
+            source_blob_sha256=[SHA],
+            projection_schema_id="s",
+            projection_schema_version="2.3.4",
+            parser_version="p",
+            partition_key="k",
+            projection_uri="u",
+            projection_sha256=SHA,
+        )
+        assert p.projection_schema_version == "2.3.4"
+
+    @pytest.mark.parametrize(
+        "bad", [1, "1", "v1", "1.0", "1.0.0-beta", "01.0.0", "1.0.-1", " 1.0.0", "1.0.0 "]
+    )
+    def test_invalid_semver_rejected(self, bad: object) -> None:
+        with pytest.raises(ValidationError):
+            RawProjectionArtifact(
+                projection_id="proj-1",
+                source_blob_sha256=[SHA],
+                projection_schema_id="s",
+                projection_schema_version=bad,  # type: ignore[arg-type]
+                parser_version="p",
+                partition_key="k",
+                projection_uri="u",
+                projection_sha256=SHA,
+            )
+
+    def test_batch_semver_contract(self) -> None:
+        b = RawNormalizationBatch(
+            batch_id="b",
+            provider="DERIBIT",
+            venue="DERIBIT",
+            sensor_family=SensorFamily.MECHANICAL_TRADE,
+            native_instrument="BTC-PERPETUAL",
+            projection_schema_id="s",
+            projection_schema_version="2.0.0",
+            parser_version="p",
+            raw_rows_or_reader="r",
+            source_blob_refs=[SHA],
+            acquisition_refs=["acq-1"],
+            logical_time_range_start=UTC_NOW,
+            logical_time_range_end=UTC_NOW,
+        )
+        assert b.projection_schema_version == "2.0.0"
+
+    def test_schema_version_distinct_from_parser_version(self) -> None:
+        p = RawProjectionArtifact(
+            projection_id="proj-1",
+            source_blob_sha256=[SHA],
+            projection_schema_id="s",
+            projection_schema_version="1.2.0",
+            parser_version="deribit-adapter-v1",
+            partition_key="k",
+            projection_uri="u",
+            projection_sha256=SHA,
+        )
+        assert p.projection_schema_version != p.parser_version
+
+
+class TestI01R1SourceLineage:
+    """I01R1 defect B — T0B must carry T0A lineage."""
+
+    def test_projection_zero_source_blobs_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            RawProjectionArtifact(
+                projection_id="proj-1",
+                source_blob_sha256=[],
+                projection_schema_id="s",
+                projection_schema_version="1.0.0",
+                parser_version="p",
+                partition_key="k",
+                projection_uri="u",
+                projection_sha256=SHA,
+            )
+
+    def test_projection_malformed_source_hash_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            RawProjectionArtifact(
+                projection_id="proj-1",
+                source_blob_sha256=["zz" + "a" * 62],
+                projection_schema_id="s",
+                projection_schema_version="1.0.0",
+                parser_version="p",
+                partition_key="k",
+                projection_uri="u",
+                projection_sha256=SHA,
+            )
+
+    def test_projection_duplicate_source_hash_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            RawProjectionArtifact(
+                projection_id="proj-1",
+                source_blob_sha256=[SHA, SHA],
+                projection_schema_id="s",
+                projection_schema_version="1.0.0",
+                parser_version="p",
+                partition_key="k",
+                projection_uri="u",
+                projection_sha256=SHA,
+            )
+
+    def test_batch_zero_source_blobs_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            RawNormalizationBatch(
+                batch_id="b",
+                provider="DERIBIT",
+                venue="DERIBIT",
+                sensor_family=SensorFamily.MECHANICAL_TRADE,
+                native_instrument="BTC-PERPETUAL",
+                projection_schema_id="s",
+                projection_schema_version="1.0.0",
+                parser_version="p",
+                raw_rows_or_reader="r",
+                source_blob_refs=[],
+                acquisition_refs=["acq-1"],
+                logical_time_range_start=UTC_NOW,
+                logical_time_range_end=UTC_NOW,
+            )
+
+    def test_batch_zero_acquisition_refs_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            RawNormalizationBatch(
+                batch_id="b",
+                provider="DERIBIT",
+                venue="DERIBIT",
+                sensor_family=SensorFamily.MECHANICAL_TRADE,
+                native_instrument="BTC-PERPETUAL",
+                projection_schema_id="s",
+                projection_schema_version="1.0.0",
+                parser_version="p",
+                raw_rows_or_reader="r",
+                source_blob_refs=[SHA],
+                acquisition_refs=[],
+                logical_time_range_start=UTC_NOW,
+                logical_time_range_end=UTC_NOW,
+            )
+
+    def test_batch_malformed_source_hash_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            RawNormalizationBatch(
+                batch_id="b",
+                provider="DERIBIT",
+                venue="DERIBIT",
+                sensor_family=SensorFamily.MECHANICAL_TRADE,
+                native_instrument="BTC-PERPETUAL",
+                projection_schema_id="s",
+                projection_schema_version="1.0.0",
+                parser_version="p",
+                raw_rows_or_reader="r",
+                source_blob_refs=["nope"],
+                acquisition_refs=["acq-1"],
+                logical_time_range_start=UTC_NOW,
+                logical_time_range_end=UTC_NOW,
+            )
+
+
+class TestI01R1HashRefSurfaces:
+    """I01R1 defect D — every T0A hash ref fails closed on syntax + duplicates."""
+
+    def test_manifest_malformed_blob_ref_rejected(self) -> None:
+        m = _make_manifest()
+        with pytest.raises(ValidationError):
+            PartitionManifest(**{**m.model_dump(), "blob_refs": ["bad"]})
+
+    def test_manifest_duplicate_blob_ref_rejected(self) -> None:
+        m = _make_manifest()
+        with pytest.raises(ValidationError):
+            PartitionManifest(**{**m.model_dump(), "blob_refs": [SHA, SHA]})
+
+    def test_result_malformed_blob_ref_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            RawEvidenceResult(
+                provider="GATE_FUTURES",
+                venue="GATE_FUTURES",
+                sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+                native_instrument="BTC_USDT",
+                source_granularity=Granularity.G1H,
+                logical_time_start=UTC_NOW,
+                logical_time_end=UTC_NOW,
+                coverage_state=CoverageState.PARTIAL,
+                integrity_state=IntegrityState.LOCAL_HASH_VERIFIED,
+                acquisition_ids=["acq-1"],
+                blob_refs=["bad"],
+            )
+
+    def test_result_duplicate_blob_ref_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            RawEvidenceResult(
+                provider="GATE_FUTURES",
+                venue="GATE_FUTURES",
+                sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+                native_instrument="BTC_USDT",
+                source_granularity=Granularity.G1H,
+                logical_time_start=UTC_NOW,
+                logical_time_end=UTC_NOW,
+                coverage_state=CoverageState.PARTIAL,
+                integrity_state=IntegrityState.LOCAL_HASH_VERIFIED,
+                acquisition_ids=["acq-1"],
+                blob_refs=[SHA, SHA],
+            )
+
+    def test_lineage_malformed_source_hash_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            ProjectionLineage(
+                lineage_manifest_id="lm-1",
+                projection_id="proj-1",
+                source_blob_sha256="bad",
+                source_acquisition_id="acq-1",
+                source_order=1,
+            )
+
+    def test_job_state_malformed_blob_hash_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            StorageJobState(
+                job_id="job-1",
+                provider_id="OKX_SWAP",
+                sensor_family=SensorFamily.MECHANICAL_TRADE,
+                request_fingerprint="fp-1",
+                last_committed_blob_sha256="bad",
+                status=StorageJobStatus.PLANNED,
+                updated_at=UTC_NOW,
+            )
+
+
+class TestI01R1DateBasis:
+    """I01R1 defect C — date_basis defaults to UNKNOWN, never inferred."""
+
+    def test_default_is_unknown(self) -> None:
+        m = _make_manifest()
+        assert m.date_basis is DateBasis.UNKNOWN
+
+    def test_explicit_event_time_preserved(self) -> None:
+        m = _make_manifest(date_basis=DateBasis.EVENT_TIME)
+        assert m.date_basis is DateBasis.EVENT_TIME
+
+    def test_explicit_provider_file_date_preserved(self) -> None:
+        m = _make_manifest(date_basis=DateBasis.PROVIDER_FILE_DATE)
+        assert m.date_basis is DateBasis.PROVIDER_FILE_DATE
+
+    def test_explicit_snapshot_time_preserved(self) -> None:
+        m = _make_manifest(date_basis=DateBasis.SNAPSHOT_TIME)
+        assert m.date_basis is DateBasis.SNAPSHOT_TIME
+
+
+class TestI01R1TimestampOrder:
+    """I01R1 defect E — paired min/max timestamps fail on inverted order."""
+
+    def test_projection_min_gt_max_rejected(self) -> None:
+        later = datetime(2026, 9, 2, 12, 0, 0, tzinfo=UTC)
+        with pytest.raises(ValidationError):
+            RawProjectionArtifact(
+                projection_id="proj-1",
+                source_blob_sha256=[SHA],
+                projection_schema_id="s",
+                projection_schema_version="1.0.0",
+                parser_version="p",
+                partition_key="k",
+                projection_uri="u",
+                projection_sha256=SHA,
+                min_provider_time=later,
+                max_provider_time=UTC_NOW,
+            )
+
+    def test_projection_one_sided_bounds_allowed(self) -> None:
+        p = RawProjectionArtifact(
+            projection_id="proj-1",
+            source_blob_sha256=[SHA],
+            projection_schema_id="s",
+            projection_schema_version="1.0.0",
+            parser_version="p",
+            partition_key="k",
+            projection_uri="u",
+            projection_sha256=SHA,
+            min_provider_time=UTC_NOW,
+        )
+        assert p.min_provider_time == UTC_NOW
+        assert p.max_provider_time is None
+
+    def test_manifest_min_gt_max_rejected(self) -> None:
+        later = datetime(2026, 9, 2, 12, 0, 0, tzinfo=UTC)
+        with pytest.raises(ValidationError):
+            _make_manifest(min_time=later, max_time=UTC_NOW)
+
+    def test_manifest_one_sided_bounds_allowed(self) -> None:
+        m = _make_manifest(min_time=UTC_NOW, max_time=None)
+        assert m.min_time == UTC_NOW
+        assert m.max_time is None
+
+
+def _make_manifest(**overrides: Any) -> PartitionManifest:
+    kwargs: dict[str, Any] = {
+        "partition_manifest_id": "pm-1",
+        "partition_key": "GATE_FUTURES/MECHANICAL_OPEN_INTEREST/BTC_USDT/2026-08",
+        "manifest_version": 1,
+        "provider": "GATE_FUTURES",
+        "venue": "GATE_FUTURES",
+        "sensor_family": SensorFamily.MECHANICAL_OPEN_INTEREST,
+        "native_instrument": "BTC_USDT",
+        "source_granularity": Granularity.G1H,
+        "logical_date_start": UTC_NOW,
+        "logical_date_end": UTC_NOW,
+        "blob_refs": [SHA],
+        "projection_refs": [],
+        "coverage_state": CoverageState.PARTIAL,
+        "integrity_state": IntegrityState.LOCAL_HASH_VERIFIED,
+        "row_count": 24,
+        "min_time": UTC_NOW,
+        "max_time": UTC_NOW,
+        "gap_count": 0,
+        "revision_count": 1,
+        "created_at": UTC_NOW,
+        "supersedes_manifest_id": None,
+    }
+    kwargs.update(overrides)
+    return PartitionManifest(**kwargs)
