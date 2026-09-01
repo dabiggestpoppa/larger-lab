@@ -64,6 +64,24 @@ class FrictionTrigger:
 
 
 @dataclass(frozen=True)
+class FrictionAction:
+    """One executed friction action — G3R-05: methods/budgets actually govern
+    execution, and every action is recorded explicitly."""
+
+    method: str
+    reviewer_id: str
+    budget_unit: int
+    exposure_mode: str
+    result: str                          # conclusion id / NO_CONCLUSION / NO_FIXTURE_DATA
+    evidence_produced: Tuple[str, ...] = ()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"method": self.method, "reviewer_id": self.reviewer_id,
+                "budget_unit": self.budget_unit, "exposure_mode": self.exposure_mode,
+                "result": self.result, "evidence_produced": list(self.evidence_produced)}
+
+
+@dataclass(frozen=True)
 class FrictionResult:
     record_id: str
     triggered: bool
@@ -73,13 +91,22 @@ class FrictionResult:
     information_gain: bool
     evidence_gap: Optional[Mapping[str, Any]]          # discriminating test gap, if any
     cost_units: int
+    actions: Tuple[FrictionAction, ...] = ()           # G3R-05: executed actions, method-bound
     rationale: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
-        return {k: getattr(self, k) for k in (
+        out = {k: getattr(self, k) for k in (
             "record_id", "triggered", "budget_used", "fresh_context_reviewers",
             "surfaced_alternatives", "information_gain", "evidence_gap",
             "cost_units", "rationale")}
+        out["actions"] = [a.to_dict() for a in self.actions]
+        return out
+
+    def actions_dict(self) -> Dict[str, Any]:
+        return {"actions": [a.to_dict() for a in self.actions]}
+
+    def action_count(self) -> int:
+        return len(self.actions)
 
 
 @dataclass(frozen=True)
@@ -167,30 +194,70 @@ def run_friction(
     incumbent_conclusion: str,
     budget: int,
     cost_per_reconstruction: int = 5,
+    method_results: Optional[Mapping[str, Mapping[str, str]]] = None,
 ) -> FrictionResult:
-    """Bounded fresh-context reconstruction. `conclusions_by_exposure` maps
-    reviewer_id -> {exposure_mode: conclusion} (fixture behavior, decision-grade).
-    A reviewer whose exposure changed to BLIND/EVIDENCE_ONLY may surface an
-    alternative; the alternative is recorded, never forced to be correct."""
+    """Bounded friction execution — G3R-05: ONLY the methods authorized on the
+    trigger may execute, and every executed action consumes one budget unit.
+
+    * `fresh_context_reconstruction` acts on BLIND/EVIDENCE_ONLY reviewers using
+      `conclusions_by_exposure` (reviewer_id -> {exposure_mode: conclusion}).
+    * any other authorized method executes from `method_results`
+      (method -> {reviewer_id: result}) when the fixture supplies data;
+      authorized-but-unprovisioned methods are recorded as not executed and
+      consume nothing.
+    * An alternative is surfaced only from an EXECUTED action; it is recorded,
+      never forced to be correct.
+    """
     if not trigger.triggered:
         return FrictionResult(
             record_id=deterministic_hex("friction", "not_triggered", incumbent_conclusion),
             triggered=False, budget_used=0, fresh_context_reviewers=(),
             surfaced_alternatives=(), information_gain=False, evidence_gap=None,
-            cost_units=0, rationale="friction not triggered",
+            cost_units=0, actions=(), rationale="friction not triggered",
         )
     fresh: List[str] = []
     alternatives: List[str] = []
+    actions: List[FrictionAction] = []
     used = 0
-    for p in reviewers:
-        if used >= budget:
-            break
-        if p.exposure_mode in ("BLIND", "EVIDENCE_ONLY"):
-            fresh.append(p.reviewer_id)
+    authorized = set(trigger.methods) if trigger.methods else {"fresh_context_reconstruction"}
+
+    # --- fresh-context reconstruction -------------------------------------- #
+    if "fresh_context_reconstruction" in authorized:
+        for p in reviewers:
+            if used >= budget:
+                break
+            if p.exposure_mode not in ("BLIND", "EVIDENCE_ONLY"):
+                continue
             used += 1
-            conclusion = (conclusions_by_exposure.get(p.reviewer_id) or {}).get(p.exposure_mode)
+            fresh.append(p.reviewer_id)
+            conclusion = (conclusions_by_exposure.get(p.reviewer_id) or {}).get(p.exposure_mode, "")
+            actions.append(FrictionAction(
+                method="fresh_context_reconstruction", reviewer_id=p.reviewer_id,
+                budget_unit=used, exposure_mode=p.exposure_mode,
+                result=str(conclusion) if conclusion else "NO_CONCLUSION",
+                evidence_produced=(str(conclusion),) if conclusion else (),
+            ))
             if conclusion and conclusion != incumbent_conclusion:
                 alternatives.append(conclusion)
+
+    # --- other authorized methods (fixture-supplied results only) ---------- #
+    for method in sorted(authorized - {"fresh_context_reconstruction"}):
+        if used >= budget:
+            break
+        results = (method_results or {}).get(method) or {}
+        for reviewer_id, result in sorted(results.items()):
+            if used >= budget:
+                break
+            used += 1
+            actions.append(FrictionAction(
+                method=method, reviewer_id=str(reviewer_id), budget_unit=used,
+                exposure_mode="METHOD_EXECUTION",
+                result=str(result) if result else "NO_RESULT",
+                evidence_produced=(str(result),) if result else (),
+            ))
+            if result and str(result) != incumbent_conclusion:
+                alternatives.append(str(result))
+
     information_gain = len(alternatives) > 0
     evidence_gap = None
     if information_gain:
@@ -201,7 +268,8 @@ def run_friction(
         }
     return FrictionResult(
         record_id=deterministic_hex("friction", tuple(p.reviewer_id for p in reviewers),
-                                    sorted(alternatives), used),
+                                    sorted(alternatives), used,
+                                    tuple(sorted(a.method for a in actions))),
         triggered=True,
         budget_used=used,
         fresh_context_reviewers=tuple(sorted(fresh)),
@@ -209,7 +277,8 @@ def run_friction(
         information_gain=information_gain,
         evidence_gap=evidence_gap,
         cost_units=used * cost_per_reconstruction,
-        rationale="bounded fresh-context reconstruction completed",
+        actions=tuple(actions),
+        rationale="bounded friction execution completed under authorized methods",
     )
 
 
@@ -231,13 +300,15 @@ class CounterAttractorReview:
     discriminating_contradiction_found: bool
     terminal_result: str                  # CHALLENGE_SUPPORTED | NO_CHANGE | UNRESOLVED
     cost_units: int = 0
+    non_admissible_findings: Tuple[Mapping[str, Any], ...] = ()   # G3R-02: never affect verdict
 
     def to_dict(self) -> Dict[str, Any]:
         return {k: getattr(self, k) for k in (
             "record_id", "trigger_reason", "incumbent_claim", "review_budget",
             "budget_used", "allowed_methods", "fresh_context_requirements",
             "source_exclusion_rules", "stop_condition", "evidence_produced",
-            "discriminating_contradiction_found", "terminal_result", "cost_units")}
+            "discriminating_contradiction_found", "terminal_result", "cost_units",
+            "non_admissible_findings")}
 
 
 @dataclass(frozen=True)
@@ -251,18 +322,27 @@ class CounterAttractorSpec:
     min_source_lineages_for_trigger: int = 2
     min_model_or_runtime_lineages_for_trigger: int = 2
     max_prior_exposure_ratio_for_trigger: float = 0.0
+    min_dominant_vote_ratio_for_trigger: float = 0.6   # G3R-03: strong consensus = actual concentration
+    allowed_methods: Tuple[str, ...] = ()              # G3R-02: empty = canonical contract
     budget: int = 4
     cost_per_method: int = 3
 
     def fingerprint(self) -> str:
         return deterministic_hex("counter_attractor_spec", self.spec_id, self.version_tag,
-                                 self.budget, length=24)
+                                 self.budget, self.min_dominant_vote_ratio_for_trigger,
+                                 self.allowed_methods, length=24)
 
 
 def counter_attractor_trigger(facts: EcologyFacts, spec: CounterAttractorSpec) -> bool:
     """A STRONG, well-supported consensus may trigger a bounded challenge. The
-    meta-observer does not need dissent to justify the check."""
+    meta-observer does not need dissent to justify the check. G3R-03: strong
+    means actual vote concentration >= the provisional ratio threshold — raw
+    reviewer count alone can never trigger (duplicates and splits do not count
+    as strong consensus)."""
     if not spec.trigger_on_strong_consensus:
+        return False
+    # strict: a 3/2 split (ratio == threshold) is NOT strong consensus
+    if facts.dominant_vote_ratio <= spec.min_dominant_vote_ratio_for_trigger:
         return False
     if facts.distinct_source_lineages < spec.min_source_lineages_for_trigger:
         return False
@@ -281,32 +361,53 @@ def run_counter_attractor(
     incumbent_claim: str,
     findings: Sequence[Mapping[str, Any]],
 ) -> CounterAttractorReview:
-    """Bounded challenge. `findings` are the fixture's decision-grade results for
-    the allowed methods (e.g. alternate-source search yields nothing). Terminal:
-    CHALLENGE_SUPPORTED if a discriminating contradiction was found, NO_CHANGE if
-    none was, UNRESOLVED if budget ran out without a verdict. Honest NO_CHANGE is
-    success; budget exhaustion does NOT lower evidence/confidence status."""
-    contradiction_found = any(f.get("discriminating_contradiction") for f in findings)
-    budget_used = min(spec.budget, max(len(findings), 1))
+    """Bounded challenge — G3R-01/02:
+
+    * ONLY findings actually CONSUMED within the authorized budget affect
+      discriminating_contradiction_found, terminal_result, evidence_produced
+      and cost_units. A contradiction beyond the budget is IGNORED.
+    * Each finding must carry a `method` in the authorized method set
+      (spec.allowed_methods or the canonical CounterAttractor contract);
+      unknown/disallowed methods are recorded as non-admissible evidence that
+      can NEVER affect the verdict and consume no budget.
+    * Honest NO_CHANGE is success; budget exhaustion does NOT lower
+      evidence/confidence status; zero findings never fake budget consumption.
+    """
+    allowed = set(spec.allowed_methods) if spec.allowed_methods else set(COUNTER_ATTRACTOR_METHODS)
+    consumed: List[Mapping[str, Any]] = []
+    non_admissible: List[Mapping[str, Any]] = []
+    budget_used = 0
+    for f in findings:
+        if budget_used >= spec.budget:
+            break
+        method = str(f.get("method") or "")
+        if method not in allowed:
+            non_admissible.append({**dict(f), "reason": "method_not_authorized"})
+            continue
+        consumed.append(dict(f))
+        budget_used += 1
+    contradiction_found = any(bool(f.get("discriminating_contradiction")) for f in consumed)
     if contradiction_found:
         terminal = "CHALLENGE_SUPPORTED"
-    elif budget_used >= spec.budget:
+    elif budget_used >= spec.budget and budget_used > 0:
         terminal = "NO_CHANGE"
     else:
         terminal = "UNRESOLVED"
-    produced = tuple(sorted({str(f.get("evidence_id", "")) for f in findings if f.get("evidence_id")}))
+    produced = tuple(sorted({str(f.get("evidence_id", "")) for f in consumed if f.get("evidence_id")}))
     return CounterAttractorReview(
-        record_id=deterministic_hex("counter_attractor", incumbent_claim, terminal, budget_used),
+        record_id=deterministic_hex("counter_attractor", incumbent_claim, terminal, budget_used,
+                                    tuple(sorted(f.get("evidence_id", "") for f in consumed))),
         trigger_reason="strong independent consensus warrants a bounded adversarial check",
         incumbent_claim=incumbent_claim,
         review_budget=spec.budget,
         budget_used=budget_used,
-        allowed_methods=COUNTER_ATTRACTOR_METHODS,
+        allowed_methods=tuple(sorted(allowed)),
         fresh_context_requirements="fresh context, no prior conclusion exposure",
         source_exclusion_rules=("exclude incumbent source bundle",),
-        stop_condition="discriminating contradiction found OR budget exhausted",
+        stop_condition="discriminating contradiction found within authorized budget OR budget exhausted",
         evidence_produced=produced,
         discriminating_contradiction_found=contradiction_found,
         terminal_result=terminal,
         cost_units=budget_used * spec.cost_per_method,
+        non_admissible_findings=tuple(non_admissible),
     )
