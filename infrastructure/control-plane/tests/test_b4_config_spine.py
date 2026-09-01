@@ -1087,6 +1087,75 @@ class TestR3R4DatabaseSecretBinding:
 
 
 # --------------------------------------------------------------------------- #
+# B4-CXR3R5 (CXR3-06) — capital authority is locked to 'none' in Book 4.
+# No source, actor, or override path can produce live-capital authority.
+# --------------------------------------------------------------------------- #
+class TestCXR3R5CapitalAuthorityLocked:
+    def test_approved_via_env_blocked(self):
+        import oce_control.config_startup as cs
+        with pytest.raises(ValidationError) as exc:
+            cs.effective_from_env(
+                {"PATH": "/usr/bin", "OCE_CAPITAL_AUTHORITY": "approved"})
+        assert "capital.authority" in str(exc.value)
+
+    def test_approved_via_file_and_cli_blocked(self):
+        reg = build_default_registry()
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"capital.authority": "approved",
+                         "postgres.password_ref": REF_PG}})
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": REF_PG}},
+                cli={"capital.authority": "approved"})
+
+    def test_approved_through_custom_default_rejected_by_validate_effective(self):
+        # even if a registry defaulted capital.authority to 'approved', the
+        # effective-config gate rejects it — defense in depth
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        eff._resolved["capital.authority"] = "approved"
+        with pytest.raises(ValidationError, match="capital.authority"):
+            validate_effective(eff)
+
+    def test_hermes_and_operator_cannot_mutate(self):
+        reg = build_default_registry()
+        authz = ConfigAuthorization(reg)
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        s = reg.get("capital.authority")
+        assert authz.can_mutate("hermes", s) is False
+        assert authz.can_mutate("operator", s) is False
+        for actor in ("hermes", "operator"):
+            with pytest.raises(PermissionError):
+                authz.operator_override(
+                    eff, actor=actor, setting_name="capital.authority",
+                    requested_change="x", reason="x", new_value="approved")
+
+    def test_po_override_still_blocked_in_book4(self):
+        # operator:po is the CEO-level actor, but even PO cannot activate
+        # live-capital authority in Book 4 (future-locked)
+        reg = build_default_registry()
+        authz = ConfigAuthorization(reg)
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        with pytest.raises(PermissionError, match="locked to 'none'"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="capital.authority",
+                requested_change="activate capital", reason="po decision",
+                new_value="approved")
+
+    def test_po_can_override_none_value_records_audit(self):
+        # the lock allows the (no-op) 'none' value; attribution still records
+        reg = build_default_registry()
+        authz = ConfigAuthorization(reg)
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        new = authz.operator_override(
+            eff, actor="operator:po", setting_name="capital.authority",
+            requested_change="confirm no capital authority",
+            reason="explicit operator decision", new_value="none")
+        assert new == "none"
+
+
+# --------------------------------------------------------------------------- #
 # B4-CXR3R4 (CXR3-05) — OWNERSHIP enforced in the real resolver: policy-owned
 # and operator(po)-owned settings cannot be weakened through ordinary
 # file/env/CLI configuration. Precedence and authority are distinct layers.

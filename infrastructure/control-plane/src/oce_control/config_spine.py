@@ -337,8 +337,9 @@ def build_default_registry() -> SettingsRegistry:
                 mutability="immutable", tags=("live", "deny-by-default")))
     reg(Setting(name="capital.authority", value_type="enum", owner="operator(po)",
                 enum=("none", "approved"), default="none",
-                validation_rule="denies live-capital by default",
-                mutability="immutable", tags=("capital",)))
+                validation_rule="locked to 'none' in Book 4 (future-locked "
+                                "'approved')",
+                mutability="immutable", tags=("capital", "deny-by-default")))
 
     # ---- billable cloud gates (policy-owned, immutable, deny-by-default) ----
     reg(Setting(name="cloud.provisioning", value_type="bool",
@@ -700,6 +701,14 @@ def validate_effective(effective: EffectiveConfig) -> None:
     if effective.get("execution.live_order_mode") != "disabled":
         raise ValidationError("execution.live_order_mode must be 'disabled'")
 
+    # capital authority stays ZERO in Book 4 (CXR3-06): no environment
+    # variable, config file, CLI source, alias, operator override, Hermes
+    # call, PO helper, or malformed value may produce live-capital authority.
+    if effective.get("capital.authority") != "none":
+        raise ValidationError(
+            "capital.authority must be 'none' — live-capital authority does "
+            "not exist in Book 4 (future-locked)")
+
     # billable cloud gates
     if effective.get_bool("cloud.provisioning") is True:
         raise ValidationError("cloud.provisioning=True is forbidden")
@@ -873,6 +882,13 @@ class ConfigAuthorization:
                 f"override of sensitive setting '{setting_name}' is not "
                 f"permitted through this path")
         new_value = validate_setting_value(setting, new_value)
+        # B4-CXR3R5 (CXR3-06): capital.authority is future-locked to 'none'
+        # in Book 4 — even operator:po cannot activate live-capital authority
+        # through the override path.
+        if setting_name == "capital.authority" and new_value != "none":
+            raise PermissionError(
+                "capital.authority is locked to 'none' in Book 4 — live-capital "
+                "authority does not exist at this stage (operator:po included)")
         self._audit.append(OverrideAudit(
             actor=actor, requested_change=requested_change, reason=reason,
             target=setting_name,
