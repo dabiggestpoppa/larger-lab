@@ -1087,6 +1087,64 @@ class TestR3R4DatabaseSecretBinding:
 
 
 # --------------------------------------------------------------------------- #
+# B4-CXR3R6 (CXR3-07) — override-audit TRUTH LABEL: the in-process audit is
+# explicitly NON-AUTHORITATIVE until an append-only durable sink is attached.
+# --------------------------------------------------------------------------- #
+class TestCXR3R6OverrideAuditTruth:
+    def test_default_audit_is_explicitly_non_authoritative(self):
+        reg = build_default_registry()
+        authz = ConfigAuthorization(reg)
+        assert authz.audit_durable is False
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        authz.operator_override(
+            eff, actor="operator:po", setting_name="control_plane.port",
+            requested_change="x", reason="r", new_value="9123")
+        assert len(authz.audit) == 1
+        # no durable truth is claimed for the in-process helper
+        assert authz.audit[0].durable is False
+
+    def test_durable_sink_attached_marks_entries_durable(self):
+        reg = build_default_registry()
+        sink: list[dict] = []
+        authz = ConfigAuthorization(reg, durable_sink=sink)
+        assert authz.audit_durable is True
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        authz.operator_override(
+            eff, actor="operator:po", setting_name="control_plane.port",
+            requested_change="x", reason="r", new_value="9124")
+        assert authz.audit[0].durable is True
+        assert len(sink) == 1
+        rec = sink[0]
+        assert rec["actor"] == "operator:po"
+        assert rec["setting"] == "control_plane.port"
+        assert rec["decision"] == "granted"
+        assert rec["durable"] is True
+        assert rec["timestamp"]
+
+    def test_durable_sink_never_contains_secret_values(self):
+        reg = build_default_registry()
+        sink: list[dict] = []
+        authz = ConfigAuthorization(reg, durable_sink=sink)
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        with pytest.raises(PermissionError):
+            authz.operator_override(
+                eff, actor="operator", setting_name="postgres.password_ref",
+                requested_change="x", reason="x", new_value="secret:other")
+        assert sink == [] and authz.audit == []
+
+    def test_denied_override_writes_no_record(self):
+        reg = build_default_registry()
+        sink: list[dict] = []
+        authz = ConfigAuthorization(reg, durable_sink=sink)
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        with pytest.raises(PermissionError):
+            authz.operator_override(
+                eff, actor="hermes", setting_name="control_plane.port",
+                requested_change="x", reason="x", new_value="9999")
+        assert sink == [] and authz.audit == []
+
+
+# --------------------------------------------------------------------------- #
 # B4-CXR3R5 (CXR3-06) — capital authority is locked to 'none' in Book 4.
 # No source, actor, or override path can produce live-capital authority.
 # --------------------------------------------------------------------------- #

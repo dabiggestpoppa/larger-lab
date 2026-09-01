@@ -835,21 +835,36 @@ class OverrideAudit:
     timestamp: str = field(default_factory=lambda:
                            datetime.now(timezone.utc).isoformat())
     authorized: bool = False
+    # B4-CXR3R6: True ONLY when the entry was appended to an approved
+    # append-only durable sink. The in-process list is NOT durable truth.
+    durable: bool = False
 
 
 class ConfigAuthorization:
     """Least-privilege boundaries over configuration mutation.
 
-    Operators may change operator-owned settings; policy-owned settings are
-    immutable by configuration at runtime and require an authorized override
-    that writes a durable audit record. No invisible override is possible.
+    TRUTH LABEL (B4-CXR3R6): the in-process ``audit`` list is a
+    NON-AUTHORITATIVE test helper. There is NO durable override audit in
+    Book 4 yet, so no canonical runtime override path may claim durability:
+    an authoritative override audit requires an attached append-only durable
+    sink (e.g. the PostgreSQL audit_log). Until one is attached, every
+    recorded entry carries ``durable=False`` and callers must not treat the
+    record as durable truth.
     """
 
     POLICY_OWNER = "policy"
 
-    def __init__(self, registry: SettingsRegistry):
+    def __init__(self, registry: SettingsRegistry, durable_sink=None):
         self._registry = registry
         self._audit: list[OverrideAudit] = []
+        # Append-only durable sink (e.g. an audit_log writer). When None the
+        # audit trail is explicitly NON-AUTHORITATIVE (in-process helper).
+        self._durable_sink = durable_sink
+
+    @property
+    def audit_durable(self) -> bool:
+        """True ONLY when an append-only durable sink is attached."""
+        return self._durable_sink is not None
 
     def can_mutate(self, actor: str, setting: Setting) -> bool:
         # policy-owned settings are not mutated by operators; only operator /
@@ -889,11 +904,27 @@ class ConfigAuthorization:
             raise PermissionError(
                 "capital.authority is locked to 'none' in Book 4 — live-capital "
                 "authority does not exist at this stage (operator:po included)")
-        self._audit.append(OverrideAudit(
+        entry = OverrideAudit(
             actor=actor, requested_change=requested_change, reason=reason,
             target=setting_name,
             previous=effective.get(setting_name, None), new=new_value,
-            authorized=True))
+            authorized=True, durable=self.audit_durable)
+        self._audit.append(entry)
+        if self._durable_sink is not None:
+            # B4-CXR3R6: append-only durable record with SAFE values only
+            # (previous/new are redacted; sensitive settings never reach here)
+            self._durable_sink.append({
+                "actor": actor,
+                "setting": setting_name,
+                "previous": redact_value(setting_name,
+                                          effective.get(setting_name, None)),
+                "new": redact_value(setting_name, new_value),
+                "reason": reason,
+                "decision": "granted",
+                "timestamp": entry.timestamp,
+                "authorized": True,
+                "durable": True,
+            })
         return new_value
 
     @property
