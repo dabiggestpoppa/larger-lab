@@ -61,8 +61,10 @@ class TestDictShape:
 
     def test_funding_genuinely_new_key_stays_additive(self) -> None:
         # A NEW unknown metric key beyond {rate, relativeRate} stays
-        # ADDITIVE (preserved raw + flagged) and is NOT silently promoted
-        # into a KNOWN semantic projection (I10R1 §14 firewall).
+        # ADDITIVE (preserved raw upstream + flagged) and is NOT silently
+        # projected into parsed convenience rows — the I10R2 additive
+        # firewall (raw additive field is evidence before an observable;
+        # I10R1 §14 + I10R2 §12).
         body = {
             "errors": [],
             "result": {
@@ -78,9 +80,31 @@ class TestDictShape:
         parsed = parse_kraken_analytics(body, SensorFamily.MECHANICAL_FUNDING)
         assert parsed.schema_state is SchemaState.ADDITIVE_SCHEMA_CHANGE
         assert parsed.semantic_output_allowed is True
-        # native field preserved in the native row view (raw payload also
-        # preserved upstream); semantic promotion is gated by schema state.
-        assert parsed.rows[0]["brandNewMetric"] == ["x"]
+        # Firewall: the unknown additive key is NOT in parsed rows; only the
+        # evidence-backed known metrics are projected.  The raw payload is
+        # preserved upstream in the RawPayloadEnvelope (adapter boundary).
+        assert "brandNewMetric" not in parsed.rows[0]
+        assert parsed.rows[0]["rate"] == ["0.0001"]
+        assert parsed.rows[0]["relativeRate"] == ["0.0001"]
+
+    def test_funding_missing_relative_rate_is_breaking(self) -> None:
+        # {rate, relativeRate} are both REQUIRED (evidence-backed, I10R2): a
+        # response omitting relativeRate is BREAKING, never silently reduced
+        # to a rate-only projection.
+        body = {
+            "errors": [],
+            "result": {
+                "timestamp": [1755000000000],
+                "data": {
+                    "rate": [["0.0001"]],
+                },
+                "more": False,
+            },
+        }
+        parsed = parse_kraken_analytics(body, SensorFamily.MECHANICAL_FUNDING)
+        assert parsed.schema_state is SchemaState.BREAKING_SCHEMA_CHANGE
+        assert parsed.semantic_output_allowed is False
+        assert parsed.rows == ()
 
     def test_basis_happy(self) -> None:
         parsed = parse_kraken_analytics(FX.HAPPY["basis"][1], SensorFamily.MECHANICAL_BASIS)

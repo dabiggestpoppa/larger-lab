@@ -41,9 +41,11 @@ _LIST_DATA_SENSORS: frozenset[SensorFamily] = frozenset(
 #: FUNDING required set is {rate, relativeRate}: the committed 09 fingerprint
 #: pins funding `data` as `dict{rate, relativeRate}` (both list[list[str]]), the
 #: live I10R1 characterization reproduced EXACTLY those two keys with matching
-#: column/timestamp cardinality, and no genuinely-new key exists — relativeRate
-#: is evidence-backed (KNOWN_OPTIONAL adjudication, I10R1), so its presence is
-#: NOT additive.  A genuinely new key stays ADDITIVE / SCHEMA_ADDITIVE_REVIEW.
+#: column/timestamp cardinality, and NO evidence shows valid responses omitting
+#: either key — BOTH are REQUIRED (final classification, I10R2; the earlier
+#: 'KNOWN_OPTIONAL' wording is superseded by BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json).
+#: A missing required key is BREAKING; a genuinely NEW key stays ADDITIVE /
+#: SCHEMA_ADDITIVE_REVIEW and is NOT projected into parsed rows (firewall).
 _DICT_DATA_REQUIRED: dict[SensorFamily, frozenset[str]] = {
     SensorFamily.MECHANICAL_FUNDING: frozenset({"rate", "relativeRate"}),
     SensorFamily.MECHANICAL_BASIS: frozenset({"basis"}),
@@ -175,7 +177,7 @@ def parse_kraken_analytics(
                 assessment=short_assessment,
             )
         return ParsedAnalytics(
-            rows=_build_dict_rows(timestamps, data),
+            rows=_build_dict_rows(timestamps, data, project=required),
             more=more,
             schema_state=assessment.state,
             assessment=assessment,
@@ -257,15 +259,23 @@ def _any_mismatched_column(data: dict[str, Any], timestamps: list[Any]) -> bool:
 def _build_dict_rows(
     timestamps: list[Any],
     data: dict[str, Any],
+    *,
+    project: frozenset[str],
 ) -> tuple[dict[str, Any], ...]:
     """Build native rows from a dict-of-metrics analytics payload.
 
-    Each row carries the bucket timestamp + one native value per metric
-    (nested `ask`/`bid` side-maps for book_metric preserved as-is, native
-    values never normalized or defaulted).
+    ADDITIVE FIREWALL (SENSOR-B3-I10R2): only the evidence-backed KNOWN metric
+    keys (`project`) are projected into parsed convenience rows.  An UNKNOWN
+    additive provider key is preserved raw (upstream RawPayloadEnvelope),
+    flagged ADDITIVE via the schema assessment, and is NOT silently promoted
+    into an accepted scientific field — an unadjudicated additive field is
+    evidence before it is an observable.  Each row carries the bucket
+    timestamp + one native value per known metric (nested `ask`/`bid`
+    side-maps for book_metric preserved as-is, native values never normalized
+    or defaulted).
     """
     rows: list[dict[str, Any]] = []
-    metrics = list(data)
+    metrics = sorted(project & set(data))
     for i, ts in enumerate(timestamps):
         row: dict[str, Any] = {"timestamp": ts}
         for metric in metrics:

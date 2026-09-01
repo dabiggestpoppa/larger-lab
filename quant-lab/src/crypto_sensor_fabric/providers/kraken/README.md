@@ -228,8 +228,10 @@ metric lists).
    probe-only universe, not production support.
 6. **Granularity enum limitation** — provider resolutions the Fabric enum
    cannot represent (30m / 12h / 1w style buckets) are recorded, not invented.
-7. **No live validation** — all I05 / I05R1 behavior is offline (fake
-   transport).
+7. **Live validation** — I05 / I05R1 behavior is offline (fake transport);
+   live network smoke validation of the six promoted paths is recorded in
+   SENSOR-B3-I10 / I10R1 / I10R2 evidence (`evidence/bloc_03/`).  Funding
+   adapter semantic version is now `kraken-adapter-v2`.
 
 ## Fixtures
 

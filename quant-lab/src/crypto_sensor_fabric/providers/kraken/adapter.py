@@ -123,7 +123,7 @@ class KrakenAdapter:
         free_only_policy: FreeOnlyPolicy | None = None,
         auth_mode: AdapterAuthMode = AdapterAuthMode.NO_AUTH,
         promotion_candidates: list[dict[str, object]] | None = None,
-        adapter_version: str = "kraken-adapter-v1",
+        adapter_version: str = "kraken-adapter-v2",
         now: Callable[[], datetime] | None = None,
     ) -> None:
         # No transport -> the adapter stays OFFLINE: a fetch with no injected
