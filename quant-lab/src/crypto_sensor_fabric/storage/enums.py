@@ -192,3 +192,20 @@ class StorageObjectType(_StrEnum):
     SOURCE_REVISION = "SOURCE_REVISION"
     STORAGE_JOB = "STORAGE_JOB"
     EXPORT_MANIFEST = "EXPORT_MANIFEST"
+
+
+class ChecksumAlgorithm(_StrEnum):
+    """Typed provider-checksum algorithms (SENSOR-B4-I02 primitives).
+
+    Not one of the frozen "exact value" vocabularies; a small typed vocabulary
+    so provider-published checksum support is EXPLICIT and never inferred from
+    digest length, header names or provider identity.
+
+    MD5 / CRC32 are accepted ONLY as provider integrity evidence — never as
+    T0 content identity / security identity.  Local T0A identity is always
+    SHA-256 of the exact provider-source bytes.
+    """
+
+    SHA256 = "SHA256"
+    MD5 = "MD5"
+    CRC32 = "CRC32"

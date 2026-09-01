@@ -12,8 +12,9 @@ storage backend yet.  These models:
 - never imply canonical asset identity or canonical market units;
 - carry NO secret-bearing fields (no API keys, tokens, cookies, credentials);
 - fail closed on unknown fields (extra="forbid"), naive datetimes, negative
-  counts, inverted windows and malformed SHA-256 syntax (syntax only — no
-  hashing, no file access, no stream reads in I01);
+  counts, inverted windows and malformed SHA-256 syntax (syntax only, via the
+  single shared rule `checksums.validate_sha256_hex` — hashing itself lives in
+  I02's `checksums.py`, never in the models);
 - serialize deterministically (see serialization helper).
 
 Dependency direction: storage -> frozen provider/base shared contracts only.
@@ -32,6 +33,7 @@ from ..contracts.base import normalize_utc_datetimes
 from ..contracts.enums import SensorFamily
 from ..providers.base.enums import Granularity, QualityFlagAcquisition
 from ..providers.base.models import AdapterEvidenceRef, ResumeToken
+from .checksums import validate_sha256_hex
 from .enums import (
     BackupClass,
     CoverageState,
@@ -47,17 +49,15 @@ from .enums import (
     StoragePriority,
 )
 
-_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
-
 _SEMVER_RE = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
 
 
-def _validate_sha256_syntax(value: str, field_name: str) -> None:
-    """Validate SHA-256 FORMAT only (64 lowercase hex chars).  No hashing."""
-    if not _SHA256_RE.fullmatch(value):
-        raise ValueError(
-            f"{field_name} must be 64 lowercase hex characters, got {value!r}"
-        )
+def _validate_sha256_field(value: str, field_name: str) -> None:
+    """SHA-256 FORMAT only (single shared rule from checksums; no hashing)."""
+    try:
+        validate_sha256_hex(value)
+    except ValueError as exc:
+        raise ValueError(f"{field_name} {exc}") from None
 
 
 def _validate_semver(value: str, field_name: str) -> None:
@@ -80,7 +80,7 @@ def _validate_unique_sha256_list(values: list[str], field_name: str) -> None:
     """
     seen: set[str] = set()
     for ref in values:
-        _validate_sha256_syntax(ref, f"{field_name} member")
+        _validate_sha256_field(ref, f"{field_name} member")
         if ref in seen:
             raise ValueError(f"{field_name} contains duplicate hash ref {ref!r}")
         seen.add(ref)
@@ -141,7 +141,7 @@ class EvidenceBlob(StorageModelBase):
 
     @model_validator(mode="after")
     def _validate_hash(self) -> EvidenceBlob:
-        _validate_sha256_syntax(self.blob_sha256, "blob_sha256")
+        _validate_sha256_field(self.blob_sha256, "blob_sha256")
         return self
 
     @model_validator(mode="after")
@@ -203,7 +203,7 @@ class AcquisitionRecord(StorageModelBase):
     @model_validator(mode="after")
     def _validate_hash_if_present(self) -> AcquisitionRecord:
         if self.blob_sha256 is not None:
-            _validate_sha256_syntax(self.blob_sha256, "blob_sha256")
+            _validate_sha256_field(self.blob_sha256, "blob_sha256")
         return self
 
 
@@ -236,7 +236,7 @@ class RawProjectionArtifact(StorageModelBase):
 
     @model_validator(mode="after")
     def _validate_hash(self) -> RawProjectionArtifact:
-        _validate_sha256_syntax(self.projection_sha256, "projection_sha256")
+        _validate_sha256_field(self.projection_sha256, "projection_sha256")
         _validate_unique_sha256_list(self.source_blob_sha256, "source_blob_sha256")
         return self
 
@@ -282,7 +282,7 @@ class ProjectionLineage(StorageModelBase):
 
     @model_validator(mode="after")
     def _validate_hash(self) -> ProjectionLineage:
-        _validate_sha256_syntax(self.source_blob_sha256, "source_blob_sha256")
+        _validate_sha256_field(self.source_blob_sha256, "source_blob_sha256")
         return self
 
     @model_validator(mode="after")
@@ -402,7 +402,7 @@ class StorageJobState(StorageModelBase):
     @model_validator(mode="after")
     def _validate_hash_if_present(self) -> StorageJobState:
         if self.last_committed_blob_sha256 is not None:
-            _validate_sha256_syntax(self.last_committed_blob_sha256, "last_committed_blob_sha256")
+            _validate_sha256_field(self.last_committed_blob_sha256, "last_committed_blob_sha256")
         return self
 
     @model_validator(mode="after")
@@ -452,7 +452,7 @@ class SourceRevision(StorageModelBase):
 
     @model_validator(mode="after")
     def _validate_hash(self) -> SourceRevision:
-        _validate_sha256_syntax(self.blob_sha256, "blob_sha256")
+        _validate_sha256_field(self.blob_sha256, "blob_sha256")
         return self
 
     @model_validator(mode="after")
@@ -493,7 +493,7 @@ class IntegrityCheck(StorageModelBase):
         for field in ("expected_hash", "observed_hash"):
             value = getattr(self, field)
             if value is not None:
-                _validate_sha256_syntax(value, field)
+                _validate_sha256_field(value, field)
         return self
 
     @model_validator(mode="after")
@@ -719,7 +719,7 @@ class ExportManifest(StorageModelBase):
 
     @model_validator(mode="after")
     def _validate_hash(self) -> ExportManifest:
-        _validate_sha256_syntax(self.manifest_sha256, "manifest_sha256")
+        _validate_sha256_field(self.manifest_sha256, "manifest_sha256")
         return self
 
     @model_validator(mode="after")
