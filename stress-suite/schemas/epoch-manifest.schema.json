@@ -12,6 +12,7 @@
     "predecessor_epoch": {"type": ["string","null"]},
     "governing_architecture_versions": {"type": "array", "items": {"type": "string"}},
     "evaluation_contract_version": {"type": "string"},
+    "lifecycle_contract_version": {"type": "string"},
     "active_ontology_versions": {"type": "array", "items": {"type": "string"}},
     "high_dependency_assumptions": {"type": "array", "items": {"type": "string"}},
     "active_runtime_certifications": {"type": "array", "items": {"type": "string"}},
@@ -20,8 +21,10 @@
     "unresolved_pattern_refs": {"type": "array", "items": {"type": "string"}},
     "active_knowledge_projection": {"type": "array", "items": {"type": "string"}},
     "dormant_knowledge_projection": {"type": "array", "items": {"type": "string"}},
+    "negative_knowledge_refs": {"type": "array", "items": {"type": "string"}},
     "validation_rules": {"type": "array", "items": {"type": "string"}},
     "authority_state_snapshot": {"type": "object"},
+    "authority_snapshot_ref": {"type": "string"},
     "operator_ratifications": {"type": "array", "items": {"type": "string"}},
     "transformation_evidence": {"type": "array", "items": {"type": "string"}},
     "challenge_conditions": {"type": "array", "items": {"type": "string"}}
