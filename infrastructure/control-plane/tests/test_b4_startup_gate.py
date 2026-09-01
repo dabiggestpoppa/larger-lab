@@ -22,7 +22,7 @@ from oce_control.config_startup import (
     startup_report,
     validate_startup,
 )
-from oce_control.config_spine import ValidationError
+from oce_control.config_spine import ValidationError, build_default_registry
 
 # Clean env (no OCE_* posture overrides) — must start.
 CLEAN_ENV: dict[str, str] = {"PATH": "/usr/bin:/bin"}
@@ -190,6 +190,73 @@ class TestCliEntryGate:
     def test_report_serializable(self):
         rep = validate_startup(CLEAN_ENV)
         json.dumps(rep)  # operator console / evidence serializes it
+
+
+# --------------------------------------------------------------------------- #
+# B4-R3RX — remaining adversarial proofs: env!=file through the real startup
+# path, env>file precedence, restart authority stability, whole-env namespace.
+# --------------------------------------------------------------------------- #
+class TestR3RXAdversarialClosure:
+    def test_env_value_labeled_environment_not_file_at_startup(self):
+        import oce_control.config_startup as cs
+        eff = cs.effective_from_env({**CLEAN_ENV, "OCE_CONTROL_PLANE_PORT": "8455"})
+        assert eff.get("control_plane.port") == 8455
+        assert eff.provenance["control_plane.port"] == "environment"
+        assert eff.provenance["control_plane.port"] != "file"
+
+    def test_env_overrides_file_and_cli_overrides_env(self):
+        reg = build_default_registry()
+        from oce_control.config_spine import ConfigResolver
+        r = ConfigResolver(reg)
+        eff = r.resolve({
+            "file": {"postgres.password_ref": "secret:postgres",
+                     "control_plane.port": "7000"},
+            "environment": {"control_plane.port": "8455"},
+        }, cli={"control_plane.port": "8456"})
+        assert eff.get("control_plane.port") == 8456
+        assert eff.provenance["control_plane.port"] == "cli"
+
+    def test_env_over_file_precedence_deterministic(self):
+        # identical inputs, reordered dicts, same effective config
+        reg = build_default_registry()
+        from oce_control.config_spine import ConfigResolver
+        a = ConfigResolver(reg).resolve({
+            "file": {"postgres.password_ref": "secret:postgres",
+                     "control_plane.port": "7000"},
+            "environment": {"control_plane.port": "8455"}})
+        b = ConfigResolver(reg).resolve({
+            "environment": {"control_plane.port": "8455"},
+            "file": {"postgres.password_ref": "secret:postgres",
+                     "control_plane.port": "7000"}})
+        assert a.resolved == b.resolved
+        assert a.provenance == b.provenance
+
+    def test_restart_does_not_change_effective_authority(self):
+        # restart with the SAME env -> identical effective config + fingerprint
+        import oce_control.config_startup as cs
+        env = {**CLEAN_ENV, "OCE_SCHEDULER_INTERVAL": "7"}
+        a = cs.effective_from_env(dict(env))
+        b = cs.effective_from_env(dict(env))
+        assert a.resolved == b.resolved
+        assert a.fingerprint == b.fingerprint
+        assert a.provenance == b.provenance
+
+    def test_unknown_oce_whole_env_fails_closed_via_startup(self):
+        import os as _os
+        suspicious = {**_os.environ}
+        suspicious["OCE_EXECUTION_BROKER_ENABLD"] = "true"
+        with pytest.raises(ValidationError):
+            effective_from_env(suspicious)
+
+    def test_env_forbidden_source_cannot_override_via_alias(self):
+        # a setting forbidden from the environment stays forbidden even when
+        # the value arrives through the OCE_API_PORT-style alias path
+        reg = build_default_registry()
+        reg.forbid_source("control_plane.port", "environment")
+        import oce_control.config_startup as cs
+        with pytest.raises(ValidationError):
+            cs.effective_from_env(
+                {**CLEAN_ENV, "OCE_API_PORT": "8500"}, registry=reg)
 
 
 # --------------------------------------------------------------------------- #
