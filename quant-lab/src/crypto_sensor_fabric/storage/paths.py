@@ -50,12 +50,6 @@ _SAFE_SEGMENT_CHARS = frozenset(
 
 _UPPERCASE_HEX = frozenset("0123456789ABCDEF")
 
-# Default projection-schema-key prefix length is NOT identity; the full
-# projection SHA-256 remains authoritative (I02 §27 — no schema-hash doctrine
-# is invented here; I05 owns the projection schema registry).
-DEFAULT_HASH_PREFIX_LENGTH = 8
-
-
 def escape_path_segment(value: str) -> str:
     """Deterministic reversible UTF-8-preserving percent-encoding (uppercase %HH).
 
@@ -175,15 +169,21 @@ def projection_object_key(
     schema_key: str,
     shard_id: int,
     projection_sha256: str,
-    hash_prefix_length: int = DEFAULT_HASH_PREFIX_LENGTH,
 ) -> str:
     """Derive the logical T0B projection object key (pure, deterministic).
 
-    Layout (I02 §24, partition doc §6):
+    Layout (I02R1 §10 — canonical, collision-free):
 
     ``projections/provider=<esc>/venue=<esc>/sensor=<esc>/instrument=<esc>/``
     ``granularity=<esc>/year=<YYYY>/month=<MM>/day=<DD>/schema=<esc>/``
-    ``part-<shard:05d>-<projection_sha256_prefix>.parquet``
+    ``part-<shard:05d>-<full_projection_sha256>.parquet``
+
+    The filename carries the FULL validated 64-char projection SHA-256 — a
+    display prefix can never become a physical identity collision (I02R1
+    §9-§11).  No ``hash_prefix_length`` parameter exists on the canonical
+    API; a short SHA for UI/debug display is a separate concern, never part
+    of the durable object key.  No compatibility alias: no real T0B
+    filesystem has been persisted yet (I02R1 §12).
 
     - Date components come from an EXPLICIT caller-adjudicated logical date;
       no date-basis inference (no ``datetime.now()``, no ingested_at, no
@@ -193,8 +193,7 @@ def projection_object_key(
       escaped so it can never become a traversal component;
     - ``shard_id`` is deterministic caller input (nonnegative int, no UUID, no
       wall clock); zero-padding width is formatting only, not scientific;
-    - ``projection_sha256`` is validated in full; the prefix is a documented
-      shorthand, NOT identity.
+    - ``projection_sha256`` is validated in full and used IN FULL.
     """
     coordinates = {
         "provider": provider,
@@ -213,14 +212,6 @@ def projection_object_key(
         raise ValueError(
             f"shard_id must be a nonnegative int, got {shard_id!r}"
         )
-    if (
-        not isinstance(hash_prefix_length, int)
-        or isinstance(hash_prefix_length, bool)
-        or not 1 <= hash_prefix_length <= 64
-    ):
-        raise ValueError(
-            f"hash_prefix_length must be an int in 1..64, got {hash_prefix_length!r}"
-        )
     validate_sha256_hex(projection_sha256)
     try:
         logical_date = date(year, month, day)
@@ -228,7 +219,8 @@ def projection_object_key(
         raise ValueError(
             f"invalid logical date year={year!r} month={month!r} day={day!r}: {exc}"
         ) from None
-    prefix = projection_sha256[:hash_prefix_length]
+    # I02R1 defect B: the FULL validated digest is the filename component —
+    # a display prefix can never become a physical identity collision.
     return "/".join(
         [
             "projections",
@@ -241,7 +233,7 @@ def projection_object_key(
             f"month={logical_date.month:02d}",
             f"day={logical_date.day:02d}",
             f"schema={escape_path_segment(schema_key)}",
-            f"part-{shard_id:05d}-{prefix}.parquet",
+            f"part-{shard_id:05d}-{projection_sha256}.parquet",
         ]
     )
 
@@ -282,7 +274,6 @@ def resolve_under_root(root: str | Path, object_key: str) -> Path:
 
 __all__ = [
     "BLOB_KEY_PREFIX",
-    "DEFAULT_HASH_PREFIX_LENGTH",
     "blob_object_key",
     "escape_path_segment",
     "projection_object_key",

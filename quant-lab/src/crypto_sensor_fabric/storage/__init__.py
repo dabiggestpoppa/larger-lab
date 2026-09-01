@@ -62,7 +62,6 @@ from .models import (
 )
 from .paths import (
     BLOB_KEY_PREFIX,
-    DEFAULT_HASH_PREFIX_LENGTH,
     blob_object_key,
     escape_path_segment,
     projection_object_key,
@@ -73,7 +72,6 @@ from .paths import (
 __all__ = [
     # paths / addressing
     "BLOB_KEY_PREFIX",
-    "DEFAULT_HASH_PREFIX_LENGTH",
     # models
     "AcquisitionRecord",
     # enums

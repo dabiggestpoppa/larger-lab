@@ -172,8 +172,19 @@ class TestProjectionObjectKey:
             "projections/provider=kraken_futures/venue=kraken/"
             "sensor=MECHANICAL_LIQUIDATION/instrument=PI_XBTUSD/"
             "granularity=1h/year=2026/month=08/day=31/"
-            "schema=liquidation_volume/part-00000-abcdef01.parquet"
+            "schema=liquidation_volume/"
+            f"part-00000-{DIGEST}.parquet"
         )
+
+    def test_full_digest_in_filename(self) -> None:
+        # I02R1 §14: the FULL validated 64-char digest is in the filename —
+        # lowercase, no prefix, no "sha256:" decoration.
+        key = projection_object_key(**_PROJECTION_KW)
+        filename = key.split("/")[-1]
+        assert DIGEST in filename
+        assert DIGEST.upper() not in filename
+        assert "sha256:" not in filename
+        assert filename == f"part-00000-{DIGEST}.parquet"
 
     def test_escapes_native_instrument(self) -> None:
         key = projection_object_key(**{**_PROJECTION_KW, "native_instrument": "BTC/USDT"})
@@ -222,10 +233,24 @@ class TestProjectionObjectKey:
             with pytest.raises(ValueError):
                 projection_object_key(**{**_PROJECTION_KW, "shard_id": bad})  # type: ignore[arg-type]
 
-    def test_bad_prefix_length_rejected(self) -> None:
-        for bad in (0, 65, True):
-            with pytest.raises(ValueError):
-                projection_object_key(**{**_PROJECTION_KW, "hash_prefix_length": bad})  # type: ignore[arg-type]
+    def test_hash_prefix_length_removed_from_canonical_api(self) -> None:
+        # I02R1 §11: hash_prefix_length is no longer part of the canonical
+        # physical address API — display shorthand must never leak into the
+        # durable object key.
+        with pytest.raises(TypeError):
+            projection_object_key(**{**_PROJECTION_KW, "hash_prefix_length": 8})  # type: ignore[arg-type]
+
+    def test_collision_adversarial_same_prefix(self) -> None:
+        # I02R1 §13: two hashes sharing the same 8-char prefix, same partition
+        # and same shard MUST produce different keys. Under the old 8-char
+        # prefix filename these two keys were identical.
+        hash_a = "abcdef01" + "a" * 56
+        hash_b = "abcdef01" + "b" * 56
+        key_a = projection_object_key(**{**_PROJECTION_KW, "projection_sha256": hash_a})
+        key_b = projection_object_key(**{**_PROJECTION_KW, "projection_sha256": hash_b})
+        assert key_a != key_b
+        assert hash_a in key_a
+        assert hash_b in key_b
 
     def test_malformed_projection_hash_rejected(self) -> None:
         with pytest.raises(ValueError):
