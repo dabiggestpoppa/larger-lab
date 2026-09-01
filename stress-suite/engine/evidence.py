@@ -30,6 +30,10 @@ class EvidenceRecord:
     status: str = "ACTIVE"               # ACTIVE / DEMOTED / DORMANT / SUPERSEDED
     seq: int = 0
     source_label: str = ""
+    source_lineage: str = ""             # observable lineage label (registry grade)
+    resolution_class: str = ""           # RESOLUTION kind, e.g. REPLACEMENT_VALIDATED / PLURAL_NON_DOMINATION (G2R-10, AMB-13)
+    allocator: str = ""                  # allocation/assignment origin (G0 Q3 — observable, never disqualifying)
+    retrieval_lineage: str = ""
 
     @classmethod
     def make(
@@ -40,6 +44,10 @@ class EvidenceRecord:
         provenance: Optional[Provenance] = None,
         source_label: str = "",
         evidence_refs: Optional[List[str]] = None,
+        source_lineage: str = "",
+        resolution_class: str = "",
+        allocator: str = "",
+        retrieval_lineage: str = "",
     ) -> "EvidenceRecord":
         if kind not in EVIDENCE_KINDS:
             raise ValueError(f"unknown evidence kind: {kind}")
@@ -51,12 +59,32 @@ class EvidenceRecord:
             evidence_refs=list(evidence_refs or []),
             seq=seq,
             source_label=source_label,
+            source_lineage=source_lineage,
+            resolution_class=resolution_class,
+            allocator=allocator,
+            retrieval_lineage=retrieval_lineage,
         )
 
     # --- conflation guards (used by authority firewall) ---------------------- #
     @property
     def is_independent_confirmation(self) -> bool:
         return self.kind == "INDEPENDENT_CONFIRMATION"
+
+
+@dataclass(frozen=True)
+class ResolutionCondition:
+    """PROVISIONAL_TEST_OBJECT (G2R-10, AMB-13). A-010 has NO dedicated
+    'replacement validated' channel; these records make the resolution semantics
+    of NEW_STABLE / PLURAL_MODEL_STATE / ROLLBACK explicit WITHOUT adding a
+    constitutional evidence channel. AMB-13 stays OPEN for ratification."""
+
+    resolution_id: str
+    resolution_class: str                 # REPLACEMENT_VALIDATED / PLURAL_NON_DOMINATION / ROLLBACK_JUSTIFIED / NO_RESOLUTION
+    claim: str = ""
+    evidence_refs: List[str] = field(default_factory=list)
+    provenance: Optional[Provenance] = None
+    status: str = "PROVISIONAL_TEST_OBJECT"
+    seq: int = 0
 
 
 @dataclass(frozen=True)

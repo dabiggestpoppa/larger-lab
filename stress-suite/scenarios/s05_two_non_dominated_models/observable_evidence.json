@@ -1,7 +1,7 @@
 {
   "records": [
     {"record_id": "E_MB_PAPER", "kind": "INDEPENDENT_CONFIRMATION", "claim": "M_B explains condition-space B where M_A fails", "lineage": "M_B_LINEAGE"},
-    {"record_id": "E_DISCRIM_A", "kind": "DETERMINISTIC", "claim": "discriminating test T1: M_A wins in condition-space A; M_B wins in B (no global dominance)", "lineage": "M_A_LINEAGE"},
-    {"record_id": "E_DISCRIM_B", "kind": "DETERMINISTIC", "claim": "discriminating test T2: neither model dominates globally; multiplicity is unresolved, not averaged", "lineage": "M_B_LINEAGE"}
+    {"record_id": "E_DISCRIM_A", "kind": "DETERMINISTIC", "claim": "discriminating test T1: M_A wins in condition-space A; M_B wins in B (no global dominance)", "lineage": "M_A_LINEAGE", "resolution_class": "PLURAL_NON_DOMINATION"},
+    {"record_id": "E_DISCRIM_B", "kind": "DETERMINISTIC", "claim": "discriminating test T2: neither model dominates globally; multiplicity is unresolved, not averaged", "lineage": "M_B_LINEAGE", "resolution_class": "PLURAL_NON_DOMINATION"}
   ]
 }
