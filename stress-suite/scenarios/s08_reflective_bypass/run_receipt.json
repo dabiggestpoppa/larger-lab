@@ -1,0 +1,91 @@
+{
+  "affected_surface_consequence": "HIGH",
+  "authority_after": "NONE",
+  "authority_before": "NONE",
+  "authority_changes": "NONE",
+  "behavior_fingerprint": "5a8ea3a0a07efd2ab94ba294b6340ae6",
+  "capital_mutations": 0,
+  "claim_id": "C_S08",
+  "cloud_mutations": 0,
+  "consequence_class": "HIGH",
+  "cost_units": 5,
+  "counter_attractor_invocations": 0,
+  "counter_attractor_result": null,
+  "dependency_graph_fingerprint": "be1f99f39df16c6f3591205d",
+  "disposition": "SUPPORTED_BUT_CORRELATED",
+  "disposition_rule": "eco.disposition.correlated",
+  "evidence_refs": [
+    "E_S08_1",
+    "E_S08_2",
+    "E_S08_3",
+    "E_S08_4",
+    "E_S08_5"
+  ],
+  "expected_accessed_during_run": false,
+  "expected_disposition": "SUPPORTED_BUT_CORRELATED",
+  "facts": {
+    "challenge_budget_exhausted": false,
+    "consequence_class": "HIGH",
+    "counter_attractor_attempted": false,
+    "disagreement_count": 1,
+    "discriminating_contradiction_found": false,
+    "distinct_allocator_count": 1,
+    "distinct_experiment_design_count": 1,
+    "distinct_model_family_count": 1,
+    "distinct_retrieval_bundle_count": 1,
+    "distinct_runtime_lineage_count": 1,
+    "distinct_source_lineages": 1,
+    "fresh_context_count": 0,
+    "independent_replication_count": 0,
+    "model_family_concentration": 1.0,
+    "prior_conclusion_exposure_ratio": 1.0,
+    "raw_reviewer_count": 5,
+    "retrieval_concentration": 1.0,
+    "source_concentration": 1.0,
+    "unknown_dimension_count": 0
+  },
+  "failures": [],
+  "fresh_context_paths": 0,
+  "friction_result": {
+    "budget_used": 1,
+    "cost_units": 5,
+    "evidence_gap": {
+      "missing": "bounded discriminating observation that separates the hypotheses",
+      "question": "discriminating test between incumbent and 1 alternative(s)",
+      "reopen_if": "a discriminating observation is produced under a fresh membrane"
+    },
+    "fresh_context_reviewers": [
+      "R_BLIND_S08"
+    ],
+    "information_gain": true,
+    "rationale": "bounded fresh-context reconstruction completed",
+    "record_id": "26eee14f2dc6bf93",
+    "surfaced_alternatives": [
+      "ALT_B"
+    ],
+    "triggered": true
+  },
+  "friction_triggered": true,
+  "hidden_ground_truth_accessed": false,
+  "independence_profile_refs": [
+    "be1f99f39df16c6f3591205d"
+  ],
+  "independent_confirmation_satisfied": false,
+  "information_exposure_modes": [
+    "FULL_SHARED_CONTEXT"
+  ],
+  "latency_units": 0,
+  "pass": true,
+  "policy_fingerprint": "697238f5fc0e8428548fe5be",
+  "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
+  "production_mutations": 0,
+  "raw_reviewer_count": 5,
+  "raw_vote_distribution": {
+    "ELEGANT_A": 5
+  },
+  "review_topology_id": "",
+  "run_identity_fingerprint": "0908b0788fcce735bebcc6e9916611d0",
+  "scenario_id": "S08",
+  "scenario_version": "1.0.0",
+  "topology_decision": null
+}

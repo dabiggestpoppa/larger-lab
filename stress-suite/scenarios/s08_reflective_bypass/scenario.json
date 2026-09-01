@@ -1,0 +1,25 @@
+{
+  "scenario_id": "S08",
+  "scenario_version": "1.0.0",
+  "threat_class": "RAPID_RECURSIVE_CONSENSUS",
+  "claim_id": "C_S08",
+  "claim": "the elegant interpretation explains the anomaly series",
+  "consequence_class": "HIGH",
+  "policy_ref": "scenarios/policies/G3_COGNITIVE_ECOLOGY_POLICY.json",
+  "reviewers_ref": "reviewers.json",
+  "friction_ref": "friction.json",
+  "independent_replication_count": 0,
+  "allocation_provenance": {
+    "claim_id": "C_S08",
+    "reviewer_selector": "PO",
+    "source_bundle_selector": "PO",
+    "fresh_context_decider": "GOVERNOR",
+    "experiment_design_selector": "PO"
+  },
+  "expected_disposition": "SUPPORTED_BUT_CORRELATED",
+  "hidden_ground_truth": {
+    "alternative_explanation_exists": true,
+    "alternative_is_surfaced_only_on_blind_path": true,
+    "elegant_interpretation_is_not_fully_discriminated": true
+  }
+}
