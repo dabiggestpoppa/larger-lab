@@ -37,8 +37,9 @@ from ..base.schema import SchemaAssessment
 # --------------------------------------------------------------------------- #
 #: Fields that are STRICT integers (type(v) is int; bool excluded).
 #: Includes the timestamp `time` (native epoch SECONDS for the current
-#: contract_stats contract; the I05-era sample was epoch ms — a provider
-#: semantic transition, see BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json)
+#: contract_stats contract; the I05-era ms sample was a SYNTHETIC fixture —
+#: final adjudication A_PRIOR_CHARACTERIZATION_ERROR, historical real unit
+#: UNIDENTIFIED, see BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json)
 #: and the integer size/count fields.
 _INT_FIELDS: frozenset[str] = frozenset(
     {

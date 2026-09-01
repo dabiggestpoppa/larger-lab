@@ -113,7 +113,7 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             "short_liq_size": "contracts (short liquidations)",
             "long_liq_usd": "USD notional",
             "short_liq_usd": "USD notional",
-            "time": "epoch seconds (interval; I05-era sample was ms — provider transition, see BLOC_03_I10R1)",
+            "time": "epoch seconds (interval; I05-era sample was a synthetic ms fixture — prior characterization error, see BLOC_03_I10R2)",
         },
         SensorFamily.MECHANICAL_OPEN_INTEREST: {
             "source": "interval OI (contracts + USD notional) via /contract_stats",
@@ -272,8 +272,9 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             return True, None  # nothing returned; completeness unresolved
         # funding_rate rows carry {"t": epoch SECONDS} (I13R1 live-observed);
         # /trades rows carry create_time_ms; contract_stats rows carry epoch
-        # SECONDS `time` (current contract — I10R1 adjudication; the I05-era
-        # sample was epoch ms, a provider transition, NOT magnitude-rescued).
+        # SECONDS `time` (current contract — I10R1 live-verified; the I05-era
+        # sample was a synthetic ms fixture — prior characterization error,
+        # NOT provider drift and NOT magnitude-rescued).
         if sensor is SensorFamily.MECHANICAL_FUNDING:
             last = max(
                 (row.get("t") for row in rows if isinstance(row.get("t"), (int, float))),

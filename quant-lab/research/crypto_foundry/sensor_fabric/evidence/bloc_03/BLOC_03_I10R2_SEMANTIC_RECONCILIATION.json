@@ -1,0 +1,66 @@
+{
+  "artifact": "BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json",
+  "checkpoint": "SENSOR-B3-I10R2",
+  "purpose": "FINAL PRE-HANDOFF SEMANTIC CONSISTENCY SEAL — supersedes the provisional I10R1A Gate adjudication and records the canonical diagnosis across code/docs/evidence",
+  "starting_sha": "3061e715ec64b69f57ed68c2e72ad5d418a35a07",
+  "run_anchor_utc": "2026-09-01T02:30:00Z",
+  "i10r1a_is_history": "BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json is preserved UNCHANGED as the intermediate I10R1A decision; this artifact is the superseding operator/evidence reconciliation",
+  "supersedes_gate_adjudication_from": "B_PROVIDER_SEMANTIC_DRIFT",
+  "gate": {
+    "provisional_diagnosis_i10r1a": "B_PROVIDER_SEMANTIC_DRIFT — old unit = epoch milliseconds, new unit = epoch seconds, transition between I13R1 and I10",
+    "final_diagnosis": "A_PRIOR_CHARACTERIZATION_ERROR_WITH_UNIDENTIFIED_HISTORICAL_UNIT",
+    "final_diagnosis_explanation": "The ONLY committed evidence for an epoch-millisecond contract_stats `time` is the I05-era SYNTHETIC probe fixture (tests/.../probe_payloads/gate/contract_stats_success.json, time=1655251200000, commit 22714a17). That fixture is an offline synthetic reconstruction (SYNTHETIC_SCHEMA_FIXTURE label), not a real provider observation. I06 fixtures inherited the assumption. I13/I13R1 real probe-derived datetimes used a magnitude-aware converter (value>1e10 -> ms) and did NOT preserve native values sufficient to identify the response unit, so they cannot certify either unit. Therefore committed REAL historical evidence does NOT establish that Gate's real provider surface ever emitted milliseconds. We know our old implementation/unit label was wrong; we do NOT know that Gate changed.",
+    "current_contract_unit": "EPOCH_SECONDS",
+    "current_contract_evidence": [
+      "I10 live smoke 2026-08-31..09-01: 10-digit ints in exact 1h steps; seconds interpretation 2026-08-31T00:00Z..2026-09-01T01:00Z matches the requested window; ms interpretation 1970 (BLOC_03_I10_NETWORK_SMOKE_RESULTS.json)",
+      "I10R1 live characterization 2026-09-01T01:49:29Z: HTTP 200, time = [1788134400..1788224400], exact 3600s step, seconds -> 2026-08-31T00:00Z..2026-09-01T01:00Z (BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json)",
+      "I10R1 recheck 2026-09-01T02:06:52Z: all three contract_stats sensors returned 26 rows with plausible 2026 timestamps, KNOWN_SCHEMA (BLOC_03_I10R1_TARGETED_RECHECK_RESULTS.json)"
+    ],
+    "historical_unit_certainty": "UNIDENTIFIED_BEFORE_CURRENT_LIVE_PROOF",
+    "historical_unit_explanation": "No committed REAL raw observation of the contract_stats response unit predates I10. The I05-era ms sample is synthetic; the 2022-era real probe attempt returned zero rows (180-day retention boundary); I13 derived datetimes are unit-masked. The real provider unit before 2026-08-31 is NOT identified by committed evidence.",
+    "synthetic_fixture_role": "PROVES_TESTS_NOT_PROVIDER_HISTORY",
+    "synthetic_fixture_role_explanation": "The I05-era ms fixture and its I06 descendants remain committed as historical artifacts with the SYNTHETIC_SCHEMA_FIXTURE label. They are retained (immutable history) and are NOT cited as provider-reality proof of a millisecond era. The ms assumption was a PRIOR_CHARACTERIZATION / SYNTHETIC_FIXTURE ERROR, not an observed provider unit.",
+    "provider_semantic_drift_claim": "NOT_ESTABLISHED",
+    "runtime_treatment": "native `time` integer preserved unchanged; convenience datetime from epoch seconds only; NO magnitude heuristic; an out-of-validity (e.g. 13-digit) value yields an un-derivable convenience datetime and the smoke temporal guard flags it",
+    "old_ms_fixture_retention": "RETAINED_AS_HISTORY_WITH_ANNOTATION — never used as current-contract evidence"
+  },
+  "kraken_funding": {
+    "timestamp_unit": "EPOCH_MILLISECONDS_SENSOR_SPECIFIC",
+    "timestamp_evidence": [
+      "I10: funding convenience timestamps NULL for 24 rows while sibling analytics paths resolved 2026 datetimes from 10-digit seconds — NULL only occurs when the epoch value overflows year-9999 seconds (>= ~2.5e11), i.e. 13-digit milliseconds",
+      "I10R1 characterization: result.timestamp = list[int] len 24 (hour grid); data = exactly {rate, relativeRate}",
+      "Kraken probe module annotation: 'timestamp is epoch seconds for most analytics types and epoch ms for funding'"
+    ],
+    "literal_timestamp_sample": "COMMITTED_IN_I10R2 — see BLOC_03_I10R2_TARGETED_RECHECK_RESULTS.json native_first_timestamps (walker list-typed capture, I10R1D harness fix)",
+    "metric_set": "REQUIRED {rate, relativeRate}",
+    "metric_classification": "REQUIRED (both keys evidenced present in every observed response: 09 fingerprint pins data:dict{rate, relativeRate}; live reproduction exact; NO evidence valid responses may omit either) — the earlier 'KNOWN_OPTIONAL' wording is superseded",
+    "additive_firewall": "ACTIVE — unknown additive metric keys are preserved raw (upstream envelope) and flagged ADDITIVE, and are NOT projected into parsed convenience rows (I10R2 _build_dict_rows projection repair)",
+    "unknown_additive_promotion": "NONE"
+  },
+  "gate_completion_policy": {
+    "authority": "I09 production matrix freezes ALL four Gate paths resume=LIMITED, completion=LIMITED (immutable, NOT modified by I10R2)",
+    "contract_stats": "from/interval/limit and NO `to`; deep traversal UNRESOLVED; is_complete=FALSE always; next_resume_token=None; nonempty rows intersecting [start,end) -> PARTIAL_INTERVAL; rows entirely outside -> GAP_DETECTED; empty -> EMPTY_VALID",
+    "funding_rate": "from/to present but NO committed evidence proves exhaustive requested-window coverage; completion stays LIMITED; is_complete=FALSE always; PARTIAL_INTERVAL/GAP_DETECTED as above; EMPTY_VALID on empty",
+    "runtime_manufactured_completion": "REMOVED — runtime no longer unconditionally claims is_complete=True",
+    "no_invented_resume_token": "TRUE"
+  },
+  "adapter_versions": {
+    "gate": "gate-adapter-v1 -> gate-adapter-v2 (I10R2; materially changed timestamp interpretation in I10R1B and completion semantics in I10R2B)",
+    "kraken": "kraken-adapter-v1 -> kraken-adapter-v2 (I10R2; materially changed funding timestamp unit and funding known-metric set in I10R1C)",
+    "okx_deribit": "UNCHANGED (no unrelated version churn)",
+    "i09_matrix_versions": "UNCHANGED gate-adapter-v1 / kraken-adapter-v1 as immutable I09 history; I10R2 creates a CURRENT RUNTIME OVERLAY showing v2 (BLOC_03_CURRENT_RUNTIME_ADAPTER_OVERLAY.json)"
+  },
+  "immutable_artifacts": {
+    "i09_matrix": "UNCHANGED",
+    "i10_plan_results_evidence": "UNCHANGED",
+    "i10r1_adjudication_recheck_evidence": "UNCHANGED",
+    "chronology": "I10 (live mismatch discovered) -> I10 REVIEW (mixed block) -> I10R1 (functional repair + recheck) -> I10R2 (semantic/provenance reconciliation)"
+  },
+  "network_budget_i10r2": {
+    "max_calls": 5,
+    "gate_targeted_recheck": "FUNDING BTC_USDT, LIQUIDATION BTC_USDT, OPEN_INTEREST BTC_USDT, POSITIONING BTC_USDT",
+    "kraken_funding_recheck": "PI_XBTUSD (literal timestamp evidence + versioned recheck)",
+    "retries": 0,
+    "credentials": "NONE"
+  }
+}
