@@ -3,7 +3,7 @@
   "authority_after": "NONE",
   "authority_before": "NONE",
   "authority_changes": "NONE",
-  "behavior_fingerprint": "e130ada1870bcca349fea5eab897a5b0",
+  "behavior_fingerprint": "ecfe8a491912ca9462316f5d37ec0e3b",
   "capital_mutations": 0,
   "claim_id": "C_S07",
   "cloud_mutations": 0,
@@ -11,9 +11,10 @@
   "cost_units": 24,
   "counter_attractor_invocations": 0,
   "counter_attractor_result": null,
-  "dependency_graph_fingerprint": "e753593bdaf7353244119a88",
+  "dependency_graph_fingerprint": "6166b56e9f2d3fe25c4be846",
   "disposition": "REQUIRES_INDEPENDENT_REVIEW",
   "disposition_rule": "eco.disposition.requires_review",
+  "evidence_obtained_from_executed_topology": false,
   "evidence_refs": [
     "E_S07_A",
     "E_S07_B"
@@ -27,13 +28,17 @@
     "disagreement_count": 1,
     "discriminating_contradiction_found": false,
     "distinct_allocator_count": 1,
+    "distinct_conclusion_count": 1,
     "distinct_experiment_design_count": 2,
     "distinct_model_family_count": 2,
     "distinct_retrieval_bundle_count": 2,
     "distinct_runtime_lineage_count": 2,
     "distinct_source_lineages": 2,
+    "dominant_vote_count": 2,
+    "dominant_vote_ratio": 1.0,
     "fresh_context_count": 0,
     "independent_replication_count": 0,
+    "independently_originated_design_count": 0,
     "model_family_concentration": 0.5,
     "prior_conclusion_exposure_ratio": 0.0,
     "raw_reviewer_count": 2,
@@ -47,7 +52,7 @@
   "friction_triggered": false,
   "hidden_ground_truth_accessed": false,
   "independence_profile_refs": [
-    "e753593bdaf7353244119a88"
+    "6166b56e9f2d3fe25c4be846"
   ],
   "independent_confirmation_satisfied": false,
   "information_exposure_modes": [
@@ -55,15 +60,17 @@
   ],
   "latency_units": 12,
   "pass": true,
-  "policy_fingerprint": "697238f5fc0e8428548fe5be",
+  "policy_fingerprint": "15a5f90f6dafd7e8c318ad2b",
   "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
+  "policy_version": "V2",
   "production_mutations": 0,
+  "provenance_conflicts": [],
   "raw_reviewer_count": 2,
   "raw_vote_distribution": {
     "BETA": 2
   },
   "review_topology_id": "TOPO_B_DIFFERENTIATED",
-  "run_identity_fingerprint": "8fb144166edf27f17f5d1cc18bdb94de",
+  "run_identity_fingerprint": "abdae54f81cbfc94cf896324ec8aa4bf",
   "scenario_id": "S07",
   "scenario_version": "1.0.0",
   "topology_decision": {
@@ -75,6 +82,8 @@
     "contract_id": "G3-S07-ROUTING",
     "cost_units": 24,
     "decision_id": "e8d97a4adab56e28",
+    "evidence_obtained": false,
+    "execution_status": "REVIEW_TOPOLOGY_RECOMMENDED",
     "independence_dimensions_achieved": {
       "allocator": 1,
       "experiment_design_origin": 4,
@@ -93,5 +102,6 @@
     "purpose": "strategy surface should adopt the beta regime model",
     "reason": "cheapest admissible topology for HIGH consequence (cost=24, reviewers=4)",
     "remaining_gaps": []
-  }
+  },
+  "topology_status": "REVIEW_TOPOLOGY_RECOMMENDED"
 }

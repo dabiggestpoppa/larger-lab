@@ -3,7 +3,7 @@
   "authority_after": "NONE",
   "authority_before": "NONE",
   "authority_changes": "NONE",
-  "behavior_fingerprint": "5a8ea3a0a07efd2ab94ba294b6340ae6",
+  "behavior_fingerprint": "096242936df013ac703b7386cad8d7fa",
   "capital_mutations": 0,
   "claim_id": "C_S08",
   "cloud_mutations": 0,
@@ -11,9 +11,10 @@
   "cost_units": 5,
   "counter_attractor_invocations": 0,
   "counter_attractor_result": null,
-  "dependency_graph_fingerprint": "be1f99f39df16c6f3591205d",
+  "dependency_graph_fingerprint": "d6f23dca317ad343bf6fa48c",
   "disposition": "SUPPORTED_BUT_CORRELATED",
   "disposition_rule": "eco.disposition.correlated",
+  "evidence_obtained_from_executed_topology": false,
   "evidence_refs": [
     "E_S08_1",
     "E_S08_2",
@@ -30,13 +31,17 @@
     "disagreement_count": 1,
     "discriminating_contradiction_found": false,
     "distinct_allocator_count": 1,
+    "distinct_conclusion_count": 1,
     "distinct_experiment_design_count": 1,
     "distinct_model_family_count": 1,
     "distinct_retrieval_bundle_count": 1,
     "distinct_runtime_lineage_count": 1,
     "distinct_source_lineages": 1,
+    "dominant_vote_count": 5,
+    "dominant_vote_ratio": 1.0,
     "fresh_context_count": 0,
     "independent_replication_count": 0,
+    "independently_originated_design_count": 0,
     "model_family_concentration": 1.0,
     "prior_conclusion_exposure_ratio": 1.0,
     "raw_reviewer_count": 5,
@@ -47,6 +52,18 @@
   "failures": [],
   "fresh_context_paths": 0,
   "friction_result": {
+    "actions": [
+      {
+        "budget_unit": 1,
+        "evidence_produced": [
+          "ALT_B"
+        ],
+        "exposure_mode": "BLIND",
+        "method": "fresh_context_reconstruction",
+        "result": "ALT_B",
+        "reviewer_id": "R_BLIND_S08"
+      }
+    ],
     "budget_used": 1,
     "cost_units": 5,
     "evidence_gap": {
@@ -58,8 +75,8 @@
       "R_BLIND_S08"
     ],
     "information_gain": true,
-    "rationale": "bounded fresh-context reconstruction completed",
-    "record_id": "26eee14f2dc6bf93",
+    "rationale": "bounded friction execution completed under authorized methods",
+    "record_id": "2c2349ca17f38f62",
     "surfaced_alternatives": [
       "ALT_B"
     ],
@@ -68,7 +85,7 @@
   "friction_triggered": true,
   "hidden_ground_truth_accessed": false,
   "independence_profile_refs": [
-    "be1f99f39df16c6f3591205d"
+    "d6f23dca317ad343bf6fa48c"
   ],
   "independent_confirmation_satisfied": false,
   "information_exposure_modes": [
@@ -76,16 +93,19 @@
   ],
   "latency_units": 0,
   "pass": true,
-  "policy_fingerprint": "697238f5fc0e8428548fe5be",
+  "policy_fingerprint": "15a5f90f6dafd7e8c318ad2b",
   "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
+  "policy_version": "V2",
   "production_mutations": 0,
+  "provenance_conflicts": [],
   "raw_reviewer_count": 5,
   "raw_vote_distribution": {
     "ELEGANT_A": 5
   },
   "review_topology_id": "",
-  "run_identity_fingerprint": "0908b0788fcce735bebcc6e9916611d0",
+  "run_identity_fingerprint": "df83a87d80c6a1603b3ed576a5752394",
   "scenario_id": "S08",
   "scenario_version": "1.0.0",
-  "topology_decision": null
+  "topology_decision": null,
+  "topology_status": "NONE"
 }
