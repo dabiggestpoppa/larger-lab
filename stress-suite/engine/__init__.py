@@ -53,15 +53,17 @@ from .g3_runner import G3ScenarioPack, G3RunResult, load_g3_pack, run_g3_scenari
 from .memory import (
     MEMORY_TIERS, KnowledgeActivationState, MemoryObject, MemoryIndex,
     MemoryCompactionRecord, MemoryRetriever, ContextBundle, RetrievalTraceEntry,
-    run_metabolism_pipeline, MetabolismReport,
+    run_metabolism_pipeline, MetabolismReport, compact_active_pool,
 )
 from .reopen import (
     REOPEN_OPERATORS, ReopenCondition, ReopenEvaluator, ReopenEvaluation,
     NegativeKnowledgeSuppressionDecision, decide_suppression, ReopenConditionError,
+    BlockerResolutionRecord, reopen_condition_state,
 )
 from .reconstruction import (
     PROVISIONAL_EPOCH_RECONSTRUCTION_CONTRACT, EpochReconstructionBundle,
     EpochReconstructionReport, reconstruct_epoch, verify_epoch_chain,
+    CanonicalArtifact, CanonicalArtifactRegistry, ReconstructionError,
 )
 from .memory_policy import MemoryPolicy, MemoryRule, MemoryPolicyError
 from .g4_runner import G4ScenarioPack, G4RunResult, load_g4_pack, run_g4_scenario, evaluate_g4_expectation
@@ -99,11 +101,13 @@ __all__ = [
     "evaluate_g3_expectation",
     "MEMORY_TIERS", "KnowledgeActivationState", "MemoryObject", "MemoryIndex",
     "MemoryCompactionRecord", "MemoryRetriever", "ContextBundle", "RetrievalTraceEntry",
-    "run_metabolism_pipeline", "MetabolismReport",
+    "run_metabolism_pipeline", "MetabolismReport", "compact_active_pool",
     "REOPEN_OPERATORS", "ReopenCondition", "ReopenEvaluator", "ReopenEvaluation",
     "NegativeKnowledgeSuppressionDecision", "decide_suppression", "ReopenConditionError",
+    "BlockerResolutionRecord", "reopen_condition_state",
     "PROVISIONAL_EPOCH_RECONSTRUCTION_CONTRACT", "EpochReconstructionBundle",
     "EpochReconstructionReport", "reconstruct_epoch", "verify_epoch_chain",
+    "CanonicalArtifact", "CanonicalArtifactRegistry", "ReconstructionError",
     "MemoryPolicy", "MemoryRule", "MemoryPolicyError",
     "G4ScenarioPack", "G4RunResult", "load_g4_pack", "run_g4_scenario",
     "evaluate_g4_expectation",
