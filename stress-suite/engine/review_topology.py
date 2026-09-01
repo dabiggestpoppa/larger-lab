@@ -25,7 +25,9 @@ from .base import deterministic_hex
 from .cognitive_ecology import (
     PROFILE_SCHEMA_VERSION,
     UNKNOWN,
+    CAPABILITY_SOURCES,
     ReviewerIndependenceProfile,
+    collect_epistemic_paths,
 )
 
 CONSEQUENCE_CLASSES = ("HIGH", "MEDIUM", "LOW")
@@ -72,14 +74,22 @@ class ReviewTopology:
     counter_attractor_budget: int = 0
     stop_conditions: Tuple[str, ...] = ()
     independently_originated_design_count: int = 0   # G3R-06: provenance-based, not name-based
+    capability_source: str = "UNVERIFIED_CAPABILITY"  # G3R2-10: provenance of the tiers
 
     def reviewer_count(self) -> int:
         return len(self.profiles)
 
+    def unique_epistemic_path_count(self) -> int:
+        """G3R2-09: UNIQUE qualifying epistemic paths — one reviewer that is
+        fresh AND independently-designed counts as ONE path, not two."""
+        return len(collect_epistemic_paths(self.profiles))
+
     def fresh_or_independent_design_count(self) -> int:
         """G3R-06: fresh-context paths OR provenance-verified independent design
-        origins both qualify for a fresh-or-design requirement."""
-        return self.fresh_context_count + self.independently_originated_design_count
+        origins both qualify for a fresh-or-design requirement. G3R2-09: counted
+        as UNIQUE epistemic paths (no double counting of a path with both
+        properties)."""
+        return self.unique_epistemic_path_count()
 
     def independence_counts(self) -> Dict[str, int]:
         axes = {
@@ -138,6 +148,7 @@ class ReviewTopologyDecision:
     admissible_alternatives: Tuple[str, ...]          # other admissible topology ids
     contract_id: str = ""
     contract_fingerprint: str = ""
+    capability_source: str = "UNVERIFIED_CAPABILITY"  # G3R2-10
     # G3R-10: choosing a better topology is NOT the same as having obtained
     # evidence from it. The G3 router only RECOMMENDS; evidence is obtained
     # only when the executed topology actually produces decision-grade results.
@@ -150,7 +161,8 @@ class ReviewTopologyDecision:
             "reason", "constraints_satisfied", "cost_units", "latency_units",
             "independence_dimensions_achieved", "individual_quality_metadata",
             "remaining_gaps", "admissible_alternatives", "contract_id",
-            "contract_fingerprint", "execution_status", "evidence_obtained")}
+            "contract_fingerprint", "capability_source", "execution_status",
+            "evidence_obtained")}
 
 
 def _capability_ok(tier: str, required: str) -> bool:
@@ -169,6 +181,11 @@ def _topology_admissible(topo: ReviewTopology, constraints: Mapping[str, Any]) -
     required_all = str(constraints.get("minimum_all_required_roles_capability")
                        or constraints.get("min_capability") or "")
     required_any = str(constraints.get("minimum_any_reviewer_capability") or "")
+    # G3R2-10: capability_tiers are evidence only when their provenance is
+    # explicit. UNVERIFIED capability can never satisfy a positive minimum
+    # capability requirement.
+    if (required_all or required_any) and topo.capability_source == "UNVERIFIED_CAPABILITY":
+        gaps.append("capability provenance unverified (cannot satisfy positive capability requirement)")
     if required_all and (not topo.capability_tiers
                          or any(not _capability_ok(t, required_all) for t in topo.capability_tiers)):
         gaps.append(f"capability below {required_all} for all required reviewers")
@@ -190,7 +207,7 @@ def _topology_admissible(topo: ReviewTopology, constraints: Mapping[str, Any]) -
             topo.independently_originated_design_count < int(constraints.get("min_independent_design", 0)):
         gaps.append("insufficient independently-originated design paths")
     if int(constraints.get("min_fresh_or_independent_design", 0)) and \
-            topo.fresh_or_independent_design_count() < int(constraints.get("min_fresh_or_independent_design", 0)):
+            topo.unique_epistemic_path_count() < int(constraints.get("min_fresh_or_independent_design", 0)):
         gaps.append("insufficient fresh-context / independent-design paths")
     if topo.cost_units > int(constraints.get("max_cost_units", 10 ** 9)):
         gaps.append("cost above budget")
@@ -245,5 +262,6 @@ def route_review_topology(
         admissible_alternatives=tuple(t.topology_id for t in admissible[1:]),
         contract_id=contract.contract_id,
         contract_fingerprint=contract.fingerprint(),
+        capability_source=chosen.capability_source if chosen else "UNVERIFIED_CAPABILITY",
     )
     return decision
