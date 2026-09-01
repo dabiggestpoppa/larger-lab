@@ -1,20 +1,27 @@
 {
   "artifact": "OFFLINE_TEST_REPORT.json",
-  "checkpoint": "SENSOR-B3-I11",
-  "purpose": "Record the exact offline test command and outcome for final Bloc 3 validation",
+  "checkpoint": "SENSOR-B3-I11R1",
+  "purpose": "Record the exact offline test command and outcome for final Bloc 3 validation — the FINAL full-suite execution, AFTER all I11 handoff tests and I11R1 semantic-consistency tests exist",
   "test_floor_before_i11": {"passed": 1360, "failed": 0},
   "final_full_suite": {
-    "command": "export PYTHONIOENCODING=utf-8; python -m pytest -q",
+    "command": "export PYTHONIOENCODING=utf-8; python -m pytest -q tests/crypto_sensor_fabric -p no:cacheprovider",
     "cwd": "<repo>/quant-lab (pytest rootdir)",
-    "passed": 1360,
+    "passed": 1379,
     "failed": 0,
     "skipped": 1,
     "skipped_reason": "tests/crypto_sensor_fabric/providers/test_network_smoke_live.py: SENSOR_NETWORK_SMOKE not set; live network smoke disabled (fail-closed opt-in)",
     "network_calls_during_normal_suite": 0,
     "network_opt_in_required": "SENSOR_NETWORK_SMOKE=1 + pytest -m sensor_network_smoke",
-    "duration_seconds": 46.65,
-    "requirement": ">= 1360 passed / 0 failed",
-    "met": true
+    "duration_seconds": 38.63,
+    "requirement": ">= 1367 passed / 0 failed",
+    "met": true,
+    "includes_handoff_and_semantic_consistency_tests": true,
+    "test_composition_note": "1379 = 1367 (I11 final, including the 7 I11D handoff-integrity tests) + 12 (I11R1 cross-surface semantic-consistency + report-table tests).  The earlier 1360-pass execution predates the I11D integrity tests and is NOT the final suite; it is preserved as historical evidence below.",
+    "historical_executions": [
+      {"checkpoint": "I10R2C/D", "passed": 1360, "failed": 0, "note": "pre-I11D handoff tests"},
+      {"checkpoint": "I11 (prior OFFLINE_TEST_REPORT)", "passed": 1360, "failed": 0, "note": "superseded — recorded before the 7 I11D handoff-integrity tests were added; the true I11 final suite was 1367"},
+      {"checkpoint": "I11 final (this report's predecessor)", "passed": 1367, "failed": 0, "skipped": 1, "note": "includes 7 I11D handoff-integrity tests"}
+    ]
   },
   "provider_conformance": {
     "kraken": "PRODUCTION_CANDIDATE conformance 0 failed (asserted in per-provider conformance tests within the full suite)",
@@ -27,7 +34,8 @@
     "ruff": "clean (changed scope)",
     "mypy": "clean on changed scope; only the known pre-existing baseline (10 probe/rest errors in untouched modules) remains — separated, not hidden"
   },
-  "handoff_integrity": "test_handoff_integrity (I11D): every file referenced by BLOC_03_HANDOFF_INDEX.md exists; every evidence ref in PROVIDER_CAPABILITY_RUNTIME.json resolves",
-  "determinism": "PROVIDER_CAPABILITY_RUNTIME.json / FINAL_ADAPTER_READINESS_MATRIX.csv/.json regenerated twice -> byte-identical (no wall-clock inside canonical content)",
-  "no_network_dependency": "ordinary full pytest with no smoke env var makes ZERO provider network calls; the marked sensor_network_smoke test is SKIPPED without SENSOR_NETWORK_SMOKE=1"
+  "handoff_integrity": "test_handoff_integrity (I11D + I11R1B): every file referenced by BLOC_03_HANDOFF_INDEX.md exists; every evidence ref in PROVIDER_CAPABILITY_RUNTIME.json resolves; cross-surface semantic equality (role/symbol scope/history scope/PIT/methodology/resume-completion/adapter versions/network state) holds across I14/I09/capability/overlay/final with chronology awareness; provider report role table == final machine matrix",
+  "determinism": "PROVIDER_CAPABILITY_RUNTIME.json / FINAL_ADAPTER_READINESS_MATRIX.csv/.json / BLOC_03_CURRENT_RUNTIME_ADAPTER_OVERLAY.json / FIXTURE_COVERAGE_REPORT.json regenerated twice -> byte-identical (SHA-256 recorded in BLOC_03_I11R1_HANDOFF_CONSISTENCY_SEAL.md)",
+  "no_network_dependency": "ordinary full pytest with no smoke env var makes ZERO provider network calls; the marked sensor_network_smoke test is SKIPPED without SENSOR_NETWORK_SMOKE=1",
+  "i11r1_network_calls": 0
 }
