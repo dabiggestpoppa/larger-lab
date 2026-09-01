@@ -63,14 +63,20 @@ _open_interest_continue = {
 }
 
 # --- funding (data: dict{rate, relativeRate}) -----------------------------
-# Bucket timestamps are EPOCH SECONDS: the committed Bloc 2 probe fixture
-# (funding_analytics_success.json) and the live probe contract both use
-# seconds; the I13R1 fingerprint (09_SCHEMA_FINGERPRINTS.jsonl) pins the
-# timestamp type as int only.  No milliseconds claim is manufactured here.
+# Funding bucket timestamps are EPOCH MILLISECONDS on the current Market
+# Analytics `funding` surface (I10R1 live adjudication: I10 returned NULL
+# convenience timestamps under a seconds converter = 13-digit overflow; the
+# probe module recorded "epoch ms for funding" at I13; live characterization
+# reproduced EXACTLY {rate, relativeRate} with matching cardinality).  The
+# I13R1 fingerprint pins the timestamp TYPE as int only; the old
+# funding_analytics_success.json fixture (seconds, list-of-{fundingRate}
+# shape) documents the SUPERSEDED response shape and cannot certify the
+# current contract.  relativeRate is evidence-backed and therefore KNOWN
+# (no longer additive).
 _funding_happy = {
     "errors": [],
     "result": {
-        "timestamp": [1755000000],
+        "timestamp": [1755000000000],
         "data": {"rate": [["0.0001"]], "relativeRate": [["0.0001"]]},
         "more": False,
     },

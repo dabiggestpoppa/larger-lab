@@ -240,13 +240,16 @@ class TestEpochUnitBehavior:
         assert batch.actual_first_timestamp == datetime.fromtimestamp(1755000000, tz=UTC)
         assert batch.actual_last_timestamp == datetime.fromtimestamp(1755003600, tz=UTC)
 
-    def test_funding_timestamps_epoch_seconds_from_evidence(self) -> None:
-        # funding happy fixture uses the same epoch-second unit as the committed
-        # probe fixture + live probe contract (I13R1 fingerprint pins int only).
+    def test_funding_timestamps_epoch_milliseconds(self) -> None:
+        # Funding bucket timestamps are epoch MILLISECONDS on the live Market
+        # Analytics funding surface (I10R1 adjudication: I10 NULL convenience
+        # timestamps = 13-digit overflow; probe module observed ms for funding;
+        # live characterization reproduced {rate, relativeRate} exactly).
+        # Convenience datetime = ms/1000; raw native int preserved.
         batch = _adapter(routes=HAPPY_ROUTES).fetch_funding(
             request(SensorFamily.MECHANICAL_FUNDING)
         )
-        assert batch.actual_first_timestamp == datetime.fromtimestamp(1755000000, tz=UTC)
+        assert batch.actual_first_timestamp == datetime.fromtimestamp(1755000000000 / 1000, tz=UTC)
 
     def test_interval_encoding_default_seconds(self) -> None:
         _, params = KrakenAnalyticsRequestBuilder().build(

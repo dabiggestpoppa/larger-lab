@@ -46,9 +46,41 @@ class TestDictShape:
         parsed = parse_kraken_analytics(FX.HAPPY["funding"][1], SensorFamily.MECHANICAL_FUNDING)
         assert parsed.rows[0]["rate"] == ["0.0001"]
         assert parsed.rows[0]["relativeRate"] == ["0.0001"]
-        # funding bucket timestamps are epoch seconds per committed probe
-        # fixture + live probe contract (I13R1 fingerprint pins int only)
-        assert parsed.rows[0]["timestamp"] == 1755000000
+        # funding bucket timestamps are RAW native INTs on the current live
+        # Market Analytics funding surface (I13R1 fingerprint pins int only);
+        # adapter-side convenience conversion treats funding as epoch ms
+        # (I10R1 adjudication) — the parser preserves the raw int verbatim.
+        assert parsed.rows[0]["timestamp"] == 1755000000000
+
+    def test_funding_known_schema_with_known_metrics(self) -> None:
+        # {rate, relativeRate} is the full evidence-backed funding set (I10R1:
+        # both keys pinned in the 09 fingerprint, live reproduction exact) —
+        # its presence is KNOWN, never ADDITIVE.
+        parsed = parse_kraken_analytics(FX.HAPPY["funding"][1], SensorFamily.MECHANICAL_FUNDING)
+        assert parsed.schema_state is SchemaState.KNOWN_SCHEMA
+
+    def test_funding_genuinely_new_key_stays_additive(self) -> None:
+        # A NEW unknown metric key beyond {rate, relativeRate} stays
+        # ADDITIVE (preserved raw + flagged) and is NOT silently promoted
+        # into a KNOWN semantic projection (I10R1 §14 firewall).
+        body = {
+            "errors": [],
+            "result": {
+                "timestamp": [1755000000000],
+                "data": {
+                    "rate": [["0.0001"]],
+                    "relativeRate": [["0.0001"]],
+                    "brandNewMetric": [["x"]],
+                },
+                "more": False,
+            },
+        }
+        parsed = parse_kraken_analytics(body, SensorFamily.MECHANICAL_FUNDING)
+        assert parsed.schema_state is SchemaState.ADDITIVE_SCHEMA_CHANGE
+        assert parsed.semantic_output_allowed is True
+        # native field preserved in the native row view (raw payload also
+        # preserved upstream); semantic promotion is gated by schema state.
+        assert parsed.rows[0]["brandNewMetric"] == ["x"]
 
     def test_basis_happy(self) -> None:
         parsed = parse_kraken_analytics(FX.HAPPY["basis"][1], SensorFamily.MECHANICAL_BASIS)
@@ -68,7 +100,8 @@ class TestEmptyValid:
 
     def test_funding_empty(self) -> None:
         parsed = parse_kraken_analytics(FX.EMPTY["funding"][1], SensorFamily.MECHANICAL_FUNDING)
-        # rate present -> ADDITIVE (relativeRate extra); still parses, zero rows
+        # rate + relativeRate are both evidence-backed known metrics (I10R1) so
+        # the observed set == required set -> KNOWN; still parses, zero rows
         assert parsed.schema_state in (SchemaState.KNOWN_SCHEMA, SchemaState.ADDITIVE_SCHEMA_CHANGE)
         assert parsed.semantic_output_allowed is True
         assert parsed.rows == ()

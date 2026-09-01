@@ -34,10 +34,18 @@ _LIST_DATA_SENSORS: frozenset[SensorFamily] = frozenset(
     }
 )
 
-#: Sensors whose analytics `data` is a DICT of per-metric lists + the primary
-#: required metric key for schema classification (additional metrics = additive).
+#: Sensors whose analytics `data` is a DICT of per-metric lists + the required
+#: metric key set for schema classification (an UNKNOWN additional metric =
+#: additive; a missing required metric = breaking).
+#:
+#: FUNDING required set is {rate, relativeRate}: the committed 09 fingerprint
+#: pins funding `data` as `dict{rate, relativeRate}` (both list[list[str]]), the
+#: live I10R1 characterization reproduced EXACTLY those two keys with matching
+#: column/timestamp cardinality, and no genuinely-new key exists — relativeRate
+#: is evidence-backed (KNOWN_OPTIONAL adjudication, I10R1), so its presence is
+#: NOT additive.  A genuinely new key stays ADDITIVE / SCHEMA_ADDITIVE_REVIEW.
 _DICT_DATA_REQUIRED: dict[SensorFamily, frozenset[str]] = {
-    SensorFamily.MECHANICAL_FUNDING: frozenset({"rate"}),
+    SensorFamily.MECHANICAL_FUNDING: frozenset({"rate", "relativeRate"}),
     SensorFamily.MECHANICAL_BASIS: frozenset({"basis"}),
     SensorFamily.MECHANICAL_BOOK_METRIC: frozenset({"ask", "bid"}),
 }
@@ -69,12 +77,15 @@ class ParsedAnalytics:
 
 
 def _timestamps_are_int(timestamps: list[Any]) -> bool:
-    """True when every timestamp member is exactly a Python int (epoch secs).
+    """True when every timestamp member is exactly a Python int.
 
-    `type(ts) is int` (not `isinstance`) rejects bool (a bool is an int in
-    Python but is NOT a valid epoch timestamp).  An empty list is valid
-    (EMPTY_VALID); a non-empty list containing any string/float/bool/None/
-    other member fails closed as a schema break.
+    This is a TYPE guard only (the unit — epoch seconds for most analytics
+    types, epoch milliseconds for funding — is adapter-side convenience
+    conversion; see BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json).  `type(ts)
+    is int` (not `isinstance`) rejects bool (a bool is an int in Python but
+    is NOT a valid epoch timestamp).  An empty list is valid (EMPTY_VALID);
+    a non-empty list containing any string/float/bool/None/other member
+    fails closed as a schema break.
     """
     for ts in timestamps:
         if type(ts) is not int:

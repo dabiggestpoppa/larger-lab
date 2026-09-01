@@ -85,23 +85,30 @@ DEFAULT_FREE_ONLY_POLICY = FreeOnlyPolicy(
 TransportFn = Callable[[str, dict[str, int]], tuple[int | None, Any]]
 
 
-def _epoch_to_dt(value: Any) -> datetime | None:
-    """Coerce a native analytics bucket timestamp (epoch SECONDS) to UTC.
+def _epoch_to_dt(value: Any, *, milliseconds: bool = False) -> datetime | None:
+    """Coerce a native analytics bucket timestamp to UTC (convenience only).
 
-    Evidence basis: the committed Bloc 2 probe fixture
-    (`funding_analytics_success.json`, `open_interest_analytics_success.json`)
-    and the corrected live probe contract both use epoch seconds for the
-    Market Analytics family; the I13R1 schema fingerprint pins the timestamp
-    type as `int` only (09_SCHEMA_FINGERPRINTS.jsonl).  No precision is
-    invented: a value that is not a plausible epoch-second timestamp yields
-    `None` (raw value still preserved in the envelope).
+    Units are SENSOR-SPECIFIC on the live Market Analytics family (I10R1
+    adjudication, BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json): most analytics
+    types emit epoch SECONDS, but MECHANICAL_FUNDING emits epoch MILLISECONDS
+    (13-digit; I10 proved seconds-class values would NOT overflow the converter
+    while funding returned NULL convenience timestamps).  The raw native int is
+    never replaced; this only affects the FetchBatch convenience datetime.  No
+    magnitude heuristic rescues an out-of-validity value (a wrong-unit value
+    yields None).
     """
     if not isinstance(value, (int, float)):
         return None
+    seconds = (float(value) / 1000.0) if milliseconds else float(value)
     try:
-        return datetime.fromtimestamp(float(value), tz=UTC)
+        return datetime.fromtimestamp(seconds, tz=UTC)
     except (OverflowError, ValueError, OSError):
         return None
+
+
+def _funding_is_milliseconds(sensor: SensorFamily) -> bool:
+    """True for the only analytics sensor whose live timestamps are epoch ms."""
+    return sensor is SensorFamily.MECHANICAL_FUNDING
 
 
 class KrakenAdapter:
@@ -352,8 +359,18 @@ class KrakenAdapter:
         if _is_non_monotonic(numeric_ts):
             quality_flags.append(QualityFlagAcquisition.NON_MONOTONIC_TIMESTAMPS)
 
-        actual_first = _epoch_to_dt(rows[0]["timestamp"]) if rows else None
-        actual_last = _epoch_to_dt(rows[-1]["timestamp"]) if rows else None
+        # Convenience datetimes are sensor-unit-aware (funding = epoch ms,
+        # siblings = epoch seconds); the raw native ints stay preserved.
+        actual_first = (
+            _epoch_to_dt(rows[0]["timestamp"], milliseconds=_funding_is_milliseconds(sensor))
+            if rows
+            else None
+        )
+        actual_last = (
+            _epoch_to_dt(rows[-1]["timestamp"], milliseconds=_funding_is_milliseconds(sensor))
+            if rows
+            else None
+        )
 
         next_resume: ResumeToken | None = None
         if parsed.more and rows:

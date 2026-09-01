@@ -122,16 +122,21 @@ pre-listing / history unavailable — an empty valid response is an observation.
 
 ## Time Semantics
 
-- Analytics bucket `timestamp` arrays are **epoch seconds** per the committed
-  Bloc 2 probe fixture and the corrected live probe contract
-  (`live_probe_contracts.yaml`).  The I13R1 schema fingerprint
-  (09_SCHEMA_FINGERPRINTS.jsonl) pins the type as `int` only; no finer
-  precision is invented.
+- Analytics bucket `timestamp` arrays are `list[int]` (I13R1 fingerprint,
+  09_SCHEMA_FINGERPRINTS.jsonl).  Units are SENSOR-SPECIFIC on the live
+  Market Analytics surface (I10R1 adjudication,
+  `evidence/bloc_03/BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json`):
+  most analytics types (basis, book metric, liquidation, OI, positioning)
+  emit **epoch seconds**; `MECHANICAL_FUNDING` emits **epoch milliseconds**
+  (13-digit; probe module I13 annotation + I10 NULL-convenience-timestamp
+  overflow proof + live characterization).  Adapter convenience conversion is
+  unit-aware; the raw native int is never replaced, and NO magnitude
+  heuristic rescues a wrong-unit value.
 - **Timestamp schema is fail-closed (SENSOR-B3-I05R2 FINAL SEAL):** Market
-  Analytics bucket timestamps are evidence-backed `list[int]` (epoch
-  seconds); a non-integer element (`"1755000000"`, `1755000000.0`, `True`,
-  `None`, or mixed types) is schema drift and fails closed with parsed output
-  blocked and the raw payload preserved in the failure envelope.  An empty
+  Analytics bucket timestamps are evidence-backed `list[int]` (type guards);
+  a non-integer element (`"1755000000"`, `1755000000.0`, `True`, `None`, or
+  mixed types) is schema drift and fails closed with parsed output blocked
+  and the raw payload preserved in the failure envelope.  An empty
   `timestamp` list remains a valid `EMPTY_VALID` observation.  No silent
   coercion (`str->int`, `float->int`, `True->1`).
 - Requests use `[start, end)` with `since`/`to` in epoch seconds.
@@ -203,11 +208,16 @@ metric lists).
 
 1. **Bucket timestamp semantics** (open/close/publication) are not resolved by
    committed Bloc 2 evidence — stated as a limitation, not invented.
-2. **Funding timestamp unit** — the Bloc 2 probe module comment mentions epoch
-   ms "probe-observed", but no committed runtime artifact pins it; the
-   committed probe fixture and live probe contract use epoch seconds, so the
-   adapter treats funding bucket timestamps as epoch seconds and flags the
-   ambiguity here rather than claiming ms.
+2. **Funding timestamp unit — RESOLVED (SENSOR-B3-I10R1).**  Funding bucket
+   timestamps are epoch MILLISECONDS on the current live Market Analytics
+   `funding` surface: the Bloc 2 probe module recorded "epoch ms for funding"
+   (I13), I10 showed funding convenience timestamps as NULL under a seconds
+   converter (13-digit overflow) while siblings decoded cleanly, and the I10R1
+   live characterization verified the dict{rate, relativeRate} shape.  The
+   older committed funding fixture (epoch seconds, list-of-{fundingRate}
+   shape) documents the SUPERSEDED response shape and is preserved as
+   historical evidence.  Adapter convenience conversion for funding is
+   ms-aware; no magnitude rescue.
 3. **Rate-limit capacity unknown** — `limit_known=False` until runtime
    evidence exists.
 4. **Liquidation methodology** is `kraken-market-analytics-liquidation-volume`
