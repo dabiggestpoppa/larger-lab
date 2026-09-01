@@ -293,11 +293,12 @@ def test_all_four_scenarios_run_under_the_same_policy_object():
         pack = load_g3_pack(ROOT / d)
         res = _run(pack)
         assert res.artifacts["policy_id"] == "G3_COGNITIVE_ECOLOGY_POLICY"
-        # G3R legacy upgrade: V1 -> V2 — the ONE shared policy gained generic
-        # correlation-risk friction (no exposure required) and the
-        # consensus-strength counter-attractor gate. Still ONE shared policy
-        # driving all four scenarios; the version records the semantic change.
-        assert res.artifacts["policy_version"] == "V2"
+        # G3R2 legacy upgrade: V2 -> V3 — the ONE shared policy added
+        # single-source-prevalence correlation risk (G3R2-04) while the
+        # UNKNOWN-exposure coverage semantics live in the independence gate.
+        # Still ONE shared policy driving all four scenarios; the version
+        # records the semantic change.
+        assert res.artifacts["policy_version"] == "V3"
 
 
 def test_health_record_is_a_vector_not_a_scalar():

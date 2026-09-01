@@ -88,10 +88,18 @@ def _ca_spec(**kw):
 
 
 def _topology(profiles, capability_tiers, cost=10, fresh=0, design=0,
-              latency=5, topology_id="T"):
+              latency=5, topology_id="T", capability_source="AUTHORITATIVE_SYNTHETIC_CAPABILITY"):
+    # G3R2-10 documented upgrade: the helper builds SYNTHETIC-FIXTURE topologies
+    # (the harness owns the tier metadata), so the capability provenance is
+    # explicitly AUTHORITATIVE_SYNTHETIC_CAPABILITY. Old assertion: routing
+    # tests passed with fixture tiers implicitly trusted. Defect: unverified
+    # capability was silently admissible. Replacement: fixture topologies state
+    # their capability provenance explicitly; the UNVERIFIED fail-closed gate
+    # is proven by the new G3R2-10 regressions. No routing assertion weakened.
     return ReviewTopology(
         topology_id=topology_id, purpose="p", consequence_class="HIGH",
         profiles=tuple(profiles), capability_tiers=tuple(capability_tiers),
+        capability_source=capability_source,
         cost_units=cost, latency_units=latency,
         fresh_context_count=fresh, independently_originated_design_count=design,
         counter_attractor_budget=0, stop_conditions=())
@@ -582,11 +590,36 @@ def test_registered_truth_changes_independence_profile():
 
 
 def test_missing_registry_entry_does_not_promote_claims():
+    """G3R2-01 documented upgrade. Old assertion (G3R): `bound.model_family ==
+    "FAM_CLAIM" or bound.model_family == UNKNOWN` — that permitted an unverified
+    claim to retain VERIFIED independence semantics, so it did not prove
+    fail-closed behavior. Defect: a missing registry record left the CLAIMED
+    profile unchanged. Replacement: with no registry record, every decision-
+    grade independence axis becomes UNKNOWN / non-qualifying; the claim is
+    never promoted. Rationale: UNKNOWN IS NOT INDEPENDENT; a self-claim is not
+    its own provenance authority."""
     registry = ReviewerProvenanceRegistry.from_fixtures([])
-    bound, conflicts = registry.bind(_claim("GHOST", model_family="FAM_CLAIM"))
-    assert bound.model_family == "FAM_CLAIM" or bound.model_family == UNKNOWN
+    bound, conflicts = registry.bind(_claim("GHOST", model_family="FAM_CLAIM",
+                                            sources=["S_CLAIM"], runtime_lineage="RT_CLAIM",
+                                            retrieval_bundle="B_CLAIM",
+                                            prior_conclusion_exposure=False,
+                                            fresh_context=True, visible="BLIND",
+                                            conclusion="CLAIM"))
+    assert bound.model_family == UNKNOWN
+    assert bound.source_lineages == ()
+    assert bound.runtime_lineage == UNKNOWN
+    assert bound.retrieval_bundle == UNKNOWN
+    assert bound.prior_conclusion_exposure is None
+    assert bound.fresh_context is False
+    assert bound.exposure_mode == UNKNOWN
+    assert bound.independently_originated_design is False
+    # identity / conclusion survive as claims but carry no independence weight
+    assert bound.reviewer_id == "GHOST"
+    assert bound.conclusion == "CLAIM"
     # every claimed axis is at least marked unverified
     assert all(c.disposition == "UNVERIFIED_CLAIM" for c in conflicts)
+    assert any(c.axis == "model_family" for c in conflicts)
+    assert any(c.axis == "fresh_context" for c in conflicts)
 
 
 # --------------------------------------------------------------------------- #
