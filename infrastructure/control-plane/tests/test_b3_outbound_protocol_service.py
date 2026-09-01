@@ -153,15 +153,9 @@ def test_full_outbound_path_with_separate_worker_process(pg, store, service, tmp
         bad.hello()
     bad.close()
 
-    # Launch a SEPARATE worker process that dials OUT and does the work.
-    jobfile = tmp_path / "job.json"
-    jobfile.write_text(json.dumps({
-        "job_id": job_id, "job_type": "b3.deterministic-hash",
-        "required_capabilities": ["hash"], "resource_envelope": {
-            "cpu_limit": 1, "memory_bytes": 512 * 1024 * 1024,
-            "disk_bytes": 128 * 1024 * 1024, "timeout_s": 60},
-        "params": {"value": "oce-b3"},
-    }), encoding="utf-8")
+    # Launch a SEPARATE worker process that dials OUT and does the work. The
+    # worker fetches the AUTHORITATIVE job detail from the control plane
+    # (B4-CXR5R6) — no local job file is injected.
     env = dict(os.environ)
     # B4-CXR3R3: the worker derives its outbound target from the validated
     # effective config (OCE_CONTROL_PLANE_PORT); OCE_CP_URL is not an
@@ -170,14 +164,14 @@ def test_full_outbound_path_with_separate_worker_process(pg, store, service, tmp
         "PYTHONPATH": str(BASE / "src") + os.pathsep + env.get("PYTHONPATH", ""),
         "OCE_CONTROL_PLANE_PORT": str(int(url.rsplit(":", 1)[1])),
         "OCE_WORKER_ID": WORKER_ID,
-        "OCE_WORKER_SECRET": SECRET,
-        "OCE_JOB_FILE": str(jobfile),
         "OCE_WS_BASE": str(tmp_path / "ws"),
         "OCE_ARTIFACT_BASE": str(tmp_path / "cas"),
-        # B4-CXR5R6: OCE_JOB_FILE and the ambient worker secret are TEST_ONLY
-        # — reachable only under the authenticated CI/test seam.
-        "OCE_CI_MODE": "true",
     })
+    # B4-CXR6R2: the worker credential comes from the APPROVED store — seed
+    # the test secret there (production authority); no ambient secret, no
+    # OCE_CI_MODE unlock.
+    from oce_control import local_secrets as ls
+    ls._mutate_store(lambda d: d.update({"worker_token": SECRET}))
     r = subprocess.run([sys.executable, str(BASE / "scripts" / "oce_b3_worker.py")],
                        cwd=str(tmp_path), env=env, capture_output=True, text=True,
                        timeout=120)

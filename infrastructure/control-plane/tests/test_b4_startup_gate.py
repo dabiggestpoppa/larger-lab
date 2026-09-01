@@ -1594,8 +1594,9 @@ class TestCXR5R6AuthorityInputs:
 
     def test_production_job_file_rejected_before_activity(self, tmp_path):
         # O/P: a local job spec can never replace the authoritative
-        # control-plane job in production. OCE_JOB_FILE is TEST_ONLY — rejected
-        # before any job/workspace/process activity (no output, no workspace).
+        # control-plane job in production. OCE_JOB_FILE is TEST_ONLY and
+        # REJECTED UNCONDITIONALLY — before any job/workspace/process/socket
+        # activity (no output, no workspace).
         jobfile = tmp_path / "job.json"
         jobfile.write_text(json.dumps({
             "job_id": "j-local", "job_type": "hash",
@@ -1611,11 +1612,10 @@ class TestCXR5R6AuthorityInputs:
         assert not (tmp_path / "output").exists()
         assert not (tmp_path / "b3-workspace").exists()
 
-    def test_test_seam_unlocks_job_file(self, tmp_path):
-        # CI-only paths remain available ONLY under the authenticated test
-        # seam: with OCE_CI_MODE=true the gate is open (the run then fails at
-        # connect — no control plane is listening — proving the seam, not the
-        # job-file rejection, decided the outcome).
+    def test_ci_mode_never_unlocks_job_file(self, tmp_path):
+        # B4-CXR6R2: OCE_CI_MODE=true carries ZERO authority — a local job
+        # spec is rejected exactly the same as in production (before any
+        # activity). An environment string can never unlock test authority.
         jobfile = tmp_path / "job.json"
         jobfile.write_text(json.dumps({
             "job_id": "j-local", "job_type": "hash",
@@ -1628,11 +1628,12 @@ class TestCXR5R6AuthorityInputs:
             "OCE_CI_MODE": "true",
         })
         assert r.returncode != 0
-        assert "TEST_ONLY" not in (r.stdout + r.stderr)
+        assert "TEST_ONLY" in (r.stdout + r.stderr)
+        assert not (tmp_path / "b3-workspace").exists()
 
     def test_ambient_worker_secret_cannot_self_authorize(self, monkeypatch):
-        # no approved store token AND no test seam -> the ambient secret can
-        # never authorize the worker (no self-legitimation).
+        # B4-CXR6R2: the ambient secret is NEVER consumed — with OR without
+        # OCE_CI_MODE — the approved store is the only credential authority.
         import scripts.oce_b3_worker as w
         import oce_control.local_secrets as ls
         monkeypatch.delenv("OCE_CI_MODE", raising=False)
@@ -1640,21 +1641,36 @@ class TestCXR5R6AuthorityInputs:
         monkeypatch.setattr(ls, "read_worker_token",
                             lambda: (_ for _ in ()).throw(
                                 RuntimeError("no token")))
-        with pytest.raises(SystemExit, match="shared secret unavailable"):
-            w._worker_shared_secret()
+        with pytest.raises(SystemExit, match="secret unavailable"):
+            w.ProductionWorkerDependencies().shared_secret()
 
-    def test_ambient_worker_secret_is_test_seam_only(self, monkeypatch):
-        # under the authenticated test seam the ambient value is the carrier;
-        # production (no seam) NEVER reaches it.
+    def test_ci_mode_never_consumes_ambient_secret(self, monkeypatch):
+        # B4-CXR6R2: even with OCE_CI_MODE=true the ambient worker secret is
+        # refused — an environment string cannot unlock a credential.
         import scripts.oce_b3_worker as w
         import oce_control.local_secrets as ls
-        monkeypatch.delenv("OCE_CI_MODE", raising=False)
+        monkeypatch.setenv("OCE_CI_MODE", "true")
+        monkeypatch.setenv("OCE_WORKER_SECRET", "test-secret-42")
         monkeypatch.setattr(ls, "read_worker_token",
                             lambda: (_ for _ in ()).throw(
                                 RuntimeError("no token")))
-        monkeypatch.setenv("OCE_CI_MODE", "true")
-        monkeypatch.setenv("OCE_WORKER_SECRET", "test-secret-42")
-        assert w._worker_shared_secret() == "test-secret-42"
+        with pytest.raises(SystemExit, match="secret unavailable"):
+            w.ProductionWorkerDependencies().shared_secret()
+
+    def test_private_dependency_seam_injects_job_and_secret(self, monkeypatch):
+        # B4-CXR6R2: test injection works ONLY through the private dependency
+        # object — the seam reaches run() directly and the production CLI can
+        # never construct it from an environment string.
+        from oce_b3_worker_test_deps import TestWorkerDependencies
+        import scripts.oce_b3_worker as w
+        deps = TestWorkerDependencies(
+            secret="test-secret-42",
+            job_spec={"job_id": "j-seam", "job_type": "hash",
+                      "params": {"value": "x"}})
+        assert deps.shared_secret() == "test-secret-42"
+        assert deps.resolve_job(None)["job_id"] == "j-seam"
+        # production deps never read a job file / ambient secret
+        assert not hasattr(w.ProductionWorkerDependencies(), "_job_spec")
 
     def test_contained_path_rejects_traversal(self, tmp_path):
         from scripts.oce_b3_worker import _contained_path
