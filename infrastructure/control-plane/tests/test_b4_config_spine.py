@@ -757,7 +757,8 @@ def _make_backend(tmp_path, provision: bool = True,
     f = tmp_path / "secrets.json"
     if provision:
         f.write_text(json.dumps({"postgres_password": value}), encoding="utf-8")
-    return ls.RuntimeSecretBackend(f)
+    # test_seam=True: the rotate() metadata seam is TEST-ONLY (B4-CXR5R4)
+    return ls.RuntimeSecretBackend(f, test_seam=True)
 
 
 # --------------------------------------------------------------------------- #

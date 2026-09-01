@@ -618,7 +618,10 @@ class ActivationContext:
         backend = backend if backend is not None else ls.RuntimeSecretBackend()
         self.assert_fresh(backend)
         password = backend.resolve(self.secret_reference)
-        return (f"postgresql://{self.postgres_user}:{password}"
+        # B4-CXR5R4: standards-compliant percent-encoding — reserved URI
+        # characters can never redirect or corrupt the DSN
+        from urllib.parse import quote_plus
+        return (f"postgresql://{self.postgres_user}:{quote_plus(password)}"
                 f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_database}")
 
     def safe_summary(self) -> dict:

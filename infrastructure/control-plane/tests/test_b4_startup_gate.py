@@ -55,6 +55,7 @@ def _doctor_env(monkeypatch, tmp_path, secrets_file):
     from oce_control import local_secrets as ls
     monkeypatch.setattr(ls, "SECRETS_FILE", secrets_file)
     monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+    monkeypatch.setattr(ls, "COMPOSE_ENV_FILE", tmp_path / "runtime" / "compose.env")
     (tmp_path / "runtime").mkdir(exist_ok=True)
     monkeypatch.setattr(ll, "docker_available", lambda: True)
     monkeypatch.setattr(ll, "published_ports_from_compose", lambda: [])
@@ -830,7 +831,8 @@ class TestCXR4R3ImmutableActivationContext:
         store = tmp_path / "secrets.json"
         store.write_text(json.dumps({"postgres_password": "k" * 40}),
                          encoding="utf-8")
-        backend = ls.RuntimeSecretBackend(store)
+        # test_seam=True: rotate() is a TEST-ONLY metadata seam (B4-CXR5R4)
+        backend = ls.RuntimeSecretBackend(store, test_seam=True)
         ctx = cs.create_activation_context(environ=env or CLEAN_ENV, backend=backend)
         return ctx, backend, store
 
@@ -939,6 +941,7 @@ class TestCXR4R4GateFirstRecoverAndMigration:
                          encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
         monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+        monkeypatch.setattr(ls, "COMPOSE_ENV_FILE", tmp_path / "runtime" / "compose.env")
         calls: list = []
         monkeypatch.setattr(ll, "docker_available", lambda: True)
         monkeypatch.setattr(ll, "compose",
@@ -973,6 +976,8 @@ class TestCXR4R4GateFirstRecoverAndMigration:
         import hashlib
         store = tmp_path / "absent.json"  # no secret -> unresolvable
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+        monkeypatch.setattr(ls, "COMPOSE_ENV_FILE", tmp_path / "runtime" / "compose.env")
         calls: list = []
         monkeypatch.setattr(ll, "compose",
                             lambda *a, **k: calls.append(("compose", a)) or self._FakeComp())
@@ -990,6 +995,8 @@ class TestCXR4R4GateFirstRecoverAndMigration:
             "b4_meta": {"runtime-local": {"revoked": True, "generation": 2}},
         }), encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+        monkeypatch.setattr(ls, "COMPOSE_ENV_FILE", tmp_path / "runtime" / "compose.env")
         before = hashlib.sha256(store.read_bytes()).hexdigest()
         calls: list = []
         monkeypatch.setattr(ll, "compose",
@@ -1327,7 +1334,8 @@ class TestCXR5R3ActivationLineage:
         store = tmp_path / "secrets.json"
         store.write_text(json.dumps({"postgres_password": "k" * 40}),
                          encoding="utf-8")
-        backend = ls.RuntimeSecretBackend(store)
+        # test_seam=True: rotate() is a TEST-ONLY metadata seam (B4-CXR5R4)
+        backend = ls.RuntimeSecretBackend(store, test_seam=True)
         ctx = cs.create_activation_context(
             environ=dict(env or CLEAN_ENV), backend=backend)
         return ctx, backend, store
@@ -1341,6 +1349,7 @@ class TestCXR5R3ActivationLineage:
                          encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
         monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+        monkeypatch.setattr(ls, "COMPOSE_ENV_FILE", tmp_path / "runtime" / "compose.env")
         class _FakeComp:
             returncode = 0
             stdout = ""

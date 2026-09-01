@@ -174,10 +174,10 @@ def test_compose_environment_reads_without_materializing(monkeypatch):
     assert "POSTGRES_DSN" not in env
     assert not ls.SECRETS_FILE.exists()
     # governed init: the INIT path explicitly honors the operator password
-    monkeypatch.setenv("POSTGRES_PASSWORD", "governed-operator-pw-123456789")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "governed-operator-pw-123456789012")
     ls.initialize_runtime_secret()
     governed = ls.read_runtime_secret()
-    assert governed == "governed-operator-pw-123456789"
+    assert governed == "governed-operator-pw-123456789012"
     env2 = ls.compose_environment()
     assert env2["POSTGRES_PASSWORD"] == governed
     assert "ambient-compose-1234567890" not in env2["POSTGRES_PASSWORD"]
@@ -289,9 +289,9 @@ def test_cxr4r1_d_e_meta_and_token_survive_start_restart_configure(monkeypatch):
 def test_cxr4r1_f_first_clean_initialization_still_works(monkeypatch):
     # F. explicit operator password on the FIRST governed init is honored;
     #    a clean init with no ambient value generates a strong secret.
-    monkeypatch.setenv("POSTGRES_PASSWORD", "explicit-init-pw-1234567890")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "explicit-init-password-1234567890")
     pw = ls.initialize_runtime_secret()
-    assert pw == "explicit-init-pw-1234567890"
+    assert pw == "explicit-init-password-1234567890"
     assert ls.load_runtime_secret() == pw
 
 
@@ -299,7 +299,8 @@ def test_cxr4r1_g_rotation_changes_only_authorized_secret_and_generation():
     # G. explicit rotation is attributable + atomic: only the authorized
     #    secret value and its generation metadata change.
     _seed_initialized_store()
-    backend = ls.RuntimeSecretBackend()
+    # test_seam=True: rotate() is a TEST-ONLY metadata seam (B4-CXR5R4)
+    backend = ls.RuntimeSecretBackend(test_seam=True)
     assert backend.generation("runtime-local") == 1
     backend.rotate("runtime-local", "rotated-governed-secret-abcdef123456")
     data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
@@ -504,6 +505,158 @@ def test_cxr5r1_h_failed_initialization_never_partially_rewrites(monkeypatch):
         ls.initialize_runtime_secret()
     assert not ls.SECRETS_FILE.exists()  # no partial file
     assert not list(ls.RUNTIME_DIR.glob("*.tmp-*"))  # no stray tmp
+
+
+# --------------------------------------------------------------------------
+# B4-CXR5R4 — secret representation + production rotation truth (CXR5-04):
+# production rotation is FUTURE-LOCKED (rotate is a TEST-ONLY metadata seam),
+# explicit init passwords are validated before persistence, compose.env is
+# written atomically restrictive at creation, malformed store schemas fail
+# closed, DSNs use standards-compliant escaping, and concurrent mutations
+# cannot lose metadata.
+# --------------------------------------------------------------------------
+
+def test_cxr5r4_production_rotation_future_locked():
+    # W: a store-only rotate() is NOT an authorized operational rotation —
+    # it fails closed unless the explicit TEST-ONLY seam is enabled
+    _seed_initialized_store()
+    backend = ls.RuntimeSecretBackend()  # production default: NO seam
+    with pytest.raises(RuntimeError, match="FUTURE-LOCKED"):
+        backend.rotate("runtime-local", "rotated-secret-9876543210abcdef")
+    # the store is byte-identical after the denial
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert data["postgres_password"] == "s" * 40
+    assert data["worker_token"] == "w" * 40
+    assert data["b4_meta"]["runtime-local"]["generation"] == 1
+
+
+def test_cxr5r4_rotate_seam_requires_explicit_enable():
+    _seed_initialized_store()
+    with pytest.raises(RuntimeError, match="FUTURE-LOCKED"):
+        ls.RuntimeSecretBackend().rotate("runtime-local", "x" * 40)
+    # the seam works ONLY when explicitly enabled (test-only metadata mutation)
+    ls.RuntimeSecretBackend(test_seam=True).rotate(
+        "runtime-local", "seam-rotated-secret-9876543210")
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert data["postgres_password"] == "seam-rotated-secret-9876543210"
+    assert data["worker_token"] == "w" * 40  # unrelated entries survive
+
+
+def test_cxr5r4_init_password_validation(monkeypatch):
+    # 6-7 (CXR5-04): explicit init passwords validated BEFORE persistence
+    # (environ dicts are passed directly — a NUL byte cannot even enter the
+    # process environment on some platforms, which is itself the point)
+    bad = ["", "short", "has-newline\ninjection", "has\rreturn",
+           "has-nul-\x00-char-1234567890", "has-\x1b-escape-1234567890"]
+    for value in bad:
+        with pytest.raises((ValueError, RuntimeError)):
+            ls.initialize_runtime_secret(environ={"POSTGRES_PASSWORD": value})
+        assert not ls.SECRETS_FILE.exists(), value  # never persisted
+    # a strength-contract password persists (via env, like the real init)
+    monkeypatch.setenv("POSTGRES_PASSWORD", "valid-strong-password-1234567890")
+    pw = ls.initialize_runtime_secret()
+    assert pw == "valid-strong-password-1234567890"
+
+
+def test_cxr5r4_special_chars_cannot_corrupt_dsn_or_compose_env(monkeypatch):
+    # X: a stored password with reserved URI characters is percent-encoded in
+    # the DSN (can never redirect/parse-corrupt it); compose projection
+    # refuses a newline-carrying value outright.
+    monkeypatch.setenv("POSTGRES_PASSWORD", "pw-with-@-slash-/-#-question-?-1234567890")
+    ls.initialize_runtime_secret()
+    dsn = ls.derive_runtime_dsn()
+    assert "@" not in dsn.split("@", 1)[0].split(":", 2)[2]  # encoded userinfo
+    assert "%40" in dsn and "%2F" in dsn  # quote_plus encoding applied
+    assert dsn.startswith("postgresql://oce_control_admin:")
+    # direct-crafted store with a newline -> projection fails closed (no
+    # ambient value may paper over the malformed store)
+    monkeypatch.delenv("POSTGRES_PASSWORD", raising=False)
+    ls.SECRETS_FILE.write_text(json.dumps(
+        {"postgres_password": "line1\nPOSTGRES_PASSWORD=injected"}),
+        encoding="utf-8")
+    with pytest.raises(ValueError, match="CR/LF"):
+        ls.write_compose_env()
+
+
+def test_cxr5r4_malformed_store_schema_fails_closed():
+    # 13 (CXR5-04): dict/list/null values are NEVER coerced into credentials
+    ls.SECRETS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    for payload in ({"postgres_password": ["not", "a", "string"]},
+                    {"postgres_password": {"nested": True}},
+                    {"postgres_password": None},
+                    {"postgres_password": "x" * 40,
+                     "b4_meta": {"runtime-local": {"generation": "one"}}},
+                    {"postgres_password": "x" * 40,
+                     "b4_meta": ["not", "a", "dict"]}):
+        ls.SECRETS_FILE.write_text(json.dumps(payload), encoding="utf-8")
+        with pytest.raises(RuntimeError, match="B4-CXR5R4"):
+            ls.RuntimeSecretBackend().resolve("secret:runtime-local")
+        with pytest.raises(RuntimeError, match="B4-CXR5R4"):
+            ls._load_full_store()
+
+
+def test_cxr5r4_compose_env_atomic_and_failed_projection_keeps_store(
+        monkeypatch, tmp_path):
+    # 10-11 (CXR5-04): compose.env is restrictive AT CREATION (no broad-write
+    # + chmod window); a failed projection leaves the approved store intact.
+    monkeypatch.setenv("POSTGRES_PASSWORD", "valid-strong-password-1234567890")
+    ls.initialize_runtime_secret()
+    before = _store_snapshot()
+    ls.write_compose_env()
+    if os.name != "nt":
+        assert ls.COMPOSE_ENV_FILE.stat().st_mode & 0o777 == 0o600
+    import os as _os
+
+    def _boom(src, dst):
+        raise OSError("projection-disk-full")
+
+    monkeypatch.setattr(_os, "replace", _boom)
+    with pytest.raises(OSError, match="projection-disk-full"):
+        ls.write_compose_env()
+    assert _store_snapshot() == before  # store unchanged by failed projection
+
+
+def test_cxr5r4_concurrent_mutations_preserve_all_entries():
+    # 12 (CXR5-04): concurrent read-modify-writes cannot erase the worker
+    # token / b4_meta / unrelated entries (locked RMW)
+    _seed_initialized_store()
+    import threading
+    backend = ls.RuntimeSecretBackend(test_seam=True)
+    errors: list = []
+
+    def _worker():
+        try:
+            ls.initialize_worker_token()
+        except Exception as exc:  # pragma: no cover
+            errors.append(exc)
+
+    def _rotator():
+        try:
+            backend.rotate("runtime-local", "concurrent-rotated-9876543210")
+        except Exception as exc:  # pragma: no cover
+            errors.append(exc)
+
+    threads = [threading.Thread(target=_worker) for _ in range(4)] + \
+        [threading.Thread(target=_rotator) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert errors == []
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert data["postgres_password"] == "concurrent-rotated-9876543210"
+    assert data["worker_token"] == "w" * 40
+    assert data["another_entry"] == "another-secret-value"
+    assert data["b4_meta"]["runtime-local"]["generation"] >= 2
+
+
+def test_cxr5r4_structured_connection_params():
+    # 8 (CXR5-04): structured psycopg2 parameters — no DSN string to parse
+    ls.initialize_runtime_secret()
+    params = ls.runtime_connection_params()
+    assert params == {"host": ls.PG_HOST, "port": ls.PG_PORT,
+                      "dbname": ls.PG_DB, "user": ls.PG_USER,
+                      "password": ls.read_runtime_secret()}
 
 
 # --------------------------------------------------------------------------

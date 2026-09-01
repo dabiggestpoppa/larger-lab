@@ -46,6 +46,7 @@ PG_HOST = "127.0.0.1"
 PG_PORT = 5433
 
 MIN_SECRET_BYTES = 24  # token_urlsafe(24) -> >= 32 chars
+MIN_SECRET_CHARS = 32  # strength contract: generated AND operator secrets
 
 
 def _chmod(path: Path, mode: int) -> None:
@@ -67,8 +68,7 @@ def _atomic_write_json(path: Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(f".{path.name}.tmp-{os.getpid()}")
     try:
-        tmp.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        _chmod(tmp, 0o600)
+        _atomic_write_text(tmp, json.dumps(data, indent=2))
         os.replace(tmp, path)
     finally:
         try:
@@ -76,6 +76,137 @@ def _atomic_write_json(path: Path, data: dict) -> None:
         except FileNotFoundError:
             pass
     _chmod(path, 0o600)
+
+
+def _atomic_write_text(path: Path, content: str, mode: int = 0o600) -> None:
+    """Write *content* to *path* RESTRICTIVE at creation (B4-CXR5R4).
+
+    The file is created with mode 0600 via os.open — never written with
+    broad permissions and chmodded afterward (no permissive window). Same-
+    directory tmp + os.replace keeps the write atomic.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp-{os.getpid()}")
+    fd = os.open(str(tmp), os.O_WRONLY | os.O_CREAT | os.O_TRUNC, mode)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(content)
+        os.replace(tmp, path)
+    finally:
+        try:
+            tmp.unlink()
+        except FileNotFoundError:
+            pass
+    _chmod(path, mode)
+
+
+def _exclusive_lock(lock_file) -> None:
+    """Take an exclusive advisory lock on *lock_file* (fcntl on POSIX,
+    msvcrt on Windows). Serializes read-modify-write of the approved store so
+    concurrent initialization/revocation can never lose metadata
+    (B4-CXR5R4)."""
+    if os.name == "nt":
+        import msvcrt
+        lock_file.seek(0)
+        msvcrt.locking(lock_file.fileno(), msvcrt.LK_LOCK, 1)
+    else:
+        import fcntl
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+
+
+def _unlock(lock_file) -> None:
+    if os.name == "nt":
+        import msvcrt
+        lock_file.seek(0)
+        msvcrt.locking(lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+    else:
+        import fcntl
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+
+
+def _load_full_store_at(path: Path) -> dict:
+    """Load + schema-validate the store at *path* (missing/unparseable-JSON
+    yields {}; valid JSON with an invalid schema raises)."""
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    _validate_store_schema(data)
+    return data
+
+
+def _mutate_store(update_fn, secrets_file: Path | None = None) -> None:
+    """Read-modify-write of the approved store under an exclusive file lock
+    (B4-CXR5R4 #12): concurrent initialization/revocation cannot erase
+    unrelated entries (worker token, b4_meta, ...). The lock and atomic write
+    target *secrets_file* (default: the module store) — a backend mutates
+    ITS OWN file, never the global store."""
+    target = secrets_file if secrets_file is not None else SECRETS_FILE
+    target.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = target.parent / f".{target.name}.lock"
+    with open(lock_path, "a+b") as lf:
+        _exclusive_lock(lf)
+        try:
+            data = _load_full_store_at(target)
+            update_fn(data)
+            _atomic_write_json(target, data)
+        finally:
+            _unlock(lf)
+
+
+def _validate_secret_value(value: str, label: str,
+                           min_length: bool = True) -> None:
+    """Validate an operator-supplied secret BEFORE persistence (B4-CXR5R4
+    #6-7): reject empty, undersized (init strength contract), CR/LF,
+    NUL/control characters, and values that cannot be represented safely by
+    the approved carrier. *min_length=False* is used only by the TEST-ONLY
+    rotate seam (representation safety still applies)."""
+    if not isinstance(value, str) or not value:
+        raise ValueError(f"{label}: empty secret refused (B4-CXR5R4)")
+    if min_length and len(value) < MIN_SECRET_CHARS:
+        raise ValueError(
+            f"{label}: secret below the {MIN_SECRET_CHARS}-character strength "
+            "contract (B4-CXR5R4)")
+    if "\r" in value or "\n" in value:
+        raise ValueError(
+            f"{label}: CR/LF characters refused — newline injection could "
+            "corrupt compose.env/DSN carriers (B4-CXR5R4)")
+    if any(ord(c) < 32 or ord(c) == 127 for c in value):
+        raise ValueError(
+            f"{label}: control characters refused — not safely representable "
+            "by the approved carrier (B4-CXR5R4)")
+
+
+def _validate_store_schema(data: dict) -> None:
+    """Fail closed on malformed secret-store types (B4-CXR5R4 #13): the store
+    must be a JSON object; every entry (except b4_meta) must be a string;
+    metadata records must be objects with integer generations. A dict/list/
+    null value is NEVER silently coerced into a credential."""
+    if not isinstance(data, dict):
+        raise RuntimeError(
+            "approved secret store must be a JSON object (B4-CXR5R4)")
+    for key, value in data.items():
+        if key == B4_META_KEY:
+            if not isinstance(value, dict):
+                raise RuntimeError(
+                    "approved secret store b4_meta must be an object "
+                    "(B4-CXR5R4)")
+            for name, rec in value.items():
+                if not isinstance(rec, dict) or \
+                        not isinstance(rec.get("generation"), int):
+                    raise RuntimeError(
+                        f"approved secret store b4_meta record '{name}' is "
+                        "malformed (generation must be an int) (B4-CXR5R4)")
+            continue
+        if not isinstance(value, str):
+            raise RuntimeError(
+                f"approved secret store entry '{key}' must be a string — "
+                "dict/list/null values are never coerced into credentials "
+                "(B4-CXR5R4)")
 
 
 def initialize_runtime_secret(environ: dict | None = None) -> str:
@@ -120,13 +251,18 @@ def initialize_runtime_secret(environ: dict | None = None) -> str:
                 "authority (B4-CXR4R1)")
         return existing
     # FIRST INITIALIZATION: store absent
-    env_pw = env.get("POSTGRES_PASSWORD")
-    if env_pw:
+    if "POSTGRES_PASSWORD" in env and env["POSTGRES_PASSWORD"] is not None:
+        env_pw = env["POSTGRES_PASSWORD"]
+        # B4-CXR5R4: explicit init passwords are VALIDATED before persistence
+        # (empty, undersized, CR/LF, NUL/control all refused)
+        _validate_secret_value(env_pw, "POSTGRES_PASSWORD")
         data = {"postgres_password": env_pw, "source": "environment"}
     else:
         data = {"postgres_password": secrets.token_urlsafe(MIN_SECRET_BYTES),
                 "source": "generated"}
-    _atomic_write_json(SECRETS_FILE, data)
+    # B4-CXR5R4: locked read-modify-write — concurrent init cannot lose
+    # metadata (worker token / b4_meta / unrelated entries)
+    _mutate_store(lambda d: d.update(data))
     return data["postgres_password"]
 
 
@@ -159,15 +295,8 @@ def read_runtime_secret() -> str | None:
 
 
 def _load_full_store() -> dict:
-    """Load the full secrets.json dict; missing/corrupt yields {} (callers
-    decide fail-closed semantics; never writes)."""
-    if not SECRETS_FILE.exists():
-        return {}
-    try:
-        data = json.loads(SECRETS_FILE.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {}
-    return data if isinstance(data, dict) else {}
+    """Load the module-level store; see _load_full_store_at."""
+    return _load_full_store_at(SECRETS_FILE)
 
 
 def initialize_worker_token() -> str:
@@ -193,12 +322,14 @@ def initialize_worker_token() -> str:
             raise RuntimeError(
                 "approved secret store is not a JSON object — manual "
                 "remediation required; OCE never overwrites it (B4-CXR4R1)")
+        _validate_store_schema(parsed)
         if parsed.get("worker_token"):
             return parsed["worker_token"]
-    data = _load_full_store()
-    data["worker_token"] = secrets.token_urlsafe(24)
-    _atomic_write_json(SECRETS_FILE, data)
-    return data["worker_token"]
+    def _set_token(data: dict) -> None:
+        if not data.get("worker_token"):
+            data["worker_token"] = secrets.token_urlsafe(24)
+    _mutate_store(_set_token)  # B4-CXR5R4: locked RMW preserves other entries
+    return _load_full_store()["worker_token"]
 
 
 def read_worker_token() -> str:
@@ -235,17 +366,22 @@ def sanitized_environment(environ: dict | None = None) -> dict:
 
 
 def write_compose_env() -> Path:
-    """Persist .runtime/compose.env (0600) for `docker compose` invocations.
+    """Persist .runtime/compose.env (0600, restrictive AT CREATION) for
+    `docker compose` invocations (B4-CXR5R4 #10).
 
     A projection of the governed store for the compose stack (the governed
     carrier). Never passes a raw ambient secret: the value comes from
     initialize_runtime_secret() (one-time init, existing store read-only).
+    The stored secret is re-validated before projection so a directly-crafted
+    store can never inject extra compose.env entries; a failed projection
+    leaves the approved store untouched (the store write and the projection
+    are independent atomic steps).
     """
     pw = initialize_runtime_secret()
+    _validate_secret_value(pw, "stored postgres_password")
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     _chmod(RUNTIME_DIR, 0o700)
-    COMPOSE_ENV_FILE.write_text(f"POSTGRES_PASSWORD={pw}\n", encoding="utf-8")
-    _chmod(COMPOSE_ENV_FILE, 0o600)
+    _atomic_write_text(COMPOSE_ENV_FILE, f"POSTGRES_PASSWORD={pw}\n")
     return COMPOSE_ENV_FILE
 
 
@@ -276,6 +412,10 @@ def derive_runtime_dsn() -> str:
     Never materializes from ambient POSTGRES_PASSWORD and never consults an
     ambient POSTGRES_DSN: the DSN is derived from the approved store. An
     absent store raises with a remediation hint (B4-CXR3R1).
+
+    B4-CXR5R4 #8: the DSN is NOT built through unsafe raw concatenation —
+    the password is percent-encoded (urllib.parse.quote_plus) so reserved
+    URI characters (/, :, @, #, ?) can never redirect or corrupt the DSN.
     """
     pw = read_runtime_secret()
     if not pw:
@@ -283,7 +423,23 @@ def derive_runtime_dsn() -> str:
             "no governed PostgreSQL secret configured — run "
             "`python scripts/oce_local.py configure` to materialize the local "
             "runtime secret (runtime reads never materialize one)")
-    return f"postgresql://{PG_USER}:{pw}@{PG_HOST}:{PG_PORT}/{PG_DB}"
+    from urllib.parse import quote_plus
+    return (f"postgresql://{PG_USER}:{quote_plus(pw)}"
+            f"@{PG_HOST}:{PG_PORT}/{PG_DB}")
+
+
+def runtime_connection_params() -> dict:
+    """Structured psycopg2 connection parameters from the governed store
+    (B4-CXR5R4 #8): host/port/dbname/user/password — no DSN string to
+    concatenate, parse, or leak. Fails closed when the store is absent."""
+    pw = read_runtime_secret()
+    if not pw:
+        raise RuntimeError(
+            "no governed PostgreSQL secret configured — run "
+            "`python scripts/oce_local.py configure` to materialize the local "
+            "runtime secret (runtime reads never materialize one)")
+    return {"host": PG_HOST, "port": PG_PORT, "dbname": PG_DB,
+            "user": PG_USER, "password": pw}
 
 
 def postgres_dsn() -> str:
@@ -340,10 +496,15 @@ class RuntimeSecretBackend:
     or revoked references fail closed (KeyError / PermissionError).
     """
 
-    def __init__(self, secrets_file: Path | None = None):
+    def __init__(self, secrets_file: Path | None = None, *, test_seam: bool = False):
         # Resolve the default lazily so tests that monkeypatch SECRETS_FILE
         # (module global) observe the patched path.
+        #
+        # B4-CXR5R4: *test_seam* gates the TEST-ONLY store-metadata mutation
+        # (rotate). Production code never constructs a seam backend; a
+        # store-only write is NOT an authorized operational rotation.
         self._file = secrets_file
+        self._test_seam = test_seam
 
     @property
     def file(self) -> Path:
@@ -357,7 +518,10 @@ class RuntimeSecretBackend:
             data = json.loads(f.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
             return {}
-        return data if isinstance(data, dict) else {}
+        if not isinstance(data, dict):
+            return {}
+        _validate_store_schema(data)  # never coerce dict/list/null -> secret
+        return data
 
     def _save(self, data: dict) -> None:
         # Atomic (same-dir tmp + os.replace): a failed rotation/revocation can
@@ -401,30 +565,55 @@ class RuntimeSecretBackend:
     def is_revoked(self, name: str) -> bool:
         return bool(self._meta(self._load(), name).get("revoked"))
 
-    # -- lifecycle (rotate / revoke are PO-audited, never silent) ----------
+    # -- lifecycle ---------------------------------------------------------
+    # B4-CXR5R4 (CXR5-04): PRODUCTION ROTATION IS FUTURE-LOCKED. A store-only
+    # write is NOT a coherent database credential rotation (it never moves
+    # the PostgreSQL role password, compose.env, live API/worker connections,
+    # recovery state, generation transition, or the durable audit record).
+    # rotate() is therefore a TEST-ONLY metadata seam: it raises unless the
+    # backend is constructed with test_seam=True, and no production path may
+    # present a store-only write as an authorized rotation.
     def rotate(self, name: str, new_value: str) -> None:
-        if not new_value:
-            raise ValueError("refused to rotate to an empty secret")
-        data = self._load()
-        data[self._entry_key(name)] = new_value
-        meta = dict(data.get(B4_META_KEY) or {})
-        rec = dict(self._meta(data, name))
-        rec["generation"] = int(rec.get("generation", 1)) + 1
-        rec["revoked"] = False
-        meta[name] = rec
-        data[B4_META_KEY] = meta
-        self._save(data)
+        if not self._test_seam:
+            raise RuntimeError(
+                "production secret rotation is FUTURE-LOCKED in Book 4: a "
+                "store-only write is not a coherent database rotation (role "
+                "password, compose.env, live connections, recovery, "
+                "generation transition, and durable audit must move "
+                "together). This method is a TEST-ONLY metadata seam — "
+                "construct RuntimeSecretBackend(test_seam=True) to exercise "
+                "the store mechanics (B4-CXR5R4)")
+        # representation safety only — the strength contract belongs to the
+        # real INIT path (this seam is not an operational rotation)
+        _validate_secret_value(new_value, f"rotation value for '{name}'",
+                               min_length=False)
+        if self._load().get(self._entry_key(name)) is None:
+            raise KeyError(f"secret '{name}' not provisioned — cannot rotate "
+                           "an absent secret")
+
+        def _update(data: dict) -> None:
+            data[self._entry_key(name)] = new_value
+            meta = dict(data.get(B4_META_KEY) or {})
+            rec = dict(self._meta(data, name))
+            rec["generation"] = int(rec.get("generation", 1)) + 1
+            rec["revoked"] = False
+            meta[name] = rec
+            data[B4_META_KEY] = meta
+        _mutate_store(_update, self.file)  # locked RMW on THIS backend's file
 
     def revoke(self, name: str) -> None:
-        data = self._load()
-        meta = dict(data.get(B4_META_KEY) or {})
-        rec = dict(self._meta(data, name))
-        rec["revoked"] = True
-        rec["generation"] = int(rec.get("generation", 1)) + 1
-        meta[name] = rec
-        data[B4_META_KEY] = meta
-        data.pop(self._entry_key(name), None)
-        self._save(data)
+        # Revocation is a fail-closed security primitive (the reference stops
+        # resolving) and remains operational. It is metadata-state mutation,
+        # not a DB rotation; like every mutation it is a locked RMW.
+        def _update(data: dict) -> None:
+            meta = dict(data.get(B4_META_KEY) or {})
+            rec = dict(self._meta(data, name))
+            rec["revoked"] = True
+            rec["generation"] = int(rec.get("generation", 1)) + 1
+            meta[name] = rec
+            data[B4_META_KEY] = meta
+            data.pop(self._entry_key(name), None)
+        _mutate_store(_update, self.file)  # locked RMW on THIS backend's file
 
     def security_metadata(self) -> dict:
         """Non-secret metadata only (reference identity, generation, revoked).
