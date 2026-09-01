@@ -203,3 +203,82 @@ class TestDefaultStaysStartable:
     def test_plane_default_startup_status(self):
         p = _plane()
         assert p.startup()["status"] == "started"
+
+
+# --------------------------------------------------------------------------- #
+# B4-R3R1 — governed OCE_* namespace (fail closed on unknown/typoed)
+# --------------------------------------------------------------------------- #
+class TestGovernedNamespace:
+    def test_typoed_execution_var_fails_closed(self):
+        with pytest.raises(ValidationError):
+            effective_from_env({**CLEAN_ENV, "OCE_EXECUTION_BROKER_ENABLD": "true"})
+        rep = validate_startup({**CLEAN_ENV, "OCE_EXECUTION_BROKER_ENABLD": "true"})
+        assert rep["ok"] is False
+        assert "OCE_EXECUTION_BROKER_ENABLD" in rep["error"]
+
+    def test_typoed_cloud_var_fails_closed(self):
+        with pytest.raises(ValidationError):
+            effective_from_env({**CLEAN_ENV, "OCE_CLOUD_PROVISION": "true"})
+
+    def test_typoed_public_listen_var_fails_closed(self):
+        with pytest.raises(ValidationError):
+            effective_from_env({**CLEAN_ENV, "OCE_PUBLIC_LISTEN": "true"})
+
+    def test_unknown_operation_variable_fails_closed(self):
+        # An OCE_* var that looks security-relevant but is not governed
+        with pytest.raises(ValidationError):
+            effective_from_env({**CLEAN_ENV, "OCE_EXEC_MODE": "live"})
+
+    def test_operational_vars_are_allowed(self):
+        eff = effective_from_env({
+            **CLEAN_ENV,
+            "OCE_RUN_ID": "abcdef",
+            "OCE_STAGE_LABEL": "B4-CONFIG-SPINE-CLOSURE",
+            "OCE_BLOCK_LABEL": "Book 4",
+            "OCE_BOOK_LABEL": "Book 4",
+            "OCE_EVIDENCE_DIR": "/tmp/evidence",
+            "OCE_EXPECTED_COMMIT": "abc123",
+            "OCE_EXPECTED_REPO": "dabiggestpoppa/larger-lab",
+            "OCE_EXPECTED_BRANCH": "oce-program-build",
+            "OCE_EXPECTED_TREE": "deadbeef",
+            "OCE_WORKER_ID": "worker-local01",
+            "OCE_WORKER_TOKEN": "opaque",
+            "OCE_WORKER_SECRET": "opaque",
+            "OCE_CP_URL": "http://127.0.0.1:8448",
+            "OCE_JOB_FILE": "/tmp/job.json",
+            "OCE_ARTIFACT_BASE": "/tmp/artifacts",
+            "OCE_RUNTIME_DIR": "/tmp/runtime",
+            "OCE_WS_BASE": "/tmp/ws",
+            "OCE_ATTEMPT_WS": "/tmp/ws/a1",
+            "OCE_CI_MODE": "1",
+        })
+        assert eff.get_bool("cloud.provisioning") is False
+
+    def test_benign_incidental_OCE_text_not_rejected(self):
+        # Vars that merely contain OCE as incidental text (not OCE_ prefix)
+        eff = effective_from_env({
+            **CLEAN_ENV,
+            "MY_OCEAN_VAR": "1",
+            "OCEAN_CURRENT": "gulf",
+        })
+        assert eff.get_bool("cloud.provisioning") is False
+
+    def test_alias_OCE_API_PORT_maps_to_canonical_when_canonical_absent(self):
+        eff = effective_from_env({**CLEAN_ENV, "OCE_API_PORT": "8449"})
+        assert eff.get("control_plane.port") == 8449
+        assert eff.provenance["control_plane.port"] == "environment"
+
+    def test_canonical_env_wins_over_alias_conflict(self):
+        eff = effective_from_env({
+            **CLEAN_ENV,
+            "OCE_API_PORT": "9090",
+            "OCE_CONTROL_PLANE_PORT": "8448",
+        })
+        assert eff.get("control_plane.port") == 8448
+
+    def test_alias_legacy_default_rejected_as_reserved(self):
+        # The legacy default 8080 is reserved by the canonical registry and
+        # cannot silently re-activate the old bind.
+        rep = validate_startup({**CLEAN_ENV, "OCE_API_PORT": "8080"})
+        assert rep["ok"] is False
+        assert "port" in rep["error"].lower()

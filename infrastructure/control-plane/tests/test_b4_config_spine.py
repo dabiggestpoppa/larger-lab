@@ -744,3 +744,79 @@ class TestAdversarialMatrix:
         r = subprocess.run([sys.executable, "-c", code],
                            capture_output=True, text=True)
         assert r.returncode == 0, r.stderr
+
+
+# --------------------------------------------------------------------------- #
+# B4-R3R1 — honest source provenance (env value must never masquerade as file)
+# --------------------------------------------------------------------------- #
+class TestR3R1SourceProvenance:
+    def test_environment_value_reports_provenance_environment(self):
+        eff = ConfigResolver(build_default_registry()).resolve({
+            "environment": {"control_plane.port": "9000",
+                            "postgres.password_ref": REF_PG},
+        })
+        assert eff.provenance["control_plane.port"] == "environment"
+
+    def test_file_value_reports_provenance_file(self):
+        eff = ConfigResolver(build_default_registry()).resolve({
+            "file": {"control_plane.port": "7000",
+                     "postgres.password_ref": REF_PG},
+        })
+        assert eff.provenance["control_plane.port"] == "file"
+
+    def test_cli_value_reports_provenance_cli(self):
+        eff = ConfigResolver(build_default_registry()).resolve({
+            "file": {"postgres.password_ref": REF_PG},
+        }, cli={"control_plane.port": "9100"})
+        assert eff.provenance["control_plane.port"] == "cli"
+
+    def test_default_value_reports_provenance_default(self):
+        eff = ConfigResolver(build_default_registry()).resolve({
+            "file": {"postgres.password_ref": REF_PG},
+        })
+        assert eff.provenance["control_plane.port"] == "default"
+
+    def test_same_value_different_source_has_different_provenance(self):
+        reg = build_default_registry()
+        same = "9000"
+        as_file = ConfigResolver(reg).resolve({
+            "file": {"control_plane.port": same, "postgres.password_ref": REF_PG}})
+        as_env = ConfigResolver(reg).resolve({
+            "environment": {"control_plane.port": same,
+                            "postgres.password_ref": REF_PG}})
+        assert as_file.provenance["control_plane.port"] == "file"
+        assert as_env.provenance["control_plane.port"] == "environment"
+
+    def test_env_value_cannot_bypass_file_only_setting(self):
+        # A setting allowed from file but forbidden from the environment must
+        # fail closed when the value arrives labeled 'environment' — even if
+        # effective_from_env orchestrates the resolution.
+        import oce_control.config_startup as cs
+        reg = build_default_registry()
+        reg.forbid_source("postgres.host", SOURCE_ENV)
+        with pytest.raises(ValidationError):
+            cs.effective_from_env(
+                {"OCE_POSTGRES_HOST": "10.0.0.5"}, registry=reg)
+
+    def test_default_under_env_never_overrides(self):
+        # default tier supplies the runtime password ref; environment may not
+        # collide with a default-tier-only setting it is forbidden from
+        import oce_control.config_startup as cs
+        reg = build_default_registry()
+        reg.forbid_source("control_plane.scheduler_interval", SOURCE_ENV)
+        with pytest.raises(ValidationError):
+            cs.effective_from_env(
+                {"OCE_SCHEDULER_INTERVAL": "10"}, registry=reg)
+
+    def test_env_provenance_truthful_through_startup_path(self):
+        import oce_control.config_startup as cs
+        eff = cs.effective_from_env({"OCE_CONTROL_PLANE_PORT": "8449"})
+        assert eff.provenance["control_plane.port"] == "environment"
+        # the runtime password-ref is a default-tier supply, never mislabeled
+        assert eff.provenance["postgres.password_ref"] == "default"
+
+    def test_scheduler_interval_env_maps_to_canonical(self):
+        import oce_control.config_startup as cs
+        eff = cs.effective_from_env({"OCE_SCHEDULER_INTERVAL": "17"})
+        assert eff.get("control_plane.scheduler_interval") == 17
+        assert eff.provenance["control_plane.scheduler_interval"] == "environment"

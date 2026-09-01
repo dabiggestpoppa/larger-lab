@@ -254,11 +254,21 @@ def build_default_registry() -> SettingsRegistry:
         if not 1 <= int(v) <= 65535 or int(v) in (8080, 5000, 5432):
             raise ValidationError("invalid/reserved port")
 
+    def _valid_scheduler_interval(v) -> None:
+        if not 1 <= int(v) <= 3600:
+            raise ValidationError("scheduler interval must be 1..3600 seconds")
+
     reg(Setting(name="control_plane.port", value_type="int",
                 owner="operator", default=8448, has_default=True,
                 validate=_valid_port,
                 validation_rule="1..65535, excludes public defaults",
                 mutability="restart", tags=("network",)))
+    reg(Setting(name="control_plane.scheduler_interval", value_type="int",
+                owner="operator", default=5, has_default=True,
+                validate=_valid_scheduler_interval,
+                validation_rule="1..3600 seconds", mutability="restart",
+                tags=("runtime",)))
+
     reg(Setting(name="control_plane.public_listen", value_type="bool",
                 owner="policy", default=False, has_default=True,
                 validation_rule="denied by default; cannot be activated",

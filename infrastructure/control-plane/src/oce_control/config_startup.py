@@ -6,6 +6,16 @@ environment (mapped to canonical settings), validates it fail-closed via
 validate_effective, and refuses to activate when the effective config is
 malformed, incomplete, or forbidden.
 
+Provenance is honest: environment values are reported with source
+``environment`` (never masqueraded as ``file``), and the resolver's
+deterministic precedence (default < file < environment < cli) is preserved.
+
+A governed OCE namespace policy applies: every ``OCE_*`` variable must be a
+known canonical setting, an explicit compatibility alias, or a documented
+operational (non-config) variable. Unknown / typoed security- or
+runtime-significant ``OCE_*`` variables fail closed instead of being silently
+ignored while still altering the real runtime.
+
 Entry points wired into startup / CLI:
   * load_effective_config(environ)  -> EffectiveConfig  (raises on violation)
   * validate_startup(environ)       -> dict report       (never raises)
@@ -22,19 +32,22 @@ import sys
 from oce_control.config_spine import (
     ConfigResolver,
     EffectiveConfig,
+    SOURCE_ENV,
+    SOURCE_DEFAULT,
     ValidationError,
     build_default_registry,
     validate_effective,
 )
 
-# Env-var -> canonical setting name. Only settings that are safe to read from
-# the environment are listed; every one of them is ALSO run through
+# Canonical env-var -> canonical setting name. Only settings that are safe to
+# read from the environment are listed; every one of them is ALSO run through
 # validate_effective, so an attempt to turn on a forbidden posture (public
 # listen, live trading, cloud activation, ...) fails closed regardless of the
 # source it came from.
 ENV_MAP = {
     "control_plane.host": "OCE_CONTROL_PLANE_HOST",
     "control_plane.port": "OCE_CONTROL_PLANE_PORT",
+    "control_plane.scheduler_interval": "OCE_SCHEDULER_INTERVAL",
     "control_plane.public_listen": "OCE_CONTROL_PLANE_PUBLIC_LISTEN",
     "postgres.host": "OCE_POSTGRES_HOST",
     "postgres.password_ref": "OCE_POSTGRES_PASSWORD_REF",
@@ -55,26 +68,104 @@ ENV_MAP = {
     "logging.redact_cli": "OCE_LOG_REDACT_CLI",
 }
 
+# Explicit compatibility aliases: legacy env vars mapped into a canonical
+# setting through a documented adapter with deterministic precedence. The
+# canonical env var wins; the alias is only consulted when the canonical name
+# is absent (never the reverse), and any alias value is still validated by the
+# canonical setting's rules (e.g. OCE_API_PORT=8080 is rejected because the
+# canonical registry treats 8080 as reserved).
+COMPAT_ALIASES = {
+    "OCE_API_PORT": "control_plane.port",
+}
 
-def effective_from_env(environ: dict | None = None) -> EffectiveConfig:
-    """Build the effective config from *environ* and validate fail-closed.
+# Documented operational (non-config) OCE_* variables used by CI runners,
+# workers, and evidence tooling. They are NOT spine settings; they are listed
+# so the governed-namespace check can classify them instead of failing closed.
+OPERATIONAL_OCE_VARS = frozenset({
+    # CI / runner identity + evidence plumbing
+    "OCE_RUN_ID", "OCE_STAGE_LABEL", "OCE_BLOCK_LABEL", "OCE_BOOK_LABEL",
+    "OCE_EVIDENCE_DIR", "OCE_ARTIFACT_BASE", "OCE_CI_MODE",
+    "OCE_EXPECTED_REPO", "OCE_EXPECTED_BRANCH", "OCE_EXPECTED_COMMIT",
+    "OCE_EXPECTED_TREE",
+    # worker CLI / outbound client plumbing
+    "OCE_CP_URL", "OCE_WORKER_ID", "OCE_WORKER_TOKEN", "OCE_WORKER_SECRET",
+    "OCE_JOB_FILE", "OCE_WS_BASE", "OCE_ATTEMPT_WS", "OCE_RUNTIME_DIR",
+})
 
-    Any OCE_* variable mapped above becomes a candidate value. Values not
-    present fall back to the canonical default (which is safe). Raises
-    ValidationError when the resulting effective config is unauthorized.
+# Canonical reference name for the local runtime PostgreSQL secret. The
+# reference is defaulted at the CONFIGURATION layer (source = default); a
+# runtime START additionally requires the reference to RESOLVE to a real
+# materialized secret in the approved local secret store (see B4-R3R3).
+DEFAULT_PASSWORD_REF = "secret:runtime-local"
+
+
+_KNOWN_OCE_VARS = None
+
+
+def known_oce_vars() -> frozenset:
+    global _KNOWN_OCE_VARS
+    if _KNOWN_OCE_VARS is None:
+        _KNOWN_OCE_VARS = frozenset(set(ENV_MAP.values()) | set(COMPAT_ALIASES)
+                                    | set(OPERATIONAL_OCE_VARS))
+    return _KNOWN_OCE_VARS
+
+
+def check_governed_namespace(environ: dict) -> None:
+    """Fail closed on unknown / typoed OCE_* runtime-significant variables.
+
+    The governed namespace is the ``OCE_`` prefix. Every variable in the
+    process environment that starts with ``OCE_`` must be a known canonical
+    env var, a compatibility alias, or a documented operational variable.
+    Anything else is rejected — it could otherwise silently alter the real
+    runtime (e.g. ``OCE_EXECUTION_BROKER_ENABLD=true``).
+
+    Unrelated variables that merely contain "OCE" as incidental text do not
+    start with ``OCE_`` and are deliberately not rejected.
+    """
+    known = known_oce_vars()
+    unknown = sorted(k for k in environ if k.startswith("OCE_") and k not in known)
+    if unknown:
+        raise ValidationError(
+            "unknown OCE_* configuration-namespace variable(s) present and "
+            f"refused: {', '.join(unknown)} — fail closed (governed namespace "
+            "policy; see B4-CONFIG-INPUT-INVENTORY.md)")
+
+
+def effective_from_env(environ: dict | None = None,
+                       registry=None) -> EffectiveConfig:
+    """Build the effective config from *environ* with honest provenance.
+
+    * Env values are mapped into the ``environment`` source tier (never
+      ``file``).
+    * Compatibility aliases (e.g. ``OCE_API_PORT``) are applied only when the
+      canonical env var is absent.
+    * ``postgres.password_ref`` has no safe *value* default, but the canonical
+      local runtime reference name is supplied at DEFAULT tier so configuration
+      resolution stays deterministic. Runtime activation must additionally
+      verify the reference resolves (B4-R3R3).
+    * Raises ValidationError for unknown OCE_* vars and any unauthorized
+      resulting posture. A caller-supplied canonical *registry* is honored so
+      forbidden-source rules can be tested through the real startup path.
     """
     env = dict(environ if environ is not None else os.environ)
-    file_source: dict[str, str] = {}
+    check_governed_namespace(env)
+    env_source: dict[str, str] = {}
     for setting_name, var in ENV_MAP.items():
         if var in env:
-            file_source[setting_name] = env[var]
-    # postgres.password_ref has no safe default and must be a reference.
-    # If the operator did not provide one, default to the approved runtime
-    # reference so a valid default config still resolves and starts.
-    if "postgres.password_ref" not in file_source:
-        file_source["postgres.password_ref"] = "secret:runtime-local"
-    resolver = ConfigResolver(build_default_registry())
-    return resolver.resolve({"file": file_source})
+            env_source[setting_name] = env[var]
+    for alias_var, setting_name in COMPAT_ALIASES.items():
+        canonical_var = ENV_MAP.get(setting_name)
+        if alias_var in env and canonical_var not in env:
+            env_source[setting_name] = env[alias_var]
+    default_source: dict[str, str] = {}
+    if "postgres.password_ref" not in env_source:
+        default_source["postgres.password_ref"] = DEFAULT_PASSWORD_REF
+    resolver = ConfigResolver(registry if registry is not None
+                              else build_default_registry())
+    return resolver.resolve({
+        SOURCE_ENV: env_source,
+        SOURCE_DEFAULT: default_source,
+    })
 
 
 def validate_startup(environ: dict | None = None) -> dict:
@@ -128,13 +219,22 @@ def redact_message(text: str) -> str:
 
 def _offending_setting(message: str) -> str | None:
     import re
-    m = re.search(r"[A-Za-z][A-Za-z0-9_.]*", message)
-    return m.group(0) if m else None
+    m = re.search(r"setting '([A-Za-z0-9_.]+)'", message)
+    if m:
+        return m.group(1)
+    m = re.search(r"refused: ([A-Z0-9_, ]+)", message)
+    if m:
+        return m.group(1).strip()
+    return None
 
 
 def require_startable(environ: dict | None = None) -> EffectiveConfig:
     """Fail-closed startup hook: returns the validated effective config or
     raises a human-readable SystemExit (secret-free) that stops activation.
+
+    NOTE: secret-reference resolution (B4-R3R3) is layered on top of this
+    function by the runtime secret backend; the configuration gate itself
+    runs here so no activation can bypass posture validation.
     """
     try:
         eff = effective_from_env(environ)
