@@ -113,7 +113,7 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             "short_liq_size": "contracts (short liquidations)",
             "long_liq_usd": "USD notional",
             "short_liq_usd": "USD notional",
-            "time": "ms epoch (interval)",
+            "time": "epoch seconds (interval; I05-era sample was ms — provider transition, see BLOC_03_I10R1)",
         },
         SensorFamily.MECHANICAL_OPEN_INTEREST: {
             "source": "interval OI (contracts + USD notional) via /contract_stats",
@@ -271,7 +271,9 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
         if not rows:
             return True, None  # nothing returned; completeness unresolved
         # funding_rate rows carry {"t": epoch SECONDS} (I13R1 live-observed);
-        # /trades rows carry create_time_ms; contract_stats rows carry ms `time`.
+        # /trades rows carry create_time_ms; contract_stats rows carry epoch
+        # SECONDS `time` (current contract — I10R1 adjudication; the I05-era
+        # sample was epoch ms, a provider transition, NOT magnitude-rescued).
         if sensor is SensorFamily.MECHANICAL_FUNDING:
             last = max(
                 (row.get("t") for row in rows if isinstance(row.get("t"), (int, float))),
@@ -280,13 +282,14 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             end = int(request.requested_end.timestamp())
             return True, (last is not None and int(last) >= end)
         if sensor in self.contract_stats_sensors:
-            # Request `from` is seconds; rows carry ms `time`.  There is no `to`
-            # param — completeness is bounded by from+interval+limit coverage, so
-            # signal coverage against the requested window end in ms.
-            end_ms = int(request.requested_end.timestamp() * 1000)
+            # Request `from` is seconds; rows carry `time` in epoch seconds.
+            # There is no `to` param — completeness is bounded by
+            # from+interval+limit coverage, so signal coverage against the
+            # requested window end in seconds.
+            end = int(request.requested_end.timestamp())
             key = "time"
         else:
-            end_ms = int(request.requested_end.timestamp() * 1000)
+            end = int(request.requested_end.timestamp())
             key = "time"
         last = max(
             (
@@ -299,5 +302,5 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             default=None,
         )
         if isinstance(last, (int, float)):
-            return True, int(last) >= end_ms
+            return True, int(last) >= end
         return True, None

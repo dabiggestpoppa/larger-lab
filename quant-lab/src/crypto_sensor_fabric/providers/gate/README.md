@@ -68,7 +68,12 @@ context.  No historical coverage is fabricated beyond I14.
 
 - `contract_stats` request **`from` = epoch SECONDS**; provider `interval` is a
   STRING bucket (`"1h"`) — never integer seconds; NO `to` is invented.
-- `contract_stats` response row **`time` = native epoch MILLISECONDS**.
+- `contract_stats` response row **`time` = native epoch SECONDS** (current
+  contract, live-verified I10R1 with exact hourly bucket alignment).  The
+  I05-era probe sample (2022) recorded epoch MILLISECONDS — a provider
+  semantic transition adjudicated in `BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json`;
+  old-millisecond rows are NOT magnitude-rescued (convenience datetime is
+  un-derivable and the smoke temporal guard flags them).
 - `funding_rate` request **`from` / `to` = epoch SECONDS**; response row
   **`t` = epoch SECONDS**; `r` is a provider-native decimal string.
 - Request-unit and response-unit semantics are DIFFERENT and kept distinct; a

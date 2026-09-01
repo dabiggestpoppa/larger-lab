@@ -36,11 +36,13 @@ from ..base.schema import SchemaAssessment
 # contract_stats field type contract (from the committed union fingerprint)
 # --------------------------------------------------------------------------- #
 #: Fields that are STRICT integers (type(v) is int; bool excluded).
-#: Includes the timestamp `time` (native epoch MILLISECONDS for contract_stats)
+#: Includes the timestamp `time` (native epoch SECONDS for the current
+#: contract_stats contract; the I05-era sample was epoch ms — a provider
+#: semantic transition, see BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json)
 #: and the integer size/count fields.
 _INT_FIELDS: frozenset[str] = frozenset(
     {
-        "time",  # native epoch ms (contract_stats)
+        "time",  # native epoch seconds (contract_stats, current contract)
         "open_interest",  # contracts
         "long_liq_size",
         "short_liq_size",

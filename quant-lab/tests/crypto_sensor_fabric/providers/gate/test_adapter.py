@@ -5,8 +5,9 @@ Covers the provider-specific minimum at the REAL `GateAdapter` boundary:
 - free-only access gate runs BEFORE any transport call (no bypass)
 - MECHANICAL_TRADE / MECHANICAL_BOOK_SNAPSHOT stay typed `CapabilityUnavailable`
 - four promoted paths fetch happy fixtures end-to-end (all SECONDARY)
-- request/response timestamp units stay distinct (contract_stats `time` ms,
-  funding `t` / from-to seconds)
+- request/response timestamp units stay distinct (contract_stats `time` epoch
+  SECONDS current contract — I05-era sample was ms (I10R1 transition); funding
+  `t` / from-to seconds)
 - EMPTY_VALID distinct from unsupported / retention
 - 180-day retention maps to `HistoricalRangeUnavailable` (never EMPTY_VALID)
 - raw payload hash deterministic; SchemaDrift carries RawPayloadEnvelope
@@ -208,13 +209,33 @@ class TestHappyFetchPerPromotedSensor:
 
 
 class TestTimestampUnits:
-    def test_contract_stats_time_is_epoch_milliseconds(self) -> None:
+    def test_contract_stats_time_is_epoch_seconds(self) -> None:
         adapter = _adapter(routes={"/contract_stats": HAPPY_ROUTES["/contract_stats"]})
         batch = adapter.fetch_open_interest(request(CONTRACT_STATS))
-        # native ms preserved in parsed view; convenience datetime derived from ms
-        # 1755000000000 ms == 1755000000 s
+        # current contract: native `time` is epoch SECONDS (I10R1 adjudication
+        # — exact hourly bucket alignment verified live; see
+        # BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json).  Convenience datetime
+        # derived directly from the seconds value, raw int preserved.
         assert batch.actual_first_timestamp == datetime.fromtimestamp(1755000000, tz=UTC)
         assert batch.actual_last_timestamp == datetime.fromtimestamp(1755003600, tz=UTC)
+
+    def test_old_millisecond_form_value_is_not_rescued(self) -> None:
+        # An epoch-MILLISECOND-form value (the I05-era unit) is OUT of validity
+        # for the current seconds contract: the convenience datetime is
+        # un-derivable (years beyond year-9999 -> None) and must NOT be
+        # magnitude-rescued (no `if value > 1e12: /1000` heuristic).  The raw
+        # native int stays preserved in the parsed view.
+        from .fixtures import responses as FX
+
+        stale_row = {**FX.contract_stats_row(), "time": 1755000000000}
+        adapter = _adapter(routes={"/contract_stats": (200, [stale_row])})
+        batch = adapter.fetch_open_interest(request(CONTRACT_STATS))
+        assert batch.row_count == 1
+        assert batch.actual_first_timestamp is None
+        assert batch.actual_last_timestamp is None
+        assert batch.raw_payloads  # raw preserved regardless
+        # native value preserved verbatim in the parsed row view
+        assert batch.raw_payloads[0].raw_body is not None
 
     def test_funding_t_is_epoch_seconds(self) -> None:
         adapter = _adapter(routes={"/funding_rate": HAPPY_ROUTES["/funding_rate"]})

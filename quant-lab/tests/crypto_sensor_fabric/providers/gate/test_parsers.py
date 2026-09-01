@@ -2,7 +2,8 @@
 
 Parser doctrine: native fields/units only, no canonicalization.  OI / LIQUIDATION
 / POSITIONING project sensor-specific subsets from the shared /contract_stats
-physical row.  Timestamps are strict: contract_stats `time` int ms, funding `t`
+physical row.  Timestamps are strict: contract_stats `time` int epoch SECONDS
+(current contract; I05-era sample was ms — I10R1 transition), funding `t`
 int seconds — string/float/bool/None fail closed.  Numeric semantic family
 (int|float) accepted; missing required structural fields fail.
 """
@@ -31,7 +32,7 @@ class TestOpenInterestProjection:
         assert parsed.semantic_output_allowed is True
         assert len(parsed.rows) == 2
         row = parsed.rows[0]
-        assert row["time"] == 1755000000000  # native ms preserved
+        assert row["time"] == 1755000000  # native seconds preserved
         assert row["open_interest"] == 12500
         assert row["open_interest_usd"] == 812500000.5
         # NO cross-sensor leakage into the OI view
@@ -56,7 +57,8 @@ class TestLiquidationProjection:
         # contract fields (sizes) remain distinct from USD fields
         assert row["long_liq_size"] != row["long_liq_usd"]
         assert row["short_liq_size"] != row["short_liq_usd"]
-        assert row["time"] == 1755000000000
+        # current contract: native `time` is epoch SECONDS
+        assert row["time"] == 1755000000
 
     def test_liquidation_does_not_leak_other_sensor_fields(self) -> None:
         parsed = parse_gate_contract_stats(FX.CONTRACT_STATS_HAPPY, LIQ)

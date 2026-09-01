@@ -8,7 +8,8 @@ corrected live_probe_contracts.yaml):
   dicts carrying one physical `dict{last_funding_rate, long_liq_*, short_liq_*,
   lsr_*, mark_price, open_interest, open_interest_usd, time, top_*}` row.  The
   union allows int/float NUMERIC SEMANTIC FAMILY variation; `time` is strict
-  int native epoch MILLISECONDS.
+  int native epoch SECONDS (current contract — the I05-era sample was epoch ms,
+  a provider transition adjudicated in BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json).
 - funding_rate: a TOP-LEVEL LIST of `dict{r: str, t: int}` (t = epoch SECONDS).
 
 Retention (older `from`) returns `dict{label, message}` with
@@ -24,8 +25,11 @@ from typing import Any
 FIXTURE_LABEL = "SYNTHETIC_SCHEMA_FIXTURE"
 
 #: One canonical physical contract_stats row matching the union fingerprint.
-#: `time` is native epoch MILLISECONDS (1755000000000 ms = 2025-08-12T20:00:00Z).
-def contract_stats_row(time_ms: int = 1755000000000) -> dict[str, Any]:
+#: `time` is native epoch SECONDS for the current contract (1755000000 s =
+#: 2025-08-12T20:00:00Z).  The I05-era probe sample was epoch MILLISECONDS — a
+#: provider semantic transition adjudicated in
+#: BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json (no magnitude rescue).
+def contract_stats_row(time_s: int = 1755000000) -> dict[str, Any]:
     return {
         "last_funding_rate": "0.000100",
         "long_liq_amount": 10.5,
@@ -45,7 +49,7 @@ def contract_stats_row(time_ms: int = 1755000000000) -> dict[str, Any]:
         "short_liq_usd_new": 400000.1,
         "short_taker_size": 80,
         "short_users": 95,
-        "time": time_ms,
+        "time": time_s,
         "top_long_account": 8,
         "top_long_size": 3000,
         "top_lsr_account": 1.4,
@@ -57,15 +61,15 @@ def contract_stats_row(time_ms: int = 1755000000000) -> dict[str, Any]:
 
 #: Shared physical /contract_stats happy payload (OI / LIQUIDATION / POSITIONING).
 CONTRACT_STATS_HAPPY: list[dict[str, Any]] = [
-    contract_stats_row(1755000000000),
-    contract_stats_row(1755003600000),
+    contract_stats_row(1755000000),
+    contract_stats_row(1755003600),
 ]
 
 #: Valid empty top-level list (EMPTY_VALID observation for the surface).
 CONTRACT_STATS_EMPTY: list[dict[str, Any]] = []
 
 #: A row with an extra (additive) provider field — required semantics intact.
-_CONTRACT_STATS_ADDITIVE_ROW = contract_stats_row(1755000000000)
+_CONTRACT_STATS_ADDITIVE_ROW = contract_stats_row(1755000000)
 _CONTRACT_STATS_ADDITIVE_ROW["funding_interval"] = 3600
 CONTRACT_STATS_ADDITIVE: list[dict[str, Any]] = [_CONTRACT_STATS_ADDITIVE_ROW]
 

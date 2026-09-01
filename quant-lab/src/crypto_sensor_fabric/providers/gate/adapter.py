@@ -92,10 +92,6 @@ def _dt_seconds(epoch_seconds: int | float) -> datetime | None:
         return None
 
 
-def _dt_millis(epoch_milliseconds: int) -> datetime | None:
-    return _dt_seconds(epoch_milliseconds / 1000)
-
-
 class GateAdapter:
     """Production Gate Futures adapter (four promoted paths, all SECONDARY)."""
 
@@ -357,9 +353,12 @@ class GateAdapter:
         """FetchBatch convenience datetime from the native bucket timestamp.
 
         Units are endpoint-specific (request/response units are DIFFERENT):
-        `contract_stats` rows carry `time` in native epoch MILLISECONDS;
-        `funding_rate` rows carry `t` in native epoch SECONDS.  The parsed
-        native field is never replaced.
+        `contract_stats` rows carry `time` in native epoch SECONDS (current
+        contract, live-verified I10R1; the I05-era sample was epoch MILLISECONDS
+        — a provider semantic transition, see
+        BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json); `funding_rate` rows carry
+        `t` in native epoch SECONDS.  The parsed native field is never
+        replaced and NO magnitude heuristic rescues an out-of-validity value.
         """
         if sensor is SensorFamily.MECHANICAL_FUNDING:
             ts = row.get("t")
@@ -368,5 +367,5 @@ class GateAdapter:
             return None
         ts = row.get("time")
         if type(ts) is int:
-            return _dt_millis(ts)
+            return _dt_seconds(ts)
         return None
