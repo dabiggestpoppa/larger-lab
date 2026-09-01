@@ -111,7 +111,12 @@ class FrictionResult:
 
 @dataclass(frozen=True)
 class FrictionContract:
-    """PROVISIONAL trigger test-contract (per consequence class)."""
+    """PROVISIONAL trigger test-contract (per consequence class).
+
+    G3R2-07: every method named by a consequence class must belong to the
+    canonical FRICTION_METHODS vocabulary — an unknown method fails closed at
+    contract construction (a contract can never make MAGIC_METHOD admissible).
+    """
 
     contract_id: str
     version_tag: str = "V1"
@@ -119,6 +124,17 @@ class FrictionContract:
     consequence_classes: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
     # e.g. {"HIGH": {"trigger_on": ["correlation_risk", "premature_convergence"],
     #                "max_prior_exposure_ratio": 0.0, "budget": 4, "cost_per_reconstruction": 5}}
+
+    def __post_init__(self) -> None:
+        unknown: List[str] = []
+        for cclass, cfg in self.consequence_classes.items():
+            for m in cfg.get("methods", []):
+                if m not in FRICTION_METHODS:
+                    unknown.append(str(m))
+        if unknown:
+            raise ValueError(
+                f"FrictionContract {self.contract_id!r}: unknown friction method(s) "
+                f"{sorted(set(unknown))} — must be in canonical FRICTION_METHODS")
 
     def for_consequence(self, consequence_class: str) -> Mapping[str, Any]:
         return dict(self.consequence_classes.get(consequence_class, {}))
@@ -171,6 +187,11 @@ def friction_trigger(facts: EcologyFacts, contract: FrictionContract) -> Frictio
     if "correlation_risk" in triggers:
         if facts.source_concentration is not None and facts.source_concentration >= 0.5:
             reasons.append("high source concentration")
+        # G3R2-04: a single common source shared across otherwise-different
+        # bundles is still a shared dependency (partial-bundle overlap).
+        if facts.max_single_source_lineage_prevalence is not None \
+                and facts.max_single_source_lineage_prevalence >= 0.5:
+            reasons.append("high single-source prevalence across bundles")
         if facts.model_family_concentration is not None and facts.model_family_concentration >= 0.5:
             reasons.append("high model-family concentration")
         if facts.retrieval_concentration is not None and facts.retrieval_concentration >= 0.5:
@@ -327,6 +348,14 @@ class CounterAttractorSpec:
     budget: int = 4
     cost_per_method: int = 3
 
+    def __post_init__(self) -> None:
+        # G3R2-07: unknown challenge methods fail closed at construction.
+        unknown = [m for m in self.allowed_methods if m not in COUNTER_ATTRACTOR_METHODS]
+        if unknown:
+            raise ValueError(
+                f"CounterAttractorSpec {self.spec_id!r}: unknown method(s) "
+                f"{sorted(set(unknown))} — must be in canonical COUNTER_ATTRACTOR_METHODS")
+
     def fingerprint(self) -> str:
         return deterministic_hex("counter_attractor_spec", self.spec_id, self.version_tag,
                                  self.budget, self.min_dominant_vote_ratio_for_trigger,
@@ -377,6 +406,7 @@ def run_counter_attractor(
     consumed: List[Mapping[str, Any]] = []
     non_admissible: List[Mapping[str, Any]] = []
     budget_used = 0
+    contradiction_found = False
     for f in findings:
         if budget_used >= spec.budget:
             break
@@ -386,7 +416,11 @@ def run_counter_attractor(
             continue
         consumed.append(dict(f))
         budget_used += 1
-    contradiction_found = any(bool(f.get("discriminating_contradiction")) for f in consumed)
+        # G3R2-08: stop on the FIRST consumed discriminating contradiction —
+        # additional findings are not consumed and cannot affect the verdict.
+        if bool(f.get("discriminating_contradiction")):
+            contradiction_found = True
+            break
     if contradiction_found:
         terminal = "CHALLENGE_SUPPORTED"
     elif budget_used >= spec.budget and budget_used > 0:
@@ -404,7 +438,7 @@ def run_counter_attractor(
         allowed_methods=tuple(sorted(allowed)),
         fresh_context_requirements="fresh context, no prior conclusion exposure",
         source_exclusion_rules=("exclude incumbent source bundle",),
-        stop_condition="discriminating contradiction found within authorized budget OR budget exhausted",
+        stop_condition="stop at FIRST consumed discriminating contradiction OR budget exhausted; later findings are never consumed",
         evidence_produced=produced,
         discriminating_contradiction_found=contradiction_found,
         terminal_result=terminal,
