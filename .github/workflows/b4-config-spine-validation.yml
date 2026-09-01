@@ -40,7 +40,7 @@ jobs:
 
       - name: Confirm pinned actions/dependencies contract
         run: |
-          pip show pytest | grep -E '^Version: 9\\.0\\.3$' || { echo 'pytest version not pinned'; exit 1; }
+          pip show pytest | grep -E '^Version: 9\.0\.3$' || { echo 'pytest version not pinned'; exit 1; }
 
       - name: Generate single OCE_RUN_ID
         id: run_id
