@@ -124,3 +124,36 @@ sequence; see `B4-EVIDENCE-RECORD.md`.*
 - Runs `33460848791`..`33504839138` — intermediate CXR3 commits failed the
   exact-count gate until the registry was regenerated at B4-CXR3R8; each
   preserved as truthful historical evidence.
+
+---
+
+## SUPERSEDING LEDGER — B4-CXR4 (post-closure authority-escape repair)
+
+*Independent POST-CLOSURE review of the CXR3 closure found remaining runtime
+paths the registered suite did not exercise: an existing secret store could
+still be overwritten by an ambient password, custom secret references could
+split compose/migration/API truth, the runtime re-read the environment
+instead of consuming one pinned activation, recover/migrate could mutate
+before the gate, migration targets were not bound to the exact governed
+identity, override durability was duck-typed, and config-valid wording
+overstated runtime readiness. The CXR4 sequence below closes each path.
+The CXR3 closure (`33505225957` / `780f7ceb`) remains valid historical
+evidence for what its suite tested — it is SUPERSEDED by CXR4, never
+rewritten.*
+
+| Repair | Commit | Scope | CXR4 defect | Evidence |
+|---|---|---|---|---|
+| B4-CXR4R1 | `1cc2b3fa` | one-time secret initialization; startup/restart/configure READ-ONLY over an existing store; atomic writes; explicit rotation path | CXR4-01 | store byte-invariance A/B/C/D/E, init F, rotation G, partial-write H |
+| B4-CXR4R2 | `27a3e7a4` | secret reference future-locked to `secret:runtime-local` at config validation — one secret authority, resolvable custom refs blocked | CXR4-02 | future-lock proofs incl. resolvable ref; fingerprint identity observability |
+| B4-CXR4R3 | `1b7cc82f` | immutable `ActivationContext` — snapshot env once, pin config + secret metadata, every durable consumer (bind/scheduler/DSN/worker URL/migrations/lifecycle) consumes it; stale context on rotation/revocation | CXR4-03 | env-mutation invariance, rotation/revocation stale proofs, deterministic context id |
+| B4-CXR4R4 | `053ec4e3` | recover/migrate gate FIRST (no compose/migrate/launch before the gate); migration target = EXACT governed identity (host+port+db+user+credential, never echoed); stop stays usable under invalid config | CXR4-04 / CXR4-05 | gate-first zero-mutation proofs, alternate-identity rejection, localhost alias determinism |
+| B4-CXR4R5 | `3c03f5f3` | audit durability is a PROVEN property: list/duck-typed sinks never durable; canonical `operator_override_durable` requires PostgresAuditSink (migration 0006 ledger); failed commit fails the override closed | CXR4-06 | truth-label proofs, commit-failure fail-closed, read-back proof |
+| B4-CXR4R6 | `53961288` | `validate_configuration` (config_ok) never reports start/ready/startable; messages say "configuration valid"; lifecycle authority matrix doc | CXR4-07 / CXR4-08 | terminology proofs, `B4-LIFECYCLE-AUTHORITY-MATRIX.md` |
+| B4-CXR4R7 | `fde3fbd6` | adversarial closure of the CXR4-10 matrix (incl. migrate-denial store invariance) + registry regenerated to 541 | CXR4-10 | store-invariance M, full matrix |
+
+### Authoritative closure (B4-CXR4) — see `B4-EVIDENCE-RECORD.md`
+
+### Previously superseded (preserved, not closure proof)
+
+- The CXR3 closure (run `33505225957` / `780f7ceb`) remains valid historical
+evidence of the CXR3 suite and is superseded by the CXR4 sequence above.
