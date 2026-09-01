@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I11 COMPLETE — FINAL BLOC 3 VALIDATION + HANDOFF (proposed PASS_BLOC_03_IMPLEMENTATION; fulfills frozen I15 final validation + I16 handoff; G1–G8 gates PASS / PASS_WITH_LIMITED; final inventory 17/17, physical 18/18, registry 4, roles 7/6/2/2, adapter versions v2/v2/v1/v1; handoff package: FINAL_ADAPTER_READINESS_MATRIX, PROVIDER_CAPABILITY_RUNTIME, PROVIDER_IMPLEMENTATION_REPORT, KNOWN_FAILURES, ACCESS_CLASS_REPORT, OFFLINE_TEST_REPORT, NETWORK_SMOKE_EVIDENCE_INDEX, BLOC_04_INPUT_MANIFEST, BLOC_03_HANDOFF_INDEX + integrity tests; BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE; next SENSOR-B4-I01 NOT begun); Gate completion sealed LIMITED; gate-adapter-v2 / kraken-adapter-v2; Kraken additive firewall; 5/5 targeted recheck LIVE_PASS; combined I10 baseline + I10R1 overlay + I10R2 seal: PASS_SENSOR_B3_I10_PRODUCTION_ADAPTER_NETWORK_SMOKE = OPERATOR_ACCEPTABLE — network validation PASS 17/17 logical, 18/18 physical) |
+| Current checkpoint | SENSOR-B3-I11R1 COMPLETE — FINAL HANDOFF CONSISTENCY + TEST-TRUTH SEAL (proposed PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED; fixes: OKX funding/trade role PRIMARY in the human report, OFFLINE_TEST_REPORT corrected to the true final suite 1379 (includes I11D + I11R1 tests), Deribit limitations path-specific via generator; cross-surface semantic-equality tests added; deterministic handoff artifacts byte-identical; BLOC_03_IMPLEMENTATION_COMPLETE=TRUE · BLOC_03_FROZEN=TRUE · NETWORK_VALIDATION=PASS (17/17 logical, 18/18 physical — I10 baseline + I10R1 overlay + I10R2 seal, operator-accepted); next SENSOR-B4-I01 NOT begun) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY); DERIBIT I08 HELD pending I08R1 (completion-truth seal) ; I08R1 COMPLETE, PASS_SENSOR_B3_I08R1_DERIBIT_SEALED ACCEPTED (I08R1-RATIFY); DERIBIT OFFLINE_FROZEN; I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE COMPLETE (PASS proposed, awaiting operator review); I09R1 AUTHORITY-BOUNDARY MICROSEAL COMPLETE (duplicate I14 promotion + duplicate human readiness rows now fail closed; explicit complete verification coverage required; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN pre-I10; PASS ACCEPTED via SENSOR-B3-I09R1-RATIFY) · I09R1-RATIFY COMPLETE (operator ACCEPTED PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED; authorized I10 network smoke ONLY) · I10 CONTROLLED PRODUCTION-ADAPTER NETWORK SMOKE EXECUTED (run i10-live, 18 calls, 0 retries; original automated 17/18 LIVE_PASS + 1 additive; operator review BLOCK_SENSOR_B3_I10_MIXED: 3 Gate contract_stats paths 1970-unit contradiction + Kraken funding) · I10R1 TARGETED REPAIR + RECHECK COMPLETE (adjudication: Gate = PRIOR_CHARACTERIZATION_ERROR → seconds; Kraken funding = sensor-specific epoch ms + {rate, relativeRate} known metric set; fail-closed temporal-plausibility guard added; 4/4 recheck paths LIVE_PASS) · I10R2 SEMANTIC CONSISTENCY SEAL COMPLETE (Gate I10R1A provisional B_PROVIDER_SEMANTIC_DRIFT SUPERSEDED → final A_PRIOR_CHARACTERIZATION_ERROR_WITH_UNIDENTIFIED_HISTORICAL_UNIT — the only ms evidence was a SYNTHETIC fixture, real historical unit UNIDENTIFIED, provider drift NOT established; Gate runtime completion sealed to LIMITED (is_complete=False, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID, no invented resume token); gate-adapter-v2 / kraken-adapter-v2 provenance (OKX/Deribit untouched); Kraken additive firewall (unknown metrics preserved raw, never projected) + relativeRate REQUIRED; literal Kraken funding ms sample captured (1788170400000..1788253200000); 5/5 targeted recheck LIVE_PASS_NONEMPTY, 0 retries) · I10R2-RATIFY COMPLETE (operator ACCEPTED PASS_SENSOR_B3_I10R2_SEMANTIC_CONSISTENCY_SEALED and PASS_SENSOR_B3_I10_PRODUCTION_ADAPTER_NETWORK_SMOKE; current live coverage 17/17 logical + 18/18 physical; semantic versions kraken-adapter-v2 / gate-adapter-v2 / okx-adapter-v1 / deribit-adapter-v1; authorized SENSOR-B3-I11 FINAL BLOC 3 VALIDATION + HANDOFF ONLY — no Bloc 4 implementation yet) · I11 FINAL BLOC 3 VALIDATION + HANDOFF COMPLETE (numbering note: I11 fulfills BOTH frozen I15 final validation AND I16 handoff responsibilities; G1–G8 gates PASS/PASS_WITH_LIMITED; final deterministic handoff package generated — FINAL_ADAPTER_READINESS_MATRIX.csv/.json, PROVIDER_CAPABILITY_RUNTIME.json, PROVIDER_IMPLEMENTATION_REPORT.md, KNOWN_FAILURES.md, ACCESS_CLASS_REPORT.md, OFFLINE_TEST_REPORT.json, NETWORK_SMOKE_EVIDENCE_INDEX.md, BLOC_04_INPUT_MANIFEST.md, BLOC_03_HANDOFF_INDEX.md + machine integrity tests; exact-set 17 across I14/adapter/I09/overlay/final matrix; provider implementation code UNCHANGED; zero network calls in I11; BLOC_03_IMPLEMENTATION_COMPLETE=TRUE · BLOC_03_FROZEN=TRUE · NETWORK_VALIDATION=PASS · REAL_PROVIDER_ADAPTERS=4 · PRODUCTION_PATHS=17/17 · PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18; proposed verdict PASS_BLOC_03_IMPLEMENTATION; next_checkpoint_authorized=FALSE; recommended next SENSOR-B4-I01 — NOT begun) |
@@ -121,8 +121,13 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I11B | 9651479f | 0 (generated handoff artifacts) | — |
 | SENSOR-B3-I11C | 8ee37b3d | 0 (reports) | — |
 | SENSOR-B3-I11D | 8f5f18ad | 7 (handoff integrity tests) | 0 |
-| SENSOR-B3-I11E | (this commit) | 0 (ledger/freeze) | — |
-| cumulative | 1367 | 1367 | 0 |
+| SENSOR-B3-I11E | 34bcc0fe | 0 (ledger/freeze) | — |
+| SENSOR-B3-I11E-fix | 5f510974 | 0 (ledger row fix) | — |
+| SENSOR-B3-I11R1A | (this commit) | 0 (handoff role/limitations repair + generator fix) | — |
+| SENSOR-B3-I11R1B | (next commit) | 12 (cross-surface semantic consistency tests) | 0 |
+| SENSOR-B3-I11R1C | (next commit) | 0 (test-truth reconciliation) | — |
+| SENSOR-B3-I11R1D | (next commit) | 0 (seal evidence/ledger) | — |
+| cumulative | 1379 | 1379 | 0 |
 
 ## External / provider blockers
 
@@ -209,6 +214,41 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B3-I11R1 COMPLETE — FINAL HANDOFF CONSISTENCY + TEST-TRUTH SEAL
+  (proposed `PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED`).  Operator
+  review held `PASS_BLOC_03_IMPLEMENTATION` pending three handoff-truth
+  repairs, all closed:
+  - **OKX role truth (A).**  `PROVIDER_IMPLEMENTATION_REPORT.md` mislabeled
+    OKX FUNDING/TRADE as SECONDARY; authoritative I14 + final matrix say
+    PRIMARY.  Human report corrected; a regression test now validates the
+    report role table against the final machine matrix (no second truth
+    surface), and the OKX adversarial assertion locks BOOK_SNAPSHOT =
+    CURRENT_ONLY / FUNDING = PRIMARY / TRADE = PRIMARY.
+  - **Test-truth (B).**  `OFFLINE_TEST_REPORT` claimed 1360 final, but the
+    I11D handoff-integrity tests (7) had already raised the true final to
+    1367.  After I11R1 the ENTIRE ordinary suite (including handoff integrity
+    + the new semantic-consistency tests) is **1379 passed / 0 failed / 1
+    skipped** (env-gated live smoke, fail-closed); report + ledger now carry
+    the same actual count; historical 1360/1367 executions preserved as
+    history.
+  - **Path-specific Deribit limitations (C).**  Generator fixed
+    (`generate_bloc_03_i11_handoff.py`): FUNDING carries only funding
+    continuation LIMITED prose; LIQUIDATION only the trade-level microscope +
+    source-page coverage; TRADE only the native trade-event surface.  All
+    generated surfaces regenerated (overlay/capability/final matrix/
+    fixture report) and byte-identical on double run (SHA-256 recorded in
+    the seal evidence).
+  Cross-surface semantic-equality tests added (I11R1B, +12): exact-set 17
+  across I14/I09/capability/overlay/final; role == I14 allowed_role; symbol
+  scope, history scope, PIT, methodology pin, resume/completion equal across
+  surfaces; current adapter versions agree (v2/v2/v1/v1) while I09 keeps v1
+  provenance and NOT_RUN network state (chronology-aware, not naive
+  equality).  Provider implementation code UNCHANGED; I09 matrix and all
+  I10/I10R1/I10R2 artifacts untouched; I11R1 network calls = 0.  Proposed
+  verdict: `PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED` then
+  `PASS_BLOC_03_IMPLEMENTATION` (BLOC_03_IMPLEMENTATION_COMPLETE=TRUE,
+  BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS).  Evidence:
+  `evidence/bloc_03/BLOC_03_I11R1_HANDOFF_CONSISTENCY_SEAL.md`.
 - SENSOR-B3-I11 COMPLETE — FINAL BLOC 3 VALIDATION + HANDOFF (proposed
   `PASS_BLOC_03_IMPLEMENTATION`).  Numbering note (§2): I11 fulfills BOTH the
   frozen planning responsibilities I15 (final validation) AND I16 (handoff);

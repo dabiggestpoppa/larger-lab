@@ -21,6 +21,7 @@ Path prefixes: files listed without a directory are in this directory
 | Network smoke evidence index | `NETWORK_SMOKE_EVIDENCE_INDEX.md` | Live validation chronology + immutable evidence pointers |
 | Bloc 4 input manifest | `BLOC_04_INPUT_MANIFEST.md` | WHAT Bloc 4 may trust / must preserve / must never assume |
 | Fixture coverage report | `FIXTURE_COVERAGE_REPORT.json` | Machine-readable per-path fixture QA coverage |
+| Handoff consistency seal | `BLOC_03_I11R1_HANDOFF_CONSISTENCY_SEAL.md` | I11R1 seal: OKX role truth, test-truth (1379), Deribit path-specific limitations, semantic-consistency guards |
 
 ## Current runtime surface
 
