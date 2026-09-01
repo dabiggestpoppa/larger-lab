@@ -126,8 +126,13 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I11R1A | (this commit) | 0 (handoff role/limitations repair + generator fix) | — |
 | SENSOR-B3-I11R1B | (next commit) | 12 (cross-surface semantic consistency tests) | 0 |
 | SENSOR-B3-I11R1C | (next commit) | 0 (test-truth reconciliation) | — |
-| SENSOR-B3-I11R1D | (next commit) | 0 (seal evidence/ledger) | — |
-| cumulative | 1379 | 1379 | 0 |
+| SENSOR-B3-I11R1D | 34a8130a | 0 (seal evidence/ledger) | — |
+| SENSOR-B3-I11R1-RATIFY | 049baf52 | 0 (governance) | — |
+| SENSOR-B4-I01A | (this commit) | 18 (storage enums) | 0 |
+| SENSOR-B4-I01B | (next commit) | 48 (storage models validation) | 0 |
+| SENSOR-B4-I01C | (next commit) | 12 (deterministic serialization + Bloc 3 handoff) | 0 |
+| SENSOR-B4-I01D | (next commit) | 0 (evidence/ledger) | — |
+| cumulative | 1457 | 1457 | 0 |
 
 ## External / provider blockers
 
@@ -214,6 +219,31 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B4-I01 COMPLETE — STORAGE MODELS + ENUMS (proposed
+  `PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN`).  Bloc 3 ratified + frozen
+  (SENSOR-B3-I11R1-RATIFY: I11R1 seal + Bloc 3 implementation OPERATOR_ACCEPTED;
+  BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN).  New `crypto_sensor_fabric/storage/`
+  package: 16 frozen models (EvidenceBlob, AcquisitionRecord, RawProjectionArtifact,
+  ProjectionLineage, PartitionManifest, StorageJobState, StorageJobTransition,
+  SourceRevision, IntegrityCheck, StorageQuotaState, BackupState, RawEvidenceQuery,
+  RawEvidenceResult, RawNormalizationBatch, RecoveryAction, ExportManifest) + 12
+  exact frozen enum vocabularies (integrity/coverage/revision-policy/revision-state/
+  projection/encoding/date-basis/priority/disk-pressure/backup/job-status/object-type).
+  Revision-policy reconciliation: FIRST_SEEN/LATEST_SEEN final vocabulary ONLY;
+  obsolete FIRST_ACQUIRED/LATEST_ACQUIRED NOT introduced; query default =
+  ERROR_ON_AMBIGUITY.  Fail-closed: extra=forbid, UTC-normalized datetimes (naive
+  rejected), SHA-256 format-only validation, nonnegative counts, end>=start windows,
+  no canonical asset/unit fields, no secret-bearing fields.  Deterministic
+  serialization helper + tests.  Bloc 3 bridge: storage imports only frozen
+  provider/base shared contracts; provider adapters do not import storage; no
+  circular dependency.  NO persistence/backend/hashing/compression/paths/manifest
+  repository/DuckDB/Postgres/Parquet; network calls = 0; provider code UNCHANGED.
+  Full suite 1457 passed / 0 failed (1 skipped live, fail-closed); ruff clean;
+  changed-scope mypy clean.  Readiness: STORAGE_MODEL_CONTRACTS_READY=TRUE,
+  T0A/T0B_STORAGE_IMPLEMENTED=FALSE, ATOMIC_BACKEND_IMPLEMENTED=FALSE,
+  MANIFEST_REPOSITORY_IMPLEMENTED=FALSE.  next_checkpoint_authorized=FALSE;
+  recommended next: **SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS**
+  (NOT started).  Evidence: `evidence/bloc_04/BLOC_04_I01_STORAGE_CONTRACTS_EVIDENCE.md`.
 - SENSOR-B3-I11R1 COMPLETE — FINAL HANDOFF CONSISTENCY + TEST-TRUTH SEAL
   (proposed `PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED`).  Operator
   review held `PASS_BLOC_03_IMPLEMENTATION` pending three handoff-truth
