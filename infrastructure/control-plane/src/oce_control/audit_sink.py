@@ -164,13 +164,31 @@ class PostgresAuditSink(DurableAuditSink):
                 pass
             return False
 
+    # Full canonical decision columns compared on conflict (B4-CXR6R3): a
+    # request/correlation ID may reconcile ONLY the EXACT same durable
+    # decision — any differing semantic field fails closed.
+    _RECONCILE_SQL = (
+        "SELECT actor, setting, requested_change, reason, previous, new, "
+        "decision, authorized, fingerprint_before, fingerprint_after, "
+        "backend_identity FROM config_override_audit WHERE request_id = %s")
+
     def append(self, record: dict) -> str:
         """Persist *record* atomically with commit confirmation; returns id.
 
-        Idempotent on ``audit_id``/``request_id`` (ON CONFLICT DO NOTHING):
-        an uncertain commit outcome can be reconciled safely by retrying with
-        the same request/correlation ID — duplicate delivery of the same
-        decision yields exactly one ledger row.
+        Idempotency is EXACT (B4-CXR6R3): a request/correlation ID may
+        reconcile ONLY the same committed decision.
+
+        * NEW request ID: INSERT, commit, verify success — only then is an
+          applicable value possible.
+        * EXACT retry (same request ID + every canonical semantic field
+          identical): the conflicting row is read back, the full decision is
+          compared, and the operation reconciles as the SAME committed
+          operation.
+        * DIVERGENT reuse (same request ID + any differing semantic field):
+          FAIL CLOSED — no applicable value, no new in-memory authoritative
+          result, and the existing durable row is left unchanged.
+
+        rowcount zero is NEVER treated as success without reconciliation.
         """
         if self._tx_status() != TX_IDLE:
             raise RuntimeError(
@@ -201,6 +219,40 @@ class PostgresAuditSink(DurableAuditSink):
                      record.get("fingerprint_before"),
                      record.get("fingerprint_after"),
                      self.backend_identity))
+                if cur.rowcount == 0:
+                    # conflict (on audit_id or the unique request_id) —
+                    # reconcile ONLY the exact same durable decision
+                    cur.execute(self._RECONCILE_SQL, (request_id,))
+                    row = cur.fetchone()
+                    if row is None:
+                        # conflict was on audit_id with a different
+                        # request_id — look the row up by audit_id instead
+                        cur.execute(
+                            self._RECONCILE_SQL.replace(
+                                "WHERE request_id = %s",
+                                "WHERE audit_id = %s"),
+                            (audit_id,))
+                        row = cur.fetchone()
+                    if row is None:
+                        raise RuntimeError(
+                            "audit conflict without an existing record — "
+                            "cannot reconcile (B4-CXR6R3)")
+                    expected = (
+                        actor, setting, requested_change, reason,
+                        record.get("previous"), record.get("new"),
+                        record.get("decision", "granted"),
+                        bool(record.get("authorized", True)),
+                        record.get("fingerprint_before"),
+                        record.get("fingerprint_after"),
+                        self.backend_identity)
+                    if tuple(row) != expected:
+                        raise PermissionError(
+                            "request_id reuse with a DIVERGENT durable "
+                            "decision — refused; no applicable value and the "
+                            "existing durable row is unchanged (B4-CXR6R3)")
+                    # exact retry of the same committed operation: reconcile
+                    # against the SAME durable row (rowcount zero + verified
+                    # read-back IS the success proof)
             self._conn.commit()  # commit confirmation
             return audit_id
         except Exception:

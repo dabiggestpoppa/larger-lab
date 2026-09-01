@@ -1462,6 +1462,7 @@ class TestR3R1SourceProvenance:
 class _FakeCursor:
     def __init__(self, conn):
         self._conn = conn
+        self.rowcount = 0
 
     def __enter__(self):
         return self
@@ -1471,6 +1472,13 @@ class _FakeCursor:
 
     def execute(self, sql, params=None):
         self._conn.executes.append((sql, params))
+        stripped = sql.strip().upper()
+        if stripped.startswith("INSERT"):
+            # B4-CXR6R3: simulate ON CONFLICT DO NOTHING rowcount — 0 means
+            # the row already exists (conflict)
+            self.rowcount = 0 if self._conn.insert_conflict else 1
+        else:
+            self.rowcount = 0
 
     def fetchone(self):
         sql = self._conn.executes[-1][0] if self._conn.executes else ""
@@ -1490,11 +1498,12 @@ class _FakeCursor:
 class _FakeConn:
     """Minimal psycopg2-shaped connection for unit-level sink proofs."""
 
-    def __init__(self, fail_commit=False, rows=None):
+    def __init__(self, fail_commit=False, rows=None, insert_conflict=False):
         self.executes: list = []
         self.committed = 0
         self.fail_commit = fail_commit
         self.rows = rows
+        self.insert_conflict = insert_conflict
         self.tx_status = 0  # TRANSACTION_STATUS_IDLE
         self.rolled_back = 0
 
@@ -1711,27 +1720,137 @@ class TestCXR4R5ProvenAuditDurability:
                        for sql, _ in conn.executes)
         assert conn.committed == 0  # nothing was committed
 
-    def test_idempotent_request_id_reconciliation(self):
-        # CXR5-05 #9: an uncertain commit can be reconciled by retrying with
-        # the SAME request/correlation id — every retry targets the same
-        # audit_id and the DB dedups (ON CONFLICT DO NOTHING).
+    # ------------------------------------------------------------------ #
+    # B4-CXR6R3: EXACT audit idempotency — a request/correlation ID may   #
+    # reconcile ONLY the exact same durable decision. Divergent reuse      #
+    # fails closed (no applicable value, existing row unchanged).         #
+    # ------------------------------------------------------------------ #
+
+    @staticmethod
+    def _insert_params(conn):
+        return [p for sql, p in conn.executes
+                if sql.strip().startswith("INSERT INTO")]
+
+    @staticmethod
+    def _committed_row(conn, mutator=None):
+        """Reconstruct the committed ledger row from the first INSERT params
+        (order matches the reconciliation SELECT columns)."""
+        row = list(TestCXR4R5ProvenAuditDurability._insert_params(conn)[0][2:13])
+        if mutator is not None:
+            mutator(row)
+        return tuple(row)
+
+    def test_exact_retry_reconciles_same_decision(self):
+        # EXACT RETRY: same request id + identical canonical decision -> the
+        # operation reconciles as the SAME committed operation (rowcount 0 +
+        # verified read-back is the success proof — never assumed success).
         conn = _FakeConn()
         authz = self._authz(PostgresAuditSink(conn))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
-        rid = "override-req-0007"
+        rid = "override-req-exact-0001"
         first = authz.operator_override(
             eff, actor="operator:po", setting_name="control_plane.port",
             requested_change="x", reason="r", new_value="9104",
             request_id=rid)
+        assert first == 9104
+        conn.rows = [self._committed_row(conn)]  # existing committed row
+        conn.insert_conflict = True              # retry collides
+        commits_before = conn.committed
         second = authz.operator_override(
             eff, actor="operator:po", setting_name="control_plane.port",
-            requested_change="x", reason="r", new_value="9105",
+            requested_change="x", reason="r", new_value="9104",
             request_id=rid)
-        assert first == 9104 and second == 9105  # both applied, both same id
-        inserts = [(params[0], params[1]) for sql, params in conn.executes
-                   if sql.strip().startswith("INSERT INTO")]
-        assert len(inserts) == 2
-        assert all(audit_id == rid for audit_id, request_id in inserts)
-        assert all(audit_id == request_id for audit_id, request_id in inserts)
-        assert any("ON CONFLICT (audit_id) DO NOTHING" in sql
-                   for sql, _ in conn.executes)
+        assert second == 9104  # same applicable value, same operation
+        assert len(self._insert_params(conn)) == 2  # retry INSERT attempted
+        assert conn.committed == commits_before + 1  # reconciled + committed
+
+    def test_collision_after_uncertain_commit_exact_readback(self):
+        # uncertain commit -> exact retry: the conflicting row is read back
+        # through a reconciliation SELECT and verified before success
+        conn = _FakeConn(insert_conflict=True)
+        sink = PostgresAuditSink(conn)
+        # pre-existing committed row identical to the retried record
+        conn.rows = [("operator:po", "control_plane.port", "x", "r",
+                      "8448", "9104", "granted", True,
+                      "fp-before", "fp-after",
+                      "postgres:config_override_audit")]
+        rid = "override-req-uncertain-0001"
+        out_id = sink.append({
+            "audit_id": rid,
+            "request_id": rid, "actor": "operator:po",
+            "setting": "control_plane.port", "requested_change": "x",
+            "reason": "r", "previous": "8448", "new": "9104",
+            "decision": "granted", "authorized": True,
+            "fingerprint_before": "fp-before",
+            "fingerprint_after": "fp-after",
+        })
+        rid = out_id
+        assert rid == "override-req-uncertain-0001"
+        assert conn.rolled_back == 0  # reconciled, not rolled back
+
+    @pytest.mark.parametrize("label,mutator", [
+        ("different new value", lambda r: r.__setitem__(5, "9105")),
+        ("different setting", lambda r: r.__setitem__(1, "other.setting")),
+        ("different actor", lambda r: r.__setitem__(0, "hermes")),
+        ("different reason", lambda r: r.__setitem__(3, "different reason")),
+        ("different fingerprint", lambda r: r.__setitem__(8, "other-fp")),
+    ])
+    def test_divergent_reuse_blocked(self, label, mutator):
+        # DIVERGENT REUSE: same request id + any differing semantic field
+        # fails closed at the sink — no applicable value, no new in-memory
+        # authoritative result, existing durable row unchanged.
+        conn = _FakeConn()
+        authz = self._authz(PostgresAuditSink(conn))
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        rid = "override-req-divergent-0001"
+        first = authz.operator_override(
+            eff, actor="operator:po", setting_name="control_plane.port",
+            requested_change="x", reason="r", new_value="9104",
+            request_id=rid)
+        assert first == 9104
+        conn.rows = [self._committed_row(conn, mutator)]
+        conn.insert_conflict = True
+        with pytest.raises(RuntimeError, match="FAILED"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9104",
+                request_id=rid)
+        # the divergent attempt added NO new in-memory authoritative result
+        assert len(authz.audit) == 1     # only the FIRST (committed) override
+        assert conn.rolled_back >= 1     # divergent append rolled back
+        assert len(self._insert_params(conn)) == 2  # existing row NOT rewritten
+
+    def test_divergent_reuse_raises_explicit_permission_error(self):
+        # the sink itself reports DIVERGENT before operator_override wraps it
+        conn = _FakeConn(insert_conflict=True)
+        sink = PostgresAuditSink(conn)
+        conn.rows = [("operator:po", "control_plane.port", "x", "r",
+                      "8448", "9105", "granted", True,
+                      "fp-before", "fp-after",
+                      "postgres:config_override_audit")]
+        with pytest.raises(PermissionError, match="DIVERGENT"):
+            sink.append({
+                "audit_id": "override-req-div-0002",
+                "request_id": "override-req-div-0002",
+                "actor": "operator:po", "setting": "control_plane.port",
+                "requested_change": "x", "reason": "r",
+                "previous": "8448", "new": "9104",
+                "decision": "granted", "authorized": True,
+                "fingerprint_before": "fp-before",
+                "fingerprint_after": "fp-after",
+            })
+        assert conn.rolled_back >= 1
+
+    def test_request_id_carries_zero_durable_authority_without_commit(self):
+        # a request id alone never authorizes: without a committed INSERT the
+        # sink raises, applies nothing, and leaves no record
+        conn = _FakeConn(fail_commit=True)
+        authz = self._authz(PostgresAuditSink(conn))
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        with pytest.raises(RuntimeError, match="FAILED"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9106",
+                request_id="override-req-nocommit-0001")
+        assert authz.audit == []
+        assert conn.rolled_back >= 1
