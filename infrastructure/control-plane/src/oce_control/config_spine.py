@@ -551,6 +551,22 @@ class ConfigResolver:
                     raise ValidationError(
                         f"setting '{key}' does not allow source "
                         f"'{source_level}' (allowed={setting.allowed_sources})")
+                # B4-CXR3R4 (CXR3-05): OWNERSHIP is enforced in the real
+                # resolver, not just documented. Policy-owned and
+                # operator(po)-owned settings are safe canonical policy: an
+                # ordinary file/env/CLI value may never weaken them — only
+                # the authorized override path (ConfigAuthorization, with an
+                # attributable audit record) can change policy, and even that
+                # path is separately gated (e.g. capital.authority is locked
+                # to 'none' in Book 4). Source precedence (cli > env > file)
+                # and actor authority are DIFFERENT layers; both must hold.
+                if setting.owner in ("policy", "operator(po)") and \
+                        source_level != SOURCE_DEFAULT:
+                    raise ValidationError(
+                        f"setting '{key}' is {setting.owner}-owned and may not "
+                        f"be supplied by source '{source_level}' — safe canonical "
+                        "policy is immutable at this stage; changes require the "
+                        "authorized override path (error class: source-authority)")
                 value = validate_setting_value(setting, value)
                 candidates.setdefault(key, {})[source_level] = value
                 candidates[key]["__owner__"] = setting.name  # for provenance

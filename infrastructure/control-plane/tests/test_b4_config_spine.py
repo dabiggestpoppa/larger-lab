@@ -1087,6 +1087,85 @@ class TestR3R4DatabaseSecretBinding:
 
 
 # --------------------------------------------------------------------------- #
+# B4-CXR3R4 (CXR3-05) — OWNERSHIP enforced in the real resolver: policy-owned
+# and operator(po)-owned settings cannot be weakened through ordinary
+# file/env/CLI configuration. Precedence and authority are distinct layers.
+# --------------------------------------------------------------------------- #
+class TestCXR3R4PolicyOwnershipEnforced:
+    POLICY_WEAKENING = [
+        ("OCE_LOG_REDACT_SECRETS", "false", "logging.redact_secrets"),
+        ("OCE_LOG_REDACT_CLI", "false", "logging.redact_cli"),
+        ("OCE_SANDBOX_PROCESS_TREE_TERMINATION", "false",
+         "sandbox.process_tree_termination"),
+        ("OCE_SANDBOX_STRICT", "false", "sandbox.strict"),
+        ("OCE_SESSIONS_AUTH_REQUIRED", "false", "sessions.auth_required"),
+        ("OCE_WORKERS_EGRESS", "loopback", "workers.egress"),
+        ("OCE_REDIS_MODE", "cache", "redis.mode"),
+        ("OCE_CONTROL_PLANE_PUBLIC_LISTEN", "true",
+         "control_plane.public_listen"),
+        ("OCE_EXECUTION_BROKER_ENABLED", "true", "execution.broker_enabled"),
+        ("OCE_EXECUTION_PAPER_TRADING_ENABLED", "true",
+         "execution.paper_trading_enabled"),
+        ("OCE_EXECUTION_LIVE_ORDER_MODE", "paper", "execution.live_order_mode"),
+        ("OCE_CLOUD_PROVISIONING", "true", "cloud.provisioning"),
+        ("OCE_CLOUD_GPU_BURST", "true", "cloud.gpu_burst"),
+        ("OCE_CAPITAL_AUTHORITY", "approved", "capital.authority"),
+    ]
+
+    def test_policy_weakening_via_env_fails_closed(self):
+        import oce_control.config_startup as cs
+        for var, val, setting in self.POLICY_WEAKENING:
+            with pytest.raises(ValidationError) as exc:
+                cs.effective_from_env({"PATH": "/usr/bin", var: val})
+            msg = str(exc.value)
+            assert setting in msg          # canonical setting, not generic
+            assert "source-authority" in msg
+            assert val not in msg          # candidate value never echoed
+
+    def test_policy_weakening_via_file_and_cli_fails_closed(self):
+        reg = build_default_registry()
+        cases = [
+            {"logging.redact_secrets": False},
+            {"logging.redact_cli": False},
+            {"sandbox.process_tree_termination": False},
+            {"sessions.auth_required": False},
+            {"capital.authority": "approved"},
+        ]
+        for kw in cases:
+            with pytest.raises(ValidationError):
+                ConfigResolver(reg).resolve(
+                    {"file": {**kw, "postgres.password_ref": REF_PG}})
+            with pytest.raises(ValidationError):
+                ConfigResolver(reg).resolve(
+                    {"file": {"postgres.password_ref": REF_PG}}, cli=kw)
+
+    def test_operator_setting_remains_env_settable(self):
+        import oce_control.config_startup as cs
+        eff = cs.effective_from_env(
+            {"PATH": "/usr/bin", "OCE_CONTROL_PLANE_PORT": "8460"})
+        assert eff.get("control_plane.port") == 8460
+        assert eff.provenance["control_plane.port"] == "environment"
+
+    def test_ownership_and_precedence_are_distinct_layers(self):
+        # even at the HIGHEST source (cli), a policy-owned setting cannot
+        # weaken policy — precedence never overrides authority
+        reg = build_default_registry()
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": REF_PG}},
+                cli={"sandbox.strict": False})
+
+    def test_default_tier_policy_is_authoritative(self):
+        # the safe canonical policy resolves from the default tier
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        assert eff.get_bool("sandbox.strict") is True
+        assert eff.get_bool("sandbox.process_tree_termination") is True
+        assert eff.get_bool("logging.redact_secrets") is True
+        assert eff.get_bool("logging.redact_cli") is True
+        assert eff.get("capital.authority") == "none"
+
+
+# --------------------------------------------------------------------------- #
 # B4-R3R1 — honest source provenance (env value must never masquerade as file)
 # --------------------------------------------------------------------------- #
 class TestR3R1SourceProvenance:
