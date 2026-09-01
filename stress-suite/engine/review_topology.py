@@ -71,9 +71,15 @@ class ReviewTopology:
     fresh_context_count: int = 0
     counter_attractor_budget: int = 0
     stop_conditions: Tuple[str, ...] = ()
+    independently_originated_design_count: int = 0   # G3R-06: provenance-based, not name-based
 
     def reviewer_count(self) -> int:
         return len(self.profiles)
+
+    def fresh_or_independent_design_count(self) -> int:
+        """G3R-06: fresh-context paths OR provenance-verified independent design
+        origins both qualify for a fresh-or-design requirement."""
+        return self.fresh_context_count + self.independently_originated_design_count
 
     def independence_counts(self) -> Dict[str, int]:
         axes = {
@@ -132,6 +138,11 @@ class ReviewTopologyDecision:
     admissible_alternatives: Tuple[str, ...]          # other admissible topology ids
     contract_id: str = ""
     contract_fingerprint: str = ""
+    # G3R-10: choosing a better topology is NOT the same as having obtained
+    # evidence from it. The G3 router only RECOMMENDS; evidence is obtained
+    # only when the executed topology actually produces decision-grade results.
+    execution_status: str = "REVIEW_TOPOLOGY_RECOMMENDED"   # RECOMMENDED | EXECUTED
+    evidence_obtained: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return {k: getattr(self, k) for k in (
@@ -139,7 +150,7 @@ class ReviewTopologyDecision:
             "reason", "constraints_satisfied", "cost_units", "latency_units",
             "independence_dimensions_achieved", "individual_quality_metadata",
             "remaining_gaps", "admissible_alternatives", "contract_id",
-            "contract_fingerprint")}
+            "contract_fingerprint", "execution_status", "evidence_obtained")}
 
 
 def _capability_ok(tier: str, required: str) -> bool:
@@ -149,9 +160,20 @@ def _capability_ok(tier: str, required: str) -> bool:
 
 def _topology_admissible(topo: ReviewTopology, constraints: Mapping[str, Any]) -> Tuple[bool, List[str]]:
     gaps: List[str] = []
-    required_cap = str(constraints.get("min_capability", "BASIC"))
-    if topo.max_capability() is None or not _capability_ok(topo.max_capability(), required_cap):
-        gaps.append(f"capability below {required_cap}")
+    # G3R-09 capability semantics are EXPLICIT — the contract states what it
+    # means. `min_capability` is the conservative alias for "every required
+    # reviewer must meet the tier" (fail-closed: one HIGH + several BASIC must
+    # not pass a contract intended to require ADEQUATE review paths).
+    # `minimum_all_required_roles_capability` is the same semantic spelled out;
+    # `minimum_any_reviewer_capability` is the explicit at-least-one semantic.
+    required_all = str(constraints.get("minimum_all_required_roles_capability")
+                       or constraints.get("min_capability") or "")
+    required_any = str(constraints.get("minimum_any_reviewer_capability") or "")
+    if required_all and (not topo.capability_tiers
+                         or any(not _capability_ok(t, required_all) for t in topo.capability_tiers)):
+        gaps.append(f"capability below {required_all} for all required reviewers")
+    if required_any and not any(_capability_ok(t, required_any) for t in topo.capability_tiers):
+        gaps.append(f"no reviewer at {required_any}+ capability")
     counts = topo.independence_counts()
     if counts["source_lineage"] < int(constraints.get("min_source_lineages", 0)):
         gaps.append("insufficient distinct source lineages")
@@ -160,8 +182,15 @@ def _topology_admissible(topo: ReviewTopology, constraints: Mapping[str, Any]) -
         gaps.append("insufficient model/runtime lineage diversity")
     if topo.prior_exposure_ratio() > float(constraints.get("max_prior_exposure_ratio", 1.0)):
         gaps.append("prior-conclusion exposure above allowed ratio")
+    # G3R-06: fresh-context OR provenance-verified independent design qualify
+    if int(constraints.get("min_fresh_context", 0)) and \
+            topo.fresh_context_count < int(constraints.get("min_fresh_context", 0)):
+        gaps.append("insufficient fresh-context paths")
+    if int(constraints.get("min_independent_design", 0)) and \
+            topo.independently_originated_design_count < int(constraints.get("min_independent_design", 0)):
+        gaps.append("insufficient independently-originated design paths")
     if int(constraints.get("min_fresh_or_independent_design", 0)) and \
-            topo.fresh_context_count < int(constraints.get("min_fresh_or_independent_design", 0)):
+            topo.fresh_or_independent_design_count() < int(constraints.get("min_fresh_or_independent_design", 0)):
         gaps.append("insufficient fresh-context / independent-design paths")
     if topo.cost_units > int(constraints.get("max_cost_units", 10 ** 9)):
         gaps.append("cost above budget")
