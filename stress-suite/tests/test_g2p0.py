@@ -111,14 +111,75 @@ def test_worker_cannot_spoof_operator_ratifier():
 
 
 def test_operator_actor_can_ratify_with_valid_grant():
+    """G2R-05 correction: a ratification must reference a PRIOR proposal. The
+    operator first receives a REQUEST_AUTHORITY (real proposal), then ratifies.
+
+    Old assertion: an OPERATOR could RATIFY a grant fabricated directly at
+    ratification time (proposal-less).
+    Why invalid: that allowed a grant that was never proposed (G2R-05:
+    ratify_without_prior_proposal_fails_closed).
+    Replacement: proposal -> ratification, then the grant exists."""
+    evs = [
+        ReplayEvent(1, "authority_step", "authority", "WORKER_1", "@AUTH",
+                    {"action": "REQUEST_AUTHORITY", "capability_gain": False,
+                     "authority_gain": False, "target": "WORKER_1",
+                     "risk_class": "read", "grant_action": "read", "target_scope": "dataset"}),
+        ReplayEvent(2, "authority_step", "authority", "OPERATOR", "@AUTH",
+                    {"action": "RATIFY", "proposer": "WORKER_1", "target": "WORKER_1",
+                     "risk_class": "read"}),
+    ]
+    replay = DeterministicReplay(authority=_auth())
+    res = replay.run(evs)
+    assert res.trace[-1]["allowed"] is True
+    assert res.trace[-1]["to"] == "ratified"
+    assert len(replay.authority.registry.grants("WORKER_1")) == 1
+
+
+def test_ratify_without_prior_proposal_fails_closed():
+    """G2R-05: an OPERATOR cannot fabricate a grant that was never proposed."""
     evs = [ReplayEvent(1, "authority_step", "authority", "OPERATOR", "@AUTH",
                        {"action": "RATIFY", "proposer": "WORKER_1", "target": "WORKER_1",
                         "risk_class": "read"})]
     replay = DeterministicReplay(authority=_auth())
     res = replay.run(evs)
-    assert res.trace[0]["allowed"] is True
-    assert res.trace[0]["to"] == "ratified"
-    assert len(replay.authority.registry.grants("WORKER_1")) == 1
+    assert res.trace[0]["allowed"] is False
+    assert "NO_PRIOR_PROPOSAL" in res.trace[0]["rule_ids"]
+    assert replay.authority.registry.grants("WORKER_1") == []
+
+
+def test_non_operator_cannot_ratify_broker_grant():
+    """G2R-05: broker is authority-bearing and requires OPERATOR ratification,
+    exactly like deployment / destructive / capital. A governed GOVERNOR-level
+    actor cannot ratify a broker grant."""
+    from engine.base import AuthorityLevel as AL
+    evs = [
+        ReplayEvent(1, "authority_step", "authority", "WORKER_1", "@AUTH",
+                    {"action": "REQUEST_AUTHORITY", "capability_gain": False,
+                     "authority_gain": False, "target": "WORKER_1",
+                     "risk_class": "broker", "grant_action": "broker_route", "target_scope": "exchange"}),
+        ReplayEvent(2, "authority_step", "authority", "GOVERNOR", "@AUTH",
+                    {"action": "RATIFY", "proposer": "WORKER_1", "target": "WORKER_1",
+                     "risk_class": "broker"}),
+    ]
+    replay = DeterministicReplay(authority=_auth())
+    res = replay.run(evs)
+    assert res.trace[1]["allowed"] is False
+    assert "AUTHORITY_FIREWALL" in res.trace[1]["rule_ids"]
+    assert replay.authority.registry.grants("WORKER_1") == []
+    # and the SAME proposal ratified by OPERATOR succeeds
+    evs2 = [
+        ReplayEvent(1, "authority_step", "authority", "WORKER_1", "@AUTH",
+                    {"action": "REQUEST_AUTHORITY", "capability_gain": False,
+                     "authority_gain": False, "target": "WORKER_1",
+                     "risk_class": "broker", "grant_action": "broker_route", "target_scope": "exchange"}),
+        ReplayEvent(2, "authority_step", "authority", "OPERATOR", "@AUTH",
+                    {"action": "RATIFY", "proposer": "WORKER_1", "target": "WORKER_1",
+                     "risk_class": "broker"}),
+    ]
+    replay2 = DeterministicReplay(authority=_auth())
+    res2 = replay2.run(evs2)
+    assert res2.trace[1]["allowed"] is True
+    assert len(replay2.authority.registry.grants("WORKER_1")) == 1
 
 
 def test_mismatched_actor_ratifier_fails_closed():

@@ -30,7 +30,8 @@ def _behavior_sig(res):
 
 def _own_run(sid):
     pack = PACKS[sid]
-    return run_scenario(pack.spec, pack.contract, pack.policy)
+    return run_scenario(pack.spec, pack.contract, pack.policy,
+                        evidence_records=pack.observable_evidence)
 
 
 @pytest.mark.parametrize("a", MAIN)
@@ -48,7 +49,8 @@ def test_cross_contract_run(a, b):
         contract_b.freeze()
     fp_before = contract_b.fingerprint()
 
-    foreign = run_scenario(pack_a.spec, contract_b, pack_a.policy)
+    foreign = run_scenario(pack_a.spec, contract_b, pack_a.policy,
+                           evidence_records=pack_a.observable_evidence)
 
     # 1) the contract participates: fingerprints always differ between contracts
     assert foreign.artifacts["evaluation_contract"]["contract_id"] != own.artifacts["evaluation_contract"]["contract_id"]
@@ -82,24 +84,45 @@ def test_audit_covers_all_pairs():
 
 
 def test_s03_under_s04_contract_diverges_honestly():
-    """S04's exception threshold (HIGH) is higher than S03's (MEDIUM): replaying
-    S03 under S04's contract must change behavior (no silent equivalence)."""
+    """S04's evaluation contract does NOT admit ESCALATION_REVIEW ->
+    TRANSFORMATION_CANDIDATE (G2R-06 admissible enforcement): replaying S03
+    under S04's contract must change behavior — the structural proposal is
+    blocked by the contract, never silently inherited."""
     own = _own_run("S03")
     s04_contract = PACKS["S04"].contract
-    foreign = run_scenario(PACKS["S03"].spec, s04_contract, PACKS["S03"].policy)
+    foreign = run_scenario(PACKS["S03"].spec, s04_contract, PACKS["S03"].policy,
+                           evidence_records=PACKS["S03"].observable_evidence)
     assert _behavior_sig(foreign) != _behavior_sig(own)
+    assert foreign.artifacts["terminal_phase"] != "TRANSFORMATION_CANDIDATE"
+    # the block is recorded as a CONTRACT_INADMISSIBLE hold, not silence
+    assert any(
+        h.get("rule_id") == "CONTRACT_INADMISSIBLE" for h in foreign.artifacts["holds"]
+    ), "the inadmissible proposal must be recorded, not silently dropped"
     verdict = evaluate_expectation(foreign, PACKS["S03"].spec)
     assert verdict["pass"] is False  # honestly fails against S03's own expectations
 
 
-def test_s02_under_s01_contract_keeps_entry_but_changes_nothing_critical():
-    """S02's sole entry gate reads independent_contradiction; S01's contract has
-    the same contradiction threshold, so S02 under S01 behaves identically —
-    recorded as benign equivalence, never as inheritance."""
+def test_s02_under_s01_contract_diverges_on_admissibility():
+    """G2R-06 correction: S01's admissible list does NOT admit ESCALATION_REVIEW
+    -> NO_CHANGE (S01 resolves via transformation, not NO_CHANGE). S02 replay
+    under S01's contract therefore LEGITIMATELY diverges at the NO_CHANGE step —
+    contract admissibility is now semantically enforced, so the old 'benign
+    equivalence' assertion encoded the exact G2R-06 defect and is replaced by
+    an honest contract-driven divergence check.
+
+    Old assertion: S02 under S01 contract behaves identically (admissible list
+    ignored).
+    Why invalid: admissible_phase_transitions was fingerprint material but not
+    semantically wired; a contract could not gate execution.
+    Replacement: divergence + recorded CONTRACT_INADMISSIBLE hold."""
     own = _own_run("S02")
     s01_contract = PACKS["S01"].contract
-    foreign = run_scenario(PACKS["S02"].spec, s01_contract, PACKS["S02"].policy)
-    assert _behavior_sig(foreign) == _behavior_sig(own)
-    assert evaluate_expectation(foreign, PACKS["S02"].spec)["pass"] is True
-    # ... and the contract fingerprints themselves still differ (identity kept)
+    foreign = run_scenario(PACKS["S02"].spec, s01_contract, PACKS["S02"].policy,
+                           evidence_records=PACKS["S02"].observable_evidence)
+    assert _behavior_sig(foreign) != _behavior_sig(own)
+    assert any(
+        h.get("rule_id") == "CONTRACT_INADMISSIBLE" for h in foreign.artifacts["holds"]
+    ), "NO_CHANGE blocked by S01 contract's admissible list must be recorded"
+    assert evaluate_expectation(foreign, PACKS["S02"].spec)["pass"] is False
+    # the contracts themselves still differ (identity kept)
     assert foreign.artifacts["fingerprint"] != own.artifacts["fingerprint"]

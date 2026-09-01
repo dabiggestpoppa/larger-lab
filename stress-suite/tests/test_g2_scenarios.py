@@ -21,8 +21,11 @@ MAIN = ["S01", "S02", "S03", "S04", "S05"]
 
 
 def _run(sid):
+    """G2R-02: scenario runs bind the governed evidence registry built from the
+    pack's observable_evidence.json; every evidence_ref resolves fail-closed."""
     pack = PACKS[sid]
-    return run_scenario(pack.spec, pack.contract, pack.policy), pack
+    return run_scenario(pack.spec, pack.contract, pack.policy,
+                        evidence_records=pack.observable_evidence), pack
 
 
 # --------------------------------------------------------------------------- #
@@ -69,14 +72,15 @@ def test_stimulus_stream_has_no_scripted_phase_events(sid):
 @pytest.mark.parametrize("sid", MAIN)
 def test_expected_trace_sealed_metamorphic(sid):
     pack = PACKS[sid]
-    base = run_scenario(pack.spec, pack.contract, pack.policy)
+    records = pack.observable_evidence
+    base = run_scenario(pack.spec, pack.contract, pack.policy, evidence_records=records)
     spec2 = pack.spec.to_dict()
     spec2["expected_phase_path"] = ["STABLE", "NEW_STABLE", "ROLLBACK", "NOPE"]  # intentional garbage
     spec2.pop("expected_terminal_knowledge", None)
     spec2.pop("terminal_states", None)
     from engine.fixtures import StressScenarioSpec
     tampered = StressScenarioSpec(**spec2)
-    res2 = run_scenario(tampered, pack.contract, pack.policy)
+    res2 = run_scenario(tampered, pack.contract, pack.policy, evidence_records=records)
     # execution is byte-identical; only the post-hoc verdict differs
     assert base.artifacts["fingerprint"] == res2.artifacts["fingerprint"]
     assert base.artifacts["actual_phase_trace"] == res2.artifacts["actual_phase_trace"]
@@ -88,10 +92,11 @@ def test_hidden_ground_truth_sealed_metamorphic():
     pack = PACKS["S03"]
     spec = pack.spec.to_dict()
     from engine.fixtures import StressScenarioSpec
-    base = run_scenario(pack.spec, pack.contract, pack.policy)
+    records = pack.observable_evidence
+    base = run_scenario(pack.spec, pack.contract, pack.policy, evidence_records=records)
     spec["hidden_ground_truth"] = {"shared_assumption": "SIG_C", "revision_matrix": "NOT LEAKED"}
     with_truth = StressScenarioSpec(**spec)
-    res = run_scenario(with_truth, pack.contract, pack.policy)
+    res = run_scenario(with_truth, pack.contract, pack.policy, evidence_records=records)
     assert base.artifacts["fingerprint"] == res.artifacts["fingerprint"]
     assert "hidden_ground_truth" not in decision_view(with_truth)
 
@@ -120,7 +125,8 @@ def test_committed_run_receipts_match_a_fresh_run():
         receipt_path = pack.path / "run_receipt.json"
         assert receipt_path.exists(), f"missing receipt for {sid}"
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-        res = run_scenario(pack.spec, pack.contract, pack.policy)
+        res = run_scenario(pack.spec, pack.contract, pack.policy,
+                           evidence_records=pack.observable_evidence)
         assert res.artifacts["fingerprint"] == receipt["fingerprint"], sid
         assert receipt["pass"] == (evaluate_expectation(res, pack.spec)["pass"]), sid
         assert res.artifacts["actual_phase_trace"] == receipt["actual_phase_trace"], sid
@@ -131,6 +137,7 @@ def test_runs_are_deterministic():
         a, _ = _run(sid)
         b, _ = _run(sid)
         assert a.artifacts["fingerprint"] == b.artifacts["fingerprint"]
+        assert a.artifacts["behavior_fingerprint"] == b.artifacts["behavior_fingerprint"]
 
 
 # --------------------------------------------------------------------------- #
