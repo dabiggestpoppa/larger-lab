@@ -270,29 +270,30 @@ def require_secret_resolvable(environ: dict | None = None,
         raise SystemExit(startup_report(environ)) from exc
 
 
-def validate_startup(environ: dict | None = None,
-                     backend: "ls.RuntimeSecretBackend | None" = None) -> dict:
-    """Validate the startup effective config.
+def validate_startup(environ: dict | None = None) -> dict:
+    """CONFIGURATION gate — schema/posture only (B4-CXR3R7).
 
     Never raises. Returns a report dict:
         {"ok": bool, "start": bool, "config": <redacted>,
-         "secret_ok": bool|None, "error": str|None}
+         "fingerprint": str, "error": str|None}
+
+    This is the start contract for a component that does not itself hold the
+    durable secret (e.g. the in-memory ControlPlane). It deliberately does
+    NOT resolve the secret: a configuration may be valid while its required
+    runtime dependency (the secret store) is not yet resolvable. Components
+    that activate durable DB-facing runtime MUST use
+    validate_runtime_readiness() / require_runtime_startable() instead — a
+    start=True result is never combined with secret_ok=False here because
+    this gate reports NO secret state at all.
     """
     try:
         eff = effective_from_env(environ)
         validate_effective(eff)  # redundant but explicit & self-documenting
-        secret_ok: bool | None = None
-        try:
-            resolve_startup_secret(eff, backend)
-            secret_ok = True
-        except (KeyError, PermissionError):
-            secret_ok = False
         return {
             "ok": True,
             "start": True,
             "config": eff.redacted(),
             "fingerprint": eff.fingerprint,
-            "secret_ok": secret_ok,
             "error": None,
         }
     except (ValidationError, KeyError, ValueError) as exc:
@@ -300,9 +301,70 @@ def validate_startup(environ: dict | None = None,
             "ok": False,
             "start": False,
             "config": None,
-            "secret_ok": False,
             "error": redact_message(str(exc)),
         }
+
+
+def validate_runtime_readiness(
+        environ: dict | None = None,
+        backend: "ls.RuntimeSecretBackend | None" = None) -> dict:
+    """COMPLETE runtime-start contract: configuration + secret resolution.
+
+    Never raises. Returns:
+        {"ok": bool, "ready": bool, "secret_ok": bool,
+         "config": <redacted>, "fingerprint": str, "error": str|None}
+
+    ``ready`` is True ONLY when the configuration is valid AND the
+    configured secret reference resolves against the approved store. No
+    contradictory state is possible: ``ready`` implies ``secret_ok`` implies
+    ``ok`` (invariant asserted by tests, B4-CXR3R7).
+    """
+    try:
+        eff = effective_from_env(environ)
+        validate_effective(eff)
+        try:
+            resolve_startup_secret(eff, backend)
+            secret_ok = True
+        except (KeyError, PermissionError, ValidationError, ValueError):
+            secret_ok = False
+        return {
+            "ok": True,
+            "ready": secret_ok,
+            "secret_ok": secret_ok,
+            "config": eff.redacted(),
+            "fingerprint": eff.fingerprint,
+            "error": (None if secret_ok else
+                       "configured secret reference does not resolve — run "
+                       "`python scripts/oce_local.py configure` to materialize "
+                       "the local runtime secret (fail closed)"),
+        }
+    except (ValidationError, KeyError, ValueError) as exc:
+        return {
+            "ok": False,
+            "ready": False,
+            "secret_ok": False,
+            "config": None,
+            "error": redact_message(str(exc)),
+        }
+
+
+def require_runtime_startable(
+        environ: dict | None = None,
+        backend: "ls.RuntimeSecretBackend | None" = None) -> EffectiveConfig:
+    """Fail-closed runtime-start gate: configuration + secret resolution.
+
+    Raises SystemExit on ANY readiness failure (malformed / incomplete /
+    forbidden config, or a configured reference that does not resolve).
+    Returns the validated effective config on success. Every durable
+    DB-facing activation entrypoint must use this — nothing may report
+    "started"/"ready" unless the full runtime-start contract holds.
+    """
+    report = validate_runtime_readiness(environ, backend)
+    if not report["ok"]:
+        raise SystemExit(startup_report(environ))
+    if not report["ready"]:
+        raise SystemExit(report["error"])
+    return effective_from_env(environ)
 
 
 def startup_report(environ: dict | None = None, prefix: str = "OCE") -> str:

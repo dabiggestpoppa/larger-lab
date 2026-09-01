@@ -36,11 +36,9 @@ def main(argv=None) -> None:
     # DSN can never redirect this worker's connection elsewhere.
     from .config_startup import (
         governed_runtime_dsn,
-        require_secret_resolvable,
-        require_startable,
+        require_runtime_startable,
     )
-    require_startable()
-    require_secret_resolvable()
+    require_runtime_startable()
     if not args.token:
         raise SystemExit("worker requires --token or OCE_WORKER_TOKEN (no predictable default, B2-R7)")
 

@@ -819,14 +819,26 @@ class TestR3R3SecretResolution:
         with pytest.raises(SystemExit):
             cs.require_secret_resolvable(environ=None, backend=backend, eff=eff)
 
-    def test_default_reference_unbacked_reports_secret_not_ok(self, tmp_path):
+    def test_unbacked_reference_fails_readiness_not_contradictory(self, tmp_path):
+        # B4-CXR3R7: validate_startup is the CONFIG gate (no secret state);
+        # the complete runtime-start contract lives in
+        # validate_runtime_readiness, where ready=False whenever the secret
+        # does not resolve — start=True + secret_ok=False is impossible.
         import oce_control.config_startup as cs
         backend = self._backend(tmp_path, provision=False)
-        rep = cs.validate_startup(
+        cfg = cs.validate_startup(
+            environ={"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        assert cfg["ok"] is True            # config posture is valid
+        assert "secret_ok" not in cfg       # config gate reports no secret
+        rep = cs.validate_runtime_readiness(
             environ={"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"},
             backend=backend)
-        assert rep["ok"] is True        # config posture is valid...
-        assert rep["secret_ok"] is False  # ...but the runtime secret is NOT
+        assert rep["ok"] is True           # configuration posture valid...
+        assert rep["secret_ok"] is False   # ...but the runtime secret is NOT
+        assert rep["ready"] is False       # ...therefore NOT ready (no lie)
+        # invariant: ready => secret_ok => ok
+        assert not (rep["ready"] and not rep["secret_ok"])
+        assert not (rep["secret_ok"] and not rep["ok"])
 
     def test_first_governed_initialization_then_restart(self, tmp_path):
         # configure materializes a real secret into the store; restart then

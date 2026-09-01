@@ -416,11 +416,15 @@ def doctor() -> dict:
     chk("durable postgres volume present", vol.returncode == 0)
     cloud_hint = cloud_credential_hint()
     chk("no cloud credentials required", not cloud_hint, "; ".join(cloud_hint) or "local-only")
-    # Book 4 surface C: effective config posture gate.
-    from oce_control.config_startup import validate_startup
-    cfg = validate_startup()
+    # Book 4 surface C + B4-CXR3R7: doctor must fail when the effective
+    # configuration is invalid AND when the configured secret reference does
+    # not resolve — configuration alone is not runtime readiness.
+    from oce_control.config_startup import validate_runtime_readiness
+    rdy = validate_runtime_readiness()
     chk("config spine effective config valid (fail-closed)",
-        cfg["ok"], cfg["error"] or "valid")
+        rdy["ok"], rdy["error"] or "valid")
+    chk("configured secret reference resolves (runtime readiness)",
+        rdy["ready"], rdy["error"] or "resolved")
     return {"checks": checks, "ok": all(c["ok"] for c in checks)}
 
 
@@ -435,15 +439,16 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     # the approved store; a fabricated, unbacked reference string never
     # activates the runtime.
     from oce_control.config_startup import (
-        require_startable, require_secret_resolvable)
+        require_runtime_startable, require_startable)
 
     require_startable()
     actions: list[str] = []
     report = configure()
     actions.append(f"configured secret ({report['secret_source']})")
-    require_secret_resolvable()
-    actions.append("secret reference resolved from approved store (fail-closed)")
-    actions.append("config spine: effective config validated (fail-closed)")
+    # B4-CXR3R7: one unified fail-closed runtime-start gate after init —
+    # configuration posture AND durable secret resolution.
+    require_runtime_startable()
+    actions.append("config spine: effective config validated + secret resolved (fail-closed)")
     if not docker_available():
         raise RuntimeError("Docker is unavailable — the local runtime requires Docker "
                            "(PostgreSQL + Redis run as local containers on loopback)")

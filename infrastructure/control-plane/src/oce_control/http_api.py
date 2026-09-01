@@ -404,9 +404,11 @@ if __name__ == "__main__":
     # store. Direct launchers carry the same obligation as lifecycle-launched
     # servers, so a DB-bound process can never start on an unbacked ref.
     import uvicorn
-    from .config_startup import require_startable, require_secret_resolvable
-    require_startable()
-    require_secret_resolvable()
+    # B4-CXR3R7: one unified fail-closed runtime-start gate — configuration
+    # posture AND durable secret resolution. Nothing reports started/ready
+    # unless the complete runtime-start contract holds.
+    from .config_startup import require_runtime_startable
+    require_runtime_startable()
     host, port = runtime_bind()
     interval = runtime_scheduler_interval()
     app = build_durable_app(scheduler_tick_interval=interval)

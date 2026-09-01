@@ -379,6 +379,95 @@ class TestR3R2RuntimeBind:
 
 
 # --------------------------------------------------------------------------- #
+# B4-CXR3R7 (CXR3-08) — unified startup-truth semantics: validate_startup is
+# the config gate; validate_runtime_readiness / require_runtime_startable are
+# the complete runtime-start contract (config + secret resolution). No
+# contradictory start=True + secret_ok=False combination is possible, and
+# doctor fails when the configured reference does not resolve.
+# --------------------------------------------------------------------------- #
+class TestCXR3R7StartupTruthSemantics:
+    def test_validate_startup_is_config_gate_without_secret_state(self):
+        rep = cs.validate_startup(CLEAN_ENV)
+        assert rep["ok"] is True and rep["start"] is True
+        assert "secret_ok" not in rep  # config gate reports NO secret state
+
+    def test_readiness_requires_secret_resolution(self, tmp_path):
+        from oce_control import local_secrets as ls
+        f = tmp_path / "secrets.json"
+        f.write_text(json.dumps({"postgres_password": "x" * 40}),
+                     encoding="utf-8")
+        backend = ls.RuntimeSecretBackend(f)
+        env = {**CLEAN_ENV, "OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"}
+        ready = cs.validate_runtime_readiness(environ=env, backend=backend)
+        assert ready["ready"] is True and ready["secret_ok"] is True
+        f.unlink()  # store gone -> not ready, never contradictory
+        not_ready = cs.validate_runtime_readiness(environ=env, backend=backend)
+        assert not_ready["ok"] is True
+        assert not_ready["ready"] is False
+        assert not_ready["secret_ok"] is False
+        assert not (not_ready["ready"] and not not_ready["secret_ok"])
+
+    def test_require_runtime_startable_fails_closed_on_missing_secret(self, tmp_path):
+        from oce_control import local_secrets as ls
+        backend = ls.RuntimeSecretBackend(tmp_path / "absent-secrets.json")
+        env = {**CLEAN_ENV, "OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"}
+        with pytest.raises(SystemExit) as exc:
+            cs.require_runtime_startable(environ=env, backend=backend)
+        assert "configure" in str(exc.value)
+
+    def test_require_runtime_startable_returns_effective_when_ready(self, tmp_path):
+        from oce_control import local_secrets as ls
+        f = tmp_path / "secrets.json"
+        f.write_text(json.dumps({"postgres_password": "y" * 40}),
+                     encoding="utf-8")
+        backend = ls.RuntimeSecretBackend(f)
+        eff = cs.require_runtime_startable(
+            environ={**CLEAN_ENV, "OCE_POSTGRES_PASSWORD_REF":
+                     "secret:runtime-local"}, backend=backend)
+        assert eff.get_bool("sandbox.strict") is True
+
+    def _doctor_env(self, monkeypatch, tmp_path, secrets_file: Path):
+        """Mirror the lifecycle doctor-test harness: no docker/ps dependency."""
+        import oce_control.local_lifecycle as ll
+        from oce_control import local_secrets as ls
+        monkeypatch.setattr(ls, "SECRETS_FILE", secrets_file)
+        monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+        (tmp_path / "runtime").mkdir(exist_ok=True)
+        monkeypatch.setattr(ll, "docker_available", lambda: True)
+        monkeypatch.setattr(ll, "published_ports_from_compose", lambda: [])
+        monkeypatch.setattr(ll, "process_cmdline", lambda pid: None)
+        import subprocess as _sp
+
+        class _FakeComp:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        monkeypatch.setattr(_sp, "run", lambda *a, **k: _FakeComp())
+        return ll
+
+    def test_doctor_fails_on_unresolved_secret(self, tmp_path, monkeypatch):
+        # doctor must FAIL when the configured reference does not resolve
+        ll = self._doctor_env(monkeypatch, tmp_path, tmp_path / "absent-doctor.json")
+        result = ll.doctor()
+        checks = {c["check"]: c["ok"] for c in result["checks"]}
+        assert checks["config spine effective config valid (fail-closed)"] is True
+        assert checks["configured secret reference resolves (runtime readiness)"] \
+            is False
+
+    def test_doctor_passes_secret_check_when_store_resolves(self, tmp_path, monkeypatch):
+        from pathlib import Path as _P
+        f = tmp_path / "doctor-secrets.json"
+        f.write_text(json.dumps({"postgres_password": "z" * 40}),
+                     encoding="utf-8")
+        ll = self._doctor_env(monkeypatch, tmp_path, f)
+        result = ll.doctor()
+        checks = {c["check"]: c["ok"] for c in result["checks"]}
+        assert checks["configured secret reference resolves (runtime readiness)"] \
+            is True
+
+
+# --------------------------------------------------------------------------- #
 # B4-CXR3R3 — outbound worker target canonicalized (CXR3-03) + durable
 # PostgreSQL host locked to loopback (CXR3-04).
 # --------------------------------------------------------------------------- #
