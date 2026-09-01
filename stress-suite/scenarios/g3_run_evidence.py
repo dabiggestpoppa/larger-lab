@@ -78,6 +78,17 @@ def build_receipt(sid: str) -> dict:
         "policy_version": a["policy_version"],
         "policy_fingerprint": a["policy_fingerprint"],
         "provenance_conflicts": a["provenance_conflicts"],
+        "provenance_mode": a["provenance_mode"],
+        "synthetic_fixture_authority_used": a["synthetic_fixture_authority_used"],
+        "synthetic_fixture_authority": a["synthetic_fixture_authority"],
+        "max_single_source_lineage_prevalence": a["facts"]["max_single_source_lineage_prevalence"],
+        "prior_exposure_counts": {
+            "true": a["facts"]["prior_exposure_true_count"],
+            "false": a["facts"]["prior_exposure_false_count"],
+            "unknown": a["facts"]["prior_exposure_unknown_count"],
+            "known_ratio": a["facts"]["prior_exposure_known_ratio"],
+        },
+        "unique_epistemic_path_count": a["facts"]["unique_epistemic_path_count"],
         "pass": verdict["pass"],
         "failures": verdict["failures"],
         "authority_changes": "NONE",
@@ -108,6 +119,11 @@ def human_result(sid: str, receipt: dict) -> str:
         f"- friction: triggered={a['friction_triggered']} · information gain={fr.get('information_gain', '—')} · "
         f"alternatives={fr.get('surfaced_alternatives', '—')}",
         f"- counter-attractor: invocations={a['counter_attractor_invocations']} · terminal={ca.get('terminal_result', '—')}",
+        f"- provenance mode: **{a['provenance_mode']}** · synthetic fixture authority: {a['synthetic_fixture_authority_used']} · "
+        f"capability provenance: {(a.get('topology_decision') or {}).get('capability_source', 'N/A')}",
+        f"- single-source prevalence: {a['facts']['max_single_source_lineage_prevalence']} · "
+        f"exposure known/unknown: {a['facts']['prior_exposure_known_ratio']:.2f}/{a['facts']['prior_exposure_unknown_count']} · "
+        f"unique epistemic paths: {a['facts']['unique_epistemic_path_count']}",
         f"- cost units: {a['cost_units']} · authority: {a['authority_before']} -> {a['authority_after']}",
         f"- sealed: expected_accessed={a['expected_accessed_during_run']} · "
         f"hidden_ground_truth_accessed={a['hidden_ground_truth_accessed']}",

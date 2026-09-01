@@ -3,7 +3,7 @@
   "authority_after": "NONE",
   "authority_before": "NONE",
   "authority_changes": "NONE",
-  "behavior_fingerprint": "bf79e784e3c42264ba13ade8cf3b4626",
+  "behavior_fingerprint": "ec879b1fe30196cc1b68a079e4a878ef",
   "capital_mutations": 0,
   "claim_id": "C_S06",
   "cloud_mutations": 0,
@@ -47,11 +47,40 @@
     "fresh_context_count": 0,
     "independent_replication_count": 0,
     "independently_originated_design_count": 0,
+    "known_coverage_by_axis": {
+      "allocator": 1.0,
+      "experiment_design_origin": 1.0,
+      "implementation_path": 1.0,
+      "model_family": 1.0,
+      "prompt_context": 1.0,
+      "provider": 1.0,
+      "retrieval_bundle": 1.0,
+      "runtime_lineage": 1.0,
+      "source_lineage": 1.0
+    },
+    "max_single_source_lineage_prevalence": 1.0,
     "model_family_concentration": 1.0,
     "prior_conclusion_exposure_ratio": 1.0,
+    "prior_exposure_false_count": 0,
+    "prior_exposure_known_ratio": 1.0,
+    "prior_exposure_true_count": 10,
+    "prior_exposure_true_ratio_among_known": 1.0,
+    "prior_exposure_unknown_count": 0,
     "raw_reviewer_count": 10,
     "retrieval_concentration": 1.0,
     "source_concentration": 1.0,
+    "unique_epistemic_path_count": 0,
+    "unknown_count_by_axis": {
+      "allocator": 0,
+      "experiment_design_origin": 0,
+      "implementation_path": 0,
+      "model_family": 0,
+      "prompt_context": 0,
+      "provider": 0,
+      "retrieval_bundle": 0,
+      "runtime_lineage": 0,
+      "source_lineage": 0
+    },
     "unknown_dimension_count": 0
   },
   "failures": [],
@@ -89,20 +118,37 @@
     "FULL_SHARED_CONTEXT"
   ],
   "latency_units": 0,
+  "max_single_source_lineage_prevalence": 1.0,
   "pass": true,
-  "policy_fingerprint": "15a5f90f6dafd7e8c318ad2b",
+  "policy_fingerprint": "79bd8f6a2157b10f20596e6c",
   "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
-  "policy_version": "V2",
+  "policy_version": "V3",
+  "prior_exposure_counts": {
+    "false": 0,
+    "known_ratio": 1.0,
+    "true": 10,
+    "unknown": 0
+  },
   "production_mutations": 0,
   "provenance_conflicts": [],
+  "provenance_mode": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
   "raw_reviewer_count": 10,
   "raw_vote_distribution": {
     "ALPHA": 10
   },
   "review_topology_id": "",
-  "run_identity_fingerprint": "4d36a87c06b8c8af4c35159f8ea53c7c",
+  "run_identity_fingerprint": "fed2edd8b4346f3ca534d4d2587e927f",
   "scenario_id": "S06",
   "scenario_version": "1.0.0",
+  "synthetic_fixture_authority": {
+    "agent_claims_trusted": false,
+    "mode": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+    "model_calls": 0,
+    "scope": "provenance_and_capability_facts_for_this_pack",
+    "wall_clock_free": true
+  },
+  "synthetic_fixture_authority_used": true,
   "topology_decision": null,
-  "topology_status": "NONE"
+  "topology_status": "NONE",
+  "unique_epistemic_path_count": 0
 }

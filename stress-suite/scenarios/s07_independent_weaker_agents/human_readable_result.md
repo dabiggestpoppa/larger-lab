@@ -9,6 +9,8 @@
 - topology decision: `TOPO_B_DIFFERENTIATED` (satisfied=True, cost=24)
 - friction: triggered=False · information gain=— · alternatives=—
 - counter-attractor: invocations=0 · terminal=—
+- provenance mode: **AUTHORITATIVE_SYNTHETIC_FIXTURE** · synthetic fixture authority: True · capability provenance: AUTHORITATIVE_SYNTHETIC_CAPABILITY
+- single-source prevalence: 0.5 · exposure known/unknown: 1.00/0 · unique epistemic paths: 0
 - cost units: 24 · authority: NONE -> NONE
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
-- behavior fingerprint: `ecfe8a491912ca9462316f5d37ec0e3b`
+- behavior fingerprint: `0e44a11fba9c977ed3a0997cfa7c4742`

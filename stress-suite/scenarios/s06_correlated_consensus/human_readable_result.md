@@ -9,6 +9,8 @@
 - topology decision: `—` (satisfied=—, cost=—)
 - friction: triggered=True · information gain=False · alternatives=()
 - counter-attractor: invocations=0 · terminal=—
+- provenance mode: **AUTHORITATIVE_SYNTHETIC_FIXTURE** · synthetic fixture authority: True · capability provenance: N/A
+- single-source prevalence: 1.0 · exposure known/unknown: 1.00/0 · unique epistemic paths: 0
 - cost units: 5 · authority: NONE -> NONE
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
-- behavior fingerprint: `bf79e784e3c42264ba13ade8cf3b4626`
+- behavior fingerprint: `ec879b1fe30196cc1b68a079e4a878ef`
