@@ -57,31 +57,76 @@ def _chmod(path: Path, mode: int) -> None:
         pass
 
 
-def initialize_runtime_secret(environ: dict | None = None) -> str:
-    """INITIALIZATION path ONLY (explicit `configure` / first governed start).
+def _atomic_write_json(path: Path, data: dict) -> None:
+    """Atomically persist *data* to *path* (same-directory tmp + os.replace).
 
-    May accept an operator-supplied POSTGRES_PASSWORD (from *environ*) or
-    generate a strong ephemeral secret, and PERSISTS the result in the
-    approved untracked store (.runtime/secrets.json, 0600). Runtime read
-    paths (read_runtime_secret / derive_runtime_dsn / require_runtime_dsn /
-    compose_environment) never call this — an ambient POSTGRES_PASSWORD can
-    therefore never mutate secret authority while the runtime is running
-    (B4-CXR3R1).
+    A crash mid-write can never leave a partially-written secrets.json: the
+    approved store is either the complete previous state or the complete new
+    state (B4-CXR4R1, test H).
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp-{os.getpid()}")
+    try:
+        tmp.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        _chmod(tmp, 0o600)
+        os.replace(tmp, path)
+    finally:
+        try:
+            tmp.unlink()
+        except FileNotFoundError:
+            pass
+    _chmod(path, 0o600)
+
+
+def initialize_runtime_secret(environ: dict | None = None) -> str:
+    """INITIALIZATION path — ONE-TIME ONLY (B4-CXR4R1).
+
+    FIRST INITIALIZATION (store absent):
+      * may accept an explicitly authorized operator POSTGRES_PASSWORD from
+        *environ*, or generate a strong ephemeral secret;
+      * persists atomically to the approved untracked store
+        (.runtime/secrets.json, 0600).
+
+    ALREADY INITIALIZED (store exists):
+      * ordinary start/restart/configure MUST NEVER overwrite it;
+      * ambient POSTGRES_PASSWORD MUST NOT rotate it, erase metadata, or be
+        silently adopted;
+      * if the store exists but the ambient POSTGRES_PASSWORD differs, this
+        FAILS CLOSED with a "use the explicit rotation path" message;
+      * if the store exists but is unreadable/corrupt, this FAILS CLOSED
+        instead of destroying it.
+
+    Runtime read paths (read_runtime_secret / derive_runtime_dsn /
+    require_runtime_dsn / compose_environment) never call this — an ambient
+    POSTGRES_PASSWORD can therefore never mutate secret authority while the
+    runtime is running.
     """
     env = environ if environ is not None else os.environ
-    env_pw = env.get("POSTGRES_PASSWORD")
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     _chmod(RUNTIME_DIR, 0o700)
+    if SECRETS_FILE.exists():
+        existing = load_runtime_secret()
+        if existing is None:
+            raise RuntimeError(
+                "approved secret store exists but is unreadable/corrupt — "
+                "manual remediation required; OCE never overwrites an "
+                "existing store (B4-CXR4R1)")
+        env_pw = env.get("POSTGRES_PASSWORD")
+        if env_pw and env_pw != existing:
+            raise RuntimeError(
+                "secret already initialized and ambient POSTGRES_PASSWORD "
+                "differs from the approved store — use the explicit rotation "
+                "path; ordinary start/restart/configure never rotates secret "
+                "authority (B4-CXR4R1)")
+        return existing
+    # FIRST INITIALIZATION: store absent
+    env_pw = env.get("POSTGRES_PASSWORD")
     if env_pw:
         data = {"postgres_password": env_pw, "source": "environment"}
     else:
-        existing = load_runtime_secret()
-        if existing:
-            return existing
         data = {"postgres_password": secrets.token_urlsafe(MIN_SECRET_BYTES),
                 "source": "generated"}
-    SECRETS_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    _chmod(SECRETS_FILE, 0o600)
+    _atomic_write_json(SECRETS_FILE, data)
     return data["postgres_password"]
 
 
@@ -235,10 +280,9 @@ class RuntimeSecretBackend:
         return data if isinstance(data, dict) else {}
 
     def _save(self, data: dict) -> None:
-        f = self.file
-        f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        _chmod(f, 0o600)
+        # Atomic (same-dir tmp + os.replace): a failed rotation/revocation can
+        # never leave a partially rewritten secrets.json (B4-CXR4R1, test H).
+        _atomic_write_json(self.file, data)
 
     # -- reference semantics ------------------------------------------------
     # (the persistence helpers _load/_save above are lazy-bound to SECRETS_FILE)

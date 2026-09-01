@@ -517,8 +517,9 @@ def _worker_token() -> str:
     if "worker_token" not in data:
         data["worker_token"] = _s.token_urlsafe(24)
         ls.RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
-        ls.SECRETS_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        ls._chmod(ls.SECRETS_FILE, 0o600)
+        # Atomic write: never partially rewrites the store, and existing
+        # entries (postgres_password, b4_meta, ...) survive exactly (B4-CXR4R1).
+        ls._atomic_write_json(ls.SECRETS_FILE, data)
     return data["worker_token"]
 
 

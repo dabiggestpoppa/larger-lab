@@ -187,6 +187,145 @@ def test_restart_uses_same_governed_secret():
 
 
 # --------------------------------------------------------------------------
+# B4-CXR4R1 — ONE-TIME secret initialization (CXR4-01): ordinary
+# start/restart/recover/configure are READ-ONLY over an existing approved
+# store. Ambient POSTGRES_PASSWORD may materialize a MISSING store only
+# through the explicit INIT path, may never rewrite an existing store, and
+# may never rotate/erase metadata. Denials have zero authority-side effects.
+# --------------------------------------------------------------------------
+
+def _seed_initialized_store() -> dict:
+    """Write a fully-initialized approved store (password + worker token +
+    b4_meta + an unrelated secret entry) — the state an already-initialized
+    store has after configure + first start."""
+    data = {
+        "postgres_password": "s" * 40,
+        "source": "generated",
+        "worker_token": "w" * 40,
+        "another_entry": "another-secret-value",
+        "b4_meta": {"runtime-local": {"generation": 1, "revoked": False}},
+    }
+    ls.SECRETS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    ls.SECRETS_FILE.write_text(json.dumps(data), encoding="utf-8")
+    return data
+
+
+def _mock_docker_runtime(monkeypatch) -> None:
+    """Mock every docker/process surface so ll.start()/restart()/recover()
+    run deterministically without a live stack."""
+    monkeypatch.setattr(ll, "docker_available", lambda: True)
+    monkeypatch.setattr(ll, "compose", lambda *a, **k: _FakeComp(0))
+    monkeypatch.setattr(ll, "wait_ready", lambda *a, **k: True)
+    monkeypatch.setattr(ll, "migrate", lambda: _FakeComp(0))
+    monkeypatch.setattr(ll, "wait_for_http", lambda *a, **k: True)
+    monkeypatch.setattr(ll, "smoke", lambda: [("health", True), ("console", True)])
+    monkeypatch.setattr(ll, "start_process",
+                        lambda *a, **k: ls.RUNTIME_DIR / "mock.pid")
+
+
+def test_cxr4r1_a_start_never_rewrites_existing_store(monkeypatch):
+    # A. existing store + ambient POSTGRES_PASSWORD + start() -> store hash
+    #    BEFORE == AFTER (ordinary start fails closed, never rotates)
+    _seed_initialized_store()
+    before = _store_snapshot()
+    monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-differs-9876543210")
+    with pytest.raises(RuntimeError, match="explicit rotation path"):
+        ll.start()
+    assert _store_snapshot() == before
+
+
+def test_cxr4r1_b_restart_never_rewrites_existing_store(monkeypatch):
+    # B. same attack through restart (CLI restart = stop -> start): the safe
+    #    shutdown half is always allowed; the activation half fails closed.
+    _seed_initialized_store()
+    before = _store_snapshot()
+    monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-differs-9876543210")
+    _mock_docker_runtime(monkeypatch)
+    monkeypatch.setattr(ll, "stop_runtime_processes", lambda: [])
+    ll.stop()
+    with pytest.raises(RuntimeError, match="explicit rotation path"):
+        ll.start()
+    assert _store_snapshot() == before
+
+
+def test_cxr4r1_c_recover_never_rewrites_existing_store(monkeypatch):
+    # C. same attack through recover(): the repair path never consults an
+    #    ambient password and never rewrites the approved store.
+    _seed_initialized_store()
+    before = _store_snapshot()
+    monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-differs-9876543210")
+    _mock_docker_runtime(monkeypatch)
+    ll.recover()
+    assert _store_snapshot() == before
+
+
+def test_cxr4r1_d_e_meta_and_token_survive_start_restart_configure(monkeypatch):
+    # D+E. b4_meta and worker_token survive configure/start/restart exactly;
+    #    unrelated entries are never lost.
+    _seed_initialized_store()
+    before = _store_snapshot()
+    ll.configure()
+    assert _store_snapshot() == before
+    _mock_docker_runtime(monkeypatch)
+    ll.start()
+    assert _store_snapshot() == before
+    monkeypatch.setattr(ll, "stop_runtime_processes", lambda: [])
+    ll.stop()
+    ll.start()  # CLI restart semantics: stop -> start
+    assert _store_snapshot() == before
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert data["worker_token"] == "w" * 40
+    assert data["b4_meta"]["runtime-local"]["generation"] == 1
+    assert data["another_entry"] == "another-secret-value"
+
+
+def test_cxr4r1_f_first_clean_initialization_still_works(monkeypatch):
+    # F. explicit operator password on the FIRST governed init is honored;
+    #    a clean init with no ambient value generates a strong secret.
+    monkeypatch.setenv("POSTGRES_PASSWORD", "explicit-init-pw-1234567890")
+    pw = ls.initialize_runtime_secret()
+    assert pw == "explicit-init-pw-1234567890"
+    assert ls.load_runtime_secret() == pw
+
+
+def test_cxr4r1_g_rotation_changes_only_authorized_secret_and_generation():
+    # G. explicit rotation is attributable + atomic: only the authorized
+    #    secret value and its generation metadata change.
+    _seed_initialized_store()
+    backend = ls.RuntimeSecretBackend()
+    assert backend.generation("runtime-local") == 1
+    backend.rotate("runtime-local", "rotated-governed-secret-abcdef123456")
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert data["postgres_password"] == "rotated-governed-secret-abcdef123456"
+    assert data["worker_token"] == "w" * 40  # untouched
+    assert data["another_entry"] == "another-secret-value"  # untouched
+    assert data["b4_meta"]["runtime-local"]["generation"] == 2
+    assert data["b4_meta"]["runtime-local"]["revoked"] is False
+
+
+def test_cxr4r1_h_failed_initialization_never_partially_rewrites(monkeypatch):
+    # H. corrupt existing store -> REFUSED (never destroyed); an atomic-write
+    #    failure mid-init -> no partial secrets.json, no stray tmp file.
+    ls.SECRETS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    ls.SECRETS_FILE.write_text("{corrupt-not-json", encoding="utf-8")
+    corrupt = ls.SECRETS_FILE.read_bytes()
+    with pytest.raises(RuntimeError, match="unreadable/corrupt"):
+        ls.initialize_runtime_secret()
+    assert ls.SECRETS_FILE.read_bytes() == corrupt  # not overwritten
+    ls.SECRETS_FILE.unlink()
+    import os as _os
+
+    def _boom(src, dst):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(_os, "replace", _boom)
+    with pytest.raises(OSError, match="disk full"):
+        ls.initialize_runtime_secret()
+    assert not ls.SECRETS_FILE.exists()  # no partial file
+    assert not list(ls.RUNTIME_DIR.glob("*.tmp-*"))  # no stray tmp
+
+
+# --------------------------------------------------------------------------
 # Ports — loopback only
 # --------------------------------------------------------------------------
 
