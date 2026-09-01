@@ -390,23 +390,36 @@ def independent_confirmation_satisfied(
     min_model_or_runtime_lineages: int = 2,
     max_prior_exposure_ratio: float = 0.0,
     min_fresh_or_independent_design: int = 1,
+    require_known_exposure_coverage: Optional[bool] = None,
+    min_source_known_coverage: Optional[float] = None,
 ) -> bool:
     """PROVISIONAL test-contract sufficiency. Explicitly NOT universal truth.
 
     Independent confirmation requires BOTH source and model/runtime diversity —
-    source diversity alone never implies model independence (P0-A)."""
+    source diversity alone never implies model independence (P0-A).
+
+    G3R2-05: UNKNOWN prior-conclusion exposure is neither TRUE nor FALSE. For
+    HIGH/MEDIUM consequence the contract requires KNOWN exposure coverage
+    (`require_known_exposure_coverage` defaults to that): a reviewer whose
+    exposure is UNKNOWN can never satisfy an "unexposed" requirement.
+
+    G3R2-09: the fresh/design/replication requirement counts UNIQUE qualifying
+    epistemic paths (one path with several properties is one path)."""
     if facts.distinct_source_lineages < min_source_lineages:
-        return False
-    if facts.distinct_model_family_count < 1 and facts.distinct_runtime_lineage_count < 1:
         return False
     model_or_runtime = max(facts.distinct_model_family_count, facts.distinct_runtime_lineage_count)
     if model_or_runtime < min_model_or_runtime_lineages:
         return False
-    if facts.prior_conclusion_exposure_ratio > max_prior_exposure_ratio:
+    if require_known_exposure_coverage is None:
+        require_known_exposure_coverage = facts.consequence_class in ("HIGH", "MEDIUM")
+    if require_known_exposure_coverage and facts.prior_exposure_known_ratio < 1.0:
+        return False                       # UNKNOWN exposure cannot satisfy "unexposed"
+    if facts.prior_exposure_true_ratio_among_known > max_prior_exposure_ratio:
         return False
-    fresh_or_design = (facts.independent_replication_count + facts.fresh_context_count
-                       + facts.independently_originated_design_count)
-    if fresh_or_design < min_fresh_or_independent_design:
+    if min_source_known_coverage is not None and \
+            facts.known_coverage_by_axis.get("source_lineage", 0.0) < min_source_known_coverage:
+        return False                       # G3R2-06: unknown-heavy sets cannot look diverse
+    if facts.unique_epistemic_path_count < min_fresh_or_independent_design:
         return False
     return True
 
@@ -432,11 +445,20 @@ class EcologyFacts:
     distinct_experiment_design_count: int = 0
     independently_originated_design_count: int = 0   # G3R-06: provenance-based
     source_concentration: Optional[float] = None
+    max_single_source_lineage_prevalence: Optional[float] = None   # G3R2-04
     model_family_concentration: Optional[float] = None
     retrieval_concentration: Optional[float] = None
     prior_conclusion_exposure_ratio: float = 0.0
+    prior_exposure_true_count: int = 0              # G3R2-05
+    prior_exposure_false_count: int = 0             # G3R2-05
+    prior_exposure_unknown_count: int = 0           # G3R2-05
+    prior_exposure_known_ratio: float = 0.0         # G3R2-05 known / all
+    prior_exposure_true_ratio_among_known: float = 0.0  # G3R2-05
     fresh_context_count: int = 0
     independent_replication_count: int = 0
+    unique_epistemic_path_count: int = 0            # G3R2-09: distinct qualifying paths
+    known_coverage_by_axis: Dict[str, float] = field(default_factory=dict)   # G3R2-06
+    unknown_count_by_axis: Dict[str, int] = field(default_factory=dict)      # G3R2-06
     disagreement_count: int = 0
     discriminating_contradiction_found: bool = False
     challenge_budget_exhausted: bool = False
@@ -479,8 +501,31 @@ class EcologyFacts:
             if p.fresh_context:
                 fresh += 1
         pce_true = sum(1 for p in profiles if p.prior_conclusion_exposure is True)
+        pce_false = sum(1 for p in profiles if p.prior_conclusion_exposure is False)
+        pce_unknown = len(profiles) - pce_true - pce_false
         votes = consensus.raw_vote_distribution or {}
         dominant_count = max(votes.values()) if votes else 0
+        # G3R2-04: max single-source prevalence — the most common single source
+        # across reviewers with KNOWN source provenance (partial-bundle overlap
+        # is a shared dependency even when whole bundles differ).
+        known_sources = [p for p in profiles if p.source_lineages]
+        prevalence: Optional[float] = None
+        if known_sources:
+            source_counts: Dict[str, int] = {}
+            for p in known_sources:
+                for s in set(p.source_lineages):
+                    source_counts[s] = source_counts.get(s, 0) + 1
+            prevalence = max(source_counts.values()) / len(known_sources)
+        # G3R2-06: per-axis known coverage / unknown counts survive into facts
+        cov_axes: Dict[str, float] = {}
+        unc_axes: Dict[str, int] = {}
+        for ax in ("model_family", "provider", "runtime_lineage", "retrieval_bundle",
+                   "prompt_context", "implementation_path", "experiment_design_origin",
+                   "allocator", "source_lineage"):
+            known = sum(1 for p in profiles if p.known_axis(ax))
+            cov_axes[ax] = (known / len(profiles)) if profiles else 0.0
+            unc_axes[ax] = len(profiles) - known
+        paths = collect_epistemic_paths(profiles, independent_replication_count)
         return cls(
             consequence_class=consequence_class,
             raw_reviewer_count=len(profiles),
@@ -495,11 +540,21 @@ class EcologyFacts:
             distinct_experiment_design_count=len(axes["experiment_design_origin"]),
             independently_originated_design_count=sum(1 for p in profiles if p.independently_originated_design),
             source_concentration=consensus.source_lineage_concentration,
+            max_single_source_lineage_prevalence=prevalence,
             model_family_concentration=consensus.model_family_concentration,
             retrieval_concentration=consensus.retrieval_bundle_concentration,
             prior_conclusion_exposure_ratio=(pce_true / len(profiles)) if profiles else 0.0,
+            prior_exposure_true_count=pce_true,
+            prior_exposure_false_count=pce_false,
+            prior_exposure_unknown_count=pce_unknown,
+            prior_exposure_known_ratio=((pce_true + pce_false) / len(profiles)) if profiles else 0.0,
+            prior_exposure_true_ratio_among_known=(
+                (pce_true / (pce_true + pce_false)) if (pce_true + pce_false) else 0.0),
             fresh_context_count=fresh,
             independent_replication_count=independent_replication_count,
+            unique_epistemic_path_count=len(paths),
+            known_coverage_by_axis=cov_axes,
+            unknown_count_by_axis=unc_axes,
             disagreement_count=len(consensus.disagreement_retained),
             discriminating_contradiction_found=discriminating_contradiction_found,
             challenge_budget_exhausted=challenge_budget_exhausted,
@@ -515,9 +570,15 @@ class EcologyFacts:
             "distinct_runtime_lineage_count", "distinct_retrieval_bundle_count",
             "distinct_allocator_count", "distinct_experiment_design_count",
             "independently_originated_design_count", "source_concentration",
+            "max_single_source_lineage_prevalence",
             "model_family_concentration", "retrieval_concentration",
-            "prior_conclusion_exposure_ratio", "fresh_context_count",
-            "independent_replication_count", "disagreement_count",
+            "prior_conclusion_exposure_ratio",
+            "prior_exposure_true_count", "prior_exposure_false_count",
+            "prior_exposure_unknown_count", "prior_exposure_known_ratio",
+            "prior_exposure_true_ratio_among_known",
+            "fresh_context_count", "independent_replication_count",
+            "unique_epistemic_path_count", "known_coverage_by_axis",
+            "unknown_count_by_axis", "disagreement_count",
             "discriminating_contradiction_found", "challenge_budget_exhausted",
             "counter_attractor_attempted", "unknown_dimension_count")}
 
@@ -604,6 +665,122 @@ class CorrelatedFailureRecord:
 
 
 # --------------------------------------------------------------------------- #
+# G3R2-02 / §13 — explicit provenance authority semantics.
+#
+# A reviewer's CLAIMED provenance is never its own authority. Two explicit modes:
+#
+#   GOVERNED_REGISTRY             — decision-grade axes come ONLY from the governed
+#                                   registered_provenance table; a missing entry
+#                                   fails closed (all independence axes UNKNOWN).
+#   AUTHORITATIVE_SYNTHETIC_FIXTURE — the harness itself owns the synthetic ground
+#                                   truth for a deterministic test pack; fixture
+#                                   fields ARE authoritative observable data.
+#                                   Explicit in the scenario contract, never
+#                                   inferred. This does NOT make agent claims
+#                                   trusted — it makes the harness the authority.
+#
+# The default (GOVERNED_REGISTRY) fails closed: no registry file => no verified
+# provenance => claims are never promoted.
+# --------------------------------------------------------------------------- #
+PROVENANCE_MODES = ("GOVERNED_REGISTRY", "AUTHORITATIVE_SYNTHETIC_FIXTURE")
+DEFAULT_PROVENANCE_MODE = "GOVERNED_REGISTRY"
+
+# Capability provenance (G3R2-10): capability_tiers are evidence only when the
+# provenance of the capability fact is explicit. UNVERIFIED never satisfies a
+# positive minimum-capability requirement.
+CAPABILITY_SOURCES = (
+    "AUTHORITATIVE_SYNTHETIC_CAPABILITY",
+    "REGISTERED_CAPABILITY",
+    "UNVERIFIED_CAPABILITY",
+)
+
+
+@dataclass(frozen=True)
+class SyntheticFixtureAuthority:
+    """Explicit mode marker (G3R2-02/§13): "for this deterministic test pack,
+    these provenance/capability facts are supplied by the harness as
+    authoritative observable fixture data." It is NOT a trust grant for agent
+    self-claims; receipts must record when synthetic authority was used."""
+
+    mode: str = "AUTHORITATIVE_SYNTHETIC_FIXTURE"
+    scope: str = "provenance_and_capability_facts_for_this_pack"
+    agent_claims_trusted: bool = False
+    wall_clock_free: bool = True
+    model_calls: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"mode": self.mode, "scope": self.scope,
+                "agent_claims_trusted": self.agent_claims_trusted,
+                "wall_clock_free": self.wall_clock_free, "model_calls": self.model_calls}
+
+
+# --------------------------------------------------------------------------- #
+# G3R2-09 — unique epistemic paths, not summed labels
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class EpistemicPathRecord:
+    """One distinct qualifying epistemic path. A single path may carry several
+    attributes (fresh_context AND independent_design AND replication) but is
+    still ONE path — a path with two properties must never be counted twice.
+    Identity is `path_id`; duplicated ids count once. A path whose provenance is
+    entirely UNKNOWN does not qualify as an independent epistemic path."""
+
+    path_id: str
+    fresh_context: bool = False
+    independent_design: bool = False
+    independent_replication: bool = False
+    reviewer_id: str = UNKNOWN
+    runtime_lineage: str = UNKNOWN
+    evidence_refs: Tuple[str, ...] = ()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"path_id": self.path_id, "fresh_context": self.fresh_context,
+                "independent_design": self.independent_design,
+                "independent_replication": self.independent_replication,
+                "reviewer_id": self.reviewer_id, "runtime_lineage": self.runtime_lineage,
+                "evidence_refs": list(self.evidence_refs)}
+
+
+_PATH_KNOWN_AXES = ("model_family", "runtime_lineage", "source_lineage",
+                    "retrieval_bundle", "experiment_design_origin")
+
+
+def collect_epistemic_paths(
+    profiles: Sequence[ReviewerIndependenceProfile],
+    independent_replication_count: int = 0,
+) -> Tuple[EpistemicPathRecord, ...]:
+    """Unique qualifying epistemic paths (G3R2-09).
+
+    * A reviewer path qualifies when it is fresh-context and/or
+      independently-originated-design AND its provenance is not entirely
+      UNKNOWN (unknown path provenance does not qualify).
+    * Reviewer paths are keyed by reviewer identity; a duplicated reviewer id
+      counts once.
+    * Replication paths are distinct fixture-declared replications (REPL:N),
+      each its own identity.
+    """
+    paths: Dict[str, EpistemicPathRecord] = {}
+    for p in profiles:
+        if not (p.fresh_context or p.independently_originated_design):
+            continue
+        if not any(p.known_axis(ax) for ax in _PATH_KNOWN_AXES):
+            continue                       # unknown path provenance does not qualify
+        paths[p.reviewer_id] = EpistemicPathRecord(
+            path_id=f"REVIEWER:{p.reviewer_id}",
+            fresh_context=p.fresh_context,
+            independent_design=p.independently_originated_design,
+            reviewer_id=p.reviewer_id,
+            runtime_lineage=p.runtime_lineage,
+            evidence_refs=p.evidence_refs,
+        )
+    for i in range(max(0, int(independent_replication_count))):
+        paths[f"REPL:{i}"] = EpistemicPathRecord(
+            path_id=f"REPL:{i}", independent_replication=True,
+            evidence_refs=(f"REPLICATION:{i}",))
+    return tuple(sorted(paths.values(), key=lambda r: r.path_id))
+
+
+# --------------------------------------------------------------------------- #
 # §31 AllocationProvenance — PO influence observable, never evidentiary
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
@@ -674,6 +851,7 @@ class RegisteredReviewerProvenance:
     fresh_context: bool = False
     exposure_mode: str = UNKNOWN
     independently_originated_design: bool = False
+    capability_tier: str = UNKNOWN      # G3R2-10: registered capability fact (if known)
 
     @classmethod
     def from_fixture(cls, entry: Mapping[str, Any]) -> "RegisteredReviewerProvenance":
@@ -694,6 +872,7 @@ class RegisteredReviewerProvenance:
             fresh_context=bool(entry.get("fresh_context", False)),
             exposure_mode=_norm(entry.get("visible_information", UNKNOWN)),
             independently_originated_design=bool(entry.get("independent_design", False)),
+            capability_tier=_norm(entry.get("capability_tier", UNKNOWN)),
         )
 
     def axis_value(self, axis: str) -> str:
@@ -720,6 +899,7 @@ class RegisteredReviewerProvenance:
             "fresh_context": self.fresh_context,
             "exposure_mode": self.exposure_mode,
             "independently_originated_design": self.independently_originated_design,
+            "capability_tier": self.capability_tier,
         }
 
 
@@ -772,18 +952,52 @@ class ReviewerProvenanceRegistry:
 
     def bind(self, claimed: ReviewerIndependenceProfile) -> Tuple[ReviewerIndependenceProfile, Tuple[ProvenanceConflict, ...]]:
         """Bind a CLAIMED profile to registry truth. Registered UNKNOWN does NOT
-        promote the claim (G3R-07 fail-closed); conflicts are returned."""
+        promote the claim (G3R-07 fail-closed); conflicts are returned.
+
+        G3R2-01: when NO registry record exists at all, every decision-grade
+        independence axis of the bound profile becomes UNKNOWN / non-qualifying
+        (fail-closed). Identity, conclusion and evidence refs remain as claims
+        but acquire NO verified independence semantics."""
         reg = self._by_id.get(claimed.reviewer_id)
         if reg is None:
-            # no registry record at all: nothing is verified; claim is not promoted
-            conflicts = tuple(
-                ProvenanceConflict(claimed.reviewer_id, ax, claimed.axis_value(ax), UNKNOWN,
-                                   "UNVERIFIED_CLAIM")
-                for ax in ("model_family", "runtime_lineage", "source_lineage",
-                           "retrieval_bundle", "allocator", "experiment_design_origin")
-                if claimed.known_axis(ax)
+            # no registry record: nothing is verified — force every
+            # independence-bearing axis to UNKNOWN / non-qualifying
+            claimed_conflicts: List[ProvenanceConflict] = []
+            for ax in ("model_family", "provider", "runtime_lineage", "source_lineage",
+                       "retrieval_bundle", "prompt_context", "experiment_design_origin",
+                       "allocator", "prior_conclusion_exposure"):
+                if claimed.known_axis(ax):
+                    claimed_conflicts.append(ProvenanceConflict(
+                        claimed.reviewer_id, ax, claimed.axis_value(ax), UNKNOWN,
+                        "UNVERIFIED_CLAIM"))
+            if claimed.fresh_context:
+                claimed_conflicts.append(ProvenanceConflict(
+                    claimed.reviewer_id, "fresh_context", True, False, "UNVERIFIED_CLAIM"))
+            if claimed.exposure_mode not in (UNKNOWN, "FULL_SHARED_CONTEXT"):
+                claimed_conflicts.append(ProvenanceConflict(
+                    claimed.reviewer_id, "exposure_mode", claimed.exposure_mode, UNKNOWN,
+                    "UNVERIFIED_CLAIM"))
+            if claimed.independently_originated_design:
+                claimed_conflicts.append(ProvenanceConflict(
+                    claimed.reviewer_id, "independently_originated_design", True, False,
+                    "UNVERIFIED_CLAIM"))
+            conflicts = tuple(claimed_conflicts)
+            bound = replace(
+                claimed,
+                model_family=UNKNOWN,
+                provider=UNKNOWN,
+                runtime_lineage=UNKNOWN,
+                source_lineages=(),
+                retrieval_bundle=UNKNOWN,
+                prompt_context=UNKNOWN,
+                experiment_design_origin=UNKNOWN,
+                allocator=UNKNOWN,
+                prior_conclusion_exposure=None,
+                fresh_context=False,
+                exposure_mode=UNKNOWN,
+                independently_originated_design=False,
             )
-            return claimed, conflicts
+            return bound, conflicts
         conflicts: List[ProvenanceConflict] = []
         kw: Dict[str, Any] = {}
 
