@@ -1,0 +1,20 @@
+{
+  "scenario_id": "S16",
+  "scenario_version": "1.0.0",
+  "domain": "CEREBUS/FX",
+  "threat_class": "SILENT_DOCTRINE_REWRITE",
+  "doctrine_claims_ref": "doctrine_claims.json",
+  "reproductions_ref": "reproductions.json",
+  "amendment_proposal": {
+    "amendment_ref": "amendment.json"
+  },
+  "current_facts": {
+    "domain": "CEREBUS/FX",
+    "claim_type": "DOCTRINE_CLAIM"
+  },
+  "expected_outcome": "CONTRADICTION_OPEN",
+  "hidden_ground_truth": {
+    "doctrine_empirically_challenged": true,
+    "doctrine_still_canonical_until_ratification": true
+  }
+}

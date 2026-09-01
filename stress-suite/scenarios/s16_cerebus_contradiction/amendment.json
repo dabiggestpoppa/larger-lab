@@ -1,0 +1,18 @@
+{
+  "amendment_id": "AMEND_CEREBUS_P90_001",
+  "original_claim_id": "CEREBUS_V4_P90_TARGET_METRICS",
+  "contradicting_evidence_refs": ["REPRO_CLEAN_1"],
+  "scope": "CEREBUS FX P90 filtered regime target metrics",
+  "possible_explanations": [
+    "regime drift since manual authorship",
+    "round-trip cost regime change",
+    "manual claim editorialized target rather than observed statistic"
+  ],
+  "reproduction_confidence": "HIGH_CONFIDENCE",
+  "affected_surface": "CEREBUS strategy doctrine (targets/limits)",
+  "dependent_strategies": ["CEREBUS CFD expansion engine sizing cascade"],
+  "requested_amendment": "revise win-rate band and drawdown target to observed reproduction distribution",
+  "rollback_implications": "all governed CEREBUS strategy semantics revert to manual baseline until re-ratified",
+  "operator_required": true,
+  "ratified": false
+}

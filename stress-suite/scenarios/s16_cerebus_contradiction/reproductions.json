@@ -1,0 +1,37 @@
+[
+  {
+    "reproduction_id": "REPRO_CLEAN_1",
+    "claim_id": "CEREBUS_V4_P90_TARGET_METRICS",
+    "dataset_lineage": "synthetic fixture: exact manual conditions (P90 protocol, filters, tier sizing)",
+    "implementation_version": "cerebus_p90_sim_1.0.0",
+    "exact_conditions": [
+      "M5 candle close in activation window",
+      "pre-session checklist applied",
+      "news filter applied",
+      "tier sizing applied"
+    ],
+    "pit_status": "PIT_CLEAN",
+    "execution_assumptions": ["2bp round-trip", "limit fills inside spreads to 90%"],
+    "sample_size": 2400,
+    "result": "CONTRADICTS_CLAIM",
+    "uncertainty": "HIGH_CONFIDENCE",
+    "protocol_fingerprint": "frozen-before-evaluation:proto-repro-1",
+    "independence_lineage": "independent lineage L2 (different estimator, same governed conditions)",
+    "known_deviations": []
+  },
+  {
+    "reproduction_id": "REPRO_FLAWED_1",
+    "claim_id": "CEREBUS_V4_P90_TARGET_METRICS",
+    "dataset_lineage": "synthetic fixture with documented deviation",
+    "implementation_version": "cerebus_p90_sim_debug_0.1",
+    "exact_conditions": ["M5 candle close in activation window"],
+    "pit_status": "PIT_CLEAN",
+    "execution_assumptions": ["zero-cost guaranteed fills"],
+    "sample_size": 300,
+    "result": "CONTRADICTS_CLAIM",
+    "uncertainty": "LOW_CONFIDENCE",
+    "protocol_fingerprint": "frozen-before-evaluation:proto-repro-2",
+    "independence_lineage": "same lineage as production run",
+    "known_deviations": ["timestamp_leakage_in_label", "wrong_session_window", "zero_cost_fills"]
+  }
+]
