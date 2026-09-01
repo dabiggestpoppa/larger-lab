@@ -101,21 +101,34 @@ def postgres_dsn() -> str:
     return f"postgresql://{PG_USER}:{pw}@{PG_HOST}:{PG_PORT}/{PG_DB}"
 
 
-def require_runtime_dsn() -> str:
-    """Fail-closed DSN for API/worker entrypoints.
+def require_runtime_dsn(environ: dict | None = None) -> str:
+    """Fail-closed DSN for API/worker entrypoints (B4-R3R4).
 
-    Prefers POSTGRES_DSN, then the runtime secret store. Raises with a
-    clear remediation hint when neither exists — there is deliberately no
-    predictable fallback.
+    The DSN is DERIVED from the governed secret store boundary — never from
+    an ambient POSTGRES_DSN that could bypass Book 4 secret validation.
+
+    A caller-supplied POSTGRES_DSN is accepted ONLY when it equals the
+    governed derivation (i.e. it is the runtime's own internal propagation,
+    e.g. compose_environment()); a DSN that diverges from the governed
+    secret reference is REJECTED as a bypass. Raises with a clear
+    remediation hint when the store is absent — no predictable fallback.
     """
-    env_dsn = os.environ.get("POSTGRES_DSN")
+    env = environ if environ is not None else os.environ
+    env_dsn = env.get("POSTGRES_DSN")
     if env_dsn:
-        return env_dsn
+        governed = postgres_dsn()
+        if env_dsn == governed:
+            return env_dsn  # internal runtime propagation, matches the store
+        raise RuntimeError(
+            "POSTGRES_DSN conflicts with the governed secret-derived DSN — "
+            "set the secret reference (OCE_POSTGRES_PASSWORD_REF) and let OCE "
+            "derive the DSN (B4-R3R4); external DSN bypasses are rejected")
     if SECRETS_FILE.exists() or os.environ.get("POSTGRES_PASSWORD"):
         return postgres_dsn()
     raise RuntimeError(
-        "no PostgreSQL DSN configured: set POSTGRES_DSN or run "
-        "`python scripts/oce_local.py configure` to generate a local secret"
+        "no PostgreSQL DSN configured: run "
+        "`python scripts/oce_local.py configure` to materialize the local "
+        "runtime secret"
     )
 
 

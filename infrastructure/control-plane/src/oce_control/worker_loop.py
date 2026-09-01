@@ -16,15 +16,15 @@ import time
 
 def _default_dsn() -> str:
     """Fail-closed DSN: never a predictable default (B2-R7)."""
-    from . import local_secrets
-    return local_secrets.require_runtime_dsn()
+    from .config_startup import governed_runtime_dsn
+    return governed_runtime_dsn()
 
 
 def main(argv=None) -> None:
     parser = argparse.ArgumentParser(description="OCE B2 runtime worker")
     parser.add_argument("--worker-id", default=os.environ.get("OCE_WORKER_ID", "worker-local01"))
     parser.add_argument("--token", default=os.environ.get("OCE_WORKER_TOKEN"))
-    parser.add_argument("--dsn", default=os.environ.get("POSTGRES_DSN") or _default_dsn())
+    parser.add_argument("--dsn", default=_default_dsn())
     parser.add_argument("--interval", type=float, default=3.0)
     parser.add_argument("--lease-ttl", type=int, default=60)
     parser.add_argument("--capabilities", default="*")

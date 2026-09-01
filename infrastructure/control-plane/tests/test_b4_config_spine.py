@@ -747,17 +747,25 @@ class TestAdversarialMatrix:
 
 
 # --------------------------------------------------------------------------- #
+# shared backed helper for secret-store proofs
+# --------------------------------------------------------------------------- #
+def _make_backend(tmp_path, provision: bool = True,
+                  value: str = "genuine-secret-abc123"):
+    from oce_control import local_secrets as ls
+    f = tmp_path / "secrets.json"
+    if provision:
+        f.write_text(json.dumps({"postgres_password": value}), encoding="utf-8")
+    return ls.RuntimeSecretBackend(f)
+
+
+# --------------------------------------------------------------------------- #
 # B4-R3R3 — secret-reference model: configuration/init vs runtime/start.
 # Runtime start passes ONLY when the reference resolves in the approved
 # store; a fabricated-but-unresolvable reference string fails closed.
 # --------------------------------------------------------------------------- #
 class TestR3R3SecretResolution:
     def _backend(self, tmp_path, provision: bool = True, value: str = "genuine-secret-abc123"):
-        from oce_control import local_secrets as ls
-        f = tmp_path / "secrets.json"
-        if provision:
-            f.write_text(json.dumps({"postgres_password": value}), encoding="utf-8")
-        return ls.RuntimeSecretBackend(f)
+        return _make_backend(tmp_path, provision=provision, value=value)
 
     def test_missing_required_reference_fails_closed(self, tmp_path):
         import oce_control.config_startup as cs
@@ -846,6 +854,75 @@ class TestR3R3SecretResolution:
         eff_redacted = json.dumps(eff.redacted())
         assert "EVIDENCE-CANARY-SECRET-98765" not in eff_redacted
         assert "EVIDENCE-CANARY-SECRET-98765" not in eff.fingerprint
+
+
+# --------------------------------------------------------------------------- #
+# B4-R3R4 — database runtime bound to the governed secret resolution boundary
+# --------------------------------------------------------------------------- #
+class TestR3R4DatabaseSecretBinding:
+    def _backend(self, tmp_path, provision: bool = True,
+                 value: str = "genuine-secret-abc123"):
+        return _make_backend(tmp_path, provision=provision, value=value)
+
+    def test_governed_dsn_derived_from_resolved_secret(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = _make_backend(tmp_path, provision=True,
+                                value="DB-BOUND-SECRET-12345")
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        dsn = cs.governed_runtime_dsn(eff=eff, backend=backend)
+        assert "DB-BOUND-SECRET-12345" in dsn
+        assert dsn.startswith("postgresql://oce_control_admin:")
+        assert "@127.0.0.1:5433/oce_control" in dsn
+
+    def test_governed_dsn_honors_canonical_host(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=True)
+        eff = cs.effective_from_env({
+            "OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local",
+            "OCE_POSTGRES_HOST": "127.0.0.1",
+        })
+        dsn = cs.governed_runtime_dsn(eff=eff, backend=backend)
+        assert "@127.0.0.1:" in dsn
+
+    def test_external_postgres_dsn_bypass_denied(self, tmp_path, monkeypatch):
+        import oce_control.config_startup as cs
+        from oce_control import local_secrets as ls
+        backend = _make_backend(tmp_path, provision=True,
+                                value="REAL-SECRET-FROM-STORE")
+        # point the module store at the same tmp file so require_runtime_dsn
+        # derives the SAME governed DSN
+        monkeypatch.setattr(ls, "SECRETS_FILE", tmp_path / "secrets.json")
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        governed = cs.governed_runtime_dsn(eff=eff, backend=backend)
+        # an operator-supplied divergent DSN must never win (fail closed)
+        monkeypatch.setenv("POSTGRES_DSN", "postgresql://u:p@10.0.0.9:5432/other")
+        with pytest.raises(RuntimeError, match="bypass"):
+            ls.require_runtime_dsn()
+        # internal propagation of the governed DSN is accepted
+        monkeypatch.setenv("POSTGRES_DSN", governed)
+        assert ls.require_runtime_dsn() == governed
+
+    def test_resolution_evidence_never_contains_secret_or_dsn(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=True,
+                                value="EVIDENCE-CANARY-DSN-SECRET")
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        ev = cs.secret_resolution_evidence(eff=eff, backend=backend)
+        blob = json.dumps(ev)
+        assert ev["resolved"] is True
+        assert ev["reference"] == "secret:runtime-local"
+        assert ev["generation"] >= 1
+        assert "EVIDENCE-CANARY-DSN-SECRET" not in blob
+        assert "postgresql://" not in blob
+
+    def test_resolution_evidence_reports_failure_safely(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=False)
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        ev = cs.secret_resolution_evidence(eff=eff, backend=backend)
+        assert ev["resolved"] is False
+        assert "configure" in (ev["error"] or "")
+        assert "postgresql://" not in json.dumps(ev)
 
 
 # --------------------------------------------------------------------------- #

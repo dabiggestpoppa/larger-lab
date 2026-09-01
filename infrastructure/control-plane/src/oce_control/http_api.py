@@ -339,7 +339,14 @@ def build_durable_app(*, dsn: Optional[str] = None, scheduler_tick_interval: int
     from .pg_worker import PgWorkerProtocol
     from .health import HealthService
 
-    dsn = dsn or os.environ.get("POSTGRES_DSN") or _default_dsn()
+    # B4-R3R4: the durable database path derives from the governed secret
+    # boundary (postgres.password_ref -> approved store -> ephemeral DSN). An
+    # ambient POSTGRES_DSN/POSTGRES_PASSWORD can no longer redirect the
+    # connection away from the spine-validated secret.
+    from .config_startup import governed_runtime_dsn, require_secret_resolvable
+    if dsn is None:
+        require_secret_resolvable()
+        dsn = governed_runtime_dsn()
     conn = psycopg2.connect(dsn)
     conn.autocommit = False
 

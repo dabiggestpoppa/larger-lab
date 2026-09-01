@@ -82,9 +82,21 @@ def test_require_runtime_dsn_fails_closed_without_secret():
         ls.require_runtime_dsn()
 
 
-def test_require_runtime_dsn_prefers_environment(monkeypatch):
+def test_require_runtime_dsn_rejects_external_bypass(monkeypatch):
+    # B4-R3R4: an ambient POSTGRES_DSN that diverges from the governed secret
+    # store is rejected (external DSN bypass denies fail closed).
+    ls.ensure_runtime_secret()
     monkeypatch.setenv("POSTGRES_DSN", "postgresql://u:p@127.0.0.1:5433/db")
-    assert ls.require_runtime_dsn() == "postgresql://u:p@127.0.0.1:5433/db"
+    with pytest.raises(RuntimeError, match="bypass"):
+        ls.require_runtime_dsn()
+
+
+def test_require_runtime_dsn_accepts_governed_propagation(monkeypatch):
+    # The runtime's OWN internal propagation (exactly the governed DSN) is
+    # accepted — this is how compose_environment passes it to subprocesses.
+    ls.ensure_runtime_secret()
+    monkeypatch.setenv("POSTGRES_DSN", ls.postgres_dsn())
+    assert ls.require_runtime_dsn() == ls.postgres_dsn()
 
 
 # --------------------------------------------------------------------------

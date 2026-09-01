@@ -169,6 +169,57 @@ def effective_from_env(environ: dict | None = None,
     })
 
 
+def governed_runtime_dsn(environ: dict | None = None,
+                         backend: "ls.RuntimeSecretBackend | None" = None,
+                         eff: EffectiveConfig | None = None) -> str:
+    """Build the ephemeral PostgreSQL DSN from the governed secret boundary.
+
+    path: effective config -> postgres.password_ref -> approved store ->
+          in-memory DSN (never logged, evidenced, or fingerprinted).
+
+    The host comes from the canonical postgres.host setting; user/db/port
+    come from the documented local runtime constants. An ambient
+    POSTGRES_DSN/POSTGRES_PASSWORD bypass is impossible here — the DSN is
+    derived, not read.
+    """
+    if eff is None:
+        eff = effective_from_env(environ)
+    password = resolve_startup_secret(eff, backend)
+    host = eff.get("postgres.host") or ls.PG_HOST
+    return (f"postgresql://{ls.PG_USER}:{password}@{host}:"
+            f"{ls.PG_PORT}/{ls.PG_DB}")
+
+
+def secret_resolution_evidence(environ: dict | None = None,
+                               backend: "ls.RuntimeSecretBackend | None" = None,
+                               eff: EffectiveConfig | None = None) -> dict:
+    """Safe, evidence-ready record of secret resolution.
+
+    Records ONLY: reference identity, resolver/backend identity,
+    generation/version, and resolution success/failure. NEVER the password,
+    a password-bearing DSN, or any digest suitable for offline recovery.
+    """
+    if eff is None:
+        eff = effective_from_env(environ)
+    backend = backend or ls.RuntimeSecretBackend()
+    ref = eff.get("postgres.password_ref")
+    name = ref.split(":", 1)[1] if isinstance(ref, str) and ":" in ref else ref
+    try:
+        resolve_startup_secret(eff, backend)
+        ok, error = True, None
+    except (KeyError, PermissionError, ValidationError, ValueError) as exc:
+        ok, error = False, redact_message(str(exc))
+    return {
+        "reference": ref,
+        "backend": "local-runtime-store-v1",
+        "generation": backend.generation(name) if isinstance(name, str) else None,
+        "revoked": backend.is_revoked(name) if isinstance(name, str) else None,
+        "resolved": ok,
+        "error": error,
+        # deliberately excludes: password value, DSN, secret digest
+    }
+
+
 def resolve_startup_secret(eff: EffectiveConfig,
                            backend: "ls.RuntimeSecretBackend | None" = None) -> str:
     """Resolve ``postgres.password_ref`` through the approved local store.
