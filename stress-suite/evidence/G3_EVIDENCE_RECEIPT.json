@@ -1,0 +1,149 @@
+{
+  "gate_id": "G3",
+  "status": "PASS_G3_COGNITIVE_ECOLOGY",
+  "authorization": "G3 ONLY — S06..S09 — DO NOT BEGIN G4",
+  "starting_sha": "9310b4af00617b9116efc1da48f2723634ab8db0",
+  "receipt_lineage": {
+    "artifacts_head_sha": "590fb252e275a5940e7098d1931c55a52f8f68d9",
+    "receipt_content_parent_sha": "590fb252e275a5940e7098d1931c55a52f8f68d9",
+    "externally_verified_branch_head": null,
+    "self_pin_attempted": false,
+    "note": "A receipt file cannot contain the SHA of the commit that contains it. artifacts_head_sha pins the commit holding all engine/scenario/test artifacts; receipt_content_parent_sha is the parent of the G3R commit; externally_verified_branch_head is filled only by an external push/verify step (G3-P0-C)."
+  },
+  "commits": [
+    "ae0a456588311661b386ef0ce00b8277d57b0b74 STRESS-G3P0: normalize cognitive independence axes and receipt lineage semantics",
+    "2dbd7968dd7a39b044aa25dfe97d2d41b1cf601d STRESS-G3A: shared cognitive-ecology policy and deterministic scenario runner",
+    "bb7bb5f4101b15c9ae1e4a02bbb6e50f056f6ae6 STRESS-G3B: review-topology constraint router + S07 scenario",
+    "c2433b24cb5e19d30f50f3227e9233a4a8eeeae8 STRESS-G3C: epistemic friction protocol and counter-attractor review contracts",
+    "590fb252e275a5940e7098d1931c55a52f8f68d9 STRESS-G3C2: expose EpistemicFrictionProtocol as the \u00a79 protocol surface",
+    "cd4b958518e8c276565efc341489b8e3efdffea6 STRESS-S06: correlated-consensus scenario pack and test family",
+    "10824a388a24ee2b31fe13e43f2a9360ecb63f6c STRESS-S08: reflective-bypass scenario pack and test family",
+    "003bc467b35a6828712bc9ce143bab4d88046ffa STRESS-S09: counter-attractor false-alarm scenario pack and test family",
+    "7330a51a1f51b23d2f679e17b62893f9b339c055 STRESS-G3X: cross-scenario audits, independence-dimension swaps, sealing metamorphics",
+    "<STRESS-G3R>: archive G3 evidence package (this commit)"
+  ],
+  "tests": {
+    "old_tests_preserved": 278,
+    "new_g3_tests": 76,
+    "total_pass": 354,
+    "g3p0": 11,
+    "s06_family": 9,
+    "s07_family": 9,
+    "s08_family": 10,
+    "s09_family": 9,
+    "cross_scenario": 22,
+    "receipt_integrity": 6
+  },
+  "scenarios": {
+    "S06": {
+      "pass": true,
+      "expected_disposition": "SUPPORTED_BUT_CORRELATED",
+      "disposition": "SUPPORTED_BUT_CORRELATED",
+      "behavior_fingerprint": "15c985382e7cb4f83be2362627baabce",
+      "raw_reviewer_count": 10,
+      "raw_vote_distribution": {"ALPHA": 10},
+      "distinct_source_lineages": 1,
+      "distinct_model_family_count": 1,
+      "distinct_runtime_lineage_count": 1,
+      "prior_conclusion_exposure_ratio": 1.0,
+      "independent_confirmation_satisfied": false,
+      "friction_triggered": true,
+      "friction_information_gain": false,
+      "counter_attractor_terminal": null,
+      "cost_units": 5
+    },
+    "S07": {
+      "pass": true,
+      "expected_disposition": "REQUIRES_INDEPENDENT_REVIEW",
+      "disposition": "REQUIRES_INDEPENDENT_REVIEW",
+      "behavior_fingerprint": "e130ada1870bcca349fea5eab897a5b0",
+      "raw_reviewer_count": 2,
+      "raw_vote_distribution": {"BETA": 2},
+      "distinct_source_lineages": 2,
+      "distinct_model_family_count": 2,
+      "distinct_runtime_lineage_count": 2,
+      "prior_conclusion_exposure_ratio": 0.0,
+      "independent_confirmation_satisfied": false,
+      "chosen_topology": "TOPO_B_DIFFERENTIATED",
+      "constraints_satisfied": true,
+      "cost_units": 24
+    },
+    "S08": {
+      "pass": true,
+      "expected_disposition": "SUPPORTED_BUT_CORRELATED",
+      "disposition": "SUPPORTED_BUT_CORRELATED",
+      "behavior_fingerprint": "5a8ea3a0a07efd2ab94ba294b6340ae6",
+      "raw_reviewer_count": 5,
+      "raw_vote_distribution": {"ELEGANT_A": 5},
+      "distinct_source_lineages": 1,
+      "distinct_model_family_count": 1,
+      "distinct_runtime_lineage_count": 1,
+      "prior_conclusion_exposure_ratio": 1.0,
+      "independent_confirmation_satisfied": false,
+      "friction_triggered": true,
+      "friction_information_gain": true,
+      "surfaced_alternatives": ["ALT_B"],
+      "evidence_gap_recorded": true,
+      "cost_units": 5
+    },
+    "S09": {
+      "pass": true,
+      "expected_disposition": "INDEPENDENTLY_SUPPORTED",
+      "disposition": "INDEPENDENTLY_SUPPORTED",
+      "behavior_fingerprint": "d1e60eda8ba1d68bcd6b99f38cf40a6c",
+      "raw_reviewer_count": 8,
+      "raw_vote_distribution": {"REGIME_A": 8},
+      "distinct_source_lineages": 3,
+      "distinct_model_family_count": 3,
+      "distinct_runtime_lineage_count": 3,
+      "prior_conclusion_exposure_ratio": 0.0,
+      "independent_confirmation_satisfied": true,
+      "friction_triggered": false,
+      "counter_attractor_terminal": "NO_CHANGE",
+      "challenge_budget_bounded": true,
+      "cost_units": 9
+    }
+  },
+  "shared_policy": {
+    "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
+    "path": "stress-suite/scenarios/policies/G3_COGNITIVE_ECOLOGY_POLICY.json",
+    "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+    "no_scenario_literals": true,
+    "drives_all_scenarios": true
+  },
+  "independence_semantics": {
+    "source_model_axes_distinct": true,
+    "unknown_stays_unknown": true,
+    "unambiguous_allocator_retrieval_counts": true,
+    "no_effective_sample_size_scalar": true,
+    "experimental_summary_only": "EXPERIMENTAL_NON_AUTHORITATIVE",
+    "pairwise_overlap_axes": [
+      "model_family", "provider", "runtime_lineage", "source_lineage",
+      "retrieval_bundle", "prompt_context", "prior_conclusion_exposure",
+      "implementation_path", "experiment_design", "allocator"
+    ]
+  },
+  "sealing": {
+    "expected_accessed_during_run": false,
+    "hidden_ground_truth_accessed": false,
+    "wrong_expected_verdict_does_not_alter_action": true,
+    "hidden_truth_flip_does_not_alter_action": true,
+    "scenario_rename_preserves_behavior_fingerprint": true,
+    "reviewer_rename_preserves_topology_decision": true
+  },
+  "cost": {
+    "usd": 0,
+    "model_calls": 0,
+    "local_only": true
+  },
+  "mutations": {
+    "cloud": 0,
+    "production": 0,
+    "capital": 0,
+    "authority_changes": "NONE"
+  },
+  "contradictions_new": [],
+  "contradictions_carried": ["CON-02", "CON-03"],
+  "ambiguities_carried": ["AMB-03", "AMB-08", "AMB-11", "AMB-13"],
+  "next_gate": "G4"
+}
