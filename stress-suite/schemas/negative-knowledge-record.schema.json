@@ -22,16 +22,23 @@
     "seq": {"type": "integer", "minimum": 0},
     "permanent_by_operator_authority": {"type": ["string","null"]},
     "permanence_authority": {
-      "description": "G4-P0-C attributable authority block: actor, actual AuthorityState level, authority basis, ratification reference, binding kind",
+      "description": "G4-P0-C/G4R-08 attributable authority block: actor, actual AuthorityState level, authority basis, ratification reference, binding kind. REQUIRED whenever permanent_by_operator_authority is non-null; schema and Python validation agree (G4R-09)",
       "type": ["object","null"],
       "properties": {
-        "actor": {"type": "string"},
-        "actual_level": {"type": "string"},
-        "authority_basis": {"type": "string"},
-        "ratification_ref": {"type": "string"},
-        "binding": {"type": "string"}
+        "actor": {"type": "string", "minLength": 1},
+        "actual_level": {"type": "string", "enum": ["OPERATOR"]},
+        "authority_basis": {"type": "string", "minLength": 1},
+        "ratification_ref": {"type": "string", "minLength": 1},
+        "binding": {"type": "string", "enum": ["EXACT_AUTHORITY_STATE"]}
       },
+      "required": ["actor","actual_level","authority_basis","ratification_ref","binding"],
       "additionalProperties": false
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"permanent_by_operator_authority": {"type": "string", "minLength": 1}}, "required": ["permanent_by_operator_authority"]},
+      "then": {"required": ["permanence_authority"]}
+    }
+  ]
 }
