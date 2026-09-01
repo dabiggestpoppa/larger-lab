@@ -177,9 +177,13 @@ def _run_worker(tmp_path: Path, url: str, job_id: str, *, ws_base: str,
     """Launch a SEPARATE worker process that dials OUT, fetches the governed
     job from the control plane, and executes it end-to-end."""
     env = dict(os.environ)
+    # B4-CXR3R3: the worker derives its outbound target from the validated
+    # effective config (OCE_CONTROL_PLANE_PORT); OCE_CP_URL is not an
+    # override surface.
     env.update({
         "PYTHONPATH": str(BASE / "src") + os.pathsep + env.get("PYTHONPATH", ""),
-        "OCE_CP_URL": url, "OCE_WORKER_ID": WORKER_ID,
+        "OCE_CONTROL_PLANE_PORT": str(int(url.rsplit(":", 1)[1])),
+        "OCE_WORKER_ID": WORKER_ID,
         "OCE_WORKER_SECRET": SECRET, "OCE_JOB_FILE": "",
         "OCE_WS_BASE": str(tmp_path / ws_base),
         "OCE_ARTIFACT_BASE": str(tmp_path / (ws_base + "-cas")),

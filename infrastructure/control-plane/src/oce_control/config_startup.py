@@ -186,6 +186,13 @@ def governed_runtime_dsn(environ: dict | None = None,
         eff = effective_from_env(environ)
     password = resolve_startup_secret(eff, backend)
     host = eff.get("postgres.host") or ls.PG_HOST
+    # CXR3-04 defense in depth: the durable DB host may only be the local
+    # loopback while the Book 4 local-first contract is in force.
+    if host not in ("127.0.0.1", "localhost"):
+        from oce_control.config_spine import ValidationError as _VE
+        raise _VE(
+            "postgres.host is not loopback — governed DSN derivation "
+            "refuses non-local durable truth (B4-CXR3R3); value not echoed")
     return (f"postgresql://{ls.PG_USER}:{password}@{host}:"
             f"{ls.PG_PORT}/{ls.PG_DB}")
 
@@ -351,6 +358,33 @@ def require_startable(environ: dict | None = None) -> EffectiveConfig:
     except ValidationError as exc:
         raise SystemExit(startup_report(environ)) from exc
     return eff
+
+
+def outbound_cp_url(environ: dict | None = None) -> str:
+    """Canonical outbound control-plane target for workers (B4-CXR3R3).
+
+    The Book 4 activation gate ALWAYS runs first regardless of whether
+    OCE_CP_URL is set — a worker can never skip validation by supplying the
+    URL. OCE_CP_URL is NOT an arbitrary operational string: when present it
+    is treated as a VERIFIED COMPATIBILITY ASSERTION that must equal the
+    canonical loopback endpoint derived from the validated effective config
+    (control_plane.host + control_plane.port). Anything else — external
+    host (10.x / 192.168.x / public hostname), noncanonical port, embedded
+    credentials, path/query — fails closed before any socket activity.
+    """
+    env = environ if environ is not None else os.environ
+    eff = require_startable(env)  # gate first: forbidden config still blocks
+    canonical = (f"http://{eff.get('control_plane.host')}:"
+                 f"{eff.get('control_plane.port')}")
+    url = env.get("OCE_CP_URL")
+    if not url:
+        return canonical
+    if url.rstrip("/") != canonical:
+        raise SystemExit(
+            "OCE startup BLOCKED: OCE_CP_URL is not the canonical loopback "
+            f"control-plane endpoint (expected {canonical}) — workers derive "
+            "their target from the validated effective config (B4-CXR3R3)")
+    return url
 
 
 def gate_start(args_start: object | None = None) -> dict:

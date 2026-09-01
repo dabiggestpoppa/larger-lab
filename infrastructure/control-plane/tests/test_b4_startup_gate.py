@@ -379,6 +379,101 @@ class TestR3R2RuntimeBind:
 
 
 # --------------------------------------------------------------------------- #
+# B4-CXR3R3 — outbound worker target canonicalized (CXR3-03) + durable
+# PostgreSQL host locked to loopback (CXR3-04).
+# --------------------------------------------------------------------------- #
+class TestCXR3R3WorkerTargetAndDbHost:
+    def test_oce_cp_url_external_hosts_blocked(self):
+        for bad in ("http://10.0.0.9:8448", "http://192.168.1.5:8448",
+                    "http://example.com:8448", "https://public-host",
+                    "http://[2001:db8::1]:8448"):
+            with pytest.raises(SystemExit) as exc:
+                cs.outbound_cp_url({**CLEAN_ENV, "OCE_CP_URL": bad})
+            assert "BLOCKED" in str(exc.value)
+
+    def test_oce_cp_url_noncanonical_port_blocked(self):
+        with pytest.raises(SystemExit):
+            cs.outbound_cp_url({**CLEAN_ENV, "OCE_CP_URL": "http://127.0.0.1:9999"})
+
+    def test_oce_cp_url_embedded_credentials_blocked(self):
+        with pytest.raises(SystemExit):
+            cs.outbound_cp_url(
+                {**CLEAN_ENV, "OCE_CP_URL": "http://user:pass@127.0.0.1:8448"})
+
+    def test_oce_cp_url_forbidden_config_still_blocks(self):
+        # the gate runs FIRST: OCE_CP_URL cannot skip require_startable()
+        with pytest.raises(SystemExit) as exc:
+            cs.outbound_cp_url({
+                **CLEAN_ENV, "OCE_EXECUTION_BROKER_ENABLED": "true",
+                "OCE_CP_URL": "http://127.0.0.1:8448"})
+        assert "broker" in str(exc.value).lower()  # config denial, not URL msg
+
+    def test_oce_cp_url_canonical_loopback_accepted(self):
+        url = cs.outbound_cp_url(
+            {**CLEAN_ENV, "OCE_CP_URL": "http://127.0.0.1:8448"})
+        assert url == "http://127.0.0.1:8448"
+
+    def test_canonical_url_follows_validated_config_port(self):
+        env = {**CLEAN_ENV, "OCE_CONTROL_PLANE_PORT": "8455"}
+        assert cs.outbound_cp_url(env) == "http://127.0.0.1:8455"
+        assert cs.outbound_cp_url(
+            {**env, "OCE_CP_URL": "http://127.0.0.1:8455"}) == \
+            "http://127.0.0.1:8455"
+        with pytest.raises(SystemExit):
+            cs.outbound_cp_url({**env, "OCE_CP_URL": "http://127.0.0.1:8448"})
+
+    def test_worker_subprocess_blocks_external_url_before_socket(self):
+        # separate-process proof: external OCE_CP_URL + dummy secret exits
+        # BLOCKED before any client/socket activity
+        import subprocess
+        import sys
+        from pathlib import Path as _P
+        env = dict(os.environ)
+        src = str(_P(__file__).resolve().parent.parent / "src")
+        env["PYTHONPATH"] = src + os.pathsep + env.get("PYTHONPATH", "")
+        env["OCE_CP_URL"] = "http://10.0.0.9:8448"
+        env["OCE_WORKER_SECRET"] = "dummy-secret"
+        env["OCE_WORKER_ID"] = "worker-x"
+        script = str(_P(__file__).resolve().parent.parent
+                     / "scripts" / "oce_b3_worker.py")
+        r = subprocess.run([sys.executable, script], env=env,
+                           capture_output=True, text=True, timeout=60)
+        assert r.returncode != 0
+        assert "BLOCKED" in (r.stderr + r.stdout)
+        assert "connect" not in (r.stderr + r.stdout).lower()
+
+    def test_postgres_host_external_rejected_via_env(self):
+        for bad in ("external.example", "10.0.0.9", "192.168.1.5",
+                    "2001:db8::1", "user:pass@127.0.0.1",
+                    "https://db.example"):
+            with pytest.raises(ValidationError):
+                cs.effective_from_env({**CLEAN_ENV, "OCE_POSTGRES_HOST": bad})
+        # only the canonical identity 127.0.0.1 is accepted under the
+        # local-first contract (deterministic, single-valued)
+        with pytest.raises(ValidationError):
+            cs.effective_from_env({**CLEAN_ENV, "OCE_POSTGRES_HOST": "localhost"})
+        eff = cs.effective_from_env(
+            {**CLEAN_ENV, "OCE_POSTGRES_HOST": "127.0.0.1"})
+        assert eff.get("postgres.host") == "127.0.0.1"
+
+    def test_postgres_host_external_rejected_via_file_and_cli(self):
+        from oce_control.config_spine import ConfigResolver
+        reg = build_default_registry()
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve({
+                "file": {"postgres.host": "10.0.0.9",
+                         "postgres.password_ref": "secret:x"}})
+        with pytest.raises(ValidationError):
+            ConfigResolver(reg).resolve(
+                {"file": {"postgres.password_ref": "secret:x"}},
+                cli={"postgres.host": "external.example"})
+        # canonical still resolves
+        eff = ConfigResolver(reg).resolve({
+            "file": {"postgres.password_ref": "secret:x"}})
+        assert eff.get("postgres.host") == "127.0.0.1"
+
+
+# --------------------------------------------------------------------------- #
 # B4-CXR3R2 — no arbitrary runtime DSN injection: worker --dsn removed,
 # build_durable_app has no DSN override, migrations cannot redirect outside
 # the governed loopback database.

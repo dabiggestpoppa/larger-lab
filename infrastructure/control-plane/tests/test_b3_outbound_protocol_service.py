@@ -163,9 +163,12 @@ def test_full_outbound_path_with_separate_worker_process(pg, store, service, tmp
         "params": {"value": "oce-b3"},
     }), encoding="utf-8")
     env = dict(os.environ)
+    # B4-CXR3R3: the worker derives its outbound target from the validated
+    # effective config (OCE_CONTROL_PLANE_PORT); OCE_CP_URL is not an
+    # override surface.
     env.update({
         "PYTHONPATH": str(BASE / "src") + os.pathsep + env.get("PYTHONPATH", ""),
-        "OCE_CP_URL": url,
+        "OCE_CONTROL_PLANE_PORT": str(int(url.rsplit(":", 1)[1])),
         "OCE_WORKER_ID": WORKER_ID,
         "OCE_WORKER_SECRET": SECRET,
         "OCE_JOB_FILE": str(jobfile),

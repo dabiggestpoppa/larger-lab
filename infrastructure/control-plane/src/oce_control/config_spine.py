@@ -278,9 +278,16 @@ def build_default_registry() -> SettingsRegistry:
                 owner="policy", default=False, has_default=True,
                 validation_rule="denied by default; cannot be activated",
                 mutability="restart", tags=("network", "deny-by-default")))
-    reg(Setting(name="postgres.host", value_type="str", owner="operator",
-                default="127.0.0.1", mutability="restart",
-                validation_rule="local database bind", tags=("database",)))
+    # B4-CXR3R3 (CXR3-04): while the Book 4 contract is local/private-first,
+    # durable PostgreSQL truth may ONLY live on the loopback identity
+    # 127.0.0.1. External hostnames, RFC1918 remotes, IPv6 non-loopback, and
+    # credential/URL-shaped values are rejected at resolution; future remote
+    # DB topology is a separate authorized increment.
+    reg(Setting(name="postgres.host", value_type="enum", owner="operator",
+                enum=("127.0.0.1",), default="127.0.0.1", has_default=True,
+                mutability="restart",
+                validation_rule="loopback-only local database bind (127.0.0.1)",
+                tags=("database", "network")))
     def _valid_secret_ref(v) -> None:
         if not isinstance(v, str) or not SECRET_REF_RE.match(v):
             raise ValidationError(
@@ -690,6 +697,13 @@ def validate_effective(effective: EffectiveConfig) -> None:
     # sessions: mandatory auth
     if effective.get_bool("sessions.auth_required") is False:
         raise ValidationError("sessions.auth_required=False weakens outbound auth")
+
+    # durable PostgreSQL truth stays on the local loopback (CXR3-04)
+    if effective.get("postgres.host") != "127.0.0.1":
+        raise ValidationError(
+            "postgres.host must be 127.0.0.1 (loopback only) under the "
+            "local-first Book 4 contract — remote database redirection is "
+            "not authorized")
 
 
 # --------------------------------------------------------------------------- #
