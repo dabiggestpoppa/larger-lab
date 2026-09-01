@@ -89,7 +89,7 @@ class TestEvidenceBlob:
 
     def test_naive_datetime_rejected(self) -> None:
         with pytest.raises(ValidationError):
-            _blob(created_at=datetime(2026, 9, 1, 12, 0, 0))
+            _blob(created_at=datetime(2026, 9, 1, 12, 0, 0))  # noqa: DTZ001 — naive input is the test subject
 
     def test_unknown_extra_field_rejected(self) -> None:
         with pytest.raises(ValidationError):
@@ -140,7 +140,7 @@ class TestAcquisitionRecord:
 
     def test_naive_datetime_rejected(self) -> None:
         with pytest.raises(ValidationError):
-            self._record(requested_start=datetime(2026, 9, 1, 12, 0, 0))
+            self._record(requested_start=datetime(2026, 9, 1, 12, 0, 0))  # noqa: DTZ001 — naive input is the test subject
 
     def test_utc_normalization(self) -> None:
         # 14:00 +02:00 == 12:00Z — proves timezone conversion to UTC.
