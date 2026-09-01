@@ -34,6 +34,8 @@ from .cognitive_ecology import (
     ReviewerIndependenceProfile, DependencyGraph, ConsensusRecord, EcologyFacts,
     CognitiveEcologyHealthRecord, CorrelatedFailureRecord, AllocationProvenance,
     RegisteredReviewerProvenance, ProvenanceConflict, ReviewerProvenanceRegistry,
+    SyntheticFixtureAuthority, EpistemicPathRecord, collect_epistemic_paths,
+    PROVENANCE_MODES, DEFAULT_PROVENANCE_MODE, CAPABILITY_SOURCES, UNKNOWN,
     SAME, DIFFERENT,
     independent_confirmation_satisfied, receipt_lineage, EXPOSURE_MODES, PAIRWISE_AXES,
 )
@@ -67,6 +69,8 @@ __all__ = [
     "ReviewerIndependenceProfile", "DependencyGraph", "ConsensusRecord", "EcologyFacts",
     "CognitiveEcologyHealthRecord", "CorrelatedFailureRecord", "AllocationProvenance",
     "RegisteredReviewerProvenance", "ProvenanceConflict", "ReviewerProvenanceRegistry",
+    "SyntheticFixtureAuthority", "EpistemicPathRecord", "collect_epistemic_paths",
+    "PROVENANCE_MODES", "DEFAULT_PROVENANCE_MODE", "CAPABILITY_SOURCES", "UNKNOWN",
     "SAME", "DIFFERENT",
     "independent_confirmation_satisfied", "receipt_lineage", "EXPOSURE_MODES", "PAIRWISE_AXES",
     "EcologyPolicy", "EcologyRule", "EcologyPolicyError",
