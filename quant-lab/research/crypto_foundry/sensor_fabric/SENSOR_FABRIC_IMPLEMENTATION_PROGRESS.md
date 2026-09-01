@@ -11,15 +11,15 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 3 — PRODUCTION PROVIDER ADAPTER ARCHITECTURE (common foundation) |
-| Current checkpoint | SENSOR-B3-I10R1 COMPLETE — TARGETED REPAIR RECHECK (PASS_SENSOR_B3_I10R1_TARGETED_REPAIR_RECHECK; combined with the immutable I10 baseline: PASS_SENSOR_B3_I10_PRODUCTION_ADAPTER_NETWORK_SMOKE — network validation PASS 17/17 logical, 18/18 physical) |
+| Current checkpoint | SENSOR-B3-I10R2 COMPLETE — SEMANTIC CONSISTENCY SEAL (PASS_SENSOR_B3_I10R2_SEMANTIC_CONSISTENCY_SEALED proposed; Gate adjudication reconciled to A_PRIOR_CHARACTERIZATION_ERROR; Gate completion sealed LIMITED; gate-adapter-v2 / kraken-adapter-v2; Kraken additive firewall; 5/5 targeted recheck LIVE_PASS; combined I10 baseline + I10R1 overlay + I10R2 seal: PASS_SENSOR_B3_I10_PRODUCTION_ADAPTER_NETWORK_SMOKE = OPERATOR_ACCEPTABLE — network validation PASS 17/17 logical, 18/18 physical) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY); DERIBIT I08 HELD pending I08R1 (completion-truth seal) ; I08R1 COMPLETE, PASS_SENSOR_B3_I08R1_DERIBIT_SEALED ACCEPTED (I08R1-RATIFY); DERIBIT OFFLINE_FROZEN; I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE COMPLETE (PASS proposed, awaiting operator review); I09R1 AUTHORITY-BOUNDARY MICROSEAL COMPLETE (duplicate I14 promotion + duplicate human readiness rows now fail closed; explicit complete verification coverage required; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN pre-I10; PASS ACCEPTED via SENSOR-B3-I09R1-RATIFY) · I09R1-RATIFY COMPLETE (operator ACCEPTED PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED; authorized I10 network smoke ONLY) · I10 CONTROLLED PRODUCTION-ADAPTER NETWORK SMOKE EXECUTED (run i10-live, 18 calls, 0 retries; original automated 17/18 LIVE_PASS + 1 additive; operator review BLOCK_SENSOR_B3_I10_MIXED: 3 Gate contract_stats paths 1970-unit contradiction + Kraken funding) · I10R1 TARGETED REPAIR + RECHECK COMPLETE (adjudication: Gate = PRIOR_CHARACTERIZATION_ERROR → seconds; Kraken funding = sensor-specific epoch ms + {rate, relativeRate} known metric set; fail-closed temporal-plausibility guard added; 4/4 recheck paths LIVE_PASS) |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 common foundation ACCEPTED; Kraken SEALED+FROZEN; Gate RATIFIED + OFFLINE_FROZEN (I06-RATIFY); OKX RATIFIED + OFFLINE_FROZEN (I07R2-RATIFY); DERIBIT I08 HELD pending I08R1 (completion-truth seal) ; I08R1 COMPLETE, PASS_SENSOR_B3_I08R1_DERIBIT_SEALED ACCEPTED (I08R1-RATIFY); DERIBIT OFFLINE_FROZEN; I09 CROSS-PROVIDER ADAPTER MATRIX / OFFLINE CLOSURE COMPLETE (PASS proposed, awaiting operator review); I09R1 AUTHORITY-BOUNDARY MICROSEAL COMPLETE (duplicate I14 promotion + duplicate human readiness rows now fail closed; explicit complete verification coverage required; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN pre-I10; PASS ACCEPTED via SENSOR-B3-I09R1-RATIFY) · I09R1-RATIFY COMPLETE (operator ACCEPTED PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED; authorized I10 network smoke ONLY) · I10 CONTROLLED PRODUCTION-ADAPTER NETWORK SMOKE EXECUTED (run i10-live, 18 calls, 0 retries; original automated 17/18 LIVE_PASS + 1 additive; operator review BLOCK_SENSOR_B3_I10_MIXED: 3 Gate contract_stats paths 1970-unit contradiction + Kraken funding) · I10R1 TARGETED REPAIR + RECHECK COMPLETE (adjudication: Gate = PRIOR_CHARACTERIZATION_ERROR → seconds; Kraken funding = sensor-specific epoch ms + {rate, relativeRate} known metric set; fail-closed temporal-plausibility guard added; 4/4 recheck paths LIVE_PASS) · I10R2 SEMANTIC CONSISTENCY SEAL COMPLETE (Gate I10R1A provisional B_PROVIDER_SEMANTIC_DRIFT SUPERSEDED → final A_PRIOR_CHARACTERIZATION_ERROR_WITH_UNIDENTIFIED_HISTORICAL_UNIT — the only ms evidence was a SYNTHETIC fixture, real historical unit UNIDENTIFIED, provider drift NOT established; Gate runtime completion sealed to LIMITED (is_complete=False, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID, no invented resume token); gate-adapter-v2 / kraken-adapter-v2 provenance (OKX/Deribit untouched); Kraken additive firewall (unknown metrics preserved raw, never projected) + relativeRate REQUIRED; literal Kraken funding ms sample captured (1788170400000..1788253200000); 5/5 targeted recheck LIVE_PASS_NONEMPTY, 0 retries) |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
-| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=4 (KRAKEN_FUTURES + GATE_FUTURES + OKX_SWAP + DERIBIT, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate + OKX + Deribit; PRODUCTION_CANDIDATE mode, 0 failed each) · I14 PRODUCTION-ADAPTER INVENTORY = 17/17 provider×sensor candidates implemented OFFLINE (4 providers × I14 sets) · CROSS_PROVIDER_OFFLINE_CLOSURE=TRUE (SENSOR-B3-I09; deterministic PRODUCTION_ADAPTER_MATRIX.csv/.json derived from I14 + adapter code; exact-set 3-level equality proven) · AUTHORITY_DUPLICATE_GUARD=TRUE (I09R1: duplicate I14 promotion + duplicate human readiness keys fail closed) · VERIFICATION_COVERAGE_GUARD=TRUE (I09R1: explicit complete verification required; missing != explicit False; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN in the immutable I09 matrix) · NETWORK_VALIDATION=PASS (I10 run i10-live + I10R1 run i10r1-recheck overlay: 17/17 logical paths, 18/18 physical production-symbol checks; I09 matrix untouched) |
-| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE · okx_offline_sealed = TRUE · okx_implementation_frozen = TRUE · okx_network_smoke = NOT_RUN · deribit_adapter_implemented = TRUE (I08) · deribit_completion_truth_sealed = TRUE (I08R1) · deribit_offline_sealed = TRUE (I08R1) · deribit_offline_implementation_frozen = TRUE (I08R1-RATIFY) · deribit_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE · cross_provider_offline_closure = TRUE (SENSOR-B3-I09 COMPLETE; deterministic 17-path production inventory + exact-set equality + evidence-ref/scope/role audits; matrix generated, NOT hand-declared) · cross_provider_authority_sealed = TRUE (SENSOR-B3-I09R1; duplicate authority + verification-coverage guards; matrix regeneration byte-identical) · network_validation = PASS (SENSOR-B3-I10 run i10-live + SENSOR-B3-I10R1 run i10r1-recheck overlay; 17/17 logical, 18/18 physical; the immutable I09 matrix keeps network_smoke_status = NOT_RUN) |
+| Common foundation status | COMMON_FRAMEWORK_READY=TRUE · BEHAVIORAL_CONFORMANCE_READY=TRUE · REAL_PROVIDER_ADAPTERS=4 (KRAKEN_FUTURES + GATE_FUTURES + OKX_SWAP + DERIBIT, offline) · PROVIDER_PARSER_CONFORMANCE=OFFLINE_PASS (Kraken + Gate + OKX + Deribit; PRODUCTION_CANDIDATE mode, 0 failed each) · I14 PRODUCTION-ADAPTER INVENTORY = 17/17 provider×sensor candidates implemented OFFLINE (4 providers × I14 sets) · CROSS_PROVIDER_OFFLINE_CLOSURE=TRUE (SENSOR-B3-I09; deterministic PRODUCTION_ADAPTER_MATRIX.csv/.json derived from I14 + adapter code; exact-set 3-level equality proven) · AUTHORITY_DUPLICATE_GUARD=TRUE (I09R1: duplicate I14 promotion + duplicate human readiness keys fail closed) · VERIFICATION_COVERAGE_GUARD=TRUE (I09R1: explicit complete verification required; missing != explicit False; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN in the immutable I09 matrix) · NETWORK_VALIDATION=PASS (I10 run i10-live + I10R1 run i10r1-recheck overlay + I10R2 run i10r2-recheck seal: 17/17 logical paths, 18/18 physical production-symbol checks; I09 matrix untouched) |
+| Bloc 3 adapter status | kraken_adapter_implemented = TRUE · kraken_offline_implementation_frozen = TRUE · kraken_network_smoke = NOT_RUN · gate_adapter_implemented = TRUE · gate_offline_implementation_frozen = TRUE · gate_network_smoke = NOT_RUN · okx_adapter_implemented = TRUE · okx_offline_sealed = TRUE · okx_implementation_frozen = TRUE · okx_network_smoke = NOT_RUN · deribit_adapter_implemented = TRUE (I08) · deribit_completion_truth_sealed = TRUE (I08R1) · deribit_offline_sealed = TRUE (I08R1) · deribit_offline_implementation_frozen = TRUE (I08R1-RATIFY) · deribit_network_smoke = NOT_RUN · bloc_03_common_foundation_complete = TRUE · cross_provider_offline_closure = TRUE (SENSOR-B3-I09 COMPLETE; deterministic 17-path production inventory + exact-set equality + evidence-ref/scope/role audits; matrix generated, NOT hand-declared) · cross_provider_authority_sealed = TRUE (SENSOR-B3-I09R1; duplicate authority + verification-coverage guards; matrix regeneration byte-identical) · network_validation = PASS (SENSOR-B3-I10 run i10-live + SENSOR-B3-I10R1 run i10r1-recheck overlay + SENSOR-B3-I10R2 run i10r2-recheck semantic seal; 17/17 logical, 18/18 physical; the immutable I09 matrix keeps network_smoke_status = NOT_RUN) · gate_completion_truth_sealed = TRUE (I10R2B: runtime is_complete=False matches frozen LIMITED/LIMITED authority; no invented resume token) · kraken_additive_firewall_sealed = TRUE (I10R2C: unknown additive metrics preserved raw, never projected) · adapter_semantic_versions = gate-adapter-v2, kraken-adapter-v2 (I10R2C; OKX/Deribit v1 unchanged) |
 | Last successful commit SHA | (see commit log below) |
 | Branch | `agent/crypto-sensor-fabric-build` |
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
@@ -104,7 +104,17 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I10A | f92d6bd9 | 29 | 0 |
 | SENSOR-B3-I10B | c4bc5c3e | 0 (live evidence) | — |
 | SENSOR-B3-I10C | (this commit) | 0 (evidence/ledger) | — |
-| cumulative | 1338 | 1338 | 0 |
+| SENSOR-B3-I10R1A | 37542be5 | 0 (evidence only) | — |
+| SENSOR-B3-I10R1B | c773aaac | (gate repair tests; full-suite cumulative first at I10R1D) | — |
+| SENSOR-B3-I10R1C | fb8c4d48 | (kraken repair tests; full-suite cumulative first at I10R1D) | — |
+| SENSOR-B3-I10R1D | 6081b88a | 15 (cumulative 1353) | 0 |
+| SENSOR-B3-I10R1E | e6b67d37 | 1 (cumulative 1354) | 0 |
+| SENSOR-B3-I10R1F | (this commit) | 0 (ledger) | — |
+| SENSOR-B3-I10R2A | da4123b2 | 0 (evidence/adjudication) | — |
+| SENSOR-B3-I10R2B | d7c49225 | 5 (cumulative 1359) | 0 |
+| SENSOR-B3-I10R2C | cb3bff61 | 1 (cumulative 1360) | 0 |
+| SENSOR-B3-I10R2D | 6fc1551d | 0 (live evidence) | — |
+| cumulative | 1360 | 1360 | 0 |
 
 ## External / provider blockers
 
@@ -191,6 +201,55 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B3-I10R2 COMPLETE — SEMANTIC CONSISTENCY SEAL (proposed
+  `PASS_SENSOR_B3_I10R2_SEMANTIC_CONSISTENCY_SEALED`).  Three closure issues
+  from operator review of I10R1 were closed:
+  - **Gate adjudication reconciled (I10R2A).**  I10R1A's provisional
+    `B_PROVIDER_SEMANTIC_DRIFT` is SUPERSEDED: the ONLY committed ms evidence
+    was the I05-era SYNTHETIC_SCHEMA_FIXTURE (proves tests, not provider
+    history); I13 datetimes were unit-masked; therefore the real historical
+    provider unit is **UNIDENTIFIED** and the ms assumption was a
+    **PRIOR_CHARACTERIZATION / SYNTHETIC-FIXTURE ERROR** (final
+    `A_PRIOR_CHARACTERIZATION_ERROR_WITH_UNIDENTIFIED_HISTORICAL_UNIT`).
+    Current contract = epoch seconds (live-proven); no provider drift is
+    claimed; all current Gate docs/code carry this one canonical diagnosis.
+    `BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json` records the supersession;
+    the I10R1A artifact remains immutable history.
+  - **Gate completion truth sealed (I10R2B).**  Runtime no longer
+    manufactures `is_complete=True`: all four Gate paths report
+    `is_complete=False`, `next_resume_token=None`, with truthful
+    PARTIAL_INTERVAL / GAP_DETECTED / EMPTY_VALID flags — matching the frozen
+    I09 LIMITED/LIMITED matrix authority.  contract_stats deep traversal
+    remains UNRESOLVED; funding from/to coverage is not proven exhaustive.
+  - **Provenance versioned + Kraken firewall (I10R2C).**  Gate/Kraken
+    adapters bumped to `gate-adapter-v2` / `kraken-adapter-v2` (OKX/Deribit
+    untouched; I09 matrix keeps v1 as history).  Kraken `_build_dict_rows`
+    now projects ONLY the evidence-backed required metric set — an unknown
+    additive key is preserved raw and flagged, never silently promoted.
+    `relativeRate` classification reconciled to REQUIRED (both keys in every
+    observed response; earlier KNOWN_OPTIONAL wording superseded).
+  - **Literal Kraken timestamp evidence (I10R2D).**  The I10R1 walker-capture
+    gap is closed: the recheck captured native funding `timestamp` members
+    `[1788170400000 … 1788253200000]` — 13-digit epoch MILLISECONDS decoding
+    to 2026-08-31T10:00Z … 2026-09-01T09:00Z (hour grid, matches window).
+  Targeted recheck (`i10r2-recheck`, manifest `ddb4dccdcdd4429b`): 5
+  sequential GET calls (Gate FUNDING/LIQUIDATION/OI/POSITIONING BTC_USDT +
+  Kraken funding PI_XBTUSD), 0 retries, 0 credentials → **5/5
+  LIVE_PASS_NONEMPTY, KNOWN_SCHEMA**, v2 adapters, no 1970 artifact, Gate
+  truthfully LIMITED (PARTIAL_INTERVAL), Kraken funding `more`-terminal
+  complete.  Full suite 1360 passed / 0 failed pre and post; ruff clean;
+  changed-scope mypy clean (pre-existing 10 baseline).  Combined I10 baseline
+  + I10R1 overlay + I10R2 seal: physical production-symbol checks 18/18,
+  logical paths 17/17 → `PASS_SENSOR_B3_I10_PRODUCTION_ADAPTER_NETWORK_SMOKE`
+  = OPERATOR_ACCEPTABLE.  `BLOC_03_CURRENT_RUNTIME_ADAPTER_OVERLAY.json`
+  (17 paths) is the current-runtime overlay for I11.  I09 matrix and all
+  original I10/I10R1 artifacts UNTOUCHED.  `next_checkpoint_authorized =
+  FALSE`; recommended next: **SENSOR-B3-I11 FINAL BLOC 3 VALIDATION +
+  HANDOFF** — NOT begun; validators must not incept it.
+  Evidence: `evidence/bloc_03/BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json`,
+  `BLOC_03_I10R2_TARGETED_RECHECK_PLAN.json`, `_RESULTS.json`,
+  `BLOC_03_I10R2_SEMANTIC_SEAL_EVIDENCE.md`,
+  `BLOC_03_CURRENT_RUNTIME_ADAPTER_OVERLAY.json`.
 - SENSOR-B3-I10R1 COMPLETE — TARGETED REPAIR RECHECK (GATE/KRAKEN LIVE
   SEMANTIC REPAIR + TARGETED RECHECK).  Operator review of I10 returned
   `BLOCK_SENSOR_B3_I10_MIXED` (b51c3883): the narrow original diagnosis was
@@ -634,3 +693,7 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I10R1D | 6081b88a | fail-closed smoke temporal-plausibility guard (TEMPORAL_SEMANTIC_REVIEW: nonempty historical batches need both convenience timestamps inside a 365-day envelope; 1970 cannot LIVE_PASS; CURRENT_ONLY books exempt; truthful LIMITED stays PARTIAL) + native integer timestamp sample capture + adversarial tests | 1353 passed / 0 failed (1 skipped live) | PASS | none |
 | SENSOR-B3-I10R1E | e6b67d37 | execute 4-path targeted live recheck (i10r1-recheck, manifest e77646fd4c5202e4): Gate liquidation/OI/positioning BTC_USDT + Kraken funding PI_XBTUSD = 4/4 LIVE_PASS_NONEMPTY, KNOWN_SCHEMA, 2026 timestamps, 0 retries; freeze plan + results + evidence; list-typed native timestamp sample capture | 1354 passed / 0 failed (post-run) | PASS | none |
 | SENSOR-B3-I10R1F | (this commit) | reconcile ledger: I10R1 COMPLETE; combined I10 verdict PASS_SENSOR_B3_I10_PRODUCTION_ADAPTER_NETWORK_SMOKE via immutable I10 baseline + I10R1 overlay; next_checkpoint_authorized = FALSE | — | PASS | none |
+| SENSOR-B3-I10R2A | da4123b2 | reconcile Gate historical-unit adjudication: I10R1A provisional B_PROVIDER_SEMANTIC_DRIFT SUPERSEDED -> final A_PRIOR_CHARACTERIZATION_ERROR_WITH_UNIDENTIFIED_HISTORICAL_UNIT (only ms evidence = synthetic fixture; real historical unit UNIDENTIFIED; provider drift NOT established); BLOC_03_I10R2_SEMANTIC_RECONCILIATION.json + current docs canonicalized | — (evidence) | PASS | none |
+| SENSOR-B3-I10R2B | d7c49225 | seal Gate runtime completion semantics against LIMITED readiness: is_complete always False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID; tests for overlap/out-of-window/empty/funding/no-invented-token | gate suite 109 passed / 0 failed | PASS | none |
+| SENSOR-B3-I10R2C | cb3bff61 | version repaired contracts gate-adapter-v2 / kraken-adapter-v2 (OKX/Deribit untouched); Kraken additive firewall (_build_dict_rows projects only required metrics; unknown additive preserved raw, never projected); relativeRate reconciled to REQUIRED (KNOWN_OPTIONAL superseded); missing-relativeRate BREAKING test | 1360 passed / 0 failed (pre-run; 1 skipped live) | PASS | none |
+| SENSOR-B3-I10R2D | 6fc1551d | execute 5-path targeted live recheck (i10r2-recheck, manifest ddb4dccdcdd4429b): Gate funding/liquidation/OI/positioning BTC_USDT + Kraken funding PI_XBTUSD = 5/5 LIVE_PASS_NONEMPTY, KNOWN_SCHEMA, v2 adapters, Gate LIMITED (is_complete=False, PARTIAL_INTERVAL), Kraken funding literal ms sample [1788170400000..1788253200000]; freeze plan + results + BLOC_03_CURRENT_RUNTIME_ADAPTER_OVERLAY.json | 1360 passed / 0 failed (post-run) | PASS | none |
