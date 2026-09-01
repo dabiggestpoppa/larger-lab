@@ -1012,12 +1012,15 @@ class TestCXR4R4GateFirstRecoverAndMigration:
         store.write_text(json.dumps({"postgres_password": "governed-secret-1234567890"}),
                          encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        before = hashlib.sha256(store.read_bytes()).hexdigest()
         dsn = "postgresql://oce_control_admin:wrong-password@127.0.0.1:5433/oce_control"
         assert mig.main(["up", "--db", dsn]) == 2
         out, err = capsys.readouterr()
         blob = out + err
         assert "wrong-password" not in blob and "governed-secret-1234567890" not in blob
         assert "never echoed" in err
+        # M: a denied migration has ZERO secret-store side effects
+        assert hashlib.sha256(store.read_bytes()).hexdigest() == before
 
     def test_migrate_canonical_target_passes_gates_and_reaches_connect(
             self, monkeypatch, tmp_path):
