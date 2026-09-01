@@ -2,8 +2,8 @@
   "gate_id": "G2R",
   "status": "PASS_G2R_GENERALIZATION_AND_EVIDENCE_INTEGRITY",
   "starting_sha": "3bca154bf58021d35d579a6d76bee6c18df46fc5",
-  "ending_sha": "ARTIFACTS_HEAD_SHA_PINNED_BY_G2RR2",
-  "receipt_terminal_commit": "ARTIFACTS_HEAD_SHA_PINNED_BY_G2RR2",
+  "ending_sha": "01773d772489b4578067a4c2191e07f15b4c7e39",
+  "receipt_terminal_commit": "01773d772489b4578067a4c2191e07f15b4c7e39",
   "note_starting_sha_delta": "The G2R authorization prompt recorded the verified head as 38b3e031; the branch has since gained the legitimate STRESS-G2PR exec-bit repair (3bca154b, committed and pushed during the PR delivery sequence). This gate begins at the ACTUAL current head 3bca154b; the delta is recorded honestly.",
   "commits": [
     "7a1cd72f STRESS-G2R1: add shared G2_CORE_PHASE_POLICY and archive per-scenario policies",
