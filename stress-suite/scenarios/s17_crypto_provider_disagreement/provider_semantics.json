@@ -1,0 +1,63 @@
+[
+  {
+    "provider": "BYBIT_LINEAR",
+    "metric": "OPEN_INTEREST_STATE",
+    "native_units": "CONTRACTS",
+    "canonical_units": "CONTRACTS",
+    "instrument_mapping_ok": true,
+    "adapter_version": "sf-adapter-2.1",
+    "time_window": "5m",
+    "timestamp_semantics": "EVENT",
+    "quality_state": "OK",
+    "methodology_notes": "linear perp open interest"
+  },
+  {
+    "provider": "GATE_FUTURES",
+    "metric": "OPEN_INTEREST_STATE",
+    "native_units": "USD_NOTIONAL",
+    "canonical_units": "CONTRACTS",
+    "instrument_mapping_ok": true,
+    "adapter_version": "sf-adapter-2.1",
+    "time_window": "5m",
+    "timestamp_semantics": "EVENT",
+    "quality_state": "OK",
+    "normalization_valid": false,
+    "methodology_notes": "gate reports USD notional natively; canonical contract requires contracts - notional->contracts conversion not yet wired (CONTROL A)"
+  },
+  {
+    "provider": "BINANCE_USDM",
+    "metric": "OPEN_INTEREST_STATE",
+    "native_units": "CONTRACTS",
+    "canonical_units": "CONTRACTS",
+    "instrument_mapping_ok": true,
+    "adapter_version": "sf-adapter-2.1",
+    "time_window": "5m",
+    "timestamp_semantics": "EVENT",
+    "quality_state": "OK",
+    "methodology_notes": "usdm perp open interest (quarterly contract mapped incorrectly by adapter)"
+  },
+  {
+    "provider": "KRAKEN_FUTURES",
+    "metric": "LIQUIDATION_STATE",
+    "native_units": "CONTRACTS",
+    "canonical_units": "CONTRACTS",
+    "instrument_mapping_ok": true,
+    "adapter_version": "sf-adapter-1.9",
+    "time_window": "5m",
+    "timestamp_semantics": "EVENT",
+    "quality_state": "OK",
+    "methodology_notes": "first-party exchange liquidations"
+  },
+  {
+    "provider": "COINALYZE",
+    "metric": "LIQUIDATION_STATE",
+    "native_units": "CONTRACTS",
+    "canonical_units": "CONTRACTS",
+    "instrument_mapping_ok": true,
+    "adapter_version": "sf-adapter-1.9",
+    "time_window": "5m",
+    "timestamp_semantics": "EVENT",
+    "quality_state": "OK",
+    "methodology_notes": "aggregator methodology; partial overlap expected"
+  }
+]
