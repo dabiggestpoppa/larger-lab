@@ -117,3 +117,126 @@ def require_runtime_dsn() -> str:
         "no PostgreSQL DSN configured: set POSTGRES_DSN or run "
         "`python scripts/oce_local.py configure` to generate a local secret"
     )
+
+
+# --------------------------------------------------------------------------- #
+# B4-R3R3 — approved secret-resolution boundary (Book 4 reference model)
+# --------------------------------------------------------------------------- #
+# The canonical local runtime PostgreSQL secret lives ONLY in the untracked
+# .runtime/secrets.json store (0600), written there by Book 2 `configure`
+# materialization. Book 4 holds a REFERENCE (secret:runtime-local) which this
+# backend resolves; startup passes only when the reference actually resolves.
+CANONICAL_REF_NAME = "runtime-local"
+B4_META_KEY = "b4_meta"
+
+
+class RuntimeSecretBackend:
+    """Approved local secret store adapter for the Book 4 reference model.
+
+    Resolves ``secret:runtime-local`` to the materialized postgres password
+    persisted by ``configure``/``ensure_runtime_secret``. Tracks a small
+    non-secret metadata record (generation, revoked) so rotation / revocation
+    are observable without ever exposing the value. Missing, unresolvable,
+    or revoked references fail closed (KeyError / PermissionError).
+    """
+
+    def __init__(self, secrets_file: Path | None = None):
+        # Resolve the default lazily so tests that monkeypatch SECRETS_FILE
+        # (module global) observe the patched path.
+        self._file = secrets_file
+
+    @property
+    def file(self) -> Path:
+        return self._file if self._file is not None else SECRETS_FILE
+
+    def _load(self) -> dict:
+        f = self.file
+        if not f.exists():
+            return {}
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            return {}
+        return data if isinstance(data, dict) else {}
+
+    def _save(self, data: dict) -> None:
+        f = self.file
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        _chmod(f, 0o600)
+
+    # -- reference semantics ------------------------------------------------
+    # (the persistence helpers _load/_save above are lazy-bound to SECRETS_FILE)
+    def _meta(self, data: dict, name: str) -> dict:
+        meta = data.get(B4_META_KEY) or {}
+        return (meta.get(name) or {}) if isinstance(meta, dict) else {}
+
+    # -- reference semantics ------------------------------------------------
+    def _entry_key(self, name: str) -> str:
+        # the canonical local ref maps to Book 2's durable store key
+        return "postgres_password" if name == CANONICAL_REF_NAME else name
+
+    def resolve(self, ref: str) -> str:
+        import re as _re
+        if not isinstance(ref, str) or not _re.match(r"^secret:[A-Za-z0-9_.-]+$", ref):
+            raise ValueError(f"not a secret reference: {ref!r}")
+        name = ref.split(":", 1)[1]
+        data = self._load()
+        if self._meta(data, name).get("revoked"):
+            raise PermissionError(
+                f"secret '{name}' is revoked — REFUSED to resolve")
+        value = data.get(self._entry_key(name))
+        if not value:
+            raise KeyError(
+                f"secret '{name}' not provisioned — run `oce_local configure` "
+                f"to materialize the local runtime secret")
+        return value
+
+    def has(self, name: str) -> bool:
+        data = self._load()
+        return bool(data.get(self._entry_key(name)))
+
+    def generation(self, name: str) -> int:
+        return int(self._meta(self._load(), name).get("generation", 1))
+
+    def is_revoked(self, name: str) -> bool:
+        return bool(self._meta(self._load(), name).get("revoked"))
+
+    # -- lifecycle (rotate / revoke are PO-audited, never silent) ----------
+    def rotate(self, name: str, new_value: str) -> None:
+        if not new_value:
+            raise ValueError("refused to rotate to an empty secret")
+        data = self._load()
+        data[self._entry_key(name)] = new_value
+        meta = dict(data.get(B4_META_KEY) or {})
+        rec = dict(self._meta(data, name))
+        rec["generation"] = int(rec.get("generation", 1)) + 1
+        rec["revoked"] = False
+        meta[name] = rec
+        data[B4_META_KEY] = meta
+        self._save(data)
+
+    def revoke(self, name: str) -> None:
+        data = self._load()
+        meta = dict(data.get(B4_META_KEY) or {})
+        rec = dict(self._meta(data, name))
+        rec["revoked"] = True
+        rec["generation"] = int(rec.get("generation", 1)) + 1
+        meta[name] = rec
+        data[B4_META_KEY] = meta
+        data.pop(self._entry_key(name), None)
+        self._save(data)
+
+    def security_metadata(self) -> dict:
+        """Non-secret metadata only (reference identity, generation, revoked).
+
+        Never includes the password value or its digest.
+        """
+        data = self._load()
+        meta = data.get(B4_META_KEY) or {}
+        out = {}
+        for name, rec in (meta.items() if isinstance(meta, dict) else []):
+            out[name] = {"generation": int(rec.get("generation", 1)),
+                         "revoked": bool(rec.get("revoked")),
+                         "backend": "local-runtime-store-v1"}
+        return out

@@ -30,12 +30,14 @@ def main(argv=None) -> None:
     parser.add_argument("--capabilities", default="*")
     parser.add_argument("--max-per-cycle", type=int, default=5)
     args = parser.parse_args(argv)
-    # B4-R3R2: every real process activation entrypoint passes the startup
-    # gate first. A worker cannot bypass Book 4 by launching this module
-    # directly — no worker session starts under a malformed / incomplete /
-    # forbidden effective config.
-    from .config_startup import require_startable
+    # B4-R3R2/R3: every real process activation entrypoint passes the startup
+    # gate first, INCLUDING the secret-resolution proof. A worker cannot
+    # bypass Book 4 by launching this module directly — no worker session
+    # starts under a malformed / incomplete / forbidden effective config, and
+    # no worker connects to PostgreSQL through an unbacked secret reference.
+    from .config_startup import require_startable, require_secret_resolvable
     require_startable()
+    require_secret_resolvable()
     if not args.token:
         raise SystemExit("worker requires --token or OCE_WORKER_TOKEN (no predictable default, B2-R7)")
 

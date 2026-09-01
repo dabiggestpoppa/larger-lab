@@ -421,12 +421,22 @@ def doctor() -> dict:
 def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     # Book 4 surface C: validate the effective configuration before activating.
     # Fail closed on malformed / incomplete / forbidden config.
-    from oce_control.config_startup import require_startable
+    #
+    # B4-R3R3: configuration/init and runtime/start are distinguished. The
+    # init step (`configure`) MAY materialize the local runtime secret (Book 2
+    # invariant — a strong random secret on first governed configuration).
+    # Runtime start then REQUIRES the canonical reference to resolve against
+    # the approved store; a fabricated, unbacked reference string never
+    # activates the runtime.
+    from oce_control.config_startup import (
+        require_startable, require_secret_resolvable)
 
     require_startable()
     actions: list[str] = []
     report = configure()
     actions.append(f"configured secret ({report['secret_source']})")
+    require_secret_resolvable()
+    actions.append("secret reference resolved from approved store (fail-closed)")
     actions.append("config spine: effective config validated (fail-closed)")
     if not docker_available():
         raise RuntimeError("Docker is unavailable — the local runtime requires Docker "

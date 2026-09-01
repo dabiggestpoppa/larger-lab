@@ -747,6 +747,108 @@ class TestAdversarialMatrix:
 
 
 # --------------------------------------------------------------------------- #
+# B4-R3R3 — secret-reference model: configuration/init vs runtime/start.
+# Runtime start passes ONLY when the reference resolves in the approved
+# store; a fabricated-but-unresolvable reference string fails closed.
+# --------------------------------------------------------------------------- #
+class TestR3R3SecretResolution:
+    def _backend(self, tmp_path, provision: bool = True, value: str = "genuine-secret-abc123"):
+        from oce_control import local_secrets as ls
+        f = tmp_path / "secrets.json"
+        if provision:
+            f.write_text(json.dumps({"postgres_password": value}), encoding="utf-8")
+        return ls.RuntimeSecretBackend(f)
+
+    def test_missing_required_reference_fails_closed(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=False)
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        with pytest.raises(SystemExit) as exc:
+            cs.require_secret_resolvable(environ=None, backend=backend, eff=eff)
+        assert "configure" in str(exc.value)
+
+    def test_valid_reference_with_existing_secret_passes(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=True, value="genuine-secret-abc123")
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        secret = cs.resolve_startup_secret(eff, backend)  # must not raise
+        assert secret == "genuine-secret-abc123"
+
+    def test_valid_reference_absent_secret_fails_closed(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=False)
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:other-name"})
+        with pytest.raises(SystemExit):
+            cs.require_secret_resolvable(environ=None, backend=backend, eff=eff)
+
+    def test_revoked_secret_fails_closed(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=True)
+        backend.revoke("runtime-local")
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        with pytest.raises(SystemExit):
+            cs.require_secret_resolvable(environ=None, backend=backend, eff=eff)
+
+    def test_rotated_secret_new_value_and_generation(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=True, value="gen-1-secret")
+        backend.rotate("runtime-local", "gen-2-secret")
+        assert backend.generation("runtime-local") == 2
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        assert cs.resolve_startup_secret(eff, backend) == "gen-2-secret"
+
+    def test_plain_secret_supplied_fails_closed(self):
+        # A plain password value is rejected at RESOLUTION (validator raises)
+        # — even before the startup secret-resolution step runs.
+        import oce_control.config_startup as cs
+        with pytest.raises(ValidationError):
+            cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "plain-password-123"})
+
+    def test_malformed_reference_fails_closed(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=True)
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:bad..name"})
+        with pytest.raises(SystemExit):
+            cs.require_secret_resolvable(environ=None, backend=backend, eff=eff)
+
+    def test_default_reference_unbacked_reports_secret_not_ok(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=False)
+        rep = cs.validate_startup(
+            environ={"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"},
+            backend=backend)
+        assert rep["ok"] is True        # config posture is valid...
+        assert rep["secret_ok"] is False  # ...but the runtime secret is NOT
+
+    def test_first_governed_initialization_then_restart(self, tmp_path):
+        # configure materializes a real secret into the store; restart then
+        # resolves the same reference successfully (Book 2 invariant kept).
+        import oce_control.config_startup as cs
+        f = tmp_path / "secrets.json"
+        from oce_control import local_secrets as ls
+        f.write_text(json.dumps({"postgres_password": "first-init-secret-xyz"}),
+                     encoding="utf-8")
+        backend = ls.RuntimeSecretBackend(f)
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        # a fresh RuntimeSecretBackend instance (simulating a restart) resolves
+        # the SAME canonical reference to the persisted secret
+        fresh = ls.RuntimeSecretBackend(f)
+        assert cs.resolve_startup_secret(eff, fresh) == "first-init-secret-xyz"
+
+    def test_secret_value_never_appears_in_evidence_metadata(self, tmp_path):
+        import oce_control.config_startup as cs
+        backend = self._backend(tmp_path, provision=True,
+                                value="EVIDENCE-CANARY-SECRET-98765")
+        meta = backend.security_metadata()
+        blob = json.dumps(meta)
+        assert "EVIDENCE-CANARY-SECRET-98765" not in blob
+        eff = cs.effective_from_env({"OCE_POSTGRES_PASSWORD_REF": "secret:runtime-local"})
+        eff_redacted = json.dumps(eff.redacted())
+        assert "EVIDENCE-CANARY-SECRET-98765" not in eff_redacted
+        assert "EVIDENCE-CANARY-SECRET-98765" not in eff.fingerprint
+
+
+# --------------------------------------------------------------------------- #
 # B4-R3R1 — honest source provenance (env value must never masquerade as file)
 # --------------------------------------------------------------------------- #
 class TestR3R1SourceProvenance:

@@ -387,7 +387,15 @@ if __name__ == "__main__":
     # separate legacy path that can bind 8080 behind the spine's back — the
     # gate runs first (require_startable) and refuses activation on any
     # malformed / incomplete / forbidden effective config.
+    #
+    # B4-R3R3: a syntactically valid postgres.password_ref is NOT enough to
+    # activate — the reference must RESOLVE against the approved local secret
+    # store. Direct launchers carry the same obligation as lifecycle-launched
+    # servers, so a DB-bound process can never start on an unbacked ref.
     import uvicorn
+    from .config_startup import require_startable, require_secret_resolvable
+    require_startable()
+    require_secret_resolvable()
     host, port = runtime_bind()
     interval = runtime_scheduler_interval()
     app = build_durable_app(scheduler_tick_interval=interval)

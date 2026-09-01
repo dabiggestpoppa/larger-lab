@@ -38,6 +38,7 @@ from oce_control.config_spine import (
     build_default_registry,
     validate_effective,
 )
+from oce_control import local_secrets as ls
 
 # Canonical env-var -> canonical setting name. Only settings that are safe to
 # read from the environment are listed; every one of them is ALSO run through
@@ -168,20 +169,72 @@ def effective_from_env(environ: dict | None = None,
     })
 
 
-def validate_startup(environ: dict | None = None) -> dict:
+def resolve_startup_secret(eff: EffectiveConfig,
+                           backend: "ls.RuntimeSecretBackend | None" = None) -> str:
+    """Resolve ``postgres.password_ref`` through the approved local store.
+
+    Returns the materialized secret. Fails closed (raises KeyError /
+    PermissionError / ValidationError) when the reference is malformed,
+    missing from the store, or revoked. The value exists only in process
+    memory — it is never logged, evidenced, or fingerprinted.
+    """
+    backend = backend or ls.RuntimeSecretBackend()
+    ref = eff.get("postgres.password_ref")
+    from oce_control.config_spine import SECRET_REF_RE
+    if not isinstance(ref, str) or not SECRET_REF_RE.match(ref):
+        raise ValidationError(
+            "postgres.password_ref must be a secret:reference "
+            "(never a plain password value)")
+    return backend.resolve(ref)
+
+
+def require_secret_resolvable(environ: dict | None = None,
+                              backend: "ls.RuntimeSecretBackend | None" = None,
+                              eff: EffectiveConfig | None = None) -> None:
+    """Activation-time secret proof: the effective password reference must
+    RESOLVE against the approved local secret store or startup is BLOCKED.
+
+    A syntactically valid reference string is NOT sufficient (B4-R3R3): a
+    runtime start never passes because the code invented an unbacked
+    reference. Distinguish configuration/init (may materialize the secret
+    via `configure`) from runtime/start (must resolve it).
+    """
+    try:
+        target = eff if eff is not None else effective_from_env(environ)
+        resolve_startup_secret(target, backend)
+    except (KeyError, PermissionError) as exc:
+        raise SystemExit(
+            f"OCE startup BLOCKED: {redact_message(str(exc))} — run "
+            "`python scripts/oce_local.py configure` to materialize the local "
+            "runtime secret (or set OCE_POSTGRES_PASSWORD_REF to an existing "
+            "reference)") from exc
+    except ValidationError as exc:
+        raise SystemExit(startup_report(environ)) from exc
+
+
+def validate_startup(environ: dict | None = None,
+                     backend: "ls.RuntimeSecretBackend | None" = None) -> dict:
     """Validate the startup effective config.
 
     Never raises. Returns a report dict:
-        {"ok": bool, "start": bool, "config": <redacted>, "error": str|None}
+        {"ok": bool, "start": bool, "config": <redacted>,
+         "secret_ok": bool|None, "error": str|None}
     """
     try:
         eff = effective_from_env(environ)
         validate_effective(eff)  # redundant but explicit & self-documenting
+        secret_ok: bool | None = None
+        try:
+            resolve_startup_secret(eff, backend)
+            secret_ok = True
+        except (KeyError, PermissionError):
+            secret_ok = False
         return {
             "ok": True,
             "start": True,
             "config": eff.redacted(),
             "fingerprint": eff.fingerprint,
+            "secret_ok": secret_ok,
             "error": None,
         }
     except (ValidationError, KeyError, ValueError) as exc:
@@ -189,6 +242,7 @@ def validate_startup(environ: dict | None = None) -> dict:
             "ok": False,
             "start": False,
             "config": None,
+            "secret_ok": False,
             "error": redact_message(str(exc)),
         }
 
