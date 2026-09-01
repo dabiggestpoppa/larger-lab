@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from .base import deterministic_hex
+from .reopen import ReopenEvaluation  # noqa: F401  (re-export for retriever consumers)
 
 MEMORY_TIERS = ("ACTIVE_CONTEXT", "DORMANT_STORE", "ARCHIVAL_STORE")
 METABOLISM_STAGES = ("INGEST", "CONSOLIDATE", "COMPRESS", "PROMOTE_DEMOTE",
@@ -201,6 +202,10 @@ class ContextBundle:
     budget_limit: int
     metrics: Mapping[str, Any]
     fingerprint: str
+    missing_required_refs: Tuple[str, ...] = ()          # G4R-18
+    required_ref_resolution_status: Mapping[str, str] = field(default_factory=dict)  # G4R-18
+    budget_sufficient: bool = True                      # G4R-16 variant D
+    bundle_status: str = "COMPLETE"                    # COMPLETE | REQUIRED_REFS_MISSING | CONTEXT_BUDGET_INSUFFICIENT | INCOMPLETE_RECALL
 
     def to_dict(self) -> Dict[str, Any]:
         return {"selected_active_objects": list(self.selected_active_objects),
@@ -210,21 +215,43 @@ class ContextBundle:
                 "archival_refs": list(self.archival_refs),
                 "retrieval_trace": [t.to_dict() for t in self.retrieval_trace],
                 "budget_used": self.budget_used, "budget_limit": self.budget_limit,
-                "metrics": dict(self.metrics), "fingerprint": self.fingerprint}
+                "metrics": dict(self.metrics), "fingerprint": self.fingerprint,
+                "missing_required_refs": list(self.missing_required_refs),
+                "required_ref_resolution_status": dict(self.required_ref_resolution_status),
+                "budget_sufficient": self.budget_sufficient,
+                "bundle_status": self.bundle_status}
 
 
 class MemoryRetriever:
     """Bounded context builder. Active context scales with TASK NEED, not with
     institutional age: history may grow arbitrarily while the default bundle
-    stays within the context budget."""
+    stays within the context budget.
+
+    G4R-19: dormant/archival reactivation is governed by ReopenEvaluation
+    records (or a resolver producing them). Raw booleans can never bypass the
+    ReopenEvaluator."""
 
     def __init__(self, index: MemoryIndex, context_budget: int = 12,
                  policy_version: str = "G4_MEMORY_AND_REACTIVATION_POLICY:1.0.0",
+                 reopen_evaluations: Optional[Mapping[str, Any]] = None,
+                 reopen_resolver: Optional[Any] = None,
                  reopen_facts: Optional[Mapping[str, Any]] = None):
         self.index = index
         self.context_budget = context_budget
         self.policy_version = policy_version
-        self.reopen_facts = reopen_facts or {}   # subject_ref -> satisfied conditions
+        self.reopen_resolver = reopen_resolver
+        evals: Dict[str, Any] = dict(reopen_evaluations or {})
+        if reopen_facts is not None:
+            # G4R-19: fail closed — raw booleans cannot bypass the evaluator
+            bad = [k for k, v in reopen_facts.items()
+                   if not isinstance(v, ReopenEvaluation)]
+            if bad:
+                raise TypeError(
+                    "MemoryRetriever accepts only governed ReopenEvaluation "
+                    "objects for reopen state; raw booleans cannot bypass the "
+                    "reopen evaluator (G4R-19): " + ",".join(map(str, bad)))
+            evals.update(reopen_facts)
+        self.reopen_evaluations: Dict[str, ReopenEvaluation] = evals   # object_id -> eval
 
     # ------------------------------------------------------------------ #
     def build_context(
@@ -253,14 +280,21 @@ class MemoryRetriever:
                 object_id=obj.object_id, policy=policy, reason=reason,
                 trigger_ref=trigger, memory_tier=obj.memory_tier, epoch=obj.epoch))
 
-        # 1) required refs — active first
+        # 1) required refs — active first, with EXPLICIT resolution status
+        #    (G4R-18): a required ref that cannot resolve never silently
+        #    disappears; missing / unsatisfied refs surface as a gap.
+        required_status: Dict[str, str] = {}
+        missing_required: List[str] = []
         for ref in required_refs:
             obj = self.index.get(ref)
             if obj is None:
+                required_status[ref] = "MISSING"
+                missing_required.append(ref)
                 continue
             if obj.memory_tier == "ACTIVE_CONTEXT":
                 select(obj, "REQUIRED_ACTIVE", "required object resident in active context",
                        task_ref)
+                required_status[ref] = "RESOLVED"
             elif obj.memory_tier == "DORMANT_STORE" and allow_dormant_reopen:
                 # reopen-condition satisfied -> retrieved despite absence from
                 # default active context (G4 §13)
@@ -269,13 +303,18 @@ class MemoryRetriever:
                            "dormant object retrieved because its reopen condition fired",
                            task_ref)
                     dormant_refs.append(obj.object_id)
+                    required_status[ref] = "RESOLVED"
                 else:
                     dormant_refs.append(obj.object_id)
+                    required_status[ref] = "DORMANT_UNSATISFIED"
             elif obj.memory_tier == "ARCHIVAL_STORE":
                 if allow_archival_reconstruct and self._reopen_satisfied(obj):
                     select(obj, "REQUIRED_ARCHIVAL_RECONSTRUCT",
                            "archival object explicitly reconstructed",
                            task_ref)
+                    required_status[ref] = "RESOLVED"
+                else:
+                    required_status[ref] = "ARCHIVAL_UNRECONSTRUCTED"
                 archival_refs.append(obj.object_id)
 
         # 2) dependency-referenced active objects (task need)
@@ -302,6 +341,16 @@ class MemoryRetriever:
                           (set(self.index.get(oid).dependency_refs) & dep_set
                            or set(self.index.get(oid).tags) & tag_set))]
         total_history = self.index.total_history_count()
+        recall_gap = [r for r in required_refs if r not in selected]
+        budget_insufficient = bool(required_refs) and len(required_refs) > budget
+        if missing_required:
+            bundle_status = "REQUIRED_REFS_MISSING"
+        elif budget_insufficient:
+            bundle_status = "CONTEXT_BUDGET_INSUFFICIENT"
+        elif recall_gap:
+            bundle_status = "INCOMPLETE_RECALL"
+        else:
+            bundle_status = "COMPLETE"
         metrics = {
             "total_historical_objects": total_history,
             "active_context_objects": len(selected),
@@ -311,11 +360,13 @@ class MemoryRetriever:
             "stale_object_intrusion_count": len(stale),
             "omitted_but_recoverable_count": max(0, total_history - len(selected)),
             "context_growth_ratio": (len(selected) / total_history) if total_history else 0.0,
+            "required_refs_missing_count": len(missing_required),
+            "recall_gap_count": len(recall_gap),
         }
         fp = deterministic_hex(
             "context_bundle", task_ref, sorted(selected), budget,
             [(w.object_id, w.policy, w.trigger_ref, w.memory_tier) for w in why],
-            length=24)
+            sorted(required_status.items()), length=24)
         return ContextBundle(
             selected_active_objects=tuple(sorted(selected)),
             why_selected=tuple(why),
@@ -327,14 +378,30 @@ class MemoryRetriever:
             budget_limit=budget,
             metrics=metrics,
             fingerprint=fp,
+            missing_required_refs=tuple(sorted(missing_required)),
+            required_ref_resolution_status=dict(required_status),
+            budget_sufficient=not budget_insufficient and not missing_required,
+            bundle_status=bundle_status,
         )
 
+    def _reopen_evaluation(self, object_id: str) -> Optional[ReopenEvaluation]:
+        if self.reopen_resolver is not None:
+            ev = self.reopen_resolver(object_id)
+            return ev if isinstance(ev, ReopenEvaluation) else None
+        return self.reopen_evaluations.get(object_id)
+
     def _reopen_satisfied(self, obj: MemoryObject) -> bool:
-        """A dormant/archival object is retrievable when ANY of its reopen
-        condition ids is satisfied by current observable facts."""
-        for cid in obj.reopen_condition_ids:
-            if self.reopen_facts.get(cid):
-                return True
+        """A dormant/archival object is retrievable only when a GOVERNED
+        ReopenEvaluation (produced by the ReopenEvaluator) returns
+        REOPEN_CANDIDATE for it. Raw booleans cannot bypass the evaluator
+        (G4R-19); CONDITION_UNKNOWN / OPERATOR_REVIEW_REQUIRED never retrieve."""
+        ev = self._reopen_evaluation(obj.object_id)
+        if ev is None:
+            return False
+        if ev.outcome == "REOPEN_CANDIDATE":
+            return True
+        if ev.outcome == "CONDITION_UNKNOWN":
+            return False
         return False
 
 
@@ -441,3 +508,43 @@ def run_metabolism_pipeline(
         delegated_promote_demote=tuple(delegated),
         provenance_intact=provenance_intact,
     )
+
+
+def compact_active_pool(
+    index: MemoryIndex,
+    policy: Optional[Any],
+    keep_refs: Sequence[str],
+    task_ref: str = "",
+    epoch: str = "",
+    reason_prefix: str = "low task relevance (policy-governed compaction)",
+) -> Tuple[Tuple[MemoryCompactionRecord, ...], str]:
+    """G4R-17 — policy-governed compaction: objects resident in ACTIVE_CONTEXT
+    that the current task does not need and whose task relevance is LOW are
+    compressed to DORMANT_STORE by the shared activation policy rule
+    (COMPRESS_TO_DORMANT). This reduces the ACTIVE operational representation
+    without deleting anything — every record keeps its provenance and
+    reconstruction pointers. Returns (compaction_records, policy_rule_id)."""
+    rule_id = ""
+    if policy is not None:
+        rule = policy.evaluate({"task_relevance": "LOW", "memory_tier": "ACTIVE_CONTEXT"},
+                               "activation")
+        rule_id = rule.rule_id if rule else ""
+    keep = set(keep_refs)
+    compactions: List[MemoryCompactionRecord] = []
+    policy_version = f"{policy.policy_id}:{policy.version_tag}" if policy is not None \
+        else "G4_MEMORY_AND_REACTIVATION_POLICY:1.0.0"
+    for obj in sorted(index.objects_by_tier("ACTIVE_CONTEXT"),
+                      key=lambda o: o.object_id):
+        if obj.object_id in keep:
+            continue
+        relevant = bool(task_ref and (task_ref in obj.tags or task_ref in obj.dependency_refs))
+        if relevant:
+            continue
+        index.set_tier(obj.object_id, "DORMANT_STORE", reason_prefix,
+                       policy=policy_version)
+        compactions.append(MemoryCompactionRecord.make(
+            len(compactions), [obj.object_id], reason_prefix, "DORMANT_STORE",
+            summary=obj.summary, provenance_pointer=obj.provenance_pointer,
+            reconstruction_pointer=obj.reconstruction_pointer, epoch=epoch,
+            policy_version=policy_version))
+    return tuple(compactions), rule_id
