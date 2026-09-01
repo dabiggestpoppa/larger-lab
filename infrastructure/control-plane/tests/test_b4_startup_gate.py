@@ -1364,6 +1364,11 @@ class TestCXR5R3ActivationLineage:
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
         monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
         monkeypatch.setattr(ls, "COMPOSE_ENV_FILE", tmp_path / "runtime" / "compose.env")
+        # B4-CXR5X1: the CI runner injects ambient POSTGRES_PASSWORD/DSN into
+        # the pytest environment; the isolated test store is the sole authority
+        # here (the ambient value must not trigger a fail-closed mismatch).
+        monkeypatch.delenv("POSTGRES_PASSWORD", raising=False)
+        monkeypatch.delenv("POSTGRES_DSN", raising=False)
         class _FakeComp:
             returncode = 0
             stdout = ""
@@ -1556,6 +1561,9 @@ class TestCXR5R6AuthorityInputs:
         base = Path(__file__).resolve().parent.parent
         env["PYTHONPATH"] = str(base / "src") + os.pathsep + \
             env.get("PYTHONPATH", "")
+        # B4-CXR5X1: never inherit the CI runner's OCE_CI_MODE into the spawned
+        # worker — the test declares the seam explicitly per invocation.
+        env.pop("OCE_CI_MODE", None)
         env.update(extra_env)
         return subprocess.run(
             [sys.executable, str(base / "scripts" / "oce_b3_worker.py")],

@@ -214,7 +214,8 @@ def _audit_insert(pg, *, audit_id: str, request_id: str = "", actor: str = "oper
             "(audit_id, request_id, actor, setting, requested_change, reason, "
             " previous, new, decision, authorized, fingerprint_before, "
             " fingerprint_after, backend_identity) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
+            "ON CONFLICT (audit_id) DO NOTHING",
             (audit_id, request_id or audit_id, actor, setting, requested_change,
              reason, previous, new, decision, authorized, fingerprint_before,
              fingerprint_after, backend_identity))
