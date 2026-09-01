@@ -164,7 +164,7 @@ committed 09 schema fingerprints, live_probe_contracts.yaml, and the committed
 Bloc 2 probe payloads.  Synthetic fixtures never establish capability, history,
 symbol support, cursor direction, or field existence.
 
-## Known Limitations
+## Known Issues / Known Limitations
 
 - Trade/liquidation/funding continuation beyond a single request window:
   UNRESOLVED by committed evidence → LIMITED, no invented resume.
@@ -173,7 +173,12 @@ symbol support, cursor direction, or field existence.
 - Verified history bounds are literal I14 values (single timestamps for
   trade/liquidation); no deep-history claim.
 - `funding_rate`/`funding_1h`/`funding_8h` are unverified additive fields.
-- Network validation NOT_RUN (reserved for SENSOR-B3-I14).
+- Liquidation is a trade-level mechanism microscope (forced-liquidation
+  events) — never aggregated numerically with Gate/Kraken liquidation totals.
+- Live network validation: I10 baseline PASS (all four Deribit paths;
+  liquidation genuinely EMPTY_VALID in its closed window); no I10R1/I10R2
+  rerun required.  See `evidence/bloc_03/BLOC_03_I10_NETWORK_SMOKE_*` and
+  `BLOC_03_I10R2_SEMANTIC_SEAL_EVIDENCE.md`.
 
 ## Examples
 
