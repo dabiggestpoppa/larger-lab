@@ -1,7 +1,7 @@
 # S12 — G4 scenario result
 
 - outcome: **BOUNDED_CONTEXT** (expected `BOUNDED_CONTEXT`) — PASS
-- behavior fingerprint: `cdde25d0dc484df1dec4fa653bfe256e`
+- behavior fingerprint: `8c27840643772336a4b8bb21b3f77e39`
 - authority: NONE -> NONE
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
 

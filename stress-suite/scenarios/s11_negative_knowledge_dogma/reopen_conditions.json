@@ -1,11 +1,12 @@
 [
   {
     "condition_type": "BLOCKER_RESOLVED",
-    "subject_ref": "family_X_european",
+    "subject_ref": "NK_FAMILY_X",
     "field": "resolved_blockers",
     "operator": "BLOCKER_RESOLVED",
     "expected_value": "SENSOR_UNAVAILABLE",
     "evidence_required": true,
+    "evidence_refs": ["EV_NEW_SENSOR_CAPABILITY"],
     "scope": "family_X_european",
     "created_under_contract": "G4_MEMORY_AND_REACTIVATION_POLICY:1.0.0",
     "version_tag": "1.0.0"

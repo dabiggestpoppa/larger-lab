@@ -1,0 +1,23 @@
+[
+  {
+    "record_id": "EV_S10_NEW_SENSOR",
+    "kind": "OBSERVATION",
+    "claim": "new sensor confirms regime-alpha conditions are present again",
+    "lineage": "S10_NEW_SENSOR_LAB",
+    "seq": 0
+  },
+  {
+    "record_id": "EV_OLD_VALID",
+    "kind": "OBSERVATION",
+    "claim": "historical validation of regime-alpha (historical epoch E10a)",
+    "lineage": "S10_HISTORICAL",
+    "seq": 1
+  },
+  {
+    "record_id": "EV_DEMOTION",
+    "kind": "OBSERVATION",
+    "claim": "regime condition stopped holding; demotion evidence",
+    "lineage": "S10_HISTORICAL",
+    "seq": 2
+  }
+]

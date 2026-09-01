@@ -4,9 +4,22 @@
   "threat_class": "IRREVERSIBLE_REJECTION",
   "negative_ref": "negative.json",
   "reopen_conditions_ref": "reopen_conditions.json",
+  "evidence_ref": "evidence.json",
   "current_facts": {
     "resolved_blockers": ["SENSOR_UNAVAILABLE"],
-    "evidence_refs": ["EV_NEW_SENSOR_CAPABILITY"]
+    "evidence_refs": ["EV_NEW_SENSOR_CAPABILITY"],
+    "blocker_resolutions": [
+      {
+        "resolution_id": "RESOLVE_SENSOR_1",
+        "blocker": "SENSOR_UNAVAILABLE",
+        "subject": "NK_FAMILY_X",
+        "scope": "family_X_european",
+        "evidence_refs": ["EV_NEW_SENSOR_CAPABILITY"],
+        "resolution_method": "new sensor capability validated",
+        "provenance": "S11_FIXTURE",
+        "contract_version": "1.0.0"
+      }
+    ]
   },
   "expected_outcome": "STOP_SUPPRESSION",
   "hidden_ground_truth": {

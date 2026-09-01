@@ -1,7 +1,7 @@
 # S10 — G4 scenario result
 
 - outcome: **REOPEN_CANDIDATE** (expected `REOPEN_CANDIDATE`) — PASS
-- behavior fingerprint: `ea9ff74be77abe855112e7d63e0dd875`
+- behavior fingerprint: `99e8a0f9dccd595eb0bf775a0c3e2b81`
 - authority: NONE -> NONE
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
 

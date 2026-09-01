@@ -1,7 +1,7 @@
 # S11 — G4 scenario result
 
 - outcome: **STOP_SUPPRESSION** (expected `STOP_SUPPRESSION`) — PASS
-- behavior fingerprint: `4f78dba120179d7144986015893cc8f0`
+- behavior fingerprint: `a6c26120175ecac40b459dc3ae918ded`
 - authority: NONE -> NONE
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
 

@@ -4,6 +4,7 @@
   "threat_class": "HISTORICAL_BURIAL",
   "knowledge_ref": "knowledge.json",
   "reopen_conditions_ref": "reopen_conditions.json",
+  "evidence_ref": "evidence.json",
   "current_facts": {
     "regime_present": true,
     "evidence_refs": ["EV_S10_NEW_SENSOR"]
