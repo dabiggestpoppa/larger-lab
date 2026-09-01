@@ -49,6 +49,8 @@ from .enums import (
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
+_SEMVER_RE = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
+
 
 def _validate_sha256_syntax(value: str, field_name: str) -> None:
     """Validate SHA-256 FORMAT only (64 lowercase hex chars).  No hashing."""
@@ -56,6 +58,32 @@ def _validate_sha256_syntax(value: str, field_name: str) -> None:
         raise ValueError(
             f"{field_name} must be 64 lowercase hex characters, got {value!r}"
         )
+
+
+def _validate_semver(value: str, field_name: str) -> None:
+    """Validate a closed semantic version MAJOR.MINOR.PATCH (no prerelease).
+
+    Accepted: 1.0.0, 1.1.0, 2.0.0.  Rejected: 1, "1", v1, 1.0, 1.0.0-beta,
+    01.0.0, negative components, whitespace-padded forms.
+    """
+    if not _SEMVER_RE.fullmatch(value):
+        raise ValueError(
+            f"{field_name} must be MAJOR.MINOR.PATCH (e.g. 1.0.0), got {value!r}"
+        )
+
+
+def _validate_unique_sha256_list(values: list[str], field_name: str) -> None:
+    """Validate a list of T0A hash refs: each valid AND set-unique.
+
+    A duplicate physical blob reference is an upstream contract contradiction
+    (order carries no meaning here; ProjectionLineage.source_order owns ordering).
+    """
+    seen: set[str] = set()
+    for ref in values:
+        _validate_sha256_syntax(ref, f"{field_name} member")
+        if ref in seen:
+            raise ValueError(f"{field_name} contains duplicate hash ref {ref!r}")
+        seen.add(ref)
 
 
 def _validate_nonnegative_int(value: int, field_name: str) -> None:
@@ -187,14 +215,15 @@ class AcquisitionRecord(StorageModelBase):
 class RawProjectionArtifact(StorageModelBase):
     """Optional T0B lossless/rebuildable provider-native projection (F6).
 
-    T0B is subordinate to T0A and rebuildable from it.  No canonical
+    T0B is subordinate to T0A and rebuildable from it: EVERY projection MUST
+    reference one or more T0A source blobs (I01R1 §7).  No canonical
     asset/unit field may live here.
     """
 
     projection_id: str = Field(min_length=1)
-    source_blob_sha256: list[str] = Field(default_factory=list)
+    source_blob_sha256: list[str] = Field(min_length=1)
     projection_schema_id: str = Field(min_length=1)
-    projection_schema_version: int = 1
+    projection_schema_version: str = Field(min_length=5, max_length=64)
     parser_version: str = Field(min_length=1)
     row_count: int = 0
     min_provider_time: datetime | None = None
@@ -208,14 +237,31 @@ class RawProjectionArtifact(StorageModelBase):
     @model_validator(mode="after")
     def _validate_hash(self) -> RawProjectionArtifact:
         _validate_sha256_syntax(self.projection_sha256, "projection_sha256")
-        for ref in self.source_blob_sha256:
-            _validate_sha256_syntax(ref, "source_blob_sha256 member")
+        _validate_unique_sha256_list(self.source_blob_sha256, "source_blob_sha256")
+        return self
+
+    @model_validator(mode="after")
+    def _validate_semver(self) -> RawProjectionArtifact:
+        _validate_semver(self.projection_schema_version, "projection_schema_version")
         return self
 
     @model_validator(mode="after")
     def _validate_counts(self) -> RawProjectionArtifact:
         _validate_nonnegative_int(self.row_count, "row_count")
-        _validate_nonnegative_int(self.projection_schema_version, "projection_schema_version")
+        return self
+
+    @model_validator(mode="after")
+    def _validate_time_order(self) -> RawProjectionArtifact:
+        if (
+            self.min_provider_time is not None
+            and self.max_provider_time is not None
+            and self.max_provider_time < self.min_provider_time
+        ):
+            raise ValueError(
+                "max_provider_time must be >= min_provider_time "
+                f"({self.min_provider_time.isoformat()} > "
+                f"{self.max_provider_time.isoformat()})"
+            )
         return self
 
     @model_validator(mode="after")
@@ -275,7 +321,7 @@ class PartitionManifest(StorageModelBase):
     sensor_family: SensorFamily
     native_instrument: str = Field(min_length=1)
     source_granularity: Granularity | None = None
-    date_basis: DateBasis = DateBasis.EVENT_TIME
+    date_basis: DateBasis = DateBasis.UNKNOWN
     logical_date_start: datetime
     logical_date_end: datetime
     blob_refs: list[str] = Field(default_factory=list)
@@ -301,6 +347,24 @@ class PartitionManifest(StorageModelBase):
                 "logical_date_end must be >= logical_date_start "
                 f"({self.logical_date_start.isoformat()} > "
                 f"{self.logical_date_end.isoformat()})"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _validate_hash_refs(self) -> PartitionManifest:
+        _validate_unique_sha256_list(self.blob_refs, "blob_refs")
+        return self
+
+    @model_validator(mode="after")
+    def _validate_time_order(self) -> PartitionManifest:
+        if (
+            self.min_time is not None
+            and self.max_time is not None
+            and self.max_time < self.min_time
+        ):
+            raise ValueError(
+                "max_time must be >= min_time "
+                f"({self.min_time.isoformat()} > {self.max_time.isoformat()})"
             )
         return self
 
@@ -555,6 +619,11 @@ class RawEvidenceResult(StorageModelBase):
     lineage_refs: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
+    def _validate_hash_refs(self) -> RawEvidenceResult:
+        _validate_unique_sha256_list(self.blob_refs, "blob_refs")
+        return self
+
+    @model_validator(mode="after")
     def _normalize_timestamps(self) -> RawEvidenceResult:
         return normalize_utc_datetimes(self)  # type: ignore[return-value]
 
@@ -578,11 +647,11 @@ class RawNormalizationBatch(StorageModelBase):
     sensor_family: SensorFamily
     native_instrument: str = Field(min_length=1)
     projection_schema_id: str = Field(min_length=1)
-    projection_schema_version: int = 1
+    projection_schema_version: str = Field(min_length=5, max_length=64)
     parser_version: str = Field(min_length=1)
     raw_rows_or_reader: str = Field(min_length=1)  # descriptor/reference only
-    source_blob_refs: list[str] = Field(default_factory=list)
-    acquisition_refs: list[str] = Field(default_factory=list)
+    source_blob_refs: list[str] = Field(min_length=1)
+    acquisition_refs: list[str] = Field(min_length=1)
     logical_time_range_start: datetime
     logical_time_range_end: datetime
     integrity_state: IntegrityState = IntegrityState.UNVERIFIED
@@ -604,8 +673,15 @@ class RawNormalizationBatch(StorageModelBase):
         return self
 
     @model_validator(mode="after")
-    def _validate_counts(self) -> RawNormalizationBatch:
-        _validate_nonnegative_int(self.projection_schema_version, "projection_schema_version")
+    def _validate_semver(self) -> RawNormalizationBatch:
+        _validate_semver(self.projection_schema_version, "projection_schema_version")
+        return self
+
+    @model_validator(mode="after")
+    def _validate_source_lineage(self) -> RawNormalizationBatch:
+        # T1 lineage must trace back to T0: a normalization batch cannot lose
+        # all T0 source evidence (I01R1 §9).
+        _validate_unique_sha256_list(self.source_blob_refs, "source_blob_refs")
         return self
 
 
