@@ -1,0 +1,11 @@
+{
+  "scenario_id": "S03",
+  "scenario_version": "1.0.0",
+  "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
+  "institutional_scope": "core phase control: structural failure hidden by successful local repairs (patch maze)",
+  "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "PO": "PO"
+  },
+  "initial_knowledge": []
+}
