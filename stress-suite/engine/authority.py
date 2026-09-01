@@ -133,7 +133,8 @@ class AuthorityState:
     def __init__(self) -> None:
         self.actors: Dict[str, str] = {}          # actor -> AuthorityLevel
         self.registry = AuthorityRegistry()
-        self._ratifications: List[Tuple[str, str, str]] = []  # (proposer, target, authority_basis)
+        self._ratifications: List[Tuple[str, str, str]] = []  # (proposer, target, grant_id)
+        self._proposals: List[Tuple[str, str, CapabilityGrant]] = []  # pending proposals (G2R-05)
         self._initialization_frozen = False
 
     def freeze_initialization(self) -> None:
@@ -183,15 +184,47 @@ class AuthorityState:
         return None
 
     def propose_authority_change(self, proposer: str, target_actor: str, grant: CapabilityGrant) -> None:
-        """A worker/agent may PROPOSE an authority change but never self-ratify it."""
+        """A worker/agent may PROPOSE an authority change but never self-ratify it.
+
+        G2R-05: every ratification MUST reference a prior proposal. The proposal
+        stores the complete grant so a later ratification cannot fabricate a grant
+        that was never proposed."""
         self._ratifications.append((proposer, target_actor, grant.grant_id))
+        self._proposals.append((proposer, target_actor, grant))
+
+    def pending_proposal(self, proposer: str, target_actor: str, risk_class: Optional[str] = None,
+                         grant_id: Optional[str] = None) -> Optional[CapabilityGrant]:
+        """Resolve an existing proposal, or None. Used by the governed RATIFY
+        path so the ratification applies the PROPOSED grant, never a fabricated
+        reconstruction."""
+        for p, t, g in self._proposals:
+            if p != proposer or t != target_actor:
+                continue
+            if risk_class is not None and g.risk_class != risk_class:
+                continue
+            if grant_id is not None and g.grant_id != grant_id:
+                continue
+            return g
+        return None
 
     def ratify_authority_change(self, ratifier: str, proposer: str, target_actor: str, grant: CapabilityGrant) -> None:
-        """Only an actor with OPERATOR (or explicit governor mandate) may ratify."""
+        """Only an actor with OPERATOR (or explicit governor mandate) may ratify;
+        only a PRIOR PROPOSAL may be ratified (G2R-05); all authority-bearing risk
+        classes (deployment / destructive / broker / capital) require OPERATOR
+        ratification consistently."""
         if ratifier == target_actor:
             raise AuthorityViolation("self-ratification of authority change is forbidden")
-        if self.level(ratifier) not in (AuthorityLevel.OPERATOR.value,) and grant.risk_class in ("capital", "deployment", "destructive"):
-            raise AuthorityViolation(f"{ratifier} lacks authority to ratify a {grant.risk_class} change")
+        if self.pending_proposal(proposer, target_actor, grant_id=grant.grant_id) is None:
+            raise AuthorityViolation(
+                f"ratification of {grant.grant_id!r} has no PRIOR proposal "
+                f"(proposer={proposer!r}, target={target_actor!r}); a grant cannot "
+                f"be fabricated at ratification time"
+            )
+        if grant.risk_class in AUTHORITY_BEARING_RISK_CLASSES:
+            if self.level(ratifier) != AuthorityLevel.OPERATOR.value:
+                raise AuthorityViolation(
+                    f"{ratifier} lacks operator authority to ratify a {grant.risk_class} change"
+                )
         # ratification is recorded; the registry only issues AFTER ratification
         self.registry.issue(grant, ratified_by=ratifier)
         self._ratifications.append((ratifier, target_actor, grant.grant_id))

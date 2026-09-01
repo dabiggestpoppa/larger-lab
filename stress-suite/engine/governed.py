@@ -56,12 +56,17 @@ class TraceEntry:
 
 
 class GovernedTransitionExecutor:
-    def __init__(self, phase: PhaseStateMachine, lifecycle: LifecycleEngine, authority: Optional[AuthorityState] = None):
+    M5_APPLY_ROLES = ("GOVERNOR", "OPERATOR")  # G2R-04: M5 mutation = GOVERNOR path only
+
+    def __init__(self, phase: PhaseStateMachine, lifecycle: LifecycleEngine, authority: Optional[AuthorityState] = None,
+                 registry=None, operator_authorizations: Optional[Dict[str, str]] = None):
         self.phase = phase
         self.lifecycle = lifecycle
         self.authority = authority or AuthorityState()
         self.evidence: List[EvidenceRecord] = []      # governed evidence registry
         self.advisory: List[dict] = []                # operator_preference / profit — NEVER evidence
+        self.registry = registry                      # governed EvidenceRegistry (G2R-02, optional for low-level use)
+        self.operator_authorizations: Dict[str, str] = dict(operator_authorizations or {})  # auth_id -> to_state (G2R-07)
         self._f = F
 
     # ------------------------------------------------------------------ #
@@ -122,6 +127,21 @@ class GovernedTransitionExecutor:
     # ------------------------------------------------------------------ #
     # phase
     # ------------------------------------------------------------------ #
+    def _evidence_refs_ok(self, refs, event) -> Optional[TraceEntry]:
+        """G2R-02: every evidence_ref must resolve in the governed registry.
+        Unknown refs fail closed BEFORE any mutation (no phantom evidence)."""
+        if self.registry is None:
+            return None
+        for ref in refs or []:
+            if not self.registry.has(ref):
+                return TraceEntry(
+                    event.seq, event.machine, event.event_type, "", "",
+                    False, False, ("EVIDENCE_REF_UNKNOWN",),
+                    f"evidence ref {ref!r} is not registered (fail closed)",
+                    "EVIDENCE_REF_UNKNOWN",
+                )
+        return None
+
     def _run_phase(self, event) -> TraceEntry:
         p = event.payload or {}
         to_state = p.get("to_state", "")
@@ -145,13 +165,54 @@ class GovernedTransitionExecutor:
             return entry
         level = bound
 
+        # 2b) G2R-04 role-to-action: M5 phase MUTATION is the GOVERNOR path only.
+        #     A legitimate WORKER/PO with an enum-valid level must NOT drive the
+        #     phase machine directly; only GOVERNOR-level actors (operator
+        #     separately as constitutional authority) apply phase transitions.
+        if level not in self.M5_APPLY_ROLES:
+            return TraceEntry(
+                event.seq, "phase", event.event_type, from_state, to_state,
+                False, False, ("ROLE_NOT_AUTHORIZED",),
+                f"level {level!r} cannot apply an M5 phase transition; "
+                f"M5 application is reserved for {'/'.join(self.M5_APPLY_ROLES)} (G2R-04)",
+                "AUTHORITY_INVALID",
+            )
+
+        # 2c) G2R-07 operator-required: a transition that requires OPERATOR
+        #     authorization cannot be applied by a GOVERNOR event without an
+        #     explicit operator authorization (granted via OPERATOR_AUTHORIZE).
+        operator_required = bool(p.get("operator_required", False))
+        auth_id = p.get("operator_authorization_id", "")
+        if operator_required:
+            if self.authority.level("OPERATOR") != "OPERATOR":
+                # no operator seated at all -> cannot ever authorize; fail closed
+                return TraceEntry(
+                    event.seq, "phase", event.event_type, from_state, to_state,
+                    False, False, ("OPERATOR_REQUIRED",),
+                    "transition requires OPERATOR authorization but no OPERATOR is seated",
+                    "AUTHORITY_INVALID",
+                )
+            if not auth_id or self.operator_authorizations.get(auth_id) != to_state:
+                return TraceEntry(
+                    event.seq, "phase", event.event_type, from_state, to_state,
+                    False, False, ("OPERATOR_REQUIRED",),
+                    f"transition to {to_state!r} requires OPERATOR authorization; "
+                    f"a GOVERNOR event cannot apply it without a matching authorized id",
+                    "AUTHORITY_INVALID",
+                )
+
+        # 2d) G2R-02: evidence refs must resolve before any decision is formed.
+        bad_ref = self._evidence_refs_ok(p.get("evidence_refs", []), event)
+        if bad_ref is not None:
+            return bad_ref
+
         # 3) authority validity: exception BEFORE ledger mutation (documented policy),
         #    converted to a deterministic invalid replay event here.
         try:
             provisional = self.phase.evaluate(
                 seq=event.seq, actor=event.actor, to_state=to_state,
                 evidence_vector=p.get("evidence_vector", {}), authority_level=level,
-                mutation_class=mutation_class, operator_required=p.get("operator_required", False),
+                mutation_class=mutation_class, operator_required=operator_required,
                 evidence_refs=p.get("evidence_refs", []), reason=p.get("reason", ""),
             )
         except PhaseDecisionError as exc:
@@ -205,6 +266,11 @@ class GovernedTransitionExecutor:
         if entry is not None:
             return entry
         level = bound
+
+        # G2R-02: lifecycle actions may only cite registered evidence objects.
+        bad_ref = self._evidence_refs_ok(p.get("evidence_refs", []), event)
+        if bad_ref is not None:
+            return bad_ref
 
         action = p.get("action")
         # cross-cutting policy rejections for knowledge/ontology actions
@@ -284,14 +350,53 @@ class GovernedTransitionExecutor:
                     f"declared ratifier {declared_ratifier!r} != event.actor {ratifier!r}",
                     "AUTHORITY_INVALID",
                 )
+            # G2R-05: the ratification must reference an EXISTING proposal; the
+            # stored proposal grant is applied, never a reconstructed one.
+            proposer = p.get("proposer", "")
+            target = p.get("target", "")
+            risk_class = p.get("risk_class")
+            proposal = self.authority.pending_proposal(proposer, target, risk_class=risk_class)
+            if proposal is None:
+                return TraceEntry(
+                    event.seq, "authority", event.event_type, target,
+                    "rejected", False, False, ("NO_PRIOR_PROPOSAL",),
+                    f"ratification has no PRIOR proposal for proposer={proposer!r} "
+                    f"target={target!r} risk={risk_class}; a grant cannot be fabricated at ratification",
+                    "FORBIDDEN",
+                )
             try:
-                self.authority.ratify_authority_change(ratifier, p.get("proposer", ""),
-                                                       p.get("target", ""), _dummy_grant(event))
-                return TraceEntry(event.seq, "authority", event.event_type, p.get("target", ""),
+                self.authority.ratify_authority_change(ratifier, proposer, target, proposal)
+                return TraceEntry(event.seq, "authority", event.event_type, target,
                                   "ratified", True, True, (), "ratified", "OK")
             except AuthorityViolation as exc:
-                return TraceEntry(event.seq, "authority", event.event_type, p.get("target", ""),
+                return TraceEntry(event.seq, "authority", event.event_type, target,
                                   "rejected", False, False, ("AUTHORITY_FIREWALL",), str(exc), "FORBIDDEN")
+        elif action == "OPERATOR_AUTHORIZE":
+            # G2R-07: only the seated OPERATOR may grant an operator authorization
+            # for a specific governed action (to_state). This grants ACTION
+            # permission only — it never changes evidence or authority levels.
+            bound, entry = self._bind(event)
+            if entry is not None:
+                return entry
+            if bound != "OPERATOR":
+                return TraceEntry(
+                    event.seq, "authority", event.event_type, p.get("target", ""),
+                    "rejected", False, False, ("ROLE_NOT_AUTHORIZED",),
+                    f"only OPERATOR may issue an operator authorization; {bound!r} cannot",
+                    "AUTHORITY_INVALID",
+                )
+            auth_id = p.get("authorization_id", "")
+            to_state = p.get("to_state", "")
+            if not auth_id or not to_state:
+                return TraceEntry(
+                    event.seq, "authority", event.event_type, "", "rejected",
+                    False, False, ("AUTHORIZATION_INCOMPLETE",),
+                    "operator authorization requires authorization_id + to_state",
+                    "AUTHORITY_INVALID",
+                )
+            self.operator_authorizations[auth_id] = to_state
+            return TraceEntry(event.seq, "authority", event.event_type, p.get("target", ""),
+                              "authorized", True, True, (), f"operator authorized {to_state!r}", "OK")
         return TraceEntry(event.seq, "authority", event.event_type, "", "", False, False, (),
                           "unknown authority action", "UNKNOWN_MACHINE")
 
