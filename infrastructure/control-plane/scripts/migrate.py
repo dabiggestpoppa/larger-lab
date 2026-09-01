@@ -42,6 +42,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -430,7 +431,27 @@ def main(argv: list[str] | None = None) -> int:
     # mutate the governed database; the set identity is stable and
     # secret-free (no SQL contents in any evidence).
     canonical = _canonical_dir()
-    migration_set_identity(canonical)  # validates + snapshots; raises on defect
+    identity = migration_set_identity(canonical)  # validates; raises on defect
+    # B4-CXR5R3: when launched as a lifecycle child (activation envelope
+    # present), the migration-set identity MUST match the parent's pinned
+    # envelope — a child can never mutate the governed database under a
+    # different migration program than the one the parent activated.
+    envelope_raw = os.environ.get("OCE_ACTIVATION_ENVELOPE")
+    if envelope_raw:
+        try:
+            from oce_control.config_startup import ActivationEnvelope
+            envelope = ActivationEnvelope.from_json(envelope_raw)
+        except ValueError as exc:
+            print(f"FAIL: malformed activation envelope — {exc} "
+                  "(B4-CXR5R3)", file=sys.stderr)
+            return 2
+        expected = envelope.migration_set_identity or {}
+        if expected.get("manifest_sha256") and \
+                expected["manifest_sha256"] != identity["manifest_sha256"]:
+            print("FAIL: migration-set identity does not match the parent "
+                  "activation envelope — database mutation refused "
+                  "(B4-CXR5R3)", file=sys.stderr)
+            return 2
     if args.command == "up":
         return cmd_up(dsn, canonical)
     return cmd_status(dsn, canonical)

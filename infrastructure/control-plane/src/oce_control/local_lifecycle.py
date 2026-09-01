@@ -325,7 +325,20 @@ def wait_ready(timeout_s: int = 120) -> bool:
     return False
 
 
-def migrate(ctx=None) -> subprocess.CompletedProcess:
+def _migration_set_identity() -> dict:
+    """Canonical migration-set identity for the activation envelope
+    (B4-CXR5R3): ordered filenames, versions, file hashes — never SQL
+    contents. Loaded from the canonical migration program module."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "oce_migrate_identity", BASE_DIR / "scripts" / "migrate.py")
+    mod = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(mod)
+    return mod.migration_set_identity()
+
+
+def migrate(ctx=None, env=None) -> subprocess.CompletedProcess:
     """Apply migrations against the GOVERNED database (B4-CXR3R2).
 
     No public DSN parameter: the migration target is always derived from the
@@ -340,8 +353,18 @@ def migrate(ctx=None) -> subprocess.CompletedProcess:
     governed connection INTERNALLY from its own pinned activation; a
     password-bearing DSN never enters process argv, /proc/<pid>/cmdline,
     command capture, or diagnostics.
+
+    B4-CXR5R3: the child runs under the PARENT's SANITIZED activation
+    environment (envelope carrier) — no ambient secret or OCE_* authority
+    survives into the child, and the migration-set identity must match the
+    parent envelope.
     """
-    env = ls.compose_environment()
+    if ctx is None:
+        from oce_control.config_startup import create_activation_context
+        ctx = create_activation_context()
+    if env is None:
+        env = ctx.child_environment(
+            migration_set_identity=_migration_set_identity())
     cmd = [PYTHON, str(BASE_DIR / "scripts" / "migrate.py"), "up"]
     return subprocess.run(cmd, cwd=str(BASE_DIR), env=env, capture_output=True,
                           text=True, timeout=300)
@@ -368,11 +391,17 @@ def smoke(port: int | None = None) -> list[str]:
     return results
 
 
-def start_process(name: str, argv: list[str]) -> Path:
-    """Launch a runtime process with PID-file ownership and a log file."""
+def start_process(name: str, argv: list[str], env: dict | None = None) -> Path:
+    """Launch a runtime process with PID-file ownership and a log file.
+
+    B4-CXR5R3: callers pass the SANITIZED child environment from the pinned
+    ActivationContext (envelope carrier) so a child can never be redirected
+    by ambient secrets or OCE_* authority. Defaults to compose_environment()
+    for compatibility with callers that do not carry a pinned context.
+    """
     log = ls.LOGS_DIR / f"{name}.log"
     ls.LOGS_DIR.mkdir(parents=True, exist_ok=True)
-    env = ls.compose_environment()
+    env = dict(env) if env is not None else ls.compose_environment()
     env["PYTHONPATH"] = str(BASE_DIR / "src") + os.pathsep + env.get("PYTHONPATH", "")
     fd = open(log, "ab")
     proc = subprocess.Popen(argv, cwd=str(BASE_DIR), env=env,
@@ -447,31 +476,36 @@ def doctor() -> dict:
 
 
 def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
-    # Book 4 surface C: validate the effective configuration before activating.
-    # Fail closed on malformed / incomplete / forbidden config.
-    #
-    # B4-R3R3: configuration/init and runtime/start are distinguished. The
-    # init step (`configure`) MAY materialize the local runtime secret (Book 2
-    # invariant — a strong random secret on first governed configuration).
-    # Runtime start then REQUIRES the canonical reference to resolve against
-    # the approved store; a fabricated, unbacked reference string never
-    # activates the runtime.
+    # B4-CXR5R3: snapshot the activation inputs ONCE and resolve/validate the
+    # effective configuration ONCE (fail closed on malformed / incomplete /
+    # forbidden config BEFORE any init/mutation).
+    from oce_control.config_spine import ValidationError as _VE
     from oce_control.config_startup import (
-        require_runtime_startable, require_startable)
-
-    require_startable()
+        create_activation_context, effective_from_env, startup_report,
+        validate_effective)
+    snapshot = dict(os.environ)
+    try:
+        eff = effective_from_env(snapshot)
+        validate_effective(eff)
+    except _VE:
+        raise SystemExit(startup_report(snapshot))
     actions: list[str] = []
+    # B4-R3R3: configuration/init and runtime/start are distinguished. The
+    # separated INIT stage (`configure`) MAY materialize the local runtime
+    # secret (Book 2 invariant — a strong random secret on first governed
+    # configuration) using the SAME snapshotted configuration.
     report = configure()
     actions.append(f"configured secret ({report['secret_source']})")
-    # B4-CXR3R7: one unified fail-closed runtime-start gate after init —
-    # configuration posture AND durable secret resolution.
-    require_runtime_startable()
-    actions.append("config spine: effective config validated + secret resolved (fail-closed)")
-    # B4-CXR4R3: freeze ONE immutable ActivationContext; every downstream
-    # step (migrations, health probe port) consumes the PINNED authority.
-    from oce_control.config_startup import create_activation_context
-    ctx = create_activation_context()
-    actions.append("activation context pinned (immutable effective config + secret identity)")
+    # B4-CXR5R3: create EXACTLY ONE authoritative parent ActivationContext
+    # (reusing the pre-resolved effective config — no second resolution);
+    # every downstream step consumes the PINNED authority.
+    ctx = create_activation_context(environ=snapshot, eff=eff)
+    actions.append("activation context pinned (one resolution; immutable effective config + secret identity)")
+    # B4-CXR5R3: the SANITIZED child environment carries the safe activation
+    # envelope — children prove the same lineage instead of re-reading
+    # ambient authority.
+    child_env = ctx.child_environment(
+        migration_set_identity=_migration_set_identity())
     if not docker_available():
         raise RuntimeError("Docker is unavailable — the local runtime requires Docker "
                            "(PostgreSQL + Redis run as local containers on loopback)")
@@ -484,7 +518,7 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
         raise RuntimeError("postgres/redis did not become healthy")
     actions.append("postgres + redis healthy")
     if migrate_now:
-        r = migrate(ctx)
+        r = migrate(ctx, env=child_env)
         if r.returncode != 0:
             raise RuntimeError(f"migrations failed:\n{r.stdout}\n{r.stderr}")
         actions.append("migrations applied")
@@ -492,10 +526,10 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     # argv — the worker reads its token from the approved store (initialized
     # once in configure(); read-only during start/restart/recover).
     start_process("worker", [PYTHON, "-m", "oce_control.worker_loop",
-                             "--worker-id", "worker-local01"])
+                             "--worker-id", "worker-local01"], env=child_env)
     actions.append("worker started (pid-file owned, token from approved store)")
-    start_process("api", [PYTHON, "-m", "oce_control.http_api"])
-    actions.append("api started (pid-file owned)")
+    start_process("api", [PYTHON, "-m", "oce_control.http_api"], env=child_env)
+    actions.append("api started (pid-file owned, pinned activation lineage)")
     if not wait_for_http(timeout_s, port=ctx.control_plane_port):
         raise RuntimeError("API did not answer on 127.0.0.1")
     results = smoke(port=ctx.control_plane_port)
@@ -563,12 +597,16 @@ def recover() -> list[str]:
     actions.append("migrations up-to-date")
     for name, (pidfile, marker) in PROCESSES.items():
         if pid_state(pid_file(name), marker)[0] != "live":
+            child_env = ctx.child_environment(
+                migration_set_identity=_migration_set_identity())
             if name == "worker":
                 start_process("worker", [PYTHON, "-m", "oce_control.worker_loop",
-                                         "--worker-id", "worker-local01"])
+                                         "--worker-id", "worker-local01"],
+                              env=child_env)
             else:
-                start_process("api", [PYTHON, "-m", "oce_control.http_api"])
-            actions.append(f"{name} restarted")
+                start_process("api", [PYTHON, "-m", "oce_control.http_api"],
+                              env=child_env)
+            actions.append(f"{name} restarted (pinned activation lineage)")
     return actions
 
 

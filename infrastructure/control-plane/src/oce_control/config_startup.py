@@ -28,7 +28,9 @@ setting and the rule, but never prints a secret value.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
+import re
 import sys
 from dataclasses import dataclass
 
@@ -96,6 +98,9 @@ OPERATIONAL_OCE_VARS = frozenset({
     # worker CLI / outbound client plumbing
     "OCE_CP_URL", "OCE_WORKER_ID", "OCE_WORKER_TOKEN", "OCE_WORKER_SECRET",
     "OCE_JOB_FILE", "OCE_WS_BASE", "OCE_ATTEMPT_WS", "OCE_RUNTIME_DIR",
+    # B4-CXR5R3: safe activation-lineage carrier for child processes (JSON
+    # envelope of SAFE metadata only — no passwords, tokens, or DSNs)
+    "OCE_ACTIVATION_ENVELOPE",
 })
 
 # Canonical reference name for the local runtime PostgreSQL secret. The
@@ -194,8 +199,18 @@ def governed_runtime_dsn(environ: dict | None = None,
     """
     if ctx is not None:
         return ctx.runtime_dsn(backend)
+    # B4-CXR5R3: a durable consumer that reaches the fallback WITHOUT a pinned
+    # context inside a lifecycle-launched process (envelope present) fails
+    # closed — the envelope is the only activation authority for children.
+    if _envelope_present(environ) and eff is None:
+        raise SystemExit(
+            "production activation requires a pinned ActivationContext — "
+            "governed_runtime_dsn() without ctx is a test-only compatibility "
+            "path and is unreachable in a lifecycle-launched process "
+            "(B4-CXR5R3)")
     if eff is None:
-        eff = effective_from_env(environ)
+        ctx = create_activation_context(environ)  # resolve ONCE, pin
+        return ctx.runtime_dsn(backend)
     password = resolve_startup_secret(eff, backend)
     host = eff.get("postgres.host") or ls.PG_HOST
     # CXR3-04 defense in depth: the durable DB host may only be the local
@@ -388,12 +403,28 @@ def require_runtime_startable(
     effective config and the resolved secret metadata so later environment
     mutation cannot alter the activation.
     """
-    report = validate_runtime_readiness(environ, backend)
-    if not report["ok"]:
-        raise SystemExit(startup_report(environ))
-    if not report["ready"]:
-        raise SystemExit(report["error"])
-    return effective_from_env(environ)
+    # B4-CXR5R3: resolve the environment EXACTLY ONCE — the returned
+    # effective config is the one that passed both gates (no second
+    # resolution that could observe a different environment).
+    try:
+        eff = effective_from_env(environ)
+        validate_effective(eff)
+        resolve_startup_secret(eff, backend)
+    except ValidationError as exc:
+        raise SystemExit(startup_report(environ)) from exc
+    except PermissionError as exc:
+        raise SystemExit(
+            f"OCE startup BLOCKED: {redact_message(str(exc))} — run "
+            "`python scripts/oce_local.py configure` to materialize the local "
+            "runtime secret (or set OCE_POSTGRES_PASSWORD_REF to an existing "
+            "reference)") from exc
+    except KeyError as exc:
+        raise SystemExit(
+            f"OCE startup BLOCKED: {redact_message(str(exc))} — run "
+            "`python scripts/oce_local.py configure` to materialize the local "
+            "runtime secret (or set OCE_POSTGRES_PASSWORD_REF to an existing "
+            "reference)") from exc
+    return eff
 
 
 # --------------------------------------------------------------------------- #
@@ -409,6 +440,124 @@ def require_runtime_startable(
 # SAME pinned object instead of re-reading os.environ. If the secret is
 # rotated/revoked after context creation, the context is STALE and every
 # consumer fails closed — a rotated authority is never silently adopted.
+
+
+@dataclass(frozen=True)
+class ActivationEnvelope:
+    """SAFE, secret-free activation-lineage proof for child processes
+    (B4-CXR5R3).
+
+    Contains ONLY safe metadata: context identity, fingerprints, secret
+    reference identity, backend identity, generation, revocation state,
+    pinned bind parameters, and the migration-set identity. NEVER contains
+    a password, a worker token, or a password-bearing DSN. Child processes
+    consume the envelope to prove the SAME pinned activation lineage; a
+    stale generation/revocation state or a forged identity fails closed
+    before any socket/database/workspace/process activity.
+    """
+    schema_version: int
+    context_id: str
+    config_fingerprint: str
+    security_state_fingerprint: str
+    secret_reference: str
+    secret_backend_identity: str
+    secret_generation: int
+    secret_revocation_state: bool
+    control_plane_host: str
+    control_plane_port: int
+    scheduler_interval: int
+    postgres_host: str
+    postgres_port: int
+    postgres_database: str
+    postgres_user: str
+    canonical_control_plane_url: str
+    migration_set_identity: dict
+    parent_activation_id: str = ""
+
+    def to_dict(self) -> dict:
+        return {
+            "schema_version": self.schema_version,
+            "context_id": self.context_id,
+            "config_fingerprint": self.config_fingerprint,
+            "security_state_fingerprint": self.security_state_fingerprint,
+            "secret_reference": self.secret_reference,
+            "secret_backend_identity": self.secret_backend_identity,
+            "secret_generation": self.secret_generation,
+            "secret_revocation_state": self.secret_revocation_state,
+            "control_plane_host": self.control_plane_host,
+            "control_plane_port": self.control_plane_port,
+            "scheduler_interval": self.scheduler_interval,
+            "postgres_host": self.postgres_host,
+            "postgres_port": self.postgres_port,
+            "postgres_database": self.postgres_database,
+            "postgres_user": self.postgres_user,
+            "canonical_control_plane_url": self.canonical_control_plane_url,
+            "migration_set_identity": self.migration_set_identity,
+            "parent_activation_id": self.parent_activation_id,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ActivationEnvelope":
+        if not isinstance(data, dict):
+            raise ValueError("envelope must be a JSON object")
+        required = ("schema_version", "context_id", "config_fingerprint",
+                    "security_state_fingerprint", "secret_reference",
+                    "secret_backend_identity", "secret_generation",
+                    "secret_revocation_state", "control_plane_host",
+                    "control_plane_port", "scheduler_interval",
+                    "postgres_host", "postgres_port", "postgres_database",
+                    "postgres_user", "canonical_control_plane_url",
+                    "migration_set_identity")
+        missing = [k for k in required if k not in data]
+        if missing:
+            raise ValueError(f"envelope missing fields: {', '.join(missing)}")
+        if not isinstance(data["schema_version"], int):
+            raise ValueError("envelope schema_version must be an int")
+        if not isinstance(data["context_id"], str) or not re.fullmatch(
+                r"[0-9a-f]{64}", data["context_id"]):
+            raise ValueError("envelope context_id must be a 64-hex string")
+        if not isinstance(data["secret_generation"], int):
+            raise ValueError("envelope secret_generation must be an int")
+        if not isinstance(data["secret_revocation_state"], bool):
+            raise ValueError("envelope secret_revocation_state must be a bool")
+        if not isinstance(data["control_plane_port"], int):
+            raise ValueError("envelope control_plane_port must be an int")
+        if not isinstance(data["scheduler_interval"], int):
+            raise ValueError("envelope scheduler_interval must be an int")
+        if not isinstance(data["postgres_port"], int):
+            raise ValueError("envelope postgres_port must be an int")
+        if not isinstance(data["migration_set_identity"], dict):
+            raise ValueError("envelope migration_set_identity must be a dict")
+        return cls(
+            schema_version=data["schema_version"],
+            context_id=data["context_id"],
+            config_fingerprint=data["config_fingerprint"],
+            security_state_fingerprint=data["security_state_fingerprint"],
+            secret_reference=data["secret_reference"],
+            secret_backend_identity=data["secret_backend_identity"],
+            secret_generation=data["secret_generation"],
+            secret_revocation_state=data["secret_revocation_state"],
+            control_plane_host=data["control_plane_host"],
+            control_plane_port=data["control_plane_port"],
+            scheduler_interval=data["scheduler_interval"],
+            postgres_host=data["postgres_host"],
+            postgres_port=data["postgres_port"],
+            postgres_database=data["postgres_database"],
+            postgres_user=data["postgres_user"],
+            canonical_control_plane_url=data["canonical_control_plane_url"],
+            migration_set_identity=data["migration_set_identity"],
+            parent_activation_id=str(data.get("parent_activation_id", "")),
+        )
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict(), sort_keys=True)
+
+    @classmethod
+    def from_json(cls, raw: str) -> "ActivationEnvelope":
+        try:
+            return cls.from_dict(json.loads(raw))
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"malformed activation envelope JSON: {exc}")
 
 
 @dataclass(frozen=True)
@@ -493,18 +642,152 @@ class ActivationContext:
             "canonical_control_plane_url": self.canonical_control_plane_url,
         }
 
+    # -- B4-CXR5R3: activation lineage -------------------------------------
+    def build_envelope(self, migration_set_identity: dict | None = None
+                       ) -> "ActivationEnvelope":
+        """Serialize this PINNED context into a safe, secret-free envelope for
+        child processes. NEVER includes passwords, tokens, or DSNs."""
+        return ActivationEnvelope(
+            schema_version=1,
+            context_id=self.context_id,
+            config_fingerprint=self.config_fingerprint,
+            security_state_fingerprint=self.security_state_fingerprint,
+            secret_reference=self.secret_reference,
+            secret_backend_identity=self.secret_backend_identity,
+            secret_generation=self.secret_generation,
+            secret_revocation_state=self.secret_revocation_state,
+            control_plane_host=self.control_plane_host,
+            control_plane_port=self.control_plane_port,
+            scheduler_interval=self.scheduler_interval,
+            postgres_host=self.postgres_host,
+            postgres_port=self.postgres_port,
+            postgres_database=self.postgres_database,
+            postgres_user=self.postgres_user,
+            canonical_control_plane_url=self.canonical_control_plane_url,
+            migration_set_identity=dict(migration_set_identity or {}),
+        )
+
+    def child_environment(self, migration_set_identity: dict | None = None
+                          ) -> dict:
+        """SANITIZED child environment for API/worker/migration subprocesses
+        (B4-CXR5R3).
+
+        Starts from sanitized_environment() (strips ambient POSTGRES_* /
+        worker-secret values), removes EVERY ambient OCE_* variable (the
+        envelope is now the only activation authority — a child cannot be
+        redirected by a mutated parent environment), and injects the safe
+        activation envelope. Children prove current secret generation/
+        revocation freshness against the approved store or fail closed.
+        """
+        env = ls.sanitized_environment()
+        for key in [k for k in env if k.startswith("OCE_")]:
+            env.pop(key, None)
+        env["OCE_ACTIVATION_ENVELOPE"] = self.build_envelope(
+            migration_set_identity).to_json()
+        return env
+
+
+def _envelope_present(environ: dict | None = None) -> bool:
+    """True when the (child) environment carries an activation envelope."""
+    env = environ if environ is not None else os.environ
+    return bool(env.get("OCE_ACTIVATION_ENVELOPE"))
+
+
+def _context_from_envelope(raw: str, env: dict,
+                           backend: "ls.RuntimeSecretBackend"
+                           ) -> "ActivationContext":
+    """Reconstruct the PINNED ActivationContext from a child envelope
+    (B4-CXR5R3).
+
+    The child consumes the parent's safe envelope instead of re-resolving
+    ambient authority: it proves current secret generation/revocation
+    freshness against the approved store (stale -> fail closed BEFORE any
+    socket/database/workspace/process activity), verifies the envelope's
+    context identity is self-consistent, and re-validates posture from the
+    (sanitized) child environment. The envelope itself contains no secrets.
+    """
+    try:
+        envelope = ActivationEnvelope.from_json(raw)
+    except ValueError as exc:
+        raise SystemExit(
+            f"OCE activation lineage BLOCKED: {redact_message(str(exc))} — "
+            "malformed activation envelope (B4-CXR5R3)") from exc
+    if envelope.schema_version != 1:
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: unsupported envelope schema "
+            f"version {envelope.schema_version} (B4-CXR5R3)")
+    name = envelope.secret_reference.split(":", 1)[1]
+    if backend.generation(name) != envelope.secret_generation or \
+            backend.is_revoked(name) != envelope.secret_revocation_state:
+        raise SystemExit(
+            "OCE activation lineage STALE: secret authority changed after "
+            "parent activation — rotated/revoked authority is never adopted "
+            "silently; re-activation required (B4-CXR5R3)")
+    # identity self-consistency: the context id must match the envelope's
+    # pinned metadata (a forged/inconsistent envelope fails closed)
+    expected_id = hashlib.sha256(
+        (f"{envelope.config_fingerprint}|{envelope.secret_reference}|"
+         f"{envelope.secret_generation}|{envelope.secret_revocation_state}|"
+         f"{envelope.secret_backend_identity}").encode("utf-8")).hexdigest()
+    if envelope.context_id != expected_id:
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: envelope context identity is "
+            "inconsistent — forged activation lineage refused (B4-CXR5R3)")
+    # posture re-validated from the sanitized child environment
+    synth = dict(env)
+    synth["OCE_CONTROL_PLANE_HOST"] = envelope.control_plane_host
+    synth["OCE_CONTROL_PLANE_PORT"] = str(envelope.control_plane_port)
+    synth["OCE_SCHEDULER_INTERVAL"] = str(envelope.scheduler_interval)
+    synth["OCE_POSTGRES_HOST"] = envelope.postgres_host
+    try:
+        eff = effective_from_env(synth)
+        validate_effective(eff)
+    except ValidationError:
+        raise SystemExit(startup_report(synth))
+    return ActivationContext(
+        effective_config=eff,
+        config_fingerprint=envelope.config_fingerprint,
+        secret_reference=envelope.secret_reference,
+        secret_backend_identity=envelope.secret_backend_identity,
+        secret_generation=envelope.secret_generation,
+        secret_revocation_state=envelope.secret_revocation_state,
+        security_state_fingerprint=envelope.security_state_fingerprint,
+        control_plane_host=envelope.control_plane_host,
+        control_plane_port=envelope.control_plane_port,
+        scheduler_interval=envelope.scheduler_interval,
+        postgres_host=envelope.postgres_host,
+        postgres_port=envelope.postgres_port,
+        postgres_database=envelope.postgres_database,
+        postgres_user=envelope.postgres_user,
+        canonical_control_plane_url=envelope.canonical_control_plane_url,
+        context_id=envelope.context_id,
+    )
+
 
 def create_activation_context(
         environ: dict | None = None,
-        backend: "ls.RuntimeSecretBackend | None" = None) -> ActivationContext:
-    """Build ONE immutable activation context (B4-CXR4R3).
+        backend: "ls.RuntimeSecretBackend | None" = None,
+        eff: EffectiveConfig | None = None) -> ActivationContext:
+    """Build ONE immutable activation context (B4-CXR4R3 / B4-CXR5R3).
 
-    snapshot env ONCE
-      -> validate governed OCE namespace
-      -> resolve EffectiveConfig ONCE (default < file < environment < cli)
-      -> validate posture (validate_effective)
-      -> resolve required secret metadata (reference MUST resolve)
-      -> freeze ActivationContext
+    PARENT path (no envelope in the environment):
+
+      snapshot env ONCE
+        -> validate governed OCE namespace
+        -> resolve EffectiveConfig ONCE (default < file < environment < cli)
+        -> validate posture (validate_effective)
+        -> resolve required secret metadata (reference MUST resolve)
+        -> freeze ActivationContext
+
+    A caller may pass a PRE-RESOLVED validated *eff* (from the same
+    snapshot) so a full start resolves the environment exactly once; the
+    context then freezes that same effective config.
+
+    CHILD path (OCE_ACTIVATION_ENVELOPE present in the environment): the
+    context is reconstructed from the parent's safe envelope — proving
+    secret generation/revocation freshness against the approved store and
+    rejecting forged/inconsistent identities — instead of re-resolving
+    ambient authority (B4-CXR5R3).
 
     Raises SystemExit (fail closed) on any violation. The SAME frozen object
     is then passed to every runtime consumer, so the configuration that
@@ -512,13 +795,18 @@ def create_activation_context(
     later os.environ mutation cannot change the activation.
     """
     env = dict(environ if environ is not None else os.environ)
-    try:
-        eff = effective_from_env(env)  # namespace + posture validated
-        validate_effective(eff)  # explicit, self-documenting
-    except ValidationError:
-        # operator-legible, secret-free denial — same contract as the other
-        # activation gates (no raw exception prose reaches the operator)
-        raise SystemExit(startup_report(env))
+    raw_envelope = env.get("OCE_ACTIVATION_ENVELOPE")
+    if raw_envelope:
+        backend = backend if backend is not None else ls.RuntimeSecretBackend()
+        return _context_from_envelope(raw_envelope, env, backend)
+    if eff is None:
+        try:
+            eff = effective_from_env(env)  # namespace + posture validated
+            validate_effective(eff)  # explicit, self-documenting
+        except ValidationError:
+            # operator-legible, secret-free denial — same contract as the
+            # other activation gates (no raw exception prose reaches operator)
+            raise SystemExit(startup_report(env))
     backend = backend if backend is not None else ls.RuntimeSecretBackend()
     ref = eff.get("postgres.password_ref")
     name = ref.split(":", 1)[1]

@@ -367,8 +367,9 @@ def test_cxr5r1_worker_launch_argv_has_no_token(monkeypatch):
     _mock_docker_runtime(monkeypatch)
     seen: dict = {}
 
-    def _capture(name, argv):
+    def _capture(name, argv, env=None):
         seen[name] = list(argv)
+        seen[f"{name}_env"] = dict(env or {})
         return ls.RUNTIME_DIR / f"{name}.pid"
 
     monkeypatch.setattr(ll, "start_process", _capture)
@@ -379,6 +380,13 @@ def test_cxr5r1_worker_launch_argv_has_no_token(monkeypatch):
     assert "--dsn" not in argv
     assert token not in argv            # canary: token bytes never in argv
     assert "postgresql://" not in argv
+    # B4-CXR5R3: the child env carries the activation envelope, NEVER the
+    # token/password or any ambient OCE_* authority
+    wenv = seen["worker_env"]
+    assert token not in " ".join(wenv.values())
+    assert "POSTGRES_PASSWORD" not in wenv and "POSTGRES_DSN" not in wenv
+    assert "OCE_ACTIVATION_ENVELOPE" in wenv  # safe lineage carrier present
+    assert "context_id" in wenv["OCE_ACTIVATION_ENVELOPE"]
 
 
 def test_cxr5r1_migrate_argv_has_no_password(monkeypatch):

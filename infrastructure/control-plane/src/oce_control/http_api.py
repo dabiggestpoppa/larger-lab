@@ -315,10 +315,20 @@ def runtime_bind(environ: Optional[dict] = None, ctx=None) -> tuple:
     B4-CXR4R3: when a pinned ActivationContext is supplied, the bind comes
     from the PINNED config — later os.environ mutation cannot move the
     listener away from the validated posture.
+
+    B4-CXR5R3: the ctx=None path is a TEST-ONLY / standalone compatibility
+    wrapper (resolves exactly once and pins). In a lifecycle-launched
+    process the activation envelope is present and the durable consumer
+    MUST use the pinned context — the fallback fails closed there.
     """
     if ctx is not None:
         return ctx.control_plane_host, ctx.control_plane_port
-    from .config_startup import require_startable
+    from .config_startup import _envelope_present, require_startable
+    if _envelope_present(environ):
+        raise SystemExit(
+            "production activation requires a pinned ActivationContext — "
+            "runtime_bind(ctx=None) is unreachable in a lifecycle-launched "
+            "process (B4-CXR5R3)")
     eff = require_startable(environ)
     host = eff.get("control_plane.host")
     port = int(eff.get("control_plane.port"))
@@ -328,10 +338,18 @@ def runtime_bind(environ: Optional[dict] = None, ctx=None) -> tuple:
 def runtime_scheduler_interval(environ: Optional[dict] = None, ctx=None) -> int:
     """Scheduler tick interval from the gated effective config (B4-R3R2).
 
-    B4-CXR4R3: a pinned context supplies the pinned interval directly."""
+    B4-CXR4R3: a pinned context supplies the pinned interval directly.
+
+    B4-CXR5R3: the ctx=None path is a TEST-ONLY / standalone compatibility
+    wrapper; it fails closed inside a lifecycle-launched process."""
     if ctx is not None:
         return ctx.scheduler_interval
-    from .config_startup import require_startable
+    from .config_startup import _envelope_present, require_startable
+    if _envelope_present(environ):
+        raise SystemExit(
+            "production activation requires a pinned ActivationContext — "
+            "runtime_scheduler_interval(ctx=None) is unreachable in a "
+            "lifecycle-launched process (B4-CXR5R3)")
     return int(require_startable(environ).get("control_plane.scheduler_interval"))
 
 
@@ -350,6 +368,11 @@ def build_durable_app(*, scheduler_tick_interval: int = 5, ctx=None) -> FastAPI:
     B4-CXR4R3: a pinned ActivationContext (ctx) supplies the DSN from its
     PINNED postgres parameters and reference (stale-checked) instead of
     re-reading the environment.
+
+    B4-CXR5R3: the ctx=None path is a TEST-ONLY compatibility wrapper that
+    resolves ONE pinned activation (never a loose re-read); it fails closed
+    inside a lifecycle-launched process (envelope present). Production
+    durable entrypoints always pass a pinned ctx.
     """
     import psycopg2
     from .authority import AuthorityEngine
@@ -362,12 +385,17 @@ def build_durable_app(*, scheduler_tick_interval: int = 5, ctx=None) -> FastAPI:
     # secret boundary (postgres.password_ref -> approved store -> ephemeral
     # DSN). Ambient POSTGRES_DSN/POSTGRES_PASSWORD can no longer redirect the
     # connection away from the spine-validated secret.
-    from .config_startup import governed_runtime_dsn, require_secret_resolvable
+    from .config_startup import _envelope_present, create_activation_context
     if ctx is not None:
         dsn = ctx.runtime_dsn()
     else:
-        require_secret_resolvable()
-        dsn = governed_runtime_dsn()
+        if _envelope_present():
+            raise SystemExit(
+                "production activation requires a pinned ActivationContext — "
+                "build_durable_app(ctx=None) is unreachable in a "
+                "lifecycle-launched process (B4-CXR5R3)")
+        ctx = create_activation_context()  # resolve ONCE, pin
+        dsn = ctx.runtime_dsn()
     conn = psycopg2.connect(dsn)
     conn.autocommit = False
 

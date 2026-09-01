@@ -1312,3 +1312,209 @@ class TestCXR5R2CanonicalMigrationProgram:
             encoding="utf-8")
         after = mig.migration_set_identity()
         assert after["manifest_sha256"] != before["manifest_sha256"]
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR5R3 (CXR5-03) — ONE activation lineage across process boundaries: the
+# parent resolves the environment exactly ONCE and freezes one authoritative
+# ActivationContext; children consume a SANITIZED environment carrying a safe
+# secret-free ActivationEnvelope and prove current generation/revocation
+# freshness (stale/forged/revoked lineage fails closed before activity).
+# --------------------------------------------------------------------------- #
+class TestCXR5R3ActivationLineage:
+    def _ctx(self, tmp_path, env=None):
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+                         encoding="utf-8")
+        backend = ls.RuntimeSecretBackend(store)
+        ctx = cs.create_activation_context(
+            environ=dict(env or CLEAN_ENV), backend=backend)
+        return ctx, backend, store
+
+    def test_one_parent_resolution_during_start(self, monkeypatch, tmp_path):
+        # exactly ONE environment/config resolution during one ll.start()
+        import oce_control.local_lifecycle as ll
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+        class _FakeComp:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+
+        monkeypatch.setattr(ll, "docker_available", lambda: True)
+        monkeypatch.setattr(ll, "compose", lambda *a, **k: _FakeComp())
+        monkeypatch.setattr(ll, "wait_ready", lambda *a, **k: True)
+        monkeypatch.setattr(ll, "migrate", lambda *a, **k: _FakeComp())
+        monkeypatch.setattr(ll, "wait_for_http", lambda *a, **k: True)
+        monkeypatch.setattr(ll, "smoke",
+                            lambda *a, **k: [("health", True), ("console", True)])
+        monkeypatch.setattr(ll, "start_process",
+                            lambda *a, **k: Path("mock.pid"))
+        calls = []
+        orig = cs.effective_from_env
+
+        def _counting(environ=None, registry=None):
+            calls.append(1)
+            return orig(environ, registry=registry)
+
+        monkeypatch.setattr(cs, "effective_from_env", _counting)
+        ll.start()
+        assert len(calls) == 1  # M: exactly one parent resolution
+
+    def test_child_consumes_envelope_pinned_values(self, tmp_path):
+        # J: parent created, environment mutated afterwards — the child
+        # (envelope env) stays pinned to the parent's authority
+        from oce_control import local_secrets as ls
+        env = {**CLEAN_ENV, "OCE_CONTROL_PLANE_PORT": "8455",
+               "OCE_SCHEDULER_INTERVAL": "9"}
+        ctx, backend, _ = self._ctx(tmp_path, env=env)
+        assert ctx.control_plane_port == 8455 and ctx.scheduler_interval == 9
+        child_env = ctx.child_environment()
+        # mutate ambient authority AFTER parent creation — must not move child
+        child_env["OCE_CONTROL_PLANE_PORT"] = "9999"
+        child_env["POSTGRES_PASSWORD"] = "ambient-attack-1234567890"
+        child = cs.create_activation_context(environ=child_env, backend=backend)
+        assert child.context_id == ctx.context_id       # same lineage
+        assert child.control_plane_port == 8455          # pinned
+        assert child.scheduler_interval == 9
+        assert child.runtime_dsn(backend) == ctx.runtime_dsn(backend)
+
+    def test_child_environment_is_sanitized(self, tmp_path):
+        # 5 (CXR5-03): child env carries NO ambient OCE_* authority or secret
+        # — only the safe envelope — and the envelope has no secret material
+        ctx, backend, store = self._ctx(tmp_path)
+        env = ctx.child_environment()
+        for key in env:
+            assert not key.startswith("OCE_") or key == "OCE_ACTIVATION_ENVELOPE", key
+        assert "POSTGRES_PASSWORD" not in env and "POSTGRES_DSN" not in env
+        assert "OCE_WORKER_TOKEN" not in env and "OCE_WORKER_SECRET" not in env
+        blob = env["OCE_ACTIVATION_ENVELOPE"]
+        assert "k" * 40 not in blob            # password never in envelope
+        assert "postgresql://" not in blob     # DSN never in envelope
+        assert "worker_token" not in blob
+        assert "secret_generation" in blob     # safe metadata IS present
+        assert "config_fingerprint" in blob
+
+    def test_child_rejects_stale_generation(self, tmp_path):
+        # L: secret rotates AFTER parent activation -> child lineage STALE,
+        # fails closed before any activity; new generation never adopted
+        ctx, backend, _ = self._ctx(tmp_path)
+        child_env = ctx.child_environment()
+        backend.rotate("runtime-local", "rotated-after-parent-9876543210")
+        with pytest.raises(SystemExit, match="STALE"):
+            cs.create_activation_context(environ=child_env, backend=backend)
+
+    def test_child_rejects_revoked_secret(self, tmp_path):
+        ctx, backend, _ = self._ctx(tmp_path)
+        child_env = ctx.child_environment()
+        backend.revoke("runtime-local")
+        with pytest.raises(SystemExit, match="STALE"):
+            cs.create_activation_context(environ=child_env, backend=backend)
+
+    def test_child_rejects_forged_identity(self, tmp_path):
+        # K: a forged/inconsistent envelope identity fails closed
+        ctx, backend, _ = self._ctx(tmp_path)
+        child_env = ctx.child_environment()
+        forged = json.loads(child_env["OCE_ACTIVATION_ENVELOPE"])
+        forged["context_id"] = "0" * 64
+        child_env["OCE_ACTIVATION_ENVELOPE"] = json.dumps(forged)
+        with pytest.raises(SystemExit, match="forged|inconsistent"):
+            cs.create_activation_context(environ=child_env, backend=backend)
+
+    def test_child_rejects_malformed_envelope(self, tmp_path):
+        ctx, backend, _ = self._ctx(tmp_path)
+        child_env = ctx.child_environment()
+        child_env["OCE_ACTIVATION_ENVELOPE"] = "{not json"
+        with pytest.raises(SystemExit, match="malformed"):
+            cs.create_activation_context(environ=child_env, backend=backend)
+
+    def test_require_runtime_startable_resolves_once(self, monkeypatch, tmp_path):
+        # M: require_runtime_startable resolves the environment exactly once
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        calls = []
+        orig = cs.effective_from_env
+
+        def _counting(environ=None, registry=None):
+            calls.append(1)
+            return orig(environ, registry=registry)
+
+        monkeypatch.setattr(cs, "effective_from_env", _counting)
+        eff = cs.require_runtime_startable(environ=CLEAN_ENV)
+        assert len(calls) == 1
+        assert eff.get_bool("sandbox.strict") is True
+
+    def test_legacy_fallbacks_fail_closed_in_lifecycle_process(self, tmp_path,
+                                                               monkeypatch):
+        # N: with an activation envelope present (lifecycle-launched child),
+        # the ctx=None compatibility fallbacks fail closed
+        from oce_control import local_secrets as ls
+        from oce_control import http_api as api
+        ctx, backend, _ = self._ctx(tmp_path)
+        child_env = ctx.child_environment()
+        with pytest.raises(SystemExit, match="pinned ActivationContext"):
+            api.runtime_bind(environ=child_env)
+        with pytest.raises(SystemExit, match="pinned ActivationContext"):
+            api.runtime_scheduler_interval(environ=child_env)
+        monkeypatch.setenv("OCE_ACTIVATION_ENVELOPE",
+                           child_env["OCE_ACTIVATION_ENVELOPE"])
+        with pytest.raises(SystemExit, match="pinned ActivationContext"):
+            api.build_durable_app(ctx=None)  # type: ignore[call-arg]
+
+    def test_migrate_child_rejects_migration_set_mismatch(self, monkeypatch,
+                                                          tmp_path, capsys):
+        # migration proves the same lineage: a child whose envelope's
+        # migration-set identity differs from the canonical set refuses to
+        # mutate the governed database (rc=2 before any connection)
+        import scripts.migrate as mig
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        ctx, backend, _ = self._ctx(tmp_path)
+        child_env = ctx.child_environment(
+            migration_set_identity={"manifest_sha256": "0" * 64})
+        monkeypatch.setenv("OCE_ACTIVATION_ENVELOPE",
+                           child_env["OCE_ACTIVATION_ENVELOPE"])
+        rc = mig.main(["up"])
+        assert rc == 2
+        out, err = capsys.readouterr()
+        assert "migration-set identity" in (out + err)
+
+    def test_migrate_child_accepts_matching_identity_reaches_gate(
+            self, monkeypatch, tmp_path, capsys):
+        # a child envelope carrying the TRUE canonical migration-set identity
+        # passes lineage and reaches the connection step (unit: no real PG;
+        # container CI proves the connect)
+        import scripts.migrate as mig
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        ctx, backend, _ = self._ctx(tmp_path)
+        identity = mig.migration_set_identity()
+        child_env = ctx.child_environment(migration_set_identity=identity)
+        monkeypatch.setenv("OCE_ACTIVATION_ENVELOPE",
+                           child_env["OCE_ACTIVATION_ENVELOPE"])
+        seen = []
+
+        def fake_connect(dsn):
+            seen.append(dsn)
+            raise RuntimeError("would-connect")
+
+        monkeypatch.setattr(mig, "connect", fake_connect)
+        with pytest.raises(RuntimeError, match="would-connect"):
+            mig.main(["up"])
+        assert seen and "k" * 40 in seen[0]  # governed secret in derived DSN
+        out, err = capsys.readouterr()
+        assert "k" * 40 not in (out + err)  # never echoed
