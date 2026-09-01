@@ -1,41 +1,316 @@
 [
-  {"kind": "EVALUATION_CONTRACT", "artifact_id": "G4-EVAL:1.0.0",
-   "content": {"contract_id": "G4-EVAL", "version": "1.0.0", "schema": "evaluation-contract.schema.json", "status": "PROVISIONAL_TEST_CONTRACT"}},
-  {"kind": "LIFECYCLE_CONTRACT", "artifact_id": "LC:1.0.0",
-   "content": {"contract_id": "LC", "version": "1.0.0", "schema": "lifecycle-edge-table.schema.json", "status": "PROVISIONAL_TEST_CONTRACT"}},
-  {"kind": "ONTOLOGY", "artifact_id": "genome-v3", "content": {"artifact_id": "genome-v3", "version": "3"}},
-  {"kind": "HIGH_DEPENDENCY_ASSUMPTION", "artifact_id": "centrality-A", "content": {"artifact_id": "centrality-A"}},
-  {"kind": "HIGH_DEPENDENCY_ASSUMPTION", "artifact_id": "centrality-B", "content": {"artifact_id": "centrality-B"}},
-  {"kind": "RUNTIME_CERTIFICATION", "artifact_id": "Hermes", "content": {"artifact_id": "Hermes", "era": "historical"}},
-  {"kind": "RUNTIME_CERTIFICATION", "artifact_id": "OpenClaw", "content": {"artifact_id": "OpenClaw", "era": "historical"}},
-  {"kind": "RUNTIME_CERTIFICATION", "artifact_id": "Pi", "content": {"artifact_id": "Pi", "era": "historical"}},
-  {"kind": "RUNTIME_CERTIFICATION", "artifact_id": "foundation-model-1", "content": {"artifact_id": "foundation-model-1", "era": "historical"}},
-  {"kind": "CAPABILITY_CERTIFICATION", "artifact_id": "scan", "content": {"artifact_id": "scan"}},
-  {"kind": "CAPABILITY_CERTIFICATION", "artifact_id": "reconcile", "content": {"artifact_id": "reconcile"}},
-  {"kind": "CAPABILITY_CERTIFICATION", "artifact_id": "adjudicate", "content": {"artifact_id": "adjudicate"}},
-  {"kind": "CAPABILITY_CERTIFICATION", "artifact_id": "orchestrate", "content": {"artifact_id": "orchestrate"}},
-  {"kind": "KNOWLEDGE_RECORD", "artifact_id": "K_A", "content": {"record_id": "K_A", "claim": "projection A"}},
-  {"kind": "KNOWLEDGE_RECORD", "artifact_id": "K_B", "content": {"record_id": "K_B", "claim": "projection B"}},
-  {"kind": "KNOWLEDGE_RECORD", "artifact_id": "K_C", "content": {"record_id": "K_C", "claim": "projection C"}},
-  {"kind": "KNOWLEDGE_RECORD", "artifact_id": "K_dorm", "content": {"record_id": "K_dorm", "claim": "dormant projection"}},
-  {"kind": "KNOWLEDGE_RECORD", "artifact_id": "K_old", "content": {"record_id": "K_old", "claim": "old dormant projection"}},
-  {"kind": "KNOWLEDGE_RECORD", "artifact_id": "K_dorm2", "content": {"record_id": "K_dorm2", "claim": "second dormant projection"}},
-  {"kind": "NEGATIVE_KNOWLEDGE", "artifact_id": "NK_E17", "content": {"record_id": "NK_E17", "claim_rejected": "family-X (E17)", "exact_scope": "family_X_european"}},
-  {"kind": "NEGATIVE_KNOWLEDGE", "artifact_id": "NK_E18", "content": {"record_id": "NK_E18", "claim_rejected": "family-X (E18)", "exact_scope": "family_X_european"}},
-  {"kind": "NEGATIVE_KNOWLEDGE", "artifact_id": "NK_E19", "content": {"record_id": "NK_E19", "claim_rejected": "family-X (E19)", "exact_scope": "family_X_european"}},
-  {"kind": "UNRESOLVED_PATTERN", "artifact_id": "UP1", "content": {"artifact_id": "UP1"}},
-  {"kind": "UNRESOLVED_PATTERN", "artifact_id": "UP2", "content": {"artifact_id": "UP2"}},
-  {"kind": "UNRESOLVED_PATTERN", "artifact_id": "UP3", "content": {"artifact_id": "UP3"}},
-  {"kind": "VALIDATION_RULE", "artifact_id": "R1", "content": {"artifact_id": "R1"}},
-  {"kind": "VALIDATION_RULE", "artifact_id": "R2", "content": {"artifact_id": "R2"}},
-  {"kind": "VALIDATION_RULE", "artifact_id": "R3", "content": {"artifact_id": "R3"}},
-  {"kind": "OPERATOR_RATIFICATION", "artifact_id": "RAT-1", "content": {"ratification_ref": "RAT-1", "actor": "OPERATOR"}},
-  {"kind": "OPERATOR_RATIFICATION", "artifact_id": "RAT-2", "content": {"ratification_ref": "RAT-2", "actor": "OPERATOR"}},
-  {"kind": "OPERATOR_RATIFICATION", "artifact_id": "RAT-3", "content": {"ratification_ref": "RAT-3", "actor": "OPERATOR"}},
-  {"kind": "TRANSFORMATION_EVIDENCE", "artifact_id": "EV_TRANS_1", "content": {"evidence_id": "EV_TRANS_1"}},
-  {"kind": "TRANSFORMATION_EVIDENCE", "artifact_id": "EV_TRANS_2", "content": {"evidence_id": "EV_TRANS_2"}},
-  {"kind": "TRANSFORMATION_EVIDENCE", "artifact_id": "EV_TRANS_3", "content": {"evidence_id": "EV_TRANS_3"}},
-  {"kind": "REOPEN_CONDITION", "artifact_id": "CC1", "content": {"condition_id": "CC1"}},
-  {"kind": "REOPEN_CONDITION", "artifact_id": "CC2", "content": {"condition_id": "CC2"}},
-  {"kind": "REOPEN_CONDITION", "artifact_id": "CC3", "content": {"condition_id": "CC3"}}
+  {
+    "kind": "EVALUATION_CONTRACT",
+    "artifact_id": "G4-EVAL:1.0.0",
+    "content": {
+      "contract_id": "G4-EVAL",
+      "version": "1.0.0",
+      "schema": "evaluation-contract.schema.json",
+      "status": "PROVISIONAL_TEST_CONTRACT"
+    }
+  },
+  {
+    "kind": "LIFECYCLE_CONTRACT",
+    "artifact_id": "LC:1.0.0",
+    "content": {
+      "contract_id": "LC",
+      "version": "1.0.0",
+      "schema": "lifecycle-edge-table.schema.json",
+      "status": "PROVISIONAL_TEST_CONTRACT"
+    }
+  },
+  {
+    "kind": "ONTOLOGY",
+    "artifact_id": "genome-v3",
+    "content": {
+      "artifact_id": "genome-v3",
+      "version": "3"
+    }
+  },
+  {
+    "kind": "HIGH_DEPENDENCY_ASSUMPTION",
+    "artifact_id": "centrality-A",
+    "content": {
+      "artifact_id": "centrality-A"
+    }
+  },
+  {
+    "kind": "HIGH_DEPENDENCY_ASSUMPTION",
+    "artifact_id": "centrality-B",
+    "content": {
+      "artifact_id": "centrality-B"
+    }
+  },
+  {
+    "kind": "RUNTIME_CERTIFICATION",
+    "artifact_id": "Hermes",
+    "content": {
+      "artifact_id": "Hermes",
+      "era": "historical"
+    }
+  },
+  {
+    "kind": "RUNTIME_CERTIFICATION",
+    "artifact_id": "OpenClaw",
+    "content": {
+      "artifact_id": "OpenClaw",
+      "era": "historical"
+    }
+  },
+  {
+    "kind": "RUNTIME_CERTIFICATION",
+    "artifact_id": "Pi",
+    "content": {
+      "artifact_id": "Pi",
+      "era": "historical"
+    }
+  },
+  {
+    "kind": "RUNTIME_CERTIFICATION",
+    "artifact_id": "foundation-model-1",
+    "content": {
+      "artifact_id": "foundation-model-1",
+      "era": "historical"
+    }
+  },
+  {
+    "kind": "CAPABILITY_CERTIFICATION",
+    "artifact_id": "scan",
+    "content": {
+      "artifact_id": "scan"
+    }
+  },
+  {
+    "kind": "CAPABILITY_CERTIFICATION",
+    "artifact_id": "reconcile",
+    "content": {
+      "artifact_id": "reconcile"
+    }
+  },
+  {
+    "kind": "CAPABILITY_CERTIFICATION",
+    "artifact_id": "adjudicate",
+    "content": {
+      "artifact_id": "adjudicate"
+    }
+  },
+  {
+    "kind": "CAPABILITY_CERTIFICATION",
+    "artifact_id": "orchestrate",
+    "content": {
+      "artifact_id": "orchestrate"
+    }
+  },
+  {
+    "kind": "KNOWLEDGE_RECORD",
+    "artifact_id": "K_A",
+    "content": {
+      "record_id": "K_A",
+      "claim": "projection A"
+    }
+  },
+  {
+    "kind": "KNOWLEDGE_RECORD",
+    "artifact_id": "K_B",
+    "content": {
+      "record_id": "K_B",
+      "claim": "projection B"
+    }
+  },
+  {
+    "kind": "KNOWLEDGE_RECORD",
+    "artifact_id": "K_C",
+    "content": {
+      "record_id": "K_C",
+      "claim": "projection C"
+    }
+  },
+  {
+    "kind": "KNOWLEDGE_RECORD",
+    "artifact_id": "K_dorm",
+    "content": {
+      "record_id": "K_dorm",
+      "claim": "dormant projection"
+    }
+  },
+  {
+    "kind": "KNOWLEDGE_RECORD",
+    "artifact_id": "K_old",
+    "content": {
+      "record_id": "K_old",
+      "claim": "old dormant projection"
+    }
+  },
+  {
+    "kind": "KNOWLEDGE_RECORD",
+    "artifact_id": "K_dorm2",
+    "content": {
+      "record_id": "K_dorm2",
+      "claim": "second dormant projection"
+    }
+  },
+  {
+    "kind": "NEGATIVE_KNOWLEDGE",
+    "artifact_id": "NK_E17",
+    "content": {
+      "record_id": "NK_E17",
+      "claim_rejected": "family-X (E17)",
+      "exact_scope": "family_X_european"
+    }
+  },
+  {
+    "kind": "NEGATIVE_KNOWLEDGE",
+    "artifact_id": "NK_E18",
+    "content": {
+      "record_id": "NK_E18",
+      "claim_rejected": "family-X (E18)",
+      "exact_scope": "family_X_european"
+    }
+  },
+  {
+    "kind": "NEGATIVE_KNOWLEDGE",
+    "artifact_id": "NK_E19",
+    "content": {
+      "record_id": "NK_E19",
+      "claim_rejected": "family-X (E19)",
+      "exact_scope": "family_X_european"
+    }
+  },
+  {
+    "kind": "UNRESOLVED_PATTERN",
+    "artifact_id": "UP1",
+    "content": {
+      "artifact_id": "UP1"
+    }
+  },
+  {
+    "kind": "UNRESOLVED_PATTERN",
+    "artifact_id": "UP2",
+    "content": {
+      "artifact_id": "UP2"
+    }
+  },
+  {
+    "kind": "UNRESOLVED_PATTERN",
+    "artifact_id": "UP3",
+    "content": {
+      "artifact_id": "UP3"
+    }
+  },
+  {
+    "kind": "VALIDATION_RULE",
+    "artifact_id": "R1",
+    "content": {
+      "artifact_id": "R1"
+    }
+  },
+  {
+    "kind": "VALIDATION_RULE",
+    "artifact_id": "R2",
+    "content": {
+      "artifact_id": "R2"
+    }
+  },
+  {
+    "kind": "VALIDATION_RULE",
+    "artifact_id": "R3",
+    "content": {
+      "artifact_id": "R3"
+    }
+  },
+  {
+    "kind": "OPERATOR_RATIFICATION",
+    "artifact_id": "RAT-1",
+    "content": {
+      "ratification_ref": "RAT-1",
+      "actor": "OPERATOR"
+    }
+  },
+  {
+    "kind": "OPERATOR_RATIFICATION",
+    "artifact_id": "RAT-2",
+    "content": {
+      "ratification_ref": "RAT-2",
+      "actor": "OPERATOR"
+    }
+  },
+  {
+    "kind": "OPERATOR_RATIFICATION",
+    "artifact_id": "RAT-3",
+    "content": {
+      "ratification_ref": "RAT-3",
+      "actor": "OPERATOR"
+    }
+  },
+  {
+    "kind": "TRANSFORMATION_EVIDENCE",
+    "artifact_id": "EV_TRANS_1",
+    "content": {
+      "evidence_id": "EV_TRANS_1"
+    }
+  },
+  {
+    "kind": "TRANSFORMATION_EVIDENCE",
+    "artifact_id": "EV_TRANS_2",
+    "content": {
+      "evidence_id": "EV_TRANS_2"
+    }
+  },
+  {
+    "kind": "TRANSFORMATION_EVIDENCE",
+    "artifact_id": "EV_TRANS_3",
+    "content": {
+      "evidence_id": "EV_TRANS_3"
+    }
+  },
+  {
+    "kind": "REOPEN_CONDITION",
+    "artifact_id": "CC1",
+    "content": {
+      "condition_id": "CC1"
+    }
+  },
+  {
+    "kind": "REOPEN_CONDITION",
+    "artifact_id": "CC2",
+    "content": {
+      "condition_id": "CC2"
+    }
+  },
+  {
+    "kind": "REOPEN_CONDITION",
+    "artifact_id": "CC3",
+    "content": {
+      "condition_id": "CC3"
+    }
+  },
+  {
+    "kind": "AUTHORITY_SNAPSHOT",
+    "artifact_id": "AUTH_SNAP:E17",
+    "content": {
+      "PO": "PO",
+      "OPERATOR": "OPERATOR"
+    },
+    "epoch_id": "E17"
+  },
+  {
+    "kind": "AUTHORITY_SNAPSHOT",
+    "artifact_id": "AUTH_SNAP:E18",
+    "content": {
+      "PO": "PO",
+      "GOVERNOR": "GOVERNOR",
+      "OPERATOR": "OPERATOR"
+    },
+    "epoch_id": "E18"
+  },
+  {
+    "kind": "AUTHORITY_SNAPSHOT",
+    "artifact_id": "AUTH_SNAP:E19",
+    "content": {
+      "PO": "PO",
+      "GOVERNOR": "GOVERNOR",
+      "OPERATOR": "OPERATOR"
+    },
+    "epoch_id": "E19"
+  }
 ]

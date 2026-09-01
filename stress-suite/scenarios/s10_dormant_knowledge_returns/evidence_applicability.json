@@ -1,0 +1,36 @@
+[
+  {
+    "evidence_id": "EV_S10_NEW_SENSOR",
+    "subject_ref": "M_OLD",
+    "scope": "regime_alpha",
+    "domain": "REGIME_STATE",
+    "claim_ref": "M_OLD",
+    "condition_ref": "RC_S10_SENSOR",
+    "epoch": "E10",
+    "provenance": "synthetic fixture (AUTHORITATIVE_SYNTHETIC_FIXTURE)",
+    "admissible_use": ["FIELD_PREDICATE"],
+    "version_tag": "1.0.0"
+  },
+  {
+    "evidence_id": "EV_OLD_VALID",
+    "subject_ref": "M_OLD",
+    "scope": "regime_alpha",
+    "domain": "REGIME_STATE",
+    "claim_ref": "M_OLD",
+    "epoch": "E_OLD",
+    "provenance": "historical fixture",
+    "admissible_use": ["FIELD_PREDICATE"],
+    "version_tag": "1.0.0"
+  },
+  {
+    "evidence_id": "EV_DEMOTION",
+    "subject_ref": "M_OLD",
+    "scope": "regime_alpha",
+    "domain": "REGIME_STATE",
+    "claim_ref": "M_OLD",
+    "epoch": "E_DEMOTE",
+    "provenance": "historical fixture",
+    "admissible_use": ["FIELD_PREDICATE"],
+    "version_tag": "1.0.0"
+  }
+]

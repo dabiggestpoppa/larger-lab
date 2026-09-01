@@ -64,6 +64,51 @@ class ReopenConditionError(ValueError):
     pass
 
 
+@dataclass(frozen=True)
+class EvidenceApplicability:
+    """G5-P0-C — a versioned external link binding an evidence object to the
+    subject/scope/domain it may support. For an evidence-required reopen
+    decision BOTH the registered evidence object AND this applicability link
+    must resolve and match the evaluated condition. Evidence registered for
+    CRYPTO/OI cannot satisfy a condition over FX/EURUSD without an explicit
+    transfer/admissible-use contract. Existence alone is never enough."""
+
+    evidence_id: str
+    subject_ref: str = ""
+    scope: str = ""
+    domain: str = ""
+    claim_ref: str = ""
+    condition_ref: str = ""
+    epoch: str = ""
+    provenance: str = ""
+    admissible_use: Tuple[str, ...] = ()   # condition types this evidence may support; () = any
+    version_tag: str = "1.0.0"
+
+    @classmethod
+    def from_fixture(cls, data: Mapping[str, Any]) -> "EvidenceApplicability":
+        return cls(
+            evidence_id=str(data.get("evidence_id", "")),
+            subject_ref=str(data.get("subject_ref", "")),
+            scope=str(data.get("scope", "")),
+            domain=str(data.get("domain", "")),
+            claim_ref=str(data.get("claim_ref", "")),
+            condition_ref=str(data.get("condition_ref", "")),
+            epoch=str(data.get("epoch", "")),
+            provenance=str(data.get("provenance", "")),
+            admissible_use=_norm_tuples(data.get("admissible_use")),
+            version_tag=str(data.get("version_tag", "1.0.0")),
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"evidence_id": self.evidence_id, "subject_ref": self.subject_ref,
+                "scope": self.scope, "domain": self.domain,
+                "claim_ref": self.claim_ref, "condition_ref": self.condition_ref,
+                "epoch": self.epoch, "provenance": self.provenance,
+                "admissible_use": list(self.admissible_use),
+                "version_tag": self.version_tag}
+
+
+
 def _norm_tuples(value: Any) -> Tuple[str, ...]:
     if value is None:
         return ()
@@ -121,6 +166,7 @@ class ReopenCondition:
     scope: str = ""
     scope_match_mode: str = "EXACT"                # G4R-03
     subject_scope: str = "OBJECT_SPECIFIC"         # G4R-02 explicit marker
+    domain: str = ""                               # G5-P0-C: applicability domain axis
     group_id: str = ""                             # G4R-04
     group_operator: str = ""                       # G4R-04: "" | ANY | ALL
     created_under_contract: str = "G4_MEMORY_AND_REACTIVATION_POLICY:1.0.0"
@@ -242,7 +288,7 @@ class ReopenCondition:
                 "evidence_required": self.evidence_required,
                 "evidence_refs": list(self.evidence_refs), "scope": self.scope,
                 "scope_match_mode": self.scope_match_mode,
-                "subject_scope": self.subject_scope,
+                "subject_scope": self.subject_scope, "domain": self.domain,
                 "group_id": self.group_id, "group_operator": self.group_operator,
                 "created_under_contract": self.created_under_contract,
                 "authority_basis_if_any": self.authority_basis_if_any,
@@ -272,20 +318,26 @@ class ReopenEvaluator:
     Never mutates M4 state."""
 
     def __init__(self, conditions: Optional[Sequence[ReopenCondition]] = None,
-                 evidence_registry: Optional[Any] = None, current_epoch: str = ""):
+                 evidence_registry: Optional[Any] = None, current_epoch: str = "",
+                 applicability: Optional[Mapping[str, EvidenceApplicability]] = None):
         self.conditions = tuple(conditions or ())
         self.evidence_registry = evidence_registry
         self.current_epoch = current_epoch
+        self.applicability = dict(applicability or {})
 
     # ------------------------------------------------------------------ #
     def _evidence_ok(self, c: ReopenCondition, facts: Mapping[str, Any],
                      record_scope: str) -> Tuple[bool, Optional[str], List[str]]:
-        """G4R-05: an evidence_required condition must cite SPECIFIC evidence
-        ids; each must resolve in the governed registry (phantom -> fail
-        closed) and be admissible for the condition type. Returns
-        (ok, failure_reason, conflict_refs)."""
+        """G4R-05 + G5-P0-B/C: an evidence_required condition must cite SPECIFIC
+        evidence ids; each must resolve in the governed registry (phantom ->
+        fail closed) and carry an EvidenceApplicability link admissible for the
+        condition's subject/scope/domain/type. Evidence for another subject,
+        scope or domain can never satisfy this condition. A condition that
+        requires evidence cannot be evaluated without a governed registry."""
         if not c.evidence_required:
             return True, None, []
+        if self.evidence_registry is None:
+            return False, "evidence_registry_missing_fail_closed", []
         if not c.evidence_refs:
             return False, "evidence_refs_empty", []
         supplied = {str(r) for r in (facts.get("evidence_refs") or [])}
@@ -295,8 +347,6 @@ class ReopenEvaluator:
         phantom: List[str] = []
         inadmissible: List[str] = []
         for ref in c.evidence_refs:
-            if self.evidence_registry is None:
-                continue
             if not self.evidence_registry.has(ref):
                 phantom.append(ref)
                 continue
@@ -305,10 +355,32 @@ class ReopenEvaluator:
             # a bare agent self-assertion can never prove blocker resolution
             if c.condition_type == "BLOCKER_RESOLVED" and kind == "AGENT_CLAIM":
                 inadmissible.append(ref)
+                continue
+            # G5-P0-C: applicability link must resolve and match
+            link = self.applicability.get(ref)
+            if link is None:
+                inadmissible.append(ref + "@no-applicability-link")
+                continue
+            if c.subject_ref and link.subject_ref and link.subject_ref != c.subject_ref:
+                inadmissible.append(ref + "@subject-mismatch")
+                continue
+            if c.scope and link.scope and link.scope != c.scope:
+                inadmissible.append(ref + "@scope-mismatch")
+                continue
+            if c.domain and link.domain and link.domain != c.domain:
+                # explicit governed transfer contract permits cross-domain use
+                transfer = link.admissible_use
+                if "TRANSFER:" + c.domain not in transfer and "*" not in transfer:
+                    inadmissible.append(ref + "@domain-mismatch")
+                continue
+            if link.admissible_use and c.condition_type not in link.admissible_use \
+                    and "*" not in link.admissible_use:
+                inadmissible.append(ref + "@condition-not-admissible")
+                continue
         if phantom:
             return False, "evidence_phantom", phantom
         if inadmissible:
-            return False, "evidence_not_admissible", inadmissible
+            return False, "evidence_not_admissible:" + ",".join(inadmissible), inadmissible
         return True, None, []
 
     def _blocker_ok(self, c: ReopenCondition, facts: Mapping[str, Any],
@@ -345,6 +417,12 @@ class ReopenEvaluator:
             return ReopenEvaluation(
                 outcome="NO_REOPEN", condition_results=(), rationale="no reopen conditions supplied",
                 conflicts=())
+        # G5-P0-B: evidence_required semantics REQUIRE a governed evidence
+        # registry; running without one must fail closed rather than decide.
+        if any(c.evidence_required for c in conds) and self.evidence_registry is None:
+            raise ReopenConditionError(
+                "evidence_required=true but no governed EvidenceRegistry supplied "
+                "(G5-P0-B: fail closed)")
         results: List[Dict[str, Any]] = []
         any_true = False
         any_unknown = False
@@ -498,15 +576,18 @@ class NegativeKnowledgeSuppressionDecision:
                 "next_action": self.next_action}
 
 
-def _policy_next_action(policy, facts: Mapping[str, Any]) -> Optional[str]:
-    """Resolve the shared memory policy's suppression disposition; None when no
-    rule applies (the caller then keeps the fail-closed default)."""
+def _policy_next_action(policy, facts: Mapping[str, Any]):
+    """Resolve the shared memory policy's suppression disposition. Returns
+    (action_or_None, rule_id, governed). When policy is None the caller keeps
+    the legacy default. When policy is supplied but NO rule matches, governed
+    is False and action is None — the factual reopen state must NOT become
+    action permission (G5-P0-A)."""
     if policy is None:
-        return None
+        return None, "", False
     rule = policy.evaluate(facts, "suppression")
     if rule is None:
-        return None
-    return rule.then.get("next_action")
+        return None, "", False
+    return rule.then.get("next_action"), rule.rule_id, True
 
 
 def decide_suppression(
@@ -532,7 +613,7 @@ def decide_suppression(
         "permanent_operator_authority": bool(permanent),
         "lifecycle_state": getattr(negative_knowledge, "current_lifecycle_state", "DEMOTED"),
     }
-    policy_action = _policy_next_action(policy, facts_for_policy)
+    policy_action, policy_rule, policy_governed = _policy_next_action(policy, facts_for_policy)
     if permanent:
         return NegativeKnowledgeSuppressionDecision(
             record_id=negative_knowledge.record_id,
@@ -546,13 +627,23 @@ def decide_suppression(
                                                  "permanent_by_operator_authority", None),
             next_action="OPERATOR_REVIEW_REQUIRED")
     if ev.outcome == "REOPEN_CANDIDATE":
-        action = policy_action or "STOP_SUPPRESSION"
+        # G5-P0-A: a supplied policy that matches decides; a supplied policy
+        # with NO matching rule HOLDS suppression (factual state cannot stop
+        # suppression by itself); only a None policy keeps the legacy default.
+        if policy is not None and not policy_governed:
+            action = "CONTINUE_SUPPRESSION"
+            reason = ("reopen condition satisfied at the factual layer, but the shared "
+                      "policy supplied no suppression rule => governed action HELD; "
+                      "suppression continues until a policy rule decides (G5-P0-A)")
+        else:
+            action = policy_action or "STOP_SUPPRESSION"
+            reason = ("reopen condition satisfied for this exact scope; suppression "
+                      "ceases, record retained")
         return NegativeKnowledgeSuppressionDecision(
             record_id=negative_knowledge.record_id,
             scope=negative_knowledge.exact_scope,
             currently_suppressed=action != "STOP_SUPPRESSION",
-            reason="reopen condition satisfied for this exact scope; suppression "
-                   "ceases, record retained",
+            reason=reason,
             reopen_condition_status="SATISFIED",
             evidence_refs=tuple(negative_knowledge.evidence_refs or ()),
             permanent_operator_authority=None,

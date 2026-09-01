@@ -355,6 +355,10 @@ def _s10_pack(conditions_satisfied=True):
                             "evidence_refs": ["EVID-S10"]}],
         evidence=[{"record_id": "EVID-S10", "kind": "OBSERVATION",
                    "claim": "sensor online", "lineage": "S10_SENSOR", "seq": 0}],
+        evidence_applicability=[{"evidence_id": "EVID-S10", "subject_ref": "M_OLD",
+                                 "scope": "regime-alpha", "domain": "REGIME_STATE",
+                                 "condition_ref": "RC", "epoch": "E1",
+                                 "admissible_use": ["FIELD_PREDICATE"]}],
         current_facts=facts,
         epochs=[{"epoch_id": "E1"}],
         expected_outcome="REOPEN_CANDIDATE" if conditions_satisfied else "NO_REOPEN",
@@ -478,6 +482,10 @@ def _s11_pack(blocker_resolved=True, with_evidence=True, operator_permanent=Fals
                             "evidence_refs": ["EVID-1"]}],
         evidence=[{"record_id": "EVID-1", "kind": "OBSERVATION",
                    "claim": "clean estimator validated", "lineage": "S11_LAB", "seq": 0}],
+        evidence_applicability=[{"evidence_id": "EVID-1", "subject_ref": "NK-1",
+                                 "scope": "FX EURUSD", "domain": "FX",
+                                 "condition_ref": "RC", "epoch": "E11",
+                                 "admissible_use": ["BLOCKER_RESOLVED", "FIELD_PREDICATE"]}],
         current_facts=facts,
         expected_outcome="STOP_SUPPRESSION" if (blocker_resolved and with_evidence
                                                 and not operator_permanent)
@@ -533,7 +541,14 @@ def test_suppression_ends_only_for_exact_scope():
     reg = EvidenceRegistry()
     from engine.evidence import EvidenceRecord
     reg.register(EvidenceRecord(record_id="EVID-1", kind="OBSERVATION", claim="x", seq=0))
-    evaluator = ReopenEvaluator(conditions=[c1, c2], evidence_registry=reg)
+    # G5-P0-C documented upgrade: evidence-required conditions now also need an
+    # applicability link binding the evidence to the subject/scope it supports.
+    from engine.reopen import EvidenceApplicability
+    applicability = {"EVID-1": EvidenceApplicability(
+        evidence_id="EVID-1", subject_ref=nk1.record_id, scope="FX EURUSD",
+        domain="FX", admissible_use=("FIELD_PREDICATE",))}
+    evaluator = ReopenEvaluator(conditions=[c1, c2], evidence_registry=reg,
+                                applicability=applicability)
     facts = {"sensor_online": True, "evidence_refs": ["EVID-1"]}
     d1 = decide_suppression(nk1, evaluator, facts, conditions=[c1])
     d2 = decide_suppression(nk2, evaluator, facts, conditions=[c2])
@@ -748,7 +763,10 @@ def _s13_epoch(with_authority=True, with_projection=True, with_negative=True,
         "negative_knowledge_refs": ["NK-1"] if with_negative else [],
         "validation_rules": ["rule-1"],
         "authority_state_snapshot": {"GOVERNOR": "GOVERNOR"} if with_authority else {},
-        "authority_snapshot_ref": "AUTH_SNAP:E17",
+        # G5-P0-F: no synthetic authority ref. When the epoch has no authority
+        # snapshot, the ref is BLANK so reconstruction treats it as a missing
+        # surface rather than inferring AUTH_SNAP:<epoch>.
+        "authority_snapshot_ref": "AUTH_SNAP:E17" if with_authority else "",
         "operator_ratifications": ["RAT-1"],
         "transformation_evidence": ["T-EVID-1"],
         "challenge_conditions": ["challenge-1"],
@@ -783,6 +801,11 @@ def _s13_artifacts():
          "content": {"evidence_id": "T-EVID-1"}},
         {"kind": "REOPEN_CONDITION", "artifact_id": "challenge-1",
          "content": {"condition_id": "challenge-1"}},
+        # G5-P0-F documented upgrade: an explicit authority_snapshot_ref must
+        # RESOLVE to a registered artifact; the runner no longer synthesizes
+        # AUTH_SNAP:<epoch> entries, so the fixture registers the snapshot.
+        {"kind": "AUTHORITY_SNAPSHOT", "artifact_id": "AUTH_SNAP:E17",
+         "content": {"GOVERNOR": "GOVERNOR"}, "epoch_id": "E17"},
     ]
 
 
@@ -791,7 +814,11 @@ def _s13_pack(with_authority=True, with_lifecycle=True, with_projection=True,
     epoch = _s13_epoch(with_authority, with_projection, with_negative, with_unresolved)
     if not with_lifecycle:
         epoch["lifecycle_contract_version"] = ""
-    return G4ScenarioPack(scenario_id="S13", epochs=[epoch], artifacts=_s13_artifacts(),
+    artifacts = _s13_artifacts()
+    if not with_authority:
+        # the authority snapshot is genuinely absent: no artifact AND no ref
+        artifacts = [a for a in artifacts if a["kind"] != "AUTHORITY_SNAPSHOT"]
+    return G4ScenarioPack(scenario_id="S13", epochs=[epoch], artifacts=artifacts,
                           expected_outcome="RECONSTRUCTED")
 
 

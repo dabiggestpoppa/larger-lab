@@ -528,7 +528,12 @@ def compact_active_pool(
     if policy is not None:
         rule = policy.evaluate({"task_relevance": "LOW", "memory_tier": "ACTIVE_CONTEXT"},
                                "activation")
-        rule_id = rule.rule_id if rule else ""
+        if rule is None:
+            # G5-P0-A: a supplied activation policy with NO matching rule HOLDS
+            # — factual low-relevance classification does not authorize a memory
+            # tier change by itself.
+            return (), "POLICY_HOLD"
+        rule_id = rule.rule_id
     keep = set(keep_refs)
     compactions: List[MemoryCompactionRecord] = []
     policy_version = f"{policy.policy_id}:{policy.version_tag}" if policy is not None \

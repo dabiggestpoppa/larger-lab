@@ -35,6 +35,58 @@ class EpochManifestError(ValueError):
     pass
 
 
+@dataclass(frozen=True, init=False)
+class SealedEpochSnapshot:
+    """G5-P0-G — the canonical reconstruction truth, separate from the mutable
+    BUILDING manifest object. A BEING-built manifest is a draft; after seal the
+    canonical snapshot is a frozen, SELF-CONTAINED projection of the manifest's
+    semantic fields plus its immutable fingerprint. Reads are copy-on-read, so
+    a caller can never mutate the snapshot's nested content. Reconstruction
+    resolves the REGISTERED snapshot (via CanonicalArtifactRegistry
+    SEALED_EPOCH_MANIFEST + fingerprint verification), never a live mutable
+    object.
+
+    Honest threat boundary: these invariants hold against every SUPPORTED
+    institutional API, and the snapshot fingerprint detects content drift. They
+    are NOT a claim of cryptographic tamper-proofness against arbitrary
+    interpreter-memory manipulation; the institution's guarantee is that
+    canonical registered sealed content cannot be changed through supported
+    APIs and that reconstruction verifies the snapshot fingerprint.
+    """
+
+    epoch_id: str
+    fingerprint: str
+    _stored: Mapping[str, object] = field(init=False, repr=False, compare=False,
+                                          default_factory=dict)
+
+    def __init__(self, epoch_id: str, fingerprint: str,
+                 semantic_content: Optional[Mapping[str, object]] = None):
+        object.__setattr__(self, "epoch_id", epoch_id)
+        object.__setattr__(self, "fingerprint", fingerprint)
+        object.__setattr__(self, "_stored", copy.deepcopy(dict(semantic_content or {})))
+
+    @property
+    def semantic_content(self) -> Mapping[str, object]:
+        return copy.deepcopy(self._stored)
+
+    @classmethod
+    def from_manifest(cls, m: "EpochManifest") -> "SealedEpochSnapshot":
+        if not m.sealed:
+            raise EpochManifestError(
+                f"cannot snapshot epoch {m.epoch_id!r}: manifest is not sealed")
+        return cls(epoch_id=m.epoch_id, semantic_content=m.to_dict(),
+                   fingerprint=m.fingerprint())
+
+    def to_dict(self) -> Dict[str, object]:
+        return {"epoch_id": self.epoch_id,
+                "semantic_content": self.semantic_content,
+                "fingerprint": self.fingerprint}
+
+    def semantic_fingerprint(self) -> str:
+        return deterministic_hex("sealed_epoch_snapshot", self.epoch_id,
+                                 self._stored, self.fingerprint, length=40)
+
+
 SEMANTIC_FIELDS = (
     "epoch_id", "schema_version", "start_cause", "predecessor_epoch",
     "governing_architecture_versions", "evaluation_contract_version",

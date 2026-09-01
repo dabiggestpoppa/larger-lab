@@ -50,6 +50,7 @@ from engine.reconstruction import (
     CanonicalArtifact,
     CanonicalArtifactRegistry,
     EpochReconstructionBundle,
+    ReconstructionError,
     reconstruct_epoch,
 )
 from engine.registry import EvidenceRegistry
@@ -107,6 +108,18 @@ def _reg(*ids):
         reg.register(EvidenceRecord(record_id=rid, kind="OBSERVATION",
                                     claim=f"evidence {rid}", seq=i))
     return reg
+
+
+def _app(subject, *ev_ids, scope="", domain="", admissible=("FIELD_PREDICATE", "BLOCKER_RESOLVED", "*")):
+    """G5-P0-C helper: evidence_id -> EvidenceApplicability links. Evidence-required
+    conditions now need BOTH the registered evidence object AND an applicability
+    link matching the condition's subject/scope/domain (documented upgrade)."""
+    from engine.reopen import EvidenceApplicability
+
+    return {eid: EvidenceApplicability(evidence_id=eid, subject_ref=subject,
+                                       scope=scope, domain=domain,
+                                       admissible_use=tuple(admissible))
+            for eid in ev_ids}
 
 
 # --------------------------------------------------------------------------- #
@@ -342,7 +355,8 @@ def test_unrelated_evidence_does_not_satisfy_condition():
 def test_correct_subject_evidence_satisfies():
     c = _cond(1, subject_ref="K", field="sensor_online", expected_value=True,
               evidence_required=True, evidence_refs=["E-A"])
-    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A")).evaluate(
+    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A"),
+                         applicability=_app("K", "E-A")).evaluate(
         "K", {"sensor_online": True, "evidence_refs": ["E-A"]})
     assert ev.outcome == "REOPEN_CANDIDATE"
 
@@ -351,7 +365,8 @@ def test_correct_scope_evidence_satisfies():
     nk = _nk(1, scope="FX/EURUSD", rid="NK-1")
     c = _cond(1, subject_ref="NK-1", scope="FX/EURUSD", field="sensor_online",
               expected_value=True, evidence_required=True, evidence_refs=["E-A"])
-    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A")).evaluate(
+    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A"),
+                         applicability=_app("NK-1", "E-A", scope="FX/EURUSD")).evaluate(
         nk.record_id, {"sensor_online": True, "evidence_refs": ["E-A"]},
         record_scope=nk.exact_scope)
     assert ev.outcome == "REOPEN_CANDIDATE"
@@ -360,7 +375,8 @@ def test_correct_scope_evidence_satisfies():
 def test_condition_evidence_refs_recorded_in_reopen_trace():
     c = _cond(1, subject_ref="K", field="sensor_online", expected_value=True,
               evidence_required=True, evidence_refs=["E-A"])
-    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A")).evaluate(
+    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A"),
+                         applicability=_app("K", "E-A")).evaluate(
         "K", {"sensor_online": True, "evidence_refs": ["E-A"]})
     assert ev.condition_results[0]["evidence_refs"] == ["E-A"]
 
@@ -384,7 +400,9 @@ def test_blocker_resolution_requires_record():
               expected_blocker="SENSOR_UNAVAILABLE", evidence_required=True,
               evidence_refs=["E-A"])
     facts = {"resolved_blockers": ["SENSOR_UNAVAILABLE"], "evidence_refs": ["E-A"]}
-    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A")).evaluate(
+    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A"),
+                         applicability=_app("NK-1", "E-A", scope="FX",
+                                            admissible=["BLOCKER_RESOLVED"])).evaluate(
         "NK-1", facts)
     assert ev.outcome == "NO_REOPEN"
     assert "blocker_resolution_record_missing" in ev.condition_results[0]["reason"]
@@ -399,7 +417,9 @@ def test_blocker_resolution_record_without_evidence_rejected():
              "blocker_resolutions": [{"resolution_id": "R1", "blocker": "SENSOR_UNAVAILABLE",
                                       "subject": "NK-1", "scope": "FX",
                                       "evidence_refs": ["E-PHANTOM"]}]}
-    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A")).evaluate(
+    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A"),
+                         applicability=_app("NK-1", "E-A", scope="FX",
+                                            admissible=["BLOCKER_RESOLVED"])).evaluate(
         "NK-1", facts)
     assert ev.outcome == "NO_REOPEN"
     assert "blocker_resolution_evidence_phantom" in ev.condition_results[0]["reason"]
@@ -429,7 +449,10 @@ def test_evidence_backed_blocker_resolution_reopens():
                                       "evidence_refs": ["E-A"],
                                       "resolution_method": "new sensor", "provenance": "lab",
                                       "contract_version": "1.0.0"}]}
-    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A")).evaluate(
+    ev = ReopenEvaluator(conditions=[c], evidence_registry=_reg("E-A"),
+                         applicability=_app("NK-1", "E-A", scope="FX",
+                                            domain="FX/OI",
+                                            admissible=["BLOCKER_RESOLVED"])).evaluate(
         "NK-1", facts)
     assert ev.outcome == "REOPEN_CANDIDATE"
 
@@ -646,6 +669,8 @@ def _s13_pack_and_registry(with_artifacts=True, bad_eval=False, wrong_epoch=Fals
                 continue
             if wrong_epoch and data["artifact_id"] == "K-ACTIVE":
                 continue
+            if wrong_auth and data["kind"] == "AUTHORITY_SNAPSHOT":
+                continue
             reg.register_fixture(data)
     reg.register_manifest(m)
     if bad_eval:
@@ -658,6 +683,10 @@ def _s13_pack_and_registry(with_artifacts=True, bad_eval=False, wrong_epoch=Fals
     if wrong_auth:
         reg.register(CanonicalArtifact.make("AUTHORITY_SNAPSHOT", "AUTH_SNAP:E17",
                                             {"GOVERNOR": "OPERATOR"}, epoch_id="E17"))
+    elif with_artifacts:
+        # G5-P0-F: the authority snapshot artifact is fixture-registered now;
+        # the registry no longer synthesizes AUTH_SNAP entries.
+        pass
     else:
         reg.register(CanonicalArtifact.make("AUTHORITY_SNAPSHOT", "AUTH_SNAP:E17",
                                             dict(m.authority_state_snapshot),
@@ -784,12 +813,21 @@ def test_artifact_with_correct_id_wrong_fingerprint_fails():
     for data in _s13_artifacts():
         reg.register_fixture(data)
     # re-register the authority snapshot with WRONG content under the SAME id
-    reg.register(CanonicalArtifact.make("AUTHORITY_SNAPSHOT", "AUTH_SNAP:E17",
-                                        {"PO": "PO", "OPERATOR": "OPERATOR"},
-                                        epoch_id="E17"))
-    report = reconstruct_epoch(EpochReconstructionBundle.for_manifest(m), reg, "R")
-    assert report.success is False
-    assert "authority_state_snapshot" in report.invalid_surfaces
+    # (G5-P0-D documented upgrade: the registry RECOMPUTES the fingerprint and
+    # rejects stale/wrong-fingerprint registrations, so the adversarial
+    # wrong-content artifact cannot even be registered.).
+    try:
+        reg.register(CanonicalArtifact.make("AUTHORITY_SNAPSHOT", "AUTH_SNAP:E17",
+                                            {"PO": "PO", "OPERATOR": "OPERATOR"},
+                                            epoch_id="E17"))
+        registered = True
+    except ReconstructionError:
+        registered = False
+    assert registered is False
+    # the sealed snapshot remains untouched by the rejected adversarial attempt
+    report_ok = reconstruct_epoch(EpochReconstructionBundle.for_manifest(m), reg, "R")
+    assert report_ok.success is True
+    assert report_ok.reconstruction_evidence_qualified is True
 
 
 def test_evaluation_and_lifecycle_contracts_are_separate():

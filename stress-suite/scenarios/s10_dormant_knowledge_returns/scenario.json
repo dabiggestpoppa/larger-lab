@@ -7,14 +7,24 @@
   "evidence_ref": "evidence.json",
   "current_facts": {
     "regime_present": true,
-    "evidence_refs": ["EV_S10_NEW_SENSOR"]
+    "evidence_refs": [
+      "EV_S10_NEW_SENSOR"
+    ]
   },
   "epochs": [
-    {"epoch_id": "E10a", "predecessor_epoch": null, "start_cause": "old regime active", "active_knowledge_projection": ["M_OLD"]}
+    {
+      "epoch_id": "E10a",
+      "predecessor_epoch": null,
+      "start_cause": "old regime active",
+      "active_knowledge_projection": [
+        "M_OLD"
+      ]
+    }
   ],
   "expected_outcome": "REOPEN_CANDIDATE",
   "hidden_ground_truth": {
     "old_regime_valid_again": true,
     "historical_validation_is_not_current_validation": true
-  }
+  },
+  "evidence_applicability_ref": "evidence_applicability.json"
 }

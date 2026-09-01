@@ -91,6 +91,7 @@ class G4ScenarioPack:
     epochs: List[Mapping[str, Any]] = field(default_factory=list)
     runtime_certifications: List[str] = field(default_factory=list)
     evidence: List[Mapping[str, Any]] = field(default_factory=list)       # G4R-05
+    evidence_applicability: List[Mapping[str, Any]] = field(default_factory=list)  # G5-P0-C
     artifacts: List[Mapping[str, Any]] = field(default_factory=list)      # G4R-11
     expected_outcome: str = ""            # SEALED — stripped before run
     hidden_ground_truth: Optional[dict] = None  # SEALED
@@ -113,12 +114,13 @@ PACK_FIELDS = {"scenario_id", "scenario_version", "knowledge", "negative_knowled
                "reopen_conditions", "current_facts", "authority_seed",
                "history_size", "experiments_size", "required_refs",
                "dependency_refs", "context_budget", "epochs",
-               "runtime_certifications", "evidence", "artifacts",
-               "expected_outcome", "hidden_ground_truth"}
+               "runtime_certifications", "evidence", "evidence_applicability",
+               "artifacts", "expected_outcome", "hidden_ground_truth"}
 
 REF_KEYS = {"knowledge_ref": "knowledge", "negative_ref": "negative_knowledge",
             "reopen_conditions_ref": "reopen_conditions", "epochs_ref": "epochs",
-            "evidence_ref": "evidence", "artifacts_ref": "artifacts"}
+            "evidence_ref": "evidence", "evidence_applicability_ref": "evidence_applicability",
+            "artifacts_ref": "artifacts"}
 
 
 def load_g4_pack(pack_dir: Path) -> G4ScenarioPack:
@@ -138,19 +140,31 @@ def _build_evidence_registry(pack: G4ScenarioPack) -> EvidenceRegistry:
     return EvidenceRegistry.from_records(list(pack.evidence or []))
 
 
+def _build_evidence_applicability(pack: G4ScenarioPack):
+    """G5-P0-C — evidence_id -> EvidenceApplicability links from the pack."""
+    from .reopen import EvidenceApplicability
+
+    return {str(link["evidence_id"]): EvidenceApplicability.from_fixture(link)
+            for link in (pack.evidence_applicability or [])}
+
+
 def _policy_outcome(policy: MemoryPolicy, facts: Mapping[str, Any], kind: str,
                     fallback: str) -> Dict[str, Any]:
-    """G4R-01: the shared policy decides the institutional disposition. Records
-    the fired rule; falls back to the evaluator-derived value only when no rule
-    applies (fail-open at the DECISION layer is impossible — the fallback is
-    the factual condition state)."""
+    """G5-P0-A: FACTUAL CLASSIFICATION != AUTHORIZED INSTITUTIONAL ACTION.
+    The shared policy decides the institutional disposition. When a policy is
+    required for a governed action and NO rule matches, the decision is
+    POLICY_HOLD / NO_GOVERNED_ACTION — the lower-layer factual disposition is
+    NEVER used as action permission. The evaluator-derived condition state
+    remains visible (facts) but cannot authorize reactivation."""
     rule = policy.evaluate(facts, kind) if policy is not None else None
     if rule is None:
-        return {"outcome": fallback, "rule_id": "", "governed": False,
-                "rationale": "no policy rule applied; factual state retained"}
+        return {"outcome": "POLICY_HOLD", "rule_id": "", "governed": False,
+                "rationale": "no shared policy rule matched; governed action HELD "
+                              "(factual condition state does not authorize action)",
+                "factual": fallback}
     return {"outcome": str(rule.then.get("outcome", rule.then.get("action", rule.then.get("next_action", fallback)))),
             "rule_id": rule.rule_id, "governed": True,
-            "rationale": rule.rationale}
+            "rationale": rule.rationale, "factual": fallback}
 
 
 def _trace_entry(entry) -> Dict[str, Any]:
@@ -189,7 +203,8 @@ def run_s10(pack: G4ScenarioPack, policy: MemoryPolicy,
                        for i, c in enumerate(pack.reopen_conditions))
     registry = _build_evidence_registry(pack)
     evaluator = ReopenEvaluator(conditions=conditions, current_epoch=pack.epochs[0]["epoch_id"]
-                                if pack.epochs else "", evidence_registry=registry)
+                                if pack.epochs else "", evidence_registry=registry,
+                                applicability=_build_evidence_applicability(pack))
     outcomes = {}
     policy_decisions: Dict[str, Dict[str, Any]] = {}
     ledger = ProvenanceConflictLedger()
@@ -296,7 +311,8 @@ def run_s11(pack: G4ScenarioPack, policy: MemoryPolicy,
                        for i, c in enumerate(pack.reopen_conditions))
     registry = _build_evidence_registry(pack)
     evaluator = ReopenEvaluator(conditions=conditions, current_epoch="E11",
-                                evidence_registry=registry)
+                                evidence_registry=registry,
+                                applicability=_build_evidence_applicability(pack))
     ledger = ProvenanceConflictLedger()
     decisions = []
     for i, nk_data in enumerate(pack.negative_knowledge):
@@ -436,20 +452,17 @@ def run_s12(pack: G4ScenarioPack, policy: MemoryPolicy,
 # --------------------------------------------------------------------------- #
 def _build_canonical_registry(pack: G4ScenarioPack,
                               manifests: Sequence[EpochManifest]) -> CanonicalArtifactRegistry:
-    """G4R-11: register ACTUAL pre-existing canonical fixture artifacts BEFORE
-    reconstruction. The sealed manifests and every external surface resolve
-    here; reconstruction never synthesizes them."""
+    """G4R-11 + G5-P0-E/F: register ACTUAL pre-existing canonical fixture
+    artifacts BEFORE reconstruction. The sealed manifests and every external
+    surface (including the authority snapshot artifact, which must be declared
+    explicitly by the manifest's authority_snapshot_ref) resolve here;
+    reconstruction never synthesizes them. A blank authority_snapshot_ref stays
+    blank — no synthetic AUTH_SNAP:<epoch> reference is invented."""
     reg = CanonicalArtifactRegistry()
     for data in (pack.artifacts or []):
         reg.register_fixture(data)
     for m in manifests:
         reg.register_manifest(m)
-        # authority snapshot artifact whose fingerprint must equal the
-        # manifest's inline snapshot (G4R-13)
-        if m.authority_state_snapshot:
-            reg.register(CanonicalArtifact.make(
-                "AUTHORITY_SNAPSHOT", m.authority_snapshot_ref or f"AUTH_SNAP:{m.epoch_id}",
-                dict(m.authority_state_snapshot), epoch_id=m.epoch_id))
     return reg
 
 

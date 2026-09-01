@@ -32,6 +32,19 @@ runtime-native memory, reconstruction may still produce a diagnostic report,
 but reconstruction_evidence_qualified is False and the run does NOT count as
 evidence for the S13 runtime-neutral reconstruction pass.
 
+G5-P0-D/E/F/G — canonical truth hardening:
+  * canonical artifact content is deep-frozen at registration and the registry
+    recomputes and verifies the fingerprint over (kind+id+content+epoch);
+  * the exact sealed manifest must itself be registered and its registered
+    fingerprint must match the bundle manifest (registered manifest identity);
+  * a blank authority_snapshot_ref is a MISSING surface — no synthetic
+    "AUTH_SNAP:<epoch>" reference is ever invented;
+  * the canonical registered snapshot (see epoch.SealedEpochSnapshot) is the
+    reconstruction truth. Threat boundary is documented honestly: these
+    invariants hold against ALL SUPPORTED INSTITUTIONAL APIS and the snapshot
+    fingerprint protects integrity; they are not a claim of cryptographic
+    tamper-proofness against arbitrary interpreter-memory manipulation.
+
 Two fingerprints:
   * HISTORICAL_EPOCH_FINGERPRINT — includes historical runtime certifications
     (they are part of history).
@@ -102,35 +115,80 @@ ARTIFACT_KINDS = (
 )
 
 
-@dataclass(frozen=True)
+def _deep_freeze(value: Any) -> Any:
+    """Deep-copy canonical content at construction (G5-P0-D): a caller holding
+    the ORIGINAL dict/list can never mutate the registered artifact, because
+    the artifact owns a private deep copy and returns copies on read."""
+    import copy as _copy
+
+    return _copy.deepcopy(value)
+
+
+@dataclass(frozen=True, init=False)
 class CanonicalArtifact:
+    """A canonical institutional artifact. G5-P0-D: content is deep-copied at
+    construction and exposed copy-on-read (a caller holding the original dict
+    or mutating a returned view can never alter the registered content), and
+    the registry verifies the fingerprint is the deterministic recompute of
+    (kind + id + canonical content + epoch), so a caller cannot register
+    content=A with fingerprint=hash(B)."""
+
     kind: str
     artifact_id: str
-    content: Mapping[str, Any]
     fingerprint: str
     epoch_id: str = ""
+    _stored: Mapping[str, Any] = field(init=False, repr=False, compare=False, default_factory=dict)
 
-    def __post_init__(self) -> None:
-        if self.kind not in ARTIFACT_KINDS:
-            raise ReconstructionError(f"unknown canonical artifact kind {self.kind!r}")
-        if not self.artifact_id:
+    def __init__(self, kind: str, artifact_id: str, fingerprint: str,
+                 epoch_id: str = "", content: Optional[Mapping[str, Any]] = None):
+        if kind not in ARTIFACT_KINDS:
+            raise ReconstructionError(f"unknown canonical artifact kind {kind!r}")
+        if not artifact_id:
             raise ReconstructionError("canonical artifact requires a non-empty id")
+        object.__setattr__(self, "kind", kind)
+        object.__setattr__(self, "artifact_id", artifact_id)
+        object.__setattr__(self, "fingerprint", fingerprint)
+        object.__setattr__(self, "epoch_id", epoch_id)
+        object.__setattr__(self, "_stored", _deep_freeze(dict(content or {})))
+
+    @property
+    def content(self) -> Mapping[str, Any]:   # copy-on-read: never expose internal nodes
+        return _copy_deep(self._stored)
+
+    def content_view(self) -> Mapping[str, Any]:
+        return _copy_deep(self._stored)
+
+    def _source_content(self) -> Mapping[str, Any]:
+        return self._stored
 
     @classmethod
     def make(cls, kind: str, artifact_id: str, content: Mapping[str, Any],
              epoch_id: str = "") -> "CanonicalArtifact":
-        return cls(kind=kind, artifact_id=artifact_id, content=dict(content),
-                   fingerprint=deterministic_hex("artifact", kind, artifact_id, content),
-                   epoch_id=epoch_id)
+        return cls(kind=kind, artifact_id=artifact_id,
+                   fingerprint=deterministic_hex("artifact", kind, artifact_id, content, epoch_id),
+                   content=dict(content), epoch_id=epoch_id)
+
+    def computed_fingerprint(self) -> str:
+        return deterministic_hex("artifact", self.kind, self.artifact_id,
+                                 self._source_content(), self.epoch_id)
 
     def to_dict(self) -> Dict[str, Any]:
         return {"kind": self.kind, "artifact_id": self.artifact_id,
-                "content": dict(self.content), "fingerprint": self.fingerprint,
+                "content": self.content_view(), "fingerprint": self.fingerprint,
                 "epoch_id": self.epoch_id}
 
 
+def _copy_deep(value: Any) -> Any:
+    import copy as _copy
+
+    return _copy.deepcopy(value)
+
+
 class CanonicalArtifactRegistry:
-    """kind+id -> canonical artifact, with duplicate rejection."""
+    """kind+id -> canonical artifact, with duplicate rejection and G5-P0-D
+    fingerprint verification: registration recomputes the expected fingerprint
+    from (kind + id + canonical content + epoch) and rejects stale or
+    manually-constructed wrong fingerprints."""
 
     def __init__(self) -> None:
         self._by_key: Dict[Tuple[str, str], CanonicalArtifact] = {}
@@ -140,6 +198,12 @@ class CanonicalArtifactRegistry:
         if key in self._by_key:
             raise ReconstructionError(
                 f"duplicate canonical artifact {artifact.artifact_id!r} ({artifact.kind})")
+        expected = artifact.computed_fingerprint()
+        if artifact.fingerprint != expected:
+            raise ReconstructionError(
+                f"canonical artifact {artifact.artifact_id!r} ({artifact.kind}): "
+                f"fingerprint {artifact.fingerprint!r} does not match the deterministic "
+                f"recompute {expected!r} over (kind+id+content+epoch) (G5-P0-D)")
         self._by_key[key] = artifact
 
     def register_manifest(self, manifest: EpochManifest) -> None:
@@ -167,6 +231,24 @@ class CanonicalArtifactRegistry:
             kind=str(data["kind"]), artifact_id=str(data["artifact_id"]),
             content=dict(data.get("content", {})),
             epoch_id=str(data.get("epoch_id", ""))))
+
+    def resolve_manifest_artifact(self, manifest: EpochManifest) -> CanonicalArtifact:
+        """G5-P0-E: the EXACT sealed manifest must itself be a registered
+        canonical artifact (kind=SEALED_EPOCH_MANIFEST, artifact_id=epoch_id),
+        and the registered fingerprint/content must match this manifest."""
+        art = self.resolve_optional("SEALED_EPOCH_MANIFEST", manifest.epoch_id)
+        if art is None:
+            raise ReconstructionError(
+                f"sealed manifest {manifest.epoch_id!r} is not registered in the "
+                f"CanonicalArtifactRegistry (kind=SEALED_EPOCH_MANIFEST) (G5-P0-E)")
+        manifest_fp = deterministic_hex("artifact", "SEALED_EPOCH_MANIFEST",
+                                        manifest.epoch_id, manifest.to_dict(),
+                                        manifest.epoch_id)
+        if art.fingerprint != manifest_fp:
+            raise ReconstructionError(
+                f"registered manifest artifact {manifest.epoch_id!r} fingerprint does not "
+                f"match the bundle manifest content (G5-P0-E)")
+        return art
 
     def all_ids(self) -> Tuple[str, ...]:
         return tuple(sorted(f"{k}:{i}" for (k, i) in self._by_key))
@@ -214,7 +296,7 @@ class EpochReconstructionBundle:
             known_tensions=tuple(m.known_tensions),
             evaluation_contract_ref=m.evaluation_contract_version,
             lifecycle_contract_ref=m.lifecycle_contract_version,
-            authority_snapshot_ref=m.authority_snapshot_ref or f"AUTH_SNAP:{m.epoch_id}",
+            authority_snapshot_ref=m.authority_snapshot_ref,   # G5-P0-F: no synthetic ref
             ontology_refs=tuple(m.active_ontology_versions),
             high_dependency_assumption_refs=tuple(m.high_dependency_assumptions),
             certification_refs=tuple(m.active_runtime_certifications),
@@ -241,6 +323,12 @@ def _kind_validator(kind: str, required_fields: Sequence[str],
     return None
 
 
+def _artifact_content(art: CanonicalArtifact) -> Mapping[str, Any]:
+    """Canonical content read: the frozen artifact exposes deep copies so a
+    nested in-place mutation can never reach the registered content."""
+    return art.content_view()
+
+
 def _resolve_surface(refs: Mapping[str, Any], registry: CanonicalArtifactRegistry,
                      surface: str, kind: str, artifact_id: str,
                      required_fields: Sequence[str],
@@ -252,7 +340,7 @@ def _resolve_surface(refs: Mapping[str, Any], registry: CanonicalArtifactRegistr
     if art is None:
         return False, f"surface '{surface}': canonical {kind} artifact " \
                       f"{artifact_id!r} is not registered (manifest alone is insufficient)", None
-    violation = _kind_validator(kind, required_fields, art.content)
+    violation = _kind_validator(kind, required_fields, _artifact_content(art))
     if violation is not None:
         return False, f"surface '{surface}': {violation}", None
     if content_transform is not None:
@@ -276,7 +364,7 @@ def _resolve_ref_list(refs: Mapping[str, Any], registry: CanonicalArtifactRegist
         art = registry.resolve_optional(kind, aid)
         if art is None:
             return False, f"surface '{surface}': {kind} artifact {aid!r} is not registered", None
-        violation = _kind_validator(kind, required_fields, art.content)
+        violation = _kind_validator(kind, required_fields, _artifact_content(art))
         if violation is not None:
             return False, f"surface '{surface}': {violation}", None
         if content_transform is not None:
@@ -324,7 +412,7 @@ def _contract_version_consistency(surface: str, declared_ref: str,
     """G4R-13: the resolved contract artifact's version must match the version
     the manifest declared. Declared refs use the canonical 'ID:VERSION' form;
     plain refs compare verbatim."""
-    declared = art.content.get("version")
+    declared = _artifact_content(art).get("version")
     if not declared:
         return f"surface '{surface}': contract artifact carries no version"
     if ":" in declared_ref:
@@ -358,7 +446,7 @@ def _authority_snapshot_consistency(art: CanonicalArtifact, refs: Mapping[str, A
     if m is None:
         return None
     inline_fp = deterministic_hex("authority_snapshot", dict(m.authority_state_snapshot))
-    art_fp = deterministic_hex("authority_snapshot", dict(art.content))
+    art_fp = deterministic_hex("authority_snapshot", dict(_artifact_content(art)))
     if inline_fp != art_fp:
         return (f"surface 'authority_state_snapshot': resolved artifact fingerprint "
                 f"does not match the manifest's inline authority snapshot (G4R-13)")
@@ -408,7 +496,17 @@ def reconstruct_epoch(
     if manifest is None or not manifest.sealed:
         missing.append("sealed_epoch_manifest")
     else:
-        resolved_surfaces.append("sealed_epoch_manifest")
+        # G5-P0-E: registered manifest identity — the exact sealed manifest must
+        # resolve from the registry with matching fingerprint/content, and the
+        # bundle epoch id must equal the manifest epoch id.
+        if bundle.epoch_id != manifest.epoch_id:
+            invalid.append("sealed_epoch_manifest")
+        else:
+            try:
+                registry.resolve_manifest_artifact(manifest)
+                resolved_surfaces.append("sealed_epoch_manifest")
+            except ReconstructionError as exc:
+                missing.append("sealed_epoch_manifest")
     if bundle.governing_architecture_versions:
         resolved_surfaces.append("governing_architecture_versions")
     else:
@@ -546,9 +644,9 @@ def reconstruct_epoch(
     else:
         missing.append("challenge_reopen_conditions")
 
-    # de-duplicate
-    missing = sorted(set(missing))
-    invalid = sorted(set(invalid))
+    # de-duplicate; only surfaces demanded by the PROVISIONAL contract count
+    missing = sorted(set(m for m in missing if m in required))
+    invalid = sorted(set(m for m in invalid if m in required))
     resolved_surfaces = sorted(set(resolved_surfaces))
 
     historical_fp = manifest.fingerprint() if manifest is not None else ""
