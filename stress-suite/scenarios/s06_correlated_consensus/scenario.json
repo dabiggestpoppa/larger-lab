@@ -8,6 +8,7 @@
   "policy_ref": "scenarios/policies/G3_COGNITIVE_ECOLOGY_POLICY.json",
   "reviewers_ref": "reviewers.json",
   "friction_ref": "friction.json",
+  "provenance_mode": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
   "independent_replication_count": 0,
   "allocation_provenance": {
     "claim_id": "C_S06",
