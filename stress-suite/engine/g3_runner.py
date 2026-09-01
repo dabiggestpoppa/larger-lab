@@ -29,6 +29,8 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from .base import deterministic_hex
 from .cognitive_ecology import (
+    DEFAULT_PROVENANCE_MODE,
+    PROVENANCE_MODES,
     AllocationProvenance,
     CognitiveEcologyHealthRecord,
     ConsensusRecord,
@@ -37,6 +39,8 @@ from .cognitive_ecology import (
     ProvenanceConflict,
     ReviewerIndependenceProfile,
     ReviewerProvenanceRegistry,
+    SyntheticFixtureAuthority,
+    UNKNOWN,
     independent_confirmation_satisfied,
 )
 from .ecology_policy import EcologyPolicy, EcologyRule
@@ -79,6 +83,7 @@ class G3ScenarioPack:
     independent_replication_count: int = 0
     allocation_provenance: Mapping[str, Any] = field(default_factory=dict)
     registered_provenance: Optional[List[Mapping[str, Any]]] = None   # G3R-07 governed registry
+    provenance_mode: str = DEFAULT_PROVENANCE_MODE   # G3R2-02: GOVERNED_REGISTRY | AUTHORITATIVE_SYNTHETIC_FIXTURE
     expected_disposition: str = ""            # SEALED — stripped before run
     hidden_ground_truth: Optional[dict] = None  # SEALED
 
@@ -132,6 +137,7 @@ def load_g3_pack(pack_dir: Path) -> G3ScenarioPack:
         independent_replication_count=int(spec.get("independent_replication_count", 0)),
         allocation_provenance=dict(spec.get("allocation_provenance", {})),
         registered_provenance=list(registered) if registered is not None else None,
+        provenance_mode=str(spec.get("provenance_mode", DEFAULT_PROVENANCE_MODE)),
         expected_disposition=str(spec.get("expected_disposition", "")),
         hidden_ground_truth=spec.get("hidden_ground_truth"),
     )
@@ -189,17 +195,42 @@ def run_g3_scenario(
     if pack.expected_disposition or pack.hidden_ground_truth is not None:
         raise ValueError("run_g3_scenario refuses sealed fields: pass pack.decision_grade()")
 
-    # ---- build profiles: CLAIMED fixture fields bound to governed registry --- #
-    # G3R-07: when a governed provenance registry exists, registered truth wins
-    # over self-reported claims; conflicts are recorded. Without a registry file
-    # the fixture itself IS the registered truth (identity binding, no conflicts).
-    registry_src = pack.registered_provenance if pack.registered_provenance is not None \
-        else pack.reviewers
-    registry = ReviewerProvenanceRegistry.from_fixtures(registry_src)
-    claimed = [ReviewerIndependenceProfile.from_reviewer_fixture(r) for r in pack.reviewers]
-    if not claimed:
+    # ---- G3R2-02: EXPLICIT provenance authority. Default (GOVERNED_REGISTRY)
+    # fails closed: no registry file => no verified provenance => claims are
+    # never promoted. AUTHORITATIVE_SYNTHETIC_FIXTURE is explicit in the
+    # scenario contract: the harness owns the synthetic ground truth for the
+    # whole pack (primary + topology + friction reviewers), so fixture fields
+    # ARE authoritative observable data. Never inferred from the absence of a
+    # registry file.
+    mode = pack.provenance_mode or DEFAULT_PROVENANCE_MODE
+    if mode not in PROVENANCE_MODES:
+        raise ValueError(f"unknown provenance mode {mode!r}; expected one of {PROVENANCE_MODES}")
+    synthetic_authority = SyntheticFixtureAuthority() if mode == "AUTHORITATIVE_SYNTHETIC_FIXTURE" \
+        else None
+    registry: Optional[ReviewerProvenanceRegistry] = None
+
+    def _bind(fixtures: Sequence[Mapping[str, Any]]
+              ) -> Tuple[Tuple[ReviewerIndependenceProfile, ...], Tuple[ProvenanceConflict, ...]]:
+        """Bind one cognitive surface (primary / topology / friction) under the
+        scenario's provenance authority. G3R2-03: secondary surfaces use the
+        SAME semantics as the primary surface — synthetic fixtures are identity
+        (harness-authoritative); governed mode binds against the registry with
+        fail-closed UNKNOWN for missing entries."""
+        if not fixtures:
+            return (), ()
+        claimed = [ReviewerIndependenceProfile.from_reviewer_fixture(r) for r in fixtures]
+        if mode == "AUTHORITATIVE_SYNTHETIC_FIXTURE":
+            return tuple(claimed), ()
+        assert registry is not None
+        return registry.bind_all(claimed)
+
+    if mode == "AUTHORITATIVE_SYNTHETIC_FIXTURE":
+        profiles, provenance_conflicts = _bind(pack.reviewers)
+    else:
+        registry = ReviewerProvenanceRegistry.from_fixtures(pack.registered_provenance or [])
+        profiles, provenance_conflicts = _bind(pack.reviewers)
+    if not profiles:
         raise ValueError("G3 scenario requires at least one reviewer")
-    profiles, provenance_conflicts = registry.bind_all(claimed)
 
     # ---- consensus + facts ------------------------------------------------- #
     graph = DependencyGraph.build(profiles)
@@ -235,15 +266,36 @@ def run_g3_scenario(
         contract = TopologyConstraintContract(**dict(pack.topology_contract or {}))
         candidates = []
         for spec in pack.topology_options:
-            topo_profiles = [ReviewerIndependenceProfile.from_reviewer_fixture(r)
-                             for r in spec.get("reviewers", [])]
+            topo_reviewers = list(spec.get("reviewers", []))
+            topo_profiles, _ = _bind(topo_reviewers)
+            if mode == "AUTHORITATIVE_SYNTHETIC_FIXTURE":
+                # G3R2-10: fixture capability tiers are harness-authoritative.
+                capability_tiers = tuple(str(r.get("capability_tier", "BASIC"))
+                                         for r in topo_reviewers)
+                capability_source = "AUTHORITATIVE_SYNTHETIC_CAPABILITY"
+            else:
+                # governed: tiers only from REGISTERED capability facts;
+                # missing/UNKNOWN registered capability => UNVERIFIED (fails
+                # any positive minimum-capability requirement).
+                tiers: List[str] = []
+                all_registered = bool(topo_reviewers)
+                for r in topo_reviewers:
+                    reg = registry.registered(str(r.get("reviewer_id", "")))
+                    if reg is None or reg.capability_tier == UNKNOWN:
+                        tiers.append(UNKNOWN)
+                        all_registered = False
+                    else:
+                        tiers.append(reg.capability_tier)
+                capability_tiers = tuple(tiers)
+                capability_source = ("REGISTERED_CAPABILITY" if all_registered
+                                     else "UNVERIFIED_CAPABILITY")
             candidates.append(ReviewTopology(
                 topology_id=str(spec.get("topology_id", "")),
                 purpose=pack.claim,
                 consequence_class=pack.consequence_class,
                 profiles=tuple(topo_profiles),
-                capability_tiers=tuple(str(r.get("capability_tier", "BASIC"))
-                                       for r in spec.get("reviewers", [])),
+                capability_tiers=capability_tiers,
+                capability_source=capability_source,
                 cost_units=int(spec.get("cost_units", 0)),
                 latency_units=int(spec.get("latency_units", 0)),
                 fresh_context_count=sum(1 for p in topo_profiles if p.fresh_context),
@@ -264,8 +316,10 @@ def run_g3_scenario(
         fcontract = FrictionContract(**dict(pack.friction_contract or {
             "contract_id": "DEFAULT-FRICTION", "consequence_classes": {}}))
         trigger = friction_trigger(facts, fcontract)
-        friction_reviewers = [ReviewerIndependenceProfile.from_reviewer_fixture(r)
-                              for r in (pack.friction_reviewers or [])]
+        # G3R2-03: fresh-context/friction reviewers use the SAME provenance
+        # authority — a reviewer cannot self-declare BLIND without
+        # registered/synthetic-authoritative provenance.
+        friction_reviewers, _ = _bind(list(pack.friction_reviewers or []))
         friction_result = run_friction(
             trigger, friction_reviewers,
             pack.conclusions_by_exposure or {},
@@ -290,8 +344,10 @@ def run_g3_scenario(
         review_cost_units=cost_units,
         information_gain=bool(friction_result and friction_result.information_gain),
         correlated_failure_warning=(
-            facts.source_concentration is not None and facts.source_concentration >= 0.8
-            and facts.distinct_source_lineages <= 1),
+            (facts.max_single_source_lineage_prevalence is not None
+             and facts.max_single_source_lineage_prevalence >= 0.8)
+            or (facts.source_concentration is not None and facts.source_concentration >= 0.8
+                and facts.distinct_source_lineages <= 1)),
     )
 
     # ---- fingerprints -------------------------------------------------------- #
@@ -344,6 +400,9 @@ def run_g3_scenario(
         "authority_after": "NONE",
         "expected_disposition_accessed": False,
         "hidden_ground_truth_accessed": False,
+        "provenance_mode": mode,
+        "synthetic_fixture_authority_used": mode == "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+        "synthetic_fixture_authority": synthetic_authority.to_dict() if synthetic_authority else None,
         "policy_id": policy.policy_id,
         "policy_version": policy.version_tag,
         "policy_fingerprint": policy_fingerprint or policy.fingerprint(),
