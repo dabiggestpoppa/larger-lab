@@ -282,14 +282,17 @@ class GateCapabilityProbe(RestCapabilityProbeBase):
             end = int(request.requested_end.timestamp())
             return True, (last is not None and int(last) >= end)
         if sensor in self.contract_stats_sensors:
-            # Request `from` is seconds; rows carry `time` in epoch seconds.
-            # There is no `to` param — completeness is bounded by
-            # from+interval+limit coverage, so signal coverage against the
-            # requested window end in seconds.
+            # Request `from` is seconds; rows carry `time` in epoch seconds
+            # (I10R1 live adjudication).  There is no `to` param — completeness
+            # is bounded by from+interval+limit coverage, so signal coverage
+            # against the requested window end in seconds.
             end = int(request.requested_end.timestamp())
             key = "time"
         else:
-            end = int(request.requested_end.timestamp())
+            # /trades: request from/to are Unix SECONDS (I13R1 live-observed),
+            # but ROW timestamps are create_time_ms (epoch ms).  Compare
+            # like-for-like: ms rows against the requested end in ms.
+            end = int(request.requested_end.timestamp() * 1000)
             key = "time"
         last = max(
             (

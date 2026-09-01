@@ -40,6 +40,7 @@ from crypto_sensor_fabric.providers.network_smoke import (
     RATE_LIMITED,
     SCHEMA_BREAKING,
     SMOKE_TRIGGER,
+    TEMPORAL_SEMANTIC_REVIEW,
     TRANSPORT_FAILURE,
     SmokeConfigError,
     SmokeManifest,
@@ -52,10 +53,12 @@ from crypto_sensor_fabric.providers.network_smoke import (
     build_smoke_targets,
     classify_error,
     cross_host_redirect,
+    extract_native_time_samples,
     network_smoke_enabled,
     perform_smoke_http,
     render_results_json,
     smoke_one,
+    temporal_plausibility_review,
     write_smoke_artifacts,
 )
 from crypto_sensor_fabric.providers.readiness import (
@@ -426,7 +429,8 @@ _OKX_FUNDING_HAPPY = {
             "instId": "BTC-USDT-SWAP",
             "fundingRate": "0.000075",
             "realizedRate": "0.000075",
-            "fundingTime": "1755000000000",
+            #: inside the 2026-08-30..31 smoke window (temporal guard pass)
+            "fundingTime": "1788134400000",
             "formulaType": "A",
             "instType": "SWAP",
             "method": "ma",
@@ -527,3 +531,161 @@ class TestSmokeOneOffline:
         out = render_results_json(manifest, [ok])
         assert '"blocking_result_count": 0' in out
         assert '"pass_result_count": 1' in out
+
+
+# ---------------------------------------------------------------------------
+# Temporal-plausibility guard (I10R1 §16/§17/§18/§19) — smoke layer only
+# ---------------------------------------------------------------------------
+
+
+class TestTemporalPlausibilityGuard:
+    """A 200 + known JSON + nonempty rows is NOT semantic correctness.
+
+    Time units are provider semantics: 1970 inside a 2026 live smoke is a
+    broken interpretation, never a LIVE_PASS.  The bound is a generous,
+    documented 365-day operational envelope — NOT window-completeness
+    validation, so truthful LIMITED pages and current-only books stay passable.
+    """
+
+    def _target(
+        self, sensor: SensorFamily = SensorFamily.MECHANICAL_FUNDING
+    ) -> SmokeTarget:
+        end = ANCHOR - timedelta(hours=2)
+        return SmokeTarget(
+            "OKX_SWAP",
+            sensor,
+            "BTC-USDT-SWAP",
+            start_time=end - timedelta(hours=24),
+            end_time=end,
+        )
+
+    def test_2026_request_2026_timestamps_pass(self) -> None:
+        t = self._target()
+        assert (
+            temporal_plausibility_review(
+                t, 5, ANCHOR - timedelta(hours=20), ANCHOR - timedelta(hours=3)
+            )
+            is None
+        )
+
+    def test_1970_timestamps_not_live_pass(self) -> None:
+        t = self._target()
+        assert (
+            temporal_plausibility_review(
+                t,
+                5,
+                datetime(1970, 1, 21, tzinfo=UTC),
+                datetime(1970, 1, 22, tzinfo=UTC),
+            )
+            == TEMPORAL_SEMANTIC_REVIEW
+        )
+
+    def test_nonempty_historical_null_first_not_live_pass(self) -> None:
+        t = self._target()
+        assert (
+            temporal_plausibility_review(t, 5, None, ANCHOR)
+            == TEMPORAL_SEMANTIC_REVIEW
+        )
+
+    def test_nonempty_historical_null_last_not_live_pass(self) -> None:
+        t = self._target()
+        assert (
+            temporal_plausibility_review(t, 5, ANCHOR, None)
+            == TEMPORAL_SEMANTIC_REVIEW
+        )
+
+    def test_truthful_partial_days_outside_still_allowed(self) -> None:
+        # OKX-style LIMITED continuation can page several days outside the
+        # requested window; that is truthful PARTIAL, not a unit catastrophe.
+        t = self._target()
+        assert (
+            temporal_plausibility_review(
+                t,
+                5,
+                t.start_time - timedelta(days=5),
+                t.start_time - timedelta(days=4),
+            )
+            is None
+        )
+
+    def test_current_only_book_seconds_after_end_not_false_rejected(self) -> None:
+        t = self._target(sensor=SensorFamily.MECHANICAL_BOOK_SNAPSHOT)
+        # Live snapshot may be stamped slightly AFTER the nominal request end
+        # (execution latency); and a book is not required to supply timestamps.
+        assert (
+            temporal_plausibility_review(
+                t,
+                5,
+                t.end_time + timedelta(seconds=2),
+                t.end_time + timedelta(seconds=2),
+            )
+            is None
+        )
+        assert temporal_plausibility_review(t, 5, None, None) is None
+
+    def test_empty_valid_no_fabricated_timestamp(self) -> None:
+        t = self._target()
+        assert temporal_plausibility_review(t, 0, None, None) is None
+
+    def test_book_still_rejects_catastrophically_wrong_timestamp(self) -> None:
+        t = self._target(sensor=SensorFamily.MECHANICAL_BOOK_SNAPSHOT)
+        assert (
+            temporal_plausibility_review(
+                t,
+                5,
+                datetime(1970, 1, 21, tzinfo=UTC),
+                datetime(1970, 1, 21, tzinfo=UTC),
+            )
+            == TEMPORAL_SEMANTIC_REVIEW
+        )
+
+    def test_native_time_sample_extraction_gate_style(self) -> None:
+        # epoch-SECONDS row timestamps (10-digit): the I10R1 Gate adjudication.
+        body = {"rows": [{"time": 1788134400}, {"time": 1788138000}]}
+        samples = extract_native_time_samples(body)
+        assert samples is not None
+        assert 1788134400 in samples
+        assert 1788138000 in samples
+        assert min(samples) == 1788134400
+        assert max(samples) == 1788138000
+
+    def test_native_time_sample_extraction_kraken_style(self) -> None:
+        # epoch-MILLISECOND top-level timestamp (13-digit): the I10R1 Kraken
+        # funding adjudication.
+        body = {"timestamp": 1758134400123, "data": [{"rate": 1}]}
+        samples = extract_native_time_samples(body)
+        assert samples == [1758134400123]
+
+    def test_native_time_sample_ignores_strings_and_floats(self) -> None:
+        body = {
+            "time": "1788134400",
+            "timestamp": 1788134400.5,
+            "nested": {"time": 1788134400},
+        }
+        assert extract_native_time_samples(body) == [1788134400]
+
+    def test_smoke_one_redirects_1970_batch_to_temporal_review(self) -> None:
+        # OKX funding rows stamped near the epoch: schema KNOWN, rows > 0 — the
+        # exact combination that wrongly passed before I10R1.  The guard must
+        # downgrade it to TEMPORAL_SEMANTIC_REVIEW.
+        body = {
+            "code": "0",
+            "msg": "",
+            "data": [
+                {
+                    "instId": "BTC-USDT-SWAP",
+                    "fundingRate": "0.000075",
+                    "realizedRate": "0.000075",
+                    "fundingTime": "1000000",
+                    "formulaType": "A",
+                    "instType": "SWAP",
+                    "method": "ma",
+                }
+            ],
+        }
+        res = smoke_one(
+            self._target(), _FakeSmokeTransport(body), run_id="r1", index=0
+        )
+        assert res.result_class == TEMPORAL_SEMANTIC_REVIEW
+        assert "temporal_plausibility" in res.quality_flags
+        assert res.summary()["result_class"] == TEMPORAL_SEMANTIC_REVIEW

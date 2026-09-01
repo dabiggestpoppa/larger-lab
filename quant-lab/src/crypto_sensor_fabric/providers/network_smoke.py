@@ -45,6 +45,16 @@ is_complete=False from a frozen LIMITED continuation is NOT a smoke failure
 (OKX/Gate/Deribit historical continuation stays LIMITED; EMPTY_VALID and
 truthfully-partial are PASS states).  No provider code is modified by this
 module; a live defect is RECORDED and returned for operator repair planning.
+
+I10R1 temporal-plausibility doctrine: a 200 with a known JSON shape and a
+nonempty batch is NOT semantic correctness.  Non-CURRENT_ONLY historical/event
+smoke requests with rows must derive BOTH convenience timestamps, and the
+derived timestamps must stay within a broad 365-day envelope around the
+requested window (catastrophic unit sanity only — this is NOT
+window-completeness validation).  1970 during a 2026 smoke is a broken interpretation and is
+classified TEMPORAL_SEMANTIC_REVIEW, never LIVE_PASS.  CURRENT_ONLY books are
+exempt from containment (a snapshot may be stamped slightly after the nominal
+request end) but a catastrophically wrong supplied timestamp still fails.
 """
 
 from __future__ import annotations
@@ -132,6 +142,7 @@ TRANSPORT_FAILURE = "TRANSPORT_FAILURE"
 PROVIDER_ERROR = "PROVIDER_ERROR"
 SCHEMA_ADDITIVE_REVIEW = "SCHEMA_ADDITIVE_REVIEW"
 SCHEMA_BREAKING = "SCHEMA_BREAKING"
+TEMPORAL_SEMANTIC_REVIEW = "TEMPORAL_SEMANTIC_REVIEW"
 UNEXPECTED_RESPONSE = "UNEXPECTED_RESPONSE"
 INTERNAL_FAILURE = "INTERNAL_FAILURE"
 
@@ -149,6 +160,7 @@ BLOCKING_CLASSES: frozenset[str] = frozenset(
         PROVIDER_ERROR,
         SCHEMA_ADDITIVE_REVIEW,
         SCHEMA_BREAKING,
+        TEMPORAL_SEMANTIC_REVIEW,
         UNEXPECTED_RESPONSE,
         INTERNAL_FAILURE,
     }
@@ -473,6 +485,7 @@ class PhysicalResult:
     endpoint_path: str | None = None
     adapter_version: str | None = None
     evidence_ref_id: str | None = None
+    native_first_timestamps: list[int] | None = None
 
     def summary(self) -> dict[str, Any]:
         return {
@@ -486,6 +499,11 @@ class PhysicalResult:
             "endpoint_path": self.endpoint_path,
             "adapter_version": self.adapter_version,
             "evidence_ref_id": self.evidence_ref_id,
+            "native_first_timestamps": (
+                list(self.native_first_timestamps)
+                if self.native_first_timestamps
+                else None
+            ),
             "result_class": self.result_class,
             "http_status": self.http_status,
             "duration_ms": int(self.duration_ms),
@@ -553,6 +571,98 @@ def _safe_error_summary(err: AcquisitionError) -> tuple[str, str | None]:
     return cls, detail
 
 
+# ---------------------------------------------------------------------------
+# Temporal-plausibility guard (I10R1 — smoke layer only, never providers)
+# ---------------------------------------------------------------------------
+
+#: Broad operational tolerance for the current-runtime smoke.  Historical/event
+#: convenience timestamps must not lie more than this far OUTSIDE the requested
+#: window — a catastrophic unit-sanity bound, NOT window-completeness
+#: validation.  A provider LIMITED page a few days outside the window remains
+#: truthfully PARTIAL; 1970 during a 2026 smoke fails review.
+TEMPORAL_TOLERANCE_DAYS = 365
+
+#: Native integer timestamp member keys recognized for EVIDENCE sampling only
+#: (magnitude/unit adjudication, I10R1 §6/§11/§38).  Never used for
+#: classification; provider bodies are heterogeneous so the generic walker
+#: intentionally avoids claiming which member is authoritative.
+_NATIVE_TIME_KEYS = frozenset({"time", "timestamp"})
+
+
+def temporal_plausibility_review(
+    target: SmokeTarget,
+    row_count: int,
+    actual_first: datetime | None,
+    actual_last: datetime | None,
+) -> str | None:
+    """Return TEMPORAL_SEMANTIC_REVIEW (smoke-only class) or None.
+
+    - NONEMPTY historical/event batch: BOTH convenience timestamps required.
+      A null actual_first OR null actual_last on rows is NOT LIVE_PASS (§16).
+    - NONEMPTY batch (incl. books): supplied timestamps must stay inside a
+      generous 365-day envelope around the requested window (§17).
+    - CURRENT_ONLY books are exempt from the required-non-null rule and
+      contains-ment is generous enough to tolerate a snapshot a few seconds
+      after the nominal request end (§18).  An empty-valid batch needs no
+      fabricated timestamp.
+    """
+    is_book = target.sensor_family is SensorFamily.MECHANICAL_BOOK_SNAPSHOT
+    if row_count > 0 and not is_book:
+        if actual_first is None or actual_last is None:
+            return TEMPORAL_SEMANTIC_REVIEW
+    if row_count > 0:
+        low = target.start_time - timedelta(days=TEMPORAL_TOLERANCE_DAYS)
+        high = target.end_time + timedelta(days=TEMPORAL_TOLERANCE_DAYS)
+        for ts in (actual_first, actual_last):
+            if ts is None:
+                continue
+            if ts < low or ts > high:
+                return TEMPORAL_SEMANTIC_REVIEW
+    return None
+
+
+def extract_native_time_samples(body: Any, *, cap: int = 4) -> list[int] | None:
+    """Walk a decoded provider payload for native integer timestamp members.
+
+    EVIDENCE ONLY (sanitized): returns the first ``cap`` distinct integer
+    values found under keys ``time``/``timestamp`` plus the min and max, so an
+    operator can adjudicate unit/magnitude without any full raw body being
+    committed.  Strings/floats/bools are ignored — native integers only.
+    """
+    if not isinstance(body, (dict, list)):
+        return None
+    found: list[int] = []
+    seen: set[int] = set()
+
+    def walk(node: Any) -> None:
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if (
+                    key in _NATIVE_TIME_KEYS
+                    and isinstance(value, int)
+                    and not isinstance(value, bool)
+                ):
+                    if value not in seen:
+                        seen.add(value)
+                        found.append(value)
+                else:
+                    walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item)
+
+    walk(body)
+    if not found:
+        return None
+    ordered = found[:cap]
+    lo, hi = min(found), max(found)
+    if lo not in ordered:
+        ordered.append(lo)
+    if hi not in ordered:
+        ordered.append(hi)
+    return ordered
+
+
 def _record_endpoint(
     base: dict[str, Any], transport: Any, calls_before: int
 ) -> None:
@@ -586,7 +696,7 @@ def smoke_one(
 ) -> PhysicalResult:
     """Execute ONE physical request through the real adapter + live transport."""
     began = time.monotonic()
-    base = dict(
+    base: dict[str, Any] = dict(
         provider_id=target.provider_id,
         sensor_family=target.sensor_family,
         native_instrument_id=target.native_instrument_id,
@@ -678,6 +788,30 @@ def smoke_one(
         )
         if envelope.evidence_ref is not None:
             base["evidence_ref_id"] = envelope.evidence_ref.evidence_id
+        try:
+            decoded = json.loads(envelope.raw_body)
+        except (ValueError, TypeError):
+            decoded = None
+        base["native_first_timestamps"] = extract_native_time_samples(decoded)
+
+    # Temporal-plausibility guard: a 1970 timestamp (or absent convenience
+    # timestamps) on a nonempty historical batch can never count as LIVE_PASS.
+    review = temporal_plausibility_review(
+        target,
+        batch.row_count,
+        batch.actual_first_timestamp,
+        batch.actual_last_timestamp,
+    )
+    if review is not None:
+        base["result_class"] = review
+        base["quality_flags"] = list(base["quality_flags"]) + [
+            "temporal_plausibility"
+        ]
+        base["error_class"] = "TemporalPlausibilityReview"
+        base["error_detail"] = (
+            "convenience timestamps absent or outside the 365-day smoke "
+            "envelope around the requested window"
+        )
     _record_endpoint(base, transport, calls_before)
     base["duration_ms"] = int((time.monotonic() - began) * 1000)
     return PhysicalResult(**base)  # type: ignore[arg-type]
