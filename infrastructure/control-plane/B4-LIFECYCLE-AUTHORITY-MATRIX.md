@@ -28,7 +28,7 @@ And the activation invariant (B4-CXR4R3/R4):
 | restart     | yes (activation half) | yes     | no             | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | shutdown half yes; activation half no  |
 | recover     | yes         | yes                | no             | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | no                                    |
 | migrate     | yes         | yes                | no             | no                      | yes (exact governed DB only) | no                | no                   | no                           | no                                    |
-| wait-ready  | no          | no                 | no             | no                      | no                    | no                   | no                   | no                           | yes                                   |
+| wait-dependencies | no      | no                 | no             | no                      | no                    | no                   | no                   | no                           | yes                                   |
 | smoke       | yes (read)  | no                 | no             | no                      | no                    | no                   | no                   | no                           | no (needs a live API)                  |
 | stop        | **no**      | **no**             | no             | no                      | no                    | no (down)            | no (terminate)       | no                           | **yes — safe shutdown is always allowed** |
 | destroy     | no          | no                 | no             | no                      | no (volume removal)   | no (down -v)         | no (terminate)       | **YES — explicit `--yes`**     | yes (explicit authorization)           |
@@ -45,7 +45,11 @@ And the activation invariant (B4-CXR4R3/R4):
 - **DATABASE MUTATION**: `migrate` — full pinned authority first, and the
   target must be the EXACT governed PostgreSQL identity (host + port + db +
   user + governed credential authority; B4-CXR4R4).
-- **OBSERVATION**: `doctor`, `smoke`, `wait-ready` — read-only.
+- **OBSERVATION**: `doctor`, `smoke`, `wait-dependencies` — read-only.
+  `wait-dependencies` reports postgres/redis DEPENDENCY health ONLY — it is
+  never activation/runtime readiness (B4-CXR5R7); `smoke` probes the pinned
+  activation destination (port from the pinned ActivationContext, never a
+  fresh environment read).
 - **SAFE SHUTDOWN**: `stop` — must remain available even under an invalid
   config; terminating known PID-file-owned processes and `compose down` never
   requires a healthy configuration.
@@ -61,3 +65,15 @@ And the activation invariant (B4-CXR4R3/R4):
 - A configuration override becomes authoritative ONLY through a PROVEN
   append-only durable audit sink (B4-CXR4R5); without one, overrides are
   blocked — durability is never duck-typed.
+- B4-CXR5R5: the canonical `operator_override` is the ONLY applicable path and
+  requires a type-exact proven `PostgresAuditSink`; `evaluate_override_preview`
+  returns a non-applicable decision object; the audit connection is dedicated
+  and transactionally isolated; the ledger is append-only in the database
+  (migration 0007 trigger); records are idempotent by request/correlation id
+  with config fingerprints.
+- B4-CXR5R6: worker/job/execution/storage inputs are authority-bearing
+  (OCE_JOB_FILE TEST_ONLY, ambient worker secret test-seam-only, path
+  containment enforced); OCE_WORKER_TOKEN is rejected.
+- B4-CXR5R7: `configured`/`initialized`/`config_valid` are never reported as
+  `started`/runtime-ready; the config gate is `config_gate`; CLI command is
+  `wait-dependencies`.
