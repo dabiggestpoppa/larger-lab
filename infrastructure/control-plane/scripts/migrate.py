@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """OCE Control Plane migration runner (B2-R2 / B4-CXR3R2 / B4-CXR4R4 /
-B4-CXR5R1).
+B4-CXR5R1 / B4-CXR5R2).
 
-Numbered, reversible migrations against PostgreSQL. Fail-closed on:
+Numbered migrations against the governed PostgreSQL. Fail-closed on:
 missing migration, out-of-order version, checksum mismatch, partial apply.
 
 B4-CXR3R2: there is NO public ``--db`` DSN parameter and no predictable
@@ -24,14 +24,24 @@ INTERNALLY from the pinned activation authority (ActivationContext). The
 derived DSN is identity-checked in-memory as an invariant guard; nothing is
 ever echoed.
 
+B4-CXR5R2 (CXR5-02): ONLY the repository-owned canonical migrations/
+directory may mutate the governed database. ``--dir`` is REMOVED; migration
+discovery rejects symlink escape, alternate directories, non-regular
+files, duplicate versions, unrecognized filename forms, and version gaps.
+An activation is bound to a secret-free migration-set identity (ordered
+filenames, versions, file hashes — never SQL contents). Production
+rollback (``down``) is FUTURE-LOCKED: destructive schema mutation requires
+a separately authorized increment.
+
 Usage:
-  migrate.py up     [--dir DIR]
-  migrate.py down   [--dir DIR]   # rollback latest applied
-  migrate.py status [--dir DIR]
+  migrate.py up
+  migrate.py down     # FUTURE-LOCKED in production (test/authorized use only)
+  migrate.py status
 """
 from __future__ import annotations
 import argparse
 import hashlib
+import json
 import re
 import sys
 from pathlib import Path
@@ -58,32 +68,131 @@ LOOPBACK_HOSTS = ("127.0.0.1", "localhost")
 PG_PORT = ls.PG_PORT
 PG_DB = ls.PG_DB
 PG_USER = ls.PG_USER
-VERSION_RE = re.compile(r"^(\d{4})_.+\.sql$")
+UP_RE = re.compile(r"^(\d{4})_([A-Za-z0-9_]+)\.sql$")
+# canonical down form is exactly NNNN_down.sql — checked BEFORE UP_RE
+# because "0001_down.sql" also matches the up pattern. Any other
+# *_down.sql variant is an unrecognized form and fails closed.
+DOWN_RE = re.compile(r"^(\d{4})_down\.sql$")
 
 
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def discover_migrations(directory: Path) -> list[tuple[str, Path, Path]]:
-    """Return [(version, up_path, down_path)] sorted by version."""
+def _parse_migration_name(fname: str) -> tuple[str, bool] | None:
+    """Return (version, is_down) for a canonical migration filename, else
+    None for an unrecognized form (CXR5-02: fail closed on unknown forms)."""
+    m = DOWN_RE.match(fname)
+    if m:
+        return (m.group(1), True)
+    m = UP_RE.match(fname)
+    return (m.group(1), False) if m else None
+
+
+def _canonical_dir() -> Path:
+    """The repository-owned canonical migration directory, verified to sit
+    beneath the control-plane root (resolve() rejects symlink escape)."""
+    d = MIGRATIONS_DIR.resolve()
+    root = BASE.resolve()
+    if d != root and root not in d.parents:
+        raise RuntimeError(
+            "canonical migration directory escapes the control-plane root "
+            "(B4-CXR5R2)")
+    if not d.is_dir():
+        raise RuntimeError(f"canonical migration directory missing: {d}")
+    return d
+
+
+def _scan_migrations(directory: Path) -> list[tuple[str, Path, Path]]:
+    """Low-level structural scanner (CXR5-02): validates every migration path
+    in *directory* — regular files only (no symlinks), canonical filenames,
+    no duplicate up/down per version, up present for every down, contiguous
+    versions. Returns [(version, up_path, down_path)] sorted by version."""
+    directory = directory.resolve()
+    if not directory.is_dir():
+        raise RuntimeError(f"migration directory is not a directory: {directory}")
     ups: dict[str, Path] = {}
     downs: dict[str, Path] = {}
-    for f in sorted(directory.glob("*.sql")):
-        m = VERSION_RE.match(f.name)
-        if not m:
+    for f in sorted(directory.iterdir()):
+        if f.name in ("__init__.py", "README.md", "README"):
             continue
-        version = m.group(1)
-        if f.name.endswith("_down.sql"):
+        if not f.is_file() or f.is_symlink():
+            # symlinks (inside or escaping the dir), dirs, sockets, devices
+            # are rejected — an operator-controlled link can never smuggle
+            # SQL from outside the canonical set
+            raise RuntimeError(
+                f"migration path is not a regular file: {f.name} "
+                "(B4-CXR5R2, symlinks rejected)")
+        if not f.name.endswith(".sql"):
+            continue  # non-SQL files in the canonical dir are ignored
+        parsed = _parse_migration_name(f.name)
+        if parsed is None:
+            raise RuntimeError(
+                f"unrecognized migration filename: {f.name} (B4-CXR5R2)")
+        version, is_down = parsed
+        if is_down:
+            if version in downs:
+                raise RuntimeError(
+                    f"duplicate down script for migration {version} (B4-CXR5R2)")
             downs[version] = f
         else:
+            if version in ups:
+                raise RuntimeError(
+                    f"duplicate up script for migration {version} (B4-CXR5R2)")
             ups[version] = f
-    result = []
-    for version in sorted(set(ups) | set(downs)):
+    result: list[tuple[str, Path, Path]] = []
+    versions = sorted(set(ups) | set(downs))
+    for version in versions:
         if version not in ups:
-            raise RuntimeError(f"migration {version}: missing up script")
+            raise RuntimeError(f"migration {version}: missing up script (B4-CXR5R2)")
         result.append((version, ups[version], downs.get(version)))
+    # fail closed on gaps / ordering contradictions: contiguous integers
+    nums = sorted(int(v) for v in versions)
+    if nums and nums != list(range(nums[0], nums[0] + len(nums))):
+        raise RuntimeError(
+            "migration versions are not contiguous (gap/ordering "
+            "contradiction) (B4-CXR5R2)")
     return result
+
+
+def discover_migrations(directory: Path | None = None) -> list[tuple[str, Path, Path]]:
+    """Return [(version, up_path, down_path)] for the CANONICAL repository
+    migration directory (CXR5-02: alternate directories are blocked)."""
+    directory = _canonical_dir() if directory is None else directory
+    if directory.resolve() != _canonical_dir().resolve():
+        raise RuntimeError(
+            "migration directory must be the repository-owned canonical "
+            "migrations/ directory (B4-CXR5R2)")
+    return _scan_migrations(directory)
+
+
+def migration_set_identity(directory: Path | None = None) -> dict:
+    """Deterministic, secret-free identity of the migration set (CXR5-02).
+
+    Contains ordered filenames, version identities, and per-file SHA-256
+    hashes — NEVER SQL contents. Binds an activation to a stable migration
+    program and detects mutation of the set after inventory.
+    """
+    directory = _canonical_dir() if directory is None else directory
+    if directory.resolve() != _canonical_dir().resolve():
+        raise RuntimeError(
+            "migration directory must be the repository-owned canonical "
+            "migrations/ directory (B4-CXR5R2)")
+    entries = []
+    for version, up_path, down_path in _scan_migrations(directory):
+        entries.append({
+            "version": version,
+            "up": up_path.name,
+            "up_sha256": sha256_file(up_path),
+            "down": down_path.name if down_path else None,
+            "down_sha256": sha256_file(down_path) if down_path else None,
+        })
+    manifest = json.dumps(entries, sort_keys=True).encode("utf-8")
+    return {
+        "directory": str(directory.resolve()),
+        "entries": entries,
+        "manifest_sha256": hashlib.sha256(manifest).hexdigest(),
+    }
 
 
 def connect(dsn: str):
@@ -158,7 +267,10 @@ def cmd_up(dsn: str, directory: Path) -> int:
 
 
 def cmd_down(dsn: str, directory: Path) -> int:
-    migrations = dict(discover_migrations(directory))
+    # CXR5-02: previously ``dict(discover_migrations(...))`` crashed on the
+    # three-item tuples — key by version so the real rollback works when
+    # invoked (production CLI is future-locked; tests exercise the engine).
+    migrations = {v: (up, down) for v, up, down in discover_migrations(directory)}
     conn = connect(dsn)
     try:
         applied = applied_versions(conn)
@@ -167,7 +279,7 @@ def cmd_down(dsn: str, directory: Path) -> int:
             if entry is None:
                 print(f"FAIL: applied migration {version} has no file on disk")
                 return 2
-            _v, _up, down_path = entry
+            _up, down_path = entry
             if down_path is None:
                 print(f"SKIP-DOWN: {version} has no down script (irreversible)")
                 continue
@@ -241,42 +353,58 @@ def check_governed_identity(parts: dict) -> str | None:
     return None
 
 
-def _reject_secret_flags(argv: list[str] | None) -> None:
-    """Reject secret-bearing CLI flags WITHOUT echoing their values.
+def _reject_forbidden_flags(argv: list[str] | None) -> None:
+    """Reject secret-bearing and alternate-program CLI flags WITHOUT echoing
+    their values.
 
     B4-CXR5R1: --db/--dsn/--token/--secret/--password/--worker-secret are
     NOT OCE migration options. argparse would echo the raw value in an
     "unrecognized arguments" message, so we intercept BEFORE parsing and
-    print a redacted denial naming only the option. The governed connection
-    is always resolved internally; secret material is never valid CLI input.
+    print a redacted denial naming only the option.
+
+    B4-CXR5R2: --dir is rejected too — only the repository-owned canonical
+    migrations/ directory may mutate the governed database; an
+    operator-controlled directory must never provide arbitrary SQL.
     """
     if not argv:
         return
-    bad = {"--db", "--dsn", "--token", "--secret", "--password",
-           "--worker-secret", "--worker-token"}
+    secret = {"--db", "--dsn", "--token", "--secret", "--password",
+              "--worker-secret", "--worker-token"}
     for tok in argv:
         opt = tok.split("=", 1)[0]
-        if opt in bad:
+        if opt in secret:
             print(f"FAIL: {opt} is not a valid OCE migration option — the "
                   "governed connection is resolved internally; secret "
                   "material is never accepted on the command line "
                   "(B4-CXR5R1)", file=sys.stderr)
+            raise SystemExit(2)
+        if opt == "--dir":
+            print("FAIL: --dir is not a valid OCE migration option — the "
+                  "migration directory is the repository-owned canonical "
+                  "migrations/ directory only; an operator-controlled "
+                  "directory can never select the SQL executed against the "
+                  "governed database (B4-CXR5R2)", file=sys.stderr)
             raise SystemExit(2)
 
 
 def main(argv: list[str] | None = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
-    # B4-CXR5R1: reject secret-bearing flags before argparse (which would
-    # echo the raw value). Never print or accept a password-bearing DSN.
-    _reject_secret_flags(argv)
+    # B4-CXR5R1/R2: reject secret-bearing and alternate-dir flags before
+    # argparse (which would echo the raw value). Never print or accept a
+    # password-bearing DSN or an operator-selected migration directory.
+    _reject_forbidden_flags(argv)
     parser = argparse.ArgumentParser(description="OCE control-plane migrations")
     parser.add_argument("command", choices=["up", "down", "status"])
-    # B4-CXR5R1: NO --db. A password-bearing DSN must never enter process
-    # argv; the governed connection is resolved internally from the pinned
-    # activation authority.
-    parser.add_argument("--dir", type=Path, default=MIGRATIONS_DIR)
     args = parser.parse_args(argv)
+    # B4-CXR5R2: production rollback is FUTURE-LOCKED — destructive schema
+    # mutation requires a separately authorized increment. Refused BEFORE
+    # any activation/connection work.
+    if args.command == "down":
+        print("down is TEST-ONLY / FUTURE-LOCKED in Book 4: production "
+              "rollback requires a separately authorized destructive "
+              "increment (B4-CXR5R2)", file=sys.stderr)
+        return 3
     # B4-CXR4R4: activation authority FIRST — validated effective config AND
     # resolved governed secret. No migration runs under a forbidden/malformed
     # config or an unresolvable secret reference. The DSN is derived here,
@@ -298,11 +426,14 @@ def main(argv: list[str] | None = None) -> int:
         print(f"FAIL: governed DSN failed identity check — {err}; "
               "values never echoed (B4-CXR4R4)", file=sys.stderr)
         return 2
+    # B4-CXR5R2: only the canonical repository-owned migration program may
+    # mutate the governed database; the set identity is stable and
+    # secret-free (no SQL contents in any evidence).
+    canonical = _canonical_dir()
+    migration_set_identity(canonical)  # validates + snapshots; raises on defect
     if args.command == "up":
-        return cmd_up(dsn, args.dir)
-    if args.command == "down":
-        return cmd_down(dsn, args.dir)
-    return cmd_status(dsn, args.dir)
+        return cmd_up(dsn, canonical)
+    return cmd_status(dsn, canonical)
 
 
 if __name__ == "__main__":

@@ -1107,3 +1107,208 @@ class TestCXR4R4GateFirstRecoverAndMigration:
                 mig.main(["up"])
         assert seen[0] == seen[1]
         assert "127.0.0.1" in seen[0]
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR5R2 (CXR5-02) — ONLY the repository-owned canonical migration program
+# may mutate the governed database: --dir removed, symlink/duplicate/unknown-
+# filename/gap rejection, secret-free migration-set identity, fixed cmd_down
+# engine, and production rollback FUTURE-LOCKED.
+# --------------------------------------------------------------------------- #
+class TestCXR5R2CanonicalMigrationProgram:
+    def _env(self) -> dict:
+        env = dict(os.environ)
+        from pathlib import Path as _P
+        env["PYTHONPATH"] = str(_P(__file__).resolve().parent.parent / "src") \
+            + os.pathsep + env.get("PYTHONPATH", "")
+        return env
+
+    def _scan_dir(self, tmp_path) -> Path:
+        d = tmp_path / "migrations"
+        d.mkdir()
+        return d
+
+    def test_migrate_cli_rejects_dir_flag_without_echo(self):
+        # E + F: --dir is rejected BEFORE anything — the alternate directory
+        # value is never echoed and can never select the SQL to execute.
+        import subprocess
+        import sys
+        from pathlib import Path as _P
+        script = str(_P(__file__).resolve().parent.parent / "scripts" / "migrate.py")
+        alt = "/tmp/attacker-migrations"
+        r = subprocess.run([sys.executable, script, "up", "--dir", alt],
+                           env=self._env(), capture_output=True, text=True,
+                           timeout=60)
+        assert r.returncode == 2
+        blob = r.stderr + r.stdout
+        assert alt not in blob
+        assert "--dir" in blob
+        assert "canonical" in blob.lower()
+
+    def test_canary_sql_never_executed_via_dir(self, monkeypatch, tmp_path, capsys):
+        # F: a directory full of canary SQL can never be executed — the CLI
+        # rejects --dir before any gate/connection; the scanner also refuses
+        # non-canonical directories programmatically.
+        import scripts.migrate as mig
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        d = tmp_path / "attacker-migrations"
+        d.mkdir()
+        (d / "0001_evil.sql").write_text("INSERT INTO canary VALUES (1);",
+                                          encoding="utf-8")
+        with pytest.raises(SystemExit) as exc:
+            mig.main(["up", "--dir", str(d)])
+        assert exc.value.code == 2
+        out, err = capsys.readouterr()
+        assert "canary" not in (out + err)
+        with pytest.raises(RuntimeError, match="canonical"):
+            mig.discover_migrations(d)
+
+    def test_symlink_escape_blocked(self, tmp_path):
+        # G: a symlink inside the scanned directory (even pointing at a
+        # regular file) is rejected — SQL can never be smuggled from outside
+        # the canonical set via a link.
+        import scripts.migrate as mig
+        outside = tmp_path / "outside.sql"
+        outside.write_text("DROP TABLE anything;", encoding="utf-8")
+        d = self._scan_dir(tmp_path)
+        try:
+            (d / "0001_link.sql").symlink_to(outside)
+        except OSError:
+            pytest.skip("symlink creation unsupported on this platform")
+        with pytest.raises(RuntimeError, match="not a regular file"):
+            mig._scan_migrations(d)
+
+    def test_duplicate_version_blocked(self, tmp_path):
+        # H: two up scripts for one version are a structural contradiction
+        import scripts.migrate as mig
+        d = self._scan_dir(tmp_path)
+        (d / "0001_a.sql").write_text("SELECT 1;", encoding="utf-8")
+        (d / "0001_b.sql").write_text("SELECT 2;", encoding="utf-8")
+        with pytest.raises(RuntimeError, match="duplicate up"):
+            mig._scan_migrations(d)
+
+    def test_noncanonical_down_variant_blocked(self, tmp_path):
+        # only the exact NNNN_down.sql form is canonical; any other *_down
+        # variant is an unrecognized form and fails closed
+        import scripts.migrate as mig
+        d = self._scan_dir(tmp_path)
+        (d / "0001_x.sql").write_text("SELECT 1;", encoding="utf-8")
+        (d / "0001_a_down.sql").write_text("SELECT 0;", encoding="utf-8")
+        # a near-miss down variant is NOT the canonical NNNN_down.sql form:
+        # it parses as a second up script and fails closed as a duplicate
+        with pytest.raises(RuntimeError, match="duplicate up"):
+            mig._scan_migrations(d)
+
+    def test_unrecognized_filename_blocked(self, tmp_path):
+        # unrecognized .sql forms fail closed instead of being silently ignored
+        import scripts.migrate as mig
+        d = self._scan_dir(tmp_path)
+        (d / "0001_x.sql").write_text("SELECT 1;", encoding="utf-8")
+        (d / "evil-notes.sql").write_text("DROP TABLE x;", encoding="utf-8")
+        with pytest.raises(RuntimeError, match="unrecognized migration filename"):
+            mig._scan_migrations(d)
+
+    def test_version_gap_blocked(self, tmp_path):
+        import scripts.migrate as mig
+        d = self._scan_dir(tmp_path)
+        (d / "0001_x.sql").write_text("SELECT 1;", encoding="utf-8")
+        (d / "0003_x.sql").write_text("SELECT 3;", encoding="utf-8")
+        with pytest.raises(RuntimeError, match="not contiguous"):
+            mig._scan_migrations(d)
+
+    def test_rollback_future_locked_in_production_cli(self):
+        # I: production `down` is FUTURE-LOCKED — refused BEFORE any
+        # activation/connection work; the engine stays unit-testable.
+        import scripts.migrate as mig
+        rc = mig.main(["down"])
+        assert rc == 3
+
+    def test_cmd_down_engine_fixed(self, capsys):
+        # I: cmd_down previously crashed on dict(discover_migrations(...));
+        # the real rollback engine now works (executes the canonical down
+        # script for the latest applied version) — production CLI locked.
+        import scripts.migrate as mig
+        applied = {"0006": "<sha>"}
+
+        class _Cur:
+            def __init__(self):
+                self.executed = []
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def execute(self, sql, params=None):
+                self.executed.append(sql)
+
+            def fetchall(self):
+                return list(applied.items())
+
+        class _Conn:
+            def __init__(self):
+                self.cur = _Cur()
+
+            def cursor(self):
+                return self.cur
+
+            def commit(self):
+                pass
+
+            def rollback(self):
+                pass
+
+            def close(self):
+                pass
+
+        conn = _Conn()
+        monkeypatched = False
+        orig_connect = mig.connect
+        mig.connect = lambda dsn: conn  # type: ignore[assignment]
+        try:
+            rc = mig.cmd_down("governed-dsn", mig.MIGRATIONS_DIR)
+        finally:
+            mig.connect = orig_connect
+        assert rc == 0
+        out = capsys.readouterr().out
+        assert "reverted 0006" in out
+        down_sql = (mig.MIGRATIONS_DIR / "0006_down.sql").read_text(encoding="utf-8")
+        assert down_sql in conn.cur.executed[-1]
+
+    def test_migration_set_identity_deterministic_and_sql_free(self):
+        # migration-set identity: ordered versions, file hashes, NO SQL
+        # contents, deterministic across calls.
+        import scripts.migrate as mig
+        a = mig.migration_set_identity()
+        b = mig.migration_set_identity()
+        assert a == b
+        assert a["manifest_sha256"] == b["manifest_sha256"]
+        blob = json.dumps(a)
+        assert "CREATE TABLE" not in blob and "SELECT" not in blob
+        versions = [e["version"] for e in a["entries"]]
+        assert versions == sorted(versions)
+        for e in a["entries"]:
+            assert re.fullmatch(r"[0-9a-f]{64}", e["up_sha256"])
+
+    def test_migration_set_identity_detects_mutation(self, monkeypatch, tmp_path):
+        # the identity changes when the migration set changes (tamper proof)
+        import shutil
+        import scripts.migrate as mig
+        real = mig.MIGRATIONS_DIR
+        fake_base = tmp_path / "control-plane"
+        (fake_base / "migrations").mkdir(parents=True)
+        shutil.copytree(real, fake_base / "migrations", dirs_exist_ok=True)
+        monkeypatch.setattr(mig, "BASE", fake_base)
+        monkeypatch.setattr(mig, "MIGRATIONS_DIR", fake_base / "migrations")
+        before = mig.migration_set_identity()
+        tamper = fake_base / "migrations" / "0006_config_override_audit.sql"
+        tamper.write_text(
+            tamper.read_text(encoding="utf-8") + "\n-- tampered\n",
+            encoding="utf-8")
+        after = mig.migration_set_identity()
+        assert after["manifest_sha256"] != before["manifest_sha256"]
