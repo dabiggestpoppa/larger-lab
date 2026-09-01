@@ -36,6 +36,7 @@ class NegativeKnowledgeRecord:
     current_lifecycle_state: str = "DEMOTED"
     seq: int = 0
     permanent_by_operator_authority: Optional[str] = None   # authority reference if operator-permanent
+    permanence_authority: Optional[dict] = None              # G4-P0-C attributable authority block
 
     @classmethod
     def make(
@@ -68,12 +69,36 @@ class NegativeKnowledgeRecord:
                 "add a reopen condition or PERMANENT_BY_OPERATOR_AUTHORITY"
             )
 
-    def make_permanent(self, authority_basis: str, authority_level: str) -> None:
-        """Only an operator-authorized call may set permanence."""
-        if authority_level != "OPERATOR" and "OPERATOR" not in str(authority_level):
-            raise NegativeKnowledgeError("only operator authority may mark negative knowledge permanent")
+    def make_permanent(self, actor: str, authority_state: "AuthorityState",
+                       authority_basis: str, ratification_ref: str = "") -> None:
+        """G4-P0-C: permanence requires EXACT actor -> AuthorityState binding.
+
+        The caller must supply the ACTOR and the governed AuthorityState; the
+        ACTUAL level of that actor is read from AuthorityState.level(actor). A
+        payload string saying "OPERATOR" while the actor is a WORKER is
+        rejected — substring checks ("OPERATOR" in authority_level) are never
+        an authority basis.
+
+        Only actual OPERATOR authority may create PERMANENT_BY_OPERATOR_AUTHORITY.
+        The actor, actual level, authority basis and ratification reference are
+        recorded so permanence is attributable and reconstructable.
+        """
+        from .authority import AuthorityLevel  # local import avoids cycle
+        actual_level = authority_state.level(actor)
+        if actual_level != AuthorityLevel.OPERATOR.value:
+            raise NegativeKnowledgeError(
+                f"only actual OPERATOR authority may mark negative knowledge "
+                f"permanent; actor {actor!r} has level {actual_level!r}"
+            )
         self.permanent_by_operator_authority = authority_basis
         self.authority_basis = authority_basis
+        self.permanence_authority = {
+            "actor": actor,
+            "actual_level": actual_level,
+            "authority_basis": authority_basis,
+            "ratification_ref": ratification_ref,
+            "binding": "EXACT_AUTHORITY_STATE",
+        }
 
     @property
     def is_permanent(self) -> bool:

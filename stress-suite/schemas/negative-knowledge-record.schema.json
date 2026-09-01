@@ -20,6 +20,18 @@
     "authority_basis": {"type": "string"},
     "current_lifecycle_state": {"type": "string"},
     "seq": {"type": "integer", "minimum": 0},
-    "permanent_by_operator_authority": {"type": ["string","null"]}
+    "permanent_by_operator_authority": {"type": ["string","null"]},
+    "permanence_authority": {
+      "description": "G4-P0-C attributable authority block: actor, actual AuthorityState level, authority basis, ratification reference, binding kind",
+      "type": ["object","null"],
+      "properties": {
+        "actor": {"type": "string"},
+        "actual_level": {"type": "string"},
+        "authority_basis": {"type": "string"},
+        "ratification_ref": {"type": "string"},
+        "binding": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
   }
 }

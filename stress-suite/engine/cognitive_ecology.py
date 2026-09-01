@@ -471,6 +471,7 @@ class EcologyFacts:
         consensus: ConsensusRecord,
         consequence_class: str = "LOW",
         independent_replication_count: int = 0,
+        replication_paths: Optional[Sequence[ReplicationPathRecord]] = None,
         discriminating_contradiction_found: bool = False,
         challenge_budget_exhausted: bool = False,
         counter_attractor_attempted: bool = False,
@@ -525,7 +526,8 @@ class EcologyFacts:
             known = sum(1 for p in profiles if p.known_axis(ax))
             cov_axes[ax] = (known / len(profiles)) if profiles else 0.0
             unc_axes[ax] = len(profiles) - known
-        paths = collect_epistemic_paths(profiles, independent_replication_count)
+        paths = collect_epistemic_paths(profiles, replication_paths,
+                                        independent_replication_count)
         return cls(
             consequence_class=consequence_class,
             raw_reviewer_count=len(profiles),
@@ -745,19 +747,100 @@ _PATH_KNOWN_AXES = ("model_family", "runtime_lineage", "source_lineage",
                     "retrieval_bundle", "experiment_design_origin")
 
 
+# --------------------------------------------------------------------------- #
+# G4-P0-A — replication must have identity / provenance
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class ReplicationPathRecord:
+    """An explicit, attributable replication path (G4-P0-A). A replication
+    counts as an independent epistemic path only when it has a distinct,
+    verified/synthetic-authoritative path identity. A raw integer count is a
+    derived DISPLAY field — it must never mint path identities by declaration.
+
+    `qualifies()` fails closed: an empty/unknown identity, an unknown
+    provenance mode, or entirely-UNKNOWN provenance never qualifies.
+    """
+
+    replication_id: str
+    claim_id: str = ""
+    method: str = UNKNOWN
+    runtime_or_deterministic_path: str = UNKNOWN
+    source_lineages: Tuple[str, ...] = ()
+    experiment_design_origin: str = UNKNOWN
+    evidence_refs: Tuple[str, ...] = ()
+    provenance_mode: str = DEFAULT_PROVENANCE_MODE
+    registered_or_synthetic_authority: str = ""
+    prior_conclusion_exposure: Optional[bool] = None
+    result: str = ""
+
+    @classmethod
+    def from_fixture(cls, data: Mapping[str, Any]) -> "ReplicationPathRecord":
+        pce = data.get("prior_conclusion_exposure")
+        if isinstance(pce, str):
+            pce = {"TRUE": True, "FALSE": False, "UNKNOWN": None}.get(pce.upper())
+        return cls(
+            replication_id=_norm(data.get("replication_id")),
+            claim_id=str(data.get("claim_id", "")),
+            method=_norm(data.get("method")),
+            runtime_or_deterministic_path=_norm(data.get("runtime_or_deterministic_path")),
+            source_lineages=tuple(str(s) for s in (data.get("source_lineages") or [])),
+            experiment_design_origin=_norm(data.get("experiment_design_origin")),
+            evidence_refs=tuple(str(r) for r in (data.get("evidence_refs") or [])),
+            provenance_mode=str(data.get("provenance_mode", DEFAULT_PROVENANCE_MODE)),
+            registered_or_synthetic_authority=str(data.get("registered_or_synthetic_authority", "")),
+            prior_conclusion_exposure=pce,
+            result=str(data.get("result", "")),
+        )
+
+    def qualifies(self) -> bool:
+        """A replication path qualifies only with a distinct identity AND known
+        provenance under an explicit provenance mode."""
+        if not self.replication_id or self.replication_id == UNKNOWN:
+            return False
+        if self.provenance_mode not in PROVENANCE_MODES:
+            return False
+        if not self.registered_or_synthetic_authority:
+            return False
+        return bool(
+            (self.method not in (UNKNOWN, ""))
+            or (self.runtime_or_deterministic_path not in (UNKNOWN, ""))
+            or bool(self.source_lineages)
+            or (self.experiment_design_origin not in (UNKNOWN, "")))
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"replication_id": self.replication_id, "claim_id": self.claim_id,
+                "method": self.method,
+                "runtime_or_deterministic_path": self.runtime_or_deterministic_path,
+                "source_lineages": list(self.source_lineages),
+                "experiment_design_origin": self.experiment_design_origin,
+                "evidence_refs": list(self.evidence_refs),
+                "provenance_mode": self.provenance_mode,
+                "registered_or_synthetic_authority": self.registered_or_synthetic_authority,
+                "prior_conclusion_exposure": self.prior_conclusion_exposure,
+                "result": self.result}
+
+
+# `replication_paths=None` means: use the LEGACY synthetic-fixture display
+# semantics (a harness-declared count synthesizes REPL:N identities). A SUPPLIED
+# sequence — even an empty one — is the explicit institutional contract: only
+# those path identities count, deduplicated, provenance-checked.
 def collect_epistemic_paths(
     profiles: Sequence[ReviewerIndependenceProfile],
+    replication_paths: Optional[Sequence[ReplicationPathRecord]] = None,
     independent_replication_count: int = 0,
 ) -> Tuple[EpistemicPathRecord, ...]:
-    """Unique qualifying epistemic paths (G3R2-09).
+    """Unique qualifying epistemic paths (G3R2-09 / G4-P0-A).
 
     * A reviewer path qualifies when it is fresh-context and/or
       independently-originated-design AND its provenance is not entirely
       UNKNOWN (unknown path provenance does not qualify).
     * Reviewer paths are keyed by reviewer identity; a duplicated reviewer id
       counts once.
-    * Replication paths are distinct fixture-declared replications (REPL:N),
-      each its own identity.
+    * Replication paths come from EXPLICIT ReplicationPathRecord identities
+      (deduplicated by replication_id; only qualifying records count). A raw
+      integer count is display-only when explicit identities are supplied.
+      When NO explicit identities are supplied (legacy synthetic fixtures), a
+      harness-declared count may synthesize REPL:N identities.
     """
     paths: Dict[str, EpistemicPathRecord] = {}
     for p in profiles:
@@ -773,10 +856,24 @@ def collect_epistemic_paths(
             runtime_lineage=p.runtime_lineage,
             evidence_refs=p.evidence_refs,
         )
-    for i in range(max(0, int(independent_replication_count))):
-        paths[f"REPL:{i}"] = EpistemicPathRecord(
-            path_id=f"REPL:{i}", independent_replication=True,
-            evidence_refs=(f"REPLICATION:{i}",))
+    if replication_paths is None:
+        # LEGACY synthetic-fixture display semantics (historical G3 receipts).
+        for i in range(max(0, int(independent_replication_count))):
+            paths[f"REPL:{i}"] = EpistemicPathRecord(
+                path_id=f"REPL:{i}", independent_replication=True,
+                evidence_refs=(f"REPLICATION:{i}",))
+    else:
+        for rp in replication_paths:
+            if not rp.qualifies():
+                continue                   # unknown replication provenance: no path
+            if rp.replication_id in paths:
+                continue                   # duplicated identity counts once
+            paths[rp.replication_id] = EpistemicPathRecord(
+                path_id=rp.replication_id, independent_replication=True,
+                reviewer_id=rp.replication_id,
+                runtime_lineage=rp.runtime_or_deterministic_path,
+                evidence_refs=rp.evidence_refs,
+            )
     return tuple(sorted(paths.values(), key=lambda r: r.path_id))
 
 
@@ -1075,3 +1172,57 @@ class ReviewerProvenanceRegistry:
             out.append(b)
             conflicts.extend(cs)
         return tuple(out), tuple(conflicts)
+
+
+# --------------------------------------------------------------------------- #
+# G4-P0-B — ProvenanceConflictLedger: secondary-surface conflicts must survive
+# --------------------------------------------------------------------------- #
+SURFACE_TAGS = ("PRIMARY_REVIEW", "TOPOLOGY_CANDIDATE", "FRICTION_REVIEW",
+                "REPLICATION_PATH")
+
+
+@dataclass(frozen=True)
+class LedgerConflict:
+    surface: str
+    reviewer_id: str
+    axis: str
+    claimed: Any
+    registered: Any
+    disposition: str
+
+    @classmethod
+    def from_conflict(cls, surface: str, c: ProvenanceConflict) -> "LedgerConflict":
+        return cls(surface=surface, reviewer_id=c.reviewer_id, axis=c.axis,
+                   claimed=c.claimed, registered=c.registered,
+                   disposition=c.disposition)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"surface": self.surface, "reviewer_id": self.reviewer_id,
+                "axis": self.axis, "claimed": self.claimed,
+                "registered": self.registered, "disposition": self.disposition}
+
+
+class ProvenanceConflictLedger:
+    """Run-level audit lineage of every provenance conflict across ALL cognitive
+    surfaces (primary review, topology candidates, friction reviewers,
+    replication paths). G4-P0-B: behavior already fails closed; this guarantees
+    the conflicts are reconstructable in receipts."""
+
+    def __init__(self) -> None:
+        self._entries: List[LedgerConflict] = []
+
+    def record(self, surface: str, conflicts: Sequence[ProvenanceConflict]) -> None:
+        if surface not in SURFACE_TAGS:
+            raise ValueError(f"unknown provenance surface tag {surface!r}")
+        for c in conflicts:
+            self._entries.append(LedgerConflict.from_conflict(surface, c))
+
+    def entries(self) -> Tuple[LedgerConflict, ...]:
+        return tuple(self._entries)
+
+    def count(self) -> int:
+        return len(self._entries)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"entries": [e.to_dict() for e in self._entries],
+                "count": len(self._entries)}

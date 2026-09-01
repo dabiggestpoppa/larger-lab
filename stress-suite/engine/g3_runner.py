@@ -37,6 +37,8 @@ from .cognitive_ecology import (
     DependencyGraph,
     EcologyFacts,
     ProvenanceConflict,
+    ProvenanceConflictLedger,
+    ReplicationPathRecord,
     ReviewerIndependenceProfile,
     ReviewerProvenanceRegistry,
     SyntheticFixtureAuthority,
@@ -81,6 +83,7 @@ class G3ScenarioPack:
     counter_attractor_spec: Optional[Mapping[str, Any]] = None
     counter_attractor_findings: List[Mapping[str, Any]] = field(default_factory=list)
     independent_replication_count: int = 0
+    replication_paths: Optional[List[Mapping[str, Any]]] = None   # G4-P0-A explicit identities
     allocation_provenance: Mapping[str, Any] = field(default_factory=dict)
     registered_provenance: Optional[List[Mapping[str, Any]]] = None   # G3R-07 governed registry
     provenance_mode: str = DEFAULT_PROVENANCE_MODE   # G3R2-02: GOVERNED_REGISTRY | AUTHORITATIVE_SYNTHETIC_FIXTURE
@@ -135,6 +138,7 @@ def load_g3_pack(pack_dir: Path) -> G3ScenarioPack:
         counter_attractor_spec=(counter or {}).get("spec"),
         counter_attractor_findings=list((counter or {}).get("findings", [])),
         independent_replication_count=int(spec.get("independent_replication_count", 0)),
+        replication_paths=spec.get("replication_paths"),
         allocation_provenance=dict(spec.get("allocation_provenance", {})),
         registered_provenance=list(registered) if registered is not None else None,
         provenance_mode=str(spec.get("provenance_mode", DEFAULT_PROVENANCE_MODE)),
@@ -232,6 +236,20 @@ def run_g3_scenario(
     if not profiles:
         raise ValueError("G3 scenario requires at least one reviewer")
 
+    # ---- G4-P0-B: every surface's provenance conflicts join the run ledger --- #
+    ledger = ProvenanceConflictLedger()
+    ledger.record("PRIMARY_REVIEW", provenance_conflicts)
+
+    # ---- G4-P0-A: replication needs explicit path identities. A raw count is
+    # display-only; in GOVERNED_REGISTRY mode it never mints paths. Synthetic
+    # fixtures without explicit paths keep the legacy harness-declared count
+    # semantics (historical G3 receipts preserved).
+    rep_records = None
+    if pack.replication_paths:
+        rep_records = [ReplicationPathRecord.from_fixture(r) for r in pack.replication_paths]
+    elif mode == "GOVERNED_REGISTRY":
+        rep_records = []
+
     # ---- consensus + facts ------------------------------------------------- #
     graph = DependencyGraph.build(profiles)
     consensus = ConsensusRecord.build(pack.claim_id, profiles, graph)
@@ -240,6 +258,7 @@ def run_g3_scenario(
         consensus,
         consequence_class=pack.consequence_class,
         independent_replication_count=pack.independent_replication_count,
+        replication_paths=rep_records,
     )
 
     # ---- shared policy evaluation (generic predicates only) ---------------- #
@@ -267,7 +286,8 @@ def run_g3_scenario(
         candidates = []
         for spec in pack.topology_options:
             topo_reviewers = list(spec.get("reviewers", []))
-            topo_profiles, _ = _bind(topo_reviewers)
+            topo_profiles, topo_conflicts = _bind(topo_reviewers)
+            ledger.record("TOPOLOGY_CANDIDATE", topo_conflicts)
             if mode == "AUTHORITATIVE_SYNTHETIC_FIXTURE":
                 # G3R2-10: fixture capability tiers are harness-authoritative.
                 capability_tiers = tuple(str(r.get("capability_tier", "BASIC"))
@@ -319,7 +339,8 @@ def run_g3_scenario(
         # G3R2-03: fresh-context/friction reviewers use the SAME provenance
         # authority — a reviewer cannot self-declare BLIND without
         # registered/synthetic-authoritative provenance.
-        friction_reviewers, _ = _bind(list(pack.friction_reviewers or []))
+        friction_reviewers, friction_conflicts = _bind(list(pack.friction_reviewers or []))
+        ledger.record("FRICTION_REVIEW", friction_conflicts)
         friction_result = run_friction(
             trigger, friction_reviewers,
             pack.conclusions_by_exposure or {},
@@ -388,6 +409,7 @@ def run_g3_scenario(
         "evidence_obtained_from_executed_topology": bool(
             topology_decision and topology_decision.evidence_obtained),
         "provenance_conflicts": [c.to_dict() for c in conflict_tuples],
+        "provenance_conflict_ledger": ledger.to_dict(),
         "friction_result": friction_result.to_dict() if friction_result else None,
         "counter_attractor_result": counter_result.to_dict() if counter_result else None,
         "health_record": health.to_dict(),
