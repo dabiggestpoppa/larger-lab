@@ -11,10 +11,10 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I01R1-RATIFY — operator ACCEPTS PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED and PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN; authorized SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS ONLY.  STORAGE_MODEL_CONTRACTS_READY=TRUE; CONTENT_ADDRESSING_READY / PATH_CONTRACT_READY / CHECKSUM_PRIMITIVES_READY not yet earned (I02); T0A/T0B/ATOMIC_BACKEND/MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; no persistence/backend/network; next SENSOR-B4-I03 NOT started |
+| Current checkpoint | SENSOR-B4-I02 COMPLETE — CONTENT ADDRESSING + PATHS + CHECKSUMS (proposed PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS).  STORAGE_MODEL_CONTRACTS_READY=TRUE; CONTENT_ADDRESSING_READY=TRUE; PATH_CONTRACT_READY=TRUE; CHECKSUM_PRIMITIVES_READY=TRUE; T0A/T0B/ATOMIC_BACKEND/MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; no persistence/backend/network; next SENSOR-B4-I03 NOT started |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN (SENSOR-B3-I11R1-RATIFY: PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED = OPERATOR_ACCEPTED, PASS_BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED, BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS, REAL_PROVIDER_ADAPTERS=4, PRODUCTION_PATHS=17/17, PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18); BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; SENSOR-B4-I01R1-RATIFY: PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED = OPERATOR_ACCEPTED, PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN = OPERATOR_ACCEPTED; authorized SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS ONLY — addresses/identity mechanics, NO persistence yet |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN (SENSOR-B3-I11R1-RATIFY: PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED = OPERATOR_ACCEPTED, PASS_BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED, BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS, REAL_PROVIDER_ADAPTERS=4, PRODUCTION_PATHS=17/17, PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18); BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; SENSOR-B4-I01R1-RATIFY: PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED = OPERATOR_ACCEPTED, PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN = OPERATOR_ACCEPTED; authorized SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS ONLY — addresses/identity mechanics, NO persistence yet; SENSOR-B4-I02 COMPLETE — proposed PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS (I02 verification pending operator review) |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
@@ -25,7 +25,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE — Bloc 4 I02 in progress (content addressing + paths + checksums; identity/address mechanics only, no blob writer, no filesystem mutation, no network); recommended next (after operator acceptance of I02): SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND (NOT started) |
+| next_checkpoint_authorized | FALSE — SENSOR-B4-I02 COMPLETE (content addressing + paths + checksums; identity/address mechanics only, no blob writer, no filesystem mutation, no network); recommended next (after operator acceptance of I02): SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND (NOT started) |
 
 ## Test counts (cumulative)
 
@@ -135,7 +135,11 @@ that is updated at every staged checkpoint.
 | SENSOR-B4-I01R1A | (this commit) | (semver + lineage contract seal; full-suite cumulative first at I01R1C) | — |
 | SENSOR-B4-I01R1B | (next commit) | 37 (date-basis/hash-ref/timestamp adversarial tests) | 0 |
 | SENSOR-B4-I01R1C | (next commit) | 0 (seal evidence/ledger) | — |
-| cumulative | 1494 | 1494 | 0 |
+| SENSOR-B4-I02A | (this commit) | 0 (checksums primitives + ChecksumAlgorithm + models shared-rule refactor) | — |
+| SENSOR-B4-I02B | (next commit) | 0 (paths/object-key derivation + public exports) | — |
+| SENSOR-B4-I02C | (next commit) | 122 (storage tests: test_checksums 35 + test_paths 87; storage 115 -> 237) | 0 |
+| SENSOR-B4-I02D | (next commit) | 0 (evidence/ledger) | — |
+| cumulative | 1616 | 1616 | 0 |
 
 ## External / provider blockers
 
@@ -222,6 +226,30 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B4-I02 COMPLETE — CONTENT ADDRESSING + PATHS + CHECKSUMS (proposed
+  `PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS`).  New storage
+  modules `checksums.py` + `paths.py`; I01 models rewire SHA-256 syntax
+  validation onto ONE shared rule (`checksums.validate_sha256_hex`); new
+  `ChecksumAlgorithm` enum (SHA256 | MD5 | CRC32).  Exact-byte SHA-256 identity
+  primitives (H1 source / H2 stored-object / H3 provider layers kept separate;
+  bytes-only hashing, no implicit decoding; empty payload valid; bounded
+  streaming, non-seekable, caller-owned, 1 GiB-equivalent large-stream proof);
+  provider checksums explicit-algorithm only, never inferred from length,
+  never promoted to T0 identity.  Content-addressed T0A blob keys
+  (`blobs/sha256/h0h1/h2h3/<full>.blob[.zst]`, content ID immune to
+  provider/sensor/instrument/date) and deterministic T0B projection keys
+  (explicit caller-adjudicated logical date, no date-basis inference, no
+  schema-hash doctrine — I05 owns that).  Reversible UTF-8-preserving segment
+  escaping (narrow literal alphabet, uppercase %HH, no Unicode normalization,
+  native identity escaped never normalized, empty coordinates fail closed) +
+  lexical-only `resolve_under_root` containment (zero filesystem mutation;
+  symlink hardening deferred to I15).  Storage tests 237 (122 new); full
+  suite 1616 passed / 0 failed / 1 skipped; ruff clean on changed files
+  (pre-existing test_models.py DTZ/I001 baseline documented); changed-scope
+  mypy clean (only the known yaml/planner baseline in untouched Bloc 2
+  modules remains); network 0; filesystem mutation 0; provider code
+  unchanged; I01 + I01R1 evidence preserved.  Evidence:
+  `evidence/bloc_04/BLOC_04_I02_CONTENT_ADDRESSING_EVIDENCE.md`.
 - SENSOR-B4-I01R1 COMPLETE — PROJECTION VERSION + T0 LINEAGE + DATE-BASIS SEAL
   (proposed `PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED`, then operator
   acceptance of `PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN`).  Five narrow
