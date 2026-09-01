@@ -1,0 +1,69 @@
+{
+  "gate": "G5",
+  "status": "PASS_G5_DOMAIN_RESILIENCE",
+  "starting_sha": "463495c368e1cd0315a4adaf8ed106dec21ef2ee",
+  "artifacts_head_sha": "b1c7e305db1e526e4efaa5b887b84fa27bc321c8",
+  "receipt_content_parent_sha": "b1c7e305db1e526e4efaa5b887b84fa27bc321c8",
+  "externally_verified_branch_head": null,
+  "sha_semantics": "non-self-referential: artifacts_head_sha is the last code/artifact commit (STRESS-G5X); externally_verified_branch_head is filled only after an external push verification and is NOT claimed by this receipt",
+  "commits": [
+    {"sha": "8a1568f2", "subject": "STRESS-G5P0: close residual policy/evidence/canonical-artifact integrity gaps"},
+    {"sha": "27a05fd1", "subject": "STRESS-G5A: shared domain contracts, B7 gate, G5 domain epistemic policy + runner"},
+    {"sha": "ccccf43d", "subject": "STRESS-S14: huge fake alpha rejected despite huge PnL (PIT + execution gates)"},
+    {"sha": "39df3c8a", "subject": "STRESS-S15: new alpha family from unresolved pattern without premature strategy"},
+    {"sha": "c050df5f", "subject": "STRESS-S16: CEREBUS doctrine contradiction preserved, amendment path opened"},
+    {"sha": "7c6a5cde", "subject": "STRESS-S17: provider disagreement diagnosed at source/adapter/normalization layers"},
+    {"sha": "b5be6fbb", "subject": "STRESS-S18: sensor gap blocks MECH/LF claim with SearchDemand, no fabricated history"},
+    {"sha": "302d56ab", "subject": "STRESS-S19: crypto-to-FX transfer firewall (analogy != transfer)"},
+    {"sha": "b1c7e305", "subject": "STRESS-G5X: adversarial + metamorphic regression suite for S14-S19"}
+  ],
+  "tests": {
+    "pass": 684,
+    "total": 684,
+    "pre_g5": 599,
+    "g5p0_new": 24,
+    "g5_new": 61,
+    "total_final": 684
+  },
+  "test_accounting_note": "pre-G5 accepted baseline = 599 (G4R total). G5-P0 added 24 regressions (tests/test_g5p0.py) and G5 added 61 regressions (tests/test_g5.py). 0 legacy tests weakened or deleted; the 5 documented G5-P0 upgrades strengthened assertions (evidence applicability links, explicit authority artifacts, blank authority ref fail-closed). 599 + 24 + 61 = 684.",
+  "scenarios": {
+    "S14": {"outcome": "REJECTED_NEGATIVE_KNOWLEDGE", "behavior_fingerprint": "a39b7cea6c2cca88f09db4e5dd093bec", "pass": true, "research_priority": "PRIORITY_HIGH", "promotion_decision": "REJECTED", "failure_atoms": ["LOOKAHEAD_LEAKAGE", "UNREALISTIC_FILL_MODEL"]},
+    "S15": {"outcome": "ONTOLOGY_EXPLORATION_CANDIDATE", "behavior_fingerprint": "13703db6dec70e78b51b4fcf990f4921", "pass": true, "stage": "MechanismCard + FrozenExperimentProtocol; no strategy/signal/execution artifact created"},
+    "S16": {"outcome": "CONTRADICTION_OPEN", "behavior_fingerprint": "34133e2559c73df7b3b050034477f946", "pass": true, "manual_version": "CEREBUS_v4_Manual_EXTRACTED.txt", "claim_id": "CEREBUS_V4_P90_TARGET_METRICS", "reproduction_statuses": ["CONTRADICTION_OPEN", "REPRODUCTION_REJECTED"], "manual_preserved": true},
+    "S17": {"outcome": "NORMALIZATION_MISMATCH", "behavior_fingerprint": "3c69e2e6a4b30d8d4c86ad72f2dfcb9c", "pass": true, "diagnosis_layer": "normalization/units", "causes": [["NORMALIZATION_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH"], ["INSTRUMENT_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH"], ["GENUINE_SOURCE_DISAGREEMENT", "GENUINE_SOURCE_DISAGREEMENT"]]},
+    "S18": {"outcome": "DATA_BLOCKED", "behavior_fingerprint": "36daa05b9d460ebe780918eebbe3041c", "pass": true, "data_availability": "UNAVAILABLE", "search_demand": true, "no_synthetic_backfill": true},
+    "S19": {"outcome": "DATA_BLOCKED", "behavior_fingerprint": "d9ce9a669cd1b72f57785f9ab30db085", "pass": true, "transfer_status": "TRANSFER_HYPOTHESIS_ONLY", "missing_observable": "target-domain sensor"}
+  },
+  "shared_policy": {
+    "policy_id": "G5_DOMAIN_EPISTEMIC_POLICY",
+    "version_tag": "V1",
+    "status": "PROVISIONAL_CLASS_C_TEST_POLICY",
+    "governs_execution": true,
+    "scenario_id_predicates": "none (static guard: decision fields contain no S14-S19 ids, no strategy/provider/concept literals)",
+    "single_policy_all_scenarios": true
+  },
+  "checks": {
+    "pnl_cannot_buy_promotion": "PASS — PRIORITY_HIGH + PROMOTION_REJECTED; PnL metamorphic 50%/500%/5000% leaves terminal state unchanged",
+    "b7_material_gate_failure": "PASS — PIT leakage (availability_time > decision_time) and unrealistc fills detected from observable artifacts, not ground truth",
+    "new_family_without_premature_strategy": "PASS — UNKNOWN_FAMILY legal; MechanismCard precedes strategy; forbidden UNRESOLVED_PATTERN -> strategy transition tested",
+    "doctrine_contradiction_not_silent_rewrite": "PASS — DoctrineClaimRecord + ReproductionRecord preserved separately; AmendmentProposal requires governed authority; flawed reproduction rejected",
+    "provider_disagreement_layer_diagnosis": "PASS — normalization/instrument mismatches localized as REPAIRABLE_SOURCE_MISMATCH before any market-field interpretation; genuine disagreement preserved, never averaged",
+    "sensor_gap_data_blocked": "PASS — UNAVAILABLE -> DATA_BLOCKED + SearchDemand with reopen condition; no synthetic backfill; sensor arrival gives REOPEN_CANDIDATE not retroactive validation",
+    "domain_transfer_firewall": "PASS — Crypto->FX stays TRANSFER_HYPOTHESIS_ONLY; invariant map required; missing target observable -> DATA_BLOCKED; source-domain evidence cannot count as FX validation",
+    "manual_authority_preserved": "PASS — CEREBUS manual untouched (manual_modified=false); doctrine canonical until operator amendment ratified",
+    "expectation_sealing": "PASS — wrong expected result leaves behavior fingerprint unchanged; scenario rename invariant; hidden_ground_truth_accessed=false",
+    "mutations": "PASS — cloud=0 production=0 capital=0 authority=NONE model_calls=0"
+  },
+  "mutations": {
+    "cloud": 0,
+    "production": 0,
+    "capital": 0,
+    "authority": "NONE",
+    "model_calls": 0,
+    "cost_usd": 0
+  },
+  "carried": ["CON-02", "CON-03", "AMB-03", "AMB-08", "AMB-11", "AMB-12 (EMPIRICALLY_TESTED_PROVISIONAL_CONTRACT)", "AMB-13", "operator-permanence revocation ambiguity"],
+  "new_contradictions": [],
+  "new_ambiguities": [],
+  "recommended_next_action": "AUTHORIZE_G6"
+}
