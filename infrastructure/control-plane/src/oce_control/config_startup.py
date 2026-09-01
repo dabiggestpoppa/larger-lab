@@ -86,22 +86,44 @@ COMPAT_ALIASES = {
     "OCE_API_PORT": "control_plane.port",
 }
 
-# Documented operational (non-config) OCE_* variables used by CI runners,
-# workers, and evidence tooling. They are NOT spine settings; they are listed
-# so the governed-namespace check can classify them instead of failing closed.
+# Documented operational (non-config) OCE_* variables used by CI runners and
+# evidence tooling. They carry run/evidence IDENTITY ONLY — never credential,
+# job, execution, storage, durable-state, or destination authority — so they
+# are listed for the governed-namespace check and classified OPERATIONAL.
 OPERATIONAL_OCE_VARS = frozenset({
-    # CI / runner identity + evidence plumbing
+    # CI / runner identity + evidence plumbing (identity only)
     "OCE_RUN_ID", "OCE_STAGE_LABEL", "OCE_BLOCK_LABEL", "OCE_BOOK_LABEL",
-    "OCE_EVIDENCE_DIR", "OCE_ARTIFACT_BASE", "OCE_CI_MODE",
+    "OCE_EVIDENCE_DIR", "OCE_CI_MODE",
     "OCE_EXPECTED_REPO", "OCE_EXPECTED_BRANCH", "OCE_EXPECTED_COMMIT",
     "OCE_EXPECTED_TREE",
-    # worker CLI / outbound client plumbing
-    "OCE_CP_URL", "OCE_WORKER_ID", "OCE_WORKER_TOKEN", "OCE_WORKER_SECRET",
-    "OCE_JOB_FILE", "OCE_WS_BASE", "OCE_ATTEMPT_WS", "OCE_RUNTIME_DIR",
     # B4-CXR5R3: safe activation-lineage carrier for child processes (JSON
     # envelope of SAFE metadata only — no passwords, tokens, or DSNs)
     "OCE_ACTIVATION_ENVELOPE",
 })
+
+# B4-CXR5R6: AUTHORITY-BEARING inputs — each changes identity, credential,
+# job source, execution content, workspace/artifact destination, or persistent
+# state location. NONE of these is merely OPERATIONAL; each is enforced at its
+# consumer (oce_b3_worker / oce_worker / config gate):
+#   OCE_CP_URL        -> VERIFIED_COMPATIBILITY_ASSERTION (must equal the
+#                        canonical loopback endpoint; divergence fails closed)
+#   OCE_WORKER_ID     -> VERIFIED against the admitted identity at handshake
+#   OCE_WORKER_SECRET -> TEST seam only (approved store is the production
+#                        authority; ambient value cannot self-authorize)
+#   OCE_JOB_FILE      -> TEST_ONLY — rejected in production runtime
+#   OCE_WS_BASE / OCE_ATTEMPT_WS / OCE_ARTIFACT_BASE -> path-containment
+#                        enforced (working-root containment, no traversal /
+#                        symlink escape / repo overwrite / secret-store overlap)
+#   OCE_RUNTIME_DIR   -> contained worker-CLI state dir (same enforcement)
+AUTHORITY_OCE_VARS = frozenset({
+    "OCE_CP_URL", "OCE_WORKER_ID", "OCE_WORKER_SECRET", "OCE_JOB_FILE",
+    "OCE_WS_BASE", "OCE_ATTEMPT_WS", "OCE_ARTIFACT_BASE", "OCE_RUNTIME_DIR",
+})
+
+# B4-CXR5R6: DEPRECATED AND REJECTED. The worker token lives ONLY in the
+# approved secret store (initialize_worker_token / read_worker_token); an
+# ambient OCE_WORKER_TOKEN can never be consumed and is refused outright.
+DEPRECATED_AND_REJECTED_OCE_VARS = frozenset({"OCE_WORKER_TOKEN"})
 
 # Canonical reference name for the local runtime PostgreSQL secret. The
 # reference is defaulted at the CONFIGURATION layer (source = default); a
@@ -118,24 +140,38 @@ _KNOWN_OCE_VARS = None
 def known_oce_vars() -> frozenset:
     global _KNOWN_OCE_VARS
     if _KNOWN_OCE_VARS is None:
-        _KNOWN_OCE_VARS = frozenset(set(ENV_MAP.values()) | set(COMPAT_ALIASES)
-                                    | set(OPERATIONAL_OCE_VARS))
+        _KNOWN_OCE_VARS = frozenset(
+            set(ENV_MAP.values()) | set(COMPAT_ALIASES)
+            | set(OPERATIONAL_OCE_VARS) | set(AUTHORITY_OCE_VARS)
+            | set(DEPRECATED_AND_REJECTED_OCE_VARS))
     return _KNOWN_OCE_VARS
 
 
 def check_governed_namespace(environ: dict) -> None:
-    """Fail closed on unknown / typoed OCE_* runtime-significant variables.
+    """Fail closed on unknown / typoed / rejected OCE_* variables.
 
     The governed namespace is the ``OCE_`` prefix. Every variable in the
     process environment that starts with ``OCE_`` must be a known canonical
-    env var, a compatibility alias, or a documented operational variable.
-    Anything else is rejected — it could otherwise silently alter the real
-    runtime (e.g. ``OCE_EXECUTION_BROKER_ENABLD=true``).
+    env var, a compatibility alias, an authority-bearing consumer-enforced
+    variable, or a documented operational variable. Anything else is rejected
+    — it could otherwise silently alter the real runtime (e.g.
+    ``OCE_EXECUTION_BROKER_ENABLD=true``).
+
+    B4-CXR5R6: DEPRECATED_AND_REJECTED variables (OCE_WORKER_TOKEN) are KNOWN
+    but refused explicitly — their authority moved into the approved secret
+    store and no ambient value is legal.
 
     Unrelated variables that merely contain "OCE" as incidental text do not
     start with ``OCE_`` and are deliberately not rejected.
     """
     known = known_oce_vars()
+    rejected = sorted(k for k in environ if k in DEPRECATED_AND_REJECTED_OCE_VARS)
+    if rejected:
+        raise ValidationError(
+            "deprecated OCE_* credential/authority variable(s) present and "
+            "refused: " + ", ".join(rejected) + " — the worker token lives "
+            "ONLY in the approved secret store; no ambient value is accepted "
+            "(B4-CXR5R6; see B4-CONFIG-INPUT-INVENTORY.md)")
     unknown = sorted(k for k in environ if k.startswith("OCE_") and k not in known)
     if unknown:
         raise ValidationError(

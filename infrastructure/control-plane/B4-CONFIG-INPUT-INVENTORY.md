@@ -21,6 +21,12 @@ Disposition classes:
 - `INIT_ONLY` — consumed exclusively by the explicit initialization path
   (`configure` / first governed start / CI runner / test stack); runtime read
   paths never materialize from it (B4-CXR3R1).
+- `TEST_ONLY` — reachable ONLY under the authenticated CI/test seam
+  (`OCE_CI_MODE=true`); a production runtime rejects it before any
+  job/workspace/process activity (B4-CXR5R6).
+- `DEPRECATED_AND_REJECTED` — known to the governed namespace but refused
+  outright; the authority it used to carry lives in the approved secret store
+  (B4-CXR5R6).
 
 ## Inventory
 
@@ -55,16 +61,18 @@ Disposition classes:
 | `OCE_LOG_REDACT_CLI` | CLI | leakage | `logging.redact_cli` | canonical | env | CANONICAL |
 | `.runtime/secrets.json` | local_secrets, spine backend | secret store | — (approved local secret backend) | durable | runtime dir 0600 | INTERNAL_RUNTIME_DERIVED (untracked) |
 | `.runtime/compose.env` | docker compose | secret carrier | — | derived | runtime dir 0600 | INTERNAL_RUNTIME_DERIVED (untracked) |
-| `OCE_WORKER_ID` | worker_loop, oce_b3_worker | worker identity | — | operational | env | OPERATIONAL |
-| `OCE_WORKER_TOKEN` | worker_loop | worker auth | — | operational | env | OPERATIONAL |
-| `OCE_WORKER_SECRET` | oce_b3_worker | worker auth | — | operational | env | OPERATIONAL |
+| `OCE_WORKER_ID` | worker_loop, oce_b3_worker | worker identity | — | verified | env | VERIFIED_COMPATIBILITY_ASSERTION (reconciled against the admitted identity at the challenge/response handshake — a mismatch fails closed before any job activity, B4-CXR5R6) |
+| `OCE_WORKER_TOKEN` | — (none; authority moved to the approved store) | worker auth | — | removed | none | DEPRECATED_AND_REJECTED (B4-CXR5R6: the worker token lives ONLY in `.runtime/secrets.json` via `initialize_worker_token`/`read_worker_token`; ambient presence refused by the governed-namespace check) |
+| `OCE_WORKER_SECRET` | oce_b3_worker | worker auth | — | test seam | env, only under `OCE_CI_MODE=true` | TEST_ONLY (B4-CXR5R6: the approved store `worker_token` is the production authority; an ambient value can never self-authorize) |
 | `OCE_CP_URL` | oce_b3_worker | outbound worker target | — (canonical loopback endpoint) | compatibility assertion | env | VERIFIED_COMPATIBILITY_ASSERTION (B4-CXR3R3: gate always runs first; URL must equal canonical `control_plane.host:port` — external hosts, noncanonical ports, credentials, and redirects fail closed before any socket) |
-| `OCE_JOB_FILE` | oce_b3_worker | job input | — | operational | env | OPERATIONAL |
+| `OCE_JOB_FILE` | oce_b3_worker | job source | — | test seam | env, only under `OCE_CI_MODE=true` | TEST_ONLY (B4-CXR5R6: production workers must fetch authoritative job detail from the control plane; a local file is rejected before any job/workspace/process activity and can never replace job type/params/resource envelope/trust zone/required capabilities) |
 | `OCE_RUN_ID` | CI runner/evidence | run identity | — | operational | env | OPERATIONAL |
 | `OCE_STAGE_LABEL` / `OCE_BLOCK_LABEL` / `OCE_BOOK_LABEL` | CI runner/gate | evidence identity | — | operational | env | OPERATIONAL |
-| `OCE_EVIDENCE_DIR` / `OCE_ARTIFACT_BASE` / `OCE_RUNTIME_DIR` | CI runner | evidence paths | — | operational | env | OPERATIONAL |
+| `OCE_EVIDENCE_DIR` | CI runner/gate | evidence identity (CI output dir) | — | operational | env | OPERATIONAL (identity only — CI-runner-owned evidence path, no execution/storage authority) |
+| `OCE_ARTIFACT_BASE` | oce_b3_worker | artifact destination | — | constrained | env | INTERNAL_DERIVED + containment (B4-CXR5R6: path must stay beneath the working root; traversal/symlink-escape/absolute-external/repo-overwrite/secret-store-overlap rejected) |
+| `OCE_RUNTIME_DIR` | oce_worker CLI | persistent worker state | — | constrained | env/CLI | INTERNAL_DERIVED + containment (B4-CXR5R6: canonical default or relative-under-root only; cannot redirect durable authority) |
 | `OCE_EXPECTED_REPO/BRANCH/COMMIT/TREE` | CI runner/gate | identity verification | — | operational | env | OPERATIONAL |
-| `OCE_WS_BASE` / `OCE_ATTEMPT_WS` | B3 execution | workspace paths | — | operational | env | OPERATIONAL |
+| `OCE_WS_BASE` / `OCE_ATTEMPT_WS` | oce_b3_worker | workspace/execution destination | — | constrained | env | INTERNAL_DERIVED + containment (B4-CXR5R6: must stay beneath the working root; traversal/symlink-escape/absolute-external/repo-overwrite/secret-store-overlap rejected) |
 | `OCE_CI_MODE` | CI runner | test-mode toggle | — | operational | env | OPERATIONAL |
 
 ## Governed-namespace rule (B4-R3R1)

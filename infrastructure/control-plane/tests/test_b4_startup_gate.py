@@ -765,6 +765,13 @@ class TestGovernedNamespace:
         with pytest.raises(ValidationError):
             effective_from_env({**CLEAN_ENV, "OCE_EXEC_MODE": "live"})
 
+    def test_ambient_worker_token_rejected(self):
+        # B4-CXR5R6: the worker token lives ONLY in the approved secret store;
+        # an ambient OCE_WORKER_TOKEN is known to the namespace but refused
+        # outright (DEPRECATED_AND_REJECTED) — it can never be consumed.
+        with pytest.raises(ValidationError, match="OCE_WORKER_TOKEN"):
+            effective_from_env({**CLEAN_ENV, "OCE_WORKER_TOKEN": "opaque"})
+
     def test_operational_vars_are_allowed(self):
         eff = effective_from_env({
             **CLEAN_ENV,
@@ -778,7 +785,6 @@ class TestGovernedNamespace:
             "OCE_EXPECTED_BRANCH": "oce-program-build",
             "OCE_EXPECTED_TREE": "deadbeef",
             "OCE_WORKER_ID": "worker-local01",
-            "OCE_WORKER_TOKEN": "opaque",
             "OCE_WORKER_SECRET": "opaque",
             "OCE_CP_URL": "http://127.0.0.1:8448",
             "OCE_JOB_FILE": "/tmp/job.json",
@@ -1527,3 +1533,115 @@ class TestCXR5R3ActivationLineage:
         assert seen and "k" * 40 in seen[0]  # governed secret in derived DSN
         out, err = capsys.readouterr()
         assert "k" * 40 not in (out + err)  # never echoed
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR5R6 — authority-bearing input fences (proofs O/P/Q + ambient-          #
+# credential). OCE_JOB_FILE is TEST_ONLY; the ambient worker secret cannot    #
+# self-authorize; workspace/artifact/runtime paths are containment-enforced.  #
+# --------------------------------------------------------------------------- #
+class TestCXR5R6AuthorityInputs:
+    def _spawn(self, tmp_path, extra_env: dict):
+        import subprocess
+        import sys
+        env = dict(os.environ)
+        base = Path(__file__).resolve().parent.parent
+        env["PYTHONPATH"] = str(base / "src") + os.pathsep + \
+            env.get("PYTHONPATH", "")
+        env.update(extra_env)
+        return subprocess.run(
+            [sys.executable, str(base / "scripts" / "oce_b3_worker.py")],
+            cwd=str(tmp_path), env=env, capture_output=True, text=True,
+            timeout=120)
+
+    def test_production_job_file_rejected_before_activity(self, tmp_path):
+        # O/P: a local job spec can never replace the authoritative
+        # control-plane job in production. OCE_JOB_FILE is TEST_ONLY — rejected
+        # before any job/workspace/process activity (no output, no workspace).
+        jobfile = tmp_path / "job.json"
+        jobfile.write_text(json.dumps({
+            "job_id": "j-local", "job_type": "hash",
+            "params": {"value": "canary"}}), encoding="utf-8")
+        r = self._spawn(tmp_path, {
+            "OCE_CP_URL": "http://127.0.0.1:8448",
+            "OCE_WORKER_ID": "worker-local01",
+            "OCE_WORKER_SECRET": "ambient-cannot-self-authorize",
+            "OCE_JOB_FILE": str(jobfile),
+        })
+        assert r.returncode != 0
+        assert "TEST_ONLY" in (r.stdout + r.stderr)
+        assert not (tmp_path / "output").exists()
+        assert not (tmp_path / "b3-workspace").exists()
+
+    def test_test_seam_unlocks_job_file(self, tmp_path):
+        # CI-only paths remain available ONLY under the authenticated test
+        # seam: with OCE_CI_MODE=true the gate is open (the run then fails at
+        # connect — no control plane is listening — proving the seam, not the
+        # job-file rejection, decided the outcome).
+        jobfile = tmp_path / "job.json"
+        jobfile.write_text(json.dumps({
+            "job_id": "j-local", "job_type": "hash",
+            "params": {"value": "x"}}), encoding="utf-8")
+        r = self._spawn(tmp_path, {
+            "OCE_CP_URL": "http://127.0.0.1:8448",
+            "OCE_WORKER_ID": "worker-local01",
+            "OCE_WORKER_SECRET": "test-secret",
+            "OCE_JOB_FILE": str(jobfile),
+            "OCE_CI_MODE": "true",
+        })
+        assert r.returncode != 0
+        assert "TEST_ONLY" not in (r.stdout + r.stderr)
+
+    def test_ambient_worker_secret_cannot_self_authorize(self, monkeypatch):
+        # no approved store token AND no test seam -> the ambient secret can
+        # never authorize the worker (no self-legitimation).
+        import scripts.oce_b3_worker as w
+        import oce_control.local_secrets as ls
+        monkeypatch.delenv("OCE_CI_MODE", raising=False)
+        monkeypatch.setenv("OCE_WORKER_SECRET", "ambient-cannot-self-authorize")
+        monkeypatch.setattr(ls, "read_worker_token",
+                            lambda: (_ for _ in ()).throw(
+                                RuntimeError("no token")))
+        with pytest.raises(SystemExit, match="shared secret unavailable"):
+            w._worker_shared_secret()
+
+    def test_ambient_worker_secret_is_test_seam_only(self, monkeypatch):
+        # under the authenticated test seam the ambient value is the carrier;
+        # production (no seam) NEVER reaches it.
+        import scripts.oce_b3_worker as w
+        import oce_control.local_secrets as ls
+        monkeypatch.delenv("OCE_CI_MODE", raising=False)
+        monkeypatch.setattr(ls, "read_worker_token",
+                            lambda: (_ for _ in ()).throw(
+                                RuntimeError("no token")))
+        monkeypatch.setenv("OCE_CI_MODE", "true")
+        monkeypatch.setenv("OCE_WORKER_SECRET", "test-secret-42")
+        assert w._worker_shared_secret() == "test-secret-42"
+
+    def test_contained_path_rejects_traversal(self, tmp_path):
+        from scripts.oce_b3_worker import _contained_path
+        with pytest.raises(SystemExit, match="traversal"):
+            _contained_path("OCE_WS_BASE", "../evil", str(tmp_path / "ws"))
+        with pytest.raises(SystemExit, match="traversal"):
+            _contained_path("OCE_ARTIFACT_BASE", "a/../../evil",
+                            str(tmp_path / "cas"))
+
+    def test_contained_path_rejects_external_absolute(self, tmp_path):
+        from scripts.oce_b3_worker import _contained_path
+        outside = tmp_path.resolve().parent.parent / "external-abs"
+        with pytest.raises(SystemExit, match="escapes the working root"):
+            _contained_path("OCE_WS_BASE", str(outside), str(tmp_path / "ws"))
+
+    def test_contained_path_rejects_repo_and_secret_store_overlap(self, tmp_path):
+        from scripts.oce_b3_worker import _contained_path, BASE
+        with pytest.raises(SystemExit, match="governed control-plane"):
+            _contained_path("OCE_WS_BASE", str(BASE), str(tmp_path / "ws"))
+        with pytest.raises(SystemExit, match="governed control-plane"):
+            _contained_path("OCE_WS_BASE", str(BASE / ".runtime"),
+                            str(tmp_path / "ws"))
+
+    def test_contained_path_accepts_internal(self, tmp_path, monkeypatch):
+        from scripts.oce_b3_worker import _contained_path
+        monkeypatch.chdir(tmp_path)
+        p = _contained_path("OCE_WS_BASE", "ws", str(tmp_path / "ws"))
+        assert p == Path("ws")

@@ -34,8 +34,31 @@ from oce_control.worker_supervisor import (WorkerSupervisor,  # noqa: E402
 
 
 def _runtime_dir(args) -> Path:
+    # B4-CXR5R6: the worker CLI runtime dir holds persistent state (logs,
+    # pids, lease state) — authority-bearing. The governed DURABLE authority
+    # (the approved secret store `.runtime/secrets.json`) is a fixed-path
+    # constant and can never be redirected by this value; the fence here
+    # rejects traversal, symlink escape, repository overwrite and
+    # secret-store overlap. An explicit operator/test state dir elsewhere is
+    # permitted (isolated worker fabric state, never durable authority).
     base = Path(args.runtime_dir or os.environ.get(
         "OCE_RUNTIME_DIR", Path.home() / ".oce-control-plane" / "runtime"))
+    if args.runtime_dir or os.environ.get("OCE_RUNTIME_DIR"):
+        if ".." in base.parts:
+            raise SystemExit(
+                "FAIL: OCE_RUNTIME_DIR contains traversal segments — refused "
+                "(B4-CXR5R6)")
+        try:
+            resolved = base.resolve()
+        except OSError as exc:
+            raise SystemExit(
+                f"FAIL: OCE_RUNTIME_DIR cannot be resolved safely: {exc} "
+                "(B4-CXR5R6)") from exc
+        control = Path(__file__).resolve().parent.parent
+        if resolved == control or control in resolved.parents:
+            raise SystemExit(
+                "FAIL: OCE_RUNTIME_DIR overlaps the governed control-plane "
+                "package/secret store — refused (B4-CXR5R6)")
     base.mkdir(parents=True, exist_ok=True)
     base.chmod(0o700)
     return base

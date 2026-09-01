@@ -174,6 +174,9 @@ def test_full_outbound_path_with_separate_worker_process(pg, store, service, tmp
         "OCE_JOB_FILE": str(jobfile),
         "OCE_WS_BASE": str(tmp_path / "ws"),
         "OCE_ARTIFACT_BASE": str(tmp_path / "cas"),
+        # B4-CXR5R6: OCE_JOB_FILE and the ambient worker secret are TEST_ONLY
+        # — reachable only under the authenticated CI/test seam.
+        "OCE_CI_MODE": "true",
     })
     r = subprocess.run([sys.executable, str(BASE / "scripts" / "oce_b3_worker.py")],
                        cwd=str(tmp_path), env=env, capture_output=True, text=True,

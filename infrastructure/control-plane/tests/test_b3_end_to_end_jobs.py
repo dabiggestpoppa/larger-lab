@@ -187,6 +187,9 @@ def _run_worker(tmp_path: Path, url: str, job_id: str, *, ws_base: str,
         "OCE_WORKER_SECRET": SECRET, "OCE_JOB_FILE": "",
         "OCE_WS_BASE": str(tmp_path / ws_base),
         "OCE_ARTIFACT_BASE": str(tmp_path / (ws_base + "-cas")),
+        # B4-CXR5R6: the ambient worker secret is TEST_ONLY — reachable only
+        # under the authenticated CI/test seam; production reads the store.
+        "OCE_CI_MODE": "true",
     })
     r = subprocess.run([sys.executable, str(BASE / "scripts" / "oce_b3_worker.py")],
                        cwd=str(tmp_path), env=env, capture_output=True, text=True,
