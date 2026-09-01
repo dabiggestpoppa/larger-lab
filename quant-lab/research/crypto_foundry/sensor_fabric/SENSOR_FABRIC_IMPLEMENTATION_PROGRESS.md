@@ -11,10 +11,10 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I01R1 COMPLETE — PROJECTION VERSION + T0 LINEAGE + DATE-BASIS SEAL (proposed PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED; then operator may accept PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN.  Five I01 defects sealed: (A) projection_schema_version int → strict MAJOR.MINOR.PATCH semver str; (B) T0B MUST carry >=1 unique T0A source blob, RawNormalizationBatch requires source + acquisition lineage; (C) PartitionManifest date_basis default EVENT_TIME → UNKNOWN (no inference); (D) SHA syntax + duplicate-ref fail-closed on ALL T0A hash surfaces; (E) projection/manifest min>max rejected, one-sided bounds allowed.  STORAGE_MODEL_CONTRACTS_READY=TRUE; T0A/T0B/ATOMIC_BACKEND/MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; no persistence/backend/network; next SENSOR-B4-I02 NOT started) |
+| Current checkpoint | SENSOR-B4-I01R1-RATIFY — operator ACCEPTS PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED and PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN; authorized SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS ONLY.  STORAGE_MODEL_CONTRACTS_READY=TRUE; CONTENT_ADDRESSING_READY / PATH_CONTRACT_READY / CHECKSUM_PRIMITIVES_READY not yet earned (I02); T0A/T0B/ATOMIC_BACKEND/MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; no persistence/backend/network; next SENSOR-B4-I03 NOT started |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN (SENSOR-B3-I11R1-RATIFY: PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED = OPERATOR_ACCEPTED, PASS_BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED, BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS, REAL_PROVIDER_ADAPTERS=4, PRODUCTION_PATHS=17/17, PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18; authorized SENSOR-B4-I01 STORAGE MODELS + ENUMS ONLY); BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; Bloc 4 I01 in progress — typed storage vocabulary only, no persistence yet |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN (SENSOR-B3-I11R1-RATIFY: PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED = OPERATOR_ACCEPTED, PASS_BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED, BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS, REAL_PROVIDER_ADAPTERS=4, PRODUCTION_PATHS=17/17, PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18); BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; SENSOR-B4-I01R1-RATIFY: PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED = OPERATOR_ACCEPTED, PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN = OPERATOR_ACCEPTED; authorized SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS ONLY — addresses/identity mechanics, NO persistence yet |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
@@ -25,7 +25,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE — Bloc 4 I01 in progress; recommended next (after operator acceptance of I01): SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS (NOT started) |
+| next_checkpoint_authorized | FALSE — Bloc 4 I02 in progress (content addressing + paths + checksums; identity/address mechanics only, no blob writer, no filesystem mutation, no network); recommended next (after operator acceptance of I02): SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND (NOT started) |
 
 ## Test counts (cumulative)
 
