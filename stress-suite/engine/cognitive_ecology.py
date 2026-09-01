@@ -1178,7 +1178,8 @@ class ReviewerProvenanceRegistry:
 # G4-P0-B — ProvenanceConflictLedger: secondary-surface conflicts must survive
 # --------------------------------------------------------------------------- #
 SURFACE_TAGS = ("PRIMARY_REVIEW", "TOPOLOGY_CANDIDATE", "FRICTION_REVIEW",
-                "REPLICATION_PATH")
+                "REPLICATION_PATH", "REOPEN_EVALUATION", "NEGATIVE_KNOWLEDGE",
+                "MEMORY_RETRIEVAL", "RECONSTRUCTION")
 
 
 @dataclass(frozen=True)

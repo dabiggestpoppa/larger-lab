@@ -57,6 +57,7 @@ class TraceEntry:
 
 class GovernedTransitionExecutor:
     M5_APPLY_ROLES = ("GOVERNOR", "OPERATOR")  # G2R-04: M5 mutation = GOVERNOR path only
+    M4_APPLY_ROLES = ("GOVERNOR", "OPERATOR")  # G4R-07: memory/reopen-driven M4 mutation = GOVERNOR path only
 
     def __init__(self, phase: PhaseStateMachine, lifecycle: LifecycleEngine, authority: Optional[AuthorityState] = None,
                  registry=None, operator_authorizations: Optional[Dict[str, str]] = None):
@@ -266,6 +267,20 @@ class GovernedTransitionExecutor:
         if entry is not None:
             return entry
         level = bound
+
+        # G4R-07: M4 mutations driven by MEMORY/REOPEN behavior (e.g. a memory
+        # component proposing DORMANT -> REACTIVATED) may only be APPLIED by a
+        # GOVERNOR-level actor. The memory system proposes; it cannot authorize
+        # its own lifecycle mutation. Ordinary (non-reopen-driven) lifecycle
+        # steps are unaffected — the gate is narrow on purpose.
+        if p.get("reopen_driven", False) and level not in self.M4_APPLY_ROLES:
+            return TraceEntry(
+                event.seq, "lifecycle", event.event_type, "", to_state, False, False,
+                ("ROLE_NOT_AUTHORIZED",),
+                f"level {level!r} cannot apply a memory/reopen-driven M4 transition; "
+                f"reactivation is reserved for {'/'.join(self.M4_APPLY_ROLES)} (G4R-07)",
+                "AUTHORITY_INVALID",
+            )
 
         # G2R-02: lifecycle actions may only cite registered evidence objects.
         bad_ref = self._evidence_refs_ok(p.get("evidence_refs", []), event)
