@@ -1,0 +1,28 @@
+{
+  "scenario_id": "S05",
+  "scenario_version": "1.0.0",
+  "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
+  "institutional_scope": "core phase control: two non-dominated models; no forced consensus, no forced averaging",
+  "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "PO": "PO"
+  },
+  "initial_knowledge": [
+    {
+      "record_id": "@M_A",
+      "state": "ACTIVE",
+      "claim": "M_A: incumbent; explains condition-space A",
+      "provenance_source_kind": "FIXTURE",
+      "provenance_source_label": "S05-seed",
+      "producing_actor": "PO"
+    },
+    {
+      "record_id": "@M_B",
+      "state": "OBSERVED",
+      "claim": "M_B: challenger; explains condition-space B",
+      "provenance_source_kind": "FIXTURE",
+      "provenance_source_label": "S05-seed",
+      "producing_actor": "RESEARCH"
+    }
+  ]
+}
