@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OCE Control Plane migration runner (B2-R2 / B4-CXR3R2).
+"""OCE Control Plane migration runner (B2-R2 / B4-CXR3R2 / B4-CXR4R4).
 
 Numbered, reversible migrations against PostgreSQL. Fail-closed on:
 missing migration, out-of-order version, checksum mismatch, partial apply.
@@ -7,6 +7,13 @@ missing migration, out-of-order version, checksum mismatch, partial apply.
 B4-CXR3R2: ``--db`` is REQUIRED and must target the governed loopback
 PostgreSQL (127.0.0.1/localhost only). There is no predictable default
 DSN and migrations can never be redirected to an external database.
+
+B4-CXR4R4 (CXR4-05): the migration target must be the EXACT governed
+PostgreSQL identity — host, port, database, user, AND credential authority.
+Alternate loopback ports/databases/users are DIFFERENT authority and are
+BLOCKED before any connection. The activation gate (validated config +
+resolved secret) runs before any migration; raw DSNs/credentials are never
+echoed.
 
 Usage:
   migrate.py up     --db DSN [--dir DIR]
@@ -25,10 +32,23 @@ try:
 except ImportError:  # pragma: no cover
     psycopg2 = None  # type: ignore[assignment]
 
-MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / "migrations"
-# B4-CXR3R2: migrations must target the governed loopback PostgreSQL only.
-# There is deliberately no predictable default DSN and no external-DB escape.
+BASE = Path(__file__).resolve().parent.parent
+# Self-sufficient import (mirrors oce_b3_worker.py): the migration CLI must
+# reach the governed secret boundary even when invoked without PYTHONPATH.
+_SRC = str(BASE / "src")
+if _SRC not in sys.path:
+    sys.path.insert(0, _SRC)
+from oce_control import local_secrets as ls  # noqa: E402
+
+MIGRATIONS_DIR = BASE / "migrations"
+# B4-CXR4R4: migrations must target the EXACT governed local PostgreSQL —
+# loopback host, governed port/db/user. Alternate loopback identities are
+# different authority and are rejected. There is deliberately no predictable
+# default DSN and no external-DB escape.
 LOOPBACK_HOSTS = ("127.0.0.1", "localhost")
+PG_PORT = ls.PG_PORT
+PG_DB = ls.PG_DB
+PG_USER = ls.PG_USER
 VERSION_RE = re.compile(r"^(\d{4})_.+\.sql$")
 
 
@@ -171,28 +191,82 @@ def cmd_status(dsn: str, directory: Path) -> int:
         conn.close()
 
 
-def _dsn_host(dsn: str) -> str:
-    """Extract the host from a postgresql:// DSN (userinfo ignored)."""
-    rest = dsn.split("://", 1)[1] if "://" in dsn else dsn
-    rest = rest.split("/", 1)[0]          # drop the database path
-    hostport = rest.rsplit("@", 1)[-1]    # drop userinfo (last @ wins)
-    return hostport.rsplit(":", 1)[0] if ":" in hostport else hostport
+def parse_dsn(dsn: str) -> dict:
+    """Parse a postgresql:// DSN into identity parts. The password is parsed
+    for the credential-authority comparison but NEVER echoed/returned in any
+    operator-facing form (B4-CXR4R4)."""
+    if not dsn.startswith("postgresql://"):
+        raise ValueError("DSN must be postgresql:// (governed target only)")
+    rest = dsn.split("://", 1)[1]
+    userinfo, _, hostpart = rest.rpartition("@")
+    if not userinfo:
+        raise ValueError("DSN missing user information")
+    user = userinfo.split(":", 1)[0]
+    password = userinfo.split(":", 1)[1] if ":" in userinfo else ""
+    hostport = hostpart.split("/", 1)[0]
+    db = hostpart.split("/", 1)[1] if "/" in hostpart else ""
+    if ":" in hostport:
+        host, _, port = hostport.rpartition(":")
+        try:
+            port = int(port)
+        except ValueError:
+            port = None
+    else:
+        host, port = hostport, None
+    return {"host": host, "port": port, "db": db, "user": user,
+            "password": password}
 
 
-def main() -> int:
+def check_governed_identity(parts: dict) -> str | None:
+    """Return an error string when *parts* is not the EXACT governed local
+    PostgreSQL identity (loopback host + governed port/db/user), else None.
+    Values are never echoed (B4-CXR4R4)."""
+    if parts["host"] not in LOOPBACK_HOSTS:
+        return "host must be the governed loopback (127.0.0.1/localhost)"
+    if parts["port"] != PG_PORT:
+        return "port must be the governed local PostgreSQL port"
+    if parts["db"] != PG_DB:
+        return "database must be the governed oce_control database"
+    if parts["user"] != PG_USER:
+        return "user must be the governed oce_control_admin user"
+    return None
+
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="OCE control-plane migrations")
     parser.add_argument("command", choices=["up", "down", "status"])
     parser.add_argument("--db", required=True,
                         help="PostgreSQL DSN (governed, loopback-only)")
     parser.add_argument("--dir", type=Path, default=MIGRATIONS_DIR)
-    args = parser.parse_args()
-    # B4-CXR3R2: fail closed before ANY connection when --db targets a
-    # non-loopback host — migrations can never be redirected outside the
-    # governed local database.
-    if _dsn_host(args.db) not in LOOPBACK_HOSTS:
-        print("FAIL: --db must target the governed loopback PostgreSQL "
-              "(127.0.0.1/localhost only); external DB redirection is "
-              "rejected (B4-CXR3R2)", file=sys.stderr)
+    args = parser.parse_args(argv)
+    # B4-CXR4R4: the EXACT governed database identity is required BEFORE any
+    # connection — alternate loopback port/db/user are different authority.
+    try:
+        parts = parse_dsn(args.db)
+    except ValueError as exc:
+        print(f"FAIL: {exc} (B4-CXR4R4)", file=sys.stderr)
+        return 2
+    err = check_governed_identity(parts)
+    if err:
+        print(f"FAIL: --db is not the exact governed database identity — {err}; "
+              "target/credentials never echoed (B4-CXR4R4)", file=sys.stderr)
+        return 2
+    # B4-CXR4R4: activation authority FIRST — validated effective config AND
+    # resolved governed secret. No migration runs under a forbidden/malformed
+    # config or an unresolvable secret reference.
+    from oce_control.config_startup import create_activation_context
+    ctx = create_activation_context()
+    # credential authority: the supplied DSN secret MUST equal the governed
+    # store secret (canonicalized host: localhost == 127.0.0.1). The
+    # comparison is in-memory; nothing is echoed.
+    governed = parse_dsn(ctx.runtime_dsn())
+    canon = dict(parts)
+    canon["host"] = "127.0.0.1" if canon["host"] == "localhost" else canon["host"]
+    gov_canon = dict(governed)
+    gov_canon["host"] = "127.0.0.1" if gov_canon["host"] == "localhost" else gov_canon["host"]
+    if canon != gov_canon:
+        print("FAIL: --db credential does not match the governed secret "
+              "reference — values never echoed (B4-CXR4R4)", file=sys.stderr)
         return 2
     if args.command == "up":
         return cmd_up(args.db, args.dir)

@@ -500,8 +500,13 @@ def create_activation_context(
     later os.environ mutation cannot change the activation.
     """
     env = dict(environ if environ is not None else os.environ)
-    eff = effective_from_env(env)  # namespace + posture validated
-    validate_effective(eff)  # explicit, self-documenting
+    try:
+        eff = effective_from_env(env)  # namespace + posture validated
+        validate_effective(eff)  # explicit, self-documenting
+    except ValidationError:
+        # operator-legible, secret-free denial — same contract as the other
+        # activation gates (no raw exception prose reaches the operator)
+        raise SystemExit(startup_report(env))
     backend = backend if backend is not None else ls.RuntimeSecretBackend()
     ref = eff.get("postgres.password_ref")
     name = ref.split(":", 1)[1]

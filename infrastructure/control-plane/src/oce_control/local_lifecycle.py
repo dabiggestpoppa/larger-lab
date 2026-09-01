@@ -614,7 +614,11 @@ def main(argv: list[str] | None = None) -> int:
             print(f"==> console at http://127.0.0.1:{effective_api_port()}/console")
             return 0
         if args.command == "migrate":
-            r = migrate()
+            # B4-CXR4R4: activation authority FIRST — no migration without a
+            # validated effective config + resolved governed secret.
+            from oce_control.config_startup import create_activation_context
+            ctx = create_activation_context()
+            r = migrate(ctx)
             print(r.stdout, end="")
             print(r.stderr, file=sys.stderr, end="")
             return r.returncode

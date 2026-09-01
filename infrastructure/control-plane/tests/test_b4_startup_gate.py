@@ -8,9 +8,11 @@ environ, so these tests stay in the authoritative local run.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
+from pathlib import Path
 
 import pytest
 
@@ -879,3 +881,168 @@ class TestCXR4R3ImmutableActivationContext:
         backend = ls.RuntimeSecretBackend(store)
         with pytest.raises(SystemExit):
             cs.create_activation_context(environ=CLEAN_ENV, backend=backend)
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR4R4 (CXR4-04/05) — recover/migrate gate FIRST: no compose up, no
+# migration, no process launch, and no secret/database mutation under a
+# forbidden/malformed/unresolved configuration; and the migration target must
+# be the EXACT governed PostgreSQL identity (host+port+db+user+credential).
+# --------------------------------------------------------------------------- #
+class TestCXR4R4GateFirstRecoverAndMigration:
+    class _FakeComp:
+        def __init__(self, rc=0):
+            self.returncode = rc
+            self.stdout = ""
+            self.stderr = ""
+
+    def _recover_env(self, monkeypatch, tmp_path):
+        import hashlib
+        from oce_control import local_secrets as ls
+        import oce_control.local_lifecycle as ll
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "x" * 40}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path / "runtime")
+        calls: list = []
+        monkeypatch.setattr(ll, "docker_available", lambda: True)
+        monkeypatch.setattr(ll, "compose",
+                            lambda *a, **k: calls.append(("compose", a)) or self._FakeComp())
+        monkeypatch.setattr(ll, "wait_ready", lambda *a, **k: True)
+        monkeypatch.setattr(ll, "migrate",
+                            lambda *a, **k: calls.append(("migrate", a)) or self._FakeComp())
+        monkeypatch.setattr(ll, "start_process",
+                            lambda *a, **k: calls.append(("start", a)) or Path("mock.pid"))
+        before = hashlib.sha256(store.read_bytes()).hexdigest()
+        return ll, calls, store, before
+
+    def test_recover_forbidden_config_no_mutation(self, monkeypatch, tmp_path):
+        ll, calls, store, before = self._recover_env(monkeypatch, tmp_path)
+        monkeypatch.setenv("OCE_EXECUTION_BROKER_ENABLED", "true")
+        with pytest.raises(SystemExit):
+            ll.recover()
+        assert calls == []  # no compose, no migration, no process launch
+        assert hashlib.sha256(store.read_bytes()).hexdigest() == before
+
+    def test_recover_malformed_config_no_mutation(self, monkeypatch, tmp_path):
+        ll, calls, store, before = self._recover_env(monkeypatch, tmp_path)
+        monkeypatch.setenv("OCE_CONTROL_PLANE_PORT", "not-a-port")
+        with pytest.raises(SystemExit):
+            ll.recover()
+        assert calls == []
+        assert hashlib.sha256(store.read_bytes()).hexdigest() == before
+
+    def test_recover_unresolved_secret_no_mutation(self, monkeypatch, tmp_path):
+        from oce_control import local_secrets as ls
+        import oce_control.local_lifecycle as ll
+        import hashlib
+        store = tmp_path / "absent.json"  # no secret -> unresolvable
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        calls: list = []
+        monkeypatch.setattr(ll, "compose",
+                            lambda *a, **k: calls.append(("compose", a)) or self._FakeComp())
+        with pytest.raises(SystemExit):
+            ll.recover()
+        assert calls == []
+
+    def test_recover_revoked_secret_no_mutation(self, monkeypatch, tmp_path):
+        import hashlib
+        from oce_control import local_secrets as ls
+        import oce_control.local_lifecycle as ll
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({
+            "postgres_password": "x" * 40,
+            "b4_meta": {"runtime-local": {"revoked": True, "generation": 2}},
+        }), encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        before = hashlib.sha256(store.read_bytes()).hexdigest()
+        calls: list = []
+        monkeypatch.setattr(ll, "compose",
+                            lambda *a, **k: calls.append(("compose", a)) or self._FakeComp())
+        with pytest.raises(SystemExit):
+            ll.recover()
+        assert calls == []
+        assert hashlib.sha256(store.read_bytes()).hexdigest() == before
+
+    def test_stop_remains_usable_under_invalid_config(self, monkeypatch):
+        # safe shutdown must never require a healthy config
+        import oce_control.local_lifecycle as ll
+        monkeypatch.setenv("OCE_EXECUTION_BROKER_ENABLED", "true")
+        monkeypatch.setattr(ll, "stop_runtime_processes", lambda: ["stopped"])
+        monkeypatch.setattr(ll, "compose", lambda *a, **k: self._FakeComp())
+        actions = ll.stop()
+        assert any("compose down" in a for a in actions)
+
+    # -- CXR4-05: migration target must be the EXACT governed DB -----------
+
+    def test_migrate_rejects_alternate_loopback_identity(self):
+        import scripts.migrate as mig
+        bad_dsns = [
+            "postgresql://oce_control_admin:pw@127.0.0.1:5432/oce_control",
+            "postgresql://oce_control_admin:pw@127.0.0.1:5433/otherdb",
+            "postgresql://other_user:pw@127.0.0.1:5433/oce_control",
+            "postgresql://oce_control_admin:pw@10.0.0.9:5433/oce_control",
+            "postgresql://oce_control_admin:pw@localhost:9999/oce_control",
+        ]
+        for dsn in bad_dsns:
+            assert mig.main(["up", "--db", dsn]) == 2, dsn
+
+    def test_migrate_rejects_credential_mismatch(self, monkeypatch, tmp_path, capsys):
+        import scripts.migrate as mig
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "governed-secret-1234567890"}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        dsn = "postgresql://oce_control_admin:wrong-password@127.0.0.1:5433/oce_control"
+        assert mig.main(["up", "--db", dsn]) == 2
+        out, err = capsys.readouterr()
+        blob = out + err
+        assert "wrong-password" not in blob and "governed-secret-1234567890" not in blob
+        assert "never echoed" in err
+
+    def test_migrate_canonical_target_passes_gates_and_reaches_connect(
+            self, monkeypatch, tmp_path):
+        # the governed canonical DSN passes identity + gate + credential
+        # checks and reaches the connection step (unit test has no real PG;
+        # container CI proves the actual connect).
+        import scripts.migrate as mig
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "governed-secret-1234567890"}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        seen = {}
+
+        def fake_connect(dsn):
+            seen["dsn"] = dsn
+            raise RuntimeError("would-connect")
+
+        monkeypatch.setattr(mig, "connect", fake_connect)
+        dsn = ("postgresql://oce_control_admin:governed-secret-1234567890"
+               "@127.0.0.1:5433/oce_control")
+        with pytest.raises(RuntimeError, match="would-connect"):
+            mig.main(["up", "--db", dsn])
+        assert seen["dsn"] == dsn
+
+    def test_migrate_localhost_alias_deterministic(self, monkeypatch, tmp_path):
+        # localhost alias is deterministically treated as the governed loopback
+        import scripts.migrate as mig
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "governed-secret-1234567890"}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        seen = {}
+
+        def fake_connect(dsn):
+            seen["dsn"] = dsn
+            raise RuntimeError("would-connect")
+
+        monkeypatch.setattr(mig, "connect", fake_connect)
+        dsn = ("postgresql://oce_control_admin:governed-secret-1234567890"
+               "@localhost:5433/oce_control")
+        with pytest.raises(RuntimeError, match="would-connect"):
+            mig.main(["up", "--db", dsn])
+        assert seen["dsn"] == dsn
