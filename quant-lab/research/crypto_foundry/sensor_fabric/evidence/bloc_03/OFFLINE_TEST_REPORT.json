@@ -1,0 +1,33 @@
+{
+  "artifact": "OFFLINE_TEST_REPORT.json",
+  "checkpoint": "SENSOR-B3-I11",
+  "purpose": "Record the exact offline test command and outcome for final Bloc 3 validation",
+  "test_floor_before_i11": {"passed": 1360, "failed": 0},
+  "final_full_suite": {
+    "command": "export PYTHONIOENCODING=utf-8; python -m pytest -q",
+    "cwd": "<repo>/quant-lab (pytest rootdir)",
+    "passed": 1360,
+    "failed": 0,
+    "skipped": 1,
+    "skipped_reason": "tests/crypto_sensor_fabric/providers/test_network_smoke_live.py: SENSOR_NETWORK_SMOKE not set; live network smoke disabled (fail-closed opt-in)",
+    "network_calls_during_normal_suite": 0,
+    "network_opt_in_required": "SENSOR_NETWORK_SMOKE=1 + pytest -m sensor_network_smoke",
+    "duration_seconds": 46.65,
+    "requirement": ">= 1360 passed / 0 failed",
+    "met": true
+  },
+  "provider_conformance": {
+    "kraken": "PRODUCTION_CANDIDATE conformance 0 failed (asserted in per-provider conformance tests within the full suite)",
+    "gate": "PRODUCTION_CANDIDATE conformance 0 failed",
+    "okx": "PRODUCTION_CANDIDATE conformance 0 failed",
+    "deribit": "PRODUCTION_CANDIDATE conformance 0 failed",
+    "cross_provider_matrix_readiness": "test_production_matrix.py green (exact-set 17, provider/role/sensor counts, evidence-ref audit, human-matrix reconciliation)"
+  },
+  "static_quality": {
+    "ruff": "clean (changed scope)",
+    "mypy": "clean on changed scope; only the known pre-existing baseline (10 probe/rest errors in untouched modules) remains — separated, not hidden"
+  },
+  "handoff_integrity": "test_handoff_integrity (I11D): every file referenced by BLOC_03_HANDOFF_INDEX.md exists; every evidence ref in PROVIDER_CAPABILITY_RUNTIME.json resolves",
+  "determinism": "PROVIDER_CAPABILITY_RUNTIME.json / FINAL_ADAPTER_READINESS_MATRIX.csv/.json regenerated twice -> byte-identical (no wall-clock inside canonical content)",
+  "no_network_dependency": "ordinary full pytest with no smoke env var makes ZERO provider network calls; the marked sensor_network_smoke test is SKIPPED without SENSOR_NETWORK_SMOKE=1"
+}
