@@ -350,10 +350,17 @@ class TestClassifier:
             actual_last=None,
             error_class=None,
             error_detail=None,
+            endpoint_host="www.okx.com",
+            endpoint_path="/api/v5/public/funding-rate-history",
+            adapter_version="okx-adapter-v1",
+            evidence_ref_id="okx_funding_evidence",
         )
         summary = r.summary()
         assert "raw_body" not in summary
         assert summary["provider_id"] == "OKX_SWAP"
+        assert summary["endpoint_host"] == "www.okx.com"
+        assert summary["adapter_version"] == "okx-adapter-v1"
+        assert summary["evidence_ref_id"] == "okx_funding_evidence"
 
     def test_render_json_is_small_sanitized(self) -> None:
         manifest = SmokeManifest(
@@ -431,14 +438,18 @@ _OKX_FUNDING_EMPTY = {"code": "0", "msg": "", "data": []}
 
 
 class _FakeSmokeTransport:
-    """Fake `(url, params) -> (status, body)` transport — never touches network."""
+    """Fake `(url, params) -> (status, body)` transport — never touches network.
+
+    Records the base URL (no query params) per call, matching the live
+    transport contract the harness endpoint evidence relies on.
+    """
 
     def __init__(self, body: dict) -> None:
         self.body = body
-        self.calls: list[tuple[str, dict]] = []
+        self.calls: list[str] = []
 
     def __call__(self, url: str, params: dict) -> tuple[int | None, dict]:
-        self.calls.append((url, params))
+        self.calls.append(url)
         return 200, self.body
 
 
@@ -465,6 +476,11 @@ class TestSmokeOneOffline:
         summary = res.summary()
         assert summary["sensor_family"] == "MECHANICAL_FUNDING"
         assert "raw_body" not in summary
+        # Sanitized evidence includes endpoint / version / provenance (I10 §27).
+        assert summary["endpoint_host"] == "www.okx.com"
+        assert summary["endpoint_path"].startswith("/api/v5/public/")
+        assert summary["adapter_version"]
+        assert summary["evidence_ref_id"]
 
     def test_smoke_one_empty_valid(self) -> None:
         res = smoke_one(

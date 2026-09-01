@@ -469,6 +469,10 @@ class PhysicalResult:
     actual_last: datetime | None
     error_class: str | None
     error_detail: str | None
+    endpoint_host: str | None = None
+    endpoint_path: str | None = None
+    adapter_version: str | None = None
+    evidence_ref_id: str | None = None
 
     def summary(self) -> dict[str, Any]:
         return {
@@ -478,6 +482,10 @@ class PhysicalResult:
             "request_fingerprint": self.request_fingerprint,
             "request_start": self.request_start.isoformat(),
             "request_end": self.request_end.isoformat(),
+            "endpoint_host": self.endpoint_host,
+            "endpoint_path": self.endpoint_path,
+            "adapter_version": self.adapter_version,
+            "evidence_ref_id": self.evidence_ref_id,
             "result_class": self.result_class,
             "http_status": self.http_status,
             "duration_ms": int(self.duration_ms),
@@ -545,6 +553,29 @@ def _safe_error_summary(err: AcquisitionError) -> tuple[str, str | None]:
     return cls, detail
 
 
+def _record_endpoint(
+    base: dict[str, Any], transport: Any, calls_before: int
+) -> None:
+    """Record the endpoint host/path of the transport call this target made.
+
+    The live transport stores the BASE url (no query params) per call, in
+    issue order; the call made between `calls_before` and the end belongs to
+    THIS target (sequential, one attempt per target).  A pre-transport
+    rejection (e.g. safety violation) leaves no call for this target and the
+    endpoint stays None — the outcome is recorded as rejected, never
+    misattributed to another request.
+    """
+    calls = getattr(transport, "calls", None)
+    if not isinstance(calls, list) or len(calls) <= calls_before:
+        return
+    url = calls[-1]
+    if not isinstance(url, str):
+        return
+    parsed = urlparse(url)
+    base["endpoint_host"] = parsed.netloc or None
+    base["endpoint_path"] = parsed.path or None
+
+
 def smoke_one(
     target: SmokeTarget,
     transport: Callable[..., Any],
@@ -575,8 +606,16 @@ def smoke_one(
         actual_last=None,
         error_class=None,
         error_detail=None,
+        endpoint_host=None,
+        endpoint_path=None,
+        adapter_version=None,
+        evidence_ref_id=None,
     )
     adapter = build_adapter(target.provider_id, transport)
+    base["adapter_version"] = str(
+        getattr(adapter, "adapter_version", "") or ""
+    ) or None
+    calls_before = len(getattr(transport, "calls", []))
     request = FetchRequest(
         provider_id=target.provider_id,
         sensor_family=target.sensor_family,
@@ -602,18 +641,21 @@ def smoke_one(
         if env is not None:
             base["raw_content_hash"] = env.content_hash
             base["schema_state"] = env.schema_state.value
+        _record_endpoint(base, transport, calls_before)
         base["duration_ms"] = int((time.monotonic() - began) * 1000)
         return PhysicalResult(**base)  # type: ignore[arg-type]
     except (SmokeConfigError, SmokeSafetyViolation) as err:
         base["result_class"] = TRANSPORT_FAILURE
         base["error_class"] = type(err).__name__
         base["error_detail"] = str(err)
+        _record_endpoint(base, transport, calls_before)
         base["duration_ms"] = int((time.monotonic() - began) * 1000)
         return PhysicalResult(**base)  # type: ignore[arg-type]
     except Exception as err:  # noqa: BLE001 - classify unexpected as INTERNAL
         base["result_class"] = INTERNAL_FAILURE
         base["error_class"] = type(err).__name__
         base["error_detail"] = str(err)[:300]
+        _record_endpoint(base, transport, calls_before)
         base["duration_ms"] = int((time.monotonic() - began) * 1000)
         return PhysicalResult(**base)  # type: ignore[arg-type]
 
@@ -626,13 +668,17 @@ def smoke_one(
     base["actual_first"] = batch.actual_first_timestamp
     base["actual_last"] = batch.actual_last_timestamp
     if batch.raw_payloads:
-        base["raw_content_hash"] = batch.raw_payloads[0].content_hash
-        base["schema_state"] = batch.raw_payloads[0].schema_state.value
+        envelope = batch.raw_payloads[0]
+        base["raw_content_hash"] = envelope.content_hash
+        base["schema_state"] = envelope.schema_state.value
         base["response_bytes"] = len(
-            batch.raw_payloads[0].raw_body
-            if isinstance(batch.raw_payloads[0].raw_body, bytes)
-            else batch.raw_payloads[0].raw_body.encode()
+            envelope.raw_body
+            if isinstance(envelope.raw_body, bytes)
+            else envelope.raw_body.encode()
         )
+        if envelope.evidence_ref is not None:
+            base["evidence_ref_id"] = envelope.evidence_ref.evidence_id
+    _record_endpoint(base, transport, calls_before)
     base["duration_ms"] = int((time.monotonic() - began) * 1000)
     return PhysicalResult(**base)  # type: ignore[arg-type]
 
@@ -827,6 +873,7 @@ def write_smoke_artifacts(
     plan_path.write_text(
         json.dumps(manifest.as_dict(), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     written: dict[str, Path] = {"plan": plan_path}
     if write_results:
@@ -835,6 +882,7 @@ def write_smoke_artifacts(
                 manifest, results, request_calls=request_calls, retries=retries
             ),
             encoding="utf-8",
+            newline="\n",
         )
         written["results"] = res_path
     return written

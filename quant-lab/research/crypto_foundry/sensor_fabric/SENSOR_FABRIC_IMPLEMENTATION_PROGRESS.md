@@ -101,7 +101,10 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09R1B | 17636a78 | 15 | 0 |
 | SENSOR-B3-I09R1C | 1dd03835 | 0 (evidence/ledger) | — |
 | SENSOR-B3-I09R1-RATIFY | (governance) | — | — |
-| cumulative | 1309 | 1309 | 0 |
+| SENSOR-B3-I10A | f92d6bd9 | 29 | 0 |
+| SENSOR-B3-I10B | c4bc5c3e | 0 (live evidence) | — |
+| SENSOR-B3-I10C | (this commit) | 0 (evidence/ledger) | — |
+| cumulative | 1338 | 1338 | 0 |
 
 ## External / provider blockers
 
@@ -188,6 +191,26 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B3-I10 EXECUTED_WITH_BLOCKER — CONTROLLED PRODUCTION-ADAPTER NETWORK
+  SMOKE (the FIRST authorized live-network checkpoint) ran the full bounded
+  17-path / 18-request plan once (run `i10-live`, manifest hash
+  `2c2e791bfad10fb4`, anchor 2026-09-01T01:23:57Z, 18 calls, 0 retries,
+  HTTPS-only allowlisted hosts, GET-only, zero credentials).  17/18
+  LIVE_PASS (16 NONEMPTY + 1 EMPTY_VALID — Deribit liquidation genuinely
+  empty in window); **1 SCHEMA_ADDITIVE_REVIEW**:
+  KRAKEN_FUTURES/MECHANICAL_FUNDING/PI_XBTUSD — live funding analytics
+  `result.data` gained ≥1 metric key beyond the offline-pinned {rate,
+  relativeRate}; parser flagged ADDITIVE (24 rows, complete=True), raw
+  preserved in-memory (hash `48c2aae5…709f2`), NOT committed; no auto-edit
+  of fingerprints/fixtures/parsers; no provider repair.  Proposed verdict:
+  **HOLD_SENSOR_B3_I10_SCHEMA_ADDITIVE_REVIEW**; `next_checkpoint_authorized
+  = FALSE`; recommended next: targeted **SENSOR-B3-I10R1** repair/recheck
+  (operator review of the additive funding metric, capture exact added key
+  from live raw body, controlled recheck).  I09 matrix untouched
+  (network_smoke_status stays NOT_RUN there); offline seals preserved.
+  Evidence: `evidence/bloc_03/BLOC_03_I10_NETWORK_SMOKE_PLAN.json`,
+  `_RESULTS.json`, `_EVIDENCE.md`.  Full suite pre/post 1338 passed / 0
+  failed; ruff clean; changed-scope mypy clean.  I11 NOT started.
 - SENSOR-B3-I09R1-RATIFY COMPLETE (governance) — operator ACCEPTED
   `PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED` and authorized
   SENSOR-B3-I10 (CONTROLLED PRODUCTION-ADAPTER NETWORK SMOKE) ONLY — the FIRST
@@ -570,3 +593,6 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09R1B | 17636a78 | authority-seal adversarial tests (15): duplicate I14 exact + conflicting, every-consumer reject, human duplicate identical + conflicting, missing conformance/schema/verification, explicit-False-vs-missing, ADAPTER_READY+failed-flag rejected, network upgrade rejected, raw/unique I14 counts | 1309 passed / 0 failed | PASS | none |
 | SENSOR-B3-I09R1C | 1dd03835 | authority-seal evidence + ledger reconciliation for I09R1; matrix regeneration byte-identical | 1309 passed / 0 failed (re-run) | PASS | none |
 | SENSOR-B3-I09R1-RATIFY | (this commit) | governance: operator ACCEPTS PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED; all four adapters stay OFFLINE_FROZEN with network_smoke_status NOT_RUN; authorizes SENSOR-B3-I10 controlled production-adapter network smoke ONLY (no repairs / schema changes / history expansion / new providers / Bloc 4 / MECH21 / LF14 / capital / alpha) | 1309 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I10A | f92d6bd9 | fail-closed network-smoke harness (network_smoke.py): opt-in env gate SENSOR_NETWORK_SMOKE=1 + @pytest.mark.sensor_network_smoke, 17-logical/18-physical target derivation from canonical matrix, HTTPS-only allowlist, GET-only, no credential headers, <=15s timeout, 2 MiB cap, zero retries, frozen+hashed manifest, sanitized artifacts; 29 offline tests | 1338 passed / 0 failed (1 skipped live) | PASS | none |
+| SENSOR-B3-I10B | c4bc5c3e | execute bounded live smoke (SENSOR_NETWORK_SMOKE=1): 18/18 requests once, 0 retries; 17 LIVE_PASS (16 nonempty + 1 empty-valid), 1 SCHEMA_ADDITIVE_REVIEW (KRAKEN funding PI_XBTUSD); immutable plan+results JSON | 1338 passed / 0 failed (post-run) | HOLD | additive funding drift — human review |
+| SENSOR-B3-I10C | (this commit) | reconcile I10 smoke evidence (EVIDENCE.md), ledger; harness records endpoint/version/evidence-ref per request (I10 §27) + LF-deterministic artifacts | 1338 passed / 0 failed (re-run) | HOLD | HOLD_SENSOR_B3_I10_SCHEMA_ADDITIVE_REVIEW |
