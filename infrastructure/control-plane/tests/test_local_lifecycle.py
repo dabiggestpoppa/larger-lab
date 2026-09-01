@@ -216,9 +216,10 @@ def _mock_docker_runtime(monkeypatch) -> None:
     monkeypatch.setattr(ll, "docker_available", lambda: True)
     monkeypatch.setattr(ll, "compose", lambda *a, **k: _FakeComp(0))
     monkeypatch.setattr(ll, "wait_ready", lambda *a, **k: True)
-    monkeypatch.setattr(ll, "migrate", lambda: _FakeComp(0))
+    monkeypatch.setattr(ll, "migrate", lambda *a, **k: _FakeComp(0))
     monkeypatch.setattr(ll, "wait_for_http", lambda *a, **k: True)
-    monkeypatch.setattr(ll, "smoke", lambda: [("health", True), ("console", True)])
+    monkeypatch.setattr(ll, "smoke",
+                        lambda *a, **k: [("health", True), ("console", True)])
     monkeypatch.setattr(ll, "start_process",
                         lambda *a, **k: ls.RUNTIME_DIR / "mock.pid")
 

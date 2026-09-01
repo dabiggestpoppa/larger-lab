@@ -47,8 +47,13 @@ def main() -> int:
     # is accepted ONLY as an exact compatibility assertion of that endpoint.
     # An external/divergent URL or a forbidden config blocks before any
     # socket activity — no worker session can start under a bypass.
-    from oce_control.config_startup import outbound_cp_url
-    url = outbound_cp_url()
+    #
+    # B4-CXR4R3: the worker freezes ONE immutable ActivationContext and the
+    # target comes from the PINNED config — a later environment mutation
+    # cannot move the worker to a different control plane.
+    from oce_control.config_startup import create_activation_context, outbound_cp_url
+    ctx = create_activation_context()
+    url = outbound_cp_url(ctx=ctx)
     worker_id = os.environ.get("OCE_WORKER_ID", "worker-local01")
     secret = os.environ["OCE_WORKER_SECRET"]
     # Optional job_file for self-contained unit runs; when absent the worker

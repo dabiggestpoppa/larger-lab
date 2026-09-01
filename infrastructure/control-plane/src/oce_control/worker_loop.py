@@ -34,11 +34,12 @@ def main(argv=None) -> None:
     # always derived from the governed secret boundary (EffectiveConfig ->>
     # postgres.password_ref -> approved store -> ephemeral DSN); an arbitrary
     # DSN can never redirect this worker's connection elsewhere.
-    from .config_startup import (
-        governed_runtime_dsn,
-        require_runtime_startable,
-    )
-    require_runtime_startable()
+    #
+    # B4-CXR4R3: the worker freezes ONE immutable ActivationContext (the full
+    # gate: posture + secret resolution) and derives its DSN from the PINNED
+    # context — environment mutation after activation cannot redirect it.
+    from .config_startup import create_activation_context
+    ctx = create_activation_context()
     if not args.token:
         raise SystemExit("worker requires --token or OCE_WORKER_TOKEN (no predictable default, B2-R7)")
 
@@ -46,7 +47,7 @@ def main(argv=None) -> None:
     from .pg_store import PgJobStore
     from .pg_worker import PgWorkerProtocol
 
-    conn = psycopg2.connect(governed_runtime_dsn())
+    conn = psycopg2.connect(ctx.runtime_dsn())
     conn.autocommit = False
     store = PgJobStore(conn)
     worker = PgWorkerProtocol(store, conn)

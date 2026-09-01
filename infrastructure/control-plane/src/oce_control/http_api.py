@@ -302,7 +302,7 @@ def create_app(api: ControlPlaneAPI, scheduler=None,
     return app
 
 
-def runtime_bind(environ: Optional[dict] = None) -> tuple:
+def runtime_bind(environ: Optional[dict] = None, ctx=None) -> tuple:
     """Return the (host, port) the durable service MUST bind (B4-R3R2).
 
     The answer comes ONLY from the gated, validated effective config — never
@@ -311,7 +311,13 @@ def runtime_bind(environ: Optional[dict] = None) -> tuple:
     posture; the runtime never validates one port and binds another. Raises
     SystemExit (fail closed) before any bind when the effective config is
     invalid/forbidden.
+
+    B4-CXR4R3: when a pinned ActivationContext is supplied, the bind comes
+    from the PINNED config — later os.environ mutation cannot move the
+    listener away from the validated posture.
     """
+    if ctx is not None:
+        return ctx.control_plane_host, ctx.control_plane_port
     from .config_startup import require_startable
     eff = require_startable(environ)
     host = eff.get("control_plane.host")
@@ -319,13 +325,17 @@ def runtime_bind(environ: Optional[dict] = None) -> tuple:
     return host, port
 
 
-def runtime_scheduler_interval(environ: Optional[dict] = None) -> int:
-    """Scheduler tick interval from the gated effective config (B4-R3R2)."""
+def runtime_scheduler_interval(environ: Optional[dict] = None, ctx=None) -> int:
+    """Scheduler tick interval from the gated effective config (B4-R3R2).
+
+    B4-CXR4R3: a pinned context supplies the pinned interval directly."""
+    if ctx is not None:
+        return ctx.scheduler_interval
     from .config_startup import require_startable
     return int(require_startable(environ).get("control_plane.scheduler_interval"))
 
 
-def build_durable_app(*, scheduler_tick_interval: int = 5) -> FastAPI:
+def build_durable_app(*, scheduler_tick_interval: int = 5, ctx=None) -> FastAPI:
     """Wire the durable components (PG store, PG scheduler, PG worker
     protocol, health) into the API and return a ready FastAPI app.
 
@@ -336,6 +346,10 @@ def build_durable_app(*, scheduler_tick_interval: int = 5) -> FastAPI:
     always derives from the governed secret boundary (EffectiveConfig ->>
     postgres.password_ref -> approved store -> ephemeral DSN); an arbitrary
     DSN can never activate this API against a different database.
+
+    B4-CXR4R3: a pinned ActivationContext (ctx) supplies the DSN from its
+    PINNED postgres parameters and reference (stale-checked) instead of
+    re-reading the environment.
     """
     import psycopg2
     from .authority import AuthorityEngine
@@ -349,8 +363,11 @@ def build_durable_app(*, scheduler_tick_interval: int = 5) -> FastAPI:
     # DSN). Ambient POSTGRES_DSN/POSTGRES_PASSWORD can no longer redirect the
     # connection away from the spine-validated secret.
     from .config_startup import governed_runtime_dsn, require_secret_resolvable
-    require_secret_resolvable()
-    dsn = governed_runtime_dsn()
+    if ctx is not None:
+        dsn = ctx.runtime_dsn()
+    else:
+        require_secret_resolvable()
+        dsn = governed_runtime_dsn()
     conn = psycopg2.connect(dsn)
     conn.autocommit = False
 
@@ -407,9 +424,14 @@ if __name__ == "__main__":
     # B4-CXR3R7: one unified fail-closed runtime-start gate — configuration
     # posture AND durable secret resolution. Nothing reports started/ready
     # unless the complete runtime-start contract holds.
-    from .config_startup import require_runtime_startable
-    require_runtime_startable()
-    host, port = runtime_bind()
-    interval = runtime_scheduler_interval()
-    app = build_durable_app(scheduler_tick_interval=interval)
+    #
+    # B4-CXR4R3: the durable process freezes ONE immutable ActivationContext
+    # and passes the SAME pinned object to bind, scheduler, and durable app —
+    # the configuration that passes the gate is the configuration the runtime
+    # actually uses, and later environment mutation cannot alter it.
+    from .config_startup import create_activation_context
+    ctx = create_activation_context()
+    host, port = runtime_bind(ctx=ctx)
+    interval = runtime_scheduler_interval(ctx=ctx)
+    app = build_durable_app(scheduler_tick_interval=interval, ctx=ctx)
     uvicorn.run(app, host=host, port=port, log_level="info")

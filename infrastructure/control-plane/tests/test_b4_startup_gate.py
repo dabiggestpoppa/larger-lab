@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 
 import pytest
 
@@ -780,3 +781,101 @@ class TestGovernedNamespace:
         rep = validate_startup({**CLEAN_ENV, "OCE_API_PORT": "8080"})
         assert rep["ok"] is False
         assert "port" in rep["error"].lower()
+
+# --------------------------------------------------------------------------- #
+# B4-CXR4R3 (CXR4-03) — ONE immutable ActivationContext: after creation,
+# os.environ mutation cannot alter the activation; a rotated/revoked secret
+# makes the context STALE and every consumer fails closed (no silent adoption).
+# --------------------------------------------------------------------------- #
+class TestCXR4R3ImmutableActivationContext:
+    def _ctx(self, tmp_path, env=None):
+        import hashlib
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "k" * 40}),
+                         encoding="utf-8")
+        backend = ls.RuntimeSecretBackend(store)
+        ctx = cs.create_activation_context(environ=env or CLEAN_ENV, backend=backend)
+        return ctx, backend, store
+
+    def test_context_pins_effective_config_and_metadata(self, tmp_path):
+        # the frozen context carries the validated config + safe secret metadata
+        ctx, backend, _ = self._ctx(tmp_path)
+        assert ctx.control_plane_host == "127.0.0.1"
+        assert ctx.control_plane_port == 8448
+        assert ctx.scheduler_interval == 5
+        assert ctx.postgres_host == "127.0.0.1"
+        assert ctx.secret_reference == "secret:runtime-local"
+        assert ctx.secret_backend_identity == "local-runtime-store-v1"
+        assert ctx.secret_generation == 1
+        assert ctx.secret_revocation_state is False
+        assert ctx.canonical_control_plane_url == "http://127.0.0.1:8448"
+        assert re.fullmatch(r"[0-9a-f]{64}", ctx.context_id)
+        blob = json.dumps(ctx.safe_summary())
+        assert "k" * 40 not in blob  # NEVER the password
+        assert "postgresql://" not in blob  # NEVER a password-bearing DSN
+
+    def test_environment_mutation_after_creation_changes_nothing(self, tmp_path, monkeypatch):
+        # create the context, then mutate every relevant env surface — the
+        # pinned consumers must not re-read ambient environment.
+        ctx, backend, _ = self._ctx(tmp_path)
+        host, port = ctx.control_plane_host, ctx.control_plane_port
+        dsn = ctx.runtime_dsn(backend)
+        monkeypatch.setenv("OCE_CONTROL_PLANE_PORT", "9999")
+        monkeypatch.setenv("OCE_POSTGRES_HOST", "10.0.0.9")
+        monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-1234567890")
+        monkeypatch.setenv("POSTGRES_DSN", "postgresql://evil:pw@10.9.9.9:5432/x")
+        assert ctx.control_plane_port == port          # pinned
+        assert ctx.postgres_host == "127.0.0.1"        # pinned
+        assert ctx.runtime_dsn(backend) == dsn         # pinned (store-derived)
+        assert "ambient-attack-1234567890" not in ctx.runtime_dsn(backend)
+        assert "10.9.9.9" not in ctx.runtime_dsn(backend)
+        from oce_control.http_api import runtime_bind, runtime_scheduler_interval
+        assert runtime_bind(ctx=ctx) == (host, port)
+        assert runtime_scheduler_interval(ctx=ctx) == ctx.scheduler_interval
+
+    def test_outbound_cp_url_pinned_with_context(self, tmp_path):
+        ctx, backend, _ = self._ctx(tmp_path)
+        # canonical assertion passes; any external OCE_CP_URL is still blocked
+        env = {**CLEAN_ENV, "OCE_CP_URL": ctx.canonical_control_plane_url}
+        assert cs.outbound_cp_url(environ=env, ctx=ctx) == ctx.canonical_control_plane_url
+        env_bad = {**CLEAN_ENV, "OCE_CP_URL": "http://10.0.0.9:8448"}
+        with pytest.raises(SystemExit):
+            cs.outbound_cp_url(environ=env_bad, ctx=ctx)
+        # env mutation after creation cannot move the canonical target
+        env_mut = {**CLEAN_ENV, "OCE_CP_URL": "http://127.0.0.1:7777"}
+        with pytest.raises(SystemExit):
+            cs.outbound_cp_url(environ=env_mut, ctx=ctx)
+
+    def test_rotation_after_creation_makes_context_stale(self, tmp_path):
+        # secret rotates AFTER ActivationContext creation -> STALE, rejected;
+        # the new generation is never silently adopted.
+        ctx, backend, _ = self._ctx(tmp_path)
+        assert ctx.runtime_dsn(backend)  # fresh
+        backend.rotate("runtime-local", "rotated-after-activation-9876543210")
+        with pytest.raises(RuntimeError, match="STALE"):
+            ctx.assert_fresh(backend)
+        with pytest.raises(RuntimeError, match="STALE"):
+            ctx.runtime_dsn(backend)
+
+    def test_revocation_after_creation_makes_context_stale(self, tmp_path):
+        ctx, backend, _ = self._ctx(tmp_path)
+        backend.revoke("runtime-local")
+        with pytest.raises(RuntimeError, match="STALE"):
+            ctx.assert_fresh(backend)
+        with pytest.raises(RuntimeError, match="STALE"):
+            ctx.runtime_dsn(backend)
+
+    def test_same_inputs_same_context_identity(self, tmp_path):
+        # deterministic: identical env + store -> identical pinned context
+        ctx_a, _, _ = self._ctx(tmp_path)
+        ctx_b, _, _ = self._ctx(tmp_path)
+        assert ctx_a.context_id == ctx_b.context_id
+        assert ctx_a.safe_summary() == ctx_b.safe_summary()
+
+    def test_context_creation_fails_closed_without_secret(self, tmp_path):
+        from oce_control import local_secrets as ls
+        store = tmp_path / "empty.json"  # no secret provisioned
+        backend = ls.RuntimeSecretBackend(store)
+        with pytest.raises(SystemExit):
+            cs.create_activation_context(environ=CLEAN_ENV, backend=backend)

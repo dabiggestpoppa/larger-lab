@@ -20,14 +20,17 @@ Entry points wired into startup / CLI:
   * load_effective_config(environ)  -> EffectiveConfig  (raises on violation)
   * validate_startup(environ)       -> dict report       (never raises)
   * startup_report(environ)         -> operator-legible dict
+  * create_activation_context()     -> frozen ActivationContext (B4-CXR4R3)
 
 Errors are operator-legible and secret-free: a violation names the offending
 setting and the rule, but never prints a secret value.
 """
 from __future__ import annotations
 
+import hashlib
 import os
 import sys
+from dataclasses import dataclass
 
 from oce_control.config_spine import (
     CANONICAL_PASSWORD_REF,
@@ -37,6 +40,7 @@ from oce_control.config_spine import (
     SOURCE_DEFAULT,
     ValidationError,
     build_default_registry,
+    security_state_fingerprint,
     validate_effective,
 )
 from oce_control import local_secrets as ls
@@ -174,17 +178,22 @@ def effective_from_env(environ: dict | None = None,
 
 def governed_runtime_dsn(environ: dict | None = None,
                          backend: "ls.RuntimeSecretBackend | None" = None,
-                         eff: EffectiveConfig | None = None) -> str:
+                         eff: EffectiveConfig | None = None,
+                         ctx: "ActivationContext | None" = None) -> str:
     """Build the ephemeral PostgreSQL DSN from the governed secret boundary.
 
     path: effective config -> postgres.password_ref -> approved store ->
           in-memory DSN (never logged, evidenced, or fingerprinted).
 
-    The host comes from the canonical postgres.host setting; user/db/port
-    come from the documented local runtime constants. An ambient
-    POSTGRES_DSN/POSTGRES_PASSWORD bypass is impossible here — the DSN is
-    derived, not read.
+    When a pinned ActivationContext (B4-CXR4R3) is supplied, the DSN comes
+    from the PINNED postgres parameters + reference, and the context is
+    checked for staleness (a rotated/revoked secret mid-activation fails
+    closed). Otherwise the DSN is derived from the effective config. An
+    ambient POSTGRES_DSN/POSTGRES_PASSWORD bypass is impossible — the DSN is
+    derived, never read.
     """
+    if ctx is not None:
+        return ctx.runtime_dsn(backend)
     if eff is None:
         eff = effective_from_env(environ)
     password = resolve_startup_secret(eff, backend)
@@ -361,6 +370,11 @@ def require_runtime_startable(
     Returns the validated effective config on success. Every durable
     DB-facing activation entrypoint must use this — nothing may report
     "started"/"ready" unless the full runtime-start contract holds.
+
+    B4-CXR4R3: activation entrypoints that need a PINNED authority should
+    use create_activation_context() instead — the context freezes the
+    effective config and the resolved secret metadata so later environment
+    mutation cannot alter the activation.
     """
     report = validate_runtime_readiness(environ, backend)
     if not report["ok"]:
@@ -368,6 +382,169 @@ def require_runtime_startable(
     if not report["ready"]:
         raise SystemExit(report["error"])
     return effective_from_env(environ)
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR4R3 — ONE IMMUTABLE ACTIVATION CONTEXT
+# --------------------------------------------------------------------------- #
+# The invariant: NO INPUT MAY MODIFY THE AUTHORITY THAT VALIDATES THAT INPUT,
+# and the exact configuration that passes the activation gate is the exact
+# configuration every component uses. create_activation_context() snapshots
+# the environment ONCE, resolves and validates the effective config ONCE,
+# resolves the required secret metadata ONCE, and freezes an immutable
+# ActivationContext. Every runtime consumer (HTTP bind, scheduler, durable DB
+# connection, worker, migrations, outbound worker URL, lifecycle) consumes the
+# SAME pinned object instead of re-reading os.environ. If the secret is
+# rotated/revoked after context creation, the context is STALE and every
+# consumer fails closed — a rotated authority is never silently adopted.
+
+
+@dataclass(frozen=True)
+class ActivationContext:
+    """Immutable, pinned activation authority (B4-CXR4R3).
+
+    Carries the validated effective config, the resolved secret METADATA
+    (reference identity, backend identity, generation, revocation state —
+    NEVER the password value or a password-bearing DSN), the pinned bind
+    parameters, and a deterministic context identity. Frozen: once created,
+    os.environ changes cannot alter the activation.
+    """
+    effective_config: EffectiveConfig
+    config_fingerprint: str
+    secret_reference: str
+    secret_backend_identity: str
+    secret_generation: int
+    secret_revocation_state: bool
+    security_state_fingerprint: str
+    control_plane_host: str
+    control_plane_port: int
+    scheduler_interval: int
+    postgres_host: str
+    postgres_port: int
+    postgres_database: str
+    postgres_user: str
+    canonical_control_plane_url: str
+    context_id: str
+
+    def assert_fresh(self,
+                     backend: "ls.RuntimeSecretBackend | None" = None) -> None:
+        """Fail closed when the secret authority changed after activation.
+
+        A rotated or revoked secret invalidates the pinned context; callers
+        MUST NOT silently adopt the new authority — re-activation is
+        required. Zero side effects.
+        """
+        backend = backend if backend is not None else ls.RuntimeSecretBackend()
+        name = self.secret_reference.split(":", 1)[1]
+        if backend.generation(name) != self.secret_generation:
+            raise RuntimeError(
+                "activation context is STALE: secret generation changed after "
+                "activation — rotated authority is never adopted silently; "
+                "re-activation required (B4-CXR4R3)")
+        if backend.is_revoked(name) != self.secret_revocation_state:
+            raise RuntimeError(
+                "activation context is STALE: secret revocation state changed "
+                "after activation — re-activation required (B4-CXR4R3)")
+
+    def runtime_dsn(self,
+                    backend: "ls.RuntimeSecretBackend | None" = None) -> str:
+        """Ephemeral DSN from the PINNED authority (never stored/evidenced).
+
+        Resolves the pinned reference through the approved store and derives
+        the DSN from the PINNED postgres parameters. Fails closed on a stale
+        context. The password exists only in process memory.
+        """
+        backend = backend if backend is not None else ls.RuntimeSecretBackend()
+        self.assert_fresh(backend)
+        password = backend.resolve(self.secret_reference)
+        return (f"postgresql://{self.postgres_user}:{password}"
+                f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_database}")
+
+    def safe_summary(self) -> dict:
+        """Evidence-ready, secret-free summary — reference identity and pinned
+        bind parameters only. NEVER the password or a password-bearing DSN."""
+        return {
+            "context_id": self.context_id,
+            "config_fingerprint": self.config_fingerprint,
+            "secret_reference": self.secret_reference,
+            "secret_backend": self.secret_backend_identity,
+            "secret_generation": self.secret_generation,
+            "secret_revocation_state": self.secret_revocation_state,
+            "security_state_fingerprint": self.security_state_fingerprint,
+            "control_plane_host": self.control_plane_host,
+            "control_plane_port": self.control_plane_port,
+            "scheduler_interval": self.scheduler_interval,
+            "postgres_host": self.postgres_host,
+            "postgres_port": self.postgres_port,
+            "postgres_database": self.postgres_database,
+            "postgres_user": self.postgres_user,
+            "canonical_control_plane_url": self.canonical_control_plane_url,
+        }
+
+
+def create_activation_context(
+        environ: dict | None = None,
+        backend: "ls.RuntimeSecretBackend | None" = None) -> ActivationContext:
+    """Build ONE immutable activation context (B4-CXR4R3).
+
+    snapshot env ONCE
+      -> validate governed OCE namespace
+      -> resolve EffectiveConfig ONCE (default < file < environment < cli)
+      -> validate posture (validate_effective)
+      -> resolve required secret metadata (reference MUST resolve)
+      -> freeze ActivationContext
+
+    Raises SystemExit (fail closed) on any violation. The SAME frozen object
+    is then passed to every runtime consumer, so the configuration that
+    passes the gate is the configuration the runtime actually uses, and a
+    later os.environ mutation cannot change the activation.
+    """
+    env = dict(environ if environ is not None else os.environ)
+    eff = effective_from_env(env)  # namespace + posture validated
+    validate_effective(eff)  # explicit, self-documenting
+    backend = backend if backend is not None else ls.RuntimeSecretBackend()
+    ref = eff.get("postgres.password_ref")
+    name = ref.split(":", 1)[1]
+    try:
+        resolve_startup_secret(eff, backend)  # reference must actually resolve
+    except (KeyError, PermissionError) as exc:
+        raise SystemExit(
+            redact_message(str(exc)) + " — run `python scripts/oce_local.py "
+            "configure` to materialize the local runtime secret (fail closed, "
+            "B4-CXR4R3)") from exc
+    except ValidationError as exc:
+        raise SystemExit(startup_report(env)) from exc
+    generation = backend.generation(name)
+    revoked = backend.is_revoked(name)
+    cfg_fp = eff.fingerprint
+    sec_meta = {name: {"generation": generation, "revoked": revoked,
+                        "backend": "local-runtime-store-v1"}}
+    sec_fp = security_state_fingerprint(sec_meta)
+    host = str(eff.get("control_plane.host"))
+    port = int(eff.get("control_plane.port"))
+    interval = int(eff.get("control_plane.scheduler_interval"))
+    pg_host = str(eff.get("postgres.host"))
+    context_id = hashlib.sha256(
+        f"{cfg_fp}|{ref}|{generation}|{revoked}|local-runtime-store-v1".encode(
+            "utf-8")).hexdigest()
+    return ActivationContext(
+        effective_config=eff,
+        config_fingerprint=cfg_fp,
+        secret_reference=ref,
+        secret_backend_identity="local-runtime-store-v1",
+        secret_generation=generation,
+        secret_revocation_state=revoked,
+        security_state_fingerprint=sec_fp,
+        control_plane_host=host,
+        control_plane_port=port,
+        scheduler_interval=interval,
+        postgres_host=pg_host,
+        postgres_port=ls.PG_PORT,
+        postgres_database=ls.PG_DB,
+        postgres_user=ls.PG_USER,
+        canonical_control_plane_url=f"http://{host}:{port}",
+        context_id=context_id,
+    )
 
 
 def startup_report(environ: dict | None = None, prefix: str = "OCE") -> str:
@@ -425,7 +602,8 @@ def require_startable(environ: dict | None = None) -> EffectiveConfig:
     return eff
 
 
-def outbound_cp_url(environ: dict | None = None) -> str:
+def outbound_cp_url(environ: dict | None = None,
+                    ctx: "ActivationContext | None" = None) -> str:
     """Canonical outbound control-plane target for workers (B4-CXR3R3).
 
     The Book 4 activation gate ALWAYS runs first regardless of whether
@@ -436,11 +614,18 @@ def outbound_cp_url(environ: dict | None = None) -> str:
     (control_plane.host + control_plane.port). Anything else — external
     host (10.x / 192.168.x / public hostname), noncanonical port, embedded
     credentials, path/query — fails closed before any socket activity.
+
+    When a pinned ActivationContext (B4-CXR4R3) is supplied, the canonical
+    endpoint comes from the PINNED config — post-creation environment
+    mutation cannot move a worker's target.
     """
     env = environ if environ is not None else os.environ
-    eff = require_startable(env)  # gate first: forbidden config still blocks
-    canonical = (f"http://{eff.get('control_plane.host')}:"
-                 f"{eff.get('control_plane.port')}")
+    if ctx is not None:
+        canonical = ctx.canonical_control_plane_url
+    else:
+        eff = require_startable(env)  # gate first: forbidden config still blocks
+        canonical = (f"http://{eff.get('control_plane.host')}:"
+                     f"{eff.get('control_plane.port')}")
     url = env.get("OCE_CP_URL")
     if not url:
         return canonical

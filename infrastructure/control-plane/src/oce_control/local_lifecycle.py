@@ -318,16 +318,20 @@ def wait_ready(timeout_s: int = 120) -> bool:
     return False
 
 
-def migrate() -> subprocess.CompletedProcess:
+def migrate(ctx=None) -> subprocess.CompletedProcess:
     """Apply migrations against the GOVERNED database (B4-CXR3R2).
 
     No public DSN parameter: the migration target is always derived from the
     governed secret boundary (ls.postgres_dsn() — read-only, fail closed).
     An arbitrary DSN can never redirect migrations to another database.
+
+    B4-CXR4R3: a pinned ActivationContext supplies the target from its
+    PINNED postgres parameters + reference (stale-checked), so migrations
+    run against the exact database the activation validated.
     """
     env = ls.compose_environment()
-    cmd = [PYTHON, str(BASE_DIR / "scripts" / "migrate.py"), "up", "--db",
-           ls.postgres_dsn()]
+    dsn = ctx.runtime_dsn() if ctx is not None else ls.postgres_dsn()
+    cmd = [PYTHON, str(BASE_DIR / "scripts" / "migrate.py"), "up", "--db", dsn]
     return subprocess.run(cmd, cwd=str(BASE_DIR), env=env, capture_output=True,
                           text=True, timeout=300)
 
@@ -342,11 +346,14 @@ def http_ok(path: str, port: int | None = None) -> bool:
         return False
 
 
-def smoke() -> list[str]:
-    """Smoke test: health endpoint + operator console served."""
+def smoke(port: int | None = None) -> list[str]:
+    """Smoke test: health endpoint + operator console served.
+
+    B4-CXR4R3: callers may pin the probe port from the activation context so
+    the smoke check targets the exact validated listener."""
     results = []
-    results.append(("health", http_ok("/health")))
-    results.append(("console", http_ok("/console")))
+    results.append(("health", http_ok("/health", port)))
+    results.append(("console", http_ok("/console", port)))
     return results
 
 
@@ -449,6 +456,11 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     # configuration posture AND durable secret resolution.
     require_runtime_startable()
     actions.append("config spine: effective config validated + secret resolved (fail-closed)")
+    # B4-CXR4R3: freeze ONE immutable ActivationContext; every downstream
+    # step (migrations, health probe port) consumes the PINNED authority.
+    from oce_control.config_startup import create_activation_context
+    ctx = create_activation_context()
+    actions.append("activation context pinned (immutable effective config + secret identity)")
     if not docker_available():
         raise RuntimeError("Docker is unavailable — the local runtime requires Docker "
                            "(PostgreSQL + Redis run as local containers on loopback)")
@@ -461,7 +473,7 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
         raise RuntimeError("postgres/redis did not become healthy")
     actions.append("postgres + redis healthy")
     if migrate_now:
-        r = migrate()
+        r = migrate(ctx)
         if r.returncode != 0:
             raise RuntimeError(f"migrations failed:\n{r.stdout}\n{r.stderr}")
         actions.append("migrations applied")
@@ -471,19 +483,19 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     actions.append("worker started (pid-file owned)")
     start_process("api", [PYTHON, "-m", "oce_control.http_api"])
     actions.append("api started (pid-file owned)")
-    if not wait_for_http(timeout_s):
+    if not wait_for_http(timeout_s, port=ctx.control_plane_port):
         raise RuntimeError("API did not answer on 127.0.0.1")
-    results = smoke()
+    results = smoke(port=ctx.control_plane_port)
     if not all(ok for _, ok in results):
         raise RuntimeError("smoke failed: " + ", ".join(f"{n}={ok}" for n, ok in results))
     actions.append("smoke: " + ", ".join(f"{n}={ok}" for n, ok in results))
     return actions
 
 
-def wait_for_http(timeout_s: int = 60) -> bool:
+def wait_for_http(timeout_s: int = 60, port: int | None = None) -> bool:
     deadline = time.time() + timeout_s
     while time.time() < deadline:
-        if http_ok("/health"):
+        if http_ok("/health", port):
             return True
         time.sleep(1)
     return False
@@ -524,8 +536,17 @@ def _worker_token() -> str:
 
 
 def recover() -> list[str]:
-    """Bring the runtime back to a known-good state without destroying data."""
+    """Bring the runtime back to a known-good state without destroying data.
+
+    B4-CXR4R3/R4: the activation gate runs FIRST (pinned ActivationContext
+    with config posture + secret resolution); compose up / migration / process
+    launch happen only AFTER the gate — a forbidden effective config can
+    never mutate infrastructure or the database before rejection.
+    """
     actions: list[str] = []
+    from oce_control.config_startup import create_activation_context
+    ctx = create_activation_context()  # gate first — fail closed before any mutation
+    actions.append("activation gate passed (pinned context)")
     # Clear stale PID files first (never signal anything unexpected).
     for name, (pidfile, marker) in PROCESSES.items():
         path = pid_file(name)
@@ -540,7 +561,7 @@ def recover() -> list[str]:
         if not wait_ready(120):
             raise RuntimeError("stack did not recover to healthy")
         actions.append("stack re-upped and healthy")
-    r = migrate()
+    r = migrate(ctx)
     if r.returncode != 0:
         raise RuntimeError(f"migrations failed:\n{r.stdout}\n{r.stderr}")
     actions.append("migrations up-to-date")
