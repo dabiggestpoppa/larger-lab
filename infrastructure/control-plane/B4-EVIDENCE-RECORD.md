@@ -613,3 +613,140 @@ environment. No production source changed.
   invalidation + generation transition + audit) remains future work,
   deliberately future-locked in Book 4; the consumed-nonce ledger and
   activation TTL are local-runtime primitives (no distributed authority).
+
+---
+
+## B4-CXR7 — POST-CLOSURE AUTHORITY REPAIR — BLOCKED AT GATE (NOT CLOSED)
+
+CXR7 opens from `f46e1beb` (B4-CXR6-EVIDENCE). The reality lock passed: HEAD
+== origin == `f46e1beb`, clean tree, 0 ahead / 0 behind, CXR6 chain intact
+(`e114c496`..`fd5b3274`), `main` == `7e7ef7222c4ecdea568b34583fd81406165cc9b6`.
+
+Per the mission's own directive, before any implementation the exact Book 4
+threat boundary must be documented — and if the current same-user local
+architecture cannot establish an enforceable parent/child issuance boundary
+without an unauthorized scope expansion, the limitation is recorded and the
+gate returns `BLOCKED_B4_CXR7`. **That is what happened. CXR7 is BLOCKED;
+no implementation was attempted and no closure is claimed.**
+
+### The threat-boundary question, answered
+
+* **Is a child process trusted to possess all parent authority?** Under the
+  current architecture, structurally YES: API / worker / migration /
+  outbound-worker children are launched by `local_lifecycle.start_process`
+  as ordinary subprocesses under the SAME OS principal (same account, same
+  token) on both the Windows dev host and the single-user Ubuntu CI runner.
+  There is no OS/process trust boundary between parent and child: a child
+  can read everything its account can read, including the 0600
+  activation-handoff key (0600 excludes OTHER accounts, not same-account
+  children) and every other file the operator can read.
+* **Is role separation intended to constrain a compromised/misbehaving
+  child?** The CXR6 claim set implies YES (`build_envelope`/`child_role`
+  role-binding, "a verified child cannot reissue"), but the implementation
+  does not enforce it: children receive the SAME `ActivationContext` type
+  the parent uses (`_context_from_envelope` reconstructs the full parent
+  object, including `build_envelope()` and `child_environment()`), and that
+  type MACs with a key the child can read.
+
+**CXR7 deliberately does not claim the second while implementing the first**
+(mission CXR7-01): the honest statement is that the current single-principal
+architecture trusts every child with all parent authority.
+
+### Confirmed audit findings (source-verified, this session)
+
+* **Amplification is real, not hypothetical.** `ActivationContext`
+  (config_startup.py:741) exposes `build_envelope(child_role=...)` (line
+  826) and `child_environment(child_role=...)` (line 868), both of which
+  MAC a NEW role-bound capability with the dedicated handoff key read from
+  disk (`ActivationEnvelope.to_json` -> `ls.read_activation_handoff_key()`).
+  A verified worker child that reconstructs its context via
+  `_context_from_envelope` can mint VALID `api`, `migration`, and
+  `outbound_worker` capabilities for the same activation: every re-derived
+  canonical value (postgres port/db/user, backend identity, derived CP URL,
+  security fingerprint, effective-config fingerprint, context_id) matches
+  because they are properties of the activation, not of the role. This was
+  demonstrated by executing the real code path (scratch audit proof, since
+  removed; working tree clean).
+* **The registered non-reissuance proof is vacuous.**
+  `tests/test_b4_cxr6_activation_capability.py:270`:
+  `assert not hasattr(child, "build_envelope") or True` — `or True`
+  guarantees PASS, and `child` DOES have the method.
+* **Verification material IS issuance material.** HMAC-SHA-256 with a
+  shared symmetric key authenticates "someone possessing the key"; it
+  cannot distinguish issuer from verifier when every verifier (same-account
+  child) can read the key (mission CXR7-01).
+* **Children receive the parent issuer type** (mission CXR7-01 requirement
+  I/J): `_context_from_envelope` returns `ActivationContext`, the same class
+  `create_activation_context` returns to the parent. Child-safe type does
+  not exist.
+
+### Why each acceptable pattern fails within scope
+
+* **Asymmetric signatures (e.g. Ed25519):** an on-disk private key is
+  readable by same-account children — a child can self-sign any role. A
+  private key held only in parent memory leaves no OS boundary preventing
+  same-account access, and the child still needs a TRUST ANCHOR for the
+  public key. A public key transported via environment/disk is attacker-
+  replaceable by the same principal (mission: "a public key supplied only
+  through attacker-controlled environment data is not a trust anchor; an
+  asymmetric private key stored in the same child-readable runtime
+  directory is also not a repair"). Embedding a static keypair in the
+  repository would spread one issuance key across every deployment with no
+  per-install secrecy. None of these establishes issuer/verifier
+  separation.
+* **Supervisor/broker behind a REAL OS/process trust boundary (protected
+  IPC, distinct OS identity):** requires a separate OS principal — a
+  service account, elevated broker, or per-UID container isolation. That is
+  an explicit scope expansion (Hard Boundary 11: no expansion into
+  distributed/cloud capability infrastructure; the Book 4 local-first
+  runtime is single-principal, and the mandatory adversarial suite runs
+  in-process under one CI user).
+* **Distinct OS identities/sandboxes per role:** same scope expansion; the
+  lifecycle child path (`subprocess.Popen`, same user) cannot express it,
+  and CXR7's required proofs A–J must execute in the registered pytest
+  suite on a single-user runner.
+
+### Required to unblock (exact, for the operator)
+
+An enforceable parent/child issuance boundary requires at least one of:
+
+1. a broker/supervisor process running under a DIFFERENT OS principal
+   (service account, or per-role containers with distinct UIDs) that owns
+   the issuance key and issues role-bound capabilities over protected IPC
+   that same-principal children cannot influence; or
+2. child processes launched with restricted tokens/capabilities that
+   genuinely cannot read issuer material; or
+3. an explicit, documented relaxation of the authority model back to
+   "children are trusted with parent authority" with the role-binding
+   claims and tests rewritten to match, or
+4. an authorized scope expansion decision (new infrastructure) from the
+   operator.
+
+Options 1/2/4 are scope expansions outside Book 4 authority; option 3
+would falsify CXR7's own exit-gate statements (1–2). Per the mission, the
+honest disposition is to record this exact limitation and return.
+
+### Disposition
+
+* **Status: `BLOCKED_B4_CXR7: no enforceable parent/child issuance boundary
+  exists`.** No repair commits were created (R1–R6 intentionally NOT
+  implemented; R2–R6 alone cannot satisfy exit-gate statements 1–2, and
+  partial repairs without the core boundary would misrepresent progress).
+* **CXR6 remains the current closure** (`fd5b3274` / run `33555566041` /
+  artifact `9819232513`) — VALID HISTORICAL EVIDENCE FOR ITS REGISTERED
+  644-TEST SUITE, superseded by nothing; CXR7 did not close and claims no
+  repair. The CXR6 run was real; its model did not cover
+  same-principal-child amplification (a shared symmetric key readable by
+  every verified child).
+* **Immutability preserved:** branch tip unchanged at `f46e1beb`; no
+  pushes made this session; CXR3–CXR6 history, archives
+  (`oce-b4-archive/run-33505225957/`, `run-33511157386/`,
+  `run-33537592969/`, `run-33555566041/`), and `main` are untouched.
+* **Hard boundaries respected:** no Book 5; no Program Block 4; no cloud /
+  broker / capital / execution mutations; recurring cost `$0`; capital
+  authority `none`; no false security claims substituted for the explicit
+  blocker.
+* **Suspects deliberately NOT claimed as closures:** child non-
+  reissuance, non-amplification, verification-material-not-issuance,
+  issuer/verifier separation, direct-launch trust-root proof. These are
+  the exact unresolved blockers.
