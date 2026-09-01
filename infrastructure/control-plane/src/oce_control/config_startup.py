@@ -316,10 +316,14 @@ def startup_report(environ: dict | None = None, prefix: str = "OCE") -> str:
 def redact_message(text: str) -> str:
     """Pare a validation message down to a secret-free operator hint.
 
-    Single-line and trimmed. Validation errors name the offending setting
-    and the rule; they never embed secret values, so this is lossless.
+    Uses the canonical redact_string leakage primitive on top of single-line
+    trimming — defense in depth, never trusting exception prose alone. If a
+    raw candidate value ever slips into a message (e.g. a canary secret in a
+    malformed field), the primitive scrubs ``key=value`` patterns for
+    sensitive keys before anything reaches the operator.
     """
-    return text.split("\n")[0].strip()
+    from oce_control.config_spine import redact_string
+    return redact_string(text.split("\n")[0].strip())
 
 
 def _offending_setting(message: str) -> str | None:

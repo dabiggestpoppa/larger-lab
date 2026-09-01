@@ -145,9 +145,10 @@ class Setting:
             self.validate(value)
         if self.value_type == "enum" and self.enum:
             if value not in self.enum:
+                # never echo the candidate value (B4-R3R6)
                 raise ValidationError(
-                    f"setting '{self.name}' value {value!r} not in allowed "
-                    f"enum {list(self.enum)}")
+                    f"setting '{self.name}': value rejected; rule: one of "
+                    f"{list(self.enum)} (error class: enum-rejection)")
 
 
 _NO_DEFAULT = object()
@@ -221,7 +222,7 @@ class SettingsRegistry:
         return self.register(setting)
 
 
-def _bool(v):
+def _bool(v, setting_name: str = ""):
     if isinstance(v, bool):
         return v
     if isinstance(v, str):
@@ -230,7 +231,11 @@ def _bool(v):
             return True
         if low in ("0", "false", "no", "off", ""):
             return False
-    raise ValidationError(f"not a boolean: {v!r}")
+    # never echo the raw candidate value (B4-R3R6 canary rule)
+    name = f" for setting '{setting_name}'" if setting_name else ""
+    raise ValidationError(
+        f"expected a boolean{name}; rule: must be true/false/1/0"
+        f" (error class: bool-coercion)")
 
 
 def build_default_registry() -> SettingsRegistry:
@@ -362,10 +367,14 @@ def validate_setting_value(setting: Setting, value: object) -> object:
     """Coerce + validate a raw value into the setting's canonical type.
 
     Raises ValidationError on failure. Returns the coerced value.
+
+    LEAKAGE DEFENSE (B4-R3R6): error text names the canonical setting, the
+    validation rule, and the error class — it NEVER echoes the raw candidate
+    value (which could be a secret placed in the wrong field).
     """
     try:
         if setting.value_type == "bool":
-            value = _bool(value)
+            value = _bool(value, setting.name)
         elif setting.value_type == "int":
             value = int(value)
         elif setting.value_type == "float":
@@ -374,13 +383,19 @@ def validate_setting_value(setting: Setting, value: object) -> object:
             if isinstance(value, str):
                 value = json.loads(value)
             if not isinstance(value, list):
-                raise ValidationError("expected a list")
+                raise ValidationError(
+                    f"setting '{setting.name}': expected a list; rule: "
+                    f"'{setting.validation_rule or 'list value'}' "
+                    f"(error class: type-coercion)")
         elif setting.value_type == "json":
             if isinstance(value, str):
                 value = json.loads(value)
-    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+    except (TypeError, ValueError, json.JSONDecodeError):
+        # coerce failed: the message must NOT contain the raw candidate value
         raise ValidationError(
-            f"setting '{setting.name}' invalid {setting.value_type}: {exc}")
+            f"setting '{setting.name}': invalid {setting.value_type}; rule: "
+            f"'{setting.validation_rule or 'type coercion'}' "
+            f"(error class: type-coercion)") from None
     setting.validate_value(value)
     return value
 

@@ -857,6 +857,64 @@ class TestR3R3SecretResolution:
 
 
 # --------------------------------------------------------------------------- #
+# B4-R3R6 — error-path leakage defense: a canary secret placed in the WRONG
+# field must never appear in exceptions, reports, doctor/CLI output, or
+# captured logs.
+# --------------------------------------------------------------------------- #
+CANARY = "canary-secret-wxyz-98765"
+CANARY_ENV_BASE = {"PATH": "/usr/bin:/bin"}
+
+
+class TestR3R6ErrorLeakageCanary:
+    def _canary_report(self, env_extra: dict):
+        import oce_control.config_startup as cs
+        env = dict(CANARY_ENV_BASE)
+        env.update(env_extra)
+        return cs.validate_startup(env), cs.startup_report(env)
+
+    def test_malformed_port_with_canary_never_leaks(self):
+        rep, msg = self._canary_report({"OCE_CONTROL_PLANE_PORT": CANARY})
+        assert rep["ok"] is False
+        assert CANARY not in json.dumps(rep)
+        assert CANARY not in msg
+        # the canonical setting name is still identified, not a generic token
+        assert "control_plane.port" in msg
+
+    def test_malformed_bool_with_canary_never_leaks(self):
+        rep, msg = self._canary_report({"OCE_SANDBOX_STRICT": CANARY})
+        assert rep["ok"] is False
+        assert CANARY not in json.dumps(rep)
+        assert CANARY not in msg
+
+    def test_malformed_enum_with_canary_never_leaks(self):
+        rep, msg = self._canary_report({"OCE_REDIS_MODE": CANARY})
+        assert rep["ok"] is False
+        assert CANARY not in json.dumps(rep)
+        assert CANARY not in msg
+
+    def test_resolver_exception_never_echoes_candidate_value(self):
+        reg = build_default_registry()
+        with pytest.raises(ValidationError) as exc:
+            ConfigResolver(reg).resolve(
+                {"file": {"control_plane.port": CANARY,
+                          "postgres.password_ref": REF_PG}})
+        assert CANARY not in str(exc.value)
+        assert "control_plane.port" in str(exc.value)
+
+    def test_cli_path_denial_is_secret_free(self):
+        rep, msg = self._canary_report({"OCE_CONTROL_PLANE_PUBLIC_LISTEN": "true"})
+        assert rep["ok"] is False
+        assert CANARY not in msg  # canary not present at all, trivially safe
+        assert "public_listen" in msg
+
+    def test_canary_in_plain_password_position_is_redacted(self):
+        rep, msg = self._canary_report({"OCE_POSTGRES_PASSWORD_REF": CANARY})
+        assert rep["ok"] is False
+        assert CANARY not in json.dumps(rep)
+        assert CANARY not in msg
+
+
+# --------------------------------------------------------------------------- #
 # B4-R3R5 — sensitive drift + security-state fingerprints (blind-fingeprint
 # repair): reference identity changes count, secret values never do.
 # --------------------------------------------------------------------------- #
