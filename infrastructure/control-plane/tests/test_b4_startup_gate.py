@@ -85,14 +85,16 @@ class TestEffectiveFromEnv:
     def test_validate_startup_clean(self):
         rep = validate_startup(CLEAN_ENV)
         assert rep["ok"] is True
-        assert rep["start"] is True
+        assert rep["config_ok"] is True
+        assert "start" not in rep  # CXR4-07: config-valid never claims start
         assert rep["error"] is None
 
     def test_live_mode_forbidden(self):
         with pytest.raises(ValidationError):
             effective_from_env(LIVE_ENV)
         rep = validate_startup(LIVE_ENV)
-        assert rep["ok"] is False and rep["start"] is False
+        assert rep["ok"] is False and rep["config_ok"] is False
+        assert "start" not in rep
         assert "broker" in rep["error"].lower()
 
     def test_cloud_provisioning_forbidden(self):
@@ -198,7 +200,8 @@ class TestCliEntryGate:
     def test_start_gate_function_returns_blocked_report(self):
         rep = cs.gate_start()
         assert rep["ok"] in (True, False)
-        assert "start" in rep
+        assert rep["config_ok"] in (True, False)
+        assert "start" not in rep  # CXR4-07: config gate never claims start
 
     def test_env_map_covers_posture_setting(self):
         # ensure the env map touches every deny-by-default posture surface
@@ -485,10 +488,24 @@ class TestCXR3R8AdversarialClosure:
 # doctor fails when the configured reference does not resolve.
 # --------------------------------------------------------------------------- #
 class TestCXR3R7StartupTruthSemantics:
-    def test_validate_startup_is_config_gate_without_secret_state(self):
+    def test_validate_configuration_is_config_gate_without_secret_state(self):
+        # CXR4-07: the config gate reports config_ok — never start/ready/
+        # startable, which belong to the complete runtime-start contract.
         rep = cs.validate_startup(CLEAN_ENV)
-        assert rep["ok"] is True and rep["start"] is True
+        assert rep["ok"] is True and rep["config_ok"] is True
+        assert "start" not in rep and "ready" not in rep
         assert "secret_ok" not in rep  # config gate reports NO secret state
+
+    def test_configuration_valid_never_claims_runtime_ready(self):
+        # CXR4-07: config-valid is distinct from runtime-ready/startable
+        rep = cs.validate_configuration(CLEAN_ENV)
+        assert rep["config_ok"] is True and rep["ok"] is True
+        for key in ("start", "ready", "startable"):
+            assert key not in rep
+        msg = cs.startup_report(CLEAN_ENV)
+        assert "configuration valid" in msg
+        assert "START ok" not in msg
+        assert "ready" not in msg.lower()
 
     def test_readiness_requires_secret_resolution(self, tmp_path):
         from oce_control import local_secrets as ls

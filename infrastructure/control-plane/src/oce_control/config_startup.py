@@ -282,28 +282,30 @@ def require_secret_resolvable(environ: dict | None = None,
         raise SystemExit(startup_report(environ)) from exc
 
 
-def validate_startup(environ: dict | None = None) -> dict:
-    """CONFIGURATION gate — schema/posture only (B4-CXR3R7).
+def validate_configuration(environ: dict | None = None) -> dict:
+    """CONFIGURATION gate — schema/posture only (B4-CXR3R7/CXR4R6).
 
     Never raises. Returns a report dict:
-        {"ok": bool, "start": bool, "config": <redacted>,
+        {"ok": bool, "config_ok": bool, "config": <redacted>,
          "fingerprint": str, "error": str|None}
 
     This is the start contract for a component that does not itself hold the
     durable secret (e.g. the in-memory ControlPlane). It deliberately does
     NOT resolve the secret: a configuration may be valid while its required
-    runtime dependency (the secret store) is not yet resolvable. Components
-    that activate durable DB-facing runtime MUST use
-    validate_runtime_readiness() / require_runtime_startable() instead — a
-    start=True result is never combined with secret_ok=False here because
-    this gate reports NO secret state at all.
+    runtime dependency (the secret store) is not yet resolvable.
+
+    B4-CXR4R6 (CXR4-07): a CONFIGURATION-VALID result is NEVER
+    misrepresented as RUNTIME-READY — this report contains NO
+    start/ready/startable keys. "configuration valid" and "runtime
+    ready/startable" are distinct truths; the latter requires
+    validate_runtime_readiness() / require_runtime_startable().
     """
     try:
         eff = effective_from_env(environ)
         validate_effective(eff)  # redundant but explicit & self-documenting
         return {
             "ok": True,
-            "start": True,
+            "config_ok": True,
             "config": eff.redacted(),
             "fingerprint": eff.fingerprint,
             "error": None,
@@ -311,10 +313,20 @@ def validate_startup(environ: dict | None = None) -> dict:
     except (ValidationError, KeyError, ValueError) as exc:
         return {
             "ok": False,
-            "start": False,
+            "config_ok": False,
             "config": None,
             "error": redact_message(str(exc)),
         }
+
+
+def validate_startup(environ: dict | None = None) -> dict:
+    """Compatibility alias of validate_configuration (B4-CXR4R6).
+
+    Returns the IDENTICAL config-only report — config_ok, and NO
+    start/ready/startable keys. A configuration-valid result is never
+    misrepresented as runtime-ready.
+    """
+    return validate_configuration(environ)
 
 
 def validate_runtime_readiness(
@@ -553,10 +565,15 @@ def create_activation_context(
 
 
 def startup_report(environ: dict | None = None, prefix: str = "OCE") -> str:
-    """Operator-legible, secret-free startup gate message."""
-    report = validate_startup(environ)
+    """Operator-legible, secret-free startup gate message.
+
+    B4-CXR4R6: config-valid reports "configuration valid" — never "START
+    ok"/"ready"/"startable", which are reserved for the complete
+    runtime-start contract.
+    """
+    report = validate_configuration(environ)
     if report["ok"]:
-        return (f"{prefix} startup config validated: START ok "
+        return (f"{prefix} configuration valid "
                 f"(fingerprint {report['fingerprint'][:12]}...)")
     # Point at the offending posture; names the setting, never the value.
     err = report["error"]
@@ -644,9 +661,9 @@ def outbound_cp_url(environ: dict | None = None,
 
 def gate_start(args_start: object | None = None) -> dict:
     """CLI hook for 'start'/'restart': gate on config before compose up."""
-    return validate_startup()
+    return validate_configuration()
 
 
 if __name__ == "__main__":  # pragma: no cover - manual diagnostic
     print(startup_report())
-    sys.exit(0 if validate_startup()["ok"] else 1)
+    sys.exit(0 if validate_configuration()["ok"] else 1)
