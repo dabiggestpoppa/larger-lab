@@ -447,10 +447,169 @@ evidence record above is preserved intact and is never rewritten.
 | `0462f1e5` | B4-CXR6R2: remove environment-unlocked test authority | CXR6-02 |
 | `066a7879` | B4-CXR6R3: make audit idempotency exact and collision-safe | CXR6-03 |
 | `cf8ca8d7` | B4-CXR6R4: make ordinary activation read-only over secret authority | CXR6-04 |
-| *(pending)* | B4-CXR6R5: correct authority inventory and closure truth labels | CXR6-05 |
-| *(pending)* | B4-CXR6R6: adversarial closure and registry regeneration | CXR6-06 |
+| `f6f11144` | B4-CXR6R5: correct authority inventory and closure truth labels | CXR6-05 |
+| `a96c05e1` | B4-CXR6R6: adversarial closure and registry regeneration | CXR6-06 |
+| `fd5b3274` | B4-CXR6X1: fix CI-only failures exposed by the authoritative CXR6 run | CI |
 
-The final authoritative CXR6 evidence (run ID, OCE_RUN_ID, artifact, totals,
-category counts, manifest verification, and the full proof matrix) is recorded
-after the authoritative `b4-config-spine-validation` run in the final
-B4-CXR6-EVIDENCE commit (documentation/evidence only).
+### CXR6-01 — activation envelope is no longer forgeable
+
+The ambient `OCE_ACTIVATION_ENVELOPE` carrier is now an AUTHENTICATED,
+role-bound activation capability: HMAC-SHA-256 over the complete typed
+payload (schema version, context identity, config + security-state
+fingerprints, secret reference/backend/generation/revocation, control-plane
+host/port, scheduler interval, PostgreSQL host/port/database/user, canonical
+control-plane URL, migration-set identity, parent activation ID, child role,
+capability nonce, issuance/expiry) with a DEDICATED 256-bit
+activation-handoff key stored 0600 under `.runtime` — never in environment,
+argv, process title, logs, evidence, diagnostics, or the repository, and
+domain-separated from the PostgreSQL password and worker token.
+
+Verification is constant-time (`hmac.compare_digest`); unknown fields,
+duplicate/ambiguous JSON keys, bool-as-int confusion, malformed types,
+out-of-range ports, and oversized carriers are rejected; after
+authentication the child RE-DERIVES canonical identities (effective-config
+fingerprint, security-state fingerprint, canonical control-plane URL from
+host+port, PostgreSQL port/database/user from canonical authority, secret
+backend identity, migration-set identity) and compares them against the
+authenticated payload. Capabilities are role-bound (api/worker/migration/
+outbound_worker — an API capability can never launch a worker, etc.),
+single-use (consumed-nonce ledger), time-boxed, and fail closed on
+rotation/revocation staleness, expiry, or replay.
+
+### CXR6-02 — OCE_CI_MODE carries zero authority
+
+`OCE_CI_MODE` is now OPERATIONAL_IDENTITY_ONLY: changing it has zero effect
+on credentials, job source, execution content, workspace, artifact
+destination, database, network, process launch, or secret authority. The
+production worker entrypoint rejects `OCE_JOB_FILE` and ambient
+`OCE_WORKER_SECRET` unconditionally, before any job/workspace/process/socket
+activity. Test injection exists ONLY through the private dependency seam
+(`ProductionWorkerDependencies` vs `TestWorkerDependencies` in
+`oce_b3_worker_test_deps.py`) supplied directly by test code — never
+selected by an environment string, pytest/CI detection, username, path, or
+process name.
+
+### CXR6-03 — audit idempotency is exact and collision-safe
+
+A request/correlation ID may reconcile ONLY the exact same durable decision.
+`PostgresAuditSink.append` inserts and commits; on conflict it reads back
+the committed record and compares the FULL canonical decision (actor,
+setting, requested_change, reason, previous, new, decision, authorized,
+before/after fingerprints, backend identity). An exact retry reconciles as
+the same committed operation; any divergent semantic field fails closed
+with zero applicable value and the durable row unchanged. Rowcount zero is
+never treated as success without reconciliation; uncertain-commit recovery
+reads back and verifies the exact record.
+
+### CXR6-04 — ordinary activation is read-only over secret authority
+
+`start`/`restart`/`recover` never call `configure()` and never materialize
+missing material (postgres password, worker token, activation handoff key
+must already exist or activation fails closed with a `configure` hint
+before any mutation). `configure` is the explicit initialization command
+and preflights configuration posture, the static loopback compose
+boundary, and store readability/schema BEFORE any write, with atomic store
+mutation. `start_process` requires an explicit verified child environment;
+the `compose_environment()` compatibility default for API/worker launch is
+removed (compose.env remains a Docker-Compose-only carrier). A failed
+start/restart/recover alters no secret, config, capability, database,
+workspace, or artifact state.
+
+### CXR6-05 — truthful input inventory
+
+`B4-CONFIG-INPUT-INVENTORY.md` regenerated from source: `migrate --db` and
+`migrate --dir` are DEPRECATED_AND_REJECTED; `OCE_ACTIVATION_ENVELOPE` is
+VERIFIED_INTERNAL_CAPABILITY (never OPERATIONAL); `OCE_CI_MODE` is
+OPERATIONAL_IDENTITY_ONLY with zero runtime authority; `OCE_JOB_FILE` and
+`OCE_WORKER_SECRET` are production-rejected with test injection available
+only through the private dependency seam.
+
+### CXR6-06 — adversarial closure and registry regeneration
+
+The mandatory registry was regenerated from actual pytest collection: **644
+ids** (596 + 48 CXR6 proofs), zero duplicate node ids, per-category totals
+(unit 120, config-spine 286, local-lifecycle 51). Zero-side-effect matrix
+proves forged/role-confused/replayed/malformed capabilities leave
+secrets.json, the handoff key, and the consumed-nonce ledger byte-identical
+with no container start, process launch, workspace, artifact, or socket
+activity.
+
+### B4-CXR6X1 — CI-exposed repair (run 33551112500, OCE_RUN_ID 6617cd2f8128)
+
+The first authoritative CXR6 run collected 644 and executed 644 with exactly
+2 failures, both test-side defects where the new authority model changed the
+subprocess contract: (1) the CXR6R2 production worker fetches job detail
+from the control plane, so the service-test fixture had to wire the real
+`PgJobStore` into `WorkerProtocolServer` (`job_store=jstore`, matching the
+proven end-to-end fixture); (2) a lifecycle test relied on Docker being
+ABSENT locally to fail at the docker preflight, so it now mocks docker
+unavailable — the store-invariance assertion is deterministic in every
+environment. No production source changed.
+
+## CXR6 Final record
+
+- **CXR6 start SHA:** `fed04ff15929544de55b74da8956b08022cf8eb1`
+  (B4-CXR5-EVIDENCE — preserved, never amended; CXR5 chain intact)
+- **Ordered CXR6 repair SHAs:** `e114c496`, `0462f1e5`, `066a7879`,
+  `cf8ca8d7`, `f6f11144`, `a96c05e1`, `fd5b3274`
+- **Final implementation SHA/tree:** `fd5b32747dba1c93223093966c1edcee3b6680a6`
+  / `e8d9f30b1a679047011d1ac63fbd1b4395dcbfd4`
+- **Authoritative workflow run:** `33555566041` (`b4-config-spine-validation`)
+- **OCE_RUN_ID:** `c048f12cca64`
+- **Artifact:** `9819232513` / `b4-config-spine-evidence-c048f12cca64`
+- **Artifact digest:** `ad41faac6a62462a125d60803bfaf5bc64e97f7106bce0516b801f900122e34a`
+  (57727 bytes)
+- **Totals:** 644 collected / 644 executed / 644 passed / 0 failed / 0 errors /
+  0 skipped; 0 duplicates; zero hidden skips.
+- **Category counts:** unit 120, adversarial 30, end-to-end-job 6,
+  outbound-session 7, representative-job 2, cli-lifecycle 7, fabric-pg 12,
+  config-spine 286, sandbox-resource 27, po-hermes-boundary 11, api 6,
+  local-lifecycle 51, postgres 13, scheduler 7, worker 13, redis 2,
+  validation-regression 16, worker-fabric-core 20, worker-supervisor 8.
+- **Manifest:** 33/33 hash+size verified independently (from the raw GitHub
+  Actions artifact download).
+- **Source cleanliness:** clean before and after.
+- **Cleanup:** removed=True; containers/network removed; durable PostgreSQL
+  volume preserved.
+- **Regressions:** b1 `33555565900`, b2 `33555565878`, b3 `33555566072` —
+  all success on the same head `fd5b3274`.
+- **Authenticated-capability forgery matrix (all rejected before any
+  activity):** forged field + recomputed context_id; forged postgres
+  port/database/user (alternate database identity); forged canonical
+  control-plane URL to an external host while keeping control_plane_host
+  loopback; forged config fingerprint; forged security-state fingerprint /
+  backend identity; forged migration-set identity; single-byte tamper;
+  missing/invalid MAC; duplicate JSON keys; oversized carrier; role
+  confusion (api↔worker↔migration↔outbound_worker); replay after
+  consumption/expiry; stale capability after secret rotation/revocation.
+- **Capability-key leak scan:** zero 64-hex handoff-key lookalikes in the
+  evidence set; key never present in env/argv/logs/diagnostics/evidence.
+- **OCE_CI_MODE authority result:** zero config authority — CI mode never
+  unlocks job file or ambient worker secret.
+- **Job/credential test-seam result:** production entrypoint rejects
+  `OCE_JOB_FILE` and `OCE_WORKER_SECRET` before file read / value
+  consumption; test injection works only through the private dependency
+  seam.
+- **Audit exact-retry result:** one truthful durable row, exact
+  reconciliation.
+- **Audit divergent-request-ID result:** zero applicable value; existing
+  durable row unchanged (actor/setting/reason/new-value/fingerprint all
+  tested).
+- **Ordinary-start secret-invariance result:** store byte-identical through
+  start/restart/recover; missing material blocks with `configure` hint.
+- **Failed-start zero-side-effect result:** no secret/config/capability/
+  ledger/workspace/artifact/process mutation on any denied path.
+- **Capital authority:** none. **Cloud mutations:** 0. **Broker mutations:** 0.
+  **Execution mutations:** 0. **Recurring cost:** $0.
+- **main:** `7e7ef7222c4ecdea568b34583fd81406165cc9b6` (unchanged, verified).
+- **Archive:** `~/Desktop/oce-b4-archive/run-33555566041/`
+  (`original-evidence.zip` + `expanded/` + `provenance.json`); the CXR5
+  archive `run-33537592969/` and the provisional runs are preserved intact.
+- **Branch-protection/signing limitations:** commits are not GPG-signed; no
+  branch-protection force-push guard is evidenced on `oce-program-build`.
+- **Unresolved limitations:** `/proc/<pid>/cmdline` proofs require POSIX and
+  execute in CI (1 truthful local skip on Windows); a coherent multi-resource
+  rotation program (DB credential + store + compose + connection
+  invalidation + generation transition + audit) remains future work,
+  deliberately future-locked in Book 4; the consumed-nonce ledger and
+  activation TTL are local-runtime primitives (no distributed authority).
