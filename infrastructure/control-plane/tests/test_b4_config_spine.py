@@ -1042,6 +1042,12 @@ class TestR3R4DatabaseSecretBinding:
     def test_external_postgres_dsn_bypass_denied(self, tmp_path, monkeypatch):
         import oce_control.config_startup as cs
         from oce_control import local_secrets as ls
+        # Hermetic env: in CI the runner pre-seeds POSTGRES_PASSWORD /
+        # POSTGRES_DSN, which would re-materialize the store from the ambient
+        # env instead of the tmp file. Remove both so the approved tmp store
+        # is the ONLY authority (matches the runtime contract).
+        monkeypatch.delenv("POSTGRES_PASSWORD", raising=False)
+        monkeypatch.delenv("POSTGRES_DSN", raising=False)
         backend = _make_backend(tmp_path, provision=True,
                                 value="REAL-SECRET-FROM-STORE")
         # point the module store at the same tmp file so require_runtime_dsn
