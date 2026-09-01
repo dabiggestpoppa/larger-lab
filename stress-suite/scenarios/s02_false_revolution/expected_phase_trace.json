@@ -1,0 +1,6 @@
+{
+  "expected_phase_path": ["STABLE", "WATCH", "ESCALATION_REVIEW", "NO_CHANGE", "STABLE"],
+  "expected_terminal_knowledge": {"@K_REV": "DEMOTED"},
+  "terminal_states": ["STABLE"],
+  "contrast_claim": "S01 required persistent independent structural contradiction; S02 collapses under timestamp leakage / survivorship bias"
+}
