@@ -1,0 +1,8 @@
+{
+  "forbidden": [
+    {"from": "WATCH", "to": "TRANSFORMATION_CANDIDATE", "rule": "leaf evidence cannot jump to candidate"},
+    {"from": "ESCALATION_REVIEW", "to": "TRANSFORMATION_WINDOW", "rule": "no window for a leaf fault"},
+    {"from": "HOMEOSTATIC_REPAIR", "to": "RECONSOLIDATION", "rule": "local repair is not reconsolidation"},
+    {"from": "STABLE", "to": "NEW_STABLE", "rule": "no review, no new stable epoch"}
+  ]
+}

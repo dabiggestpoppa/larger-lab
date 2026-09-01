@@ -1,0 +1,28 @@
+{
+  "contract_id": "S04-EVAL-V1",
+  "schema_version": "1.0.0",
+  "version_tag": "V1",
+  "authority_basis": "PROVISIONAL_SCENARIO_TEST_POLICY (G2 §4)",
+  "channel_rules": {
+    "reliability_degradation": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"},
+    "exception_burden": {"threshold": "HIGH", "visibility_policy": "PUBLIC"},
+    "independent_contradiction": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"},
+    "unresolved_pattern_density": {"threshold": "LOW", "visibility_policy": "PUBLIC"},
+    "dependency_centrality": {"threshold": "HIGH", "visibility_policy": "PUBLIC"},
+    "external_environment_shift": {"threshold": "LOW", "visibility_policy": "PUBLIC"},
+    "opportunity_cost_of_stability": {"threshold": "LOW", "visibility_policy": "PUBLIC"},
+    "cost_and_reversibility": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"}
+  },
+  "hysteresis_rules": {
+    "enter_watch": "any_of(>= MEDIUM) on reliability_degradation (inherited)",
+    "escalation": "persistence(2) of exception_burden >= MEDIUM",
+    "repair": "HOMEOSTATIC_REPAIR only while AffectedSurface max_level L1 and scope @PARSER",
+    "verify": "repair verified on exception LOW"
+  },
+  "admissible_phase_transitions": [
+    ["STABLE", "WATCH"],
+    ["WATCH", "ESCALATION_REVIEW"],
+    ["ESCALATION_REVIEW", "HOMEOSTATIC_REPAIR"],
+    ["HOMEOSTATIC_REPAIR", "STABLE"]
+  ]
+}
