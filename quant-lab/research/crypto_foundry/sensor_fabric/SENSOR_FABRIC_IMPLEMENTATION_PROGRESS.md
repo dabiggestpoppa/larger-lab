@@ -100,6 +100,7 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09R1A | b3e26cef | 0 (code) | — |
 | SENSOR-B3-I09R1B | 17636a78 | 15 | 0 |
 | SENSOR-B3-I09R1C | 1dd03835 | 0 (evidence/ledger) | — |
+| SENSOR-B3-I09R1-RATIFY | (governance) | — | — |
 | cumulative | 1309 | 1309 | 0 |
 
 ## External / provider blockers
@@ -187,9 +188,17 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B3-I09R1-RATIFY COMPLETE (governance) — operator ACCEPTED
+  `PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED` and authorized
+  SENSOR-B3-I10 (CONTROLLED PRODUCTION-ADAPTER NETWORK SMOKE) ONLY — the FIRST
+  authorized live-network checkpoint.  KRAKEN_FUTURES, GATE_FUTURES, OKX_SWAP
+  and DERIBIT remain OFFLINE_FROZEN; the offline production inventory (17
+  provider×sensor paths) stays `network_smoke_status = NOT_RUN` (I10 writes
+  NEW smoke evidence; it never rewrites the immutable I09 matrix).  NOT
+  authorized: provider repairs, schema changes, history expansion, new
+  providers, Bloc 4, MECH21, LF14, capital field, alpha.
 - SENSOR-B3-I09R1 COMPLETE — CROSS-PROVIDER AUTHORITY BOUNDARY MICROSEAL
-  (proposed `PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED`,
-  awaiting operator review; NOT `PASS_BLOC_03`).  Three fail-closed authority
+  (operator RATIFIED via SENSOR-B3-I09R1-RATIFY; NOT `PASS_BLOC_03`).  Three fail-closed authority
   seams repaired in `providers/readiness.py` + `test_production_matrix.py`
   (+15 tests; cumulative 1309):  (A) I14 promotion authority is validated
   structurally unique by `validate_promotion_candidate_uniqueness`
@@ -560,3 +569,4 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I09R1A | b3e26cef | fail closed on duplicate I14 promotion + duplicate human readiness rows; require explicit complete verification coverage (missing != explicit False; ADAPTER_READY cannot coexist with failed validation; network smoke locked NOT_RUN pre-I10) | 1294 passed / 0 failed | PASS | none |
 | SENSOR-B3-I09R1B | 17636a78 | authority-seal adversarial tests (15): duplicate I14 exact + conflicting, every-consumer reject, human duplicate identical + conflicting, missing conformance/schema/verification, explicit-False-vs-missing, ADAPTER_READY+failed-flag rejected, network upgrade rejected, raw/unique I14 counts | 1309 passed / 0 failed | PASS | none |
 | SENSOR-B3-I09R1C | 1dd03835 | authority-seal evidence + ledger reconciliation for I09R1; matrix regeneration byte-identical | 1309 passed / 0 failed (re-run) | PASS | none |
+| SENSOR-B3-I09R1-RATIFY | (this commit) | governance: operator ACCEPTS PASS_SENSOR_B3_I09R1_CROSS_PROVIDER_OFFLINE_CLOSURE_SEALED; all four adapters stay OFFLINE_FROZEN with network_smoke_status NOT_RUN; authorizes SENSOR-B3-I10 controlled production-adapter network smoke ONLY (no repairs / schema changes / history expansion / new providers / Bloc 4 / MECH21 / LF14 / capital / alpha) | 1309 passed / 0 failed (re-run) | PASS | none |
