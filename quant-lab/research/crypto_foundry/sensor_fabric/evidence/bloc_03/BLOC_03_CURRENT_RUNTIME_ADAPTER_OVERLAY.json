@@ -1,0 +1,212 @@
+{
+  "adapter_semantic_versions": {
+    "DERIBIT": "deribit-adapter-v1",
+    "GATE_FUTURES": "gate-adapter-v2",
+    "KRAKEN_FUTURES": "kraken-adapter-v2",
+    "OKX_SWAP": "okx-adapter-v1"
+  },
+  "artifact": "BLOC_03_CURRENT_RUNTIME_ADAPTER_OVERLAY.json",
+  "generated_utc": "2026-09-01T11:41:16.555023+00:00",
+  "network_validation": "PASS \u2014 17/17 logical paths, 18/18 physical production-symbol checks (I10 baseline + I10R1/I10R2 overlays)",
+  "note": "I09 matrix (PRODUCTION_ADAPTER_MATRIX.csv/json) remains UNCHANGED and immutable; this overlay records current adapter semantic versions and runtime completion truth after I10/I10R1/I10R2.",
+  "paths": [
+    {
+      "adapter_version": "deribit-adapter-v1",
+      "completion_truth": "funding LIMITED; trade/liquidation has_more=false terminal (completion per I09)",
+      "i09_completion_status": "n/a",
+      "i09_resume_status": "n/a",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "DERIBIT",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT"
+    },
+    {
+      "adapter_version": "deribit-adapter-v1",
+      "completion_truth": "funding LIMITED; trade/liquidation has_more=false terminal (completion per I09)",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "DERIBIT",
+      "sensor_family": "MECHANICAL_FUNDING"
+    },
+    {
+      "adapter_version": "deribit-adapter-v1",
+      "completion_truth": "funding LIMITED; trade/liquidation has_more=false terminal (completion per I09)",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "DERIBIT",
+      "sensor_family": "MECHANICAL_LIQUIDATION"
+    },
+    {
+      "adapter_version": "deribit-adapter-v1",
+      "completion_truth": "funding LIMITED; trade/liquidation has_more=false terminal (completion per I09)",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "DERIBIT",
+      "sensor_family": "MECHANICAL_TRADE"
+    },
+    {
+      "adapter_version": "gate-adapter-v2",
+      "completion_truth": "LIMITED \u2014 runtime is_complete=False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline",
+        "I10R2 recheck"
+      ],
+      "provider_id": "GATE_FUTURES",
+      "sensor_family": "MECHANICAL_FUNDING"
+    },
+    {
+      "adapter_version": "gate-adapter-v2",
+      "completion_truth": "LIMITED \u2014 runtime is_complete=False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline",
+        "I10R1 recheck",
+        "I10R2 recheck"
+      ],
+      "provider_id": "GATE_FUTURES",
+      "sensor_family": "MECHANICAL_LIQUIDATION"
+    },
+    {
+      "adapter_version": "gate-adapter-v2",
+      "completion_truth": "LIMITED \u2014 runtime is_complete=False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline",
+        "I10R1 recheck",
+        "I10R2 recheck"
+      ],
+      "provider_id": "GATE_FUTURES",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST"
+    },
+    {
+      "adapter_version": "gate-adapter-v2",
+      "completion_truth": "LIMITED \u2014 runtime is_complete=False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline",
+        "I10R1 recheck",
+        "I10R2 recheck"
+      ],
+      "provider_id": "GATE_FUTURES",
+      "sensor_family": "MECHANICAL_POSITIONING"
+    },
+    {
+      "adapter_version": "kraken-adapter-v2",
+      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
+      "i09_completion_status": "YES",
+      "i09_resume_status": "YES",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "KRAKEN_FUTURES",
+      "sensor_family": "MECHANICAL_BASIS"
+    },
+    {
+      "adapter_version": "kraken-adapter-v2",
+      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
+      "i09_completion_status": "YES",
+      "i09_resume_status": "YES",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "KRAKEN_FUTURES",
+      "sensor_family": "MECHANICAL_BOOK_METRIC"
+    },
+    {
+      "adapter_version": "kraken-adapter-v2",
+      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
+      "i09_completion_status": "YES",
+      "i09_resume_status": "YES",
+      "live_validation_refs": [
+        "I10 baseline",
+        "I10R1 recheck",
+        "I10R2 recheck"
+      ],
+      "provider_id": "KRAKEN_FUTURES",
+      "sensor_family": "MECHANICAL_FUNDING"
+    },
+    {
+      "adapter_version": "kraken-adapter-v2",
+      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
+      "i09_completion_status": "YES",
+      "i09_resume_status": "YES",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "KRAKEN_FUTURES",
+      "sensor_family": "MECHANICAL_LIQUIDATION"
+    },
+    {
+      "adapter_version": "kraken-adapter-v2",
+      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
+      "i09_completion_status": "YES",
+      "i09_resume_status": "YES",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "KRAKEN_FUTURES",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST"
+    },
+    {
+      "adapter_version": "kraken-adapter-v2",
+      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
+      "i09_completion_status": "YES",
+      "i09_resume_status": "YES",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "KRAKEN_FUTURES",
+      "sensor_family": "MECHANICAL_POSITIONING"
+    },
+    {
+      "adapter_version": "okx-adapter-v1",
+      "completion_truth": "LIMITED continuation (resume/completion LIMITED per I09)",
+      "i09_completion_status": "n/a",
+      "i09_resume_status": "n/a",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "OKX_SWAP",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT"
+    },
+    {
+      "adapter_version": "okx-adapter-v1",
+      "completion_truth": "LIMITED continuation (resume/completion LIMITED per I09)",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "OKX_SWAP",
+      "sensor_family": "MECHANICAL_FUNDING"
+    },
+    {
+      "adapter_version": "okx-adapter-v1",
+      "completion_truth": "LIMITED continuation (resume/completion LIMITED per I09)",
+      "i09_completion_status": "LIMITED",
+      "i09_resume_status": "LIMITED",
+      "live_validation_refs": [
+        "I10 baseline"
+      ],
+      "provider_id": "OKX_SWAP",
+      "sensor_family": "MECHANICAL_TRADE"
+    }
+  ],
+  "purpose": "CURRENT RUNTIME overlay over the immutable I09 offline matrix \u2014 consumed by SENSOR-B3-I11 final validation/handoff",
+  "starting_sha": "cb3bff61007d77fe4369c516ff9eff4b171300e2"
+}
