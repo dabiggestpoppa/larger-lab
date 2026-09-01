@@ -19,6 +19,7 @@ from .replay import DeterministicReplay, ReplayEvent
 class StressScenarioSpec:
     scenario_id: str
     scenario_version: str = "1.0.0"
+    policy_ref: str = ""
     threat_class: str = "DETERMINISTIC_CONSTITUTIONAL"
     institutional_scope: str = ""
     initial_epoch: str = ""

@@ -8,6 +8,7 @@
   "properties": {
     "scenario_id": {"type": "string", "minLength": 1},
     "scenario_version": {"type": "string"},
+    "policy_ref": {"type": "string"},
     "threat_class": {"enum": ["DETERMINISTIC_CONSTITUTIONAL","COGNITIVE_ECOLOGY","DOMAIN_RESEARCH_SIM"]},
     "institutional_scope": {"type": "string"},
     "initial_epoch": {"type": "string"},

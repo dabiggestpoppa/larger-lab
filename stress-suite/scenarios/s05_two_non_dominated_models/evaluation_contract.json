@@ -14,10 +14,10 @@
     "cost_and_reversibility": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"}
   },
   "hysteresis_rules": {
-    "enter_watch": "any_of(>= HIGH) on independent_contradiction (inherited)",
-    "escalation": "persistence(2) of independent_contradiction >= HIGH",
-    "candidate": "persistence(3) + reliability >= MEDIUM",
-    "plural_outcome": "PLURAL_MODEL_STATE when unresolved_pattern_density HIGH + contradiction persists — never average, never force a winner"
+    "watch": {"minimum_persistence": 1, "entry_bar_below_escalation": true},
+    "escalation": {"minimum_persistence": 2},
+    "transformation": {"minimum_persistence": 3, "stronger_than_watch": true},
+    "recovery": {"independent_exit_predicate": true}
   },
   "admissible_phase_transitions": [
     ["STABLE", "WATCH"],

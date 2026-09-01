@@ -26,13 +26,15 @@
       "level": "PO"
     }
   },
+  "behavior_fingerprint": "935730d5e3880c20e98a4d97ec3e5e75",
   "evaluation_contract": {
     "contract_id": "S02-EVAL-V1",
-    "fingerprint": "1699b74c0bb225cb",
+    "fingerprint": "0a73bf51a0e41ab3",
     "freeze_status": "FROZEN",
     "version_tag": "V1"
   },
   "evidence_count": 6,
+  "evidence_ref_violations": 0,
   "evidence_refs_by_transition": {
     "1": [
       "E_NOVEL"
@@ -56,30 +58,35 @@
   ],
   "expected_trace_accessed_during_run": false,
   "failures": [],
-  "fingerprint": "d3aa6a8ce65f385f73633fbf51313cf5",
+  "fingerprint": "2ddeff2d86f3506ffd6875171078d09d",
   "forbidden_attempts": [],
   "hidden_ground_truth_accessed": false,
   "holds": [
     {
-      "rationale": "data-quality defect parks escalation; the anomaly is preserved, not erased",
-      "rule_id": "S02.defect.hold",
+      "rationale": "no rule fired; hold phase",
+      "rule_id": "NO_MATCH",
       "seq": 3
     },
     {
-      "rationale": "data-quality defect parks escalation; the anomaly is preserved, not erased",
-      "rule_id": "S02.defect.hold",
+      "rationale": "no rule fired; hold phase",
+      "rule_id": "NO_MATCH",
       "seq": 4
     }
   ],
   "pass": true,
-  "policy_id": "S02-POLICY",
+  "policy_fingerprint": "46ab6fadaaa5e10c80657b26",
+  "policy_id": "G2_CORE_PHASE_POLICY",
   "policy_version": "V1",
+  "registry_records": 5,
   "scenario_id": "S02",
   "scenario_version": "1.0.0",
+  "scripted_m4_side_effects": 1,
+  "scripted_m4_side_effects_labeled_fixture": true,
   "starting_epoch": "E-S02-0",
   "stimulus_count": 6,
   "terminal_knowledge_states": {
     "@K_REV": "DEMOTED"
   },
-  "terminal_phase": "STABLE"
+  "terminal_phase": "STABLE",
+  "transitions_audited": 4
 }

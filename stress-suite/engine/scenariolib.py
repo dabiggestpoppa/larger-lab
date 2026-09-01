@@ -90,7 +90,15 @@ def load_scenario_pack(sdir: Union[str, Path]) -> ScenarioPack:
     spec.terminal_states = list(expected.get("terminal_states", []))
 
     contract = _build_contract(_read_json(d / "evaluation_contract.json"))
-    policy = AdjudicatorPolicy.from_data(_read_json(d / "adjudicator_policy.json"))
+    # G2R-01: primary evidence runs under the SHARED G2_CORE_PHASE_POLICY. A
+    # scenario directory may still carry its own archived per-scenario policy
+    # for forensic comparison, but `policy_ref` decides what the loader binds.
+    policy_ref = str(scenario_raw.get("policy_ref", ""))
+    if policy_ref:
+        shared = d.parent / "policies" / f"{policy_ref}.json"
+        policy = AdjudicatorPolicy.from_data(_read_json(shared))
+    else:
+        policy = AdjudicatorPolicy.from_data(_read_json(d / "adjudicator_policy.json"))
     observable = _read_json(d / "observable_evidence.json").get("records", [])
     forbidden = _read_json(d / "forbidden_transitions.json").get("forbidden", [])
     initial_epoch = _read_json(d / "initial_epoch.json")

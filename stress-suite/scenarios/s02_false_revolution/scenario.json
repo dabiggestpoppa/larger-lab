@@ -1,6 +1,7 @@
 {
   "scenario_id": "S02",
   "scenario_version": "1.0.0",
+  "policy_ref": "G2_CORE_PHASE_POLICY",
   "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
   "institutional_scope": "core phase control: novelty addiction / false revolution collapses under data-quality inspection",
   "initial_phase": "STABLE",

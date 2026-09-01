@@ -1,6 +1,7 @@
 {
   "scenario_id": "S05",
   "scenario_version": "1.0.0",
+  "policy_ref": "G2_CORE_PHASE_POLICY",
   "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
   "institutional_scope": "core phase control: two non-dominated models; no forced consensus, no forced averaging",
   "initial_phase": "STABLE",

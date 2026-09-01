@@ -14,13 +14,14 @@
     "cost_and_reversibility": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"}
   },
   "hysteresis_rules": {
-    "enter_watch": "any_of(>= MEDIUM) on reliability/exception/contradiction — inherited from contract",
-    "escalation": "persistence(3) of independent_contradiction >= MEDIUM",
-    "transformation_candidate": "persistence(3) + all_of(contra HIGH, reliability >= MEDIUM) + CORE stronger-review gate",
-    "leave_review": "NOT the mechanical inverse of entry; recovery uses equality-to-LOW gates with all_of"
+    "watch": {"minimum_persistence": 1, "entry_bar_below_escalation": true},
+    "escalation": {"minimum_persistence": 2},
+    "transformation": {"minimum_persistence": 3, "stronger_than_watch": true},
+    "recovery": {"independent_exit_predicate": true}
   },
   "admissible_phase_transitions": [
     ["STABLE", "WATCH"],
+    ["WATCH", "STABLE"],
     ["WATCH", "ESCALATION_REVIEW"],
     ["ESCALATION_REVIEW", "TRANSFORMATION_CANDIDATE"],
     ["TRANSFORMATION_CANDIDATE", "TRANSFORMATION_WINDOW"],

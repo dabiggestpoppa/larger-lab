@@ -37,8 +37,10 @@ def main() -> int:
     summary = {}
 
     for sid, pack in packs.items():
-        res = run_scenario(pack.spec, pack.contract, pack.policy)
+        res = run_scenario(pack.spec, pack.contract, pack.policy,
+                           evidence_records=pack.observable_evidence)
         verdict = evaluate_expectation(res, pack.spec)
+        side_effects = [t for t in res.artifacts["trace"] if t.get("institutional")]
         receipt = {
             "scenario_id": sid,
             "scenario_version": pack.spec.scenario_version,
@@ -46,8 +48,11 @@ def main() -> int:
             "evaluation_contract": res.artifacts["evaluation_contract"],
             "policy_id": res.artifacts["policy_id"],
             "policy_version": res.artifacts["policy_version"],
+            "policy_fingerprint": res.artifacts["policy_fingerprint"],
             "stimulus_count": res.artifacts["stimulus_count"],
             "evidence_count": res.artifacts["evidence_count"],
+            "registry_records": len(res.artifacts["registry_ids"]),
+            "evidence_ref_violations": len(res.artifacts["evidence_ref_violations"]),
             "actual_phase_trace": res.artifacts["actual_phase_trace"],
             "expected_phase_trace": verdict["expected_phase_path"],
             "terminal_phase": res.artifacts["terminal_phase"],
@@ -55,6 +60,11 @@ def main() -> int:
             "forbidden_attempts": res.artifacts["forbidden_attempts"],
             "holds": res.artifacts["holds"],
             "evidence_refs_by_transition": res.artifacts["evidence_refs_by_transition"],
+            "transitions_audited": len(res.artifacts["transitions_audit"]),
+            "scripted_m4_side_effects": len(side_effects),
+            "scripted_m4_side_effects_labeled_fixture": all(
+                t.get("fixture_side_effect", False) for t in side_effects
+            ) if side_effects else None,
             "authority_state_before": res.artifacts["authority_state_before"],
             "authority_state_after": res.artifacts["authority_state_after"],
             "hidden_ground_truth_accessed": res.artifacts["hidden_ground_truth_accessed"],
@@ -62,6 +72,7 @@ def main() -> int:
             "pass": verdict["pass"],
             "failures": verdict["failures"],
             "fingerprint": res.artifacts["fingerprint"],
+            "behavior_fingerprint": res.artifacts["behavior_fingerprint"],
         }
         (pack.path / "run_receipt.json").write_text(
             json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -99,6 +110,13 @@ def _human_readable(sid, r) -> str:
         f"fp={r['evaluation_contract']['fingerprint'][:16]}…)",
         f"- **Expected trace accessed during run:** {r['expected_trace_accessed_during_run']}",
         f"- **Hidden ground truth accessed:** {r['hidden_ground_truth_accessed']}",
+        f"- **Governed evidence registry records:** {r.get('registry_records')} "
+        f"(evidence ref violations: {r.get('evidence_ref_violations')})",
+        f"- **Transitions audited:** {r.get('transitions_audited')}",
+        f"- **Scripted M4 side effects (FIXTURE_SIDE_EFFECT):** "
+        f"{r.get('scripted_m4_side_effects')} — G2 proves these are LEGAL and "
+        f"evidence-bound, NOT that OCE autonomously chose them (G2R-09)",
+        f"- **Behavior fingerprint (scenario-id independent):** {r.get('behavior_fingerprint')}",
         f"- **Run fingerprint:** {r['fingerprint']}",
         "",
     ]
@@ -119,14 +137,16 @@ def _cross_audit(packs) -> str:
         "|---|---|---|---|",
     ]
     for a in MAIN:
-        own = run_scenario(packs[a].spec, packs[a].contract, packs[a].policy)
+        own = run_scenario(packs[a].spec, packs[a].contract, packs[a].policy,
+                           evidence_records=packs[a].observable_evidence)
         for b in MAIN:
             if a == b:
                 continue
             cb = packs[b].contract
             if not cb.is_frozen():
                 cb.freeze()
-            foreign = run_scenario(packs[a].spec, cb, packs[a].policy)
+            foreign = run_scenario(packs[a].spec, cb, packs[a].policy,
+                                   evidence_records=packs[a].observable_evidence)
             same = _behavior_sig(foreign) == _behavior_sig(own)
             verdict = evaluate_expectation(foreign, packs[a].spec)
             lines.append(

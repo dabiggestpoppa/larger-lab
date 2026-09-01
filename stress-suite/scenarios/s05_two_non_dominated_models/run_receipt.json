@@ -29,13 +29,15 @@
       "level": "PO"
     }
   },
+  "behavior_fingerprint": "b0c7461e48f29987633fe5a75622dbd4",
   "evaluation_contract": {
     "contract_id": "S05-EVAL-V1",
-    "fingerprint": "ef1a395bcc841829",
+    "fingerprint": "3e1b3695490b27ca",
     "freeze_status": "FROZEN",
     "version_tag": "V1"
   },
   "evidence_count": 7,
+  "evidence_ref_violations": 0,
   "evidence_refs_by_transition": {
     "1": [
       "E_MB_PAPER"
@@ -76,20 +78,25 @@
   ],
   "expected_trace_accessed_during_run": false,
   "failures": [],
-  "fingerprint": "9e5b22de4d53d24e564c5b8c28d3e792",
+  "fingerprint": "fc106b50c07779c96a065ca4db78e1b1",
   "forbidden_attempts": [],
   "hidden_ground_truth_accessed": false,
   "holds": [],
   "pass": true,
-  "policy_id": "S05-POLICY",
+  "policy_fingerprint": "46ab6fadaaa5e10c80657b26",
+  "policy_id": "G2_CORE_PHASE_POLICY",
   "policy_version": "V1",
+  "registry_records": 3,
   "scenario_id": "S05",
   "scenario_version": "1.0.0",
+  "scripted_m4_side_effects": 4,
+  "scripted_m4_side_effects_labeled_fixture": true,
   "starting_epoch": "E-S05-0",
   "stimulus_count": 7,
   "terminal_knowledge_states": {
     "@M_A": "ACTIVE",
     "@M_B": "ACTIVE"
   },
-  "terminal_phase": "STABLE"
+  "terminal_phase": "STABLE",
+  "transitions_audited": 7
 }

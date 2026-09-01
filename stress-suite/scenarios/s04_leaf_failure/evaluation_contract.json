@@ -14,10 +14,9 @@
     "cost_and_reversibility": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"}
   },
   "hysteresis_rules": {
-    "enter_watch": "any_of(>= MEDIUM) on reliability_degradation (inherited)",
-    "escalation": "persistence(2) of exception_burden >= MEDIUM",
-    "repair": "HOMEOSTATIC_REPAIR only while AffectedSurface max_level L1 and scope @PARSER",
-    "verify": "repair verified on exception LOW"
+    "watch": {"minimum_persistence": 1, "entry_bar_below_escalation": true},
+    "escalation": {"minimum_persistence": 2},
+    "recovery": {"independent_exit_predicate": true}
   },
   "admissible_phase_transitions": [
     ["STABLE", "WATCH"],

@@ -6,7 +6,8 @@
   "initial_phase": "STABLE",
   "initial_authority_state": {
     "PO": "PO",
-    "WORKER": "WORKER"
+    "WORKER": "WORKER",
+    "GOVERNOR": "GOVERNOR"
   },
   "initial_knowledge": [
     {
@@ -21,7 +22,7 @@
     {
       "seq": 1,
       "machine": "phase",
-      "actor": "PO",
+      "actor": "GOVERNOR",
       "target": "@INST",
       "payload": {
         "to_state": "NEW_STABLE",
@@ -36,7 +37,7 @@
     {
       "seq": 2,
       "machine": "phase",
-      "actor": "WORKER",
+      "actor": "GOVERNOR",
       "target": "@INST",
       "payload": {
         "to_state": "TRANSFORMATION_WINDOW",
@@ -61,7 +62,11 @@
       }
     }
   ],
-  "expected_phase_path": ["STABLE"],
-  "terminal_states": ["STABLE"],
+  "expected_phase_path": [
+    "STABLE"
+  ],
+  "terminal_states": [
+    "STABLE"
+  ],
   "hidden_ground_truth": null
 }

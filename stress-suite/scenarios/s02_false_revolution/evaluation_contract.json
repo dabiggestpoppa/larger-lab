@@ -14,10 +14,9 @@
     "cost_and_reversibility": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"}
   },
   "hysteresis_rules": {
-    "enter_watch": "any_of(>= MEDIUM) on independent_contradiction (inherited)",
-    "escalation": "persistence(2) of independent_contradiction >= MEDIUM",
-    "data_quality_defect": "hold escalations while TIMESTAMP_LEAKAGE / SURVIVORSHIP_BIAS present",
-    "resolution": "NO_CHANGE on contradiction evens to LOW, then STABLE"
+    "watch": {"minimum_persistence": 1, "entry_bar_below_escalation": true},
+    "escalation": {"minimum_persistence": 2},
+    "recovery": {"independent_exit_predicate": true}
   },
   "admissible_phase_transitions": [
     ["STABLE", "WATCH"],

@@ -38,13 +38,15 @@
       "level": "WORKER"
     }
   },
+  "behavior_fingerprint": "2a362801548fa77a8d93b07cde03457d",
   "evaluation_contract": {
     "contract_id": "S01-EVAL-V1",
-    "fingerprint": "79fd96f05b47222c",
+    "fingerprint": "d5c934c228b000f5",
     "freeze_status": "FROZEN",
     "version_tag": "V1"
   },
   "evidence_count": 10,
+  "evidence_ref_violations": 0,
   "evidence_refs_by_transition": {
     "1": [
       "E1"
@@ -56,6 +58,9 @@
     "4": [
       "E4"
     ],
+    "5": [
+      "E5"
+    ],
     "6": [
       "E6A",
       "E6B"
@@ -63,9 +68,6 @@
     "7": [
       "E7A",
       "E7B"
-    ],
-    "8": [
-      "E8"
     ],
     "9": [
       "E9"
@@ -87,7 +89,7 @@
   ],
   "expected_trace_accessed_during_run": false,
   "failures": [],
-  "fingerprint": "cdc524274120e82ba33943766fd3d42c",
+  "fingerprint": "7fc4a113a73692eadbfb8304d8368687",
   "forbidden_attempts": [],
   "hidden_ground_truth_accessed": false,
   "holds": [
@@ -97,21 +99,26 @@
       "seq": 2
     },
     {
-      "rationale": "no rule fired; hold phase",
-      "rule_id": "NO_MATCH",
-      "seq": 5
+      "rationale": "contract inadmissible: TRANSFORMATION_WINDOW -> HOMEOSTATIC_REPAIR is outside the frozen evaluation contract's admissible_phase_transitions",
+      "rule_id": "CONTRACT_INADMISSIBLE",
+      "seq": 8
     }
   ],
   "pass": true,
-  "policy_id": "S01-POLICY",
+  "policy_fingerprint": "46ab6fadaaa5e10c80657b26",
+  "policy_id": "G2_CORE_PHASE_POLICY",
   "policy_version": "V1",
+  "registry_records": 13,
   "scenario_id": "S01",
   "scenario_version": "1.0.0",
+  "scripted_m4_side_effects": 5,
+  "scripted_m4_side_effects_labeled_fixture": true,
   "starting_epoch": "E-S01-0",
   "stimulus_count": 10,
   "terminal_knowledge_states": {
     "@M_A": "SUPERSEDED",
     "@M_B": "ACTIVE"
   },
-  "terminal_phase": "NEW_STABLE"
+  "terminal_phase": "NEW_STABLE",
+  "transitions_audited": 8
 }

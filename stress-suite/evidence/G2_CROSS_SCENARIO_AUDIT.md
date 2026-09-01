@@ -8,26 +8,26 @@ inheritance of foreign semantics).
 
 | scenario | under contract | behavior identical | foreign verdict |
 |---|---|---|---|
-| S01 | S02 | yes | PASS |
+| S01 | S02 | no | FAIL |
 | S01 | S03 | no | FAIL |
-| S01 | S04 | yes | PASS |
+| S01 | S04 | no | FAIL |
 | S01 | S05 | no | FAIL |
-| S02 | S01 | yes | PASS |
-| S02 | S03 | yes | PASS |
-| S02 | S04 | yes | PASS |
+| S02 | S01 | no | FAIL |
+| S02 | S03 | no | FAIL |
+| S02 | S04 | no | FAIL |
 | S02 | S05 | no | FAIL |
-| S03 | S01 | yes | PASS |
+| S03 | S01 | no | FAIL |
 | S03 | S02 | no | FAIL |
 | S03 | S04 | no | FAIL |
-| S03 | S05 | yes | PASS |
-| S04 | S01 | yes | PASS |
+| S03 | S05 | no | FAIL |
+| S04 | S01 | no | FAIL |
 | S04 | S02 | no | FAIL |
-| S04 | S03 | no | FAIL |
+| S04 | S03 | yes | PASS |
 | S04 | S05 | no | FAIL |
-| S05 | S01 | yes | PASS |
-| S05 | S02 | yes | PASS |
-| S05 | S03 | yes | PASS |
-| S05 | S04 | yes | PASS |
+| S05 | S01 | no | FAIL |
+| S05 | S02 | no | FAIL |
+| S05 | S03 | no | FAIL |
+| S05 | S04 | no | FAIL |
 
 **Interpretation:** a `yes` row means the foreign threshold happened to be
 semantically equivalent for that scenario's gates (recorded as benign
