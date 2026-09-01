@@ -1,0 +1,22 @@
+{
+  "actual_outcome": "RECONSTRUCTED",
+  "authority_after": "NONE",
+  "authority_before": "NONE",
+  "authority_changes": "NONE",
+  "behavior_fingerprint": "a69a8c800bcd96212bf51280515e6906",
+  "capital_mutations": 0,
+  "cloud_mutations": 0,
+  "expected_outcome": "RECONSTRUCTED",
+  "expected_outcome_accessed": false,
+  "failures": [],
+  "fingerprint": "c73af89e2918fb79e2dcabd09628384e",
+  "hidden_ground_truth_accessed": false,
+  "model_calls": 0,
+  "pass": true,
+  "policy_fingerprint": "48e8ff6569fbb030d1a5fc8f",
+  "policy_id": "G4_MEMORY_AND_REACTIVATION_POLICY",
+  "policy_version": "V1",
+  "production_mutations": 0,
+  "scenario_id": "S13",
+  "scenario_version": "1.0.0"
+}

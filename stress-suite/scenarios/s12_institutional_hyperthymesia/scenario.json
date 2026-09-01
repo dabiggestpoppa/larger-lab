@@ -1,0 +1,18 @@
+{
+  "scenario_id": "S12",
+  "scenario_version": "1.0.0",
+  "threat_class": "EVERYTHING_REMAINS_ACTIVE_FOREVER",
+  "history_size": 50000,
+  "experiments_size": 5000,
+  "required_refs": [
+    "REL_01", "REL_02", "REL_03", "REL_04", "REL_05", "REL_06",
+    "REL_07", "REL_08", "REL_09", "REL_10", "REL_11", "REL_12"
+  ],
+  "dependency_refs": ["REL_01", "REL_02"],
+  "context_budget": 12,
+  "expected_outcome": "BOUNDED_CONTEXT",
+  "hidden_ground_truth": {
+    "only_12_objects_relevant": true,
+    "history_is_irrelevant_to_default_context": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "actual_outcome": "STOP_SUPPRESSION",
+  "authority_after": "NONE",
+  "authority_before": "NONE",
+  "authority_changes": "NONE",
+  "behavior_fingerprint": "4f78dba120179d7144986015893cc8f0",
+  "capital_mutations": 0,
+  "cloud_mutations": 0,
+  "expected_outcome": "STOP_SUPPRESSION",
+  "expected_outcome_accessed": false,
+  "failures": [],
+  "fingerprint": "53210558bad4e0ffb2c7d6910e85ddf9",
+  "hidden_ground_truth_accessed": false,
+  "model_calls": 0,
+  "pass": true,
+  "policy_fingerprint": "48e8ff6569fbb030d1a5fc8f",
+  "policy_id": "G4_MEMORY_AND_REACTIVATION_POLICY",
+  "policy_version": "V1",
+  "production_mutations": 0,
+  "scenario_id": "S11",
+  "scenario_version": "1.0.0"
+}

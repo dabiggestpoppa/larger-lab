@@ -1,0 +1,13 @@
+[
+  {
+    "condition_type": "FIELD_PREDICATE",
+    "subject_ref": "M_OLD",
+    "field": "regime_present",
+    "operator": "EQ",
+    "expected_value": true,
+    "evidence_required": true,
+    "scope": "regime_alpha",
+    "created_under_contract": "G4_MEMORY_AND_REACTIVATION_POLICY:1.0.0",
+    "version_tag": "1.0.0"
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "scenario_id": "S10",
+  "scenario_version": "1.0.0",
+  "threat_class": "HISTORICAL_BURIAL",
+  "knowledge_ref": "knowledge.json",
+  "reopen_conditions_ref": "reopen_conditions.json",
+  "current_facts": {
+    "regime_present": true,
+    "evidence_refs": ["EV_S10_NEW_SENSOR"]
+  },
+  "epochs": [
+    {"epoch_id": "E10a", "predecessor_epoch": null, "start_cause": "old regime active", "active_knowledge_projection": ["M_OLD"]}
+  ],
+  "expected_outcome": "REOPEN_CANDIDATE",
+  "hidden_ground_truth": {
+    "old_regime_valid_again": true,
+    "historical_validation_is_not_current_validation": true
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "scenario_id": "S13",
+  "scenario_version": "1.0.0",
+  "threat_class": "INSTITUTIONAL_IDENTITY_BOUND_TO_CURRENT_AGENTS",
+  "epochs_ref": "epochs.json",
+  "expected_outcome": "RECONSTRUCTED",
+  "hidden_ground_truth": {
+    "all_current_runtimes_unavailable": true,
+    "replacement_has_zero_private_memory": true
+  }
+}

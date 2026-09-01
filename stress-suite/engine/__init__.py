@@ -34,7 +34,8 @@ from .cognitive_ecology import (
     ReviewerIndependenceProfile, DependencyGraph, ConsensusRecord, EcologyFacts,
     CognitiveEcologyHealthRecord, CorrelatedFailureRecord, AllocationProvenance,
     RegisteredReviewerProvenance, ProvenanceConflict, ReviewerProvenanceRegistry,
-    SyntheticFixtureAuthority, EpistemicPathRecord, collect_epistemic_paths,
+    SyntheticFixtureAuthority, EpistemicPathRecord, ReplicationPathRecord,
+    ProvenanceConflictLedger, collect_epistemic_paths,
     PROVENANCE_MODES, DEFAULT_PROVENANCE_MODE, CAPABILITY_SOURCES, UNKNOWN,
     SAME, DIFFERENT,
     independent_confirmation_satisfied, receipt_lineage, EXPOSURE_MODES, PAIRWISE_AXES,
@@ -49,6 +50,21 @@ from .friction import (
     FrictionAction, CounterAttractorReview, CounterAttractorSpec,
 )
 from .g3_runner import G3ScenarioPack, G3RunResult, load_g3_pack, run_g3_scenario, evaluate_g3_expectation
+from .memory import (
+    MEMORY_TIERS, KnowledgeActivationState, MemoryObject, MemoryIndex,
+    MemoryCompactionRecord, MemoryRetriever, ContextBundle, RetrievalTraceEntry,
+    run_metabolism_pipeline, MetabolismReport,
+)
+from .reopen import (
+    REOPEN_OPERATORS, ReopenCondition, ReopenEvaluator, ReopenEvaluation,
+    NegativeKnowledgeSuppressionDecision, decide_suppression, ReopenConditionError,
+)
+from .reconstruction import (
+    PROVISIONAL_EPOCH_RECONSTRUCTION_CONTRACT, EpochReconstructionBundle,
+    EpochReconstructionReport, reconstruct_epoch, verify_epoch_chain,
+)
+from .memory_policy import MemoryPolicy, MemoryRule, MemoryPolicyError
+from .g4_runner import G4ScenarioPack, G4RunResult, load_g4_pack, run_g4_scenario, evaluate_g4_expectation
 
 __all__ = [
     "HARNESS_VERSION",
@@ -69,7 +85,8 @@ __all__ = [
     "ReviewerIndependenceProfile", "DependencyGraph", "ConsensusRecord", "EcologyFacts",
     "CognitiveEcologyHealthRecord", "CorrelatedFailureRecord", "AllocationProvenance",
     "RegisteredReviewerProvenance", "ProvenanceConflict", "ReviewerProvenanceRegistry",
-    "SyntheticFixtureAuthority", "EpistemicPathRecord", "collect_epistemic_paths",
+    "SyntheticFixtureAuthority", "EpistemicPathRecord", "ReplicationPathRecord",
+    "ProvenanceConflictLedger", "collect_epistemic_paths",
     "PROVENANCE_MODES", "DEFAULT_PROVENANCE_MODE", "CAPABILITY_SOURCES", "UNKNOWN",
     "SAME", "DIFFERENT",
     "independent_confirmation_satisfied", "receipt_lineage", "EXPOSURE_MODES", "PAIRWISE_AXES",
@@ -80,4 +97,14 @@ __all__ = [
     "FrictionAction", "CounterAttractorReview", "CounterAttractorSpec",
     "G3ScenarioPack", "G3RunResult", "load_g3_pack", "run_g3_scenario",
     "evaluate_g3_expectation",
+    "MEMORY_TIERS", "KnowledgeActivationState", "MemoryObject", "MemoryIndex",
+    "MemoryCompactionRecord", "MemoryRetriever", "ContextBundle", "RetrievalTraceEntry",
+    "run_metabolism_pipeline", "MetabolismReport",
+    "REOPEN_OPERATORS", "ReopenCondition", "ReopenEvaluator", "ReopenEvaluation",
+    "NegativeKnowledgeSuppressionDecision", "decide_suppression", "ReopenConditionError",
+    "PROVISIONAL_EPOCH_RECONSTRUCTION_CONTRACT", "EpochReconstructionBundle",
+    "EpochReconstructionReport", "reconstruct_epoch", "verify_epoch_chain",
+    "MemoryPolicy", "MemoryRule", "MemoryPolicyError",
+    "G4ScenarioPack", "G4RunResult", "load_g4_pack", "run_g4_scenario",
+    "evaluate_g4_expectation",
 ]

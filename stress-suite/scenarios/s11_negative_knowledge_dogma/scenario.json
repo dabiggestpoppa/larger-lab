@@ -1,0 +1,16 @@
+{
+  "scenario_id": "S11",
+  "scenario_version": "1.0.0",
+  "threat_class": "IRREVERSIBLE_REJECTION",
+  "negative_ref": "negative.json",
+  "reopen_conditions_ref": "reopen_conditions.json",
+  "current_facts": {
+    "resolved_blockers": ["SENSOR_UNAVAILABLE"],
+    "evidence_refs": ["EV_NEW_SENSOR_CAPABILITY"]
+  },
+  "expected_outcome": "STOP_SUPPRESSION",
+  "hidden_ground_truth": {
+    "blocker_genuinely_resolved": true,
+    "family_still_risky": false
+  }
+}
