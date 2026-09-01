@@ -25,7 +25,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE — NONE beyond operator review; recommended next: SENSOR-B3-I11 FINAL BLOC 3 VALIDATION + HANDOFF (NOT begun — validators must not incept it) |
+| next_checkpoint_authorized | FALSE — Bloc 3 FROZEN; recommended next: SENSOR-B4-I01 IMMUTABLE T0 RAW EVIDENCE LAKE FOUNDATION (NOT begun — Bloc 4 must not be incepted without operator authorization) |
 
 ## Test counts (cumulative)
 
