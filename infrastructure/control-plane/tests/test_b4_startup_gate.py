@@ -9,6 +9,7 @@ environ, so these tests stay in the authoritative local run.
 from __future__ import annotations
 
 import json
+import os
 
 import pytest
 
@@ -203,6 +204,111 @@ class TestDefaultStaysStartable:
     def test_plane_default_startup_status(self):
         p = _plane()
         assert p.startup()["status"] == "started"
+
+
+# --------------------------------------------------------------------------- #
+# B4-R3R2 — converged runtime bind: effective config == actual listener.
+# Subprocess proofs: direct-launch denial + real loopback bind with the SAME
+# gate decision the durable entry uses. No public listener is ever opened.
+# --------------------------------------------------------------------------- #
+class TestR3R2RuntimeBind:
+    def test_runtime_bind_resolves_effective_host_port(self):
+        from oce_control.http_api import runtime_bind, runtime_scheduler_interval
+        eff = effective_from_env({**CLEAN_ENV, "OCE_CONTROL_PLANE_PORT": "8451"})
+        host, port = runtime_bind({**CLEAN_ENV, "OCE_CONTROL_PLANE_PORT": "8451"})
+        assert host == eff.get("control_plane.host")
+        assert port == eff.get("control_plane.port") == 8451
+        assert runtime_scheduler_interval(
+            {**CLEAN_ENV, "OCE_SCHEDULER_INTERVAL": "9"}) == 9
+
+    def test_direct_launch_denied_on_forbidden_config(self):
+        # `python -m oce_control.http_api` must NOT activate when the effective
+        # config is forbidden — the gate raises before any bind/DB work.
+        import subprocess
+        import sys
+        from pathlib import Path
+        env = dict(os.environ)
+        env["PYTHONPATH"] = str(Path(__file__).resolve().parent.parent / "src") \
+            + os.pathsep + env.get("PYTHONPATH", "")
+        for bad in (LIVE_ENV, CLOUD_ENV, {"OCE_WORKERS_EGRESS": "public"}):
+            full = {**env, **bad}
+            r = subprocess.run(
+                [sys.executable, "-c",
+                 "from oce_control.http_api import runtime_bind; "
+                 "print('BOUND', runtime_bind()[1])"],
+                env=full, capture_output=True, text=True, timeout=60)
+            assert r.returncode != 0, f"direct launch must fail closed: {bad}"
+            assert "BOUND" not in r.stdout
+
+    def test_direct_launch_denied_on_malformed_config(self):
+        import subprocess
+        import sys
+        from pathlib import Path
+        env = dict(os.environ)
+        env["PYTHONPATH"] = str(Path(__file__).resolve().parent.parent / "src") \
+            + os.pathsep + env.get("PYTHONPATH", "")
+        full = {**env, "OCE_CONTROL_PLANE_PORT": "not-a-port"}
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "from oce_control.http_api import runtime_bind; "
+             "print('BOUND', runtime_bind()[1])"],
+            env=full, capture_output=True, text=True, timeout=60)
+        assert r.returncode != 0
+        assert "BOUND" not in r.stdout
+
+    def test_actual_loopback_bind_matches_effective_config(self):
+        # Real bind proof: the gate decision (runtime_bind) is used verbatim to
+        # open a loopback listener; probe it live, then tear it down.
+        import socket
+        import subprocess
+        import sys
+        import time
+        import urllib.request
+        from pathlib import Path
+        s = socket.socket()
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+        s.close()
+        src = str(Path(__file__).resolve().parent.parent / "src")
+        env = dict(os.environ)
+        env["PYTHONPATH"] = src + os.pathsep + env.get("PYTHONPATH", "")
+        env["OCE_CONTROL_PLANE_PORT"] = str(port)
+        script = (
+            "import uvicorn\n"
+            "from fastapi import FastAPI\n"
+            "from oce_control.http_api import runtime_bind\n"
+            "host, port = runtime_bind()\n"
+            "app = FastAPI()\n"
+            "@app.get('/api/health')\n"
+            "def h(): return {'ok': True}\n"
+            "uvicorn.run(app, host=host, port=port, log_level='warning')\n")
+        proc = subprocess.Popen([sys.executable, "-c", script], env=env,
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL)
+        try:
+            deadline = time.time() + 30
+            body = None
+            while time.time() < deadline:
+                try:
+                    with urllib.request.urlopen(
+                            f"http://127.0.0.1:{port}/api/health",
+                            timeout=2) as resp:
+                        body = resp.read().decode()
+                        break
+                except OSError:
+                    if proc.poll() is not None:
+                        break
+                    time.sleep(0.4)
+            assert body is not None and "ok" in body, \
+                f"server on effective port {port} did not answer (rc={proc.poll()})"
+            # no public listener: only 127.0.0.1 was bound by the effective host
+            assert proc.poll() is None  # still serving -> real bind
+        finally:
+            proc.terminate()
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
 
 
 # --------------------------------------------------------------------------- #

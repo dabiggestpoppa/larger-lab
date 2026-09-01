@@ -38,8 +38,22 @@ def _pick_eligible(client) -> str:
     return jobs[0]
 
 
+def _default_cp_url() -> str:
+    """Canonical loopback CP URL from the gated effective config (B4-R3R2).
+
+    The outbound worker's control-plane target is derived from the same
+    validated host/port the durable API actually binds — never a stale hard-
+    coded 8080 default that diverges from the effective config.
+    """
+    from oce_control.config_startup import require_startable
+    eff = require_startable()
+    host = eff.get("control_plane.host")
+    port = int(eff.get("control_plane.port"))
+    return f"http://{host}:{port}"
+
+
 def main() -> int:
-    url = os.environ.get("OCE_CP_URL", "http://127.0.0.1:8080")
+    url = os.environ.get("OCE_CP_URL") or _default_cp_url()
     worker_id = os.environ.get("OCE_WORKER_ID", "worker-local01")
     secret = os.environ["OCE_WORKER_SECRET"]
     # Optional job_file for self-contained unit runs; when absent the worker

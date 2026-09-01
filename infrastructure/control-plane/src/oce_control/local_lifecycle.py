@@ -38,7 +38,17 @@ PYTHON = sys.executable or "python3"
 
 API_MARKER = "oce_control.http_api"
 WORKER_MARKER = "oce_control.worker_loop"
-API_PORT = int(os.environ.get("OCE_API_PORT", "8080"))
+
+
+def effective_api_port(environ: dict | None = None) -> int:
+    """Canonical runtime HTTP port from the gated effective config (B4-R3R2).
+
+    The lifecycle smoke/console paths use the SAME validated config the API
+    binds, so the reported console URL always matches the actual listener.
+    There is deliberately no legacy ``OCE_API_PORT``/8080 default here.
+    """
+    from oce_control.config_startup import require_startable
+    return int(require_startable(environ).get("control_plane.port"))
 
 # name -> (pid file, cmdline marker expected in the process args)
 PROCESSES = {
@@ -316,7 +326,8 @@ def migrate(dsn: str | None = None) -> subprocess.CompletedProcess:
                           text=True, timeout=300)
 
 
-def http_ok(path: str, port: int = API_PORT) -> bool:
+def http_ok(path: str, port: int | None = None) -> bool:
+    port = port if port is not None else effective_api_port()
     url = f"http://127.0.0.1:{port}{path}"
     try:
         with urllib.request.urlopen(url, timeout=10) as resp:
@@ -557,7 +568,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "start":
             for a in start(timeout_s=args.timeout, migrate_now=not args.no_migrate):
                 print(f"==> {a}")
-            print(f"==> console at http://127.0.0.1:{API_PORT}/console")
+            print(f"==> console at http://127.0.0.1:{effective_api_port()}/console")
             return 0
         if args.command == "migrate":
             r = migrate()

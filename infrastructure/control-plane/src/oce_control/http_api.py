@@ -302,6 +302,29 @@ def create_app(api: ControlPlaneAPI, scheduler=None,
     return app
 
 
+def runtime_bind(environ: Optional[dict] = None) -> tuple:
+    """Return the (host, port) the durable service MUST bind (B4-R3R2).
+
+    The answer comes ONLY from the gated, validated effective config — never
+    from a separate legacy env read. Direct ``python -m oce_control.http_api``
+    and lifecycle-launched servers therefore produce the SAME effective
+    posture; the runtime never validates one port and binds another. Raises
+    SystemExit (fail closed) before any bind when the effective config is
+    invalid/forbidden.
+    """
+    from .config_startup import require_startable
+    eff = require_startable(environ)
+    host = eff.get("control_plane.host")
+    port = int(eff.get("control_plane.port"))
+    return host, port
+
+
+def runtime_scheduler_interval(environ: Optional[dict] = None) -> int:
+    """Scheduler tick interval from the gated effective config (B4-R3R2)."""
+    from .config_startup import require_startable
+    return int(require_startable(environ).get("control_plane.scheduler_interval"))
+
+
 def build_durable_app(*, dsn: Optional[str] = None, scheduler_tick_interval: int = 5) -> FastAPI:
     """Wire the durable components (PG store, PG scheduler, PG worker
     protocol, health) into the API and return a ready FastAPI app.
@@ -359,9 +382,13 @@ def build_durable_app(*, dsn: Optional[str] = None, scheduler_tick_interval: int
 
 
 if __name__ == "__main__":
+    # B4-R3R2: the durable HTTP service consumes the VALIDATED EFFECTIVE
+    # CONFIG for its bind host/port and scheduler interval. There is no
+    # separate legacy path that can bind 8080 behind the spine's back — the
+    # gate runs first (require_startable) and refuses activation on any
+    # malformed / incomplete / forbidden effective config.
     import uvicorn
-    interval = int(os.environ.get("OCE_SCHEDULER_INTERVAL", "5"))
+    host, port = runtime_bind()
+    interval = runtime_scheduler_interval()
     app = build_durable_app(scheduler_tick_interval=interval)
-    uvicorn.run(app, host="127.0.0.1",
-                port=int(os.environ.get("OCE_API_PORT", "8080")),
-                log_level="info")
+    uvicorn.run(app, host=host, port=port, log_level="info")
