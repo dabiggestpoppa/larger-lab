@@ -32,6 +32,8 @@ import secrets
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
+from oce_control.audit_sink import DurableAuditSink  # noqa: E402
+
 
 # --------------------------------------------------------------------------- #
 # Sensitive value semantics
@@ -882,8 +884,15 @@ class ConfigAuthorization:
 
     @property
     def audit_durable(self) -> bool:
-        """True ONLY when an append-only durable sink is attached."""
-        return self._durable_sink is not None
+        """True ONLY when a PROVEN durable sink is attached.
+
+        B4-CXR4R5: durability is a proven property — isinstance() of the
+        approved DurableAuditSink contract AND proven() at this moment. A
+        Python list or any duck-typed .append() object is NOT durable, and a
+        non-proven sink is never treated as durable.
+        """
+        return (isinstance(self._durable_sink, DurableAuditSink)
+                and self._durable_sink.proven())
 
     def can_mutate(self, actor: str, setting: Setting) -> bool:
         # policy-owned settings are not mutated by operators; only operator /
@@ -928,23 +937,53 @@ class ConfigAuthorization:
             target=setting_name,
             previous=effective.get(setting_name, None), new=new_value,
             authorized=True, durable=self.audit_durable)
-        self._audit.append(entry)
-        if self._durable_sink is not None:
-            # B4-CXR3R6: append-only durable record with SAFE values only
-            # (previous/new are redacted; sensitive settings never reach here)
-            self._durable_sink.append({
-                "actor": actor,
-                "setting": setting_name,
-                "previous": redact_value(setting_name,
-                                          effective.get(setting_name, None)),
-                "new": redact_value(setting_name, new_value),
-                "reason": reason,
-                "decision": "granted",
-                "timestamp": entry.timestamp,
-                "authorized": True,
-                "durable": True,
-            })
+        if self.audit_durable:
+            # B4-CXR4R5: append-only durable record with SAFE values only
+            # (previous/new are redacted; sensitive settings never reach
+            # here). A failed durable commit FAILS THE OVERRIDE CLOSED and
+            # leaves NO record — not even in the in-memory helper list.
+            try:
+                self._durable_sink.append({
+                    "actor": actor,
+                    "setting": setting_name,
+                    "requested_change": requested_change,
+                    "previous": redact_value(setting_name,
+                                              effective.get(setting_name, None)),
+                    "new": redact_value(setting_name, new_value),
+                    "reason": reason,
+                    "decision": "granted",
+                    "timestamp": entry.timestamp,
+                    "authorized": True,
+                    "durable": True,
+                })
+            except Exception as exc:
+                raise RuntimeError(
+                    "durable override audit append FAILED — override NOT "
+                    "applied (fail closed, B4-CXR4R5)") from exc
+        self._audit.append(entry)  # in-memory helper record (non-authoritative)
         return new_value
+
+    def operator_override_durable(
+            self, effective: EffectiveConfig, *, actor: str,
+            setting_name: str, requested_change: str,
+            reason: str, new_value: object) -> object:
+        """CANONICAL override path — requires PROVEN durability.
+
+        An authoritative configuration override must be attributable in an
+        append-only durable ledger. Without a PROVEN durable sink attached
+        this BLOCKS (fail closed): durability is never claimed, never
+        duck-typed (B4-CXR4R5). On success the record is transaction-
+        committed; a failed commit raises and the override is not applied.
+        """
+        if not self.audit_durable:
+            raise RuntimeError(
+                "no PROVEN durable audit sink attached — authoritative "
+                "configuration override BLOCKED; durable means demonstrably "
+                "persistent, never just non-null (B4-CXR4R5)")
+        return self.operator_override(
+            effective, actor=actor, setting_name=setting_name,
+            requested_change=requested_change, reason=reason,
+            new_value=new_value)
 
     @property
     def audit(self) -> list[OverrideAudit]:

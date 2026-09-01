@@ -1145,23 +1145,19 @@ class TestCXR3R6OverrideAuditTruth:
         # no durable truth is claimed for the in-process helper
         assert authz.audit[0].durable is False
 
-    def test_durable_sink_attached_marks_entries_durable(self):
+    def test_list_sink_is_not_durable(self):
+        # CXR4R5 truth repair: a Python list with .append() is NOT a durable
+        # sink — audit_durable stays False and no durable truth is claimed.
         reg = build_default_registry()
         sink: list[dict] = []
         authz = ConfigAuthorization(reg, durable_sink=sink)
-        assert authz.audit_durable is True
+        assert authz.audit_durable is False
         eff = ConfigResolver(reg).resolve(HAPPY)
         authz.operator_override(
             eff, actor="operator:po", setting_name="control_plane.port",
             requested_change="x", reason="r", new_value="9124")
-        assert authz.audit[0].durable is True
-        assert len(sink) == 1
-        rec = sink[0]
-        assert rec["actor"] == "operator:po"
-        assert rec["setting"] == "control_plane.port"
-        assert rec["decision"] == "granted"
-        assert rec["durable"] is True
-        assert rec["timestamp"]
+        assert authz.audit[0].durable is False
+        assert sink == []  # nothing was claimed/persisted as durable
 
     def test_durable_sink_never_contains_secret_values(self):
         reg = build_default_registry()
@@ -1408,3 +1404,145 @@ class TestR3R1SourceProvenance:
         eff = cs.effective_from_env({"OCE_SCHEDULER_INTERVAL": "17"})
         assert eff.get("control_plane.scheduler_interval") == 17
         assert eff.provenance["control_plane.scheduler_interval"] == "environment"
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR4R5 (CXR4-06) — audit durability is a PROVEN property: a Python list
+# or a duck-typed .append() object is NEVER durable; the canonical override
+# path requires a proven append-only durable sink and fails closed otherwise.
+# --------------------------------------------------------------------------- #
+class _FakeCursor:
+    def __init__(self, conn):
+        self._conn = conn
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def execute(self, sql, params=None):
+        self._conn.executes.append((sql, params))
+
+    def fetchone(self):
+        return (1,) if self._conn.rows is None else (self._conn.rows[0] if self._conn.rows else None)
+
+    def fetchall(self):
+        return list(self._conn.rows or [])
+
+
+class _FakeConn:
+    """Minimal psycopg2-shaped connection for unit-level sink proofs."""
+
+    def __init__(self, fail_commit=False, rows=None):
+        self.executes: list = []
+        self.committed = 0
+        self.fail_commit = fail_commit
+        self.rows = rows
+
+    def cursor(self):
+        return _FakeCursor(self)
+
+    def commit(self):
+        if self.fail_commit:
+            raise RuntimeError("commit failed")
+        self.committed += 1
+
+    def rollback(self):
+        pass
+
+
+class TestCXR4R5ProvenAuditDurability:
+    def _authz(self, sink):
+        return ConfigAuthorization(build_default_registry(), durable_sink=sink)
+
+    def test_fake_append_object_is_not_durable(self):
+        class FakeAppend:
+            def __init__(self):
+                self.records = []
+
+            def append(self, record):
+                self.records.append(record)
+
+        authz = self._authz(FakeAppend())
+        assert authz.audit_durable is False  # duck-typed append != durability
+
+    def test_proven_postgres_sink_marks_entries_durable(self):
+        from oce_control.audit_sink import PostgresAuditSink
+        conn = _FakeConn()
+        sink = PostgresAuditSink(conn)
+        authz = self._authz(sink)
+        assert authz.audit_durable is True  # isinstance + proven()
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        authz.operator_override(
+            eff, actor="operator:po", setting_name="control_plane.port",
+            requested_change="x", reason="r", new_value="9124")
+        assert authz.audit[0].durable is True
+        assert conn.committed >= 1  # transaction commit confirmation
+        assert any("config_override_audit" in sql for sql, _ in conn.executes)
+
+    def test_canonical_durable_override_blocked_without_proven_sink(self):
+        reg = build_default_registry()
+        eff = ConfigResolver(reg).resolve(HAPPY)
+        # no sink at all
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            self._authz(None).operator_override_durable(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9125")
+        # a LIST is still not a proven durable sink
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            self._authz([]).operator_override_durable(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9125")
+        # a duck-typed append object is still not proven
+        class FakeAppend:
+            def append(self, record):
+                pass
+
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            self._authz(FakeAppend()).operator_override_durable(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9125")
+
+    def test_durable_commit_failure_fails_override_closed(self):
+        from oce_control.audit_sink import PostgresAuditSink
+        conn = _FakeConn(fail_commit=True)
+        sink = PostgresAuditSink(conn)
+        authz = self._authz(sink)
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        with pytest.raises(RuntimeError, match="FAILED"):
+            authz.operator_override_durable(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9126")
+        assert authz.audit == []  # no record — not even in-memory
+
+    def test_denied_and_sensitive_overrides_write_zero_durable_records(self):
+        from oce_control.audit_sink import PostgresAuditSink
+        conn = _FakeConn()
+        authz = self._authz(PostgresAuditSink(conn))
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        with pytest.raises(PermissionError):
+            authz.operator_override_durable(
+                eff, actor="hermes", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9127")
+        with pytest.raises(PermissionError):
+            authz.operator_override_durable(
+                eff, actor="operator", setting_name="postgres.password_ref",
+                requested_change="x", reason="r", new_value="secret:other")
+        assert not any("INSERT INTO config_override_audit" in sql
+                       for sql, _ in conn.executes)
+        assert authz.audit == []
+
+    def test_postgres_sink_read_back_restart_proof(self):
+        # reload/read-back: a fresh sink over the same connection returns the
+        # committed ledger (container CI proves real PostgreSQL persistence)
+        from oce_control.audit_sink import PostgresAuditSink
+        row = ("a1", "operator:po", "control_plane.port", "x", "r",
+               "8448", "9124", "granted", True, "2026-01-01T00:00:00Z")
+        conn = _FakeConn(rows=[row])
+        sink = PostgresAuditSink(conn)
+        back = sink.read_back()
+        assert len(back) == 1
+        assert back[0]["actor"] == "operator:po"
+        assert back[0]["setting"] == "control_plane.port"
+        assert back[0]["authorized"] is True
