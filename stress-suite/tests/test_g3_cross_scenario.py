@@ -293,7 +293,11 @@ def test_all_four_scenarios_run_under_the_same_policy_object():
         pack = load_g3_pack(ROOT / d)
         res = _run(pack)
         assert res.artifacts["policy_id"] == "G3_COGNITIVE_ECOLOGY_POLICY"
-        assert res.artifacts["policy_version"] == "V1"
+        # G3R legacy upgrade: V1 -> V2 — the ONE shared policy gained generic
+        # correlation-risk friction (no exposure required) and the
+        # consensus-strength counter-attractor gate. Still ONE shared policy
+        # driving all four scenarios; the version records the semantic change.
+        assert res.artifacts["policy_version"] == "V2"
 
 
 def test_health_record_is_a_vector_not_a_scalar():

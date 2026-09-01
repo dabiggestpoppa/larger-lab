@@ -48,7 +48,11 @@ def test_high_consequence_review_triggers_friction():
     res = _run()
     a = res.artifacts
     assert a["friction_triggered"] is True
-    assert a["friction_rule"] == "eco.friction.context_correlation"
+    # G3R-04 legacy upgrade: the shared friction rule was renamed from
+    # eco.friction.context_correlation to eco.friction.correlation_risk because
+    # correlation risk is now generic (shared-axis concentration triggers even
+    # at zero prior-conclusion exposure) — a blind monoculture is a monoculture.
+    assert a["friction_rule"] == "eco.friction.correlation_risk"
     assert a["friction_result"]["budget_used"] >= 1
 
 

@@ -180,13 +180,23 @@ def test_no_self_referential_terminal_pin_in_g3_receipt_semantics():
 
 
 def test_p0_axes_distinct_in_pairwise_graph():
-    """Pairwise overlap distinguishes source vs model axes explicitly."""
+    """Pairwise overlap distinguishes source vs model axes explicitly.
+
+    G3R-08 legacy upgrade: overlaps were booleans (True/False). A boolean False
+    could be misread as either "distinct" OR "unknown". Replaced with the
+    tri-state SAME / DIFFERENT / UNKNOWN — P1 and P2 use disjoint known sources
+    (DIFFERENT) while sharing model family and runtime (SAME).
+    Old assertion: overlaps["source_lineage"] is False.
+    Why invalid: unknown-vs-known could not be represented; missing metadata
+    must never mint favorable independence.
+    Replacement: tri-state relation asserted below.
+    """
     profiles = [
         _profile("P1", sources=["S_1"], model_family="FAM_M", runtime_lineage="RT_1"),
         _profile("P2", sources=["S_2"], model_family="FAM_M", runtime_lineage="RT_1"),
     ]
     graph = DependencyGraph.build(profiles)
     pair = graph.pairs[0]
-    assert pair.overlaps["source_lineage"] is False
-    assert pair.overlaps["model_family"] is True
-    assert pair.overlaps["runtime_lineage"] is True
+    assert pair.overlaps["source_lineage"] == "DIFFERENT"
+    assert pair.overlaps["model_family"] == "SAME"
+    assert pair.overlaps["runtime_lineage"] == "SAME"
