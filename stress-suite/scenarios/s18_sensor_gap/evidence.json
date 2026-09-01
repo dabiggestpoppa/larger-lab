@@ -1,0 +1,9 @@
+[
+  {
+    "record_id": "EV_S18_SENSOR",
+    "kind": "OBSERVATION",
+    "claim": "aggressor-flow sensor passed Bloc-2 capability probe with verified history depth 12m",
+    "lineage": "SF_CAPABILITY_PROBE_L3",
+    "seq": 0
+  }
+]
