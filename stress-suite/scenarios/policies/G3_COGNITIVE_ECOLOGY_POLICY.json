@@ -1,8 +1,8 @@
 {
   "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
-  "version_tag": "V1",
+  "version_tag": "V2",
   "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
-  "authority_basis": "ONE shared, scenario-agnostic cognitive-ecology policy drives the entire cognitive-ecology scenario family. Rules inspect ONLY generic ecology properties (consequence class, lineage/model/runtime/retrieval diversity, concentrations, prior-conclusion exposure, fresh-context counts, independent replication, discriminating-contradiction state, challenge budget). No scenario id, no reviewer literals, no expected conclusions, no hidden ground truth. Dispositions are test-only epistemic states, NOT new A-009 lifecycle states.",
+  "authority_basis": "ONE shared, scenario-agnostic cognitive-ecology policy drives the entire cognitive-ecology scenario family. Rules inspect ONLY generic ecology properties (consequence class, lineage/model/runtime/retrieval diversity, concentrations, consensus-strength vote topology, prior-conclusion exposure, fresh-context and independent-design counts, independent replication, discriminating-contradiction state, challenge budget). No scenario id, no reviewer literals, no expected conclusions, no hidden ground truth. Dispositions are test-only epistemic states, NOT new A-009 lifecycle states. V2 (G3R): correlation risk is generic — concentration on any shared axis triggers friction even at zero prior-conclusion exposure (a blind monoculture is still a monoculture); counter-attractor strong-consensus requires actual dominant-vote concentration, not reviewer count.",
   "rules": [
     {"rule_id": "eco.disposition.correlated", "kind": "disposition",
      "when": {"consequence_class": {"in": ["HIGH", "MEDIUM"]},
@@ -23,20 +23,30 @@
      "when": {"consequence_class": "LOW"},
      "then": {"disposition": "TASK_OPTIMIZATION_OK"},
      "rationale": "low-consequence task may use the cheapest admissible path; independence is a constraint, not universal maximization"},
-    {"rule_id": "eco.friction.context_correlation", "kind": "friction",
+    {"rule_id": "eco.friction.correlation_risk", "kind": "friction",
      "when": {"consequence_class": {"in": ["HIGH", "MEDIUM"]},
-              "prior_conclusion_exposure_ratio": {"gt": 0.0}},
+              "any_of": [
+                {"source_concentration": {"gte": 0.6}},
+                {"model_family_concentration": {"gte": 0.6}},
+                {"retrieval_concentration": {"gte": 0.6}},
+                {"prior_conclusion_exposure_ratio": {"gt": 0.0}}
+              ]},
      "then": {"trigger": true},
-     "rationale": "shared-context convergence under prior-conclusion exposure demands a bounded fresh-context check; friction is triggered by correlation risk, not by disagreement"},
+     "rationale": "G3R-04: correlation risk is GENERIC — concentration on any shared axis (source/model/retrieval) OR prior-conclusion exposure demands a bounded check at high consequence; prior-conclusion exposure is NOT required for correlation to exist. A blind monoculture is still a monoculture. Friction is triggered by correlation risk, never by disagreement alone."},
     {"rule_id": "eco.friction.no_correlation", "kind": "friction",
-     "when": {"prior_conclusion_exposure_ratio": {"eq": 0.0}},
+     "when": {"consequence_class": {"in": ["HIGH", "MEDIUM"]},
+              "source_concentration": {"lt": 0.6},
+              "model_family_concentration": {"lt": 0.6},
+              "retrieval_concentration": {"lt": 0.6},
+              "prior_conclusion_exposure_ratio": {"eq": 0.0}},
      "then": {"trigger": false},
-     "rationale": "no shared-context exposure -> no epistemic-friction trigger"},
+     "rationale": "G3R-04: no shared-axis concentration and no prior-conclusion exposure -> no epistemic-friction trigger"},
     {"rule_id": "eco.counter_attractor.strong_consensus", "kind": "counter_attractor",
      "when": {"independent_confirmation_satisfied": true,
               "consequence_class": {"in": ["HIGH", "MEDIUM"]},
-              "raw_reviewer_count": {"gte": 5}},
+              "raw_reviewer_count": {"gte": 5},
+              "dominant_vote_ratio": {"gt": 0.6}},
      "then": {"trigger": true},
-     "rationale": "a strong, independently-supported consensus warrants a BOUNDED adversarial check; an honest NO_CHANGE is a success and never manufactures dissent"}
+     "rationale": "G3R-03: strong consensus means ACTUAL vote concentration STRICTLY above 0.6 (dominant_vote_ratio > 0.6), not mere reviewer count — a 3/2 split among five reviewers (ratio exactly 0.6) is not strong consensus, and duplicate correlated votes create no independent support. A strong, independently-supported consensus warrants a BOUNDED adversarial check; an honest NO_CHANGE is a success and never manufactures dissent."}
   ]
 }

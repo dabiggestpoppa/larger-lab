@@ -26,12 +26,16 @@ RULE_KINDS = ("disposition", "friction", "counter_attractor")
 KNOWN_FIELDS = {
     "consequence_class",
     "raw_reviewer_count",
+    "dominant_vote_count",
+    "dominant_vote_ratio",
+    "distinct_conclusion_count",
     "distinct_source_lineages",
     "distinct_model_family_count",
     "distinct_runtime_lineage_count",
     "distinct_retrieval_bundle_count",
     "distinct_allocator_count",
     "distinct_experiment_design_count",
+    "independently_originated_design_count",
     "source_concentration",
     "model_family_concentration",
     "retrieval_concentration",
@@ -46,6 +50,9 @@ KNOWN_FIELDS = {
     "independent_confirmation_satisfied",
     "sufficient_differentiation",
 }
+
+# structural condition keys (not facts) — allow OR/AND grouping in `when`
+STRUCTURAL_KEYS = {"any_of", "all_of"}
 
 
 class EcologyPolicyError(ValueError):
@@ -95,7 +102,10 @@ class EcologyRule:
         if kind not in RULE_KINDS:
             raise EcologyPolicyError(f"rule {data.get('rule_id', '?')}: unknown kind {kind!r}")
         when = dict(data.get("when", {}))
-        unknown = set(when) - KNOWN_FIELDS
+        unknown = set(when) - KNOWN_FIELDS - STRUCTURAL_KEYS
+        for skey in ("any_of", "all_of"):
+            for block in when.get(skey, []):
+                unknown |= set(block) - KNOWN_FIELDS
         if unknown:
             raise EcologyPolicyError(
                 f"rule {data.get('rule_id', '?')}: conditions on non-generic fields {sorted(unknown)}"
@@ -145,12 +155,30 @@ class EcologyPolicy:
                                  self.to_dict(), length=24)
 
     # ------------------------------------------------------------------ #
+    @staticmethod
+    def _when_ok(when: Mapping[str, Any], facts: Mapping[str, Any]) -> bool:
+        for field, cond in when.items():
+            if field == "any_of":
+                if not any(
+                    all(_condition_ok(c2, facts.get(f2)) for f2, c2 in block.items())
+                    for block in cond
+                ):
+                    return False
+            elif field == "all_of":
+                for block in cond:
+                    if not all(_condition_ok(c2, facts.get(f2)) for f2, c2 in block.items()):
+                        return False
+            else:
+                if not _condition_ok(cond, facts.get(field)):
+                    return False
+        return True
+
     def evaluate(self, facts: Mapping[str, Any], kind: str) -> Optional[EcologyRule]:
         """First matching rule of `kind` in declared order (deterministic)."""
         for rule in self.rules:
             if rule.kind != kind:
                 continue
-            if all(_condition_ok(cond, facts.get(field)) for field, cond in rule.when.items()):
+            if self._when_ok(rule.when, facts):
                 return rule
         return None
 
