@@ -37,3 +37,50 @@ Builder). Field names and precedence below are derived from the mission inventor
 - B4-R5: network posture + live-order denial + billable cloud gates
 - B4-R6: adversarial matrix + regression wiring + dedicated CI
 - B4-R7: authoritative execution, evidence archive, evidence-only commit
+
+---
+
+## ACTUAL IMPLEMENTATION LEDGER / SUPERSEDING MILESTONE STATUS (B4-R3R7)
+
+*The section above preserves the original planning sequence as historical
+intent. It does NOT describe what shipped. The ledger below is the truth;
+never infer completed scope from commit labels alone.*
+
+### Superseding implementation history
+
+| Planned milestone | Actual commit | Actual scope | Remaining scope | Reason for deviation | Evidence status |
+|---|---|---|---|---|---|
+| R1 registry/startup | `d793f36b` B4-R1 | canonical settings registry + ownership + fail-closed resolution | — | planning intent | superseded by R3R repairs |
+| R2 precedence/fingerprint | `14da06f8` B4-R2 | surfaces A-J spine tests (95) | — | planning intent | superseded by R3R repairs |
+| R3 secret lifecycle | `a58671b4` B4-R3 | startup gate hooked into ControlPlane/lifecycle/doctor | — | startup gate took priority | superseded (fabricated-ref defect) |
+| (unplanned) B4-R4 | `4624ec38` B4-R4 | config-spine CI category + dedicated workflow | — | completed before B4-R3R mission arrived | active (provisional) |
+| R3R1 provenance + namespace | `488f1699` B4-R3R1 | env!=file provenance; governed OCE_* namespace; input inventory | — | independent review of B4-R3 | active |
+| R3R2 runtime convergence | `fdcbf34b` B4-R3R2 | host/port + scheduler interval from effective config; every entrypoint gated | — | split-brain repair | active |
+| R3R3 secret storage | `f9b85f5d` B4-R3R3 | RuntimeSecretBackend; config-vs-runtime start split; unbacked refs fail closed | — | fabricated-ref removal | active |
+| R3R4 DB binding | `518c4e01` B4-R3R4 | governed DSN derivation; POSTGRES_DSN bypass denied | — | secret-boundary convergence | active |
+| R3R5 fingerprints | `dde36795` B4-R3R5 | config-identity + security-state fingerprints | — | blind-fingerprint defect | active |
+| R3R6 redaction | `9eb926eb` B4-R3R6 | cand-error no-echo validation; canonical redaction primitive | — | error-path leakage defect | active |
+| R3R7 ledger | (this commit) B4-R3R7 | acceptance matrix / implementation ledger | — | Defect R-10 | active |
+| R4 authorization/override audit | covered in code + suite since B4-R2 | `ConfigAuthorization` boundary; operator_override audit tests exist in `test_b4_config_spine` (surface F) | not yet isolated as a dedicated closure milestone / evidence artifact | original milestone ordering folded into B4-R2 spine suite | partially (tests green; milestone-level evidence artifact pending) |
+| R5 network/live/cloud gates | not started as isolated milestone | — | deny surfaces implemented inside spine `validate_effective` + R3R2 runtime gate; dedicated gate milestone outstanding | folded into earlier milestones | open |
+| R6 adversarial/regression + CI | partially | — | dedicated B4 workflow pushed; full adversarial matrix + authoritative CI run pending | workflow landed in B4-R4 | open |
+| R7 authoritative evidence | not started | — | authoritative run, artifact archive, evidence-only commit | — | open |
+
+### Superseding milestone status
+
+- **Book 4 status:** `IN_PROGRESS / CLOSURE_REPAIR` (post-B4-R3R sequence)
+- **B4-R1..R4 commits:** preserved exactly as historical evidence; scope claims
+  above reflect what they actually contain, not what the old milestone names
+  suggested.
+- **Known open items before book close:**
+  1. R6-op: full adversarial matrix execution under the dedicated B4 workflow
+     (currently only provisional workflow + registry wiring exist; the R3R
+     adversarial proofs live in the local B4 suite classes TestR3R*).
+  2. R7-op: authoritative CI evidence, artifact download + hashing, provenance
+     record, evidence-only commit.
+  3. Secret-leak scan over src/tests/scripts for the B4 canary + any committed
+     fixture material.
+  4. Registry regeneration from actual collection (new B4 test classes added
+     across the R3R sequence) before the authoritative CI run.
+  5. Final acceptance re-check: source cleanliness, cleanup evidence, cloud
+     mutations=0, cost=$0, main=7e7ef722 untouched.
