@@ -1,0 +1,17 @@
+{
+  "records": [
+    {"record_id": "E1", "kind": "OBSERVATION", "claim": "M_A reliability dips below historical band", "lineage": "LINEAGE_A"},
+    {"record_id": "E2", "kind": "OBSERVATION", "claim": "isolated strategy failures; implementation checks pass", "lineage": "LINEAGE_A"},
+    {"record_id": "E_IMPL", "kind": "DETERMINISTIC", "claim": "implementation checks pass; no code-level fault", "lineage": "CONTROL_PLANE"},
+    {"record_id": "E_DATA", "kind": "DETERMINISTIC", "claim": "data checks pass; no ingestion fault", "lineage": "CONTROL_PLANE"},
+    {"record_id": "E4", "kind": "OBSERVATION", "claim": "reliability decline resumes after recovery", "lineage": "LINEAGE_A"},
+    {"record_id": "E5", "kind": "OBSERVATION", "claim": "reliability grade HIGH; single contradiction lineage", "lineage": "LINEAGE_A"},
+    {"record_id": "E6A", "kind": "INDEPENDENT_CONFIRMATION", "claim": "lineage A independently reproduces contradiction", "lineage": "LINEAGE_A"},
+    {"record_id": "E6B", "kind": "INDEPENDENT_CONFIRMATION", "claim": "lineage B independently reproduces contradiction", "lineage": "LINEAGE_B"},
+    {"record_id": "E7A", "kind": "INDEPENDENT_CONFIRMATION", "claim": "both lineages persist; implementation/data fault implausible", "lineage": "LINEAGE_A|B"},
+    {"record_id": "E7B", "kind": "INDEPENDENT_CONFIRMATION", "claim": "exception/override burden grows under same causal signature", "lineage": "LINEAGE_A|B"},
+    {"record_id": "E8", "kind": "OBSERVATION", "claim": "patch pressure L2 recurring; tuning does not suppress", "lineage": "CONTROL_PLANE"},
+    {"record_id": "E9", "kind": "OBSERVATION", "claim": "structural contradiction persists at L3 patch pressure", "lineage": "LINEAGE_A|B"},
+    {"record_id": "E_MB", "kind": "DETERMINISTIC", "claim": "replacement mechanism M_B validated across M_A condition space", "lineage": "RESEARCH_VALIDATION"}
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "records": {
+    "@M_A": {"state": "SUPERSEDED", "provenance_retained": true, "reopen_path": "SUPERSEDED -> CANDIDATE", "note": "not deleted; regime evidence reconstructable"},
+    "@M_B": {"state": "ACTIVE", "provenance_retained": true, "note": "adopted replacement"}
+  }
+}
