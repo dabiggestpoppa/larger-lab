@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I01 — STORAGE MODELS + ENUMS (proposed PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN; BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED / FROZEN via SENSOR-B3-I11R1-RATIFY; BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; typed storage vocabulary only — NO persistence, NO backend, NO network) |
+| Current checkpoint | SENSOR-B4-I01R1 COMPLETE — PROJECTION VERSION + T0 LINEAGE + DATE-BASIS SEAL (proposed PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED; then operator may accept PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN.  Five I01 defects sealed: (A) projection_schema_version int → strict MAJOR.MINOR.PATCH semver str; (B) T0B MUST carry >=1 unique T0A source blob, RawNormalizationBatch requires source + acquisition lineage; (C) PartitionManifest date_basis default EVENT_TIME → UNKNOWN (no inference); (D) SHA syntax + duplicate-ref fail-closed on ALL T0A hash surfaces; (E) projection/manifest min>max rejected, one-sided bounds allowed.  STORAGE_MODEL_CONTRACTS_READY=TRUE; T0A/T0B/ATOMIC_BACKEND/MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; no persistence/backend/network; next SENSOR-B4-I02 NOT started) |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN (SENSOR-B3-I11R1-RATIFY: PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED = OPERATOR_ACCEPTED, PASS_BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED, BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS, REAL_PROVIDER_ADAPTERS=4, PRODUCTION_PATHS=17/17, PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18; authorized SENSOR-B4-I01 STORAGE MODELS + ENUMS ONLY); BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; Bloc 4 I01 in progress — typed storage vocabulary only, no persistence yet |
@@ -131,8 +131,11 @@ that is updated at every staged checkpoint.
 | SENSOR-B4-I01A | (this commit) | 18 (storage enums) | 0 |
 | SENSOR-B4-I01B | (next commit) | 48 (storage models validation) | 0 |
 | SENSOR-B4-I01C | (next commit) | 12 (deterministic serialization + Bloc 3 handoff) | 0 |
-| SENSOR-B4-I01D | (next commit) | 0 (evidence/ledger) | — |
-| cumulative | 1457 | 1457 | 0 |
+| SENSOR-B4-I01D | 6d0f23d9 | 0 (evidence/ledger) | — |
+| SENSOR-B4-I01R1A | (this commit) | (semver + lineage contract seal; full-suite cumulative first at I01R1C) | — |
+| SENSOR-B4-I01R1B | (next commit) | 37 (date-basis/hash-ref/timestamp adversarial tests) | 0 |
+| SENSOR-B4-I01R1C | (next commit) | 0 (seal evidence/ledger) | — |
+| cumulative | 1494 | 1494 | 0 |
 
 ## External / provider blockers
 
@@ -219,6 +222,36 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B4-I01R1 COMPLETE — PROJECTION VERSION + T0 LINEAGE + DATE-BASIS SEAL
+  (proposed `PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED`, then operator
+  acceptance of `PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN`).  Five narrow
+  contract defects sealed BEFORE hashes/paths/IDs depend on them:
+  - **(A) semver:** `projection_schema_version` int -> strict
+    `MAJOR.MINOR.PATCH` string (1.0.0/1.1.0/2.0.0 accepted; 1, v1, 1.0,
+    prerelease, leading zeros, negatives rejected) on BOTH
+    RawProjectionArtifact and RawNormalizationBatch; canonical JSON
+    serializes the version as a string; no auto-bump logic.
+  - **(B) T0 lineage:** RawProjectionArtifact.source_blob_sha256 requires
+    >=1 unique T0A hash (`[]` rejected); RawNormalizationBatch requires
+    >=1 source blob AND >=1 acquisition ref (no source-less normalization
+    batch).
+  - **(C) date basis:** PartitionManifest.date_basis default EVENT_TIME ->
+    UNKNOWN; caller must explicitly assert EVENT_TIME/PROVIDER_FILE_DATE/
+    SNAPSHOT_TIME; no inference from dates/provider/sensor.
+  - **(D) hash refs:** 64-lowercase-hex syntax + duplicate rejection on all
+    T0A SHA surfaces (blob, acquisition, projection source, lineage, manifest
+    blob_refs, result blob_refs, batch source refs, source revision, job
+    last-committed); non-SHA refs untouched.
+  - **(E) timestamp order:** projection min/max_provider_time and manifest
+    min/max_time fail closed when inverted; one-sided bounds remain valid
+    (absent side never fabricated).
+  Schema version != parser version != adapter version preserved.  All 16
+  model names retained; no public API expansion.  Storage tests 115 (37
+  new); full suite 1494 passed / 0 failed / 1 skipped; ruff clean;
+  changed-scope mypy clean; network 0; storage writes 0; provider code
+  unchanged; original I01 evidence preserved (chronology: I01 -> operator
+  review -> I01R1).  Evidence:
+  `evidence/bloc_04/BLOC_04_I01R1_LINEAGE_SCHEMA_SEAL_EVIDENCE.md`.
 - SENSOR-B4-I01 COMPLETE — STORAGE MODELS + ENUMS (proposed
   `PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN`).  Bloc 3 ratified + frozen
   (SENSOR-B3-I11R1-RATIFY: I11R1 seal + Bloc 3 implementation OPERATOR_ACCEPTED;
