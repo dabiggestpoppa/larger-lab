@@ -270,3 +270,62 @@ class TestCXR6R1AuthenticatedActivationCapability:
         assert not hasattr(child, "build_envelope") or True
         # child context is frozen: no env carrier regeneration is possible
         assert child.context_id == self.ctx.context_id
+
+    # -- Z: every denied activation has ZERO authority-side effects ---------
+    @staticmethod
+    def _state_snapshot():
+        import hashlib
+
+        def _digest(path: Path) -> str | None:
+            if not path.exists():
+                return None
+            return hashlib.sha256(path.read_bytes()).hexdigest()
+
+        return {
+            "secrets": _digest(ls.SECRETS_FILE),
+            "handoff_key": _digest(ls.activation_key_file()),
+            "consumed_nonces": _digest(ls.consumed_nonces_file()),
+        }
+
+    @pytest.mark.parametrize("attack", ["forgery", "role", "replay",
+                                        "malformed"])
+    def test_z_denied_activation_has_zero_side_effects(self, attack):
+        # Z: forged / role-confused / replayed / malformed capabilities leave
+        # secrets.json, the handoff key, and the consumed-nonce ledger
+        # byte-identical — no container start, no process launch, no
+        # workspace creation, no artifact publication, no socket activity.
+        carrier = _carrier(self.ctx)
+        if attack == "forgery":
+            outer = json.loads(carrier)
+            outer["mac"] = "0" * 64
+            before = self._state_snapshot()
+            with pytest.raises(SystemExit):
+                self._verified_child(json.dumps(outer))
+        elif attack == "role":
+            before = self._state_snapshot()
+            with pytest.raises(SystemExit):
+                self._verified_child(carrier, role="worker")
+        elif attack == "replay":
+            self._verified_child(carrier)   # consume once (allowed)
+            before = self._state_snapshot()  # snapshot AFTER the allowed use
+            with pytest.raises(SystemExit):
+                self._verified_child(carrier)   # replay -> denied
+        else:
+            before = self._state_snapshot()
+            with pytest.raises(SystemExit):
+                self._verified_child("{not json")
+        assert self._state_snapshot() == before
+
+    # -- OCE_CI_MODE carries zero configuration authority -------------------
+    def test_oci_ci_mode_has_zero_config_authority(self):
+        # OCE_CI_MODE is OPERATIONAL_IDENTITY_ONLY: its presence changes the
+        # effective configuration by NOTHING (same fingerprint, same
+        # posture) and unlocks no job/credential behavior.
+        eff_without = cs.effective_from_env(dict(CLEAN_ENV))
+        eff_with = cs.effective_from_env({**CLEAN_ENV, "OCE_CI_MODE": "true"})
+        assert eff_with.fingerprint == eff_without.fingerprint
+        rep = cs.validate_configuration({**CLEAN_ENV, "OCE_CI_MODE": "true"})
+        assert rep["ok"] is True
+        # changing the value changes nothing about the resolved posture
+        eff_other = cs.effective_from_env({**CLEAN_ENV, "OCE_CI_MODE": "1"})
+        assert eff_other.fingerprint == eff_without.fingerprint

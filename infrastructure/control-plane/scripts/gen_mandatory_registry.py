@@ -13,6 +13,7 @@ regenerates b2_registry.py from every collected testcase id. The committed
 registry is then reviewed as part of the change that adds/removes tests.
 """
 from __future__ import annotations
+import json
 import os
 import subprocess
 import sys
@@ -148,7 +149,9 @@ def render(ids: list[str]) -> str:
         L.append('    "%s": "%s",' % (k, v))
     L += ["}", "", "MANDATORY_TEST_IDS = ["]
     for n in ids:
-        L.append('    "%s",' % n)
+        # json.dumps escapes quotes/backslashes so parametrized node ids that
+        # contain JSON carriers or other quoted text render as valid Python
+        L.append("    %s," % json.dumps(n))
     L += ["]", "", "_CATEGORY_RULES = ["]
     for sub, cat in CATEGORY_RULES:
         L.append('    ("%s", "%s"),' % (sub, cat))

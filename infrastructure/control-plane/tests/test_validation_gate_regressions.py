@@ -70,8 +70,13 @@ def build_evidence(tmp_path, *, skip_ids=(), fail_ids=(), error_ids=(), omit_ids
     skipped, failed, errors = set(skip_ids), set(fail_ids), set(error_ids)
 
     cases = []
+    import xml.sax.saxutils as _sax
     for nid in ids:
         cls, name = nid.rsplit("::", 1)
+        # XML-escape attribute values: parametrized node ids can contain
+        # quotes/JSON carriers (e.g. the CXR6 MAC-failure matrix)
+        cls = _sax.escape(cls, {"\"": "&quot;"})
+        name = _sax.escape(name, {"\"": "&quot;"})
         inner = ""
         if nid in failed:
             inner = '<failure message="boom" />'
