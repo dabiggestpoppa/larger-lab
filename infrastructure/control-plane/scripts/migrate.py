@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""OCE Control Plane migration runner (B2-R2 / B4-CXR3R2 / B4-CXR4R4).
+"""OCE Control Plane migration runner (B2-R2 / B4-CXR3R2 / B4-CXR4R4 /
+B4-CXR5R1).
 
 Numbered, reversible migrations against PostgreSQL. Fail-closed on:
 missing migration, out-of-order version, checksum mismatch, partial apply.
 
-B4-CXR3R2: ``--db`` is REQUIRED and must target the governed loopback
-PostgreSQL (127.0.0.1/localhost only). There is no predictable default
-DSN and migrations can never be redirected to an external database.
+B4-CXR3R2: there is NO public ``--db`` DSN parameter and no predictable
+default DSN. The migration target is always derived from the governed
+secret boundary — migrations can never be redirected to another database
+by an operator-controlled DSN.
 
 B4-CXR4R4 (CXR4-05): the migration target must be the EXACT governed
 PostgreSQL identity — host, port, database, user, AND credential authority.
@@ -15,10 +17,17 @@ BLOCKED before any connection. The activation gate (validated config +
 resolved secret) runs before any migration; raw DSNs/credentials are never
 echoed.
 
+B4-CXR5R1 (CXR5-01): the production ``--db`` interface is REMOVED — a
+password-bearing DSN can never appear in process argv, /proc/<pid>/cmdline,
+command capture, or diagnostics. The governed connection is resolved
+INTERNALLY from the pinned activation authority (ActivationContext). The
+derived DSN is identity-checked in-memory as an invariant guard; nothing is
+ever echoed.
+
 Usage:
-  migrate.py up     --db DSN [--dir DIR]
-  migrate.py down   --db DSN [--dir DIR]   # rollback latest applied
-  migrate.py status --db DSN [--dir DIR]
+  migrate.py up     [--dir DIR]
+  migrate.py down   [--dir DIR]   # rollback latest applied
+  migrate.py status [--dir DIR]
 """
 from __future__ import annotations
 import argparse
@@ -232,47 +241,68 @@ def check_governed_identity(parts: dict) -> str | None:
     return None
 
 
+def _reject_secret_flags(argv: list[str] | None) -> None:
+    """Reject secret-bearing CLI flags WITHOUT echoing their values.
+
+    B4-CXR5R1: --db/--dsn/--token/--secret/--password/--worker-secret are
+    NOT OCE migration options. argparse would echo the raw value in an
+    "unrecognized arguments" message, so we intercept BEFORE parsing and
+    print a redacted denial naming only the option. The governed connection
+    is always resolved internally; secret material is never valid CLI input.
+    """
+    if not argv:
+        return
+    bad = {"--db", "--dsn", "--token", "--secret", "--password",
+           "--worker-secret", "--worker-token"}
+    for tok in argv:
+        opt = tok.split("=", 1)[0]
+        if opt in bad:
+            print(f"FAIL: {opt} is not a valid OCE migration option — the "
+                  "governed connection is resolved internally; secret "
+                  "material is never accepted on the command line "
+                  "(B4-CXR5R1)", file=sys.stderr)
+            raise SystemExit(2)
+
+
 def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    # B4-CXR5R1: reject secret-bearing flags before argparse (which would
+    # echo the raw value). Never print or accept a password-bearing DSN.
+    _reject_secret_flags(argv)
     parser = argparse.ArgumentParser(description="OCE control-plane migrations")
     parser.add_argument("command", choices=["up", "down", "status"])
-    parser.add_argument("--db", required=True,
-                        help="PostgreSQL DSN (governed, loopback-only)")
+    # B4-CXR5R1: NO --db. A password-bearing DSN must never enter process
+    # argv; the governed connection is resolved internally from the pinned
+    # activation authority.
     parser.add_argument("--dir", type=Path, default=MIGRATIONS_DIR)
     args = parser.parse_args(argv)
-    # B4-CXR4R4: the EXACT governed database identity is required BEFORE any
-    # connection — alternate loopback port/db/user are different authority.
+    # B4-CXR4R4: activation authority FIRST — validated effective config AND
+    # resolved governed secret. No migration runs under a forbidden/malformed
+    # config or an unresolvable secret reference. The DSN is derived here,
+    # in process memory, from the pinned context; it is never echoed.
+    from oce_control.config_startup import create_activation_context
+    ctx = create_activation_context()
+    dsn = ctx.runtime_dsn()
+    # Invariant guard (defense in depth): the governed derivation MUST be the
+    # exact governed identity — host/port/db/user (+ credential authority).
+    # Values are compared in-memory; nothing is echoed (B4-CXR4R4).
     try:
-        parts = parse_dsn(args.db)
+        parts = parse_dsn(dsn)
     except ValueError as exc:
-        print(f"FAIL: {exc} (B4-CXR4R4)", file=sys.stderr)
+        print(f"FAIL: governed DSN malformed: {exc} (never echoed, B4-CXR5R1)",
+              file=sys.stderr)
         return 2
     err = check_governed_identity(parts)
     if err:
-        print(f"FAIL: --db is not the exact governed database identity — {err}; "
-              "target/credentials never echoed (B4-CXR4R4)", file=sys.stderr)
-        return 2
-    # B4-CXR4R4: activation authority FIRST — validated effective config AND
-    # resolved governed secret. No migration runs under a forbidden/malformed
-    # config or an unresolvable secret reference.
-    from oce_control.config_startup import create_activation_context
-    ctx = create_activation_context()
-    # credential authority: the supplied DSN secret MUST equal the governed
-    # store secret (canonicalized host: localhost == 127.0.0.1). The
-    # comparison is in-memory; nothing is echoed.
-    governed = parse_dsn(ctx.runtime_dsn())
-    canon = dict(parts)
-    canon["host"] = "127.0.0.1" if canon["host"] == "localhost" else canon["host"]
-    gov_canon = dict(governed)
-    gov_canon["host"] = "127.0.0.1" if gov_canon["host"] == "localhost" else gov_canon["host"]
-    if canon != gov_canon:
-        print("FAIL: --db credential does not match the governed secret "
-              "reference — values never echoed (B4-CXR4R4)", file=sys.stderr)
+        print(f"FAIL: governed DSN failed identity check — {err}; "
+              "values never echoed (B4-CXR4R4)", file=sys.stderr)
         return 2
     if args.command == "up":
-        return cmd_up(args.db, args.dir)
+        return cmd_up(dsn, args.dir)
     if args.command == "down":
-        return cmd_down(args.db, args.dir)
-    return cmd_status(args.db, args.dir)
+        return cmd_down(dsn, args.dir)
+    return cmd_status(dsn, args.dir)
 
 
 if __name__ == "__main__":

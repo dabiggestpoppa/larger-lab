@@ -1,10 +1,15 @@
-"""Minimal B2 runtime worker process (B2-R6).
+"""Minimal B2 runtime worker process (B2-R6 / B4-CXR5R1).
 
 Claims pending jobs from PostgreSQL through the authenticated worker
 protocol, simulates execution, and commits results with lease-token
 fencing. Part of the complete local runtime (scripts/start-local.sh):
 
-    python -m oce_control.worker_loop --worker-id worker-1 --token <token>
+    python -m oce_control.worker_loop --worker-id worker-1
+
+B4-CXR5R1: there is NO --token argument and NO ambient worker-token env
+surface — worker authentication material is read from the approved store
+(read-only at runtime; initialized once by `oce_local configure`). A
+password/token never appears in process argv.
 
 --capabilities accepts a comma-separated list; "*" (default) claims any
 job. Admission is idempotent with the same token.
@@ -12,13 +17,42 @@ job. Admission is idempotent with the same token.
 from __future__ import annotations
 import argparse
 import os
+import sys
 import time
 
 
+def _reject_secret_flags(argv) -> None:
+    """Reject secret-bearing CLI flags WITHOUT echoing their values.
+
+    B4-CXR5R1: --token/--dsn/--secret/--password are NOT OCE worker options.
+    argparse would echo the raw value in an "unrecognized arguments" message,
+    so we intercept BEFORE parsing and print a redacted denial naming only
+    the option. Worker authentication material comes from the approved
+    store — never from the command line.
+    """
+    if not argv:
+        return
+    bad = {"--token", "--dsn", "--secret", "--password",
+           "--worker-secret", "--worker-token"}
+    import sys as _sys
+    for tok in argv:
+        opt = tok.split("=", 1)[0]
+        if opt in bad:
+            print(f"{opt} is not a valid OCE worker option — worker "
+                  "authentication material is read from the approved store; "
+                  "secret material is never accepted on the command line "
+                  "(B4-CXR5R1)", file=_sys.stderr)
+            raise SystemExit(2)
+
+
 def main(argv=None) -> None:
+    if argv is None:
+        argv = sys.argv[1:]
+    # B4-CXR5R1: reject secret-bearing flags before argparse (which would
+    # echo the raw value). Never print or accept a token/DSN on argv.
+    _reject_secret_flags(argv)
     parser = argparse.ArgumentParser(description="OCE B2 runtime worker")
     parser.add_argument("--worker-id", default=os.environ.get("OCE_WORKER_ID", "worker-local01"))
-    parser.add_argument("--token", default=os.environ.get("OCE_WORKER_TOKEN"))
     parser.add_argument("--interval", type=float, default=3.0)
     parser.add_argument("--lease-ttl", type=int, default=60)
     parser.add_argument("--capabilities", default="*")
@@ -38,10 +72,14 @@ def main(argv=None) -> None:
     # B4-CXR4R3: the worker freezes ONE immutable ActivationContext (the full
     # gate: posture + secret resolution) and derives its DSN from the PINNED
     # context — environment mutation after activation cannot redirect it.
+    #
+    # B4-CXR5R1: the worker token comes from the approved store via
+    # read_worker_token() — NEVER from argv or ambient environment. An
+    # uninitialized store fails closed (never materializes on the fly).
     from .config_startup import create_activation_context
+    from . import local_secrets as ls
     ctx = create_activation_context()
-    if not args.token:
-        raise SystemExit("worker requires --token or OCE_WORKER_TOKEN (no predictable default, B2-R7)")
+    token = ls.read_worker_token()  # read-only; raises when not initialized
 
     import psycopg2
     from .pg_store import PgJobStore
@@ -52,17 +90,17 @@ def main(argv=None) -> None:
     store = PgJobStore(conn)
     worker = PgWorkerProtocol(store, conn)
     caps = [c.strip() for c in args.capabilities.split(",") if c.strip()]
-    worker.admit_worker(worker_id=args.worker_id, token=args.token, capabilities=caps)
+    worker.admit_worker(worker_id=args.worker_id, token=token, capabilities=caps)
     print(f"worker '{args.worker_id}' admitted (capabilities={caps})", flush=True)
 
     while True:
         pending = store.jobs_by_status("pending")[: args.max_per_cycle]
         for job in pending:
             try:
-                claimed = worker.claim_work(args.worker_id, args.token, job.job_id,
+                claimed = worker.claim_work(args.worker_id, token, job.job_id,
                                             lease_ttl=args.lease_ttl)
                 time.sleep(0.5)  # simulated execution
-                done = worker.submit_result(args.worker_id, args.token, job.job_id,
+                done = worker.submit_result(args.worker_id, token, job.job_id,
                                             {"result": "ok", "worker": args.worker_id})
                 print(f"completed {job.job_id} -> {done['status']}", flush=True)
             except Exception as exc:  # keep the loop alive on transient failures

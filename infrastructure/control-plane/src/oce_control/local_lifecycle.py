@@ -287,8 +287,15 @@ def live_port_bindings() -> list[str]:
 # --------------------------------------------------------------------------
 
 def configure() -> dict:
-    """Generate/confirm the runtime secret, write compose.env, verify loopback."""
+    """Generate/confirm the runtime secret, write compose.env, verify loopback.
+
+    INITIALIZATION phase (B4-CXR5R1): materializes the postgres password
+    (one-time) AND the worker token (one-time) in the approved store. Later
+    invocations are read-only over the existing store — start/restart/
+    recover never silently add or rotate either secret.
+    """
     ls.write_compose_env()
+    ls.initialize_worker_token()  # one-time init; existing token preserved
     source = "unset"
     if ls.SECRETS_FILE.exists():
         try:
@@ -328,10 +335,14 @@ def migrate(ctx=None) -> subprocess.CompletedProcess:
     B4-CXR4R3: a pinned ActivationContext supplies the target from its
     PINNED postgres parameters + reference (stale-checked), so migrations
     run against the exact database the activation validated.
+
+    B4-CXR5R1: NO --db anywhere. The child migration process resolves the
+    governed connection INTERNALLY from its own pinned activation; a
+    password-bearing DSN never enters process argv, /proc/<pid>/cmdline,
+    command capture, or diagnostics.
     """
     env = ls.compose_environment()
-    dsn = ctx.runtime_dsn() if ctx is not None else ls.postgres_dsn()
-    cmd = [PYTHON, str(BASE_DIR / "scripts" / "migrate.py"), "up", "--db", dsn]
+    cmd = [PYTHON, str(BASE_DIR / "scripts" / "migrate.py"), "up"]
     return subprocess.run(cmd, cwd=str(BASE_DIR), env=env, capture_output=True,
                           text=True, timeout=300)
 
@@ -477,10 +488,12 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
         if r.returncode != 0:
             raise RuntimeError(f"migrations failed:\n{r.stdout}\n{r.stderr}")
         actions.append("migrations applied")
+    # B4-CXR5R1: worker authentication material is NEVER passed through
+    # argv — the worker reads its token from the approved store (initialized
+    # once in configure(); read-only during start/restart/recover).
     start_process("worker", [PYTHON, "-m", "oce_control.worker_loop",
-                             "--worker-id", "worker-local01",
-                             "--token", _worker_token()])
-    actions.append("worker started (pid-file owned)")
+                             "--worker-id", "worker-local01"])
+    actions.append("worker started (pid-file owned, token from approved store)")
     start_process("api", [PYTHON, "-m", "oce_control.http_api"])
     actions.append("api started (pid-file owned)")
     if not wait_for_http(timeout_s, port=ctx.control_plane_port):
@@ -518,23 +531,6 @@ def cloud_credential_hint(environ: dict | None = None) -> list[str]:
     return sorted(k for k in env if provider.search(k) and secret.search(k))
 
 
-def _worker_token() -> str:
-    import secrets as _s
-    data = {}
-    if ls.SECRETS_FILE.exists():
-        try:
-            data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            data = {}
-    if "worker_token" not in data:
-        data["worker_token"] = _s.token_urlsafe(24)
-        ls.RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
-        # Atomic write: never partially rewrites the store, and existing
-        # entries (postgres_password, b4_meta, ...) survive exactly (B4-CXR4R1).
-        ls._atomic_write_json(ls.SECRETS_FILE, data)
-    return data["worker_token"]
-
-
 def recover() -> list[str]:
     """Bring the runtime back to a known-good state without destroying data.
 
@@ -569,8 +565,7 @@ def recover() -> list[str]:
         if pid_state(pid_file(name), marker)[0] != "live":
             if name == "worker":
                 start_process("worker", [PYTHON, "-m", "oce_control.worker_loop",
-                                         "--worker-id", "worker-local01",
-                                         "--token", _worker_token()])
+                                         "--worker-id", "worker-local01"])
             else:
                 start_process("api", [PYTHON, "-m", "oce_control.http_api"])
             actions.append(f"{name} restarted")

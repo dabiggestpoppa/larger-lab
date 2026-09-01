@@ -158,8 +158,89 @@ def read_runtime_secret() -> str | None:
     return load_runtime_secret()
 
 
+def _load_full_store() -> dict:
+    """Load the full secrets.json dict; missing/corrupt yields {} (callers
+    decide fail-closed semantics; never writes)."""
+    if not SECRETS_FILE.exists():
+        return {}
+    try:
+        data = json.loads(SECRETS_FILE.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def initialize_worker_token() -> str:
+    """INITIALIZATION path (B4-CXR5R1) — materialize the worker token ONCE.
+
+    Called only by the explicit init phase (`oce_local configure` / first
+    governed start). Generates a strong token when absent and preserves the
+    existing token on later invocations — a runtime start/restart/recover
+    NEVER silently adds a token to an existing store. Atomic write.
+    """
+    if SECRETS_FILE.exists():
+        # a corrupt/unparseable store is REFUSED, never rewritten with only
+        # a token (mirrors initialize_runtime_secret's fail-closed contract)
+        try:
+            raw = SECRETS_FILE.read_text(encoding="utf-8")
+            parsed = json.loads(raw)
+        except (json.JSONDecodeError, OSError):
+            raise RuntimeError(
+                "approved secret store exists but is unreadable/corrupt — "
+                "manual remediation required; OCE never overwrites an "
+                "existing store (B4-CXR4R1)")
+        if not isinstance(parsed, dict):
+            raise RuntimeError(
+                "approved secret store is not a JSON object — manual "
+                "remediation required; OCE never overwrites it (B4-CXR4R1)")
+        if parsed.get("worker_token"):
+            return parsed["worker_token"]
+    data = _load_full_store()
+    data["worker_token"] = secrets.token_urlsafe(24)
+    _atomic_write_json(SECRETS_FILE, data)
+    return data["worker_token"]
+
+
+def read_worker_token() -> str:
+    """RUNTIME read path (B4-CXR5R1) — read-only, fails closed when absent.
+
+    The worker token lives ONLY in the approved store; it is never passed
+    through process argv or ambient environment. Zero side effects.
+    """
+    data = _load_full_store()
+    token = data.get("worker_token")
+    if not token or not isinstance(token, str):
+        raise RuntimeError(
+            "worker token not configured — run `oce_local configure` to "
+            "initialize it (runtime reads never materialize one)")
+    return token
+
+
+def sanitized_environment(environ: dict | None = None) -> dict:
+    """Child-process environment WITHOUT ambient secret authority (B4-CXR5R1).
+
+    Strips ambient POSTGRES_DSN / POSTGRES_PASSWORD / OCE_WORKER_TOKEN /
+    OCE_WORKER_SECRET so a spawned process can never inherit a secret that
+    was not deliberately supplied through a governed carrier. The governed
+    store remains the ONLY source of secret material; children read it
+    directly. Docker-compose subprocesses use compose_environment() instead
+    (the compose stack is the specifically governed carrier for the
+    container's POSTGRES_PASSWORD).
+    """
+    env = dict(environ if environ is not None else os.environ)
+    for var in ("POSTGRES_DSN", "POSTGRES_PASSWORD",
+                "OCE_WORKER_TOKEN", "OCE_WORKER_SECRET"):
+        env.pop(var, None)
+    return env
+
+
 def write_compose_env() -> Path:
-    """Persist .runtime/compose.env (0600) for `docker compose` invocations."""
+    """Persist .runtime/compose.env (0600) for `docker compose` invocations.
+
+    A projection of the governed store for the compose stack (the governed
+    carrier). Never passes a raw ambient secret: the value comes from
+    initialize_runtime_secret() (one-time init, existing store read-only).
+    """
     pw = initialize_runtime_secret()
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     _chmod(RUNTIME_DIR, 0o700)
@@ -171,22 +252,21 @@ def write_compose_env() -> Path:
 def compose_environment() -> dict[str, str]:
     """Env dict for docker compose / migrate / api / worker (RUNTIME, read-only).
 
-    Reads the approved store WITHOUT materializing: POSTGRES_PASSWORD and
-    POSTGRES_DSN are set only when a governed secret already exists. When the
-    store is absent, teardown commands still run (empty substitution) while
-    any activation that needs the secret fails closed at its own gate — an
-    ambient runtime value can never create secret authority (B4-CXR3R1).
+    B4-CXR5R1: starts from sanitized_environment() so ambient secret
+    authority (POSTGRES_DSN / POSTGRES_PASSWORD / OCE_WORKER_TOKEN /
+    OCE_WORKER_SECRET) is NEVER inherited by a child. POSTGRES_PASSWORD and
+    POSTGRES_DSN are set ONLY from the governed store when a secret already
+    exists (the compose stack is the specifically governed carrier for the
+    container's POSTGRES_PASSWORD). When the store is absent, teardown
+    commands still run (empty substitution) while any activation that needs
+    the secret fails closed at its own gate — an ambient runtime value can
+    never create secret authority (B4-CXR3R1).
     """
-    env = dict(os.environ)
+    env = sanitized_environment()
     pw = read_runtime_secret()
     if pw:
         env["POSTGRES_PASSWORD"] = pw
         env["POSTGRES_DSN"] = derive_runtime_dsn()
-    else:
-        # never pass an ambient password/DSN to a subprocess — only the
-        # governed store may supply secret authority
-        env.pop("POSTGRES_PASSWORD", None)
-        env.pop("POSTGRES_DSN", None)
     return env
 
 

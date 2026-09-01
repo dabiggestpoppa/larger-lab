@@ -671,18 +671,28 @@ class TestCXR3R2DsnEscapeRemoved:
             + os.pathsep + env.get("PYTHONPATH", "")
         return env
 
-    def test_worker_loop_has_no_dsn_argument(self):
-        # D: `python -m oce_control.worker_loop --dsn <external>` must fail at
-        # the CLI (unrecognized argument) — no gate, no DB connection possible.
+    def test_worker_loop_has_no_secret_arguments(self):
+        # D + CXR5-01-B: `python -m oce_control.worker_loop --dsn <external>`
+        # or `--token <canary>` must fail at the CLI WITHOUT echoing the
+        # candidate value — no gate, no DB connection possible, and the
+        # worker token never travels through argv.
         import subprocess
         import sys
-        r = subprocess.run(
-            [sys.executable, "-m", "oce_control.worker_loop",
-             "--dsn", "postgresql://u:p@10.0.0.9:5432/other", "--token", "t"],
-            env=self._env(), capture_output=True, text=True, timeout=60)
-        assert r.returncode != 0
-        assert "unrecognized arguments" in (r.stderr + r.stdout).lower()
-        assert "connect" not in r.stderr.lower()  # never reached a connection
+        cases = [
+            (["--dsn", "postgresql://u:p@10.0.0.9:5432/other"],
+             "postgresql://u:p@10.0.0.9:5432/other"),
+            (["--token", "worker-token-canary-9876543210"],
+             "worker-token-canary-9876543210"),
+        ]
+        for extra, canary in cases:
+            r = subprocess.run(
+                [sys.executable, "-m", "oce_control.worker_loop",
+                 "--worker-id", "worker-x"] + extra,
+                env=self._env(), capture_output=True, text=True, timeout=60)
+            assert r.returncode == 2, extra
+            blob = r.stderr + r.stdout
+            assert canary not in blob  # candidate value is NEVER echoed
+            assert "connect" not in r.stderr.lower()  # never reached a connection
 
     def test_build_durable_app_accepts_no_dsn_override(self):
         # E: the durable API cannot activate against an arbitrary DSN
@@ -696,31 +706,38 @@ class TestCXR3R2DsnEscapeRemoved:
         with pytest.raises(TypeError):
             ll.migrate(dsn="postgresql://u:p@10.0.0.9:5432/other")  # type: ignore
 
-    def test_migrate_cli_rejects_external_db(self):
-        # F(part 2): migrate.py --db external is rejected BEFORE connecting
+    def test_migrate_cli_rejects_db_flag_without_echo(self):
+        # F(part 2) + CXR5-01-A: migrate.py --db is NOT a valid option. The
+        # password-bearing DSN is never echoed and no connection is attempted.
         import subprocess
         import sys
         from pathlib import Path as _P
         script = str(_P(__file__).resolve().parent.parent / "scripts" / "migrate.py")
-        r = subprocess.run(
-            [sys.executable, script, "up",
-             "--db", "postgresql://u:p@10.0.0.9:5432/other"],
-            env=self._env(), capture_output=True, text=True, timeout=60)
-        assert r.returncode == 2
-        assert "loopback" in (r.stderr + r.stdout).lower()
-        assert "10.0.0.9" not in r.stdout  # target never echoed
-
-    def test_migrate_cli_requires_db(self):
-        # no predictable default DSN: --db is mandatory
-        import subprocess
-        import sys
-        from pathlib import Path as _P
-        script = str(_P(__file__).resolve().parent.parent / "scripts" / "migrate.py")
-        r = subprocess.run([sys.executable, script, "up"],
+        canary = "postgresql://u:p@10.0.0.9:5432/other"
+        r = subprocess.run([sys.executable, script, "up", "--db", canary],
                            env=self._env(), capture_output=True, text=True,
                            timeout=60)
         assert r.returncode == 2
-        assert "--db" in r.stderr
+        blob = r.stderr + r.stdout
+        assert canary not in blob       # candidate value never echoed
+        assert "10.0.0.9" not in blob
+        assert "--db" in blob          # the option NAME is named, never its value
+        assert "never accepted on the command line" in blob  # redacted denial
+
+    def test_migrate_cli_rejects_equals_form_without_echo(self):
+        # the --db=value form is rejected identically (raw value never echoed)
+        import subprocess
+        import sys
+        from pathlib import Path as _P
+        script = str(_P(__file__).resolve().parent.parent / "scripts" / "migrate.py")
+        canary = "postgresql://u:canary-pw@10.0.0.9:5432/other"
+        r = subprocess.run([sys.executable, script, "up", f"--db={canary}"],
+                           env=self._env(), capture_output=True, text=True,
+                           timeout=60)
+        assert r.returncode == 2
+        blob = r.stderr + r.stdout
+        assert "canary-pw" not in blob
+        assert "--db" in blob
 
 
 # --------------------------------------------------------------------------- #
@@ -992,8 +1009,13 @@ class TestCXR4R4GateFirstRecoverAndMigration:
         assert any("compose down" in a for a in actions)
 
     # -- CXR4-05: migration target must be the EXACT governed DB -----------
+    # (B4-CXR5R1: NO --db exists at all — the governed DSN is derived
+    # internally, so an alternate identity cannot even be offered as input.)
 
-    def test_migrate_rejects_alternate_loopback_identity(self):
+    def test_migrate_rejects_db_flag_before_any_connection(self, capsys):
+        # CXR5-01-A: NO --db interface exists — even a canonical-looking DSN
+        # is rejected BEFORE the gate/connection, and the candidate value is
+        # never echoed (DSNs are not valid CLI input, period).
         import scripts.migrate as mig
         bad_dsns = [
             "postgresql://oce_control_admin:pw@127.0.0.1:5432/oce_control",
@@ -1001,11 +1023,22 @@ class TestCXR4R4GateFirstRecoverAndMigration:
             "postgresql://other_user:pw@127.0.0.1:5433/oce_control",
             "postgresql://oce_control_admin:pw@10.0.0.9:5433/oce_control",
             "postgresql://oce_control_admin:pw@localhost:9999/oce_control",
+            "postgresql://oce_control_admin:pw@127.0.0.1:5433/oce_control",
         ]
         for dsn in bad_dsns:
-            assert mig.main(["up", "--db", dsn]) == 2, dsn
+            with pytest.raises(SystemExit) as exc:
+                mig.main(["up", "--db", dsn])
+            assert exc.value.code == 2, dsn
+        out, err = capsys.readouterr()
+        blob = out + err
+        assert "postgresql://" not in blob      # no DSN ever echoed
+        assert "127.0.0.1" not in blob
+        assert "never accepted on the command line" in err  # redacted denial
 
-    def test_migrate_rejects_credential_mismatch(self, monkeypatch, tmp_path, capsys):
+    def test_migrate_db_denial_has_zero_secret_store_effects(
+            self, monkeypatch, tmp_path, capsys):
+        # M: a denied migration has ZERO secret-store side effects, and the
+        # candidate DSN (even with a wrong password) is never echoed.
         import scripts.migrate as mig
         from oce_control import local_secrets as ls
         store = tmp_path / "secrets.json"
@@ -1014,55 +1047,63 @@ class TestCXR4R4GateFirstRecoverAndMigration:
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
         before = hashlib.sha256(store.read_bytes()).hexdigest()
         dsn = "postgresql://oce_control_admin:wrong-password@127.0.0.1:5433/oce_control"
-        assert mig.main(["up", "--db", dsn]) == 2
+        with pytest.raises(SystemExit) as exc:
+            mig.main(["up", "--db", dsn])
+        assert exc.value.code == 2
         out, err = capsys.readouterr()
         blob = out + err
-        assert "wrong-password" not in blob and "governed-secret-1234567890" not in blob
-        assert "never echoed" in err
-        # M: a denied migration has ZERO secret-store side effects
+        assert "wrong-password" not in blob
+        assert "governed-secret-1234567890" not in blob
+        assert "never accepted on the command line" in err
         assert hashlib.sha256(store.read_bytes()).hexdigest() == before
 
-    def test_migrate_canonical_target_passes_gates_and_reaches_connect(
+    def test_migrate_canonical_target_derived_internally_and_reaches_connect(
+            self, monkeypatch, tmp_path, capsys):
+        # the governed canonical DSN is DERIVED from the pinned activation
+        # (no --db): it passes identity + gate checks in-memory and reaches
+        # the connection step with the store-derived secret. Nothing is
+        # echoed (unit test has no real PG; container CI proves the connect).
+        import scripts.migrate as mig
+        from oce_control import local_secrets as ls
+        store = tmp_path / "secrets.json"
+        store.write_text(json.dumps({"postgres_password": "governed-secret-1234567890"}),
+                         encoding="utf-8")
+        monkeypatch.setattr(ls, "SECRETS_FILE", store)
+        seen = {}
+
+        def fake_connect(dsn):
+            seen["dsn"] = dsn
+            raise RuntimeError("would-connect")
+
+        monkeypatch.setattr(mig, "connect", fake_connect)
+        with pytest.raises(RuntimeError, match="would-connect"):
+            mig.main(["up"])
+        derived = seen["dsn"]
+        assert derived.startswith("postgresql://oce_control_admin:")
+        assert "governed-secret-1234567890" in derived
+        assert "@127.0.0.1:5433/oce_control" in derived
+        out, err = capsys.readouterr()
+        assert "governed-secret-1234567890" not in (out + err)  # never echoed
+
+    def test_migrate_localhost_alias_derivation_deterministic(
             self, monkeypatch, tmp_path):
-        # the governed canonical DSN passes identity + gate + credential
-        # checks and reaches the connection step (unit test has no real PG;
-        # container CI proves the actual connect).
+        # the derived target is deterministic: same store -> same canonical
+        # loopback identity every time (127.0.0.1), no ambient influence.
         import scripts.migrate as mig
         from oce_control import local_secrets as ls
         store = tmp_path / "secrets.json"
         store.write_text(json.dumps({"postgres_password": "governed-secret-1234567890"}),
                          encoding="utf-8")
         monkeypatch.setattr(ls, "SECRETS_FILE", store)
-        seen = {}
+        seen = []
 
         def fake_connect(dsn):
-            seen["dsn"] = dsn
+            seen.append(dsn)
             raise RuntimeError("would-connect")
 
         monkeypatch.setattr(mig, "connect", fake_connect)
-        dsn = ("postgresql://oce_control_admin:governed-secret-1234567890"
-               "@127.0.0.1:5433/oce_control")
-        with pytest.raises(RuntimeError, match="would-connect"):
-            mig.main(["up", "--db", dsn])
-        assert seen["dsn"] == dsn
-
-    def test_migrate_localhost_alias_deterministic(self, monkeypatch, tmp_path):
-        # localhost alias is deterministically treated as the governed loopback
-        import scripts.migrate as mig
-        from oce_control import local_secrets as ls
-        store = tmp_path / "secrets.json"
-        store.write_text(json.dumps({"postgres_password": "governed-secret-1234567890"}),
-                         encoding="utf-8")
-        monkeypatch.setattr(ls, "SECRETS_FILE", store)
-        seen = {}
-
-        def fake_connect(dsn):
-            seen["dsn"] = dsn
-            raise RuntimeError("would-connect")
-
-        monkeypatch.setattr(mig, "connect", fake_connect)
-        dsn = ("postgresql://oce_control_admin:governed-secret-1234567890"
-               "@localhost:5433/oce_control")
-        with pytest.raises(RuntimeError, match="would-connect"):
-            mig.main(["up", "--db", dsn])
-        assert seen["dsn"] == dsn
+        for _ in range(2):
+            with pytest.raises(RuntimeError, match="would-connect"):
+                mig.main(["up"])
+        assert seen[0] == seen[1]
+        assert "127.0.0.1" in seen[0]

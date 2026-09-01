@@ -218,9 +218,11 @@ class Runner:
     def step_migrations(self) -> None:
         """Step 10: apply numbered migrations; fail closed on any error."""
         env = self._env()
-        from oce_control import local_secrets as ls
+        # B4-CXR5R1: NO --db — a password-bearing DSN must never enter
+        # process argv. The migration child resolves the governed connection
+        # internally from its own pinned activation context.
         r = self._run([sys.executable, str(BASE_DIR / "scripts" / "migrate.py"),
-                       "up", "--db", ls.postgres_dsn()], env=env, timeout=600)
+                       "up"], env=env, timeout=600)
         applied = re.findall(r"applied (\d{4})", r.stdout or "")
         self._write_json("migration-results.json", {
             "ok": r.returncode == 0,

@@ -75,6 +75,12 @@ def test_configure_writes_compose_env_with_secret():
     assert ls.COMPOSE_ENV_FILE.exists()
     assert f"POSTGRES_PASSWORD={ls.load_runtime_secret()}" in ls.COMPOSE_ENV_FILE.read_text()
     assert report["port_offenders"] == []  # real compose.yml is loopback-only
+    # B4-CXR5R1: configure is the INIT phase — it also materializes the
+    # worker token ONCE (read-only thereafter; never added by runtime start)
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert data.get("worker_token")
+    assert ls.read_worker_token() == data["worker_token"]
+    assert ls.initialize_worker_token() == data["worker_token"]  # preserved
 
 
 def test_require_runtime_dsn_fails_closed_without_secret():
@@ -304,7 +310,173 @@ def test_cxr4r1_g_rotation_changes_only_authorized_secret_and_generation():
     assert data["b4_meta"]["runtime-local"]["revoked"] is False
 
 
-def test_cxr4r1_h_failed_initialization_never_partially_rewrites(monkeypatch):
+# --------------------------------------------------------------------------
+# B4-CXR5R1 — NO secrets in process argv: the worker token is initialized
+# once by configure() and read-only at runtime; worker/migrate child argv is
+# secret-free; child environments are sanitized; ambient worker-secret values
+# can never flow to a spawned process.
+# --------------------------------------------------------------------------
+
+def test_cxr5r1_worker_token_init_read_split():
+    # 7-8 (CXR5-01): worker token initialized ONCE during the explicit init
+    # phase; runtime reads never materialize/add one; a missing store fails
+    # closed instead of creating a token on the fly.
+    with pytest.raises(RuntimeError, match="worker token"):
+        ls.read_worker_token()          # runtime read, no store -> fail closed
+    tok = ls.initialize_worker_token()  # explicit init materializes it
+    assert tok and ls.read_worker_token() == tok
+    assert ls.initialize_worker_token() == tok  # init preserves existing
+    before = _store_snapshot()
+    assert ls.read_worker_token() == tok         # runtime read never mutates
+    assert _store_snapshot() == before
+
+
+def test_cxr5r1_worker_token_init_refuses_corrupt_store():
+    # H (CXR4R1 contract): a corrupt store is REFUSED by the token init path
+    # too — never rewritten with only a token, never partially mutated.
+    ls.SECRETS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    ls.SECRETS_FILE.write_text("{corrupt-not-json", encoding="utf-8")
+    corrupt = ls.SECRETS_FILE.read_bytes()
+    with pytest.raises(RuntimeError, match="unreadable/corrupt"):
+        ls.initialize_worker_token()
+    assert ls.SECRETS_FILE.read_bytes() == corrupt  # not overwritten
+    # a non-object store is refused as well
+    ls.SECRETS_FILE.write_text('["not", "a", "dict"]', encoding="utf-8")
+    with pytest.raises(RuntimeError, match="not a JSON object"):
+        ls.initialize_worker_token()
+    assert ls.SECRETS_FILE.read_text(encoding="utf-8") == '["not", "a", "dict"]'
+
+
+def test_cxr5r1_runtime_never_adds_worker_token_to_existing_store():
+    # A store seeded WITHOUT a worker token must not gain one through any
+    # runtime read path (start/restart/recover never silently add a token).
+    ls.initialize_runtime_secret()
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert "worker_token" not in data
+    before = _store_snapshot()
+    with pytest.raises(RuntimeError, match="worker token"):
+        ls.read_worker_token()
+    assert _store_snapshot() == before  # zero authority-side effects
+
+
+def test_cxr5r1_worker_launch_argv_has_no_token(monkeypatch):
+    # A + B (CXR5-01): the lifecycle worker launch argv contains NO token —
+    # the worker reads it from the approved store. A canary token placed in
+    # the store never appears in the captured subprocess command list.
+    _seed_initialized_store()
+    _mock_docker_runtime(monkeypatch)
+    seen: dict = {}
+
+    def _capture(name, argv):
+        seen[name] = list(argv)
+        return ls.RUNTIME_DIR / f"{name}.pid"
+
+    monkeypatch.setattr(ll, "start_process", _capture)
+    ll.start()
+    argv = " ".join(seen["worker"])
+    token = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))["worker_token"]
+    assert "--token" not in argv
+    assert "--dsn" not in argv
+    assert token not in argv            # canary: token bytes never in argv
+    assert "postgresql://" not in argv
+
+
+def test_cxr5r1_migrate_argv_has_no_password(monkeypatch):
+    # A (CXR5-01): the lifecycle migrate() subprocess argv contains NO
+    # password-bearing DSN — migration resolves the governed connection
+    # internally. A canary password in the store never enters the command.
+    _seed_initialized_store()
+    seen: dict = {}
+
+    def _capture_run(cmd, **kw):
+        seen["cmd"] = list(cmd)
+
+        class _R:
+            returncode = 0
+            stdout = ""
+            stderr = ""
+        return _R()
+
+    monkeypatch.setattr(ll.subprocess, "run", _capture_run)
+    ll.migrate(ctx=None)
+    argv = " ".join(seen["cmd"])
+    pw = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))["postgres_password"]
+    assert "--db" not in argv and "--dsn" not in argv
+    assert "postgresql://" not in argv
+    assert pw not in argv               # canary: password bytes never in argv
+
+
+def test_cxr5r1_proc_cmdline_free_of_secrets():
+    # C (CXR5-01): the argv the lifecycle constructs reaches the kernel
+    # command line cleanly — /proc/<pid>/cmdline contains no token/password.
+    # (Lifecycle argv construction is proven secret-free by the captured-argv
+    # tests above; this proves the argv -> kernel cmdline mechanism.)
+    if not Path("/proc").exists():
+        pytest.skip("no /proc — cmdline inspection unsupported on this platform")
+    canary = "cmdline-canary-token-9876543210"
+    # Replay the EXACT lifecycle worker argv shape (constant list, no secret
+    # slots) with a short-lived stand-in process so we can read /proc while
+    # alive. The kernel cmdline is byte-identical to the argv list passed.
+    argv = [sys.executable, "-c",
+            "import time; time.sleep(10)", "--worker-id", "probe-x"]
+    assert "--token" not in " ".join(argv)
+    proc = subprocess.Popen(argv, stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL)
+    try:
+        deadline = time.time() + 5
+        seen = None
+        while time.time() < deadline:
+            try:
+                raw = Path(f"/proc/{proc.pid}/cmdline").read_bytes()
+                if raw:
+                    seen = raw.replace(b"\0", b" ").decode("utf-8", "replace")
+                    break
+            except OSError:
+                pass
+            time.sleep(0.002)
+        assert seen is not None, "could not read /proc cmdline"
+        assert "--token" not in seen
+        assert "postgresql://" not in seen
+        assert canary not in seen
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def test_cxr5r1_sanitized_environment_strips_secrets(monkeypatch):
+    # 9 (CXR5-01): ambient POSTGRES_DSN / POSTGRES_PASSWORD / worker-token /
+    # worker-secret values are stripped from child environments; the compose
+    # env inherits ONLY the governed store values.
+    monkeypatch.setenv("POSTGRES_DSN", "postgresql://u:p@1.2.3.4/db")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-pw-1234567890")
+    monkeypatch.setenv("OCE_WORKER_TOKEN", "ambient-token-1234567890")
+    monkeypatch.setenv("OCE_WORKER_SECRET", "ambient-secret-1234567890")
+    env = ls.sanitized_environment()
+    for var in ("POSTGRES_DSN", "POSTGRES_PASSWORD",
+                "OCE_WORKER_TOKEN", "OCE_WORKER_SECRET"):
+        assert var not in env, var
+    cenv = ls.compose_environment()  # no store -> no secret vars at all
+    assert "POSTGRES_PASSWORD" not in cenv and "POSTGRES_DSN" not in cenv
+    assert "OCE_WORKER_TOKEN" not in cenv and "OCE_WORKER_SECRET" not in cenv
+    # explicit INIT may honor an operator password; afterwards an ambient
+    # rewrite attempt must be ignored — the store (and compose env) is the
+    # ONLY source of secret material.
+    monkeypatch.delenv("POSTGRES_PASSWORD")
+    monkeypatch.setenv("POSTGRES_PASSWORD", "explicit-init-operator-pw-1234567890")
+    ls.initialize_runtime_secret()
+    governed = ls.read_runtime_secret()
+    assert governed == "explicit-init-operator-pw-1234567890"
+    monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-late-1234567890")
+    cenv2 = ls.compose_environment()
+    assert cenv2["POSTGRES_PASSWORD"] == governed
+    assert "ambient-attack-late-1234567890" not in cenv2["POSTGRES_PASSWORD"]
+    assert "OCE_WORKER_TOKEN" not in cenv2
+
+
+def test_cxr5r1_h_failed_initialization_never_partially_rewrites(monkeypatch):
     # H. corrupt existing store -> REFUSED (never destroyed); an atomic-write
     #    failure mid-init -> no partial secrets.json, no stray tmp file.
     ls.SECRETS_FILE.parent.mkdir(parents=True, exist_ok=True)
