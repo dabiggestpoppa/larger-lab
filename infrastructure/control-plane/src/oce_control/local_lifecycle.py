@@ -286,14 +286,61 @@ def live_port_bindings() -> list[str]:
 # Commands
 # --------------------------------------------------------------------------
 
-def configure() -> dict:
-    """Generate/confirm the runtime secret, write compose.env, verify loopback.
-
-    INITIALIZATION phase (B4-CXR5R1): materializes the postgres password
-    (one-time) AND the worker token (one-time) in the approved store. Later
-    invocations are read-only over the existing store — start/restart/
-    recover never silently add or rotate either secret.
+def _require_runtime_init_material() -> None:
+    """CXR6-04: ordinary start/restart/recover are READ-ONLY over secret
+    authority. They REQUIRE the material `configure` materialized and never
+    create it — missing material fails closed with a `configure` hint.
     """
+    missing = []
+    if not ls.load_runtime_secret():
+        missing.append("postgres password")
+    try:
+        ls.read_worker_token()
+    except RuntimeError:
+        missing.append("worker token")
+    try:
+        ls.read_activation_handoff_key()
+    except RuntimeError:
+        missing.append("activation handoff key")
+    if missing:
+        raise SystemExit(
+            "OCE start BLOCKED: required initialization material missing "
+            "(" + ", ".join(missing) + ") — run `python scripts/oce_local.py "
+            "configure` to initialize it; ordinary start is READ-ONLY over "
+            "secret authority and never materializes missing material "
+            "(B4-CXR6R4)")
+
+
+def _preflight_configuration() -> None:
+    """Configuration posture preflight (B4-CXR6R4 #7): the effective config
+    must validate BEFORE any mutation; a forbidden/malformed posture never
+    reaches an initialization or activation step."""
+    from oce_control.config_spine import ValidationError as _VE
+    from oce_control.config_startup import (
+        effective_from_env, startup_report, validate_effective)
+    try:
+        eff = effective_from_env(dict(os.environ))
+        validate_effective(eff)
+    except _VE:
+        raise SystemExit(startup_report(dict(os.environ)))
+
+
+def configure() -> dict:
+    """EXPLICIT INITIALIZATION command (B4-CXR6R4).
+
+    Materializes the postgres password (one-time), the worker token
+    (one-time), AND the dedicated activation-handoff key (one-time) in the
+    approved store, then writes compose.env. `start`/`restart`/`recover`
+    NEVER call this — ordinary activation is read-only over secret authority.
+    Preflights (configuration posture, static compose boundary, store
+    readability) BEFORE any mutation; a failed step never partially writes.
+    """
+    _preflight_configuration()
+    offenders = published_ports_from_compose()
+    if offenders:
+        raise SystemExit(
+            "configure BLOCKED: published ports are not loopback-only: "
+            + "; ".join(offenders) + " (B4-CXR6R4 preflight)")
     ls.write_compose_env()
     ls.initialize_worker_token()  # one-time init; existing token preserved
     ls.initialize_activation_handoff_key()  # B4-CXR6R1 dedicated capability key
@@ -306,7 +353,7 @@ def configure() -> dict:
     report = {
         "runtime_dir": str(ls.RUNTIME_DIR),
         "secret_source": source,
-        "port_offenders": published_ports_from_compose(),
+        "port_offenders": offenders,
     }
     return report
 
@@ -411,17 +458,25 @@ def smoke(*, port: int) -> list[str]:
     return results
 
 
-def start_process(name: str, argv: list[str], env: dict | None = None) -> Path:
+def start_process(name: str, argv: list[str], env: dict) -> Path:
     """Launch a runtime process with PID-file ownership and a log file.
 
-    B4-CXR5R3: callers pass the SANITIZED child environment from the pinned
-    ActivationContext (envelope carrier) so a child can never be redirected
-    by ambient secrets or OCE_* authority. Defaults to compose_environment()
-    for compatibility with callers that do not carry a pinned context.
+    B4-CXR6R4: *env* is REQUIRED — an explicit verified child environment
+    (the sanitized, role-bound activation capability environment from a
+    pinned ActivationContext). The compose_environment() compatibility
+    default is REMOVED: a runtime API/worker process can never acquire the
+    Docker-Compose-only secret carrier (POSTGRES_PASSWORD/POSTGRES_DSN)
+    through a default, and a process launch without verified lineage is
+    rejected.
     """
+    if env is None:
+        raise RuntimeError(
+            "start_process requires an explicit verified child environment — "
+            "no compose_environment default; a process launch without "
+            "verified activation lineage is refused (B4-CXR6R4)")
     log = ls.LOGS_DIR / f"{name}.log"
     ls.LOGS_DIR.mkdir(parents=True, exist_ok=True)
-    env = dict(env) if env is not None else ls.compose_environment()
+    env = dict(env)
     env["PYTHONPATH"] = str(BASE_DIR / "src") + os.pathsep + env.get("PYTHONPATH", "")
     fd = open(log, "ab")
     proc = subprocess.Popen(argv, cwd=str(BASE_DIR), env=env,
@@ -472,6 +527,14 @@ def doctor() -> dict:
         "generated" if secret else "missing — run `configure`")
     secret_file_mode = ls.SECRETS_FILE.stat().st_mode & 0o777 if ls.SECRETS_FILE.exists() else None
     chk("secrets.json 0600", secret_file_mode == 0o600, f"mode={oct(secret_file_mode) if secret_file_mode else 'n/a'}")
+    try:
+        ls.read_activation_handoff_key()
+        key_ok = True
+        key_detail = "configured"
+    except RuntimeError as exc:
+        key_ok = False
+        key_detail = str(exc)
+    chk("activation handoff key configured (0600, read-only)", key_ok, key_detail)
     offenders = published_ports_from_compose()
     chk("published ports loopback-only", not offenders, "; ".join(offenders) or "all ports bind 127.0.0.1")
     for name, (pidfile, marker) in PROCESSES.items():
@@ -510,12 +573,13 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     except _VE:
         raise SystemExit(startup_report(snapshot))
     actions: list[str] = []
-    # B4-R3R3: configuration/init and runtime/start are distinguished. The
-    # separated INIT stage (`configure`) MAY materialize the local runtime
-    # secret (Book 2 invariant — a strong random secret on first governed
-    # configuration) using the SAME snapshotted configuration.
-    report = configure()
-    actions.append(f"configured secret ({report['secret_source']})")
+    # B4-CXR6R4: `start` is READ-ONLY over secret authority. It NEVER calls
+    # configure() and NEVER materializes missing material — required
+    # initialization material (postgres password, worker token, activation
+    # handoff key) must already exist or start fails closed with a
+    # `configure` remediation hint.
+    _require_runtime_init_material()
+    actions.append("initialization material present (start is read-only over secret authority)")
     # B4-CXR5R3: create EXACTLY ONE authoritative parent ActivationContext
     # (reusing the pre-resolved effective config — no second resolution);
     # every downstream step consumes the PINNED authority.
@@ -534,9 +598,10 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     if not docker_available():
         raise RuntimeError("Docker is unavailable — the local runtime requires Docker "
                            "(PostgreSQL + Redis run as local containers on loopback)")
-    if report["port_offenders"]:
+    offenders = published_ports_from_compose()
+    if offenders:
         raise RuntimeError("published ports are not loopback-only: "
-                           + "; ".join(report["port_offenders"]))
+                           + "; ".join(offenders))
     compose("up", "-d")
     actions.append("compose up -d")
     if not wait_dependencies(timeout_s):
@@ -604,6 +669,9 @@ def recover() -> list[str]:
     never mutate infrastructure or the database before rejection.
     """
     actions: list[str] = []
+    # B4-CXR6R4: recover is READ-ONLY over secret authority — required
+    # initialization material must exist (never materialized here).
+    _require_runtime_init_material()
     from oce_control.config_startup import create_activation_context
     ctx = create_activation_context()  # gate first — fail closed before any mutation
     actions.append("activation gate passed (pinned context)")

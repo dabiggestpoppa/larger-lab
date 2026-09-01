@@ -202,8 +202,8 @@ def test_restart_uses_same_governed_secret():
 
 def _seed_initialized_store() -> dict:
     """Write a fully-initialized approved store (password + worker token +
-    b4_meta + an unrelated secret entry) — the state an already-initialized
-    store has after configure + first start."""
+    b4_meta + an unrelated secret entry) AND the dedicated activation-handoff
+    key — the state an already-initialized runtime has after configure."""
     data = {
         "postgres_password": "s" * 40,
         "source": "generated",
@@ -232,27 +232,33 @@ def _mock_docker_runtime(monkeypatch) -> None:
 
 
 def test_cxr4r1_a_start_never_rewrites_existing_store(monkeypatch):
-    # A. existing store + ambient POSTGRES_PASSWORD + start() -> store hash
-    #    BEFORE == AFTER (ordinary start fails closed, never rotates)
+    # A (B4-CXR6R4): existing store + ambient POSTGRES_PASSWORD + start() —
+    # ordinary start is READ-ONLY over secret authority: the ambient value is
+    # NEVER consulted (no rotation path is even reachable) and the store hash
+    # BEFORE == AFTER. With no docker mock the run fails at the docker
+    # preflight; the store is untouched.
     _seed_initialized_store()
     before = _store_snapshot()
     monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-differs-9876543210")
-    with pytest.raises(RuntimeError, match="explicit rotation path"):
+    with pytest.raises(RuntimeError, match="Docker is unavailable"):
         ll.start()
     assert _store_snapshot() == before
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert data["postgres_password"] == "s" * 40  # ambient value never adopted
 
 
 def test_cxr4r1_b_restart_never_rewrites_existing_store(monkeypatch):
-    # B. same attack through restart (CLI restart = stop -> start): the safe
-    #    shutdown half is always allowed; the activation half fails closed.
+    # B (B4-CXR6R4): same attack through restart (CLI restart = stop ->
+    # start) with the docker surface mocked — start SUCCEEDS because the
+    # ambient value is never consulted, and the store is byte-identical. The
+    # ambient-password attack surface is eliminated, not merely blocked.
     _seed_initialized_store()
     before = _store_snapshot()
     monkeypatch.setenv("POSTGRES_PASSWORD", "ambient-attack-differs-9876543210")
     _mock_docker_runtime(monkeypatch)
     monkeypatch.setattr(ll, "stop_runtime_processes", lambda: [])
     ll.stop()
-    with pytest.raises(RuntimeError, match="explicit rotation path"):
-        ll.start()
+    ll.start()
     assert _store_snapshot() == before
 
 
@@ -777,9 +783,64 @@ class _FakeComp:
 # --------------------------------------------------------------------------
 
 def test_start_fails_closed_without_docker(monkeypatch):
+    # Docker unavailable + FULLY INITIALIZED store (password + token + key):
+    # start fails closed at the docker preflight and never mutates authority.
+    _seed_initialized_store()
+    before = _store_snapshot()
     monkeypatch.setattr(ll, "docker_available", lambda: False)
     with pytest.raises(RuntimeError, match="Docker is unavailable"):
         ll.start()
+    assert _store_snapshot() == before
+
+
+def test_start_fails_closed_without_init_material():
+    # CXR6-04: missing required init material (no store at all) -> start
+    # fails closed with a `configure` remediation hint and creates nothing.
+    before = _store_snapshot()
+    with pytest.raises(SystemExit, match="configure"):
+        ll.start()
+    assert _store_snapshot() == before
+    assert not ls.SECRETS_FILE.exists()
+    assert not ls.activation_key_file().exists()
+
+
+def test_start_missing_worker_token_blocks_without_mutation():
+    # T: existing postgres password but NO worker token + start -> store
+    # byte-identical and start blocked with a configure remediation hint.
+    ls.initialize_runtime_secret()
+    ls.initialize_activation_handoff_key()
+    before = _store_snapshot()
+    with pytest.raises(SystemExit, match="worker token.*configure|configure.*worker token"):
+        ll.start()
+    assert _store_snapshot() == before
+    data = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))
+    assert "worker_token" not in data  # never silently added
+
+
+def test_start_process_requires_verified_child_environment():
+    # V: start_process without a verified child environment is rejected —
+    # the compose_environment() compatibility default is REMOVED so a
+    # runtime process can never inherit the compose-only secret carrier.
+    with pytest.raises(RuntimeError, match="verified child environment"):
+        ll.start_process("worker", [sys.executable, "-c", "pass"], env=None)  # type: ignore[arg-type]
+
+
+def test_child_environment_never_carries_secret_material():
+    # F: the API/worker child environment contains NO POSTGRES_PASSWORD,
+    # NO POSTGRES_DSN, NO activation-handoff key, and NO worker token — the
+    # authenticated capability carrier is the only secret-free lineage proof.
+    _seed_initialized_store()
+    from oce_control.config_startup import create_activation_context
+    ctx = create_activation_context(environ={"PATH": "/usr/bin:/bin"})
+    for role in ("worker", "api"):
+        child_env = ctx.child_environment(child_role=role)
+        assert "POSTGRES_PASSWORD" not in child_env
+        assert "POSTGRES_DSN" not in child_env
+        assert "OCE_WORKER_TOKEN" not in child_env
+        assert "OCE_WORKER_SECRET" not in child_env
+        assert ls.read_activation_handoff_key() not in child_env["OCE_ACTIVATION_ENVELOPE"]
+        assert "w" * 40 not in child_env["OCE_ACTIVATION_ENVELOPE"]  # no token
+        assert "postgresql://" not in child_env["OCE_ACTIVATION_ENVELOPE"]
 
 
 def test_cloud_credential_hint_detects_cloud_env(monkeypatch):
