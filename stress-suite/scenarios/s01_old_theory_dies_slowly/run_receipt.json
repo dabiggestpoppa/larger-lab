@@ -1,0 +1,117 @@
+{
+  "actual_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "TRANSFORMATION_CANDIDATE",
+    "TRANSFORMATION_WINDOW",
+    "RECONSOLIDATION",
+    "NEW_STABLE"
+  ],
+  "authority_state_after": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    },
+    "WORKER_1": {
+      "grants": [],
+      "level": "WORKER"
+    }
+  },
+  "authority_state_before": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    },
+    "WORKER_1": {
+      "grants": [],
+      "level": "WORKER"
+    }
+  },
+  "evaluation_contract": {
+    "contract_id": "S01-EVAL-V1",
+    "fingerprint": "79fd96f05b47222c",
+    "freeze_status": "FROZEN",
+    "version_tag": "V1"
+  },
+  "evidence_count": 10,
+  "evidence_refs_by_transition": {
+    "1": [
+      "E1"
+    ],
+    "3": [
+      "E_IMPL",
+      "E_DATA"
+    ],
+    "4": [
+      "E4"
+    ],
+    "6": [
+      "E6A",
+      "E6B"
+    ],
+    "7": [
+      "E7A",
+      "E7B"
+    ],
+    "8": [
+      "E8"
+    ],
+    "9": [
+      "E9"
+    ],
+    "10": [
+      "E_MB"
+    ]
+  },
+  "expected_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "TRANSFORMATION_CANDIDATE",
+    "TRANSFORMATION_WINDOW",
+    "RECONSOLIDATION",
+    "NEW_STABLE"
+  ],
+  "expected_trace_accessed_during_run": false,
+  "failures": [],
+  "fingerprint": "cdc524274120e82ba33943766fd3d42c",
+  "forbidden_attempts": [],
+  "hidden_ground_truth_accessed": false,
+  "holds": [
+    {
+      "rationale": "no rule fired; hold phase",
+      "rule_id": "NO_MATCH",
+      "seq": 2
+    },
+    {
+      "rationale": "no rule fired; hold phase",
+      "rule_id": "NO_MATCH",
+      "seq": 5
+    }
+  ],
+  "pass": true,
+  "policy_id": "S01-POLICY",
+  "policy_version": "V1",
+  "scenario_id": "S01",
+  "scenario_version": "1.0.0",
+  "starting_epoch": "E-S01-0",
+  "stimulus_count": 10,
+  "terminal_knowledge_states": {
+    "@M_A": "SUPERSEDED",
+    "@M_B": "ACTIVE"
+  },
+  "terminal_phase": "NEW_STABLE"
+}

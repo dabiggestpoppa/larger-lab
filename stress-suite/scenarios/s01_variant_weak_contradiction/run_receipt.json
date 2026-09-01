@@ -1,0 +1,80 @@
+{
+  "actual_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "STABLE",
+    "WATCH",
+    "STABLE"
+  ],
+  "authority_state_after": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "authority_state_before": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "evaluation_contract": {
+    "contract_id": "S01W-EVAL-V1",
+    "fingerprint": "bcee117c70571181",
+    "freeze_status": "FROZEN",
+    "version_tag": "V1"
+  },
+  "evidence_count": 5,
+  "evidence_refs_by_transition": {
+    "1": [
+      "W1"
+    ],
+    "2": [
+      "W2"
+    ],
+    "3": [
+      "W3"
+    ],
+    "4": [
+      "W4"
+    ]
+  },
+  "expected_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "STABLE",
+    "WATCH",
+    "STABLE"
+  ],
+  "expected_trace_accessed_during_run": false,
+  "failures": [],
+  "fingerprint": "3afffb0361cdcaa9f95ff117097a64ab",
+  "forbidden_attempts": [],
+  "hidden_ground_truth_accessed": false,
+  "holds": [
+    {
+      "rationale": "no rule fired; hold phase",
+      "rule_id": "NO_MATCH",
+      "seq": 5
+    }
+  ],
+  "pass": true,
+  "policy_id": "S01W-POLICY",
+  "policy_version": "V1",
+  "scenario_id": "S01_WEAK",
+  "scenario_version": "1.0.0",
+  "starting_epoch": "E-S01W-0",
+  "stimulus_count": 5,
+  "terminal_knowledge_states": {
+    "@M_A": "ACTIVE"
+  },
+  "terminal_phase": "STABLE"
+}

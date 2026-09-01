@@ -1,0 +1,95 @@
+{
+  "actual_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "TRANSFORMATION_CANDIDATE",
+    "TRANSFORMATION_WINDOW",
+    "RECONSOLIDATION",
+    "PLURAL_MODEL_STATE",
+    "STABLE"
+  ],
+  "authority_state_after": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "authority_state_before": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "evaluation_contract": {
+    "contract_id": "S05-EVAL-V1",
+    "fingerprint": "ef1a395bcc841829",
+    "freeze_status": "FROZEN",
+    "version_tag": "V1"
+  },
+  "evidence_count": 7,
+  "evidence_refs_by_transition": {
+    "1": [
+      "E_MB_PAPER"
+    ],
+    "2": [
+      "E_MB_PAPER"
+    ],
+    "3": [
+      "E_DISCRIM_A",
+      "E_DISCRIM_B"
+    ],
+    "4": [
+      "E_DISCRIM_A",
+      "E_DISCRIM_B"
+    ],
+    "5": [
+      "E_DISCRIM_A",
+      "E_DISCRIM_B"
+    ],
+    "6": [
+      "E_DISCRIM_A",
+      "E_DISCRIM_B"
+    ],
+    "7": [
+      "E_DISCRIM_A",
+      "E_DISCRIM_B"
+    ]
+  },
+  "expected_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "TRANSFORMATION_CANDIDATE",
+    "TRANSFORMATION_WINDOW",
+    "RECONSOLIDATION",
+    "PLURAL_MODEL_STATE",
+    "STABLE"
+  ],
+  "expected_trace_accessed_during_run": false,
+  "failures": [],
+  "fingerprint": "9e5b22de4d53d24e564c5b8c28d3e792",
+  "forbidden_attempts": [],
+  "hidden_ground_truth_accessed": false,
+  "holds": [],
+  "pass": true,
+  "policy_id": "S05-POLICY",
+  "policy_version": "V1",
+  "scenario_id": "S05",
+  "scenario_version": "1.0.0",
+  "starting_epoch": "E-S05-0",
+  "stimulus_count": 7,
+  "terminal_knowledge_states": {
+    "@M_A": "ACTIVE",
+    "@M_B": "ACTIVE"
+  },
+  "terminal_phase": "STABLE"
+}

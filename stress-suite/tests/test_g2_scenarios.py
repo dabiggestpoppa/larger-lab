@@ -113,6 +113,19 @@ def test_evidence_refs_recorded_for_every_material_transition():
         assert ids, f"transition at seq {seq} lacks evidence refs"
 
 
+def test_committed_run_receipts_match_a_fresh_run():
+    """The evidence receipts on disk must reproduce exactly: same fingerprint,
+    same verdict. Guards against drift between committed evidence and code."""
+    for sid, pack in PACKS.items():
+        receipt_path = pack.path / "run_receipt.json"
+        assert receipt_path.exists(), f"missing receipt for {sid}"
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        res = run_scenario(pack.spec, pack.contract, pack.policy)
+        assert res.artifacts["fingerprint"] == receipt["fingerprint"], sid
+        assert receipt["pass"] == (evaluate_expectation(res, pack.spec)["pass"]), sid
+        assert res.artifacts["actual_phase_trace"] == receipt["actual_phase_trace"], sid
+
+
 def test_runs_are_deterministic():
     for sid in MAIN:
         a, _ = _run(sid)

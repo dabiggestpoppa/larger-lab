@@ -1,0 +1,107 @@
+{
+  "actual_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "TRANSFORMATION_CANDIDATE"
+  ],
+  "authority_state_after": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "authority_state_before": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "evaluation_contract": {
+    "contract_id": "S03-EVAL-V1",
+    "fingerprint": "c79aa75a8bb374e9",
+    "freeze_status": "FROZEN",
+    "version_tag": "V1"
+  },
+  "evidence_count": 11,
+  "evidence_refs_by_transition": {
+    "1": [
+      "P1"
+    ],
+    "2": [
+      "P2"
+    ],
+    "3": [
+      "P3"
+    ],
+    "4": [
+      "P4"
+    ],
+    "5": [
+      "P5"
+    ],
+    "6": [
+      "P6"
+    ],
+    "7": [
+      "P7"
+    ],
+    "8": [
+      "P8"
+    ],
+    "9": [
+      "P9"
+    ],
+    "10": [
+      "P10"
+    ],
+    "11": [
+      "P11"
+    ]
+  },
+  "expected_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "TRANSFORMATION_CANDIDATE"
+  ],
+  "expected_trace_accessed_during_run": false,
+  "failures": [],
+  "fingerprint": "9c7f3f2906e26e41935735d1fabc882b",
+  "forbidden_attempts": [],
+  "hidden_ground_truth_accessed": false,
+  "holds": [],
+  "pass": true,
+  "policy_id": "S03-POLICY",
+  "policy_version": "V1",
+  "scenario_id": "S03",
+  "scenario_version": "1.0.0",
+  "starting_epoch": "E-S03-0",
+  "stimulus_count": 11,
+  "terminal_knowledge_states": {},
+  "terminal_phase": "TRANSFORMATION_CANDIDATE"
+}

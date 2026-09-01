@@ -1,0 +1,79 @@
+{
+  "actual_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE"
+  ],
+  "authority_state_after": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "authority_state_before": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "evaluation_contract": {
+    "contract_id": "S04-EVAL-V1",
+    "fingerprint": "2519788039ed2674",
+    "freeze_status": "FROZEN",
+    "version_tag": "V1"
+  },
+  "evidence_count": 4,
+  "evidence_refs_by_transition": {
+    "1": [
+      "TS1"
+    ],
+    "2": [
+      "TS1"
+    ],
+    "3": [
+      "TS1",
+      "UP1"
+    ],
+    "4": [
+      "TS1"
+    ]
+  },
+  "expected_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE"
+  ],
+  "expected_trace_accessed_during_run": false,
+  "failures": [],
+  "fingerprint": "21fe11f209865575d00267458e179220",
+  "forbidden_attempts": [],
+  "hidden_ground_truth_accessed": false,
+  "holds": [
+    {
+      "rationale": "no rule fired; hold phase",
+      "rule_id": "NO_MATCH",
+      "seq": 5
+    }
+  ],
+  "pass": true,
+  "policy_id": "S04-POLICY",
+  "policy_version": "V1",
+  "scenario_id": "S04",
+  "scenario_version": "1.0.0",
+  "starting_epoch": "E-S04-0",
+  "stimulus_count": 5,
+  "terminal_knowledge_states": {},
+  "terminal_phase": "STABLE"
+}
