@@ -23,6 +23,11 @@ from .forbidden import ForbiddenTransitionValidator
 from .governed import GovernedTransitionExecutor, TraceEntry
 from .replay import DeterministicReplay, ReplayEvent, ReplayResult
 from .fixtures import StressScenarioSpec, spec_to_replay_events, load_spec
+from .adjudicate import (
+    EvidenceAdjudicator, AdjudicatorPolicy, AdjudicatorRule, PredicateGate,
+    EvidenceObservation, PhaseProposal, PolicyError,
+)
+from .scenario import run_scenario, evaluate_expectation, decision_view, ScenarioRunResult
 
 __all__ = [
     "HARNESS_VERSION",
