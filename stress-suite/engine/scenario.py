@@ -143,6 +143,16 @@ def run_scenario(
         proposal: PhaseProposal = adjudicator.propose(current_phase=phase.state)
 
         base_seq = int(raw["seq"]) * 10
+        # generic topology prefilter: a proposal whose target is not reachable
+        # from the current phase is never submitted to the executor (it would
+        # only generate a noisy forbidden attempt). Recorded as a filtered hold.
+        if proposal.action == "TRANSITION" and not phase.can_transition(proposal.to_state):
+            holds.append({
+                "seq": obs.seq,
+                "rule_id": proposal.rule_id,
+                "rationale": f"proposal filtered: {phase.state} -> {proposal.to_state} is not a legal phase edge",
+            })
+            proposal = PhaseProposal(rule_id="PREFILTERED", action="HOLD", rationale="topology-prefiltered")
         if proposal.action == "HOLD":
             holds.append({"seq": obs.seq, "rule_id": proposal.rule_id, "rationale": proposal.rationale})
         else:
@@ -168,15 +178,18 @@ def run_scenario(
                 actual_phase_trace.append(entry.to_dict()["to"])
                 evidence_refs_by_transition[obs.seq] = list(proposal.evidence_refs)
 
-        # optional generic institutional action (lifecycle/evidence/authority)
-        ia = raw.get("institutional_action")
-        if ia:
-            ia_event = _institutional_action_event(base_seq + 1, ia)
-            ia_entry = executor.execute(ia_event)
-            trace_entries.append({"seq": obs.seq, "institutional": True,
-                                  **{k: ia_entry.to_dict()[k] for k in
-                                     ("machine", "event_type", "from", "to", "allowed",
-                                      "applied", "rule_ids", "rationale", "kind")}})
+        # optional generic institutional action(s) (lifecycle/evidence/authority)
+        ias = raw.get("institutional_action")
+        if ias:
+            if isinstance(ias, dict):
+                ias = [ias]
+            for offset, ia in enumerate(ias):
+                ia_event = _institutional_action_event(base_seq + 1 + offset, ia)
+                ia_entry = executor.execute(ia_event)
+                trace_entries.append({"seq": obs.seq, "institutional": True,
+                                      **{k: ia_entry.to_dict()[k] for k in
+                                         ("machine", "event_type", "from", "to", "allowed",
+                                          "applied", "rule_ids", "rationale", "kind")}})
 
     terminal_lifecycle = {rid: r.state for rid, r in lifecycle.records.items()}
     authority_after = {

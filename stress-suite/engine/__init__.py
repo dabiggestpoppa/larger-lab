@@ -28,6 +28,7 @@ from .adjudicate import (
     EvidenceObservation, PhaseProposal, PolicyError,
 )
 from .scenario import run_scenario, evaluate_expectation, decision_view, ScenarioRunResult
+from .scenariolib import ScenarioPack, load_scenario_pack, load_all_packs, SCENARIO_DIRS
 
 __all__ = [
     "HARNESS_VERSION",

@@ -139,12 +139,19 @@ def test_hysteresis_self_transition_skipped():
 
 
 def test_hold_when_blocks_transition():
-    p = _policy([{"rule_id": "leak.hold", "to_state": "ESCALATION_REVIEW",
-                  "all_of": [{"independent_contradiction": "HIGH"}],
-                  "hold_when": ["DATA_QUALITY_DEFECT"]}])
+    """A data-quality blocker HOLD is its own rule (pass 1); the escalation
+    rule (pass 2) fires only when the blocker label is absent. Two explicit
+    rules, never one rule playing both roles."""
+    p = _policy([
+        {"rule_id": "escalate", "to_state": "ESCALATION_REVIEW",
+         "all_of": [{"independent_contradiction": "HIGH"}]},
+        {"rule_id": "leak.hold", "hold": True,
+         "hold_when": ["DATA_QUALITY_DEFECT"]},
+    ])
     a = EvidenceAdjudicator(p, _contract())
     a.observe(_obs(1, {"independent_contradiction": "HIGH"}))
-    assert a.propose(current_phase="WATCH").action == "TRANSITION"
+    prop = a.propose(current_phase="WATCH")
+    assert prop.action == "TRANSITION" and prop.rule_id == "escalate"
     b = EvidenceAdjudicator(p, _contract())
     b.observe(_obs(1, {"independent_contradiction": "HIGH"}, holds=("DATA_QUALITY_DEFECT",)))
     prop = b.propose(current_phase="WATCH")
