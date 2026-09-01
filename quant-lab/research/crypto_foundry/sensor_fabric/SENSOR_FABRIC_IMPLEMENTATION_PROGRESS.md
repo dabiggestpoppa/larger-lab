@@ -11,10 +11,10 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I02 COMPLETE — CONTENT ADDRESSING + PATHS + CHECKSUMS (proposed PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS).  STORAGE_MODEL_CONTRACTS_READY=TRUE; CONTENT_ADDRESSING_READY=TRUE; PATH_CONTRACT_READY=TRUE; CHECKSUM_PRIMITIVES_READY=TRUE; T0A/T0B/ATOMIC_BACKEND/MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; no persistence/backend/network; next SENSOR-B4-I03 NOT started |
+| Current checkpoint | SENSOR-B4-I02R1 COMPLETE — CANONICAL PATH DECODING + COLLISION-FREE PROJECTION ADDRESS SEAL (proposed PASS_SENSOR_B4_I02R1_CANONICAL_PATHS_SEALED; then operator acceptance of PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS).  Defect A (over-escaped safe chars) + Defect B (8-char projection prefix collision) sealed; canonical bijection test-frozen; T0A unchanged.  STORAGE_MODEL_CONTRACTS_READY=TRUE; CONTENT_ADDRESSING_READY=TRUE; PATH_CONTRACT_READY=TRUE; CHECKSUM_PRIMITIVES_READY=TRUE; T0A/T0B/ATOMIC_BACKEND/MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; LONG_COMPONENT_CHECK_REQUIRED_IN_I03=TRUE; no persistence/backend/network; next SENSOR-B4-I03 NOT started |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN (SENSOR-B3-I11R1-RATIFY: PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED = OPERATOR_ACCEPTED, PASS_BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED, BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS, REAL_PROVIDER_ADAPTERS=4, PRODUCTION_PATHS=17/17, PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18); BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; SENSOR-B4-I01R1-RATIFY: PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED = OPERATOR_ACCEPTED, PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN = OPERATOR_ACCEPTED; authorized SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS ONLY — addresses/identity mechanics, NO persistence yet; SENSOR-B4-I02 COMPLETE — proposed PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS (I02 verification pending operator review) |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN (SENSOR-B3-I11R1-RATIFY: PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED = OPERATOR_ACCEPTED, PASS_BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED, BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS, REAL_PROVIDER_ADAPTERS=4, PRODUCTION_PATHS=17/17, PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18); BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; SENSOR-B4-I01R1-RATIFY: PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED = OPERATOR_ACCEPTED, PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN = OPERATOR_ACCEPTED; authorized SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS ONLY — addresses/identity mechanics, NO persistence yet; SENSOR-B4-I02 COMPLETE — proposed PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS (I02 verification pending operator review); SENSOR-B4-I02R1 COMPLETE — proposed PASS_SENSOR_B4_I02R1_CANONICAL_PATHS_SEALED (canonical decoder + collision-free projection keys; pending operator review) |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
@@ -25,7 +25,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE — SENSOR-B4-I02 COMPLETE (content addressing + paths + checksums; identity/address mechanics only, no blob writer, no filesystem mutation, no network); recommended next (after operator acceptance of I02): SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND (NOT started) |
+| next_checkpoint_authorized | FALSE — SENSOR-B4-I02R1 COMPLETE (canonical path decoding + collision-free projection addresses; identity/address mechanics only, no blob writer, no filesystem mutation, no network); recommended next (after operator acceptance of I02R1/I02): SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND (NOT started; must fail closed on overlong components) |
 
 ## Test counts (cumulative)
 
@@ -139,7 +139,12 @@ that is updated at every staged checkpoint.
 | SENSOR-B4-I02B | (next commit) | 0 (paths/object-key derivation + public exports) | — |
 | SENSOR-B4-I02C | (next commit) | 122 (storage tests: test_checksums 35 + test_paths 87; storage 115 -> 237) | 0 |
 | SENSOR-B4-I02D | (next commit) | 0 (evidence/ledger) | — |
-| cumulative | 1616 | 1616 | 0 |
+| SENSOR-B4-I02E | d11895bd | 0 (ruff hygiene: DTZ001 noqa on intentional naive-datetime tests) | — |
+| SENSOR-B4-I02F | 7b6926c3 | 0 (empty CI re-trigger) | — |
+| SENSOR-B4-I02R1A | 8fbe5500 | 35 (canonical decoding + bijection both directions) | 0 |
+| SENSOR-B4-I02R1B | 94922be3 | 0 (full-SHA projection key; collision + full-hash tests folded into R1A batch) | 0 |
+| SENSOR-B4-I02R1C | d7a4f6c6 | 0 (canonical-path seal evidence) | — |
+| cumulative | 1638 | 1638 | 0 |
 
 ## External / provider blockers
 
