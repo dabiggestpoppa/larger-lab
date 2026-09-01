@@ -6,207 +6,281 @@
     "OKX_SWAP": "okx-adapter-v1"
   },
   "artifact": "BLOC_03_CURRENT_RUNTIME_ADAPTER_OVERLAY.json",
-  "generated_utc": "2026-09-01T11:41:16.555023+00:00",
-  "network_validation": "PASS \u2014 17/17 logical paths, 18/18 physical production-symbol checks (I10 baseline + I10R1/I10R2 overlays)",
-  "note": "I09 matrix (PRODUCTION_ADAPTER_MATRIX.csv/json) remains UNCHANGED and immutable; this overlay records current adapter semantic versions and runtime completion truth after I10/I10R1/I10R2.",
+  "immutable_authority_note": "PRODUCTION_ADAPTER_MATRIX.csv/.json (I09) and all I10/I10R1/I10R2 artifacts remain UNCHANGED; this overlay is the current-runtime surface.",
+  "network_validation": {
+    "live_calls_total": 29,
+    "logical_paths": "17/17",
+    "note": "operator-accepted combined I10 baseline + I10R1 repair overlay + I10R2 semantic seal: 17/17 logical paths, 18/18 physical production-symbol checks",
+    "physical_symbol_checks": "18/18",
+    "retries": 0,
+    "status": "PASS"
+  },
   "paths": [
     {
       "adapter_version": "deribit-adapter-v1",
-      "completion_truth": "funding LIMITED; trade/liquidation has_more=false terminal (completion per I09)",
-      "i09_completion_status": "n/a",
-      "i09_resume_status": "n/a",
+      "completion_status": "n/a",
+      "current_only": true,
+      "history_scope": "CURRENT_ONLY",
+      "limitations": "current-only raw snapshot; no historical coverage claimed",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "DERIBIT",
+      "resume_status": "n/a",
+      "runtime_batch_completion_semantics": "current-only snapshot; completion n/a (no historical replay, no resume semantics)",
       "sensor_family": "MECHANICAL_BOOK_SNAPSHOT"
     },
     {
       "adapter_version": "deribit-adapter-v1",
-      "completion_truth": "funding LIMITED; trade/liquidation has_more=false terminal (completion per I09)",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "DERIBIT",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "is_complete=False (LIMITED: funding continuation not proven exhaustive); truthful PARTIAL/EMPTY",
       "sensor_family": "MECHANICAL_FUNDING"
     },
     {
       "adapter_version": "deribit-adapter-v1",
-      "completion_truth": "funding LIMITED; trade/liquidation has_more=false terminal (completion per I09)",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "DERIBIT",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "terminal = provider has_more==false AND in-window coverage; COMPLETE never PARTIAL; PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
       "sensor_family": "MECHANICAL_LIQUIDATION"
     },
     {
       "adapter_version": "deribit-adapter-v1",
-      "completion_truth": "funding LIMITED; trade/liquidation has_more=false terminal (completion per I09)",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "funding continuation LIMITED (I08R1); trade/liq completion from source coverage; liquidation = trade-level microscope (never aggregated numerically with Gate/Kraken totals)",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "DERIBIT",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "terminal = provider has_more==false AND in-window coverage; COMPLETE never PARTIAL; PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
       "sensor_family": "MECHANICAL_TRADE"
     },
     {
       "adapter_version": "gate-adapter-v2",
-      "completion_truth": "LIMITED \u2014 runtime is_complete=False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "LIMITED/LIMITED (frozen I09); contract_stats deep traversal UNRESOLVED; ~180-day rolling retention",
       "live_validation_refs": [
-        "I10 baseline",
-        "I10R2 recheck"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json",
+        "BLOC_03_I10R2_TARGETED_RECHECK_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "GATE_FUTURES",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "is_complete=False always (LIMITED authority); no resume token; PARTIAL_INTERVAL when rows intersect window, GAP_DETECTED when outside, EMPTY_VALID on empty",
       "sensor_family": "MECHANICAL_FUNDING"
     },
     {
       "adapter_version": "gate-adapter-v2",
-      "completion_truth": "LIMITED \u2014 runtime is_complete=False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "LIMITED/LIMITED (frozen I09); contract_stats deep traversal UNRESOLVED; ~180-day rolling retention",
       "live_validation_refs": [
-        "I10 baseline",
-        "I10R1 recheck",
-        "I10R2 recheck"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json",
+        "BLOC_03_I10R1_TARGETED_RECHECK_RESULTS.json",
+        "BLOC_03_I10R2_TARGETED_RECHECK_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "GATE_FUTURES",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "is_complete=False always (LIMITED authority); no resume token; PARTIAL_INTERVAL when rows intersect window, GAP_DETECTED when outside, EMPTY_VALID on empty",
       "sensor_family": "MECHANICAL_LIQUIDATION"
     },
     {
       "adapter_version": "gate-adapter-v2",
-      "completion_truth": "LIMITED \u2014 runtime is_complete=False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "LIMITED/LIMITED (frozen I09); contract_stats deep traversal UNRESOLVED; ~180-day rolling retention",
       "live_validation_refs": [
-        "I10 baseline",
-        "I10R1 recheck",
-        "I10R2 recheck"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json",
+        "BLOC_03_I10R1_TARGETED_RECHECK_RESULTS.json",
+        "BLOC_03_I10R2_TARGETED_RECHECK_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "GATE_FUTURES",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "is_complete=False always (LIMITED authority); no resume token; PARTIAL_INTERVAL when rows intersect window, GAP_DETECTED when outside, EMPTY_VALID on empty",
       "sensor_family": "MECHANICAL_OPEN_INTEREST"
     },
     {
       "adapter_version": "gate-adapter-v2",
-      "completion_truth": "LIMITED \u2014 runtime is_complete=False, no resume token, PARTIAL_INTERVAL/GAP_DETECTED/EMPTY_VALID",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "LIMITED/LIMITED (frozen I09); contract_stats deep traversal UNRESOLVED; ~180-day rolling retention",
       "live_validation_refs": [
-        "I10 baseline",
-        "I10R1 recheck",
-        "I10R2 recheck"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json",
+        "BLOC_03_I10R1_TARGETED_RECHECK_RESULTS.json",
+        "BLOC_03_I10R2_TARGETED_RECHECK_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "GATE_FUTURES",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "is_complete=False always (LIMITED authority); no resume token; PARTIAL_INTERVAL when rows intersect window, GAP_DETECTED when outside, EMPTY_VALID on empty",
       "sensor_family": "MECHANICAL_POSITIONING"
     },
     {
       "adapter_version": "kraken-adapter-v2",
-      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
-      "i09_completion_status": "YES",
-      "i09_resume_status": "YES",
+      "completion_status": "YES",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "ragged historical boundaries per I14; bucket semantics not proven",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "KRAKEN_FUTURES",
+      "resume_status": "YES",
+      "runtime_batch_completion_semantics": "is_complete = not result.more (native terminal flag); resume via since=oldest-bucket cursor where more=true",
       "sensor_family": "MECHANICAL_BASIS"
     },
     {
       "adapter_version": "kraken-adapter-v2",
-      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
-      "i09_completion_status": "YES",
-      "i09_resume_status": "YES",
+      "completion_status": "YES",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "ragged historical boundaries per I14; bucket semantics not proven",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "KRAKEN_FUTURES",
+      "resume_status": "YES",
+      "runtime_batch_completion_semantics": "is_complete = not result.more (native terminal flag); resume via since=oldest-bucket cursor where more=true",
       "sensor_family": "MECHANICAL_BOOK_METRIC"
     },
     {
       "adapter_version": "kraken-adapter-v2",
-      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
-      "i09_completion_status": "YES",
-      "i09_resume_status": "YES",
+      "completion_status": "YES",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "ragged historical boundaries per I14; bucket semantics not proven",
       "live_validation_refs": [
-        "I10 baseline",
-        "I10R1 recheck",
-        "I10R2 recheck"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json",
+        "BLOC_03_I10R1_TARGETED_RECHECK_RESULTS.json",
+        "BLOC_03_I10R2_TARGETED_RECHECK_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "KRAKEN_FUTURES",
+      "resume_status": "YES",
+      "runtime_batch_completion_semantics": "is_complete = not result.more (native terminal flag); resume via since=oldest-bucket cursor where more=true",
       "sensor_family": "MECHANICAL_FUNDING"
     },
     {
       "adapter_version": "kraken-adapter-v2",
-      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
-      "i09_completion_status": "YES",
-      "i09_resume_status": "YES",
+      "completion_status": "YES",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "ragged historical boundaries per I14; bucket semantics not proven",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "KRAKEN_FUTURES",
+      "resume_status": "YES",
+      "runtime_batch_completion_semantics": "is_complete = not result.more (native terminal flag); resume via since=oldest-bucket cursor where more=true",
       "sensor_family": "MECHANICAL_LIQUIDATION"
     },
     {
       "adapter_version": "kraken-adapter-v2",
-      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
-      "i09_completion_status": "YES",
-      "i09_resume_status": "YES",
+      "completion_status": "YES",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "ragged historical boundaries per I14; bucket semantics not proven",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "KRAKEN_FUTURES",
+      "resume_status": "YES",
+      "runtime_batch_completion_semantics": "is_complete = not result.more (native terminal flag); resume via since=oldest-bucket cursor where more=true",
       "sensor_family": "MECHANICAL_OPEN_INTEREST"
     },
     {
       "adapter_version": "kraken-adapter-v2",
-      "completion_truth": "native `more` terminal flag; funding/analytics continue-window via since-cursor (resume=YES)",
-      "i09_completion_status": "YES",
-      "i09_resume_status": "YES",
+      "completion_status": "YES",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "ragged historical boundaries per I14; bucket semantics not proven",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "KRAKEN_FUTURES",
+      "resume_status": "YES",
+      "runtime_batch_completion_semantics": "is_complete = not result.more (native terminal flag); resume via since=oldest-bucket cursor where more=true",
       "sensor_family": "MECHANICAL_POSITIONING"
     },
     {
       "adapter_version": "okx-adapter-v1",
-      "completion_truth": "LIMITED continuation (resume/completion LIMITED per I09)",
-      "i09_completion_status": "n/a",
-      "i09_resume_status": "n/a",
+      "completion_status": "n/a",
+      "current_only": true,
+      "history_scope": "CURRENT_ONLY",
+      "limitations": "current-only raw snapshot; no historical coverage claimed",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "OKX_SWAP",
+      "resume_status": "n/a",
+      "runtime_batch_completion_semantics": "current-only snapshot; completion n/a (no historical replay, no resume semantics)",
       "sensor_family": "MECHANICAL_BOOK_SNAPSHOT"
     },
     {
       "adapter_version": "okx-adapter-v1",
-      "completion_truth": "LIMITED continuation (resume/completion LIMITED per I09)",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "LIMITED continuation (I09); no multi-window traversal proven",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "OKX_SWAP",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "is_complete=False (LIMITED continuation; direction unresolved); no invented resume token; PARTIAL_INTERVAL / GAP_DETECTED / EMPTY_VALID truthful flags",
       "sensor_family": "MECHANICAL_FUNDING"
     },
     {
       "adapter_version": "okx-adapter-v1",
-      "completion_truth": "LIMITED continuation (resume/completion LIMITED per I09)",
-      "i09_completion_status": "LIMITED",
-      "i09_resume_status": "LIMITED",
+      "completion_status": "LIMITED",
+      "current_only": false,
+      "history_scope": "HISTORICAL",
+      "limitations": "LIMITED continuation (I09); no multi-window traversal proven",
       "live_validation_refs": [
-        "I10 baseline"
+        "BLOC_03_I10_NETWORK_SMOKE_RESULTS.json"
       ],
+      "live_validation_status": "PASS",
       "provider_id": "OKX_SWAP",
+      "resume_status": "LIMITED",
+      "runtime_batch_completion_semantics": "is_complete=False (LIMITED continuation; direction unresolved); no invented resume token; PARTIAL_INTERVAL / GAP_DETECTED / EMPTY_VALID truthful flags",
       "sensor_family": "MECHANICAL_TRADE"
     }
   ],
-  "purpose": "CURRENT RUNTIME overlay over the immutable I09 offline matrix \u2014 consumed by SENSOR-B3-I11 final validation/handoff",
-  "starting_sha": "cb3bff61007d77fe4369c516ff9eff4b171300e2"
+  "purpose": "CURRENT RUNTIME overlay over the immutable I09 offline matrix (post-I10/I10R1/I10R2); consumed by SENSOR-B3-I11 handoff and Bloc 4",
+  "schema_version": "2.0"
 }
