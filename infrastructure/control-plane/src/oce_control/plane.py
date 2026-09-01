@@ -63,12 +63,17 @@ class ControlPlane:
         self.replay = ReplayHarness(self.job_store)
 
     def startup(self, environ: Optional[dict] = None) -> dict:
-        """Start the control plane. Returns startup status.
+        """Start the in-memory control plane. Returns startup status.
 
-        Before activating, the effective configuration is validated fail-closed
-        (Book 4 surface C). A malformed / incomplete / forbidden effective
-        config refuses to start and returns a BLOCKED status with an
-        operator-legible, secret-free message instead of {"status": "started"}.
+        B4-CXR5R7: this embedded assembly validates the effective
+        configuration fail-closed (Book 4 surface C) and reports in-memory
+        component health — it does NOT run the complete runtime activation
+        contract (no pinned ActivationContext, no live PostgreSQL/Redis, no
+        container readiness, no process launch). It therefore reports
+        ``configured`` / ``initialized`` truthfully and NEVER claims
+        ``started`` or runtime-ready. A malformed / incomplete / forbidden
+        effective config returns a BLOCKED status with an operator-legible,
+        secret-free message.
         """
         from .config_startup import require_startable, startup_report
 
@@ -86,7 +91,10 @@ class ControlPlane:
             }
         health = self.health_service.check_health()
         return {
-            "status": "started",
+            # B4-CXR5R7: config-only in-memory assembly — "configured",
+            # never "started"/runtime-ready without the full activation.
+            "status": "configured",
+            "activation_ready": False,
             "health": health.to_dict(),
             "components": [
                 "authority", "job_store", "scheduler", "worker_protocol",

@@ -221,7 +221,7 @@ def _mock_docker_runtime(monkeypatch) -> None:
     run deterministically without a live stack."""
     monkeypatch.setattr(ll, "docker_available", lambda: True)
     monkeypatch.setattr(ll, "compose", lambda *a, **k: _FakeComp(0))
-    monkeypatch.setattr(ll, "wait_ready", lambda *a, **k: True)
+    monkeypatch.setattr(ll, "wait_dependencies", lambda *a, **k: True)
     monkeypatch.setattr(ll, "migrate", lambda *a, **k: _FakeComp(0))
     monkeypatch.setattr(ll, "wait_for_http", lambda *a, **k: True)
     monkeypatch.setattr(ll, "smoke",

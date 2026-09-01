@@ -3,7 +3,7 @@
 oce_control.local_lifecycle — keeps all logic importable/testable.
 
     python scripts/oce_local.py <command> [options]
-    configure | doctor | start | migrate | wait-ready | smoke |
+    configure | doctor | start | migrate | wait-dependencies | smoke |
     restart | recover | stop | destroy
 """
 import os

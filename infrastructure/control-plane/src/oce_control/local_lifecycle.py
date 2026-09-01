@@ -1,7 +1,7 @@
 """OCE Book 2 — local lifecycle (B2-R7).
 
 Deterministic operator commands: configure, doctor, start, migrate,
-wait-ready, smoke, restart, recover, stop, destroy.
+wait-dependencies, smoke, restart, recover, stop, destroy.
 
 Design rules (each is enforced by tests in tests/test_local_lifecycle.py):
 
@@ -310,7 +310,15 @@ def configure() -> dict:
     return report
 
 
-def wait_ready(timeout_s: int = 120) -> bool:
+def wait_dependencies(timeout_s: int = 120) -> bool:
+    """Wait for DEPENDENCY health ONLY (postgres + redis containers).
+
+    B4-CXR5R7: named truthfully — this reports dependency health and is
+    NEVER activation/runtime readiness. Activation readiness is a strictly
+    stronger contract (pinned ActivationContext + resolved governed secret +
+    migration state + processes); callers must treat this as dependency
+    health only.
+    """
     deadline = time.time() + timeout_s
     while time.time() < deadline:
         pg = subprocess.run(
@@ -380,11 +388,18 @@ def http_ok(path: str, port: int | None = None) -> bool:
         return False
 
 
-def smoke(port: int | None = None) -> list[str]:
+def smoke(*, port: int) -> list[str]:
     """Smoke test: health endpoint + operator console served.
 
-    B4-CXR4R3: callers may pin the probe port from the activation context so
-    the smoke check targets the exact validated listener."""
+    B4-CXR5R7: the probe target MUST come from the pinned activation
+    destination — callers pass ``port=ctx.control_plane_port``. There is NO
+    port-less default that silently re-reads the environment; a fresh
+    environment read can never select a different listener than the one the
+    activation validated.
+    """
+    if not isinstance(port, int) or isinstance(port, bool):
+        raise TypeError("smoke requires the pinned activation port "
+                        "(B4-CXR5R7)")
     results = []
     results.append(("health", http_ok("/health", port)))
     results.append(("console", http_ok("/console", port)))
@@ -514,7 +529,7 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
                            + "; ".join(report["port_offenders"]))
     compose("up", "-d")
     actions.append("compose up -d")
-    if not wait_ready(timeout_s):
+    if not wait_dependencies(timeout_s):
         raise RuntimeError("postgres/redis did not become healthy")
     actions.append("postgres + redis healthy")
     if migrate_now:
@@ -586,9 +601,9 @@ def recover() -> list[str]:
             actions.append(f"cleared stale {name} pid: {detail}")
     if not docker_available():
         raise RuntimeError("Docker unavailable")
-    if not wait_ready(60):
+    if not wait_dependencies(60):
         compose("up", "-d")
-        if not wait_ready(120):
+        if not wait_dependencies(120):
             raise RuntimeError("stack did not recover to healthy")
         actions.append("stack re-upped and healthy")
     r = migrate(ctx)
@@ -621,7 +636,8 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--no-migrate", action="store_true")
     sp.add_argument("--timeout", type=int, default=120)
     sub.add_parser("migrate", help="apply numbered migrations")
-    sp = sub.add_parser("wait-ready", help="wait until postgres+redis are healthy")
+    sp = sub.add_parser("wait-dependencies",
+                        help="wait until postgres+redis are healthy (dependency health ONLY — never activation readiness)")
     sp.add_argument("--timeout", type=int, default=120)
     sub.add_parser("smoke", help="health + console smoke test against the running API")
     sub.add_parser("restart", help="stop then start (durable volume preserved)")
@@ -655,10 +671,14 @@ def main(argv: list[str] | None = None) -> int:
             print(r.stdout, end="")
             print(r.stderr, file=sys.stderr, end="")
             return r.returncode
-        if args.command == "wait-ready":
-            return 0 if wait_ready(args.timeout) else 1
+        if args.command == "wait-dependencies":
+            return 0 if wait_dependencies(args.timeout) else 1
         if args.command == "smoke":
-            results = smoke()
+            # B4-CXR5R7: smoke is pinned to the activation destination — the
+            # probe port comes from the pinned context, never a fresh env read.
+            from oce_control.config_startup import create_activation_context
+            ctx = create_activation_context()
+            results = smoke(port=ctx.control_plane_port)
             for n, ok in results:
                 print(f"smoke {n}: {'OK' if ok else 'FAIL'}")
             return 0 if all(ok for _, ok in results) else 1

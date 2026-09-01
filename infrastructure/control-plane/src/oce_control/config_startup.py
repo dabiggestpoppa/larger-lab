@@ -986,8 +986,14 @@ def outbound_cp_url(environ: dict | None = None,
     return url
 
 
-def gate_start(args_start: object | None = None) -> dict:
-    """CLI hook for 'start'/'restart': gate on config before compose up."""
+def config_gate() -> dict:
+    """CLI hook for 'start'/'restart': gate on CONFIGURATION before compose up.
+
+    B4-CXR5R7: named truthfully — this validates configuration ONLY and
+    never claims the runtime start gate. Activation readiness is a separate,
+    strictly stronger contract (pinned context + resolved governed secret +
+    dependencies + processes); this function reports configuration validity.
+    """
     return validate_configuration()
 
 

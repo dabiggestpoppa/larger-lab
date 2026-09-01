@@ -135,10 +135,14 @@ class TestEffectiveFromEnv:
 # Real startup path: ControlPlane.startup()
 # --------------------------------------------------------------------------- #
 class TestControlPlaneStartupGate:
-    def test_valid_default_config_starts(self):
+    def test_valid_default_config_reports_configured_not_started(self):
+        # B4-CXR5R7: the in-memory assembly validates configuration and
+        # reports in-memory health — it is CONFIGURED, never STARTED /
+        # runtime-ready without the complete activation contract.
         p = _plane()
         result = p.startup(environ=dict(CLEAN_ENV))
-        assert result["status"] == "started"
+        assert result["status"] == "configured"
+        assert result["activation_ready"] is False
         assert result["health"] is not None
         assert "api" in result["components"]
 
@@ -174,8 +178,10 @@ class TestControlPlaneStartupGate:
         p = _plane()
         blocked = p.startup(environ=dict(CLOUD_ENV))
         assert blocked["status"] == "blocked"
-        started = p.startup(environ=dict(CLEAN_ENV))
-        assert started["status"] == "started"
+        configured = p.startup(environ=dict(CLEAN_ENV))
+        # B4-CXR5R7: never "started" without full activation
+        assert configured["status"] == "configured"
+        assert configured["activation_ready"] is False
 
 
 # --------------------------------------------------------------------------- #
@@ -199,10 +205,10 @@ class TestCliEntryGate:
             assert "plain-password-123" not in msg
 
     def test_start_gate_function_returns_blocked_report(self):
-        rep = cs.gate_start()
+        rep = cs.config_gate()
         assert rep["ok"] in (True, False)
         assert rep["config_ok"] in (True, False)
-        assert "start" not in rep  # CXR4-07: config gate never claims start
+        assert "start" not in rep  # CXR4-07/CXR5-07: config gate never claims start
 
     def test_env_map_covers_posture_setting(self):
         # ensure the env map touches every deny-by-default posture surface
@@ -298,7 +304,9 @@ class TestDefaultStaysStartable:
 
     def test_plane_default_startup_status(self):
         p = _plane()
-        assert p.startup()["status"] == "started"
+        result = p.startup()
+        assert result["status"] == "configured"  # B4-CXR5R7: never "started"
+        assert result["activation_ready"] is False
 
 
 # --------------------------------------------------------------------------- #
@@ -952,7 +960,7 @@ class TestCXR4R4GateFirstRecoverAndMigration:
         monkeypatch.setattr(ll, "docker_available", lambda: True)
         monkeypatch.setattr(ll, "compose",
                             lambda *a, **k: calls.append(("compose", a)) or self._FakeComp())
-        monkeypatch.setattr(ll, "wait_ready", lambda *a, **k: True)
+        monkeypatch.setattr(ll, "wait_dependencies", lambda *a, **k: True)
         monkeypatch.setattr(ll, "migrate",
                             lambda *a, **k: calls.append(("migrate", a)) or self._FakeComp())
         monkeypatch.setattr(ll, "start_process",
@@ -1363,7 +1371,7 @@ class TestCXR5R3ActivationLineage:
 
         monkeypatch.setattr(ll, "docker_available", lambda: True)
         monkeypatch.setattr(ll, "compose", lambda *a, **k: _FakeComp())
-        monkeypatch.setattr(ll, "wait_ready", lambda *a, **k: True)
+        monkeypatch.setattr(ll, "wait_dependencies", lambda *a, **k: True)
         monkeypatch.setattr(ll, "migrate", lambda *a, **k: _FakeComp())
         monkeypatch.setattr(ll, "wait_for_http", lambda *a, **k: True)
         monkeypatch.setattr(ll, "smoke",
