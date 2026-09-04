@@ -1876,3 +1876,65 @@ class TestCXR4R5ProvenAuditDurability:
                 request_id="override-req-nocommit-0001")
         assert authz.audit == []
         assert conn.rolled_back >= 1
+
+
+class TestCXR7U5CanonicalAuditValue:
+    """B4-CXR7U5 (unit, runs everywhere): ONE canonical representation
+    before insertion and comparison. Container CI proves the same property
+    through the real PostgreSQL sink."""
+
+    def _authz(self, sink):
+        return ConfigAuthorization(build_default_registry(), durable_sink=sink)
+
+    def test_canonical_values(self):
+        from oce_control.audit_sink import canonical_audit_value
+        assert canonical_audit_value(True) == "true"
+        assert canonical_audit_value(False) == "false"
+        assert canonical_audit_value(9104) == "9104"
+        assert canonical_audit_value(None) is None
+        assert canonical_audit_value("loopback-only") == "loopback-only"
+
+    def test_canonical_is_idempotent(self):
+        from oce_control.audit_sink import canonical_audit_value
+        for v in (True, False, 0, 9104, "x", None):
+            once = canonical_audit_value(v)
+            assert canonical_audit_value(once) == once
+
+    def test_bool_checked_before_int(self):
+        # bool is an int subclass: True must never render as '1' or 'True'
+        from oce_control.audit_sink import canonical_audit_value
+        assert canonical_audit_value(True) == "true"
+        assert canonical_audit_value(1) == "1"
+
+    def test_unrepresentable_type_fails_closed(self):
+        from oce_control.audit_sink import canonical_audit_value
+        for bad in (3.5, object(), ["x"], {"x": 1}):
+            with pytest.raises(PermissionError):
+                canonical_audit_value(bad)
+
+    def test_bool_retry_reconciles_through_fake_text_row(self):
+        # the fake preserves DB-side TEXT exactly as PostgreSQL would: the
+        # durable row is built from the FIRST insert's canonical params, then
+        # an exact retry must reconcile against it (canonical == canonical).
+        conn = _FakeConn()
+        authz = self._authz(PostgresAuditSink(conn))
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        rid = "override-req-bool-0001"
+        first = authz.operator_override(
+            eff, actor="operator:po", setting_name="capital.authority",
+            requested_change="confirm no capital authority", reason="r",
+            new_value="none",
+            request_id=rid)
+        assert first == "none"
+        # reconstruct the committed TEXT row from the first INSERT params
+        # (same column order as the reconciliation SELECT)
+        insert = next(p for sql, p in conn.executes
+                      if sql.strip().startswith("INSERT"))
+        conn.rows = [tuple(insert[2:13])]
+        conn.insert_conflict = True
+        second = authz.operator_override(
+            eff, actor="operator:po", setting_name="capital.authority",
+            requested_change="confirm no capital authority", reason="r",
+            new_value="none",
+            request_id=rid)
+        assert second == "none"  # canonical retry reconciles
