@@ -1,0 +1,10 @@
+[
+  {
+    "record_id": "FAM_A_EXTREME_NEGATIVE_BASIS_DISLOCATION",
+    "kind": "OBSERVATION",
+    "claim": "crypto foundry FAM_A extreme negative basis dislocation (source-domain evidence, CRYPTO)",
+    "lineage": "CRYPTO_FOUNDRY_FAM_A",
+    "source_label": "FAM_A crypto evidence",
+    "seq": 0
+  }
+]
