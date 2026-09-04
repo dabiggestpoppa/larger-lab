@@ -45,7 +45,8 @@ def _reject_secret_flags(argv) -> None:
             raise SystemExit(2)
 
 
-def main(argv=None) -> None:
+def main(argv=None,
+         ctx: "ParentActivationContext | VerifiedChildContext | None" = None) -> None:
     if argv is None:
         argv = sys.argv[1:]
     # B4-CXR5R1: reject secret-bearing flags before argparse (which would
@@ -81,7 +82,15 @@ def main(argv=None) -> None:
     # B4-CXR6R1: this process declares the WORKER role; when launched as a
     # lifecycle child the activation capability must be role-bound to
     # 'worker' or activation is refused before any connection.
-    ctx = create_activation_context(role="worker")
+    ctx = create_activation_context(role="worker") if ctx is None else ctx
+    declared = getattr(ctx, "declared_role", None)
+    if declared is not None and declared != "worker":
+        # B4-CXR7U2: the verified child's declared role/audience comes from
+        # the authenticated handoff and cannot be re-declared by the child.
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: verified child role/audience "
+            f"'{declared}' does not match the consumer role 'worker' "
+            "(B4-CXR7U2)")
     token = ls.read_worker_token()  # read-only; raises when not initialized
 
     import psycopg2

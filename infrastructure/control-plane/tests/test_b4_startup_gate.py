@@ -1420,6 +1420,12 @@ class TestCXR5R3ActivationLineage:
         assert child.control_plane_port == 8455          # pinned
         assert child.scheduler_interval == 9
         assert child.runtime_dsn(backend) == ctx.runtime_dsn(backend)
+        # B4-CXR7U2: the verified child receives the DISTINCT child type
+        assert type(child) is cs.VerifiedChildContext
+        assert type(ctx) is cs.ParentActivationContext
+        assert child.declared_role == "api"
+        assert not hasattr(child, "issue_child_handoff")
+        assert not hasattr(child, "child_environment")
 
     def test_child_environment_is_sanitized(self, tmp_path):
         # 5 (CXR5-03): child env carries NO ambient OCE_* authority or secret

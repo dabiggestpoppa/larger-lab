@@ -20,7 +20,8 @@ Entry points wired into startup / CLI:
   * load_effective_config(environ)  -> EffectiveConfig  (raises on violation)
   * validate_startup(environ)       -> dict report       (never raises)
   * startup_report(environ)         -> operator-legible dict
-  * create_activation_context()     -> frozen ActivationContext (B4-CXR4R3)
+  * create_activation_context()     -> ParentActivationContext (parent/issuer
+    path) or VerifiedChildContext (child path, B4-CXR4R3 + B4-CXR7U2)
 
 Errors are operator-legible and secret-free: a violation names the offending
 setting and the rule, but never prints a secret value.
@@ -246,13 +247,13 @@ def effective_from_env(environ: dict | None = None,
 def governed_runtime_dsn(environ: dict | None = None,
                          backend: "ls.RuntimeSecretBackend | None" = None,
                          eff: EffectiveConfig | None = None,
-                         ctx: "ActivationContext | None" = None) -> str:
+                         ctx: "ParentActivationContext | VerifiedChildContext | None" = None) -> str:
     """Build the ephemeral PostgreSQL DSN from the governed secret boundary.
 
     path: effective config -> postgres.password_ref -> approved store ->
           in-memory DSN (never logged, evidenced, or fingerprinted).
 
-    When a pinned ActivationContext (B4-CXR4R3) is supplied, the DSN comes
+    When a pinned parent context (B4-CXR4R3) is supplied, the DSN comes
     from the PINNED postgres parameters + reference, and the context is
     checked for staleness (a rotated/revoked secret mid-activation fails
     closed). Otherwise the DSN is derived from the effective config. An
@@ -266,9 +267,10 @@ def governed_runtime_dsn(environ: dict | None = None,
     # closed — the envelope is the only activation authority for children.
     if _envelope_present(environ) and eff is None:
         raise SystemExit(
-            "production activation requires a pinned ActivationContext — "
-            "governed_runtime_dsn() without ctx is a test-only compatibility "
-            "path and is unreachable in a lifecycle-launched process "
+            "production activation requires a pinned parent activation "
+            "context — governed_runtime_dsn() without ctx is a test-only "
+            "compatibility path and is unreachable in a lifecycle-launched "
+            "process "
             "(B4-CXR5R3)")
     if eff is None:
         ctx = create_activation_context(environ)  # resolve ONCE, pin
@@ -497,9 +499,10 @@ def require_runtime_startable(
 # configuration every component uses. create_activation_context() snapshots
 # the environment ONCE, resolves and validates the effective config ONCE,
 # resolves the required secret metadata ONCE, and freezes an immutable
-# ActivationContext. Every runtime consumer (HTTP bind, scheduler, durable DB
-# connection, worker, migrations, outbound worker URL, lifecycle) consumes the
-# SAME pinned object instead of re-reading os.environ. If the secret is
+# ParentActivationContext. Every runtime consumer (HTTP bind, scheduler,
+# durable DB connection, worker, migrations, outbound worker URL, lifecycle)
+# consumes the SAME pinned object instead of re-reading os.environ. If the
+# secret is
 # rotated/revoked after context creation, the context is STALE and every
 # consumer fails closed — a rotated authority is never silently adopted.
 
@@ -734,6 +737,11 @@ class ActivationEnvelope:
         return cls.from_dict(payload)
 
 
+# B4-CXR7U2: preferred terminology — the authenticated launch handoff carrier.
+# An alias, not a subclass: serialization/MAC behavior is identical.
+ActivationHandoff = ActivationEnvelope
+
+
 def _reject_duplicate_keys(pairs) -> dict:
     """Reject duplicate/ambiguous JSON object keys (B4-CXR6R1): a duplicate
     key is a representation ambiguity that must never silently win."""
@@ -746,14 +754,24 @@ def _reject_duplicate_keys(pairs) -> dict:
 
 
 @dataclass(frozen=True)
-class ActivationContext:
-    """Immutable, pinned activation authority (B4-CXR4R3).
+class ParentActivationContext:
+    """Immutable, pinned activation authority for the PARENT/ISSUER role
+    (B4-CXR4R3; separated from the child-consumer type in B4-CXR7U2).
 
     Carries the validated effective config, the resolved secret METADATA
     (reference identity, backend identity, generation, revocation state —
     NEVER the password value or a password-bearing DSN), the pinned bind
     parameters, and a deterministic context identity. Frozen: once created,
     os.environ changes cannot alter the activation.
+
+    ONLY this type can mint child handoffs (`issue_child_handoff` /
+    `child_environment`). A child reconstructed from OCE_ACTIVATION_ENVELOPE
+    receives VerifiedChildContext, which exposes NO issuance API.
+
+    TRUTH (B4-CXR7U2): type separation is API-LEVEL LEAST PRIVILEGE AND
+    DEFENSE IN DEPTH — it is NOT OS isolation. Arbitrary same-user Python
+    code can still import internal modules or read the runtime key (one
+    trusted computing base; see B4-THREAT-MODEL.md).
     """
     effective_config: EffectiveConfig
     config_fingerprint: str
@@ -830,18 +848,22 @@ class ActivationContext:
             "canonical_control_plane_url": self.canonical_control_plane_url,
         }
 
-    # -- B4-CXR6R1: authenticated role-bound activation lineage -------------
-    def build_envelope(self, child_role: str,
-                       migration_set_identity: dict | None = None,
-                       ttl_seconds: int = ls.CAPABILITY_TTL_SECONDS
-                       ) -> "ActivationEnvelope":
-        """Serialize this PINNED context into an AUTHENTICATED, role-bound
-        activation capability for ONE child process (B4-CXR6R1).
+    # -- B4-CXR6R1/CXR7U2: authenticated role-bound launch handoff ----------
+    def issue_child_handoff(self, child_role: str,
+                            migration_set_identity: dict | None = None,
+                            ttl_seconds: int = ls.CAPABILITY_TTL_SECONDS
+                            ) -> ActivationHandoff:
+        """Serialize this PINNED parent context into an AUTHENTICATED,
+        role-bound launch handoff for ONE child process (B4-CXR6R1; named
+        per B4-CXR7U2 terminology).
+
+        Issuance exists ONLY on ParentActivationContext — the verified child
+        type (VerifiedChildContext) exposes no issuance method.
 
         NEVER includes passwords, tokens, or DSNs. The payload is MACed with
         the dedicated activation-handoff key (read-only from the approved
         0600 store — missing key fails closed with a `configure` hint). A
-        fresh nonce + issuance/expiry are minted per launch so a capability
+        fresh nonce + issuance/expiry are minted per launch so a handoff
         cannot be replayed from an earlier launch or another parent.
         """
         if child_role not in CAPABILITY_ROLES:
@@ -876,13 +898,13 @@ class ActivationContext:
     def child_environment(self, child_role: str,
                           migration_set_identity: dict | None = None) -> dict:
         """SANITIZED child environment for API/worker/migration subprocesses
-        (B4-CXR6R1).
+        (B4-CXR6R1; issuer-side, only on ParentActivationContext).
 
         Starts from sanitized_environment() (strips ambient POSTGRES_* /
         worker-secret values), removes EVERY ambient OCE_* variable (the
-        capability is now the only activation authority — a child cannot be
+        handoff is now the only activation authority — a child cannot be
         redirected by a mutated parent environment), and injects the
-        MAC-authenticated activation capability for *child_role*. The child
+        MAC-authenticated activation handoff for *child_role*. The child
         verifies the MAC with the approved handoff key, proves current
         secret generation/revocation freshness, re-derives canonical values,
         and enforces its declared role — or fails closed before any
@@ -891,9 +913,104 @@ class ActivationContext:
         env = ls.sanitized_environment()
         for key in [k for k in env if k.startswith("OCE_")]:
             env.pop(key, None)
-        env["OCE_ACTIVATION_ENVELOPE"] = self.build_envelope(
+        env["OCE_ACTIVATION_ENVELOPE"] = self.issue_child_handoff(
             child_role, migration_set_identity).to_json()
         return env
+
+
+@dataclass(frozen=True)
+class VerifiedChildContext:
+    """The ONLY type a verified child receives (B4-CXR7U2).
+
+    A child reconstructed from OCE_ACTIVATION_ENVELOPE proves the
+    authenticated, role-bound, non-stale handoff lineage and then gets THIS
+    type — a pinned view of the same authority with NO issuance API:
+
+      * NO build_envelope / issue_child_handoff()
+      * NO child_environment()
+
+    This is API-level least privilege and defense in depth for one trusted
+    computing base. It is NOT OS isolation: arbitrary same-user Python code
+    can still import internal modules or read the runtime key (see
+    B4-THREAT-MODEL.md; CXR7 operator disposition).
+    """
+    effective_config: EffectiveConfig
+    config_fingerprint: str
+    secret_reference: str
+    secret_backend_identity: str
+    secret_generation: int
+    secret_revocation_state: bool
+    security_state_fingerprint: str
+    control_plane_host: str
+    control_plane_port: int
+    scheduler_interval: int
+    postgres_host: str
+    postgres_port: int
+    postgres_database: str
+    postgres_user: str
+    canonical_control_plane_url: str
+    context_id: str
+    # declared role/audience of the verified handoff (B4-CXR7U2)
+    declared_role: str
+
+    def assert_fresh(self,
+                     backend: "ls.RuntimeSecretBackend | None" = None) -> None:
+        """Fail closed when the secret authority changed after activation.
+
+        A rotated or revoked secret invalidates the pinned context; callers
+        MUST NOT silently adopt the new authority — re-activation is
+        required. Zero side effects.
+        """
+        backend = backend if backend is not None else ls.RuntimeSecretBackend()
+        name = self.secret_reference.split(":", 1)[1]
+        if backend.generation(name) != self.secret_generation:
+            raise RuntimeError(
+                "activation context is STALE: secret generation changed after "
+                "activation — rotated authority is never adopted silently; "
+                "re-activation required (B4-CXR4R3)")
+        if backend.is_revoked(name) != self.secret_revocation_state:
+            raise RuntimeError(
+                "activation context is STALE: secret revocation state changed "
+                "after activation — re-activation required (B4-CXR4R3)")
+
+    def runtime_dsn(self,
+                    backend: "ls.RuntimeSecretBackend | None" = None) -> str:
+        """Ephemeral DSN from the PINNED authority (never stored/evidenced).
+
+        Resolves the pinned reference through the approved store and derives
+        the DSN from the PINNED postgres parameters. Fails closed on a stale
+        context. The password exists only in process memory.
+        """
+        backend = backend if backend is not None else ls.RuntimeSecretBackend()
+        self.assert_fresh(backend)
+        password = backend.resolve(self.secret_reference)
+        # B4-CXR5R4: standards-compliant percent-encoding — reserved URI
+        # characters can never redirect or corrupt the DSN
+        from urllib.parse import quote_plus
+        return (f"postgresql://{self.postgres_user}:{quote_plus(password)}"
+                f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_database}")
+
+    def safe_summary(self) -> dict:
+        """Evidence-ready, secret-free summary — reference identity and pinned
+        bind parameters only. NEVER the password or a password-bearing DSN."""
+        return {
+            "context_id": self.context_id,
+            "config_fingerprint": self.config_fingerprint,
+            "secret_reference": self.secret_reference,
+            "secret_backend": self.secret_backend_identity,
+            "secret_generation": self.secret_generation,
+            "secret_revocation_state": self.secret_revocation_state,
+            "security_state_fingerprint": self.security_state_fingerprint,
+            "control_plane_host": self.control_plane_host,
+            "control_plane_port": self.control_plane_port,
+            "scheduler_interval": self.scheduler_interval,
+            "postgres_host": self.postgres_host,
+            "postgres_port": self.postgres_port,
+            "postgres_database": self.postgres_database,
+            "postgres_user": self.postgres_user,
+            "canonical_control_plane_url": self.canonical_control_plane_url,
+            "declared_role": self.declared_role,
+        }
 
 
 def _envelope_present(environ: dict | None = None) -> bool:
@@ -1018,13 +1135,14 @@ def _verify_activation_capability(raw: str, env: dict, role: str | None,
 
 def _context_from_envelope(raw: str, env: dict, role: str | None,
                            backend: "ls.RuntimeSecretBackend"
-                           ) -> "ActivationContext":
-    """Reconstruct the PINNED ActivationContext from a VERIFIED activation
-    capability (B4-CXR6R1).
+                           ) -> "VerifiedChildContext":
+    """Reconstruct the PINNED VerifiedChildContext from a VERIFIED activation
+    handoff (B4-CXR6R1; child type separated in B4-CXR7U2).
 
     The child proves the authenticated, role-bound, non-stale lineage and
     re-derives every canonical identity from approved authority instead of
-    trusting redundant envelope fields."""
+    trusting redundant handoff fields. The child receives
+    VerifiedChildContext — NO issuance API (B4-CXR7U2)."""
     envelope = _verify_activation_capability(raw, env, role, backend)
     name = envelope.secret_reference.split(":", 1)[1]
     synth = dict(env)
@@ -1034,7 +1152,7 @@ def _context_from_envelope(raw: str, env: dict, role: str | None,
     synth["OCE_POSTGRES_HOST"] = envelope.postgres_host
     eff = effective_from_env(synth)
     validate_effective(eff)
-    return ActivationContext(
+    return VerifiedChildContext(
         effective_config=eff,
         config_fingerprint=envelope.config_fingerprint,
         secret_reference=envelope.secret_reference,
@@ -1051,6 +1169,7 @@ def _context_from_envelope(raw: str, env: dict, role: str | None,
         postgres_user=envelope.postgres_user,
         canonical_control_plane_url=envelope.canonical_control_plane_url,
         context_id=envelope.context_id,
+        declared_role=envelope.child_role,
     )
 
 
@@ -1058,29 +1177,31 @@ def create_activation_context(
         environ: dict | None = None,
         backend: "ls.RuntimeSecretBackend | None" = None,
         eff: EffectiveConfig | None = None,
-        role: str | None = None) -> ActivationContext:
+        role: str | None = None) -> "ParentActivationContext | VerifiedChildContext":
     """Build ONE immutable activation context (B4-CXR4R3 / B4-CXR6R1).
 
-    PARENT path (no activation capability in the environment):
+    PARENT path (no activation handoff in the environment) ->
+    ParentActivationContext (issuer-capable):
 
       snapshot env ONCE
         -> validate governed OCE namespace
         -> resolve EffectiveConfig ONCE (default < file < environment < cli)
         -> validate posture (validate_effective)
         -> resolve required secret metadata (reference MUST resolve)
-        -> freeze ActivationContext
+        -> freeze ParentActivationContext
 
     A caller may pass a PRE-RESOLVED validated *eff* (from the same
     snapshot) so a full start resolves the environment exactly once; the
     context then freezes that same effective config.
 
-    CHILD path (OCE_ACTIVATION_ENVELOPE present in the environment): the
-    context is reconstructed ONLY from a verified authenticated activation
-    capability — the child proves the MAC (dedicated handoff key),
-    role-binding (the *role* the process declares must match the capability),
+    CHILD path (OCE_ACTIVATION_ENVELOPE present in the environment) ->
+    VerifiedChildContext: reconstructed ONLY from a verified authenticated
+    launch handoff — the child proves the MAC (dedicated handoff key),
+    role-binding (the *role* the process declares must match the handoff),
     freshness (secret generation/revocation), single-use, and re-derives
-    every canonical identity from approved authority. An ambient JSON blob
-    with no valid protected proof fails closed before any socket/database/
+    every canonical identity from approved authority. The verified child
+    type exposes NO issuance API (B4-CXR7U2). An ambient JSON blob with no
+    valid protected proof fails closed before any socket/database/
     migration/workspace/process activity (B4-CXR6R1).
 
     Raises SystemExit (fail closed) on any violation. The SAME frozen object
@@ -1126,7 +1247,7 @@ def create_activation_context(
     context_id = hashlib.sha256(
         f"{cfg_fp}|{ref}|{generation}|{revoked}|local-runtime-store-v1".encode(
             "utf-8")).hexdigest()
-    return ActivationContext(
+    return ParentActivationContext(
         effective_config=eff,
         config_fingerprint=cfg_fp,
         secret_reference=ref,
@@ -1207,7 +1328,7 @@ def require_startable(environ: dict | None = None) -> EffectiveConfig:
 
 
 def outbound_cp_url(environ: dict | None = None,
-                    ctx: "ActivationContext | None" = None) -> str:
+                    ctx: "ParentActivationContext | VerifiedChildContext | None" = None) -> str:
     """Canonical outbound control-plane target for workers (B4-CXR3R3).
 
     The Book 4 activation gate ALWAYS runs first regardless of whether
@@ -1219,7 +1340,7 @@ def outbound_cp_url(environ: dict | None = None,
     host (10.x / 192.168.x / public hostname), noncanonical port, embedded
     credentials, path/query — fails closed before any socket activity.
 
-    When a pinned ActivationContext (B4-CXR4R3) is supplied, the canonical
+    When a pinned parent context (B4-CXR4R3) is supplied, the canonical
     endpoint comes from the PINNED config — post-creation environment
     mutation cannot move a worker's target.
     """

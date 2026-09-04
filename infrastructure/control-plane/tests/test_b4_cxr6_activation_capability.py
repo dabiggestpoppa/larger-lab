@@ -259,17 +259,62 @@ class TestCXR6R1AuthenticatedActivationCapability:
         with pytest.raises(SystemExit, match="MAC verification FAILED"):
             cs.create_activation_context(environ=env, backend=self.backend)
 
-    # -- child of a child: envelope cannot spawn a different role -----------
+    # -- child of a child: the verified child exposes NO issuance API ------
     def test_child_cannot_reissue_capability(self):
-        # a verified child context CANNOT mint a new envelope (no key access
-        # in the child path is surfaced; build_envelope requires the store
-        # key and the child process never receives it) — the API of the
-        # verified context exposes no capability-reissuance authority
+        # B4-CXR7U2 (replaces the vacuous `assert not hasattr(child,
+        # "build_envelope") or True`): the verified child receives the
+        # DISTINCT VerifiedChildContext type, which exposes NO parent
+        # issuance methods and whose ordinary issuance use FAILS.
         carrier = _carrier(self.ctx, role="worker")
         child = self._verified_child(carrier, role="worker")
-        assert not hasattr(child, "build_envelope") or True
-        # child context is frozen: no env carrier regeneration is possible
-        assert child.context_id == self.ctx.context_id
+        parent = self.ctx
+        # parent and child context types are DISTINCT
+        assert type(child) is not type(parent)
+        assert type(child).__name__ == "VerifiedChildContext"
+        assert type(parent).__name__ == "ParentActivationContext"
+        # the child type exposes no issuance method
+        assert not hasattr(child, "build_envelope")
+        assert not hasattr(child, "issue_child_handoff")
+        assert not hasattr(child, "child_environment")
+        # attempting ordinary issuance through the child context FAILS
+        with pytest.raises((AttributeError, TypeError)):
+            child.issue_child_handoff("api")  # type: ignore[attr-defined]
+        with pytest.raises((AttributeError, TypeError)):
+            child.child_environment(child_role="api")  # type: ignore[attr-defined]
+        # the parent CAN issue each required audience
+        for role in cs.CAPABILITY_ROLES:
+            handoff = parent.issue_child_handoff(role)
+            assert handoff.child_role == role
+        # child context is frozen: same verified lineage
+        assert child.context_id == parent.context_id
+        assert child.declared_role == "worker"
+
+    def test_parent_can_issue_and_child_verifies(self):
+        # B4-CXR7U2: end-to-end parent issuance -> verified child consumption
+        carrier = self.ctx.child_environment(child_role="api")[
+            "OCE_ACTIVATION_ENVELOPE"]
+        child = self._verified_child(carrier, role="api")
+        assert isinstance(child, cs.VerifiedChildContext)
+        assert child.declared_role == "api"
+        # wrong audience fails BEFORE runtime activity (role check precedes
+        # ledger consumption and every other authority use) — and the failed
+        # attempt consumes nothing: a FRESH carrier for the declared audience
+        # still verifies afterwards
+        carrier2 = self.ctx.child_environment(child_role="api")[
+            "OCE_ACTIVATION_ENVELOPE"]
+        with pytest.raises(SystemExit, match="role-bound"):
+            self._verified_child(carrier2, role="worker")
+        child2 = self._verified_child(carrier2, role="api")
+        assert child2.declared_role == "api"
+
+    def test_wrong_audience_fails_before_runtime_activity(self):
+        # B4-CXR7U2: a wrong-audience use of an ambient handoff fails closed
+        # with ZERO authority-side effects (ledger untouched)
+        carrier = _carrier(self.ctx, role="migration")
+        before = self._state_snapshot()
+        with pytest.raises(SystemExit, match="role-bound"):
+            self._verified_child(carrier, role="api")
+        assert self._state_snapshot() == before
 
     # -- Z: every denied activation has ZERO authority-side effects ---------
     @staticmethod

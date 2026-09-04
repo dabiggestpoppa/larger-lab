@@ -214,7 +214,9 @@ def run(deps: WorkerDependencies, *, ctx, url: str,
         client.close()
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(
+        argv: list[str] | None = None,
+        ctx: "ParentActivationContext | VerifiedChildContext | None" = None) -> int:
     # B4-CXR3R3: the Book 4 activation gate runs FIRST (regardless of whether
     # OCE_CP_URL is set). The worker target is the canonical loopback endpoint
     # derived from the validated effective config; OCE_CP_URL, when present,
@@ -231,6 +233,14 @@ def main(argv: list[str] | None = None) -> int:
     # role-bound to 'outbound_worker'.
     from oce_control.config_startup import create_activation_context, outbound_cp_url
     ctx = create_activation_context(role="outbound_worker")
+    declared = getattr(ctx, "declared_role", None)
+    if declared is not None and declared != "outbound_worker":
+        # B4-CXR7U2: the verified child's declared role/audience comes from
+        # the authenticated handoff and cannot be re-declared by the child.
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: verified child role/audience "
+            f"'{declared}' does not match the consumer role "
+            "'outbound_worker' (B4-CXR7U2)")
     url = outbound_cp_url(ctx=ctx)
     worker_id = os.environ.get("OCE_WORKER_ID", "worker-local01")
 

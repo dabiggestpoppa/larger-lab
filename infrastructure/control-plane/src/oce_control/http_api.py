@@ -30,6 +30,29 @@ except ImportError:  # pragma: no cover — only needed where the service runs
 
 from .api import ControlPlaneAPI, APIResponse
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from .config_startup import ParentActivationContext, VerifiedChildContext
+
+
+def _with_declared_role(ctx, role: str):
+    """B4-CXR7U2: pin the verified child's declared role/audience.
+
+    The VerifiedChildContext already carries declared_role from the
+    authenticated handoff (enforced equal to the declared process role at
+    verification time); this helper is a defensive re-assertion for durable
+    consumers and fails closed on divergence.
+    """
+    declared = getattr(ctx, "declared_role", None)
+    if declared is not None and declared != role:
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: verified child role/audience "
+            f"'{declared}' does not match the consumer role '{role}' "
+            "(B4-CXR7U2)")
+    return ctx
+
+
 CONSOLE_PATH = Path(__file__).resolve().parents[2] / "ui" / "console.html"
 
 def _default_dsn() -> str:
@@ -302,7 +325,8 @@ def create_app(api: ControlPlaneAPI, scheduler=None,
     return app
 
 
-def runtime_bind(environ: Optional[dict] = None, ctx=None) -> tuple:
+def runtime_bind(environ: Optional[dict] = None,
+                 ctx: "Optional[ParentActivationContext | VerifiedChildContext]" = None) -> tuple:
     """Return the (host, port) the durable service MUST bind (B4-R3R2).
 
     The answer comes ONLY from the gated, validated effective config — never
@@ -335,7 +359,9 @@ def runtime_bind(environ: Optional[dict] = None, ctx=None) -> tuple:
     return host, port
 
 
-def runtime_scheduler_interval(environ: Optional[dict] = None, ctx=None) -> int:
+def runtime_scheduler_interval(
+        environ: Optional[dict] = None,
+        ctx: "Optional[ParentActivationContext | VerifiedChildContext]" = None) -> int:
     """Scheduler tick interval from the gated effective config (B4-R3R2).
 
     B4-CXR4R3: a pinned context supplies the pinned interval directly.
@@ -353,7 +379,8 @@ def runtime_scheduler_interval(environ: Optional[dict] = None, ctx=None) -> int:
     return int(require_startable(environ).get("control_plane.scheduler_interval"))
 
 
-def build_durable_app(*, scheduler_tick_interval: int = 5, ctx=None) -> FastAPI:
+def build_durable_app(*, scheduler_tick_interval: int = 5,
+                      ctx: "ParentActivationContext | VerifiedChildContext | None" = None) -> FastAPI:
     """Wire the durable components (PG store, PG scheduler, PG worker
     protocol, health) into the API and return a ready FastAPI app.
 
@@ -395,6 +422,11 @@ def build_durable_app(*, scheduler_tick_interval: int = 5, ctx=None) -> FastAPI:
                 "build_durable_app(ctx=None) is unreachable in a "
                 "lifecycle-launched process (B4-CXR5R3)")
         ctx = create_activation_context(role="api")  # resolve ONCE, pin
+        if hasattr(ctx, "declared_role"):
+            # B4-CXR7U2: the verified child re-derives its role/audience
+            # from the authenticated handoff; the declared role is not
+            # authority and cannot be changed by the child.
+            ctx = _with_declared_role(ctx, "api")
         dsn = ctx.runtime_dsn()
     conn = psycopg2.connect(dsn)
     conn.autocommit = False
@@ -461,6 +493,8 @@ if __name__ == "__main__":
     # B4-CXR6R1: direct API launch declares the API role; a lifecycle child
     # must present an authenticated capability bound to 'api'.
     ctx = create_activation_context(role="api")
+    if hasattr(ctx, "declared_role"):
+        ctx = _with_declared_role(ctx, "api")
     host, port = runtime_bind(ctx=ctx)
     interval = runtime_scheduler_interval(ctx=ctx)
     app = build_durable_app(scheduler_tick_interval=interval, ctx=ctx)

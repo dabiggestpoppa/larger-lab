@@ -388,7 +388,9 @@ def _reject_forbidden_flags(argv: list[str] | None) -> None:
             raise SystemExit(2)
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(
+        argv: list[str] | None = None,
+        ctx: "ParentActivationContext | VerifiedChildContext | None" = None) -> int:
     if argv is None:
         argv = sys.argv[1:]
     # B4-CXR5R1/R2: reject secret-bearing and alternate-dir flags before
@@ -456,6 +458,10 @@ def main(argv: list[str] | None = None) -> int:
                   "activation envelope — database mutation refused "
                   "(B4-CXR5R3)", file=sys.stderr)
             return 2
+    # B4-CXR7U2: the verified child type carries its declared role/audience
+    # from the authenticated handoff; the envelope carrier is aliased
+    # ActivationHandoff. Role/audience consistency was already enforced at
+    # verification time (declared role == minted role, before any activity).
     if args.command == "up":
         return cmd_up(dsn, canonical)
     return cmd_status(dsn, canonical)
