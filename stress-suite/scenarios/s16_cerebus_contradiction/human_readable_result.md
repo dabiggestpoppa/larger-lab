@@ -1,7 +1,7 @@
 # S16 — G5 CLASS C domain scenario result
 
 - outcome: **CONTRADICTION_OPEN** (expected `CONTRADICTION_OPEN`) — PASS
-- behavior fingerprint: `34133e2559c73df7b3b050034477f946`
+- behavior fingerprint: `ca9d22034e6785228a5bc1a444648210`
 - authority: NONE -> NONE
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
 

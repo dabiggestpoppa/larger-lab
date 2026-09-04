@@ -1,7 +1,7 @@
 # S14 — G5 CLASS C domain scenario result
 
 - outcome: **REJECTED_NEGATIVE_KNOWLEDGE** (expected `REJECTED_NEGATIVE_KNOWLEDGE`) — PASS
-- behavior fingerprint: `a39b7cea6c2cca88f09db4e5dd093bec`
+- behavior fingerprint: `b259b6e1faf914ba597c48b5ce97734b`
 - authority: NONE -> NONE
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
 
