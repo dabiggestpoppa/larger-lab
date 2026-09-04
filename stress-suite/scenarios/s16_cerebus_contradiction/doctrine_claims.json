@@ -6,8 +6,8 @@
     "source_path": "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt",
     "section": "PART_1_CORE_MANUAL / Target Metric table",
     "page": "PAGE 4-5",
-    "source_fingerprint": "72ba79d7064404b463dfcf7d937a3a4c",
-    "exact_claim_representation": "Filtered P90 execution regime target: Win Rate (Filtered) 85%-90%; Daily Goal 1.0%-1.5%; Max Daily Drawdown < 0.50%; Prop Firm Circuit Breaker hard boundary at 0.40% loss. Conditions: pre-session checklist applied (Asian range measured 00:00-08:00 UTC), news filter (no high-impact within 4 hours), day-of-week size adjustments.",
+    "source_fingerprint": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+    "exact_claim_representation": "Target Metric table (bounded fragment): Win Rate (Filtered) 85% - 90%; Daily Goal 1.0% - 1.5%; Max Daily Drawdown < 0.50%; Prop Firm Circuit Breaker: hard constraint boundary at 0.40% loss.",
     "numeric_parameters": {
       "win_rate_band": [0.85, 0.90],
       "daily_goal_band": [0.010, 0.015],
@@ -19,7 +19,9 @@
         "6-8am_est": 4.6,
         "8-10am_est": 5.9,
         "10-11am_est": 6.2
-      }
+      },
+      "session_window": "00:00-08:00 UTC (Asia)",
+      "tier_constraints": ["TIER_1_100%", "TIER_2_75%", "TIER_3_50%", "NO_GO_>45p"]
     },
     "structural_conditions": [
       "M5 timeframe candle close inside 2:00-11:00 AM EST activation window",

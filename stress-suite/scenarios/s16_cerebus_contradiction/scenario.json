@@ -5,9 +5,7 @@
   "threat_class": "SILENT_DOCTRINE_REWRITE",
   "doctrine_claims_ref": "doctrine_claims.json",
   "reproductions_ref": "reproductions.json",
-  "amendment_proposal": {
-    "amendment_ref": "amendment.json"
-  },
+  "amendment_ref": "amendment.json",
   "current_facts": {
     "domain": "CEREBUS/FX",
     "claim_type": "DOCTRINE_CLAIM"
