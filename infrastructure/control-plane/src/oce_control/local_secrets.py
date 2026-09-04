@@ -23,8 +23,14 @@ INITIALIZATION vs RUNTIME (B4-CXR3R1 — no self-legitimation):
 * RUNTIME path (``read_runtime_secret`` / ``derive_runtime_dsn`` /
   ``require_runtime_dsn`` / ``compose_environment``) NEVER materializes or
   overwrites a secret. An ambient POSTGRES_PASSWORD therefore cannot rewrite
-  an existing store, cannot materialize a missing store, and cannot
-  self-legitimate a matching ambient POSTGRES_DSN.
+  an existing store, cannot materialize a missing store, and  cannot self-legitimate a matching ambient POSTGRES_DSN.
+
+TRUST BOUNDARY (B4-CXR7U1): see ``B4-THREAT-MODEL.md``. The approved
+store and its keys live INSIDE the single trusted local OCE computing base.
+0600 same-user readability is NOT process-role isolation; an attacker
+running as the approved account already owns these files. The handoff key
+MACs legitimate parent-launch handoffs; it does not separate mutually
+hostile processes of one principal.
 """
 from __future__ import annotations
 

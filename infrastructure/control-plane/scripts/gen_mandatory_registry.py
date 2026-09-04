@@ -72,6 +72,7 @@ CATEGORY_RULES = [
     ("test_b3_worker_fabric_store_integration", "fabric-pg"),
     ("test_b4_config_spine", "config-spine"),
     ("test_b4_startup_gate", "config-spine"),
+    ("test_b4_cxr7", "config-spine"),
     (".TestPOBoundary::", "po-hermes-boundary"),
     (".TestHermesBoundary::", "po-hermes-boundary"),
 ]

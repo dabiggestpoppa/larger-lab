@@ -22,6 +22,12 @@ selected by an environment string and unreachable from the production CLI
 or environment construction.
 
 Exits 0 on success, 2 on protocol denial, nonzero on execution failure.
+
+TRUST BOUNDARY (B4-CXR7U1/U3): see ``B4-THREAT-MODEL.md``. This worker
+runs inside the single trusted local OCE computing base. Job execution is
+limited to fixed repository-owned allowlisted programs (program_for) with a
+hard lock against generated/downloaded/third-party/plugin/user/model code;
+job parameters are data only. Resource bounding is reported literally.
 """
 from __future__ import annotations
 import json

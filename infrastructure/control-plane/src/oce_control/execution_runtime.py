@@ -17,6 +17,14 @@ Design constraints drawn from the canonical brief:
 
 The content-addressable artifact store is the durable backstop: worker loss
 after an accepted publication cannot erase operational truth.
+
+TRUST BOUNDARY (B4-CXR7U1/U3): see ``B4-THREAT-MODEL.md``. This module
+provides BOUNDED RESOURCE EXECUTION (`resource_limits_available`) and
+WATCHDOG/TREE TERMINATION — NOT network, filesystem, identity, syscall, or
+hostile-code isolation. RLIMIT/CPU/address-space/file-size controls are
+reported literally. Network is denied by Book 4 policy; OS network
+enforcement is NOT implemented and is never claimed. Only fixed
+repository-owned allowlisted programs may execute.
 """
 from __future__ import annotations
 import hashlib

@@ -15,6 +15,15 @@ Design rules (each is enforced by tests in tests/test_local_lifecycle.py):
     Only the explicit ``destroy --yes`` command removes durable state.
   * Every published port must bind loopback (127.0.0.1) only.
   * No cloud account or credential is required for any command.
+
+TRUST BOUNDARY (B4-CXR7U1): see ``B4-THREAT-MODEL.md``. All lifecycle
+child processes run under ONE trusted local OCE computing base; child
+handoffs are AUTHENTICATED PARENT-LAUNCH HANDOFFS WITH ROLE/AUDIENCE
+CONSISTENCY CHECKING, not hostile-child isolation. Ordinary
+start/restart/recover are READ-ONLY over secret authority; only explicit
+``configure`` initializes (complete-or-nothing, B4-CXR7U6). ``recover``'s
+only intentional mutation is classified stale-PID cleanup (non-authoritative,
+after the activation gate).
 """
 from __future__ import annotations
 

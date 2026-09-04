@@ -24,6 +24,14 @@ Entry points wired into startup / CLI:
 
 Errors are operator-legible and secret-free: a violation names the offending
 setting and the rule, but never prints a secret value.
+
+TRUST BOUNDARY (B4-CXR7U1): see ``B4-THREAT-MODEL.md``. This module's
+activation handoff is an AUTHENTICATED PARENT-LAUNCH HANDOFF WITH
+ROLE/AUDIENCE CONSISTENCY CHECKING inside ONE trusted local OCE computing
+base — NOT a hostile-child isolation boundary. Same-principal child
+processes share the parent's trusted-computing-base authority (including
+the handoff key); API-level parent/child separation (B4-CXR7U2) is
+least-privilege defense in depth, never OS isolation.
 """
 from __future__ import annotations
 
