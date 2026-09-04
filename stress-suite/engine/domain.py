@@ -23,6 +23,7 @@ contact. All identifiers derive deterministically from content.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
@@ -85,6 +86,191 @@ class DomainDisposition(str, Enum):
     PRIORITY_HIGH = "PRIORITY_HIGH"
     PRIORITY_NORMAL = "PRIORITY_NORMAL"
     REOPEN_CANDIDATE = "REOPEN_CANDIDATE"
+
+
+# --------------------------------------------------------------------------- #
+# G5R-16 — structured duration/history representation
+# --------------------------------------------------------------------------- #
+HISTORY_ANCHOR = "2026-01-01T00:00:00Z"   # fixed provisional anchor for SINCE spans
+
+
+@dataclass(frozen=True)
+class HistorySpan:
+    """Small deterministic structured duration/history representation. Never
+    naive string equality for durations: '12m' == 12 months, '2021-06-01..' is
+    months-since the fixed provisional HISTORY_ANCHOR (a deterministic
+    convention, not wall-clock truth)."""
+
+    kind: str                        # MONTHS | SINCE | NONE
+    value: int = 0
+    start_label: str = ""
+
+    @classmethod
+    def from_string(cls, raw: str) -> "HistorySpan":
+        raw = (raw or "").strip()
+        if not raw:
+            return cls(kind="NONE")
+        m = re.match(r"^(\d+)m$", raw)
+        if m:
+            return cls(kind="MONTHS", value=int(m.group(1)))
+        if raw.endswith(".."):
+            start = raw[:-2].strip()
+            months = _months_since(start)
+            return cls(kind="SINCE", value=months, start_label=start)
+        raise ValueError(f"unparseable history span {raw!r}")
+
+    def satisfies(self, required: "HistorySpan") -> bool:
+        if required.kind == "NONE":
+            return True
+        if self.kind == "NONE":
+            return False
+        return self.value >= required.value
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"kind": self.kind, "value": self.value, "start_label": self.start_label}
+
+
+def _months_since(start_iso: str) -> int:
+    import datetime as _dt
+
+    start = _dt.datetime.fromisoformat(start_iso.replace("Z", "+00:00"))
+    anchor = _dt.datetime.fromisoformat(HISTORY_ANCHOR.replace("Z", "+00:00"))
+    return max(0, (anchor.year - start.year) * 12 + (anchor.month - start.month))
+
+
+# --------------------------------------------------------------------------- #
+# G5R-25 — B7 gate materiality contract (OCE-B7-PLAN-001)
+# --------------------------------------------------------------------------- #
+GATE_MATERIALITY = ("BLOCKING", "ADVISORY", "CONDITIONAL")
+
+
+@dataclass(frozen=True)
+class B7GateContract:
+    """Versioned declaration of each B7 gate's materiality + condition, from
+    the authoritative OCE-B7-PLAN-001. No hidden hardcoded materiality: the
+    kernel reads every gate's class from this contract.
+
+    * BLOCKING    — a failed/absent required gate rejects the candidate.
+    * ADVISORY    — failure is preserved and demotes; it never certifies.
+    * CONDITIONAL — required for promotion but not an integrity rejection.
+    * NOT_EXECUTED— declared from doctrine but not executed in this fixture;
+                    surfaced in every result, never silently passed.
+    """
+
+    contract_id: str
+    version: str
+    source_doc_ref: str
+    gates: Tuple[Tuple[str, str, str], ...]   # (gate_id, materiality, condition)
+
+    @classmethod
+    def from_data(cls, data: Mapping[str, Any]) -> "B7GateContract":
+        gates = []
+        for g in data.get("gates", []):
+            gid = str(g["gate_id"])
+            mat = str(g.get("materiality", "ADVISORY"))
+            if mat not in GATE_MATERIALITY and mat != "NOT_EXECUTED":
+                raise ValueError(f"unknown B7 gate materiality {mat!r}")
+            gates.append((gid, mat, str(g.get("condition", ""))))
+        return cls(contract_id=str(data["contract_id"]), version=str(data.get("version", "1.0")),
+                   source_doc_ref=str(data.get("source_doc_ref", "")),
+                   gates=tuple(gates))
+
+    def materiality(self, gate_id: str) -> str:
+        for gid, mat, _ in self.gates:
+            if gid == gate_id:
+                return mat
+        return "ADVISORY"    # unknown gates are never BLOCKING by default
+
+    def condition(self, gate_id: str) -> str:
+        for gid, _, cond in self.gates:
+            if gid == gate_id:
+                return cond
+        return ""
+
+    def not_executed_gates(self) -> Tuple[str, ...]:
+        return tuple(gid for gid, mat, _ in self.gates if mat == "NOT_EXECUTED")
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"contract_id": self.contract_id, "version": self.version,
+                "source_doc_ref": self.source_doc_ref,
+                "gates": [{"gate_id": g[0], "materiality": g[1], "condition": g[2]}
+                          for g in self.gates]}
+
+
+B7_GATE_CONTRACT_DATA: Dict[str, Any] = {
+    "contract_id": "B7_GATE_CONTRACT",
+    "version": "1.0",
+    "source_doc_ref": "docs/oce-golden-system/OCE_BLOCK_07_QUANT_FOUNDATION_PLAN_v1.0.md (OCE-B7-PLAN-001)",
+    "gates": [
+        {"gate_id": "PIT_INTEGRITY", "materiality": "BLOCKING",
+         "condition": "B7.C1.S5 — availability before decision; look-ahead/survivorship mutations are rejected"},
+        {"gate_id": "EXECUTION_REALISM", "materiality": "BLOCKING",
+         "condition": "B7.C2.S4 — impossible fills rejected; optimistic zero-cost/guaranteed-fill cases are explicit simulations only"},
+        {"gate_id": "OOS_WALK_FORWARD", "materiality": "BLOCKING",
+         "condition": "B7.C3.S2/S3/S5 — pre-registered holdout + walk-forward surfaces required for promotion"},
+        {"gate_id": "REPRODUCIBILITY", "materiality": "NOT_EXECUTED",
+         "condition": "B7.C2.S5 — repeated run matches tolerances; divergence blocks promotion (kernel not executed in this fixture; surfaced, never silently passed)"},
+        {"gate_id": "COST_SENSITIVITY", "materiality": "ADVISORY",
+         "condition": "B7.C3.S4 — edge dependent on narrow/optimistic cost assumptions is demoted, not hard-rejected"},
+        {"gate_id": "FAMILY_MULTIPLICITY", "materiality": "ADVISORY",
+         "condition": "B7.C3.S5 — narrow parameter optimum demotes"},
+        {"gate_id": "SENSITIVITY_STRESS", "materiality": "NOT_EXECUTED",
+         "condition": "B7.C3.S4 — stress/sensitivity robustness cube (kernel not executed in this fixture; surfaced, never silently passed)"},
+        {"gate_id": "MECHANISM_PLAUSIBILITY", "materiality": "CONDITIONAL",
+         "condition": "B7.C2.S1 — mechanism frozen in spec; required for promotion, not an integrity rejection"},
+    ],
+}
+
+DEFAULT_B7_GATE_CONTRACT = B7GateContract.from_data(B7_GATE_CONTRACT_DATA)
+
+
+# --------------------------------------------------------------------------- #
+# G5R-15 — disagreement tolerance contract (S17)
+# --------------------------------------------------------------------------- #
+@dataclass(frozen=True)
+class DisagreementToleranceContract:
+    """PROVISIONAL per-metric/units tolerance contract. Deterministic; values
+    are NOT constitutionalized — the contract itself is versioned data."""
+
+    contract_id: str
+    metric: str = "*"
+    units: str = "*"
+    absolute_tolerance: float = 0.0
+    relative_tolerance: float = 0.0
+    basis_points_tolerance: float = 0.0
+
+    @classmethod
+    def make(cls, seq, metric="*", units="*", absolute_tolerance=0.0,
+             relative_tolerance=0.0, basis_points_tolerance=0.0) -> "DisagreementToleranceContract":
+        return cls(contract_id=deterministic_hex("tol", seq, metric, units),
+                   metric=metric, units=units, absolute_tolerance=absolute_tolerance,
+                   relative_tolerance=relative_tolerance,
+                   basis_points_tolerance=basis_points_tolerance)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"contract_id": self.contract_id, "metric": self.metric, "units": self.units,
+                "absolute_tolerance": self.absolute_tolerance,
+                "relative_tolerance": self.relative_tolerance,
+                "basis_points_tolerance": self.basis_points_tolerance}
+
+
+@dataclass(frozen=True)
+class ProviderSemanticsContract:
+    """Semantic contract for one provider+metric (G5R-10): indexed by the
+    (provider, metric) key, never provider alone."""
+
+    provider: str
+    metric: str
+    canonical_instrument: str = ""
+    contract_type: str = ""
+
+    def key(self) -> Tuple[str, str]:
+        return (self.provider, self.metric)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"provider": self.provider, "metric": self.metric,
+                "canonical_instrument": self.canonical_instrument,
+                "contract_type": self.contract_type}
 
 
 # --------------------------------------------------------------------------- #
@@ -254,9 +440,11 @@ class ValidationGateResult:
 
 @dataclass(frozen=True)
 class B7ValidationResult:
-    """The FULL gate vector plus a deterministic promotion verdict. A material
-    hard failure blocks promotion regardless of any other surface (B7.C3.S5:
-    no single Sharpe/win rate can approve; uncertainty stays explicit)."""
+    """The FULL gate vector plus a deterministic promotion verdict. Gate
+    materiality comes from the versioned B7GateContract (OCE-B7-PLAN-001), not
+    hidden hardcoded tuples. A material (BLOCKING) hard failure rejects
+    regardless of any other surface (B7.C3.S5: no single Sharpe/win rate can
+    approve; uncertainty stays explicit)."""
 
     candidate_id: str
     gates: Tuple[ValidationGateResult, ...]
@@ -264,6 +452,8 @@ class B7ValidationResult:
     terminal: str            # VALIDATION_PASS | REJECTED
     failure_atoms: Tuple[FailureAtom, ...]
     promotion_packet_ref: str = ""
+    gate_contract_id: str = ""
+    not_executed_gates: Tuple[str, ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         return {"candidate_id": self.candidate_id,
@@ -271,23 +461,28 @@ class B7ValidationResult:
                 "material_failures": list(self.material_failures),
                 "terminal": self.terminal,
                 "failure_atoms": [a.to_dict() for a in self.failure_atoms],
-                "promotion_packet_ref": self.promotion_packet_ref}
+                "promotion_packet_ref": self.promotion_packet_ref,
+                "gate_contract_id": self.gate_contract_id,
+                "not_executed_gates": list(self.not_executed_gates)}
 
 
 class B7ValidationGate:
     """Generic B7 (Quant Foundation, OCE-B7-PLAN-001) validation kernel. Gates
     inspect ONLY observable artifacts — PIT timestamps, fill artifacts, cost
     model, holdout/WF refs, mechanism spec, parameter/family multiplicity.
-    Hidden ground truth (e.g. 'lookahead caused the edge') is never consulted;
-    the gates must discover the failure from the timestamps themselves."""
-
-    MATERIAL_GATES = ("PIT_INTEGRITY", "EXECUTION_REALISM")
+    Hidden ground truth is never consulted; the gates must discover the failure
+    from the timestamps themselves. Materiality is read from the versioned
+    B7GateContract (G5R-25): BLOCKING failures reject; ADVISORY failures are
+    preserved and demote; NOT_EXECUTED doctrine gates are surfaced, never
+    silently passed."""
 
     def run(self, candidate: StrategyCandidate,
+            contract: Optional[B7GateContract] = None,
             cost_sensitivity_bad: bool = False,
             oos_degraded: bool = False,
             mechanism_plausible: bool = True,
             family_multiple_peak: bool = False) -> B7ValidationResult:
+        contract = contract or DEFAULT_B7_GATE_CONTRACT
         gates: List[ValidationGateResult] = []
 
         # PIT (B7.C1.S5): reject future leakage from observable timestamps
@@ -354,13 +549,16 @@ class B7ValidationGate:
                                              "narrow parameter optimum")])
             if not family_pass else ()))
 
-        material = [g.gate_id for g in gates if g.material and not g.passed]
+        material = [g.gate_id for g in gates if not g.passed
+                    and contract.materiality(g.gate_id) == "BLOCKING"]
         atoms = [a for g in gates for a in g.failure_atoms]
         terminal = "REJECTED" if material else "VALIDATION_PASS"
         return B7ValidationResult(candidate_id=candidate.candidate_id,
                                   gates=tuple(gates),
                                   material_failures=tuple(sorted(material)),
-                                  terminal=terminal, failure_atoms=tuple(atoms))
+                                  terminal=terminal, failure_atoms=tuple(atoms),
+                                  gate_contract_id=contract.contract_id,
+                                  not_executed_gates=contract.not_executed_gates())
 
 
 @dataclass(frozen=True)
@@ -381,17 +579,26 @@ class ResearchPriorityRecord:
 
 @dataclass(frozen=True)
 class PromotionDecision:
-    """Separate from ResearchPriorityRecord — promotion requires the B7 gates."""
+    """Separate from ResearchPriorityRecord — promotion requires the B7 gates.
+    G5R-24 vocabulary: the validation result (VALIDATION_PASS / REJECTED) is a
+    DIFFERENT layer from the research promotion decision (PROMOTION_CANDIDATE /
+    REJECTED / HOLD), which is a DIFFERENT layer again from execution authority
+    (always NONE here — promotion to validation is never execution)."""
 
     decision_id: str
     claim_ref: str
-    decision: str                    # PROMOTED | REJECTED | VALIDATION_REQUIRED | DATA_BLOCKED
+    decision: str                    # PROMOTION_CANDIDATE | REJECTED | HOLD
+    validation_terminal: str = ""    # VALIDATION_PASS | REJECTED
+    execution_authority: str = "NONE"
     authority_class: str = "B7_VALIDATION"
     rationale: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return {"decision_id": self.decision_id, "claim_ref": self.claim_ref,
-                "decision": self.decision, "authority_class": self.authority_class,
+                "decision": self.decision,
+                "validation_terminal": self.validation_terminal,
+                "execution_authority": self.execution_authority,
+                "authority_class": self.authority_class,
                 "rationale": self.rationale}
 
 
@@ -416,7 +623,7 @@ class UnresolvedPatternRecord:
     what_remains_unexplained: str
     family_label: str = "UNKNOWN_FAMILY"
     required_sensor: str = ""
-    evidence_lineages: int = 0
+    evidence_lineages: int = 0    # LEGACY DISPLAY ONLY — no decision authority (G5R-01)
 
     @classmethod
     def from_fixture(cls, data: Mapping[str, Any]) -> "UnresolvedPatternRecord":
@@ -509,7 +716,10 @@ class MechanismCard:
 @dataclass(frozen=True)
 class FrozenExperimentProtocol:
     """Frozen BEFORE any result evaluation. Post-hoc threshold changes are
-    prohibited; criteria cannot change after results exist."""
+    prohibited; criteria cannot change after results exist. G5R-21: a frozen
+    target-domain protocol additionally carries the target_domain it was frozen
+    for, so a hypothesis can only authorize DOMAIN_VALIDATION_REQUIRED against a
+    protocol whose registered domain matches."""
 
     protocol_id: str
     mechanism_ref: str
@@ -521,6 +731,7 @@ class FrozenExperimentProtocol:
     holdout_ref: str
     cost_execution_assumptions: Tuple[str, ...]
     promotion_criteria: Tuple[str, ...]
+    target_domain: str = ""
     fingerprint: str = ""
 
     @classmethod
@@ -534,7 +745,8 @@ class FrozenExperimentProtocol:
                   falsification_criteria=tuple(data.get("falsification_criteria", [])),
                   holdout_ref=str(data.get("holdout_ref", "")),
                   cost_execution_assumptions=tuple(data.get("cost_execution_assumptions", [])),
-                  promotion_criteria=tuple(data.get("promotion_criteria", [])))
+                  promotion_criteria=tuple(data.get("promotion_criteria", [])),
+                  target_domain=str(data.get("target_domain", "")))
         object.__setattr__(obj, "fingerprint", deterministic_hex("frozen_protocol", obj.to_dict()))
         return obj
 
@@ -546,6 +758,7 @@ class FrozenExperimentProtocol:
                 "holdout_ref": self.holdout_ref,
                 "cost_execution_assumptions": list(self.cost_execution_assumptions),
                 "promotion_criteria": list(self.promotion_criteria),
+                "target_domain": self.target_domain,
                 "fingerprint": self.fingerprint}
 
 
@@ -726,12 +939,13 @@ class ProviderObservation:
     receive_time: int
     mode: str                       # HISTORICAL | LIVE
     native_value: float
-    normalized_value: float
+    normalized_value: Optional[float]  # G5R-12: absent normalized value stays UNKNOWN, never 0.0
     quality_state: str
     adapter_version: str
 
     @classmethod
     def from_fixture(cls, data: Mapping[str, Any]) -> "ProviderObservation":
+        norm = data.get("normalized_value")
         return cls(observation_id=str(data["observation_id"]),
                    provider=str(data.get("provider", "")),
                    instrument_native_id=str(data.get("instrument_native_id", "")),
@@ -745,9 +959,13 @@ class ProviderObservation:
                    receive_time=int(data.get("receive_time", 0)),
                    mode=str(data.get("mode", "HISTORICAL")),
                    native_value=float(data.get("native_value", 0.0)),
-                   normalized_value=float(data.get("normalized_value", 0.0)),
+                   normalized_value=float(norm) if norm is not None else None,
                    quality_state=str(data.get("quality_state", "OK")),
                    adapter_version=str(data.get("adapter_version", "")))
+
+    @property
+    def has_normalized_value(self) -> bool:
+        return self.normalized_value is not None
 
     def to_dict(self) -> Dict[str, Any]:
         return {"observation_id": self.observation_id, "provider": self.provider,
@@ -778,6 +996,9 @@ class ProviderSemanticsRecord:
     quality_state: str
     normalization_valid: bool = True   # adapter converts native -> canonical correctly
     methodology_notes: str = ""
+    canonical_instrument: str = ""    # G5R-13: registered canonical instrument identity
+    contract_type: str = ""           # G5R-13: PERP_LINEAR / SPOT / QUARTERLY ...
+    compatible_adapter_versions: Tuple[str, ...] = ()  # G5R-11: explicit compatible-version contract
 
     @classmethod
     def from_fixture(cls, data: Mapping[str, Any]) -> "ProviderSemanticsRecord":
@@ -790,7 +1011,10 @@ class ProviderSemanticsRecord:
                    timestamp_semantics=str(data.get("timestamp_semantics", "EVENT")),
                    quality_state=str(data.get("quality_state", "OK")),
                    normalization_valid=bool(data.get("normalization_valid", True)),
-                   methodology_notes=str(data.get("methodology_notes", "")))
+                   methodology_notes=str(data.get("methodology_notes", "")),
+                   canonical_instrument=str(data.get("canonical_instrument", "")),
+                   contract_type=str(data.get("contract_type", "")),
+                   compatible_adapter_versions=tuple(data.get("compatible_adapter_versions", [])))
 
     def to_dict(self) -> Dict[str, Any]:
         return {"provider": self.provider, "metric": self.metric,
@@ -799,7 +1023,10 @@ class ProviderSemanticsRecord:
                 "adapter_version": self.adapter_version, "time_window": self.time_window,
                 "timestamp_semantics": self.timestamp_semantics,
                 "quality_state": self.quality_state,
-                "methodology_notes": self.methodology_notes}
+                "methodology_notes": self.methodology_notes,
+                "canonical_instrument": self.canonical_instrument,
+                "contract_type": self.contract_type,
+                "compatible_adapter_versions": list(self.compatible_adapter_versions)}
 
 
 @dataclass(frozen=True)
@@ -815,16 +1042,25 @@ class SourceDiagnosisStep:
 @dataclass(frozen=True)
 class SourceDiagnosisResult:
     """The localized cause, discovered strictly in canonical layer order. A
-    failure at layer k blocks all later layers (source first)."""
+    failure at layer k blocks all later layers (source first).
+
+    Terminals (G5R-14): REPAIRABLE_SOURCE_MISMATCH | GENUINE_SOURCE_DISAGREEMENT |
+    NO_DISAGREEMENT | DATA_INSUFFICIENT. NO_DISAGREEMENT never terminates as
+    GENUINE_SOURCE_DISAGREEMENT.
+    """
 
     disagreement_id: str
     steps: Tuple[SourceDiagnosisStep, ...]
-    cause: str                       # UNIT_MISMATCH | INSTRUMENT_MISMATCH | ADAPTER_MISMATCH |
-                                     # TIME_WINDOW_MISMATCH | NORMALIZATION_MISMATCH |
-                                     # QUALITY_FAILURE | GENUINE_SOURCE_DISAGREEMENT
+    cause: str                       # UNIT_MISMATCH | INSTRUMENT_MISMATCH |
+                                     # CONTRACT_TYPE_MISMATCH | ADAPTER_MISMATCH |
+                                     # NORMALIZATION_MISMATCH | NORMALIZATION_MISSING |
+                                     # TIME_WINDOW_MISMATCH | QUALITY_FAILURE |
+                                     # SEMANTIC_CONTRACT_MISSING | GENUINE_SOURCE_DISAGREEMENT |
+                                     # NO_DISAGREEMENT
     provider_a: str
     provider_b: str
-    terminal: str                    # REPAIRABLE_SOURCE_MISMATCH | GENUINE_SOURCE_DISAGREEMENT
+    terminal: str                    # REPAIRABLE_SOURCE_MISMATCH | GENUINE_SOURCE_DISAGREEMENT |
+                                     # NO_DISAGREEMENT | DATA_INSUFFICIENT
 
     def to_dict(self) -> Dict[str, Any]:
         return {"disagreement_id": self.disagreement_id,
@@ -836,91 +1072,146 @@ class SourceDiagnosisResult:
 def diagnose_provider_disagreement(
     obs_a: ProviderObservation, obs_b: ProviderObservation,
     sem_a: ProviderSemanticsRecord, sem_b: ProviderSemanticsRecord,
+    tolerance: Optional[DisagreementToleranceContract] = None,
 ) -> SourceDiagnosisResult:
     """Deterministic source-layer diagnosis. Only AFTER layers 1..6 pass may
-    higher-level market-field interpretation be challenged (layer 7)."""
+    higher-level market-field interpretation be challenged (layer 7).
+
+    G5R-11 adapter versions must MATCH (or an explicit compatible-version
+    contract); G5R-12 absent normalized values stay MISSING (never 0.0) and
+    block the comparison; G5R-13 time window, quality contract, contract type
+    and canonical instrument identity are each validated; G5R-14 equal clean
+    values terminate NO_DISAGREEMENT (never genuine); G5R-15 materiality uses
+    the explicit tolerance contract, not raw float inequality alone."""
     steps: List[SourceDiagnosisStep] = []
-    cause = "GENUINE_SOURCE_DISAGREEMENT"
 
     def add(layer: str, ok: bool, detail: str = "") -> bool:
         steps.append(SourceDiagnosisStep(layer, ok, detail))
         return ok
 
+    def result(cause: str, terminal: str) -> SourceDiagnosisResult:
+        return SourceDiagnosisResult(
+            disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
+                                              obs_b.observation_id),
+            steps=tuple(steps), cause=cause,
+            provider_a=obs_a.provider, provider_b=obs_b.provider,
+            terminal=terminal)
+
+    # 0 provider semantics contract present (G5R-10 fail closed handled at the
+    # runner level; the kernel still refuses to compare without both contracts)
+    if sem_a is None or sem_b is None:
+        add("provider_semantics", False, "semantic contract missing")
+        return result("SEMANTIC_CONTRACT_MISSING", "DATA_INSUFFICIENT")
     # 1 provider semantics (units + methodology)
     ok = add("provider_semantics", obs_a.units == sem_a.native_units
              and obs_b.units == sem_b.native_units,
              f"A={sem_a.native_units} B={sem_b.native_units}")
     if not ok:
-        return SourceDiagnosisResult(
-            disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
-                                              obs_b.observation_id),
-            steps=tuple(steps), cause="UNIT_MISMATCH",
-            provider_a=obs_a.provider, provider_b=obs_b.provider,
-            terminal="REPAIRABLE_SOURCE_MISMATCH")
-    # 2 instrument identity
-    ok = add("instrument_identity",
-             obs_a.instrument_canonical_id == obs_b.instrument_canonical_id
-             and sem_a.instrument_mapping_ok and sem_b.instrument_mapping_ok)
+        return result("UNIT_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH")
+    # 2 instrument identity (canonical instrument + contract type in ONE step)
+    canon_ok = (obs_a.instrument_canonical_id == obs_b.instrument_canonical_id
+                and sem_a.instrument_mapping_ok and sem_b.instrument_mapping_ok)
+    if canon_ok and sem_a.canonical_instrument:
+        canon_ok = (obs_a.instrument_canonical_id == sem_a.canonical_instrument
+                    and obs_b.instrument_canonical_id == sem_b.canonical_instrument)
+    ct_ok = True
+    if (sem_a.contract_type or sem_b.contract_type) and canon_ok:
+        # G5R-13: contract-type compatibility is BOTH per-provider (each
+        # observation matches its own registered semantic contract) AND
+        # pairwise (the two observations must be on the same contract type —
+        # a SPOT and a PERP_LINEAR reading of the same metric are not
+        # comparable even when each matches its own contract).
+        ct_ok = (obs_a.contract_type == sem_a.contract_type
+                 and obs_b.contract_type == sem_b.contract_type
+                 and obs_a.contract_type == obs_b.contract_type)
+    ok = add("instrument_identity", canon_ok and ct_ok,
+             f"canonical A={obs_a.instrument_canonical_id} B={obs_b.instrument_canonical_id}; "
+             f"contract A={obs_a.contract_type}/{sem_a.contract_type} "
+             f"B={obs_b.contract_type}/{sem_b.contract_type}")
     if not ok:
-        return SourceDiagnosisResult(
-            disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
-                                              obs_b.observation_id),
-            steps=tuple(steps), cause="INSTRUMENT_MISMATCH",
-            provider_a=obs_a.provider, provider_b=obs_b.provider,
-            terminal="REPAIRABLE_SOURCE_MISMATCH")
-    # 3 adapter
-    ok = add("adapter", sem_a.adapter_version and sem_b.adapter_version)
+        if ct_ok and not canon_ok:
+            cause, terminal = "INSTRUMENT_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH"
+        elif canon_ok and not ct_ok:
+            cause, terminal = "CONTRACT_TYPE_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH"
+        else:
+            cause, terminal = "INSTRUMENT_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH"
+        return result(cause, terminal)
+    # 3 adapter — version must MATCH the registered semantic contract (or an
+    # explicit compatible-version contract exists)
+    def _adapter_ok(obs: ProviderObservation, sem: ProviderSemanticsRecord) -> bool:
+        if not obs.adapter_version or not sem.adapter_version:
+            return False
+        if obs.adapter_version == sem.adapter_version:
+            return True
+        return obs.adapter_version in (sem.compatible_adapter_versions or ())
+
+    ok = add("adapter", _adapter_ok(obs_a, sem_a) and _adapter_ok(obs_b, sem_b),
+             f"A={obs_a.adapter_version}/{sem_a.adapter_version} "
+             f"B={obs_b.adapter_version}/{sem_b.adapter_version}")
     if not ok:
-        return SourceDiagnosisResult(
-            disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
-                                              obs_b.observation_id),
-            steps=tuple(steps), cause="ADAPTER_MISMATCH",
-            provider_a=obs_a.provider, provider_b=obs_b.provider,
-            terminal="REPAIRABLE_SOURCE_MISMATCH")
+        return result("ADAPTER_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH")
     # 4 normalization (canonical units agree AND each adapter's native->canonical
-    # conversion is valid; e.g. a provider natively in USD notional whose
-    # contracts conversion is not wired => normalization repair required)
+    # conversion is valid AND normalized values are actually present)
+    if (not obs_a.has_normalized_value) or (not obs_b.has_normalized_value):
+        add("normalization", False, "normalized value missing (never coerced to 0.0)")
+        return result("NORMALIZATION_MISSING", "DATA_INSUFFICIENT")
     ok = add("normalization", sem_a.canonical_units == sem_b.canonical_units
              and sem_a.normalization_valid and sem_b.normalization_valid
-             and obs_a.normalized_value is not None and obs_b.normalized_value is not None)
+             and obs_a.has_normalized_value and obs_b.has_normalized_value,
+             f"canonical A={sem_a.canonical_units} B={sem_b.canonical_units}")
     if not ok:
-        return SourceDiagnosisResult(
-            disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
-                                              obs_b.observation_id),
-            steps=tuple(steps), cause="NORMALIZATION_MISMATCH",
-            provider_a=obs_a.provider, provider_b=obs_b.provider,
-            terminal="REPAIRABLE_SOURCE_MISMATCH")
-    # 5 time semantics
-    ok = add("time_semantics", obs_a.time_window == obs_b.time_window
-             and sem_a.timestamp_semantics == sem_b.timestamp_semantics)
+        return result("NORMALIZATION_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH")
+    # 5 time semantics — observation window must match the provider semantic
+    # window AND the two observations must share the window semantics
+    ok = add("time_semantics",
+             obs_a.time_window == sem_a.time_window
+             and obs_b.time_window == sem_b.time_window
+             and sem_a.timestamp_semantics == sem_b.timestamp_semantics,
+             f"windows A={obs_a.time_window}/{sem_a.time_window} "
+             f"B={obs_b.time_window}/{sem_b.time_window}")
     if not ok:
-        return SourceDiagnosisResult(
-            disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
-                                              obs_b.observation_id),
-            steps=tuple(steps), cause="TIME_WINDOW_MISMATCH",
-            provider_a=obs_a.provider, provider_b=obs_b.provider,
-            terminal="REPAIRABLE_SOURCE_MISMATCH")
-    # 6 quality
-    ok = add("quality", obs_a.quality_state == "OK" and obs_b.quality_state == "OK")
+        return result("TIME_WINDOW_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH")
+    # 6 quality — observation quality must meet the semantic contract's
+    # required quality state
+    ok = add("quality",
+             obs_a.quality_state == sem_a.quality_state
+             and obs_b.quality_state == sem_b.quality_state,
+             f"quality A={obs_a.quality_state}/{sem_a.quality_state} "
+             f"B={obs_b.quality_state}/{sem_b.quality_state}")
     if not ok:
-        return SourceDiagnosisResult(
-            disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
-                                              obs_b.observation_id),
-            steps=tuple(steps), cause="QUALITY_FAILURE",
-            provider_a=obs_a.provider, provider_b=obs_b.provider,
-            terminal="REPAIRABLE_SOURCE_MISMATCH")
-    # 7 disagreement surface — only reached when source layers are clean
+        return result("QUALITY_FAILURE", "REPAIRABLE_SOURCE_MISMATCH")
+    # 7 disagreement surface — only reached when source layers are clean.
+    # Materiality uses the explicit tolerance contract (G5R-15); equal clean
+    # values terminate NO_DISAGREEMENT, never GENUINE (G5R-14).
+    va, vb = obs_a.normalized_value, obs_b.normalized_value
+    assert va is not None and vb is not None
+    tol = tolerance or DisagreementToleranceContract(
+        contract_id="default", metric=obs_a.metric, units=obs_a.units)
+    if va == vb or not disagreement_is_material(va, vb, tol):
+        add("disagreement_surface", True,
+            f"equal/within-tolerance normalized values ({va} vs {vb}); no disagreement")
+        return result("NO_DISAGREEMENT", "NO_DISAGREEMENT")
     add("disagreement_surface", True,
-        f"persistent disagreement under clean semantics "
-        f"({obs_a.normalized_value} vs {obs_b.normalized_value})")
-    return SourceDiagnosisResult(
-        disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
-                                          obs_b.observation_id),
-        steps=tuple(steps),
-        cause="GENUINE_SOURCE_DISAGREEMENT" if obs_a.normalized_value != obs_b.normalized_value
-        else "NO_DISAGREEMENT",
-        provider_a=obs_a.provider, provider_b=obs_b.provider,
-        terminal="GENUINE_SOURCE_DISAGREEMENT")
+        f"persistent disagreement under clean semantics ({va} vs {vb})")
+    return result("GENUINE_SOURCE_DISAGREEMENT", "GENUINE_SOURCE_DISAGREEMENT")
+
+
+def disagreement_is_material(a: float, b: float, tol: DisagreementToleranceContract) -> bool:
+    """Raw float inequality is NOT the universal disagreement definition (G5R-15).
+    Materiality is decided by the explicit provisional tolerance contract:
+    absolute, relative or basis-point tolerance. Deterministic; values are NOT
+    constitutionalized. Public API (re-exported by engine.g5r)."""
+    diff = abs(a - b)
+    if diff == 0.0:
+        return False
+    scale = max(abs(a), abs(b), 1e-9)
+    if tol.absolute_tolerance and diff <= tol.absolute_tolerance:
+        return False
+    if tol.relative_tolerance and (diff / scale) <= tol.relative_tolerance:
+        return False
+    if tol.basis_points_tolerance and (diff / scale * 1e4) <= tol.basis_points_tolerance:
+        return False
+    return True
 
 
 @dataclass(frozen=True)
@@ -931,8 +1222,8 @@ class SourceDisagreementRecord:
     provider_a: str
     provider_b: str
     metric: str
-    value_a: float
-    value_b: float
+    value_a: Optional[float]
+    value_b: Optional[float]
     diagnosis: SourceDiagnosisResult
     preserved: bool = True
 
@@ -989,7 +1280,10 @@ class SensorRequirement:
 @dataclass(frozen=True)
 class DataAvailabilityRecord:
     """From actual/synthetic Sensor Fabric capability declarations. UNKNOWN is
-    NOT AVAILABLE. PARTIAL/CURRENT_ONLY never satisfies historical coverage."""
+    NOT AVAILABLE. PARTIAL/CURRENT_ONLY never satisfies historical coverage.
+    G5R-16/17: adequacy checks the FULL requirement vector (observable, status,
+    verified, resolution, history, instrument coverage, time semantics, quality
+    minimum, provenance/certification) — never status+history alone."""
 
     observable: str
     status: str
@@ -998,6 +1292,10 @@ class DataAvailabilityRecord:
     claimed: bool = False
     verified: bool = False
     source: str = "CRYPTO_SENSOR_FABRIC"
+    resolution: str = ""            # G5R-16
+    time_semantics: str = ""        # G5R-16
+    quality_state: str = ""         # G5R-16
+    certification: str = ""         # G5R-17 provenance: AUTHORITATIVE_SYNTHETIC_SENSOR_FIXTURE | CRYPTO_SENSOR_FABRIC_CERTIFICATION
 
     @classmethod
     def from_fixture(cls, data: Mapping[str, Any]) -> "DataAvailabilityRecord":
@@ -1009,12 +1307,39 @@ class DataAvailabilityRecord:
                    instrument_coverage=tuple(data.get("instrument_coverage", [])),
                    claimed=bool(data.get("claimed", False)),
                    verified=bool(data.get("verified", False)),
-                   source=str(data.get("source", "CRYPTO_SENSOR_FABRIC")))
+                   source=str(data.get("source", "CRYPTO_SENSOR_FABRIC")),
+                   resolution=str(data.get("resolution", "")),
+                   time_semantics=str(data.get("time_semantics", "")),
+                   quality_state=str(data.get("quality_state", "")),
+                   certification=str(data.get("certification", "")))
 
     def adequate_history(self, requirement: SensorRequirement) -> bool:
+        """AVAILABLE != ADEQUATE. Full-vector adequacy under the provisional
+        contract (G5R-16/17): observable match, status AVAILABLE, verified,
+        known provenance, sufficient resolution, sufficient history, required
+        instrument coverage, compatible time semantics, quality minimum."""
+        if self.observable != requirement.required_observable:
+            return False
         if self.status != "AVAILABLE":
             return False
-        if requirement.history_depth and self.history_depth != requirement.history_depth:
+        if not self.verified:
+            return False
+        if not self.certification or not self.source \
+                or str(self.certification).strip().upper() == "UNKNOWN":
+            return False                     # UNKNOWN provenance => not adequate
+        if requirement.resolution and self.resolution != requirement.resolution:
+            return False
+        if not HistorySpan.from_string(self.history_depth).satisfies(
+                HistorySpan.from_string(requirement.history_depth)):
+            return False
+        if not set(requirement.instrument_coverage) <= set(self.instrument_coverage):
+            return False
+        if requirement.time_semantics and self.time_semantics != requirement.time_semantics:
+            return False
+        if requirement.quality_minimum == "VERIFIED":
+            if not self.verified:
+                return False
+        elif requirement.quality_minimum and self.quality_state != requirement.quality_minimum:
             return False
         return True
 
@@ -1022,33 +1347,44 @@ class DataAvailabilityRecord:
         return {"observable": self.observable, "status": self.status,
                 "history_depth": self.history_depth,
                 "instrument_coverage": list(self.instrument_coverage),
-                "claimed": self.claimed, "verified": self.verified, "source": self.source}
+                "claimed": self.claimed, "verified": self.verified, "source": self.source,
+                "resolution": self.resolution, "time_semantics": self.time_semantics,
+                "quality_state": self.quality_state, "certification": self.certification}
 
 
 @dataclass(frozen=True)
 class SearchDemand:
     """Endogenous institutional search demand. NOT claim validation; a SearchDemand
-    fires because the institution cannot currently adjudicate the claim."""
+    fires because the institution cannot currently adjudicate the claim.
+    G5R-19: required instruments are SEPARATE from acceptable provider/source
+    classes — an instrument id is never stored as if it were a provider.
+    (`acceptable_sources` is a LEGACY DISPLAY field retained only for old-call
+    compatibility; decision semantics live in required_instruments /
+    acceptable_source_classes.)"""
 
     demand_id: str
     blocked_claim: str
     required_sensor: str
     reason: str
-    value_of_information_class: str
-    acceptable_sources: Tuple[str, ...]
-    history_requirement: str
-    quality_requirement: str
+    required_instruments: Tuple[str, ...] = ()
+    acceptable_source_classes: Tuple[str, ...] = ()
+    history_requirement: str = ""
+    quality_requirement: str = ""
+    value_of_information_class: str = "HIGH"
     status: str = "OPEN"
     reopen_condition: str = ""
+    acceptable_sources: Tuple[str, ...] = ()   # LEGACY DISPLAY ONLY (G5R-19)
 
     def to_dict(self) -> Dict[str, Any]:
         return {"demand_id": self.demand_id, "blocked_claim": self.blocked_claim,
                 "required_sensor": self.required_sensor, "reason": self.reason,
-                "value_of_information_class": self.value_of_information_class,
-                "acceptable_sources": list(self.acceptable_sources),
+                "required_instruments": list(self.required_instruments),
+                "acceptable_source_classes": list(self.acceptable_source_classes),
                 "history_requirement": self.history_requirement,
                 "quality_requirement": self.quality_requirement,
-                "status": self.status, "reopen_condition": self.reopen_condition}
+                "value_of_information_class": self.value_of_information_class,
+                "status": self.status, "reopen_condition": self.reopen_condition,
+                "acceptable_sources_legacy": list(self.acceptable_sources)}
 
 
 # --------------------------------------------------------------------------- #

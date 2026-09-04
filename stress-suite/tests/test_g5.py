@@ -190,7 +190,16 @@ def test_control_b_fixing_fills_only_still_rejects():
 
 def test_control_c_moderate_clean_progresses_farther():
     """A moderate clean candidate passes the B7 vector and becomes
-    VALIDATION_REQUIRED (never promoted) while the fake alpha is REJECTED."""
+    VALIDATION_REQUIRED (never promoted into execution) while the fake alpha
+    is REJECTED.
+
+    G5R-24 vocab change (documented): OLD assertion asserted
+    `promotion_decision == PROMOTED` while simultaneously asserting
+    `disposition == VALIDATION_REQUIRED` — one word used for two layers.
+    REPLACEMENT: the research promotion decision is `PROMOTION_CANDIDATE`
+    (validation passed, promotion to a validation program) and
+    `execution_authority == NONE`; the terminal disposition stays
+    VALIDATION_REQUIRED."""
     data = json.loads((G5_DIRS["S14"] / "strategies.json").read_text(encoding="utf-8"))
     clean = {
         "candidate_id": "CAND_CLEAN",
@@ -211,8 +220,10 @@ def test_control_c_moderate_clean_progresses_farther():
     res = run_g5_scenario(pack, POLICY)
     item = res.artifacts["items"][0]
     assert item["material_failures"] == []
-    assert item["promotion_decision"]["decision"] == "PROMOTED"  # validated gates
-    assert item["disposition"] == "VALIDATION_REQUIRED"          # but not promoted into execution
+    assert item["promotion_decision"]["decision"] == "PROMOTION_CANDIDATE"  # validated gates
+    assert item["promotion_decision"]["validation_terminal"] == "VALIDATION_PASS"
+    assert item["promotion_decision"]["execution_authority"] == "NONE"
+    assert item["disposition"] == "VALIDATION_REQUIRED"          # not execution authority
     assert item["research_priority"]["priority"] == "PRIORITY_NORMAL"
 
 
@@ -301,8 +312,13 @@ def test_control_a_quality_failure_kills_false_pattern():
 
 
 def test_control_b_single_lineage_remains_unresolved():
+    """G5R-01 vocab change (documented): the OLD assertion mutated
+    `evidence_lineages` (a legacy display integer that held NO decision
+    authority after G5R). REPLACEMENT: reduce the REGISTERED evidence refs to a
+    single lineage so derived independence is one lineage -> UNRESOLVED."""
     raw = json.loads((G5_DIRS["S15"] / "unresolved_patterns.json").read_text(encoding="utf-8"))[0]
     one = dict(raw)
+    one["independence_evidence_refs"] = ["IND_1"]
     one["evidence_lineages"] = 1
     pack = G5ScenarioPack(scenario_id="S15", unresolved_patterns=[one]).decision_grade()
     res = run_g5_scenario(pack, POLICY)
@@ -410,10 +426,20 @@ def test_claim_id_rename_leaves_doctrine_authority_unchanged():
 
 def test_operator_preference_cannot_fabricate_contradiction():
     """A bare 'operator prefers different' input cannot create a contradiction
-    record without a CLEAN reproduction result."""
+    record without a CLEAN reproduction result.
+
+    G5R-07 change (documented): the OLD assertion mutated `result` STRINGS
+    (e.g. "CONTRADICTS_CLAIM" -> "SUPPORTS_CLAIM") — the string held the
+    contradiction authority, which is exactly the defect G5R-07 closes.
+    REPLACEMENT: even a CLEAN reproduction whose fixture string claims
+    CONTRADICTS_CLAIM but whose MEASURED result lies inside the doctrine band
+    must produce ZERO contradictions (the measured result is the authority)."""
     raw = json.loads((G5_DIRS["S16"] / "reproductions.json").read_text(encoding="utf-8"))
     for r in raw:
-        r["result"] = "SUPPORTS_CLAIM" if r["reproduction_id"] == "REPRO_CLEAN_1" else r["result"]
+        if r["reproduction_id"] == "REPRO_CLEAN_1":
+            r["observed_result"] = {"metric": "filtered_win_rate", "estimate": 0.87,
+                                     "uncertainty_interval": [0.86, 0.88],
+                                     "sample_size": 2400, "units": "RATE"}
     pack = G5ScenarioPack(scenario_id="S16", doctrine_claims=[
         json.loads((G5_DIRS["S16"] / "doctrine_claims.json").read_text(encoding="utf-8"))[0]],
         reproductions=raw).decision_grade()
@@ -641,19 +667,61 @@ def test_broken_structural_assumption_transfer_rejected():
     assert res.artifacts["transfers"][0]["disposition"] == "TRANSFER_REJECTED"
 
 
-def test_target_data_frozen_protocol_routes_domain_validation_required():
-    """CONTROL C: mapping + target data + frozen protocol =>
-    DOMAIN_VALIDATION_REQUIRED (never DOMAIN_VALIDATED on source evidence)."""
+def _s19_adequate_pack():
+    """S19 pack whose target FX sensors satisfy the full requirement vector."""
     pack = load_g5_pack(G5_DIRS["S19"]).decision_grade()
-    res = run_g5_scenario(pack, POLICY, target_data_available=True, protocol_frozen=True)
-    assert res.artifacts["transfers"][0]["disposition"] == "DOMAIN_VALIDATION_REQUIRED"
-    assert res.artifacts["transfers"][0]["source_validation_as_target_validation"] is False
+    adequate = []
+    for req in pack.sensor_requirements:
+        adequate.append({
+            "observable": req["required_observable"], "status": "AVAILABLE",
+            "history_depth": req["history_depth"],
+            "instrument_coverage": list(req["instrument_coverage"]),
+            "claimed": True, "verified": True,
+            "source": "CRYPTO_SENSOR_FABRIC",
+            "resolution": req["resolution"],
+            "time_semantics": req["time_semantics"],
+            "quality_state": req["quality_minimum"],
+            "certification": "AUTHORITATIVE_SYNTHETIC_SENSOR_FIXTURE",
+        })
+    return G5ScenarioPack(**{**pack.__dict__, "data_availability": adequate})
+
+
+def test_target_data_frozen_protocol_routes_domain_validation_required():
+    """CONTROL C: mapping + GOVERNED target adequacy + registered frozen
+    protocol => DOMAIN_VALIDATION_REQUIRED (never DOMAIN_VALIDATED on source
+    evidence).
+
+    G5R-22 change (documented): the OLD control passed
+    `target_data_available=True` as a caller boolean that flipped the target
+    result. A boolean override is NON-AUTHORITATIVE test plumbing and cannot
+    change the primary governed result; governed target adequacy comes from
+    the sensor requirement vector (this pack provides it)."""
+    pack = _s19_adequate_pack()
+    res = run_g5_scenario(pack, POLICY, protocol_frozen=True)
+    item = res.artifacts["transfers"][0]
+    assert item["disposition"] == "DOMAIN_VALIDATION_REQUIRED"
+    assert item["source_validation_as_target_validation"] is False
+    assert item["target_data_available"] is True
+    assert item["target_data_override"] is None
+    assert item["protocol_resolution"]["resolved"] is True
 
 
 def test_without_frozen_protocol_transfer_stays_hypothesis():
-    pack = load_g5_pack(G5_DIRS["S19"]).decision_grade()
-    res = run_g5_scenario(pack, POLICY, target_data_available=True, protocol_frozen=False)
+    """G5R-22 change (documented): with the legacy boolean override removed as
+    a decision authority, the no-frozen-protocol control needs GOVERNED target
+    adequacy to isolate the protocol variable. Adequate data + no frozen
+    protocol => TRANSFER_HYPOTHESIS_ONLY. The boolean override alone on the
+    primary (inadequate) pack must NOT flip DATA_BLOCKED."""
+    adequate = _s19_adequate_pack()
+    res = run_g5_scenario(adequate, POLICY, protocol_frozen=False)
     assert res.artifacts["transfers"][0]["disposition"] == "TRANSFER_HYPOTHESIS_ONLY"
+    # boolean override cannot change the primary governed result (G5R-22)
+    primary = load_g5_pack(G5_DIRS["S19"]).decision_grade()
+    res2 = run_g5_scenario(primary, POLICY, target_data_available=True, protocol_frozen=True)
+    item2 = res2.artifacts["transfers"][0]
+    assert item2["disposition"] == "DATA_BLOCKED"
+    assert item2["target_data_available"] is False
+    assert item2["target_data_override"] == "NON_AUTHORITATIVE_TEST_CONVENIENCE"
 
 
 def test_analogy_control_same_name_different_mechanics():

@@ -6,6 +6,7 @@
   "unresolved_patterns_ref": "unresolved_patterns.json",
   "mechanism_cards_ref": "mechanism_cards.json",
   "protocols_ref": "protocols.json",
+  "evidence_ref": "evidence.json",
   "current_facts": {
     "domain": "FX",
     "claim_type": "MECHANISM_HYPOTHESIS"
