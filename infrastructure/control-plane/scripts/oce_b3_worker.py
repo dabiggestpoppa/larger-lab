@@ -162,6 +162,10 @@ def run(deps: WorkerDependencies, *, ctx, url: str,
                                            "disk_bytes": 256 * 1024 * 1024,
                                            "timeout_s": 60}),
         }
+        # B4-CXR7U3: resolve the repository-owned allowlisted program BEFORE
+        # claiming a lease — an unknown job type fails closed before any
+        # subprocess, workspace seeding, or control-plane claim side effect.
+        prog = program_for(spec["job_type"])
         lease = client.claim(job)
         lease_id = lease["lease_id"]
         fence = lease["fence"]
@@ -178,7 +182,14 @@ def run(deps: WorkerDependencies, *, ctx, url: str,
         ws = _contained_path("OCE_ATTEMPT_WS", os.environ.get("OCE_ATTEMPT_WS", ""),
                              str(Path.cwd() / f"attempt-{fence_id}"))
         prepare_workspace(ws, spec["job_type"], params)
-        prog = program_for(spec["job_type"])
+        # B4-CXR7U3: *prog* is the fixed, repository-owned allowlisted program
+        # selected by program_for(job_type). Job params are DATA seeded into
+        # input/params.json — they can never become source code, executable
+        # names, argv programs, shell fragments, import/module paths, script
+        # paths, environment authority, or filesystem authority. Shell
+        # execution stays disabled (shell=False); runtime code is never loaded
+        # from the attempt workspace; the job cannot select or modify the
+        # program registry.
         env = JobResourceEnvelope(timeout_s=int(spec.get("timeout_s", 60)))
         result = runner.run(["python", "-c", prog], envelope=env, workspace=ws)
 

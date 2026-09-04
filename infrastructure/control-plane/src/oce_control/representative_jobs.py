@@ -7,6 +7,20 @@ production path (BoundedRunner + ContentAddressable artifact store), never
 by direct function substitution. These prove worker execution only; the
 synthetic backtest is deterministic fixture output and is NOT a validated
 Quant Lab strategy. No broker / paper / live trading connection exists.
+
+HARD CODE-EXECUTION LOCK (B4-CXR7U3; canonical statement in
+``B4-THREAT-MODEL.md``):
+
+    GENERATED, DOWNLOADED, THIRD-PARTY, PLUGIN, STRATEGY, USER-SUPPLIED,
+    OR MODEL-PRODUCED CODE MAY NOT EXECUTE UNTIL A REAL OS ISOLATION
+    INCREMENT IS SEPARATELY AUTHORIZED AND PROVEN.
+
+Only the fixed, repository-owned programs registered here may execute.
+``program_for`` fails closed on unknown job types; job parameters are DATA
+only — they can never become source code, executable names, argv programs,
+shell fragments, import/module paths, script paths, environment authority,
+or filesystem authority; the registry cannot be selected or modified by a
+job; test dependency seams cannot be activated from production input.
 """
 from __future__ import annotations
 import json

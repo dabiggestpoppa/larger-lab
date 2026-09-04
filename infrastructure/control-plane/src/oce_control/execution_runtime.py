@@ -139,6 +139,18 @@ class IsolatedSandboxUnsupported(Exception):
 class BoundedRunner:
     """Bounded, disposable, tree-terminating local task runner (B3-C4).
 
+    TRUTHFUL CAPABILITY STATEMENT (B4-CXR7U3; see B4-THREAT-MODEL.md):
+    this runner provides RESOURCE BOUNDING and WATCHDOG/TREE TERMINATION
+    only. RLIMIT CPU/address-space/file-size controls plus process-group
+    termination do NOT provide network isolation, filesystem isolation,
+    identity isolation, secret-store isolation, syscall isolation, or
+    hostile-code containment. ``strict`` mode enforces MANDATORY RESOURCE
+    boundaries; it never implies filesystem, network, or identity
+    isolation. Network is denied by Book 4 POLICY; OS network enforcement
+    is NOT implemented and is never claimed.
+
+    Current execution trust: repository-owned allowlisted programs only.
+
     Cross-platform best-effort limits:
 
     * POSIX: ``resource.setrlimit`` for CPU time, address space and max file
@@ -147,8 +159,8 @@ class BoundedRunner:
       strongest local equivalent (job objects are not reliable across
       subprocesses without ctypes) is a hard watchdog timeout plus process
       tree termination via ``taskkill /T`` on the session. This limitation
-      is recorded per attempt so it is never silently claimed as full
-      isolation.
+      is recorded per attempt so it is never silently claimed as resource
+      bounding beyond what is real.
     """
 
     def __init__(self, workspace_base: Optional[Path] = None,
@@ -206,36 +218,88 @@ class BoundedRunner:
     # -- platform limit helpers (truthful reporting) ---------------------------
 
     @property
-    def full_isolation(self) -> bool:
-        """True only when real OS resource isolation is applied (POSIX)."""
+    def resource_limits_available(self) -> bool:
+        """True when POSIX rlimit resource bounding is available (B4-CXR7U3).
+
+        This reports RESOURCE-LIMIT AVAILABILITY ONLY. It is NOT "full
+        isolation": rlimits never provide network, filesystem, identity,
+        secret-store, syscall, or hostile-code isolation. (B4-CXR7U1/U3.)
+        """
         return not platform.system().lower().startswith("win")
 
+    @property
+    def full_isolation(self) -> bool:
+        """DEPRECATED COMPATIBILITY ALIAS of resource_limits_available.
+
+        B4-CXR7U3 truth correction: the value means POSIX rlimit RESOURCE
+        bounding availability — never "full isolation". Kept only so existing
+        callers keep working; new code uses resource_limits_available.
+        """
+        return self.resource_limits_available
+
+    @property
+    def resource_enforcement_report(self) -> dict:
+        """Literal, secret-free report of what execution enforcement IS
+        (B4-CXR7U3) — the exact three-line truth:
+
+            network authorization:  denied by Book 4 policy
+            OS network enforcement: not implemented
+            current execution trust: repository-owned allowlisted programs only
+
+        plus per-platform resource bounding status. Never overstates:
+        "policy-denied" is a boolean policy check, NOT syscall enforcement.
+        """
+        return {
+            "network_authorization": "denied by Book 4 policy",
+            "os_network_enforcement": "not implemented",
+            "current_execution_trust": "repository-owned allowlisted programs only",
+            "resource_limits_available": self.resource_limits_available,
+            "resource_bounding": (
+                "POSIX rlimits (CPU, address space, file size) + process-group "
+                "termination" if self.resource_limits_available
+                else "watchdog timeout + process-tree termination (taskkill /T); "
+                     "rlimit primitives unavailable on this platform"),
+            "not_provided": [
+                "network isolation", "filesystem isolation", "identity isolation",
+                "secret-store isolation", "syscall isolation",
+                "hostile-code containment",
+            ],
+            "adversarial_sandbox": False,
+        }
+
     def _limits_preamble(self, envelope: JobResourceEnvelope) -> Optional[str]:
-        """Returns None on POSIX (real limits applied) or a truthful note."""
-        if self.full_isolation:
+        """Returns None on POSIX (rlimit resource bounding applied) or a
+        truthful note."""
+        if self.resource_limits_available:
             return None
         return ("windows: rlimit primitives unavailable; applied watchdog "
-                "timeout + tree termination as strongest local equivalent")
+                "timeout + tree termination as strongest local equivalent "
+                "(resource bounding only — never full isolation, B4-CXR7U3)")
 
     def preflight_isolation(self, envelope: JobResourceEnvelope) -> dict:
-        """Verify the sandbox boundaries that will be enforced BEFORE any job
+        """Verify the RESOURCE boundaries that will be enforced BEFORE any job
         code runs. Returns a truthful report of enforced vs unavailable
-        boundaries. In ``strict`` mode, a MANDATORY boundary that cannot be
-        established raises ``IsolatedSandboxUnsupported`` (BLOCKED) instead of
-        silently running with weaker isolation.
+        boundaries. In ``strict`` mode, a MANDATORY RESOURCE boundary that
+        cannot be established raises ``IsolatedSandboxUnsupported`` (BLOCKED)
+        instead of silently running with weaker bounding.
 
-        Mandatory boundaries:
+        Strict mode never implies filesystem, network, or identity isolation
+        (B4-CXR7U3).
+
+        Mandatory boundaries (resource bounding only):
           timeout_s, max_output_bytes  — enforced on every platform
           memory_bytes, disk_bytes, cpu_limit — rlimit-backed on POSIX; on
               Windows the strongest available local equivalent (watchdog + tree
               termination + output cap) is applied and reported truthfully
-          network — denied by policy (allow_network must be False); a job is
-              never granted sockets unless the policy grants them
+          network — denied by Book 4 POLICY (allow_network must be False);
+              this is a policy check, NOT OS network enforcement
         """
         enforced = ["timeout", "output_size"]
-        unavailable: dict[str, str] = {"network": "policy-denied"}
+        unavailable: dict[str, str] = {
+            "network": ("denied by Book 4 policy (policy check only — OS "
+                        "network enforcement NOT implemented, B4-CXR7U3)")}
         mandatory_missing: list[str] = []
-        if self.full_isolation:
+        if self.resource_limits_available:
             import resource as _res
             ok_cpu = False
             ok_mem = False
@@ -286,6 +350,9 @@ class BoundedRunner:
         report = {"enforced": enforced, "unavailable": unavailable,
                   "mandatory_missing": mandatory_missing,
                   "network": "denied" if not self._policy.allow_network else "granted-by-policy",
+                  "network_enforcement": "policy check only — OS network "
+                                        "enforcement not implemented (B4-CXR7U3)",
+                  "resource_enforcement_report": self.resource_enforcement_report,
                   "strict": self._policy.strict}
         if self._policy.strict and mandatory_missing:
             raise IsolatedSandboxUnsupported(
@@ -294,9 +361,19 @@ class BoundedRunner:
         return report
 
     def _deny_network(self) -> None:
-        """Jobs may not silently gain network access the policy denies."""
+        """Book 4 network POLICY check (B4-CXR7U3 truth correction).
+
+        This performs NO OS network restriction — there is no syscall-level
+        network enforcement in Book 4. It only refuses to run when the
+        policy itself grants network. The preflight report states this
+        literally: network authorization is denied by policy; OS network
+        enforcement is NOT implemented.
+        """
         if self._policy.allow_network:
-            return
+            raise ExecutionPolicyError(
+                "allow_network=True refused: Book 4 network authorization is "
+                "denied by policy and OS network enforcement is not "
+                "implemented (B4-CXR7U3)")
 
     def _guard_output_extension(self, rel_name: str) -> None:
         """Enforce the output-extension allowlist; anything else fails closed."""
@@ -387,7 +464,7 @@ class BoundedRunner:
                 "env": env, "cwd": str(ws), "text": True,
                 "encoding": "utf-8", "errors": "replace",
             }
-            if self.full_isolation:
+            if self.resource_limits_available:
                 popen_kwargs["preexec_fn"] = self._apply_posix_limits(envelope)
             proc = subprocess.Popen(argv, **popen_kwargs, shell=(False))
             self._current_proc = proc
@@ -408,10 +485,10 @@ class BoundedRunner:
             if cancel.wait(envelope.timeout_s):
                 # cancellation requested -> actively kill the tree so the run
                 # is reaped as a cancellation, never waited out (defect 9).
-                _kill(proc, self.full_isolation)
+                _kill(proc, self.resource_limits_available)
                 return
             killed_by_timeout.set()
-            _kill(proc, self.full_isolation)
+            _kill(proc, self.resource_limits_available)
 
         watcher = threading.Thread(target=_watch, daemon=True)
         watcher.start()
@@ -430,10 +507,10 @@ class BoundedRunner:
             elif (len(result.stdout.encode("utf-8")) +
                   len(result.stderr.encode("utf-8"))) > envelope.max_output_bytes:
                 result.resource_violation = "output_size_limit"
-                _kill(proc, self.full_isolation)
+                _kill(proc, self.resource_limits_available)
         except subprocess.TimeoutExpired:
             killed_by_timeout.set()
-            _kill(proc, self.full_isolation)
+            _kill(proc, self.resource_limits_available)
             out, err = proc.communicate()
             result.stdout = (out or "")[:envelope.max_output_bytes]
             result.stderr = (err or "")[:envelope.max_output_bytes]
@@ -441,7 +518,7 @@ class BoundedRunner:
             result.exit_code = proc.returncode
             result.resource_violation = "timeout"
         except Exception as exc:
-            _kill(proc, self.full_isolation)
+            _kill(proc, self.resource_limits_available)
             result.raise_fired = True
             result.stderr += f"\ncommunicate failed: {exc}"
             result.exit_code = proc.returncode
@@ -464,7 +541,7 @@ class BoundedRunner:
             self._cancel_event.set()
         proc = self._current_proc
         if proc is not None and proc.poll() is None:
-            _kill(proc, self.full_isolation)
+            _kill(proc, self.resource_limits_available)
 
     def cleanup(self) -> None:
         """Dispose of every attempt workspace (attempt workspace is disposable)."""
@@ -478,7 +555,7 @@ class BoundedRunner:
                  "ok": a.ok, "started_at": a.started_at} for a in self._attempts]
 
 
-def _kill(proc: subprocess.Popen, full_isolation: bool) -> None:
+def _kill(proc: subprocess.Popen, resource_limits_available: bool) -> None:
     if proc.poll() is not None:
         return
     try:
