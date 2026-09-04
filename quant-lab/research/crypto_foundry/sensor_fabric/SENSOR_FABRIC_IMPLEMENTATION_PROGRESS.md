@@ -11,7 +11,8 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I02R1-RATIFY COMPLETE (governance) — OPERATOR ACCEPTS PASS_SENSOR_B4_I02R1_CANONICAL_PATHS_SEALED + PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS; CONTENT_ADDRESSING_READY=TRUE; PATH_CONTRACT_READY=TRUE; CHECKSUM_PRIMITIVES_READY=TRUE; test-node truth reconciled (I02R1A actually +20 collectible nodes, I02R1B net +2 → path suite 87→109 / storage 237→259 / full collect 1617→1639; historical "35 I02R1A tests / 272 storage" wording recorded as overstated, evidence preserved); authorizes SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND ONLY; I04 NOT authorized |
+| Current checkpoint | SENSOR-B4-I03 COMPLETE — ATOMIC FILESYSTEM BACKEND (proposed `PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND`).  LocalBlobStore on an explicit configurable root: staging → streaming write → flush → fsync → staged verify (H2 + decoded H1 + length + optional explicit H3) → no-clobber os.link publication (never overwrites; valid existing = REUSED_EXISTING; corrupt existing = typed conflict, preserved) → parent-directory fsync → success.  NONE/ZSTD wrappers via zstandard>=0.23.0 (H1 source SHA before compression invariant; H2 stored SHA; H1==H2 only for NONE).  Typed fail-closed errors; ComponentTooLong BEFORE any artifact write (PC_NAME_MAX / NTFS 255, closes I02R1's LONG_COMPONENT_CHECK_REQUIRED_IN_I03); st_dev same-filesystem enforcement, cross-device denied, no copy fallback; crash matrix A-F (UNCOMMITTED_STAGING / ORPHAN_DURABLE_BLOB / DURABLE_COMMITTED) generated into BLOC_04_I03_CRASH_MATRIX.json; atomic-order evidence BLOC_04_I03_ATOMIC_ORDER.json; storage 390 nodes (+131); full suite 1768 passed / 0 failed / 2 skipped; ruff clean; changed-scope mypy clean; network 0; provider code unchanged; no acquisition repository / manifest / resume / T0B / DuckDB / Postgres.  ATOMIC_FILESYSTEM_BACKEND_READY=TRUE; T0A_BLOB_BACKEND_IMPLEMENTED=TRUE; T0A_EVIDENCE_PIPELINE_COMPLETE=FALSE (AcquisitionRecord + PartitionManifest persistence = I04); MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; T0B_STORAGE_IMPLEMENTED=FALSE; I04 NOT started |
+| Previous checkpoint | SENSOR-B4-I02R1-RATIFY COMPLETE (governance) — OPERATOR ACCEPTS PASS_SENSOR_B4_I02R1_CANONICAL_PATHS_SEALED + PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS; CONTENT_ADDRESSING_READY=TRUE; PATH_CONTRACT_READY=TRUE; CHECKSUM_PRIMITIVES_READY=TRUE; test-node truth reconciled (I02R1A actually +20 collectible nodes, I02R1B net +2 → path suite 87→109 / storage 237→259 / full collect 1617→1639; historical "35 I02R1A tests / 272 storage" wording recorded as overstated, evidence preserved); authorizes SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND ONLY; I04 NOT authorized |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN (SENSOR-B3-I11R1-RATIFY: PASS_SENSOR_B3_I11R1_HANDOFF_CONSISTENCY_SEALED = OPERATOR_ACCEPTED, PASS_BLOC_03_IMPLEMENTATION = OPERATOR_ACCEPTED, BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE, NETWORK_VALIDATION=PASS, REAL_PROVIDER_ADAPTERS=4, PRODUCTION_PATHS=17/17, PHYSICAL_PRODUCTION_SYMBOL_CHECKS=18/18); BLOC_04_PLAN = PASS_BLOC_04_PLAN_FROZEN; SENSOR-B4-I01R1-RATIFY: PASS_SENSOR_B4_I01R1_STORAGE_CONTRACTS_SEALED = OPERATOR_ACCEPTED, PASS_SENSOR_B4_I01_STORAGE_CONTRACTS_FROZEN = OPERATOR_ACCEPTED; authorized SENSOR-B4-I02 CONTENT ADDRESSING + PATHS + CHECKSUMS ONLY — addresses/identity mechanics, NO persistence yet; SENSOR-B4-I02 COMPLETE — proposed PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS; SENSOR-B4-I02R1 COMPLETE — proposed PASS_SENSOR_B4_I02R1_CANONICAL_PATHS_SEALED; SENSOR-B4-I02R1-RATIFY (this commit): OPERATOR_ACCEPTED both verdicts, pytest-node truth reconciled (storage 259 = enums 18 + models 81 + serialization 16 + checksums 35 + paths 109; full collect 1639 = 1638 run + 1 live-smoke skip; I02R1A +20 nodes, I02R1B net +2, total +22), historical "35/272" wording recorded as overstated, original I02/I02R1 evidence preserved; authorized SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND ONLY — I04 NOT authorized |
@@ -25,7 +26,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | TRUE — SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND ONLY (operator-authorized via SENSOR-B4-I02R1-RATIFY; NOT started at the ratification commit; must fail closed on overlong components, enforce same-filesystem atomicity and no-clobber publication). SENSOR-B4-I04 NOT authorized. |
+| next_checkpoint_authorized | FALSE — SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND is COMPLETE (proposed PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND, awaiting operator review).  Recommended next: SENSOR-B4-I04 ACQUISITION + MANIFEST REPOSITORY — NOT authorized and NOT started. |
 
 ## Test counts (cumulative)
 
@@ -145,6 +146,10 @@ that is updated at every staged checkpoint.
 | SENSOR-B4-I02R1B | 94922be3 | 0 (full-SHA projection key; collision + full-hash tests folded into R1A batch) | 0 |
 | SENSOR-B4-I02R1C | d7a4f6c6 | 0 (canonical-path seal evidence) | — |
 | cumulative | 1638 | 1638 | 0 |
+| SENSOR-B4-I03A | fa95b771 | 56 (compression 34 + atomic 22; storage 259 → 315) | 0 |
+| SENSOR-B4-I03B | fa41aa43 | 51 (blob store core; storage 315 → 366) | 0 |
+| SENSOR-B4-I03C | 95b21b26 | 24 (adversarial seal; storage 366 → 390; full-suite cumulative 1768 passed / 0 failed / 2 skipped) | 0 |
+| cumulative | 1768 | 1768 | 0 (2 env-skips: live smoke + POSIX-only permission on Windows) |
 
 ## External / provider blockers
 
@@ -231,6 +236,58 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B4-I03 COMPLETE — ATOMIC FILESYSTEM BACKEND (proposed
+  `PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND`).  New storage modules
+  `compression.py` (streaming NONE/ZSTD wrapper: `encode_source_stream` +
+  `iter_decode_stored`; H1 = exact-source SHA-256 BEFORE wrapper compression,
+  H2 = stored-object SHA-256, H1==H2 only for NONE; bounded reads,
+  non-seekable sources, caller stream ownership preserved, no full-object
+  materialization; zstandard>=0.23.0 per dependency policy — no
+  gzip/bz2/lzma substitute), `atomic.py` (generic no-clobber durability
+  primitives reusable by I05: component-length guard via PC_NAME_MAX / NTFS
+  255 failing closed typed ComponentTooLong BEFORE any artifact write —
+  closes I02R1's LONG_COMPONENT_CHECK_REQUIRED_IN_I03; st_dev
+  same-filesystem enforcement, cross-device denied with NO copy+delete
+  fallback; os.link-based publish_no_replace — final name appears only for
+  a fully-fsynced inode, existing final never overwritten;
+  platform-truthful directory fsync (POSIX O_RDONLY fsync / Windows
+  FILE_FLAG_BACKUP_SEMANTICS + FlushFileBuffers) or typed
+  DurabilityUnsupported; deterministic FaultPoint hooks A-F + ListOpRecorder
+  canonical seven-operation durable-order contract) and `blob_store.py`
+  (LocalBlobStore on an EXPLICIT configurable root — runtime configuration,
+  never evidence identity, storage_uri = backend-neutral object key;
+  commit sequence THROUGH step 6: staging under
+  staging/<escaped job_id>/<nonce>.partial O_EXCL 0o600 → streaming write →
+  flush → fsync(fd while open) → staged verification (re-opened: stored H2,
+  decoded H1, length, optional explicit-algorithm H3 against decoded source
+  bytes; mismatch refuses the commit with staged evidence preserved) →
+  no-clobber publication → parent-directory fsync → success; steps 7-8 NOT
+  here).  Public API: put/put_bytes/blob_exists (presence only)/open_blob
+  (decoded source stream; missing = typed BlobMissing, distinct from
+  empty)/verify_blob (recomputed H1 vs content identity; corruption =
+  QUARANTINED_INTEGRITY_FAILURE, no repair; recovery = I08);
+  BlobPutResult disposition COMMITTED_NEW | REUSED_EXISTING (disposition !=
+  integrity state); EvidenceBlob LOCAL_HASH_VERIFIED only, created_at via
+  injected clock (metadata, never identity); NO public overwrite operation —
+  committed T0A is immutable.  Duplicate put idempotent (final mtime/content
+  untouched); 8-thread same-hash race → exactly one COMMITTED_NEW / one
+  final / all verify; corrupt existing final = ExistingBlobIntegrityConflict,
+  never overwritten/deleted/repaired.  Crash matrix A-F test-frozen +
+  generated BLOC_04_I03_CRASH_MATRIX.json (UNCOMMITTED_STAGING x4 /
+  ORPHAN_DURABLE_BLOB / DURABLE_COMMITTED) + BLOC_04_I03_ATOMIC_ORDER.json;
+  no auto-recovery, no stale-partial scanning (I08).  Storage tests 390
+  (+131: compression 34 + atomic 22 + blob-store core 51 + adversarial 24);
+  full suite 1768 passed / 0 failed / 2 skipped (1 env-gated live smoke + 1
+  POSIX-only permission assertion skipped on Windows; floor was >=1638);
+  ruff clean on changed scope; changed-scope mypy clean (remaining 4 =
+  documented pre-existing yaml/planner baseline in untouched Bloc 2/3
+  modules); network 0; provider code UNCHANGED; no acquisition repository,
+  no manifests, no resume advancement, no T0B, no DuckDB, no Postgres.
+  Flags: ATOMIC_FILESYSTEM_BACKEND_READY=TRUE, T0A_BLOB_BACKEND_IMPLEMENTED=
+  TRUE, T0A_EVIDENCE_PIPELINE_COMPLETE=FALSE (AcquisitionRecord +
+  PartitionManifest persistence = I04), MANIFEST_REPOSITORY_IMPLEMENTED=
+  FALSE, T0B_STORAGE_IMPLEMENTED=FALSE.  Evidence:
+  `evidence/bloc_04/BLOC_04_I03_ATOMIC_FILESYSTEM_EVIDENCE.md`.
 - SENSOR-B4-I02 COMPLETE — CONTENT ADDRESSING + PATHS + CHECKSUMS (proposed
   `PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS`).  New storage
   modules `checksums.py` + `paths.py`; I01 models rewire SHA-256 syntax
