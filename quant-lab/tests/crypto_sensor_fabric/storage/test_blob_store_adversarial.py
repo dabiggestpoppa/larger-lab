@@ -236,8 +236,14 @@ class TestCrashMatrix:
             # row-local staging state: clear this row's leftover before the next
             for leftover in (tmp_path / "staging").rglob("*.partial"):
                 leftover.unlink()
+        # SENSOR-B4-I03R1 §2: the historical I03 crash matrix is IMMUTABLE
+        # evidence and is never rewritten.  The generator therefore REGENERATES
+        # the six rows in memory and asserts they still match the frozen
+        # historical artifact byte-for-byte — any durability-behavior drift
+        # fails loudly here instead of silently falsifying history.
         out_path = EVIDENCE_DIR / "BLOC_04_I03_CRASH_MATRIX.json"
-        out_path.write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8")
+        frozen = json.loads(out_path.read_text(encoding="utf-8"))
+        assert rows == frozen
         assert len(rows) == 6
         assert all(row["success_returned"] is False for row in rows)
 
@@ -278,7 +284,13 @@ class TestOperationOrder:
         assert is_canonical_durable_order(ops.ops)
 
     def test_atomic_order_artifact_written(self, tmp_path) -> None:
-        """Regenerate BLOC_04_I03_ATOMIC_ORDER.json deterministically (I03 §75)."""
+        """Regenerate the I03R1-supplemental atomic-order artifact.
+
+        I03R1 §2: ``BLOC_04_I03_ATOMIC_ORDER.json`` is HISTORICAL I03
+        evidence and is never rewritten.  The current operation stream now
+        includes I03R1 milestones, so the live generator seals the
+        supplemental file instead.
+        """
         store = make_store(tmp_path)
         ops = ListOpRecorder()
         store.put_bytes(
@@ -306,7 +318,7 @@ class TestOperationOrder:
             ),
             "encoding": "NONE",
         }
-        out_path = EVIDENCE_DIR / "BLOC_04_I03_ATOMIC_ORDER.json"
+        out_path = EVIDENCE_DIR / "BLOC_04_I03R1_ATOMIC_ORDER.json"
         out_path.write_text(
             json.dumps(payload, indent=2) + "\n", encoding="utf-8"
         )

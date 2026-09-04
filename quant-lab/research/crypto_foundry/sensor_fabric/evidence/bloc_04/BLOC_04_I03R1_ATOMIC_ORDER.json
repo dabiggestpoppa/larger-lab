@@ -1,0 +1,40 @@
+{
+  "operation_order": [
+    "stage_write",
+    "file_flush",
+    "file_fsync",
+    "stage_verify",
+    "dir_create",
+    "dir_fsync",
+    "parent_namespace_fsync",
+    "dir_create",
+    "dir_fsync",
+    "parent_namespace_fsync",
+    "dir_create",
+    "dir_fsync",
+    "parent_namespace_fsync",
+    "dir_create",
+    "dir_fsync",
+    "parent_namespace_fsync",
+    "device_check",
+    "atomic_publish",
+    "final_link",
+    "parent_dir_fsync",
+    "final_parent_fsync",
+    "staging_cleanup",
+    "success_return"
+  ],
+  "canonical_order_contract": [
+    "stage_write",
+    "file_flush",
+    "file_fsync",
+    "stage_verify",
+    "atomic_publish",
+    "parent_dir_fsync",
+    "success_return"
+  ],
+  "order_proven": true,
+  "success_returned_last": true,
+  "parent_fsync_before_success": true,
+  "encoding": "NONE"
+}
