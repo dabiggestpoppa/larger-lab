@@ -181,6 +181,30 @@
       "rationale": "required observable absent at needed resolution/history blocks the claim and emits a SearchDemand; no synthetic backfill (S18)"
     },
     {
+      "rule_id": "g5.availability.blocked_insufficient_vector",
+      "kind": "availability",
+      "when": {
+        "data_availability": "AVAILABLE",
+        "sensor_resolution": "INSUFFICIENT"
+      },
+      "then": {
+        "disposition": "DATA_BLOCKED"
+      },
+      "rationale": "AVAILABLE != ADEQUATE (G5R-16): an available sensor whose full requirement vector fails (resolution, history, instruments, time semantics, quality, provenance) still blocks the claim"
+    },
+    {
+      "rule_id": "g5.availability.blocked_unverified_sensor",
+      "kind": "availability",
+      "when": {
+        "data_availability": "AVAILABLE",
+        "sensor_verified": false
+      },
+      "then": {
+        "disposition": "DATA_BLOCKED"
+      },
+      "rationale": "AVAILABLE != ADEQUATE (G5R-16/17): an available-but-unverified/certified sensor does not satisfy the requirement vector; the claim stays DATA_BLOCKED and the SearchDemand stands"
+    },
+    {
       "rule_id": "g5.transfer.analogy_only",
       "kind": "transfer",
       "when": {
