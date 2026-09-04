@@ -127,7 +127,6 @@ class TestNamespaceDurabilityMatrix:
         assert (
             ops.ops.index(OP_PARENT_DIR_FSYNC) < ops.ops.index(OP_SUCCESS_RETURN)
         )
-        final = final_path_for(tmp_path, sha, StorageEncoding.NONE)
         check = store.verify_blob(sha, StorageEncoding.NONE)
         assert check.integrity_state is IntegrityState.LOCAL_HASH_VERIFIED
         self._row = {
