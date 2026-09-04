@@ -1486,12 +1486,34 @@ class _FakeCursor:
             return (True,)
         if sql.strip().startswith("SELECT 1 FROM config_override_audit"):
             return (1,) if self._conn.rows else None
+        if "information_schema.table_constraints" in sql:
+            return (1,)  # PRIMARY KEY present
+        if "pg_index" in sql:
+            # request_id uniqueness index: (indisunique, indisvalid,
+            # indisready) — all true in the governed fake schema
+            return (True, True, True)
+        if "pg_trigger" in sql:
+            return ("O",)  # append-only trigger ENABLED
         return (self._conn.rows[0] if self._conn.rows else None)
 
     def fetchall(self):
         sql = self._conn.executes[-1][0] if self._conn.executes else ""
         if "information_schema.columns" in sql:
-            return [(c,) for c in sorted(REQUIRED_COLUMNS)]
+            # B4-CXR7U5: (column_name, data_type, is_nullable) with the
+            # governed types; request_id is NOT NULL
+            types = {
+                "audit_id": "text", "actor": "text",
+                "setting": "text", "requested_change": "text",
+                "reason": "text", "previous": "text", "new": "text",
+                "decision": "text", "authorized": "boolean",
+                "recorded_at": "timestamp with time zone",
+                "request_id": "text",
+                "fingerprint_before": "text",
+                "fingerprint_after": "text",
+                "backend_identity": "text",
+            }
+            return [(c, types[c], "NO" if c == "request_id" else "YES")
+                    for c in sorted(REQUIRED_COLUMNS)]
         return list(self._conn.rows or [])
 
 
