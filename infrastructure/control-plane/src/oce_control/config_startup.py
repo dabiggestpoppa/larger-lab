@@ -1060,11 +1060,18 @@ def _verify_activation_capability(raw: str, env: dict, role: str | None,
             f"OCE activation lineage BLOCKED: capability is role-bound to "
             f"'{envelope.child_role}' but the process declared '{role}' — "
             "role confusion refused before any activity (B4-CXR6R1)")
-    # single-use replay protection (checked BEFORE consuming)
-    if ls.is_capability_consumed(envelope.capability_nonce):
+    # B4-CXR7U4: single-use replay protection is NOT a pre-check here. The
+    # check and the consume are ONE atomic operation performed AFTER full
+    # verification (below) — exactly one concurrent consumer can succeed and
+    # corrupt ledger state fails closed instead of looking like a fresh
+    # nonce.
+    try:
+        _ = ls._load_consumed_nonces()  # fail closed early on corrupt state
+    except ls.LedgerCorrupt as exc:
         raise SystemExit(
-            "OCE activation lineage BLOCKED: capability nonce already "
-            "consumed — replayed one-time capability refused (B4-CXR6R1)")
+            "OCE activation lineage BLOCKED: persisted replay-ledger state "
+            "is corrupt/unreadable — fail closed, no rewrite "
+            f"(B4-CXR7U4): {redact_message(str(exc))}") from exc
     name = envelope.secret_reference.split(":", 1)[1]
     if backend.generation(name) != envelope.secret_generation or \
             backend.is_revoked(name) != envelope.secret_revocation_state:
@@ -1128,8 +1135,21 @@ def _verify_activation_capability(raw: str, env: dict, role: str | None,
         raise SystemExit(
             "OCE activation lineage BLOCKED: capability context identity is "
             "inconsistent with re-derived authority (B4-CXR6R1)")
-    # consume the one-time capability (only after full verification)
-    ls.mark_capability_consumed(envelope.capability_nonce)
+    # B4-CXR7U4: consume the one-time handoff ATOMICALLY (only after full
+    # verification) — check + commit is ONE locked operation, so exactly one
+    # concurrent consumer can succeed and a corrupt ledger fails closed.
+    try:
+        consumed = ls.consume_handoff_once(
+            envelope.capability_nonce, metadata={"role": envelope.child_role})
+    except (ls.LedgerCorrupt, ls.LedgerUnwritable) as exc:
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: replay-ledger consumption "
+            "failed — fail closed, previous state preserved "
+            f"(B4-CXR7U4): {redact_message(str(exc))}") from exc
+    if not consumed:
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: capability nonce already "
+            "consumed — replayed one-time capability refused (B4-CXR6R1)")
     return envelope
 
 

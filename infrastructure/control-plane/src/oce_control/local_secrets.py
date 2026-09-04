@@ -54,13 +54,21 @@ LOGS_DIR = RUNTIME_DIR / "logs"
 # environment, argv, process title, logs, evidence, diagnostics, or the
 # repository — only in this 0600 file.
 ACTIVATION_KEY_FILE_NAME = "activation_handoff_key"
-# Consumed-capability nonce ledger (single-use replay protection). Written
-# ONLY after a capability verifies successfully; never on a denied path.
+# Consumed-handoff nonce ledger (single-use replay protection). Written ONLY
+# by the ONE atomic consume operation (B4-CXR7U4) after a handoff verifies
+# successfully; never on a denied path. Corrupt/unreadable/malformed state is
+# REFUSED — never treated as empty, never silently reset.
 CONSUMED_NONCES_FILE_NAME = "consumed_activation_nonces.json"
 # Capability lifetime (seconds). The envelope is consumed at child startup;
 # the window exists so a launched child can always verify before starting
 # work, while a replayed/stale capability fails closed.
 CAPABILITY_TTL_SECONDS = 900
+# Ledger retention floor (B4-CXR7U4): entries are pruned only after this many
+# seconds — far beyond CAPABILITY_TTL_SECONDS, so pruning can never reopen a
+# valid replay window (a handoff whose nonce was consumed within the last 24h
+# is always still in the ledger, while the handoff itself expired long before
+# its entry becomes prunable).
+LEDGER_RETENTION_SECONDS = 24 * 3600
 
 
 def activation_key_file() -> Path:
@@ -118,32 +126,111 @@ def read_activation_handoff_key() -> str:
     return key
 
 
-def _load_consumed_nonces() -> set[str]:
-    """Read the consumed-capability nonce ledger (read-only)."""
+class LedgerCorrupt(RuntimeError):
+    """Persisted security state is corrupt/unreadable/malformed (B4-CXR7U4).
+
+    Raised instead of ANY recovery/rewrite: the consumer fails closed with
+    the previous ledger preserved byte-for-byte. Replay history is never
+    erased during recovery — manual remediation is required.
+    """
+
+
+class LedgerUnwritable(RuntimeError):
+    """The ledger commit failed; the previous ledger is preserved
+    byte-for-byte and the consumer fails closed (B4-CXR7U4)."""
+
+
+def _load_consumed_nonces() -> dict[str, dict]:
+    """Read the consumed-handoff ledger STRICTLY (B4-CXR7U4).
+
+    Canonical schema: a JSON object mapping each nonce to
+    ``{"t": <consumed-at epoch seconds>, "m": <optional non-secret role>}``.
+
+    Missing file -> empty ledger (nothing consumed yet). Any corrupt,
+    unreadable, malformed, or wrong-schema state RAISES LedgerCorrupt —
+    it is NEVER silently treated as an empty set and NEVER reset.
+    """
     path = consumed_nonces_file()
     if not path.exists():
-        return set()
+        return {}
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return set()
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise LedgerCorrupt(
+            f"consumed-handoff ledger unreadable — fail closed, no rewrite "
+            f"(B4-CXR7U4): {exc}") from exc
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise LedgerCorrupt(
+            f"consumed-handoff ledger is corrupt JSON — fail closed, no "
+            f"rewrite (B4-CXR7U4): {exc}") from exc
     if not isinstance(data, dict):
-        return set()
-    return {k for k, v in data.items()
-            if isinstance(k, str) and isinstance(v, (int, float))}
+        raise LedgerCorrupt(
+            "consumed-handoff ledger schema invalid: must be a JSON object "
+            "of {nonce: {t: epoch}} (B4-CXR7U4)")
+    normalized: dict[str, dict] = {}
+    for k, v in data.items():
+        if not isinstance(k, str) or not k:
+            raise LedgerCorrupt(
+                "consumed-handoff ledger schema invalid: nonces must be "
+                "non-empty strings (B4-CXR7U4)")
+        if isinstance(v, dict):
+            ts = v.get("t")
+            if isinstance(ts, bool) or not isinstance(ts, (int, float)):
+                raise LedgerCorrupt(
+                    "consumed-handoff ledger schema invalid: entry 't' must "
+                    "be an epoch number (B4-CXR7U4)")
+            if "m" in v and not isinstance(v["m"], str):
+                raise LedgerCorrupt(
+                    "consumed-handoff ledger schema invalid: entry 'm' must "
+                    "be a string when present (B4-CXR7U4)")
+            normalized[k] = v
+        elif isinstance(v, (int, float)) and not isinstance(v, bool):
+            # canonical-state re-derivation (B4-CXR7U4): entries written by
+            # the pre-U4 ledger schema (plain epoch numbers) are honored as
+            # their consumption timestamp — never rewritten, never erased
+            normalized[k] = {"t": float(v)}
+        else:
+            raise LedgerCorrupt(
+                "consumed-handoff ledger schema invalid: entries must be "
+                "{nonce: {t: epoch}} objects or legacy epoch numbers "
+                "(B4-CXR7U4)")
+    return normalized
 
 
-def mark_capability_consumed(nonce: str) -> None:
-    """Record *nonce* as consumed (B4-CXR6R1 single-use replay protection).
+def consume_handoff_once(nonce: str, metadata: dict | None = None) -> bool:
+    """ATOMIC single-use consumption of an activation handoff nonce
+    (B4-CXR7U4). Replaces the split is_capability_consumed() /
+    mark_capability_consumed() pair — the check and the consume can never be
+    split across different locks again.
 
-    Called ONLY after a capability verifies successfully. Locked atomic
-    read-modify-write: concurrent consumers cannot lose entries. Old nonces
-    are pruned so the ledger stays bounded (a replayed old capability is
-    already rejected by its expiry + parent binding; the ledger guards the
-    launch window).
+    Required sequence (exactly one concurrent consumer may succeed):
+      1. ONE exclusive ledger lock is acquired;
+      2. the ledger is loaded AND schema-validated UNDER that lock (corrupt,
+         unreadable, or wrong-schema state raises LedgerCorrupt — fail closed,
+         no rewrite, replay history never erased);
+      3. an existing nonce is REJECTED (return False) — sequential replay
+         denied;
+      4. the new nonce is appended and atomically committed (same-directory
+         tmp + os.replace) so a failed replacement preserves the complete
+         previous ledger;
+      5. only after a successful commit does the caller proceed to runtime
+         activity.
+
+    The ledger is symlink-refusing and permission-checking where the OS
+    allows: a substituted symlink or a group/world-writable ledger is
+    rejected (fail closed) instead of being followed/written.
+
+    *metadata* is currently recorded as "m" (non-secret, e.g. role); it may
+    never carry secret values.
+
+    Returns True when THIS call is the single successful consumer; False when
+    the nonce was already consumed (replay). Raises LedgerCorrupt /
+    LedgerUnwritable on any fail-closed condition.
     """
     if not isinstance(nonce, str) or not nonce:
-        raise RuntimeError("refusing to consume a malformed capability nonce")
+        raise RuntimeError("refusing to consume a malformed handoff nonce")
     path = consumed_nonces_file()
     path.parent.mkdir(parents=True, exist_ok=True)
     lock_path = path.parent / f".{path.name}.lock"
@@ -152,26 +239,56 @@ def mark_capability_consumed(nonce: str) -> None:
     with open(lock_path, "a+b") as lf:
         _exclusive_lock(lf)
         try:
-            data = {}
+            # (2) load + validate UNDER the lock
+            data = _load_consumed_nonces()
+            # (3) reject an existing nonce
+            if nonce in data:
+                return False
+            # symlink refusal: never follow/replace a symlinked ledger
+            if path.is_symlink():
+                raise LedgerCorrupt(
+                    "consumed-handoff ledger is a symlink — substitution "
+                    "refused, fail closed (B4-CXR7U4)")
+            # weak-permission refusal where the OS can enforce it (B4-CXR7U4):
+            # a group/world-writable ledger is never approved or rewritten
+            if os.name != "nt" and path.exists():
+                mode = path.stat().st_mode & 0o777
+                if mode & 0o022:
+                    raise LedgerCorrupt(
+                        f"consumed-handoff ledger has weak permissions "
+                        f"({oct(mode)}) — fail closed, no rewrite (B4-CXR7U4)")
+            entry: dict = {"t": now}
+            if isinstance(metadata, dict) and metadata:
+                # bounded, non-secret metadata (e.g. role) — stored per nonce
+                entry["m"] = str(metadata.get("role", ""))[:32]
+            # prune ONLY entries older than the retention floor; the floor is
+            # far beyond the capability TTL so pruning can never reopen a
+            # valid replay window (B4-CXR7U4)
+            cutoff = now - LEDGER_RETENTION_SECONDS
+            pruned: dict[str, dict] = {}
+            for k, v in data.items():
+                if v.get("t", 0) >= cutoff:
+                    pruned[k] = v
+            pruned[nonce] = entry
             try:
-                parsed = json.loads(path.read_text(encoding="utf-8"))
-                if isinstance(parsed, dict):
-                    data = parsed
-            except (json.JSONDecodeError, OSError):
-                pass
-            data[nonce] = now
-            # bound the ledger: drop entries older than 24h (their expiry +
-            # freshness checks already fail closed long before this window)
-            cutoff = now - 24 * 3600
-            pruned = {k: v for k, v in data.items()
-                      if isinstance(v, (int, float)) and v >= cutoff}
-            _atomic_write_json(path, pruned)
+                _atomic_write_json(path, pruned)
+            except OSError as exc:
+                raise LedgerUnwritable(
+                    f"consumed-handoff ledger commit failed — previous "
+                    f"ledger preserved byte-for-byte, fail closed "
+                    f"(B4-CXR7U4): {exc}") from exc
+            return True
         finally:
             _unlock(lf)
 
 
 def is_capability_consumed(nonce: str) -> bool:
-    """True when *nonce* was already consumed (replay guard, read-only)."""
+    """True when *nonce* was already consumed (replay guard, read-only).
+
+    B4-CXR7U4: strict read — corrupt state raises LedgerCorrupt instead of
+    behaving like an empty ledger. Kept ONLY as a read-only helper; the
+    consume path uses consume_handoff_once() exclusively.
+    """
     return nonce in _load_consumed_nonces()
 
 # Local-only defaults that are NOT secrets (the password is never defaulted).
