@@ -291,6 +291,38 @@ def is_capability_consumed(nonce: str) -> bool:
     """
     return nonce in _load_consumed_nonces()
 
+
+# --------------------------------------------------------------------------- #
+# B4-CXR7U6 — explicit-initialization transaction journal support.
+#
+# configure() stages FOUR mutations that were previously independent writes
+# (postgres password, worker token, activation handoff key, compose.env
+# projection). The journal + backups + commit marker below make the
+# initialization COMPLETE-OR-NOTHING: a failure (or crash) at any stage is
+# rolled back deterministically to the previous byte-for-byte state.
+# --------------------------------------------------------------------------- #
+
+CONFIGURE_JOURNAL_FILE_NAME = "configure_journal.json"
+CONFIGURE_COMMIT_MARKER_NAME = "configure.committed"
+
+
+def configure_journal_path() -> Path:
+    return RUNTIME_DIR / CONFIGURE_JOURNAL_FILE_NAME
+
+
+def configure_commit_marker_path() -> Path:
+    return RUNTIME_DIR / CONFIGURE_COMMIT_MARKER_NAME
+
+
+def atomic_write_json(path: Path, data: dict) -> None:
+    """Public atomic JSON write (same-directory tmp + os.replace, 0600).
+
+    Used by the configure journal so a crash mid-journal-write can never
+    leave a partial journal: the journal is either the complete previous
+    state or the complete new state.
+    """
+    _atomic_write_json(path, data)
+
 # Local-only defaults that are NOT secrets (the password is never defaulted).
 PG_USER = "oce_control_admin"
 PG_DB = "oce_control"

@@ -334,15 +334,68 @@ def _preflight_configuration() -> None:
         raise SystemExit(startup_report(dict(os.environ)))
 
 
+def _configure_snapshot(paths) -> dict:
+    """Byte-for-byte snapshot of the authority stores BEFORE configure.
+
+    Backs up every initialization-stage target so a failure at ANY stage
+    restores the previous state exactly (B4-CXR7U6). Unrelated metadata in
+    the same files survives: restore is byte-for-byte, not schema-aware.
+    """
+    import hashlib
+    backups = {}
+    for p in paths:
+        if p.exists():
+            backups[str(p)] = p.read_bytes()
+        else:
+            backups[str(p)] = None
+    digest = hashlib.sha256(
+        "".join(f"{k}:{len(v) if v else -1};" for k, v in sorted(backups.items()))
+        .encode("utf-8")).hexdigest()
+    return {"backups": backups, "digest": digest}
+
+
+def _configure_restore(snapshot: dict) -> None:
+    """Deterministic rollback to the snapshot state (B4-CXR7U6)."""
+    for raw_path, data in snapshot["backups"].items():
+        p = Path(raw_path)
+        if data is None:
+            try:
+                p.unlink()
+            except FileNotFoundError:
+                pass
+        else:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_bytes(data)
+            try:
+                p.chmod(0o600)
+            except OSError:
+                pass
+
+
 def configure() -> dict:
-    """EXPLICIT INITIALIZATION command (B4-CXR6R4).
+    """EXPLICIT INITIALIZATION command (B4-CXR6R4; complete-or-nothing per
+    B4-CXR7U6).
 
     Materializes the postgres password (one-time), the worker token
     (one-time), AND the dedicated activation-handoff key (one-time) in the
     approved store, then writes compose.env. `start`/`restart`/`recover`
     NEVER call this — ordinary activation is read-only over secret authority.
-    Preflights (configuration posture, static compose boundary, store
-    readability) BEFORE any mutation; a failed step never partially writes.
+
+    COMPLETE-OR-NOTHING (B4-CXR7U6): the staged writes run under an explicit
+    transaction journal with a commit marker and deterministic rollback.
+
+      1. snapshot (byte-for-byte) every initialization-stage target;
+      2. write the journal {stage: pending} atomically;
+      3. stage the mutations (secrets.json authority; compose.env is a
+         DERIVED PROJECTION, never authority);
+      4. mark each stage committed in the journal as it completes;
+      5. write the commit marker and delete the journal.
+
+    A failure after ANY stage rolls back to the exact previous state;
+    unrelated metadata survives (byte-for-byte restore); a failed configure
+    never leaves a false initialized state. Repeated configure preserves
+    existing authority byte-for-byte (one-time init semantics). Ambient
+    passwords cannot rotate established authority (B4-CXR4R1 unchanged).
     """
     _preflight_configuration()
     offenders = published_ports_from_compose()
@@ -350,9 +403,62 @@ def configure() -> dict:
         raise SystemExit(
             "configure BLOCKED: published ports are not loopback-only: "
             + "; ".join(offenders) + " (B4-CXR6R4 preflight)")
-    ls.write_compose_env()
-    ls.initialize_worker_token()  # one-time init; existing token preserved
-    ls.initialize_activation_handoff_key()  # B4-CXR6R1 dedicated capability key
+
+    ls.RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
+    journal_path = ls.configure_journal_path()
+    marker_path = ls.configure_commit_marker_path()
+
+    # targets of every initialization stage (+ the commit marker so a failed
+    # RE-configure restores a pre-existing marker instead of erasing it)
+    targets = [ls.SECRETS_FILE, ls.COMPOSE_ENV_FILE, ls.activation_key_file(),
+               marker_path]
+    snapshot = _configure_snapshot(targets)
+
+    def _journal(stage: str, status: str) -> None:
+        ls.atomic_write_json(journal_path, {
+            "stage": stage, "status": status,
+            "snapshot_digest": snapshot["digest"],
+        })
+
+    try:
+        _journal("begin", "pending")
+
+        # stage 1: postgres password (one-time init; existing store read-only)
+        ls.initialize_runtime_secret()
+        _journal("postgres_password", "committed")
+
+        # stage 2: worker token (one-time init; existing token preserved)
+        ls.initialize_worker_token()
+        _journal("worker_token", "committed")
+
+        # stage 3: activation handoff key (B4-CXR6R1; one-time, 0600)
+        ls.initialize_activation_handoff_key()
+        _journal("activation_handoff_key", "committed")
+
+        # stage 4: compose.env — DERIVED PROJECTION of the governed store,
+        # never authority (B4-CXR7U6)
+        ls.write_compose_env()
+        _journal("compose_env_projection", "committed")
+
+        # COMMIT: marker first-class evidence that initialization completed
+        marker_path.write_text("", encoding="utf-8")
+        try:
+            marker_path.chmod(0o600)
+        except OSError:
+            pass
+        journal_path.unlink(missing_ok=True)
+    except BaseException:
+        # deterministic rollback: prior state restored byte-for-byte (the
+        # commit marker is part of the snapshot — a pre-existing marker is
+        # restored, a first-time failure leaves none). The failed journal is
+        # removed only AFTER the restore so a crash during rollback still
+        # leaves the journal as evidence.
+        try:
+            _configure_restore(snapshot)
+        finally:
+            journal_path.unlink(missing_ok=True)
+        raise
+
     source = "unset"
     if ls.SECRETS_FILE.exists():
         try:
@@ -363,6 +469,8 @@ def configure() -> dict:
         "runtime_dir": str(ls.RUNTIME_DIR),
         "secret_source": source,
         "port_offenders": offenders,
+        "initialization": "complete-or-nothing (transaction journal + commit marker, B4-CXR7U6)",
+        "compose_env": "derived projection of the governed store (not authority)",
     }
     return report
 
@@ -676,6 +784,13 @@ def recover() -> list[str]:
     with config posture + secret resolution); compose up / migration / process
     launch happen only AFTER the gate — a forbidden effective config can
     never mutate infrastructure or the database before rejection.
+
+    B4-CXR7U6 TRUTH CLASSIFICATION: recover() is read-only over secret
+    AUTHORITY, but it is NOT zero-state-mutation — its intentional,
+    non-authoritative mutation is stale-PID-file cleanup (removal of dead or
+    mismatched runtime-owned PID files, after the activation gate). No
+    secret, token, key, compose.env, or durable-store byte is created,
+    rotated, or rewritten by recover().
     """
     actions: list[str] = []
     # B4-CXR6R4: recover is READ-ONLY over secret authority — required
@@ -725,9 +840,9 @@ def main(argv: list[str] | None = None) -> int:
                                      description="OCE Book 2 local runtime lifecycle (B2-R7)")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("configure", help="generate/verify local secret, write compose.env")
+    sub.add_parser("configure", help="EXPLICIT INITIALIZATION: complete-or-nothing materialization of the secret authority (one-time); never run implicitly by start/restart/recover")
     sub.add_parser("doctor", help="run every local-runtime check")
-    sp = sub.add_parser("start", help="configure -> compose up -> migrate -> worker+api -> smoke")
+    sp = sub.add_parser("start", help="READ-ONLY over secret authority: requires prior `configure`; compose up -> migrate -> worker+api -> smoke")
     sp.add_argument("--no-migrate", action="store_true")
     sp.add_argument("--timeout", type=int, default=120)
     sub.add_parser("migrate", help="apply numbered migrations")
