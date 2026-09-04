@@ -9,7 +9,9 @@
     "time_window": "5m",
     "timestamp_semantics": "EVENT",
     "quality_state": "OK",
-    "methodology_notes": "linear perp open interest"
+    "methodology_notes": "linear perp open interest",
+    "canonical_instrument": "BTC_USDT_PERP",
+    "contract_type": "PERP_LINEAR"
   },
   {
     "provider": "GATE_FUTURES",
@@ -22,7 +24,9 @@
     "timestamp_semantics": "EVENT",
     "quality_state": "OK",
     "normalization_valid": false,
-    "methodology_notes": "gate reports USD notional natively; canonical contract requires contracts - notional->contracts conversion not yet wired (CONTROL A)"
+    "methodology_notes": "gate reports USD notional natively; canonical contract requires contracts - notional->contracts conversion not yet wired (CONTROL A)",
+    "canonical_instrument": "BTC_USDT_PERP",
+    "contract_type": "PERP_LINEAR"
   },
   {
     "provider": "BINANCE_USDM",
@@ -34,7 +38,9 @@
     "time_window": "5m",
     "timestamp_semantics": "EVENT",
     "quality_state": "OK",
-    "methodology_notes": "usdm perp open interest (quarterly contract mapped incorrectly by adapter)"
+    "methodology_notes": "usdm perp open interest (quarterly contract mapped incorrectly by adapter)",
+    "canonical_instrument": "BTC_USDT_PERP",
+    "contract_type": "PERP_LINEAR"
   },
   {
     "provider": "KRAKEN_FUTURES",
@@ -46,7 +52,9 @@
     "time_window": "5m",
     "timestamp_semantics": "EVENT",
     "quality_state": "OK",
-    "methodology_notes": "first-party exchange liquidations"
+    "methodology_notes": "first-party exchange liquidations",
+    "canonical_instrument": "BTC_USDT_PERP",
+    "contract_type": "PERP_LINEAR"
   },
   {
     "provider": "COINALYZE",
@@ -58,6 +66,8 @@
     "time_window": "5m",
     "timestamp_semantics": "EVENT",
     "quality_state": "OK",
-    "methodology_notes": "aggregator methodology; partial overlap expected"
+    "methodology_notes": "aggregator methodology; partial overlap expected",
+    "canonical_instrument": "BTC_USDT_PERP",
+    "contract_type": "PERP_LINEAR"
   }
 ]
