@@ -61,12 +61,14 @@ from .atomic import (
     OP_SUCCESS_RETURN,
     AtomicPublishError,
     AtomicPublishTargetExists,
+    DurabilityUnsupported,
     FaultError,
     FaultHook,
     FaultPoint,
     OpRecorder,
     default_device_probe,
     default_name_max,
+    ensure_durable_directory,
     fsync_directory,
     publish_no_replace,
     validate_component_length,
@@ -280,6 +282,27 @@ class LocalBlobStore:
         except ValueError as exc:
             raise UnsafeObjectKey(f"object key containment failed: {exc}") from None
 
+    def _component_limit_for(self, path: Path) -> int:
+        """Probe the ACTUAL component limit from an EXISTING directory.
+
+        SENSOR-B4-I03R1 (Defect C, §16/§18): the limit must be measured on the
+        real filesystem — never guessed because the target directory does not
+        exist yet.  The probe therefore walks UP from ``path`` to its deepest
+        existing ancestor (same filesystem, same limit) and queries THERE.
+        A failing probe fails closed (``DurabilityUnsupported``), never a
+        silent 255.
+        """
+        current = path
+        while not current.exists():
+            parent = current.parent
+            if parent == current:  # pragma: no cover - filesystem-root guard
+                raise DurabilityUnsupported(
+                    f"no existing directory found to probe the component "
+                    f"limit for {path!s}"
+                )
+            current = parent
+        return self._name_max_probe(current)
+
     def _staging_dir(self, job_id: str | None) -> Path:
         if job_id is None:
             rel = "staging"
@@ -290,18 +313,21 @@ class LocalBlobStore:
             # provider value can introduce '/', '\\', '..', NUL or abs paths.
             escaped = escape_path_segment(job_id)
             # LONG-COMPONENT GUARD before ANY artifact path is opened/written
-            # (I03 §10): the encoded staging component is checked against the
-            # filesystem's component limit — over-limit fails typed
-            # ComponentTooLong BEFORE the staging directory or file exists,
-            # never as a late raw ENAMETOOLONG.  No truncation/normalization.
+            # (I03 §10, I03R1 §16): the encoded staging component is checked
+            # against the ACTUAL filesystem limit probed from an existing
+            # ancestor — over-limit fails typed ComponentTooLong BEFORE the
+            # staging directory or file exists, never as a late raw
+            # ENAMETOOLONG.  No truncation/normalization.
             staging_root = self._resolve("staging")
-            validate_component_length(escaped, self._name_max_probe(staging_root))
+            validate_component_length(
+                escaped, self._component_limit_for(staging_root)
+            )
             rel = f"staging/{escaped}"
         return self._resolve(rel)
 
     def _check_key_components(self, object_key: str, directory: Path) -> None:
-        """Fail closed BEFORE any final artifact write (I03 §10)."""
-        limit = self._name_max_probe(directory)
+        """Fail closed BEFORE any final artifact write (I03 §10, I03R1 §20)."""
+        limit = self._component_limit_for(directory)
         for segment in object_key.split("/"):
             validate_component_length(segment, limit)
 
@@ -523,8 +549,24 @@ class LocalBlobStore:
             )
 
         staging_dir = self._staging_dir(job_id)
-        os.makedirs(staging_dir, exist_ok=True)
-        staging_path = staging_dir / f"{secrets.token_hex(16)}.partial"
+        # SENSOR-B4-I03R1 (Defect B, §12): the staging namespace is created
+        # under the same durable directory contract as final publication —
+        # every new directory NAME is fsynced into its parent.  No blind
+        # os.makedirs() + assumed durable namespace.  (Directory milestones
+        # are proven by the dedicated I03R1 namespace tests; the canonical
+        # file-level op stream of put() is unchanged for I03 evidence
+        # compatibility.)
+        ensure_durable_directory(staging_dir, name_max_probe=self._name_max_probe)
+        # SENSOR-B4-I03R1 (§19): the transient nonce IS a filesystem
+        # component.  It is validated against the ACTUAL filesystem limit
+        # BEFORE the staging file is opened — typed failure, never a late raw
+        # ENAMETOOLONG.  The nonce remains transient staging identity only;
+        # it never becomes blob/acquisition/manifest/lineage identity.
+        nonce_name = f"{secrets.token_hex(16)}.partial"
+        validate_component_length(
+            nonce_name, self._component_limit_for(staging_dir)
+        )
+        staging_path = staging_dir / nonce_name
         if ops is not None:
             ops.record(OP_STAGE_WRITE)
         try:

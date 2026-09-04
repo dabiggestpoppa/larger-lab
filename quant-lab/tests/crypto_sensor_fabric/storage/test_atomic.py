@@ -18,6 +18,8 @@ from crypto_sensor_fabric.storage.atomic import (
     OP_ATOMIC_PUBLISH,
     OP_DEVICE_CHECK,
     OP_EXISTING_FINAL_VERIFY,
+    OP_FINAL_LINK,
+    OP_FINAL_PARENT_FSYNC,
     OP_FILE_FLUSH,
     OP_FILE_FSYNC,
     OP_PARENT_DIR_FSYNC,
@@ -235,10 +237,15 @@ class TestOperationOrder:
         record = ListOpRecorder()
         sp, fp = _staged_final_fixture(tmp_path)
         publish_no_replace(sp, fp, ops=record)
+        # I03R1: the final parent already exists here, so no directory-chain
+        # milestones appear; publication still emits the explicit link and
+        # final-parent-fsync milestones (I03R1 §22).
         assert record.ops == [
             OP_DEVICE_CHECK,
             OP_ATOMIC_PUBLISH,
+            OP_FINAL_LINK,
             OP_PARENT_DIR_FSYNC,
+            OP_FINAL_PARENT_FSYNC,
             OP_STAGING_CLEANUP,
         ]
 

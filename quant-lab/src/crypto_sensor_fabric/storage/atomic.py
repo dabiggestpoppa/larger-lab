@@ -85,21 +85,38 @@ def default_device_probe(path: Path) -> DeviceId:
 
 
 def default_name_max(path: Path) -> int:
-    """Return the supported filename component byte limit for a directory.
+    """Return the ACTUAL supported component byte limit of an EXISTING directory.
 
-    - POSIX: ``os.pathconf(path, 'PC_NAME_MAX')`` is queried where supported;
-    - Windows: ``os.pathconf`` is unavailable, so the documented NTFS limit of
-      255 UTF-16 units is used.  Our backend-controlled object-key components
-      are ASCII after canonical escaping, so units == bytes there; the bound
-      is also the conventional POSIX ``NAME_MAX``, keeping behavior portable;
+    SENSOR-B4-I03R1 (Defect C, §16-§17): the limit must be measured against
+    the real filesystem via an existing directory on the same filesystem —
+    never silently guessed because a future path does not exist yet.
+
+    - a probe of a NONEXISTENT directory fails closed: it cannot prove
+      filesystem truth;
+    - POSIX: ``os.pathconf(path, 'PC_NAME_MAX')`` is queried where supported.
+      A probe FAILURE fails closed with ``DurabilityUnsupported`` — it is NOT
+      silently replaced by 255;
+    - Windows / platforms without ``os.pathconf``: the documented NTFS limit
+      of 255 UTF-16 units is used as EXPLICIT PLATFORM POLICY (backend
+      controlled components are ASCII after canonical escaping, so units ==
+      bytes there).  This is honest recorded policy, not dynamic proof;
     - any platform that reports a non-positive limit fails closed.
     """
+    if not path.exists():
+        raise DurabilityUnsupported(
+            f"cannot probe component limit of nonexistent directory {path!s}; "
+            "filesystem truth requires an existing directory"
+        )
     if hasattr(os, "pathconf"):
         try:
             limit = os.pathconf(path, "PC_NAME_MAX")
-        except (OSError, ValueError):
-            limit = 255
+        except (OSError, ValueError) as exc:
+            raise DurabilityUnsupported(
+                f"PC_NAME_MAX probe of {path!s} failed ({exc!r}); refusing to "
+                "assume a default component limit"
+            ) from exc
     else:
+        # Explicit Windows/platform policy (documented, not dynamic proof).
         limit = 255
     if not isinstance(limit, int) or limit <= 0:
         raise DurabilityUnsupported(
@@ -258,6 +275,165 @@ def is_canonical_reuse_order(ops: list[str]) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Durable directory-chain creation (SENSOR-B4-I03R1 — Defect B)
+# ---------------------------------------------------------------------------
+
+# I03R1 §22 directory-durability operation tags.  Machine-readable evidence
+# must be able to distinguish these from the file-level commit milestones.
+OP_DIR_CREATE = "dir_create"
+OP_DIR_FSYNC = "dir_fsync"
+OP_PARENT_NAMESPACE_FSYNC = "parent_namespace_fsync"
+OP_FINAL_LINK = "final_link"
+OP_FINAL_PARENT_FSYNC = "final_parent_fsync"
+
+ComponentValidator = Callable[[str, int], str]
+
+
+def ensure_durable_directory_chain(
+    base: str | Path,
+    components: list[str],
+    *,
+    name_max_probe: NameMaxProbe = default_name_max,
+    validate_component: ComponentValidator | None = None,
+    dir_fsync: Callable[[Path], None] | None = None,
+    ops: OpRecorder | None = None,
+) -> Path:
+    """Create ``base/<c1>/<c2>/...`` so EVERY new name is durably established.
+
+    ``base`` must already exist on the target filesystem (the trusted
+    ancestor).  For every missing component, descending from the deepest
+    existing ancestor:
+
+    1. validate the component against the ACTUAL filesystem component limit
+       probed from its EXISTING parent (never a guessed 255, never a probe of
+       a directory that does not exist yet);
+    2. ``mkdir`` the child;
+    3. fsync the child directory;
+    4. fsync the parent so the child's NAME is durable;
+    5. continue downward.
+
+    Concurrent creation is tolerated: a ``FileExistsError`` race confirms the
+    path is a directory and continues.  A conflicting non-directory component
+    (file, or symlink where the lexical scope prohibits it) FAILS CLOSED —
+    nothing is deleted or replaced.
+
+    Returns the fully-created leaf directory path.
+    """
+    flush_dir = dir_fsync if dir_fsync is not None else fsync_directory
+    if not components:
+        raise ValueError("components must be nonempty")
+    if any(
+        (not isinstance(c, str)) or c == "" or c in (".", "..")
+        for c in components
+    ):
+        raise ValueError(f"invalid directory components: {components!r}")
+    if any("/" in c or "\\" in c or "\x00" in c for c in components):
+        raise ValueError(
+            f"path separators/NUL in directory components: {components!r}"
+        )
+
+    validator = (
+        validate_component
+        if validate_component is not None
+        else validate_component_length
+    )
+    current = Path(base)
+    if not current.exists():
+        raise DurabilityUnsupported(
+            f"trusted ancestor {current!s} does not exist; refusing to "
+            "durably create a chain without an existing anchor"
+        )
+    for component in components:
+        child = current / component
+        if child.exists():
+            if child.is_symlink() or not child.is_dir():
+                raise AtomicPublishError(
+                    f"namespace component {child!s} exists and is not a plain "
+                    "directory; fail closed, NOT removed or replaced"
+                )
+            current = child
+            continue
+        # Validate BEFORE creating, using the limit of the EXISTING parent
+        # (I03R1 §18) — never a probe of a directory that does not exist yet.
+        validator(component, name_max_probe(current))
+        try:
+            child.mkdir()
+        except FileExistsError:
+            # Another writer created it first: confirm it is a directory and
+            # continue.  A conflicting non-directory fails closed below.
+            if child.is_symlink() or not child.is_dir():
+                raise AtomicPublishError(
+                    f"namespace component {child!s} appeared as a non-directory "
+                    "during a creation race; fail closed, NOT removed"
+                ) from None
+        except OSError as exc:
+            raise AtomicPublishError(
+                f"durable creation of directory {child!s} failed: {exc}"
+            ) from exc
+        if ops is not None:
+            ops.record(OP_DIR_CREATE)
+        # The child directory itself is flushed, then the parent namespace is
+        # flushed so the child's NAME is durable before descent continues.
+        if ops is not None:
+            ops.record(OP_DIR_FSYNC)
+        flush_dir(child)
+        if ops is not None:
+            ops.record(OP_PARENT_NAMESPACE_FSYNC)
+        flush_dir(current)
+        current = child
+    return current
+
+
+def ensure_durable_directory(
+    target: str | Path,
+    *,
+    name_max_probe: NameMaxProbe = default_name_max,
+    dir_fsync: Callable[[Path], None] | None = None,
+    ops: OpRecorder | None = None,
+) -> Path:
+    """Durably create ``target`` and any missing ancestors below an existing one.
+
+    Walks up from ``target`` to the deepest EXISTING directory (the trusted
+    ancestor on the same filesystem), then durably creates every missing
+    component via ``ensure_durable_directory_chain``.  If the deepest existing
+    ancestor is not a plain directory, the operation FAILS CLOSED — nothing
+    is deleted or replaced.
+    """
+    target_path = Path(target)
+    if target_path.exists():
+        # Already present: the durability boundary here is publication-time
+        # parent fsync, not creation.  A non-directory fails closed.
+        if target_path.is_symlink() or not target_path.is_dir():
+            raise AtomicPublishError(
+                f"namespace component {target_path!s} exists and is not a "
+                "plain directory; fail closed, NOT removed or replaced"
+            )
+        return target_path
+    missing: list[str] = []
+    current = target_path
+    while not current.exists():
+        missing.append(current.name)
+        parent = current.parent
+        if parent == current:  # pragma: no cover - filesystem-root guard
+            raise DurabilityUnsupported(
+                f"no existing ancestor found for {target_path!s}"
+            )
+        current = parent
+    if current.is_symlink() or not current.is_dir():
+        raise AtomicPublishError(
+            f"deepest existing ancestor {current!s} of {target_path!s} is not "
+            "a plain directory; fail closed, NOT removed or replaced"
+        )
+    return ensure_durable_directory_chain(
+        current,
+        list(reversed(missing)),
+        name_max_probe=name_max_probe,
+        dir_fsync=dir_fsync,
+        ops=ops,
+    )
+
+
+# ---------------------------------------------------------------------------
 # fsync helpers
 # ---------------------------------------------------------------------------
 
@@ -409,15 +585,21 @@ def publish_no_replace(
         raise AtomicPublishError(
             f"staging artifact {sp!s} is missing or not a regular file"
         )
-    # Directory creation STRICTLY before final publication (I03 §28) and
-    # before the device check (the final parent must exist to be stat'd).
-    os.makedirs(fp.parent, exist_ok=True)
+    # SENSOR-B4-I03R1 (Defect B): the final parent chain is created DURABLY
+    # from the deepest existing ancestor — every new directory NAME is fsynced
+    # into its parent BEFORE publication — never via blind os.makedirs() +
+    # assumed durable namespace.  Publication happens only after the complete
+    # parent path exists under the durability contract
+    # (DURABLE_DIRECTORY_CHAIN_READY < ATOMIC_PUBLISH, I03R1 §23).
+    ensure_durable_directory(fp.parent, ops=ops)
     if ops is not None:
         ops.record(OP_DEVICE_CHECK)
     ensure_same_device(sp.parent, fp.parent, device_probe=device_probe)
 
     if ops is not None:
         ops.record(OP_ATOMIC_PUBLISH)
+    if ops is not None:
+        ops.record(OP_FINAL_LINK)
     try:
         os.link(sp, fp)
     except FileExistsError as exc:
@@ -434,6 +616,8 @@ def publish_no_replace(
 
     if ops is not None:
         ops.record(OP_PARENT_DIR_FSYNC)
+    if ops is not None:
+        ops.record(OP_FINAL_PARENT_FSYNC)
     fsync_directory(fp.parent)
 
     if fault_hooks is not None:
@@ -454,10 +638,15 @@ def publish_no_replace(
 __all__ = [
     "OP_ATOMIC_PUBLISH",
     "OP_DEVICE_CHECK",
+    "OP_DIR_CREATE",
+    "OP_DIR_FSYNC",
     "OP_EXISTING_FINAL_VERIFY",
     "OP_FILE_FLUSH",
     "OP_FILE_FSYNC",
+    "OP_FINAL_LINK",
+    "OP_FINAL_PARENT_FSYNC",
     "OP_PARENT_DIR_FSYNC",
+    "OP_PARENT_NAMESPACE_FSYNC",
     "OP_STAGE_VERIFY",
     "OP_STAGE_WRITE",
     "OP_STAGING_CLEANUP",
@@ -465,6 +654,7 @@ __all__ = [
     "AtomicPublishError",
     "AtomicPublishTargetExists",
     "ComponentTooLong",
+    "ComponentValidator",
     "CrossFilesystemAtomicityError",
     "DeviceId",
     "DeviceProbe",
@@ -472,6 +662,8 @@ __all__ = [
     "NameMaxProbe",
     "default_device_probe",
     "default_name_max",
+    "ensure_durable_directory",
+    "ensure_durable_directory_chain",
     "ensure_same_device",
     "fsync_directory",
     "fsync_file",

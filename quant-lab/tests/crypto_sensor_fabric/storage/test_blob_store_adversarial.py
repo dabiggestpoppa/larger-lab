@@ -43,6 +43,8 @@ from crypto_sensor_fabric.storage.atomic import (
     OP_EXISTING_FINAL_VERIFY,
     OP_FILE_FLUSH,
     OP_FILE_FSYNC,
+    OP_FINAL_LINK,
+    OP_FINAL_PARENT_FSYNC,
     OP_PARENT_DIR_FSYNC,
     OP_STAGE_VERIFY,
     OP_STAGE_WRITE,
@@ -267,8 +269,12 @@ class TestOperationOrder:
         assert ops.ops.index(OP_PARENT_DIR_FSYNC) < ops.ops.index(OP_SUCCESS_RETURN)
         assert ops.ops[-1] == OP_SUCCESS_RETURN
         assert ops.ops[-2] == OP_STAGING_CLEANUP
-        assert ops.ops[-3] == OP_PARENT_DIR_FSYNC
-        assert ops.ops[-4] == OP_ATOMIC_PUBLISH
+        # I03R1: explicit publication milestones sit between the canonical
+        # tags (I03R1 §22) without reordering the canonical sequence.
+        assert ops.ops[-3] == OP_FINAL_PARENT_FSYNC
+        assert ops.ops[-4] == OP_PARENT_DIR_FSYNC
+        assert ops.ops[-5] == OP_FINAL_LINK
+        assert ops.ops.index(OP_FINAL_LINK) > ops.ops.index(OP_ATOMIC_PUBLISH)
         assert is_canonical_durable_order(ops.ops)
 
     def test_atomic_order_artifact_written(self, tmp_path) -> None:
