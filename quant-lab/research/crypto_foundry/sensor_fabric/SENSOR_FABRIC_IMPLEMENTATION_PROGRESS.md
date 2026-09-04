@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I03 COMPLETE — ATOMIC FILESYSTEM BACKEND (proposed `PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND`).  LocalBlobStore on an explicit configurable root: staging → streaming write → flush → fsync → staged verify (H2 + decoded H1 + length + optional explicit H3) → no-clobber os.link publication (never overwrites; valid existing = REUSED_EXISTING; corrupt existing = typed conflict, preserved) → parent-directory fsync → success.  NONE/ZSTD wrappers via zstandard>=0.23.0 (H1 source SHA before compression invariant; H2 stored SHA; H1==H2 only for NONE).  Typed fail-closed errors; ComponentTooLong BEFORE any artifact write (PC_NAME_MAX / NTFS 255, closes I02R1's LONG_COMPONENT_CHECK_REQUIRED_IN_I03); st_dev same-filesystem enforcement, cross-device denied, no copy fallback; crash matrix A-F (UNCOMMITTED_STAGING / ORPHAN_DURABLE_BLOB / DURABLE_COMMITTED) generated into BLOC_04_I03_CRASH_MATRIX.json; atomic-order evidence BLOC_04_I03_ATOMIC_ORDER.json; storage 390 nodes (+131); full suite 1768 passed / 0 failed / 2 skipped; ruff clean; changed-scope mypy clean; network 0; provider code unchanged; no acquisition repository / manifest / resume / T0B / DuckDB / Postgres.  ATOMIC_FILESYSTEM_BACKEND_READY=TRUE; T0A_BLOB_BACKEND_IMPLEMENTED=TRUE; T0A_EVIDENCE_PIPELINE_COMPLETE=FALSE (AcquisitionRecord + PartitionManifest persistence = I04); MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; T0B_STORAGE_IMPLEMENTED=FALSE; I04 NOT started |
+| Current checkpoint | SENSOR-B4-I03R1 COMPLETE — DURABILITY NAMESPACE SEAL (proposed `PASS_SENSOR_B4_I03R1_DURABILITY_NAMESPACE_SEALED`, then proposed operator acceptance `PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND`).  Three durability seams sealed on the accepted I03 architecture (no redesign): (A) every REUSED_EXISTING path (ordinary dedupe, publish-race loser, retry after crash-E orphan, retry after crash-F) now proves CURRENT parent-directory durability BEFORE success — frozen order EXISTING_FINAL_VERIFY < PARENT_DIR_FSYNC < STAGING_CLEANUP < SUCCESS_RETURN via is_canonical_reuse_order(); (B) durable directory-chain creation: ensure_durable_directory_chain()/ensure_durable_directory() create each missing namespace component with DIR_CREATE < DIR_FSYNC < PARENT_NAMESPACE_FSYNC before any final link; blind os.makedirs() gone from the commit path; concurrent mkdir races tolerated; conflicting non-directory components fail closed (never removed/replaced); root contract: configured root must pre-exist as a directory (InvalidStorageRoot otherwise); (C) true NAME_MAX probe: PC_NAME_MAX queried only on an EXISTING ancestor; nonexistent target or failing probe → DurabilityUnsupported, never silent 255 (Windows 255 = explicit platform policy); deepest-existing-ancestor probing in the store; generated staging <nonce>.partial component validated BEFORE open — typed ComponentTooLong, no truncation/normalization.  Historical I03 evidence immutable (crash-matrix generator now asserts byte-equality with frozen artifact; atomic-order generator seals supplemental BLOC_04_I03R1_ATOMIC_ORDER.json).  Machine evidence: BLOC_04_I03R1_NAMESPACE_DURABILITY.json (5 cases).  Storage 426 nodes (+36); full suite 1803 passed / 0 failed / 3 skipped; ruff clean; changed-scope mypy clean; network 0; provider code unchanged; no recovery scanner / acquisition repository / manifest / resume / T0B.  ATOMIC_FILESYSTEM_BACKEND_READY=TRUE; T0A_BLOB_BACKEND_IMPLEMENTED=TRUE; T0A_EVIDENCE_PIPELINE_COMPLETE=FALSE (I04); MANIFEST_REPOSITORY_IMPLEMENTED=FALSE; T0B_STORAGE_IMPLEMENTED=FALSE; I04 NOT started |
 | Previous checkpoint | SENSOR-B4-I02R1-RATIFY COMPLETE (governance) — OPERATOR ACCEPTS PASS_SENSOR_B4_I02R1_CANONICAL_PATHS_SEALED + PASS_SENSOR_B4_I02_CONTENT_ADDRESSING_PATHS_CHECKSUMS; CONTENT_ADDRESSING_READY=TRUE; PATH_CONTRACT_READY=TRUE; CHECKSUM_PRIMITIVES_READY=TRUE; test-node truth reconciled (I02R1A actually +20 collectible nodes, I02R1B net +2 → path suite 87→109 / storage 237→259 / full collect 1617→1639; historical "35 I02R1A tests / 272 storage" wording recorded as overstated, evidence preserved); authorizes SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND ONLY; I04 NOT authorized |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
@@ -26,7 +26,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE — SENSOR-B4-I03 ATOMIC FILESYSTEM BACKEND is COMPLETE (proposed PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND, awaiting operator review).  Recommended next: SENSOR-B4-I04 ACQUISITION + MANIFEST REPOSITORY — NOT authorized and NOT started. |
+| next_checkpoint_authorized | FALSE — SENSOR-B4-I03R1 DURABILITY NAMESPACE SEAL is COMPLETE (proposed PASS_SENSOR_B4_I03R1_DURABILITY_NAMESPACE_SEALED, then proposed operator acceptance PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND).  Recommended next: SENSOR-B4-I04 ACQUISITION + MANIFEST REPOSITORY — NOT authorized and NOT started. |
 
 ## Test counts (cumulative)
 
@@ -150,6 +150,10 @@ that is updated at every staged checkpoint.
 | SENSOR-B4-I03B | fa41aa43 | 51 (blob store core; storage 315 → 366) | 0 |
 | SENSOR-B4-I03C | 95b21b26 | 24 (adversarial seal; storage 366 → 390; full-suite cumulative 1768 passed / 0 failed / 2 skipped) | 0 |
 | cumulative | 1768 | 1768 | 0 (2 env-skips: live smoke + POSIX-only permission on Windows) |
+| SENSOR-B4-I03R1A | d19e9d13 | 9 (reuse-durability seal: 5 adversarial + 4 reuse-order contract; storage 390 → 399) | 0 |
+| SENSOR-B4-I03R1B | 9225acb6 | 21 (durable directory chain + fail-closed NAME_MAX probe + nonce validation; storage 399 → 420, +1 POSIX-only probe skip on Windows) | 0 |
+| SENSOR-B4-I03R1C | 9363143e | 6 (namespace/crash/race supplemental matrix + machine evidence; storage 420 → 426) | 0 |
+| cumulative | 1806 | 1803 | 0 (3 env-skips: live smoke + 2 POSIX-only probe tests on Windows; full collect 1806) |
 
 ## External / provider blockers
 
@@ -236,6 +240,50 @@ that is updated at every staged checkpoint.
 
 ## Next checkpoint
 
+- SENSOR-B4-I03R1 COMPLETE — DURABILITY NAMESPACE SEAL (proposed
+  `PASS_SENSOR_B4_I03R1_DURABILITY_NAMESPACE_SEALED`, then proposed operator
+  acceptance `PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND`).  Operator
+  review HOLD found three NARROW durability seams on the accepted I03
+  architecture; all sealed without redesign:
+  (A) ORPHAN RETRY — every REUSED_EXISTING path (ordinary dedupe,
+  publish-race loser, retry after crash-E orphan, retry after crash-F) now
+  re-establishes CURRENT parent-directory durability BEFORE success, frozen
+  as EXISTING_FINAL_VERIFY < PARENT_DIR_FSYNC < STAGING_CLEANUP <
+  SUCCESS_RETURN via is_canonical_reuse_order(); a crash-E orphan that
+  verifies byte-perfectly is no longer silently promoted to durable success;
+  (B) DIRECTORY CHAIN — new ensure_durable_directory_chain() /
+  ensure_durable_directory() in atomic.py create each missing namespace
+  component with DIR_CREATE < DIR_FSYNC < PARENT_NAMESPACE_FSYNC from the
+  deepest existing ancestor BEFORE any final link; blind os.makedirs() is
+  gone from the commit path; concurrent mkdir races tolerated
+  (confirm-and-continue); existing file/symlink components FAIL CLOSED
+  (never removed/replaced); staging namespace created under the same
+  contract; root policy explicit: configured root must pre-exist as a
+  directory (InvalidStorageRoot otherwise); final publication remains
+  no-clobber os.link with post-link final-parent fsync — both concerns
+  separately tagged (FINAL_LINK / FINAL_PARENT_FSYNC);
+  (C) TRUE COMPONENT LIMIT — default_name_max() probes PC_NAME_MAX only on
+  an EXISTING directory; a nonexistent target or failing probe raises
+  DurabilityUnsupported instead of silently assuming 255 (Windows 255
+  recorded as explicit platform policy, not dynamic proof); the store probes
+  from the deepest existing ancestor and validates the generated staging
+  <nonce>.partial component BEFORE open — typed ComponentTooLong; no
+  truncation/normalization/native-id hashing anywhere.  Historical I03
+  evidence untouched: the crash-matrix generator now regenerates rows in
+  memory and asserts byte-equality with the frozen
+  BLOC_04_I03_CRASH_MATRIX.json; the atomic-order generator seals the
+  supplemental BLOC_04_I03R1_ATOMIC_ORDER.json instead.  Machine evidence:
+  BLOC_04_I03R1_NAMESPACE_DURABILITY.json (fresh_namespace_commit /
+  reuse_existing / retry_after_crash_E / retry_after_crash_F /
+  publish_race_loser).  No recovery scanner, no acquisition records, no
+  manifests, no resume, no T0B (I08 owns recovery; I04 owns metadata).
+  Storage tests 426 nodes (+36); full suite 1803 passed / 0 failed / 3
+  skipped (floor >=1768); ruff clean; changed-scope mypy clean; network 0;
+  provider code UNCHANGED.  Flags: ATOMIC_FILESYSTEM_BACKEND_READY=TRUE,
+  T0A_BLOB_BACKEND_IMPLEMENTED=TRUE, T0A_EVIDENCE_PIPELINE_COMPLETE=FALSE,
+  MANIFEST_REPOSITORY_IMPLEMENTED=FALSE, T0B_STORAGE_IMPLEMENTED=FALSE.
+  Evidence:
+  `evidence/bloc_04/BLOC_04_I03R1_DURABILITY_NAMESPACE_SEAL_EVIDENCE.md`.
 - SENSOR-B4-I03 COMPLETE — ATOMIC FILESYSTEM BACKEND (proposed
   `PASS_SENSOR_B4_I03_ATOMIC_FILESYSTEM_BACKEND`).  New storage modules
   `compression.py` (streaming NONE/ZSTD wrapper: `encode_source_stream` +
