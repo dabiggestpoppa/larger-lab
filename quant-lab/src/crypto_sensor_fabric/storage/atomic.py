@@ -197,6 +197,11 @@ OP_PARENT_DIR_FSYNC = "parent_dir_fsync"
 OP_STAGING_CLEANUP = "staging_cleanup"
 OP_SUCCESS_RETURN = "success_return"
 
+# SENSOR-B4-I03R1 — reuse-path milestone: the existing final object was
+# opened and verified against expected content identity BEFORE durability of
+# its namespace was (re-)established and success was returned.
+OP_EXISTING_FINAL_VERIFY = "existing_final_verify"
+
 _CANONICAL_ORDER = [
     OP_STAGE_WRITE,
     OP_FILE_FLUSH,
@@ -207,17 +212,49 @@ _CANONICAL_ORDER = [
     OP_SUCCESS_RETURN,
 ]
 
+# SENSOR-B4-I03R1 §5 — frozen REUSE operation order.  Any path returning
+# REUSED_EXISTING must pass through EVERY stage, including parent-directory
+# fsync, before success: STAGE_WRITE < FILE_FLUSH < FILE_FSYNC < STAGE_VERIFY
+# < EXISTING_FINAL_VERIFY < PARENT_DIR_FSYNC < STAGING_CLEANUP < SUCCESS_RETURN.
+# A verified orphan (crash E) may not be silently promoted: verified bytes
+# are not durable bytes.
+_CANONICAL_REUSE_ORDER = [
+    OP_STAGE_WRITE,
+    OP_FILE_FLUSH,
+    OP_FILE_FSYNC,
+    OP_STAGE_VERIFY,
+    OP_EXISTING_FINAL_VERIFY,
+    OP_PARENT_DIR_FSYNC,
+    OP_STAGING_CLEANUP,
+    OP_SUCCESS_RETURN,
+]
+
+
+def _tags_in_order(ops: list[str], tags: list[str]) -> bool:
+    """True iff every tag appears in ``ops`` and their first positions ascend."""
+    if any(tag not in ops for tag in tags):
+        return False
+    positions = [ops.index(tag) for tag in tags]
+    return positions == sorted(positions)
+
 
 def is_canonical_durable_order(ops: list[str]) -> bool:
     """True iff ALL seven canonical durable operations appear, in order.
 
-    Extra tags (device_check, staging_cleanup) may sit between them; the
-    durability contract forbids both omission and reordering of the
-    canonical sequence (I03 §65).
+    Extra tags (device_check, staging_cleanup, I03R1 directory-chain tags)
+    may sit between them; the durability contract forbids both omission and
+    reordering of the canonical sequence (I03 §65).
     """
-    return all(tag in ops for tag in _CANONICAL_ORDER) and [
-        ops.index(tag) for tag in _CANONICAL_ORDER
-    ] == sorted(ops.index(tag) for tag in _CANONICAL_ORDER)
+    return _tags_in_order(ops, _CANONICAL_ORDER)
+
+
+def is_canonical_reuse_order(ops: list[str]) -> bool:
+    """True iff the frozen I03R1 REUSE order contract is satisfied.
+
+    Every reuse disposition (ordinary dedupe, publish-race loser, retry after
+    crash E or F) must prove parent-directory durability BEFORE success.
+    """
+    return _tags_in_order(ops, _CANONICAL_REUSE_ORDER)
 
 
 # ---------------------------------------------------------------------------
@@ -417,6 +454,7 @@ def publish_no_replace(
 __all__ = [
     "OP_ATOMIC_PUBLISH",
     "OP_DEVICE_CHECK",
+    "OP_EXISTING_FINAL_VERIFY",
     "OP_FILE_FLUSH",
     "OP_FILE_FSYNC",
     "OP_PARENT_DIR_FSYNC",
@@ -438,6 +476,7 @@ __all__ = [
     "fsync_directory",
     "fsync_file",
     "is_canonical_durable_order",
+    "is_canonical_reuse_order",
     "publish_no_replace",
     "validate_component_length",
 ]

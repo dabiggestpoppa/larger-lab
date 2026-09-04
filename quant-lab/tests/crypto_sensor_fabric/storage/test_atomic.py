@@ -17,6 +17,7 @@ import pytest
 from crypto_sensor_fabric.storage.atomic import (
     OP_ATOMIC_PUBLISH,
     OP_DEVICE_CHECK,
+    OP_EXISTING_FINAL_VERIFY,
     OP_FILE_FLUSH,
     OP_FILE_FSYNC,
     OP_PARENT_DIR_FSYNC,
@@ -38,6 +39,7 @@ from crypto_sensor_fabric.storage.atomic import (
     fsync_directory,
     fsync_file,
     is_canonical_durable_order,
+    is_canonical_reuse_order,
     publish_no_replace,
     validate_component_length,
 )
@@ -239,3 +241,58 @@ class TestOperationOrder:
             OP_PARENT_DIR_FSYNC,
             OP_STAGING_CLEANUP,
         ]
+
+
+class TestReuseOrder:
+    """SENSOR-B4-I03R1 §5: frozen REUSED_EXISTING durability order contract."""
+
+    def test_full_reuse_order_accepted(self) -> None:
+        ops = [
+            OP_STAGE_WRITE,
+            OP_FILE_FLUSH,
+            OP_FILE_FSYNC,
+            OP_STAGE_VERIFY,
+            OP_EXISTING_FINAL_VERIFY,
+            OP_PARENT_DIR_FSYNC,
+            OP_STAGING_CLEANUP,
+            OP_SUCCESS_RETURN,
+        ]
+        assert is_canonical_reuse_order(ops)
+
+    def test_reuse_without_parent_fsync_rejected(self) -> None:
+        """A reuse result without parent-directory fsync is a FAIL (I03R1 §5)."""
+        ops = [
+            OP_STAGE_WRITE,
+            OP_FILE_FLUSH,
+            OP_FILE_FSYNC,
+            OP_STAGE_VERIFY,
+            OP_EXISTING_FINAL_VERIFY,
+            OP_STAGING_CLEANUP,
+            OP_SUCCESS_RETURN,
+        ]
+        assert not is_canonical_reuse_order(ops)
+
+    def test_reuse_success_before_fsync_rejected(self) -> None:
+        ops = [
+            OP_STAGE_WRITE,
+            OP_FILE_FLUSH,
+            OP_FILE_FSYNC,
+            OP_STAGE_VERIFY,
+            OP_EXISTING_FINAL_VERIFY,
+            OP_SUCCESS_RETURN,
+            OP_PARENT_DIR_FSYNC,
+            OP_STAGING_CLEANUP,
+        ]
+        assert not is_canonical_reuse_order(ops)
+
+    def test_reuse_missing_existing_verify_rejected(self) -> None:
+        ops = [
+            OP_STAGE_WRITE,
+            OP_FILE_FLUSH,
+            OP_FILE_FSYNC,
+            OP_STAGE_VERIFY,
+            OP_PARENT_DIR_FSYNC,
+            OP_STAGING_CLEANUP,
+            OP_SUCCESS_RETURN,
+        ]
+        assert not is_canonical_reuse_order(ops)

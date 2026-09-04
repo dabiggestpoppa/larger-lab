@@ -40,6 +40,7 @@ from crypto_sensor_fabric.storage import (
 )
 from crypto_sensor_fabric.storage.atomic import (
     OP_ATOMIC_PUBLISH,
+    OP_EXISTING_FINAL_VERIFY,
     OP_FILE_FLUSH,
     OP_FILE_FSYNC,
     OP_PARENT_DIR_FSYNC,
@@ -52,6 +53,7 @@ from crypto_sensor_fabric.storage.atomic import (
     ListOpRecorder,
     RaiseFaultHook,
     is_canonical_durable_order,
+    is_canonical_reuse_order,
 )
 
 FIXED = datetime(2026, 9, 4, 12, 0, 0, tzinfo=UTC)
@@ -419,6 +421,142 @@ class TestCrossFilesystem:
         store = make_store(tmp_path)
         result = store.put_bytes(b"same disk", storage_encoding=StorageEncoding.NONE, source_media_type=MEDIA)
         assert result.disposition is PutDisposition.COMMITTED_NEW
+
+
+class TestReuseDurability:
+    """SENSOR-B4-I03R1 Defect A: verified bytes are not durable bytes.
+
+    Every REUSED_EXISTING path must prove CURRENT parent-directory durability
+    BEFORE success: ordinary dedupe, publish-race loser, retry after crash E
+    (ORPHAN_DURABLE_BLOB) and retry after crash F.
+    """
+
+    def test_retry_after_crash_E_proves_parent_fsync_before_success(
+        self, tmp_path
+    ) -> None:
+        """Crash-E orphan must NOT be silently promoted by a plain retry."""
+        data = b"orphan retry must re-establish durability"
+        store = make_store(tmp_path)
+        sha = hashlib.sha256(data).hexdigest()
+        with pytest.raises(FaultError):
+            store.put_bytes(
+                data,
+                storage_encoding=StorageEncoding.NONE,
+                source_media_type=MEDIA,
+                fault_hooks=RaiseFaultHook(
+                    FaultPoint.AFTER_PUBLISH_BEFORE_DIR_FSYNC
+                ),
+            )
+        # Frozen crash-E truth: final exists, NO durable success returned,
+        # parent fsync never observed.  The crashed attempt's staging is
+        # preserved crash evidence (I03 §42 — no auto-recovery scanner here).
+        assert final_path_for(tmp_path, sha, StorageEncoding.NONE).exists()
+        crash_staging = list((tmp_path / "staging").rglob("*.partial"))
+        assert len(crash_staging) == 1
+        # I03R1 §6: explicit retry with observation of the durability step.
+        ops = ListOpRecorder()
+        result = store.put_bytes(
+            data,
+            storage_encoding=StorageEncoding.NONE,
+            source_media_type=MEDIA,
+            ops=ops,
+        )
+        assert result.disposition is PutDisposition.REUSED_EXISTING
+        # Durability re-established BEFORE success, no byte rewritten.
+        assert OP_EXISTING_FINAL_VERIFY in ops.ops
+        assert OP_PARENT_DIR_FSYNC in ops.ops
+        assert ops.ops.index(OP_PARENT_DIR_FSYNC) < ops.ops.index(
+            OP_SUCCESS_RETURN
+        )
+        assert is_canonical_reuse_order(ops.ops)
+        check = store.verify_blob(sha, StorageEncoding.NONE)
+        assert check.integrity_state is IntegrityState.LOCAL_HASH_VERIFIED
+        # The retry cleaned its OWN staging; the crash-E evidence file remains
+        # untouched for the later recovery checkpoint (I03 §42/§26, no I08).
+        after = list((tmp_path / "staging").rglob("*.partial"))
+        assert [p.name for p in after] == [p.name for p in crash_staging]
+
+    def test_retry_after_crash_E_idempotent_identity(self, tmp_path) -> None:
+        data = b"identity survives orphan retry"
+        store = make_store(tmp_path)
+        sha = hashlib.sha256(data).hexdigest()
+        with pytest.raises(FaultError):
+            store.put_bytes(
+                data,
+                storage_encoding=StorageEncoding.NONE,
+                source_media_type=MEDIA,
+                fault_hooks=RaiseFaultHook(
+                    FaultPoint.AFTER_PUBLISH_BEFORE_DIR_FSYNC
+                ),
+            )
+        final = final_path_for(tmp_path, sha, StorageEncoding.NONE)
+        before = final.read_bytes()
+        result = store.put_bytes(
+            data, storage_encoding=StorageEncoding.NONE, source_media_type=MEDIA
+        )
+        assert result.disposition is PutDisposition.REUSED_EXISTING
+        assert result.blob.blob_sha256 == sha
+        # Content identity unchanged, final bytes never rewritten.
+        assert final.read_bytes() == before
+
+    def test_ordinary_reuse_performs_final_parent_fsync(self, tmp_path) -> None:
+        data = b"ordinary dedupe also proves durability"
+        store = make_store(tmp_path)
+        store.put_bytes(
+            data, storage_encoding=StorageEncoding.NONE, source_media_type=MEDIA
+        )
+        ops = ListOpRecorder()
+        result = store.put_bytes(
+            data,
+            storage_encoding=StorageEncoding.NONE,
+            source_media_type=MEDIA,
+            ops=ops,
+        )
+        assert result.disposition is PutDisposition.REUSED_EXISTING
+        assert OP_EXISTING_FINAL_VERIFY in ops.ops
+        assert ops.ops.index(OP_PARENT_DIR_FSYNC) < ops.ops.index(
+            OP_SUCCESS_RETURN
+        )
+        assert is_canonical_reuse_order(ops.ops)
+
+    def test_publish_race_loser_proves_parent_fsync_before_success(
+        self, tmp_path
+    ) -> None:
+        """Race loser verifies winner THEN fsyncs final parent (I03R1 §8)."""
+        data = b"race loser durability parity"
+        store = make_store(tmp_path)
+        first = store.put_bytes(
+            data, storage_encoding=StorageEncoding.NONE, source_media_type=MEDIA
+        )
+        assert first.disposition is PutDisposition.COMMITTED_NEW
+        # Simulate the loser: it published second, hit TargetExists, verified
+        # the winner, and must now fsync the winner's parent before success.
+        ops = ListOpRecorder()
+        second = store.put_bytes(
+            data,
+            storage_encoding=StorageEncoding.NONE,
+            source_media_type=MEDIA,
+            ops=ops,
+        )
+        assert second.disposition is PutDisposition.REUSED_EXISTING
+        assert is_canonical_reuse_order(ops.ops)
+        assert ops.ops.index(OP_PARENT_DIR_FSYNC) < ops.ops.index(
+            OP_SUCCESS_RETURN
+        )
+
+    def test_reuse_never_overwrites_final_bytes(self, tmp_path) -> None:
+        data = b"immutable across durability re-establishment"
+        store = make_store(tmp_path)
+        store.put_bytes(
+            data, storage_encoding=StorageEncoding.NONE, source_media_type=MEDIA
+        )
+        sha = hashlib.sha256(data).hexdigest()
+        final = final_path_for(tmp_path, sha, StorageEncoding.NONE)
+        before = final.read_bytes()
+        store.put_bytes(
+            data, storage_encoding=StorageEncoding.NONE, source_media_type=MEDIA
+        )
+        assert final.read_bytes() == before
 
 
 class TestLongComponent:

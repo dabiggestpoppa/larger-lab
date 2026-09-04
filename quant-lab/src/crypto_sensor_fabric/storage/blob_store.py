@@ -53,6 +53,8 @@ from ..contracts.base import coerce_utc
 from .atomic import (
     OP_FILE_FLUSH,
     OP_FILE_FSYNC,
+    OP_EXISTING_FINAL_VERIFY,
+    OP_PARENT_DIR_FSYNC,
     OP_STAGE_VERIFY,
     OP_STAGE_WRITE,
     OP_STAGING_CLEANUP,
@@ -65,6 +67,7 @@ from .atomic import (
     OpRecorder,
     default_device_probe,
     default_name_max,
+    fsync_directory,
     publish_no_replace,
     validate_component_length,
 )
@@ -435,8 +438,28 @@ class LocalBlobStore:
         object_key: str,
         ops: OpRecorder | None,
         staging_path: Path,
+        final_path: Path,
     ) -> BlobPutResult:
+        """Return a truthful REUSED_EXISTING result — durability PROVEN first.
+
+        SENSOR-B4-I03R1 (Defect A, §4-§5): every reuse path (ordinary dedupe,
+        publish-race loser, retry after crash E orphan, retry after crash F)
+        must re-establish parent-directory durability BEFORE success.  A final
+        name that verifies byte-perfectly is NOT automatically durable —
+        crash E proved that a visible filename can lack a proven namespace
+        commit.  The frozen reuse order is: EXISTING_FINAL_VERIFY <
+        PARENT_DIR_FSYNC < STAGING_CLEANUP < SUCCESS_RETURN.  No byte is ever
+        overwritten here.
+        """
         digest, length, stored_h2, stored_len = existing
+        if ops is not None:
+            ops.record(OP_EXISTING_FINAL_VERIFY)
+        # Durability re-established on the CURRENT filesystem state.  A
+        # DurabilityUnsupported here propagates truthfully — success is never
+        # claimed without a proven parent-directory flush.
+        if ops is not None:
+            ops.record(OP_PARENT_DIR_FSYNC)
+        fsync_directory(final_path.parent)
         self._cleanup_staging(staging_path)
         if ops is not None:
             ops.record(OP_STAGING_CLEANUP)
@@ -576,6 +599,7 @@ class LocalBlobStore:
                 object_key,
                 ops,
                 staging_path,
+                final_path,
             )
 
         try:
@@ -604,6 +628,7 @@ class LocalBlobStore:
                 object_key,
                 ops,
                 staging_path,
+                final_path,
             )
         # FaultError / CrossFilesystemAtomicityError / DurabilityUnsupported /
         # ComponentTooLong / AtomicPublishError propagate: no success claimed,
