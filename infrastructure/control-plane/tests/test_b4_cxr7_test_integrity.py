@@ -488,10 +488,13 @@ MUTATION_CONTROLS = [
                 "test_failure_on_first_configure_leaves_no_state",
         "mutations": [{
             "path": "src/oce_control/local_lifecycle.py",
-            "pattern": "_configure_restore(snapshot)",
+            # the 16-space-call site is configure()'s exception-rollback
+            # path (the pinned test injects a projection failure and
+            # asserts NO state); the recover() helper site is 4-space
+            "pattern": "                _configure_restore(snapshot)",
             "mutate": lambda t: t.replace(
-                "_configure_restore(snapshot)",
-                "pass  # MUTANT: rollback removed", 1),
+                "                _configure_restore(snapshot)",
+                "                pass  # MUTANT: rollback removed", 1),
         }],
     },
     {

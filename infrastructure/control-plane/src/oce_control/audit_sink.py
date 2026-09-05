@@ -154,15 +154,25 @@ class PostgresAuditSink(DurableAuditSink):
     commit unrelated application work), commits ONLY its own INSERT, and
     rolls back on failure — the override then fails closed at the caller.
 
-    ``proven()`` proves the expected schema/backend: the ledger table must
-    exist, expose every REQUIRED_COLUMNS column, and answer a SELECT — not
-    merely that one SELECT did not throw. SAFE values only.
+    ``proven()`` proves the exact governed structure (B4-CXR7U8-06): table/
+    schema identity, every required column with type AND nullability, a
+    PRIMARY KEY specifically on audit_id, the request_id uniqueness index
+    bound to this exact table/schema/column, and the append-only trigger with
+    the governed function enabled. SAFE values only.
     """
 
     backend_identity = "postgres:config_override_audit"
 
-    def __init__(self, conn):
+    def __init__(self, conn, *, governed_database: str | None = None,
+                 governed_user: str | None = None):
         self._conn = conn
+        # Pinned governed identity (B4-CXR7U8-06): proven() verifies the
+        # connection is attached to EXACTLY this database/role, so a cloned
+        # table on a non-governed database is never proven. The production
+        # seam pins these from the ActivationContext-derived connection; when
+        # None the database-identity probe is skipped (structure-only proof).
+        self._governed_database = governed_database
+        self._governed_user = governed_user
 
     def _tx_status(self) -> int:
         fn = getattr(self._conn, "get_transaction_status", None)
@@ -171,39 +181,51 @@ class PostgresAuditSink(DurableAuditSink):
         return int(fn())
 
     def proven(self) -> bool:
-        """Prove governed schema/table identity + required structure right now
-        (B4-CXR7U5):
+        """Prove the EXACT governed structure (B4-CXR7U8-06), not merely that
+        a SELECT did not throw. Inside one read-only transaction (rolled back
+        so the dedicated connection is left IDLE):
 
-        * the governed table exists in schema 'public'
-          (to_regclass('public.config_override_audit'));
-        * every REQUIRED_COLUMNS column is present with the EXPECTED TYPE
-          (audit_id/actor/setting/... TEXT, authorized BOOLEAN,
-          recorded_at TIMESTAMPTZ);
-        * request_id is NOT NULL (governed reconciliation key);
-        * the request_id uniqueness index exists AND is valid;
-        * the primary key exists (audit_id);
-        * the append-only trigger is present AND enabled;
-        * the dedicated connection is left in an acceptable transaction
-          state (IDLE after the read-only probe transaction rolls back).
-
-        Read-only: performs its probes inside one transaction and ROLLS BACK
-        so the dedicated connection is left IDLE for append().
+        * when a governed database identity is pinned at construction, the
+          connection must be attached to that exact database (current_db) and
+          role (current_user) — a cloned table on a non-governed database is
+          NEVER proven;
+        * the governed table exists in schema 'public' and every required
+          column is present with the EXPECTED type AND nullability (the
+          NOT NULL set matches the 0006/0007/0008 migration exactly);
+        * the PRIMARY KEY is specifically on audit_id (a PK on any other
+          column fails the proof);
+        * the request_id uniqueness index belongs to THIS exact table and
+          schema, is unique/valid/ready, and covers exactly request_id (a
+          same-named index on another table, in another schema, or over the
+          wrong column fails the proof);
+        * the append-only trigger belongs to this exact table, calls the
+          expected governed function, and is enabled;
+        * the connection is left in an acceptable transaction state (IDLE).
         """
         try:
             with self._conn.cursor() as cur:
+                # 0. exact governed database/role identity (when pinned)
+                if self._governed_database is not None:
+                    cur.execute("SELECT current_database(), current_user")
+                    row = cur.fetchone()
+                    if row is None or row[0] != self._governed_database:
+                        return False
+                    if self._governed_user is not None and \
+                            row[1] != self._governed_user:
+                        return False
+                # 1. table identity in the governed schema
                 cur.execute(
                     "SELECT to_regclass('public.config_override_audit') "
                     "IS NOT NULL")
                 if not cur.fetchone()[0]:
                     return False
-                # required columns AND their types (B4-CXR7U5)
+                # 2. required columns, types AND nullability
                 cur.execute(
                     "SELECT column_name, data_type, is_nullable "
                     "FROM information_schema.columns "
                     "WHERE table_schema = 'public' "
                     "AND table_name = 'config_override_audit'")
-                colinfo = {row[0]: (row[1], row[2])
-                           for row in cur.fetchall()}
+                colinfo = {r[0]: (r[1], r[2]) for r in cur.fetchall()}
                 if not REQUIRED_COLUMNS.issubset(colinfo):
                     return False
                 expected_types = {
@@ -220,35 +242,62 @@ class PostgresAuditSink(DurableAuditSink):
                 for col, want in expected_types.items():
                     if colinfo[col][0] != want:
                         return False
-                if colinfo["request_id"][1] != "NO":
-                    return False  # request_id must be NOT NULL
-                # primary key on audit_id
+                not_null = {"audit_id", "actor", "setting",
+                            "requested_change", "reason", "decision",
+                            "authorized", "recorded_at", "request_id",
+                            "backend_identity"}
+                for col in not_null:
+                    if colinfo[col][1] != "NO":
+                        return False
+                for col in REQUIRED_COLUMNS - not_null:
+                    if colinfo[col][1] != "YES":
+                        return False
+                # 3. PRIMARY KEY specifically on audit_id IN THE GOVERNED
+                #    public schema (a same-named table cloned in another
+                #    schema can never satisfy the proof)
                 cur.execute(
-                    "SELECT 1 FROM information_schema.table_constraints "
-                    "WHERE table_schema = 'public' "
-                    "AND table_name = 'config_override_audit' "
-                    "AND constraint_type = 'PRIMARY KEY' LIMIT 1")
-                if cur.fetchone() is None:
+                    "SELECT pg_get_constraintdef(c.oid) FROM pg_constraint c "
+                    "JOIN pg_class t ON t.oid = c.conrelid "
+                    "JOIN pg_namespace ns ON ns.oid = t.relnamespace "
+                    "WHERE t.relname = 'config_override_audit' "
+                    "AND ns.nspname = 'public' AND c.contype = 'p'")
+                pk_row = cur.fetchone()
+                if pk_row is None or "PRIMARY KEY (audit_id)" not in pk_row[0]:
                     return False
-                # request_id uniqueness: index exists, is unique, and is
-                # VALID (not left invalid by a failed concurrent creation)
+                # 4. request_id uniqueness bound to THIS table, unique,
+                #    valid, ready, covering exactly request_id
                 cur.execute(
-                    "SELECT i.indisunique, i.indisvalid, i.indisready "
-                    "FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid "
-                    "WHERE c.relname = 'config_override_audit_request_id_key'")
+                    "SELECT i.indisunique, i.indisvalid, i.indisready, "
+                    "pg_get_indexdef(i.indexrelid) "
+                    "FROM pg_index i "
+                    "JOIN pg_class idx ON idx.oid = i.indexrelid "
+                    "JOIN pg_class tbl ON tbl.oid = i.indrelid "
+                    "JOIN pg_namespace ns ON ns.oid = idx.relnamespace "
+                    "WHERE idx.relname = 'config_override_audit_request_id_key' "
+                    "AND tbl.relname = 'config_override_audit' "
+                    "AND ns.nspname = 'public'")
                 idx = cur.fetchone()
                 if idx is None or not (idx[0] and idx[1] and idx[2]):
                     return False
-                # append-only trigger present AND enabled (B4-CXR7U5)
+                if "(request_id)" not in idx[3]:
+                    return False  # same-named index over the WRONG column
+                # 5. append-only trigger: exact table + governed function +
+                #    enabled
                 cur.execute(
-                    "SELECT tgenabled FROM pg_trigger "
-                    "WHERE tgrelid = 'config_override_audit'::regclass "
-                    "AND tgname = 'config_override_audit_append_only'")
-                trg = cur.fetchone()
-                if trg is None or trg[0] not in ("O", "A"):
+                    "SELECT t.tgname, p.proname, t.tgenabled "
+                    "FROM pg_trigger t "
+                    "JOIN pg_proc p ON p.oid = t.tgfoid "
+                    "WHERE t.tgrelid = 'config_override_audit'::regclass "
+                    "AND NOT t.tgisinternal")
+                trig = None
+                for trow in cur.fetchall():
+                    if trow[0] == "config_override_audit_append_only":
+                        trig = trow
+                if trig is None or \
+                        trig[1] != "config_override_audit_append_only" or \
+                        trig[2] not in ("O", "A"):
                     return False
-                cur.execute(
-                    "SELECT 1 FROM config_override_audit LIMIT 1")
+                cur.execute("SELECT 1 FROM config_override_audit LIMIT 1")
                 cur.fetchone()
             self._conn.rollback()  # leave the dedicated connection IDLE
             if self._tx_status() != TX_IDLE:
@@ -261,277 +310,60 @@ class PostgresAuditSink(DurableAuditSink):
                 pass
             return False
 
-    # Full canonical decision columns compared on conflict (B4-CXR6R3): a
-    # request/correlation ID may reconcile ONLY the EXACT same durable
-    # decision — any differing semantic field fails closed.
-    _RECONCILE_SQL = (
-        "SELECT actor, setting, requested_change, reason, previous, new, "
-        "decision, authorized, fingerprint_before, fingerprint_after, "
-        "backend_identity FROM config_override_audit WHERE request_id = %s")
 
-    # INSERT with BOTH conflict arms handled (B4-CXR7U5): ON CONFLICT
-    # (audit_id) DO NOTHING alone does not catch a collision caused ONLY by
-    # the unique request_id index — that raises unless explicitly handled.
+    # INSERT handled with ON CONFLICT DO NOTHING RETURNING: every governed
+    # uniqueness constraint (audit_id PRIMARY KEY AND the request_id unique
+    # index) is swallowed WITHOUT aborting the transaction — a request_id-only
+    # collision no longer raises and then tries to reconcile on an aborted
+    # transaction (B4-CXR7U8-05).
     _INSERT_SQL = (
         "INSERT INTO config_override_audit "
         "(audit_id, request_id, actor, setting, requested_change, "
         " reason, previous, new, decision, authorized, "
         " fingerprint_before, fingerprint_after, backend_identity) "
         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
-        "ON CONFLICT (audit_id) DO NOTHING")
-
-    def append(self, record: dict) -> str:
-        """Persist *record* atomically with commit confirmation; returns id.
-
-        Idempotency is EXACT (B4-CXR6R3): a request/correlation ID may
-        reconcile ONLY the same committed decision.
-
-        * NEW request ID: INSERT, commit, verify success — only then is an
-          applicable value possible.
-        * EXACT retry (same request ID + every canonical semantic field
-          identical): the conflicting row is read back, the full decision is
-          compared, and the operation reconciles as the SAME committed
-          operation.
-        * DIVERGENT reuse (same request ID + any differing semantic field):
-          FAIL CLOSED — no applicable value, no new in-memory authoritative
-          result, and the existing durable row is left unchanged.
-
-        Both conflict arms are handled (B4-CXR7U5): an audit_id collision AND
-        a request_id-only collision (the unique request_id index) each
-        reconcile through the canonical comparison below.
-
-        Typed `previous`/`new` values (int/bool/None/str) are normalized
-        through canonical_audit_value() BEFORE insertion AND BEFORE
-        comparison — PostgreSQL returns TEXT columns as strings, and only
-        one canonical form makes exact-retry comparison truthful.
-
-        rowcount zero is NEVER treated as success without reconciliation.
-        """
-        if self._tx_status() != TX_IDLE:
-            raise RuntimeError(
-                "audit connection carries a pending transaction — refusing "
-                "to commit unrelated work; the audit ledger uses a DEDICATED "
-                "connection (B4-CXR5R5)")
-        audit_id = str(record.get("audit_id") or record.get("request_id")
-                       or uuid.uuid4().hex)
-        request_id = str(record.get("request_id") or audit_id)
-        actor = safe_audit_text(record.get("actor", ""), "actor")
-        setting = safe_audit_text(record.get("setting", ""), "setting")
-        requested_change = safe_audit_text(
-            record.get("requested_change", ""), "requested_change")
-        reason = safe_audit_text(record.get("reason", ""), "reason")
-        # ONE canonical representation before insertion (B4-CXR7U5)
-        previous = canonical_audit_value(record.get("previous"), "previous")
-        new_value = canonical_audit_value(record.get("new"), "new")
-        decision = record.get("decision", "granted")
-        authorized = bool(record.get("authorized", True))
-        fp_before = record.get("fingerprint_before")
-        fp_after = record.get("fingerprint_after")
-        try:
-            try:
-                with self._conn.cursor() as cur:
-                    cur.execute(
-                        self._INSERT_SQL,
-                        (audit_id, request_id, actor, setting,
-                         requested_change, reason, previous, new_value,
-                         decision, authorized, fp_before, fp_after,
-                         self.backend_identity))
-                    conflicted = cur.rowcount == 0
-            except Exception as exc:
-                # the request_id-unique arm: a collision caused ONLY by the
-                # unique request_id index raises (ON CONFLICT (audit_id)
-                # does not catch it) — reconcile instead of failing
-                if "config_override_audit_request_id_key" not in str(exc):
-                    raise
-                conflicted = True
-            if conflicted:
-                # conflict (on audit_id or the unique request_id) —
-                # reconcile ONLY the exact same durable decision
-                with self._conn.cursor() as cur:
-                    cur.execute(self._RECONCILE_SQL, (request_id,))
-                    row = cur.fetchone()
-                    if row is None:
-                        # conflict was on audit_id with a different
-                        # request_id — look the row up by audit_id instead
-                        cur.execute(
-                            self._RECONCILE_SQL.replace(
-                                "WHERE request_id = %s",
-                                "WHERE audit_id = %s"),
-                            (audit_id,))
-                        row = cur.fetchone()
-                    if row is None:
-                        raise RuntimeError(
-                            "audit conflict without an existing record — "
-                            "cannot reconcile (B4-CXR6R3)")
-                    # canonical comparison (B4-CXR7U5): the durable row is
-                    # TEXT from PostgreSQL; the retried record is canonical
-                    expected = (
-                        actor, setting, requested_change, reason,
-                        previous, new_value, decision, authorized,
-                        fp_before, fp_after, self.backend_identity)
-                    if tuple(row) != expected:
-                        raise PermissionError(
-                            "request_id reuse with a DIVERGENT durable "
-                            "decision — refused; no applicable value and the "
-                            "existing durable row is unchanged (B4-CXR6R3)")
-                    # exact retry of the same committed operation: reconcile
-                    # against the SAME durable row (rowcount zero + verified
-                    # read-back IS the success proof)
-            self._conn.commit()  # commit confirmation
-            return audit_id
-        except Exception:
-            try:
-                self._conn.rollback()  # failed append applies NOTHING
-            except Exception:
-                pass
-            raise
-
-    def read_back(self) -> list[dict]:
-        """Reload the ledger (restart-persistence proof)."""
-        raise NotImplementedError
-
-
-class PostgresAuditSink(DurableAuditSink):
-    """Append-only config-override audit in the governed PostgreSQL
-    (table ``config_override_audit``, migrations 0006 + 0007).
-
-    The connection is DEDICATED to the audit ledger. append() refuses to run
-    while the connection carries ANY pending transaction (it will never
-    commit unrelated application work), commits ONLY its own INSERT, and
-    rolls back on failure — the override then fails closed at the caller.
-
-    ``proven()`` proves the expected schema/backend: the ledger table must
-    exist, expose every REQUIRED_COLUMNS column, and answer a SELECT — not
-    merely that one SELECT did not throw. SAFE values only.
-    """
-
-    backend_identity = "postgres:config_override_audit"
-
-    def __init__(self, conn):
-        self._conn = conn
-
-    def _tx_status(self) -> int:
-        fn = getattr(self._conn, "get_transaction_status", None)
-        if fn is None:
-            return TX_IDLE  # unit fakes without the probe default to idle
-        return int(fn())
-
-    def proven(self) -> bool:
-        """Prove governed schema/table identity + required structure right now
-        (B4-CXR7U5):
-
-        * the governed table exists in schema 'public'
-          (to_regclass('public.config_override_audit'));
-        * every REQUIRED_COLUMNS column is present with the EXPECTED TYPE
-          (audit_id/actor/setting/... TEXT, authorized BOOLEAN,
-          recorded_at TIMESTAMPTZ);
-        * request_id is NOT NULL (governed reconciliation key);
-        * the request_id uniqueness index exists AND is valid;
-        * the primary key exists (audit_id);
-        * the append-only trigger is present AND enabled;
-        * the dedicated connection is left in an acceptable transaction
-          state (IDLE after the read-only probe transaction rolls back).
-
-        Read-only: performs its probes inside one transaction and ROLLS BACK
-        so the dedicated connection is left IDLE for append().
-        """
-        try:
-            with self._conn.cursor() as cur:
-                cur.execute(
-                    "SELECT to_regclass('public.config_override_audit') "
-                    "IS NOT NULL")
-                if not cur.fetchone()[0]:
-                    return False
-                # required columns AND their types (B4-CXR7U5)
-                cur.execute(
-                    "SELECT column_name, data_type, is_nullable "
-                    "FROM information_schema.columns "
-                    "WHERE table_schema = 'public' "
-                    "AND table_name = 'config_override_audit'")
-                colinfo = {row[0]: (row[1], row[2])
-                           for row in cur.fetchall()}
-                if not REQUIRED_COLUMNS.issubset(colinfo):
-                    return False
-                expected_types = {
-                    "audit_id": "text", "actor": "text",
-                    "setting": "text", "requested_change": "text",
-                    "reason": "text", "previous": "text", "new": "text",
-                    "decision": "text", "authorized": "boolean",
-                    "recorded_at": "timestamp with time zone",
-                    "request_id": "text",
-                    "fingerprint_before": "text",
-                    "fingerprint_after": "text",
-                    "backend_identity": "text",
-                }
-                for col, want in expected_types.items():
-                    if colinfo[col][0] != want:
-                        return False
-                if colinfo["request_id"][1] != "NO":
-                    return False  # request_id must be NOT NULL
-                # primary key on audit_id
-                cur.execute(
-                    "SELECT 1 FROM information_schema.table_constraints "
-                    "WHERE table_schema = 'public' "
-                    "AND table_name = 'config_override_audit' "
-                    "AND constraint_type = 'PRIMARY KEY' LIMIT 1")
-                if cur.fetchone() is None:
-                    return False
-                # request_id uniqueness: index exists, is unique, and is
-                # VALID (not left invalid by a failed concurrent creation)
-                cur.execute(
-                    "SELECT i.indisunique, i.indisvalid, i.indisready "
-                    "FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid "
-                    "WHERE c.relname = 'config_override_audit_request_id_key'")
-                idx = cur.fetchone()
-                if idx is None or not (idx[0] and idx[1] and idx[2]):
-                    return False
-                # append-only trigger present AND enabled (B4-CXR7U5)
-                cur.execute(
-                    "SELECT tgenabled FROM pg_trigger "
-                    "WHERE tgrelid = 'config_override_audit'::regclass "
-                    "AND tgname = 'config_override_audit_append_only'")
-                trg = cur.fetchone()
-                if trg is None or trg[0] not in ("O", "A"):
-                    return False
-                cur.execute(
-                    "SELECT 1 FROM config_override_audit LIMIT 1")
-                cur.fetchone()
-            self._conn.rollback()  # leave the dedicated connection IDLE
-            if self._tx_status() != TX_IDLE:
-                return False
-            return True
-        except Exception:
-            try:
-                self._conn.rollback()
-            except Exception:
-                pass
-            return False
+        "ON CONFLICT DO NOTHING RETURNING audit_id")
 
     # Full canonical decision columns compared on conflict (B4-CXR6R3): a
     # request/correlation ID may reconcile ONLY the EXACT same durable
-    # decision — any differing semantic field fails closed.
+    # decision. Looked up by EITHER governed key (the row that actually
+    # blocked the insert); every semantic field compared canonically.
     _RECONCILE_SQL = (
-        "SELECT actor, setting, requested_change, reason, previous, new, "
-        "decision, authorized, fingerprint_before, fingerprint_after, "
-        "backend_identity FROM config_override_audit WHERE request_id = %s")
+        "SELECT audit_id, actor, setting, requested_change, reason, "
+        "previous, new, decision, authorized, fingerprint_before, "
+        "fingerprint_after, backend_identity "
+        "FROM config_override_audit "
+        "WHERE request_id = %s OR audit_id = %s "
+        "ORDER BY recorded_at, audit_id")
 
     def append(self, record: dict) -> str:
-        """Persist *record* atomically with commit confirmation; returns id.
+        """Persist *record* atomically with commit confirmation; returns the
+        audit ID of the row that ACTUALLY EXISTS durably (B4-CXR7U8-05).
 
         Idempotency is EXACT (B4-CXR6R3): a request/correlation ID may
         reconcile ONLY the same committed decision.
 
-        * NEW request ID: INSERT, commit, verify success — only then is an
-          applicable value possible.
-        * EXACT retry (same request ID + every canonical semantic field
-          identical): the conflicting row is read back, the full decision is
-          compared, and the operation reconciles as the SAME committed
-          operation.
-        * DIVERGENT reuse (same request ID + any differing semantic field):
-          FAIL CLOSED — no applicable value, no new in-memory authoritative
-          result, and the existing durable row is left unchanged.
+        * NEW record: INSERT ... ON CONFLICT DO NOTHING RETURNING audit_id —
+          a returned row means a fresh durable insert; commit confirmation;
+          the returned audit_id is the inserted one.
+        * CONFLICT on ANY governed uniqueness constraint (audit_id PK or the
+          unique request_id index) is handled WITHOUT aborting the
+          transaction: no row is returned, the conflicting durable row is
+          read back by request_id OR audit_id, and every canonical semantic
+          field is compared.
+        * EXACT retry (one durable row matches every canonical field):
+          reconciles as the SAME committed operation and returns THAT row's
+          durable audit_id (identity model B: distinct IDs are permitted but
+          the returned ID always resolves to the existing durable row).
+        * DIVERGENT reuse (no durable row matches every field): FAIL CLOSED —
+          PermissionError, no applicable value, the existing durable row is
+          unchanged, and the transaction stays usable (rolled back by the
+          caller contract only on failure paths that need it).
 
-        rowcount zero is NEVER treated as success without reconciliation.
+        Typed `previous`/`new` values (int/bool/None/str) are normalized
+        through canonical_audit_value() BEFORE insertion AND BEFORE
+        comparison — PostgreSQL returns TEXT columns as strings, and only one
+        canonical form makes exact-retry comparison truthful.
         """
         if self._tx_status() != TX_IDLE:
             raise RuntimeError(
@@ -546,64 +378,58 @@ class PostgresAuditSink(DurableAuditSink):
         requested_change = safe_audit_text(
             record.get("requested_change", ""), "requested_change")
         reason = safe_audit_text(record.get("reason", ""), "reason")
+        previous = canonical_audit_value(record.get("previous"), "previous")
+        new_value = canonical_audit_value(record.get("new"), "new")
+        decision = str(record.get("decision", "granted"))
+        authorized = bool(record.get("authorized", True))
+        fp_before = record.get("fingerprint_before")
+        fp_after = record.get("fingerprint_after")
+        expected = (
+            actor, setting, requested_change, reason,
+            previous, new_value, decision, authorized,
+            fp_before, fp_after, self.backend_identity)
         try:
             with self._conn.cursor() as cur:
                 cur.execute(
-                    "INSERT INTO config_override_audit "
-                    "(audit_id, request_id, actor, setting, requested_change, "
-                    " reason, previous, new, decision, authorized, "
-                    " fingerprint_before, fingerprint_after, backend_identity) "
-                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) "
-                    "ON CONFLICT (audit_id) DO NOTHING",
-                    (audit_id, request_id, actor, setting, requested_change,
-                     reason, record.get("previous"), record.get("new"),
-                     record.get("decision", "granted"),
-                     bool(record.get("authorized", True)),
-                     record.get("fingerprint_before"),
-                     record.get("fingerprint_after"),
+                    self._INSERT_SQL,
+                    (audit_id, request_id, actor, setting,
+                     requested_change, reason, previous, new_value,
+                     decision, authorized, fp_before, fp_after,
                      self.backend_identity))
-                if cur.rowcount == 0:
-                    # conflict (on audit_id or the unique request_id) —
-                    # reconcile ONLY the exact same durable decision
-                    cur.execute(self._RECONCILE_SQL, (request_id,))
-                    row = cur.fetchone()
-                    if row is None:
-                        # conflict was on audit_id with a different
-                        # request_id — look the row up by audit_id instead
-                        cur.execute(
-                            self._RECONCILE_SQL.replace(
-                                "WHERE request_id = %s",
-                                "WHERE audit_id = %s"),
-                            (audit_id,))
-                        row = cur.fetchone()
-                    if row is None:
-                        raise RuntimeError(
-                            "audit conflict without an existing record — "
-                            "cannot reconcile (B4-CXR6R3)")
-                    expected = (
-                        actor, setting, requested_change, reason,
-                        record.get("previous"), record.get("new"),
-                        record.get("decision", "granted"),
-                        bool(record.get("authorized", True)),
-                        record.get("fingerprint_before"),
-                        record.get("fingerprint_after"),
-                        self.backend_identity)
-                    if tuple(row) != expected:
-                        raise PermissionError(
-                            "request_id reuse with a DIVERGENT durable "
-                            "decision — refused; no applicable value and the "
-                            "existing durable row is unchanged (B4-CXR6R3)")
-                    # exact retry of the same committed operation: reconcile
-                    # against the SAME durable row (rowcount zero + verified
-                    # read-back IS the success proof)
-            self._conn.commit()  # commit confirmation
-            return audit_id
+                returned = cur.fetchone()
+                if returned is not None:
+                    durable_audit_id = str(returned[0])
+                    self._conn.commit()  # commit confirmation
+                    return durable_audit_id
+                # conflict on a governed uniqueness constraint (audit_id PK
+                # OR the unique request_id index) — the transaction is still
+                # USABLE (ON CONFLICT DO NOTHING never aborts it). Reconcile
+                # against the durable row that actually exists.
+                cur.execute(self._RECONCILE_SQL, (request_id, audit_id))
+                matches = []
+                for row in cur.fetchall():
+                    if tuple(row[1:]) == expected:
+                        matches.append(str(row[0]))
+                if len(matches) == 1:
+                    durable_audit_id = matches[0]
+                    self._conn.commit()
+                    return durable_audit_id
+                if len(matches) > 1:
+                    raise RuntimeError(
+                        "duplicate durable rows reconcile the same retry — "
+                        "governed uniqueness is broken; manual remediation "
+                        "required (B4-CXR7U8-05)")
+                raise PermissionError(
+                    "request_id/audit_id reuse with a DIVERGENT durable "
+                    "decision — refused; no applicable value and the existing "
+                    "durable row is unchanged (B4-CXR6R3)")
         except Exception:
             try:
                 self._conn.rollback()  # failed append applies NOTHING
             except Exception:
                 pass
             raise
+
 
     def read_back(self) -> list[dict]:
         """Reload the committed ledger (restart-persistence proof)."""

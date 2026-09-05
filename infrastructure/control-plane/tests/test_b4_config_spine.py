@@ -1482,16 +1482,29 @@ class _FakeCursor:
 
     def fetchone(self):
         sql = self._conn.executes[-1][0] if self._conn.executes else ""
+        if "RETURNING audit_id" in sql:
+            # B4-CXR7U8-05: INSERT ... ON CONFLICT DO NOTHING RETURNING — a
+            # row means a fresh durable insert; None means a conflict
+            if self._conn.insert_conflict:
+                return None
+            return ("unit-audit-%d" % len(self._conn.executes),)
+        if "current_database" in sql:
+            return ("oce_control", "oce_control_admin")
         if "to_regclass" in sql:
             return (True,)
         if sql.strip().startswith("SELECT 1 FROM config_override_audit"):
             return (1,) if self._conn.rows else None
+        if "pg_get_constraintdef" in sql:
+            return ("PRIMARY KEY (audit_id)",)
+        if "pg_index" in sql and "pg_get_indexdef" in sql:
+            # (indisunique, indisvalid, indisready, indexdef)
+            return (True, True, True,
+                    "CREATE UNIQUE INDEX config_override_audit_request_id_key "
+                    "ON public.config_override_audit USING btree (request_id)")
+        if "pg_index" in sql:
+            return (True, True, True)
         if "information_schema.table_constraints" in sql:
             return (1,)  # PRIMARY KEY present
-        if "pg_index" in sql:
-            # request_id uniqueness index: (indisunique, indisvalid,
-            # indisready) — all true in the governed fake schema
-            return (True, True, True)
         if "pg_trigger" in sql:
             return ("O",)  # append-only trigger ENABLED
         return (self._conn.rows[0] if self._conn.rows else None)
@@ -1499,8 +1512,8 @@ class _FakeCursor:
     def fetchall(self):
         sql = self._conn.executes[-1][0] if self._conn.executes else ""
         if "information_schema.columns" in sql:
-            # B4-CXR7U5: (column_name, data_type, is_nullable) with the
-            # governed types; request_id is NOT NULL
+            # B4-CXR7U8-06: (column_name, data_type, is_nullable) with the
+            # governed types AND the exact NOT NULL set
             types = {
                 "audit_id": "text", "actor": "text",
                 "setting": "text", "requested_change": "text",
@@ -1512,8 +1525,15 @@ class _FakeCursor:
                 "fingerprint_after": "text",
                 "backend_identity": "text",
             }
-            return [(c, types[c], "NO" if c == "request_id" else "YES")
+            not_null = {"audit_id", "actor", "setting", "requested_change",
+                        "reason", "decision", "authorized", "recorded_at",
+                        "request_id", "backend_identity"}
+            return [(c, types[c], "NO" if c in not_null else "YES")
                     for c in sorted(REQUIRED_COLUMNS)]
+        if "pg_trigger" in sql and "pg_proc" in sql:
+            # (tgname, proname, tgenabled)
+            return [("config_override_audit_append_only",
+                     "config_override_audit_append_only", "O")]
         return list(self._conn.rows or [])
 
 
@@ -1755,12 +1775,16 @@ class TestCXR4R5ProvenAuditDurability:
 
     @staticmethod
     def _committed_row(conn, mutator=None):
-        """Reconstruct the committed ledger row from the first INSERT params
-        (order matches the reconciliation SELECT columns)."""
-        row = list(TestCXR4R5ProvenAuditDurability._insert_params(conn)[0][2:13])
+        """Reconstruct the committed ledger row from the first INSERT params.
+        The reconciliation SELECT now returns the durable audit_id FIRST
+        (B4-CXR7U8-05) followed by the canonical semantic columns; mutators
+        operate on the semantic slice (their indices are unchanged)."""
+        params = TestCXR4R5ProvenAuditDurability._insert_params(conn)[0]
+        audit_id = params[0]
+        row = list(params[2:13])
         if mutator is not None:
             mutator(row)
-        return tuple(row)
+        return (audit_id,) + tuple(row)
 
     def test_exact_retry_reconciles_same_decision(self):
         # EXACT RETRY: same request id + identical canonical decision -> the
@@ -1792,7 +1816,10 @@ class TestCXR4R5ProvenAuditDurability:
         conn = _FakeConn(insert_conflict=True)
         sink = PostgresAuditSink(conn)
         # pre-existing committed row identical to the retried record
-        conn.rows = [("operator:po", "control_plane.port", "x", "r",
+        # (B4-CXR7U8-05: the reconciliation SELECT returns the durable
+        # audit_id FIRST, then the canonical semantic columns)
+        conn.rows = [("override-req-uncertain-0001",
+                      "operator:po", "control_plane.port", "x", "r",
                       "8448", "9104", "granted", True,
                       "fp-before", "fp-after",
                       "postgres:config_override_audit")]
@@ -1846,7 +1873,8 @@ class TestCXR4R5ProvenAuditDurability:
         # the sink itself reports DIVERGENT before operator_override wraps it
         conn = _FakeConn(insert_conflict=True)
         sink = PostgresAuditSink(conn)
-        conn.rows = [("operator:po", "control_plane.port", "x", "r",
+        conn.rows = [("override-req-div-0002",
+                      "operator:po", "control_plane.port", "x", "r",
                       "8448", "9105", "granted", True,
                       "fp-before", "fp-after",
                       "postgres:config_override_audit")]
@@ -1930,7 +1958,8 @@ class TestCXR7U5CanonicalAuditValue:
         # (same column order as the reconciliation SELECT)
         insert = next(p for sql, p in conn.executes
                       if sql.strip().startswith("INSERT"))
-        conn.rows = [tuple(insert[2:13])]
+        # B4-CXR7U8-05: durable row now carries the audit_id column first
+        conn.rows = [(insert[0],) + tuple(insert[2:13])]
         conn.insert_conflict = True
         second = authz.operator_override(
             eff, actor="operator:po", setting_name="capital.authority",
