@@ -31,7 +31,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ..contracts.base import normalize_utc_datetimes
 from ..contracts.enums import SensorFamily
-from ..providers.base.enums import Granularity, QualityFlagAcquisition
+from ..providers.base.enums import Granularity, QualityFlagAcquisition, SchemaState
 from ..providers.base.models import AdapterEvidenceRef, ResumeToken
 from .checksums import validate_sha256_hex
 from .enums import (
@@ -158,9 +158,17 @@ class EvidenceBlob(StorageModelBase):
 class AcquisitionRecord(StorageModelBase):
     """ONE actual retrieval/acquisition event (F4: acquisitions != blobs).
 
+    SENSOR-B4-I04A reconciled this model against the frozen Bloc 3 handoff
+    (BLOC_04_INPUT_MANIFEST §2 + bloc_04/01 §4.2): adapter capability
+    version, endpoint/request-family identity, ACTUAL (not requested) range,
+    schema state, evidence ref and provider-checksum distinction were added
+    so no raw acquisition context can disappear at persistence time.
+
     Preserves provider/native identity, request identity, time ranges, adapter
     provenance, blob linkage, resume linkage and failure/quality state.
     Nothing is canonicalized: no BTC/contract-type/unit/notional/side.
+    actual_start/actual_end are NEVER inferred from requested_start/end: they
+    stay None until provider evidence supports them.
     """
 
     acquisition_id: str = Field(min_length=1)
@@ -169,17 +177,27 @@ class AcquisitionRecord(StorageModelBase):
     sensor_family: SensorFamily
     request_fingerprint: str = Field(min_length=1)
     adapter_version: str = Field(min_length=1)
+    adapter_capability_version: str | None = None
     requested_start: datetime
     requested_end: datetime
+    actual_start: datetime | None = None
+    actual_end: datetime | None = None
     native_instrument: str = Field(min_length=1)
     native_granularity: Granularity | None = None
     request_started_at: datetime
     response_observed_at: datetime
     ingested_at: datetime
     http_status_or_source_status: str | None = None
+    endpoint_host: str | None = None
+    endpoint_path: str | None = None
+    request_family: str | None = None
     source_locator: str = Field(min_length=1)
     blob_sha256: str | None = None
-    provider_checksum: str | None = None
+    schema_state: SchemaState | None = None
+    evidence_ref: AdapterEvidenceRef | None = None
+    provider_checksum_algorithm: str | None = None
+    provider_checksum_value: str | None = None
+    provider_checksum_verified: bool | None = None
     resume_token_before: ResumeToken | None = None
     resume_token_after: ResumeToken | None = None
     quality_flags: list[QualityFlagAcquisition] = Field(default_factory=list)
@@ -204,6 +222,43 @@ class AcquisitionRecord(StorageModelBase):
     def _validate_hash_if_present(self) -> AcquisitionRecord:
         if self.blob_sha256 is not None:
             _validate_sha256_field(self.blob_sha256, "blob_sha256")
+        return self
+
+    @model_validator(mode="after")
+    def _validate_actual_window(self) -> AcquisitionRecord:
+        # ACTUAL range is never inferred from the requested range: it stays
+        # None until provider evidence supports it (I04 §8).  When BOTH actual
+        # bounds are known they must be ordered.
+        if (
+            self.actual_start is not None
+            and self.actual_end is not None
+            and self.actual_end < self.actual_start
+        ):
+            raise ValueError(
+                "actual_end must be >= actual_start "
+                f"({self.actual_start.isoformat()} > {self.actual_end.isoformat()})"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _validate_provider_checksum(self) -> AcquisitionRecord:
+        # I04 §11: algorithm/value/verified are a reconciled trio; an opaque
+        # digest-length inference is never performed.
+        if self.provider_checksum_value is not None and self.provider_checksum_algorithm is None:
+            raise ValueError(
+                "provider_checksum_algorithm is required when "
+                "provider_checksum_value is supplied (I04 §11)"
+            )
+        if self.provider_checksum_algorithm is not None and self.provider_checksum_value is None:
+            raise ValueError(
+                "provider_checksum_value is required when "
+                "provider_checksum_algorithm is supplied (I04 §11)"
+            )
+        if self.provider_checksum_verified is not None and self.provider_checksum_value is None:
+            raise ValueError(
+                "provider_checksum_verified requires a provider_checksum_value "
+                "(I04 §11)"
+            )
         return self
 
 

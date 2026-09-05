@@ -14,7 +14,8 @@ import pytest
 from pydantic import ValidationError
 
 from crypto_sensor_fabric.contracts.enums import SensorFamily
-from crypto_sensor_fabric.providers.base.enums import Granularity
+from crypto_sensor_fabric.providers.base.enums import Granularity, SchemaState
+from crypto_sensor_fabric.providers.base.models import AdapterEvidenceRef
 from crypto_sensor_fabric.storage.enums import (
     BackupClass,
     CoverageState,
@@ -120,7 +121,6 @@ class TestAcquisitionRecord:
             "http_status_or_source_status": "200",
             "source_locator": "https://futures.kraken.com/api/charts/v1/analytics/PI_XBTUSD/funding",
             "blob_sha256": SHA,
-            "provider_checksum": None,
             "resume_token_before": None,
             "resume_token_after": None,
             "quality_flags": [],
@@ -152,6 +152,81 @@ class TestAcquisitionRecord:
     def test_bad_blob_sha_rejected(self) -> None:
         with pytest.raises(ValidationError):
             self._record(blob_sha256="not-a-hash")
+
+    # -- SENSOR-B4-I04A: Bloc-3 handoff reconciliation ----------------------
+
+    def test_i04a_handoff_fields_preserved(self) -> None:
+        """Every frozen Bloc-3 handoff fact survives model round-trip (I04 §58)."""
+        rec = self._record(
+            adapter_capability_version="kraken-capability-v2",
+            actual_start=datetime(2026, 8, 31, 10, 0, 0, tzinfo=UTC),
+            actual_end=datetime(2026, 8, 31, 11, 0, 0, tzinfo=UTC),
+            endpoint_host="futures.kraken.com",
+            endpoint_path="/api/charts/v1/analytics/PI_XBTUSD/funding",
+            request_family="market_analytics_funding",
+            schema_state=SchemaState.KNOWN_SCHEMA,
+            evidence_ref=AdapterEvidenceRef(
+                evidence_id="ev-funding-1",
+                provider_id="KRAKEN_FUTURES",
+                sensor_family=SensorFamily.MECHANICAL_FUNDING,
+            ),
+            provider_checksum_algorithm="MD5",
+            provider_checksum_value="0" * 32,
+            provider_checksum_verified=True,
+        )
+        assert rec.adapter_capability_version == "kraken-capability-v2"
+        assert rec.actual_start == datetime(2026, 8, 31, 10, 0, 0, tzinfo=UTC)
+        assert rec.actual_end == datetime(2026, 8, 31, 11, 0, 0, tzinfo=UTC)
+        assert rec.endpoint_host == "futures.kraken.com"
+        assert rec.endpoint_path == (
+            "/api/charts/v1/analytics/PI_XBTUSD/funding"
+        )
+        assert rec.request_family == "market_analytics_funding"
+        assert rec.schema_state is SchemaState.KNOWN_SCHEMA
+        assert rec.evidence_ref is not None
+        assert rec.evidence_ref.evidence_id == "ev-funding-1"
+        assert rec.provider_checksum_algorithm == "MD5"
+        assert rec.provider_checksum_value == "0" * 32
+        assert rec.provider_checksum_verified is True
+
+    def test_actual_range_never_inferred(self) -> None:
+        """actual_* stays None when provider evidence does not support it."""
+        rec = self._record()
+        assert rec.actual_start is None
+        assert rec.actual_end is None
+        assert rec.requested_start is not None
+        assert rec.requested_end is not None
+
+    def test_actual_window_inverted_rejected(self) -> None:
+        later = datetime(2026, 9, 2, 12, 0, 0, tzinfo=UTC)
+        with pytest.raises(ValidationError):
+            self._record(actual_start=later, actual_end=UTC_NOW)
+
+    def test_provider_checksum_value_requires_algorithm(self) -> None:
+        with pytest.raises(ValidationError):
+            self._record(
+                provider_checksum_value="0" * 64,
+                provider_checksum_algorithm=None,
+            )
+
+    def test_provider_checksum_verified_requires_value(self) -> None:
+        with pytest.raises(ValidationError):
+            self._record(
+                provider_checksum_algorithm="SHA256",
+                provider_checksum_value=None,
+                provider_checksum_verified=True,
+            )
+
+    def test_provider_checksum_algorithm_never_inferred_from_length(self) -> None:
+        """A 64-hex value with an explicit MD5 algorithm stays MD5 (I04 §11)."""
+        rec = self._record(
+            provider_checksum_algorithm="MD5",
+            provider_checksum_value="0" * 64,
+            provider_checksum_verified=False,
+        )
+        assert rec.provider_checksum_algorithm == "MD5"
+        assert rec.provider_checksum_value == "0" * 64
+        assert rec.provider_checksum_verified is False
 
 
 class TestRawProjectionArtifact:
