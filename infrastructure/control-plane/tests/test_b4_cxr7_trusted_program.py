@@ -301,12 +301,9 @@ class TestTruthfulIsolationReporting:
     def test_production_cannot_select_test_dependency_seam(self, tmp_path):
         # the seam module lives in tests/, is imported by nothing in
         # production code paths, and no environment string reaches it.
-        # (The production script's DOCSTRING names the seam only to state it
-        # is unreachable; that is documentation, not an import.)
         import scripts.oce_b3_worker as w
         assert "oce_b3_worker_test_deps" not in Path(w.__file__).read_text(
             encoding="utf-8")
-        assert "import" not in ""  # import surface check below
         for prod_file in (BASE / "scripts" / "oce_b3_worker.py",
                           BASE / "src" / "oce_control" / "worker_loop.py"):
             tree_ok = True
