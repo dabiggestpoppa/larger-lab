@@ -1,4 +1,4 @@
-"""SENSOR-B4-I01/I02/I03 — immutable T0 raw-evidence lake storage surface.
+"""SENSOR-B4-I01/I02/I03/I04 — immutable T0 raw-evidence lake storage surface.
 
 - I01 froze the STORAGE CONTRACT vocabulary (models + enums).
 - I02 froze HOW immutable evidence is IDENTIFIED and ADDRESSED: exact-source
@@ -8,9 +8,14 @@
   (compression.py), generic no-clobber durability primitives (atomic.py) and
   the immutable ``LocalBlobStore`` put/exists/open/verify surface
   (blob_store.py) — commit sequence through parent-directory fsync only.
+- I04 implements the DURABLE ACQUISITION + MANIFEST CATALOG: immutable
+  PyArrow Parquet catalog fragments with durable metadata for EvidenceBlob
+  and AcquisitionRecord (catalog.py), and append-only PartitionManifest
+  versions with a transactional current pointer, partition-scoped writer
+  locks and expected-current CAS (manifests.py).
 
-NOT implemented: acquisition/manifest repository (I04), T0B projections (I05),
-recovery scanner (I08), DuckDB/Postgres, resume advancement, network.
+NOT implemented: T0B projections (I05), recovery scanner (I08), DuckDB/Postgres,
+resume advancement, network.
 
 Dependency direction (frozen):
 - storage -> may import frozen provider/base shared contracts (SensorFamily,
@@ -43,6 +48,30 @@ from .blob_store import (
     StagingWriteError,
     UnsafeObjectKey,
 )
+from .catalog import (
+    ACQUISITION_SCHEMA,
+    AcquisitionIdentityConflict,
+    AcquisitionNotFound,
+    AcquisitionRepository,
+    BLOB_SCHEMA,
+    BlobMetadataConflict,
+    BlobMetadataNotFound,
+    BlobMetadataRepository,
+    BlobStorageKey,
+    CatalogDurabilityError,
+    CatalogError,
+    CatalogFragmentReceipt,
+    CatalogIntegrityError,
+    CatalogNotFound,
+    DanglingBlobReference,
+    LocalEvidenceCatalog,
+    ProjectionReferenceUnavailable,
+    canonical_nested_json,
+    model_canonical_json,
+    publish_immutable_fragment,
+    read_fragment,
+    resolve_catalog_root,
+)
 from .checksums import (
     Sha256Result,
     checksum_algorithm_from_name,
@@ -69,6 +98,22 @@ from .enums import (
     StorageJobStatus,
     StorageObjectType,
     StoragePriority,
+)
+from .manifests import (
+    CurrentPointerCorrupt,
+    CurrentPointerDangling,
+    MANIFEST_SCHEMA,
+    ManifestAppendResult,
+    ManifestCASConflict,
+    ManifestDisposition,
+    ManifestIdentityConflict,
+    ManifestLockHeld,
+    ManifestNotFound,
+    ManifestVersionConflict,
+    PartitionCurrentPointer,
+    PartitionManifestRepository,
+    PointerFaultPoint,
+    RaisePointerFaultHook,
 )
 from .models import (
     AcquisitionRecord,
@@ -98,6 +143,44 @@ from .paths import (
 )
 
 __all__ = [
+    # catalog schemas
+    "ACQUISITION_SCHEMA",
+    "BLOB_SCHEMA",
+    "MANIFEST_SCHEMA",
+    # catalog repositories + errors
+    "AcquisitionIdentityConflict",
+    "AcquisitionNotFound",
+    "AcquisitionRepository",
+    "BlobMetadataConflict",
+    "BlobMetadataNotFound",
+    "BlobMetadataRepository",
+    "BlobStorageKey",
+    "CatalogDurabilityError",
+    "CatalogError",
+    "CatalogFragmentReceipt",
+    "CatalogIntegrityError",
+    "CatalogNotFound",
+    "CurrentPointerCorrupt",
+    "CurrentPointerDangling",
+    "DanglingBlobReference",
+    "LocalEvidenceCatalog",
+    "ManifestAppendResult",
+    "ManifestCASConflict",
+    "ManifestDisposition",
+    "ManifestIdentityConflict",
+    "ManifestLockHeld",
+    "ManifestNotFound",
+    "ManifestVersionConflict",
+    "PartitionCurrentPointer",
+    "PartitionManifestRepository",
+    "PointerFaultPoint",
+    "ProjectionReferenceUnavailable",
+    "RaisePointerFaultHook",
+    "canonical_nested_json",
+    "model_canonical_json",
+    "publish_immutable_fragment",
+    "read_fragment",
+    "resolve_catalog_root",
     # paths / addressing
     "BLOB_KEY_PREFIX",
     # models
