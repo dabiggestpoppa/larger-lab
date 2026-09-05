@@ -1,0 +1,212 @@
+{
+  "logical_path_count": 17,
+  "manifest_hash": "2c2e791bfad10fb4",
+  "max_permitted_max_calls": 20,
+  "page_size_hint": 25,
+  "physical_request_count": 18,
+  "purpose": "PROBE",
+  "requests": [
+    {
+      "adapter_semantic_version": "deribit-adapter-v1",
+      "end_time": "2026-09-01T01:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC-PERPETUAL",
+      "page_size_hint": 25,
+      "provider_id": "DERIBIT",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "start_time": "2026-09-01T01:23:56.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "deribit-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC-PERPETUAL",
+      "page_size_hint": 25,
+      "provider_id": "DERIBIT",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "deribit-adapter-v1",
+      "end_time": "2026-09-01T01:18:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC-PERPETUAL",
+      "page_size_hint": 25,
+      "provider_id": "DERIBIT",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_LIQUIDATION",
+      "start_time": "2026-09-01T00:18:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "deribit-adapter-v1",
+      "end_time": "2026-09-01T01:18:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC-PERPETUAL",
+      "page_size_hint": 25,
+      "provider_id": "DERIBIT",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_TRADE",
+      "start_time": "2026-09-01T01:08:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "gate-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC_USDT",
+      "page_size_hint": 25,
+      "provider_id": "GATE_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "gate-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC_USDT",
+      "page_size_hint": 25,
+      "provider_id": "GATE_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_LIQUIDATION",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "gate-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC_USDT",
+      "page_size_hint": 25,
+      "provider_id": "GATE_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "gate-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC_USDT",
+      "page_size_hint": 25,
+      "provider_id": "GATE_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_POSITIONING",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "kraken-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "PI_XBTUSD",
+      "page_size_hint": 25,
+      "provider_id": "KRAKEN_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_BASIS",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "kraken-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "PI_XBTUSD",
+      "page_size_hint": 25,
+      "provider_id": "KRAKEN_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_BOOK_METRIC",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "kraken-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "PI_XBTUSD",
+      "page_size_hint": 25,
+      "provider_id": "KRAKEN_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "kraken-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "PI_XBTUSD",
+      "page_size_hint": 25,
+      "provider_id": "KRAKEN_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_LIQUIDATION",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "kraken-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "PI_ETHUSD",
+      "page_size_hint": 25,
+      "provider_id": "KRAKEN_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "kraken-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "PI_XBTUSD",
+      "page_size_hint": 25,
+      "provider_id": "KRAKEN_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "kraken-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "PI_XBTUSD",
+      "page_size_hint": 25,
+      "provider_id": "KRAKEN_FUTURES",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_POSITIONING",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "okx-adapter-v1",
+      "end_time": "2026-09-01T01:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC-USDT-SWAP",
+      "page_size_hint": 25,
+      "provider_id": "OKX_SWAP",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "start_time": "2026-09-01T01:23:56.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "okx-adapter-v1",
+      "end_time": "2026-08-31T23:23:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC-USDT-SWAP",
+      "page_size_hint": 25,
+      "provider_id": "OKX_SWAP",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "start_time": "2026-08-30T23:23:57.492186+00:00"
+    },
+    {
+      "adapter_semantic_version": "okx-adapter-v1",
+      "end_time": "2026-09-01T01:18:57.492186+00:00",
+      "granularity": null,
+      "native_instrument_id": "BTC-USDT-SWAP",
+      "page_size_hint": 25,
+      "provider_id": "OKX_SWAP",
+      "purpose": "PROBE",
+      "sensor_family": "MECHANICAL_TRADE",
+      "start_time": "2026-09-01T01:08:57.492186+00:00"
+    }
+  ],
+  "run_anchor_utc": "2026-09-01T01:23:57.492186+00:00",
+  "run_id": "i10-live",
+  "run_timestamp_utc": "2026-09-01T01:23:57.492186+00:00",
+  "starting_sha": "f92d6bd9802ec8529af60779caa950f60fc3fce4"
+}

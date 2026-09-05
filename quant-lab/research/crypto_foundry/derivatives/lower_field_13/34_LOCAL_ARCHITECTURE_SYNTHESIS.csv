@@ -1,0 +1,5 @@
+architecture,support,status
+A_LOOSE_HIERARCHY,capacity -> absorption/propagation; propagation -> containment/decoupling (10/09),PARTIAL — order exists but is bypassable
+B_PARALLEL_CONSTRAINTS,absorption and containment respond to different features (11); capacity families coupled-but-distinct (05); decoupling has independent health pathway (21),PARTIAL — parallel constraints coexist
+C_HYBRID,"structural condition + current shock + short recency -> absorb/reorganize/propagate -> contain/reactivate/persist -> rejoin/decouple, with bypasses and parallel decay",BEST_FIT
+VERDICT,HYBRID,loose feed-forward spine with parallel constraints and bypassable transitions; no strict sequence

@@ -1,0 +1,13 @@
+{
+  "retCode": 0,
+  "retMsg": "OK",
+  "result": {
+    "category": "linear",
+    "symbol": "BTCUSDT",
+    "list": [
+      {"execId": "e1", "id": "1", "price": "29510.5", "qty": "0.0089", "side": "Sell", "time": "1655251200000", "isBlockTrade": false},
+      {"execId": "e2", "id": "2", "price": "29512.0", "qty": "0.0021", "side": "Buy", "time": "1655251265000", "isBlockTrade": false},
+      {"execId": "e3", "id": "3", "price": "29508.2", "qty": "0.015", "side": "Sell", "time": "1655251330000", "isBlockTrade": false}
+    ]
+  }
+}

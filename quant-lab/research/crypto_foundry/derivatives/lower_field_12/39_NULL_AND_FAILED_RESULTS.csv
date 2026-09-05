@@ -1,0 +1,12 @@
+result,context,status,note
+NO_FRAGILITY_ACCELERATION,LF11 damage accumulation (10),REINTERPRETED,"LF12 selection audit (14) shows cross-sectional gradient is composition; within-asset rho ~0.06. Null stands; mechanism = selection, not resilience."
+RECOVERY_RESTORES_ABSORPTION,LF12 recovery curve (13),FAILED,Absorption does NOT rebuild with time-since-shock; declines (selection). No damage-recovery clock.
+RELATIONAL_DISTANCE_ROUTING,LF12 relational distance (18),NULL,Relational distance does not route contagion (all AUC<0.52) at daily resolution. Not promoted.
+BRANCHING_STRUCTURAL_DISTINCTION,LF12 branching utility (22),NULL,Branching R2 range 0.27 across species - parked.
+LONG_MEMORY_KERNEL,LF12 kernel repair (02),REJECTED,180d kernel is worst (0.572); 3d/7d best (0.639). LF11 summary's 180d claim corrected.
+CUMULATIVE_BURDEN_DOMINANCE,LF12 burden vs recency (03),REJECTED,Recency (days-since-prior 0.6115) beats all cumulative constructions.
+MULTI_FACTOR_REACTIVATION,LF12 reactivation repair (04),REJECTED,Fresh shock / burden / churn / peer stress alone do NOT drive relapse; only prior-contagion x recency does. LF11 wording retracted.
+CIRCULAR_UPSIDE_HIERARCHY,LF12 leakage audit (05),FIXED,3 of 7 LF11 permission variables removed (forward-outcome leakage ~1.0); hierarchy rebuilt PIT-safe.
+CORRELATION_COMPRESSION_PRECURSOR,LF12 correlation deep (29),NULL,Compression COINCIDES with spread; not a precursor. No causality.
+MECHANICAL_SIGN_EXPLANATION,LF12 sensors (30) / sign law (31),DATA_BLOCKED,Funding/OI/liquidations/depth/flow/margin unavailable free-only; sign gap IRREDUCIBLE_WITH_AVAILABLE_DATA.
+UPSIDE_ACCUMULATION_LAW,LF12 upside retest (34),PARTIAL,STATE_LOCAL: prior rejoin history lifts rejoin by <=5.4pp; no downside-style accumulation.

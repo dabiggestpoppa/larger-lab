@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_archive_btcusdt_2019_09",
+  "method": "GET",
+  "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1d/BTCUSDT-1d-2019-09.zip",
+  "request_params": null,
+  "http_status": 404,
+  "retrieved_at": "2026-08-24T14:20:09+00:00",
+  "sha256": "68c9f30dd5a99c12acd1d557dcbbdbb1867d5d5f22456c468111fe68f24512e4",
+  "bytes": 335
+}

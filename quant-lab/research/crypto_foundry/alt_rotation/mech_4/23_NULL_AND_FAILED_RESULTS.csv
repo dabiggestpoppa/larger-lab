@@ -1,0 +1,6 @@
+workstream,test,classification,count
+B,gate,NOT_SUPPORTED,1
+C,path memory,HYSTERESIS_DESCRIPTIVE,1
+D,semi-markov,EARNED,1
+E,activation-first,NULL,1
+H,graph reconfiguration,NULL,1

@@ -1,0 +1,9 @@
+strata,level,n,p_absorbed,med_events_per_asset,med_within_rho,frac_positive
+EVENT_FREQ,FREQ_LOW,1216,0.0058,1.2614,,
+EVENT_FREQ,FREQ_MID,1215,0.0568,3.563,,
+EVENT_FREQ,FREQ_HIGH,1216,0.1752,10.3932,,
+LIQUIDITY,LIQ_HIGH,1778,0.1215,,,
+LIQUIDITY,LIQ_LOW,1869,0.0391,,,
+WITHIN_ASSET,"spearman(cnt_prev_90d, absorbed)",39,,,0.0583,0.5128
+MATCHED,high-freq+liq vs low-freq+liq,562,0.2267,,,
+VERDICT,SELECTION_CONFIRMED,3647,,,0.0583,0.5128

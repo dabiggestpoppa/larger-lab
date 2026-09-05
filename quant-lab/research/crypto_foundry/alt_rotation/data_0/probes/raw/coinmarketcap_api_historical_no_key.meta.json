@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinmarketcap_api_historical_no_key",
+  "method": "GET",
+  "url": "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/historical",
+  "request_params": {
+    "date": "2024-06-01",
+    "start": 1,
+    "limit": 100
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:41+00:00",
+  "http_status": 401,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "793f4217ddb13605ee12af6eefaf642ab3173296d2a69ddb87d144e2165c00b0",
+  "bytes": 195,
+  "access_class": "PAID",
+  "historical_date": "2024-06-01",
+  "known_limitations": "",
+  "notes": "Pro API historical listings WITHOUT key \u2014 expect 401 (documents PAID_REQUIRED)",
+  "final_url": "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/historical?date=2024-06-01&start=1&limit=100",
+  "response_headers_safe": {
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "195",
+    "Connection": "keep-alive",
+    "Date": "Mon, 24 Aug 2026 14:01:40 GMT",
+    "X-Traefik-Route": "coinmarketcap-pro-apis",
+    "Server": "Tengine",
+    "Cache-Control": "no-cache",
+    "Vary": "origin",
+    "X-Cache": "Error from cloudfront",
+    "Via": "1.1 6b9e972828445e8f396a8df0e97ce690.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Pop": "BOS50-P5",
+    "X-Amz-Cf-Id": "6yITm4yVI5k2VopKcKvBI6RfjtLXeQR1vgbpPDtzc_aHTnCclr0iYQ=="
+  }
+}

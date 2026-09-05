@@ -1,0 +1,8 @@
+result,status,n,reason
+hourly_contagion_temporal_map,DATA_LIMITED,0,no PIT-safe hourly data in the LF5 substrate; reported at daily resolution only (16)
+peer_rank_distance_spatial_map,MEASUREMENT_BLOCKED,0,per-peer ranks are not carried on the partial peer map; spatial breadth uses peer-touch fraction + rank depth + field breadth instead (17)
+manifold_learning_shock_taxonomy,NOT_CLAIMED,0,mission governance: avoid manifold math unless genuinely earned; weak structure phrased as continuous space
+relational_state_forecast_resurrection,NULL_FROZEN,3,RELATIONAL_STATE_NOT_INCREMENTAL_PREDICTOR froze at LF9; NOT reopened in LF10. Only internal validation of newly-defined shock/contagion objects is predictive.
+static_peer_graph_resurrection,NOT_RESURRECTED,0,LF10 maps dynamic churn anatomy; static peer topology not revived
+downside_to_upside_mirror_assumption,NOT_ASSUMED,0,upside analogue search (23) explicitly tested per primitive instead of mirroring
+rescue_choice_prd_subtypes,DISSOLVED,0,BETA_RESCUE / PEER_RESCUE / DELAYED_REHAB remain dissolved (LF9); carried forward with no budget (26)

@@ -1,0 +1,2 @@
+exit_cell,cell_7d,cell_30d,n_episodes,median_dwell_d,p_7d_success,p_30d_success,p_7d_reentry,subperiods
+LOW_BREADTH_LOW_DISP,HIGH_BREADTH_HIGH_DISP,HIGH_BREADTH_HIGH_DISP,11,7.0,0.36363636363636365,0.6363636363636364,0.6363636363636364,2

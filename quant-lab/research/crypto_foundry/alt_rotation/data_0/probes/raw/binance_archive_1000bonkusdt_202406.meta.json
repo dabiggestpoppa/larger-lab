@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_archive_1000bonkusdt_202406",
+  "http_status": 200,
+  "retrieved_at": "2026-08-24T14:21:59+00:00",
+  "sha256": "e618f2f85eca985e0e2a31e73fee3d69f51323bc22d36000aa981e9644a61558",
+  "bytes": 2055,
+  "request_params": {
+    "url": "https://data.binance.vision/data/futures/um/monthly/klines/1000BONKUSDT/1d/1000BONKUSDT-1d-2024-06.zip"
+  }
+}

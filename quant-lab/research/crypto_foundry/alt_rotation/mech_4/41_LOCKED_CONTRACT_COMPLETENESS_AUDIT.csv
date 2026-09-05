@@ -1,0 +1,37 @@
+id,requirement,completeness,result_evidence,result_status
+SEC_A_RANK,Rank transition anatomy,COMPLETE,125 events,POSITIVE
+SEC_A_PERSIST,Band persistence,COMPLETE,Escape-by-age,POSITIVE
+SEC_A_CASCADE,Band cascade tested,COMPLETE,CONC_VIA_BROAD_RISK,POSITIVE
+SEC_B_ROUTING,BTC/ETH/alt routing,COMPLETE,State-conditioned,POSITIVE
+SEC_C_SECTOR,Sector rotation,COMPLETE,Routing graph,POSITIVE
+SEC_C_LEADER,Leader/follower,COMPLETE,Separable gates,POSITIVE
+SEC_D_BREADTH,Breadth anatomy,COMPLETE,breadth30 strongest,POSITIVE
+SEC_E_STABLE,Stablecoin flow,PARTIAL,chain_tvl only,POSITIVE
+SEC_F_CHAIN,Chain flow,PARTIAL,Activation NOT established,NULL/NOT_EARNED
+SEC_G_PERSIST,Persistence/exhaustion,COMPLETE,"52 reentry, 44 mixed",POSITIVE
+SEC_H_LEDGER,Episode ledger,COMPLETE,"126 entries, 125 exits",POSITIVE
+SEC_I_DEP,Dependence-aware uncertainty,COMPLETE,Perm p corrected,POSITIVE
+SEC_J_MULTITEST,Multiple testing,COMPLETE,BH-FDR,POSITIVE
+SEC_K_SUBPERIOD,Subperiod stability,COMPLETE,By subperiod,POSITIVE
+SEC_L_VALUE,Incremental value,COMPLETE,R2 0.076->0.195,POSITIVE
+SEC_M_REGISTRY,Mechanism registry,COMPLETE,8 nodes,POSITIVE
+SEC_N_NO_PNL,No PnL,COMPLETE,,POSITIVE
+SEC_O_NO_STRAT,No strategy,COMPLETE,,POSITIVE
+ADD_A_P1,P1 micro-perturbation,COMPLETE,"{'GLOBAL_BREADTH_DISPERSION': 464, 'RANK_BAND_REPRICING': 289, 'TRUE_STALL': 29, 'OFFSETTING_LOCAL_ROTATION': 15}",POSITIVE
+ADD_B_TEMPORAL,Temporal delivery,COMPLETE,All TAU w censoring,POSITIVE
+ADD_C_LATTICE,Natural temporal lattice,COMPLETE,TEMPORAL_LATTICE_EARNED,POSITIVE
+ADD_D_FIRSTMOVE,First move vs delivery,COMPLETE,Bootstrap + alt def,POSITIVE
+ADD_E_ACCUM,Accumulation-like,COMPLETE,MERGE_ABSORBED_BY_BREADTH,POSITIVE
+ADD_F_SECONDORDER,Second-order routing,COMPLETE,Latency + dwell,POSITIVE
+ADD_G_TERM,Termination precursor,COMPLETE,EARLY_DECAY_SIGNAL,POSITIVE
+ADD_H_BIF,Bifurcation,COMPLETE,6/15 planes,POSITIVE
+ADD_I_VOL,Volatility lifecycle,COMPLETE,Functional role,POSITIVE
+CL_42,Transient vs sustained,COMPLETE,Touch/dwell,POSITIVE
+CL_43,P1 pseudoreplication,COMPLETE,Chain/global/boot/LOCO,POSITIVE
+CL_44,Purged temporal CV,COMPLETE,G3 purged AUC=0.625,POSITIVE
+CL_45,Statistical corrections,COMPLETE,All perm p corrected,POSITIVE
+CL_46,Node review,COMPLETE,8 nodes,POSITIVE
+CL_47,Closeout summary,COMPLETE,,POSITIVE
+CL_48,Closeout decision,COMPLETE,,POSITIVE
+IR_TAU,Complete TAU set,COMPLETE,perturb=124 exit=103,POSITIVE
+IR_G3,G3 canonical reconciliation,COMPLETE,SUPPORTED_WITH_LIMITATIONS,POSITIVE

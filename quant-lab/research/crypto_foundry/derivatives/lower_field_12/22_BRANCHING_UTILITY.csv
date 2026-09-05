@@ -1,0 +1,7 @@
+metric,value,note
+n_generations_approx,"3 (G1<=7d, G2=7d/1d, G3=30d/7d)",
+R2_median,1.0,
+R3_median,1.0,
+extinction_timing,not directly observable; daily resolution,
+R2_range_across_species,0.2679,"if ~0, branching adds no structural distinction across species"
+VERDICT,PARK,

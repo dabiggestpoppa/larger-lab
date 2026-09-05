@@ -1,0 +1,5 @@
+result,status,n,reason
+mech12_constraint_entropy_join,DATA_BLOCKED,0,mech_12 constraint-entropy artifact unavailable in this checkout (13b_FIELD_JOIN_VERDICT)
+corr_family_peer_return_relational_metrics,DATA_BLOCKED,0,"CORR peer maps carry no peer_return (LF5 quality row 1.0); return-based relational metrics restricted to BEHAVIORAL_10/STATE/HYBRID_10, never substituted"
+relational_state_persistence_cond_sparse_cells,APPROXIMATE,0,conditional persistence at +30/+60 uses nearest-snapshot lookup; sparse event anchoring gives small n (e.g. 12/9)
+sigma_shock_reorg_response,NO_STABLE_RELATION,3,SIGMA_SHOCK response curve has no stable monotone relation (normalized surprise is not the reorganization driver)

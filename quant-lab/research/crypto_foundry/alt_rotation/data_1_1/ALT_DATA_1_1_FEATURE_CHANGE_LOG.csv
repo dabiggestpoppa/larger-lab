@@ -1,0 +1,11 @@
+feature,v1_hash,v2_hash,changed_rows,max_abs_diff,reason
+relative_return_vs_BTC_*d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.9497,Calendar-day benchmark alignment
+relative_return_vs_ETH_*d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.8134,Calendar-day benchmark alignment
+rolling_beta_vs_BTC_30d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.0000,Calendar-day benchmark alignment
+rolling_beta_vs_BTC_60d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.0000,Calendar-day benchmark alignment
+rolling_beta_vs_BTC_90d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.0000,Calendar-day benchmark alignment
+rolling_beta_vs_ETH_30d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.0000,Calendar-day benchmark alignment
+rolling_beta_vs_ETH_60d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.0000,Calendar-day benchmark alignment
+rolling_beta_vs_ETH_90d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.0000,Calendar-day benchmark alignment
+residual_return_vs_BTC_*d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.0000,Calendar-day benchmark alignment
+residual_return_vs_ETH_*d,12655965882ffe6a...,0d666e74c0cf76ad...,1049060,0.0000,Calendar-day benchmark alignment

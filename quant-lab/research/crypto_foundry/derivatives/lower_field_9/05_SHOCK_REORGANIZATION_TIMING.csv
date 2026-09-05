@@ -1,0 +1,12 @@
+event,n_detected,median_lag_after_t0_d,bootstrap_95ci,p25_lag,p75_lag,p_after_t0,p_same_day_as_t0,n_anchors,note
+T1_MEMBERSHIP_TURNOVER,1470,0.0,"[0.0, 0.0]",0.0,0.0,0.9,0.0905,1470,
+T2_RELATIONAL_STATE_CHANGE,145,5.0,"[3.0, 6.0]",2.0,12.0,0.0939,0.0034,1470,
+T3_CONTAGION_REJOIN_DECOUPLING,120,4.0,"[3.0, 6.0]",1.0,10.0,0.0782,0.0034,1470,
+t1_turnover_before_t2_state_change,145,0.9448,,,,,,1470,fraction of anchors where A precedes B
+t1_turnover_before_t3_transport,120,0.9333,,,,,,1470,fraction of anchors where A precedes B
+t2_state_change_before_t3_transport,120,0.0,,,,,,1470,fraction of anchors where A precedes B
+SUBPERIOD_2020-2021,439,0.0,,0.0,0.0,,,1470,
+SUBPERIOD_2022,250,0.0,,0.0,0.0,,,1470,
+SUBPERIOD_2023,167,0.0,,0.0,0.0,,,1470,
+SUBPERIOD_2024,252,0.0,,0.0,0.0,,,1470,
+SUBPERIOD_2025-2026,362,0.0,,0.0,0.0,,,1470,

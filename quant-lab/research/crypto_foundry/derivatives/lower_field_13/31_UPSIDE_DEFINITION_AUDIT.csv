@@ -1,0 +1,4 @@
+function,issue,definition,rejoin_hi,rejoin_lo,delta,finding
+COHERENCE,A-negative-delta,ups_current_coherence = peer_corr >= median (T0),0.1338,0.1448,-0.011,"delta is NEGATIVE — coherence is not a positive amplifier for rejoin; LF12 wording that all 7 functions lift is corrected: coherence is a weak negative or neutral condition, not an amplifier"
+REJOIN vs POSITIVE_HISTORY,B-aliasing,"ups_positive_history = prev_rejoin (prior-event, PIT-safe)",,,1.0,"ups_positive_history is definitionally identical to prev_rejoin (overlap 1.0) — the two are ALIASED; LF13 treats them as one 'positive history' coordinate, not two functions"
+VERDICT,,UPSIDE_FUNCTIONS_ARE_WEAK_AMPLIFIERS,,,,"after correction: coherence is neutral/negative; positive-history and rejoin are one aliased coordinate; the remaining PIT-safe functions are weak amplifiers, not hard permission gates"

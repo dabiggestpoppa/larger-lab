@@ -1,0 +1,9 @@
+result,verdict,reason
+SHMC-specific tail-activation gradient,DISSOLVED,lower tail than every other momentum state at all depths; the LF1 21->30% claim is a shared-depth artifact
+sector/chain residual displacement effect,NULL (residual),"0 cells BH-sig after mean-centering on (band, vol-quintile, age); descriptive atlas variation is compositional"
+volatility-quintile within-date lens,DISSOLVED (degenerate),mkt_vol_30d is date-constant; within-date ranking degenerates; use vol_regime instead
+liquidity Q5 (highest-volume) tail rate,DATA/ARTIFACT (excluded),micro-N (1-1.2k) with near-zero trailing sigma -> inflated z; not a genuine displacement lens
+impossible 181-sigma cross-rank moves (LF1),RESOLVED (integrity bug fixed),multi-day return algorithm corrected; now sane diffusion scaling
+'~329k events / 10% >=3sigma' framing,DISSOLVED,329k = union of event lenses (raw-15% dominated); true unconditional 1D >=3sigma = 2.25%
+MECH-4 EXIT -> lower-field dispersion handoff,"NULL (LF1 confirmed, not retested)",carried from LF1; discrete exit events do not produce dispersion handoff; breadth state does
+time-to-peak beyond 21-30D horizon,DATA_LIMITED,forward horizon capped at 30D; censoring not modeled for longer decay

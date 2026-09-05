@@ -1,0 +1,316 @@
+{
+  "schema_version": "1.0.0",
+  "run_started_at": "2026-08-24T14:00:11+00:00",
+  "run_finished_at": "2026-08-24T14:06:59+00:00",
+  "probe_count": 44,
+  "probes": [
+    {
+      "name": "coingecko_ping",
+      "http_status": 401,
+      "row_count": 0,
+      "sha256_prefix": "01cd461908dc",
+      "error": null
+    },
+    {
+      "name": "coingecko_coins_list",
+      "http_status": 200,
+      "row_count": 18656,
+      "sha256_prefix": "48ed86321fb8",
+      "error": null
+    },
+    {
+      "name": "coingecko_markets_top250",
+      "http_status": 200,
+      "row_count": 250,
+      "sha256_prefix": "d28a0625a80d",
+      "error": null
+    },
+    {
+      "name": "coingecko_categories_list",
+      "http_status": 200,
+      "row_count": 865,
+      "sha256_prefix": "9111f040ee3e",
+      "error": null
+    },
+    {
+      "name": "coingecko_btc_market_chart_max",
+      "http_status": 401,
+      "row_count": 0,
+      "sha256_prefix": "71e47632ab7a",
+      "error": null
+    },
+    {
+      "name": "coingecko_lunc_market_chart_max",
+      "http_status": 429,
+      "row_count": 0,
+      "sha256_prefix": "6529e19eb4c1",
+      "error": null
+    },
+    {
+      "name": "coingecko_ftt_market_chart_max",
+      "http_status": 429,
+      "row_count": 0,
+      "sha256_prefix": "6529e19eb4c1",
+      "error": null
+    },
+    {
+      "name": "coingecko_serum_market_chart_max",
+      "http_status": 429,
+      "row_count": 0,
+      "sha256_prefix": "6529e19eb4c1",
+      "error": null
+    },
+    {
+      "name": "coingecko_btc_meta",
+      "http_status": 429,
+      "row_count": 0,
+      "sha256_prefix": "6529e19eb4c1",
+      "error": null
+    },
+    {
+      "name": "coingecko_global",
+      "http_status": 429,
+      "row_count": 0,
+      "sha256_prefix": "6529e19eb4c1",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_coins",
+      "http_status": 200,
+      "row_count": 61115,
+      "sha256_prefix": "5113481e41ae",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_tickers_top20",
+      "http_status": 200,
+      "row_count": 20,
+      "sha256_prefix": "13b8c553a708",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_btc_historical_rank",
+      "http_status": 402,
+      "row_count": 0,
+      "sha256_prefix": "68f7cb87cf06",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_btc_historical_recent",
+      "http_status": 200,
+      "row_count": 4,
+      "sha256_prefix": "d826fcca736a",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_btc_ticker_current",
+      "http_status": 200,
+      "row_count": 0,
+      "sha256_prefix": "373f66dee600",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_lunc_historical_rank",
+      "http_status": 402,
+      "row_count": 0,
+      "sha256_prefix": "877fa22e26b0",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_ftt_historical_rank",
+      "http_status": 402,
+      "row_count": 0,
+      "sha256_prefix": "786d1c446aa6",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_serum_meta",
+      "http_status": 404,
+      "row_count": 0,
+      "sha256_prefix": "8dbee780dea6",
+      "error": null
+    },
+    {
+      "name": "coinpaprika_global",
+      "http_status": 200,
+      "row_count": 0,
+      "sha256_prefix": "5e51ce846b13",
+      "error": null
+    },
+    {
+      "name": "coinmarketcap_web_historical_20240601",
+      "http_status": 200,
+      "row_count": 0,
+      "sha256_prefix": "8b3b1e74a52c",
+      "error": null
+    },
+    {
+      "name": "coinmarketcap_api_historical_no_key",
+      "http_status": 401,
+      "row_count": 0,
+      "sha256_prefix": "793f4217ddb1",
+      "error": null
+    },
+    {
+      "name": "coinmarketcap_web_api_historical_probe",
+      "http_status": 200,
+      "row_count": 0,
+      "sha256_prefix": "a26d3693f065",
+      "error": null
+    },
+    {
+      "name": "dexscreener_tokens_weth",
+      "http_status": null,
+      "row_count": 0,
+      "sha256_prefix": "e3b0c44298fc",
+      "error": "ReadTimeout: HTTPSConnectionPool(host='api.dexscreener.com', port=443): Read timed out. (read timeout=45)"
+    },
+    {
+      "name": "dexscreener_token_pairs_v1_weth",
+      "http_status": null,
+      "row_count": 0,
+      "sha256_prefix": "e3b0c44298fc",
+      "error": "ReadTimeout: HTTPSConnectionPool(host='api.dexscreener.com', port=443): Read timed out. (read timeout=45)"
+    },
+    {
+      "name": "dexpaprika_networks",
+      "http_status": 404,
+      "row_count": 0,
+      "sha256_prefix": "8699bf1eda7e",
+      "error": null
+    },
+    {
+      "name": "dexpaprika_token_weth",
+      "http_status": 404,
+      "row_count": 0,
+      "sha256_prefix": "8699bf1eda7e",
+      "error": null
+    },
+    {
+      "name": "dexpaprika_pairs_weth_usdc",
+      "http_status": 404,
+      "row_count": 0,
+      "sha256_prefix": "8699bf1eda7e",
+      "error": null
+    },
+    {
+      "name": "binance_fapi_ping",
+      "http_status": 451,
+      "row_count": 0,
+      "sha256_prefix": "79c1db471a4c",
+      "error": null
+    },
+    {
+      "name": "binance_spot_ping",
+      "http_status": 451,
+      "row_count": 0,
+      "sha256_prefix": "79c1db471a4c",
+      "error": null
+    },
+    {
+      "name": "binance_spot_mirror_klines",
+      "http_status": 200,
+      "row_count": 3,
+      "sha256_prefix": "bcd7572607b6",
+      "error": null
+    },
+    {
+      "name": "binance_fapi_mirror_exchange_info",
+      "http_status": 404,
+      "row_count": 0,
+      "sha256_prefix": "d465172175d3",
+      "error": null
+    },
+    {
+      "name": "binance_fapi_exchange_info",
+      "http_status": 451,
+      "row_count": 0,
+      "sha256_prefix": "79c1db471a4c",
+      "error": null
+    },
+    {
+      "name": "binance_fapi_btc_klines_oldest",
+      "http_status": 451,
+      "row_count": 0,
+      "sha256_prefix": "79c1db471a4c",
+      "error": null
+    },
+    {
+      "name": "binance_fapi_btc_funding_oldest",
+      "http_status": 451,
+      "row_count": 0,
+      "sha256_prefix": "79c1db471a4c",
+      "error": null
+    },
+    {
+      "name": "binance_fapi_trading_status",
+      "http_status": 451,
+      "row_count": 0,
+      "sha256_prefix": "79c1db471a4c",
+      "error": null
+    },
+    {
+      "name": "bybit_instruments_linear_p1",
+      "http_status": 403,
+      "row_count": 0,
+      "sha256_prefix": "7ef856c94570",
+      "error": null
+    },
+    {
+      "name": "bybit_instruments_linear_p2",
+      "http_status": 403,
+      "row_count": 0,
+      "sha256_prefix": "7ef856c94570",
+      "error": null
+    },
+    {
+      "name": "bybit_funding_btc_oldest",
+      "http_status": 403,
+      "row_count": 0,
+      "sha256_prefix": "7ef856c94570",
+      "error": null
+    },
+    {
+      "name": "okx_instruments_swap",
+      "http_status": 200,
+      "row_count": 454,
+      "sha256_prefix": "25bac37faffb",
+      "error": null
+    },
+    {
+      "name": "okx_btc_swap_funding_oldest",
+      "http_status": 200,
+      "row_count": 0,
+      "sha256_prefix": "fc24d69479ed",
+      "error": null
+    },
+    {
+      "name": "hyperliquid_meta",
+      "http_status": 200,
+      "row_count": 232,
+      "sha256_prefix": "eb191a003d8a",
+      "error": null
+    },
+    {
+      "name": "hyperliquid_meta_and_asset_ctxs",
+      "http_status": 200,
+      "row_count": 2,
+      "sha256_prefix": "f194eb260cd3",
+      "error": null
+    },
+    {
+      "name": "hyperliquid_funding_btc_oldest",
+      "http_status": 200,
+      "row_count": 500,
+      "sha256_prefix": "aff6213fba21",
+      "error": null
+    },
+    {
+      "name": "hyperliquid_candles_btc_oldest",
+      "http_status": 200,
+      "row_count": 2197,
+      "sha256_prefix": "64a9fd1745f1",
+      "error": null
+    }
+  ]
+}

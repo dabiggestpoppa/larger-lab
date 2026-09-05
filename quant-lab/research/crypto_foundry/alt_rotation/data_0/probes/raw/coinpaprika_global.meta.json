@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_global",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/global",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:36+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "5e51ce846b13384816e2a9e5c4b27784c867376d7018f1df95643d203342e063",
+  "bytes": 451,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "",
+  "notes": "current global snapshot (context)",
+  "final_url": "https://api.coinpaprika.com/v1/global",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:36 GMT",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Content-Length": "265",
+    "Connection": "keep-alive",
+    "cache-control": "public, max-age=60, s-maxage=60, stale-while-revalidate=10, stale-if-error=600",
+    "content-encoding": "gzip",
+    "vary": "Accept-Encoding, Origin",
+    "h-hap": "01",
+    "Accept-Ranges": "bytes",
+    "Age": "291",
+    "last-modified": "Mon, 24 Aug 2026 13:57:02 GMT",
+    "cf-cache-status": "HIT",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3cfbc1a4314-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

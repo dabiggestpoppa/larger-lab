@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_archive_1000pepeusdt_202406",
+  "http_status": 200,
+  "retrieved_at": "2026-08-24T14:21:58+00:00",
+  "sha256": "dcbb22f4f93273c8263e15e9f02ef5efdd801720a0497cadd32eade1372366f8",
+  "bytes": 2159,
+  "request_params": {
+    "url": "https://data.binance.vision/data/futures/um/monthly/klines/1000PEPEUSDT/1d/1000PEPEUSDT-1d-2024-06.zip"
+  }
+}

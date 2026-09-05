@@ -1,0 +1,5 @@
+surface,group_col,topology_metric,topology_chrono_rho,topology_pairs,transfer_metric,transfer_chrono_rho,transfer_pairs,verdict
+TOPOLOGY_4STATE,grp4s,self_transition,0.667,3,prop7,1.0,3,FREEZE_CANDIDATE
+TOPOLOGY_6CELL,grp6,self_transition,0.767,3,prop7,0.867,3,FREEZE_CANDIDATE
+TOPOLOGY_8CELL,grp8,self_transition,0.895,3,prop7,0.924,3,FREEZE_CANDIDATE
+LOCAL_HIGHWAYS_6CELL,grp6,modal_exit,0.943,6,n/a,,0,INVARIANT_CANDIDATE

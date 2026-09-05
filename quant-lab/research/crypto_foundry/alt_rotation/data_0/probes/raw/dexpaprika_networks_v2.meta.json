@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "dexpaprika_networks_v2",
+  "method": "GET",
+  "url": "https://api.dexpaprika.com/networks",
+  "request_params": null,
+  "request_json": null,
+  "retrieved_at": "2026-08-24T14:11:00+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 36,
+  "first_record": {
+    "display_name": "Sonic",
+    "id": "sonic",
+    "volume_usd_24h": 1333667.6112383653,
+    "txns_24h": 41384,
+    "pools_count": 395
+  },
+  "last_record": {
+    "display_name": "Scroll",
+    "id": "scroll",
+    "volume_usd_24h": 597376.6862960034,
+    "txns_24h": 7113,
+    "pools_count": 27
+  },
+  "sha256": "08a4ae400c20ff43771d7a8f4f5867449a426449f30f7eb8ce85f2314fbd6d5f",
+  "bytes": 4111,
+  "access_class": "PUBLIC",
+  "notes": "networks list (correct base path)",
+  "known_limitations": ""
+}

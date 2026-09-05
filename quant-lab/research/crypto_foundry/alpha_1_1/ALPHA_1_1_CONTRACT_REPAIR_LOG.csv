@@ -1,0 +1,9 @@
+repair_id,field,old,new,reason,ts
+1,data_split,start>end,2026-01-25 to 2026-08-21,impossible dates,2026-08-23T16:35:20Z
+2,coverage,25 promoted,"25 direct, 0 control, 0 rejected",exact mapping,2026-08-23T16:35:20Z
+3a,FAM_C,10 states,"C1=4 extreme, C2=6 normal->FAM_E",entry mismatch,2026-08-23T16:35:20Z
+3b,FAM_C2,6 states,DESIGN_REJECTED_REDUNDANT,duplicate FAM_E,2026-08-23T16:35:20Z
+4,FAM_D,3 states,"ETH-led 3 retained, SYSTEMIC=1 REJECTED",diff resolution,2026-08-23T16:35:20Z
+5,FAM_E S011,PRIMARY_MECHANISM,EXPLORATORY_EXPRESSION,ambiguous direction,2026-08-23T16:35:20Z
+6a,contracts,13 count,13 count,controls+direction+thresholds,2026-08-23T16:35:20Z
+11,registry_hash,5f7c3b6024a6e576...,2abaf8c21200a67e...,rehashed after repairs,2026-08-23T16:35:20Z

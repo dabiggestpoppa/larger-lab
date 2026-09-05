@@ -1,0 +1,6 @@
+tempo,n,down_n,up_n,down_share,down_reach_1d,up_reach_1d,reach_gap_1d,shock_gap,p_decouple_down,p_decouple_up,note
+FAST,522,457,65,0.8755,0.5714,0.6,-0.0286,0.0939,0.2144,0.3692,
+MEDIUM,118,95,23,0.8051,0.3,0.2,0.1,0.001,0.2105,0.4783,
+SLOW,193,140,53,0.7254,0.7,0.8,-0.1,0.0089,0.0286,0.5283,
+PERSISTENT,158,131,27,0.8291,0.3,0.4,-0.1,0.0049,0.1069,0.2963,
+VERDICT,,,,,,,,,,,"within-contagion, downside share is ~0.73-0.88 in every tempo (contagion is a predominantly downside phenomenon), but early-reach gaps are mixed and the decoupling-aftermath gap runs UPSIDE-higher in SLOW/MEDIUM — the sign gap is broad across tempos, not a pure speed phenomenon; tempo conditioning inverts some gaps vs the full sample, so species-level asymmetry is state-local"

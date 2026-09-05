@@ -1,0 +1,6 @@
+layer,n,p_rejoin,p_rank_up,med_rejoin_vel,p_positive_breadth,p_rank_up_30,p_price_up_30,p_decouple,note
+SOURCE_LOCAL_MOVE,1185.0,0.189,0.6312,,,,,,
+NEIGHBORHOOD_PARTICIPATION,1185.0,,,0.0,0.5055,,,,
+RANK_RECRUITMENT,1185.0,,,,,0.6312,0.3198,,
+DOWN_REFERENCE,2462.0,0.1154,,,,,,0.1665,
+VERDICT,,SYMMETRIC_RELATIONAL_PATHS,,,,,,,"upside rejoin path (0.189) vs downside decouple path (0.1665): relational outcomes are sign-specific, not mirrored"

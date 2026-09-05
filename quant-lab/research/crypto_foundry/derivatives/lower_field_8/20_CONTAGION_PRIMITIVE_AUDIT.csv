@@ -1,0 +1,14 @@
+coordinate,purged_auc_single,n,best_coordinate,best_pair
+roll_turnover_30d,0.4808,3647,,
+entropy_30d,0.5184,3647,,
+vol_30d,0.5539,3647,,
+abs_ret,0.5599,3647,,
+z1,0.5172,3647,,
+rank_vel_7d,0.6064,3647,,
+top500_breadth_30d,0.5042,3647,,
+state_age_d,0.4901,3647,,
+is_true_loner,0.5329,3647,,
+peer_stress,0.4839,3647,,
+BEST_SINGLE,0.6064,3647,rank_vel_7d,
+BEST_PAIR,0.6074,3647,,rank_vel_7d + abs_ret
+GREEDY_SET,0.6259,3647,,rank_vel_7d + is_true_loner

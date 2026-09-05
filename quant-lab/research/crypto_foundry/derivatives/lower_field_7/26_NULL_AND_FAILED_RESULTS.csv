@@ -1,0 +1,4 @@
+result,status,n,reason
+peer_current_state_similarity,DATA_BLOCKED,0,per-event peer_return correlation requires a dense aligned matrix not present in event cache
+peer_lifetime_60d_signal,APPROXIMATE,0,forward fwd60 column unavailable; lifetime at 60D falls back to base overlap floor
+shmc_shhm_placement,NOT_TESTED,0,deferred; LF6 showed no incremental value beyond loner x 4-state; LF7 focuses on absolute/sigma + catch radius

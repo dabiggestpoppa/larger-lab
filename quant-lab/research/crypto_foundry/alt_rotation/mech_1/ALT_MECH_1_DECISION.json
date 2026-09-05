@@ -1,0 +1,37 @@
+{
+  "checkpoint": "CRYPTO-ALT-MECH-1-RANK-MIGRATION-LEAD-LAG-SECTOR-AND-CAPITAL-FLOW-ANATOMY",
+  "base_sha": "2c36afd0ee3f1670506b7c824513b64930e7626b",
+  "parent_checkpoint": "CRYPTO-ALT-DATA-1.1-BENCHMARK-TRUTH-SEAL-AND-CAPITAL-FLOW-ENRICHMENT",
+  "parent_decision": "PASS_ALT_DATA_TRUTH_SEAL_WITH_METEORA_DEFERRED",
+  "decision": "PASS_ALT_MECHANISM_ANATOMY",
+  "v2_feature_hash": "0d666e74c0cf76adf6e6e6f2a6c47b1f52116f070fd1376c83274e6b077703ba",
+  "v2_feature_hash_note": "Checkpoint brief quoted this hash with two hex characters dropped ('e6'); canonical recomputed hash matches DATA-1.1 frozen registry.",
+  "registry_definition_hash": "ea7eca86a2656654c65f20971d5fc70374adfbba4186c5f9a2a48c4ce21917ef",
+  "pit_rows": 1098000,
+  "unique_assets": 2898,
+  "included_dates": 2196,
+  "excluded_source_gap_dates": 79,
+  "raw_episode_count": 57683,
+  "effective_episode_cluster_count": 21146,
+  "supported_mechanisms": [
+    "RANK_PERSISTENCE",
+    "LEADER_FIRST_SECTOR_ROTATION",
+    "FOLLOWER_CATCHUP",
+    "CHAIN_FLOW_LEAD",
+    "RANK_EXHAUSTION"
+  ],
+  "weak_mechanisms": [
+    "STABLECOIN_LEAD"
+  ],
+  "inconclusive_mechanisms": [
+    "BAND_CASCADE",
+    "BTC_TO_ETH_TO_ALT_SEQUENCE",
+    "BREADTH_CONFIRMATION"
+  ],
+  "not_supported_mechanisms": [],
+  "no_pnl": true,
+  "no_strategy_design": true,
+  "no_ml": true,
+  "meteora_status": "PARTIAL_PROXY_ONLY",
+  "generated_utc": "2026-08-26T14:48:30.228175+00:00"
+}

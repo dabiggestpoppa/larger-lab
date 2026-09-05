@@ -1,0 +1,2 @@
+n_assets,p_topology_fast_role_slow,p_both_fast,p_both_slow,p_state_dependent,spearman_turnover_vs_state_change,spearman_p,median_membership_turnover,median_state_change_rate,median_relational_state_survival,verdict
+271,0.0996,0.1845,0.2251,0.4908,0.3936,0.0,0.8562,0.5,0.5714,STATE_DEPENDENT

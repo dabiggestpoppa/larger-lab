@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_spot_ping",
+  "method": "GET",
+  "url": "https://api.binance.com/api/v3/ping",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:06:29+00:00",
+  "http_status": 451,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+  "bytes": 224,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "",
+  "notes": "spot main API connectivity probe",
+  "final_url": "https://api.binance.com/api/v3/ping",
+  "response_headers_safe": {
+    "Server": "CloudFront",
+    "Date": "Mon, 24 Aug 2026 14:06:28 GMT",
+    "Content-Length": "224",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "X-Cache": "Error from cloudfront",
+    "Via": "1.1 dc2c9775397edd7b6dcd6264e93076ba.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Pop": "BOS50-P2",
+    "X-Amz-Cf-Id": "KsFB72SS1xeyBZgv96bONaIZRp40wdaKJ0Z5DVleYFDpfp8hpUPWuw=="
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-1.1-CONTRACT-INTEGRITY-AND-BACKTEST-READINESS-SEAL",
+  "parent": "ALPHA-1",
+  "parent_sha": "3ad0a3ab9443c193c92c2f38e629d6c7e6e8ca90",
+  "decision": "PASS_ALPHA_CONTRACT_INTEGRITY",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "pnl_observed": false,
+  "strategy_count": 13,
+  "control_count": 6,
+  "mechanism_families": 6,
+  "repairs_applied": 8,
+  "old_hash": "5f7c3b6024a6e5767cd49b49084c84795ef0b89ca8fcf65feb42eaa17bcbf5a7",
+  "new_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "next": "CRYPTO-ALPHA-2-PREREGISTERED-BACKTEST-AND-FALSIFICATION"
+}

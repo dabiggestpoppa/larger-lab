@@ -1,0 +1,7 @@
+coordinate,viable_mean,aborted_mean,cohens_d,p_value,direction,mechanism
+exit_entropy,0.152,0.701,1.295,0.0,aborted_higher,unresolved_route_set
+n_live_exits,0.954,1.888,1.366,0.0,aborted_higher,physical
+route_deformation_js,0.24,0.233,0.039,0.976,aborted_lower,unresolved_route_set
+dominant_share_instability,0.184,0.125,0.663,0.0,aborted_lower,unresolved_route_set
+exit_p1,0.71,0.752,0.14,0.002,aborted_higher,physical
+BOTH_OPEN_AND_UNSTABLE,,2.323,,,n_live=2.32 std_p1=0.144,diagnostic

@@ -1,0 +1,6 @@
+operation,object,evidence,decision
+NEW_NODE,chain TVL level / TVL 7D change / TVL share,WS A: max TVL-family |r| = 0.683 (tvl_chg30-tvl_share class=CANDIDATE_DISTINCT); 0 REDUNDANT_PROXY pairs across all 66 chain-liquidity pairs,CONFIRMED
+NEW_NODE,native improving share (imp_share) vs TVL coordinates,WS A: imp_share max |r| vs others = 0.814 (PARTIAL_PROXY only vs vel7); WS B: 5 SURVIVES cells all VELOCITY->NATIVE_IMPROVING,CONFIRMED
+NEW_NODE,concentration pivot boundary coordinates,"WS F: 6/10 coordinates with |rho| >= 0.5 bin->probability monotonicity (top3_share exit rho=-0.66, breadth exit rho=-0.68, dispersion enter rho=-0.93)",CONFIRMED
+DISSOLVE,global stablecoin as universal chain-liquidity driver,"WS B: STABLECOIN->TVL SURVIVES=0, DISSOLVES=10, NO_RELATION=30; WS J: DEPLOYABLE_LIQUIDITY delta_r2=0.0003",CONFIRMED
+NEW_NODE,primitive candidates,WS J: GLOBAL_CANDIDATE_PRIMITIVE = ['VOLATILITY']; VOLATILITY survives removal (delta_r2=0.0054) and is top-3 in 5/5 subperiods; DEPLOYABLE_LIQUIDITY/BREADTH NOT_PRIMITIVE,CONFIRMED

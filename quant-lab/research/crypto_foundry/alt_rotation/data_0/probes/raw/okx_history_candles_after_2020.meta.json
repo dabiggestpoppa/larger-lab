@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "okx_history_candles_after_2020",
+  "method": "GET",
+  "url": "https://www.okx.com/api/v5/market/history-candles",
+  "request_params": {
+    "instId": "BTC-USDT-SWAP",
+    "after": "1600000000000",
+    "limit": "5"
+  },
+  "http_status": 200,
+  "retrieved_at": "2026-08-24T14:20:09+00:00",
+  "sha256": "9f3d00184958639afccc9c1dd460d2b6204ea252b0768e58e926cd32c2772345",
+  "bytes": 465
+}

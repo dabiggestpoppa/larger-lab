@@ -1,0 +1,8 @@
+patch,recent_max30_dR2_test,recent_max30_dR2_train,drawdown30_dR2_test,drawdown30_dR2_train,cum_load30_dR2_test,cum_load30_dR2_train,time_above_90d_dR2_test,time_above_90d_dR2_train,time_since_breach_dR2_test,time_since_breach_dR2_train,time_since_peak_dR2_test,time_since_peak_dR2_train,crossings_90d_dR2_test,crossings_90d_dR2_train,best_memory_var,best_dR2,memory_verdict
+26-100,0.0001,0.0001,0.0001,0.0001,0.0034,0.0001,0.001,0.0014,0.0,0.0007,0.0053,0.0004,0.0,0.0003,time_since_peak,0.0053,STATE_LOCAL_MEMORY
+101-250,0.0,0.0,0.0,0.0,0.0041,0.0001,0.0007,0.0019,0.0004,0.0005,0.0042,0.001,0.0,0.0,time_since_peak,0.0042,STATE_LOCAL_MEMORY
+251-500,0.0002,0.0,0.0002,0.0,0.0026,0.0003,0.0001,0.0022,0.0007,0.0004,0.0059,0.0013,0.0007,0.0,time_since_peak,0.0059,STATE_LOCAL_MEMORY
+501-750,0.0,0.0,0.0,0.0,0.0045,0.0002,0.0002,0.0027,0.0003,0.0012,0.0046,0.0018,0.0001,0.0002,time_since_peak,0.0046,STATE_LOCAL_MEMORY
+751-1000,0.0001,0.0,0.0001,0.0,0.0033,0.0003,0.0002,0.0016,0.0006,0.0014,0.0037,0.0014,0.0002,0.0014,time_since_peak,0.0037,STATE_LOCAL_MEMORY
+1001-1500,0.0005,0.0001,0.0005,0.0001,0.0038,0.0,0.0002,0.0016,0.001,0.0022,0.0043,0.002,0.0005,0.003,time_since_peak,0.0043,STATE_LOCAL_MEMORY
+1501-2000,0.0024,0.0,0.0024,0.0,0.0015,0.0001,0.0004,0.0006,0.0032,0.0012,0.0028,0.0013,0.0024,0.0053,time_since_breach,0.0032,STATE_LOCAL_MEMORY

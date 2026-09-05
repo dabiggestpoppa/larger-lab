@@ -1,0 +1,29 @@
+node,status,action,note
+LOCAL_PHYSICS_HIERARCHY,COMPUTED,PROMOTE_STRUCTURAL_CAPACITY_LAYER,structural_integrity / accumulated_load / absorption_capacity / relational_reorganization / containment_decay links SUPPORTED; current_shock_load + propagation_susceptibility LOCAL (02)
+CAPACITY_FAMILIES,COMPUTED,KEEP_TIGHT,structural / liquidity / rank-health / stress / recovery families measured (03)
+LOCAL_CAPACITY_SURFACE,COMPUTED,PROMOTE_IF_STABLE (STABLE_LOCAL_CAPACITY_SURFACE),structural-integrity x accumulated-load surface (04); deps: REGIME_LOCAL_CAPACITY
+ABSORPTION_VS_CONTAINMENT,COMPUTED,PROMOTE_DISTINCT_LAWS,absorption and containment feature-rank distinctness => DISTINCT_LAWS (06)
+PRIOR_SHOCK_BURDEN,COMPUTED,PROMOTE_BEST_CONSTRUCT,best burden construction by purged AUC: days_since_prior
+SHOCK_MEMORY_KERNEL,COMPUTED,PROMOTE_EXP_WITH_CONSTRAINED_HORIZON,kernels compared (exp/power/finite); best grid-row id exp_half_life_180d
+DAMAGE_ACCUMULATION,COMPUTED,KEEP_AS_DESCRIPTIVE,verdict: NO_FRAGILITY_ACCELERATION (10)
+RECOVERY_RESET,COMPUTED,KEEP_AS_LOCAL_LAW,verdict: STATE_DEPENDENT; time-without-shock / rank repair / stability (11)
+STRESS_DEFORMATION_PILOT,COMPUTED,KEEP_DESCRIPTIVE_ONLY,STABLE_RESPONSE_REGIONS; physics analogy not forced into ontology (12)
+SHOCK_SPECIES_HIERARCHY,COMPUTED,PROMOTE_FEW_FAMILIES,verdict: FEW_FAMILIES_WITH_CONTINUOUS_OVERLAY (13)
+TOPOLOGY_CHURN_HIERARCHY,COMPUTED,KEEP_TIGHT,churn->who-left->who-entered->replacement->coherence->rank links measured (14)
+REPLACEMENT_QUALITY,COMPUTED,KEEP_TIGHT,added-vs-dropped forward returns + churn quantity/quality (15)
+CHURN_SHOCK_INTERACTION,COMPUTED,KEEP_TIGHT,matched mag: does churn change absorption/propagation (16)
+CONTAGION_CONTINUOUS_SPACE,COMPUTED,PROMOTE_AS_CONTINUOUS_OVERLAY,latency/peak/radius/depth/persistence/speed measured; redundancy verdict (17)
+CONTAGION_TEMPORAL_SPECIES,COMPUTED,PROMOTE_IF_STABLE,"verdict: FEW_TEMPORAL_SPECIES; silhouette 0.36, 4 stable across 5 subperiods (18)"
+EARLY_CONTAGION_PLACEMENT,COMPUTED,KEEP_AS_CONTINUOUS_PLACEMENT,"verdict: MIXTURE_SPECIES — EC sits in the contagion space, not a discrete singleton (19)"
+CONTAGION_GENERATIONS,COMPUTED,KEEP_TIGHT,G0->G1->G2->G3 descriptive generation geometry (20); daily resolution
+BRANCHING_PILOT,COMPUTED,KEEP_AS_DESCRIPTIVE_AMPLIFICATION,"verdict: SELF_SUSTAINING_LOOKING_SPREAD (descriptive analogy only, 21)"
+PROPAGATION_SCALING,COMPUTED,KEEP_REFERENCE,"radius~t^alpha, alpha ~0.13, r2~0.55 => WEAK (22)"
+CONTAGION_DECAY,COMPUTED,KEEP_TIGHT,decay law fitted EXPONENTIAL; daily resolution (23)
+REACTIVATION,COMPUTED,PROMOTE_AS_CONDITIONAL_NODE,AFTER_PRIOR_CONTAGION raises relapse vs baseline (24)
+PERSISTENT_DECOUPLING_MECHANISMS,COMPUTED,KEEP_MULTI_MECHANISM,min mechanisms: MULTI_MECHANISM (25)
+DOWNSIDE_MECHANICAL_LAYER,DATA_BLOCKED,HONESTLY_DATA_BLOCKED,funding/OI/liquidations/spread/depth absent from free-only substrate (27)
+SIGN_ASYMMETRY_ROUND2,COMPUTED,KEEP_IRREDUCIBLE,down log-odds after mechanical pass: IRREDUCIBLE_AFTER_MECHANICS (28)
+CORRELATION_COMPRESSION,COMPUTED,KEEP_AS_CANDIDATE_PRIMITIVE,verdict: DOWN_SPECIFIC_CORRELATION (29)
+LIQUIDITY_X_RANK_HEALTH_MATRIX,COMPUTED,KEEP_AS_AMPLIFICATION_MATRIX,asymmetry amplified when damaged rank + thin liq coexist (30)
+UPSIDE_ACCUMULATION,COMPUTED,KEEP_AS_STATE_LOCAL,verdict: STATE_LOCAL (32)
+GLOBAL_LOCAL_MEMORY_CROSSCHECK,COMPUTED,PROMOTE_SHARED_PRINCIPLE,verdict: SEPARATE_LOCAL_GLOBAL_MEMORY (35)

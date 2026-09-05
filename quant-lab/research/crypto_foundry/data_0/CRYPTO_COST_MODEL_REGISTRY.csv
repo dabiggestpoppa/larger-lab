@@ -1,0 +1,10 @@
+venue,instrument_type,maker_fee,taker_fee,funding_frequency,funding_rate_typical,gas_notes,spread_estimate,impact_notes,withdrawal_fee,min_order,lot_size,margin_model,notes
+Uniswap v3 ETH,spot,0.30% pool fee (varies),0.30% pool fee (varies),n/a,n/a,variable gas ~$0.50-$50 Ethereum ~$0.01-$0.10 Base,0.01-0.10%,concentrated LP has lower impact,bridge cost if moving assets,1 wei,1 wei,n/a,fee taken from swap amount. Gas is primary cost on Ethereum. Base is cheap.
+Aerodrome,spot,0.04% (voted)+incentives,0.04% (voted),n/a,n/a,Base gas ~$0.01-$0.10,0.01-0.05%,CL with deeper liquidity,bridge cost if moving assets,1 wei,1 wei,n/a,Aerodrome fee tiers: 0.01% 0.04% 0.30% 1%. Most active pools use 0.04%.
+Hyperliquid BTC,perp,0.020%,0.025%,1h,variable 0.001%-0.01% per period,on-chain gas negligible (absorbed by HL),0.01-0.05%,deep book for BTC. ~$10k-$50k orders minimal impact,USDC withdrawal ~$1 network fee,$1 notional,0.00001 BTC,cross-margin isolated,Hyperliquid absorbs gas via L1. Maker rebate possible with VIP.
+Hyperliquid ETH,perp,0.020%,0.025%,1h,variable,negligible,0.01-0.05%,deep book,$1 network fee,$1 notional,0.0001 ETH,cross-margin isolated,
+Binance BTC,perp,0.020%,0.040%,8h,variable,n/a (CEX),0.01-0.03%,deepest order book in crypto,variable by chain,$5-$10 notional,varies,isolated cross,not U.S.-accessible. Reference only.
+Kraken BTC,perp,0.020%,0.050%,4h,variable,n/a (CEX),0.02-0.10%,good liquidity for BTC,$5-$25 withdrawal,$1-$10,varies,cross,U.S.-accessible. Higher fees than offshore.
+Deribit BTC,options,variable,variable,n/a,n/a,n/a,0.5-2% (BTC options),options market specific,n/a,varies,varies,portfolio margin,Options fees: maker 0.02% taker 0.04% of notional.
+Deribit BTC,perp,0.010%,0.050%,8h,variable,n/a (CEX),0.02-0.05%,very deep BTC book,$25 withdrawal,varies,varies,portfolio margin,
+Gamma,LP vault,0% (protocol takes swap fee portion),n/a,n/a,n/a,gas ~$5-$50 per rebalance,n/a,vault manages range,variable,n/a,n/a,Gamma takes 10% performance fee on vault profits.

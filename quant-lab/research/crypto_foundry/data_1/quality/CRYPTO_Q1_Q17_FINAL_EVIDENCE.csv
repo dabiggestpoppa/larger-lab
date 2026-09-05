@@ -1,0 +1,66 @@
+dataset_id,gate_id,result,records_tested,metric_value,evidence
+bn_btcusdt_spot_5m,Q1,PASS,420464,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 420464
+bn_btcusdt_spot_5m,Q2,PASS,420464,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+bn_btcusdt_spot_5m,Q3,PASS,420464,{'invalid_price_count': 0},0 records with invalid/nonpositive price
+bn_btcusdt_spot_5m,Q4,PASS,420464,"{'negative_count': 0, 'zero_volume_count': 14}",0 negative-volume records; 14 zero-volume bars classified VALID_ZERO_ACTIVITY
+bn_btcusdt_spot_5m,Q5,PASS,420464,"{'gap_count': 1, 'sample_gaps': [{'from': '2023-03-24T12:35:00+00:00', 'to': '2023-03-24T14:00:00+00:00', 'gap_seconds': 5100}]}",1 interval gaps detected (expected every 300s) | classified PASS_WITH_DOCUMENTED_SOURCE_GAP (2023-03-24 Binance source outage)
+bn_ethusdt_spot_5m,Q1,PASS,420464,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 420464
+bn_ethusdt_spot_5m,Q2,PASS,420464,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+bn_ethusdt_spot_5m,Q3,PASS,420464,{'invalid_price_count': 0},0 records with invalid/nonpositive price
+bn_ethusdt_spot_5m,Q4,PASS,420464,"{'negative_count': 0, 'zero_volume_count': 14}",0 negative-volume records; 14 zero-volume bars classified VALID_ZERO_ACTIVITY
+bn_ethusdt_spot_5m,Q5,PASS,420464,"{'gap_count': 1, 'sample_gaps': [{'from': '2023-03-24T12:35:00+00:00', 'to': '2023-03-24T14:00:00+00:00', 'gap_seconds': 5100}]}",1 interval gaps detected (expected every 300s) | classified PASS_WITH_DOCUMENTED_SOURCE_GAP (2023-03-24 Binance source outage)
+hl_btc_perp_state_5m,Q1,PASS,5041,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 5041
+hl_btc_perp_state_5m,Q2,PASS,5041,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+hl_btc_perp_state_5m,Q3,PASS,5041,{'invalid_price_count': 0},0 records with invalid/nonpositive price
+hl_eth_perp_state_5m,Q1,PASS,5040,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 5040
+hl_eth_perp_state_5m,Q2,PASS,5040,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+hl_eth_perp_state_5m,Q3,PASS,5040,{'invalid_price_count': 0},0 records with invalid/nonpositive price
+hl_btc_funding_hourly,Q1,PASS,28175,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 28175
+hl_btc_funding_hourly,Q2,PASS,28175,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+hl_btc_funding_hourly,Q8,PASS,28175,{'bad_funding_ts_count': 0},0 funding timestamps > 24h from event time
+hl_eth_funding_hourly,Q1,PASS,28175,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 28175
+hl_eth_funding_hourly,Q2,PASS,28175,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+hl_eth_funding_hourly,Q8,PASS,28175,{'bad_funding_ts_count': 0},0 funding timestamps > 24h from event time
+hl_btc_book,Q6,PASS,1,{'crossed_count': 0},0 crossed book snapshots
+hl_eth_book,Q6,PASS,1,{'crossed_count': 0},0 crossed book snapshots
+hl_btc_mark_index_oi,Q7,PASS,2,"{'excessive_divergence_count': 0, 'max_bps_threshold': 500.0}",0 records with mark/index divergence > 500.0 bps
+hl_btc_mark_index_oi,Q9,PASS,2,{'negative_oi_count': 0},0 records with negative OI
+hl_eth_mark_index_oi,Q7,PASS,2,"{'excessive_divergence_count': 0, 'max_bps_threshold': 500.0}",0 records with mark/index divergence > 500.0 bps
+hl_eth_mark_index_oi,Q9,PASS,2,{'negative_oi_count': 0},0 records with negative OI
+eth_weth_usdc_swap,Q1,PASS,1057,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 1057
+eth_weth_usdc_swap,Q2,PASS,1057,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+eth_weth_usdc_swap,Q12,PASS,1057,{'duplicate_keys': 0},0 duplicate block/tx/log keys
+eth_weth_usdc_swap,Q10,PASS,1057,{},Token ordering is valid
+eth_weth_usdc_swap,Q11,PASS,1057,"{'expected': '0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640', 'wrong_count': 0}",0 records with wrong pool address
+eth_wbtc_usdc_swap,Q1,PASS,205,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 205
+eth_wbtc_usdc_swap,Q2,PASS,205,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+eth_wbtc_usdc_swap,Q12,PASS,205,{'duplicate_keys': 0},0 duplicate block/tx/log keys
+eth_wbtc_usdc_swap,Q10,PASS,205,{},Token ordering is valid
+eth_wbtc_usdc_swap,Q11,PASS,205,"{'expected': '0x99ac8cA7087fA4A2A1FB6357269965A2014ABc35', 'wrong_count': 0}",0 records with wrong pool address
+base_weth_usdc_swap,Q1,PASS,4035,"{'duplicate_count': 0, 'sample_indices': []}",0 duplicate records found out of 4035
+base_weth_usdc_swap,Q2,PASS,4035,{'non_monotonic_count': 0},0 non-monotonic timestamp transitions
+base_weth_usdc_swap,Q12,PASS,4035,{'duplicate_keys': 0},0 duplicate block/tx/log keys
+base_weth_usdc_swap,Q10,PASS,4035,{},Token ordering is valid
+base_weth_usdc_swap,Q11,PASS,4035,"{'expected': '0xd0b53d9277642d899df5c87a3966a349a798f224', 'wrong_count': 0}",0 records with wrong pool address
+bn_btcusdt_spot_5m,Q14,PASS,200,{'identical': True},byte-identical canonical output over 2 runs
+bn_btcusdt_spot_5m,Q15,PASS,100,{'prefix_stable': True},earlier normalized records unchanged when future records appended
+hl_btc_perp_state_5m,Q14,PASS,200,{'identical': True},byte-identical canonical output over 2 runs
+hl_btc_perp_state_5m,Q15,PASS,100,{'prefix_stable': True},earlier normalized records unchanged when future records appended
+hl_btc_funding_hourly,Q14,PASS,200,{'identical': True},byte-identical canonical output over 2 runs
+hl_btc_funding_hourly,Q15,PASS,100,{'prefix_stable': True},earlier normalized records unchanged when future records appended
+eth_weth_usdc_swap,Q14,PASS,200,{'identical': True},byte-identical canonical output over 2 runs
+eth_weth_usdc_swap,Q15,PASS,100,{'prefix_stable': True},earlier normalized records unchanged when future records appended
+base_weth_usdc_swap,Q14,PASS,200,{'identical': True},byte-identical canonical output over 2 runs
+base_weth_usdc_swap,Q15,PASS,100,{'prefix_stable': True},earlier normalized records unchanged when future records appended
+bn_btcusdt_spot_5m,Q16,PASS,420464,"{'passed': 420464, 'failed': 0}",schema SPOT_BAR_REFERENCE v1.0.0
+bn_ethusdt_spot_5m,Q16,PASS,420464,"{'passed': 420464, 'failed': 0}",schema SPOT_BAR_REFERENCE v1.0.0
+hl_btc_perp_state_5m,Q16,PASS,5041,"{'passed': 5041, 'failed': 0}",schema SPOT_BAR_REFERENCE v1.0.0
+hl_eth_perp_state_5m,Q16,PASS,5040,"{'passed': 5040, 'failed': 0}",schema SPOT_BAR_REFERENCE v1.0.0
+hl_btc_funding_hourly,Q16,PASS,28175,"{'passed': 28175, 'failed': 0}",schema PERP_FUNDING v1.0.0
+hl_eth_funding_hourly,Q16,PASS,28175,"{'passed': 28175, 'failed': 0}",schema PERP_FUNDING v1.0.0
+eth_weth_usdc_swap,Q16,PASS,1057,"{'passed': 1057, 'failed': 0}",schema AMM_SWAP v1.0.0
+eth_wbtc_usdc_swap,Q16,PASS,205,"{'passed': 205, 'failed': 0}",schema AMM_SWAP v1.0.0
+base_weth_usdc_swap,Q16,PASS,4035,"{'passed': 4035, 'failed': 0}",schema AMM_SWAP v1.0.0
+bn_btcusdt_spot_5m,Q17,PASS,0,{'classified': True},Binance REST geo-block HTTP 451 (local file provenance used)
+hl_btc_funding_hourly,Q17,PASS,0,{'classified': True},Hyperliquid 500-record page limit; forward pagination applied
+eth_weth_usdc_swap,Q17,PASS,0,{'classified': True},RPC free-tier archive range limit; recent window only

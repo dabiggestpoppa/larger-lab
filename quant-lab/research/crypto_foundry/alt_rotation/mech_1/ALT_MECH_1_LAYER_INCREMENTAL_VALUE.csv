@@ -1,0 +1,7 @@
+base_entropy_nats,layer,holdout_conditional_entropy_nats,gain_vs_base_nats,incremental_gain_nats,adds_information_gt_0.005_nats
+0.33426,L1_rank_only,0.2865,0.04776,0.04776,True
+0.33426,L2_plus_velocity,0.2764,0.05787,0.0101,True
+0.33426,L3_plus_sector,0.2764,0.05787,0.0,False
+0.33426,L4_plus_breadth,0.27607,0.0582,0.00033,False
+0.33426,L5_plus_stablecoin,0.2742,0.06007,0.00187,False
+0.33426,L6_plus_dex_context,0.27267,0.06159,0.00153,False

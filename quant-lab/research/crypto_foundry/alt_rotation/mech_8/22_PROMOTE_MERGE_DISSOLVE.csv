@@ -1,0 +1,11 @@
+node,operation,evidence,status
+ISOLATED_DOWN_PRE_EVENT_BUILDUP,NEW_NODE_DIRECTIONAL,only rank_depth_rel@-21D survives FDR pre-event; M7 -14D dispersion directional only (q=0.264); divergence is contemporaneous; see 04,DIRECTIONAL_ONLY_NOT_ROBUST
+BREADTH_DISP_4STATE_MACHINE,PROMOTE,full 16-transition matrix; see 06,TRANSITION_SYSTEM_EARNED
+STATE_AGE_MATURITY,NEW_NODE,state age changes outcome geometry; see 07,SUPPORTED
+HH_FULL_LIFECYCLE,NEW_NODE,entry/exit choreography (BRD_FIRST/DISP_FIRST/COUPLED); see 08/09,DESCRIPTIVE
+BREADTH_ARCHITECTURE,MERGE,composition not incremental beyond level (WS7); see 12,MERGED_INTO_BREADTH_LEVEL
+PRICE_RANK_HEALTH_SPLIT,NEW_NODE,price recovery vs rank decay cross states; see 13/14,PRIORITY_MATRIX_EARNED
+RANK_DETERIORATION_SHOCK_BRIDGE,RECONCILE,M7 vs LF3 disagreement definition-driven; see 19,LOCAL_ROLE
+ACTIVE_LIQUIDITY_SHOCK_ABSORPTION,QUEUED,volume marginal/descriptive; see 16,DESCRIPTIVE_ONLY
+SHMC_TAIL_ACTIVATION,DISSOLVE,WS11: reversion-like role only,LOCAL_ROLE_DESCRIPTIVE
+VOLATILITY_PARKED,PARK,WS12: intensity context only; not incremental gate,PARKED_AS_INTENSITY

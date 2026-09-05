@@ -1,0 +1,9 @@
+venue,chain,protocol_type,tvl_reconstructable,active_liquidity_reconstructable,fee_tier_data,swap_fee_data,LP_additions_removals,ranges_data,rebalancing_events,IL_calculable,incentive_data,automation_available,notes
+Uniswap v3,Ethereum,CL AMM,yes via subgraph,yes via tick data,yes fee tiers,yes per-swap,yes on-chain,yes per-position,manual no protocol,no direct IL formula but computable,yes reward data,Gamma/Arrakis,Most data-rich AMM. Full tick-level reconstruction possible.
+Uniswap v3,Base,CL AMM,yes,yes,yes,yes,yes,yes,manual,computable,yes,Gamma/Arrakis,Same as Ethereum but cheaper gas for LP management.
+Aerodrome,Base,CL AMM + ve,yes via API,yes via API,yes,votes determine fees,yes,yes,automated by ve-AL,computable,yes ve-AL incentives,protocol native,Aerodrome has ve-tokenomics layer on top. Epoch-based voting for fee allocation.
+PancakeSwap,BNB,CL AMM,yes,yes,yes,yes,yes,yes,manual,no direct,yes,limited,Standard CL AMM. Less feature-rich than Aerodrome.
+Raydium,Solana,CL AMM,yes via RPC,yes via on-chain,limited,limited,yes,yes,manual,no,no standard,Gamma not on Solana yet.
+Orca,Solana,CL Whirlpools,yes via API,yes,via API,yes,yes,yes,manual,computable,limited,Gamma not on Solana.
+Gamma,Multi-chain,vault manager,yes API history,yes API history,n/a (vault managed),fee income tracked,yes,yes position snapshots,automated vault ranges,computable IL,yes rewards,Gamma manages positions automatically. 10% perf fee.
+Arrakis,ETH/Base,vault manager,yes API history,yes API history,n/a,via API,yes,yes,automated,computable,via API,automated,Similar to Gamma. Different strategy.

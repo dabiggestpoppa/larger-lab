@@ -1,0 +1,10 @@
+sensor,desired_field,needed_frequency,window,free_source,sign_law_dependence,note
+FUNDING_RATE,perpetual funding rate per asset,daily/hourly,2020-2026,NO - exchange API data required,HIGH - leverage pressure is a candidate mechanical driver of the downside gap,
+OPEN_INTEREST,per-asset OI,daily,2020-2026,NO,HIGH,
+LIQUIDATIONS,liquidation volumes per asset,daily,2020-2026,NO,HIGH,
+ORDER_BOOK_DEPTH,bid/ask depth,intraday,2020-2026,NO,MEDIUM-HIGH,
+SPREAD,bid-ask spread,intraday,2020-2026,NO,MEDIUM,
+ORDER_FLOW_IMBALANCE,taker buy/sell imbalance,intraday,2020-2026,NO,MEDIUM,
+COLLATERAL/MARGIN_STRESS,"margin usage, collateral ratios",daily,2020-2026,NO,HIGH,
+ONCHAIN_STABLECOIN_FLOWS,"stablecoin mint/burn, exchange in/out",daily,2020-2026,PARTIAL (some public explorers),MEDIUM,
+VERDICT,DATA_BLOCKED,,,,BLOCKING,5 of 7 sensors rated HIGH dependence on sign-law inference; all require non-free exchange data; no scraping; sign asymmetry remains IRREDUCIBLE_WITH_AVAILABLE_DATA until these arrive

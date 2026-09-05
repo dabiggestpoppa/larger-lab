@@ -1,0 +1,13 @@
+outcome,feature_family,purged_auc,n
+recovery,relational_state,0.5081,3647
+recovery,exact_peer_ids,0.5626,3647
+recovery,membership_stability,0.5218,3647
+recovery,local_shock,0.5354,3647
+contagion,relational_state,0.4981,3647
+contagion,exact_peer_ids,0.5447,3647
+contagion,membership_stability,0.4976,3647
+contagion,local_shock,0.5512,3647
+decoupling,relational_state,0.5131,3647
+decoupling,exact_peer_ids,0.5734,3647
+decoupling,membership_stability,0.5386,3647
+decoupling,local_shock,0.4787,3647

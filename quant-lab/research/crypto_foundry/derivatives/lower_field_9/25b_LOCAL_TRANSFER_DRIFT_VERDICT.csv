@@ -1,0 +1,5 @@
+transfer,n_subperiods,slope_cv,ed50_range,slope_vs_forcing_spearman,verdict
+abs_to_turnover,5,1.609,145.6185,0.8,FIELD_CONDITIONAL_DRIFT
+abs_to_decoupling,5,1.6538,46512.1471,-0.6,FIELD_CONDITIONAL_DRIFT
+abs_to_contagion,5,1.1077,42442.5377,0.9,FIELD_CONDITIONAL_DRIFT
+abs_to_rejoin,5,0.8248,35.4753,-0.3,FIELD_CONDITIONAL_DRIFT

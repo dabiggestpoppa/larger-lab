@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_btc_ticker_current",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/tickers/btc-bitcoin",
+  "request_params": {
+    "quotes": "USD"
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:32+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "373f66dee600b5f4be5ba780396245c221f329e3648c48b2200d5fe5c374e387",
+  "bytes": 813,
+  "access_class": "PUBLIC",
+  "historical_date": "2026-08-24",
+  "known_limitations": "",
+  "notes": "current single ticker incl. rank (free-plan baseline)",
+  "final_url": "https://api.coinpaprika.com/v1/tickers/btc-bitcoin?quotes=USD",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:32 GMT",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Content-Length": "438",
+    "Connection": "keep-alive",
+    "cache-control": "public, max-age=30, s-maxage=30, stale-while-revalidate=10, stale-if-error=600",
+    "content-encoding": "gzip",
+    "vary": "Accept-Encoding, Origin",
+    "h-hap": "01",
+    "Accept-Ranges": "bytes",
+    "Age": "117",
+    "last-modified": "Mon, 24 Aug 2026 14:00:26 GMT",
+    "cf-cache-status": "HIT",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3b70bcf4314-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

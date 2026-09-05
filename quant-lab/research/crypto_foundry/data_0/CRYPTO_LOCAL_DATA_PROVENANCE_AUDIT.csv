@@ -1,0 +1,10 @@
+filename,source_claimed,verified_source,first_timestamp,last_timestamp,row_count,interval_minutes,gaps_gt_5min,sha256,provenance_status,notes
+btc_5m_4yr.json,Hyperliquid,RELABELED_BINANCE,2022-06-16 21:00 UTC,2026-06-15 20:55 UTC,420464,5,1,2f76a9ad142c09283749c308d46e9f3117448650086473a63e3ed4a56c989550,RELABELED_ORIGIN,Pre-dates Hyperliquid launch (May 2023) by 11 months. Identical OHLCV to btc_usdt_1460d.json at same timestamps. Same gap at 2023-03-24 12:35. Cannot be native Hyperliquid data.
+btc_usdt_1460d.json,Binance,BINANCE_PUBLIC_API,2022-06-16 21:20 UTC,2026-06-15 21:15 UTC,420464,5,1,e9c977e3ba9a027dcc6be35ee1d57acc3dcc4fc2ca5853b547f33fd02d8c9625,VERIFIED_BINANCE,Format matches Binance kline API [ts_ms OHLCV]. Fetched by binance_fetcher.py. 1460-day lookback.
+eth_usdt_1460d.json,Binance,BINANCE_PUBLIC_API,2022-06-16 21:30 UTC,2026-06-15 21:25 UTC,420464,5,1,88fbaae38587b822cd568832f0e12f07788dae2c258de0d663373cb9b2a32299,VERIFIED_BINANCE,Same structure as BTC file. 1460-day lookback.
+sol_usdt_1460d.json,Binance,BINANCE_PUBLIC_API,2022-06-16 21:35 UTC,2026-06-15 21:30 UTC,420464,5,1,da79caa9cbb310d07bbd31d12214be038aa22da3029fb667ae478a3def5fc3d6,VERIFIED_BINANCE,Same structure. 1460-day lookback.
+BTCUSD_D1.csv,Unknown,UNKNOWN,2022-06-16,unknown,1462,1440,unknown,NOT_CHECKED,UNKNOWN_PROVENANCE,Volume=0 in all rows. Likely synthetic/placeholder data. NOT USEFUL.
+ETHUSD_D1.csv,Unknown,UNKNOWN,2020-06-14,unknown,2114,1440,unknown,NOT_CHECKED,UNKNOWN_PROVENANCE,Volume=0 in all rows. Likely synthetic. NOT USEFUL.
+BNBUSD_M5.csv,MT5 broker,MT5_BROKER_EXPORT,2022-01-19,unknown,435748,5,unknown,NOT_CHECKED,VERIFIED_MT5,MT5 export format. Includes spread column. Timestamps may be broker-local time.
+LTCUSD_M5.csv,MT5 broker,MT5_BROKER_EXPORT,2022-01-19,unknown,386500,5,unknown,NOT_CHECKED,VERIFIED_MT5,MT5 export format.
+XLMUSD_M5.csv,MT5 broker,MT5_BROKER_EXPORT,2022-01-19,unknown,381874,5,unknown,NOT_CHECKED,VERIFIED_MT5,MT5 export format.

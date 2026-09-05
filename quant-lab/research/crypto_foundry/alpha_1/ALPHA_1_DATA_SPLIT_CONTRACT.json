@@ -1,0 +1,26 @@
+{
+  "contract_id": "ALPHA1_1_DATA_SPLIT_V2",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "replaces": "ALPHA1_DATA_SPLIT_V1",
+  "repair_reason": "development had impossible date range (start=2026-01-25 > end=2025-12-31)",
+  "periods": {
+    "research_consumed": {
+      "start": "2026-01-25",
+      "end": "2026-08-21",
+      "consumed": true
+    },
+    "alpha2_replay": {
+      "start": "2026-01-25",
+      "end": "2026-08-21",
+      "status": "DEVELOPMENT_ONLY"
+    }
+  },
+  "untouched_confirmation": {
+    "available": false,
+    "status": "NONE_AVAILABLE"
+  },
+  "forward_confirmation": {
+    "after": "2026-08-21",
+    "status": "DEFERRED_TO_FUTURE_DATA"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "checkpoint": "CRYPTO-ALT-DATA-1-CANONICAL-POINT-IN-TIME-UNIVERSE-AND-MULTISCALE-FEATURE-PANEL",
+  "collection_contract_version": "1.0.0",
+  "rank_source": {
+    "name": "CoinMarketCap",
+    "endpoint": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listings/historical",
+    "authority": "PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
+    "official_documented_api": "NO",
+    "api_key_required": "NO",
+    "stability_risk": "INTERNAL_ENDPOINT",
+    "tos_review_required_for_long_term_operation": "YES",
+    "method": "GET",
+    "request_params": {
+      "date": "YYYY-MM-DD",
+      "start": 1,
+      "limit": 500,
+      "convertId": 2781
+    },
+    "rate_limit_design": {
+      "base_sleep_seconds": 0.45,
+      "jitter_seconds": 0.2,
+      "max_retries": 6,
+      "backoff_base_seconds": 2,
+      "adaptive_429_sleep_cap_seconds": 8
+    }
+  },
+  "date_range": {
+    "start": "2020-06-01",
+    "end": "2026-08-23",
+    "n_dates": 2275,
+    "end_date_rationale": "latest complete UTC day before run date 2026-08-24; avoids partial current-day information",
+    "deeper_history": "UNVERIFIED"
+  },
+  "snapshot": {
+    "frequency": "DAILY",
+    "rows_per_date": 500,
+    "timing_semantics": "ranked top-500 as of end of UTC day t (lastUpdated tT23:59:00Z); normalized observation timestamp = end-of-day UTC t",
+    "fields_per_row": [
+      "id", "name", "symbol", "slug", "cmcRank", "numMarketPairs",
+      "circulatingSupply", "totalSupply", "maxSupply", "lastUpdated",
+      "dateAdded", "tags", "platform", "quotes[0].price",
+      "quotes[0].volume24h", "quotes[0].marketCap",
+      "quotes[0].percentChange1h/24h/7d"
+    ]
+  },
+  "raw_persistence": {
+    "raw_bodies": "probes/raw/cmc_snapshot_YYYYMMDD_top500.json (local, gitignored, ~880MB total)",
+    "meta_sidecars": "probes/raw/cmc_snapshot_YYYYMMDD_top500.meta.json (committed; contains sha256, http_status, retrieved_at, url, request_params, error)",
+    "checkpoint": "probes/raw/.checkpoint.json (operational, gitignored; resumable)",
+    "run_log": "probes/raw/.collect_run.log (gitignored)"
+  },
+  "failure_handling": {
+    "retry": "up to 6 attempts, exponential backoff 2^n + jitter",
+    "429_adaptive": "on 429 double sleep up to 8s for subsequent requests",
+    "failed_dates": "recorded in checkpoint with error; surfaced in quality report; FAIL date never silently skipped"
+  },
+  "post_conditions": {
+    "all_dates_200_with_500_rows": "REQUIRED for included dates",
+    "any_date_missing_rows": "REQUIRES explicit documented exception (CMC_side_data_gap_YYYYMMDD) with missing ranks recorded, or re-collection",
+    "hash_all_raw_inputs": "sha256 per date in meta sidecar + manifest"
+  },
+  "gap_policy": {
+    "detection": "status 200 but rows != 500 after 1 re-confirm",
+    "reconstruction": "narrow-window pagination (limit 50, start 1..451) merged by rank",
+    "persist": "truncated body + meta sidecar preserved; recorded in checkpoint gaps",
+    "panel_inclusion": "dates with <500 rows EXCLUDED from the panel; exclusion documented in data quality report (observed: CMC-side missing ranks, e.g. 2021-09-28 = 318 rows / 182 missing ranks)"
+  },
+  "known_limitations": [
+    "internal web endpoint; NOT official documented API; TOS review required for long-term operation",
+    "rank panel is top-500 only; assets ranked >500 on a given day are absent that day",
+    "provider-internal rank/mcap monotonicity is imperfect (Spearman 0.88-0.99 observed in DATA-0); rank field is authoritative, mcap order may differ slightly"
+  ],
+  "generation_script": "scripts/alt_data_1_collect_cmc_daily.py"
+}

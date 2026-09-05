@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "cmc_snapshot_20200819_top500",
+  "method": "GET",
+  "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listings/historical?date=2020-08-19&start=1&limit=500&convertId=2781",
+  "request_params": {
+    "date": "2020-08-19",
+    "start": 1,
+    "limit": 500,
+    "convertId": 2781
+  },
+  "retrieved_at": "2026-08-24T17:07:02+00:00",
+  "historical_date": "2020-08-19",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "sha256": "401c3d200e1e90fe00fa174c2d7009a6044a912e7fb0ba08c56e598af3744195",
+  "bytes": 292880,
+  "access_class": "WEB_ONLY",
+  "source_authority": "PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
+  "notes": "daily PIT top-500 snapshot; lastUpdated 23:59Z semantics",
+  "known_limitations": "internal web endpoint; TOS review required for long-term operation; NOT official documented API",
+  "rows": 500
+}

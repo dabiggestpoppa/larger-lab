@@ -1,0 +1,18 @@
+{
+  "eligibility_prototype_rows": 10000,
+  "eligibility_prototype_cols": 23,
+  "coverage_rows": 42,
+  "earliest_verified_rank_date": "2020-06-01",
+  "earliest_probed_dates": [
+    "2022-06-01",
+    "2021-06-01",
+    "2020-06-01"
+  ],
+  "collision_class_counts": {
+    "PROVIDER_SYMBOL_COLLISION": 450,
+    "TRUE_TICKER_REUSE": 22,
+    "NO_COLLISION": 341,
+    "UNKNOWN_COLLISION": 136
+  },
+  "identity_rows_audited": 949
+}

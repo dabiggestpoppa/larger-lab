@@ -1,0 +1,8 @@
+venue,bot_type,native_or_build,control_via_nautilus,api_addressable,use_case,notes
+Crypto.com,spot grid bot,native (exchange product),NO,limited UI only,grid trading BTC/ETH,exchange-managed. limited control.
+Crypto.com,futures grid bot,native,NO,limited UI only,leveraged grid,exchange-managed.
+Binance,spot grid bot,native,NO,limited UI only,grid trading,not U.S.-accessible.
+Gamma,LP vault manager,protocol managed,NO,via Gamma API,managed CL positions,Gamma rebalances positions based on strategy.
+Arrakis,LP vault manager,protocol managed,NO,via Arrakis API,managed CL positions,Similar to Gamma.
+Hyperliquid,grid via Nautilus,N/A,YES,via Nautilus Hyperliquid adapter,custom perp grid,Build custom via Nautilus. No native grid product.
+Drift,grid via Drift,N/A,partial,via Drift SDK,perp grid,Drift has basic grid interface.

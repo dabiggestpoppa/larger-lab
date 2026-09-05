@@ -1,0 +1,18 @@
+{
+  "checkpoint": "MECH-16",
+  "commit": "TBD",
+  "verdict": "PASS_MECH16_TOPOLOGY_STABLE_TRANSFER_DRIFT",
+  "freeze_recommendation": "DUAL_RESOLUTION",
+  "shift_classification": "MIXED_DRIFT",
+  "chrono_rho_16cell": 0.4313661001875017,
+  "chrono_rho_6cell": 0.39971988795518215,
+  "chrono_rho_4state": 0.1333333333333333,
+  "clock": "UNSTABLE_CLOCK",
+  "entropy_law": "ENTROPY_RESPONSE_DRIFT",
+  "forcing_law": "FULL_FORCING_DRIFT",
+  "rank_thresholds": "DEEP_THRESHOLDS_DRIFT",
+  "transition_roads": "FULL_STABILITY",
+  "n_invariants": 3,
+  "human_review_required": true,
+  "next_checkpoint_authorized": false
+}

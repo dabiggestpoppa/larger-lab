@@ -1,0 +1,10 @@
+result,status,note
+Universal sequence grammar,DEMOTED,MECH-12; not revived
+Metastability (any cell),KILLED,MECH-13; not revisited; transition structure is NOT metastability
+Single necessary initiation primitive,NULL,MECH-13/14: equifinality instead
+Single hidden field coordinate,NULL,MECH-14: MULTIPLE_LOCAL_COORDINATES
+16-cell matrix as automatically valid,TESTED,MATRIX_SURVIVES_FALSIFICATION
+Age redundant inside matrix,AGE_PARTIAL_OVERLAY,MECH-15 WS7 state x age overlay
+Common forcing + patch thresholds,SUPPORTED,MECH-14 WS12
+DAR as primitive,PILOT,"MECH-14/15: pilot only, not promoted"
+cell LH_HA_LE,SPARSE,n=43 subperiods=5

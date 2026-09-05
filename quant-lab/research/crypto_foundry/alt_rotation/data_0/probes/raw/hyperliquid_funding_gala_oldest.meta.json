@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_funding_gala_oldest",
+  "method": "POST",
+  "url": "https://api.hyperliquid.xyz/info",
+  "request_params": null,
+  "request_json": {
+    "type": "fundingHistory",
+    "coin": "GALA",
+    "startTime": 0,
+    "endTime": 2000000000000
+  },
+  "retrieved_at": "2026-08-24T14:12:10+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 500,
+  "first_record": {
+    "coin": "GALA",
+    "fundingRate": "0.0000840311",
+    "premium": "0.0009722491",
+    "time": 1701806400334
+  },
+  "last_record": {
+    "coin": "GALA",
+    "fundingRate": "0.000115045",
+    "premium": "0.0014203596",
+    "time": 1703602800355
+  },
+  "sha256": "49d4e2c5284241616a70ee8d7b1c9c99c1118870098a4c73179439ca730b2181",
+  "bytes": 45246,
+  "access_class": "PUBLIC",
+  "notes": "oldest funding for GALA \u2014 probes delisted-recovery semantics",
+  "known_limitations": ""
+}

@@ -1,0 +1,14 @@
+venue,rest_api,websocket,historical_candles,trades_stream,funding_stream,oi_stream,liquidation_stream,orderbook_l2,execution_api,auth_required,rate_limit_notes
+Uniswap v3,subgraph + RPC,contract events (not WS),subgraph queries,yes (event filter),n/a,n/a,n/a,n/a,no (read only),no,subgraph query limits
+Uniswap v3 (Base),subgraph + RPC,contract events,yes via subgraph,yes (event filter),n/a,n/a,n/a,n/a,no (read only),no,subgraph query limits
+Aerodrome,Aerodrome API + subgraph,contract events,yes via subgraph,yes,n/a,n/a,n/a,n/a,no (read only),no,standard
+PancakeSwap,PCS subgraph + API,contract events,yes via subgraph,yes,n/a,n/a,n/a,n/a,no (read only),no,standard
+Raydium,RPC + API,RPC websockets,yes via RPC logs,yes (program logs),n/a,n/a,n/a,n/a,no (read only),no,RPC rate limits
+Orca,Orca API + RPC,RPC,yes via API,yes,n/a,n/a,n/a,n/a,no (read only),no,standard
+Hyperliquid,REST yes,WebSocket yes,candles_snapshot endpoint,trade stream,funding history REST,meta_and_asset_ctxs,liquidation events,L2 book stream,full execution REST,API key for execution,public endpoints generous
+Binance,REST yes,WebSocket yes,klines endpoint,trade stream,funding REST,open_interest REST,liquidation stream,depth stream,full execution REST,API key for execution+data,1200 req/min public
+Kraken,REST yes,WebSocket yes,OHLC endpoint,trade history REST,n/a,n/a,n/a,depth WebSocket,execution REST,API key for execution,rate limited public
+Coinbase,REST yes,WebSocket yes,candles endpoint,trade stream,n/a,n/a,n/a,level2 stream,execution REST,API key for execution,standard
+Deribit,REST yes,WebSocket yes,TradingView chart data REST,trade stream,funding REST,book_summary REST,book_summary REST,book REST,execution WS+REST,API key for execution,public generous
+Gamma,Gamma REST API,WebSocket,API history,position snapshots,n/a,n/a,n/a,n/a,vault management REST,API key,standard
+Arrakis,Arrakis REST,subgraph,subgraph history,position snapshots,n/a,n/a,n/a,n/a,vault management,API key,standard

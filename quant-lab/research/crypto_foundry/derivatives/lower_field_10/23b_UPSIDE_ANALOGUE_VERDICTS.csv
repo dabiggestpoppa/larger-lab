@@ -1,0 +1,8 @@
+primitive,verdict,note
+correlation_compression,REPORTED,see down vs up relation columns (do not mirror downside)
+liquidity_withdrawal,REPORTED,see down vs up relation columns (do not mirror downside)
+peer_stress,REPORTED,see down vs up relation columns (do not mirror downside)
+crowded_exits,REPORTED,see down vs up relation columns (do not mirror downside)
+rank_health_damage,REPORTED,see down vs up relation columns (do not mirror downside)
+topology_churn,REPORTED,see down vs up relation columns (do not mirror downside)
+fast_propagation,REPORTED,see down vs up relation columns (do not mirror downside)

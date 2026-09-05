@@ -1,0 +1,10 @@
+result,status,note
+Broad EARLY_DECAY_SEQUENCE (global),NULL,MECH-9; local termination only
+Semi-Markov transition improvement,NULL,MECH-11; MARKOV_SUFFICIENT
+HH birth quality OOS,PARKED,MECH-9/10
+Transition velocity,PARKED,MECH-10
+Volatility route selector,NULL,intensity/clock only
+SHMC high-tail activation,DEAD,reversion-like local role only
+Chain/DEX activity as driver,NULL,MECH-11 sensor-only
+Breadth composition incremental,NULL,merged into level
+Universal master primitive,NULL,MECH-12: no grand unified theorem

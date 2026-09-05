@@ -1,0 +1,4 @@
+outcome,relational_state_auc,best_other_auc,rel_state_beats_exact_peer_ids,rel_state_beats_best_other,dynamic_relational_state_more_robust
+recovery,0.5081,0.5626,False,False,NO
+contagion,0.4981,0.5447,False,False,NO
+decoupling,0.5131,0.6,False,False,NO

@@ -1,0 +1,12 @@
+metric,upside,downside,upside_n,downside_n,asymmetry_direction
+median_membership_turnover,0.8889,0.9474,1185,2462,DOWNSIDE_STRONGER
+median_membership_entropy,3.3219,3.3219,1185,2462,SYMMETRIC
+p_rejoin_30d,0.189,0.1154,1185,2462,UPSIDE_STRONGER
+p_contagion_7d,0.1426,0.3461,1185,2462,DOWNSIDE_STRONGER
+p_decoupling_30d,0.5122,0.1665,1185,2462,UPSIDE_STRONGER
+p_peer_catchup,0.4414,0.4614,1185,2462,DOWNSIDE_STRONGER
+p_peer_catchdown,0.5519,0.5276,1185,2462,UPSIDE_STRONGER
+p_persistent_outperformance_30d,0.3451,0.5272,1185,2462,DOWNSIDE_STRONGER
+p_persistent_underperformance_30d,0.6287,0.4435,1185,2462,UPSIDE_STRONGER
+median_state_age_d,0.0,0.0,1185,2462,SYMMETRIC
+ranksum_turnover_asymmetry_p,,,1185,2462,p=0.0

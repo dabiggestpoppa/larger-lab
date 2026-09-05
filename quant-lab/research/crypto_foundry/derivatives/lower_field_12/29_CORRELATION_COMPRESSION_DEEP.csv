@@ -1,0 +1,10 @@
+metric,value,n,value2,note
+corr_pre_median,-0.0148,2226.0,,
+corr_jump_median,-0.0003,2226.0,,
+corr_jump_contagion_vs_non,0.0,,-0.0058,"left=contagion, right=non"
+corr_jump vs neg_frac1,0.026,,,
+corr_jump vs neg_frac3,0.027,,,
+corr_jump vs radius_T7,-0.012,2226.0,,
+corr_jump vs persistence_T30,0.022,2226.0,,
+corr_jump vs CONT_SPEED,0.005,2226.0,,
+VERDICT,COINCIDES,,,temporal role of correlation compression (PRECEDES/COINCIDES/LAGS); no causality

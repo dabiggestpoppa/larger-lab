@@ -1,0 +1,42 @@
+{
+  "additionalProperties": false,
+  "description": "One price/quantity level of a book snapshot (02 §8).",
+  "properties": {
+    "price": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Price"
+    },
+    "quantity": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+          "type": "string"
+        }
+      ],
+      "title": "Quantity"
+    },
+    "quantity_unit": {
+      "minLength": 1,
+      "title": "Quantity Unit",
+      "type": "string"
+    }
+  },
+  "required": [
+    "price",
+    "quantity",
+    "quantity_unit"
+  ],
+  "title": "PriceLevel",
+  "type": "object"
+}

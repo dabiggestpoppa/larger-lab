@@ -1,0 +1,13 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "trades": [
+      {"trade_id": "9990001", "timestamp": 1655251200000, "price": 29510.5, "amount": 0.0089, "direction": "sell", "liquidation": "liquidation", "instrument_name": "BTC-PERPETUAL", "index_price": 29508.0, "mark_price": 29510.0},
+      {"trade_id": "9990002", "timestamp": 1655251265000, "price": 29512.0, "amount": 0.0021, "direction": "buy", "liquidation": "taker", "instrument_name": "BTC-PERPETUAL", "index_price": 29509.0, "mark_price": 29511.5},
+      {"trade_id": "9990003", "timestamp": 1655251330000, "price": 29508.2, "amount": 0.015, "direction": "sell", "liquidation": "liquidation", "instrument_name": "BTC-PERPETUAL", "index_price": 29506.0, "mark_price": 29508.0}
+    ],
+    "has_more": false,
+    "next_offset": 9990003
+  }
+}

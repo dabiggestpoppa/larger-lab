@@ -1,0 +1,6 @@
+test,detail,value
+support,"n=266, cycles=5",n
+duration,median state age at decoupling event,0.0
+decoupling_rate_by_cell4,HH:1.0;HL:1.0;LH:1.0;LL:1.0,FIELD_FLAT
+decoupling_rate_by_rank_depth,DEEP:1.0;MID:1.0;SHALLOW:1.0,RANK_DEPENDENT
+decoupling_rate_by_abs_class,10-20%:1.0;2-5%:1.0;5-10%:1.0;<2%:1.0;>20%:1.0,SHOCK_DEPENDENT

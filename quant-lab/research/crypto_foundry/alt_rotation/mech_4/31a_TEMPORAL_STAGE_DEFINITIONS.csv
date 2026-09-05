@@ -1,0 +1,9 @@
+tau,definition
+tau_release_d,Days from exit to next state change (escape latency)
+tau_activate_d,Days from exit to first PROP_FAMILY state
+tau_broaden_d,Days from exit to first BROAD_RISK_EXPANSION
+tau_peak_d,Days from exit to max breadth within 30D
+tau_hold_d,Contiguous run of first destination state
+tau_decay_d,Days from peak to first dispersion rise >5% above entry
+tau_reroute_d,Days from dest run end to next different state
+tau_total_d,Days from exit to next concentration entry (90D censor)

@@ -1,0 +1,20 @@
+{
+  "dataset_id": "hl_eth_funding_hourly",
+  "venue": "hyperliquid",
+  "market": "ETH-PERP",
+  "source": "hyperliquid_rest",
+  "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info (fundingHistory)",
+  "collector_version": "1.1.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": "2023-05-12T00:00:00.048000+00:00",
+  "last_timestamp": "2026-08-21T16:00:00.031000+00:00",
+  "row_count": 28175,
+  "sha256": "a6c408245980083a22f2fbc076c7aef7f00d975121055adbfdb02a9a011a4974",
+  "created_at_utc": "2026-08-21T16:54:12.802781+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "500-record API page limit; forward pagination applied"
+  ],
+  "status": "VALID"
+}

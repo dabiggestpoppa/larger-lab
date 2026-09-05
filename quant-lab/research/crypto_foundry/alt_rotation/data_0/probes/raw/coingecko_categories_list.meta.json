@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coingecko_categories_list",
+  "method": "GET",
+  "url": "https://api.coingecko.com/api/v3/coins/categories/list",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:00:40+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 865,
+  "first_record": {
+    "category_id": "0g-ecosystem",
+    "name": "0g Ecosystem"
+  },
+  "last_record": {
+    "category_id": "zora-ecosystem",
+    "name": "Zora Ecosystem"
+  },
+  "sha256": "9111f040ee3eea9dc7c13eef642e53fb100e4facb7386e13c1ce5d0d910deb83",
+  "bytes": 54595,
+  "access_class": "PUBLIC_RATELIMITED",
+  "historical_date": null,
+  "known_limitations": "",
+  "notes": "category taxonomy ids (current)",
+  "final_url": "https://api.coingecko.com/api/v3/coins/categories/list",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:00:39 GMT",
+    "Content-Type": "application/json; charset=utf-8",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Server": "cloudflare",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "0",
+    "x-content-type-options": "nosniff",
+    "x-permitted-cross-domain-policies": "none",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "Cache-Control": "max-age=30, public, must-revalidate, s-maxage=300",
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "POST, PUT, DELETE, GET, OPTIONS",
+    "access-control-request-method": "*",
+    "access-control-allow-headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    "access-control-expose-headers": "link, per-page, total",
+    "vary": "Accept-Encoding, Origin",
+    "Content-Encoding": "gzip",
+    "etag": "W/\"ce8d8f721475848fc3bab1b47b875e0c\"",
+    "x-request-id": "f56a646c-824c-4026-a51f-e9af6e5df5ad",
+    "x-runtime": "0.103746",
+    "content-security-policy-report-only": "script-src https://accounts.google.com/gsi/client; frame-src https://accounts.google.com/gsi/; connect-src https://accounts.google.com/gsi/;",
+    "strict-transport-security": "max-age=600, max-age=15724800; includeSubdomains",
+    "Age": "145",
+    "cf-cache-status": "HIT",
+    "CF-RAY": "a302e26f8bd843c9-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_archive_1mbabydogeusdt_202406",
+  "http_status": 404,
+  "retrieved_at": "2026-08-24T14:22:00+00:00",
+  "sha256": "53211d53306a43325e787dfd2595d7dd41df77745ac358c6195ec1838cc23e7f",
+  "bytes": 369,
+  "request_params": {
+    "url": "https://data.binance.vision/data/futures/um/monthly/klines/1MBABYDOGEUSDT/1d/1MBABYDOGEUSDT-1d-2024-06.zip"
+  }
+}

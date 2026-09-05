@@ -1,0 +1,26 @@
+node,type,status,action,note
+continuous_relational_coordinates,OBJECT,COMPUTED,PROMOTE_AS_CONTINUOUS_OVERLAY,15-coordinate set; several are redundant (03 verdict: MULTIPLE_LOCAL_COORDINATES); prefer continuous overlay over label explosion
+relational_coordinate_compression,COMPRESSION,COMPUTED,KEEP_TIGHT,verdict=MULTIPLE_LOCAL_COORDINATES
+topology_churn_anatomy,LENS,COMPUTED,PROMOTE_AS_LOCAL_LENS,"who leaves/enters; old/new coherence, rank, stress, vol, directional composition; replacement-quality test in 04"
+topology_churn_species,SPECIES,COMPUTED,PROMOTE_IF_STABLE,verdict=FEW_STABLE_CHURN_SPECIES; silhouette=0.4019
+broad_local_shock_atlas,ATLAS,COMPUTED,KEEP_AS_REFERENCE,conditional slices (abs x sigma x liq x neighborhood x direction x duration x rank); no giant cube; 06b field overlay separate
+shock_species_compression,SPECIES,COMPUTED,PROMOTE_IF_STABLE,verdict=FEW_SHOCK_SPECIES
+shock_absorption_reorganization,LENS,COMPUTED,PROMOTE_AS_LOCAL_SENSOR,ABSORBED / REORGANIZED / PROPAGATED / PERSISTENT outcome mapping (08)
+local_absorption_capacity,COORDINATE,COMPUTED,LOCAL_ABSORPTION_COORDINATE,membership-stability (purged AUC 0.83) and prior-shock-burden (0.72) carry the capacity signal (09)
+physical_shock_response_curves,LENS,COMPUTED,KEEP_TIGHT,"onset / half-sat / ceiling per response, upside vs downside (10)"
+shock_path_dependence,LAW,COMPUTED,KEEP_AS_ADAPTIVE_LAW,verdict=ACCUMULATION (11) — repeated disturbance accumulates; not a reset
+early_contagion_deep_map,SUBTYPE,COMPUTED,PROMOTE_AS_LOCAL_PHYSICS,anatomy (12) + matched vs non-contagious controls (13); survived purged/FDR at LF9
+persistent_decoupling_deep_map,SUBTYPE,COMPUTED,KEEP_AS_MULTI_MECHANISM,subspecies verdict=MULTI_MECHANISM_CONTINUOUS (14/15)
+downside_contagion_temporal_map,MAP,COMPUTED,PROMOTE_AS_CONTAGION_CLOCK,"T1 first peer reaction ~1d, T3 peak ~3d, T4 decay ~30d; daily resolution (16)"
+downside_contagion_spatial_map,MAP,COMPUTED,PROMOTE_AS_CONTAGION_GEOMETRY,source -> immediate peers -> neighborhood -> field breadth (17)
+contagion_coordinates,COORDINATE,COMPUTED,KEEP_TIGHT,verdict=DEPTH_PERSISTENCE_REDUNDANT_SPEED_DISTINCT (18)
+contagion_containment,TEST,COMPUTED,KEEP_TIGHT,liquidity/rank-health modestly contain (AUC ~0.55); no dominant containment factor (19)
+directional_asymmetry_stripping,ASYMMETRY,COMPUTED,PROMOTE_IF_IRREDUCIBLE,raw down log-odds 1.147 -> 0.931 after 13 covariates; gap reduced ~19% (20)
+directional_asymmetry_residual,ASYMMETRY,COMPUTED,PROMOTE_AS_PRIMITIVE,verdict=IRREDUCIBLE_SIGN_ASYMMETRY (21) — residual sign gap survives all controls
+downside_primitive_search,TEST,COMPUTED,KEEP_TIGHT,22
+upside_analogue_search,TEST,COMPUTED,KEEP_TIGHT,downside->upside mirror NOT assumed (23)
+local_upside_permission,MAP,COMPUTED,KEEP_AS_REFERENCE,24
+relational_granularity_audit,AUDIT,COMPUTED,CONTINUOUS_OVERLAY_ONLY_PREFERRED,no forced label merge; continuous overlay preferred (25)
+prd_carry_forward,CARRY,CARRIED,PROMOTE_TEMPORARY_SPLIT_KEEP_OTHERS,"TEMPORARY_SPLIT=PROMOTED, RELATIVE_DECAY=LOCAL, rescue DISSOLVED (26)"
+local_physics_role_assignment,FREEZE_PREP,COMPUTED,GOES_INTO_31_FREEZE_MAP,27
+global_local_separability,SEPARABILITY,COMPUTED,PROMOTE_AS_PARTIALLY_SEPARABLE,local model dominates; global surface adds ~0.002-0.008 (28b)

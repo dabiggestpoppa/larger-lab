@@ -1,0 +1,29 @@
+test_id,object,finding,verdict,n,evidence
+J_CHAIN_RESID,ETH,chain residual within +/-0.5% of band-impulse median,DISSOLVE,1658840,median_resid=0.0001
+J_CHAIN_RESID,BNB,chain residual within +/-0.5% of band-impulse median,DISSOLVE,402391,median_resid=-0.0002
+J_CHAIN_RESID,SOL,chain residual within +/-0.5% of band-impulse median,DISSOLVE,220935,median_resid=-0.0020
+J_CHAIN_RESID,POL,chain residual within +/-0.5% of band-impulse median,DISSOLVE,43631,median_resid=-0.0012
+J_CHAIN_RESID,-,chain residual within +/-0.5% of band-impulse median,DISSOLVE,39971,median_resid=-0.0035
+J_CHAIN_RESID,ARB,chain residual within +/-0.5% of band-impulse median,DISSOLVE,18287,median_resid=-0.0023
+J_CHAIN_RESID,KAIA,chain residual within +/-0.5% of band-impulse median,DISSOLVE,18179,median_resid=-0.0008
+J_CHAIN_RESID,AVAX,chain residual within +/-0.5% of band-impulse median,DISSOLVE,16861,median_resid=-0.0021
+J_CHAIN_RESID,TRX,chain residual within +/-0.5% of band-impulse median,DISSOLVE,11993,median_resid=0.0003
+J_CHAIN_RESID,SUI,chain residual within +/-0.5% of band-impulse median,DISSOLVE,10368,median_resid=-0.0048
+J_CHAIN_RESID,NEO,chain residual within +/-0.5% of band-impulse median,DISSOLVE,8960,median_resid=0.0005
+J_CHAIN_RESID,GRAM,chain residual within +/-0.5% of band-impulse median,DISSOLVE,8015,median_resid=-0.0032
+J_SECTOR_RESID,ethereum-ecosystem,sector residual within +/-0.5% of band-impulse median,DISSOLVE,512416,median_resid=-0.0005
+J_SECTOR_RESID,defi,sector residual within +/-0.5% of band-impulse median,DISSOLVE,469088,median_resid=-0.0008
+J_SECTOR_RESID,collectibles-nfts,sector residual within +/-0.5% of band-impulse median,DISSOLVE,300411,median_resid=-0.0018
+J_SECTOR_RESID,bnb-chain-ecosystem,sector residual within +/-0.5% of band-impulse median,DISSOLVE,293880,median_resid=-0.0001
+J_SECTOR_RESID,mineable,sector residual within +/-0.5% of band-impulse median,DISSOLVE,275439,median_resid=0.0010
+J_SECTOR_RESID,solana-ecosystem,sector residual within +/-0.5% of band-impulse median,DISSOLVE,253831,median_resid=-0.0015
+J_SECTOR_RESID,gaming,sector residual within +/-0.5% of band-impulse median,DISSOLVE,248053,median_resid=-0.0022
+J_SECTOR_RESID,bnb-chain,sector residual within +/-0.5% of band-impulse median,DISSOLVE,245018,median_resid=-0.0002
+J_SECTOR_RESID,memes,sector residual within +/-0.5% of band-impulse median,DISSOLVE,210625,median_resid=0.0003
+J_SECTOR_RESID,ai-big-data,sector residual within +/-0.5% of band-impulse median,DISSOLVE,197046,median_resid=-0.0028
+J_SECTOR_RESID,platform,sector residual within +/-0.5% of band-impulse median,DISSOLVE,196701,median_resid=-0.0004
+J_SECTOR_RESID,binance-ecosystem,sector residual within +/-0.5% of band-impulse median,DISSOLVE,194879,median_resid=-0.0025
+J_SECTOR_RESID,polygon-ecosystem,sector residual within +/-0.5% of band-impulse median,DISSOLVE,180988,median_resid=-0.0009
+J_SECTOR_RESID,metaverse,sector residual within +/-0.5% of band-impulse median,DISSOLVE,136302,median_resid=-0.0024
+J_SECTOR_RESID,binance-listing,sector residual within +/-0.5% of band-impulse median,DISSOLVE,120330,median_resid=-0.0024
+L_HIDDEN_STATE_GATE,residual structure after impulse x vol x btc conditioning,assessed in 15c_HIDDEN_STATE_GATE.csv; verdict in decision doc,PENDING,3235023,residual std by cell in 15c

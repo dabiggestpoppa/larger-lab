@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_funding_neo_oldest",
+  "method": "POST",
+  "url": "https://api.hyperliquid.xyz/info",
+  "request_params": null,
+  "request_json": {
+    "type": "fundingHistory",
+    "coin": "NEO",
+    "startTime": 0,
+    "endTime": 2000000000000
+  },
+  "retrieved_at": "2026-08-24T14:12:12+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 500,
+  "first_record": {
+    "coin": "NEO",
+    "fundingRate": "0.0000146926",
+    "premium": "0.0004175409",
+    "time": 1699542000315
+  },
+  "last_record": {
+    "coin": "NEO",
+    "fundingRate": "0.0000168604",
+    "premium": "0.0004348831",
+    "time": 1701338400006
+  },
+  "sha256": "7f4b302840d0f2b8dc79eda040f652900d6237ab7ec7e21734c42d1e95bf7a71",
+  "bytes": 44494,
+  "access_class": "PUBLIC",
+  "notes": "oldest funding for NEO \u2014 probes delisted-recovery semantics",
+  "known_limitations": ""
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_bapi_futures_exchange_info",
+  "method": "GET",
+  "url": "https://www.binance.com/bapi/futures/v1/public/future/common/get-exchange-info",
+  "request_params": null,
+  "request_json": null,
+  "retrieved_at": "2026-08-24T14:10:58+00:00",
+  "http_status": 404,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "3afae370f6555397956288a5cac2a712adf857684f502a1c25965fdbd800c58a",
+  "bytes": 145,
+  "access_class": "WEB_ONLY",
+  "notes": "web bapi USD-M exchange info (may bypass 451 geo-block)",
+  "known_limitations": "guess at bapi path"
+}

@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "dexscreener_tokens_weth",
+  "method": "GET",
+  "url": "https://api.dexscreener.com/latest/dex/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:04:03+00:00",
+  "http_status": null,
+  "ok": false,
+  "error": "ReadTimeout: HTTPSConnectionPool(host='api.dexscreener.com', port=443): Read timed out. (read timeout=45)",
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bytes": 0,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "current pairs only; historical liquidity NOT available; endpoint slow from some networks",
+  "notes": "WETH token -> pairs with pairCreatedAt, liquidity, volume, fdv",
+  "final_url": null,
+  "response_headers_safe": {}
+}

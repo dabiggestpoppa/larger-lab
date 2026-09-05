@@ -1,0 +1,20 @@
+dataset,gate_id,gate_name,status,evidence,affected_rows
+bn_BTCUSDT,Q1,duplicates,PASS,0 duplicate records found out of 420464,0
+bn_BTCUSDT,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+bn_BTCUSDT,Q3,invalid_price,PASS,0 records with invalid/nonpositive price,0
+bn_BTCUSDT,Q4,invalid_size,FAIL,14 records with invalid/nonpositive size,14
+bn_BTCUSDT,Q5,missing_intervals,FAIL,1 interval gaps detected (expected every 300s),1
+bn_BTCUSDT,Q13,replay_determinism,PASS,0 records differ between replay batches,0
+bn_ETHUSDT,Q1,duplicates,PASS,0 duplicate records found out of 420464,0
+bn_ETHUSDT,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+bn_ETHUSDT,Q3,invalid_price,PASS,0 records with invalid/nonpositive price,0
+bn_ETHUSDT,Q4,invalid_size,FAIL,14 records with invalid/nonpositive size,14
+bn_ETHUSDT,Q5,missing_intervals,FAIL,1 interval gaps detected (expected every 300s),1
+bn_ETHUSDT,Q13,replay_determinism,PASS,0 records differ between replay batches,0
+eth_pool_WETH-USDC-500,Q10,amm_token_order,PASS,Token ordering is valid,0
+eth_pool_WBTC-USDC-3000,Q10,amm_token_order,PASS,Token ordering is valid,0
+base_WETH,Q_BASE,base_WETH,PASS,verified=True,0
+base_USDC,Q_BASE,base_USDC,PASS,verified=True,0
+base_cbBTC,Q_BASE,base_cbBTC,FAIL,verified=False,0
+q14,Q14,normalized_from_raw_determinism,PASS,Normalization produced 1 distinct outputs from 2 runs,0
+q15,Q15,future_independent_normalization,PASS,Prefix normalization matches,0

@@ -1,0 +1,20 @@
+{
+  "dataset_id": "hl_eth_mark_index_oi",
+  "venue": "hyperliquid",
+  "market": "ETH-PERP",
+  "source": "hyperliquid_rest",
+  "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info (metaAndAssetCtxs)",
+  "collector_version": "1.1.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": "2026-08-21T16:54:13.264336+00:00",
+  "last_timestamp": "2026-08-21T16:54:13.264336+00:00",
+  "row_count": 2,
+  "sha256": "c7ee91aa1542ddd4bb19b77899a33a667dbe96997420e1b6f3262f20057533c8",
+  "created_at_utc": "2026-08-21T16:54:13.266348+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "Snapshot sample at ingest time"
+  ],
+  "status": "VALID"
+}

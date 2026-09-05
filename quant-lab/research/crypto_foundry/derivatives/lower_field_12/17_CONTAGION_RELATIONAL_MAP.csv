@@ -1,0 +1,8 @@
+relation,coordinate,contagion_med,non_contagion_med,ranksums_p,n_cont,n_non
+coherence,peer_corr,-0.0113,-0.045,0.002,1021.0,2626.0
+rank_health_similarity,rank_vel_7d,-4.0,2.0,0.0,1021.0,2626.0
+liquidity_similarity,liq_proxy,11.1978,11.6013,0.0,993.0,2563.0
+topology_overlap,jaccard_overlap,0.1765,0.1765,0.545,645.0,1581.0
+relational_role,state_changed,1.0,1.0,0.677,1021.0,2626.0
+membership_proximity,rel_membership_proximity,0.0526,0.0526,0.758,1020.0,2626.0
+VERDICT,RELATIONAL_LINKS,,,"distinguishing relations (p<0.01): ['coherence', 'liquidity_similarity', 'rank_health_similarity']",,

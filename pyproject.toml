@@ -46,6 +46,7 @@ dependencies = [
     "lithosai-motus>=0.4.1",
     # Hyperliquid DEX
     "hyperliquid-python-sdk>=0.24.0",
+    "zstandard>=0.23.0",
 ]
 
 [dependency-groups]
@@ -58,3 +59,13 @@ dev = [
 [tool.pytest.ini_options]
 pythonpath = ["quant-lab/src"]
 testpaths = ["quant-lab/tests"]
+# Test packages under quant-lab/tests/crypto_sensor_fabric share the src package
+# name; importlib mode keeps sys.path clean so `crypto_sensor_fabric` resolves
+# to quant-lab/src instead of the tests tree.
+addopts = "--import-mode=importlib"
+# SENSOR-B3-I10: the only marked network test.  It SKIPs unless the operator
+# explicitly sets SENSOR_NETWORK_SMOKE=1; a normal `pytest` never touches the
+# network.  Offline harness tests are unmarked and always run offline.
+markers = [
+    "sensor_network_smoke: controlled production-adapter live smoke (opt-in via SENSOR_NETWORK_SMOKE=1)",
+]

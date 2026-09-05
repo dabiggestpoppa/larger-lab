@@ -1,0 +1,4 @@
+subtype,peer_health,loner_type,n,p_persist_prd_14d,p_rank_rehab_30d,median_peer_ret_7d
+PEER_HEALTH_x_LONER,PEER_STRESSED,TRUE_LONER,32,0.3125,0.5312,-0.15253
+CELL,ANY,HH,14,0.4286,0.3571,
+CELL,ANY,LL,21,0.2381,0.5714,

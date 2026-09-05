@@ -1,0 +1,6 @@
+ecology,n,p_membership_stable,median_membership_entropy,median_member_turnover,field_state_mode,rank_patch_mode,median_abs_shock,median_sigma_shock,median_state_age_d,p_rejoin_30d,p_price_repair
+FALSE_LONER,164,0.5549,3.3219,0.75,HH,26-100,0.0084,2.4639,0.0,0.2195,0.189
+LOCAL_CONTAGION,2,0.0,3.3219,1.0,LH,101-250,0.1047,2.3696,864.5,0.0,0.0
+OTHER,1771,0.2919,3.3219,0.9474,LL,101-250,0.1247,2.4817,0.0,0.1163,0.1412
+PEER_CATCHDOWN,2,0.0,3.3219,1.0,HH,101-250,0.2398,2.5367,0.0,0.0,0.0
+TRUE_LONER,523,0.2849,3.3219,0.9474,HH,251-500,0.1418,2.5103,0.0,0.0803,0.2677

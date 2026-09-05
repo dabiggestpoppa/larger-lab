@@ -1,0 +1,11 @@
+probe,value
+MI_threshold_delivery,0.0829
+MI_transfer_delivery,0.158
+MI_threshold_transfer_delivery,0.167
+MI_sum_individual,0.2409
+logit_coef_threshold,0.9035
+logit_coef_transfer,1.2395
+logit_coef_interaction,-0.4822
+classification,SUBSTITUTES
+threshold_lift_when_transfer_low,0.033
+threshold_lift_when_transfer_high,0.174

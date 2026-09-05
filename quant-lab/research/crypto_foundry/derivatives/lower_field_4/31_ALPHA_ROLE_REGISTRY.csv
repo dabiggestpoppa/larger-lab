@@ -1,0 +1,5 @@
+node,role,sample,effect,confidence,conditionality,rank_scope,time_scope,causal_level,failure_modes,statistical_validity,executability_status,possible_expression
+ISOLATED_DOWN_REVERSAL,REVERSAL / DISTRIBUTION,LF2/LF3 event families,rank- and sign-dependent descriptive reversal,moderate with limitations,"rank, sign, participation",501-2000,1-30D,L0/L1,"overlap, peer attribution unavailable",DESCRIPTIVE_REPLICATION,NOT_YET_AUDITED,SPOT_LONG_OR_PERP_LONG_UNKNOWN
+RANK_CONTEXT_ISOLATION,LOCAL_CLUSTER / DISTRIBUTION,same-date rank neighbors,separate rank-context coordinate,moderate,rank window,501-2000,event day,L0,wrong-neighbor risk,DESCRIPTIVE,NOT_YET_AUDITED,UNKNOWN
+TOP500_BREADTH_GATE,CROSS_FIELD_GATE / REGIME_FILTER,LF2/LF3,higher realization under high breadth,moderate,common-factor controls in parent work,501-2000,event-time,L1 candidate,"lag ambiguity, no MECH-8 join",PARENT_REPLICATION,NOT_YET_AUDITED,UNKNOWN
+PRICE_RANK_SEPARATION,RANK_HEALTH / DECAY_CONTEXT,not estimable,queued,none,future rank history required,501-2000,3-30D,DATA_BLOCKED,missing future ranks,NOT_ESTIMABLE,NOT_YET_AUDITED,UNKNOWN

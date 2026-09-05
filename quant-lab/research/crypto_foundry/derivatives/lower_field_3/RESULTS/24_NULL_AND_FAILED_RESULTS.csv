@@ -1,0 +1,8 @@
+result,verdict,reason
+single master isolation score,NOT_BUILT,neighborhood families are incomplete; no unjustified compression
+DTW/k-medoids outcome clusters,DESCRIPTIVE_ONLY,rule-based path families used; formal clustering requires robustness audit
+sector/chain residual,NULL,carried LF2 residual sector/chain null
+SHMC-specific tail activation,DISSOLVED,SHMC is lowest-tail state; depth effect is shared
+isolated deep-rank cells,DATA_LIMITED,effective isolated counts are thin
+MECH-7 context reuse,QUEUED,not required for core generation; date-keyed schema retained for future alignment
+tradeability/execution,NOT_AUDITED,explicitly out of scope

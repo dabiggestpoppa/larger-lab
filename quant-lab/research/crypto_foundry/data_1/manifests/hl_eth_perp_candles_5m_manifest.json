@@ -1,0 +1,22 @@
+{
+  "dataset_id": "hl_eth_perp_candles_5m",
+  "venue": "hyperliquid",
+  "market": "ETH-PERP",
+  "source": "hyperliquid_rest",
+  "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info",
+  "collector_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": null,
+  "last_timestamp": null,
+  "row_count": 0,
+  "sha256": null,
+  "created_at_utc": "2026-08-21T12:37:05.357952+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "History starts ~2023-05 (market launch)",
+    "No historical trade backfill via REST",
+    "5m candle resolution"
+  ],
+  "status": "PARTIAL"
+}

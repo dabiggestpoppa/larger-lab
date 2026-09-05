@@ -1,0 +1,2 @@
+n_chain_days,n_positive,activation_pre_vs_post_p,activation_pre_vs_ctrl_p,base_cv_logloss,activation_cv_logloss,delta_logloss
+4171,12,0.0272,0.0902,0.0144,0.0155,-0.0011

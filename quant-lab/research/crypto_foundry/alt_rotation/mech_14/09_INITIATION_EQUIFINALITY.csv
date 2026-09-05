@@ -1,0 +1,5 @@
+cell,n_days,n_success,full_model_auc,viable_configs_total,viable_k1,viable_k2,viable_k3,distinct_viable_configs,top_configs,data_limited,verdict
+HIGH_BREADTH_HIGH_DISP,633,386,0.8289316355855761,1.0,0.0,0.0,1.0,1.0,top500_breadth_30d+top500_dispersion_30d+btc_return_7d,0,EQUIFINAL_MULTI_CONFIG
+HIGH_BREADTH_LOW_DISP,204,67,0.6958274321821548,34.0,3.0,10.0,21.0,34.0,btc_return_7d+rank_depth_rel;btc_return_7d+top3_share+rank_depth_rel;btc_return_7d+vol_med+rank_depth_rel;eth_btc_relative_return_7d;eth_btc_relative_return_7d+btc_return_7d;eth_btc_relative_return_7d+btc_return_7d+rank_depth_rel,0,EQUIFINAL_MULTI_CONFIG
+LOW_BREADTH_HIGH_DISP,62,18,,,,,,,,1,DATA_LIMITED
+LOW_BREADTH_LOW_DISP,152,33,0.7751464222052458,6.0,0.0,1.0,5.0,6.0,eth_btc_relative_return_7d+top500_dispersion_30d;eth_btc_relative_return_7d+top500_dispersion_30d+btc_return_7d;eth_btc_relative_return_7d+top500_dispersion_30d+rank_depth_rel;eth_btc_relative_return_7d+top500_dispersion_30d+top3_share;eth_btc_relative_return_7d+top500_dispersion_30d+vol_med;top500_breadth_30d+eth_btc_relative_return_7d+top500_dispersion_30d,0,EQUIFINAL_MULTI_CONFIG

@@ -1,0 +1,51 @@
+peer_family,relational_state,n_snapshots,fraction,supported,purpose,pit_safe
+BEHAVIORAL_10,REORGANIZING,2041,0.5596,YES,consecutive-snapshot membership turnover >= p67 (membership churning),YES
+BEHAVIORAL_10,DECOUPLED,868,0.238,YES,|res_z|>1.5 persistently (previous snapshot also dislocated or full turnover),YES
+BEHAVIORAL_10,TRUE_ISOLATED,151,0.0414,YES,|res_z|>1.5 AND peer dispersion <= p67 AND abs move >= 2% (real idiosyncratic move),YES
+BEHAVIORAL_10,FALSE_ISOLATED,51,0.014,YES,|res_z|>1.5 AND peer dispersion <= p67 AND abs move < 2% (sigma-inflated small move),YES
+BEHAVIORAL_10,PEER_STRESSED,83,0.0228,YES,peer dispersion >= p67 AND peer abs move >= p67 while asset within 1.5 sigma,YES
+BEHAVIORAL_10,REJOINING,44,0.0121,NOT_SUPPORTED,previous snapshot dislocated (|prev_res_z|>1.5) and residual back <= 1.5 sigma,YES
+BEHAVIORAL_10,REHABILITATING,68,0.0186,YES,previous snapshot dislocated and residual back <= 1.0 sigma with low turnover,YES
+BEHAVIORAL_10,CONTAGIOUS,58,0.0159,YES,|res_z|>1.0 AND peer dispersion > p67 AND peer abs move > 1% (shared local move),YES
+BEHAVIORAL_10,LOCALLY_CONFORMING,283,0.0776,YES,default: |res_z|<=1.5 and none of the stress conditions,YES
+BEHAVIORAL_10,DISLOCATED_UNCLASSIFIED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 not claimed by any named state (honest leftover),YES
+CORR_60_10,REORGANIZING,2577,0.7223,YES,consecutive-snapshot membership turnover >= p67 (membership churning),YES
+CORR_60_10,DECOUPLED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 persistently (previous snapshot also dislocated or full turnover),YES
+CORR_60_10,TRUE_ISOLATED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 AND peer dispersion <= p67 AND abs move >= 2% (real idiosyncratic move),YES
+CORR_60_10,FALSE_ISOLATED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 AND peer dispersion <= p67 AND abs move < 2% (sigma-inflated small move),YES
+CORR_60_10,PEER_STRESSED,0,0.0,NOT_SUPPORTED,peer dispersion >= p67 AND peer abs move >= p67 while asset within 1.5 sigma,YES
+CORR_60_10,REJOINING,0,0.0,NOT_SUPPORTED,previous snapshot dislocated (|prev_res_z|>1.5) and residual back <= 1.5 sigma,YES
+CORR_60_10,REHABILITATING,0,0.0,NOT_SUPPORTED,previous snapshot dislocated and residual back <= 1.0 sigma with low turnover,YES
+CORR_60_10,CONTAGIOUS,0,0.0,NOT_SUPPORTED,|res_z|>1.0 AND peer dispersion > p67 AND peer abs move > 1% (shared local move),YES
+CORR_60_10,LOCALLY_CONFORMING,991,0.2777,YES,default: |res_z|<=1.5 and none of the stress conditions,YES
+CORR_60_10,DISLOCATED_UNCLASSIFIED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 not claimed by any named state (honest leftover),YES
+CORR_120_10,REORGANIZING,2118,0.6179,YES,consecutive-snapshot membership turnover >= p67 (membership churning),YES
+CORR_120_10,DECOUPLED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 persistently (previous snapshot also dislocated or full turnover),YES
+CORR_120_10,TRUE_ISOLATED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 AND peer dispersion <= p67 AND abs move >= 2% (real idiosyncratic move),YES
+CORR_120_10,FALSE_ISOLATED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 AND peer dispersion <= p67 AND abs move < 2% (sigma-inflated small move),YES
+CORR_120_10,PEER_STRESSED,0,0.0,NOT_SUPPORTED,peer dispersion >= p67 AND peer abs move >= p67 while asset within 1.5 sigma,YES
+CORR_120_10,REJOINING,0,0.0,NOT_SUPPORTED,previous snapshot dislocated (|prev_res_z|>1.5) and residual back <= 1.5 sigma,YES
+CORR_120_10,REHABILITATING,0,0.0,NOT_SUPPORTED,previous snapshot dislocated and residual back <= 1.0 sigma with low turnover,YES
+CORR_120_10,CONTAGIOUS,0,0.0,NOT_SUPPORTED,|res_z|>1.0 AND peer dispersion > p67 AND peer abs move > 1% (shared local move),YES
+CORR_120_10,LOCALLY_CONFORMING,1310,0.3821,YES,default: |res_z|<=1.5 and none of the stress conditions,YES
+CORR_120_10,DISLOCATED_UNCLASSIFIED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 not claimed by any named state (honest leftover),YES
+STATE,REORGANIZING,2288,0.6723,YES,consecutive-snapshot membership turnover >= p67 (membership churning),YES
+STATE,DECOUPLED,745,0.2189,YES,|res_z|>1.5 persistently (previous snapshot also dislocated or full turnover),YES
+STATE,TRUE_ISOLATED,44,0.0129,NOT_SUPPORTED,|res_z|>1.5 AND peer dispersion <= p67 AND abs move >= 2% (real idiosyncratic move),YES
+STATE,FALSE_ISOLATED,30,0.0088,NOT_SUPPORTED,|res_z|>1.5 AND peer dispersion <= p67 AND abs move < 2% (sigma-inflated small move),YES
+STATE,PEER_STRESSED,29,0.0085,NOT_SUPPORTED,peer dispersion >= p67 AND peer abs move >= p67 while asset within 1.5 sigma,YES
+STATE,REJOINING,23,0.0068,NOT_SUPPORTED,previous snapshot dislocated (|prev_res_z|>1.5) and residual back <= 1.5 sigma,YES
+STATE,REHABILITATING,43,0.0126,NOT_SUPPORTED,previous snapshot dislocated and residual back <= 1.0 sigma with low turnover,YES
+STATE,CONTAGIOUS,28,0.0082,NOT_SUPPORTED,|res_z|>1.0 AND peer dispersion > p67 AND peer abs move > 1% (shared local move),YES
+STATE,LOCALLY_CONFORMING,173,0.0508,YES,default: |res_z|<=1.5 and none of the stress conditions,YES
+STATE,DISLOCATED_UNCLASSIFIED,0,0.0,NOT_SUPPORTED,|res_z|>1.5 not claimed by any named state (honest leftover),YES
+HYBRID_10,REORGANIZING,1556,0.4267,YES,consecutive-snapshot membership turnover >= p67 (membership churning),YES
+HYBRID_10,DECOUPLED,1380,0.3784,YES,|res_z|>1.5 persistently (previous snapshot also dislocated or full turnover),YES
+HYBRID_10,TRUE_ISOLATED,125,0.0343,YES,|res_z|>1.5 AND peer dispersion <= p67 AND abs move >= 2% (real idiosyncratic move),YES
+HYBRID_10,FALSE_ISOLATED,37,0.0101,NOT_SUPPORTED,|res_z|>1.5 AND peer dispersion <= p67 AND abs move < 2% (sigma-inflated small move),YES
+HYBRID_10,PEER_STRESSED,62,0.017,YES,peer dispersion >= p67 AND peer abs move >= p67 while asset within 1.5 sigma,YES
+HYBRID_10,REJOINING,30,0.0082,NOT_SUPPORTED,previous snapshot dislocated (|prev_res_z|>1.5) and residual back <= 1.5 sigma,YES
+HYBRID_10,REHABILITATING,94,0.0258,YES,previous snapshot dislocated and residual back <= 1.0 sigma with low turnover,YES
+HYBRID_10,CONTAGIOUS,47,0.0129,NOT_SUPPORTED,|res_z|>1.0 AND peer dispersion > p67 AND peer abs move > 1% (shared local move),YES
+HYBRID_10,LOCALLY_CONFORMING,314,0.0861,YES,default: |res_z|<=1.5 and none of the stress conditions,YES
+HYBRID_10,DISLOCATED_UNCLASSIFIED,2,0.0005,NOT_SUPPORTED,|res_z|>1.5 not claimed by any named state (honest leftover),YES
