@@ -53,6 +53,7 @@ from .catalog import (
     CatalogNotFound,
     ManifestNotFound,
     ProjectionReferenceUnavailable,
+    UnearnedProviderIntegrityClaim,
     _rows_equal,
     publish_immutable_fragment,
     read_fragment,
@@ -464,7 +465,13 @@ class PartitionManifestRepository:
     # -- pointer read/validate (I04 §62) -------------------------------------
 
     def read_current_pointer(self, partition_key: str) -> PartitionCurrentPointer | None:
-        """Raw operational pointer state (None when no pointer exists yet)."""
+        """Raw operational pointer state (None when no pointer exists yet).
+
+        I04R1 §38: the physical locator hash is NEVER enough — the pointer's
+        exact logical ``partition_key`` must equal the requested partition
+        key, else the read fails as corrupt.  A pointer file resolving to a
+        different logical partition is never returned.
+        """
         path = self._pointer_path(_partition_hash(partition_key))
         if not path.exists():
             return None
@@ -696,7 +703,22 @@ class PartitionManifestRepository:
         # EVERY referenced blob (physical + metadata + provenance + a
         # matching acquisition whose verified=True H3 was recomputed by the
         # repository).
-
+        if manifest.integrity_state is IntegrityState.PROVIDER_HASH_VERIFIED:
+            for ref in manifest.blob_refs:
+                if not self._acquisitions.has_earned_h3_proof(
+                    blob_sha256=ref,
+                    provider_id=manifest.provider,
+                    venue=manifest.venue,
+                    sensor_family=manifest.sensor_family,
+                    native_instrument=manifest.native_instrument,
+                    native_granularity=manifest.source_granularity,
+                ):
+                    raise UnearnedProviderIntegrityClaim(
+                        f"manifest claims PROVIDER_HASH_VERIFIED but blob_ref "
+                        f"{ref} lacks a matching acquisition carrying earned "
+                        "(repository-recomputed) H3 with verified=True "
+                        "(I04R1 §22)"
+                    )
 
     # -- partition identity (I04 §30/§32) ------------------------------------
 

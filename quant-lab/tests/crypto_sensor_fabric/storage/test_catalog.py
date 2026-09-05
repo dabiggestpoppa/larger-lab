@@ -8,6 +8,7 @@ I04A round trips, and fail-closed fragment reads.
 
 from __future__ import annotations
 
+import hashlib
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -15,7 +16,6 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
-
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.providers.base.enums import (
     Granularity,
@@ -292,7 +292,7 @@ class TestAcquisitionRepository:
 
     def test_blobless_failure_explainable_via_failure_ref(self, tmp_path: Path) -> None:
         _, _, acq_repo = self._repo(tmp_path)
-        rec, _ = acq_repo.append_acquisition(
+        acq_repo.append_acquisition(
             _record(
                 acquisition_id="acq-fail",
                 blob_sha256=None,
@@ -379,9 +379,16 @@ class TestAcquisitionRepository:
         # never collapsed, never labeled canonical (I06 owns revisions)
 
     def test_lossless_round_trip_all_handoff_fields(self, tmp_path: Path) -> None:
-        """I04 §59: model -> row -> fragment -> model preserves semantic equality."""
+        """I04 §59: model -> row -> fragment -> model preserves semantic equality.
+
+        I04R1 (Defect B): the persisted H3 trio must be the REAL recomputed
+        checksum of the exact source bytes — a caller-supplied verified=True
+        digest that does not match is a ProviderChecksumClaimConflict, never
+        silently persisted.
+        """
+        source = b'{"n": 1}'
         store, blob_repo, acq_repo = self._repo(tmp_path)
-        blob = put_data(store, b'{"n": 1}')
+        blob = put_data(store, source)
         blob_repo.append_metadata(blob)
         rec = _record(
             acquisition_id="acq-rt",
@@ -389,7 +396,7 @@ class TestAcquisitionRepository:
             actual_start=datetime(2026, 8, 31, 10, 0, 0, tzinfo=UTC),
             actual_end=datetime(2026, 8, 31, 11, 0, 0, tzinfo=UTC),
             provider_checksum_algorithm="MD5",
-            provider_checksum_value="0" * 32,
+            provider_checksum_value=hashlib.md5(source).hexdigest(),
             provider_checksum_verified=True,
             resume_token_before=ResumeToken(
                 mode="TIME_RANGE",
@@ -428,7 +435,7 @@ class TestAcquisitionRepository:
         )
         table = pq.read_table(str(path))
         row = table.to_pylist()[0]
-        for key, value in row.items():
+        for value in row.values():
             if isinstance(value, list):
                 assert all(isinstance(v, str) for v in value)
             else:

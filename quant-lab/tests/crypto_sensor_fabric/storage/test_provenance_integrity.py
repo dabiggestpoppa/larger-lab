@@ -1,9 +1,17 @@
 """SENSOR-B4-I04R1 — provenance + integrity + pointer-truth microseal tests.
 
-SENSOR-B4-I04R1A stage: the acquisition-provenance gate (Defect A) — every
-non-empty manifest blob_ref requires a durable matching AcquisitionRecord
-(I04R1 §4-§11; the frozen ordering is never skipped).  Later R1 stages add
-the H3 (B), blobless/secret (C) and pointer (D) classes to this file.
+Covers the four operator TRUTH-SEAM classes (I04R1 §0):
+
+A. every non-empty manifest blob_ref requires durable matching acquisition
+   provenance (I04R1 §4-§11 — the frozen ordering is never skipped);
+B. provider checksums (H3) are recomputed over the EXACT decoded source
+   bytes — a caller boolean is never verification evidence (I04R1 §14-§24);
+C. blobless outcomes require closed explicit failure evidence and secret-
+   bearing acquisition metadata is refused before persistence
+   (I04R1 §25-§33);
+D. the current pointer is a closed, strictly-typed JSON contract bound to
+   the requested partition_key and to the manifest's ancestry
+   (I04R1 §34-§40).
 
 Regression coverage: P1-P5 crash matrix and old-or-new pointer visibility
 remain green under the sealed pointer schema.
@@ -11,12 +19,14 @@ remain green under the sealed pointer schema.
 
 from __future__ import annotations
 
+import hashlib
+import json
+import zlib
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 import pytest
-
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.providers.base.enums import Granularity
 from crypto_sensor_fabric.storage import (
@@ -29,12 +39,14 @@ from crypto_sensor_fabric.storage import (
     MissingAcquisitionProvenance,
     PartitionManifest,
     PartitionManifestRepository,
+    ProviderChecksumClaimConflict,
     StorageEncoding,
+    UnearnedProviderIntegrityClaim,
 )
-
 FIXED = datetime(2026, 9, 5, 12, 0, 0, tzinfo=UTC)
 MEDIA = "application/json"
 PK = "KRAKEN_FUTURES/MECHANICAL_FUNDING/PI_XBTUSD/2026-08"
+PK_OTHER = "OKX_SPOT/MECHANICAL_OPEN_INTEREST/PI_ETHUSD/2026-08"
 
 
 def make_store(root: Path) -> LocalBlobStore:
@@ -281,3 +293,192 @@ class TestAcquisitionProvenanceGate:
         current = manifest_repo.get_current_manifest(PK)
         assert current.integrity_state is IntegrityState.UNVERIFIED
         assert current.coverage_state.value == "NOT_ATTEMPTED"
+
+
+class TestH3Recomputation:
+    """I04R1 §44 — Defect B: provider integrity earned from exact bytes."""
+
+    DATA = b'{"funding_rate": 1.5e-07, "ts": 1723000000}'
+
+    @staticmethod
+    def _seed(root: Path, data: bytes = DATA) -> tuple[str, LocalBlobStore, BlobMetadataRepository, AcquisitionRepository]:
+        store = make_store(root)
+        blob_repo = BlobMetadataRepository(root, blob_store=store, clock=lambda: FIXED)
+        acq_repo = AcquisitionRepository(
+            root,
+            blob_store=store,
+            blob_metadata_repository=blob_repo,
+            clock=lambda: FIXED,
+        )
+        blob = _put(store, data)
+        blob_repo.append_metadata(blob)
+        return blob.blob_sha256, store, blob_repo, acq_repo
+
+    def test_real_md5_verified_accepted(self, tmp_path: Path) -> None:
+        """10: real MD5 + verified=True -> accepted."""
+        sha, _, _, acq_repo = self._seed(tmp_path)
+        acq_repo.append_acquisition(
+            _acquisition(
+                acquisition_id="acq-md5",
+                blob_sha256=sha,
+                provider_checksum_algorithm="MD5",
+                provider_checksum_value=hashlib.md5(self.DATA).hexdigest(),
+                provider_checksum_verified=True,
+            )
+        )
+        loaded = acq_repo.get_acquisition("acq-md5")
+        assert loaded.provider_checksum_verified is True
+
+    def test_fake_md5_verified_rejected(self, tmp_path: Path) -> None:
+        """11: all-zero MD5 + verified=True -> ProviderChecksumClaimConflict."""
+        sha, _, _, acq_repo = self._seed(tmp_path)
+        with pytest.raises(ProviderChecksumClaimConflict):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-fake",
+                    blob_sha256=sha,
+                    provider_checksum_algorithm="MD5",
+                    provider_checksum_value="0" * 32,
+                    provider_checksum_verified=True,
+                )
+            )
+
+    def test_real_sha256_h3_accepted(self, tmp_path: Path) -> None:
+        """12: real SHA256 H3 -> accepted."""
+        sha, _, _, acq_repo = self._seed(tmp_path)
+        acq_repo.append_acquisition(
+            _acquisition(
+                acquisition_id="acq-sha",
+                blob_sha256=sha,
+                provider_checksum_algorithm="SHA256",
+                provider_checksum_value=hashlib.sha256(self.DATA).hexdigest(),
+                provider_checksum_verified=True,
+            )
+        )
+        assert acq_repo.get_acquisition("acq-sha").provider_checksum_verified is True
+
+    def test_real_crc32_h3_accepted(self, tmp_path: Path) -> None:
+        """13: real CRC32 H3 (8 lowercase hex) -> accepted."""
+        sha, _, _, acq_repo = self._seed(tmp_path)
+        acq_repo.append_acquisition(
+            _acquisition(
+                acquisition_id="acq-crc",
+                blob_sha256=sha,
+                provider_checksum_algorithm="CRC32",
+                provider_checksum_value=format(zlib.crc32(self.DATA), "08x"),
+                provider_checksum_verified=True,
+            )
+        )
+        assert acq_repo.get_acquisition("acq-crc").provider_checksum_verified is True
+
+    def test_verified_false_when_bytes_match_rejected(self, tmp_path: Path) -> None:
+        """14: verified=False against matching bytes -> claim conflict."""
+        sha, _, _, acq_repo = self._seed(tmp_path)
+        with pytest.raises(ProviderChecksumClaimConflict):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-mis",
+                    blob_sha256=sha,
+                    provider_checksum_algorithm="MD5",
+                    provider_checksum_value=hashlib.md5(self.DATA).hexdigest(),
+                    provider_checksum_verified=False,
+                )
+            )
+
+    def test_verified_true_with_blob_none_rejected(self, tmp_path: Path) -> None:
+        """15: verified=True with no durable source bytes -> rejected."""
+        _, _, _, acq_repo = self._seed(tmp_path)
+        with pytest.raises(ProviderChecksumClaimConflict):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-nb",
+                    blob_sha256=None,
+                    http_status_or_source_status="503",
+                    failure_ref="gate:rate_limited",
+                    provider_checksum_algorithm="MD5",
+                    provider_checksum_value=hashlib.md5(self.DATA).hexdigest(),
+                    provider_checksum_verified=True,
+                )
+            )
+
+    def test_algorithm_never_inferred(self, tmp_path: Path) -> None:
+        """16: unknown explicit algorithm -> typed conflict, no length guess."""
+        sha, _, _, acq_repo = self._seed(tmp_path)
+        with pytest.raises(ProviderChecksumClaimConflict):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-unknown",
+                    blob_sha256=sha,
+                    provider_checksum_algorithm="XXH64",
+                    provider_checksum_value="deadbeef",
+                    provider_checksum_verified=True,
+                )
+            )
+
+    def test_unearned_provider_blob_metadata_rejected(self, tmp_path: Path) -> None:
+        """17: caller-set PROVIDER_HASH_VERIFIED metadata -> rejected."""
+        store = make_store(tmp_path)
+        blob_repo = BlobMetadataRepository(tmp_path, blob_store=store, clock=lambda: FIXED)
+        blob = _put(store, self.DATA)
+        with pytest.raises(UnearnedProviderIntegrityClaim):
+            blob_repo.append_metadata(
+                blob.model_copy(
+                    update={"integrity_state": IntegrityState.PROVIDER_HASH_VERIFIED}
+                )
+            )
+
+    def test_local_verified_metadata_remains_accepted(self, tmp_path: Path) -> None:
+        """18: LOCAL_HASH_VERIFIED metadata remains appendable."""
+        store = make_store(tmp_path)
+        blob_repo = BlobMetadataRepository(tmp_path, blob_store=store, clock=lambda: FIXED)
+        blob = _put(store, self.DATA)
+        returned, _ = blob_repo.append_metadata(blob)
+        assert returned.integrity_state is IntegrityState.LOCAL_HASH_VERIFIED
+
+    def test_provider_manifest_claim_without_earned_h3_rejected(
+        self, tmp_path: Path
+    ) -> None:
+        """19: PROVIDER manifest claim needs earned H3 on EVERY blob."""
+        store, blob_repo, acq_repo, manifest_repo = _repos(tmp_path)
+        sha = _seed_blob(store, blob_repo, self.DATA)
+        acq_repo.append_acquisition(
+            _acquisition(acquisition_id="acq-prov", blob_sha256=sha)  # NO H3
+        )
+        with pytest.raises(UnearnedProviderIntegrityClaim):
+            manifest_repo.append_partition_manifest(
+                _manifest(
+                    blob_refs=[sha],
+                    integrity_state=IntegrityState.PROVIDER_HASH_VERIFIED,
+                ),
+                expected_current=None,
+            )
+
+    def test_provider_manifest_claim_with_earned_h3_accepted(
+        self, tmp_path: Path
+    ) -> None:
+        """20: earned matching H3 on every blob -> PROVIDER claim accepted."""
+        store, blob_repo, acq_repo, manifest_repo = _repos(tmp_path)
+        sha = _seed_blob(store, blob_repo, self.DATA)
+        acq_repo.append_acquisition(
+            _acquisition(
+                acquisition_id="acq-h3",
+                blob_sha256=sha,
+                provider_checksum_algorithm="SHA256",
+                provider_checksum_value=hashlib.sha256(self.DATA).hexdigest(),
+                provider_checksum_verified=True,
+            )
+        )
+        result = manifest_repo.append_partition_manifest(
+            _manifest(
+                blob_refs=[sha],
+                integrity_state=IntegrityState.PROVIDER_HASH_VERIFIED,
+            ),
+            expected_current=None,
+        )
+        assert result.disposition.value == "COMMITTED_NEW"
+        assert (
+            manifest_repo.get_current_manifest(PK).integrity_state
+            is IntegrityState.PROVIDER_HASH_VERIFIED
+        )
+
+

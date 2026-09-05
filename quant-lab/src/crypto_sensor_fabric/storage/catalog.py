@@ -53,7 +53,12 @@ from .atomic import (
     publish_no_replace,
 )
 from .blob_store import BlobMissing, InvalidStorageRoot, LocalBlobStore
-from .checksums import sha256_file, validate_sha256_hex
+from .checksums import (
+    checksum_algorithm_from_name,
+    sha256_file,
+    validate_sha256_hex,
+    verify_checksum,
+)
 from .enums import IntegrityState, StorageEncoding
 from .models import AcquisitionRecord, EvidenceBlob
 from .paths import blob_object_key, resolve_under_root
@@ -118,6 +123,28 @@ class ProjectionReferenceUnavailable(CatalogError):
 
     I05 owns T0B projections; I04 manifest writes must keep projection_refs
     EMPTY and fail closed on dangling projection refs.
+    """
+
+
+class ProviderChecksumClaimConflict(CatalogError):
+    """A provider-checksum (H3) claim contradicts recomputation over bytes.
+
+    SENSOR-B4-I04R1 (Defect B): ``provider_checksum_verified`` is NEVER
+    trusted from caller input.  The repository recomputes the specified
+    algorithm against the EXACT decoded T0A source bytes before publication;
+    a persisted True/False claim that disagrees with observed reality is a
+    typed conflict (I04R1 §14-§18).
+    """
+
+
+class UnearnedProviderIntegrityClaim(CatalogError):
+    """A PROVIDER_HASH_VERIFIED claim lacks durable recomputed proof.
+
+    I04R1 §20-§22: provider-level integrity must be EARNED from exact source
+    bytes.  Blob metadata may only be appended at UNVERIFIED or
+    LOCAL_HASH_VERIFIED; provider-level manifest claims additionally require
+    a durable matching acquisition carrying a repository-recomputed H3 with
+    verified=True.
     """
 
 
@@ -586,6 +613,18 @@ class BlobMetadataRepository:
         (never overwrite, never silently choose one — I04 §27).
         """
         key = BlobStorageKey(blob.blob_sha256, blob.storage_encoding)
+        # I04R1 §20/§21 (Defect B): provider-level blob metadata is NOT
+        # appendable here.  BlobMetadataRepository proves LOCAL source-hash
+        # verification only; PROVIDER_HASH_VERIFIED requires durable H3 proof
+        # that lives in the AcquisitionRecord AFTER repository recomputation.
+        # No caller-set enum may manufacture an unearned provider claim.
+        if blob.integrity_state is IntegrityState.PROVIDER_HASH_VERIFIED:
+            raise UnearnedProviderIntegrityClaim(
+                "BlobMetadataRepository cannot append PROVIDER_HASH_VERIFIED "
+                "metadata: provider integrity must be earned as a durable H3 "
+                "claim in the AcquisitionRecord (recomputed over exact source "
+                "bytes), never manufactured from caller input (I04R1 §20/§21)"
+            )
         self._require_physical_truth(blob)
         rows = [_blob_row(blob)]
         final = self._fragment_path(key)
@@ -725,7 +764,7 @@ class AcquisitionRepository:
         return self._family_dir() / self._fragment_name(acquisition_id)
 
     def _validate_blob_linkage(self, record: AcquisitionRecord) -> None:
-        """I04 §12/§13/§14: blob truth before acquisition fact."""
+        """I04 §12/§13/§14 + I04R1 §25-§27: blob truth before acquisition fact."""
         if record.blob_sha256 is not None:
             try:
                 metas = self._blob_metadata_repository.get_blob_metadata(
@@ -780,6 +819,112 @@ class AcquisitionRepository:
                     "explicit failure/unavailable evidence cannot be "
                     "persisted (I04 §13)"
                 )
+
+    def _validate_provider_checksum_claim(self, record: AcquisitionRecord) -> None:
+        """I04R1 §14-§19: recompute H3 over the EXACT decoded source bytes.
+
+        A caller boolean is NOT verification evidence.  When algorithm/value
+        are supplied and a blob exists, the repository recomputes the
+        specified algorithm and the persisted ``provider_checksum_verified``
+        claim must match observed reality (True requires match, False requires
+        mismatch).  A persisted mismatch is retained ONLY as explicit failure
+        evidence (verified=False + failure evidence); it never qualifies as
+        usable provenance.  ``None`` means NOT YET CLAIMED VERIFIED.
+        """
+        if record.blob_sha256 is None:
+            # no durable source bytes exist against which any H3 claim could
+            # have been proven (I04R1 §18)
+            if record.provider_checksum_verified is True:
+                raise ProviderChecksumClaimConflict(
+                    "provider_checksum_verified=True requires durable source "
+                    "bytes; this acquisition has no blob (I04R1 §18)"
+                )
+            return
+        if record.provider_checksum_algorithm is None:
+            return  # no H3 claim; nothing to recompute
+        try:
+            algorithm = checksum_algorithm_from_name(record.provider_checksum_algorithm)
+        except ValueError as exc:
+            raise ProviderChecksumClaimConflict(
+                "unsupported provider checksum algorithm "
+                f"{record.provider_checksum_algorithm!r}; explicit selection "
+                "required, never inferred from digest length (I04R1 §15/§16)"
+            ) from exc
+        value = record.provider_checksum_value
+        if value is None:  # defensive: the model already forbids this
+            raise ProviderChecksumClaimConflict(
+                "provider_checksum_value is required when algorithm is supplied"
+            )
+        metas = self._blob_metadata_repository.get_blob_metadata(record.blob_sha256)
+        verified_encoding: StorageEncoding | None = None
+        for meta in metas:
+            if meta.integrity_state in (
+                IntegrityState.QUARANTINED_INTEGRITY_FAILURE,
+                IntegrityState.MISSING_BLOB,
+                IntegrityState.PROJECTION_INVALID,
+            ):
+                continue
+            try:
+                check = self._blob_store.verify_blob(
+                    meta.blob_sha256,
+                    meta.storage_encoding,
+                    expected_byte_length=meta.byte_length,
+                )
+            except BlobMissing:
+                continue
+            if check.integrity_state is IntegrityState.LOCAL_HASH_VERIFIED:
+                verified_encoding = meta.storage_encoding
+                break
+        if verified_encoding is None:
+            raise DanglingBlobReference(
+                f"cannot recompute provider checksum for blob "
+                f"{record.blob_sha256}: no physically verified representation "
+                "exists (I04R1 §15)"
+            )
+        with self._blob_store.open_blob(
+            record.blob_sha256, verified_encoding
+        ) as stream:
+            source_bytes = stream.read()
+        try:
+            observed = verify_checksum(source_bytes, algorithm, value)
+        except ValueError as exc:
+            raise ProviderChecksumClaimConflict(
+                "provider checksum value does not match the algorithm's "
+                "canonical form; never inferred from digest length (I04R1 §16)"
+            ) from exc
+        claimed = record.provider_checksum_verified
+        if claimed is True and not observed:
+            raise ProviderChecksumClaimConflict(
+                "provider_checksum_verified=True but recomputing "
+                f"{algorithm.value} over the exact source bytes does NOT "
+                "match the persisted value (I04R1 §16)"
+            )
+        if claimed is False and observed:
+            raise ProviderChecksumClaimConflict(
+                "provider_checksum_verified=False but recomputing "
+                f"{algorithm.value} over the exact source bytes DOES match "
+                "the persisted value (I04R1 §16)"
+            )
+        if not observed:
+            # a mismatched provider checksum is retained ONLY as explicit
+            # failure evidence (I04R1 §19); it must never masquerade as
+            # usable acquisition provenance for a manifest.  (The closed
+            # failure predicate moves to the shared I04R1C helper.)
+            has_failure_evidence = record.failure_ref is not None
+            if not has_failure_evidence:
+                status = record.http_status_or_source_status
+                try:
+                    has_failure_evidence = status is not None and int(status.strip()) >= 400
+                except (TypeError, ValueError):
+                    has_failure_evidence = False
+            if claimed is False and has_failure_evidence:
+                return
+            raise ProviderChecksumClaimConflict(
+                "persisted provider checksum does not match the exact source "
+                "bytes and is not backed by explicit failure evidence; "
+                "retain a checksum mismatch ONLY as verified=False failure "
+                "evidence with failure_ref (I04R1 §19)"
+            )
 
     # -- narrow provenance reads (I04R1 §12/§47 — NOT RawEvidenceQuery) ------
 
@@ -867,6 +1012,37 @@ class AcquisitionRepository:
             )
         )
 
+    def has_earned_h3_proof(
+        self,
+        *,
+        blob_sha256: str,
+        provider_id: str,
+        venue: str,
+        sensor_family: SensorFamily,
+        native_instrument: str,
+        native_granularity: Granularity | None,
+    ) -> bool:
+        """I04R1 §22.C: a matching acquisition carries recomputed verified H3.
+
+        ``provider_checksum_verified=True`` only ever reaches a durable row
+        AFTER repository recomputation (I04R1B), so its presence in a
+        matching acquisition IS earned provider proof.
+        """
+        for record in self.find_matching_acquisitions(
+            blob_sha256=blob_sha256,
+            provider_id=provider_id,
+            venue=venue,
+            sensor_family=sensor_family,
+            native_instrument=native_instrument,
+            native_granularity=native_granularity,
+        ):
+            if (
+                record.provider_checksum_algorithm is not None
+                and record.provider_checksum_verified is True
+            ):
+                return True
+        return False
+
     def append_acquisition(
         self, record: AcquisitionRecord
     ) -> tuple[AcquisitionRecord, CatalogFragmentReceipt]:
@@ -875,8 +1051,13 @@ class AcquisitionRepository:
         Same acquisition_id + exact same semantic record -> idempotent.
         Same acquisition_id + any differing field -> AcquisitionIdentityConflict
         (never mutate old acquisition facts — I04 §28/§70).
+
+        I04R1 gates before any publication: blob linkage (I04 §12-§14), and
+        provider-checksum recomputation over the exact decoded source bytes
+        (Defect B).
         """
         self._validate_blob_linkage(record)
+        self._validate_provider_checksum_claim(record)
         rows = [_acquisition_row(record)]
         final = self._fragment_path(record.acquisition_id)
         try:
@@ -980,6 +1161,8 @@ __all__ = [
     "DanglingBlobReference",
     "LocalEvidenceCatalog",
     "ProjectionReferenceUnavailable",
+    "ProviderChecksumClaimConflict",
+    "UnearnedProviderIntegrityClaim",
     "canonical_nested_json",
     "model_canonical_json",
     "publish_immutable_fragment",
