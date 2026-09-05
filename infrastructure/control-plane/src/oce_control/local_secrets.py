@@ -304,6 +304,7 @@ def is_capability_consumed(nonce: str) -> bool:
 
 CONFIGURE_JOURNAL_FILE_NAME = "configure_journal.json"
 CONFIGURE_COMMIT_MARKER_NAME = "configure.committed"
+CONFIGURE_LOCK_FILE_NAME = "configure.lock"
 
 
 def configure_journal_path() -> Path:
@@ -312,6 +313,10 @@ def configure_journal_path() -> Path:
 
 def configure_commit_marker_path() -> Path:
     return RUNTIME_DIR / CONFIGURE_COMMIT_MARKER_NAME
+
+
+def configure_lock_path() -> Path:
+    return RUNTIME_DIR / CONFIGURE_LOCK_FILE_NAME
 
 
 def atomic_write_json(path: Path, data: dict) -> None:
@@ -353,13 +358,35 @@ def _atomic_write_json(path: Path, data: dict) -> None:
     tmp = path.with_name(f".{path.name}.tmp-{os.getpid()}")
     try:
         _atomic_write_text(tmp, json.dumps(data, indent=2))
-        os.replace(tmp, path)
+        _replace_with_retry(tmp, path)
     finally:
         try:
             tmp.unlink()
         except FileNotFoundError:
             pass
     _chmod(path, 0o600)
+
+
+def _replace_with_retry(tmp: Path, target: Path, attempts: int = 40) -> None:
+    """os.replace with bounded retry for Windows sharing violations.
+
+    A concurrent reader (journal poller, audit probe, store watcher) can make
+    the destination briefly un-replaceable on Windows (WinError 5/32). The
+    write is atomic only when the replace succeeds; retrying for up to ~1s
+    preserves the same-directory tmp + os.replace guarantee instead of
+    failing the whole operation on a transient sharing race.
+    """
+    import time as _time
+    for attempt in range(attempts):
+        try:
+            os.replace(tmp, target)
+            return
+        except OSError as exc:
+            if exc.errno not in (13, 32, 33):  # EACCES / sharing / locked
+                raise
+            if attempt == attempts - 1:
+                raise
+            _time.sleep(0.025)
 
 
 def _atomic_write_text(path: Path, content: str, mode: int = 0o600) -> None:
@@ -375,7 +402,10 @@ def _atomic_write_text(path: Path, content: str, mode: int = 0o600) -> None:
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
             fh.write(content)
-        os.replace(tmp, path)
+        # Windows: os.replace can transiently fail (WinError 5/32) when a
+        # concurrent reader holds the destination open — retry briefly; the
+        # tmp name is pid-unique so a retry never overwrites a partial write.
+        _replace_with_retry(tmp, path)
     finally:
         try:
             tmp.unlink()

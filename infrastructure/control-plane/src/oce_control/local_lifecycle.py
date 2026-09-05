@@ -28,6 +28,7 @@ after the activation gate).
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
 import re
@@ -372,30 +373,192 @@ def _configure_restore(snapshot: dict) -> None:
                 pass
 
 
+def _configure_lock_path() -> Path:
+    """Whole-configure exclusive lock (B4-CXR7U8-04). One file lock
+    serializes the ENTIRE configure operation across processes so no failed
+    or crashed configure can interleave with another; OS file locks are
+    released automatically when the holder dies (even a hard kill), so a
+    crashed holder can never wedge configure forever."""
+    return ls.configure_lock_path()
+
+
+def _configure_lock() -> None:
+    """Acquire the whole-configure exclusive lock (blocking, bounded).
+
+    OS advisory locks (msvcrt on Windows) give up after ~10s of contention,
+    so the lock retries until acquired or a 300s deadline passes — a
+    concurrent configure must WAIT, never fail-open or interleave.
+    """
+    _configure_lock_path().parent.mkdir(parents=True, exist_ok=True)
+    global _CONFIGURE_LOCK_FILE
+    lf = open(_configure_lock_path(), "a+b")
+    deadline = time.time() + 300
+    while True:
+        try:
+            ls._exclusive_lock(lf)
+            break
+        except OSError:
+            if time.time() > deadline:
+                lf.close()
+                raise RuntimeError(
+                    "another configure holds the whole-configure lock and "
+                    "did not finish within 300s — refusing to interleave "
+                    "(B4-CXR7U8-04)")
+            time.sleep(0.2)
+    _CONFIGURE_LOCK_FILE = lf
+
+
+def _configure_unlock() -> None:
+    global _CONFIGURE_LOCK_FILE
+    lf = _CONFIGURE_LOCK_FILE
+    _CONFIGURE_LOCK_FILE = None
+    if lf is None:
+        return
+    try:
+        ls._unlock(lf)
+    finally:
+        try:
+            lf.close()
+        except OSError:
+            pass
+
+
+_CONFIGURE_LOCK_FILE = None
+
+
+def _configure_pause_point(stage: str) -> None:
+    """Deterministic interruption hook for crash/concurrency tests
+    (B4-CXR7U8-04). Purely test/CI instrumentation, carried OUTSIDE the
+    governed OCE_* namespace so the fail-closed namespace policy never sees
+    it: when CXR7U8_CONFIGURE_PAUSE_STAGE names the current stage, block
+    until the process is killed or a release file
+    (CXR7U8_CONFIGURE_RELEASE_FILE) appears. Production never sets these;
+    without them this returns immediately and adds no behavior."""
+    pause = os.environ.get("CXR7U8_CONFIGURE_PAUSE_STAGE", "")
+    if pause != stage:
+        return
+    release = os.environ.get("CXR7U8_CONFIGURE_RELEASE_FILE", "")
+    deadline = time.time() + 300
+    while time.time() < deadline:
+        if release and os.path.exists(release):
+            return
+        time.sleep(0.02)
+    raise RuntimeError(f"configure pause at {stage} timed out")
+
+
+def _encode_snapshot(snapshot: dict) -> dict:
+    """Serialize a snapshot (bytes -> base64) so the on-disk journal durably
+    contains the recoverable prior state (B4-CXR7U8-04)."""
+    payload = {}
+    for raw_path, data in snapshot["backups"].items():
+        payload[raw_path] = (
+            base64.b64encode(data).decode("ascii") if data is not None else None)
+    return {"version": 1, "snapshot": payload,
+            "snapshot_digest": snapshot["digest"]}
+
+
+def _decode_snapshot(payload: dict) -> dict:
+    """Validate + deserialize a journal snapshot payload (B4-CXR7U8-04).
+    Malformed payloads fail closed (never guess, never reset)."""
+    if not isinstance(payload, dict) or payload.get("version") != 1:
+        raise RuntimeError(
+            "configure journal snapshot payload is malformed/unsupported - "
+            "manual remediation required; OCE never guesses prior state "
+            "(B4-CXR7U8-04)")
+    snap = payload.get("snapshot")
+    if not isinstance(snap, dict):
+        raise RuntimeError(
+            "configure journal carries no recoverable snapshot - manual "
+            "remediation required (B4-CXR7U8-04)")
+    backups = {}
+    for raw_path, enc in snap.items():
+        if enc is None:
+            backups[raw_path] = None
+            continue
+        if not isinstance(enc, str):
+            raise RuntimeError(
+                "configure journal snapshot entry is not base64 text - "
+                "manual remediation required (B4-CXR7U8-04)")
+        try:
+            backups[raw_path] = base64.b64decode(enc.encode("ascii"))
+        except Exception as exc:  # noqa: BLE001 - decode failure = corrupt journal
+            raise RuntimeError(
+                "configure journal snapshot entry is corrupt base64 - manual "
+                "remediation required (B4-CXR7U8-04)") from exc
+    return {"backups": backups, "digest": payload.get("snapshot_digest")}
+
+
+def _recover_interrupted_configure() -> bool:
+    """Deterministic recovery of a configure interrupted by process death
+    (B4-CXR7U8-04). Called while holding the whole-configure lock, before any
+    new snapshot:
+
+    * journal absent                        -> nothing to recover;
+    * journal present + commit marker       -> the authoritative bundle
+      COMMITTED; roll FORWARD by re-deriving the compose projection from the
+      committed store, then drop the journal;
+    * journal present + no commit marker    -> NOT committed; roll BACK to the
+      byte-for-byte prior state captured in the journal durable snapshot,
+      then drop the journal.
+
+    A corrupt/unreadable journal fails closed (manual remediation) - corrupt
+    state is never guessed, never reset, and never overwritten.
+    """
+    journal_path = ls.configure_journal_path()
+    if not journal_path.exists():
+        return False
+    try:
+        payload = json.loads(journal_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        raise RuntimeError(
+            "configure journal exists but is corrupt/unreadable - manual "
+            "remediation required; OCE never guesses prior state "
+            f"(B4-CXR7U8-04): {exc}") from exc
+    marker_path = ls.configure_commit_marker_path()
+    if marker_path.exists():
+        # committed bundle is authoritative: reconcile the projection
+        ls.write_compose_env()
+        journal_path.unlink(missing_ok=True)
+        return True
+    snapshot = _decode_snapshot(payload)
+    _configure_restore(snapshot)
+    journal_path.unlink(missing_ok=True)
+    return True
+
+
 def configure() -> dict:
     """EXPLICIT INITIALIZATION command (B4-CXR6R4; complete-or-nothing per
-    B4-CXR7U6).
+    B4-CXR7U6, serialized + crash-recoverable per B4-CXR7U8-04).
 
     Materializes the postgres password (one-time), the worker token
     (one-time), AND the dedicated activation-handoff key (one-time) in the
     approved store, then writes compose.env. `start`/`restart`/`recover`
     NEVER call this — ordinary activation is read-only over secret authority.
 
-    COMPLETE-OR-NOTHING (B4-CXR7U6): the staged writes run under an explicit
-    transaction journal with a commit marker and deterministic rollback.
+    COMPLETE-OR-NOTHING + CRASH-SAFE (B4-CXR7U6 / B4-CXR7U8-04):
 
-      1. snapshot (byte-for-byte) every initialization-stage target;
-      2. write the journal {stage: pending} atomically;
-      3. stage the mutations (secrets.json authority; compose.env is a
-         DERIVED PROJECTION, never authority);
-      4. mark each stage committed in the journal as it completes;
-      5. write the commit marker and delete the journal.
+      0. the WHOLE operation runs under one exclusive configure lock, so two
+         configure processes can never interleave (a stale snapshot can never
+         be restored over a newer successful commit);
+      1. an interrupted configure from a previous process is recovered FIRST,
+         deterministically: committed (marker present) -> projections rolled
+         forward from the authoritative bundle; not committed -> the prior
+         state captured IN the journal (base64 snapshot) is restored
+         byte-for-byte;
+      2. a byte-for-byte snapshot of every initialization-stage target is
+         written INTO the journal (durable recoverable state);
+      3. stages mutate (secrets.json authority; compose.env is a DERIVED
+         PROJECTION, never authority);
+      4. each stage is marked committed in the journal as it completes;
+      5. the commit marker is written and the journal removed.
 
-    A failure after ANY stage rolls back to the exact previous state;
-    unrelated metadata survives (byte-for-byte restore); a failed configure
-    never leaves a false initialized state. Repeated configure preserves
-    existing authority byte-for-byte (one-time init semantics). Ambient
-    passwords cannot rotate established authority (B4-CXR4R1 unchanged).
+    A failure (or process death) after ANY stage therefore either rolls back
+    to the exact previous state or rolls forward from the committed bundle on
+    the next configure; unrelated metadata survives (byte-for-byte restore);
+    a failed configure never leaves a false initialized state. Repeated
+    configure preserves existing authority byte-for-byte (one-time init
+    semantics). Ambient passwords cannot rotate established authority
+    (B4-CXR4R1 unchanged).
     """
     _preflight_configuration()
     offenders = published_ports_from_compose()
@@ -405,59 +568,73 @@ def configure() -> dict:
             + "; ".join(offenders) + " (B4-CXR6R4 preflight)")
 
     ls.RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
-    journal_path = ls.configure_journal_path()
-    marker_path = ls.configure_commit_marker_path()
-
-    # targets of every initialization stage (+ the commit marker so a failed
-    # RE-configure restores a pre-existing marker instead of erasing it)
-    targets = [ls.SECRETS_FILE, ls.COMPOSE_ENV_FILE, ls.activation_key_file(),
-               marker_path]
-    snapshot = _configure_snapshot(targets)
-
-    def _journal(stage: str, status: str) -> None:
-        ls.atomic_write_json(journal_path, {
-            "stage": stage, "status": status,
-            "snapshot_digest": snapshot["digest"],
-        })
-
+    _configure_lock()
     try:
-        _journal("begin", "pending")
+        recovered = _recover_interrupted_configure()
 
-        # stage 1: postgres password (one-time init; existing store read-only)
-        ls.initialize_runtime_secret()
-        _journal("postgres_password", "committed")
+        journal_path = ls.configure_journal_path()
+        marker_path = ls.configure_commit_marker_path()
 
-        # stage 2: worker token (one-time init; existing token preserved)
-        ls.initialize_worker_token()
-        _journal("worker_token", "committed")
+        # targets of every initialization stage (+ the commit marker so a
+        # failed RE-configure restores a pre-existing marker instead of
+        # erasing it)
+        targets = [ls.SECRETS_FILE, ls.COMPOSE_ENV_FILE,
+                   ls.activation_key_file(), marker_path]
+        snapshot = _configure_snapshot(targets)
 
-        # stage 3: activation handoff key (B4-CXR6R1; one-time, 0600)
-        ls.initialize_activation_handoff_key()
-        _journal("activation_handoff_key", "committed")
+        def _journal(stage: str, status: str) -> None:
+            # the journal durably contains the recoverable prior state
+            payload = _encode_snapshot(snapshot)
+            payload.update({"stage": stage, "status": status})
+            ls.atomic_write_json(journal_path, payload)
 
-        # stage 4: compose.env — DERIVED PROJECTION of the governed store,
-        # never authority (B4-CXR7U6)
-        ls.write_compose_env()
-        _journal("compose_env_projection", "committed")
-
-        # COMMIT: marker first-class evidence that initialization completed
-        marker_path.write_text("", encoding="utf-8")
         try:
-            marker_path.chmod(0o600)
-        except OSError:
-            pass
-        journal_path.unlink(missing_ok=True)
-    except BaseException:
-        # deterministic rollback: prior state restored byte-for-byte (the
-        # commit marker is part of the snapshot — a pre-existing marker is
-        # restored, a first-time failure leaves none). The failed journal is
-        # removed only AFTER the restore so a crash during rollback still
-        # leaves the journal as evidence.
-        try:
-            _configure_restore(snapshot)
-        finally:
+            _journal("begin", "pending")
+
+            # stage 1: postgres password (one-time; existing store read-only)
+            ls.initialize_runtime_secret()
+            _journal("postgres_password", "committed")
+            _configure_pause_point("postgres_password")
+
+            # stage 2: worker token (one-time; existing token preserved)
+            ls.initialize_worker_token()
+            _journal("worker_token", "committed")
+            _configure_pause_point("worker_token")
+
+            # stage 3: activation handoff key (B4-CXR6R1; one-time, 0600)
+            ls.initialize_activation_handoff_key()
+            _journal("activation_handoff_key", "committed")
+            _configure_pause_point("activation_handoff_key")
+
+            # stage 4: compose.env — DERIVED PROJECTION of the governed
+            # store, never authority (B4-CXR7U6)
+            ls.write_compose_env()
+            _journal("compose_env_projection", "committed")
+            _configure_pause_point("compose_env_projection")
+
+            # COMMIT: marker first-class evidence that initialization
+            # completed (crash after this point rolls FORWARD on restart)
+            marker_path.write_text("", encoding="utf-8")
+            try:
+                marker_path.chmod(0o600)
+            except OSError:
+                pass
+            _journal("commit", "committed")
+            _configure_pause_point("commit")
             journal_path.unlink(missing_ok=True)
-        raise
+        except BaseException:
+            # deterministic rollback: prior state restored byte-for-byte (the
+            # commit marker is part of the snapshot — a pre-existing marker
+            # is restored, a first-time failure leaves none). The failed
+            # journal is removed only AFTER the restore so a crash during
+            # rollback still leaves the journal as evidence.
+            try:
+                _configure_restore(snapshot)
+            finally:
+                journal_path.unlink(missing_ok=True)
+            raise
+    finally:
+        _configure_unlock()
 
     source = "unset"
     if ls.SECRETS_FILE.exists():
@@ -465,11 +642,15 @@ def configure() -> dict:
             source = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8")).get("source", "persisted")
         except (json.JSONDecodeError, OSError):
             source = "persisted"
+    recovered = locals().get("recovered", False)
     report = {
         "runtime_dir": str(ls.RUNTIME_DIR),
         "secret_source": source,
         "port_offenders": offenders,
         "initialization": "complete-or-nothing (transaction journal + commit marker, B4-CXR7U6)",
+        "crash_recovery": ("rolled forward/back from an interrupted configure"
+                           if recovered else "none"),
+        "serialized": "whole-configure exclusive lock (B4-CXR7U8-04)",
         "compose_env": "derived projection of the governed store (not authority)",
     }
     return report
