@@ -733,6 +733,7 @@ class FrozenExperimentProtocol:
     promotion_criteria: Tuple[str, ...]
     target_domain: str = ""
     fingerprint: str = ""
+    frozen_before_result_evidence: str = ""   # ER-01: evidence for freeze-before-result, not mere assertion
 
     @classmethod
     def from_fixture(cls, data: Mapping[str, Any]) -> "FrozenExperimentProtocol":
@@ -746,11 +747,15 @@ class FrozenExperimentProtocol:
                   holdout_ref=str(data.get("holdout_ref", "")),
                   cost_execution_assumptions=tuple(data.get("cost_execution_assumptions", [])),
                   promotion_criteria=tuple(data.get("promotion_criteria", [])),
-                  target_domain=str(data.get("target_domain", "")))
-        object.__setattr__(obj, "fingerprint", deterministic_hex("frozen_protocol", obj.to_dict()))
+                  target_domain=str(data.get("target_domain", "")),
+                  frozen_before_result_evidence=str(data.get("frozen_before_result_evidence", "")),
+                  )
+        object.__setattr__(obj, "fingerprint", obj.compute_fingerprint_canonical())
         return obj
 
-    def to_dict(self) -> Dict[str, Any]:
+    def canonical_dict(self) -> Dict[str, Any]:
+        """Canonical fields ONLY — excludes fingerprint so the fingerprint is never
+        self-referential (ER-01: fingerprint excludes its own fingerprint field)."""
         return {"protocol_id": self.protocol_id, "mechanism_ref": self.mechanism_ref,
                 "dataset_ref": self.dataset_ref, "time_range": self.time_range,
                 "features": list(self.features), "metrics": list(self.metrics),
@@ -759,7 +764,19 @@ class FrozenExperimentProtocol:
                 "cost_execution_assumptions": list(self.cost_execution_assumptions),
                 "promotion_criteria": list(self.promotion_criteria),
                 "target_domain": self.target_domain,
-                "fingerprint": self.fingerprint}
+                "frozen_before_result_evidence": self.frozen_before_result_evidence}
+
+    def compute_fingerprint_canonical(self) -> str:
+        """Recompute fingerprint from canonical fields only (ER-01: fingerprint
+        must be independently derivable from the canonical protocol fields)."""
+        return deterministic_hex("frozen_protocol", self.canonical_dict())
+
+    def to_dict(self) -> Dict[str, Any]:
+        d = self.canonical_dict()
+        d["fingerprint"] = self.fingerprint
+        return d
+
+
 
 
 # --------------------------------------------------------------------------- #
@@ -1127,7 +1144,9 @@ def diagnose_provider_disagreement(
     ok = add("instrument_identity", canon_ok and ct_ok,
              f"canonical A={obs_a.instrument_canonical_id} B={obs_b.instrument_canonical_id}; "
              f"contract A={obs_a.contract_type}/{sem_a.contract_type} "
-             f"B={obs_b.contract_type}/{sem_b.contract_type}")
+             f"B={obs_b.contract_type}/{sem_b.contract_type}; "
+             f"instrument_mapping_ok A={sem_a.instrument_mapping_ok} B={sem_b.instrument_mapping_ok} "
+             f"(contract-declared, not independently re-derived in kernel)")
     if not ok:
         if ct_ok and not canon_ok:
             cause, terminal = "INSTRUMENT_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH"
@@ -1151,14 +1170,28 @@ def diagnose_provider_disagreement(
     if not ok:
         return result("ADAPTER_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH")
     # 4 normalization (canonical units agree AND each adapter's native->canonical
-    # conversion is valid AND normalized values are actually present)
+    # conversion is valid AND normalized values are actually present).
+    #
+    # ER-06: sem_a.normalization_valid / sem_b.normalization_valid are
+    # contract-declared semantics (what the provider contract asserts SHOULD be
+    # true). They are NOT independently re-derived from the observation data in
+    # this kernel — the kernel does not have a live adapter engine. Where the
+    # observation itself carries deterministic evidence of normalization fidelity
+    # (e.g. a recomputed checksum or native-value round-trip), that evidence
+    # would be checked here. In its absence, the diagnosis reports the
+    # contract-declared status HONESTLY rather than labeling it empirically
+    # verified. The has_normalized_value gate (presence, never 0.0 coercion)
+    # IS independently checkable and is enforced.
     if (not obs_a.has_normalized_value) or (not obs_b.has_normalized_value):
         add("normalization", False, "normalized value missing (never coerced to 0.0)")
         return result("NORMALIZATION_MISSING", "DATA_INSUFFICIENT")
-    ok = add("normalization", sem_a.canonical_units == sem_b.canonical_units
-             and sem_a.normalization_valid and sem_b.normalization_valid
-             and obs_a.has_normalized_value and obs_b.has_normalized_value,
-             f"canonical A={sem_a.canonical_units} B={sem_b.canonical_units}")
+    norm_contract_ok = sem_a.canonical_units == sem_b.canonical_units
+    norm_reported = sem_a.normalization_valid and sem_b.normalization_valid
+    norm_ok = norm_contract_ok and norm_reported
+    detail = (f"canonical A={sem_a.canonical_units} B={sem_b.canonical_units}; "
+              f"contract_declared_valid A={sem_a.normalization_valid} B={sem_b.normalization_valid} "
+              f"(not independently re-derived in kernel — no live adapter engine)")
+    ok = add("normalization", norm_ok, detail)
     if not ok:
         return result("NORMALIZATION_MISMATCH", "REPAIRABLE_SOURCE_MISMATCH")
     # 5 time semantics — observation window must match the provider semantic

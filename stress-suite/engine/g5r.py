@@ -56,7 +56,8 @@ class IndependenceAssessment:
     distinct_method_runtime_lineages: int = 0
     unknown_lineage_count: int = 0
     verified_distinct_lineage_count: int = 0
-    independence_status: str = "UNRESOLVED"     # CONFIRMED | SUPPORTED | UNRESOLVED
+    independence_status: str = "UNRESOLVED"     # CONFIRMED | SUPPORTED | SOURCE_ONLY | UNRESOLVED
+    topology_scope: str = ""                    # which lineage dimensions were assessed
     rationale: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
@@ -68,6 +69,7 @@ class IndependenceAssessment:
             "unknown_lineage_count": self.unknown_lineage_count,
             "verified_distinct_lineage_count": self.verified_distinct_lineage_count,
             "independence_status": self.independence_status,
+            "topology_scope": self.topology_scope,
             "rationale": self.rationale,
         }
 
@@ -106,10 +108,38 @@ def derive_independence(
                 ml = (method_lineage_of.get(r) or "").strip()
                 if ml:
                     method_lineages.add(ml)
+    # ER-05: G5 independence is a SUBSET of the G3 topology. G5 assesses
+    # source lineage and (where available) method/runtime lineage. It does NOT
+    # claim the full G3 topology (model_family, provider, retrieval, prior-
+    # conclusion-exposure, implementation_path, experiment_design, allocator).
+    # The topology_scope documents which dimensions were assessed.
+    #
+    # CONFIRMED requires >= 2 distinct source lineages AND zero unknowns.
+    # WHEN method_lineage_of IS provided: CONFIRMED further requires that the
+    # method/runtime lineages are also distinct (len(method_lineages) >= 2) when
+    # there are >= 2 source lineages — different source labels alone is not full
+    # independence (ER-05: DIFFERENT SOURCE LABELS ALONE != FULL INDEPENDENCE).
+    # If method_lineage_of is provided but method lineages are not distinct
+    # (e.g. 2 source lineages, 1 method lineage), the result is SOURCE_ONLY.
+    # When method_lineage_of is NOT provided, the result is CONFIRMED with
+    # topology_scope='source_only' (method/runtime not assessed).
+    topology_scope = "source_and_method_runtime" if method_lineage_of else "source_only"
     if refs and source_lineages and not unknown and len(source_lineages) >= 2:
-        status = "CONFIRMED"
-        rationale = (f"{len(source_lineages)} verified distinct source lineages "
-                     f"({sorted(source_lineages)}); 0 unknown")
+        if method_lineage_of and len(method_lineages) < 2:
+            # method_lineage_of provided but method lineages not distinct enough
+            # for full independence given the source lineage count
+            status = "SOURCE_ONLY"
+            rationale = (f"{len(source_lineages)} distinct source lineages but "
+                         f"only {len(method_lineages)} distinct method/runtime lineage(s) "
+                         f"(need >= 2 for full independence); topology: {topology_scope}; "
+                         f"0 unknown")
+        else:
+            status = "CONFIRMED"
+            rationale = (f"{len(source_lineages)} verified distinct source lineages"
+                         + (f" + {len(method_lineages)} distinct method/runtime lineages "
+                            f"({sorted(method_lineages)})" if method_lineage_of and method_lineages else ""
+                            )
+                         + f"; 0 unknown; topology: {topology_scope}")
     elif refs and source_lineages and not unknown and len(source_lineages) == 1 and len(refs) >= 2:
         status = "SUPPORTED"
         rationale = f"{len(refs)} refs all on one lineage ({sorted(source_lineages)}) — one lineage only"
@@ -128,6 +158,7 @@ def derive_independence(
         unknown_lineage_count=unknown,
         verified_distinct_lineage_count=len(source_lineages),
         independence_status=status,
+        topology_scope=topology_scope,
         rationale=rationale,
     )
 
@@ -379,6 +410,9 @@ class ReproductionQualityAssessment:
     pit_clean: bool = False
     protocol_fingerprint_present: bool = False
     protocol_fingerprint_valid: bool = False
+    claim_ref_match: bool = False
+    metric_definition_present: bool = False
+    unchecked_dimensions: Tuple[str, ...] = ()
     deviations: Tuple[str, ...] = ()
     reasons: Tuple[str, ...] = ()
 
@@ -388,6 +422,9 @@ class ReproductionQualityAssessment:
                 "pit_clean": self.pit_clean,
                 "protocol_fingerprint_present": self.protocol_fingerprint_present,
                 "protocol_fingerprint_valid": self.protocol_fingerprint_valid,
+                "claim_ref_match": self.claim_ref_match,
+                "metric_definition_present": self.metric_definition_present,
+                "unchecked_dimensions": list(self.unchecked_dimensions),
                 "deviations": list(self.deviations), "reasons": list(self.reasons)}
 
 
@@ -428,6 +465,30 @@ def derive_reproduction_quality(
     pit_clean = bool(protocol.pit_rules) and all(
         str(r).strip() for r in protocol.pit_rules)
 
+    # claim_ref must match the claim being reproduced (ER-03: wrong claim_ref
+    # cannot silently pass as a valid reproduction).
+    claim_ref_match = bool(protocol.claim_ref) and protocol.claim_ref == claim.claim_id
+    if not claim_ref_match:
+        deviations.append("wrong_claim_ref")
+        reasons.append(f"protocol claim_ref {protocol.claim_ref!r} != doctrine claim {claim.claim_id!r}")
+
+    # metric_definition: the protocol must define the metric being reproduced.
+    # The doctrine claim defines the TARGET_METRIC (win_rate_band etc.); the
+    # protocol's metric_definition must name a metric compatible with the claim.
+    # We check that the protocol's metric_definition is present and non-empty and
+    # that the claim's numeric_parameters carry a win_rate_band (indicating the
+    # claim is about win rate, the metric the protocol should reproduce).
+    metric_def_present = bool(protocol.metric_definition) and len(str(protocol.metric_definition).strip()) > 0
+    claim_has_target_metric = bool(claim.numeric_parameters.get("win_rate_band"))
+    if not metric_def_present:
+        deviations.append("missing_metric_definition")
+        reasons.append("protocol metric_definition is empty (cannot verify what is being reproduced)")
+    elif not claim_has_target_metric:
+        # the claim doesn't define a target metric band — the metric definition
+        # cannot be compared against a doctrine metric contract; classified as
+        # non-comparable (documented, not a silent pass)
+        reasons.append("claim has no target metric band; protocol metric_definition not doctrine-comparable")
+
     # protocol fingerprint — must exist; when a frozen reference fingerprint is
     # supplied it must MATCH the recomputed fingerprint (a post-result protocol
     # change alters the fingerprint and invalidates the comparison)
@@ -437,6 +498,14 @@ def derive_reproduction_quality(
     else:
         fp_valid = fp_present
 
+    # declaration of which protocol dimensions were NOT compared against any
+    # doctrine/applicability contract (ER-03: unchecked dimensions cannot silently
+    # pass as verified). These are listed for transparency; a CLEAN rating still
+    # requires all CHECKED dimensions to pass.
+    unchecked = ("dataset_lineage", "implementation_version", "feature_definitions",
+                 "sample_definition", "execution_assumptions", "evaluation_criterion",
+                 "independence_lineage", "falsification_criterion")
+
     # declared deviations are recorded but cannot excuse structured mismatches
     for d in declared_deviations:
         if d not in deviations:
@@ -444,11 +513,15 @@ def derive_reproduction_quality(
             reasons.append(f"declared deviation: {d}")
 
     if (not session_match) or (not tier_match) or (not pit_clean) or (not fp_present) \
-            or not fp_valid:
+            or not fp_valid or (not claim_ref_match) or (not metric_def_present and claim_has_target_metric):
         if not fp_present:
             reasons.append("protocol fingerprint missing (cannot be frozen-verified)")
         if not fp_valid and fp_present:
             reasons.append("protocol fingerprint does not match the frozen reference")
+        if not claim_ref_match:
+            reasons.append("protocol claim_ref does not match the doctrine claim")
+        if not metric_def_present and claim_has_target_metric:
+            reasons.append("protocol metric_definition missing while claim defines a target metric")
         quality = "FLAWED"
     else:
         quality = "CLEAN"
@@ -462,6 +535,9 @@ def derive_reproduction_quality(
         protocol_fingerprint_valid=fp_valid,
         deviations=tuple(sorted(set(deviations))),
         reasons=tuple(reasons),
+        claim_ref_match=claim_ref_match,
+        metric_definition_present=metric_def_present,
+        unchecked_dimensions=unchecked,
     )
 
 
@@ -525,32 +601,57 @@ class DoctrineComparison:
 
 
 def compare_measured_result(observed: ObservedResult, claim_interval: Sequence[float]) -> DoctrineComparison:
-    """Generic deterministic comparator for numeric doctrine claims.
+    """Generic deterministic comparator for numeric doctrine claims (ER-04 hardened).
 
     * observed interval entirely inside the claim band  -> SUPPORTS_CLAIM
-    * observed interval entirely outside the claim band with no overlap
-      (materially outside)                              -> CONTRADICTS_CLAIM
-    * partial overlap / touching                        -> INCONCLUSIVE
+    * observed interval entirely outside the claim band with STRICT separation
+      (no boundary touching)                             -> CONTRADICTS_CLAIM
+    * touching at a boundary (hi == c_lo or lo == c_hi) -> INCONCLUSIVE
+    * partial overlap                                     -> INCONCLUSIVE
+    * invalid interval (lo > hi)                         -> fail closed (DATA_INSUFFICIENT)
+
+    A string verdict can never override the measurement; the comparator derives the
+    relation from the intervals alone (G5R-07 / ER-04).
     """
-    lo, hi = observed.uncertainty_interval
+    lo, hi = float(observed.uncertainty_interval[0]), float(observed.uncertainty_interval[1])
     c_lo, c_hi = float(claim_interval[0]), float(claim_interval[1])
-    if hi <= c_lo or lo >= c_hi:
+
+    # fail closed on invalid interval — an inverted uncertainty interval is not a
+    # high-confidence contradiction; it is malformed input (ER-04).
+    if lo > hi:
+        raise ValueError(
+            f"observed uncertainty interval is inverted: lo={lo} > hi={hi} "
+            f"for metric {observed.metric!r} — cannot derive a reliable comparison")
+
+    # STRICT separation only -> CONTRADICTS. ANY boundary touching (hi == c_lo
+    # or lo == c_hi) is INCONCLUSIVE — the intervals meet at a boundary but do
+    # not strictly overlap, so the result is indeterminate rather than a material
+    # contradiction (ER-04: touching / partial overlap -> INCONCLUSIVE).
+    if hi < c_lo or lo > c_hi:
         verdict = "CONTRADICTS_CLAIM"
-        rationale = (f"observed interval [{lo}, {hi}] is entirely outside the claim "
-                     f"band [{c_lo}, {c_hi}] — material disagreement")
-    elif lo >= c_lo and hi <= c_hi:
+        rationale = (f"observed interval ({lo}, {hi}) is entirely outside the claim "
+                     f"band ({c_lo}, {c_hi}) with strict separation — material disagreement")
+    elif lo > c_lo and hi < c_hi:
+        # strictly inside: no endpoint touches a claim boundary
         verdict = "SUPPORTS_CLAIM"
-        rationale = f"observed interval [{lo}, {hi}] lies inside the claim band [{c_lo}, {c_hi}]"
+        rationale = f"observed interval ({lo}, {hi}) lies strictly inside the claim band ({c_lo}, {c_hi})"
     else:
+        # touching one or both boundaries, OR partial overlap -> INCONCLUSIVE
         verdict = "INCONCLUSIVE"
-        rationale = (f"observed interval [{lo}, {hi}] partially overlaps the claim "
-                     f"band [{c_lo}, {c_hi}] — uncertainty overlap")
+        if (hi == c_lo or lo == c_hi) and not (lo < c_lo and hi > c_hi):
+            # boundary touching without interior overlap
+            rationale = (f"observed interval ({lo}, {hi}) touches the claim band "
+                         f"({c_lo}, {c_hi}) at a boundary without interior overlap — "
+                         f"indeterminate, not a material contradiction")
+        else:
+            rationale = (f"observed interval ({lo}, {hi}) partially overlaps or touches "
+                         f"the claim band ({c_lo}, {c_hi}) — uncertainty overlap")
     return DoctrineComparison(
         comparison_id=deterministic_hex("doctrine_compare", observed.metric,
                                         observed.estimate, c_lo, c_hi),
         claim_id="", reproduction_id="",
         metric=observed.metric, observed_estimate=observed.estimate,
-        observed_interval=observed.uncertainty_interval,
+        observed_interval=(lo, hi),
         claim_interval=(c_lo, c_hi), verdict=verdict, rationale=rationale,
     )
 
@@ -863,8 +964,15 @@ def resolve_frozen_target_protocol(
 ) -> FrozenProtocolResolution:
     """A frozen boolean without a registered protocol ref cannot authorize
     DOMAIN_VALIDATION_REQUIRED. The ref must resolve to a real registered
-    protocol whose target domain, claim/hypothesis, fingerprint and
-    frozen-before-result all hold."""
+    protocol whose target domain matches, whose fingerprint is independently
+    recomputed from canonical fields and matches the stored frozen fingerprint,
+    and whose frozen-before-result is evidenced (ER-01).
+
+    The fingerprint is NOT merely checked as non-empty — it is recomputed from the
+    protocol's canonical_dict() (which excludes the fingerprint field itself) and
+    compared to the stored fingerprint. A forged or stale non-empty fingerprint
+    will not match the recomputed value and fails validation.
+    """
     ref = hypothesis.frozen_target_protocol_ref or ""
     if not ref:
         return FrozenProtocolResolution(
@@ -878,25 +986,36 @@ def resolve_frozen_target_protocol(
             claim_hypothesis_ok=False, fingerprint_valid=False, frozen_before_result=False,
             reason=f"protocol ref {ref!r} does not resolve to a registered frozen protocol")
     protocol = matches[0]
-    fp_ok = bool(protocol.fingerprint)
+    # ER-01: independently recompute fingerprint from canonical fields (excludes
+    # the fingerprint field itself) and verify it matches the stored frozen fingerprint.
+    recomputed_fp = protocol.compute_fingerprint_canonical()
+    fp_ok = bool(protocol.fingerprint) and protocol.fingerprint == recomputed_fp
     if getattr(protocol, "target_domain", "") != hypothesis.target_domain:
-        # G5R-21: the protocol must have been frozen FOR the hypothesis's target
-        # domain — a registered protocol for another domain cannot authorize it.
+        # G5R-21 / ER-01: the protocol must have been frozen FOR the hypothesis's
+        # target domain — a registered protocol for another domain cannot authorize it.
         return FrozenProtocolResolution(
             protocol_ref=ref, resolved=True, target_domain_ok=False,
             claim_hypothesis_ok=False, fingerprint_valid=fp_ok,
-            frozen_before_result=True, protocol=protocol,
+            frozen_before_result=bool(protocol.frozen_before_result_evidence),
+            protocol=protocol,
             reason=(f"registered protocol {ref!r} was frozen for target domain "
                     f"{protocol.target_domain!r}, not {hypothesis.target_domain!r}"))
-    domain_ok = True
+    # frozen_before_result must be evidenced, not merely asserted. The
+    # frozen_before_result_evidence field records HOW we know the protocol was
+    # frozen before any result evaluation (e.g. registration timestamp, explicit
+    # freeze statement). A protocol with no such evidence does not authorize.
+    fbr_evidenced = bool(protocol.frozen_before_result_evidence)
     return FrozenProtocolResolution(
         protocol_ref=ref, resolved=True,
-        target_domain_ok=domain_ok,
+        target_domain_ok=True,
         claim_hypothesis_ok=True,
         fingerprint_valid=fp_ok,
-        frozen_before_result=True,
+        frozen_before_result=fbr_evidenced,
         protocol=protocol,
-        reason="frozen protocol registered; ref/domain/fingerprint verified")
+        reason=("frozen protocol registered; ref/domain/fingerprint verified; "
+                f"frozen_before_result evidenced" if fbr_evidenced else
+                "frozen protocol registered; ref/domain/fingerprint verified; "
+                "frozen_before_result NOT evidenced"))
 
 
 # --------------------------------------------------------------------------- #

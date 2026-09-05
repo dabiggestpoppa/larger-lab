@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -57,13 +58,44 @@ def main() -> dict:
         assert verdict["pass"], f"{sid}: {verdict['failures']}"
     print(json.dumps(verdicts, indent=2))
 
-    # 2. digests (non-self-referential: the receipt never hashes itself)
-    tests_pass = int(git("rev-parse", "--short", "HEAD") != "")  # placeholder, real count from pytest
-    counts = {
-        "tests_pass": int(sys.argv[1]) if len(sys.argv) > 1 else tests_pass,
-        "tests_total": int(sys.argv[2]) if len(sys.argv) > 2 else tests_pass,
-    }
+    # 2. digests (non-self-referential: the receipt never hashes itself).
+    #
+    # ER-07: the evidence generator MUST NOT invent test counts. When explicit
+    # counts are not supplied via argv, the script MUST run the bounded test
+    # suite and parse its result. If the test run fails or produces no parseable
+    # result, the generator fails closed rather than emitting a placeholder
+    # success count.
     head = git("rev-parse", "HEAD")
+
+    if len(sys.argv) > 2:
+        # explicit counts supplied from an external authoritative source
+        counts = {
+            "tests_pass": int(sys.argv[1]),
+            "tests_total": int(sys.argv[2]),
+        }
+    else:
+        # run the bounded suite and parse the result -- no placeholder
+        r = subprocess.run(
+            [sys.executable, "-m", "pytest", "-q",
+             "tests/test_g5.py", "tests/test_g5r.py"],
+            capture_output=True, text=True, cwd=str(ROOT))
+        if r.returncode != 0:
+            msg = ("ER-07: evidence generator cannot emit truthful counts when the "
+                   "bounded test suite fails (rc={}); no placeholder "
+                   "success count is permitted.\n"
+                   "{}\n{}"
+                   ).format(r.returncode, r.stdout, r.stderr)
+            raise SystemExit(msg)
+        m = re.search(r"(\d+) passed", r.stdout)
+        if not m:
+            raise SystemExit(
+                "ER-07: evidence generator could not parse pytest pass count from "
+                "stdout; failing closed rather than inventing a count.\n" + r.stdout)
+        tp = int(m.group(1))
+        # total = passed (the bounded suite has no known failures expected at
+        # closure; if there were failures pytest would have non-zero rc above)
+        counts = {"tests_pass": tp, "tests_total": tp}
+
     print(json.dumps({
         "head": head,
         "manual_sha256": hashlib.sha256(MANUAL.read_bytes()).hexdigest(),

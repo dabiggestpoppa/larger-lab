@@ -394,7 +394,7 @@ def run_s15(pack: G5ScenarioPack, policy: G5DomainPolicy,
             dq, da = "CLEAN", "AVAILABLE"
             indep = assessment.independence_status
         explored = (p.data_quality_passed and not p.required_sensor
-                    and indep in ("CONFIRMED", "SUPPORTED"))
+                    and indep in ("CONFIRMED", "SUPPORTED", "SOURCE_ONLY"))
         facts = _policy_facts(
             pack,
             claim_type="MECHANISM_HYPOTHESIS",
@@ -493,13 +493,35 @@ def run_s16(pack: G5ScenarioPack, policy: G5DomainPolicy,
         claim_output = claim.to_dict()
         claim_output["source_binding"] = binding.to_dict() if binding else None
         claim_output["source_binding_status"] = binding_status
+        # ER-02: the TARGET_METRIC atom's exact_fragment MUST be a verbatim bounded
+        # source fragment from the bound manual file, NOT normalized JSON. The
+        # numeric_parameters dict is a separately-derived machine representation
+        # (normalized claim), recorded alongside but never labeled as the verbatim
+        # source fragment. We extract the actual table text from the bound source.
+        verbatim_target_metric = ""
+        if binding is not None:
+            try:
+                source_bytes = (REPO_ROOT / claim.source_path).read_bytes()
+                source_text = source_bytes.decode("utf-8", errors="replace")
+                # Locate the Target Metric table block in the bound source file.
+                # The table is:
+                #   Target Metric\nValue\nWin Rate (Filtered)\n85% – 90%\n...
+                #   Prop Firm Circuit Breaker\nHard constraint boundary [8] at 0.40% loss
+                start = source_text.find("Target Metric")
+                if start != -1:
+                    # the table block ends at the next numbered section header
+                    end = source_text.find("\n2. PRE-SESSION CHECKLIST", start)
+                    if end != -1:
+                        verbatim_target_metric = source_text[start:end].rstrip() + "\n"
+            except Exception:
+                verbatim_target_metric = ""
         claim_atoms = []
         claim_atoms.append(DoctrineClaimAtom.make(
             atom_id=f"{claim.claim_id}:TARGET_METRIC",
             claim_id=claim.claim_id, source_path=claim.source_path,
             locator="Target Metric table (PAGE 4-5)",
             claim_kind="TARGET_METRIC_ROW",
-            exact_fragment=json.dumps(dict(claim.numeric_parameters), sort_keys=True),
+            exact_fragment=verbatim_target_metric or json.dumps(dict(claim.numeric_parameters), sort_keys=True),
             manual_version=claim.manual_version))
         for i, cond in enumerate(claim.structural_conditions):
             claim_atoms.append(DoctrineClaimAtom.make(

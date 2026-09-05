@@ -47,7 +47,7 @@ def _policy():
 
 from engine.domain import (  # noqa: E402
     B7ValidationGate, B7ValidationResult, DataAvailabilityRecord,
-    DisagreementToleranceContract, FrozenExperimentProtocol,
+    DisagreementToleranceContract, DoctrineClaimRecord, FrozenExperimentProtocol,
     ProviderObservation, ProviderSemanticsRecord, SensorRequirement,
     StrategyCandidate, FeatureUse, FillRecord, PerformanceReport,
     TransferInvariantMap,
@@ -243,6 +243,61 @@ def raw_evidence():
 
 
 # =========================================================================== #
+# ER-05 — G5 independence must not fork from G3 topology
+# =========================================================================== #
+
+
+def test_g5_independence_is_source_and_method_runtime_subset():
+    """ER-05: G5 independence assesses source lineage + (where available)
+    method/runtime lineage. It does NOT claim the full G3 topology. When
+    method_lineage_of is provided and shows distinct method lineages alongside
+    distinct source lineages, the status is CONFIRMED with topology_scope
+    'source_and_method_runtime'. When only source lineages are assessed (no
+    method_lineage_of), the topology_scope is 'source_only'."""
+    p = _pattern(refs=["E1", "E2"])
+    # source-only: no method_lineage_of -> CONFIRMED with topology_scope source_only
+    a = derive_independence(p, _registry(("E1", "L1"), ("E2", "L2")), {})
+    assert a.independence_status == "CONFIRMED"
+    assert a.topology_scope == "source_only"
+    assert a.distinct_source_lineages == 2
+    assert a.distinct_method_runtime_lineages == 0
+    # with method_lineage_of showing distinct method lineages -> CONFIRMED,
+    # topology_scope source_and_method_runtime
+    a = derive_independence(p, _registry(("E1", "L1"), ("E2", "L2")),
+                            {"E1": "M1", "E2": "M2"})
+    assert a.independence_status == "CONFIRMED"
+    assert a.topology_scope == "source_and_method_runtime"
+    assert a.distinct_method_runtime_lineages == 2
+    # with method_lineage_of showing SAME method lineage (distinct sources, one
+    # method) -> SOURCE_ONLY (sources distinct but method not)
+    a = derive_independence(p, _registry(("E1", "L1"), ("E2", "L2")),
+                            {"E1": "M1", "E2": "M1"})
+    assert a.independence_status == "SOURCE_ONLY"
+    assert a.topology_scope == "source_and_method_runtime"
+    assert a.distinct_source_lineages == 2
+    assert a.distinct_method_runtime_lineages == 1
+    # G5 does NOT claim full G3 topology: model_family, provider, retrieval,
+    # prior_conclusion_exposure, implementation_path, experiment_design,
+    # allocator_overlap are NOT assessed by G5 independence.
+    assert "model_family" not in a.rationale
+    assert "provider" not in a.rationale
+    assert "retrieval" not in a.rationale
+
+
+def test_g5_independence_does_not_confuse_ref_id_with_epistemic_path():
+    """ER-05: different ref IDs that resolve to the same source lineage count
+    as ONE lineage, not two independent paths. The G5 registry resolves refs
+    to their source_lineage; distinct ref strings != distinct epistemic paths."""
+    p = _pattern(refs=["E1", "E2"])
+    # both refs resolve to the same lineage L1
+    a = derive_independence(p, _registry(("E1", "L1"), ("E2", "L1")), {})
+    assert a.distinct_source_lineages == 1
+    assert a.verified_distinct_lineage_count == 1
+    assert a.independence_status == "SUPPORTED"  # >= 2 refs, one lineage
+    assert a.topology_scope == "source_only"
+
+
+# =========================================================================== #
 # G5R-03 — mechanism admission follows the governed disposition
 # =========================================================================== #
 def _card():
@@ -341,15 +396,33 @@ def test_source_file_unchanged():
 
 
 def test_exact_claim_atoms_preserve_section_boundaries():
-    """G5R-05: the 'exact' claim is the bounded Target Metric table; pre-session
-    conditions / tier sizing / P90 thresholds are SEPARATELY bound fragments,
-    never paraphrased into one composite quote."""
+    """G5R-05 + ER-02: the 'exact' claim is the bounded Target Metric table
+    extracted VERBATIM from the bound source file; pre-session conditions / tier
+    sizing / P90 thresholds are SEPARATELY bound fragments, never paraphrased into
+    one composite quote. The TARGET_METRIC atom's exact_fragment is a verbatim
+    source fragment, NOT normalized JSON (normalized_parameters is a separate
+    machine representation)."""
     res = run_s16(load_g5_pack(G5_DIRS["S16"]).decision_grade(), _policy()).artifacts
     claim = res["doctrine_claims"][0]
     atoms = {a["atom_id"]: a for a in claim["claim_atoms"]}
     target = atoms[f"{claim['claim_id']}:TARGET_METRIC"]
     assert target["claim_kind"] == "TARGET_METRIC_ROW"
-    assert "win_rate_band" in json.loads(target["exact_fragment"])
+    # ER-02: exact_fragment is verbatim source text, not json.dumps of
+    # numeric_parameters. The verbatim table from the manual contains the human-
+    # readable metric names and values.
+    fragment = target["exact_fragment"]
+    assert "Win Rate (Filtered)" in fragment, (
+        "TARGET_METRIC atom exact_fragment must contain the verbatim manual text "
+        "(Win Rate (Filtered)); a JSON-normalized fragment is NOT a verbatim source "
+        "fragment (ER-02)")
+    assert "85%" in fragment or "85" in fragment, (
+        "TARGET_METRIC verbatim fragment must include the 85% value from the manual")
+    assert "Daily Goal" in fragment
+    assert "Max Daily Drawdown" in fragment
+    assert "Prop Firm Circuit Breaker" in fragment
+    # normalized_parameters remains a separate derived representation; the fragment
+    # digest is computed from the verbatim text, not from JSON.
+    assert target["fragment_digest"], "fragment_digest must be present"
     # the composite paraphrase is GONE: no token for external sections inside
     # the exact representation
     assert "Conditions:" not in claim["exact_claim_representation"]
@@ -434,6 +507,118 @@ def test_post_result_protocol_change_changes_fingerprint_and_invalidates_compari
 
 
 # =========================================================================== #
+# ER-03 — reproduction quality must not claim more coverage than it checks
+# =========================================================================== #
+
+
+def _proto(**overrides):
+    """Base reproduction protocol fixture for ER-03 tests."""
+    from engine.g5r import ReproductionProtocol
+    base = {
+        "protocol_id": "RP", "claim_ref": "CEREBUS_V4_P90_TARGET_METRICS",
+        "dataset_lineage": "DS_P90_VALIDATION",
+        "implementation_version": "impl-1.0",
+        "session_window": "00:00-08:00 UTC (Asia)",
+        "tier_constraints": ["TIER_1_100%", "TIER_2_75%", "TIER_3_50%", "NO_GO_>45p"],
+        "feature_definitions": ["asian_range", "p90_activation"],
+        "pit_rules": ["availability_before_decision"],
+        "sample_definition": "M5 EUR/USD 2022-2026",
+        "metric_definition": "filtered_win_rate = wins / filtered_activations",
+        "execution_assumptions": ["zero slippage"],
+        "evaluation_criterion": "win_rate_band",
+        "independence_lineage": "L1",
+        "falsification_criterion": "win_rate below 85% over 200 activations",
+        "frozen_before_result": True,
+    }
+    base.update(overrides)
+    return ReproductionProtocol.from_fixture(base)
+
+
+def _claim():
+    from engine.domain import DoctrineClaimRecord
+    return DoctrineClaimRecord.from_fixture({
+        "claim_id": "CEREBUS_V4_P90_TARGET_METRICS",
+        "doctrine": "CEREBUS", "manual_version": "v4",
+        "source_path": "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt",
+        "section": "PART_1", "page": "PAGE 4-5",
+        "source_fingerprint": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+        "exact_claim_representation": "Target Metric table (bounded).",
+        "numeric_parameters": {
+            "win_rate_band": [0.85, 0.90],
+            "daily_goal_band": [0.010, 0.015],
+            "max_daily_drawdown": 0.005,
+            "prop_circuit_breaker": 0.004,
+            "session_window": "00:00-08:00 UTC (Asia)",
+            "tier_constraints": ["TIER_1_100%", "TIER_2_75%", "TIER_3_50%", "NO_GO_>45p"],
+        },
+        "structural_conditions": ["M5 timeframe", "Asian range tier sizing"],
+        "authority_class": "CEREBUS_MANUAL", "current_status": "AUTHORITATIVE",
+    })
+
+
+def test_wrong_claim_ref_fails_reproduction_quality():
+    """ER-03 CASE L1: a reproduction whose protocol references the wrong claim
+    cannot be CLEAN — the claim_ref must match."""
+    qa = derive_reproduction_quality(_proto(claim_ref="WRONG_CLAIM_ID"), _claim())
+    assert qa.quality == "FLAWED"
+    assert "wrong_claim_ref" in qa.deviations
+    assert qa.claim_ref_match is False
+
+
+def test_missing_metric_definition_fails_when_claim_defines_target_metric():
+    """ER-03 CASE L2: when the doctrine claim defines a target metric band,
+    the protocol must carry a non-empty metric_definition."""
+    qa = derive_reproduction_quality(
+        _proto(metric_definition=""), _claim())
+    assert qa.quality == "FLAWED"
+    assert "missing_metric_definition" in qa.deviations
+    assert qa.metric_definition_present is False
+
+
+def test_correct_protocol_passes_with_unchecked_dimensions_documented():
+    """ER-03: a correct protocol still produces CLEAN, but the assessment
+    HONESTLY documents which dimensions were not compared against any doctrine
+    contract (dataset_lineage, implementation_version, feature_definitions, etc.).
+    No silent pass: the unchecked dimensions are listed."""
+    qa = derive_reproduction_quality(_proto(), _claim())
+    assert qa.quality == "CLEAN"
+    assert qa.claim_ref_match is True
+    assert qa.metric_definition_present is True
+    assert len(qa.unchecked_dimensions) > 0, (
+        "ER-03: a CLEAN assessment must document which dimensions were not "
+        "compared against any doctrine contract; silent passes are prohibited")
+    # the unchecked dimensions are the ones the doctrine does not define a
+    # contract for — they are preserved as non-comparable, not silent passes
+    assert "dataset_lineage" in qa.unchecked_dimensions
+    assert "implementation_version" in qa.unchecked_dimensions
+
+
+def test_claim_with_no_target_metric_band_does_not_fail_on_metric_definition():
+    """ER-03: when the doctrine claim does NOT define a target metric band
+    (e.g. a structural/process claim), the protocol's metric_definition cannot
+    be doctrine-compared; it is classified as non-comparable rather than
+    failing the reproduction."""
+    claim_no_metric = _claim()
+    claim_no_metric = DoctrineClaimRecord(
+        claim_id=claim_no_metric.claim_id, doctrine=claim_no_metric.doctrine,
+        manual_version=claim_no_metric.manual_version,
+        source_path=claim_no_metric.source_path, section=claim_no_metric.section,
+        page=claim_no_metric.page, source_fingerprint=claim_no_metric.source_fingerprint,
+        exact_claim_representation=claim_no_metric.exact_claim_representation,
+        numeric_parameters={"session_window": "00:00-08:00 UTC (Asia)",
+                            "tier_constraints": ["TIER_1_100%"]},
+        structural_conditions=claim_no_metric.structural_conditions,
+        authority_class=claim_no_metric.authority_class,
+        current_status=claim_no_metric.current_status)
+    qa = derive_reproduction_quality(_proto(), claim_no_metric)
+    assert qa.quality == "CLEAN"
+    assert qa.metric_definition_present is True
+    assert any("not doctrine-comparable" in r for r in qa.reasons), (
+        "ER-03: when the claim has no target metric band, the metric_definition "
+        "must be classified as non-comparable, not silently passed or failed")
+
+
+# =========================================================================== #
 # G5R-07 — contradiction from measured result
 # =========================================================================== #
 def test_fixture_string_contradicts_cannot_override_measured_result():
@@ -462,6 +647,54 @@ def test_uncertainty_overlap_can_return_inconclusive():
     obs = ObservedResult(metric="filtered_win_rate", estimate=0.83,
                          uncertainty_interval=(0.78, 0.88), sample_size=2400)
     assert compare_measured_result(obs, [0.85, 0.90]).verdict == "INCONCLUSIVE"
+
+
+def test_boundary_touching_is_inconclusive_not_contradiction():
+    """ER-04 CASE N: an observed interval whose upper bound EQUALS the claim
+    lower bound (touching) must be INCONCLUSIVE, not CONTRADICTS_CLAIM.
+    Likewise an observed lower bound EQUALS the claim upper bound. A string
+    verdict can never override the measured intervals."""
+    # observed upper == claim lower -> touching at lower boundary
+    obs_touch_low = ObservedResult(metric="filtered_win_rate", estimate=0.825,
+                                   uncertainty_interval=(0.80, 0.85), sample_size=2400)
+    c = compare_measured_result(obs_touch_low, [0.85, 0.90])
+    assert c.verdict == "INCONCLUSIVE", (
+        f"ER-04: touching at claim lower boundary must be INCONCLUSIVE, got {c.verdict!r}")
+    assert "touches" in c.rationale or "boundary" in c.rationale.lower()
+    # observed lower == claim upper -> touching at upper boundary
+    obs_touch_high = ObservedResult(metric="filtered_win_rate", estimate=0.925,
+                                    uncertainty_interval=(0.90, 0.95), sample_size=2400)
+    c = compare_measured_result(obs_touch_high, [0.85, 0.90])
+    assert c.verdict == "INCONCLUSIVE", (
+        f"ER-04: touching at claim upper boundary must be INCONCLUSIVE, got {c.verdict!r}")
+    # observed interval exactly equals claim band -> touches at BOTH boundaries
+    obs_exact = ObservedResult(metric="filtered_win_rate", estimate=0.875,
+                               uncertainty_interval=(0.85, 0.90), sample_size=2400)
+    c = compare_measured_result(obs_exact, [0.85, 0.90])
+    assert c.verdict == "INCONCLUSIVE", (
+        f"ER-04: exact-equality interval touches both boundaries -> INCONCLUSIVE, got {c.verdict!r}")
+    # strictly inside -> SUPPORTS
+    obs_inside = ObservedResult(metric="filtered_win_rate", estimate=0.87,
+                                uncertainty_interval=(0.86, 0.88), sample_size=2400)
+    assert compare_measured_result(obs_inside, [0.85, 0.90]).verdict == "SUPPORTS_CLAIM"
+    # strictly outside -> CONTRADICTS
+    obs_outside = ObservedResult(metric="filtered_win_rate", estimate=0.72,
+                                 uncertainty_interval=(0.68, 0.76), sample_size=2400)
+    assert compare_measured_result(obs_outside, [0.85, 0.90]).verdict == "CONTRADICTS_CLAIM"
+
+
+def test_invalid_uncertainty_interval_fails_closed():
+    """ER-04: an inverted uncertainty interval (lo > hi) must fail closed with
+    a ValueError, not produce a spurious CONTRADICTS_CLAIM."""
+    from engine.g5r import ObservedResult
+    obs_bad = ObservedResult(metric="filtered_win_rate", estimate=0.87,
+                             uncertainty_interval=(0.90, 0.80), sample_size=2400)
+    try:
+        compare_measured_result(obs_bad, [0.85, 0.90])
+        assert False, "should have raised ValueError on inverted interval"
+    except ValueError as e:
+        assert "inverted" in str(e).lower() or "lo" in str(e).lower(), (
+            f"ER-04: fail-closed message should mention the inverted interval, got {str(e)!r}")
 
 
 # =========================================================================== #
@@ -730,6 +963,81 @@ def test_tolerance_wired_into_diagnosis():
                                           tolerance=tol)
     assert diag.cause == "NO_DISAGREEMENT"
     assert diag.terminal == "NO_DISAGREEMENT"
+
+
+# =========================================================================== #
+# =========================================================================== #
+# ER-06 — provider semantics: contract-declared vs empirically-verified
+# =========================================================================== #
+
+
+def test_normalization_step_reports_contract_declared_not_empirical():
+    """ER-06 CASE Q: the normalization step in the source diagnosis must
+    HONESTLY report that normalization_valid is a contract-declared semantic
+    (what the provider contract asserts), not an empirically re-derived fact.
+    The kernel does not have a live adapter engine to re-derive the conversion
+    from observation data, so it must not label the transformation as
+    empirically verified merely because the fixture says normalization_valid=True.
+    The has_normalized_value gate (presence, never 0.0 coercion) IS
+    independently enforced."""
+    from engine.domain import diagnose_provider_disagreement
+    obs_a = _obs("O1", normalized_value=340.0, contract_type="SPOT")
+    obs_b = _obs("O2", normalized_value=340.0, contract_type="SPOT")
+    sem_a = _sem("P", "M", normalization_valid=True, contract_type="SPOT")
+    sem_b = _sem("P2", "M", normalization_valid=True, contract_type="SPOT")
+    diag = diagnose_provider_disagreement(obs_a, obs_b, sem_a, sem_b)
+    # the diagnosis should pass (both values equal, semantics clean)
+    assert diag.cause == "NO_DISAGREEMENT"
+    assert diag.terminal == "NO_DISAGREEMENT"
+    # but the normalization step detail must HONESTLY report contract-declared
+    # status, not claim empirical verification
+    norm_step = [s for s in diag.steps if s.layer == "normalization"]
+    assert len(norm_step) == 1, "normalization step must be present in diagnosis"
+    detail = norm_step[0].detail
+    assert "contract_declared" in detail or "not independently" in detail or            "no live adapter engine" in detail, (
+        "ER-06: the normalization step must report that normalization_valid is "
+        "contract-declared, not empirically re-derived; got {!r}".format(detail))
+
+
+def test_instrument_mapping_step_reports_contract_declared():
+    """ER-06: the instrument_identity step must report that
+    instrument_mapping_ok is contract-declared, not independently re-derived."""
+    from engine.domain import diagnose_provider_disagreement
+    obs_a = _obs("O1", contract_type="SPOT")
+    obs_b = _obs("O2", contract_type="SPOT")
+    sem_a = _sem("P", "M", instrument_mapping_ok=True, contract_type="SPOT",
+                 canonical_instrument="BTC_USDT_PERP")
+    sem_b = _sem("P2", "M", instrument_mapping_ok=True, contract_type="SPOT",
+                 canonical_instrument="BTC_USDT_PERP")
+    diag = diagnose_provider_disagreement(obs_a, obs_b, sem_a, sem_b)
+    inst_step = [s for s in diag.steps if s.layer == "instrument_identity"]
+    assert len(inst_step) == 1, "instrument_identity step must be present"
+    detail = inst_step[0].detail
+    assert "contract-declared" in detail or "not independently" in detail, (
+        "ER-06: the instrument_identity step must report instrument_mapping_ok as "
+        "contract-declared; got {!r}".format(detail))
+
+
+def test_missing_normalized_value_blocks_comparison_never_zero():
+    """ER-06 / G5R-12: an observation without a normalized value must block
+    the comparison with NORMALIZATION_MISSING / DATA_INSUFFICIENT, never be
+    silently coerced to 0.0. The diagnosis must not treat absence as a real
+    zero."""
+    from engine.domain import diagnose_provider_disagreement
+    obs_a = _obs("O1", normalized_value=None)
+    obs_b = _obs("O2", normalized_value=340.0)
+    sem_a = _sem("P", "M")
+    sem_b = _sem("P2", "M")
+    diag = diagnose_provider_disagreement(obs_a, obs_b, sem_a, sem_b)
+    assert diag.cause == "NORMALIZATION_MISSING", (
+        "ER-06: missing normalized value must produce NORMALIZATION_MISSING, "
+        "not be coerced to 0.0; got {!r}".format(diag.cause))
+    assert diag.terminal == "DATA_INSUFFICIENT"
+
+
+# =========================================================================== #
+# G5R-16/17 — full-vector sensor adequacy with provenance
+# =========================================================================== #
 
 
 # =========================================================================== #

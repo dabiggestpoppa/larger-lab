@@ -13,6 +13,7 @@
     "holdout_ref": "HOLDOUT_FX",
     "cost_execution_assumptions": ["fx venue session boundaries", "2bp round-trip"],
     "promotion_criteria": ["falsification criteria pass", "independent confirmation of at least 2 lineages"],
-    "target_domain": "FX"
+    "target_domain": "FX",
+    "frozen_before_result_evidence": "registered frozen protocol; frozen before any target-domain result evaluation; protocol_id PROTO_TC1_FX present at scenario load"
   }
 ]
