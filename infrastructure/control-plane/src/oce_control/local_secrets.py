@@ -140,6 +140,18 @@ class LedgerUnwritable(RuntimeError):
     byte-for-byte and the consumer fails closed (B4-CXR7U4)."""
 
 
+class SecretStoreCorrupt(RuntimeError):
+    """Approved secret authority exists but is corrupt (bad JSON, wrong
+    schema, wrong credential/metadata types, or a missing authority key) —
+    FAIL CLOSED (B4-CXR7U8-07). OCE never treats it as empty state and never
+    overwrites it; manual remediation is required."""
+
+
+class SecretStoreUnreadable(SecretStoreCorrupt):
+    """Approved secret authority exists but cannot be read (OS error) —
+    FAIL CLOSED; OCE never rewrites it (B4-CXR7U8-07)."""
+
+
 def _load_consumed_nonces() -> dict[str, dict]:
     """Read the consumed-handoff ledger STRICTLY (B4-CXR7U4).
 
@@ -439,16 +451,30 @@ def _unlock(lock_file) -> None:
 
 
 def _load_full_store_at(path: Path) -> dict:
-    """Load + schema-validate the store at *path* (missing/unparseable-JSON
-    yields {}; valid JSON with an invalid schema raises)."""
+    """Load + schema-validate the store at *path* (B4-CXR7U8-07).
+
+    Missing file MAY mean uninitialized (-> {}). An EXISTING file that is
+    unreadable, invalid JSON, a non-object, or schema-invalid is CORRUPTION
+    and raises SecretStoreCorrupt/SecretStoreUnreadable — it is NEVER treated
+    as empty state and NEVER rewritten."""
     if not path.exists():
         return {}
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {}
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise SecretStoreUnreadable(
+            "approved secret store exists but is unreadable — fail closed, "
+            "no rewrite (B4-CXR7U8-07)") from exc
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise SecretStoreCorrupt(
+            "approved secret store exists but is unreadable/corrupt — fail "
+            "closed, no rewrite (B4-CXR7U8-07)") from exc
     if not isinstance(data, dict):
-        return {}
+        raise SecretStoreCorrupt(
+            "approved secret store is not a JSON object — manual "
+            "remediation required; OCE never overwrites it (B4-CXR7U8-07)")
     _validate_store_schema(data)
     return data
 
@@ -501,26 +527,28 @@ def _validate_store_schema(data: dict) -> None:
     metadata records must be objects with integer generations. A dict/list/
     null value is NEVER silently coerced into a credential."""
     if not isinstance(data, dict):
-        raise RuntimeError(
+        raise SecretStoreCorrupt(
             "approved secret store must be a JSON object (B4-CXR5R4)")
     for key, value in data.items():
         if key == B4_META_KEY:
             if not isinstance(value, dict):
-                raise RuntimeError(
+                raise SecretStoreCorrupt(
                     "approved secret store b4_meta must be an object "
                     "(B4-CXR5R4)")
             for name, rec in value.items():
                 if not isinstance(rec, dict) or \
                         not isinstance(rec.get("generation"), int):
-                    raise RuntimeError(
+                    raise SecretStoreCorrupt(
                         f"approved secret store b4_meta record '{name}' is "
                         "malformed (generation must be an int) (B4-CXR5R4)")
             continue
-        if not isinstance(value, str):
-            raise RuntimeError(
-                f"approved secret store entry '{key}' must be a string — "
-                "dict/list/null values are never coerced into credentials "
-                "(B4-CXR5R4)")
+        if not isinstance(value, str) or not value:
+            # B4-CXR7U8-07: empty/typed credential values are corruption —
+            # never coerced, never silently replaced by a new credential.
+            raise SecretStoreCorrupt(
+                f"approved secret store entry '{key}' must be a non-empty "
+                "string — empty/dict/list/null values are never coerced "
+                "into credentials (B4-CXR5R4)")
 
 
 def initialize_runtime_secret(environ: dict | None = None) -> str:
@@ -590,13 +618,21 @@ def ensure_runtime_secret(environ: dict | None = None) -> str:
 
 
 def load_runtime_secret() -> str | None:
-    """Read the persisted runtime secret, or None if not configured yet."""
+    """Read the persisted runtime secret (B4-CXR7U8-07).
+
+    Missing file -> None (uninitialized). A missing postgres_password KEY in
+    an existing type-valid store -> None (incomplete: the runtime treats it
+    as missing material and start fails closed with a `configure` hint). An
+    EXISTING store that is unreadable, invalid JSON, a non-object, or holds
+    wrong/empty credential or metadata types raises SecretStoreCorrupt — it
+    never behaves like empty state and is never rewritten."""
     if not SECRETS_FILE.exists():
         return None
-    try:
-        return json.loads(SECRETS_FILE.read_text(encoding="utf-8")).get("postgres_password")
-    except (json.JSONDecodeError, OSError):
+    data = _load_full_store()  # raises SecretStoreCorrupt/Unreadable
+    value = data.get("postgres_password")
+    if value is None:
         return None
+    return value
 
 
 def read_runtime_secret() -> str | None:
@@ -627,13 +663,18 @@ def initialize_worker_token() -> str:
         try:
             raw = SECRETS_FILE.read_text(encoding="utf-8")
             parsed = json.loads(raw)
-        except (json.JSONDecodeError, OSError):
-            raise RuntimeError(
+        except json.JSONDecodeError:
+            raise SecretStoreCorrupt(
+                "approved secret store exists but is unreadable/corrupt — "
+                "manual remediation required; OCE never overwrites an "
+                "existing store (B4-CXR4R1)")
+        except OSError:
+            raise SecretStoreUnreadable(
                 "approved secret store exists but is unreadable/corrupt — "
                 "manual remediation required; OCE never overwrites an "
                 "existing store (B4-CXR4R1)")
         if not isinstance(parsed, dict):
-            raise RuntimeError(
+            raise SecretStoreCorrupt(
                 "approved secret store is not a JSON object — manual "
                 "remediation required; OCE never overwrites it (B4-CXR4R1)")
         _validate_store_schema(parsed)
@@ -828,14 +869,10 @@ class RuntimeSecretBackend:
         f = self.file
         if not f.exists():
             return {}
-        try:
-            data = json.loads(f.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
-            return {}
-        if not isinstance(data, dict):
-            return {}
-        _validate_store_schema(data)  # never coerce dict/list/null -> secret
-        return data
+        # B4-CXR7U8-07: an EXISTING corrupt/unreadable/wrong-schema store
+        # raises (fail closed) — it is never treated as an empty store and
+        # never rewritten by a denied or failed operation.
+        return _load_full_store_at(f)
 
     def _save(self, data: dict) -> None:
         # Atomic (same-dir tmp + os.replace): a failed rotation/revocation can

@@ -819,10 +819,15 @@ def doctor() -> dict:
     chk("compose file present", COMPOSE_FILE.exists(), str(COMPOSE_FILE))
     chk("runtime dir perms 0700",
         ls.RUNTIME_DIR.stat().st_mode & 0o777 == 0o700 if ls.RUNTIME_DIR.exists() else False)
-    secret = ls.load_runtime_secret()
+    try:
+        secret = ls.load_runtime_secret()
+        secret_ok = bool(secret) and len(secret) >= 32
+        secret_detail = "generated" if secret else "missing — run `configure`"
+    except ls.SecretStoreCorrupt as exc:
+        secret_ok = False
+        secret_detail = f"CORRUPT store — manual remediation required: {exc}"
     chk("runtime secret configured (no predictable default)",
-        bool(secret) and len(secret) >= 32,
-        "generated" if secret else "missing — run `configure`")
+        secret_ok, secret_detail)
     secret_file_mode = ls.SECRETS_FILE.stat().st_mode & 0o777 if ls.SECRETS_FILE.exists() else None
     chk("secrets.json 0600", secret_file_mode == 0o600, f"mode={oct(secret_file_mode) if secret_file_mode else 'n/a'}")
     try:
@@ -848,11 +853,16 @@ def doctor() -> dict:
     # configuration is invalid AND when the configured secret reference does
     # not resolve — configuration alone is not runtime readiness.
     from oce_control.config_startup import validate_runtime_readiness
-    rdy = validate_runtime_readiness()
+    try:
+        rdy = validate_runtime_readiness()
+        rdy_ok, rdy_ready, rdy_error = rdy["ok"], rdy["ready"], rdy["error"]
+    except ls.SecretStoreCorrupt as exc:
+        rdy_ok = rdy_ready = False
+        rdy_error = f"CORRUPT store — manual remediation required: {exc}"
     chk("config spine effective config valid (fail-closed)",
-        rdy["ok"], rdy["error"] or "valid")
+        rdy_ok, rdy_error or "valid")
     chk("configured secret reference resolves (runtime readiness)",
-        rdy["ready"], rdy["error"] or "resolved")
+        rdy_ready, rdy_error or "resolved")
     return {"checks": checks, "ok": all(c["ok"] for c in checks)}
 
 
@@ -1074,6 +1084,10 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"smoke {n}: {'OK' if ok else 'FAIL'}")
             return 0 if all(ok for _, ok in results) else 1
         if args.command == "restart":
+            # B4-CXR7U8-07: restart never tears down the stack (compose down)
+            # when the secret authority is corrupt or missing — the material
+            # gate fails closed BEFORE any stop/start mutation.
+            _require_runtime_init_material()
             for a in stop():
                 print(f"==> {a}")
             for a in start():
