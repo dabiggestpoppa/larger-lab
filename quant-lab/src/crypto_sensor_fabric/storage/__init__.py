@@ -67,6 +67,7 @@ from .catalog import (
     LocalEvidenceCatalog,
     ProjectionReferenceUnavailable,
     ProviderChecksumClaimConflict,
+    SecretBearingAcquisitionMetadata,
     UnearnedProviderIntegrityClaim,
     canonical_nested_json,
     model_canonical_json,
@@ -222,6 +223,7 @@ __all__ = [
     "RevisionPolicy",
     "RevisionState",
     # checksums / identity primitives
+    "SecretBearingAcquisitionMetadata",
     "Sha256Result",
     "SourceRevision",
     "StagedVerificationError",

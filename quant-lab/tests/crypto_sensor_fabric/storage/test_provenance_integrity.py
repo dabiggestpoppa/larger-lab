@@ -33,6 +33,7 @@ from crypto_sensor_fabric.storage import (
     AcquisitionRecord,
     AcquisitionRepository,
     BlobMetadataRepository,
+    CatalogIntegrityError,
     EvidenceBlob,
     IntegrityState,
     LocalBlobStore,
@@ -40,6 +41,7 @@ from crypto_sensor_fabric.storage import (
     PartitionManifest,
     PartitionManifestRepository,
     ProviderChecksumClaimConflict,
+    SecretBearingAcquisitionMetadata,
     StorageEncoding,
     UnearnedProviderIntegrityClaim,
 )
@@ -480,5 +482,147 @@ class TestH3Recomputation:
             manifest_repo.get_current_manifest(PK).integrity_state
             is IntegrityState.PROVIDER_HASH_VERIFIED
         )
+
+
+class TestBloblessAndSecrets:
+    """I04R1 §45 — Defect C: closed failure evidence + non-secret metadata."""
+
+    def test_blobless_ok_rejected(self, tmp_path: Path) -> None:
+        """21: blobless 'OK' without failure_ref -> rejected (no 2xx guess)."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        with pytest.raises(CatalogIntegrityError):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-ok", blob_sha256=None, http_status_or_source_status="OK"
+                )
+            )
+
+    def test_blobless_success_rejected(self, tmp_path: Path) -> None:
+        """22: blobless 'SUCCESS' without failure_ref -> rejected."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        with pytest.raises(CatalogIntegrityError):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-succ",
+                    blob_sha256=None,
+                    http_status_or_source_status="SUCCESS",
+                )
+            )
+
+    def test_blobless_failure_ref_accepted(self, tmp_path: Path) -> None:
+        """23: blobless with explicit failure_ref -> accepted."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        rec, _ = acq_repo.append_acquisition(
+            _acquisition(
+                acquisition_id="acq-fail",
+                blob_sha256=None,
+                http_status_or_source_status="503",
+                failure_ref="gate:rate_limited",
+                quality_flags=[],
+            )
+        )
+        assert rec.failure_ref == "gate:rate_limited"
+
+    def test_blobless_numeric_http_failure_accepted(self, tmp_path: Path) -> None:
+        """§27: only an explicitly parsed HTTP failure code may contribute."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        acq_repo.append_acquisition(
+            _acquisition(
+                acquisition_id="acq-503",
+                blob_sha256=None,
+                http_status_or_source_status="503",
+                failure_ref="provider:gate_geo",
+            )
+        )
+        assert acq_repo.get_acquisition("acq-503").http_status_or_source_status == "503"
+
+    def test_endpoint_path_with_api_key_rejected(self, tmp_path: Path) -> None:
+        """24: endpoint_path carrying ?api_key= -> refused."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        with pytest.raises(SecretBearingAcquisitionMetadata):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-sec1",
+                    blob_sha256=None,
+                    http_status_or_source_status="503",
+                    failure_ref="gate:x",
+                    endpoint_path="/api/charts?api_key=fake123",
+                )
+            )
+
+    def test_source_locator_token_query_rejected(self, tmp_path: Path) -> None:
+        """25: source_locator with a token query -> refused."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        with pytest.raises(SecretBearingAcquisitionMetadata):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-sec2",
+                    blob_sha256=None,
+                    http_status_or_source_status="503",
+                    failure_ref="gate:x",
+                    source_locator="https://futures.kraken.com/api?token=sekrit",
+                )
+            )
+
+    def test_source_locator_signature_query_rejected(self, tmp_path: Path) -> None:
+        """26: source_locator with a signature query -> refused."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        with pytest.raises(SecretBearingAcquisitionMetadata):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-sec3",
+                    blob_sha256=None,
+                    http_status_or_source_status="503",
+                    failure_ref="gate:x",
+                    source_locator="https://futures.kraken.com/api?signature=abc123",
+                )
+            )
+
+    def test_url_userinfo_rejected(self, tmp_path: Path) -> None:
+        """27: URL userinfo credentials -> refused."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        with pytest.raises(SecretBearingAcquisitionMetadata):
+            acq_repo.append_acquisition(
+                _acquisition(
+                    acquisition_id="acq-sec4",
+                    blob_sha256=None,
+                    http_status_or_source_status="503",
+                    failure_ref="gate:x",
+                    source_locator="https://user:sekrit@futures.kraken.com/api",
+                )
+            )
+
+    def test_public_query_param_preserved(self, tmp_path: Path) -> None:
+        """28: non-secret query parameters are preserved, not stripped."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        rec, _ = acq_repo.append_acquisition(
+            _acquisition(
+                acquisition_id="acq-pub",
+                blob_sha256=None,
+                http_status_or_source_status="503",
+                failure_ref="gate:x",
+                source_locator="https://futures.kraken.com/api?page=2&venue=test",
+            )
+        )
+        assert rec.source_locator == "https://futures.kraken.com/api?page=2&venue=test"
+
+    def test_error_never_echoes_secret_value(self, tmp_path: Path) -> None:
+        """29: failure text names the KEY, never the secret VALUE."""
+        _, _, acq_repo, _ = _repos(tmp_path)
+        for locator, secret in [
+            ("https://host/x?token=super-secret-value-xyz", "super-secret-value-xyz"),
+            ("https://host/x?api_key=ultra-secret-abc", "ultra-secret-abc"),
+        ]:
+            with pytest.raises(SecretBearingAcquisitionMetadata) as excinfo:
+                acq_repo.append_acquisition(
+                    _acquisition(
+                        acquisition_id="acq-sec9",
+                        blob_sha256=None,
+                        http_status_or_source_status="503",
+                        failure_ref="gate:x",
+                        source_locator=locator,
+                    )
+                )
+            assert secret not in str(excinfo.value)
 
 

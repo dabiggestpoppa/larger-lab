@@ -31,6 +31,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -145,6 +146,16 @@ class UnearnedProviderIntegrityClaim(CatalogError):
     LOCAL_HASH_VERIFIED; provider-level manifest claims additionally require
     a durable matching acquisition carrying a repository-recomputed H3 with
     verified=True.
+    """
+
+
+class SecretBearingAcquisitionMetadata(CatalogError):
+    """Acquisition metadata would persist credential material.
+
+    SENSOR-B4-I04R1 (Defect C): endpoint/request-family identity fields are
+    arbitrary strings; the repository refuses secret-bearing values BEFORE
+    persistence (reject, never silently redact — I04R1 §28-§32).  Error
+    messages name the offending KEY, never the secret VALUE.
     """
 
 
@@ -723,6 +734,36 @@ class BlobMetadataRepository:
 
 
 # ---------------------------------------------------------------------------
+# Secret-bearing metadata boundary (I04R1 §28-§32)
+# ---------------------------------------------------------------------------
+
+# Frozen key vocabulary for the narrow non-secret acquisition metadata
+# validator.  ``access_token`` and ``access-token`` are the same normalized
+# key; ``sig`` is word-bounded so it cannot match inside ``signature``.
+# This is the narrow I04R1 repository boundary — NOT the full I15 secret
+# scanner.
+_SECRET_QUERY_KEYS: frozenset[str] = frozenset(
+    {
+        "authorization",
+        "proxy-authorization",
+        "cookie",
+        "set-cookie",
+        "x-api-key",
+        "api-key",
+        "apikey",
+        "access-token",
+        "token",
+        "bearer",
+        "secret",
+        "client-secret",
+        "password",
+        "signature",
+        "sig",
+    }
+)
+
+
+# ---------------------------------------------------------------------------
 # Acquisition repository (I04 §15/§18/§26/§28/§29/§70)
 # ---------------------------------------------------------------------------
 
@@ -807,18 +848,39 @@ class AcquisitionRepository:
                 )
         else:
             # blob_sha256 absent ONLY when the record truthfully represents a
-            # failure/non-payload outcome (I04 §13): explicit failure_ref OR
-            # an explicit failed/unavailable source status is required.
-            status = record.http_status_or_source_status
-            explainable = record.failure_ref is not None or (
-                status is not None and not status.startswith("2")
-            )
-            if not explainable:
+            # failure/non-payload outcome (I04R1 §25-§27).  The old
+            # ``not status.startswith("2")`` heuristic was TOO WEAK — "OK",
+            # "SUCCESS", "CURRENT_ONLY" are not automatically failures.  With
+            # no closed source-status enum in the repo, blobless persistence
+            # requires explicit failure_ref; an explicitly PARSED numeric HTTP
+            # failure code may contribute but string-prefix guessing never
+            # does.  failure_ref remains the preferred evidence.
+            if not self._is_explicit_failure(record):
                 raise CatalogIntegrityError(
                     "successful acquisition without a blob and without "
                     "explicit failure/unavailable evidence cannot be "
-                    "persisted (I04 §13)"
+                    "persisted (I04R1 §26)"
                 )
+
+    @staticmethod
+    def _is_explicit_failure(record: AcquisitionRecord) -> bool:
+        """Closed blobless-failure predicate (I04R1 §26/§27).
+
+        True ONLY when failure_ref is present, OR the source status is an
+        explicitly parsed numeric HTTP failure code (>= 400).  Arbitrary
+        non-2xx-looking strings ("OK", "SUCCESS", "CURRENT_ONLY") are never
+        proof of failure.
+        """
+        if record.failure_ref is not None:
+            return True
+        status = record.http_status_or_source_status
+        if status is None:
+            return False
+        try:
+            code = int(status.strip())
+        except (TypeError, ValueError):
+            return False
+        return code >= 400
 
     def _validate_provider_checksum_claim(self, record: AcquisitionRecord) -> None:
         """I04R1 §14-§19: recompute H3 over the EXACT decoded source bytes.
@@ -908,22 +970,101 @@ class AcquisitionRepository:
         if not observed:
             # a mismatched provider checksum is retained ONLY as explicit
             # failure evidence (I04R1 §19); it must never masquerade as
-            # usable acquisition provenance for a manifest.  (The closed
-            # failure predicate moves to the shared I04R1C helper.)
-            has_failure_evidence = record.failure_ref is not None
-            if not has_failure_evidence:
-                status = record.http_status_or_source_status
-                try:
-                    has_failure_evidence = status is not None and int(status.strip()) >= 400
-                except (TypeError, ValueError):
-                    has_failure_evidence = False
-            if claimed is False and has_failure_evidence:
+            # usable acquisition provenance for a manifest.
+            if claimed is False and self._is_explicit_failure(record):
                 return
             raise ProviderChecksumClaimConflict(
                 "persisted provider checksum does not match the exact source "
                 "bytes and is not backed by explicit failure evidence; "
                 "retain a checksum mismatch ONLY as verified=False failure "
                 "evidence with failure_ref (I04R1 §19)"
+            )
+
+    def _validate_non_secret_metadata(self, record: AcquisitionRecord) -> None:
+        """I04R1 §28-§32: refuse secret-bearing endpoint/request metadata.
+
+        The schema has no credential-specific fields (I04 §5), but the
+        endpoint/request-family identity fields are arbitrary strings: a
+        repository secret boundary must refuse values that would persist
+        credentials.  REJECT, never silently redact — immutable acquisition
+        facts are never mutated during append.  Error messages name the
+        offending KEY, never the secret VALUE.
+        """
+        if record.endpoint_host is not None:
+            self._reject_host_identity(record.endpoint_host)
+        if record.endpoint_path is not None:
+            self._reject_path_identity(record.endpoint_path)
+        if (
+            record.request_family is not None
+            and self._contains_secret_material(record.request_family)
+        ):
+            raise SecretBearingAcquisitionMetadata(
+                "request_family carries secret-bearing material; persist "
+                "sanitized request-family identity only (I04R1 §28)"
+            )
+        self._reject_locator_identity(record.source_locator)
+
+    @staticmethod
+    def _contains_secret_material(text: str) -> bool:
+        """Case-insensitive secret-KEY token scan (word-bounded).
+
+        Normalizes ``access_token`` -> ``access-token`` so the key vocabulary
+        is compared in one canonical form.  ``\b`` prevents false positives
+        like ``sig`` inside ``signature`` while still catching query keys
+        (``?api_key=``, ``?token=``) as they appear literally in a string.
+        """
+        normalized = text.lower().replace("_", "-")
+        for key in _SECRET_QUERY_KEYS:
+            if re.search(rf"\b{re.escape(key)}\b", normalized):
+                return True
+        return False
+
+    @classmethod
+    def _reject_host_identity(cls, host: str) -> None:
+        """endpoint_host must be host identity only (I04R1 §29)."""
+        if any(ch in host for ch in ("@", "?", "#", "/", " ")):
+            raise SecretBearingAcquisitionMetadata(
+                "endpoint_host must be host identity only — userinfo "
+                "credentials, query, fragment and path material are refused "
+                "(I04R1 §29)"
+            )
+        if cls._contains_secret_material(host):
+            raise SecretBearingAcquisitionMetadata(
+                "endpoint_host carries Authorization-like material; persist "
+                "host identity only (I04R1 §29)"
+            )
+
+    @classmethod
+    def _reject_path_identity(cls, path: str) -> None:
+        """endpoint_path must be path identity only (I04R1 §30)."""
+        if any(ch in path for ch in ("?", "#", "@", " ")):
+            raise SecretBearingAcquisitionMetadata(
+                "endpoint_path must be path identity only — query strings, "
+                "fragments and userinfo material are refused; request "
+                "parameters belong in request_fingerprint (I04R1 §30)"
+            )
+        if cls._contains_secret_material(path):
+            raise SecretBearingAcquisitionMetadata(
+                "endpoint_path carries secret-bearing material; persist path "
+                "identity only (I04R1 §30)"
+            )
+
+    @classmethod
+    def _reject_locator_identity(cls, locator: str) -> None:
+        """source_locator: URL userinfo + secret-bearing query keys (I04R1 §31)."""
+        if "://" in locator:
+            # reject userinfo credentials embedded in a URL authority
+            _, tail = locator.split("://", 1)
+            authority = tail.split("/", 1)[0].split("?", 1)[0].split("#", 1)[0]
+            if "@" in authority:
+                raise SecretBearingAcquisitionMetadata(
+                    "source_locator carries URL userinfo credentials; persist "
+                    "a sanitized locator (I04R1 §31)"
+                )
+        if cls._contains_secret_material(locator):
+            raise SecretBearingAcquisitionMetadata(
+                "source_locator carries a secret-bearing query key; persist a "
+                "sanitized locator (I04R1 §31)"
             )
 
     # -- narrow provenance reads (I04R1 §12/§47 — NOT RawEvidenceQuery) ------
@@ -1052,10 +1193,11 @@ class AcquisitionRepository:
         Same acquisition_id + any differing field -> AcquisitionIdentityConflict
         (never mutate old acquisition facts — I04 §28/§70).
 
-        I04R1 gates before any publication: blob linkage (I04 §12-§14), and
-        provider-checksum recomputation over the exact decoded source bytes
-        (Defect B).
+        I04R1 gates before any publication: non-secret metadata boundary
+        (Defect C), blob linkage (I04 §12-§14), and provider-checksum
+        recomputation over the exact decoded source bytes (Defect B).
         """
+        self._validate_non_secret_metadata(record)
         self._validate_blob_linkage(record)
         self._validate_provider_checksum_claim(record)
         rows = [_acquisition_row(record)]
@@ -1162,6 +1304,7 @@ __all__ = [
     "LocalEvidenceCatalog",
     "ProjectionReferenceUnavailable",
     "ProviderChecksumClaimConflict",
+    "SecretBearingAcquisitionMetadata",
     "UnearnedProviderIntegrityClaim",
     "canonical_nested_json",
     "model_canonical_json",
