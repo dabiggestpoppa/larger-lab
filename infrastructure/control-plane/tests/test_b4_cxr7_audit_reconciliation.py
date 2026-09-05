@@ -68,6 +68,13 @@ def pg():
 def _clean_db(pg):
     """Fresh tables per test: full drop then migrate up from empty DB."""
     import migrate
+    # B4-CXR7U8X1: recover from any aborted transaction a previous test may
+    # have left behind (a failed assertion must never poison the shared
+    # module-scoped connection for every later test in the module).
+    try:
+        pg.rollback()
+    except Exception:
+        pass
     with pg.cursor() as cur:
         cur.execute(
             "DROP TABLE IF EXISTS schema_migrations, evidence_refs, audit_log, events, "
@@ -138,8 +145,11 @@ def test_u5_null_exact_retry_through_production_sink(pg):
     sink.append(_sink_record(rid, rid, new=None, previous="9104"))
     sink.append(_sink_record(rid, rid, new=None, previous="9104"))
     with pg.cursor() as cur:
-        cur.execute("SELECT count(*), new IS NULL FROM config_override_audit "
-                    "WHERE request_id=%s", (rid,))
+        # B4-CXR7U8X1: count(*) + a bare boolean expression is invalid SQL
+        # (GroupingError on real PostgreSQL) — aggregate both columns so the
+        # query is valid on every backend.
+        cur.execute("SELECT count(*), bool_and(new IS NULL) "
+                    "FROM config_override_audit WHERE request_id=%s", (rid,))
         count, is_null = cur.fetchone()
     assert count == 1
     assert is_null is True  # NULL round-trips as NULL, not '' or 'None'

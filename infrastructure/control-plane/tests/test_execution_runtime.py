@@ -218,19 +218,21 @@ class TestSandboxB3R5:
         assert "enforced" in report and "unavailable" in report
 
     def test_strict_mode_blocks_when_isolation_unavailable(self, tmp_path, monkeypatch):
-        # Simulate a platform without rlimit primitives by forcing full_isolation False
-        import platform as _platform
+        # B4-CXR7U8X1: force the LIVE resource_limits_available property
+        # (the deprecated full_isolation alias is no longer consulted by the
+        # runner) to simulate a platform without rlimit primitives.
         monkeypatch.setattr(
-            BoundedRunner, "full_isolation",
+            BoundedRunner, "resource_limits_available",
             property(lambda self: False))  # pretend Windows-like
         policy = SandboxPolicy(strict=True)
         runner = BoundedRunner(workspace_base=tmp_path, policy=policy)
         from oce_control.execution_runtime import IsolatedSandboxUnsupported
         with pytest.raises(IsolatedSandboxUnsupported):
-            runner.run(["python", "-c", "print(1)"], envelope=JobResourceEnvelope())
+            runner.run(["python", "-c", "print(1)"],
+                       envelope=JobResourceEnvelope())
 
     def test_non_strict_reports_degradation_without_raising(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(BoundedRunner, "full_isolation",
+        monkeypatch.setattr(BoundedRunner, "resource_limits_available",
                             property(lambda self: False))
         runner = BoundedRunner(workspace_base=tmp_path,
                                policy=SandboxPolicy(strict=False))

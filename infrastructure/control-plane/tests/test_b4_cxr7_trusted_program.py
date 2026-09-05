@@ -291,13 +291,25 @@ class TestTruthfulIsolationReporting:
             assert "cpu" in report["enforced"]
             assert "memory" in report["enforced"]
             assert "disk" in report["enforced"]
-            blob = json.dumps(report).lower()
-            assert "isolation" not in blob.replace(
-                "network_enforcement", "").replace(
-                "isolation_note", "")
-            assert "network isolation" not in blob
-            assert "filesystem isolation" not in blob
-            assert "identity isolation" not in blob
+            # B4-CXR7U8X1: the report TRUTHFULLY enumerates which isolations
+            # are NOT provided (network/filesystem/identity/secret-store/
+            # syscall/hostile-code) — a crude word-absence assertion would
+            # forbid exactly the truthful not_provided list. The truth
+            # contract is: those kinds appear ONLY in not_provided and NEVER
+            # in enforced; network is a policy denial, never OS enforcement.
+            never_enforced = {
+                "network isolation", "filesystem isolation", "identity "
+                "isolation", "secret-store isolation", "syscall isolation",
+                "hostile-code containment",
+            }
+            assert not (set(report["enforced"]) & never_enforced)
+            rep = runner.resource_enforcement_report
+            assert rep["adversarial_sandbox"] is False
+            assert rep["os_network_enforcement"] == "not implemented"
+            assert never_enforced <= set(rep["not_provided"])
+            assert report["network_enforcement"] == (
+                "policy check only — OS network enforcement not implemented "
+                "(B4-CXR7U3)")
 
     def test_windows_reports_watchdog_and_tree_termination_literally(
             self, tmp_path, monkeypatch):

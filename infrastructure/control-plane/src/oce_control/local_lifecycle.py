@@ -345,10 +345,18 @@ def _configure_snapshot(paths) -> dict:
     import hashlib
     backups = {}
     for p in paths:
-        if p.exists():
-            backups[str(p)] = p.read_bytes()
-        else:
+        if not p.exists():
             backups[str(p)] = None
+            continue
+        try:
+            backups[str(p)] = p.read_bytes()
+        except OSError as exc:
+            # B4-CXR7U8-07: an EXISTING unreadable authority store is
+            # corruption — configure fails closed with the TYPED failure and
+            # writes nothing (no journal, no projection, no rewrite).
+            raise ls.SecretStoreUnreadable(
+                f"approved authority store {p.name} exists but is unreadable "
+                f"— fail closed, no rewrite (B4-CXR7U8-07): {exc}") from exc
     digest = hashlib.sha256(
         "".join(f"{k}:{len(v) if v else -1};" for k, v in sorted(backups.items()))
         .encode("utf-8")).hexdigest()
