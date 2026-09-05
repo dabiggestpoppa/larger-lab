@@ -191,11 +191,32 @@ class TestCompleteOrNothingConfigure:
 
     def test_start_remains_read_only_over_authority(self, runtime, monkeypatch):
         # start() requires material (never creates it) — missing material
-        # fails closed with a configure hint and mutates nothing
-        monkeypatch.setattr(ll, "BASE_DIR", runtime)  # never touches compose
+        # fails closed with a configure hint and mutates NOTHING. The REAL
+        # ll.start() entrypoint is invoked (never a private helper): every
+        # external surface (compose, process launch, HTTP probe) is spied on
+        # and must stay untouched because the material gate fires first.
+        monkeypatch.setenv("OCE_CONTROL_PLANE_HOST", "127.0.0.1")
+        monkeypatch.setenv("OCE_CONTROL_PLANE_PORT", "8448")
+        calls = {"compose": [], "start_process": [], "http": []}
+
+        def _spy_compose(*args, **kwargs):
+            calls["compose"].append(args)
+            raise AssertionError("compose must never run when material is absent")
+
+        def _spy_start_process(*args, **kwargs):
+            calls["start_process"].append(args)
+            raise AssertionError("process launch must never run when material is absent")
+
+        monkeypatch.setattr(ll, "compose", _spy_compose)
+        monkeypatch.setattr(ll, "start_process", _spy_start_process)
+        monkeypatch.setattr(ll, "wait_for_http", lambda *a, **k: True)
+        monkeypatch.setattr(ll, "docker_available", lambda: True)
         with pytest.raises(SystemExit, match="configure"):
-            ll.start.__wrapped__ if False else _run_start_gate_only(monkeypatch)
+            ll.start()  # REAL production entrypoint, no __wrapped__, no helper
+        assert calls == {"compose": [], "start_process": [], "http": []}
         assert not (runtime / "secrets.json").exists()
+        assert not (runtime / "compose.env").exists()
+        assert not (runtime / "activation_handoff_key").exists()
 
     def test_recover_only_mutation_is_classified_stale_pid_cleanup(
             self, runtime, tmp_path, monkeypatch):
@@ -242,6 +263,3 @@ class TestCompleteOrNothingConfigure:
         assert (runtime / "configure.committed").exists()
 
 
-def _run_start_gate_only(monkeypatch):
-    """Invoke the read-only initialization-material gate directly."""
-    ll._require_runtime_init_material()

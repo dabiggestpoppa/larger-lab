@@ -101,6 +101,24 @@ def _vacuous_assert(node: ast.AST) -> str | None:
     return None
 
 
+def _constant_false_ternary_in_test(module_path: Path) -> str | None:
+    """Detect `X if False else Y` expression statements inside test bodies —
+    the False branch makes the ternary constant-selected and the test's
+    advertised path unreachable (B4-CXR7U8-03)."""
+    tree = ast.parse(module_path.read_text(encoding="utf-8"))
+    for fn in ast.walk(tree):
+        if not isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if not fn.name.startswith("test_"):
+            continue
+        for node in ast.walk(fn):
+            if isinstance(node, ast.IfExp) and isinstance(node.test, ast.Constant):
+                if node.test.value is False:
+                    return (f"{module_path.name}:{fn.name}: constant-false "
+                            f"ternary at line {node.lineno}")
+    return None
+
+
 def _unconditional_early_return_after_advertised_path(module_path: Path) -> str | None:
     """Detect an unconditional early return as the FIRST statement of a test
     function (the security decision can never be reached)."""
@@ -133,6 +151,14 @@ class TestAntiVacuityGate:
     def test_no_unconditional_early_return_in_security_tests(self, module):
         path = TESTS / module
         offense = _unconditional_early_return_after_advertised_path(path)
+        assert offense is None, offense
+
+    @pytest.mark.parametrize("module", SECURITY_TEST_MODULES)
+    def test_no_constant_false_ternary_in_security_tests(self, module):
+        # `X if False else Y` makes the advertised path unreachable — the
+        # constant-selected branch is vacuous noise (B4-CXR7U8-03)
+        path = TESTS / module
+        offense = _constant_false_ternary_in_test(path)
         assert offense is None, offense
 
     @pytest.mark.parametrize("module", SECURITY_RUNTIME_MODULES)

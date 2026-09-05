@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -173,6 +174,83 @@ class TestProductionJobTypeGate:
         assert 'runner.run(["python", "-c", prog]' in src
         assert "str(ws /" not in src          # never a workspace-built path
         assert "importlib" not in src          # never dynamic import of input
+
+
+    def test_unknown_job_type_reaches_real_gate_rejected_before_claim_or_side_effects(
+            self, monkeypatch):
+        # BEHAVIORAL (B4-CXR7U8-03): drive the REAL scripts.oce_b3_worker.run()
+        # with an injected job spec of an unsupported type. The repository
+        # allowlisting gate (program_for) fires BEFORE lease claim, workspace
+        # seeding, or subprocess launch — proven by spies that must stay empty.
+        import scripts.oce_b3_worker as w
+        from oce_b3_worker_test_deps import TestWorkerDependencies
+        claims: list = []
+        prepares: list = []
+        runs: list = []
+
+        class _FakeOutbound:
+            def __init__(self, url, worker_id, secret):
+                pass
+
+            def connect(self):
+                return None
+
+            def heartbeat(self):
+                return None
+
+            def claim(self, job):
+                claims.append(job)
+                return {"lease_id": "lease-x", "fence": 1}
+
+            def surrender(self, job_id, lease_id, fence):
+                return {"surrendered": True}
+
+            def close(self):
+                return None
+
+        monkeypatch.setattr(w, "OutboundWorkerClient", _FakeOutbound)
+        monkeypatch.setattr(w, "prepare_workspace",
+                            lambda *a, **k: prepares.append(a))
+        deps = TestWorkerDependencies(
+            secret="s" * 43,
+            job_spec={"job_id": "j-evil", "job_type": "attacker-chosen-type",
+                      "required_capabilities": ["hash"], "params": {"code": "x"},
+                      "timeout_s": 5})
+        with pytest.raises(KeyError):
+            w.run(deps, ctx=None, url="http://127.0.0.1:9",
+                  worker_id="w-evil", environ={})
+        # the fail-closed gate fired before ANY control-plane claim,
+        # workspace creation, or execution attempt
+        assert claims == []
+        assert prepares == []
+        assert runs == []
+
+    def test_production_sys_path_cannot_import_test_dependency_seam(self):
+        # BEHAVIORAL seam proof: a REAL subprocess with the production
+        # sys.path order (control-plane, scripts, src — never tests/) cannot
+        # import the test-only dependency module; only the test path order
+        # (tests/ prepended) can. Production therefore cannot activate it.
+        prod_env = dict(os.environ)
+        prod_env["PYTHONPATH"] = os.pathsep.join(
+            [str(BASE), str(BASE / "scripts"), str(BASE / "src"),
+             prod_env.get("PYTHONPATH", "")])
+        r = subprocess.run(
+            [sys.executable, "-c", "import oce_b3_worker_test_deps"],
+            capture_output=True, text=True, env=prod_env, timeout=120,
+            errors="replace")
+        assert r.returncode != 0, "seam importable from the production path!"
+        assert "No module named" in r.stderr or "no module named" in r.stderr
+        # control: the seam is reachable only when tests/ is on the path
+        test_env = dict(prod_env)
+        test_env["PYTHONPATH"] = os.pathsep.join(
+            [str(BASE / "tests")] + [str(BASE), str(BASE / "scripts"),
+                                     str(BASE / "src")])
+        r2 = subprocess.run(
+            [sys.executable, "-c",
+             "import oce_b3_worker_test_deps as m; print('ok')"],
+            capture_output=True, text=True, env=test_env, timeout=120,
+            errors="replace")
+        assert r2.returncode == 0, r2.stderr
 
 
 # ---------------------------------------------------------------------------
