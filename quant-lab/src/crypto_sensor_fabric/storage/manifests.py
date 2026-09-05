@@ -161,6 +161,23 @@ class ManifestAppendResult:
 # ---------------------------------------------------------------------------
 
 
+POINTER_SCHEMA_VERSION = 1
+
+# CLOSED pointer JSON contract (I04R1 §34-§37): unknown fields are corrupt,
+# never silently ignored.  Future schema changes require a schema_version
+# bump.
+_POINTER_FIELDS: frozenset[str] = frozenset(
+    {
+        "schema_version",
+        "partition_key",
+        "partition_manifest_id",
+        "manifest_version",
+        "previous_manifest_id",
+        "updated_at",
+    }
+)
+
+
 @dataclass(frozen=True)
 class PartitionCurrentPointer:
     """Small operational pointer — NOT historical raw evidence."""
@@ -173,6 +190,7 @@ class PartitionCurrentPointer:
 
     def to_canonical_json(self) -> str:
         payload = {
+            "schema_version": POINTER_SCHEMA_VERSION,
             "partition_key": self.partition_key,
             "partition_manifest_id": self.partition_manifest_id,
             "manifest_version": self.manifest_version,
@@ -185,6 +203,16 @@ class PartitionCurrentPointer:
 
     @classmethod
     def from_canonical_json(cls, text: str) -> PartitionCurrentPointer:
+        """STRICT closed-schema parser (I04R1 §36/§37).
+
+        - schema_version must be the integer 1 (not bool, not string);
+        - partition_key / partition_manifest_id: nonempty strings (numeric
+          values are rejected, never coerced);
+        - manifest_version: integer >= 1 (not bool, not string, not float);
+        - previous_manifest_id: null or nonempty string;
+        - updated_at: timezone-aware ISO-8601 string;
+        - unknown extra fields: CurrentPointerCorrupt.
+        """
         try:
             payload = json.loads(text)
         except json.JSONDecodeError as exc:
@@ -193,23 +221,70 @@ class PartitionCurrentPointer:
             ) from exc
         if not isinstance(payload, dict):
             raise CurrentPointerCorrupt("current pointer must be a JSON object")
+        unknown = sorted(set(payload) - _POINTER_FIELDS)
+        if unknown:
+            raise CurrentPointerCorrupt(
+                "current pointer JSON is CLOSED — unknown field(s): "
+                + ", ".join(unknown)
+                + "; future schema changes require a schema_version bump "
+                "(I04R1 §37)"
+            )
         try:
-            partition_key = str(payload["partition_key"])
-            manifest_id = str(payload["partition_manifest_id"])
-            version = int(payload["manifest_version"])
-            previous = payload.get("previous_manifest_id")
-            previous_id: str | None = (
-                None if previous is None else str(previous)
-            )
-            updated_at = datetime.fromisoformat(str(payload["updated_at"]))
-        except (KeyError, TypeError, ValueError) as exc:
+            schema_version = payload["schema_version"]
+            partition_key = payload["partition_key"]
+            manifest_id = payload["partition_manifest_id"]
+            version = payload["manifest_version"]
+            previous = payload["previous_manifest_id"]
+            updated_raw = payload["updated_at"]
+        except KeyError as exc:
             raise CurrentPointerCorrupt(
-                f"current pointer missing/invalid fields: {exc}"
+                f"current pointer missing required field {exc.args[0]}"
             ) from exc
-        if not partition_key or not manifest_id or version < 1:
+        if (
+            isinstance(schema_version, bool)
+            or not isinstance(schema_version, int)
+            or schema_version != POINTER_SCHEMA_VERSION
+        ):
             raise CurrentPointerCorrupt(
-                "current pointer carries invalid identity fields"
+                "current pointer schema_version must be the integer 1; "
+                f"got {schema_version!r}"
             )
+        if not isinstance(partition_key, str) or not partition_key:
+            raise CurrentPointerCorrupt(
+                "current pointer partition_key must be a nonempty string; "
+                f"got {partition_key!r}"
+            )
+        if not isinstance(manifest_id, str) or not manifest_id:
+            raise CurrentPointerCorrupt(
+                "current pointer partition_manifest_id must be a nonempty "
+                f"string; got {manifest_id!r}"
+            )
+        if (
+            isinstance(version, bool)
+            or not isinstance(version, int)
+            or version < 1
+        ):
+            raise CurrentPointerCorrupt(
+                "current pointer manifest_version must be an integer >= 1; "
+                f"got {version!r}"
+            )
+        if previous is not None and (
+            not isinstance(previous, str) or not previous
+        ):
+            raise CurrentPointerCorrupt(
+                "current pointer previous_manifest_id must be null or a "
+                "nonempty string"
+            )
+        if not isinstance(updated_raw, str):
+            raise CurrentPointerCorrupt(
+                "current pointer updated_at must be an ISO-8601 string"
+            )
+        try:
+            updated_at = datetime.fromisoformat(updated_raw)
+        except ValueError as exc:
+            raise CurrentPointerCorrupt(
+                f"current pointer updated_at is not ISO-8601: {exc}"
+            ) from exc
         if updated_at.tzinfo is None:
             raise CurrentPointerCorrupt(
                 "current pointer updated_at must be timezone-aware"
@@ -218,7 +293,7 @@ class PartitionCurrentPointer:
             partition_key=partition_key,
             partition_manifest_id=manifest_id,
             manifest_version=version,
-            previous_manifest_id=previous_id,
+            previous_manifest_id=previous,
             updated_at=coerce_utc(updated_at),
         )
 
@@ -481,7 +556,17 @@ class PartitionManifestRepository:
             raise CurrentPointerCorrupt(
                 f"current pointer {path!s} unreadable: {exc}"
             ) from exc
-        return PartitionCurrentPointer.from_canonical_json(text)
+        pointer = PartitionCurrentPointer.from_canonical_json(text)
+        if pointer.partition_key != partition_key:
+            raise CurrentPointerCorrupt(
+                "current pointer file under physical locator "
+                f"{_partition_hash(partition_key)} holds partition_key "
+                f"{pointer.partition_key!r}, but partition_key "
+                f"{partition_key!r} was requested — the exact logical "
+                "partition_key is authoritative, never the physical locator "
+                "(I04R1 §38/§40)"
+            )
+        return pointer
 
     def _load_manifest_fragment(
         self, pointer: PartitionCurrentPointer
@@ -518,6 +603,12 @@ class PartitionManifestRepository:
             raise CurrentPointerDangling(
                 "current pointer partition_key does not match the referenced "
                 "fragment"
+            )
+        if pointer.previous_manifest_id != manifest.supersedes_manifest_id:
+            raise CurrentPointerDangling(
+                "current pointer previous_manifest_id does not match the "
+                "referenced manifest's supersedes_manifest_id — inconsistent "
+                "ancestry is corrupt, not merely retry-relevant (I04R1 §39)"
             )
         return manifest
 
@@ -939,6 +1030,7 @@ class PartitionManifestRepository:
 
 __all__ = [
     "MANIFEST_SCHEMA",
+    "POINTER_SCHEMA_VERSION",
     "CatalogError",
     "CatalogNotFound",
     "CurrentPointerCorrupt",

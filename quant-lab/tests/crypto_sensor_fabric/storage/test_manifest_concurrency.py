@@ -242,7 +242,9 @@ class TestPointerVisibility:
                 pointer_dir = tmp_path / "catalogs" / "current" / "partitions"
                 for pointer_file in pointer_dir.glob("*.json"):
                     payload = json.loads(pointer_file.read_text(encoding="utf-8"))
+                    # CLOSED pointer schema (I04R1 §36/§37)
                     assert set(payload) == {
+                        "schema_version",
                         "partition_key",
                         "partition_manifest_id",
                         "manifest_version",

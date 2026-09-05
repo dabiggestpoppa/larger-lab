@@ -34,6 +34,8 @@ from crypto_sensor_fabric.storage import (
     AcquisitionRepository,
     BlobMetadataRepository,
     CatalogIntegrityError,
+    CurrentPointerCorrupt,
+    CurrentPointerDangling,
     EvidenceBlob,
     IntegrityState,
     LocalBlobStore,
@@ -45,6 +47,11 @@ from crypto_sensor_fabric.storage import (
     StorageEncoding,
     UnearnedProviderIntegrityClaim,
 )
+from crypto_sensor_fabric.storage.manifests import (
+    POINTER_SCHEMA_VERSION,
+    PartitionCurrentPointer,
+)
+
 FIXED = datetime(2026, 9, 5, 12, 0, 0, tzinfo=UTC)
 MEDIA = "application/json"
 PK = "KRAKEN_FUTURES/MECHANICAL_FUNDING/PI_XBTUSD/2026-08"
@@ -626,3 +633,166 @@ class TestBloblessAndSecrets:
             assert secret not in str(excinfo.value)
 
 
+class TestClosedPointerSchema:
+    """I04R1 §46 — Defect D: closed strict pointer contract."""
+
+    def _valid_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": POINTER_SCHEMA_VERSION,
+            "partition_key": PK,
+            "partition_manifest_id": "pm-1",
+            "manifest_version": 1,
+            "previous_manifest_id": None,
+            "updated_at": "2026-09-05T12:00:00+00:00",
+        }
+
+    def test_schema_version_1_valid(self) -> None:
+        """30: schema_version=1 parses."""
+        pointer = PartitionCurrentPointer.from_canonical_json(
+            json.dumps(self._valid_payload())
+        )
+        assert pointer.partition_key == PK
+        assert pointer.manifest_version == 1
+
+    def test_unknown_schema_version_rejected(self) -> None:
+        """31: schema_version=2 -> corrupt."""
+        payload = self._valid_payload()
+        payload["schema_version"] = 2
+        with pytest.raises(CurrentPointerCorrupt):
+            PartitionCurrentPointer.from_canonical_json(json.dumps(payload))
+
+    def test_missing_schema_version_rejected(self) -> None:
+        """32: no schema_version -> corrupt."""
+        payload = self._valid_payload()
+        del payload["schema_version"]
+        with pytest.raises(CurrentPointerCorrupt):
+            PartitionCurrentPointer.from_canonical_json(json.dumps(payload))
+
+    def test_extra_field_rejected(self) -> None:
+        """33: closed schema — unknown field -> corrupt."""
+        payload = self._valid_payload()
+        payload["surprise"] = 1
+        with pytest.raises(CurrentPointerCorrupt):
+            PartitionCurrentPointer.from_canonical_json(json.dumps(payload))
+
+    @pytest.mark.parametrize(
+        ("field", "value"),
+        [
+            ("manifest_version", True),
+            ("manifest_version", "1"),
+            ("manifest_version", 1.2),
+            ("partition_key", 123),
+            ("schema_version", True),
+            ("schema_version", "1"),
+        ],
+    )
+    def test_strict_types_rejected(self, field: str, value: Any) -> None:
+        """34/35/36: bool/str/float/numeric coercions are all rejected."""
+        payload = self._valid_payload()
+        payload[field] = value
+        with pytest.raises(CurrentPointerCorrupt):
+            PartitionCurrentPointer.from_canonical_json(json.dumps(payload))
+
+    def test_pointer_partition_binding_enforced(self, tmp_path: Path) -> None:
+        """37: pointer for A under B's locator -> B read fails as corrupt."""
+        store, blob_repo, acq_repo, manifest_repo = _repos(tmp_path)
+        sha = _seed_blob(store, blob_repo, b"bind")
+        acq_repo.append_acquisition(
+            _acquisition(acquisition_id="acq-bind", blob_sha256=sha)
+        )
+        manifest_repo.append_partition_manifest(
+            _manifest(blob_refs=[sha], integrity_state=IntegrityState.LOCAL_HASH_VERIFIED),
+            expected_current=None,
+        )
+        pointer_dir = tmp_path / "catalogs" / "current" / "partitions"
+        pointer_files = list(pointer_dir.glob("*.json"))
+        assert len(pointer_files) == 1
+        content = pointer_files[0].read_text(encoding="utf-8")
+        # plant the SAME pointer content under the OTHER partition's physical
+        # locator: the exact logical partition_key inside must reject it
+        import hashlib as _hl
+
+        other_hash = _hl.sha256(PK_OTHER.encode("utf-8")).hexdigest()[:32]
+        other_path = pointer_dir / f"{other_hash}.json"
+        other_path.write_text(content, encoding="utf-8")
+        with pytest.raises(CurrentPointerCorrupt):
+            manifest_repo.read_current_pointer(PK_OTHER)
+
+    def test_pointer_ancestry_binding_enforced(self, tmp_path: Path) -> None:
+        """38: pointer.previous_manifest_id must equal supersedes_manifest_id."""
+        _, _, _, manifest_repo = _repos(tmp_path)
+        manifest_repo.append_partition_manifest(_manifest(), expected_current=None)
+        pointer_dir = tmp_path / "catalogs" / "current" / "partitions"
+        pointer_file = next(iter(pointer_dir.glob("*.json")))
+        payload = json.loads(pointer_file.read_text(encoding="utf-8"))
+        assert payload["previous_manifest_id"] is None  # v1 supersedes None
+        payload["previous_manifest_id"] = "pm-ghost"  # inconsistent ancestry
+        pointer_file.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+        with pytest.raises(CurrentPointerDangling):
+            manifest_repo.get_current_manifest(PK)
+
+    def test_p1_p5_crash_matrix_regression(self, tmp_path: Path) -> None:
+        """39: pointer crash matrix remains green under the sealed schema."""
+        from crypto_sensor_fabric.storage import (
+            ManifestDisposition,
+            PointerFaultPoint,
+            RaisePointerFaultHook,
+        )
+
+        cases = [
+            (PointerFaultPoint.P1, 1, ManifestDisposition.COMMITTED_NEW),
+            (PointerFaultPoint.P2, 1, ManifestDisposition.COMMITTED_NEW),
+            (PointerFaultPoint.P3, 1, ManifestDisposition.COMMITTED_NEW),
+            (PointerFaultPoint.P4, 2, ManifestDisposition.IDEMPOTENT_COMPLETION),
+            (PointerFaultPoint.P5, 2, ManifestDisposition.IDEMPOTENT_COMPLETION),
+        ]
+        for point, expect_version, expect_disposition in cases:
+            root = tmp_path / point.value
+            root.mkdir()
+            _, _, _, manifest_repo = _repos(root)
+            manifest_repo.append_partition_manifest(_manifest(), expected_current=None)
+            v2 = _manifest(
+                partition_manifest_id="pm-2",
+                manifest_version=2,
+                supersedes_manifest_id="pm-1",
+            )
+            with pytest.raises(RuntimeError, match=f"injected pointer fault at {point.value}"):
+                manifest_repo.append_partition_manifest(
+                    v2,
+                    expected_current=("pm-1", 1),
+                    fault_hooks=RaisePointerFaultHook(point),
+                )
+            pointer = manifest_repo.read_current_pointer(PK)
+            assert pointer is not None
+            assert pointer.manifest_version == expect_version
+            retry = manifest_repo.append_partition_manifest(
+                v2, expected_current=("pm-1", 1)
+            )
+            assert retry.disposition is expect_disposition
+            assert manifest_repo.get_current_manifest(PK).partition_manifest_id == "pm-2"
+
+    def test_old_or_new_pointer_visibility_regression(self, tmp_path: Path) -> None:
+        """40: old-or-new reader visibility remains green."""
+        _, _, _, manifest_repo = _repos(tmp_path)
+        manifest_repo.append_partition_manifest(_manifest(), expected_current=None)
+        for version in range(2, 5):
+            manifest_repo.append_partition_manifest(
+                _manifest(
+                    partition_manifest_id=f"pm-{version}",
+                    manifest_version=version,
+                    supersedes_manifest_id=f"pm-{version - 1}",
+                ),
+                expected_current=(f"pm-{version - 1}", version - 1),
+            )
+            assert manifest_repo.get_current_manifest(PK).manifest_version == version
+        pointer_dir = tmp_path / "catalogs" / "current" / "partitions"
+        for pointer_file in pointer_dir.glob("*.json"):
+            payload = json.loads(pointer_file.read_text(encoding="utf-8"))
+            assert set(payload) == {
+                "schema_version",
+                "partition_key",
+                "partition_manifest_id",
+                "manifest_version",
+                "previous_manifest_id",
+                "updated_at",
+            }

@@ -584,11 +584,13 @@ class TestManifestRepo:
             )
             current = repo.get_current_manifest(PK)
             assert current.manifest_version == version
-        # pointer file is always parseable, never partial JSON
+        # pointer file is always parseable, never partial JSON; the CLOSED
+        # schema (I04R1 §36/§37) pins the exact field set incl. schema_version
         pointer_dir = tmp_path / "catalogs" / "current" / "partitions"
         for pointer_file in pointer_dir.glob("*.json"):
             payload = json.loads(pointer_file.read_text(encoding="utf-8"))
             assert set(payload) == {
+                "schema_version",
                 "partition_key",
                 "partition_manifest_id",
                 "manifest_version",

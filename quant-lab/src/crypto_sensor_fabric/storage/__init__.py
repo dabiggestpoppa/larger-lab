@@ -104,6 +104,7 @@ from .enums import (
 )
 from .manifests import (
     MANIFEST_SCHEMA,
+    POINTER_SCHEMA_VERSION,
     CurrentPointerCorrupt,
     CurrentPointerDangling,
     ManifestAppendResult,
@@ -153,6 +154,7 @@ __all__ = [
     "BLOB_KEY_PREFIX",
     "BLOB_SCHEMA",
     "MANIFEST_SCHEMA",
+    "POINTER_SCHEMA_VERSION",
     # catalog repositories + errors
     "AcquisitionIdentityConflict",
     "AcquisitionNotFound",
