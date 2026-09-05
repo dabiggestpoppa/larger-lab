@@ -32,15 +32,17 @@ import hashlib
 import json
 import os
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
 from ..contracts.base import coerce_utc
+from ..contracts.enums import SensorFamily
 from ..providers.base.enums import Granularity, QualityFlagAcquisition, SchemaState
 from ..providers.base.models import AdapterEvidenceRef, ResumeToken
 from .atomic import (
@@ -334,8 +336,8 @@ def _rows_equal(got: dict[str, Any], expected: dict[str, Any]) -> bool:
     """Semantic row equality (None == null; scalars compare directly)."""
     if got.keys() != expected.keys():
         return False
-    for key in got:
-        if got[key] != expected[key]:
+    for key, got_value in got.items():
+        if got_value != expected[key]:
             return False
     return True
 
@@ -468,7 +470,7 @@ def read_fragment(path: Path, schema: pa.Schema) -> list[dict[str, Any]]:
     """
     try:
         table = pq.read_table(str(path))
-    except Exception as exc:  # noqa: BLE001 - any read failure is integrity noise
+    except Exception as exc:  # any read failure is integrity noise
         raise CatalogIntegrityError(
             f"catalog fragment {path!s} is unreadable: {exc}"
         ) from exc
@@ -779,6 +781,92 @@ class AcquisitionRepository:
                     "persisted (I04 §13)"
                 )
 
+    # -- narrow provenance reads (I04R1 §12/§47 — NOT RawEvidenceQuery) ------
+
+    def list_acquisitions_for_blob(self, blob_sha256: str) -> list[AcquisitionRecord]:
+        """Every durable acquisition referencing one content hash.
+
+        Scans the immutable acquisition fragments (CORRECTNESS-FIRST local v1:
+        I10 DuckDB / I11 Postgres later provide indexed discovery — I04R1 §48).
+        List semantics: empty list when none exist.
+        """
+        validate_sha256_hex(blob_sha256)
+        family = self._family_dir()
+        if not family.exists():
+            return []
+        found: list[AcquisitionRecord] = []
+        for path in sorted(family.glob("*.parquet")):
+            rows = read_fragment(path, ACQUISITION_SCHEMA)
+            if len(rows) != 1:
+                raise CatalogIntegrityError(
+                    f"acquisition fragment {path!s} holds {len(rows)} rows"
+                )
+            record = _acquisition_from_row(rows[0])
+            if record.blob_sha256 == blob_sha256:
+                found.append(record)
+        found.sort(key=lambda r: r.acquisition_id)
+        return found
+
+    def find_matching_acquisitions(
+        self,
+        *,
+        blob_sha256: str,
+        provider_id: str,
+        venue: str,
+        sensor_family: SensorFamily,
+        native_instrument: str,
+        native_granularity: Granularity | None,
+    ) -> list[AcquisitionRecord]:
+        """Durable acquisitions attributing one blob to one logical identity.
+
+        I04R1 §5/§6: a manifest blob_ref needs at least ONE acquisition whose
+        provider/venue/sensor/native-instrument match the manifest's logical
+        identity (and native granularity where BOTH are known).  Byte
+        identity NEVER transfers provider identity (I04R1 §7-§8).  Requested
+        time equality is deliberately NOT required (requested time != logical
+        event time — I04R1 §6).
+        """
+        matches: list[AcquisitionRecord] = []
+        for record in self.list_acquisitions_for_blob(blob_sha256):
+            if record.provider_id != provider_id:
+                continue
+            if record.venue != venue:
+                continue
+            if record.sensor_family != sensor_family:
+                continue
+            if record.native_instrument != native_instrument:
+                continue
+            if (
+                record.native_granularity is not None
+                and native_granularity is not None
+                and record.native_granularity != native_granularity
+            ):
+                continue
+            matches.append(record)
+        return matches
+
+    def has_matching_acquisition(
+        self,
+        *,
+        blob_sha256: str,
+        provider_id: str,
+        venue: str,
+        sensor_family: SensorFamily,
+        native_instrument: str,
+        native_granularity: Granularity | None,
+    ) -> bool:
+        """I04R1 §5: provenance gate used by PartitionManifest publication."""
+        return bool(
+            self.find_matching_acquisitions(
+                blob_sha256=blob_sha256,
+                provider_id=provider_id,
+                venue=venue,
+                sensor_family=sensor_family,
+                native_instrument=native_instrument,
+                native_granularity=native_granularity,
+            )
+        )
+
     def append_acquisition(
         self, record: AcquisitionRecord
     ) -> tuple[AcquisitionRecord, CatalogFragmentReceipt]:
@@ -853,7 +941,7 @@ class LocalEvidenceCatalog:
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         # imported lazily: manifests.py imports catalog.py at module level
-        from .manifests import PartitionManifestRepository  # noqa: PLC0415
+        from .manifests import PartitionManifestRepository
 
         self.root = resolve_catalog_root(root)
         self.blob_metadata = BlobMetadataRepository(
@@ -869,16 +957,17 @@ class LocalEvidenceCatalog:
             root,
             blob_store=blob_store,
             blob_metadata_repository=self.blob_metadata,
+            acquisition_repository=self.acquisitions,
             clock=clock,
         )
 
 
 __all__ = [
     "ACQUISITION_SCHEMA",
+    "BLOB_SCHEMA",
     "AcquisitionIdentityConflict",
     "AcquisitionNotFound",
     "AcquisitionRepository",
-    "BLOB_SCHEMA",
     "BlobMetadataConflict",
     "BlobMetadataNotFound",
     "BlobMetadataRepository",

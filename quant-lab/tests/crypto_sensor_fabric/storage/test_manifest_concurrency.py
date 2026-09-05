@@ -15,10 +15,10 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.providers.base.enums import Granularity
 from crypto_sensor_fabric.storage import (
+    AcquisitionRepository,
     BlobMetadataRepository,
     IntegrityState,
     LocalBlobStore,
@@ -71,10 +71,17 @@ def _make_repo(
 ) -> tuple[LocalBlobStore, BlobMetadataRepository, PartitionManifestRepository]:
     store = make_store(tmp_path)
     blob_repo = BlobMetadataRepository(tmp_path, blob_store=store, clock=lambda: FIXED)
+    acq_repo = AcquisitionRepository(
+        tmp_path,
+        blob_store=store,
+        blob_metadata_repository=blob_repo,
+        clock=lambda: FIXED,
+    )
     repo = PartitionManifestRepository(
         tmp_path,
         blob_store=store,
         blob_metadata_repository=blob_repo,
+        acquisition_repository=acq_repo,
         clock=lambda: FIXED,
     )
     return store, blob_repo, repo

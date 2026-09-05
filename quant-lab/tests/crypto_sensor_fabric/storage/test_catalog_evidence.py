@@ -24,10 +24,10 @@ from typing import Any
 
 import pyarrow as pa
 import pytest
-
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.providers.base.enums import Granularity
 from crypto_sensor_fabric.storage import (
+    AcquisitionRepository,
     BlobMetadataRepository,
     IntegrityState,
     LocalBlobStore,
@@ -66,10 +66,17 @@ def _make_repo(
 ) -> tuple[LocalBlobStore, BlobMetadataRepository, PartitionManifestRepository]:
     store = _make_store(root)
     blob_repo = BlobMetadataRepository(root, blob_store=store, clock=lambda: FIXED)
+    acq_repo = AcquisitionRepository(
+        root,
+        blob_store=store,
+        blob_metadata_repository=blob_repo,
+        clock=lambda: FIXED,
+    )
     repo = PartitionManifestRepository(
         root,
         blob_store=store,
         blob_metadata_repository=blob_repo,
+        acquisition_repository=acq_repo,
         clock=lambda: FIXED,
     )
     return store, blob_repo, repo
@@ -160,7 +167,7 @@ class TestCatalogSchemasEvidence:
 
 class TestManifestConcurrencyEvidence:
     def _run_case(self, root: Path, case: str) -> dict[str, Any]:
-        store, blob_repo, repo = _make_repo(root)
+        _, _, repo = _make_repo(root)
         if case == "first_manifest":
             repo.append_partition_manifest(_manifest(), expected_current=None)
             current = repo.get_current_manifest(PK)

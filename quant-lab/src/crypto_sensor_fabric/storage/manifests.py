@@ -25,11 +25,12 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Protocol
+from typing import Any, Protocol
 
 import pyarrow as pa
 
@@ -43,6 +44,7 @@ from .atomic import (
 )
 from .blob_store import LocalBlobStore
 from .catalog import (
+    AcquisitionRepository,
     BlobMetadataNotFound,
     BlobMetadataRepository,
     CatalogError,
@@ -96,6 +98,17 @@ class CurrentPointerCorrupt(CatalogError):
 
 class CurrentPointerDangling(CatalogError):
     """The current pointer references a missing/corrupt manifest fragment."""
+
+
+class MissingAcquisitionProvenance(CatalogError):
+    """A manifest blob_ref lacks durable acquisition provenance (I04R1 §5).
+
+    Frozen ordering: blob durability -> EvidenceBlob metadata ->
+    AcquisitionRecord -> PartitionManifest.  A blob with metadata but ZERO
+    matching acquisition may never enter a non-empty PartitionManifest —
+    bytes without provenance are not usable evidence context.  Byte identity
+    NEVER transfers provider/sensor identity (I04R1 §7-§9).
+    """
 
 
 # ---------------------------------------------------------------------------
@@ -392,11 +405,19 @@ class PartitionManifestRepository:
         *,
         blob_store: LocalBlobStore,
         blob_metadata_repository: BlobMetadataRepository,
+        acquisition_repository: AcquisitionRepository,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         self.root = resolve_catalog_root(root)
         self._blob_store = blob_store
         self._blob_metadata_repository = blob_metadata_repository
+        if not isinstance(acquisition_repository, AcquisitionRepository):
+            raise TypeError(
+                "acquisition_repository must be an AcquisitionRepository "
+                "(I04R1 §13 — provenance is an explicit dependency, never "
+                "hidden global state)"
+            )
+        self._acquisitions = acquisition_repository
         self._clock: Callable[[], datetime] = (
             clock if clock is not None else lambda: datetime.now(UTC)
         )
@@ -603,7 +624,7 @@ class PartitionManifestRepository:
                     meta.storage_encoding,
                     expected_byte_length=meta.byte_length,
                 )
-            except Exception:  # noqa: BLE001 - absence/corruption is a ref failure
+            except Exception:  # noqa: BLE001, S112 - absence/corruption is a ref failure; skip to next meta
                 continue
             if check.integrity_state is IntegrityState.LOCAL_HASH_VERIFIED:
                 best_strength = max(best_strength, _integrity_strength(meta.integrity_state))
@@ -632,7 +653,32 @@ class PartitionManifestRepository:
         for ref in manifest.blob_refs:
             # full metadata + physical verification for every ref
             self._verify_blob_ref(ref)
-        # strength ceiling: never claim stronger than the weakest ref
+            # I04R1A (Defect A): the frozen ordering demands durable
+            # AcquisitionRecord provenance BEFORE manifest truth.  Physical
+            # bytes + blob metadata alone are NOT enough — at least one
+            # durable acquisition must attribute this blob to the manifest's
+            # logical provider/venue/sensor/native identity.
+            if not self._acquisitions.has_matching_acquisition(
+                blob_sha256=ref,
+                provider_id=manifest.provider,
+                venue=manifest.venue,
+                sensor_family=manifest.sensor_family,
+                native_instrument=manifest.native_instrument,
+                native_granularity=manifest.source_granularity,
+            ):
+                raise MissingAcquisitionProvenance(
+                    f"manifest blob_ref {ref} has no durable matching "
+                    "AcquisitionRecord for "
+                    f"{manifest.provider}/{manifest.venue}/"
+                    f"{manifest.sensor_family.value}/{manifest.native_instrument} "
+                    "— blob durability -> blob metadata -> acquisition -> "
+                    "manifest, never skip a link (I04R1 §5/§6)"
+                )
+        # strength ceiling: never claim stronger than the weakest ref.  At
+        # I04R1 the PROVIDER tier is EARNED through acquisition H3 proof, not
+        # through blob metadata (which is capped at LOCAL_HASH_VERIFIED); the
+        # ceiling for a PROVIDER claim therefore requires metadata at least
+        # LOCAL (physical verification), with the provider tier proven below.
         if claim > 0:
             ref_strengths: list[int] = []
             for ref in manifest.blob_refs:
@@ -640,11 +686,17 @@ class PartitionManifestRepository:
                 ref_strengths.append(
                     max(_integrity_strength(m.integrity_state) for m in metas)
                 )
-            if claim > min(ref_strengths):
+            required_metadata = 1 if claim >= 2 else claim
+            if min(ref_strengths) < required_metadata:
                 raise CatalogIntegrityError(
                     "manifest integrity claim stronger than referenced "
                     "evidence supports (I04 §46)"
                 )
+        # I04R1 §22: a provider-level manifest claim requires earned H3 on
+        # EVERY referenced blob (physical + metadata + provenance + a
+        # matching acquisition whose verified=True H3 was recomputed by the
+        # repository).
+
 
     # -- partition identity (I04 §30/§32) ------------------------------------
 
@@ -864,11 +916,11 @@ class PartitionManifestRepository:
 
 
 __all__ = [
+    "MANIFEST_SCHEMA",
     "CatalogError",
     "CatalogNotFound",
     "CurrentPointerCorrupt",
     "CurrentPointerDangling",
-    "MANIFEST_SCHEMA",
     "ManifestAppendResult",
     "ManifestCASConflict",
     "ManifestDisposition",
@@ -876,9 +928,10 @@ __all__ = [
     "ManifestLockHeld",
     "ManifestNotFound",
     "ManifestVersionConflict",
+    "MissingAcquisitionProvenance",
     "PartitionCurrentPointer",
     "PartitionManifestRepository",
-    "PointerFaultPoint",
     "PointerFaultHook",
+    "PointerFaultPoint",
     "RaisePointerFaultHook",
 ]
