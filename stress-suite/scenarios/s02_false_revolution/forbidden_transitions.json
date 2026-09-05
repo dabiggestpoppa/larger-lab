@@ -1,0 +1,7 @@
+{
+  "forbidden": [
+    {"from": "WATCH", "to": "TRANSFORMATION_CANDIDATE", "rule": "novelty must pass escalation + source/data-quality inspection before candidate"},
+    {"from": "ESCALATION_REVIEW", "to": "TRANSFORMATION_WINDOW", "rule": "no direct entry to window"},
+    {"from": "STABLE", "to": "NEW_STABLE", "rule": "no new epoch without review"}
+  ]
+}

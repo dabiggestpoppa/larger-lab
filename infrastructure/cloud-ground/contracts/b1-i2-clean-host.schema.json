@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/b1-i2-clean-host.schema.json",
+  "title": "B1-I2 Clean Host Baseline - Acceptance Contract",
+  "description": "Freezes the acceptance criteria for the B1-I2 clean-host baseline: approved provider/product, contract and spending ceilings, supported operating system, hostname convention, required evidence, and declared network posture. Used as the machine-readable acceptance source for local regression and the remote-independent final gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id",
+    "stage",
+    "repository",
+    "approved_provider",
+    "approved_product",
+    "approved_contract_term",
+    "approved_ceiling_first_month_usd",
+    "approved_ceiling_monthly_usd",
+    "operating_system",
+    "hostname_convention",
+    "private_network",
+    "required_evidence",
+    "mandatory_local_tools",
+    "forbidden_services",
+    "posture"
+  ],
+  "properties": {
+    "contract_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage": {
+      "const": "B1-I2"
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorized_stage"
+      ],
+      "properties": {
+        "authorized_stage": {
+          "const": "B1-I2"
+        }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full_name"
+      ],
+      "properties": {
+        "full_name": {
+          "const": "dabiggestpoppa/larger-lab"
+        }
+      }
+    },
+    "approved_provider": {
+      "type": "string",
+      "enum": [
+        "netcup",
+        "ovh",
+        "hetzner",
+        "contabo"
+      ]
+    },
+    "approved_product": {
+      "type": "string",
+      "enum": [
+        "RS 4000 G12",
+        "rs-4000-g12",
+        "VPS-4",
+        "vps-4"
+      ]
+    },
+    "approved_contract_term": {
+      "enum": [
+        "MONTHLY",
+        "monthly"
+      ]
+    },
+    "approved_ceiling_first_month_usd": {
+      "type": "number",
+      "minimum": 0
+    },
+    "approved_ceiling_monthly_usd": {
+      "type": "number",
+      "minimum": 0
+    },
+    "fallback_provider": {
+      "type": "string"
+    },
+    "fallback_product": {
+      "type": "string"
+    },
+    "operating_system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "distribution",
+        "version",
+        "supported"
+      ],
+      "properties": {
+        "distribution": {
+          "enum": [
+            "ubuntu",
+            "debian"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "supported": {
+          "type": "boolean"
+        }
+      }
+    },
+    "hostname_convention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern",
+        "example"
+      ],
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "example": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ssh_posture": {
+      "type": "object",
+      "properties": {
+        "password_authentication": {
+          "enum": [
+            "no",
+            false
+          ]
+        },
+        "permit_root_login": {
+          "enum": [
+            "no",
+            false
+          ]
+        },
+        "host_key_verification": {
+          "enum": [
+            "yes",
+            true
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "docker_posture": {
+      "type": "object",
+      "properties": {
+        "tcp_api_public": {
+          "enum": [
+            false,
+            "no"
+          ]
+        },
+        "admin_group": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "firewall_posture": {
+      "type": "object",
+      "properties": {
+        "default_incoming": {
+          "const": "deny"
+        },
+        "default_outgoing": {
+          "enum": [
+            "allow",
+            "deny"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "private_network": {
+      "enum": [
+        "tailscale",
+        "wireguard",
+        "none"
+      ]
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "mandatory_local_tools": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "forbidden_services": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "posture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "public_ingress",
+        "statement"
+      ],
+      "properties": {
+        "public_ingress": {
+          "const": "deny"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

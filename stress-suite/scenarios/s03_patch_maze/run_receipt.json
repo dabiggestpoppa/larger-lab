@@ -1,0 +1,114 @@
+{
+  "actual_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "TRANSFORMATION_CANDIDATE"
+  ],
+  "authority_state_after": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "authority_state_before": {
+    "GOVERNOR": {
+      "grants": [],
+      "level": "GOVERNOR"
+    },
+    "PO": {
+      "grants": [],
+      "level": "PO"
+    }
+  },
+  "behavior_fingerprint": "b01c5c02acf2570367f3296dfd35bd66",
+  "evaluation_contract": {
+    "contract_id": "S03-EVAL-V1",
+    "fingerprint": "12b54e385c7f84ec",
+    "freeze_status": "FROZEN",
+    "version_tag": "V1"
+  },
+  "evidence_count": 11,
+  "evidence_ref_violations": 0,
+  "evidence_refs_by_transition": {
+    "1": [
+      "P1"
+    ],
+    "2": [
+      "P2"
+    ],
+    "3": [
+      "P3"
+    ],
+    "4": [
+      "P4"
+    ],
+    "5": [
+      "P5"
+    ],
+    "6": [
+      "P6"
+    ],
+    "7": [
+      "P7"
+    ],
+    "8": [
+      "P8"
+    ],
+    "9": [
+      "P9"
+    ],
+    "10": [
+      "P10"
+    ],
+    "11": [
+      "P11"
+    ]
+  },
+  "expected_phase_trace": [
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "HOMEOSTATIC_REPAIR",
+    "STABLE",
+    "WATCH",
+    "ESCALATION_REVIEW",
+    "TRANSFORMATION_CANDIDATE"
+  ],
+  "expected_trace_accessed_during_run": false,
+  "failures": [],
+  "fingerprint": "05e6bc909e21dfc7ed403a2aa7f95c84",
+  "forbidden_attempts": [],
+  "hidden_ground_truth_accessed": false,
+  "holds": [],
+  "pass": true,
+  "policy_fingerprint": "46ab6fadaaa5e10c80657b26",
+  "policy_id": "G2_CORE_PHASE_POLICY",
+  "policy_version": "V1",
+  "registry_records": 11,
+  "scenario_id": "S03",
+  "scenario_version": "1.0.0",
+  "scripted_m4_side_effects": 0,
+  "scripted_m4_side_effects_labeled_fixture": null,
+  "starting_epoch": "E-S03-0",
+  "stimulus_count": 11,
+  "terminal_knowledge_states": {},
+  "terminal_phase": "TRANSFORMATION_CANDIDATE",
+  "transitions_audited": 11
+}

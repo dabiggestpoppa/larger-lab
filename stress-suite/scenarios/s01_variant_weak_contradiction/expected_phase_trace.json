@@ -1,0 +1,6 @@
+{
+  "expected_phase_path": ["STABLE", "WATCH", "STABLE", "WATCH", "STABLE"],
+  "expected_terminal_knowledge": {"@M_A": "ACTIVE"},
+  "terminal_states": ["STABLE"],
+  "sensitivity_claim": "SAME CORE centrality as S01, weak/non-persistent contradiction => NO transformation (no ESCALATION_REVIEW / TRANSFORMATION_* / RECONSOLIDATION)"
+}

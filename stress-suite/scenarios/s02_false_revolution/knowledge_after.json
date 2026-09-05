@@ -1,0 +1,5 @@
+{
+  "records": {
+    "@K_REV": {"state": "DEMOTED", "provenance_retained": true, "reopen_condition": "reopen only if a corrected dataset sustains a non-leakage, non-survivorship signal", "note": "negative knowledge with reopen conditions; never reached PROMOTED/ACTIVE"}
+  }
+}

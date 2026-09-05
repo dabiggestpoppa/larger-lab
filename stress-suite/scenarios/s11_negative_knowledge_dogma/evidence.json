@@ -1,0 +1,23 @@
+[
+  {
+    "record_id": "EV_NEW_SENSOR_CAPABILITY",
+    "kind": "OBSERVATION",
+    "claim": "new sensor capability validated in an independent lab fixture",
+    "lineage": "S11_SENSOR_LAB",
+    "seq": 0
+  },
+  {
+    "record_id": "EV_REJECT_1",
+    "kind": "OBSERVATION",
+    "claim": "historical rejection evidence (blocker SENSOR_UNAVAILABLE)",
+    "lineage": "S11_HISTORICAL",
+    "seq": 1
+  },
+  {
+    "record_id": "EV_REJECT_2",
+    "kind": "OBSERVATION",
+    "claim": "historical rejection evidence (blocker SENSOR_UNAVAILABLE)",
+    "lineage": "S11_HISTORICAL",
+    "seq": 2
+  }
+]

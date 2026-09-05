@@ -1,0 +1,21 @@
+{
+  "scenario_id": "S02",
+  "scenario_version": "1.0.0",
+  "policy_ref": "G2_CORE_PHASE_POLICY",
+  "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
+  "institutional_scope": "core phase control: novelty addiction / false revolution collapses under data-quality inspection",
+  "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "PO": "PO"
+  },
+  "initial_knowledge": [
+    {
+      "record_id": "@K_REV",
+      "state": "CANDIDATE",
+      "claim": "revolutionary claim: new paper + new dataset appear to contradict the incumbent model",
+      "provenance_source_kind": "FIXTURE",
+      "provenance_source_label": "S02-seed",
+      "producing_actor": "RESEARCH"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "format": "oce-pg-recovery-receipt-v1",
+  "operation_phase": "promote",
+  "database": "oce_local",
+  "source_database": "oce_local",
+  "target_database": "oce_local",
+  "source_commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f",
+  "source_tree": "85cb2379f614dde118670194dc6a08c59b1f3f54",
+  "run_id": "f767fadd3d67",
+  "inventory_path": "/tmp/pytest-of-runner/pytest-0/test_ctl_full_replace_into_pop0/bk/.backup-content/postgres/inventory.json",
+  "phases": [
+    "inventory_validated",
+    "archive_validated",
+    "staging_created",
+    "staging_restored",
+    "staging_verified",
+    "canonical_quarantined",
+    "promoted",
+    "canonical_verified"
+  ],
+  "started_at": "2026-08-30T12:32:49Z",
+  "stamp": "0fedcb68b00b",
+  "quarantine_database": "oce_local_quarantine_0fedcb68b00b",
+  "quarantine_held": true,
+  "quarantine_dropped": false,
+  "promoted": true,
+  "inventory_sha256": "dbc1ab378607c4081b8f3d607a2893cfbab3ecba6c9cbfdeab0fd85b283f5720",
+  "source_archive_sha256": "a8a9bcfe60af002d2bf5d42b8fe51765e782b4d04fc553fc356faf52b3a4cf5f",
+  "archive_validated": true,
+  "postgres_version": "16.2",
+  "staging_database": "oce_local_restore_0fedcb68b00b",
+  "staging_verification": {
+    "result": "ok",
+    "tables": {
+      "public.backup_probe": 2,
+      "public.replace_probe": 2,
+      "public.state_probe": 4
+    },
+    "fingerprints": {
+      "public.backup_probe": "e2aacec2fe98e981dc9f3941062345be",
+      "public.replace_probe": "358c8f468382cfe16d17654f10c40905",
+      "public.state_probe": "333d8b545eeb4d0bb63fa6dd6842c081"
+    }
+  },
+  "promotion": "ok",
+  "canonical_verification": {
+    "result": "ok",
+    "tables": {
+      "public.backup_probe": 2,
+      "public.replace_probe": 2,
+      "public.state_probe": 4
+    },
+    "fingerprints": {
+      "public.backup_probe": "e2aacec2fe98e981dc9f3941062345be",
+      "public.replace_probe": "358c8f468382cfe16d17654f10c40905",
+      "public.state_probe": "333d8b545eeb4d0bb63fa6dd6842c081"
+    }
+  },
+  "finished_at": "2026-08-30T12:32:50Z",
+  "exit_status": 0,
+  "redis_restored": false
+}

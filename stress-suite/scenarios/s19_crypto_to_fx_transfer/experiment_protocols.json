@@ -1,0 +1,19 @@
+[
+  {
+    "protocol_id": "PROTO_TC1_FX",
+    "mechanism_ref": "TRANSFER_CAPACITY_1",
+    "dataset_ref": "DS_FX_FORWARD_VALIDATION",
+    "time_range": "2019-01-01..2025-12-31",
+    "features": ["forward_basis", "swaps_points", "cash_forward_spread"],
+    "metrics": ["convergence_speed", "dislocation_persistence", "bandwidth_dependence"],
+    "falsification_criteria": [
+      "convergence speed independent of measured bandwidth in target domain",
+      "fx cash-forward convergence not bounded by capital availability"
+    ],
+    "holdout_ref": "HOLDOUT_FX",
+    "cost_execution_assumptions": ["fx venue session boundaries", "2bp round-trip"],
+    "promotion_criteria": ["falsification criteria pass", "independent confirmation of at least 2 lineages"],
+    "target_domain": "FX",
+    "frozen_before_result_evidence": "registered frozen protocol; frozen before any target-domain result evaluation; protocol_id PROTO_TC1_FX present at scenario load"
+  }
+]

@@ -1,0 +1,140 @@
+{
+  "contract": {
+    "contract_id": "G3-S07-ROUTING",
+    "version_tag": "V1",
+    "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+    "constraints": {
+      "HIGH": {
+        "min_capability": "ADEQUATE",
+        "min_source_lineages": 2,
+        "min_model_or_runtime_lineages": 2,
+        "max_prior_exposure_ratio": 0.0,
+        "min_fresh_or_independent_design": 1,
+        "max_cost_units": 100,
+        "max_latency_units": 50
+      },
+      "MEDIUM": {
+        "min_capability": "ADEQUATE",
+        "min_source_lineages": 2,
+        "min_model_or_runtime_lineages": 1,
+        "max_prior_exposure_ratio": 0.0,
+        "min_fresh_or_independent_design": 0,
+        "max_cost_units": 60,
+        "max_latency_units": 30
+      },
+      "LOW": {
+        "min_capability": "ADEQUATE",
+        "min_source_lineages": 0,
+        "min_model_or_runtime_lineages": 0,
+        "max_prior_exposure_ratio": 1.0,
+        "min_fresh_or_independent_design": 0,
+        "max_cost_units": 30,
+        "max_latency_units": 30
+      }
+    }
+  },
+  "topology_options": [
+    {
+      "topology_id": "TOPO_A_MONOCULTURE",
+      "purpose": "beta regime adoption review",
+      "cost_units": 15,
+      "latency_units": 5,
+      "counter_attractor_budget": 0,
+      "stop_conditions": ["capability gate"],
+      "reviewers": [
+        {"reviewer_id": "R_A1", "role": "reviewer", "model_family": "BENCH", "provider": "PROV_H",
+         "runtime_lineage": "RT_H", "sources": ["S_BENCH"], "retrieval_bundle": "BUNDLE_H",
+         "prompt_context": "CTX_H", "prior_conclusion_exposure": "TRUE", "implementation_path": "IMP_H",
+         "experiment_design_origin": "DESIGN_H", "allocator": "PO", "visible_information": "FULL_SHARED_CONTEXT",
+         "conclusion": "BETA", "confidence": "HIGH", "evidence_refs": ["E_A1"], "cost_units": 3,
+         "latency_units": 1, "capability_tier": "HIGH"},
+        {"reviewer_id": "R_A2", "role": "reviewer", "model_family": "BENCH", "provider": "PROV_H",
+         "runtime_lineage": "RT_H", "sources": ["S_BENCH"], "retrieval_bundle": "BUNDLE_H",
+         "prompt_context": "CTX_H", "prior_conclusion_exposure": "TRUE", "implementation_path": "IMP_H",
+         "experiment_design_origin": "DESIGN_H", "allocator": "PO", "visible_information": "FULL_SHARED_CONTEXT",
+         "conclusion": "BETA", "confidence": "HIGH", "evidence_refs": ["E_A2"], "cost_units": 3,
+         "latency_units": 1, "capability_tier": "HIGH"},
+        {"reviewer_id": "R_A3", "role": "reviewer", "model_family": "BENCH", "provider": "PROV_H",
+         "runtime_lineage": "RT_H", "sources": ["S_BENCH"], "retrieval_bundle": "BUNDLE_H",
+         "prompt_context": "CTX_H", "prior_conclusion_exposure": "TRUE", "implementation_path": "IMP_H",
+         "experiment_design_origin": "DESIGN_H", "allocator": "PO", "visible_information": "FULL_SHARED_CONTEXT",
+         "conclusion": "BETA", "confidence": "HIGH", "evidence_refs": ["E_A3"], "cost_units": 3,
+         "latency_units": 1, "capability_tier": "HIGH"},
+        {"reviewer_id": "R_A4", "role": "reviewer", "model_family": "BENCH", "provider": "PROV_H",
+         "runtime_lineage": "RT_H", "sources": ["S_BENCH"], "retrieval_bundle": "BUNDLE_H",
+         "prompt_context": "CTX_H", "prior_conclusion_exposure": "TRUE", "implementation_path": "IMP_H",
+         "experiment_design_origin": "DESIGN_H", "allocator": "PO", "visible_information": "FULL_SHARED_CONTEXT",
+         "conclusion": "BETA", "confidence": "HIGH", "evidence_refs": ["E_A4"], "cost_units": 3,
+         "latency_units": 1, "capability_tier": "HIGH"},
+        {"reviewer_id": "R_A5", "role": "reviewer", "model_family": "BENCH", "provider": "PROV_H",
+         "runtime_lineage": "RT_H", "sources": ["S_BENCH"], "retrieval_bundle": "BUNDLE_H",
+         "prompt_context": "CTX_H", "prior_conclusion_exposure": "TRUE", "implementation_path": "IMP_H",
+         "experiment_design_origin": "DESIGN_H", "allocator": "PO", "visible_information": "FULL_SHARED_CONTEXT",
+         "conclusion": "BETA", "confidence": "HIGH", "evidence_refs": ["E_A5"], "cost_units": 3,
+         "latency_units": 1, "capability_tier": "HIGH"}
+      ]
+    },
+    {
+      "topology_id": "TOPO_B_DIFFERENTIATED",
+      "purpose": "beta regime adoption review",
+      "cost_units": 24,
+      "latency_units": 12,
+      "counter_attractor_budget": 0,
+      "stop_conditions": ["independence gate", "capability gate"],
+      "reviewers": [
+        {"reviewer_id": "R_B1", "role": "reviewer", "model_family": "FAM_P", "provider": "PROV_Q",
+         "runtime_lineage": "RT_P", "sources": ["S_P1"], "retrieval_bundle": "BUNDLE_P",
+         "prompt_context": "CTX_P", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_P",
+         "experiment_design_origin": "DESIGN_P", "allocator": "GOVERNOR", "visible_information": "EVIDENCE_ONLY",
+         "fresh_context": true, "conclusion": "BETA", "confidence": "MEDIUM", "evidence_refs": ["E_B1"],
+         "cost_units": 6, "latency_units": 3, "capability_tier": "ADEQUATE"},
+        {"reviewer_id": "R_B2", "role": "reviewer", "model_family": "FAM_R", "provider": "PROV_R",
+         "runtime_lineage": "RT_R", "sources": ["S_R1"], "retrieval_bundle": "BUNDLE_R",
+         "prompt_context": "CTX_R", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_R",
+         "experiment_design_origin": "DESIGN_R", "allocator": "GOVERNOR", "visible_information": "EVIDENCE_ONLY",
+         "fresh_context": true, "conclusion": "BETA", "confidence": "MEDIUM", "evidence_refs": ["E_B2"],
+         "cost_units": 6, "latency_units": 3, "capability_tier": "ADEQUATE"},
+        {"reviewer_id": "R_B3", "role": "reviewer", "model_family": "FAM_S", "provider": "PROV_S",
+         "runtime_lineage": "RT_S", "sources": ["S_S1"], "retrieval_bundle": "BUNDLE_S",
+         "prompt_context": "CTX_S", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_S",
+         "experiment_design_origin": "DESIGN_S", "allocator": "GOVERNOR", "visible_information": "BLIND",
+         "fresh_context": true, "conclusion": "BETA", "confidence": "MEDIUM", "evidence_refs": ["E_B3"],
+         "cost_units": 6, "latency_units": 3, "capability_tier": "ADEQUATE"},
+        {"reviewer_id": "R_B4", "role": "reviewer", "model_family": "FAM_T", "provider": "PROV_T",
+         "runtime_lineage": "RT_T", "sources": ["S_T1"], "retrieval_bundle": "BUNDLE_T",
+         "prompt_context": "CTX_T", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_T",
+         "experiment_design_origin": "DESIGN_T", "allocator": "GOVERNOR", "visible_information": "BLIND",
+         "fresh_context": true, "conclusion": "BETA", "confidence": "MEDIUM", "evidence_refs": ["E_B4"],
+         "cost_units": 6, "latency_units": 3, "capability_tier": "ADEQUATE"}
+      ]
+    },
+    {
+      "topology_id": "TOPO_C_DIVERSE_WEAK",
+      "purpose": "beta regime adoption review",
+      "cost_units": 6,
+      "latency_units": 3,
+      "counter_attractor_budget": 0,
+      "stop_conditions": ["capability gate"],
+      "reviewers": [
+        {"reviewer_id": "R_C1", "role": "reviewer", "model_family": "FAM_U", "provider": "PROV_U",
+         "runtime_lineage": "RT_U", "sources": ["S_U1"], "retrieval_bundle": "BUNDLE_U",
+         "prompt_context": "CTX_U", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_U",
+         "experiment_design_origin": "DESIGN_U", "allocator": "PO", "visible_information": "EVIDENCE_ONLY",
+         "conclusion": "BETA", "confidence": "LOW", "evidence_refs": ["E_C1"], "cost_units": 2,
+         "latency_units": 1, "capability_tier": "BASIC"},
+        {"reviewer_id": "R_C2", "role": "reviewer", "model_family": "FAM_V", "provider": "PROV_V",
+         "runtime_lineage": "RT_V", "sources": ["S_V1"], "retrieval_bundle": "BUNDLE_V",
+         "prompt_context": "CTX_V", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_V",
+         "experiment_design_origin": "DESIGN_V", "allocator": "PO", "visible_information": "EVIDENCE_ONLY",
+         "conclusion": "BETA", "confidence": "LOW", "evidence_refs": ["E_C2"], "cost_units": 2,
+         "latency_units": 1, "capability_tier": "BASIC"},
+        {"reviewer_id": "R_C3", "role": "reviewer", "model_family": "FAM_W", "provider": "PROV_W",
+         "runtime_lineage": "RT_W", "sources": ["S_W1"], "retrieval_bundle": "BUNDLE_W",
+         "prompt_context": "CTX_W", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_W",
+         "experiment_design_origin": "DESIGN_W", "allocator": "PO", "visible_information": "EVIDENCE_ONLY",
+         "conclusion": "BETA", "confidence": "LOW", "evidence_refs": ["E_C3"], "cost_units": 2,
+         "latency_units": 1, "capability_tier": "BASIC"}
+      ]
+    }
+  ]
+}

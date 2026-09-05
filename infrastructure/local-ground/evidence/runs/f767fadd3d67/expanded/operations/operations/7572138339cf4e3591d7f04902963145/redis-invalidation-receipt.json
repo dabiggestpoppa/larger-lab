@@ -1,0 +1,13 @@
+{
+  "format": "oce-redis-invalidation-receipt-v1",
+  "redis_restored": false,
+  "redis_invalidation_required": true,
+  "redis_invalidation_attempted": true,
+  "redis_invalidated": false,
+  "redis_verification": "failed",
+  "redis_failure": "redis-cli FLUSHALL failed (container not running?)",
+  "postgres_promoted": true,
+  "postgres_exit_status": 0,
+  "started_at": "2026-08-30T12:33:24Z",
+  "finished_at": "2026-08-30T12:33:24Z"
+}

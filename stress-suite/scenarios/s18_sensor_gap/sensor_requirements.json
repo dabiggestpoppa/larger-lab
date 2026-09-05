@@ -1,0 +1,26 @@
+[
+  {
+    "requirement_id": "REQ_MECH_LF_1",
+    "claim_ref": "MECH_LIQUIDATION_FLOW_1",
+    "required_observable": "AGGRESSOR_FLOW_STATE",
+    "resolution": "1m",
+    "history_depth": "12m",
+    "instrument_coverage": ["BTC_USDT_PERP", "ETH_USDT_PERP"],
+    "time_semantics": "EVENT",
+    "quality_minimum": "VERIFIED",
+    "why_required": "mechanism requires taker aggressor flow attribution per liquidation event",
+    "alternative_insufficient": "liquidations alone cannot identify aggressor side; volume is not flow"
+  },
+  {
+    "requirement_id": "REQ_MECH_LF_2",
+    "claim_ref": "MECH_LIQUIDATION_FLOW_1",
+    "required_observable": "HISTORICAL_LIQUIDATION_DETAIL",
+    "resolution": "RAW_EVENT",
+    "history_depth": "36m",
+    "instrument_coverage": ["BTC_USDT_PERP"],
+    "time_semantics": "EVENT",
+    "quality_minimum": "VERIFIED",
+    "why_required": "liquidation-size distribution over 3y is the mechanism's test domain",
+    "alternative_insufficient": "current-only liquidation state is not historical coverage"
+  }
+]

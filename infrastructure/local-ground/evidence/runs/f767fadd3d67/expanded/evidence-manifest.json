@@ -1,0 +1,200 @@
+{
+  "block": "B1",
+  "stage": "B1-LOCAL-GROUND-CLOSURE",
+  "run_id": "f767fadd3d67",
+  "repository": "dabiggestpoppa/larger-lab",
+  "branch": "oce-program-build",
+  "implementation_commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f",
+  "implementation_tree": "85cb2379f614dde118670194dc6a08c59b1f3f54",
+  "cloud_mutations": 0,
+  "cloud_cost_state": "ZERO",
+  "cloud_activation_state": "DEFERRED_BY_OPERATOR",
+  "artifacts": [
+    {
+      "path": "acceptance-output.txt",
+      "sha256": "7770cb1f97adf60bdf9ad4e1115bdf70b7add0185d6c4ff826f483e427c94dd8",
+      "size": 17819
+    },
+    {
+      "path": "adversarial-output.txt",
+      "sha256": "e91c9aac55f4f37469577cdb0959570e1f7a2d2c0a2e0d5f4e6a44778971a04d",
+      "size": 2177
+    },
+    {
+      "path": "adversarial-results.json",
+      "sha256": "cb0472ffb866ab65e1f82855859394c5c89c7b84e8ccb97561fd464b0ee328c4",
+      "size": 965
+    },
+    {
+      "path": "artifact-recovery-receipt.json",
+      "sha256": "252f29f1275db3ca5080fdfbb466e251f440f394f7ddb8edff8d304bf090fdf1",
+      "size": 275
+    },
+    {
+      "path": "cleanup.json",
+      "sha256": "382da6348eb9f820e60fe1531a212d64899913d7ccb88722427912a93490ef1a",
+      "size": 46
+    },
+    {
+      "path": "cloud-apply-denial.json",
+      "sha256": "44e950211b9d5cdd61ca7534aed8f5cd1874603fc4f186646f9dc61956449034",
+      "size": 48
+    },
+    {
+      "path": "cloud-apply-denial.txt",
+      "sha256": "b1c480359d4d38fb949db72fa7ede2006730a19292d57617345e3ffb483c71ec",
+      "size": 89
+    },
+    {
+      "path": "cloud-plan-2.txt",
+      "sha256": "e1fea33c148063cdb6f82e396bed8e446ba06b21a1fef5a0a90dd4c0990e3892",
+      "size": 1036
+    },
+    {
+      "path": "cloud-plan-deterministic.json",
+      "sha256": "5e77f59dff7a37d25dd89ead1d82e9f4597fb539cb612f639abc97626cd8cd00",
+      "size": 27
+    },
+    {
+      "path": "cloud-plan.txt",
+      "sha256": "e1fea33c148063cdb6f82e396bed8e446ba06b21a1fef5a0a90dd4c0990e3892",
+      "size": 1036
+    },
+    {
+      "path": "container-cleanup.json",
+      "sha256": "65a04ed483c1eee3a7043054f2fcba676bf9bda73dfa3a6624ea307d444f4cec",
+      "size": 136
+    },
+    {
+      "path": "environment-fingerprint.json",
+      "sha256": "b8faf5daabcf760483f225d663d1b2232cf0decf5b3a16c22958e8b575a78a2f",
+      "size": 493
+    },
+    {
+      "path": "evidence-dir.path",
+      "sha256": "d200237592a7f323638bb60f3396645982b208c3cef732ba7cb129d2ea4aa3d0",
+      "size": 62
+    },
+    {
+      "path": "identity.json",
+      "sha256": "5aa75829c20ae5e71215ef87e316ddce4370877bf397a0037d9e83d864a4476c",
+      "size": 643
+    },
+    {
+      "path": "independent-gate.json",
+      "sha256": "fafdcb73828842a74003d823b63b01704acf40322e8ecb5812f09c9bf3543bf1",
+      "size": 14479
+    },
+    {
+      "path": "junit.xml",
+      "sha256": "4940df3ff79fd89da8fb6e4ce9e814c148bb8c6086e6ee016716a585009979a4",
+      "size": 21471
+    },
+    {
+      "path": "local-after-denied.json",
+      "sha256": "8f0c1c520d4343f54805dcdaa74287fb690f4d610186020a9343b1407654bdbd",
+      "size": 20
+    },
+    {
+      "path": "local-after-denied.txt",
+      "sha256": "be858f356e7f392efbc83c678f2cd3590aebfb481cdc8daa7c904f24ef100510",
+      "size": 358
+    },
+    {
+      "path": "log-driver-config.json",
+      "sha256": "fcd205dad742cc3045a3c79ce9b1373831c60d21022364ee772ef5f4af122a4c",
+      "size": 87
+    },
+    {
+      "path": "postgres-recovery-receipt-1788093157314815560.json",
+      "sha256": "fcf4653d90ded27f1adca4eb0115102dd3fe33e439020245cb1cd30b06ab8a4b",
+      "size": 1669
+    },
+    {
+      "path": "postgres-recovery-receipt-1788093173912202907.json",
+      "sha256": "b70295f945970a80ba98557ad5dab03fc11650828bbf96e1c715eb58b1d0d5f3",
+      "size": 1768
+    },
+    {
+      "path": "postgres-recovery-receipt-1788093204231123866.json",
+      "sha256": "b3c4aa18618c94cf487db3ce44fc614b1ae0e657a08ffd5adbecaf5de16af9be",
+      "size": 1768
+    },
+    {
+      "path": "postgres-recovery-receipt.json",
+      "sha256": "b3c4aa18618c94cf487db3ce44fc614b1ae0e657a08ffd5adbecaf5de16af9be",
+      "size": 1768
+    },
+    {
+      "path": "promote-receipt-1788093154347807867.json",
+      "sha256": "ffcf415232fceed2838bf524f5d42b5699b52d22cc1bd493e36ba2542abd3c32",
+      "size": 1870
+    },
+    {
+      "path": "promote-receipt-1788093170581187949.json",
+      "sha256": "6c5191b993083591c4ed49ba04c60c56df849497593a7834c19861e2fc02894a",
+      "size": 2068
+    },
+    {
+      "path": "promote-receipt-1788093200899156033.json",
+      "sha256": "95561c345d3c37164afe5caad5edfc1b9f95e1a21079ee8fac98ed7d59fca0d3",
+      "size": 2068
+    },
+    {
+      "path": "promote-receipt.json",
+      "sha256": "95561c345d3c37164afe5caad5edfc1b9f95e1a21079ee8fac98ed7d59fca0d3",
+      "size": 2068
+    },
+    {
+      "path": "redis-invalidation-receipt.json",
+      "sha256": "a4f7f455a0bfbab0c2d60a8ef3d590470a1a8e8ea4dc574715b8d3bdc3cd1f55",
+      "size": 433
+    },
+    {
+      "path": "restore-receipt.json",
+      "sha256": "b70295f945970a80ba98557ad5dab03fc11650828bbf96e1c715eb58b1d0d5f3",
+      "size": 1768
+    },
+    {
+      "path": "rollback-failure-receipt.json",
+      "sha256": "f5ee7979cadb606f5c6d6fd7645734b1dd32f53c1b22c1facbbe489dd017c874",
+      "size": 1762
+    },
+    {
+      "path": "rollback-receipt-af5e367a1e25.json",
+      "sha256": "1428cb13a458c358fe936602b9f431544965365364ca6d406501a3796d0d3409",
+      "size": 2069
+    },
+    {
+      "path": "rollback-receipt.json",
+      "sha256": "1428cb13a458c358fe936602b9f431544965365364ca6d406501a3796d0d3409",
+      "size": 2069
+    },
+    {
+      "path": "source-clean.json",
+      "sha256": "57e2734dfe0753e080ee37be3433187ae85c44d86bac544d5ae1c92ce155d3e7",
+      "size": 70
+    },
+    {
+      "path": "stage-log.txt",
+      "sha256": "1f59a623d188c9c5873c3452025f510ef9f5525140bd21ec06cef0889d56a89b",
+      "size": 401
+    },
+    {
+      "path": "stage-status.json",
+      "sha256": "3f7f306889993525ff2763c62da571015bc66a583c53ef5fdd1f278e0a138693",
+      "size": 467
+    },
+    {
+      "path": "test-mode.txt",
+      "sha256": "f92e9b2fbccb78c0df3470eba945b46353e978d2a7cdc27fedc53a20d918df85",
+      "size": 17
+    },
+    {
+      "path": "test-summary.json",
+      "sha256": "42c97495c2ab73e4190b01478f1e835dcebc8830e5d3e82dd1713d7d6145dd9b",
+      "size": 42199
+    }
+  ],
+  "generated_at": "2026-08-30T12:33:51Z"
+}

@@ -1,0 +1,23 @@
+{
+  "policy_id": "S04-POLICY",
+  "version_tag": "V1",
+  "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+  "authority_basis": "G2 §12: a single leaf failure must remain local — no ontology mutation, no architecture rewrite, no patch escalation",
+  "rules": [
+    {"rule_id": "S04.enter.watch", "to_state": "WATCH",
+     "any_of": [{"channel": "reliability_degradation"}],
+     "rationale": "degraded reliability opens WATCH"},
+    {"rule_id": "S04.escalate.review", "to_state": "ESCALATION_REVIEW",
+     "all_of": [{"exception_burden": "MEDIUM"}],
+     "persistence": {"channel": "exception_burden", "grade": "MEDIUM", "minimum_observations": 2},
+     "rationale": "sustained fault load escalates to review"},
+    {"rule_id": "S04.repair.leaf", "to_state": "HOMEOSTATIC_REPAIR",
+     "all_of": [{"exception_burden": "HIGH"}],
+     "affected": {"max_level": "L1", "scope": "@PARSER"},
+     "mutation_class": "HOMEOSTATIC_REPAIR",
+     "rationale": "provider/adapter-level fault: repair locally; the surface must stay narrow"},
+    {"rule_id": "S04.repair.verified", "to_state": "STABLE",
+     "all_of": [{"exception_burden": "LOW", "op": "eq"}],
+     "rationale": "repair verified; stability restored"}
+  ]
+}

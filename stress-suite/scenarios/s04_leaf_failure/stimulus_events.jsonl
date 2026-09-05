@@ -1,0 +1,5 @@
+{"seq": 1, "evidence_vector": {"exception_burden": "MEDIUM", "reliability_degradation": "MEDIUM"}, "evidence_refs": ["TS1"], "affected": {"scope": "@PARSER", "level": "L1"}}
+{"seq": 2, "evidence_vector": {"exception_burden": "MEDIUM", "reliability_degradation": "MEDIUM"}, "evidence_refs": ["TS1"], "affected": {"scope": "@PARSER", "level": "L1"}}
+{"seq": 3, "evidence_vector": {"exception_burden": "HIGH", "reliability_degradation": "MEDIUM"}, "evidence_refs": ["TS1", "UP1"], "affected": {"scope": "@PARSER", "level": "L1"}}
+{"seq": 4, "evidence_vector": {"exception_burden": "LOW", "reliability_degradation": "LOW"}, "evidence_refs": ["TS1"]}
+{"seq": 5, "evidence_vector": {"exception_burden": "LOW", "reliability_degradation": "LOW"}, "evidence_refs": []}

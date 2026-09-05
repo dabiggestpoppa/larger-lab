@@ -1,0 +1,2 @@
+status,timestamp_utc,process,pid,protocol,local_endpoint,remote_ip,remote_port,dns_name,http_host,url_or_sni,classification,evidence
+NOT_OBSERVED,,,,,,,,,,,No guest runtime telemetry; sample was not executed

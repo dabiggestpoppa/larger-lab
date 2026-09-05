@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/evidence-record.json",
+  "title": "OCE Stress Suite EvidenceRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_id", "schema_version", "kind", "claim", "status", "seq"],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string"},
+    "kind": {"enum": ["OBSERVATION", "AGENT_CLAIM", "INDEPENDENT_CONFIRMATION", "DETERMINISTIC"]},
+    "claim": {"type": "string"},
+    "provenance": {"type": ["object", "null"]},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "status": {"enum": ["ACTIVE", "DEMOTED", "DORMANT", "SUPERSEDED"]},
+    "seq": {"type": "integer", "minimum": 0},
+    "source_label": {"type": "string"},
+    "source_lineage": {"type": "string"},
+    "resolution_class": {"type": "string"},
+    "allocator": {"type": "string"},
+    "retrieval_lineage": {"type": "string"}
+  }
+}

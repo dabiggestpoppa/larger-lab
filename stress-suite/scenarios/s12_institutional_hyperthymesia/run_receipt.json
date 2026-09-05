@@ -1,0 +1,22 @@
+{
+  "actual_outcome": "BOUNDED_CONTEXT",
+  "authority_after": "NONE",
+  "authority_before": "NONE",
+  "authority_changes": "NONE",
+  "behavior_fingerprint": "8c27840643772336a4b8bb21b3f77e39",
+  "capital_mutations": 0,
+  "cloud_mutations": 0,
+  "expected_outcome": "BOUNDED_CONTEXT",
+  "expected_outcome_accessed": false,
+  "failures": [],
+  "fingerprint": "e1e24d8d6f8ae92d55a6e6a0200536f7",
+  "hidden_ground_truth_accessed": false,
+  "model_calls": 0,
+  "pass": true,
+  "policy_fingerprint": "e959ec6c7ed494f1da978582",
+  "policy_id": "G4_MEMORY_AND_REACTIVATION_POLICY",
+  "policy_version": "V2",
+  "production_mutations": 0,
+  "scenario_id": "S12",
+  "scenario_version": "1.0.0"
+}

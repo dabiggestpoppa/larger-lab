@@ -1,0 +1,11 @@
+{"seq": 1, "evidence_vector": {"exception_burden": "MEDIUM"}, "evidence_refs": ["P1"], "patch_pressure": {"structural_level": "L1", "causal_signature": "SIG_C", "recurrence": 1, "override_count": 1}}
+{"seq": 2, "evidence_vector": {"exception_burden": "MEDIUM"}, "evidence_refs": ["P2"], "patch_pressure": {"structural_level": "L1", "causal_signature": "SIG_C", "recurrence": 2, "override_count": 1}}
+{"seq": 3, "evidence_vector": {"exception_burden": "HIGH"}, "evidence_refs": ["P3"], "patch_pressure": {"structural_level": "L1", "causal_signature": "SIG_C", "recurrence": 2, "override_count": 2}}
+{"seq": 4, "evidence_vector": {"exception_burden": "LOW"}, "evidence_refs": ["P4"]}
+{"seq": 5, "evidence_vector": {"exception_burden": "MEDIUM"}, "evidence_refs": ["P5"], "patch_pressure": {"structural_level": "L2", "causal_signature": "SIG_C", "recurrence": 3, "override_count": 2}}
+{"seq": 6, "evidence_vector": {"exception_burden": "MEDIUM"}, "evidence_refs": ["P6"], "patch_pressure": {"structural_level": "L2", "causal_signature": "SIG_C", "recurrence": 4, "override_count": 3}}
+{"seq": 7, "evidence_vector": {"exception_burden": "HIGH"}, "evidence_refs": ["P7"], "patch_pressure": {"structural_level": "L2", "causal_signature": "SIG_C", "recurrence": 5, "override_count": 3}}
+{"seq": 8, "evidence_vector": {"exception_burden": "LOW"}, "evidence_refs": ["P8"]}
+{"seq": 9, "evidence_vector": {"exception_burden": "MEDIUM"}, "evidence_refs": ["P9"], "patch_pressure": {"structural_level": "L3", "causal_signature": "SIG_X", "recurrence": 99, "override_count": 50}}
+{"seq": 10, "evidence_vector": {"exception_burden": "MEDIUM"}, "evidence_refs": ["P10"], "patch_pressure": {"structural_level": "L3", "causal_signature": "SIG_C", "recurrence": 6, "override_count": 4}}
+{"seq": 11, "evidence_vector": {"exception_burden": "HIGH"}, "evidence_refs": ["P11"], "patch_pressure": {"structural_level": "L3", "causal_signature": "SIG_C", "recurrence": 7, "override_count": 6}}

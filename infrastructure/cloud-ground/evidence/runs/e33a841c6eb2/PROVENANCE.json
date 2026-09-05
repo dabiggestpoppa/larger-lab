@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "record_type": "authoritative-evidence-archive",
+  "block": "B1",
+  "increment": "B1-I1R3H",
+  "checkpoint": "B1-I1",
+  "implementation_commit": "50bf8fe4acc3a0f0750065dfec67c17fc8c5a3d7",
+  "evidence_commit": "3ee31b2a6c58a3bb467f5cb141dba5eb027d419a",
+  "tested_tree": "93cfd6e656c8e22dc8db60dda6163f29fb462bf0",
+  "branch": "oce",
+  "ci_run_id": "33010802229",
+  "ci_run_url": "https://github.com/dabiggestpoppa/larger-lab/actions/runs/33010802229",
+  "artifact_id": "9622689584",
+  "artifact_name": "b1-i1r3h-evidence-e33a841c6eb2.zip",
+  "outer_zip_sha256": "a87a4ab8bcb3fa017496bd1cf846b95421cf7f689f35553b7b1c76c735f7684e",
+  "internal_artifact_sha256": {
+    "static-validation-results.json": "dd47ae6644abb1fd0799e0a9b8235e224d08c44b076ed71e74f9e7175bb4473c",
+    "static-validation-summary.md": "3818e2f8214f77dff58979da0675ab02868ec1360f23585b823965d579579512",
+    "adversarial-results.json": "e2017bec0a1da2d7befd97b6b0a2fa85a373eb73023dddd656110cdea0296e86",
+    "stage-status.json": "a2afd3bb0e23bdffce68b14eeaff6c60b70026c4798a91cc22bf80ccf74405f5",
+    "worktree-cleanup.json": "628d95097fe0d237a52188e02a05406c3696d7b9ce2269d3e3bffeedfd409750",
+    "regression-output.txt": "23629fc8cc6438c4c374c3deaa790c743fda482ebcb3f4e0945d79f40e6e675d",
+    "stage-log.txt": "6aa11cefeb7b8ace70a33171571806ff303b385aed70e01b07b9aed805c4628e"
+  },
+  "run_id": "e33a841c6eb2",
+  "validator_version": "3.6.0",
+  "schema_version_engine": "3.6.0",
+  "artifact_created_at": "2026-08-26T20:39:21Z",
+  "artifact_expires_at": "2026-09-25T20:39:21Z",
+  "archival_timestamp": "2026-08-26T21:08:21Z",
+  "archive_method": "gh api actions/artifacts/{id}/zip -> sha256 verified -> copied byte-identical to evidence/archive -> expanded to evidence/runs/{run_id}",
+  "content_modified": false,
+  "verification": "outer zip sha256 matches upload log; every internal artifact sha256 recomputed after extraction and matches evidence-manifest.json",
+  "additional_artifacts_sha256": {
+    "initial-validation-results.json": "1cafde065a4f3abc153bfd780726f190850dcf9dc9812ccd7294ec9885772e6b",
+    "initial-validation-summary.md": "3e8528a84e87725cc0ba545669def3faaf265c5d4abd2319df4dd52544d108d3",
+    "evidence-dir.path": "1c0800d0213b6ed2b1c82654af37df9b5b9df988f7c7e70972873da788cde394",
+    "adversarial-output.txt": "819bd652ba2b3a8d2c4ad184563c189da1ce04e518a5dca07937dc0532cf0733"
+  },
+  "evidence_manifest_sha256": "03d9c6a847652e3c9d960b4e7c9a3bb162f523d4e47b82b86d81c84a9682318c"
+}

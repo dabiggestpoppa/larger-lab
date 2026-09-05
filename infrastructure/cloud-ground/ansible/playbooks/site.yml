@@ -1,0 +1,38 @@
+---
+# OCE Cloud Ground — Host Baseline Playbook
+# B1-I1 — Static skeleton (syntax-valid, untested on live host)
+#
+# This playbook applies the Ubuntu 24.04 LTS host baseline
+# for the OCE Cloud Ground control plane.
+#
+# Prerequisites:
+#   - Ubuntu Server 24.04 LTS minimal
+#   - SSH key-based access as non-root user
+#   - User in sudoers with NOPASSWD (or password prompt)
+#
+# Usage:
+#   ansible-playbook -i inventories/example/hosts.yml playbooks/site.yml
+#
+# WARNING: This playbook modifies the target host.
+# Run only after explicit operator authorization (B1-I2+).
+
+- name: OCE Cloud Ground — Host Baseline
+  hosts: control_plane
+  become: true
+  roles:
+    - role: common
+      tags: [common, base]
+    - role: security
+      tags: [security, ssh, firewall]
+    - role: tailscale
+      tags: [tailscale, network]
+    - role: docker
+      tags: [docker, runtime]
+    - role: storage_layout
+      tags: [storage, disk]
+    - role: backup_client
+      tags: [backup]
+    - role: monitoring_agent
+      tags: [monitoring, observability]
+    - role: host_manifest
+      tags: [manifest, inventory]

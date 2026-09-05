@@ -1,0 +1,71 @@
+# OCE Cloud Ground — B1-I1R Validation CI
+# Runs static validation without provisioning cloud resources
+# Fail-closed: any mandatory failure blocks the gate
+
+name: B1-I1R Validation
+
+on:
+  push:
+    branches: [oce/block-1-i1r-truth-repair]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          pip install pyyaml jsonschema
+
+      - name: Install system tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          pip install ansible-core ansible-lint
+          ansible-galaxy collection install -r infrastructure/cloud-ground/ansible/requirements.yml
+
+      - name: Doctor
+        run: ./infrastructure/cloud-ground/scripts/doctor
+
+      - name: Validation engine
+        run: python3 infrastructure/cloud-ground/scripts/validate_engine.py
+
+      - name: Config validation
+        run: ./infrastructure/cloud-ground/scripts/render-config
+
+      - name: Adversarial tests
+        run: ./infrastructure/cloud-ground/tests/adversarial-tests.sh
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b1-i1r-evidence
+          path: infrastructure/cloud-ground/evidence/
+          retention-days: 30
+
+      - name: Gate check
+        if: always()
+        run: |
+          if [ -f infrastructure/cloud-ground/evidence/stage-status.json ]; then
+            GATE=$(python3 -c "import json; print(json.load(open('infrastructure/cloud-ground/evidence/stage-status.json'))['gate_status'])")
+            echo "Gate: $GATE"
+            if [ "$GATE" != "READY_FOR_OPERATOR_REVIEW" ]; then
+              echo "Gate is not READY_FOR_OPERATOR_REVIEW — failing"
+              exit 1
+            fi
+          else
+            echo "No stage-status.json found — failing"
+            exit 1
+          fi

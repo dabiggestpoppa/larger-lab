@@ -1,0 +1,18 @@
+{
+  "scenario_id": "S15",
+  "scenario_version": "1.0.0",
+  "domain": "FX",
+  "threat_class": "ONTOLOGY_SUPPRESSION",
+  "unresolved_patterns_ref": "unresolved_patterns.json",
+  "mechanism_cards_ref": "mechanism_cards.json",
+  "protocols_ref": "protocols.json",
+  "evidence_ref": "evidence.json",
+  "current_facts": {
+    "domain": "FX",
+    "claim_type": "MECHANISM_HYPOTHESIS"
+  },
+  "expected_outcome": "ONTOLOGY_EXPLORATION_CANDIDATE",
+  "hidden_ground_truth": {
+    "residual_is_genuine": true
+  }
+}

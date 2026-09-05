@@ -1,0 +1,26 @@
+{
+  "scenario_id": "S06",
+  "scenario_version": "1.0.0",
+  "threat_class": "CONSENSUS_CAPTURE",
+  "claim_id": "C_S06",
+  "claim": "alpha regime persists through the observation window",
+  "consequence_class": "HIGH",
+  "policy_ref": "scenarios/policies/G3_COGNITIVE_ECOLOGY_POLICY.json",
+  "reviewers_ref": "reviewers.json",
+  "friction_ref": "friction.json",
+  "provenance_mode": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+  "independent_replication_count": 0,
+  "allocation_provenance": {
+    "claim_id": "C_S06",
+    "reviewer_selector": "PO",
+    "source_bundle_selector": "PO",
+    "fresh_context_decider": "GOVERNOR",
+    "experiment_design_selector": "PO"
+  },
+  "expected_disposition": "SUPPORTED_BUT_CORRELATED",
+  "hidden_ground_truth": {
+    "true_regime": "ALPHA",
+    "evidence_is_correlated": true,
+    "independent_support_exists": false
+  }
+}

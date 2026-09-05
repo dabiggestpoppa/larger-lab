@@ -1,0 +1,4 @@
+# OCE Cloud Ground — Python Dependencies
+# B1-I1R3B — Pinned for reproducible validation
+pyyaml>=6.0,<7.0
+jsonschema>=4.20,<5.0

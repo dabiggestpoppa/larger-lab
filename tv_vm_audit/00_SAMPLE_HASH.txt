@@ -1,0 +1,17 @@
+TradingView Premium Desktop sample identity
+
+Source path: C:\Users\wifik\Downloads\TradingView_Premium_Desktop.zip
+Outer archive size: 137495959 bytes
+Outer archive SHA-256: 52b02d200f835f6fccda4b6882e673c1aebbc443d2e4ba26e38839526ce3a298
+
+Outer archive entry: TradingView_Premium_Desktop_(password_github).zip
+Embedded executable entry: TradingView Premium Desktop.exe
+Embedded executable size: 146726768 bytes
+Embedded executable SHA-256: 21550755ff60024adbd2fa69575a4363cb6c77dc21bc427b754e62eed22c5d8b
+
+Expected executable SHA-256: 21550755ff60024adbd2fa69575a4363cb6c77dc21bc427b754e62eed22c5d8b
+Expected executable size: 146726768 bytes
+
+SAMPLE HASH MATCH: YES
+Verification method: SHA-256 computed directly over the embedded executable ZIP stream; sample was not extracted or executed.
+Verification timestamp: 2026-08-26

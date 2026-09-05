@@ -1,0 +1,317 @@
+{
+  "schema_version": "3.6.0",
+  "run_id": "e33a841c6eb2",
+  "validator_version": "3.6.0",
+  "phase": "initial",
+  "increment": "B1-I1R3H",
+  "start_time": "2026-08-26T20:37:07Z",
+  "end_time": "2026-08-26T20:37:14Z",
+  "tested_commit": "50bf8fe4acc3a0f0750065dfec67c17fc8c5a3d7",
+  "tested_tree": "93cfd6e656c8e22dc8db60dda6163f29fb462bf0",
+  "tested_branch": "oce",
+  "expected_branch": "oce",
+  "observed_git_branch": "oce",
+  "trusted_ci_ref": "oce",
+  "checkout_state": "attached",
+  "branch_provenance": "git-symbolic-ref",
+  "repository": "dabiggestpoppa/larger-lab",
+  "remote_url": "https://github.com/dabiggestpoppa/larger-lab",
+  "command": "validate_engine.py --all",
+  "tools": {
+    "python": "Python 3.12.14",
+    "ansible": "ansible-playbook [core 2.16.0]",
+    "ansible_lint": "ansible-lint 6.22.0 using ansible-core:2.16.0 ansible-compat:4.1.11 ruamel-yaml:0.19.1 ruamel-yaml-clib:None",
+    "docker": "Docker version 28.0.4, build b8034c0",
+    "shellcheck": "ShellCheck - shell script analysis tool",
+    "gitleaks": "Error: unknown flag: --version"
+  },
+  "results": [
+    {
+      "check_id": "SOURCE-IDENTITY",
+      "description": "Source identity verification",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "repo=dabiggestpoppa/larger-lab, expected_branch=oce, observed_branch=oce, commit=50bf8fe4acc3, tree=93cfd6e656c8, root=infrastructure/cloud-ground, gha_repo=dabiggestpoppa/larger-lab, gha_sha=50bf8fe4acc3",
+      "output": "All identity checks passed",
+      "timestamp": "2026-08-26T20:37:07Z"
+    },
+    {
+      "check_id": "YAML-PARSE",
+      "description": "YAML files parse correctly",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "29/29",
+      "output": "All parse",
+      "timestamp": "2026-08-26T20:37:07Z"
+    },
+    {
+      "check_id": "JSON-PARSE",
+      "description": "JSON contract files parse",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "9/9",
+      "output": "All parse",
+      "timestamp": "2026-08-26T20:37:07Z"
+    },
+    {
+      "check_id": "SCHEMA-VALID",
+      "description": "JSON Schemas valid Draft 2020-12",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "7/7",
+      "output": "All valid",
+      "timestamp": "2026-08-26T20:37:07Z"
+    },
+    {
+      "check_id": "SCHEMA-FIXTURES",
+      "description": "Schema fixture tests pass",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "15/15",
+      "output": "All pass",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "NO-LATEST-TAGS",
+      "description": "No :latest image tags",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "DIGEST-LOCK",
+      "description": "All images use digest pinning",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "All pinned",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "DIGEST-PROOF",
+      "description": "Image digests match registry evidence",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "2 verified",
+      "output": "All compose digests match",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "DIGEST-REGISTRY",
+      "description": "Image digests resolve against registry",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "2/2 resolved",
+      "output": "postgres: RESOLVED\nredis: RESOLVED",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "HOST-KEY-CHECKING",
+      "description": "Ansible host_key_checking is True",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "host_key_checking = True",
+      "output": "Verified",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "NO-DB-PORTS",
+      "description": "No published DB/cache ports",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "NO-PRIV",
+      "description": "No privileged containers",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "NO-SOCKET",
+      "description": "No Docker socket mounts",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "NO-SECRETS",
+      "description": "No embedded secrets",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "HEALTH-CHECKS",
+      "description": "Health checks on foundation services",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "2 health checks",
+      "output": "Both services",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "COST-THRESHOLDS",
+      "description": "Cost thresholds match ratification",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "All thresholds",
+      "output": "$60/$50/$100",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "WORKER-DENY",
+      "description": "Workers denied DB/Redis/SSH/Docker",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "14 DENY rules",
+      "output": "14 denial rules",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "WORKER-NO-DB",
+      "description": "Workers denied direct DB access",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "12/12 rules",
+      "output": "All denied",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "SECURITY-OPTS",
+      "description": "Security options (no-new-privileges)",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "2 declarations",
+      "output": "Both hardened",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "NO-EXTERNAL-NET",
+      "description": "No external networks",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "ROLES-TASKS",
+      "description": "All Ansible roles have tasks",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "8 roles",
+      "output": "All have tasks/main.yml",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "EVIDENCE-DIR",
+      "description": "Evidence directory with templates",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "evidence/ and templates/",
+      "output": "Structure present",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "RUNBOOKS",
+      "description": "Operator runbooks present",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "3 runbooks",
+      "output": "Present",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "SINGLE-ROOT",
+      "description": "Single infrastructure root",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "1 roots",
+      "output": "Single canonical root",
+      "timestamp": "2026-08-26T20:37:08Z"
+    },
+    {
+      "check_id": "ANSIBLE-SYNTAX",
+      "description": "Ansible playbook syntax valid",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "syntax-check passed",
+      "output": "\nplaybook: /home/runner/work/larger-lab/larger-lab/infrastructure/cloud-ground/ansible/playbooks/site.yml\n",
+      "timestamp": "2026-08-26T20:37:09Z"
+    },
+    {
+      "check_id": "ANSIBLE-LINT",
+      "description": "Ansible lint passes",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "clean",
+      "output": "",
+      "timestamp": "2026-08-26T20:37:13Z"
+    },
+    {
+      "check_id": "COMPOSE-RENDER",
+      "description": "Compose foundation renders",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "docker compose config",
+      "output": "Renders OK",
+      "timestamp": "2026-08-26T20:37:13Z"
+    },
+    {
+      "check_id": "SHELLCHECK",
+      "description": "Shell scripts pass shellcheck",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "8 scripts",
+      "output": "All clean",
+      "timestamp": "2026-08-26T20:37:14Z"
+    },
+    {
+      "check_id": "GITLEAKS",
+      "description": "Secret scan passes (gitleaks)",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "gitleaks clean",
+      "output": "No secrets found",
+      "timestamp": "2026-08-26T20:37:14Z"
+    },
+    {
+      "check_id": "SCAFFOLD-SCAN",
+      "description": "No unresolved scaffolds in executables",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "0 violations",
+      "output": "Clean",
+      "timestamp": "2026-08-26T20:37:14Z"
+    },
+    {
+      "check_id": "TOTALS-CONSIST",
+      "description": "Result totals self-consistent",
+      "mandatory": true,
+      "result": "PASS",
+      "evidence": "30 results",
+      "output": "P=30 F=0 B=0 S=0",
+      "timestamp": "2026-08-26T20:37:14Z"
+    }
+  ],
+  "totals": {
+    "PASS": 31,
+    "FAIL": 0,
+    "BLOCKED": 0,
+    "SKIPPED": 0,
+    "total": 31
+  },
+  "gate": "READY_FOR_OPERATOR_REVIEW"
+}

@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: oce_cloud_ground
+  description: OCE Cloud Ground host baseline
+  author: OCE Build Agent
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - "all"
+dependencies: []

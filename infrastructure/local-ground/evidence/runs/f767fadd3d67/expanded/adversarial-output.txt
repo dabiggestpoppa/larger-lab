@@ -1,0 +1,41 @@
+DENIED: cloud apply blocked — missing required field 'AUTHORIZED_STAGE' (fail-closed).
+PASS: cloud apply denied without authorization (rc=5 as expected)
+===============================================================
+  OCE Local Ground bootstrap (A-003)
+  runtime_target=local
+===============================================================
+exists: /home/runner/work/larger-lab/larger-lab/infrastructure/local-ground/compose/.env (left untouched)
+FAIL_CLOSED: secret 'POSTGRES_PASSWORD' not set (or still a placeholder)
+bootstrap halted at secret guard
+PASS: bootstrap fail-closed without secrets (rc=3)
+Traceback (most recent call last):
+  File "<stdin>", line 40, in <module>
+ValueError: allowed_path '/root' outside local scope
+PASS: unauthorized worker rejected (rc=1 as expected)
+operation 66643c85384a4d50a0d7a39439f7a9e8 indexed (1 receipts)
+backup complete -> /tmp/tmp.PtLrXYGY2P/bk
+scope: state-only | backup_id: 66643c85384a4d50a0d7a39439f7a9e8 | disaster_recovery_capable: false
+includes: state
+tracked files: 11
+manifest: /tmp/tmp.PtLrXYGY2P/bk/BACKUP_MANIFEST.sha256
+verifying backup integrity (fail closed)...
+CORRUPT: hash/size mismatch 'state.json'
+BLOCKED: corrupt backup NOT restored
+PASS: corrupt backup rejected (rc=3 as expected)
+USAGE_ERROR: unknown --scope 'bogus'
+PASS: unknown backup scope rejected (rc=2 as expected)
+BLOCKED: full backup requires healthy local PostgreSQL (oce-local-postgresql).
+PASS: full backup blocked without runtime (rc=3 as expected)
+operation b0bdef6e591c4dd8806d7d70f9e76916 indexed (1 receipts)
+backup complete -> /tmp/tmp.PtLrXYGY2P/bk4
+scope: state-only | backup_id: b0bdef6e591c4dd8806d7d70f9e76916 | disaster_recovery_capable: false
+includes: state
+tracked files: 11
+manifest: /tmp/tmp.PtLrXYGY2P/bk4/BACKUP_MANIFEST.sha256
+verifying backup integrity (fail closed)...
+integrity OK: 11 files verified
+BLOCKED: full-replace mode requires a 'full' backup (got scope=state-only).
+         A state-only backup cannot be restored with full-replace.
+PASS: state-only backup with full-replace rejected (rc=3 as expected)
+FATAL: unknown OCE_RUNTIME_TARGET='not-a-target'
+PASS: unknown runtime target rejected (rc=2 as expected)

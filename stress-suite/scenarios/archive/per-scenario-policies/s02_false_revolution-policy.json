@@ -1,0 +1,24 @@
+{
+  "policy_id": "S02-POLICY",
+  "version_tag": "V1",
+  "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+  "authority_basis": "G2 §10: novelty may open review but can never vote for transformation; data-quality defects reverse the claim",
+  "rules": [
+    {"rule_id": "S02.enter.watch", "to_state": "WATCH",
+     "any_of": [{"channel": "independent_contradiction"}],
+     "rationale": "an interesting apparent contradiction opens WATCH — investigation, not transformation"},
+    {"rule_id": "S02.escalate.review", "to_state": "ESCALATION_REVIEW",
+     "all_of": [{"independent_contradiction": "MEDIUM"}],
+     "persistence": {"channel": "independent_contradiction", "grade": "MEDIUM", "minimum_observations": 2},
+     "rationale": "early evidence is legitimately escalated for ADVERSE review"},
+    {"rule_id": "S02.defect.hold", "hold": true,
+     "hold_when": ["TIMESTAMP_LEAKAGE", "SURVIVORSHIP_BIAS"],
+     "rationale": "data-quality defect parks escalation; the anomaly is preserved, not erased"},
+    {"rule_id": "S02.no.change", "to_state": "NO_CHANGE",
+     "all_of": [{"independent_contradiction": "LOW", "op": "eq"}],
+     "rationale": "apparent contradiction collapses under inspection; no structural change"},
+    {"rule_id": "S02.stable.after", "to_state": "STABLE",
+     "all_of": [{"independent_contradiction": "LOW", "op": "eq"}, {"reliability_degradation": "LOW", "op": "eq"}],
+     "rationale": "institution returns to STABLE; the failed claim is demoted, not erased"}
+  ]
+}

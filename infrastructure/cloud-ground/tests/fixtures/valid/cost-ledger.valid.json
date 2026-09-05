@@ -1,0 +1,9 @@
+{
+  "entry_id": "cost-abc12345",
+  "cost_class": "fixed",
+  "provider": "netcup",
+  "amount_usd": 43.00,
+  "recorded_at": "2026-08-20T12:00:00Z",
+  "description": "Monthly RS 4000 G12 hosting",
+  "schema_version": "1.0.0"
+}

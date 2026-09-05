@@ -1,0 +1,219 @@
+#!/usr/bin/env bash
+#
+# oce-ctl — OCE Local Ground operator CLI (A-003).
+#
+# Commands:
+#   oce-ctl local up                  bring the `local` runtime up
+#   oce-ctl local down                stop the local runtime
+#   oce-ctl local health              report service health/readiness
+#   oce-ctl local status              print the independent ledger model
+#   oce-ctl local logs [svc]          tails structured logs
+#   oce-ctl backup [--scope full|state-only] [--out DIR]   create a local backup
+#                                                          (default --scope full)
+#   oce-ctl restore --mode state-only|full-replace --from DIR
+#                  [--confirm-local-target oce_local]        restore a backup
+#   oce-ctl worker admit              admit a validated local worker
+#   oce-ctl worker reject             reject an unauthorized worker
+#   oce-ctl deploy validate --target cloud   read-only cloud validation (local)
+#   oce-ctl deploy plan    --target cloud   deterministic, NON-mutating plan
+#   oce-ctl deploy apply   --target cloud   FAILS CLOSED without auth envelope
+#
+# Default behaviour is always `local`. Cloud is deferred. apply denies unless an
+# authorization envelope and required inputs are present.
+set -uo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+COMPOSE_DIR="$BASE_DIR/compose"
+CONTRACTS_DIR="$BASE_DIR/contracts"
+POLICY_FILE="$BASE_DIR/policy/local-ground.yml"
+STATE_FILE="${OCE_LOCALGROUND_STATE:-$BASE_DIR/var/state.json}"
+LOG_JSON="${OCE_LOCALGROUND_LOG:-$BASE_DIR/var/operations.jsonl}"
+
+# ─── git-root resolution for compose ───────────────────────────────────────
+PROJ_ROOT="$(cd "$BASE_DIR/../.." && pwd)"
+
+# ─── runtime target selection (A-003: default is local) ─────────────────────
+REQ_TARGET="${OCE_RUNTIME_TARGET:-local}"
+case "$REQ_TARGET" in
+  local|local-test|local-recovery|cloud-plan|cloud) ;;
+  *) echo "FATAL: unknown OCE_RUNTIME_TARGET='$REQ_TARGET'" >&2; exit 2 ;;
+esac
+
+require() { command -v "$1" >/dev/null 2>&1 || { echo "BLOCKED: mandatory tool missing: $1" >&2; exit 3; }; }
+
+# ─── ledger helpers ─────────────────────────────────────────────────────────
+ensure_state() {
+  mkdir -p "$(dirname "$STATE_FILE")"
+  if [ ! -f "$STATE_FILE" ]; then
+    cat > "$STATE_FILE" <<'JSON'
+{ "local_ground_state": "BUILDING", "cloud_plan_state": "NOT_VALIDATED",
+  "cloud_activation_state": "DEFERRED_BY_OPERATOR", "cloud_deployment_state": "NOT_DEPLOYED",
+  "cloud_cost_state": "ZERO", "next_local_book": "B2", "operator_hold_reason": "CLOUD_PURCHASE_DEFERRED" }
+JSON
+  fi
+}
+set_field() { ensure_state; python3 - "$STATE_FILE" "$1" "$2" <<'PY'
+import json, sys
+p, k, v = sys.argv[1], sys.argv[2], sys.argv[3]
+d = json.load(open(p, encoding="utf-8")); d[k] = v
+json.dump(d, open(p, "w", encoding="utf-8"), indent=2)
+PY
+}
+log_op() {
+  mkdir -p "$(dirname "$LOG_JSON")"
+  python3 - "$LOG_JSON" "$@" <<'PY'
+import json, os, sys, datetime
+path, cmd, ok = sys.argv[1], sys.argv[2], sys.argv[3]
+os.makedirs(os.path.dirname(path), exist_ok=True)
+rec = {"ts": datetime.datetime.now(datetime.timezone.utc).isoformat(), "command": cmd, "success": ok, "run_target": os.environ.get("OCE_RUNTIME_TARGET", "local")}
+with open(path, "a", encoding="utf-8") as f:
+    f.write(json.dumps(rec) + "\n")
+PY
+}
+
+# ─── compose presence (CLI is fully functional where docker is absent) ──────
+have_docker() { command -v docker >/dev/null 2>&1; }
+
+cmd_local_up() {
+  ensure_state
+  if ! have_docker; then
+    echo "BLOCKED: docker is not installed on this host; cannot start containers."
+    echo "         Local Ground scripts/tests still run; the container runtime requires Docker."
+    log_op "local up" false
+    return 4
+  fi
+  require docker
+  (cd "$COMPOSE_DIR" || exit 1
+   # Env-injected secrets win over .env placeholders (secure local injection).
+   if [ -f .env ]; then
+     while IFS= read -r line; do
+       case "$line" in \#*|"") continue ;; esac
+       k="${line%%=*}"
+       [ -n "$k" ] || continue
+       if [ -z "${!k:-}" ]; then export "$line"; fi
+     done < .env
+   fi
+   docker compose -f compose.yml --profile local up -d)
+  rc=$?
+  log_op "local up" "$([ $rc -eq 0 ] && echo true || echo false)"
+  return $rc
+}
+
+cmd_local_down() {
+  ensure_state
+  if have_docker; then
+    (cd "$COMPOSE_DIR" && docker compose -f compose.yml down)
+    rc=$?
+  else
+    echo "INFO: docker absent; nothing to stop."
+    rc=0
+  fi
+  log_op "local down" "$([ $rc -eq 0 ] && echo true || echo false)"
+  return $rc
+}
+
+cmd_local_health() {
+  ensure_state
+  if ! have_docker; then
+    echo "BLOCKED: docker absent; health UNKNOWN (never reported healthy)."
+    python3 - "$STATE_FILE" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1], encoding="utf-8"))
+d["local_ground_state"] = "VERIFYING"
+json.dump(d, open(sys.argv[1], "w", encoding="utf-8"), indent=2)
+PY
+    return 4
+  fi
+  (cd "$COMPOSE_DIR" && docker compose -f compose.yml ps --format json)
+  return $?
+}
+
+cmd_local_status() {
+  ensure_state
+  echo "=== OCE Local Ground ledger ==="
+  # Canonical ledger model comes from the frozen contract; live overrides from
+  # state.json are layered on top so an operator never sees a partial ledger.
+  python3 - "$STATE_FILE" "$CONTRACTS_DIR/local-ground-contract.json" <<'PY'
+import json, sys
+state, contract = json.load(open(sys.argv[1], encoding="utf-8")), json.load(open(sys.argv[2], encoding="utf-8"))
+ledger = dict(contract["ledger_model"])
+ledger.update(state)
+print(json.dumps(ledger, indent=2))
+PY
+  echo "runtime_target=${REQ_TARGET}"
+}
+
+cmd_local_logs() {
+  if ! have_docker; then echo "BLOCKED: docker absent." >&2; return 4; fi
+  svc="${1:-}"
+  (cd "$COMPOSE_DIR" && docker compose -f compose.yml logs --tail=100 $svc)
+  return $?
+}
+
+# ─── fail-closed cloud boundary ─────────────────────────────────────────────
+AUTHORIZED_FIELDS="AUTHORIZED_STAGE CLOUD_AUTHORIZATION_ENVELOPE CLOUD_PROVIDER CLOUD_PROVIDER_IDENTITY CLOUD_COST_APPROVED_USD PUBLIC_EXPOSURE_APPROVED"
+
+cmd_deploy_validate() { ensure_state; echo "cloud-plan: VALIDATE (read-only, no provider contact)"; set_field cloud_plan_state "VALIDATED_NO_APPLY"; mkdir -p "$BASE_DIR/var"; bash "$SCRIPT_DIR/generate-cloud-plan.sh" --mode validate; rc=$?; log_op "deploy validate cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+
+cmd_deploy_plan() { ensure_state; echo "cloud-plan: PLAN (deterministic, NON-mutating, no provider contact)"; mkdir -p "$BASE_DIR/var"; bash "$SCRIPT_DIR/generate-cloud-plan.sh" --mode plan 2>&1 | tee "$BASE_DIR/var/cloud-plan.txt"; rc=${PIPESTATUS[0]}; log_op "deploy plan cloud" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+
+cmd_deploy_apply() {
+  ensure_state
+  # Deny list — fail closed.
+  for v in AUTHORIZED_STAGE CLOUD_AUTHORIZATION_ENVELOPE CLOUD_PROVIDER CLOUD_PROVIDER_IDENTITY CLOUD_COST_APPROVED_USD PUBLIC_EXPOSURE_APPROVED CLOUD_PROVIDER_API_TOKEN; do
+    if [ -z "${!v:-}" ] || [ "${!v}" = "NONE" ]; then
+      echo "DENIED: cloud apply blocked — missing required field '$v' (fail-closed)." >&2
+      set_field operator_hold_reason "CLOUD_PURCHASE_DEFERRED"
+      log_op "deploy apply cloud" false
+      return 5
+    fi
+  done
+  echo "BLOCKED: no real provider contact is defined for the deferred cloud target yet — apply cannot proced here."
+  log_op "deploy apply cloud" false
+  return 5
+}
+
+cmd_worker() {
+  # Admission gate: authorized workers only. Calls worker-admit.sh
+  shift
+  bash "$SCRIPT_DIR/worker-admit.sh" "$@"
+  rc=$?
+  log_op "worker $*" "$([ $rc -eq 0 ] && echo true || echo false)"
+  return $rc
+}
+
+cmd_backup() {
+  ensure_state
+  # operator-facing default is full backup; explicit scopes override
+  case " $* " in *" --scope "?) : ;; *) set -- --scope full "$@" ;; esac
+  bash "$SCRIPT_DIR/backup.sh" "$@"; rc=$?; log_op "backup $*" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc
+}
+cmd_restore() { ensure_state; bash "$SCRIPT_DIR/restore.sh" "$@"; rc=$?; log_op "restore $*" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+
+usage() {
+  cat <<'US'
+Usage: oce-ctl <command> [args]
+
+  local up | down | health | status | logs [svc]
+  deploy validate|plan|apply --target cloud
+  worker admit <manifest> | worker reject <manifest>
+  backup [--scope full|state-only] [--out DIR]
+  restore --mode state-only|full-replace --from DIR [--confirm-local-target oce_local]
+US
+}
+
+cmd="${1:-}"; shift 2>/dev/null || true
+case "${cmd}" in
+  local)
+    sub="${1:-}"; shift 2>/dev/null || true
+    case "$sub" in up) cmd_local_up ;; down) cmd_local_down ;; health) cmd_local_health ;; status) cmd_local_status ;; logs) cmd_local_logs "${1:-}" ;; *) usage ;; esac ;;
+  deploy)
+    sub="${1:-}"; shift 2>/dev/null || true
+    case "$sub" in validate) cmd_deploy_validate ;; plan) cmd_deploy_plan ;; apply) cmd_deploy_apply ;; *) usage ;; esac ;;
+  worker) cmd_worker "$@" ;;
+  backup) cmd_backup "$@" ;;
+  restore) cmd_restore "$@" ;;
+  status) cmd_local_status ;;
+  *) usage ;;
+esac

@@ -1,0 +1,56 @@
+PASS: Missing OCE_RUN_ID rejected in authoritative mode
+PASS: Empty OCE_RUN_ID rejected in authoritative mode
+PASS: Mixed RUN_ID rejected
+PASS: Engine uses external OCE_RUN_ID, no self-generated ID
+PASS: Wrong commit rejected
+PASS: Wrong tree rejected
+PASS: Wrong branch rejected
+PASS: Missing authoritative args rejected
+PASS: N/A lifecycle values rejected
+PASS: Empty baseline hash rejected
+PASS: Empty restored hash rejected
+PASS: Hash mismatch rejected
+PASS: Baseline failure rejected
+PASS: Baseline nonzero exit rejected
+PASS: Mutation PASS rejected
+PASS: Mutation zero exit rejected
+PASS: Restoration failure rejected
+PASS: Restoration nonzero exit rejected
+PASS: Forged meta-test PASS rejected
+PASS: Zero rejection exit rejected
+PASS: Missing fixture_type rejected by META-TEST-EVIDENCE
+PASS: observed_rejection=PASS rejected by FAIL-CLOSED
+PASS: Missing observed_rejection rejected by META-TEST-EVIDENCE
+PASS: Wrong schema version rejected
+PASS: Empty test lists rejected
+PASS: Stale evidence from another RUN_ID rejected
+PASS: Missing required evidence file blocks
+PASS: Dirty authoritative source rejected
+PASS: RUN_ID consistency across all artifacts
+PASS: validate-local is a thin wrapper
+PASS: run-validation.sh is the single runner
+PASS: Authoritative mode requires explicit --phase
+PASS: Authoritative mode requires --evidence-dir outside the repository
+PASS: Initial phase runs without adversarial evidence
+PASS: Final phase refuses missing adversarial evidence
+PASS: Version mismatch (3.5.0 vs 3.6.0) rejected
+PASS: Independent gate rejects artifact version mismatch
+PASS: Observed identity recorded truthfully; expected never substituted
+PASS: evidence-manifest.json hashes match the evidence files
+PASS: cleanup evidence written before final gate and listed in manifest
+PASS: Gate rejects missing worktree-cleanup.json
+PASS: Gate rejects removed:false
+PASS: Gate rejects pruned:false
+PASS: Workflow preserves runner exit code and prints the full log
+PASS: all 48 registered tests executed (registry-execution proof)
+PASS: single authoritative validation entrypoint
+PASS: adversarial --only engine runs confined to scratch dir
+PASS: gate contract path resolved from script dir; manifest refreshed before gate
+
+==================================================
+  B1-I1R3H Regression Tests (registry-executed, 48 registered)
+==================================================
+  Total:  48
+  PASS:   48
+  FAIL:   0
+==================================================

@@ -1,0 +1,21 @@
+{
+  "scenario_id": "S19",
+  "scenario_version": "1.0.0",
+  "domain": "CRYPTO->FX",
+  "threat_class": "METAPHOR / ONTOLOGY_OVERREACH",
+  "transfer_hypotheses_ref": "transfer_hypotheses.json",
+  "protocols_ref": "experiment_protocols.json",
+  "sensor_requirements_ref": "sensor_requirements.json",
+  "data_availability_ref": "data_availability.json",
+  "evidence_ref": "evidence.json",
+  "current_facts": {
+    "domain": "CRYPTO",
+    "claim_type": "TRANSFER_HYPOTHESIS",
+    "domain_transfer_status": "HYPOTHESIS"
+  },
+  "expected_outcome": "DATA_BLOCKED",
+  "hidden_ground_truth": {
+    "crypto_evidence_strong": true,
+    "target_observables_absent": true
+  }
+}
