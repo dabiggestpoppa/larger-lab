@@ -58,7 +58,7 @@ from .checksums import (
     checksum_algorithm_from_name,
     sha256_file,
     validate_sha256_hex,
-    verify_checksum,
+    verify_checksum_stream,
 )
 from .enums import IntegrityState, StorageEncoding
 from .models import AcquisitionRecord, EvidenceBlob
@@ -943,12 +943,16 @@ class AcquisitionRepository:
                 f"{record.blob_sha256}: no physically verified representation "
                 "exists (I04R1 §15)"
             )
-        with self._blob_store.open_blob(
-            record.blob_sha256, verified_encoding
-        ) as stream:
-            source_bytes = stream.read()
         try:
-            observed = verify_checksum(source_bytes, algorithm, value)
+            # I04R2 §20/§24: bounded INCREMENTAL recomputation over the
+            # decoded source stream — the entire decoded T0A artifact is
+            # never materialized solely to verify H3.  The malformed-value
+            # check inside verify_checksum_stream raises before any byte is
+            # consumed, so no stream leak occurs on that path.
+            with self._blob_store.open_blob(
+                record.blob_sha256, verified_encoding
+            ) as stream:
+                observed = verify_checksum_stream(stream, algorithm, value)
         except ValueError as exc:
             raise ProviderChecksumClaimConflict(
                 "provider checksum value does not match the algorithm's "

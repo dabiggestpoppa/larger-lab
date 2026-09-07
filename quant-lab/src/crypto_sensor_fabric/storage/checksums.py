@@ -237,15 +237,139 @@ def verify_checksum(
     return hmac.compare_digest(actual, normalized)
 
 
+# ---------------------------------------------------------------------------
+# Streaming provider checksums (H3 layer) — I04R2 bounded verification
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ChecksumStreamResult:
+    """Canonical hex checksum + exact byte count of a streamed source.
+
+    The digest is in the algorithm's canonical form (SHA256 → 64 lowercase
+    hex; MD5 → 32 lowercase hex; CRC32 → 8 lowercase hex with leading zeros);
+    ``byte_length`` is the exact number of bytes consumed from the stream.
+    """
+
+    hex_digest: str
+    byte_length: int
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.byte_length, int) or self.byte_length < 0:
+            raise ValueError(f"byte_length must be >= 0, got {self.byte_length!r}")
+
+
+def compute_checksum_stream(
+    stream: BinaryIO,
+    algorithm: ChecksumAlgorithm,
+    *,
+    chunk_size: int = DEFAULT_CHUNK_SIZE,
+) -> ChecksumStreamResult:
+    """Incrementally checksum a binary stream for ONE explicit algorithm.
+
+    I04R2 §21/§22 — the bounded counterpart of ``compute_checksum``:
+
+    - reads ONLY with ``stream.read(chunk_size)`` — never an unbounded
+      ``read()``; bounded memory regardless of source size;
+    - works on non-seekable streams (e.g. a decoded ZSTD stream reader);
+      starts at the current stream position and never rewinds;
+    - does NOT close the caller-owned stream;
+    - ``chunk_size`` must be a positive int;
+    - CRC32 updates incrementally across chunks and preserves the canonical
+      8-lowercase-hex representation with leading zeros (I04R2 §23);
+    - EXACT parity with the byte-based ``compute_checksum`` (I04R2 §22).
+    """
+    if (
+        not isinstance(chunk_size, int)
+        or isinstance(chunk_size, bool)
+        or chunk_size <= 0
+    ):
+        raise ValueError(f"chunk_size must be a positive int, got {chunk_size!r}")
+    if not isinstance(algorithm, ChecksumAlgorithm):
+        raise TypeError(
+            f"algorithm must be a ChecksumAlgorithm, got {type(algorithm).__name__}"
+        )
+    sha: Any = None
+    md5: Any = None
+    crc: int | None = None
+    if algorithm is ChecksumAlgorithm.SHA256:
+        sha = hashlib.sha256()
+    elif algorithm is ChecksumAlgorithm.MD5:
+        md5 = hashlib.md5()
+    else:
+        crc = 0
+    total = 0
+    while True:
+        chunk = stream.read(chunk_size)
+        if not isinstance(chunk, bytes):
+            raise TypeError(
+                f"stream.read({chunk_size}) must return bytes, "
+                f"got {type(chunk).__name__}"
+            )
+        if not chunk:
+            break
+        if sha is not None:
+            sha.update(chunk)
+        elif md5 is not None:
+            md5.update(chunk)
+        else:
+            assert crc is not None  # narrowed for mypy
+            crc = zlib.crc32(chunk, crc)
+        total += len(chunk)
+    if sha is not None:
+        hex_digest: str = sha.hexdigest()
+    elif md5 is not None:
+        hex_digest = md5.hexdigest()
+    else:
+        assert crc is not None  # narrowed for mypy
+        hex_digest = format(crc, "08x")
+    return ChecksumStreamResult(hex_digest=hex_digest, byte_length=total)
+
+
+def verify_checksum_stream(
+    stream: BinaryIO,
+    algorithm: ChecksumAlgorithm,
+    expected_hex: str,
+    *,
+    chunk_size: int = DEFAULT_CHUNK_SIZE,
+) -> bool:
+    """Streaming ``verify_checksum``: same contract, bounded memory.
+
+    The expected value is validated against the algorithm's canonical hex
+    form BEFORE any byte is consumed (a malformed expectation never reads
+    the stream).  Then the stream is checksummed incrementally and compared
+    with constant-time equality.  Parity with ``verify_checksum`` over the
+    same bytes is exact (I04R2 §22).
+    """
+    if not isinstance(algorithm, ChecksumAlgorithm):
+        raise TypeError(
+            f"algorithm must be a ChecksumAlgorithm, got {type(algorithm).__name__}"
+        )
+    if not isinstance(expected_hex, str):
+        raise TypeError(f"expected_hex must be str, got {type(expected_hex).__name__}")
+    pattern = _ALGORITHM_HEX_RE[algorithm]
+    normalized = expected_hex.lower()
+    if not pattern.fullmatch(normalized):
+        raise ValueError(
+            f"expected {algorithm.value} checksum must match {pattern.pattern}, "
+            f"got {expected_hex!r}"
+        )
+    result = compute_checksum_stream(stream, algorithm, chunk_size=chunk_size)
+    return hmac.compare_digest(result.hex_digest, normalized)
+
+
 __all__ = [
     "DEFAULT_CHUNK_SIZE",
+    "ChecksumStreamResult",
     "Sha256Result",
     "checksum_algorithm_from_name",
     "compute_checksum",
+    "compute_checksum_stream",
     "sha256_bytes",
     "sha256_chunks",
     "sha256_file",
     "sha256_stream",
     "validate_sha256_hex",
     "verify_checksum",
+    "verify_checksum_stream",
 ]

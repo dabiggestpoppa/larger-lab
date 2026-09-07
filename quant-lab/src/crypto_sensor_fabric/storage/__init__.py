@@ -79,12 +79,14 @@ from .checksums import (
     Sha256Result,
     checksum_algorithm_from_name,
     compute_checksum,
+    compute_checksum_stream,
     sha256_bytes,
     sha256_chunks,
     sha256_file,
     sha256_stream,
     validate_sha256_hex,
     verify_checksum,
+    verify_checksum_stream,
 )
 from .compression import EncodeResult, encode_source_stream, iter_decode_stored
 from .enums import (
@@ -243,6 +245,7 @@ __all__ = [
     "canonical_nested_json",
     "checksum_algorithm_from_name",
     "compute_checksum",
+    "compute_checksum_stream",
     "encode_source_stream",
     "escape_path_segment",
     "iter_decode_stored",
@@ -259,4 +262,5 @@ __all__ = [
     "unescape_path_segment",
     "validate_sha256_hex",
     "verify_checksum",
+    "verify_checksum_stream",
 ]
