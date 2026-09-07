@@ -79,8 +79,14 @@ def _clean_db(pg):
         cur.execute(
             "DROP TABLE IF EXISTS schema_migrations, evidence_refs, audit_log, events, "
             "workers, schedules, leases, idempotency, job_transitions, jobs, denials, "
-            "capability_grants, actors, config_override_audit CASCADE"
+            "capability_grants, actors, config_override_audit, decoy_audit CASCADE"
         )
+        # B4-CXR7U8X2: mutation tests create decoy structures (evil/clone
+        # schemas); drop them defensively so residue can never skew a later
+        # baseline (a leftover object owning a governed name would make
+        # migration 0008's IF NOT EXISTS silently skip the governed index).
+        cur.execute("DROP SCHEMA IF EXISTS evil CASCADE")
+        cur.execute("DROP SCHEMA IF EXISTS clone_schema CASCADE")
     pg.commit()
     rc = migrate.cmd_up(oc.dsn(), migrate.MIGRATIONS_DIR)
     assert rc == 0, "migrations from empty DB must succeed"
@@ -376,6 +382,11 @@ def test_u5_proven_false_on_wrong_column_type(pg):
     of BOOLEAN) fails proven()."""
     from oce_control.audit_sink import PostgresAuditSink
     with pg.cursor() as cur:
+        # B4-CXR7U8X2: the column carries DEFAULT TRUE, which PostgreSQL
+        # cannot cast automatically to INTEGER — drop the default for the
+        # mutation window and restore it after the governed type is back.
+        cur.execute("ALTER TABLE config_override_audit "
+                    "ALTER COLUMN authorized DROP DEFAULT")
         cur.execute("ALTER TABLE config_override_audit "
                     "ALTER COLUMN authorized TYPE INTEGER USING "
                     "CASE WHEN authorized THEN 1 ELSE 0 END")
@@ -383,10 +394,23 @@ def test_u5_proven_false_on_wrong_column_type(pg):
     try:
         assert PostgresAuditSink(pg).proven() is False
     finally:
+        pg.rollback()
         with pg.cursor() as cur:
-            cur.execute("ALTER TABLE config_override_audit "
-                        "ALTER COLUMN authorized TYPE BOOLEAN USING "
-                        "authorized = 1")
+            cur.execute(
+                "SELECT data_type FROM information_schema.columns "
+                "WHERE table_schema = 'public' "
+                "AND table_name = 'config_override_audit' "
+                "AND column_name = 'authorized'")
+            if cur.fetchone()[0] == "integer":
+                cur.execute("ALTER TABLE config_override_audit "
+                            "ALTER COLUMN authorized TYPE BOOLEAN USING "
+                            "authorized = 1")
+                cur.execute("ALTER TABLE config_override_audit "
+                            "ALTER COLUMN authorized SET DEFAULT TRUE")
+            else:
+                # mutation window never committed: only re-pin the default
+                cur.execute("ALTER TABLE config_override_audit "
+                            "ALTER COLUMN authorized SET DEFAULT TRUE")
         pg.commit()
         assert PostgresAuditSink(pg).proven() is True
 
@@ -625,11 +649,15 @@ def test_u8_proven_false_when_same_named_index_on_other_table(pg):
     try:
         assert PostgresAuditSink(pg).proven() is False
     finally:
+        pg.rollback()
         with pg.cursor() as cur:
-            cur.execute("CREATE UNIQUE INDEX "
+            # B4-CXR7U8X2: drop the decoy FIRST — it currently OWNS the
+            # governed index name, so the governed index cannot be recreated
+            # while the decoy still stands (DuplicateTable otherwise).
+            cur.execute("DROP TABLE IF EXISTS decoy_audit")
+            cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS "
                         "config_override_audit_request_id_key "
                         "ON config_override_audit (request_id)")
-            cur.execute("DROP TABLE decoy_audit")
         pg.commit()
         assert PostgresAuditSink(pg).proven() is True
 
