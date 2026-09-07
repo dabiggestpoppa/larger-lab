@@ -756,7 +756,12 @@ class PartitionManifestRepository:
             # bytes + blob metadata alone are NOT enough — at least one
             # durable acquisition must attribute this blob to the manifest's
             # logical provider/venue/sensor/native identity.
-            if not self._acquisitions.has_matching_acquisition(
+            # I04R2 §11: durable acquisition HISTORY is not automatically
+            # USABLE provenance — the publication gate consumes the USABLE
+            # predicate, so a failed acquisition retained as forensic failure
+            # evidence (H3=False / failure_ref / explicit numeric HTTP
+            # failure) can never satisfy a manifest provenance claim.
+            if not self._acquisitions.has_usable_matching_acquisition(
                 blob_sha256=ref,
                 provider_id=manifest.provider,
                 venue=manifest.venue,
@@ -790,10 +795,10 @@ class PartitionManifestRepository:
                     "manifest integrity claim stronger than referenced "
                     "evidence supports (I04 §46)"
                 )
-        # I04R1 §22: a provider-level manifest claim requires earned H3 on
-        # EVERY referenced blob (physical + metadata + provenance + a
-        # matching acquisition whose verified=True H3 was recomputed by the
-        # repository).
+        # I04R1 §22 + I04R2 §12: a provider-level manifest claim requires
+        # earned H3 on EVERY referenced blob (physical + metadata + USABLE
+        # provenance + a matching acquisition whose verified=True H3 was
+        # recomputed by the repository — failure evidence never qualifies).
         if manifest.integrity_state is IntegrityState.PROVIDER_HASH_VERIFIED:
             for ref in manifest.blob_refs:
                 if not self._acquisitions.has_earned_h3_proof(

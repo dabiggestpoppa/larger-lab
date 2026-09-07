@@ -1069,9 +1069,79 @@ class AcquisitionRepository:
 
     # -- narrow provenance reads (I04R1 §12/§47 — NOT RawEvidenceQuery) ------
 
+    @staticmethod
+    def _identity_matches(
+        record: AcquisitionRecord,
+        *,
+        provider_id: str,
+        venue: str,
+        sensor_family: SensorFamily,
+        native_instrument: str,
+        native_granularity: Granularity | None,
+    ) -> bool:
+        """Matching acquisition identity (I04R1 §5/§6) — one shared rule.
+
+        Provider/venue/sensor/native-instrument must match (and native
+        granularity where BOTH sides are known).  Requested-time equality is
+        deliberately NOT required (requested time != logical event time).
+        Byte identity NEVER transfers provider identity (I04R1 §7-§8).
+        """
+        if record.provider_id != provider_id:
+            return False
+        if record.venue != venue:
+            return False
+        if record.sensor_family != sensor_family:
+            return False
+        if record.native_instrument != native_instrument:
+            return False
+        if (
+            record.native_granularity is not None
+            and native_granularity is not None
+            and record.native_granularity != native_granularity
+        ):
+            return False
+        return True
+
+    @staticmethod
+    def is_usable_manifest_provenance(record: AcquisitionRecord) -> bool:
+        """I04R2 §5: THE usable-manifest-provenance eligibility predicate.
+
+        Durable acquisition HISTORY is not automatically USABLE provenance
+        (I04R2 §3).  A record may support scientific manifest truth only when
+        ALL of the following hold:
+
+        - durable source bytes exist (``blob_sha256 is not None``);
+        - no explicit failure evidence is attached (``failure_ref is None``);
+        - the source/HTTP status is not an explicitly parsed numeric failure
+          (>= 400) — a failed outcome whose bytes were archived stays
+          FORENSIC T0A evidence, never manifest provenance (I04R2 §6);
+        - ``provider_checksum_verified`` is not False — an H3 mismatch may be
+          preserved as forensic failure evidence but can never certify a
+          manifest (I04R2 §7).
+
+        Quality flags (PARTIAL_INTERVAL / SCHEMA_ADDITIVE / LIMITED) do NOT
+        disqualify: partial data can still be truthful evidence (I04R2 §5).
+
+        This is the ONE authoritative eligibility rule (I04R2 §13):
+        ``find_usable_matching_acquisitions``, ``has_usable_matching_acquisition``,
+        ``has_earned_h3_proof`` and PartitionManifestRepository all route
+        through it — no duplicated eligibility logic anywhere.
+        """
+        if record.blob_sha256 is None:
+            return False
+        if record.failure_ref is not None:
+            return False
+        if AcquisitionRepository._is_explicit_failure(record):
+            return False
+        if record.provider_checksum_verified is False:
+            return False
+        return True
+
     def list_acquisitions_for_blob(self, blob_sha256: str) -> list[AcquisitionRecord]:
         """Every durable acquisition referencing one content hash.
 
+        FORENSIC/HISTORICAL read (I04R2 §11): returns ALL durable records —
+        including failed acquisitions retained as forensic failure evidence.
         Scans the immutable acquisition fragments (CORRECTNESS-FIRST local v1:
         I10 DuckDB / I11 Postgres later provide indexed discovery — I04R1 §48).
         List semantics: empty list when none exist.
@@ -1103,33 +1173,66 @@ class AcquisitionRepository:
         native_instrument: str,
         native_granularity: Granularity | None,
     ) -> list[AcquisitionRecord]:
-        """Durable acquisitions attributing one blob to one logical identity.
+        """DURABLE acquisition history attributing one blob to one identity.
 
-        I04R1 §5/§6: a manifest blob_ref needs at least ONE acquisition whose
-        provider/venue/sensor/native-instrument match the manifest's logical
-        identity (and native granularity where BOTH are known).  Byte
-        identity NEVER transfers provider identity (I04R1 §7-§8).  Requested
-        time equality is deliberately NOT required (requested time != logical
-        event time — I04R1 §6).
+        FORENSIC/HISTORICAL read (I04R2 §3.A/§11): every durable acquisition
+        whose provider/venue/sensor/native-instrument match the requested
+        logical identity (and native granularity where BOTH are known),
+        INCLUDING failed acquisitions retained as forensic failure evidence.
+        I04R1 §5/§6 froze the identity rule; I04R2 keeps it unchanged —
+        eligibility is applied AFTER identity matching, never instead of it
+        (I04R2 §17).  Byte identity NEVER transfers provider identity
+        (I04R1 §7-§8).  Requested time equality is deliberately NOT required
+        (requested time != logical event time — I04R1 §6).
+
+        Manifest publication MUST NOT consume this read directly: use
+        ``find_usable_matching_acquisitions``/``has_usable_matching_acquisition``
+        (I04R2 §11).
         """
-        matches: list[AcquisitionRecord] = []
-        for record in self.list_acquisitions_for_blob(blob_sha256):
-            if record.provider_id != provider_id:
-                continue
-            if record.venue != venue:
-                continue
-            if record.sensor_family != sensor_family:
-                continue
-            if record.native_instrument != native_instrument:
-                continue
-            if (
-                record.native_granularity is not None
-                and native_granularity is not None
-                and record.native_granularity != native_granularity
-            ):
-                continue
-            matches.append(record)
-        return matches
+        return [
+            record
+            for record in self.list_acquisitions_for_blob(blob_sha256)
+            if self._identity_matches(
+                record,
+                provider_id=provider_id,
+                venue=venue,
+                sensor_family=sensor_family,
+                native_instrument=native_instrument,
+                native_granularity=native_granularity,
+            )
+        ]
+
+    def find_usable_matching_acquisitions(
+        self,
+        *,
+        blob_sha256: str,
+        provider_id: str,
+        venue: str,
+        sensor_family: SensorFamily,
+        native_instrument: str,
+        native_granularity: Granularity | None,
+    ) -> list[AcquisitionRecord]:
+        """USABLE manifest provenance attributing one blob to one identity.
+
+        I04R2 §3.C/§11: matching acquisition IDENTITY (I04R1 §5/§6) filtered
+        through the ONE usable-provenance eligibility predicate
+        (``is_usable_manifest_provenance``, I04R2 §5/§13).  Failed durable
+        history (H3=False, failure_ref, explicit numeric HTTP failure) is
+        excluded here yet stays fully visible through the forensic reads
+        ``list_acquisitions_for_blob``/``find_matching_acquisitions``.
+        """
+        return [
+            record
+            for record in self.find_matching_acquisitions(
+                blob_sha256=blob_sha256,
+                provider_id=provider_id,
+                venue=venue,
+                sensor_family=sensor_family,
+                native_instrument=native_instrument,
+                native_granularity=native_granularity,
+            )
+            if self.is_usable_manifest_provenance(record)
+        ]
 
     def has_matching_acquisition(
         self,
@@ -1141,9 +1244,43 @@ class AcquisitionRepository:
         native_instrument: str,
         native_granularity: Granularity | None,
     ) -> bool:
-        """I04R1 §5: provenance gate used by PartitionManifest publication."""
+        """I04R1 §5: durable matching-acquisition IDENTITY gate.
+
+        Historical identity-only semantics are preserved (forensic history
+        included — I04R2 §11).  PartitionManifest publication MUST use
+        ``has_usable_matching_acquisition`` instead (I04R2 §11): durable
+        history is not automatically usable provenance.
+        """
         return bool(
             self.find_matching_acquisitions(
+                blob_sha256=blob_sha256,
+                provider_id=provider_id,
+                venue=venue,
+                sensor_family=sensor_family,
+                native_instrument=native_instrument,
+                native_granularity=native_granularity,
+            )
+        )
+
+    def has_usable_matching_acquisition(
+        self,
+        *,
+        blob_sha256: str,
+        provider_id: str,
+        venue: str,
+        sensor_family: SensorFamily,
+        native_instrument: str,
+        native_granularity: Granularity | None,
+    ) -> bool:
+        """I04R2 §11: the provenance gate used by PartitionManifest publication.
+
+        True only when at least one durable matching acquisition ALSO
+        satisfies usable-provenance eligibility (I04R2 §5).  A blob whose
+        only matching acquisitions are forensic failures can never satisfy
+        this gate — no matter how well the identity matches (I04R2 §7).
+        """
+        return bool(
+            self.find_usable_matching_acquisitions(
                 blob_sha256=blob_sha256,
                 provider_id=provider_id,
                 venue=venue,
@@ -1163,13 +1300,19 @@ class AcquisitionRepository:
         native_instrument: str,
         native_granularity: Granularity | None,
     ) -> bool:
-        """I04R1 §22.C: a matching acquisition carries recomputed verified H3.
+        """I04R1 §22.C + I04R2 §12: earned provider-integrity proof.
 
         ``provider_checksum_verified=True`` only ever reaches a durable row
         AFTER repository recomputation (I04R1B), so its presence in a
-        matching acquisition IS earned provider proof.
+        matching acquisition IS earned provider proof — but ONLY when the
+        acquisition also satisfies usable-provenance eligibility (I04R2 §12):
+        a record cannot become provider-integrity evidence merely because
+        verified=True while it simultaneously carries a failure_ref or an
+        explicitly failed numeric status.  H3=None never proves provider
+        integrity (I04R2 §8); H3=True may support LOCAL and, for every ref,
+        PROVIDER claims (I04R2 §9).
         """
-        for record in self.find_matching_acquisitions(
+        for record in self.find_usable_matching_acquisitions(
             blob_sha256=blob_sha256,
             provider_id=provider_id,
             venue=venue,
