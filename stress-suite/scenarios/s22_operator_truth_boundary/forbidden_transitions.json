@@ -1,0 +1,8 @@
+{
+  "forbidden_transitions": [
+    {"transition": "GRADE_IMPROVED_BY_DESIRE", "meaning": "evidence grade raised because an operator wanted the transformation"},
+    {"transition": "GRADE_FROZEN_BY_DESIRE", "meaning": "evidence grade blocked from changing because an operator preferred the incumbent"},
+    {"transition": "DIRECTIVE_AUTHORIZED_UNGROUNDED", "meaning": "action authorized by a bare constitution_allows_action boolean"},
+    {"transition": "GOVERNOR_AUTHORIZED_WITHOUT_MANDATE", "meaning": "GOVERNOR authority used as OPERATOR authority without a mandate"}
+  ]
+}

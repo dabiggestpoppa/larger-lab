@@ -1,0 +1,8 @@
+{"type": "define_permission", "permission_id": "PERM_RESEARCH", "rule_ref": "A-009", "permitted_action_class": "RESEARCH", "basis": "constitution permits bounded research experiments", "seq": 1}
+{"type": "operator_directive", "directive_id": "DIR_WEAK_DESIRE", "authority_level": "OPERATOR", "permission_id": "PERM_RESEARCH", "evidence_id": "EV_TRANSFER", "operator_preference": "wants transformation"}
+{"type": "operator_directive", "directive_id": "DIR_GOV_NO_MANDATE", "authority_level": "GOVERNOR", "permission_id": "PERM_RESEARCH", "evidence_id": "EV_TRANSFER"}
+{"type": "grant_operator_mandate", "actor": "GOV", "scope": "RESEARCH", "issued_by": "OPERATOR_1", "grant_ref": "GR_M1", "seq": 2}
+{"type": "operator_directive", "directive_id": "DIR_GOV_MANDATE", "authority_level": "GOVERNOR", "permission_id": "PERM_RESEARCH", "evidence_id": "EV_TRANSFER", "mandate_for": "GOV"}
+{"type": "evidence_grade_change", "evidence_id": "EV_TRANSFER", "new_grade": "SUPPORTED", "ref": "GHOST_MEASUREMENT"}
+{"type": "evidence_grade_change", "evidence_id": "EV_INCUMBENT", "new_grade": "REFUTED", "ref": "MEASURE_STRONG"}
+{"type": "operator_directive", "directive_id": "DIR_INCUMBENT_DESIRE", "authority_level": "OPERATOR", "permission_id": "PERM_RESEARCH", "evidence_id": "EV_INCUMBENT", "operator_preference": "wants incumbent preserved"}

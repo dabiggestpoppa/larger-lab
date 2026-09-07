@@ -1,0 +1,7 @@
+{
+  "forbidden_transitions": [
+    {"transition": "KEYWORD_ROUTED", "meaning": "an event routed to a channel solely because raw text contained the channel name"},
+    {"transition": "NEAREST_CATEGORY_FORCED", "meaning": "an unresolved event relabeled to the nearest known channel"},
+    {"transition": "ONTOLOGY_MUTATED", "meaning": "the channel ontology changed without a governed amendment"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "phases": [
+    {"phase": "PERMISSION_RECORDED"},
+    {"phase": "DIRECTIVE_AUTHORIZED"},
+    {"phase": "DIRECTIVE_REFUSED"},
+    {"phase": "MANDATE_RECORDED"},
+    {"phase": "DIRECTIVE_AUTHORIZED"},
+    {"phase": "GRADE_CHANGE_REFUSED"},
+    {"phase": "GRADE_CHANGED"},
+    {"phase": "DIRECTIVE_AUTHORIZED"}
+  ]
+}

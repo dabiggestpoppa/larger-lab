@@ -1,0 +1,15 @@
+{
+  "scenario_id": "S22",
+  "scenario_version": "1.0.0",
+  "threat_class": "OPERATOR_AUTHORITY_OVERRIDING_TRUTH",
+  "initial_epoch_ref": "initial_epoch.json",
+  "stimulus_events_ref": "stimulus_events.jsonl",
+  "expected_phase_trace_ref": "expected_phase_trace.json",
+  "forbidden_transitions_ref": "forbidden_transitions.json",
+  "expected_outcome": "AUTHORITY_AND_TRUTH_SEPARATED_BOTH_DIRECTIONS",
+  "hidden_ground_truth": {
+    "operator_wants_transformation_with_weak_evidence": true,
+    "operator_wants_incumbent_with_strong_contradiction": true,
+    "grade_change_attempted_with_unregistered_ref": true
+  }
+}
