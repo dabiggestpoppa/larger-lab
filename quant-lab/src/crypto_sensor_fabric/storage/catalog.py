@@ -764,6 +764,46 @@ _SECRET_QUERY_KEYS: frozenset[str] = frozenset(
 
 
 # ---------------------------------------------------------------------------
+# Usable manifest provenance (I04R2 §5/§13 — THE ONE eligibility predicate)
+# ---------------------------------------------------------------------------
+
+
+def is_usable_manifest_provenance(record: AcquisitionRecord) -> bool:
+    """I04R2 §5: THE usable-manifest-provenance eligibility predicate.
+
+    Durable acquisition HISTORY is not automatically USABLE provenance
+    (I04R2 §3).  A record may support scientific manifest truth only when
+    ALL of the following hold:
+
+    - durable source bytes exist (``blob_sha256 is not None``);
+    - no explicit failure evidence is attached (``failure_ref is None``);
+    - the source/HTTP status is not an explicitly parsed numeric failure
+      (>= 400) — a failed outcome whose bytes were archived stays FORENSIC
+      T0A evidence, never manifest provenance (I04R2 §6);
+    - ``provider_checksum_verified`` is not False — an H3 mismatch may be
+      preserved as forensic failure evidence but can never certify a
+      manifest (I04R2 §7).
+
+    Quality flags (PARTIAL_INTERVAL / SCHEMA_ADDITIVE / LIMITED) do NOT
+    disqualify: partial data can still be truthful evidence (I04R2 §5).
+
+    This is the ONE authoritative eligibility rule (I04R2 §13):
+    ``find_usable_matching_acquisitions``, ``has_usable_matching_acquisition``,
+    ``has_earned_h3_proof`` and PartitionManifestRepository all route through
+    it — no duplicated eligibility logic anywhere.
+    """
+    if record.blob_sha256 is None:
+        return False
+    if record.failure_ref is not None:
+        return False
+    if AcquisitionRepository._is_explicit_failure(record):
+        return False
+    if record.provider_checksum_verified is False:
+        return False
+    return True
+
+
+# ---------------------------------------------------------------------------
 # Acquisition repository (I04 §15/§18/§26/§28/§29/§70)
 # ---------------------------------------------------------------------------
 
@@ -1108,38 +1148,13 @@ class AcquisitionRepository:
 
     @staticmethod
     def is_usable_manifest_provenance(record: AcquisitionRecord) -> bool:
-        """I04R2 §5: THE usable-manifest-provenance eligibility predicate.
+        """Class-surface alias of the ONE usable-provenance predicate.
 
-        Durable acquisition HISTORY is not automatically USABLE provenance
-        (I04R2 §3).  A record may support scientific manifest truth only when
-        ALL of the following hold:
-
-        - durable source bytes exist (``blob_sha256 is not None``);
-        - no explicit failure evidence is attached (``failure_ref is None``);
-        - the source/HTTP status is not an explicitly parsed numeric failure
-          (>= 400) — a failed outcome whose bytes were archived stays
-          FORENSIC T0A evidence, never manifest provenance (I04R2 §6);
-        - ``provider_checksum_verified`` is not False — an H3 mismatch may be
-          preserved as forensic failure evidence but can never certify a
-          manifest (I04R2 §7).
-
-        Quality flags (PARTIAL_INTERVAL / SCHEMA_ADDITIVE / LIMITED) do NOT
-        disqualify: partial data can still be truthful evidence (I04R2 §5).
-
-        This is the ONE authoritative eligibility rule (I04R2 §13):
-        ``find_usable_matching_acquisitions``, ``has_usable_matching_acquisition``,
-        ``has_earned_h3_proof`` and PartitionManifestRepository all route
-        through it — no duplicated eligibility logic anywhere.
+        The authoritative implementation is the module-level
+        ``is_usable_manifest_provenance`` (I04R2 §5/§13); this alias keeps
+        the repository-facing API discoverable without duplicating the rule.
         """
-        if record.blob_sha256 is None:
-            return False
-        if record.failure_ref is not None:
-            return False
-        if AcquisitionRepository._is_explicit_failure(record):
-            return False
-        if record.provider_checksum_verified is False:
-            return False
-        return True
+        return is_usable_manifest_provenance(record)
 
     def list_acquisitions_for_blob(self, blob_sha256: str) -> list[AcquisitionRecord]:
         """Every durable acquisition referencing one content hash.

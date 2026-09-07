@@ -30,7 +30,7 @@ import re
 import zlib
 from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import BinaryIO
+from typing import Any, BinaryIO
 
 from .enums import ChecksumAlgorithm
 

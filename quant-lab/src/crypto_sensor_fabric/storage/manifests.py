@@ -112,6 +112,19 @@ class MissingAcquisitionProvenance(CatalogError):
     """
 
 
+class NoUsableAcquisitionProvenance(MissingAcquisitionProvenance):
+    """Matching durable acquisition history exists but NONE of it is usable
+    manifest provenance (I04R2 §7/§14).
+
+    I04R2 separates DURABLE ACQUISITION HISTORY from USABLE MANIFEST
+    PROVENANCE: a failed acquisition (H3=False, failure_ref, explicitly
+    parsed numeric HTTP failure) stays durably queryable forensic history
+    but can never certify a PartitionManifest.  Subclasses
+    MissingAcquisitionProvenance so pre-I04R2 callers catching the provenance
+    failure keep working.
+    """
+
+
 # ---------------------------------------------------------------------------
 # Pointer fault injection (I04 §42 — P1..P5 deterministic crash matrix)
 # ---------------------------------------------------------------------------
@@ -769,6 +782,28 @@ class PartitionManifestRepository:
                 native_instrument=manifest.native_instrument,
                 native_granularity=manifest.source_granularity,
             ):
+                if self._acquisitions.has_matching_acquisition(
+                    blob_sha256=ref,
+                    provider_id=manifest.provider,
+                    venue=manifest.venue,
+                    sensor_family=manifest.sensor_family,
+                    native_instrument=manifest.native_instrument,
+                    native_granularity=manifest.source_granularity,
+                ):
+                    # I04R2 §7/§10/§14: identity matches but every matching
+                    # durable record is forensic failure evidence — durable
+                    # history is not automatically usable provenance.
+                    raise NoUsableAcquisitionProvenance(
+                        f"manifest blob_ref {ref} has durable matching "
+                        "acquisition history for "
+                        f"{manifest.provider}/{manifest.venue}/"
+                        f"{manifest.sensor_family.value}/"
+                        f"{manifest.native_instrument} but NONE of it is "
+                        "usable manifest provenance (failed H3 / failure_ref "
+                        "/ explicit numeric HTTP failure); the failed records "
+                        "remain durable forensic history and are never "
+                        "deleted (I04R2 §4/§7/§10)"
+                    )
                 raise MissingAcquisitionProvenance(
                     f"manifest blob_ref {ref} has no durable matching "
                     "AcquisitionRecord for "
