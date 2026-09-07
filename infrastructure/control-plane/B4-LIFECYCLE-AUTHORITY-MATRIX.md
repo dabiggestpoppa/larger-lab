@@ -24,7 +24,7 @@ And the activation invariant (B4-CXR4R3/R4):
 |-------------|-------------|-------------------|----------------|-------------------------|-----------------------|----------------------|----------------------|------------------------------|----------------------------------------|
 | configure   | no          | no                | **YES**        | YES (one-time init only) | no                    | no                   | no                   | no                           | yes (initialization path)              |
 | doctor      | yes (read)  | yes (read)        | no             | no                      | no                    | no                   | no                   | no                           | yes (observes, never mutates)          |
-| start       | yes         | yes                | yes (first run only) | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | no                                    |
+| start       | yes         | yes                | no (B4-CXR6R4: start is READ-ONLY over secret authority — required material must already exist or start fails closed with a `configure` remediation hint) | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | no                                    |
 | restart     | yes (activation half) | yes     | no             | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | shutdown half yes; activation half no  |
 | recover     | yes         | yes                | no             | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | no                                    |
 | migrate     | yes         | yes                | no             | no                      | yes (exact governed DB only) | no                | no                   | no                           | no                                    |
@@ -77,3 +77,38 @@ And the activation invariant (B4-CXR4R3/R4):
 - B4-CXR5R7: `configured`/`initialized`/`config_valid` are never reported as
   `started`/runtime-ready; the config gate is `config_gate`; CLI command is
   `wait-dependencies`.
+
+## CXR7U / CXR7U8 truth classes (supersede the rows above where they differ)
+
+- **`configure` is INITIALIZATION and nothing else** (B4-CXR7U6/U8R3): it is
+  serialized by a whole-operation exclusive lock, commits one authoritative
+  secret bundle atomically (journal + commit marker), and derives
+  `compose.env` as a projection. An interrupted configure rolls FORWARD from
+  the committed bundle on the next configure; a failed concurrent configure
+  can never restore a stale snapshot over a successful one. Real
+  process-kill interruption at every stage is proven by tests, not just
+  exception rollback.
+- **`start` / `restart` / `recover` NEVER initialize.** `start` fails closed
+  before any compose/socket/database/process mutation when initialization
+  authority is absent (B4-CXR7U8R2 behavioral proof on the real `start()`).
+- **`recover` truthfully reports PID-file cleanup** (B4-CXR7U6): removing a
+  stale PID file is an intentional, reported state mutation — not "zero
+  mutation".
+- **Corrupt secret authority fails closed everywhere** (B4-CXR7U8R5): no
+  lifecycle command may treat corrupt/unreadable/wrong-schema store bytes as
+  empty state, and no denied or failed operation may overwrite them
+  (`SecretStoreCorrupt`/`SecretStoreUnreadable`; byte-invariance proven for
+  initialize/resolve/generation/revoke/rotate/configure/start/restart/recover).
+- **Trusted execution boundary** (B4-CXR7U3): only fixed, repository-owned
+  allowlisted programs execute; job parameters are data only; unknown job
+  types fail closed before any subprocess; generated/downloaded/third-party/
+  plugin/strategy/user-supplied/model-produced code MAY NOT EXECUTE until a
+  real OS-isolation increment is separately authorized and proven.
+- **Isolation reporting is literal** (B4-CXR7U3): `BoundedProcessRunner`
+  reports resource bounding (POSIX rlimits) / watchdog + tree termination
+  (Windows) exactly; network is denied by Book 4 POLICY while OS network
+  enforcement is NOT IMPLEMENTED; no report calls this an adversarial sandbox
+  or "full isolation".
+- **Handoff consumption is atomic** (B4-CXR7U4): exactly one concurrent
+  consumer can use a nonce (`consume_handoff_once`); corrupt/unreadable/
+  symlinked/weak-permission ledger state fails closed without rewrite.

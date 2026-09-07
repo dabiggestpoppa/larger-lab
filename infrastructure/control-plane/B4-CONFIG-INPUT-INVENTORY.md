@@ -142,3 +142,28 @@ or overwrite the store.
   effective config; `OCE_CP_URL` is a verified compatibility assertion only.
 - Durable DB host: `postgres.host` is loopback-only (127.0.0.1) while the
   local-first Book 4 contract is in force.
+
+## CXR7U / CXR7U8 corrections (supersede the rows above)
+
+- `OCE_ACTIVATION_ENVELOPE` truth label corrected per the operator disposition
+  (B4-CXR7U1): it is an AUTHENTICATED PARENT-LAUNCH HANDOFF with role/audience
+  consistency checking — NOT a security boundary against arbitrary code already
+  executing as the approved OCE OS account. Same-principal arbitrary code
+  execution is FULL LOCAL OCE COMPROMISE; the child context type is
+  `VerifiedChildContext` (API-level least privilege, defense in depth — not OS
+  isolation).
+- `CXR7U8_CONFIGURE_PAUSE_STAGE` / `CXR7U8_CONFIGURE_RELEASE_FILE` are
+  TEST-ONLY configure crash-injection hooks (B4-CXR7U8R3). They are OUTSIDE the
+  governed `OCE_*` namespace by design, are consumed only by the crash-recovery
+  test driver, and carry zero production authority; production configure
+  ignores them entirely.
+- `.runtime/secrets.json` corruption semantics (B4-CXR7U8R5): missing file =
+  uninitialized; existing-but-unreadable, invalid JSON, non-object JSON, and
+  wrong-typed credential/metadata values are CORRUPTION — every read and every
+  mutation path raises `SecretStoreCorrupt`/`SecretStoreUnreadable` and fails
+  closed with byte invariance (no compose, no DB mutation, no process launch,
+  no projection rewrite, no authority overwrite).
+- `.runtime/compose.env` remains a DERIVED PROJECTION of the governed store
+  (B4-CXR7U6/U8R3), now carrying an authority generation/fingerprint that an
+  interrupted projection step reconciles deterministically from the committed
+  authoritative bundle on the next configure.

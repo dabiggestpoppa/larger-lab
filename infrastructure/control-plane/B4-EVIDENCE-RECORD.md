@@ -1,6 +1,6 @@
 # OCE Book 4 — Configuration & Security Control Spine Evidence Record
 
-**Status:** `COMPLETE / B4-CXR5-CLOSURE / GATED_COMPLETE`
+**Status:** `COMPLETE / B4-CXR7U-CLOSURE / GATED_COMPLETE` (supersedes CXR5/CXR6 labels below; CXR7-BLOCKED preserved)
 **Branch:** `oce-program-build`
 **B4-CXR5 repair start SHA:** `047b5eb6afd7e46a48024726fbbb1e83b2d876cd`
 **Book 4 start SHA:** `acddeb696e6b5df1828fc7baf8c7bfbd2eb43e90`
@@ -750,3 +750,224 @@ honest disposition is to record this exact limitation and return.
   reissuance, non-amplification, verification-material-not-issuance,
   issuer/verifier separation, direct-launch trust-root proof. These are
   the exact unresolved blockers.
+
+## B4-CXR7U — SINGLE-PRINCIPAL TRUST MODEL + CLOSURE-PROOF REPAIR (supersedes the CXR7 BLOCKED state as directed by the operator disposition)
+
+### Operator disposition (recorded, not rewritten)
+
+The CXR7 blocker (`35b940cf`) was ACCEPTED as technically correct: mutually
+hostile same-principal isolation is unavailable without an unauthorized scope
+expansion. The operator did NOT authorize an OS-isolation expansion. Instead:
+
+> The OCE supervisor, API, worker, migration, and outbound-worker processes
+> running as the same approved local OS principal form ONE trusted computing
+> base. `OCE_ACTIVATION_ENVELOPE` is an AUTHENTICATED PARENT-LAUNCH HANDOFF
+> with role/audience consistency checking — not a security boundary against
+> arbitrary code already executing as the approved OCE OS account.
+> SAME-PRINCIPAL ARBITRARY CODE EXECUTION IS FULL LOCAL OCE COMPROMISE.
+
+The disposition supersedes the impossible hostile-child portion of the original
+CXR7 exit gate WITHOUT erasing the blocker finding. `B4-THREAT-MODEL.md`
+(CXR7U1) is the canonical boundary statement referenced by the inventory,
+lifecycle matrix, tests, and this record.
+
+### Ordered commit history (all pushed, `oce-program-build`; no squash, no amend)
+
+CXR7U start SHA: `f46e1beb21c6ec5f25c94278949dea946449a503` (CXR6 evidence head).
+
+| Commit | Gate step |
+|---|---|
+| `35b940cf` | CXR7-BLOCKED (137-line non-amplification assessment; evidence-record only) |
+| `0476cf0d` | CXR7U1 canonical single-principal trust boundary |
+| `50902d2b` | CXR7U2 parent/child context separation |
+| `d3d3cb6f` | CXR7U3 trusted-program lock + isolation truth |
+| `7124c0aa` | CXR7U4 atomic fail-closed handoff consumption |
+| `6db19c11` | CXR7U5 real PostgreSQL audit reconciliation |
+| `0781b93d` | CXR7U6 complete-or-nothing initialization |
+| `080c82da` | CXR7U7 test integrity, inventory, matrices, registry |
+| `471e3e2c` | CXR7U8R1 mutation controls isolated + attributable failures |
+| `d36efb86` | CXR7U8R2 vacuous paths removed, real production entrypoints |
+| `5cbe0d88` | CXR7U8R3 configure serialized + crash/restart recoverable |
+| `20f8404e` | CXR7U8R4 exact PostgreSQL reconciliation + schema proof |
+| `b56bc75f` | CXR7U8R5 corrupt secret authority fails closed |
+| `890e2eee` | CXR7U8X1 CI-exposed repairs (run `33979406177`) |
+| `b1f7a078` | CXR7U8X2 CI-exposed repairs (run `33986527406`) |
+
+Final implementation SHA/tree: `b1f7a07881df1173ca7bb20183f99e04acc3cf6f` /
+`0b51afccd362a7b15d028464dde047f2a763396e`.
+
+### CXR7U Final authoritative run
+
+- **CI workflow:** `b4-config-spine-validation`
+- **CI run:** `34118435301` — **success**
+- **CI URL:** `https://github.com/dabiggestpoppa/larger-lab/actions/runs/34118435301`
+- **OCE_RUN_ID:** `c4394d247914`
+- **Artifact ID / name:** `10017304559` / `b4-config-spine-evidence-c4394d247914`
+- **Outer ZIP SHA-256 (from run log):** `5955f45aca019f499edd35706855bf38d00d449aeedf8e11e55bc7e7e902dced`
+- **Totals (junit.xml, independently re-parsed):** 835 collected / 835 executed /
+  835 passed / 0 failed / 0 errors / **0 skipped** (zero hidden skips in CI);
+  registry `duplicate_ids: []`; expected=collected=executed=passed=835.
+- **Category counts (validation-summary.md):** unit 122/122, adversarial 30/30,
+  end-to-end-job 6/6, outbound-session 7/7, representative-job 2/2,
+  cli-lifecycle 7/7, fabric-pg 12/12, config-spine 475/475,
+  sandbox-resource 27/27, po-hermes-boundary 11/11, api 6/6,
+  local-lifecycle 51/51, postgres 13/13, scheduler 7/7, worker 13/13,
+  redis 2/2, validation-regression 16/16, worker-fabric-core 20/20,
+  worker-supervisor 8/8.
+- **Independent gate:** `PASS` (identity repo/branch/commit/tree, exact totals,
+  zero duplicates, every mandatory id, migrations, source clean before/after,
+  cleanup verified, durable PG volume preserved, manifest hashes/sizes,
+  cloud mutations 0, cost ZERO).
+- **Evidence manifest:** 33 entries — all hashes AND sizes independently
+  re-verified after download (33/33 verified, 0 bad).
+- **Regression on the same head:** `b1-local-ground-validation` `34118435295`
+  success; `b2-control-plane-validation` `34118435261` success;
+  `b3-worker-fabric-validation` `34118435201` success.
+- **Real PostgreSQL reconciliation executed in CI:** the container-backed
+  `test_b4_cxr7_audit_reconciliation` module and the postgres/fabric-pg
+  categories ran against real PostgreSQL in CI (Docker 28.0.4; 0 skips).
+- **Leak scan:** 11 canary/leak-defense testcases executed in the same
+  authoritative run (committed-file canary scan, error-path canary redaction,
+  fingerprint no-leak), all passing.
+- **Source cleanliness:** `source-cleanliness.json` — before CLEAN / after
+  CLEAN at commit `b1f7a078`.
+- **Cleanup:** `containers_removed=True networks_removed=True
+  postgres_volume_preserved=True`.
+- **Archive:** `~/Desktop/oce-b4-archive/run-34118435301/` (35 files, full
+  independent verification above).
+
+### CXR7U proof summary (each backed by registered tests)
+
+- **Single-principal TCB model documented honestly** (CXR7U1): in-scope =
+  adversarial inputs, forged/malformed/stale/expired/replayed/wrong-audience
+  handoffs, unauthorized init/rotation/migration/override, corrupt state,
+  partial writes/concurrency/replay races, untrusted job parameters, direct
+  child entrypoint invocation. Out of scope = same-principal arbitrary code
+  execution, compromised trusted component, `.runtime` read/modify,
+  admin/root/SYSTEM, kernel/host, repo/runtime replacement, same-user
+  debugger, mutually hostile same-principal isolation.
+- **Verified children expose no parent issuance API** (CXR7U2):
+  `VerifiedChildContext` has no `build_envelope`/`issue_child_handoff`/
+  `child_environment`; behavioral tests prove ordinary issuance through a
+  child context fails, parent issues every required audience, wrong audience
+  fails before runtime activity, tampered/malformed handoffs fail, and
+  ambient-only input without store access cannot create a valid MAC.
+  Truth label: TYPE SEPARATION IS API-LEVEL LEAST PRIVILEGE AND DEFENSE IN
+  DEPTH — not OS isolation.
+- **Only repository-owned allowlisted programs execute** (CXR7U3): unknown
+  job types fail closed before subprocess; parameters are data only (never
+  source/argv/shell/imports/script paths/env or fs authority); shell
+  disabled; workspace traversal/symlink escape/repo overlap blocked;
+  production cannot select the test dependency seam;
+  generated/downloaded/third-party/plugin/strategy/user-supplied/
+  model-produced code MAY NOT EXECUTE until a real OS-isolation increment is
+  separately authorized and proven.
+- **Isolation reporting is literal** (CXR7U3): `BoundedProcessRunner` +
+  `resource_limits_available`/`resource_enforcement_report`; POSIX reports
+  resource bounding only; Windows reports watchdog/tree termination
+  literally; network authorization denied by policy with OS network
+  enforcement NOT IMPLEMENTED; no evidence calls this an adversarial
+  sandbox.
+- **Mutation tests never modify the canonical checkout** (CXR7U8R1): every
+  control materializes a minimum runnable tree under `tmp_path`, pins cwd
+  and PYTHONPATH to the copy, and hashes the canonical checkout
+  before/after; byte-identity proven across normal mutant failure,
+  mutation-function exception, subprocess timeout, subprocess termination,
+  invalid mutant, and collection failure.
+- **A mutation proof passes only when the expected assertion detects the
+  mutant** (CXR7U8R1/R2): baseline collected-exactly-once/
+  passed-exactly-once/rc=0 first; mutant digest verified changed; detection
+  accepted only on normal completion with the expected node failed;
+  JUnit-parsed; negative controls prove missing node ID, collection error,
+  syntax-error mutant, timeout, unrelated failing test, and absent
+  replacement pattern do NOT count as detection.
+- **Configure is serialized and recoverable after actual process
+  interruption** (CXR7U6/U8R3): whole-operation exclusive lock;
+  authoritative bundle committed atomically; compose.env is a derived
+  projection with an authority generation/fingerprint; interrupted
+  projection rolls forward deterministically; real subprocess kills after
+  every staging stage and during projection all recover on restart
+  configure; two concurrent configure processes — exactly one succeeds, the
+  loser fails without erasing the winner's commit; unrelated metadata
+  survives; no stale rollback over a successful commit.
+- **Audit retries reconcile without an aborted transaction** (CXR7U8R4):
+  `INSERT ... ON CONFLICT DO NOTHING RETURNING audit_id` handles BOTH
+  governed uniqueness constraints without aborting; no-row result
+  reconciles against the durable row; exact semantic match is idempotent;
+  divergence fails closed; every returned audit ID resolves to the durable
+  row that exists (identity model B); the transaction remains usable after
+  reconciliation; proven through the PRODUCTION sink on real PostgreSQL.
+- **Audit durability proof is bound to the exact governed structure**
+  (CXR7U8R4/U8-06): pinned database/role identity, public-schema table,
+  exact column types AND nullability, PK specifically on audit_id,
+  request_id uniqueness index bound to this exact table/schema/column
+  (unique/valid/ready), append-only trigger calling the governed function,
+  enabled; schema-mutation proofs (PK moved, same-named index in another
+  schema/on another table/wrong column, wrong trigger function, cloned
+  table in another schema) all fail the proof.
+- **Corrupt secret authority never behaves like empty state** (CXR7U8R5):
+  missing = uninitialized; unreadable/invalid-JSON/non-object/wrong-schema/
+  wrong-typed = corruption (`SecretStoreCorrupt`/`SecretStoreUnreadable`);
+  every read and mutation path (initialize/resolve/generation/revoke/
+  rotate/configure/start/restart/recover) fails closed with store-bytes
+  BEFORE == AFTER, no compose, no DB mutation, no process launch, no new
+  authority file, no projection rewrite.
+- **No mandatory security test can pass vacuously** (CXR7U7/U8R2): AST
+  anti-vacuity gate (no `assert ... or True`, no `assert True`, no
+  constant-false ternaries, no unconditional early returns before the
+  security decision) + 8 mutation negative controls over parent/child
+  separation, role/audience validation, atomic nonce consumption,
+  corrupt-ledger refusal, audit canonicalization, configure
+  rollback/recovery, trusted-program allowlisting, truthful isolation
+  reporting.
+
+### Historical evidence preserved
+
+- **CXR6 closure:** implementation `fd5b32747dba1c93223093966c1edcee3b6680a6`,
+  evidence head `f46e1beb21c6ec5f25c94278949dea946449a503`, workflow run
+  `33555566041`, OCE_RUN_ID `c048f12cca64`, artifact `9819232513`
+  (`b4-config-spine-evidence-c048f12cca64`), digest
+  `ad41faac6a62462a125d60803bfaf5bc64e97f7106bce0516b801f900122e34a`,
+  644/644 PASS — valid historical evidence for its registered suite.
+- **CXR7 blocker:** `35b940cf` preserved verbatim (section above); not
+  rewritten as a false alarm.
+- **Intermediate failed runs preserved:** `33979406177` (4 failed + 34 errors
+  -> U8X1) and `33986527406` (5 failed -> U8X2), with their failure artifacts
+  downloaded and root-caused; both are truthful history, not closure proof.
+
+### Boundaries and cost (this sequence)
+
+- `main` unchanged: `7e7ef7222c4ecdea568b34583fd81406165cc9b6`.
+- Capital authority: **none**. Cloud mutations: **0**. Broker mutations:
+  **0**. Capital mutations: **0**. Execution-authority mutations: **0**.
+- Recurring cost: **$0**. No Book 5, no Program Block 4, no OS-principal
+  separation, no restricted tokens, no VM/container isolation expansion, no
+  network firewall, no generated/model/plugin code execution, no cloud
+  provisioning, no remote PostgreSQL, no GPU spend, no broker connection, no
+  paper/live trading, no CEREBUS changes, no OpenClaw activation, no
+  production deployment.
+
+### Unresolved limitations (truthfully recorded, not blockers to this gate)
+
+- OS network enforcement remains NOT IMPLEMENTED (policy denial only).
+- Resource bounding is not hostile-code containment; the single-principal
+  TCB model applies (same-principal arbitrary code execution is full local
+  OCE compromise).
+- Process-crash recovery is proven for process kill; power-loss durability
+  of the atomic bundle replacement is bounded by the OS/filesystem semantics
+  of atomic rename and is NOT separately proven.
+- The AST anti-vacuity gate is static and cannot prove arbitrary test
+  correctness; behavioral proofs remain authoritative.
+
+## Confirmation (CXR7U)
+
+CXR7U exit-gate statements 1-11 verified: single-principal TCB explicit (1);
+handoff authenticates parent activation with role/audience consistency
+without hostile-child claims (2); verified children expose no parent
+issuance API (3); arbitrary/generated/third-party/plugin/model-produced code
+execution blocked (4); resource/network/OS enforcement reported literally
+(5); exactly one concurrent nonce consumer (6); corrupt security state fails
+closed (7); audit retry proven through the real PostgreSQL sink (8); explicit
+initialization complete-or-nothing (9); no mandatory security test passes
+vacuously (10); final evidence claims only what the implementation proves
+(11). Book 4 remains closed at the CXR7U sequence.

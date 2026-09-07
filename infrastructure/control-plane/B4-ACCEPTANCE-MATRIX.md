@@ -157,3 +157,54 @@ rewritten.*
 
 - The CXR3 closure (run `33505225957` / `780f7ceb`) remains valid historical
 evidence of the CXR3 suite and is superseded by the CXR4 sequence above.
+
+---
+
+## SUPERSEDING LEDGER — B4-CXR7U / CXR7U8 (single-principal trust model + closure-proof repair)
+
+*CXR7 was BLOCKED at its gate: the original hostile-child isolation requirement
+was impossible under the local-first single-principal architecture. The operator
+ACCEPTED that blocker as technically correct and issued the CXR7U disposition:
+Book 4 is ONE trusted computing base; `OCE_ACTIVATION_ENVELOPE` is an
+authenticated parent-launch handoff with role/audience consistency checking —
+NOT an OS isolation boundary. CXR7U1–U7 implemented that model; CXR7U8 (R1–R5,
+X1, X2) repaired the proofs so they are literal. Book 4 is closed after this
+sequence; see `B4-EVIDENCE-RECORD.md`.*
+
+| Repair | Commit | Scope | Evidence |
+|---|---|---|---|
+| CXR7-BLOCKED | `35b940cf` | exact non-amplification blocker assessment (137 lines, evidence-record only) | preserved verbatim in `B4-EVIDENCE-RECORD.md` |
+| CXR7U1 | `0476cf0d` | canonical single-principal threat model (`B4-THREAT-MODEL.md`) + 12 boundary tests | threat model referenced by inventory/matrices/tests |
+| CXR7U2 | `50902d2b` | `ParentActivationContext` vs `VerifiedChildContext` separation; `issue_child_handoff`; vacuous `or True` test replaced | child-type behavioral proofs |
+| CXR7U3 | `d3d3cb6f` | trusted-program execution lock (`program_for` allowlist); `BoundedProcessRunner` truthful isolation reporting | trusted-program + truthful-report tests |
+| CXR7U4 | `7124c0aa` | atomic fail-closed `consume_handoff_once` ledger | 20 concurrent/replay/corruption tests |
+| CXR7U5 | `6db19c11` | canonical audit representation + strengthened `proven()` + container-backed production-sink tests | real PostgreSQL reconciliation |
+| CXR7U6 | `0781b93d` | journal-based complete-or-nothing `configure`; truthful `recover()` PID cleanup | failure-injection matrix |
+| CXR7U7 | `080c82da` | anti-vacuity AST gate + 8 mutation negative controls | security-test integrity |
+| CXR7U8R1 | `471e3e2c` | mutation controls isolated under `tmp_path` (canonical checkout byte-identical) + attributable-failure protocol (JUnit-parsed, 6 negative controls) | `test_b4_cxr7_test_integrity` (43 tests) |
+| CXR7U8R2 | `d36efb86` | vacuous paths removed; behavioral proofs on real `start()` / real worker dispatch gate / real seam | production-entrypoint tests |
+| CXR7U8R3 | `5cbe0d88` | configure serialized (whole-operation lock) + crash/restart recoverable (durable journal snapshot, roll-forward, real subprocess interruption) | crash/concurrency test module (11) |
+| CXR7U8R4 | `20f8404e` | exact PostgreSQL reconciliation (`ON CONFLICT DO NOTHING RETURNING`; durable-ID returns; transaction stays usable) + exact-schema `proven()` (PK column, schema-pinned index/trigger identity) | container-backed U8-05/06 tests |
+| CXR7U8R5 | `b56bc75f` | corrupt secret authority fails closed (`SecretStoreCorrupt`/`SecretStoreUnreadable`); byte-invariance across every mutation/read path | corrupt-store byte-invariance matrix |
+| CXR7U8X1 | `890e2eee` | CI-exposed repairs from run `33979406177` (4 failed + 34 errors): broken test-helper SQL, unreadable-store configure path, Linux-truthful isolation assertions | failure artifact preserved |
+| CXR7U8X2 | `b1f7a078` | CI-exposed repairs from run `33986527406` (5 failed): decoy-index `finally` ordering (DuplicateTable cascade), `authorized` DEFAULT TRUE auto-cast, `_clean_db` residue hardening | failure artifact preserved |
+
+### Authoritative closure (B4-CXR7U, verified from junit + gate + artifact)
+
+- **Run:** `34118435301` on `b1f7a078` — `b4-config-spine-validation` **success**
+- **OCE_RUN_ID:** `c4394d247914`; **artifact:** `b4-config-spine-evidence-c4394d247914` (id `10017304559`)
+- **JUnit:** 835 collected / 835 executed / 835 passed / 0 failed / 0 errors / 0 skipped; duplicate_ids `[]`
+- **Regression on the same head:** `b1-local-ground-validation` success (`34118435295`),
+  `b2-control-plane-validation` success (`34118435261`), `b3-worker-fabric-validation` success (`34118435201`)
+- **Archive:** `~/Desktop/oce-b4-archive/run-34118435301/` (33 manifest entries, all hashes re-verified)
+
+### Previously superseded (preserved, not closure proof)
+
+- The CXR6 closure (run `33555566041` / `fd5b3274`) remains valid historical
+  evidence of its 644-test suite; its model did not cover same-principal-child
+  amplification. Superseded by the CXR7U sequence, never rewritten.
+- The CXR7 blocker record (`35b940cf`) is preserved verbatim; the operator
+  disposition supersedes the impossible hostile-child requirement without
+  erasing the finding.
+- Intermediate failed runs `33979406177` (U8X1 repairs) and `33986527406`
+  (U8X2 repairs) are preserved as truthful historical evidence.
