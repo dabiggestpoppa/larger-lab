@@ -49,11 +49,15 @@ from .domain import (
 from .domain_policy import G5DomainPolicy, g5_policy_outcome
 from .evidence import EvidenceRecord
 from .g5r import (
+    FRAGMENT_STATUS_UNRESOLVED,
+    FRAGMENT_STATUS_VERIFIED,
+    REPRESENTATION_NORMALIZED_APPLICABILITY,
     DoctrineAmendmentProposal,
-    DoctrineClaimAtom,
+    NormalizedDoctrineClaim,
     ObservedResult,
     ReproductionProtocol,
     SensorCapabilityChangeRecord,
+    SourceFragmentAtom,
     assess_sensor_adequacy,
     cluster_verified_observation_paths,
     compare_measured_result,
@@ -493,44 +497,80 @@ def run_s16(pack: G5ScenarioPack, policy: G5DomainPolicy,
         claim_output = claim.to_dict()
         claim_output["source_binding"] = binding.to_dict() if binding else None
         claim_output["source_binding_status"] = binding_status
-        # ER-02: the TARGET_METRIC atom's exact_fragment MUST be a verbatim bounded
-        # source fragment from the bound manual file, NOT normalized JSON. The
-        # numeric_parameters dict is a separately-derived machine representation
-        # (normalized claim), recorded alongside but never labeled as the verbatim
-        # source fragment. We extract the actual table text from the bound source.
+        # ER-02 + TC-02: an atom labeled exact/verbatim MUST be a verbatim bounded
+        # source fragment from the bound manual file. The numeric_parameters dict is
+        # a separately-derived machine representation (NormalizedDoctrineClaim),
+        # recorded alongside but NEVER substituted as the exact fragment. Source
+        # extraction failure FAILS CLOSED (SOURCE_FRAGMENT_UNRESOLVED) — there is
+        # NO fallback that promotes normalized JSON to an exact atom.
         verbatim_target_metric = ""
+        manual_text = ""
+        source_digest = binding.content_digest if binding else ""
         if binding is not None:
             try:
                 source_bytes = (REPO_ROOT / claim.source_path).read_bytes()
-                source_text = source_bytes.decode("utf-8", errors="replace")
+                manual_text = source_bytes.decode("utf-8", errors="replace")
                 # Locate the Target Metric table block in the bound source file.
                 # The table is:
                 #   Target Metric\nValue\nWin Rate (Filtered)\n85% – 90%\n...
                 #   Prop Firm Circuit Breaker\nHard constraint boundary [8] at 0.40% loss
-                start = source_text.find("Target Metric")
+                start = manual_text.find("Target Metric")
                 if start != -1:
-                    # the table block ends at the next numbered section header
-                    end = source_text.find("\n2. PRE-SESSION CHECKLIST", start)
+                    # the table block ends at the next numbered section header.
+                    # The fragment is the EXACT slice of the decoded source text
+                    # (no rstrip/re-join — re-joining can break byte-exact
+                    # occurrence on CRLF sources, TC-02).
+                    end = manual_text.find("\n2. PRE-SESSION CHECKLIST", start)
                     if end != -1:
-                        verbatim_target_metric = source_text[start:end].rstrip() + "\n"
+                        verbatim_target_metric = manual_text[start:end]
             except Exception:
                 verbatim_target_metric = ""
-        claim_atoms = []
-        claim_atoms.append(DoctrineClaimAtom.make(
+        target_atom = SourceFragmentAtom.make(
             atom_id=f"{claim.claim_id}:TARGET_METRIC",
             claim_id=claim.claim_id, source_path=claim.source_path,
             locator="Target Metric table (PAGE 4-5)",
             claim_kind="TARGET_METRIC_ROW",
-            exact_fragment=verbatim_target_metric or json.dumps(dict(claim.numeric_parameters), sort_keys=True),
-            manual_version=claim.manual_version))
+            exact_fragment=verbatim_target_metric,
+            source_text=manual_text,
+            source_file_digest=source_digest,
+            manual_version=claim.manual_version)
+        claim_atoms = [target_atom.to_dict()]
+        if target_atom.fragment_status == FRAGMENT_STATUS_UNRESOLVED:
+            # fail closed: no exact atom is emitted; the claim's normalized
+            # representation is recorded separately and derived_from is left empty
+            # because there is no resolved exact atom to derive from.
+            claim_atoms[-1]["unresolved_reason"] = (
+                "verbatim source fragment could not be extracted/verified in the bound "
+                "source; normalized JSON was NOT substituted as an exact atom (TC-02)")
+        # applicability conditions are bound fragments ONLY when they actually occur
+        # in the source; otherwise they are normalized representations and are
+        # labeled NORMALIZED_APPLICABILITY (never 'exact source atom').
         for i, cond in enumerate(claim.structural_conditions):
-            claim_atoms.append(DoctrineClaimAtom.make(
+            cond_atom = SourceFragmentAtom.make(
                 atom_id=f"{claim.claim_id}:APPLICABILITY:{i}",
                 claim_id=claim.claim_id, source_path=claim.source_path,
                 locator=f"{claim.section} / applicability fragment {i + 1}",
                 claim_kind="APPLICABILITY_CONDITION", exact_fragment=cond,
-                manual_version=claim.manual_version))
-        claim_output["claim_atoms"] = [a.to_dict() for a in claim_atoms]
+                source_text=manual_text,
+                source_file_digest=source_digest,
+                manual_version=claim.manual_version)
+            if cond_atom.fragment_status != FRAGMENT_STATUS_VERIFIED:
+                # keep the claim_kind value (back-compat) but mark the
+                # representation honestly: NORMALIZED_APPLICABILITY, not exact.
+                cond_atom_dict = cond_atom.to_dict()
+                cond_atom_dict["representation_mode"] = REPRESENTATION_NORMALIZED_APPLICABILITY
+                cond_atom_dict["source_bound"] = False
+                claim_atoms.append(cond_atom_dict)
+            else:
+                claim_atoms.append(cond_atom.to_dict())
+        claim_output["claim_atoms"] = claim_atoms
+        # TC-02: the normalized machine representation is a separate object with
+        # its own digest and derived_from linkage to the resolved exact atom(s).
+        derived_from = [target_atom.atom_id] if target_atom.fragment_status == FRAGMENT_STATUS_VERIFIED else []
+        normalized = NormalizedDoctrineClaim.make(
+            claim_id=claim.claim_id, representation=claim.numeric_parameters,
+            derived_from_atom_refs=derived_from)
+        claim_output["normalized_claim"] = normalized.to_dict()
         claim_outputs.append(claim_output)
 
     results = []

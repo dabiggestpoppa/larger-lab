@@ -733,7 +733,12 @@ class FrozenExperimentProtocol:
     promotion_criteria: Tuple[str, ...]
     target_domain: str = ""
     fingerprint: str = ""
-    frozen_before_result_evidence: str = ""   # ER-01: evidence for freeze-before-result, not mere assertion
+    frozen_before_result_evidence: str = ""   # ER-01: human-readable note only; NEVER sufficient alone (TC-01)
+    freeze_seq: int = 0                        # TC-01: logical freeze sequence (deterministic, not wall clock)
+    freeze_epoch: str = ""                     # TC-01: epoch/load identity at which the protocol was frozen
+    frozen_by: str = ""                        # TC-01: actor that froze it
+    authority_basis: str = ""                  # TC-01: authority/evidence basis for the freeze
+    freeze_evidence_refs: Tuple[str, ...] = () # TC-01: registered freeze evidence refs (resolve for proof)
 
     @classmethod
     def from_fixture(cls, data: Mapping[str, Any]) -> "FrozenExperimentProtocol":
@@ -749,13 +754,28 @@ class FrozenExperimentProtocol:
                   promotion_criteria=tuple(data.get("promotion_criteria", [])),
                   target_domain=str(data.get("target_domain", "")),
                   frozen_before_result_evidence=str(data.get("frozen_before_result_evidence", "")),
+                  freeze_seq=int(data.get("freeze_seq", 0) or 0),
+                  freeze_epoch=str(data.get("freeze_epoch", "")),
+                  frozen_by=str(data.get("frozen_by", "")),
+                  authority_basis=str(data.get("authority_basis", "")),
+                  freeze_evidence_refs=tuple(data.get("freeze_evidence_refs", [])),
                   )
         object.__setattr__(obj, "fingerprint", obj.compute_fingerprint_canonical())
         return obj
 
+    def structured_freeze_present(self) -> bool:
+        """TC-01: a STRUCTURED freeze record exists. Free-form text in
+        frozen_before_result_evidence alone is never sufficient — the freeze must
+        be witnessed by a logical sequence/epoch/authority and (ideally) evidence
+        refs that resolve."""
+        return bool(self.freeze_epoch or self.frozen_by or self.authority_basis
+                    or self.freeze_evidence_refs or self.freeze_seq > 0)
+
     def canonical_dict(self) -> Dict[str, Any]:
         """Canonical fields ONLY — excludes fingerprint so the fingerprint is never
-        self-referential (ER-01: fingerprint excludes its own fingerprint field)."""
+        self-referential (ER-01). Includes the structured freeze fields so ANY
+        post-freeze change — including to the freeze record itself — invalidates
+        the stored fingerprint (TC-01: current-object consistency)."""
         return {"protocol_id": self.protocol_id, "mechanism_ref": self.mechanism_ref,
                 "dataset_ref": self.dataset_ref, "time_range": self.time_range,
                 "features": list(self.features), "metrics": list(self.metrics),
@@ -764,7 +784,10 @@ class FrozenExperimentProtocol:
                 "cost_execution_assumptions": list(self.cost_execution_assumptions),
                 "promotion_criteria": list(self.promotion_criteria),
                 "target_domain": self.target_domain,
-                "frozen_before_result_evidence": self.frozen_before_result_evidence}
+                "frozen_before_result_evidence": self.frozen_before_result_evidence,
+                "freeze_seq": self.freeze_seq, "freeze_epoch": self.freeze_epoch,
+                "frozen_by": self.frozen_by, "authority_basis": self.authority_basis,
+                "freeze_evidence_refs": list(self.freeze_evidence_refs)}
 
     def compute_fingerprint_canonical(self) -> str:
         """Recompute fingerprint from canonical fields only (ER-01: fingerprint
@@ -1046,6 +1069,16 @@ class ProviderSemanticsRecord:
                 "compatible_adapter_versions": list(self.compatible_adapter_versions)}
 
 
+# TC-06: terminal semantic-honesty vocabulary — contract-declared semantics
+# must never be implied as empirically verified.
+SEMANTICS_CONTRACT_ACCEPTED = "CONTRACT_SEMANTICS_ACCEPTED"
+SEMANTICS_EMPIRICALLY_VERIFIED = "TRANSFORMATION_EMPIRICALLY_VERIFIED"
+TIMESTAMP_CONTRACT_DECLARED = "CONTRACT_DECLARED"
+TIMESTAMP_DETERMINISTICALLY_VERIFIED = "DETERMINISTICALLY_VERIFIED"
+TRANSFORMATION_STEPS = ("normalization", "instrument_identity", "adapter",
+                        "time_semantics")
+
+
 @dataclass(frozen=True)
 class SourceDiagnosisStep:
     layer: str
@@ -1078,18 +1111,31 @@ class SourceDiagnosisResult:
     provider_b: str
     terminal: str                    # REPAIRABLE_SOURCE_MISMATCH | GENUINE_SOURCE_DISAGREEMENT |
                                      # NO_DISAGREEMENT | DATA_INSUFFICIENT
+    # TC-06: terminal semantic honesty. A result whose normalization fidelity or
+    # instrument mapping rests on contract-declared semantics must not imply
+    # those transformations were empirically verified. Grades:
+    #   CONTRACT_SEMANTICS_ACCEPTED          (default: declared, not re-derived)
+    #   TRANSFORMATION_EMPIRICALLY_VERIFIED  (only when a step was re-derived
+    #                                         from observation data)
+    semantics_grade: str = "CONTRACT_SEMANTICS_ACCEPTED"
+    timestamp_grade: str = "CONTRACT_DECLARED"          # DETERMINISTICALLY_VERIFIED | CONTRACT_DECLARED
+    transformation_grades: Mapping[str, str] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return {"disagreement_id": self.disagreement_id,
                 "steps": [s.to_dict() for s in self.steps], "cause": self.cause,
                 "provider_a": self.provider_a, "provider_b": self.provider_b,
-                "terminal": self.terminal}
+                "terminal": self.terminal,
+                "semantics_grade": self.semantics_grade,
+                "timestamp_grade": self.timestamp_grade,
+                "transformation_grades": dict(self.transformation_grades)}
 
 
 def diagnose_provider_disagreement(
     obs_a: ProviderObservation, obs_b: ProviderObservation,
     sem_a: ProviderSemanticsRecord, sem_b: ProviderSemanticsRecord,
     tolerance: Optional[DisagreementToleranceContract] = None,
+    empirically_verified_steps: Sequence[str] = (),
 ) -> SourceDiagnosisResult:
     """Deterministic source-layer diagnosis. Only AFTER layers 1..6 pass may
     higher-level market-field interpretation be challenged (layer 7).
@@ -1107,12 +1153,30 @@ def diagnose_provider_disagreement(
         return ok
 
     def result(cause: str, terminal: str) -> SourceDiagnosisResult:
+        # TC-06: terminal semantics are as honest as the steps. Transformations
+        # only claim empirical verification when the caller supplied the step as
+        # independently re-derived (no live adapter engine exists in this kernel,
+        # so by default every transformation is CONTRACT_SEMANTICS_ACCEPTED).
+        empirically = set(empirically_verified_steps or ())
+        grades = {
+            step: (SEMANTICS_EMPIRICALLY_VERIFIED if step in empirically
+                   else SEMANTICS_CONTRACT_ACCEPTED)
+            for step in TRANSFORMATION_STEPS
+        }
+        all_verified = all(g == SEMANTICS_EMPIRICALLY_VERIFIED for g in grades.values())
+        semantics_grade = (SEMANTICS_EMPIRICALLY_VERIFIED if all_verified
+                           else SEMANTICS_CONTRACT_ACCEPTED)
+        timestamp_grade = (TIMESTAMP_DETERMINISTICALLY_VERIFIED
+                           if "time_semantics" in empirically
+                           else TIMESTAMP_CONTRACT_DECLARED)
         return SourceDiagnosisResult(
             disagreement_id=deterministic_hex("src_diag", obs_a.observation_id,
                                               obs_b.observation_id),
             steps=tuple(steps), cause=cause,
             provider_a=obs_a.provider, provider_b=obs_b.provider,
-            terminal=terminal)
+            terminal=terminal,
+            semantics_grade=semantics_grade, timestamp_grade=timestamp_grade,
+            transformation_grades=dict(grades))
 
     # 0 provider semantics contract present (G5R-10 fail closed handled at the
     # runner level; the kernel still refuses to compare without both contracts)
@@ -1491,6 +1555,8 @@ class DomainTransferHypothesis:
     source_evidence_refs: Tuple[str, ...]
     transfer_map: TransferInvariantMap
     frozen_target_protocol_ref: str = ""
+    mechanism_ref: str = ""     # TC-01: mechanism/hypothesis identity the frozen protocol must bind to
+    claim_ref: str = ""         # TC-01: optional claim linkage (documented honestly when absent)
 
     @classmethod
     def from_fixture(cls, data: Mapping[str, Any]) -> "DomainTransferHypothesis":
@@ -1500,7 +1566,9 @@ class DomainTransferHypothesis:
                    target_domain=str(data.get("target_domain", "")),
                    source_evidence_refs=tuple(data.get("source_evidence_refs", [])),
                    transfer_map=TransferInvariantMap.from_fixture(data["transfer_map"]),
-                   frozen_target_protocol_ref=str(data.get("frozen_target_protocol_ref", "")))
+                   frozen_target_protocol_ref=str(data.get("frozen_target_protocol_ref", "")),
+                   mechanism_ref=str(data.get("mechanism_ref", "")),
+                   claim_ref=str(data.get("claim_ref", "")))
 
     def to_dict(self) -> Dict[str, Any]:
         return {"hypothesis_id": self.hypothesis_id,
@@ -1508,7 +1576,8 @@ class DomainTransferHypothesis:
                 "source_domain": self.source_domain, "target_domain": self.target_domain,
                 "source_evidence_refs": list(self.source_evidence_refs),
                 "transfer_map": self.transfer_map.to_dict(),
-                "frozen_target_protocol_ref": self.frozen_target_protocol_ref}
+                "frozen_target_protocol_ref": self.frozen_target_protocol_ref,
+                "mechanism_ref": self.mechanism_ref, "claim_ref": self.claim_ref}
 
 
 @dataclass(frozen=True)

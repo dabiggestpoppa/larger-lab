@@ -56,8 +56,9 @@ class IndependenceAssessment:
     distinct_method_runtime_lineages: int = 0
     unknown_lineage_count: int = 0
     verified_distinct_lineage_count: int = 0
-    independence_status: str = "UNRESOLVED"     # CONFIRMED | SUPPORTED | SOURCE_ONLY | UNRESOLVED
+    independence_status: str = "UNRESOLVED"     # policy-channel vocabulary: CONFIRMED | SUPPORTED | SOURCE_ONLY | UNRESOLVED
     topology_scope: str = ""                    # which lineage dimensions were assessed
+    semantic_label: str = "UNRESOLVED"          # TC-05 explicit vocabulary (below)
     rationale: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
@@ -70,8 +71,74 @@ class IndependenceAssessment:
             "verified_distinct_lineage_count": self.verified_distinct_lineage_count,
             "independence_status": self.independence_status,
             "topology_scope": self.topology_scope,
+            "semantic_label": self.semantic_label,
             "rationale": self.rationale,
         }
+
+
+# TC-05: EXPLICIT independence vocabulary (compatible with G3's qualitative
+# grades; never collapses to an effective-sample-size scalar). UNKNOWN dimensions
+# never count as favorable evidence.
+SEMANTIC_UNRESOLVED = "UNRESOLVED"
+SEMANTIC_SOURCE_DIVERSE = "SOURCE_DIVERSE"
+SEMANTIC_SOURCE_AND_METHOD_DIVERSE = "SOURCE_AND_METHOD_DIVERSE"
+SEMANTIC_FULL_NOT_ASSESSED = "FULL_INDEPENDENCE_NOT_ASSESSED"
+SEMANTIC_CORRELATED = "CORRELATED"
+
+
+# G3 assesses 10 qualitative overlap dimensions (engine/independence.py:
+# INDEPENDENCE_DIMENSIONS). G5's derive_independence assesses a strict subset:
+# source lineage and (when supplied) method/runtime lineage. The projection below
+# documents WHICH G3 dimensions a G5 semantic label speaks about, so G5 never
+# invents a meaning G3 would not agree with.
+G3_DIMENSIONS = (
+    "model_family_overlap", "provider_overlap", "source_overlap",
+    "retrieval_overlap", "prompt_context_overlap", "prior_conclusion_exposure",
+    "implementation_path_overlap", "experiment_design_overlap",
+    "runtime_lineage_overlap_if_known", "allocator_overlap",
+)
+G5_ASSESSED_G3_DIMENSIONS = ("source_overlap", "runtime_lineage_overlap_if_known")
+G5_UNASSESSED_G3_DIMENSIONS = tuple(
+    d for d in G3_DIMENSIONS if d not in G5_ASSESSED_G3_DIMENSIONS)
+
+
+def derive_semantic_label(
+    distinct_sources: int,
+    distinct_methods: int,
+    unknown: int,
+    method_assessed: bool,
+    refs: Sequence[str],
+    sources_known: int = -1,
+) -> str:
+    """TC-05: map the assessed lineage vector onto the EXPLICIT vocabulary.
+
+    * zero refs or any UNKNOWN lineage  -> UNRESOLVED (unknown never favorable)
+    * >=2 distinct sources AND >=2 distinct methods (method assessed)
+                                        -> SOURCE_AND_METHOD_DIVERSE
+    * >=2 distinct sources, method NOT assessed
+                                        -> FULL_INDEPENDENCE_NOT_ASSESSED
+      (source diversity alone is NOT global independence — method/runtime,
+      model family, provider, retrieval, design and allocator overlap are
+      unassessed)
+    * >=2 distinct sources but method assessed and <2 distinct methods
+                                        -> CORRELATED (shared method/runtime)
+    * single lineage with multiple refs -> CORRELATED
+    """
+    if unknown > 0:
+        return SEMANTIC_UNRESOLVED
+    n = len(list(refs or ()))
+    if n == 0 or distinct_sources <= 0:
+        return SEMANTIC_UNRESOLVED
+    if method_assessed:
+        if distinct_methods >= 2:
+            return SEMANTIC_SOURCE_AND_METHOD_DIVERSE
+        if distinct_sources >= 2:
+            return SEMANTIC_CORRELATED
+        return SEMANTIC_CORRELATED
+    # method not assessed
+    if distinct_sources >= 2:
+        return SEMANTIC_FULL_NOT_ASSESSED
+    return SEMANTIC_CORRELATED
 
 
 def derive_independence(
@@ -150,6 +217,17 @@ def derive_independence(
         status = "UNRESOLVED"
         rationale = (f"{unknown} unknown lineage(s); verified distinct lineages "
                      f"= {len(source_lineages)}")
+    method_assessed = bool(method_lineage_of)
+    semantic_label = derive_semantic_label(
+        len(source_lineages), len(method_lineages), unknown, method_assessed, refs)
+    # TC-05: the explicit semantic label is carried alongside the policy-channel
+    # status. SOURCE-only diversity is never globally CONFIRMED independence — it
+    # is labeled FULL_INDEPENDENCE_NOT_ASSESSED (see derive_semantic_label).
+    if semantic_label == SEMANTIC_FULL_NOT_ASSESSED and status == "CONFIRMED":
+        rationale = (rationale + "; semantic label FULL_INDEPENDENCE_NOT_ASSESSED: "
+                     "source lineage diversity alone is NOT global independence "
+                     "(method/runtime, model family, provider, retrieval, design and "
+                     "allocator overlap not assessed)").strip()
     return IndependenceAssessment(
         pattern_id=pattern.pattern_id,
         raw_evidence_paths=refs,
@@ -159,6 +237,7 @@ def derive_independence(
         verified_distinct_lineage_count=len(source_lineages),
         independence_status=status,
         topology_scope=topology_scope,
+        semantic_label=semantic_label,
         rationale=rationale,
     )
 
@@ -166,22 +245,32 @@ def derive_independence(
 # --------------------------------------------------------------------------- #
 # G5R-02 — cluster membership is evidence-bound
 # --------------------------------------------------------------------------- #
+def canonical_evidence_identity(ref: str, registry) -> str:
+    """TC-05: the CANONICAL underlying identity of a resolved evidence ref — the
+    registered object's record_id when it resolves, else the ref string. Two ref
+    strings that alias ONE evidence object share one canonical identity."""
+    try:
+        obj = registry.resolve(ref)
+    except Exception:
+        return ref
+    return str(getattr(obj, "record_id", None) or getattr(obj, "id", "") or ref)
+
+
 def cluster_verified_observation_paths(
     members: Sequence[UnresolvedPatternRecord], registry
 ) -> Tuple[str, ...]:
-    """Unique verified evidence paths across cluster members. A repeated
-    pattern record referencing the SAME underlying observation cannot inflate
-    the cluster's independent observation count."""
-    seen: List[str] = []
+    """Unique verified evidence paths across cluster members, deduped on the
+    CANONICAL underlying evidence identity (TC-05) — not on reference-string
+    identity. A repeated pattern record referencing the SAME underlying
+    observation cannot inflate the cluster's independent observation count, and
+    two ref strings that alias ONE registered evidence object count once."""
+    seen_canonical: List[str] = []
     for m in members:
         for r in (m.independence_evidence_refs or ()):
-            try:
-                registry.resolve(r)
-            except Exception:
-                continue
-            if r not in seen:
-                seen.append(r)
-    return tuple(seen)
+            canon = canonical_evidence_identity(r, registry)
+            if canon not in seen_canonical:
+                seen_canonical.append(canon)
+    return tuple(seen_canonical)
 
 
 # --------------------------------------------------------------------------- #
@@ -327,6 +416,107 @@ class DoctrineClaimAtom:
 
 
 # --------------------------------------------------------------------------- #
+# TC-02 — source-bound atoms FAIL CLOSED (no normalized-JSON laundering)
+# --------------------------------------------------------------------------- #
+FRAGMENT_STATUS_VERIFIED = "VERIFIED_IN_SOURCE"
+FRAGMENT_STATUS_UNRESOLVED = "SOURCE_FRAGMENT_UNRESOLVED"
+REPRESENTATION_VERBATIM = "VERBATIM_SOURCE"
+REPRESENTATION_NORMALIZED = "NORMALIZED_REPRESENTATION"
+REPRESENTATION_NORMALIZED_APPLICABILITY = "NORMALIZED_APPLICABILITY"
+
+
+@dataclass(frozen=True)
+class SourceFragmentAtom:
+    """TC-02: an atom labeled exact/verbatim MUST come from the bound source.
+    Carries the source file digest (whole bound file) and the fragment digest
+    (exact extracted bytes) plus an occurrence status. If the fragment cannot be
+    found in the bound source it is SOURCE_FRAGMENT_UNRESOLVED — never promoted
+    to an exact atom via a normalized-JSON fallback."""
+
+    atom_id: str
+    claim_id: str
+    source_path: str
+    locator: str
+    claim_kind: str
+    exact_fragment: str
+    fragment_status: str = FRAGMENT_STATUS_UNRESOLVED
+    representation_mode: str = REPRESENTATION_VERBATIM
+    source_file_digest: str = ""
+    fragment_digest: str = ""
+    manual_version: str = ""
+
+    @classmethod
+    def make(cls, atom_id, claim_id, source_path, locator, claim_kind, exact_fragment,
+             source_text: str = "", source_file_digest: str = "",
+             manual_version: str = "") -> "SourceFragmentAtom":
+        """Digests are computed from the EXACT bytes/text supplied. Occurrence is
+        verified against source_text when provided: a fragment that is NOT found in
+        the bound source is SOURCE_FRAGMENT_UNRESOLVED (fail closed)."""
+        frag = str(exact_fragment or "")
+        frag_digest = sha256_hex(frag.encode("utf-8"))
+        occurs = bool(frag) and bool(source_text) and (frag in source_text)
+        status = FRAGMENT_STATUS_VERIFIED if occurs else FRAGMENT_STATUS_UNRESOLVED
+        return cls(
+            atom_id=atom_id, claim_id=claim_id, source_path=source_path,
+            locator=locator, claim_kind=claim_kind, exact_fragment=frag,
+            fragment_status=status,
+            representation_mode=REPRESENTATION_VERBATIM if occurs else REPRESENTATION_NORMALIZED,
+            source_file_digest=source_file_digest, fragment_digest=frag_digest,
+            manual_version=manual_version,
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"atom_id": self.atom_id, "claim_id": self.claim_id,
+                "source_path": self.source_path, "locator": self.locator,
+                "claim_kind": self.claim_kind, "exact_fragment": self.exact_fragment,
+                "fragment_status": self.fragment_status,
+                "representation_mode": self.representation_mode,
+                "source_file_digest": self.source_file_digest,
+                "fragment_digest": self.fragment_digest,
+                "manual_version": self.manual_version}
+
+
+def verify_atom_occurs_in_source(atom: SourceFragmentAtom, source_text: str) -> bool:
+    """Re-derive whether the atom's exact fragment actually occurs in the bound
+    source text. Deterministic; no hashing tricks can launder a fragment that is
+    not present."""
+    return bool(atom.exact_fragment) and atom.exact_fragment in (source_text or "")
+
+
+@dataclass(frozen=True)
+class NormalizedDoctrineClaim:
+    """TC-02: the normalized numeric/structural machine representation of a
+    claim. It is SEPARATE from any exact source atom and is never labeled exact
+    or verbatim. `derived_from_atom_refs` records which source-bound atom(s) it
+    was derived from (empty when the source atom is unresolved)."""
+
+    claim_id: str
+    representation: Mapping[str, Any]
+    representation_digest: str
+    derived_from_atom_refs: Tuple[str, ...] = ()
+    representation_kind: str = REPRESENTATION_NORMALIZED
+
+    @classmethod
+    def make(cls, claim_id, representation: Mapping[str, Any],
+             derived_from_atom_refs=()) -> "NormalizedDoctrineClaim":
+        canon = deterministic_hex("normalized_claim", claim_id, dict(representation))
+        return cls(
+            claim_id=claim_id,
+            representation=dict(representation),
+            representation_digest=canon,
+            derived_from_atom_refs=tuple(derived_from_atom_refs),
+            representation_kind=REPRESENTATION_NORMALIZED,
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"claim_id": self.claim_id,
+                "representation": dict(self.representation),
+                "representation_digest": self.representation_digest,
+                "representation_kind": self.representation_kind,
+                "derived_from_atom_refs": list(self.derived_from_atom_refs)}
+
+
+# --------------------------------------------------------------------------- #
 # G5R-06 — reproduction protocol + DERIVED quality
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
@@ -396,15 +586,139 @@ class ReproductionProtocol:
         return d
 
 
+# TC-03: reproduction fidelity vocabulary. 'CLEAN' is always scoped to the
+# CHECKED surface; it must never be read as whole-protocol validation.
+FIDELITY_FULL = "FULL_PROTOCOL_VERIFIED"
+FIDELITY_PARTIAL = "PARTIAL_PROTOCOL_COVERAGE"
+FIDELITY_FLAWED = "FLAWED_REPRODUCTION"
+FIDELITY_UNASSESSED = "UNASSESSED"
+
+# per-dimension classification vocabulary (TC-03)
+DIM_VERIFIED = "VERIFIED"
+DIM_MISMATCH = "MISMATCH"
+DIM_NOT_APPLICABLE = "NOT_APPLICABLE"
+DIM_UNVERIFIED = "UNVERIFIED"
+DIM_NOT_DOCTRINE_COMPARABLE = "NOT_DOCTRINE_COMPARABLE"
+
+PROTOCOL_DIMENSIONS = (
+    "claim_ref", "session", "tiers", "PIT", "metric_definition",
+    "observed_metric_identity", "units", "sample_definition",
+    "execution_assumptions", "feature_definitions", "evaluation_criterion",
+    "falsification_criterion", "dataset_lineage", "implementation_version",
+    "independence_lineage",
+)
+
+
+def classify_protocol_dimensions(
+    protocol: ReproductionProtocol,
+    claim: DoctrineClaimRecord,
+) -> Tuple[Tuple[str, str], ...]:
+    """TC-03: classify each protocol dimension as VERIFIED / MISMATCH /
+    NOT_APPLICABLE / UNVERIFIED / NOT_DOCTRINE_COMPARABLE. A dimension is only
+    VERIFIED or MISMATCH when the doctrine claim actually defines a contract for
+    it; where the source has no doctrine contract the dimension is
+    NOT_DOCTRINE_COMPARABLE (never a silent pass). observed_metric_identity and
+    units are NOT_APPLICABLE here because they are validated by the measured-
+    comparison contract (TC-04) against an observed result, which this
+    protocol-vs-claim assessment does not carry."""
+    out: List[Tuple[str, str]] = []
+    num = claim.numeric_parameters or {}
+
+    out.append(("claim_ref", DIM_VERIFIED if (protocol.claim_ref == claim.claim_id)
+                else DIM_MISMATCH))
+
+    claim_window = str(num.get("session_window", "") or "")
+    if claim_window:
+        ok = bool(protocol.session_window) and (
+            claim_window in protocol.session_window
+            or protocol.session_window in claim_window)
+        out.append(("session", DIM_VERIFIED if ok else DIM_MISMATCH))
+    else:
+        out.append(("session", DIM_NOT_DOCTRINE_COMPARABLE))
+
+    claim_tiers = tuple(num.get("tier_constraints", []) or [])
+    if claim_tiers:
+        ok = all(t in protocol.tier_constraints for t in claim_tiers)
+        out.append(("tiers", DIM_VERIFIED if ok else DIM_MISMATCH))
+    else:
+        out.append(("tiers", DIM_NOT_DOCTRINE_COMPARABLE))
+
+    # PIT: the doctrine claim defines no PIT contract in this fixture surface;
+    # the protocol's own PIT discipline is a checked surface (non-empty rules
+    # = VERIFIED; empty = UNVERIFIED and gates quality to FLAWED).
+    if protocol.pit_rules and all(str(r).strip() for r in protocol.pit_rules):
+        out.append(("PIT", DIM_VERIFIED))
+    else:
+        out.append(("PIT", DIM_UNVERIFIED))
+
+    claim_has_target_metric = bool(num.get("win_rate_band"))
+    if claim_has_target_metric:
+        ok = bool(protocol.metric_definition) and bool(str(protocol.metric_definition).strip())
+        out.append(("metric_definition", DIM_VERIFIED if ok else DIM_MISMATCH))
+    else:
+        if protocol.metric_definition and bool(str(protocol.metric_definition).strip()):
+            out.append(("metric_definition", DIM_NOT_DOCTRINE_COMPARABLE))
+        else:
+            out.append(("metric_definition", DIM_UNVERIFIED))
+
+    # observed metric identity + units belong to the measured-comparison
+    # contract (TC-04); this assessment has no observed result.
+    out.append(("observed_metric_identity", DIM_NOT_APPLICABLE))
+    out.append(("units", DIM_NOT_APPLICABLE))
+
+    # dimensions with no doctrine contract in the claim fixture:
+    for dim in ("sample_definition", "execution_assumptions", "feature_definitions",
+                "evaluation_criterion", "falsification_criterion", "dataset_lineage",
+                "implementation_version", "independence_lineage"):
+        out.append((dim, DIM_NOT_DOCTRINE_COMPARABLE))
+    return tuple(out)
+
+
+def derive_fidelity(
+    quality: str,
+    dimension_classifications: Sequence[Tuple[str, str]],
+) -> Tuple[str, str]:
+    """TC-03: fidelity + clean-surface scope derived from the dimension
+    classification. CLEAN never implies whole-protocol validation:
+
+      * any MISMATCH / FLAWED quality      -> FLAWED_REPRODUCTION
+      * any material UNVERIFIED dimension  -> PARTIAL_PROTOCOL_COVERAGE
+      * FULL_PROTOCOL_VERIFIED only when every dimension is VERIFIED or
+        NOT_APPLICABLE (i.e. the whole assessed surface is actually verified).
+    """
+    if quality == "FLAWED":
+        return FIDELITY_FLAWED, "CHECKED_SURFACE_ONLY"
+    labels = {d: c for d, c in dimension_classifications}
+    if DIM_MISMATCH in labels.values():
+        return FIDELITY_FLAWED, "CHECKED_SURFACE_ONLY"
+    material_unverified = [d for d, c in dimension_classifications
+                           if c == DIM_UNVERIFIED]
+    if material_unverified:
+        return FIDELITY_PARTIAL, "CHECKED_SURFACE_ONLY"
+    not_comparable = [d for d, c in dimension_classifications
+                      if c in (DIM_NOT_DOCTRINE_COMPARABLE,)]
+    if not_comparable:
+        # doctrine defines no contract for these dimensions, so the protocol
+        # could not be verified against doctrine for them — coverage is partial.
+        return FIDELITY_PARTIAL, "CHECKED_SURFACE_ONLY"
+    return FIDELITY_FULL, "FULL_ASSESSED_SURFACE"
+
+
 @dataclass(frozen=True)
 class ReproductionQualityAssessment:
     """Reproduction quality is DERIVED from structured protocol-vs-claim
     comparison, never self-declared. A fixture's `known_deviations=[]` cannot
     make a reproduction clean when its structured conditions disagree with the
-    doctrine applicability contract."""
+    doctrine applicability contract.
+
+    TC-03: `quality` (CLEAN | FLAWED) is always scoped to the CHECKED surface:
+    `clean_surface` says so, and `fidelity` (FULL_PROTOCOL_VERIFIED /
+    PARTIAL_PROTOCOL_COVERAGE / FLAWED_REPRODUCTION) carries the whole-protocol
+    verdict. CLEAN + PARTIAL is the normal honest outcome wherever the doctrine
+    defines no contract for part of the protocol."""
 
     reproduction_id: str
-    quality: str                    # CLEAN | FLAWED
+    quality: str                    # CLEAN | FLAWED (checked surface only)
     session_match: bool = False
     tier_match: bool = False
     pit_clean: bool = False
@@ -415,6 +729,9 @@ class ReproductionQualityAssessment:
     unchecked_dimensions: Tuple[str, ...] = ()
     deviations: Tuple[str, ...] = ()
     reasons: Tuple[str, ...] = ()
+    fidelity: str = FIDELITY_UNASSESSED
+    clean_surface: str = ""
+    dimension_classifications: Tuple[Tuple[str, str], ...] = ()
 
     def to_dict(self) -> Dict[str, Any]:
         return {"reproduction_id": self.reproduction_id, "quality": self.quality,
@@ -425,7 +742,9 @@ class ReproductionQualityAssessment:
                 "claim_ref_match": self.claim_ref_match,
                 "metric_definition_present": self.metric_definition_present,
                 "unchecked_dimensions": list(self.unchecked_dimensions),
-                "deviations": list(self.deviations), "reasons": list(self.reasons)}
+                "deviations": list(self.deviations), "reasons": list(self.reasons),
+                "fidelity": self.fidelity, "clean_surface": self.clean_surface,
+                "dimension_classifications": [list(p) for p in self.dimension_classifications]}
 
 
 def derive_reproduction_quality(
@@ -525,6 +844,10 @@ def derive_reproduction_quality(
         quality = "FLAWED"
     else:
         quality = "CLEAN"
+    # TC-03: derive per-dimension classification + fidelity scope. quality stays
+    # scoped to the checked surface; fidelity carries the whole-protocol verdict.
+    dims = classify_protocol_dimensions(protocol, claim)
+    fidelity, clean_surface = derive_fidelity(quality, dims)
     return ReproductionQualityAssessment(
         reproduction_id=protocol.protocol_id,
         quality=quality,
@@ -538,6 +861,9 @@ def derive_reproduction_quality(
         claim_ref_match=claim_ref_match,
         metric_definition_present=metric_def_present,
         unchecked_dimensions=unchecked,
+        fidelity=fidelity,
+        clean_surface=clean_surface,
+        dimension_classifications=dims,
     )
 
 
@@ -556,10 +882,13 @@ class ObservedResult:
     sample_size: int = 0
     units: str = ""
     source_refs: Tuple[str, ...] = ()
+    result_seq: int = 0          # TC-01: logical evaluation sequence of this result
+    evaluation_seq: int = 0      # TC-01: alias kept for explicit evaluation sequencing
 
     @classmethod
     def from_fixture(cls, data: Mapping[str, Any]) -> "ObservedResult":
         iv = data.get("uncertainty_interval", (data.get("estimate", 0.0), data.get("estimate", 0.0)))
+        seq = int(data.get("result_seq", data.get("evaluation_seq", 0)) or 0)
         return cls(
             metric=str(data.get("metric", "")),
             estimate=float(data.get("estimate", 0.0)),
@@ -567,13 +896,16 @@ class ObservedResult:
             sample_size=int(data.get("sample_size", 0)),
             units=str(data.get("units", "")),
             source_refs=tuple(data.get("source_refs", [])),
+            result_seq=seq,
+            evaluation_seq=seq,
         )
 
     def to_dict(self) -> Dict[str, Any]:
         return {"metric": self.metric, "estimate": self.estimate,
                 "uncertainty_interval": list(self.uncertainty_interval),
                 "sample_size": self.sample_size, "units": self.units,
-                "source_refs": list(self.source_refs)}
+                "source_refs": list(self.source_refs), "result_seq": self.result_seq,
+                "evaluation_seq": self.evaluation_seq}
 
 
 @dataclass(frozen=True)
@@ -654,6 +986,156 @@ def compare_measured_result(observed: ObservedResult, claim_interval: Sequence[f
         observed_interval=(lo, hi),
         claim_interval=(c_lo, c_hi), verdict=verdict, rationale=rationale,
     )
+
+
+# --------------------------------------------------------------------------- #
+# TC-04 — measured comparison CONTRACT (validate before comparing values)
+# --------------------------------------------------------------------------- #
+COMPARISON_READY = "READY_TO_COMPARE"
+COMPARISON_BLOCKERS = (
+    "METRIC_MISMATCH", "UNITS_INCOMPATIBLE", "INVALID_INTERVAL",
+    "INVALID_CLAIM_INTERVAL", "ESTIMATE_OUTSIDE_UNCERTAINTY", "SAMPLE_REQUIRED",
+)
+
+
+@dataclass(frozen=True)
+class MeasuredComparisonContract:
+    """TC-04: two floats are NOT comparable merely because both are floats.
+    Before compare_measured_result may compare values, the observation must
+    match the target metric contract, units must be compatible, both intervals
+    valid, the estimate inside its own uncertainty interval (unless explicitly
+    allowed), and a positive sample size present where sample evidence is
+    required. Any blocker -> the comparison must not run (fail closed)."""
+
+    metric_ok: bool
+    units_ok: bool
+    interval_valid: bool
+    claim_interval_valid: bool
+    estimate_in_interval: bool
+    sample_ok: bool
+    readiness: str            # READY_TO_COMPARE | one of COMPARISON_BLOCKERS
+    rationale: str = ""
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"metric_ok": self.metric_ok, "units_ok": self.units_ok,
+                "interval_valid": self.interval_valid,
+                "claim_interval_valid": self.claim_interval_valid,
+                "estimate_in_interval": self.estimate_in_interval,
+                "sample_ok": self.sample_ok, "readiness": self.readiness,
+                "rationale": self.rationale}
+
+
+def validate_measured_comparison_contract(
+    observed: ObservedResult,
+    claim_interval: Sequence[float],
+    expected_metric: str = "",
+    claim_metric: str = "",
+    claim_units: str = "",
+    require_sample: bool = True,
+    allow_estimate_outside_interval: bool = False,
+) -> MeasuredComparisonContract:
+    """Deterministic contract validation for a measured-vs-doctrine comparison.
+
+    Metric identity: observed.metric must equal the claim's target metric when a
+    contract is declared (expected_metric == claim_metric == observed.metric).
+    Units: when the claim declares units, observed.units must match them.
+    Intervals: lo <= hi and finite for both observed and claim; an inverted or
+    non-finite interval is a blocker, never a contradiction.
+    Estimate: must lie inside its own uncertainty interval unless explicitly
+    allowed (an estimate outside its own interval is malformed input).
+    Sample: sample_size > 0 where sample evidence is required.
+    """
+    reasons: List[str] = []
+    lo, hi = float(observed.uncertainty_interval[0]), float(observed.uncertainty_interval[1])
+    c_lo, c_hi = float(claim_interval[0]), float(claim_interval[1])
+    iv_ok = (lo <= hi) and _finite(lo) and _finite(hi)
+    if not iv_ok:
+        reasons.append(f"observed interval invalid: ({lo}, {hi})")
+    civ_ok = (c_lo <= c_hi) and _finite(c_lo) and _finite(c_hi)
+    if not civ_ok:
+        reasons.append(f"claim interval invalid: ({c_lo}, {c_hi})")
+
+    metric_ok = True
+    if expected_metric:
+        metric_ok = (observed.metric == expected_metric)
+        if claim_metric and claim_metric != expected_metric:
+            metric_ok = False
+        if not metric_ok:
+            reasons.append(
+                f"metric mismatch: observed {observed.metric!r} vs doctrine target "
+                f"{expected_metric!r}")
+    elif claim_metric and observed.metric != claim_metric:
+        metric_ok = False
+        reasons.append(f"metric mismatch: observed {observed.metric!r} vs claim {claim_metric!r}")
+
+    units_ok = True
+    if claim_units:
+        units_ok = (observed.units == claim_units)
+        if not units_ok:
+            reasons.append(f"units incompatible: observed {observed.units!r} vs claim {claim_units!r}")
+    elif observed.units:
+        # units declared on the observation but no claim contract -> cannot
+        # confirm compatibility; treat as incompatible to avoid comparing
+        # unlike quantities (fail closed on unverified semantics).
+        units_ok = False
+        reasons.append(f"observed units {observed.units!r} but claim declares no units contract")
+
+    estimate_in = (lo <= observed.estimate <= hi)
+    if not estimate_in and not allow_estimate_outside_interval:
+        reasons.append(
+            f"estimate {observed.estimate} outside its own uncertainty interval "
+            f"({lo}, {hi}) — malformed observed result")
+
+    sample_ok = (observed.sample_size > 0) or (not require_sample)
+    if not sample_ok:
+        reasons.append("sample_size <= 0 while sample evidence is required")
+
+    blocker = ""
+    if not metric_ok:
+        blocker = "METRIC_MISMATCH"
+    elif not units_ok:
+        blocker = "UNITS_INCOMPATIBLE"
+    elif not iv_ok:
+        blocker = "INVALID_INTERVAL"
+    elif not civ_ok:
+        blocker = "INVALID_CLAIM_INTERVAL"
+    elif not estimate_in and not allow_estimate_outside_interval:
+        blocker = "ESTIMATE_OUTSIDE_UNCERTAINTY"
+    elif not sample_ok:
+        blocker = "SAMPLE_REQUIRED"
+    return MeasuredComparisonContract(
+        metric_ok=metric_ok, units_ok=units_ok,
+        interval_valid=iv_ok, claim_interval_valid=civ_ok,
+        estimate_in_interval=estimate_in, sample_ok=sample_ok,
+        readiness=blocker if blocker else COMPARISON_READY,
+        rationale="; ".join(reasons) if reasons else "contract valid — ready to compare",
+    )
+
+
+def _finite(x: float) -> bool:
+    import math
+    return math.isfinite(x)
+
+
+def compare_measured_result_guarded(
+    observed: ObservedResult,
+    claim_interval: Sequence[float],
+    expected_metric: str = "",
+    claim_metric: str = "",
+    claim_units: str = "",
+    require_sample: bool = True,
+    allow_estimate_outside_interval: bool = False,
+) -> Tuple[Optional[MeasuredComparisonContract], Optional[DoctrineComparison]]:
+    """TC-04: run the contract first; compare ONLY when READY_TO_COMPARE.
+    Returns (contract, comparison) — comparison is None when the contract blocks."""
+    contract = validate_measured_comparison_contract(
+        observed, claim_interval, expected_metric=expected_metric,
+        claim_metric=claim_metric, claim_units=claim_units,
+        require_sample=require_sample,
+        allow_estimate_outside_interval=allow_estimate_outside_interval)
+    if contract.readiness != COMPARISON_READY:
+        return contract, None
+    return contract, compare_measured_result(observed, claim_interval)
 
 
 # --------------------------------------------------------------------------- #
@@ -935,6 +1417,143 @@ def validate_transfer_map(tmap: TransferInvariantMap) -> TransferMapValidationRe
 
 
 # --------------------------------------------------------------------------- #
+# TC-01 — real freeze proof: structured chronology, not "trust me" text
+# --------------------------------------------------------------------------- #
+FREEZE_CHRONOLOGY_STATUSES = (
+    "FROZEN_BEFORE_RESULT_VERIFIED",   # recomputed fp == stored fp AND freeze_seq < result_seq AND refs resolve
+    "NO_FREEZE_RECORD",                # protocol carries no stored frozen fingerprint
+    "FINGERPRINT_MISMATCH",            # stored fingerprint != recomputed canonical fingerprint (forged or stale-after-mutation)
+    "FREEZE_RECORD_INCOMPLETE",        # fingerprint valid but no structured freeze witness (text alone never proves)
+    "RESULT_PRECEDES_FREEZE",          # freeze_seq >= result_seq (chronology impossible)
+    "FREEZE_EVIDENCE_REFS_UNRESOLVED", # freeze evidence refs do not all resolve in the registry
+    "FREEZE_EVIDENCE_REFS_UNVERIFIED", # freeze evidence refs present but no registry supplied — cannot verify
+)
+
+
+@dataclass(frozen=True)
+class FreezeChronologyProof:
+    """Deterministic proof that a protocol was frozen BEFORE an observed result.
+    Distinguishes CURRENT-OBJECT CONSISTENCY (recomputed fingerprint == stored)
+    from HISTORICAL FREEZE INTEGRITY (freeze_seq < result_seq + witness)."""
+
+    protocol_ref: str
+    stored_fingerprint: str
+    recomputed_fingerprint: str
+    fingerprint_valid: bool
+    freeze_seq: int
+    result_seq: int
+    chronology_ok: bool          # freeze_seq < result_seq
+    structured_freeze: bool      # protocol carries a structured freeze witness
+    evidence_refs_resolve: Optional[bool] = None   # None = no refs to check / no registry
+    status: str = "NO_FREEZE_RECORD"
+    reason: str = ""
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"protocol_ref": self.protocol_ref,
+                "stored_fingerprint": self.stored_fingerprint,
+                "recomputed_fingerprint": self.recomputed_fingerprint,
+                "fingerprint_valid": self.fingerprint_valid,
+                "freeze_seq": self.freeze_seq, "result_seq": self.result_seq,
+                "chronology_ok": self.chronology_ok,
+                "structured_freeze": self.structured_freeze,
+                "evidence_refs_resolve": self.evidence_refs_resolve,
+                "status": self.status, "reason": self.reason}
+
+
+def verify_freeze_chronology(
+    protocol: FrozenExperimentProtocol,
+    result_seq: int,
+    registry=None,
+) -> FreezeChronologyProof:
+    """TC-01: prove (or fail) that a frozen protocol predates an observed result.
+
+    Fail-closed ladder (first failed rung decides):
+      1. a STORED frozen fingerprint must exist                 -> NO_FREEZE_RECORD
+      2. recomputed canonical fingerprint == stored fingerprint -> FINGERPRINT_MISMATCH
+         (a forged stored fingerprint OR a stale fingerprint left behind after a
+         post-freeze field mutation both land here — the stored value does not
+         match what the CURRENT canonical fields produce);
+      3. a STRUCTURED freeze witness must exist (freeze_seq/epoch/authority) —
+         free-form frozen_before_result_evidence text alone proves nothing;
+      4. freeze evidence refs, when declared, must resolve        -> *_REFS_*
+         (a registry must be supplied to verify them; without one the proof is
+         UNVERIFIED, never claimed resolved);
+      5. freeze_seq < result_seq                                 -> RESULT_PRECEDES_FREEZE
+
+    Logical chronology is used (deterministic seq), not wall clock.
+    """
+    stored = str(protocol.fingerprint or "")
+    if not stored:
+        return FreezeChronologyProof(
+            protocol_ref=protocol.protocol_id, stored_fingerprint="",
+            recomputed_fingerprint="", fingerprint_valid=False,
+            freeze_seq=protocol.freeze_seq, result_seq=int(result_seq or 0),
+            chronology_ok=False, structured_freeze=protocol.structured_freeze_present(),
+            status="NO_FREEZE_RECORD",
+            reason="protocol carries no stored frozen fingerprint — freeze cannot be proven")
+    recomputed = protocol.compute_fingerprint_canonical()
+    if recomputed != stored:
+        return FreezeChronologyProof(
+            protocol_ref=protocol.protocol_id, stored_fingerprint=stored,
+            recomputed_fingerprint=recomputed, fingerprint_valid=False,
+            freeze_seq=protocol.freeze_seq, result_seq=int(result_seq or 0),
+            chronology_ok=False, structured_freeze=protocol.structured_freeze_present(),
+            status="FINGERPRINT_MISMATCH",
+            reason=("stored fingerprint != recomputed canonical fingerprint — the stored value "
+                    "is forged or stale (fields mutated after freeze); CURRENT OBJECT CONSISTENCY "
+                    "is broken, so no freeze claim can be trusted"))
+    if not protocol.structured_freeze_present():
+        return FreezeChronologyProof(
+            protocol_ref=protocol.protocol_id, stored_fingerprint=stored,
+            recomputed_fingerprint=recomputed, fingerprint_valid=True,
+            freeze_seq=protocol.freeze_seq, result_seq=int(result_seq or 0),
+            chronology_ok=False, structured_freeze=False,
+            status="FREEZE_RECORD_INCOMPLETE",
+            reason=("fingerprint is self-consistent but no STRUCTURED freeze witness exists; "
+                    "free-form 'frozen_before_result_evidence' text alone must not prove chronology"))
+    refs = tuple(protocol.freeze_evidence_refs or ())
+    if refs:
+        if registry is None:
+            return FreezeChronologyProof(
+                protocol_ref=protocol.protocol_id, stored_fingerprint=stored,
+                recomputed_fingerprint=recomputed, fingerprint_valid=True,
+                freeze_seq=protocol.freeze_seq, result_seq=int(result_seq or 0),
+                chronology_ok=False, structured_freeze=True,
+                evidence_refs_resolve=None, status="FREEZE_EVIDENCE_REFS_UNVERIFIED",
+                reason="freeze evidence refs declared but no registry supplied — refs cannot be verified")
+        unresolved = [r for r in refs if not registry.has(r)]
+        if unresolved:
+            return FreezeChronologyProof(
+                protocol_ref=protocol.protocol_id, stored_fingerprint=stored,
+                recomputed_fingerprint=recomputed, fingerprint_valid=True,
+                freeze_seq=protocol.freeze_seq, result_seq=int(result_seq or 0),
+                chronology_ok=False, structured_freeze=True,
+                evidence_refs_resolve=False, status="FREEZE_EVIDENCE_REFS_UNRESOLVED",
+                reason=f"freeze evidence refs do not resolve in the registry: {unresolved}")
+    freeze_seq = int(protocol.freeze_seq or 0)
+    result_seq_i = int(result_seq or 0)
+    if freeze_seq >= result_seq_i:
+        return FreezeChronologyProof(
+            protocol_ref=protocol.protocol_id, stored_fingerprint=stored,
+            recomputed_fingerprint=recomputed, fingerprint_valid=True,
+            freeze_seq=freeze_seq, result_seq=result_seq_i,
+            chronology_ok=False, structured_freeze=True,
+            evidence_refs_resolve=(True if refs else None),
+            status="RESULT_PRECEDES_FREEZE",
+            reason=(f"freeze_seq {freeze_seq} is not < result_seq {result_seq_i} — the result "
+                    f"cannot have been produced after the freeze"))
+    return FreezeChronologyProof(
+        protocol_ref=protocol.protocol_id, stored_fingerprint=stored,
+        recomputed_fingerprint=recomputed, fingerprint_valid=True,
+        freeze_seq=freeze_seq, result_seq=result_seq_i,
+        chronology_ok=True, structured_freeze=True,
+        evidence_refs_resolve=(True if refs else None),
+        status="FROZEN_BEFORE_RESULT_VERIFIED",
+        reason=(f"recomputed canonical fingerprint == stored frozen fingerprint; "
+                f"freeze_seq {freeze_seq} < result_seq {result_seq_i}; chronology proven"))
+
+
+# --------------------------------------------------------------------------- #
 # G5R-21 — frozen target protocol resolution
 # --------------------------------------------------------------------------- #
 @dataclass(frozen=True)
@@ -996,15 +1615,37 @@ def resolve_frozen_target_protocol(
         return FrozenProtocolResolution(
             protocol_ref=ref, resolved=True, target_domain_ok=False,
             claim_hypothesis_ok=False, fingerprint_valid=fp_ok,
-            frozen_before_result=bool(protocol.frozen_before_result_evidence),
+            frozen_before_result=protocol.structured_freeze_present(),
             protocol=protocol,
             reason=(f"registered protocol {ref!r} was frozen for target domain "
                     f"{protocol.target_domain!r}, not {hypothesis.target_domain!r}"))
-    # frozen_before_result must be evidenced, not merely asserted. The
-    # frozen_before_result_evidence field records HOW we know the protocol was
-    # frozen before any result evaluation (e.g. registration timestamp, explicit
-    # freeze statement). A protocol with no such evidence does not authorize.
-    fbr_evidenced = bool(protocol.frozen_before_result_evidence)
+    # TC-01 / AMB-G5R-02: claim_hypothesis_ok must be a TESTED linkage, never a
+    # default-true. The protocol's mechanism_ref must bind to the hypothesis's
+    # mechanism identity (hypothesis.mechanism_ref, falling back to the
+    # hypothesis_id which IS the mechanism identity in this domain object model).
+    # Where no such binding exists, claim_hypothesis_ok stays False and the reason
+    # documents that claim linkage is mechanism-mediated only (the protocol carries
+    # no direct claim_ref — this is stated, not hidden).
+    mech = (hypothesis.mechanism_ref or hypothesis.hypothesis_id or "").strip()
+    protocol_mech = (protocol.mechanism_ref or "").strip()
+    binding_ok = bool(mech) and bool(protocol_mech) and protocol_mech == mech
+    if not binding_ok:
+        return FrozenProtocolResolution(
+            protocol_ref=ref, resolved=True, target_domain_ok=True,
+            claim_hypothesis_ok=False, fingerprint_valid=fp_ok,
+            frozen_before_result=protocol.structured_freeze_present(),
+            protocol=protocol,
+            reason=(f"protocol mechanism_ref {protocol_mech!r} does not bind to the "
+                    f"hypothesis mechanism identity {mech!r}; claim-hypothesis linkage "
+                    f"is mechanism-mediated (protocol carries no direct claim_ref) and "
+                    f"is NOT set true without a tested binding"))
+    # frozen_before_result must be STRUCTURALLY evidenced (TC-01). Free-form
+    # frozen_before_result_evidence text alone no longer proves chronology — the
+    # protocol must carry a structured freeze witness (freeze_seq/epoch/authority
+    # and/or freeze evidence refs). Full chronological proof against a specific
+    # result seq is computed by verify_freeze_chronology(); this resolver proves
+    # the freeze record exists and is self-consistent.
+    fbr_evidenced = protocol.structured_freeze_present()
     return FrozenProtocolResolution(
         protocol_ref=ref, resolved=True,
         target_domain_ok=True,
@@ -1013,9 +1654,11 @@ def resolve_frozen_target_protocol(
         frozen_before_result=fbr_evidenced,
         protocol=protocol,
         reason=("frozen protocol registered; ref/domain/fingerprint verified; "
-                f"frozen_before_result evidenced" if fbr_evidenced else
+                "mechanism binding verified; structured freeze witness present"
+                if fbr_evidenced else
                 "frozen protocol registered; ref/domain/fingerprint verified; "
-                "frozen_before_result NOT evidenced"))
+                "mechanism binding verified; NO structured freeze witness — "
+                "freeze-before-result NOT evidenced"))
 
 
 # --------------------------------------------------------------------------- #

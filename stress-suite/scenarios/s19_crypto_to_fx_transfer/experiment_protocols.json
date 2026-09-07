@@ -14,6 +14,13 @@
     "cost_execution_assumptions": ["fx venue session boundaries", "2bp round-trip"],
     "promotion_criteria": ["falsification criteria pass", "independent confirmation of at least 2 lineages"],
     "target_domain": "FX",
-    "frozen_before_result_evidence": "registered frozen protocol; frozen before any target-domain result evaluation; protocol_id PROTO_TC1_FX present at scenario load"
+    "frozen_before_result_evidence": "registered frozen protocol; frozen before any target-domain result evaluation; protocol_id PROTO_TC1_FX present at scenario load",
+    "freeze_seq": 1,
+    "freeze_epoch": "EPOCH_TC1_LOAD",
+    "frozen_by": "GOVERNOR_G5R_TEST",
+    "authority_basis": "registered at scenario load before any target-domain result evaluation",
+    "freeze_evidence_refs": [
+      "TC1_FREEZE_REGISTRATION"
+    ]
   }
 ]
