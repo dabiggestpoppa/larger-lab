@@ -434,24 +434,51 @@ def _configure_unlock() -> None:
 _CONFIGURE_LOCK_FILE = None
 
 
-def _configure_pause_point(stage: str) -> None:
-    """Deterministic interruption hook for crash/concurrency tests
-    (B4-CXR7U8-04). Purely test/CI instrumentation, carried OUTSIDE the
-    governed OCE_* namespace so the fail-closed namespace policy never sees
-    it: when CXR7U8_CONFIGURE_PAUSE_STAGE names the current stage, block
-    until the process is killed or a release file
-    (CXR7U8_CONFIGURE_RELEASE_FILE) appears. Production never sets these;
-    without them this returns immediately and adds no behavior."""
-    pause = os.environ.get("CXR7U8_CONFIGURE_PAUSE_STAGE", "")
-    if pause != stage:
-        return
-    release = os.environ.get("CXR7U8_CONFIGURE_RELEASE_FILE", "")
-    deadline = time.time() + 300
-    while time.time() < deadline:
-        if release and os.path.exists(release):
+# B4-CXR7U9R3: PRIVATE test-interruption seam. Production configure NEVER
+# consumes ambient environment variables for test control — an env var that
+# could delay or alter production configuration behavior is a production
+# input (and invisible to the governed OCE_* namespace inventory). The seam
+# lives in a module-private controller that:
+#   * production code never activates (no CLI flag, no env read, no default);
+#   * only a test driver importing oce_control.local_lifecycle and mutating
+#     this private object can arm;
+#   * changes TIMING ONLY — it grants no configuration, secret, or
+#     authority power whatsoever.
+class _ConfigureInterruptionController:
+    """Private interruption controller for crash/concurrency tests.
+
+    Armed ONLY by a test harness assigning ``stages`` (dict stage -> release
+    file path). Each stage in ``stages`` blocks configure() at that stage's
+    pause point until the named release file appears (or the deadline
+    expires). Disarmed by default: production behavior is untouched.
+    """
+
+    def __init__(self):
+        self.stages: dict = {}
+        self.deadline_seconds = 300
+
+    def wait_for_release(self, stage: str) -> None:
+        release = self.stages.get(stage)
+        if release is None:
             return
-        time.sleep(0.02)
-    raise RuntimeError(f"configure pause at {stage} timed out")
+        deadline = time.time() + self.deadline_seconds
+        while time.time() < deadline:
+            if os.path.exists(release):
+                return
+            time.sleep(0.02)
+        raise RuntimeError(f"configure pause at {stage} timed out")
+
+
+# Module-private singleton; tests arm/clear it directly. Never read from
+# environment, CLI, or any ambient input.
+_configure_interruption = _ConfigureInterruptionController()
+
+
+def _configure_pause_point(stage: str) -> None:
+    """Internal pause hook: consults ONLY the private controller above.
+    Production never arms it; without an armed stage this returns
+    immediately and adds no behavior."""
+    _configure_interruption.wait_for_release(stage)
 
 
 def _encode_snapshot(snapshot: dict) -> dict:
