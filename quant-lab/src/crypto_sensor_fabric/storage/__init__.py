@@ -121,7 +121,10 @@ from .manifests import (
     NoUsableAcquisitionProvenance,
     PartitionCurrentPointer,
     PartitionManifestRepository,
+    ProjectionLineageResolver,
     PointerFaultPoint,
+    ProjectionSourceMismatch,
+    DanglingProjectionReference,
     RaisePointerFaultHook,
 )
 from .models import (

@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 import pyarrow as pa
 
@@ -99,6 +99,37 @@ class CurrentPointerCorrupt(CatalogError):
 
 class CurrentPointerDangling(CatalogError):
     """The current pointer references a missing/corrupt manifest fragment."""
+
+
+class DanglingProjectionReference(CatalogError):
+    """PartitionManifest references a projection_id that has no committed
+    artifact or lineage (I05 §47)."""
+
+
+class ProjectionSourceMismatch(CatalogError):
+    """Projection source blobs are not visible in the manifest blob_refs
+    (I05 §51/§92)."""
+
+
+@runtime_checkable
+class ProjectionLineageResolver(Protocol):
+    """Protocol for projection lineage resolution dependency.
+
+    Injected into PartitionManifestRepository to validate projection_refs.
+    Avoids hidden globals and circular imports (I05 §49).
+    """
+
+    def validate_projection_ref(
+        self,
+        projection_id: str,
+        manifest: object,
+    ) -> None:
+        """Validate a single projection_id against artifact + lineage.
+
+        Raises DanglingProjectionReference, ProjectionSourceMismatch, or
+        other CatalogError if validation fails.
+        """
+        ...
 
 
 class MissingAcquisitionProvenance(CatalogError):
@@ -495,6 +526,7 @@ class PartitionManifestRepository:
         blob_store: LocalBlobStore,
         blob_metadata_repository: BlobMetadataRepository,
         acquisition_repository: AcquisitionRepository,
+        projection_lineage_resolver: ProjectionLineageResolver | None = None,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         self.root = resolve_catalog_root(root)
@@ -507,6 +539,7 @@ class PartitionManifestRepository:
                 "hidden global state)"
             )
         self._acquisitions = acquisition_repository
+        self._projection_resolver = projection_lineage_resolver
         self._clock: Callable[[], datetime] = (
             clock if clock is not None else lambda: datetime.now(UTC)
         )
@@ -747,11 +780,19 @@ class PartitionManifestRepository:
 
     def _validate_referential_integrity(self, manifest: PartitionManifest) -> None:
         if manifest.projection_refs:
-            raise ProjectionReferenceUnavailable(
-                "PartitionManifest carries projection_refs but I05 owns T0B "
-                "projections — I04 manifest writes keep projection_refs "
-                "EMPTY and fail closed on dangling projection refs (I04 §20)"
-            )
+            if self._projection_resolver is None:
+                # No projection repository configured: fail closed (I04 §20)
+                raise ProjectionReferenceUnavailable(
+                    "PartitionManifest carries projection_refs but no "
+                    "ProjectionLineageResolver is configured — fail closed "
+                    "on dangling projection refs (I04 §20)"
+                )
+            # I05 §47/§48/§50: validate each projection ref against
+            # artifact + lineage + partition match.
+            for projection_id in manifest.projection_refs:
+                self._projection_resolver.validate_projection_ref(
+                    projection_id, manifest
+                )
         if not manifest.blob_refs:
             if _integrity_strength(manifest.integrity_state) > 0:
                 raise CatalogIntegrityError(
