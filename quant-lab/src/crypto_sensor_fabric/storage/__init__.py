@@ -150,6 +150,15 @@ from .paths import (
     resolve_under_root,
     unescape_path_segment,
 )
+from .projection_schema import (
+    ProjectionSchemaConflict,
+    ProjectionSchemaDefinition,
+    ProjectionSchemaNotFound,
+    ProjectionSchemaRegistry,
+    ReservedProjectionColumn,
+    compute_schema_fingerprint,
+    compute_schema_key,
+)
 
 __all__ = [
     # catalog schemas
