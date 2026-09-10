@@ -109,6 +109,15 @@ def _sink_record(audit_id, request_id, *, previous=8448, new=9104, reason="r",
     }
 
 
+def _pinned(conn, **kw):
+    """B4-CXR7U9R2: governed-identity-pinned production sink (authoritative
+    construction path): pinned to the B2 compose governed database AND
+    role from the same constants that build the DSN."""
+    return PostgresAuditSink(
+        conn, governed_database=kw.get("governed_database", oc.PG_DB),
+        governed_user=kw.get("governed_user", oc.PG_USER))
+
+
 # --------------------------------------------------------------------------- #
 # Canonical typed-value exact retries through the production sink
 # --------------------------------------------------------------------------- #
@@ -117,7 +126,7 @@ def test_u5_integer_exact_retry_through_production_sink(pg):
     """An int-typed retry reconciles against the TEXT row the production sink
     wrote (canonical '9104' == '9104')."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u5-int-exact-0001"
     sink.append(_sink_record(rid, rid, new=9104, previous=8448))
     sink.append(_sink_record(rid, rid, new=9104, previous=8448))  # exact retry
@@ -132,7 +141,7 @@ def test_u5_integer_exact_retry_through_production_sink(pg):
 
 def test_u5_boolean_exact_retry_through_production_sink(pg):
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u5-bool-exact-0001"
     sink.append(_sink_record(rid, rid, new=False, previous=None))
     sink.append(_sink_record(rid, rid, new=False, previous=None))
@@ -146,7 +155,7 @@ def test_u5_boolean_exact_retry_through_production_sink(pg):
 
 def test_u5_null_exact_retry_through_production_sink(pg):
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u5-null-exact-0001"
     sink.append(_sink_record(rid, rid, new=None, previous="9104"))
     sink.append(_sink_record(rid, rid, new=None, previous="9104"))
@@ -163,7 +172,7 @@ def test_u5_null_exact_retry_through_production_sink(pg):
 
 def test_u5_string_exact_retry_through_production_sink(pg):
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u5-str-exact-0001"
     sink.append(_sink_record(rid, rid, new="loopback-only", previous="unset"))
     sink.append(_sink_record(rid, rid, new="loopback-only", previous="unset"))
@@ -197,10 +206,10 @@ def test_u5_fresh_connection_exact_retry(pg):
     import psycopg2
     from oce_control.audit_sink import PostgresAuditSink
     rid = "u5-fresh-conn-0001"
-    PostgresAuditSink(pg).append(_sink_record(rid, rid, new=9104))
+    _pinned(pg).append(_sink_record(rid, rid, new=9104))
     conn2 = psycopg2.connect(oc.dsn())
     try:
-        PostgresAuditSink(conn2).append(_sink_record(rid, rid, new=9104))
+        _pinned(conn2).append(_sink_record(rid, rid, new=9104))
         conn2.commit()
     finally:
         conn2.close()
@@ -214,7 +223,7 @@ def test_u5_uncertain_commit_reconciliation(pg):
     """Uncertain commit: the row is committed but the caller never learned —
     the retry reconciles via canonical comparison and returns the same id."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u5-uncertain-0001"
     first_id = sink.append(_sink_record(rid, rid, new=9104))
     second_id = sink.append(_sink_record(rid, rid, new=9104))
@@ -229,7 +238,7 @@ def test_u5_same_request_id_different_audit_id(pg):
     """A retry carrying the same request_id under a different audit_id still
     reconciles EXACTLY (the governed key is request_id)."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u5-same-rid-0001"
     sink.append(_sink_record("audit-A-" + rid, rid, new=9104))
     sink.append(_sink_record("audit-B-" + rid, rid, new=9104))
@@ -243,7 +252,7 @@ def test_u5_same_audit_id_different_request_id(pg):
     """An audit_id collision with a DIFFERENT request_id and a divergent
     decision is refused — the original row stays unchanged."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     aid = "u5-shared-audit-id"
     rid1 = "u5-same-aid-r1"
     rid2 = "u5-same-aid-r2"
@@ -266,7 +275,7 @@ def test_u5_request_id_only_collision_reconciles(pg):
     exists durably (audit-X), never the proposed id (audit-Y) for which no
     row exists."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u5-rid-only-collision-0001"
     durable = sink.append(_sink_record("audit-X-" + rid, rid, new=9104))
     assert durable == "audit-X-" + rid
@@ -296,7 +305,7 @@ def test_u5_divergent_reuse_refused_no_applicable_value(pg, field, bad):
     """Same request_id + ANY differing canonical field: the production sink
     refuses — no applicable value, existing durable row unchanged."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = f"u5-div-{field}-0001"
     sink.append(_sink_record(rid, rid, new=9104))
     record = _sink_record(rid, rid, new=9104)
@@ -429,7 +438,7 @@ def test_u5_proven_rolls_back_probe_leaves_connection_idle(pg):
     """proven() runs read-only probes and leaves the dedicated connection
     IDLE — a following append() must not refuse."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     assert sink.proven() is True
     sink.append(_sink_record("u5-idle-probe-0001", "u5-idle-probe-0001"))
 
@@ -443,7 +452,7 @@ def test_u8_same_audit_id_exact_retry_returns_durable_id(pg):
     idempotent retry: the durable row's audit_id is returned and only one
     durable row exists (B4-CXR7U8-05 identity model B)."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u8-same-aid-exact-0001"
     first = sink.append(_sink_record(rid, rid, new=9104))
     again = sink.append(_sink_record(rid, rid, new=9104))
@@ -459,7 +468,7 @@ def test_u8_same_audit_id_different_request_id_exact_reconciles(pg):
     PK collision reconciles as the same committed operation and returns the
     durable audit_id — never an id for which no row exists."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     aid = "u8-shared-aid-exact"
     sink.append(_sink_record(aid, "u8-shared-aid-r1", new=9104))
     out = sink.append(_sink_record(aid, "u8-shared-aid-r2", new=9104))
@@ -477,7 +486,7 @@ def test_u8_same_audit_id_different_request_id_divergent_refused(pg):
     """Same audit_id + different request_id + ANY divergent decision fails
     closed — the existing durable row stays byte-identical."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     aid = "u8-shared-aid-div"
     sink.append(_sink_record(aid, "u8-div-r1", new=9104))
     with pg.cursor() as cur:
@@ -506,7 +515,7 @@ def test_u8_transaction_usable_after_reconcile_and_refusal(pg):
     conn = psycopg2.connect(oc.dsn())
     conn.autocommit = False
     try:
-        sink = PostgresAuditSink(conn)
+        sink = _pinned(conn)
         rid1 = "u8-txn-usable-0001"
         sink.append(_sink_record(rid1, rid1, new=9104))
         sink.append(_sink_record(rid1, rid1, new=9104))  # exact reconcile
@@ -531,7 +540,7 @@ def test_u8_semantic_field_divergence_refused(pg):
     previous/authorized/decision/fingerprint_before — and a divergence in any
     of them fails closed (B4-CXR7U8-05)."""
     from oce_control.audit_sink import PostgresAuditSink
-    sink = PostgresAuditSink(pg)
+    sink = _pinned(pg)
     rid = "u8-semantic-div-0001"
     sink.append(_sink_record(rid, rid, new=9104))
     cases = [

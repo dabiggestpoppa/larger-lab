@@ -166,13 +166,19 @@ class PostgresAuditSink(DurableAuditSink):
     def __init__(self, conn, *, governed_database: str | None = None,
                  governed_user: str | None = None):
         self._conn = conn
-        # Pinned governed identity (B4-CXR7U8-06): proven() verifies the
-        # connection is attached to EXACTLY this database/role, so a cloned
-        # table on a non-governed database is never proven. The production
-        # seam pins these from the ActivationContext-derived connection; when
-        # None the database-identity probe is skipped (structure-only proof).
+        # Pinned governed identity (B4-CXR7U8-06 / B4-CXR7U9R2): the
+        # AUTHORITATIVE proof (proven_authoritative) requires the connection
+        # to be attached to EXACTLY this database AND role, so a cloned table
+        # on a non-governed database can never self-certify. The production
+        # seam pins these from the ActivationContext-derived connection.
+        # A sink constructed WITHOUT identity remains structure-only: useful
+        # for diagnostics (inspect_structure), never authoritative.
         self._governed_database = governed_database
         self._governed_user = governed_user
+        # B4-CXR7U9R2: an identity-bound sink additionally pins the expected
+        # backend identity so append()/read_back() refuse a non-pinned sink
+        self._pinned = bool(governed_database or governed_user)
+        self._rollback_failed = False
 
     def _tx_status(self) -> int:
         fn = getattr(self._conn, "get_transaction_status", None)
@@ -180,135 +186,220 @@ class PostgresAuditSink(DurableAuditSink):
             return TX_IDLE  # unit fakes without the probe default to idle
         return int(fn())
 
-    def proven(self) -> bool:
-        """Prove the EXACT governed structure (B4-CXR7U8-06), not merely that
-        a SELECT did not throw. Inside one read-only transaction (rolled back
-        so the dedicated connection is left IDLE):
+    def _structure_defects(self) -> list[str]:
+        """Run every governed-structure probe and return a list of defects.
 
-        * when a governed database identity is pinned at construction, the
-          connection must be attached to that exact database (current_db) and
-          role (current_user) — a cloned table on a non-governed database is
-          NEVER proven;
-        * the governed table exists in schema 'public' and every required
-          column is present with the EXPECTED type AND nullability (the
-          NOT NULL set matches the 0006/0007/0008 migration exactly);
-        * the PRIMARY KEY is specifically on audit_id (a PK on any other
-          column fails the proof);
-        * the request_id uniqueness index belongs to THIS exact table and
-          schema, is unique/valid/ready, and covers exactly request_id (a
-          same-named index on another table, in another schema, or over the
-          wrong column fails the proof);
-        * the append-only trigger belongs to this exact table, calls the
-          expected governed function, and is enabled;
-        * the connection is left in an acceptable transaction state (IDLE).
+        Read-only. Opens ONE cursor over one implicit transaction; the caller
+        OWNS rollback (B4-CXR7U9R1: cleanup is unconditional — never an early
+        return from inside the cursor block). Every defect is recorded, not
+        raised, so a single proof pass reports exactly why a schema failed.
+        """
+        defects: list[str] = []
+        with self._conn.cursor() as cur:
+            # 0. exact governed database/role identity (when pinned)
+            if (self._governed_database is not None
+                    or self._governed_user is not None):
+                cur.execute("SELECT current_database(), current_user")
+                row = cur.fetchone()
+                if row is None:
+                    defects.append("identity probe returned no row")
+                else:
+                    if (self._governed_database is not None
+                            and row[0] != self._governed_database):
+                        defects.append(
+                            "governed database mismatch: "
+                            f"{row[0]!r} != {self._governed_database!r}")
+                    if (self._governed_user is not None
+                            and row[1] != self._governed_user):
+                        defects.append(
+                            "governed user mismatch: "
+                            f"{row[1]!r} != {self._governed_user!r}")
+            # 1. table identity in the governed schema
+            cur.execute(
+                "SELECT to_regclass('public.config_override_audit') "
+                "IS NOT NULL")
+            if not cur.fetchone()[0]:
+                defects.append("governed table missing from schema 'public'")
+            # 2. required columns, types AND nullability
+            cur.execute(
+                "SELECT column_name, data_type, is_nullable "
+                "FROM information_schema.columns "
+                "WHERE table_schema = 'public' "
+                "AND table_name = 'config_override_audit'")
+            colinfo = {r[0]: (r[1], r[2]) for r in cur.fetchall()}
+            for col in sorted(REQUIRED_COLUMNS - set(colinfo)):
+                defects.append(f"required column missing: {col}")
+            expected_types = {
+                "audit_id": "text", "actor": "text",
+                "setting": "text", "requested_change": "text",
+                "reason": "text", "previous": "text", "new": "text",
+                "decision": "text", "authorized": "boolean",
+                "recorded_at": "timestamp with time zone",
+                "request_id": "text",
+                "fingerprint_before": "text",
+                "fingerprint_after": "text",
+                "backend_identity": "text",
+            }
+            for col, want in expected_types.items():
+                if col in colinfo and colinfo[col][0] != want:
+                    defects.append(
+                        f"column {col}: type {colinfo[col][0]!r} != {want!r}")
+            not_null = {"audit_id", "actor", "setting",
+                        "requested_change", "reason", "decision",
+                        "authorized", "recorded_at", "request_id",
+                        "backend_identity"}
+            for col in sorted(not_null):
+                if col in colinfo and colinfo[col][1] != "NO":
+                    defects.append(f"column {col}: expected NOT NULL")
+            for col in sorted(REQUIRED_COLUMNS - not_null):
+                if col in colinfo and colinfo[col][1] != "YES":
+                    defects.append(f"column {col}: expected nullable")
+            # 3. PRIMARY KEY specifically on audit_id IN THE GOVERNED public
+            #    schema (a same-named table cloned in another schema can
+            #    never satisfy the proof)
+            cur.execute(
+                "SELECT pg_get_constraintdef(c.oid) FROM pg_constraint c "
+                "JOIN pg_class t ON t.oid = c.conrelid "
+                "JOIN pg_namespace ns ON ns.oid = t.relnamespace "
+                "WHERE t.relname = 'config_override_audit' "
+                "AND ns.nspname = 'public' AND c.contype = 'p'")
+            pk_row = cur.fetchone()
+            if pk_row is None:
+                defects.append("primary key missing on the governed table")
+            elif "PRIMARY KEY (audit_id)" not in pk_row[0]:
+                defects.append(
+                    "primary key is not specifically on audit_id: "
+                    f"{pk_row[0]!r}")
+            # 4. request_id uniqueness bound to THIS table, unique, valid,
+            #    ready, covering exactly request_id
+            cur.execute(
+                "SELECT i.indisunique, i.indisvalid, i.indisready, "
+                "pg_get_indexdef(i.indexrelid) "
+                "FROM pg_index i "
+                "JOIN pg_class idx ON idx.oid = i.indexrelid "
+                "JOIN pg_class tbl ON tbl.oid = i.indrelid "
+                "JOIN pg_namespace ns ON ns.oid = idx.relnamespace "
+                "WHERE idx.relname = "
+                "'config_override_audit_request_id_key' "
+                "AND tbl.relname = 'config_override_audit' "
+                "AND ns.nspname = 'public'")
+            idx = cur.fetchone()
+            if idx is None:
+                defects.append(
+                    "request_id uniqueness index missing (or not bound to "
+                    "the governed table/schema)")
+            else:
+                if not (idx[0] and idx[1] and idx[2]):
+                    defects.append(
+                        "request_id index is not unique/valid/ready")
+                if "(request_id)" not in idx[3]:
+                    defects.append(
+                        "request_id index does not cover exactly request_id")
+            # 5. append-only trigger: exact table + governed function +
+            #    enabled
+            cur.execute(
+                "SELECT t.tgname, p.proname, t.tgenabled "
+                "FROM pg_trigger t "
+                "JOIN pg_proc p ON p.oid = t.tgfoid "
+                "WHERE t.tgrelid = 'config_override_audit'::regclass "
+                "AND NOT t.tgisinternal")
+            trig = None
+            for trow in cur.fetchall():
+                if trow[0] == "config_override_audit_append_only":
+                    trig = trow
+            if trig is None:
+                defects.append("append-only trigger missing")
+            else:
+                if trig[1] != "config_override_audit_append_only":
+                    defects.append(f"trigger calls wrong function: {trig[1]!r}")
+                if trig[2] not in ("O", "A"):
+                    defects.append(f"trigger is not enabled: {trig[2]!r}")
+            # 6. the table is readable through the governed path
+            cur.execute("SELECT 1 FROM config_override_audit LIMIT 1")
+            cur.fetchone()
+        return defects
+
+    def proven(self) -> bool:
+        """Prove the EXACT governed structure (B4-CXR7U8-06 / B4-CXR7U9R1):
+        identity (when pinned), table/schema, every column with type AND
+        nullability, PRIMARY KEY on audit_id, the request_id uniqueness
+        index bound to this table/schema/column (unique/valid/ready), and
+        the append-only trigger calling the governed function, enabled.
+
+        CLEANUP IS UNCONDITIONAL (B4-CXR7U9R1): the proof runs inside ONE
+        read-only probe transaction and the finally block ALWAYS rolls back
+        — on the positive path, on every negative branch, and on any
+        SQL/driver exception. The transaction status is validated BEFORE
+        returning, so a proven() result can never leave the dedicated
+        connection INTRANS, and a rollback failure fails closed (never
+        proven; the connection is not reusable as authoritative).
+        proven() never COMMITs anything.
         """
         try:
-            with self._conn.cursor() as cur:
-                # 0. exact governed database/role identity (when pinned)
-                if self._governed_database is not None:
-                    cur.execute("SELECT current_database(), current_user")
-                    row = cur.fetchone()
-                    if row is None or row[0] != self._governed_database:
-                        return False
-                    if self._governed_user is not None and \
-                            row[1] != self._governed_user:
-                        return False
-                # 1. table identity in the governed schema
-                cur.execute(
-                    "SELECT to_regclass('public.config_override_audit') "
-                    "IS NOT NULL")
-                if not cur.fetchone()[0]:
-                    return False
-                # 2. required columns, types AND nullability
-                cur.execute(
-                    "SELECT column_name, data_type, is_nullable "
-                    "FROM information_schema.columns "
-                    "WHERE table_schema = 'public' "
-                    "AND table_name = 'config_override_audit'")
-                colinfo = {r[0]: (r[1], r[2]) for r in cur.fetchall()}
-                if not REQUIRED_COLUMNS.issubset(colinfo):
-                    return False
-                expected_types = {
-                    "audit_id": "text", "actor": "text",
-                    "setting": "text", "requested_change": "text",
-                    "reason": "text", "previous": "text", "new": "text",
-                    "decision": "text", "authorized": "boolean",
-                    "recorded_at": "timestamp with time zone",
-                    "request_id": "text",
-                    "fingerprint_before": "text",
-                    "fingerprint_after": "text",
-                    "backend_identity": "text",
-                }
-                for col, want in expected_types.items():
-                    if colinfo[col][0] != want:
-                        return False
-                not_null = {"audit_id", "actor", "setting",
-                            "requested_change", "reason", "decision",
-                            "authorized", "recorded_at", "request_id",
-                            "backend_identity"}
-                for col in not_null:
-                    if colinfo[col][1] != "NO":
-                        return False
-                for col in REQUIRED_COLUMNS - not_null:
-                    if colinfo[col][1] != "YES":
-                        return False
-                # 3. PRIMARY KEY specifically on audit_id IN THE GOVERNED
-                #    public schema (a same-named table cloned in another
-                #    schema can never satisfy the proof)
-                cur.execute(
-                    "SELECT pg_get_constraintdef(c.oid) FROM pg_constraint c "
-                    "JOIN pg_class t ON t.oid = c.conrelid "
-                    "JOIN pg_namespace ns ON ns.oid = t.relnamespace "
-                    "WHERE t.relname = 'config_override_audit' "
-                    "AND ns.nspname = 'public' AND c.contype = 'p'")
-                pk_row = cur.fetchone()
-                if pk_row is None or "PRIMARY KEY (audit_id)" not in pk_row[0]:
-                    return False
-                # 4. request_id uniqueness bound to THIS table, unique,
-                #    valid, ready, covering exactly request_id
-                cur.execute(
-                    "SELECT i.indisunique, i.indisvalid, i.indisready, "
-                    "pg_get_indexdef(i.indexrelid) "
-                    "FROM pg_index i "
-                    "JOIN pg_class idx ON idx.oid = i.indexrelid "
-                    "JOIN pg_class tbl ON tbl.oid = i.indrelid "
-                    "JOIN pg_namespace ns ON ns.oid = idx.relnamespace "
-                    "WHERE idx.relname = 'config_override_audit_request_id_key' "
-                    "AND tbl.relname = 'config_override_audit' "
-                    "AND ns.nspname = 'public'")
-                idx = cur.fetchone()
-                if idx is None or not (idx[0] and idx[1] and idx[2]):
-                    return False
-                if "(request_id)" not in idx[3]:
-                    return False  # same-named index over the WRONG column
-                # 5. append-only trigger: exact table + governed function +
-                #    enabled
-                cur.execute(
-                    "SELECT t.tgname, p.proname, t.tgenabled "
-                    "FROM pg_trigger t "
-                    "JOIN pg_proc p ON p.oid = t.tgfoid "
-                    "WHERE t.tgrelid = 'config_override_audit'::regclass "
-                    "AND NOT t.tgisinternal")
-                trig = None
-                for trow in cur.fetchall():
-                    if trow[0] == "config_override_audit_append_only":
-                        trig = trow
-                if trig is None or \
-                        trig[1] != "config_override_audit_append_only" or \
-                        trig[2] not in ("O", "A"):
-                    return False
-                cur.execute("SELECT 1 FROM config_override_audit LIMIT 1")
-                cur.fetchone()
-            self._conn.rollback()  # leave the dedicated connection IDLE
-            if self._tx_status() != TX_IDLE:
-                return False
-            return True
+            defects = self._structure_defects()
+            result = not defects
         except Exception:
+            result = False
+        finally:
+            try:
+                self._conn.rollback()
+            except Exception:
+                # rollback failure: fail closed; the connection is not
+                # considered authoritative for anything afterwards
+                self._rollback_failed = True
+            else:
+                self._rollback_failed = False
+        if self._rollback_failed:
+            return False
+        if self._tx_status() != TX_IDLE:
+            return False
+        return result
+
+    def proven_authoritative(self) -> bool:
+        """AUTHORITATIVE durability proof (B4-CXR7U9R2).
+
+        proven() only validates STRUCTURE. This method additionally requires
+        the governed identity PINNED at construction — database AND role —
+        and proves the connection is attached to exactly that database and
+        user. A structure-only sink (no pinned identity), a cloned schema on
+        another database, or a wrong role can never be authoritative:
+
+        * governed_database OR governed_user missing -> False (BOTH are
+          required for authority);
+        * governed_database pinned but the connection is on another
+          database -> False;
+        * governed_user pinned but the connection runs as another
+          role -> False;
+        * structure defective -> False.
+
+        ConfigAuthorization.audit_durable uses THIS method — never bare
+        proven() — so structure alone can never self-certify durability.
+        """
+        if self._governed_database is None or self._governed_user is None:
+            # B4-CXR7U9R2: BOTH the governed database AND the governed role
+            # must be pinned — a partial identity can never self-certify
+            return False
+        return self.proven()
+
+    def inspect_structure(self) -> dict:
+        """NON-AUTHORITATIVE structure inspection (B4-CXR7U9R2).
+
+        Diagnostics/tests only: reports the governed structure verdict and
+        its defects. Never satisfies ConfigAuthorization.audit_durable and
+        never permits operator_override() to return an applicable value.
+        Leaves the dedicated connection IDLE (unconditional rollback —
+        B4-CXR7U9R1).
+        """
+        try:
+            defects = self._structure_defects()
+        except Exception:
+            defects = ["structure probe raised"]
+        finally:
             try:
                 self._conn.rollback()
             except Exception:
                 pass
-            return False
+        return {"structure_valid": not defects, "defects": defects}
 
 
     # INSERT handled with ON CONFLICT DO NOTHING RETURNING: every governed
@@ -370,6 +461,14 @@ class PostgresAuditSink(DurableAuditSink):
                 "audit connection carries a pending transaction — refusing "
                 "to commit unrelated work; the audit ledger uses a DEDICATED "
                 "connection (B4-CXR5R5)")
+        if not self._pinned:
+            # B4-CXR7U9R2: a structure-only sink (no pinned governed
+            # identity) can never write the authoritative ledger. Diagnostics
+            # may inspect it; nothing may be appended through it.
+            raise RuntimeError(
+                "audit sink is not bound to the governed database identity "
+                "— append REFUSED (B4-CXR7U9R2); construct the sink through "
+                "the governed production seam")
         audit_id = str(record.get("audit_id") or record.get("request_id")
                        or uuid.uuid4().hex)
         request_id = str(record.get("request_id") or audit_id)

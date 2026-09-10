@@ -260,7 +260,9 @@ def test_audit_record_reloadable_via_fresh_connection(pg):
                   fingerprint_before="fp-b", fingerprint_after="fp-a")
     conn2 = psycopg2.connect(oc.dsn())
     try:
-        back = PostgresAuditSink(conn2).read_back()
+        back = PostgresAuditSink(
+            conn2, governed_database=oc.PG_DB,
+            governed_user=oc.PG_USER).read_back()
         rows = [r for r in back if r["audit_id"] == "aud-fresh-conn-1"]
         assert len(rows) == 1
         row = rows[0]

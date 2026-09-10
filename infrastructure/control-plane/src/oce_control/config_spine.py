@@ -928,8 +928,13 @@ class ConfigAuthorization:
         or any duck-typed .append() object is NOT durable, and a non-proven
         sink is never treated as durable.
         """
+        # B4-CXR7U9R2: type-exactness AND the AUTHORITATIVE proof — the sink
+        # must be bound to the governed database/role identity pinned from
+        # the ActivationContext and prove it right now. A structure-only
+        # sink (matching table on a cloned/non-governed database) can never
+        # self-certify durability through bare proven().
         return (type(self._durable_sink) is PostgresAuditSink
-                and self._durable_sink.proven())
+                and self._durable_sink.proven_authoritative())
 
     def can_mutate(self, actor: str, setting: Setting) -> bool:
         # policy-owned settings are not mutated by operators; only operator /

@@ -512,7 +512,7 @@ class TestAuthorization:
 
     def _proven(self, reg):
         # PROVEN durable sink (unit-level fake) for the canonical apply path
-        return ConfigAuthorization(reg, durable_sink=PostgresAuditSink(_FakeConn()))
+        return ConfigAuthorization(reg, durable_sink=PostgresAuditSink(_FakeConn(), governed_database="oce_control", governed_user="oce_control_admin"))
 
     def test_override_records_attributable_audit(self):
         reg = build_default_registry()
@@ -1193,7 +1193,7 @@ class TestCXR3R6OverrideAuditTruth:
         reg = build_default_registry()
         conn = _FakeConn()
         authz = ConfigAuthorization(reg,
-                                    durable_sink=PostgresAuditSink(conn))
+                                    durable_sink=PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(reg).resolve(HAPPY)
         with pytest.raises(PermissionError):
             authz.operator_override(
@@ -1207,7 +1207,7 @@ class TestCXR3R6OverrideAuditTruth:
         reg = build_default_registry()
         conn = _FakeConn()
         authz = ConfigAuthorization(reg,
-                                    durable_sink=PostgresAuditSink(conn))
+                                    durable_sink=PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(reg).resolve(HAPPY)
         with pytest.raises(PermissionError):
             authz.operator_override(
@@ -1296,7 +1296,7 @@ class TestCXR3R5CapitalAuthorityLocked:
     @staticmethod
     def _proven(reg):
         return ConfigAuthorization(reg,
-                                   durable_sink=PostgresAuditSink(_FakeConn()))
+                                   durable_sink=PostgresAuditSink(_FakeConn(), governed_database="oce_control", governed_user="oce_control_admin"))
 
 
 # --------------------------------------------------------------------------- #
@@ -1472,6 +1472,10 @@ class _FakeCursor:
 
     def execute(self, sql, params=None):
         self._conn.executes.append((sql, params))
+        # B4-CXR7U9R1: injected probe exception (SQL/driver failure path)
+        for needle, exc in self._conn.probe_raise.items():
+            if needle in sql:
+                raise exc
         stripped = sql.strip().upper()
         if stripped.startswith("INSERT"):
             # B4-CXR6R3: simulate ON CONFLICT DO NOTHING rowcount — 0 means
@@ -1482,6 +1486,11 @@ class _FakeCursor:
 
     def fetchone(self):
         sql = self._conn.executes[-1][0] if self._conn.executes else ""
+        # B4-CXR7U9R1: injected probe override (defect simulation); the key
+        # identifies the probe, the value replaces fetchone()'s result
+        for needle, val in self._conn.probe_overrides.items():
+            if needle in sql:
+                return None if val == "__NO_ROW__" else val
         if "RETURNING audit_id" in sql:
             # B4-CXR7U8-05: INSERT ... ON CONFLICT DO NOTHING RETURNING — a
             # row means a fresh durable insert; None means a conflict
@@ -1511,6 +1520,11 @@ class _FakeCursor:
 
     def fetchall(self):
         sql = self._conn.executes[-1][0] if self._conn.executes else ""
+        # B4-CXR7U9R1: injected probe override (defect simulation) — the
+        # columns/trigger probes read through fetchall()
+        for needle, val in self._conn.probe_overrides.items():
+            if needle in sql:
+                return [] if val == "__NO_ROW__" else val
         if "information_schema.columns" in sql:
             # B4-CXR7U8-06: (column_name, data_type, is_nullable) with the
             # governed types AND the exact NOT NULL set
@@ -1548,6 +1562,14 @@ class _FakeConn:
         self.insert_conflict = insert_conflict
         self.tx_status = 0  # TRANSACTION_STATUS_IDLE
         self.rolled_back = 0
+        # B4-CXR7U9R1: defect/exception injection + rollback-fail simulation
+        # for the unconditional-cleanup proof suite
+        self.probe_overrides: dict = {}
+        self.probe_raise: dict = {}
+        self.rollback_fail = False
+        # B4-CXR7U9R1: when set, rollback() leaves this status instead of 0
+        # (simulates a rollback that fails to restore IDLE)
+        self.tx_status_after_rollback = None
 
     def cursor(self):
         return _FakeCursor(self)
@@ -1562,8 +1584,11 @@ class _FakeConn:
         self.tx_status = 0
 
     def rollback(self):
+        if self.rollback_fail:
+            raise RuntimeError("rollback failed (simulated)")
         self.rolled_back += 1
-        self.tx_status = 0
+        self.tx_status = (self.tx_status_after_rollback
+                          if self.tx_status_after_rollback is not None else 0)
 
 
 class TestCXR4R5ProvenAuditDurability:
@@ -1583,7 +1608,7 @@ class TestCXR4R5ProvenAuditDurability:
 
     def test_proven_postgres_sink_marks_entries_durable(self):
         conn = _FakeConn()
-        sink = PostgresAuditSink(conn)
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
         authz = self._authz(sink)
         assert authz.audit_durable is True  # type-exact + proven()
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
@@ -1643,7 +1668,7 @@ class TestCXR4R5ProvenAuditDurability:
 
     def test_durable_commit_failure_fails_override_closed(self):
         conn = _FakeConn(fail_commit=True)
-        sink = PostgresAuditSink(conn)
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
         authz = self._authz(sink)
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         with pytest.raises(RuntimeError, match="FAILED"):
@@ -1655,7 +1680,7 @@ class TestCXR4R5ProvenAuditDurability:
 
     def test_denied_and_sensitive_overrides_write_zero_durable_records(self):
         conn = _FakeConn()
-        authz = self._authz(PostgresAuditSink(conn))
+        authz = self._authz(PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         with pytest.raises(PermissionError):
             authz.operator_override(
@@ -1677,7 +1702,7 @@ class TestCXR4R5ProvenAuditDurability:
                "8448", "9124", "granted", True, "fp-before", "fp-after",
                "postgres:config_override_audit", "2026-01-01T00:00:00Z")
         conn = _FakeConn(rows=[row])
-        sink = PostgresAuditSink(conn)
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
         back = sink.read_back()
         assert len(back) == 1
         assert back[0]["actor"] == "operator:po"
@@ -1700,7 +1725,7 @@ class TestCXR4R5ProvenAuditDurability:
         # refused BEFORE any INSERT and zero secret bytes ever reach the
         # connection surface.
         conn = _FakeConn()
-        authz = self._authz(PostgresAuditSink(conn))
+        authz = self._authz(PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         dsn_canary = "postgresql://bob:supersecret-dsn-pw@db:5432/oce"
         with pytest.raises(PermissionError, match="secret material"):
@@ -1718,7 +1743,7 @@ class TestCXR4R5ProvenAuditDurability:
 
     def test_secret_canary_in_requested_change_rejected(self):
         conn = _FakeConn()
-        authz = self._authz(PostgresAuditSink(conn))
+        authz = self._authz(PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         token_canary = "ghp_" + "A" * 20
         with pytest.raises(PermissionError, match="secret material"):
@@ -1736,7 +1761,7 @@ class TestCXR4R5ProvenAuditDurability:
         # multiline/control-character content could forge extra ledger rows
         # or break a row-based carrier — refused (CXR5-05 #12).
         conn = _FakeConn()
-        authz = self._authz(PostgresAuditSink(conn))
+        authz = self._authz(PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         with pytest.raises(PermissionError, match="control characters"):
             authz.operator_override(
@@ -1752,7 +1777,7 @@ class TestCXR4R5ProvenAuditDurability:
         # append must never commit unrelated application work. A connection
         # already inside a transaction refuses before any INSERT.
         conn = _FakeConn()
-        sink = PostgresAuditSink(conn)
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
         conn.tx_status = 1  # TRANSACTION_STATUS_INTRANS (unrelated work open)
         with pytest.raises(RuntimeError, match="pending transaction"):
             sink.append({"actor": "operator:po", "setting": "x",
@@ -1791,7 +1816,7 @@ class TestCXR4R5ProvenAuditDurability:
         # operation reconciles as the SAME committed operation (rowcount 0 +
         # verified read-back is the success proof — never assumed success).
         conn = _FakeConn()
-        authz = self._authz(PostgresAuditSink(conn))
+        authz = self._authz(PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         rid = "override-req-exact-0001"
         first = authz.operator_override(
@@ -1814,7 +1839,7 @@ class TestCXR4R5ProvenAuditDurability:
         # uncertain commit -> exact retry: the conflicting row is read back
         # through a reconciliation SELECT and verified before success
         conn = _FakeConn(insert_conflict=True)
-        sink = PostgresAuditSink(conn)
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
         # pre-existing committed row identical to the retried record
         # (B4-CXR7U8-05: the reconciliation SELECT returns the durable
         # audit_id FIRST, then the canonical semantic columns)
@@ -1849,7 +1874,7 @@ class TestCXR4R5ProvenAuditDurability:
         # fails closed at the sink — no applicable value, no new in-memory
         # authoritative result, existing durable row unchanged.
         conn = _FakeConn()
-        authz = self._authz(PostgresAuditSink(conn))
+        authz = self._authz(PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         rid = "override-req-divergent-0001"
         first = authz.operator_override(
@@ -1872,7 +1897,7 @@ class TestCXR4R5ProvenAuditDurability:
     def test_divergent_reuse_raises_explicit_permission_error(self):
         # the sink itself reports DIVERGENT before operator_override wraps it
         conn = _FakeConn(insert_conflict=True)
-        sink = PostgresAuditSink(conn)
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
         conn.rows = [("override-req-div-0002",
                       "operator:po", "control_plane.port", "x", "r",
                       "8448", "9105", "granted", True,
@@ -1895,7 +1920,7 @@ class TestCXR4R5ProvenAuditDurability:
         # a request id alone never authorizes: without a committed INSERT the
         # sink raises, applies nothing, and leaves no record
         conn = _FakeConn(fail_commit=True)
-        authz = self._authz(PostgresAuditSink(conn))
+        authz = self._authz(PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         with pytest.raises(RuntimeError, match="FAILED"):
             authz.operator_override(
@@ -1904,6 +1929,388 @@ class TestCXR4R5ProvenAuditDurability:
                 request_id="override-req-nocommit-0001")
         assert authz.audit == []
         assert conn.rolled_back >= 1
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR7U9R1 — proof cleanup is UNCONDITIONAL: every proven() outcome rolls
+# back its probe transaction and leaves the dedicated connection TX_IDLE
+# before returning — positive, every negative branch, SQL exception, and
+# rollback failure. The transaction status is asserted IMMEDIATELY after
+# proven() returns; a later cleanup must never be what restored IDLE.
+# --------------------------------------------------------------------------- #
+class TestCXR7U9R1ProvenCleanupUnconditional:
+    TX_IDLE = 0   # psycopg2.extensions.TRANSACTION_STATUS_IDLE
+    TX_INTRANS = 1
+
+    def _conn(self):
+        return _FakeConn()
+
+    def _inject(self, conn, needle, *, fetch=None, exc=None):
+        """Route one probe through a defect: a replaced fetch result or an
+        injected SQL exception."""
+        if fetch is not None:
+            conn.probe_overrides[needle] = fetch
+        if exc is not None:
+            conn.probe_raise[needle] = exc
+
+    # ---------------- identity + structure branches ---------------- #
+
+    def test_wrong_database_negative_leaves_idle(self):
+        conn = self._conn()
+        sink = PostgresAuditSink(conn, governed_database="other_db")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_wrong_user_negative_leaves_idle(self):
+        conn = self._conn()
+        sink = PostgresAuditSink(conn, governed_user="other_user")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_missing_table_leaves_idle(self):
+        conn = self._conn()
+        self._inject(conn, "to_regclass", fetch=(False,))
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_missing_column_leaves_idle(self):
+        conn = self._conn()
+        missing = "request_id"
+        cols = [(c, "text", "NO") for c in sorted(REQUIRED_COLUMNS - {missing})]
+        cols.append((missing, "text", "NO"))  # absent from colinfo below
+        cols = [c for c in cols if c[0] != missing]
+        self._inject(conn, "information_schema.columns", fetch=cols)
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_wrong_column_type_leaves_idle(self):
+        conn = self._conn()
+        row = ("authorized", "integer", "NO")
+        self._inject(conn, "information_schema.columns",
+                     fetch=[(c, "text", "NO") for c in sorted(
+                         REQUIRED_COLUMNS - {"authorized"})] + [row])
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_wrong_nullability_leaves_idle(self):
+        conn = self._conn()
+        cols = [(c, "text", "NO") for c in sorted(
+            REQUIRED_COLUMNS - {"previous"})]
+        cols.append(("previous", "text", "NO"))  # must be nullable
+        self._inject(conn, "information_schema.columns", fetch=cols)
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_wrong_primary_key_leaves_idle(self):
+        conn = self._conn()
+        self._inject(conn, "pg_get_constraintdef",
+                     fetch=("PRIMARY KEY (request_id)",))
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_missing_uniqueness_leaves_idle(self):
+        conn = self._conn()
+        self._inject(conn, "pg_index", fetch="__NO_ROW__")
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_invalid_decoy_index_leaves_idle(self):
+        conn = self._conn()
+        self._inject(conn, "pg_index",
+                     fetch=(True, False, True,
+                            "CREATE UNIQUE INDEX ... USING btree (request_id)"))
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_missing_trigger_leaves_idle(self):
+        conn = self._conn()
+        self._inject(conn, "pg_trigger", fetch="__NO_ROW__")
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_disabled_trigger_leaves_idle(self):
+        conn = self._conn()
+        self._inject(conn, "pg_trigger",
+                     fetch=[("config_override_audit_append_only",
+                             "config_override_audit_append_only", "D")])
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_wrong_trigger_function_leaves_idle(self):
+        conn = self._conn()
+        self._inject(conn, "pg_trigger",
+                     fetch=[("config_override_audit_append_only",
+                             "evil_fn", "O")])
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    def test_probe_exception_leaves_idle_and_fails_closed(self):
+        conn = self._conn()
+        self._inject(conn, "information_schema.columns",
+                     exc=RuntimeError("driver failure mid-proof"))
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.rolled_back >= 1
+
+    # ---------------- cleanup-contract branches ---------------- #
+
+    def test_rollback_failure_fails_closed(self):
+        conn = self._conn()
+        conn.rollback_fail = True
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.rolled_back == 0  # rollback itself raised
+
+    def test_rollback_failure_on_defective_schema_fails_closed(self):
+        conn = self._conn()
+        conn.rollback_fail = True
+        self._inject(conn, "to_regclass", fetch=(False,))
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+
+    def test_rollback_failure_is_not_cached_forever(self):
+        # a subsequent proof on a RECOVERED connection re-evaluates normally
+        conn = self._conn()
+        conn.rollback_fail = True
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        conn.rollback_fail = False
+        assert sink.proven() is True
+        assert conn.get_transaction_status() == self.TX_IDLE
+
+    def test_tx_intrans_after_proof_is_never_proven(self):
+        conn = self._conn()
+        # a rollback that FAILS to restore IDLE must never yield proven=True
+        conn.tx_status = self.TX_INTRANS
+        conn.tx_status_after_rollback = self.TX_INTRANS
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+
+    # ---------------- positive-path determinism ---------------- #
+
+    def test_positive_proof_leaves_idle_and_is_deterministic(self):
+        conn = self._conn()
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        for _ in range(3):
+            assert sink.proven() is True
+            assert conn.get_transaction_status() == self.TX_IDLE
+        assert conn.committed == 0  # proof never COMMITs anything
+
+    def test_repaired_schema_proves_on_same_connection(self):
+        conn = self._conn()
+        self._inject(conn, "to_regclass", fetch=(False,))
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert conn.get_transaction_status() == self.TX_IDLE
+        conn.probe_overrides.clear()
+        assert sink.proven() is True
+        assert conn.get_transaction_status() == self.TX_IDLE
+
+    def test_failed_proof_leaves_append_unavailable(self):
+        conn = self._conn()
+        conn.rollback_fail = True
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        assert sink.proven() is False
+        authz = ConfigAuthorization(build_default_registry(), durable_sink=sink)
+        assert authz.audit_durable is False
+        eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            authz.operator_override(
+                eff, actor="operator:po", setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9130")
+
+    def test_proof_creates_no_audit_row(self):
+        conn = self._conn()
+        sink = PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin")
+        sink.proven()
+        assert not any("INSERT INTO" in sql for sql, _ in conn.executes)
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR7U9R2 — structure-only proof is NOT authoritative durability. The
+# authority gate is type-exact PostgresAuditSink AND proven_authoritative():
+# pinned governed database AND role, proven right now. A sink over a cloned
+# schema, an unpinned sink, a wrong database, a wrong user, a list, a fake,
+# or a subclass can never enable the committed override path, and every
+# denial writes no audit record and applies no configuration value.
+# --------------------------------------------------------------------------- #
+class TestCXR7U9R2GovernedIdentityAuthority:
+    GOV = {"governed_database": "oce_control",
+           "governed_user": "oce_control_admin"}
+
+    def _authz(self, sink):
+        return ConfigAuthorization(build_default_registry(), durable_sink=sink)
+
+    def _eff(self):
+        return ConfigResolver(build_default_registry()).resolve(HAPPY)
+
+    def _deny_blocked(self, sink):
+        """authoritative proof False AND the canonical apply path BLOCKED."""
+        authz = self._authz(sink)
+        assert authz.audit_durable is False
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            authz.operator_override(
+                self._eff(), actor="operator:po",
+                setting_name="control_plane.port",
+                requested_change="x", reason="r", new_value="9131")
+        return authz
+
+    # ---------------- non-authoritative sinks ---------------- #
+
+    def test_unpinned_sink_is_never_authoritative(self):
+        conn = _FakeConn()  # perfect structure, zero identity
+        sink = PostgresAuditSink(conn)
+        assert sink.proven() is True          # structure alone proves
+        assert sink.proven_authoritative() is False
+        self._deny_blocked(sink)
+
+    def test_database_only_without_governed_user_not_authoritative(self):
+        # U9-02: "database-only with missing governed user -> False"
+        conn = _FakeConn()
+        sink = PostgresAuditSink(conn, governed_database="oce_control")
+        assert sink.proven_authoritative() is False
+        self._deny_blocked(sink)
+
+    def test_user_only_without_governed_database_not_authoritative(self):
+        conn = _FakeConn()
+        sink = PostgresAuditSink(conn, governed_user="oce_control_admin")
+        assert sink.proven_authoritative() is False
+        self._deny_blocked(sink)
+
+    def test_wrong_database_not_authoritative(self):
+        conn = _FakeConn()  # fake reports ('oce_control', 'oce_control_admin')
+        sink = PostgresAuditSink(conn, governed_database="other_db",
+                                 governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert sink.proven_authoritative() is False
+        self._deny_blocked(sink)
+
+    def test_wrong_user_not_authoritative(self):
+        conn = _FakeConn()
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="other_role")
+        assert sink.proven() is False
+        assert sink.proven_authoritative() is False
+        self._deny_blocked(sink)
+
+    def test_list_fake_and_subclass_remain_non_authoritative(self):
+        self._deny_blocked([])
+        class FakeAppend:
+            def append(self, record):
+                return "fake"
+        self._deny_blocked(FakeAppend())
+        class LyingSubclass(PostgresAuditSink):
+            def proven(self):
+                return True
+            def proven_authoritative(self):
+                return True
+            def append(self, record):
+                return "fake"
+        self._deny_blocked(LyingSubclass(_FakeConn(), **self.GOV))
+
+    def test_cloned_exact_schema_cannot_self_certify(self):
+        # a cloned schema on ANOTHER database satisfies structure probes but
+        # is pinned to the WRONG identity -> never authoritative (the
+        # container suite proves this against real PostgreSQL; here the unit
+        # fake stands in for the cloned structure reporting another db)
+        conn = _FakeConn()
+        conn.probe_overrides["current_database"] = ("clone_db", "intruder")
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        assert sink.proven() is False
+        assert sink.proven_authoritative() is False
+        self._deny_blocked(sink)
+
+    # ---------------- pinned governed path ---------------- #
+
+    def test_pinned_governed_sink_enables_committed_override(self):
+        conn = _FakeConn()
+        sink = PostgresAuditSink(conn, **self.GOV)
+        assert sink.proven_authoritative() is True
+        authz = self._authz(sink)
+        assert authz.audit_durable is True
+        new = authz.operator_override(
+            self._eff(), actor="operator:po",
+            setting_name="control_plane.port",
+            requested_change="x", reason="r", new_value="9132")
+        assert new == 9132
+        assert authz.audit[0].durable is True
+        assert conn.committed >= 1
+
+    def test_pinned_identity_wrong_database_never_enables(self):
+        conn = _FakeConn()
+        conn.probe_overrides["current_database"] = ("oce_control", "intruder")
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        assert sink.proven() is False   # role mismatch fails the proof
+        self._deny_blocked(sink)
+
+    # ---------------- diagnostics boundary ---------------- #
+
+    def test_inspect_structure_never_grants_authority(self):
+        conn = _FakeConn()
+        sink = PostgresAuditSink(conn)   # structure-only
+        report = sink.inspect_structure()
+        assert report["structure_valid"] is True
+        assert report["defects"] == []
+        assert sink.proven_authoritative() is False
+        self._deny_blocked(sink)
+        authz = self._authz(sink)
+        assert authz.audit_durable is False
+
+    def test_inspect_structure_reports_defects_and_leaves_idle(self):
+        conn = _FakeConn()
+        conn.probe_overrides["to_regclass"] = (False,)
+        sink = PostgresAuditSink(conn)
+        report = sink.inspect_structure()
+        assert report["structure_valid"] is False
+        assert report["defects"]
+        assert conn.get_transaction_status() == 0  # TX_IDLE
+
+    def test_append_refused_on_structure_only_sink(self):
+        conn = _FakeConn()
+        sink = PostgresAuditSink(conn)
+        with pytest.raises(RuntimeError, match="REFUSED"):
+            sink.append({"audit_id": "a", "request_id": "a", "actor": "op",
+                         "setting": "s", "requested_change": "x",
+                         "reason": "r"})
+        assert not any("INSERT INTO" in sql for sql, _ in conn.executes)
+        assert conn.committed == 0
+
+    def test_failed_authority_proof_leaves_connection_idle(self):
+        conn = _FakeConn()
+        conn.probe_overrides["to_regclass"] = (False,)
+        sink = PostgresAuditSink(conn, **self.GOV)
+        assert sink.proven_authoritative() is False
+        assert conn.get_transaction_status() == 0  # TX_IDLE
+
+    def test_denied_authority_writes_no_audit_record(self):
+        authz = self._deny_blocked(
+            PostgresAuditSink(_FakeConn()))  # unpinned: denied
+        assert authz.audit == []
 
 
 class TestCXR7U5CanonicalAuditValue:
@@ -1945,7 +2352,7 @@ class TestCXR7U5CanonicalAuditValue:
         # durable row is built from the FIRST insert's canonical params, then
         # an exact retry must reconcile against it (canonical == canonical).
         conn = _FakeConn()
-        authz = self._authz(PostgresAuditSink(conn))
+        authz = self._authz(PostgresAuditSink(conn, governed_database="oce_control", governed_user="oce_control_admin"))
         eff = ConfigResolver(build_default_registry()).resolve(HAPPY)
         rid = "override-req-bool-0001"
         first = authz.operator_override(
