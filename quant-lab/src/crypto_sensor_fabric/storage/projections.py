@@ -39,6 +39,7 @@ from .atomic import (
 from .checksums import sha256_file
 from .models import RawProjectionArtifact
 from .projection_schema import ProjectionSchemaDefinition
+from ..providers.base.enums import QualityFlagAcquisition
 
 # ---------------------------------------------------------------------------
 # T0B metadata columns injected by the projection layer
@@ -317,7 +318,9 @@ def write_projection(
             partition_key=partition_key,
             projection_uri=key,
             projection_sha256=projection_sha256,
-            quality_flags=quality_flags or [],
+            quality_flags=[
+                QualityFlagAcquisition(f) for f in (quality_flags or [])
+            ],
         )
 
         return artifact, final
