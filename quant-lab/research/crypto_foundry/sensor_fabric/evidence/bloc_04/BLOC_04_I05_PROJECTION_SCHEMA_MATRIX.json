@@ -1,0 +1,65 @@
+{
+  "case_count": 5,
+  "cases": [
+    {
+      "case_id": "schema_register",
+      "expected_error": null,
+      "field_count": 1,
+      "fields": [
+        "price"
+      ],
+      "schema_fingerprint": "f7be7346f3451ca74e9383323ba426c69310046486b29acc5d502be9848da208",
+      "schema_id": "kraken_futures.liquidation_volume",
+      "schema_key": "8acd01f2f8c33dfb49239591677d2e101def102c03f1aaa9bb48518a82e00f00",
+      "schema_version": "1.0.0"
+    },
+    {
+      "case_id": "schema_id_version_reuse_exact",
+      "expected_error": null,
+      "field_count": 1,
+      "fields": [
+        "price"
+      ],
+      "schema_fingerprint": "f7be7346f3451ca74e9383323ba426c69310046486b29acc5d502be9848da208",
+      "schema_id": "kraken_futures.liquidation_volume",
+      "schema_key": "8acd01f2f8c33dfb49239591677d2e101def102c03f1aaa9bb48518a82e00f00",
+      "schema_version": "1.0.0"
+    },
+    {
+      "case_id": "schema_id_version_conflict",
+      "expected_error": "ProjectionSchemaConflict",
+      "field_count": 1,
+      "fields": [
+        "qty"
+      ],
+      "schema_fingerprint": "8242991fb128bcc17c77f4159193a67d2c7a105a7d5061d917e8797450e5498e",
+      "schema_id": "kraken_futures.liquidation_volume",
+      "schema_key": "8acd01f2f8c33dfb49239591677d2e101def102c03f1aaa9bb48518a82e00f00",
+      "schema_version": "1.0.0"
+    },
+    {
+      "case_id": "semver_invalid",
+      "expected_error": "semver",
+      "field_count": 1,
+      "fields": [
+        "x"
+      ],
+      "schema_fingerprint": "4bddfb06664666151b9e218030e2644b01d2547a25a9bbc12fd5ff377701f74a",
+      "schema_id": "test.schema",
+      "schema_key": "dfc6e060d0ca4bbb502a0e4dcae747e2422eab40bb9fe05adf9da2424c9deaaf",
+      "schema_version": "1.0"
+    },
+    {
+      "case_id": "reserved_column",
+      "expected_error": "ReservedProjectionColumn",
+      "field_count": 1,
+      "fields": [
+        "_t0_provider"
+      ],
+      "schema_fingerprint": "975318cac3fdd258c478a7a6a6dbb2592dafd306fc0ad1525d4a9293e6c90238",
+      "schema_id": "test.reserved",
+      "schema_key": "947b331a9993752b0b41547962dc134d5a8b4807c14157f4d605ab7570921367",
+      "schema_version": "1.0.0"
+    }
+  ]
+}
