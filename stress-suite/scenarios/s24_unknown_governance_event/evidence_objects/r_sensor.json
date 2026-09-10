@@ -2,5 +2,6 @@
   "record_id": "R_SENSOR",
   "kind": "OBSERVATION",
   "claim": "sensor calibration stream reports drift outside nominal band",
+  "subject": "sensor-drift",
   "seq": 3
 }

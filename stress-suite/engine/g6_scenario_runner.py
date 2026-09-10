@@ -37,7 +37,9 @@ from .g6_governance import (
     ActionRequest,
     AllocatorProvenanceLedger,
     AllocatorProvenanceRecord,
+    CapabilityGrant,
     CapabilityGraphEntry,
+    ConstitutionalRuleRegistry,
     ConstitutionPermissionRecord,
     EmpiricalEvidenceGrade,
     EvalContractSnapshot,
@@ -55,6 +57,17 @@ from .g6_governance import (
     propose_contract_criteria_change,
 )
 from .registry import EvidenceRegistry, UnknownEvidenceRef
+
+#: governed constitutional rule fixture (G6-TC06) — the smallest bounded
+#: representation of the constitutional authority relevant to the G6 scenarios.
+_CONSTITUTIONAL_RULES_FIXTURE = (
+    Path(__file__).resolve().parent.parent / "fixtures" /
+    "g6_constitutional_rules.json")
+
+
+def _load_constitutional_rules() -> ConstitutionalRuleRegistry:
+    data = json.loads(_CONSTITUTIONAL_RULES_FIXTURE.read_text(encoding="utf-8"))
+    return ConstitutionalRuleRegistry.from_fixture(data)
 
 
 class ScenarioStimulusError(Exception):
@@ -122,6 +135,7 @@ class _ReplayState:
     seq: int
     authority: AuthorityState
     registry: EvidenceRegistry
+    rules: ConstitutionalRuleRegistry
     contracts: Dict[str, EvalContractSnapshot] = field(default_factory=dict)
     candidates: Dict[str, Any] = field(default_factory=dict)
     capability: Dict[str, CapabilityGraphEntry] = field(default_factory=dict)
@@ -144,8 +158,12 @@ def _register_evidence(state: _ReplayState, objects: List[Dict[str, Any]]) -> No
             source_lineage=obj.get("source_lineage", ""),
             allocator=obj.get("allocator", ""),
             retrieval_lineage=obj.get("retrieval_lineage", ""),
+            subject=obj.get("subject", ""),
             seq=int(obj.get("seq", 0)),
         ))
+
+
+
 
 
 def _refusal(phase: str, detail: Dict[str, Any]) -> Dict[str, Any]:
@@ -274,13 +292,21 @@ def _apply_stimulus(state: _ReplayState, ev: Dict[str, Any]) -> Dict[str, Any]:
 
     # ---- S22: operator directive / evidence grades ------------------------ #
     if etype == "define_permission":
-        rec = ConstitutionPermissionRecord(
+        rec = ConstitutionPermissionRecord.claim(
             rule_ref=ev["rule_ref"],
             permitted_action_class=ev["permitted_action_class"],
-            basis=ev["basis"], seq=int(ev.get("seq", 0)))
-        state.permissions[ev["permission_id"]] = rec
+            basis=ev["basis"], seq=int(ev.get("seq", 0)),
+            provenance=ev.get("provenance", "scenario-stimulus"))
+        try:
+            verified = rec.verify(state.rules)
+        except ValueError as exc:
+            return _refusal("PERMISSION_CLAIM_UNVERIFIED",
+                            {"permission_id": ev["permission_id"],
+                             "rule_ref": ev["rule_ref"], "reason": str(exc)})
+        state.permissions[ev["permission_id"]] = verified
         return {"phase": "PERMISSION_RECORDED",
-                "detail": {**rec.to_dict(), "permission_id": ev["permission_id"]}}
+                "detail": {**verified.to_dict(),
+                           "permission_id": ev["permission_id"]}}
 
     if etype == "grant_operator_mandate":
         mandate = OperatorMandate(
@@ -288,19 +314,44 @@ def _apply_stimulus(state: _ReplayState, ev: Dict[str, Any]) -> Dict[str, Any]:
             grant_ref=ev["grant_ref"], seq=int(ev["seq"]))
         state.mandates[ev["actor"]] = mandate
         return {"phase": "MANDATE_RECORDED",
-                "detail": {**mandate.to_dict()}}
+                "detail": {**mandate.to_dict(),
+                           "note": "claim recorded; verification happens at directive time against canonical authority"}}
+
+    if etype == "governed_grant_issue":
+        # canonical capability grant issued via propose+ratify (G6-TC05):
+        # the grant must PRE-EXIST any mandate/directive that references it.
+        grant = CapabilityGrant(
+            grant_id=ev["grant_id"], actor=ev["actor"], action=ev["action"],
+            target=ev["target"], environment=ev.get("environment", "local-test"),
+            risk_class=ev.get("risk_class", "read"),
+            issued_by=ev["issued_by"], issued_seq=int(ev["seq"]))
+        try:
+            state.authority.propose_authority_change(
+                ev.get("proposer", grant.actor), grant.actor, grant)
+            state.authority.ratify_authority_change(
+                ev["issued_by"], ev.get("proposer", grant.actor), grant.actor, grant)
+        except AuthorityViolation as exc:
+            return _refusal("GOVERNED_GRANT_REFUSED",
+                            {"grant_id": ev["grant_id"], "reason": str(exc)})
+        return {"phase": "GOVERNED_GRANT_ISSUED",
+                "detail": {"grant_id": grant.grant_id, "actor": grant.actor,
+                           "issued_by": grant.issued_by,
+                           "risk_class": grant.risk_class,
+                           "issued_seq": grant.issued_seq}}
 
     if etype == "operator_directive":
         perm = state.permissions[ev["permission_id"]]
         mandate = state.mandates.get(ev.get("mandate_for", ""))
         out = apply_operator_directive(
             directive_id=ev["directive_id"],
-            authority_level=ev["authority_level"],
+            actor=ev["actor"],
+            authority=state.authority,
             graph=state.evidence_graph,
             permission=perm,
             evidence_id=ev.get("evidence_id", ""),
             mandate=mandate,
-            operator_preference=ev.get("operator_preference", ""))
+            operator_preference=ev.get("operator_preference", ""),
+            claimed_level=ev.get("claimed_level", ""))
         return {"phase": "DIRECTIVE_AUTHORIZED" if out.operator_action_authorized
                 else "DIRECTIVE_REFUSED",
                 "detail": {**out.to_dict()}}
@@ -308,7 +359,8 @@ def _apply_stimulus(state: _ReplayState, ev: Dict[str, Any]) -> Dict[str, Any]:
     if etype == "evidence_grade_change":
         try:
             state.evidence_graph = state.evidence_graph.with_grade(
-                ev["evidence_id"], ev["new_grade"], ev["ref"], state.registry)
+                ev["evidence_id"], ev["new_grade"], ev["ref"], state.registry,
+                subject=ev.get("subject", ev["evidence_id"]))
         except (ValueError, UnknownEvidenceRef) as exc:
             return _refusal("GRADE_CHANGE_REFUSED",
                             {"evidence_id": ev["evidence_id"],
@@ -372,7 +424,9 @@ def _apply_stimulus(state: _ReplayState, ev: Dict[str, Any]) -> Dict[str, Any]:
         ce = [GovernanceClassificationEvidence(
             proposed_channel=c["proposed_channel"],
             evidence_refs=tuple(c.get("evidence_refs", ())),
-            status=c.get("status", "SUPPORTED"))
+            status=c.get("status", "SUPPORTED"),
+            binding=c.get("binding", ""),
+            scope=c.get("scope", ""))
             for c in ev.get("classification_evidence", ())]
         event = GovernanceEvent(
             event_id=ev["event_id"], raw_event=ev.get("raw_event", ""),
@@ -380,7 +434,9 @@ def _apply_stimulus(state: _ReplayState, ev: Dict[str, Any]) -> Dict[str, Any]:
             consequence_class=ev.get("consequence_class", ""),
             authority_context=ev.get("authority_context", ""),
             containment_action=ev.get("containment_action", "SAFE_HOLD"),
-            seq=int(ev.get("seq", 0)))
+            seq=int(ev.get("seq", 0)),
+            binding=ev.get("binding", ""),
+            scope=ev.get("scope", ""))
         d = classify_governance_event(event, ce, registry=state.registry)
         return {"phase": d.channel,
                 "detail": {**d.to_dict()}}
@@ -425,7 +481,8 @@ def run_g6_scenario(decision: Dict[str, Any]) -> G6ScenarioResult:
     state = _ReplayState(
         seq=int(decision["initial_epoch"].get("seq", 0)),
         authority=AuthorityState(),
-        registry=EvidenceRegistry())
+        registry=EvidenceRegistry(),
+        rules=_load_constitutional_rules())
     for actor, level in decision["initial_epoch"].get("authority_seed", {}).items():
         state.authority.seed_level(actor, level)
     state.authority.freeze_initialization()
@@ -451,7 +508,9 @@ def run_g6_scenario(decision: Dict[str, Any]) -> G6ScenarioResult:
         forbidden_shortcuts_attempted=sorted(set(attempted)),
         forbidden_shortcuts_refused=sorted(set(attempted)),
         artifacts={"allocator_concentration":
-                   state.allocator_ledger.allocator_concentration()})
+                   state.allocator_ledger.allocator_concentration(),
+                   "authority_event_summary":
+                   state.authority.authority_event_summary()})
 
 
 def evaluate_g6_expectation(res: G6ScenarioResult, pack: G6Pack) -> Dict[str, Any]:
@@ -492,7 +551,15 @@ def build_receipt(pack: G6Pack, res: G6ScenarioResult,
         "allocator_concentration": res.artifacts["allocator_concentration"],
         "expected_outcome_accessed": False,
         "hidden_ground_truth_accessed": False,
-        "authority_changes": "NONE",
+        "authority_accounting": {
+            "external_authority_mutations": 0,
+            "production_authority_mutations": 0,
+            "scenario_internal_authority_events":
+                res.artifacts.get("authority_event_summary", {}),
+            "note": ("scenario-internal AuthorityState objects are SIMULATED "
+                     "transitions inside the scenario; they are not external "
+                     "or production authority mutations"),
+        },
         "cloud_mutations": 0,
         "production_mutations": 0,
         "capital_mutations": 0,
@@ -514,8 +581,13 @@ def human_result(receipt: Dict[str, Any]) -> str:
         f"{receipt['forbidden_shortcuts_attempted']}",
         f"- sealed: expected_accessed={receipt['expected_outcome_accessed']} · "
         f"hidden_ground_truth_accessed={receipt['hidden_ground_truth_accessed']}",
-        f"- authority changes: {receipt['authority_changes']} · model calls: "
-        f"{receipt['model_calls']} · cloud/production/capital mutations: "
+        f"- authority accounting: external mutations "
+        f"{receipt['authority_accounting']['external_authority_mutations']} · "
+        f"production {receipt['authority_accounting']['production_authority_mutations']} · "
+        f"scenario-internal events "
+        f"{receipt['authority_accounting']['scenario_internal_authority_events']['total']} "
+        f"(simulated only) · model calls: {receipt['model_calls']} · "
+        f"cloud/production/capital mutations: "
         f"{receipt['cloud_mutations']}/{receipt['production_mutations']}/"
         f"{receipt['capital_mutations']}",
         "",

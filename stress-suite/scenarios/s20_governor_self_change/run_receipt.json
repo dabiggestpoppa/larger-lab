@@ -7,7 +7,18 @@
     "distinct_initiators": 0,
     "paths": 0
   },
-  "authority_changes": "NONE",
+  "authority_accounting": {
+    "external_authority_mutations": 0,
+    "note": "scenario-internal AuthorityState objects are SIMULATED transitions inside the scenario; they are not external or production authority mutations",
+    "production_authority_mutations": 0,
+    "scenario_internal_authority_events": {
+      "proposals": 1,
+      "ratifications": 0,
+      "registry_issues": 0,
+      "registry_revokes": 0,
+      "total": 1
+    }
+  },
   "behavior_fingerprint": "3f86dc9669f1fbfce29a57147bc72a70",
   "capital_mutations": 0,
   "cloud_mutations": 0,

@@ -34,6 +34,9 @@ class EvidenceRecord:
     resolution_class: str = ""           # RESOLUTION kind, e.g. REPLACEMENT_VALIDATED / PLURAL_NON_DOMINATION (G2R-10, AMB-13)
     allocator: str = ""                  # allocation/assignment origin (G0 Q3 — observable, never disqualifying)
     retrieval_lineage: str = ""
+    subject: str = ""                    # deterministic relevance key: WHICH claim/event this
+                                         # record bears on (G6-TC07/TC08). Empty = UNKNOWN
+                                         # relevance — never favorable, always fail-closed.
 
     @classmethod
     def make(
@@ -48,6 +51,7 @@ class EvidenceRecord:
         resolution_class: str = "",
         allocator: str = "",
         retrieval_lineage: str = "",
+        subject: str = "",
     ) -> "EvidenceRecord":
         if kind not in EVIDENCE_KINDS:
             raise ValueError(f"unknown evidence kind: {kind}")
@@ -63,6 +67,7 @@ class EvidenceRecord:
             resolution_class=resolution_class,
             allocator=allocator,
             retrieval_lineage=retrieval_lineage,
+            subject=subject,
         )
 
     # --- conflation guards (used by authority firewall) ---------------------- #

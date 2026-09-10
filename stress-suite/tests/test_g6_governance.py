@@ -1,10 +1,15 @@
-"""G6 — constitutional-attack governance regressions S20–S24 (G6-ER01..ER07).
+"""G6 — constitutional-attack governance regressions S20–S24 (G6-ER01..ER07
++ G6-TC01..TC09 truth closure).
 
-Rewritten against the external-review-hardened engine: deep-frozen evaluation
-contracts, future-rule changes as CANDIDATES ratified via the CANONICAL
-authority engine, GOVERNOR != OPERATOR, actual-vs-granted action envelopes,
-evidence-bound governance classification, and CON-02 allocator provenance
-observability. Deterministic, local, model-free, wall-clock-free.
+Rewritten against the external-review-hardened engine plus the truth-closure
+repairs: deep-frozen evaluation contracts whose internal representation is not
+exposed as mutable state (TC03), future-rule changes as CANDIDATES ratified via
+the CANONICAL authority engine, GOVERNOR != OPERATOR with authority DERIVED
+from canonical AuthorityState (TC04), governed operator mandates verified
+against canonical grants (TC05), verified governed permissions (TC06),
+subject-bound evidence grade changes (TC07), deterministically linked
+governance classification (TC08), and honest authority-mutation accounting
+(TC09). Deterministic, local, model-free, wall-clock-free.
 """
 from __future__ import annotations
 
@@ -19,6 +24,8 @@ from engine.g6_governance import (
     AllocatorProvenanceRecord,
     CapabilityGraphEntry,
     ConstitutionPermissionRecord,
+    ConstitutionalRuleRegistry,
+    ConstitutionRule,
     EmpiricalEvidenceGrade,
     EvalContractSnapshot,
     EvidenceGraph,
@@ -33,12 +40,13 @@ from engine.g6_governance import (
     evaluate_against_window,
     execute_under_operator_hold,
     propose_contract_criteria_change,
+    verify_operator_mandate,
 )
 from engine.registry import EvidenceRegistry
 
 
 # =========================================================================== #
-# S20 / ER01 — deep freeze: nested mutation is structurally impossible
+# S20 / ER01 + TC03 — deep freeze: nested mutation is structurally impossible
 # =========================================================================== #
 def _criteria():
     return {
@@ -63,6 +71,36 @@ def test_s20_er01_nested_mutation_is_structurally_impossible():
     with pytest.raises(TypeError):
         del snap.criteria["routing"]                              # frozen mapping
     assert list(snap.criteria["routing"]["channels"]) == ["A", "B"]
+
+
+def test_s20_tc03_backing_store_is_not_exposed_as_mutable_state():
+    """TC03: the reachable `_data` attribute must not be a mutable dict.
+    Item assignment through the reachable backing store must raise."""
+    snap = EvalContractSnapshot.freeze("EVAL_A", 1, _criteria())
+    assert snap.is_deeply_frozen()
+    with pytest.raises(TypeError):
+        snap.criteria._data["threshold"] = 0.99
+    with pytest.raises(TypeError):
+        snap.criteria._data["routing"]["weights"]["A"] = 99
+    with pytest.raises(TypeError):
+        snap.criteria._data["new_key"] = 1
+    # nothing moved
+    assert snap.criteria["threshold"] == 0.5
+    assert snap.criteria["routing"]["weights"]["A"] == 1
+    assert snap.is_deeply_frozen()
+    # honest claim: the frozen tree is immutable through every supported/public
+    # access path and through reachable internal attributes (MappingProxyType).
+    # (deliberate object.__setattr__ introspection is outside every supported
+    # surface and is NOT claimed impossible.)
+
+
+def test_s20_tc03_sets_rejected_json_like_contract():
+    """TC03: sets are not JSON — they are rejected at freeze time instead of
+    being smuggled in with an invented canonical ordering."""
+    with pytest.raises(TypeError):
+        EvalContractSnapshot.freeze("EVAL_A", 1, {"tags": {"x", "y"}})
+    with pytest.raises(TypeError):
+        EvalContractSnapshot.freeze("EVAL_A", 1, {"tags": frozenset({"x"})})
 
 
 def test_s20_er01_caller_alias_is_severed():
@@ -262,48 +300,135 @@ def test_s21_governor_cannot_grant_itself_governor_authority():
 
 
 # =========================================================================== #
-# S22 / ER04 — operator authority != truth; GOVERNOR is not OPERATOR
+# S22 / ER04 + TC04/TC05/TC06/TC07 — operator authority != truth; authority is
+# DERIVED from canonical AuthorityState; mandates and permissions are governed
 # =========================================================================== #
-def _perm():
-    return ConstitutionPermissionRecord(
-        rule_ref="A-009", permitted_action_class="RESEARCH",
-        basis="constitution permits bounded research experiments", seq=1)
+def _rule_registry():
+    return ConstitutionalRuleRegistry([
+        ConstitutionRule(rule_ref="A-009", version="1.0",
+                         permitted_action_classes=("RESEARCH", "EXPERIMENT"),
+                         scope="local-test",
+                         applicable_roles=("OPERATOR", "GOVERNOR"),
+                         status="ACTIVE", seq=1),
+        ConstitutionRule(rule_ref="A-010", version="1.0",
+                         permitted_action_classes=("POLICY",),
+                         scope="local-test",
+                         applicable_roles=("OPERATOR",),
+                         status="ACTIVE", seq=1),
+    ])
 
 
-def _graph(eid="EV_1", grade="CONTESTED", ref="MEASURE_1"):
+def _verified_perm(action_class="RESEARCH", rule_ref="A-009"):
+    return ConstitutionPermissionRecord.claim(
+        rule_ref=rule_ref, permitted_action_class=action_class,
+        basis="constitution permits bounded research experiments", seq=1
+    ).verify(_rule_registry())
+
+
+def _auth(**seed):
+    a = AuthorityState()
+    for actor, level in seed.items():
+        a.seed_level(actor, level)
+    a.freeze_initialization()
+    return a
+
+
+def _issue_grant(authority, grant_id, actor, issued_by, seq,
+                 action="research_directives", target="research://bounded",
+                 risk_class="local-write"):
+    from engine.authority import CapabilityGrant
+    grant = CapabilityGrant(grant_id=grant_id, actor=actor, action=action,
+                            target=target, environment="local-test",
+                            risk_class=risk_class, issued_by=issued_by,
+                            issued_seq=seq)
+    authority.propose_authority_change(grant.actor, grant.actor, grant)
+    authority.ratify_authority_change(issued_by, grant.actor, grant.actor, grant)
+    return grant
+
+
+def _graph(eid="EV_1", grade="CONTESTED", ref="MEASURE_1", subject="EV_1"):
     return EvidenceGraph(grades=(
         EmpiricalEvidenceGrade(evidence_id=eid, empirical_grade=grade,
-                               grade_evidence_refs=(ref,)),))
+                               grade_evidence_refs=(ref,), subject=subject),))
+
+
+def _mandate(actor="GOV", scope="RESEARCH", issued_by="OPERATOR_1",
+             grant_ref="GR_M1", seq=2):
+    return OperatorMandate(actor=actor, scope=scope, issued_by=issued_by,
+                           grant_ref=grant_ref, seq=seq)
 
 
 def test_s22_operator_may_authorize_where_constitution_permits():
-    out = apply_operator_directive("DIR_1", "OPERATOR", _graph(), _perm(),
-                                   evidence_id="EV_1",
+    auth = _auth(OPERATOR_1="OPERATOR")
+    out = apply_operator_directive("DIR_1", "OPERATOR_1", auth, _graph(),
+                                   _verified_perm(), evidence_id="EV_1",
                                    operator_preference="wants transformation")
     assert out.operator_action_authorized is True
     assert out.evidence_grade_unchanged is True
     assert out.evidence_grade_before == out.evidence_grade_after == "CONTESTED"
+    assert "canonical OPERATOR authority" in out.authorization_basis
 
 
 def test_s22_governor_is_not_automatically_operator():
-    out = apply_operator_directive("DIR_2", "GOVERNOR", _graph(), _perm(),
-                                   evidence_id="EV_1")
+    auth = _auth(GOV="GOVERNOR")
+    out = apply_operator_directive("DIR_2", "GOV", auth, _graph(),
+                                   _verified_perm(), evidence_id="EV_1")
     assert out.operator_action_authorized is False
     assert "NOT operator authority" in out.authorization_basis
 
 
-def test_s22_governor_with_specific_mandate_may_authorize():
-    mandate = OperatorMandate(actor="GOV", scope="RESEARCH",
-                              issued_by="OPERATOR_1", grant_ref="GR_M1", seq=1)
-    out = apply_operator_directive("DIR_3", "GOVERNOR", _graph(), _perm(),
-                                   evidence_id="EV_1", mandate=mandate)
+def test_s22_governor_with_verified_mandate_may_authorize():
+    auth = _auth(GOV="GOVERNOR", OPERATOR_1="OPERATOR")
+    _issue_grant(auth, "GR_M1", actor="GOV", issued_by="OPERATOR_1", seq=1)
+    mandate = _mandate(seq=2)
+    out = apply_operator_directive("DIR_3", "GOV", auth, _graph(),
+                                   _verified_perm(), evidence_id="EV_1",
+                                   mandate=mandate)
     assert out.operator_action_authorized is True
     assert mandate.mandate_id in out.authorization_basis
+    assert "VERIFIED governed operator mandate" in out.authorization_basis
 
 
 def test_s22_worker_cannot_authorize_operator_actions():
-    out = apply_operator_directive("DIR_4", "WORKER", _graph(), _perm())
+    auth = _auth(W1="WORKER")
+    out = apply_operator_directive("DIR_4", "W1", auth, _graph(),
+                                   _verified_perm())
     assert out.operator_action_authorized is False
+
+
+def test_s22_tc04_claimed_operator_label_has_no_authority():
+    """TC04: the stimulus claims OPERATOR but canonical state says WORKER —
+    the claim is recorded with NO VOTE; the decision derives WORKER."""
+    auth = _auth(W1="WORKER", OPERATOR_1="OPERATOR")
+    out = apply_operator_directive("DIR_5", "W1", auth, _graph(),
+                                   _verified_perm(), evidence_id="EV_1",
+                                   claimed_level="OPERATOR")
+    assert out.operator_action_authorized is False
+    assert "WORKER" in out.authorization_basis
+    assert "claimed_level" in out.rationale
+    assert "NO VOTE" in out.rationale
+
+
+def test_s22_tc04_unknown_actor_fails_closed():
+    """TC04: an actor with no canonical entry resolves to OBSERVER and cannot
+    authorize operator actions."""
+    auth = _auth(OPERATOR_1="OPERATOR")
+    out = apply_operator_directive("DIR_6", "STRANGER", auth, _graph(),
+                                   _verified_perm())
+    assert out.operator_action_authorized is False
+    assert "OBSERVER" in out.authorization_basis
+
+
+def test_s22_tc06_operator_requires_verified_governed_permission():
+    """TC06: a permission CLAIM (non-empty rule_ref/basis but unverified) cannot
+    authorize anything — the decision path fails closed."""
+    auth = _auth(OPERATOR_1="OPERATOR")
+    claim = ConstitutionPermissionRecord.claim(
+        rule_ref="A-009", permitted_action_class="RESEARCH",
+        basis="constitution permits bounded research experiments", seq=1)
+    with pytest.raises(ValueError):
+        apply_operator_directive("DIR_7", "OPERATOR_1", auth, _graph(),
+                                 claim, evidence_id="EV_1")
 
 
 def test_s22_bare_boolean_cannot_mint_permission():
@@ -312,20 +437,143 @@ def test_s22_bare_boolean_cannot_mint_permission():
                                      basis="")
 
 
+def test_s22_tc06_permission_rule_must_resolve():
+    """TC06: an unknown rule_ref fails closed even when strings are populated."""
+    claim = ConstitutionPermissionRecord.claim(
+        rule_ref="B-999", permitted_action_class="RESEARCH",
+        basis="invented rule", seq=1)
+    with pytest.raises(ValueError):
+        claim.verify(_rule_registry())
+
+
+def test_s22_tc06_permission_action_class_must_be_permitted():
+    claim = ConstitutionPermissionRecord.claim(
+        rule_ref="A-009", permitted_action_class="POLICY",
+        basis="policy under research rule", seq=1)
+    with pytest.raises(ValueError):
+        claim.verify(_rule_registry())
+
+
+def test_s22_tc06_permission_requires_active_rule():
+    reg = ConstitutionalRuleRegistry([
+        ConstitutionRule(rule_ref="A-009", version="1.0",
+                         permitted_action_classes=("RESEARCH",),
+                         scope="local-test",
+                         applicable_roles=("OPERATOR", "GOVERNOR"),
+                         status="SUSPENDED", seq=1)])
+    claim = ConstitutionPermissionRecord.claim(
+        rule_ref="A-009", permitted_action_class="RESEARCH",
+        basis="under suspended rule", seq=1)
+    with pytest.raises(ValueError):
+        claim.verify(reg)
+
+
+def test_s22_tc06_verified_permission_binds_rule_identity():
+    verified = _verified_perm()
+    assert verified.verified is True
+    assert verified.version == "1.0"
+    assert verified.status == "ACTIVE"
+    assert "VERIFIED GOVERNED PERMISSION" in verified.verification_note
+
+
+def test_s22_tc05_mandate_strings_alone_are_not_authority():
+    """TC05: a mandate with populated strings but no resolving grant has no
+    authority — verification fails."""
+    auth = _auth(GOV="GOVERNOR", OPERATOR_1="OPERATOR")
+    mandate = _mandate(grant_ref="GHOST_GRANT")
+    ok, reasons = verify_operator_mandate(mandate, auth, "RESEARCH")
+    assert ok is False
+    assert any("does not resolve" in r for r in reasons)
+
+
+def test_s22_tc05_mandate_issuer_must_hold_operator_authority():
+    # issuer is a WORKER — populated strings cannot mint the operator claim
+    auth = _auth(GOV="GOVERNOR", W2="WORKER", OPERATOR_1="OPERATOR")
+    _issue_grant(auth, "GR_M1", actor="GOV", issued_by="OPERATOR_1", seq=1)
+    mandate = _mandate(issued_by="W2", seq=2)
+    ok, reasons = verify_operator_mandate(mandate, auth, "RESEARCH")
+    assert ok is False
+    assert any("does not hold OPERATOR authority" in r for r in reasons)
+
+
+def test_s22_tc05_mandate_grant_must_pre_exist():
+    auth = _auth(GOV="GOVERNOR", OPERATOR_1="OPERATOR")
+    _issue_grant(auth, "GR_M1", actor="GOV", issued_by="OPERATOR_1", seq=5)
+    mandate = _mandate(seq=2)          # grant issued AFTER the mandate
+    ok, reasons = verify_operator_mandate(mandate, auth, "RESEARCH")
+    assert ok is False
+    assert any("not pre-existing" in r for r in reasons)
+
+
+def test_s22_tc05_mandate_grantee_must_match_actor():
+    auth = _auth(GOV="GOVERNOR", W2="WORKER", OPERATOR_1="OPERATOR")
+    _issue_grant(auth, "GR_M1", actor="W2", issued_by="OPERATOR_1", seq=1)
+    mandate = _mandate(actor="GOV", seq=2)
+    ok, reasons = verify_operator_mandate(mandate, auth, "RESEARCH")
+    assert ok is False
+    assert any("grantee mismatch" in r for r in reasons)
+
+
+def test_s22_tc05_mandate_revoked_grant_fails():
+    auth = _auth(GOV="GOVERNOR", OPERATOR_1="OPERATOR")
+    _issue_grant(auth, "GR_M1", actor="GOV", issued_by="OPERATOR_1", seq=1)
+    auth.registry.revoke("GR_M1", "OPERATOR_1")
+    mandate = _mandate(seq=2)
+    ok, reasons = verify_operator_mandate(mandate, auth, "RESEARCH")
+    assert ok is False
+    assert any("does not resolve to an ACTIVE grant" in r for r in reasons)
+
+
+def test_s22_tc05_mandate_scope_must_cover_action_class():
+    auth = _auth(GOV="GOVERNOR", OPERATOR_1="OPERATOR")
+    _issue_grant(auth, "GR_M1", actor="GOV", issued_by="OPERATOR_1", seq=1)
+    mandate = _mandate(scope="EXPERIMENT", seq=2)
+    ok, reasons = verify_operator_mandate(mandate, auth, "RESEARCH")
+    assert ok is False
+    assert any("does not cover requested action class" in r for r in reasons)
+
+
+def test_s22_tc05_mandate_authority_bearing_grant_cannot_back_mandate():
+    auth = _auth(GOV="GOVERNOR", OPERATOR_1="OPERATOR")
+    _issue_grant(auth, "GR_M1", actor="GOV", issued_by="OPERATOR_1", seq=1,
+                 risk_class="capital")
+    mandate = _mandate(seq=2)
+    ok, reasons = verify_operator_mandate(mandate, auth, "RESEARCH")
+    assert ok is False
+    assert any("authority-bearing risk class" in r for r in reasons)
+
+
+def test_s22_tc05_self_issuance_refused_at_construction():
+    with pytest.raises(AuthorityViolation):
+        _mandate(issued_by="GOV")
+
+
+def test_s22_tc05_governor_with_unverifiable_mandate_refused_at_directive():
+    auth = _auth(GOV="GOVERNOR", OPERATOR_1="OPERATOR")
+    mandate = _mandate(grant_ref="GHOST_GRANT", seq=2)   # grant never issued
+    out = apply_operator_directive("DIR_8", "GOV", auth, _graph(),
+                                   _verified_perm(), evidence_id="EV_1",
+                                   mandate=mandate)
+    assert out.operator_action_authorized is False
+    assert "FAILED verification" in out.authorization_basis
+
+
 def test_s22_direction_a_desire_cannot_improve_weak_evidence():
     reg = EvidenceRegistry()
     reg.register(EvidenceRecord(record_id="MEASURE_WEAK", kind="OBSERVATION",
-                                claim="weak mixed measurement", seq=1))
+                                claim="weak mixed measurement", subject="EV_1",
+                                seq=1))
     g = _graph(grade="CONTESTED")
-    out = apply_operator_directive("DIR_5", "OPERATOR", g, _perm(),
-                                   evidence_id="EV_1",
+    auth = _auth(OPERATOR_1="OPERATOR")
+    out = apply_operator_directive("DIR_9", "OPERATOR_1", auth, g,
+                                   _verified_perm(), evidence_id="EV_1",
                                    operator_preference="wants transformation")
     # authorized on the authority axis; evidence axis untouched by desire
     assert out.operator_action_authorized is True
     assert out.evidence_grade_after == "CONTESTED"
-    # the grade moves ONLY through a registered evidence ref, not through desire
+    # the grade moves ONLY through a registered, RELEVANT evidence ref
     reg.register(EvidenceRecord(record_id="MEASURE_2", kind="OBSERVATION",
-                                claim="new measurement", seq=2))
+                                claim="new measurement", subject="EV_1", seq=2))
     g2 = g.with_grade("EV_1", "SUPPORTED", "MEASURE_2", reg)
     assert g2.grade_of("EV_1") == "SUPPORTED"
 
@@ -333,9 +581,12 @@ def test_s22_direction_a_desire_cannot_improve_weak_evidence():
 def test_s22_direction_b_desire_cannot_block_contradictory_evidence():
     reg = EvidenceRegistry()
     reg.register(EvidenceRecord(record_id="MEASURE_STRONG", kind="OBSERVATION",
-                                claim="strong contradictory measurement", seq=2))
-    g = _graph(eid="EV_INC", grade="SUPPORTED", ref="MEASURE_1")
-    apply_operator_directive("DIR_6", "OPERATOR", g, _perm(),
+                                claim="strong contradictory measurement",
+                                subject="EV_INC", seq=2))
+    g = _graph(eid="EV_INC", grade="SUPPORTED", ref="MEASURE_1",
+               subject="EV_INC")
+    auth = _auth(OPERATOR_1="OPERATOR")
+    apply_operator_directive("DIR_10", "OPERATOR_1", auth, g, _verified_perm(),
                              evidence_id="EV_INC",
                              operator_preference="wants incumbent preserved")
     # operator preference did not freeze the graph — evidence still moves
@@ -343,7 +594,7 @@ def test_s22_direction_b_desire_cannot_block_contradictory_evidence():
     assert g2.grade_of("EV_INC") == "REFUTED"
 
 
-def test_s22_grade_change_requires_registered_evidence_ref():
+def test_s22_tc07_grade_change_requires_registered_evidence_ref():
     g = _graph()
     reg = EvidenceRegistry()          # empty: MEASURE_9 is not registered
     with pytest.raises(ValueError):
@@ -353,10 +604,47 @@ def test_s22_grade_change_requires_registered_evidence_ref():
     assert g.grade_of("EV_1") == "CONTESTED"
 
 
+def test_s22_tc07_registered_but_unrelated_ref_cannot_regrade():
+    """TC07: registered-but-unrelated evidence (BTC price) cannot regrade an
+    unrelated authority-policy claim."""
+    reg = EvidenceRegistry()
+    reg.register(EvidenceRecord(record_id="EV_BTC_PRICE", kind="OBSERVATION",
+                                claim="btc price observation", subject="btc-price",
+                                seq=1))
+    g = _graph(eid="EV_AUTHORITY_POLICY", grade="CONTESTED",
+               ref="MEASURE_1", subject="authority-policy")
+    with pytest.raises(ValueError):
+        g.with_grade("EV_AUTHORITY_POLICY", "SUPPORTED", "EV_BTC_PRICE", reg)
+    assert g.grade_of("EV_AUTHORITY_POLICY") == "CONTESTED"
+
+
+def test_s22_tc07_unknown_relevance_fails_closed():
+    """TC07: an evidence record without a subject has UNKNOWN relevance and can
+    never move a grade."""
+    reg = EvidenceRegistry()
+    reg.register(EvidenceRecord(record_id="MEASURE_NOSUBJ", kind="OBSERVATION",
+                                claim="no subject binding", seq=1))
+    g = _graph(eid="EV_1", grade="CONTESTED", subject="EV_1")
+    with pytest.raises(ValueError):
+        g.with_grade("EV_1", "SUPPORTED", "MEASURE_NOSUBJ", reg)
+    assert g.grade_of("EV_1") == "CONTESTED"
+
+
+def test_s22_tc07_relevant_ref_moves_grade_and_records_provenance():
+    reg = EvidenceRegistry()
+    reg.register(EvidenceRecord(record_id="MEASURE_2", kind="OBSERVATION",
+                                claim="new measurement", subject="EV_1", seq=2))
+    g = _graph(eid="EV_1", grade="CONTESTED", subject="EV_1")
+    g2 = g.with_grade("EV_1", "SUPPORTED", "MEASURE_2", reg)
+    assert g2.grade_of("EV_1") == "SUPPORTED"
+    assert "MEASURE_2" in g2.grades[0].grade_evidence_refs
+
+
 def test_s22_unknown_grade_fails_closed():
     g = _graph()
     reg = EvidenceRegistry()
-    reg.register(EvidenceRecord(record_id="M1", kind="OBSERVATION", claim="x"))
+    reg.register(EvidenceRecord(record_id="M1", kind="OBSERVATION", claim="x",
+                                subject="EV_1"))
     with pytest.raises(ValueError):
         g.with_grade("EV_1", "OBVIOUSLY_TRUE", "M1", reg)
 
@@ -477,26 +765,39 @@ def test_s23_unknown_risk_class_fails_closed():
 
 
 # =========================================================================== #
-# S24 / ER06 — raw keywords are not governance truth
+# S24 / ER06 + TC08 — raw keywords are not governance truth; classification
+# evidence must be deterministically LINKED to the event
 # =========================================================================== #
-def _ev(raw="authority amendment evaluation", refs=(), **kw):
-    base = dict(event_id="EVT_1", raw_event=raw, evidence_refs=refs, seq=1)
+def _ev(raw="authority amendment evaluation", refs=(), binding="", **kw):
+    base = dict(event_id="EVT_1", raw_event=raw, evidence_refs=refs, seq=1,
+                binding=binding)
     base.update(kw)
     return GovernanceEvent(**base)
 
 
+def _sensor_registry():
+    reg = EvidenceRegistry()
+    reg.register(EvidenceRecord(record_id="R_SENSOR", kind="OBSERVATION",
+                                claim="sensor drift outside nominal band",
+                                subject="sensor-drift", seq=3))
+    return reg
+
+
 def test_s24_structured_channel_routes_correctly():
-    ev = _ev(raw="sensor recalibration event", refs=("R1",))
+    reg = _sensor_registry()
+    ev = _ev(raw="sensor recalibration event", refs=("R_SENSOR",),
+             binding="sensor-drift")
     ce = GovernanceClassificationEvidence(
-        proposed_channel="SENSOR", evidence_refs=("R1",), status="SUPPORTED")
-    d = classify_governance_event(ev, (ce,))
+        proposed_channel="SENSOR", evidence_refs=("R_SENSOR",),
+        status="SUPPORTED", binding="sensor-drift")
+    d = classify_governance_event(ev, (ce,), registry=reg)
     assert d.channel == "SENSOR"
     assert d.classification_failure == ""
 
 
 def test_s24_raw_keyword_without_evidence_is_unresolved():
     # raw text contains "authority" but NO classification evidence exists
-    ev = _ev(raw="authority grant request observed in prose")
+    ev = _ev(raw="authority grant request observed in prose", binding="x")
     d = classify_governance_event(ev)
     assert d.channel == "UNRESOLVED_GOVERNANCE_EVENT"
     assert d.classification_failure == "NO_EVIDENCE_SUPPORTED_CHANNEL"
@@ -505,22 +806,74 @@ def test_s24_raw_keyword_without_evidence_is_unresolved():
 
 
 def test_s24_contested_or_refless_evidence_does_not_route():
-    ev = _ev(refs=("R1",))
+    ev = _ev(refs=("R1",), binding="b1")
     contested = GovernanceClassificationEvidence(
-        proposed_channel="EVIDENCE", evidence_refs=("R1",), status="CONTESTED")
+        proposed_channel="EVIDENCE", evidence_refs=("R1",), status="CONTESTED",
+        binding="b1")
     refless = GovernanceClassificationEvidence(
-        proposed_channel="AMENDMENT", evidence_refs=(), status="SUPPORTED")
+        proposed_channel="AMENDMENT", evidence_refs=(), status="SUPPORTED",
+        binding="b1")
     d = classify_governance_event(ev, (contested, refless))
     assert d.channel == "UNRESOLVED_GOVERNANCE_EVENT"
 
 
+def test_s24_tc08_unbound_classification_evidence_fails_closed():
+    """TC08: classification evidence without a deterministic binding is UNKNOWN
+    linkage and cannot route anything."""
+    reg = _sensor_registry()
+    ev = _ev(raw="sensor recalibration drift", refs=("R_SENSOR",),
+             binding="sensor-drift")
+    unbound = GovernanceClassificationEvidence(
+        proposed_channel="SENSOR", evidence_refs=("R_SENSOR",),
+        status="SUPPORTED")                     # no binding field
+    d = classify_governance_event(ev, (unbound,), registry=reg)
+    assert d.channel == "UNRESOLVED_GOVERNANCE_EVENT"
+
+
+def test_s24_tc08_registered_but_unrelated_evidence_cannot_route():
+    """TC08: EV_RANDOM_PRICE resolves but is unrelated to the event subject —
+    it must NOT route an AUTHORITY event."""
+    reg = EvidenceRegistry()
+    reg.register(EvidenceRecord(record_id="EV_RANDOM_PRICE", kind="OBSERVATION",
+                                claim="random price tick", subject="price-tick",
+                                seq=1))
+    ev = _ev(raw="authority policy drift", refs=("EV_RANDOM_PRICE",),
+             binding="authority-event")
+    ce = GovernanceClassificationEvidence(
+        proposed_channel="AUTHORITY", evidence_refs=("EV_RANDOM_PRICE",),
+        status="SUPPORTED", binding="authority-event")
+    d = classify_governance_event(ev, (ce,), registry=reg)
+    assert d.channel == "UNRESOLVED_GOVERNANCE_EVENT"
+    assert d.classification_failure == "NO_EVIDENCE_SUPPORTED_CHANNEL"
+
+
+def test_s24_tc08_scope_mismatch_blocks_linkage():
+    reg = _sensor_registry()
+    ev = _ev(raw="sensor recalibration drift", refs=("R_SENSOR",),
+             binding="sensor-drift", scope="production")
+    ce = GovernanceClassificationEvidence(
+        proposed_channel="SENSOR", evidence_refs=("R_SENSOR",),
+        status="SUPPORTED", binding="sensor-drift", scope="local-test")
+    d = classify_governance_event(ev, (ce,), registry=reg)
+    assert d.channel == "UNRESOLVED_GOVERNANCE_EVENT"
+
+
 def test_s24_multiple_supported_channels_is_unresolved():
-    ev = _ev(refs=("R1", "R2"))
+    reg = EvidenceRegistry()
+    reg.register(EvidenceRecord(record_id="R1", kind="OBSERVATION",
+                                claim="evidence-channel signal",
+                                subject="dual-domain", seq=1))
+    reg.register(EvidenceRecord(record_id="R2", kind="OBSERVATION",
+                                claim="authority-channel signal",
+                                subject="dual-domain", seq=2))
+    ev = _ev(refs=("R1", "R2"), binding="dual-domain")
     ce1 = GovernanceClassificationEvidence(
-        proposed_channel="EVIDENCE", evidence_refs=("R1",), status="SUPPORTED")
+        proposed_channel="EVIDENCE", evidence_refs=("R1",), status="SUPPORTED",
+        binding="dual-domain")
     ce2 = GovernanceClassificationEvidence(
-        proposed_channel="AUTHORITY", evidence_refs=("R2",), status="SUPPORTED")
-    d = classify_governance_event(ev, (ce1, ce2))
+        proposed_channel="AUTHORITY", evidence_refs=("R2",), status="SUPPORTED",
+        binding="dual-domain")
+    d = classify_governance_event(ev, (ce1, ce2), registry=reg)
     assert d.channel == "UNRESOLVED_GOVERNANCE_EVENT"
     assert d.classification_failure == "AMBIGUOUS_EVIDENCE_SUPPORTED_CHANNELS"
     assert sorted(d.preserved["matching_channels"]) == ["AUTHORITY", "EVIDENCE"]
@@ -530,13 +883,15 @@ def test_s24_multiple_supported_channels_is_unresolved():
 def test_s24_classification_refs_must_resolve_in_registry():
     reg = EvidenceRegistry()
     reg.register(EvidenceRecord(record_id="R1", kind="OBSERVATION",
-                                claim="real evidence", seq=1))
-    ev = _ev(refs=("R1",))
+                                claim="real evidence", subject="evaluation-1",
+                                seq=1))
+    ev = _ev(refs=("R1",), binding="evaluation-1")
     good = GovernanceClassificationEvidence(
-        proposed_channel="EVALUATION", evidence_refs=("R1",), status="SUPPORTED")
+        proposed_channel="EVALUATION", evidence_refs=("R1",),
+        status="SUPPORTED", binding="evaluation-1")
     bad = GovernanceClassificationEvidence(
         proposed_channel="CAPABILITY", evidence_refs=("GHOST_REF",),
-        status="SUPPORTED")
+        status="SUPPORTED", binding="evaluation-1")
     d = classify_governance_event(ev, (good, bad), registry=reg)
     assert d.channel == "EVALUATION"       # only the resolving ref routes
 
@@ -544,7 +899,7 @@ def test_s24_classification_refs_must_resolve_in_registry():
 def test_s24_unknown_event_fully_preserved_no_ontology_mutation():
     ev = _ev(raw="quantum-regime data drift with no precedent rule",
              refs=("E9",), consequence_class="UNKNOWN",
-             containment_action="SAFE_HOLD")
+             containment_action="SAFE_HOLD", binding="novel-quantum")
     d = classify_governance_event(ev)
     assert d.channel == "UNRESOLVED_GOVERNANCE_EVENT"
     assert d.preserved["raw_event"] == ev.raw_event

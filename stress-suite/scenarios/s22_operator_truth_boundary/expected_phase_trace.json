@@ -1,7 +1,9 @@
 {
   "phases": [
     {"phase": "PERMISSION_RECORDED"},
+    {"phase": "GOVERNED_GRANT_ISSUED"},
     {"phase": "DIRECTIVE_AUTHORIZED"},
+    {"phase": "DIRECTIVE_REFUSED"},
     {"phase": "DIRECTIVE_REFUSED"},
     {"phase": "MANDATE_RECORDED"},
     {"phase": "DIRECTIVE_AUTHORIZED"},

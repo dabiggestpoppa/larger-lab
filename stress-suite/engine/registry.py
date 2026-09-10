@@ -188,6 +188,17 @@ class EvidenceRegistry:
         for r in refs:
             self.resolve(r)
 
+    def relevance(self, rid: str, subject: str) -> Optional[bool]:
+        """G6-TC07/TC08: deterministic relevance of a registered record to a
+        subject key. True only when BOTH sides carry a non-empty key and they
+        match exactly. None = UNKNOWN relevance (empty key on either side) and
+        callers MUST fail closed on None — UNKNOWN is never favorable."""
+        obj = self.resolve(rid)
+        rec_subject = str(getattr(obj, "subject", "") or "")
+        if not subject or not rec_subject:
+            return None
+        return rec_subject == subject
+
     @property
     def ids(self) -> List[str]:
         return sorted(self._objects)

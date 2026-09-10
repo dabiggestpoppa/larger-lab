@@ -51,6 +51,8 @@ class CapabilityGrant:
     risk_class: str                     # matches control-plane capability-grant.schema.json
     issued_by: str                      # issuing/ratifying actor
     status: str = "active"
+    issued_seq: int = 0                 # sequence at which the grant was made
+                                        # (G6-TC05: grants must PRE-EXIST any use)
 
     def __post_init__(self) -> None:
         # G2-P0-D: fail closed at construction — an unknown risk class must not
@@ -70,6 +72,7 @@ class CapabilityGrant:
             environment=environment,
             risk_class=risk_class,
             issued_by=issued_by,
+            issued_seq=int(seq),
         )
 
 
@@ -114,6 +117,15 @@ class AuthorityRegistry:
 
     def grants(self, actor: str) -> List[CapabilityGrant]:
         return [self._grants[i] for i in self._by_actor.get(actor, []) if self._grants[i].status == "active"]
+
+    def resolve(self, grant_id: str) -> Optional[CapabilityGrant]:
+        """Resolve an ACTIVE grant by id, or None. A revoked/expired grant is
+        never returned: a referenced grant must be live to carry authority
+        (G6-TC05)."""
+        g = self._grants.get(grant_id)
+        if g is None or g.status != "active":
+            return None
+        return g
 
     def event_log(self) -> List[str]:
         return list(self._events)
@@ -228,3 +240,15 @@ class AuthorityState:
         # ratification is recorded; the registry only issues AFTER ratification
         self.registry.issue(grant, ratified_by=ratifier)
         self._ratifications.append((ratifier, target_actor, grant.grant_id))
+
+    def authority_event_summary(self) -> Dict[str, int]:
+        """G6-TC09: honest accounting of scenario-internal authority activity.
+        These are SIMULATED transitions inside a scenario's temporary
+        AuthorityState — never external/production authority mutations."""
+        proposals = len(self._proposals)
+        ratifications = max(0, len(self._ratifications) - proposals)
+        issues = sum(1 for e in self.registry.event_log() if e.startswith("ISSUE "))
+        revokes = sum(1 for e in self.registry.event_log() if e.startswith("REVOKE "))
+        return {"proposals": proposals, "ratifications": ratifications,
+                "registry_issues": issues, "registry_revokes": revokes,
+                "total": proposals + ratifications + issues + revokes}

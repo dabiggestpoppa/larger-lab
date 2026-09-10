@@ -52,11 +52,34 @@ def test_g6_scenario_receipts_are_sealed_and_clean():
         receipt = build_receipt(pack, res, verdict)
         assert receipt["expected_outcome_accessed"] is False
         assert receipt["hidden_ground_truth_accessed"] is False
-        assert receipt["authority_changes"] == "NONE"
         assert receipt["model_calls"] == 0
         assert receipt["cloud_mutations"] == 0
         assert receipt["production_mutations"] == 0
         assert receipt["capital_mutations"] == 0
+
+
+def test_g6_receipts_account_for_internal_vs_external_authority_mutation():
+    """TC09: receipts must distinguish EXTERNAL/production authority mutations
+    (always 0) from SCENARIO-INTERNAL simulated authority events (measured, not
+    hidden as if they never happened)."""
+    for sid, d in PACKS.items():
+        pack = load_g6_pack(d)
+        res = run_g6_scenario(pack.decision_grade())
+        verdict = evaluate_g6_expectation(res, pack)
+        receipt = build_receipt(pack, res, verdict)
+        acct = receipt["authority_accounting"]
+        assert acct["external_authority_mutations"] == 0
+        assert acct["production_authority_mutations"] == 0
+        summary = acct["scenario_internal_authority_events"]
+        assert summary["total"] >= 0
+        assert isinstance(summary["proposals"], int)
+        assert isinstance(summary["ratifications"], int)
+        # S21 and S22 exercise proposal/ratification paths; they must not be
+        # reported as zero simply because the word 'authority' did not appear
+        if sid in ("S21", "S22", "S20"):
+            assert summary["total"] >= 1, (
+                f"{sid}: scenario-internal authority events must be MEASURED, "
+                f"not silently zero")
 
 
 def test_g6_runner_is_generic_no_scenario_id_dispatch():

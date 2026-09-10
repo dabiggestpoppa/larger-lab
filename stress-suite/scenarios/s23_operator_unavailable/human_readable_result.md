@@ -5,7 +5,7 @@
 - forbidden transitions declared: ['CAPITAL_ACTION_CONTINUED', 'IRREVERSIBLE_ACTION_CONTINUED', 'POST_HOC_GRANT_AUTHORIZED', 'NEAR_MATCH_CONTINUED', 'REVOKED_GRANT_USED']
 - forbidden shortcuts attempted & refused: ['OPERATOR_HOLD']
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
-- authority changes: NONE · model calls: 0 · cloud/production/capital mutations: 0/0/0
+- authority accounting: external mutations 0 · production 0 · scenario-internal events 0 (simulated only) · model calls: 0 · cloud/production/capital mutations: 0/0/0
 
 ## Phase trace
 

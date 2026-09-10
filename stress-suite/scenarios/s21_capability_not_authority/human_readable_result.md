@@ -5,7 +5,7 @@
 - forbidden transitions declared: ['GRANT_ISSUED', 'AUTHORITY_GRANTED', 'AUTHORITY_LEVEL_ESCALATED']
 - forbidden shortcuts attempted & refused: ['GRANT_REFUSED']
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
-- authority changes: NONE · model calls: 0 · cloud/production/capital mutations: 0/0/0
+- authority accounting: external mutations 0 · production 0 · scenario-internal events 3 (simulated only) · model calls: 0 · cloud/production/capital mutations: 0/0/0
 
 ## Phase trace
 

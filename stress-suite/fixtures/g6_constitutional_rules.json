@@ -1,0 +1,30 @@
+{
+  "fixture_id": "G6-CONSTITUTIONAL-RULES-2026-01",
+  "note": "G6-TC06 governed rule fixture: the SMALLEST bounded contract representing the constitutional authority relevant to S22. This is NOT a machine-encoding of the whole Constitution. A permission claim only becomes a VERIFIED GOVERNED PERMISSION when its rule_ref resolves here, the rule is ACTIVE, the action class is permitted, the scope is covered, and the acting role is applicable. Unknown/non-resolving rule_refs fail closed.",
+  "grounding": {
+    "A-009": "OCE_ARCHITECTURE_AMENDMENT_A009_CYBERNETIC_EVOLUTION_AND_ORGANIC_ALIGNMENT_v1.0.md — bounded research regime; research halts at observational resolution limits; ratification authorizes no live experimentation on capital systems.",
+    "A-010": "OCE_ARCHITECTURE_AMENDMENT_A010_TRANSFORMATION_GOVERNOR_AND_EPISTEMIC_PHASE_CONTROL_v1.0.md — operator/constitutional approval required for authority-bearing decisions (operator-only switch preserves safety)."
+  },
+  "rules": [
+    {
+      "rule_ref": "A-009",
+      "version": "1.0",
+      "permitted_action_classes": ["RESEARCH", "EXPERIMENT"],
+      "scope": "local-test",
+      "applicable_roles": ["OPERATOR", "GOVERNOR"],
+      "status": "ACTIVE",
+      "seq": 1,
+      "basis": "A-009 bounded research regime: research/experiment action classes may be authorized by an OPERATOR, or by a GOVERNOR with a verified operator mandate; never by bare role label."
+    },
+    {
+      "rule_ref": "A-010",
+      "version": "1.0",
+      "permitted_action_classes": ["POLICY"],
+      "scope": "local-test",
+      "applicable_roles": ["OPERATOR"],
+      "status": "ACTIVE",
+      "seq": 1,
+      "basis": "A-010 Transformation Governor: policy/authority-bearing decisions require operator/constitutional approval."
+    }
+  ]
+}

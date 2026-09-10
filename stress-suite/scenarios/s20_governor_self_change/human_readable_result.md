@@ -5,7 +5,7 @@
 - forbidden transitions declared: ['MUTATION_APPLIED', 'NESTED_MUTATION_APPLIED', 'FUTURE_VERSION_ADOPTED', 'FUTURE_VERSION_RATIFIED_SELF', 'RETROACTIVE_CHANGE_APPLIED']
 - forbidden shortcuts attempted & refused: ['ACTIVATION_REFUSED', 'MUTATION_REFUSED', 'NESTED_MUTATION_IMPOSSIBLE', 'RETROACTIVE_CHANGE_REFUSED', 'STALE_FINGERPRINT_REFUSED']
 - sealed: expected_accessed=False · hidden_ground_truth_accessed=False
-- authority changes: NONE · model calls: 0 · cloud/production/capital mutations: 0/0/0
+- authority accounting: external mutations 0 · production 0 · scenario-internal events 1 (simulated only) · model calls: 0 · cloud/production/capital mutations: 0/0/0
 
 ## Phase trace
 

@@ -18,6 +18,7 @@
     "source_lineage": {"type": "string"},
     "resolution_class": {"type": "string"},
     "allocator": {"type": "string"},
-    "retrieval_lineage": {"type": "string"}
+    "retrieval_lineage": {"type": "string"},
+    "subject": {"type": "string", "description": "deterministic relevance key: which claim/event this record bears on (G6-TC07/TC08); empty = UNKNOWN relevance, never favorable"}
   }
 }

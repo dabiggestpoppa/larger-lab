@@ -41,8 +41,8 @@ wall clock. All identifiers derive from content (deterministic_hex).
 """
 from __future__ import annotations
 
-import copy
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 from .authority import (
@@ -59,13 +59,22 @@ from .registry import EvidenceRegistry
 # ER01 — deep-freeze primitives (structural, not convention)
 # --------------------------------------------------------------------------- #
 class _FrozenMapping(Mapping):
-    """An immutable mapping. Mutation raises; nested values are already frozen."""
+    """An immutable mapping. Mutation raises; nested values are already frozen.
+
+    G6-TC03: the backing store is a `MappingProxyType` over a freshly built dict
+    that is NEVER retained anywhere else, so no reachable attribute exposes a
+    mutable dict: `frozen._data[key] = v` raises TypeError (a mappingproxy has
+    no item assignment), and the underlying dict is unreachable through any
+    supported/public access path or retained external alias. (Deliberate
+    `object.__setattr__` introspection that swaps `_data` is outside every
+    supported surface and is NOT claimed as impossible.)
+    """
 
     __slots__ = ("_data",)
 
     def __init__(self, data: Mapping[str, Any]) -> None:
-        object.__setattr__(self, "_data",
-                           {str(k): _deep_freeze(v) for k, v in dict(data).items()})
+        backing = {str(k): _deep_freeze(v) for k, v in dict(data).items()}
+        object.__setattr__(self, "_data", MappingProxyType(backing))
 
     def __getitem__(self, key: Any) -> Any:
         return self._data[key]
@@ -83,7 +92,7 @@ class _FrozenMapping(Mapping):
         raise TypeError("FrozenMapping is immutable")
 
     def __repr__(self) -> str:
-        return f"FrozenMapping({self._data!r})"
+        return f"FrozenMapping({dict(self._data)!r})"
 
 
 class _FrozenSequence(Sequence):
@@ -107,27 +116,32 @@ class _FrozenSequence(Sequence):
         return f"FrozenSequence({self._items!r})"
 
 
-_IMMUTABLE_SCALARS = (str, int, float, bool, type(None), frozenset)
+_IMMUTABLE_SCALARS = (str, int, float, bool, type(None))
 
 
 def _deep_freeze(value: Any) -> Any:
     """Convert a plain structure into a fully immutable tree. Every container is
     REBUILT, so any alias the caller retained now points at the old mutable
     object and cannot reach into the frozen one. Unknown container types fail
-    closed rather than being stored unfrozen."""
+    closed rather than being stored unfrozen.
+
+    G6-TC03: the supported contract is JSON-like (dict/list/str/number/bool/
+    None), so Python `set`/`frozenset` are REJECTED at freeze time instead of
+    being smuggled in with an invented canonical ordering. (Sets are not JSON;
+    a deterministic sort would be an arbitrary representation decision that the
+    contract should not carry.)"""
     if isinstance(value, _FrozenMapping) or isinstance(value, _FrozenSequence):
         return value
     if isinstance(value, dict):
         return _FrozenMapping(value)
     if isinstance(value, (list, tuple)):
         return _FrozenSequence(value)
-    if isinstance(value, set):
-        return frozenset(value)
     if isinstance(value, _IMMUTABLE_SCALARS):
         return value
     raise TypeError(
         f"cannot deep-freeze value of type {type(value).__name__!r}; "
-        f"criteria trees must be JSON-like (dict/list/str/number/bool/None)")
+        f"criteria trees must be JSON-like (dict/list/str/number/bool/None); "
+        f"sets are not part of the JSON-like contract")
 
 
 def _thaw(value: Any) -> Any:
@@ -142,8 +156,6 @@ def _thaw(value: Any) -> Any:
         return [_thaw(v) for v in value]
     if isinstance(value, dict):
         return {k: _thaw(v) for k, v in value.items()}
-    if isinstance(value, frozenset):
-        return sorted(_thaw(v) for v in value)
     return value
 
 
@@ -525,9 +537,15 @@ VALID_EMPIRICAL_GRADES = ("UNVERIFIED", "CONTESTED", "SUPPORTED", "REFUTED")
 
 @dataclass(frozen=True)
 class EmpiricalEvidenceGrade:
+    """One claim's empirical grade. `subject` is the deterministic relevance key
+    (the claim/object being graded): a grade change requires evidence refs that
+    RESOLVE in the governed registry AND are RELEVANT to this subject
+    (G6-TC07). Empty subject = UNKNOWN relevance = fail closed."""
+
     evidence_id: str
     empirical_grade: str = "UNVERIFIED"
     grade_evidence_refs: Tuple[str, ...] = ()
+    subject: str = ""
 
     def __post_init__(self) -> None:
         if self.empirical_grade not in VALID_EMPIRICAL_GRADES:
@@ -536,7 +554,8 @@ class EmpiricalEvidenceGrade:
 
     def to_dict(self) -> Dict[str, Any]:
         return {"evidence_id": self.evidence_id, "empirical_grade": self.empirical_grade,
-                "grade_evidence_refs": list(self.grade_evidence_refs)}
+                "grade_evidence_refs": list(self.grade_evidence_refs),
+                "subject": self.subject}
 
 
 @dataclass(frozen=True)
@@ -550,24 +569,41 @@ class EvidenceGraph:
         return "UNVERIFIED"
 
     def with_grade(self, evidence_id: str, new_grade: str, ref: str,
-                   registry: EvidenceRegistry) -> "EvidenceGraph":
-        """ER04: a grade changes ONLY when the evidence changes — `ref` must
-        RESOLVE in the governed evidence registry (an arbitrary non-empty string
-        is not evidence), and the new grade must be in the canonical vocabulary.
-        This is the only path that moves an EmpiricalEvidenceGrade."""
+                   registry: EvidenceRegistry, subject: str = "") -> "EvidenceGraph":
+        """ER04 + G6-TC07: a grade changes ONLY when the evidence changes.
+
+        `ref` must RESOLVE in the governed registry AND be RELEVANT to the
+        graded subject: a registered-but-unrelated record (e.g. a BTC price
+        observation) must never regrade an unrelated authority claim. `subject`
+        defaults to the target grade's own subject; an empty subject on either
+        side is UNKNOWN relevance and fails closed (UNKNOWN is never
+        favorable). This is the only path that moves an EmpiricalEvidenceGrade."""
         if new_grade not in VALID_EMPIRICAL_GRADES:
             raise ValueError(f"unknown empirical grade {new_grade!r}; "
                              f"canonical: {list(VALID_EMPIRICAL_GRADES)}")
+        target_subject = subject
+        for g in self.grades:
+            if g.evidence_id == evidence_id:
+                target_subject = subject or g.subject
+                break
         if not ref or not registry.has(ref):
             raise ValueError(
                 f"evidence grade change requires a REGISTERED evidence ref; "
                 f"{ref!r} does not resolve in the governed registry")
+        relevance = registry.relevance(ref, target_subject)
+        if relevance is not True:
+            raise ValueError(
+                f"evidence grade change requires evidence RELEVANT to subject "
+                f"{target_subject!r}; ref {ref!r} is registered but its "
+                f"relevance is {relevance} — UNKNOWN or unrelated relevance "
+                f"fails closed (G6-TC07)")
         updated = []
         for g in self.grades:
             if g.evidence_id == evidence_id:
                 updated.append(EmpiricalEvidenceGrade(
                     evidence_id=g.evidence_id, empirical_grade=new_grade,
-                    grade_evidence_refs=g.grade_evidence_refs + (ref,)))
+                    grade_evidence_refs=g.grade_evidence_refs + (ref,),
+                    subject=g.subject or target_subject))
             else:
                 updated.append(g)
         return EvidenceGraph(grades=tuple(updated))
@@ -577,7 +613,11 @@ class EvidenceGraph:
 class OperatorMandate:
     """ER04: a Governor is not automatically an Operator. Operator-level action
     authorization requires a specifically granted mandate (issued by someone
-    other than the holder — no self-mandate)."""
+    other than the holder — no self-mandate).
+
+    G6-TC05: the fields below are a CLAIM, not proof. Populated strings do not
+    carry authority: the decision path verifies the mandate against the
+    canonical AuthorityState + grant registry (see verify_operator_mandate)."""
 
     actor: str
     scope: str
@@ -599,16 +639,141 @@ class OperatorMandate:
                 "grant_ref": self.grant_ref, "seq": self.seq}
 
 
+def verify_operator_mandate(
+    mandate: OperatorMandate,
+    authority: AuthorityState,
+    requested_action_class: str,
+) -> Tuple[bool, List[str]]:
+    """G6-TC05: a mandate is verified only when EVERY governed precondition holds
+    against the canonical AuthorityState + grant registry. Populated strings are
+    claims; nothing here trusts them:
+
+      * no self-issuance (also enforced at construction, re-checked here);
+      * the issuer actually held OPERATOR authority in canonical state;
+      * grant_ref RESOLVES to an ACTIVE grant in the canonical registry;
+      * the grant PRE-EXISTED the mandate (issued_seq < mandate seq);
+      * grantee matches the mandate actor;
+      * issuer/provenance of grant matches the mandate issuer;
+      * the grant's envelope is not authority-bearing (a mandate backed by a
+        deployment/capital grant cannot authorize routine operator actions);
+      * the mandate scope covers the requested action class.
+
+    Returns (verified, reasons). No exception: the decision path records the
+    refusal as evidence. This deliberately composes with canonical
+    AuthorityState semantics instead of inventing a second mandate
+    constitution."""
+    reasons: List[str] = []
+    if mandate.issued_by == mandate.actor:
+        reasons.append("self-issuance: an actor may not issue its own operator mandate")
+    if authority.level(mandate.issued_by) != "OPERATOR":
+        reasons.append(
+            f"issuer {mandate.issued_by!r} does not hold OPERATOR authority in "
+            f"canonical state (level={authority.level(mandate.issued_by)!r})")
+    grant = authority.registry.resolve(mandate.grant_ref)
+    if grant is None:
+        reasons.append(
+            f"grant_ref {mandate.grant_ref!r} does not resolve to an ACTIVE "
+            f"grant in the canonical registry")
+    else:
+        if grant.actor != mandate.actor:
+            reasons.append(f"grantee mismatch: grant held by {grant.actor!r}, "
+                           f"mandate actor {mandate.actor!r}")
+        if grant.issued_by != mandate.issued_by:
+            reasons.append(f"provenance mismatch: grant issued by "
+                           f"{grant.issued_by!r}, mandate issuer {mandate.issued_by!r}")
+        if grant.issued_seq >= mandate.seq:
+            reasons.append(f"grant not pre-existing: issued at seq "
+                           f"{grant.issued_seq} not before mandate seq {mandate.seq}")
+        if grant.status != "active":
+            reasons.append(f"grant status is {grant.status!r}, not active")
+        if grant.risk_class in AUTHORITY_BEARING_RISK_CLASSES:
+            reasons.append(f"grant envelope carries authority-bearing risk class "
+                           f"{grant.risk_class!r}; cannot back an operator mandate")
+    if mandate.scope != requested_action_class:
+        reasons.append(f"mandate scope {mandate.scope!r} does not cover requested "
+                       f"action class {requested_action_class!r}")
+    return (not reasons), reasons
+
+
+@dataclass(frozen=True)
+class ConstitutionRule:
+    """One entry in the governed constitutional rule registry (G6-TC06). This is
+    the smallest bounded contract required for S22 — NOT a machine-encoding of
+    the whole Constitution: which rule ids exist, which action classes they
+    permit, for which roles, in which scope, at which status/version."""
+
+    rule_ref: str
+    version: str
+    permitted_action_classes: Tuple[str, ...]
+    scope: str
+    applicable_roles: Tuple[str, ...]
+    status: str = "ACTIVE"              # ACTIVE | SUSPENDED | REPEALED
+    seq: int = 0
+    basis: str = ""
+
+    def __post_init__(self) -> None:
+        if self.status not in ("ACTIVE", "SUSPENDED", "REPEALED"):
+            raise ValueError(f"unknown rule status {self.status!r}")
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"rule_ref": self.rule_ref, "version": self.version,
+                "permitted_action_classes": list(self.permitted_action_classes),
+                "scope": self.scope, "applicable_roles": list(self.applicable_roles),
+                "status": self.status, "seq": self.seq, "basis": self.basis}
+
+
+class ConstitutionalRuleRegistry:
+    """Governed rule fixture representing the relevant constitutional authority
+    for the G6 scenarios. Unknown rule_refs resolve to None (fail closed); no
+    rule can be invented by the stimulus."""
+
+    def __init__(self, rules: Iterable[ConstitutionRule]) -> None:
+        self._rules: Dict[str, ConstitutionRule] = {}
+        for r in rules:
+            if r.rule_ref in self._rules:
+                raise ValueError(f"duplicate constitutional rule {r.rule_ref!r}")
+            self._rules[r.rule_ref] = r
+
+    @classmethod
+    def from_fixture(cls, fixture: Dict[str, Any]) -> "ConstitutionalRuleRegistry":
+        rules = [ConstitutionRule(
+            rule_ref=r["rule_ref"], version=r["version"],
+            permitted_action_classes=tuple(r.get("permitted_action_classes", ())),
+            scope=r.get("scope", ""),
+            applicable_roles=tuple(r.get("applicable_roles", ())),
+            status=r.get("status", "ACTIVE"), seq=int(r.get("seq", 0)),
+            basis=r.get("basis", ""))
+            for r in fixture.get("rules", [])]
+        return cls(rules)
+
+    def resolve(self, rule_ref: str) -> Optional[ConstitutionRule]:
+        return self._rules.get(rule_ref)
+
+
 @dataclass(frozen=True)
 class ConstitutionPermissionRecord:
-    """ER04: constitutional permission is represented by a governed record, not
-    a fixture boolean. `rule_ref` must name the constitutional rule and `basis`
-    must say why the action class is permitted."""
+    """ER04 + G6-TC06: constitutional permission is a governed record, not a
+    fixture boolean, and NOT self-describing: non-empty rule_ref/basis strings
+    alone are a PERMISSION CLAIM, not a VERIFIED GOVERNED PERMISSION.
+
+    A record becomes verified only through `verify(...)` against the governed
+    ConstitutionalRuleRegistry (rule resolves, is ACTIVE, permits the action
+    class, covers the scope, and the acting role is applicable). The verified
+    record binds rule id/version, action class, scope, applicable role,
+    status, provenance and the verification trace. The decision path requires
+    `verified=True`; unknown/non-resolving rules fail closed."""
 
     rule_ref: str
     permitted_action_class: str
     basis: str
     seq: int = 0
+    version: str = ""
+    scope: str = ""
+    applicable_roles: Tuple[str, ...] = ()
+    status: str = "ACTIVE"
+    provenance: str = ""
+    verified: bool = False
+    verification_note: str = ""
 
     def __post_init__(self) -> None:
         if not self.rule_ref or not self.basis:
@@ -616,10 +781,55 @@ class ConstitutionPermissionRecord:
                 "a constitutional permission record requires a rule_ref and a basis; "
                 "a bare boolean cannot mint constitutional permission")
 
+    @classmethod
+    def claim(cls, rule_ref: str, permitted_action_class: str, basis: str,
+              seq: int = 0, provenance: str = "") -> "ConstitutionPermissionRecord":
+        """A permission CLAIM: fields populated, not yet verified."""
+        return cls(rule_ref=rule_ref, permitted_action_class=permitted_action_class,
+                   basis=basis, seq=seq, provenance=provenance)
+
+    def verify(self, rules: ConstitutionalRuleRegistry,
+               acting_role: str = "") -> "ConstitutionPermissionRecord":
+        """Verify against the governed rule registry. Raises ValueError on any
+        failure (fail closed); returns a new VERIFIED record on success."""
+        rule = rules.resolve(self.rule_ref)
+        if rule is None:
+            raise ValueError(
+                f"permission claim rule_ref {self.rule_ref!r} does not resolve "
+                f"in the governed constitutional rule registry (G6-TC06)")
+        if rule.status != "ACTIVE":
+            raise ValueError(f"rule {self.rule_ref!r} is {rule.status!r}, not ACTIVE")
+        if self.permitted_action_class not in rule.permitted_action_classes:
+            raise ValueError(
+                f"rule {self.rule_ref!r} does not permit action class "
+                f"{self.permitted_action_class!r} (permitted: "
+                f"{list(rule.permitted_action_classes)})")
+        if self.scope and rule.scope and self.scope != rule.scope:
+            raise ValueError(f"permission scope {self.scope!r} outside rule scope "
+                             f"{rule.scope!r}")
+        if acting_role and rule.applicable_roles \
+                and acting_role not in rule.applicable_roles:
+            raise ValueError(
+                f"role {acting_role!r} is not applicable under rule "
+                f"{self.rule_ref!r} (applicable: {list(rule.applicable_roles)})")
+        note = (f"verified against governed rule {rule.rule_ref!r} v{rule.version} "
+                f"({rule.status}) — PERMISSION CLAIM upgraded to VERIFIED "
+                f"GOVERNED PERMISSION")
+        return ConstitutionPermissionRecord(
+            rule_ref=self.rule_ref, permitted_action_class=self.permitted_action_class,
+            basis=self.basis, seq=self.seq, version=rule.version,
+            scope=self.scope or rule.scope, applicable_roles=rule.applicable_roles,
+            status=rule.status, provenance=self.provenance, verified=True,
+            verification_note=note)
+
     def to_dict(self) -> Dict[str, Any]:
-        return {"rule_ref": self.rule_ref,
+        return {"rule_ref": self.rule_ref, "version": self.version,
                 "permitted_action_class": self.permitted_action_class,
-                "basis": self.basis, "seq": self.seq}
+                "basis": self.basis, "seq": self.seq, "scope": self.scope,
+                "applicable_roles": list(self.applicable_roles),
+                "status": self.status, "provenance": self.provenance,
+                "verified": self.verified,
+                "verification_note": self.verification_note}
 
 
 @dataclass(frozen=True)
@@ -644,55 +854,89 @@ class OperatorDirectiveOutcome:
 
 def apply_operator_directive(
     directive_id: str,
-    authority_level: str,
+    actor: str,
+    authority: AuthorityState,
     graph: EvidenceGraph,
     permission: ConstitutionPermissionRecord,
     evidence_id: str = "",
     mandate: Optional[OperatorMandate] = None,
     operator_preference: str = "",
+    claimed_level: str = "",
 ) -> OperatorDirectiveOutcome:
-    """S22/ER04: authority != truth, in BOTH directions.
+    """S22/ER04 + G6-TC04..TC06: authority != truth, in BOTH directions.
 
-    Authority side: the action is authorized only when the actor holds OPERATOR
-    authority, or holds GOVERNOR authority WITH a specifically granted operator
-    mandate, AND a governed ConstitutionPermissionRecord covers the action
-    class. A bare boolean cannot mint permission; GOVERNOR alone is not
-    OPERATOR.
+    Authority side (G6-TC04): the decision path receives the ACTOR IDENTITY
+    plus the CANONICAL AuthorityState (initial governed state; immutable after
+    freeze except through propose+ratify) and DERIVES the actor's authority.
+    The stimulus may identify an actor and may carry a `claimed_level`, but the
+    claim is RECORDED WITHOUT VOTE — "this actor is OPERATOR" can never be
+    dictated by the stimulus. Unknown actors resolve to OBSERVER and fail
+    closed.
+
+      * canonical OPERATOR level  -> authorized IF a VERIFIED governed
+        constitutional permission covers the action class;
+      * canonical GOVERNOR level   -> authorized IF the permission is VERIFIED
+        AND a specifically granted operator mandate verifies against canonical
+        state + grant registry (G6-TC05); GOVERNOR alone is NOT OPERATOR;
+      * WORKER / PO / OBSERVER / unknown -> never authorize operator actions.
 
     Truth side: the empirical evidence grade is never read or written here.
     Operator preference is recorded for the receipt but has NO vote: desire
     cannot improve weak evidence (directional test A) and desire cannot prevent
     a strong contradictory evidence transition (directional test B — the grade
-    moves only via EvidenceGraph.with_grade with a registered evidence ref).
+    moves only via EvidenceGraph.with_grade with a registered, RELEVANT
+    evidence ref).
     """
     if permission.permitted_action_class not in ("RESEARCH", "EXPERIMENT", "POLICY"):
         raise ValueError(f"unknown permitted action class "
                          f"{permission.permitted_action_class!r}")
+    if not permission.verified:
+        raise ValueError(
+            f"permission record for {permission.rule_ref!r} is a CLAIM, not a "
+            f"VERIFIED GOVERNED PERMISSION (G6-TC06) — the decision path "
+            f"requires verification against the governed rule registry")
+    authority_level = authority.level(actor)      # derived, canonical
     authorized = False
     basis = ""
     if authority_level == "OPERATOR":
         authorized = True
-        basis = "operator authority + governed constitutional permission record"
+        basis = (f"actor {actor!r} holds canonical OPERATOR authority + VERIFIED "
+                 f"governed constitutional permission record")
     elif authority_level == "GOVERNOR":
-        if mandate is not None and mandate.actor and mandate.grant_ref:
-            authorized = True
-            basis = (f"GOVERNOR with specifically granted operator mandate "
-                     f"{mandate.mandate_id} (issued_by={mandate.issued_by}) + "
-                     f"governed constitutional permission record")
+        if mandate is not None:
+            ok, reasons = verify_operator_mandate(
+                mandate, authority, permission.permitted_action_class)
+            if ok:
+                authorized = True
+                basis = (f"actor {actor!r} holds canonical GOVERNOR authority WITH "
+                         f"a VERIFIED governed operator mandate "
+                         f"{mandate.mandate_id} (issued_by={mandate.issued_by}, "
+                         f"grant={mandate.grant_ref}) + VERIFIED governed "
+                         f"constitutional permission record")
+            else:
+                basis = (f"GOVERNOR authority alone is NOT operator authority; "
+                         f"mandate {mandate.mandate_id} FAILED verification: "
+                         + "; ".join(reasons))
         else:
             basis = ("GOVERNOR authority alone is NOT operator authority; "
                      "no mandate granted — action not authorized")
     else:
-        basis = (f"authority level {authority_level!r} cannot authorize operator "
-                 f"actions")
+        basis = (f"canonical authority level {authority_level!r} (actor "
+                 f"{actor!r}) cannot authorize operator actions")
+    claim_note = (f"; claimed_level={claimed_level!r} RECORDED WITH NO VOTE — "
+                  f"authority is derived from canonical AuthorityState, not "
+                  f"from the stimulus claim") if claimed_level else ""
     if authorized:
-        basis += f" [{permission.rule_ref}: {permission.permitted_action_class}]"
+        basis += (f" [{permission.rule_ref} v{permission.version}: "
+                  f"{permission.permitted_action_class}]")
     before = graph.grade_of(evidence_id) if evidence_id else "UNVERIFIED"
     preference_note = (f"; operator_preference={operator_preference!r} recorded "
                        f"with no vote over evidence") if operator_preference else ""
     rationale = (f"directive recorded; action_authorized={authorized} (authority "
-                 f"axis); empirical evidence grade untouched (truth axis) — "
-                 f"grades move only via registered evidence refs{preference_note}")
+                 f"axis, derived from canonical AuthorityState); empirical "
+                 f"evidence grade untouched (truth axis) — grades move only "
+                 f"via registered, RELEVANT evidence refs{preference_note}"
+                 f"{claim_note}")
     return OperatorDirectiveOutcome(
         directive_id=directive_id,
         operator_action_authorized=authorized,
@@ -883,26 +1127,38 @@ class GovernanceEvent:
     authority_context: str = ""
     containment_action: str = "SAFE_HOLD"
     seq: int = 0
+    binding: str = ""                # deterministic linkage key (G6-TC08):
+                                     # WHAT this event is about, shared with the
+                                     # evidence records that bear on it
+    scope: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         return {"event_id": self.event_id, "raw_event": self.raw_event,
                 "evidence_refs": list(self.evidence_refs),
                 "consequence_class": self.consequence_class,
                 "authority_context": self.authority_context,
-                "containment_action": self.containment_action, "seq": self.seq}
+                "containment_action": self.containment_action, "seq": self.seq,
+                "binding": self.binding, "scope": self.scope}
 
 
 @dataclass(frozen=True)
 class GovernanceClassificationEvidence:
-    """ER06: structured classification signal. A channel may be used ONLY when
-    supported by such evidence (with resolving evidence refs); raw_event prose
-    tokens are never a decision authority."""
+    """ER06 + G6-TC08: structured classification signal. A channel may be used
+    ONLY when supported by evidence that RESOLVES in the governed registry AND
+    is deterministically LINKED to this event: `binding` must match the event's
+    binding key (or be empty = UNKNOWN = fail closed), `scope` must match when
+    set, and at least one evidence ref must resolve to a record whose `subject`
+    equals the event binding. A registered-but-unrelated ref (e.g. a random
+    price record) can never route an AUTHORITY event. raw_event prose tokens
+    are never a decision authority."""
 
     proposed_channel: str
     evidence_refs: Tuple[str, ...] = ()
     classifier_version: str = "g6-classifier-1"
     status: str = "SUPPORTED"        # SUPPORTED | CONTESTED | UNVERIFIED
     unresolved_conflicts: Tuple[str, ...] = ()
+    binding: str = ""
+    scope: str = ""
 
     def __post_init__(self) -> None:
         if self.status not in ("SUPPORTED", "CONTESTED", "UNVERIFIED"):
@@ -914,7 +1170,8 @@ class GovernanceClassificationEvidence:
                 "evidence_refs": list(self.evidence_refs),
                 "classifier_version": self.classifier_version,
                 "status": self.status,
-                "unresolved_conflicts": list(self.unresolved_conflicts)}
+                "unresolved_conflicts": list(self.unresolved_conflicts),
+                "binding": self.binding, "scope": self.scope}
 
 
 @dataclass(frozen=True)
@@ -932,20 +1189,49 @@ class GovernanceEventDisposition:
                 "preserved": self.preserved, "amendment_candidate": self.amendment_candidate}
 
 
+def _classification_evidence_linked(
+    ce: GovernanceClassificationEvidence,
+    event: GovernanceEvent,
+    registry: Optional[EvidenceRegistry],
+) -> bool:
+    """G6-TC08 deterministic linkage for one classification evidence:
+    binding must match the event binding (empty binding = UNKNOWN and fails
+    closed), scope must match when set, and at least one ref must resolve to a
+    record whose subject equals the event binding. No semantic/LLM judgment —
+    fixture bindings only."""
+    if not ce.binding or not event.binding:
+        return False                       # UNKNOWN linkage -> fail closed
+    if ce.binding != event.binding:
+        return False
+    if ce.scope and event.scope and ce.scope != event.scope:
+        return False
+    for ref in ce.evidence_refs:
+        if registry is not None and not registry.has(ref):
+            continue
+        rel = registry.relevance(ref, event.binding) if registry is not None else None
+        if rel is True:
+            return True
+    # registry is None in some unit contexts: then binding agreement on a
+    # non-empty ref list is the linkage contract (still deterministic)
+    if registry is None and ce.evidence_refs:
+        return True
+    return False
+
+
 def classify_governance_event(
     event: GovernanceEvent,
     classification_evidence: Sequence[GovernanceClassificationEvidence] = (),
     channels: Sequence[str] = GOVERNANCE_CHANNELS,
     registry: Optional[EvidenceRegistry] = None,
 ) -> GovernanceEventDisposition:
-    """S24/ER06: route a governance event ONLY on structured, evidence-backed
-    classification signals.
+    """S24/ER06 + G6-TC08: route a governance event ONLY on structured,
+    evidence-backed classification signals that are deterministically LINKED to
+    the event (see _classification_evidence_linked).
 
-      * exactly one unique SUPPORTED channel (with evidence refs that resolve
-        when a registry is supplied) -> that channel;
+      * exactly one unique SUPPORTED, linked channel -> that channel;
       * zero supported channels -> UNRESOLVED_GOVERNANCE_EVENT
         (NO_EVIDENCE_SUPPORTED_CHANNEL) — even if the raw text contains a
-        familiar keyword;
+        familiar keyword and even if resolving-but-unrelated evidence exists;
       * more than one supported channel -> UNRESOLVED_GOVERNANCE_EVENT
         (AMBIGUOUS_EVIDENCE_SUPPORTED_CHANNELS);
       * an unresolved event preserves raw event, evidence refs, consequence
@@ -965,6 +1251,8 @@ def classify_governance_event(
         if registry is not None:
             if not all(registry.has(r) for r in ce.evidence_refs):
                 continue
+        if not _classification_evidence_linked(ce, event, registry):
+            continue
         supported.append(ce.proposed_channel)
     unique = sorted(set(supported))
     preserved = event.to_dict()
