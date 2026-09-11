@@ -532,9 +532,17 @@ def write_projection(
         raise ProjectionPreconditionError(
             "shard_id must be a nonnegative int"
         )
-    if row_lineage is not None and len(source_blob_sha256) == 1:
+    declared_pairs = set(zip(source_blob_sha256, acquisition_ids))
+    if row_lineage is not None:
         for rl in row_lineage:
-            if rl.source_blob_sha256 != source_blob_sha256[0]:
+            if (rl.source_blob_sha256, rl.source_acquisition_id) not in declared_pairs:
+                raise ProjectionPreconditionError(
+                    f"row lineage for row {rl.row_ordinal} references "
+                    f"undeclared source pair ({rl.source_blob_sha256!r}, "
+                    f"{rl.source_acquisition_id!r}); a row may never point "
+                    "outside the committed file-level lineage set"
+                )
+            if len(source_blob_sha256) == 1 and rl.source_blob_sha256 != source_blob_sha256[0]:
                 raise ProjectionPreconditionError(
                     "row lineage references a blob outside the single "
                     "declared source"
