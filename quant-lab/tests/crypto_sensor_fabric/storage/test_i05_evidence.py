@@ -14,25 +14,11 @@ import json
 from pathlib import Path
 
 import pyarrow as pa
-import pytest
 
 from crypto_sensor_fabric.storage.projection_schema import (
-    ProjectionSchemaDefinition,
     compute_schema_fingerprint,
     compute_schema_key,
 )
-from crypto_sensor_fabric.storage.projection_lineage import (
-    NoLineageEntries,
-    NoUsableProjectionSource,
-    ProjectionLineageConflict,
-    SourceOrderConflict,
-    validate_source_order,
-)
-from crypto_sensor_fabric.storage.projections import (
-    ProjectionIdentityConflict,
-    ProjectionSchemaMismatch,
-)
-from crypto_sensor_fabric.storage.models import ProjectionLineage
 
 EVIDENCE_DIR = Path(__file__).parent.parent.parent.parent / (
     "research/crypto_foundry/sensor_fabric/evidence/bloc_04"

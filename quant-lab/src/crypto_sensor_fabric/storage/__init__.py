@@ -166,6 +166,17 @@ from .projection_schema import (
 __all__ = [
     # catalog schemas
     "ACQUISITION_SCHEMA",
+    # projection resolver + lineage contract (I05R1C production path)
+    "ProjectionLineageResolver",
+    "ProjectionSourceMismatch",
+    "DanglingProjectionReference",
+    "ProjectionSchemaConflict",
+    "ProjectionSchemaDefinition",
+    "ProjectionSchemaNotFound",
+    "ProjectionSchemaRegistry",
+    "ReservedProjectionColumn",
+    "compute_schema_fingerprint",
+    "compute_schema_key",
     # paths / addressing
     "BLOB_KEY_PREFIX",
     "BLOB_SCHEMA",

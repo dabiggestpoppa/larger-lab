@@ -13,10 +13,9 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pyarrow as pa
 import pytest
 
-from crypto_sensor_fabric.contracts.enums import SensorFamily
-from crypto_sensor_fabric.providers.base.enums import Granularity
 from crypto_sensor_fabric.storage.blob_store import LocalBlobStore
 from crypto_sensor_fabric.storage.catalog import (
     AcquisitionRepository,
@@ -27,7 +26,6 @@ from crypto_sensor_fabric.storage.manifests import (
     PartitionManifest,
     PartitionManifestRepository,
 )
-from crypto_sensor_fabric.storage.models import RawProjectionArtifact
 from crypto_sensor_fabric.storage.projection_lineage import (
     ProjectionLineageRepository,
 )
@@ -45,14 +43,10 @@ from crypto_sensor_fabric.storage.projections import (
     ProjectionContextRepository,
     ProjectionSourceNotUsable,
     T0BProjectionService,
-    write_projection,
 )
 
 FIXED = datetime(2026, 9, 6, 12, 0, 0, tzinfo=UTC)
 MEDIA = "application/json"
-
-NATIVE_SCHEMA = None  # set at import time below
-import pyarrow as pa
 
 NATIVE_SCHEMA = pa.schema(
     [
@@ -372,7 +366,6 @@ class TestEndToEnd:
         chain.seed_acquisition(sha, "acq-1")
         # Simulate source loss AFTER durable metadata + acquisition exist:
         # a fresh chain cannot re-verify the bytes.
-        chain2 = Chain(tmp_path)
         # reuse the same T0A stack but drop the physical file
         from crypto_sensor_fabric.storage.paths import blob_object_key
 
@@ -493,7 +486,6 @@ class TestRestart:
         # disk (reopen mode — T0B catalogs must NOT be wiped); validate
         # again with the REAL production resolver.
         chain2 = Chain(tmp_path, fresh_t0b=False)
-        resolver2 = chain2.resolver
         artifacts2 = chain2.artifacts
         contexts2 = chain2.contexts
         lineage2 = chain2.lineage

@@ -23,7 +23,6 @@ from crypto_sensor_fabric.storage.atomic import (
     OP_ATOMIC_PUBLISH,
     OP_PARENT_DIR_FSYNC,
     ListOpRecorder,
-    is_canonical_durable_order,
 )
 from crypto_sensor_fabric.storage.json_catalog import (
     CATALOG_OP_DIR_FSYNC,
@@ -317,7 +316,6 @@ class TestConcurrentAdoption:
             fresh.commit("x", {"id": "x", "v": 3})
 
     def test_uncached_existing_identical_file_adopted(self, catalog_root) -> None:
-        cat = _make(catalog_root)
         payload = {"id": "z", "v": 9}
         final = catalog_root / catalog_physical_key("z")
         final.write_bytes(canonical_json_bytes(payload))
