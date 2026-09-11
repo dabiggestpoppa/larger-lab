@@ -54,6 +54,24 @@ def _with_declared_role(ctx, role: str):
 
 
 CONSOLE_PATH = Path(__file__).resolve().parents[2] / "ui" / "console.html"
+# Repository-owned static console content, read once at import time (the
+# file ships inside the governed source tree — no runtime upload or
+# user-controlled write path exists for it).
+with open(CONSOLE_PATH, "r", encoding="utf-8") as _console_fh:
+    CONSOLE_HTML = _console_fh.read()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def _default_dsn() -> str:
     """Fail-closed DSN: never a predictable default (B2-R7)."""
@@ -68,8 +86,8 @@ OPERATOR_ACTIONS = [
 
 def _console_html() -> str:
     try:
-        return CONSOLE_PATH.read_text(encoding="utf-8")
-    except OSError:
+        return CONSOLE_HTML
+    except NameError:  # pragma: no cover - repository layout guarantee
         return "<html><body><h1>OCE console unavailable</h1></body></html>"
 
 
@@ -320,6 +338,10 @@ def create_app(api: ControlPlaneAPI, scheduler=None,
 
     @app.get("/console", response_class=HTMLResponse, include_in_schema=False)
     def console():
+        # B4-CXR7U9R4 (Sonar S5331 review): the body is repository-owned
+        # static content (ui/console.html, read once at import) — never
+        # derived from request data, query strings, headers, or worker
+        # input, so no unsanitized user-controlled data reaches it.
         return HTMLResponse(content=_console_html())
 
     return app

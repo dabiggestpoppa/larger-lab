@@ -22,7 +22,7 @@ missing=""
 for t in python3 git; do
   if ! command -v "$t" >/dev/null 2>&1; then missing="$missing $t"; fi
 done
-if [ -n "$missing" ]; then
+if [[ -n "$missing" ]]; then
   echo "BLOCKED: missing mandatory tools:${missing}" >&2
   exit 3
 fi

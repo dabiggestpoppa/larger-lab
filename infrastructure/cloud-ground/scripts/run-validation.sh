@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+# Shared visual separator (S1192: literal repeated 6x).
+SEP="════════════════════════════════════════════════════════════════"
 #
 # OCE Cloud Ground — Shared Validation Runner
 # B1-I1R3H — Gate Closure
@@ -167,7 +170,7 @@ write_worktree_cleanup_evidence() {
 
 cleanup() {
     local rc=$?
-    if [ "$WORKTREE_REGISTERED" = true ] && [ "$WORKTREE_REMOVED" = false ] && [ -n "$ADV_WORKTREE" ]; then
+    if [[ "$WORKTREE_REGISTERED" == true && "$WORKTREE_REMOVED" == false && -n "$ADV_WORKTREE" ]]; then
         if git -C "$PROJ_ROOT" worktree remove --force "$ADV_WORKTREE" >/dev/null 2>&1; then
             WORKTREE_REMOVED=true
         else
@@ -232,13 +235,13 @@ os.replace(tmp, man_path)
 PYEOF
 }
 
-echo "════════════════════════════════════════════════════════════════"
+echo "$SEP"
 echo "  OCE B1-I1R3H Shared Validation Runner"
-echo "════════════════════════════════════════════════════════════════"
+echo "$SEP"
 echo "  OCE_RUN_ID:      $OCE_RUN_ID"
 echo "  EVIDENCE_DIR:    $FINAL_EVIDENCE"
 echo "  PROJ_ROOT:       $PROJ_ROOT"
-echo "════════════════════════════════════════════════════════════════"
+echo "$SEP"
 echo ""
 
 # ═══════════════════════════════════════════════════════════════════
@@ -298,7 +301,7 @@ fi
 # ═══════════════════════════════════════════════════════════════════
 echo "[STEP d] Assert clean authoritative worktree..."
 DIRTY=$(git -C "$PROJ_ROOT" status --porcelain | wc -l)
-if [ "$DIRTY" -ne 0 ]; then
+if [[ "$DIRTY" -ne 0 ]]; then
     FAILED_PHASE="clean-source-pre"
     echo "FATAL: Worktree is not clean ($DIRTY dirty entries):" >&2
     git -C "$PROJ_ROOT" status --porcelain >&2
@@ -412,7 +415,7 @@ echo ""
 # ═══════════════════════════════════════════════════════════════════
 echo "[STEP j] Reconfirm authoritative source still clean..."
 DIRTY=$(git -C "$PROJ_ROOT" status --porcelain | wc -l)
-if [ "$DIRTY" -ne 0 ]; then
+if [[ "$DIRTY" -ne 0 ]]; then
     FAILED_PHASE="clean-source-post"
     echo "FATAL: Authoritative checkout dirty after adversarial tests ($DIRTY entries):" >&2
     git -C "$PROJ_ROOT" status --porcelain >&2
@@ -476,14 +479,14 @@ echo ""
 # ═══════════════════════════════════════════════════════════════════
 # Step o: Success — report honestly. Nonzero unless genuinely ready.
 # ═══════════════════════════════════════════════════════════════════
-echo "════════════════════════════════════════════════════════════════"
+echo "$SEP"
 echo "  RUNNER RESULT: READY_FOR_OPERATOR_REVIEW"
-echo "════════════════════════════════════════════════════════════════"
+echo "$SEP"
 echo "  OCE_RUN_ID:   $OCE_RUN_ID"
 echo "  COMMIT:       ${COMMIT:0:12}"
 echo "  TREE:         ${TREE:0:12}"
 echo "  BRANCH:       $IDENTITY_BRANCH ($BRANCH_PROVENANCE)"
 echo "  EVIDENCE DIR: $FINAL_EVIDENCE"
-echo "════════════════════════════════════════════════════════════════"
+echo "$SEP"
 ls -la "$FINAL_EVIDENCE/"
 exit 0

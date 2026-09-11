@@ -38,7 +38,7 @@ check "cloud apply denied without authorization" 5 \
 # 2. bootstrap with missing secrets must fail closed (3).
 env -u POSTGRES_PASSWORD -u ARTIFACT_SECRET_KEY bash "$SCRIPTS/bootstrap-local.sh" >> "$LOG" 2>&1
 rc=$?
-if [ "$rc" -eq 3 ]; then
+if [[ "$rc" -eq 3 ]]; then
   echo "PASS: bootstrap fail-closed without secrets (rc=3)" | tee -a "$LOG"
   NAMES+=("bootstrap fail-closed without secrets"); OUTCOMES+=("PASS")
 else

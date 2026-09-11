@@ -153,7 +153,7 @@ done > "$OUT/BACKUP_MANIFEST.sha256"
 if [ "$SCOPE" = "full" ]; then
   [ -f "$CONTENT/postgres/archive.dump" ] && [ -s "$CONTENT/postgres/archive.dump" ] \
     || { echo "BLOCKED: full backup missing PostgreSQL archive" >&2; exit 3; }
-  [ -f "$CONTENT/postgres/inventory.json" ] && [ -s "$CONTENT/postgres/inventory.json" ] \
+  [[ -f "$CONTENT/postgres/inventory.json" && -s "$CONTENT/postgres/inventory.json" ]] \
     || { echo "BLOCKED: full backup missing database inventory" >&2; exit 3; }
   [ -f "$CONTENT/artifacts/artifacts.tar.gz" ] && [ -s "$CONTENT/artifacts/artifacts.tar.gz" ] \
     || { echo "BLOCKED: full backup missing artifact data" >&2; exit 3; }

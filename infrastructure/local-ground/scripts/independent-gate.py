@@ -23,9 +23,14 @@ CI_MODE = os.environ.get("OCE_CI_MODE") == "true"
 GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "")
 GITHUB_REF = os.environ.get("GITHUB_REF_NAME", "")
 
+# Canonical evidence artifact names (S1192: literal repeated 3x).
+TEST_SUMMARY_NAME = "test-summary.json"
+
+
+
 REQUIRED = [
     "identity.json", "environment-fingerprint.json", "junit.xml",
-    "test-summary.json", "test-mode.txt", "adversarial-results.json",
+    TEST_SUMMARY_NAME, "test-mode.txt", "adversarial-results.json",
     "adversarial-output.txt", "cloud-plan.txt", "cloud-apply-denial.txt",
     "cloud-apply-denial.json", "cloud-plan-deterministic.json",
     "local-after-denied.json", "source-clean.json", "cleanup.json",
@@ -121,7 +126,7 @@ def main():
     add("gate-01-required-artifacts", "required artifacts exist", not missing, missing or "all present")
 
     # 2. Required JSON parses
-    json_files = ["identity.json", "test-summary.json", "adversarial-results.json",
+    json_files = ["identity.json", TEST_SUMMARY_NAME, "adversarial-results.json",
                   "cloud-apply-denial.json", "cloud-plan-deterministic.json",
                   "local-after-denied.json", "source-clean.json", "cleanup.json",
                   "stage-status.json", "evidence-manifest.json"]
@@ -191,7 +196,7 @@ def main():
     add("gate-12-source-clean", "source clean before and after", sc_ok, sc)
 
     # 13-16. Test totals from machine-readable registry
-    ts = load_json(os.path.join(ev, "test-summary.json"))
+    ts = load_json(os.path.join(ev, TEST_SUMMARY_NAME))
     t = ts.get("totals", {})
     cb = ts.get("container_backed", {})
     collected, executed = t.get("collected", 0), t.get("executed", 0)

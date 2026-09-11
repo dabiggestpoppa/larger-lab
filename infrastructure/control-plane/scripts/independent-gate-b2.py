@@ -55,7 +55,9 @@ from b2_registry import (  # noqa: E402
 
 RUN_ID_RE = re.compile(r"^[0-9a-f]{12,}$")
 # Artifacts produced AFTER pass A (stage status + manifest) — verified in pass B.
-LATE_ARTIFACTS = {"stage-status.json", "evidence-manifest.json"}
+STAGE_STATUS_NAME = "stage-status.json"
+MANIFEST_NAME = "evidence-manifest.json"
+LATE_ARTIFACTS = {STAGE_STATUS_NAME, MANIFEST_NAME}
 
 # Truthful stage identity — same env contract as the runner (defect 15). When
 # a Book 3 workflow sets OCE_BLOCK_LABEL/OCE_STAGE_LABEL, the gate labels the
@@ -257,7 +259,7 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
 
     # ------------------------------------------------------------------ reconciliation
     # every JSON artifact that carries a run id must reconcile to this run
-    reconciling = pass_a_required + (["stage-status.json"] if final else [])
+    reconciling = pass_a_required + ([STAGE_STATUS_NAME] if final else [])
     for name in reconciling:
         path = evidence / name
         if not path.exists():
@@ -312,7 +314,7 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
 
     # ------------------------------------------------------------------ final phase
     if final:
-        manifest_path = evidence / "evidence-manifest.json"
+        manifest_path = evidence / MANIFEST_NAME
         if not manifest_path.exists():
             add("manifest-exists", "final evidence manifest present", False, "missing")
         else:
@@ -337,13 +339,13 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
                         mismatches.append(f"{name}: hash/size mismatch")
                 # the manifest is generated LAST and never self-references
                 missing_from_manifest = [a for a in REQUIRED_ARTIFACTS
-                                         if a != "evidence-manifest.json" and a not in files]
+                                         if a != MANIFEST_NAME and a not in files]
                 add("manifest-hashes", "manifest SHA-256 + sizes match final files",
                     not mismatches, "; ".join(mismatches[:5]) or "all match")
                 add("manifest-complete", "all required artifacts in manifest",
                     not missing_from_manifest, f"missing={missing_from_manifest}")
 
-        stage = _parse_json(evidence, "stage-status.json", checks, "stage-status-parses")
+        stage = _parse_json(evidence, STAGE_STATUS_NAME, checks, "stage-status-parses")
         if stage is not None:
             # stage status must match the gate result computed WITHOUT the
             # stage-status / manifest checks themselves (avoid self-reference)

@@ -391,6 +391,12 @@ def _reject_forbidden_flags(argv: list[str] | None) -> None:
 def main(
         argv: list[str] | None = None,
         ctx: "ParentActivationContext | VerifiedChildContext | None" = None) -> int:
+    """Run governed migrations (B4-CXR5R1/R2).
+
+    ``ctx`` is accepted for call-site compatibility with the other governed
+    entrypoints; the migration role context is ALWAYS derived in-process
+    below (role-bound to 'migration') so a caller can never inject a
+    different role through this seam (B4-CXR7U9R4)."""
     if argv is None:
         argv = sys.argv[1:]
     # B4-CXR5R1/R2: reject secret-bearing and alternate-dir flags before
@@ -417,8 +423,8 @@ def main(
     # launched as a lifecycle child the activation capability must be
     # role-bound to 'migration' or database mutation is refused before any
     # connection.
-    ctx = create_activation_context(role="migration")
-    dsn = ctx.runtime_dsn()
+    _ctx = create_activation_context(role="migration")
+    dsn = _ctx.runtime_dsn()
     # Invariant guard (defense in depth): the governed derivation MUST be the
     # exact governed identity — host/port/db/user (+ credential authority).
     # Values are compared in-memory; nothing is echoed (B4-CXR4R4).

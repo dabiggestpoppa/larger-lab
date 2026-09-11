@@ -36,7 +36,11 @@ jobs:
           python-version: '3.12'
 
       - name: Install pinned Python test dependencies
-        run: pip install -r infrastructure/control-plane/requirements-ci.txt
+        # uv enforces exact versions from requirements-ci.txt; bare pip would
+        # silently accept and resolve beyond the pinned contract.
+        run: |
+          pipx install uv 2>/dev/null || pip install --quiet uv
+          uv pip install --system -r infrastructure/control-plane/requirements-ci.txt
 
       - name: Confirm pinned actions/dependencies contract
         run: |

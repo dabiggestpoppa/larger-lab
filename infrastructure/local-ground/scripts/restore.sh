@@ -85,7 +85,10 @@ while IFS=' ' read -r sha size rel extra; do
   case "$rel" in
     /*|*\"/../\"*|\"..\"|*/\"..\"|\"../\"*|*'/..'*) echo "CORRUPT: unsafe manifest path '$rel'" >&2; rc=1; continue ;;
   esac
-  case "$rel" in *\\\\*) echo "CORRUPT: backslash in manifest path '$rel'" >&2; rc=1; continue ;; esac
+  case "$rel" in
+    *\\\\*) echo "CORRUPT: backslash in manifest path '$rel'" >&2; rc=1; continue ;;
+    *) : ;;  # single backslash is a legal POSIX filename character (S3923 default)
+  esac
   if [ -n "${seen[$rel]:-}" ]; then echo "CORRUPT: duplicate manifest path '$rel'" >&2; rc=1; continue; fi
   seen[$rel]=1
   count=$((count+1))
@@ -150,7 +153,7 @@ if [ "$MODE" = "state-only" ]; then
 fi
 
 # ── full-replace restore ───────────────────────────────────────────────────
-if [ "$SCOPE" != "full" ]; then
+if [[ "$SCOPE" != "full" ]]; then
   echo "BLOCKED: full-replace mode requires a 'full' backup (got scope=$SCOPE)." >&2
   echo "         A state-only backup cannot be restored with full-replace." >&2
   exit 3
@@ -160,7 +163,7 @@ if [ "$DCR" != "True" ] && [ "$DCR" != "true" ]; then
   exit 3
 fi
 [ -z "$CONFIRM_TARGET" ] && { echo "BLOCKED: full-replace requires --confirm-local-target <db>." >&2; exit 3; }
-[ "$CONFIRM_TARGET" != "$PG_DB" ] && { echo "BLOCKED: --confirm-local-target must equal the local recovery database ($PG_DB)." >&2; exit 3; }
+[[ "$CONFIRM_TARGET" != "$PG_DB" ]] && { echo "BLOCKED: --confirm-local-target must equal the local recovery database ($PG_DB)." >&2; exit 3; }
 
 # R24: validate artifact archive members BEFORE the docker gate, so an unsafe
 # archive is rejected even where no runtime is available.
@@ -303,15 +306,15 @@ PG_COMMON=(--inventory "$CONTENT/postgres/inventory.json"
 save_pg_receipt() { # one or more receipt files -> evidence (never clobbered)
   local src
   for src in "$@"; do
-    [ -f "$src" ] || continue
+    [[ -f "$src" ]] || continue
     if [ -n "$EV_DIR" ]; then
       cp "$src" "$EV_DIR/$(basename "$src")" 2>/dev/null || true
       cp "$src" "$EV_DIR/$(basename "$src" .json)-$(date +%s%N).json" 2>/dev/null || true
     fi
   done
 }
-if [ -f "$CONTENT/postgres/archive.dump" ] && [ -f "$CONTENT/postgres/inventory.json" ] \
-   && [ -f "$CONTENT/postgres/inventory.json.sha256" ]; then
+if [[ -f "$CONTENT/postgres/archive.dump" && -f "$CONTENT/postgres/inventory.json" \
+   && -f "$CONTENT/postgres/inventory.json.sha256" ]]; then
   # PHASE 1 — promote: staging restore + verify, canonical->quarantine,
   # promote, canonical verify. The quarantine (rollback source) is HELD.
   if ! python3 "$BIN/pg-recovery.py" --phase promote \
@@ -360,7 +363,7 @@ fi
 # invalidated ONLY after PostgreSQL and artifact replacement passed final
 # verification. Invalidation failure BLOCKS a clean success (nonzero) while
 # preserving evidence of PostgreSQL status and the cache-invalidation failure.
-if [ "$SCOPE" = "full" ] && [ "$MODE" = "full-replace" ]; then
+if [[ "$SCOPE" == "full" && "$MODE" == "full-replace" ]]; then
   REDIS_RECEIPT="$RECEIPT_DIR/redis-invalidation-receipt.json"
   REDIS_INVALIDATED=false
   REDIS_VERIFICATION="not-attempted"
@@ -411,9 +414,9 @@ PY
   fi
 fi
 
-if [ "$SCOPE" = "full" ] && { [ ! -f "$CONTENT/postgres/archive.dump" ] \
-     || [ ! -f "$CONTENT/postgres/inventory.json" ] \
-     || [ ! -f "$CONTENT/postgres/inventory.json.sha256" ]; }; then
+if [[ "$SCOPE" == "full" && ( ! -f "$CONTENT/postgres/archive.dump" \
+     || ! -f "$CONTENT/postgres/inventory.json" \
+     || ! -f "$CONTENT/postgres/inventory.json.sha256" ) ]]; then
   echo "BLOCKED: full backup is missing required PostgreSQL archive/inventory" >&2
   exit 3
 fi

@@ -72,6 +72,25 @@ def build_supervisor(runtime: Path) -> WorkerSupervisor:
     return WorkerSupervisor(runtime, au)
 
 
+def _add_configure_parser(sub) -> None:
+    """Register the worker configure subcommand (S1077/S3776 extraction)."""
+    conf = sub.add_parser("configure", help="configure a worker (does NOT admit)")
+    conf.add_argument("worker_id")
+    conf.add_argument("--cap", action="append", default=[],
+                      help="capability (repeatable) — operator declaration")
+    conf.add_argument("--actor", default="operator:po")
+
+
+def _add_admit_parser(sub) -> None:
+    """Register the PO-only admit subcommand."""
+    admit = sub.add_parser("admit", help="PO-only admission")
+    admit.add_argument("worker_id")
+    admit.add_argument("--cap", action="append", default=[],
+                       help="capability (repeatable)")
+    admit.add_argument("--actor", default="operator:po")
+    admit.add_argument("--confirm", action="store_true",
+                       help="admission is a governance action; pass to confirm PO intent")
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(argv) if argv is not None else sys.argv[1:]
     # Capture the worker command explicitly: everything after the first `--`
@@ -89,19 +108,8 @@ def main(argv: list[str] | None = None) -> int:
                    help="runtime dir (default OCE_RUNTIME_DIR or ~/.oce-control-plane/runtime)")
     sub = p.add_subparsers(dest="command", required=True)
 
-    conf = sub.add_parser("configure", help="configure a worker (does NOT admit)")
-    conf.add_argument("worker_id")
-    conf.add_argument("--cap", action="append", default=[],
-                      help="capability (repeatable) — operator declaration")
-    conf.add_argument("--actor", default="operator:po")
-
-    admit = sub.add_parser("admit", help="PO-only admission")
-    admit.add_argument("worker_id")
-    admit.add_argument("--cap", action="append", default=[],
-                       help="capability (repeatable)")
-    admit.add_argument("--actor", default="operator:po")
-    admit.add_argument("--confirm", action="store_true",
-                       help="admission is a governance action; pass to confirm PO intent")
+    _add_configure_parser(sub)
+    _add_admit_parser(sub)
 
     for cmd in ("start", "up", "status", "pause", "resume", "drain",
                 "restart", "revoke", "stop"):

@@ -56,8 +56,8 @@ def verify_canonical(container, db, user, inv):
     return ok, problems
 
 
-def main():
-    args = sys.argv[1:]
+def _parse_args(args):
+    """Parse pg-verify CLI flags -> (kwargs, stable). Exits on usage errors."""
     kw = {}
     stable = 2
     i = 0
@@ -73,6 +73,12 @@ def main():
             print(f"USAGE_ERROR: unknown arg '{a}'", file=sys.stderr)
             sys.exit(2)
         i += 1
+    return kw, stable
+
+
+def main():
+    args = sys.argv[1:]
+    kw, stable = _parse_args(args)
     if not kw.get("inventory") or not kw.get("inventory_sha"):
         print("USAGE_ERROR: --inventory and --inventory-sha required", file=sys.stderr)
         sys.exit(2)

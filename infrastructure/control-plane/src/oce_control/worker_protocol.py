@@ -265,7 +265,9 @@ class WorkerProtocolServer:
 
     def renew(self, session_id: str, signature: str, job_id: str,
               lease_id: str, fence: int) -> dict:
-        sess = self._auth(session_id, signature, "renew")
+        # auth result is the gate itself; the renewal payload carries no
+        # session-dependent fields (B4-CXR7U9R4: unused binding removed)
+        self._auth(session_id, signature, "renew")
         try:
             self._scheduler.renew(job_id, lease_id, fence,
                                   ttl_s=self._scheduler.default_ttl)

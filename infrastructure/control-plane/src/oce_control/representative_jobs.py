@@ -32,6 +32,9 @@ from typing import Optional
 _PROGRAMS: dict[str, str] = {}
 
 
+REPO_INVENTORY_JOB_TYPE = "b3.repo-inventory"
+
+
 def _define(job_type: str, src: str) -> None:
     src = textwrap.dedent(src).strip()
     _PROGRAMS[job_type] = src
@@ -56,7 +59,7 @@ pathlib.Path("output/compute.json").write_text(
     json.dumps({"n": n, "sum_sqrt": round(total, 6)}), encoding="utf-8")
 """)
 
-_define("b3.repo-inventory", """
+_define(REPO_INVENTORY_JOB_TYPE, """
 import json, pathlib
 lines = pathlib.Path("input/README.txt").read_text(encoding="utf-8").splitlines()
 pathlib.Path("output/inventory.json").write_text(
@@ -127,7 +130,7 @@ def prepare_workspace(workspace: Path, job_type: str, params: Optional[dict] = N
     (workspace / "output").mkdir(parents=True, exist_ok=True)
     (workspace / "cache").mkdir(parents=True, exist_ok=True)
     params = params or {}
-    if job_type in ("b3.repo-inventory",):
+    if job_type == REPO_INVENTORY_JOB_TYPE:
         readme = workspace / "input" / "README.txt"
         readme.write_text("OCE representative repo inventory fixture line ONE\n"
                           "line two\n", encoding="utf-8")
@@ -137,4 +140,4 @@ def prepare_workspace(workspace: Path, job_type: str, params: Optional[dict] = N
 
 
 def job_type_requires_readme(job_type: str) -> bool:
-    return job_type == "b3.repo-inventory"
+    return job_type == REPO_INVENTORY_JOB_TYPE

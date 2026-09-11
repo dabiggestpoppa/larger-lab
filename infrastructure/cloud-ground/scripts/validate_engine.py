@@ -24,6 +24,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 VERSION = "3.6.0"
+YAML_GLOB = "*.yaml"
+CHECK_COST_THRESHOLDS = "Cost thresholds match ratification"
+CHECK_WORKER_DENY = "Workers denied DB/Redis/SSH/Docker"
+CHECK_TOTALS_CONSIST = "Result totals self-consistent"
+STATIC_RESULTS_NAME = "static-validation-results.json"
 SCRIPT_DIR = Path(__file__).resolve().parent
 BASE_DIR = SCRIPT_DIR.parent
 REPO_ROOT = BASE_DIR.parent.parent  # infrastructure/cloud-ground -> repo root
@@ -401,7 +406,7 @@ class Validator:
 
     # ===== STATIC CHECKS =====
     def check_yaml_parsing(self):
-        yaml_files = self._find_files(BASE_DIR, "*.yml") + self._find_files(BASE_DIR, "*.yaml")
+        yaml_files = self._find_files(BASE_DIR, "*.yml") + self._find_files(BASE_DIR, YAML_GLOB)
         yaml_files = [f for f in yaml_files if ".git" not in str(f) and "node_modules" not in str(f)]
         passed, failed, details = 0, 0, []
         for f in yaml_files:
@@ -542,7 +547,7 @@ class Validator:
                       "\n".join(details))
 
     def check_no_latest_tags(self):
-        compose_files = self._find_files(COMPOSE_DIR, "*.yml") + self._find_files(COMPOSE_DIR, "*.yaml")
+        compose_files = self._find_files(COMPOSE_DIR, "*.yml") + self._find_files(COMPOSE_DIR, YAML_GLOB)
         violations = []
         for f in compose_files:
             content = self._read_file(f)
@@ -559,7 +564,7 @@ class Validator:
             self.add("NO-LATEST-TAGS", "No :latest image tags", True, "PASS", "0 violations", "Clean")
 
     def check_digest_lock(self):
-        compose_files = self._find_files(COMPOSE_DIR, "*.yml") + self._find_files(COMPOSE_DIR, "*.yaml")
+        compose_files = self._find_files(COMPOSE_DIR, "*.yml") + self._find_files(COMPOSE_DIR, YAML_GLOB)
         violations = []
         for f in compose_files:
             content = self._read_file(f)
@@ -603,22 +608,7 @@ class Validator:
                       "compose.foundation.yml not found", "")
             return
         content = self._read_file(foundation)
-        violations = []
-        for i, line in enumerate(content.split("\n"), 1):
-            stripped = line.lstrip()
-            if stripped.startswith("#"):
-                continue
-            m = re.match(r"image:\s*(.+)", stripped)
-            if m:
-                img_ref = m.group(1).strip().strip('"').strip("'")
-                parts = img_ref.split("@")
-                img_name = parts[0] if parts else ""
-                img_digest = parts[1] if len(parts) > 1 else ""
-                if img_name in evidence_digests:
-                    if img_digest != evidence_digests[img_name]:
-                        violations.append(f"{img_name}: compose mismatch")
-                elif img_name:
-                    violations.append(f"{img_name}: no digest proof")
+        violations = self._compose_digest_violations(content, evidence_digests)
         unverified = [name for name in evidence_digests if name not in verified_digests]
         if violations:
             self.add("DIGEST-PROOF", "Image digests match registry evidence", True, "FAIL",
@@ -629,6 +619,28 @@ class Validator:
         else:
             self.add("DIGEST-PROOF", "Image digests match registry evidence", True, "PASS",
                       f"{len(verified_digests)} verified", "All compose digests match")
+
+    @staticmethod
+    def _compose_digest_violations(content: str, evidence_digests: dict) -> list:
+        """Scan compose image: lines for digest mismatches (S3776 extraction)."""
+        violations = []
+        for line in content.split("\n"):
+            stripped = line.lstrip()
+            if stripped.startswith("#"):
+                continue
+            m = re.match(r"image:\s*(.+)", stripped)
+            if not m:
+                continue
+            img_ref = m.group(1).strip().strip('"').strip("'")
+            parts = img_ref.split("@")
+            img_name = parts[0] if parts else ""
+            img_digest = parts[1] if len(parts) > 1 else ""
+            if img_name in evidence_digests:
+                if img_digest != evidence_digests[img_name]:
+                    violations.append(f"{img_name}: compose mismatch")
+            elif img_name:
+                violations.append(f"{img_name}: no digest proof")
+        return violations
 
     def check_digest_registry(self):
         evidence_path = EVIDENCE_DIR / "image-digests.json"
@@ -776,7 +788,7 @@ class Validator:
             (r"-----BEGIN\s+(RSA|DSA|EC|OPENSSH)\s+PRIVATE\s+KEY-----", "private key"),
         ]
         scan_dirs = [BASE_DIR / "scripts", BASE_DIR / "tests", ANSIBLE_DIR, COMPOSE_DIR]
-        scan_exts = ["*.py", "*.yml", "*.yaml", "*.json", "*.sh", "*.cfg", "*.conf", "*.j2"]
+        scan_exts = ["*.py", "*.yml", YAML_GLOB, "*.json", "*.sh", "*.cfg", "*.conf", "*.j2"]
         files = []
         for d in scan_dirs:
             if d.exists():
@@ -818,7 +830,7 @@ class Validator:
     def check_cost_thresholds(self):
         cost_file = POLICY_DIR / "cost-guardrails.yml"
         if not cost_file.exists():
-            self.add("COST-THRESHOLDS", "Cost thresholds match ratification", True, "FAIL",
+            self.add("COST-THRESHOLDS", CHECK_COST_THRESHOLDS, True, "FAIL",
                       "cost-guardrails.yml not found", "")
             return
         content = self._read_file(cost_file)
@@ -829,24 +841,24 @@ class Validator:
         ]
         missing = [desc for pattern, desc in checks if pattern not in content]
         if missing:
-            self.add("COST-THRESHOLDS", "Cost thresholds match ratification", True, "FAIL",
+            self.add("COST-THRESHOLDS", CHECK_COST_THRESHOLDS, True, "FAIL",
                       f"Missing: {', '.join(missing)}", "")
         else:
-            self.add("COST-THRESHOLDS", "Cost thresholds match ratification", True, "PASS",
+            self.add("COST-THRESHOLDS", CHECK_COST_THRESHOLDS, True, "PASS",
                       "All thresholds", "$60/$50/$100")
 
     def check_worker_deny(self):
         policy = POLICY_DIR / "network-access.yml"
         if not policy.exists():
-            self.add("WORKER-DENY", "Workers denied DB/Redis/SSH/Docker", True, "FAIL",
+            self.add("WORKER-DENY", CHECK_WORKER_DENY, True, "FAIL",
                       "network-access.yml not found", "")
             return
         deny_count = self._read_file(policy).count("action: DENY")
         if deny_count >= 12:
-            self.add("WORKER-DENY", "Workers denied DB/Redis/SSH/Docker", True, "PASS",
+            self.add("WORKER-DENY", CHECK_WORKER_DENY, True, "PASS",
                       f"{deny_count} DENY rules", f"{deny_count} denial rules")
         else:
-            self.add("WORKER-DENY", "Workers denied DB/Redis/SSH/Docker", True, "FAIL",
+            self.add("WORKER-DENY", CHECK_WORKER_DENY, True, "FAIL",
                       f"{deny_count} DENY rules", f"Need 12+, found {deny_count}")
 
     def check_worker_no_db_access(self):
@@ -1138,14 +1150,14 @@ class Validator:
         expected_total = totals["PASS"] + totals["FAIL"] + totals["BLOCKED"] + totals["SKIPPED"]
         actual_total = totals["total"]
         if actual_total == 0:
-            self.add("TOTALS-CONSIST", "Result totals self-consistent", True, "FAIL",
+            self.add("TOTALS-CONSIST", CHECK_TOTALS_CONSIST, True, "FAIL",
                       "0 results", "No checks executed")
         elif actual_total == expected_total:
-            self.add("TOTALS-CONSIST", "Result totals self-consistent", True, "PASS",
+            self.add("TOTALS-CONSIST", CHECK_TOTALS_CONSIST, True, "PASS",
                       f"{actual_total} results",
                       f"P={totals['PASS']} F={totals['FAIL']} B={totals['BLOCKED']} S={totals['SKIPPED']}")
         else:
-            self.add("TOTALS-CONSIST", "Result totals self-consistent", True, "FAIL",
+            self.add("TOTALS-CONSIST", CHECK_TOTALS_CONSIST, True, "FAIL",
                       f"total={actual_total} computed={expected_total}", "Disagreement")
 
     def _evidence_dir(self):
@@ -1320,7 +1332,7 @@ class Validator:
         errors = []
 
         for fname, label in [
-            ("static-validation-results.json", "static-validation-results"),
+            (STATIC_RESULTS_NAME, "static-validation-results"),
             ("adversarial-results.json", "adversarial-results"),
             ("stage-status.json", "stage-status"),
         ]:
@@ -1345,7 +1357,7 @@ class Validator:
                       f"run_id={self.run_uid}", "All evidence artifacts use same RUN_ID")
 
     def check_evidence_consistency(self):
-        ev_path = self._evidence_dir() / "static-validation-results.json"
+        ev_path = self._evidence_dir() / STATIC_RESULTS_NAME
         git = get_git_info()
         errors = []
 
@@ -1567,7 +1579,7 @@ class Validator:
         payload["gate"] = self.determine_gate(payload["totals"])
 
         results_json = json.dumps(payload, indent=2, ensure_ascii=False)
-        self._atomic_write(ev_dir / "static-validation-results.json", results_json)
+        self._atomic_write(ev_dir / STATIC_RESULTS_NAME, results_json)
         self.write_summary_md(git_info, payload["totals"], payload["gate"], ev_dir)
         self.write_stage_status(git_info, payload["totals"], payload["gate"], ev_dir)
         if self.phase == "final":
@@ -1579,7 +1591,7 @@ class Validator:
         """R3G: SHA-256 inventory of required evidence artifacts."""
         import hashlib
         required = [
-            "static-validation-results.json",
+            STATIC_RESULTS_NAME,
             "static-validation-summary.md",
             "adversarial-results.json",
             "stage-status.json",
@@ -1648,7 +1660,7 @@ class Validator:
             "gate": gate,
         }
         self._atomic_write(
-            ev_dir / "static-validation-results.json",
+            ev_dir / STATIC_RESULTS_NAME,
             json.dumps(payload, indent=2, ensure_ascii=False),
         )
         return gate, totals

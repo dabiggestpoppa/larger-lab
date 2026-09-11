@@ -357,7 +357,7 @@ class WorkerSupervisor:
     def cleanup(self, preserve_artifacts_dir: Optional[Path] = None) -> dict:
         """Clean disposable state, PRESERVING durable artifacts storage and any
         authoritative PostgreSQL state (handled by the control plane)."""
-        for worker_id in list(self._workers):
+        for worker_id in self._workers:  # stop()/start() never mutate membership
             try:
                 self.stop(worker_id)
             except Exception:

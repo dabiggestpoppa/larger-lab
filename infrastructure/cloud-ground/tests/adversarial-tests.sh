@@ -35,9 +35,9 @@ SCRATCH_DIR="$(mktemp -d "${TMPDIR:-/tmp}/oce-adv-scratch-XXXXXX")"
 # Final evidence directory (where adversarial-results.json is written).
 # R3G: in authoritative mode OCE_EVIDENCE_DIR is mandatory — no default
 # inside the repository.
-if [ -n "${OCE_EVIDENCE_DIR:-}" ]; then
+if [[ -n "${OCE_EVIDENCE_DIR:-}" ]]; then
     EVIDENCE_DIR="$OCE_EVIDENCE_DIR"
-elif [ -n "${OCE_ADVERSARIAL_ALLOW_LOCAL_EVIDENCE:-}" ]; then
+elif [[ -n "${OCE_ADVERSARIAL_ALLOW_LOCAL_EVIDENCE:-}" ]]; then
     EVIDENCE_DIR="$PROJ_ROOT/.oce-adversarial-evidence"
 else
     echo "FATAL: OCE_EVIDENCE_DIR is not set. The adversarial suite must write to an externally supplied evidence directory outside the repository." >&2
@@ -82,11 +82,13 @@ run_check() {
 get_result() {
     local check_id="$1"
     python3 -c "import json,sys; d=json.load(open(sys.argv[1])); results=[r['result'] for r in d.get('results',[]) if r['check_id']==sys.argv[2]]; sys.stdout.buffer.write((results[0] if results else 'NOT_FOUND').encode())" "$EVIDENCE_FILE" "$check_id" 2>/dev/null || echo -n ERROR
+    return 0
 }
 
 scratch_path() {
     # Windows-safe path to a file inside the scratch dir.
     win_path "$SCRATCH_DIR/$1"
+    return 0
 }
 
 write_result() {
@@ -183,11 +185,11 @@ run_one() {
     post_restore_result=$(get_result "$expect")
 
     local pass=true reason=""
-    if [ "$baseline_result" != "PASS" ]; then pass=false; reason="baseline=$baseline_result (must be PASS)"
-    elif [ "$baseline_exit" -ne 0 ]; then pass=false; reason="baseline_exit=$baseline_exit (must be 0)"
-    elif [ "$mutation_result" != "FAIL" ]; then pass=false; reason="mutation_result=$mutation_result (must be exactly FAIL)"
-    elif [ "$mutation_exit" -eq 0 ]; then pass=false; reason="mutation_exit=0 (must be nonzero)"
-    elif [ "$post_restore_result" != "PASS" ]; then pass=false; reason="post_restore_result=$post_restore_result (must be PASS)"
+    if [[ "$baseline_result" != "PASS" ]]; then pass=false; reason="baseline=$baseline_result (must be PASS)"
+    elif [[ "$baseline_exit" -ne 0 ]]; then pass=false; reason="baseline_exit=$baseline_exit (must be 0)"
+    elif [[ "$mutation_result" != "FAIL" ]]; then pass=false; reason="mutation_result=$mutation_result (must be exactly FAIL)"
+    elif [[ "$mutation_exit" -eq 0 ]]; then pass=false; reason="mutation_exit=0 (must be nonzero)"
+    elif [[ "$post_restore_result" != "PASS" ]]; then pass=false; reason="post_restore_result=$post_restore_result (must be PASS)"
     elif [ "$post_restore_exit" -ne 0 ]; then pass=false; reason="post_restore_exit=$post_restore_exit (must be 0)"
     elif [ "$orig_hash" != "$rest_hash" ]; then pass=false; reason="hash mismatch orig=$orig_hash rest=$rest_hash"
     fi
@@ -438,7 +440,7 @@ CB_CONTRACT=$(python3 -c "import json;print(json.load(open('$IDENTITY'))['author
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-01: Missing authoritative inputs"
 rc=0; python3 "$ENGINE_WIN" --authoritative >/dev/null 2>&1 || rc=$?
-if [ "$rc" -ne 0 ]; then
+if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-01" "PASS" "Missing authoritative inputs" \
         "cli-input" "authoritative mode without --target-commit/--target-tree/--target-branch" \
@@ -454,7 +456,7 @@ fi
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-02: Wrong target commit"
 rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit 0000000000000000000000000000000000000000 --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
-if [ "$rc" -ne 0 ]; then
+if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-02" "PASS" "Wrong target commit" \
         "cli-input" "--target-commit=0000...0000 does not match HEAD" \
@@ -470,7 +472,7 @@ fi
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-03: Wrong branch"
 rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "$CT" --target-branch wrong-branch >/dev/null 2>&1 || rc=$?
-if [ "$rc" -ne 0 ]; then
+if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-03" "PASS" "Wrong branch" \
         "cli-input" "--target-branch=wrong-branch does not match authorized branch" \
@@ -488,7 +490,7 @@ echo "  [$TOTAL_COUNT] CLI-04: Wrong repository"
 GR_ORIG="${GITHUB_REPOSITORY:-}"; export GITHUB_REPOSITORY="wrong/repo"
 rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
 if [ -n "$GR_ORIG" ]; then export GITHUB_REPOSITORY="$GR_ORIG"; else unset GITHUB_REPOSITORY; fi
-if [ "$rc" -ne 0 ]; then
+if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-04" "PASS" "Wrong repository" \
         "cli-input" "GITHUB_REPOSITORY=wrong/repo does not match expected" \
@@ -531,7 +533,7 @@ echo "  [$TOTAL_COUNT] ST-02: Dirty worktree rejected"
 echo "# oce-dirty-test" >> "$COMPOSE"
 rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
 git -C "$PROJ_ROOT" checkout -- "$COMPOSE" 2>/dev/null || true
-if [ "$rc" -ne 0 ]; then
+if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "ST-02" "PASS" "Dirty worktree rejected" \
         "state-condition" "untracked file present in authoritative checkout" \
@@ -547,7 +549,7 @@ fi
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] ST-03: Wrong tree rejected"
 rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "0000000000000000000000000000000000000000000000000000000000000000" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
-if [ "$rc" -ne 0 ]; then
+if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "ST-03" "PASS" "Wrong tree rejected" \
         "cli-input" "--target-tree=000...000 does not match HEAD tree" \

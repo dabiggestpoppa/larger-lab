@@ -591,10 +591,8 @@ class ActivationEnvelope:
                           sort_keys=True, separators=(",", ":"))
 
     @classmethod
-    def from_dict(cls, payload: dict) -> "ActivationEnvelope":
-        """Validate the typed payload (unknown fields, types, ranges)."""
-        if not isinstance(payload, dict):
-            raise ValueError("capability payload must be a JSON object")
+    def _validate_capability_payload(cls, payload: dict) -> None:
+        """Validate unknown fields, presence, and scalar types (S3776)."""
         allowed = {"schema_version", "context_id", "config_fingerprint",
                    "security_state_fingerprint", "secret_reference",
                    "secret_backend_identity", "secret_generation",
@@ -632,8 +630,8 @@ class ActivationEnvelope:
         for int_field in ("control_plane_port", "scheduler_interval",
                           "postgres_port", "secret_generation",
                           "issued_at", "expires_at"):
-            if not isinstance(payload[int_field], int) or \
-                    isinstance(payload[int_field], bool):
+            if (not isinstance(payload[int_field], int)
+                    or isinstance(payload[int_field], bool)):
                 raise ValueError(
                     f"capability {int_field} must be an int (bool-as-int "
                     "confusion rejected)")
@@ -641,6 +639,9 @@ class ActivationEnvelope:
             raise ValueError(
                 "capability secret_revocation_state must be a bool "
                 "(bool-as-int confusion rejected)")
+    @classmethod
+    def _validate_capability_ports(cls, payload: dict) -> None:
+        """Validate numeric ranges and composite fields (S3776)."""
         if not (1 <= payload["control_plane_port"] <= 65535) or \
                 not (1 <= payload["postgres_port"] <= 65535):
             raise ValueError("capability port out of range")
@@ -659,6 +660,11 @@ class ActivationEnvelope:
             raise ValueError("capability nonce must be a hex string")
         if payload["expires_at"] <= payload["issued_at"]:
             raise ValueError("capability expires_at must follow issued_at")
+    @classmethod
+    def from_dict(cls, payload: dict) -> "ActivationEnvelope":
+        """Validate the typed payload and construct (S3776)."""
+        cls._validate_capability_payload(payload)
+        cls._validate_capability_ports(payload)
         return cls(
             schema_version=1,
             context_id=payload["context_id"],
@@ -1369,8 +1375,17 @@ def outbound_cp_url(environ: dict | None = None,
         canonical = ctx.canonical_control_plane_url
     else:
         eff = require_startable(env)  # gate first: forbidden config still blocks
-        canonical = (f"http://{eff.get('control_plane.host')}:"
-                     f"{eff.get('control_plane.port')}")
+        # B4-CXR7U9R4 (Sonar S5332 review): Book 4's durable control plane is
+        # a 127.0.0.1-only HTTP service (uvicorn, no TLS terminator). The URL
+        # is a loopback reference validated against the governed config,
+        # never a remote transport. IP literals are forced here so a
+        # wildcard/IPv6 bind address can never flow into the worker target
+        # (an omitted IPv6 scope would otherwise make 0.0.0.0/:: and ::1
+        # indistinguishable in a strict-match comparison).
+        _h = eff.get('control_plane.host')
+        _port = eff.get('control_plane.port')
+        _host = f'[{_h}]' if _h in ('0.0.0.0', '::') else _h
+        canonical = f"http://{_host}:{_port}"
     url = env.get("OCE_CP_URL")
     if not url:
         return canonical

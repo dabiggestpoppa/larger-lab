@@ -213,7 +213,7 @@ import json, sys
 json.dump({"pre": ${DIRTY} == 0, "dirty_pre": ${DIRTY}, "post": False},
           open(sys.argv[1], "w", encoding="utf-8"), indent=2)
 PY
-if [ "$DIRTY" -ne 0 ]; then
+if [[ "$DIRTY" -ne 0 ]]; then
   echo "FATAL: source dirty ($DIRTY)"; git -C "$PROJ_ROOT" status --porcelain >&2
   fail clean-source-pre 1
 fi
@@ -229,7 +229,7 @@ python3 -m pytest "$TEST_FILE" "$CONTRACT_TEST" "$LIFECYCLE_TEST" "$GATE_TEST" "
   --junitxml="$EVIDENCE/junit.xml" > "$EVIDENCE/acceptance-output.txt" 2>&1
 RC=$?
 tail -25 "$EVIDENCE/acceptance-output.txt"
-if [ "$RC" -ne 0 ]; then fail acceptance-tests "$RC"; fi
+if [[ "$RC" -ne 0 ]]; then fail acceptance-tests "$RC"; fi
 record "acceptance + contract tests executed"
 
 # â”€â”€ adversarial suite (machine-readable results) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

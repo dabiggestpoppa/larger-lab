@@ -260,10 +260,10 @@ def published_ports_from_compose() -> list[str]:
     text = COMPOSE_FILE.read_text(encoding="utf-8")
     offenders: list[str] = []
     for line in text.splitlines():
-        m = re.search(r'^\s*-\s*"?([^"#]*?)"?\s*$', line)
-        if not m:
+        s = line.strip()
+        if not (s.startswith("-") and len(s) > 1):
             continue
-        decl = m.group(1).strip()
+        decl = s[1:].strip().strip('"').split("#", 1)[0].strip()
         if not decl or ":" not in decl or "/" in decl:
             continue  # empty, comment, or volume mount (contains /)
         # port declarations look like 127.0.0.1:5433:5432 (or bare HOST:CONTAINER)
