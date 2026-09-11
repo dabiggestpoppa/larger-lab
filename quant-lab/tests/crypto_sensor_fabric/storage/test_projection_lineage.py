@@ -21,12 +21,18 @@ from pathlib import Path
 
 import pytest
 
-from crypto_sensor_fabric.storage.catalog import is_usable_manifest_provenance
+from crypto_sensor_fabric.storage.catalog import (
+    AcquisitionRepository,
+    BlobMetadataRepository,
+    is_usable_manifest_provenance,
+)
+from crypto_sensor_fabric.storage.blob_store import LocalBlobStore
 from crypto_sensor_fabric.storage.models import (
     AcquisitionRecord,
     EvidenceBlob,
     ProjectionLineage,
 )
+from crypto_sensor_fabric.storage.enums import StorageEncoding
 from crypto_sensor_fabric.storage.projection_lineage import (
     ArtifactLineageMismatch,
     NoLineageEntries,
@@ -116,6 +122,65 @@ SHA_C = "c" * 64
 @pytest.fixture()
 def lineage_repo(tmp_path: Path) -> ProjectionLineageRepository:
     return ProjectionLineageRepository(tmp_path / "lineage")
+
+
+# ---------------------------------------------------------------------------
+# Real T0A stack for repository-level commit gates (I05R1 §11/§12/§48)
+# ---------------------------------------------------------------------------
+
+
+def _make_store(root: Path) -> LocalBlobStore:
+    # The blob store root and the catalog root are the SAME t0a root
+    # (blob_object_key is resolved relative to it, as in I04R2 tests).
+    return LocalBlobStore(str(root))
+
+
+def _real_blob(
+    store: LocalBlobStore,
+    blob_repo: BlobMetadataRepository,
+    data: bytes,
+) -> str:
+    put = store.put_bytes(
+        data, storage_encoding=StorageEncoding.NONE, source_media_type="application/json"
+    )
+    blob_repo.append_metadata(put.blob)
+    return put.blob.blob_sha256
+
+
+def _real_acq(
+    sha: str,
+    acq_id: str,
+    provider: str = "kraken",
+    venue: str = "futures",
+    sensor: str = "MECHANICAL_TRADE",
+    instrument: str = "BTC-USDT",
+) -> AcquisitionRecord:
+    return _acq(
+        acq_id,
+        sha,
+        provider=provider,
+        venue=venue,
+        sensor=sensor,
+        instrument=instrument,
+    )
+
+
+def _wired_repo(tmp_path: Path):
+    """Lineage repository wired to REAL durable T0A repositories."""
+    root = tmp_path / "t0a"
+    root.mkdir()
+    store = _make_store(root)
+    blob_repo = BlobMetadataRepository(root, blob_store=store)
+    acq_repo = AcquisitionRepository(
+        root, blob_store=store, blob_metadata_repository=blob_repo
+    )
+    lineage = ProjectionLineageRepository(
+        tmp_path / "lineage",
+        blob_store=store,
+        blob_metadata_repository=blob_repo,
+        acquisition_repository=acq_repo,
+    )
+    return store, blob_repo, acq_repo, lineage
 
 
 # ---------------------------------------------------------------------------
@@ -272,73 +337,103 @@ class TestLineageSource:
 
 
 # ---------------------------------------------------------------------------
-# Repository round trip
+# Repository round trip — repository-level commits need REAL T0A truth
+# (I05R1 §11/§12): durable blob metadata, physically verified bytes, and
+# usable acquisitions.
 # ---------------------------------------------------------------------------
 
 
 class TestLineageRepository:
-    def test_commit_and_get(self, lineage_repo: ProjectionLineageRepository) -> None:
-        entries = [
-            _lineage("lm-001", "proj-001", SHA_A, "acq-a", 0),
-        ]
-        committed = lineage_repo.commit("lm-001", entries)
+    def test_commit_and_get(self, tmp_path: Path) -> None:
+        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
+        sha = _real_blob(store, blob_repo, b'{"rows": [1, 2, 3]}')
+        acq_repo.append_acquisition(_real_acq(sha, "acq-1"))
+        entries = [_lineage("lm-001", "proj-001", sha, "acq-1", 0)]
+        committed = lineage.commit("lm-001", entries)
         assert len(committed) == 1
 
-        retrieved = lineage_repo.get("lm-001")
+        retrieved = lineage.get("lm-001")
         assert retrieved is not None
-        assert retrieved[0].source_blob_sha256 == SHA_A
+        assert retrieved[0].source_blob_sha256 == sha
 
-    def test_idempotent(self, lineage_repo: ProjectionLineageRepository) -> None:
-        entries = [
-            _lineage("lm-002", "proj-002", SHA_A, "acq-a", 0),
-        ]
-        r1 = lineage_repo.commit("lm-002", entries)
-        r2 = lineage_repo.commit("lm-002", entries)
+    def test_idempotent(self, tmp_path: Path) -> None:
+        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
+        sha = _real_blob(store, blob_repo, b'{"rows": [1]}')
+        acq_repo.append_acquisition(_real_acq(sha, "acq-2"))
+        entries = [_lineage("lm-002", "proj-002", sha, "acq-2", 0)]
+        r1 = lineage.commit("lm-002", entries)
+        r2 = lineage.commit("lm-002", entries)
         assert r1[0].source_blob_sha256 == r2[0].source_blob_sha256
 
     def test_conflict_different_content(
-        self, lineage_repo: ProjectionLineageRepository
+        self, tmp_path: Path
     ) -> None:
-        entries_a = [_lineage("lm-003", "proj-003", SHA_A, "acq-a", 0)]
-        lineage_repo.commit("lm-003", entries_a)
+        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
+        sha = _real_blob(store, blob_repo, b'{"rows": [2]}')
+        acq_repo.append_acquisition(_real_acq(sha, "acq-a"))
+        entries_a = [_lineage("lm-003", "proj-003", sha, "acq-a", 0)]
+        lineage.commit("lm-003", entries_a)
 
-        entries_b = [_lineage("lm-003", "proj-003", SHA_B, "acq-b", 0)]
+        # Same lmid, different acquisition id (sha has no other durable
+        # acquisition, so this content genuinely differs).
+        entries_b = [_lineage("lm-003", "proj-003", sha, "acq-other", 0)]
         with pytest.raises(ProjectionLineageConflict):
-            lineage_repo.commit("lm-003", entries_b)
+            lineage.commit("lm-003", entries_b)
 
     def test_empty_rejected(self, lineage_repo: ProjectionLineageRepository) -> None:
         with pytest.raises(NoLineageEntries):
             lineage_repo.commit("lm-empty", [])
 
-    def test_get_by_projection(self, lineage_repo: ProjectionLineageRepository) -> None:
+    def test_get_by_projection(self, tmp_path: Path) -> None:
+        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
+        sha_a = _real_blob(store, blob_repo, b'{"rows": [3]}')
+        sha_b = _real_blob(store, blob_repo, b'{"rows": [4]}')
+        acq_repo.append_acquisition(_real_acq(sha_a, "acq-a"))
+        acq_repo.append_acquisition(_real_acq(sha_b, "acq-b"))
         entries = [
-            _lineage("lm-004", "proj-004", SHA_A, "acq-a", 0),
-            _lineage("lm-004", "proj-004", SHA_B, "acq-b", 1),
+            _lineage("lm-004", "proj-004", sha_a, "acq-a", 0),
+            _lineage("lm-004", "proj-004", sha_b, "acq-b", 1),
         ]
-        lineage_repo.commit("lm-004", entries)
-        result = lineage_repo.get_by_projection("proj-004")
+        lineage.commit("lm-004", entries)
+        result = lineage.get_by_projection("proj-004")
         assert len(result) == 2
         assert result[0].source_order == 0
         assert result[1].source_order == 1
 
-    def test_list_manifest_ids(
-        self, lineage_repo: ProjectionLineageRepository
-    ) -> None:
-        for lmid in ["lm-c", "lm-a", "lm-b"]:
-            lineage_repo.commit(
+    def test_list_manifest_ids(self, tmp_path: Path) -> None:
+        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
+        for i, lmid in enumerate(["lm-c", "lm-a", "lm-b"]):
+            sha = _real_blob(store, blob_repo, f'{{"rows": [{i}]}}'.encode())
+            acq_id = f"acq-{lmid}"
+            acq_repo.append_acquisition(_real_acq(sha, acq_id))
+            lineage.commit(
                 lmid,
-                [_lineage(lmid, f"p-{lmid}", SHA_A, f"acq-{lmid}", 0)],
+                [_lineage(lmid, f"p-{lmid}", sha, acq_id, 0)],
             )
-        ids = lineage_repo.list_manifest_ids()
+        ids = lineage.list_manifest_ids()
         assert ids == ["lm-a", "lm-b", "lm-c"]
 
     def test_persist_and_reload(self, tmp_path: Path) -> None:
+        store, blob_repo, acq_repo, _ = _wired_repo(tmp_path)
+        sha = _real_blob(store, blob_repo, b'{"rows": [9]}')
+        acq_repo.append_acquisition(_real_acq(sha, "acq-r"))
         root = tmp_path / "lineage"
-        repo1 = ProjectionLineageRepository(root)
-        entries = [_lineage("lm-reload", "proj-reload", SHA_A, "acq-r", 0)]
+        repo1 = ProjectionLineageRepository(
+            root,
+            blob_store=store,
+            blob_metadata_repository=blob_repo,
+            acquisition_repository=acq_repo,
+        )
+        entries = [_lineage("lm-reload", "proj-reload", sha, "acq-r", 0)]
         repo1.commit("lm-reload", entries)
 
-        repo2 = ProjectionLineageRepository(root)
+        # Reload wired to the SAME T0A truth (durable repos, no in-memory state).
+        repo2 = ProjectionLineageRepository(
+            root,
+            blob_store=store,
+            blob_metadata_repository=blob_repo,
+            acquisition_repository=acq_repo,
+        )
         retrieved = repo2.get("lm-reload")
         assert retrieved is not None
-        assert retrieved[0].source_blob_sha256 == SHA_A
+        assert retrieved[0].source_blob_sha256 == sha

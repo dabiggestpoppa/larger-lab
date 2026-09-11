@@ -118,9 +118,11 @@ class TestWriteProjection:
         projection_root: Path,
         sample_rows: list[dict],
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         artifact, path = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=sample_rows,
             schema_definition=schema_definition,
             projection_id="proj-001",
@@ -149,9 +151,11 @@ class TestWriteProjection:
         projection_root: Path,
         sample_rows: list[dict],
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         artifact, path = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=sample_rows,
             schema_definition=schema_definition,
             projection_id="proj-ordinals",
@@ -177,10 +181,12 @@ class TestWriteProjection:
         projection_root: Path,
         sample_rows: list[dict],
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         source_sha = "c" * 64
         artifact, path = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=sample_rows,
             schema_definition=schema_definition,
             projection_id="proj-meta",
@@ -209,9 +215,11 @@ class TestWriteProjection:
         projection_root: Path,
         sample_rows: list[dict],
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         artifact, path = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=sample_rows,
             schema_definition=schema_definition,
             projection_id="proj-sha",
@@ -237,6 +245,7 @@ class TestWriteProjection:
         self,
         projection_root: Path,
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         with pytest.raises(ProjectionWriteError, match="at least one row"):
             write_projection(
@@ -270,9 +279,11 @@ class TestProjectionIdempotent:
         projection_root: Path,
         sample_rows: list[dict],
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         kwargs = dict(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=sample_rows,
             schema_definition=schema_definition,
             projection_id="proj-idem",
@@ -299,11 +310,13 @@ class TestProjectionIdempotent:
         projection_root: Path,
         sample_rows: list[dict],
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
         projection_artifact_repo: ProjectionArtifactRepository,
     ) -> None:
         """Different bytes for same projection_id conflict at catalog level."""
         a1, _ = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=sample_rows,
             schema_definition=schema_definition,
             projection_id="proj-conflict",
@@ -325,6 +338,7 @@ class TestProjectionIdempotent:
         different_rows = [{"price": 999.0, "qty": 999, "symbol": "DIFFERENT"}]
         a2, _ = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=different_rows,
             schema_definition=schema_definition,
             projection_id="proj-conflict",
@@ -357,12 +371,14 @@ class TestSchemaMismatch:
         self,
         projection_root: Path,
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         """int value where float expected."""
         rows = [{"price": "not_a_number", "qty": 1, "symbol": "BTC"}]
         with pytest.raises((ProjectionSchemaMismatch, pa.ArrowInvalid)):
             write_projection(
                 root=projection_root,
+                schema_registry=schema_registry,
                 rows=rows,
                 schema_definition=schema_definition,
                 projection_id="proj-mismatch",
@@ -391,10 +407,12 @@ class TestTypePreservation:
         self,
         projection_root: Path,
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         rows = [{"price": 1.0, "qty": None, "symbol": "BTC"}]
         artifact, path = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=rows,
             schema_definition=schema_definition,
             projection_id="proj-null",
@@ -418,6 +436,7 @@ class TestTypePreservation:
         self,
         projection_root: Path,
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         """Provider-native values preserved exactly."""
         rows = [
@@ -427,6 +446,7 @@ class TestTypePreservation:
         ]
         artifact, path = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=rows,
             schema_definition=schema_definition,
             projection_id="proj-roundtrip",
@@ -481,6 +501,7 @@ class TestMultiBlob:
         self,
         projection_root: Path,
         schema_definition: ProjectionSchemaDefinition,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         """Multi-source: row-level source attribution left NULL."""
         rows = [
@@ -489,6 +510,7 @@ class TestMultiBlob:
         ]
         artifact, path = write_projection(
             root=projection_root,
+            schema_registry=schema_registry,
             rows=rows,
             schema_definition=schema_definition,
             projection_id="proj-multi",
