@@ -30,7 +30,12 @@ if [ ! -f "$CONTRACT_PATH" ]; then
     exit 1
 fi
 
-python3 - "$EVIDENCE_DIR" "$EXPECTED_COMMIT" "$EXPECTED_TREE" "$CONTRACT_PATH" <<'PYEOF'
+# B4-CXR7U9R8: OCE_EXPECTED_BRANCH (caller override, same contract as
+# run-validation.sh) may pin the expected branch for PR validation runs;
+# default remains the checkpoint contract's authorized_branch.
+EXPECTED_BRANCH_OVERRIDE="${OCE_EXPECTED_BRANCH:-}"
+
+python3 - "$EVIDENCE_DIR" "$EXPECTED_COMMIT" "$EXPECTED_TREE" "$CONTRACT_PATH" "$EXPECTED_BRANCH_OVERRIDE" <<'PYEOF'
 import hashlib
 import json
 import os
@@ -39,6 +44,7 @@ import sys
 
 ev_dir, expected_commit, expected_tree = sys.argv[1], sys.argv[2], sys.argv[3]
 contract_path_arg = sys.argv[4]
+expected_branch_override = sys.argv[5]
 errors = []
 warnings = []
 
@@ -143,6 +149,8 @@ try:
 except Exception as e:
     expected_branch = ""
     errors.append(f"CONTRACT: cannot read authorized_branch: {e}")
+if expected_branch_override:
+    expected_branch = expected_branch_override
 
 observed_git = results.get("observed_git_branch", "")
 trusted_ref = results.get("trusted_ci_ref") or ""
