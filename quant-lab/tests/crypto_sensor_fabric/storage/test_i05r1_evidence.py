@@ -168,10 +168,17 @@ class Stack:
         )
         return put.blob.blob_sha256
 
-    def commit(self, projection_id: str, sources: list[tuple[str, str]]):
+    def commit(
+        self,
+        projection_id: str,
+        sources: list[tuple[str, str]],
+        lineage_manifest_id: str | None = None,
+    ):
         definition = self.definition()
         if not self.schemas.has(definition.schema_key):
             self.schemas.register(definition)
+        if lineage_manifest_id is None:
+            lineage_manifest_id = f"lm-{projection_id}"
         return self.service.commit_projection(
             rows=[{"price": 1.0, "qty": 1, "symbol": "BTC-USDT"}],
             schema_definition=definition,
@@ -188,7 +195,7 @@ class Stack:
             logical_year=2026,
             logical_month=1,
             logical_day=15,
-            lineage_manifest_id=f"lm-{projection_id}",
+            lineage_manifest_id=lineage_manifest_id,
         )
 
 
@@ -307,7 +314,7 @@ def _durability_matrix(tmp_path: Path) -> dict:
     s = Stack(tmp_path)
     try:
         sha = s.seed(b'{"m": 4}', "acq-m4")
-        s.commit("proj-1", [(sha, "acq-m4")])
+        s.commit("proj-1", [(sha, "acq-m4")], lineage_manifest_id="lm-idem")
         from crypto_sensor_fabric.storage.models import ProjectionLineage
 
         entries = [
@@ -351,7 +358,7 @@ def _durability_matrix(tmp_path: Path) -> dict:
     s = Stack(tmp_path)
     try:
         sha = s.seed(b'{"m": 5}', "acq-m5")
-        s.commit("proj-1", [(sha, "acq-m5")])
+        s.commit("proj-1", [(sha, "acq-m5")], lineage_manifest_id="lm-real")
         from crypto_sensor_fabric.storage.models import ProjectionLineage
 
         entries = [

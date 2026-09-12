@@ -160,10 +160,17 @@ class Stack:
         )
         return put.blob.blob_sha256
 
-    def commit(self, projection_id: str, sources: list[tuple[str, str]]):
+    def commit(
+        self,
+        projection_id: str,
+        sources: list[tuple[str, str]],
+        lineage_manifest_id: str | None = None,
+    ):
         definition = self.schema_definition()
         if not self.schemas.has(definition.schema_key):
             self.schemas.register(definition)
+        if lineage_manifest_id is None:
+            lineage_manifest_id = f"lm-{projection_id}"
         return self.service.commit_projection(
             rows=[{"price": 1.0, "qty": 1, "symbol": "BTC-USDT"}],
             schema_definition=definition,
@@ -180,7 +187,7 @@ class Stack:
             logical_year=2026,
             logical_month=1,
             logical_day=15,
-            lineage_manifest_id=f"lm-{projection_id}",
+            lineage_manifest_id=lineage_manifest_id,
         )
 
 
@@ -410,7 +417,7 @@ class TestConcurrentWriters:
         s = Stack(tmp_path)
         try:
             sha = s.seed_source(b'{"c": 7}', "acq-1")
-            s.commit("proj-1", [(sha, "acq-1")])
+            s.commit("proj-1", [(sha, "acq-1")], lineage_manifest_id="lm-concurrent")
             lin_a = ProjectionLineageRepository(
                 s.ROOT / "catalogs" / "manifests" / "projection_lineage",
                 blob_store=s.store,
@@ -448,7 +455,7 @@ class TestConcurrentWriters:
         s = Stack(tmp_path)
         try:
             sha = s.seed_source(b'{"c": 8}', "acq-1")
-            s.commit("proj-1", [(sha, "acq-1")])
+            s.commit("proj-1", [(sha, "acq-1")], lineage_manifest_id="lm-conflict")
             from crypto_sensor_fabric.storage.models import ProjectionLineage
 
             entries_a = [

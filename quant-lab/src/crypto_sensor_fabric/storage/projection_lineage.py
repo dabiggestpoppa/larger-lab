@@ -99,6 +99,20 @@ class ProjectionContextMissing(LineageError):
     """Lineage references a projection_id with no committed context (I05R2 §12)."""
 
 
+class LineageContextBindingConflict(LineageError):
+    """commit lineage_manifest_id disagrees with the context's authoritative
+    lineage_manifest_id for the same projection (I05R3 §3/§4).
+
+    A projection has EXACTLY ONE authoritative lineage manifest; a second
+    lineage identity must not poison an already-valid projection.
+    """
+
+
+class LineageProjectionIdentityConflict(LineageError):
+    """Multiple committed lineage manifests claim one projection_id
+    (I05R3 §6) — corrupt/tampered state; never silently pick one."""
+
+
 class LineageConfigurationError(LineageError):
     """A commit-capable lineage repository was constructed incompletely."""
 
@@ -333,10 +347,25 @@ class ProjectionLineageRepository:
         return entries
 
     def _load_all(self) -> None:
+        owners: dict[str, str] = {}
         for logical_id in self._catalog.list_ids():
             payload = self._catalog.get(logical_id)
             assert payload is not None
             self._cache[logical_id] = self._parse_fragment(payload)
+        # I05R3 §6 load invariant: at most ONE committed lineage manifest
+        # may claim a given projection_id.  This should be impossible after
+        # I05R3, but protects against legacy/tampered disk — fail closed,
+        # never silently pick one.
+        for lmid, entries in self._cache.items():
+            pid = entries[0].projection_id
+            previous = owners.get(pid)
+            if previous is not None:
+                raise LineageProjectionIdentityConflict(
+                    f"lineage manifests {previous!r} and {lmid!r} both claim "
+                    f"projection_id={pid!r}; a projection has exactly one "
+                    "authoritative lineage manifest"
+                )
+            owners[pid] = lmid
 
     # -- durable source verification (I05R1 §11/§13/§48 + I05R2 §14) ---------
 
@@ -469,7 +498,9 @@ class ProjectionLineageRepository:
         validate_source_order(entries)
 
         # Idempotence/conflict: ALL fields compared exactly, including row
-        # bounds (§18).
+        # bounds (§18).  Content conflict fails fast; identical content
+        # falls through to FULL re-validation below — idempotence is NOT
+        # permission to trust stale evidence (I05R3 §9/§10).
         if lmid in self._cache:
             existing = self._cache[lmid]
             if len(existing) != len(entries):
@@ -486,11 +517,11 @@ class ProjectionLineageRepository:
                         f"lineage_manifest_id={lmid!r} already committed "
                         "with different content"
                     )
-            return existing
 
         # I05R2 §11: the projection MUST have a committed artifact BEFORE
         # lineage publication.  Missing artifact = typed failure, never
-        # "no artifact consistency rule applicable".
+        # "no artifact consistency rule applicable".  Re-proven on EVERY
+        # commit, idempotent or not (I05R3 §10).
         artifact = self._artifact_repository.get(pid)
         if artifact is None:
             raise ProjectionArtifactMissing(
@@ -514,9 +545,28 @@ class ProjectionLineageRepository:
                 "identity checks are mandatory (I05R2 §12)"
             )
 
-        # T0A source truth + identity matching, per entry, BEFORE publication.
+        # I05R3 §3/§4: the THREE-WAY binding must hold — commit argument ==
+        # every entry's lineage_manifest_id == context.lineage_manifest_id.
+        # A projection has exactly ONE authoritative lineage manifest; a
+        # second lineage identity may not poison an already-valid projection.
+        if context.lineage_manifest_id != lmid:
+            raise LineageContextBindingConflict(
+                f"lineage_manifest_id={lmid!r} does not match the context's "
+                f"authoritative lineage_manifest_id="
+                f"{context.lineage_manifest_id!r} for projection "
+                f"{pid!r}; one projection has exactly one authoritative "
+                "lineage manifest (I05R3 §4)"
+            )
+
+        # T0A source truth + identity matching, per entry, BEFORE publication
+        # and before ANY idempotent success (I05R3 §10).
         for entry in sorted(entries, key=lambda e: e.source_order):
             self._verify_source_pair(entry, context)
+
+        # Fully re-validated — only NOW may the idempotent existing manifest
+        # be returned as current truth (I05R3 §10).
+        if lmid in self._cache:
+            return self._cache[lmid]
 
         # Durable publication through the shared catalog primitive.
         payload = {
@@ -539,12 +589,25 @@ class ProjectionLineageRepository:
         return self._cache.get(lineage_manifest_id)
 
     def get_by_projection(self, projection_id: str) -> list[ProjectionLineage]:
-        """Retrieve all lineage entries for a projection_id (ordered)."""
-        result = []
-        for entries in self._cache.values():
-            for entry in entries:
-                if entry.projection_id == projection_id:
-                    result.append(entry)
+        """Retrieve lineage entries for a projection_id (ordered).
+
+        I05R3 §7: a projection resolves to EXACTLY ONE lineage manifest.
+        Zero manifests -> empty list.  More than one manifest claiming the
+        projection -> typed corruption (never concatenate competing
+        manifests into one truth).
+        """
+        owners: list[str] = []
+        result: list[ProjectionLineage] = []
+        for lmid, entries in self._cache.items():
+            if entries and entries[0].projection_id == projection_id:
+                owners.append(lmid)
+                result.extend(entries)
+        if len(owners) > 1:
+            raise LineageProjectionIdentityConflict(
+                f"lineage manifests {sorted(owners)!r} all claim "
+                f"projection_id={projection_id!r}; a projection has exactly "
+                "one authoritative lineage manifest"
+            )
         return sorted(result, key=lambda e: e.source_order)
 
     def has(self, lineage_manifest_id: str) -> bool:
@@ -564,9 +627,11 @@ def json_entry(entry: ProjectionLineage) -> dict[str, Any]:
 __all__ = [
     "ArtifactLineageMismatch",
     "LineageConfigurationError",
+    "LineageContextBindingConflict",
     "LineageError",
     "LineageManifestBindingConflict",
     "LineageManifestNotFound",
+    "LineageProjectionIdentityConflict",
     "NoLineageEntries",
     "NoUsableProjectionSource",
     "ProjectionArtifactMissing",

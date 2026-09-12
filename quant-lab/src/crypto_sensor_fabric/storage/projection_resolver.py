@@ -120,20 +120,39 @@ class ProjectionLineageResolver:
             )
         return context
 
-    def _load_lineage(self, projection_id: str, context: ProjectionCatalogRecord) -> list[Any]:
-        entries = self._lineage.get_by_projection(projection_id)
+    def _load_lineage(
+        self, projection_id: str, context: ProjectionCatalogRecord
+    ) -> list[Any]:
+        """Resolve lineage through the context's authoritative manifest id.
+
+        I05R3 §8: the binding is EXPLICIT — the resolver reads
+        ``lineage.get(context.lineage_manifest_id)`` rather than scanning
+        all fragments for the projection.  Every returned entry must still
+        name the projection; a competing manifest identity for the same
+        projection cannot be discovered here by design.
+        """
+        entries = self._lineage.get(context.lineage_manifest_id)
         if not entries:
             raise ProjectionChainBroken(
-                f"projection_id={projection_id!r} has zero lineage entries "
-                "(a VALID projection always has >= 1)"
+                f"projection_id={projection_id!r} has no committed lineage "
+                f"manifest {context.lineage_manifest_id!r} "
+                "(a VALID projection always has >= 1 entry)"
             )
-        # Every entry must belong to the context's lineage manifest id.
+        # Every entry must belong to the context's lineage manifest id AND
+        # to the projection being resolved.
         for entry in entries:
             if entry.lineage_manifest_id != context.lineage_manifest_id:
                 raise ProjectionChainBroken(
                     f"lineage entry manifest {entry.lineage_manifest_id!r} "
                     f"!= context lineage_manifest_id "
                     f"{context.lineage_manifest_id!r}"
+                )
+            if entry.projection_id != projection_id:
+                raise ProjectionChainBroken(
+                    f"authoritative lineage manifest "
+                    f"{context.lineage_manifest_id!r} contains an entry for "
+                    f"projection_id={entry.projection_id!r}, expected "
+                    f"{projection_id!r}"
                 )
         return entries
 
@@ -308,9 +327,10 @@ class ProjectionLineageResolver:
                 f"0..{table.num_rows - 1}"
             )
 
-        # Physical row lineage revalidation (§21).
+        # Physical row lineage revalidation (§21): resolve lineage through
+        # the context's authoritative manifest id (I05R3 §8).
         entries = sorted(
-            self._lineage.get_by_projection(projection_id),
+            self._lineage.get(context.lineage_manifest_id) or [],
             key=lambda e: e.source_order,
         )
         row_blobs = table.column("_t0_source_blob_sha256").to_pylist()

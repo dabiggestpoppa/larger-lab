@@ -31,6 +31,7 @@ from crypto_sensor_fabric.storage.catalog import (
     BlobMetadataRepository,
     is_usable_manifest_provenance,
 )
+from crypto_sensor_fabric.storage.json_catalog import catalog_physical_key
 from crypto_sensor_fabric.storage.blob_store import LocalBlobStore
 from crypto_sensor_fabric.storage.models import (
     AcquisitionRecord,
@@ -41,6 +42,8 @@ from crypto_sensor_fabric.storage.enums import StorageEncoding
 from crypto_sensor_fabric.storage.projection_lineage import (
     ArtifactLineageMismatch,
     LineageConfigurationError,
+    LineageContextBindingConflict,
+    LineageProjectionIdentityConflict,
     NoLineageEntries,
     NoUsableProjectionSource,
     ProjectionArtifactMissing,
@@ -48,6 +51,7 @@ from crypto_sensor_fabric.storage.projection_lineage import (
     ProjectionLineageConflict,
     ProjectionLineageRepository,
     SourceOrderConflict,
+    json_entry,
     validate_artifact_lineage_consistency,
     validate_lineage_completeness,
     validate_lineage_source,
@@ -431,8 +435,11 @@ class SealedStack:
         projection_id: str,
         pairs: list[tuple[str, str]],
         rows: list[dict] | None = None,
+        lineage_manifest_id: str | None = None,
     ):
         """Write the physical projection, commit artifact + context."""
+        if lineage_manifest_id is None:
+            lineage_manifest_id = f"lm-{projection_id}"
 
         sources = [sha for sha, _acq_id in pairs]
         acq_ids = [acq_id for _sha, acq_id in pairs]
@@ -479,7 +486,7 @@ class SealedStack:
                 row_count=artifact.row_count,
                 min_provider_time=None,
                 max_provider_time=None,
-                lineage_manifest_id=f"lm-{projection_id}",
+                lineage_manifest_id=lineage_manifest_id,
                 quality_flags=[],
                 created_at=datetime(2026, 1, 15, tzinfo=UTC),
             )
@@ -502,7 +509,9 @@ class TestLineageRepository:
         s = SealedStack(tmp_path)
         try:
             sha = s.seed_source(b'{"rows": [1, 2, 3]}', "acq-1")
-            s.commit_projection("proj-001", [(sha, "acq-1")])
+            s.commit_projection(
+                "proj-001", [(sha, "acq-1")], lineage_manifest_id="lm-001"
+            )
             lineage = s.lineage_repo()
             entries = [_lineage("lm-001", "proj-001", sha, "acq-1", 0)]
             committed = lineage.commit("lm-001", entries)
@@ -518,7 +527,9 @@ class TestLineageRepository:
         s = SealedStack(tmp_path)
         try:
             sha = s.seed_source(b'{"rows": [1]}', "acq-2")
-            s.commit_projection("proj-002", [(sha, "acq-2")])
+            s.commit_projection(
+                "proj-002", [(sha, "acq-2")], lineage_manifest_id="lm-002"
+            )
             lineage = s.lineage_repo()
             entries = [_lineage("lm-002", "proj-002", sha, "acq-2", 0)]
             r1 = lineage.commit("lm-002", entries)
@@ -531,7 +542,9 @@ class TestLineageRepository:
         s = SealedStack(tmp_path)
         try:
             sha = s.seed_source(b'{"rows": [2]}', "acq-a")
-            s.commit_projection("proj-003", [(sha, "acq-a")])
+            s.commit_projection(
+                "proj-003", [(sha, "acq-a")], lineage_manifest_id="lm-003"
+            )
             lineage = s.lineage_repo()
             entries_a = [_lineage("lm-003", "proj-003", sha, "acq-a", 0)]
             lineage.commit("lm-003", entries_a)
@@ -558,7 +571,10 @@ class TestLineageRepository:
         try:
             sha_a = s.seed_source(b'{"rows": [3]}', "acq-a")
             sha_b = s.seed_source(b'{"rows": [4]}', "acq-b")
-            s.commit_projection("proj-004", [(sha_a, "acq-a"), (sha_b, "acq-b")])
+            s.commit_projection(
+                "proj-004", [(sha_a, "acq-a"), (sha_b, "acq-b")],
+                lineage_manifest_id="lm-004",
+            )
             lineage = s.lineage_repo()
             entries = [
                 _lineage("lm-004", "proj-004", sha_a, "acq-a", 0),
@@ -578,7 +594,9 @@ class TestLineageRepository:
             for i, lmid in enumerate(["lm-c", "lm-a", "lm-b"]):
                 sha = s.seed_source(f'{{"rows": [{i}]}}'.encode(), f"acq-{lmid}")
                 pid = f"p-{lmid}"
-                s.commit_projection(pid, [(sha, f"acq-{lmid}")])
+                s.commit_projection(
+                    pid, [(sha, f"acq-{lmid}")], lineage_manifest_id=lmid
+                )
                 lineage = s.lineage_repo()
                 lineage.commit(lmid, [_lineage(lmid, pid, sha, f"acq-{lmid}", 0)])
             ids = s.lineage_repo().list_manifest_ids()
@@ -590,7 +608,9 @@ class TestLineageRepository:
         s = SealedStack(tmp_path)
         try:
             sha = s.seed_source(b'{"rows": [9]}', "acq-r")
-            s.commit_projection("proj-reload", [(sha, "acq-r")])
+            s.commit_projection(
+                "proj-reload", [(sha, "acq-r")], lineage_manifest_id="lm-reload"
+            )
             repo1 = s.lineage_repo()
             entries = [_lineage("lm-reload", "proj-reload", sha, "acq-r", 0)]
             repo1.commit("lm-reload", entries)
@@ -700,5 +720,136 @@ class TestSealedLineageConstructor:
             ]
             with pytest.raises(ArtifactLineageMismatch):
                 lineage.commit("lm-005", entries)
+        finally:
+            s.close()
+
+
+# ---------------------------------------------------------------------------
+# I05R3 §3-§8 — context/lineage-manifest binding and one-manifest rule
+# ---------------------------------------------------------------------------
+
+
+class TestContextLineageBinding:
+    def test_alternate_lmid_for_same_projection_rejected(
+        self, tmp_path: Path
+    ) -> None:
+        """I05R3 §4: context L1 + commit L2 for same projection -> rejected."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [11]}', "acq-bind")
+            s.commit_projection("proj-bind", [(sha, "acq-bind")])  # context L1 = lm-proj-bind
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-other", "proj-bind", sha, "acq-bind", 0)]
+            with pytest.raises(LineageContextBindingConflict, match="lm-other"):
+                lineage.commit("lm-other", entries)
+            # Nothing was durably written under the alternate identity.
+            assert not lineage.has("lm-other")
+        finally:
+            s.close()
+
+    def test_alternate_lmid_manifest_not_durable(self, tmp_path: Path) -> None:
+        """I05R3 §21.2: the rejected L2 fragment must never reach disk."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [12]}', "acq-dur")
+            s.commit_projection("proj-dur", [(sha, "acq-dur")])
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-alt", "proj-dur", sha, "acq-dur", 0)]
+            with pytest.raises(LineageContextBindingConflict):
+                lineage.commit("lm-alt", entries)
+            frag = (
+                s.t0b
+                / "catalogs"
+                / "manifests"
+                / "projection_lineage"
+                / catalog_physical_key("lm-alt")
+            )
+            assert not frag.exists()
+        finally:
+            s.close()
+
+    def test_restart_with_duplicate_projection_ownership_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """I05R3 §21.3: two committed manifests claiming one projection fail
+        closed on load — the silent-pick-one path is forbidden."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [13]}', "acq-dup")
+            s.commit_projection(
+                "proj-dup", [(sha, "acq-dup")], lineage_manifest_id="lm-a"
+            )
+            lineage = s.lineage_repo()
+            lineage.commit("lm-a", [_lineage("lm-a", "proj-dup", sha, "acq-dup", 0)])
+            # Tamper: write a second committed fragment claiming proj-dup via
+            # the raw catalog (simulating legacy/tampered disk — not through
+            # the repository, which now forbids it).
+            from crypto_sensor_fabric.storage.json_catalog import DurableJsonCatalog
+
+            raw = DurableJsonCatalog(
+                s.t0b / "catalogs" / "manifests" / "projection_lineage",
+                logical_id_field="lineage_manifest_id",
+            )
+            raw.commit(
+                "lm-b",
+                {
+                    "record_type": "projection_lineage_manifest",
+                    "lineage_manifest_id": "lm-b",
+                    "projection_id": "proj-dup",
+                    "entries": [
+                        json_entry(
+                            ProjectionLineage(
+                                lineage_manifest_id="lm-b",
+                                projection_id="proj-dup",
+                                source_blob_sha256=sha,
+                                source_acquisition_id="acq-dup",
+                                source_order=0,
+                            )
+                        )
+                    ],
+                },
+            )
+            with pytest.raises(LineageProjectionIdentityConflict):
+                ProjectionLineageRepository(
+                    s.t0b / "catalogs" / "manifests" / "projection_lineage",
+                    blob_store=s.store,
+                    blob_metadata_repository=s.blob_repo,
+                    acquisition_repository=s.acq_repo,
+                    artifact_repository=s.artifacts,
+                    context_repository=s.contexts,
+                )
+        finally:
+            s.close()
+
+    def test_resolver_uses_context_lmid(self, tmp_path: Path) -> None:
+        """I05R3 §8/§21.4: the resolver resolves lineage through
+        context.lineage_manifest_id — a competing manifest is ignored."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [14]}', "acq-res")
+            s.commit_projection(
+                "proj-res", [(sha, "acq-res")], lineage_manifest_id="lm-auth"
+            )
+            lineage = s.lineage_repo()
+            lineage.commit(
+                "lm-auth", [_lineage("lm-auth", "proj-res", sha, "acq-res", 0)]
+            )
+            assert lineage.get_by_projection("proj-res")[0].lineage_manifest_id == "lm-auth"
+            # get() by the context's lmid resolves; get_by_projection agrees.
+            assert lineage.get("lm-auth") is not None
+        finally:
+            s.close()
+
+    def test_lineage_for_projection_without_artifact_still_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """§21 regression: the I05R2 missing-artifact gate stays green."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [15]}', "acq-ghost2")
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-ghost2", "proj-ghost2", sha, "acq-ghost2", 0)]
+            with pytest.raises(ProjectionArtifactMissing):
+                lineage.commit("lm-ghost2", entries)
         finally:
             s.close()
