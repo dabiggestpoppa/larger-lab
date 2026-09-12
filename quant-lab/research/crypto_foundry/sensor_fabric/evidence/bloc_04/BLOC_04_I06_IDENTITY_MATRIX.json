@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "case": "same_request_semantics_same_key",
+      "expected": true,
+      "key_acq1": "4dcfe270d525b387573f13ff1018c3014dc55be994415aa847a0b37ac1ab75f3",
+      "key_derived_acq2": "4dcfe270d525b387573f13ff1018c3014dc55be994415aa847a0b37ac1ab75f3",
+      "keys_equal": true
+    },
+    {
+      "case": "key_is_full_sha256_hex",
+      "expected_length": 64,
+      "is_lowercase_hex": true,
+      "length": 64
+    },
+    {
+      "case": "descriptor_tamper_fails_reload",
+      "expected": true,
+      "rejected": true
+    },
+    {
+      "case": "identity_version_frozen_v1",
+      "expected": 1,
+      "identity_version": 1
+    }
+  ],
+  "excluded_fields": [
+    "acquisition_id",
+    "blob_sha256",
+    "source_locator",
+    "adapter_version",
+    "request_started_at",
+    "response_observed_at",
+    "ingested_at",
+    "http_status_or_source_status",
+    "provider_checksum_*",
+    "resume_token_*",
+    "quality_flags",
+    "failure_ref"
+  ],
+  "identity_version": 1,
+  "included_fields": [
+    "provider_id",
+    "venue",
+    "sensor_family",
+    "native_instrument",
+    "native_granularity",
+    "request_fingerprint",
+    "requested_start",
+    "requested_end",
+    "endpoint_host",
+    "endpoint_path",
+    "request_family"
+  ],
+  "matrix": "BLOC_04_I06_IDENTITY_MATRIX",
+  "source_key_formula": "SHA256(canonical_json({identity_version, fields}))"
+}
