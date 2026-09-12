@@ -113,6 +113,7 @@ def _pinned(conn, **kw):
     """B4-CXR7U9R2: governed-identity-pinned production sink (authoritative
     construction path): pinned to the B2 compose governed database AND
     role from the same constants that build the DSN."""
+    from oce_control.audit_sink import PostgresAuditSink
     return PostgresAuditSink(
         conn, governed_database=kw.get("governed_database", oc.PG_DB),
         governed_user=kw.get("governed_user", oc.PG_USER))
