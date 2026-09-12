@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "cmc_tags_drift_test",
+  "method": "GET",
+  "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listings/historical",
+  "request_params": {
+    "dates": [
+      "2024-06-01",
+      "2026-08-20"
+    ],
+    "ids": [
+      1,
+      1027,
+      2,
+      1839
+    ]
+  },
+  "retrieved_at": "2026-08-24T14:28:15+00:00",
+  "http_status": 200,
+  "ok": true,
+  "row_count": null,
+  "sha256": "16218a7e236bd33a995f692ef2cb48fbc66dcbe22a141a73e359b1eeab6a1f15",
+  "bytes": 6470,
+  "access_class": "PUBLIC",
+  "notes": "derived probe: CMC snapshot tags across dates 2024-06-01 vs 2026-08-20 for ids 1/1027/2/1839",
+  "known_limitations": "meta sidecar added post-hoc at analysis time"
+}

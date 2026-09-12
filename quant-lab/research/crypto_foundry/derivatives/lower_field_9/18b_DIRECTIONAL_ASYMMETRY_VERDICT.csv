@@ -1,0 +1,2 @@
+verdict,overall_contagion,cycle_consistency_frac,cell_consistency_frac,depth_consistency_frac
+ROBUST_SIGN_ASYMMETRY,DOWN=0.3461;UP=0.1426,1.0,1.0,1.0

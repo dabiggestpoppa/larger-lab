@@ -1,0 +1,14 @@
+{
+  "probe": "binance_archive_btcusdt_2024_06",
+  "method": "GET",
+  "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1d/BTCUSDT-1d-2024-06.zip",
+  "request_params": null,
+  "http_status": 200,
+  "ok": true,
+  "access_class": "PUBLIC",
+  "notes": "official bulk archive: USD-M monthly klines (BTCUSDT 2024-06)",
+  "known_limitations": "zip body; provenance hash over zip bytes",
+  "sha256": "a92b43b86ff23ad4e9ea0b931c6a88ecdb4d3265052ab96e81a078344c99328c",
+  "bytes": 2068,
+  "retrieved_at": "2026-08-24T14:13:59+00:00"
+}

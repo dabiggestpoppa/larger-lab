@@ -1,0 +1,7 @@
+node,verdict,effect,statistical_validity,executability_status,possible_expression
+RANK_CONTEXT_ISOLATION,LOCAL_NODE,same-date rank context is reproducible; true behavioral/correlation peers unavailable,VALID_DESCRIPTIVE,NOT_YET_AUDITED,UNKNOWN
+PRICE_RECOVERY_VS_RANK_HEALTH,DATA_BLOCKED,future rank history absent from LF2 event cache,NOT_ESTIMABLE,NOT_YET_AUDITED,UNKNOWN
+ISOLATED_DOWN_REVERSAL,PROMOTION_CANDIDATE_WITH_LIMITATIONS,retained as LF2/LF3 descriptive node; LF4 peer attribution not established,DESCRIPTIVE_REPLICATION,NOT_YET_AUDITED,SPOT_LONG_OR_PERP_LONG_UNKNOWN
+BREADTH_DISP_TAIL,DESCRIPTIVE_ONLY,repaired triangle is associational; no mediation/synergy claim,DESCRIPTIVE,NOT_YET_AUDITED,UNKNOWN
+ACTIVE_LIQUIDITY,DESCRIPTIVE_ONLY,volume quintile anatomy without joint controlled model,DESCRIPTIVE,NOT_YET_AUDITED,UNKNOWN
+SHHM_VS_SHMC,LOCAL_NODE,one focused recheck; no causal or executable interpretation,DESCRIPTIVE,NOT_YET_AUDITED,UNKNOWN

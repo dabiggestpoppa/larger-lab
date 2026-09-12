@@ -1,0 +1,3 @@
+mechanism,n,median_persist,reopen_frac,median_rank7_post,median_transfer_post,verdict
+EDGE_PRUNING,146,2.0,1.0,1.0,0.45,MEASURED
+PRESSURE_CONCENTRATION,38,1.0,1.0,1.0,0.405,MEASURED

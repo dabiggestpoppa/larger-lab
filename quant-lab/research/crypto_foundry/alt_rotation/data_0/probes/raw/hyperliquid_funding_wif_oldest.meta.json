@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_funding_wif_oldest",
+  "method": "POST",
+  "url": "https://api.hyperliquid.xyz/info",
+  "request_params": null,
+  "request_json": {
+    "type": "fundingHistory",
+    "coin": "WIF",
+    "startTime": 0,
+    "endTime": 2000000000000
+  },
+  "retrieved_at": "2026-08-24T14:12:09+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 500,
+  "first_record": {
+    "coin": "WIF",
+    "fundingRate": "0.0000125",
+    "premium": "-0.000387341",
+    "time": 1703260800182
+  },
+  "last_record": {
+    "coin": "WIF",
+    "fundingRate": "0.0003453526",
+    "premium": "0.0032628208",
+    "time": 1705057200394
+  },
+  "sha256": "cfe77fa0ba1780c3055fae7296f65e285a5f98f319d7d48b6613f72e11ec53b7",
+  "bytes": 45215,
+  "access_class": "PUBLIC",
+  "notes": "oldest funding for WIF \u2014 probes delisted-recovery semantics",
+  "known_limitations": ""
+}

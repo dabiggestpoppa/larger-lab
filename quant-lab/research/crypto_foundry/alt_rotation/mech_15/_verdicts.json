@@ -1,0 +1,15 @@
+{
+  "checkpoint": "MECH-15",
+  "commit": "TBD",
+  "verdict": "PASS_MECH15_REDUCED_MATRIX",
+  "recommended_cells": 6,
+  "support": "8 ROBUST / 7 LOCAL / 1 SPARSE / 0 UNUSABLE",
+  "differentiation": "76 DISTINCT pairs",
+  "null_test": "MATRIX_SURVIVES_FALSIFICATION",
+  "heldout": "PARTIAL_MATRIX",
+  "age_overlay": "AGE_PARTIAL_OVERLAY",
+  "equifinality_inside": "EQUIFINALITY_INSIDE_MATRIX",
+  "market_os_candidate": "CONDITIONAL",
+  "human_review_required": true,
+  "next_checkpoint_authorized": false
+}

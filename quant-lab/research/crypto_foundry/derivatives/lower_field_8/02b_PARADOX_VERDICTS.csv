@@ -1,0 +1,6 @@
+peer_family,same_member_60d,any_neighborhood_60d,relational_state_60d,lf7_alive_60d,paradox_resolution
+BEHAVIORAL_10,0.1513,0.0239,0.4368,0.869,A_REJECTED_same_peers_do_not_persist | C_PARTIAL_lf7_60d_alive_figure_is_data_floor_not_membership | D_MIXTURE
+CORR_60_10,0.0249,0.0238,0.5765,0.0,A_REJECTED_same_peers_do_not_persist | D_MIXTURE
+CORR_120_10,0.0881,0.0245,0.4762,0.0,A_REJECTED_same_peers_do_not_persist | D_MIXTURE
+STATE,0.0682,0.0215,0.4932,1.0,A_REJECTED_same_peers_do_not_persist | C_PARTIAL_lf7_60d_alive_figure_is_data_floor_not_membership | D_MIXTURE
+HYBRID_10,0.216,0.0239,0.5632,0.9733,A_REJECTED_same_peers_do_not_persist | C_PARTIAL_lf7_60d_alive_figure_is_data_floor_not_membership | D_MIXTURE

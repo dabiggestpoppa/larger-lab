@@ -1,0 +1,9 @@
+feature,n_ec,n_ctrl,raw_mean_diff_ec_minus_ctrl,stratum_weighted_diff
+peer_corr,81,1287,-0.033,-0.009
+peer_stress,81,1287,-0.17,-0.018
+roll_turnover_30d,81,1287,-0.067,-0.026
+rank_vel_7d,81,1287,7.538,0.095
+peer_touch_frac1,81,1287,-0.069,0.021
+peer_neg_frac7,81,1287,-0.02,0.002
+state_changed,81,1287,-0.0,0.045
+vol_30d,81,1287,-0.042,-0.001

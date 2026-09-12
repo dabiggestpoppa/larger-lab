@@ -1,0 +1,7 @@
+pathway,p,n,class,note
+BASE_DECOUPLING_RATE,0.2778,3556,baseline,
+CONTAGION_DOWNSTREAM,0.2145,993,common,
+HEALTH_DECAY_ALONE_NO_CONTAGION,0.171,1088,independent-pathway,
+LIQUIDITY_WEAK_NO_CONTAGION,0.2471,1218,independent-pathway,
+CONTAGION_AND_RANK_DECAY,0.1533,587,compound,
+VERDICT,MIXED_ORIGINS,,DESCRIPTIVE,decoupling occurs both downstream of contagion (esp. with rank decay) and via independent health/liquidity deterioration — persistent decoupling is not a single mechanism origin; contagion raises the base rate but is not required

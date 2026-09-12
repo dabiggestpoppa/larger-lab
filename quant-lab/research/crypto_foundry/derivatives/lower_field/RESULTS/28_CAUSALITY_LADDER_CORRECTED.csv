@@ -1,0 +1,9 @@
+claim,measure,ladder_level,note
+EXPLANATORY_CLIFF: BTC+ETH explain 13.5% at ranks 26-100,Pooled OLS R²,L0_DESCRIPTIVE_CO_MOVEMENT,Same-day returns; X and Y are contemporaneous. Not L2.
+EXPLANATORY_CLIFF: R² drops to <0.1% at ranks 101-2000,Pooled OLS R²,L0_DESCRIPTIVE_CO_MOVEMENT,Same-day returns; contemporaneous co-movement only.
+BAND-MEDIAN RETURN correlates with market,Cross-day correlation of band-median daily return vs mkt_ret_1d,L1_TEMPORAL_ORDERING,"Band-median at t is compared to market at t. Contemporaneous. However, if market leads (open→close), partial L1."
+POSITIVE_ELASTICITY declines with rank,Median return on top-decile market days,L0_DESCRIPTIVE_CO_MOVEMENT,Conditioning on same-day market move. Descriptive.
+MOMENTUM_SHAPE predicts extreme forward moves,P(|fwd7d|>15%) conditional on 3D×14D sign state,L1_TEMPORAL_ORDERING,"Momentum state at t, forward return at t+1..t+7. Temporal ordering present. Not causal."
+REVERSAL after extreme events,Forward return sign opposite to event sign,L1_TEMPORAL_ORDERING,"Event at t, forward return at t+1..t+30. Temporal ordering present."
+CHAIN_SECTOR_NULL,Median residual after band conditioning,L0_DESCRIPTIVE_CO_MOVEMENT,Descriptive cross-sectional analysis.
+TAIL_ACTIVATION_GRADIENT,Extreme forward move probability by rank,L1_TEMPORAL_ORDERING,"Momentum state at t, extreme forward return at t+1..t+7. Temporal ordering."

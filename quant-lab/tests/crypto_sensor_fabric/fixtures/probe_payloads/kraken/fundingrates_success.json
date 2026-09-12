@@ -1,0 +1,10 @@
+{
+  "result": {
+    "rates": [
+      {"time": 1655251200000, "fundingRate": 0.000075, "relativeFundingRate": 0.000075},
+      {"time": 1655280000000, "fundingRate": 0.000101, "relativeFundingRate": 0.000101},
+      {"time": 1655308800000, "fundingRate": 0.000043, "relativeFundingRate": 0.000043}
+    ],
+    "lastTime": 1655308800000
+  }
+}

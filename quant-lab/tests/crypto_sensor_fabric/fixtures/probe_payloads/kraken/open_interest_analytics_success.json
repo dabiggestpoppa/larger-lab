@@ -1,0 +1,12 @@
+{
+  "result": {
+    "timestamp": [1655251200, 1655254800, 1655258400],
+    "data": [
+      {"openInterest": 218.0},
+      {"openInterest": 220.4},
+      {"openInterest": 219.1}
+    ],
+    "more": true
+  },
+  "errors": []
+}

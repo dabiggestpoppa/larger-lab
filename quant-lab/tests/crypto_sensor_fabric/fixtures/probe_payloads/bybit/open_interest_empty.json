@@ -1,0 +1,10 @@
+{
+  "retCode": 0,
+  "retMsg": "OK",
+  "result": {
+    "category": "linear",
+    "symbol": "BTCUSDT",
+    "list": [],
+    "nextPageCursor": ""
+  }
+}

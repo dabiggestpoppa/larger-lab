@@ -1,0 +1,5 @@
+patch,n,verdict,strongest_coord,strongest_corr,corr_abs_shock,corr_sigma_shock,corr_rank_depth,corr_peer_health_proxy_top500,corr_field_state_dispersion,corr_early_recovery_amp,corr_vol_30d
+GLOBAL,2462,CONDITIONAL_PRIMITIVE,early_recovery_amp,0.5591,0.0277,-0.006,-0.0357,0.0204,0.0125,0.5591,-0.0149
+TOP_500,1485,CONDITIONAL_PRIMITIVE,early_recovery_amp,0.541,0.0681,-0.0092,0.0211,0.0263,0.0228,0.541,0.0118
+501_1000,865,CONDITIONAL_PRIMITIVE,early_recovery_amp,0.5931,-0.015,0.0487,-0.0424,0.006,-0.0215,0.5931,-0.0319
+1001_2000,112,CONDITIONAL_PRIMITIVE,early_recovery_amp,0.5401,0.0438,-0.0126,-0.051,0.0567,-0.0241,0.5401,-0.0082

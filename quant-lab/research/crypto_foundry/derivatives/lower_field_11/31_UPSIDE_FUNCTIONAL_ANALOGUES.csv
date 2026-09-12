@@ -1,0 +1,9 @@
+upside_function,coordinate,up_side_relation,down_side_relation,verdict,note
+liquidity_expansion,liq_proxy,0.077,0.135,DIFFERENT_THRESHOLD,
+rank_health_improvement,rank_vel_7d,0.061,0.263,DIFFERENT_THRESHOLD,
+repeated_recruitment,,,,DESCRIPTIVE_NO_PROXY,no PIT-safe free proxy in substrate
+topology_stabilization,,,,DESCRIPTIVE_NO_PROXY,no PIT-safe free proxy in substrate
+rehabilitation,rejoin_vel,1.0,-0.25,REPORTED,
+deconcentration,,,,DESCRIPTIVE_NO_PROXY,no PIT-safe free proxy in substrate
+breadth_persistence,,,,DESCRIPTIVE_NO_PROXY,no PIT-safe free proxy in substrate
+positive_participation,,,,DESCRIPTIVE_NO_PROXY,no PIT-safe free proxy in substrate

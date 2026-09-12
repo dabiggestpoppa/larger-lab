@@ -1,0 +1,2 @@
+auc_common_only,auc_common_plus_patch_offset,auc_patch_specific_avg,heldout_auc_common_offset,heldout_auc_patch_specific,verdict
+0.5968022659171516,0.5976470855519267,0.5973032461364691,0.5973319450116497,0.599657085269894,COMMON_FORCING_WITH_THRESHOLDS

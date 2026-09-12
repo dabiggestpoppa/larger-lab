@@ -1,0 +1,13 @@
+{
+  "defillama": {
+    "stablecoin_chart": "a5dc4ad4312cbd353ff34be614f0430b3df0fdb6042f703372c2e77906bd7b8f",
+    "dex_volume_chart": "1130ceca60159866ed933abdd5c64c6c5333aa8c5fee04bc564ba584690ba022",
+    "fees_chart": "f321aac3be994686b683b8c93f6c8b6854e66e0194040a4de97a7e024db44c92",
+    "revenue_chart": "8c5c0d451e5fb7c6489ad796a7705ae0e8f1f64169b39e076b3dcb687f4b7ab3"
+  },
+  "chain_flow": {
+    "chains": "2b86f3355dd28a3537f6c90560778d65d81795215c385e09ae2592a84c2fc9da"
+  },
+  "meteora": "917d198b5915453c9376b69c712886d13522db1ab894191db1395dc2a82c47d3",
+  "collected_at": "2026-08-25T11:21:41.627547+00:00"
+}

@@ -1,0 +1,4 @@
+group,n,med_latency,med_peak,med_radius,med_depth,med_speed,silhouette_ec_vs_rest
+EARLY_CONTAGION,81,1.0,3.0,0.3,0.0005,0.0,
+OTHER_CONTAGION,940,1.0,3.0,0.3167,0.0001,0.0,
+VERDICT,991,1.0,1.0,MIXTURE_SPECIES,,,-0.0494

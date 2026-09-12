@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "case": "idempotent_registration",
+      "catalog": "projection_schema",
+      "committed_fragments": 1,
+      "expected": "single_fragment",
+      "schema_keys": [
+        "f0447800b376dc46dc21b8741e1a35555b8481ab6f384bc781ab6fe0e66d7972"
+      ]
+    },
+    {
+      "case": "idempotent_commit",
+      "catalog": "projection_artifact",
+      "expected": "single_fragment_same_content",
+      "fragments": 1,
+      "projection_id": "proj-1"
+    },
+    {
+      "case": "identity_conflict",
+      "catalog": "projection_artifact",
+      "expected_error": "ProjectionIdentityConflict",
+      "observed_error": "ProjectionIdentityConflict"
+    },
+    {
+      "case": "idempotent_commit",
+      "catalog": "projection_context",
+      "expected": "single_fragment_same_content",
+      "fragments": 1,
+      "projection_id": "proj-1"
+    },
+    {
+      "case": "idempotent_including_row_bounds",
+      "catalog": "projection_lineage",
+      "conflict_case": "same_id_different_row_bounds",
+      "expected_error": "ProjectionLineageConflict",
+      "observed_error": "ProjectionLineageConflict"
+    },
+    {
+      "case": "manifest_id_argument_binding",
+      "catalog": "projection_lineage",
+      "expected_error": "LineageManifestBindingConflict",
+      "observed_error": "LineageManifestBindingConflict"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R1",
+  "clock": "injected-fixed",
+  "matrix": "BLOC_04_I05R1_DURABILITY_MATRIX"
+}

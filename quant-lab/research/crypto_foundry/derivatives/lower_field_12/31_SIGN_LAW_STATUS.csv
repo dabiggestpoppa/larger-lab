@@ -1,0 +1,5 @@
+step,down_log_odds,note,raw_gap
+RAW,1.147,LF11 raw,
+13_COVARIATES,0.931,LF11 after 13 covariates,
+AVAILABLE_MECH,0.954,LF11 after correlation-compression + volume-pressure only (4/6 mechanical families DATA_BLOCKED),
+VERDICT,IRREDUCIBLE_WITH_AVAILABLE_DATA,sign asymmetry NOT called primitive while funding/OI/liquidations/depth/flow/margin remain unavailable,0.2034

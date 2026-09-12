@@ -1,0 +1,5 @@
+horizon,n,same_band_spillover,adjacent_band_spillover,multi_band_spillover,radius
+1,1957,10.897,21.992,6.73,FIELD_WIDE
+3,1957,12.188,24.383,6.767,FIELD_WIDE
+7,1957,11.843,23.891,6.733,FIELD_WIDE
+14,1957,11.702,23.816,6.754,FIELD_WIDE

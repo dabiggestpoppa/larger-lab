@@ -1,0 +1,13 @@
+{
+  "retCode": 0,
+  "retMsg": "OK",
+  "result": {
+    "category": "linear",
+    "list": [
+      {"symbol": "BTCUSDT", "fundingRate": "0.000075", "fundingTime": "1655251200000", "markPrice": "29510.5"},
+      {"symbol": "BTCUSDT", "fundingRate": "0.000101", "fundingTime": "1655280000000", "markPrice": "29512.0"},
+      {"symbol": "BTCUSDT", "fundingRate": "0.000043", "fundingTime": "1655308800000", "markPrice": "29508.2"}
+    ],
+    "nextPageCursor": ""
+  }
+}

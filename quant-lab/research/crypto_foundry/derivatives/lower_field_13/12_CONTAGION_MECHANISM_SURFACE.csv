@@ -1,0 +1,11 @@
+coordinate,band,n,peak_time,radius,persistence,decay,p_reactivate,p_decouple,note
+shock_mag,LO,340.0,3.0,0.2,0.5,0.0,0.7471,0.2382,
+shock_mag,MID,340.0,3.0,0.4,0.6,0.0,0.6588,0.2412,
+shock_mag,HI,341.0,3.0,0.4,0.5,0.0,0.654,0.1613,
+recency,LO,340.0,3.0,0.3,0.4722,0.0,0.6824,0.2294,
+recency,MID,340.0,7.0,0.4,0.6,0.0,0.6706,0.1912,
+recency,HI,341.0,3.0,0.3,0.5,0.0,0.7067,0.2199,
+early_reach,LO,340.0,7.0,0.2,0.4,0.2,0.7147,0.2588,
+early_reach,MID,340.0,3.0,0.3,0.5,0.0,0.6794,0.2029,
+early_reach,HI,341.0,1.0,0.5,0.6,-0.2,0.6657,0.1789,
+VERDICT,,,,,,,,,"radius rho: shock=0.269 recency=-0.0491 early_reach=0.2494 — early reach and shock magnitude are the dominant mechanism coordinates; species appear as continuous regions of this surface, not discrete objects"

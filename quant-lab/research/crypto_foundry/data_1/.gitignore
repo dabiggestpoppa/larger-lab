@@ -1,0 +1,8 @@
+# Large raw datasets are NOT committed to Git.
+# Manifests in manifests/ carry sha256 + row counts as the provenance evidence.
+raw/*_raw.json
+raw/*.parquet
+normalized/*.json
+normalized/*.parquet
+__pycache__/
+*.pyc

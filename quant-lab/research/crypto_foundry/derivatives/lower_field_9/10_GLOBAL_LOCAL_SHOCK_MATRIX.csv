@@ -1,0 +1,6 @@
+global_forcing,local_shock,n_days,median_turnover,p_state_change,p_decoupling,p_contagion,p_rejoin,median_abs,median_forcing,z_decouple_high_vs_low_forcing,z_contagion_high_vs_low_forcing,delta_p_decouple_high_minus_low_forcing,delta_p_contagion_high_minus_low_forcing,turnover_median_diff_high_minus_low_forcing
+HIGH_GLOBAL_FORCING,HIGH_LOCAL_SHOCK,141317,1.0,0.0025,0.2924,0.2676,0.1146,0.0827,0.4379,,,,,
+HIGH_GLOBAL_FORCING,LOW_LOCAL_SHOCK,422404,1.0,0.0003,0.303,0.2483,0.1212,0.0142,0.2831,,,,,
+LOW_GLOBAL_FORCING,HIGH_LOCAL_SHOCK,147579,1.0,0.0029,0.2823,0.2598,0.1244,0.0839,-0.8864,,,,,
+LOW_GLOBAL_FORCING,LOW_LOCAL_SHOCK,466378,1.0,0.0003,0.2902,0.2495,0.1246,0.0136,-0.8396,,,,,
+VERDICT,FIELD_CONDITIONAL_ABSORPTION,1177678,,,,,,,,5.98,4.77,0.0101,0.0078,0.0

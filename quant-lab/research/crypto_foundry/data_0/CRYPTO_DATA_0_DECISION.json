@@ -1,0 +1,86 @@
+{
+  "checkpoint": "CRYPTO-DATA-0-VENUE-AND-MARKET-REALITY-AUDIT",
+  "branch": "agent/crypto-quant-foundry",
+  "decision": "PASS_CRYPTO_DATA_FOUNDATION",
+  "timestamp_utc": "2026-08-20T00:00:00Z",
+  "pass_conditions": {
+    "amm_spot_lane": "PASS — Uniswap v3 (4yr), Aerodrome (2yr), Binance spot (8yr)",
+    "perp_futures_lane": "PASS — Hyperliquid (2.5yr full state), Binance (8yr data)",
+    "options_lane": "PASS — Deribit (6yr full chain with IV/Greeks)",
+    "lp_yield_lane": "PASS — Gamma (4yr), Uniswap/Aerodrome subgraph",
+    "historical_data": "PASS — Binance (8yr), Hyperliquid (2.5yr), Kraken (12yr)",
+    "live_data": "PASS — Hyperliquid WS, Deribit WS, subgraph",
+    "cost_reconstruction": "PASS — Fee structures documented, gas measurable",
+    "nautilus_reuse": "PASS — HL instruments, fetchers, bundled adapters",
+    "wrapper_ambiguity": "PASS — Primary HL pairs use no wrappers"
+  },
+  "primary_venues": [
+    {"venue": "Hyperliquid", "role": "primary_perp_benchmark", "markets": ["BTC-PERP", "ETH-PERP", "SOL-PERP"], "us_access": true},
+    {"venue": "Binance", "role": "primary_historical_data", "markets": ["BTCUSDT", "ETHUSDT", "SOLUSDT"], "us_access": false},
+    {"venue": "Uniswap v3", "role": "primary_AMM_ethereum", "markets": ["WETH/USDC", "WBTC/USDC"], "us_access": true},
+    {"venue": "Aerodrome", "role": "primary_AMM_base", "markets": ["WETH/USDC", "cbBTC/USDC"], "us_access": true},
+    {"venue": "Deribit", "role": "primary_options", "markets": ["BTC options", "ETH options"], "us_access": false},
+    {"venue": "Gamma", "role": "primary_LP_vaults", "markets": ["managed vaults"], "us_access": true}
+  ],
+  "secondary_venues": [
+    {"venue": "PancakeSwap", "role": "EVM_comparison"},
+    {"venue": "Raydium", "role": "Solana_CL_comparison"},
+    {"venue": "Orca", "role": "Solana_Whirlpools"},
+    {"venue": "Drift", "role": "Solana_perp"},
+    {"venue": "Kraken", "role": "US_CEX_benchmark"},
+    {"venue": "Coinbase", "role": "US_CEX_spot"},
+    {"venue": "Arrakis", "role": "LP_vault_alternative"},
+    {"venue": "Aster", "role": "BNB_chain_perp"}
+  ],
+  "rejected_watch": [
+    {"venue": "Jupiter Perps", "decision": "WATCH", "reason": "Thin standalone value"},
+    {"venue": "Avantis", "decision": "WATCH", "reason": "Small volume"},
+    {"venue": "Crypto.com", "decision": "WATCH", "reason": "U.S. limited"},
+    {"venue": "Derive", "decision": "WATCH", "reason": "Early stage"},
+    {"venue": "Aevo", "decision": "WATCH", "reason": "ETH-focused, thin BTC"},
+    {"venue": "GammaSwap", "decision": "RESEARCH_ONLY", "reason": "Niche LP gamma"},
+    {"venue": "Binance (execution)", "decision": "RESEARCH_ONLY", "reason": "Not U.S.-accessible"}
+  ],
+  "existing_data_in_repo": [
+    {"file": "btc_5m_4yr.json", "source": "Hyperliquid", "coverage": "BTC-PERP 5m ~4 years"},
+    {"file": "btc_usdt_1460d.json", "source": "Binance", "coverage": "BTCUSDT 5m ~4 years"},
+    {"file": "eth_usdt_1460d.json", "source": "Binance", "coverage": "ETHUSDT 5m ~4 years"},
+    {"file": "sol_usdt_1460d.json", "source": "Binance", "coverage": "SOLUSDT 5m ~4 years"},
+    {"file": "BNBUSD_M5.csv", "source": "MT5", "coverage": "BNB M5 435K rows from 2022"},
+    {"file": "hyperliquid_fetcher.py", "source": "Custom", "coverage": "HL candle fetcher"},
+    {"file": "binance_fetcher.py", "source": "Custom", "coverage": "Binance candle fetcher"}
+  ],
+  "nautilus_reuse": {
+    "hyperliquid_adapter": "REUSE_DIRECTLY — bundled in Nautilus 1.221.0",
+    "binance_adapter": "REUSE_DIRECTLY — bundled but not U.S. execution",
+    "coinbase_adapter": "REUSE_DIRECTLY — bundled, U.S.-accessible",
+    "kraken_adapter": "REUSE_DIRECTLY — bundled, U.S.-accessible",
+    "deribit_adapter": "REUSE_DIRECTLY — bundled, options support",
+    "hl_instruments_def": "REUSE_DIRECTLY — existing in .exec-runtime",
+    "hl_fetcher": "REUSE_DIRECTLY — existing in quant-lab/data",
+    "binance_fetcher": "REUSE_DIRECTLY — existing in quant-lab/data",
+    "dex_adapters": "NOT_BUNDLED — needs custom subgraph collectors"
+  },
+  "known_blockers": [
+    "Hyperliquid Python SDK not installed in environment",
+    "Nautilus HL adapter not wired into larger-lab yet",
+    "No upstream DEX/AMM Nautilus adapter exists",
+    "Solana infrastructure deferred",
+    "Deribit options U.S.-restricted for execution"
+  ],
+  "next_checkpoint": "CRYPTO-DATA-1-CANONICAL-COLLECTOR-FOUNDATION",
+  "next_scope": [
+    "Wire Nautilus Hyperliquid adapter for BTC/ETH perps",
+    "Build Binance historical backfill pipeline",
+    "Build Uniswap v3 subgraph adapter",
+    "Build Aerodrome subgraph adapter",
+    "Store raw + normalized data with provenance",
+    "Validate data quality",
+    "Produce canonical price series"
+  ],
+  "strategy_pnl_computed": false,
+  "optimization_performed": false,
+  "alpha_research_started": false,
+  "live_capital_deployed": false,
+  "execution_authorized": false
+}

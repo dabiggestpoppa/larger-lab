@@ -1,0 +1,7 @@
+role,description,maturity,next_step
+ABSOLUTE_VS_SIGMA_LENS,Normalized surprise vs physical displacement as shock coordinates,COMPUTED,amplitude_conditioning_study
+PEER_NETWORK_STABILITY,Dynamic vs persistent peer formations,COMPUTED,network_time_series_build
+UP_DOWN_LONER_SYMMETRY,Sign asymmetry in rejoin/contagion/catchdown,COMPUTED,symmetric_replication
+EARLY_WARNING_LOCAL_SENSOR,Asset-led loner precedes peer deterioration (contagion early warning),L2_DESCRIPTIVE,purged_fdr_validation
+FALSE_LONER_ARSENAL,false-loner ontology (low-vol artifact vs shared local shock),COMPUTED,merge_with_lf6_ontology
+CATCH_RADIUS,LOCAL/PATCH/MULTI_PATCH/FIELD_WIDE propagation classification,COMPUTED,spillover_validation

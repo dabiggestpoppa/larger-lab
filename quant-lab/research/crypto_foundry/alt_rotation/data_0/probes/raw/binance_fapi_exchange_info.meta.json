@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_fapi_exchange_info",
+  "method": "GET",
+  "url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:06:32+00:00",
+  "http_status": 451,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+  "bytes": 224,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "delisted contracts NOT in exchangeInfo; endpoint may be geo-blocked from some locations (451)",
+  "notes": "current USD-M contracts incl. onboardDate, deliveryDate, status; contractType 1000x naming visible",
+  "final_url": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+  "response_headers_safe": {
+    "Server": "CloudFront",
+    "Date": "Mon, 24 Aug 2026 14:06:31 GMT",
+    "Content-Length": "224",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "X-Cache": "Error from cloudfront",
+    "Via": "1.1 e7a41892bebb9d5aa268f6882fbca1fa.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Pop": "BOS50-P1",
+    "X-Amz-Cf-Id": "OuFdcgNvoiDvvJEFEs2GkxopsAClwAHXnuPg96o_0Jp9Sacv-scxxQ=="
+  }
+}

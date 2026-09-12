@@ -1,0 +1,199 @@
+{
+  "adversarial_cases": [
+    {
+      "case": "valid",
+      "expected_outcome": "OK",
+      "mutations": {},
+      "observed_outcome": "OK",
+      "test_name": "pointer_case_valid"
+    },
+    {
+      "case": "unknown_schema_version",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "schema_version": 2
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_unknown_schema_version"
+    },
+    {
+      "case": "schema_version_bool",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "schema_version": true
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_schema_version_bool"
+    },
+    {
+      "case": "schema_version_string",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "schema_version": "1"
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_schema_version_string"
+    },
+    {
+      "case": "missing_schema_version",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "schema_version": "__delete__"
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_missing_schema_version"
+    },
+    {
+      "case": "missing_required_field",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "partition_manifest_id": "__delete__"
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_missing_required_field"
+    },
+    {
+      "case": "extra_field",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "surprise": 1
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_extra_field"
+    },
+    {
+      "case": "manifest_version_bool",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "manifest_version": true
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_manifest_version_bool"
+    },
+    {
+      "case": "manifest_version_string",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "manifest_version": "1"
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_manifest_version_string"
+    },
+    {
+      "case": "manifest_version_float",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "manifest_version": 1.2
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_manifest_version_float"
+    },
+    {
+      "case": "manifest_version_zero",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "manifest_version": 0
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_manifest_version_zero"
+    },
+    {
+      "case": "partition_key_numeric",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "partition_key": 123
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_partition_key_numeric"
+    },
+    {
+      "case": "partition_key_empty",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "partition_key": ""
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_partition_key_empty"
+    },
+    {
+      "case": "previous_manifest_id_empty",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "previous_manifest_id": ""
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_previous_manifest_id_empty"
+    },
+    {
+      "case": "updated_at_naive",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "updated_at": "2026-09-05T12:00:00"
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_updated_at_naive"
+    },
+    {
+      "case": "updated_at_bad_iso",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "updated_at": "not-a-date"
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_updated_at_bad_iso"
+    },
+    {
+      "case": "updated_at_numeric",
+      "expected_outcome": "CurrentPointerCorrupt",
+      "mutations": {
+        "updated_at": 123
+      },
+      "observed_outcome": "CurrentPointerCorrupt",
+      "test_name": "pointer_case_updated_at_numeric"
+    }
+  ],
+  "ancestry_binding": "pointer.previous_manifest_id must equal manifest.supersedes_manifest_id (I04R1 \u00a739)",
+  "closed_fields": [
+    {
+      "constraint": "== 1 (bool rejected)",
+      "field": "schema_version",
+      "json_type": "int",
+      "required": true
+    },
+    {
+      "constraint": "nonempty; numeric values rejected, never coerced",
+      "field": "partition_key",
+      "json_type": "string",
+      "required": true
+    },
+    {
+      "constraint": "nonempty",
+      "field": "partition_manifest_id",
+      "json_type": "string",
+      "required": true
+    },
+    {
+      "constraint": ">= 1; bool/str/float rejected",
+      "field": "manifest_version",
+      "json_type": "int",
+      "required": true
+    },
+    {
+      "constraint": "null or nonempty string",
+      "field": "previous_manifest_id",
+      "json_type": "null|string",
+      "required": true
+    },
+    {
+      "constraint": "timezone-aware ISO-8601",
+      "field": "updated_at",
+      "json_type": "string",
+      "required": true
+    }
+  ],
+  "closed_json": true,
+  "partition_key_binding": "pointer.partition_key must equal the requested partition_key on read (I04R1 \u00a738)",
+  "pointer_object": "PartitionCurrentPointer (operational state, I04 \u00a734)",
+  "schema_version": 1,
+  "unknown_field_policy": "CurrentPointerCorrupt (never silently ignored)"
+}

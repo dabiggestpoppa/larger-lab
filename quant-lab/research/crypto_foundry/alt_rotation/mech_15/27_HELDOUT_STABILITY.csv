@@ -1,0 +1,4 @@
+test,rho_prop_order,rho_dir_entropy_order,n_early,n_late,n_folds,verdict
+chronological_80_20,-0.49999999999999994,0.6,1756.0,440.0,,PARTIAL_MATRIX
+leave_one_subperiod_out,0.9813025210084033,,,,6.0,PARTIAL_MATRIX
+early_vs_late_half,0.8303030303030302,,1098.0,1098.0,,PARTIAL_MATRIX

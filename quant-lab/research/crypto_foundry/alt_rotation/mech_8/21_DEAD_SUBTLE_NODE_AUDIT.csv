@@ -1,0 +1,13 @@
+node,prior,this_audit,verdict
+BREADTH_OSCILLATION,M6 NEW_NODE (robust),Re-checked against 2x2 plane; consistent with breadth oscillation between HIGH/LOW cells; retained.,LOCAL_ROLE
+BREADTH_FADE,M5/M6 descriptive failure geometry,Fade = transition to LOW_BREADTH cell; captured by transition matrix; no new subfamily evidence.,MERGE_INTO_TRANSITION_LATTICE
+EARLY_SNAPBACK,M5/M6 LOCAL_NODE,Snapback = fast reentry; consistent with fast reentry clock in transition matrix; retained.,LOCAL_ROLE
+SHMC_TAIL_ACTIVATION,DISSOLVED (LF2),WS11 recheck: SHMC reversion-like; SHHM continuation-like; descriptive local role only.,LOCAL_ROLE_DESCRIPTIVE
+VOLATILITY_INTENSITY,NULL incremental gate,WS12: conditions HH persistence / early recovery / up-retention descriptively; parked as intensity context.,PARKED_AS_INTENSITY
+RANK_DETERIORATION,contradictory M7 vs LF3,WS13 reconciliation: definition-driven disagreement; pre-rank-state split is a real local coordinate.,LOCAL_ROLE
+LIQUIDITY_Q4,LF2 Q4 active-liquidity tail effect,WS10: volume adds marginal info for reversal/recovery only descriptively; not robust incremental.,QUEUED_DESCRIPTIVE
+ACCUMULATION_LIKE,MERGED into breadth (M4),No new evidence; absorbed by breadth level.,NO_ACTION
+BREADTH_ACCELERATION,REDUNDANT (M6/M7),Not re-tested as primary; still no incremental evidence.,NO_ACTION
+RETEST_RELOAD,DESCRIPTIVE_ONLY (M5),Not reproduced at >=50 events; kept descriptive.,QUEUED
+TERMINATION_BREADTH_FIRST,M6 DESCRIPTIVE_ONLY (n=27),Still below naming bar; no new evidence.,QUEUED
+BREADTH_LEVEL_PRIMITIVE,STRONGEST_SINGLE_COORDINATE,WS7: level remains dominant; composition not incremental.,CONFIRMED

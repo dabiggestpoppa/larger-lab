@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_funding_axs_oldest",
+  "method": "POST",
+  "url": "https://api.hyperliquid.xyz/info",
+  "request_params": null,
+  "request_json": {
+    "type": "fundingHistory",
+    "coin": "AXS",
+    "startTime": 0,
+    "endTime": 2000000000000
+  },
+  "retrieved_at": "2026-08-24T14:12:11+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 500,
+  "first_record": {
+    "coin": "AXS",
+    "fundingRate": "-0.0023122934",
+    "premium": "-0.0189983469",
+    "time": 1768708800062
+  },
+  "last_record": {
+    "coin": "AXS",
+    "fundingRate": "-0.0000361509",
+    "premium": "-0.0007892074",
+    "time": 1770505200038
+  },
+  "sha256": "6fe1b3bcae50d04494f5e1c59dd949a3aa1284eb5a3d4401bd454365caf06cd6",
+  "bytes": 45770,
+  "access_class": "PUBLIC",
+  "notes": "oldest funding for AXS \u2014 probes delisted-recovery semantics",
+  "known_limitations": ""
+}

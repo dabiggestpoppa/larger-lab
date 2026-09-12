@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "okx_delisted_candidates",
+  "description": "OKX delisted SWAP recovery probe",
+  "retrieved_at": "2026-08-24T14:06:48+00:00",
+  "access_class": "PUBLIC",
+  "composite": true,
+  "n_rows": 4
+}

@@ -1,0 +1,10 @@
+family,constituents,within_family_redundancy,regime_stability_std_of_mean,edge_assoc_mean_abs_rho,threshold_assoc_abs_rho,saturation_assoc_abs_rho,rank_patch_assoc_mean_abs_rho,cross_family_mean_abs_rho
+PARTICIPATION_FORCING,breadth_vel|pos_ret_share,0.748,0.0372,0.025,0.75,0.808,0.786,0.122
+DISPERSION_FORCING,top500_dispersion_7d,0.404,0.0038,0.063,0.07,0.071,0.071,0.092
+VOLATILITY_FORCING,vol_med,1.0,0.6224,0.165,0.038,0.004,0.005,0.155
+BTC_ANCHOR_FORCING,btc_return_7d,1.0,0.1787,0.047,0.244,0.295,0.295,0.205
+ETH_RELATIVE_FORCING,eth_btc_relative_return_7d,1.0,0.1419,0.024,0.095,0.128,0.126,0.122
+RANK_RECRUITMENT_FORCING,rank_depth_rel,1.0,0.2245,0.035,0.057,0.057,0.055,0.134
+CONCENTRATION_RELEASE_FORCING,top3_share_chg7,1.0,0.0553,0.09,0.028,0.044,0.04,0.111
+STABLECOIN_CAPITAL_FORCING,stablecoin_change_7d,1.0,0.5909,0.137,0.043,0.031,0.032,0.205
+PHYSICAL_DISTURBANCE_FORCING,total_mcap_chg30,1.0,0.2218,0.056,0.15,0.174,0.175,0.195

@@ -1,0 +1,4 @@
+_cache_*.pkl
+_run.log
+__pycache__/
+plots/*.png

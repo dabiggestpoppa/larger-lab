@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "case": "context_t1_t2_idempotent",
+      "expected": "first_created_at_preserved",
+      "observed": "first_preserved"
+    },
+    {
+      "case": "context_scientific_conflict",
+      "expected_error": "ProjectionIdentityConflict",
+      "observed_error": "ProjectionIdentityConflict"
+    },
+    {
+      "artifact_ids": [
+        "proj-r"
+      ],
+      "case": "service_repeat_complete_chain",
+      "context_created_at_preserved": true
+    },
+    {
+      "case": "partial_context_without_lineage_not_visible",
+      "expected": "resolver_fails_closed",
+      "observed": "resolver_fails_closed"
+    },
+    {
+      "case": "partial_context_retry_completed",
+      "context_created_at_preserved": true,
+      "lineage_durable": true
+    },
+    {
+      "case": "alternate_lmid_retry_rejected",
+      "expected_error": "LineageContextBindingConflict|ProjectionIdentityConflict",
+      "observed_error": "ProjectionIdentityConflict"
+    },
+    {
+      "case": "changed_projection_retry_rejected",
+      "expected_error": "ProjectionIdentityConflict",
+      "observed_error": "ProjectionIdentityConflict"
+    },
+    {
+      "case": "restart_after_retry_valid",
+      "expected": "resolver_passes",
+      "observed": "resolver_passes"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R4",
+  "generated_from_fixture": "i05r4-deterministic-fixture-v1",
+  "matrix": "BLOC_04_I05R4_SERVICE_RETRY_MATRIX"
+}

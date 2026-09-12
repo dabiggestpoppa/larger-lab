@@ -1,0 +1,6 @@
+operation,object,evidence,decision
+UNRESOLVED,BROAD_RISK vs ALT release routes,"WS A: P(BROAD_RISK before ALT | ALT reached)=0.5333; pattern counts {'CONC_REENTRY': 52, 'CONC_MIXED': 44, 'CONC_BROAD_RISK_ONLY': 18, 'CONC_DIRECT_ALT': 9, 'CONC_DEFENSIVE': 2}",CONFIRMED
+DISSOLVE,HYSTERESIS_PREDICTIVE_MECHANISM (path memory),"WS C: HYSTERESIS_DESCRIPTIVE, delta_logloss=-0.0918, perm_p=0.87",CONFIRMED
+NEW_NODE,duration-dependence (semi-Markov),WS D: semi_markov_earned=True,CONFIRMED
+NEW_NODE,release trigger vs route gate,WS F: ROUTE_GATE_NEW_NODE,CONFIRMED
+NULL,state-conditioned routing graph,WS H: reconfig_supported=False,CONFIRMED

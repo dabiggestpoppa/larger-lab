@@ -1,0 +1,2 @@
+subtype,n,n_cycles,outcome_rate_in_subtype,outcome_rate_baseline_true_loners,chrono_first_half_rate,chrono_second_half_rate,chrono_chi2_p,loo_cycle_rate_min,loo_cycle_rate_max,fdr_q_across_subtype_scan,purged_auc_indicator,verdict
+EARLY_CONTAGION,81,5,1.0,0.3424,1.0,1.0,,1.0,1.0,0.0,0.5567,SURVIVES_PURGED_FDR

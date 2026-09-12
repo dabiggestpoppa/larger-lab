@@ -1,0 +1,10 @@
+workstream,test,classification,count
+B,perturbation,DISSOLVES,25
+B,perturbation,LOCAL,5
+B,perturbation,NO_RELATION,135
+B,perturbation,SURVIVES,5
+B,perturbation,WEAKENED,130
+D,routing flip,GAINED,15
+D,routing flip,LOST,33
+D,routing flip,REVERSED,27
+D,routing flip,SAME_SIGN,35

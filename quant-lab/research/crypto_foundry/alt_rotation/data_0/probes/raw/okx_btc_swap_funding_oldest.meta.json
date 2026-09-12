@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "okx_btc_swap_funding_oldest",
+  "method": "GET",
+  "url": "https://www.okx.com/api/v5/public/funding-rate-history",
+  "request_params": {
+    "instId": "BTC-USDT-SWAP",
+    "after": "0",
+    "limit": "100"
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:06:45+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "fc24d69479edbb84f22c7d5bd4525349734056ad3baf7a5adf7e553f68c06a3a",
+  "bytes": 31,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "",
+  "notes": "oldest BTC-USDT-SWAP funding (listing lower bound)",
+  "final_url": "https://www.okx.com/api/v5/public/funding-rate-history?instId=BTC-USDT-SWAP&after=0&limit=100",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:06:44 GMT",
+    "Content-Type": "application/json;charset=UTF-8",
+    "Content-Length": "31",
+    "Connection": "keep-alive",
+    "CF-Ray": "a302eb560ff51dc7-EWR",
+    "CF-Cache-Status": "DYNAMIC",
+    "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+    "Expires": "0",
+    "Server": "cloudflare",
+    "Strict-Transport-Security": "max-age=31536000 ; includeSubDomains, max-age=31536000; includeSubDomains",
+    "Vary": "Origin",
+    "Pragma": "no-cache",
+    "b-locale": "en_US",
+    "content-security-policy": "frame-ancestors 'self'",
+    "x-brokerid": "0",
+    "x-content-type-options": "nosniff, nosniff",
+    "x-frame-options": "SAMEORIGIN, DENY",
+    "x-routed-to": "TKY",
+    "x-xss-protection": "1; mode=block, 1; mode=block"
+  }
+}

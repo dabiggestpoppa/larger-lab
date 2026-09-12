@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "cmc_dataapi_btc_recent_window",
+  "method": "GET",
+  "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/historical",
+  "request_params": {
+    "id": 1,
+    "convertId": 2781,
+    "timeStart": 1755648000000,
+    "timeEnd": 1755820800000
+  },
+  "request_json": null,
+  "retrieved_at": "2026-08-24T14:10:54+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 1,
+  "first_record": {
+    "id": 1,
+    "name": "Bitcoin",
+    "symbol": "BTC",
+    "timeEnd": "1755647999999",
+    "quotes": []
+  },
+  "last_record": {
+    "id": 1,
+    "name": "Bitcoin",
+    "symbol": "BTC",
+    "timeEnd": "1755647999999",
+    "quotes": []
+  },
+  "sha256": "9f25503cfbc4283aeacb664c7a25997afa11b3f1b6196a266053e2e104f3a31b",
+  "bytes": 213,
+  "access_class": "WEB_ONLY",
+  "notes": "recent-window test: does per-coin historical ever return quotes on the internal data-api?",
+  "known_limitations": "internal endpoint; may require web session"
+}

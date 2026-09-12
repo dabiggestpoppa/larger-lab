@@ -1,0 +1,5 @@
+coordinate,fast_q25,fast_median,fast_q75,other_median,n_fast,n_other,note
+latency_T1,1.0,1.0,1.0,1.0,522,499,
+peer_neg_frac1,0.4,0.6,0.7778,0.4,522,499,
+peak_time_T3,1.0,1.0,7.0,7.0,522,499,
+VERDICT,FAST_CONTAGION_REGION,DESCRIPTIVE_TAG,stable_subperiods=5/5,,,,"fast region = latency<=1d, early reach high, peak<=3d; boundaries overlap with medium species so they are descriptive bounds, NOT a discrete cluster — EARLY_CONTAGION demotion confirmed (region within continuous tempo geometry)"

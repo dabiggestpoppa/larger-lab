@@ -1,0 +1,7 @@
+removed,reduced_auc,delta
+range_compression_ratio,0.2948,0.459
+activity_over_displacement,0.5756,0.1782
+mean_reversion_ac1,0.3934,0.3604
+adverse_perturb_min_1d,0.3333,0.4204
+rapid_reclaim_max_1d,0.3556,0.3981
+choppy_participation,0.3084,0.4454

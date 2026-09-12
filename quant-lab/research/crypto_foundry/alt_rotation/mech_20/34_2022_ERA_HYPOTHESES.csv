@@ -1,0 +1,7 @@
+hypothesis,pre_gain_mean,post_gain_mean,low_gain_regime_frac_pre,low_gain_regime_frac_post,test,year,gain_mean,gain_std,n_days,monthly_regime_transitions,n_low_gain_runs,n_high_gain_runs,post_frac_low_regime,verdict
+H1_TEMPORARY_SCAR,0.7746,0.8408,0.312,0.237,post recovers pre low-regime frequency,,,,,,,,,H3_MULTIPLE_REGIME_MODULATIONS
+H2_ERA_TRANSITION,,,,,,2023.0,0.7224,0.2725,345.0,,,,,H3_MULTIPLE_REGIME_MODULATIONS
+H2_ERA_TRANSITION,,,,,,2024.0,0.7749,0.641,358.0,,,,,H3_MULTIPLE_REGIME_MODULATIONS
+H2_ERA_TRANSITION,,,,,,2025.0,1.3539,0.9903,365.0,,,,,H3_MULTIPLE_REGIME_MODULATIONS
+H2_ERA_TRANSITION,,,,,,2026.0,0.2851,0.006,235.0,,,,,H3_MULTIPLE_REGIME_MODULATIONS
+H3_MULTIPLE_MODULATIONS,,,,,,,,,,21.0,5.0,7.0,0.237,H3_MULTIPLE_REGIME_MODULATIONS

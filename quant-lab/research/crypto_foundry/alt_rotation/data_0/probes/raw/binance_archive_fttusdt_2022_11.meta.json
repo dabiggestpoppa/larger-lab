@@ -1,0 +1,14 @@
+{
+  "probe": "binance_archive_fttusdt_2022_11",
+  "method": "GET",
+  "url": "https://data.binance.vision/data/futures/um/monthly/klines/FTTUSDT/1d/FTTUSDT-1d-2022-11.zip",
+  "request_params": null,
+  "http_status": 200,
+  "ok": true,
+  "access_class": "PUBLIC",
+  "notes": "delisted FTTUSDT monthly klines from official archive",
+  "known_limitations": "zip body",
+  "sha256": "e3810831bad00134dfde840c4a20c99eb028df57280de8190fd6d0110bdbe826",
+  "bytes": 1224,
+  "retrieved_at": "2026-08-24T14:14:01+00:00"
+}

@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinmarketcap_web_api_historical_probe",
+  "method": "GET",
+  "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/historical",
+  "request_params": {
+    "id": 1,
+    "convertId": 2781,
+    "timeStart": 1717200000000,
+    "timeEnd": 1717286400000
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:42+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "a26d3693f065264ca5bd066d9a15af908333c9f145f0d1806a1f79930f5e5d85",
+  "bytes": 212,
+  "access_class": "WEB_ONLY",
+  "historical_date": "2024-06-01",
+  "known_limitations": "internal endpoint; behavior may change; do not rely on",
+  "notes": "internal data-api used by the website \u2014 classify availability",
+  "final_url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/historical?id=1&convertId=2781&timeStart=1717200000000&timeEnd=1717286400000",
+  "response_headers_safe": {
+    "Content-Type": "application/json",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Date": "Mon, 24 Aug 2026 14:01:41 GMT",
+    "Access-Control-Max-Age": "600",
+    "Content-Encoding": "gzip",
+    "Server": "Tengine",
+    "x-server-traceid": "09b360e67fd68416a5166dbb15878ac6",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Headers": "origin,csrftoken,x-csrf-token,accept,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,fvideo-id,x-request-id,authHeader,accept-language,cmc-captcha-token,Platform,security-id,x-se-bh,x-se-pd,x-se-rd,x-se-sd,x-se-gsd,x-se-gd,device-info,x-pwd-encryption,deviceModel,deviceId,deviceName,languageCode,versionname,clienttype,x-seccheck-sig,x-seccheck-token",
+    "Access-Control-Allow-Methods": "OPTIONS, HEAD, GET, POST, PUT, DELETE, PATCH",
+    "Access-Control-Expose-Headers": "Authorization,x-cache,c-backend-cache,age,date,x-user-email",
+    "Vary": "Accept-Encoding",
+    "X-Cache": "Miss from cloudfront",
+    "Via": "1.1 e8039dd25e051dc29f5a0599477e9634.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Pop": "BOS50-P4",
+    "X-Amz-Cf-Id": "KqgXYr8UNNYI3lEwilgoxWxt5_qa4HxV10lUOS9lUrVbwJ9hcJcR4w=="
+  }
+}

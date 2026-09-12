@@ -1,0 +1,10 @@
+result,status,note
+Pre-event isolated-down divergence (MECH-7 claim),NOT_EARNED,corrected in MECH-8
+Broad EARLY_DECAY_SEQUENCE,NULL,MECH-9; local termination only
+Breadth composition incremental value,NULL,MECH-8/9; merged into level
+Transition velocity,PARKED,MECH-10
+HH birth quality OOS,PARKED,MECH-9/10
+Active liquidity independent recovery role,PARKED,MECH-9
+SHMC high-tail activation,DEAD,reversion-like local role only
+Chain/DEX activity as driver,NULL,MECH-11 WS17 sensor-only
+Volatility route selector,NULL,intensity/clock only

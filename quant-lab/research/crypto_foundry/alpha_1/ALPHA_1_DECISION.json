@@ -1,0 +1,18 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-1-MECHANISM-TO-STRATEGY-GENERATION",
+  "parent": "CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY",
+  "parent_sha": "1e0265c684ef457f6ead0e6bc84d4eb2147eaa11",
+  "decision": "PASS_ALPHA_HYPOTHESIS_GENERATION",
+  "frozen_at": "2026-08-23T15:51:23Z",
+  "strategy_count": 13,
+  "control_count": 6,
+  "promoted_states_consumed": 25,
+  "mechanism_families": 6,
+  "next_checkpoint": "CRYPTO-ALPHA-2-PREREGISTERED-BACKTEST-AND-FALSIFICATION",
+  "authorized": {
+    "strategy_generation": true,
+    "backtest": false,
+    "execution": false,
+    "live_capital": false
+  }
+}

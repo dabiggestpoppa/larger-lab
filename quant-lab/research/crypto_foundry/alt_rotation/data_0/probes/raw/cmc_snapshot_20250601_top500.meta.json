@@ -1,0 +1,19 @@
+{
+  "probe": "cmc_snapshot_20250601_top500",
+  "method": "GET",
+  "url": "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/listings/historical?date=2025-06-01&start=1&limit=500&convertId=2781",
+  "request_params": {
+    "date": "2025-06-01",
+    "start": 1,
+    "limit": 500,
+    "convertId": 2781
+  },
+  "http_status": 200,
+  "ok": true,
+  "access_class": "WEB_ONLY",
+  "notes": "PIT ranked snapshot for 2025-06-01 (limit 500) via CMC internal data-api (web-only)",
+  "known_limitations": "internal endpoint; TOS: web scraping terms apply; verify limit=500 honored via row count",
+  "sha256": "a4c9f9cec7c42889a1bc13600bd44f1f2836adf939f3f2b159016c9cfb522c6e",
+  "bytes": 370773,
+  "retrieved_at": "2026-08-24T14:13:55+00:00"
+}

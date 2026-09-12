@@ -1,0 +1,7 @@
+link,feature,outcome,spearman,p,purged_auc,n
+CHURN->propagated,churn_turnover,out_contagion,-0.005,0.748,0.4808,3646
+WHO_LEFT->propagated,old_peer_stress,out_contagion,0.007,0.754,0.4918,2226
+WHO_ENTERED->absorbed,added_peer_fwd7,absorbed,0.02,0.341,0.5344,2194
+REPLACEMENT_QUALITY->reorganized,new_coherence,reorganized,0.015,0.373,0.4859,3647
+COHERENCE_CHANGE->absorbed,new_coherence,absorbed,0.014,0.389,0.5136,3647
+RANK_HEALTH_CHANGE->reorganized,rank_migration,state_changed,0.049,0.022,0.5276,2226

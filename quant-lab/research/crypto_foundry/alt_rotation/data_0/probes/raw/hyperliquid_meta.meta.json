@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_meta",
+  "method": "POST",
+  "url": "https://api.hyperliquid.xyz/info",
+  "request_params": null,
+  "request_json": {
+    "type": "meta"
+  },
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:06:49+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 232,
+  "first_record": {
+    "szDecimals": 5,
+    "name": "BTC",
+    "maxLeverage": 40,
+    "marginTableId": 56
+  },
+  "last_record": {
+    "szDecimals": 0,
+    "name": "CASHCAT",
+    "maxLeverage": 3,
+    "marginTableId": 3,
+    "onlyIsolated": true,
+    "marginMode": "strictIsolated"
+  },
+  "sha256": "eb191a003d8ad2d0b52e6ff16e660c9ba105c03dade579e83abcfed9ee046a93",
+  "bytes": 17527,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "CURRENT only; no historical universe versioning via API",
+  "notes": "current perp universe (names, szDecimals, maxLeverage)",
+  "final_url": "https://api.hyperliquid.xyz/info",
+  "response_headers_safe": {
+    "Content-Type": "application/json",
+    "Content-Length": "17527",
+    "Connection": "keep-alive",
+    "Server": "nginx/1.22.1",
+    "Date": "Mon, 24 Aug 2026 14:06:48 GMT",
+    "access-control-expose-headers": "*",
+    "access-control-allow-origin": "*",
+    "vary": "origin, access-control-request-method, access-control-request-headers",
+    "X-Cache": "Miss from cloudfront",
+    "Via": "1.1 27d6451eef68b8beda74f9749214fe2c.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Pop": "BOS50-P1",
+    "X-Amz-Cf-Id": "JFjrowI3V6iU7P9sC9m2RF_yvphGNJlNHZEJA-9ODAvR55QC4GggJg=="
+  }
+}

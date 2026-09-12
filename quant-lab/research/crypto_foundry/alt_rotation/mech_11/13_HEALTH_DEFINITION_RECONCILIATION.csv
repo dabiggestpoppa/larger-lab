@@ -1,0 +1,6 @@
+finding,agent1_definition,agent2_definition,universe_overlap,verdict
+PRICE_RECOVERY_RANK_DECAY exists as a population,isolated-down 2s+ events; PRICE_UP = fwd7 cum>0; RANK_DOWN = fwd_rank_vel_7d<=0,LF5 isolated-down events (2s/3s/4s+); PRICE_UP = median fwd return>0 at horizon; RANK_UP = median fwd rank vel>0,68.8% (704/1023 M9-health events in LF5),ALIGNED_IN_DIRECTION_DIFFER_IN_GATE
+Rank deterioration precedes reversal,pre_rank_state over 7D rank velocity; RANK_DETERIORATING if vel<=-threshold,rank_vel over 3/7/14/30D with own threshold; horizon-specific,n/a - definitional,RESOLVED_AS_DEFINITION_DRIVEN
+Isolated downside reversal rate,reversal within 7D by fwd7_sigma,rev7 / recover1s7 at 1-sigma threshold,"same events, different thresholds",NEEDS_HARMONIZED_THRESHOLD
+Event universe (2s+ vs all sigma),2s+ isolated downside (LF2 gate),all isolated-down incl 2s/3s/4s+,LF5 superset of M9-health,M9-SUBSET_OF-LF5
+Price anchor,"t0 close, fwd cumulative return","t0 close, fwd cumulative return (PIT)",identical anchor,ALIGNED

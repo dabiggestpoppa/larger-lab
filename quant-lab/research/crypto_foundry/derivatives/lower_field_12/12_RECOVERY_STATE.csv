@@ -1,0 +1,5 @@
+recovery_state,n,p_absorbed,p_propagated,p_persistent,med_recovery_index,recovery_index_auc,days_since_prior_auc,note
+RECENTLY_DISTURBED,312,0.1186,0.5673,0.2372,0.279,,,
+RECOVERING,1123,0.1131,0.4105,0.2342,0.5008,,,
+RECOVERED,2212,0.0565,0.1731,0.3074,0.85,,,
+VERDICT,2226,,,,,0.5276,0.6115,recovery-state vs raw recency for absorption

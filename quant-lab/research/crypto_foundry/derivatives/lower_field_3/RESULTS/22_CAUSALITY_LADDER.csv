@@ -1,0 +1,6 @@
+claim,level,status,note
+same-day neighborhood and participation anatomy,L0 DESCRIPTIVE_CO_MOVEMENT,earned,No temporal causation
+deep-rank downside reversal,L0,earned,"Forward ordering is descriptive, not causal"
+Top-500 breadth to lower tail delivery,L1 TEMPORAL_ORDERING / L2 CONDITIONAL_LEAD_LAG CANDIDATE,limited,Explicit multi-lag/subperiod confirmation remains queued
+triangle breadth-dispersion-tail,L0/L1,associational,Partial correlation pilot only
+sector/chain mechanism,NULL,not earned,LF2 residual null

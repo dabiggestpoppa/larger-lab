@@ -1,0 +1,2 @@
+source,local_coverage_days,required_coverage,status,reason,verdict
+SoSoValue_free_ETF_flow_history,0,free ETF-flow history sufficient to span the recent regime,DATA_BLOCKED,No local ETF-flow data present; scraping and paid APIs are forbidden by the free-only tech stack gate. Exploratory pilot only; not a core MECH-16 requirement.,DATA_BLOCKED

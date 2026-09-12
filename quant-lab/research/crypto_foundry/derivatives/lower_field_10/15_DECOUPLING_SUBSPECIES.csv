@@ -1,0 +1,4 @@
+subspecies,n,n_subperiods,silhouette,med_rank,med_liq,med_coherence,med_churn,med_state_age,verdict
+DECOUP_0,39,5.0,0.2133,118.0,11.7586,-0.0665,0.75,0.0,
+DECOUP_1,28,5.0,0.2133,603.5,10.2275,-0.0634,0.9474,0.0,
+VERDICT,67,,0.2133,,,,,,MULTI_MECHANISM_CONTINUOUS

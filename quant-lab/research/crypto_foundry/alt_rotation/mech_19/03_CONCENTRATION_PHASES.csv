@@ -1,0 +1,6 @@
+probe,n,rho_rank,rate_bin_low,rate_bin_mid,rate_bin_high,verdict
+p1_gap on exit,72,0.2,0.958,1.0,1.0,
+entropy on exit,72,,0.986,,0.986,
+saturation on exit,72,-0.106,1.0,1.0,0.962,
+p1 on reopen,72,,1.0,1.0,1.0,
+phase_gradient,72,,,,,DATA_LIMITED

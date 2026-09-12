@@ -1,0 +1,6 @@
+species,n,shock_mag,early_reach_1d,cap_structural,cap_liquidity,rank,downside_share,p_decouple,rank_vel_7d,note
+FAST,522,0.1063,0.6,0.4993,0.4401,326.5,0.8755,0.2337,-4.0,
+SLOW,193,0.1465,0.7,0.3747,0.4168,404.0,0.7254,0.1658,-5.0,
+PERSISTENT,158,0.1252,0.3167,0.3747,0.4518,366.0,0.8291,0.1392,-4.0,
+MEDIUM,118,0.121,0.3,0.5502,0.5003,249.5,0.8051,0.2627,-3.0,
+VERDICT,,,,,,,,,,"slow/persistent events show similar shock magnitude to fast but lower early reach, weaker capacity, deeper ranks, more downside, and markedly higher decoupling aftermath — persistence is a residue phenomenon, not a small-shock artifact"

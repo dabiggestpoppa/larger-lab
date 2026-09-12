@@ -1,0 +1,12 @@
+{
+  "checkpoint": "MECH-11",
+  "commit": "TBD",
+  "verdict": "PASS_MECH11_TEMPORAL_FIELD_PHYSICS_WITH_LIMITATIONS",
+  "semi_markov": "MARKOV_SUFFICIENT",
+  "sequence_grammar": "COMMON",
+  "competing_risk": "MASS_SHIFT_EARNED",
+  "propagation_radius": "LOCAL",
+  "loner_context": "DISTINCT_GEOMETRY",
+  "human_review_required": true,
+  "next_checkpoint_authorized": false
+}

@@ -1,0 +1,11 @@
+{
+  "result": {
+    "timestamp": [1655251200, 1655254800, 1655258400],
+    "data": {
+      "liquidation": [12.5, 0.0, 8.25],
+      "relativeLiquidation": [0.0012, 0.0, 0.0009]
+    },
+    "more": false
+  },
+  "errors": []
+}

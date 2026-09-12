@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_btc_historical_recent",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical",
+  "request_params": {
+    "start": "2026-08-20",
+    "end": "2026-08-24",
+    "interval": "1d"
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:31+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 4,
+  "first_record": {
+    "timestamp": "2026-08-20T00:00:00Z",
+    "price": 71273.02,
+    "volume_24h": 47615478426,
+    "market_cap": 1430649392625
+  },
+  "last_record": {
+    "timestamp": "2026-08-23T00:00:00Z",
+    "price": 77015.46,
+    "volume_24h": 24597074540,
+    "market_cap": 1546017268792
+  },
+  "sha256": "d826fcca736a1adf862a1549af8f744cd51e6c8ab055090ad7174d466901ee4e",
+  "bytes": 426,
+  "access_class": "PUBLIC",
+  "historical_date": "2026-08-20",
+  "known_limitations": "",
+  "notes": "boundary probe: is ANY historical window free, or is all pre-now history paid-gated?",
+  "final_url": "https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical?start=2026-08-20&end=2026-08-24&interval=1d",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:31 GMT",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Content-Length": "201",
+    "Connection": "keep-alive",
+    "cache-control": "public, max-age=60, s-maxage=60, stale-while-revalidate=10, stale-if-error=600",
+    "content-encoding": "gzip",
+    "vary": "Accept-Encoding, Origin",
+    "version": "2",
+    "h-hap": "01",
+    "Accept-Ranges": "bytes",
+    "last-modified": "Mon, 24 Aug 2026 14:01:31 GMT",
+    "cf-cache-status": "MISS",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3b05b3f4314-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

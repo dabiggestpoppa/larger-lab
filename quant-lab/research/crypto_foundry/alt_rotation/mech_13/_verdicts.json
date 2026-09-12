@@ -1,0 +1,16 @@
+{
+  "checkpoint": "MECH-13",
+  "commit": "TBD",
+  "verdict": "PASS_MECH13_LIFECYCLE_DEEPENING_WITH_LIMITATIONS",
+  "initiation_geometry": "17 sig coords",
+  "entropy": "ENTROPY_DEEP_MAP_BUILT",
+  "constraint_axes": "INDEPENDENT_CONSTRAINT_DIMENSIONS",
+  "waterfall_subtypes": "1 named",
+  "metastability": "HIGH_BREADTH_HIGH_DISP:ORDINARY_STATE; HIGH_BREADTH_LOW_DISP:ORDINARY_STATE; LOW_BREADTH_HIGH_DISP:ORDINARY_STATE; LOW_BREADTH_LOW_DISP:ORDINARY_STATE",
+  "abs_sigma_delta_auc": "0.012",
+  "directional_asymmetry": "ASYMMETRIC_FIELD_GEOMETRY",
+  "patch_response": "140 response cells",
+  "dir_info_gain": "DIRECTION_LOCALLY_CONSTRAINED",
+  "human_review_required": true,
+  "next_checkpoint_authorized": false
+}

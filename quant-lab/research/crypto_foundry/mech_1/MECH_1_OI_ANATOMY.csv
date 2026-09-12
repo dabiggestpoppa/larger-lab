@@ -1,0 +1,3 @@
+label,snapshot_only,mark_price,index_price,oracle_price,mark_index_basis_bps,open_interest,limitation,asset
+BTC,True,77488.1,77490.5,77469.1,-0.3097,33628.27022,OI/mark/index time series NOT available in frozen DATA-1 freeze (snapshot rows only); OI_UP/OI_DOWN classification over time impossible on frozen data,BTC
+ETH,True,2412.3,2412.4,2411.3,-0.4145,909802.1056000004,OI/mark/index time series NOT available in frozen DATA-1 freeze (snapshot rows only); OI_UP/OI_DOWN classification over time impossible on frozen data,ETH

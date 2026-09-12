@@ -1,0 +1,23 @@
+result,workstream,causality_level,note
+first_divergence_btc_dom_chg30,WS1,L1_TEMPORAL_ORDERING,"earliest at +10D, p_fdr=7e-06"
+first_divergence_btc_return_30d,WS1,L1_TEMPORAL_ORDERING,"earliest at +0D, p_fdr=0.0"
+first_divergence_btc_return_7d,WS1,L1_TEMPORAL_ORDERING,"earliest at +3D, p_fdr=0.001122"
+first_divergence_chain_tvl_med_chg7,WS1,L1_TEMPORAL_ORDERING,"earliest at +7D, p_fdr=0.000134"
+first_divergence_eth_btc_relative_return_30d,WS1,L1_TEMPORAL_ORDERING,"earliest at +2D, p_fdr=0.011689"
+first_divergence_eth_btc_relative_return_7d,WS1,L1_TEMPORAL_ORDERING,"earliest at +5D, p_fdr=0.034086"
+first_divergence_med_ret30_11_50,WS1,L1_TEMPORAL_ORDERING,"earliest at +21D, p_fdr=0.000576"
+first_divergence_med_ret30_201_500,WS1,L1_TEMPORAL_ORDERING,"earliest at +14D, p_fdr=0.0"
+first_divergence_med_ret30_51_200,WS1,L1_TEMPORAL_ORDERING,"earliest at +21D, p_fdr=0.000829"
+first_divergence_top3_share,WS1,L1_TEMPORAL_ORDERING,"earliest at +30D, p_fdr=0.006545"
+first_divergence_top3_share_chg7,WS1,L1_TEMPORAL_ORDERING,"earliest at +0D, p_fdr=0.043949"
+first_divergence_top500_breadth_30d,WS1,L1_TEMPORAL_ORDERING,"earliest at +1D, p_fdr=0.0"
+first_divergence_top500_breadth_7d,WS1,L1_TEMPORAL_ORDERING,"earliest at +1D, p_fdr=0.000169"
+first_divergence_top500_dispersion_30d,WS1,L1_TEMPORAL_ORDERING,"earliest at +3D, p_fdr=0.000267"
+first_divergence_top500_dispersion_7d,WS1,L1_TEMPORAL_ORDERING,"earliest at +1D, p_fdr=0.002031"
+first_divergence_total_mcap_chg30,WS1,L1_TEMPORAL_ORDERING,"earliest at +21D, p_fdr=0.034683"
+success_failure_incremental_map,WS2,L0_DESCRIPTIVE_CO_MOVEMENT,"best AUC=0.8689, perm_p=0.002"
+retest_reload_vs_failed_ignition,WS3,L0_NULL,0/8 vars sig after FDR
+escape_hazard,WS4,L1_TEMPORAL_ORDERING,descriptive hazard by horizon
+early_decay_sequence,WS5,L1_TEMPORAL_ORDERING,1/8 vars show early decline
+failure_motif_classification,WS6,L0_DESCRIPTIVE_CO_MOVEMENT,descriptive motifs
+conditional_rescue,WS7,L2_CONDITIONAL_LEAD_LAG,4/10 conditions sig after FDR

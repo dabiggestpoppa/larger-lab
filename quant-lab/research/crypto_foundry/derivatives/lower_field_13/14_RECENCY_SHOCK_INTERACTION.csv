@@ -1,0 +1,6 @@
+cell,n,p_propagation,latency,radius,note
+RECENT_BIG,292,0.3048,1.0,0.4444,
+RECENT_SMALL,374,0.3021,1.0,0.2,
+NOTRECENT_BIG,780,0.2423,1.0,0.5,
+NOTRECENT_SMALL,697,0.3357,1.0,0.2,
+VERDICT,,,,,interaction coef=0.4702 p=0.0222 — recency AMPLIFIES shock->propagation

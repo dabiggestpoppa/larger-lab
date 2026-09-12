@@ -1,0 +1,5 @@
+model,auc,ll,base_ll,delta,n_test,delta_ll,delta_auc,perm_p,verdict
+M_A,0.4926,0.4594,0.3365,-0.123,38.0,,,,
+M_B,0.886,0.2684,0.3365,0.0681,38.0,,,,
+M_AB,0.7059,0.3077,0.3365,0.0288,38.0,,,,
+INCREMENTAL,,,,,,-0.0394,-0.1801,0.9751,MERGE_ABSORBED_BY_BREADTH

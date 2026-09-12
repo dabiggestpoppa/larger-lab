@@ -1,0 +1,9 @@
+object,null,note
+EARLY_PEER_REACH_SIGN_GAP,peer-reach medians ~0 gap at 1-14d; slightly negative at 30d (26),the downside gap lives in propagation RATE not median peer reach — honest null for the reach object
+SIGN_GAP_IN_ABSORPTION,absorption gap small/negative (-0.011) (27),asymmetry is NOT at initial absorption
+REACTIVATION->DECOUPLING_EDGE,reactivation high in all species but decoupling share differs; no clean edge (19/18),relation map edge NULL (33)
+RELATIONAL_DISTANCE_ROUTING,carried as HARD-PARKED (LF12 null); not reopened (protocol),no new evidence requested
+BRANCHING_CRITICALITY,carried as HARD-PARKED (LF12); not reopened (protocol),generation map retained only inside mechanism surface (12)
+CUMULATIVE_DAMAGE_ACCELERATION,carried as NO_FRAGILITY_ACCELERATION + SELECTION (LF12); not reopened (protocol),hard-parked per LF13 governance
+CONTAGION_PHASES_DISCRETE,"phases observable but boundaries overlap (16) — FEW_PHASES, not stable phases",parked as organizing tag only
+UPSIDE_HARD_GATE,no threshold effect; functions add +0.5-1.6pp (32),upside park confirmed

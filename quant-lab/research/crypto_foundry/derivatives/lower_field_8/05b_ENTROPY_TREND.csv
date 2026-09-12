@@ -1,0 +1,6 @@
+peer_family,verdict,median_entropy_drift_bits,frac_assets_concentrating,n_assets
+BEHAVIORAL_10,STABLE,0.0,0.1107,271
+CORR_60_10,STABLE,0.0,0.1065,263
+CORR_120_10,STABLE,0.0,0.1235,251
+STATE,STABLE,0.0,0.494,249
+HYBRID_10,STABLE,0.0,0.1033,271

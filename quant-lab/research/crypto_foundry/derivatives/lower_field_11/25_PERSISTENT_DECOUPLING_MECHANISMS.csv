@@ -1,0 +1,11 @@
+mechanism_axis,coordinate,n,point_biserial,p,purged_auc_pd,available
+shock_burden,mem_exp_sum,1874,-0.015,0.525,0.4448,YES
+rank_health_decay,rank_vel_7d,3647,0.176,0.0,0.6801,YES
+liquidity,liq_proxy,3556,0.125,0.0,0.6088,YES
+topology_replacement,roll_turnover_30d,3646,-0.039,0.019,0.5278,YES
+old_peer_recovery,old_peer_stress,2226,-0.013,0.544,0.4983,YES
+new_neighborhood_found,rejoin_vel,3647,-0.25,0.0,0.597,YES
+failed_rejoin_burden,,0,,,,NO
+duration,state_age_d,3647,0.059,0.0,0.5279,YES
+residual_peer_divergence,peer_std_ret,3647,-0.014,0.392,0.5248,YES
+VERDICT,,3647,,,,MULTI_MECHANISM

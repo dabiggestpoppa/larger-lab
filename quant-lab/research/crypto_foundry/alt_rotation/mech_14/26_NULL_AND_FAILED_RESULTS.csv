@@ -1,0 +1,11 @@
+result,status,note
+Universal sequence grammar,DEMOTED,MECH-12; not revived
+Metastability (any cell),KILLED,MECH-13; not revisited
+Single necessary initiation primitive,NULL,MECH-13 zero necessary coords; equifinality instead
+Common forcing + patch thresholds,SUPPORTED,MECH-14 WS12: COMMON_FORCING_WITH_THRESHOLDS
+Lifecycle phase adds over raw age,WEAK,MECH-14 WS3: AGE_SUFFICIENT (phase ~ age clock)
+Spatial x temporal axis independence,RETAINED,MECH-14 WS15: independent after age-residualization
+HH birth quality OOS as single-coordinate predictor,PARKED,MECH-9/10; equifinality re-frame
+Volatility route selector,NULL,intensity/retention only
+SHMC high-tail activation,DEAD,reversion-like local role only
+Breadth composition beyond level,NULL,MECH-11/12

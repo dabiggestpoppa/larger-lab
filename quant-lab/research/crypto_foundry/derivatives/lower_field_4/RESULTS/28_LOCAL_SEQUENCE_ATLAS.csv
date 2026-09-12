@@ -1,0 +1,2 @@
+sequence,n,periods,lift,status
+RANK_ONLY_ISOLATED -> forward recovery,1023,,,DESCRIPTIVE_ONLY_NO_PURGED_SEQUENCE_TEST

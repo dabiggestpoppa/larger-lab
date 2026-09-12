@@ -56,6 +56,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
+.venv/
 
 # Databases
 *.sqlite
@@ -111,3 +112,10 @@ argo-ref/
 .po_heartbeat_state.json
 .memory-sync-daemon.status.json
 .git_commit_msg.txt
+# LOWER-FIELD-1 heavy reproducible panels (excluded from git; regenerate via scripts)
+quant-lab/research/crypto_foundry/derivatives/lower_field_1/RESULTS/08_POTENTIAL_REALIZATION_PANEL.parquet
+
+
+# LF2 700MB recomputable feature frame (from lf2_load.py)
+quant-lab/research/crypto_foundry/derivatives/lower_field_2/RESULTS/lf2_feature_frame.parquet
+quant-lab/research/crypto_foundry/derivatives/lower_field_3/RESULTS/_lf3_events_internal.csv

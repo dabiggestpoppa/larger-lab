@@ -1,0 +1,9 @@
+{
+  "result": {
+    "history": [
+      {"time": 1655316000000, "trade_id": 371498400, "price": "29500.0", "size": 0.01, "side": "buy", "type": "fill"},
+      {"time": 1655322000000, "trade_id": 371498401, "price": "29505.0", "size": 0.02, "side": "sell", "type": "fill"}
+    ],
+    "lastTime": 1655322000000
+  }
+}

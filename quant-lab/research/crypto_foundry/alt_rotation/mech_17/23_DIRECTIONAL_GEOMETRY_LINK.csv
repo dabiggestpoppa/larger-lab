@@ -1,0 +1,5 @@
+demand,exit_entropy,capacity,n,branch_concentration,dominant_exit_share,effective_exit_families_k,exit_band,directional_narrowing
+HIGH,OPEN,HIGH_CAP,490,0.1,0.641,1.23,NEAR_SINGLE_EXIT,OPEN
+HIGH,OPEN,LOW_CAP,532,0.065,0.467,0.87,CONCENTRATED,OPEN
+LOW,OPEN,HIGH_CAP,662,0.068,0.596,1.05,CONCENTRATED,OPEN
+LOW,OPEN,LOW_CAP,509,0.073,0.511,0.95,CONCENTRATED,OPEN

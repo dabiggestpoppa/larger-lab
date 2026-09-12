@@ -1,0 +1,7 @@
+phase,definition,observed,n,class,note
+INITIATION,latency_T1 small + reach ramping 1->3d,0.9243,991,OBSERVABLE,
+EXPANSION,reach increases 3->7d (expansion slope > 0),0.4127,991,OBSERVABLE,
+PEAK,peak_time_T3 small (peak within 3d),0.5469,991,COMMON_FOR_FAST,
+DECAY,reach declines 14->30d,0.4077,991,OBSERVABLE,
+RESIDUE_REACTIVATION,reactivation after first spread,0.6811,991,MINORITY,
+VERDICT,,FEW_PHASES,,DESCRIPTIVE,initiation/expansion/decay are observable for most events but phase boundaries overlap heavily across species — continuous trajectory with species-local phase emphasis (FAST peaks early; PERSISTENT lacks clear decay)

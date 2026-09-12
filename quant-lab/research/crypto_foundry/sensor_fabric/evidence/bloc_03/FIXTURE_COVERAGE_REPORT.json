@@ -1,0 +1,354 @@
+{
+  "artifact": "FIXTURE_COVERAGE_REPORT.json",
+  "method": "AST-derived from committed test fixture modules (scenario dict keys -> QA categories)",
+  "note": "categories: happy, empty, additive, drift, malformed, provider_error, resume_completion; missing = no committed fixture for that category on that path",
+  "paths": {
+    "DERIBIT|MECHANICAL_BOOK_SNAPSHOT": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_level",
+        "bad_timestamp",
+        "bool_timestamp",
+        "drift",
+        "empty_levels",
+        "happy",
+        "invalid_instrument",
+        "minimal",
+        "missing_asks",
+        "missing_bids",
+        "provider_error",
+        "rate_limit",
+        "str_timestamp"
+      ]
+    },
+    "DERIBIT|MECHANICAL_FUNDING": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_timestamp",
+        "bool_timestamp",
+        "dict_result",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_instrument",
+        "missing_field",
+        "none_timestamp",
+        "provider_error",
+        "rate_limit",
+        "str_timestamp"
+      ]
+    },
+    "DERIBIT|MECHANICAL_LIQUIDATION": {
+      "categories": [
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "bad_flag_type",
+        "bad_timestamp",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_instrument",
+        "missing_field",
+        "missing_flag",
+        "no_events",
+        "provider_error",
+        "rate_limit"
+      ]
+    },
+    "DERIBIT|MECHANICAL_TRADE": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error",
+        "resume_completion"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_has_more",
+        "bad_timestamp",
+        "bool_timestamp",
+        "drift",
+        "empty",
+        "happy",
+        "has_more_true",
+        "invalid_instrument",
+        "missing_field",
+        "missing_has_more",
+        "none_timestamp",
+        "provider_error",
+        "rate_limit",
+        "str_timestamp"
+      ]
+    },
+    "GATE_FUTURES|MECHANICAL_FUNDING": {
+      "categories": [
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "bad_t",
+        "bool_t",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_contract",
+        "missing_t",
+        "none_t",
+        "provider_error",
+        "rate_limit",
+        "retention"
+      ]
+    },
+    "GATE_FUTURES|MECHANICAL_LIQUIDATION": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_time",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_contract",
+        "missing_field",
+        "none_time",
+        "provider_error",
+        "rate_limit",
+        "retention"
+      ]
+    },
+    "GATE_FUTURES|MECHANICAL_OPEN_INTEREST": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_time",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_contract",
+        "missing_field",
+        "none_time",
+        "provider_error",
+        "rate_limit",
+        "retention"
+      ]
+    },
+    "GATE_FUTURES|MECHANICAL_POSITIONING": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_time",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_contract",
+        "missing_field",
+        "none_time",
+        "provider_error",
+        "rate_limit",
+        "retention"
+      ]
+    },
+    "KRAKEN_FUTURES|MECHANICAL_BASIS": {
+      "categories": [
+        "drift",
+        "empty",
+        "happy",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "empty_valid",
+        "error_symbol",
+        "happy",
+        "schema_drift"
+      ]
+    },
+    "KRAKEN_FUTURES|MECHANICAL_BOOK_METRIC": {
+      "categories": [
+        "drift",
+        "empty",
+        "happy",
+        "provider_error",
+        "resume_completion"
+      ],
+      "scenario_keys": [
+        "continuation",
+        "empty_valid",
+        "error_symbol",
+        "happy",
+        "schema_drift"
+      ]
+    },
+    "KRAKEN_FUTURES|MECHANICAL_FUNDING": {
+      "categories": [
+        "drift",
+        "empty",
+        "happy",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "empty_valid",
+        "error_symbol",
+        "happy",
+        "schema_drift"
+      ]
+    },
+    "KRAKEN_FUTURES|MECHANICAL_LIQUIDATION": {
+      "categories": [
+        "drift",
+        "empty",
+        "happy",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "empty_valid",
+        "error_symbol",
+        "happy",
+        "schema_drift"
+      ]
+    },
+    "KRAKEN_FUTURES|MECHANICAL_OPEN_INTEREST": {
+      "categories": [
+        "drift",
+        "empty",
+        "happy",
+        "provider_error",
+        "resume_completion"
+      ],
+      "scenario_keys": [
+        "continuation",
+        "empty_valid",
+        "error_symbol",
+        "happy",
+        "schema_drift"
+      ]
+    },
+    "KRAKEN_FUTURES|MECHANICAL_POSITIONING": {
+      "categories": [
+        "drift",
+        "empty",
+        "happy",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "empty_valid",
+        "error_symbol",
+        "happy",
+        "schema_drift"
+      ]
+    },
+    "OKX_SWAP|MECHANICAL_BOOK_SNAPSHOT": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_level",
+        "bad_timestamp",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_instrument",
+        "missing_field",
+        "none_timestamp",
+        "provider_error",
+        "rate_limit"
+      ]
+    },
+    "OKX_SWAP|MECHANICAL_FUNDING": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_timestamp",
+        "bool_timestamp",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_instrument",
+        "missing_field",
+        "none_timestamp",
+        "provider_error",
+        "rate_limit"
+      ]
+    },
+    "OKX_SWAP|MECHANICAL_TRADE": {
+      "categories": [
+        "additive",
+        "drift",
+        "empty",
+        "happy",
+        "malformed",
+        "provider_error"
+      ],
+      "scenario_keys": [
+        "additive",
+        "bad_timestamp",
+        "drift",
+        "empty",
+        "happy",
+        "invalid_instrument",
+        "missing_field",
+        "provider_error",
+        "rate_limit"
+      ]
+    }
+  }
+}

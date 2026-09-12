@@ -1,0 +1,20 @@
+{
+  "dataset_id": "bn_ethusdt_spot_5m",
+  "venue": "binance",
+  "market": "ETHUSDT",
+  "source": "binance_local_file",
+  "source_endpoint_or_contract": "local .exec-runtime/quant-lab/data/eth_usdt_1460d.json",
+  "collector_version": "1.2.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": "2022-06-16T21:30:00+00:00",
+  "last_timestamp": "2026-06-15T21:25:00+00:00",
+  "row_count": 420464,
+  "sha256": "ec517e6bb93a34a1fbd1de29a9dedfecdfdada054d35cf7326ebc3c01e6ecb01",
+  "created_at_utc": "2026-08-21T16:27:47.251584+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "Binance REST geo-blocked (HTTP 451); local file provenance verified"
+  ],
+  "status": "VALID"
+}

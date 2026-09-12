@@ -1,0 +1,46 @@
+# Kraken Market Analytics offline fixture inventory (SENSOR-B3-I05)
+#
+# Every fixture is a SYNTHETIC_SCHEMA_FIXTURE: a minimal reconstruction that
+# strictly matches the committed Bloc 2 schema fingerprint for its path
+# (evidence/bloc_02/09_SCHEMA_FINGERPRINTS.jsonl).  Synthetic fixtures are NOT
+# raw observed evidence; they exercise the adapter/parser offline only.  No new
+# network call produced any of these.
+
+fixture_kind: SYNTHETIC_SCHEMA_FIXTURE
+source_authority: evidence/bloc_02/09_SCHEMA_FINGERPRINTS.jsonl
+network_calls_to_produce: 0
+defining_module: tests/crypto_sensor_fabric/providers/kraken/fixtures/analytics.py
+
+scenarios_per_sensor:
+  open_interest:
+    happy: present          # data:list[list[str]]
+    empty_valid: present    # data:[], timestamp:[]  (matches 2022 1h observed)
+    error_symbol: present
+    schema_drift: present
+    continuation: present   # result.more == true
+  funding:
+    happy: present          # data:{rate, relativeRate}
+    empty_valid: present    # data:{rate:[], relativeRate:[]}
+    error_symbol: present
+    schema_drift: present
+  basis:
+    happy: present
+    empty_valid: present    # data:{basis:[]}
+    error_symbol: present
+    schema_drift: present
+  positioning:
+    happy: present          # data:list[str]
+    empty_valid: present
+    error_symbol: present
+    schema_drift: present
+  liquidation:
+    happy: present
+    empty_valid: present
+    error_symbol: present
+    schema_drift: present
+  book_metric:
+    happy: present          # data:{ask:{...}, bid:{...}}
+    empty_valid: present    # empty metric sublists
+    error_symbol: present
+    schema_drift: present
+    continuation: present

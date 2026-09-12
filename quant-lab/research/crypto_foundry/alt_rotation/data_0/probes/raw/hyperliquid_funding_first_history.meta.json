@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_funding_first_history",
+  "method": "GET",
+  "url": "https://api.hyperliquid.xyz/info",
+  "request_params": {
+    "type": "fundingHistory",
+    "startTime": 0
+  },
+  "retrieved_at": "2026-08-24T14:28:15+00:00",
+  "http_status": 200,
+  "ok": true,
+  "row_count": null,
+  "sha256": "952fcbfc20e0f8a72ab341ab237179f65757466e44d0cf3c7684e8b117167d02",
+  "bytes": 104999,
+  "access_class": "PUBLIC",
+  "notes": "composite: first funding timestamp per HL coin (232 coins); per-coin raw bodies in hl_funding/",
+  "known_limitations": "meta sidecar added post-hoc at analysis time"
+}

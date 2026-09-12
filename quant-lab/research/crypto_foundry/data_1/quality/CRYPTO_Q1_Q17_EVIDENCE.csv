@@ -1,0 +1,27 @@
+dataset,gate,status,evidence,affected_rows
+binance_source,Q17,PASS_WITH_DOCUMENTED_SOURCE_OUTAGE,Binance live API returns HTTP 451 from US. Local files verified. 2023-03-24 gap documented.,0
+bn_BTCUSDT,Q1,PASS,0 duplicate records found out of 420464,0
+bn_BTCUSDT,Q2,PASS,0 non-monotonic timestamp transitions,0
+bn_BTCUSDT,Q3,PASS,0 records with invalid/nonpositive price,0
+bn_BTCUSDT,Q4,PASS,0 negative volume records (zero-volume bars classified as VALID_ZERO_ACTIVITY),0
+bn_BTCUSDT,Q5,PASS_WITH_DOCUMENTED_SOURCE_GAP,1 interval gaps detected (expected every 300s) [2023-03-24 ~12:30-14:00 UTC: Binance source outage],1
+bn_BTCUSDT,Q13,PASS,0 records differ between replay batches,0
+bn_BTCUSDT,Q16,PASS,50/50 passed,0
+bn_BTCUSDT_determinism,Q13,PASS,0 records differ between replay batches,0
+bn_BTCUSDT_determinism,Q14,PASS,Normalization produced 1 distinct outputs from 2 runs,0
+bn_BTCUSDT_determinism,Q15,PASS,Prefix normalization matches,0
+bn_ETHUSDT,Q1,PASS,0 duplicate records found out of 420464,0
+bn_ETHUSDT,Q2,PASS,0 non-monotonic timestamp transitions,0
+bn_ETHUSDT,Q3,PASS,0 records with invalid/nonpositive price,0
+bn_ETHUSDT,Q4,PASS,0 negative volume records (zero-volume bars classified as VALID_ZERO_ACTIVITY),0
+bn_ETHUSDT,Q5,PASS_WITH_DOCUMENTED_SOURCE_GAP,1 interval gaps detected (expected every 300s) [2023-03-24 ~12:30-14:00 UTC: Binance source outage],1
+bn_ETHUSDT,Q13,PASS,0 records differ between replay batches,0
+eth_pool_WBTC-USDC-3000,Q10,PASS,Token ordering is valid,0
+eth_pool_WBTC-USDC-3000,Q11,PASS,0 records with wrong pool address,0
+eth_pool_WETH-USDC-500,Q10,PASS,Token ordering is valid,0
+eth_pool_WETH-USDC-500,Q11,PASS,0 records with wrong pool address,0
+hl_api,Q17,PASS,HL API accessible. Funding rate-limited during full pagination (500/page max).,0
+hl_mark_index_BTC,Q7,NOT_APPLICABLE,Only one snapshot available,0
+hl_mark_index_ETH,Q7,NOT_APPLICABLE,Only one snapshot available,0
+hl_oi_BTC,Q9,NOT_APPLICABLE,No OI records,0
+hl_oi_ETH,Q9,NOT_APPLICABLE,No OI records,0

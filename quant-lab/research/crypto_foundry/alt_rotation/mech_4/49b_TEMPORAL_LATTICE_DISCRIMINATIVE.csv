@@ -1,0 +1,17 @@
+target,from_horizon,to_horizon,incremental
+escape,1D,2-3D,0.192
+escape,2-3D,4-7D,0.12
+escape,4-7D,8-14D,0.072
+escape,8-14D,15-30D,0.016
+prop30,1D,2-3D,0.064
+prop30,2-3D,4-7D,0.096
+prop30,4-7D,8-14D,0.104
+prop30,8-14D,15-30D,0.2
+reentry7,1D,2-3D,0.16
+reentry7,2-3D,4-7D,0.112
+reentry7,4-7D,8-14D,0.136
+reentry7,8-14D,15-30D,0.072
+broad7,1D,2-3D,0.024
+broad7,2-3D,4-7D,0.064
+broad7,4-7D,8-14D,0.064
+broad7,8-14D,15-30D,0.168

@@ -1,0 +1,6 @@
+measure,median,mean,value,note,verdict,n,R2_med,R3_med
+R_G1_new_affected,5.0,5.0853,,,,,,
+R_G2_amplification,1.0,1.4856,,,,,,
+R_G3_amplification,1.0,1.1761,,,,,,
+generation_terms,,,"G1<=7d, G2=7d vs 1d, G3=30d vs 7d","descriptive amplification only, daily resolution",,,,
+VERDICT,,,,,SELF_SUSTAINING_LOOKING_SPREAD,1021.0,1.0,1.0

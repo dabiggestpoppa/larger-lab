@@ -1,0 +1,10 @@
+statistic,family,roles,evidence_level,sample_size,conditionality,known_nulls,data_limits,causal_level,potential_redundancies,status
+BREADTH_EXPANDING regime,breadth,TRANSITION_GATE;STRUCTURAL_STATE,L2_CONDITIONAL_LEAD_LAG,715/2196 days,GLOBAL,acceleration adds little beyond level (WS3 Q5),Top-500 universe only,L2,breadth30 level/velocity partially overlap,EARNED
+RANK_RECRUITMENT (deeper bands),rank participation,PROPAGATION_DEPTH;CONFIRMATION,L1_TEMPORAL_ORDERING,MECH-5 WS2 +0.028 AUC,GLOBAL,occurs after breadth gate,Top-500 only,L2,med_ret30_201_500 vs 51_200 correlated,EARNED
+BTC 30D return at release,backdrop,RISK_CONTEXT;REGIME_FILTER,L1_TEMPORAL_ORDERING,MECH-5 r=0.51 +0D,GLOBAL,not a gate alone,none,L1,partly in RISK_ON/OFF,EARNED
+EARLY_SNAPBACK motif,failure,FAILURE_FILTER;TEMPORAL_DELIVERY,L0_DESCRIPTIVE,28 events,"n<50, no promoted subfamily",no stable subfamily,small n,L0,overlaps REENTRY label,LOCAL_NODE
+BREADTH_FADE motif,failure,FAILURE_FILTER;DECAY_TERMINATION,L0_DESCRIPTIVE,23 events,n<50,no stable subfamily,small n,L0,overlaps MIXED label,LOCAL_NODE
+Two-clock: escape fast / propagation slow,temporal,TEMPORAL_DELIVERY;TRANSITION_GATE,L1_TEMPORAL_ORDERING,125 events prospective,GLOBAL,no narrow window substitutes lattice,30D horizon,L1,none,EARNED
+Competing-risk CIF: reentry > propagation early,temporal,FAILURE_FILTER;TEMPORAL_DELIVERY,L1_TEMPORAL_ORDERING,125 events,state-conditioned hazards in 14_STATE_CONDITIONED_HAZARDS,TBD,30D horizon,L1,overlaps escape hazard,EARNED
+Breadth transmission stage order (level -> depth),breadth,PROPAGATION_DEPTH;TRANSITION_GATE,L2_CONDITIONAL_LEAD_LAG,123 primary events,Q3 expansion+rank vs expansion alone,accel not incremental,Top-500,L2,depth_chg vs breadth_vel,EARNED_PARTIAL
+Micro-state sequences (WS2),sequence,LOCAL_CLUSTER;UNKNOWN,L0_DESCRIPTIVE,2 promoted / 125 events,see 16_CONDITIONAL_LOCAL_RULE_AUDIT,most sequences LOW_SAMPLE,event-horizon lattice,L0,persistence trivially re-stated,ATLAS

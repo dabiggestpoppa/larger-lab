@@ -1,0 +1,7 @@
+primitive,n_patches,signs,verdict
+shock_amplitude,3,"[np.float64(0.035), np.float64(0.037), np.float64(0.086)]",GLOBAL_PRIMITIVE
+true_isolation,3,"[np.float64(-0.179), np.float64(-0.074), np.float64(-0.128)]",GLOBAL_PRIMITIVE
+early_1sigma,3,"[np.float64(-0.369), np.float64(-0.392), np.float64(-0.36)]",GLOBAL_PRIMITIVE
+rank_depth,3,"[np.float64(-0.021), np.float64(-0.01), np.float64(0.013)]",LOCAL_NODE
+breadth,3,"[np.float64(-0.009), np.float64(0.019), np.float64(0.125)]",LOCAL_NODE
+dispersion,3,"[np.float64(0.005), np.float64(0.034), np.float64(0.085)]",GLOBAL_PRIMITIVE

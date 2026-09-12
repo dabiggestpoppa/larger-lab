@@ -1,0 +1,108 @@
+{
+  "gates_version": "1.0.0",
+  "registered_at": "2026-08-20",
+  "required_gates": [
+    {
+      "gate_id": "DQ-01",
+      "name": "duplicate_detection",
+      "description": "No duplicate event_time_utc + raw_identifier within same dataset",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-02",
+      "name": "monotonic_timestamps",
+      "description": "Event timestamps must be non-decreasing within each market stream",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-03",
+      "name": "invalid_price_detection",
+      "description": "All prices must be positive. OHLC invariants: high >= max(open,close), low <= min(open,close), high >= low",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-04",
+      "name": "invalid_size_detection",
+      "description": "All sizes/quantities must be non-negative",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-05",
+      "name": "missing_interval_analysis",
+      "description": "For interval data (candles), flag gaps > expected interval * 1.5",
+      "severity": "WARNING"
+    },
+    {
+      "gate_id": "DQ-06",
+      "name": "crossed_book_detection",
+      "description": "L2 book: best_bid must be < best_ask",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-07",
+      "name": "mark_index_sanity",
+      "description": "Mark price within 5% of index price (outliers flagged)",
+      "severity": "WARNING"
+    },
+    {
+      "gate_id": "DQ-08",
+      "name": "funding_timestamp_sanity",
+      "description": "Funding settlements at expected intervals (1h for HL, 8h for Binance)",
+      "severity": "WARNING"
+    },
+    {
+      "gate_id": "DQ-09",
+      "name": "oi_nonnegative",
+      "description": "Open interest must be >= 0",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-10",
+      "name": "amm_token_order_sanity",
+      "description": "Swap events: token0/token1 order must be consistent with pool contract",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-11",
+      "name": "pool_address_identity",
+      "description": "Pool address must match known pool factory + token pair + fee tier",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-12",
+      "name": "block_log_uniqueness",
+      "description": "For on-chain events: block_number + log_index must be unique",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-13",
+      "name": "replay_determinism",
+      "description": "Collecting the same data twice produces identical raw records (deterministic timestamps)",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-14",
+      "name": "normalized_from_raw_determinism",
+      "description": "Normalization of raw data is pure function — same input always produces same output",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-15",
+      "name": "future_independence",
+      "description": "Normalization at time T uses only data available at or before T",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-16",
+      "name": "schema_validation",
+      "description": "Every record validates against its registered schema",
+      "severity": "BLOCK"
+    },
+    {
+      "gate_id": "DQ-17",
+      "name": "source_outage_classification",
+      "description": "Extended gaps (>1h for perps, >1 block for on-chain) classified as SOURCE_OUTAGE not data corruption",
+      "severity": "INFO"
+    }
+  ]
+}

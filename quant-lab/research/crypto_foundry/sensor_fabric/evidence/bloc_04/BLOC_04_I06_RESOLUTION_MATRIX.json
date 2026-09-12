@@ -1,0 +1,87 @@
+{
+  "cases": [
+    {
+      "case": "ALL_complete_sequence_no_dedupe",
+      "expected": [
+        1,
+        2,
+        3
+      ],
+      "selected": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "case": "ERROR_ON_AMBIGUITY_never_picks_latest",
+      "expected": true,
+      "refused": true
+    },
+    {
+      "case": "FIRST_SEEN_explicit_opt_in",
+      "expected": [
+        1
+      ],
+      "selected": [
+        1
+      ]
+    },
+    {
+      "case": "LATEST_SEEN_explicit_opt_in",
+      "expected": [
+        3
+      ],
+      "selected": [
+        3
+      ]
+    },
+    {
+      "case": "EXACT_REVISION_explicit_number",
+      "expected": [
+        2
+      ],
+      "selected": [
+        2
+      ]
+    },
+    {
+      "case": "EXACT_REVISION_unknown_not_found",
+      "expected": true,
+      "typed_not_found": true
+    },
+    {
+      "case": "EXACT_REVISION_requires_number",
+      "expected": true,
+      "typed_config_error": true
+    },
+    {
+      "case": "PROVIDER_DECLARED_CANONICAL_zero_unresolved",
+      "expected": true,
+      "typed_unresolved": true
+    },
+    {
+      "case": "duplicate_same_revision_canonical_resolves",
+      "expected": [
+        2
+      ],
+      "selected": [
+        2
+      ]
+    },
+    {
+      "case": "multiple_distinct_canonicals_ambiguous",
+      "expected": true,
+      "refused": true
+    }
+  ],
+  "matrix": "BLOC_04_I06_RESOLUTION_MATRIX",
+  "policies": [
+    "ERROR_ON_AMBIGUITY",
+    "ALL",
+    "FIRST_SEEN",
+    "LATEST_SEEN",
+    "EXACT_REVISION",
+    "PROVIDER_DECLARED_CANONICAL"
+  ]
+}

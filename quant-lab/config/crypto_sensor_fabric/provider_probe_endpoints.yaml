@@ -1,0 +1,194 @@
+# PROVIDER PROBE ENDPOINT REGISTRY — free, public, unauthenticated surfaces
+# for Bloc 2 capability characterization (bloc_02/02 provider playbooks).
+#
+# These are probe-time endpoint hints, NOT a production adapter contract.
+# Each provider probe module loads this registry and may fall back to its own
+# documented defaults.  Verification of every URL happens during live probes
+# (SENSOR-B2-I13); nothing here is marked verified.
+#
+# Status vocabulary for `access`: UNVERIFIED | FREE_PUBLIC | FREE_API_KEY
+schema_version: "1.0"
+
+providers:
+  KRAKEN_FUTURES:
+    base_url: "https://futures.kraken.com/derivatives/api/v3"
+    analytics_base_url: "https://futures.kraken.com/api/charts/v1/analytics"
+    access: FREE_PUBLIC
+    endpoints:
+      # trade-level execution/liquidation anatomy (raw v3 surface)
+      MECHANICAL_TRADE: "/history"
+      MECHANICAL_LIQUIDATION: "/history"
+      MECHANICAL_BOOK_SNAPSHOT: "/orderbook"
+      # bucketed Market Analytics (historical mechanical source)
+      MECHANICAL_OPEN_INTEREST: "/api/charts/v1/analytics/{symbol}/open-interest"
+      MECHANICAL_FUNDING: "/api/charts/v1/analytics/{symbol}/funding"
+      MECHANICAL_BASIS: "/api/charts/v1/analytics/{symbol}/future-basis"
+      MECHANICAL_POSITIONING: "/api/charts/v1/analytics/{symbol}/long-short-ratio"
+      MECHANICAL_BOOK_METRIC: "/api/charts/v1/analytics/{symbol}/orderbook"
+    notes: >
+      Two surfaces are kept SEPARATE (I12R1).  trade-level: /history rows carry
+      `type` "liquidation" for liquidation anatomy.  bucketed: /api/charts/v1/
+      analytics/{symbol}/{analytics_type} is the selected HISTORICAL source for
+      open-interest / funding / future-basis / long-short-ratio / orderbook
+      (+candidates liquidation-volume, top-traders, long-short-info, spreads,
+      liquidity, slippage, aggressor-differential, cvd).  Query contract: since
+      and to are epoch SECONDS, interval is one supported resolution in seconds
+      (60..604800); envelope {"result":{"timestamp":[],"data":[],"more":bool}}.  Do
+      NOT characterize historical OI via current-only /tickers.  Precomputed
+      analytics are never assumed EXACT_EQUIVALENT to Fabric-derived metrics
+      without later live evidence.
+
+  GATE_FUTURES:
+    base_url: "https://api.gateio.ws/api/v4/futures/usdt"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_LIQUIDATION: "/contract_stats"
+      MECHANICAL_OPEN_INTEREST: "/contract_stats"
+      MECHANICAL_POSITIONING: "/contract_stats"
+      MECHANICAL_FUNDING: "/funding_rate"
+      MECHANICAL_TRADE: "/trades"
+      MECHANICAL_BOOK_SNAPSHOT: "/order_book"
+    notes: >
+      /contract_stats carries interval long/short liquidation sizes AND OI
+      (contracts + USD notional) AND market-wide positioning (lsr_taker,
+      lsr_account, top_lsr_*, top_long/short_size, long/short_users) (I12R1).
+      I13R1: funding uses the SINGLE-contract GET /funding_rate?contract=...
+      (no auth) — NOT the plural batch POST /funding_rates, which is a POST
+      batch endpoint (probing it under GET-style model produced
+      INVALID_CREDENTIALS = REQUEST_CONTRACT_INVALID, never a provider auth
+      failure).  LIVE-OBSERVED (I13R1): /funding_rate from/to are Unix SECONDS
+      (like contract_stats, NOT ms) and rows are {"r": rate, "t": epoch
+      seconds}; retention is bounded by the same rolling 180-day window
+      ("from time exceeds 180-day limit" for older eras).
+      contract_stats contract: `from` is Unix SECONDS (not ms), `interval` is a
+      STRING bucket ("5m"/"1h"/"1d", ...) — NOT seconds (live-observed I13:
+      seconds returns HTTP 400 INVALID_PARAM_VALUE), `limit` caps records, and
+      `to` is NOT invented — historical traversal is characterized via
+      from/interval/limit.  Market positioning
+      MUST use the PUBLIC /contract_stats; user /positions is
+      PRIVATE_ACCOUNT_DATA and OUT_OF_SCOPE for the Sensor Fabric runtime (no
+      exchange credentials required).  /funding_rates and /trades accept
+      from/to (ms) windows; retention caps probed per era.  /trades `taker_side`
+      is the aggressor side directly (order flow is a T2-derived family).  Gate
+      is US-region-restricted; forbidden responses are geo evidence, never
+      bypassed.
+
+  BINANCE_USDM:
+    base_url: "https://fapi.binance.com/fapi/v1"
+    archive_base_url: "https://data.binance.vision/data/futures/um/daily"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_TRADE: "/aggTrades"
+      MECHANICAL_OPEN_INTEREST: "https://fapi.binance.com/futures/data/openInterestHist"
+      MECHANICAL_FUNDING: "/fundingRate"
+      MECHANICAL_BOOK_SNAPSHOT: "/depth"
+    notes: >
+      ROUTE FAMILIES ARE PER-SENSOR (I12R1): aggTrades/fundingRate/depth live
+      under /fapi/v1 on fapi.binance.com, but OI statistics live at the ABSOLUTE
+      https://fapi.binance.com/futures/data/openInterestHist (NOT beneath
+      /fapi/v1).  openInterestHist is bucketed by `period` (5m..1d) and caps at
+      500 records/window.  aggTrades REST is a bounded RECENT window; deep
+      trade/aggTrades/funding/bookDepth/metrics history is archive-only
+      (data.binance.vision deterministic {SYMBOL}-{kind}-{YYYY-MM-DD}.zip +
+      .CHECKSUM).  REST retention limits are recorded SEPARATELY from archive
+      capability — never conflated.  No public historical liquidation endpoint;
+      liquidation starts UNVERIFIED_OR_UNAVAILABLE.  fapi.binance.com is
+      US-geo-restricted (HTTP 451); the vision archive is generally reachable.
+      isBuyerMaker contract: true -> SELL aggressor, false -> BUY (R01
+      PROVISIONAL until fixture verification).
+
+  BYBIT_LINEAR:
+    base_url: "https://api.bybit.com/v5/market"
+    archive_base_url: "https://public.bybit.com/trading"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_OPEN_INTEREST: "/open-interest"
+      MECHANICAL_FUNDING: "/funding/history"
+      MECHANICAL_TRADE: "/recent-trade"
+      MECHANICAL_BOOK_SNAPSHOT: "/orderbook"
+    notes: >
+      OI/funding rows carry numeric strings; OI units are contracts (linear)
+      and must be verified per contract type.  nextPageCursor cursor
+      pagination must be traversed to prove symbol-launch-depth history —
+      documentation claims alone do not establish it.  No public historical
+      liquidation surface; do not infer one from current streams.  Historical
+      trades live in the public.bybit.com daily {SYMBOL}{YYYY-MM-DD}.csv.gz
+      archive (no published checksums).
+
+  OKX_SWAP:
+    base_url: "https://www.okx.com/api/v5/market"
+    archive_base_url: "https://www.okx.com/cdn/okex/traderecords"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_TRADE: "/history-trades"
+      MECHANICAL_FUNDING: "https://www.okx.com/api/v5/public/funding-rate-history"
+      MECHANICAL_BOOK_SNAPSHOT: "/books"
+    notes: >
+      ENDPOINT NAMESPACES ARE SEPARATED (I12R1): trades/books live in
+      /api/v5/market, but funding-rate history is in the /public namespace at
+      https://www.okx.com/api/v5/public/funding-rate-history (NEVER composed
+      as /api/v5/market/funding-rate-history).  Pagination semantics are
+      separated too: trades page via trade-oriented after/before (trade ids),
+      funding pages via after/before keyed around fundingTime timestamps — one
+      shared "trade id" explanation must not cover both.  Preserve funding
+      fields fundingRate / realizedRate / fundingTime / formulaType / method;
+      funding interval is NOT frozen to 8h (may differ by instrument/regime;
+      provider methodology has changed over time).  /books is a CURRENT
+      snapshot — DEEP BOOK HISTORY stays UNVERIFIED.  traderecords daily zip
+      {instId}/{YYYYMMDD}.zip is the public trade-history route; link expiry
+      and async generation probed.  OI: no assumed free historical route.
+
+  DERIBIT:
+    base_url: "https://www.deribit.com/api/v2/public"
+    access: FREE_PUBLIC
+    endpoints:
+      MECHANICAL_TRADE: "/get_last_trades_by_instrument"
+      MECHANICAL_LIQUIDATION: "/get_last_trades_by_instrument"
+      MECHANICAL_FUNDING: "/get_funding_rate_history"
+      MECHANICAL_BOOK_SNAPSHOT: "/get_order_book"
+    notes: >
+      Mechanism microscope (BTC/ETH-heavy).  Liquidations appear as trade
+      rows carrying a liquidation flag; TRADE_LEVEL anatomy — never
+      numerically merged with interval liquidation totals (T2-SEM-06).
+      Historical traversal requires include_old=true with start/end timestamp
+      windows and count<=1000; has_more drives pagination.      Funding history is
+      hourly with 8h/1h series.  Narrower asset universe recorded explicitly:
+      MID_TAIL_CONTROL is NOT mapped.
+
+  COINALYZE:
+    base_url: "https://api.coinalyze.net/v1"
+    access: FREE_API_KEY
+    endpoints:
+      MECHANICAL_OPEN_INTEREST: "/open-interest-history"
+      MECHANICAL_LIQUIDATION: "/liquidations-history"
+      MECHANICAL_FUNDING: "/funding-rate-history"
+      MECHANICAL_POSITIONING: "/long-short-ratio-history"
+    notes: >
+      THIRD_PARTY_AGGREGATOR — never counts as independent venue truth
+      (T2-COV-05).  Free API key required; rate limits and intraday retention
+      must be probed (documented deletion of old intraday data).  Symbols
+      carry venue suffixes (BTCUSDT_PERP.BINANCE) so attribution is preserved
+      at symbol level; aggregated methodology is opaque and per-field
+      equivalence remains corroboration-classified pending live evidence.
+
+  BITFINEX_COMMUNITY_ARCHIVE:
+    repository_url: "https://github.com/tradingstrategy-ai/bitfinex-liquidations"
+    repository_api_url: "https://api.github.com/repos/tradingstrategy-ai/bitfinex-liquidations"
+    dump_path: "bitfinex_liquidations.duckdb"
+    dump_storage: GIT_LFS
+    access: COMMUNITY_ARCHIVE
+    endpoints:
+      MECHANICAL_LIQUIDATION: "Git-LFS DuckDB dump bitfinex_liquidations.duckdb (whole-opaque artifact)"
+    notes: >
+      The real community source is the public GitHub replication repository
+      tradingstrategy-ai/bitfinex-liquidations — a single Git-LFS DuckDB dump,
+      NOT a daily CSV tree and NOT Bitfinex first-party.  COMMUNITY_ARCHIVE
+      evidence class; corroboration / replication role, never EXACT_EQUIVALENT
+      to first-party interval liquidation totals (T2-COV-05 / master §14).
+      License (MIT), README methodology, .gitattributes LFS pointer and
+      upstream commit SHA must be recorded before promotion.  The dump mixes
+      spot/margin AND perpetual market types — never label the whole DB
+      PERPETUAL_LIQUIDATIONS.  No upstream checksums.txt exists; integrity
+      evidence is the Git LFS OID + commit SHA + declared size.  No automatic
+      multi-hundred-MB download during probing; the LFS pointer is the fixture.
+      Live access remains UNVERIFIED until SENSOR-B2-I13 evidence.

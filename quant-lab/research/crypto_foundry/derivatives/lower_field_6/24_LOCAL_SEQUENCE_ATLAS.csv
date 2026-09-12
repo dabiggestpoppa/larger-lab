@@ -1,0 +1,4 @@
+sequence,n_total,n_1s,n_2s,n_rejoin,n_rank_repair,pct_full,n_no_1s,n_new_low,n_contagion
+TRUE_LONER->1SIGMA->2SIGMA->PEER_REJOIN->RANK_REPAIR,1957,390.0,506.0,262.0,1154.0,0.5897,,,
+TRUE_LONER->NO_1SIGMA->NEW_LOW,1957,,,,,0.3786,1571.0,741.0,
+FALSE_LONER->PEER_STRESS->LOCAL_CONTAGION,495,,,,,0.703,,,348.0

@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "result": [
+    {"timestamp": 1655251200000, "index_price": 29508.0, "prev_index_price": 29490.0, "interest_8h": 0.0001, "interest_1h": 0.0000125, "funding_8h": 0.0006, "funding_1h": 0.000075, "funding_rate": 0.000075},
+    {"timestamp": 1655254800000, "index_price": 29512.0, "prev_index_price": 29508.0, "interest_8h": 0.0001, "interest_1h": 0.0000125, "funding_8h": 0.0008, "funding_1h": 0.000101, "funding_rate": 0.000101},
+    {"timestamp": 1655258400000, "index_price": 29506.0, "prev_index_price": 29512.0, "interest_8h": 0.0001, "interest_1h": 0.0000125, "funding_8h": 0.00034, "funding_1h": 0.000043, "funding_rate": 0.000043}
+  ]
+}

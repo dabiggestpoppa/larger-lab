@@ -1,0 +1,57 @@
+{
+  "venue": "hyperliquid",
+  "chain_if_applicable": "Hyperliquid L1",
+  "market_id": "BTC-PERP",
+  "instrument_id": "BTC-PERP",
+  "event_time_utc": "2026-08-21T12:36:43.704498+00:00",
+  "ingest_time_utc": "2026-08-21T12:36:43.704498+00:00",
+  "source": "hyperliquid_rest",
+  "source_version": "1.0.0",
+  "raw_identifier": "hl_l2book_BTC_1787315802341",
+  "schema_version": "1.0.0",
+  "bids": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ]
+  ],
+  "asks": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0
+    ]
+  ],
+  "checksum": null
+}

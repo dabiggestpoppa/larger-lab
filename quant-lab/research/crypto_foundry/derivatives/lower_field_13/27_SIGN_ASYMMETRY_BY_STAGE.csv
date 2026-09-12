@@ -1,0 +1,9 @@
+stage,down_rate,up_rate,gap,label,note
+ABSORPTION,0.0755,0.0869,-0.0114,gap in initial absorption,
+REORGANIZATION,0.3708,0.2245,0.1464,gap in reorganization,
+PROPAGATION,0.3461,0.1426,0.2034,gap in contagion,
+CONTAINMENT,0.2864,0.0827,0.2037,gap in containment,
+REACTIVATION,0.4403,0.654,-0.2137,gap in reactivation,
+DECOUPLING,0.1665,0.5122,-0.3457,gap in decoupling,
+REJOIN,0.1154,0.189,-0.0737,gap in rejoin,
+VERDICT,ASYM_ENTERS_AT_PROPAGATION,,,,"the sign gap is small/negative in absorption but large POSITIVE in propagation/containment (downside spreads more); reactivation/decoupling gaps run OPPOSITE (upside events more likely to relapse/decouple in this partition) — asymmetry enters at the propagation stage, not initial absorption; stage-wise direction matters, so sign asymmetry is not one monolithic object"

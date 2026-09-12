@@ -1,0 +1,20 @@
+{
+  "dataset_id": "eth_wbtc_usdc_swap",
+  "venue": "uniswap_v3",
+  "market": "WBTC-USDC-3000",
+  "source": "ethereum_rpc",
+  "source_endpoint_or_contract": "0x99ac8cA7087fA4A2A1FB6357269965A2014ABc35",
+  "collector_version": "1.3.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": "2026-08-14T17:21:11+00:00",
+  "last_timestamp": "2026-08-18T00:41:47+00:00",
+  "row_count": 205,
+  "sha256": "37c2ee3759160b6d22b8785e945fdd44865c01a3c703d2bade1182ad49dd7743",
+  "created_at_utc": "2026-08-21T16:21:44.838458+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "RPC archive-range limitation on free tier; recent block window only"
+  ],
+  "status": "VALID"
+}

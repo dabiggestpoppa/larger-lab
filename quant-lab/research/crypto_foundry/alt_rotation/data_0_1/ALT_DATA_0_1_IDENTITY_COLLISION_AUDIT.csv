@@ -1,0 +1,957 @@
+internal_asset_id,canonical_symbol,cmc_name,distinct_cmc_ids_for_symbol,coingecko_candidates,coinpaprika_candidates,collision_class,classification_note
+CMC:1,BTC,Bitcoin,1,11,33,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2,LTC,Litecoin,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:52,XRP,XRP,1,5,11,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:74,DOGE,Dogecoin,2,7,33,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:109,DGB,DigiByte,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:131,DASH,Dash,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:328,XMR,Monero,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:512,XLM,Stellar,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:541,SYS,Syscoin,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:693,XVG,Verge,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:825,USDT,Tether USDt,1,48,11,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:873,XEM,NEM,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1027,ETH,Ethereum,1,14,11,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1042,SC,Siacoin,1,3,16,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1168,DCR,Decred,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1214,LSK,Lisk,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1230,STEEM,Steem,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1274,WAVES,Waves,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1320,ARDR,Ardor,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1321,ETC,Ethereum Classic,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1376,NEO,Neo,1,1,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1437,ZEC,Zcash,1,4,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1455,GLM,Golem,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1518,MKR,Maker,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1567,XNO,Nano,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1586,ARK,Ark,1,3,10,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1637,RLC,iExec RLC,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1659,GNO,Gnosis,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1680,ANT,Aragon,1,3,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1684,QTUM,Qtum,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1697,BAT,Basic Attention Token,1,3,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1698,ZEN,Horizen,1,6,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1712,QRL,Quantum Resistant Ledger,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1720,IOTA,IOTA,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1727,BNT,Bancor,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1732,NMR,Numeraire,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1757,FUN,FUNToken,1,6,10,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1759,SNT,Status,1,1,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1762,ERG,Ergo,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1765,EOS,EOS,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1772,STORJ,Storj,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1785,GAS,Gas,1,3,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1788,MTL,Metal DAO,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1808,OMG,OMG Network,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1816,CVC,Civic,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1831,BCH,Bitcoin Cash,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1839,BNB,BNB,1,2,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1886,DENT,Dent,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:1896,ZRX,0x Protocol,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:1934,LRC,Loopring,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1958,TRX,TRON,1,3,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1966,MANA,Decentraland,1,3,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1974,PRO,Propy,1,5,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:1975,LINK,Chainlink,1,3,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2010,ADA,Cardano,1,3,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2011,XTZ,Tezos,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2071,REQ,Request,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2083,BTG,Bitcoin Gold,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2087,KCS,KuCoin Token,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2099,ICX,ICON,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2130,ENJ,Enjin Coin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2132,POWR,Powerledger,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2223,VEE,BLOCKv,1,3,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2280,FIL,Filecoin,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2299,ELF,aelf,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2300,WAXP,WAX,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2303,MED,MediBloc,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2341,SWFTC,SwftCoin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2394,TEL,Telcoin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2396,WETH,WETH,1,63,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2405,IOST,IOST,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2416,THETA,Theta Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2424,AGIX,SingularityNET,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2467,TRAC,OriginTrail,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2469,ZIL,Zilliqa,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2499,BORG,SwissBorg,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2502,HT,Huobi Token,1,1,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:2505,BLZ,Bluzelle,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2545,ABT,Arcblock,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2563,TUSD,TrueUSD,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2566,ONT,Ontology,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2577,RVN,Ravencoin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2586,SNX,Synthetix,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:2588,LOOM,Loom Network,1,3,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2634,XDC,XDC Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2682,HOT,Holo,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2694,NEXO,Nexo,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2765,XYO,XYO,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2777,IOTX,IoTeX,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2868,DAG,Constellation,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2930,IQ,IQ,1,4,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2933,BMX,BitMart Token,1,3,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:2943,RPL,Rocket Pool,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:2982,MVL,MVL,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:2989,EURS,STASIS EURO,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3012,VTHO,VeThor Token,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3029,FLUX,Flux,1,2,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3077,VET,VeChain,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3155,QNT,Quant,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3217,ONG,Ontology Gas,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3306,GUSD,Gemini Dollar,2,3,3,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:3330,USDP,Pax Dollar,1,5,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3408,USDC,USDC,1,60,17,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3513,FTM,Fantom,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3602,BSV,Bitcoin SV,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3626,RBTC,Rootstock Bitcoin,1,1,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3635,CRO,Cronos,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3637,AERGO,Aergo,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3640,LPT,Livepeer,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3661,SHX,Stronghold SHx,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3701,RIF,Rootstock Infrastructure Framework,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3714,LTO,LTO Network,1,0,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:3717,WBTC,Wrapped Bitcoin,1,36,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3773,FET,Fetch.ai,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3783,ANKR,Ankr,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3794,ATOM,Cosmos,1,1,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:3801,BORA,BORA,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3814,CELR,Celer Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3822,TFUEL,Theta Fuel,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3835,ORBS,Orbs,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3871,AB,AB,1,3,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:3890,MATIC,Polygon,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:3893,NOW,ChangeNOW Token,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:3897,OKB,OKB,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3911,OCEAN,Ocean Protocol,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3945,ONE,Harmony,1,6,14,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3951,ARRR,Pirate Chain,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3957,LEO,UNUS SED LEO,1,4,9,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:3964,RSR,Reserve Rights,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:3978,CHR,Chromia,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3987,BDX,Beldex,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:3992,COTI,COTI,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4006,STPT,STP,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:4023,BTCB,Bitcoin BEP2,1,3,6,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:4030,ALGO,Algorand,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4039,ARPA,ARPA,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4041,MX,MX TOKEN,1,1,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:4056,AMPL,Ampleforth,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4066,CHZ,Chiliz,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4092,DUSK,Dusk,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4120,PROM,Prom,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4157,RUNE,THORChain,1,2,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4166,RIO,Realio Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4172,LUNC,Terra Classic,1,3,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4191,NOIA,Synternet,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:4195,FTT,FTX Token,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:4206,WIN,WINkLink,1,4,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4256,KLAY,Klaytn,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4269,GT,GateToken,1,1,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:4279,SXP,Solar,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4512,FNSA,FINSCHIA,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:4558,FLOW,Flow,1,6,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4642,HBAR,Hedera,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4660,TLOS,Telos,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4679,BAND,Band Protocol,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4687,BUSD,BUSD,1,9,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4691,ZANO,Zano,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4705,PAXG,PAX Gold,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4758,DF,dForce,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4807,CTK,Shentu,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4846,KAVA,Kava,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4847,STX,Stacks,1,1,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4943,DAI,Dai,1,28,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:4944,TRB,Tellor,1,1,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:4948,CKB,Nervos Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:4950,LCX,LCX,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5015,HEX,HEX,1,3,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:5026,OXT,Orchid,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5031,MWC,MimbleWimbleCoin,1,1,6,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:5034,KSM,Kusama,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5113,SURE,inSure DeFi,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:5176,XAUT,Tether Gold,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5190,FLEX,FLEX,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5198,CTC,Creditcoin,1,1,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5266,MLK,MiL.k,1,1,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:5268,EWT,Energy Web Token,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5275,PCI,Paycoin,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:5279,SOLO,Sologenic,1,4,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5309,OG,OG Fan Token,1,1,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5350,XPR,XPR Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5370,HIVE,Hive,1,5,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5426,SOL,Solana,2,11,19,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:5444,CTSI,Cartesi,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5446,USDJ,USDJ,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5488,JST,JUST,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5566,KEEP,Keep Network,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5567,CELO,Celo,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5604,SCRT,Secret,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5617,UMA,UMA,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5632,AR,Arweave,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5647,KDA,Kadena,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5665,HNT,Helium,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5690,RNDR,Render,1,0,0,NO_COLLISION,no symbol multiplicity
+CMC:5691,SKL,SKALE,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5692,COMP,Compound,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5728,BAL,Balancer,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5802,XOR,SORA,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5805,AVAX,Avalanche,1,4,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5824,SLP,Smooth Love Potion,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5864,YFI,yearn.finance,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5893,FRONT,Frontier,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5899,CSPR,Casper,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5908,DKA,dKargo,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:5964,TWT,Trust Wallet Token,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:5994,SHIB,Shiba Inu,1,8,25,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6193,CREAM,Cream Finance,1,1,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:6210,SAND,The Sandbox,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6535,NEAR,NEAR Protocol,1,3,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6536,OM,MANTRA,1,0,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:6538,CRV,Curve DAO Token,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6554,GHX,GamerCoin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:6636,DOT,Polkadot,1,5,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6719,GRT,The Graph,1,1,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6748,CFG,Centrifuge,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6756,ACA,Acala Token,1,1,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:6758,SUSHI,SushiSwap,1,1,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:6783,AXS,Axie Infinity,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:6836,GLMR,Moonbeam,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:6841,PHA,Phala Network,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:6843,RAD,Radworks,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6892,EGLD,MultiversX,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:6945,AMP,Amp,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:6952,FRAX,Frax,1,3,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:6953,FXS,Frax Share,1,0,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:6958,ACH,Alchemy Pay,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:7080,GALA,Gala,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7083,UNI,Uniswap,1,5,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7127,VELO,Velo,2,2,3,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:7129,USTC,TerraClassicUSD,1,2,1,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:7184,KOGE,48 Club Token,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:7186,CAKE,PancakeSwap,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7192,WBNB,Wrapped BNB,1,13,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7224,DODO,DODO,1,3,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7226,INJ,Injective,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:7232,ALPHA,Stella,1,7,16,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7278,AAVE,Aave,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7288,XVS,Venus,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:7326,DEXE,DeXe,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:7334,CFX,Conflux,1,3,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:7411,CQT,Covalent,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:7429,LQTY,Liquity,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7431,AKT,Akash Network,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7455,AUDIO,Audius,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7497,POND,Marlin,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7501,WOO,WOO,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7505,EVER,Everscale,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7533,ORAI,Oraichain,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:7548,WEMIX,WEMIX,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:7653,ROSE,Oasis,1,3,6,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:7725,TRU,TrueFi,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7737,API3,API3,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:7859,BADGER,Badger DAO,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:7878,MOB,MobileCoin,1,3,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7950,FLR,Flare,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:7957,VUSDT,Venus USDT,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:7958,VUSDC,Venus USDC,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:7959,VBUSD,Venus BUSD,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:7961,VBNB,Venus BNB,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:7962,VBTC,Venus BTC,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:7963,VETH,Venus ETH,1,4,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:7978,FIDA,Solana Name Service,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8000,LDO,Lido DAO,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:8037,VANRY,Vanar Chain,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:8049,TORN,Tornado Cash,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8083,LON,Tokenlon Network Token,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8085,STETH,Lido Staked ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8100,ANKRETH,Ankr Staked ETH,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:8104,1INCH,1inch Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8119,SFP,SafePal,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:8258,CUDOS,CUDOS,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8290,SUPER,SuperVerse,1,3,11,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:8353,BETH,Beacon ETH,1,2,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:8420,DAO,DAO Maker,1,2,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:8422,PNG,Pangolin,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:8425,JASMY,JasmyCoin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8526,RAY,Raydium,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8534,CHEX,Chintai,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:8536,MASK,Mask Network,1,2,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:8602,AUCTION,Bounce Token,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:8646,MINA,Mina,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:8677,XYM,Symbol,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:8719,ILV,Illuvium,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:8766,ALICE,MyNeighborAlice,1,3,6,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:8916,ICP,Internet Computer,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:8925,WMATIC,Wrapped Matic,1,0,0,NO_COLLISION,no symbol multiplicity
+CMC:8972,SFUND,Seedify.fund,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:9025,TRIBE,Tribe,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9040,PUNDIX,Pundi X (New),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:9067,OHM,Olympus v2,1,2,1,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:9104,AIOZ,AIOZ Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:9175,MBOX,MOBOX,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9258,XCH,Chia,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9260,ZIG,Zignaly,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:9263,ZCX,Unizen,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:9285,MOVR,Moonriver,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9288,QI,BENQI,1,4,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9308,PYR,Vulcan Forged (PYR),1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9436,ELON,Dogelon Mars,1,4,16,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9444,KNC,Kyber Network Crystal v2,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9462,WAVAX,Wrapped AVAX,1,5,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9481,PENDLE,Pendle,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:9486,BTCT,Bitcoin TRC20,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9543,BICO,Biconomy,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:9566,LUSD,Liquity USD,1,3,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9637,ALU,Altura,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9640,METIS,Metis,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9674,WILD,Wilder World,1,1,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:9816,NFT,APENFT,1,2,11,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:9903,CVX,Convex Finance,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:10052,GTC,Gitcoin,1,3,10,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:10180,GOMINING,Gomining,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:10188,ATA,Automata Network,1,2,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:10240,WFTM,Wrapped Fantom,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:10312,ELG,EscoinToken,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:10407,BABYDOGE,Baby Doge Coin,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:10442,DESO,Decentralized Social,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:10508,FLUID,Fluid,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:10529,SUN,Sun (New),1,1,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:10603,IMX,Immutable,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:10630,GOG,Guild of Guardians,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:10688,YGG,Yield Guild Games,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:10791,XEC,eCash,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:10804,FLOKI,FLOKI,1,1,18,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:10894,SRX,StorX Network,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:10898,WCFG,Wrapped Centrifuge,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:10903,C98,Coin98,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:11078,IAG,IAGON,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:11092,BGB,Bitget Token,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:11156,ETHDYDX,dYdX (ethDYDX),1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:11165,ORCA,Orca,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11232,HIGH,Highstreet,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:11289,SPELL,Spell Token,1,2,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:11294,RARE,SuperRare,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11374,DAR,Mines of Dalarnia,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11396,JOE,JOE,1,4,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11419,TON,Toncoin,1,4,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:11461,MSOL,Marinade Staked SOL,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11568,AGLD,Adventure Gold,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11584,BTRST,Braintrust,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:11706,ACT,Acet,2,3,8,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:11823,POKT,Pocket Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:11840,OP,Optimism,1,2,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11841,ARB,Arbitrum,1,2,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11857,GMX,GMX,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11865,BONE,Bone ShibaSwap,1,4,10,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11877,GAL,Galxe,1,3,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:11948,XRD,Radix,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:11976,AZERO,Aleph Zero,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:12147,SYN,Synapse,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:12165,SOLV,Solv Protocol,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:12220,OSMO,Osmosis,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:12387,RBN,Ribbon Finance,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:12400,DEL,Decimal,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:12409,WSTETH,Lido wstETH,1,15,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:12573,CPOOL,Clearpool,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:12749,NAKA,Nakamoto Games,1,3,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:12760,INF,Sanctum Infinity,1,2,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:12885,ASTR,Astar,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:12894,SQD,Subsquid,1,1,6,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:12999,SSV,ssv.network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:13502,WLD,Worldcoin,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:13631,MANTA,Manta Network,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:13663,GNS,Gains Network,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:13769,WMTX,World Mobile Token,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:13855,ENS,Ethereum Name Service,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:13967,GFI,Goldfinch,1,2,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:13969,PHB,Phoenix,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:14101,RON,Ronin,1,1,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:14280,EUL,Euler,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:14519,VVS,VVS Finance,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:14532,WCRO,Wrapped CRO,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:14588,PEAQ,peaq,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:14721,REAL,RealLink,1,8,13,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:14783,MAGIC,Treasure,1,3,14,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:14803,AURORA,Aurora,1,3,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:14806,PEOPLE,ConstitutionDAO,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:14822,VR,Victoria VR,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:14878,ALPH,Alephium,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:14926,JSOL,JPool Staked SOL (JSOL),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:15060,RETH,Rocket Pool ETH,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:15185,KUJI,Kujira,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:15271,RLB,Rollbit Coin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:15584,HEART,Humans.ai,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:15585,GF,GuildFi,1,0,6,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:16086,BTT,BitTorrent [New],1,1,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:16093,KUB,Bitkub Coin,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:16116,SOL,Wrapped Solana,2,11,19,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:16360,GEAR,Gearbox Protocol,1,2,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:16612,NOS,Nosana,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:16868,SHDW,Shadow Token,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:16876,ALI,Artificial Liquid Intelligence,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:17081,LOOKS,LooksRare,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:17520,ORBR,Orbler,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:17591,NYM,NYM,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:17751,T,Threshold,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:17799,AXL,Axelar,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:17917,RSS3,RSS3,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:18031,CCD,Concordium,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:18037,MAV,Maverick Protocol,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:18069,GMT,GMT,1,1,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:18523,SAVAX,BENQI Liquid Staked AVAX,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:18579,WTRX,Wrapped TRON,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:18679,XCN,Onyxcoin,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:18688,STMATIC,Lido Staked Matic,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:18852,USDC.E,USD Coin Bridged,1,21,1,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:18876,APE,ApeCoin,1,4,16,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:18895,MBX,MARBLEX,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:18934,STG,Stargate Finance,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:19055,AITECH,Solidus Ai Tech,1,0,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:19075,OMI,ECOMI,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:19091,H2O,H2O DAO,1,2,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:19269,COW,CoW Protocol,1,4,10,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:19843,APEX,ApeX Protocol,1,2,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:19891,USDD,USDD,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:20279,DHN,Dohrnii,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:20314,LUNA,Terra,2,2,10,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:20362,POLYX,Polymesh,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:20396,KAS,Kaspa,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:20435,VELO,Velodrome Finance,2,2,3,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:20605,TAI,TARS AI,1,1,16,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:20622,FORT,Forta,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:20641,EURC,EURC,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:20700,WKC,Wiki Cat,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:20721,BTC.B,Bitcoin Avalanche Bridged,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:20787,FLZ,Fellaz,1,0,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:20873,LEVER,LeverFi,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:20947,SUI,Sui,1,1,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:20964,LBT,Law Blocks (AI),1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:20969,GEOD,GEODNET,1,2,1,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:21106,RDNT,Radiant Capital,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:21159,ONDO,Ondo,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:21178,MRS,Metars Genesis,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:21259,ZETA,ZetaChain,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:21296,ETHW,EthereumPoW,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:21330,LISUSD,lisUSD,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:21473,DIONE,Dione Protocol,1,2,1,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:21535,CBETH,Coinbase Wrapped Staked ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:21585,SAFE,Safe,1,5,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:21707,RED,RedStone,1,2,10,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:21781,STRD,Stride,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:21794,APT,Aptos,1,1,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:21846,ID,SPACE ID,1,3,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:21849,DLC,Diverge Loop,1,1,8,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:21870,MPLX,Metaplex,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:22059,VENOM,Venom,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22125,MYTH,Mythos,1,2,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22265,OAS,Oasys,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22289,MYRIA,Myria,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22359,XPLA,XPLA,1,0,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:22461,HFT,Hashflow,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22533,JITOSOL,Jito Staked SOL,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:22615,FTN,Fasttoken,1,0,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:22620,ACX,Across Protocol,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22691,STRK,Starknet,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22764,HOOK,Hooked Protocol,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22765,AL,ArchLoot,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22850,HONEY,Hivemapper,1,1,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22861,TIA,Celestia,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:22974,TAO,Bittensor,1,3,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23037,HIFI,Hifi Finance,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23054,CHEEL,Cheelee,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:23095,BONK,Bonk,1,4,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23121,BLUR,Blur,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23149,SEI,Sei,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23177,SFRXETH,Frax Staked Ether,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:23254,CORE,Core,1,4,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23335,THE,THENA,1,3,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23355,0X0,0x0.ai,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:23508,GHO,GHO,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23635,FORM,BinaryX,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:23711,PRIME,Echelon Prime,1,3,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23756,CGPT,ChainGPT,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:23757,ATOR,ATOR Protocol,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:23782,LSETH,Liquid Staked ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:23951,STIK,Staika,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24007,AGI,Delysium,1,6,15,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24087,FUEL,Fuel Network,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24091,ZK,ZKsync,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24203,SDEX,SmarDex,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:24225,METFI,MetFi,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:24257,LGCT,Legacy Token,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:24399,WHBAR,Wrapped HBAR,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:24476,LMWR,LimeWire,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:24478,PEPE,Pepe,1,21,71,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24554,BZR,Bazaars,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24600,MOBILE,Helium Mobile,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:24613,EDU,Open Campus,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24647,BERA,Berachain,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24735,WPLS,Wrapped Pulse,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24760,WBETH,Wrapped Beacon ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:24781,CYBER,Cyber,1,2,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24835,PEPECOIN,PepeCoin,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24875,STRX,Staked TRX,1,3,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24877,BIM,BIM,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24911,TURBO,Turbo,1,6,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:24927,CRVUSD,crvUSD,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:25023,LADYS,Milady Meme Coin,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:25028,ORDI,ORDI,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:25114,CETUS,Cetus Protocol,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:25147,SWETH,swETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:25194,JSM,Joseon Mun,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:25220,BITCOIN,HarryPotterObamaSonic10Inu (ERC-20),1,2,9,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:25264,SNEK,Snek,1,2,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:25715,MNTC,Minati Coin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:26081,FDUSD,First Digital USD,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:26133,TBTC,tBTC,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:26680,NTRN,Neutron,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:26997,ZRO,LayerZero,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:26998,SCR,Scroll,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:27048,APEPE,Ape and Pepe,1,1,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:27054,RSC,ResearchCoin,1,1,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:27075,MNT,Mantle,2,2,9,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:27178,PAAL,PAAL AI,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:27533,OSAK,Osaka Protocol,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:27565,ARKM,Arkham,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:27566,ETHX,Stader ETHx,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:27568,SLISBNB,Lista Staked BNB,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:27657,LINEA,Linea,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:27659,MOG,Mog Coin,1,4,10,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:27750,TOSHI,Toshi,1,3,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:27765,ZBU,Zeebu,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:27772,PYUSD,PayPal USD,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:27793,STUSDT,Staked USDT,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:27872,TRUMP,MAGA,2,4,62,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:27960,NPC,Non-Playable Coin,1,4,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28066,BANANA,Banana Gun,1,5,13,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28076,OZO,Ozone Chain,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28081,SPX,SPX6900,1,1,11,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28177,PYTH,Pyth Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28183,WFLR,Wrapped Flare,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:28194,SATS,SATS (Ordinals),1,3,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28230,BIGTIME,Big Time,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28293,ULTIMA,Ultima,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28298,BEAM,Beam,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28299,TOKEN,TokenFi,1,3,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28301,MEME,Memecoin,1,5,27,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28321,POL,Polygon Ecosystem Token,1,4,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:28324,DYDX,dYdX (Native),1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:28367,IPV,IPVERSE,1,0,0,NO_COLLISION,no symbol multiplicity
+CMC:28382,MYRO,Myro,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28394,GROK,Grok,1,5,21,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28458,OLAS,Autonolas,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28476,OSETH,StakeWise Staked ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28480,BLAST,Blast,1,4,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28541,JTO,Jito,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28568,EETH,ether.fi Staked ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28596,AEUR,Anchored Coins AEUR,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28654,UPC,UPCX,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28656,VCNT,ViciCoin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28674,ACE,Fusionist,1,2,13,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28675,COQ,Coq Inu,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28683,1000SATS,SATS,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28688,AIAT,AI Analysis Token,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28695,WEETH,Wrapped eETH,1,3,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28752,WIF,dogwifhat,1,7,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28778,NFP,NFPrompt,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28782,POPCAT,Popcat (SOL),1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:28829,MAVIA,Heroes of Mavia,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:28846,AI,Sleepless AI,1,12,33,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28850,NOT,Notcoin,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28853,JLP,Jupiter Perps LP,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:28862,BSOL,BlazeStake Staked SOL,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28932,DYM,Dymension,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:28933,XAI,Xai,1,4,11,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29035,METH,Mantle Staked Ether,1,2,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:29073,ALT,Altlayer,1,5,13,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29082,SAROS,Saros,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29150,PONKE,Ponke,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29160,HTX,HTX,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:29169,QUBIC,Qubic,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29175,WEN,Wen,1,4,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29210,JUP,Jupiter,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29242,RSETH,Kelp DAO Restaked ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29256,USDY,Ondo US Dollar Yield,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29270,AERO,Aerodrome Finance,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29325,PUFETH,pufETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29335,PIXEL,Pixels,1,3,11,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29402,HASUI,Haedal Staked SUI,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:29420,VIRTUAL,Virtuals Protocol,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29447,NMT,NetMind Token,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29470,USDE,Ethena USDe,1,5,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29471,SUSDE,Ethena Staked USDe,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29513,GPU,Node AI,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:29520,EZETH,Renzo Restaked ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29530,OX,OX Coin,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:29555,PORTAL,Portal,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29585,NMD,Nexusmind,1,0,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:29587,W,Wormhole,1,5,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29599,USDB,USDB,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29676,AEVO,Aevo,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29711,ZRC,Zircuit,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29743,BRETT,Brett,1,5,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29779,ZKJ,Polyhedra Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29814,ETHFI,ether.fi,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29835,IO,io.net,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29839,MGC,Meta Games Coin,1,1,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:29870,BOME,BOOK OF MEME,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29879,ANDY,ANDY,1,9,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29884,DSYNC,Destra Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29920,SLERF,SLERF,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:29933,UDS,Undeads Games,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29960,SHFL,Shuffle,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:29974,RSWETH,Restaked Swell Ethereum,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30008,APU,Apu Apustaja,1,5,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30030,EDGESOL,Edgevana Staked SOL,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:30063,GIGA,Gigachad (gigachadsolana.com),1,2,8,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:30083,ATH,Aethir,1,4,14,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30096,DEGEN,Degen,1,7,19,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30126,MEW,cat in a dogs world,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30168,STRAX,Stratis [New],1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30171,ENA,Ethena,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30315,OMNI,Omni Network,1,6,11,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30369,HASHAI,HashAI,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30372,SAGA,Saga,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30449,TNSR,Tensor,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30460,BURN,Burnedfi,1,8,20,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30484,PUPS,PUPS (Ordinals),2,1,3,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:30491,WZRD,Bitcoin Wizards,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:30494,EIGEN,EigenLayer,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:30495,MON,Monad,1,3,11,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30506,WZEDX,Wrapped Zedxion,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:30528,NEURAL,NeuralAI,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30584,BASEDAI,BasedAI,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30605,ALE,Ailey,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30636,ZBCN,Zebec Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30651,QFI,QuantixAI,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:30712,MERL,Merlin Chain,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30746,BB,BounceBit,1,5,15,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30843,REZ,Renzo,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30902,WOLF,Landwolf 0x67,1,11,24,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:30912,MANEKI,MANEKI,1,3,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30915,VERUM,Verum Coin,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:30923,CDCETH,Crypto.com Staked ETH,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30933,DOG,DOG•GO•TO•THE•MOON,1,11,19,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:30943,$MICHI,michi,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:30953,SHIBTC,ShibaBitcoin,1,0,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:30963,ZENT,Zentry,1,3,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:30986,KMNO,Kamino Finance,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:31016,MODE,Mode,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:31024,DEUSD,Elixir deUSD,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:31173,SKI,Ski Mask Dog,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:31246,GAME,GameBuild,1,5,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:31278,DRIFT,Drift,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:31305,MAGA,MAGA,1,4,21,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:31369,BBTC,BounceBit BTC,1,2,8,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:31379,ZCHF,Frankencoin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:31525,TAIKO,Taiko,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:31526,MOCA,Moca Network,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:31838,COOKIE,Cookie DAO,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:32037,ANYONE,ANyONe Protocol,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:32068,GCB,Global Commercial Business,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32087,SOPH,Sophon,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32089,XION,XION,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:32120,G,Gravity,1,2,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:32193,ALEO,Aleo,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32195,HMSTR,Hamster Kombat,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32196,HYPE,Hyperliquid,1,5,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32197,ME,Magic Eden,1,2,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32198,BABY,Babylon,1,9,17,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32257,UXLINK,UXLINK,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:32306,FBTC,Function,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:32307,USD0,Usual USD,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:32372,XUSD,StraitsX USD,1,4,11,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:32376,AVAIL,Avail,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32452,MOVE,Movement,1,2,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32454,USDL,Lift Dollar,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:32461,NEIRO,Neiro Ethereum,2,5,11,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:32521,NEIRO,Neiro (First Neiro On Ethereum),2,5,11,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:32526,CXT,Covalent X Token,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32684,S,Sonic,1,2,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32698,DOGS,DOGS,1,4,10,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32717,SUNDOG,SUNDOG,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:32724,CAT,Simon's Cat,1,15,35,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32778,DOGE,Department Of Government Efficiency (dogegov.com),2,7,33,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:32796,EURCV,EUR CoinVertible,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:32826,JET,Satoshi Airline,1,1,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:32856,MNT,Mr Mint,2,2,9,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:32864,AUSD,AUSD,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32878,MNEE,MNEE,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:32880,KAIA,Kaia,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32882,BNSOL,Binance Staked SOL,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:32925,SPEC,Spectral,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32956,GRASS,Grass,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32966,CATI,Catizen,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32968,AIC,AI Companions,1,3,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:32994,CBBTC,Coinbase Wrapped BTC,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33038,SKY,Sky,1,6,15,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33039,USDS,USDS,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33055,SLISBNBX,slisBNBx,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:33093,MOODENG,Moo Deng (moodengsol.com),1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33108,X,X Empire,1,10,29,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33110,SOS,Solana Swap,1,6,14,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33120,INIT,Initia,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33152,WCT,WalletConnect Token,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33223,LAB,LAB,1,3,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33251,WLFI,World Liberty Financial,1,3,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33258,HIPPO,sudeng,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33280,CHEEMS,Cheems (cheems.pet),1,4,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:33291,FWOG,Fwog (SOL),1,2,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:33310,XSOLVBTC,xSolvBTC,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:33312,SOLVBTC,SolvBTC,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:33320,PUPS,Pups (Bitcoin),2,1,3,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:33372,CARV,CARV,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:33391,DEEP,DeepBook Protocol,1,3,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:33405,KOMA,Koma Inu,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33439,LUMIA,Lumia,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:33440,GOAT,Goatseus Maximus,1,8,21,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33469,WCHZ,Wrapped Chiliz,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:33543,LUNA,Luna by Virtuals,2,2,10,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:33553,INSURANCE,insurance,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:33566,ACT,Act I : The AI Prophecy,2,3,8,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:33597,FARTCOIN,Fartcoin,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33652,LBTC,Lombard Staked BTC,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33696,EBTC,ether.fi Staked BTC,1,3,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33788,PNUT,Peanut the Squirrel,1,4,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33793,USDG,Global Dollar,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33824,SYRUP,Maple Finance,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:33834,BBSOL,Bybit Staked SOL,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33849,HSK,HashKey Platform Token,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33871,WONUS,Wrapped ONUS,1,0,0,NO_COLLISION,no symbol multiplicity
+CMC:33881,BAN,Comedian,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:33978,CMETH,Mantle Restaked Ether,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:33979,USUAL,Usual,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:33981,BUSD0,Bond USD0,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:33983,SUT,SuperTrust,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:34017,PIN,PinLink,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34025,VVAIFU,Dasha,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:34026,AI16Z,ai16z,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:34083,ZEREBRO,Zerebro,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:34103,AIXBT,aixbt by Virtuals,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:34104,MORPHO,Morpho,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34118,BANANAS31,Banana For Scale,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:34125,CHILLGUY,Just a chill guy,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34143,WHITE,WhiteRock,1,3,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34187,LOFI,LOFI,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34212,XAUM,Matrixdock Gold,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:34261,WFI,WeFi,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:34330,FAI,Freysa,1,1,11,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:34332,PURR,Purr,1,4,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34378,SHIRO,Shiro Neko,1,4,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34387,RLUSD,Ripple USD,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:34434,REKT,Rekt (rektcoin.com),1,4,6,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:34466,PENGU,Pudgy Penguins,1,1,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34600,REX,REVOX,1,5,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34610,MONKY,Wise Monkey,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34611,SEND,Suilend,1,3,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34619,VANA,Vana,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34691,USDTB,Ethena Labs (USDTb),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:34792,GRIFFAIN,GRIFFAIN,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:34812,BIO,Bio Protocol,1,2,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34880,ALCH,Alchemist AI,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34926,ARC,AI Rig Complex,1,6,20,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:34958,TAG,Tagger,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35014,DRV,Derive,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35053,PIPPIN,pippin,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35092,ANON,Hey Anon,1,6,16,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:35268,GPS,GoPlus Security,1,1,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:35293,ASBNB,Aster asBNB,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35319,ANIME,Animecoin,1,4,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35336,TRUMP,OFFICIAL TRUMP,2,4,62,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:35347,MELANIA,Official Melania Meme,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35364,PLUME,Plume,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35429,LAYER,Solayer,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35437,USDF,Aster USDF,2,5,3,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:35487,LAUNCHCOIN,Launch Coin on Believe,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:35491,M,MemeCore,1,2,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35509,VVV,Venice Token,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35537,JELLYJELLY,Jelly-My-Jelly,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35600,SIGN,Sign,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35626,IP,Story,1,0,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:35637,BDCA,BitDCA,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35669,CAR,Central African Republic Meme,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35690,B3,B3 (Base),1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:35697,PI,Pi,1,3,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:35701,GOHOME,GOHOME,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35702,NIL,Nillion,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35721,USDF,Falcon USD,2,5,3,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:35763,KAITO,KAITO,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35766,SIREN,siren,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35818,SOSO,SoSoValue,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35837,WOULD,would,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35881,WHYPE,Wrapped HYPE,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35930,WXTZ,Wrapped XTZ,1,1,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:35931,ZORA,ZORA,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35943,PUNDIAI,Pundi AI,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:35954,LION,Loaded Lions,1,5,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:35976,YUSD,Aegis YUSD,1,4,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36039,FRXUSD,Frax USD,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36044,NXPC,NEXPACE,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36056,XP,Xphere,1,3,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36063,BR,Bedrock,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:36066,KTA,Keeta,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36067,USDO,OpenEden OpenDollar,1,1,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:36068,CUSDO,OpenEden Compounding OpenDollar,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36080,MBG,MultiBank Group,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:36102,PARTI,Particle Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36119,WAL,Walrus,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36133,HOME,Defi App,1,2,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:36148,USD1,World Liberty Financial USD,1,1,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:36175,UNIBTC,Universal BTC,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36195,AGT,Alaya Governance Token,1,2,12,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:36215,APTM,Apertum,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36238,XPIN,XPIN Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36246,STKAAVE,Staked Aave,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36300,SKYAI,SKYAI,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36302,NILA,MindWaveDAO,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36313,TROLL,TROLL (SOL),1,6,11,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:36341,ASTER,Aster,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36352,B2,BSquared Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36405,SXT,Space and Time,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36410,MYX,MYX Finance,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36457,AETHUSDT,Aave Ethereum USDT,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:36458,AETHWETH,Aave Ethereum WETH,1,0,0,NO_COLLISION,no symbol multiplicity
+CMC:36462,A,Vaulta,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36507,PUMP,Pump.fun,1,4,21,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36510,LA,Lagrange,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36511,SLT,SLT,1,2,15,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:36532,B,BUILDon,1,4,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36542,SOON,SOON,1,2,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36569,SPK,Spark,1,1,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36576,HUMA,Huma Finance,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36645,XPL,Plasma,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36671,SAHARA,Sahara AI,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36707,CBXRP,Coinbase Wrapped XRP,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36743,TIBBIR,Ribbita by Virtuals,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:36762,DUSD,StandX DUSD,1,6,13,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36828,USELESS,Useless Coin,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:36838,WAPTM,Wrapped Apertum,1,0,0,NO_COLLISION,no symbol multiplicity
+CMC:36902,SN51,lium,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:36912,SN4,Targon,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:36922,H,Humanity Protocol,1,3,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:37003,MSTRX,MicroStrategy tokenized stock (xStock),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37004,TSLAX,Tesla tokenized stock (xStock),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37005,CRCLX,Circle tokenized stock (xStock),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37006,SPYX,SP500 tokenized ETF (xStock),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37070,ICNT,Impossible Cloud Network,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37166,CROSS,CROSS,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:37263,CC,Canton,1,6,26,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:37277,INI,InitVerse,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37298,VELVET,Velvet,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37322,VSN,Vision,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37387,BAS,BNB Attestation Service,1,1,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:37414,ESPORTS,Yooldo,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37456,OPEN,OpenLedger,1,5,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:37574,TETH,Treehouse ETH,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:37593,PROVE,Succinct,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37654,SUSD1+,Lorenzo staked USD1+,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37745,CTM,c8ntinuum,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:37760,BFUSD,BFUSD,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:37986,LIGHT,Light,1,5,7,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:38014,MUON,Micron Technology Tokenized Stock (Ondo),1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38051,IVVON,iShares Core S&P 500 Tokenized ETF (Ondo),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38056,CRCLON,Circle Internet Group Tokenized Stock (Ondo),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38067,SPYON,SPDR S&P 500 Tokenized ETF (Ondo),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38093,NVDAON,NVIDIA Tokenized Stock (Ondo),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38127,AKE,AKEDO,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38151,YZY,YZY MONEY,1,2,3,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:38185,ADI,ADI,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38186,DIEM,Diem,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38187,UCN,Uchain,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38192,JUPSOL,Jupiter Staked SOL,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38236,Q,Quack AI,1,3,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38273,USDON,U.S. Dollar Tokenized Currency (Ondo),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38283,CARDS,Collector Crypt,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38299,AVNT,Avantis,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38309,HOLO,Holoworld AI,1,4,5,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:38330,GUSD,GUSD,2,3,3,TRUE_TICKER_REUSE,same symbol maps to >1 distinct CMC asset
+CMC:38337,0G,0G,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38339,UB,Unibase,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38341,RAIN,Rain,1,7,8,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:38353,MET,Meteora,1,3,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38386,USAT,USAT,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38408,BARD,Lombard,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38417,RIVER,River,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38470,GIGGLE,Giggle Fund,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38482,FF,Falcon Finance,1,2,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38489,COAI,ChainOpera AI,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38515,2Z,DoubleZero,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38517,USDT0,USDT0,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38554,KGEN,KGeN,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38562,USDAI,USDai,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38569,APR,Capricorn,1,1,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38590,币安人生,币安人生,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38634,CLO,Yei Finance,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38750,ON,Orochi Network,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38767,NOCK,Nockchain,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38770,MEGA,MegaETH,1,3,17,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38779,SYRUPUSDC,syrupUSDC,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38786,SYRUPUSDT,syrupUSDT,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38828,KITE,Kite,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38837,BEAT,Audiera,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:38838,SENTIS,SentismAI,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38841,UAI,UnifAI Network,1,2,1,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38849,PIEVERSE,Pieverse,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38868,SENT,Sentient,1,2,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38869,US,Talus,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38892,STABLE,Stable,1,5,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:38908,ALLO,Allora,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38942,USDSUI,USDsui,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38947,EUSX,Solstice eUSX,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:38948,USX,Solstice USX,1,2,4,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:38967,RAVE,RaveDAO,1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39042,POWER,Power Protocol,1,3,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39064,NIGHT,Midnight,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39070,KNTQ,Kinetiq,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39071,CYS,Cysic,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39072,KHYPE,Kinetiq Staked HYPE,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39090,GTBTC,GTBTC,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39094,ANTFUN,AntFun,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39120,U,United Stables,1,4,9,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39121,MAGMA,Magma Finance,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39125,LIT,Lighter,1,4,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39143,WHITEWHALE,The White Whale,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39158,BTW,Bitway,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39159,BREV,Brevis,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39172,VAM,Vitalum,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39177,TBK,TronBank,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39332,ZAMA,Zama,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39369,WPEAQ,Wrapped peaq,1,1,0,NO_COLLISION,no symbol multiplicity
+CMC:39545,BILL,Billions Network,1,2,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39548,ESP,Espresso,1,2,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39549,FIDD,Fidelity Digital Dollar,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39614,VBWBTC,VaultBridge Bridged WBTC (Katana),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39665,UP,Unitas,1,8,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39682,PROS,Pharos,1,5,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39683,USDGO,USDGO,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39686,BP,Backpack,1,4,7,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39689,GCOIN,Playnance,1,2,1,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:39711,STRCX,Strategy PP Variable tokenized stock (xStock),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39720,EDGE,edgeX,1,4,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39769,IBITON,iShares Bitcoin Trust Tokenized Stock (Ondo),1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:39797,PRL,Perle,1,3,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39841,GENIUS,Genius Terminal,1,2,2,UNKNOWN_COLLISION,multiple provider candidates without a HIGH name match — must be manually resolved
+CMC:39870,CHIP,USD.AI,1,3,8,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39922,ASSET,REAL,1,2,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39925,PUSD,Polymarket USD,1,4,5,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:39965,NEX,Nexus,1,6,6,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:40092,O,o1.exchange,1,3,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:40212,MUB,Micron Technology Tokenized bStocks,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:40213,CRCLB,Circle Internet Group Tokenized bStocks,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:40217,SPCXB,SpaceX Tokenized bStocks,1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:40224,RE,Re,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:40531,CAP,Cap,1,7,12,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:40558,AVV,AIVIVE,1,0,1,NO_COLLISION,no symbol multiplicity
+CMC:40588,ANSEM,The Black Bull,1,3,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:40643,PRESPCX,"SpaceX 
+Pre-IPO stock (Republic)",1,1,1,NO_COLLISION,no symbol multiplicity
+CMC:40809,CASHCAT,Cash Cat,1,1,2,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:40980,DOS,DAPPOS,1,2,4,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+CMC:41861,牛来,牛来 (Niu Lai),1,1,3,PROVIDER_SYMBOL_COLLISION,"symbol matches multiple provider candidates but best name-join resolves the asset (needs disambiguation, not a different asset)"
+VENUE_ALIAS,PEPE,venue-side,1,0,0,MULTIPLIER_ALIAS,Binance/Bybit USD-M venue symbol is 1000PEPE (archive verified); canonical asset is PEPE
+VENUE_ALIAS,SHIB,venue-side,1,0,0,MULTIPLIER_ALIAS,Binance/Bybit USD-M venue symbol is 1000SHIB (archive verified); canonical asset is SHIB
+VENUE_ALIAS,BONK,venue-side,1,0,0,MULTIPLIER_ALIAS,Binance/Bybit USD-M venue symbol is 1000BONK (archive verified); canonical asset is BONK
+VENUE_ALIAS,MATIC,venue-side,1,0,0,VENUE_ALIAS,"HL legacy coin MATIC (isDelisted) == POL (current); rename alias, not a different asset"
+VENUE_ALIAS,RNDR,venue-side,1,0,0,VENUE_ALIAS,"HL legacy coin RNDR (isDelisted) == RENDER (current); rename alias, not a different asset"
+VENUE_ALIAS,MKR,venue-side,1,0,0,VENUE_ALIAS,"HL legacy coin MKR (isDelisted) == SKY (rebrand); rename alias, not a different asset"

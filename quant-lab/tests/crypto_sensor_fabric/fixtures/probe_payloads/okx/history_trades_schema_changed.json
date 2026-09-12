@@ -1,0 +1,8 @@
+{
+  "code": "0",
+  "msg": "",
+  "data": [
+    {"instId": "BTC-USDT-SWAP", "tradeId": "400001", "px": "29510.5", "sz": "0.0089", "Side": "sell", "ts": "2022-06-15T00:00:00.000Z"},
+    {"instId": "BTC-USDT-SWAP", "tradeId": "400000", "px": "29512.0", "sz": "0.0021", "Side": "buy", "ts": "2022-06-15T00:01:05.000Z"}
+  ]
+}

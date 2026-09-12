@@ -1,0 +1,9 @@
+sensor_family,verified_provider_count,verified_venues,redundancy_class,first_party_count,aggregator_count,community_count,PIT_ready_provider_count,gap_status,notes
+MECHANICAL_BASIS,1,KRAKEN_FUTURES,R1_SINGLE_INDEPENDENT,1,0,0,1,SINGLE_SOURCE,verified data-semantics only (I13R1); roles not frozen
+MECHANICAL_BOOK_METRIC,1,KRAKEN_FUTURES,R1_SINGLE_INDEPENDENT,1,0,0,1,SINGLE_SOURCE,verified data-semantics only (I13R1); roles not frozen
+MECHANICAL_BOOK_SNAPSHOT,2,DERIBIT|OKX_SWAP,R2_TWO_INDEPENDENT,2,0,0,2,ADEQUATE,verified data-semantics only (I13R1); roles not frozen
+MECHANICAL_FUNDING,4,DERIBIT|GATE_FUTURES|KRAKEN_FUTURES|OKX_SWAP,R3_THREE_PLUS_INDEPENDENT,4,0,0,4,ADEQUATE,verified data-semantics only (I13R1); roles not frozen
+MECHANICAL_LIQUIDATION,3,DERIBIT|GATE_FUTURES|KRAKEN_FUTURES,R3_THREE_PLUS_INDEPENDENT,3,0,0,3,ADEQUATE,verified data-semantics only (I13R1); roles not frozen
+MECHANICAL_OPEN_INTEREST,2,GATE_FUTURES|KRAKEN_FUTURES,R2_TWO_INDEPENDENT,2,0,0,2,ADEQUATE,verified data-semantics only (I13R1); roles not frozen
+MECHANICAL_POSITIONING,2,GATE_FUTURES|KRAKEN_FUTURES,R2_TWO_INDEPENDENT,2,0,0,2,ADEQUATE,verified data-semantics only (I13R1); roles not frozen
+MECHANICAL_TRADE,3,DERIBIT|GATE_FUTURES|OKX_SWAP,R3_THREE_PLUS_INDEPENDENT,3,0,0,2,ADEQUATE,verified data-semantics only (I13R1); roles not frozen

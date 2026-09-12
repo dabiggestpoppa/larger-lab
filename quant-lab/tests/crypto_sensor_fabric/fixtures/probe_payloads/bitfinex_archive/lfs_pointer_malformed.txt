@@ -1,0 +1,4 @@
+version https://git-lfs.github.com/spec/v1
+oid sha256:short-and-invalid
+size not-a-number
+# fixture sentinel: not a real LFS object; stands in for the DuckDB artifact

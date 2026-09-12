@@ -1,0 +1,7 @@
+# byte-exact storage: provenance hashes must survive checkout
+* -text
+*.md text eol=lf
+*.py text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.parquet binary

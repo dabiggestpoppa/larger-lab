@@ -1,0 +1,22 @@
+{
+  "ws1_state_age_surface": "COMPLETE",
+  "ws2_survivorship": "COMPLETE",
+  "ws3_hh_maturation": "COMPLETE",
+  "ws4_hh_birth_quality": "COMPLETE",
+  "ws5_second_order": "COMPLETE",
+  "ws6_transition_velocity": "COMPLETE",
+  "ws7_bifurcation": "COMPLETE",
+  "ws8_vector_field": "COMPLETE",
+  "ws9_perturbation": "COMPLETE",
+  "ws10_health_matrix": "COMPLETE",
+  "ws11_price_up_rank_down": "COMPLETE",
+  "ws12_stress_classes": "COMPLETE",
+  "ws13_stress_surface": "COMPLETE",
+  "ws14_no_response": "COMPLETE",
+  "ws15_liquidity": "COMPLETE",
+  "ws16_shmc_locality": "COMPLETE",
+  "ws17_vol_locality": "COMPLETE",
+  "ws18_registry": "COMPLETE",
+  "ws19_export": "COMPLETE",
+  "verdict": "PASS_MECH9_STATE_AGE_DYNAMICS_WITH_LIMITATIONS"
+}

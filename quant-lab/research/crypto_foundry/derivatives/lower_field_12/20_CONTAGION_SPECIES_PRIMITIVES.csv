@@ -1,0 +1,16 @@
+species,n,n_subperiods,shock_magnitude,sigma_surprise,liquidity,rank_depth,recency_burden,churn,relational_distance,peer_dispersion,global_context,early_reach,note
+TEMP_SP0,24,5.0,0.1333,2.4472,11.0271,478.0,0.0269,1.0,0.1714,0.0313,0.423,0.05,
+TEMP_SP1,257,5.0,0.1388,2.5578,11.3228,316.0,0.0586,0.9474,-0.0182,0.0332,0.22,0.7,
+TEMP_SP2,141,5.0,0.1336,2.6532,11.1899,371.0,0.0106,0.9474,-0.0223,0.0329,0.264,0.4,
+TEMP_SP3,569,5.0,0.1067,2.5111,11.1609,331.0,0.015,0.9474,-0.0063,0.0339,0.244,0.5,
+DISTINGUISH,991,,0.0,,,,,,,,,,KW p across species for shock_magnitude
+DISTINGUISH,991,,,0.203,,,,,,,,,KW p across species for sigma_surprise
+DISTINGUISH,991,,,,0.124,,,,,,,,KW p across species for liquidity
+DISTINGUISH,991,,,,,0.396,,,,,,,KW p across species for rank_depth
+DISTINGUISH,991,,,,,,0.0,,,,,,KW p across species for recency_burden
+DISTINGUISH,991,,,,,,,0.053,,,,,KW p across species for churn
+DISTINGUISH,991,,,,,,,,0.22,,,,KW p across species for relational_distance
+DISTINGUISH,991,,,,,,,,,0.343,,,KW p across species for peer_dispersion
+DISTINGUISH,991,,,,,,,,,,0.044,,KW p across species for global_context
+DISTINGUISH,991,,,,,,,,,,,0.0,KW p across species for early_reach
+VERDICT,991,,,,,,,,,,,,"distinguishing primitives (KW p<0.01): ['early_reach', 'recency_burden', 'shock_magnitude']"

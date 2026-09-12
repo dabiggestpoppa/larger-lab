@@ -1,0 +1,104 @@
+{
+  "benchmark_return_repair": {
+    "description": "BTC/ETH relative returns recomputed using calendar-day lookups instead of row offsets",
+    "affected_columns": [
+      "relative_return_vs_BTC_1d",
+      "relative_return_vs_BTC_3d",
+      "relative_return_vs_BTC_7d",
+      "relative_return_vs_BTC_14d",
+      "relative_return_vs_BTC_30d",
+      "relative_return_vs_BTC_60d",
+      "relative_return_vs_BTC_90d",
+      "relative_return_vs_ETH_1d",
+      "relative_return_vs_ETH_3d",
+      "relative_return_vs_ETH_7d",
+      "relative_return_vs_ETH_14d",
+      "relative_return_vs_ETH_30d",
+      "relative_return_vs_ETH_60d",
+      "relative_return_vs_ETH_90d",
+      "rolling_beta_vs_BTC_30d",
+      "rolling_beta_vs_BTC_60d",
+      "rolling_beta_vs_BTC_90d",
+      "rolling_beta_vs_ETH_30d",
+      "rolling_beta_vs_ETH_60d",
+      "rolling_beta_vs_ETH_90d",
+      "expected_return_given_BTC_30d",
+      "expected_return_given_BTC_60d",
+      "expected_return_given_BTC_90d",
+      "expected_return_given_ETH_30d",
+      "expected_return_given_ETH_60d",
+      "expected_return_given_ETH_90d",
+      "residual_return_vs_BTC_30d",
+      "residual_return_vs_BTC_60d",
+      "residual_return_vs_BTC_90d",
+      "residual_return_vs_ETH_30d",
+      "residual_return_vs_ETH_60d",
+      "residual_return_vs_ETH_90d"
+    ],
+    "windows": [
+      1,
+      3,
+      7,
+      14,
+      30,
+      60,
+      90
+    ],
+    "method": "price(t) / price(t - w calendar days) - 1"
+  },
+  "defillama_global_flow": {
+    "columns": [
+      "stablecoin_total_mcap",
+      "stablecoin_change_1d",
+      "stablecoin_change_7d",
+      "stablecoin_change_30d",
+      "total_dex_volume",
+      "dex_volume_change_1d",
+      "dex_volume_change_7d",
+      "dex_volume_change_30d",
+      "total_fees",
+      "fees_change_1d",
+      "fees_change_7d",
+      "fees_change_30d",
+      "total_revenue",
+      "revenue_change_1d",
+      "revenue_change_7d",
+      "revenue_change_30d"
+    ],
+    "source": "DefiLlama public API",
+    "coverage": "2014-02-17 to 2026-08-25 (DEX); 2017-11-29 to 2026-08-25 (stablecoin); 2018-03-26 to 2026-08-25 (fees/revenue)"
+  },
+  "defillama_chain_flow": {
+    "columns": [
+      "chain",
+      "chain_tvl",
+      "chain_tvl_share",
+      "chain_tvl_change_1d",
+      "chain_tvl_change_7d",
+      "chain_tvl_change_30d"
+    ],
+    "source": "DefiLlama public API",
+    "chains_covered": 25
+  },
+  "meteora_daily_tvl": {
+    "columns": [
+      "meteora_tvl",
+      "meteora_tvl_change_1d",
+      "meteora_tvl_change_7d",
+      "meteora_tvl_change_30d"
+    ],
+    "source": "DefiLlama protocol endpoint (proxy)",
+    "coverage": "Partial (aggregate protocol TVL only)"
+  },
+  "chain_mapping": {
+    "columns": [
+      "chain",
+      "contract_address",
+      "mapping_source",
+      "mapping_confidence",
+      "multi_chain_flag"
+    ],
+    "source": "CMC PIT universe",
+    "coverage": "78.3% mapped"
+  }
+}

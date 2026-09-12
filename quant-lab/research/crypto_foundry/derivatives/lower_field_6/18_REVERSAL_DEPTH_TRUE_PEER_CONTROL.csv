@@ -1,0 +1,6 @@
+block,n,auc,coefs
+rank_only,2462,0.5096,{'rank': 0.0001}
+rank_plus_amp,2462,0.5132,"{'rank': 0.0001, 'z1': 0.0041}"
+rank_plus_isolation,2462,0.5779,"{'rank': 0.0003, 'isolation': -0.7426}"
+rank_plus_field,2350,0.5138,"{'rank': 0.0002, 'top500_breadth_30d': 0.1314, 'top500_dispersion_30d': 0.0059}"
+full,2350,0.5821,"{'rank': 0.0003, 'z1': 0.0041, 'isolation': -0.7531, 'top500_breadth_30d': 0.0584, 'top500_dispersion_30d': 0.0058}"

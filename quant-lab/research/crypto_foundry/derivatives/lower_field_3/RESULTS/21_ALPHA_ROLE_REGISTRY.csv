@@ -1,0 +1,7 @@
+node,sample,effect,confidence,conditionality,rank_scope,causal_level,failure_modes,future_role
+DEPTH_TAIL_GRADIENT,3.29M panel rows,7D normalized tail rises with rank depth across all states,HIGH descriptive,rank depth / volatility,501-2000,L0,scale and liquidity composition,STRUCTURAL_STATE / DISTRIBUTION
+DEEP_DOWNSIDE_REVERSAL,~7k 30D-purged 3s down events,"1501-2000 P(rev7) ~.58, giveback materially larger than shallow",HIGH purge-stable,"sign, depth, participation",501-2000,L0,"censoring, local sample",REVERSAL / DISTRIBUTION
+BREADTH_DELIVERY_GATE,2095 daily observations per band + event panel,breadth level remains positive after BTC/vol controls; high breadth raises delivery,MEDIUM-HIGH,global breadth + local dispersion,501-2000,L1/L2 candidate,observational confounding; lag stability pending,CROSS_FIELD_GATE / REGIME_FILTER
+ISOLATED_SHOCK_TOPOLOGY,1025 isolated downside >=2s; 307 isolated downside >=3s,isolated downside shocks are local and rebound-prone; deepest cells thin,MEDIUM,participation topology,501-2000,L0,small isolated N,LOCAL_CLUSTER / REVERSAL
+SHHM_VS_SHMC,large four-state comparison,SHHM has higher normalized tail than SHMC; SHMC is reversion-like,MEDIUM,momentum alignment,501-2000,L0,no future mechanism claim,CONTINUATION / DISTRIBUTION
+RANK_HEALTH_BRIDGE,isolated >=3s downside events,rank deterioration/improvement coordinates compared descriptively,QUEUED,pre-event rank velocity,501-2000,L0,no MECH-7 context needed for core; no death label,RANK_HEALTH / DECAY_CONTEXT

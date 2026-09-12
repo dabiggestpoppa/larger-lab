@@ -1,0 +1,9 @@
+transition,p,n,class,note
+SHOCK->ABSORPTION,0.0792,3647,COMMON,base absorption rate
+SHOCK->REORGANIZATION,0.3233,3647,COMMON,relational reorg without contagion
+SHOCK->PROPAGATION,0.28,3647,COMMON,contagion base rate
+ABSORBED->PROPAGATION,0.0,289,BYPASSABLE,"absorbed events NEVER propagate in this partition (mutually exclusive) — propagation happens without absorption failure, so the chain is bypassable"
+PROPAGATION->CONTAINMENT,0.7865,1021,COMMON,share of contagion events that do NOT decouple (contained)
+PROPAGATION->DECOUPLING,0.2135,1021,OPTIONAL,"decoupling is an optional downstream of contagion, not automatic"
+DECOUPLING_WITHOUT_CONTAGION,0.2191,799,STATE_LOCAL,a large share of decoupling occurs WITHOUT prior contagion — independent asset-health pathway exists alongside the contagion route
+VERDICT,LOOSE_BYPASSABLE_CHAIN,,DESCRIPTIVE,"transitions are partial and state-local; absorption, propagation and decoupling are linked but bypassable — NOT a strict feed-forward chain"

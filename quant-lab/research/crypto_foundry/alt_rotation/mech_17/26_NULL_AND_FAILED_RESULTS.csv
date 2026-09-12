@@ -1,0 +1,10 @@
+avenue,status,note
+Free ETF/institutional flow sensor,DATA_BLOCKED,no local data; only stablecoin-capital local proxy
+Absolute physical capacity units,NULL,no physical units supportable; capacity = state-local response ceiling
+Hysteresis / path dependence,PILOT,gap magnitude check; not promoted unless robust
+Forcing as single deterministic scalar,NULL,family decomposition preferred
+Directional sign prediction,FORBIDDEN,traffic geometry only; no sign signal
+16-cell raw operational surface,DISSOLVED,replaced by reduced 6/8-cell dual
+State-age as universal clock,DISSOLVED,UNSTABLE_CLOCK
+Archetype naming without sample support,NULL,"requires n>=50, >=3 subperiods, no single period >50%"
+SoSoValue ETF-flow forcing coordinate,DATA_BLOCKED,no runtime dependency; blocked

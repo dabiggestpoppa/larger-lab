@@ -1,0 +1,9 @@
+downside_function,upside_analogue,classification,note
+LOAD,STABILITY,DIFFERENT_THRESHOLD,both are state coordinates; downside threshold lower
+ABSORPTION_FAILURE,REJOIN,SIGN_SPECIFIC,no direct upside mirror of failure
+CORRELATION_COMPRESSION,COHERENCE,DIFFERENT_THRESHOLD,downside compresses corr; upside raises coherence only at higher thresholds
+SPREAD,RECRUITMENT_PRECONDITION,SIGN_SPECIFIC,upside propagation not a mirror of spread
+REACTIVATION,PARTICIPATION_PERSISTENCE,NO_ANALOGUE,reactivation is a downside-specific second-wave mechanism
+PERSISTENT_DECOUPLING,PERSISTENT_ACCUMULATION,UNKNOWN,upside accumulation weak / state-local
+CONTAGION,BREADTH_PARTICIPATION,DIFFERENT_THRESHOLD,both spread through neighborhood relations but upside needs permission
+VERDICT,NO_FORCED_MIRROR,MIXED,"classification counts {'DIFFERENT_THRESHOLD': 3, 'SIGN_SPECIFIC': 2, 'NO_ANALOGUE': 1, 'UNKNOWN': 1}: shared/different-threshold only where mechanism is genuinely analogous; no mechanical sign-inversion"

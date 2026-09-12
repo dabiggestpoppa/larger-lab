@@ -1,0 +1,101 @@
+{
+  "checkpoint": "CRYPTO-ALT-DATA-0.1-FOUNDATION-TRUTH-REPAIR",
+  "parent_checkpoint": "CRYPTO-ALT-DATA-0-POINT-IN-TIME-RANKING-AND-PERP-UNIVERSE-REALITY-AUDIT",
+  "parent_reported_decision": "PASS_ALT_POINT_IN_TIME_UNIVERSE_FOUNDATION",
+  "human_review_verdict": "PARTIAL_ALT_POINT_IN_TIME_UNIVERSE_FOUNDATION",
+  "decision": "PASS_ALT_POINT_IN_TIME_UNIVERSE_FOUNDATION",
+  "decision_note": "restored after bounded truth-repair: coverage denominators corrected to unique PIT assets, eligibility prototype regenerated to canonical schema, liquidity terminology separated, CMC source authority relabeled, earliest verified rank date empirically extended to 2020-06-01, identity collisions reclassified, all repair criteria test-verified",
+  "decision_date": "2026-08-24",
+  "branch": "agent/crypto-quant-foundry",
+  "base_sha_commit_parent": "e8e2a7abe952634696363ea94246a03dc8a627f8",
+  "repair_criteria": {
+    "1_pit_rank_universe_remains_proven": true,
+    "2_unique_asset_coverage_recomputed": true,
+    "3_perp_eligibility_prototype_non_empty_canonical": true,
+    "4_maturity_tradability_terminology_corrected": true,
+    "5_historical_liquidity_limitation_separated": true,
+    "6_source_authority_corrected": true,
+    "7_required_artifacts_complete": true,
+    "8_all_repair_tests_pass": true
+  },
+  "fail_closed_rules": {
+    "current_survivor_rank_backfill": "NOT_VIOLATED",
+    "current_symbol_list_as_listing_truth": "NOT_VIOLATED",
+    "delisted_unrecoverable": "NOT_VIOLATED",
+    "symbol_only_identity_join": "NOT_VIOLATED",
+    "current_only_sectors_as_historical": "NOT_VIOLATED",
+    "missing_provenance": "NOT_VIOLATED",
+    "fully_eligible_without_verified_liquidity": "NOT_VIOLATED",
+    "internal_endpoint_labeled_official_api": "NOT_VIOLATED"
+  },
+  "coverage": {
+    "asset_count_method": "UNIQUE_PIT_ASSET",
+    "per_date_band_denominators": "10/15/25/50/100/100/200",
+    "per_date_band_sum": 500,
+    "aggregate_denominators_5_dates": "50/75/125/250/500/500/1000",
+    "any_perp_pct_by_band": {"1-10": 90.0, "11-25": 80.0, "26-50": 83.2, "51-100": 75.6, "101-200": 59.6, "201-300": 17.8, "301-500": 26.3},
+    "mature_30d_pct_by_band": {"1-10": 88.0, "11-25": 72.0, "26-50": 74.4, "51-100": 67.6, "101-200": 53.6, "201-300": 14.4, "301-500": 19.2},
+    "reconciliation_csv": "ALT_DATA_0_1_COVERAGE_RECONCILIATION.csv"
+  },
+  "perp_eligibility_prototype": {
+    "rows": 10000,
+    "columns": 23,
+    "venues": ["HYPERLIQUID", "OKX"],
+    "schema": "canonical 23-col (listing/delisting timestamps + authorities, contract_age_days_at_t, tradable_at_t, mature_30d_at_t, per-dimension data flags, liquidity_evidence_status, 4 eligibility-dimension booleans, eligibility_status, exclusion_reason)",
+    "duplicate_key_check": "NO_DUPLICATES (date, cmc_id, venue, instrument)",
+    "note": "the previously committed DATA-0 file was in fact non-empty (1.9MB, 10000 rows); regenerated to canonical schema and corrected terminology"
+  },
+  "liquidity_taxonomy": {
+    "contract_existence_eligible": "CONTRACT_EXISTENCE_ELIGIBLE",
+    "contract_maturity_eligible": "CONTRACT_MATURITY_ELIGIBLE",
+    "historical_data_eligible": "HISTORICAL_DATA_ELIGIBLE",
+    "historical_liquidity_verified": "HISTORICAL_LIQUIDITY_VERIFIED (never TRUE in DATA-0/0.1)",
+    "terminal_status": "ELIGIBLE_EX_LIQUIDITY",
+    "fully_eligible": "REMOVED"
+  },
+  "historical_liquidity_path": {
+    "document": "ALT_DATA_0_1_HISTORICAL_LIQUIDITY_PATH.md",
+    "binance_archive_volume": "YES (klines, 2020-01+, delisted kept)",
+    "binance_archive_funding": "YES (fundingRate files)",
+    "hyperliquid_volume": "YES (candle volume post-listing; v=0 pre-listing filter)",
+    "hyperliquid_funding": "YES (hourly, 232/232)",
+    "okx": "PARTIAL (retention-limited)",
+    "bybit": "NO (403 from env)",
+    "dex_liquidity": "CURRENT_ONLY (DexPaprika 30d window)",
+    "l2_historical_liquidity": "NOT_AVAILABLE_IN_FREE_STACK (not invented)",
+    "data1_usage": "volume proxies under a preregistered frozen rule; HISTORICAL_LIQUIDITY_VERIFIED never implied"
+  },
+  "cmc_authority": {
+    "class": "PRIMARY_EMPIRICALLY_VERIFIED_WEB_ENDPOINT",
+    "official_documentation": "NO/UNVERIFIED",
+    "api_key_required": "NO",
+    "stability_risk": "INTERNAL_ENDPOINT",
+    "tos_review_required_for_long_term_operation": "YES"
+  },
+  "earliest_verified_rank_history": "2020-06-01",
+  "earliest_history_claim_note": "2022-06-01, 2021-06-01, 2020-06-01 empirically tested (all 500 rows, PIT-consistent); deeper history UNVERIFIED; 'any date supported' claim removed",
+  "identity_collision_audit": {
+    "rows_audited": 949,
+    "TRUE_TICKER_REUSE": 22,
+    "PROVIDER_SYMBOL_COLLISION": 450,
+    "UNKNOWN_COLLISION": 136,
+    "NO_COLLISION": 341,
+    "MULTIPLIER_ALIAS": 3,
+    "VENUE_ALIAS": 3,
+    "csv": "ALT_DATA_0_1_IDENTITY_COLLISION_AUDIT.csv"
+  },
+  "test_results": {
+    "original_suite": "test_alt_data_0.py: 21 passed (schema-updated to canonical columns; determinism test isolated to scratch copy)",
+    "repair_suite": "test_alt_data_0_1.py: 20 passed",
+    "total": "41 passed, 0 failed"
+  },
+  "blockers": [],
+  "residual_limitations": [
+    "Binance/Bybit live APIs geo-blocked from this environment (451/403); Binance archive path verified",
+    "free-tier rank cross-check single-provider (CMC) before 2025-08; paid CoinPaprika/CMC Pro closes it",
+    "HL purged coins + OKX delisted swaps unrecoverable via public API (archive collection task for DATA-1)",
+    "historical liquidity (perp/DEX) current-only in free stack; volume proxies only"
+  ],
+  "next_checkpoint": "CRYPTO-ALT-DATA-1-CANONICAL-POINT-IN-TIME-UNIVERSE-AND-MULTISCALE-FEATURE-PANEL",
+  "next_checkpoint_started": false
+}

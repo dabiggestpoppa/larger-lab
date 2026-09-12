@@ -1,0 +1,368 @@
+{
+  "motif_total": 201,
+  "recurring": 32,
+  "partially_recurring": 27,
+  "cycle_specific": 142,
+  "top_motifs": [
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 459,
+      "subperiods_with_ge3": 5,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 118, \"2022\": 91, \"2023\": 87, \"2020-2021\": 85, \"2024\": 77}"
+    },
+    {
+      "state_1": "BTC_CONCENTRATION",
+      "state_2": "BTC_CONCENTRATION",
+      "state_3": "BTC_CONCENTRATION",
+      "occurrences": 364,
+      "subperiods_with_ge3": 5,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 100, \"2023\": 97, \"2020-2021\": 82, \"2024\": 63, \"2022\": 22}"
+    },
+    {
+      "state_1": "BROAD_RISK_EXPANSION",
+      "state_2": "BROAD_RISK_EXPANSION",
+      "state_3": "BROAD_RISK_EXPANSION",
+      "occurrences": 145,
+      "subperiods_with_ge3": 5,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 65, \"2024\": 23, \"2023\": 21, \"2022\": 20, \"2025-2026\": 15}"
+    },
+    {
+      "state_1": "STABLECOIN_PARKING",
+      "state_2": "STABLECOIN_PARKING",
+      "state_3": "STABLECOIN_PARKING",
+      "occurrences": 99,
+      "subperiods_with_ge3": 3,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 70, \"2025-2026\": 22, \"2022\": 5, \"2024\": 2}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "BTC_CONCENTRATION",
+      "state_3": "BTC_CONCENTRATION",
+      "occurrences": 73,
+      "subperiods_with_ge3": 5,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2024\": 21, \"2025-2026\": 20, \"2023\": 15, \"2020-2021\": 9, \"2022\": 8}"
+    },
+    {
+      "state_1": "CAPITAL_EXIT",
+      "state_2": "CAPITAL_EXIT",
+      "state_3": "CAPITAL_EXIT",
+      "occurrences": 69,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2022\": 47, \"2025-2026\": 22}"
+    },
+    {
+      "state_1": "BTC_CONCENTRATION",
+      "state_2": "BTC_CONCENTRATION",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 62,
+      "subperiods_with_ge3": 5,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2024\": 19, \"2025-2026\": 16, \"2023\": 10, \"2020-2021\": 9, \"2022\": 8}"
+    },
+    {
+      "state_1": "ETH_BROADENING",
+      "state_2": "ETH_BROADENING",
+      "state_3": "ETH_BROADENING",
+      "occurrences": 60,
+      "subperiods_with_ge3": 3,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 42, \"2022\": 10, \"2025-2026\": 6, \"2023\": 1, \"2024\": 1}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "BTC_CONCENTRATION",
+      "occurrences": 56,
+      "subperiods_with_ge3": 5,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 26, \"2023\": 9, \"2024\": 8, \"2020-2021\": 7, \"2022\": 6}"
+    },
+    {
+      "state_1": "BTC_CONCENTRATION",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 55,
+      "subperiods_with_ge3": 5,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 25, \"2024\": 12, \"2020-2021\": 7, \"2023\": 5, \"2022\": 5}"
+    },
+    {
+      "state_1": "BTC_CONCENTRATION",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "BTC_CONCENTRATION",
+      "occurrences": 42,
+      "subperiods_with_ge3": 5,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2024\": 14, \"2025-2026\": 12, \"2023\": 8, \"2020-2021\": 4, \"2022\": 4}"
+    },
+    {
+      "state_1": "LARGE_ALT_ROTATION",
+      "state_2": "LARGE_ALT_ROTATION",
+      "state_3": "LARGE_ALT_ROTATION",
+      "occurrences": 41,
+      "subperiods_with_ge3": 4,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 23, \"2023\": 12, \"2020-2021\": 3, \"2024\": 3}"
+    },
+    {
+      "state_1": "MID_CAP_ROTATION",
+      "state_2": "MID_CAP_ROTATION",
+      "state_3": "MID_CAP_ROTATION",
+      "occurrences": 32,
+      "subperiods_with_ge3": 4,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 17, \"2024\": 6, \"2025-2026\": 5, \"2023\": 4}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "BTC_CONCENTRATION",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 30,
+      "subperiods_with_ge3": 4,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 17, \"2024\": 5, \"2020-2021\": 3, \"2023\": 3, \"2022\": 2}"
+    },
+    {
+      "state_1": "NARROW_LEADERSHIP",
+      "state_2": "NARROW_LEADERSHIP",
+      "state_3": "NARROW_LEADERSHIP",
+      "occurrences": 25,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 16, \"2024\": 3, \"2020-2021\": 2, \"2023\": 2, \"2022\": 2}"
+    },
+    {
+      "state_1": "NARROW_LEADERSHIP",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 16,
+      "subperiods_with_ge3": 3,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2022\": 6, \"2025-2026\": 6, \"2023\": 3, \"2024\": 1}"
+    },
+    {
+      "state_1": "STABLECOIN_PARKING",
+      "state_2": "STABLECOIN_PARKING",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 16,
+      "subperiods_with_ge3": 3,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 6, \"2020-2021\": 4, \"2024\": 4, \"2022\": 2}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "NARROW_LEADERSHIP",
+      "occurrences": 15,
+      "subperiods_with_ge3": 4,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2022\": 6, \"2023\": 3, \"2024\": 3, \"2025-2026\": 3}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "STABLECOIN_PARKING",
+      "state_3": "STABLECOIN_PARKING",
+      "occurrences": 13,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 6, \"2024\": 4, \"2020-2021\": 2, \"2022\": 1}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "STABLECOIN_PARKING",
+      "occurrences": 13,
+      "subperiods_with_ge3": 3,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2024\": 6, \"2020-2021\": 3, \"2025-2026\": 3, \"2022\": 1}"
+    },
+    {
+      "state_1": "STABLECOIN_PARKING",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 13,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2024\": 5, \"2020-2021\": 4, \"2022\": 2, \"2025-2026\": 2}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "ETH_BROADENING",
+      "occurrences": 11,
+      "subperiods_with_ge3": 1,
+      "classification": "PARTIALLY_RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 5, \"2022\": 2, \"2025-2026\": 2, \"2023\": 1, \"2024\": 1}"
+    },
+    {
+      "state_1": "ETH_BROADENING",
+      "state_2": "BROAD_RISK_EXPANSION",
+      "state_3": "BROAD_RISK_EXPANSION",
+      "occurrences": 11,
+      "subperiods_with_ge3": 3,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 5, \"2022\": 3, \"2025-2026\": 3}"
+    },
+    {
+      "state_1": "ETH_BROADENING",
+      "state_2": "ETH_BROADENING",
+      "state_3": "BROAD_RISK_EXPANSION",
+      "occurrences": 11,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 5, \"2022\": 4, \"2025-2026\": 2}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "ETH_BROADENING",
+      "state_3": "ETH_BROADENING",
+      "occurrences": 11,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 6, \"2022\": 3, \"2025-2026\": 2}"
+    },
+    {
+      "state_1": "BTC_CONCENTRATION",
+      "state_2": "BTC_CONCENTRATION",
+      "state_3": "MID_CAP_ROTATION",
+      "occurrences": 10,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2023\": 4, \"2024\": 3, \"2025-2026\": 2, \"2022\": 1}"
+    },
+    {
+      "state_1": "BROAD_RISK_EXPANSION",
+      "state_2": "BROAD_RISK_EXPANSION",
+      "state_3": "ETH_BROADENING",
+      "occurrences": 10,
+      "subperiods_with_ge3": 3,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 4, \"2020-2021\": 3, \"2022\": 3}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "NARROW_LEADERSHIP",
+      "state_3": "NARROW_LEADERSHIP",
+      "occurrences": 10,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2022\": 4, \"2025-2026\": 3, \"2024\": 2, \"2023\": 1}"
+    },
+    {
+      "state_1": "NARROW_LEADERSHIP",
+      "state_2": "NARROW_LEADERSHIP",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 10,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2022\": 5, \"2025-2026\": 3, \"2023\": 1, \"2024\": 1}"
+    },
+    {
+      "state_1": "BROAD_RISK_EXPANSION",
+      "state_2": "ETH_BROADENING",
+      "state_3": "ETH_BROADENING",
+      "occurrences": 10,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 5, \"2025-2026\": 3, \"2022\": 2}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "NARROW_LEADERSHIP",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 9,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2022\": 4, \"2024\": 3, \"2023\": 2}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "STABLECOIN_PARKING",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 8,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 5, \"2024\": 3}"
+    },
+    {
+      "state_1": "MIXED_NO_CLEAR_ROUTE",
+      "state_2": "ETH_BROADENING",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 8,
+      "subperiods_with_ge3": 1,
+      "classification": "PARTIALLY_RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 5, \"2024\": 2, \"2023\": 1}"
+    },
+    {
+      "state_1": "ETH_BROADENING",
+      "state_2": "ETH_BROADENING",
+      "state_3": "NARROW_LEADERSHIP",
+      "occurrences": 8,
+      "subperiods_with_ge3": 1,
+      "classification": "PARTIALLY_RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 5, \"2020-2021\": 1, \"2022\": 1, \"2024\": 1}"
+    },
+    {
+      "state_1": "STABLECOIN_PARKING",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "STABLECOIN_PARKING",
+      "occurrences": 8,
+      "subperiods_with_ge3": 2,
+      "classification": "RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 4, \"2025-2026\": 3, \"2024\": 1}"
+    },
+    {
+      "state_1": "MID_CAP_ROTATION",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 7,
+      "subperiods_with_ge3": 1,
+      "classification": "PARTIALLY_RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 3, \"2023\": 2, \"2022\": 1, \"2020-2021\": 1}"
+    },
+    {
+      "state_1": "BROAD_RISK_EXPANSION",
+      "state_2": "BROAD_RISK_EXPANSION",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 7,
+      "subperiods_with_ge3": 1,
+      "classification": "PARTIALLY_RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 4, \"2022\": 1, \"2023\": 1, \"2024\": 1}"
+    },
+    {
+      "state_1": "LARGE_ALT_ROTATION",
+      "state_2": "BROAD_RISK_EXPANSION",
+      "state_3": "BROAD_RISK_EXPANSION",
+      "occurrences": 7,
+      "subperiods_with_ge3": 1,
+      "classification": "PARTIALLY_RECURRING",
+      "subperiod_counts": "{\"2023\": 3, \"2020-2021\": 2, \"2024\": 2}"
+    },
+    {
+      "state_1": "ETH_BROADENING",
+      "state_2": "NARROW_LEADERSHIP",
+      "state_3": "NARROW_LEADERSHIP",
+      "occurrences": 7,
+      "subperiods_with_ge3": 1,
+      "classification": "PARTIALLY_RECURRING",
+      "subperiod_counts": "{\"2025-2026\": 4, \"2020-2021\": 1, \"2022\": 1, \"2024\": 1}"
+    },
+    {
+      "state_1": "ETH_BROADENING",
+      "state_2": "MIXED_NO_CLEAR_ROUTE",
+      "state_3": "MIXED_NO_CLEAR_ROUTE",
+      "occurrences": 6,
+      "subperiods_with_ge3": 1,
+      "classification": "PARTIALLY_RECURRING",
+      "subperiod_counts": "{\"2020-2021\": 3, \"2022\": 2, \"2023\": 1}"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "cases": [
+    {
+      "case": "single_source_real_chain",
+      "expected_error": null,
+      "lineage_entries": 1,
+      "observed": "accepted",
+      "result": "valid",
+      "source_blobs": 1
+    },
+    {
+      "case": "multi_source_real_chain",
+      "expected_error": null,
+      "lineage_orders": [
+        0,
+        1
+      ],
+      "observed": "accepted",
+      "result": "valid",
+      "source_blobs": 2
+    },
+    {
+      "case": "wrong_provider",
+      "doctrine": "byte_equality_never_transfers_provenance",
+      "expected_error": "ProjectionSourceNotUsable",
+      "observed": "ProjectionSourceNotUsable",
+      "result": "rejected"
+    },
+    {
+      "case": "wrong_acquisition_blob",
+      "expected_error": "ProjectionSourceNotUsable",
+      "observed": "ProjectionSourceNotUsable",
+      "result": "rejected"
+    },
+    {
+      "case": "failed_acquisition",
+      "expected_error": "ProjectionSourceNotUsable",
+      "forensic_history_preserved": true,
+      "observed": "ProjectionSourceNotUsable",
+      "result": "rejected"
+    },
+    {
+      "case": "missing_physical_blob",
+      "expected_error": "BlobMissing",
+      "observed": "BlobMissing",
+      "result": "rejected"
+    },
+    {
+      "case": "missing_artifact",
+      "expected_error": "ProjectionChainBroken",
+      "observed": "ProjectionChainBroken",
+      "result": "rejected"
+    },
+    {
+      "case": "missing_lineage",
+      "expected_error": "ProjectionChainBroken",
+      "observed": "ProjectionChainBroken",
+      "result": "rejected"
+    },
+    {
+      "case": "wrong_partition",
+      "expected_error": "ProjectionPartitionMismatch",
+      "observed": "ProjectionPartitionMismatch",
+      "result": "rejected"
+    },
+    {
+      "case": "source_blob_hidden_from_manifest",
+      "expected_error": "ProjectionSourceHidden",
+      "observed": "ProjectionSourceHidden",
+      "result": "rejected"
+    },
+    {
+      "case": "restart_valid",
+      "detail": "all repositories reinstantiated from disk",
+      "expected_error": null,
+      "observed": "accepted",
+      "result": "valid"
+    },
+    {
+      "case": "restart_corrupt_schema",
+      "expected_error": "ProjectionSchemaCatalogCorrupt",
+      "fragment_preserved": true,
+      "observed": "ProjectionSchemaCatalogCorrupt",
+      "result": "rejected"
+    },
+    {
+      "case": "restart_corrupt_artifact",
+      "expected_error": "ProjectionArtifactCatalogCorrupt",
+      "fragment_preserved": true,
+      "observed": "ProjectionArtifactCatalogCorrupt",
+      "result": "rejected"
+    },
+    {
+      "case": "restart_corrupt_lineage",
+      "expected_error": "ProjectionLineageCatalogCorrupt",
+      "fragment_preserved": true,
+      "observed": "ProjectionLineageCatalogCorrupt",
+      "result": "rejected"
+    },
+    {
+      "case": "restart_corrupt_projection",
+      "expected_error": "typed_corruption_failure",
+      "observed": "ProjectionCorruption",
+      "result": "rejected"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R1",
+  "clock": "injected-fixed",
+  "matrix": "BLOC_04_I05R1_END_TO_END_LINEAGE_MATRIX",
+  "resolver": "production ProjectionLineageResolver (no stub)"
+}

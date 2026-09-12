@@ -1,0 +1,17 @@
+venue,public_data_access,account_required,kyc_required,us_data_access,us_spot_execution,us_derivatives_execution,non_us_execution_candidate,self_custodial,terms_restricted,status_verified_at,source_class,notes
+Uniswap v3,YES,NO,NO,YES,YES,NOT_APPLICABLE,YES,YES,NO,2026-08,PROTOCOL_DOCS,Permissionless AMM. No account. No KYC. Self-custodial wallet only.
+Aerodrome,YES,NO,NO,YES,YES,NOT_APPLICABLE,YES,YES,NO,2026-08,PROTOCOL_DOCS,Permissionless AMM on Base. Same model as Uniswap.
+PancakeSwap,YES,NO,NO,YES,YES,NOT_APPLICABLE,YES,YES,NO,2026-08,PROTOCOL_DOCS,Permissionless AMM on BNB Chain.
+Raydium,YES,NO,NO,YES,YES,NOT_APPLICABLE,YES,YES,NO,2026-08,PROTOCOL_DOCS,Permissionless on Solana.
+Orca,YES,NO,NO,YES,YES,NOT_APPLICABLE,YES,YES,NO,2026-08,PROTOCOL_DOCS,Permissionless on Solana.
+Hyperliquid,YES,NO,NO,YES,RESTRICTED,RESTRICTED,UNKNOWN,YES,UNKNOWN,2026-08,PROTOCOL_AND_TERMS,Public data fully accessible. Execution is self-custodial but U.S. execution is RESTRICTED. Do NOT infer execution eligibility from protocol reachability. Terms of service may restrict U.S. persons. Data/research use is ACCEPT_PRIMARY.
+Binance,YES,NO,NO,YES,NO,NO,YES,NO,YES,2026-08,EXCHANGE_DOCS,Not U.S.-accessible for execution. Historical data public API is free. Account required for trading.
+Kraken,YES,YES,YES,YES,YES,YES,YES,NO,NO,2026-08,EXCHANGE_DOCS,U.S.-accessible regulated exchange. Full KYC. Spot + futures.
+Coinbase,YES,YES,YES,YES,YES,LIMITED,YES,NO,NO,2026-08,EXCHANGE_DOCS,U.S.-accessible regulated exchange. BTC futures recently launched.
+Deribit,YES,NO,NO,YES,NO,NO,YES,NO,YES,2026-08,EXCHANGE_DOCS,Options NOT U.S.-accessible. Public data API is free. Perps may have restrictions.
+Drift,YES,NO,NO,YES,VERIFY_CURRENTLY,VERIFY_CURRENTLY,UNKNOWN,YES,UNKNOWN,2026-08,UNVERIFIED,Self-custodial Solana perp. Security status requires revalidation. Historical data accessible. Execution readiness unverified.
+Aster,YES,NO,NO,YES,VERIFY_CURRENTLY,VERIFY_CURRENTLY,UNKNOWN,YES,UNKNOWN,2026-08,UNVERIFIED,BNB-chain perp. Early stage. Execution unverified.
+Jupiter Perps,YES,NO,NO,YES,VERIFY_CURRENTLY,VERIFY_CURRENTLY,UNKNOWN,YES,UNKNOWN,2026-08,UNVERIFIED,Aggregates from Drift. Standalone execution limited.
+Avantis,YES,NO,NO,YES,VERIFY_CURRENTLY,VERIFY_CURRENTLY,UNKNOWN,YES,UNKNOWN,2026-08,UNVERIFIED,Base-native perp. Early stage.
+Gamma,YES,NO,NO,YES,YES,NOT_APPLICABLE,YES,YES,NO,2026-08,PROTOCOL_DOCS,Vault management. Permissionless.
+Arrakis,YES,NO,NO,YES,YES,NOT_APPLICABLE,YES,YES,NO,2026-08,PROTOCOL_DOCS,Vault management. Permissionless.

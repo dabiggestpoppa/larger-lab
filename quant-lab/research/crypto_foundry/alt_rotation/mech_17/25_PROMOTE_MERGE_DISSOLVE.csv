@@ -1,0 +1,12 @@
+object,decision,role,reason
+TRAFFIC_DEMAND,PROMOTE,ADAPTIVE_LAW,interpretable composite; efficiency denominator
+CAPACITY,PROMOTE,LOCAL_PHYSICS,state-local response ceiling on 6/8-cell
+CONGESTION,PROMOTE,LOCAL_PHYSICS,demand/capacity ratio
+EXIT_PRESSURE,PROMOTE,STRUCTURAL_CORE,branch geometry; narrowing without sign
+TRANSFER_EFFICIENCY,PROMOTE,ADAPTIVE_LAW,propagation per unit demand; censored
+SATURATION_LAW,PROMOTE,STRUCTURAL_CORE_CANDIDATE,stable shape; nodes drift
+THRESHOLD_BAND,PROMOTE,ADAPTIVE_LAW,bands more transportable than point thresholds
+HYSTERESIS,PARK,RESEARCH_ONLY,max_abs_gap=0.348
+16_CELL_RAW_SURFACE,DISSOLVE,REPLACED_BY_REDUCED,MECH-16 dissolved
+COMMON_FORCING_SCALAR_ONLY,DISSOLVE,REPLACED_BY_FAMILIES,family decomposition preferred
+STATE_X_AGE_CLOCK_LAW,DISSOLVE,UNSTABLE_CLOCK,MECH-16 dissolved

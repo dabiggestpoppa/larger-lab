@@ -1,0 +1,14 @@
+{
+  "contract_id": "ALPHA1_1_COST_ACCOUNTING_V1",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "convention": "ONE-WAY (entry+exit)",
+  "perp_roundtrip_bps": 5.0,
+  "spot_roundtrip_bps": 7.5,
+  "hedge_roundtrip_bps": 12.5,
+  "stress_2x": {
+    "mult": 2.0,
+    "perp": 10.0,
+    "spot": 15.0,
+    "hedge": 25.0
+  }
+}

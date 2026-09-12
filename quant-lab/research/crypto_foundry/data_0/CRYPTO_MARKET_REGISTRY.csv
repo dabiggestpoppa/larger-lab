@@ -1,0 +1,25 @@
+venue,chain,market_id,base_asset,quote_asset,instrument_type,wrapper_type,launch_date,history_start,live,liquidity_status,recommended_role,notes
+Uniswap v3,Ethereum,0x99ac8cA7087fA4A2A1FB6357269965A2014ABc35,WBTC,USDC,spot,wrapped_BTCERC20,2021-05-05,2021-05-05,yes,deep,reference_AMM,Most liquid BTC/USD on Ethereum. Wrapped BTC (WBTC).
+Uniswap v3,Ethereum,0xB4e16d0168e52d35CaCD2c6185b44281ec28C9Dc,WETH,USDC,spot,native_ERC20,2021-05-05,2021-05-05,yes,deep,reference_AMM,Liquid ETH/USD on Ethereum.
+Uniswap v3,Ethereum,0x7Be8076f4ea4A4AD08075C2508e481D6C946D12B,WBTC,WETH,spot,wrapped_pair,2021-05-05,2021-05-05,yes,medium,reference_AMM,BTC/ETH cross via AMM. Wrapped assets.
+Uniswap v3,Base,0xB38B5A03eB85c057D3c114Cb2116C90365681A40,cbBTC,USDC,spot,wrapped_BTC_base,2023-09-01,2023-09-01,yes,growing,reference_AMM,Coinbase wrapped BTC on Base. Clean BTC/USD.
+Uniswap v3,Base,0x7Ba2的选择,WETH,USDC,spot,native_ERC20_base,2023-08-01,2023-08-01,yes,deep,primary_AMM,ETH/USD on Base. Native WETH. Low gas.
+Aerodrome,Base,USDC-WETH (CL),WETH,USDC,spot+CL,wrapped_pair,2023-08-01,2023-08-01,yes,deep,primary_AMM,Concentrated liquidity ETH/USD on Aerodrome/Base. High incentive-boosted TVL.
+Aerodrome,Base,USDC-cbBTC (CL),cbBTC,USDC,spot+CL,wrapped_BTC_base,2023-10-01,2023-10-01,yes,medium,reference_AMM,BTC/USD on Aerodrome via cbBTC.
+PancakeSwap,BNB,0x7130d2A12B9BCbFAuce4f2A944bAb14C9B2A052D0,BTCB,USDT,spot,wrapped_BTC_bep20,2020-09-01,2020-09-01,yes,deep,reference_AMM,BTC/Binance-Peg BSC. High volume BNB chain.
+PancakeSwap,BNB,0x74E47470B2Aa06B904f580C7A807d47A425083B6,WETH,USDT,spot,wrapped_pair,2021-01-01,2021-01-01,yes,deep,reference_AMM,ETH/BSC via wrapped assets.
+Raydium,Solana,So11111111111111111111111111111111111111112-SOL/USDC,SOL,USDC,spot,native_SPL,2022-02-24,2022-02-24,yes,deep,reference_AMM,Solana native SOL. Cleanest Solana pair.
+Raydium,Solana,BTC-SOL/USDC,wrapped_BTC_sol,USDC,spot,wrapped_SPL,2023-01-01,2023-01-01,yes,medium,reference_AMM,BTC on Solana via wrapped. Less clean.
+Hyperliquid,Hyperliquid,BTC-PERP,BTC,USD,perp,none_on_chain,2023-05-01,2023-05-01,yes,deep,primary_perp,Primary BTC perp benchmark. USD-margined linear. Full on-chain order book. Max leverage 40x.
+Hyperliquid,Hyperliquid,ETH-PERP,ETH,USD,perp,none_on_chain,2023-05-01,2023-05-01,yes,deep,primary_perp,Primary ETH perp benchmark. USD-margined linear. Max leverage 25x.
+Hyperliquid,Hyperliquid,SOL-PERP,SOL,USD,perp,none_on_chain,2023-06-01,2023-06-01,yes,deep,reference_perp,SOL perp on Hyperliquid. USD-margined.
+Hyperliquid,Hyperliquid,BTC-SPOT,BTC,USDC,spot,none_on_chain,2024-01-01,2024-01-01,yes,medium,reference_spot,Recently added spot. BTC/USDC.
+Hyperliquid,Hyperliquid,ETH-SPOT,ETH,USDC,spot,none_on_chain,2024-01-01,2024-01-01,yes,medium,reference_spot,Recently added spot. ETH/USDC.
+Drift,Solana,BTC-PERP,BTC,USDC,perp,none_SPL,2021-07-01,2021-07-01,yes,medium,reference_perp,Solana-native BTC perp via Drift. Dynamic AMM + order book.
+Drift,Solana,ETH-PERP,ETH,USDC,perp,none_SPL,2021-07-01,2021-07-01,yes,medium,reference_perp,Solana-native ETH perp via Drift.
+Kraken,futures,PI_XBTUSD,BTC,USD,futures,none_CEX,2016-01-01,2016-01-01,yes,deep,reference_futures,Kraken BTC futures. U.S.-accessible.
+Kraken,futures,PI_ETHUSD,ETH,USD,futures,none_CEX,2018-01-01,2018-01-01,yes,deep,reference_futures,Kraken ETH futures. U.S.-accessible.
+Coinbase,futures,BTC-PERP,BTC,USD,futures,none_CEX,2024-06-01,2024-06-01,yes,growing,reference_futures,Coinbase BTC futures. Recently launched. U.S.-accessible.
+Deribit,options,BTC-PERPETUAL,BTC,USD,perp,none_CEX,2018-12-01,2018-12-01,yes,deep,reference_perp_options,BTC perp on Deribit. For options hedging context.
+Deribit,options, BTC-options-chain,BTC,USD,options,none_CEX,2018-12-01,2018-12-01,yes,deep,primary_options,Full BTC options chain. Calls/puts. All strikes/expiries. IV/Greeks. No U.S. access.
+Deribit,options,ETH-options-chain,ETH,USD,options,none_CEX,2019-01-01,2019-01-01,yes,deep,reference_options,ETH options chain. Full Greeks/IV.

@@ -1,0 +1,6 @@
+loner,sigma_class,abs_class,n,p_full_repair_30d,p_rank_repair_30d,p_new_low_30d,median_abs_move
+TRUE,2-3σ,ALL,1392,0.1717,0.6078,0.3843,0.13326
+TRUE,3-4σ,ALL,314,0.1911,0.5318,0.4076,0.16144
+TRUE,4σ+,ALL,251,0.2749,0.5618,0.4382,0.24513
+FALSE,2-3σ,ALL,123,0.0813,0.4634,0.5854,0.00255
+FALSE,3-4σ,ALL,29,0.069,0.5862,0.6207,0.00284

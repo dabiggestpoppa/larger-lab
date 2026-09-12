@@ -1,0 +1,3 @@
+subtype,n,n_subperiods,cycle_shares,max_cycle_share,median_active_bands,median_max_depth,verdict
+FRAGMENTED_ACTIVATION,1,1,{'2023': 1},1.0,3.0,2.0,DESCRIPTIVE
+ORDERLY_SHALLOW_TO_DEEP,240,5,"{'2020-2021': 63, '2022': 35, '2023': 38, '2024': 39, '2025-2026': 65}",0.2708333333333333,7.0,6.0,NAMED_SUBTYPE

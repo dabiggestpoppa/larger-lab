@@ -1,0 +1,22 @@
+venue,market,history_start,useful_history_start,granularity,depth_rating,notes
+Uniswap v3 ETH,ETH/USDC,2021-05,2021-05,M5-equivalent swaps,LONG_HISTORY,~4 years of on-chain swap data
+Uniswap v3 BTC,WBTC/USDC,2021-05,2021-05,M5-equivalent swaps,LONG_HISTORY,~4 years but WBTC wrapper adds bridge risk
+Aerodrome,ETH/USDC,2023-08,2023-08,M5-equivalent swaps,MEDIUM_HISTORY,~2 years. High quality CL data.
+Aerodrome,BTC/USDC,2023-10,2023-10,M5-equivalent swaps,MEDIUM_HISTORY,~2 years via cbBTC
+PancakeSwap,BTC/USDT,2020-09,2020-09,M5-equivalent swaps,LONG_HISTORY,~5 years BNB chain
+Raydium,SOL/USDC,2022-02,2022-02,M5-equivalent swaps,MEDIUM_HISTORY,~3 years Solana
+Orca,SOL/USDC,2021-08,2021-08,M5-equivalent swaps,MEDIUM_HISTORY,~3.5 years
+Hyperliquid BTC,BTC-PERP,2023-05,2023-05,1m candles,MEDIUM_HISTORY,~2.5 years. Growing rapidly.
+Hyperliquid BTC,funding,2023-05,2023-05,1h funding,MEDIUM_HISTORY,Full funding history since launch
+Hyperliquid BTC,liquidations,2023-05,2023-05,event-level,MEDIUM_HISTORY,On-chain visible
+Binance BTC,BTCUSDT,2017-07,2017-07,1m candles,LONG_HISTORY,~8 years. Deepest history available.
+Binance BTC,funding,2019-09,2019-09,8h,LONG_HISTORY,~6 years
+Binance ETH,ETHUSDT,2017-07,2017-07,1m candles,LONG_HISTORY,~8 years
+Kraken BTC,BTC/USD,2013-01,2013-01,1m candles,LONG_HISTORY,~12 years. Deepest spot history.
+Kraken ETH,ETH/USD,2015-08,2015-08,1m candles,LONG_HISTORY,~9 years
+Coinbase BTC,BTC/USD,2014-12,2014-12,1m candles,LONG_HISTORY,~10 years
+Coinbase ETH,ETH/USD,2015-08,2015-08,1m candles,LONG_HISTORY,~9 years
+Deribit BTC,options,2018-12,2018-12,per-expiry,LONG_HISTORY,~6 years options chain
+Deribit BTC,perp,2018-12,2018-12,1m candles,LONG_HISTORY,~6 years
+Deribit ETH,options,2019-01,2019-01,per-expiry,LONG_HISTORY,~5.5 years options
+Gamma,ETH vaults,2021-01,2021-01,epoch-level,MEDIUM_HISTORY,~4 years vault performance

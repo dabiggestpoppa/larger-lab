@@ -1,0 +1,8 @@
+architecture,n,p_absorbed,p_propagated,p_persistent,note
+SI_hi & SHOCK_lo,1070,0.1589,0.3,0.2879,
+SI_hi & SHOCK_lo & REC_hi,339,0.1298,0.174,0.3156,
+SI_lo & SHOCK_hi,1069,0.015,0.2825,0.2722,
+SI_lo & SHOCK_hi & REC_lo,307,0.0391,0.5049,0.1987,
+AUC_SI+SHOCK,3647,0.766,,,
+AUC_SI+SHOCK+RECOVERY,3647,0.7808,,,gain from recovery-state term
+VERDICT,3647,LOOSE_HIERARCHY,,,architecture is descriptive; strict sequencing not claimed

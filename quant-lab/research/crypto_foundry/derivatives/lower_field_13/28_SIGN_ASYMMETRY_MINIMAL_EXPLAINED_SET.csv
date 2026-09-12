@@ -1,0 +1,8 @@
+covariate_set,propagation_auc,explains_gap,note
+LIQUIDITY,0.5538,,
+LIQUIDITY+RANK,0.5536,,
+LIQUIDITY+RANK+CAPACITY,0.5543,,
++SHOCK_MAGNITUDE,0.5691,,
++RECENCY+STRESS+CHURN,0.5778,,
+FULL_MODEL_DOWNSIDE_COEF,0.945,coef=0.945 p=0.0,
+VERDICT,PARTIALLY_EXPLAINED,,"available covariates (liquidity/rank/capacity/shock/recency/stress/churn) explain propagation partially (AUC 0.58 vs 0.55 liquidity-only); the downside residual after full controls is SIGNIFICANT (p<0.05) (coef=0.945 p=0.0) — a downside-specific residual survives the additive controls, so the gap is IRREDUCIBLE_WITH_AVAILABLE_DATA at this panel depth; sign asymmetry NOT called primitive while major mechanical sensors are DATA_BLOCKED"

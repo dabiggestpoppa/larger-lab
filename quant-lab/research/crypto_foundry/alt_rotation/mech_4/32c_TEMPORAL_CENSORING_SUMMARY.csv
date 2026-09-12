@@ -1,0 +1,11 @@
+tau,censor_status,count
+tau_release_d,OBSERVED,125
+tau_activate_d,OBSERVED,96
+tau_activate_d,RIGHT_CENSORED,29
+tau_broaden_d,OBSERVED,73
+tau_broaden_d,RIGHT_CENSORED,52
+tau_peak_d,OBSERVED,125
+tau_hold_d,OBSERVED,125
+tau_reroute_d,OBSERVED,125
+tau_total_d,OBSERVED,123
+tau_total_d,RIGHT_CENSORED,2

@@ -1,0 +1,12 @@
+recovery,bin,med_days,p_absorb,p_propagated,med_capacity,delta_vs_base
+days_since_prior,0,2.0,0.2237,0.2803,0.6,
+days_since_prior,1,19.0,0.1914,0.3154,0.6,
+days_since_prior,2,63.0,0.0997,0.3019,0.6,
+days_since_prior,3,121.0,0.0916,0.2911,0.6,
+days_since_prior,4,224.0,0.0728,0.3046,0.4015,
+days_since_prior,5,569.0,0.0997,0.2453,0.4002,
+rank_repair,true,0.0,0.0832,0.2085,0.4,-0.0466
+membership_stable,true,0.0,0.1383,0.2823,0.6,0.0084
+low_stress,true,0.0,0.0914,0.2807,0.3722,-0.0384
+rejoin_positive,true,0.0,0.185,0.2224,0.3785,0.0552
+VERDICT,STATE_DEPENDENT,,0.1298,,,

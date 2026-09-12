@@ -1,0 +1,37 @@
+# HISTORICAL CHECKPOINTS — frozen from bloc_02/01 §5.5, §6 and 02 §3.
+#
+# RECENT_CONTROL_DATE is resolved at runtime (today) so a source that works
+# now but not historically is distinguishable from a completely broken source.
+#
+# window_sizes: bounded probe window around each target date by granularity
+# (bloc_02/02 §3).  Raw events and books use short bounded samples.
+#
+# boundary_search: earliest-history estimation stops at month precision
+# (bloc_02/01 §14) — never waste requests on the first millisecond of history.
+schema_version: "1.0"
+
+eras:
+  - name: "2021"
+    checkpoint_date: "2021-06-15T00:00:00Z"
+  - name: "2022"
+    checkpoint_date: "2022-06-15T00:00:00Z"
+  - name: "2024"
+    checkpoint_date: "2024-06-15T00:00:00Z"
+  - name: "2026"
+    checkpoint_date: "2026-06-15T00:00:00Z"
+
+recent_control: "RECENT_CONTROL"
+
+window_sizes:
+  "1m": "24h"
+  "5m": "24h"
+  "15m": "24h"
+  "1h": "7d"
+  "4h": "7d"
+  "1d": "30d"
+  RAW_EVENT: "1h"
+  BOOK_SNAPSHOT: "1h"
+
+boundary_search:
+  precision: "month"
+  max_probes: 12

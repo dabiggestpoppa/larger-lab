@@ -1,0 +1,12 @@
+kernel,coordinate,n,abs_spearman,p,purged_auc_absorbed,note
+exp,mem_exp_sum,1874,0.116,0.0,0.5937,
+power,mem_power_sum,1874,0.123,0.0,0.5887,
+finite,mem_finite_sum,1874,0.162,0.0,0.6252,
+exp_half_life_7d,,1874,,,0.6391,exp weighted burden looked back 365d
+exp_half_life_15d,,1874,,,0.6259,exp weighted burden looked back 365d
+exp_half_life_30d,,1874,,,0.6055,exp weighted burden looked back 365d
+exp_half_life_45d,,1874,,,0.5937,exp weighted burden looked back 365d
+exp_half_life_60d,,1874,,,0.5855,exp weighted burden looked back 365d
+exp_half_life_90d,,1874,,,0.5781,exp weighted burden looked back 365d
+exp_half_life_120d,,1874,,,0.5754,exp weighted burden looked back 365d
+exp_half_life_180d,,1874,,,0.5717,exp weighted burden looked back 365d

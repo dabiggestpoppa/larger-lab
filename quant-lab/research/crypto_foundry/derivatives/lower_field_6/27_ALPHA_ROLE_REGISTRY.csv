@@ -1,0 +1,8 @@
+role,description,maturity,next_step
+TRUE_FALSE_LONER_CONSENSUS,Consensus isolation across 5 true peer families,COMPUTED,tradability_audit
+MULTI_SIGMA_LADDER,0.5/1/2/3σ recovery checkpoints,COMPUTED,conditioning_analysis
+PEER_REJOIN_CATCHDOWN,Asset vs frozen-peer forward geometry,COMPUTED,classification_validation
+PRD_HARMONIZED,Canonical price-up rank-down definition,RESOLVED,cross_agent_synthesis
+REVERSAL_PRIMITIVE,Reversal structure across rank patches,COMPUTED,global_validation
+PROPAGATION_RADIUS,Local shock spillover classification,COMPUTED,spillover_validation
+SEQUENCE_ATLAS,Recovery/failure sequence families,PARTIAL,purged_fdr_validation

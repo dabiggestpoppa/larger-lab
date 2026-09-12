@@ -1,0 +1,10 @@
+wrapped_asset,native_asset,chain,wrapper_type,bridge_provider,extra_risk,severity,notes
+WBTC (Ethereum),BTC,Ethereum,ERC-20,BitGo (renounced custody),centralized custodial risk. custody proved but single-entity dependency,ACCEPT_WITH_CAVEAT,Most liquid wrapped BTC on Ethereum. Has operated since 2019.
+cbBTC (Base),BTC,Base,ERC-20,Coinbase,custodial wrapped. Coinbase custodies native BTC. regulatory risk if Coinbase compromised,ACCEPT_WITH_CAVEAT,Clean newer option on Base. Coinbase backing is strong but centralized.
+BTCB (BNB Chain),BTC,BNB Chain,BEP-20,Binance,custodial wrapped by Binance. Binance custody risk. censorship risk,ACCEPT_WITH_CAVEAT,Very liquid on BSC. Binance custody risk is non-trivial.
+renBTC,Ethereum,ERC-20,Ren Protocol (now defunct),decentralized but protocol no longer maintained,AVOID,Went through governance issues. Ren 1.0 was centralized.
+sBTC (Solana),BTC,Solana,SPL,deprecated/non-standard,not production ready for research,AVOID,sBTC on Solana is not standard. Use native SOL pairs instead.
+WETH (all),ETH,all,ERC-20/SPL,N/A,ETH itself. WETH is 1:1 canonical wrapper. negligible risk,ACCEPT,WETH is universally accepted as ETH representation.
+stETH (Ethereum),ETH,Ethereum,ERC-20,Lido,staking derivative. not 1:1. depeg risk during stress,RESEARCH_ONLY,Not suitable as ETH price reference. Depeg during 2022 stress was ~5%.
+rETH (Ethereum),ETH,Ethereum,ERC-20,Rocket Pool,staking derivative. not 1:1,RESEARCH_ONLY,Similar to stETH. Better peg historically.
+Jito SOL (Solana),SOL,Solana,SPL,Jito,staking derivative. slight depeg possible,RESEARCH_ONLY,Liquid staking derivative. Use native SOL for reference.

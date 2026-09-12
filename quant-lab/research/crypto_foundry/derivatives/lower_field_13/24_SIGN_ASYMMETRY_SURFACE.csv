@@ -1,0 +1,9 @@
+cell,down_n,up_n,down_prop,up_prop,gap,shock_mag_med,note
+LIQ_THIN|RANK_LOW|CAP_LOW,1070,225,0.3626,0.0889,0.2737,-0.0717,
+LIQ_THIN|RANK_LOW|CAP_HIGH,237,22,0.3629,0.1364,0.2265,-0.0464,
+LIQ_THIN|RANK_HIGH|CAP_LOW,43,21,0.4186,0.0476,0.371,-0.0686,
+LIQ_THIN|RANK_HIGH|CAP_HIGH,126,34,0.3333,0.0588,0.2745,-0.0186,
+LIQ_DEEP|RANK_LOW|CAP_LOW,124,52,0.2258,0.1731,0.0527,-0.042,
+LIQ_DEEP|RANK_HIGH|CAP_LOW,83,160,0.3373,0.1562,0.1811,-0.0983,
+LIQ_DEEP|RANK_HIGH|CAP_HIGH,667,644,0.3373,0.1646,0.1727,-0.0536,
+VERDICT,,,GAP_EMERGES_IN_THIN_LOW_RANK,,,,"the downside-up propagation gap is largest where liquidity is thin AND rank health is low (weak capacity); it shrinks toward zero in deep-liquidity high-rank cells — the gap is conditional on local weakness, not uniform"

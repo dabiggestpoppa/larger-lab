@@ -1,0 +1,6 @@
+horizon_d,n,p_price_health,p_rank_health,median_price_health_cum_ret,median_rank_at_h,median_vol_30d,median_liq_proxy,median_activity_turnover,p_activity_positive,peer_normalization_median_resz,relational_state_persistence,median_membership_entropy_at_h,p_rel_state_still_decoupled
+30,998,0.481,0.013,-0.0017,236.0,0.051,11.9429,0.0669,0.9709,,,,
+60,998,0.48,0.1503,-0.0016,234.0,0.051,11.9429,0.0669,0.9709,,,,
+90,998,0.476,0.1723,-0.0016,233.0,0.051,11.9429,0.0669,0.9709,,,,
+30,12,,,,,,,,,1.0573,0.5,3.5889,0.25
+60,9,,,,,,,,,3.6207,0.4444,3.3219,0.4444

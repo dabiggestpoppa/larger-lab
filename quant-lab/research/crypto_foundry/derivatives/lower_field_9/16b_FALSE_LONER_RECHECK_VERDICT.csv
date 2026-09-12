@@ -1,0 +1,2 @@
+n_false_loners,n_low_vol_normalization_artifact,artifact_share_of_false_loners,median_abs_move_false_loners,median_peer_abs_move_false_loners,verdict
+495,233,0.4707,0.0086,0.0046,ARTIFACT_REDUCED

@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "bybit_delisted_candidates",
+  "description": "Bybit delisted linear recovery probe",
+  "retrieved_at": "2026-08-24T14:06:42+00:00",
+  "access_class": "PUBLIC",
+  "rows": [
+    {
+      "label": "SRMUSDT-instrument",
+      "method": "GET",
+      "url": "https://api.bybit.com/v5/market/instruments-info",
+      "params": {
+        "category": "linear",
+        "symbol": "SRMUSDT"
+      },
+      "json_body": null,
+      "http_status": 403,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "7ef856c945703d5772f1b1f2a8c65913247c9b0769302b10facfe14fa1e2083c",
+      "bytes": 96
+    },
+    {
+      "label": "SRMUSDT-kline",
+      "method": "GET",
+      "url": "https://api.bybit.com/v5/market/kline",
+      "params": {
+        "category": "linear",
+        "symbol": "SRMUSDT",
+        "interval": "D",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 403,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "7ef856c945703d5772f1b1f2a8c65913247c9b0769302b10facfe14fa1e2083c",
+      "bytes": 96
+    },
+    {
+      "label": "FTTUSDT-instrument",
+      "method": "GET",
+      "url": "https://api.bybit.com/v5/market/instruments-info",
+      "params": {
+        "category": "linear",
+        "symbol": "FTTUSDT"
+      },
+      "json_body": null,
+      "http_status": 403,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "7ef856c945703d5772f1b1f2a8c65913247c9b0769302b10facfe14fa1e2083c",
+      "bytes": 96
+    },
+    {
+      "label": "LUNA2USDT-instrument",
+      "method": "GET",
+      "url": "https://api.bybit.com/v5/market/instruments-info",
+      "params": {
+        "category": "linear",
+        "symbol": "LUNA2USDT"
+      },
+      "json_body": null,
+      "http_status": 403,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "7ef856c945703d5772f1b1f2a8c65913247c9b0769302b10facfe14fa1e2083c",
+      "bytes": 96
+    },
+    {
+      "label": "BTCSTUSDT-instrument",
+      "method": "GET",
+      "url": "https://api.bybit.com/v5/market/instruments-info",
+      "params": {
+        "category": "linear",
+        "symbol": "BTCSTUSDT"
+      },
+      "json_body": null,
+      "http_status": 403,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "7ef856c945703d5772f1b1f2a8c65913247c9b0769302b10facfe14fa1e2083c",
+      "bytes": 96
+    },
+    {
+      "label": "HOTUSDT-instrument",
+      "method": "GET",
+      "url": "https://api.bybit.com/v5/market/instruments-info",
+      "params": {
+        "category": "linear",
+        "symbol": "HOTUSDT"
+      },
+      "json_body": null,
+      "http_status": 403,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "7ef856c945703d5772f1b1f2a8c65913247c9b0769302b10facfe14fa1e2083c",
+      "bytes": 96
+    }
+  ],
+  "known_limitations": "Composite probe; per-row status recorded."
+}

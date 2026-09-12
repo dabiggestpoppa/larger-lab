@@ -1,0 +1,130 @@
+{
+  "checkpoint": "CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY",
+  "preregistered_method": "quant-lab/research/crypto_foundry/mech_2/MECH_2_PREREGISTRATION.md (2026-08-21)",
+  "quantile_method": "numpy.percentile linear",
+  "thresholds_computed_from": "frozen DATA-1 datasets (full frozen sample), before any transition/path result inspection",
+  "thresholds": {
+    "BTC": {
+      "basis": {
+        "p10": -6.577962718910118,
+        "p25": -5.651158215649719,
+        "p75": -3.8056159046102183,
+        "p90": -2.808619214243713,
+        "p75_abs": 5.651158215649719,
+        "p90_abs": 6.577962718910118,
+        "n": 3401
+      },
+      "funding": {
+        "p5": -0.11169749999999999,
+        "p25": 0.09835050000000001,
+        "p75": 0.125,
+        "p95": 0.6746435000000001,
+        "n": 28175
+      },
+      "accel": {
+        "mad_bps": 0.04924899999999999,
+        "lag_hours": 24,
+        "n_deltas": 28151
+      },
+      "vol": {
+        "p25": 0.0028407730409933125,
+        "p75": 0.005547509374197954,
+        "p90": 0.007557784119962916,
+        "n": 35016
+      },
+      "premium": {
+        "p10": -4.9677098,
+        "p90": 7.8770558,
+        "n": 28175
+      }
+    },
+    "ETH": {
+      "basis": {
+        "p10": -6.755868450484545,
+        "p25": -5.682160751403105,
+        "p75": -3.7134110697751845,
+        "p90": -2.693626498607895,
+        "p75_abs": 5.688165060689039,
+        "p90_abs": 6.765573157115444,
+        "n": 3401
+      },
+      "funding": {
+        "p5": -0.11641789999999999,
+        "p25": 0.08460100000000001,
+        "p75": 0.125,
+        "p95": 0.7094102,
+        "n": 28175
+      },
+      "accel": {
+        "mad_bps": 0.059981999999999994,
+        "lag_hours": 24,
+        "n_deltas": 28151
+      },
+      "vol": {
+        "p25": 0.003808844483971815,
+        "p75": 0.007490132363017661,
+        "p90": 0.010136553419227612,
+        "n": 35016
+      },
+      "premium": {
+        "p10": -5.2043504,
+        "p90": 8.2302774,
+        "n": 28175
+      }
+    }
+  },
+  "path_classification_precedence": [
+    "CENSORED",
+    "PERSISTENT",
+    "EXPANSION_FIRST_THEN_RESOLVE",
+    "REGIME_SHIFT",
+    "FAST_RESOLUTION",
+    "SLOW_RESOLUTION"
+  ],
+  "min_support": {
+    "usable": 100,
+    "limited": 50,
+    "sparse": 20,
+    "insufficient": 20
+  },
+  "horizons_hours": [
+    1,
+    4,
+    8,
+    24
+  ],
+  "fine_horizons_minutes": [
+    5,
+    15,
+    30
+  ],
+  "vol_lookbacks_hours": [
+    1,
+    4,
+    24
+  ],
+  "label_aliases": {
+    "B2_EXTREME_POSITIVE": "B_EXTREME_POS",
+    "B1_ELEVATED_POSITIVE": "B_ELEVATED_POS",
+    "B0_NORMAL": "B_NORMAL",
+    "B3_ELEVATED_NEGATIVE": "B_ELEVATED_NEG",
+    "B4_EXTREME_NEGATIVE": "B_EXTREME_NEG",
+    "F_POS_EXTREME": "F_EXTREME_POS",
+    "F_POS_ELEVATED": "F_ELEVATED_POS",
+    "F_NORMAL": "F_NORMAL",
+    "F_NEG_ELEVATED": "F_ELEVATED_NEG",
+    "F_NEG_EXTREME": "F_EXTREME_NEG",
+    "F_ACCEL_POS": "F_ACCEL_POS",
+    "F_STABLE": "F_STABLE",
+    "F_ACCEL_NEG": "F_ACCEL_NEG",
+    "V_EXTREME": "V_EXTREME",
+    "V_HIGH": "V_HIGH",
+    "V_NORMAL": "V_NORMAL",
+    "V_LOW": "V_LOW",
+    "MI_STRESS_POSITIVE": "MI_STRESS_POS",
+    "MI_NORMAL": "MI_NORMAL",
+    "MI_STRESS_NEGATIVE": "MI_STRESS_NEG"
+  },
+  "note": "Thresholds are frozen BEFORE transition/path/information results are inspected. No window or threshold is chosen after observing results.",
+  "definitions_hash": "171673b82a7249642a7dfe69bf8d87879dfb3591f18352b00a94e05208c658d0"
+}

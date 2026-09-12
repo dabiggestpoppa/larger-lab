@@ -1,0 +1,8 @@
+primitive,down_side_relation_contagion,up_side_relation_rejoin,n_down,n_up
+correlation_compression,-0.0,-0.011,2462,1185
+liquidity_withdrawal,-0.077,0.01,2394,1162
+peer_stress,0.016,-0.041,2462,1185
+crowded_exits,0.003,-0.009,2462,1185
+rank_health_damage,-0.066,-0.032,2462,1185
+topology_churn,-0.008,-0.028,2461,1185
+fast_propagation,0.01,-0.031,2462,1185

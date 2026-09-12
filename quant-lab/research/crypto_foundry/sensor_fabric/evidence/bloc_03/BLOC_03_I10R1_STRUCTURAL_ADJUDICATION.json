@@ -1,0 +1,100 @@
+{
+  "artifact": "BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json",
+  "checkpoint": "SENSOR-B3-I10R1",
+  "purpose": "SANITIZED LIVE STRUCTURAL CHARACTERIZATION + EVIDENCE ADJUDICATION (pre-repair)",
+  "run_anchor_utc": "2026-09-01T01:49:29.802248Z",
+  "characterization_calls": 2,
+  "retries": 0,
+  "credentials_used": "NONE",
+  "endpoints_authorized": [
+    "https://api.gateio.ws/api/v4/futures/usdt/contract_stats (shared: LIQUIDATION/OPEN_INTEREST/POSITIONING)",
+    "https://futures.kraken.com/api/charts/v1/analytics/PI_XBTUSD/funding"
+  ],
+  "gate_contract_stats": {
+    "adjudication": "B_PROVIDER_SEMANTIC_DRIFT",
+    "current_live_contract": {
+      "http_status": 200,
+      "endpoint_host": "api.gateio.ws",
+      "endpoint_path": "/api/v4/futures/usdt/contract_stats",
+      "params_used": {"contract": "BTC_USDT", "interval": "1h", "limit": 26, "from": "epoch seconds"},
+      "requested_window_utc": ["2026-08-30T23:49:29.802248Z", "2026-08-31T23:49:29.802248Z"],
+      "response_sha256": "af8a400a2ab5c703c96c0bcff07328f4ad30691301548958f3539a89600d4f1f",
+      "rows": 26,
+      "time": {
+        "native_type": "int",
+        "count": 26,
+        "digit_count": "10",
+        "first_few": [1788134400, 1788138000, 1788141600, 1788145200, 1788148800],
+        "min": 1788134400,
+        "max": 1788224400,
+        "step_seconds": 3600,
+        "seconds_interpretation": {"min_utc": "2026-08-31T00:00:00Z", "max_utc": "2026-09-01T01:00:00Z"},
+        "milliseconds_interpretation": {"min_utc": "1970-01-21T16:42:14.400Z", "max_utc": "1970-01-21T16:43:44.400Z"},
+        "temporally_plausible_unit": "epoch seconds (exact hourly step + alignment with requested window)"
+      }
+    },
+    "committed_evidence_reviewed": [
+      "09_SCHEMA_FINGERPRINTS.jsonl gate_futures_{open_interest,liquidation,positioning}_*: `time:int` (unit not pinned)",
+      "live_probe_contracts.yaml: contract_stats request `from` = epoch_seconds; response `time` unit not pinned",
+      "provider_probe_endpoints.yaml: notes request contract only",
+      "I05-era synthetic probe payload tests/.../probe_payloads/gate/contract_stats_success.json: time=1655251200000 (13-digit, epoch ms, 2022-06-14)",
+      "I06 adapter fixture tests/.../gate/fixtures/responses.py contract_stats_row: epoch ms",
+      "I13 probe attempts (quant-lab/data/crypto_sensor_fabric/i13/.../attempts.jsonl): first/last derived via magnitude heuristic (value>1e10 -> ms) — unit-agnostic for both interpretations; raw values not recorded",
+      "I10 BLOC_03_I10_NETWORK_SMOKE_RESULTS.json: actual_first/last = 1970-01-21 derivations (ms interpretation) for a 2026-08-30..31 request"
+    ],
+    "classified_as": "PROVIDER_SEMANTIC_DRIFT",
+    "reasoning": "The current live surface returns 10-digit ints in exact 3600s steps that decode to 2026-08-31T00:00:00Z..2026-09-01T01:00:00Z ONLY under epoch-seconds. Under milliseconds they decode to 1970-01-21 (the I10 artifact), which is a catastrophic unit error for a 2026 request. The only committed ms-class evidence is the I05-era (2022) synthetic probe sample (13-digit). The I13/I13R1-era derived datetimes are unit-agnostic (magnitude heuristic), so they cannot discriminate. Conclusion: the provider's contract_stats `time` was epoch-milliseconds at the 2022-era characterization and is epoch-seconds on the current (Aug/Sep 2026) live surface.",
+    "semantic_validity_intervals": {
+      "old_unit": "epoch milliseconds",
+      "old_validity_evidence": "I05-era sample time=1655251200000 (2022-06-14); I06 adapter fixture",
+      "new_unit": "epoch seconds",
+      "new_validity_first_verified_observation": "I10 live smoke 2026-08-31 (BLOC_03_I10 results) + I10R1 characterization 2026-09-01 (this artifact)",
+      "transition_bound": "between I13R1 RECENT_CONTROL probing (2026-08-23..30, unit-agnostic evidence) and I10 (2026-08-31..09-01, seconds)",
+      "error_class_when_old_rows_recur": "un-derivable convenience datetime -> smoke temporal guard flags; raw native int preserved; NO magnitude rescue"
+    },
+    "raw_rows_committed": "NO (market values not committed; only structure + hash)"
+  },
+  "kraken_funding": {
+    "adjudication_timestamp": "B_FUNDING_SPECIFIC_EPOCH_MILLISECONDS",
+    "current_live_contract": {
+      "http_status": 200,
+      "endpoint_host": "futures.kraken.com",
+      "endpoint_path": "/api/charts/v1/analytics/PI_XBTUSD/funding",
+      "params_used": {"interval": 3600, "since": "epoch seconds", "to": "epoch seconds"},
+      "requested_window_utc": ["2026-08-30T23:49:29.802248Z", "2026-08-31T23:49:29.802248Z"],
+      "response_sha256": "ccf0da44b9ecfbaae8d96ad6d6a4a9df599bfb5bcc63b8b058ea70c2851be070",
+      "result_keys": ["data", "more", "timestamp"],
+      "timestamp": {"native_type": "list[int]", "len": 24},
+      "data": {
+        "exact_metric_key_set": ["rate", "relativeRate"],
+        "column_types_and_lengths": {"rate": "list len 24", "relativeRate": "list len 24"},
+        "cardinality_equals_timestamp_len": true
+      },
+      "temporally_plausible_unit": "epoch milliseconds (13-digit; seconds-class values would NOT overflow the convenience converter and would have produced 2026 datetimes in I10)",
+      "capture_note": "The characterization walker recorded type/len/cardinality but not the literal integer values (capture bug: list-of-int timestamp values were not collected). The raw values are implied: I10's funding convenience timestamps were NULL for all 24 rows, which only happens when the epoch value overflows year-9999 seconds (>= ~2.5e11) — i.e. 13-digit milliseconds. Post-repair recheck artifacts will commit a native timestamp sample (first values) as live proof."
+    },
+    "committed_evidence_reviewed": [
+      "09_SCHEMA_FINGERPRINTS.jsonl kraken_futures_funding_pi_xbtusd_RECENT_CONTROL_1h + 2026_1h: data:dict{rate,relativeRate}, timestamp:list[int] (value unit not pinned)",
+      "kraken/probe.py extraction comment (SENSOR-B2-I13): 'timestamp is epoch seconds for most analytics types and epoch ms for funding'",
+      "kraken README Known Issue #2: probe module observed ms for funding; committed fixture/contract used seconds; ambiguity flagged, adapter used seconds",
+      "I05-era probe payload tests/.../probe_payloads/kraken/funding_analytics_success.json: OLD response shape (data list of {fundingRate} dicts) with epoch-SECOND timestamps — superseded shape, cannot certify current contract",
+      "I13 probe attempts: funding RECENT_CONTROL 168 rows first=2026-08-23T15:00:00Z last=2026-08-30T14:00:00Z (magnitude-heuristic derivation — unit-agnostic)",
+      "I10 BLOC_03_I10 results: funding 24 rows, actual_first/last = NULL (convenience conversion overflow) while sibling analytics paths resolved valid 2026 datetimes from 10-digit seconds"
+    ],
+    "classified_as": "FUNDING-SPECIFIC EPOCH MILLISECONDS (current contract); siblings remain epoch seconds",
+    "reasoning": "I10 proves funding timestamp magnitudes exceed the seconds-converter's representable range (NULL convenience datetimes) while sibling analytics paths decode cleanly as 10-digit seconds; the probe module records the I13 observation 'epoch ms for funding'; today's live capture is structurally consistent (24 int timestamps, matching column cardinality). The old committed funding sample (seconds) belongs to the superseded response shape (data as list of {fundingRate} dicts) and cannot certify the current dict{rate,relativeRate} contract.",
+    "additive_key_adjudication": {
+      "live_exact_keys": ["rate", "relativeRate"],
+      "keys_in_committed_fingerprint": ["rate", "relativeRate"],
+      "genuine_new_key": false,
+      "root_cause_of_i10_additive_flag": "parser funding required-set was {rate} only, so the evidence-backed `relativeRate` key (pinned in 09 fingerprint data:dict{rate,relativeRate}) was mislabeled ADDITIVE on every funding response",
+      "adjudication": "KNOWN_OPTIONAL_UPGRADE_PENDING_OPERATOR_ACCEPTANCE — record relativeRate as known (evidence-backed: fingerprint + live reproduction + stable type/cardinality); does not alter I14 methodology; `rate` semantics unchanged; a genuinely new key remains ADDITIVE/SCHEMA_ADDITIVE_REVIEW",
+      "unknown_additive_promotion": "NONE — no new scientific observable is created; raw payload always preserved"
+    }
+  },
+  "non_mutation_statements": {
+    "original_i10_artifacts": "UNCHANGED (plan/results/evidence md preserved as immutable history)",
+    "i09_matrix": "UNCHANGED",
+    "okx_deribit": "NOT TOUCHED"
+  }
+}

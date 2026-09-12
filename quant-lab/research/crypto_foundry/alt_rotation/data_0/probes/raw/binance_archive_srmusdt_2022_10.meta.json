@@ -1,0 +1,14 @@
+{
+  "probe": "binance_archive_srmusdt_2022_10",
+  "method": "GET",
+  "url": "https://data.binance.vision/data/futures/um/monthly/klines/SRMUSDT/1d/SRMUSDT-1d-2022-10.zip",
+  "request_params": null,
+  "http_status": 200,
+  "ok": true,
+  "access_class": "PUBLIC",
+  "notes": "delisted SRMUSDT monthly klines from official archive (delisted-contract bar recovery test)",
+  "known_limitations": "zip body; 404 = archive does not retain this symbol",
+  "sha256": "9db1d68fb22913db45b39524cb029dc14ce0f0b5c644a710b07b8ced7ab6a60c",
+  "bytes": 1720,
+  "retrieved_at": "2026-08-24T14:14:00+00:00"
+}

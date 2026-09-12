@@ -1,0 +1,4 @@
+persistence_window_days,snapback_date,days_after_peak,sensitivity
+14,2022-06-12,108,STABLE
+30,2022-06-12,108,STABLE
+60,2023-04-05,405,SENSITIVE

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "dexscreener_tokens_weth_retry",
+  "method": "GET",
+  "url": "https://api.dexscreener.com/latest/dex/tokens/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+  "request_params": null,
+  "request_json": null,
+  "retrieved_at": "2026-08-24T14:12:07+00:00",
+  "http_status": null,
+  "ok": false,
+  "error": "ReadTimeout: HTTPSConnectionPool(host='api.dexscreener.com', port=443): Read timed out. (read timeout=60)",
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "bytes": 0,
+  "access_class": "PUBLIC",
+  "notes": "retry after wave-1 timeout",
+  "known_limitations": "endpoint slow/unreachable from some networks"
+}

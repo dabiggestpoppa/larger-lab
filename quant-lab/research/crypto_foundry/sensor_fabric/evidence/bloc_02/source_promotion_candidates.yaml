@@ -1,0 +1,267 @@
+schema_version: '2.0'
+derived_from: SENSOR-B2-I14 evidence-backed decision
+verification_head: 7d5b4372114440ccbe95135fc1ec9fe6d976ceef
+policy: This is the ONLY input list Bloc 3 adapter work may consume.  Roles are final
+  and sensor-specific; a provider excluded here is not available for Bloc 3 production
+  adapters.  Provider identity, PIT requirement, methodology pin and known hazards
+  are mandatory.
+candidates:
+- provider: DERIBIT
+  sensor: MECHANICAL_BOOK_SNAPSHOT
+  allowed_role: CURRENT_ONLY
+  access_path: PUBLIC_REST
+  history_mode: CURRENT_ONLY
+  verified_history: 2026-08-30T13:55:12.240279Z..2026-08-30T13:55:12.240279Z
+  redundancy_class: R2_TWO_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: deribit-book_snapshot
+  known_hazards:
+  - current-only surface (no historical window by nature)
+  evidence_basis:
+  - deribit_book_snapshot_btc-perpetual_RECENT_CONTROL_book_snapshot
+- provider: DERIBIT
+  sensor: MECHANICAL_FUNDING
+  allowed_role: SECONDARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2021-06-15Z..2026-08-23T14:55:12.048205Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: deribit-funding
+  known_hazards: []
+  evidence_basis:
+  - deribit_funding_btc-perpetual_RECENT_CONTROL_1h
+  - deribit_funding_btc-perpetual_2021_1h
+  - deribit_funding_btc-perpetual_2022_1h
+  - deribit_funding_btc-perpetual_2024_1h
+  - deribit_funding_btc-perpetual_2026_1h
+- provider: DERIBIT
+  sensor: MECHANICAL_LIQUIDATION
+  allowed_role: MECHANISM_MICROSCOPE
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2026-08-23T14:55:11.833559Z..2026-08-23T14:55:11.833559Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: deribit-trade-level-liquidation-anatomy
+  known_hazards:
+  - TRADE_LEVEL anatomy microscope (distinct from interval totals)
+  evidence_basis:
+  - deribit_liquidation_btc-perpetual_RECENT_CONTROL_1h
+  - deribit_liquidation_btc-perpetual_2022_1h
+- provider: DERIBIT
+  sensor: MECHANICAL_TRADE
+  allowed_role: MECHANISM_MICROSCOPE
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2026-08-30T13:55:11.474770Z..2026-08-30T13:55:11.474770Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: deribit-trade-level-liquidation-anatomy
+  known_hazards:
+  - TRADE_LEVEL anatomy microscope (distinct from interval totals)
+  evidence_basis:
+  - deribit_trade_btc-perpetual_RECENT_CONTROL_raw_event
+  - deribit_trade_btc-perpetual_2022_raw_event
+  - deribit_trade_btc-perpetual_2021_raw_event
+  - deribit_trade_btc-perpetual_2024_raw_event
+  - deribit_trade_btc-perpetual_2026_raw_event
+- provider: GATE_FUTURES
+  sensor: MECHANICAL_FUNDING
+  allowed_role: SECONDARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2026-06-15Z..2026-08-23T15:44:40.901129Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: gate_futures-funding
+  known_hazards: []
+  evidence_basis:
+  - gate_futures_funding_btc_usdt_RECENT_CONTROL_1h
+  - gate_futures_funding_btc_usdt_2026_1h
+- provider: GATE_FUTURES
+  sensor: MECHANICAL_LIQUIDATION
+  allowed_role: SECONDARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2026-06-15Z..2026-08-23T14:55:06.963000Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: gate_futures-liquidation
+  known_hazards: []
+  evidence_basis:
+  - gate_futures_liquidation_btc_usdt_RECENT_CONTROL_1h
+  - gate_futures_liquidation_btc_usdt_2022_1h
+  - gate_futures_liquidation_btc_usdt_2026_1h
+- provider: GATE_FUTURES
+  sensor: MECHANICAL_OPEN_INTEREST
+  allowed_role: SECONDARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2026-06-15Z..2026-08-23T14:55:05.522441Z
+  redundancy_class: R2_TWO_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: gate_futures-open_interest
+  known_hazards: []
+  evidence_basis:
+  - gate_futures_open_interest_btc_usdt_RECENT_CONTROL_1h
+  - gate_futures_open_interest_btc_usdt_2022_1h
+  - gate_futures_open_interest_btc_usdt_2026_1h
+- provider: GATE_FUTURES
+  sensor: MECHANICAL_POSITIONING
+  allowed_role: SECONDARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2026-06-15Z..2026-08-23T14:55:07.337755Z
+  redundancy_class: R2_TWO_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: gate-contract-stats-public-lsr
+  known_hazards: []
+  evidence_basis:
+  - gate_futures_positioning_btc_usdt_RECENT_CONTROL_1h
+  - gate_futures_positioning_btc_usdt_2022_1h
+  - gate_futures_positioning_btc_usdt_2026_1h
+- provider: KRAKEN_FUTURES
+  sensor: MECHANICAL_BASIS
+  allowed_role: PRIMARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2022-06-15Z..2026-08-23T14:55:04.725011Z
+  redundancy_class: R1_SINGLE_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: kraken_futures-basis
+  known_hazards: []
+  evidence_basis:
+  - kraken_futures_basis_pi_xbtusd_RECENT_CONTROL_1h
+  - kraken_futures_basis_pi_xbtusd_2022_1h
+  - kraken_futures_basis_pi_xbtusd_2021_1h
+  - kraken_futures_basis_pi_xbtusd_2024_1h
+  - kraken_futures_basis_pi_xbtusd_2026_1h
+- provider: KRAKEN_FUTURES
+  sensor: MECHANICAL_BOOK_METRIC
+  allowed_role: PRIMARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2024-06-15Z..2026-08-23T14:55:05.140795Z
+  redundancy_class: R1_SINGLE_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: kraken_futures-book_metric
+  known_hazards: []
+  evidence_basis:
+  - kraken_futures_book_metric_pi_xbtusd_RECENT_CONTROL_1h
+  - kraken_futures_book_metric_pi_xbtusd_2021_1h
+  - kraken_futures_book_metric_pi_xbtusd_2022_1h
+  - kraken_futures_book_metric_pi_xbtusd_2024_1h
+  - kraken_futures_book_metric_pi_xbtusd_2026_1h
+- provider: KRAKEN_FUTURES
+  sensor: MECHANICAL_FUNDING
+  allowed_role: SECONDARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2026-06-15Z..2026-08-23T14:55:04.309346Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: kraken_futures-funding
+  known_hazards: []
+  evidence_basis:
+  - kraken_futures_funding_pi_xbtusd_RECENT_CONTROL_1h
+  - kraken_futures_funding_pi_xbtusd_2022_1h
+  - kraken_futures_funding_pi_xbtusd_2024_1h
+  - kraken_futures_funding_pi_xbtusd_2021_1h
+  - kraken_futures_funding_pi_xbtusd_2026_1h
+- provider: KRAKEN_FUTURES
+  sensor: MECHANICAL_LIQUIDATION
+  allowed_role: PRIMARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2021-06-15Z..2026-08-23T15:39:15.749985Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: kraken-market-analytics-liquidation-volume
+  known_hazards: []
+  evidence_basis:
+  - kraken_futures_liquidation_pi_xbtusd_RECENT_CONTROL_1h
+  - kraken_futures_liquidation_pi_xbtusd_2021_1h
+  - kraken_futures_liquidation_pi_xbtusd_2022_1h
+  - kraken_futures_liquidation_pi_xbtusd_2024_1h
+  - kraken_futures_liquidation_pi_xbtusd_2026_1h
+- provider: KRAKEN_FUTURES
+  sensor: MECHANICAL_OPEN_INTEREST
+  allowed_role: PRIMARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2024-06-15Z..2026-08-23T14:55:03.925948Z
+  redundancy_class: R2_TWO_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: kraken_futures-open_interest
+  known_hazards: []
+  evidence_basis:
+  - kraken_futures_open_interest_pi_xbtusd_RECENT_CONTROL_1h
+  - kraken_futures_open_interest_pi_xbtusd_2022_1h
+  - kraken_futures_open_interest_pi_xbtusd_2024_1h
+  - kraken_futures_open_interest_pi_ethusd_RECENT_CONTROL_1h
+  - kraken_futures_open_interest_pi_ethusd_2022_1h
+  - kraken_futures_open_interest_pi_ethusd_2024_1h
+  - kraken_futures_open_interest_pi_xbtusd_2021_1h
+  - kraken_futures_open_interest_pi_xbtusd_2026_1h
+- provider: KRAKEN_FUTURES
+  sensor: MECHANICAL_POSITIONING
+  allowed_role: PRIMARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2024-06-15Z..2026-08-23T14:55:05.009310Z
+  redundancy_class: R2_TWO_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: kraken_futures-positioning
+  known_hazards: []
+  evidence_basis:
+  - kraken_futures_positioning_pi_xbtusd_RECENT_CONTROL_1h
+  - kraken_futures_positioning_pi_xbtusd_2021_1h
+  - kraken_futures_positioning_pi_xbtusd_2022_1h
+  - kraken_futures_positioning_pi_xbtusd_2024_1h
+  - kraken_futures_positioning_pi_xbtusd_2026_1h
+- provider: OKX_SWAP
+  sensor: MECHANICAL_BOOK_SNAPSHOT
+  allowed_role: CURRENT_ONLY
+  access_path: PUBLIC_REST
+  history_mode: CURRENT_ONLY
+  verified_history: 2026-08-30T13:55:11.250844Z..2026-08-30T13:55:11.250844Z
+  redundancy_class: R2_TWO_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: okx_swap-book_snapshot
+  known_hazards:
+  - current-only surface (no historical window by nature)
+  evidence_basis:
+  - okx_swap_book_snapshot_btc-usdt-swap_RECENT_CONTROL_book_snapshot
+- provider: OKX_SWAP
+  sensor: MECHANICAL_FUNDING
+  allowed_role: PRIMARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2021-06-15Z..2026-08-23T14:55:10.584064Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: okx_swap-funding
+  known_hazards: []
+  evidence_basis:
+  - okx_swap_funding_btc-usdt-swap_RECENT_CONTROL_1h
+  - okx_swap_funding_btc-usdt-swap_2022_1h
+  - okx_swap_funding_btc-usdt-swap_2021_1h
+  - okx_swap_funding_btc-usdt-swap_2024_1h
+  - okx_swap_funding_btc-usdt-swap_2026_1h
+- provider: OKX_SWAP
+  sensor: MECHANICAL_TRADE
+  allowed_role: PRIMARY
+  access_path: PUBLIC_REST
+  history_mode: HISTORICAL
+  verified_history: 2021-06-15Z..2026-08-30T13:55:11.053007Z
+  redundancy_class: R3_THREE_PLUS_INDEPENDENT
+  PIT_requirement: PIT_READY_WITH_METHOD_VERSION
+  methodology_pin: okx_swap-trade
+  known_hazards: []
+  evidence_basis:
+  - okx_swap_trade_btc-usdt-swap_RECENT_CONTROL_raw_event
+  - okx_swap_trade_btc-usdt-swap_2021_raw_event
+  - okx_swap_trade_btc-usdt-swap_2022_raw_event
+  - okx_swap_trade_btc-usdt-swap_2024_raw_event
+  - okx_swap_trade_btc-usdt-swap_2026_raw_event

@@ -1,0 +1,13 @@
+variable,description,layer,source,median_max_abs_r,n_chains_with_data
+tvl_lvl,log chain TVL level,CHAIN,chain flow,0.7834,12
+tvl_chg7,chain TVL 7D change,CHAIN,chain flow,0.5017,12
+tvl_chg30,chain TVL 30D change,CHAIN,chain flow,0.5093,12
+tvl_share,chain TVL share,CHAIN,chain flow,0.7834,12
+imp_share,native improving share,CHAIN,chain_native_aggregates,0.8143,12
+vel7,native median rank velocity 7D,CHAIN,chain_native_aggregates,0.8143,12
+mcshare,native mcap share,CHAIN,chain_native_aggregates,0.721,12
+ret_brd1,native 1D return breadth,CHAIN,chain_native_aggregates,0.1306,12
+sc_chg7,global stablecoin 7D change,GLOBAL,global flow,0.7612,12
+sc_chg30,global stablecoin 30D change,GLOBAL,global flow,0.7713,12
+dex_chg7,global DEX 7D change,GLOBAL,global flow,0.6567,12
+fees_chg7,global fees 7D change,GLOBAL,global flow,0.6567,12

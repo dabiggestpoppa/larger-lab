@@ -1,0 +1,6 @@
+horizon,mean_diagonal_prob
+1D,0.966
+3D,0.9453
+7D,0.92
+14D,0.889
+30D,0.8403

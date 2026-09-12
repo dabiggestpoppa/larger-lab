@@ -1,0 +1,11 @@
+coordinate,pre_2021,during_022_0417,post,z_during_vs_2022,n_pre,n_during,n_post
+common_forcing,1.1219,-0.4744,-1.2815,0.714,360,61,245
+activation_field,0.4928,0.4622,0.4551,0.023,360,61,245
+branch_entropy,0.1041,0.371,0.294,0.194,360,61,245
+branch_count,0.5278,1.3934,1.0857,0.384,360,61,245
+dominant_exit_share,0.3596,0.7752,0.6203,0.392,360,61,245
+breadth_participation,0.485,0.4661,0.4516,0.04,360,61,245
+dispersion,0.9338,0.1451,0.1444,-0.022,360,61,245
+concentration,0.6734,0.6236,0.6314,-0.381,360,61,245
+rank_depth,-0.0646,-0.0073,-0.0185,0.201,360,61,245
+topology_self_transition_rho,,,,,360,61,245

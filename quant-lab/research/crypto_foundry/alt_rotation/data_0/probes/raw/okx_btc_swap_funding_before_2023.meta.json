@@ -1,0 +1,18 @@
+{
+  "probe": "okx_btc_swap_funding_before_2023",
+  "method": "GET",
+  "url": "https://www.okx.com/api/v5/public/funding-rate-history?instId=BTC-USDT-SWAP&before=1672531200000&limit=5",
+  "request_params": {
+    "instId": "BTC-USDT-SWAP",
+    "before": "1672531200000",
+    "limit": "5"
+  },
+  "http_status": 200,
+  "ok": true,
+  "access_class": "PUBLIC",
+  "notes": "OKX funding history before 2023-01-01 \u2014 tests how far back funding history is retained",
+  "known_limitations": "",
+  "sha256": "c1c99ab7496eb11f4e59b55480da4420c8745aa48112fd0bbad87f65d96e29eb",
+  "bytes": 1013,
+  "retrieved_at": "2026-08-24T14:14:04+00:00"
+}

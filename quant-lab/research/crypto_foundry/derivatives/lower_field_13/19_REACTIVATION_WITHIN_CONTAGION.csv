@@ -1,0 +1,12 @@
+dimension,level,n,p_reactivate,static,rolling,note
+species,FAST,522,0.7375,post-event,n/a,
+species,MEDIUM,118,0.6864,post-event,n/a,
+species,SLOW,193,0.5855,post-event,n/a,
+species,PERSISTENT,158,0.6076,post-event,n/a,
+time_since_prior_contagion,0-7d,14,0.9286,n/a,n/a,
+time_since_prior_contagion,8-30d,23,0.6087,n/a,n/a,
+time_since_prior_contagion,31-90d,28,0.6786,n/a,n/a,
+time_since_prior_contagion,90d+,111,0.6847,n/a,n/a,
+capacity,STRUCT_HIGH,511,0.7006,n/a,n/a,
+capacity,STRUCT_LOW,510,0.6725,n/a,n/a,
+VERDICT,RECURRENCE_IS_RECENCY_BOUND,,,,,reactivation concentrates in the first 7d after a prior contagion and in weak-capacity events; consistent with near-frozen prior-contagion x recency status

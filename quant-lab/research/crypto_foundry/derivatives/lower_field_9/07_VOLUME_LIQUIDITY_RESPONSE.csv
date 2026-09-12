@@ -1,0 +1,11 @@
+feature_set,purged_auc_turnover_high,n,note
+volume_amplitude,0.5336,3536,
+abs_return,0.6473,3536,
+abs_return_volume_amplitude,0.5338,3536,
+liq_proxy,0.6642,3536,
+log10_mcap,0.696,3536,
+mcap_quantile,0.6288,3536,
+partial_volamp_turnover_given_abs,0.1004,3536,
+partial_abs_turnover_given_volamp,0.0156,3536,
+spearman_volamp_vs_abs,0.2534,3536,p=0.0
+VERDICT,REDUNDANT,3536,

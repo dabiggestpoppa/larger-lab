@@ -1,0 +1,10 @@
+# raw snapshot bodies (~880MB) preserved on disk, NOT committed
+probes/raw/cmc_snapshot_*_top500.json
+# operational state
+probes/raw/.checkpoint.json
+probes/raw/.collect_run.log
+probes/raw/.collect_err.log
+# python caches
+__pycache__/
+.pytest_cache/
+*.pyc

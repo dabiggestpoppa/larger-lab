@@ -1,0 +1,159 @@
+[
+  {
+    "case": "first_manifest",
+    "current_manifest_id": "pm-1",
+    "expected_current": null,
+    "final_version": 1,
+    "orphan_count": 0,
+    "test_name": "test_first_manifest_v1",
+    "winner_count": 1
+  },
+  {
+    "case": "sequential_v2",
+    "current_manifest_id": "pm-2",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "final_version": 2,
+    "orphan_count": 0,
+    "test_name": "test_sequential_v2",
+    "winner_count": 1
+  },
+  {
+    "candidate_count": 8,
+    "candidate_set_fingerprint": "d04d6ef0a8402ca3143aab4a3eefaca0b711232c3d1a0bb1546bb96d4f79cc2e",
+    "case": "eight_writer_same_base",
+    "current_manifest_id": null,
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "final_version": 2,
+    "loser_count": 7,
+    "orphan_count": 0,
+    "test_name": "test_exactly_one_current_v2",
+    "winner_count": 1,
+    "winner_identity_nondeterministic": true,
+    "winner_in_candidate_set": true
+  },
+  {
+    "case": "stale_writer",
+    "current_manifest_id": "pm-2",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "final_version": 2,
+    "orphan_count": 0,
+    "stale_writer_rejected": true,
+    "test_name": "test_stale_writer_cas_conflict_no_auto_rebase",
+    "winner_count": 1
+  },
+  {
+    "case": "duplicate_exact_manifest",
+    "current_manifest_id": "pm-2",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "final_version": 2,
+    "orphan_count": 0,
+    "second_disposition": "IDEMPOTENT_COMPLETION",
+    "second_idempotent": true,
+    "test_name": "test_idempotent_completion_after_pointer_move",
+    "winner_count": 1
+  },
+  {
+    "case": "identity_conflict",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "final_version": 1,
+    "identity_conflict_raised": true,
+    "orphan_count": 1,
+    "test_name": "test_same_manifest_id_different_content_conflict",
+    "winner_count": 0
+  },
+  {
+    "case": "pointer_P1",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "fault_point": "P1",
+    "fault_raised": true,
+    "final_version": 2,
+    "manifest_published": false,
+    "orphan_count_after_retry": 0,
+    "pointer_version_after_fault": 1,
+    "retry_disposition": "COMMITTED_NEW",
+    "retry_resolves": true,
+    "test_name": "test_pointer_crash_matrix"
+  },
+  {
+    "case": "pointer_P2",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "fault_point": "P2",
+    "fault_raised": true,
+    "final_version": 2,
+    "manifest_published": true,
+    "orphan_count_after_retry": 0,
+    "pointer_version_after_fault": 1,
+    "retry_disposition": "COMMITTED_NEW",
+    "retry_resolves": true,
+    "test_name": "test_pointer_crash_matrix"
+  },
+  {
+    "case": "pointer_P3",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "fault_point": "P3",
+    "fault_raised": true,
+    "final_version": 2,
+    "manifest_published": true,
+    "orphan_count_after_retry": 0,
+    "pointer_version_after_fault": 1,
+    "retry_disposition": "COMMITTED_NEW",
+    "retry_resolves": true,
+    "test_name": "test_pointer_crash_matrix"
+  },
+  {
+    "case": "pointer_P4",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "fault_point": "P4",
+    "fault_raised": true,
+    "final_version": 2,
+    "manifest_published": true,
+    "orphan_count_after_retry": 0,
+    "pointer_version_after_fault": 2,
+    "retry_disposition": "IDEMPOTENT_COMPLETION",
+    "retry_resolves": true,
+    "test_name": "test_pointer_crash_matrix"
+  },
+  {
+    "case": "pointer_P5",
+    "expected_current": [
+      "pm-1",
+      1
+    ],
+    "fault_point": "P5",
+    "fault_raised": true,
+    "final_version": 2,
+    "manifest_published": true,
+    "orphan_count_after_retry": 0,
+    "pointer_version_after_fault": 2,
+    "retry_disposition": "IDEMPOTENT_COMPLETION",
+    "retry_resolves": true,
+    "test_name": "test_pointer_crash_matrix"
+  }
+]

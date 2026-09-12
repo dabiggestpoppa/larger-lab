@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "case": "context_lmid_exact",
+      "durable": true,
+      "expected": "commit_succeeds",
+      "observed_error": null
+    },
+    {
+      "case": "alternate_lmid_same_projection",
+      "expected_error": "LineageContextBindingConflict",
+      "fragment_written": false,
+      "observed_error": "LineageContextBindingConflict"
+    },
+    {
+      "case": "duplicate_lineage_projection_restart",
+      "expected_error": "LineageProjectionIdentityConflict",
+      "observed_error": "LineageProjectionIdentityConflict"
+    },
+    {
+      "case": "idempotent_healthy",
+      "expected": "recommit_succeeds_after_full_revalidation",
+      "observed_error": null
+    },
+    {
+      "case": "idempotent_source_corrupt",
+      "expected": "recommit_fails_no_stale_cache_success",
+      "historical_lineage_durable": true,
+      "observed_error": "ProjectionLineageConflict"
+    },
+    {
+      "case": "idempotent_context_missing",
+      "expected_error": "ProjectionContextMissing",
+      "observed_error": "ProjectionContextMissing"
+    },
+    {
+      "case": "idempotent_artifact_corrupt",
+      "expected": "recommit_fails_via_artifact_verification",
+      "observed_error": "ProjectionCorruption"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R3",
+  "generated_from_fixture": "deterministic (injected clock, fixed ids)",
+  "matrix": "BLOC_04_I05R3_LINEAGE_IDENTITY_MATRIX"
+}

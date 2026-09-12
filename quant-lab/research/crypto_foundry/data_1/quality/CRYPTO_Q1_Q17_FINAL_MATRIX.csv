@@ -1,0 +1,71 @@
+dataset_id,gate_id,gate_name,result,evidence,affected_rows
+bn_btcusdt_spot_5m,Q1,duplicates,PASS,0 duplicate records found out of 420464,0
+bn_btcusdt_spot_5m,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+bn_btcusdt_spot_5m,Q3,invalid_price,PASS,0 records with invalid/nonpositive price,0
+bn_btcusdt_spot_5m,Q4,invalid_size,PASS,0 negative-volume records; 14 zero-volume bars classified VALID_ZERO_ACTIVITY,0
+bn_btcusdt_spot_5m,Q5,missing_intervals,PASS,1 interval gaps detected (expected every 300s) | classified PASS_WITH_DOCUMENTED_SOURCE_GAP (2023-03-24 Binance source outage),1
+bn_ethusdt_spot_5m,Q1,duplicates,PASS,0 duplicate records found out of 420464,0
+bn_ethusdt_spot_5m,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+bn_ethusdt_spot_5m,Q3,invalid_price,PASS,0 records with invalid/nonpositive price,0
+bn_ethusdt_spot_5m,Q4,invalid_size,PASS,0 negative-volume records; 14 zero-volume bars classified VALID_ZERO_ACTIVITY,0
+bn_ethusdt_spot_5m,Q5,missing_intervals,PASS,1 interval gaps detected (expected every 300s) | classified PASS_WITH_DOCUMENTED_SOURCE_GAP (2023-03-24 Binance source outage),1
+hl_btc_perp_state_5m,Q1,duplicates,PASS,0 duplicate records found out of 5041,0
+hl_btc_perp_state_5m,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+hl_btc_perp_state_5m,Q3,invalid_price,PASS,0 records with invalid/nonpositive price,0
+hl_eth_perp_state_5m,Q1,duplicates,PASS,0 duplicate records found out of 5040,0
+hl_eth_perp_state_5m,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+hl_eth_perp_state_5m,Q3,invalid_price,PASS,0 records with invalid/nonpositive price,0
+hl_btc_funding_hourly,Q1,duplicates,PASS,0 duplicate records found out of 28175,0
+hl_btc_funding_hourly,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+hl_btc_funding_hourly,Q8,funding_timestamp_sanity,PASS,0 funding timestamps > 24h from event time,0
+hl_eth_funding_hourly,Q1,duplicates,PASS,0 duplicate records found out of 28175,0
+hl_eth_funding_hourly,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+hl_eth_funding_hourly,Q8,funding_timestamp_sanity,PASS,0 funding timestamps > 24h from event time,0
+hl_btc_book,Q6,crossed_invalid_books,PASS,0 crossed book snapshots,0
+hl_eth_book,Q6,crossed_invalid_books,PASS,0 crossed book snapshots,0
+hl_btc_mark_index_oi,Q7,mark_index_sanity,PASS,0 records with mark/index divergence > 500.0 bps,0
+hl_btc_mark_index_oi,Q9,nonnegative_oi,PASS,0 records with negative OI,0
+hl_eth_mark_index_oi,Q7,mark_index_sanity,PASS,0 records with mark/index divergence > 500.0 bps,0
+hl_eth_mark_index_oi,Q9,nonnegative_oi,PASS,0 records with negative OI,0
+eth_weth_usdc_swap,Q1,duplicates,PASS,0 duplicate records found out of 1057,0
+eth_weth_usdc_swap,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+eth_weth_usdc_swap,Q12,unique_block_tx_log_keys,PASS,0 duplicate block/tx/log keys,0
+eth_weth_usdc_swap,Q10,amm_token_order,PASS,Token ordering is valid,0
+eth_weth_usdc_swap,Q11,pool_identity,PASS,0 records with wrong pool address,0
+eth_wbtc_usdc_swap,Q1,duplicates,PASS,0 duplicate records found out of 205,0
+eth_wbtc_usdc_swap,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+eth_wbtc_usdc_swap,Q12,unique_block_tx_log_keys,PASS,0 duplicate block/tx/log keys,0
+eth_wbtc_usdc_swap,Q10,amm_token_order,PASS,Token ordering is valid,0
+eth_wbtc_usdc_swap,Q11,pool_identity,PASS,0 records with wrong pool address,0
+base_weth_usdc_swap,Q1,duplicates,PASS,0 duplicate records found out of 4035,0
+base_weth_usdc_swap,Q2,monotonic_timestamps,PASS,0 non-monotonic timestamp transitions,0
+base_weth_usdc_swap,Q12,unique_block_tx_log_keys,PASS,0 duplicate block/tx/log keys,0
+base_weth_usdc_swap,Q10,amm_token_order,PASS,Token ordering is valid,0
+base_weth_usdc_swap,Q11,pool_identity,PASS,0 records with wrong pool address,0
+bn_btcusdt_spot_5m,Q14,normalized_from_raw_determinism,PASS,normalize twice identical: True,0
+bn_btcusdt_spot_5m,Q15,future_independent_normalization,PASS,prefix stable under future truncation: True,0
+bn_btcusdt_spot_5m,Q13,replay_determinism,PASS,replay identical: True,0
+hl_btc_perp_state_5m,Q14,normalized_from_raw_determinism,PASS,normalize twice identical: True,0
+hl_btc_perp_state_5m,Q15,future_independent_normalization,PASS,prefix stable under future truncation: True,0
+hl_btc_perp_state_5m,Q13,replay_determinism,PASS,replay identical: True,0
+hl_btc_funding_hourly,Q14,normalized_from_raw_determinism,PASS,normalize twice identical: True,0
+hl_btc_funding_hourly,Q15,future_independent_normalization,PASS,prefix stable under future truncation: True,0
+hl_btc_funding_hourly,Q13,replay_determinism,PASS,replay identical: True,0
+eth_weth_usdc_swap,Q14,normalized_from_raw_determinism,PASS,normalize twice identical: True,0
+eth_weth_usdc_swap,Q15,future_independent_normalization,PASS,prefix stable under future truncation: True,0
+eth_weth_usdc_swap,Q13,replay_determinism,PASS,replay identical: True,0
+base_weth_usdc_swap,Q14,normalized_from_raw_determinism,PASS,normalize twice identical: True,0
+base_weth_usdc_swap,Q15,future_independent_normalization,PASS,prefix stable under future truncation: True,0
+base_weth_usdc_swap,Q13,replay_determinism,PASS,replay identical: True,0
+bn_btcusdt_spot_5m,Q16,schema_validation,PASS,420464/420464 passed SPOT_BAR_REFERENCE,0
+bn_ethusdt_spot_5m,Q16,schema_validation,PASS,420464/420464 passed SPOT_BAR_REFERENCE,0
+hl_btc_perp_state_5m,Q16,schema_validation,PASS,5041/5041 passed SPOT_BAR_REFERENCE,0
+hl_eth_perp_state_5m,Q16,schema_validation,PASS,5040/5040 passed SPOT_BAR_REFERENCE,0
+hl_btc_funding_hourly,Q16,schema_validation,PASS,28175/28175 passed PERP_FUNDING,0
+hl_eth_funding_hourly,Q16,schema_validation,PASS,28175/28175 passed PERP_FUNDING,0
+eth_weth_usdc_swap,Q16,schema_validation,PASS,1057/1057 passed AMM_SWAP,0
+eth_wbtc_usdc_swap,Q16,schema_validation,PASS,205/205 passed AMM_SWAP,0
+base_weth_usdc_swap,Q16,schema_validation,PASS,4035/4035 passed AMM_SWAP,0
+bn_btcusdt_spot_5m,Q17,source_outage_classification,PASS,Binance REST geo-block HTTP 451 (local file provenance used),0
+hl_btc_funding_hourly,Q17,source_outage_classification,PASS,Hyperliquid 500-record page limit; forward pagination applied,0
+eth_weth_usdc_swap,Q17,source_outage_classification,PASS,RPC free-tier archive range limit; recent window only,0

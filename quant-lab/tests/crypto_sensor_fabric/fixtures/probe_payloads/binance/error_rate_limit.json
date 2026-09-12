@@ -1,0 +1,4 @@
+{
+  "code": -1003,
+  "msg": "Too many requests; current limit is 1200 requests per minute."
+}

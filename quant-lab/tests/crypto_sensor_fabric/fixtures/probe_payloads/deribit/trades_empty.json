@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "id": 5,
+  "result": {
+    "trades": [],
+    "has_more": false,
+    "next_offset": null
+  }
+}
