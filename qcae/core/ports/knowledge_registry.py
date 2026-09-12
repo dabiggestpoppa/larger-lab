@@ -128,5 +128,35 @@ class RegistryQuery(ABC):
         - ``latest_contract_version``: highest stored version or None;
         - ``atom_ids``: atoms whose parent_capabilities include the ID;
         - ``composite_member_count``: members in the latest composite, or None;
-        - ``candidate_refs``: candidate_ids claiming the capability's atoms.
+        - ``candidate_refs``: candidate_ids claiming the capability's atoms;
+        - ``repository_revisions``: {repository_id: [revisions]} for the
+          repositories the known candidates are located in (ADR-0007
+          identity/revision split — P1-R1 continuation §8).
+        """
+
+    @abstractmethod
+    def internal_first_findings(self, capability_id: str, contract_id: str,
+                                contract_version: str) -> dict:
+        """Internal-first classification for the future discovery planner
+        (P1-R1 continuation §9). Pure retrieval over durable state; no LLM,
+        no discovery, no capability semantics invented here.
+
+        ``categories`` is a subset of:
+
+        - ``CAPABILITY_ACTIVE`` (A): an ACTIVE receipt matches the
+          capability/contract;
+        - ``EVIDENCE_STALE`` (B): evidence the belief rests on is stale or
+          requires revalidation;
+        - ``CANDIDATE_PREVIOUSLY_FAILED`` (C): an active negative-knowledge
+          record blocks a candidate of this capability's atoms;
+        - ``REVISION_CHANGED`` (D): a candidate's claimed revision is absent
+          from the located repository's stored revisions while other revisions
+          exist (ADR-0007 observation model);
+        - ``DEFINITION_WITHOUT_IMPLEMENTATION`` (E): contract/atoms exist but
+          no candidate claims them;
+        - ``NO_INTERNAL_KNOWLEDGE`` (F): none of the above — nothing useful
+          is held internally.
+
+        ``detail`` carries the supporting durable record references per
+        category. F is reported alone; A–E may combine.
         """

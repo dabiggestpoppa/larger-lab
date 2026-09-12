@@ -92,6 +92,7 @@ class TestKnownCapabilityState:
             "atom_ids": [],
             "composite_member_count": None,
             "candidate_refs": [],
+            "repository_revisions": {},
         }
 
     def test_full_inventory_assembled(self, env) -> None:

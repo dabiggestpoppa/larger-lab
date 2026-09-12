@@ -240,12 +240,14 @@ class SqliteRegistryQuery(RegistryQuery):
         negative: SqliteNegativeKnowledgeRepository,
         evidence_freshness,  # LifecycleLogRepository
         capability_registry=None,  # CapabilityRegistryPort (P1-R1 §11)
+        repository_registry=None,  # RepositoryRegistryPort (P1-R1 continuation §8)
     ) -> None:
         self._receipts = receipts
         self._positive = positive
         self._negative = negative
         self._freshness = evidence_freshness
         self._capabilities = capability_registry
+        self._repositories = repository_registry
 
     def decision_reuse_findings(self, capability_id: str, contract_id: str, contract_version: str) -> dict:
         active = self._receipts.active_for_capability(capability_id)
@@ -303,7 +305,94 @@ class SqliteRegistryQuery(RegistryQuery):
             for cand in self._capabilities.list_candidates_for_atom(atom_id):
                 candidate_ids.add(cand.candidate_id)
         state["candidate_refs"] = sorted(candidate_ids)
+        # repository revisions the known candidates are located in (ADR-0007)
+        repo_revisions: dict = {}
+        if self._repositories is not None:
+            for atom_id in state["atom_ids"]:
+                for cand in self._capabilities.list_candidates_for_atom(atom_id):
+                    ref = cand.source_ref
+                    if ref.startswith("repo:"):
+                        repo_id = ref[len("repo:"):]
+                        revs = self._repositories.list_revisions(repo_id)
+                        if revs:
+                            repo_revisions[repo_id] = sorted(
+                                r.revision for r in revs)
+        state["repository_revisions"] = repo_revisions
         return state
+
+    def internal_first_findings(self, capability_id: str, contract_id: str,
+                                contract_version: str) -> dict:
+        """P1-R1 continuation §9: structured A–F internal-first classification.
+        Pure retrieval; the P3 planner decides what to do with it."""
+        categories: List[str] = []
+        detail: dict = {}
+
+        # A — capability active
+        active = self._receipts.active_for_capability(capability_id) \
+            if self._receipts is not None else []
+        matched = [r for r in active
+                   if r.contract_id == contract_id
+                   and r.contract_version == contract_version]
+        if matched:
+            categories.append("CAPABILITY_ACTIVE")
+            detail["CAPABILITY_ACTIVE"] = [r.receipt_id for r in matched]
+
+        # B — evidence stale
+        stale = self._stale_evidence_ids()
+        if stale:
+            categories.append("EVIDENCE_STALE")
+            detail["EVIDENCE_STALE"] = stale
+
+        # C — candidate previously failed
+        blocked: List[str] = []
+        if self._capabilities is not None:
+            atoms = self._capabilities.list_atoms_for_capability(capability_id)
+            atom_ids = sorted({a.atom_id for a in atoms})
+            for n in self._negative.active():
+                if not n.retry_allowed and n.subject_id in atom_ids:
+                    blocked.append(n.record_id)
+            if blocked:
+                categories.append("CANDIDATE_PREVIOUSLY_FAILED")
+                detail["CANDIDATE_PREVIOUSLY_FAILED"] = blocked
+
+            # D — revision changed (ADR-0007): candidate's claimed revision is
+            # absent from the located repository's stored revisions
+            revision_changed: List[str] = []
+            if self._repositories is not None:
+                for atom_id in atom_ids:
+                    for cand in self._capabilities.list_candidates_for_atom(atom_id):
+                        ref = cand.source_ref
+                        if not ref.startswith("repo:"):
+                            continue
+                        repo_id = ref[len("repo:"):]
+                        stored = {r.revision
+                                  for r in self._repositories.list_revisions(repo_id)}
+                        if stored and cand.revision not in stored:
+                            revision_changed.append(cand.candidate_id)
+            if revision_changed:
+                categories.append("REVISION_CHANGED")
+                detail["REVISION_CHANGED"] = sorted(set(revision_changed))
+
+            # E — definition without implementation
+            if atom_ids and not any(
+                self._capabilities.list_candidates_for_atom(a) for a in atom_ids
+            ):
+                categories.append("DEFINITION_WITHOUT_IMPLEMENTATION")
+                detail["DEFINITION_WITHOUT_IMPLEMENTATION"] = atom_ids
+        else:
+            atom_ids = []
+
+        # F — no internal knowledge at all
+        contracts_known = (
+            self._capabilities.list_contract_versions(capability_id)
+            if self._capabilities is not None else []
+        )
+        if not categories and not contracts_known:
+            categories.append("NO_INTERNAL_KNOWLEDGE")
+            detail["NO_INTERNAL_KNOWLEDGE"] = []
+
+        return {"capability_id": capability_id, "categories": categories,
+                "detail": detail}
 
     def _stale_evidence_ids(self) -> List[str]:
         rows = self._conn_freshness_rows()
