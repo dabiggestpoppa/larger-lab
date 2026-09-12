@@ -106,7 +106,7 @@ class TestDecisionReuse:
         """9.7 order: active receipt + matching positive knowledge + no
         negative blocks => QCAE can skip external discovery."""
         env["rcpt"].add(_receipt(receipt_id="r1"))
-        env["pos"].add(_positive(env["pos"]))
+        _positive(env["pos"])
         env["conn"].commit()
         findings = env["query"].decision_reuse_findings(
             "CAP-REPLAY-001", "CAP-REPLAY-001", "1.0.0"
@@ -120,7 +120,7 @@ class TestDecisionReuse:
     def test_negative_block_prevents_rediscovery_loop(self, env) -> None:
         """9.7 anti-loop: a prior unrecoverable failure blocks rerunning."""
         env["rcpt"].add(_receipt(receipt_id="r1"))
-        env["pos"].add(_positive(env["pos"]))
+        _positive(env["pos"])
         env["neg"].add(_negative())  # retry_allowed=False for same source/revision
         env["conn"].commit()
         findings = env["query"].decision_reuse_findings(
