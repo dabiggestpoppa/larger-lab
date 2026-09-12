@@ -115,7 +115,8 @@ class BackupService:
         """Row counts for every registry table present (P1-R1 §10)."""
         tables = (
             "capability_contract", "capability_atom", "composite_capability",
-            "candidate", "repository_record", "graph_relationship",
+            "candidate", "repository_record", "repository_revision",
+            "graph_relationship",
             "negative_knowledge", "positive_knowledge", "capability_receipt",
             "external_registry_ref",
         )

@@ -78,6 +78,11 @@ def _build_full_registry_state(tmp_path):
     repos.add(RepositoryRecord(
         repository_id="repo-1", source_kind=RepositorySourceKind.GIT,
         canonical_locator="git+https://example.com/owner/impl-a", revision="abc123"))
+    # ADR-0007: a second observed revision of the SAME repository identity —
+    # backup/restore must carry full revision history, not just the identity row
+    repos.add(RepositoryRecord(
+        repository_id="repo-1", source_kind=RepositorySourceKind.GIT,
+        canonical_locator="git+https://example.com/owner/impl-a", revision="def456"))
 
     rel.add(_edge())
     conn.commit()
@@ -107,6 +112,7 @@ class TestRegistryBackupRestore:
         assert manifest["registry_rows"]["composite_capability"] == 1
         assert manifest["registry_rows"]["candidate"] == 1
         assert manifest["registry_rows"]["repository_record"] == 1
+        assert manifest["registry_rows"]["repository_revision"] == 2
         assert manifest["registry_rows"]["graph_relationship"] == 1
         conn.close()
 
@@ -131,11 +137,14 @@ class TestRegistryBackupRestore:
         # composition survives
         members = caps2.member_atoms("CAP-REPLAY-001", 1)
         assert [a.atom_id for a in members] == ["atom-replay"]
-        # repository identity survives, and its revision history with it
+        # repository identity survives, and its FULL revision history with it
         repo = repos2.get("repo-1")
         assert repo is not None and repo.revision == "abc123"
         revisions = repos2.list_revisions("repo-1")
-        assert [r.revision for r in revisions] == ["abc123"]
+        assert {r.revision for r in revisions} == {"abc123", "def456"}
+        # exact-revision lookup resolves both restored observation records
+        assert repos2.get_revision_of("repo-1", "def456") is not None
+        assert repos2.get_revision_of("repo-1", "abc123") is not None
         # linking graph survives
         edges = rel2.edges_implementing(EntityType.CAPABILITY_ATOM, "atom-replay")
         assert len(edges) == 1 and edges[0].source.entity_id == "cand-1"
