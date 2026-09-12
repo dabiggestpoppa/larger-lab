@@ -16,9 +16,10 @@ fixed identities, generation-twice byte-stability asserted):
 from __future__ import annotations
 
 import json
-import shutil
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
+
+import pyarrow as pa
 
 from crypto_sensor_fabric.storage.blob_store import LocalBlobStore
 from crypto_sensor_fabric.storage.catalog import (
@@ -26,7 +27,10 @@ from crypto_sensor_fabric.storage.catalog import (
     BlobMetadataRepository,
 )
 from crypto_sensor_fabric.storage.enums import StorageEncoding
-from crypto_sensor_fabric.storage.json_catalog import DurableJsonCatalog
+from crypto_sensor_fabric.storage.json_catalog import (
+    DurableJsonCatalog,
+    catalog_physical_key,
+)
 from crypto_sensor_fabric.storage.models import (
     AcquisitionRecord,
     ProjectionLineage,
@@ -48,20 +52,17 @@ from crypto_sensor_fabric.storage.projections import (
 FIXED = datetime(2026, 9, 12, 12, 0, 0, tzinfo=UTC)
 UTC_M5 = timezone(timedelta(hours=-5))
 MEDIA = "application/json"
-ROOT = Path("C:/tmp_r3e_proj")
 EVIDENCE_DIR = (
     Path(__file__).parent.parent.parent.parent
     / "research" / "crypto_foundry" / "sensor_fabric" / "evidence" / "bloc_04"
 )
 
 
-def _dump_stable(path: Path, payload: dict) -> bytes:
-    raw = json.dumps(
+def stable_evidence_bytes(payload: dict) -> bytes:
+    """Canonical serializer for deterministic evidence payloads (I05R4 §31)."""
+    return json.dumps(
         payload, sort_keys=True, ensure_ascii=False, indent=2
     ).encode("utf-8")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(raw)
-    return raw
 
 
 def _err_name(exc: BaseException | None) -> str | None:
@@ -95,13 +96,15 @@ def _acq(acq_id: str, sha: str) -> AcquisitionRecord:
 
 
 class Stack:
-    """Minimal real chain with INJECTED clocks (byte-stable evidence)."""
+    """Minimal real chain with INJECTED clocks (byte-stable evidence).
+
+    I05R4 §16: the T0B catalog root is derived from the pytest tmp_path —
+    no global workstation path.
+    """
 
     def __init__(self, tmp_path: Path) -> None:
-        if ROOT.exists():
-            shutil.rmtree(ROOT)
-        ROOT.mkdir(parents=True)
-        self.root = ROOT
+        self.root = tmp_path / "t0b"
+        self.root.mkdir(parents=True, exist_ok=True)
         self.t0a = tmp_path / "t0a"
         self.t0a.mkdir(parents=True, exist_ok=True)
         self.store = LocalBlobStore(str(self.t0a), clock=lambda: FIXED)
@@ -138,27 +141,18 @@ class Stack:
         )
         return self
 
-    def close(self) -> None:
-        if ROOT.exists():
-            shutil.rmtree(ROOT, ignore_errors=True)
+    def close(self) -> None:  # pragma: no cover - tmp_path cleanup is automatic
+        pass
 
     def definition(self) -> ProjectionSchemaDefinition:
         return ProjectionSchemaDefinition(
             projection_schema_id="r3e.market.projection",
             projection_schema_version="1.0.0",
-            provider_native_schema=__import__(
-                "pyarrow", fromlist=["schema"]
-            ).schema(
+            provider_native_schema=pa.schema(
                 [
-                    __import__("pyarrow", fromlist=["field"]).field(
-                        "price", __import__("pyarrow").float64(), nullable=False
-                    ),
-                    __import__("pyarrow", fromlist=["field"]).field(
-                        "qty", __import__("pyarrow").int64(), nullable=True
-                    ),
-                    __import__("pyarrow", fromlist=["field"]).field(
-                        "symbol", __import__("pyarrow").string(), nullable=False
-                    ),
+                    pa.field("price", pa.float64(), nullable=False),
+                    pa.field("qty", pa.int64(), nullable=True),
+                    pa.field("symbol", pa.string(), nullable=False),
                 ]
             ),
         )
@@ -285,8 +279,8 @@ def _build_lineage_identity_matrix(tmp_path: Path) -> dict:
         except Exception as exc:  # noqa: BLE001
             raised = exc
         frag = (
-            ROOT / "catalogs" / "manifests" / "projection_lineage"
-            / f"{__import__('hashlib').sha256(b'lm-alt2').hexdigest()}.json"
+            s.root / "catalogs" / "manifests" / "projection_lineage"
+            / catalog_physical_key("lm-alt2")
         )
         cases.append({
             "case": "alternate_lmid_same_projection",
@@ -310,7 +304,7 @@ def _build_lineage_identity_matrix(tmp_path: Path) -> dict:
         )
         # Tamper via the raw catalog (legacy/tampered disk simulation).
         raw = DurableJsonCatalog(
-            ROOT / "catalogs" / "manifests" / "projection_lineage",
+            s.root / "catalogs" / "manifests" / "projection_lineage",
             logical_id_field="lineage_manifest_id",
         )
         raw.commit(
@@ -401,7 +395,7 @@ def _build_lineage_identity_matrix(tmp_path: Path) -> dict:
         )
         entries = [_lineage("lm-li6", "proj-li6", sha, "acq-li6")]
         s.lineage.commit("lm-li6", entries)
-        for frag in (ROOT / "catalogs" / "manifests" / "projection_context").glob(
+        for frag in (s.root / "catalogs" / "manifests" / "projection_context").glob(
             "*.json"
         ):
             frag.unlink()
@@ -428,7 +422,7 @@ def _build_lineage_identity_matrix(tmp_path: Path) -> dict:
         )
         entries = [_lineage("lm-li7", "proj-li7", sha, "acq-li7")]
         s.lineage.commit("lm-li7", entries)
-        physical = ROOT / artifact.projection_uri
+        physical = s.root / artifact.projection_uri
         physical.write_bytes(b"CORRUPTED-T0B")
         raised = None
         try:
@@ -571,32 +565,62 @@ def _build_time_contract_matrix() -> dict:
 
 
 class TestI05R3Evidence:
-    def test_lineage_identity_matrix_deterministic(self, tmp_path: Path) -> None:
+    """I05R4 §10-§13: evidence tests are READ-ONLY.
+
+    Generation happens in memory; canonical bytes are compared against the
+    COMMITTED evidence file.  No write to EVIDENCE_DIR ever occurs from a
+    test — a future behavior change that alters matrix output FAILS here
+    instead of silently rewriting governance history.
+    """
+
+    def test_lineage_identity_matrix_matches_committed(
+        self, tmp_path: Path
+    ) -> None:
         matrix = _build_lineage_identity_matrix(tmp_path)
-        raw1 = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R3_LINEAGE_IDENTITY_MATRIX.json", matrix
-        )
-        # Second generation must be byte-identical.
+        raw1 = stable_evidence_bytes(matrix)
+        # Generation #2 (independent fixture tree) must be byte-identical.
         matrix2 = _build_lineage_identity_matrix(tmp_path / "second")
-        raw2 = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R3_LINEAGE_IDENTITY_MATRIX.json", matrix2
-        )
-        assert raw1 == raw2
+        assert raw1 == stable_evidence_bytes(matrix2)
         assert len(matrix["cases"]) == 7
         assert cases_ok(matrix["cases"])
+        # §13: the regenerated bytes must equal the COMMITTED artifact.
+        committed = (
+            EVIDENCE_DIR / "BLOC_04_I05R3_LINEAGE_IDENTITY_MATRIX.json"
+        ).read_bytes()
+        assert raw1 == committed
 
-    def test_time_contract_matrix_deterministic(self, tmp_path: Path) -> None:
+    def test_time_contract_matrix_matches_committed(self, tmp_path: Path) -> None:
         matrix = _build_time_contract_matrix()
-        raw1 = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R3_TIME_CONTRACT_MATRIX.json", matrix
-        )
+        raw1 = stable_evidence_bytes(matrix)
         matrix2 = _build_time_contract_matrix()
-        raw2 = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R3_TIME_CONTRACT_MATRIX.json", matrix2
-        )
-        assert raw1 == raw2
+        assert raw1 == stable_evidence_bytes(matrix2)
         assert len(matrix["cases"]) == 8
         assert cases_ok(matrix["cases"])
+        committed = (
+            EVIDENCE_DIR / "BLOC_04_I05R3_TIME_CONTRACT_MATRIX.json"
+        ).read_bytes()
+        assert raw1 == committed
+
+    def test_evidence_tree_not_written_by_generation(
+        self, tmp_path: Path
+    ) -> None:
+        """§36.4/§36.7: running the generators leaves committed evidence
+        bytes byte-identical — the read-only policy is itself proven."""
+        before = {
+            p.name: p.read_bytes()
+            for p in EVIDENCE_DIR.glob("BLOC_04_I05R3_*.json")
+        }
+        _build_lineage_identity_matrix(tmp_path)
+        _build_time_contract_matrix()
+        after = {
+            p.name: p.read_bytes()
+            for p in EVIDENCE_DIR.glob("BLOC_04_I05R3_*.json")
+        }
+        assert before == after
+        assert set(before) >= {
+            "BLOC_04_I05R3_LINEAGE_IDENTITY_MATRIX.json",
+            "BLOC_04_I05R3_TIME_CONTRACT_MATRIX.json",
+        }
 
 
 def cases_ok(cases: list[dict]) -> bool:

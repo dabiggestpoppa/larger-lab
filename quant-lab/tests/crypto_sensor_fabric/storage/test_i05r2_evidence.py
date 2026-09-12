@@ -81,6 +81,13 @@ NATIVE = pa.schema(
 FULL_SCHEMA = pa.schema(list(NATIVE) + list(T0_METADATA_SCHEMA))
 
 
+def stable_evidence_bytes(payload: dict) -> bytes:
+    """Canonical serializer (I05R4 §31) — no publication side effects."""
+    return json.dumps(
+        payload, sort_keys=True, ensure_ascii=False, indent=2
+    ).encode("utf-8")
+
+
 def _dump_stable(path: Path, payload: dict) -> bytes:
     raw = json.dumps(
         payload, sort_keys=True, ensure_ascii=False, indent=2
@@ -815,12 +822,12 @@ class TestPublicApiMatrix:
     def test_deterministic_generation(self, tmp_path: Path) -> None:
         first = _public_api_matrix(tmp_path / "a")
         second = _public_api_matrix(tmp_path / "b")
-        raw = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R2_PUBLIC_API_MATRIX.json", first
-        )
-        assert raw == json.dumps(
-            second, sort_keys=True, ensure_ascii=False, indent=2
-        ).encode("utf-8")
+        raw = stable_evidence_bytes(first)
+        assert raw == stable_evidence_bytes(second)
+        # I05R4 §10: READ-ONLY — compare to the committed artifact bytes.
+        assert raw == (
+            EVIDENCE_DIR / "BLOC_04_I05R2_PUBLIC_API_MATRIX.json"
+        ).read_bytes()
 
     def test_required_cases_present(self, tmp_path: Path) -> None:
         matrix = _public_api_matrix(tmp_path)
@@ -840,12 +847,11 @@ class TestPhysicalSchemaMatrix:
     def test_deterministic_generation(self, tmp_path: Path) -> None:
         first = _physical_schema_matrix(tmp_path / "a")
         second = _physical_schema_matrix(tmp_path / "b")
-        raw = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R2_PHYSICAL_SCHEMA_MATRIX.json", first
-        )
-        assert raw == json.dumps(
-            second, sort_keys=True, ensure_ascii=False, indent=2
-        ).encode("utf-8")
+        raw = stable_evidence_bytes(first)
+        assert raw == stable_evidence_bytes(second)
+        assert raw == (
+            EVIDENCE_DIR / "BLOC_04_I05R2_PHYSICAL_SCHEMA_MATRIX.json"
+        ).read_bytes()
 
     def test_required_cases_present(self, tmp_path: Path) -> None:
         matrix = _physical_schema_matrix(tmp_path)
@@ -869,12 +875,11 @@ class TestCrashBoundaryMatrix:
     def test_deterministic_generation(self, tmp_path: Path) -> None:
         first = _crash_boundary_matrix(tmp_path / "a")
         second = _crash_boundary_matrix(tmp_path / "b")
-        raw = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R2_CRASH_BOUNDARY_MATRIX.json", first
-        )
-        assert raw == json.dumps(
-            second, sort_keys=True, ensure_ascii=False, indent=2
-        ).encode("utf-8")
+        raw = stable_evidence_bytes(first)
+        assert raw == stable_evidence_bytes(second)
+        assert raw == (
+            EVIDENCE_DIR / "BLOC_04_I05R2_CRASH_BOUNDARY_MATRIX.json"
+        ).read_bytes()
 
     def test_after_write_boundary_proves_zero_file_fsyncs(
         self, tmp_path: Path

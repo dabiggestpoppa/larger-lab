@@ -68,7 +68,9 @@ class Chain:
     def __init__(self, tmp_path: Path, *, fresh_t0b: bool = True) -> None:
         import shutil
 
-        self.root = Path("C:/tmp_e2e_proj")
+        # I05R4 §16: portable per-test T0B root derived from pytest tmp_path
+        # — no global workstation path.
+        self.root = tmp_path / "t0b"
         if fresh_t0b:
             if self.root.exists():
                 shutil.rmtree(self.root)
@@ -273,14 +275,8 @@ class Chain:
         )
 
 
-def teardown_function() -> None:
-    import shutil
-
-    root = Path("C:/tmp_e2e_proj")
-    if root.exists():
-        shutil.rmtree(root)
-
-
+# I05R4 §10/§16: tests own no global T0B state; every Chain is rooted in
+# its own pytest tmp_path, so no teardown of a workstation path is needed.
 # ---------------------------------------------------------------------------
 # Real end-to-end chains
 # ---------------------------------------------------------------------------

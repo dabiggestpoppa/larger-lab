@@ -59,11 +59,11 @@ NATIVE = pa.schema(
 )
 
 
-def _dump_stable(path: Path, payload: dict) -> bytes:
-    raw = json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2).encode("utf-8")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(raw)
-    return raw
+def stable_evidence_bytes(payload: dict) -> bytes:
+    """Canonical serializer (I05R4 §31) — no publication side effects."""
+    return json.dumps(
+        payload, sort_keys=True, ensure_ascii=False, indent=2
+    ).encode("utf-8")
 
 
 class Stack:
@@ -866,11 +866,14 @@ def _schema_fidelity_matrix() -> dict:
 
 class TestDurabilityMatrix:
     def test_deterministic_generation(self, tmp_path: Path) -> None:
+        """I05R4 §10: READ-ONLY — generate in memory, compare to committed."""
         first = _durability_matrix(tmp_path / "a")
         second = _durability_matrix(tmp_path / "b")
-        raw = _dump_stable(EVIDENCE_DIR / "BLOC_04_I05R1_DURABILITY_MATRIX.json", first)
-        assert raw == json.dumps(second, sort_keys=True, ensure_ascii=False,
-                                 indent=2).encode("utf-8")
+        raw = stable_evidence_bytes(first)
+        assert raw == stable_evidence_bytes(second)
+        assert raw == (
+            EVIDENCE_DIR / "BLOC_04_I05R1_DURABILITY_MATRIX.json"
+        ).read_bytes()
 
     def test_all_cases_deterministic_fields(self, tmp_path: Path) -> None:
         matrix = _durability_matrix(tmp_path)
@@ -881,13 +884,14 @@ class TestDurabilityMatrix:
 
 class TestEndToEndLineageMatrix:
     def test_deterministic_generation(self, tmp_path: Path) -> None:
+        """I05R4 §10: READ-ONLY — generate in memory, compare to committed."""
         first = _end_to_end_matrix(tmp_path / "a")
         second = _end_to_end_matrix(tmp_path / "b")
-        raw = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R1_END_TO_END_LINEAGE_MATRIX.json", first
-        )
-        assert raw == json.dumps(second, sort_keys=True, ensure_ascii=False,
-                                 indent=2).encode("utf-8")
+        raw = stable_evidence_bytes(first)
+        assert raw == stable_evidence_bytes(second)
+        assert raw == (
+            EVIDENCE_DIR / "BLOC_04_I05R1_END_TO_END_LINEAGE_MATRIX.json"
+        ).read_bytes()
 
     def test_required_cases_present(self, tmp_path: Path) -> None:
         matrix = _end_to_end_matrix(tmp_path)
@@ -905,13 +909,14 @@ class TestEndToEndLineageMatrix:
 
 class TestSchemaFidelityMatrix:
     def test_deterministic_generation(self) -> None:
+        """I05R4 §10: READ-ONLY — generate in memory, compare to committed."""
         first = _schema_fidelity_matrix()
         second = _schema_fidelity_matrix()
-        raw = _dump_stable(
-            EVIDENCE_DIR / "BLOC_04_I05R1_SCHEMA_FIDELITY_MATRIX.json", first
-        )
-        assert raw == json.dumps(second, sort_keys=True, ensure_ascii=False,
-                                 indent=2).encode("utf-8")
+        raw = stable_evidence_bytes(first)
+        assert raw == stable_evidence_bytes(second)
+        assert raw == (
+            EVIDENCE_DIR / "BLOC_04_I05R1_SCHEMA_FIDELITY_MATRIX.json"
+        ).read_bytes()
 
     def test_required_cases_present(self) -> None:
         matrix = _schema_fidelity_matrix()
