@@ -93,6 +93,7 @@ class CapabilityContract(SerializableRecord):
     def validate(self) -> None:
         # Identity (canon 1.1.5: capability identity is behavior, not product).
         require_identifier(self.capability_id, "capability_id")
+        require_identifier(self.request_id, "request_id")
         require_non_empty_str(self.title, "title")
         require_non_empty_str(self.problem_statement, "problem_statement")
         require_non_empty_str(self.intent, "intent")
@@ -115,6 +116,9 @@ class CapabilityContract(SerializableRecord):
         require_str_list(self.required_behaviors, "required_behaviors")
         require_str_list(self.optional_behaviors, "optional_behaviors")
         require_str_list(self.explicit_non_goals, "explicit_non_goals")
+        require_str_list(self.inputs, "inputs")
+        require_str_list(self.outputs, "outputs")
+        require_str_list(self.forbidden_conditions, "forbidden_conditions")
 
         # Observable success before promotion (canon 1.1.9).
         if not self.acceptance_tests:
@@ -144,8 +148,28 @@ class CapabilityContract(SerializableRecord):
                 f"behaviors cannot be both required and optional: {optional_overlap}"
             )
 
+        # Every declared string-tuple field participates in canonical contract
+        # semantics and is shape-validated (P0-A001-04 operator repair).
+        for field_name in (
+            "performance_requirements",
+            "precision_requirements",
+            "latency_requirements",
+            "throughput_requirements",
+            "runtime_constraints",
+            "platform_constraints",
+            "language_constraints",
+            "integration_constraints",
+            "license_constraints",
+            "cost_constraints",
+            "maintenance_constraints",
+        ):
+            require_str_list(getattr(self, field_name), field_name)
+
         require_no_duplicates(self.required_behaviors, "required_behaviors")
         require_no_duplicates(self.acceptance_tests, "acceptance_tests")
+        require_no_duplicates(self.optional_behaviors, "optional_behaviors")
+        require_no_duplicates(self.explicit_non_goals, "explicit_non_goals")
+        require_no_duplicates(self.forbidden_conditions, "forbidden_conditions")
 
         # Evidence classes must be concrete members.
         for evidence in self.required_evidence_classes:
