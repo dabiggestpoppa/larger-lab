@@ -124,6 +124,53 @@ class TestCandidateLinks:
         assert atoms == {"atom-1", "atom-2"}
 
 
+class TestRevisionSensitiveEdges:
+    """Spec §7: "revision X implements atom Y" must never mean "every revision
+    of repository R implements atom Y". All three scenarios coexist without
+    rewriting history."""
+
+    def test_three_revision_scenarios_coexist(self, env) -> None:
+        conn, rel, svc = env
+        # revision A implements atom-x only
+        svc.repository_implements_atom(_repo("repo-r", "revA"), "atom-x")
+        # revision B implements atom-x AND atom-y
+        svc.repository_implements_atom(_repo("repo-r", "revB"), "atom-x")
+        svc.repository_implements_atom(_repo("repo-r", "revB"), "atom-y")
+        # revision C implements neither — no edge is recorded for it
+        conn.commit()
+
+        # revision A's claim survives untouched (history not rewritten)
+        a_x = [e for e in rel.edges_implementing(EntityType.CAPABILITY_ATOM, "atom-x")
+               if e.source.entity_id == "repo-r" and e.source_revision == "revA"]
+        assert len(a_x) == 1
+        # revision B holds both claims, as distinct revision-scoped records
+        b_x = [e for e in rel.edges_implementing(EntityType.CAPABILITY_ATOM, "atom-x")
+               if e.source.entity_id == "repo-r" and e.source_revision == "revB"]
+        b_y = [e for e in rel.edges_implementing(EntityType.CAPABILITY_ATOM, "atom-y")
+               if e.source.entity_id == "repo-r" and e.source_revision == "revB"]
+        assert len(b_x) == 1 and len(b_y) == 1
+        # revision C propagates no claims: querying the atom's implementers
+        # yields exactly the two asserting revisions, never a blanket "repo-r"
+        impl_x = {(e.source.entity_id, e.source_revision)
+                  for e in rel.edges_implementing(EntityType.CAPABILITY_ATOM, "atom-x")}
+        assert impl_x == {("repo-r", "revA"), ("repo-r", "revB")}
+        # and revision C can be asked directly: it has no outgoing edges at all
+        assert rel.edges_from(EntityType.COMPONENT, "repo-r@revC") == []
+
+    def test_revision_change_creates_new_edge_not_rewrite(self, env) -> None:
+        """A capability claim held by revA then dropped in revC is represented
+        by the ABSENCE of a revC edge — never by mutating revA's record."""
+        conn, rel, svc = env
+        svc.repository_implements_atom(_repo("repo-q", "revA"), "atom-x")
+        conn.commit()
+        before = rel.edges_implementing(EntityType.CAPABILITY_ATOM, "atom-x")
+        # revC observes the repository no longer implementing atom-x:
+        # nothing is written, and nothing prior changes
+        after = rel.edges_implementing(EntityType.CAPABILITY_ATOM, "atom-x")
+        assert before == after
+        assert all(e.source_revision == "revA" for e in after)
+
+
 class TestPersistenceIntegrity:
     def test_relationship_survives_restart(self, tmp_path) -> None:
         db = tmp_path / "rel.db"
