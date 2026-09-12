@@ -140,6 +140,20 @@ class TestRequestContract:
         with pytest.raises(QcaeValidationError, match="provenance"):
             request_handoff(provenance=None).validate()
 
+    def test_malformed_provenance_missing_producer_rejected(self) -> None:
+        with pytest.raises(QcaeValidationError, match="producer"):
+            request_handoff(provenance=provenance(producer="")).validate()
+
+    def test_malformed_provenance_missing_created_at_rejected(self) -> None:
+        with pytest.raises(QcaeValidationError, match="created_at"):
+            request_handoff(provenance=provenance(created_at="")).validate()
+
+    def test_malformed_provenance_bad_evidence_hash_rejected(self) -> None:
+        with pytest.raises(QcaeValidationError, match="evidence_hashes"):
+            request_handoff(
+                provenance=provenance(evidence_hashes=("definitely-not-a-hash",))
+            ).validate()
+
     def test_bad_request_id_rejected(self) -> None:
         with pytest.raises(QcaeValidationError, match="request_id"):
             request_handoff(request_id="has spaces!").validate()
