@@ -78,6 +78,15 @@ class FallbackClass(StrEnum):
     LOCAL_FALLBACK_RESEARCH = "LOCAL_FALLBACK_RESEARCH"
 
 
+#: Gap types a handoff can carry — the interface-schema subset of the full
+#: core GapType taxonomy (research-capability-handoff.schema.json v1.0).
+#: EXECUTION_FAILURE and INSTITUTIONAL_LEARNING_CANDIDATE route elsewhere and
+#: cannot be requested through this boundary.
+HANDOFF_GAP_TYPES: frozenset = frozenset(
+    {GapType.KNOWLEDGE_GAP, GapType.CAPABILITY_GAP, GapType.MIXED_GAP}
+)
+
+
 #: Statuses that imply a usable result payload must exist.
 RESULT_REQUIRED_STATUSES = frozenset({HandoffStatus.COMPLETED, HandoffStatus.PARTIAL})
 
@@ -224,6 +233,12 @@ class ResearchCapabilityHandoff(SerializableRecord):
             raise QcaeValidationError(f"mode must be a HandoffMode, got {self.mode!r}")
         if not isinstance(self.gap_type, GapType):
             raise QcaeValidationError(f"gap_type must be a GapType member, got {self.gap_type!r}")
+        if self.gap_type not in HANDOFF_GAP_TYPES:
+            raise QcaeValidationError(
+                f"gap_type {self.gap_type} cannot be requested through the Research "
+                "Mesh handoff boundary (interface schema allows only "
+                "KNOWLEDGE_GAP/CAPABILITY_GAP/MIXED_GAP)"
+            )
         if not isinstance(self.status, HandoffStatus):
             raise QcaeValidationError(f"status must be a HandoffStatus, got {self.status!r}")
         if not isinstance(self.fallback_class, FallbackClass):

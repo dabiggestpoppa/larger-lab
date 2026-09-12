@@ -27,6 +27,12 @@ CORE_DIR = QCAE_DIR / "core"
 CORE_PACKAGE = "qcae.core"
 OCE_ADAPTER_PACKAGE = "qcae.governance.oce"
 
+#: A-001 §7: QCAE must not rebuild or import Research Mesh implementation.
+#: Research Mesh enters core through interface contracts only.
+RESEARCH_MESH_IMPLEMENT_FRAGMENTS = frozenset(
+    {"research_mesh", "researchmesh", "research-mesh"}
+)
+
 #: Higher layers that core must never depend on (canon 15.2 dependency direction).
 HIGHER_LAYERS = frozenset(
     {
@@ -184,6 +190,37 @@ class TestOceIsolation:
     def test_no_qcae_module_imports_oce_adapters(self) -> None:
         violations = scan_directory(QCAE_DIR, REPO_ROOT, is_core=False)
         assert not violations, "\n" + "\n".join(str(v) for v in violations)
+
+    def test_core_rejects_research_mesh_implementation_import(self, tmp_path: Path) -> None:
+        """A-001 §7 / reconciliation §13: a direct Research Mesh implementation
+        import into qcae/core must be flagged as a stdlib/layer violation."""
+        pkg_dir = tmp_path / "qcae" / "core"
+        pkg_dir.mkdir(parents=True)
+        (pkg_dir / "__init__.py").write_text("", encoding="utf-8")
+        (pkg_dir / "leak.py").write_text(
+            "import research_mesh.institution\n"
+            "from researchmesh.consensus import engine\n"
+            "from qcae.research_mesh.adapter import x\n",
+            encoding="utf-8",
+        )
+        violations = scan_directory(pkg_dir, tmp_path, is_core=True)
+        modules = {v.module for v in violations}
+        assert "research_mesh.institution" in modules
+        assert "researchmesh.consensus" in modules
+        assert "qcae.research_mesh.adapter" in modules
+
+    def test_core_contains_no_research_mesh_import(self) -> None:
+        """The real core tree imports no Research Mesh implementation."""
+        for py_file in sorted(CORE_DIR.rglob("*.py")):
+            for module, _lineno, _node in _iter_imports(py_file):
+                if module == "__importfrom__":
+                    module = _resolve_import(py_file, REPO_ROOT, _node)
+                lowered = module.lower()
+                for fragment in RESEARCH_MESH_IMPLEMENT_FRAGMENTS:
+                    assert fragment not in lowered, (
+                        f"{py_file}: core imports '{module}' — Research Mesh "
+                        "implementation must not leak into core (A-001 §7)"
+                    )
 
     def test_oce_adapter_package_is_empty_placeholder(self) -> None:
         """P0 ships the boundary, not the implementation (canon 18.1 P12)."""
