@@ -1,6 +1,7 @@
 # OCE Book 4 — Configuration & Security Control Spine Evidence Record
 
-**Status:** `COMPLETE / B4-CXR7U-CLOSURE / GATED_COMPLETE` (supersedes CXR5/CXR6 labels below; CXR7-BLOCKED preserved)
+**Status:** `B4-CXR7U9 IN PROGRESS — GATE OPEN` (supersedes the CXR7U closure label below; CXR7U implementation history and CXR7-BLOCKED preserved)
+**CXR7U9 quality gate:** SonarQube Security E / Reliability C on new code (required A/A) — credential-blocked; see the CXR7U9 section below
 **Branch:** `oce-program-build`
 **B4-CXR5 repair start SHA:** `047b5eb6afd7e46a48024726fbbb1e83b2d876cd`
 **Book 4 start SHA:** `acddeb696e6b5df1828fc7baf8c7bfbd2eb43e90`
@@ -23,7 +24,44 @@ repairs every enumerated escape path. Each is closed with a real proof.
 ## Ordered repair commits (all pushed, `oce-program-build`)
 
 | Commit | Message | Defect |
-|---|---|---|
+|
+## B4-CXR7U9 — PRE-MERGE PROOF AND QUALITY REPAIR (IN PROGRESS)
+
+Start SHA: `caa1791e0f35f8975150577975867a96eafa7fc4` (CXR7U evidence head; not amended).
+PR: #4 (base main, head oce-program-build, OPEN, not merged).
+
+### Implemented repairs (CI-green on final head `3fef6615`)
+
+- `b5b53de5` R1+R2: audit-proof transaction cleanup unconditional (every negative branch leaves TX_IDLE) + governed-identity binding (`proven_authoritative()`; structure-only `inspect_structure()` can never authorize an override).
+- `c3e226a3` R3: production configure no longer consumes `CXR7U8_CONFIGURE_*` ambient variables; interruption instrumentation is a private in-process seam only.
+- `9e3bf98f` R4: first Sonar repair round (28 findings).
+- `15e116fd` R5: mandatory registry regenerated (875 unique full node IDs, zero duplicates).
+- `bce3283e` X3: missing `PostgresAuditSink` import in shared `_pinned` helper (run 34590833387: 21 container failures, all one NameError).
+- `db14871e` X4: MinIO artifact-store image repointed to `quay.io/minio/minio` with the identical pinned release tag after Docker Hub removed it (b1-local-ground runs 34698877725 + rerun failed on pull-access-denied; quay.io registry API verified the tag exists).
+- `1a81dd7d` X5: all 25 visible Sonar failure-level findings — realpath fail-closed taint guards (pg-recovery, pg-verify, independent-gate), 4 cognitive-complexity extractions (oce_worker.main, validate_engine check_scaffold_scan/check_meta_test_evidence, recovery-ops.cmd_add), duplicate-literal constants, 15 shell `[[` conversions, restore.sh case default.
+- `3fef6615` X6: S5734 — lifecycle CLI dispatcher no longer swallows `SystemExit`; it propagates to the `sys.exit(main())` boundary (behavior unchanged end-to-end; 771 local tests green).
+
+### Authoritative CI on `3fef6615`
+
+- b1-local-ground-validation: run 34703724053 — success.
+- b2-control-plane-validation: run 34703724028 — success.
+- b3-worker-fabric-validation: run 34703724068 — success.
+- b4-config-spine-validation: run 34703724055 — success.
+- B1-I1R Validation: pre-existing failure on every branch commit (stale Book-1 cloud-ground workflow requiring absent evidence); b1-local-ground is the in-force Book 1 regression and is green.
+
+### Unresolved gate: SonarQube Security E / Reliability C (exit-gate statements 6 and 7)
+
+The SonarCloud quality gate on new code remains Security E / Reliability C after two full repair rounds (X5, X6) covering every visible failure-level finding. The remaining gap is credential-blocked:
+
+1. No Sonar token exists anywhere reachable: repository and organization secrets are empty, no scanner configuration exists, and SonarCloud analyzes the repository through its GitHub App.
+2. The SonarCloud issues API returns an empty 200 response for this private project when unauthenticated — verified by sending the same request to a bogus project key and receiving an identical empty response — so the exact issue inventory cannot be enumerated.
+3. The GitHub check-run annotation channel is capped at 50 issues and the visible set rotates as the head moves; findings visible across rounds were repaired, but ratings did not move, proving gate-driving findings exist beyond the visible cap.
+4. Dispositions (true-positive fix vs false-positive marking) for the unseen findings — including the four AI-taint Path Traversal findings whose canonical disposition under the single-principal threat model is false-positive — require SonarCloud API write access.
+5. Quality-gate weakening (NOSONAR suppression, exclusion patterns, severity downgrades, project policy changes) is prohibited by the CXR7U9 mission and was not performed.
+
+Operator action required: provide SonarCloud API credentials for exact inventory and FP disposition, or explicitly accept the gate state. PR #4 remains OPEN and unmerged.
+
+---|---|---|
 | `0e44617c` | B4-CXR3R1: separate secret initialization from runtime authority | CXR3-01 |
 | `c17b7142` | B4-CXR3R2: remove arbitrary runtime DSN injection paths | CXR3-02 |
 | `1cb9a8d7` | B4-CXR3R3: canonicalize outbound worker target and DB host boundary | CXR3-03 / CXR3-04 |
