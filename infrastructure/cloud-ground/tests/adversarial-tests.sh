@@ -72,10 +72,23 @@ SCRATCH_DIR_WIN=$(win_path "$SCRATCH_DIR")
 # final evidence directory.
 EVIDENCE_FILE="$SCRATCH_DIR_WIN/static-validation-results.json"
 
+# B4-CXR7U9R8: the expected-branch input for every engine invocation in
+# this suite is the OBSERVED branch (HEAD), exactly as the authoritative
+# runner (run-validation.sh steps f/l) pins identity via
+# --target-branch "$OBSERVED_BRANCH". The checkpoint contract's
+# authorized_branch describes the historical B1-I1R3H closure branch and
+# must not make every non-"oce" checkout fail baseline identity.
+CB=$(git -C "$PROJ_ROOT" branch --show-current)
+
 run_check() {
     local check_id="$1"
     local rc=0
-    python3 "$ENGINE_WIN" --only "$check_id" --evidence-dir "$SCRATCH_DIR_WIN" >/dev/null 2>&1 || rc=$?
+    # B4-CXR7U9R8: pin expected identity to the OBSERVED branch (HEAD), the
+    # same contract the authoritative runner uses (--target-branch
+    # "$OBSERVED_BRANCH"); without it the engine falls back to the checkpoint
+    # contract's historical authorized_branch ("oce") and every baseline on
+    # any other branch fails before the adversarial mutation even applies.
+    python3 "$ENGINE_WIN" --only "$check_id" --evidence-dir "$SCRATCH_DIR_WIN"         --target-branch "$CB" >/dev/null 2>&1 || rc=$?
     _RUN_CHECK_EXIT=$rc
 }
 
@@ -225,7 +238,20 @@ ANSIBLE_CFG="$BASE_DIR/ansible/ansible.cfg"
 echo "--- Block A: Source Identity Mutations ---"
 run_one "ID-01" "Wrong repo owner" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['owner']='wrong';json.dump(d,open(p,'w'),indent=2)"
 run_one "ID-02" "Wrong repo name" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['name']='other';json.dump(d,open(p,'w'),indent=2)"
-run_one "ID-03" "Wrong branch" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['authorized_branch']='main';json.dump(d,open(p,'w'),indent=2)"
+# B4-CXR7U9R8: since run_check() pins --target-branch to the OBSERVED
+# branch, ID-03 becomes a CLI meta test: a WRONG --target-branch value
+# must be rejected by SOURCE-IDENTITY (mismatch with the observed HEAD
+# branch), exit nonzero.
+TOTAL_COUNT=$((TOTAL_COUNT + 1))
+echo "  [$TOTAL_COUNT] ID-03: Wrong --target-branch rejected"
+rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" --target-branch "definitely-wrong-branch" >/dev/null 2>&1 || rc=$?
+if [[ "$rc" -ne 0 ]]; then
+    echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
+    write_meta_result "ID-03" "PASS" "Wrong --target-branch rejected"         "cli-input" "--target-branch=definitely-wrong-branch does not match observed branch"         "FAIL" "FAIL" "$rc" "Validator correctly rejected wrong target branch"
+else
+    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    write_meta_result "ID-03" "FAIL" "Wrong --target-branch rejected"         "cli-input" "--target-branch=definitely-wrong-branch does not match observed branch"         "FAIL" "PASS" "0" "Validator accepted wrong target branch"
+fi
 run_one "ID-04" "Wrong base SHA" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['authoritative_base_sha']='0'*40;json.dump(d,open(p,'w'),indent=2)"
 run_one "ID-05" "Wrong project root" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['expected_project_root']='wrong';json.dump(d,open(p,'w'),indent=2)"
 run_one "ID-06" "Wrong origins" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['accepted_origins']=['https://evil.com/r.git'];json.dump(d,open(p,'w'),indent=2)"
@@ -433,8 +459,7 @@ echo "--- Block G: CLI Input Rejection (Meta Tests) ---"
 
 CC=$(git -C "$PROJ_ROOT" rev-parse HEAD)
 CT=$(git -C "$PROJ_ROOT" rev-parse "HEAD^{tree}")
-CB=$(git -C "$PROJ_ROOT" branch --show-current)
-CB_CONTRACT=$(python3 -c "import json;print(json.load(open('$IDENTITY'))['authorized_branch'])" 2>/dev/null || echo "$CB")
+CB_CONTRACT="$CB"
 
 # CLI-01: Missing authoritative inputs
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
