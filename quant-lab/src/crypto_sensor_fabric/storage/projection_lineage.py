@@ -40,7 +40,7 @@ helpers remain for unit tests.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
 
 from .json_catalog import JsonCatalogCorrupt, DurableJsonCatalog
 from .models import AcquisitionRecord, EvidenceBlob, ProjectionLineage
@@ -115,6 +115,27 @@ class LineageProjectionIdentityConflict(LineageError):
 
 class LineageConfigurationError(LineageError):
     """A commit-capable lineage repository was constructed incompletely."""
+
+
+@runtime_checkable
+class ProjectionArtifactVerifier(Protocol):
+    """Capability contract for the lineage repository's artifact dependency
+    (I05R4 §5).
+
+    Physical T0B re-verification is an INVARIANT of every lineage commit,
+    so the dependency must PROVE the capability at construction — not be
+    duck-typed at commit time.  ``ProjectionArtifactRepository`` satisfies
+    this protocol; a substitute exposing ``get`` without
+    ``verify_physical`` is rejected before any lineage can exist.
+    """
+
+    def get(self, projection_id: str) -> Any:
+        """Resolve the committed RawProjectionArtifact, or None."""
+        ...  # pragma: no cover
+
+    def verify_physical(self, projection_id: str) -> None:
+        """Re-prove the stored T0B bytes NOW; raise typed corruption on drift."""
+        ...  # pragma: no cover
 
 
 # ---------------------------------------------------------------------------
@@ -295,6 +316,19 @@ class ProjectionLineageRepository:
                 "ProjectionLineageRepository requires "
                 "artifact_repository (lineage may not publish without "
                 "artifact agreement — I05R2 §11)"
+            )
+        # I05R4 §5/§7: the artifact dependency must PROVE the verifier
+        # capability at CONSTRUCTION.  A substitute exposing get() without
+        # verify_physical() would silently downgrade physical T0B
+        # re-verification to optional — forbidden.  runtime_checkable
+        # isinstance only checks method PRESENCE, so a wrong-signature
+        # verify_physical is still caught by the commit-time call itself.
+        if not isinstance(artifact_repository, ProjectionArtifactVerifier):
+            raise LineageConfigurationError(
+                "artifact_repository must satisfy the "
+                "ProjectionArtifactVerifier protocol (get + verify_physical); "
+                "physical T0B re-verification is a mandatory invariant, not "
+                "a duck-typed option (I05R4 §5)"
             )
         if (
             context_repository is _MISSING
@@ -558,12 +592,11 @@ class ProjectionLineageRepository:
                 "lineage manifest (I05R3 §4)"
             )
 
-        # I05R3 §10/§13: the committed artifact's physical T0B bytes are
-        # re-proven NOW — the writer validated them once, but that history
-        # is not a current integrity proof.  Idempotence never returns stale
-        # cached lineage as successful current evidence over corrupt bytes.
-        if hasattr(self._artifact_repository, "verify_physical"):
-            self._artifact_repository.verify_physical(pid)
+        # I05R4 §6: UNCONDITIONAL physical T0B re-verification — the
+        # writer validated these bytes once, but that history is not a
+        # current integrity proof, and the capability contract (§5)
+        # guarantees verify_physical exists.  There is no optional branch.
+        self._artifact_repository.verify_physical(pid)
 
         # T0A source truth + identity matching, per entry, BEFORE publication
         # and before ANY idempotent success (I05R3 §10).

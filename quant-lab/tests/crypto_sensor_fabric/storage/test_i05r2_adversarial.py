@@ -410,13 +410,23 @@ class TestPublicApiBypass:
         self, tmp_path: Path
     ) -> None:
         """§31E: typed failure BEFORE any durable publication is possible."""
+
+        class _VerifierSatisfyingStub:
+            # I05R4 §5: satisfies the ProjectionArtifactVerifier protocol so
+            # the targeted context_repository omission is what fails.
+            def get(self, projection_id: str) -> object:
+                return None
+
+            def verify_physical(self, projection_id: str) -> None:
+                return None
+
         with pytest.raises(LineageConfigurationError, match="context_repository"):
             ProjectionLineageRepository(  # type: ignore[call-arg]
                 tmp_path / "lin",
                 blob_store=object(),
                 blob_metadata_repository=object(),
                 acquisition_repository=object(),
-                artifact_repository=object(),
+                artifact_repository=_VerifierSatisfyingStub(),
             )
 
     def test_lineage_bare_construction_fails_typed(

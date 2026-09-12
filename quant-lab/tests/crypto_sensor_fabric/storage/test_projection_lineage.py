@@ -182,6 +182,17 @@ def _real_acq(
     )
 
 
+class _VerifierSatisfyingStub:
+    """Placeholder satisfying the I05R4 ProjectionArtifactVerifier protocol
+    (get + verify_physical) for dependency-omission construction tests."""
+
+    def get(self, projection_id: str) -> object:  # pragma: no cover
+        return None
+
+    def verify_physical(self, projection_id: str) -> None:  # pragma: no cover
+        return None
+
+
 def _wired_repo(tmp_path: Path, *, without: str | None = None):
     """Lineage repository wired to REAL durable T0A repositories.
 
@@ -199,7 +210,7 @@ def _wired_repo(tmp_path: Path, *, without: str | None = None):
         blob_store=store,
         blob_metadata_repository=blob_repo,
         acquisition_repository=acq_repo,
-        artifact_repository=object(),
+        artifact_repository=_VerifierSatisfyingStub(),
         context_repository=object(),
     )
     if without is not None:
