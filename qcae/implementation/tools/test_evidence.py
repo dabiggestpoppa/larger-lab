@@ -74,12 +74,16 @@ PYTEST_Q_PASS = re.compile(
     r"^(?P<passed>\d+) passed(?: in (?P<seconds>[\d.]+)s)?\s*$", re.MULTILINE
 )
 #: "2 failed, 557 passed, 1 skipped in 3.10s" (pytest -q, mixed)
+#: Also tolerates trailing non-count parts ("1 warning", "12 deselected")
+#: that follow a warnings-summary section (spec §12 robustness list).
 PYTEST_Q_FAIL = re.compile(
-    r"^(?P<summary>(?:\d+ (?:failed|passed|skipped|errors?|error)(?:, )?)+)"
+    r"^(?P<summary>(?:\d+ (?:failed|passed|skipped|errors?|warnings?|deselected)(?:, )?)+)"
     r"(?: in (?P<seconds>[\d.]+)s)?\s*$",
     re.MULTILINE,
 )
-_SUMMARY_PART = re.compile(r"(?P<n>\d+) (?P<kind>failed|passed|skipped|errors?)")
+_SUMMARY_PART = re.compile(r"(?P<n>\d+) (?P<kind>failed|passed|skipped|errors?|warnings?|deselected)")
+#: summary parts that are not test outcomes
+_IGNORED_KINDS = {"warning", "warnings", "deselected"}
 
 
 def git_head_commit(repo_cwd: Optional[str] = None) -> str:
@@ -106,7 +110,9 @@ def _parse_pytest_q(output: str) -> dict:
     if match.groupdict().get("summary"):
         counts = {"passed": 0, "failed": 0, "skipped": 0, "error": 0}
         for m in _SUMMARY_PART.finditer(match.group("summary")):
-            kind = "error" if m.group("kind") == "errors" else m.group("kind")
+            kind = "error" if m.group("kind") in ("error", "errors") else m.group("kind")
+            if kind in _IGNORED_KINDS:
+                continue  # warnings/deselected are not test outcomes
             counts[kind] = int(m.group("n"))
         if counts["error"]:
             raise FreezeEvidenceError(
