@@ -56,5 +56,5 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["quant-lab/src"]
-testpaths = ["quant-lab/tests"]
+pythonpath = ["quant-lab/src", "."]
+testpaths = ["quant-lab/tests", "qcae/tests"]
