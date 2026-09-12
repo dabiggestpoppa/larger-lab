@@ -177,6 +177,13 @@ class SerializableRecord:
             if field_name in kwargs:
                 kwargs[field_name] = coerce(kwargs[field_name])
         for field_name, nested_cls in cls._NESTED_RECORDS.items():
+            if isinstance(nested_cls, str):
+                # Forward reference by class name; resolve in the declaring
+                # module's namespace (mirrors dataclass forward refs).
+                import sys
+
+                module = sys.modules[cls.__module__]
+                nested_cls = getattr(module, nested_cls)
             value = kwargs.get(field_name)
             if isinstance(value, dict):
                 kwargs[field_name] = nested_cls.from_dict(value)
