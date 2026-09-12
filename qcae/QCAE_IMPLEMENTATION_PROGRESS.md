@@ -9,9 +9,35 @@
 
 ## Current Phase
 
-**P1 — IN BUILD** (Evidence + Registry Spine; P0/P0-A001 frozen below)
+**P1 — FROZEN / OPERATOR-REVIEWED** (Evidence + Registry Spine + P1-R1 repair; P2 NOT started)
 
-### P1 phase log
+### P1-R1 — Registry Completion + Freeze Truth Repair (supersedes original P1 freeze bookkeeping)
+
+Operator review of `bbbe05a7` identified three exit-gate defects; repaired in
+P1-R1 without redesigning any accepted P1 subsystem:
+
+1. **Freeze truth** — original `P1-freeze-manifest.json` had
+   `test_results: null`. Preserved byte-for-byte (blob `ab9ab86e…`, introduced
+   in `20ee6465`); superseded by `qcae/implementation/P1-R1-freeze-manifest.json`
+   whose `test_results` are captured from an actual full-suite run by the
+   fail-closed generator (`qcae/implementation/tools/p1r1_freeze_manifest.py`
+   + `test_evidence.py`). Generator refuses to emit on test failure,
+   unparseable output, or commit mismatch. Counts are never hardcoded.
+2. **Canonical status** — this ledger now reads P1 — FROZEN /
+   OPERATOR-REVIEWED; P2 is not active.
+3. **Registry substrate** — CapabilityRegistry (contracts/atoms/composites/
+   candidates, versioned keys, digest-verified rows) and provider-neutral
+   RepositoryRegistry (multi-revision coexistence) added in P1-R1-C01/C02;
+   linked via the frozen P0 Relationship vocabulary (no new edge types);
+   backup/restore covers all registry tables with count verification;
+   decision-reuse exposes known capability/candidate state; RepositoryRegistry
+   deferral removed from the superseding freeze (P3 populates it).
+
+P1-R1 repair commits: `34d256bf` (I0), `9a990a85` (C01), `53106b1f` (C02),
+`e3059465`+`31e5ba20` (C03), `7d541a97` (C04), `1817ed57` (C05), `a8ea1014`
+(T01), `7fbf5326`+freeze-commit (FREEZE).
+
+### P1 phase log (original build; superseded bookkeeping per P1-R1 above)
 
 - **P1-I0** `a53b401b` — preflight repairs (ledger test-count 139→141 via
   addendum, vacuous `or True` assertion removed) + **ADR-0006**: SQLite

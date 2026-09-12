@@ -1,0 +1,134 @@
+{
+  "manifest_version": 1,
+  "type": "SUPERSEDING_FREEZE_MANIFEST",
+  "phase": "P1-R1",
+  "phase_title": "Registry Completion + Freeze Truth Repair",
+  "canon_version": "0.1",
+  "qcae_version": "0.1.0",
+  "generated_at": "2026-09-12T20:20:29.140668+00:00",
+  "head_commit": "7fbf53265bf6d0c7207c4bdf44ea480a4b4ba637",
+  "branch": "qcae-capability-acquisition-engine",
+  "original_freeze": {
+    "phase": "P1",
+    "artifact": "qcae/implementation/P1-freeze-manifest.json",
+    "refs": {
+      "manifest_path": "qcae/implementation/P1-freeze-manifest.json",
+      "introduced_in_commit": "20ee6465",
+      "manifest_git_blob_sha256_ref": "ab9ab86ebe974c11b63bdcba3a661b1496d2a79f",
+      "manifest_content_digest_sha256": "27131cdde2f3550712e778fbbe41146569998fe6184b4c71e0e8167f3d39fbfa",
+      "preserved_unchanged": true
+    },
+    "defects_identified_by_operator": [
+      "test_results was null (no actual test evidence embedded)",
+      "canonical progress status said 'P1 \u2014 IN BUILD' although P1 was frozen",
+      "CapabilityRegistry and RepositoryRegistry persistence absent from the durable spine despite P1 scope"
+    ]
+  },
+  "repair_relationship": {
+    "type": "SUPERSEDES_FREEZE_RECORD_OF",
+    "scope": "freeze bookkeeping + registry substrate completion; all accepted P1 subsystems unchanged (evidence model, artifact store, metadata persistence, lineage, receipts, knowledge, cross-registry refs, unit-of-work, migrations, backup/restore)",
+    "history_policy": "original P1 freeze manifest is preserved byte-for-byte; this artifact supersedes its bookkeeping only"
+  },
+  "operator_review_trigger": {
+    "directive": "P1-R1 work-session prompt (reviewed head bbbe05a7)",
+    "review_date": "2026-09-12"
+  },
+  "repair_commits": [
+    {
+      "sha": "34d256bf",
+      "subject": "P1-R1-I0: add fail-closed stdlib test-evidence capture for freeze manifests"
+    },
+    {
+      "sha": "9a990a85",
+      "subject": "P1-R1-C01: add CapabilityRegistry ports and SQLite persistence for P0 capability objects"
+    },
+    {
+      "sha": "53106b1f",
+      "subject": "P1-R1-C02: add provider-neutral RepositoryRecord and RepositoryRegistry substrate"
+    },
+    {
+      "sha": "e3059465",
+      "subject": "P1-R1-C03: persist capability-graph relationships linking repositories, candidates, and atoms"
+    },
+    {
+      "sha": "31e5ba20",
+      "subject": "P1-R1-C03: fix illegal-endpoint test to build the edge via the domain constructor"
+    },
+    {
+      "sha": "7d541a97",
+      "subject": "P1-R1-C04: extend decision-reuse lookup with known capability and candidate state"
+    },
+    {
+      "sha": "1817ed57",
+      "subject": "P1-R1-C05: extend backup and restore with registry-table coverage and count verification"
+    },
+    {
+      "sha": "a8ea1014",
+      "subject": "P1-R1-T01: add capability identity law and registry adversarial qualification suite"
+    }
+  ],
+  "test_results": {
+    "collected": 625,
+    "passed": 625,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 4.72,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-09-12T20:20:28.821421+00:00",
+    "tested_commit": "7fbf53265bf6d0c7207c4bdf44ea480a4b4ba637"
+  },
+  "deferred_items_removed": [
+    {
+      "item": "RepositoryRegistry substrate (was deferred in original P1 manifest)",
+      "resolution": "implemented in P1-R1-C02; P3 populates and uses the registry \u2014 P1 supplies the durable substrate"
+    }
+  ],
+  "deferred_items_remaining": [
+    {
+      "item": "Semantic/vector retrieval (15.9) deferred; structured retrieval only",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "when discovery volume demands"
+    },
+    {
+      "item": "Analytics snapshots (Parquet/DuckDB) deferred per ADR-0006",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P9 quant validation"
+    },
+    {
+      "item": "SqliteRegistryQuery freshness lookup reaches into the lifecycle log connection; refactor to a port method when P2 jobs need it",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P2 job runtime"
+    }
+  ],
+  "known_failures_outside_qcae": [
+    "tests/forge/phase_00/test_extension_docs.py (2 pre-existing failures on this branch, unrelated to QCAE; present before P0 work)"
+  ],
+  "blockers": [],
+  "evidence_refs": {
+    "progress_ledger": "qcae/QCAE_IMPLEMENTATION_PROGRESS.md",
+    "adr_refs": [
+      "qcae/implementation/decisions/ADR-0006-persistence-engine.md"
+    ],
+    "p1r1_tests": [
+      "qcae/tests/unit/test_p1r1_freeze_evidence.py",
+      "qcae/tests/unit/test_p1r1_capability_registry.py",
+      "qcae/tests/unit/test_p1r1_repository_registry.py",
+      "qcae/tests/unit/test_p1r1_relationships.py",
+      "qcae/tests/unit/test_p1r1_decision_reuse.py",
+      "qcae/tests/unit/test_p1r1_backup_restore.py",
+      "qcae/tests/unit/test_p1r1_identity_law.py"
+    ],
+    "architecture_guards": "qcae/tests/architecture/test_p0_dependency_guards.py"
+  }
+}
