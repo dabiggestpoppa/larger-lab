@@ -86,16 +86,20 @@ class TestRepositoryAtomLinks:
             svc.repository_implements_atom(paper_repo, "atom-1")
 
     def test_illegal_endpoint_rejected_by_canon_rules(self, env) -> None:
-        """The frozen 1.3.4 endpoint enforcement still guards persistence."""
+        """The frozen 1.3.4 endpoint enforcement still guards persistence:
+        an atom cannot IMPLEMENT another atom."""
+        from qcae.core.relationships.graph import EntityRef
+
         conn, rel, svc = env
-        bad = {
-            "source": {"entity_type": "CAPABILITY_ATOM", "entity_id": "atom-1"},
-            "relation": "implements",
-            "target": {"entity_type": "CAPABILITY_ATOM", "entity_id": "atom-2"},
-        }
-        with pytest.raises(QcaeValidationError, match="IMPLEMENTS source"):
-            rel.add(Relationship.from_dict(
-                {**bad, "schema_version": 1, "object_type": "Relationship"}))
+        bad = Relationship(
+            source=EntityRef(entity_type=EntityType.CAPABILITY_ATOM, entity_id="atom-1"),
+            relation=RelationType.IMPLEMENTS,
+            target=EntityRef(entity_type=EntityType.CAPABILITY_ATOM, entity_id="atom-2"),
+        )
+        with pytest.raises(QcaeValidationError, match="source must be an implementation/component"):
+            bad.validate()
+        with pytest.raises(QcaeValidationError, match="source must be an implementation/component"):
+            rel.add(bad)
 
 
 class TestCandidateLinks:
