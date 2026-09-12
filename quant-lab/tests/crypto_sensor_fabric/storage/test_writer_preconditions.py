@@ -36,7 +36,6 @@ from crypto_sensor_fabric.storage.projections import (
     ProjectionPreconditionError,
     ProjectionSchemaMismatch,
     ProjectionSchemaNotFound,
-    ProjectionSourceNotUsable,
     RowProjectionLineage,
     write_projection,
 )

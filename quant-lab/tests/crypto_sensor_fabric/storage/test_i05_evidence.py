@@ -20,9 +20,11 @@ from crypto_sensor_fabric.storage.projection_schema import (
     compute_schema_key,
 )
 
-EVIDENCE_DIR = Path(__file__).parent.parent.parent.parent / (
-    "research/crypto_foundry/sensor_fabric/evidence/bloc_04"
-)
+# SENSOR-B4-I05R1 (§2): historical I05 evidence is FROZEN.  This I05E
+# generator now writes to a throwaway directory so running the suite can
+# never mutate committed historical evidence; the committed matrices are
+# the frozen artifacts.
+EVIDENCE_DIR = Path("C:/tmp_i05_evidence_regenerate")
 
 
 # ---------------------------------------------------------------------------

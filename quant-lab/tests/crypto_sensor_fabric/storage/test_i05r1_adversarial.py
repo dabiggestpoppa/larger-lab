@@ -16,7 +16,6 @@ Covers (I05R1 §45/§47/§16):
 
 from __future__ import annotations
 
-import json
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path

@@ -43,7 +43,6 @@ from typing import Any
 from .atomic import (
     AtomicPublishTargetExists,
     FaultError,
-    FaultHook,
     OpRecorder,
     ensure_durable_directory,
     fsync_directory,
