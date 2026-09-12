@@ -39,6 +39,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import pyarrow as pa
 import pyarrow.parquet as pq
 
 from .checksums import sha256_file
@@ -49,7 +50,7 @@ from .projection_lineage import (
     ProjectionLineageConflict,
     SourceOrderConflict,
 )
-from .projection_schema import T0_METADATA_SCHEMA
+from .projection_schema import ProjectionSchemaDefinition, T0_METADATA_SCHEMA
 from .projections import ProjectionCatalogRecord, ProjectionCorruption
 
 
@@ -232,8 +233,18 @@ class ProjectionLineageResolver:
                 )
 
     def _verify_physical(
-        self, projection_id: str, artifact: Any, context: ProjectionCatalogRecord
+        self,
+        projection_id: str,
+        artifact: Any,
+        context: ProjectionCatalogRecord,
+        registered: ProjectionSchemaDefinition,
     ) -> None:
+        """Prove the stored physical T0B file NOW (I05R2 §18-§22).
+
+        "The writer validated it once" is not sufficient (§22): the
+        read-time chain re-proves exact schema, T0 constant VALUES, row
+        ordinals and physical row lineage from the bytes that exist now.
+        """
         path = resolve_under_root(self._root, artifact.projection_uri)
         if not path.is_file():
             raise ProjectionCorruption(
@@ -245,22 +256,92 @@ class ProjectionLineageResolver:
                 f"physical projection SHA {actual_sha} != committed "
                 f"{artifact.projection_sha256}"
             )
-        table = pq.read_table(str(path))
+        # Read the FILE's own schema via ParquetFile: pq.read_table()
+        # performs dataset discovery and would append Hive partition
+        # columns inferred from the directory layout, which are NOT part
+        # of the stored schema contract.
+        table = pq.ParquetFile(str(path)).read()
         if table.num_rows != artifact.row_count:
             raise ProjectionCorruption(
                 f"physical row count {table.num_rows} != committed "
                 f"{artifact.row_count}"
             )
-        for field in T0_METADATA_SCHEMA:
-            name = field.name
-            if name not in table.schema.names:
+        # EXACT full-schema equality (I05R2 §16/§18): registered native
+        # schema + T0_METADATA_SCHEMA, checked with exact structural
+        # equality (field order, names, types, nullability, nested
+        # children, decimal precision/scale, timestamp units/timezones).
+        # A name-only proof is not a schema proof.
+        expected_full_schema = pa.schema(
+            list(registered.provider_native_schema) + list(T0_METADATA_SCHEMA)
+        )
+        if not table.schema.equals(expected_full_schema, check_metadata=False):
+            raise ProjectionCorruption(
+                "physical projection schema does not EXACTLY equal the "
+                f"registered schema {registered.projection_schema_id!r} @ "
+                f"{registered.projection_schema_version!r}"
+            )
+
+        # T0 VALUE revalidation (§19): constants on EVERY row.
+        expected_constants = {
+            "_t0_projection_id": projection_id,
+            "_t0_provider": context.provider,
+            "_t0_venue": context.venue,
+            "_t0_sensor_family": context.sensor_family,
+            "_t0_native_instrument": context.native_instrument,
+            "_t0_parser_version": context.parser_version,
+            "_t0_schema_version": context.projection_schema_version,
+        }
+        for column, expected in expected_constants.items():
+            values = set(table.column(column).to_pylist())
+            if values != {expected}:
                 raise ProjectionCorruption(
-                    f"physical projection missing required T0 column {name!r}"
+                    f"physical T0 column {column!r} is not constant "
+                    f"{expected!r}: {values!r}"
                 )
-            if table.schema.field(name).type != field.type:
-                raise ProjectionCorruption(
-                    f"physical T0 column {name!r} has unexpected type"
-                )
+
+        # Row ordinal revalidation (§20): exactly 0..row_count-1,
+        # contiguous, no duplicates, no gaps, no reordered identity.
+        ordinals = table.column("_t0_row_ordinal").to_pylist()
+        if ordinals != list(range(table.num_rows)):
+            raise ProjectionCorruption(
+                "physical _t0_row_ordinal is not exactly contiguous "
+                f"0..{table.num_rows - 1}"
+            )
+
+        # Physical row lineage revalidation (§21).
+        entries = sorted(
+            self._lineage.get_by_projection(projection_id),
+            key=lambda e: e.source_order,
+        )
+        row_blobs = table.column("_t0_source_blob_sha256").to_pylist()
+        row_acqs = table.column("_t0_acquisition_id").to_pylist()
+        if len(entries) == 1:
+            exact_blob = entries[0].source_blob_sha256
+            exact_acq = entries[0].source_acquisition_id
+            for i, (b, a) in enumerate(zip(row_blobs, row_acqs)):
+                if b != exact_blob or a != exact_acq:
+                    raise ProjectionCorruption(
+                        f"row {i} single-source lineage ({b!r}, {a!r}) != "
+                        f"committed ({exact_blob!r}, {exact_acq!r})"
+                    )
+        else:
+            declared = {
+                (e.source_blob_sha256, e.source_acquisition_id) for e in entries
+            }
+            for i, (b, a) in enumerate(zip(row_blobs, row_acqs)):
+                if b is None and a is None:
+                    continue  # unattributed row is allowed for multi-source
+                if (b is None) != (a is None):
+                    raise ProjectionCorruption(
+                        f"row {i} has one-sided lineage (blob={b!r}, "
+                        f"acquisition={a!r}); both or neither"
+                    )
+                if (b, a) not in declared:
+                    raise ProjectionCorruption(
+                        f"row {i} lineage pair ({b!r}, {a!r}) is not a "
+                        "committed lineage pair"
+                    )
+
         # Artifact/context agreement on identity + schema + lineage binding.
         if context.projection_sha256 != artifact.projection_sha256:
             raise ProjectionChainBroken(
@@ -312,7 +393,9 @@ class ProjectionLineageResolver:
                 "registered schema fingerprint != recorded schema fingerprint"
             )
 
-        self._verify_physical(projection_id, artifact, context)
+        # I05R2 §18: physical verification is the authoritative read-time
+        # proof — exact schema + T0 values + ordinals + row lineage.
+        self._verify_physical(projection_id, artifact, context, registered)
 
         # Partition match (§50): same projection bytes never transfer
         # partition identity.
