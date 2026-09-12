@@ -558,6 +558,13 @@ class ProjectionLineageRepository:
                 "lineage manifest (I05R3 §4)"
             )
 
+        # I05R3 §10/§13: the committed artifact's physical T0B bytes are
+        # re-proven NOW — the writer validated them once, but that history
+        # is not a current integrity proof.  Idempotence never returns stale
+        # cached lineage as successful current evidence over corrupt bytes.
+        if hasattr(self._artifact_repository, "verify_physical"):
+            self._artifact_repository.verify_physical(pid)
+
         # T0A source truth + identity matching, per entry, BEFORE publication
         # and before ANY idempotent success (I05R3 §10).
         for entry in sorted(entries, key=lambda e: e.source_order):

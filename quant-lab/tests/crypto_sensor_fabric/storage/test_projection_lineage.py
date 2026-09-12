@@ -853,3 +853,114 @@ class TestContextLineageBinding:
                 lineage.commit("lm-ghost2", entries)
         finally:
             s.close()
+
+
+class TestIdempotentRevalidation:
+    """I05R3 §9-§13: idempotence is not permission to trust stale evidence."""
+
+    def test_idempotent_healthy_commit_succeeds(self, tmp_path: Path) -> None:
+        """§21.5: same manifest, intact chain -> idempotent success."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [21]}', "acq-idem")
+            s.commit_projection(
+                "proj-idem", [(sha, "acq-idem")], lineage_manifest_id="lm-idem"
+            )
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-idem", "proj-idem", sha, "acq-idem", 0)]
+            r1 = lineage.commit("lm-idem", entries)
+            r2 = lineage.commit("lm-idem", entries)
+            assert r1[0].model_dump() == r2[0].model_dump()
+        finally:
+            s.close()
+
+    def test_idempotent_after_source_blob_corruption_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """§21.6: corrupt the source T0A blob, then repeat the identical
+        lineage commit -> FAIL.  No cached lineage as current proof."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [22]}', "acq-src")
+            s.commit_projection(
+                "proj-src", [(sha, "acq-src")], lineage_manifest_id="lm-src"
+            )
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-src", "proj-src", sha, "acq-src", 0)]
+            lineage.commit("lm-src", entries)
+            # Corrupt the physical source blob in place.
+            from crypto_sensor_fabric.storage.paths import blob_object_key
+
+            metas = s.blob_repo.get_blob_metadata(sha)
+            blob_path = s.t0a / blob_object_key(metas[0].blob_sha256, metas[0].storage_encoding)
+            blob_path.write_bytes(b"CORRUPTED")
+            with pytest.raises(Exception) as excinfo:
+                lineage.commit("lm-src", entries)
+            assert not isinstance(excinfo.value, type(None))
+            # The historical lineage remains durable — but was NOT returned
+            # as a successful current proof.
+            assert lineage.get("lm-src") is not None
+        finally:
+            s.close()
+
+    def test_idempotent_after_context_removal_fails(self, tmp_path: Path) -> None:
+        """§21.7: context unavailable -> identical commit fails closed."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [23]}', "acq-ctx")
+            s.commit_projection(
+                "proj-ctx", [(sha, "acq-ctx")], lineage_manifest_id="lm-ctx"
+            )
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-ctx", "proj-ctx", sha, "acq-ctx", 0)]
+            lineage.commit("lm-ctx", entries)
+            # Remove the committed context fragment (isolated fixture loss),
+            # then RESTART the repository so the loss is visible on disk —
+            # matching real restart semantics, not a stale in-memory cache.
+            for frag in (s.t0b / "catalogs" / "manifests" / "projection_context").glob(
+                "*.json"
+            ):
+                frag.unlink()
+            from crypto_sensor_fabric.storage.projection_lineage import (
+                ProjectionContextMissing,
+            )
+
+            from crypto_sensor_fabric.storage.projections import (
+                ProjectionContextRepository,
+            )
+
+            lineage2 = ProjectionLineageRepository(
+                s.t0b / "catalogs" / "manifests" / "projection_lineage",
+                blob_store=s.store,
+                blob_metadata_repository=s.blob_repo,
+                acquisition_repository=s.acq_repo,
+                artifact_repository=s.artifacts,
+                context_repository=ProjectionContextRepository(
+                    s.t0b / "catalogs" / "manifests" / "projection_context"
+                ),
+            )
+            with pytest.raises(ProjectionContextMissing):
+                lineage2.commit("lm-ctx", entries)
+        finally:
+            s.close()
+
+    def test_idempotent_after_t0b_corruption_fails(self, tmp_path: Path) -> None:
+        """§21.8: corrupt the physical T0B parquet -> identical lineage
+        commit fails through the artifact physical-verification path."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [24]}', "acq-t0b")
+            artifact = s.commit_projection(
+                "proj-t0b", [(sha, "acq-t0b")], lineage_manifest_id="lm-t0b"
+            )
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-t0b", "proj-t0b", sha, "acq-t0b", 0)]
+            lineage.commit("lm-t0b", entries)
+            # Corrupt the physical projection beneath the T0B root.
+            physical = s.t0b / artifact.projection_uri
+            assert physical.exists()
+            physical.write_bytes(b"CORRUPTED-T0B")
+            with pytest.raises(Exception):
+                lineage.commit("lm-t0b", entries)
+        finally:
+            s.close()

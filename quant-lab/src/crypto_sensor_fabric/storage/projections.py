@@ -983,6 +983,21 @@ class ProjectionArtifactRepository:
         """Retrieve a projection artifact by ID, or None."""
         return self._cache.get(projection_id)
 
+    def verify_physical(self, projection_id: str) -> None:
+        """Re-prove the physical T0B bytes NOW (I05R3 §10/§13).
+
+        The writer validated the file once at commit; that history is not
+        a current integrity proof.  Raises ``ProjectionCorruption`` if the
+        stored bytes no longer satisfy the committed artifact identity.
+        """
+        artifact = self._cache.get(projection_id)
+        if artifact is None:
+            raise ProjectionCorruption(
+                f"projection_id={projection_id!r} has no committed "
+                "RawProjectionArtifact to verify"
+            )
+        self._verify_physical_projection(artifact)
+
     def get_strict(self, projection_id: str) -> RawProjectionArtifact:
         """Typed NotFound variant of :meth:`get`."""
         artifact = self._cache.get(projection_id)
