@@ -46,14 +46,14 @@ import time
 from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Literal, Protocol, runtime_checkable
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # I04R2 §13: THE one authoritative usable-provenance eligibility predicate.
 # The registry must never duplicate eligibility logic.
 from .catalog import is_usable_manifest_provenance
-from .enums import StorageEncoding  # re-exported for registry consumers
+from .enums import RevisionPolicy, RevisionState  # frozen vocabulary
 from .json_catalog import (
     DurableJsonCatalog,
     JsonCatalogConflict,
@@ -62,33 +62,23 @@ from .json_catalog import (
 )
 from .json_catalog import ensure_durable_directory
 
+# I06R1 §5/§41: the FROZEN core model in storage/models.py is the ONE
+# public/materialized revision view.  This module re-exports it (object
+# alias — no shadow model).
+from .models import SourceRevision
+
 # ---------------------------------------------------------------------------
-# Revision vocabulary (frozen, §6) and resolution policies (§7)
+# Canonical vocabulary (I06R1 §3/§4): the FROZEN enums in storage/enums.py are
+# the ONLY RevisionState / revision-policy classes.  This module re-exports
+# them under their historical I06 names (object aliases — no second Enum).
+# ObservationState / MutationSeverity are registry-specific event vocabularies
+# (§31/§37 of the I06 charter); they remain here by design.
 # ---------------------------------------------------------------------------
 
-
-class RevisionState(str, Enum):
-    """Frozen revision-segment states (§6).  No aliases."""
-
-    STABLE = "STABLE"
-    IDENTICAL_REFETCH = "IDENTICAL_REFETCH"
-    SOURCE_MUTATION = "SOURCE_MUTATION"
-    PROVIDER_DECLARED_REVISION = "PROVIDER_DECLARED_REVISION"
-    UNKNOWN_REVISION = "UNKNOWN_REVISION"
+RevisionResolutionMode = RevisionPolicy
 
 
-class RevisionResolutionMode(str, Enum):
-    """Frozen revision resolution policies (§7).  No old aliases."""
-
-    ERROR_ON_AMBIGUITY = "ERROR_ON_AMBIGUITY"
-    ALL = "ALL"
-    FIRST_SEEN = "FIRST_SEEN"
-    LATEST_SEEN = "LATEST_SEEN"
-    EXACT_REVISION = "EXACT_REVISION"
-    PROVIDER_DECLARED_CANONICAL = "PROVIDER_DECLARED_CANONICAL"
-
-
-class ObservationState(str, Enum):
+class ObservationState(str, Enum):  # registry-specific event vocabulary
     """Immutable observation-event states (§24/§25/§31)."""
 
     FIRST_REGISTRATION = "FIRST_REGISTRATION"
@@ -279,15 +269,27 @@ class RevisionSegmentRecord(BaseModel):
     record_type: str = "source_revision_segment"
     segment_id: str
     source_revision_key: str
-    identity_version: int
+    identity_version: Literal[1]
     identity_descriptor: dict[str, Any]
     revision_number: int
     blob_sha256: str
-    first_seen_at: str  # response_observed_at of the first acquisition
+    first_seen_at: datetime  # response_observed_at of the first acquisition
     first_acquisition_id: str
     revision_state: str
     revision_reason: str
-    registered_at: str  # operational audit clock (§21) — not chronology
+    registered_at: datetime  # operational audit clock (§21) — not chronology
+
+    @field_validator("first_seen_at", "registered_at")
+    @classmethod
+    def _utc(cls, value: datetime) -> datetime:
+        """I06R1 §31/§32: naive/malformed timestamps rejected; aware values
+        canonicalized to UTC — no lexical-time assumptions."""
+        if value.tzinfo is None:
+            raise ValueError(
+                f"naive datetime {value.isoformat()!r} not allowed; supply "
+                "an offset-aware timestamp"
+            )
+        return value.astimezone(UTC)
 
 
 class RevisionObservationRecord(BaseModel):
@@ -305,11 +307,21 @@ class RevisionObservationRecord(BaseModel):
     source_revision_key: str
     revision_number: int
     blob_sha256: str
-    seen_at: str
+    seen_at: datetime
     observation_state: str
     usable_provenance: bool
     severity: str
-    registered_at: str
+    registered_at: datetime
+
+    @field_validator("seen_at", "registered_at")
+    @classmethod
+    def _utc(cls, value: datetime) -> datetime:
+        if value.tzinfo is None:
+            raise ValueError(
+                f"naive datetime {value.isoformat()!r} not allowed; supply "
+                "an offset-aware timestamp"
+            )
+        return value.astimezone(UTC)
 
 
 class RevisionDeclarationRecord(BaseModel):
@@ -326,10 +338,78 @@ class RevisionDeclarationRecord(BaseModel):
     declaration_id: str
     source_revision_key: str
     revision_number: int | None  # None = declaration precedes the segment
-    declaration_kind: str  # "revision" | "canonical"
+    declaration_kind: Literal["revision", "canonical"]  # I06R1 §33
     evidence_ref: str
-    declared_at: str
-    registered_at: str
+    declared_at: datetime
+    registered_at: datetime
+    # The birth-acquisition transition this declaration is bound to (I06R1
+    # §25 option A): the pending declaration names the acquisition whose
+    # bytes it classifies, so a retried registration can re-find it.
+    bound_acquisition_id: str | None = None
+    blob_sha256: str | None = None
+
+    @field_validator("declared_at", "registered_at")
+    @classmethod
+    def _utc(cls, value: datetime) -> datetime:
+        if value.tzinfo is None:
+            raise ValueError(
+                f"naive datetime {value.isoformat()!r} not allowed; supply "
+                "an offset-aware timestamp"
+            )
+        return value.astimezone(UTC)
+
+    @field_validator("evidence_ref")
+    @classmethod
+    def _evidence_nonempty(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError(
+                "evidence_ref must be a nonempty durable reference "
+                "(I06R1 §30)"
+            )
+        return value
+
+    @field_validator("declaration_kind")
+    @classmethod
+    def _kind_closed(cls, value: str) -> str:
+        if value not in ("revision", "canonical"):
+            raise ValueError(
+                f"declaration_kind must be 'revision' or 'canonical', "
+                f"got {value!r} (I06R1 §33)"
+            )
+        return value
+
+
+class ProviderRevisionDeclaration(BaseModel):
+    """Typed registration-time declaration input (I06R1 §24).
+
+    Replaces arbitrary dict semantics: evidence_ref must be nonempty and
+    ``declared_at`` must be an offset-aware datetime (normalized to UTC —
+    no ``str(datetime)``, no naive timestamps)."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    evidence_ref: str
+    declared_at: datetime
+
+    @field_validator("evidence_ref")
+    @classmethod
+    def _evidence_nonempty(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError(
+                "provider declaration requires a nonempty durable "
+                "evidence_ref (never inferred — I06 §33 / I06R1 §24)"
+            )
+        return value
+
+    @field_validator("declared_at")
+    @classmethod
+    def _aware(cls, value: datetime) -> datetime:
+        if value.tzinfo is None:
+            raise ValueError(
+                f"naive declared_at {value.isoformat()!r} not allowed; "
+                "supply an offset-aware datetime"
+            )
+        return value.astimezone(UTC)
 
 
 # ---------------------------------------------------------------------------
@@ -400,12 +480,14 @@ class RevisionResolution(BaseModel):
     provider_canonical_revision_number: int | None = None
 
 
-def _canonical_utc(value: datetime) -> str:
+def _canonical_utc(value: datetime) -> datetime:
+    """I06R1 §31/§32: typed aware-UTC datetimes throughout the records —
+    no ISO-string time fields, no lexical-time assumptions."""
     if value.tzinfo is None:
         raise RevisionConfigurationError(
             "chronology timestamps must be offset-aware"
         )
-    return value.astimezone(UTC).isoformat()
+    return value.astimezone(UTC)
 
 
 # Fields that define the SCIENTIFIC identity of a committed record.
@@ -562,6 +644,11 @@ class SourceRevisionRegistry:
                 f"unknown revision_state {record.revision_state!r} in "
                 "committed segment"
             )
+        if record.identity_version != IDENTITY_VERSION:
+            raise SourceRevisionCatalogCorrupt(
+                f"unsupported identity_version {record.identity_version!r}; "
+                f"this registry understands V{IDENTITY_VERSION} only"
+            )
         fields = record.identity_descriptor.get("fields", {})
         try:
             rebuilt = RevisionSourceIdentityV1(
@@ -627,7 +714,10 @@ class SourceRevisionRegistry:
             ).append(record)
 
     def _validate_cross_constraints(self) -> None:
-        # §49 restart validation.
+        # §49 restart validation + I06R1 §11/§15/§40: identity is bound back
+        # to the DURABLE acquisition that produced the evidence — internal
+        # hash consistency is not enough.
+        birth_bindings: dict[str, tuple[str, int, str]] = {}
         for key, segments in self._segments_by_key.items():
             numbers = sorted(s.revision_number for s in segments)
             if numbers != list(range(1, len(numbers) + 1)):
@@ -650,6 +740,18 @@ class SourceRevisionRegistry:
                         "duplicate revision number in committed segments"
                     )
                 seen_numbers.add(birth_seg.revision_number)
+                # I06R1 §15: one acquisition_id can never be the birth of
+                # two different revision segments — even with matching blobs.
+                prior_birth = birth_bindings.get(birth_seg.first_acquisition_id)
+                if prior_birth is not None and prior_birth != (
+                    birth_seg.source_revision_key,
+                    birth_seg.revision_number,
+                    birth_seg.blob_sha256,
+                ):
+                    raise SourceRevisionCatalogCorrupt(
+                        f"acquisition {birth_seg.first_acquisition_id!r} is "
+                        "the birth of two different revision segments"
+                    )
                 try:
                     acq = self._acquisitions.get_acquisition(
                         birth_seg.first_acquisition_id
@@ -665,13 +767,35 @@ class SourceRevisionRegistry:
                         "segment first acquisition blob does not match the "
                         "segment blob"
                     )
-        # §49: observations reference existing revisions, blob matches, the
-        # acquisition exists durably with the SAME blob, and no acquisition
-        # belongs to two revisions.  Seen times obey accepted ordering: a
-        # segment's first_seen_at is strictly increasing per source key
-        # (§39/§40 make ties and back-dating impossible) and each
-        # observation cannot precede the birth of its own revision.
-        all_bindings: dict[str, tuple[str, int, str]] = {}
+                # I06R1 §11: re-derive the identity from the durable
+                # acquisition's REQUEST semantics and require the persisted
+                # descriptor AND key to match it exactly.
+                actual_identity = RevisionSourceIdentityV1.from_acquisition(
+                    acq
+                )
+                if (
+                    actual_identity.to_descriptor()
+                    != birth_seg.identity_descriptor
+                    or actual_identity.source_revision_key()
+                    != birth_seg.source_revision_key
+                ):
+                    raise SourceRevisionCatalogCorrupt(
+                        f"segment {birth_seg.segment_id[:16]}... identity "
+                        "does not match the request semantics of its durable "
+                        "first acquisition (I06R1 §11)"
+                    )
+                birth_bindings[birth_seg.first_acquisition_id] = (
+                    birth_seg.source_revision_key,
+                    birth_seg.revision_number,
+                    birth_seg.blob_sha256,
+                )
+        # §49 + I06R1 §12/§18: observations reference existing revisions,
+        # blob matches, the acquisition exists durably with the SAME blob,
+        # AND the observation's source key matches the request semantics of
+        # its durable acquisition (byte identity never transfers source
+        # identity).  Birth bindings were seeded from segments above (§18);
+        # later observation bindings merge with conflict detection.
+        all_bindings: dict[str, tuple[str, int, str]] = dict(birth_bindings)
         for key, observations in self._observations_by_key.items():
             segments_by_num = {
                 s.revision_number: s for s in self._segments_by_key.get(key, [])
@@ -715,6 +839,17 @@ class SourceRevisionRegistry:
                     raise SourceRevisionCatalogCorrupt(
                         "observation acquisition blob does not match the "
                         "observation"
+                    )
+                # I06R1 §12: the observation's SOURCE key must equal the key
+                # derived from its durable acquisition — same bytes under a
+                # different logical source is corruption, not identity.
+                derived = RevisionSourceIdentityV1.from_acquisition(acq)
+                if derived.source_revision_key() != obs.source_revision_key:
+                    raise SourceRevisionCatalogCorrupt(
+                        f"observation {obs.observation_id!r} claims source "
+                        f"{obs.source_revision_key[:12]}... but its durable "
+                        "acquisition request semantics derive a different "
+                        "source key (I06R1 §12)"
                     )
                 if obs.seen_at < seg.first_seen_at:
                     raise SourceRevisionCatalogCorrupt(
@@ -1503,13 +1638,14 @@ class SourceRevisionRegistry:
             s.revision_number for s in self._segments_by_key.get(key, [])
         }
 
-    # -- materialized reads (§50-§53) ---------------------------------------------
+    # -- materialized reads (§50-§53, I06R1 §41/§42) ---------------------------
 
     def get_revision(self, source_revision_key: str, revision_number: int):
-        """Materialized frozen SourceRevision view (§50): first_seen from
-        segment birth, last_seen materialized from observations, reason and
-        state from the birth classification.  The persisted birth record is
-        NEVER mutated."""
+        """Materialized FROZEN ``models.SourceRevision`` view (I06R1 §41):
+        first_seen from segment birth, last_seen materialized from
+        observations, reason/state from the birth classification.  Timestamps
+        are aware-UTC datetimes and the state is the canonical enum.  The
+        persisted birth record is NEVER mutated."""
         for seg in self._segments_by_key.get(source_revision_key, []):
             if seg.revision_number == revision_number:
                 last_seen = seg.first_seen_at
@@ -1529,8 +1665,18 @@ class SourceRevisionRegistry:
                     last_seen_at=last_seen,
                     revision_state=seg.revision_state,
                     revision_reason=seg.revision_reason,
-                    first_acquisition_id=seg.first_acquisition_id,
                 )
+        return None
+
+    def segment_for_revision(
+        self, source_revision_key: str, revision_number: int
+    ) -> RevisionSegmentRecord | None:
+        """Registry metadata API (I06R1 §7): the immutable segment-birth
+        record, including ``first_acquisition_id`` — deliberately NOT part
+        of the frozen SourceRevision core model."""
+        for seg in self._segments_by_key.get(source_revision_key, []):
+            if seg.revision_number == revision_number:
+                return seg
         return None
 
     def list_revisions(self, source_revision_key: str) -> list["SourceRevision"]:
@@ -1683,25 +1829,11 @@ class SourceRevisionRegistry:
         return result([numbers[0]])
 
 
-class SourceRevision(BaseModel):
-    """Frozen materialized revision view (§50)."""
-
-    model_config = ConfigDict(frozen=True)
-
-    source_revision_key: str
-    revision_number: int
-    blob_sha256: str
-    first_seen_at: str
-    last_seen_at: str
-    revision_state: str
-    revision_reason: str
-    first_acquisition_id: str
-
-
 __all__ = [
     "IDENTITY_VERSION",
     "MutationSeverity",
     "ObservationState",
+    "ProviderRevisionDeclaration",
     "RevisionAcquisitionSource",
     "RevisionAmbiguityError",
     "RevisionBlobSource",
@@ -1726,5 +1858,4 @@ __all__ = [
     "SourceRevision",
     "SourceRevisionCatalogCorrupt",
     "SourceRevisionRegistry",
-    "StorageEncoding",
 ]

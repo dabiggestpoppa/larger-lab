@@ -275,8 +275,15 @@ class TestRevisionClassification:
         assert rev.revision_number == 1
         assert rev.revision_state == RevisionState.STABLE.value
         assert rev.blob_sha256 == acq.blob_sha256
-        assert rev.first_seen_at == rev.last_seen_at == T1.isoformat()
-        assert rev.first_acquisition_id == acq.acquisition_id
+        assert rev.first_seen_at == rev.last_seen_at == T1  # aware-UTC datetimes
+        # first_acquisition_id lives on the segment metadata (I06R1 §7),
+        # not the frozen core model.
+        assert (
+            stack.registry.segment_for_revision(
+                obs.source_revision_key, 1
+            ).first_acquisition_id
+            == acq.acquisition_id
+        )
 
     def test_identical_refetch_no_new_revision(self, tmp_path) -> None:
         """§24: same bytes ⇒ observation event, SAME revision number;
@@ -295,8 +302,8 @@ class TestRevisionClassification:
         revs = stack.registry.list_revisions(o1.source_revision_key)
         assert len(revs) == 1  # no new segment
         rev = revs[0]
-        assert rev.first_seen_at == T1.isoformat()  # birth unchanged
-        assert rev.last_seen_at == (T1 + timedelta(hours=1)).isoformat()
+        assert rev.first_seen_at == T1  # birth unchanged
+        assert rev.last_seen_at == T1 + timedelta(hours=1)
         # Both acquisitions visible in observation history (§52).
         views = stack.registry.list_observations(o1.source_revision_key)
         assert {v.acquisition_id for v in views} == {
@@ -342,7 +349,10 @@ class TestRevisionClassification:
         # rev1 and rev3 share the content hash but are DISTINCT segments —
         # history is never collapsed by blob identity.
         assert revs[0].blob_sha256 == revs[2].blob_sha256
-        assert revs[0].first_acquisition_id != revs[2].first_acquisition_id
+        assert (
+            stack.registry.segment_for_revision(key, 1).first_acquisition_id
+            != stack.registry.segment_for_revision(key, 3).first_acquisition_id
+        )
         assert revs[2].revision_state == RevisionState.SOURCE_MUTATION.value
 
     def test_match_of_older_revision_after_change_is_new_transition(
