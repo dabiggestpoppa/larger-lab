@@ -1141,8 +1141,10 @@ def main(argv: list[str] | None = None) -> int:
             for a in destroy(args.yes):
                 print(f"==> {a}")
             return 0
-    except SystemExit as exc:
-        return int(exc.code) if isinstance(exc.code, int) else 1
+    # S5734: SystemExit is never swallowed
+    # — it propagates so the
+    # interpreter applies the requested exit code at the sys.exit(main())
+    # boundary (SystemExit does not derive from Exception).
     except Exception as exc:  # fail closed with a plain message
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1
