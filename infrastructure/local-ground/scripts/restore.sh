@@ -107,7 +107,7 @@ done < <(tr -d '\r' < "$MANIFEST")
 declared_count=$count
 content_files=$(find "$CONTENT" -type f -printf '%P\n' | sort | tr -d '\r')
 count_content=$(printf '%s\n' "$content_files" | grep -c . || true)
-if [ "$declared_count" -ne "$count_content" ]; then
+if [[ "$declared_count" -ne "$count_content" ]]; then
   echo "CORRUPT: undeclared files or missing manifest entries (declared=$declared_count content=$count_content)" >&2
   rc=1
 fi
@@ -142,7 +142,7 @@ if [ "$MODE" = "state-only" ]; then
   mkdir -p "$VAR_DIR"
   (cd "$CONTENT" && find . -type f | sort) | while read -r rel; do
     rel="${rel#./}"
-    case "$rel" in backup-info.json) continue ;; esac
+    case "$rel" in backup-info.json) continue ;; *) ;; esac
     dest="$VAR_DIR/$rel"
     mkdir -p "$(dirname "$dest")"
     cp "$CONTENT/$rel" "$dest"
@@ -158,7 +158,7 @@ if [[ "$SCOPE" != "full" ]]; then
   echo "         A state-only backup cannot be restored with full-replace." >&2
   exit 3
 fi
-if [ "$DCR" != "True" ] && [ "$DCR" != "true" ]; then
+if [[ "$DCR" != "True" && "$DCR" != "true" ]]; then
   echo "BLOCKED: full backup must claim disaster_recovery_capable=true." >&2
   exit 3
 fi
@@ -212,7 +212,7 @@ OPS_ROOT="${OCE_EVIDENCE_DIR:-$VAR_DIR}/operations"
 BACKUP_ID="$(python3 -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));print(d.get('backup_id',''))" "$INFO" 2>/dev/null || echo unknown)"
 register_op() { # EXIT trap: index this restore operation immutably (idempotent)
   local rc="$1"
-  [ "$MODE" = "full-replace" ] || return 0
+  [[ "$MODE" == "full-replace" ]] || return 0
   local final="success" rollback="none"
   [ "$rc" -eq 0 ] || final="blocked"
   if [ -f "$RECEIPT_DIR/rollback-receipt.json" ]; then
@@ -372,7 +372,7 @@ if [[ "$SCOPE" == "full" && "$MODE" == "full-replace" ]]; then
   if docker inspect oce-local-redis >/dev/null 2>&1; then
     if docker exec oce-local-redis redis-cli FLUSHALL >/dev/null 2>&1; then
       DBSIZE=$(docker exec oce-local-redis redis-cli DBSIZE 2>/dev/null | tr -d '[:space:]')
-      if [ "$DBSIZE" = "0" ]; then
+      if [[ "$DBSIZE" == "0" ]]; then
         REDIS_INVALIDATED=true
         REDIS_VERIFICATION="ok"
       else

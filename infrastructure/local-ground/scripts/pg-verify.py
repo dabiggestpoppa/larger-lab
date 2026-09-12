@@ -36,9 +36,23 @@ DB = _PG.DB
 USER = _PG.USER
 
 
+def _validated_open_path(path: str) -> str:
+    """Canonicalize a filesystem path and refuse symlink escape (S2651).
+
+    Verification inputs name backup artifacts, not authority: an open()
+    target must resolve to its real path with no symlink indirection.
+    """
+    real = os.path.realpath(path)
+    if real != os.path.abspath(path):
+        raise RuntimeError(f"path escapes realpath containment: {path}")
+    if not os.path.isfile(real):
+        raise RuntimeError(f"not a regular file: {path}")
+    return real
+
+
 def load_protected_inventory(inventory_path, inventory_sha_path):
-    inv_doc = open(inventory_path, encoding="utf-8").read()
-    inv_sha = open(inventory_sha_path, encoding="utf-8").read().strip()
+    inv_doc = open(_validated_open_path(inventory_path), encoding="utf-8").read()
+    inv_sha = open(_validated_open_path(inventory_sha_path), encoding="utf-8").read().strip()
     if hashlib.sha256(inv_doc.encode()).hexdigest() != inv_sha:
         raise RuntimeError("database inventory tampered (SHA mismatch)")
     inv = _PG.parse_inventory(inv_doc)

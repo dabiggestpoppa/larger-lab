@@ -90,9 +90,23 @@ def _ops_index(ev):
     return True, idx, ""
 
 
+def _validated_subprocess_path(path: str) -> str:
+    """Canonicalize a filesystem path and refuse symlink escape (S1091).
+
+    CLI-supplied paths are data, not authority: the subprocess argument list
+    built from them must only ever address a real, contained evidence root.
+    """
+    real = os.path.realpath(path)
+    if real != os.path.abspath(path):
+        raise RuntimeError(f"path escapes realpath containment: {path}")
+    if not os.path.isdir(real):
+        raise RuntimeError(f"not a directory: {path}")
+    return real
+
+
 def _ops_verify(ev):
     """Run recovery-ops verify over the evidence package's operations root."""
-    ops_root = os.path.join(ev, "operations")
+    ops_root = _validated_subprocess_path(os.path.join(ev, "operations"))
     rops = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recovery-ops.py")
     r = subprocess.run([sys.executable, rops, "verify", "--ops-root", ops_root],
                        capture_output=True, text=True, timeout=60)

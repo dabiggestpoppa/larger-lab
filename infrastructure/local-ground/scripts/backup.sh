@@ -150,7 +150,7 @@ done > "$OUT/BACKUP_MANIFEST.sha256"
 
 # R25: for full scope, refuse to produce an incomplete backup if either
 # authoritative source silently produced nothing.
-if [ "$SCOPE" = "full" ]; then
+if [[ "$SCOPE" == "full" ]]; then
   [ -f "$CONTENT/postgres/archive.dump" ] && [ -s "$CONTENT/postgres/archive.dump" ] \
     || { echo "BLOCKED: full backup missing PostgreSQL archive" >&2; exit 3; }
   [[ -f "$CONTENT/postgres/inventory.json" && -s "$CONTENT/postgres/inventory.json" ]] \

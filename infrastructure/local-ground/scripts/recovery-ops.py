@@ -74,7 +74,8 @@ def _write_atomic(path, data):
     os.replace(tmp, path)
 
 
-def cmd_add(args):
+def _parse_add_args(args):
+    """Parse recovery-ops add arguments. Returns (kw, receipts, exit_code)."""
     kw = {}
     receipts = []
     i = 0
@@ -92,43 +93,79 @@ def cmd_add(args):
             kw[a[2:].replace("-", "_")] = args[i] if i < len(args) else None
         else:
             print(f"USAGE_ERROR: unknown arg '{a}'", file=sys.stderr)
-            return 2
+            return kw, receipts, 2
         i += 1
-    root = kw.get("ops_root")
-    opid = kw.get("operation_id", "")
-    if not root:
-        print("USAGE_ERROR: --ops-root required", file=sys.stderr)
-        return 2
+    return kw, receipts, 0
+
+
+def _add_usage_errors(kw, opid):
+    """Return a usage-error message or None when all required fields exist."""
+    if not kw.get("ops_root"):
+        return "USAGE_ERROR: --ops-root required"
     if not opid or not ID_RE.match(opid):
-        print(f"USAGE_ERROR: invalid --operation-id {opid!r}", file=sys.stderr)
-        return 2
+        return f"USAGE_ERROR: invalid --operation-id {opid!r}"
     required = ("operation_type", "run_id", "commit", "tree", "started_at",
                 "finished_at", "backup_id", "backup_scope", "restore_mode",
                 "source_database", "target_database", "final_result",
                 "rollback_result", "cloud_mutations", "cloud_cost_state")
     missing = [r for r in required if kw.get(r) in (None, "")]
     if missing:
-        print(f"USAGE_ERROR: missing required fields: {missing}", file=sys.stderr)
-        return 2
-    op_dir = os.path.join(root, "operations", opid)
-    if os.path.isdir(op_dir):
-        print(f"DUPLICATE_OPERATION_ID: {opid} already exists — immutable, cannot overwrite",
-              file=sys.stderr)
-        return 2
-    os.makedirs(op_dir, exist_ok=True)
+        return f"USAGE_ERROR: missing required fields: {missing}"
+    return None
+
+
+def _copy_receipts(root, op_dir, receipts):
+    """Copy receipt files into the operation dir. Returns (copied, error)."""
     copied = []
     for src in receipts:
         if not src or not os.path.isfile(src):
-            print(f"USAGE_ERROR: receipt file missing: {src}", file=sys.stderr)
-            shutil.rmtree(op_dir, ignore_errors=True)
-            return 2
+            return None, f"USAGE_ERROR: receipt file missing: {src}"
         name = os.path.basename(src)
         dst = os.path.join(op_dir, name)
         shutil.copy2(src, dst)
         copied.append({"path": os.path.relpath(dst, root).replace(os.sep, "/"),
                        "sha256": sha256_file(dst), "size": os.path.getsize(dst)})
     if not copied:
-        print("USAGE_ERROR: at least one --receipt is required", file=sys.stderr)
+        return None, "USAGE_ERROR: at least one --receipt is required"
+    return copied, None
+
+
+def _add_index_entry(index_path, entry):
+    """Append the operation entry to the immutable index. Returns error or None."""
+    try:
+        idx = load_index(index_path)
+    except Exception as e:
+        return f"BLOCKED: cannot read existing index: {e}"
+    if any(op.get("operation_id") == entry["operation_id"] for op in idx.get("operations", [])):
+        return "DUPLICATE_OPERATION_ID: already indexed — immutable, cannot overwrite"
+    idx.setdefault("operations", []).append(entry)
+    _write_atomic(index_path, idx)
+    _write_atomic(os.path.join(os.path.dirname(os.path.abspath(index_path)), "latest.json"),
+                  {"format": "oce-operation-index-latest-v1",
+                   "operation_id": entry["operation_id"],
+                   "entry": entry, "note": "convenience pointer; NOT authoritative"})
+    return None
+
+
+def cmd_add(args):
+    kw, receipts, rc = _parse_add_args(args)
+    if rc:
+        return rc
+    opid = kw.get("operation_id", "")
+    err = _add_usage_errors(kw, opid)
+    if err:
+        print(err, file=sys.stderr)
+        return 2
+    root = kw["ops_root"]
+    op_dir = os.path.join(root, "operations", opid)
+    if os.path.isdir(op_dir):
+        print(f"DUPLICATE_OPERATION_ID: {opid} already exists — immutable, cannot overwrite",
+              file=sys.stderr)
+        return 2
+    os.makedirs(op_dir, exist_ok=True)
+    copied, cerr = _copy_receipts(root, op_dir, receipts)
+    if cerr:
+        print(cerr, file=sys.stderr)
         shutil.rmtree(op_dir, ignore_errors=True)
         return 2
     entry = {"operation_id": opid,
@@ -149,21 +186,13 @@ def cmd_add(args):
              "cloud_cost_state": kw["cloud_cost_state"],
              "receipts": copied}
     index_path = os.path.join(root, "index.json")
-    try:
-        idx = load_index(index_path)
-    except Exception as e:
-        print(f"BLOCKED: cannot read existing index: {e}", file=sys.stderr)
+    ierr = _add_index_entry(index_path, entry)
+    if ierr:
+        print(ierr, file=sys.stderr)
+        if ierr.startswith("DUPLICATE"):
+            shutil.rmtree(op_dir, ignore_errors=True)
+            return 2
         return 1
-    if any(op.get("operation_id") == opid for op in idx.get("operations", [])):
-        print(f"DUPLICATE_OPERATION_ID: {opid} already indexed — immutable, cannot overwrite",
-              file=sys.stderr)
-        shutil.rmtree(op_dir, ignore_errors=True)
-        return 2
-    idx.setdefault("operations", []).append(entry)
-    _write_atomic(index_path, idx)
-    _write_atomic(os.path.join(root, "latest.json"),
-                  {"format": "oce-operation-index-latest-v1", "operation_id": opid,
-                   "entry": entry, "note": "convenience pointer; NOT authoritative"})
     print(f"operation {opid} indexed ({len(copied)} receipts)")
     return 0
 

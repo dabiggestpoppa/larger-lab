@@ -91,6 +91,66 @@ def _add_admit_parser(sub) -> None:
     admit.add_argument("--confirm", action="store_true",
                        help="admission is a governance action; pass to confirm PO intent")
 
+def _dispatch_admit(sup, wid, args) -> int:
+    """Governance-gated worker admission (dispatch extraction)."""
+    if not args.confirm:
+        print("admission is a governance action — re-run with --confirm "
+              "to authorize PO admission", file=sys.stderr)
+        return 2
+    try:
+        ident = sup.admit(wid, requested=args.cap or None, actor=args.actor)
+    except PermissionError as e:
+        print(f"DENIED: {e}", file=sys.stderr)
+        return 2
+    print_json(ident.to_dict())
+    return 0
+
+
+def _dispatch_worker_lifecycle(sup, cmd, wid) -> int:
+    """Start/stop/status-style worker commands (dispatch extraction)."""
+    try:
+        if cmd == "status" and not wid:
+            print_json(sup.status())   # full dashboard across workers
+            return 0
+        if not wid:
+            print(f"worker {cmd} requires a worker id", file=sys.stderr)
+            return 2
+        result = sup.status(wid) if cmd == "status" else getattr(sup, cmd)(wid)
+    except (PermissionError, KeyError) as e:
+        print(f"DENIED/error: {e}", file=sys.stderr)
+        return 2
+    print_json(result.to_dict() if hasattr(result, "to_dict") else result)
+    return 0
+
+
+def _dispatch_command(sup, args, worker_command) -> int:
+    """Route a parsed CLI command to its supervisor action."""
+    cmd = args.command
+    wid = getattr(args, "worker_id", "") or ""
+    if cmd == "console":
+        print_json(sup.operator_view())
+        return 0
+    if cmd == "doctor":
+        print_json(sup.doctor())
+        return 1 if not sup.doctor()["ok"] else 0
+    if cmd == "cleanup":
+        print_json(sup.cleanup())
+        return 0
+    if cmd == "configure":
+        command = worker_command or [sys.executable]
+        rec = sup.configure(wid, command=command,
+                            capabilities=args.cap or None, actor=args.actor)
+        print_json(rec.to_dict())
+        return 0
+    if cmd == "admit":
+        return _dispatch_admit(sup, wid, args)
+    if cmd in ("start", "up", "status", "pause", "resume", "drain",
+               "restart", "revoke", "stop"):
+        return _dispatch_worker_lifecycle(sup, cmd, wid)
+    print(f"unknown command '{cmd}'", file=sys.stderr)
+    return 2
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(argv) if argv is not None else sys.argv[1:]
     # Capture the worker command explicitly: everything after the first `--`
@@ -122,55 +182,7 @@ def main(argv: list[str] | None = None) -> int:
 
     args = p.parse_args(argv)
     sup = build_supervisor(_runtime_dir(args))
-    cmd = args.command
-
-    if cmd == "console":
-        print_json(sup.operator_view())
-        return 0
-    if cmd == "doctor":
-        print_json(sup.doctor())
-        return 1 if not sup.doctor()["ok"] else 0
-    if cmd == "cleanup":
-        print_json(sup.cleanup())
-        return 0
-
-    wid = getattr(args, "worker_id", "") or ""
-    if cmd == "configure":
-        command = worker_command or [sys.executable]
-        rec = sup.configure(wid, command=command,
-                            capabilities=args.cap or None, actor=args.actor)
-        print_json(rec.to_dict())
-        return 0
-    if cmd == "admit":
-        if not args.confirm:
-            print("admission is a governance action — re-run with --confirm "
-                  "to authorize PO admission", file=sys.stderr)
-            return 2
-        try:
-            ident = sup.admit(wid, requested=args.cap or None, actor=args.actor)
-        except PermissionError as e:
-            print(f"DENIED: {e}", file=sys.stderr)
-            return 2
-        print_json(ident.to_dict())
-        return 0
-    if cmd in ("start", "up", "status", "pause", "resume", "drain",
-               "restart", "revoke", "stop"):
-        try:
-            if cmd == "status" and not wid:
-                print_json(sup.status())   # full dashboard across workers
-                return 0
-            if not wid:
-                print(f"worker {cmd} requires a worker id", file=sys.stderr)
-                return 2
-            result = sup.status(wid) if cmd == "status" else getattr(sup, cmd)(wid)
-        except (PermissionError, KeyError) as e:
-            print(f"DENIED/error: {e}", file=sys.stderr)
-            return 2
-        print_json(result.to_dict() if hasattr(result, "to_dict") else result)
-        return 0
-
-    print(f"unknown command '{cmd}'", file=sys.stderr)
-    return 2
+    return _dispatch_command(sup, args, worker_command)
 
 
 def print_json(obj) -> None:

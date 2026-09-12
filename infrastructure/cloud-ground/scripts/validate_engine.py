@@ -814,17 +814,18 @@ class Validator:
             self.add("NO-SECRETS", "No embedded secrets", True, "PASS", "0 violations", "Clean")
 
     def check_health_checks(self):
+        label = "Health checks on foundation services"
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
-            self.add("HEALTH-CHECKS", "Health checks on foundation services", True, "BLOCKED",
+            self.add("HEALTH-CHECKS", label, True, "BLOCKED",
                       "compose.foundation.yml not found", "")
             return
         hc_count = self._read_file(foundation).count("healthcheck:")
         if hc_count >= 2:
-            self.add("HEALTH-CHECKS", "Health checks on foundation services", True, "PASS",
+            self.add("HEALTH-CHECKS", label, True, "PASS",
                       f"{hc_count} health checks", "Both services")
         else:
-            self.add("HEALTH-CHECKS", "Health checks on foundation services", True, "FAIL",
+            self.add("HEALTH-CHECKS", label, True, "FAIL",
                       f"{hc_count} health checks", f"Need 2+, found {hc_count}")
 
     def check_cost_thresholds(self):
@@ -1106,12 +1107,13 @@ class Validator:
         except subprocess.TimeoutExpired:
             self.add("GITLEAKS", "Secret scan passes (gitleaks)", True, "BLOCKED", "timeout", "")
 
-    def check_scaffold_scan(self):
+    def _collect_scaffold_violations(self):
+        """Collect unresolved scaffold markers from executable scripts."""
         violations = []
         scaffold_patterns = [
-            (r"\bTODO\b", "TODO marker"),
-            (r"\bFIXME\b", "FIXME marker"),
-            (r"\bNOT\s+IMPLEMENTED\b", "NOT IMPLEMENTED marker"),
+            (r"TODO", "TODO marker"),
+            (r"FIXME", "FIXME marker"),
+            (r"NOT\s+IMPLEMENTED", "NOT IMPLEMENTED marker"),
         ]
         scan_paths = []
         if (BASE_DIR / "scripts").exists():
@@ -1129,6 +1131,10 @@ class Validator:
                     if re.search(pattern, stripped, re.IGNORECASE):
                         violations.append(f"{f.relative_to(BASE_DIR)}:{i}: {desc}")
                         break
+        return violations
+
+    def check_scaffold_scan(self):
+        violations = self._collect_scaffold_violations()
         if violations:
             self.add("SCAFFOLD-SCAN", "No unresolved scaffolds in executables", True, "FAIL",
                       f"{len(violations)} violations", "\n".join(violations))
@@ -1270,26 +1276,8 @@ class Validator:
                       f"{neg_passed} negative + {meta_passed} meta pass",
                       "All mutations correctly rejected; all meta tests prove rejection")
 
-    def check_meta_test_evidence(self):
-        adv_path = self._evidence_dir() / "adversarial-results.json"
-        if not adv_path.exists():
-            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
-                      "adversarial-results.json not found", "")
-            return
-        try:
-            with open(adv_path, "r", encoding="utf-8") as f:
-                adv = json.load(f)
-        except Exception as e:
-            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
-                      f"Cannot parse: {e}", "")
-            return
-
-        meta_tests = adv.get("meta_tests", [])
-        if not meta_tests:
-            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
-                      "No meta tests found", "")
-            return
-
+    def _meta_test_errors(self, meta_tests):
+        """Validate one meta-test evidence record list; returns error strings."""
         errors = []
         for t in meta_tests:
             tid = t.get("test_id", "?")
@@ -1317,7 +1305,29 @@ class Validator:
                     errors.append(f"{tid}: expected_rejection={expected_rejection} (must be FAIL or BLOCKED)")
                 if observed_rejection not in ("FAIL", "BLOCKED"):
                     errors.append(f"{tid}: observed_rejection={observed_rejection} (must be FAIL or BLOCKED)")
+        return errors
 
+    def check_meta_test_evidence(self):
+        adv_path = self._evidence_dir() / "adversarial-results.json"
+        if not adv_path.exists():
+            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
+                      "adversarial-results.json not found", "")
+            return
+        try:
+            with open(adv_path, "r", encoding="utf-8") as f:
+                adv = json.load(f)
+        except Exception as e:
+            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
+                      f"Cannot parse: {e}", "")
+            return
+
+        meta_tests = adv.get("meta_tests", [])
+        if not meta_tests:
+            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
+                      "No meta tests found", "")
+            return
+
+        errors = self._meta_test_errors(meta_tests)
         if errors:
             self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "FAIL",
                       f"{len(errors)} issues", "\n".join(errors[:10]))

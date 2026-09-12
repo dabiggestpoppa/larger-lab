@@ -319,7 +319,7 @@ run_meta() {
     local fr
     fr=$(get_result "FAIL-CLOSED")
     rm -f "$SCRATCH_DIR/adversarial-results.json"
-    if [ "$fr" = "FAIL" ] || [ "$fr" = "BLOCKED" ]; then
+    if [[ "$fr" == "FAIL" || "$fr" == "BLOCKED" ]]; then
         echo "    PASS (FAIL-CLOSED=$fr, exit=$rc)"; PASS_COUNT=$((PASS_COUNT + 1))
         write_meta_result "$meta_id" "PASS" "$desc" "$fixture_type" "$invalid_condition" \
             "FAIL" "$fr" "$rc" "Invalid fixture correctly rejected"
@@ -511,7 +511,7 @@ python3 -c "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['
 rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" >/dev/null 2>&1 || rc=$?
 cp "$BACKUP_DIR/pre-CLI-05.json" "$IDENTITY"
 res=$(get_result "SOURCE-IDENTITY")
-if [ "$res" = "FAIL" ] && [ "$rc" -ne 0 ]; then
+if [[ "$res" == "FAIL" && "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-05" "PASS" "FAIL+nonzero exit paired" \
         "cli-exit" "SOURCE-IDENTITY FAIL must pair with nonzero exit code" \
@@ -574,8 +574,8 @@ echo "  FAIL:    $FAIL_COUNT"
 echo "=============================================="
 
 SUITE_RESULT="PASS"
-[ "$FAIL_COUNT" -gt 0 ] && SUITE_RESULT="FAIL"
-[ "$TOTAL_COUNT" -lt 30 ] && SUITE_RESULT="FAIL"
+[[ "$FAIL_COUNT" -gt 0 ]] && SUITE_RESULT="FAIL"
+[[ "$TOTAL_COUNT" -lt 30 ]] && SUITE_RESULT="FAIL"
 echo "  Suite:   $SUITE_RESULT"
 
 # Aggregate all test result files into adversarial-results.json

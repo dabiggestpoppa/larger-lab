@@ -963,10 +963,10 @@ def start(timeout_s: int = 120, migrate_now: bool = True) -> list[str]:
     # B4-CXR5R1: worker authentication material is NEVER passed through
     # argv — the worker reads its token from the approved store (initialized
     # once in configure(); read-only during start/restart/recover).
-    start_process("worker", [PYTHON, "-m", "oce_control.worker_loop",
+    start_process("worker", [PYTHON, "-m", WORKER_MARKER,
                              "--worker-id", "worker-local01"], env=worker_env)
     actions.append("worker started (pid-file owned, token from approved store)")
-    start_process("api", [PYTHON, "-m", "oce_control.http_api"], env=api_env)
+    start_process("api", [PYTHON, "-m", API_MARKER], env=api_env)
     actions.append("api started (pid-file owned, pinned activation lineage)")
     if not wait_for_http(timeout_s, port=ctx.control_plane_port):
         raise RuntimeError("API did not answer on 127.0.0.1")
@@ -1051,11 +1051,11 @@ def recover() -> list[str]:
                 child_role=child_role,
                 migration_set_identity=_migration_set_identity())
             if name == "worker":
-                start_process("worker", [PYTHON, "-m", "oce_control.worker_loop",
+                start_process("worker", [PYTHON, "-m", WORKER_MARKER,
                                          "--worker-id", "worker-local01"],
                               env=child_env)
             else:
-                start_process("api", [PYTHON, "-m", "oce_control.http_api"],
+                start_process("api", [PYTHON, "-m", API_MARKER],
                               env=child_env)
             actions.append(f"{name} restarted (pinned activation lineage)")
     return actions

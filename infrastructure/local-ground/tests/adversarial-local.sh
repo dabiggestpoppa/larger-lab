@@ -21,7 +21,7 @@ check() { # name expected_rc cmd...
   local name="$1" expected="$2"; shift 2
   "$@" >> "$LOG" 2>&1
   local rc=$?
-  if [ "$rc" -eq "$expected" ]; then
+  if [[ "$rc" -eq "$expected" ]]; then
     echo "PASS: $name (rc=$rc as expected)" | tee -a "$LOG"
     NAMES+=("$name"); OUTCOMES+=("PASS")
   else

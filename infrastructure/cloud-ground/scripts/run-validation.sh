@@ -64,7 +64,7 @@ WORKTREE_PRUNED=false
 # ═══════════════════════════════════════════════════════════════════
 # Step a: Validate external OCE_RUN_ID (fail closed)
 # ═══════════════════════════════════════════════════════════════════
-if [ -z "${OCE_RUN_ID:-}" ]; then
+if [[ -z "${OCE_RUN_ID:-}" ]]; then
     echo "FATAL: OCE_RUN_ID is not set. The shared runner must receive exactly one RUN_ID from the caller." >&2
     exit 2
 fi
@@ -163,8 +163,8 @@ write_worktree_cleanup_evidence() {
     # and again from the exit trap for abnormal-failure cleanup.
     export _WT_REMOVED=$WORKTREE_REMOVED _WT_PRUNED=$WORKTREE_PRUNED
     printf '{"removed": %s, "pruned": %s}\n' \
-        "$( [ "$WORKTREE_REMOVED" = true ] && echo true || echo false)" \
-        "$( [ "$WORKTREE_PRUNED" = true ] && echo true || echo false)" \
+        "$( [[ "$WORKTREE_REMOVED" = true ]] && echo true || echo false)" \
+        "$( [[ "$WORKTREE_PRUNED" = true ]] && echo true || echo false)" \
         > "$FINAL_EVIDENCE/worktree-cleanup.json" 2>/dev/null || true
 }
 
@@ -181,7 +181,7 @@ cleanup() {
         WORKTREE_PRUNED=true
     fi
     write_worktree_cleanup_evidence
-    if [ -n "$FAILED_PHASE" ] && [ "$rc" -ne 0 ]; then
+    if [[ -n "$FAILED_PHASE" && "$rc" -ne 0 ]]; then
         write_failure_context "$FAILED_PHASE" "$rc" || true
     fi
     exit "$rc"
@@ -342,7 +342,7 @@ python3 "$ENGINE_WIN" --all --authoritative --phase initial \
     --target-commit "$COMMIT" --target-tree "$TREE" --target-branch "$OBSERVED_BRANCH" \
     --evidence-dir "$FINAL_EVIDENCE_WIN"
 ENGINE_RC=$?
-if [ "$ENGINE_RC" -ne 0 ]; then
+if [[ "$ENGINE_RC" -ne 0 ]]; then
     FAILED_PHASE="initial-validation"
     echo "FATAL: Initial validation failed (exit $ENGINE_RC)." >&2
     exit 1
@@ -447,7 +447,7 @@ python3 "$ENGINE_WIN" --all --authoritative --phase final \
     --target-commit "$COMMIT" --target-tree "$TREE" --target-branch "$OBSERVED_BRANCH" \
     --evidence-dir "$FINAL_EVIDENCE_WIN"
 ENGINE_RC=$?
-if [ "$ENGINE_RC" -ne 0 ]; then
+if [[ "$ENGINE_RC" -ne 0 ]]; then
     FAILED_PHASE="final-validation"
     echo "FATAL: Final validation did not reach READY (exit $ENGINE_RC)." >&2
     exit 1

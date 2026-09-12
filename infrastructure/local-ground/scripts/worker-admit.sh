@@ -17,7 +17,7 @@ ADMISSIONS="$BASE_DIR/var/worker-admissions.jsonl"
 mkdir -p "$(dirname "$ADMISSIONS")"
 
 mode="${1:-}"; env_file="${2:-}"
-if [ -z "$mode" ] || [ -z "$env_file" ] || [ ! -f "$env_file" ]; then
+if [[ -z "$mode" || -z "$env_file" || ! -f "$env_file" ]]; then
   echo "BLOCKED: worker-admit.sh <admit|reject> <envelope.json>" >&2
   exit 3
 fi
