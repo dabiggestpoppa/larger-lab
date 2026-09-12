@@ -2,13 +2,49 @@
 
 **Branch:** `qcae-capability-acquisition-engine`
 **Canon:** QCAE v0.1 (Blocks 0–18, COMPLETE / FROZEN) under `qcae/books/`
+**Active amendments:** A-001 (Research Mesh Boundary and Economic Experience v1.0)
 **Build mode:** BUILD MODE per master prompt; phases P0→P12 strictly sequential.
 
 ---
 
 ## Current Phase
 
-**P0 — Skeleton + Domain Schemas: FROZEN (pending operator review)**
+**P0 — FROZEN v0.1 + A-001 RECONCILED (pending operator authorization for P1)**
+
+### Amendment reconciliation timeline
+
+1. **P0 original freeze** at `6d23c956` (270/270 LOCAL TEST EVIDENCE; manifest
+   `qcae/implementation/P0-freeze-manifest.json` — preserved, not overwritten).
+2. **A-001 landed** on the branch (`docs(qcae)` commits:
+   `66e99505`, `6d98193c`, `a399f525`, `281d1aa9`) — additive amendment register,
+   Research Mesh boundary, ResearchCapabilityHandoff + EconomicExperienceRecord
+   interface schemas.
+3. **P0 amendment reconciliation opened** per operator directive (reconcile
+   A-001 §13 P0 obligations; repair reviewed ambiguities).
+4. **Reconciliation commits** `983a742e` → (see commit log below).
+5. **Amendment tests added** (139 new tests across vocabulary, handoff,
+   economic/cross-registry, contract repair, deferred semantics, schema drift).
+6. **New freeze** — `qcae/implementation/P0-A001-freeze-manifest.json`
+   (411/411 LOCAL TEST EVIDENCE).
+
+### P0-A001 exit gate (reconciliation prompt §17)
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| all active amendments registered | PASS | A-001 in manifest `active_amendments`; register read in full |
+| A-001 P0 obligations have domain/interface representation | PASS | gap taxonomy, resolution vocabulary, handoff contract, EconomicExperienceRecord, ExternalRegistryRef |
+| original P0 semantics remain compatible | PASS | all 270 original tests pass unmodified except one terminal-set assertion updated by ADR-0004 (documented, not weakened) |
+| no Research Mesh implementation leaked into core | PASS | 2 new architecture guards + fragment scan; interface contracts only |
+| no economic/marketplace authority added | PASS | no execution/revenue/mutation code; reference records only |
+| customer payment/acceptance cannot become institutional proof | PASS | firewall tests (promotion requires governed refs; PROMOTED requires citation) |
+| client-protected material fail-closed | PASS | PROMOTED + protected-rights pre-RIGHTS_FILTERED rejection tests |
+| DEFERRED ambiguity resolved | PASS | ADR-0004 interpretation A; consistency tests |
+| CapabilityContract validation repair complete | PASS | request_id + all string-tuple fields validated; 34 negative tests |
+| schema/interface drift guard exists | PASS | test_p0_a001_schema_drift.py (ADR-0005), self-verifying |
+| all qcae tests pass | PASS | 411/411 (LOCAL TEST EVIDENCE) |
+| amendment-aware freeze manifest exists | PASS | P0-A001-freeze-manifest.json |
+| progress ledger current | PASS | this file |
+| no unapproved canon deviation | PASS | ADRs 0003–0005 documented; none contradict canon |
 
 ### P0 Checklist — COMPLETE
 
@@ -42,6 +78,8 @@
 
 ## Commit Log
 
+### P0 original freeze (pre-A001, preserved)
+
 | Commit | Phase-Intent | Purpose |
 | --- | --- | --- |
 | e1fda033 | P0-I0 | progress ledger + ADR-0001/0002 |
@@ -53,15 +91,31 @@
 | 9acd4d2f | P0-C06 | relationships + evidence refs |
 | 102c3c5c | P0-C07 | acquisition decisions + authority + job/step |
 | 7ad5277c | P0-T01 | architecture dependency guards |
-| (this commit) | P0-FREEZE | freeze manifest + ledger freeze state |
+| 6d23c956 | P0-FREEZE | freeze manifest + ledger freeze state |
+
+### P0-A001 reconciliation (additive)
+
+| Commit | Phase-Intent | Purpose |
+| --- | --- | --- |
+| 983a742e | P0-A001-01 | gap taxonomy + economic resolution vocabulary |
+| 69b347ef | P0-A001-02 | Research Mesh handoff contract |
+| 6eee5fb8 | P0-A001-03 | Economic Experience + cross-registry refs + ADR-0003 |
+| 16bb5229 | P0-A001-04 | CapabilityContract validation repair |
+| 74993b67 | P0-A001-05 | DEFERRED semantics resolution (ADR-0004) |
+| 24d3364c | P0-A001-T02 | schema drift guard + Research Mesh isolation guards (ADR-0005) |
+| d82f727f | P0-A001-T02 | malformed provenance rejection tests |
+| (this commit) | P0-A001-FREEZE | amendment-aware manifest + ledger freeze state |
 
 ---
 
 ## Test Ledger
 
+All rows are LOCAL TEST EVIDENCE (`python -m pytest qcae/tests -q`).
+
 | Suite | Tests | Passed | Failed | Skipped | Commit |
 | --- | --- | --- | --- | --- | --- |
-| qcae/tests (final P0) | 270 | 270 | 0 | 0 | P0-FREEZE |
+| qcae/tests (P0 original freeze) | 270 | 270 | 0 | 0 | 6d23c956 |
+| qcae/tests (P0 + A-001 reconciliation) | 411 | 411 | 0 | 0 | P0-A001-FREEZE |
 
 Composition: 255 unit + 15 architecture guards.
 
@@ -82,13 +136,15 @@ Pre-existing failure outside QCAE (not introduced by this work, verified identic
 
 ---
 
-## Evidence Artifacts (canon 18.3 Phase 0 matrix)
+## Evidence Artifacts (canon 18.3 Phase 0 matrix + reconciliation §10)
 
-- [x] schema snapshots — `qcae/implementation/P0-freeze-manifest.json` (`schema_snapshots` + `schema_snapshot_digest`)
-- [x] lifecycle transition tests — `qcae/tests/unit/test_p0_lifecycle.py`
+- [x] schema snapshots (22: 13 original + 9 amendment) — both freeze manifests
+- [x] lifecycle transition tests — `qcae/tests/unit/test_p0_lifecycle.py`, `test_p0_a001_deferred.py`
 - [x] architecture/dependency guards — `qcae/tests/architecture/test_p0_dependency_guards.py`
-- [x] serialization round-trip evidence — `qcae/tests/unit/test_p0_serialization.py`, `test_p0_contract.py`
-- [x] P0 freeze manifest — machine-readable: commits, SHAs, test run, deferred items, evidence refs
+- [x] serialization round-trip evidence — `qcae/tests/unit/test_p0_serialization.py`, `test_p0_contract.py`, A-001 contract tests
+- [x] P0 freeze manifest (preserved) — `qcae/implementation/P0-freeze-manifest.json`
+- [x] P0-A001 amendment-aware freeze manifest — `qcae/implementation/P0-A001-freeze-manifest.json`
+- [x] ADRs — 0001/0002 (original), 0003 (vocabulary layering), 0004 (DEFERRED), 0005 (drift guard)
 
 ---
 
@@ -96,6 +152,9 @@ Pre-existing failure outside QCAE (not introduced by this work, verified identic
 
 - ADR-0001 — core domain: stdlib dataclasses + explicit validation; zero third-party dependencies in `qcae/core`
 - ADR-0002 — `qcae/` package at repo root per Book V 15.1; tests under `qcae/tests/`; root pytest config extended
+- ADR-0003 — two-layer acquisition vocabulary: CapabilityResolutionMode (institutional) over AcquisitionForm (implementation); no silent replacement
+- ADR-0004 — DEFERRED is terminal for that decision/version; resumption = superseding object (canon 0.5.15 + Book IV 11.6)
+- ADR-0005 — amendment interface-schema drift guard via explicit compatibility assertions; no new dependencies
 
 Location: `qcae/implementation/decisions/`
 
@@ -121,4 +180,4 @@ None.
 
 ## Next Action
 
-P0 is frozen and awaiting operator review. On explicit authorization, begin **P1 — Evidence + Registry Spine** (canon 18.1 Phase 1: artifact hashing/store, structured persistence, provenance relationships, Capability Receipts, negative knowledge, repositories/unit-of-work, migrations, backup/restore), reading Book IV Block 9 chapters first.
+P0 — FROZEN v0.1 + A-001 RECONCILED. Awaiting operator authorization for **P1 — Evidence + Registry Spine** (canon 18.1 Phase 1: artifact hashing/store, structured persistence, provenance relationships, Capability Receipts, negative knowledge, repositories/unit-of-work, migrations, backup/restore; plus A-001 §13 P1 obligation: cross-registry provenance without collapsing knowledge/capability ownership). Book IV Block 9 chapters + A-001 to be read before P1 starts.

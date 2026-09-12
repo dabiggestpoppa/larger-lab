@@ -1,0 +1,760 @@
+{
+  "manifest_version": 1,
+  "phase": "P0-A001",
+  "canon_version": "0.1",
+  "qcae_version": "0.1.0",
+  "generated_at": "2026-09-12T16:25:17.179437+00:00",
+  "head_commit": "d82f727f28022c92892b7645dbf0e72ad65df72f",
+  "branch": "qcae-capability-acquisition-engine",
+  "phase_commits": [
+    {
+      "sha": "d82f727f",
+      "subject": "P0-A001-T02: add malformed provenance rejection tests for handoff contract"
+    },
+    {
+      "sha": "24d3364c",
+      "subject": "P0-A001-T02: add A-001 schema drift guard and Research Mesh isolation guards"
+    },
+    {
+      "sha": "74993b67",
+      "subject": "P0-A001-05: resolve DEFERRED as terminal per ADR-0004 with consistency tests"
+    },
+    {
+      "sha": "16bb5229",
+      "subject": "P0-A001-04: tighten CapabilityContract validation for request_id and all string-tuple fields"
+    },
+    {
+      "sha": "6eee5fb8",
+      "subject": "P0-A001-03: add Economic Experience reference and cross-registry refs with promotion firewall"
+    },
+    {
+      "sha": "69b347ef",
+      "subject": "P0-A001-02: add Research Mesh handoff contract with fallback and evidence-firewall rules"
+    },
+    {
+      "sha": "983a742e",
+      "subject": "P0-A001-01: add gap taxonomy and economic resolution vocabulary per amendment A-001"
+    }
+  ],
+  "schema_snapshots": [
+    {
+      "object_type": "CapabilityContract",
+      "schema_version": 1,
+      "fields": [
+        "capability_id",
+        "contract_version",
+        "request_id",
+        "title",
+        "problem_statement",
+        "intent",
+        "required_behaviors",
+        "optional_behaviors",
+        "explicit_non_goals",
+        "inputs",
+        "outputs",
+        "acceptance_tests",
+        "required_evidence_classes",
+        "forbidden_conditions",
+        "preferred_acquisition_forms",
+        "forbidden_acquisition_forms",
+        "performance_requirements",
+        "precision_requirements",
+        "latency_requirements",
+        "throughput_requirements",
+        "runtime_constraints",
+        "platform_constraints",
+        "language_constraints",
+        "integration_constraints",
+        "license_constraints",
+        "cost_constraints",
+        "maintenance_constraints",
+        "security_class",
+        "data_classification",
+        "network_policy",
+        "secret_policy",
+        "quant_domain",
+        "cerebus_relevance",
+        "owner",
+        "created_at",
+        "supersedes_contract"
+      ]
+    },
+    {
+      "object_type": "CapabilityAtom",
+      "schema_version": 1,
+      "fields": [
+        "atom_id",
+        "atom_version",
+        "name",
+        "atom_type",
+        "description",
+        "parent_capabilities",
+        "inputs",
+        "outputs",
+        "state",
+        "acceptance_conditions",
+        "implementation_candidates",
+        "dependencies",
+        "coupling",
+        "security_class",
+        "domain",
+        "provenance",
+        "status"
+      ]
+    },
+    {
+      "object_type": "CompositionMember",
+      "schema_version": 1,
+      "fields": [
+        "atom_id",
+        "role"
+      ]
+    },
+    {
+      "object_type": "Candidate",
+      "schema_version": 1,
+      "fields": [
+        "candidate_id",
+        "name",
+        "source_kind",
+        "source_ref",
+        "revision",
+        "claims_atoms",
+        "claim_verification",
+        "discovered_via",
+        "notes"
+      ]
+    },
+    {
+      "object_type": "EntityRef",
+      "schema_version": 1,
+      "fields": [
+        "entity_type",
+        "entity_id"
+      ]
+    },
+    {
+      "object_type": "Relationship",
+      "schema_version": 1,
+      "fields": [
+        "source",
+        "relation",
+        "target",
+        "verification",
+        "source_revision",
+        "target_revision",
+        "evidence_digests",
+        "asserted_by",
+        "asserted_at"
+      ]
+    },
+    {
+      "object_type": "EvidenceRef",
+      "schema_version": 1,
+      "fields": [
+        "artifact_digest",
+        "evidence_class",
+        "subject_id",
+        "revision",
+        "locator",
+        "collected_at",
+        "collected_by"
+      ]
+    },
+    {
+      "object_type": "TransitionWaiver",
+      "schema_version": 1,
+      "fields": [
+        "waived_gate",
+        "justification",
+        "policy_ref",
+        "authority_id",
+        "decided_at"
+      ]
+    },
+    {
+      "object_type": "AcquisitionDecision",
+      "schema_version": 1,
+      "fields": [
+        "decision_id",
+        "capability_scope",
+        "candidate_ref",
+        "form",
+        "outcome",
+        "rationale",
+        "rejection_reason",
+        "evidence_digests",
+        "authority_decision_ref",
+        "deferred_pending",
+        "decided_by",
+        "decided_at",
+        "supersedes_decision"
+      ]
+    },
+    {
+      "object_type": "AuthorityRequest",
+      "schema_version": 1,
+      "fields": [
+        "request_id",
+        "action",
+        "subject_id",
+        "justification",
+        "requested_by",
+        "context"
+      ]
+    },
+    {
+      "object_type": "AuthorityDecision",
+      "schema_version": 1,
+      "fields": [
+        "decision_id",
+        "request_ref",
+        "action",
+        "outcome",
+        "decided_by",
+        "decided_at",
+        "reason"
+      ]
+    },
+    {
+      "object_type": "Step",
+      "schema_version": 1,
+      "fields": [
+        "step_id",
+        "step_kind",
+        "status",
+        "evidence_digests",
+        "error"
+      ]
+    },
+    {
+      "object_type": "Job",
+      "schema_version": 1,
+      "fields": [
+        "job_id",
+        "deterministic_id",
+        "job_kind",
+        "subject_ref",
+        "status",
+        "steps",
+        "worker_role",
+        "context_packet_ref",
+        "created_by",
+        "created_at"
+      ]
+    },
+    {
+      "object_type": "GapRef",
+      "schema_version": 1,
+      "fields": [
+        "gap_id",
+        "gap_type"
+      ]
+    },
+    {
+      "object_type": "MixedGapDecomposition",
+      "schema_version": 1,
+      "fields": [
+        "mixed_gap_id",
+        "component_gaps"
+      ]
+    },
+    {
+      "object_type": "HandoffConstraints",
+      "schema_version": 1,
+      "fields": [
+        "deadline",
+        "max_compute_cost_usd",
+        "max_tool_cost_usd",
+        "max_human_minutes",
+        "source_allowlist",
+        "source_denylist",
+        "data_rights"
+      ]
+    },
+    {
+      "object_type": "HandoffProvenance",
+      "schema_version": 1,
+      "fields": [
+        "created_at",
+        "producer",
+        "source_refs",
+        "evidence_hashes",
+        "parent_event_ids"
+      ]
+    },
+    {
+      "object_type": "HandoffResult",
+      "schema_version": 1,
+      "fields": [
+        "finding",
+        "confidence",
+        "uncertainty",
+        "assumptions",
+        "contradictions",
+        "testable_claims",
+        "specification_inputs",
+        "recommended_next_action"
+      ]
+    },
+    {
+      "object_type": "ResearchCapabilityHandoff",
+      "schema_version": 1,
+      "fields": [
+        "interface_version",
+        "direction",
+        "request_id",
+        "mode",
+        "gap_type",
+        "status",
+        "provenance",
+        "origin_objective_id",
+        "capability_gap_id",
+        "research_question",
+        "capability_context",
+        "constraints",
+        "required_outputs",
+        "result",
+        "fallback_class"
+      ]
+    },
+    {
+      "object_type": "EconomicsBlock",
+      "schema_version": 1,
+      "fields": [
+        "gross_payout",
+        "direct_cost",
+        "compute_cost",
+        "tool_cost",
+        "currency",
+        "estimated_human_cost",
+        "net_contribution"
+      ]
+    },
+    {
+      "object_type": "EconomicExperienceRecord",
+      "schema_version": 1,
+      "fields": [
+        "interface_version",
+        "experience_id",
+        "source",
+        "opportunity_id",
+        "objective_type",
+        "economics",
+        "human_intervention_minutes",
+        "execution_time_seconds",
+        "capabilities_used",
+        "research_used",
+        "knowledge_gaps_found",
+        "capability_gaps_found",
+        "errors_encountered",
+        "client_revisions",
+        "qa_result",
+        "customer_acceptance",
+        "outcome",
+        "reusability_score",
+        "transferability_score",
+        "lesson_candidates",
+        "data_rights",
+        "contains_client_specific_material",
+        "promotion_state",
+        "promotion_refs",
+        "recorded_at"
+      ]
+    },
+    {
+      "object_type": "ExternalRegistryRef",
+      "schema_version": 1,
+      "fields": [
+        "registry",
+        "external_id",
+        "owner_domain",
+        "lifecycle_role",
+        "external_digest",
+        "referenced_at"
+      ]
+    }
+  ],
+  "schema_snapshot_digest": "f0946c3f02391cb8c39a08b6635a03cb44eb219448a513ec376b543cf973ab03",
+  "lifecycle": {
+    "states": [
+      "REQUESTED",
+      "DECOMPOSED",
+      "DISCOVERING",
+      "CANDIDATE",
+      "TRIAGED",
+      "CODE_VERIFIED",
+      "SANDBOX_VERIFIED",
+      "DEMO_VERIFIED",
+      "DOMAIN_VERIFIED",
+      "INTEGRATION_VERIFIED",
+      "ACQUISITION_CANDIDATE",
+      "APPROVED",
+      "REJECTED",
+      "DEFERRED",
+      "MONITORED",
+      "REVIEW_REQUIRED",
+      "SUPERSEDED",
+      "RETIRED"
+    ],
+    "evidence_gate_order": [
+      "REQUESTED",
+      "DECOMPOSED",
+      "DISCOVERING",
+      "CANDIDATE",
+      "TRIAGED",
+      "CODE_VERIFIED",
+      "SANDBOX_VERIFIED",
+      "DEMO_VERIFIED",
+      "DOMAIN_VERIFIED",
+      "INTEGRATION_VERIFIED",
+      "ACQUISITION_CANDIDATE"
+    ],
+    "waivable_gates": [
+      "DOMAIN_VERIFIED"
+    ],
+    "terminal_states": [
+      "DEFERRED",
+      "REJECTED",
+      "RETIRED",
+      "SUPERSEDED"
+    ]
+  },
+  "tests": {
+    "total": 411,
+    "passed": 411,
+    "failed": 0,
+    "skipped": 0,
+    "suite_command": "python -m pytest qcae/tests -q",
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "composition": {
+      "original_p0_unit": 255,
+      "original_p0_architecture": 15,
+      "new_research_mesh_guards": 2,
+      "a001_vocabulary": 20,
+      "a001_handoff": 31,
+      "a001_economic_crossregistry": 25,
+      "a001_contract_repair": 34,
+      "a001_deferred": 7,
+      "a001_schema_drift": 22
+    }
+  },
+  "known_failures_outside_qcae": [
+    "tests/forge/phase_00/test_extension_docs.py (2 pre-existing failures on this branch, unrelated to QCAE; present before P0 work)"
+  ],
+  "deferred_items": [
+    {
+      "item": "AtomStatus values are a P0 derivation (canon 1.2.22 leaves status unvalued)",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P5 capability forensics"
+    },
+    {
+      "item": "Job/Step status vocabularies are minimal identity contracts; queue/lease semantics arrive at P2",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P2 job runtime"
+    }
+  ],
+  "blockers": [],
+  "evidence_refs": {
+    "progress_ledger": "qcae/QCAE_IMPLEMENTATION_PROGRESS.md",
+    "adrs": [
+      "qcae/implementation/decisions/ADR-0001-core-domain-representation.md",
+      "qcae/implementation/decisions/ADR-0002-package-layout-and-test-wiring.md"
+    ],
+    "architecture_guards": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "lifecycle_tests": "qcae/tests/unit/test_p0_lifecycle.py",
+    "serialization_tests": "qcae/tests/unit/test_p0_serialization.py",
+    "contract_tests": "qcae/tests/unit/test_p0_contract.py",
+    "capability_tests": "qcae/tests/unit/test_p0_capabilities.py",
+    "relationship_tests": "qcae/tests/unit/test_p0_relationships.py",
+    "decision_job_tests": "qcae/tests/unit/test_p0_decisions_jobs.py"
+  },
+  "original_freeze_ref": {
+    "manifest": "P0-freeze-manifest.json",
+    "head_commit_at_original_freeze": "7ad5277c7248dbd725283979447c0b8a6a9a664b",
+    "original_test_ledger": {
+      "total": 270,
+      "passed": 270,
+      "failed": 0,
+      "skipped": 0,
+      "suite_command": "python -m pytest qcae/tests -q",
+      "architecture_guards": 15,
+      "unit": 255
+    },
+    "preserved": true
+  },
+  "active_amendments": [
+    {
+      "amendment_id": "QCAE-AMEND-A001",
+      "version": "1.0",
+      "title": "Research Mesh Boundary and Economic Experience",
+      "register": "qcae/amendments/README.md",
+      "document": "qcae/amendments/QCAE_AMENDMENT_A001_RESEARCH_MESH_BOUNDARY_AND_ECONOMIC_EXPERIENCE_v1.0.md",
+      "interface_schemas": [
+        "qcae/amendments/schemas/research-capability-handoff.schema.json",
+        "qcae/amendments/schemas/economic-experience.schema.json"
+      ]
+    }
+  ],
+  "amendment_commits": [
+    {
+      "sha": "281d1aa9",
+      "subject": "docs(qcae): add economic experience evidence schema"
+    },
+    {
+      "sha": "a399f525",
+      "subject": "docs(qcae): add research capability handoff schema"
+    },
+    {
+      "sha": "6d98193c",
+      "subject": "docs(qcae): define Research Mesh boundary and economic experience contract"
+    },
+    {
+      "sha": "66e99505",
+      "subject": "docs(qcae): establish additive amendment register"
+    },
+    {
+      "sha": "c4e5df83",
+      "subject": "docs(qcae): freeze full six-book canon and implementation roadmap"
+    },
+    {
+      "sha": "3f49badb",
+      "subject": "docs(qcae): mark Book VI complete and canon frozen"
+    },
+    {
+      "sha": "9be81b36",
+      "subject": "docs(qcae): complete and freeze Book VI"
+    },
+    {
+      "sha": "bb552c4b",
+      "subject": "docs(qcae): freeze Block 18 build roadmap"
+    },
+    {
+      "sha": "e9ecc529",
+      "subject": "docs(qcae): define freeze and release criteria"
+    },
+    {
+      "sha": "e9d19799",
+      "subject": "docs(qcae): define OCE integration milestone"
+    },
+    {
+      "sha": "87ab2ada",
+      "subject": "docs(qcae): define reverse acquisition milestone"
+    },
+    {
+      "sha": "35d1329f",
+      "subject": "docs(qcae): define quant validation milestone"
+    },
+    {
+      "sha": "d6e2196f",
+      "subject": "docs(qcae): define DeepWiki integration milestone"
+    },
+    {
+      "sha": "68880c0b",
+      "subject": "docs(qcae): define minimum viable standalone release"
+    },
+    {
+      "sha": "c28f7512",
+      "subject": "docs(qcae): define phase evidence requirements"
+    },
+    {
+      "sha": "81be0431",
+      "subject": "docs(qcae): define phase entry and exit criteria"
+    },
+    {
+      "sha": "b20f3005",
+      "subject": "docs(qcae): define implementation phase sequencing"
+    },
+    {
+      "sha": "21b4bdc7",
+      "subject": "docs(qcae): start Block 18 build roadmap"
+    },
+    {
+      "sha": "561a618f",
+      "subject": "docs(qcae): freeze Block 17 operating manual"
+    },
+    {
+      "sha": "9a8307cb",
+      "subject": "docs(qcae): define capability retirement operations"
+    },
+    {
+      "sha": "8749c5fb",
+      "subject": "docs(qcae): define security event operations"
+    },
+    {
+      "sha": "3daf9bd6",
+      "subject": "docs(qcae): define upstream breakage operations"
+    },
+    {
+      "sha": "f8adcae4",
+      "subject": "docs(qcae): define capability monitoring operations"
+    },
+    {
+      "sha": "b1054c1b",
+      "subject": "docs(qcae): define integration approval operating flow"
+    },
+    {
+      "sha": "c6bf65b0",
+      "subject": "docs(qcae): define capability receipt operating guide"
+    },
+    {
+      "sha": "e0ad982a",
+      "subject": "docs(qcae): define reimplementation operating flow"
+    },
+    {
+      "sha": "e7645384",
+      "subject": "docs(qcae): define implementation comparison operating flow"
+    },
+    {
+      "sha": "17014c66",
+      "subject": "docs(qcae): define repository investigation operating flow"
+    },
+    {
+      "sha": "2b6eaf7d",
+      "subject": "docs(qcae): define capability request operating flow"
+    },
+    {
+      "sha": "dd842338",
+      "subject": "docs(qcae): start Block 17 operating manual"
+    },
+    {
+      "sha": "cf84b6c0",
+      "subject": "docs(qcae): freeze Block 16 testing and qualification"
+    },
+    {
+      "sha": "f18cbc4c",
+      "subject": "docs(qcae): define quant validation benchmarks"
+    },
+    {
+      "sha": "60534ffa",
+      "subject": "docs(qcae): define acquisition benchmark suite"
+    },
+    {
+      "sha": "6d63f5d7",
+      "subject": "docs(qcae): define evidence integrity qualification"
+    },
+    {
+      "sha": "b4bd535d",
+      "subject": "docs(qcae): define sandbox escape qualification"
+    },
+    {
+      "sha": "561ee76b",
+      "subject": "docs(qcae): define license conflict qualification"
+    },
+    {
+      "sha": "19426fa6",
+      "subject": "docs(qcae): define malicious repository qualification"
+    },
+    {
+      "sha": "59440d25",
+      "subject": "docs(qcae): define repository comprehension qualification"
+    },
+    {
+      "sha": "e3cead02",
+      "subject": "docs(qcae): define false-positive qualification"
+    },
+    {
+      "sha": "f50402f9",
+      "subject": "docs(qcae): define discovery recall qualification"
+    },
+    {
+      "sha": "956f5b4f",
+      "subject": "docs(qcae): define worker qualification"
+    }
+  ],
+  "gap_taxonomy": {
+    "gap_types": {
+      "values": [
+        "KNOWLEDGE_GAP",
+        "CAPABILITY_GAP",
+        "EXECUTION_FAILURE",
+        "INSTITUTIONAL_LEARNING_CANDIDATE",
+        "MIXED_GAP"
+      ]
+    },
+    "gap_ownership": {
+      "KNOWLEDGE_GAP": "RESEARCH_MESH",
+      "CAPABILITY_GAP": "QCAE",
+      "EXECUTION_FAILURE": "EXECUTION_SERVICE_OWNER",
+      "INSTITUTIONAL_LEARNING_CANDIDATE": "INSTITUTION_TRANSFORMATION_GOVERNOR"
+    },
+    "mixed_gap_requires_decomposition": true,
+    "handoff_boundary_subset": [
+      "CAPABILITY_GAP",
+      "KNOWLEDGE_GAP",
+      "MIXED_GAP"
+    ]
+  },
+  "resolution_vocabulary": {
+    "capability_resolution_modes": {
+      "values": [
+        "USE",
+        "BORROW",
+        "RENT",
+        "BUY",
+        "ACQUIRE",
+        "BUILD",
+        "RESEARCH",
+        "DECLINE"
+      ]
+    },
+    "layered_over_acquisition_form": true,
+    "acquisition_form_unchanged": true,
+    "adr": "ADR-0003"
+  },
+  "data_rights": {
+    "values": [
+      "PUBLIC",
+      "LICENSED",
+      "CLIENT_CONFIDENTIAL",
+      "INTERNAL",
+      "RESTRICTED",
+      "UNKNOWN"
+    ]
+  },
+  "cross_registry_references": {
+    "registries": {
+      "values": [
+        "RESEARCH_MESH",
+        "ECONOMIC_EXPERIENCE",
+        "INSTITUTIONAL_LEARNING"
+      ]
+    },
+    "lifecycle_roles": {
+      "values": [
+        "OBSERVE",
+        "SUBMIT"
+      ]
+    },
+    "schema_snapshot": {
+      "object_type": "ExternalRegistryRef",
+      "schema_version": 1,
+      "fields": [
+        "registry",
+        "external_id",
+        "owner_domain",
+        "lifecycle_role",
+        "external_digest",
+        "referenced_at"
+      ]
+    },
+    "ownership_note": "references carry owner_domain and OBSERVE/SUBMIT role only; lifecycle authority never merges (A-001 section 6)"
+  },
+  "deferred_lifecycle_resolution": {
+    "adr": "ADR-0004",
+    "interpretation": "A",
+    "summary": "DEFERRED is terminal for that decision/version; renewed investigation creates a superseding object"
+  },
+  "schema_drift_guard": {
+    "adr": "ADR-0005",
+    "test": "qcae/tests/unit/test_p0_a001_schema_drift.py",
+    "dependencies_added": []
+  },
+  "schema_snapshot_counts": {
+    "original_p0": 13,
+    "amendment_added": 9,
+    "total": 22
+  }
+}
