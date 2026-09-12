@@ -1058,3 +1058,19 @@ that is updated at every staged checkpoint.
 | SENSOR-B3-I11C | 8ee37b3d | implementation report, known failures, access class report, offline test report | 1360 passed / 0 failed | PASS | none |
 | SENSOR-B3-I11D | 8f5f18ad | Bloc 4 input manifest + handoff index + network evidence index + handoff integrity tests (7) | 1367 passed / 0 failed | PASS | none |
 | SENSOR-B3-I11E | (this commit) | final evidence / ledger / freeze reconciliation: BLOC_03_IMPLEMENTATION_COMPLETE=TRUE, BLOC_03_FROZEN=TRUE; proposed PASS_BLOC_03_IMPLEMENTATION; next_checkpoint_authorized=FALSE; recommended next SENSOR-B4-I01 (NOT begun) | 1367 passed / 0 failed (re-run) | PASS | none |
+
+## BLOC 4 — I05 CHAIN RATIFICATION + I06 SOURCE REVISION / MUTATION REGISTRY
+
+| Commit | Stage | Tests | Verdict | Notes |
+|---|---|---|---|---|
+| SENSOR-B4-I05R4-RATIFY | ce4d8412 | governance only | PASS (operator) | operator ACCEPTS the complete I05 chain: PASS_SENSOR_B4_I05R4_EVIDENCE_INTERFACE_RETRY_SEALED, PASS_SENSOR_B4_I05R3_LINEAGE_IDENTITY_TIME_SEALED, PASS_SENSOR_B4_I05R2_FAIL_CLOSED_PUBLIC_API_SEALED, PASS_SENSOR_B4_I05R1_DURABLE_END_TO_END_LINEAGE_SEALED, PASS_SENSOR_B4_I05_RAW_PROJECTION_LINEAGE; I05R4 evidence-hash wording chronologically corrected (new files added, historical bytes untouched); authorizes SENSOR-B4-I06 ONLY |
+| SENSOR-B4-I06A | c5c90c3e | RevisionSourceIdentityV1 identity contract (14 identity/construction/tamper tests) | PASS | source_revision_key = SHA256(canonical_json({identity_version:1, fields})); REQUEST semantics only (11 fields); content/observation fields + source_locator structurally excluded; descriptor persisted and recomputed on reload (§14); sealed dependency protocols at construction (§16) |
+| SENSOR-B4-I06B | b43b35f5 | registry semantics/locks/idempotence/crash (23 tests) | PASS | physical T0A verification gates registration; blobless never segments; forensic usable_provenance=false via single I04R2 predicate; rev1 STABLE / IDENTICAL_REFETCH / SOURCE_MUTATION / A→B→A / PROVIDER_DECLARED_REVISION with explicit evidence; out-of-order + same-time-ambiguity fail closed; per-source locks, never auto-deleted; idempotent re-registration re-proves durable truth; crash completion keeps segment's own classification |
+| SENSOR-B4-I06C | e2e98331 | declarations + six resolution modes (17 tests) + invocation-robust sibling imports | PASS | canonical declarations require evidence_ref + existing revision; unique/duplicate/zero/multiple canonical semantics per §36/§60; ERROR_ON_AMBIGUITY never picks latest; ALL no-dedupe; FIRST/LATEST explicit; EXACT strict; strictens reload chronology validation; closes the I05R4 audit invocation-sensitivity defect via _sibling_import loader |
+| SENSOR-B4-I06D | e0e6466d | restart/corruption/concurrency/T0B-preservation (9 tests) | PASS | restart preserves chains; per-family corruption fails closed with frozen-vocabulary reload validation; concurrent different-byte mutations cannot fork numbering; rev1 bytes byte-identical across later revisions; rev1 T0B chain stays resolver-valid + manifest untouched after rev2 (§63/§64) |
+| SENSOR-B4-I06E | 80cfbcfe + (this commit) | 3 deterministic matrices (identity/mutation/resolution) published once, pytest READ-ONLY vs committed bytes; evidence MD + ledger | 939 storage / 2318 full, 0 failed | proposed PASS_SENSOR_B4_I06_SOURCE_REVISION_MUTATION_REGISTRY; G4-04_REVISION_GATE = IMPLEMENTATION_PASS; SOURCE_REVISION_REGISTRY_IMPLEMENTED=TRUE, SOURCE_MUTATION_EXPLICIT=TRUE, REVISION_RESOLUTION_READY=TRUE; DURABLE_RESUME_IMPLEMENTED=FALSE; next_checkpoint_authorized=FALSE; recommended next SENSOR-B4-I07 DURABLE JOB STATE + RESUME COUPLING (NOT started) |
+
+Current state: SOURCE_REVISION_REGISTRY_IMPLEMENTED=TRUE. I05→I06 chain
+complete and pending operator review. next_checkpoint_authorized=FALSE —
+SENSOR-B4-I07 (DURABLE JOB STATE + RESUME COUPLING) NOT authorized, NOT
+started. Research NOT resumed.
