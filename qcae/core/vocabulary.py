@@ -47,3 +47,19 @@ class AcquisitionForm(StrEnum):
 
 #: Evidence classes ranked from weakest to strongest claim support.
 EVIDENCE_STRENGTH_ORDER: tuple = tuple(EvidenceClass)
+
+
+class VerificationLevel(StrEnum):
+    """Verification states for graph edges and claims (canon Book I 1.3.13).
+
+    These levels are never collapsed into a single "true" status: a claim's
+    label records how far independent verification has progressed.
+    """
+
+    DISCOVERED = "DISCOVERED"
+    DOCUMENTED = "DOCUMENTED"
+    SOURCE_LOCATED = "SOURCE_LOCATED"
+    CODE_VERIFIED = "CODE_VERIFIED"
+    RUNTIME_VERIFIED = "RUNTIME_VERIFIED"
+    CONTRACT_VERIFIED = "CONTRACT_VERIFIED"
+    DOMAIN_VERIFIED = "DOMAIN_VERIFIED"
