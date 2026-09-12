@@ -19,10 +19,14 @@ from qcae.infrastructure.persistence.sqlite_metadata_store import (
     _SCHEMA_DDL,
 )
 
+#: Runtime engine version, exposed here so build tools need no engine import.
+SQLITE_VERSION = sqlite3.sqlite_version
+
 __all__ = [
     "SqliteEvidenceRepository",
     "SqliteLifecycleLogRepository",
     "SCHEMA_VERSION",
+    "SQLITE_VERSION",
     "open_metadata_db",
 ]
 
