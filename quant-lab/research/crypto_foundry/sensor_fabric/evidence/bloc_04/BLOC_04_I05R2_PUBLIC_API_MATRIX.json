@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "allowed": false,
+      "case": "artifact_no_root",
+      "detail": "construction refused",
+      "expected_error": "TypeError"
+    },
+    {
+      "allowed": false,
+      "case": "artifact_no_schema_registry",
+      "detail": "construction refused",
+      "expected_error": "TypeError"
+    },
+    {
+      "allowed": true,
+      "case": "artifact_valid_physical",
+      "detail": "VALID earned by proof",
+      "expected_error": null
+    },
+    {
+      "allowed": false,
+      "case": "lineage_no_artifact_repo",
+      "detail": null,
+      "expected_error": "LineageConfigurationError"
+    },
+    {
+      "allowed": false,
+      "case": "lineage_no_context_repo",
+      "detail": null,
+      "expected_error": "LineageConfigurationError"
+    },
+    {
+      "allowed": false,
+      "case": "lineage_nonexistent_projection",
+      "detail": null,
+      "expected_error": "ProjectionArtifactMissing"
+    },
+    {
+      "allowed": true,
+      "case": "lineage_valid_full_dependencies",
+      "detail": null,
+      "expected_error": null
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R2",
+  "clock": "injected-fixed",
+  "matrix": "BLOC_04_I05R2_PUBLIC_API_MATRIX"
+}

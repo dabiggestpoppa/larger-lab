@@ -34,7 +34,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import uuid
 from enum import Enum
 from pathlib import Path

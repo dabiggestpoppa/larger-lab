@@ -433,7 +433,6 @@ class SealedStack:
         rows: list[dict] | None = None,
     ):
         """Write the physical projection, commit artifact + context."""
-        from datetime import UTC
 
         sources = [sha for sha, _acq_id in pairs]
         acq_ids = [acq_id for _sha, acq_id in pairs]
