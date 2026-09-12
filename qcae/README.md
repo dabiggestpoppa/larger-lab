@@ -97,11 +97,19 @@ DeepWiki is integrated only after local source-grounded comprehension works. Qua
 - Block 18 freeze: `books/book-06/BLOCK-18-FREEZE-REVIEW.md`
 - Book VI freeze: `books/book-06/BOOK-06-FREEZE-REVIEW.md`
 
+## Active additive amendments
+
+Frozen book text remains frozen. Implementation agents must also read active amendments that constrain cross-system boundaries or add interface contracts.
+
+- `amendments/QCAE_AMENDMENT_A001_RESEARCH_MESH_BOUNDARY_AND_ECONOMIC_EXPERIENCE_v1.0.md` — separates Research Mesh epistemic acquisition from QCAE capability acquisition; adds Research Mesh handoffs, use/borrow/rent/buy/acquire/build/research/decline capability economics, Economic Experience boundaries, and institutional promotion firewalls.
+- Amendment register: `amendments/README.md`
+
 ## Next artifact
 
 The architecture/planning phase is complete. The next artifact should be the **QCAE implementation master prompt / coding-agent operating contract**. It should instruct the build agent to:
 
 - treat all six books as authoritative;
+- read all active amendments before affected phases;
 - execute P0–P12 sequentially;
 - read the governing chapters before each phase;
 - use narrow subsystem/milestone commits;
