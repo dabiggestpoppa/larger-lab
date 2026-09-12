@@ -1860,7 +1860,9 @@ class TestCXR4R5ProvenAuditDurability:
         })
         rid = out_id
         assert rid == "override-req-uncertain-0001"
-        assert conn.rolled_back == 0  # reconciled, not rolled back
+        # B4-CXR7U9R6: the authority gate's read-only probe rolls back exactly
+        # once; the reconciliation itself never rolls back on success
+        assert conn.rolled_back == 1  # gate probe only; reconciled, not rolled back
 
     @pytest.mark.parametrize("label,mutator", [
         ("different new value", lambda r: r.__setitem__(5, "9105")),
@@ -2374,3 +2376,192 @@ class TestCXR7U5CanonicalAuditValue:
             new_value="none",
             request_id=rid)
         assert second == "none"  # canonical retry reconciles
+
+
+# --------------------------------------------------------------------------- #
+# B4-CXR7U9R6 — audit-sink authority lifecycle (append/read_back/inspect)
+# --------------------------------------------------------------------------- #
+class TestCXR7U9R6AuthorityLifecycle:
+    """append()/read_back() refuse unpinned, PARTIALLY pinned, wrongly pinned
+    and unproven sinks; read_back always leaves the connection IDLE and
+    never presents rows after failed cleanup; inspect_structure never
+    reports valid structure after failed/unproven cleanup."""
+
+    def _mk(self, **kw):
+        from oce_control.audit_sink import PostgresAuditSink
+        return PostgresAuditSink(_FakeConn(rows=[]), **kw)
+
+    def _pinned_conn(self):
+        return _FakeConn(rows=[])
+
+    # -- pinning truth -----------------------------------------------------
+
+    def test_partial_pin_database_only_is_unpinned(self):
+        sink = self._mk(governed_database="oce_control")
+        assert sink._pinned is False
+        with pytest.raises(RuntimeError, match="governed database identity"):
+            sink.append({"request_id": "r1"})
+
+    def test_partial_pin_user_only_is_unpinned(self):
+        sink = self._mk(governed_user="oce_control_admin")
+        assert sink._pinned is False
+        with pytest.raises(RuntimeError, match="governed database identity"):
+            sink.read_back()
+
+    def test_unpinned_append_refused_before_any_sql(self):
+        conn = self._pinned_conn()
+        sink = PostgresAuditSink(conn)
+        with pytest.raises(RuntimeError, match="governed database identity"):
+            sink.append({"request_id": "r1"})
+        assert conn.executes == []  # nothing reached the connection
+
+    def test_unpinned_read_back_refused_before_any_sql(self):
+        conn = self._pinned_conn()
+        sink = PostgresAuditSink(conn)
+        with pytest.raises(RuntimeError, match="governed database identity"):
+            sink.read_back()
+        assert conn.executes == []
+
+    def test_wrong_identity_refused_by_gate(self):
+        conn = _FakeConn(rows=[])
+        conn.probe_overrides["current_database"] = ("other_db", "other_user")
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        with pytest.raises(RuntimeError, match="authoritative proof"):
+            sink.append({"request_id": "r1"})
+
+    # -- gate semantics ----------------------------------------------------
+
+    def test_rollback_failed_sink_refuses_append(self):
+        conn = self._pinned_conn()
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        sink._rollback_failed = True
+        with pytest.raises(RuntimeError, match="rollback cleanup"):
+            sink.append({"request_id": "r1"})
+        assert conn.executes == []
+
+    def test_gate_never_cached_append_reproves_each_time(self):
+        conn = self._pinned_conn()
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        sink.append({"request_id": "gate-1", "actor": "operator:po",
+                            "setting": "control_plane.port",
+                            "requested_change": "x", "reason": "r"})  # proves once
+        # degrade the connection: the NEXT append must fail, proving the
+        # gate is re-derived (never a cached construction Boolean)
+        conn.probe_overrides["current_database"] = ("evil_db", "oce_control_admin")
+        with pytest.raises(RuntimeError, match="authoritative proof"):
+            sink.append({"request_id": "gate-2"})
+
+    def test_append_records_writable_after_full_gate(self):
+        conn = self._pinned_conn()
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        out = sink.append({"request_id": "ok-1", "actor": "operator:po",
+                           "setting": "control_plane.port",
+                           "requested_change": "x", "reason": "r"})
+        assert out.startswith("unit-audit-")
+        assert conn.committed == 1
+
+    # -- read_back lifecycle ------------------------------------------------
+
+    def test_read_back_authoritative_returns_rows_and_idle(self):
+        row = ("a1", "a1", "operator:po", "control_plane.port", "x", "r",
+               "8448", "9124", "granted", True, "fp-b", "fp-a",
+               "postgres:config_override_audit", "2026-01-01T00:00:00Z")
+        conn = _FakeConn(rows=[row])
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        back = sink.read_back()
+        assert len(back) == 1 and back[0]["request_id"] == "a1"
+        assert conn.tx_status == 0  # TX_IDLE
+        assert conn.rolled_back == 2  # gate probe rollback + read cleanup
+
+    def test_read_back_then_append_succeeds_on_same_connection(self):
+        row = ("a1", "a1", "op", "s", "x", "r", None, "1", "granted", True,
+               None, None, "postgres:config_override_audit",
+               "2026-01-01T00:00:00Z")
+        conn = _FakeConn(rows=[row])
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        back = sink.read_back()
+        assert len(back) == 1
+        out = sink.append({"request_id": "after-read", "actor": "operator:po",
+                           "setting": "control_plane.port",
+                           "requested_change": "x", "reason": "r"})
+        assert out.startswith("unit-audit-")
+
+    def test_read_back_select_exception_rolls_back_and_raises(self):
+        conn = self._pinned_conn()
+        conn.probe_raise["SELECT audit_id"] = RuntimeError("driver lost")
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        with pytest.raises(RuntimeError, match="driver lost"):
+            sink.read_back()
+        # gate probe + except-branch + finally cleanup
+        assert conn.rolled_back == 3
+        assert conn.tx_status == 0
+
+    def test_read_back_rollback_exception_fails_closed_no_rows(self):
+        row = ("a1", "a1", "op", "s", "x", "r", None, "1", "granted", True,
+               None, None, "postgres:config_override_audit",
+               "2026-01-01T00:00:00Z")
+        conn = _FakeConn(rows=[row])
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        # the gate probe rollback succeeds; the READ cleanup rollback
+        # raises: read_back fails closed, marks the connection unusable
+        # and presents NO rows
+        orig = conn.rollback
+        calls = {"n": 0}
+
+        def flaky():
+            calls["n"] += 1
+            if calls["n"] > 1:  # call 1 = gate probe, call 2 = cleanup
+                raise RuntimeError("rollback exploded")
+            return orig()
+
+        conn.rollback = flaky
+        with pytest.raises(RuntimeError, match="could not restore"):
+            sink.read_back()
+        assert sink._rollback_failed is True  # marked unusable
+        # every later append is refused by the authority gate
+        with pytest.raises(RuntimeError, match="rollback cleanup"):
+            sink.append({"request_id": "nope"})
+        assert conn.committed == 0
+
+    def test_read_back_non_idle_after_cleanup_fails_closed(self):
+        row = ("a1", "a1", "op", "s", "x", "r", None, "1", "granted", True,
+               None, None, "postgres:config_override_audit",
+               "2026-01-01T00:00:00Z")
+        conn = _FakeConn(rows=[row])
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        # the gate probe rollback restores IDLE; the READ cleanup rollback
+        # leaves INTRANS: read_back must fail closed with no rows
+        orig = conn.rollback
+        calls = {"n": 0}
+
+        def degrading():
+            calls["n"] += 1
+            if calls["n"] > 1:
+                conn.tx_status_after_rollback = 2  # cleanup leaves INTRANS
+            return orig()
+
+        conn.rollback = degrading
+        with pytest.raises(RuntimeError, match="could not restore"):
+            sink.read_back()
+        assert conn.get_transaction_status() != 0
+
+    def test_read_back_repeated_is_deterministic_and_idle(self):
+        row = ("a1", "a1", "op", "s", "x", "r", None, "1", "granted", True,
+               None, None, "postgres:config_override_audit",
+               "2026-01-01T00:00:00Z")
+        conn = _FakeConn(rows=[row])
+        sink = PostgresAuditSink(conn, governed_database="oce_control",
+                                 governed_user="oce_control_admin")
+        r1 = sink.read_back()
+        r2 = sink.read_back()
+        assert r1 == r2
+        assert conn.tx_status == 0

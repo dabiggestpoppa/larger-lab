@@ -171,13 +171,21 @@ class PostgresAuditSink(DurableAuditSink):
         # to be attached to EXACTLY this database AND role, so a cloned table
         # on a non-governed database can never self-certify. The production
         # seam pins these from the ActivationContext-derived connection.
+        # B4-CXR7U9R6 (OPTION B disposition): NO runtime construction seam
+        # exists — the only constructions are tests; authoritative runtime
+        # override is DISABLED by design until a separately authorized
+        # increment wires it.
         # A sink constructed WITHOUT identity remains structure-only: useful
         # for diagnostics (inspect_structure), never authoritative.
         self._governed_database = governed_database
         self._governed_user = governed_user
         # B4-CXR7U9R2: an identity-bound sink additionally pins the expected
         # backend identity so append()/read_back() refuse a non-pinned sink
-        self._pinned = bool(governed_database or governed_user)
+        # B4-CXR7U9R6: BOTH identity components are required — a sink
+        # pinned with only ONE (database-only or user-only) is UNPINNED
+        # for every authority decision: append()/read_back() refuse it,
+        # proven_authoritative() is False.
+        self._pinned = (bool(governed_database) and bool(governed_user))
         self._rollback_failed = False
 
     def _tx_status(self) -> int:
@@ -355,6 +363,41 @@ class PostgresAuditSink(DurableAuditSink):
             return False
         return result
 
+    def ensure_authoritative(self) -> None:
+        """AUTHORITY GATE for every mutating/reading path (B4-CXR7U9R6).
+
+        Raises RuntimeError BEFORE any INSERT/SELECT unless the sink is:
+          * fully identity-pinned (BOTH governed database AND user);
+          * proven right now against the governed live structure;
+          * left on a connection whose transaction status is TX_IDLE
+            after that proof (the probe rollback happens inside proven()).
+
+        The result is NEVER cached: every append/read_back re-derives it,
+        so a sink can never rely on a Boolean captured at construction.
+        No DSN or credential material is ever exposed by this method.
+        """
+        if not self._pinned:
+            raise RuntimeError(
+                "audit sink is not bound to the governed database identity "
+                "(partial or absent) — REFUSED (B4-CXR7U9R2/R6); construct "
+                "the sink with BOTH governed_database and governed_user")
+        if self._rollback_failed:
+            raise RuntimeError(
+                "audit connection previously failed rollback cleanup — "
+                "fail closed, not authoritative (B4-CXR7U9R1/R6)")
+        if not self.proven():
+            try:
+                defects = "; ".join(self._structure_defects())
+            except Exception:
+                defects = "structure probe failed"
+            raise RuntimeError(
+                "audit sink failed the authoritative proof — append/read "
+                "REFUSED (B4-CXR7U9R6): " + (defects or "unproven"))
+        if self._tx_status() != TX_IDLE:
+            raise RuntimeError(
+                "audit connection not IDLE after proof — REFUSED "
+                "(B4-CXR7U9R6)")
+
     def proven_authoritative(self) -> bool:
         """AUTHORITATIVE durability proof (B4-CXR7U9R2).
 
@@ -390,6 +433,7 @@ class PostgresAuditSink(DurableAuditSink):
         Leaves the dedicated connection IDLE (unconditional rollback —
         B4-CXR7U9R1).
         """
+        cleanup_proven = True
         try:
             defects = self._structure_defects()
         except Exception:
@@ -398,8 +442,19 @@ class PostgresAuditSink(DurableAuditSink):
             try:
                 self._conn.rollback()
             except Exception:
-                pass
-        return {"structure_valid": not defects, "defects": defects}
+                self._rollback_failed = True
+                cleanup_proven = False
+        if cleanup_proven and self._tx_status() != TX_IDLE:
+            cleanup_proven = False
+            defects.append("connection not IDLE after cleanup")
+        if not cleanup_proven:
+            defects.append("rollback cleanup failed or unproven — " 
+                           "structure_valid is False (B4-CXR7U9R6)")
+        # diagnostics remain NON-authoritative: structure_valid never
+        # unlocks append/read_back/operator_override, and cleanup that
+        # cannot be PROVEN can never report a valid structure.
+        return {"structure_valid": bool(cleanup_proven and not defects), 
+                "defects": defects}
 
 
     # INSERT handled with ON CONFLICT DO NOTHING RETURNING: every governed
@@ -461,14 +516,10 @@ class PostgresAuditSink(DurableAuditSink):
                 "audit connection carries a pending transaction — refusing "
                 "to commit unrelated work; the audit ledger uses a DEDICATED "
                 "connection (B4-CXR5R5)")
-        if not self._pinned:
-            # B4-CXR7U9R2: a structure-only sink (no pinned governed
-            # identity) can never write the authoritative ledger. Diagnostics
-            # may inspect it; nothing may be appended through it.
-            raise RuntimeError(
-                "audit sink is not bound to the governed database identity "
-                "— append REFUSED (B4-CXR7U9R2); construct the sink through "
-                "the governed production seam")
+        # B4-CXR7U9R6: the FULL authority gate runs before every append —
+        # complete pinned identity, live authoritative proof, and TX_IDLE
+        # after the proof. Never a cached Boolean from construction.
+        self.ensure_authoritative()
         audit_id = str(record.get("audit_id") or record.get("request_id")
                        or uuid.uuid4().hex)
         request_id = str(record.get("request_id") or audit_id)
@@ -530,17 +581,48 @@ class PostgresAuditSink(DurableAuditSink):
             raise
 
 
+    _READ_BACK_SQL = (
+        "SELECT audit_id, request_id, actor, setting, "
+        "requested_change, reason, previous, new, decision, "
+        "authorized, fingerprint_before, fingerprint_after, "
+        "backend_identity, recorded_at "
+        "FROM config_override_audit "
+        "ORDER BY recorded_at, audit_id")
+
     def read_back(self) -> list[dict]:
-        """Reload the committed ledger (restart-persistence proof)."""
-        with self._conn.cursor() as cur:
-            cur.execute(
-                "SELECT audit_id, request_id, actor, setting, "
-                "requested_change, reason, previous, new, decision, "
-                "authorized, fingerprint_before, fingerprint_after, "
-                "backend_identity, recorded_at "
-                "FROM config_override_audit "
-                "ORDER BY recorded_at, audit_id")
-            rows = cur.fetchall()
+        """Reload the committed ledger (restart-persistence proof).
+
+        B4-CXR7U9R6: read_back is an AUTHORITATIVE path — it runs the same
+        gate as append() (complete pinned identity + live proven structure)
+        and its SELECT transaction is unconditionally rolled back in a
+        finally block. The transaction status is validated BEFORE returning,
+        so read_back can never leave the dedicated connection INTRANS and
+        never presents rows as authoritative after failed cleanup: a
+        rollback failure or non-IDLE status raises (fail closed) and NO
+        rows are returned.
+        """
+        self.ensure_authoritative()
+        rows: list = []
+        try:
+            with self._conn.cursor() as cur:
+                cur.execute(self._READ_BACK_SQL)
+                rows = cur.fetchall()
+        except Exception:
+            try:
+                self._conn.rollback()
+            except Exception:
+                self._rollback_failed = True
+            raise
+        finally:
+            try:
+                self._conn.rollback()
+            except Exception:
+                self._rollback_failed = True
+        # cleanup truth validated BEFORE any row is presented
+        if self._rollback_failed or self._tx_status() != TX_IDLE:
+            raise RuntimeError(
+                "read_back could not restore the dedicated connection to "
+                "IDLE — failing closed, no rows presented (B4-CXR7U9R6)")
         cols = ["audit_id", "request_id", "actor", "setting",
                 "requested_change", "reason", "previous", "new", "decision",
                 "authorized", "fingerprint_before", "fingerprint_after",
