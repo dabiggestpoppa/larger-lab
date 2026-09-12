@@ -1098,11 +1098,29 @@ class ProjectionContextRepository:
                     f"projection context fragment corrupt: {exc}"
                 ) from exc
 
+    # I05R4 §22: the idempotence-conflict comparison covers ALL scientific
+    # / structural immutable context fields.  created_at is the ONLY field
+    # excluded — it is first-seen operational metadata (I05R4 §20/§21),
+    # never part of projection content SHA, schema identity or T0 evidence
+    # identity, so wall-clock movement between retries must not manufacture
+    # a scientific identity conflict.
+    _IDEMPOTENCE_EXCLUDED_FIELDS = frozenset({"created_at", "record_type"})
+
     def commit(self, record: ProjectionCatalogRecord) -> ProjectionCatalogRecord:
-        if record.projection_id in self._cache:
-            if self._cache[record.projection_id] != record:
+        existing = self._cache.get(record.projection_id)
+        if existing is not None:
+            # Compare scientific/structural fields ONLY (§21/§22).
+            old = existing.to_dict()
+            new = record.to_dict()
+            excluded = self._IDEMPOTENCE_EXCLUDED_FIELDS
+            scientific_old = {k: v for k, v in old.items() if k not in excluded}
+            scientific_new = {k: v for k, v in new.items() if k not in excluded}
+            if scientific_old != scientific_new:
                 raise ProjectionIdentityConflict(record.projection_id)
-            return self._cache[record.projection_id]
+            # §23: return the FIRST committed record; its original
+            # created_at is preserved — never rewritten, never updated,
+            # and the committed fragment is not touched again.
+            return existing
         try:
             self._catalog.commit(record.projection_id, record.to_dict())
         except JsonCatalogCorrupt as exc:
