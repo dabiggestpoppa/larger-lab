@@ -619,6 +619,14 @@ class SourceRevisionRegistry:
                     f"revision numbers for {key[:12]}... are not contiguous "
                     "from 1"
                 )
+            ordered = sorted(segments, key=lambda s: s.revision_number)
+            for prev, curr in zip(ordered, ordered[1:]):
+                if curr.first_seen_at <= prev.first_seen_at:
+                    raise SourceRevisionCatalogCorrupt(
+                        f"segment first_seen_at for {key[:12]}... is not "
+                        "strictly increasing — committed chronology is "
+                        "inconsistent with accepted ordering rules"
+                    )
             seen_numbers: set[int] = set()
             for seg in segments:
                 if seg.revision_number in seen_numbers:
@@ -642,14 +650,19 @@ class SourceRevisionRegistry:
                     )
         # §49: observations reference existing revisions, blob matches, the
         # acquisition exists durably with the SAME blob, and no acquisition
-        # belongs to two revisions.  Seen times obey accepted ordering.
+        # belongs to two revisions.  Seen times obey accepted ordering: a
+        # segment's first_seen_at is strictly increasing per source key
+        # (§39/§40 make ties and back-dating impossible) and each
+        # observation cannot precede the birth of its own revision.
         all_bindings: dict[str, tuple[str, int, str]] = {}
         for key, observations in self._observations_by_key.items():
-            segments = {
+            segments_by_num = {
                 s.revision_number: s for s in self._segments_by_key.get(key, [])
             }
             for obs in observations:
-                seg = segments.get(obs.revision_number)
+                seg: RevisionSegmentRecord | None = segments_by_num.get(
+                    obs.revision_number
+                )
                 if seg is None:
                     raise SourceRevisionCatalogCorrupt(
                         f"observation {obs.observation_id!r} references a "
@@ -686,20 +699,19 @@ class SourceRevisionRegistry:
                         "observation acquisition blob does not match the "
                         "observation"
                     )
-                latest = self._latest_seen_for(key)
-                if obs.seen_at < latest:
+                if obs.seen_at < seg.first_seen_at:
                     raise SourceRevisionCatalogCorrupt(
-                        "committed observation violates seen-time ordering "
-                        f"for {key[:12]}..."
+                        "committed observation precedes the birth of its "
+                        f"own revision for {key[:12]}..."
                     )
         for key, declarations in self._declarations_by_key.items():
-            segments = {
+            segment_numbers = {
                 s.revision_number for s in self._segments_by_key.get(key, [])
             }
             for dec in declarations:
                 if (
                     dec.revision_number is not None
-                    and dec.revision_number not in segments
+                    and dec.revision_number not in segment_numbers
                 ):
                     raise SourceRevisionCatalogCorrupt(
                         f"declaration {dec.declaration_id!r} references a "
@@ -1421,6 +1433,11 @@ class SourceRevisionRegistry:
     ) -> RevisionDeclarationRecord:
         """Explicit CANONICAL designation (§35): a persisted declaration
         binding source key + revision number + evidence + canonical=true."""
+        if not evidence_ref:
+            raise RevisionConfigurationError(
+                "canonical declaration requires a durable evidence_ref "
+                "(never inferred — I06 §35)"
+            )
         if revision_number not in self._segment_numbers(source_revision_key):
             raise RevisionNotFound(
                 f"canonical declaration targets revision {revision_number} "

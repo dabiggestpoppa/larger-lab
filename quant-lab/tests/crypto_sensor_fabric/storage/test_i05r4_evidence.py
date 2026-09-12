@@ -29,6 +29,9 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
+# Make the sibling loader importable regardless of pytest invocation
+# directory (importlib mode + competing repo-root ``tests`` package).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from crypto_sensor_fabric.storage.projection_lineage import (
     ProjectionLineageRepository,
@@ -241,11 +244,12 @@ def _build_verifier_interface_matrix(tmp_path: Path) -> dict:
 def _build_service_retry_matrix(tmp_path: Path) -> dict:
     """Reuses the R4C/R4D chain fixtures to record the eight retry cases."""
 
-    from tests.crypto_sensor_fabric.storage.test_i05r4_retry import (
-        RetryChain,
-        _commit_via_service,
-        _context,
-    )
+    from _sibling_import import load_sibling
+
+    _retry = load_sibling("_i05r4_retry_mod", "test_i05r4_retry")
+    RetryChain = _retry.RetryChain
+    _commit_via_service = _retry._commit_via_service
+    _context = _retry._context
     from crypto_sensor_fabric.storage.projections import (
         ProjectionContextRepository,
     )
@@ -303,9 +307,8 @@ def _build_service_retry_matrix(tmp_path: Path) -> dict:
     )
 
     # 4. partial_context_without_lineage_not_visible
-    from tests.crypto_sensor_fabric.storage.test_i05r4_adversarial import (
-        CrashChain,
-    )
+    _adv = load_sibling("_i05r4_adv_mod", "test_i05r4_adversarial")
+    CrashChain = _adv.CrashChain
 
     pchain = CrashChain(tmp_path / "s4")
     psha = pchain.seed(b'{"rows": [2]}', "acq-2")
