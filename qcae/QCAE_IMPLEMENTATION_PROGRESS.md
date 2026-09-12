@@ -9,7 +9,76 @@
 
 ## Current Phase
 
-**P0 — FROZEN v0.1 + A-001 RECONCILED (pending operator authorization for P1)**
+**P1 — IN BUILD** (Evidence + Registry Spine; P0/P0-A001 frozen below)
+
+### P1 phase log
+
+- **P1-I0** `a53b401b` — preflight repairs (ledger test-count 139→141 via
+  addendum, vacuous `or True` assertion removed) + **ADR-0006**: SQLite
+  (stdlib) metadata engine behind ports; DuckDB declined for OLTP (analytics
+  deferred); raw artifacts content-addressed on filesystem.
+- **P1-C01** `d5e8882e` — evidence object model: EvidenceObjectType vs
+  EvidenceClass kept as separate axes (Book IV 9.1), structured ScopeDimensions,
+  FreshnessState, raw/interpretation partitioning.
+- **P1-C02** `6890f852` — content-addressed artifact store (sha256,
+  `sha256/ab/cd/<digest>` layout, atomic writes, retrieval verification,
+  collision/corruption/traversal guards).
+- **P1-C03** `93b7a1ea`/`090e7edc`/`f113c396` — persistence ports (core) +
+  SQLite adapter (infrastructure): digest-verified rows, INSERT-only factual
+  tables, append-only freshness log, forward-compat guard, sqlite3 denial
+  scoped to infrastructure only.
+- **P1-C04** `01a31a69` — lineage edge store: 9.5 vocabulary, contradiction
+  coexistence (no resolution-by-deletion API), idempotent edges.
+- **P1-C05** `3aaddeea` — Capability Receipt (9.2): 6 states, scope-bounded,
+  authority + rollback required, proof firewall (external-only evidence can
+  never satisfy executable proof).
+- **P1-C06** `07475b2d` — positive/negative knowledge (9.3/9.4): 11 failure
+  categories, causal-detail minimum, mandatory reconsideration conditions,
+  material knowledge evidence-linked (notes are non-material).
+- **P1-C07** `e59632e7`/`a498a955`/`70c6b306` — knowledge/receipt repositories
+  + structured decision-reuse query implementing the 9.7 retrieval order
+  (active receipts → positive knowledge → negative blocks → stale evidence →
+  external discovery).
+- **P1-C08** `e8cfb720` — A-001 cross-registry persistence: ExternalRegistryRef
+  durable, owner-domain immutable (laundering rejected), OBSERVE/SUBMIT only.
+- **P1-C09** `04983524` — UnitOfWork (BEGIN IMMEDIATE, rollback on any
+  failure, no nesting) + atomic evidence+lineage commit service; WAL isolation
+  across connections verified.
+- **P1-C10** `55ba326d` — migration framework: forward-only runner keyed by
+  target version, ledger with pre/post schema digests, v1→v2 mechanism proof,
+  rollback and refusal behaviors verified.
+- **P1-C11** `772ab794`/`da69813d` — backup/restore: consistent SQLite
+  snapshot + flat artifact copies + manifest with digests; restore verifies
+  every digest before declaring success (full-cycle exactness tested).
+- **P1-T01** `ba9c3e35` — adversarial suite: payload/digest tampering,
+  append-only pressure across all stores, restart persistence of the whole
+  spine, evidence→receipt firewall chain, classification flow-through.
+- **P1-FREEZE** `20ee6465` — `qcae/implementation/P1-freeze-manifest.json`
+  (559/559 LOCAL TEST EVIDENCE).
+
+### P1 exit gate (spec §25)
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| durable local structured persistence | PASS | SQLite adapter + restart tests |
+| raw evidence content-addressed, integrity-checked | PASS | test_p1_artifact_store, adversarial binding test |
+| evidence provenance-linked, raw/interpretation separate | PASS | EvidenceArtifact validation + lineage store |
+| receipts scope-bounded, firewall enforced | PASS | test_p1_receipt |
+| positive knowledge evidence-linked | PASS | material flag enforcement |
+| negative knowledge durable/searchable | PASS | subject/revision/type retrieval |
+| contradictions/lineage preserved | PASS | contradiction coexistence tests |
+| cross-registry provenance without ownership collapse | PASS | owner-rewrite rejection, rights visibility |
+| transactions rollback correctly | PASS | injected-failure rollback tests |
+| schema version/migration mechanism works | PASS | v1→v2 migration + ledger evidence |
+| backup restored successfully in test | PASS | full-cycle exactness test |
+| registry survives process restart | PASS | complete-spine restart test |
+| retrieval detects reusable internal knowledge | PASS | decision-reuse findings tests |
+| no provider SDK / Research Mesh / OCE in core | PASS | architecture guards incl. self-verifying engine-free guard |
+| all QCAE tests pass | PASS | 559/559 (LOCAL TEST EVIDENCE) |
+| ledger + manifest current | PASS | this file + P1-freeze-manifest.json |
+| no unresolved high-severity deviation | PASS | deferred items in manifest are MINOR, trigger-tagged |
+
+## Historical: P0 — FROZEN v0.1 + A-001 RECONCILED
 
 ### Amendment reconciliation timeline
 
