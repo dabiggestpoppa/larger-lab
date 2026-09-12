@@ -130,6 +130,13 @@ class Stack:
         self.acq_repo.append_acquisition(record)
         return record
 
+    def key_of(self, acq_id: str) -> str:
+        """The registered source key of a seeded acquisition, derived from
+        its durable request semantics."""
+        binding = self.registry.revision_for_acquisition(acq_id)
+        assert binding is not None, f"acquisition {acq_id!r} not registered"
+        return binding[0]
+
     def reopen(self) -> SourceRevisionRegistry:
         return SourceRevisionRegistry(
             self.root,

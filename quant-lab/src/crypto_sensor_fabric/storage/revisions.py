@@ -509,6 +509,23 @@ _OBSERVATION_SEMANTIC_FIELDS = (
     "usable_provenance",
     "severity",
 )
+# I06R1 §19: a birth's observation identity mirrors the segment's OWN
+# classification — idempotent re-registration is never a new observation.
+_BIRTH_OBSERVATION_STATES = {
+    RevisionState.STABLE.value: (
+        ObservationState.FIRST_REGISTRATION,
+        MutationSeverity.INFO,
+    ),
+    RevisionState.SOURCE_MUTATION.value: (
+        ObservationState.SOURCE_MUTATION,
+        MutationSeverity.WARNING,
+    ),
+    RevisionState.PROVIDER_DECLARED_REVISION.value: (
+        ObservationState.PROVIDER_DECLARED_REVISION,
+        MutationSeverity.NOTICE,
+    ),
+}
+
 _DECLARATION_SEMANTIC_FIELDS = (
     "source_revision_key",
     "revision_number",
@@ -883,35 +900,38 @@ class SourceRevisionRegistry:
                         f"declaration {dec.declaration_id!r} references a "
                         "revision that does not exist"
                     )
-                # I06R1 §26: a durable PROVIDER_DECLARED_REVISION segment
-                # must carry declaration evidence that independently proves
-                # why it is provider-declared — matching source key and the
-                # birth-acquisition transition it classifies.
-                for seg in self._segments_by_key.get(key, []):
-                    if seg.revision_state != (
-                        RevisionState.PROVIDER_DECLARED_REVISION.value
-                    ):
-                        continue
-                    supporting = [
-                        d
-                        for d in declarations
-                        if d.declaration_kind == "revision"
-                        and (
-                            d.revision_number == seg.revision_number
-                            or (
-                                d.revision_number is None
-                                and d.bound_acquisition_id
-                                == seg.first_acquisition_id
-                                and d.blob_sha256 == seg.blob_sha256
-                            )
+        # I06R1 §26: EVERY durable PROVIDER_DECLARED_REVISION segment must
+        # carry declaration evidence that independently proves why it is
+        # provider-declared — matching source key and the birth-acquisition
+        # transition it classifies.  Segment-driven so REMOVED evidence is
+        # still caught.
+        for key, segments in self._segments_by_key.items():
+            declarations = self._declarations_by_key.get(key, [])
+            for seg in segments:
+                if seg.revision_state != (
+                    RevisionState.PROVIDER_DECLARED_REVISION.value
+                ):
+                    continue
+                supporting = [
+                    d
+                    for d in declarations
+                    if d.declaration_kind == "revision"
+                    and (
+                        d.revision_number == seg.revision_number
+                        or (
+                            d.revision_number is None
+                            and d.bound_acquisition_id
+                            == seg.first_acquisition_id
+                            and d.blob_sha256 == seg.blob_sha256
                         )
-                    ]
-                    if not supporting:
-                        raise SourceRevisionCatalogCorrupt(
-                            f"segment {seg.segment_id[:16]}... is classified "
-                            "PROVIDER_DECLARED_REVISION but no durable "
-                            "declaration evidence proves it (I06R1 §26)"
-                        )
+                    )
+                ]
+                if not supporting:
+                    raise SourceRevisionCatalogCorrupt(
+                        f"segment {seg.segment_id[:16]}... is classified "
+                        "PROVIDER_DECLARED_REVISION but no durable "
+                        "declaration evidence proves it (I06R1 §26)"
+                    )
 
     def _load_all(self) -> None:
         self._load_segments()
@@ -1200,20 +1220,29 @@ class SourceRevisionRegistry:
             None,
         )
         if birth_segment is not None:
-            # I06R1 §28: a prior crash may have left the pending declaration
-            # committed but the segment absent.  A RETRY with the SAME
-            # declaration semantics completes the exact intended provider-
-            # declared revision; divergent evidence is a typed conflict —
-            # never a silent downgrade or upgrade of the classification.
+            # I06R1 §28/§68: the classification is already durable with its
+            # declaration evidence bound; a retry may complete the birth
+            # observation WITHOUT re-supplying evidence, but supplied
+            # evidence must MATCH — never a silent downgrade or upgrade.
             self._check_pending_declaration(
                 key=key,
                 acquisition_id=acquisition_id,
-                blob_sha=blob_sha,
                 provider_declaration=provider_declaration,
+                require_match=False,
             )
             return self._complete_birth_observation(
                 key=key, segment=birth_segment, usable=usable
             )
+        # I06R1 §28: a prior crash may have left the pending declaration
+        # committed but the segment absent.  A RETRY must re-supply the
+        # EXACT declaration evidence to complete the intended provider-
+        # declared revision; none/divergent evidence is a typed conflict.
+        self._check_pending_declaration(
+            key=key,
+            acquisition_id=acquisition_id,
+            provider_declaration=provider_declaration,
+            require_match=True,
+        )
         if blob_sha == current.blob_sha256:
             # §24/§41: identical bytes to the CURRENT segment — no new
             # revision, ever.  §34: an explicit provider declaration with
@@ -1313,14 +1342,16 @@ class SourceRevisionRegistry:
         *,
         key: str,
         acquisition_id: str,
-        blob_sha: str,
         provider_declaration: ProviderRevisionDeclaration | None,
+        require_match: bool,
     ) -> None:
         """I06R1 §28: after a crash that left a pending (segment-less)
         declaration, an exact retry must reuse that evidence and complete
         the intended provider-declared revision; DIFFERENT evidence_ref or
         declaration semantics for the same acquisition transition is a
-        typed conflict."""
+        typed conflict.  ``require_match`` is False only for §68 birth
+        completion, where the classification and its evidence are already
+        durable and a supplied declaration must merely agree."""
         pending = [
             d
             for d in self._declarations_by_key.get(key, [])
@@ -1331,11 +1362,14 @@ class SourceRevisionRegistry:
         if not pending:
             return
         if provider_declaration is None:
-            raise RevisionDeclarationConflict(
-                f"acquisition {acquisition_id!r} has pending provider "
-                "declaration evidence but the retry supplies none; the "
-                "intended classification cannot be re-proven (I06R1 §28)"
-            )
+            if require_match:
+                raise RevisionDeclarationConflict(
+                    f"acquisition {acquisition_id!r} has pending provider "
+                    "declaration evidence but the retry supplies none; the "
+                    "intended classification cannot be re-proven "
+                    "(I06R1 §28)"
+                )
+            return
         for d in pending:
             if (
                 d.evidence_ref != provider_declaration.evidence_ref
@@ -1358,20 +1392,9 @@ class SourceRevisionRegistry:
         """§68: finish a partially registered birth (segment committed,
         observation record missing) with the segment's OWN classification —
         never a different revision chain."""
-        state_for = {
-            RevisionState.STABLE.value: ObservationState.FIRST_REGISTRATION,
-            RevisionState.SOURCE_MUTATION.value: ObservationState.SOURCE_MUTATION,
-            RevisionState.PROVIDER_DECLARED_REVISION.value: (
-                ObservationState.PROVIDER_DECLARED_REVISION
-            ),
-        }
-        severity_for = {
-            RevisionState.STABLE.value: MutationSeverity.INFO,
-            RevisionState.SOURCE_MUTATION.value: MutationSeverity.WARNING,
-            RevisionState.PROVIDER_DECLARED_REVISION.value: (
-                MutationSeverity.NOTICE
-            ),
-        }
+        obs_state, severity = _BIRTH_OBSERVATION_STATES[
+            segment.revision_state
+        ]
         record = RevisionObservationRecord(
             observation_id=f"{segment.first_acquisition_id}",
             acquisition_id=segment.first_acquisition_id,
@@ -1379,9 +1402,9 @@ class SourceRevisionRegistry:
             revision_number=segment.revision_number,
             blob_sha256=segment.blob_sha256,
             seen_at=segment.first_seen_at,
-            observation_state=state_for[segment.revision_state].value,
+            observation_state=obs_state.value,
             usable_provenance=usable,
-            severity=severity_for[segment.revision_state].value,
+            severity=severity.value,
             registered_at=_canonical_utc(self._clock()),
         )
         try:
@@ -1416,9 +1439,27 @@ class SourceRevisionRegistry:
         self, existing_payload: dict[str, Any], candidate, fields
     ) -> bool:
         """True when a concurrent/committed record diverges on any SCIENTIFIC
-        field (registered_at is operational-only, §21)."""
+        field (registered_at is operational-only, §21).  Datetime fields on
+        the candidate are compared in their canonical serialized form so an
+        exact logical repeat never reads as a conflict."""
+
+        def canon(value: Any) -> Any:
+            if isinstance(value, datetime):
+                return value.astimezone(UTC)
+            if isinstance(value, str):
+                # Persisted payloads serialize datetimes as ISO-8601 (pydantic
+                # emits a 'Z' UTC suffix); compare as real timestamps.
+                try:
+                    return datetime.fromisoformat(
+                        value.replace("Z", "+00:00")
+                    ).astimezone(UTC)
+                except ValueError:
+                    return value
+            return value
+
         return any(
-            existing_payload.get(name) != getattr(candidate, name)
+            canon(existing_payload.get(name))
+            != canon(getattr(candidate, name))
             for name in fields
         )
 
@@ -1680,21 +1721,9 @@ class SourceRevisionRegistry:
             # DIFFERENT acquisition event.  No new observation, no new
             # segment; same-process and restart paths produce identical
             # results.
-            state_for = {
-                RevisionState.STABLE.value: (
-                    ObservationState.FIRST_REGISTRATION,
-                    MutationSeverity.INFO,
-                ),
-                RevisionState.SOURCE_MUTATION.value: (
-                    ObservationState.SOURCE_MUTATION,
-                    MutationSeverity.WARNING,
-                ),
-                RevisionState.PROVIDER_DECLARED_REVISION.value: (
-                    ObservationState.PROVIDER_DECLARED_REVISION,
-                    MutationSeverity.NOTICE,
-                ),
-            }
-            obs_state, severity = state_for[birth.revision_state]
+            obs_state, severity = _BIRTH_OBSERVATION_STATES[
+                birth.revision_state
+            ]
             return RevisionObservationRecord(
                 observation_id=f"{acquisition_id}",
                 acquisition_id=acquisition_id,
@@ -1852,7 +1881,13 @@ class SourceRevisionRegistry:
                 ) from None
         except JsonCatalogCorrupt as exc:
             raise SourceRevisionCatalogCorrupt(str(exc)) from exc
-        self._declarations_by_key.setdefault(key, []).append(record)
+        # §37: an idempotent re-commit must NOT append a duplicate in-memory
+        # copy — adopt the committed record exactly once.
+        by_key = self._declarations_by_key.setdefault(key, [])
+        for existing_record in by_key:
+            if existing_record.declaration_id == declaration_id:
+                return existing_record
+        by_key.append(record)
         return record
 
     def _segment_numbers(self, key: str) -> set[int]:
