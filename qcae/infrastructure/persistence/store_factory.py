@@ -31,6 +31,18 @@ __all__ = [
 ]
 
 
+def open_raw_connection(path: Union[str, Path]) -> sqlite3.Connection:
+    """Open a raw connection to an existing SQLite file (test/repair tooling).
+
+    Engine access stays inside infrastructure per the architecture guard; this
+    escape hatch exists for tests that must corrupt/inspect a database file
+    to prove the integrity layers fire.
+    """
+    conn = sqlite3.connect(str(path))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
 def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
     """Open (creating if needed) a QCAE metadata database.
 

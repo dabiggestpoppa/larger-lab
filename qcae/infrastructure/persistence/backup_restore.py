@@ -60,7 +60,7 @@ def _file_sha256(path: Path) -> str:
 
 class BackupService:
     def __init__(self, conn: sqlite3.Connection,
-                 artifact_store: ContentAddressedArtifactStore) -> None:
+                 artifact_store: "ContentAddressedArtifactStore | None" = None) -> None:
         self._conn = conn
         self._artifacts = artifact_store
 
@@ -76,9 +76,9 @@ class BackupService:
             self._conn.backup(dst)
 
         # 2. Raw artifacts: copy blobs flat under their digest names.
-        algo_dir = self._artifacts._root / "sha256"
         artifact_count = 0
-        if algo_dir.exists():
+        algo_dir = (self._artifacts._root / "sha256") if self._artifacts is not None else None
+        if algo_dir is not None and algo_dir.exists():
             for blob in sorted(algo_dir.rglob("*")):
                 if blob.is_file():
                     shutil.copy2(blob, destination / "artifacts" / blob.name)
@@ -94,12 +94,13 @@ class BackupService:
         except sqlite3.OperationalError:
             pass  # lineage table optional in minimal stores
         manifest = {
-            "backup_version": 1,
+            "backup_version": 2,
             "schema_version": int(
                 self._conn.execute("PRAGMA user_version").fetchone()[0]),
             "metadata_db_sha256": _file_sha256(meta_path),
             "evidence_rows": evidence_rows,
             "lineage_rows": lineage_rows,
+            "registry_rows": self._registry_row_counts(),
             "artifact_count": artifact_count,
             "artifact_hashes": {
                 p.name: _file_sha256(p)
@@ -109,6 +110,23 @@ class BackupService:
         (destination / BACKUP_MANIFEST_NAME).write_text(
             json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
         return manifest
+
+    def _registry_row_counts(self) -> Dict[str, int]:
+        """Row counts for every registry table present (P1-R1 §10)."""
+        tables = (
+            "capability_contract", "capability_atom", "composite_capability",
+            "candidate", "repository_record", "graph_relationship",
+            "negative_knowledge", "positive_knowledge", "capability_receipt",
+            "external_registry_ref",
+        )
+        counts: Dict[str, int] = {}
+        for table in tables:
+            try:
+                counts[table] = int(self._conn.execute(
+                    f"SELECT COUNT(*) FROM {table}").fetchone()[0])
+            except sqlite3.OperationalError:
+                continue  # table not present in this store
+        return counts
 
 
 class RestoreService:
@@ -154,4 +172,17 @@ class RestoreService:
         if rows != manifest["evidence_rows"]:
             raise QcaeValidationError(
                 f"restored evidence rows {rows} != manifest {manifest['evidence_rows']}")
+        # Verify registry table counts when the backup declares them (v2+).
+        declared_registry = manifest.get("registry_rows") or {}
+        if declared_registry:
+            conn2 = sqlite3.connect(str(metadata_db_path))
+            try:
+                for table, expected in declared_registry.items():
+                    actual = int(conn2.execute(
+                        f"SELECT COUNT(*) FROM {table}").fetchone()[0])
+                    if actual != expected:
+                        raise QcaeValidationError(
+                            f"restored {table} rows {actual} != manifest {expected}")
+            finally:
+                conn2.close()
         return RestoreResult(rows, restored, version)
