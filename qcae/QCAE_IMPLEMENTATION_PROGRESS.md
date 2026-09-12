@@ -22,8 +22,11 @@
 3. **P0 amendment reconciliation opened** per operator directive (reconcile
    A-001 §13 P0 obligations; repair reviewed ambiguities).
 4. **Reconciliation commits** `983a742e` → (see commit log below).
-5. **Amendment tests added** (139 new tests across vocabulary, handoff,
-   economic/cross-registry, contract repair, deferred semantics, schema drift).
+5. **Amendment tests added** (141 new tests across vocabulary, handoff,
+   economic/cross-registry, contract repair, deferred semantics, schema drift;
+   count corrected from an earlier 139 transcription error during P1-I0 —
+   composition arithmetic in the freeze manifest: 20+31+25+34+7+22 = 139 unit
+   + 2 Research Mesh architecture guards = 141).
 6. **New freeze** — `qcae/implementation/P0-A001-freeze-manifest.json`
    (411/411 LOCAL TEST EVIDENCE).
 

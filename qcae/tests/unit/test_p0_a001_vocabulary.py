@@ -80,10 +80,11 @@ class TestGapTaxonomy:
         decomposition.validate()
         types = {ref.gap_type for ref in decomposition.component_gaps}
         assert types == {GapType.EXECUTION_FAILURE, GapType.CAPABILITY_GAP}
-        assert GapOwner.QCAE not in {GAP_OWNERSHIP.get(t) for t in types if t in GAP_OWNERSHIP} or True
-        # ownership routing stays per-type, never per-decomposition
+        # ownership routing stays per-type, never per-decomposition: neither
+        # component gap type may inherit ownership from the mixed parent
         assert GAP_OWNERSHIP[GapType.EXECUTION_FAILURE] is GapOwner.EXECUTION_SERVICE_OWNER
         assert GAP_OWNERSHIP[GapType.CAPABILITY_GAP] is GapOwner.QCAE
+        assert GapOwner.QCAE is GAP_OWNERSHIP[GapType.CAPABILITY_GAP]
 
     def test_execution_failure_not_silently_a_capability_gap(self) -> None:
         """A-001 §3: a known capability failing its existing contract is not

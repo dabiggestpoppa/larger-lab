@@ -1,0 +1,61 @@
+{
+  "addendum_version": 1,
+  "type": "FREEZE_MANIFEST_ADDENDUM",
+  "phase": "P0-A001",
+  "created_at": "2026-09-12T00:00:00Z",
+  "created_during": "P1-I0 preflight repairs",
+  "operator_directive": "P1 work-session prompt section 2 (operator preflight repairs)",
+  "corrects_manifest": {
+    "path": "qcae/implementation/P0-A001-freeze-manifest.json",
+    "frozen_in_commit": "459c824b",
+    "manifest_digest_sha256_at_freeze": "UNCOMPUTED_AT_FREEZE",
+    "digest_note": "The manifest was committed before digest self-computation existed; identity is anchored by git blob, see frozen_in_commit.",
+    "git_blob_ref": "754a1bb701186f6bd5f76d271f986e097b34357c"
+  },
+  "correction_reason": "Operator review identified two bookkeeping defects in the P0-A001 freeze record: (1) the progress ledger transcribed 139 new amendment tests where the manifest composition arithmetic gives 141 (20+31+25+34+7+22 unit + 2 Research Mesh architecture guards); (2) evidence_refs.adrs omitted the three reconciliation-phase decision records ADR-0003/0004/0005 (listed only ADR-0001/0002 from the original P0).",
+  "corrections": [
+    {
+      "target": "QCAE_IMPLEMENTATION_PROGRESS.md amendment timeline item 5",
+      "field": "amendment test count",
+      "recorded_value": 139,
+      "corrected_value": 141,
+      "evidence": "freeze manifest test_results.composition: original_p0_unit 255 + original_p0_architecture 15 + new_research_mesh_guards 2 + a001_vocabulary 20 + a001_handoff 31 + a001_economic_crossregistry 25 + a001_contract_repair 34 + a001_deferred 7 + a001_schema_drift 22 = 411 total; amendment delta = 411 - 270 = 141"
+    },
+    {
+      "target": "P0-A001-freeze-manifest.json evidence_refs.adrs",
+      "field": "ADR references",
+      "recorded_value": [
+        "qcae/implementation/decisions/ADR-0001-core-domain-representation.md",
+        "qcae/implementation/decisions/ADR-0002-package-layout-and-test-wiring.md"
+      ],
+      "corrected_value": [
+        "qcae/implementation/decisions/ADR-0001-core-domain-representation.md",
+        "qcae/implementation/decisions/ADR-0002-package-layout-and-test-wiring.md",
+        "qcae/implementation/decisions/ADR-0003-two-layer-acquisition-vocabulary.md",
+        "qcae/implementation/decisions/ADR-0004-deferred-lifecycle-semantics.md",
+        "qcae/implementation/decisions/ADR-0005-amendment-schema-drift-guard.md"
+      ],
+      "evidence": "ADR-0003 was authored in commit 6eee5fb8 (P0-A001-03), ADR-0004 in 74993b67 (P0-A001-05), ADR-0005 in 24d3364c (P0-A001-T02) — all inside the frozen phase commit list; the manifest's evidence_refs section simply predates their inclusion by transcription."
+    }
+  ],
+  "history_policy": {
+    "original_manifest_modified": false,
+    "rationale": "Freeze manifests are historical evidence (prompt section 14 append/supersede law; Book IV 9.1 immmutability invariant). The defect is bookkeeping only — no test, domain schema, or qualification result recorded by the manifest is disputed. The correction therefore supersedes rather than rewrites, mirroring the evidence model used by QCAE itself."
+  },
+  "supersession": {
+    "relationship": "ADDENDUM_SUPERSEDES_BOOKKEEPING_OF",
+    "target_manifest": "P0-A001-freeze-manifest.json",
+    "scope": "evidence_refs.adrs list and ledger test-count transcription ONLY",
+    "all_other_manifest_content": "unchanged and affirmed"
+  },
+  "operator_review": {
+    "directive": "P1 authorization prompt (head 35658840), section 2",
+    "review_date": "2026-09-12"
+  },
+  "vacuous_assertion_removal": {
+    "file": "qcae/tests/unit/test_p0_a001_vocabulary.py",
+    "defect": "test_mixed_gap_requires_decomposition ended an ownership assertion with 'or True', making one assertion vacuous",
+    "repair": "assertion replaced with explicit per-type ownership checks preserving the real invariant (ownership routes per component gap type, never per decomposition)",
+    "test_effect": "strictly strengthening; no previously-passing behavior invalidated"
+  }
+}
