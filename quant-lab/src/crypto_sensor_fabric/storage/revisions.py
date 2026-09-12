@@ -557,6 +557,11 @@ class SourceRevisionRegistry:
             )
         if record.record_type != "source_revision_segment":
             raise SourceRevisionCatalogCorrupt("wrong segment record_type")
+        if record.revision_state not in {s.value for s in RevisionState}:
+            raise SourceRevisionCatalogCorrupt(
+                f"unknown revision_state {record.revision_state!r} in "
+                "committed segment"
+            )
         fields = record.identity_descriptor.get("fields", {})
         try:
             rebuilt = RevisionSourceIdentityV1(
@@ -585,6 +590,13 @@ class SourceRevisionRegistry:
                 raise SourceRevisionCatalogCorrupt(
                     "observation fragment does not bind to its observation_id"
                 )
+            if record.observation_state not in {
+                s.value for s in ObservationState
+            } or record.severity not in {s.value for s in MutationSeverity}:
+                raise SourceRevisionCatalogCorrupt(
+                    "unknown observation_state/severity in committed "
+                    "observation"
+                )
             self._observations_by_key.setdefault(
                 record.source_revision_key, []
             ).append(record)
@@ -605,6 +617,10 @@ class SourceRevisionRegistry:
             if record.declaration_id != logical_id:
                 raise SourceRevisionCatalogCorrupt(
                     "declaration fragment does not bind to its declaration_id"
+                )
+            if record.declaration_kind not in {"revision", "canonical"}:
+                raise SourceRevisionCatalogCorrupt(
+                    f"unknown declaration_kind {record.declaration_kind!r}"
                 )
             self._declarations_by_key.setdefault(
                 record.source_revision_key, []
@@ -628,22 +644,23 @@ class SourceRevisionRegistry:
                         "inconsistent with accepted ordering rules"
                     )
             seen_numbers: set[int] = set()
-            for seg in segments:
-                if seg.revision_number in seen_numbers:
+            for birth_seg in segments:
+                if birth_seg.revision_number in seen_numbers:
                     raise SourceRevisionCatalogCorrupt(
                         "duplicate revision number in committed segments"
                     )
-                seen_numbers.add(seg.revision_number)
+                seen_numbers.add(birth_seg.revision_number)
                 try:
                     acq = self._acquisitions.get_acquisition(
-                        seg.first_acquisition_id
+                        birth_seg.first_acquisition_id
                     )
                 except Exception as exc:
                     raise SourceRevisionCatalogCorrupt(
                         f"segment first acquisition "
-                        f"{seg.first_acquisition_id!r} does not exist durably"
+                        f"{birth_seg.first_acquisition_id!r} does not exist "
+                        "durably"
                     ) from exc
-                if acq.blob_sha256 != seg.blob_sha256:
+                if acq.blob_sha256 != birth_seg.blob_sha256:
                     raise SourceRevisionCatalogCorrupt(
                         "segment first acquisition blob does not match the "
                         "segment blob"
