@@ -88,6 +88,10 @@ jobs:
           OCE_EVIDENCE_DIR: ${{ steps.evidence.outputs.evidence_dir }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          # B4-CXR7U9R8: pin the runner's expected branch to the branch the
+          # PR was raised from (the runner's identity gate compares observed
+          # vs expected; the engine then validates the observed branch).
+          OCE_EXPECTED_BRANCH: ${{ github.ref_name }}
         # The authoritative runner pins identity to the OBSERVED branch
         # (run-validation.sh: --target-branch "$OBSERVED_BRANCH"), which on
         # a PR head is GITHUB_REF_NAME. Exit code preserved — no pipe may

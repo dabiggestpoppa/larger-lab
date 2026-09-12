@@ -271,7 +271,19 @@ if [ "$CHECKOUT_STATE" = "attached" ]; then
     IDENTITY_BRANCH="$OBSERVED_BRANCH"
 fi
 
-EXPECTED_BRANCH=$(python3 -c "import json;print(json.load(open('$CONTRACT_WIN'))['authorized_branch'])")
+# B4-CXR7U9R8: the expected branch comes from the checkpoint contract by
+# default (authoritative oce-branch runs are unchanged). A caller MAY pin a
+# different expected branch via OCE_EXPECTED_BRANCH — used by the PR
+# validation workflow, where the engine's identity check must validate the
+# branch the PR was actually raised from (GITHUB_REF_NAME), matching the
+# engine's own --target-branch "$OBSERVED_BRANCH" model. The override is
+# an explicit, logged caller contract — never an ambient silent default.
+if [ -n "${OCE_EXPECTED_BRANCH:-}" ]; then
+    EXPECTED_BRANCH="$OCE_EXPECTED_BRANCH"
+    BRANCH_EXPECT_PROVENANCE="OCE_EXPECTED_BRANCH (caller override)"
+else
+    BRANCH_EXPECT_PROVENANCE="contract"
+fi
 
 # R3G: trusted ref for engine runs inside the detached disposable worktree.
 export OCE_TRUSTED_REF="$IDENTITY_BRANCH"
@@ -281,7 +293,7 @@ echo "  TREE:              $TREE"
 echo "  ORIGIN:            $ORIGIN"
 echo "  OBSERVED_BRANCH:   $OBSERVED_BRANCH ($CHECKOUT_STATE, provenance=$BRANCH_PROVENANCE)"
 echo "  TRUSTED_CI_REF:    ${GITHUB_REF_NAME:-none}"
-echo "  EXPECTED_BRANCH:   $EXPECTED_BRANCH"
+echo "  EXPECTED_BRANCH:   $EXPECTED_BRANCH (provenance=$BRANCH_EXPECT_PROVENANCE)"
 echo ""
 
 # Branch identity rules: observed/trusted identity must equal contract.
