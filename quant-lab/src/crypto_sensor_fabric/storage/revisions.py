@@ -56,6 +56,7 @@ from .catalog import is_usable_manifest_provenance
 from .enums import StorageEncoding  # re-exported for registry consumers
 from .json_catalog import (
     DurableJsonCatalog,
+    JsonCatalogConflict,
     JsonCatalogCorrupt,
     canonical_json_bytes,
 )
@@ -407,6 +408,33 @@ def _canonical_utc(value: datetime) -> str:
     return value.astimezone(UTC).isoformat()
 
 
+# Fields that define the SCIENTIFIC identity of a committed record.
+# ``registered_at`` is operational audit metadata (§21): two writers may
+# legitimately commit the same observation under different wall clocks,
+# so it never enters conflict comparison.
+_OBSERVATION_SEMANTIC_FIELDS = (
+    "acquisition_id",
+    "source_revision_key",
+    "revision_number",
+    "blob_sha256",
+    "seen_at",
+    "observation_state",
+    "usable_provenance",
+    "severity",
+)
+_SEGMENT_SEMANTIC_FIELDS = (
+    "source_revision_key",
+    "segment_id",
+    "identity_version",
+    "revision_number",
+    "blob_sha256",
+    "first_seen_at",
+    "first_acquisition_id",
+    "revision_state",
+    "revision_reason",
+)
+
+
 # ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
@@ -749,7 +777,12 @@ class SourceRevisionRegistry:
                 "(failure/no-data/unavailable acquisitions never create a "
                 "content revision segment; no zero hash is manufactured)"
             )
-        metas = self._blob_metadata.get_blob_metadata(blob_sha)
+        try:
+            metas = self._blob_metadata.get_blob_metadata(blob_sha)
+        except Exception as exc:
+            raise RevisionContentCorrupt(
+                f"blob {blob_sha} has no durable EvidenceBlob metadata: {exc}"
+            ) from exc
         if not metas:
             raise RevisionContentCorrupt(
                 f"blob {blob_sha} has no durable EvidenceBlob metadata"
@@ -1089,6 +1122,16 @@ class SourceRevisionRegistry:
         candidates = [v for v in (latest, obs_latest) if v is not None]
         return max(candidates) if candidates else ""
 
+    def _semantic_conflict(
+        self, existing_payload: dict[str, Any], candidate, fields
+    ) -> bool:
+        """True when a concurrent/committed record diverges on any SCIENTIFIC
+        field (registered_at is operational-only, §21)."""
+        return any(
+            existing_payload.get(name) != getattr(candidate, name)
+            for name in fields
+        )
+
     def _register_identical_refetch(
         self,
         *,
@@ -1118,19 +1161,28 @@ class SourceRevisionRegistry:
             self._observations.commit(
                 observation_id, record.model_dump(mode="json")
             )
+        except JsonCatalogConflict:
+            # A concurrent writer already committed this observation_id.
+            # Semantic agreement ⇒ adopt; divergence ⇒ typed conflict (§48).
+            existing = self._observations.get(observation_id)
+            if existing is None or self._semantic_conflict(
+                existing,
+                record,
+                _OBSERVATION_SEMANTIC_FIELDS,
+            ):
+                raise RevisionObservationConflict(
+                    f"observation {observation_id!r} already exists with "
+                    "different revision semantics (I06 §48)"
+                ) from None
         except JsonCatalogCorrupt as exc:
             raise SourceRevisionCatalogCorrupt(str(exc)) from exc
         self._observations_by_key.setdefault(key, []).append(record)
-        # A duplicate observation_id means the same acquisition_id was
-        # already mapped by an observation record — compare and type-conflict
-        # on divergence (§48) rather than silently adopt.
-        prior = self._acquisition_bindings.get(acquisition_id)
-        if prior is not None and prior != (key, current.revision_number, current.blob_sha256):
-            raise RevisionObservationConflict(
-                f"acquisition {acquisition_id!r} is already bound to "
-                f"revision {prior[1]} of {prior[0][:12]}...; refusing to "
-                "rebind (I06 §48)"
-            )
+        self._acquisition_bindings[acquisition_id] = (
+            key,
+            current.revision_number,
+            current.blob_sha256,
+        )
+        return record
 
     def _register_new_revision(
         self,
@@ -1206,6 +1258,17 @@ class SourceRevisionRegistry:
             self._observations.commit(
                 observation_id, record.model_dump(mode="json")
             )
+        except JsonCatalogConflict:
+            existing = self._observations.get(observation_id)
+            if existing is None or self._semantic_conflict(
+                existing,
+                record,
+                _OBSERVATION_SEMANTIC_FIELDS,
+            ):
+                raise RevisionObservationConflict(
+                    f"observation {observation_id!r} already exists with "
+                    "different revision semantics (I06 §48)"
+                ) from None
         except JsonCatalogCorrupt as exc:
             raise SourceRevisionCatalogCorrupt(str(exc)) from exc
         self._observations_by_key.setdefault(key, []).append(record)
@@ -1241,12 +1304,69 @@ class SourceRevisionRegistry:
         acquisition = self._resolve_durable_acquisition(acquisition_id)
         identity = RevisionSourceIdentityV1.from_acquisition(acquisition)
         recomputed = identity.source_revision_key()
-        if recomputed != key or acquisition.blob_sha256 != blob_sha:
+        if (
+            recomputed != key
+            or acquisition.blob_sha256 != blob_sha
+            or revision_number < 1
+        ):
             raise RevisionObservationConflict(
                 f"acquisition {acquisition_id!r} is durably bound to "
                 f"revision {revision_number} of {key[:12]}... but the "
                 "current durable acquisition/blob no longer matches that "
                 "binding (I06 §48)"
+            )
+        # §47/§48: the binding must agree with DURABLE registry truth —
+        # a birth acquisition's authoritative binding is its segment's
+        # first_acquisition_id; any other observation record binds through
+        # the observation itself.  Divergence is a typed conflict; never a
+        # stale cached success and never a silent reclassification.
+        birth = next(
+            (
+                s
+                for segs in self._segments_by_key.values()
+                for s in segs
+                if s.first_acquisition_id == acquisition_id
+            ),
+            None,
+        )
+        if birth is not None and (
+            birth.source_revision_key != key
+            or birth.revision_number != revision_number
+            or birth.blob_sha256 != blob_sha
+        ):
+            raise RevisionObservationConflict(
+                f"acquisition {acquisition_id!r} is durably bound as the "
+                f"birth of revision {birth.revision_number} of "
+                f"{birth.source_revision_key[:12]}...; the requested "
+                "binding diverges (I06 §48)"
+            )
+        persisted = self._observations.get(acquisition_id)
+        if (
+            persisted is not None
+            and self._semantic_conflict(
+                persisted,
+                RevisionObservationRecord(
+                    observation_id=acquisition_id,
+                    acquisition_id=acquisition_id,
+                    source_revision_key=key,
+                    revision_number=revision_number,
+                    blob_sha256=blob_sha,
+                    seen_at=_canonical_utc(
+                        acquisition.response_observed_at
+                    ),
+                    observation_state=persisted["observation_state"],
+                    usable_provenance=bool(
+                        persisted["usable_provenance"]
+                    ),
+                    severity=persisted["severity"],
+                    registered_at=persisted["registered_at"],
+                ),
+                _OBSERVATION_SEMANTIC_FIELDS,
+            )
+        ):
+            raise RevisionObservationConflict(
+                f"acquisition {acquisition_id!r} is durably bound to "
+                "different observation semantics (I06 §47/§48)"
             )
         usable = self._usable_provenance(acquisition)
         return RevisionObservationRecord(
