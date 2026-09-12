@@ -129,11 +129,31 @@ class ProjectionSourceNotUsable(ProjectionWriteError):
 
 
 def _canonical_utc(value: datetime | None) -> str | None:
+    """Serialize an offset-AWARE datetime to normalized UTC.
+
+    I05R3 §14-§16: naive datetimes are rejected upstream in
+    :class:`ProjectionCatalogRecord` — no silent ``replace(tzinfo=UTC)``
+    reinterpretation happens anywhere in the serialization path.
+    """
     if value is None:
         return None
     if value.tzinfo is None:
-        value = value.replace(tzinfo=UTC)
+        raise ProjectionPreconditionError(
+            "naive datetime reached serialization; ProjectionCatalogRecord "
+            "must be constructed with offset-aware timestamps (I05R3 §15)"
+        )
     return value.astimezone(UTC).isoformat()
+
+
+def _require_aware(name: str, value: datetime) -> None:
+    """I05R3 §15: time without an offset is not UTC — reject it typed."""
+    if not isinstance(value, datetime):
+        raise ProjectionPreconditionError(f"{name} must be a datetime")
+    if value.tzinfo is None or value.tzinfo.utcoffset(value) is None:
+        raise ProjectionPreconditionError(
+            f"{name} must be timezone-aware; naive datetimes are not "
+            "silently interpreted as UTC (I05R3 §14-§15)"
+        )
 
 
 class ProjectionCatalogRecord:
@@ -214,9 +234,29 @@ class ProjectionCatalogRecord:
                 raise ProjectionPreconditionError(
                     f"{name} must be a nonempty string"
                 )
+        # I05R3 §15: every timestamp field must be offset-aware.  Naive
+        # inputs FAIL — no implicit UTC assignment anywhere.
+        _require_aware("logical_date_start", logical_date_start)
+        _require_aware("logical_date_end", logical_date_end)
+        if min_provider_time is not None:
+            _require_aware("min_provider_time", min_provider_time)
+        if max_provider_time is not None:
+            _require_aware("max_provider_time", max_provider_time)
+        _require_aware("created_at", created_at)
         if logical_date_end < logical_date_start:
             raise ProjectionPreconditionError(
                 "logical_date_end must be >= logical_date_start"
+            )
+        # §17: provider-time ordering enforced when both bounds exist.
+        # Missing bounds are never manufactured.
+        if (
+            min_provider_time is not None
+            and max_provider_time is not None
+            and max_provider_time < min_provider_time
+        ):
+            raise ProjectionPreconditionError(
+                "max_provider_time must be >= min_provider_time when both "
+                "are present (I05R3 §17); no one-sided inference"
             )
         self.projection_id = projection_id
         self.provider = provider
@@ -283,7 +323,17 @@ class ProjectionCatalogRecord:
                 raise ProjectionArtifactCatalogCorrupt(
                     f"projection context missing {field}"
                 )
-            return datetime.fromisoformat(raw)
+            value = datetime.fromisoformat(raw)
+            # I05R3 §18: a persisted naive timestamp fails closed on
+            # reload — a tampered fragment is never loaded as UTC by
+            # assumption.
+            if value.tzinfo is None or value.tzinfo.utcoffset(value) is None:
+                raise ProjectionArtifactCatalogCorrupt(
+                    f"projection context {field}={raw!r} is a naive "
+                    "timestamp; catalog fragments must persist offset-aware "
+                    "UTC-normalized datetimes (I05R3 §18)"
+                )
+            return value
 
         return cls(
             projection_id=payload["projection_id"],
@@ -304,14 +354,10 @@ class ProjectionCatalogRecord:
             projection_sha256=payload["projection_sha256"],
             row_count=payload["row_count"],
             min_provider_time=(
-                datetime.fromisoformat(payload["min_provider_time"])
-                if payload.get("min_provider_time")
-                else None
+                _dt("min_provider_time") if payload.get("min_provider_time") else None
             ),
             max_provider_time=(
-                datetime.fromisoformat(payload["max_provider_time"])
-                if payload.get("max_provider_time")
-                else None
+                _dt("max_provider_time") if payload.get("max_provider_time") else None
             ),
             lineage_manifest_id=payload["lineage_manifest_id"],
             quality_flags=list(payload.get("quality_flags", [])),
