@@ -1074,3 +1074,20 @@ Current state: SOURCE_REVISION_REGISTRY_IMPLEMENTED=TRUE. I05→I06 chain
 complete and pending operator review. next_checkpoint_authorized=FALSE —
 SENSOR-B4-I07 (DURABLE JOB STATE + RESUME COUPLING) NOT authorized, NOT
 started. Research NOT resumed.
+
+## BLOC 4 — I06R1 CANONICAL REVISION CONTRACT MICROSEAL
+
+| Commit | Stage | Tests | Verdict | Notes |
+|---|---|---|---|---|
+| SENSOR-B4-I06R1A/R1B | 2c4ad0b1 | canonical vocabulary + durable-acquisition identity binding (10 R1A/R1B tests incl. coordinated-tamper) | PASS | RevisionState/Policy imported from storage.enums only — RevisionResolutionMode is RevisionPolicy (object alias, §4); shadow SourceRevision deleted, get/list return frozen models.SourceRevision with aware-UTC datetimes + canonical enum (§5-§7); identity_version Literal[1] on identity AND segment records, V2 construction AND persisted-V2 rejected (§9/§10); restart re-derives identity from durable birth acquisition for EVERY segment — descriptor AND key must match (§11); observation source keys bound to durable acquisitions (§12); coordinated descriptor+key+filename tamper, same-blob wrong-source observation, duplicate birth acquisition all fail closed (§13-§15) |
+| SENSOR-B4-I06R1C | 444e2ad1 | typed declarations + crash-safe ordering + collision-free ids (declaration tests updated) | PASS | ProviderRevisionDeclaration typed input replaces dict semantics (§24); declaration committed BEFORE segment (§25 option A) — pending evidence alone is safe, never unsupported truth; restart segment-driven proof that every PROVIDER_DECLARED_REVISION has supporting evidence (§26); default declaration ID = full SHA256 over source-namespaced semantics, no wall clock (§35); cross-source collisions impossible (§36); idempotent exact repeat adopts, semantic divergence → RevisionDeclarationConflict (§37); declared_at/registered_at typed aware-UTC datetimes, no str(datetime) path (§31/§32); evidence_ref nonempty everywhere (§30) |
+| SENSOR-B4-I06R1D | 3f142288 | birth idempotence + declaration crash-boundary adversarial proof (17 tests) | PASS | birth re-registration returns ORIGINAL classification (FIRST_REGISTRATION/SOURCE_MUTATION/PROVIDER_DECLARED_REVISION — never IDENTICAL_REFETCH), identical same-process vs restart (§19-§21); IDENTICAL_REFETCH requires distinct acquisition event (§22); crash matrix: before declaration / after declaration before segment / retry-completes / divergent-evidence conflict / missing-evidence restart all fail safe (§26-§28); same-bytes declaration preserves evidence without minting a revision (§29) |
+| SENSOR-B4-I06R1E | (this commit) | 3 deterministic R1 matrices (canonical-contract / identity-binding / declaration-durability) published once, pytest READ-ONLY vs committed bytes; evidence MD + ledger | 960 storage / 2339 full, 0 failed (fresh baseline 939/2318 re-measured at 295a8af5) | proposed PASS_SENSOR_B4_I06R1_CANONICAL_CONTRACT_DECLARATION_SEALED; then operator may accept PASS_SENSOR_B4_I06_SOURCE_REVISION_MUTATION_REGISTRY and G4-04_REVISION_GATE = IMPLEMENTATION_PASS; REVISION_CANONICAL_CONTRACT_SEALED=TRUE, PROVIDER_DECLARATION_DURABILITY_SEALED=TRUE; frozen enums.py/models.py byte-identical (reconciliation by import, not edit); historical I06 evidence untouched; DURABLE_RESUME_IMPLEMENTED=FALSE; next_checkpoint_authorized=FALSE; recommended next SENSOR-B4-I07 (NOT started) |
+
+I06R1 current state: operator findings A-E sealed (canonical vocabulary,
+durable-acquisition identity binding, evidence-before-classification,
+declaration contract, birth idempotence). Historical I06 evidence remains
+chronological truth for the pre-I06R1 implementation. I05→I06→I06R1 chain
+complete and pending operator review. next_checkpoint_authorized=FALSE —
+SENSOR-B4-I07 (DURABLE JOB STATE + RESUME COUPLING) NOT authorized, NOT
+started. Research NOT resumed.

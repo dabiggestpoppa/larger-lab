@@ -575,7 +575,7 @@ class SourceRevisionRegistry:
         blob_metadata_repository: Any = None,
         blob_store: Any = None,
         clock: Any = None,
-        lock_timeout_seconds: float = 5.0,
+        lock_timeout_seconds: float = 30.0,
     ) -> None:
         """Contract for a registration clock injection (§21); defaults to
         wall time.  Operational only — never revision chronology.

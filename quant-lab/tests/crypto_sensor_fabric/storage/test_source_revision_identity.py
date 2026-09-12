@@ -284,7 +284,7 @@ class TestDescriptorTamperFailClosed(TestRegistryConstruction):
         a tampered descriptor is catalog corruption, never trusted."""
         acq_repo, blob_repo, store = self._deps(tmp_path)
         root = tmp_path / "reg"
-        reg = SourceRevisionRegistry(
+        SourceRevisionRegistry(
             root,
             acquisition_repository=acq_repo,
             blob_metadata_repository=blob_repo,
