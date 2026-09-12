@@ -48,7 +48,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Literal, Protocol, runtime_checkable
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 # I04R2 §13: THE one authoritative usable-provenance eligibility predicate.
 # The registry must never duplicate eligibility logic.
@@ -142,6 +142,11 @@ class RevisionLockHeld(RevisionError):
     auto-deleted; I08 owns stale-lock recovery."""
 
 
+class RevisionDeclarationConflict(RevisionError):
+    """A declaration with the same id exists with DIFFERENT semantics
+    (I06R1 §37): evidence/time/transition divergence — never overwritten."""
+
+
 class RevisionAmbiguityError(RevisionError):
     """Resolution policy refuses to pick (§55/§60): ERROR_ON_AMBIGUITY with
     >1 revisions, or multiple distinct provider-canonical declarations."""
@@ -210,7 +215,7 @@ class RevisionSourceIdentityV1(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    identity_version: int = IDENTITY_VERSION
+    identity_version: Literal[1] = 1
     provider_id: str
     venue: str
     sensor_family: str
@@ -503,6 +508,15 @@ _OBSERVATION_SEMANTIC_FIELDS = (
     "observation_state",
     "usable_provenance",
     "severity",
+)
+_DECLARATION_SEMANTIC_FIELDS = (
+    "source_revision_key",
+    "revision_number",
+    "declaration_kind",
+    "evidence_ref",
+    "declared_at",
+    "bound_acquisition_id",
+    "blob_sha256",
 )
 _SEGMENT_SEMANTIC_FIELDS = (
     "source_revision_key",
@@ -869,6 +883,35 @@ class SourceRevisionRegistry:
                         f"declaration {dec.declaration_id!r} references a "
                         "revision that does not exist"
                     )
+                # I06R1 §26: a durable PROVIDER_DECLARED_REVISION segment
+                # must carry declaration evidence that independently proves
+                # why it is provider-declared — matching source key and the
+                # birth-acquisition transition it classifies.
+                for seg in self._segments_by_key.get(key, []):
+                    if seg.revision_state != (
+                        RevisionState.PROVIDER_DECLARED_REVISION.value
+                    ):
+                        continue
+                    supporting = [
+                        d
+                        for d in declarations
+                        if d.declaration_kind == "revision"
+                        and (
+                            d.revision_number == seg.revision_number
+                            or (
+                                d.revision_number is None
+                                and d.bound_acquisition_id
+                                == seg.first_acquisition_id
+                                and d.blob_sha256 == seg.blob_sha256
+                            )
+                        )
+                    ]
+                    if not supporting:
+                        raise SourceRevisionCatalogCorrupt(
+                            f"segment {seg.segment_id[:16]}... is classified "
+                            "PROVIDER_DECLARED_REVISION but no durable "
+                            "declaration evidence proves it (I06R1 §26)"
+                        )
 
     def _load_all(self) -> None:
         self._load_segments()
@@ -1024,7 +1067,7 @@ class SourceRevisionRegistry:
         self,
         acquisition_id: str,
         *,
-        provider_declaration: dict[str, Any] | None = None,
+        provider_declaration: ProviderRevisionDeclaration | None = None,
     ) -> RevisionObservationRecord:
         """Resolve the durable acquisition, verify its blob, classify the
         observation against the source's revision history and persist it
@@ -1085,7 +1128,7 @@ class SourceRevisionRegistry:
         identity: RevisionSourceIdentityV1,
         acquisition_id: str,
         blob_sha: str,
-        seen_at: str,
+        seen_at: datetime,
         usable: bool,
     ) -> RevisionObservationRecord:
         """§23: no prior revision exists — rev1 STABLE.  The segment birth
@@ -1130,10 +1173,10 @@ class SourceRevisionRegistry:
         identity: RevisionSourceIdentityV1,
         acquisition_id: str,
         blob_sha: str,
-        seen_at: str,
+        seen_at: datetime,
         usable: bool,
         segments: list[RevisionSegmentRecord],
-        provider_declaration: dict[str, Any] | None,
+        provider_declaration: ProviderRevisionDeclaration | None,
     ) -> RevisionObservationRecord:
         current = segments[-1]
         latest_seen = self._latest_seen_for(key)
@@ -1157,11 +1200,20 @@ class SourceRevisionRegistry:
             None,
         )
         if birth_segment is not None:
+            # I06R1 §28: a prior crash may have left the pending declaration
+            # committed but the segment absent.  A RETRY with the SAME
+            # declaration semantics completes the exact intended provider-
+            # declared revision; divergent evidence is a typed conflict —
+            # never a silent downgrade or upgrade of the classification.
+            self._check_pending_declaration(
+                key=key,
+                acquisition_id=acquisition_id,
+                blob_sha=blob_sha,
+                provider_declaration=provider_declaration,
+            )
             return self._complete_birth_observation(
                 key=key, segment=birth_segment, usable=usable
             )
-        if provider_declaration is not None:
-            self._validate_declaration_payload(provider_declaration)
         if blob_sha == current.blob_sha256:
             # §24/§41: identical bytes to the CURRENT segment — no new
             # revision, ever.  §34: an explicit provider declaration with
@@ -1169,16 +1221,22 @@ class SourceRevisionRegistry:
             # the content revision number remains unchanged.
             if provider_declaration is not None:
                 self._commit_declaration(
-                    declaration_id=f"{acquisition_id}:revision",
+                    declaration_id=self._declaration_id(
+                        key=key,
+                        declaration_kind="revision",
+                        revision_number=current.revision_number,
+                        acquisition_id=acquisition_id,
+                        blob_sha256=current.blob_sha256,
+                        evidence_ref=provider_declaration.evidence_ref,
+                        declared_at=provider_declaration.declared_at,
+                    ),
                     key=key,
                     revision_number=current.revision_number,
                     declaration_kind="revision",
-                    evidence_ref=str(provider_declaration["evidence_ref"]),
-                    declared_at=str(
-                        provider_declaration.get(
-                            "declared_at", _canonical_utc(self._clock())
-                        )
-                    ),
+                    evidence_ref=provider_declaration.evidence_ref,
+                    declared_at=provider_declaration.declared_at,
+                    bound_acquisition_id=acquisition_id,
+                    blob_sha256=current.blob_sha256,
                 )
             return self._register_identical_refetch(
                 key=key,
@@ -1208,21 +1266,87 @@ class SourceRevisionRegistry:
 
     @staticmethod
     def _validate_declaration_payload(
-        provider_declaration: dict[str, Any],
+        declaration: ProviderRevisionDeclaration,
     ) -> None:
-        """§33: declaration evidence is EXPLICIT — kind + durable
-        evidence_ref are mandatory; status/ETag/filename are never
-        consulted."""
-        if provider_declaration.get("declaration_kind") != "revision":
+        """I06R1 §24/§30: declarations are TYPED — ProviderRevisionDeclaration
+        already enforces nonempty evidence_ref + aware declared_at at
+        construction.  This guard only makes the contract explicit at the
+        registration boundary."""
+        if not isinstance(declaration, ProviderRevisionDeclaration):
             raise RevisionConfigurationError(
-                "provider_declaration at registration must be a "
-                "'revision' declaration"
+                "provider_declaration must be a ProviderRevisionDeclaration "
+                "(typed evidence: nonempty evidence_ref + aware declared_at "
+                "— I06R1 §24/§30)"
             )
-        if not provider_declaration.get("evidence_ref"):
-            raise RevisionConfigurationError(
-                "provider declaration requires durable evidence_ref "
-                "(never inferred — I06 §33)"
+
+    def _declaration_id(
+        self,
+        *,
+        key: str,
+        declaration_kind: str,
+        revision_number: int | None,
+        acquisition_id: str | None,
+        blob_sha256: str | None,
+        evidence_ref: str,
+        declared_at: datetime,
+    ) -> str:
+        """I06R1 §35: DEFAULT declaration identity is a deterministic full
+        SHA256 over the canonical declaration semantics — source-namespaced,
+        so two unrelated source keys can never collide.  No wall-clock
+        registered_at enters the identity."""
+        payload = {
+            "identity_kind": "source_revision_declaration_v1",
+            "source_revision_key": key,
+            "declaration_kind": declaration_kind,
+            "revision_number": revision_number,
+            "bound_acquisition_id": acquisition_id,
+            "blob_sha256": blob_sha256,
+            "evidence_ref": evidence_ref,
+            "declared_at": _canonical_utc(declared_at).isoformat(),
+        }
+        return hashlib.sha256(
+            canonical_json_bytes(payload)
+        ).hexdigest()
+
+    def _check_pending_declaration(
+        self,
+        *,
+        key: str,
+        acquisition_id: str,
+        blob_sha: str,
+        provider_declaration: ProviderRevisionDeclaration | None,
+    ) -> None:
+        """I06R1 §28: after a crash that left a pending (segment-less)
+        declaration, an exact retry must reuse that evidence and complete
+        the intended provider-declared revision; DIFFERENT evidence_ref or
+        declaration semantics for the same acquisition transition is a
+        typed conflict."""
+        pending = [
+            d
+            for d in self._declarations_by_key.get(key, [])
+            if d.declaration_kind == "revision"
+            and d.revision_number is None
+            and d.bound_acquisition_id == acquisition_id
+        ]
+        if not pending:
+            return
+        if provider_declaration is None:
+            raise RevisionDeclarationConflict(
+                f"acquisition {acquisition_id!r} has pending provider "
+                "declaration evidence but the retry supplies none; the "
+                "intended classification cannot be re-proven (I06R1 §28)"
             )
+        for d in pending:
+            if (
+                d.evidence_ref != provider_declaration.evidence_ref
+                or _canonical_utc(d.declared_at)
+                != _canonical_utc(provider_declaration.declared_at)
+            ):
+                raise RevisionDeclarationConflict(
+                    f"acquisition {acquisition_id!r} has pending provider "
+                    "declaration evidence with different semantics; the "
+                    "retry must supply the exact same evidence (I06R1 §28)"
+                )
 
     def _complete_birth_observation(
         self,
@@ -1274,7 +1398,9 @@ class SourceRevisionRegistry:
         )
         return record
 
-    def _latest_seen_for(self, key: str) -> str:
+    def _latest_seen_for(self, key: str) -> datetime:
+        """Latest accepted ``seen_at`` for the source key (§39/§40 ordering
+        guard) — across segment births and observations alike."""
         segments = self._segments_by_key.get(key, [])
         latest = max(
             (s.first_seen_at for s in segments), default=None
@@ -1284,7 +1410,7 @@ class SourceRevisionRegistry:
             (o.seen_at for o in observations), default=None
         )
         candidates = [v for v in (latest, obs_latest) if v is not None]
-        return max(candidates) if candidates else ""
+        return max(candidates) if candidates else datetime.min.replace(tzinfo=UTC)
 
     def _semantic_conflict(
         self, existing_payload: dict[str, Any], candidate, fields
@@ -1302,7 +1428,7 @@ class SourceRevisionRegistry:
         key: str,
         acquisition_id: str,
         current: RevisionSegmentRecord,
-        seen_at: str,
+        seen_at: datetime,
         usable: bool,
     ) -> RevisionObservationRecord:
         """§24: NO new revision number.  Append an immutable observation;
@@ -1355,16 +1481,41 @@ class SourceRevisionRegistry:
         identity: RevisionSourceIdentityV1,
         acquisition_id: str,
         blob_sha: str,
-        seen_at: str,
+        seen_at: datetime,
         usable: bool,
         current: RevisionSegmentRecord,
-        provider_declaration: dict[str, Any] | None,
+        provider_declaration: ProviderRevisionDeclaration | None,
     ) -> RevisionObservationRecord:
         """§25/§33: new bytes → new revision.  PROVIDER_DECLARED_REVISION
         ONLY with explicit declaration evidence; otherwise SOURCE_MUTATION
-        (WARNING — BLOCKER requires explicit drift evidence, §37)."""
+        (WARNING — BLOCKER requires explicit drift evidence, §37).
+
+        I06R1 §25 option A — crash-safe evidence ordering: the immutable
+        provider declaration is committed BEFORE the segment birth, so no
+        durable PROVIDER_DECLARED_REVISION classification can ever exist
+        without evidence that independently proves it (a crash between the
+        two leaves declaration evidence only — never unsupported truth)."""
         if provider_declaration is not None:
             self._validate_declaration_payload(provider_declaration)
+            self._commit_declaration(
+                declaration_id=self._declaration_id(
+                    key=key,
+                    declaration_kind="revision",
+                    revision_number=current.revision_number + 1,
+                    acquisition_id=acquisition_id,
+                    blob_sha256=blob_sha,
+                    evidence_ref=provider_declaration.evidence_ref,
+                    declared_at=provider_declaration.declared_at,
+                ),
+                key=key,
+                # None = declaration precedes the segment (pending state).
+                revision_number=None,
+                declaration_kind="revision",
+                evidence_ref=provider_declaration.evidence_ref,
+                declared_at=provider_declaration.declared_at,
+                bound_acquisition_id=acquisition_id,
+                blob_sha256=blob_sha,
+            )
         new_number = current.revision_number + 1
         state = (
             RevisionState.PROVIDER_DECLARED_REVISION.value
@@ -1436,19 +1587,6 @@ class SourceRevisionRegistry:
         except JsonCatalogCorrupt as exc:
             raise SourceRevisionCatalogCorrupt(str(exc)) from exc
         self._observations_by_key.setdefault(key, []).append(record)
-        if provider_declaration is not None:
-            self._commit_declaration(
-                declaration_id=f"{acquisition_id}:revision",
-                key=key,
-                revision_number=new_number,
-                declaration_kind="revision",
-                evidence_ref=str(provider_declaration["evidence_ref"]),
-                declared_at=str(
-                    provider_declaration.get(
-                        "declared_at", _canonical_utc(self._clock())
-                    )
-                ),
-            )
         self._acquisition_bindings[acquisition_id] = (
             key,
             new_number,
@@ -1533,13 +1671,49 @@ class SourceRevisionRegistry:
                 "different observation semantics (I06 §47/§48)"
             )
         usable = self._usable_provenance(acquisition)
+        seen_at = _canonical_utc(acquisition.response_observed_at)
+        if birth is not None:
+            # I06R1 §19-§21: re-registering a BIRTH acquisition returns the
+            # ORIGINAL birth classification (FIRST_REGISTRATION/STABLE,
+            # SOURCE_MUTATION, PROVIDER_DECLARED_REVISION).  Idempotence is
+            # NOT a new provider observation — IDENTICAL_REFETCH requires a
+            # DIFFERENT acquisition event.  No new observation, no new
+            # segment; same-process and restart paths produce identical
+            # results.
+            state_for = {
+                RevisionState.STABLE.value: (
+                    ObservationState.FIRST_REGISTRATION,
+                    MutationSeverity.INFO,
+                ),
+                RevisionState.SOURCE_MUTATION.value: (
+                    ObservationState.SOURCE_MUTATION,
+                    MutationSeverity.WARNING,
+                ),
+                RevisionState.PROVIDER_DECLARED_REVISION.value: (
+                    ObservationState.PROVIDER_DECLARED_REVISION,
+                    MutationSeverity.NOTICE,
+                ),
+            }
+            obs_state, severity = state_for[birth.revision_state]
+            return RevisionObservationRecord(
+                observation_id=f"{acquisition_id}",
+                acquisition_id=acquisition_id,
+                source_revision_key=key,
+                revision_number=revision_number,
+                blob_sha256=blob_sha,
+                seen_at=seen_at,
+                observation_state=obs_state.value,
+                usable_provenance=usable,
+                severity=severity.value,
+                registered_at=_canonical_utc(self._clock()),
+            )
         return RevisionObservationRecord(
             observation_id=f"{acquisition_id}",
             acquisition_id=acquisition_id,
             source_revision_key=key,
             revision_number=revision_number,
             blob_sha256=blob_sha,
-            seen_at=_canonical_utc(acquisition.response_observed_at),
+            seen_at=seen_at,
             observation_state=ObservationState.IDENTICAL_REFETCH.value,
             usable_provenance=usable,
             severity=MutationSeverity.INFO.value,
@@ -1557,21 +1731,38 @@ class SourceRevisionRegistry:
         declared_at: datetime | None = None,
         declaration_id: str | None = None,
     ) -> RevisionDeclarationRecord:
-        """Explicit provider revision/canonical declaration evidence
-        (§33-§35).  Never inferred."""
+        """Explicit provider revision declaration evidence (§33-§35).
+        Never inferred; requires a nonempty durable ``evidence_ref``
+        (I06R1 §30) and an offset-aware ``declared_at``."""
+        if not evidence_ref or not evidence_ref.strip():
+            raise RevisionConfigurationError(
+                "provider revision declaration requires a nonempty durable "
+                "evidence_ref (I06R1 §30)"
+            )
         if revision_number not in self._segment_numbers(source_revision_key):
             raise RevisionNotFound(
                 f"declaration targets revision {revision_number} of "
                 f"{source_revision_key[:12]}... which does not exist"
             )
+        aware_declared_at = _canonical_utc(
+            declared_at if declared_at is not None else self._clock()
+        )
         return self._commit_declaration(
             declaration_id=declaration_id
-            or f"decl-{len(self._declarations_by_key.get(source_revision_key, [])) + 1}-{revision_number}",
+            or self._declaration_id(
+                key=source_revision_key,
+                declaration_kind="revision",
+                revision_number=revision_number,
+                acquisition_id=None,
+                blob_sha256=None,
+                evidence_ref=evidence_ref,
+                declared_at=aware_declared_at,
+            ),
             key=source_revision_key,
             revision_number=revision_number,
             declaration_kind="revision",
             evidence_ref=evidence_ref,
-            declared_at=_canonical_utc(declared_at or self._clock()),
+            declared_at=aware_declared_at,
         )
 
     def declare_provider_canonical(
@@ -1585,24 +1776,35 @@ class SourceRevisionRegistry:
     ) -> RevisionDeclarationRecord:
         """Explicit CANONICAL designation (§35): a persisted declaration
         binding source key + revision number + evidence + canonical=true."""
-        if not evidence_ref:
+        if not evidence_ref or not evidence_ref.strip():
             raise RevisionConfigurationError(
                 "canonical declaration requires a durable evidence_ref "
-                "(never inferred — I06 §35)"
+                "(never inferred — I06 §35 / I06R1 §30)"
             )
         if revision_number not in self._segment_numbers(source_revision_key):
             raise RevisionNotFound(
                 f"canonical declaration targets revision {revision_number} "
                 f"of {source_revision_key[:12]}... which does not exist"
             )
+        aware_declared_at = _canonical_utc(
+            declared_at if declared_at is not None else self._clock()
+        )
         return self._commit_declaration(
             declaration_id=declaration_id
-            or f"canon-{len(self._declarations_by_key.get(source_revision_key, [])) + 1}-{revision_number}",
+            or self._declaration_id(
+                key=source_revision_key,
+                declaration_kind="canonical",
+                revision_number=revision_number,
+                acquisition_id=None,
+                blob_sha256=None,
+                evidence_ref=evidence_ref,
+                declared_at=aware_declared_at,
+            ),
             key=source_revision_key,
             revision_number=revision_number,
             declaration_kind="canonical",
             evidence_ref=evidence_ref,
-            declared_at=_canonical_utc(declared_at or self._clock()),
+            declared_at=aware_declared_at,
         )
 
     def _commit_declaration(
@@ -1613,21 +1815,41 @@ class SourceRevisionRegistry:
         revision_number: int | None,
         declaration_kind: str,
         evidence_ref: str,
-        declared_at: str,
+        declared_at: datetime,
+        bound_acquisition_id: str | None = None,
+        blob_sha256: str | None = None,
     ) -> RevisionDeclarationRecord:
+        """Idempotent declaration publication (I06R1 §37): an exact repeat
+        adopts the committed record (registered_at is operational-only);
+        semantic divergence under the same id is a typed conflict."""
         record = RevisionDeclarationRecord(
             declaration_id=declaration_id,
             source_revision_key=key,
             revision_number=revision_number,
-            declaration_kind=declaration_kind,
+            declaration_kind=(
+                "revision"
+                if declaration_kind == "revision"
+                else "canonical"
+            ),
             evidence_ref=evidence_ref,
             declared_at=declared_at,
             registered_at=_canonical_utc(self._clock()),
+            bound_acquisition_id=bound_acquisition_id,
+            blob_sha256=blob_sha256,
         )
         try:
             self._declarations.commit(
                 declaration_id, record.model_dump(mode="json")
             )
+        except JsonCatalogConflict:
+            existing = self._declarations.get(declaration_id)
+            if existing is None or self._semantic_conflict(
+                existing, record, _DECLARATION_SEMANTIC_FIELDS
+            ):
+                raise RevisionDeclarationConflict(
+                    f"declaration {declaration_id[:16]}... already exists "
+                    "with different semantics (I06R1 §37)"
+                ) from None
         except JsonCatalogCorrupt as exc:
             raise SourceRevisionCatalogCorrupt(str(exc)) from exc
         self._declarations_by_key.setdefault(key, []).append(record)
@@ -1663,7 +1885,7 @@ class SourceRevisionRegistry:
                     blob_sha256=seg.blob_sha256,
                     first_seen_at=seg.first_seen_at,
                     last_seen_at=last_seen,
-                    revision_state=seg.revision_state,
+                    revision_state=RevisionState(seg.revision_state),
                     revision_reason=seg.revision_reason,
                 )
         return None
@@ -1839,6 +2061,7 @@ __all__ = [
     "RevisionBlobSource",
     "RevisionConfigurationError",
     "RevisionContentCorrupt",
+    "RevisionDeclarationConflict",
     "RevisionContentUnavailable",
     "RevisionDeclarationRecord",
     "RevisionError",

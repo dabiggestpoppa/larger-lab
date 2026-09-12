@@ -32,6 +32,7 @@ import pytest
 
 from crypto_sensor_fabric.storage.revisions import (
     MutationSeverity,
+    ProviderRevisionDeclaration,
     RevisionAmbiguityError,
     RevisionConfigurationError,
     RevisionNotFound,
@@ -189,10 +190,10 @@ class TestCanonicalDeclarations:
         )
         obs = registry.register_acquisition(
             b.acquisition_id,
-            provider_declaration={
-                "declaration_kind": "revision",
-                "evidence_ref": "evidence/provider-rev-note",
-            },
+            provider_declaration=ProviderRevisionDeclaration(
+                evidence_ref="evidence/provider-rev-note",
+                declared_at=T1,
+            ),
         )
         assert obs.observation_state == "PROVIDER_DECLARED_REVISION"
         with pytest.raises(RevisionResolutionUnavailable):

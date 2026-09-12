@@ -47,6 +47,7 @@ from crypto_sensor_fabric.storage.revisions import (
     RevisionLockHeld,
     RevisionState,
     RevisionTemporalAmbiguity,
+    ProviderRevisionDeclaration,
     SourceRevisionRegistry,
 )
 
@@ -384,11 +385,10 @@ class TestRevisionClassification:
         stack.registry.register_acquisition(a.acquisition_id)
         o2 = stack.registry.register_acquisition(
             b.acquisition_id,
-            provider_declaration={
-                "declaration_kind": "revision",
-                "evidence_ref": "evidence/provider-note-42",
-                "declared_at": (T1 + timedelta(minutes=5)).isoformat(),
-            },
+            provider_declaration=ProviderRevisionDeclaration(
+                evidence_ref="evidence/provider-note-42",
+                declared_at=T1 + timedelta(minutes=5),
+            ),
         )
         assert o2.observation_state == (
             ObservationState.PROVIDER_DECLARED_REVISION.value
@@ -412,7 +412,7 @@ class TestRevisionClassification:
                 b.acquisition_id,
                 provider_declaration={"declaration_kind": "revision"},
             )
-        assert "evidence_ref" in str(excinfo.value)
+        assert "ProviderRevisionDeclaration" in str(excinfo.value)
         # Fail-closed: no segment was published for the declaration attempt.
         revs_after = stack.reopen().list_revisions(
             stack.registry.revision_for_acquisition(a.acquisition_id)[0]
