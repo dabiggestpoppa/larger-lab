@@ -55,7 +55,7 @@ services:
     security_opt: ["no-new-privileges:true"]
 
   artifact-store:
-    image: minio/minio:RELEASE.2024-05-28T17-19-04Z
+    image: quay.io/minio/minio:RELEASE.2024-05-28T17-19-04Z
     container_name: oce-local-artifact
     restart: unless-stopped
     command: ["server", "/data", "--console-address", ":9001"]
