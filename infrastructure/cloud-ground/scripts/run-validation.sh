@@ -351,7 +351,7 @@ echo ""
 # ═══════════════════════════════════════════════════════════════════
 echo "[STEP f] Run INITIAL validation phase..."
 python3 "$ENGINE_WIN" --all --authoritative --phase initial \
-    --target-commit "$COMMIT" --target-tree "$TREE" --target-branch "$OBSERVED_BRANCH" \
+    --target-commit "$COMMIT" --target-tree "$TREE" --target-branch "$IDENTITY_BRANCH" \
     --evidence-dir "$FINAL_EVIDENCE_WIN"
 ENGINE_RC=$?
 if [[ "$ENGINE_RC" -ne 0 ]]; then
@@ -456,7 +456,7 @@ echo ""
 # ═══════════════════════════════════════════════════════════════════
 echo "[STEP l] Run FINAL validation phase..."
 python3 "$ENGINE_WIN" --all --authoritative --phase final \
-    --target-commit "$COMMIT" --target-tree "$TREE" --target-branch "$OBSERVED_BRANCH" \
+    --target-commit "$COMMIT" --target-tree "$TREE" --target-branch "$IDENTITY_BRANCH" \
     --evidence-dir "$FINAL_EVIDENCE_WIN"
 ENGINE_RC=$?
 if [[ "$ENGINE_RC" -ne 0 ]]; then
