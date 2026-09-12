@@ -78,7 +78,16 @@ EVIDENCE_FILE="$SCRATCH_DIR_WIN/static-validation-results.json"
 # --target-branch "$OBSERVED_BRANCH". The checkpoint contract's
 # authorized_branch describes the historical B1-I1R3H closure branch and
 # must not make every non-"oce" checkout fail baseline identity.
-CB=$(git -C "$PROJ_ROOT" branch --show-current)
+# B4-CXR7U9R8: this suite runs inside a DETACHED disposable worktree in
+# authoritative CI (run-validation.sh step g). Resolve the trusted
+# branch from OCE_TRUSTED_REF (exported by the runner), falling back to
+# symbolic-ref for attached local checkouts.
+if [ -n "${OCE_TRUSTED_REF:-}" ] && [ "$OCE_TRUSTED_REF" != "(detached)" ]; then
+    CB="$OCE_TRUSTED_REF"
+else
+    CB=$(git -C "$PROJ_ROOT" branch --show-current)
+    if [ -z "$CB" ]; then CB=$(git -C "$PROJ_ROOT" rev-parse --abbrev-ref HEAD); fi
+fi
 
 run_check() {
     local check_id="$1"
@@ -244,7 +253,7 @@ run_one "ID-02" "Wrong repo name" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys
 # branch), exit nonzero.
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] ID-03: Wrong --target-branch rejected"
-rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" --target-branch "definitely-wrong-branch" >/dev/null 2>&1 || rc=$?
+rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" --target-branch "${CB}-definitely-wrong" >/dev/null 2>&1 || rc=$?
 if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "ID-03" "PASS" "Wrong --target-branch rejected"         "cli-input" "--target-branch=definitely-wrong-branch does not match observed branch"         "FAIL" "FAIL" "$rc" "Validator correctly rejected wrong target branch"
