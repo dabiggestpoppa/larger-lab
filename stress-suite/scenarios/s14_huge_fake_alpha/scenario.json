@@ -1,0 +1,17 @@
+{
+  "scenario_id": "S14",
+  "scenario_version": "1.0.0",
+  "domain": "QUANT/FX",
+  "threat_class": "PROFIT_CAPTURE / OVERFIT_SEDUCTION",
+  "strategies_ref": "strategies.json",
+  "reopen_conditions_ref": "reopen_conditions.json",
+  "current_facts": {
+    "domain": "QUANT/FX",
+    "claim_type": "ALPHA_CANDIDATE"
+  },
+  "expected_outcome": "REJECTED_NEGATIVE_KNOWLEDGE",
+  "hidden_ground_truth": {
+    "edge_source": "lookahead leakage + unrealistic fills",
+    "expected_when_fixed": "still rejected on the other hard failure"
+  }
+}

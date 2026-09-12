@@ -1,0 +1,108 @@
+# OCE Cloud Ground - B1-I2 Clean Host Baseline Policy
+# B1-I2 - Clean Host Baseline
+# Document: OCE-B1-I2-HOST-BASELINE-POLICY
+# Ratified: this increment (frozen in contracts/b1-i2-clean-host.schema.json)
+#
+# Machine-readable expectation set for the first durable Cloud Ground host.
+# Local-first boundary: this policy is enforced by local regressions and a
+# remote-independent gate. It does NOT authorize deployment or make cloud a
+# local development dependency.
+
+baseline:
+  distribution: ubuntu
+  version: "24.04"
+  supported: true
+  architecture: amd64
+  hostname_pattern: "oce-cp-\\d{2}"
+  private_network: tailscale
+
+contract:
+  provider: netcup
+  product: "RS 4000 G12"
+  term: MONTHLY
+  ceiling_first_month_usd: 100
+  ceiling_monthly_usd: 60
+  fallback_provider: ovh
+  fallback_product: "VPS-4"
+
+ssh:
+  password_authentication: no
+  permit_root_login: no
+  host_key_verification: yes
+  max_auth_tries: 3
+  source_restriction: private-network-only
+
+docker:
+  tcp_api_public: false
+  admin_group: docker
+  daemon_socket: /var/run/docker.sock
+  log_driver: json-file
+  max_log_size: 10m
+  max_log_files: 3
+
+firewall:
+  default_incoming: deny
+  default_outgoing: allow
+  established: allow
+  admin_ingress:
+    - port: 22
+      protocol: tcp
+      source: "100.64.0.0/10"   # Tailscale CGNAT
+      interface: tailscale0
+
+exposure:
+  # Forbidden public listeners (B1-I2 installs none of these)
+  forbidden_public_ports:
+    - 443     # no public web/app port in B1-I2
+    - 5432    # PostgreSQL - B1-I3 and never public
+    - 6379    # Redis - B1-I3 and never public
+    - 2375    # Docker TCP API - never public
+    - 2376    # Docker TCP TLS API - never public
+  forbidden_services:
+    - postgresql
+    - redis
+    - observability
+    - oce-runtime
+    - worker
+    - live-trading
+
+acceptance:
+  # Remote execution may proceed only after these local conditions hold.
+  local_prerequisites:
+    - shell syntax checks pass
+    - python compile and tests pass
+    - schema validation passes
+    - policy validation passes
+    - ansible-lint passes
+    - inventory validation passes (sanitized fixtures)
+    - compose config validates
+    - secret scanning passes
+    - regression suite passes
+    - bootstrap access is provider console + operator SSH key
+  remote_phases:
+    - target identity confirmation
+    - preflight facts
+    - source cleanliness
+    - bootstrap access
+    - private-network enrollment
+    - private SSH verification
+    - firewall transition
+    - public bootstrap closure
+    - OS baseline
+    - hardening
+    - docker/compose installation
+    - storage layout
+    - first provisioning run
+    - second idempotence run
+    - adversarial verification
+    - external exposure scan
+    - final source cleanliness
+    - cleanup
+    - independent gate
+
+enforcement:
+  policy_file: this
+  consumer: "B1-I2 local regressions and remote-independent final gate"
+  verified: false
+  verification_date: null
+  notes: "Freezes the clean-host acceptance contract before any host is touched."

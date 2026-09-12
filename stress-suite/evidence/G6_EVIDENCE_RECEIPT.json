@@ -1,0 +1,53 @@
+{
+  "receipt_id": "G6-ER-2026-01",
+  "generated_by": "manual archive commit STRESS-G6ERR (regenerable via scenarios/g6_run_scenarios.py + pytest)",
+  "gate": "G6_CONSTITUTIONAL_ATTACK_EXTERNAL_REVIEW",
+  "verdict": "PASS_G6_CONSTITUTIONAL_ATTACK_EXTERNAL_REVIEW",
+  "start_sha": "d064bc66e9eeca1e10e6586d47a4e9845c2381bf",
+  "tested_sha": "214f3460e7999a7c673d876d87c5b864731122f2",
+  "artifact_sha_semantics": "scenario run_receipt.json sha256 values are content digests of the generated receipt bytes; scenario-fixture digests (evidence/G6_*_AUDIT.md) cover the decision-grade fixture tree excluding generated receipts; artifact digests are recorded, not self-referential for the commit that contains them",
+  "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
+  "collected": 874,
+  "passed": 874,
+  "failed": 0,
+  "superseded_tests": "the 22 first-draft test_g6_governance.py tests were superseded by 45 rewritten regressions in the same file (STRESS-G6ER2); no test was silently deleted",
+  "scenario_ids": ["S20", "S21", "S22", "S23", "S24"],
+  "scenario_receipt_digests": {
+    "S20": "a11fc462ed3e91029113d357d9e37b4c588cc5bf62bd5eaae7b9ef2faf46fe4c",
+    "S21": "6150310feaeab39b26e35b774e383243eaa8033d1cefa844e5f4dcdf295ce652",
+    "S22": "0941fbf50df2b541848e3afb5ba79b19d615bf8993adf8883737aa7da87df9c1",
+    "S23": "561ec644aa3c03b407c6c269ee46a8493764f8d0e6884d636692f45101f0517a",
+    "S24": "5290642eb6de55e9b7ab488ecc17d2a0f22ade549914788234fe8a17145f289b"
+  },
+  "forbidden_transitions": {
+    "S20": ["MUTATION_APPLIED", "NESTED_MUTATION_APPLIED", "FUTURE_VERSION_ADOPTED", "FUTURE_VERSION_RATIFIED_SELF", "RETROACTIVE_CHANGE_APPLIED"],
+    "S21": ["GRANT_ISSUED", "AUTHORITY_GRANTED", "AUTHORITY_LEVEL_ESCALATED"],
+    "S22": ["GRADE_IMPROVED_BY_DESIRE", "GRADE_FROZEN_BY_DESIRE", "DIRECTIVE_AUTHORIZED_UNGROUNDED", "GOVERNOR_AUTHORIZED_WITHOUT_MANDATE"],
+    "S23": ["CAPITAL_ACTION_CONTINUED", "IRREVERSIBLE_ACTION_CONTINUED", "POST_HOC_GRANT_AUTHORIZED", "NEAR_MATCH_CONTINUED", "REVOKED_GRANT_USED"],
+    "S24": ["KEYWORD_ROUTED", "NEAREST_CATEGORY_FORCED", "ONTOLOGY_MUTATED"]
+  },
+  "expected_outcome_access": 0,
+  "hidden_ground_truth_access": 0,
+  "authority_mutations": "NONE",
+  "model_calls": 0,
+  "cloud_mutations": 0,
+  "production_mutations": 0,
+  "capital_mutations": 0,
+  "carried_items": {
+    "CON-02": "allocator provenance observable (AllocatorProvenanceLedger); no constitutional rule applied; A-009/A-010 unchanged",
+    "CON-03": "threshold transparency/gameability NOT solved by future-candidate machinery; carried into G7 CON-03 sensitivity",
+    "AMB-08": "operator-unavailable reversible scope: hold semantics exact-envelope only; no universal surface ontology invented",
+    "AMB-G5R-01": "no canonical PDF identity; preserved",
+    "AMB-G5R-02": "claim linkage is mechanism-mediated; preserved"
+  },
+  "new_contradictions": [],
+  "new_ambiguities": [
+    "who may ratify future evaluation contracts beyond 'an OPERATOR per canonical authority rules' is doctrine-space, not engine space; recorded in G6_EVALUATION_FREEZE_AUDIT.md"
+  ],
+  "external_verification": "NOT claimed — this receipt is self-generated; external review of this package is the recommended next step",
+  "recommended_next_gate": "G7_SENSITIVITY_METAMORPHIC",
+  "g6_commits": [
+    {"sha": "90f8b653", "title": "STRESS-G6ER2: harden G6 engine per external review ER01-ER07"},
+    {"sha": "214f3460", "title": "STRESS-G6ER1: materialize S20-S24 as canonical scenario contracts"}
+  ]
+}

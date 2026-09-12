@@ -1,0 +1,2 @@
+status,operation,root_key,key_or_value,process,pid,timestamp_utc,evidence
+NOT_OBSERVED,,,,,,,No guest runtime telemetry; sample was not executed

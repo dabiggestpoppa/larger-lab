@@ -1,0 +1,31 @@
+{
+  "checkpoint_id": "B1-I1R3H-GATE-CLOSURE",
+  "block": "B1",
+  "increment": "B1-I1R3H",
+  "repository": {
+    "owner": "dabiggestpoppa",
+    "name": "larger-lab",
+    "full_name": "dabiggestpoppa/larger-lab"
+  },
+  "accepted_origins": [
+    "https://github.com/dabiggestpoppa/larger-lab.git",
+    "git@github.com:dabiggestpoppa/larger-lab.git"
+  ],
+  "authorized_branch": "oce",
+  "authoritative_base_sha": "70c9a9f3142079ac8ad5307ad3f9537b895de820",
+  "expected_project_root": "infrastructure/cloud-ground",
+  "expected_implementation_commit_source": "",
+  "expected_tree_sha": "",
+  "ci_workflow_name": "b1-i1r3-validation.yml",
+  "evidence_schema_version": "3.6.0",
+  "constitutional_gates": {
+    "no_cloud_provisioning": true,
+    "no_purchases": true,
+    "no_deployments": true,
+    "no_port_exposure": true,
+    "no_real_credentials": true,
+    "no_live_trading": true,
+    "no_merge_to_main": true,
+    "no_block2_advance": true
+  }
+}

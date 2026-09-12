@@ -1,0 +1,132 @@
+==============================================
+  OCE B1-I1R3F Adversarial Test Suite
+  RUN_ID: e33a841c6eb2
+==============================================
+Engine: /tmp/oce-adversarial-parent-slIoZn/wt/infrastructure/cloud-ground/scripts/validate_engine.py
+Evidence: /home/runner/work/_temp/oce-evidence-e33a841c6eb2
+
+--- Block A: Source Identity Mutations ---
+  [1] ID-01: Wrong repo owner
+    PASS
+  [2] ID-02: Wrong repo name
+    PASS
+  [3] ID-03: Wrong branch
+    PASS
+  [4] ID-04: Wrong base SHA
+    PASS
+  [5] ID-05: Wrong project root
+    PASS
+  [6] ID-06: Wrong origins
+    PASS
+  [7] ID-07: Wrong expected commit
+    PASS
+  [8] ID-08: Wrong full_name
+    PASS
+  [9] ID-09: Wrong tree SHA
+    PASS
+
+--- Block B: Compose / Image Mutations ---
+  [10] CM-01: PostgreSQL tag-only
+    PASS
+  [11] CM-02: Redis tag-only
+    PASS
+  [12] CM-03: Remove healthcheck
+    PASS
+  [13] CM-04: Add :latest PostgreSQL
+    PASS
+  [14] CM-05: Remove security_opt
+    PASS
+
+--- Block C: Policy Mutations ---
+  [15] PL-01: Remove DENY rules
+    PASS
+  [16] PL-02: Remove worker-local->postgresql
+    PASS
+  [17] PL-03: Remove SSH denials
+    PASS
+  [18] PL-04: Remove Docker denials
+    PASS
+
+--- Block D: Schema + Config Mutations ---
+  [19] ST-01: Remove schema required
+    PASS
+  [20] CF-01: Disable host_key_checking
+    PASS
+  [21] CF-02: Add :latest Redis
+    PASS
+
+--- Block E: Evidence Mutation ---
+  [22] EV-01: Wrong repository rejected
+    PASS
+  [23] EV-02: Evidence wrong commit
+    PASS
+  [24] EV-03: Evidence wrong tree
+    PASS
+  [25] EV-04: Evidence inconsistent totals
+    PASS
+
+--- Block F: Meta-Tests (Gate Rejection) ---
+  [26] FAKE-01: BLOCKED mutation_result rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [27] FAKE-02: SKIPPED mutation_result rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [28] FAKE-03: ERROR mutation_result rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [29] FAKE-04: NOT_FOUND mutation_result rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [30] FAKE-05: PASS mutation_result rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [31] FAKE-06: mutation_exit=0 rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [32] FAKE-07: Empty mutation_result rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [33] FAKE-08: Empty test lists rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [34] FAKE-09: Wrong schema version rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [35] FAKE-10: suite_result=FAIL rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [36] FAKE-11: Missing RUN_ID rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [37] FAKE-12: Mixed RUN_ID rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [38] FAKE-13: N/A baseline_result rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [39] FAKE-14: Empty baseline hash rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [40] FAKE-15: Hash mismatch rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [41] FAKE-16: Meta without fixture_type rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+  [42] FAKE-17: Meta with rejection_exit=0 rejected
+    PASS (FAIL-CLOSED=FAIL, exit=1)
+
+--- Block G: CLI Input Rejection (Meta Tests) ---
+  [43] CLI-01: Missing authoritative inputs
+    PASS
+  [44] CLI-02: Wrong target commit
+    PASS
+  [45] CLI-03: Wrong branch
+    PASS
+  [46] CLI-04: Wrong repository
+    PASS
+  [47] CLI-05: FAIL paired with nonzero exit
+    PASS
+
+--- Block H: State Tests (Meta Tests) ---
+  [48] ST-02: Dirty worktree rejected
+    PASS
+  [49] ST-03: Wrong tree rejected
+    PASS
+
+
+==============================================
+  Adversarial Test Summary
+  RUN_ID: e33a841c6eb2
+==============================================
+  Total:   49
+  PASS:    49
+  FAIL:    0
+==============================================
+  Suite:   PASS
+Written 25 negative + 24 meta tests to /home/runner/work/_temp/oce-evidence-e33a841c6eb2/adversarial-results.json

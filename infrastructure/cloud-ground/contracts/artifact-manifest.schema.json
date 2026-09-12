@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oce.dev/schemas/artifact-manifest/v1.0.0",
+  "title": "OCE Artifact Manifest",
+  "description": "Schema for artifact identity, lineage, and storage metadata. Version 1.0.0 — B1-I1.",
+  "type": "object",
+  "required": [
+    "artifact_id",
+    "artifact_type",
+    "producer_id",
+    "task_id",
+    "attempt_id",
+    "created_at",
+    "content_hash",
+    "size_bytes",
+    "media_type",
+    "retention_class",
+    "lineage",
+    "schema_version"
+  ],
+  "properties": {
+    "artifact_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$"
+    },
+    "artifact_type": {
+      "type": "string",
+      "enum": ["code", "model", "data", "report", "log", "config", "manifest"]
+    },
+    "producer_id": {
+      "type": "string",
+      "description": "Identity of the worker or service that produced this artifact"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "attempt_id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Content hash for integrity verification"
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 107374182400
+    },
+    "media_type": {
+      "type": "string",
+      "description": "MIME type or schema version"
+    },
+    "retention_class": {
+      "type": "string",
+      "enum": ["critical", "operational", "artifact", "transient", "hazardous"]
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "default": "internal"
+    },
+    "storage_location": {
+      "type": "object",
+      "properties": {
+        "provider": { "type": "string" },
+        "bucket": { "type": "string" },
+        "key": { "type": "string" },
+        "region": { "type": "string" }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "required": ["parent_artifacts"],
+      "properties": {
+        "parent_artifacts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "strategy_id": { "type": "string" },
+        "experiment_id": { "type": "string" }
+      }
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    }
+  },
+  "additionalProperties": false
+}

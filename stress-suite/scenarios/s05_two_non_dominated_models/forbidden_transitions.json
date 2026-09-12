@@ -1,0 +1,7 @@
+{
+  "forbidden": [
+    {"from": "RECONSOLIDATION", "to": "NEW_STABLE", "rule": "a forced winner would erase the multiplicity; only PLURAL_MODEL_STATE is honest here"},
+    {"from": "TRANSFORMATION_WINDOW", "to": "CAPITAL", "rule": "window grants no capital authority"},
+    {"from": "STABLE", "to": "PLURAL_MODEL_STATE", "rule": "pluralism emerges from reconsolidation, not STABLE direct"}
+  ]
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "condition_id": "RC_S14_REOPEN",
+    "condition_type": "FIELD_PREDICATE",
+    "subject_ref": "CAND_FAKE_ALPHA",
+    "field": "reopen_element",
+    "operator": "EQ",
+    "expected_value": "READY",
+    "evidence_required": false,
+    "scope": "family:MOMENTUM_ORPHAN",
+    "scope_match_mode": "EXACT",
+    "subject_scope": "OBJECT_SPECIFIC",
+    "created_under_contract": "G5_DOMAIN_EPISTEMIC_POLICY:1.0.0",
+    "version_tag": "1.0.0"
+  }
+]

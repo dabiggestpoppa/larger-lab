@@ -1,0 +1,123 @@
+# OCE Cloud Ground — Foundation Services
+# B1-I1R — Foundation compose (validated by validate_engine.py)
+#
+# This file defines PostgreSQL (durable truth) and Redis (transient transport)
+# for the OCE control plane.
+#
+# Status: IMPLEMENTED_UNVERIFIED — syntactically valid, not deployed
+# Validation: Passes compose config, schema, and security checks
+#
+# NOTE: WAL archive to postgres_wal volume is LOCAL STAGING only.
+# Off-server backup requires pgBackRest or equivalent (B1-I4).
+#
+# Usage:
+#   docker compose -f compose.foundation.yml up -d
+#
+# Prerequisites:
+#   - Docker Engine 24+ and Compose v2
+#   - .env file with required values (see examples/oce.env.example)
+#   - Volumes directory structure created
+
+services:
+  postgresql:
+    image: postgres@sha256:5660c2cbfea50c7a9127d17dc4e48543eedd3d7a41a595a2dfa572471e37e64c
+    container_name: oce-postgresql
+    restart: unless-stopped
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-oce}
+      POSTGRES_USER: ${POSTGRES_USER:-oce_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=en_US.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - postgres_wal:/var/lib/postgresql/wal
+    networks:
+      - oce_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-oce_admin} -d ${POSTGRES_DB:-oce} -h localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 8G
+        reservations:
+          cpus: "1.0"
+          memory: 2G
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    stop_grace_period: 30s
+    # NO published ports — private network only
+    # NO privileged mode
+    # NO Docker socket mount
+    read_only: false
+    security_opt:
+      - no-new-privileges:true
+
+  redis:
+    image: redis@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+    container_name: oce-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --maxmemory 1gb
+      --maxmemory-policy allkeys-lru
+      --save 60 100
+      --save 300 10
+      --appendonly yes
+      --appendfsync everysec
+    volumes:
+      - redis_data:/data
+    networks:
+      - oce_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 2G
+        reservations:
+          cpus: "0.25"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    stop_grace_period: 10s
+    # NO published ports — private network only
+    # Redis is TRANSPORT ONLY — not authoritative truth
+    read_only: false
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  oce_internal:
+    driver: bridge
+    internal: true
+    name: oce_internal
+
+volumes:
+  postgres_data:
+    driver: local
+    name: oce_postgres_data
+  postgres_wal:
+    driver: local
+    name: oce_postgres_wal
+  redis_data:
+    driver: local
+    name: oce_redis_data

@@ -1,0 +1,11 @@
+# OCE Cloud Ground — Ansible Collection Dependencies
+# B1-I1R — Pinned collection requirements
+# Install: ansible-galaxy collection install -r requirements.yml
+
+collections:
+  - name: community.general
+    version: ">=8.0.0,<10.0.0"
+  - name: community.docker
+    version: ">=3.0.0,<5.0.0"
+  - name: ansible.posix
+    version: ">=1.0.0,<2.0.0"

@@ -1,0 +1,89 @@
+---
+# Common role — base host configuration
+# B1-I1 — Static skeleton
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  tags: [common, apt]
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - software-properties-common
+      - unzip
+      - git
+      - htop
+      - iotop
+      - net-tools
+      - jq
+      - tmux
+      - fail2ban
+    state: present
+  tags: [common, packages]
+
+- name: Set timezone to UTC
+  community.general.timezone:
+    name: UTC
+  notify: Restart chrony
+  tags: [common, time]
+
+- name: Ensure chrony is installed and running
+  ansible.builtin.apt:
+    name: chrony
+    state: present
+  notify: Restart chrony
+  tags: [common, time]
+
+- name: Ensure chrony service is enabled
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true
+  tags: [common, time]
+
+- name: Configure unattended security updates
+  ansible.builtin.apt:
+    name:
+      - unattended-upgrades
+      - apt-listchanges
+    state: present
+  tags: [common, security]
+
+- name: Enable unattended upgrades
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/20auto-upgrades
+    regexp: 'APT::Periodic::Update-Package-Lists'
+    line: 'APT::Periodic::Update-Package-Lists "1";'
+    mode: "0644"
+    create: true
+  tags: [common, security]
+
+- name: Create oce-operator group
+  ansible.builtin.group:
+    name: oce-operator
+    state: present
+  tags: [common, user]
+
+- name: Create oce-operator user
+  ansible.builtin.user:
+    name: oce-operator
+    group: oce-operator
+    shell: /bin/bash
+    home: /home/oce-operator
+    create_home: true
+    state: present
+  tags: [common, user]
+
+- name: Add oce-operator to docker group
+  ansible.builtin.user:
+    name: oce-operator
+    groups: docker
+    append: true
+  tags: [common, user]

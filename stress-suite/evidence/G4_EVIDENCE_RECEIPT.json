@@ -1,0 +1,55 @@
+{
+  "gate": "G4",
+  "status": "PASS_G4_MEMORY_AND_EPOCHS",
+  "starting_sha": "27ae2a5aee7e02bba62b352c6e9bf8d6eb2c07bf",
+  "artifacts_head_sha": "490e078d1e2e6f1c31e88944de9cf2dcd99a4609",
+  "receipt_content_parent_sha": "490e078d1e2e6f1c31e88944de9cf2dcd99a4609",
+  "externally_verified_branch_head": null,
+  "sha_semantics": "non-self-referential: artifacts_head_sha is the last code/artifact commit; externally_verified_branch_head is filled only after an external push verification and is NOT claimed by this receipt",
+  "commits": [
+    {"sha": "f67c2627", "subject": "STRESS-G4P0: replication identity/provenance, provenance conflict ledger, exact operator permanence, sealed epoch snapshots"},
+    {"sha": "2788b964", "subject": "STRESS-G4A: activation tiers, memory index, epistemic metabolism pipeline"},
+    {"sha": "2f5bb0f6", "subject": "STRESS-G4B: versioned machine-readable reopen conditions, evaluator, suppression decisions"},
+    {"sha": "d71174d9", "subject": "STRESS-G4C: one shared G4 memory/reactivation policy (S10-S13)"},
+    {"sha": "c3a958df", "subject": "STRESS-G4D: sealed epoch reconstruction bundle + PROVISIONAL reconstruction contract"},
+    {"sha": "df038fdb", "subject": "STRESS-S10-S13: dormant reactivation, negative-knowledge reopen, bounded-context scaling, runtime-replacement reconstruction"},
+    {"sha": "490e078d", "subject": "STRESS-G4X: adversarial cross-scenario and metamorphic regression suite (66 tests)"}
+  ],
+  "tests": {"pass": 524, "total": 524, "prior_preserved": 458, "new_g4": 66},
+  "g4_p0": "PASS",
+  "scenarios": {
+    "S10": {"outcome": "REOPEN_CANDIDATE", "behavior_fingerprint": "ea9ff74be77abe855112e7d63e0dd875", "pass": true},
+    "S11": {"outcome": "STOP_SUPPRESSION", "behavior_fingerprint": "4f78dba120179d7144986015893cc8f0", "pass": true},
+    "S12": {"outcome": "BOUNDED_CONTEXT", "behavior_fingerprint": "cdde25d0dc484df1dec4fa653bfe256e", "pass": true, "total_history": 55012, "active_context_objects": 12, "required_object_recall": 1.0, "stale_object_intrusion_count": 0},
+    "S13": {"outcome": "RECONSTRUCTED", "behavior_fingerprint": "a69a8c800bcd96212bf51280515e6906", "pass": true, "chain": "acyclic sealed predecessors resolved", "runtime_rename_semantic_stable": true}
+  },
+  "shared_policy": {
+    "policy_id": "G4_MEMORY_AND_REACTIVATION_POLICY",
+    "version_tag": "V1",
+    "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+    "scenario_id_predicates": "none (static guards verified)",
+    "single_policy_all_scenarios": true
+  },
+  "checks": {
+    "replication_path_identity": "PASS",
+    "secondary_provenance_conflicts_reconstructable": "PASS",
+    "negative_knowledge_permanence_exact_operator": "PASS",
+    "sealed_epochs_deeply_immutable": "PASS",
+    "m4_lifecycle_separate_from_memory_tier": "PASS",
+    "machine_readable_reopen_conditions_versioned": "PASS",
+    "s10_no_automatic_promotion": "PASS",
+    "s11_reopen_without_deletion": "PASS",
+    "s12_bounded_active_context": "PASS",
+    "s13_total_runtime_replacement_reconstruction": "PASS",
+    "missing_reconstruction_surfaces_fail_closed": "PASS",
+    "historical_canonical_distinct_from_current": "PASS",
+    "provenance_survives_compaction_retrieval": "PASS",
+    "expected_hidden_sealed": "PASS",
+    "amb12_provisional": "EMPIRICALLY_TESTED_PROVISIONAL_CONTRACT (subject to ratification)"
+  },
+  "mutations": {"cloud": 0, "production": 0, "capital": 0, "authority_changes": "NONE", "model_calls": 0, "cost_usd": 0},
+  "carried": ["CON-02", "CON-03", "AMB-03", "AMB-08", "AMB-11", "AMB-13", "AMB-12 (provisional)"],
+  "new_contradictions": [],
+  "new_ambiguities": ["operator-permanence revocation semantics remain unspecified (preserved explicitly, not resolved)"],
+  "recommended_next_action": "AUTHORIZE_G5"
+}

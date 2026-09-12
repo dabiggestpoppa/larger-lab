@@ -1,0 +1,2 @@
+status,image_name,pid,parent_pid,command_line,executable_path,integrity_level,signer_publisher,start_time_utc,exit_time_utc,evidence
+NOT_OBSERVED,,,,,,,,,,No disposable Windows VM or runtime launch was available

@@ -1,0 +1,16 @@
+[
+  {
+    "record_id": "M_OLD",
+    "claim": "old regime alpha mechanism",
+    "m4_state": "DORMANT",
+    "memory_tier": "DORMANT_STORE",
+    "tags": ["regime_alpha", "mechanism"],
+    "dependency_refs": ["DEP_CENTRAL"],
+    "epoch": "E10a",
+    "demotion_reason": "regime condition stopped holding; evidence contradicting regime alpha",
+    "evidence_refs": ["EV_OLD_VALID", "EV_DEMOTION"],
+    "provenance_pointer": "hist://M_OLD",
+    "reconstruction_pointer": "recon://M_OLD",
+    "source_label": "S10_FIXTURE"
+  }
+]

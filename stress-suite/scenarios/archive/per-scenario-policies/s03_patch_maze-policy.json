@@ -1,0 +1,27 @@
+{
+  "policy_id": "S03-POLICY",
+  "version_tag": "V1",
+  "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+  "authority_basis": "G2 §11: raw patch count alone is insufficient; only SAME causal signature aggregates; scope escalates L1->L2->L3, never L6",
+  "rules": [
+    {"rule_id": "S03.enter.watch", "to_state": "WATCH",
+     "any_of": [{"channel": "exception_burden"}],
+     "rationale": "patch-driven tension opens WATCH"},
+    {"rule_id": "S03.escalate.review", "to_state": "ESCALATION_REVIEW",
+     "all_of": [{"exception_burden": "MEDIUM"}],
+     "persistence": {"channel": "exception_burden", "grade": "MEDIUM", "minimum_observations": 2},
+     "rationale": "sustained failure load escalates for review"},
+    {"rule_id": "S03.structural.break", "to_state": "TRANSFORMATION_CANDIDATE",
+     "patch": {"structural_level": "L3", "max_structural_level": "L6", "causal_signature": "SIG_C", "min_recurrence": 3},
+     "all_of": [{"exception_burden": "HIGH"}],
+     "rationale": "same-signature pressure at L3+ with recurrence >= 3 is structural; unrelated signatures never aggregate"},
+    {"rule_id": "S03.repair.local", "to_state": "HOMEOSTATIC_REPAIR",
+     "patch": {"structural_level": "L1", "max_structural_level": "L2", "causal_signature": "SIG_C"},
+     "all_of": [{"exception_burden": "HIGH"}],
+     "mutation_class": "HOMEOSTATIC_REPAIR",
+     "rationale": "local repairs at L1..L2 are reasonable while the shared cause is hidden"},
+    {"rule_id": "S03.repair.verified", "to_state": "STABLE",
+     "all_of": [{"exception_burden": "LOW", "op": "eq"}],
+     "rationale": "repair verified: institution returns to STABLE"}
+  ]
+}

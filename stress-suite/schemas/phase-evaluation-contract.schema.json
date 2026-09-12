@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/phase-evaluation-contract.json",
+  "title": "OCE Stress Suite PhaseEvaluationContract (G1 §8, CON-03/AMB-05)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_id","schema_version","version_tag","channel_rules","freeze_status"],
+  "properties": {
+    "contract_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string"},
+    "version_tag": {"type": "string"},
+    "channel_rules": {"type": "object"},
+    "hysteresis_rules": {"type": "object"},
+    "admissible_phase_transitions": {"type": "array", "items": {"type": "array"}},
+    "created_at_seq": {"type": "integer", "minimum": 0},
+    "authority_basis": {"type": "string"},
+    "freeze_status": {"enum": ["UNFROZEN","FROZEN"]},
+    "supersedes": {"type": ["string","null"]}
+  }
+}

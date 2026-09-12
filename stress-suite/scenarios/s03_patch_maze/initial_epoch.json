@@ -1,0 +1,9 @@
+{
+  "epoch_id": "E-S03-0",
+  "predecessor": "E-PRIOR-RATIFIED",
+  "governing_architecture_versions": {"constitution": "1.1", "a009": "v1.0", "a010": "v1.0"},
+  "evaluation_contract": "S03-EVAL-V1",
+  "authority_state": {"PO": "PO", "GOVERNOR": "GOVERNOR"},
+  "active_knowledge": [],
+  "dependency_summary": {"hidden_ground_truth": "many failures share one task-contract assumption (SIG_C)"}
+}

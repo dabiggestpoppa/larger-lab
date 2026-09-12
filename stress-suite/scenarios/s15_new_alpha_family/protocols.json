@@ -1,0 +1,14 @@
+[
+  {
+    "protocol_id": "PROTO_ORPHAN_1",
+    "mechanism_ref": "MECH_ORPHAN_1",
+    "dataset_ref": "DS_S15_FIXTURE",
+    "time_range": "2019-01-01..2023-12-31",
+    "features": ["news_surprise_z", "overhang_size", "post_news_volume"],
+    "metrics": ["sign_asymmetry_ratio", "oos_sharpe", "decay_half_life"],
+    "falsification_criteria": ["sign_asymmetry_ratio < 1.1", "oos_sharpe <= 0"],
+    "holdout_ref": "HOLDOUT_S15",
+    "cost_execution_assumptions": ["5m fill horizon", "2bp round-trip"],
+    "promotion_criteria": ["falsification criteria pass", "independent confirmation of at least 2 lineages"]
+  }
+]

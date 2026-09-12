@@ -1,0 +1,8 @@
+{
+  "profile": "local",
+  "default": true,
+  "mutates_external": false,
+  "requires_authorization": false,
+  "contact_provider": false,
+  "cost": "ZERO"
+}

@@ -1,0 +1,26 @@
+{
+  "scenario_id": "S07",
+  "scenario_version": "1.0.0",
+  "threat_class": "RUNTIME_QUALITY_FIXATION",
+  "claim_id": "C_S07",
+  "claim": "strategy surface should adopt the beta regime model",
+  "consequence_class": "HIGH",
+  "policy_ref": "scenarios/policies/G3_COGNITIVE_ECOLOGY_POLICY.json",
+  "reviewers_ref": "reviewers.json",
+  "topology_options_ref": "topology_options.json",
+  "provenance_mode": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+  "independent_replication_count": 0,
+  "allocation_provenance": {
+    "claim_id": "C_S07",
+    "reviewer_selector": "PO",
+    "source_bundle_selector": "PO",
+    "fresh_context_decider": "GOVERNOR",
+    "experiment_design_selector": "PO"
+  },
+  "expected_disposition": "REQUIRES_INDEPENDENT_REVIEW",
+  "hidden_ground_truth": {
+    "true_model": "BETA",
+    "differentiation_required_for_high_consequence": true,
+    "cheapest_capable_path_acceptable_for_low_consequence": true
+  }
+}

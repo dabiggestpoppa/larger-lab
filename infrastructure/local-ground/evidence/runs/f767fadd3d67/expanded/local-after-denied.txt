@@ -1,0 +1,12 @@
+=== OCE Local Ground ledger ===
+{
+  "local_ground_state": "BUILDING",
+  "cloud_plan_state": "VALIDATED_NO_APPLY",
+  "cloud_activation_state": "DEFERRED_BY_OPERATOR",
+  "cloud_deployment_state": "NOT_DEPLOYED",
+  "cloud_cost_state": "ZERO",
+  "next_local_book": "B2",
+  "operator_hold_reason": "CLOUD_PURCHASE_DEFERRED",
+  "clean": "1"
+}
+runtime_target=local

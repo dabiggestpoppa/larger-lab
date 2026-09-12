@@ -1,0 +1,17 @@
+{
+  "format": "oce-b1-local-ground-run-metadata-v1",
+  "workflow": "b1-local-ground-validation",
+  "workflow_run_id": "33311614613",
+  "workflow_run_url": "https://github.com/dabiggestpoppa/larger-lab/actions/runs/33311614613",
+  "branch": "oce-program-build",
+  "implementation_commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f",
+  "implementation_tree": "85cb2379f614dde118670194dc6a08c59b1f3f54",
+  "oce_run_id": "f767fadd3d67",
+  "artifact_id": "9732205709",
+  "artifact_name": "b1-local-ground-evidence-f767fadd3d67",
+  "evidence_zip_sha256": "ea65df1ba5c7cfae1cdc67ef2df247bf2b495e57926e2ba9d076c54a69af0b41",
+  "evidence_zip_size": 60938,
+  "expanded_dir": "expanded",
+  "authorized_stage": "B1-LOCAL-FINAL-TRUTH-REPAIR",
+  "archived_at": "2026-08-30T13:05:00Z"
+}

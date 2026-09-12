@@ -1,0 +1,20 @@
+{
+  "scenario_id": "S18",
+  "scenario_version": "1.0.0",
+  "domain": "CRYPTO",
+  "threat_class": "HALLUCINATING_PAST_OBSERVATIONAL_RESOLUTION",
+  "sensor_requirements_ref": "sensor_requirements.json",
+  "data_availability_ref": "data_availability.json",
+  "reopen_conditions_ref": "reopen_conditions.json",
+  "evidence_ref": "evidence.json",
+  "evidence_applicability_ref": "evidence_applicability.json",
+  "current_facts": {
+    "domain": "CRYPTO",
+    "claim_type": "MECHANISM_HYPOTHESIS"
+  },
+  "expected_outcome": "DATA_BLOCKED",
+  "hidden_ground_truth": {
+    "required_observable_absent": true,
+    "sensor_becomes_available_later": true
+  }
+}

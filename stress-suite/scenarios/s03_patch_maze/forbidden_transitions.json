@@ -1,0 +1,8 @@
+{
+  "forbidden": [
+    {"from": "TRANSFORMATION_CANDIDATE", "to": "TRANSFORMATION_WINDOW", "rule": "no window without candidate review completing"},
+    {"from": "HOMEOSTATIC_REPAIR", "to": "RECONSOLIDATION", "rule": "local repair never reconsolidates"},
+    {"from": "TRANSFORMATION_WINDOW", "to": "CAPITAL", "rule": "window grants no capital authority"},
+    {"from": "STABLE", "to": "NEW_STABLE", "rule": "no review, no new stable epoch"}
+  ]
+}
