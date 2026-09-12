@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import sqlite3
 
 import pytest
 
@@ -33,7 +32,7 @@ def _artifact(evidence_id="ev-1", subject_id="atom-x", **over) -> EvidenceArtifa
 
 
 @pytest.fixture()
-def conn():
+def conn():  # returns sqlite3.Connection from open_metadata_db
     c = open_metadata_db(":memory:")
     yield c
     c.close()
