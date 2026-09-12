@@ -60,7 +60,9 @@ class TestCanonicalStructure:
         assert WAIVABLE_GATES == {S.DOMAIN_VERIFIED}
 
     def test_terminal_states(self) -> None:
-        assert TERMINAL_STATES == {S.REJECTED, S.SUPERSEDED, S.RETIRED}
+        # DEFERRED is terminal per ADR-0004 (P0-A001-05): renewed investigation
+        # creates a superseding object; no direct resume transition exists.
+        assert TERMINAL_STATES == {S.REJECTED, S.DEFERRED, S.SUPERSEDED, S.RETIRED}
 
     def test_no_outgoing_edges_from_terminal_states(self) -> None:
         for terminal in TERMINAL_STATES:

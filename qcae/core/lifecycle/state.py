@@ -87,8 +87,16 @@ WAIVER_EDGES: Mapping[Tuple[LifecycleState, LifecycleState], LifecycleState] = {
 }
 
 #: Terminal states: no outgoing transitions (canon 0.2.8, 0.5.18, 0.5.19).
+#: DEFERRED is terminal for that decision/version per ADR-0004: renewed
+#: investigation creates a new/superseding object (canon 0.5.15 scope + Book IV
+#: 11.6 anti-reopening doctrine).
 TERMINAL_STATES: FrozenSet[LifecycleState] = frozenset(
-    {LifecycleState.REJECTED, LifecycleState.SUPERSEDED, LifecycleState.RETIRED}
+    {
+        LifecycleState.REJECTED,
+        LifecycleState.DEFERRED,
+        LifecycleState.SUPERSEDED,
+        LifecycleState.RETIRED,
+    }
 )
 
 
