@@ -94,7 +94,7 @@ class ReceiptRepository(ABC):
 
 
 class RegistryQuery(ABC):
-    """Retrieval-order support (Book IV 9.7, P1 spec §18).
+    """Retrieval-order support (Book IV 9.7, P1 spec §18; P1-R1 §11).
 
     Answers "do we already know enough to avoid external discovery?" with
     structured findings — never an LLM yes/no.
@@ -113,4 +113,20 @@ class RegistryQuery(ABC):
         - ``stale_evidence``: evidence needing refresh before reuse;
         - ``sufficient_without_discovery``: bool — active receipt AND
           matching positive knowledge AND no blocking negatives.
+        """
+
+    @abstractmethod
+    def known_capability_state(self, capability_id: str) -> dict:
+        """Structured inventory of what QCAE already holds for a capability
+        (P1-R1 §11), so a future P3 discovery planner can consult internal
+        state before external search. Returns references to existing durable
+        records — no discovery logic lives here.
+
+        Returns a dict with keys (all optional-empty when unknown):
+
+        - ``contract_versions``: stored contract version numbers;
+        - ``latest_contract_version``: highest stored version or None;
+        - ``atom_ids``: atoms whose parent_capabilities include the ID;
+        - ``composite_member_count``: members in the latest composite, or None;
+        - ``candidate_refs``: candidate_ids claiming the capability's atoms.
         """

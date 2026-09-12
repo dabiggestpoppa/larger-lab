@@ -239,11 +239,13 @@ class SqliteRegistryQuery(RegistryQuery):
         positive: SqlitePositiveKnowledgeRepository,
         negative: SqliteNegativeKnowledgeRepository,
         evidence_freshness,  # LifecycleLogRepository
+        capability_registry=None,  # CapabilityRegistryPort (P1-R1 §11)
     ) -> None:
         self._receipts = receipts
         self._positive = positive
         self._negative = negative
         self._freshness = evidence_freshness
+        self._capabilities = capability_registry
 
     def decision_reuse_findings(self, capability_id: str, contract_id: str, contract_version: str) -> dict:
         active = self._receipts.active_for_capability(capability_id)
@@ -268,6 +270,40 @@ class SqliteRegistryQuery(RegistryQuery):
             "stale_evidence": stale,
             "sufficient_without_discovery": bool(matched_receipts) and bool(pos) and not blocks,
         }
+
+    def known_capability_state(self, capability_id: str) -> dict:
+        """P1-R1 §11: structured inventory for the future discovery planner.
+
+        Pure retrieval over durable registries; never mutates, never searches
+        externally, never invents capability semantics.
+        """
+        state: dict = {
+            "contract_versions": [],
+            "latest_contract_version": None,
+            "atom_ids": [],
+            "composite_member_count": None,
+            "candidate_refs": [],
+        }
+        if self._capabilities is None:
+            return state
+        contracts = self._capabilities.list_contract_versions(capability_id)
+        state["contract_versions"] = [c.contract_version for c in contracts]
+        state["latest_contract_version"] = (
+            max(state["contract_versions"]) if state["contract_versions"] else None
+        )
+        atoms = self._capabilities.list_atoms_for_capability(capability_id)
+        state["atom_ids"] = sorted({a.atom_id for a in atoms})
+        if state["latest_contract_version"] is not None:
+            composite = self._capabilities.get_composite(
+                capability_id, state["latest_contract_version"])
+            if composite is not None:
+                state["composite_member_count"] = len(composite.members)
+        candidate_ids = set()
+        for atom_id in state["atom_ids"]:
+            for cand in self._capabilities.list_candidates_for_atom(atom_id):
+                candidate_ids.add(cand.candidate_id)
+        state["candidate_refs"] = sorted(candidate_ids)
+        return state
 
     def _stale_evidence_ids(self) -> List[str]:
         rows = self._conn_freshness_rows()
