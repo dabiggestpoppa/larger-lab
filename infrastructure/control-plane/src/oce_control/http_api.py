@@ -1,0 +1,523 @@
+"""Runnable local HTTP service for the OCE control plane (B2-R6, gap 7).
+
+Wraps the ControlPlaneAPI boundary in a real FastAPI service that binds
+to loopback only. Every endpoint except health/readiness requires the
+service-boundary authorization headers X-OCE-Grant / X-OCE-Actor; the
+authority grant is verified by the façade before any read or mutation
+(gap 9). A minimal operator console is served at /console (gap 8).
+
+Start the complete local runtime (PG + Redis + API + console +
+scheduler + worker) with scripts/start-local.sh, or run the durable
+app directly:
+
+    python -m oce_control.http_api          # builds durable wiring from env
+
+For tests: create_app(api, scheduler=..., scheduler_tick_interval=0)
+returns a plain FastAPI app (no background loop unless requested).
+"""
+from __future__ import annotations
+import asyncio
+import os
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Optional
+
+try:
+    from fastapi import Depends, FastAPI, Header, HTTPException
+    from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+except ImportError:  # pragma: no cover — only needed where the service runs
+    FastAPI = None  # type: ignore
+
+from .api import ControlPlaneAPI, APIResponse
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from .config_startup import ParentActivationContext, VerifiedChildContext
+
+
+def _with_declared_role(ctx, role: str):
+    """B4-CXR7U2: pin the verified child's declared role/audience.
+
+    The VerifiedChildContext already carries declared_role from the
+    authenticated handoff (enforced equal to the declared process role at
+    verification time); this helper is a defensive re-assertion for durable
+    consumers and fails closed on divergence.
+    """
+    declared = getattr(ctx, "declared_role", None)
+    if declared is not None and declared != role:
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: verified child role/audience "
+            f"'{declared}' does not match the consumer role '{role}' "
+            "(B4-CXR7U2)")
+    return ctx
+
+
+CONSOLE_PATH = Path(__file__).resolve().parents[2] / "ui" / "console.html"
+# Repository-owned static console content, read once at import time (the
+# file ships inside the governed source tree — no runtime upload or
+# user-controlled write path exists for it).
+with open(CONSOLE_PATH, "r", encoding="utf-8") as _console_fh:
+    CONSOLE_HTML = _console_fh.read()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def _default_dsn() -> str:
+    """Fail-closed DSN: never a predictable default (B2-R7)."""
+    from . import local_secrets
+    return local_secrets.require_runtime_dsn()
+
+# Operator grants issued at durable startup (deterministic ids, printed at boot).
+OPERATOR_ACTIONS = [
+    "submit_job", "cancel_job", "retry_job", "read",
+]
+
+
+def _console_html() -> str:
+    try:
+        return CONSOLE_HTML
+    except NameError:  # pragma: no cover - repository layout guarantee
+        return "<html><body><h1>OCE console unavailable</h1></body></html>"
+
+
+def _status_code(resp: APIResponse) -> int:
+    if resp.status == "denied":
+        return 403
+    if resp.status == "not_found":
+        return 404
+    if resp.status == "error":
+        return 400
+    if resp.status == "not_ready":
+        return 503
+    return 200
+
+
+def create_app(api: ControlPlaneAPI, scheduler=None,
+               scheduler_tick_interval: int = 0,
+               worker_protocol_server=None) -> FastAPI:
+    """Build the FastAPI app over a ControlPlaneAPI boundary.
+
+    scheduler_tick_interval > 0 starts a background tick loop (durable
+    runtime). worker_protocol_server optionally exposes the Book 3
+    authenticated outbound worker fabric endpoints (loopback only); when
+    None (default) those endpoints are absent, matching the Book 2 service.
+    Tests pass 0 for deterministic, single-threaded behavior.
+    """
+    if FastAPI is None:
+        raise RuntimeError("fastapi is not installed — required to run the HTTP service")
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        task = None
+        if scheduler is not None and scheduler_tick_interval > 0:
+            async def _tick_loop():
+                while True:
+                    await asyncio.sleep(scheduler_tick_interval)
+                    try:
+                        await asyncio.to_thread(scheduler.tick)
+                    except Exception:
+                        pass  # transient failures must not kill the loop
+            task = asyncio.create_task(_tick_loop())
+        yield
+        if task is not None:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+
+    app = FastAPI(title="OCE Control Plane", version="2.0.0",
+                  lifespan=lifespan)
+
+    def _auth(grant: str = Header(default="", alias="X-OCE-Grant"),
+              actor: str = Header(default="", alias="X-OCE-Actor")):
+        if not grant or not actor:
+            raise HTTPException(status_code=401, detail="missing X-OCE-Grant/X-OCE-Actor headers")
+        return grant, actor
+
+    def _emit(resp: APIResponse):
+        return JSONResponse(status_code=_status_code(resp), content=resp.to_dict())
+
+    @app.get("/api/health")
+    def health():
+        return _emit(api.health())
+
+    @app.get("/api/readiness")
+    def readiness():
+        return _emit(api.readiness())
+
+    @app.post("/api/jobs")
+    def submit_job(body: dict, auth=Depends(_auth)):
+        grant, actor = auth
+        resp = api.submit_job(
+            grant_id=grant, actor_id=actor,
+            job_type=body.get("job_type", ""),
+            payload=body.get("payload", {}),
+            **{k: v for k, v in body.items() if k in ("resource_scope", "environment", "priority")},
+        )
+        return _emit(resp)
+
+    @app.get("/api/jobs/{job_id}")
+    def inspect_job(job_id: str, auth=Depends(_auth)):
+        grant, actor = auth
+        return _emit(api.inspect_job(grant_id=grant, actor_id=actor, job_id=job_id))
+
+    @app.post("/api/jobs/{job_id}/cancel")
+    def cancel_job(job_id: str, auth=Depends(_auth)):
+        grant, actor = auth
+        return _emit(api.cancel_job(grant_id=grant, actor_id=actor, job_id=job_id))
+
+    @app.post("/api/jobs/{job_id}/retry")
+    def retry_job(job_id: str, auth=Depends(_auth)):
+        grant, actor = auth
+        return _emit(api.retry_job(grant_id=grant, actor_id=actor, job_id=job_id))
+
+    @app.get("/api/schedules")
+    def list_schedules(auth=Depends(_auth)):
+        grant, actor = auth
+        return _emit(api.list_schedules(grant_id=grant, actor_id=actor))
+
+    @app.get("/api/workers")
+    def list_workers(auth=Depends(_auth)):
+        grant, actor = auth
+        return _emit(api.list_workers(grant_id=grant, actor_id=actor))
+
+    @app.get("/api/system")
+    def system_state(auth=Depends(_auth)):
+        grant, actor = auth
+        return _emit(api.system_state(grant_id=grant, actor_id=actor))
+
+    @app.get("/api/audit")
+    def audit_history(auth=Depends(_auth)):
+        grant, actor = auth
+        return _emit(api.audit_history(grant_id=grant, actor_id=actor))
+
+    # -- Book 3 outbound authenticated worker fabric (loopback only) --------
+    # Workers dial OUT to these endpoints; there is no worker public inbound
+    # port. Every fabric endpoint authenticates (challenge/response + HMAC
+    # signature over the derived wire key). Present only when a
+    # worker_protocol_server is wired in.
+    proto_errors = None
+    if worker_protocol_server is not None:
+        from .worker_protocol import (
+            WorkerProtocolError, UnknownWorker, ForgedProof, SessionGone,
+            CapabilityEscalation, WrongTrustZone)
+        proto_errors = (WorkerProtocolError,)
+
+        def _proto_status(e: Exception) -> int:
+            if isinstance(e, (ForgedProof, CapabilityEscalation, WrongTrustZone,
+                              UnknownWorker)):
+                return 403
+            if isinstance(e, SessionGone):
+                return 410
+            return 400
+
+        @app.post("/api/worker/hello")
+        def worker_hello(body: dict):
+            try:
+                return worker_protocol_server.hello(
+                    worker_id=body.get("worker_id", ""),
+                    proof=body.get("proof", ""))
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e),
+                                    detail=str(e))
+
+        @app.post("/api/worker/respond")
+        def worker_respond(body: dict):
+            try:
+                return worker_protocol_server.respond(
+                    session_id=body.get("session_id", ""),
+                    response=body.get("response", ""))
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e),
+                                    detail=str(e))
+
+        @app.post("/api/worker/heartbeat")
+        def worker_heartbeat(body: dict):
+            try:
+                return worker_protocol_server.heartbeat(
+                    session_id=body["session_id"], signature=body["signature"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/eligible")
+        def worker_eligible(body: dict):
+            from fastapi import Query as _Q
+            try:
+                jobs = worker_protocol_server.eligible_jobs(
+                    session_id=body["session_id"], signature=body["signature"],
+                    queue=body.get("queue", "default"))
+                return {"jobs": jobs}
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/fetch_job")
+        def worker_fetch_job(body: dict):
+            try:
+                return worker_protocol_server.fetch_job(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job_id=body["job_id"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/capabilities")
+        def worker_capabilities(body: dict):
+            try:
+                return worker_protocol_server.advertise_capabilities(
+                    session_id=body["session_id"], signature=body["signature"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/claim")
+        def worker_claim(body: dict):
+            try:
+                return worker_protocol_server.claim(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job=body.get("job", {}))
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/renew")
+        def worker_renew(body: dict):
+            try:
+                return worker_protocol_server.renew(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job_id=body["job_id"], lease_id=body["lease_id"],
+                    fence=body["fence"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/result")
+        def worker_result(body: dict):
+            try:
+                return worker_protocol_server.deliver_result(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job_id=body["job_id"], lease_id=body["lease_id"],
+                    fence=body["fence"], effect_key=body["effect_key"],
+                    manifest=body.get("manifest"),
+                    success=body.get("success", True))
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/surrender")
+        def worker_surrender(body: dict):
+            try:
+                return worker_protocol_server.surrender(
+                    session_id=body["session_id"], signature=body["signature"],
+                    job_id=body["job_id"], lease_id=body["lease_id"],
+                    fence=body["fence"])
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=_proto_status(e), detail=str(e))
+
+        @app.post("/api/worker/revoke")
+        def worker_revoke(body: dict):
+            from fastapi import Header as _H
+            actor = body.get("actor", "")
+            try:
+                worker_protocol_server.revoke_worker(
+                    actor=actor, worker_id=body.get("worker_id", ""))
+                return {"revoked": True, "worker_id": body.get("worker_id"),
+                        "actor": actor}
+            except WorkerProtocolError as e:
+                raise HTTPException(status_code=403, detail=str(e))
+
+    @app.get("/", include_in_schema=False)
+    def root():
+        return RedirectResponse(url="/console")
+
+    @app.get("/console", response_class=HTMLResponse, include_in_schema=False)
+    def console():
+        # B4-CXR7U9R4 (Sonar S5331 review): the body is repository-owned
+        # static content (ui/console.html, read once at import) — never
+        # derived from request data, query strings, headers, or worker
+        # input, so no unsanitized user-controlled data reaches it.
+        return HTMLResponse(content=_console_html())
+
+    return app
+
+
+def runtime_bind(environ: Optional[dict] = None,
+                 ctx: "Optional[ParentActivationContext | VerifiedChildContext]" = None) -> tuple:
+    """Return the (host, port) the durable service MUST bind (B4-R3R2).
+
+    The answer comes ONLY from the gated, validated effective config — never
+    from a separate legacy env read. Direct ``python -m oce_control.http_api``
+    and lifecycle-launched servers therefore produce the SAME effective
+    posture; the runtime never validates one port and binds another. Raises
+    SystemExit (fail closed) before any bind when the effective config is
+    invalid/forbidden.
+
+    B4-CXR4R3: when a pinned ActivationContext is supplied, the bind comes
+    from the PINNED config — later os.environ mutation cannot move the
+    listener away from the validated posture.
+
+    B4-CXR5R3: the ctx=None path is a TEST-ONLY / standalone compatibility
+    wrapper (resolves exactly once and pins). In a lifecycle-launched
+    process the activation envelope is present and the durable consumer
+    MUST use the pinned context — the fallback fails closed there.
+    """
+    if ctx is not None:
+        return ctx.control_plane_host, ctx.control_plane_port
+    from .config_startup import _envelope_present, require_startable
+    if _envelope_present(environ):
+        raise SystemExit(
+            "production activation requires a pinned ActivationContext — "
+            "runtime_bind(ctx=None) is unreachable in a lifecycle-launched "
+            "process (B4-CXR5R3)")
+    eff = require_startable(environ)
+    host = eff.get("control_plane.host")
+    port = int(eff.get("control_plane.port"))
+    return host, port
+
+
+def runtime_scheduler_interval(
+        environ: Optional[dict] = None,
+        ctx: "Optional[ParentActivationContext | VerifiedChildContext]" = None) -> int:
+    """Scheduler tick interval from the gated effective config (B4-R3R2).
+
+    B4-CXR4R3: a pinned context supplies the pinned interval directly.
+
+    B4-CXR5R3: the ctx=None path is a TEST-ONLY / standalone compatibility
+    wrapper; it fails closed inside a lifecycle-launched process."""
+    if ctx is not None:
+        return ctx.scheduler_interval
+    from .config_startup import _envelope_present, require_startable
+    if _envelope_present(environ):
+        raise SystemExit(
+            "production activation requires a pinned ActivationContext — "
+            "runtime_scheduler_interval(ctx=None) is unreachable in a "
+            "lifecycle-launched process (B4-CXR5R3)")
+    return int(require_startable(environ).get("control_plane.scheduler_interval"))
+
+
+def build_durable_app(*, scheduler_tick_interval: int = 5,
+                      ctx: "ParentActivationContext | VerifiedChildContext | None" = None) -> FastAPI:
+    """Wire the durable components (PG store, PG scheduler, PG worker
+    protocol, health) into the API and return a ready FastAPI app.
+
+    Operator grants are issued deterministically at startup and printed;
+    the console uses the `read` grant id.
+
+    B4-CXR3R2: there is NO public DSN override. The durable database path
+    always derives from the governed secret boundary (EffectiveConfig ->>
+    postgres.password_ref -> approved store -> ephemeral DSN); an arbitrary
+    DSN can never activate this API against a different database.
+
+    B4-CXR4R3: a pinned ActivationContext (ctx) supplies the DSN from its
+    PINNED postgres parameters and reference (stale-checked) instead of
+    re-reading the environment.
+
+    B4-CXR5R3: the ctx=None path is a TEST-ONLY compatibility wrapper that
+    resolves ONE pinned activation (never a loose re-read); it fails closed
+    inside a lifecycle-launched process (envelope present). Production
+    durable entrypoints always pass a pinned ctx.
+    """
+    import psycopg2
+    from .authority import AuthorityEngine
+    from .pg_store import PgJobStore
+    from .pg_scheduler import PgScheduler
+    from .pg_worker import PgWorkerProtocol
+    from .health import HealthService
+
+    # B4-R3R4/CXR3R2: the durable database path derives from the governed
+    # secret boundary (postgres.password_ref -> approved store -> ephemeral
+    # DSN). Ambient POSTGRES_DSN/POSTGRES_PASSWORD can no longer redirect the
+    # connection away from the spine-validated secret.
+    from .config_startup import _envelope_present, create_activation_context
+    if ctx is not None:
+        dsn = ctx.runtime_dsn()
+    else:
+        if _envelope_present():
+            raise SystemExit(
+                "production activation requires a pinned ActivationContext — "
+                "build_durable_app(ctx=None) is unreachable in a "
+                "lifecycle-launched process (B4-CXR5R3)")
+        ctx = create_activation_context(role="api")  # resolve ONCE, pin
+        if hasattr(ctx, "declared_role"):
+            # B4-CXR7U2: the verified child re-derives its role/audience
+            # from the authenticated handoff; the declared role is not
+            # authority and cannot be changed by the child.
+            ctx = _with_declared_role(ctx, "api")
+        dsn = ctx.runtime_dsn()
+    conn = psycopg2.connect(dsn)
+    conn.autocommit = False
+
+    authority = AuthorityEngine()
+    grants = {}
+    for action in OPERATOR_ACTIONS:
+        grant = authority.issue_grant(
+            actor_id="operator",
+            action=action,
+            target="default",
+            environment="local",
+            risk_class="read" if action == "read" else None,
+            ttl_seconds=24 * 3600,
+        )
+        grants[action] = grant.grant_id
+
+    store = PgJobStore(conn)
+    scheduler = PgScheduler(conn, store)
+    worker = PgWorkerProtocol(store, conn)
+    health = HealthService(job_store=store, scheduler=scheduler,
+                           worker_protocol=worker)
+    try:
+        store.get_job("__probe__")
+        health.set_pg_available(True)
+    except Exception:
+        health.set_pg_available(False)
+
+    api = ControlPlaneAPI(
+        authority=authority,
+        job_store=store,
+        scheduler=scheduler,
+        worker_protocol=worker,
+        health_service=health,
+    )
+    print("OCE control plane grants (console uses 'read'):")
+    for action, gid in grants.items():
+        print(f"  {action:14s} -> {gid}")
+    return create_app(api, scheduler=scheduler,
+                      scheduler_tick_interval=scheduler_tick_interval)
+
+
+if __name__ == "__main__":
+    # B4-R3R2: the durable HTTP service consumes the VALIDATED EFFECTIVE
+    # CONFIG for its bind host/port and scheduler interval. There is no
+    # separate legacy path that can bind 8080 behind the spine's back — the
+    # gate runs first (require_startable) and refuses activation on any
+    # malformed / incomplete / forbidden effective config.
+    #
+    # B4-R3R3: a syntactically valid postgres.password_ref is NOT enough to
+    # activate — the reference must RESOLVE against the approved local secret
+    # store. Direct launchers carry the same obligation as lifecycle-launched
+    # servers, so a DB-bound process can never start on an unbacked ref.
+    import uvicorn
+    # B4-CXR3R7: one unified fail-closed runtime-start gate — configuration
+    # posture AND durable secret resolution. Nothing reports started/ready
+    # unless the complete runtime-start contract holds.
+    #
+    # B4-CXR4R3: the durable process freezes ONE immutable ActivationContext
+    # and passes the SAME pinned object to bind, scheduler, and durable app —
+    # the configuration that passes the gate is the configuration the runtime
+    # actually uses, and later environment mutation cannot alter it.
+    from .config_startup import create_activation_context
+    # B4-CXR6R1: direct API launch declares the API role; a lifecycle child
+    # must present an authenticated capability bound to 'api'.
+    ctx = create_activation_context(role="api")
+    if hasattr(ctx, "declared_role"):
+        ctx = _with_declared_role(ctx, "api")
+    host, port = runtime_bind(ctx=ctx)
+    interval = runtime_scheduler_interval(ctx=ctx)
+    app = build_durable_app(scheduler_tick_interval=interval, ctx=ctx)
+    uvicorn.run(app, host=host, port=port, log_level="info")

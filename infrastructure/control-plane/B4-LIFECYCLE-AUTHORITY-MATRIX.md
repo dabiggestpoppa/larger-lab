@@ -1,0 +1,114 @@
+# Book 4 — Lifecycle Authority Matrix (B4-CXR4R6 / CXR4-08)
+
+One principle governs every lifecycle command:
+
+> **No lifecycle command may acquire more authority merely by being called.**
+
+Each command's authority is enumerated below. Two separate layers must both
+hold for any mutation:
+
+1. **Source precedence** (`default < file < environment < cli`) — which input
+   wins when sources disagree.
+2. **Actor authority** (policy / operator / operator:po) — whether the actor
+   is authorized to change policy at all.
+
+And the activation invariant (B4-CXR4R3/R4):
+
+> **NO DATABASE OR INFRASTRUCTURE MUTATION OCCURS BEFORE THE BOOK 4
+> AUTHORITY GATE** (validated effective config + resolved governed secret,
+> frozen into an `ActivationContext`).
+
+## Commands
+
+| Command     | Config gate | Runtime readiness | May initialize | May mutate secret store | May mutate PostgreSQL | May start containers | May start worker/API | Destructive authority needed | Usable under broken config (emergency) |
+|-------------|-------------|-------------------|----------------|-------------------------|-----------------------|----------------------|----------------------|------------------------------|----------------------------------------|
+| configure   | no          | no                | **YES**        | YES (one-time init only) | no                    | no                   | no                   | no                           | yes (initialization path)              |
+| doctor      | yes (read)  | yes (read)        | no             | no                      | no                    | no                   | no                   | no                           | yes (observes, never mutates)          |
+| start       | yes         | yes                | no (B4-CXR6R4: start is READ-ONLY over secret authority — required material must already exist or start fails closed with a `configure` remediation hint) | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | no                                    |
+| restart     | yes (activation half) | yes     | no             | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | shutdown half yes; activation half no  |
+| recover     | yes         | yes                | no             | no (existing store is READ-ONLY) | yes (migrations after gate) | yes (after gate) | yes (after gate)     | no                           | no                                    |
+| migrate     | yes         | yes                | no             | no                      | yes (exact governed DB only) | no                | no                   | no                           | no                                    |
+| wait-dependencies | no      | no                 | no             | no                      | no                    | no                   | no                   | no                           | yes                                   |
+| smoke       | yes (read)  | no                 | no             | no                      | no                    | no                   | no                   | no                           | no (needs a live API)                  |
+| stop        | **no**      | **no**             | no             | no                      | no                    | no (down)            | no (terminate)       | no                           | **yes — safe shutdown is always allowed** |
+| destroy     | no          | no                 | no             | no                      | no (volume removal)   | no (down -v)         | no (terminate)       | **YES — explicit `--yes`**     | yes (explicit authorization)           |
+
+## Authority classes
+
+- **INITIALIZATION**: `configure` only — the one-time materialization of the
+  local runtime secret (B4-CXR4R1). Once the store exists, ordinary
+  start/restart/recover/configure are READ-ONLY over it; an ambient
+  `POSTGRES_PASSWORD` can never rewrite, rotate, or erase it.
+- **ACTIVATION**: `start` / restart's activation half / `recover` — the full
+  pinned readiness gate (`create_activation_context`) runs FIRST; compose up,
+  migrations, and process launch happen only after it passes (B4-CXR4R4).
+- **DATABASE MUTATION**: `migrate` — full pinned authority first, and the
+  target must be the EXACT governed PostgreSQL identity (host + port + db +
+  user + governed credential authority; B4-CXR4R4).
+- **OBSERVATION**: `doctor`, `smoke`, `wait-dependencies` — read-only.
+  `wait-dependencies` reports postgres/redis DEPENDENCY health ONLY — it is
+  never activation/runtime readiness (B4-CXR5R7); `smoke` probes the pinned
+  activation destination (port from the pinned ActivationContext, never a
+  fresh environment read).
+- **SAFE SHUTDOWN**: `stop` — must remain available even under an invalid
+  config; terminating known PID-file-owned processes and `compose down` never
+  requires a healthy configuration.
+- **DESTRUCTION**: `destroy` — removes the durable PostgreSQL volume and
+  requires the explicit `--yes` confirmation; never triggered implicitly.
+
+## Override authority
+
+- Policy-owned settings (`sandbox.strict`, `workers.egress`, `redis.mode`,
+  `execution.*`, `cloud.*`, `logging.redact_*`, `sessions.auth_required`,
+  `capital.authority`, `control_plane.public_listen`) cannot be weakened by
+  file/env/CLI/operator input (B4-CXR3R4).
+- A configuration override becomes authoritative ONLY through a PROVEN
+  append-only durable audit sink (B4-CXR4R5); without one, overrides are
+  blocked — durability is never duck-typed.
+- B4-CXR5R5: the canonical `operator_override` is the ONLY applicable path and
+  requires a type-exact proven `PostgresAuditSink`; `evaluate_override_preview`
+  returns a non-applicable decision object; the audit connection is dedicated
+  and transactionally isolated; the ledger is append-only in the database
+  (migration 0007 trigger); records are idempotent by request/correlation id
+  with config fingerprints.
+- B4-CXR5R6: worker/job/execution/storage inputs are authority-bearing
+  (OCE_JOB_FILE TEST_ONLY, ambient worker secret test-seam-only, path
+  containment enforced); OCE_WORKER_TOKEN is rejected.
+- B4-CXR5R7: `configured`/`initialized`/`config_valid` are never reported as
+  `started`/runtime-ready; the config gate is `config_gate`; CLI command is
+  `wait-dependencies`.
+
+## CXR7U / CXR7U8 truth classes (supersede the rows above where they differ)
+
+- **`configure` is INITIALIZATION and nothing else** (B4-CXR7U6/U8R3): it is
+  serialized by a whole-operation exclusive lock, commits one authoritative
+  secret bundle atomically (journal + commit marker), and derives
+  `compose.env` as a projection. An interrupted configure rolls FORWARD from
+  the committed bundle on the next configure; a failed concurrent configure
+  can never restore a stale snapshot over a successful one. Real
+  process-kill interruption at every stage is proven by tests, not just
+  exception rollback.
+- **`start` / `restart` / `recover` NEVER initialize.** `start` fails closed
+  before any compose/socket/database/process mutation when initialization
+  authority is absent (B4-CXR7U8R2 behavioral proof on the real `start()`).
+- **`recover` truthfully reports PID-file cleanup** (B4-CXR7U6): removing a
+  stale PID file is an intentional, reported state mutation — not "zero
+  mutation".
+- **Corrupt secret authority fails closed everywhere** (B4-CXR7U8R5): no
+  lifecycle command may treat corrupt/unreadable/wrong-schema store bytes as
+  empty state, and no denied or failed operation may overwrite them
+  (`SecretStoreCorrupt`/`SecretStoreUnreadable`; byte-invariance proven for
+  initialize/resolve/generation/revoke/rotate/configure/start/restart/recover).
+- **Trusted execution boundary** (B4-CXR7U3): only fixed, repository-owned
+  allowlisted programs execute; job parameters are data only; unknown job
+  types fail closed before any subprocess; generated/downloaded/third-party/
+  plugin/strategy/user-supplied/model-produced code MAY NOT EXECUTE until a
+  real OS-isolation increment is separately authorized and proven.
+- **Isolation reporting is literal** (B4-CXR7U3): `BoundedProcessRunner`
+  reports resource bounding (POSIX rlimits) / watchdog + tree termination
+  (Windows) exactly; network is denied by Book 4 POLICY while OS network
+  enforcement is NOT IMPLEMENTED; no report calls this an adversarial sandbox
+  or "full isolation".
+- **Handoff consumption is atomic** (B4-CXR7U4): exactly one concurrent
+  consumer can use a nonce (`consume_handoff_once`); corrupt/unreadable/
+  symlinked/weak-permission ledger state fails closed without rewrite.

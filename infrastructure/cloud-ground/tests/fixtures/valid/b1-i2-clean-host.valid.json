@@ -1,0 +1,55 @@
+{
+  "contract_id": "OCE-B1I2-CLEANHOST-FIXTURE-OK",
+  "stage": "B1-I2",
+  "authorization": {
+    "authorized_stage": "B1-I2"
+  },
+  "repository": {
+    "full_name": "dabiggestpoppa/larger-lab"
+  },
+  "approved_provider": "netcup",
+  "approved_product": "RS 4000 G12",
+  "approved_contract_term": "MONTHLY",
+  "approved_ceiling_first_month_usd": 100,
+  "approved_ceiling_monthly_usd": 60,
+  "fallback_provider": "ovh",
+  "fallback_product": "VPS-4",
+  "operating_system": {
+    "distribution": "ubuntu",
+    "version": "24.04",
+    "supported": true
+  },
+  "hostname_convention": {
+    "pattern": "oce-cp-\\\\d{2}",
+    "example": "oce-cp-01"
+  },
+  "ssh_posture": {
+    "password_authentication": "no",
+    "permit_root_login": "no",
+    "host_key_verification": "yes"
+  },
+  "docker_posture": {
+    "tcp_api_public": false,
+    "admin_group": "docker"
+  },
+  "firewall_posture": {
+    "default_incoming": "deny",
+    "default_outgoing": "allow"
+  },
+  "private_network": "tailscale",
+  "required_evidence": [
+    "evidence-manifest.json"
+  ],
+  "mandatory_local_tools": [
+    "python3",
+    "git"
+  ],
+  "forbidden_services": [
+    "postgresql",
+    "redis"
+  ],
+  "posture": {
+    "public_ingress": "deny",
+    "statement": "Fixture valid clean-host contract."
+  }
+}

@@ -1,75 +1,61 @@
 # OCE Golden System Program
 
-This directory is the canonical planning and governance entrypoint for the OCE Golden System program.
+This directory is the canonical planning and governance entrypoint for the OCE Golden System.
 
-## Required Reading Order
+## Required reading order
 
-1. **OCE Golden System Architecture Constitution 1.1** — mission, philosophy, authority, invariants, truth rules, cloud doctrine, and amendment process.
-2. **OCE Master Program Atlas 1.0** — complete Block → Chapter → Section map and deep-planning protocol.
-3. **Block 0 Constitutional Control Plan 1.0** — ratified mission, authority, truth, program-control, and build-intelligence contracts.
-4. **Block 1 Cloud Ground Plan 1.0** — ratified capacity, trust, data, runtime, worker, evidence, and cost contracts.
-5. **Block 1 Agent Master Prompt 1.0** — stage-scoped execution instructions and hard hold points.
-6. **Current Chapter and Section Dossiers** — ratified step-by-step design.
-7. **Current Block Gate Report and Build Learning Ledger** — evidence, failures, lessons, unresolved matters, and operator decision.
+1. **Architecture Constitution 1.1** — permanent mission, authority, truth, evidence and local-first doctrine.
+2. **Amendment A-002** — PO is the OCE/Quant/Larger Lab chief operator; Hermes is the separate personal/supplemental agent.
+3. **Master Program Atlas 1.0** — canonical Blocks 0–10 and Block → Chapter → Section grammar.
+4. **Full Program Build Roadmap 1.0** — staged implementation and evidence assembly line.
+5. **Complete Planning Index 1.0** — exact dossier reading order and planning/build status.
+6. **Block 0 and Block 1 ratified plans** — completed constitutional plan and active Cloud Ground plan.
+7. **Block 2 through Block 10 planning dossiers** — implementation-ready section and increment contracts.
+8. **Current build/evidence ledgers** — the only source for active authorization and observed status.
 
-No builder or agent should begin implementation from a section title alone.
+No builder begins from a title, chat summary or future roadmap alone.
 
-## Canonical Program Order
+## Program order
 
-| Block | Name | Current status |
-|---|---|---|
-| B0 | Constitutional Control | GATED_COMPLETE |
-| B1 | Cloud Ground | RATIFIED — B1-I1 AUTHORIZED |
-| B2 | OCE Reality Seal | MAPPED |
-| B3 | OCE Constitutional Spine | MAPPED |
-| B4 | PO Governed Builder | MAPPED |
-| B5 | Reference Application Factory | MAPPED |
-| B6 | Reusable Platform Surfaces | MAPPED |
-| B7 | Quant Foundation | MAPPED |
-| B8 | Quant Lab and Quant Watch | MAPPED |
-| B9 | Controlled Execution | MAPPED |
-| B10 | Operational Compounding | MAPPED |
+| Block | Name | Planning state | Build state |
+|---|---|---|---|
+| B0 | Constitutional Control | Ratified; A-002 proposed | GATED_COMPLETE |
+| B1 | Cloud Ground | Ratified | IN PROGRESS; consult current ledger |
+| B2 | OCE Reality Seal | READY_FOR_OPERATOR_REVIEW | LOCKED |
+| B3 | OCE Constitutional Spine | READY_FOR_OPERATOR_REVIEW | LOCKED |
+| B4 | PO Governed Builder | READY_FOR_OPERATOR_REVIEW | LOCKED |
+| B5 | Reference Application Factory | READY_FOR_OPERATOR_REVIEW | LOCKED |
+| B6 | Reusable Platform Surfaces | READY_FOR_OPERATOR_REVIEW | LOCKED |
+| B7 | Quant Foundation | READY_FOR_OPERATOR_REVIEW | LOCKED |
+| B8 | Quant Lab and Quant Watch | READY_FOR_OPERATOR_REVIEW | LOCKED |
+| B9 | Controlled Execution | READY_FOR_OPERATOR_REVIEW | LOCKED |
+| B10 | Operational Compounding | READY_FOR_OPERATOR_REVIEW | LOCKED |
 
-## Block Checkpoint Workflow
+Planning completion is not build completion. Only an exact operator-provided `AUTHORIZED_STAGE=B<n>-I<m>` plus its ratified dependency authorizes an implementation increment.
 
-Each block follows:
+## Agent architecture
 
-> articulate → interrogate → simulate → refine → ratify → build when authorized → verify → review → commit
+- **PO:** high-level OCE, Quant Lab, Quant Watch and Larger Lab operator/builder.
+- **Hermes:** separate personal and supplemental Telegram agent.
+- **OCE:** canonical identity, authority, state, evidence and recovery.
+- **Workers:** task-scoped subagents with minimum context and expiring authority.
 
-At the end of every block:
+PO and Hermes have direct Telegram access, separate identities and separate memories. Hermes is not a mandatory gateway to PO. Neither agent can approve its own consequential action.
 
-1. review delivered artifacts against the Block Charter;
-2. review evidence, failures, contradictions, security, authority, and cost;
-3. review the Build Learning Ledger;
-4. decide advance, revise, quarantine, or stop;
-5. update this status index;
-6. commit the completed block checkpoint to Git.
+## Build workflow
 
-Planning commits do not authorize implementation. Build authorization must be explicit in the ratified section dossier or operator decision.
+> plan → ratify → authorize one increment → bounded branch → implementation commit → local validation → authoritative CI → evidence-only commit → operator review → next authorization
 
-## Git Doctrine
+Every failed attempt remains truthful evidence. Agents do not merge, deploy, purchase, expose, rotate credentials, delete history, connect brokers or act on capital without separate authority.
 
-- The main branch holds ratified program baselines and reviewed block checkpoints.
-- Work that has not passed its block review must not be labeled complete.
-- Each completed block receives a distinct checkpoint commit.
-- Earlier reasoning is preserved through Git history and superseding documents rather than silently rewritten.
-- Commit messages identify the block and gate state.
-- Legacy documentation remains evidence for the reality audit but does not override the Constitution or Atlas.
+## Local-first doctrine
 
-## Holistic Learning Doctrine
+Planning, development, debugging, ordinary execution and validation run locally. Cloud is a later surface for deployment, durability, remote availability, observability, backups and heavy compute. Telegram is an interface, not canonical state. Core OCE/PO operation must not depend on Telegram or cloud availability.
 
-Every build produces both a product artifact and process knowledge. Meaningful attempts, errors, partial successes, corrections, rejected paths, and recurring practices are recorded and dispositioned.
+## Current checkpoint
 
-“No observation is trash” does not mean unlimited raw retention. Every meaningful observation receives an explicit decision: retain, normalize, summarize, redact, quarantine, expire, or delete with a tombstone and reason.
-
-## Current Checkpoint
-
-**Checkpoint:** Block 0 — Constitutional Control  
-**Constitution:** 1.1, ratified  
-**Atlas:** 1.0, ratified  
-**Block 0:** 1.0, ratified and gated complete  
-**Active execution unit:** B1-I1 — static Cloud Ground repository skeleton  
-**Build authorization:** B1-I1 only  
-**Purchase authorization:** None  
-**Cloud mutation authorization:** None  
-**Next checkpoint:** B1-I1 evidence review before any purchase or deployment
+- Canonical integration branch: `oce`
+- Planning branch: `oce-full-program-planning-books-2-10`
+- Block 1 remains the active implementation block.
+- Blocks 2–10 are planned but build-locked.
+- Main is not changed by this planning package.

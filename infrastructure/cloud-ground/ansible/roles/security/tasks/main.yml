@@ -1,0 +1,148 @@
+---
+# Security role — SSH hardening and firewall
+# B1-I1R3A — Repaired for operator safety
+#
+# SAFETY: This role MUST NOT lock out the operator.
+# Password auth is disabled ONLY after key-based access is verified.
+# host_key_checking = True (not False).
+
+# === PREFLIGHT ===
+- name: Preflight — verify SSH key exists
+  ansible.builtin.stat:
+    path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
+  register: ssh_key_stat
+  tags: [security, preflight]
+
+- name: Preflight — fail if no SSH key configured
+  ansible.builtin.fail:
+    msg: >
+      ABORT: No SSH authorized_keys found for {{ ansible_user }}.
+      Cannot safely disable password auth without key-based access.
+  when: not ssh_key_stat.stat.exists
+  tags: [security, preflight]
+
+# === SSH SERVICE DETECTION (dynamic, portable) ===
+- name: Detect SSH service name
+  ansible.builtin.set_fact:
+    ssh_service_name: "{{ 'ssh' if (ansible_service_mgr == 'systemd' and ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('22.04', '>=')) else 'sshd' }}"
+  tags: [security, ssh]
+
+# === SSH HARDENING ===
+- name: Harden SSH configuration
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    validate: "sshd -t -f %s"
+  loop:
+    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+    - { regexp: '^#?X11Forwarding', line: 'X11Forwarding no' }
+    - { regexp: '^#?MaxAuthTries', line: 'MaxAuthTries 3' }
+    - { regexp: '^#?ClientAliveInterval', line: 'ClientAliveInterval 300' }
+    - { regexp: '^#?ClientAliveCountMax', line: 'ClientAliveCountMax 2' }
+  notify: Restart ssh
+  tags: [security, ssh]
+
+# NOTE: PasswordAuthentication is intentionally NOT disabled here.
+- name: Document SSH hardening status
+  ansible.builtin.debug:
+    msg: >
+      SSH hardened: PermitRootLogin=no, X11Forwarding=no, MaxAuthTries=3.
+      PasswordAuthentication still enabled —
+      disable manually after verifying key-based access.
+      host_key_checking=True enforced in ansible.cfg.
+  tags: [security, ssh]
+
+# === KNOWN HOST BOOTSTRAP ===
+- name: Ensure .ssh directory exists
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.ssh"
+    state: directory
+    mode: '0700'
+  tags: [security, ssh, known-hosts]
+
+# Operator-supplied verified host key (required)
+- name: Fail if no verified host key provided
+  ansible.builtin.fail:
+    msg: >
+      ABORT: No verified host public key or fingerprint provided for
+      {{ inventory_hostname }}. SSH trust requires operator-supplied
+      verified host-key material — never use unverified ssh-keyscan results.
+      Set 'verified_host_key' in the inventory or provide a fingerprint
+      via 'ansible_host_key_fingerprint'.
+  when: >
+    verified_host_key is not defined and verified_host_key_fingerprint is not defined
+  tags: [security, ssh, known-hosts]
+
+- name: Add verified host key to known_hosts
+  ansible.builtin.known_hosts:
+    name: "{{ inventory_hostname }}"
+    key: "{{ verified_host_key }}"
+    state: present
+  when: verified_host_key is defined
+  tags: [security, ssh, known-hosts]
+
+# === FAIL2BAN ===
+- name: Ensure fail2ban is installed
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+  tags: [security, fail2ban]
+
+- name: Enable fail2ban service
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true
+  tags: [security, fail2ban]
+
+# === FIREWALL (UFW) ===
+- name: Configure UFW default deny incoming
+  community.general.ufw:
+    direction: incoming
+    default: deny
+  tags: [security, firewall]
+
+- name: Configure UFW default allow outgoing
+  community.general.ufw:
+    direction: outgoing
+    default: allow
+  tags: [security, firewall]
+
+# Allow SSH only through Tailscale interface (specific source range)
+- name: Allow SSH from Tailscale CGNAT range only
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ item }}"
+    to_port: "22"
+    proto: tcp
+  loop:
+    - "100.64.0.0/10"
+  tags: [security, firewall, tailscale]
+
+# DO NOT: Allow all traffic through Tailscale interface.
+# Administrative traffic is restricted to SSH (port 22) only.
+# Service traffic is handled by Docker's internal bridge network.
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  tags: [security, firewall]
+
+# === SUDO HARDENING ===
+- name: Document sudo authority classification
+  ansible.builtin.debug:
+    msg: >
+      SECURITY NOTE: Passwordless sudo and Docker group membership
+      are root-equivalent authority. Appropriate for single-operator
+      control plane but must be documented.
+  tags: [security, sudo, authority]
+
+- name: Configure passwordless sudo for operator group
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+  tags: [security, sudo]

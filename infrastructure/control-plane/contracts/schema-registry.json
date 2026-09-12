@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/control-plane/schema-registry.json",
+  "title": "OCE Control Plane Schema Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "registry_id",
+    "schemas"
+  ],
+  "properties": {
+    "registry_id": {
+      "type": "string",
+      "const": "OCE-CP-SCHEMA-REGISTRY-v2"
+    },
+    "schemas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_id",
+          "name",
+          "version",
+          "owner",
+          "compatibility_class",
+          "status"
+        ],
+        "properties": {
+          "schema_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "compatibility_class": {
+            "enum": [
+              "backward",
+              "forward",
+              "full",
+              "none"
+            ]
+          },
+          "status": {
+            "enum": [
+              "active",
+              "deprecated",
+              "retired"
+            ]
+          },
+          "retirement_book": {
+            "type": "string"
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}

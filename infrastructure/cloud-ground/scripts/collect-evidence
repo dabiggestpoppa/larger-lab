@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# OCE Cloud Ground -- Collect Evidence
+# B1-I1R -- Calls validation engine then collects evidence
+# Version: 2.0.0
+#
+# This script:
+# 1. Runs the validation engine (which produces results JSON + summary MD)
+# 2. Collects file manifest (excluding volatile evidence outputs)
+# 3. Records source commit and tool versions
+# 4. Does NOT hash itself while writing
+
+set -uo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR="$(dirname "$SCRIPT_DIR")"
+EVIDENCE_DIR="$BASE_DIR/evidence"
+TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+mkdir -p "$EVIDENCE_DIR"
+
+echo "=== OCE Cloud Ground -- Evidence Collection ==="
+echo "Timestamp: $TIMESTAMP"
+
+# 1. Run validation engine
+echo ""
+echo "--- Running Validation Engine ---"
+if python3 "$SCRIPT_DIR/validate_engine.py" 2>&1; then
+    echo "Validation engine completed successfully"
+else
+    echo "Validation engine returned nonzero (expected for BLOCKED/FAIL)"
+fi
+
+# 2. Collect file manifest (excluding volatile evidence outputs and .git)
+echo ""
+echo "--- File Manifest ---"
+MANIFEST="$EVIDENCE_DIR/file-manifest.json"
+# Start JSON
+echo '{"timestamp":"'"$TIMESTAMP"'","tested_commit":"'"$(git -C "$BASE_DIR" rev-parse HEAD 2>/dev/null || echo unknown)"'","files":[' > "$MANIFEST"
+FIRST=true
+find "$BASE_DIR" -type f \
+    -not -path "*/.git/*" \
+    -not -path "*/node_modules/*" \
+    -not -path "*/evidence/static-validation-*" \
+    -not -path "*/evidence/file-manifest.json" \
+    -not -path "*/evidence/tool-manifest.json" \
+    -not -path "*/evidence/stage-status.json" \
+    | sort | while read -r f; do
+    # Compute hash
+    if command -v sha256sum &>/dev/null; then
+        HASH=$(sha256sum "$f" 2>/dev/null | cut -d' ' -f1 || echo "hash-unavailable")
+    elif command -v shasum &>/dev/null; then
+        HASH=$(shasum -a 256 "$f" 2>/dev/null | cut -d' ' -f1 || echo "hash-unavailable")
+    else
+        HASH="no-hash-tool"
+    fi
+    SIZE=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f" 2>/dev/null || echo 0)
+    REL=$(realpath --relative-to="$BASE_DIR" "$f" 2>/dev/null || echo "$f")
+    if [ "$FIRST" = true ]; then
+        FIRST=false
+    else
+        printf ',' >> "$MANIFEST"
+    fi
+    printf '{"path":"%s","sha256":"%s","size":%s}' "$REL" "$HASH" "$SIZE" >> "$MANIFEST"
+done
+echo ']}' >> "$MANIFEST"
+echo "File manifest: $MANIFEST"
+
+# 3. Tool/version manifest
+echo ""
+echo "--- Tool Manifest ---"
+TOOLMANIFEST="$EVIDENCE_DIR/tool-manifest.json"
+python3 -c "
+import json, subprocess, os, sys
+from datetime import datetime, timezone
+
+def get_version(cmd):
+    try:
+        r = subprocess.run([cmd, '--version'], capture_output=True, text=True, timeout=10)
+        return (r.stdout + r.stderr).strip().split(chr(10))[0][:120]
+    except:
+        return 'not installed'
+
+tools = {
+    'python3': get_version('python3'),
+    'ansible-playbook': get_version('ansible-playbook'),
+    'ansible-lint': get_version('ansible-lint'),
+    'docker': get_version('docker'),
+    'shellcheck': get_version('shellcheck'),
+    'jq': get_version('jq'),
+    'gitleaks': get_version('gitleaks'),
+    'yamllint': get_version('yamllint'),
+}
+
+try:
+    import yaml; tools['pyyaml'] = yaml.__version__
+except: tools['pyyaml'] = 'not installed'
+try:
+    import jsonschema; tools['jsonschema'] = jsonschema.__version__
+except: tools['jsonschema'] = 'not installed'
+
+result = {
+    'timestamp': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+    'tools': tools,
+    'os': os.uname().sysname + ' ' + os.uname().release,
+}
+print(json.dumps(result, indent=2))
+" > "$TOOLMANIFEST"
+echo "Tool manifest: $TOOLMANIFEST"
+
+# 4. Stage status (read from validation engine output)
+echo ""
+echo "--- Stage Status ---"
+if [ -f "$EVIDENCE_DIR/stage-status.json" ]; then
+    echo "Stage status: $EVIDENCE_DIR/stage-status.json (produced by validate_engine.py)"
+else
+    echo "WARNING: stage-status.json not produced by validation engine"
+fi
+
+echo ""
+echo "=== Evidence collection complete ==="

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oce.dev/schemas/worker-admission-report/v1.0.0",
+  "title": "OCE Worker Admission Report",
+  "description": "Schema for worker admission evaluation results. Version 1.0.0 — B1-I1.",
+  "type": "object",
+  "required": [
+    "worker_id",
+    "worker_class",
+    "admission_status",
+    "evaluated_at",
+    "tests",
+    "evaluator_id",
+    "schema_version"
+  ],
+  "properties": {
+    "worker_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$"
+    },
+    "worker_class": {
+      "type": "string",
+      "enum": ["local", "burst-octaspace", "burst-runpod", "windows-mt5"]
+    },
+    "admission_status": {
+      "type": "string",
+      "enum": ["ADMITTED", "CONDITIONAL", "REJECTED", "EXPIRED", "REVOKED"],
+      "description": "Final admission decision"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["test_id", "test_name", "result", "evidence"],
+        "properties": {
+          "test_id": { "type": "string" },
+          "test_name": { "type": "string" },
+          "result": { "type": "string", "enum": ["PASS", "FAIL", "SKIP", "BLOCKED"] },
+          "evidence": { "type": "string", "description": "Reference to evidence artifact" },
+          "details": { "type": "string" }
+        }
+      },
+      "minItems": 1
+    },
+    "restrictions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Conditions for CONDITIONAL admission"
+    },
+    "rejection_reason": {
+      "type": "string",
+      "description": "Reason for REJECTED status"
+    },
+    "evaluator_id": {
+      "type": "string",
+      "description": "Identity of the admission evaluator"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    }
+  },
+  "additionalProperties": false
+}

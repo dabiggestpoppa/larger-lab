@@ -1,0 +1,13 @@
+{
+  "worker_id": "wrk-local-01",
+  "worker_class": "local",
+  "os": {"name": "Ubuntu", "version": "24.04"},
+  "architecture": "x86_64",
+  "runtime_versions": {"python": "3.11.9"},
+  "hardware": {"cpu_cores": 8, "memory_mb": 16384, "disk_gb": 500},
+  "network_capabilities": {"outbound_allowed": true, "inbound_denied": true},
+  "image_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000004",
+  "declared_at": "2026-08-20T12:00:00Z",
+  "expires_at": "2026-08-21T12:00:00Z",
+  "schema_version": "1.0.0"
+}
