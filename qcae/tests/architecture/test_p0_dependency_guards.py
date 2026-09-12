@@ -43,7 +43,11 @@ HIGHER_LAYERS = frozenset(
 )
 
 #: Explicit denials beyond the stdlib-only rule (canon 15.2 forbidden list).
+# Database engines are denied everywhere except the persistence adapters
+# under qcae/infrastructure/ (Book V 15.9: engine implementations live under
+# infrastructure; ADR-0006 names sqlite3 as the P1 metadata engine).
 DENIED_ROOTS = frozenset({"sqlite3"})
+ENGINE_ALLOWED_PREFIXES = ("qcae/infrastructure/",)
 
 
 @dataclass(frozen=True)
@@ -109,6 +113,8 @@ def scan_directory(directory: Path, tree_root: Path, *, is_core: bool) -> list:
             root = module.split(".")[0] if module else ""
 
             if root in DENIED_ROOTS:
+                if rel_posix.startswith(ENGINE_ALLOWED_PREFIXES):
+                    continue  # persistence adapter: the sanctioned engine site
                 violations.append(ImportViolation(py_file, lineno, module,
                                                   "denied root (canon 15.2)"))
                 continue
@@ -190,6 +196,29 @@ class TestOceIsolation:
     def test_no_qcae_module_imports_oce_adapters(self) -> None:
         violations = scan_directory(QCAE_DIR, REPO_ROOT, is_core=False)
         assert not violations, "\n" + "\n".join(str(v) for v in violations)
+
+    def test_core_is_engine_free(self) -> None:
+        """ADR-0006 scoping: the database engine may appear ONLY under
+        qcae/infrastructure/. Core and every other layer stay engine-free.
+        Self-verifying: a synthetic engine import outside the allowed prefix
+        must be flagged."""
+        core_violations = scan_directory(CORE_DIR, REPO_ROOT, is_core=True)
+        assert not core_violations, "\n" + "\n".join(str(v) for v in core_violations)
+
+        infra_violations = scan_directory(
+            REPO_ROOT / "qcae" / "infrastructure", REPO_ROOT, is_core=False
+        )
+        assert not infra_violations, "\n" + "\n".join(str(v) for v in infra_violations)
+
+        import tempfile
+
+        tree = Path(tempfile.mkdtemp())
+        pkg = tree / "qcae" / "services"
+        pkg.mkdir(parents=True)
+        (pkg / "__init__.py").write_text("", encoding="utf-8")
+        (pkg / "leak.py").write_text("import sqlite3\n", encoding="utf-8")
+        flagged = scan_directory(pkg, tree, is_core=False)
+        assert any(v.module == "sqlite3" for v in flagged)
 
     def test_core_rejects_research_mesh_implementation_import(self, tmp_path: Path) -> None:
         """A-001 §7 / reconciliation §13: a direct Research Mesh implementation
