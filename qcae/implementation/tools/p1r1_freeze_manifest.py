@@ -41,6 +41,12 @@ P1R1_REPAIR_COMMITS = [
     "7d541a97",  # P1-R1-C04: decision-reuse capability/candidate inventory
     "1817ed57",  # P1-R1-C05: backup/restore registry-table coverage
     "a8ea1014",  # P1-R1-T01: identity-law/adversarial suite
+    # continuation (operator directive: reviewed head 31e5ba20)
+    "a69baaa8",  # P1-R1-C03R: repository identity vs revision split (ADR-0007) + migration v3
+    "2dd94b85",  # P1-R1-C03R2: revision-sensitive IMPLEMENTS edge qualification
+    "47f8f067",  # P1-R1-C04R: decision reuse + A-F internal-first findings
+    "0a3bd46b",  # P1-R1-C05R: backup/restore carries revision history
+    "d9a92e5f",  # P1-R1-T01R: parser robustness fixtures + candidate identity rule
 ]
 
 TEST_COMMAND = ["python", "-m", "pytest", "qcae/tests", "-q"]
@@ -108,7 +114,9 @@ def build_manifest(expected_head: str, test_results: dict) -> dict:
                               "this artifact supersedes its bookkeeping only",
         },
         "operator_review_trigger": {
-            "directive": "P1-R1 work-session prompt (reviewed head bbbe05a7)",
+            "directive": "P1-R1 work-session prompt (reviewed head bbbe05a7); "
+                         "continuation directive (reviewed head 31e5ba20) for the "
+                         "repository identity/revision repair",
             "review_date": "2026-09-12",
         },
         "repair_commits": repair_commits,
@@ -129,25 +137,38 @@ def build_manifest(expected_head: str, test_results: dict) -> dict:
             {"item": "SqliteRegistryQuery freshness lookup reaches into the lifecycle log "
                      "connection; refactor to a port method when P2 jobs need it",
              "severity": "MINOR", "owner": "build-agent", "trigger": "P2 job runtime"},
+            {"item": "RepositoryRegistry observation timestamps rely on caller-supplied "
+                     "first_seen_at/last_observed_at; a monotonic observed_sequence "
+                     "column can replace the tie-break chain if P3 needs stricter "
+                     "ordering guarantees",
+             "severity": "MINOR", "owner": "build-agent", "trigger": "P3 discovery"},
         ],
         "known_failures_outside_qcae": [
             "tests/forge/phase_00/test_extension_docs.py (2 pre-existing failures "
             "on this branch, unrelated to QCAE; present before P0 work)"
         ],
         "blockers": [],
+        "schema_version": "v3 (repository_revision table added by ADR-0007 migration)",
         "evidence_refs": {
             "progress_ledger": "qcae/QCAE_IMPLEMENTATION_PROGRESS.md",
-            "adr_refs": ["qcae/implementation/decisions/ADR-0006-persistence-engine.md"],
+            "adr_refs": [
+                "qcae/implementation/decisions/ADR-0006-persistence-engine.md",
+                "qcae/implementation/decisions/ADR-0007-repository-identity-vs-revision-identity.md",
+            ],
             "p1r1_tests": [
                 "qcae/tests/unit/test_p1r1_freeze_evidence.py",
+                "qcae/tests/unit/test_p1r1_freeze_evidence_robustness.py",
                 "qcae/tests/unit/test_p1r1_capability_registry.py",
                 "qcae/tests/unit/test_p1r1_repository_registry.py",
                 "qcae/tests/unit/test_p1r1_relationships.py",
                 "qcae/tests/unit/test_p1r1_decision_reuse.py",
+                "qcae/tests/unit/test_p1r1_decision_reuse_full.py",
                 "qcae/tests/unit/test_p1r1_backup_restore.py",
                 "qcae/tests/unit/test_p1r1_identity_law.py",
             ],
             "architecture_guards": "qcae/tests/architecture/test_p0_dependency_guards.py",
+            "migration_evidence": "qcae/tests/unit/test_p1_migrations.py (v1->v2) + "
+                                  "test_p1r1_repository_registry.py (v2->v3 back-fill)",
         },
     }
     return manifest
