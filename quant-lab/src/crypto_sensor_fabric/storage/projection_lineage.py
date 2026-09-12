@@ -1,4 +1,4 @@
-"""SENSOR-B4-I05C/I05R1C — projection lineage repository.
+"""SENSOR-B4-I05C/I05R1C/I05R2A — projection lineage repository.
 
 Persists ``ProjectionLineage`` rows immutably under
 ``<t0_root>/catalogs/manifests/projection_lineage/`` through the shared
@@ -24,13 +24,21 @@ publication — that:
   never transfers provider provenance: a KRAKEN projection may not use a
   GATE acquisition even for identical bytes).
 
+I05R2 §9-§14: a commit-capable lineage repository has NO optional proof
+dependencies.  ``blob_store``, ``blob_metadata_repository``,
+``acquisition_repository``, ``artifact_repository`` and
+``context_repository`` are MANDATORY constructor dependencies; there is no
+conditional branch that skips artifact source-list agreement or projection
+context identity matching.  The referenced projection MUST have a committed
+``RawProjectionArtifact`` (§11) and a committed ``ProjectionCatalogRecord``
+(§12) BEFORE any lineage publication.
+
 Production commits read durable repositories only (§12); dictionary-based
 helpers remain for unit tests.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -81,6 +89,18 @@ class ProjectionLineageCatalogCorrupt(LineageError):
 
 class LineageManifestNotFound(KeyError):
     """Requested lineage_manifest_id not found."""
+
+
+class ProjectionArtifactMissing(LineageError):
+    """Lineage references a projection_id with no committed artifact (I05R2 §11)."""
+
+
+class ProjectionContextMissing(LineageError):
+    """Lineage references a projection_id with no committed context (I05R2 §12)."""
+
+
+class LineageConfigurationError(LineageError):
+    """A commit-capable lineage repository was constructed incompletely."""
 
 
 # ---------------------------------------------------------------------------
@@ -155,7 +175,7 @@ def validate_lineage_source(
     evidence_blobs: dict[str, EvidenceBlob],
     acquisitions: dict[str, AcquisitionRecord],
     *,
-    is_usable_predicate: Callable[[AcquisitionRecord], bool],
+    is_usable_predicate: Any,
 ) -> None:
     """Validate a single lineage source entry against supplied dictionaries.
 
@@ -189,8 +209,14 @@ def validate_lineage_source(
 
 
 # ---------------------------------------------------------------------------
-# Projection lineage repository — enforcing, durable, immutable
+# Projection lineage repository — enforcing, durable, immutable, SEALED
 # ---------------------------------------------------------------------------
+
+
+# Sentinel for omitted mandatory dependencies: lets the constructor raise
+# the TYPED configuration error (I05R2 §10) instead of a bare TypeError,
+# while remaining a mandatory keyword in every realistic call.
+_MISSING = object()
 
 
 class ProjectionLineageRepository:
@@ -205,26 +231,72 @@ class ProjectionLineageRepository:
     any durable publication: T0A physical verification, usable-provenance
     acquisition selection, identity matching against the projection
     context, contiguous source order, and exact artifact/lineage agreement.
+
+    I05R2 §9-§14: ALL proof dependencies are MANDATORY constructor
+    arguments.  There is no metadata-only or dependency-starved commit
+    path: artifact existence (§11), context existence (§12), artifact
+    source-list agreement (§13) and provider/venue/sensor/instrument
+    identity (§14) are ALWAYS enforced before durable publication.
     """
 
     def __init__(
         self,
         catalog_root: Path,
         *,
-        blob_store: Any = None,
-        blob_metadata_repository: Any = None,
-        acquisition_repository: Any = None,
-        artifact_repository: Any = None,
-        context_repository: Any = None,
-        projection_root: Path | None = None,
+        blob_store: Any = _MISSING,
+        blob_metadata_repository: Any = _MISSING,
+        acquisition_repository: Any = _MISSING,
+        artifact_repository: Any = _MISSING,
+        context_repository: Any = _MISSING,
     ) -> None:
+        # I05R2 §10: no optional enforcement.  A commit-capable lineage
+        # repository is born with its complete proof-dependency set; a
+        # missing dependency is a construction-time typed failure, never a
+        # silent skip at commit time.
+        if blob_store is _MISSING or blob_store is None:
+            raise LineageConfigurationError(
+                "ProjectionLineageRepository requires blob_store"
+            )
+        if (
+            blob_metadata_repository is _MISSING
+            or blob_metadata_repository is None
+        ):
+            raise LineageConfigurationError(
+                "ProjectionLineageRepository requires "
+                "blob_metadata_repository"
+            )
+        if (
+            acquisition_repository is _MISSING
+            or acquisition_repository is None
+        ):
+            raise LineageConfigurationError(
+                "ProjectionLineageRepository requires "
+                "acquisition_repository"
+            )
+        if (
+            artifact_repository is _MISSING
+            or artifact_repository is None
+        ):
+            raise LineageConfigurationError(
+                "ProjectionLineageRepository requires "
+                "artifact_repository (lineage may not publish without "
+                "artifact agreement — I05R2 §11)"
+            )
+        if (
+            context_repository is _MISSING
+            or context_repository is None
+        ):
+            raise LineageConfigurationError(
+                "ProjectionLineageRepository requires "
+                "context_repository (lineage may not publish without "
+                "context identity — I05R2 §12)"
+            )
         self._root = Path(catalog_root)
         self._blob_store = blob_store
         self._blob_metadata_repository = blob_metadata_repository
         self._acquisitions = acquisition_repository
         self._artifact_repository = artifact_repository
         self._context_repository = context_repository
-        self._projection_root = projection_root
         try:
             self._catalog = DurableJsonCatalog(
                 self._root, logical_id_field="lineage_manifest_id"
@@ -266,32 +338,28 @@ class ProjectionLineageRepository:
             assert payload is not None
             self._cache[logical_id] = self._parse_fragment(payload)
 
-    # -- durable source verification (I05R1 §11/§13/§48) ---------------------
+    # -- durable source verification (I05R1 §11/§13/§48 + I05R2 §14) ---------
 
     def _verify_source_pair(
         self,
         entry: ProjectionLineage,
-        context: Any | None,
+        context: Any,
     ) -> None:
+        """Prove one lineage source against durable T0A truth + context.
+
+        ``context`` is MANDATORY (I05R2 §12): provider/venue/sensor/
+        instrument identity matching is unconditional (§14 — it lives in
+        the real commit path, not only the later resolver).
+        """
         blob_sha = entry.source_blob_sha256
         acq_id = entry.source_acquisition_id
 
         # Durable blob metadata + PHYSICAL verification (no metadata-only proof).
-        if self._blob_metadata_repository is None:
-            raise LineageError(
-                "ProjectionLineageRepository requires a "
-                "blob_metadata_repository to prove source blob truth"
-            )
         metas = self._blob_metadata_repository.get_blob_metadata(blob_sha)
         if not metas:
             raise ProjectionLineageConflict(
                 f"lineage source_blob_sha256={blob_sha!r} has no durable "
                 "EvidenceBlob metadata"
-            )
-        if self._blob_store is None:
-            raise LineageError(
-                "ProjectionLineageRepository requires a blob_store to "
-                "physically verify source blobs"
             )
         verified = False
         for meta in metas:
@@ -310,11 +378,6 @@ class ProjectionLineageRepository:
             )
 
         # Durable acquisition truth.
-        if self._acquisitions is None:
-            raise LineageError(
-                "ProjectionLineageRepository requires an "
-                "acquisition_repository to prove source acquisition truth"
-            )
         try:
             acq = self._acquisitions.get_acquisition(acq_id)
         except Exception as exc:
@@ -337,47 +400,34 @@ class ProjectionLineageRepository:
                 "(forensic failure evidence may not become T0B lineage)"
             )
 
-        # Identity matching against the projection context (§13).
-        if context is not None:
-            for name, expected, actual in (
-                ("provider", context.provider, acq.provider_id),
-                ("venue", context.venue, acq.venue),
-                ("sensor_family", context.sensor_family, acq.sensor_family),
-                (
-                    "native_instrument",
-                    context.native_instrument,
-                    acq.native_instrument,
-                ),
-            ):
-                if str(actual) != expected:
-                    raise ProjectionLineageConflict(
-                        f"acquisition {acq_id!r} {name}={actual!r} does not "
-                        f"match projection context {expected!r}; byte "
-                        "equality never transfers provider provenance"
-                    )
-            if (
-                context.source_granularity is not None
-                and acq.native_granularity is not None
-                and str(acq.native_granularity) != context.source_granularity
-            ):
+        # Identity matching against the projection context (I05R2 §14 —
+        # ALWAYS, never conditional on an optional dependency).
+        for name, expected, actual in (
+            ("provider", context.provider, acq.provider_id),
+            ("venue", context.venue, acq.venue),
+            ("sensor_family", context.sensor_family, acq.sensor_family),
+            (
+                "native_instrument",
+                context.native_instrument,
+                acq.native_instrument,
+            ),
+        ):
+            if str(actual) != expected:
                 raise ProjectionLineageConflict(
-                    f"acquisition {acq_id!r} granularity "
-                    f"{str(acq.native_granularity)!r} does not match "
-                    f"projection {context.source_granularity!r}"
+                    f"acquisition {acq_id!r} {name}={actual!r} does not "
+                    f"match projection context {expected!r}; byte "
+                    "equality never transfers provider provenance"
                 )
-
-    def _resolve_context(self, projection_id: str) -> Any | None:
-        if self._context_repository is None:
-            return None
-        return self._context_repository.get(projection_id)
-
-    def _resolve_artifact_sources(self, projection_id: str) -> list[str] | None:
-        if self._artifact_repository is None:
-            return None
-        artifact = self._artifact_repository.get(projection_id)
-        if artifact is None:
-            return None
-        return list(artifact.source_blob_sha256)
+        if (
+            context.source_granularity is not None
+            and acq.native_granularity is not None
+            and str(acq.native_granularity) != context.source_granularity
+        ):
+            raise ProjectionLineageConflict(
+                f"acquisition {acq_id!r} granularity "
+                f"{str(acq.native_granularity)!r} does not match "
+                f"projection {context.source_granularity!r}"
+            )
 
     # -- commit ----------------------------------------------------------------
 
@@ -438,14 +488,33 @@ class ProjectionLineageRepository:
                     )
             return existing
 
-        # Artifact source-list agreement (when an artifact repository is
-        # wired — production always wires it; I05C-era callers may not).
-        artifact_sources = self._resolve_artifact_sources(pid)
-        if artifact_sources is not None:
-            validate_artifact_lineage_consistency(artifact_sources, entries)
+        # I05R2 §11: the projection MUST have a committed artifact BEFORE
+        # lineage publication.  Missing artifact = typed failure, never
+        # "no artifact consistency rule applicable".
+        artifact = self._artifact_repository.get(pid)
+        if artifact is None:
+            raise ProjectionArtifactMissing(
+                f"projection_id={pid!r} has no committed "
+                "RawProjectionArtifact; lineage may not publish without "
+                "artifact agreement (I05R2 §11)"
+            )
+
+        # I05R2 §13: artifact source-list agreement is UNCONDITIONAL.
+        validate_artifact_lineage_consistency(
+            list(artifact.source_blob_sha256), entries
+        )
+
+        # I05R2 §12: the projection MUST have a committed context BEFORE
+        # lineage publication.  No context = no scientific lineage commit.
+        context = self._context_repository.get(pid)
+        if context is None:
+            raise ProjectionContextMissing(
+                f"projection_id={pid!r} has no committed "
+                "ProjectionCatalogRecord; provider/venue/sensor/instrument "
+                "identity checks are mandatory (I05R2 §12)"
+            )
 
         # T0A source truth + identity matching, per entry, BEFORE publication.
-        context = self._resolve_context(pid)
         for entry in sorted(entries, key=lambda e: e.source_order):
             self._verify_source_pair(entry, context)
 
@@ -494,11 +563,14 @@ def json_entry(entry: ProjectionLineage) -> dict[str, Any]:
 
 __all__ = [
     "ArtifactLineageMismatch",
+    "LineageConfigurationError",
     "LineageError",
     "LineageManifestBindingConflict",
     "LineageManifestNotFound",
     "NoLineageEntries",
     "NoUsableProjectionSource",
+    "ProjectionArtifactMissing",
+    "ProjectionContextMissing",
     "ProjectionLineageCatalogCorrupt",
     "ProjectionLineageConflict",
     "ProjectionLineageRepository",

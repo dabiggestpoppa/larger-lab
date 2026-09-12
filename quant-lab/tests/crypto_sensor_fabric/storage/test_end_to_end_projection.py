@@ -27,6 +27,7 @@ from crypto_sensor_fabric.storage.manifests import (
     PartitionManifestRepository,
 )
 from crypto_sensor_fabric.storage.projection_lineage import (
+    ProjectionArtifactMissing,
     ProjectionLineageRepository,
 )
 from crypto_sensor_fabric.storage.projection_resolver import (
@@ -431,22 +432,26 @@ class TestEndToEnd:
             repo._validate_referential_integrity(manifest)
 
     def test_missing_artifact_but_lineage_rejected(self, tmp_path: Path) -> None:
+        """I05R2 §11: lineage for a projection with no committed artifact
+        fails AT LINEAGE COMMIT (typed), and a manifest referencing it
+        still fails closed at the resolver."""
         chain = Chain(tmp_path)
         sha = chain.seed_blob(b'{"k": "v"}')
         chain.seed_acquisition(sha, "acq-1")
-        # Commit lineage for a projection whose artifact never existed.
         from crypto_sensor_fabric.storage.models import ProjectionLineage
 
-        chain.lineage.commit(
-            "lm-orphan",
-            [ProjectionLineage(
-                lineage_manifest_id="lm-orphan",
-                projection_id="proj-orphan",
-                source_blob_sha256=sha,
-                source_acquisition_id="acq-1",
-                source_order=0,
-            )],
-        )
+        # I05R2 §11: the lineage repository itself refuses orphan lineage.
+        with pytest.raises(ProjectionArtifactMissing):
+            chain.lineage.commit(
+                "lm-orphan",
+                [ProjectionLineage(
+                    lineage_manifest_id="lm-orphan",
+                    projection_id="proj-orphan",
+                    source_blob_sha256=sha,
+                    source_acquisition_id="acq-1",
+                    source_order=0,
+                )],
+            )
         repo = chain.manifest_repo()
         manifest = chain.manifest(
             "pm-orphan", blob_refs=[sha], projection_refs=["proj-orphan"]

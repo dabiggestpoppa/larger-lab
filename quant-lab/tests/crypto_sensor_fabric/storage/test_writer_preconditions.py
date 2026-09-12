@@ -468,57 +468,117 @@ class TestArtifactPhysicalGate:
         kwargs.update(overrides)
         return RawProjectionArtifact(**kwargs)
 
-    def test_metadata_only_repo_allows_commit(self, tmp_path) -> None:
-        repo = ProjectionArtifactRepository(tmp_path / "artifacts")
-        committed = repo.commit(self._artifact())
-        assert committed.projection_id == "proj-phys"
+    def _wired_repo(self, tmp_path) -> ProjectionArtifactRepository:
+        """Sealed commit-capable artifact repository (I05R2 §5)."""
+        import shutil
+
+        t0 = tmp_path / "t0"
+        if t0.exists():
+            shutil.rmtree(t0)
+        t0.mkdir()
+        return ProjectionArtifactRepository(
+            tmp_path / "artifacts",
+            projection_root=t0,
+            schema_registry=self._registry(),
+        ), t0
+
+    def _registry(self) -> ProjectionSchemaRegistry:
+        import shutil
+
+        root = Path("C:/tmp_r1d_registry")
+        if root.exists():
+            shutil.rmtree(root)
+        root.mkdir(parents=True)
+        registry = ProjectionSchemaRegistry(root / "projection_schemas")
+        registry.register(
+            ProjectionSchemaDefinition(
+                projection_schema_id="r1d.schema",
+                projection_schema_version="1.0.0",
+                provider_native_schema=NATIVE,
+            )
+        )
+        return registry
+
+    def test_no_metadata_only_commit_path(self, tmp_path) -> None:
+        """I05R2 §31A/§31C: construction without projection_root fails AND
+        the historical verify_physical=False bypass no longer exists."""
+        with pytest.raises(TypeError):
+            ProjectionArtifactRepository(tmp_path / "artifacts")  # type: ignore[call-arg]
+        with pytest.raises(TypeError):
+            # verify_physical is not a constructor parameter at all.
+            ProjectionArtifactRepository(  # type: ignore[call-arg]
+                tmp_path / "artifacts",
+                projection_root=tmp_path / "t0",
+                schema_registry=self._registry(),
+                verify_physical=False,
+            )
+
+    def test_commit_without_schema_registry_fails(self, tmp_path) -> None:
+        """I05R2 §31B: schema_registry is mandatory for commits."""
+        with pytest.raises(TypeError):
+            ProjectionArtifactRepository(  # type: ignore[call-arg]
+                tmp_path / "artifacts",
+                projection_root=tmp_path / "t0",
+            )
 
     def test_commit_without_physical_fails_when_wired(self, tmp_path) -> None:
         from crypto_sensor_fabric.storage.projections import ProjectionCorruption
 
-        repo = ProjectionArtifactRepository(
-            tmp_path / "artifacts",
-            projection_root=tmp_path / "t0",
-            schema_registry=None,
-        )
+        repo, _t0 = self._wired_repo(tmp_path)
         with pytest.raises(ProjectionCorruption, match="missing"):
             repo.commit(self._artifact())
 
     def test_commit_with_sha_mismatch_fails(self, tmp_path) -> None:
         import pyarrow.parquet as pq
+        from crypto_sensor_fabric.storage.checksums import sha256_file
         from crypto_sensor_fabric.storage.projections import ProjectionCorruption
 
-        t0 = tmp_path / "t0"
-        t0.mkdir()
+        repo, t0 = self._wired_repo(tmp_path)
         table = pa.table({"x": [1]})
         uri = "projections/fake/part-00000.parquet"
         target = t0 / uri
         target.parent.mkdir(parents=True)
         pq.write_table(table, str(target))
+        sha = sha256_file(str(target)).hex_digest
 
-        repo = ProjectionArtifactRepository(
-            tmp_path / "artifacts", projection_root=t0
-        )
-        with pytest.raises(ProjectionCorruption, match="SHA"):
-            repo.commit(self._artifact(projection_uri=uri))
+        # Real bytes + real SHA but the physical schema is NOT the
+        # registered projection schema (§32 native-schema attack).
+        with pytest.raises(ProjectionCorruption, match="EXACTLY"):
+            repo.commit(
+                self._artifact(projection_uri=uri, projection_sha256=sha)
+            )
 
     def test_commit_with_row_count_mismatch_fails(self, tmp_path) -> None:
         import pyarrow.parquet as pq
         from crypto_sensor_fabric.storage.checksums import sha256_file
         from crypto_sensor_fabric.storage.projections import ProjectionCorruption
 
-        t0 = tmp_path / "t0"
-        t0.mkdir()
-        table = pa.table({"x": [1, 2, 3]})
+        repo, t0 = self._wired_repo(tmp_path)
+        # Full registered schema so schema equality passes and the row
+        # count gate is what fires.
+        full = pa.table(
+            {
+                "price": [1.0, 2.0, 3.0],
+                "qty": [1, 2, 3],
+                "symbol": ["a", "b", "c"],
+                "_t0_projection_id": ["p", "p", "p"],
+                "_t0_source_blob_sha256": ["a" * 64] * 3,
+                "_t0_acquisition_id": ["acq", "acq", "acq"],
+                "_t0_provider": ["kraken"] * 3,
+                "_t0_venue": ["futures"] * 3,
+                "_t0_sensor_family": ["market_data"] * 3,
+                "_t0_native_instrument": ["BTC-USDT"] * 3,
+                "_t0_parser_version": ["1.0.0"] * 3,
+                "_t0_schema_version": ["1.0.0"] * 3,
+                "_t0_row_ordinal": [0, 1, 2],
+            }
+        )
         uri = "projections/fake/part-00001.parquet"
         target = t0 / uri
         target.parent.mkdir(parents=True)
-        pq.write_table(table, str(target))
+        pq.write_table(full, str(target))
         sha = sha256_file(str(target)).hex_digest
 
-        repo = ProjectionArtifactRepository(
-            tmp_path / "artifacts", projection_root=t0
-        )
         with pytest.raises(ProjectionCorruption, match="row count"):
             repo.commit(
                 self._artifact(
@@ -529,8 +589,6 @@ class TestArtifactPhysicalGate:
     def test_unsafe_uri_fails(self, tmp_path) -> None:
         from crypto_sensor_fabric.storage.projections import ProjectionCorruption
 
-        repo = ProjectionArtifactRepository(
-            tmp_path / "artifacts", projection_root=tmp_path / "t0"
-        )
+        repo, _t0 = self._wired_repo(tmp_path)
         with pytest.raises(ProjectionCorruption, match="resolve"):
             repo.commit(self._artifact(projection_uri="../../escape.parquet"))

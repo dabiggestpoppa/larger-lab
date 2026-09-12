@@ -416,6 +416,8 @@ class TestConcurrentWriters:
                 blob_store=s.store,
                 blob_metadata_repository=s.blob_repo,
                 acquisition_repository=s.acq_repo,
+                artifact_repository=s.artifacts,
+                context_repository=s.contexts,
             )
             from crypto_sensor_fabric.storage.models import ProjectionLineage
 

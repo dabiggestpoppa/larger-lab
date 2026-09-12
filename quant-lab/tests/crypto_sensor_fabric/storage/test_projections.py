@@ -101,10 +101,56 @@ def sample_rows() -> list[dict]:
 
 
 @pytest.fixture()
-def projection_artifact_repo(tmp_path: Path) -> ProjectionArtifactRepository:
-    """Fresh projection artifact repository."""
+def projection_artifact_repo(
+    tmp_path: Path,
+    projection_root: Path,
+    schema_registry: ProjectionSchemaRegistry,
+) -> ProjectionArtifactRepository:
+    """Sealed commit-capable artifact repository (I05R2 §5).
+
+    ``projection_root`` and ``schema_registry`` are mandatory: there is no
+    metadata-only persistence bypass.
+    """
     catalog_root = tmp_path / "catalogs" / "manifests" / "projections"
-    return ProjectionArtifactRepository(catalog_root)
+    return ProjectionArtifactRepository(
+        catalog_root,
+        projection_root=projection_root,
+        schema_registry=schema_registry,
+    )
+
+
+def _real_artifact(
+    projection_root: Path,
+    schema_registry: ProjectionSchemaRegistry,
+    schema_definition: ProjectionSchemaDefinition,
+    sample_rows: list[dict],
+    projection_id: str,
+):
+    """Write a REAL physical projection and return its verified artifact.
+
+    I05R2 §6: unit tests exercise the repository with physical truth,
+    never as an unverified metadata sink.
+    """
+    artifact, _path = write_projection(
+        root=projection_root,
+        schema_registry=schema_registry,
+        rows=sample_rows,
+        schema_definition=schema_definition,
+        projection_id=projection_id,
+        source_blob_sha256=["a" * 64],
+        acquisition_ids=[f"acq-{projection_id}"],
+        provider="kraken",
+        venue="futures",
+        sensor_family="market_data",
+        native_instrument="BTC-USDT",
+        native_granularity="1m",
+        parser_version="1.0.0",
+        partition_key="kraken/futures/BTC-USDT/2026-01-15",
+        logical_year=2026,
+        logical_month=1,
+        logical_day=15,
+    )
+    return artifact
 
 
 # ---------------------------------------------------------------------------
@@ -541,122 +587,138 @@ class TestMultiBlob:
 
 class TestProjectionArtifactRepository:
     def test_commit_and_get(
-        self, projection_artifact_repo: ProjectionArtifactRepository
+        self,
+        projection_artifact_repo: ProjectionArtifactRepository,
+        projection_root: Path,
+        schema_registry: ProjectionSchemaRegistry,
+        schema_definition: ProjectionSchemaDefinition,
+        sample_rows: list[dict],
     ) -> None:
-        from crypto_sensor_fabric.storage.models import RawProjectionArtifact
-
-        artifact = RawProjectionArtifact(
-            projection_id="proj-001",
-            source_blob_sha256=["a" * 64],
-            projection_schema_id="test.schema",
-            projection_schema_version="1.0.0",
-            parser_version="1.0.0",
-            row_count=10,
-            partition_key="kraken/futures/BTC-USDT/2026-01-15",
-            projection_uri="projections/provider=kraken/venue=futures/part-00000-abc.parquet",
-            projection_sha256="d" * 64,
+        artifact = _real_artifact(
+            projection_root,
+            schema_registry,
+            schema_definition,
+            sample_rows,
+            "proj-001",
         )
         committed = projection_artifact_repo.commit(artifact)
         assert committed.projection_id == "proj-001"
 
         retrieved = projection_artifact_repo.get("proj-001")
         assert retrieved is not None
-        assert retrieved.projection_sha256 == "d" * 64
+        assert retrieved.projection_sha256 == artifact.projection_sha256
 
     def test_idempotent_commit(
-        self, projection_artifact_repo: ProjectionArtifactRepository
+        self,
+        projection_artifact_repo: ProjectionArtifactRepository,
+        projection_root: Path,
+        schema_registry: ProjectionSchemaRegistry,
+        schema_definition: ProjectionSchemaDefinition,
+        sample_rows: list[dict],
     ) -> None:
-        from crypto_sensor_fabric.storage.models import RawProjectionArtifact
-
-        artifact = RawProjectionArtifact(
-            projection_id="proj-idem",
-            source_blob_sha256=["a" * 64],
-            projection_schema_id="test.schema",
-            projection_schema_version="1.0.0",
-            parser_version="1.0.0",
-            row_count=10,
-            partition_key="kraken/futures/BTC-USDT/2026-01-15",
-            projection_uri="projections/part-00000-abc.parquet",
-            projection_sha256="d" * 64,
+        artifact = _real_artifact(
+            projection_root,
+            schema_registry,
+            schema_definition,
+            sample_rows,
+            "proj-idem",
         )
         r1 = projection_artifact_repo.commit(artifact)
+        # I05R2 §8: the idempotent path RE-VERIFIES physical truth.
         r2 = projection_artifact_repo.commit(artifact)
         assert r1.projection_sha256 == r2.projection_sha256
 
     def test_conflict_different_bytes(
-        self, projection_artifact_repo: ProjectionArtifactRepository
+        self,
+        projection_artifact_repo: ProjectionArtifactRepository,
+        projection_root: Path,
+        schema_registry: ProjectionSchemaRegistry,
+        schema_definition: ProjectionSchemaDefinition,
+        sample_rows: list[dict],
     ) -> None:
-        from crypto_sensor_fabric.storage.models import RawProjectionArtifact
-
-        a1 = RawProjectionArtifact(
-            projection_id="proj-conflict",
-            source_blob_sha256=["a" * 64],
-            projection_schema_id="test.schema",
-            projection_schema_version="1.0.0",
-            parser_version="1.0.0",
-            row_count=10,
-            partition_key="kraken/futures/BTC-USDT/2026-01-15",
-            projection_uri="projections/part-00000-abc.parquet",
-            projection_sha256="d" * 64,
+        a1 = _real_artifact(
+            projection_root,
+            schema_registry,
+            schema_definition,
+            sample_rows,
+            "proj-conflict",
         )
         projection_artifact_repo.commit(a1)
 
-        a2 = RawProjectionArtifact(
-            projection_id="proj-conflict",
-            source_blob_sha256=["b" * 64],  # different
-            projection_schema_id="test.schema",
-            projection_schema_version="1.0.0",
-            parser_version="1.0.0",
-            row_count=10,
-            partition_key="kraken/futures/BTC-USDT/2026-01-15",
-            projection_uri="projections/part-00000-def.parquet",
-            projection_sha256="e" * 64,  # different
+        # Same projection_id, different immutable semantic content: the
+        # idempotence field comparison fires before physical verification.
+        a2 = a1.model_copy(
+            update={
+                "source_blob_sha256": ["b" * 64],
+                "projection_sha256": "e" * 64,
+            }
         )
         with pytest.raises(ProjectionIdentityConflict):
             projection_artifact_repo.commit(a2)
 
     def test_list_ids(
-        self, projection_artifact_repo: ProjectionArtifactRepository
+        self,
+        projection_artifact_repo: ProjectionArtifactRepository,
+        projection_root: Path,
+        schema_registry: ProjectionSchemaRegistry,
+        schema_definition: ProjectionSchemaDefinition,
+        sample_rows: list[dict],
     ) -> None:
-        from crypto_sensor_fabric.storage.models import RawProjectionArtifact
-
         for pid in ["proj-c", "proj-a", "proj-b"]:
             projection_artifact_repo.commit(
-                RawProjectionArtifact(
-                    projection_id=pid,
-                    source_blob_sha256=["a" * 64],
-                    projection_schema_id="test.schema",
-                    projection_schema_version="1.0.0",
-                    parser_version="1.0.0",
-                    row_count=1,
-                    partition_key="key",
-                    projection_uri="uri",
-                    projection_sha256="d" * 64,
+                _real_artifact(
+                    projection_root,
+                    schema_registry,
+                    schema_definition,
+                    sample_rows,
+                    pid,
                 )
             )
         ids = projection_artifact_repo.list_ids()
         assert ids == ["proj-a", "proj-b", "proj-c"]
 
-    def test_persist_and_reload(self, tmp_path: Path) -> None:
-        from crypto_sensor_fabric.storage.models import RawProjectionArtifact
-
+    def test_persist_and_reload(
+        self,
+        tmp_path: Path,
+        projection_root: Path,
+        schema_registry: ProjectionSchemaRegistry,
+        schema_definition: ProjectionSchemaDefinition,
+        sample_rows: list[dict],
+    ) -> None:
         catalog_root = tmp_path / "catalogs" / "manifests" / "projections"
-        repo1 = ProjectionArtifactRepository(catalog_root)
-        artifact = RawProjectionArtifact(
-            projection_id="proj-reload",
-            source_blob_sha256=["a" * 64],
-            projection_schema_id="test.schema",
-            projection_schema_version="1.0.0",
-            parser_version="1.0.0",
-            row_count=5,
-            partition_key="key",
-            projection_uri="uri",
-            projection_sha256="d" * 64,
+        repo1 = ProjectionArtifactRepository(
+            catalog_root,
+            projection_root=projection_root,
+            schema_registry=schema_registry,
+        )
+        artifact = _real_artifact(
+            projection_root,
+            schema_registry,
+            schema_definition,
+            sample_rows,
+            "proj-reload",
         )
         repo1.commit(artifact)
 
-        # Reload from disk
-        repo2 = ProjectionArtifactRepository(catalog_root)
+        # Reload from disk (same mandatory sealed constructor).
+        repo2 = ProjectionArtifactRepository(
+            catalog_root,
+            projection_root=projection_root,
+            schema_registry=schema_registry,
+        )
         retrieved = repo2.get("proj-reload")
         assert retrieved is not None
-        assert retrieved.row_count == 5
+        assert retrieved.row_count == artifact.row_count
+
+    def test_constructor_requires_projection_root(self, tmp_path: Path) -> None:
+        """I05R2 §31A: no commit-capable repository without projection_root."""
+        with pytest.raises(TypeError):
+            ProjectionArtifactRepository(tmp_path / "artifacts")  # type: ignore[call-arg]
+
+    def test_constructor_requires_schema_registry(self, tmp_path: Path) -> None:
+        """I05R2 §31B: no commit-capable repository without schema_registry."""
+        with pytest.raises(TypeError):
+            ProjectionArtifactRepository(  # type: ignore[call-arg]
+                tmp_path / "artifacts",
+                projection_root=tmp_path / "t0",
+            )

@@ -1,22 +1,27 @@
-"""SENSOR-B4-I05C — projection lineage repository and validation tests.
+"""SENSOR-B4-I05C/I05R1C/I05R2A — projection lineage repository tests.
 
 Covers:
   - single-source lineage exact
   - multi-source lineage complete
   - wrong blob/acquisition pair rejected
   - failed acquisition rejected as projection source
-  - wrong-provider acquisition rejected
+  - wrong-provider acquisition rejected (I05R2 §14: in the commit path)
   - source_order duplicates rejected
   - source_order gaps rejected
   - artifact/lineage mismatch rejected
   - no lineage entries rejected
   - lineage manifest persistence round trip
   - idempotent commit
+I05R2 additions (§31D-§31G):
+  - commit without artifact repository → construction fails
+  - commit without context repository → construction fails
+  - lineage for nonexistent projection → fail before persistence
+  - lineage for projection with no context → fail before persistence
 """
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -35,8 +40,11 @@ from crypto_sensor_fabric.storage.models import (
 from crypto_sensor_fabric.storage.enums import StorageEncoding
 from crypto_sensor_fabric.storage.projection_lineage import (
     ArtifactLineageMismatch,
+    LineageConfigurationError,
     NoLineageEntries,
     NoUsableProjectionSource,
+    ProjectionArtifactMissing,
+    ProjectionContextMissing,
     ProjectionLineageConflict,
     ProjectionLineageRepository,
     SourceOrderConflict,
@@ -44,6 +52,16 @@ from crypto_sensor_fabric.storage.projection_lineage import (
     validate_lineage_completeness,
     validate_lineage_source,
     validate_source_order,
+)
+from crypto_sensor_fabric.storage.projection_schema import (
+    ProjectionSchemaDefinition,
+    ProjectionSchemaRegistry,
+)
+from crypto_sensor_fabric.storage.projections import (
+    ProjectionArtifactRepository,
+    ProjectionCatalogRecord,
+    ProjectionContextRepository,
+    write_projection,
 )
 
 
@@ -119,11 +137,6 @@ SHA_B = "b" * 64
 SHA_C = "c" * 64
 
 
-@pytest.fixture()
-def lineage_repo(tmp_path: Path) -> ProjectionLineageRepository:
-    return ProjectionLineageRepository(tmp_path / "lineage")
-
-
 # ---------------------------------------------------------------------------
 # Real T0A stack for repository-level commit gates (I05R1 §11/§12/§48)
 # ---------------------------------------------------------------------------
@@ -165,21 +178,29 @@ def _real_acq(
     )
 
 
-def _wired_repo(tmp_path: Path):
-    """Lineage repository wired to REAL durable T0A repositories."""
+def _wired_repo(tmp_path: Path, *, without: str | None = None):
+    """Lineage repository wired to REAL durable T0A repositories.
+
+    ``without`` optionally omits one mandatory dependency to prove the
+    I05R2 §10 construction-time failure.
+    """
     root = tmp_path / "t0a"
-    root.mkdir()
+    root.mkdir(exist_ok=True)
     store = _make_store(root)
     blob_repo = BlobMetadataRepository(root, blob_store=store)
     acq_repo = AcquisitionRepository(
         root, blob_store=store, blob_metadata_repository=blob_repo
     )
-    lineage = ProjectionLineageRepository(
-        tmp_path / "lineage",
+    kwargs: dict = dict(
         blob_store=store,
         blob_metadata_repository=blob_repo,
         acquisition_repository=acq_repo,
+        artifact_repository=object(),
+        context_repository=object(),
     )
+    if without is not None:
+        del kwargs[without]
+    lineage = ProjectionLineageRepository(tmp_path / "lineage", **kwargs)
     return store, blob_repo, acq_repo, lineage
 
 
@@ -252,7 +273,7 @@ class TestLineageCompleteness:
 
 
 # ---------------------------------------------------------------------------
-# Lineage source validation
+# Lineage source validation (unit-test helper)
 # ---------------------------------------------------------------------------
 
 
@@ -339,101 +360,346 @@ class TestLineageSource:
 # ---------------------------------------------------------------------------
 # Repository round trip — repository-level commits need REAL T0A truth
 # (I05R1 §11/§12): durable blob metadata, physically verified bytes, and
-# usable acquisitions.
+# usable acquisitions.  I05R2: commits additionally require the committed
+# artifact + context for the projection (§11/§12).
 # ---------------------------------------------------------------------------
+
+
+NATIVE = None  # set in SealedStack (needs pyarrow import lazily)
+
+
+class SealedStack:
+    """Real T0A + committed artifact + context on short roots (Windows)."""
+
+    def __init__(self, tmp_path: Path) -> None:
+        import shutil
+
+        import pyarrow as pa
+
+        self.tmp = tmp_path
+        self.t0b = Path("C:/tmp_r2a_lin")
+        if self.t0b.exists():
+            shutil.rmtree(self.t0b)
+        self.t0b.mkdir(parents=True)
+
+        self.t0a = tmp_path / "t0a"
+        self.t0a.mkdir(exist_ok=True)
+        self.store = _make_store(self.t0a)
+        self.blob_repo = BlobMetadataRepository(self.t0a, blob_store=self.store)
+        self.acq_repo = AcquisitionRepository(
+            self.t0a, blob_store=self.store, blob_metadata_repository=self.blob_repo
+        )
+
+        self.schemas = ProjectionSchemaRegistry(
+            self.t0b / "catalogs" / "projection_schemas"
+        )
+        self.definition = ProjectionSchemaDefinition(
+            projection_schema_id="r2a.market.projection",
+            projection_schema_version="1.0.0",
+            provider_native_schema=pa.schema(
+                [
+                    pa.field("price", pa.float64(), nullable=False),
+                    pa.field("qty", pa.int64(), nullable=True),
+                    pa.field("symbol", pa.string(), nullable=False),
+                ]
+            ),
+        )
+        self.schemas.register(self.definition)
+
+        self.artifacts = ProjectionArtifactRepository(
+            self.t0b / "catalogs" / "manifests" / "projections",
+            projection_root=self.t0b,
+            schema_registry=self.schemas,
+        )
+        self.contexts = ProjectionContextRepository(
+            self.t0b / "catalogs" / "manifests" / "projection_context"
+        )
+
+    def close(self) -> None:
+        import shutil
+
+        if self.t0b.exists():
+            shutil.rmtree(self.t0b)
+
+    def seed_source(self, data: bytes, acq_id: str) -> str:
+        sha = _real_blob(self.store, self.blob_repo, data)
+        self.acq_repo.append_acquisition(_real_acq(sha, acq_id))
+        return sha
+
+    def commit_projection(
+        self,
+        projection_id: str,
+        pairs: list[tuple[str, str]],
+        rows: list[dict] | None = None,
+    ):
+        """Write the physical projection, commit artifact + context."""
+        from datetime import UTC
+
+        sources = [sha for sha, _acq_id in pairs]
+        acq_ids = [acq_id for _sha, acq_id in pairs]
+        if rows is None:
+            rows = [{"price": 1.0, "qty": 1, "symbol": "BTC-USDT"}]
+        artifact, _path = write_projection(
+            root=self.t0b,
+            rows=rows,
+            schema_definition=self.definition,
+            schema_registry=self.schemas,
+            projection_id=projection_id,
+            source_blob_sha256=sources,
+            acquisition_ids=acq_ids,
+            provider="kraken",
+            venue="futures",
+            sensor_family="MECHANICAL_TRADE",
+            native_instrument="BTC-USDT",
+            native_granularity="1m",
+            parser_version="1.0.0",
+            partition_key="kraken/futures/BTC-USDT/2026-01-15",
+            logical_year=2026,
+            logical_month=1,
+            logical_day=15,
+        )
+        self.artifacts.commit(artifact)
+        self.contexts.commit(
+            ProjectionCatalogRecord(
+                projection_id=projection_id,
+                provider="kraken",
+                venue="futures",
+                sensor_family="MECHANICAL_TRADE",
+                native_instrument="BTC-USDT",
+                source_granularity="1m",
+                partition_key="kraken/futures/BTC-USDT/2026-01-15",
+                logical_date_start=datetime(2026, 1, 15, tzinfo=UTC),
+                logical_date_end=datetime(2026, 1, 15, 23, 59, 59, tzinfo=UTC),
+                projection_schema_id=self.definition.projection_schema_id,
+                projection_schema_version=self.definition.projection_schema_version,
+                schema_key=self.definition.schema_key,
+                schema_fingerprint=self.definition.schema_fingerprint,
+                parser_version="1.0.0",
+                projection_uri=artifact.projection_uri,
+                projection_sha256=artifact.projection_sha256,
+                row_count=artifact.row_count,
+                min_provider_time=None,
+                max_provider_time=None,
+                lineage_manifest_id=f"lm-{projection_id}",
+                quality_flags=[],
+                created_at=datetime(2026, 1, 15, tzinfo=UTC),
+            )
+        )
+        return artifact
+
+    def lineage_repo(self) -> ProjectionLineageRepository:
+        return ProjectionLineageRepository(
+            self.t0b / "catalogs" / "manifests" / "projection_lineage",
+            blob_store=self.store,
+            blob_metadata_repository=self.blob_repo,
+            acquisition_repository=self.acq_repo,
+            artifact_repository=self.artifacts,
+            context_repository=self.contexts,
+        )
 
 
 class TestLineageRepository:
     def test_commit_and_get(self, tmp_path: Path) -> None:
-        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
-        sha = _real_blob(store, blob_repo, b'{"rows": [1, 2, 3]}')
-        acq_repo.append_acquisition(_real_acq(sha, "acq-1"))
-        entries = [_lineage("lm-001", "proj-001", sha, "acq-1", 0)]
-        committed = lineage.commit("lm-001", entries)
-        assert len(committed) == 1
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [1, 2, 3]}', "acq-1")
+            s.commit_projection("proj-001", [(sha, "acq-1")])
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-001", "proj-001", sha, "acq-1", 0)]
+            committed = lineage.commit("lm-001", entries)
+            assert len(committed) == 1
 
-        retrieved = lineage.get("lm-001")
-        assert retrieved is not None
-        assert retrieved[0].source_blob_sha256 == sha
+            retrieved = lineage.get("lm-001")
+            assert retrieved is not None
+            assert retrieved[0].source_blob_sha256 == sha
+        finally:
+            s.close()
 
     def test_idempotent(self, tmp_path: Path) -> None:
-        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
-        sha = _real_blob(store, blob_repo, b'{"rows": [1]}')
-        acq_repo.append_acquisition(_real_acq(sha, "acq-2"))
-        entries = [_lineage("lm-002", "proj-002", sha, "acq-2", 0)]
-        r1 = lineage.commit("lm-002", entries)
-        r2 = lineage.commit("lm-002", entries)
-        assert r1[0].source_blob_sha256 == r2[0].source_blob_sha256
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [1]}', "acq-2")
+            s.commit_projection("proj-002", [(sha, "acq-2")])
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-002", "proj-002", sha, "acq-2", 0)]
+            r1 = lineage.commit("lm-002", entries)
+            r2 = lineage.commit("lm-002", entries)
+            assert r1[0].source_blob_sha256 == r2[0].source_blob_sha256
+        finally:
+            s.close()
 
-    def test_conflict_different_content(
-        self, tmp_path: Path
-    ) -> None:
-        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
-        sha = _real_blob(store, blob_repo, b'{"rows": [2]}')
-        acq_repo.append_acquisition(_real_acq(sha, "acq-a"))
-        entries_a = [_lineage("lm-003", "proj-003", sha, "acq-a", 0)]
-        lineage.commit("lm-003", entries_a)
+    def test_conflict_different_content(self, tmp_path: Path) -> None:
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [2]}', "acq-a")
+            s.commit_projection("proj-003", [(sha, "acq-a")])
+            lineage = s.lineage_repo()
+            entries_a = [_lineage("lm-003", "proj-003", sha, "acq-a", 0)]
+            lineage.commit("lm-003", entries_a)
 
-        # Same lmid, different acquisition id (sha has no other durable
-        # acquisition, so this content genuinely differs).
-        entries_b = [_lineage("lm-003", "proj-003", sha, "acq-other", 0)]
-        with pytest.raises(ProjectionLineageConflict):
-            lineage.commit("lm-003", entries_b)
+            # Same lmid, different acquisition id (sha has no other durable
+            # acquisition, so this content genuinely differs).
+            entries_b = [_lineage("lm-003", "proj-003", sha, "acq-other", 0)]
+            with pytest.raises(ProjectionLineageConflict):
+                lineage.commit("lm-003", entries_b)
+        finally:
+            s.close()
 
-    def test_empty_rejected(self, lineage_repo: ProjectionLineageRepository) -> None:
-        with pytest.raises(NoLineageEntries):
-            lineage_repo.commit("lm-empty", [])
+    def test_empty_rejected(self, tmp_path: Path) -> None:
+        s = SealedStack(tmp_path)
+        try:
+            lineage = s.lineage_repo()
+            with pytest.raises(NoLineageEntries):
+                lineage.commit("lm-empty", [])
+        finally:
+            s.close()
 
     def test_get_by_projection(self, tmp_path: Path) -> None:
-        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
-        sha_a = _real_blob(store, blob_repo, b'{"rows": [3]}')
-        sha_b = _real_blob(store, blob_repo, b'{"rows": [4]}')
-        acq_repo.append_acquisition(_real_acq(sha_a, "acq-a"))
-        acq_repo.append_acquisition(_real_acq(sha_b, "acq-b"))
-        entries = [
-            _lineage("lm-004", "proj-004", sha_a, "acq-a", 0),
-            _lineage("lm-004", "proj-004", sha_b, "acq-b", 1),
-        ]
-        lineage.commit("lm-004", entries)
-        result = lineage.get_by_projection("proj-004")
-        assert len(result) == 2
-        assert result[0].source_order == 0
-        assert result[1].source_order == 1
+        s = SealedStack(tmp_path)
+        try:
+            sha_a = s.seed_source(b'{"rows": [3]}', "acq-a")
+            sha_b = s.seed_source(b'{"rows": [4]}', "acq-b")
+            s.commit_projection("proj-004", [(sha_a, "acq-a"), (sha_b, "acq-b")])
+            lineage = s.lineage_repo()
+            entries = [
+                _lineage("lm-004", "proj-004", sha_a, "acq-a", 0),
+                _lineage("lm-004", "proj-004", sha_b, "acq-b", 1),
+            ]
+            lineage.commit("lm-004", entries)
+            result = lineage.get_by_projection("proj-004")
+            assert len(result) == 2
+            assert result[0].source_order == 0
+            assert result[1].source_order == 1
+        finally:
+            s.close()
 
     def test_list_manifest_ids(self, tmp_path: Path) -> None:
-        store, blob_repo, acq_repo, lineage = _wired_repo(tmp_path)
-        for i, lmid in enumerate(["lm-c", "lm-a", "lm-b"]):
-            sha = _real_blob(store, blob_repo, f'{{"rows": [{i}]}}'.encode())
-            acq_id = f"acq-{lmid}"
-            acq_repo.append_acquisition(_real_acq(sha, acq_id))
-            lineage.commit(
-                lmid,
-                [_lineage(lmid, f"p-{lmid}", sha, acq_id, 0)],
-            )
-        ids = lineage.list_manifest_ids()
-        assert ids == ["lm-a", "lm-b", "lm-c"]
+        s = SealedStack(tmp_path)
+        try:
+            for i, lmid in enumerate(["lm-c", "lm-a", "lm-b"]):
+                sha = s.seed_source(f'{{"rows": [{i}]}}'.encode(), f"acq-{lmid}")
+                pid = f"p-{lmid}"
+                s.commit_projection(pid, [(sha, f"acq-{lmid}")])
+                lineage = s.lineage_repo()
+                lineage.commit(lmid, [_lineage(lmid, pid, sha, f"acq-{lmid}", 0)])
+            ids = s.lineage_repo().list_manifest_ids()
+            assert ids == ["lm-a", "lm-b", "lm-c"]
+        finally:
+            s.close()
 
     def test_persist_and_reload(self, tmp_path: Path) -> None:
-        store, blob_repo, acq_repo, _ = _wired_repo(tmp_path)
-        sha = _real_blob(store, blob_repo, b'{"rows": [9]}')
-        acq_repo.append_acquisition(_real_acq(sha, "acq-r"))
-        root = tmp_path / "lineage"
-        repo1 = ProjectionLineageRepository(
-            root,
-            blob_store=store,
-            blob_metadata_repository=blob_repo,
-            acquisition_repository=acq_repo,
-        )
-        entries = [_lineage("lm-reload", "proj-reload", sha, "acq-r", 0)]
-        repo1.commit("lm-reload", entries)
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [9]}', "acq-r")
+            s.commit_projection("proj-reload", [(sha, "acq-r")])
+            repo1 = s.lineage_repo()
+            entries = [_lineage("lm-reload", "proj-reload", sha, "acq-r", 0)]
+            repo1.commit("lm-reload", entries)
 
-        # Reload wired to the SAME T0A truth (durable repos, no in-memory state).
-        repo2 = ProjectionLineageRepository(
-            root,
-            blob_store=store,
-            blob_metadata_repository=blob_repo,
-            acquisition_repository=acq_repo,
-        )
-        retrieved = repo2.get("lm-reload")
-        assert retrieved is not None
-        assert retrieved[0].source_blob_sha256 == sha
+            # Reload wired to the SAME durable truth (no in-memory state).
+            repo2 = s.lineage_repo()
+            retrieved = repo2.get("lm-reload")
+            assert retrieved is not None
+            assert retrieved[0].source_blob_sha256 == sha
+        finally:
+            s.close()
+
+
+# ---------------------------------------------------------------------------
+# I05R2 §9-§12 — mandatory dependencies + existence gates
+# ---------------------------------------------------------------------------
+
+
+class TestSealedLineageConstructor:
+    def test_commit_without_artifact_repository_fails(self, tmp_path: Path) -> None:
+        """I05R2 §31D: no lineage publication without artifact repository."""
+        with pytest.raises(LineageConfigurationError, match="artifact_repository"):
+            _wired_repo(tmp_path, without="artifact_repository")
+
+    def test_commit_without_context_repository_fails(self, tmp_path: Path) -> None:
+        """I05R2 §31E: no lineage publication without context repository."""
+        with pytest.raises(LineageConfigurationError, match="context_repository"):
+            _wired_repo(tmp_path, without="context_repository")
+
+    def test_commit_without_blob_store_fails(self, tmp_path: Path) -> None:
+        with pytest.raises(LineageConfigurationError, match="blob_store"):
+            _wired_repo(tmp_path, without="blob_store")
+
+    def test_commit_without_blob_metadata_fails(self, tmp_path: Path) -> None:
+        with pytest.raises(LineageConfigurationError, match="blob_metadata"):
+            _wired_repo(tmp_path, without="blob_metadata_repository")
+
+    def test_commit_without_acquisitions_fails(self, tmp_path: Path) -> None:
+        with pytest.raises(LineageConfigurationError, match="acquisition"):
+            _wired_repo(tmp_path, without="acquisition_repository")
+
+    def test_lineage_for_nonexistent_projection_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """I05R2 §31F: lineage for a projection with no committed artifact."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [5]}', "acq-x")
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-noart", "proj-ghost", sha, "acq-x", 0)]
+            with pytest.raises(ProjectionArtifactMissing, match="no committed"):
+                lineage.commit("lm-noart", entries)
+            # Nothing was durably published.
+            assert not lineage.has("lm-noart")
+        finally:
+            s.close()
+
+    def test_lineage_for_projection_without_context_fails(
+        self, tmp_path: Path
+    ) -> None:
+        """I05R2 §31G: artifact present but no committed context."""
+        s = SealedStack(tmp_path)
+        try:
+            sha = s.seed_source(b'{"rows": [6]}', "acq-y")
+            # Commit ONLY the artifact (no context record).
+            sources = [sha]
+            artifact, _path = write_projection(
+                root=s.t0b,
+                rows=[{"price": 1.0, "qty": 1, "symbol": "BTC-USDT"}],
+                schema_definition=s.definition,
+                schema_registry=s.schemas,
+                projection_id="proj-noctx",
+                source_blob_sha256=sources,
+                acquisition_ids=["acq-y"],
+                provider="kraken",
+                venue="futures",
+                sensor_family="MECHANICAL_TRADE",
+                native_instrument="BTC-USDT",
+                native_granularity="1m",
+                parser_version="1.0.0",
+                partition_key="kraken/futures/BTC-USDT/2026-01-15",
+                logical_year=2026,
+                logical_month=1,
+                logical_day=15,
+            )
+            s.artifacts.commit(artifact)
+            lineage = s.lineage_repo()
+            entries = [_lineage("lm-noctx", "proj-noctx", sha, "acq-y", 0)]
+            with pytest.raises(ProjectionContextMissing, match="no committed"):
+                lineage.commit("lm-noctx", entries)
+            assert not lineage.has("lm-noctx")
+        finally:
+            s.close()
+
+    def test_artifact_source_list_always_checked(self, tmp_path: Path) -> None:
+        """I05R2 §13: artifact agreement is unconditional — no optional branch."""
+        s = SealedStack(tmp_path)
+        try:
+            sha_a = s.seed_source(b'{"rows": [7]}', "acq-a2")
+            sha_b = s.seed_source(b'{"rows": [8]}', "acq-b2")
+            s.commit_projection("proj-005", [(sha_a, "acq-a2"), (sha_b, "acq-b2")])
+            lineage = s.lineage_repo()
+            # Lineage order disagrees with the artifact's ordered sources.
+            entries = [
+                _lineage("lm-005", "proj-005", sha_b, "acq-b2", 0),
+                _lineage("lm-005", "proj-005", sha_a, "acq-a2", 1),
+            ]
+            with pytest.raises(ArtifactLineageMismatch):
+                lineage.commit("lm-005", entries)
+        finally:
+            s.close()

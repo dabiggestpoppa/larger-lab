@@ -804,32 +804,39 @@ class ProjectionArtifactRepository:
     shared ``DurableJsonCatalog`` primitive: hashed physical keys, staged
     fsync'd writes, no-clobber publish, corruption fail-closed.
 
-    Commit gates (I05R1 §21-§23):
+    I05R2 §4-§7: a commit-capable repository has NO verification bypass.
+    ``projection_root`` and ``schema_registry`` are MANDATORY constructor
+    dependencies; the historical ``verify_physical=False`` metadata-only
+    persistence path is removed.  Unit tests that only need artifact
+    metadata use ``RawProjectionArtifact`` directly — never this writer as
+    an unverified metadata sink.
+
+    Commit gates (I05R1 §21-§23 + I05R2 §7):
 
     - the physical projection_uri must resolve safely beneath root;
     - the file must exist and its exact SHA-256 must equal
       ``projection_sha256``;
-    - the Parquet must open; ``row_count`` must agree; the registered schema
-      (by schema_id/version) must agree; every required ``_t0_*`` column
-      must be present with the canonical type;
+    - the Parquet must open; ``row_count`` must agree;
+    - the physical schema must EXACTLY equal the registered
+      ``provider_native_schema`` + ``T0_METADATA_SCHEMA`` (I05R2 §15-§17:
+      field order, names, Arrow types, nullability, nested structure —
+      a name-only proof is not a schema proof);
     - ``state=VALID`` is accepted only after that physical + schema proof;
-    - idempotence compares ALL immutable semantic fields.
+    - idempotence compares ALL immutable semantic fields and RE-VERIFIES
+      the physical truth for VALID artifacts on every idempotent commit
+      (I05R2 §8 — no success claimed from stale cache).
     """
 
     def __init__(
         self,
         catalog_root: Path,
         *,
-        projection_root: Path | None = None,
-        schema_registry: ProjectionSchemaRegistry | None = None,
-        verify_physical: bool = True,
+        projection_root: Path,
+        schema_registry: ProjectionSchemaRegistry,
     ) -> None:
         self._root = Path(catalog_root)
-        self._projection_root = (
-            Path(projection_root) if projection_root is not None else None
-        )
+        self._projection_root = Path(projection_root)
         self._schema_registry = schema_registry
-        self._verify_physical = verify_physical
         try:
             self._catalog = DurableJsonCatalog(
                 self._root, logical_id_field="projection_id"
@@ -864,8 +871,12 @@ class ProjectionArtifactRepository:
     # -- physical verification (§22) ------------------------------------------
 
     def _verify_physical_projection(self, artifact: RawProjectionArtifact) -> None:
-        if self._projection_root is None or not self._verify_physical:
-            return  # tests may run metadata-only; production wires the root
+        """Prove the stored physical T0B bytes (I05R1 §22 + I05R2 §15-§17).
+
+        No bypass: the caller-supplied schema is not authority — the
+        REGISTERED schema (by id/version) plus the canonical T0 metadata
+        schema must EXACTLY equal the physical Parquet schema.
+        """
         if artifact.state.name != "VALID":
             return  # only VALID claims require physical proof
         from .checksums import validate_sha256_hex
@@ -895,52 +906,55 @@ class ProjectionArtifactRepository:
                 f"physical projection SHA {actual} != committed "
                 f"{artifact.projection_sha256}"
             )
-        table = pq.read_table(str(path))
+        # Read the FILE's own Arrow schema via ParquetFile: pq.read_table()
+        # performs dataset discovery and would append Hive partition columns
+        # (provider=/venue=/...) inferred from the physical directory layout,
+        # which are NOT part of the stored schema contract.
+        table = pq.ParquetFile(str(path)).read()
         if table.num_rows != artifact.row_count:
             raise ProjectionCorruption(
                 f"physical row count {table.num_rows} != committed "
                 f"{artifact.row_count}"
             )
-        # Required T0 metadata columns with canonical types (§22).
-        for field in T0_METADATA_SCHEMA:
-            if field.name not in table.schema.names:
-                raise ProjectionCorruption(
-                    f"physical projection missing required T0 column "
-                    f"{field.name!r}"
-                )
-            if table.schema.field(field.name).type != field.type:
-                raise ProjectionCorruption(
-                    f"physical T0 column {field.name!r} has type "
-                    f"{table.schema.field(field.name).type}, expected "
-                    f"{field.type}"
-                )
-        # Registered schema agreement (§22), when a registry is wired.
-        if self._schema_registry is not None:
-            try:
-                registered = self._schema_registry.resolve_by_id(
-                    artifact.projection_schema_id,
-                    artifact.projection_schema_version,
-                )
-            except Exception as exc:
-                raise ProjectionCorruption(
-                    "artifact references an unregistered projection schema: "
-                    f"{artifact.projection_schema_id!r} @ "
-                    f"{artifact.projection_schema_version!r}"
-                ) from exc
-            native_field_names = {
-                f.name for f in registered.provider_native_schema
-            }
-            for name in native_field_names:
-                if name not in table.schema.names:
-                    raise ProjectionCorruption(
-                        f"physical projection missing registered native "
-                        f"field {name!r}"
-                    )
+        # Registered schema agreement — MANDATORY (I05R2 §15-§17): the
+        # physical schema must EXACTLY equal registered provider-native
+        # schema + T0_METADATA_SCHEMA.  Exact structural equality covers
+        # field order, names, Arrow types (incl. nested children, decimal
+        # precision/scale, timestamp units/timezones) and nullability —
+        # it subsumes the per-column T0 type and native-name checks of
+        # I05R1 with a single authoritative proof.
+        try:
+            registered = self._schema_registry.resolve_by_id(
+                artifact.projection_schema_id,
+                artifact.projection_schema_version,
+            )
+        except Exception as exc:
+            raise ProjectionCorruption(
+                "artifact references an unregistered projection schema: "
+                f"{artifact.projection_schema_id!r} @ "
+                f"{artifact.projection_schema_version!r}"
+            ) from exc
+        expected_full_schema = pa.schema(
+            list(registered.provider_native_schema) + list(T0_METADATA_SCHEMA)
+        )
+        if not table.schema.equals(expected_full_schema, check_metadata=False):
+            raise ProjectionCorruption(
+                "physical projection schema does not EXACTLY equal the "
+                f"registered schema {artifact.projection_schema_id!r} @ "
+                f"{artifact.projection_schema_version!r}: expected "
+                f"{expected_full_schema}, got {table.schema}"
+            )
 
     # -- commit ---------------------------------------------------------------
 
     def commit(self, artifact: RawProjectionArtifact) -> RawProjectionArtifact:
-        """Commit one immutable artifact record (idempotent or conflict)."""
+        """Commit one immutable artifact record (idempotent or conflict).
+
+        I05R2 §8: idempotent reuse is NEVER claimed from stale cache —
+        after the immutable-field comparison, a VALID artifact re-runs the
+        full physical verification so corruption since startup fails
+        instead of silently succeeding.
+        """
         pid = artifact.projection_id
         if pid in self._cache:
             existing = self._cache[pid]
@@ -948,6 +962,9 @@ class ProjectionArtifactRepository:
             for field in _ARTIFACT_IDEMPOTENCE_FIELDS:
                 if getattr(existing, field) != getattr(artifact, field):
                     raise ProjectionIdentityConflict(pid)
+            # I05R2 §8: re-verify physical truth NOW (the writer validated
+            # it once; that history is not a current integrity proof).
+            self._verify_physical_projection(existing)
             return existing
 
         # Physical verification BEFORE first commit (§22) — VALID is earned.
@@ -1084,6 +1101,36 @@ class T0BProjectionService:
         lineage_repository: Any,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
+        # I05R2 §29: the service only accepts SEALED, commit-capable
+        # repositories.  A non-verifying artifact writer or a lineage
+        # repository without its mandatory proof dependencies cannot be
+        # constructed since I05R2; assert the invariant explicitly so a
+        # partial future regression fails immediately at construction.
+        if getattr(artifact_repository, "_projection_root", None) is None:
+            raise ProjectionPreconditionError(
+                "T0BProjectionService requires a sealed "
+                "ProjectionArtifactRepository with a mandatory "
+                "projection_root"
+            )
+        if getattr(artifact_repository, "_schema_registry", None) is None:
+            raise ProjectionPreconditionError(
+                "T0BProjectionService requires a sealed "
+                "ProjectionArtifactRepository with a mandatory "
+                "schema_registry"
+            )
+        for dep in (
+            "_blob_store",
+            "_blob_metadata_repository",
+            "_acquisitions",
+            "_artifact_repository",
+            "_context_repository",
+        ):
+            if getattr(lineage_repository, dep, None) is None:
+                raise ProjectionPreconditionError(
+                    "T0BProjectionService requires a sealed "
+                    "ProjectionLineageRepository with ALL mandatory "
+                    f"dependencies (missing: {dep})"
+                )
         self._root = Path(root)
         self._blob_store = blob_store
         self._blob_metadata_repository = blob_metadata_repository

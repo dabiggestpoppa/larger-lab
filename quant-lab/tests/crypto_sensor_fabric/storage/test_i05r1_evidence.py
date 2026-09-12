@@ -44,10 +44,11 @@ from crypto_sensor_fabric.storage.projections import (
 )
 
 FIXED = datetime(2026, 9, 6, 12, 0, 0, tzinfo=UTC)
-EVIDENCE_DIR = (
-    Path(__file__).parent.parent.parent.parent
-    / "research" / "crypto_foundry" / "sensor_fabric" / "evidence" / "bloc_04"
-)
+# SENSOR-B4-I05R2 (§2): the committed I05R1 matrices are FROZEN historical
+# evidence.  This generator now writes to a throwaway directory so running
+# the suite can never mutate the committed I05R1 artifacts; the stability
+# assertions below remain meaningful (generate twice, assert byte-equal).
+EVIDENCE_DIR = Path("C:/tmp_i05r1_evidence_regenerate")
 
 NATIVE = pa.schema(
     [
@@ -529,16 +530,23 @@ def _end_to_end_matrix(tmp_path: Path) -> dict:
         sha = s.seed(b'{"e": 9}', "acq-e9")
         from crypto_sensor_fabric.storage.models import ProjectionLineage
 
-        s.lineage.commit(
-            "lm-orphan",
-            [ProjectionLineage(
-                lineage_manifest_id="lm-orphan",
-                projection_id="proj-orphan",
-                source_blob_sha256=sha,
-                source_acquisition_id="acq-e9",
-                source_order=0,
-            )],
-        )
+        # I05R2 §11: the lineage repository now REFUSES orphan lineage at
+        # commit time (typed ProjectionArtifactMissing).  The resolver-level
+        # cases below remain valid: a manifest referencing a projection with
+        # no committed artifact/lineage fails closed at the resolver.
+        try:
+            s.lineage.commit(
+                "lm-orphan",
+                [ProjectionLineage(
+                    lineage_manifest_id="lm-orphan",
+                    projection_id="proj-orphan",
+                    source_blob_sha256=sha,
+                    source_acquisition_id="acq-e9",
+                    source_order=0,
+                )],
+            )
+        except Exception:  # noqa: BLE001 — expected under the I05R2 seal
+            pass
         resolver = ProjectionLineageResolver(
             root=s.ROOT, artifacts=s.artifacts, contexts=s.contexts,
             lineage=s.lineage, schemas=s.schemas,
