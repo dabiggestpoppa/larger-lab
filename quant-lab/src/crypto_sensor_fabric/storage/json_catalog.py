@@ -343,17 +343,20 @@ class DurableJsonCatalog:
         try:
             if self._ops is not None:
                 self._ops.record(CATALOG_OP_STAGE_WRITE)
+            # I05R2 §26/§27: open staged file -> write canonical bytes ->
+            # flush userspace buffers -> close.  NO fsync happens inside the
+            # open-file block, so the named AFTER_WRITE_BEFORE_FSYNC fault
+            # point genuinely precedes ALL file durability fsyncs.
             with open(staged, "wb") as fh:
                 fh.write(canonical)
                 fh.flush()
-                os.fsync(fh.fileno())
 
             if self._fault_hooks is not None:
                 self._fault_hooks.raise_if(CatalogFaultPoint.AFTER_WRITE_BEFORE_FSYNC)
 
             if self._ops is not None:
                 self._ops.record(CATALOG_OP_FILE_FSYNC)
-            fsync_file(staged)  # post-close re-sync of the staged artifact
+            fsync_file(staged)  # the ONE file-fsync of the staged artifact
 
             if self._fault_hooks is not None:
                 self._fault_hooks.raise_if(CatalogFaultPoint.AFTER_FSYNC_BEFORE_VERIFY)

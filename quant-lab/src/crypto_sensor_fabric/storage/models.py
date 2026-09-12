@@ -411,6 +411,24 @@ class PartitionManifest(StorageModelBase):
         return self
 
     @model_validator(mode="after")
+    def _validate_projection_refs_unique(self) -> PartitionManifest:
+        """Projection refs must be unique (I05R2 §23/§24).
+
+        A repeated projection id would let one resolver failure masquerade
+        as multiple projection dependencies; repeated invocation of the
+        same ref is not multiple provenance.  No silent dedupe.
+        """
+        seen: set[str] = set()
+        for ref in self.projection_refs:
+            if ref in seen:
+                raise ValueError(
+                    f"projection_refs contains duplicate projection id "
+                    f"{ref!r}"
+                )
+            seen.add(ref)
+        return self
+
+    @model_validator(mode="after")
     def _validate_time_order(self) -> PartitionManifest:
         if (
             self.min_time is not None
