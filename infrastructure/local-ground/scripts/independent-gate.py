@@ -90,23 +90,43 @@ def _ops_index(ev):
     return True, idx, ""
 
 
-def _validated_subprocess_path(path: str) -> str:
-    """Canonicalize a filesystem path and refuse symlink escape (S1091).
+def _validated_subprocess_path(path: str, root: str) -> str:
+    """Enforce REAL containment of *path* inside approved *root*
+    (B4-CXR7U9R7; replaces the former realpath-only check, S1091).
 
-    CLI-supplied paths are data, not authority: the subprocess argument list
-    built from them must only ever address a real, contained evidence root.
+    The approved root is the evidence directory supplied on the command
+    line; the operations root handed to a subprocess argument list MUST
+    resolve inside it. Rejected on every escape:
+      * parent traversal ("..") that normalizes outside the root;
+      * absolute paths outside the root;
+      * symlink substitution of the candidate or any parent directory;
+      * prefix collisions (/root/evidence-evil does not contain
+        /root/evidence - commonpath comparison, not prefix strings).
+    Existence and directory type are checked on the CANONICAL path.
+    Denial has zero durable side effects: this is a pure predicate.
     """
+    if not os.path.isdir(root):
+        raise RuntimeError(f"approved root is not a directory: {root}")
+    approved = os.path.realpath(root)
     real = os.path.realpath(path)
-    if real != os.path.abspath(path):
-        raise RuntimeError(f"path escapes realpath containment: {path}")
+    if os.path.commonpath([approved, real]) != approved:
+        raise RuntimeError(f"path escapes approved root containment: {path}")
     if not os.path.isdir(real):
         raise RuntimeError(f"not a directory: {path}")
     return real
 
 
 def _ops_verify(ev):
-    """Run recovery-ops verify over the evidence package's operations root."""
-    ops_root = _validated_subprocess_path(os.path.join(ev, "operations"))
+    """Run recovery-ops verify over the evidence package's operations root.
+
+    B4-CXR7U9R7: the evidence directory is the approved root; the
+    subprocess --ops-root argument is enforced contained within it.
+    The executable itself is NEVER path-controlled: recovery-ops.py is
+    derived from this script's own location and sys.executable is the
+    interpreter running this gate.
+    """
+    ops_root = _validated_subprocess_path(os.path.join(ev, "operations"),
+                                          os.path.abspath(ev))
     rops = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recovery-ops.py")
     r = subprocess.run([sys.executable, rops, "verify", "--ops-root", ops_root],
                        capture_output=True, text=True, timeout=60)

@@ -372,14 +372,26 @@ def _load_receipt(path):
 
 
 def _validated_open_path(path: str) -> str:
-    """Canonicalize a filesystem path and refuse symlink escape (S2651).
+    """Canonicalize an OPERATOR-TRUSTED artifact path (B4-CXR7U9R7).
 
-    Recovery-tool inputs name backup artifacts, not authority: an open()
-    target must resolve to its real path with no symlink indirection.
+    AUTHORITY MODEL - truthful, not "containment": recovery-tool inputs
+    name backup artifacts the operator selects; there is NO fixed approved
+    root, so NO containment check is claimed. These paths are DATA, never
+    authority: they cannot alter executable identity (docker/pg_restore
+    are driven by this engine itself), credentials, the governed database
+    destination, or any decision authority; their content is SHA-verified
+    before use (tamper fails closed). They are supplied by the operator or
+    the governed restore pipeline - never by untrusted runtime data - and
+    the OCE_* environment inputs feed provenance strings only, no paths.
+
+    Refused here: symlink indirection (the artifact must BE the named
+    file, not a pointer elsewhere), non-regular files, missing paths.
+    Canonical-open race note: the open follows validation; on POSIX the
+    content SHA check still fails closed against any replacement.
     """
     real = os.path.realpath(path)
     if real != os.path.abspath(path):
-        raise RuntimeError(f"path escapes realpath containment: {path}")
+        raise RuntimeError(f"path uses symlink indirection: {path}")
     if not os.path.isfile(real):
         raise RuntimeError(f"not a regular file: {path}")
     return real

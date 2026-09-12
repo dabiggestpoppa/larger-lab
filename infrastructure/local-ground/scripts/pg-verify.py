@@ -37,14 +37,21 @@ USER = _PG.USER
 
 
 def _validated_open_path(path: str) -> str:
-    """Canonicalize a filesystem path and refuse symlink escape (S2651).
+    """Canonicalize an OPERATOR-TRUSTED artifact path (B4-CXR7U9R7).
 
-    Verification inputs name backup artifacts, not authority: an open()
-    target must resolve to its real path with no symlink indirection.
+    AUTHORITY MODEL - truthful, not "containment": verification inputs
+    name backup artifacts the operator selects; there is NO fixed approved
+    root, so NO containment check is claimed. These paths are DATA, never
+    authority: they cannot alter executable identity, credentials, the
+    governed database destination, or any decision authority; their
+    content is SHA-verified before use (tamper fails closed). Supplied by
+    the operator or the governed restore pipeline only.
+
+    Refused here: symlink indirection, non-regular files, missing paths.
     """
     real = os.path.realpath(path)
     if real != os.path.abspath(path):
-        raise RuntimeError(f"path escapes realpath containment: {path}")
+        raise RuntimeError(f"path uses symlink indirection: {path}")
     if not os.path.isfile(real):
         raise RuntimeError(f"not a regular file: {path}")
     return real
