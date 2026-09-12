@@ -131,11 +131,11 @@ class TestRegistryBackupRestore:
         # composition survives
         members = caps2.member_atoms("CAP-REPLAY-001", 1)
         assert [a.atom_id for a in members] == ["atom-replay"]
-        # repository identity survives
+        # repository identity survives, and its revision history with it
         repo = repos2.get("repo-1")
         assert repo is not None and repo.revision == "abc123"
-        assert len(repos2.list_revisions(
-            RepositorySourceKind.GIT, "git+https://example.com/owner/impl-a")) == 1
+        revisions = repos2.list_revisions("repo-1")
+        assert [r.revision for r in revisions] == ["abc123"]
         # linking graph survives
         edges = rel2.edges_implementing(EntityType.CAPABILITY_ATOM, "atom-replay")
         assert len(edges) == 1 and edges[0].source.entity_id == "cand-1"

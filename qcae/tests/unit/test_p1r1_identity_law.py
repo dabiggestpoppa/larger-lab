@@ -132,29 +132,27 @@ class TestCapabilityIdentityLaw:
         assert caps.get_candidate(locator) is None
 
     def test_same_repository_multiple_versions_distinct_records(self, env) -> None:
+        """ADR-0007: one identity, two immutable revision records."""
         conn, caps, repos, svc = env
         repos.add(_repo("repo-v", "v1"))
-        repos.add(_repo("repo-v2", "v2"))
+        repos.add(_repo("repo-v", "v2"))
         conn.commit()
-        revisions = repos.list_revisions(
-            RepositorySourceKind.GIT, "git+https://example.com/owner/repo-v")
-        # note: locator differs per repository_id in this fixture; identity
-        # grouping test uses identical locators below
-        assert len(revisions) == 1
+        revisions = repos.list_revisions("repo-v")
+        assert {r.revision for r in revisions} == {"v1", "v2"}
 
     def test_identical_locator_multiple_revisions_grouped(self, env) -> None:
         conn, caps, repos, svc = env
         base = "git+https://example.com/owner/lib"
         repos.add(RepositoryRecord(
-            repository_id="lib-r1", source_kind=RepositorySourceKind.GIT,
+            repository_id="lib-stable", source_kind=RepositorySourceKind.GIT,
             canonical_locator=base, revision="v1"))
         repos.add(RepositoryRecord(
-            repository_id="lib-r2", source_kind=RepositorySourceKind.GIT,
+            repository_id="lib-stable", source_kind=RepositorySourceKind.GIT,
             canonical_locator=base, revision="v2"))
         conn.commit()
-        assert len(repos.list_revisions(RepositorySourceKind.GIT, base)) == 2
-        # and neither record was deleted
-        assert repos.get("lib-r1") is not None
+        assert len(repos.list_revisions("lib-stable")) == 2
+        # and neither record was deleted; identity is ONE repository
+        assert repos.get("lib-stable") is not None
 
 
 class TestAdversarialRegistry:
@@ -173,14 +171,31 @@ class TestAdversarialRegistry:
         assert not hasattr(repos, "delete_contract")
 
     def test_repository_key_content_mutation_rejected(self, env) -> None:
-        """Same repository_id with different content is a rewrite attempt —
-        rejected, never merged."""
+        """Same identity+revision with different content is a rewrite attempt —
+        rejected as an immutable-observation violation (identical re-observation
+        is idempotent, conflicting content is not)."""
         conn, caps, repos, svc = env
         repos.add(_repo("repo-1", "r1"))
-        with pytest.raises(QcaeValidationError, match="conflicts"):
+        # identical content: idempotent, not an error
+        repos.add(_repo("repo-1", "r1"))
+        # conflicting content under the same (repository_id, revision): rejected
+        mutated = RepositoryRecord(
+            repository_id="repo-1", source_kind=RepositorySourceKind.GIT,
+            canonical_locator="git+https://example.com/owner/repo-1",
+            revision="r1", display_name="rewritten display name")
+        with pytest.raises(QcaeValidationError, match="immutable"):
+            repos.add(mutated)
+
+    def test_identity_attribute_migration_rejected(self, env) -> None:
+        """ADR-0007: identity attributes are immutable — moving an identity to
+        a new locator requires explicit supersession, not an edit."""
+        conn, caps, repos, svc = env
+        repos.add(_repo("repo-1", "r1"))
+        with pytest.raises(QcaeValidationError, match="immutable"):
             repos.add(RepositoryRecord(
                 repository_id="repo-1", source_kind=RepositorySourceKind.GIT,
-                canonical_locator="git+https://example.com/owner/other", revision="r9"))
+                canonical_locator="git+https://example.com/owner/other",
+                revision="r9"))
 
     def test_relationship_revision_scoping_distinguishes_revisions(self, env) -> None:
         """An IMPLEMENTS edge holds for the observed revision, not forever:

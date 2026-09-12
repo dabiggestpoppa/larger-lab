@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional
@@ -171,4 +172,54 @@ TEST_V1_TO_V2 = Migration(
     migration_id="P1-TEST-0001-evidence-provenance-note",
     apply=_apply_test_v2,
     description="adds provenance_note column to evidence_artifact (mechanism proof)",
+)
+
+
+REPOSITORY_REVISION_DDL = """
+CREATE TABLE IF NOT EXISTS repository_revision (
+    repository_revision_id TEXT PRIMARY KEY,
+    repository_id          TEXT NOT NULL,
+    revision               TEXT NOT NULL,
+    payload_json           TEXT NOT NULL,
+    payload_digest         TEXT NOT NULL,
+    UNIQUE (repository_id, revision)
+);
+CREATE INDEX IF NOT EXISTS ix_repo_revision_identity
+    ON repository_revision(repository_id);
+"""
+
+
+def _apply_v3(conn: sqlite3.Connection) -> None:
+    """ADR-0007: add immutable repository_revision records (v2 -> v3).
+
+    Additive only. Existing repository_record rows are unchanged; a revision
+    record is created for each existing repository_record observation so
+    identity/revision history is preserved through the migration itself.
+    """
+    conn.executescript(REPOSITORY_REVISION_DDL)
+    rows = conn.execute(
+        "SELECT payload_json, payload_digest FROM repository_record"
+    ).fetchall()
+    for payload_json, payload_digest in rows:
+        data = json.loads(payload_json)
+        revision_id = f"{data['repository_id']}@{data['revision']}"
+        conn.execute(
+            "INSERT OR IGNORE INTO repository_revision (repository_revision_id,"
+            " repository_id, revision, payload_json, payload_digest)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (revision_id, data["repository_id"], data["revision"],
+             payload_json, payload_digest),
+        )
+
+
+V2_TO_V3 = Migration(
+    from_version=2,
+    to_version=3,
+    migration_id="P1R1-0003-repository-revision-records",
+    apply=_apply_v3,
+    description=(
+        "ADR-0007: adds repository_revision table (stable repository identity "
+        "plus immutable revision records); back-fills one revision record per "
+        "existing repository_record"
+    ),
 )

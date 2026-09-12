@@ -94,24 +94,25 @@ class TestRepositoryRegistry:
         assert hit is not None and hit.repository_id == "repo-001"
 
     def test_multiple_revisions_coexist(self, reg) -> None:
-        """A new observation is a new record; latest does not delete prior."""
+        """ADR-0007: one stable identity, MANY immutable revision records."""
         registry, _ = reg
         registry.add(_repo("repo-r1", revision="abc123"))
-        registry.add(_repo("repo-r2", revision="def456",
+        registry.add(_repo("repo-r1", revision="def456",
                            last_observed_at="2026-09-13T00:00:00Z"))
-        revs = registry.list_revisions(
-            RepositorySourceKind.GIT, "git+https://example.com/owner/impl-a")
+        revs = registry.list_revisions("repo-r1")
         assert {r.revision for r in revs} == {"abc123", "def456"}
-        assert registry.get("repo-r1") is not None  # prior revision retained
+        assert registry.get("repo-r1") is not None  # identity persists
 
     def test_pinned_revision_lookup(self, reg) -> None:
         registry, _ = reg
         registry.add(_repo("repo-r1", revision="abc123"))
-        registry.add(_repo("repo-r2", revision="def456"))
+        registry.add(_repo("repo-r1", revision="def456"))
         hit = registry.get_by_locator(
             RepositorySourceKind.GIT, "git+https://example.com/owner/impl-a",
             revision="def456")
-        assert hit is not None and hit.repository_id == "repo-r2"
+        assert hit is not None and hit.revision == "def456"
+        by_id = registry.get_revision_of("repo-r1", "abc123")
+        assert by_id is not None and by_id.revision == "abc123"
 
     def test_source_kind_filter(self, reg) -> None:
         registry, _ = reg
@@ -122,9 +123,10 @@ class TestRepositoryRegistry:
         assert kinds == {RepositorySourceKind.PACKAGE}
 
     def test_identity_key_reuse_with_different_content_rejected(self, reg) -> None:
+        """Same identity+revision with conflicting content is a rewrite attempt."""
         registry, _ = reg
         registry.add(_repo("repo-001"))
-        with pytest.raises(QcaeValidationError, match="conflicts"):
+        with pytest.raises(QcaeValidationError, match="immutable"):
             registry.add(_repo("repo-001", display_name="different record"))
 
     def test_identical_readd_idempotent(self, reg) -> None:
