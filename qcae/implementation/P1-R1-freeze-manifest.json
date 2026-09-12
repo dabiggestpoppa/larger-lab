@@ -5,8 +5,8 @@
   "phase_title": "Registry Completion + Freeze Truth Repair",
   "canon_version": "0.1",
   "qcae_version": "0.1.0",
-  "generated_at": "2026-09-12T20:20:29.140668+00:00",
-  "head_commit": "7fbf53265bf6d0c7207c4bdf44ea480a4b4ba637",
+  "generated_at": "2026-09-12T21:11:46.625270+00:00",
+  "head_commit": "92547ac1374a1c3e7667fe49c827bb18de99d9f8",
   "branch": "qcae-capability-acquisition-engine",
   "original_freeze": {
     "phase": "P1",
@@ -30,7 +30,7 @@
     "history_policy": "original P1 freeze manifest is preserved byte-for-byte; this artifact supersedes its bookkeeping only"
   },
   "operator_review_trigger": {
-    "directive": "P1-R1 work-session prompt (reviewed head bbbe05a7)",
+    "directive": "P1-R1 work-session prompt (reviewed head bbbe05a7); continuation directive (reviewed head 31e5ba20) for the repository identity/revision repair",
     "review_date": "2026-09-12"
   },
   "repair_commits": [
@@ -65,15 +65,35 @@
     {
       "sha": "a8ea1014",
       "subject": "P1-R1-T01: add capability identity law and registry adversarial qualification suite"
+    },
+    {
+      "sha": "a69baaa8",
+      "subject": "P1-R1-C03R: split repository identity from revision observation (ADR-0007)"
+    },
+    {
+      "sha": "2dd94b85",
+      "subject": "P1-R1-C03R2: prove revision-sensitive IMPLEMENTS edges in the capability graph"
+    },
+    {
+      "sha": "47f8f067",
+      "subject": "P1-R1-C04R: extend decision reuse with repository revisions and A-F internal-first findings"
+    },
+    {
+      "sha": "0a3bd46b",
+      "subject": "P1-R1-C05R: carry repository revision history through backup/restore"
+    },
+    {
+      "sha": "d9a92e5f",
+      "subject": "P1-R1-T01R: harden pytest summary parser and pin candidate identity rule"
     }
   ],
   "test_results": {
-    "collected": 625,
-    "passed": 625,
+    "collected": 646,
+    "passed": 646,
     "passed_is_placeholder": false,
     "failed": 0,
     "skipped": 0,
-    "duration_seconds": 4.72,
+    "duration_seconds": 3.39,
     "command": [
       "python",
       "-m",
@@ -82,8 +102,8 @@
       "-q"
     ],
     "evidence_label": "LOCAL TEST EVIDENCE",
-    "executed_at": "2026-09-12T20:20:28.821421+00:00",
-    "tested_commit": "7fbf53265bf6d0c7207c4bdf44ea480a4b4ba637"
+    "executed_at": "2026-09-12T21:11:46.196492+00:00",
+    "tested_commit": "92547ac1374a1c3e7667fe49c827bb18de99d9f8"
   },
   "deferred_items_removed": [
     {
@@ -109,26 +129,37 @@
       "severity": "MINOR",
       "owner": "build-agent",
       "trigger": "P2 job runtime"
+    },
+    {
+      "item": "RepositoryRegistry observation timestamps rely on caller-supplied first_seen_at/last_observed_at; a monotonic observed_sequence column can replace the tie-break chain if P3 needs stricter ordering guarantees",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P3 discovery"
     }
   ],
   "known_failures_outside_qcae": [
     "tests/forge/phase_00/test_extension_docs.py (2 pre-existing failures on this branch, unrelated to QCAE; present before P0 work)"
   ],
   "blockers": [],
+  "schema_version": "v3 (repository_revision table added by ADR-0007 migration)",
   "evidence_refs": {
     "progress_ledger": "qcae/QCAE_IMPLEMENTATION_PROGRESS.md",
     "adr_refs": [
-      "qcae/implementation/decisions/ADR-0006-persistence-engine.md"
+      "qcae/implementation/decisions/ADR-0006-persistence-engine.md",
+      "qcae/implementation/decisions/ADR-0007-repository-identity-vs-revision-identity.md"
     ],
     "p1r1_tests": [
       "qcae/tests/unit/test_p1r1_freeze_evidence.py",
+      "qcae/tests/unit/test_p1r1_freeze_evidence_robustness.py",
       "qcae/tests/unit/test_p1r1_capability_registry.py",
       "qcae/tests/unit/test_p1r1_repository_registry.py",
       "qcae/tests/unit/test_p1r1_relationships.py",
       "qcae/tests/unit/test_p1r1_decision_reuse.py",
+      "qcae/tests/unit/test_p1r1_decision_reuse_full.py",
       "qcae/tests/unit/test_p1r1_backup_restore.py",
       "qcae/tests/unit/test_p1r1_identity_law.py"
     ],
-    "architecture_guards": "qcae/tests/architecture/test_p0_dependency_guards.py"
+    "architecture_guards": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "migration_evidence": "qcae/tests/unit/test_p1_migrations.py (v1->v2) + test_p1r1_repository_registry.py (v2->v3 back-fill)"
   }
 }

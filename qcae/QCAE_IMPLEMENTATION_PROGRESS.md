@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P1 — FROZEN / OPERATOR-REVIEWED** (Evidence + Registry Spine + P1-R1 repair; P2 NOT started)
+**P1 — FROZEN / OPERATOR-REVIEWED + R1 COMPLETE** (Evidence + Registry Spine + P1-R1 repair incl. repository identity/revision repair; P2 NOT started)
 
 ### P1-R1 — Registry Completion + Freeze Truth Repair (supersedes original P1 freeze bookkeeping)
 
@@ -27,15 +27,50 @@ P1-R1 without redesigning any accepted P1 subsystem:
    OPERATOR-REVIEWED; P2 is not active.
 3. **Registry substrate** — CapabilityRegistry (contracts/atoms/composites/
    candidates, versioned keys, digest-verified rows) and provider-neutral
-   RepositoryRegistry (multi-revision coexistence) added in P1-R1-C01/C02;
-   linked via the frozen P0 Relationship vocabulary (no new edge types);
-   backup/restore covers all registry tables with count verification;
-   decision-reuse exposes known capability/candidate state; RepositoryRegistry
-   deferral removed from the superseding freeze (P3 populates it).
+   RepositoryRegistry added in P1-R1-C01/C02; linked via the frozen P0
+   Relationship vocabulary (no new edge types); backup/restore covers all
+   registry tables with count verification; decision-reuse exposes known
+   capability/candidate state; RepositoryRegistry deferral removed from the
+   superseding freeze (P3 populates it).
 
 P1-R1 repair commits: `34d256bf` (I0), `9a990a85` (C01), `53106b1f` (C02),
 `e3059465`+`31e5ba20` (C03), `7d541a97` (C04), `1817ed57` (C05), `a8ea1014`
 (T01), `7fbf5326`+freeze-commit (FREEZE).
+
+### P1-R1 continuation — repository identity/revision repair (reviewed head `31e5ba20`)
+
+Operator review of the first P1-R1 tranche identified one remaining
+registry defect: `PRIMARY KEY(repository_id)` contradicted the documented
+multi-revision model. Resolved with **ADR-0007** and schema migration v2→v3:
+
+- **Repository identity** = stable `repository_id` (source container);
+  **revision identity** = immutable `repository_revision_id`
+  (`<repository_id>@<revision>`) with content digest. One identity → many
+  immutable revision records; a new commit SHA is never a new repository.
+- **"Latest observation"** uses explicit observation metadata, never
+  revision-string lexical order (Git SHAs are not chronological).
+- **Candidate identity** resolved per §6: `candidate_id` names one immutable
+  revision record; new revision = new record (no update path) — pinned by
+  test.
+- **Relationship edges are revision-scoped**: revA implements X, revB
+  implements X+Y, revC implements none coexist without rewriting history.
+- **Decision reuse** extended: repository revisions behind known candidates;
+  structured A–F internal-first findings (CAPABILITY_ACTIVE,
+  EVIDENCE_STALE, CANDIDATE_PREVIOUSLY_FAILED, REVISION_CHANGED,
+  DEFINITION_WITHOUT_IMPLEMENTATION, NO_INTERNAL_KNOWLEDGE).
+- **Backup/restore** carries full revision history; restore verifies both
+  observation records of one identity.
+- **Parser robustness**: warnings-summary and deselected tails parse;
+  collection errors (singular/plural) refuse freeze.
+
+Continuation commits: `a69baaa8` (C03R + ADR-0007 + migration v3),
+`2dd94b85` (C03R2), `47f8f067` (C04R), `0a3bd46b` (C05R), `d9a92e5f`
+(T01R), `92547ac1` (FREEZE generator update).
+
+**Final freeze evidence** (regenerated at `92547ac1` by the fail-closed
+generator, LOCAL TEST EVIDENCE): `python -m pytest qcae/tests -q` →
+**646 collected, 646 passed, 0 failed, 0 skipped, 3.39s** at tested commit
+`92547ac1374a…`.
 
 ### P1 phase log (original build; superseded bookkeeping per P1-R1 above)
 
