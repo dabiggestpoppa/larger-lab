@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/schema-registry.json",
+  "title": "OCE Stress Suite Schema Registry",
+  "registry_id": "OCE-STRESS-SCHEMA-REGISTRY-v0.1",
+  "schemas": [
+    {"schema_id": "evidence-record", "name": "EvidenceRecord", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"},
+    {"schema_id": "knowledge-record", "name": "KnowledgeRecord", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"},
+    {"schema_id": "transition-record", "name": "TransitionRecord", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"},
+    {"schema_id": "independence-record", "name": "IndependenceRecord", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"},
+    {"schema_id": "negative-knowledge-record", "name": "NegativeKnowledgeRecord", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"},
+    {"schema_id": "unresolved-record", "name": "Unresolved records", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"},
+    {"schema_id": "epoch-manifest", "name": "EpochManifest", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"},
+    {"schema_id": "phase-evaluation-contract", "name": "PhaseEvaluationContract", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"},
+    {"schema_id": "scenario-spec", "name": "StressScenarioSpec", "version": "1.0.0", "owner": "stress-suite", "compatibility_class": "backward", "status": "active"}
+  ]
+}

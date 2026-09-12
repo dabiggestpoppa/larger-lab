@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/control-plane/worker-capability-manifest.json",
+  "title": "OCE Worker Capability Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["worker_id", "capabilities", "connected_at", "schema_version"],
+  "properties": {
+    "worker_id": { "type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$" },
+    "capabilities": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "trust_zone": { "enum": ["worker-local", "worker-burst", "worker-windows"] },
+    "connected_at": { "type": "string", "format": "date-time" },
+    "last_heartbeat": { "type": "string", "format": "date-time" },
+    "max_concurrent_jobs": { "type": "integer", "minimum": 1 },
+    "schema_version": { "type": "string", "const": "1.0.0" }
+  }
+}

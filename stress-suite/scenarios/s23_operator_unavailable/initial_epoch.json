@@ -1,0 +1,7 @@
+{
+  "seq": 1,
+  "authority_seed": {
+    "OP_AGENT": "WORKER"
+  },
+  "note": "operator goes unavailable at seq 3; grants must pre-exist that decision"
+}

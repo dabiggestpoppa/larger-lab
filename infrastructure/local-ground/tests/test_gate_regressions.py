@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OCE Local Ground — independent gate and final-package regression tests.
+"""OCE Local Ground â€” independent gate and final-package regression tests.
 
 Builds a synthetic-but-valid evidence package, proves the pristine package
 passes the gate, then tampers one aspect at a time and proves each regression
@@ -75,7 +75,11 @@ def build_valid_evidence(tmp):
                            "test_08_backup_completes",
                            "test_09_clean_room_local_restore_succeeds",
                            "test_10_restore_meets_declared_recovery_targets",
-                           "test_11_corrupt_backup_is_rejected"]
+                           "test_11_corrupt_backup_is_rejected",
+                           "test_full_backup_blocked_without_docker_or_services",
+                           "test_full_backup_blocked_when_postgres_unavailable",
+                           "test_full_backup_blocked_when_artifact_store_unavailable",
+                           "test_state_only_backup_still_works_without_docker"]
     tests = []
     for n in container_names:
         tests.append({"name": n, "nodeid": n, "container_backed": True, "outcome": "passed", "duration_s": 0.1})
@@ -97,7 +101,7 @@ def build_valid_evidence(tmp):
     (ev / "cloud-plan.txt").write_text(
         "provider contacts: 0\nresources changed: 0\ncost incurred: ZERO\n", encoding="utf-8")
     (ev / "cloud-apply-denial.txt").write_text(
-        "DENIED: cloud apply blocked — missing required field 'AUTHORIZED_STAGE' (fail-closed).\n", encoding="utf-8")
+        "DENIED: cloud apply blocked â€” missing required field 'AUTHORIZED_STAGE' (fail-closed).\n", encoding="utf-8")
     write_json(ev / "cloud-apply-denial.json", {"exit_code": 5, "expected_nonzero": True})
     write_json(ev / "cloud-plan-deterministic.json", {"deterministic": True})
     write_json(ev / "local-after-denied.json", {"exit_code": 0})
@@ -106,14 +110,89 @@ def build_valid_evidence(tmp):
     write_json(ev / "container-cleanup.json", {
         "cleanup": "ok", "containers_removed": True,
         "networks_removed": True, "volumes_removed": True, "disposable_removed": True})
+    # Recovery evidence required in CI mode: verified postgres promotion receipt
+    write_json(ev / "postgres-recovery-receipt.json", {
+        "format": "oce-pg-recovery-receipt-v1", "database": "oce_local",
+        "source_archive_sha256": "a" * 64, "source_commit": COMMIT, "run_id": RUN_ID,
+        "staging_database": "oce_local_restore_abc", "promoted": True,
+        "exit_status": 0, "redis_restored": False, "tables_verified": True})
     (ev / "stage-log.txt").write_text("identity captured\n", encoding="utf-8")
     write_json(ev / "stage-status.json", {
         "block": "B1", "stage": "B1-LOCAL-GROUND-CLOSURE", "run_id": RUN_ID,
         "gate_status": "PENDING_FINAL_GATE", "cloud_mutations": 0, "cloud_cost_state": "ZERO",
         "cloud_activation_state": "DEFERRED_BY_OPERATOR", "cloud_deployment_state": "NOT_DEPLOYED",
         "implementation_commit": COMMIT, "implementation_tree": TREE, "branch": BRANCH})
+    _add_ops_index(ev)
     _refresh_manifest(ev)
     return ev
+
+
+def _add_ops_index(ev):
+    """Build the immutable operation index a valid CI evidence package must
+    contain: one successful full-replace restore operation (promote+finalize
+    with fingerprints, quarantine held-then-dropped, redis invalidated,
+    artifact replaced) and one post-promotion rollback operation."""
+    ops_root = ev / "operations"
+    src_root = ev / "receipt-src"
+    op_a = "a" * 16
+    op_b = "b" * 16
+    (src_root / op_a).mkdir(parents=True, exist_ok=True)
+    (src_root / op_b).mkdir(parents=True, exist_ok=True)
+    promote = {"format": "oce-pg-recovery-receipt-v1", "operation_phase": "promote",
+               "quarantine_held": True, "quarantine_dropped": False, "promoted": True,
+               "staging_verification": {"result": "ok",
+                                         "fingerprints": {"public.backup_probe": "x" * 32}},
+               "canonical_verification": {"result": "ok",
+                                           "fingerprints": {"public.backup_probe": "x" * 32}},
+               "phases": ["inventory_validated", "archive_validated", "staging_created",
+                          "staging_restored", "staging_verified", "canonical_quarantined",
+                          "promoted", "canonical_verified"], "exit_status": 0}
+    finalize = {"format": "oce-pg-recovery-receipt-v1", "operation_phase": "finalize",
+                "promoted": True, "exit_status": 0, "redis_restored": False,
+                "final_verification": {"result": "ok",
+                                        "fingerprints": {"public.backup_probe": "x" * 32}},
+                "quarantine_dropped": True, "quarantine_removal_verified": True,
+                "phases": ["final_canonical_verified", "quarantine_dropped",
+                           "quarantine_removal_verified"]}
+    redis = {"format": "oce-redis-invalidation-receipt-v1", "redis_restored": False,
+             "redis_invalidation_required": True, "redis_invalidation_attempted": True,
+             "redis_invalidated": True, "redis_verification": "ok"}
+    artifact = {"format": "oce-artifact-recovery-receipt-v1", "artifact_replaced": True,
+                "artifact_verify": "ok"}
+    for name, data in (("promote-receipt.json", promote),
+                       ("postgres-recovery-receipt.json", finalize),
+                       ("redis-invalidation-receipt.json", redis),
+                       ("artifact-recovery-receipt.json", artifact)):
+        (src_root / op_a / name).write_text(json.dumps(data, indent=2), encoding="utf-8")
+    rollback = {"format": "oce-pg-recovery-receipt-v1", "operation_phase": "finalize",
+                "rollback_required": True, "rollback_attempted": True,
+                "rollback_succeeded": True, "rollback_failed": False,
+                "original_canonical_restored": True, "promoted_candidate_removed": True,
+                "rollback_verification": {"result": "ok"}, "exit_status": 1}
+    (src_root / op_b / "postgres-recovery-receipt.json").write_text(
+        json.dumps(rollback, indent=2), encoding="utf-8")
+
+    def add_op(opid, final, rb, receipts):
+        cmd = [sys.executable, str(SCRIPTS / "recovery-ops.py"), "add",
+               "--ops-root", str(ops_root), "--operation-id", opid,
+               "--operation-type", "restore", "--run-id", RUN_ID,
+               "--commit", COMMIT, "--tree", TREE,
+               "--started-at", "2026-01-01T00:00:00Z", "--finished-at", "2026-01-01T00:00:01Z",
+               "--backup-id", "b" * 32, "--backup-scope", "full", "--restore-mode", "full-replace",
+               "--source-database", "oce_local", "--target-database", "oce_local",
+               "--final-result", final, "--rollback-result", rb,
+               "--cloud-mutations", "0", "--cloud-cost-state", "ZERO"]
+        for rec in receipts:
+            cmd += ["--receipt", str(rec)]
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        assert r.returncode == 0, r.stdout + r.stderr
+
+    add_op(op_a, "success", "none",
+           [src_root / op_a / n for n in
+            ("promote-receipt.json", "postgres-recovery-receipt.json",
+             "redis-invalidation-receipt.json", "artifact-recovery-receipt.json")])
+    add_op(op_b, "failed", "ok",
+           [src_root / op_b / "postgres-recovery-receipt.json"])
 
 
 def _refresh_manifest(ev):
@@ -152,7 +231,7 @@ def run_verify(ev, expect_fail=False):
     return r
 
 
-# ── positive ─────────────────────────────────────────────────────────────
+# â”€â”€ positive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_passes_on_valid_package(tmp_path):
     ev = build_valid_evidence(tmp_path)
     run_gate(ev)
@@ -164,7 +243,7 @@ def test_verify_passes_on_valid_package(tmp_path):
     run_verify(ev)
 
 
-# ── identity / repository regressions ────────────────────────────────────
+# â”€â”€ identity / repository regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_wrong_repository(tmp_path):
     ev = build_valid_evidence(tmp_path)
     d = json.loads((ev / "identity.json").read_text())
@@ -221,7 +300,7 @@ def test_gate_rejects_missing_trusted_ci_identity(tmp_path):
     run_gate(ev, expect_fail=True, env={"GITHUB_REPOSITORY": "wrong/owner"})
 
 
-# ── artifact / parse regressions ─────────────────────────────────────────
+# â”€â”€ artifact / parse regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_malformed_json(tmp_path):
     ev = build_valid_evidence(tmp_path)
     (ev / "identity.json").write_text("{not json", encoding="utf-8")
@@ -256,7 +335,7 @@ def test_gate_rejects_incorrect_size(tmp_path):
     run_gate(ev, expect_fail=True)
 
 
-# ── totals / container / adversarial regressions ─────────────────────────
+# â”€â”€ totals / container / adversarial regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_skipped_mandatory_test_in_ci(tmp_path):
     ev = build_valid_evidence(tmp_path)
     d = json.loads((ev / "test-summary.json").read_text())
@@ -306,7 +385,7 @@ def test_gate_rejects_adversarial_failure(tmp_path):
     run_gate(ev, expect_fail=True)
 
 
-# ── cloud boundary regressions ───────────────────────────────────────────
+# â”€â”€ cloud boundary regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_cloud_apply_zero_exit(tmp_path):
     ev = build_valid_evidence(tmp_path)
     d = json.loads((ev / "cloud-apply-denial.json").read_text())
@@ -350,7 +429,7 @@ def test_gate_rejects_cloud_not_deferred(tmp_path):
     run_gate(ev, expect_fail=True)
 
 
-# ── source / cleanup regressions ─────────────────────────────────────────
+# â”€â”€ source / cleanup regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_gate_rejects_dirty_source_before(tmp_path):
     ev = build_valid_evidence(tmp_path)
     d = json.loads((ev / "source-clean.json").read_text())
@@ -376,7 +455,7 @@ def test_gate_rejects_cleanup_failure(tmp_path):
     run_gate(ev, expect_fail=True)
 
 
-# ── final-package verifier regressions ───────────────────────────────────
+# â”€â”€ final-package verifier regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_verify_rejects_post_gate_status_mutation(tmp_path):
     ev = build_valid_evidence(tmp_path)
     run_gate(ev)
@@ -407,7 +486,7 @@ def test_verify_rejects_tampered_final_artifact(tmp_path):
     run_verify(ev, expect_fail=True)
 
 
-# ── CI workflow / dependency regressions ─────────────────────────────────
+# â”€â”€ CI workflow / dependency regressions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def test_ci_workflow_uses_shared_runner():
     wf = (BASE_DIR.parents[1] / ".github" / "workflows" / "b1-local-ground.yml").read_text(encoding="utf-8")
     assert "run-validation.sh" in wf, "workflow must use the shared validation runner"
@@ -419,3 +498,116 @@ def test_ci_dependencies_are_pinned():
     assert "latest" not in req
     wf = (BASE_DIR.parents[1] / ".github" / "workflows" / "b1-local-ground.yml").read_text(encoding="utf-8")
     assert "requirements-ci.txt" in wf, "workflow must install from the pinned requirements"
+
+
+# ── R9: final recovery truth regressions (operation index + gate) ─────────
+def test_gate_rejects_missing_operation_index(tmp_path):
+    ev = build_valid_evidence(tmp_path)
+    import shutil as _sh
+    _sh.rmtree(ev / "operations")
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)
+
+
+def test_gate_rejects_latest_only_without_index(tmp_path):
+    """A convenience latest.json cannot substitute for the authoritative
+    indexed receipt sets: without index.json the gate must fail."""
+    ev = build_valid_evidence(tmp_path)
+    import shutil as _sh
+    _sh.rmtree(ev / "operations")
+    (ev / "operations").mkdir(parents=True)
+    write_json(ev / "operations" / "latest.json", {"operation_id": "a" * 16})
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)
+
+
+def test_gate_rejects_tampered_indexed_receipt(tmp_path):
+    """Modifying an indexed receipt file changes its hash: the gate must fail
+    (receipt hash mismatch)."""
+    ev = build_valid_evidence(tmp_path)
+    p = ev / "operations" / "operations" / ("a" * 16) / "postgres-recovery-receipt.json"
+    p.write_text('{"tampered": true}', encoding="utf-8")
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)
+
+
+def test_gate_rejects_missing_indexed_receipt(tmp_path):
+    ev = build_valid_evidence(tmp_path)
+    (ev / "operations" / "operations" / ("a" * 16) / "redis-invalidation-receipt.json").unlink()
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)
+
+
+def test_gate_rejects_missing_rollback_operation(tmp_path):
+    """The post-promotion rollback regression must genuinely execute: without
+    an indexed rollback_result=ok operation the gate fails."""
+    ev = build_valid_evidence(tmp_path)
+    import shutil as _sh
+    _sh.rmtree(ev / "operations" / "operations" / ("b" * 16))
+    idx = json.loads((ev / "operations" / "index.json").read_text(encoding="utf-8"))
+    idx["operations"] = [o for o in idx["operations"] if o["operation_id"] != "b" * 16]
+    write_json(ev / "operations" / "index.json", idx)
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)
+
+
+def test_gate_rejects_redis_not_invalidated(tmp_path):
+    """A successful full replacement without Redis invalidation must fail the
+    gate (stale cache must not survive replacement of PostgreSQL truth)."""
+    ev = build_valid_evidence(tmp_path)
+    p = ev / "operations" / "operations" / ("a" * 16) / "redis-invalidation-receipt.json"
+    d = json.loads(p.read_text(encoding="utf-8"))
+    d["redis_invalidated"] = False
+    d["redis_verification"] = "failed"
+    p.write_text(json.dumps(d, indent=2), encoding="utf-8")
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)
+
+
+def test_gate_rejects_fingerprints_missing(tmp_path):
+    """A successful recovery whose receipts carry no value fingerprints must
+    fail the gate (row counts alone are not content proof)."""
+    ev = build_valid_evidence(tmp_path)
+    p = ev / "operations" / "operations" / ("a" * 16) / "postgres-recovery-receipt.json"
+    d = json.loads(p.read_text(encoding="utf-8"))
+    d["final_verification"].pop("fingerprints", None)
+    p.write_text(json.dumps(d, indent=2), encoding="utf-8")
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)
+
+
+def test_gate_rejects_unavailable_service_test_skipped(tmp_path):
+    """If the unavailable-service negative test is skipped (not executed),
+    the gate must fail even when every other total is green."""
+    ev = build_valid_evidence(tmp_path)
+    d = json.loads((ev / "test-summary.json").read_text(encoding="utf-8"))
+    for t in d["tests"]:
+        if t["name"] == "test_full_backup_blocked_without_docker_or_services":
+            t["outcome"] = "skipped"
+    d["totals"]["skipped"] = 1
+    d["totals"]["passed"] = d["totals"]["passed"] - 1
+    write_json(ev / "test-summary.json", d)
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)
+
+
+def test_gate_rejects_invalid_rollback_syntax(tmp_path):
+    """If invalid PostgreSQL rollback syntax reappears in the recovery
+    engine, the gate must fail (source scan)."""
+    ev = build_valid_evidence(tmp_path)
+    fake_src = tmp_path / "pg-recovery.py"
+    fake_src.write_text('ALTER DATABASE IF EXISTS "x" RENAME TO "y";\n', encoding="utf-8")
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True, env={"OCE_PG_RECOVERY_SRC": str(fake_src)})
+
+
+def test_gate_rejects_ci_skips_even_with_green_totals(tmp_path):
+    """A green test count cannot override a recovery invariant: any skipped
+    test in CI (skipped > 0) fails the gate."""
+    ev = build_valid_evidence(tmp_path)
+    d = json.loads((ev / "test-summary.json").read_text(encoding="utf-8"))
+    d["totals"]["skipped"] = 1
+    d["totals"]["passed"] = d["totals"]["passed"] - 1
+    write_json(ev / "test-summary.json", d)
+    _refresh_manifest(ev)
+    run_gate(ev, expect_fail=True)

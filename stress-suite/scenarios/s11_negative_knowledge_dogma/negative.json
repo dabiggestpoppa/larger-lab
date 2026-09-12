@@ -1,0 +1,13 @@
+[
+  {
+    "record_id": "NK_FAMILY_X",
+    "claim_rejected": "family-X alpha strategy",
+    "exact_scope": "family_X_european",
+    "evidence_refs": ["EV_REJECT_1", "EV_REJECT_2"],
+    "rejection_reason": "blocker SENSOR_UNAVAILABLE: strategy family depended on a sensor that did not exist",
+    "assumptions": ["requires low-latency sensor feed"],
+    "blockers": ["SENSOR_UNAVAILABLE"],
+    "reopen_conditions": ["machine-readable: BLOCKER_RESOLVED SENSOR_UNAVAILABLE"],
+    "operator_permanent": false
+  }
+]

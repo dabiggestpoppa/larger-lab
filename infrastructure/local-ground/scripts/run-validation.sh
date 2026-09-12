@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 #
-# run-validation.sh — OCE Local Ground shared validation runner (B1-LOCAL).
+# run-validation.sh â€” OCE Local Ground shared validation runner (B1-LOCAL).
 # Sole authoritative orchestration for the Local Ground gate. Both the local
 # thin wrapper and GitHub Actions invoke this exactly once.
 #
 # Environment:
-#   OCE_RUN_ID        — required, single authoritative run id (12+ hex)
-#   OCE_EVIDENCE_DIR  — optional caller-provided evidence dir (outside repo)
-#   OCE_CI_MODE       — "true" in CI (authoritative)
-#   GITHUB_REF_NAME   — trusted ref in CI
-#   GITHUB_REPOSITORY — trusted repository in CI
+#   OCE_RUN_ID        â€” required, single authoritative run id (12+ hex)
+#   OCE_EVIDENCE_DIR  â€” optional caller-provided evidence dir (outside repo)
+#   OCE_CI_MODE       â€” "true" in CI (authoritative)
+#   GITHUB_REF_NAME   â€” trusted ref in CI
+#   GITHUB_REPOSITORY â€” trusted repository in CI
 #
 # Finalization (Defect 4): candidate status -> candidate manifest ->
 # independent gate -> final status -> final stage-log line -> final manifest ->
@@ -91,14 +91,18 @@ fail() { # phase rc
 
 have_docker() { command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; }
 
-# Capture bounded machine-readable diagnostics BEFORE cleanup destroys them.
+# Capture bounded machine-readable diagnostics into the POST-CLEANUP namespace
+# only. These run after resources may already be gone, so they prove what was
+# removed; they NEVER overwrite the immutable pre-teardown namespace that the
+# pytest hook wrote while containers were alive.
 failure_diagnostics() {
   if ! have_docker; then return 0; fi
-  local d="$EVIDENCE/failure-diagnostics"
+  local d="$EVIDENCE/failure-diagnostics/post-cleanup"
   mkdir -p "$d"
   (cd "$COMPOSE_DIR" && docker compose -f compose.yml ps --format json) > "$d/compose-ps.json" 2>&1 || true
   docker network ls --filter name=oce_local_internal > "$d/networks.txt" 2>&1 || true
   docker volume ls --filter name=oce_local_ > "$d/volumes.txt" 2>&1 || true
+  printf 'post-cleanup\n' > "$d/phase.txt"
   for c in oce-local-postgresql oce-local-redis oce-local-artifact oce-local-prometheus; do
     docker inspect "$c" > "$d/$c.inspect.json" 2>&1 || true
     docker logs --tail 50 "$c" > "$d/$c.logs.txt" 2>&1 || true
@@ -146,10 +150,26 @@ cleanup_trap() {
     # the exact package. NEVER touch the evidence directory here.
     exit 0
   fi
-  # Failure/interrupt: collect diagnostics, attempt cleanup, record truth,
-  # then exit with the ORIGINAL code (cleanup must not mask it).
+  # Failure/interrupt: collect POST-CLEANUP diagnostics (distinct namespace),
+  # attempt cleanup, record truth, then exit with the ORIGINAL code (cleanup
+  # must not mask it). The immutable PRE-TEARDOWN namespace is never touched.
   failure_diagnostics || true
   failure_cleanup || true
+  # index the diagnostic namespaces (pre-teardown preserved, post-cleanup fresh)
+  python3 - "$EVIDENCE" <<'PY' || true
+import os, sys
+from pathlib import Path
+ev = Path(sys.argv[1])
+base = ev / "failure-diagnostics"
+pre = (base / "pre-teardown")
+areas = {}
+if pre.is_dir():
+    areas["pre_teardown"] = sorted(p.name for p in pre.iterdir() if p.is_dir())
+import json
+areas["post_cleanup"] = (base / "post-cleanup").is_dir()
+(ev / "diagnostic-namespaces.json").write_text(
+    json.dumps(areas, indent=2), encoding="utf-8")
+PY
   write_failure_context "${FAILED_PHASE:-interrupted}" "$rc" || true
   exit "$rc"
 }
@@ -158,7 +178,7 @@ trap cleanup_trap EXIT INT TERM
 echo "=== OCE Local Ground Shared Validation Runner ==="
 echo "OCE_RUN_ID: $OCE_RUN_ID | evidence: $EVIDENCE | ci_mode: ${OCE_CI_MODE:-false}"
 
-# ── identity ──────────────────────────────────────────────────────────────
+# â”€â”€ identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 COMMIT=$(git -C "$PROJ_ROOT" rev-parse HEAD) || fail identity 1
 TREE=$(git -C "$PROJ_ROOT" rev-parse "HEAD^{tree}") || fail identity 1
 BRANCH=$(git -C "$PROJ_ROOT" branch --show-current 2>/dev/null || echo detached)
@@ -186,7 +206,7 @@ export OCE_PROJ_ROOT="$PROJ_ROOT"
 record "identity: $COMMIT repo=$REMOTE_REPO branch=$BRANCH"
 echo "  identity: commit=$COMMIT tree=$TREE branch=$BRANCH repo=$REMOTE_REPO"
 
-# ── clean source (pre) ────────────────────────────────────────────────────
+# â”€â”€ clean source (pre) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 DIRTY=$(git -C "$PROJ_ROOT" status --porcelain | wc -l)
 python3 - "$EVIDENCE/source-clean.json" <<PY
 import json, sys
@@ -199,11 +219,11 @@ if [ "$DIRTY" -ne 0 ]; then
 fi
 record "source clean (pre)"
 
-# ── doctor fingerprint ────────────────────────────────────────────────────
+# â”€â”€ doctor fingerprint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 bash "$SCRIPT_DIR/doctor.sh" "$EVIDENCE/environment-fingerprint.json" || fail doctor 1
 record "doctor fingerprint captured"
 
-# ── acceptance + contract tests (machine-readable) ────────────────────────
+# â”€â”€ acceptance + contract tests (machine-readable) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 OCE_CI_MODE="${OCE_CI_MODE:-false}" OCE_RUNNER_ACTIVE=1
 python3 -m pytest "$TEST_FILE" "$CONTRACT_TEST" "$LIFECYCLE_TEST" "$GATE_TEST" "$COMPOSE_OUT_TEST" "$PORTABILITY_TEST" "$BACKUP_HARDEN_TEST" -v --tb=short \
   --junitxml="$EVIDENCE/junit.xml" > "$EVIDENCE/acceptance-output.txt" 2>&1
@@ -212,14 +232,14 @@ tail -25 "$EVIDENCE/acceptance-output.txt"
 if [ "$RC" -ne 0 ]; then fail acceptance-tests "$RC"; fi
 record "acceptance + contract tests executed"
 
-# ── adversarial suite (machine-readable results) ──────────────────────────
+# â”€â”€ adversarial suite (machine-readable results) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 bash "$ADV_SH" > /dev/null 2>&1
 ADV_RC=$?
 tail -12 "$EVIDENCE/adversarial-output.txt"
 if [ "$ADV_RC" -ne 0 ]; then fail adversarial "$ADV_RC"; fi
 record "adversarial suite passed"
 
-# ── cloud boundary (deterministic plan; apply denied; zero mutation) ───────
+# â”€â”€ cloud boundary (deterministic plan; apply denied; zero mutation) â”€â”€â”€â”€â”€â”€â”€
 OCE_RUNTIME_TARGET=cloud-plan bash "$SCRIPT_DIR/oce-ctl" deploy plan --target cloud > "$EVIDENCE/cloud-plan.txt" 2>&1
 RC=$?
 [ "$RC" -ne 0 ] && fail cloud-plan "$RC"
@@ -249,7 +269,7 @@ PY
 [ "$RC" -ne 0 ] && fail local-after-denied "$RC"
 record "cloud plan deterministic + zero mutation; cloud apply denied; local unaffected"
 
-# ── clean source (post) ───────────────────────────────────────────────────
+# â”€â”€ clean source (post) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 DIRTY=$(git -C "$PROJ_ROOT" status --porcelain | wc -l)
 python3 - "$EVIDENCE/source-clean.json" <<PY
 import json, sys
@@ -261,11 +281,11 @@ PY
 [ "$DIRTY" -ne 0 ] && fail clean-source-post 1
 record "source clean (post)"
 
-# ── cleanup record ────────────────────────────────────────────────────────
+# â”€â”€ cleanup record â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "{\"cleanup\": \"ok\", \"disposable_removed\": true}" > "$EVIDENCE/cleanup.json"
 record "cleanup ok"
 
-# ── candidate status + candidate manifest ─────────────────────────────────
+# â”€â”€ candidate status + candidate manifest â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 python3 - "$EVIDENCE" "$COMMIT" "$TREE" "$BRANCH" <<'PY'
 import json, os, sys
 ev, commit, tree, branch = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
@@ -301,15 +321,15 @@ PY
 }
 write_manifest
 
-# ── independent gate (candidate package) ──────────────────────────────────
+# â”€â”€ independent gate (candidate package) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 bash "$GATE" "$EVIDENCE" "$COMMIT" "$TREE"
 GATE_RC=$?
 if [ "$GATE_RC" -ne 0 ]; then
-  echo "GATE FAILED (exit $GATE_RC) — preserving evidence, no readiness claim." >&2
+  echo "GATE FAILED (exit $GATE_RC) â€” preserving evidence, no readiness claim." >&2
   fail final-gate "$GATE_RC"
 fi
 
-# ── finalize mutable outputs, then refresh the final manifest ─────────────
+# â”€â”€ finalize mutable outputs, then refresh the final manifest â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 write_status() {
   python3 - "$EVIDENCE/stage-status.json" "$1" <<'PY'
 import json, sys

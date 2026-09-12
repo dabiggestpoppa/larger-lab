@@ -1,0 +1,121 @@
+{
+  "gate": "G3R2",
+  "status": "PASS_G3R2_PROVENANCE_AND_UNKNOWN_CLOSURE",
+  "starting_sha": "e787fef30b3cc5864694d3c184e091a0180ce7c4",
+  "receipt_lineage": {
+    "artifacts_head_sha": "52848620dc64b7ec48556a69e8a6a9bb245a0c37",
+    "receipt_content_parent_sha": "52848620dc64b7ec48556a69e8a6a9bb245a0c37",
+    "externally_verified_branch_head": null,
+    "self_pin_attempted": false,
+    "semantics": {
+      "artifacts_head_sha": "the LAST CODE commit whose artifacts this package documents (the parent of the evidence commit); known at write time",
+      "receipt_content_parent_sha": "the commit whose tree contains this receipt (the evidence commit's parent); known at write time",
+      "externally_verified_branch_head": "the branch head AFTER push, verified by git ls-remote; NOT self-contained in the receipt — stated in the final human report"
+    }
+  },
+  "commits": [
+    "74dd311e STRESS-G3R2A: fail-close missing provenance, explicit fixture authority, prevalence/unknown-coverage facts, unique epistemic paths",
+    "18890689 STRESS-G3R2E: validate friction/counter method vocabularies and stop on first discriminating contradiction",
+    "70eed99f STRESS-G3R2G: bind topology capability provenance and unique-path accounting",
+    "75d6c38f STRESS-G3R2B: bind topology/friction secondary reviewer surfaces to the scenario provenance authority",
+    "79a3be6b STRESS-G3R2C: shared policy V3 — single-source prevalence correlation + explicit synthetic fixture authority in scenario contracts",
+    "9b2b32cb STRESS-G3R2F: export provenance-mode and epistemic-path surfaces",
+    "b2d3ca0d STRESS-G3R2X: adversarial provenance/unknown-semantics regression suite + documented legacy upgrades",
+    "52848620 STRESS-G3R2R: regenerate per-scenario receipts under the hardened provenance pipeline"
+  ],
+  "old_tests": 402,
+  "old_tests_preserved": 402,
+  "legacy_upgrades": [
+    {
+      "test": "test_g3r.py::test_missing_registry_entry_does_not_promote_claims",
+      "old_assertion": "bound.model_family == FAM_CLAIM or bound.model_family == UNKNOWN",
+      "defect": "G3R2-01 — a missing registry record returned the CLAIMED profile unchanged, so an unverified claim could retain VERIFIED independence semantics; the assertion did not prove fail-closed behavior",
+      "replacement": "bound.model_family == UNKNOWN (plus UNKNOWN/non-qualifying on sources, runtime, retrieval, exposure, fresh_context, exposure_mode, independent_design)",
+      "rationale": "UNKNOWN IS NOT INDEPENDENT; a self-claim is not its own provenance authority"
+    },
+    {
+      "test": "test_g3r.py::_topology helper",
+      "old_assertion": "ReviewTopology built with fixture capability_tiers implicitly trusted",
+      "defect": "G3R2-10 — capability tiers were fixture metadata with no provenance; unverified claims could satisfy capability constraints",
+      "replacement": "helper declares capability_source=AUTHORITATIVE_SYNTHETIC_CAPABILITY explicitly",
+      "rationale": "synthetic-fixture routing tests remain meaningful; the UNVERIFIED fail-closed gate is proven by new G3R2-10 regressions; no routing assertion weakened"
+    },
+    {
+      "test": "test_g3_cross_scenario.py::test_all_four_scenarios_run_under_the_same_policy_object",
+      "old_assertion": "policy_version == V2",
+      "defect": "policy semantics changed (prevalence correlation, UNKNOWN-exposure coverage)",
+      "replacement": "policy_version == V3",
+      "rationale": "one shared policy still drives all four scenarios; the version records the semantic change"
+    }
+  ],
+  "new_tests": 54,
+  "total_pass": 456,
+  "total_tests": 456,
+  "scenario_results_shared_policy": {
+    "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
+    "policy_version": "V3",
+    "S06": {"pass": true, "disposition": "SUPPORTED_BUT_CORRELATED", "behavior_fingerprint": "ec879b1fe30196cc1b68a079e4a878ef"},
+    "S07": {"pass": true, "disposition": "REQUIRES_INDEPENDENT_REVIEW", "behavior_fingerprint": "0e44a11fba9c977ed3a0997cfa7c4742"},
+    "S08": {"pass": true, "disposition": "SUPPORTED_BUT_CORRELATED", "behavior_fingerprint": "662edcf34c0e41e160f39b39e3998d5c"},
+    "S09": {"pass": true, "disposition": "INDEPENDENTLY_SUPPORTED", "behavior_fingerprint": "d8e76f5dbdcd8b4f44e217b243b55c51"}
+  },
+  "provenance_modes": {
+    "S06": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+    "S07": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+    "S08": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+    "S09": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+    "default_mode": "GOVERNED_REGISTRY",
+    "synthetic_fixture_authority_used": true,
+    "synthetic_fixture_authority": {
+      "mode": "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+      "scope": "provenance_and_capability_facts_for_this_pack",
+      "agent_claims_trusted": false,
+      "wall_clock_free": true,
+      "model_calls": 0
+    }
+  },
+  "defect_status": {
+    "G3R2-01_missing_registry_fail_closed": "PASS",
+    "G3R2-02_no_silent_self_registration": "PASS",
+    "G3R2-03_secondary_surface_binding": "PASS",
+    "G3R2-04_source_overlap_prevalence": "PASS",
+    "G3R2-05_unknown_exposure_not_false": "PASS",
+    "G3R2-06_tri_state_into_facts": "PASS",
+    "G3R2-07_method_vocabulary_fail_closed": "PASS",
+    "G3R2-08_early_contradiction_stop": "PASS",
+    "G3R2-09_unique_epistemic_paths": "PASS",
+    "G3R2-10_capability_provenance": "PASS"
+  },
+  "test_families": {
+    "missing_registry_fail_closed_tests": ["missing_registry_model_claim_becomes_unknown", "missing_registry_source_claim_becomes_unknown", "missing_registry_runtime_claim_becomes_unknown", "missing_registry_retrieval_claim_becomes_unknown", "missing_registry_blind_claim_not_verified", "missing_registry_independent_design_not_verified", "unverified_claims_cannot_satisfy_independence"],
+    "provenance_mode_tests": ["default_missing_registry_fails_closed", "explicit_synthetic_fixture_mode_allows_fixture_truth", "synthetic_fixture_mode_recorded_in_receipt", "governed_registry_mode_never_self_registers_claims", "unknown_provenance_mode_rejected"],
+    "secondary_surface_binding_tests": ["topology_candidate_fake_model_diversity_fails", "topology_candidate_fake_source_diversity_fails", "topology_candidate_fake_independent_design_fails", "friction_reviewer_fake_blind_status_fails", "friction_reviewer_registry_blind_status_succeeds", "secondary_surfaces_share_same_provenance_semantics"],
+    "source_overlap_tests": ["partial_bundle_overlap_detects_shared_source", "all_reviewers_share_one_source_prevalence_is_one", "disjoint_source_bundles_remain_low_overlap", "unknown_source_metadata_not_treated_as_diverse", "common_source_plus_unique_sources_keeps_correlation_visible"],
+    "unknown_exposure_tests": ["all_unknown_exposure_does_not_count_as_zero_exposure", "unknown_exposure_cannot_satisfy_strict_independence_contract", "known_false_exposure_can_satisfy", "mixed_known_unknown_preserves_coverage_uncertainty", "case_h_unknown_exposure_blocks_strict_independence"],
+    "tri_state_coverage_tests": ["unknown_heavy_set_is_not_equivalent_to_known_diversity", "unknown_axis_coverage_survives_into_facts_dict"],
+    "method_vocabulary_tests": ["unknown_counter_method_contract_rejected", "unknown_friction_method_contract_rejected", "canonical_subset_accepted", "empty_allowed_methods_uses_documented_default"],
+    "early_stop_tests": ["early_contradiction_stops_review", "post_contradiction_findings_not_consumed", "post_contradiction_evidence_not_recorded", "cost_stops_with_review", "case_i_early_challenge_stops_at_two"],
+    "unique_path_tests": ["one_path_fresh_plus_design_counts_as_one", "two_distinct_qualifying_paths_count_as_two", "duplicated_path_id_counts_once", "unknown_path_provenance_does_not_qualify", "case_j_one_path_two_labels_is_one", "replication_paths_are_distinct_identities"],
+    "capability_provenance_tests": ["unverified_high_capability_does_not_pass", "registered_adequate_capability_passes", "synthetic_authoritative_capability_mode_explicit", "case_k_fake_topology_cannot_satisfy_verified_routing", "capability_change_does_not_change_authority"],
+    "cross_case_tests": ["case_f_self_registered_swarm_fails_closed", "case_g_partial_source_monoculture_detected", "case_h_unknown_exposure_blocks_strict_independence", "case_i_early_challenge_stops_at_two", "case_j_one_path_two_labels_is_one", "case_k_fake_topology_cannot_satisfy_verified_routing", "recommended_topology_remains_distinct_from_executed_evidence", "no_effective_independence_scalar_minted"]
+  },
+  "per_scenario_facts": {
+    "S06": {"max_single_source_lineage_prevalence": 1.0, "prior_exposure_known_ratio": 1.0, "unique_epistemic_path_count": 0, "provenance_conflicts": 0, "cost_units": 5},
+    "S07": {"max_single_source_lineage_prevalence": 0.5, "prior_exposure_known_ratio": 1.0, "unique_epistemic_path_count": 0, "provenance_conflicts": 0, "cost_units": 24},
+    "S08": {"max_single_source_lineage_prevalence": 1.0, "prior_exposure_known_ratio": 1.0, "unique_epistemic_path_count": 0, "provenance_conflicts": 0, "cost_units": 5},
+    "S09": {"max_single_source_lineage_prevalence": 0.375, "prior_exposure_known_ratio": 1.0, "unique_epistemic_path_count": 5, "provenance_conflicts": 0, "cost_units": 9}
+  },
+  "new_contradictions": [],
+  "new_ambiguities": [],
+  "carried_open": ["CON-02", "CON-03", "AMB-03", "AMB-08", "AMB-11", "AMB-13"],
+  "AMB13_status": "OPEN",
+  "mutations": {
+    "cloud": 0,
+    "production": 0,
+    "capital": 0,
+    "authority_changes": "NONE"
+  },
+  "cost": "$0",
+  "model_calls": 0,
+  "next_gate": "AUTHORIZE_G4"
+}

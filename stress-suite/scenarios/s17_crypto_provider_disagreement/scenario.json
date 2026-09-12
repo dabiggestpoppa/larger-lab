@@ -1,0 +1,19 @@
+{
+  "scenario_id": "S17",
+  "scenario_version": "1.0.0",
+  "domain": "CRYPTO",
+  "threat_class": "SOURCE/MODEL_CONFUSION",
+  "provider_observations_ref": "provider_packets.json",
+  "provider_semantics_ref": "provider_semantics.json",
+  "current_facts": {
+    "domain": "CRYPTO",
+    "claim_type": "PROVIDER_OBSERVATION",
+    "source_disagreement": "PRESENT"
+  },
+  "expected_outcome": "NORMALIZATION_MISMATCH",
+  "hidden_ground_truth": {
+    "cause_o1": "unit mismatch (notional vs contracts)",
+    "cause_o2": "instrument mapping mismatch",
+    "cause_o3": "genuine provider methodology difference"
+  }
+}

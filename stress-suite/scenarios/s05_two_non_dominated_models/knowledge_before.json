@@ -1,0 +1,6 @@
+{
+  "records": {
+    "@M_A": {"state": "ACTIVE", "provenance": "S05-seed", "claim": "incumbent; condition-space A"},
+    "@M_B": {"state": "OBSERVED", "provenance": "S05-seed", "claim": "challenger; condition-space B"}
+  }
+}

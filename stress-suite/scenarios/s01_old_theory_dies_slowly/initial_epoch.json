@@ -1,0 +1,15 @@
+{
+  "epoch_id": "E-S01-0",
+  "predecessor": "E-PRIOR-RATIFIED",
+  "governing_architecture_versions": {
+    "constitution": "1.1",
+    "ll_institutional_architecture": "v1.1",
+    "a009": "v1.0",
+    "a010": "v1.0"
+  },
+  "evaluation_contract": "S01-EVAL-V1",
+  "authority_state": {"PO": "PO", "WORKER_1": "WORKER", "GOVERNOR": "GOVERNOR"},
+  "known_tensions": [],
+  "active_knowledge": ["@M_A"],
+  "dependency_summary": {"@M_A": "CORE (multiple downstream research/strategy surfaces)"}
+}

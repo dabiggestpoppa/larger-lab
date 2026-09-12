@@ -1,0 +1,27 @@
+{
+  "contract_id": "S02-EVAL-V1",
+  "schema_version": "1.0.0",
+  "version_tag": "V1",
+  "authority_basis": "PROVISIONAL_SCENARIO_TEST_POLICY (G2 §4)",
+  "channel_rules": {
+    "reliability_degradation": {"threshold": "LOW", "visibility_policy": "PUBLIC"},
+    "exception_burden": {"threshold": "HIGH", "visibility_policy": "PUBLIC"},
+    "independent_contradiction": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"},
+    "unresolved_pattern_density": {"threshold": "LOW", "visibility_policy": "PUBLIC"},
+    "dependency_centrality": {"threshold": "HIGH", "visibility_policy": "PUBLIC"},
+    "external_environment_shift": {"threshold": "LOW", "visibility_policy": "PUBLIC"},
+    "opportunity_cost_of_stability": {"threshold": "LOW", "visibility_policy": "PUBLIC"},
+    "cost_and_reversibility": {"threshold": "MEDIUM", "visibility_policy": "PUBLIC"}
+  },
+  "hysteresis_rules": {
+    "watch": {"minimum_persistence": 1, "entry_bar_below_escalation": true},
+    "escalation": {"minimum_persistence": 2},
+    "recovery": {"independent_exit_predicate": true}
+  },
+  "admissible_phase_transitions": [
+    ["STABLE", "WATCH"],
+    ["WATCH", "ESCALATION_REVIEW"],
+    ["ESCALATION_REVIEW", "NO_CHANGE"],
+    ["NO_CHANGE", "STABLE"]
+  ]
+}

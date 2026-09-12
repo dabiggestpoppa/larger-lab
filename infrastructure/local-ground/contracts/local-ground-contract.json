@@ -3,9 +3,17 @@
   "stage": "B1-LOCAL-GROUND-CLOSURE",
   "decision": "LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED",
   "amendment": "OCE-AMEND-A003",
-  "repository": { "full_name": "dabiggestpoppa/larger-lab" },
+  "repository": {
+    "full_name": "dabiggestpoppa/larger-lab"
+  },
   "default_runtime_target": "local",
-  "runtime_profiles": ["local", "local-test", "local-recovery", "cloud-plan", "cloud"],
+  "runtime_profiles": [
+    "local",
+    "local-test",
+    "local-recovery",
+    "cloud-plan",
+    "cloud"
+  ],
   "local_data_contract": {
     "postgresql_is_authoritative_truth": true,
     "redis_is_transient_only": true,
@@ -26,13 +34,13 @@
     "no_false_dry_run_equivalence": true
   },
   "ledger_model": {
-    "local_ground_state": "BUILDING",
+    "local_ground_state": "RATIFIED",
     "cloud_plan_state": "VALIDATED_NO_APPLY",
     "cloud_activation_state": "DEFERRED_BY_OPERATOR",
     "cloud_deployment_state": "NOT_DEPLOYED",
     "cloud_cost_state": "ZERO",
     "next_local_book": "B2",
-    "operator_hold_reason": "CLOUD_PURCHASE_DEFERRED"
+    "operator_hold_reason": "NONE"
   },
   "local_acceptance_tests": {
     "count": 30,

@@ -1,0 +1,69 @@
+# OCE Control Plane — durable local runtime stack (B2-R2/R7, A-003).
+# PostgreSQL is authoritative truth; Redis is disposable transport only.
+# All ports publish to LOOPBACK ONLY (127.0.0.1) — never publicly exposed.
+# Cloud is deferred; this stack uses only local resources.
+#
+#   docker compose -f compose.yml up -d
+#
+# Durable vs disposable:
+#   b2_postgres_data — DURABLE (authoritative state; cleanup never removes
+#                      without explicit operator authorization)
+#   b2_redis_data    — DISPOSABLE (transport/cache; safe to flush)
+x-logging: &x-logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
+services:
+  postgresql:
+    image: postgres:16.2-alpine
+    container_name: b2-local-postgresql
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-oce_control}
+      POSTGRES_USER: ${POSTGRES_USER:-oce_control_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - b2_postgres_data:/var/lib/postgresql/data
+    networks: [b2_local]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-oce_control_admin} -d ${POSTGRES_DB:-oce_control} -h localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    logging: *x-logging
+    security_opt: ["no-new-privileges:true"]
+
+  redis:
+    image: redis:7.2.4-alpine
+    container_name: b2-local-redis
+    restart: unless-stopped
+    # TRANSPORT ONLY — no persistence; authoritative truth lives in PostgreSQL
+    # and Redis projections are reconstructable from it (B2-R3).
+    command: ["redis-server", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:6380:6379"
+    networks: [b2_local]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+    logging: *x-logging
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  b2_local:
+    driver: bridge
+    name: b2_local
+
+volumes:
+  b2_postgres_data:
+    driver: local
+    name: b2_local_postgres_data
+  b2_redis_data:
+    driver: local
+    name: b2_local_redis_data

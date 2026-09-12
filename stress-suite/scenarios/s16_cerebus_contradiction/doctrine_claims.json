@@ -1,0 +1,35 @@
+[
+  {
+    "claim_id": "CEREBUS_V4_P90_TARGET_METRICS",
+    "doctrine": "CEREBUS",
+    "manual_version": "v4",
+    "source_path": "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt",
+    "section": "PART_1_CORE_MANUAL / Target Metric table",
+    "page": "PAGE 4-5",
+    "source_fingerprint": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+    "exact_claim_representation": "Target Metric table (bounded fragment): Win Rate (Filtered) 85% - 90%; Daily Goal 1.0% - 1.5%; Max Daily Drawdown < 0.50%; Prop Firm Circuit Breaker: hard constraint boundary at 0.40% loss.",
+    "numeric_parameters": {
+      "win_rate_band": [0.85, 0.90],
+      "daily_goal_band": [0.010, 0.015],
+      "max_daily_drawdown": 0.005,
+      "prop_circuit_breaker": 0.004,
+      "p90_activation_thresholds": {
+        "2-4am_est": 4.1,
+        "4-6am_est": 4.6,
+        "6-8am_est": 4.6,
+        "8-10am_est": 5.9,
+        "10-11am_est": 6.2
+      },
+      "session_window": "00:00-08:00 UTC (Asia)",
+      "tier_constraints": ["TIER_1_100%", "TIER_2_75%", "TIER_3_50%", "NO_GO_>45p"]
+    },
+    "structural_conditions": [
+      "M5 timeframe candle close inside 2:00-11:00 AM EST activation window",
+      "Asian range tier sizing applies (<20p 100%, 20-30p 75%, 30-45p 50%, >45p NO-GO)",
+      "constraint boundaries as invalidation points",
+      "manual remains authoritative until explicit operator ratification"
+    ],
+    "authority_class": "CEREBUS_MANUAL",
+    "current_status": "AUTHORITATIVE"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "expected_phase_path": ["STABLE", "WATCH", "ESCALATION_REVIEW", "TRANSFORMATION_CANDIDATE", "TRANSFORMATION_WINDOW", "RECONSOLIDATION", "PLURAL_MODEL_STATE", "STABLE"],
+  "expected_terminal_knowledge": {"@M_A": "ACTIVE", "@M_B": "ACTIVE"},
+  "terminal_states": ["STABLE", "PLURAL_MODEL_STATE"],
+  "contrast_claim": "S01 resolves contradiction -> NEW_STABLE; S05 preserves unresolved multiplicity -> PLURAL_MODEL_STATE. Phase STABLE coexists with plural ACTIVE knowledge (M4/M5 separation)."
+}

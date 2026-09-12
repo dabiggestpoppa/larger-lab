@@ -1,0 +1,71 @@
+{
+  "receipt_schema_version": "1.0",
+  "gate_id": "G1",
+  "milestone_id": "STRESS-G1",
+  "status": "PASS_G1_HARNESS_CONTRACTS",
+  "program": "OCE_INSTITUTIONAL_STRESS_SUITE",
+  "branch": "agent/oce-institutional-stress-suite-build",
+  "starting_sha": "df2abf8334e8cdbdf6a390b2c5c647f8060eae73",
+  "ending_sha": "5fc4d97717a819c5d18407f1764c8263fb7bea0e",
+  "ending_sha_note": "ending_sha is the last content commit; the receipt commit is the terminal commit of the gate.",
+  "commits": [
+    {"sha": "19c201ee", "message": "STRESS-G1A: add canonical schemas and shared deterministic primitives"},
+    {"sha": "4e017db5", "message": "STRESS-G1B: add phase-state validator (M5 Governor machine)"},
+    {"sha": "68e2fd59", "message": "STRESS-G1C: add knowledge lifecycle engine (M4 provisional edge table)"},
+    {"sha": "3b6927e9", "message": "STRESS-G1D: add authority firewall and forbidden-transition checks"},
+    {"sha": "add0e8ae", "message": "STRESS-G1E: add independence vector and provenance/negative/unresolved contracts"},
+    {"sha": "e06f26f8", "message": "STRESS-G1F: add evaluation-contract freeze, deterministic replay, epoch, fixtures"},
+    {"sha": "5fc4d977", "message": "STRESS-G1G: assemble package surface and harness README"}
+  ],
+  "schemas_created": [
+    "evidence-record", "knowledge-record", "transition-record", "independence-record",
+    "negative-knowledge-record", "unresolved-record", "epoch-manifest",
+    "phase-evaluation-contract", "scenario-spec", "schema-registry"
+  ],
+  "schemas_reused": [
+    "capability-grant.schema.json (control-plane; referenced for risk_class/environment vocabulary)",
+    "evidence-manifest.schema.json (control-plane; referenced for evidence lineage conventions)",
+    "event-envelope.schema.json (control-plane; audit-wrapper pattern referenced, not forked)",
+    "schema-registry.json (control-plane; registry convention followed for stress-suite)"
+  ],
+  "tests_run": 77,
+  "pass_count": 77,
+  "fail_count": 0,
+  "known_gaps": [
+    "AMB-09 CEREBUS canonical representation still unresolved (G5 fixture grounding pending operator)",
+    "AMB-10 Crypto doctrine extraction from sibling branches pending operator confirmation",
+    "AMB-02 amendment-version-under-test assumption (v1.0 texts) not yet overridden by operator"
+  ],
+  "contradictions": "Carried forward OPEN: CON-02 (A-009 PO posture vs A-010 Governor decision), CON-03 (threshold preregistration vs opacity). Representation surfaces built; not architecturally resolved.",
+  "ambiguities_carried_forward": [
+    "AMB-01 phase vs knowledge machine mapping (implemented as SEPARATE engines)",
+    "AMB-03 independence aggregation (vector represented; no authoritative scalar)",
+    "AMB-05 threshold preregistration mechanics (PhaseEvaluationContract + freeze built; policy open)",
+    "AMB-06 lifecycle edge table (PROVISIONAL_TEST_CONTRACT, replaceable, history preserved)",
+    "AMB-07 truth-label vs lifecycle vocabularies (M1 kept separate; mapping deferred)",
+    "AMB-08 reversible low-scope boundary (fixtures must pin; Governor exposes classification)",
+    "AMB-11 causal-signature clustering (deterministic grouping only; no automated discovery)",
+    "AMB-12 epoch reconstruction checklist (round-trip done; rehydration checklist is G4)"
+  ],
+  "legal_transition_test_count": 7,
+  "forbidden_transition_test_count": 20,
+  "deterministic_replay_tests": 6,
+  "authority_escalation_tests": 6,
+  "phase_transition_coverage": "M5 legal-edge tests + forbidden negatives present",
+  "forbidden_transition_tests": 20,
+  "artifacts": [
+    "stress-suite/schemas/*.schema.json + schema-registry.json",
+    "stress-suite/engine/*.py (base, phase, lifecycle, authority, forbidden, truth, evidence, independence, negative, unresolved, patch, affected, constraint, evalcontract, window, epoch, outcome, replay, fixtures)",
+    "stress-suite/fixtures/smoke/*.json (3 smoke fixtures, harness mechanics only)",
+    "stress-suite/tests/*.py (77 tests)",
+    "stress-suite/README.md",
+    "stress-suite/evidence/G1_EVIDENCE_RECEIPT.json",
+    "stress-suite/evidence/G1_RESULT.md"
+  ],
+  "cost": 0.0,
+  "cloud_mutations": 0,
+  "production_mutations": 0,
+  "capital_mutations": 0,
+  "authority_changes": "NONE",
+  "next_gate": "G2"
+}

@@ -1,0 +1,18 @@
+{
+  "spec": {
+    "spec_id": "G3-S09-COUNTER",
+    "version_tag": "V1",
+    "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+    "trigger_on_strong_consensus": true,
+    "min_source_lineages_for_trigger": 2,
+    "min_model_or_runtime_lineages_for_trigger": 2,
+    "max_prior_exposure_ratio_for_trigger": 0.0,
+    "budget": 3,
+    "cost_per_method": 3
+  },
+  "findings": [
+    {"method": "fresh_context", "evidence_id": "CA_FRESH_1", "discriminating_contradiction": false},
+    {"method": "reverse_premise", "evidence_id": "CA_REVERSE_1", "discriminating_contradiction": false},
+    {"method": "alternate_source_search", "evidence_id": "CA_SEARCH_1", "discriminating_contradiction": false}
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "actual_outcome": "REOPEN_CANDIDATE",
+  "authority_after": "NONE",
+  "authority_before": "NONE",
+  "authority_changes": "NONE",
+  "behavior_fingerprint": "99e8a0f9dccd595eb0bf775a0c3e2b81",
+  "capital_mutations": 0,
+  "cloud_mutations": 0,
+  "expected_outcome": "REOPEN_CANDIDATE",
+  "expected_outcome_accessed": false,
+  "failures": [],
+  "fingerprint": "8e368f90d4a7a0b5c12a727e6895c2b7",
+  "hidden_ground_truth_accessed": false,
+  "model_calls": 0,
+  "pass": true,
+  "policy_fingerprint": "e959ec6c7ed494f1da978582",
+  "policy_id": "G4_MEMORY_AND_REACTIVATION_POLICY",
+  "policy_version": "V2",
+  "production_mutations": 0,
+  "scenario_id": "S10",
+  "scenario_version": "1.0.0"
+}

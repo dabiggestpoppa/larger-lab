@@ -1,0 +1,9 @@
+{
+  "seq": 1,
+  "authority_seed": {
+    "OPERATOR_1": "OPERATOR",
+    "GOV": "GOVERNOR",
+    "W1": "WORKER"
+  },
+  "note": "operator presents both directional preference cases; W1 present to prove a claimed OPERATOR label carries no authority"
+}

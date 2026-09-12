@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/unresolved-record.json",
+  "title": "OCE Stress Suite Unresolved Records (UNRESOLVED_PATTERN / UNRESOLVED_GOVERNANCE_EVENT)",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id","schema_version","classification","observation","seq"],
+      "properties": {
+        "record_id": {"type": "string", "minLength": 1},
+        "schema_version": {"type": "string"},
+        "classification": {"const": "UNRESOLVED_PATTERN"},
+        "observation": {"type": "string"},
+        "provenance": {"type": ["object", "null"]},
+        "confirmed_by": {"type": "array", "items": {"type": "string"}},
+        "candidate_explanations": {"type": "array", "items": {"type": "string"}},
+        "revisit_trigger": {"type": "string"},
+        "status": {"type": "string"},
+        "seq": {"type": "integer", "minimum": 0}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id","schema_version","classification","description","seq"],
+      "properties": {
+        "record_id": {"type": "string", "minLength": 1},
+        "schema_version": {"type": "string"},
+        "classification": {"const": "UNRESOLVED_GOVERNANCE_EVENT"},
+        "description": {"type": "string"},
+        "provenance": {"type": ["object", "null"]},
+        "suggested_consequences": {"type": "array", "items": {"type": "string"}},
+        "amendment_candidate": {"type": "string"},
+        "status": {"type": "string"},
+        "seq": {"type": "integer", "minimum": 0}
+      }
+    }
+  ]
+}

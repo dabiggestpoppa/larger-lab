@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "worker-identity",
+  "description": "OCE Worker Fabric admitted worker identity (B3-C1). Workers cannot self-authorize; identity is immutable and versioned.",
+  "type": "object",
+  "required": ["worker_id", "admission_nonce", "protocol_version",
+               "host_os_class", "runtime_class", "trust_zone", "worker_version"],
+  "additionalProperties": false,
+  "properties": {
+    "worker_id": { "type": "string", "minLength": 1 },
+    "admission_nonce": { "type": "string", "minLength": 16 },
+    "protocol_version": { "type": "string", "enum": ["1.0"] },
+    "host_os_class": { "type": "string", "enum": ["windows", "linux", "darwin"] },
+    "runtime_class": { "type": "string", "enum": ["python", "container-docker", "isolated-subprocess"] },
+    "trust_zone": { "type": "string", "enum": ["worker-local", "quant-lab", "operator", "isolated"] },
+    "sandbox_profile": { "type": "string", "enum": ["default", "readonly", "network-none", "compute-heavy"] },
+    "worker_version": { "type": "string", "minLength": 1 },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

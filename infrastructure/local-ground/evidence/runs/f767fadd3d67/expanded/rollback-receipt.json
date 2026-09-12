@@ -1,0 +1,55 @@
+{
+  "format": "oce-pg-recovery-receipt-v1",
+  "operation_phase": "finalize",
+  "database": "oce_local",
+  "source_database": "oce_local",
+  "target_database": "oce_local",
+  "source_commit": "unknown",
+  "source_tree": "unknown",
+  "run_id": "f767fadd3d67",
+  "inventory_path": "/tmp/pytest-of-runner/pytest-0/test_ctl_post_promotion_failur0/bk/.backup-content/postgres/inventory.json",
+  "phases": [],
+  "started_at": "2026-08-30T12:33:06Z",
+  "promote_receipt": "/tmp/pytest-of-runner/pytest-0/test_ctl_post_promotion_failur0/promote.json",
+  "stamp": "af5e367a1e25",
+  "staging_database": "oce_local_restore_af5e367a1e25",
+  "quarantine_database": "oce_local_quarantine_af5e367a1e25",
+  "source_archive_sha256": "9f3c4c257e750681b6e9e74be3382413c2e0b71bf21e2238c036d2ba7b5f0785",
+  "promoted": true,
+  "rollback_required": true,
+  "rollback_attempted": true,
+  "rollback_succeeded": true,
+  "rollback_failed": false,
+  "original_canonical_restored": true,
+  "promoted_candidate_removed": true,
+  "quarantine_retained": false,
+  "final_verification": {
+    "result": "failed",
+    "tables": {
+      "public.backup_probe": 2,
+      "public.replace_probe": 2,
+      "public.state_probe": 4
+    },
+    "fingerprints": {
+      "public.backup_probe": "4dac6b7df442f44d90927ace08f5e3fb",
+      "public.replace_probe": "358c8f468382cfe16d17654f10c40905",
+      "public.state_probe": "333d8b545eeb4d0bb63fa6dd6842c081"
+    }
+  },
+  "error": "final canonical verification FAILED (quarantine held; rolling back): value fingerprint mismatch public.backup_probe: expected e2aacec2fe98e981\u2026 got 4dac6b7df442f44d\u2026",
+  "rollback_verification": {
+    "result": "ok",
+    "fingerprints": {
+      "public.backup_probe": "e2aacec2fe98e981dc9f3941062345be",
+      "public.replace_probe": "358c8f468382cfe16d17654f10c40905",
+      "public.state_probe": "333d8b545eeb4d0bb63fa6dd6842c081"
+    },
+    "tables": {
+      "public.backup_probe": 2,
+      "public.replace_probe": 2,
+      "public.state_probe": 4
+    }
+  },
+  "finished_at": "2026-08-30T12:33:07Z",
+  "exit_status": 1
+}

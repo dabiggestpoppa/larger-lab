@@ -1,0 +1,17 @@
+{
+  "os": "Linux",
+  "platform_release": "6.17.0-1022-azure",
+  "machine": "x86_64",
+  "runtime_target": "local",
+  "tools": {
+    "python": "Python 3.12.14",
+    "git": "git version 2.55.0",
+    "docker": "Docker version 28.0.4, build b8034c0",
+    "docker_compose": "Docker Compose version v2.38.2",
+    "ansible": "ansible-playbook [core 2.21.3]",
+    "ansible_lint": "absent",
+    "shellcheck": "ShellCheck - shell script analysis tool",
+    "gitleaks": "absent",
+    "wsl": "absent"
+  }
+}

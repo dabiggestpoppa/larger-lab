@@ -8,8 +8,10 @@
 #   oce-ctl local health              report service health/readiness
 #   oce-ctl local status              print the independent ledger model
 #   oce-ctl local logs [svc]          tails structured logs
-#   oce-ctl backup [--out DIR]        create a local backup
-#   oce-ctl restore --from DIR        restore from a local backup
+#   oce-ctl backup [--scope full|state-only] [--out DIR]   create a local backup
+#                                                          (default --scope full)
+#   oce-ctl restore --mode state-only|full-replace --from DIR
+#                  [--confirm-local-target oce_local]        restore a backup
 #   oce-ctl worker admit              admit a validated local worker
 #   oce-ctl worker reject             reject an unauthorized worker
 #   oce-ctl deploy validate --target cloud   read-only cloud validation (local)
@@ -181,8 +183,13 @@ cmd_worker() {
   return $rc
 }
 
-cmd_backup() { ensure_state; bash "$SCRIPT_DIR/backup.sh" "$@"; rc=$?; log_op "backup" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
-cmd_restore() { ensure_state; bash "$SCRIPT_DIR/restore.sh" "$@"; rc=$?; log_op "restore" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
+cmd_backup() {
+  ensure_state
+  # operator-facing default is full backup; explicit scopes override
+  case " $* " in *" --scope "?) : ;; *) set -- --scope full "$@" ;; esac
+  bash "$SCRIPT_DIR/backup.sh" "$@"; rc=$?; log_op "backup $*" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc
+}
+cmd_restore() { ensure_state; bash "$SCRIPT_DIR/restore.sh" "$@"; rc=$?; log_op "restore $*" "$([ $rc -eq 0 ] && echo true || echo false)"; return $rc; }
 
 usage() {
   cat <<'US'
@@ -191,8 +198,8 @@ Usage: oce-ctl <command> [args]
   local up | down | health | status | logs [svc]
   deploy validate|plan|apply --target cloud
   worker admit <manifest> | worker reject <manifest>
-  backup [--out DIR]
-  restore --from DIR
+  backup [--scope full|state-only] [--out DIR]
+  restore --mode state-only|full-replace --from DIR [--confirm-local-target oce_local]
 US
 }
 
