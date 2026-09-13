@@ -194,10 +194,11 @@ class LocalRuntimeService:
         updated = dc_replace(job, status=RuntimeJobStatus.CANCELLED,
                              updated_at=self._clock())
         self._store.update_job(updated)
+        # P2-C07R4: event identity is store-allocated (no engine internals).
         self._store.append_event(
             JobEvent(
                 event_seq=0,
-                event_id=self._engine._next_event_id(),
+                event_id="",
                 event_type=JobEventType.JOB_CANCELLED,
                 job_id=job_id,
                 occurred_at=self._clock(),

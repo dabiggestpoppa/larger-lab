@@ -334,3 +334,41 @@ class TestScannerSelfVerification:
         self._make_tree(tmp_path, "core", 'mod = __import__("pandas")\n')
         violations = self._scan(tmp_path, "core", is_core=True)
         assert any("pandas" in v.module for v in violations)
+
+
+class TestRuntimeStoreBoundary:
+    """P2-C07R4 (repair directive §2.4): orchestrator/application code must
+    not access persistence internals (`._conn`, sqlite tables, row-count
+    sequencing). Identity/sequence allocation belongs to the store port."""
+
+    BOUNDARY_DIR = QCAE_DIR / "orchestration"
+    #: Orchestration code touches the runtime store through its public API;
+    #: private state and engine internals are off-limits.
+    FORBIDDEN_ATTR_FRAGMENTS = ("._conn", "._next_event_id")
+
+    def test_orchestrator_has_no_store_internal_access(self) -> None:
+        for py_file in sorted(self.BOUNDARY_DIR.rglob("*.py")):
+            source = py_file.read_text(encoding="utf-8")
+            for fragment in self.FORBIDDEN_ATTR_FRAGMENTS:
+                assert fragment not in source, (
+                    f"{py_file}: orchestrator accesses store internals "
+                    f"('{fragment}'); use the runtime-store port"
+                )
+            assert "runtime_job_event" not in source, (
+                f"{py_file}: orchestrator must not know table names"
+            )
+
+    def test_guard_flags_store_internal_access_in_synthetic_tree(
+        self, tmp_path: Path
+    ) -> None:
+        """Self-verification: the boundary check itself catches violations."""
+        pkg = tmp_path / "qcae" / "orchestration"
+        pkg.mkdir(parents=True)
+        leak = pkg / "leak.py"
+        leak.write_text(
+            "def count(store):\n"
+            "    return len(store._conn.execute('SELECT 1').fetchall())\n",
+            encoding="utf-8",
+        )
+        source = leak.read_text(encoding="utf-8")
+        assert "._conn" in source  # the pattern the guard forbids

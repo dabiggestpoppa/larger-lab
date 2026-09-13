@@ -82,27 +82,18 @@ class OrchestratorEngine:
         self._workers = workers or {}
         self._emit = event_emitter or (lambda event, payload: None)
         self._budgets = budget_service
-        self._event_counter = 0
 
     # -- events --------------------------------------------------------------
 
-    def _next_event_id(self) -> str:
-        # Event ids are unique across restarts: seed from the durable event
-        # stream's current high-water mark, not an in-memory counter.
-        if not getattr(self, "_event_seq_seeded", False):
-            self._event_seq_seeded = True
-            self._event_counter = len(self._store._conn.execute(
-                "SELECT event_id FROM runtime_job_event"
-            ).fetchall())
-        self._event_counter += 1
-        return f"ev-{self._event_counter:08d}"
-
     def _record(self, event_type: JobEventType, job_id: str, step_id: str = "",
                 payload_json: str = "") -> None:
+        # P2-C07R4 (directive §2.4): event identity/sequence allocation belongs
+        # to the runtime store, which assigns both durably and collision-safe.
+        # The orchestrator knows no sqlite, no table names, no counters.
         self._store.append_event(
             JobEvent(
                 event_seq=0,
-                event_id=self._next_event_id(),
+                event_id="",
                 event_type=event_type,
                 job_id=job_id,
                 step_id=step_id,
@@ -138,7 +129,7 @@ class OrchestratorEngine:
             tx.add_job(job, queued_at=self._clock(), not_before=not_before)
             tx.append_event(
                 JobEvent(
-                    event_seq=0, event_id=self._next_event_id(),
+                    event_seq=0, event_id="",
                     event_type=JobEventType.JOB_CREATED,
                     job_id=job.job_id, occurred_at=self._clock(),
                 )
@@ -147,7 +138,7 @@ class OrchestratorEngine:
                 tx.add_step(step)
             tx.append_event(
                 JobEvent(
-                    event_seq=0, event_id=self._next_event_id(),
+                    event_seq=0, event_id="",
                     event_type=JobEventType.JOB_QUEUED,
                     job_id=job.job_id, occurred_at=self._clock(),
                 ),
@@ -482,8 +473,6 @@ class OrchestratorEngine:
         # deleting the claim row directly via the queue's expiry path.
         self._queue.expire_stale_leases_for([step.step_id])
 
-    def _release_claim(self, step_id: str) -> None:  # pragma: no cover - legacy
-        pass
 
     def _fail(self, step: RuntimeStep, failure_class: str) -> None:
         assert_step_transition(step.status, RuntimeStepStatus.FAILED)
@@ -514,17 +503,9 @@ class OrchestratorEngine:
         job = self._require_job(job_id)
         steps = self._store.list_steps_for_job(job_id)
         completed = [s.step_id for s in steps if s.status is RuntimeStepStatus.SUCCEEDED]
-        # Monotonic suffix keeps checkpoint ids unique across the whole run
-        # and across restarts (append-oriented progress, never an overwrite).
-        # Seed from durable state so a restarted engine never collides.
-        if not getattr(self, "_checkpoint_seq_seeded", False):
-            self._checkpoint_seq_seeded = True
-            self._checkpoint_seq = len(self._store._conn.execute(
-                "SELECT checkpoint_id FROM runtime_checkpoint WHERE job_id = ?",
-                (job_id,),
-            ).fetchall())
-        self._checkpoint_seq += 1
-        checkpoint_id = f"cp-{job_id}-{self._checkpoint_seq:06d}"
+        # P2-C07R4: checkpoint identity is store-allocated (durable, unique);
+        # the engine holds no counters and no store internals.
+        checkpoint_id = self._store.allocate_checkpoint_id(job_id)
         self._store.put_checkpoint(
             checkpoint_id,
             job_id,

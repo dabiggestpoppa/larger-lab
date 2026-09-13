@@ -13,6 +13,7 @@ DDL is applied by ``RUNTIME_DDL``; tables are additive in schema v4
 from __future__ import annotations
 
 import json
+import secrets
 import sqlite3
 from typing import Dict, List, Optional, Tuple
 
@@ -333,35 +334,51 @@ class SqliteRuntimeStore:
     # -- Job events (append-only) -------------------------------------------
 
     def append_event(self, event: JobEvent, payload_json: str = "") -> int:
-        """Append one runtime fact. seq is assigned by AUTOINCREMENT.
+        """Append one runtime fact; the STORE owns identity allocation.
 
-        ``event.event_seq`` may be 0 at call time; the stored value is
-        returned and the caller should treat the returned seq as canonical.
+        P2-C07R4 (repair directive §2.4): both the durable monotonic
+        ``event_seq`` and the collision-safe ``event_id`` are allocated here,
+        from durable state inside the same write — never from row counts held
+        by callers. Callers pass ``event_seq=0``; ``event_id`` may be empty,
+        in which case a unique ``ev-<seq>-<token>`` id is assigned. Explicit
+        non-empty caller ids are honored (unique-index guarded).
+        The stored seq is returned and is canonical.
         """
+        if event.event_seq != 0:
+            raise QcaeValidationError(
+                "event_seq is store-assigned; pass 0 and treat the return "
+                "value as canonical"
+            )
         row = self._conn.execute(
             "SELECT COALESCE(MAX(event_seq), 0) + 1 FROM runtime_job_event"
         ).fetchone()
         seq = int(row[0])
-        event = dataclasses_replace(event, event_seq=seq)
+        event_id = event.event_id or f"ev-{seq:08d}-{secrets.token_hex(6)}"
+        event = dataclasses_replace(event, event_seq=seq, event_id=event_id)
         event_digest = hashlib.sha256(
             canonical_json_bytes(event.to_dict())
         ).hexdigest()
-        self._conn.execute(
-            "INSERT INTO runtime_job_event (event_seq, event_id, event_type, job_id,"
-            " step_id, occurred_at, actor, payload_json, event_digest)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                seq,
-                event.event_id,
-                event.event_type.value,
-                event.job_id,
-                event.step_id,
-                event.occurred_at,
-                event.actor,
-                payload_json,
-                event_digest,
-            ),
-        )
+        try:
+            self._conn.execute(
+                "INSERT INTO runtime_job_event (event_seq, event_id, event_type, job_id,"
+                " step_id, occurred_at, actor, payload_json, event_digest)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    seq,
+                    event.event_id,
+                    event.event_type.value,
+                    event.job_id,
+                    event.step_id,
+                    event.occurred_at,
+                    event.actor,
+                    payload_json,
+                    event_digest,
+                ),
+            )
+        except sqlite3.IntegrityError as exc:
+            raise QcaeValidationError(
+                f"duplicate event_id {event.event_id!r} (event identity collision)"
+            ) from exc
         return seq
 
     def event_digest_of(self, event_id: str) -> Optional[str]:
@@ -400,6 +417,28 @@ class SqliteRuntimeStore:
         return events
 
     # -- Checkpoints ---------------------------------------------------------
+
+    def allocate_checkpoint_id(self, job_id: str) -> str:
+        """Store-side durable checkpoint identity (P2-C07R4, §2.4).
+
+        Sequence derived from the durable per-job high-water mark at write
+        time; uniqueness guarded by the checkpoint primary key, so a retry
+        after a torn write cannot collide with a stored row.
+        """
+        row = self._conn.execute(
+            "SELECT COUNT(*) FROM runtime_checkpoint WHERE job_id = ?",
+            (job_id,),
+        ).fetchone()
+        seq = int(row[0]) + 1
+        while True:
+            candidate = f"cp-{job_id}-{seq:06d}"
+            exists = self._conn.execute(
+                "SELECT 1 FROM runtime_checkpoint WHERE checkpoint_id = ?",
+                (candidate,),
+            ).fetchone()
+            if not exists:
+                return candidate
+            seq += 1
 
     def put_checkpoint(
         self, checkpoint_id: str, job_id: str, step_id: str, data: dict, created_at: str
