@@ -9,9 +9,32 @@
 
 ## Current Phase
 
-**P2 — IN BUILD** (Job Runtime + Local Governance; authorized at reviewed head `4f3ec2f6`)
+**P2 — FROZEN (LOCAL TEST EVIDENCE: 861/861 at `8022b61d`)** — Job Runtime + Local Governance complete; pending operator review; **P3 NOT started**
 
 Prior phases: P0 FROZEN+RECONCILED · P0-A001 FROZEN · P1 FROZEN / OPERATOR-REVIEWED + R1 COMPLETE (incl. ADR-0007 identity/revision repair).
+
+### P2 milestone ledger (commits)
+
+- `ab0098c5` P2-I0 — ADR-0008 (runtime state vocabulary, additive over frozen P0 identity layer) + ADR-0009 (13.2 policy decisions ↔ P0 authority outcomes) + ledger transition
+- `52be767f` P2-C01 — runtime job/step domain, fail-closed state machines (Book V 13.6 step vocabulary verbatim), step graph with cycle/self/missing-dep rejection
+- `534f7864` P2-C02 — durable runtime store: jobs, steps, append-only digest-verified event log, checkpoints, idempotency table
+- `766efa0d` P2-C03 — durable step queue: token-guarded lease ownership, guarded-claim upsert, expiry recovery
+- `cb047e4a` P2-C04 — local identity, versioned fail-closed policy engine (no mutation API), LocalAuthorityProvider behind a port
+- `e1936d06` P2-C05 — approval + escalation workflow: exact-scope binding (laundering rejected at write), expiry, durable decision records
+- `fbe93cef` P2-C06 — Context Packet (least-context, reference-based) + typed WorkerRequest/WorkerResult (canon 12.3 vocabulary) + six test workers
+- `21bc4466` P2-C07 — orchestrator engine: bounded class-specific retries, semantic checkpoints, idempotent completion, crash recovery (completed steps never repeated; authority rechecked after restart)
+- `0603b882` P2-C08 — hierarchical budgets: conservation law (child ≤ parent remaining), retry consumption, no reset on recovery, approval-scoped increases
+- `38e6ca66` P2-C09 — SecretProvider (handles not values), value-free audit log, centralized Redactor on failure paths
+- `c531e12f` P2-C10 — standalone runtime service: submit/inspect/list/run/resume/cancel/approvals/recovery/identity; safe cancellation; job completion semantics
+- `49f6fdbc` P2-C11 — composition factory + QcaeApp application service + thin CLI (job/approval/identity commands)
+- `61488273` P2-C12 — schema migration v3→v4 (additive runtime + governance tables) + backup/restore carrying full runtime state; stale leases recoverable after restore
+- `afdbaa84` P2-T01 — adversarial qualification: forged approvals, stale tokens, budget underflow, retry storms (bounded at max_attempts), tampered payloads, restart-during-wait, durable DENY
+- freeze commits — generator (`p2_freeze_manifest.py`) + manifest sealed with captured test results
+
+### P2 exit-gate status
+
+All directive §44 criteria satisfied with committed evidence: durable jobs/steps with explicit transitions; graph dependencies (A→B→C and fan-out/fan-in) proven; queue uses single-owner leases with expiry recovery; crash/restart resumes without repeating committed steps; retries bounded by class and max_attempts; budgets conserved; local identity/policy deterministic and versioned; REQUIRE_APPROVAL blocks execution and approval scope cannot be laundered; secrets are references with value-free audit; Context Packets are least-context; worker handoffs typed; escalation durable; cancellation safe; P1→P2 migration preserves registry/evidence state; backup/restore preserves runtime state; runtime runs with OCE completely absent (`OCE_ABSENT`); architecture guards green (engine confined to infrastructure; core stdlib-only).Freeze manifest: `qcae/implementation/P2-freeze-manifest.json` — test results captured from an actual full-suite run by the fail-closed generator (`qcae/implementation/tools/p2_freeze_manifest.py`), never hardcoded.
+
 
 ### P2 — Job Runtime + Local Governance (opened)
 
