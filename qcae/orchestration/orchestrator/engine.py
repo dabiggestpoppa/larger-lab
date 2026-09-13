@@ -120,9 +120,11 @@ class OrchestratorEngine:
                not_before: str = "") -> RuntimeJob:
         """Persist a new job + its graph atomically in CREATED state.
 
-        Deterministic step ids are caller-supplied but validated for
-        duplicates via the graph; re-submission of the same deterministic_id
-        is refused (idempotency at the job boundary).
+        P2-C07R3 (repair directive §2.3): job identity, every step, the
+        initial events, and queue metadata commit in ONE transaction on the
+        store's connection — any failure rolls back to no job, no steps, no
+        partial event history. Re-submission of the same deterministic_id is
+        refused (idempotency at the job boundary).
         """
         job.validate()
         for step in steps:
@@ -132,15 +134,28 @@ class OrchestratorEngine:
             raise QcaeValidationError(
                 f"job with deterministic_id {job.deterministic_id!r} already exists"
             )
-        self._store.add_job(job, queued_at=self._clock(), not_before=not_before)
-        self._record(JobEventType.JOB_CREATED, job.job_id)
-        for step in steps:
-            self._store.add_step(step)
-        self._record(
-            JobEventType.JOB_QUEUED, job.job_id,
-            payload_json=f'{{"steps": {len(steps)}, "graph_version": "{job.step_graph_version}"}}',
-        )
-        _ = graph  # structural validation happened above
+        with self._store.transaction() as tx:
+            tx.add_job(job, queued_at=self._clock(), not_before=not_before)
+            tx.append_event(
+                JobEvent(
+                    event_seq=0, event_id=self._next_event_id(),
+                    event_type=JobEventType.JOB_CREATED,
+                    job_id=job.job_id, occurred_at=self._clock(),
+                )
+            )
+            for step in steps:
+                tx.add_step(step)
+            tx.append_event(
+                JobEvent(
+                    event_seq=0, event_id=self._next_event_id(),
+                    event_type=JobEventType.JOB_QUEUED,
+                    job_id=job.job_id, occurred_at=self._clock(),
+                ),
+                payload_json=(
+                    f'{{"steps": {len(steps)}, '
+                    f'"graph_version": "{job.step_graph_version}"}}'
+                ),
+            )
         return job
 
     def mark_running(self, job_id: str) -> RuntimeJob:

@@ -42,6 +42,7 @@ from qcae.orchestration.orchestrator.execution import (
 
 __all__ = [
     "SqliteRuntimeStore",
+    "RuntimeTransaction",
     "RUNTIME_DDL",
     "RUNTIME_TABLES",
 ]
@@ -144,11 +145,39 @@ RUNTIME_TABLES = (
 )
 
 
+class RuntimeTransaction:
+    """Unit-of-work view over one SQLite transaction (P2-C07R3, §2.3).
+
+    Exposes only the write operations a multi-record commit needs, all on
+    the SAME connection, so the group either commits together or not at all.
+    """
+
+    def __init__(self, store: "SqliteRuntimeStore") -> None:
+        self._store = store
+
+    def add_job(self, job, *, queued_at: str = "", not_before: str = "") -> None:
+        self._store.add_job(job, queued_at=queued_at, not_before=not_before)
+
+    def add_step(self, step, *, not_before: str = "") -> None:
+        self._store.add_step(step, not_before=not_before)
+
+    def append_event(self, event, payload_json: str = "") -> int:
+        return self._store.append_event(event, payload_json=payload_json)
+
+
 class SqliteRuntimeStore:
     """Durable job/step/event/checkpoint persistence (P2 directive §8)."""
 
     def __init__(self, conn: sqlite3.Connection) -> None:
         self._conn = conn
+
+    def transaction(self) -> "RuntimeTransaction":
+        """Context manager: all writes inside commit together or not at all.
+
+        Real transaction semantics (BEGIN IMMEDIATE ... COMMIT/ROLLBACK) on
+        the store's connection — never fake ones (directive §2.3).
+        """
+        return _StoreTransaction(self)
 
     # -- RuntimeJob ----------------------------------------------------------
 
@@ -558,3 +587,34 @@ class SqliteRuntimeStore:
             ).fetchone()
             is not None
         )
+
+
+class _StoreTransaction:
+    """Explicit BEGIN IMMEDIATE / COMMIT / ROLLBACK around a write group.
+
+    Used by ``SqliteRuntimeStore.transaction()`` so multi-record writes
+    (job + steps + initial events) either commit together or not at all
+    (P2-C07R3, repair directive §2.3).
+    """
+
+    def __init__(self, store: SqliteRuntimeStore) -> None:
+        self._store = store
+        self._conn = store._conn
+
+    def __enter__(self) -> RuntimeTransaction:
+        # A prior DDL executescript / legacy-mode implicit txn can leave the
+        # connection inside a transaction on entry. That open txn holds no
+        # intended work here (the runtime store has no autocommit writes), so
+        # end it explicitly before taking the write lock — otherwise SQLite
+        # rejects the nested BEGIN (budget-suite fixtures hit this).
+        if self._conn.in_transaction:
+            self._conn.commit()
+        self._conn.execute("BEGIN IMMEDIATE")
+        return RuntimeTransaction(self._store)
+
+    def __exit__(self, exc_type, exc, tb) -> bool:
+        if exc_type is None:
+            self._conn.execute("COMMIT")
+        else:
+            self._conn.execute("ROLLBACK")
+        return False  # never swallow failures
