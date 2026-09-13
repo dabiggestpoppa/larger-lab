@@ -338,6 +338,24 @@ class OrchestratorEngine:
         self._record(JobEventType.CHECKPOINT_WRITTEN, step.job_id, step.step_id)
         self._record(JobEventType.STEP_SUCCEEDED, step.job_id, step.step_id)
         self.write_checkpoint(step.job_id)
+        self._succeed_job_if_graph_done(step.job_id)
+
+    def _succeed_job_if_graph_done(self, job_id: str) -> None:
+        """Job-level completion when every step reached a terminal state."""
+        job = self._store.get_job(job_id)
+        if job is None or job.status is not RuntimeJobStatus.RUNNING:
+            return
+        steps = self._store.list_steps_for_job(job_id)
+        if steps and all(
+            s.status in (RuntimeStepStatus.SUCCEEDED, RuntimeStepStatus.CANCELLED)
+            for s in steps
+        ):
+            assert_job_transition(job.status, RuntimeJobStatus.SUCCEEDED)
+            self._store.update_job(
+                dc_replace(job, status=RuntimeJobStatus.SUCCEEDED,
+                           updated_at=self._clock())
+            )
+            self._record(JobEventType.JOB_SUCCEEDED, job_id)
 
     def _ack_safely(self, step: RuntimeStep) -> None:
         try:
