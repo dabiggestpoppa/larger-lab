@@ -1,0 +1,92 @@
+[
+  {
+    "case": "no_acquisition",
+    "expected_error": "MissingAcquisitionProvenance",
+    "local_integrity_proven": true,
+    "manifest_allowed": false,
+    "matching_acquisition_count": 0,
+    "provider_integrity_proven": false,
+    "test_name": "test_no_acquisition_manifest_rejected"
+  },
+  {
+    "case": "matching_acquisition",
+    "expected_error": null,
+    "local_integrity_proven": true,
+    "manifest_allowed": true,
+    "matching_acquisition_count": 1,
+    "provider_integrity_proven": false,
+    "test_name": "test_matching_acquisition_manifest_accepted"
+  },
+  {
+    "case": "wrong_provider",
+    "expected_error": "MissingAcquisitionProvenance",
+    "local_integrity_proven": true,
+    "manifest_allowed": false,
+    "matching_acquisition_count": 0,
+    "provider_integrity_proven": false,
+    "test_name": "test_wrong_provider_rejected"
+  },
+  {
+    "case": "wrong_sensor",
+    "expected_error": "MissingAcquisitionProvenance",
+    "local_integrity_proven": true,
+    "manifest_allowed": false,
+    "matching_acquisition_count": 0,
+    "provider_integrity_proven": false,
+    "test_name": "test_wrong_sensor_rejected"
+  },
+  {
+    "case": "wrong_instrument",
+    "expected_error": "MissingAcquisitionProvenance",
+    "local_integrity_proven": true,
+    "manifest_allowed": false,
+    "matching_acquisition_count": 0,
+    "provider_integrity_proven": false,
+    "test_name": "test_wrong_native_instrument_rejected"
+  },
+  {
+    "case": "multiple_one_matching",
+    "expected_error": null,
+    "local_integrity_proven": true,
+    "manifest_allowed": true,
+    "matching_acquisition_count": 1,
+    "provider_integrity_proven": false,
+    "test_name": "test_multiple_acquisitions_one_matching_accepted"
+  },
+  {
+    "case": "h3_valid",
+    "expected_error": null,
+    "local_integrity_proven": true,
+    "manifest_allowed": null,
+    "matching_acquisition_count": 1,
+    "provider_integrity_proven": true,
+    "test_name": "test_real_sha256_h3_accepted"
+  },
+  {
+    "case": "h3_false_claim",
+    "expected_error": "ProviderChecksumClaimConflict",
+    "local_integrity_proven": true,
+    "manifest_allowed": null,
+    "matching_acquisition_count": 0,
+    "provider_integrity_proven": false,
+    "test_name": "test_fake_md5_verified_rejected"
+  },
+  {
+    "case": "h3_missing_proof",
+    "expected_error": "UnearnedProviderIntegrityClaim",
+    "local_integrity_proven": true,
+    "manifest_allowed": false,
+    "matching_acquisition_count": 1,
+    "provider_integrity_proven": false,
+    "test_name": "test_provider_manifest_claim_without_earned_h3_rejected"
+  },
+  {
+    "case": "provider_integrity_manifest",
+    "expected_error": null,
+    "local_integrity_proven": true,
+    "manifest_allowed": true,
+    "matching_acquisition_count": 1,
+    "provider_integrity_proven": true,
+    "test_name": "test_provider_manifest_claim_with_earned_h3_accepted"
+  }
+]

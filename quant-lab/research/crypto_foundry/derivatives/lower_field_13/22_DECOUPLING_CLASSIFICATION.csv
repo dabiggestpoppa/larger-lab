@@ -1,0 +1,7 @@
+class,n,share,rejoin_rate,note
+CONTAGION_LINKED,91,0.0895,0.0,
+HEALTH_DECAY,52,0.0511,0.0,
+LIQUIDITY_LINKED,378,0.3717,0.0,
+NEW_NEIGHBORHOOD_FAILURE,171,0.1681,0.0,
+MIXED_OR_UNCLASSIFIED,325,0.3196,n/a,
+VERDICT,,CONTINUOUS_MULTI_MECHANISM,,classes overlap; a large share is mixed — persistent decoupling is retained as a continuous multi-mechanism map rather than a clean taxonomy

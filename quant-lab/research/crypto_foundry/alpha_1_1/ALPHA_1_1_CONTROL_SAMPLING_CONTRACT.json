@@ -1,0 +1,13 @@
+{
+  "contract_id": "ALPHA1_1_CONTROL_SAMPLING_V1",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "protocol": "STATE-MATCHED_RANDOM",
+  "seed": 31082026,
+  "draws_per_event": 10,
+  "matching": [
+    "asset",
+    "month",
+    "hour_utc"
+  ],
+  "no_future": true
+}

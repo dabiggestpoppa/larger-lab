@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "dexpaprika_search_uniswap",
+  "method": "GET",
+  "url": "https://api.dexpaprika.com/search",
+  "request_params": {
+    "query": "uniswap"
+  },
+  "request_json": null,
+  "retrieved_at": "2026-08-24T14:11:06+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "0256c78c93bb3b4aa393da10a11455736e039670b10b3e03c8080e227d0f03b5",
+  "bytes": 31992,
+  "access_class": "PUBLIC",
+  "notes": "search endpoint sanity",
+  "known_limitations": ""
+}

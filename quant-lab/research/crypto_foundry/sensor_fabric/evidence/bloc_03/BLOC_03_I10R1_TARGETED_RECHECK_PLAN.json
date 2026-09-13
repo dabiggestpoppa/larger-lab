@@ -1,0 +1,72 @@
+{
+  "characterization_calls": 2,
+  "characterization_evidence_ref": "BLOC_03_I10R1_STRUCTURAL_ADJUDICATION.json",
+  "credentials": "NONE",
+  "method": "GET",
+  "plan": {
+    "logical_path_count": 4,
+    "manifest_hash": "e77646fd4c5202e4",
+    "max_permitted_max_calls": 20,
+    "page_size_hint": 25,
+    "physical_request_count": 4,
+    "purpose": "PROBE",
+    "requests": [
+      {
+        "adapter_semantic_version": "gate-adapter-v1",
+        "end_time": "2026-09-01T00:06:52.823267+00:00",
+        "granularity": null,
+        "native_instrument_id": "BTC_USDT",
+        "page_size_hint": 25,
+        "provider_id": "GATE_FUTURES",
+        "purpose": "PROBE",
+        "sensor_family": "MECHANICAL_LIQUIDATION",
+        "start_time": "2026-08-31T00:06:52.823267+00:00"
+      },
+      {
+        "adapter_semantic_version": "gate-adapter-v1",
+        "end_time": "2026-09-01T00:06:52.823267+00:00",
+        "granularity": null,
+        "native_instrument_id": "BTC_USDT",
+        "page_size_hint": 25,
+        "provider_id": "GATE_FUTURES",
+        "purpose": "PROBE",
+        "sensor_family": "MECHANICAL_OPEN_INTEREST",
+        "start_time": "2026-08-31T00:06:52.823267+00:00"
+      },
+      {
+        "adapter_semantic_version": "gate-adapter-v1",
+        "end_time": "2026-09-01T00:06:52.823267+00:00",
+        "granularity": null,
+        "native_instrument_id": "BTC_USDT",
+        "page_size_hint": 25,
+        "provider_id": "GATE_FUTURES",
+        "purpose": "PROBE",
+        "sensor_family": "MECHANICAL_POSITIONING",
+        "start_time": "2026-08-31T00:06:52.823267+00:00"
+      },
+      {
+        "adapter_semantic_version": "kraken-adapter-v1",
+        "end_time": "2026-09-01T00:06:52.823267+00:00",
+        "granularity": null,
+        "native_instrument_id": "PI_XBTUSD",
+        "page_size_hint": 25,
+        "provider_id": "KRAKEN_FUTURES",
+        "purpose": "PROBE",
+        "sensor_family": "MECHANICAL_FUNDING",
+        "start_time": "2026-08-31T00:06:52.823267+00:00"
+      }
+    ],
+    "run_anchor_utc": "2026-09-01T02:06:52.823267+00:00",
+    "run_id": "i10r1-recheck",
+    "run_timestamp_utc": "2026-09-01T02:06:52.823267+00:00",
+    "starting_sha": "6081b88ae558fb9e48b4c3bdb8deee787115c169"
+  },
+  "recheck_calls": 4,
+  "repair_shas": [
+    "c773aaac",
+    "fb8c4d48",
+    "6081b88a"
+  ],
+  "total_i10r1_live_call_budget": 6,
+  "zero_retry_policy": true
+}

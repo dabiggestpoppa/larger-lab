@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "case": "i05r3_lineage_generated_matches_committed",
+      "committed_bytes_present": true,
+      "generated_bytes_sha_matches_committed": true
+    },
+    {
+      "case": "i05r3_time_generated_matches_committed",
+      "committed_bytes_present": true,
+      "generated_bytes_sha_matches_committed": true
+    },
+    {
+      "case": "pytest_evidence_tree_unchanged",
+      "committed_matrix_files": [
+        "BLOC_04_I05_LINEAGE_MATRIX.json",
+        "BLOC_04_I05_PROJECTION_INTEGRITY.json",
+        "BLOC_04_I05_PROJECTION_SCHEMA_MATRIX.json",
+        "BLOC_04_I05R1_DURABILITY_MATRIX.json",
+        "BLOC_04_I05R1_END_TO_END_LINEAGE_MATRIX.json",
+        "BLOC_04_I05R1_SCHEMA_FIDELITY_MATRIX.json",
+        "BLOC_04_I05R2_CRASH_BOUNDARY_MATRIX.json",
+        "BLOC_04_I05R2_PHYSICAL_SCHEMA_MATRIX.json",
+        "BLOC_04_I05R2_PUBLIC_API_MATRIX.json",
+        "BLOC_04_I05R3_LINEAGE_IDENTITY_MATRIX.json",
+        "BLOC_04_I05R3_TIME_CONTRACT_MATRIX.json",
+        "BLOC_04_I05R4_EVIDENCE_IMMUTABILITY_MATRIX.json",
+        "BLOC_04_I05R4_SERVICE_RETRY_MATRIX.json",
+        "BLOC_04_I05R4_VERIFIER_INTERFACE_MATRIX.json"
+      ],
+      "generator_writes_to_evidence_dir": false
+    },
+    {
+      "case": "portable_i05r3_root",
+      "hardcoded_root_present": false,
+      "tmp_path_derived_root": true
+    },
+    {
+      "case": "portable_e2e_root",
+      "hardcoded_root_present": false,
+      "tmp_path_derived_root": true
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R4",
+  "generated_from_fixture": "i05r4-deterministic-fixture-v1",
+  "matrix": "BLOC_04_I05R4_EVIDENCE_IMMUTABILITY_MATRIX"
+}

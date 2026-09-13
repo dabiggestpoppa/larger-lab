@@ -1,0 +1,14 @@
+node,operation,evidence,status
+HH_STATE_AGE_MATURITY,PROMOTE,fwd7 prop rises with age within HH (continuous surface),NEW_NODE
+HH_MATURITY_WITHIN_EPISODE,KEEP,maturity effect not separable from selection (within-episode n small),NOT_EARNED_SEPARATELY
+HH_BIRTH_QUALITY,KEEP,univariate entry signal (breadth/disp/btc) but purged CV perm p=0.80 - NOT robust,DIRECTIONAL_ONLY
+LOCAL_BIFURCATION_SEARCH,DESCRIPTIVE,"raw-coordinate sharp regions on ['top500_breadth_30d', 'top500_dispersion_30d', 'rank_depth_rel', 'top3_share', 'vol_med'] are route-gate projections (breadth/rank-depth gates already earned); no novel multidimensional boundary",SHARP_ROUTE_GATE_ONLY
+SECOND_ORDER_STATE_PATHS,KEEP,below naming bar,DESCRIPTIVE
+TRANSITION_VELOCITY,KEEP,velocity not outcome-relevant,DESCRIPTIVE
+PERTURBATION_RESPONSE,NEW_NODE,8 cell x perturbation cells with |delta_prop|>=0.05,LOCAL_NODE
+HEALTH_STATE_FIELD_MATRIX,NEW_NODE,4 health states embedded in distinct field geometry (11),PRIORITY_MATRIX_EARNED
+STRESS_RESPONSE_STRATIFICATION,NEW_NODE,RESPONDS vs NO_RESPONSE separable on field coords (13/14),SUPPORTED
+STRESS_RESPONSE_SURFACE,KEEP,verdict=NO_STABLE_RESPONSE,NO_STABLE_RESPONSE
+LIQUIDITY_LOCAL_PLACEMENT,PARK,no stable incremental role (17),PARKED
+SHMC_SHHM_LOCALITY,LOCAL_NODE,locality map produced (18),LOCAL_ROLE
+VOLATILITY_LOCALITY,LOCAL_NODE,vol conditions HH persistence/intensity (19),LOCAL_ROLE_INTENSITY

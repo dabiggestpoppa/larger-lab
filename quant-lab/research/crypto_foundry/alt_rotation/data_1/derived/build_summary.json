@@ -1,0 +1,511 @@
+{
+  "universe_rows": 1098000,
+  "n_dates": 2196,
+  "n_unique_assets": 2898,
+  "identity_rows": 2898,
+  "eligibility_rows": 493419,
+  "eligibility_eligible_ex_liquidity": 314217,
+  "eligibility_mature_30d": 314217,
+  "eligibility_tradable": 324576,
+  "asset_feature_rows": 1098000,
+  "asset_feature_cols": 128,
+  "band_feature_rows": 15372,
+  "sector_feature_rows": 2742365,
+  "sector_membership_rows": 6490190,
+  "terrain_rows": 2196,
+  "feature_registry_sha256": "12655965882ffe6ab1083e96a65dd06c299b6425c39660fa733e00506fa15189",
+  "first_date": "2020-06-01",
+  "last_date": "2026-08-23",
+  "date_range_expected": "2020-06-01..2026-08-23",
+  "collision_class_counts": {
+    "PROVIDER_SYMBOL_COLLISION": 783,
+    "UNKNOWN_COLLISION": 674,
+    "NO_COLLISION": 1143,
+    "TRUE_TICKER_REUSE": 298
+  },
+  "sector_statuses": [
+    "HISTORICAL_APPROXIMATION"
+  ],
+  "liquidity_statuses": [
+    "VOLUME_PROXY_ONLY",
+    "PARTIAL",
+    "N_A_NOT_LISTED"
+  ],
+  "excluded_dates": [
+    {
+      "historical_date": "20210928",
+      "rows": 318,
+      "exclusion": "CMC_side_data_gap_20210928",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230513",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230513",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230605",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230605",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230612",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230612",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230624",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230624",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230721",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230721",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230729",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230729",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230807",
+      "rows": 498,
+      "exclusion": "CMC_side_data_gap_20230807",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230831",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230831",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230913",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230913",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20230925",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20230925",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20231011",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20231011",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20231110",
+      "rows": 497,
+      "exclusion": "CMC_side_data_gap_20231110",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20231114",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20231114",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20231123",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20231123",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20231206",
+      "rows": 498,
+      "exclusion": "CMC_side_data_gap_20231206",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20231211",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20231211",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20231228",
+      "rows": 498,
+      "exclusion": "CMC_side_data_gap_20231228",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20240102",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20240102",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20240103",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20240103",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20240108",
+      "rows": 498,
+      "exclusion": "CMC_side_data_gap_20240108",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "20240114",
+      "rows": 499,
+      "exclusion": "CMC_side_data_gap_20240114",
+      "note": "snapshot incomplete on source; reconstruction attempt exhausted; excluded from panel"
+    },
+    {
+      "historical_date": "2020-10-28",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-10-28",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-10-29",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-10-29",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-10-30",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-10-30",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-10-31",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-10-31",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-01",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-11-01",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-02",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-11-02",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-03",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-11-03",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-04",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-11-04",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-05",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-11-05",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-06",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-11-06",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-07",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-11-07",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-08",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2020-11-08",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-09",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2020-11-09",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-10",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2020-11-10",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-11",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2020-11-11",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-12",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2020-11-12",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-13",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2020-11-13",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-14",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2020-11-14",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-15",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2020-11-15",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2020-11-18",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2020-11-18",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2021-01-08",
+      "rows": 499,
+      "exclusion": "CMC_pagination_gap_2021-01-08",
+      "note": "top-500 incomplete after rank filter; 499 of 500 rows retained"
+    },
+    {
+      "historical_date": "2021-01-16",
+      "rows": 499,
+      "exclusion": "CMC_pagination_gap_2021-01-16",
+      "note": "top-500 incomplete after rank filter; 499 of 500 rows retained"
+    },
+    {
+      "historical_date": "2021-06-01",
+      "rows": 499,
+      "exclusion": "CMC_pagination_gap_2021-06-01",
+      "note": "top-500 incomplete after rank filter; 499 of 500 rows retained"
+    },
+    {
+      "historical_date": "2021-12-31",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2021-12-31",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-01",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-01",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-02",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-02",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-03",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-03",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-04",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-04",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-05",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-05",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-06",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-06",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-07",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-07",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-08",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-08",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-09",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-09",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-10",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-10",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-11",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-11",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-12",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-12",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-13",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-13",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-14",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-14",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-15",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-15",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-16",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-16",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-17",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-17",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-18",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-18",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-19",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-19",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-20",
+      "rows": 497,
+      "exclusion": "CMC_pagination_gap_2022-01-20",
+      "note": "top-500 incomplete after rank filter; 497 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-21",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2022-01-21",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-22",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2022-01-22",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-23",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2022-01-23",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-24",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2022-01-24",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-25",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2022-01-25",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2022-01-26",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2022-01-26",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2023-05-31",
+      "rows": 499,
+      "exclusion": "CMC_pagination_gap_2023-05-31",
+      "note": "top-500 incomplete after rank filter; 499 of 500 rows retained"
+    },
+    {
+      "historical_date": "2023-09-16",
+      "rows": 496,
+      "exclusion": "CMC_pagination_gap_2023-09-16",
+      "note": "top-500 incomplete after rank filter; 496 of 500 rows retained"
+    },
+    {
+      "historical_date": "2023-10-17",
+      "rows": 488,
+      "exclusion": "CMC_pagination_gap_2023-10-17",
+      "note": "top-500 incomplete after rank filter; 488 of 500 rows retained"
+    },
+    {
+      "historical_date": "2024-05-07",
+      "rows": 484,
+      "exclusion": "CMC_pagination_gap_2024-05-07",
+      "note": "top-500 incomplete after rank filter; 484 of 500 rows retained"
+    },
+    {
+      "historical_date": "2024-08-01",
+      "rows": 490,
+      "exclusion": "CMC_pagination_gap_2024-08-01",
+      "note": "top-500 incomplete after rank filter; 490 of 500 rows retained"
+    },
+    {
+      "historical_date": "2024-08-15",
+      "rows": 492,
+      "exclusion": "CMC_pagination_gap_2024-08-15",
+      "note": "top-500 incomplete after rank filter; 492 of 500 rows retained"
+    },
+    {
+      "historical_date": "2024-08-17",
+      "rows": 472,
+      "exclusion": "CMC_pagination_gap_2024-08-17",
+      "note": "top-500 incomplete after rank filter; 472 of 500 rows retained"
+    }
+  ],
+  "n_excluded_dates": 79
+}

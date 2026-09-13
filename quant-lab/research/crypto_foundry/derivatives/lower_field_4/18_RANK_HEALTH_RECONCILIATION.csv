@@ -1,0 +1,13 @@
+rank_band,threshold,participation,horizon,n,p_reversal,rank_velocity_definition,purge,mech7_comparison,adjudication
+1001-1500,z1>=2,ISOLATED,3D,83,0.6265060240963856,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+1001-1500,z1>=2,ISOLATED,7D,83,0.6144578313253012,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+1001-1500,z1>=2,ISOLATED,14D,83,0.6265060240963856,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+1501-2000,z1>=2,ISOLATED,3D,29,0.7931034482758621,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+1501-2000,z1>=2,ISOLATED,7D,29,0.7241379310344828,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+1501-2000,z1>=2,ISOLATED,14D,29,0.6551724137931034,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+501-750,z1>=2,ISOLATED,3D,508,0.5393700787401575,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+501-750,z1>=2,ISOLATED,7D,508,0.5177165354330708,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+501-750,z1>=2,ISOLATED,14D,508,0.515748031496063,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+751-1000,z1>=2,ISOLATED,3D,403,0.56575682382134,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+751-1000,z1>=2,ISOLATED,7D,403,0.5707196029776674,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY
+751-1000,z1>=2,ISOLATED,14D,403,0.5459057071960298,not available as future rank; pre-event only,not applied to descriptive denominator,not directly reproducible without MECH-7 event table,DESCRIPTIVE_ONLY

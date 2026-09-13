@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "AccessClass": {
+      "description": "Free-only access taxonomy (Bloc 1 §7).",
+      "enum": [
+        "FREE_AUTOMATED",
+        "FREE_LIMITED_AUTOMATED",
+        "FREE_REFERENCE_ONLY",
+        "PAID_EXCLUDED",
+        "UNVERIFIED"
+      ],
+      "title": "AccessClass",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Cost/access contract for a provider or provider capability.",
+  "properties": {
+    "access_class": {
+      "$ref": "#/$defs/AccessClass",
+      "default": "UNVERIFIED"
+    },
+    "api_key_required": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Api Key Required"
+    },
+    "cost_usd_required": {
+      "default": 0,
+      "title": "Cost Usd Required",
+      "type": "integer"
+    },
+    "historical_access_claimed": {
+      "default": false,
+      "title": "Historical Access Claimed",
+      "type": "boolean"
+    },
+    "historical_access_verified": {
+      "default": false,
+      "title": "Historical Access Verified",
+      "type": "boolean"
+    },
+    "payment_method_required": {
+      "default": false,
+      "title": "Payment Method Required",
+      "type": "boolean"
+    },
+    "rate_limit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rate Limit"
+    },
+    "staking_required": {
+      "default": false,
+      "title": "Staking Required",
+      "type": "boolean"
+    },
+    "terms_reference": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terms Reference"
+    },
+    "transaction_required": {
+      "default": false,
+      "title": "Transaction Required",
+      "type": "boolean"
+    },
+    "verification_method": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verification Method"
+    },
+    "verified_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verified At"
+    }
+  },
+  "title": "FreeOnlyPolicy",
+  "type": "object"
+}

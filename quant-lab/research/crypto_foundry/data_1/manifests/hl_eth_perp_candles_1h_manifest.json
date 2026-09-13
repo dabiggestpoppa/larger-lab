@@ -1,0 +1,20 @@
+{
+  "dataset_id": "hl_eth_perp_candles_1h",
+  "venue": "hyperliquid",
+  "market": "ETH-PERP",
+  "source": "hyperliquid_rest",
+  "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info (candleSnapshot 1h)",
+  "collector_version": "1.1.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": null,
+  "last_timestamp": null,
+  "row_count": 5003,
+  "sha256": "4294e5e962dfa0ebc691a73aa9fa967257ddf1f3b7fc2ab2ac103d1266345cdc",
+  "created_at_utc": "2026-08-21T16:44:52.481976+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "1H candles used for cross-source parity overlap only"
+  ],
+  "status": "VALID"
+}

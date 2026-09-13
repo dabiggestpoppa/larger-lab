@@ -1,0 +1,19 @@
+node,operation,strength,source,note
+DIVERGENCE_btc_dom_chg30,NEW_NODE,ROBUST,WS1,earliest at +10D
+DIVERGENCE_btc_return_30d,NEW_NODE,ROBUST,WS1,earliest at +0D
+DIVERGENCE_btc_return_7d,NEW_NODE,ROBUST,WS1,earliest at +3D
+DIVERGENCE_chain_tvl_med_chg7,NEW_NODE,ROBUST,WS1,earliest at +7D
+DIVERGENCE_eth_btc_relative_return_30d,NEW_NODE,ROBUST,WS1,earliest at +2D
+DIVERGENCE_eth_btc_relative_return_7d,NEW_NODE,ROBUST,WS1,earliest at +5D
+DIVERGENCE_med_ret30_11_50,NEW_NODE,ROBUST,WS1,earliest at +21D
+DIVERGENCE_med_ret30_201_500,NEW_NODE,ROBUST,WS1,earliest at +14D
+DIVERGENCE_med_ret30_51_200,NEW_NODE,ROBUST,WS1,earliest at +21D
+DIVERGENCE_top3_share,NEW_NODE,ROBUST,WS1,earliest at +30D
+DIVERGENCE_top3_share_chg7,NEW_NODE,ROBUST,WS1,earliest at +0D
+DIVERGENCE_top500_breadth_30d,NEW_NODE,ROBUST,WS1,earliest at +1D
+DIVERGENCE_top500_breadth_7d,NEW_NODE,ROBUST,WS1,earliest at +1D
+DIVERGENCE_top500_dispersion_30d,NEW_NODE,ROBUST,WS1,earliest at +3D
+DIVERGENCE_top500_dispersion_7d,NEW_NODE,ROBUST,WS1,earliest at +1D
+DIVERGENCE_total_mcap_chg30,NEW_NODE,ROBUST,WS1,earliest at +21D
+RETEST_RELOAD_STRUCTURE,DESCRIPTIVE_ONLY,0_vars_sig,WS3,
+EARLY_DECAY_SEQUENCE,DESCRIPTIVE_ONLY,1_vars_early_decline,WS5,

@@ -1,0 +1,20 @@
+{
+  "contract_id": "ALPHA1_1_BACKTEST_V1",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "development": "2026-01-25 to 2026-08-21",
+  "confirmation": "NONE (DEFERRED)",
+  "result_classes": [
+    "SURVIVES_DEVELOPMENT",
+    "WEAK_DEVELOPMENT",
+    "FALSIFIED",
+    "INSUFFICIENT_EVENTS",
+    "BLOCKED_DATA",
+    "CONTROL_EQUIVALENT",
+    "COST_FRAGILE"
+  ],
+  "no_classes": [
+    "VALIDATED",
+    "PRODUCTION_READY",
+    "LIVE_READY"
+  ]
+}

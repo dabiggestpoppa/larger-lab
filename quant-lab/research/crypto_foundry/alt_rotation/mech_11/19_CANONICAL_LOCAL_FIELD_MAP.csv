@@ -1,0 +1,11 @@
+node,global_state,local_patch,state_age,sequence,clock,perturbation,radius,health,peer_context,status
+4-STATE_MACHINE,GLOBAL,ALL,ALL,transition matrix,EXIT+DELIVERY,amplitude-tested,WS6,WS13,WS10,KEEP
+HH_MATURITY,GLOBAL,HH,1..15+,delivery back-loaded,PROPAGATION,WS5,WS6,n/a,n/a,KEEP
+PRICE_UP_RANK_DOWN,LOCAL,isolated-down,n/a,WS13 lattice,WS1,n/a,n/a,PRIORITY,WS10,KEEP
+SEMI_MARKOV,GLOBAL,ALL,1..15+,WS3 audit,n/a,n/a,n/a,n/a,n/a,EVALUATE
+SEQUENCE_GRAMMAR,GLOBAL,ALL,n/a,WS2 B->D->R,n/a,n/a,n/a,n/a,n/a,EVALUATE
+RANK_PATCHES,LOCAL,26-1000,n/a,WS7 depth order,n/a,n/a,WS6,n/a,WS8/9,EVALUATE
+SHMC_SHHM,LOCAL,cell-dependent,WS15,WS15 placement,n/a,n/a,n/a,WS10,WS10,KEEP_LOCAL
+TRUE_FALSE_LONER,LOCAL,isolated-down,n/a,n/a,n/a,n/a,n/a,WS13,LF5,KEEP
+CHAIN_ACTIVITY,DESCRIPTIVE,ALL,n/a,n/a,n/a,n/a,n/a,n/a,n/a,SENSOR
+VOLATILITY,GLOBAL,ALL,ALL,n/a,WS16,WS5,n/a,n/a,n/a,INTENSITY_ONLY

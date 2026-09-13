@@ -1,0 +1,5 @@
+peer_family,coverage,status
+rank25/50/100,available same-date rank context only,VALID
+behavioral,0,DATA_BLOCKED
+correlation,0,DATA_BLOCKED
+state,0,DATA_BLOCKED

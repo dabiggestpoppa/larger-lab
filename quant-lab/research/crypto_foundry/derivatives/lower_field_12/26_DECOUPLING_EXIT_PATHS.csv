@@ -1,0 +1,4 @@
+exit_path,n,rate,med_days_since,med_capacity,down_share,high_churn_share,note
+RANK_DETERIORATION,284,0.2793,65.0,0.3042,0.8169,0.5106,
+CONTINUED_ISOLATION,1017,1.0,96.0,0.4065,0.4031,0.5261,
+VERDICT,1017,CONTINUED_ISOLATION=1.0 (n=1017) | RANK_DETERIORATION=0.2793 (n=284),,,,,rejoin-old / join-new / normalize exits too rare to estimate (<20 each); decoupling mostly ENDS in continued isolation or rank deterioration - no universal clock

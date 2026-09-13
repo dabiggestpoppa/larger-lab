@@ -1,0 +1,14 @@
+claim,highest_level,evidence
+CHAIN_LIQUIDITY_DECOMPOSITION,L1,"A: 0 redundant pairs, 6 distinct, 53 candidate-distinct"
+CHAIN_LIQUIDITY_PERTURBATION,L3,"B: 5 SURVIVES (chain,link) cells"
+CHAIN_MULTIVIEW_RECONSTRUCTION,L1,C: 12 chain-days rows
+REGIME_ROUTING_FLIP,L2,D: 27 REVERSED cells
+CONCENTRATION_PIVOT_ANATOMY,L2,E: 19 FDR-significant precursor cells
+CONCENTRATION_PIVOT_BOUNDARY,L1,F: 50 bin rows
+RELEASE_ROUTE_MAP,L1,G: 125 exit events
+INFORMATION_PLATEAU,L0,H: 3 phenomena
+FIELD_PLATEAU,L1,I: 922 plateau episodes
+PRIMITIVE_CANDIDATE_AUDIT,L1,J: 1 global candidates
+TOPOLOGY_READINESS,L1,"K: density=0.0909, comps=8"
+DYNAMICAL_SYSTEM_READINESS,L1,L: 5 subperiod rows
+MORPHISM_SURVIVAL,L1,M: recurring_share=0.1592

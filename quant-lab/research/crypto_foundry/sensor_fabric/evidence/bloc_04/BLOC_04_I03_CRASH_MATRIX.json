@@ -1,0 +1,50 @@
+[
+  {
+    "fault_point": "STAGE_WRITE",
+    "final_exists": false,
+    "staging_exists": true,
+    "success_returned": false,
+    "expected_state": "UNCOMMITTED_STAGING",
+    "test_name": "test_crash_row[STAGE_WRITE]"
+  },
+  {
+    "fault_point": "BEFORE_FILE_FSYNC",
+    "final_exists": false,
+    "staging_exists": true,
+    "success_returned": false,
+    "expected_state": "UNCOMMITTED_STAGING",
+    "test_name": "test_crash_row[BEFORE_FILE_FSYNC]"
+  },
+  {
+    "fault_point": "BEFORE_STAGE_VERIFY",
+    "final_exists": false,
+    "staging_exists": true,
+    "success_returned": false,
+    "expected_state": "UNCOMMITTED_STAGING",
+    "test_name": "test_crash_row[BEFORE_STAGE_VERIFY]"
+  },
+  {
+    "fault_point": "BEFORE_PUBLISH",
+    "final_exists": false,
+    "staging_exists": true,
+    "success_returned": false,
+    "expected_state": "UNCOMMITTED_STAGING",
+    "test_name": "test_crash_row[BEFORE_PUBLISH]"
+  },
+  {
+    "fault_point": "AFTER_PUBLISH_BEFORE_DIR_FSYNC",
+    "final_exists": true,
+    "staging_exists": true,
+    "success_returned": false,
+    "expected_state": "ORPHAN_DURABLE_BLOB",
+    "test_name": "test_crash_row[AFTER_PUBLISH_BEFORE_DIR_FSYNC]"
+  },
+  {
+    "fault_point": "AFTER_DIR_FSYNC_BEFORE_RETURN",
+    "final_exists": true,
+    "staging_exists": true,
+    "success_returned": false,
+    "expected_state": "DURABLE_COMMITTED",
+    "test_name": "test_crash_row[AFTER_DIR_FSYNC_BEFORE_RETURN]"
+  }
+]

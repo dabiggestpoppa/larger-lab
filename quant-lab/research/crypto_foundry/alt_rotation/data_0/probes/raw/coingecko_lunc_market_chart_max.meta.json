@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coingecko_lunc_market_chart_max",
+  "method": "GET",
+  "url": "https://api.coingecko.com/api/v3/coins/terra-luna-classic/market_chart",
+  "request_params": {
+    "vs_currency": "usd",
+    "days": "max"
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:00:56+00:00",
+  "http_status": 429,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "6529e19eb4c125e9bf94e997ea53c292ea8f4d6d0a8f8c25fb400947c088da2e",
+  "bytes": 187,
+  "access_class": "PUBLIC_RATELIMITED",
+  "historical_date": null,
+  "known_limitations": "free tier granularity",
+  "notes": "DEAD coin (LUNC crash 2022-05) historical series \u2014 rank-survivorship evidence",
+  "final_url": "https://api.coingecko.com/api/v3/coins/terra-luna-classic/market_chart?vs_currency=usd&days=max",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:00:55 GMT",
+    "Content-Type": "application/json",
+    "Content-Length": "187",
+    "Connection": "keep-alive",
+    "Retry-After": "60",
+    "Cache-Control": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+    "Expires": "Thu, 01 Jan 1970 00:00:01 GMT",
+    "Referrer-Policy": "same-origin",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e2d54f6343c9-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "BTC_candles": 2017,
+  "BTC_book_bids": 20,
+  "BTC_book_asks": 20,
+  "BTC_trades": 10,
+  "ETH_candles": 2017,
+  "ETH_book_bids": 20,
+  "ETH_book_asks": 20,
+  "ETH_trades": 10,
+  "BTC_mark": 77635.0,
+  "BTC_index": 77630.5,
+  "BTC_oi": 33906.87878,
+  "ETH_mark": 2399.4,
+  "ETH_index": 2398.65,
+  "ETH_oi": 913018.1635999999,
+  "eth_WETH-USDC-500_swaps": 0
+}

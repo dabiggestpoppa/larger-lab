@@ -1,0 +1,6 @@
+species_id,n_clusters,silhouette,n_events,n_subperiods,meets_support_bar,med_churn,med_old_coherence,med_new_coherence,med_rank_migration,med_sign_aligned,species_supported,verdict
+BEST,3,0.4019,3647,,,,,,,,,
+CHURN_SP0,3,,2723,5.0,YES,0.9474,0.0,-0.0188,3.0,0.0,,
+CHURN_SP1,3,,330,5.0,YES,0.9474,0.0,-0.0366,10.0,0.0,,
+CHURN_SP2,3,,594,5.0,YES,1.0,0.0,-0.1454,3.0,0.0,,
+VERDICT,3,0.4019,3647,,,,,,,,3.0,FEW_STABLE_CHURN_SPECIES

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "registered_at": "2026-08-20",
+  "time_standard": "UTC",
+  "schemas": {
+    "PERP_TRADE": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "instrument_id", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "trade_id", "price", "size", "side", "liquidation_flag", "matching_engine_id"],
+      "description": "Individual trade on perp venue"
+    },
+    "PERP_BOOK_SNAPSHOT": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "instrument_id", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "bids", "asks", "checksum"],
+      "description": "L2 order book snapshot. bids/asks as [[price, size], ...]"
+    },
+    "PERP_FUNDING": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "instrument_id", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "funding_rate", "funding_time_utc", "mark_price", "index_price"],
+      "description": "Funding rate settlement"
+    },
+    "PERP_OPEN_INTEREST": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "instrument_id", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "open_interest", "open_interest_value_usd"],
+      "description": "Open interest snapshot"
+    },
+    "PERP_MARK_INDEX": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "instrument_id", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "mark_price", "index_price", "oracle_price", "premium"],
+      "description": "Mark/index/oracle price state"
+    },
+    "PERP_LIQUIDATION": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "instrument_id", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "side", "size", "price", "liquidated_account", "estimated_loss"],
+      "description": "Liquidation event"
+    },
+    "SPOT_BAR_REFERENCE": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "instrument_id", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "open", "high", "low", "close", "volume", "trades_count", "interval"],
+      "description": "OHLCV bar (derived from trades). interval in seconds."
+    },
+    "AMM_SWAP": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "pool_address", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "block_number", "tx_hash", "log_index", "sender", "recipient", "amount0", "amount1", "sqrt_price_x96", "tick", "fee_tier", "pool_fee_amount0", "pool_fee_amount1"],
+      "description": "Uniswap-style swap event"
+    },
+    "AMM_LIQUIDITY_EVENT": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "pool_address", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "block_number", "tx_hash", "log_index", "event_type", "owner", "amount", "amount0", "amount1", "tick_lower", "tick_upper", "liquidity"],
+      "description": "Mint/Burn/Collect event"
+    },
+    "AMM_POOL_STATE": {
+      "fields": ["venue", "chain_if_applicable", "market_id", "pool_address", "event_time_utc", "ingest_time_utc", "source", "source_version", "raw_identifier", "schema_version", "block_number", "sqrt_price_x96", "tick", "liquidity", "fee_growth_global_0_x128", "fee_growth_global_1_x128"],
+      "description": "Pool state snapshot at block level"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+mechanism,coordinate,n,point_biserial,p,purged_auc_pd,note
+topology_replacement_quality,added_peer_fwd7,2194,0.05,0.019,0.5371,
+rank_health_decay,rank_vel_7d,3647,0.176,0.0,0.6801,
+liquidity,liq_proxy,3556,0.125,0.0,0.6088,
+prior_contagion,prev_contagion,3647,-0.003,0.853,0.4872,
+shock_memory,mem_exp_sum,1874,-0.015,0.525,0.4448,
+old_neighborhood_recovery,old_peer_stress,2226,-0.013,0.544,0.4983,
+new_neighborhood_formation,rejoin_vel,3647,-0.25,0.0,0.597,
+VERDICT,PD_MECHANISM_MAP,3647,,,,"mechanisms>=0.58 AUC: ['liquidity', 'new_neighborhood_formation', 'rank_health_decay'] | rank-health decay dominates (0.68), then liquidity (0.61), then failed new-neighborhood formation (0.60); old-peer recovery flat"

@@ -1,0 +1,201 @@
+{
+  "$defs": {
+    "MissingReason": {
+      "description": "Structured missingness vocabulary (Bloc 1 §11). No member is a zero.",
+      "enum": [
+        "NOT_SUPPORTED",
+        "NOT_LISTED",
+        "OUTSIDE_PROVIDER_HISTORY",
+        "ENDPOINT_UNAVAILABLE",
+        "RATE_LIMITED",
+        "AUTH_BLOCKED",
+        "GEO_BLOCKED",
+        "PROVIDER_GAP",
+        "PARSE_FAILED",
+        "SEMANTIC_UNRESOLVED",
+        "DATA_BLOCKED"
+      ],
+      "title": "MissingReason",
+      "type": "string"
+    },
+    "QualityFlag": {
+      "description": "Additive per-record quality flags (Bloc 1 §12). Canonical set.",
+      "enum": [
+        "SOURCE_NATIVE",
+        "SOURCE_AGGREGATED",
+        "SOURCE_COMMUNITY",
+        "RECONSTRUCTED_INTERNAL",
+        "TIMESTAMP_ASSUMED",
+        "TIMESTAMP_COARSE",
+        "UNIT_NATIVE_ONLY",
+        "UNIT_NORMALIZED",
+        "UNIT_NORMALIZATION_UNAVAILABLE",
+        "VENUE_NOT_DECOMPOSABLE",
+        "INSTRUMENT_ID_UNRESOLVED",
+        "WINDOW_SEMANTICS_UNCERTAIN",
+        "PARTIAL_INTERVAL",
+        "DUPLICATE_SOURCE_RECORD",
+        "SOURCE_GAP",
+        "STALE_SOURCE",
+        "PROVIDER_DEGRADED",
+        "CROSS_PROVIDER_DISAGREEMENT",
+        "HISTORICAL_DEPTH_UNVERIFIED",
+        "ACCESS_CLASS_UNVERIFIED",
+        "PIT_RISK"
+      ],
+      "title": "QualityFlag",
+      "type": "string"
+    },
+    "SensorFamily": {
+      "description": "Canonical sensor families (frozen initial set, Bloc 1 §3 / F2).",
+      "enum": [
+        "MECHANICAL_TRADE",
+        "MECHANICAL_LIQUIDATION",
+        "MECHANICAL_OPEN_INTEREST",
+        "MECHANICAL_FUNDING",
+        "MECHANICAL_BOOK_SNAPSHOT",
+        "MECHANICAL_BOOK_METRIC",
+        "MECHANICAL_POSITIONING",
+        "MECHANICAL_BASIS"
+      ],
+      "title": "SensorFamily",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Structured missingness object (Bloc 1 §11 / B1-T51).\n\nMissing is information.  A missing observation is never a numeric zero and\nnever silently carries forward prior values.  `reason` is mandatory.",
+  "properties": {
+    "affected_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Affected End"
+    },
+    "affected_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Affected Start"
+    },
+    "detail": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Detail"
+    },
+    "instrument_native": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Instrument Native"
+    },
+    "provider": {
+      "minLength": 1,
+      "title": "Provider",
+      "type": "string"
+    },
+    "providers_attempted": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Providers Attempted",
+      "type": "array"
+    },
+    "quality_flags": {
+      "items": {
+        "$ref": "#/$defs/QualityFlag"
+      },
+      "title": "Quality Flags",
+      "type": "array"
+    },
+    "reason": {
+      "$ref": "#/$defs/MissingReason"
+    },
+    "sensor_family": {
+      "$ref": "#/$defs/SensorFamily"
+    },
+    "source_interval": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Interval"
+    },
+    "venue": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Venue"
+    },
+    "window_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Window End"
+    },
+    "window_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Window Start"
+    }
+  },
+  "required": [
+    "sensor_family",
+    "provider",
+    "reason"
+  ],
+  "title": "MissingObservation",
+  "type": "object"
+}

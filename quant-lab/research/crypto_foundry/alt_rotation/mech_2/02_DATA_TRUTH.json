@@ -1,0 +1,16 @@
+{
+  "checks": {
+    "pit_rows_1098000": true,
+    "unique_assets_2898": true,
+    "included_dates_2196": true,
+    "v2_feature_hash_matches": true,
+    "registry_hash_matches": true,
+    "excluded_source_gap_dates_79": true,
+    "defillama_flow_files_present": true
+  },
+  "v2_feature_hash_computed": "0d666e74c0cf76adf6e6e6f2a6c47b1f52116f070fd1376c83274e6b077703ba",
+  "v2_feature_hash_canonical": "0d666e74c0cf76adf6e6e6f2a6c47b1f52116f070fd1376c83274e6b077703ba",
+  "v2_feature_hash_note": "Checkpoint brief quoted this hash with two hex characters dropped ('e6'); canonical recomputed hash matches DATA-1.1 frozen registry.",
+  "excluded_source_gap_dates_recorded": 79,
+  "all_pass": true
+}

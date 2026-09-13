@@ -1,0 +1,6 @@
+metric,n,pre_median,during_median,post_median
+membership_entropy_30d,1556,,3.3219,4.3219
+relational_label_entropy,1556,0.0,0.0,0.0
+peer_family_disagreement,1556,,0.9667,
+peer_residual_dispersion,1556,,0.042,0.0764
+entropy_after_reconstitution,1556,,,3.3219

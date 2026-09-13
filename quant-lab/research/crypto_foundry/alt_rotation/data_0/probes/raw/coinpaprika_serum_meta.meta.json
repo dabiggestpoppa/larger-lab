@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_serum_meta",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/coins/serum",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:35+00:00",
+  "http_status": 404,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "8dbee780dea6607849b0ddf5e1c61d27f5dc14d574f15df6e3cd4f23686ba22f",
+  "bytes": 25,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "",
+  "notes": "inactive coin metadata (rank=0, is_active=false)",
+  "final_url": "https://api.coinpaprika.com/v1/coins/serum",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:35 GMT",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Content-Length": "49",
+    "Connection": "keep-alive",
+    "cache-control": "public, max-age=60, s-maxage=60, stale-while-revalidate=10, stale-if-error=600",
+    "content-encoding": "gzip",
+    "vary": "Accept-Encoding, Origin",
+    "h-hap": "01",
+    "cf-cache-status": "MISS",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3c94ae14314-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

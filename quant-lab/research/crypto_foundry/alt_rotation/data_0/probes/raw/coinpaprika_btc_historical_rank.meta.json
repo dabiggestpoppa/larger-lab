@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_btc_historical_rank",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical",
+  "request_params": {
+    "start": "2024-05-25",
+    "end": "2024-06-05",
+    "interval": "1d"
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:30+00:00",
+  "http_status": 402,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "68f7cb87cf068290bb74609cbd34d0d137b973701c9b1b8a808cf4ceeff5a9eb",
+  "bytes": 153,
+  "access_class": "PUBLIC",
+  "historical_date": "2024-06-01",
+  "known_limitations": "",
+  "notes": "daily RANK + mcap per coin \u2014 key PIT rank reconstruction mechanism (per-coin daily rank). Expect 402 on free plan.",
+  "final_url": "https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical?start=2024-05-25&end=2024-06-05&interval=1d",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:30 GMT",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Content-Length": "153",
+    "Connection": "keep-alive",
+    "vary": "Accept-Encoding, Origin",
+    "h-hap": "01",
+    "cf-cache-status": "BYPASS",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3aa1ca84314-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

@@ -1,0 +1,11 @@
+metric,value
+n_families,9
+mean_abs_spearman_corr,0.149
+pca1_explained_variance,0.234
+pca2_explained_variance,0.179
+pca1_plus_pca2_variance,0.413
+top3_loadings_pc1,STABLECOIN_CAPITAL_FORCING:0.61;RANK_RECRUITMENT_FORCING:-0.49;VOLATILITY_FORCING:0.41
+top3_loadings_pc2,BTC_ANCHOR_FORCING:0.60;PARTICIPATION_FORCING:0.59;VOLATILITY_FORCING:-0.41
+corr_common_forcing_vs_field_activation,0.172
+corr_2factor_reconstruct_vs_field_activation,0.065
+verdict,MULTI_FORCING_FAMILY

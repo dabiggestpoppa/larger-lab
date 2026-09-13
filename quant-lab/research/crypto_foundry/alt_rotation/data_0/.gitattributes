@@ -1,0 +1,5 @@
+# Byte-exact storage for the ALT-DATA-0 workspace.
+# core.autocrlf=true would normalize line endings on checkout and break the
+# SHA256 provenance contract in ALT_DATA_0_PROVENANCE_MANIFEST.json.
+# `-text` stores exactly the bytes as committed; checkout reproduces them.
+* -text

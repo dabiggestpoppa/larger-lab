@@ -1,0 +1,7 @@
+containment_factor,purged_auc_spread,point_biserial,p,n,direction_note
+neighborhood_coherence,0.524,0.051,0.002,3647,lower metric => less confidence in containment
+peer_stress,0.4839,-0.003,0.835,3647,lower metric => less confidence in containment
+liquidity,0.5642,-0.107,0.0,3556,lower metric => less spreading
+rank_health,0.547,0.079,0.0,3647,lower metric => less spreading
+membership_turnover,0.4808,-0.003,0.837,3646,lower metric => less confidence in containment
+abs_shock,0.5599,-0.01,0.53,3647,lower metric => less confidence in containment

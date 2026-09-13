@@ -1,0 +1,17 @@
+cohort,label,count,family
+canonical_destination,BTC_CONCENTRATION,52,FAILURE
+canonical_destination,MIXED_NO_CLEAR_ROUTE,44,FAILURE
+canonical_destination,BROAD_RISK_EXPANSION,18,SUCCESS
+canonical_destination,LARGE_ALT_ROTATION,4,SUCCESS
+canonical_destination,MID_CAP_ROTATION,4,SUCCESS
+canonical_destination,ETH_BROADENING,1,SUCCESS
+canonical_destination,STABLECOIN_PARKING,1,OTHER
+canonical_destination,CAPITAL_EXIT,1,OTHER
+family,SUCCESS,27,SUCCESS
+family,FAILURE,96,FAILURE
+family,OTHER,2,OTHER
+first_move_class,FAILED_IGNITION,52,FIRST_MOVE
+first_move_class,FULL_FAILURE,45,FIRST_MOVE
+first_move_class,IMMEDIATE_DELIVERY,14,FIRST_MOVE
+first_move_class,RETEST_RELOAD,14,FIRST_MOVE
+total,ALL_EVENTS,125,ALL

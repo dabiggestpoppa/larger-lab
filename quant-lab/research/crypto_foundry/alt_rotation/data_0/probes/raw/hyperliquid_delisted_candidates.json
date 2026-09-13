@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_delisted_candidates",
+  "description": "Hyperliquid delisted-coin recovery probe (funding history for coins absent from current meta)",
+  "retrieved_at": "2026-08-24T14:06:59+00:00",
+  "access_class": "PUBLIC",
+  "rows": [
+    {
+      "label": "LUNA2-funding",
+      "method": "POST",
+      "url": "https://api.hyperliquid.xyz/info",
+      "params": null,
+      "json_body": {
+        "type": "fundingHistory",
+        "coin": "LUNA2",
+        "startTime": 0,
+        "endTime": 2000000000000
+      },
+      "http_status": 500,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "bytes": 4
+    },
+    {
+      "label": "LUNC-funding",
+      "method": "POST",
+      "url": "https://api.hyperliquid.xyz/info",
+      "params": null,
+      "json_body": {
+        "type": "fundingHistory",
+        "coin": "LUNC",
+        "startTime": 0,
+        "endTime": 2000000000000
+      },
+      "http_status": 500,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "bytes": 4
+    },
+    {
+      "label": "FTT-funding",
+      "method": "POST",
+      "url": "https://api.hyperliquid.xyz/info",
+      "params": null,
+      "json_body": {
+        "type": "fundingHistory",
+        "coin": "FTT",
+        "startTime": 0,
+        "endTime": 2000000000000
+      },
+      "http_status": 200,
+      "ok": true,
+      "error": null,
+      "row_count": 500,
+      "first_record": {
+        "coin": "FTT",
+        "fundingRate": "0.0000125",
+        "premium": "-0.0000435996",
+        "time": 1695646800109
+      },
+      "last_record": {
+        "coin": "FTT",
+        "fundingRate": "0.0000369773",
+        "premium": "0.0005958184",
+        "time": 1697443200044
+      },
+      "sha256": "d6d14b1f13bd06da0ca5f590a875f2d10257d8ddcdacac9ea505558c14a86d3b",
+      "bytes": 43860
+    },
+    {
+      "label": "SRM-funding",
+      "method": "POST",
+      "url": "https://api.hyperliquid.xyz/info",
+      "params": null,
+      "json_body": {
+        "type": "fundingHistory",
+        "coin": "SRM",
+        "startTime": 0,
+        "endTime": 2000000000000
+      },
+      "http_status": 500,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "bytes": 4
+    },
+    {
+      "label": "HOT-funding",
+      "method": "POST",
+      "url": "https://api.hyperliquid.xyz/info",
+      "params": null,
+      "json_body": {
+        "type": "fundingHistory",
+        "coin": "HOT",
+        "startTime": 0,
+        "endTime": 2000000000000
+      },
+      "http_status": 500,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "bytes": 4
+    },
+    {
+      "label": "BTS-funding",
+      "method": "POST",
+      "url": "https://api.hyperliquid.xyz/info",
+      "params": null,
+      "json_body": {
+        "type": "fundingHistory",
+        "coin": "BTS",
+        "startTime": 0,
+        "endTime": 2000000000000
+      },
+      "http_status": 500,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "bytes": 4
+    }
+  ],
+  "known_limitations": "Composite probe; per-row status recorded."
+}

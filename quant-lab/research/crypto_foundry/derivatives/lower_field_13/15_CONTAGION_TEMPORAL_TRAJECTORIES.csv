@@ -1,0 +1,6 @@
+species,n,static_peer_neg_1D,static_peer_neg_3D,static_peer_neg_7D,static_peer_neg_14D,static_peer_neg_30D,roll_peer_neg_3D,roll_peer_neg_7D,roll_peer_neg_14D,roll_peer_neg_30D,rank_vel_7d,p_decouple,p_reactivate,note
+FAST,522,0.6,0.5,0.4444,0.4,0.4,0.4986,0.4993,0.4949,0.4926,-4.0,0.2337,0.7375,
+MEDIUM,118,0.3,0.7778,0.7,0.6,0.5,0.4903,0.4993,0.5036,0.495,-3.0,0.2627,0.6864,
+SLOW,193,0.7,0.7,0.8,0.8,0.8,0.4956,0.5065,0.5056,0.5061,-5.0,0.1658,0.5855,
+PERSISTENT,158,0.3167,0.3,0.4,0.5,0.7,0.5111,0.5275,0.515,0.5093,-4.0,0.1392,0.6076,
+VERDICT,,SPECIES_TRAJECTORIES_DISTINCT,,,,,,,,,,,,"species differ in static reach (peak at 1-3d for FAST vs 14-30d for PERSISTENT) but share rolling context; trajectories confirm species are continuous regions of reach-vs-time, not discrete mechanisms"

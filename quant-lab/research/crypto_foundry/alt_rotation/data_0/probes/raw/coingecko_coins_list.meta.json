@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coingecko_coins_list",
+  "method": "GET",
+  "url": "https://api.coingecko.com/api/v3/coins/list?include_platform=true",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:00:26+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 18656,
+  "first_record": {
+    "id": "_",
+    "symbol": "gib",
+    "name": "\u0f3c \u3064 \u25d5_\u25d5 \u0f3d\u3064",
+    "platforms": {
+      "hedera-hashgraph": "0x00000000000000000000000000000000007872cb"
+    }
+  },
+  "last_record": {
+    "id": "zyncoin-2",
+    "symbol": "zyn",
+    "name": "ZynCoin",
+    "platforms": {
+      "ethereum": "0x58cb30368ceb2d194740b144eab4c2da8a917dcb",
+      "solana": "PzuaVAUH2tfxGZcbBR6kMxeJsBngnsPLFotGJNCtcsd"
+    }
+  },
+  "sha256": "48ed86321fb811d106959ba29007c85acae5770cf5bb3962039db2d57a208bec",
+  "bytes": 2938172,
+  "access_class": "PUBLIC_RATELIMITED",
+  "historical_date": null,
+  "known_limitations": "free tier; ~20k rows; list may lag delistings",
+  "notes": "full coin registry incl. inactive/dead coins; platform contract addresses. Registry, NOT a top-N list.",
+  "final_url": "https://api.coingecko.com/api/v3/coins/list?include_platform=true",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:00:25 GMT",
+    "Content-Type": "application/json; charset=utf-8",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Server": "cloudflare",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "0",
+    "x-content-type-options": "nosniff",
+    "x-permitted-cross-domain-policies": "none",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "x-data-source": "2.0",
+    "Cache-Control": "max-age=30, public, must-revalidate, s-maxage=1800",
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "POST, PUT, DELETE, GET, OPTIONS",
+    "access-control-request-method": "*",
+    "access-control-allow-headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    "access-control-expose-headers": "link, per-page, total",
+    "vary": "Accept-Encoding, Origin",
+    "Content-Encoding": "gzip",
+    "etag": "W/\"9ec49d337c6c9817dcb1e01456e00eab\"",
+    "x-request-id": "f11c797c-f937-4f39-9e1e-dc40f60e8395",
+    "x-runtime": "0.240908",
+    "content-security-policy-report-only": "script-src https://accounts.google.com/gsi/client; frame-src https://accounts.google.com/gsi/; connect-src https://accounts.google.com/gsi/;",
+    "strict-transport-security": "max-age=600, max-age=15724800; includeSubdomains",
+    "Age": "1231",
+    "cf-cache-status": "HIT",
+    "CF-RAY": "a302e214eaca43c9-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

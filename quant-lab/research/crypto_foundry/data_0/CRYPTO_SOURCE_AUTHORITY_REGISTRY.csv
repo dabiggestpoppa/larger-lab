@@ -1,0 +1,24 @@
+venue,claim,source,source_date,verified_at,source_class,notes
+Hyperliquid,launch_date,Hyperliquid docs + on-chain,2023-05,2026-08,PROTOCOL_SOURCE,BTC-PERP went live ~May 2023. No data before that.
+Hyperliquid,fee_schedule_maker,Hyperliquid docs,2026-08,2026-08,OFFICIAL_DOCS,Maker 0.020% taker 0.025% standard.
+Hyperliquid,funding_interval,Hyperliquid docs + on-chain,2026-08,2026-08,ON_CHAIN,1-hour funding intervals.
+Hyperliquid,us_access,Hyperliquid Terms of Service,2026-08,2026-08,TERMS_OF_SERVICE,U.S. execution is RESTRICTED per ToS. Public data is accessible.
+Binance,launch_date,Binance blog + API,2017-07,2026-08,EXCHANGE_SOURCE,BTCUSDT perp launched ~Sep 2019. Spot from 2017.
+Binance,fee_schedule,Binance fee schedule page,2026-08,2026-08,OFFICIAL_DOCS,Maker 0.020% taker 0.040% for VIP0 BTCUSDT perp.
+Binance,us_access,Binance terms + compliance,2026-08,2026-08,TERMS_OF_SERVICE,Not U.S.-accessible. Compliance restrictions.
+Binance,funding_interval,Binance API + docs,2026-08,2026-08,OFFICIAL_DOCS,8-hour funding intervals.
+Kraken,launch_date,Kraken blog,2016-01,2026-08,EXCHANGE_SOURCE,Kraken futures launched ~2016.
+Kraken,us_access,Kraken compliance,2026-08,2026-08,EXCHANGE_SOURCE,U.S.-accessible regulated exchange.
+Coinbase,launch_date,Coinbase blog,2014-12,2026-08,EXCHANGE_SOURCE,Spot since 2014. BTC futures launched 2024.
+Coinbase,us_access,Coinbase compliance,2026-08,2026-08,EXCHANGE_SOURCE,U.S.-accessible regulated exchange.
+Deribit,launch_date,Deribit blog,2018-12,2026-08,EXCHANGE_SOURCE,BTC options since Dec 2018.
+Deribit,us_access,Deribit terms,2026-08,2026-08,TERMS_OF_SERVICE,Options NOT U.S.-accessible. Public data API accessible.
+Deribit,fee_schedule,Deribit fee page,2026-08,2026-08,OFFICIAL_DOCS,Options: maker 0.02% taker 0.04% notional. Perp: maker 0.01% taker 0.05%.
+Uniswap v3,launch_date,Uniswap blog + Ethereum,2021-05,2026-08,ON_CHAIN,Uniswap v3 deployed May 2021.
+Aerodrome,launch_date,Aerodrome docs,2023-08,2026-08,PROTOCOL_SOURCE,Aerodrome launched Aug 2023 on Base.
+Drift,security_status,UNKNOWN,2026-08,2026-08,UNVERIFIED,Security and operational status not independently verified for current use.
+Nautilus,binance_adapter,nautilus_trader 1.221.0,2026-08,2026-08,IMPORT_TEST,BinanceDataClientConfig + BinanceLiveDataClientFactory importable.
+Nautilus,hyperliquid_adapter,nautilus_trader 1.221.0,2026-08,2026-08,IMPORT_TEST,HyperliquidDataClientConfig + HyperliquidLiveDataClientFactory importable.
+Nautilus,coinbase_adapter,nautilus_trader 1.221.0,2026-08,2026-08,IMPORT_TEST,Importable as nautilus_trader.adapters.coinbase_intx. Not nautilus_trader.adapters.coinbase.
+Nautilus,deribit_adapter,NOT_PRESENT,2026-08,2026-08,IMPORT_TEST,Deribit is NOT in nautilus_trader 1.221.0 adapter package. DATA-0 claim was incorrect.
+Nautilus,dydx_adapter,nautilus_trader 1.221.0,2026-08,2026-08,IMPORT_TEST,Import fails — missing v4_proto dependency. BLOCKED_DEPENDENCY.

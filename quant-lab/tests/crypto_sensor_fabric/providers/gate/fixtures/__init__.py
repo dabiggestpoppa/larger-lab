@@ -1,0 +1,1 @@
+"""Gate offline response fixtures (SENSOR-B3-I06)."""

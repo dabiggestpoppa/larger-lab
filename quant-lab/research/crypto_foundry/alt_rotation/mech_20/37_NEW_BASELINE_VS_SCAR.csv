@@ -1,0 +1,5 @@
+year,n_days,gain_mean,gain_std,low_regime_months,high_regime_months,regime_transitions,verdict
+2023,345,0.7224,0.2725,1,3,3,REPEATED_SCAR(bimodal)
+2024,358,0.7749,0.641,1,2,2,REPEATED_SCAR(bimodal)
+2025,365,1.3539,0.9903,0,7,2,REPEATED_SCAR(bimodal)
+2026,235,0.2851,0.006,8,0,0,REPEATED_SCAR(bimodal)

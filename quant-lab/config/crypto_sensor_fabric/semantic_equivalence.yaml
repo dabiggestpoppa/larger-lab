@@ -1,0 +1,77 @@
+# SEMANTIC EQUIVALENCE REGISTRY — frozen from bloc_01/02 §15
+#
+# Every provider→canonical mapping carries: source definition, canonical
+# target, transformation method, evidence reference, equivalence class and
+# version.  All entries below are PROVISIONAL planning mappings; Bloc 2
+# capability probes produce the evidence that upgrades or demotes them.
+#
+# evidence_reference: BLOC2_PROBE_PENDING until a probe proves the mapping.
+# Same field name never establishes comparability (02 §13).
+schema_version: "1.0"
+
+mappings:
+  - provider: GATE_FUTURES
+    source_metric: long_liq_usd
+    canonical_sensor: MECHANICAL_LIQUIDATION
+    canonical_field: source_long_liq_usd
+    equivalence: NORMALIZABLE_COMPARABLE
+    methodology_id: LIQ_USD_NATIVE_PROVIDER_V1
+    evidence_reference: BLOC2_PROBE_PENDING
+    version: "1"
+    source_definition: "Interval long-side liquidation notional reported in USD by Gate futures stats endpoint."
+    transformation_method: "Map provider USD liquidation aggregate to canonical source_long_liq_usd without unit conversion."
+
+  - provider: GATE_FUTURES
+    source_metric: short_liq_usd
+    canonical_sensor: MECHANICAL_LIQUIDATION
+    canonical_field: source_short_liq_usd
+    equivalence: NORMALIZABLE_COMPARABLE
+    methodology_id: LIQ_USD_NATIVE_PROVIDER_V1
+    evidence_reference: BLOC2_PROBE_PENDING
+    version: "1"
+    source_definition: "Interval short-side liquidation notional reported in USD by Gate futures stats endpoint."
+    transformation_method: "Map provider USD liquidation aggregate to canonical source_short_liq_usd without unit conversion."
+
+  - provider: DERIBIT
+    source_metric: trade.liquidation
+    canonical_sensor: MECHANICAL_LIQUIDATION
+    canonical_field: liquidation_role
+    equivalence: CORROBORATION_ONLY
+    methodology_id: DERIBIT_TRADE_LIQ_TAG_V1
+    evidence_reference: BLOC2_PROBE_PENDING
+    version: "1"
+    source_definition: "Deribit individual trades carrying a liquidation tag."
+    transformation_method: "Interpret liquidation-tagged trade as a TRADE_LEVEL liquidation observation; never pooled numerically with interval aggregates at T1."
+
+  - provider: BINANCE_USDM
+    source_metric: isBuyerMaker
+    canonical_sensor: MECHANICAL_TRADE
+    canonical_field: aggressor_side
+    equivalence: NORMALIZABLE_COMPARABLE
+    methodology_id: AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1
+    evidence_reference: BLOC2_PROBE_PENDING
+    version: "1"
+    source_definition: "Binance aggTrade isBuyerMaker boolean; true = buyer is maker, false = buyer is taker."
+    transformation_method: "isBuyerMaker=true -> aggressor_side=SELL (seller is taker); isBuyerMaker=false -> aggressor_side=BUY (buyer is taker). Frozen direction (SENSOR-B1-R01); mapping must be proven by a provider fixture test before trust (Bloc 2/5)."
+
+  - provider: BYBIT_LINEAR
+    source_metric: open_interest
+    canonical_sensor: MECHANICAL_OPEN_INTEREST
+    canonical_field: oi_native
+    equivalence: NORMALIZABLE_COMPARABLE
+    methodology_id: OI_CONTRACTS_TO_USD_V1
+    evidence_reference: BLOC2_PROBE_PENDING
+    version: "1"
+    source_definition: "Bybit linear perp open interest; native unit and semantics require probe verification."
+    transformation_method: "Preserve oi_native/native_unit; normalized oi_usd only via OI_CONTRACTS_TO_USD_V1 when defensible."
+
+  - provider: KRAKEN_FUTURES
+    source_metric: funding_rate
+    canonical_sensor: MECHANICAL_FUNDING
+    canonical_field: funding_rate_native
+    equivalence: NORMALIZABLE_COMPARABLE
+    methodology_id: FUNDING_NATIVE_TO_8H_EQUIV_V1
+    evidence_reference: BLOC2_PROBE_PENDING
+    version: "1"
+    source_definition: "Kraken futures funding rate on its native interval."
+    transformation_method: "Preserve native rate and interval; 8h equivalent only as derived field via FUNDING_NATIVE_TO_8H_EQUIV_V1."

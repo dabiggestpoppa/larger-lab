@@ -1,0 +1,22 @@
+object,action,verdict,note
+SHOCK_MEMORY_KERNEL,FREEZE,TWO_TIMESCALE_LOCAL_MEMORY,TWO_TIMESCALE_LOCAL_MEMORY: 3-7d fast discrimination + 10-30d residue envelope (03); species-dependent horizon (04)
+CAPACITY_DEPENDENCY,FREEZE,COUPLED_BUT_DISTINCT,COUPLED_BUT_DISTINCT: LF12 'largely independent' wording refined (05)
+CAPACITY_CORE_COORDINATES,FREEZE,3_COORDINATES_SUFFICE,3 coordinates capture 91% variance; 2-3 reconstruct propagation/containment (06)
+CAPACITY_SUBSTITUTION,FREEZE,PARTIAL_ONE_WAY_SUBSTITUTION,PARTIAL_ONE_WAY_SUBSTITUTION: rank health partially rescues thin liquidity; structural is bottleneck (07/08)
+CAPACITY_FINAL_SURFACE,FREEZE,COMMON_CAPACITY_GEOMETRY,COMMON_CAPACITY_GEOMETRY on minimal coordinates; shape repeats across subperiods (09)
+ABS->PROP->CONT_RELATIONS,FREEZE-DESCRIPTIVE,LOOSE_BYPASSABLE_CHAIN,LOOSE_BYPASSABLE_CHAIN: absorption never precedes propagation in partition; 0.79 containment after contagion (10)
+ABSORPTION x CONTAINMENT 2X2,FREEZE,DISTINCT_LOCAL_ENVIRONMENTS,DISTINCT_LOCAL_ENVIRONMENTS: cells differ in decoupling/reactivation/species (11)
+CONTAGION_MECHANISM_SURFACE,FREEZE,SHOCK_X_RECENCY_X_EARLY_REACH,shock magnitude (rho 0.27) and early reach (rho 0.25) dominate radius; recency weak; species are regions of this surface (12)
+RECENCY x SHOCK INTERACTION,FREEZE,AMPLIFICATION,"recency AMPLIFIES shock->propagation (interaction coef 0.47, p=0.022) (14)"
+CONTAGION_PHASES,PARK,FEW_PHASES,FEW_PHASES observable but boundaries overlap heavily across species (16)
+EARLY_CONTAGION / FAST_CONTAGION_REGION,DISSOLVE-STANDALONE,FAST_CONTAGION_REGION,FAST_CONTAGION_REGION is a descriptive region within continuous tempo geometry; boundaries overlap MEDIUM (17); demotion CONFIRMED
+CONTAGION_CLEARANCE,FREEZE,MULTIPLE_LAYER_CLEARANCES,MULTIPLE_LAYER_CLEARANCES: peer reach normalizes 14-30d; reactivation/decoupling risk persists (20)
+PERSISTENT_DECOUPLING_ORIGIN,FREEZE,MIXED_ORIGINS,MIXED_ORIGINS: contagion-linked AND independent health/liquidity pathways (21); continuous multi-mechanism (22)
+DECOUPLING_EXIT_PATHS,FREEZE,DOMINATED_BY_ISOLATION_AND_RANK_DECAY,isolation/rank-deterioration dominate; rejoin-old is partition-mutually-exclusive (23)
+SIGN_ASYMMETRY_SURFACE,FREEZE-CONDITIONAL,GAP_EMERGES_IN_THIN_LOW_RANK,gap emerges in thin-liquidity low-rank cells; near-zero in deep-liquidity cells (24)
+SIGN_ASYMMETRY_BY_STAGE,FREEZE,ASYM_ENTERS_AT_PROPAGATION,ASYM_ENTERS_AT_PROPAGATION; reactivation/decoupling gaps run UPSIDE-higher (27)
+SIGN_ASYMMETRY_MINIMAL_SET,FREEZE,PARTIALLY_EXPLAINED,PARTIALLY_EXPLAINED; significant downside residual after additive controls (28) — NOT primitive
+MISSING_MECHANICAL_SENSORS,DATA_BLOCKED,DATA_BLOCKED_PENDING_SENSORS,funding/OI/liquidations/depth/spread/order-flow/margin all DATA_BLOCKED; highest VOI = liquidations/order-flow/OI/funding (29/30)
+UPSIDE_FUNCTIONS,PARK,UPSIDE_FUNCTIONS_ARE_WEAK_AMPLIFIERS,UPSIDE_FUNCTIONS_ARE_WEAK_AMPLIFIERS: coherence neutral/negative; positive-history aliased with rejoin (31); compress to 2-3 coordinates (32)
+UPSIDE_PERMISSION_GATE,DISSOLVE,2-3_WEAK_AMPLIFIERS,"no hard permission gate — 2-3 weak amplifiers, each +0.5-1.6pp (32)"
+LOCAL_ARCHITECTURE,FREEZE,HYBRID,loose feed-forward spine + parallel constraints + bypassable transitions (34)

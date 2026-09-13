@@ -1,0 +1,12 @@
+result,status,note,verdict
+Metastability (any cell),KILLED,MECH-13; not revisited; transition structure is NOT metastability,NULL_AND_FAILED_DONE
+Universal sequence grammar,DEMOTED,MECH-12; not revived,NULL_AND_FAILED_DONE
+Single hidden field coordinate,NULL,MECH-14; not revived in M16,NULL_AND_FAILED_DONE
+Single initiation primitive,NULL,MECH-14 equifinality carried,NULL_AND_FAILED_DONE
+Chronological instability = matrix invalid,REJECTED,reproduced -0.50 on 16-cell but reduced surfaces stable; WS3=MIXED_DRIFT,NULL_AND_FAILED_DONE
+Forced changepoint dates,NOT_FORCED,aligned windows: 1,NULL_AND_FAILED_DONE
+Price-return direction as regime definition,NOT_USED,regimes defined by law signatures only,NULL_AND_FAILED_DONE
+Semi-Markov clock resurrection,NOT_USED,plain clocks remain default,NULL_AND_FAILED_DONE
+SoSoValue ETF flow context,DATA_BLOCKED,no local coverage; scraping/paying forbidden (WS18),NULL_AND_FAILED_DONE
+Upside permission region,CARRIED,MECH-15 NO_PERMISSION_REGION (definitional limit),NULL_AND_FAILED_DONE
+DAR as primitive,PILOT,"pilot only, not promoted",NULL_AND_FAILED_DONE

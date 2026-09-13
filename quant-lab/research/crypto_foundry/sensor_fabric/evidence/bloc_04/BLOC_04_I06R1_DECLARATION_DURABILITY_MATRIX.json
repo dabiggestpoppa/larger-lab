@@ -1,0 +1,67 @@
+{
+  "cases": [
+    {
+      "case": "empty_revision_evidence_ref",
+      "error_type": "ValidationError",
+      "rejected": true
+    },
+    {
+      "case": "empty_canonical_evidence_ref",
+      "error_type": "RevisionConfigurationError",
+      "rejected": true
+    },
+    {
+      "case": "naive_declared_at",
+      "error_type": "ValidationError",
+      "rejected": true
+    },
+    {
+      "case": "cross_source_revision_ids",
+      "deterministic_full_sha256": true,
+      "distinct": true
+    },
+    {
+      "case": "cross_source_canonical_ids",
+      "distinct": true,
+      "revision_and_canonical_distinct": true
+    },
+    {
+      "case": "provider_declared_complete",
+      "declaration_committed_before_segment": true,
+      "observation_state": "PROVIDER_DECLARED_REVISION",
+      "segment_state": "PROVIDER_DECLARED_REVISION"
+    },
+    {
+      "case": "crash_before_declaration",
+      "declarations_after": 0,
+      "error_type": "ValidationError",
+      "rejected": true,
+      "segments_after": 1
+    },
+    {
+      "case": "crash_after_declaration_before_segment",
+      "pending_declarations_after_crash": 1,
+      "retry_completed_provider_declared": true,
+      "retry_observation_state": "PROVIDER_DECLARED_REVISION",
+      "segments_after_crash": 2
+    },
+    {
+      "case": "provider_declared_retry",
+      "divergent_evidence_conflict": true,
+      "error_type": "RevisionDeclarationConflict"
+    },
+    {
+      "case": "missing_declaration_restart",
+      "error_type": "SourceRevisionCatalogCorrupt",
+      "failed_closed": true
+    },
+    {
+      "case": "same_bytes_declaration_no_new_segment",
+      "declaration_preserved_as_evidence": true,
+      "observation_state": "IDENTICAL_REFETCH",
+      "revision_count": 1
+    }
+  ],
+  "generated_at_spec": "fixed-T1 (no wall clock)",
+  "matrix": "BLOC_04_I06R1_DECLARATION_DURABILITY_MATRIX"
+}

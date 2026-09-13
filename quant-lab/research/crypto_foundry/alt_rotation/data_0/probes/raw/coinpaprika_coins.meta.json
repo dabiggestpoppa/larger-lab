@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_coins",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/coins",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:28+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 61115,
+  "first_record": {
+    "id": "btc-bitcoin",
+    "name": "Bitcoin",
+    "symbol": "BTC",
+    "rank": 1,
+    "is_new": false,
+    "is_active": true,
+    "type": "coin"
+  },
+  "last_record": {
+    "id": "smart-smartcash",
+    "name": "SmartCash",
+    "symbol": "SMART",
+    "rank": 0,
+    "is_new": false,
+    "is_active": false,
+    "type": "coin"
+  },
+  "sha256": "5113481e41ae6c4561d15d117346152e6fd65700a63ca8eb9469317ab107e52d",
+  "bytes": 7408594,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "id is a slug; renames change id",
+  "notes": "full coin list incl. is_active flag; ID = stable-ish slug",
+  "final_url": "https://api.coinpaprika.com/v1/coins",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:27 GMT",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "cache-control": "public, max-age=60, s-maxage=60, stale-while-revalidate=10, stale-if-error=600",
+    "content-encoding": "gzip",
+    "vary": "Accept-Encoding,Origin",
+    "h-hap": "01",
+    "Age": "133",
+    "last-modified": "Mon, 24 Aug 2026 13:59:21 GMT",
+    "cf-cache-status": "HIT",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3989e2d4314-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

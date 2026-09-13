@@ -1,0 +1,12 @@
+old_node,prior_role,mech20_connection,placement_changed
+POTENTIAL_REALIZATION,ADAPTIVE_LAW,M20 17-20: realization = constraint network with equifinality; THRESHOLD x TRANSFER 2x2 repaired; MI-based complementarity replaces M19 inconsistent SUBSTITUTABLE language,yes
+EQUIFINALITY,ADAPTIVE_LAW,M20 20: initiation equifinality (MECH-14) now mirrored downstream: realization shows multiple constraint patterns (realization equifinality),yes
+BRANCH_CLOSURE,ADAPTIVE_LAW,"M20 17: route deformation / exit pressure remain weakly coupled to gain; branch closure is a downstream expression of transfer+threshold, not an independent law",yes
+RANK_RECRUITMENT,ADAPTIVE_LAW,"M20 08: not a differentiator in matched sat-with/without-delivery; remains rank7 coordinate, not a response-law node",no
+PHYSICAL_VS_SIGMA,RESEARCH_ONLY,M20 25-27: threshold inversion materiality audit reframes 'deep early activation' as composition-artifact-prone; physical/sigma question absorbed into materiality gate,yes
+STATE_TOPOLOGY,STRUCTURAL_CORE,"Frozen; M20 uses states only as conditioning strata (08 matching, 14 2x2, 29 hysteresis) - no structural change",no
+SPATIAL_ACTIVATION,STRUCTURAL_CORE,M20 30-31: spatial character (broad vs rank-local) of forcing families reuses patch activation correlations - consistent with frozen topology,no
+SATURATION_LAW,ADAPTIVE_LAW,M20 03-07: gain + ceiling confirmed as the 2-coordinate saturation description; slope x ceiling surface defines response environments; saturation meaning is response-dependent,yes
+THRESHOLD_BAND,ADAPTIVE_LAW,M20 14-16: threshold position is the strongest single realization coordinate; complements transfer,no
+BIRTH_GEOMETRY,ADAPTIVE_LAW,M20 21-24: failure = load-vs-resolution mismatch; recovery path mapped (which variable normalizes first),yes
+2022_STRUCTURAL_SCAR,RESEARCH_ONLY,M20 34-39: era hypotheses + changepoint agreement + surface-vs-law generalization tested; verdict finalizes 2022 interpretation,yes

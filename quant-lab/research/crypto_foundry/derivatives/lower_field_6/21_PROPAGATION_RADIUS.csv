@@ -1,0 +1,5 @@
+horizon,n_events,band_spillover_per_event,adjacent_band_spillover_per_event,multi_band_spillover_per_event,pct_events_with_band_spillover
+1,2462,10.3684,20.7741,6.7302,1.0
+3,2462,11.6702,23.219,6.7651,1.0
+7,2462,11.5541,22.9821,6.7357,1.0
+14,2462,11.3913,22.8297,6.7553,1.0

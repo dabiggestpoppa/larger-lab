@@ -1,0 +1,2 @@
+state,dominant,n,commit_frac_pre_sat,commit_frac_near_ceiling,median_sat_at_commit,sat_mean,sat_without_delivery,verdict
+6C_3,6C_4,142,0.532,0.458,0.702,0.712,0.19,MEASURED

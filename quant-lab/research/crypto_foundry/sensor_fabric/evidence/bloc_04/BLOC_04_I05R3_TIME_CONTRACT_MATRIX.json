@@ -1,0 +1,48 @@
+{
+  "cases": [
+    {
+      "case": "naive_logical_start",
+      "expected_error": "ProjectionPreconditionError",
+      "observed_error": "ProjectionPreconditionError"
+    },
+    {
+      "case": "naive_logical_end",
+      "expected_error": "ProjectionPreconditionError",
+      "observed_error": "ProjectionPreconditionError"
+    },
+    {
+      "case": "naive_min_provider_time",
+      "expected_error": "ProjectionPreconditionError",
+      "observed_error": "ProjectionPreconditionError"
+    },
+    {
+      "case": "naive_max_provider_time",
+      "expected_error": "ProjectionPreconditionError",
+      "observed_error": "ProjectionPreconditionError"
+    },
+    {
+      "case": "naive_created_at",
+      "expected_error": "ProjectionPreconditionError",
+      "observed_error": "ProjectionPreconditionError"
+    },
+    {
+      "case": "offset_aware_normalized",
+      "expected": "2026-01-01T17:00:00+00:00",
+      "observed": "2026-01-01T17:00:00+00:00",
+      "observed_error": null
+    },
+    {
+      "case": "persisted_naive_reload",
+      "expected_error": "ProjectionArtifactCatalogCorrupt",
+      "observed_error": "ProjectionArtifactCatalogCorrupt"
+    },
+    {
+      "case": "inverted_provider_range",
+      "expected_error": "ProjectionPreconditionError",
+      "observed_error": "ProjectionPreconditionError"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R3",
+  "generated_from_fixture": "deterministic (fixed ids, no wall clock)",
+  "matrix": "BLOC_04_I05R3_TIME_CONTRACT_MATRIX"
+}

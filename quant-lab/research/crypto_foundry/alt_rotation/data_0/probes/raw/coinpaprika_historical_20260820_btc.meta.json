@@ -1,0 +1,18 @@
+{
+  "probe": "coinpaprika_historical_20260820_btc",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/tickers/btc-bitcoin/historical?start=2026-08-19&end=2026-08-21&interval=1d",
+  "request_params": {
+    "start": "2026-08-19",
+    "end": "2026-08-21",
+    "interval": "1d"
+  },
+  "http_status": 200,
+  "ok": true,
+  "access_class": "PUBLIC",
+  "notes": "CoinPaprika in-window cross-check (2026-08-20)",
+  "known_limitations": "",
+  "sha256": "d0eb38d1aa752f86899bb93c6337b64f20ee41ea5dddd6646bf765a2eb57d9c8",
+  "bytes": 214,
+  "retrieved_at": "2026-08-24T14:14:05+00:00"
+}

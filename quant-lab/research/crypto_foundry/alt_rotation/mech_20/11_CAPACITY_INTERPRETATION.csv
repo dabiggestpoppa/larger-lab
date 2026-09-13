@@ -1,0 +1,12 @@
+hypothesis,delivery_high_cap,delivery_low_cap,prop_high_cap_high_forcing,prop_low_cap_high_forcing,sat_without_delivery_high_cap,sat_without_delivery_low_cap,median_state_rho,n_states,positive_states,negative_states,condition,rho_cap_prop,n
+H1_ENABLEMENT,0.21,0.558,,,,,,,,,,,
+H2_ABSORPTION,,,0.355,0.722,0.149,0.09,,,,,,,
+H3_STATE_DEPENDENT,,,,,,,,6.0,0.0,0.0,,,
+H3_CONDITIONAL,,,,,,,,,,,threshold_hi,-0.339,674.0
+H3_CONDITIONAL,,,,,,,,,,,threshold_lo,-0.203,674.0
+H3_CONDITIONAL,,,,,,,,,,,transfer_hi,-0.203,632.0
+H3_CONDITIONAL,,,,,,,,,,,transfer_lo,0.081,702.0
+H3_CONDITIONAL,,,,,,,,,,,gain_hi,-0.425,743.0
+H3_CONDITIONAL,,,,,,,,,,,gain_lo,-0.347,742.0
+H3_CONDITIONAL,,,,,,,,,,,ceiling_hi,-0.256,744.0
+H3_CONDITIONAL,,,,,,,,,,,ceiling_lo,-0.405,747.0

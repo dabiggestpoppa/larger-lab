@@ -1,0 +1,328 @@
+[
+  {
+    "catalog_family": "blobs",
+    "fields": [
+      {
+        "logical_type": "string",
+        "name": "blob_sha256",
+        "nullable": false
+      },
+      {
+        "logical_type": "int64",
+        "name": "byte_length",
+        "nullable": false
+      },
+      {
+        "logical_type": "int64",
+        "name": "stored_byte_length",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "source_media_type",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "storage_encoding",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "storage_uri",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "integrity_state",
+        "nullable": false
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "created_at",
+        "nullable": false
+      }
+    ],
+    "model_source": "EvidenceBlob (I01 model)",
+    "schema_version": "1.0.0"
+  },
+  {
+    "catalog_family": "acquisitions",
+    "fields": [
+      {
+        "logical_type": "string",
+        "name": "acquisition_id",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "provider_id",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "venue",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "sensor_family",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "request_fingerprint",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "adapter_version",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "adapter_capability_version",
+        "nullable": true
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "requested_start",
+        "nullable": false
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "requested_end",
+        "nullable": false
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "actual_start",
+        "nullable": true
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "actual_end",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "native_instrument",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "native_granularity",
+        "nullable": true
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "request_started_at",
+        "nullable": false
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "response_observed_at",
+        "nullable": false
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "ingested_at",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "http_status_or_source_status",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "endpoint_host",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "endpoint_path",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "request_family",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "source_locator",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "blob_sha256",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "schema_state",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "evidence_ref",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "provider_checksum_algorithm",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "provider_checksum_value",
+        "nullable": true
+      },
+      {
+        "logical_type": "bool",
+        "name": "provider_checksum_verified",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "resume_token_before",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "resume_token_after",
+        "nullable": true
+      },
+      {
+        "logical_type": "list<string>",
+        "name": "quality_flags",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "failure_ref",
+        "nullable": true
+      }
+    ],
+    "model_source": "AcquisitionRecord (I01 + I04A)",
+    "schema_version": "1.0.0"
+  },
+  {
+    "catalog_family": "partitions",
+    "fields": [
+      {
+        "logical_type": "string",
+        "name": "partition_manifest_id",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "partition_key",
+        "nullable": false
+      },
+      {
+        "logical_type": "int64",
+        "name": "manifest_version",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "provider",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "venue",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "sensor_family",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "native_instrument",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "source_granularity",
+        "nullable": true
+      },
+      {
+        "logical_type": "string",
+        "name": "date_basis",
+        "nullable": false
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "logical_date_start",
+        "nullable": false
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "logical_date_end",
+        "nullable": false
+      },
+      {
+        "logical_type": "list<string>",
+        "name": "blob_refs",
+        "nullable": false
+      },
+      {
+        "logical_type": "list<string>",
+        "name": "projection_refs",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "coverage_state",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "integrity_state",
+        "nullable": false
+      },
+      {
+        "logical_type": "int64",
+        "name": "row_count",
+        "nullable": true
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "min_time",
+        "nullable": true
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "max_time",
+        "nullable": true
+      },
+      {
+        "logical_type": "int64",
+        "name": "gap_count",
+        "nullable": true
+      },
+      {
+        "logical_type": "int64",
+        "name": "revision_count",
+        "nullable": false
+      },
+      {
+        "logical_type": "timestamp(us, tz=UTC)",
+        "name": "created_at",
+        "nullable": false
+      },
+      {
+        "logical_type": "string",
+        "name": "supersedes_manifest_id",
+        "nullable": true
+      }
+    ],
+    "model_source": "PartitionManifest (I01 model)",
+    "schema_version": "1.0.0"
+  }
+]

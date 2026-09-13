@@ -1,0 +1,7 @@
+species,n,n_subperiods,meets_support_bar,med_latency,med_peak,med_radius,med_depth,med_persist,silhouette
+TEMP_SP0,118,5.0,YES,1.0,3.0,0.6,0.0001,0.5,
+TEMP_SP1,522,5.0,YES,1.0,1.0,0.2,0.0,0.4,
+TEMP_SP2,134,5.0,YES,1.0,30.0,0.3,0.0887,0.8,
+TEMP_SP3,24,5.0,NO,30.0,30.0,0.1,0.0,0.4,
+TEMP_SP4,193,5.0,YES,1.0,7.0,0.7,0.1787,0.8,
+VERDICT,991,,FEW_TEMPORAL_SPECIES,,,,,,0.3592

@@ -1,0 +1,1 @@
+"""OKX offline fixture matrix (SENSOR-B3-I07)."""

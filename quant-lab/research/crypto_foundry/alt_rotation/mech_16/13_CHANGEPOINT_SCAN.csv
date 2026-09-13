@@ -1,0 +1,7 @@
+coordinate,two_seg_break_date,two_seg_t,two_seg_p,two_seg_n_early_pts,two_seg_n_late_pts,cusum_break_date,cusum_z,cusum_sig,crossing_date,candidate,verdict,window_start,window_end,n_coordinates,coordinates
+state_propagation,2022-02-16,11.176464612772019,7.330866920239477e-10,8.0,54.0,2023-07-16,2.3542487654143267,True,2024-04-30,True,CHANGEPOINT_SCAN_DONE,,,,
+rank_threshold_deep,2022-04-17,4.014719985169608,0.00017318892318352226,10.0,52.0,2023-01-12,2.05121624872514,True,2024-04-30,True,CHANGEPOINT_SCAN_DONE,,,,
+state_age_hazard_gap,2022-02-16,11.821090514091923,2.730781114087693e-15,8.0,54.0,2022-04-17,1.7732310246994312,True,2023-07-16,True,CHANGEPOINT_SCAN_DONE,,,,
+entropy_response_slope,2022-02-16,-5.173040598201565,4.679385473294842e-06,8.0,54.0,2023-09-20,1.5123098243160216,True,2023-07-16,True,CHANGEPOINT_SCAN_DONE,,,,
+forcing_response_slope,2025-10-26,5.654475967424885,0.00012845162327742635,52.0,10.0,2025-10-26,1.8466204994874196,True,2023-07-16,True,CHANGEPOINT_SCAN_DONE,,,,
+,,,,,,,,,,,CHANGEPOINT_SCAN_DONE,2022-02-16,2022-04-17,4.0,entropy_response_slope;rank_threshold_deep;state_age_hazard_gap;state_propagation

@@ -1,0 +1,62 @@
+{
+  "checkpoint": "CRYPTO-MECH-1-SPOT-PERP-AMM-CONSTRAINT-ANATOMY",
+  "schema_version": "1.0.0",
+  "created_at_utc": "2026-08-21T23:08:32.212427+00:00",
+  "policy": "Datasets below were collected by the SAME frozen DATA-1 collectors (hyperliquid_rest 1.1.0) and persisted in data_1/raw with manifests, but are NOT among the 9 canonical dataset_ids in CRYPTO_DATA_FOUNDATION_FREEZE.json. Registered here as MECH1_RESEARCH_EXTENSION per the frozen data rule. They never replace DATA-1 freeze evidence.",
+  "datasets": {
+    "hl_btc_perp_candles_1h": {
+      "file": "hl_btc_perp_candles_1h_raw.json",
+      "rows": 5003,
+      "sha256": "2cf7623922344b5f90cbfd6a84d05d0b46570100fbdac261759d2e04779760bd",
+      "first_timestamp": "2026-01-25T06:00:00+00:00",
+      "last_timestamp": "2026-08-21T16:00:00+00:00",
+      "collector": "hyperliquid_rest 1.1.0 (frozen)",
+      "manifest": "manifests/hl_btc_perp_candles_1h_manifest.json"
+    },
+    "hl_eth_perp_candles_1h": {
+      "file": "hl_eth_perp_candles_1h_raw.json",
+      "rows": 5003,
+      "sha256": "4294e5e962dfa0ebc691a73aa9fa967257ddf1f3b7fc2ab2ac103d1266345cdc",
+      "first_timestamp": "2026-01-25T06:00:00+00:00",
+      "last_timestamp": "2026-08-21T16:00:00+00:00",
+      "collector": "hyperliquid_rest 1.1.0 (frozen)",
+      "manifest": "manifests/hl_eth_perp_candles_1h_manifest.json"
+    },
+    "hl_btc_mark_index_oi": {
+      "file": "hl_btc_mark_index_oi_raw.json",
+      "rows": 2,
+      "sha256": "7f3144e1863e1ba23a00e3777880863dae8ec85898faf1b9eb79bfd87d122294",
+      "first_timestamp": "2026-08-21T16:53:22.580000+00:00",
+      "last_timestamp": "2026-08-21T16:53:22.580000+00:00",
+      "collector": "hyperliquid_rest 1.1.0 (frozen)",
+      "manifest": "manifests/hl_btc_mark_index_oi_manifest.json"
+    },
+    "hl_eth_mark_index_oi": {
+      "file": "hl_eth_mark_index_oi_raw.json",
+      "rows": 2,
+      "sha256": "c7ee91aa1542ddd4bb19b77899a33a667dbe96997420e1b6f3262f20057533c8",
+      "first_timestamp": "2026-08-21T16:54:13.264336+00:00",
+      "last_timestamp": "2026-08-21T16:54:13.264336+00:00",
+      "collector": "hyperliquid_rest 1.1.0 (frozen)",
+      "manifest": "manifests/hl_eth_mark_index_oi_manifest.json"
+    },
+    "hl_btc_book": {
+      "file": "hl_btc_book_raw.json",
+      "rows": 1,
+      "sha256": "b9cf58b4e274be38083f6e7b08a2dda5fe6527f818d3e1d42495a8e8ca3507ac",
+      "first_timestamp": "2026-08-21T16:53:22.803687+00:00",
+      "last_timestamp": "2026-08-21T16:53:22.803687+00:00",
+      "collector": "hyperliquid_rest 1.1.0 (frozen)",
+      "manifest": "manifests/hl_btc_book_manifest.json"
+    },
+    "hl_eth_book": {
+      "file": "hl_eth_book_raw.json",
+      "rows": 1,
+      "sha256": "d816eb3ebab1f634fb83d20c9cc861c88bcb635a31e6a44beed6e84d076e736a",
+      "first_timestamp": "2026-08-21T16:54:13.498147+00:00",
+      "last_timestamp": "2026-08-21T16:54:13.498147+00:00",
+      "collector": "hyperliquid_rest 1.1.0 (frozen)",
+      "manifest": "manifests/hl_eth_book_manifest.json"
+    }
+  }
+}

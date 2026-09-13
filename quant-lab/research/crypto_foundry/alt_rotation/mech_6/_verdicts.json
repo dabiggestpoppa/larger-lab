@@ -1,0 +1,14 @@
+{
+  "verdict": "PASS_MECH6_MICROSTATE_SEQUENCE_ATLAS",
+  "n_promoted": 2,
+  "n_breadth_earliest": 6,
+  "two_clock": true,
+  "n_cond_sig": 65,
+  "n_motif_sig": 0,
+  "final_cif": {
+    "REENTRY": 0.416,
+    "MIXED": 0.352,
+    "PROPAGATION": 0.216,
+    "OTHER": 0.016
+  }
+}

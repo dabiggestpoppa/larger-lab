@@ -1,0 +1,15 @@
+variable,first_normalization_date,days_before_snapback,relation
+slope_FIELD,2022-02-25,107,PRECEDED
+ceiling_FIELD,2022-05-12,31,PRECEDED
+onset_FIELD,2022-06-12,0,COINCIDED
+slope_patch_mean,2022-02-25,107,PRECEDED
+ceiling_patch_mean,2022-04-29,44,PRECEDED
+onset_patch_mean,2022-06-08,4,COINCIDED
+exit_entropy,2022-02-25,107,PRECEDED
+exit_p1,2022-02-25,107,PRECEDED
+recruitment,2022-03-22,82,PRECEDED
+demand,2022-03-12,92,PRECEDED
+propagation,2022-02-25,107,PRECEDED
+reentry,2022-02-25,107,PRECEDED
+volatility,2022-03-05,99,PRECEDED
+breadth,2022-02-25,107,PRECEDED

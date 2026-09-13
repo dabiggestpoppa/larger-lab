@@ -1,0 +1,5 @@
+cell,n,p_decouple,p_reactivate,rank_vel_7d,downside_share,fast_species_share,persistent_species_share,note
+HIGH_ABS_HIGH_CONT,289,0.0,0.0,-6.0242,0.6436,0.0,0.0,
+LOW_ABS_HIGH_CONT,2337,0.3419,0.4955,10.994,0.6093,0.0,0.0,
+LOW_ABS_LOW_CONT,1021,0.2135,0.6866,-19.8325,0.8345,0.5113,0.1548,
+VERDICT,,DISTINCT_LOCAL_ENVIRONMENTS,,,,,,cells differ materially in decoupling/reactivation and species composition — the 2x2 organizes local shock outcomes; supports separate absorption vs containment OS nodes

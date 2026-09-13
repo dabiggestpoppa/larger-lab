@@ -1,0 +1,52 @@
+[
+  {
+    "case": "fresh_namespace_commit",
+    "directory_chain_ready": true,
+    "parent_fsync_before_success": true,
+    "success_returned": true,
+    "disposition": "COMMITTED_NEW",
+    "final_verified": true,
+    "no_overwrite": true,
+    "test_name": "test_fresh_namespace_commit"
+  },
+  {
+    "case": "reuse_existing",
+    "directory_chain_ready": true,
+    "parent_fsync_before_success": true,
+    "success_returned": true,
+    "disposition": "REUSED_EXISTING",
+    "final_verified": true,
+    "no_overwrite": true,
+    "test_name": "test_reuse_existing"
+  },
+  {
+    "case": "retry_after_crash_E",
+    "directory_chain_ready": true,
+    "parent_fsync_before_success": true,
+    "success_returned": true,
+    "disposition": "REUSED_EXISTING",
+    "final_verified": true,
+    "no_overwrite": true,
+    "test_name": "test_retry_after_crash_E"
+  },
+  {
+    "case": "retry_after_crash_F",
+    "directory_chain_ready": true,
+    "parent_fsync_before_success": true,
+    "success_returned": true,
+    "disposition": "REUSED_EXISTING",
+    "final_verified": true,
+    "no_overwrite": true,
+    "test_name": "test_retry_after_crash_F"
+  },
+  {
+    "case": "publish_race_loser",
+    "directory_chain_ready": true,
+    "parent_fsync_before_success": true,
+    "success_returned": true,
+    "disposition": "REUSED_EXISTING",
+    "final_verified": true,
+    "no_overwrite": true,
+    "test_name": "test_publish_race_loser"
+  }
+]

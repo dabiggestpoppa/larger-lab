@@ -1,0 +1,118 @@
+{
+  "date_range": [
+    "2020-06-01",
+    "2026-08-23"
+  ],
+  "n_dates": 2196,
+  "n_assets": 2898,
+  "universe_rows": 1098000,
+  "registry_hash": "12655965882ffe6ab1083e96a65dd06c299b6425c39660fa733e00506fa15189",
+  "feature_coverage": {
+    "return_1d": 0.960216757741348,
+    "rank_change_1d": 0.9620883424408014,
+    "realized_volatility_1d": 0.0,
+    "relative_return_vs_BTC_1d": 0.960216757741348,
+    "return_3d": 0.9482058287795992,
+    "rank_change_3d": 0.950051912568306,
+    "realized_volatility_3d": 0.9303315118397085,
+    "relative_return_vs_BTC_3d": 0.9482058287795992,
+    "return_7d": 0.9302504553734062,
+    "rank_change_7d": 0.9320646630236794,
+    "realized_volatility_7d": 0.9349763205828779,
+    "relative_return_vs_BTC_7d": 0.9302504553734062,
+    "return_14d": 0.904047358834244,
+    "rank_change_14d": 0.9058096539162113,
+    "realized_volatility_14d": 0.9053169398907104,
+    "relative_return_vs_BTC_14d": 0.904047358834244,
+    "return_30d": 0.8618606557377049,
+    "rank_change_30d": 0.8635300546448087,
+    "realized_volatility_30d": 0.8725810564663024,
+    "relative_return_vs_BTC_30d": 0.8618606557377049,
+    "return_60d": 0.8106612021857923,
+    "rank_change_60d": 0.8122522768670309,
+    "realized_volatility_60d": 0.8044699453551912,
+    "relative_return_vs_BTC_60d": 0.8106612021857923,
+    "return_90d": 0.7696666666666667,
+    "rank_change_90d": 0.7711912568306011,
+    "realized_volatility_90d": 0.7474061930783242,
+    "relative_return_vs_BTC_90d": 0.7696666666666667
+  },
+  "eligibility_rows": 493419,
+  "eligibility_by_venue": {
+    "OKX": 267859,
+    "HYPERLIQUID": 225560
+  },
+  "eligibility_by_status": {
+    "ELIGIBLE_EX_LIQUIDITY": 314217,
+    "NOT_ELIGIBLE": 168843,
+    "CONTRACT_EXISTENCE_ELIGIBLE": 10359
+  },
+  "mature_30d_rows": 314217,
+  "eligible_ex_liquidity_rows": 314217,
+  "eligible_ex_liquidity_assets": 273,
+  "eligible_ex_liquidity_by_band": {
+    "1-10": 17044,
+    "101-200": 63374,
+    "11-25": 21454,
+    "201-300": 12944,
+    "26-50": 33174,
+    "301-500": 32572,
+    "51-100": 46871
+  },
+  "eligible_ex_liquidity_by_band_frac": {
+    "1-10": 0.7761,
+    "101-200": 1.9239,
+    "11-25": 0.3908,
+    "201-300": 0.1179,
+    "26-50": 0.1511,
+    "301-500": 0.1483,
+    "51-100": 0.1067
+  },
+  "sector_feature_rows": 2742365,
+  "sector_membership_rows": 6490190,
+  "n_tags": 621,
+  "sector_mapped_asset_dates": 6490190,
+  "sector_statuses": [
+    "HISTORICAL_APPROXIMATION"
+  ],
+  "unmapped_asset_dates": 108611,
+  "sector_status_fraction": {
+    "HISTORICAL_APPROXIMATION": 0.9010828779599271,
+    "UNMAPPED": 0.09891712204007286
+  },
+  "band_feature_rows": 15372,
+  "band_counts_by_date_ok": true,
+  "terrain_rows": 2196,
+  "btc_dominance_range": [
+    0.0345,
+    0.6971
+  ],
+  "stablecoin_share_range": [
+    0.0051,
+    0.2438
+  ],
+  "identity_rows": 2898,
+  "collision_classes": {
+    "PROVIDER_SYMBOL_COLLISION": 783,
+    "UNKNOWN_COLLISION": 674,
+    "NO_COLLISION": 1143,
+    "TRUE_TICKER_REUSE": 298
+  },
+  "cg_join_high": 1546,
+  "cp_join_high": 2237,
+  "survivorship_rows": 1098000,
+  "n_exited_assets": 2898,
+  "n_assets_still_present": 0,
+  "quality": {
+    "n_dates_with_500": 2196,
+    "duplicate_rank_dates": 0,
+    "negative_volume_rows": 0,
+    "negative_price_rows": 0,
+    "missing_mcap_rows": 0,
+    "missing_volume_rows": 15889,
+    "rank_out_of_range": 0,
+    "mcap_share_sum_max_dev": 2.220446049250313e-16,
+    "non_causal_columns_in_features": []
+  },
+  "top10_assets_present_all_dates": 4
+}

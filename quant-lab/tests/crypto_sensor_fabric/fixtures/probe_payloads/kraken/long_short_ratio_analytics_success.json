@@ -1,0 +1,12 @@
+{
+  "result": {
+    "timestamp": [1655251200, 1655254800, 1655258400],
+    "data": [
+      {"longShortRatio": 1.21, "topTradersAccountRatio": 1.09},
+      {"longShortRatio": 0.98, "topTradersAccountRatio": 1.02},
+      {"longShortRatio": 1.05, "topTradersAccountRatio": 1.0}
+    ],
+    "more": false
+  },
+  "errors": []
+}

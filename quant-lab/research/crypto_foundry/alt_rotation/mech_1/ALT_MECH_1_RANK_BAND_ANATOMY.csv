@@ -1,0 +1,8 @@
+band,member_days,entries,exits,entry_rate_per_member_day,exit_rate_per_member_day,upward_migration_rate_all_horizons,downward_migration_rate_all_horizons,median_residence_days,median_rank_velocity_7d_at_entry,median_rank_velocity_7d_after_entry_plus7d,median_rank_accel_short_at_entry,median_rank_accel_short_after_entry_plus7d,spell_count
+1-10,21960,208,198,0.00947,0.00902,0.0,0.02555,5.0,-0.5,0.0,0.5,1.0,208
+11-25,32940,950,935,0.02884,0.02838,0.01624,0.05959,3.0,-1.0,0.0,-0.5,1.0,950
+26-50,54900,2192,2167,0.03993,0.03947,0.03418,0.06861,3.0,-1.0,-1.0,0.5,0.0,2192
+51-100,109800,4219,4169,0.03842,0.03797,0.03081,0.06922,3.0,-3.0,-0.5,-1.0,1.0,4219
+101-200,219600,7637,7537,0.03478,0.03432,0.0294,0.06139,3.0,-3.0,-3.0,-1.0,0.0,7637
+201-300,219600,19221,19121,0.08753,0.08707,0.04078,0.11507,2.0,-2.0,-1.0,1.0,-1.0,19221
+301-500,439200,31167,30967,0.07096,0.07051,0.0578,0.0,2.0,-1.0,-1.0,0.0,0.0,31167

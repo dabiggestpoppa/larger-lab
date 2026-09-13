@@ -1,0 +1,12 @@
+family_a,family_b,spearman_rho,spearman_p,partial_rho,partial_p,n,coupling,redundant_after_controls,note
+structural,liquidity,0.6437,0.0,0.0786,0.0,3556,STRONG,NO,
+structural,rankhealth,0.7189,0.0,0.3316,0.0,3556,STRONG,PARTIAL,
+structural,stress,0.3076,0.0,0.1827,0.0,3556,MODERATE,NO,
+structural,recovery,-0.2957,0.0,-0.2108,0.0,3556,MODERATE,NO,
+liquidity,rankhealth,0.8785,0.0,0.7752,0.0,3556,STRONG,YES,
+liquidity,stress,0.1884,0.0,-0.0656,0.0001,3556,WEAK,NO,
+liquidity,recovery,-0.0991,0.0,0.2129,0.0,3556,WEAK,NO,
+rankhealth,stress,0.2446,0.0,0.0778,0.0,3556,WEAK,NO,
+rankhealth,recovery,-0.2122,0.0,-0.1619,0.0,3556,WEAK,NO,
+stress,recovery,-0.1423,0.0,-0.0443,0.0082,3556,WEAK,NO,
+VERDICT,COUPLED_BUT_DISTINCT,,,,,,,,STRUCTURAL<->LIQUIDITY and STRUCTURAL<->RANK_HEALTH and LIQUIDITY<->RANK_HEALTH show the strongest raw coupling; partial correlations moderate it — families are correlated but not redundant; LF12 'largely independent' wording refined to 'correlated-but-distinct functions'

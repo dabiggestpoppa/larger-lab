@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "case": "t0_metadata_type_change",
+      "change": "_t0_row_ordinal int64 -> string",
+      "expected": true,
+      "fingerprint_changes": true
+    },
+    {
+      "case": "time32_unit",
+      "fingerprint_changes": true,
+      "lossless_roundtrip": true
+    },
+    {
+      "case": "time64_unit",
+      "fingerprint_changes": true,
+      "lossless_roundtrip": true
+    },
+    {
+      "case": "timestamp_timezone",
+      "fingerprint_changes": true,
+      "lossless_roundtrip": true
+    },
+    {
+      "case": "list_child_nullability",
+      "fingerprint_changes": true,
+      "lossless_roundtrip": true
+    },
+    {
+      "case": "struct_child_nullability",
+      "fingerprint_changes": true,
+      "lossless_roundtrip": true
+    },
+    {
+      "case": "decimal_precision_scale",
+      "fingerprint_changes": true,
+      "lossless_roundtrip": true
+    },
+    {
+      "case": "unsupported_arrow_type",
+      "expected_error": "UnsupportedProjectionSchemaType",
+      "observed_error": "UnsupportedProjectionSchemaType"
+    },
+    {
+      "case": "schema_key_tamper",
+      "expected_error": "ProjectionSchemaCatalogCorrupt",
+      "observed_error": "ProjectionSchemaCatalogCorrupt"
+    },
+    {
+      "case": "schema_fingerprint_tamper",
+      "expected_error": "ProjectionSchemaCatalogCorrupt",
+      "observed_error": "ProjectionSchemaCatalogCorrupt"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R1",
+  "clock": "injected-fixed",
+  "matrix": "BLOC_04_I05R1_SCHEMA_FIDELITY_MATRIX"
+}

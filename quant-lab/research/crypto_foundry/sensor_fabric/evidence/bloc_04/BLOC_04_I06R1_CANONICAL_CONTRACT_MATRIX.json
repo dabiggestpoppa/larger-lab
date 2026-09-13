@@ -1,0 +1,37 @@
+{
+  "cases": [
+    {
+      "case": "canonical_revision_state_singleton",
+      "expected": true,
+      "policy_is_enums_revision_policy": true,
+      "revision_state_is_enums_revision_state": true
+    },
+    {
+      "case": "canonical_source_revision_model",
+      "expected": true,
+      "revisions_source_revision_is_models": true
+    },
+    {
+      "case": "identity_version_2_rejected",
+      "error_type": "ValidationError",
+      "rejected": true
+    },
+    {
+      "case": "birth_same_process_idempotent",
+      "classification": "FIRST_REGISTRATION",
+      "classification_preserved": true,
+      "observations": 1,
+      "re_registered_classification": "FIRST_REGISTRATION",
+      "segments": 1
+    },
+    {
+      "case": "birth_restart_idempotent",
+      "identical_to_same_process": true,
+      "observations": 1,
+      "restart_classification": "FIRST_REGISTRATION",
+      "segments": 1
+    }
+  ],
+  "generated_at_spec": "fixed-T1 (no wall clock)",
+  "matrix": "BLOC_04_I06R1_CANONICAL_CONTRACT_MATRIX"
+}

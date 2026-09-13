@@ -1,0 +1,9 @@
+asset_pair,measure,state_pair,count,fraction
+BTC|ETH,joint_systemic,NORMAL_CROSS_STATE|NORMAL_CROSS_STATE,2524,0.742135
+BTC|ETH,joint_systemic,BTC_SPECIFIC|BTC_SPECIFIC,388,0.114084
+BTC|ETH,joint_systemic,ETH_SPECIFIC|ETH_SPECIFIC,325,0.09556
+BTC|ETH,joint_systemic,SYSTEMIC_STRESS|SYSTEMIC_STRESS,164,0.048221
+BTC|ETH,episode_lead_lag,BTC_FIRST,73,
+BTC|ETH,episode_lead_lag,ETH_FIRST,78,
+BTC|ETH,episode_lead_lag,ISOLATED_BTC,130,
+BTC|ETH,episode_lead_lag,ISOLATED_ETH,99,

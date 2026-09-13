@@ -1,0 +1,9 @@
+variable,metric,n_rr,n_fi,median_rr,median_fi,p_raw,p_fdr
+top500_breadth_30d,retention_5d,14,46,0.9989,1.0938,0.302456,0.460489
+top500_breadth_7d,retention_5d,14,52,0.9418,1.0421,0.371295,0.460489
+top500_dispersion_30d,retention_5d,14,46,1.0635,0.981,0.035966,0.143864
+vol_med,retention_5d,14,51,1.0324,0.9913,0.093825,0.205674
+top3_share_chg7,retention_5d,14,52,0.8499,0.5156,0.102837,0.205674
+eth_btc_relative_return_7d,retention_5d,13,52,0.0922,0.0715,0.402928,0.460489
+btc_return_7d,retention_5d,13,52,0.3009,0.224,0.973834,0.973834
+med_ret30_51_200,retention_5d,14,46,1.2247,0.7429,0.032984,0.143864

@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_tickers_top20",
+  "method": "GET",
+  "url": "https://api.coinpaprika.com/v1/tickers",
+  "request_params": {
+    "quotes": "USD",
+    "limit": 20
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:29+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 20,
+  "first_record": {
+    "id": "btc-bitcoin",
+    "name": "Bitcoin",
+    "symbol": "BTC",
+    "rank": 1,
+    "total_supply": 20074562,
+    "max_supply": 21000000,
+    "beta_value": 1.01758,
+    "first_data_at": "2010-07-17T00:00:00Z",
+    "last_updated": "2026-08-24T13:59:16Z",
+    "quotes": {
+      "USD": {
+        "price": 78498.65622545102,
+        "volume_24h": 29940189588.497486,
+        "volume_24h_change_24h": 21.690000534057617,
+        "market_cap": 1575826141314,
+        "market_cap_change_24h": 1.7699999809265137,
+        "percent_change_15m": 0.3700000047683716,
+        "percent_change_30m": -0.15000000596046448,
+        "percent_change_1h": -0.7300000190734863,
+        "percent_change_6h": 1.649999976158142,
+        "percent_change_12h": 1.659999966621399,
+        "percent_change_24h": 1.7699999809265137,
+        "percent_change_7d": 23.1200008392334,
+        "percent_change_30d": 0,
+        "percent_change_1y": 0,
+        "ath_price": 126173.1777846797,
+        "ath_date": "2025-10-06T19:00:40Z",
+        "percent_from_price_ath": -37.99
+      }
+    }
+  },
+  "last_record": {
+    "id": "ada-cardano",
+    "name": "Cardano",
+    "symbol": "ADA",
+    "rank": 20,
+    "total_supply": 44995037804,
+    "max_supply": 45000000000,
+    "beta_value": 1.57604,
+    "first_data_at": "2017-10-01T00:00:00Z",
+    "last_updated": "2026-08-24T13:59:16Z",
+    "quotes": {
+      "USD": {
+        "price": 0.22135122361325946,
+        "volume_24h": 491059583.5552359,
+        "volume_24h_change_24h": -2.2699999809265137,
+        "market_cap": 8595823632,
+        "market_cap_change_24h": -1.7100000381469727,
+        "percent_change_15m": 0.2800000011920929,
+        "percent_change_30m": -0.3400000035762787,
+        "percent_change_1h": -1.7799999713897705,
+        "percent_change_6h": 1.2899999618530273,
+        "percent_change_12h": 0.8100000023841858,
+        "percent_change_24h": -1.7100000381469727,
+        "percent_change_7d": 26.920000076293945,
+        "percent_change_30d": 0,
+        "percent_change_1y": 0,
+        "ath_price": 3.0950278974839334,
+        "ath_date": "2021-09-02T06:00:00Z",
+        "percent_from_price_ath": -92.87
+      }
+    }
+  },
+  "sha256": "13b8c553a708c9968395fa3f21574d2a2b19141e0a56dd564ec219ff9a97bb6e",
+  "bytes": 16231,
+  "access_class": "PUBLIC",
+  "historical_date": "2026-08-24",
+  "known_limitations": "",
+  "notes": "current top-20 with rank + mcap (never historical truth)",
+  "final_url": "https://api.coinpaprika.com/v1/tickers?quotes=USD&limit=20",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:29 GMT",
+    "Content-Type": "application/json; charset=UTF-8",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "cache-control": "public, max-age=5, s-maxage=5, stale-while-revalidate=10, stale-if-error=300",
+    "content-encoding": "gzip",
+    "vary": "Accept-Encoding, Origin",
+    "h-hap": "01",
+    "last-modified": "Mon, 24 Aug 2026 14:01:29 GMT",
+    "cf-cache-status": "HIT",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3a3dbc64314-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

@@ -1,0 +1,24 @@
+metric,value,detail
+n_asset_days_total,1748294,all asset-days for assets with >= 1 primary-family snapshot
+n_asset_days_covered,1177678,days with carried relational state (>= 1 snapshot <= day)
+n_assets,1421,assets in panel
+n_snapshot_days,3647,event-anchored snapshot rows (state re-derived)
+date_range,2020-06-01 -> 2026-08-23,LF5 substrate range for covered assets
+coverage_fraction,0.6736,covered / total
+freshness_FRESH_0_7,26802,days with a snapshot within the last 7d
+freshness_STALE_8_30,66930,
+freshness_STALE_31_60,77527,
+freshness_STALE_60_PLUS,1006419,
+median_days_since_snapshot,303.0,
+carried_state_REORGANIZING,610167,carried asset-days in state
+carried_state_DECOUPLED,438922,carried asset-days in state
+carried_state_TRUE_ISOLATED,29309,carried asset-days in state
+carried_state_FALSE_ISOLATED,3830,carried asset-days in state
+carried_state_PEER_STRESSED,18488,carried asset-days in state
+carried_state_REJOINING,9678,carried asset-days in state
+carried_state_REHABILITATING,17283,carried asset-days in state
+carried_state_CONTAGIOUS,15136,carried asset-days in state
+carried_state_LOCALLY_CONFORMING,33410,carried asset-days in state
+carried_state_DISLOCATED_UNCLASSIFIED,1455,carried asset-days in state
+mcell16_join_rate,1.0,fraction of asset-days joined to MECH-15 16-cell surface
+quality_flag_rate,0.0457,asset-days with any LF5 quality flag

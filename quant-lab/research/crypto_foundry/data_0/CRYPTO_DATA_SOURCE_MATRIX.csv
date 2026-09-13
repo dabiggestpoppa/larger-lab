@@ -1,0 +1,32 @@
+venue,data_type,source_method,free_tier,historical_depth,granularity,notes
+Uniswap v3,swap_events,The Graph subgraph,yes,2021-05 onward,trades per block,Uniswap V3 subgraph on Ethereum mainnet
+Uniswap v3,pool_state,Subgraph + RPC,yes,2021-05 onward,state changes,TVL/liquidity/ticks via subgraph
+Uniswap v3 (Base),swap_events,Base subgraph RPC,yes,2023-08 onward,trades per block,Base chain subgraph
+Aerodrome,pool_events,Aerodrome subgraph + API,yes,2023-08 onward,trades/farms,Aerodrome has official API + subgraph
+PancakeSwap,swap_events,BSC subgraph + PCS API,yes,2020-09 onward,trades per block,PancakeSwap subgraph on BSC
+Raydium,swap_events,Solana RPC + indexer,yes,2022-02 onward,trades per slot,Solana program logs + custom indexer
+Orca,swap_events,Solana RPC + Orca API,yes,2021-08 onward,trades per slot,Clean API available
+Hyperliquid,candles,REST API candles_snapshot,yes,2023-05 onward,1m/5m/1h/1d,Free. Chunked by time. No API key.
+Hyperliquid,trades,WebSocket user/market,yes,live only,real-time,Snapshot on connect for recent trades
+Hyperliquid,funding,REST API funding_history,yes,2023-05 onward,1h funding rate,Public endpoint
+Hyperliquid,open_interest,REST API meta_and_asset_ctxs,yes,current + recent,per-asset,Free public API
+Hyperliquid,liquidations,WebSocket + REST,yes,2023-05 onward,event-level,On-chain liquidation events visible
+Hyperliquid,orderbook,WebSocket L2,yes,live only,L2 depth,Real-time depth bands
+Hyperliquid,spot,REST + WebSocket,yes,2024-01 onward,candles + trades,Spot recently added
+Binance,OHLCV,Binance REST API klines,yes,2017-07 onward,1m-1d,Free. 1000 candles per request. No key.
+Binance,trades,Binance REST + WebSocket,yes,2017-07 onward,trade-level,Full trade history via REST pagination
+Binance,open_interest,REST API,yes,current + recent,daily/aggregate,Free public endpoint
+Binance,funding,REST API,yes,2019-09 onward,8h funding rate,Free. Full history.
+Binance,liquidations,REST API,yes,2019-11 onward,order-level,Liquidation stream via REST (not all coins)
+Kraken,OHLCV,Kraken REST OHLC,yes,2013-01 onward,1m-1w,Free. Full history. No key.
+Kraken,trades,Kraken REST trades,yes,2013-01 onward,trade-level,Free. Paginated.
+Kraken,ticker,Kraken REST ticker,yes,current,spread/vol,Free.
+Coinbase,OHLCV,Coinbase Exchange API,yes,2014-12 onward,1m-1d,Free historical candles.
+Coinbase,trades,Coinbase Exchange API,yes,2014-12 onward,trade-level,Free paginated.
+Deribit,options_chain,Deribit REST get_book_summary,yes,2018-12 onward,per-expiry,Full chain. No key for public data.
+Deribit,OHLCV,Deribit REST get_tradingview_chart_data,yes,2018-12 onward,1m-1D,Free historical candles.
+Deribit,funding,Deribit REST,yes,2019-01 onward,8h,Public endpoint.
+Deribit,Greeks,Deribit REST,yes,2018-12 onward,per-option real-time,IV/delta/gamma/vega/theta.
+Gamma,vault_state,Gamma API,yes,2021-01 onward,epoch-level,Vault TVL/fees/positions history.
+Gamma,position_range,Gamma API,yes,current + recent,epoch,Active liquidity ranges.
+Arrakis,vault_state,Arrakis API + subgraph,yes,2022-01 onward,epoch-level,Similar to Gamma.

@@ -1,0 +1,26 @@
+{
+  "cases": [
+    {
+      "case": "artifact_verifier_valid",
+      "isinstance_protocol": true
+    },
+    {
+      "case": "artifact_verifier_missing_verify_physical",
+      "expected_error": "LineageConfigurationError",
+      "failed_at": "construction",
+      "observed_error": "LineageConfigurationError"
+    },
+    {
+      "case": "artifact_verify_failure_propagates",
+      "construction_accepts_sealed_form": true,
+      "verifier_raises": "ProjectionCorruption"
+    },
+    {
+      "case": "lineage_commit_unconditional_verify",
+      "hasattr_guard_in_commit": false
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R4",
+  "generated_from_fixture": "i05r4-deterministic-fixture-v1",
+  "matrix": "BLOC_04_I05R4_VERIFIER_INTERFACE_MATRIX"
+}

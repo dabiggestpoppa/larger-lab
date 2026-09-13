@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coingecko_btc_meta",
+  "method": "GET",
+  "url": "https://api.coingecko.com/api/v3/coins/bitcoin",
+  "request_params": {
+    "localization": "false",
+    "tickers": "false",
+    "market_data": "false",
+    "community_data": "false",
+    "developer_data": "false"
+  },
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:01:19+00:00",
+  "http_status": 429,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "6529e19eb4c125e9bf94e997ea53c292ea8f4d6d0a8f8c25fb400947c088da2e",
+  "bytes": 187,
+  "access_class": "PUBLIC_RATELIMITED",
+  "historical_date": null,
+  "known_limitations": "",
+  "notes": "coin metadata: categories, links, genesis date",
+  "final_url": "https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:01:19 GMT",
+    "Content-Type": "application/json",
+    "Content-Length": "187",
+    "Connection": "keep-alive",
+    "Retry-After": "36",
+    "Cache-Control": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+    "Expires": "Thu, 01 Jan 1970 00:00:01 GMT",
+    "Referrer-Policy": "same-origin",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Server": "cloudflare",
+    "CF-RAY": "a302e3660f1743c9-EWR",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

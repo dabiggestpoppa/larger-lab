@@ -1,0 +1,5 @@
+stage,coordinate,cohens_d
+COMMITMENT,pruning_rate,1.073
+EARLY_SURVIVAL,live_exits,0.501
+INITIATION,live_exits,1.366
+PRECONDITION,capacity,0.714

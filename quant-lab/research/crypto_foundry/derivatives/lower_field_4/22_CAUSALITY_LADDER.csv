@@ -1,0 +1,6 @@
+claim,level,basis
+same-date asset/rank neighbor co-movement,L0_DESCRIPTIVE_CO_MOVEMENT,contemporaneous rank-window context
+isolated shock forward reversal,L1_TEMPORAL_ORDERING,event precedes forward observation; no causal mechanism
+Top500 breadth to lower delivery,L1_CANDIDATE_ONLY,parent lag/conditioning evidence; LF4 does not upgrade
+behavioral/correlation peer attribution,DATA_BLOCKED,required PIT peer maps unavailable
+price recovery causes rank recovery,NOT_SUPPORTED,future rank observations unavailable

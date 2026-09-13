@@ -1,0 +1,9 @@
+{
+    "status": {
+        "timestamp": "2026-08-24T14:01:40.472Z",
+        "error_code": 1002,
+        "error_message": "API key missing.",
+        "elapsed": 0,
+        "credit_count": 0
+    }
+}

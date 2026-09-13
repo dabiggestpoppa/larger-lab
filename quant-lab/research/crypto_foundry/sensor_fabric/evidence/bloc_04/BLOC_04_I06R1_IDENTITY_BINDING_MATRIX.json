@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "case": "descriptor_key_valid",
+      "descriptor_matches_durable_acquisition": true,
+      "key_matches_durable_acquisition": true
+    },
+    {
+      "case": "coordinated_descriptor_key_tamper",
+      "error_type": "SourceRevisionCatalogCorrupt",
+      "failed_closed": true
+    },
+    {
+      "case": "observation_wrong_source_same_blob",
+      "distinct_source_keys": true,
+      "error_type": "SourceRevisionCatalogCorrupt",
+      "failed_closed": true
+    },
+    {
+      "case": "duplicate_birth_acquisition",
+      "error_type": "SourceRevisionCatalogCorrupt",
+      "failed_closed": true
+    },
+    {
+      "case": "durable_acquisition_request_mismatch",
+      "error_type": "",
+      "failed_closed": false,
+      "tampered": false
+    }
+  ],
+  "generated_at_spec": "fixed-T1 (no wall clock)",
+  "matrix": "BLOC_04_I06R1_IDENTITY_BINDING_MATRIX"
+}

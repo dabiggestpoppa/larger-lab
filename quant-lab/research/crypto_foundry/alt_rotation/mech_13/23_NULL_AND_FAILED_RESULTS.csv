@@ -1,0 +1,11 @@
+result,status,note
+Broad EARLY_DECAY_SEQUENCE (global),NULL,MECH-9; local termination only
+Semi-Markov transition improvement,NULL,MECH-11 MARKOV_SUFFICIENT
+HH birth quality OOS,PARKED,MECH-9/10
+Transition velocity main driver,PARKED,MECH-10
+Volatility route selector,NULL,intensity/retention only
+SHMC high-tail activation,DEAD,reversion-like local role only
+Chain/DEX activity as driver,NULL,sensor only
+Breadth composition incremental beyond level,NULL,MECH-11/12 merged into level
+MECH-11 universal sequence grammar,DEMOTED,MECH-12: conditional delivery ordering only
+MECH-12 metastability interpretation,RECHECKED,WS13 confirm-or-kill; carry verdict

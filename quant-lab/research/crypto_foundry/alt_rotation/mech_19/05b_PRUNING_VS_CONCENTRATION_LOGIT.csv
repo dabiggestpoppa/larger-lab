@@ -1,0 +1,12 @@
+covariate,logit_coef,magnitude
+forcing,0.294,0.294
+demand,0.694,0.694
+capacity,-0.005,0.005
+saturation,0.151,0.151
+rank_depth,-0.0,0.0
+route_deform,0.041,0.041
+volatility,-0.01,0.01
+dispersion,-0.18,0.18
+btc_anchor,0.032,0.032
+stablecoin,-0.005,0.005
+concentration,0.007,0.007

@@ -1,0 +1,7 @@
+first_change,n_episodes,frac
+routes_prune,39,0.375
+demand,36,0.346
+threshold_normalizes,23,0.221
+transfer_repairs,4,0.038
+entropy_collapses,1,0.01
+gain_changes,1,0.01

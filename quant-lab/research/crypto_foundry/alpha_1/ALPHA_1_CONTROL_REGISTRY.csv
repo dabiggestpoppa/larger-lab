@@ -1,0 +1,7 @@
+control_id,family_id,name,description,strategy_id_mirror,differences,status
+ALPHA1_C001,FAM_A,FAM_A_UNCONDITIONAL_DIRECTIONAL,"long BTC/ETH perp at random hourly bars (no state filter), exit at 8h",ALPHA1_S001,no basis-state filter; unconditional entry at any bar,CONTROL
+ALPHA1_C002,FAM_B,FAM_B_UNCONDITIONAL_CROWDING,unconditional perp directional with 8h time exit; no basis/funding state filter,ALPHA1_S004,no basis or funding state filter,CONTROL
+ALPHA1_C003,FAM_C,FAM_C_HIGH_VOL_UNCONDITIONAL,unconditional perp directional in high vol only; no basis/funding state filter,ALPHA1_S007,high vol filter only; no basis or funding state filter,CONTROL
+ALPHA1_C004,FAM_D,FAM_D_UNCONDITIONAL_ETH,unconditional long ETH perp with 24h time exit; no relative-state filter,ALPHA1_S009,no relative-state filter; entry at any bar,CONTROL
+ALPHA1_C005,FAM_E,FAM_E_UNCONDITIONAL_FUNDING,unconditional perp directional when funding is extreme (any basis); exit at 4h,ALPHA1_S011,funding state filter only; no basis state filter,CONTROL
+ALPHA1_C006,FAM_X,FAM_X_NORMAL_BASIS_CONTROL,long perp when basis is NORMAL; exit at 8h. Mechanism-trivial control to test whether state conditioning adds value over unconditional entry.,ALPHA1_S001,uses normal basis filter rather than extreme negative filter,CONTROL
