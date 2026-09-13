@@ -101,3 +101,9 @@ class SqlitePolicyDecisionLog:
             (decision_id,),
         ).fetchone()
         return _decode((row[0], row[1]), decision_id, PolicyDecision) if row else None
+
+    def count_decisions(self) -> int:
+        """High-water mark for decision-id allocation across restarts."""
+        return int(self._conn.execute(
+            "SELECT COUNT(*) FROM governance_policy_decision"
+        ).fetchone()[0])

@@ -49,6 +49,10 @@ class PolicyDecisionLog(Protocol):
 
     def get_decision(self, decision_id: str) -> Optional[PolicyDecision]: ...
 
+    def count_decisions(self) -> int:
+        """High-water mark for restart-safe id allocation."""
+        ...
+
 
 def policy_outcome_to_authority_outcome(decision: PolicyDecision) -> AuthorityOutcome:
     """ADR-0009 mapping; any future unmapped value fails closed."""
@@ -73,6 +77,15 @@ class LocalAuthorityProvider(AuthorityProvider):
         self._counter = 0
 
     def _next_id(self, prefix: str) -> str:
+        # Seed once from the durable decision log so ids never collide across
+        # provider instances sharing the same storage (restart safety).
+        if not getattr(self, "_id_seeded", False):
+            self._id_seeded = True
+            try:
+                existing = self._log.count_decisions()
+            except AttributeError:
+                existing = 0
+            self._counter = existing
         self._counter += 1
         return f"{prefix}-{self._counter:08d}"
 
