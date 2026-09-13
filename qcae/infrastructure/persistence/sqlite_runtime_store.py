@@ -34,6 +34,11 @@ from qcae.orchestration.jobs.runtime import (
     RuntimeStep,
     RuntimeStepStatus,
 )
+from qcae.orchestration.orchestrator.execution import (
+    ExecutionRecord,
+    ExecutionState,
+    ReplaySafety,
+)
 
 __all__ = [
     "SqliteRuntimeStore",
@@ -110,14 +115,23 @@ CREATE TABLE IF NOT EXISTS runtime_checkpoint (
     payload_digest    TEXT NOT NULL,
     created_at        TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS ix_checkpoint_job ON runtime_checkpoint(job_id);
-
-CREATE TABLE IF NOT EXISTS runtime_idempotency (
+CREATE INDEX IF NOT EXISTS ix_checkpoint_job ON runtime_checkpoint(job_id);CREATE TABLE IF NOT EXISTS runtime_idempotency (
     idempotency_key   TEXT PRIMARY KEY,
     job_id            TEXT NOT NULL,
     step_id           TEXT NOT NULL,
     completed_at      TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS runtime_execution (
+    idempotency_key   TEXT PRIMARY KEY,
+    job_id            TEXT NOT NULL,
+    step_id           TEXT NOT NULL,
+    state             TEXT NOT NULL,
+    replay_safety     TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_runtime_execution_job ON runtime_execution(job_id);
 """
 
 RUNTIME_TABLES = (
@@ -126,6 +140,7 @@ RUNTIME_TABLES = (
     "runtime_job_event",
     "runtime_checkpoint",
     "runtime_idempotency",
+    "runtime_execution",
 )
 
 
@@ -398,7 +413,128 @@ class SqliteRuntimeStore:
             )
         return data
 
-    # -- Idempotency ---------------------------------------------------------
+    # -- Idempotency / execution records (P2-C07R2) --------------------------
+
+    def reserve_execution(
+        self,
+        idempotency_key: str,
+        job_id: str,
+        step_id: str,
+        replay_safety: ReplaySafety,
+        reserved_at: str,
+    ) -> bool:
+        """Durably reserve a key BEFORE execution; False if already reserved.
+
+        Deterministic: the first reservation for a key wins; every later
+        reservation of the same key is refused (the boundary for dedup).
+        """
+        record = ExecutionRecord(
+            idempotency_key=idempotency_key,
+            job_id=job_id,
+            step_id=step_id,
+            state=ExecutionState.RESERVED,
+            replay_safety=replay_safety,
+            reserved_at=reserved_at,
+        )
+        record.validate()
+        payload, digest = _encode(record)
+        try:
+            self._conn.execute(
+                "INSERT INTO runtime_execution (idempotency_key, job_id, step_id,"
+                " state, replay_safety, payload_json, payload_digest)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (
+                    idempotency_key,
+                    job_id,
+                    step_id,
+                    ExecutionState.RESERVED.value,
+                    replay_safety.value,
+                    payload,
+                    digest,
+                ),
+            )
+            return True
+        except sqlite3.IntegrityError:
+            return False
+
+    def get_execution_record(self, idempotency_key: str) -> Optional[ExecutionRecord]:
+        row = self._conn.execute(
+            "SELECT payload_json, payload_digest FROM runtime_execution"
+            " WHERE idempotency_key = ?",
+            (idempotency_key,),
+        ).fetchone()
+        return _decode(row, idempotency_key, ExecutionRecord) if row else None
+
+    def update_execution_record(self, record: ExecutionRecord) -> None:
+        """Advance an execution record along its explicit state machine."""
+        record.validate()
+        current = self.get_execution_record(record.idempotency_key)
+        if current is None:
+            raise QcaeValidationError(
+                f"execution record {record.idempotency_key!r} does not exist"
+            )
+        if current.state is not record.state:
+            from qcae.orchestration.orchestrator.execution import (
+                assert_execution_transition,
+            )
+
+            assert_execution_transition(current.state, record.state)
+        payload, digest = _encode(record)
+        cur = self._conn.execute(
+            "UPDATE runtime_execution SET state = ?, payload_json = ?,"
+            " payload_digest = ? WHERE idempotency_key = ?",
+            (record.state.value, payload, digest, record.idempotency_key),
+        )
+        if cur.rowcount != 1:
+            raise QcaeValidationError(
+                f"execution record {record.idempotency_key!r} vanished"
+            )
+
+    def list_execution_records_for_job(self, job_id: str) -> List[ExecutionRecord]:
+        rows = self._conn.execute(
+            "SELECT payload_json, payload_digest FROM runtime_execution"
+            " WHERE job_id = ? ORDER BY idempotency_key",
+            (job_id,),
+        ).fetchall()
+        return [_decode((r[0], r[1]), "execution", ExecutionRecord) for r in rows]
+
+    def commit_execution(
+        self,
+        idempotency_key: str,
+        result,
+        completed_at: str,
+    ) -> bool:
+        """COMMITTED stores the durable result for crash-window reconstruction.
+
+        Returns False (without effect) if the key was never reserved or is
+        already COMMITTED — commit is only legal from RESERVED/EXECUTING.
+        """
+        current = self.get_execution_record(idempotency_key)
+        if current is None:
+            return False
+        if current.state is ExecutionState.COMMITTED:
+            return False
+        from qcae.core.serialization import canonical_json_bytes
+
+        result_json = canonical_json_bytes(result.to_dict()).decode("utf-8")
+        record = dataclasses_replace(
+            current,
+            state=ExecutionState.COMMITTED,
+            completed_at=completed_at,
+            result_json=result_json,
+        )
+        self.update_execution_record(record)
+        return True
+
+    def unresolved_executions_for_job(self, job_id: str) -> List[ExecutionRecord]:
+        """Execution records left ambiguous by a crash (RESERVED/EXECUTING)."""
+        return [
+            r
+            for r in self.list_execution_records_for_job(job_id)
+            if r.state in (ExecutionState.RESERVED, ExecutionState.EXECUTING)
+        ]
+
+    # -- Legacy completion-marker API (back-compat; backed by runtime_idempotency)
 
     def record_idempotent_completion(
         self, idempotency_key: str, job_id: str, step_id: str, completed_at: str

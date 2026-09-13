@@ -287,6 +287,17 @@ CREATE TABLE IF NOT EXISTS runtime_idempotency (
     completed_at      TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS runtime_execution (
+    idempotency_key   TEXT PRIMARY KEY,
+    job_id            TEXT NOT NULL,
+    step_id           TEXT NOT NULL,
+    state             TEXT NOT NULL,
+    replay_safety     TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_runtime_execution_job ON runtime_execution(job_id);
+
 CREATE TABLE IF NOT EXISTS runtime_queue_claim (
     step_id           TEXT PRIMARY KEY,
     job_id            TEXT NOT NULL,

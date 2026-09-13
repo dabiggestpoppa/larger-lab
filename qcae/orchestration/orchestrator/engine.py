@@ -21,6 +21,11 @@ from typing import Callable, Dict, List, Optional
 
 from qcae.core.errors import QcaeStateTransitionError, QcaeValidationError
 from qcae.orchestration.jobs.graph import StepGraph
+from qcae.orchestration.orchestrator.execution import (
+    ExecutionState,
+    ExecutionRecord,
+    ReplaySafety,
+)
 from qcae.orchestration.orchestrator.budgets import (
     BudgetExhaustedError,
     BudgetState,
@@ -282,12 +287,64 @@ class OrchestratorEngine:
             raise QcaeValidationError(
                 f"no worker registered for step_type {step.step_type!r}"
             )
+        key = step.idempotency_key or f"{step.job_id}:{step.step_id}"
         request = WorkerRequest(
             job_id=step.job_id,
             step_id=step.step_id,
             worker_type=step.step_type,
-            idempotency_key=step.idempotency_key or f"{step.job_id}:{step.step_id}",
+            idempotency_key=key,
         )
+
+        # P2-C07R2 (directive §2.2): the key is durably RESERVED before the
+        # worker runs; the commit marker is written with the result payload so
+        # a crash between effect and marker can be resolved without
+        # re-execution. This is at-least-once execution with durable dedup —
+        # never a silent exactly-once claim.
+        replay_safety = getattr(worker, "replay_safety", ReplaySafety.REPLAY_SAFE)
+        if not isinstance(replay_safety, ReplaySafety):
+            replay_safety = ReplaySafety.REPLAY_SAFE
+        first_reservation = self._store.reserve_execution(
+            key, step.job_id, step.step_id, replay_safety, self._clock()
+        )
+        if not first_reservation:
+            prior = self._store.get_execution_record(key)
+            if prior is not None and prior.state is ExecutionState.COMMITTED:
+                # Deterministic duplicate: reconstruct, never re-execute.
+                self._record(
+                    JobEventType.STEP_SUCCEEDED, step.job_id, step.step_id,
+                    payload_json='{"idempotent_reconstruct": true}',
+                )
+                return prior.reconstruct_result()
+            if prior is not None and prior.state is ExecutionState.EXECUTING \
+                    and replay_safety is ReplaySafety.NON_REPLAY_SAFE:
+                # Ambiguous outcome for a non-replay-safe effect: fail closed
+                # into explicit recovery, never a blind rerun (directive §2.2).
+                assert_step_transition(step.status, RuntimeStepStatus.WAITING_INPUT)
+                self._store.update_step(
+                    dc_replace(step, status=RuntimeStepStatus.WAITING_INPUT),
+                    lease_owner="", lease_token="", lease_expires_at="",
+                )
+                self._record(
+                    JobEventType.APPROVAL_REQUESTED, step.job_id, step.step_id,
+                    payload_json='{"reason": "non-replay-safe execution ambiguous after crash"}',
+                )
+                return WorkerResult(
+                    step_id=step.step_id, job_id=step.job_id,
+                    status=WorkerStatus.BLOCKED_INPUT,
+                    failure_class=FailureClass.UNKNOWN.value,
+                    error_summary=(
+                        "non-replay-safe step has unresolved prior execution; "
+                        "operator recovery required"
+                    ),
+                )
+            # Same-key re-entry (REPLAY_SAFE / IDEMPOTENCY_AWARE retry after a
+            # FAILED record or an acknowledged REPLAY_SAFE rerun) proceeds.
+        record = self._store.get_execution_record(key)
+        if record is not None and record.state is not ExecutionState.COMMITTED:
+            self._store.update_execution_record(
+                dc_replace(record, state=ExecutionState.EXECUTING)
+            )
+
         result = worker.execute(request, _minimal_packet(step))
 
         if result.status is WorkerStatus.SUCCESS:
@@ -314,13 +371,17 @@ class OrchestratorEngine:
         return result
 
     def _complete(self, step: RuntimeStep, result: WorkerResult) -> None:
-        # Idempotency: a committed side effect is never repeated (directive §25).
+        # P2-C07R2: commit is durable and carries the result payload, closing
+        # the crash window between effect and marker (directive §2.2, windows
+        # C/D: effect committed + marker lost ⇒ reconstruct, never re-execute).
         key = step.idempotency_key or f"{step.job_id}:{step.step_id}"
+        self._store.commit_execution(key, result, self._clock())
         first = self._store.record_idempotent_completion(
             key, step.job_id, step.step_id, self._clock()
         )
         if not first:
-            # Already committed — treat as complete without re-running effects.
+            # Already completed via the legacy marker — treat as complete
+            # without re-running effects.
             self._record(
                 JobEventType.STEP_SUCCEEDED, step.job_id, step.step_id,
                 payload_json='{"idempotent_skip": true}',
@@ -538,6 +599,10 @@ class OrchestratorEngine:
                 dc_replace(job, status=RuntimeJobStatus.RUNNING,
                            updated_at=self._clock())
             )
+        # P2-C07R2: surface unresolved execution records — the crash-window
+        # truth. NON_REPLAY_SAFE ambiguity is never silently rerun; recovery
+        # reports it for explicit operator resolution (directive §2.2).
+        unresolved = self._store.unresolved_executions_for_job(job_id)
         return {
             "job_id": job_id,
             "recovered_lease_steps": [
@@ -546,6 +611,18 @@ class OrchestratorEngine:
             "completed_steps": completed,
             "requeued_steps": requeued,
             "completed_steps_not_repeated": completed,
+            "unresolved_executions": [
+                {
+                    "idempotency_key": r.idempotency_key,
+                    "step_id": r.step_id,
+                    "state": r.state.value,
+                    "replay_safety": r.replay_safety.value,
+                    "requires_operator_resolution": (
+                        r.replay_safety is ReplaySafety.NON_REPLAY_SAFE
+                    ),
+                }
+                for r in unresolved
+            ],
         }
 
 
