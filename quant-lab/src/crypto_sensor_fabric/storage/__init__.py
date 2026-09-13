@@ -105,6 +105,15 @@ from .enums import (
     StorageObjectType,
     StoragePriority,
 )
+from .jobs import (
+    DurableJobStateRepository,
+    JobCatalogCorrupt,
+    JobIdentityConflict,
+    JobLockHeld,
+    JobResumeGateError,
+    JobTransitionConflict,
+    JobUnknown,
+)
 from .manifests import (
     MANIFEST_SCHEMA,
     POINTER_SCHEMA_VERSION,
@@ -250,6 +259,13 @@ __all__ = [
     "RawEvidenceResult",
     "RawNormalizationBatch",
     "RawProjectionArtifact",
+    "DurableJobStateRepository",
+    "JobCatalogCorrupt",
+    "JobIdentityConflict",
+    "JobLockHeld",
+    "JobResumeGateError",
+    "JobTransitionConflict",
+    "JobUnknown",
     "RecoveryAction",
     "RevisionPolicy",
     "RevisionState",
