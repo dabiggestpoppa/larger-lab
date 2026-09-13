@@ -1,0 +1,56 @@
+{
+  "cases": [
+    {
+      "case": "forward_chain_contiguous",
+      "chain": [
+        "ACQUIRING",
+        "RAW_STAGED",
+        "RAW_COMMITTED",
+        "PROJECTION_PENDING",
+        "PROJECTION_COMMITTED",
+        "MANIFEST_COMMITTED"
+      ],
+      "contiguous": true,
+      "result": "PASS"
+    },
+    {
+      "attempted": "ACQUIRING->PROJECTION_PENDING",
+      "case": "single_step_enforced",
+      "outcome": "PASS"
+    },
+    {
+      "backward_with_reason_conflict": "PASS",
+      "case": "backward_moves_annotated_only",
+      "result": "PASS",
+      "silent_backward_conflict": "PASS"
+    },
+    {
+      "case": "failure_requires_reason",
+      "with_reason_accepted": "PASS",
+      "without_reason": "PASS"
+    },
+    {
+      "case": "retry_resume_requires_reason",
+      "with_reason_accepted": "PASS",
+      "without_reason": "PASS"
+    },
+    {
+      "case": "terminal_no_exits",
+      "failed_terminal_exit_conflict": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "cas_guard",
+      "matching_expected_accepted": "PASS",
+      "stale_expected_rejected": "PASS"
+    },
+    {
+      "case": "crash_and_identity",
+      "crash_leaves_no_partial_birth": "PASS",
+      "divergent_birth_identity_conflict": "PASS"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07",
+  "doctrine": "bloc_04/03_INTEGRITY_ATOMICITY_REVISION_AND_RECOVERY.md \u00a715",
+  "matrix": "BLOC_04_I07_JOB_STATE_MATRIX"
+}

@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "anchored_acquisition": "acq-evg",
+      "anchored_manifest": "pm-evg",
+      "case": "checkpoint_gate_proven_advance",
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED",
+      "token_persisted": true
+    },
+    {
+      "case": "gate_refuses_uncommitted_batch",
+      "cursor_status": "MANIFEST_COMMITTED",
+      "refused": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "gate_refuses_status_below_floor",
+      "refused": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "weak_floor_raw_committed",
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED"
+    },
+    {
+      "case": "crash_before_advancement_retry_completes",
+      "crash_injected": "True",
+      "pre_crash_status": "MANIFEST_COMMITTED",
+      "result": "PASS",
+      "retry_status": "CHECKPOINT_ADVANCED"
+    },
+    {
+      "adopted_status": "CHECKPOINT_ADVANCED",
+      "case": "crash_after_publication_adoption",
+      "crash_injected": "True",
+      "gate_event_count": 1,
+      "result": "PASS"
+    },
+    {
+      "case": "divergent_retry_conflict",
+      "divergent_conflict": "PASS",
+      "preserved_cursor_page": 1,
+      "result": "PASS"
+    },
+    {
+      "case": "restart_reanchoring",
+      "manifest_id": "pm-evre",
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED",
+      "token_page": 3
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07",
+  "doctrine": "bloc_04/03_INTEGRITY_ATOMICITY_REVISION_AND_RECOVERY.md \u00a716 + \u00a720 (crash tests 6/7)",
+  "matrix": "BLOC_04_I07_RESUME_COUPLING_MATRIX"
+}

@@ -1108,3 +1108,16 @@ I06R1-RATIFY current state: I05→I06→I06R1 chain OPERATOR_ACCEPTED;
 G4-04_REVISION_GATE=IMPLEMENTATION_PASS. next_checkpoint_authorized=TRUE —
 SENSOR-B4-I07 DURABLE JOB STATE + RESUME COUPLING ONLY. I08+ NOT authorized,
 NOT started. Research NOT resumed.
+
+## BLOC 4 — I07 DURABLE JOB STATE + RESUME COUPLING
+
+| Commit | Stage | Tests | Verdict | Notes |
+|---|---|---|---|---|
+| SENSOR-B4-I07A | 37a54678 | DurableJobStateRepository (storage/jobs.py): append-only birth+event chain on the FROZEN StorageJobState/StorageJobTransition models; single-step forward state machine, no silent backward moves, annotated retry/continuation edges, terminal states, CAS guard; §16 resume gate (advance_checkpoint resolves acquisition + physical-verify + manifest-committed proof from durable truth; weaker explicit RAW_COMMITTED floor); CHECKPOINT_ADVANCED reachable ONLY via the gate; re-entrant per-job file+process locks, never auto-deleted; restart validation fail-closed incl. durable re-anchoring of committed checkpoint pointers | 29 tests | PASS |
+| SENSOR-B4-I07B | 00a47ccd | job↔evidence coupling adversarial proof: two-batch resume cycle; cursor-never-advances-past-unindexed-evidence attack; §20 crash tests 6/7 (crash-before-advancement retry completes; crash-after-publication adopts exactly once with durable proof re-resolved — idempotence is not stale trust); divergent-retry typed conflicts visible after restart; manifest-anchor parquet tamper + stale/cross-process lock fail closed | 11 tests (storage 1000 passed / 0 failed / 3 skipped) | PASS |
+| SENSOR-B4-I07C | (this commit) | 2 deterministic matrices (job-state §15 / resume-coupling §16+§20) published once, pytest READ-ONLY vs committed bytes; evidence MD + ledger | — | proposed PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED; DURABLE_RESUME_IMPLEMENTED=TRUE; RECOVERY_SCANNER_IMPLEMENTED=FALSE; recommended next SENSOR-B4-I08 RECOVERY / QUARANTINE (NOT authorized, NOT started) |
+
+I07 current state: durable job state + resume coupling sealed per 03 doc §15/§16
+with the frozen I01 vocabulary. next_checkpoint_authorized=FALSE pending operator
+review of PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED. I08+ NOT authorized,
+NOT started. Research NOT resumed.
