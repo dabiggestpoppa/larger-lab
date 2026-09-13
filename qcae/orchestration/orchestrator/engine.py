@@ -21,6 +21,10 @@ from typing import Callable, Dict, List, Optional
 
 from qcae.core.errors import QcaeStateTransitionError, QcaeValidationError
 from qcae.orchestration.jobs.graph import StepGraph
+from qcae.orchestration.orchestrator.budgets import (
+    BudgetExhaustedError,
+    BudgetState,
+)
 from qcae.orchestration.jobs.runtime import (
     FailureClass,
     JobEvent,
@@ -65,12 +69,14 @@ class OrchestratorEngine:
         clock: Callable[[], str],
         workers: Optional[Dict[str, Worker]] = None,
         event_emitter: Optional[Callable[[JobEvent, str], None]] = None,
+        budget_service: Optional["BudgetService"] = None,
     ) -> None:
         self._store = runtime_store
         self._queue = queue
         self._clock = clock
         self._workers = workers or {}
         self._emit = event_emitter or (lambda event, payload: None)
+        self._budgets = budget_service
         self._event_counter = 0
 
     # -- events --------------------------------------------------------------
@@ -177,7 +183,17 @@ class OrchestratorEngine:
         return out
 
     def lease_next(self, job_id: str, worker_id: str) -> Optional:
-        """Claim the next READY step of this job for ``worker_id``."""
+        """Claim the next READY step of this job for ``worker_id``.
+
+        Budget gate: an exhausted job budget blocks leasing (BudgetExhausted
+        is surfaced as an explicit failure, never silent continuation).
+        """
+        if self._budgets is not None:
+            job_budget = self._budgets.snapshot(f"bud-{job_id}")
+            if job_budget is not None and job_budget.state is BudgetState.EXHAUSTED:
+                raise BudgetExhaustedError(
+                    f"job {job_id!r} budget is exhausted; refusing to lease work"
+                )
         steps = self._store.list_steps_for_job(job_id)
         ready_ids = {s.step_id for s in steps if s.status is RuntimeStepStatus.READY}
         if not ready_ids:
@@ -199,10 +215,27 @@ class OrchestratorEngine:
             lease_token=lease.lease_token,
             lease_expires_at=lease.lease_expires_at,
         )
+        # Retry economics: attempts consume the job's attempt budget (directive
+        # §28: retries consume budget; recovery never resets it).
+        if self._budgets is not None:
+            self._charge_attempt(job_id, started.attempt)
         self._record(JobEventType.STEP_LEASED, job_id, lease.step_id,
                      payload_json=f'{{"worker": "{worker_id}"}}')
         self._record(JobEventType.STEP_STARTED, job_id, lease.step_id)
         return lease
+
+    def _charge_attempt(self, job_id: str, attempt: int) -> None:
+        budget_id = f"bud-{job_id}"
+        try:
+            self._budgets.charge(budget_id, "attempts", 1)
+        except BudgetExhaustedError:
+            # Cap reached mid-flight: mark the job budget exhausted and
+            # re-raise so the caller sees explicit exhaustion.
+            self._record(
+                JobEventType.STEP_FAILED, job_id,
+                payload_json='{"failure_class": "BUDGET_EXHAUSTED"}',
+            )
+            raise
 
     # -- execution -----------------------------------------------------------
 
