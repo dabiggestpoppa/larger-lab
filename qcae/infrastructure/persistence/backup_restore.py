@@ -112,13 +112,21 @@ class BackupService:
         return manifest
 
     def _registry_row_counts(self) -> Dict[str, int]:
-        """Row counts for every registry table present (P1-R1 §10)."""
+        """Row counts for every persisted table present (P1-R1 §10 + P2-C12)."""
         tables = (
             "capability_contract", "capability_atom", "composite_capability",
             "candidate", "repository_record", "repository_revision",
             "graph_relationship",
             "negative_knowledge", "positive_knowledge", "capability_receipt",
             "external_registry_ref",
+            # P2 runtime + governance state (directive §38: restore must
+            # preserve jobs/steps/events/checkpoints/approvals/budgets).
+            "runtime_job", "runtime_step", "runtime_job_event",
+            "runtime_checkpoint", "runtime_idempotency", "runtime_queue_claim",
+            "runtime_budget",
+            "governance_policy_request", "governance_policy_decision",
+            "governance_approval_request", "governance_approval_decision",
+            "governance_escalation", "governance_escalation_decision",
         )
         counts: Dict[str, int] = {}
         for table in tables:

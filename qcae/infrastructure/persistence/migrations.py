@@ -19,7 +19,7 @@ from typing import Callable, Dict, List, Optional
 from qcae.core.errors import QcaeValidationError
 
 __all__ = ["Migration", "MigrationLedgerEntry", "MigrationRunner", "MIGRATION_LEDGER_DDL",
-           "TEST_V1_TO_V2"]
+           "TEST_V1_TO_V2", "V2_TO_V3", "V3_TO_V4"]
 
 MIGRATION_LEDGER_DDL = """
 CREATE TABLE IF NOT EXISTS schema_migration_ledger (
@@ -221,5 +221,174 @@ V2_TO_V3 = Migration(
         "ADR-0007: adds repository_revision table (stable repository identity "
         "plus immutable revision records); back-fills one revision record per "
         "existing repository_record"
+    ),
+)
+
+
+RUNTIME_DDL_MIGRATION = """
+CREATE TABLE IF NOT EXISTS runtime_job (
+    job_id            TEXT PRIMARY KEY,
+    deterministic_id  TEXT NOT NULL,
+    status            TEXT NOT NULL,
+    job_type          TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    priority          INTEGER NOT NULL DEFAULT 0,
+    queued_at         TEXT NOT NULL DEFAULT '',
+    not_before        TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX IF NOT EXISTS ix_runtime_job_status ON runtime_job(status);
+CREATE INDEX IF NOT EXISTS ix_runtime_job_queue ON runtime_job(not_before, priority DESC);
+
+CREATE TABLE IF NOT EXISTS runtime_step (
+    step_id           TEXT NOT NULL,
+    job_id            TEXT NOT NULL,
+    status            TEXT NOT NULL,
+    step_type         TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    lease_owner       TEXT NOT NULL DEFAULT '',
+    lease_token       TEXT NOT NULL DEFAULT '',
+    lease_expires_at  TEXT NOT NULL DEFAULT '',
+    not_before        TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY (step_id)
+);
+CREATE INDEX IF NOT EXISTS ix_runtime_step_job ON runtime_step(job_id);
+CREATE INDEX IF NOT EXISTS ix_runtime_step_status ON runtime_step(status);
+
+CREATE TABLE IF NOT EXISTS runtime_job_event (
+    event_seq         INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id          TEXT NOT NULL,
+    event_type        TEXT NOT NULL,
+    job_id            TEXT NOT NULL,
+    step_id           TEXT NOT NULL DEFAULT '',
+    occurred_at       TEXT NOT NULL,
+    actor             TEXT NOT NULL DEFAULT '',
+    payload_json      TEXT NOT NULL DEFAULT '',
+    event_digest      TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS ix_runtime_event_id ON runtime_job_event(event_id);
+CREATE INDEX IF NOT EXISTS ix_runtime_event_job ON runtime_job_event(job_id);
+
+CREATE TABLE IF NOT EXISTS runtime_checkpoint (
+    checkpoint_id     TEXT PRIMARY KEY,
+    job_id            TEXT NOT NULL,
+    step_id           TEXT NOT NULL DEFAULT '',
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    created_at        TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_checkpoint_job ON runtime_checkpoint(job_id);
+
+CREATE TABLE IF NOT EXISTS runtime_idempotency (
+    idempotency_key   TEXT PRIMARY KEY,
+    job_id            TEXT NOT NULL,
+    step_id           TEXT NOT NULL,
+    completed_at      TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS runtime_queue_claim (
+    step_id           TEXT PRIMARY KEY,
+    job_id            TEXT NOT NULL,
+    lease_owner       TEXT NOT NULL,
+    lease_token       TEXT NOT NULL,
+    leased_at         TEXT NOT NULL,
+    lease_expires_at  TEXT NOT NULL,
+    acknowledged      INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS ix_queue_claim_expiry
+    ON runtime_queue_claim(lease_expires_at);
+
+CREATE TABLE IF NOT EXISTS runtime_budget (
+    budget_id         TEXT PRIMARY KEY,
+    owner_kind        TEXT NOT NULL,
+    owner_id          TEXT NOT NULL,
+    parent_budget_id  TEXT NOT NULL DEFAULT '',
+    state             TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_budget_owner ON runtime_budget(owner_id);
+
+CREATE TABLE IF NOT EXISTS governance_policy_request (
+    request_ref       TEXT PRIMARY KEY,
+    principal         TEXT NOT NULL,
+    action            TEXT NOT NULL,
+    resource          TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    created_at        TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS governance_policy_decision (
+    decision_id       TEXT PRIMARY KEY,
+    request_ref       TEXT NOT NULL,
+    decision          TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    created_at        TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_gov_decision_request
+    ON governance_policy_decision(request_ref);
+
+CREATE TABLE IF NOT EXISTS governance_approval_request (
+    request_id        TEXT PRIMARY KEY,
+    principal         TEXT NOT NULL,
+    action            TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    created_at        TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS governance_approval_decision (
+    decision_id       TEXT PRIMARY KEY,
+    request_ref       TEXT NOT NULL,
+    state             TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    created_at        TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_approval_decision_request
+    ON governance_approval_decision(request_ref);
+
+CREATE TABLE IF NOT EXISTS governance_escalation (
+    escalation_id     TEXT PRIMARY KEY,
+    job_id            TEXT NOT NULL,
+    state             TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    created_at        TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS governance_escalation_decision (
+    decision_id       TEXT PRIMARY KEY,
+    escalation_ref    TEXT NOT NULL,
+    state             TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL,
+    created_at        TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_escalation_decision_ref
+    ON governance_escalation_decision(escalation_ref);
+"""
+
+
+def _apply_v4(conn: sqlite3.Connection) -> None:
+    """P2: add runtime + governance tables (v3 -> v4).
+
+    Purely additive: P1 registry/evidence data is untouched. All runtime
+    tables start empty; the P2 runtime populates them after migration.
+    """
+    conn.executescript(RUNTIME_DDL_MIGRATION)
+
+
+V3_TO_V4 = Migration(
+    from_version=3,
+    to_version=4,
+    migration_id="P2-0004-runtime-governance-tables",
+    apply=_apply_v4,
+    description=(
+        "P2: adds runtime job/step/event/checkpoint/idempotency/claim/budget "
+        "and governance policy/approval/escalation tables (additive)"
     ),
 )
