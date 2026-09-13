@@ -43,6 +43,7 @@ recovery scanner, no quota, no DuckDB/Postgres (later checkpoints).
 
 from __future__ import annotations
 
+import json
 import threading
 import time
 from datetime import UTC, datetime
@@ -321,7 +322,9 @@ class DurableJobStateRepository:
                 "job_id": job_id,
                 "job_state": birth_state.model_dump(mode="json"),
             }
-            self._commit_adopting(self._births, job_id, payload)
+            self._commit_adopting(
+                self._births, job_id, payload, conflict_error=JobIdentityConflict
+            )
             return birth_state
 
     def advance_status(
@@ -416,10 +419,31 @@ class DurableJobStateRepository:
         with self._job_lock(job_id):
             current = self.get_job(job_id)
             if current.status is StorageJobStatus.CHECKPOINT_ADVANCED:
+                # Exact retry of the SAME batch after a lost-return crash is
+                # idempotence (§68), not a second advancement: re-prove the
+                # durable chain, then return the already-committed state.
+                # Divergent semantics are a typed conflict.
+                last = self._latest_event(job_id)
+                if last is not None:
+                    committed = StorageJobState.model_validate(
+                        last["resulting_state"]
+                    )
+                    same_batch = (
+                        committed.last_committed_acquisition_id
+                        == acquisition_id
+                        and committed.last_manifest_id == manifest_id
+                        and committed.resume_token == resume_token
+                    )
+                    if same_batch:
+                        # Idempotence is not permission to trust stale
+                        # evidence (I05R3 §10 doctrine): re-prove.
+                        self._prove_batch_durable(acquisition_id, manifest_id)
+                        return committed
                 raise JobTransitionConflict(
-                    "job is already CHECKPOINT_ADVANCED; the next batch "
-                    "continues via an annotated ACQUIRING transition, not "
-                    "another checkpoint advancement"
+                    "job is already CHECKPOINT_ADVANCED for a different "
+                    "batch; the next batch continues via an annotated "
+                    "ACQUIRING transition, not another checkpoint "
+                    "advancement"
                 )
             if current.status is StorageJobStatus.COMPLETE:
                 raise JobTransitionConflict(
@@ -615,10 +639,20 @@ class DurableJobStateRepository:
             transition=transition,
             resulting_state=resulting,
         )
-        self._commit_adopting(self._events, transition.transition_id, payload)
+        self._commit_adopting(
+            self._events,
+            transition.transition_id,
+            payload,
+            conflict_error=JobTransitionConflict,
+        )
 
     def _commit_adopting(
-        self, catalog: DurableJsonCatalog, logical_id: str, payload: dict[str, Any]
+        self,
+        catalog: DurableJsonCatalog,
+        logical_id: str,
+        payload: dict[str, Any],
+        *,
+        conflict_error: type[JobError],
     ) -> dict[str, Any]:
         """Commit with exact-retry adoption (I06 §37 doctrine).
 
@@ -626,17 +660,37 @@ class DurableJobStateRepository:
         leave the record committed while the caller saw failure.  An exact
         retry re-derives the same logical id; if the committed payload
         matches on all semantics except operational clocks, adopt it.
-        Any other divergence is a real conflict.
+        Any other divergence raises ``conflict_error`` (typed) — divergence
+        is visible, never silently adopted, never silently generic.
         """
         try:
             return catalog.commit(logical_id, payload)
-        except JsonCatalogConflict:
+        except JsonCatalogConflict as exc:
             existing = catalog.get(logical_id)
             if existing is not None and _event_semantics(
                 existing
             ) == _event_semantics(payload):
                 return existing
-            raise
+            # The conflicting record may exist only on disk (committed by a
+            # lost-race writer this process never cached).
+            from .json_catalog import catalog_physical_key
+
+            on_disk = catalog.root / catalog_physical_key(logical_id)
+            if existing is None and on_disk.is_file():
+                try:
+                    disk_payload = json.loads(
+                        on_disk.read_text(encoding="utf-8")
+                    )
+                except (OSError, ValueError):
+                    disk_payload = None
+                if disk_payload is not None and _event_semantics(
+                    disk_payload
+                ) == _event_semantics(payload):
+                    return disk_payload
+            raise conflict_error(
+                f"durable record {logical_id!r} diverges from the retry "
+                f"payload (semantic conflict, no adoption)"
+            ) from exc
 
     # -- coordination (I06 §43/§44 pattern) ------------------------------------
 
