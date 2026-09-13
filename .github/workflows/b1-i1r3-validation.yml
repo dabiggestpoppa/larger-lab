@@ -1,0 +1,128 @@
+name: b1-i1r3-validation
+on:
+  push:
+    branches: [oce]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    # The regression suite runs the full check battery (ansible-lint,
+    # ansible-playbook, gitleaks, shellcheck) per --all test, so an
+    # authoritative run legitimately takes ~30-45 min. Bound it anyway so a
+    # genuine hang is killed and the partial evidence is still uploaded.
+    timeout-minutes: 120
+    steps:
+      # ═══════════════════════════════════════════════════════════════
+      # Checkout (pinned action revision)
+      # ═══════════════════════════════════════════════════════════════
+      - name: Checkout implementation commit
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          # Full history: the engine's BASE_SHA check resolves ancestry via
+          # git merge-base against the contract's authoritative base, which a
+          # shallow (fetch-depth: 1) checkout cannot.
+          fetch-depth: 0
+
+      # ═══════════════════════════════════════════════════════════════
+      # Install Python and pinned dependencies
+      # ═══════════════════════════════════════════════════════════════
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned Python dependencies
+        run: pip install -r infrastructure/cloud-ground/requirements.txt
+
+      # ═══════════════════════════════════════════════════════════════
+      # Install mandatory tools (pinned versions)
+      # ═══════════════════════════════════════════════════════════════
+      - name: Install Ansible and ansible-lint
+        run: |
+          # ansible-compat MUST be pinned to the 6.22.0-era 4.1.11. Newer
+          # ansible-compat (>=5) computes an isolated cache dir as
+          # <project_dir>/.ansible, and since ansible-lint 6.22.0 resolves
+          # project_dir to the git root, an unpinned install drops a stray
+          # .ansible/ into the checkout and trips the clean-source check.
+          pip install ansible-core==2.16.0 ansible-lint==6.22.0 ansible-compat==4.1.11
+          # Collections required by the playbook roles (community.general,
+          # community.docker, ansible.posix) for syntax-check and lint.
+          ansible-galaxy collection install -r infrastructure/cloud-ground/ansible/requirements.yml
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y docker-compose-v2
+
+      - name: Install Gitleaks
+        # Extract OUTSIDE the workspace: the release tarball contains its own
+        # README.md and LICENSE, which would clobber the checkout and trip the
+        # runner's clean-source check (step d).
+        run: |
+          mkdir -p "$RUNNER_TEMP/gitleaks"
+          wget -q -O "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
+          tar xzf "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" -C "$RUNNER_TEMP/gitleaks"
+          sudo mv "$RUNNER_TEMP/gitleaks/gitleaks" /usr/local/bin/
+
+      # ═══════════════════════════════════════════════════════════════
+      # Generate single authoritative OCE_RUN_ID — known before validation
+      # ═══════════════════════════════════════════════════════════════
+      - name: Generate single OCE_RUN_ID
+        id: run_id
+        run: |
+          OCE_RUN_ID=$(python3 -c "import secrets; print(secrets.token_hex(6))")
+          echo "oce_run_id=$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "=== SINGLE OCE_RUN_ID: $OCE_RUN_ID ==="
+
+      # ═══════════════════════════════════════════════════════════════
+      # Deterministic evidence directory — known BEFORE validation begins
+      # so failed runs still upload truthful evidence. Outside the repo.
+      # ═══════════════════════════════════════════════════════════════
+      - name: Prepare evidence directory
+        id: evidence
+        run: |
+          EVIDENCE_DIR="$RUNNER_TEMP/oce-evidence-${{ steps.run_id.outputs.oce_run_id }}"
+          mkdir -p "$EVIDENCE_DIR"
+          echo "evidence_dir=$EVIDENCE_DIR" >> "$GITHUB_OUTPUT"
+
+      # ═══════════════════════════════════════════════════════════════
+      # Invoke the shared validation runner EXACTLY ONCE.
+      # Exit code is preserved (no pipe that swallows it).
+      # ═══════════════════════════════════════════════════════════════
+      - name: Run shared validation runner
+        env:
+          OCE_RUN_ID: ${{ steps.run_id.outputs.oce_run_id }}
+          OCE_CI_MODE: "true"
+          OCE_EVIDENCE_DIR: ${{ steps.evidence.outputs.evidence_dir }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        # R3H: the Actions default shell runs `bash -eo pipefail` (fail-fast).
+        # Capture the runner's real exit code with `|| rc=$?` so a failing
+        # runner never aborts before the log is printed, then exit with the
+        # exact captured status. No pipeline may hide or replace it.
+        shell: bash
+        run: |
+          rc=0
+          bash infrastructure/cloud-ground/scripts/run-validation.sh > /tmp/oce-run.log 2>&1 || rc=$?
+          cat /tmp/oce-run.log
+          exit "$rc"
+
+      # ═══════════════════════════════════════════════════════════════
+      # Upload evidence on SUCCESS and FAILURE alike.
+      # ═══════════════════════════════════════════════════════════════
+      - name: Upload evidence artifact
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
+        with:
+          name: b1-i1r3h-evidence-${{ steps.run_id.outputs.oce_run_id }}
+          path: ${{ steps.evidence.outputs.evidence_dir }}
+          retention-days: 30

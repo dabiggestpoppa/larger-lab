@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/control-plane/capability-grant.json",
+  "title": "OCE Capability Grant",
+  "description": "Encodes actor, action, target, environment, limits, expiry, approval, idempotency, and evidence obligations. B3.C2.S1 / B2-C2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["grant_id", "actor_id", "action", "target", "environment", "risk_class", "limits", "issued_at", "expires_at", "status"],
+  "properties": {
+    "grant_id": { "type": "string", "pattern": "^[a-f0-9]{16,64}$" },
+    "actor_id": { "type": "string", "minLength": 1 },
+    "action": { "type": "string", "minLength": 1 },
+    "target": { "type": "string", "minLength": 1 },
+    "environment": { "enum": ["local", "local-test", "local-recovery", "cloud-plan", "cloud"] },
+    "risk_class": { "enum": ["read", "local-write", "external-write", "deployment", "destructive", "messaging", "broker", "capital"] },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_concurrent": { "type": "integer", "minimum": 1 },
+        "rate_per_minute": { "type": "integer", "minimum": 1 },
+        "max_payload_bytes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "approval_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "approved_by": { "type": "string" },
+        "approved_at": { "type": "string", "format": "date-time" },
+        "approval_id": { "type": "string" }
+      }
+    },
+    "idempotency_required": { "type": "boolean" },
+    "evidence_obligations": { "type": "array", "items": { "type": "string" } },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "revoked_at": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["active", "revoked", "expired"] },
+    "schema_version": { "type": "string", "const": "1.0.0" }
+  }
+}

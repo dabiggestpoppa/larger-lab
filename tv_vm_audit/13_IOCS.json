@@ -1,0 +1,25 @@
+{
+  "sample": {
+    "source_path": "C:\\Users\\wifik\\Downloads\\TradingView_Premium_Desktop.zip",
+    "outer_archive_sha256": "52b02d200f835f6fccda4b6882e673c1aebbc443d2e4ba26e38839526ce3a298",
+    "embedded_entry": "TradingView Premium Desktop.exe",
+    "embedded_sha256": "21550755ff60024adbd2fa69575a4363cb6c77dc21bc427b754e62eed22c5d8b",
+    "embedded_size_bytes": 146726768,
+    "sample_hash_match": true
+  },
+  "runtime_iocs": {
+    "domains": [],
+    "ips": [],
+    "urls": [],
+    "files_created": [],
+    "registry_keys": [],
+    "services": [],
+    "scheduled_tasks": [],
+    "status": "NOT_OBSERVED_NO_EXECUTION"
+  },
+  "static_observations": [
+    "Outer ZIP contains a nested ZIP named TradingView_Premium_Desktop_(password_github).zip.",
+    "Nested package contains the target executable and several DLLs.",
+    "Nested package inventory includes Linux-style filesystem/package paths; significance is undetermined without analysis of the extracted package in an isolated environment."
+  ]
+}

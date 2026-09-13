@@ -1,0 +1,9 @@
+{
+  "name": "cloud-plan-readonly",
+  "kind": "cloud",
+  "phase": "plan",
+  "mutates_external": false,
+  "public_exposure": false,
+  "requires_authorization_fields": [],
+  "cost_ceiling_usd": 0
+}

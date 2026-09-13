@@ -1,0 +1,13 @@
+{
+  "evidence_id": "ev-abc12345",
+  "claim_id": "claim-schema-valid",
+  "protocol": "jsonschema-validate",
+  "inputs": {"schema": "worker-task-envelope"},
+  "environment": {"os": "Ubuntu 24.04", "tool_versions": {"python": "3.11"}},
+  "actor": "validate_engine.py",
+  "timestamp": "2026-08-20T12:00:00Z",
+  "result": "PASS",
+  "pass_criteria": "Schema validates correct instance",
+  "verifier": "validate_engine.py v2.0.0",
+  "schema_version": "1.0.0"
+}

@@ -1,0 +1,45 @@
+---
+# Backup client role — install restic for file-level backup
+# B1-I1 — Static skeleton
+# WARNING: Actual backup target and credentials needed during B1-I4
+
+- name: Install restic
+  ansible.builtin.apt:
+    name: restic
+    state: present
+  tags: [backup]
+
+- name: Verify restic is installed
+  ansible.builtin.command: restic version
+  register: restic_version
+  changed_when: false
+  tags: [backup, verify]
+
+- name: Create backup configuration template
+  ansible.builtin.template:
+    src: backup-env.j2
+    dest: /opt/oce/config/backup.env.example
+    owner: root
+    group: oce-operator
+    mode: '0640'
+  tags: [backup, config]
+
+- name: Create backup exclusion list
+  ansible.builtin.copy:
+    dest: /opt/oce/config/backup-excludes.txt
+    content: |
+      # OCE backup exclusion list
+      # Do not backup: secrets, temp files, caches, node_modules
+      *.key
+      *.pem
+      *.env
+      secrets/
+      __pycache__/
+      node_modules/
+      .cache/
+      *.tmp
+      .disk-headroom
+    owner: root
+    group: oce-operator
+    mode: '0640'
+  tags: [backup, config]

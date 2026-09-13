@@ -1,0 +1,9 @@
+{
+  "worker_id": "wrk-local-01",
+  "worker_class": "local",
+  "admission_status": "INVALID_STATUS",
+  "evaluated_at": "2026-08-20T12:00:00Z",
+  "tests": [{"test_id": "T01", "test_name": "identity", "result": "PASS", "evidence": "manifest"}],
+  "evaluator_id": "eval-01",
+  "schema_version": "1.0.0"
+}
