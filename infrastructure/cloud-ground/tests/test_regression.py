@@ -491,7 +491,8 @@ def test_run_id_consistency_across_artifacts():
                 json.dump(data, f)
         run_engine("--only", "RUN-ID-CONSISTENCY", "--evidence-dir", tmpdir, env={"OCE_RUN_ID": run_id})
         check = get_check_result(tmpdir, "RUN-ID-CONSISTENCY")
-        assert check and check["result"] == "PASS", f"Expected PASS for consistent RUN_ID, got {check}"
+        assert check, "RUN-ID-CONSISTENCY check result missing"
+        assert check["result"] == "PASS", f"Expected PASS for consistent RUN_ID, got {check}"
         print("PASS: RUN_ID consistency across all artifacts")
 
 
@@ -549,7 +550,8 @@ def test_authoritative_requires_explicit_phase():
             env={"OCE_RUN_ID": make_run_id()},
         )
         combined = (out + err).lower()
-        assert rc != 0 and "phase" in combined, f"Expected phase-missing rejection, got rc={rc} {combined}"
+        assert rc != 0, f"Expected phase-missing rejection, got rc={rc} {combined}"
+        assert "phase" in combined, f"Expected phase-missing message, got rc={rc} {combined}"
         print("PASS: Authoritative mode requires explicit --phase")
 
 
@@ -599,7 +601,8 @@ def test_final_phase_requires_adversarial_evidence():
             env={"OCE_RUN_ID": make_run_id()},
         )
         check = get_check_result(tmpdir, "FAIL-CLOSED")
-        assert check and check["result"] == "BLOCKED", f"Expected BLOCKED, got {check}"
+        assert check, "FAIL-CLOSED check result missing"
+        assert check["result"] == "BLOCKED", f"Expected BLOCKED, got {check}"
         print("PASS: Final phase refuses missing adversarial evidence")
 
 
@@ -753,7 +756,8 @@ def test_cleanup_evidence_written_before_final_gate():
     content = RUN_VALIDATION.read_text(encoding="utf-8")
     cleanup_call = content.find("write_worktree_cleanup_evidence")
     gate_call = content.find('bash "$GATE"')
-    assert cleanup_call != -1 and gate_call != -1, "runner missing cleanup or gate step"
+    assert cleanup_call != -1, "runner missing cleanup step"
+    assert gate_call != -1, "runner missing gate step"
     assert cleanup_call < gate_call, (
         "worktree-cleanup evidence must be written before the final gate runs"
     )
@@ -799,8 +803,8 @@ def test_gate_rejects_cleanup_removed_false():
         gate_rc, out, err = run_gate(tmpdir, commit, tree, env={"OCE_RUN_ID": run_id})
         combined = out + err
         assert gate_rc != 0, f"Gate must reject removed:false, rc={gate_rc}"
-        assert "WORKTREE-CLEANUP" in combined and "removed" in combined, \
-            f"No removed-false error in gate output: {combined}"
+        assert "WORKTREE-CLEANUP" in combined, f"No WORKTREE-CLEANUP error in gate output: {combined}"
+        assert "removed" in combined, f"No removed-false error in gate output: {combined}"
         print("PASS: Gate rejects removed:false")
 
 

@@ -336,7 +336,8 @@ def test_cxr5r1_worker_token_init_read_split():
     with pytest.raises(RuntimeError, match="worker token"):
         ls.read_worker_token()          # runtime read, no store -> fail closed
     tok = ls.initialize_worker_token()  # explicit init materializes it
-    assert tok and ls.read_worker_token() == tok
+    assert tok
+    assert ls.read_worker_token() == tok
     assert ls.initialize_worker_token() == tok  # init preserves existing
     before = _store_snapshot()
     assert ls.read_worker_token() == tok         # runtime read never mutates

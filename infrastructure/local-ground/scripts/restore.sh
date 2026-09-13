@@ -67,7 +67,10 @@ fi
 
 PG_USER="${POSTGRES_USER:-oce_local_admin}"
 PG_DB="${POSTGRES_DB:-oce_local}"
-have_docker() { command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; }
+have_docker() {
+  command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1
+  return $?
+}
 
 echo "verifying backup integrity (fail closed)..."
 rc=0

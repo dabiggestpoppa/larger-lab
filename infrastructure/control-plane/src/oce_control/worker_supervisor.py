@@ -218,7 +218,7 @@ class WorkerSupervisor:
         return reports
 
     def configure(self, worker_id: str, command: list[str],
-                  capabilities: Optional[list[str]] = None, actor: str = "operator:po") -> WorkerRecord:
+                  capabilities: Optional[list[str]] = None) -> WorkerRecord:
         caps = list(capabilities or BOOTSTRAP_CAPABILITIES)
         rec = WorkerRecord(worker_id=worker_id, command=command, capabilities=caps)
         self._workers[worker_id] = rec

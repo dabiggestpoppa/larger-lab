@@ -245,7 +245,7 @@ record "adversarial suite passed"
 # â”€â”€ cloud boundary (deterministic plan; apply denied; zero mutation) â”€â”€â”€â”€â”€â”€â”€
 OCE_RUNTIME_TARGET=cloud-plan bash "$SCRIPT_DIR/oce-ctl" deploy plan --target cloud > "$EVIDENCE/cloud-plan.txt" 2>&1
 RC=$?
-[ "$RC" -ne 0 ] && fail cloud-plan "$RC"
+[[ "$RC" -ne 0 ]] && fail cloud-plan "$RC"
 OCE_RUNTIME_TARGET=cloud-plan bash "$SCRIPT_DIR/oce-ctl" deploy plan --target cloud > "$EVIDENCE/cloud-plan-2.txt" 2>&1
 python3 - "$EVIDENCE" <<'PY'
 import json, sys
@@ -269,7 +269,7 @@ python3 - "$EVIDENCE" "$RC" <<'PY'
 import json, sys
 json.dump({"exit_code": int(sys.argv[2])}, open(sys.argv[1] + "/local-after-denied.json", "w", encoding="utf-8"), indent=2)
 PY
-[ "$RC" -ne 0 ] && fail local-after-denied "$RC"
+[[ "$RC" -ne 0 ]] && fail local-after-denied "$RC"
 record "cloud plan deterministic + zero mutation; cloud apply denied; local unaffected"
 
 # â”€â”€ clean source (post) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -355,7 +355,7 @@ record "independent gate PASS; final status $FINAL_STATUS"
 write_manifest
 bash "$FINAL_VERIFY" "$EVIDENCE" "$COMMIT" "$TREE"
 VERIFY_RC=$?
-if [ "$VERIFY_RC" -ne 0 ]; then
+if [[ "$VERIFY_RC" -ne 0 ]]; then
   echo "FINAL PACKAGE VERIFICATION FAILED (exit $VERIFY_RC)" >&2
   fail final-package-verify "$VERIFY_RC"
 fi

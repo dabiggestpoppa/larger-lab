@@ -155,6 +155,9 @@ with open(sys.argv[10], 'w') as f: json.dump(t, f, indent=2)
 }
 
 # Run one negative mutation test: backup -> mutate -> detect -> restore -> verify
+readonly HR='=============================================='
+readonly EXPECT_WORKER_NO_DB='WORKER-NO-DB'
+
 run_one() {
     local test_id="$1" desc="$2" target="$3" expect="$4" mut_code="$5"
     local target_win
@@ -226,12 +229,13 @@ run_one() {
             "$baseline_result" "$baseline_exit" "$mutation_result" "$mutation_exit" \
             "$post_restore_result" "$post_restore_exit" "$orig_hash" "$rest_hash" "$reason"
     fi
+    return 0
 }
 
-echo "=============================================="
+echo "$HR"
 echo "  OCE B1-I1R3F Adversarial Test Suite"
 echo "  RUN_ID: $RUN_ID"
-echo "=============================================="
+echo "$HR"
 echo "Engine: $ENGINE"
 echo "Evidence: $EVIDENCE_DIR"
 echo ""
@@ -278,20 +282,20 @@ run_one "CM-05" "Remove security_opt" "$COMPOSE" "SECURITY-OPTS" "import sys;p=s
 echo ""
 
 echo "--- Block C: Policy Mutations ---"
-run_one "PL-01" "Remove DENY rules" "$POLICY" "WORKER-NO-DB" "import sys;p=sys.argv[1];lines=open(p).readlines();open(p,'w').writelines([l for l in lines if 'action: DENY' not in l])"
-run_one "PL-02" "Remove worker-local->postgresql" "$POLICY" "WORKER-NO-DB" "import sys;p=sys.argv[1];lines=open(p).readlines();out=[];s=0
+run_one "PL-01" "Remove DENY rules" "$POLICY" "$EXPECT_WORKER_NO_DB" "import sys;p=sys.argv[1];lines=open(p).readlines();open(p,'w').writelines([l for l in lines if 'action: DENY' not in l])"
+run_one "PL-02" "Remove worker-local->postgresql" "$POLICY" "$EXPECT_WORKER_NO_DB" "import sys;p=sys.argv[1];lines=open(p).readlines();out=[];s=0
 for i,l in enumerate(lines):
  if s>0:s-=1;continue
  if 'from: worker-local' in l and i+2<len(lines) and 'to: postgresql' in lines[i+1] and 'action: DENY' in lines[i+2]:s=2;continue
  out.append(l)
 open(p,'w').writelines(out)"
-run_one "PL-03" "Remove SSH denials" "$POLICY" "WORKER-NO-DB" "import sys;p=sys.argv[1];lines=open(p).readlines();out=[];s=0
+run_one "PL-03" "Remove SSH denials" "$POLICY" "$EXPECT_WORKER_NO_DB" "import sys;p=sys.argv[1];lines=open(p).readlines();out=[];s=0
 for i,l in enumerate(lines):
  if s>0:s-=1;continue
  if i+1<len(lines) and 'action: DENY' in lines[i+1] and 'to: ssh' in l:s=1;continue
  out.append(l)
 open(p,'w').writelines(out)"
-run_one "PL-04" "Remove Docker denials" "$POLICY" "WORKER-NO-DB" "import sys;p=sys.argv[1];lines=open(p).readlines();out=[];s=0
+run_one "PL-04" "Remove Docker denials" "$POLICY" "$EXPECT_WORKER_NO_DB" "import sys;p=sys.argv[1];lines=open(p).readlines();out=[];s=0
 for i,l in enumerate(lines):
  if s>0:s-=1;continue
  if i+1<len(lines) and 'action: DENY' in lines[i+1] and 'to: docker' in l:s=1;continue
@@ -363,6 +367,7 @@ run_meta() {
         write_meta_result "$meta_id" "FAIL" "$desc" "$fixture_type" "$invalid_condition" \
             "FAIL" "$fr" "$rc" "Invalid fixture was not rejected"
     fi
+    return 0
 }
 
 mk_fake_neg() { python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':sys.argv[1],'mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}))" "$1"; }
@@ -598,14 +603,14 @@ echo ""
 
 # === SUMMARY ===
 echo ""
-echo "=============================================="
+echo "$HR"
 echo "  Adversarial Test Summary"
 echo "  RUN_ID: $RUN_ID"
-echo "=============================================="
+echo "$HR"
 echo "  Total:   $TOTAL_COUNT"
 echo "  PASS:    $PASS_COUNT"
 echo "  FAIL:    $FAIL_COUNT"
-echo "=============================================="
+echo "$HR"
 
 SUITE_RESULT="PASS"
 [[ "$FAIL_COUNT" -gt 0 ]] && SUITE_RESULT="FAIL"

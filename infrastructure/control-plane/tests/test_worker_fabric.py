@@ -59,7 +59,8 @@ class TestContracts:
         ok, errs = validate_identity_fields(ident.to_dict())
         assert ok, errs
         # immutability: frozen dataclass
-        with pytest.raises(Exception):
+        from dataclasses import FrozenInstanceError
+        with pytest.raises(FrozenInstanceError):
             ident.capabilities = ()  # type: ignore[misc]
 
     def test_capability_escalation_refused(self):

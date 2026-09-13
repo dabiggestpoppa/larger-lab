@@ -28,7 +28,8 @@ class TestBoundedRunner:
     def test_allowed_executable_ok(self, tmp_path):
         code = "print('hello oce')"
         _, r = _run(tmp_path, ["python", "-c", code])
-        assert r.exit_code == 0 and "hello oce" in r.stdout
+        assert r.exit_code == 0
+        assert "hello oce" in r.stdout
 
     def test_forbidden_executable_fails_closed(self, tmp_path):
         policy = SandboxPolicy(allowed_executables=("python",))

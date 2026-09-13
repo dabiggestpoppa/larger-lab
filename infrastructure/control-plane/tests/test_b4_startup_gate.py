@@ -402,8 +402,8 @@ class TestR3R2RuntimeBind:
                     if proc.poll() is not None:
                         break
                     time.sleep(0.4)
-            assert body is not None and "ok" in body, \
-                f"server on effective port {port} did not answer (rc={proc.poll()})"
+            assert body is not None, f"server on effective port {port} did not answer (rc={proc.poll()})"
+            assert "ok" in body, f"server response missing ok: {body}"
             # no public listener: only 127.0.0.1 was bound by the effective host
             assert proc.poll() is None  # still serving -> real bind
         finally:
@@ -508,7 +508,8 @@ class TestCXR3R7StartupTruthSemantics:
     def test_configuration_valid_never_claims_runtime_ready(self):
         # CXR4-07: config-valid is distinct from runtime-ready/startable
         rep = cs.validate_configuration(CLEAN_ENV)
-        assert rep["config_ok"] is True and rep["ok"] is True
+        assert rep["config_ok"] is True
+        assert rep["ok"] is True
         for key in ("start", "ready", "startable"):
             assert key not in rep
         msg = cs.startup_report(CLEAN_ENV)

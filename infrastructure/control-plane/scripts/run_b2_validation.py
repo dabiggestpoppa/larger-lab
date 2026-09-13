@@ -21,6 +21,7 @@ Env:   OCE_RUN_ID (required, 12+ hex), OCE_EVIDENCE_DIR, OCE_CI_MODE,
 """
 from __future__ import annotations
 
+MANIFEST_NAME = "evidence-manifest.json"
 import hashlib
 import json
 import os
@@ -419,13 +420,13 @@ class Runner:
             "files": {},
         }
         for name in sorted(p.name for p in self.evidence.iterdir() if p.is_file()):
-            if name == "evidence-manifest.json":
+            if name == MANIFEST_NAME:
                 continue  # generated last; never self-referential
             manifest["files"][name] = {
                 "sha256": sha256_file(self.evidence / name),
                 "size": (self.evidence / name).stat().st_size,
             }
-        self._write_json("evidence-manifest.json", manifest)
+        self._write_json(MANIFEST_NAME, manifest)
         print("manifest: generated last, hashing all final files")
 
     def step_final_verify(self) -> None:
@@ -493,13 +494,13 @@ def write_failure_evidence(evidence: Path, run_id: str, ctx: dict, reason: str,
                                                 encoding="utf-8")
     manifest = {"manifest_version": "1.0.0", "run_id": run_id, "files": {}}
     for name in sorted(p.name for p in evidence.iterdir() if p.is_file()):
-        if name == "evidence-manifest.json":
+        if name == MANIFEST_NAME:
             continue
         manifest["files"][name] = {
             "sha256": sha256_file(evidence / name),
             "size": (evidence / name).stat().st_size,
         }
-    (evidence / "evidence-manifest.json").write_text(json.dumps(manifest, indent=2),
+    (evidence / MANIFEST_NAME).write_text(json.dumps(manifest, indent=2),
                                                      encoding="utf-8")
 
 

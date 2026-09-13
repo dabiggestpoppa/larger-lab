@@ -93,13 +93,14 @@ class TestTrustedProgramRegistry:
 
     def test_executable_allowlist_enforced(self, tmp_path):
         runner = BoundedRunner(workspace_base=tmp_path, policy=SandboxPolicy())
+        envelope = JobResourceEnvelope(timeout_s=5)
         for evil_argv in (["bash", "-c", "echo hi"],
                           ["cmd", "/c", "echo hi"],
                           ["python3.9", "-c", "pass"],
                           ["/bin/sh", "script.sh"],
                           ["attacker.exe"]):
             with pytest.raises(ExecutionPolicyError):
-                runner.run(evil_argv, envelope=JobResourceEnvelope(timeout_s=5))
+                runner.run(evil_argv, envelope=envelope)
 
     def test_params_cannot_become_environment_or_fs_authority(self, tmp_path):
         runner = BoundedRunner(workspace_base=tmp_path, policy=SandboxPolicy())

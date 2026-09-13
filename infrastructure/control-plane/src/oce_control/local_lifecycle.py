@@ -1025,13 +1025,24 @@ def recover() -> list[str]:
     from oce_control.config_startup import create_activation_context
     ctx = create_activation_context()  # gate first — fail closed before any mutation
     actions.append("activation gate passed (pinned context)")
-    # Clear stale PID files first (never signal anything unexpected).
+    _recover_cleanup_stale_pids(actions)
+    _recover_restore_stack(actions)
+    _recover_restore_processes(ctx, actions)
+    return actions
+
+
+def _recover_cleanup_stale_pids(actions: list[str]) -> None:
+    """Clear stale PID files first (never signal anything unexpected)."""
     for name, (pidfile, marker) in PROCESSES.items():
         path = pid_file(name)
         state, detail = pid_state(path, marker)
         if state == "stale" and path.exists():
             clear_pid(path)
             actions.append(f"cleared stale {name} pid: {detail}")
+
+
+def _recover_restore_stack(actions: list[str]) -> None:
+    """Bring compose dependencies back to healthy and apply migrations."""
     if not docker_available():
         raise RuntimeError("Docker unavailable")
     if not wait_dependencies(60):
@@ -1039,10 +1050,14 @@ def recover() -> list[str]:
         if not wait_dependencies(120):
             raise RuntimeError("stack did not recover to healthy")
         actions.append("stack re-upped and healthy")
-    r = migrate(ctx)
+    r = migrate(None)
     if r.returncode != 0:
         raise RuntimeError(f"migrations failed:\n{r.stdout}\n{r.stderr}")
     actions.append("migrations up-to-date")
+
+
+def _recover_restore_processes(ctx, actions: list[str]) -> None:
+    """Restart any non-live governed process from the pinned activation lineage."""
     for name, (pidfile, marker) in PROCESSES.items():
         if pid_state(pid_file(name), marker)[0] != "live":
             # B4-CXR6R1: each restarted child consumes a role-bound capability

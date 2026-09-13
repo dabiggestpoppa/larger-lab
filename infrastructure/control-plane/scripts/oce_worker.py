@@ -139,7 +139,7 @@ def _dispatch_command(sup, args, worker_command) -> int:
     if cmd == "configure":
         command = worker_command or [sys.executable]
         rec = sup.configure(wid, command=command,
-                            capabilities=args.cap or None, actor=args.actor)
+                            capabilities=args.cap or None)
         print_json(rec.to_dict())
         return 0
     if cmd == "admit":

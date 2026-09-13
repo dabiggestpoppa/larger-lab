@@ -31,7 +31,6 @@ from oce_control import local_secrets as ls
 def _isolate(tmp_path, monkeypatch):
     monkeypatch.setattr(ls, "RUNTIME_DIR", tmp_path)
     # consumed_nonces_file() derives from RUNTIME_DIR
-    yield
 
 
 def _ledger_path() -> Path:

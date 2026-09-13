@@ -25,6 +25,10 @@ from pathlib import Path
 
 VERSION = "3.6.0"
 YAML_GLOB = "*.yaml"
+COMPOSE_RENDER_NAME = "Compose foundation renders"
+ADVERSARIAL_RESULTS_NAME = "adversarial-results.json"
+YML_GLOB = "*.yml"
+META_TEST_EVIDENCE_NAME = "Meta-test rejection evidence complete"
 CHECK_COST_THRESHOLDS = "Cost thresholds match ratification"
 CHECK_WORKER_DENY = "Workers denied DB/Redis/SSH/Docker"
 CHECK_TOTALS_CONSIST = "Result totals self-consistent"
@@ -405,7 +409,7 @@ class Validator:
 
     # ===== STATIC CHECKS =====
     def check_yaml_parsing(self):
-        yaml_files = self._find_files(BASE_DIR, "*.yml") + self._find_files(BASE_DIR, YAML_GLOB)
+        yaml_files = self._find_files(BASE_DIR, YML_GLOB) + self._find_files(BASE_DIR, YAML_GLOB)
         yaml_files = [f for f in yaml_files if ".git" not in str(f) and "node_modules" not in str(f)]
         passed, failed, details = 0, 0, []
         for f in yaml_files:
@@ -546,7 +550,7 @@ class Validator:
                       "\n".join(details))
 
     def check_no_latest_tags(self):
-        compose_files = self._find_files(COMPOSE_DIR, "*.yml") + self._find_files(COMPOSE_DIR, YAML_GLOB)
+        compose_files = self._find_files(COMPOSE_DIR, YML_GLOB) + self._find_files(COMPOSE_DIR, YAML_GLOB)
         violations = []
         for f in compose_files:
             content = self._read_file(f)
@@ -563,7 +567,7 @@ class Validator:
             self.add("NO-LATEST-TAGS", "No :latest image tags", True, "PASS", "0 violations", "Clean")
 
     def check_digest_lock(self):
-        compose_files = self._find_files(COMPOSE_DIR, "*.yml") + self._find_files(COMPOSE_DIR, YAML_GLOB)
+        compose_files = self._find_files(COMPOSE_DIR, YML_GLOB) + self._find_files(COMPOSE_DIR, YAML_GLOB)
         violations = self._compose_tag_violations(compose_files)
         if violations:
             self.add("DIGEST-LOCK", "All images use digest pinning", True, "FAIL",
@@ -760,7 +764,7 @@ class Validator:
 
     def check_no_privileged(self):
         violations = []
-        for f in self._find_files(COMPOSE_DIR, "*.yml"):
+        for f in self._find_files(COMPOSE_DIR, YML_GLOB):
             for i, line in enumerate(self._read_file(f).split("\n"), 1):
                 stripped = line.lstrip()
                 if stripped.startswith("#"):
@@ -775,7 +779,7 @@ class Validator:
 
     def check_no_socket_mount(self):
         violations = []
-        for f in self._find_files(COMPOSE_DIR, "*.yml"):
+        for f in self._find_files(COMPOSE_DIR, YML_GLOB):
             for i, line in enumerate(self._read_file(f).split("\n"), 1):
                 stripped = line.lstrip()
                 if stripped.startswith("#"):
@@ -795,7 +799,7 @@ class Validator:
             (r"-----BEGIN\s+(RSA|DSA|EC|OPENSSH)\s+PRIVATE\s+KEY-----", "private key"),
         ]
         scan_dirs = [BASE_DIR / "scripts", BASE_DIR / "tests", ANSIBLE_DIR, COMPOSE_DIR]
-        scan_exts = ["*.py", "*.yml", YAML_GLOB, "*.json", "*.sh", "*.cfg", "*.conf", "*.j2"]
+        scan_exts = ["*.py", YML_GLOB, YAML_GLOB, "*.json", "*.sh", "*.cfg", "*.conf", "*.j2"]
         files = []
         for d in scan_dirs:
             if d.exists():
@@ -1041,7 +1045,7 @@ class Validator:
     def check_compose_render(self):
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
-            self.add("COMPOSE-RENDER", "Compose foundation renders", True, "BLOCKED",
+            self.add("COMPOSE-RENDER", COMPOSE_RENDER_NAME, True, "BLOCKED",
                       "compose.foundation.yml not found", "")
             return
         try:
@@ -1052,16 +1056,16 @@ class Validator:
                 capture_output=True, text=True, timeout=30, env=env, cwd=str(COMPOSE_DIR),
             )
             if r.returncode == 0:
-                self.add("COMPOSE-RENDER", "Compose foundation renders", True, "PASS",
+                self.add("COMPOSE-RENDER", COMPOSE_RENDER_NAME, True, "PASS",
                           "docker compose config", "Renders OK")
             else:
-                self.add("COMPOSE-RENDER", "Compose foundation renders", True, "FAIL",
+                self.add("COMPOSE-RENDER", COMPOSE_RENDER_NAME, True, "FAIL",
                           "docker compose config", (r.stdout + r.stderr)[:500])
         except FileNotFoundError:
-            self.add("COMPOSE-RENDER", "Compose foundation renders", True, "BLOCKED",
+            self.add("COMPOSE-RENDER", COMPOSE_RENDER_NAME, True, "BLOCKED",
                       "docker not installed", "")
         except subprocess.TimeoutExpired:
-            self.add("COMPOSE-RENDER", "Compose foundation renders", True, "BLOCKED", "timeout", "")
+            self.add("COMPOSE-RENDER", COMPOSE_RENDER_NAME, True, "BLOCKED", "timeout", "")
 
     def check_shellcheck(self):
         scripts = [
@@ -1180,7 +1184,7 @@ class Validator:
 
     def check_fail_closed(self):
         """Validate adversarial evidence with strict requirements."""
-        adv_path = self._evidence_dir() / "adversarial-results.json"
+        adv_path = self._evidence_dir() / ADVERSARIAL_RESULTS_NAME
         if not adv_path.exists():
             self.add("FAIL-CLOSED", self.MSG_FAIL_CLOSED, True, "BLOCKED",
                       "adversarial-results.json not found", "Run adversarial-tests.sh first")
@@ -1315,31 +1319,31 @@ class Validator:
         return errors
 
     def check_meta_test_evidence(self):
-        adv_path = self._evidence_dir() / "adversarial-results.json"
+        adv_path = self._evidence_dir() / ADVERSARIAL_RESULTS_NAME
         if not adv_path.exists():
-            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
                       "adversarial-results.json not found", "")
             return
         try:
             with open(adv_path, "r", encoding="utf-8") as f:
                 adv = json.load(f)
         except Exception as e:
-            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
                       f"Cannot parse: {e}", "")
             return
 
         meta_tests = adv.get("meta_tests", [])
         if not meta_tests:
-            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "BLOCKED",
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
                       "No meta tests found", "")
             return
 
         errors = self._meta_test_errors(meta_tests)
         if errors:
-            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "FAIL",
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "FAIL",
                       f"{len(errors)} issues", "\n".join(errors[:10]))
         else:
-            self.add("META-TEST-EVIDENCE", "Meta-test rejection evidence complete", True, "PASS",
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "PASS",
                       f"{len(meta_tests)} meta tests with complete evidence",
                       "All meta tests have fixture_type, invalid_condition, expected/observed rejection, nonzero exit")
 
@@ -1350,7 +1354,7 @@ class Validator:
 
         for fname, label in [
             (STATIC_RESULTS_NAME, "static-validation-results"),
-            ("adversarial-results.json", "adversarial-results"),
+            (ADVERSARIAL_RESULTS_NAME, "adversarial-results"),
             ("stage-status.json", "stage-status"),
         ]:
             path = ev_dir / fname
@@ -1610,7 +1614,7 @@ class Validator:
         required = [
             STATIC_RESULTS_NAME,
             "static-validation-summary.md",
-            "adversarial-results.json",
+            ADVERSARIAL_RESULTS_NAME,
             "stage-status.json",
             "worktree-cleanup.json",
             "regression-output.txt",

@@ -711,19 +711,19 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
         return receipt
 
 
-def main():
-    args = sys.argv[1:]
+def _parse_cli(argv):
+    """Parse the recovery CLI into (phase, probe, kw). Exits 2 on unknown args."""
     kw = {}
     phase = None
     probe = None
     i = 0
-    while i < len(args):
-        a = args[i]
+    while i < len(argv):
+        a = argv[i]
         if a in ("--phase", "--archive", "--inventory", "--inventory-sha", "--db",
                  "--user", "--container", "--receipt-out", "--receipt-in",
                  "--verify-tables"):
             i += 1
-            val = args[i] if i < len(args) else None
+            val = argv[i] if i < len(argv) else None
             if a == "--phase":
                 phase = val
             elif a == "--verify-tables":
@@ -734,6 +734,11 @@ def main():
             print(f"USAGE_ERROR: unknown arg '{a}'", file=sys.stderr)
             sys.exit(2)
         i += 1
+    return phase, probe, kw
+
+
+def _validate_cli(phase, kw):
+    """Fail closed on incomplete recovery invocations (usage errors, exit 2)."""
     if phase not in ("promote", "finalize", "rollback"):
         print("USAGE_ERROR: --phase <promote|finalize|rollback> required", file=sys.stderr)
         sys.exit(2)
@@ -746,6 +751,11 @@ def main():
     if phase in ("finalize", "rollback") and not kw.get("receipt_in"):
         print(f"USAGE_ERROR: --phase {phase} requires --receipt-in", file=sys.stderr)
         sys.exit(2)
+
+
+def main():
+    phase, probe, kw = _parse_cli(sys.argv[1:])
+    _validate_cli(phase, kw)
     db = kw.get("db", DB)
     user = kw.get("user", USER)
     container = kw.get("container", CONTAINER)

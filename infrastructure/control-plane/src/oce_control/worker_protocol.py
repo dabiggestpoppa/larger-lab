@@ -317,7 +317,7 @@ class WorkerProtocolServer:
 
     def surrender(self, session_id: str, signature: str, job_id: str,
                   lease_id: str, fence: int) -> dict:
-        sess = self._auth(session_id, signature, "surrender")
+        self._auth(session_id, signature, "surrender")  # auth-only: session must be live
         try:
             self._scheduler.surrender(job_id, lease_id, fence)
         except LeaseFencingError as exc:

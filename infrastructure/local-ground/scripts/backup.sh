@@ -133,7 +133,7 @@ cat > "$CONTENT/backup-info.json" <<JSON
 { "format": "oce-local-ground-backup-v1", "schema_version": "2",
   "hash_algorithm": "sha256", "scope": "$SCOPE", "backup_id": "$BACKUP_ID",
   "disaster_recovery_capable": $DCR, "includes": "$INCLUDES",
-  "database": "$PG_DB", "pg_dump_version": "$([ -n "$PGVERSION" ] && printf '%s' "$PGVERSION" || echo null)",
+  "database": "$PG_DB", "pg_dump_version": "$([[ -n "$PGVERSION" ]] && printf '%s' "$PGVERSION" || echo null)",
   "pg_dump_format": "$([ -n "$DUMPFMT" ] && printf '%s' "$DUMPFMT" || echo null)",
   "pg_version_num": "$([ -n "$PGVER_NUM" ] && printf '%s' "$PGVER_NUM" || echo null)",
   "source_commit": "$COMMIT", "run_id": "${OCE_RUN_ID:-not-set}",

@@ -86,7 +86,8 @@ def test_restore_rejects_missing_manifest_file(tmp_path):
     bk = _make_backup(tmp_path)
     (bk / "BACKUP_MANIFEST.sha256").unlink()
     r = _run_restore(bk)
-    assert r.returncode != 0 and "CORRUPT" in r.stdout + r.stderr
+    assert r.returncode != 0
+    assert "CORRUPT" in r.stdout + r.stderr
 
 
 def test_restore_rejects_absolute_manifest_path(tmp_path):
@@ -130,7 +131,8 @@ def test_restore_rejects_tampered_metadata_hash(tmp_path):
     bk = _make_backup(tmp_path)
     (bk / ".backup-content" / "backup-info.json").write_text('{"tampered": true}', encoding="utf-8")
     r = _run_restore(bk)
-    assert r.returncode != 0 and "CORRUPT" in r.stdout + r.stderr
+    assert r.returncode != 0
+    assert "CORRUPT" in r.stdout + r.stderr
 
 
 def test_restore_rejects_unsafe_artifact_member(tmp_path):

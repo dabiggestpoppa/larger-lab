@@ -28,11 +28,13 @@ TEST_SUMMARY_NAME = "test-summary.json"
 
 
 
+CLOUD_PLAN_DETERMINISTIC = "cloud-plan-deterministic.json"
+
 REQUIRED = [
     "identity.json", "environment-fingerprint.json", "junit.xml",
     TEST_SUMMARY_NAME, "test-mode.txt", "adversarial-results.json",
     "adversarial-output.txt", "cloud-plan.txt", "cloud-apply-denial.txt",
-    "cloud-apply-denial.json", "cloud-plan-deterministic.json",
+    "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
     "local-after-denied.json", "source-clean.json", "cleanup.json",
     "stage-log.txt", "stage-status.json", "evidence-manifest.json",
 ]
@@ -161,7 +163,7 @@ def main():
 
     # 2. Required JSON parses
     json_files = ["identity.json", TEST_SUMMARY_NAME, "adversarial-results.json",
-                  "cloud-apply-denial.json", "cloud-plan-deterministic.json",
+                  "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
                   "local-after-denied.json", "source-clean.json", "cleanup.json",
                   "stage-status.json", "evidence-manifest.json"]
     parse_ok = True
@@ -301,7 +303,7 @@ def main():
 
     # 25-26. Cloud plan deterministic + zero mutation (parse machine lines)
     try:
-        cpd = load_json(os.path.join(ev, "cloud-plan-deterministic.json"))
+        cpd = load_json(os.path.join(ev, CLOUD_PLAN_DETERMINISTIC))
         det_ok = cpd.get("deterministic") is True
     except Exception:
         det_ok = False
@@ -387,9 +389,6 @@ def main():
                 if pred(op):
                     return op
             return None
-
-        def receipt_field(rcpt, field):
-            return (rcpt or {}).get(field)
 
         # 35. A full-replace SUCCESS operation proves the full recovery truth:
         # promotion, fingerprints, quarantine held-then-dropped, artifacts, and

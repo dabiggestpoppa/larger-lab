@@ -260,15 +260,12 @@ def test_destroy_denial_message_contains_no_secret_material(isolated_runtime):
     rt, _ = isolated_runtime
     _seed_valid(rt)
     before = _authority_bytes(rt)
-    try:
+    with pytest.raises(SystemExit) as exc_info:
         ll.main(["destroy"])
-    except SystemExit as e:
-        msg = str(e)
-        assert "DESTRUCTIVE" in msg
-        # the denial message must not embed any authority value
-        assert ("p" * 40) not in msg
-        assert ("t" * 40) not in msg
-        assert ("k" * 40) not in msg
-    else:
-        pytest.fail("destroy without --yes must raise SystemExit")
+    msg = str(exc_info.value)
+    assert "DESTRUCTIVE" in msg
+    # the denial message must not embed any authority value
+    assert ("p" * 40) not in msg
+    assert ("t" * 40) not in msg
+    assert ("k" * 40) not in msg
     assert _authority_bytes(rt) == before

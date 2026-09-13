@@ -272,8 +272,9 @@ class TestStartupFailClosed:
     def test_missing_incomplete_required_rejected(self):
         reg = build_default_registry()
         # postgres.password_ref is required and absent everywhere
+        resolver = ConfigResolver(reg)
         with pytest.raises(ValidationError):
-            ConfigResolver(reg).resolve({})
+            resolver.resolve({})
 
     def test_public_listen_true_rejected(self):
         with pytest.raises(ValidationError):
@@ -545,7 +546,8 @@ class TestAuthorization:
             p = authz.evaluate_override_preview(
                 eff, actor=actor, setting_name="sandbox.strict",
                 requested_change="x", reason="x", new_value=False)
-            assert p.authorized is False and p.decision == "denied"
+            assert p.authorized is False
+            assert p.decision == "denied"
             sink = self._proven(reg)
             with pytest.raises(PermissionError):
                 sink.operator_override(
@@ -560,8 +562,9 @@ class TestAuthorization:
             eff, actor="operator", setting_name="postgres.password_ref",
             requested_change="x", reason="x", new_value="secret:other")
         assert p.authorized is False
+        sink = self._proven(reg)
         with pytest.raises(PermissionError):
-            self._proven(reg).operator_override(
+            sink.operator_override(
                 eff, actor="operator", setting_name="postgres.password_ref",
                 requested_change="x", reason="x", new_value="secret:other")
 
@@ -1237,12 +1240,13 @@ class TestCXR3R5CapitalAuthorityLocked:
 
     def test_approved_via_file_and_cli_blocked(self):
         reg = build_default_registry()
+        resolver = ConfigResolver(reg)
         with pytest.raises(ValidationError):
-            ConfigResolver(reg).resolve(
+            resolver.resolve(
                 {"file": {"capital.authority": "approved",
                          "postgres.password_ref": REF_PG}})
         with pytest.raises(ValidationError):
-            ConfigResolver(reg).resolve(
+            resolver.resolve(
                 {"file": {"postgres.password_ref": REF_PG}},
                 cli={"capital.authority": "approved"})
 
@@ -1266,7 +1270,8 @@ class TestCXR3R5CapitalAuthorityLocked:
             p = authz.evaluate_override_preview(
                 eff, actor=actor, setting_name="capital.authority",
                 requested_change="x", reason="x", new_value="approved")
-            assert p.authorized is False and p.decision == "denied"
+            assert p.authorized is False
+            assert p.decision == "denied"
 
     def test_po_override_still_blocked_in_book4(self):
         # operator:po is the CEO-level actor, but even PO cannot activate

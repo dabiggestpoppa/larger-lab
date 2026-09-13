@@ -267,7 +267,7 @@ class BoundedRunner:
             "adversarial_sandbox": False,
         }
 
-    def _limits_preamble(self, envelope: JobResourceEnvelope) -> Optional[str]:
+    def _limits_preamble(self) -> Optional[str]:
         """Returns None on POSIX (rlimit resource bounding applied) or a
         truthful note."""
         if self.resource_limits_available:
@@ -452,7 +452,7 @@ class BoundedRunner:
         result = AttemptResult(exit_code=None, stdout="", stderr="",
                                raise_fired=False, timed_out=False,
                                cancel_requested=False, workspace=ws)
-        result.isolation_note = self._limits_preamble(envelope)
+        result.isolation_note = self._limits_preamble()
         result.isolation_report = self._last_preflight
         self._cancel_event = threading.Event()
         cancel = self._cancel_event   # single cancellation signal (B3-R5)
@@ -567,9 +567,9 @@ def _kill(proc: subprocess.Popen, resource_limits_available: bool) -> None:
             # isolating) so a child can never outlive its bounded attempt.
             try:
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-            except (ProcessLookupError, PermissionError, OSError):
+            except OSError:
                 proc.kill()
-    except (ProcessLookupError, PermissionError, OSError):
+    except OSError:
         pass
     try:
         proc.kill()

@@ -314,7 +314,8 @@ class TestCXR7U9R3ConfigureSeamIsolation:
         assert rep
         store = __import__("json").loads(
             (rt / "secrets.json").read_text(encoding="utf-8"))
-        assert store["postgres_password"] and store["worker_token"]
+        assert store["postgres_password"]
+        assert store["worker_token"]
 
     def test_legacy_names_absent_from_production_env_reads(self):
         import pathlib
@@ -375,7 +376,8 @@ class TestCXR7U9R3ConfigureSeamIsolation:
             # full authority materialized through the REAL implementation
             store = json.loads(
                 (rt / "secrets.json").read_text(encoding="utf-8"))
-            assert store["postgres_password"] and store["worker_token"]
+            assert store["postgres_password"]
+            assert store["worker_token"]
         finally:
             for k, v in saved.items():
                 setattr(ls, k, v)
