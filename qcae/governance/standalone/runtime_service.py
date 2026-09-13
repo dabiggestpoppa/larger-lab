@@ -17,15 +17,17 @@ credentials (Book V 13.8; directive §35). Mode is explicitly OCE_ABSENT.
 
 from __future__ import annotations
 
+import secrets
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional
 
 from qcae.core.errors import QcaeValidationError
 from qcae.core.jobs import deterministic_job_id
-from qcae.governance.standalone.approvals import ApprovalState
+from qcae.governance.standalone.approvals import ApprovalDecision, ApprovalState
 from qcae.governance.standalone.identity import LocalIdentityProvider
 from qcae.orchestration.jobs.graph import StepGraph
 from qcae.orchestration.jobs.runtime import (
+    JobEvent,
     JobEventType,
     RuntimeJob,
     RuntimeJobStatus,
@@ -214,3 +216,95 @@ class LocalRuntimeService:
 
     def record_approval(self, decision) -> None:
         self._approvals.record_decision(decision)
+
+    # -- event log (P2-C11: operator-facing append-oriented history) ----------
+
+    def job_events(self, job_id: str) -> List[dict]:
+        """Append-oriented event stream for one job (facts, never commands)."""
+        if self._store.get_job(job_id) is None:
+            raise QcaeValidationError(f"unknown job {job_id!r}")
+        return [
+            {
+                "seq": seq,
+                "event_id": ev.event_id,
+                "type": ev.event_type.value,
+                "step_id": ev.step_id,
+                "occurred_at": ev.occurred_at,
+                "actor": ev.actor,
+                "payload": payload,
+            }
+            for seq, ev, payload in self._store.events_for_job(job_id)
+        ]
+
+    def decide_approval(
+        self, *, request_id: str, decision: str, decided_by: str,
+        job_id: str = "", reason: str = "",
+    ) -> dict:
+        """Record a durable operator decision on one exact approval request.
+
+        Grant/deny are separate durable artifacts bound to the request's
+        exact scope (no approval laundering — directive §14). Service-side
+        identity/consistency checks; not a CLI concern.
+        """
+        request = self._approvals.get_request(request_id)
+        if request is None:
+            raise QcaeValidationError(f"unknown approval request {request_id!r}")
+        if self._already_decided(request_id):
+            raise QcaeValidationError(
+                f"approval request {request_id!r} already decided; "
+                "decisions are immutable artifacts (no re-decision)"
+            )
+        if job_id:
+            # The event must point at a real job the caller can see.
+            if self._store.get_job(job_id) is None:
+                raise QcaeValidationError(f"unknown job {job_id!r}")
+        if decided_by:
+            self._identity.require(decided_by)
+        state = ApprovalState(decision)
+        decision_id = f"dec-{len(request_id)}-{secrets.token_hex(6)}"
+        bound = {
+            "bound_action": request.action,
+            "bound_resource": request.resource,
+            "bound_scope": request.scope,
+            "bound_budget_ref": request.budget_ref,
+        }
+        self._approvals.record_decision(
+            ApprovalDecision(
+                decision_id=decision_id,
+                request_ref=request_id,
+                state=state,
+                decided_by=decided_by,
+                decided_at=self._clock(),
+                reason=reason,
+                **bound,
+            )
+        )
+        event_type = (
+            JobEventType.APPROVAL_GRANTED
+            if state is ApprovalState.GRANTED
+            else JobEventType.APPROVAL_DENIED
+        )
+        self._store.append_event(
+            JobEvent(
+                event_seq=0, event_id="", event_type=event_type,
+                job_id=job_id, occurred_at=self._clock(),
+            ),
+            payload_json=(
+                f'{{"request_id": "{request_id}", '
+                f'"decision": "{state.value}", "decided_by": "{decided_by}"}}'
+            ),
+        )
+        return {"decision_id": decision_id, "state": state.value,
+                "request_id": request_id}
+
+    def _already_decided(self, request_id: str) -> bool:
+        """True if any durable decision exists for the request.
+
+        Duck-typed: any registry exposing the P2-C11 decision-history
+        accessor is consulted; a registry without it fails closed (no
+        re-decision) rather than guessing.
+        """
+        accessor = getattr(self._approvals, "decisions_for_request", None)
+        if accessor is None:
+            return True  # fail closed: cannot prove it is undecided
+        return bool(accessor(request_id))

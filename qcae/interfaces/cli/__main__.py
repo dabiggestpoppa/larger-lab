@@ -20,6 +20,24 @@ def _app(db: str) -> QcaeApp:
     return QcaeApp(build_local_runtime(db))
 
 
+class _Session:
+    """One CLI invocation's runtime: committed on success, always closed.
+
+    The CLI owns no domain logic, but it does own the process boundary: a
+    decision that reports success must be durable, and the connection must
+    not leak (WAL file locks on Windows)."""
+
+    def __init__(self, db: str) -> None:
+        self._rt = build_local_runtime(db)
+        self.app = QcaeApp(self._rt)
+
+    def close(self) -> None:
+        try:
+            self._rt.conn.commit()
+        finally:
+            self._rt.conn.close()
+
+
 def _print(payload) -> None:
     import dataclasses
 
@@ -54,12 +72,18 @@ def build_parser() -> argparse.ArgumentParser:
     status = job_sub.add_parser("status", help="inspect a job")
     status.add_argument("job_id")
 
+    events = job_sub.add_parser("events", help="job event log (append-oriented)")
+    events.add_argument("job_id")
+
     resume = job_sub.add_parser("resume", help="recover and resume a job")
     resume.add_argument("job_id")
 
     cancel = job_sub.add_parser("cancel", help="cancel a job")
     cancel.add_argument("job_id")
     cancel.add_argument("--reason", default="")
+
+    recover = sub.add_parser("recover", help="recover expired leases / resume a job")
+    recover.add_argument("job_id", nargs="?", default=None)
 
     run = job_sub.add_parser("run", help="run one eligible step of a job")
     run.add_argument("job_id")
@@ -69,6 +93,13 @@ def build_parser() -> argparse.ArgumentParser:
     approval_sub = approval.add_subparsers(dest="approval_command", required=True)
     approval_sub.add_parser("list", help="list pending approvals")
 
+    decide = approval_sub.add_parser("decide", help="grant or deny an approval request")
+    decide.add_argument("request_id")
+    decide.add_argument("--decision", required=True, choices=("GRANTED", "DENIED"))
+    decide.add_argument("--decided-by", required=True)
+    decide.add_argument("--job-id", default="")
+    decide.add_argument("--reason", default="")
+
     identity = sub.add_parser("identity", help="show runtime identity")
     return parser
 
@@ -76,9 +107,17 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Optional[List[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    app = _app(args.db)
+    session = _Session(args.db)
+    app = session.app
+    try:
+        return _dispatch(app, args)
+    finally:
+        session.close()
 
-    if args.command == "job":
+
+def _dispatch(app: QcaeApp, args) -> int:
+
+    if args.command == "job":  # noqa: SIM114 - readable argparse dispatch
         if args.job_command == "list":
             _print(app.job_list())
         elif args.job_command == "status":
@@ -87,6 +126,12 @@ def main(argv: Optional[List[str]] = None) -> int:
                 print(f"unknown job {args.job_id}", file=sys.stderr)
                 return 2
             _print(view)
+        elif args.job_command == "events":
+            try:
+                _print(app.job_events(args.job_id))
+            except Exception:
+                print(f"unknown job {args.job_id}", file=sys.stderr)
+                return 2
         elif args.job_command == "resume":
             _print(app.job_resume(args.job_id))
         elif args.job_command == "cancel":
@@ -100,9 +145,23 @@ def main(argv: Optional[List[str]] = None) -> int:
             _print(result)
         return 0
 
+    if args.command == "recover":
+        _print(app.recover(args.job_id))
+        return 0
+
     if args.command == "approval":
         if args.approval_command == "list":
             _print(app.approval_list())
+        elif args.approval_command == "decide":
+            try:
+                _print(app.approval_decide(
+                    request_id=args.request_id, decision=args.decision,
+                    decided_by=args.decided_by, job_id=args.job_id,
+                    reason=args.reason,
+                ))
+            except Exception as exc:
+                print(f"approval decision rejected: {exc}", file=sys.stderr)
+                return 2
         return 0
 
     if args.command == "identity":

@@ -177,6 +177,15 @@ class QcaeApp:
     def job_cancel(self, job_id: str, *, reason: str = ""):
         return self._rt.service.cancel(job_id, reason=reason)
 
+    def job_events(self, job_id: str):
+        return self._rt.service.job_events(job_id)
+
+    def recover(self, job_id: str | None = None):
+        """Recover expired leases (all jobs) or resume one job."""
+        if job_id is not None:
+            return self._rt.service.resume(job_id)
+        return self._rt.service.recover_expired_leases()
+
     # -- approvals -----------------------------------------------------------
 
     def approval_list(self):
@@ -184,6 +193,15 @@ class QcaeApp:
 
     def approval_record(self, decision):
         self._rt.service.record_approval(decision)
+
+    def approval_decide(
+        self, *, request_id: str, decision: str, decided_by: str,
+        job_id: str = "", reason: str = "",
+    ):
+        return self._rt.service.decide_approval(
+            request_id=request_id, decision=decision, decided_by=decided_by,
+            job_id=job_id, reason=reason,
+        )
 
     # -- governance ----------------------------------------------------------
 

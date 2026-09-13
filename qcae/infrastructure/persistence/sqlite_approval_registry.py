@@ -127,6 +127,15 @@ class SqliteApprovalRegistry:
         ).fetchall()
         return [_decode((r[0], r[1]), "approval", ApprovalRequest) for r in rows]
 
+    def decisions_for_request(self, request_id: str) -> List[ApprovalDecision]:
+        """All durable decisions for a request (oldest first; immutable)."""
+        rows = self._conn.execute(
+            "SELECT payload_json, payload_digest FROM governance_approval_decision"
+            " WHERE request_ref = ? ORDER BY created_at, decision_id",
+            (request_id,),
+        ).fetchall()
+        return [_decode((r[0], r[1]), request_id, ApprovalDecision) for r in rows]
+
     def record_decision(self, decision: ApprovalDecision) -> None:
         decision.validate()
         request = self.get_request(decision.request_ref)

@@ -46,13 +46,23 @@ class LocalIdentity(SerializableRecord):
 class LocalIdentityProvider:
     """Static local identity registry implementing the P0 Protocol."""
 
+    #: Canonical standalone operator principal (Book V 13.1: minimum local
+    #: identities include an operator). Deterministic so approval decisions
+    #: survive process boundaries (CLI invocations get a fresh provider);
+    #: OCE replaces this at P12.
+    LOCAL_OPERATOR_ID = "id-operator-local"
+
     def __init__(self) -> None:
         self._identities: Dict[str, LocalIdentity] = {}
         self._current: Optional[str] = None
-        # Boot identity: the runtime itself.
+        # Boot identities: the runtime itself + the canonical local operator.
         runtime = LocalIdentity(identity_id="id-runtime-local", kind=IdentityKind.RUNTIME,
                                 display_name="local runtime")
         self._identities[runtime.identity_id] = runtime
+        operator = LocalIdentity(identity_id=self.LOCAL_OPERATOR_ID,
+                                 kind=IdentityKind.OPERATOR,
+                                 display_name="standalone operator")
+        self._identities[operator.identity_id] = operator
         self._current = runtime.identity_id
 
     def register(self, identity: LocalIdentity) -> None:
