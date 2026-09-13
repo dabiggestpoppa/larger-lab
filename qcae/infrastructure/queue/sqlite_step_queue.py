@@ -215,6 +215,22 @@ class SqliteStepQueue:
             recovered.append(step_id)
         return recovered
 
+    def expire_stale_leases_for(self, step_ids) -> List[str]:
+        """Force-release claim rows for specific steps (retry/recovery path).
+
+        The steps' lease columns are cleared by the caller first; this only
+        removes the queue claim so a new lease can be taken immediately
+        instead of waiting for TTL expiry.
+        """
+        released: List[str] = []
+        for step_id in step_ids:
+            cur = self._conn.execute(
+                "DELETE FROM runtime_queue_claim WHERE step_id = ?", (step_id,)
+            )
+            if cur.rowcount:
+                released.append(step_id)
+        return released
+
     def lease_owner_of(self, step_id: str) -> Optional[str]:
         row = self._conn.execute(
             "SELECT lease_owner FROM runtime_queue_claim WHERE step_id = ?",
