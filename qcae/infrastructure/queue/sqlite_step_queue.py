@@ -16,7 +16,7 @@ from __future__ import annotations
 import secrets
 import sqlite3
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Iterable, List, Optional
 
 from qcae.core.errors import QcaeValidationError
 from qcae.core.jobs import deterministic_job_id  # re-export convenience
@@ -90,69 +90,94 @@ class SqliteStepQueue:
         *,
         step_types: Optional[List[str]] = None,
         priority_hint: bool = False,
+        eligible_step_ids: Optional[Iterable[str]] = None,
+        job_id: Optional[str] = None,
+        now: Optional[str] = None,
     ) -> Optional[StepLease]:
         """Lease the next READY, unclaimed (or expired-claim) step.
 
-        Uses a single transaction with a guarded UPDATE so two concurrent
-        claimers can never both own a step (directive §22; Book V 13.6).
+        Eligibility is enforced *inside* the atomic claim selection (P2-C07R1,
+        repair directive §2.1): a worker never obtains ownership of an
+        ineligible step merely to discover afterward that it was ineligible.
+
+        ``job_id`` restricts the claim to one job's steps; ``eligible_step_ids``
+        restricts it to an explicit candidate set (empty set => nothing to
+        claim, no claim rows created); ``now`` overrides the queue clock for
+        the caller that already holds a consistent timestamp. Candidates are
+        attempted in order and the guarded UPDATE is the single arbitration
+        point, so two concurrent claimers can never both own a step
+        (directive §22; Book V 13.6) and a lost race falls through to the next
+        eligible candidate instead of stranding it.
         """
-        now = self._now()
+        if eligible_step_ids is not None:
+            eligible = list(eligible_step_ids)
+            if not eligible:
+                return None  # invalid/empty eligibility: no claim rows, ever
+        else:
+            eligible = None
+
+        params: List[object] = [RuntimeStepStatus.READY.value]
+        eligibility_sql = ""
+        if job_id is not None:
+            eligibility_sql += " AND s.job_id = ?"
+            params.append(job_id)
+        if eligible is not None:
+            placeholders = ",".join("?" for _ in eligible)
+            eligibility_sql += f" AND s.step_id IN ({placeholders})"
+            params.extend(eligible)
+
+        now = now or self._now()
         rows = self._conn.execute(
             "SELECT s.step_id, s.job_id, c.lease_token, c.lease_expires_at,"
-            " s.not_before, s.lease_owner, s.lease_token, s.lease_expires_at"
+            " s.not_before"
             " FROM runtime_step s"
             " LEFT JOIN runtime_queue_claim c ON c.step_id = s.step_id"
-            " WHERE s.status = ?"
+            " WHERE s.status = ?" + eligibility_sql +
             " ORDER BY s.not_before ASC, s.step_id ASC",
-            (RuntimeStepStatus.READY.value,),
+            params,
         ).fetchall()
 
-        chosen = None
         for r in rows:
-            (step_id, job_id, claim_token, claim_expiry, s_nb, s_owner, s_token, s_expiry) = r
+            step_id, step_job_id, claim_token, claim_expiry, s_nb = r
             if step_types and self._store.get_step(step_id).step_type not in step_types:
                 continue
             if not self._not_before_passed(s_nb):
                 continue
-            # Active unexpired claim blocks a new owner.
+            # Active unexpired, unacknowledged claim blocks a new owner.
             if claim_token and claim_expiry > now and not self._acknowledged(step_id):
                 continue
-            chosen = step_id
-            break
+            token = f"lease-{secrets.token_hex(12)}"
+            expires = self._expires_at()
+            cur = self._conn.execute(
+                "INSERT INTO runtime_queue_claim (step_id, job_id, lease_owner,"
+                " lease_token, leased_at, lease_expires_at, acknowledged)"
+                " VALUES (?, ?, ?, ?, ?, ?, 0)"
+                " ON CONFLICT(step_id) DO UPDATE SET"
+                " lease_owner=excluded.lease_owner, lease_token=excluded.lease_token,"
+                " leased_at=excluded.leased_at, lease_expires_at=excluded.lease_expires_at,"
+                " acknowledged=0"
+                " WHERE runtime_queue_claim.acknowledged = 1"
+                "    OR runtime_queue_claim.lease_expires_at <= ?",
+                (step_id, step_job_id, worker_id, token, now, expires, now),
+            )
+            if cur.rowcount != 1:
+                # Lost the race for THIS candidate (another claimer won between
+                # selection and claim) — fall through to the next candidate.
+                continue
 
-        if chosen is None:
-            return None
-
-        token = f"lease-{secrets.token_hex(12)}"
-        expires = self._expires_at()
-        cur = self._conn.execute(
-            "INSERT INTO runtime_queue_claim (step_id, job_id, lease_owner,"
-            " lease_token, leased_at, lease_expires_at, acknowledged)"
-            " VALUES (?, ?, ?, ?, ?, ?, 0)"
-            " ON CONFLICT(step_id) DO UPDATE SET"
-            " lease_owner=excluded.lease_owner, lease_token=excluded.lease_token,"
-            " leased_at=excluded.leased_at, lease_expires_at=excluded.lease_expires_at,"
-            " acknowledged=0"
-            " WHERE runtime_queue_claim.acknowledged = 1"
-            "    OR runtime_queue_claim.lease_expires_at <= ?",
-            (chosen, self._store.get_step(chosen).job_id, worker_id, token, now, expires, now),
-        )
-        if cur.rowcount != 1:
-            # Lost the race to another claimer — safe, not an error.
-            return None
-
-        step = self._store.get_step(chosen)
-        leased = _with_lease(step, LeaseInfo(
-            lease_owner=worker_id, lease_token=token,
-            leased_at=now, lease_expires_at=expires,
-        ))
-        self._store.update_step(
-            leased, lease_owner=worker_id, lease_token=token, lease_expires_at=expires
-        )
-        return StepLease(
-            step_id=chosen, job_id=step.job_id, lease_token=token,
-            lease_owner=worker_id, lease_expires_at=expires,
-        )
+            step = self._store.get_step(step_id)
+            leased = _with_lease(step, LeaseInfo(
+                lease_owner=worker_id, lease_token=token,
+                leased_at=now, lease_expires_at=expires,
+            ))
+            self._store.update_step(
+                leased, lease_owner=worker_id, lease_token=token, lease_expires_at=expires
+            )
+            return StepLease(
+                step_id=step_id, job_id=step_job_id, lease_token=token,
+                lease_owner=worker_id, lease_expires_at=expires,
+            )
+        return None
 
     def _acknowledged(self, step_id: str) -> bool:
         row = self._conn.execute(

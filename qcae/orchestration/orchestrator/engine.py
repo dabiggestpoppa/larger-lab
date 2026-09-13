@@ -198,8 +198,13 @@ class OrchestratorEngine:
         ready_ids = {s.step_id for s in steps if s.status is RuntimeStepStatus.READY}
         if not ready_ids:
             return None
-        lease = self._queue.claim_next(worker_id)
-        if lease is None or lease.step_id not in ready_ids:
+        # P2-C07R1 (directive §2.1): eligibility is enforced inside the atomic
+        # claim — the queue can only ever hand back a step from this job's
+        # ready set. No global claim-then-filter, no claim-then-release.
+        lease = self._queue.claim_next(
+            worker_id, eligible_step_ids=ready_ids, job_id=job_id
+        )
+        if lease is None:
             return None
         step = self._require_step(lease.step_id)
         assert_step_transition(step.status, RuntimeStepStatus.RUNNING)
