@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P2 — FROZEN (LOCAL TEST EVIDENCE: 861/861 at `8022b61d`)** — Job Runtime + Local Governance complete; pending operator review; **P3 NOT started**
+**P2 — FROZEN / REPAIRED (P2-R1; LOCAL TEST EVIDENCE: 921/921 at `ea493b8e`)** — Job Runtime + Local Governance with operator-directed C07R repair tranche complete; **P3 NOT started**
 
 Prior phases: P0 FROZEN+RECONCILED · P0-A001 FROZEN · P1 FROZEN / OPERATOR-REVIEWED + R1 COMPLETE (incl. ADR-0007 identity/revision repair).
 
@@ -66,6 +66,48 @@ Milestone plan (narrow commits):
 - P2-C12 — schema migration v3→v4 + backup/restore extension
 - P2-T01 — adversarial runtime qualification
 - P2-FREEZE — freeze manifest with captured test evidence (P1-R1 mechanism)
+
+### P2-R1 — Runtime Repair Tranche (supersedes original P2 freeze bookkeeping)
+
+Operator review of `21bc4466` accepted C01–C06 and accepted C07 in concept
+with four required repairs. The original P2 freeze artifact
+(`4cca8729`) is preserved unchanged as historical truth; superseded by
+`qcae/implementation/P2-R1-freeze-manifest.json` whose `test_results` are
+captured from an actual full-suite run by the fail-closed generator
+(`qcae/implementation/tools/p2r1_freeze_manifest.py`).
+
+Repairs (no redesign of accepted subsystems):
+
+1. **C07R1 `425ac5f6`** — job-scoped atomic queue claim: eligibility moves
+   inside the atomic claim selection; a worker can never own an ineligible
+   step; empty eligibility writes no claim rows; lost races fall through.
+2. **C07R2 `3b5aaed0`** — durable execution semantics: ExecutionRecords
+   (RESERVED→EXECUTING→COMMITTED/FAILED/ABANDONED) with result payloads
+   close the crash window between effect and marker; ReplaySafety classes
+   (REPLAY_SAFE / IDEMPOTENCY_AWARE / NON_REPLAY_SAFE); ambiguous
+   non-replay-safe outcomes escalate to WAITING_INPUT + operator resolution,
+   never a blind rerun; orchestrator claims at-least-once + durable dedup,
+   never exactly-once. Crash windows A–G tested.
+3. **C07R3 `bfead6f6`** — atomic submission: job + steps + initial events
+   + queue metadata commit in one BEGIN IMMEDIATE..COMMIT; failure injection
+   after any write rolls back to no partial state.
+4. **C07R4 `acf31b6f`** — store-owned identity: event_seq/event_id and
+   checkpoint ids allocated by the runtime store; orchestrator holds no
+   counters and no `_conn`; architecture guard `TestRuntimeStoreBoundary`
+   forbids store-internal access and table-name knowledge.
+5. **C07RT `cb1cede4`** — combined crash/concurrency/adversarial suite
+   proving the four repair laws together across restarts.
+6. **C11 gap closure `6ea6dcef`** — job events, recover, approval decide
+   (immutable decisions, no laundering), durable CLI sessions that commit
+   before close; canonical local operator identity (Book V 13.1).
+7. **Coverage closure `ac0dd3c2`** — concurrent budget reservation cannot
+   overdraw; policy change between crash and resume forces authority
+   re-check; event append concurrency; worker-contract boundary violations
+   rejected.
+
+**P2-R1 freeze evidence:** `python -m pytest qcae/tests -q` → 921 collected /
+921 passed / 0 failed / 0 skipped (LOCAL TEST EVIDENCE, captured by the
+generator at tested commit `ea493b8e`).
 
 ### P1-R1 — Registry Completion + Freeze Truth Repair (supersedes original P1 freeze bookkeeping)
 

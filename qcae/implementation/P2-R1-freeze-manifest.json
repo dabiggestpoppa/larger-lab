@@ -1,0 +1,269 @@
+{
+  "phase": "P2-R1 \u2014 Runtime Repair + Freeze Truth Repair (superseding)",
+  "supersedes": {
+    "original_freeze_artifact": "qcae/implementation/P2-freeze-manifest.json",
+    "original_freeze_commit": "4cca8729",
+    "original_freeze_digest": "sha256:0c2c7a1df104a58c70c528f99ffeb59c4560124e9d021a75709a0a4b47b272f1",
+    "relationship": "superseding repair manifest; original P2 freeze artifact is preserved unchanged as historical truth"
+  },
+  "operator_review_trigger": "Operator review of P2 C07 (accepted in concept, repair required): job-scoped lease claiming, idempotency crash window, atomic submission, event/store abstraction; P3 NOT authorized",
+  "canon_version": "0.1",
+  "active_amendments": [
+    "A-001 v1.0"
+  ],
+  "branch": "qcae-capability-acquisition-engine",
+  "head_commit": "ea493b8ed250f49e3d14d630459627e0cda57b35",
+  "tested_commit": "ea493b8ed250f49e3d14d630459627e0cda57b35",
+  "phase_commits": {
+    "original_p2_build": [
+      "ab0098c5",
+      "52be767f",
+      "534f7864",
+      "766efa0d",
+      "cb047e4a",
+      "e1936d06",
+      "fbe93cef",
+      "21bc4466",
+      "0603b882",
+      "38e6ca66",
+      "c531e12f",
+      "49f6fdbc",
+      "61488273",
+      "afdbaa84",
+      "8022b61d",
+      "4cca8729"
+    ],
+    "repair_tranche": [
+      "425ac5f6",
+      "3b5aaed0",
+      "bfead6f6",
+      "acf31b6f",
+      "cb1cede4",
+      "6ea6dcef",
+      "ac0dd3c2"
+    ]
+  },
+  "adr_refs": [
+    "qcae/implementation/decisions/ADR-0006-persistence-architecture.md",
+    "qcae/implementation/decisions/ADR-0007-repository-identity-vs-revision-identity.md",
+    "qcae/implementation/decisions/ADR-0008-p2-runtime-state-vocabulary.md",
+    "qcae/implementation/decisions/ADR-0009-policy-vs-authority-vocabularies.md"
+  ],
+  "prior_freeze_refs": [
+    "qcae/implementation/P1-R1-freeze-manifest.json",
+    "qcae/implementation/P2-freeze-manifest.json (historical, superseded by this manifest)"
+  ],
+  "repairs": {
+    "c07r1_job_scoped_atomic_claim": {
+      "defect": "global claim-then-filter could strand another job's READY step until TTL",
+      "repair": "eligibility enforced inside the atomic claim selection; lost races fall through",
+      "tests": "qcae/tests/unit/test_p2_c07r1_scoped_claim.py"
+    },
+    "c07r2_durable_execution_semantics": {
+      "defect": "worker executed before completion marker; crash window allowed silent re-execution",
+      "repair": "durable ExecutionRecords RESERVED/EXECUTING/COMMITTED/FAILED/ABANDONED with result payloads; ReplaySafety classes; NON_REPLAY_SAFE ambiguity escalates, never reruns; orchestrator claims at-least-once + durable dedup, never exactly-once",
+      "tests": "qcae/tests/unit/test_p2_c07r2_execution_semantics.py (crash windows A-G)"
+    },
+    "c07r3_atomic_submission": {
+      "defect": "submit() performed separate writes despite 'atomic' claim",
+      "repair": "single BEGIN IMMEDIATE..COMMIT via RuntimeTransaction; failure injection rolls back all",
+      "tests": "qcae/tests/unit/test_p2_c07r3_atomic_submit.py"
+    },
+    "c07r4_store_owned_identity": {
+      "defect": "orchestrator accessed store._conn and derived event ids from row counts",
+      "repair": "store allocates event_seq + collision-safe event_id and checkpoint ids; orchestrator holds no counters; architecture guard forbids ._conn/table knowledge",
+      "tests": "qcae/tests/unit/test_p2_c07r4_event_allocation.py + test_p0_dependency_guards.py::TestRuntimeStoreBoundary"
+    }
+  },
+  "persistence": {
+    "engine": "SQLite (stdlib sqlite3)",
+    "metadata_schema_version": 4,
+    "artifact_hash_algorithm": "sha256",
+    "migration_v3_to_v4": {
+      "migration_id": "P2-0004-runtime-governance-tables",
+      "evidence": "qcae/tests/unit/test_p2_migration_backup.py::TestMigrationV3ToV4"
+    }
+  },
+  "vocabularies": {
+    "job_states": [
+      "CREATED",
+      "QUEUED",
+      "RUNNING",
+      "WAITING",
+      "WAITING_APPROVAL",
+      "RETRY_PENDING",
+      "SUCCEEDED",
+      "FAILED",
+      "CANCELLED",
+      "BLOCKED"
+    ],
+    "step_states": [
+      "PENDING",
+      "READY",
+      "RUNNING",
+      "WAITING_POLICY",
+      "WAITING_INPUT",
+      "RETRY_SCHEDULED",
+      "SUCCEEDED",
+      "PARTIAL",
+      "FAILED",
+      "CANCELLED",
+      "STALE"
+    ],
+    "failure_classes": [
+      "TRANSIENT",
+      "PERMANENT",
+      "POLICY_DENIED",
+      "APPROVAL_REQUIRED",
+      "BUDGET_EXHAUSTED",
+      "INVALID_INPUT",
+      "DEPENDENCY_FAILED",
+      "UNKNOWN"
+    ],
+    "execution_states": [
+      "RESERVED",
+      "EXECUTING",
+      "COMMITTED",
+      "FAILED",
+      "ABANDONED"
+    ],
+    "replay_safety_classes": [
+      "REPLAY_SAFE",
+      "IDEMPOTENCY_AWARE",
+      "NON_REPLAY_SAFE"
+    ],
+    "policy_decisions": [
+      "ALLOW",
+      "DENY",
+      "REQUIRE_APPROVAL",
+      "ALLOW_WITH_CONSTRAINTS"
+    ],
+    "authority_outcomes": [
+      "GRANT",
+      "DENY",
+      "REQUEST_MORE_EVIDENCE"
+    ],
+    "approval_states": [
+      "GRANTED",
+      "DENIED",
+      "EXPIRED"
+    ],
+    "worker_result_status": [
+      "SUCCESS",
+      "PARTIAL",
+      "FAILED",
+      "BLOCKED_POLICY",
+      "BLOCKED_INPUT",
+      "INCONCLUSIVE",
+      "RETRYABLE",
+      "CANCELLED"
+    ],
+    "budget_states": [
+      "ACTIVE",
+      "EXHAUSTED",
+      "EXCEEDED"
+    ],
+    "budget_dimensions": [
+      "attempts",
+      "tool_calls",
+      "network_requests",
+      "sandbox_executions",
+      "wall_clock_seconds",
+      "artifact_bytes",
+      "cost_units"
+    ]
+  },
+  "queue_lease_semantics": {
+    "claim": "atomic, eligibility-scoped (job_id/eligible_step_ids inside the claim); guarded upsert; one active owner per step; empty eligibility creates no claim rows",
+    "ack": "token-guarded; owner-only; single ack",
+    "recovery": "expired/unacked claims reclaimed on restart",
+    "priority": "not_before ASC; priority never bypasses policy state"
+  },
+  "event_semantics": {
+    "identity": "store-allocated, collision-safe, unique-index guarded",
+    "order": "durable monotonic event_seq; append-only; never rewritten",
+    "emitter_access": "orchestrator knows no _conn/table names (guard enforced)"
+  },
+  "secret_provider_semantics": {
+    "handles_not_values": true,
+    "audit_records_values": false,
+    "production_class_denied_by_default": true,
+    "redaction": "centralized Redactor on failure paths"
+  },
+  "a001_compliance": {
+    "research_mesh_boundary": "no Research Mesh implementation in qcae/core or runtime (guard-enforced)",
+    "external_registry_ownership": "external owner domains preserved; refs are references, not authority",
+    "economic_experience": "no runtime/marketplace authority granted by economic records",
+    "fallback_research_budget": "A-001 fallback research cannot grow runtime authority"
+  },
+  "cli_commands": [
+    "job list",
+    "job status",
+    "job events",
+    "job run",
+    "job resume",
+    "job cancel",
+    "approval list",
+    "approval decide",
+    "recover",
+    "identity"
+  ],
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "qcae/tests",
+    "-q"
+  ],
+  "test_results": {
+    "collected": 921,
+    "passed": 921,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 6.43,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-09-13T23:05:25.871140+00:00",
+    "tested_commit": "ea493b8ed250f49e3d14d630459627e0cda57b35"
+  },
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "migration_evidence": {
+    "test": "test_p2_migration_backup.py::TestMigrationV3ToV4",
+    "result": "v3 migrates to v4; P1 registry rows preserved; runtime/governance tables additive"
+  },
+  "crash_recovery_evidence": {
+    "tests": [
+      "test_p2_recovery.py::TestCrashRecovery",
+      "test_p2_c07r2_execution_semantics.py::TestCrashWindows",
+      "test_p2_c07rt_repair_qualification.py::TestCombinedFlows"
+    ],
+    "result": "completed steps never repeated; expired leases recovered; NON_REPLAY_SAFE ambiguity escalated; authority rechecked after restart"
+  },
+  "backup_restore_evidence": {
+    "test": "test_p2_migration_backup.py::TestBackupRestoreRuntime",
+    "result": "jobs/steps/checkpoints/budgets/approvals restored exactly; stale leases recoverable"
+  },
+  "architecture_guard_evidence": {
+    "core_stdlib_only": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "engine_confined_to_infrastructure": "governance/interfaces use ports only",
+    "runtime_store_boundary": "TestRuntimeStoreBoundary forbids ._conn/table knowledge in orchestration",
+    "oce_absent": "runtime identity reports OCE_ABSENT; no OCE import anywhere in qcae/"
+  },
+  "known_external_failures": [
+    "tests/forge/phase_00/test_extension_docs.py: 2 pre-existing failures external to qcae/ (documented since P1; unchanged)"
+  ],
+  "deferred_items": [
+    "heartbeat-based lease liveness (single-process P2 model uses restart-based recovery)",
+    "HTTP API surface (QcaeApp is the stable boundary; thin adapters later)",
+    "OCE governance migration (P12; provider seam in place)"
+  ],
+  "blockers": [],
+  "generated_at": "2026-09-13T23:05:25Z"
+}
