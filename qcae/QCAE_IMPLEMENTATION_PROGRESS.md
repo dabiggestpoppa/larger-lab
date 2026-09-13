@@ -9,7 +9,40 @@
 
 ## Current Phase
 
-**P1 — FROZEN / OPERATOR-REVIEWED + R1 COMPLETE** (Evidence + Registry Spine + P1-R1 repair incl. repository identity/revision repair; P2 NOT started)
+**P2 — IN BUILD** (Job Runtime + Local Governance; authorized at reviewed head `4f3ec2f6`)
+
+Prior phases: P0 FROZEN+RECONCILED · P0-A001 FROZEN · P1 FROZEN / OPERATOR-REVIEWED + R1 COMPLETE (incl. ADR-0007 identity/revision repair).
+
+### P2 — Job Runtime + Local Governance (opened)
+
+Operator authorization received after P1-R1 freeze (`4f3ec2f6`). Scope per
+operator directive: durable jobs/steps with explicit state machines, job
+directed graph, durable queue with safe leases, local identity/policy/
+authority (Book V 13.2), approval + escalation workflow, Context Packets,
+typed worker contracts (Book V 12.3), bounded retries + checkpoints + crash
+recovery, budgets, SecretProvider boundary + redaction, standalone runtime
+service, CLI, P1→P2 schema migration, backup/restore extension, adversarial
+runtime qualification. OCE stays absent (Book V 13.8).
+
+Milestone plan (narrow commits):
+
+- P2-I0 — ADR-0008 (runtime state vocabulary, additive over frozen P0
+  identity layer per Book V 13.6) + ADR-0009 (13.2 policy decisions vs P0
+  authority outcomes mapping) + schema plan
+- P2-C01 — job/step runtime domain + fail-closed state machines
+- P2-C02 — job graph + durable job/step/event/checkpoint repositories
+- P2-C03 — durable queue + lease ownership
+- P2-C04 — local identity + policy engine + authority provider (ADR-0009)
+- P2-C05 — approval + escalation workflow
+- P2-C06 — Context Packet + WorkerRequest/WorkerResult contracts
+- P2-C07 — checkpoint + bounded retry + crash recovery
+- P2-C08 — budget representation + enforcement/conservation
+- P2-C09 — SecretProvider + central redaction
+- P2-C10 — standalone runtime service (submit/run/resume/cancel/recover)
+- P2-C11 — CLI + application service boundary
+- P2-C12 — schema migration v3→v4 + backup/restore extension
+- P2-T01 — adversarial runtime qualification
+- P2-FREEZE — freeze manifest with captured test evidence (P1-R1 mechanism)
 
 ### P1-R1 — Registry Completion + Freeze Truth Repair (supersedes original P1 freeze bookkeeping)
 
