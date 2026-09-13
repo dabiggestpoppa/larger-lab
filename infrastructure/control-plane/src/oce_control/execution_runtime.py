@@ -449,7 +449,6 @@ class BoundedRunner:
                         f"env var '{k}' is a forbidden/cloud-prefixed var (fail closed)")
                 env[k] = env_override[k]
 
-        started = time.monotonic()
         result = AttemptResult(exit_code=None, stdout="", stderr="",
                                raise_fired=False, timed_out=False,
                                cancel_requested=False, workspace=ws)

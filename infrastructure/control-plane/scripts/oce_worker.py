@@ -178,7 +178,7 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("doctor", help="run fabric doctor checks")
     sub.add_parser("cleanup", help="clean disposable state (preserve durable)")
-    cns = sub.add_parser("console", help="operator-console view")
+    sub.add_parser("console", help="operator-console view")
 
     args = p.parse_args(argv)
     sup = build_supervisor(_runtime_dir(args))

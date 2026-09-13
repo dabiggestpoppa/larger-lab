@@ -209,7 +209,12 @@ def cmd_verify(args):
             print(f"USAGE_ERROR: unknown arg '{a}'", file=sys.stderr)
             return 2
         i += 1
-    root = kw.get("ops_root")
+    return _verify_ops_index(kw.get("ops_root"))
+
+
+def _verify_ops_index(root):
+    """Verify the operation index and receipt hashes under *root*.
+    Returns a process exit code."""
     if not root:
         print("USAGE_ERROR: --ops-root required", file=sys.stderr)
         return 2

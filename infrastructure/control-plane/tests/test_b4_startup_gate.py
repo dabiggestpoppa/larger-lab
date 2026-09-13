@@ -1435,7 +1435,8 @@ class TestCXR5R3ActivationLineage:
         env = ctx.child_environment(child_role="api")
         for key in env:
             assert not key.startswith("OCE_") or key == "OCE_ACTIVATION_ENVELOPE", key
-        assert "POSTGRES_PASSWORD" not in env and "POSTGRES_DSN" not in env
+        assert "POSTGRES_PASSWORD" not in env
+        assert "POSTGRES_DSN" not in env
         assert "OCE_WORKER_TOKEN" not in env and "OCE_WORKER_SECRET" not in env
         blob = env["OCE_ACTIVATION_ENVELOPE"]
         assert "k" * 40 not in blob            # password never in envelope

@@ -42,7 +42,7 @@ PROJ_ROOT="$(cd "$BASE_DIR/../.." && pwd)"
 MODE=""
 FROM=""
 CONFIRM_TARGET=""
-while [ $# -gt 0 ]; do
+while [[ $# -gt 0 ]]; do
   case "$1" in
     --mode) MODE="${2:-}"; shift 2 ;;
     --from) FROM="${2:-}"; shift 2 ;;
@@ -50,17 +50,17 @@ while [ $# -gt 0 ]; do
     *) echo "USAGE_ERROR: unknown argument '$1'" >&2; exit 2 ;;
   esac
 done
-if [ -z "$MODE" ]; then echo "USAGE_ERROR: --mode <state-only|full-replace> required" >&2; exit 2; fi
+if [[ -z "$MODE" ]]; then echo "USAGE_ERROR: --mode <state-only|full-replace> required" >&2; exit 2; fi
 MODE="$(printf '%s' "$MODE" | tr '[:upper:]' '[:lower:]')"
 case "$MODE" in state-only|full-replace) ;; *) echo "USAGE_ERROR: unknown --mode '$MODE'" >&2; exit 2 ;; esac
-if [ -z "$FROM" ] || [ ! -d "$FROM" ]; then
+if [[ -z "$FROM" || ! -d "$FROM" ]]; then
   echo "BLOCKED: restore requires --from <backup-dir>" >&2
   exit 3
 fi
 FROM="$(cd "$FROM" && pwd)"
 MANIFEST="$FROM/BACKUP_MANIFEST.sha256"
 CONTENT="$FROM/.backup-content"
-if [ ! -f "$MANIFEST" ] || [ ! -d "$CONTENT" ]; then
+if [[ ! -f "$MANIFEST" || ! -d "$CONTENT" ]]; then
   echo "CORRUPT: backup missing content or manifest" >&2
   exit 3
 fi
@@ -74,10 +74,10 @@ rc=0
 count=0
 declare -A seen
 while IFS=' ' read -r sha size rel extra; do
-  if [ -z "$sha" ] && [ -z "$size" ] && [ -z "$rel" ] && [ -z "$extra" ]; then
+  if [[ -z "$sha" && -z "$size" && -z "$rel" && -z "$extra" ]]; then
     continue
   fi
-  if [ -z "$rel" ] || [ -z "$size" ] || [ -n "$extra" ] || [ "$rel" = "$sha" ]; then
+  if [[ -z "$rel" || -z "$size" || -n "$extra" || "$rel" == "$sha" ]]; then
     echo "CORRUPT: malformed manifest line (expected 'sha256 size relpath')" >&2
     rc=1
     continue
@@ -89,16 +89,16 @@ while IFS=' ' read -r sha size rel extra; do
     *\\\\*) echo "CORRUPT: backslash in manifest path '$rel'" >&2; rc=1; continue ;;
     *) : ;;  # single backslash is a legal POSIX filename character (S3923 default)
   esac
-  if [ -n "${seen[$rel]:-}" ]; then echo "CORRUPT: duplicate manifest path '$rel'" >&2; rc=1; continue; fi
+  if [[ -n "${seen[$rel]:-}" ]]; then echo "CORRUPT: duplicate manifest path '$rel'" >&2; rc=1; continue; fi
   seen[$rel]=1
   count=$((count+1))
   f="$CONTENT/$rel"
-  if [ ! -f "$f" ]; then
+  if [[ ! -f "$f" ]]; then
     echo "CORRUPT: missing '$rel'" >&2; rc=1; continue
   fi
   actual_size=$(stat -c %s "$f" 2>/dev/null || wc -c < "$f")
   actual=$(sha256sum "$f" | awk '{print $1}')
-  if [ "$actual" != "$sha" ] || [ "$actual_size" != "$size" ]; then
+  if [[ "$actual" != "$sha" || "$actual_size" != "$size" ]]; then
     echo "CORRUPT: hash/size mismatch '$rel'" >&2; rc=1
   fi
 done < <(tr -d '\r' < "$MANIFEST")
@@ -112,14 +112,14 @@ if [[ "$declared_count" -ne "$count_content" ]]; then
   rc=1
 fi
 
-if [ $rc -ne 0 ]; then
+if [[ $rc -ne 0 ]]; then
   echo "BLOCKED: corrupt backup NOT restored" >&2
   exit 3
 fi
 echo "integrity OK: $count files verified"
 
 # backup metadata must be present and hash-protected (inside content)
-if [ ! -f "$CONTENT/backup-info.json" ]; then
+if [[ ! -f "$CONTENT/backup-info.json" ]]; then
   echo "CORRUPT: backup-info.json missing (unprotected metadata)" >&2
   exit 3
 fi
@@ -128,13 +128,13 @@ SCOPE="$(python3 -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-
 DCR="$(python3 -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));print(d.get('disaster_recovery_capable',False))" "$INFO")"
 
 # ── state-only restore ─────────────────────────────────────────────────────
-if [ "$MODE" = "state-only" ]; then
-  if [ "$SCOPE" != "state-only" ]; then
+if [[ "$MODE" == "state-only" ]]; then
+  if [[ "$SCOPE" != "state-only" ]]; then
     echo "BLOCKED: state-only mode accepts only a state-only backup (got scope=$SCOPE)." >&2
     echo "         Use --mode full-replace for a full backup." >&2
     exit 3
   fi
-  if [ "$DCR" != "False" ] && [ "$DCR" != "false" ]; then
+  if [[ "$DCR" != "False" && "$DCR" != "false" ]]; then
     echo "BLOCKED: state-only backup must claim disaster_recovery_capable=false." >&2
     exit 3
   fi
@@ -167,8 +167,7 @@ fi
 
 # R24: validate artifact archive members BEFORE the docker gate, so an unsafe
 # archive is rejected even where no runtime is available.
-if [ -f "$CONTENT/artifacts/artifacts.tar.gz" ]; then
-  if ! python3 - "$CONTENT/artifacts/artifacts.tar.gz" <<'PY'
+if [[ -f "$CONTENT/artifacts/artifacts.tar.gz" ]]    && ! python3 - "$CONTENT/artifacts/artifacts.tar.gz" <<'PY'
 import sys, tarfile
 p = sys.argv[1]
 try:
@@ -187,10 +186,9 @@ if bad:
 tf.close()
 sys.exit(0)
 PY
-  then
-    echo "BLOCKED: artifact archive failed safe validation" >&2
-    exit 3
-  fi
+then
+  echo "BLOCKED: artifact archive failed safe validation" >&2
+  exit 3
 fi
 
 if ! have_docker; then
@@ -201,7 +199,8 @@ fi
 RECEIPT_DIR="$VAR_DIR/recovery"
 mkdir -p "$RECEIPT_DIR"
 EV_DIR="${OCE_EVIDENCE_DIR:-}"
-START_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+TS_FMT='%Y-%m-%dT%H:%M:%SZ'
+START_TS=$(date -u +"$TS_FMT")
 
 # R8: every restore is ONE immutable, indexed operation. Receipts are copied
 # into operations/<operation-id>/ under the operations root and registered in
@@ -215,7 +214,7 @@ register_op() { # EXIT trap: index this restore operation immutably (idempotent)
   [[ "$MODE" == "full-replace" ]] || return 0
   local final="success" rollback="none"
   [ "$rc" -eq 0 ] || final="blocked"
-  if [ -f "$RECEIPT_DIR/rollback-receipt.json" ]; then
+  if [[ -f "$RECEIPT_DIR/rollback-receipt.json" ]]; then
     rollback="$(python3 -c "import json;d=json.load(open(r'$RECEIPT_DIR/rollback-receipt.json',encoding='utf-8'));print('ok' if d.get('rollback_succeeded') is True else 'failed')" 2>/dev/null || echo failed)"
   fi
   local op_receipts=()
@@ -228,7 +227,7 @@ register_op() { # EXIT trap: index this restore operation immutably (idempotent)
   python3 "$BIN/recovery-ops.py" add --ops-root "$OPS_ROOT" \
     --operation-id "$OPERATION_ID" --operation-type restore \
     --run-id "${OCE_RUN_ID:-not-set}" --commit "${OCE_COMMIT:-unknown}" --tree "${OCE_TREE:-unknown}" \
-    --started-at "$START_TS" --finished-at "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --started-at "$START_TS" --finished-at "$(date -u +"$TS_FMT")" \
     --backup-id "$BACKUP_ID" --backup-scope "$SCOPE" --restore-mode "$MODE" \
     --source-database "$PG_DB" --target-database "$PG_DB" \
     --final-result "$final" --rollback-result "$rollback" \
@@ -239,7 +238,7 @@ trap 'rc=$?; register_op "$rc"; exit "$rc"' EXIT
 
 # ── controlled artifact replacement (R24) ──────────────────────────────────
 ARTIFACT_APPLIED=false
-if [ -f "$CONTENT/artifacts/artifacts.tar.gz" ]; then
+if [[ -f "$CONTENT/artifacts/artifacts.tar.gz" ]]; then
   TMP_X="$(mktemp -d)"
   if ! docker inspect oce-local-artifact >/dev/null 2>&1; then
     echo "BLOCKED: artifact container unavailable" >&2
@@ -273,7 +272,7 @@ if [ -f "$CONTENT/artifacts/artifacts.tar.gz" ]; then
   docker start oce-local-artifact >/dev/null 2>&1 || true
   ARTIFACT_APPLIED=true
   # artifact-replacement evidence (R8): archive identity + replace result
-  python3 - "$RECEIPT_DIR/artifact-recovery-receipt.json" "$CONTENT/artifacts/artifacts.tar.gz" "$ARTIFACT_APPLIED" "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" <<'PY'
+  python3 - "$RECEIPT_DIR/artifact-recovery-receipt.json" "$CONTENT/artifacts/artifacts.tar.gz" "$ARTIFACT_APPLIED" "$(date -u +"$TS_FMT")" <<'PY'
 import hashlib, json, os, sys
 p, archive, applied, ts = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 h = hashlib.sha256()
@@ -288,7 +287,7 @@ json.dump({"format": "oce-artifact-recovery-receipt-v1",
            "timestamp": ts},
           open(p, "w", encoding="utf-8"), indent=2)
 PY
-  if [ -n "$EV_DIR" ]; then
+  if [[ -n "$EV_DIR" ]]; then
     cp "$RECEIPT_DIR/artifact-recovery-receipt.json" "$EV_DIR/artifact-recovery-receipt.json" 2>/dev/null || true
   fi
 fi
@@ -307,7 +306,7 @@ save_pg_receipt() { # one or more receipt files -> evidence (never clobbered)
   local src
   for src in "$@"; do
     [[ -f "$src" ]] || continue
-    if [ -n "$EV_DIR" ]; then
+    if [[ -n "$EV_DIR" ]]; then
       cp "$src" "$EV_DIR/$(basename "$src")" 2>/dev/null || true
       cp "$src" "$EV_DIR/$(basename "$src" .json)-$(date +%s%N).json" 2>/dev/null || true
     fi
@@ -368,7 +367,7 @@ if [[ "$SCOPE" == "full" && "$MODE" == "full-replace" ]]; then
   REDIS_INVALIDATED=false
   REDIS_VERIFICATION="not-attempted"
   REDIS_FAILURE=""
-  REDIS_START=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  REDIS_START=$(date -u +"$TS_FMT")
   if docker inspect oce-local-redis >/dev/null 2>&1; then
     if docker exec oce-local-redis redis-cli FLUSHALL >/dev/null 2>&1; then
       DBSIZE=$(docker exec oce-local-redis redis-cli DBSIZE 2>/dev/null | tr -d '[:space:]')
@@ -387,7 +386,7 @@ if [[ "$SCOPE" == "full" && "$MODE" == "full-replace" ]]; then
     REDIS_VERIFICATION="failed"
     REDIS_FAILURE="redis container unavailable"
   fi
-  python3 - "$REDIS_RECEIPT" "$REDIS_START" "$REDIS_INVALIDATED" "$REDIS_VERIFICATION" "$REDIS_FAILURE" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" <<'PY'
+  python3 - "$REDIS_RECEIPT" "$REDIS_START" "$REDIS_INVALIDATED" "$REDIS_VERIFICATION" "$REDIS_FAILURE" "$(date -u +"$TS_FMT")" <<'PY'
 import json, sys
 p, start, invalidated, ver, failure, finish = sys.argv[1:7]
 json.dump({
@@ -403,10 +402,10 @@ json.dump({
   "started_at": start, "finished_at": finish,
 }, open(p, "w", encoding="utf-8"), indent=2)
 PY
-  if [ -n "$EV_DIR" ]; then
+  if [[ -n "$EV_DIR" ]]; then
     cp "$REDIS_RECEIPT" "$EV_DIR/redis-invalidation-receipt.json" 2>/dev/null || true
   fi
-  if [ "$REDIS_INVALIDATED" = "true" ] && [ "$REDIS_VERIFICATION" = "ok" ]; then
+  if [[ "$REDIS_INVALIDATED" == "true" && "$REDIS_VERIFICATION" == "ok" ]]; then
     echo "  redis: invalidated (transient cache cleared; never restored from backup)"
   else
     echo "BLOCKED: redis invalidation failed (${REDIS_FAILURE:-unknown}) — postgres promoted but recovery NOT clean" >&2
@@ -421,9 +420,9 @@ if [[ "$SCOPE" == "full" && ( ! -f "$CONTENT/postgres/archive.dump" \
   exit 3
 fi
 
-END_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+END_TS=$(date -u +"$TS_FMT")
 cp "$RECEIPT_OUT" "$RECEIPT_DIR/restore-receipt.json" 2>/dev/null || true
-if [ -n "$EV_DIR" ]; then
+if [[ -n "$EV_DIR" ]]; then
   cp "$RECEIPT_DIR/restore-receipt.json" "$EV_DIR/restore-receipt.json" 2>/dev/null || true
 fi
 echo "full-replace restore complete <- $FROM"

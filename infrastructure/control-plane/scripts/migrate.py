@@ -69,7 +69,7 @@ LOOPBACK_HOSTS = ("127.0.0.1", "localhost")
 PG_PORT = ls.PG_PORT
 PG_DB = ls.PG_DB
 PG_USER = ls.PG_USER
-UP_RE = re.compile(r"^(\d{4})_([A-Za-z0-9_]+)\.sql$")
+UP_RE = re.compile(r"^(\d{4})_(\w+)\.sql$", re.ASCII)
 # canonical down form is exactly NNNN_down.sql — checked BEFORE UP_RE
 # because "0001_down.sql" also matches the up pattern. Any other
 # *_down.sql variant is an unrecognized form and fails closed.

@@ -46,7 +46,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install pinned Python dependencies
-        run: pip install -r infrastructure/cloud-ground/requirements.txt
+        run: pip install --only-binary :all: -r infrastructure/cloud-ground/requirements.txt
 
       - name: Install Ansible and ansible-lint
         run: |

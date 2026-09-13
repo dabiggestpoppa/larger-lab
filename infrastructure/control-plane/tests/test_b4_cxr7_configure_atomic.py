@@ -70,7 +70,8 @@ class TestCompleteOrNothingConfigure:
         assert "complete-or-nothing" in report["initialization"]
         # all three authorities present and non-empty
         store = json.loads((runtime / "secrets.json").read_text("utf-8"))
-        assert store["postgres_password"] and store["worker_token"]
+        assert store["postgres_password"]
+        assert store["worker_token"]
         key = (runtime / "activation_handkey").exists() or \
             len((runtime / "activation_handoff_key").read_text().strip()) >= 64
         assert key

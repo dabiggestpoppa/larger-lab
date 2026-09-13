@@ -49,7 +49,10 @@ printf '%s\n' "$EVIDENCE" > "$EVIDENCE/evidence-dir.path"
 export OCE_EVIDENCE_DIR="$EVIDENCE"
 export OCE_DOCKER_AVAILABLE="$([ "$(command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; echo $?)" = 0 ] && echo true || echo false)"
 
-record() { printf '%s\n' "$*" >> "$EVIDENCE/stage-log.txt"; }
+record() {
+  printf '%s\n' "$*" >> "$EVIDENCE/stage-log.txt"
+  return 0
+}
 
 write_failure_context() { # phase rc
   local phase="$1" rc="$2"

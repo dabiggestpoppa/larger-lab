@@ -31,14 +31,14 @@ PROJ_ROOT="$(cd "$BASE_DIR/../.." && pwd)"
 
 SCOPE=""
 OUT=""
-while [ $# -gt 0 ]; do
+while [[ $# -gt 0 ]]; do
   case "$1" in
     --scope) SCOPE="${2:-}"; shift 2 ;;
     --out) OUT="${2:-}"; shift 2 ;;
     *) echo "USAGE_ERROR: unknown argument '$1'" >&2; exit 2 ;;
   esac
 done
-if [ -z "$SCOPE" ]; then echo "USAGE_ERROR: --scope <state-only|full> required" >&2; exit 2; fi
+if [[ -z "$SCOPE" ]]; then echo "USAGE_ERROR: --scope <state-only|full> required" >&2; exit 2; fi
 SCOPE="$(printf '%s' "$SCOPE" | tr '[:upper:]' '[:lower:]')"
 case "$SCOPE" in state-only|full) ;; *) echo "USAGE_ERROR: unknown --scope '$SCOPE'" >&2; exit 2 ;; esac
 
@@ -151,11 +151,11 @@ done > "$OUT/BACKUP_MANIFEST.sha256"
 # R25: for full scope, refuse to produce an incomplete backup if either
 # authoritative source silently produced nothing.
 if [[ "$SCOPE" == "full" ]]; then
-  [ -f "$CONTENT/postgres/archive.dump" ] && [ -s "$CONTENT/postgres/archive.dump" ] \
+  [[ -f "$CONTENT/postgres/archive.dump" && -s "$CONTENT/postgres/archive.dump" ]] \
     || { echo "BLOCKED: full backup missing PostgreSQL archive" >&2; exit 3; }
   [[ -f "$CONTENT/postgres/inventory.json" && -s "$CONTENT/postgres/inventory.json" ]] \
     || { echo "BLOCKED: full backup missing database inventory" >&2; exit 3; }
-  [ -f "$CONTENT/artifacts/artifacts.tar.gz" ] && [ -s "$CONTENT/artifacts/artifacts.tar.gz" ] \
+  [[ -f "$CONTENT/artifacts/artifacts.tar.gz" && -s "$CONTENT/artifacts/artifacts.tar.gz" ]] \
     || { echo "BLOCKED: full backup missing artifact data" >&2; exit 3; }
   # manifest completeness: every content file is declared
   declared=$(wc -l < "$OUT/BACKUP_MANIFEST.sha256")

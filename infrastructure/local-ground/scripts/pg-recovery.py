@@ -183,6 +183,50 @@ def parse_probe_spec(spec):
     return out
 
 
+def _verify_row_counts(inventory, observed_rows, problems):
+    """Append row-count problems to *problems* (B4-CXR7U9R10 extraction)."""
+    expected = capture_inventory_rows(inventory)
+    for tbl, cnt in expected.items():
+        got = observed_rows.get(tbl)
+        if got is None:
+            problems.append(f"missing table {tbl}")
+        elif cnt != got:
+            problems.append(f"row count mismatch {tbl}: expected {cnt} got {got}")
+
+
+def _verify_probe_rows(observed_rows, probe_rows, problems):
+    """Append recovery-probe problems to *problems* (extraction)."""
+    for probe_tbl, probe_cnt in (probe_rows or {}).items():
+        got = observed_rows.get(probe_tbl)
+        if got is None:
+            problems.append(f"missing recovery probe table {probe_tbl}")
+        elif got != probe_cnt:
+            problems.append(f"recovery probe mismatch {probe_tbl}: expected {probe_cnt} got {got}")
+
+
+def _verify_fingerprints(inventory, observed_fingerprints, problems):
+    """Append fingerprint-evidence problems to *problems* (extraction).
+
+    Content (fingerprint) verification: the protected inventory proves exact
+    values. If the inventory records fingerprints, observations MUST carry
+    matching fingerprints or verification fails closed.
+    """
+    exp_fps = capture_inventory_fingerprints(inventory)
+    if not exp_fps:
+        return
+    if observed_fingerprints is None:
+        problems.append("missing fingerprint evidence (row counts alone cannot "
+                        "prove protected values)")
+        return
+    for tbl, want in exp_fps.items():
+        got = observed_fingerprints.get(tbl)
+        if got is None or got == "-err-":
+            problems.append(f"missing fingerprint for {tbl}")
+        elif got != want:
+            problems.append(f"value fingerprint mismatch {tbl}: expected "
+                            f"{want[:16]}… got {got[:16]}…")
+
+
 def verify_inventory(inventory, observed_rows, probe_rows=None, observed_fingerprints=None):
     """Verify observed rows (and, when the protected inventory carries
     fingerprints, observed fingerprints) against a parsed inventory plus
@@ -194,35 +238,9 @@ def verify_inventory(inventory, observed_rows, probe_rows=None, observed_fingerp
     (ok, list_of_problem_msgs).
     """
     problems = []
-    expected = capture_inventory_rows(inventory)
-    for tbl, cnt in expected.items():
-        got = observed_rows.get(tbl)
-        if got is None:
-            problems.append(f"missing table {tbl}")
-        elif cnt != got:
-            problems.append(f"row count mismatch {tbl}: expected {cnt} got {got}")
-    for probe_tbl, probe_cnt in (probe_rows or {}).items():
-        got = observed_rows.get(probe_tbl)
-        if got is None:
-            problems.append(f"missing recovery probe table {probe_tbl}")
-        elif got != probe_cnt:
-            problems.append(f"recovery probe mismatch {probe_tbl}: expected {probe_cnt} got {got}")
-    # Content (fingerprint) verification: the protected inventory proves exact
-    # values. If the inventory records fingerprints, observations MUST carry
-    # matching fingerprints or verification fails closed.
-    exp_fps = capture_inventory_fingerprints(inventory)
-    if exp_fps:
-        if observed_fingerprints is None:
-            problems.append("missing fingerprint evidence (row counts alone cannot "
-                            "prove protected values)")
-        else:
-            for tbl, want in exp_fps.items():
-                got = observed_fingerprints.get(tbl)
-                if got is None or got == "-err-":
-                    problems.append(f"missing fingerprint for {tbl}")
-                elif got != want:
-                    problems.append(f"value fingerprint mismatch {tbl}: expected "
-                                    f"{want[:16]}… got {got[:16]}…")
+    _verify_row_counts(inventory, observed_rows, problems)
+    _verify_probe_rows(observed_rows, probe_rows, problems)
+    _verify_fingerprints(inventory, observed_fingerprints, problems)
     return (len(problems) == 0), problems
 
 
@@ -345,7 +363,7 @@ def validate_archive(container, remote):
     return r.stdout.decode(errors="replace")
 
 
-def _base_receipt(kind, db, container, inventory_path):
+def _base_receipt(kind, db, inventory_path):
     return {"format": "oce-pg-recovery-receipt-v1",
             "operation_phase": kind,
             "database": db, "source_database": db, "target_database": db,
@@ -406,7 +424,7 @@ def _load_protected_inventory(inventory_path, inventory_sha_path):
     return parse_inventory(inv_doc)
 
 
-def _verify_db(container, db, user, inventory, probe, label):
+def _verify_db(container, db, user, inventory, probe):
     """Row counts + protected fingerprints of one database. Returns
     (ok, problems, rows, fps)."""
     watch = sorted(set(capture_inventory_rows(inventory)) | set(probe))
@@ -446,8 +464,7 @@ def rollback_recovery(container, user, db, quarantine, inventory, probe):
             detail["promoted_candidate_removed"] = True
         rename_db(container, user, quarantine, db)
         detail["original_canonical_restored"] = True
-        ok, vprobs, rows, fps = _verify_db(container, db, user, inventory, probe,
-                                           "rollback")
+        ok, vprobs, rows, fps = _verify_db(container, db, user, inventory, probe)
         detail["rollback_verification"] = {"result": "ok" if ok else "failed"}
         if fps is not None:
             detail["rollback_verification"]["fingerprints"] = fps
@@ -469,7 +486,7 @@ def rollback_recovery(container, user, db, quarantine, inventory, probe):
 # ── phase: promote ───────────────────────────────────────────────────────
 def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
                   container, probe_spec):
-    receipt = _base_receipt("promote", db, container, inventory_path)
+    receipt = _base_receipt("promote", db, inventory_path)
     stamp = hashlib.sha256(os.urandom(8)).hexdigest()[:12]
     quarantine = f"oce_local_quarantine_{stamp}"
     receipt["stamp"] = stamp
@@ -513,7 +530,7 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
                                + r.stderr.decode(errors="replace"))
         receipt["phases"].append("staging_restored")
         # 5. staging truth verified (counts + protected fingerprints)
-        ok, problems, rows, fps = _verify_db(container, staging, user, inventory, probe, "staging")
+        ok, problems, rows, fps = _verify_db(container, staging, user, inventory, probe)
         receipt["staging_verification"] = {"result": "ok" if ok else "failed",
                                            "tables": rows}
         if fps is not None:
@@ -533,7 +550,7 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         receipt["promotion"] = "ok"
         receipt["phases"].append("promoted")
         # 9. canonical truth verified (counts + fingerprints) — quarantine held
-        ok2, problems2, rows2, fps2 = _verify_db(container, db, user, inventory, probe, "canonical")
+        ok2, problems2, rows2, fps2 = _verify_db(container, db, user, inventory, probe)
         receipt["canonical_verification"] = {"result": "ok" if ok2 else "failed",
                                              "tables": rows2}
         if fps2 is not None:
@@ -581,7 +598,7 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
     quarantine = promote.get("quarantine_database")
     if not quarantine:
         raise RuntimeError("promote receipt lacks quarantine_database")
-    receipt = _base_receipt("finalize", db, container, inventory_path)
+    receipt = _base_receipt("finalize", db, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
     receipt["stamp"] = promote.get("stamp")
     receipt["staging_database"] = promote.get("staging_database")
@@ -602,7 +619,7 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
         probe = parse_probe_spec(probe_spec)
         # 1. FINAL canonical truth re-verified while quarantine still exists
         # (never run a fallible verification after removing the rollback source)
-        ok, problems, rows, fps = _verify_db(container, db, user, inventory, probe, "final")
+        ok, problems, rows, fps = _verify_db(container, db, user, inventory, probe)
         receipt["final_verification"] = {"result": "ok" if ok else "failed",
                                          "tables": rows}
         if fps is not None:
@@ -665,7 +682,7 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
     quarantine = promote.get("quarantine_database")
     if not quarantine:
         raise RuntimeError("rollback requires a promote receipt with quarantine_database")
-    receipt = _base_receipt("rollback", db, container, inventory_path)
+    receipt = _base_receipt("rollback", db, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
     receipt["stamp"] = promote.get("stamp")
     receipt["quarantine_database"] = quarantine

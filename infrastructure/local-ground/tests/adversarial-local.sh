@@ -100,7 +100,7 @@ json.dump({"format": "oce-adversarial-results-v1", "totals": totals, "checks": r
 PY
 
 echo ""
-if [ "$FAIL" -eq 0 ]; then
+if [[ "$FAIL" -eq 0 ]]; then
   echo "ADVERSARIAL: ALL PASS"
 else
   echo "ADVERSARIAL: FAILURES PRESENT"

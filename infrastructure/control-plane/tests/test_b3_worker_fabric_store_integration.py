@@ -262,7 +262,8 @@ def test_retry_state_dead_letter_and_po_authorized_retry(pg, fresh):
                              classified="retryable", last_reason="exit=None",
                              exhausted=True, poison=True)
     state = fresh.retry_state("job-r")
-    assert state["attempts"] == 3 and state["poison"] is True
+    assert state["attempts"] == 3
+    assert state["poison"] is True
 
     fresh.dead_letter(job_id="job-r", attempt=3, worker_id="w1",
                       reason="retry_exhausted", detail="crashed",

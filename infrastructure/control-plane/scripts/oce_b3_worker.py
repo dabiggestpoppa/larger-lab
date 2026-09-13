@@ -132,7 +132,7 @@ def _contained_path(name: str, value: str, default: str) -> Path:
     return p
 
 
-def run(deps: WorkerDependencies, *, ctx, url: str,
+def run(deps: WorkerDependencies, *, url: str,
         worker_id: str, environ: dict | None = None) -> int:
     """Execute one outbound worker round under an explicit dependency
     object (B4-CXR6R2). The production CLI calls this with
@@ -271,7 +271,7 @@ def main(
             "approved secret store is the only worker-credential authority; "
             "test injection is available only through the private dependency "
             "seam (B4-CXR6R2)")
-    return run(ProductionWorkerDependencies(), ctx=ctx, url=url,
+    return run(ProductionWorkerDependencies(), url=url,
                worker_id=worker_id)
 
 

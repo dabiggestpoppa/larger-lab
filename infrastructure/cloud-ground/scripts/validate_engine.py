@@ -331,11 +331,10 @@ class Validator:
                 errors.append(f"GITHUB_REPOSITORY: expected dabiggestpoppa/larger-lab, got {gha_repo}")
             if gha_sha and actual_commit and gha_sha != actual_commit:
                 errors.append(f"GITHUB_SHA: {gha_sha[:12]} does not match HEAD {actual_commit[:12]}")
-            if gha_ref:
-                if expected_branch and gha_ref != expected_branch:
-                    errors.append(
-                        f"GITHUB_REF_NAME: expected '{expected_branch}', got '{gha_ref}'"
-                    )
+            if gha_ref and expected_branch and gha_ref != expected_branch:
+                errors.append(
+                    f"GITHUB_REF_NAME: expected '{expected_branch}', got '{gha_ref}'"
+                )
 
         if self.authoritative:
             if not self.target_commit or not self.target_commit.strip():
@@ -565,6 +564,15 @@ class Validator:
 
     def check_digest_lock(self):
         compose_files = self._find_files(COMPOSE_DIR, "*.yml") + self._find_files(COMPOSE_DIR, YAML_GLOB)
+        violations = self._compose_tag_violations(compose_files)
+        if violations:
+            self.add("DIGEST-LOCK", "All images use digest pinning", True, "FAIL",
+                      f"{len(violations)} tag-only images", "\n".join(violations))
+        else:
+            self.add("DIGEST-LOCK", "All images use digest pinning", True, "PASS", "0 violations", "All pinned")
+
+    def _compose_tag_violations(self, compose_files) -> list:
+        """Scan compose files for images without digest pinning (S3776 extraction)."""
         violations = []
         for f in compose_files:
             content = self._read_file(f)
@@ -577,11 +585,7 @@ class Validator:
                     img = m.group(1).strip().strip('"').strip("'")
                     if img and "@sha256:" not in img:
                         violations.append(f"{f.relative_to(BASE_DIR)}:{i}: {img}")
-        if violations:
-            self.add("DIGEST-LOCK", "All images use digest pinning", True, "FAIL",
-                      f"{len(violations)} tag-only images", "\n".join(violations))
-        else:
-            self.add("DIGEST-LOCK", "All images use digest pinning", True, "PASS", "0 violations", "All pinned")
+        return violations
 
     def check_digest_proof(self):
         evidence_path = EVIDENCE_DIR / "image-digests.json"
@@ -642,17 +646,20 @@ class Validator:
                 violations.append(f"{img_name}: no digest proof")
         return violations
 
+    MSG_DIGEST_REGISTRY = "Image digests resolve against registry"
+    MSG_FAIL_CLOSED = "Adversarial mutations detected and rejected"
+
     def check_digest_registry(self):
         evidence_path = EVIDENCE_DIR / "image-digests.json"
         if not evidence_path.exists():
-            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True, "BLOCKED",
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "BLOCKED",
                       "image-digests.json not found", "")
             return
         try:
             with open(evidence_path, "r", encoding="utf-8") as f:
                 evidence = json.load(f)
         except Exception as e:
-            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True, "BLOCKED",
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "BLOCKED",
                       f"Cannot parse: {e}", "")
             return
         verify_cmd = None
@@ -665,7 +672,7 @@ class Validator:
             except (FileNotFoundError, subprocess.TimeoutExpired):
                 continue
         if not verify_cmd:
-            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True, "BLOCKED",
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "BLOCKED",
                       "No registry tool available", "")
             return
         cmd, fmt = verify_cmd
@@ -695,12 +702,12 @@ class Validator:
                 failed_count += 1
                 details.append(f"{name}: ERROR")
         if failed_count > 0:
-            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True, "FAIL",
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "FAIL",
                       f"{failed_count}/{len(images)} failed", "\n".join(details))
         elif resolved == 0:
-            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True, "BLOCKED", "No images", "")
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "BLOCKED", "No images", "")
         else:
-            self.add("DIGEST-REGISTRY", "Image digests resolve against registry", True, "PASS",
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "PASS",
                       f"{resolved}/{len(images)} resolved", "\n".join(details))
 
     def check_host_key_checking(self):
@@ -1175,14 +1182,14 @@ class Validator:
         """Validate adversarial evidence with strict requirements."""
         adv_path = self._evidence_dir() / "adversarial-results.json"
         if not adv_path.exists():
-            self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True, "BLOCKED",
+            self.add("FAIL-CLOSED", self.MSG_FAIL_CLOSED, True, "BLOCKED",
                       "adversarial-results.json not found", "Run adversarial-tests.sh first")
             return
         try:
             with open(adv_path, "r", encoding="utf-8") as f:
                 adv = json.load(f)
         except Exception as e:
-            self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True, "BLOCKED",
+            self.add("FAIL-CLOSED", self.MSG_FAIL_CLOSED, True, "BLOCKED",
                       f"Cannot parse: {e}", "")
             return
 
@@ -1269,10 +1276,10 @@ class Validator:
             errors.append("0 adversarial tests total")
 
         if errors:
-            self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True, "FAIL",
+            self.add("FAIL-CLOSED", self.MSG_FAIL_CLOSED, True, "FAIL",
                       f"{len(errors)} issues", "\n".join(errors[:10]))
         else:
-            self.add("FAIL-CLOSED", "Adversarial mutations detected and rejected", True, "PASS",
+            self.add("FAIL-CLOSED", self.MSG_FAIL_CLOSED, True, "PASS",
                       f"{neg_passed} negative + {meta_passed} meta pass",
                       "All mutations correctly rejected; all meta tests prove rejection")
 

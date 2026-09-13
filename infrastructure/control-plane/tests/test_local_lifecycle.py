@@ -577,7 +577,8 @@ def test_cxr5r4_special_chars_cannot_corrupt_dsn_or_compose_env(monkeypatch):
     ls.initialize_runtime_secret()
     dsn = ls.derive_runtime_dsn()
     assert "@" not in dsn.split("@", 1)[0].split(":", 2)[2]  # encoded userinfo
-    assert "%40" in dsn and "%2F" in dsn  # quote_plus encoding applied
+    assert "%40" in dsn  # quote_plus encoding applied
+    assert "%2F" in dsn
     assert dsn.startswith("postgresql://oce_control_admin:")
     # direct-crafted store with a newline -> projection fails closed (no
     # ambient value may paper over the malformed store)

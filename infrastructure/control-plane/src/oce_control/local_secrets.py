@@ -531,16 +531,7 @@ def _validate_store_schema(data: dict) -> None:
             "approved secret store must be a JSON object (B4-CXR5R4)")
     for key, value in data.items():
         if key == B4_META_KEY:
-            if not isinstance(value, dict):
-                raise SecretStoreCorrupt(
-                    "approved secret store b4_meta must be an object "
-                    "(B4-CXR5R4)")
-            for name, rec in value.items():
-                if not isinstance(rec, dict) or \
-                        not isinstance(rec.get("generation"), int):
-                    raise SecretStoreCorrupt(
-                        f"approved secret store b4_meta record '{name}' is "
-                        "malformed (generation must be an int) (B4-CXR5R4)")
+            _validate_b4_meta_record(value)
             continue
         if not isinstance(value, str) or not value:
             # B4-CXR7U8-07: empty/typed credential values are corruption —
@@ -549,6 +540,20 @@ def _validate_store_schema(data: dict) -> None:
                 f"approved secret store entry '{key}' must be a non-empty "
                 "string — empty/dict/list/null values are never coerced "
                 "into credentials (B4-CXR5R4)")
+
+
+def _validate_b4_meta_record(value: object) -> None:
+    """b4_meta entries must be objects with integer generations (B4-CXR5R4)."""
+    if not isinstance(value, dict):
+        raise SecretStoreCorrupt(
+            "approved secret store b4_meta must be an object "
+            "(B4-CXR5R4)")
+    for name, rec in value.items():
+        if not isinstance(rec, dict) or \
+                not isinstance(rec.get("generation"), int):
+            raise SecretStoreCorrupt(
+                f"approved secret store b4_meta record '{name}' is "
+                "malformed (generation must be an int) (B4-CXR5R4)")
 
 
 def initialize_runtime_secret(environ: dict | None = None) -> str:

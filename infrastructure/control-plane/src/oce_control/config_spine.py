@@ -946,7 +946,7 @@ class ConfigAuthorization:
         # operator-owned
         return actor in ("operator", "operator:po")
 
-    def _authorize_request(self, effective: EffectiveConfig, *, actor: str,
+    def _authorize_request(self, *, actor: str,
                            setting_name: str, requested_change: str,
                            reason: str, new_value: object
                            ) -> tuple[Setting, object]:
@@ -993,7 +993,7 @@ class ConfigAuthorization:
         """
         try:
             _setting, validated = self._authorize_request(
-                effective, actor=actor, setting_name=setting_name,
+                actor=actor, setting_name=setting_name,
                 requested_change=requested_change, reason=reason,
                 new_value=new_value)
         except (ValidationError, PermissionError) as exc:
@@ -1032,7 +1032,7 @@ class ConfigAuthorization:
                 "configuration override BLOCKED; durable means demonstrably "
                 "persistent, never just non-null (B4-CXR4R5)")
         setting, validated = self._authorize_request(
-            effective, actor=actor, setting_name=setting_name,
+            actor=actor, setting_name=setting_name,
             requested_change=requested_change, reason=reason,
             new_value=new_value)
         rid = request_id or uuid.uuid4().hex

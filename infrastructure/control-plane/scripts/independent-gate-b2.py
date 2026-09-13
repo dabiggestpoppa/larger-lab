@@ -329,7 +329,27 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
                 files = manifest.get("files", {})
                 mismatches = []
                 for name, entry in files.items():
+                    # S2083 fail-closed: manifest-controlled names must never
+                    # escape the evidence root (../, absolute, drive forms,
+                    # symlinks). A manifest entry can only ever address a
+                    # plain regular file INSIDE the evidence directory.
+                    if (os.path.isabs(name) or name.startswith("/")
+                            or ":" in name.split("/")[0]
+                            or ".." in name.split("/")
+                            or name in ("", ".")
+                            or os.path.normpath(name) != name
+                            or "\\" in name):
+                        mismatches.append(f"{name}: unsafe manifest path")
+                        continue
                     path = evidence / name
+                    if path.is_symlink() or not path.is_file():
+                        mismatches.append(f"{name}: missing/not a regular file")
+                        continue
+                    real = os.path.realpath(path)
+                    if os.path.commonpath([os.path.realpath(evidence), real]) != os.path.realpath(evidence):
+                        mismatches.append(f"{name}: escapes evidence root")
+                        continue
+                    path = Path(real)
                     if not path.exists():
                         mismatches.append(f"{name}: missing")
                         continue

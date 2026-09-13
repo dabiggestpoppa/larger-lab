@@ -103,8 +103,9 @@ class TestOwnershipRegistry:
 
     def test_enum_without_allowed_values_rejected(self):
         reg = SettingsRegistry()
+        setting = Setting(name="a.b", value_type="enum")
         with pytest.raises(ValueError):
-            reg.register(Setting(name="a.b", value_type="enum"))
+            reg.register(setting)
 
     def test_alias_collision_rejected(self):
         reg = SettingsRegistry()
@@ -210,8 +211,9 @@ class TestDeterministicResolution:
 
     def test_malformed_int_rejected(self):
         reg = build_default_registry()
+        resolver = ConfigResolver(reg)
         with pytest.raises(ValidationError):
-            ConfigResolver(reg).resolve(
+            resolver.resolve(
                 {"file": {"postgres.password_ref": REF_PG,
                           "control_plane.port": "abc"}})
 
@@ -544,8 +546,9 @@ class TestAuthorization:
                 eff, actor=actor, setting_name="sandbox.strict",
                 requested_change="x", reason="x", new_value=False)
             assert p.authorized is False and p.decision == "denied"
+            sink = self._proven(reg)
             with pytest.raises(PermissionError):
-                self._proven(reg).operator_override(
+                sink.operator_override(
                     eff, actor=actor, setting_name="sandbox.strict",
                     requested_change="x", reason="x", new_value=False)
 
@@ -570,8 +573,9 @@ class TestAuthorization:
             eff, actor="operator", setting_name="no.such",
             requested_change="x", reason="x", new_value="1")
         assert p.authorized is False
+        sink = self._proven(reg)
         with pytest.raises(ValidationError):
-            self._proven(reg).operator_override(
+            sink.operator_override(
                 eff, actor="operator", setting_name="no.such",
                 requested_change="x", reason="x", new_value="1")
 
@@ -603,8 +607,9 @@ class TestDenialGates:
             self._resolve({"workers.egress": "public"})
 
     def test_live_mode_via_env_denied(self):
+        resolver = ConfigResolver(build_default_registry())
         with pytest.raises(ValidationError):
-            ConfigResolver(build_default_registry()).resolve(
+            resolver.resolve(
                 {"environment": {"execution.live_order_mode": "paper",
                                  "postgres.password_ref": REF_PG}})
 
@@ -1273,7 +1278,8 @@ class TestCXR3R5CapitalAuthorityLocked:
             eff, actor="operator:po", setting_name="capital.authority",
             requested_change="activate capital", reason="po decision",
             new_value="approved")
-        assert p.authorized is False and "locked to 'none'" in p.reason_code
+        assert p.authorized is False
+        assert "locked to 'none'" in p.reason_code
         with pytest.raises(PermissionError, match="locked to 'none'"):
             TestCXR3R5CapitalAuthorityLocked._proven(reg).operator_override(
                 eff, actor="operator:po", setting_name="capital.authority",
@@ -1643,8 +1649,9 @@ class TestCXR4R5ProvenAuditDurability:
             def append(self, record):
                 pass
 
+        authz = self._authz(FakeAppend())
         with pytest.raises(RuntimeError, match="BLOCKED"):
-            self._authz(FakeAppend()).operator_override(
+            authz.operator_override(
                 eff, actor="operator:po", setting_name="control_plane.port",
                 requested_change="x", reason="r", new_value="9125")
 

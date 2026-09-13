@@ -341,7 +341,7 @@ class WorkerSupervisor:
                 and (not expected or expected in _cmdline(pid))):
             try:
                 os.kill(pid, signal.SIGTERM)
-            except (ProcessLookupError, PermissionError, OSError):
+            except OSError:
                 pass
         self._procs.pop(worker_id, None)
         self._clear_pid(worker_id)

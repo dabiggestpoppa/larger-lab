@@ -191,17 +191,15 @@ class SessionHost:
     def prune_expired(self, now: Optional[str] = None) -> int:
         """Drop sessions past their expiry or liveness window."""
         now = now or utcnow_iso()
-        dropped = 0
-        for sid in list(self._sessions):
-            sess = self._sessions[sid]
-            if sess.expired(now):
-                self._sessions.pop(sid, None)
-                dropped += 1
-            elif sess.last_heartbeat and dt_pass(now, sess.last_heartbeat,
-                                                 self._liveness):
-                self._sessions.pop(sid, None)
-                dropped += 1
-        return dropped
+        stale = [
+            sid for sid, sess in self._sessions.items()
+            if sess.expired(now)
+            or (sess.last_heartbeat and dt_pass(now, sess.last_heartbeat,
+                                                self._liveness))
+        ]
+        for sid in stale:
+            self._sessions.pop(sid, None)
+        return len(stale)
 
     def sessions(self, worker_id: Optional[str] = None) -> list[dict]:
         out = [s.to_dict() for s in self._sessions.values()

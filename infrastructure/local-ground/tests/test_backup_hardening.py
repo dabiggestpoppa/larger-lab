@@ -229,7 +229,8 @@ def test_full_backup_blocked_without_docker_or_services(tmp_path):
     r = _run_full_backup_with_fake_docker(tmp_path, "no-docker")
     assert r.returncode != 0, "full backup must block when the docker runtime is unavailable"
     combo = (r.stdout + r.stderr).lower()
-    assert "blocked" in combo and "full" in combo
+    assert "blocked" in combo
+    assert "full" in combo
     assert "docker" in combo
 
 
@@ -351,8 +352,9 @@ def test_sha256_file_is_deterministic():
     """sha256_file returns a 64-char hex digest deterministically."""
     pr = _load_pr()
     p = str(BASE_DIR / "requirements-ci.txt")
-    assert len(pr.sha256_file(p)) == 64
-    assert pr.sha256_file(p) == pr.sha256_file(p)
+    digest = pr.sha256_file(p)
+    assert len(digest) == 64
+    assert digest == pr.sha256_file(p)
 
 
 # ── R25: phase-safe recovery state machine (pure) ─────────────────────────

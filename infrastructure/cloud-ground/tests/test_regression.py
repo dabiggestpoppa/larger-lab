@@ -156,7 +156,8 @@ def test_rejects_mixed_run_id():
             json.dump(fake_adv, f)
         run_engine("--only", "FAIL-CLOSED", "--evidence-dir", tmpdir, env={"OCE_RUN_ID": run_id})
         check = get_check_result(tmpdir, "FAIL-CLOSED")
-        assert check and check["result"] == "FAIL", f"Expected FAIL for mixed RUN_ID, got {check}"
+        assert check, "Expected a FAIL-CLOSED check result for mixed RUN_ID, got none"
+        assert check["result"] == "FAIL", f"Expected FAIL for mixed RUN_ID, got {check}"
         print("PASS: Mixed RUN_ID rejected")
 
 
@@ -448,7 +449,8 @@ def test_rejects_missing_required_evidence_file():
     with tempfile.TemporaryDirectory() as tmpdir:
         run_engine("--only", "FAIL-CLOSED", "--evidence-dir", tmpdir, env={"OCE_RUN_ID": make_run_id()})
         check = get_check_result(tmpdir, "FAIL-CLOSED")
-        assert check and check["result"] == "BLOCKED", f"Expected BLOCKED for missing file, got {check}"
+        assert check, "Expected a FAIL-CLOSED check result for missing file, got none"
+        assert check["result"] == "BLOCKED", f"Expected BLOCKED for missing file, got {check}"
         print("PASS: Missing required evidence file blocks")
 
 

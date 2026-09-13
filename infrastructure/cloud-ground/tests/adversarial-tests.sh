@@ -21,7 +21,7 @@ ENGINE="$BASE_DIR/scripts/validate_engine.py"
 PROJ_ROOT="$(cd "$BASE_DIR/../.." && pwd)"
 
 # === R3F: Consume external OCE_RUN_ID. Fail closed if missing. ===
-if [ -z "${OCE_RUN_ID:-}" ]; then
+if [[ -z "${OCE_RUN_ID:-}" ]]; then
     echo "FATAL: OCE_RUN_ID is not set. The adversarial suite requires an externally supplied RUN_ID." >&2
     exit 1
 fi
@@ -82,11 +82,11 @@ EVIDENCE_FILE="$SCRATCH_DIR_WIN/static-validation-results.json"
 # authoritative CI (run-validation.sh step g). Resolve the trusted
 # branch from OCE_TRUSTED_REF (exported by the runner), falling back to
 # symbolic-ref for attached local checkouts.
-if [ -n "${OCE_TRUSTED_REF:-}" ] && [ "$OCE_TRUSTED_REF" != "(detached)" ]; then
+if [[ -n "${OCE_TRUSTED_REF:-}" && "$OCE_TRUSTED_REF" != "(detached)" ]]; then
     CB="$OCE_TRUSTED_REF"
 else
     CB=$(git -C "$PROJ_ROOT" branch --show-current)
-    if [ -z "$CB" ]; then CB=$(git -C "$PROJ_ROOT" rev-parse --abbrev-ref HEAD); fi
+    if [[ -z "$CB" ]]; then CB=$(git -C "$PROJ_ROOT" rev-parse --abbrev-ref HEAD); fi
 fi
 
 run_check() {
@@ -167,7 +167,7 @@ run_one() {
     local baseline_exit=$_RUN_CHECK_EXIT
     local baseline_result
     baseline_result=$(get_result "$expect")
-    if [ "$baseline_result" != "PASS" ] || [ "$baseline_exit" -ne 0 ]; then
+    if [[ "$baseline_result" != "PASS" || "$baseline_exit" -ne 0 ]]; then
         echo "    FAIL: baseline $expect=$baseline_result (exit $baseline_exit)"
         FAIL_COUNT=$((FAIL_COUNT + 1))
         write_result "$test_id" "FAIL" "$desc" "$expect" "BASELINE_FAIL" \
@@ -183,7 +183,7 @@ run_one() {
 
     local mut_rc=0
     python3 -c "$mut_code" "$target_win" || mut_rc=$?
-    if [ "$mut_rc" -ne 0 ]; then
+    if [[ "$mut_rc" -ne 0 ]]; then
         echo "    FAIL: mutation code failed (exit $mut_rc)"
         FAIL_COUNT=$((FAIL_COUNT + 1))
         cp "$BACKUP_DIR/pre-${test_id}.bak" "$target"
@@ -212,11 +212,11 @@ run_one() {
     elif [[ "$mutation_result" != "FAIL" ]]; then pass=false; reason="mutation_result=$mutation_result (must be exactly FAIL)"
     elif [[ "$mutation_exit" -eq 0 ]]; then pass=false; reason="mutation_exit=0 (must be nonzero)"
     elif [[ "$post_restore_result" != "PASS" ]]; then pass=false; reason="post_restore_result=$post_restore_result (must be PASS)"
-    elif [ "$post_restore_exit" -ne 0 ]; then pass=false; reason="post_restore_exit=$post_restore_exit (must be 0)"
-    elif [ "$orig_hash" != "$rest_hash" ]; then pass=false; reason="hash mismatch orig=$orig_hash rest=$rest_hash"
+    elif [[ "$post_restore_exit" -ne 0 ]]; then pass=false; reason="post_restore_exit=$post_restore_exit (must be 0)"
+    elif [[ "$orig_hash" != "$rest_hash" ]]; then pass=false; reason="hash mismatch orig=$orig_hash rest=$rest_hash"
     fi
 
-    if [ "$pass" = true ]; then
+    if [[ "$pass" == true ]]; then
         echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
         write_result "$test_id" "PASS" "$desc" "$expect" "$mutation_result" \
             "PASS" "0" "$mutation_result" "$mutation_exit" "PASS" "0" "$orig_hash" "$rest_hash" "Mutation detected, restored, baseline clean"
@@ -320,7 +320,7 @@ run_check "SOURCE-IDENTITY"; me=$_RUN_CHECK_EXIT; mr=$(get_result "SOURCE-IDENTI
 cp "$BACKUP_DIR/pre-EV-01.json" "$IDENTITY"
 rest_h=$(sha256sum "$IDENTITY" | cut -d' ' -f1)
 run_check "SOURCE-IDENTITY"; pe=$_RUN_CHECK_EXIT; pr=$(get_result "SOURCE-IDENTITY")
-if [ "$br" = "PASS" ] && [ "$be" -eq 0 ] && [ "$mr" = "FAIL" ] && [ "$me" -ne 0 ] && [ "$pr" = "PASS" ] && [ "$pe" -eq 0 ] && [ "$orig_h" = "$rest_h" ]; then
+if [[ "$br" == "PASS" && "$be" -eq 0 && "$mr" == "FAIL" && "$me" -ne 0 && "$pr" == "PASS" && "$pe" -eq 0 && "$orig_h" == "$rest_h" ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_result "EV-01" "PASS" "Wrong repository rejected" "SOURCE-IDENTITY" "FAIL" \
         "PASS" "0" "FAIL" "$me" "PASS" "0" "$orig_h" "$rest_h" "Correctly rejected"
@@ -523,7 +523,7 @@ TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] CLI-04: Wrong repository"
 GR_ORIG="${GITHUB_REPOSITORY:-}"; export GITHUB_REPOSITORY="wrong/repo"
 rc=0; python3 "$ENGINE_WIN" --authoritative --phase initial --evidence-dir "$SCRATCH_DIR_WIN" --target-commit "$CC" --target-tree "$CT" --target-branch "$CB_CONTRACT" >/dev/null 2>&1 || rc=$?
-if [ -n "$GR_ORIG" ]; then export GITHUB_REPOSITORY="$GR_ORIG"; else unset GITHUB_REPOSITORY; fi
+if [[ -n "$GR_ORIG" ]]; then export GITHUB_REPOSITORY="$GR_ORIG"; else unset GITHUB_REPOSITORY; fi
 if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-04" "PASS" "Wrong repository" \

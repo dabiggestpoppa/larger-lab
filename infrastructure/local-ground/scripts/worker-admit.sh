@@ -22,7 +22,7 @@ if [[ -z "$mode" || -z "$env_file" || ! -f "$env_file" ]]; then
   exit 3
 fi
 
-if [ "$mode" = "reject" ]; then
+if [[ "$mode" == "reject" ]]; then
   echo "REJECTED (unconditional)" 
   exit 1
 fi

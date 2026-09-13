@@ -37,7 +37,8 @@ class TestSupervisor:
         sup.admit("wkr-y")
         sup.start("wkr-y")
         pid = sup._read_pid("wkr-y")
-        assert pid and pid > 0
+        assert pid
+        assert pid > 0
         assert (sup._pid_dir / "wkr-y.pid").exists()
         st = sup.status("wkr-y")
         assert st["alive"] is True

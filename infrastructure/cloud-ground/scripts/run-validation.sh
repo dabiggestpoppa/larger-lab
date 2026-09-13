@@ -78,7 +78,7 @@ export OCE_RUN_ID
 # Step b: Final evidence directory — outside the repository,
 #         known to the caller BEFORE validation begins.
 # ═══════════════════════════════════════════════════════════════════
-if [ -n "${OCE_EVIDENCE_DIR:-}" ]; then
+if [[ -n "${OCE_EVIDENCE_DIR:-}" ]]; then
     FINAL_EVIDENCE="$OCE_EVIDENCE_DIR"
 else
     FINAL_EVIDENCE="$(mktemp -d "${TMPDIR:-/tmp}/oce-final-evidence-XXXXXX")"
@@ -259,7 +259,7 @@ if git -C "$PROJ_ROOT" symbolic-ref -q HEAD >/dev/null 2>&1; then
 else
     OBSERVED_BRANCH="(detached)"
     CHECKOUT_STATE="detached"
-    if [ -n "${GITHUB_REF_NAME:-}" ]; then
+    if [[ -n "${GITHUB_REF_NAME:-}" ]]; then
         BRANCH_PROVENANCE="GITHUB_REF_NAME"
         IDENTITY_BRANCH="$GITHUB_REF_NAME"
     else
@@ -267,7 +267,7 @@ else
         IDENTITY_BRANCH="(detached)"
     fi
 fi
-if [ "$CHECKOUT_STATE" = "attached" ]; then
+if [[ "$CHECKOUT_STATE" == "attached" ]]; then
     IDENTITY_BRANCH="$OBSERVED_BRANCH"
 fi
 
@@ -278,7 +278,7 @@ fi
 # branch the PR was actually raised from (GITHUB_REF_NAME), matching the
 # engine's own --target-branch "$OBSERVED_BRANCH" model. The override is
 # an explicit, logged caller contract — never an ambient silent default.
-if [ -n "${OCE_EXPECTED_BRANCH:-}" ]; then
+if [[ -n "${OCE_EXPECTED_BRANCH:-}" ]]; then
     EXPECTED_BRANCH="$OCE_EXPECTED_BRANCH"
     BRANCH_EXPECT_PROVENANCE="OCE_EXPECTED_BRANCH (caller override)"
 else
@@ -297,12 +297,12 @@ echo "  EXPECTED_BRANCH:   $EXPECTED_BRANCH (provenance=$BRANCH_EXPECT_PROVENANC
 echo ""
 
 # Branch identity rules: observed/trusted identity must equal contract.
-if [ "$IDENTITY_BRANCH" != "$EXPECTED_BRANCH" ]; then
+if [[ "$IDENTITY_BRANCH" != "$EXPECTED_BRANCH" ]]; then
     FAILED_PHASE="identity"
     echo "FATAL: Branch identity mismatch: identity='$IDENTITY_BRANCH' expected='$EXPECTED_BRANCH'" >&2
     exit 1
 fi
-if [ "$CHECKOUT_STATE" = "detached" ] && [ "$BRANCH_PROVENANCE" = "none" ]; then
+if [[ "$CHECKOUT_STATE" == "detached" && "$BRANCH_PROVENANCE" == "none" ]]; then
     FAILED_PHASE="identity"
     echo "FATAL: Local detached HEAD without trusted ref." >&2
     exit 1
@@ -336,7 +336,7 @@ export PYTHONDONTWRITEBYTECODE=1
 # so the post-suite clean-source check (step j/f) does not see stray files.
 python3 -u "$REGRESSIONS_WIN" 2>&1 | tee "$FINAL_EVIDENCE/regression-output.txt"
 REG_RC=${PIPESTATUS[0]}
-if [ "$REG_RC" -ne 0 ]; then
+if [[ "$REG_RC" -ne 0 ]]; then
     FAILED_PHASE="regressions"
     echo "FATAL: Regression suite failed (exit $REG_RC)." >&2
     exit 1
@@ -387,14 +387,14 @@ echo ""
 # ═══════════════════════════════════════════════════════════════════
 echo "[STEP h] Run adversarial tests in isolated worktree..."
 ADV_SH="$ADV_WORKTREE/infrastructure/cloud-ground/tests/adversarial-tests.sh"
-if [ ! -f "$ADV_SH" ]; then
+if [[ ! -f "$ADV_SH" ]]; then
     FAILED_PHASE="adversarial-staging"
     echo "FATAL: adversarial-tests.sh not found inside worktree." >&2
     exit 1
 fi
 bash "$ADV_SH" 2>&1 | tee "$FINAL_EVIDENCE/adversarial-output.txt"
 ADV_RC=${PIPESTATUS[0]}
-if [ "$ADV_RC" -ne 0 ]; then
+if [[ "$ADV_RC" -ne 0 ]]; then
     FAILED_PHASE="adversarial-tests"
     echo "FATAL: Adversarial suite failed (exit $ADV_RC)." >&2
     exit 1
@@ -441,7 +441,7 @@ echo ""
 # Step k: Confirm adversarial evidence exists
 # ═══════════════════════════════════════════════════════════════════
 echo "[STEP k] Confirm adversarial-results.json present..."
-if [ ! -f "$FINAL_EVIDENCE/adversarial-results.json" ]; then
+if [[ ! -f "$FINAL_EVIDENCE/adversarial-results.json" ]]; then
     FAILED_PHASE="evidence-transfer"
     echo "FATAL: adversarial-results.json not found in $FINAL_EVIDENCE" >&2
     exit 1
@@ -477,7 +477,7 @@ write_manifest
 echo "[STEP n] Run independent final gate..."
 bash "$GATE" "$FINAL_EVIDENCE_WIN" "$COMMIT" "$TREE"
 GATE_RC=$?
-if [ "$GATE_RC" -ne 0 ]; then
+if [[ "$GATE_RC" -ne 0 ]]; then
     FAILED_PHASE="final-gate"
     echo "FATAL: Independent final gate rejected the evidence (exit $GATE_RC)." >&2
     exit 1

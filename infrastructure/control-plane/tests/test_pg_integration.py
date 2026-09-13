@@ -55,7 +55,8 @@ def test_migrations_from_empty_db(pg):
     with pg.cursor() as cur:
         cur.execute("SELECT version FROM schema_migrations ORDER BY version")
         versions = [r[0] for r in cur.fetchall()]
-    assert "0001" in versions and "0002" in versions
+    assert "0001" in versions
+    assert "0002" in versions
 
 
 def test_job_persists_and_survives_reconnect(pg):

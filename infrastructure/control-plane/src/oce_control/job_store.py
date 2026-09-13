@@ -211,7 +211,7 @@ class JobStore:
         """Surrender a lease, returning the job to pending/scheduled."""
         job = self._jobs.get(job_id)
         if job is None:
-            raise KeyError(f"Job not found")
+            raise KeyError("Job not found")
         if job.lease.get("worker_id") != worker_id:
             raise PermissionError(f"Worker does not own lease")
         job.lease = {}
@@ -254,7 +254,7 @@ class JobStore:
         now = clock.now()
         job = self._jobs.get(job_id)
         if job is None:
-            raise KeyError(f"Job not found")
+            raise KeyError("Job not found")
         if not job.lease or job.lease.get("worker_id") != worker_id:
             raise PermissionError(f"Stale or no lease")
         if self.is_lease_expired(job_id):
@@ -273,7 +273,7 @@ class JobStore:
     def cancel_job(self, job_id: str) -> JobEnvelope:
         job = self._jobs.get(job_id)
         if job is None:
-            raise KeyError(f"Job not found")
+            raise KeyError("Job not found")
         assert_transition("job", job.status, "cancelled")
         job.status = "cancelled"
         job.lease = {}
@@ -283,7 +283,7 @@ class JobStore:
         clock = get_clock()
         job = self._jobs.get(job_id)
         if job is None:
-            raise KeyError(f"Job not found")
+            raise KeyError("Job not found")
         if job.status in ("running", "failed", "pending"):
             job.status = "quarantined"
             job.failure_envelope = {"error_type": "quarantined", "error_message": reason, "failed_at": clock.now().isoformat(), "retryable": True}

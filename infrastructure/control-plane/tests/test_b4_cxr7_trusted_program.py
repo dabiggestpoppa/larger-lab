@@ -217,7 +217,7 @@ class TestProductionJobTypeGate:
                       "required_capabilities": ["hash"], "params": {"code": "x"},
                       "timeout_s": 5})
         with pytest.raises(KeyError):
-            w.run(deps, ctx=None, url="http://127.0.0.1:9",
+            w.run(deps, url="http://127.0.0.1:9",
                   worker_id="w-evil", environ={})
         # the fail-closed gate fired before ANY control-plane claim,
         # workspace creation, or execution attempt
