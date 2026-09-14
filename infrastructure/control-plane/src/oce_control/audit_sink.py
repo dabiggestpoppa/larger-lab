@@ -49,7 +49,7 @@ _SECRET_PATTERNS = (
     re.compile(r"\bAuthorization\s*:", re.IGNORECASE),
     re.compile(r"\bBearer\s+", re.IGNORECASE),
     re.compile(r"\bghp_[A-Za-z0-9]+\b"),
-    re.compile(r"\bgithub_pat_[A-Za-z0-9_]+\b"),
+    re.compile(r"\bgithub_pat_\w+\b"),
     re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
     re.compile(r"\bxox[baprs]-[A-Za-z0-9-]+\b"),
     re.compile(r"\bsk-[A-Za-z0-9]{20,}\b"),

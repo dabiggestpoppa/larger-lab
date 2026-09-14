@@ -95,9 +95,14 @@ def _validated_open_path(path: str) -> str:
     return real
 
 
+def _validated_read_text(path: str) -> str:
+    """Read a path as UTF-8 text after containment validation (R14)."""
+    return open(_validated_open_path(path), encoding="utf-8").read()
+
+
 def load_protected_inventory(inventory_path, inventory_sha_path):
-    inv_doc = open(_validated_open_path(inventory_path), encoding="utf-8").read()
-    inv_sha = open(_validated_open_path(inventory_sha_path), encoding="utf-8").read().strip()
+    inv_doc = _validated_read_text(inventory_path)
+    inv_sha = _validated_read_text(inventory_sha_path).strip()
     if hashlib.sha256(inv_doc.encode()).hexdigest() != inv_sha:
         raise RuntimeError("database inventory tampered (SHA mismatch)")
     inv = _PG.parse_inventory(inv_doc)

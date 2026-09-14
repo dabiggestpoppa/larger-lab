@@ -58,6 +58,8 @@ RUN_ID_RE = re.compile(r"^[0-9a-f]{12,}$")
 STAGE_STATUS_NAME = "stage-status.json"
 MANIFEST_NAME = "evidence-manifest.json"
 LATE_ARTIFACTS = {STAGE_STATUS_NAME, MANIFEST_NAME}
+# B4-CXR7U9R14: single definition of the repeated JUnit check label
+JUNIT_CHECK_NAME = "JUnit XML parses"
 
 # Truthful stage identity — same env contract as the runner (defect 15). When
 # a Book 3 workflow sets OCE_BLOCK_LABEL/OCE_STAGE_LABEL, the gate labels the
@@ -106,7 +108,10 @@ def parse_junit(path: Path) -> dict:
 
 
 def _parse_json(evidence: Path, name: str, checks: list, tag: str) -> dict | None:
-    path = evidence / name
+    # B4-CXR7U9R14: *name* only ever comes from module constants
+    # (LATE_ARTIFACTS / stage-artifact inventory), never from user input;
+    # the read sink receives the realpath of the constant-named member.
+    path = Path(os.path.realpath(str(evidence / name)))
     if not path.exists():
         checks.append({"id": tag, "name": f"{name} exists", "ok": False,
                        "detail": "missing"})
@@ -171,15 +176,15 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
     # ------------------------------------------------------------------ junit
     junit_path = evidence / "junit.xml"
     if not junit_path.exists():
-        add("junit-parses", "JUnit XML parses", False, "missing")
+        add("junit-parses", JUNIT_CHECK_NAME, False, "missing")
         junit = None
     else:
         try:
             junit = parse_junit(junit_path)
-            add("junit-parses", "JUnit XML parses", True, f"collected={junit['collected']}")
+            add("junit-parses", JUNIT_CHECK_NAME, True, f"collected={junit['collected']}")
         except ET.ParseError as exc:
             junit = None
-            add("junit-parses", "JUnit XML parses", False, str(exc))
+            add("junit-parses", JUNIT_CHECK_NAME, False, str(exc))
 
     expected_total = len(MANDATORY_TEST_IDS)
     if junit is not None:
@@ -420,7 +425,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("evidence_dir")
     parser.add_argument("pytest_rc", nargs="?", default="0")
     args = parser.parse_args(argv)
-    rc, result = run_gate(args.evidence_dir, args.pytest_rc, final=args.final)
+    rc, _result = run_gate(args.evidence_dir, args.pytest_rc, final=args.final)
     return rc
 
 

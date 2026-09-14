@@ -158,6 +158,34 @@ class SecretStoreUnreadable(SecretStoreCorrupt):
     FAIL CLOSED; OCE never rewrites it (B4-CXR7U8-07)."""
 
 
+def _validate_ledger_entry(k, v) -> dict:
+    """Validate one ledger entry; returns the normalized form.
+
+    B4-CXR7U9R14: extracted from _load_consumed_nonces so the loader
+    stays a straight-line reader (cognitive complexity).
+    """
+    if isinstance(v, dict):
+        ts = v.get("t")
+        if isinstance(ts, bool) or not isinstance(ts, (int, float)):
+            raise LedgerCorrupt(
+                "consumed-handoff ledger schema invalid: entry 't' must "
+                "be an epoch number (B4-CXR7U4)")
+        if "m" in v and not isinstance(v["m"], str):
+            raise LedgerCorrupt(
+                "consumed-handoff ledger schema invalid: entry 'm' must "
+                "be a string when present (B4-CXR7U4)")
+        return v
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        # canonical-state re-derivation (B4-CXR7U4): entries written by
+        # the pre-U4 ledger schema (plain epoch numbers) are honored as
+        # their consumption timestamp — never rewritten, never erased
+        return {"t": float(v)}
+    raise LedgerCorrupt(
+        "consumed-handoff ledger schema invalid: entries must be "
+        "{nonce: {t: epoch}} objects or legacy epoch numbers "
+        "(B4-CXR7U4)")
+
+
 def _load_consumed_nonces() -> dict[str, dict]:
     """Read the consumed-handoff ledger STRICTLY (B4-CXR7U4).
 
@@ -193,27 +221,7 @@ def _load_consumed_nonces() -> dict[str, dict]:
             raise LedgerCorrupt(
                 "consumed-handoff ledger schema invalid: nonces must be "
                 "non-empty strings (B4-CXR7U4)")
-        if isinstance(v, dict):
-            ts = v.get("t")
-            if isinstance(ts, bool) or not isinstance(ts, (int, float)):
-                raise LedgerCorrupt(
-                    "consumed-handoff ledger schema invalid: entry 't' must "
-                    "be an epoch number (B4-CXR7U4)")
-            if "m" in v and not isinstance(v["m"], str):
-                raise LedgerCorrupt(
-                    "consumed-handoff ledger schema invalid: entry 'm' must "
-                    "be a string when present (B4-CXR7U4)")
-            normalized[k] = v
-        elif isinstance(v, (int, float)) and not isinstance(v, bool):
-            # canonical-state re-derivation (B4-CXR7U4): entries written by
-            # the pre-U4 ledger schema (plain epoch numbers) are honored as
-            # their consumption timestamp — never rewritten, never erased
-            normalized[k] = {"t": float(v)}
-        else:
-            raise LedgerCorrupt(
-                "consumed-handoff ledger schema invalid: entries must be "
-                "{nonce: {t: epoch}} objects or legacy epoch numbers "
-                "(B4-CXR7U4)")
+        normalized[k] = _validate_ledger_entry(k, v)
     return normalized
 
 

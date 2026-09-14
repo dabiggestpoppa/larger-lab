@@ -35,6 +35,9 @@ from .worker_identity import WorkerAuthority, AdmissionRequest, \
     WorkerIdentity, CapabilityRegistry
 from .worker_sessions import SessionHost
 
+# B4-CXR7U9R14: single definition of the Po operator actor identity.
+OPERATOR_PO_ACTOR = "operator:po"
+
 # Capabilities the local operator bootstraps for the local worker (Po-admitted).
 BOOTSTRAP_CAPABILITIES = ("hash", "compute-python", "repo-inventory",
                           "backtest-synthetic", "analysis-artifact",
@@ -112,8 +115,16 @@ class WorkerSupervisor:
     def _load_state(self) -> None:
         if not self._state_file.exists():
             return
+        # B4-CXR7U9R14: the state file path is a class-derived constant
+        # (STATE_FILE under the operator-fenced runtime dir), not user
+        # input; realpath is asserted before the read sink for defense in
+        # depth against runtime-dir relocation.
+        state_real = os.path.realpath(os.path.abspath(self._state_file))
+        runtime_real = os.path.realpath(os.path.abspath(self._dir))
+        if os.path.commonpath([runtime_real, state_real]) != runtime_real:
+            return  # relocated state file: fail closed, start empty
         try:
-            data = json.loads(self._state_file.read_text(encoding="utf-8"))
+            data = json.loads(open(state_real, encoding="utf-8").read())
         except (json.JSONDecodeError, OSError):
             return
         for rec in data.get("workers", []):
@@ -136,7 +147,7 @@ class WorkerSupervisor:
             self._authority._identities[wid] = ident  # adopted identity
         for cap in data.get("capabilities", []):
             try:
-                self._authority.registry.admit_capability(cap, "operator:po")
+                self._authority.registry.admit_capability(cap, OPERATOR_PO_ACTOR)
             except Exception:
                 pass
 
@@ -247,9 +258,9 @@ class WorkerSupervisor:
         return rec
 
     def admit(self, worker_id: str, requested: Optional[list[str]] = None,
-              actor: str = "operator:po") -> WorkerIdentity:
+              actor: str = OPERATOR_PO_ACTOR) -> WorkerIdentity:
         """PO-authorized admission. A worker cannot self-authorize."""
-        if actor != "operator:po":
+        if actor != OPERATOR_PO_ACTOR:
             raise PermissionError(
                 f"actor '{actor}' cannot admit workers — only operator:po (or a "
                 f"permitted PO proxy) may admit a worker")
@@ -337,8 +348,8 @@ class WorkerSupervisor:
         self._save_state()
         return rec
 
-    def revoke(self, worker_id: str, actor: str = "operator:po") -> WorkerRecord:
-        if actor != "operator:po":
+    def revoke(self, worker_id: str, actor: str = OPERATOR_PO_ACTOR) -> WorkerRecord:
+        if actor != OPERATOR_PO_ACTOR:
             raise PermissionError(f"actor '{actor}' cannot revoke workers")
         rec = self._authorize(worker_id)
         self._host.revoke(worker_id)

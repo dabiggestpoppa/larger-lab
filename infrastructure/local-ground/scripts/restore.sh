@@ -165,7 +165,7 @@ if [[ "$DCR" != "True" && "$DCR" != "true" ]]; then
   echo "BLOCKED: full backup must claim disaster_recovery_capable=true." >&2
   exit 3
 fi
-[ -z "$CONFIRM_TARGET" ] && { echo "BLOCKED: full-replace requires --confirm-local-target <db>." >&2; exit 3; }
+[[ -z "$CONFIRM_TARGET" ]] && { echo "BLOCKED: full-replace requires --confirm-local-target <db>." >&2; exit 3; }
 [[ "$CONFIRM_TARGET" != "$PG_DB" ]] && { echo "BLOCKED: --confirm-local-target must equal the local recovery database ($PG_DB)." >&2; exit 3; }
 
 # R24: validate artifact archive members BEFORE the docker gate, so an unsafe

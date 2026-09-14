@@ -619,7 +619,7 @@ class Validator:
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
             self.add("DIGEST-PROOF", "Image digests match registry evidence", True, "BLOCKED",
-                      "compose.foundation.yml not found", "")
+                      self.MSG_COMPOSE_NOT_FOUND, "")
             return
         content = self._read_file(foundation)
         violations = self._compose_digest_violations(content, evidence_digests)
@@ -658,6 +658,11 @@ class Validator:
 
     MSG_DIGEST_REGISTRY = "Image digests resolve against registry"
     MSG_FAIL_CLOSED = "Adversarial mutations detected and rejected"
+    # B4-CXR7U9R14: single definitions of repeated check messages
+    MSG_NO_DB_PORTS = "No published DB/cache ports"
+    MSG_NO_EXTERNAL_NET = "No external networks"
+    MSG_ANSIBLE_LINT = "Ansible lint passes"
+    MSG_COMPOSE_NOT_FOUND = "compose.foundation.yml not found"
 
     def check_digest_registry(self):
         evidence_path = EVIDENCE_DIR / "image-digests.json"
@@ -687,6 +692,22 @@ class Validator:
             return
         cmd, fmt = verify_cmd
         images = evidence.get("images", [])
+        resolved, failed_count, details = self._probe_image_digests(cmd, fmt, images)
+        if failed_count > 0:
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "FAIL",
+                      f"{failed_count}/{len(images)} failed", "\n".join(details))
+        elif resolved == 0:
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "BLOCKED", "No images", "")
+        else:
+            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "PASS",
+                      f"{resolved}/{len(images)} resolved", "\n".join(details))
+
+    def _probe_image_digests(self, cmd, fmt, images):
+        """B4-CXR7U9R14: extracted from check_digest_registry.
+
+        Probes each image reference against the registry tool and returns
+        (resolved_count, failed_count, details); verdicts unchanged.
+        """
         resolved, failed_count, details = 0, 0, []
         for img in images:
             name, digest = img.get("name", ""), img.get("digest", "")
@@ -711,14 +732,7 @@ class Validator:
             except Exception:
                 failed_count += 1
                 details.append(f"{name}: ERROR")
-        if failed_count > 0:
-            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "FAIL",
-                      f"{failed_count}/{len(images)} failed", "\n".join(details))
-        elif resolved == 0:
-            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "BLOCKED", "No images", "")
-        else:
-            self.add("DIGEST-REGISTRY", self.MSG_DIGEST_REGISTRY, True, "PASS",
-                      f"{resolved}/{len(images)} resolved", "\n".join(details))
+        return resolved, failed_count, details
 
     def check_host_key_checking(self):
         cfg_path = ANSIBLE_DIR / "ansible.cfg"
@@ -748,8 +762,8 @@ class Validator:
     def check_no_published_ports(self):
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
-            self.add("NO-DB-PORTS", "No published DB/cache ports", True, "BLOCKED",
-                      "compose.foundation.yml not found", "")
+            self.add("NO-DB-PORTS", self.MSG_NO_DB_PORTS, True, "BLOCKED",
+                      self.MSG_COMPOSE_NOT_FOUND, "")
             return
         content = self._read_file(foundation)
         violations, in_services, current_service = [], False, ""
@@ -763,10 +777,10 @@ class Validator:
             if in_services and "ports:" in line and not line.lstrip().startswith("#"):
                 violations.append(f"Line {i} in {current_service}: {line.strip()}")
         if violations:
-            self.add("NO-DB-PORTS", "No published DB/cache ports", True, "FAIL",
+            self.add("NO-DB-PORTS", self.MSG_NO_DB_PORTS, True, "FAIL",
                       f"{len(violations)} violations", "\n".join(violations))
         else:
-            self.add("NO-DB-PORTS", "No published DB/cache ports", True, "PASS", "0 violations", "Clean")
+            self.add("NO-DB-PORTS", self.MSG_NO_DB_PORTS, True, "PASS", "0 violations", "Clean")
 
     def check_no_privileged(self):
         violations = []
@@ -835,7 +849,7 @@ class Validator:
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
             self.add("HEALTH-CHECKS", label, True, "BLOCKED",
-                      "compose.foundation.yml not found", "")
+                      self.MSG_COMPOSE_NOT_FOUND, "")
             return
         hc_count = self._read_file(foundation).count("healthcheck:")
         if hc_count >= 2:
@@ -921,7 +935,7 @@ class Validator:
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
             self.add("SECURITY-OPTS", "Security options present", True, "BLOCKED",
-                      "compose.foundation.yml not found", "")
+                      self.MSG_COMPOSE_NOT_FOUND, "")
             return
         count = self._read_file(foundation).count("no-new-privileges")
         if count >= 2:
@@ -934,8 +948,8 @@ class Validator:
     def check_no_external_networks(self):
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
-            self.add("NO-EXTERNAL-NET", "No external networks", True, "BLOCKED",
-                      "compose.foundation.yml not found", "")
+            self.add("NO-EXTERNAL-NET", self.MSG_NO_EXTERNAL_NET, True, "BLOCKED",
+                      self.MSG_COMPOSE_NOT_FOUND, "")
             return
         violations = []
         for i, line in enumerate(self._read_file(foundation).split("\n"), 1):
@@ -945,10 +959,10 @@ class Validator:
             if "external:" in stripped and "true" in stripped:
                 violations.append(f"Line {i}: {stripped}")
         if violations:
-            self.add("NO-EXTERNAL-NET", "No external networks", True, "FAIL",
+            self.add("NO-EXTERNAL-NET", self.MSG_NO_EXTERNAL_NET, True, "FAIL",
                       f"{len(violations)} violations", "\n".join(violations))
         else:
-            self.add("NO-EXTERNAL-NET", "No external networks", True, "PASS", "0 violations", "Clean")
+            self.add("NO-EXTERNAL-NET", self.MSG_NO_EXTERNAL_NET, True, "PASS", "0 violations", "Clean")
 
     def check_roles_have_tasks(self):
         roles_dir = ANSIBLE_DIR / "roles"
@@ -1039,20 +1053,20 @@ class Validator:
                 capture_output=True, text=True, timeout=120, cwd=str(ANSIBLE_DIR), env=env,
             )
             if r.returncode == 0:
-                self.add("ANSIBLE-LINT", "Ansible lint passes", True, "PASS", "clean", r.stdout[:200])
+                self.add("ANSIBLE-LINT", self.MSG_ANSIBLE_LINT, True, "PASS", "clean", r.stdout[:200])
             else:
-                self.add("ANSIBLE-LINT", "Ansible lint passes", True, "FAIL", "found issues",
+                self.add("ANSIBLE-LINT", self.MSG_ANSIBLE_LINT, True, "FAIL", "found issues",
                           (r.stdout + r.stderr)[:4000])
         except FileNotFoundError:
-            self.add("ANSIBLE-LINT", "Ansible lint passes", True, "BLOCKED", "ansible-lint not installed", "")
+            self.add("ANSIBLE-LINT", self.MSG_ANSIBLE_LINT, True, "BLOCKED", "ansible-lint not installed", "")
         except subprocess.TimeoutExpired:
-            self.add("ANSIBLE-LINT", "Ansible lint passes", True, "BLOCKED", "timeout", "")
+            self.add("ANSIBLE-LINT", self.MSG_ANSIBLE_LINT, True, "BLOCKED", "timeout", "")
 
     def check_compose_render(self):
         foundation = COMPOSE_DIR / "compose.foundation.yml"
         if not foundation.exists():
             self.add("COMPOSE-RENDER", COMPOSE_RENDER_NAME, True, "BLOCKED",
-                      "compose.foundation.yml not found", "")
+                      self.MSG_COMPOSE_NOT_FOUND, "")
             return
         try:
             env = os.environ.copy()
@@ -1293,6 +1307,43 @@ class Validator:
                       f"{neg_passed} negative + {meta_passed} meta pass",
                       "All mutations correctly rejected; all meta tests prove rejection")
 
+    def _load_meta_test_evidence(self):
+        """B4-CXR7U9R14: extracted from check_meta_test_evidence.
+
+        Loads and parses adversarial-results.json; records the BLOCKED
+        verdict itself and returns None on any problem, else the
+        meta_tests list.
+        """
+        adv_path = self._evidence_dir() / ADVERSARIAL_RESULTS_NAME
+        if not adv_path.exists():
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
+                      "adversarial-results.json not found", "")
+            return None
+        try:
+            with open(adv_path, "r", encoding="utf-8") as f:
+                adv = json.load(f)
+        except Exception as e:
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
+                      f"Cannot parse: {e}", "")
+            return None
+        meta_tests = adv.get("meta_tests", [])
+        if not meta_tests:
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
+                      "No meta tests found", "")
+            return None
+        return meta_tests
+
+    def _record_meta_test_verdict(self, meta_tests):
+        """B4-CXR7U9R14: extracted verdict recording for meta tests."""
+        errors = self._meta_test_errors(meta_tests)
+        if errors:
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "FAIL",
+                      f"{len(errors)} issues", "\n".join(errors[:10]))
+        else:
+            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "PASS",
+                      f"{len(meta_tests)} meta tests with complete evidence",
+                      "All meta tests have fixture_type, invalid_condition, expected/observed rejection, nonzero exit")
+
     def _meta_test_errors(self, meta_tests):
         """Validate one meta-test evidence record list; returns error strings."""
         errors = []
@@ -1325,33 +1376,10 @@ class Validator:
         return errors
 
     def check_meta_test_evidence(self):
-        adv_path = self._evidence_dir() / ADVERSARIAL_RESULTS_NAME
-        if not adv_path.exists():
-            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
-                      "adversarial-results.json not found", "")
-            return
-        try:
-            with open(adv_path, "r", encoding="utf-8") as f:
-                adv = json.load(f)
-        except Exception as e:
-            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
-                      f"Cannot parse: {e}", "")
-            return
-
-        meta_tests = adv.get("meta_tests", [])
-        if not meta_tests:
-            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "BLOCKED",
-                      "No meta tests found", "")
-            return
-
-        errors = self._meta_test_errors(meta_tests)
-        if errors:
-            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "FAIL",
-                      f"{len(errors)} issues", "\n".join(errors[:10]))
-        else:
-            self.add("META-TEST-EVIDENCE", META_TEST_EVIDENCE_NAME, True, "PASS",
-                      f"{len(meta_tests)} meta tests with complete evidence",
-                      "All meta tests have fixture_type, invalid_condition, expected/observed rejection, nonzero exit")
+        meta_tests = self._load_meta_test_evidence()
+        if meta_tests is None:
+            return  # verdict already recorded by the loader
+        self._record_meta_test_verdict(meta_tests)
 
     def check_run_id_consistency(self):
         """Verify one RUN_ID is used consistently across all evidence artifacts."""

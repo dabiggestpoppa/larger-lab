@@ -13,7 +13,7 @@ from typing import Any, Optional
 from .clocks import get_clock
 from .hashes import generate_id, generate_idempotency_key, generate_correlation_id, payload_hash
 from .state_machines import assert_transition
-from .job_store import JobEnvelope
+from .job_store import JobEnvelope, JOB_NOT_FOUND_MSG
 
 
 class IdempotencyConflict(Exception):
@@ -369,7 +369,7 @@ class PgJobStore:
         now = clock.now()
         job = self.get_job(job_id)
         if job is None:
-            raise KeyError("Job not found")
+            raise KeyError(JOB_NOT_FOUND_MSG)
         row = self._one(
             "SELECT worker_id, expires_at FROM leases WHERE job_id = %s AND lease_id = %s",
             (job_id, lease_id),
@@ -403,7 +403,7 @@ class PgJobStore:
         clock = get_clock()
         job = self.get_job(job_id)
         if job is None:
-            raise KeyError("Job not found")
+            raise KeyError(JOB_NOT_FOUND_MSG)
         assert_transition("job", job.status, "cancelled")
         try:
             with self._conn.cursor() as cur:
@@ -424,7 +424,7 @@ class PgJobStore:
         clock = get_clock()
         job = self.get_job(job_id)
         if job is None:
-            raise KeyError("Job not found")
+            raise KeyError(JOB_NOT_FOUND_MSG)
         if job.status not in ("running", "failed", "pending"):
             return job
         try:

@@ -107,7 +107,7 @@ async function refreshAll() {
     document.getElementById('jobs').textContent = 'jobs: ' + e.message;
   }
 }
-refreshAll();
+refreshAll().catch((e) => console.error('console refresh failed:', e));
 </script>
 </body>
 </html>

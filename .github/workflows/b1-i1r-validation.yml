@@ -63,7 +63,7 @@ jobs:
       - name: Install Gitleaks (outside the workspace)
         run: |
           mkdir -p "$RUNNER_TEMP/gitleaks"
-          wget -q -O "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
+          wget -q --max-redirect=0 -O "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
           tar xzf "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" -C "$RUNNER_TEMP/gitleaks"
           sudo mv "$RUNNER_TEMP/gitleaks/gitleaks" /usr/local/bin/
 

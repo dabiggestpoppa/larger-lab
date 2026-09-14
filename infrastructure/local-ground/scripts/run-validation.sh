@@ -335,13 +335,18 @@ fi
 
 # â”€â”€ finalize mutable outputs, then refresh the final manifest â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 write_status() {
-  python3 - "$EVIDENCE/stage-status.json" "$1" <<'PY'
+  local gate_status="$1"
+  if ! python3 - "$EVIDENCE/stage-status.json" "$gate_status" <<'PY'
 import json, sys
 p, gs = sys.argv[1], sys.argv[2]
 d = json.load(open(p, encoding="utf-8"))
 d["gate_status"] = gs
 json.dump(d, open(p, "w", encoding="utf-8"), indent=2)
 PY
+  then
+    return 1
+  fi
+  return 0
 }
 if [ "${OCE_CI_MODE:-false}" = "true" ]; then
   FINAL_STATUS="LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW"

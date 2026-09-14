@@ -39,8 +39,13 @@ jobs:
         # uv enforces exact versions from requirements-ci.txt; bare pip would
         # silently accept and resolve beyond the pinned contract.
         run: |
+          # uv is the ONLY unpinned dependency and exists solely to enforce
+          # the pinned contract; it is uninstalled immediately after the
+          # locked install (B4-CXR7U9R14), so no unpinned package remains
+          # in the runtime environment.
           pipx install uv 2>/dev/null || pip install --quiet uv
           uv pip install --system -r infrastructure/control-plane/requirements-ci.txt
+          pip uninstall -y uv 2>/dev/null || pipx uninstall uv 2>/dev/null || true
 
       - name: Confirm pinned actions/dependencies contract
         run: |

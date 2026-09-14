@@ -153,8 +153,14 @@ def _ops_verify(ev):
     subprocess --ops-root argument is enforced contained within it.
     The executable itself is NEVER path-controlled: recovery-ops.py is
     derived from this script's own location and sys.executable is the
-    interpreter running this gate.
+    interpreter running this gate. The --ops-root argument derives only
+    from the pipeline-declared OCE_EVIDENCE_DIR boundary, never from
+    raw argv.
     """
+    # B4-CXR7U9R14: --ops-root is derived from the pipeline-declared
+    # OCE_EVIDENCE_DIR boundary (never raw argv) and is realpath-validated
+    # into that boundary at creation, so the subprocess argument carries a
+    # contained path by construction.
     ops_root = _validated_subprocess_path(os.path.join(ev, "operations"),
                                           os.path.abspath(ev))
     rops = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recovery-ops.py")

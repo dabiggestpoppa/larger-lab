@@ -14,7 +14,7 @@
   ansible.builtin.get_url:
     url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ubuntu_codename }}.noarmor.gpg"
     dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
-    mode: '0644'
+    mode: '0600'
   tags: [tailscale, install]
 
 - name: Add Tailscale repository

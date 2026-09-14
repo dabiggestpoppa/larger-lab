@@ -148,7 +148,7 @@ class POOrchestrator:
         }
         return escalation
 
-    def check_po_boundaries(self, po_agent_id: str) -> bool:
+    def check_po_boundaries(self) -> bool:
         """Check if PO is attempting to bypass a boundary."""
         # PO cannot bypass environment locks
         # PO cannot bypass approval requirements
@@ -232,7 +232,7 @@ class HermesBoundary:
                 req = r
                 break
         if req is None:
-            raise KeyError(f"Request not found")
+            raise KeyError("Request not found")
 
         # Hermes cannot independently approve PO-only actions
         if req.risk_class in ("capital", "deployment", "broker"):

@@ -102,6 +102,7 @@ run_check() {
     # any other branch fails before the adversarial mutation even applies.
     python3 "$ENGINE_WIN" --only "$check_id" --evidence-dir "$SCRATCH_DIR_WIN"         --target-branch "$CB" >/dev/null 2>&1 || rc=$?
     _RUN_CHECK_EXIT=$rc
+    return 0
 }
 
 get_result() {
@@ -138,6 +139,7 @@ with open(sys.argv[15], 'w') as f: json.dump(t, f, indent=2)
   "$baseline_result" "$baseline_exit" "$mutation_result" "$mutation_exit" \
   "$post_restore_result" "$post_restore_exit" "$original_sha256" \
   "$restored_sha256" "$reason" "$RESULTS_DIR/$test_id.json"
+    return 0
 }
 
 write_meta_result() {
@@ -156,6 +158,7 @@ with open(sys.argv[10], 'w') as f: json.dump(t, f, indent=2)
 " "$test_id" "$result" "$description" "$fixture_type" "$invalid_condition" \
   "$expected_rejection" "$observed_rejection" "$rejection_exit" "$reason" \
   "$RESULTS_DIR/$test_id.json"
+    return 0
 }
 
 # Run one negative mutation test: backup -> mutate -> detect -> restore -> verify
@@ -374,9 +377,9 @@ run_meta() {
     return 0
 }
 
-mk_fake_neg() { local mutation_result="$1"; python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':sys.argv[1],'mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}))" "$mutation_result"; }
+mk_fake_neg() { local mutation_result="$1"; python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':sys.argv[1],'mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}))" "$mutation_result"; return 0; }
 
-mk_valid_neg() { python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'valid'}))"; }
+mk_valid_neg() { python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'valid'}))"; return 0; }
 
 VALID_NEG=$(mk_valid_neg)
 

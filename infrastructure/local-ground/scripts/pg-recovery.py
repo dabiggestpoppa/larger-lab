@@ -453,10 +453,20 @@ def _validated_open_path(path: str) -> str:
     return real
 
 
+def _validated_read_text(path: str) -> str:
+    """Read a path as UTF-8 text after containment validation.
+
+    B4-CXR7U9R14: the validated path itself (never the raw argument) is
+    what reaches the open() sink, so the reading sink only ever sees a
+    realpath-resolved, approved-root-contained path.
+    """
+    return open(_validated_open_path(path), encoding="utf-8").read()
+
+
 def _load_protected_inventory(inventory_path, inventory_sha_path):
     """Load and hash-verify the protected inventory (fail closed on tamper)."""
-    inv_doc = open(_validated_open_path(inventory_path), encoding="utf-8").read()
-    inv_sha = open(_validated_open_path(inventory_sha_path), encoding="utf-8").read().strip()
+    inv_doc = _validated_read_text(inventory_path)
+    inv_sha = _validated_read_text(inventory_sha_path).strip()
     if hashlib.sha256(inv_doc.encode()).hexdigest() != inv_sha:
         raise RuntimeError("database inventory tampered (SHA mismatch)")
     return parse_inventory(inv_doc)
@@ -538,9 +548,7 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
     try:
         # 1. protected inventory validated (hash + parse + non-empty truth)
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
-        receipt["inventory_sha256"] = open(
-            _validated_open_path(inventory_sha_path), encoding="utf-8"
-        ).read().strip()
+        receipt["inventory_sha256"] = _validated_read_text(inventory_sha_path).strip()
         probe = parse_probe_spec(probe_spec)
         if not (capture_inventory_rows(inventory) or probe):
             raise RuntimeError("database inventory lists no tables to verify (incomplete backup)")

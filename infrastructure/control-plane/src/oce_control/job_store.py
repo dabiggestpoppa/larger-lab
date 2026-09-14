@@ -19,6 +19,9 @@ from .hashes import generate_id, generate_idempotency_key, generate_correlation_
 from .state_machines import assert_transition, is_valid_transition
 from .authority import AuthorityEngine
 
+# B4-CXR7U9R14: single definition of the shared not-found message
+JOB_NOT_FOUND_MSG = "Job not found"
+
 
 @dataclass
 class JobEnvelope:
@@ -211,7 +214,7 @@ class JobStore:
         """Surrender a lease, returning the job to pending/scheduled."""
         job = self._jobs.get(job_id)
         if job is None:
-            raise KeyError("Job not found")
+            raise KeyError(JOB_NOT_FOUND_MSG)
         if job.lease.get("worker_id") != worker_id:
             raise PermissionError(f"Worker does not own lease")
         job.lease = {}
@@ -254,7 +257,7 @@ class JobStore:
         now = clock.now()
         job = self._jobs.get(job_id)
         if job is None:
-            raise KeyError("Job not found")
+            raise KeyError(JOB_NOT_FOUND_MSG)
         if not job.lease or job.lease.get("worker_id") != worker_id:
             raise PermissionError("Stale or no lease")
         if self.is_lease_expired(job_id):
@@ -273,7 +276,7 @@ class JobStore:
     def cancel_job(self, job_id: str) -> JobEnvelope:
         job = self._jobs.get(job_id)
         if job is None:
-            raise KeyError("Job not found")
+            raise KeyError(JOB_NOT_FOUND_MSG)
         assert_transition("job", job.status, "cancelled")
         job.status = "cancelled"
         job.lease = {}
@@ -283,7 +286,7 @@ class JobStore:
         clock = get_clock()
         job = self._jobs.get(job_id)
         if job is None:
-            raise KeyError("Job not found")
+            raise KeyError(JOB_NOT_FOUND_MSG)
         if job.status in ("running", "failed", "pending"):
             job.status = "quarantined"
             job.failure_envelope = {"error_type": "quarantined", "error_message": reason, "failed_at": clock.now().isoformat(), "retryable": True}

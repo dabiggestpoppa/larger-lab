@@ -237,18 +237,23 @@ def _verify_ops_index(root):
         if opid in seen:
             problems.append(f"duplicate operation_id {opid}")
         seen[opid] = True
-        for rec in op.get("receipts", []):
-            p = os.path.join(root, rec["path"])
-            if not os.path.isfile(p):
-                problems.append(f"{opid}: indexed receipt missing: {rec['path']}")
-                continue
-            if sha256_file(p) != rec.get("sha256") or os.path.getsize(p) != rec.get("size"):
-                problems.append(f"{opid}: indexed receipt hash/size mismatch: {rec['path']}")
+        _check_op_receipts(root, opid, op.get("receipts", []), problems)
     if problems:
         print("UNVERIFIED: " + "; ".join(problems), file=sys.stderr)
         return 1
     print(f"operation index verified ({len(ops)} operations)")
     return 0
+
+
+def _check_op_receipts(root, opid, receipts, problems):
+    """B4-CXR7U9R14: extracted from _verify_ops_index (complexity)."""
+    for rec in receipts:
+        p = os.path.join(root, rec["path"])
+        if not os.path.isfile(p):
+            problems.append(f"{opid}: indexed receipt missing: {rec['path']}")
+            continue
+        if sha256_file(p) != rec.get("sha256") or os.path.getsize(p) != rec.get("size"):
+            problems.append(f"{opid}: indexed receipt hash/size mismatch: {rec['path']}")
 
 
 def main():

@@ -42,6 +42,9 @@ from oce_control.audit_sink import (  # noqa: E402
 # B4-CXR7U9R12: single definitions of governed setting names
 EGRESS_SETTING_NAME = "workers.egress"
 CAPITAL_AUTHORITY_SETTING_NAME = "capital.authority"
+# B4-CXR7U9R14: single definitions of shared identity/owner literals
+OPERATOR_PO_OWNER = "operator(po)"
+POSTGRES_HOST_SETTING = "postgres.host"
 
 
 # --------------------------------------------------------------------------- #
@@ -352,7 +355,7 @@ def build_default_registry() -> SettingsRegistry:
                 owner="policy", enum=("disabled",), default="disabled",
                 validation_rule="only 'disabled' is a legal mode",
                 mutability="immutable", tags=("live", "deny-by-default")))
-    reg(Setting(name=CAPITAL_AUTHORITY_SETTING_NAME, value_type="enum", owner="operator(po)",
+    reg(Setting(name=CAPITAL_AUTHORITY_SETTING_NAME, value_type="enum", owner=OPERATOR_PO_OWNER,
                 enum=("none", "approved"), default="none",
                 validation_rule="locked to 'none' in Book 4 (future-locked "
                                 "'approved')",
@@ -371,7 +374,7 @@ def build_default_registry() -> SettingsRegistry:
                 default=[], validation_rule="empty when dormant",
                 mutability="immutable", tags=("cloud",)))
     reg(Setting(name="cloud.cost_ceiling_usd_per_month", value_type="float",
-                owner="operator(po)", default=0.0,
+                owner=OPERATOR_PO_OWNER, default=0.0,
                 validation_rule="0 means no authorized spend",
                 mutability="immutable", tags=("cloud", "billable")))
 
@@ -557,18 +560,7 @@ class ConfigResolver:
                 raise ValidationError(
                     f"source '{source_level}' must be a mapping")
             for key, value in raw.items():
-                setting = self._registry.get(key)
-                if setting is None:
-                    raise ValidationError(
-                        f"unknown setting '{key}' injected from "
-                        f"{source_level} — fail closed")
-                if (key, source_level) in self._registry.forbidden_sources:
-                    raise ValidationError(
-                        f"setting '{key}' forbids source '{source_level}'")
-                if source_level not in setting.allowed_sources:
-                    raise ValidationError(
-                        f"setting '{key}' does not allow source "
-                        f"'{source_level}' (allowed={setting.allowed_sources})")
+                setting = self._check_source_allowed(key, source_level)
                 # B4-CXR3R4 (CXR3-05): OWNERSHIP is enforced in the real
                 # resolver, not just documented. Policy-owned and
                 # operator(po)-owned settings are safe canonical policy: an
@@ -578,7 +570,7 @@ class ConfigResolver:
                 # path is separately gated (e.g. capital.authority is locked
                 # to 'none' in Book 4). Source precedence (cli > env > file)
                 # and actor authority are DIFFERENT layers; both must hold.
-                if setting.owner in ("policy", "operator(po)") and \
+                if setting.owner in ("policy", OPERATOR_PO_OWNER) and \
                         source_level != SOURCE_DEFAULT:
                     raise ValidationError(
                         f"setting '{key}' is {setting.owner}-owned and may not "
@@ -618,6 +610,28 @@ class ConfigResolver:
         effective = EffectiveConfig(self._registry, resolved, provenance,
                                     fingerprint_config(self._registry, resolved))
         return self._post_validate(effective)
+
+    def _check_source_allowed(self, key: str, source_level: str):
+        """Validate source permissions for one candidate value.
+
+        B4-CXR7U9R14: extracted from resolve() (cognitive complexity).
+        Returns the resolved Setting; raises ValidationError on any
+        unknown-setting / forbidden-source / disallowed-source condition
+        (fail closed, identical messages as before the extraction).
+        """
+        setting = self._registry.get(key)
+        if setting is None:
+            raise ValidationError(
+                f"unknown setting '{key}' injected from "
+                f"{source_level} — fail closed")
+        if (key, source_level) in self._registry.forbidden_sources:
+            raise ValidationError(
+                f"setting '{key}' forbids source '{source_level}'")
+        if source_level not in setting.allowed_sources:
+            raise ValidationError(
+                f"setting '{key}' does not allow source "
+                f"'{source_level}' (allowed={setting.allowed_sources})")
+        return setting
 
     def _post_validate(self, effective: EffectiveConfig) -> EffectiveConfig:
         """Cross-setting runtime gates: network, live, cloud, sandbox."""
@@ -944,7 +958,7 @@ class ConfigAuthorization:
         # operator(po) owned settings are mutable by those actors.
         if setting.owner == self.POLICY_OWNER:
             return False
-        if setting.owner == "operator(po)":
+        if setting.owner == OPERATOR_PO_OWNER:
             return actor == "operator:po"
         # operator-owned
         return actor in ("operator", "operator:po")

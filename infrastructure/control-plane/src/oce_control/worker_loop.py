@@ -109,8 +109,8 @@ def main(argv=None,
         pending = store.jobs_by_status("pending")[: args.max_per_cycle]
         for job in pending:
             try:
-                claimed = worker.claim_work(args.worker_id, token, job.job_id,
-                                            lease_ttl=args.lease_ttl)
+                worker.claim_work(args.worker_id, token, job.job_id,
+                                  lease_ttl=args.lease_ttl)
                 time.sleep(0.5)  # simulated execution
                 done = worker.submit_result(args.worker_id, token, job.job_id,
                                             {"result": "ok", "worker": args.worker_id})

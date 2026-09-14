@@ -126,10 +126,6 @@ class InMemoryLeaseStore(LeaseStore):
             rec["lease_id"] = None
         return True
 
-    def reclaim_expired(self, now_iso: str) -> list[str]:
-        return []
-
-
 class FabricScheduler:
     """Composes authority, outbound sessions and fenced leases so a governed
     job is matched to an authenticated, capable worker, claimed with a fenced

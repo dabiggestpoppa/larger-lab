@@ -66,13 +66,16 @@ from oce_control import local_secrets as ls
 # source it came from.
 CONTROL_PLANE_PORT_SETTING = "control_plane.port"
 
+POSTGRES_HOST_SETTING = "postgres.host"
+POSTGRES_PASSWORD_REF_SETTING = "postgres.password_ref"
+
 ENV_MAP = {
     "control_plane.host": "OCE_CONTROL_PLANE_HOST",
     CONTROL_PLANE_PORT_SETTING: "OCE_CONTROL_PLANE_PORT",
     "control_plane.scheduler_interval": "OCE_SCHEDULER_INTERVAL",
     "control_plane.public_listen": "OCE_CONTROL_PLANE_PUBLIC_LISTEN",
-    "postgres.host": "OCE_POSTGRES_HOST",
-    "postgres.password_ref": "OCE_POSTGRES_PASSWORD_REF",
+    POSTGRES_HOST_SETTING: "OCE_POSTGRES_HOST",
+    POSTGRES_PASSWORD_REF_SETTING: "OCE_POSTGRES_PASSWORD_REF",
     "redis.mode": "OCE_REDIS_MODE",
     "workers.egress": "OCE_WORKERS_EGRESS",
     "sandbox.strict": "OCE_SANDBOX_STRICT",
@@ -236,8 +239,8 @@ def effective_from_env(environ: dict | None = None,
         if alias_var in env and canonical_var not in env:
             env_source[setting_name] = env[alias_var]
     default_source: dict[str, str] = {}
-    if "postgres.password_ref" not in env_source:
-        default_source["postgres.password_ref"] = DEFAULT_PASSWORD_REF
+    if POSTGRES_PASSWORD_REF_SETTING not in env_source:
+        default_source[POSTGRES_PASSWORD_REF_SETTING] = DEFAULT_PASSWORD_REF
     resolver = ConfigResolver(registry if registry is not None
                               else build_default_registry())
     return resolver.resolve({
@@ -278,7 +281,7 @@ def governed_runtime_dsn(environ: dict | None = None,
         ctx = create_activation_context(environ)  # resolve ONCE, pin
         return ctx.runtime_dsn(backend)
     password = resolve_startup_secret(eff, backend)
-    host = eff.get("postgres.host") or ls.PG_HOST
+    host = eff.get(POSTGRES_HOST_SETTING) or ls.PG_HOST
     # CXR3-04 defense in depth: the durable DB host may only be the local
     # loopback while the Book 4 local-first contract is in force.
     if host not in ("127.0.0.1", "localhost"):
@@ -302,7 +305,7 @@ def secret_resolution_evidence(environ: dict | None = None,
     if eff is None:
         eff = effective_from_env(environ)
     backend = backend or ls.RuntimeSecretBackend()
-    ref = eff.get("postgres.password_ref")
+    ref = eff.get(POSTGRES_PASSWORD_REF_SETTING)
     name = ref.split(":", 1)[1] if isinstance(ref, str) and ":" in ref else ref
     try:
         resolve_startup_secret(eff, backend)
@@ -330,7 +333,7 @@ def resolve_startup_secret(eff: EffectiveConfig,
     memory — it is never logged, evidenced, or fingerprinted.
     """
     backend = backend or ls.RuntimeSecretBackend()
-    ref = eff.get("postgres.password_ref")
+    ref = eff.get(POSTGRES_PASSWORD_REF_SETTING)
     from oce_control.config_spine import SECRET_REF_RE
     if not isinstance(ref, str) or not SECRET_REF_RE.match(ref):
         raise ValidationError(
@@ -391,7 +394,7 @@ def validate_configuration(environ: dict | None = None) -> dict:
             "fingerprint": eff.fingerprint,
             "error": None,
         }
-    except (ValidationError, KeyError, ValueError) as exc:
+    except (ValidationError, KeyError) as exc:
         return {
             "ok": False,
             "config_ok": False,
@@ -443,7 +446,7 @@ def validate_runtime_readiness(
                        "`python scripts/oce_local.py configure` to materialize "
                        "the local runtime secret (fail closed)"),
         }
-    except (ValidationError, KeyError, ValueError) as exc:
+    except (ValidationError, KeyError) as exc:
         return {
             "ok": False,
             "ready": False,
@@ -1101,7 +1104,11 @@ def _verify_activation_capability(raw: str, env: dict, role: str | None,
         raise SystemExit(
             "OCE activation lineage BLOCKED: capability backend identity is "
             "not the canonical approved store (B4-CXR6R1)")
-    # canonical control-plane URL is DERIVED from the authenticated host+port
+    # canonical control-plane URL is DERIVED from the authenticated host+port.
+    # Plain HTTP is the approved Book 4 loopback contract: the API serves no
+    # TLS terminator (http_api.py documents this), the port binds 127.0.0.1
+    # only, and the single-principal trusted computing base makes an
+    # on-host TLS endpoint pointless. Do not switch to https here.
     derived_url = (f"http://{envelope.control_plane_host}:"
                    f"{envelope.control_plane_port}")
     if envelope.canonical_control_plane_url != derived_url:
@@ -1251,7 +1258,7 @@ def create_activation_context(
             # other activation gates (no raw exception prose reaches operator)
             raise SystemExit(startup_report(env))
     backend = backend if backend is not None else ls.RuntimeSecretBackend()
-    ref = eff.get("postgres.password_ref")
+    ref = eff.get(POSTGRES_PASSWORD_REF_SETTING)
     name = ref.split(":", 1)[1]
     try:
         resolve_startup_secret(eff, backend)  # reference must actually resolve
@@ -1271,7 +1278,7 @@ def create_activation_context(
     host = str(eff.get("control_plane.host"))
     port = int(eff.get(CONTROL_PLANE_PORT_SETTING))
     interval = int(eff.get("control_plane.scheduler_interval"))
-    pg_host = str(eff.get("postgres.host"))
+    pg_host = str(eff.get(POSTGRES_HOST_SETTING))
     context_id = hashlib.sha256(
         f"{cfg_fp}|{ref}|{generation}|{revoked}|local-runtime-store-v1".encode(
             "utf-8")).hexdigest()
