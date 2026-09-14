@@ -1,0 +1,35 @@
+{
+  "registry_version": "0.2",
+  "effective_date": "2026-09-14",
+  "supersedes": "TRADING_SERVICE_PACKAGE_REGISTRY_v0.1.json",
+  "default_project_floor_usd": 150,
+  "default_stack": ["python", "pine_script"],
+  "translation_targets": ["python", "pine_script", "ninjatrader_pilot"],
+  "decline_by_default": ["mt5", "mql5", "ea_development"],
+  "packages": [
+    {"id":"TS-PKG-01","name":"Pine Quick Build / Repair","price_min_usd":150,"price_max_usd":300,"market_band":"UPPER_LOW_END","launch_priority":"HIGH","platforms":["upwork","fiverr"],"capabilities":["pine_indicator","pine_debug","alerts","bounded_refactor"],"max_revision_rounds":1,"research_depth":"LOW","qcae_required":false},
+    {"id":"TS-PKG-02","name":"Custom TradingView Indicator Pro","price_min_usd":300,"price_max_usd":650,"market_band":"MIDDLE","launch_priority":"VERY_HIGH","platforms":["upwork","fiverr"],"capabilities":["pine_indicator","mtf_logic","session_logic","dashboards","alerts","state_logic"],"max_revision_rounds":2,"research_depth":"LOW_TO_MEDIUM","qcae_required":false},
+    {"id":"TS-PKG-03","name":"Indicator to Strategy / Strategy Engineering","price_min_usd":400,"price_max_usd":850,"market_band":"MIDDLE","launch_priority":"VERY_HIGH","platforms":["upwork","fiverr"],"capabilities":["strategy_spec","pine_strategy","python_strategy","risk_rules","baseline_backtest"],"max_revision_rounds":1,"research_depth":"MEDIUM","qcae_required":false},
+    {"id":"TS-PKG-04","name":"Python Backtest & Strategy Validation","price_min_usd":500,"price_max_usd":1200,"market_band":"MIDDLE","launch_priority":"VERY_HIGH","platforms":["upwork","fiverr","direct"],"capabilities":["python_backtest","oos","walk_forward","cost_model","parameter_stability","regime_analysis","falsification"],"max_revision_rounds":1,"research_depth":"HIGH","qcae_required":false},
+    {"id":"TS-PKG-05","name":"Strategy Audit / Forensic Debug","price_min_usd":350,"price_max_usd":900,"market_band":"MIDDLE","launch_priority":"HIGH","platforms":["upwork","fiverr","direct"],"capabilities":["logic_audit","repaint_audit","lookahead_audit","data_time_audit","backtest_forensics","bounded_repair"],"max_revision_rounds":1,"research_depth":"MEDIUM_TO_HIGH","qcae_required":false},
+    {"id":"TS-PKG-06","name":"Pine-Python Translation + Equivalence","price_min_usd":500,"price_max_usd":1200,"market_band":"MIDDLE","launch_priority":"HIGH","platforms":["upwork","fiverr","direct"],"capabilities":["pine","python","semantic_mapping","fixture_testing","signal_equivalence"],"max_revision_rounds":1,"research_depth":"MEDIUM","qcae_required":false},
+    {"id":"TS-PKG-07","name":"NinjaTrader Translation Pilot","price_min_usd":750,"price_max_usd":1500,"market_band":"MIDDLE_TO_HIGH","launch_priority":"PILOT","platforms":["upwork","direct"],"capabilities":["strategy_spec","ninjatrader","equivalence_testing"],"max_revision_rounds":1,"research_depth":"MEDIUM","qcae_required":true},
+    {"id":"TS-PKG-08","name":"Quant Research Sprint","price_min_usd":900,"price_max_usd":2000,"market_band":"MIDDLE_TO_HIGH","launch_priority":"HIGH","platforms":["upwork","direct"],"capabilities":["hypothesis_design","state_taxonomy","conditional_analysis","bootstrap","null_models","fdr","regime_analysis"],"max_revision_rounds":1,"research_depth":"VERY_HIGH","qcae_required":false},
+    {"id":"TS-PKG-09","name":"Quant Research Infrastructure Build","price_min_usd":1500,"price_max_usd":null,"market_band":"HIGH_TICKET","launch_priority":"SELECTIVE","platforms":["upwork","direct"],"capabilities":["data_pipeline","research_runner","experiment_registry","backtest_engine","analytics_infrastructure","evidence_store"],"max_revision_rounds":null,"research_depth":"VERY_HIGH","qcae_required":"POSSIBLE"},
+    {"id":"TS-PKG-10","name":"Ongoing Research / Engineering Retainer","price_min_usd":750,"price_max_usd":null,"billing_period":"MONTH","market_band":"RECURRING","launch_priority":"UPSELL","platforms":["upwork","direct"],"capabilities":["research_queue","maintenance","indicator_enhancement","validation_updates","data_qa"],"max_revision_rounds":null,"research_depth":"VARIABLE","qcae_required":"POSSIBLE"},
+    {"id":"TS-PKG-11","name":"Idea / Model to Feasibility & System Specification","price_min_usd":350,"price_max_usd":900,"market_band":"MIDDLE","launch_priority":"VERY_HIGH","platforms":["upwork","fiverr","direct"],"capabilities":["model_formalization","ambiguity_mapping","automation_feasibility","baseline_research","indicator_or_system_routing"],"max_revision_rounds":1,"research_depth":"MEDIUM","qcae_required":false,"valid_outcomes":["IMPLEMENT_AS_SYSTEM","BUILD_DECISION_SUPPORT_INDICATOR","RESEARCH_MORE","DO_NOT_AUTOMATE"]},
+    {"id":"TS-PKG-12","name":"Quick Research / Hypothesis Test","price_min_usd":150,"price_max_usd":450,"market_band":"UPPER_LOW_END_TO_MIDDLE","launch_priority":"VERY_HIGH","platforms":["upwork","fiverr","direct"],"capabilities":["focused_hypothesis_test","bounded_data_check","descriptive_statistics","conditional_analysis","research_memo"],"max_revision_rounds":1,"research_depth":"LOW_TO_MEDIUM","qcae_required":false,"scope_limits":{"primary_hypotheses":1,"open_ended_parameter_search":false,"production_implementation":false}},
+    {"id":"TS-PKG-13","name":"Model Optimization & Robustness","price_min_usd":500,"price_max_usd":1500,"market_band":"MIDDLE_TO_HIGH","launch_priority":"VERY_HIGH","platforms":["upwork","fiverr","direct"],"capabilities":["parameter_surface","walk_forward","oos","cost_sensitivity","regime_analysis","stability_mapping","baseline_comparison"],"max_revision_rounds":1,"research_depth":"HIGH","qcae_required":false,"requires_reproducible_baseline":true,"valid_outcomes":["IMPROVEMENT_ROBUST","IMPROVEMENT_CONDITIONAL","NO_MATERIAL_IMPROVEMENT","OPTIMIZATION_EXPOSED_FRAGILITY","INSUFFICIENT_EVIDENCE"]}
+  ],
+  "global_gates": {
+    "profit_guarantee_requests": "DECLINE",
+    "protected_indicator_decompilation": "DECLINE",
+    "mt5_or_mql5": "DECLINE_BY_DEFAULT",
+    "ambiguous_acceptance_criteria": "CLARIFY_OR_DECLINE",
+    "project_under_floor": "OPERATOR_EXCEPTION_OR_DECLINE",
+    "new_capability": "QCAE_COST_BEFORE_BID",
+    "optimization_without_reproducible_baseline": "REQUIRE_BASELINE_FIRST",
+    "idea_not_fully_automatable": "OFFER_DECISION_SUPPORT_INDICATOR_OR_RESEARCH",
+    "quick_research_scope_expands": "REQUOTE_TO_PKG_04_OR_PKG_08"
+  }
+}
