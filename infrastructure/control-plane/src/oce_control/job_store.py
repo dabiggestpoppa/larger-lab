@@ -258,7 +258,7 @@ class JobStore:
         if not job.lease or job.lease.get("worker_id") != worker_id:
             raise PermissionError("Stale or no lease")
         if self.is_lease_expired(job_id):
-            raise PermissionError(f"Stale worker cannot commit")
+            raise PermissionError("Stale worker cannot commit")
         if success:
             assert_transition("job", job.status, "succeeded")
             job.status = "succeeded"

@@ -20,8 +20,10 @@ from oce_control.pg_worker import (
 
 
 def test_admission_token_hash_is_deterministic():
-    assert hash_admission_token("tok-alpha") == hash_admission_token("tok-alpha")
-    assert hash_admission_token("tok-alpha") != hash_admission_token("tok-beta")
+    first = hash_admission_token("tok-alpha")
+    second = hash_admission_token("tok-alpha")
+    assert first == second
+    assert first != hash_admission_token("tok-beta")
     assert len(hash_admission_token("anything")) == 64  # sha256 hexdigest
 
 

@@ -32,7 +32,7 @@ RUN_ID="$OCE_RUN_ID"
 # would clobber authoritative artifacts mid-run.
 SCRATCH_DIR="$(mktemp -d "${TMPDIR:-/tmp}/oce-adv-scratch-XXXXXX")"
 
-# Final evidence directory (where adversarial-results.json is written).
+# Final evidence directory (where the adversarial results file is written).
 # R3G: in authoritative mode OCE_EVIDENCE_DIR is mandatory — no default
 # inside the repository.
 if [[ -n "${OCE_EVIDENCE_DIR:-}" ]]; then
@@ -49,6 +49,7 @@ EVIDENCE_DIR=$(cd "$EVIDENCE_DIR" && pwd)
 # Temp dirs OUTSIDE the repository (no pollution of the authoritative source).
 BACKUP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/oce-adv-backup-XXXXXX")"
 RESULTS_DIR="$SCRATCH_DIR/results"
+ADVERSARIAL_RESULTS_BASENAME="adversarial-results.json"
 mkdir -p "$RESULTS_DIR"
 trap 'rm -rf "$BACKUP_DIR" "$SCRATCH_DIR"' EXIT
 
@@ -58,6 +59,7 @@ ENGINE_VERSION=$(python3 "$ENGINE" --version-json 2>/dev/null | python3 -c "impo
     exit 1
 }
 
+ADV_RESULTS_NAME="adversarial-results"
 PASS_COUNT=0
 FAIL_COUNT=0
 TOTAL_COUNT=0
@@ -110,7 +112,8 @@ get_result() {
 
 scratch_path() {
     # Windows-safe path to a file inside the scratch dir.
-    win_path "$SCRATCH_DIR/$1"
+    local rel="$1"
+    win_path "$SCRATCH_DIR/$rel"
     return 0
 }
 
@@ -351,14 +354,14 @@ run_meta() {
     mkdir -p "$BACKUP_DIR"
     echo "$fake_json" > "$BACKUP_DIR/$meta_id-fake.json"
     # R3G: fake fixtures are evaluated against the SCRATCH dir only —
-    # the real adversarial-results.json in the final evidence directory
+    # the real results file in the final evidence directory
     # is never touched.
-    cp "$BACKUP_DIR/$meta_id-fake.json" "$SCRATCH_DIR/adversarial-results.json"
+    cp "$BACKUP_DIR/$meta_id-fake.json" "$SCRATCH_DIR/$ADVERSARIAL_RESULTS_BASENAME"
     local rc=0
     python3 "$ENGINE_WIN" --only "FAIL-CLOSED" --evidence-dir "$SCRATCH_DIR_WIN" >/dev/null 2>&1 || rc=$?
     local fr
     fr=$(get_result "FAIL-CLOSED")
-    rm -f "$SCRATCH_DIR/adversarial-results.json"
+    rm -f "$SCRATCH_DIR/$ADVERSARIAL_RESULTS_BASENAME"
     if [[ "$fr" == "FAIL" || "$fr" == "BLOCKED" ]]; then
         echo "    PASS (FAIL-CLOSED=$fr, exit=$rc)"; PASS_COUNT=$((PASS_COUNT + 1))
         write_meta_result "$meta_id" "PASS" "$desc" "$fixture_type" "$invalid_condition" \
@@ -371,7 +374,7 @@ run_meta() {
     return 0
 }
 
-mk_fake_neg() { python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':sys.argv[1],'mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}))" "$1"; }
+mk_fake_neg() { local mutation_result="$1"; python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':sys.argv[1],'mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}))" "$mutation_result"; }
 
 mk_valid_neg() { python3 -c "import json,sys;print(json.dumps({'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'valid'}))"; }
 
@@ -381,82 +384,82 @@ VALID_NEG=$(mk_valid_neg)
 FAKE_NEG=$(mk_fake_neg "BLOCKED")
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
 run_meta "FAKE-01" "BLOCKED mutation_result rejected" "$FAKE_ADV" \
-    "adversarial-results" "mutation_result set to BLOCKED instead of FAIL"
+    ADV_RESULTS_NAME "mutation_result set to BLOCKED instead of FAIL"
 
 # FAKE-02: SKIPPED mutation_result
 FAKE_NEG=$(mk_fake_neg "SKIPPED")
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
 run_meta "FAKE-02" "SKIPPED mutation_result rejected" "$FAKE_ADV" \
-    "adversarial-results" "mutation_result set to SKIPPED instead of FAIL"
+    ADV_RESULTS_NAME "mutation_result set to SKIPPED instead of FAIL"
 
 # FAKE-03: ERROR mutation_result
 FAKE_NEG=$(mk_fake_neg "ERROR")
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
 run_meta "FAKE-03" "ERROR mutation_result rejected" "$FAKE_ADV" \
-    "adversarial-results" "mutation_result set to ERROR instead of FAIL"
+    ADV_RESULTS_NAME "mutation_result set to ERROR instead of FAIL"
 
 # FAKE-04: NOT_FOUND mutation_result
 FAKE_NEG=$(mk_fake_neg "NOT_FOUND")
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
 run_meta "FAKE-04" "NOT_FOUND mutation_result rejected" "$FAKE_ADV" \
-    "adversarial-results" "mutation_result set to NOT_FOUND instead of FAIL"
+    ADV_RESULTS_NAME "mutation_result set to NOT_FOUND instead of FAIL"
 
 # FAKE-05: PASS mutation_result
 FAKE_NEG=$(mk_fake_neg "PASS")
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
 run_meta "FAKE-05" "PASS mutation_result rejected" "$FAKE_ADV" \
-    "adversarial-results" "mutation_result falsely set to PASS"
+    ADV_RESULTS_NAME "mutation_result falsely set to PASS"
 
 # FAKE-06: mutation_exit=0 with mutation_result=FAIL
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':0,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
 run_meta "FAKE-06" "mutation_exit=0 rejected" "$FAKE_ADV" \
-    "adversarial-results" "mutation_exit=0 despite mutation_result=FAIL"
+    ADV_RESULTS_NAME "mutation_exit=0 despite mutation_result=FAIL"
 
 # FAKE-07: empty mutation_result
 FAKE_NEG=$(mk_fake_neg "")
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[$FAKE_NEG],'meta_tests':[]}))")
 run_meta "FAKE-07" "Empty mutation_result rejected" "$FAKE_ADV" \
-    "adversarial-results" "mutation_result is empty string"
+    ADV_RESULTS_NAME "mutation_result is empty string"
 
 # FAKE-08: empty test lists
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':0,'PASS':0,'FAIL':0},'suite_result':'PASS','negative_tests':[],'meta_tests':[]}))")
 run_meta "FAKE-08" "Empty test lists rejected" "$FAKE_ADV" \
-    "adversarial-results" "no negative or meta tests present"
+    ADV_RESULTS_NAME "no negative or meta tests present"
 
 # FAKE-09: wrong schema version
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'1.0.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
 run_meta "FAKE-09" "Wrong schema version rejected" "$FAKE_ADV" \
-    "adversarial-results" "schema_version=1.0.0 instead of 3.6.0"
+    ADV_RESULTS_NAME "schema_version=1.0.0 instead of 3.6.0"
 
 # FAKE-10: suite_result=FAIL
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'FAIL','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
 run_meta "FAKE-10" "suite_result=FAIL rejected" "$FAKE_ADV" \
-    "adversarial-results" "suite_result set to FAIL"
+    ADV_RESULTS_NAME "suite_result set to FAIL"
 
 # FAKE-11: missing RUN_ID
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
 run_meta "FAKE-11" "Missing RUN_ID rejected" "$FAKE_ADV" \
-    "adversarial-results" "run_id field missing entirely"
+    ADV_RESULTS_NAME "run_id field missing entirely"
 
 # FAKE-12: mixed RUN_ID
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'deadbeef1234','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
 run_meta "FAKE-12" "Mixed RUN_ID rejected" "$FAKE_ADV" \
-    "adversarial-results" "run_id=deadbeef1234 does not match current run"
+    ADV_RESULTS_NAME "run_id=deadbeef1234 does not match current run"
 
 # FAKE-13: N/A baseline_result
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'N/A','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'a','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
 run_meta "FAKE-13" "N/A baseline_result rejected" "$FAKE_ADV" \
-    "adversarial-results" "baseline_result=N/A instead of PASS"
+    ADV_RESULTS_NAME "baseline_result=N/A instead of PASS"
 
 # FAKE-14: empty baseline hash
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'','restored_sha256':'a','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
 run_meta "FAKE-14" "Empty baseline hash rejected" "$FAKE_ADV" \
-    "adversarial-results" "original_sha256 is empty"
+    ADV_RESULTS_NAME "original_sha256 is empty"
 
 # FAKE-15: hash mismatch
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[{'test_id':'X','result':'PASS','mutation_result':'FAIL','mutation_exit':1,'baseline_result':'PASS','baseline_exit':0,'post_restore_result':'PASS','post_restore_exit':0,'original_sha256':'aaa','restored_sha256':'bbb','expected_check':'X','observed_check':'X','reason':'fake'}],'meta_tests':[]}))")
 run_meta "FAKE-15" "Hash mismatch rejected" "$FAKE_ADV" \
-    "adversarial-results" "restored_sha256 != original_sha256"
+    ADV_RESULTS_NAME "restored_sha256 != original_sha256"
 
 # FAKE-16: meta-test without fixture_type
 FAKE_ADV=$(python3 -c "import json;print(json.dumps({'schema_version':'3.6.0','validator_version':'3.6.0','run_id':'$RUN_ID','suite':'B1-I1R3F-adversarial','totals':{'total':1,'PASS':1,'FAIL':0},'suite_result':'PASS','negative_tests':[],'meta_tests':[{'test_id':'M1','result':'PASS','fixture_type':'','invalid_condition':'bad','expected_rejection':'FAIL','observed_rejection':'FAIL','rejection_exit':1,'reason':'fake'}]}))")

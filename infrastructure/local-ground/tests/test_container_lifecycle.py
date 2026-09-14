@@ -421,7 +421,8 @@ def test_ctl_redis_invalidation_failure_blocks_success(oce_stack, tmp_path):
                     "--from", str(bk), "--confirm-local-target", oc.PG_DB], check=False)
         assert r.returncode != 0, "restore must not report clean success when redis invalidation fails"
         combo = r.stdout + r.stderr
-        assert "BLOCKED" in combo and "redis" in combo.lower(), combo
+        assert "BLOCKED" in combo, combo
+        assert "redis" in combo.lower(), combo
         # postgres truth is intact (promotion succeeded before the redis step)
         r2 = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-tAc",
                                     "SELECT k || '=' || v FROM backup_probe ORDER BY k;"])

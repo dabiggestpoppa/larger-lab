@@ -30,15 +30,6 @@ def payload_hash(payload: Any) -> str:
     return sha256_hex(canonical)
 
 
-def fingerprint_rows(rows: list[dict]) -> str:
-    """Compute MD5 fingerprint over sorted canonical row-JSON.
-
-    Matches B1's protected-inventory fingerprint pattern.
-    """
-    canonical = json.dumps(sorted(rows, key=json.dumps), sort_keys=True, separators=(",", ":"))
-    return hashlib.md5(canonical.encode("utf-8")).hexdigest()
-
-
 def generate_id() -> str:
     """Generate a 32-char hex ID (128 bits of entropy)."""
     import secrets

@@ -25,6 +25,8 @@ GITHUB_REF = os.environ.get("GITHUB_REF_NAME", "")
 
 # Canonical evidence artifact names (S1192: literal repeated 3x).
 TEST_SUMMARY_NAME = "test-summary.json"
+STAGE_STATUS_NAME = "stage-status.json"
+EVIDENCE_MANIFEST_NAME = "evidence-manifest.json"
 
 
 
@@ -36,7 +38,7 @@ REQUIRED = [
     "adversarial-output.txt", "cloud-plan.txt", "cloud-apply-denial.txt",
     "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
     "local-after-denied.json", "source-clean.json", "cleanup.json",
-    "stage-log.txt", "stage-status.json", "evidence-manifest.json",
+    "stage-log.txt", STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME,
 ]
 
 checks = []  # (id, name, ok, detail)
@@ -46,8 +48,34 @@ def add(cid, name, ok, detail=""):
     checks.append({"id": cid, "name": name, "ok": bool(ok), "detail": str(detail)})
 
 
+def _evidence_root() -> str:
+    """Pipeline-declared evidence boundary (B4-CXR7U9R13, S2077).
+
+    The evidence directory this gate may read/write is the one the
+    validation pipeline exported as OCE_EVIDENCE_DIR before launching
+    the gate - never the raw argv value alone. The artifact path cannot
+    self-approve its own containment; test harnesses declare their own
+    root through the same channel."""
+    root = os.environ.get("OCE_EVIDENCE_DIR", "")
+    if not root:
+        raise RuntimeError(
+            "OCE_EVIDENCE_DIR is not set: the evidence boundary must be "
+            "declared by the pipeline, not by argv")
+    return os.path.normcase(os.path.realpath(os.path.abspath(root)))
+
+
+def _validated_path(path):
+    real = os.path.normcase(os.path.realpath(os.path.abspath(path)))
+    root = _evidence_root()
+    if not real.startswith(root + os.sep) and real != root:
+        raise RuntimeError(
+            f"evidence path outside the declared OCE_EVIDENCE_DIR "
+            f"boundary: {path}")
+    return real
+
+
 def load_json(path):
-    with open(path, "r", encoding="utf-8") as f:
+    with open(_validated_path(path), "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -165,7 +193,7 @@ def main():
     json_files = ["identity.json", TEST_SUMMARY_NAME, "adversarial-results.json",
                   "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
                   "local-after-denied.json", "source-clean.json", "cleanup.json",
-                  "stage-status.json", "evidence-manifest.json"]
+                  STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME]
     parse_ok = True
     for jf in json_files:
         p = os.path.join(ev, jf)
@@ -180,7 +208,7 @@ def main():
     # 3. One nonempty OCE_RUN_ID everywhere
     run_env = os.environ.get("OCE_RUN_ID", "")
     run_ids = set()
-    for jf in ["identity.json", "stage-status.json", "evidence-manifest.json"]:
+    for jf in ["identity.json", STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME]:
         p = os.path.join(ev, jf)
         if os.path.isfile(p):
             d = load_json(p)
@@ -214,7 +242,7 @@ def main():
     # 9-11. Commit/tree arguments used and match
     commit_ok = ident.get("commit", "") == commit == ident.get("tested_commit", commit)
     tree_ok = ident.get("tree", "") == tree
-    man = load_json(os.path.join(ev, "evidence-manifest.json"))
+    man = load_json(os.path.join(ev, EVIDENCE_MANIFEST_NAME))
     commit_ok = commit_ok and man.get("implementation_commit", "") == commit
     tree_ok = tree_ok and man.get("implementation_tree", "") == tree
     add("gate-09-implementation-commit", "implementation commit matches tested checkout", commit_ok, commit)
@@ -493,7 +521,7 @@ def main():
     add("gate-31-manifest-hashes-sizes", "manifest hashes and sizes match final files", manifest_ok)
 
     # 32. Cloud fields remain deferred / not deployed / zero / 0 mutations
-    st = load_json(os.path.join(ev, "stage-status.json"))
+    st = load_json(os.path.join(ev, STAGE_STATUS_NAME))
     cloud_ok = (st.get("cloud_activation_state") == "DEFERRED_BY_OPERATOR"
                 and st.get("cloud_deployment_state") == "NOT_DEPLOYED"
                 and st.get("cloud_cost_state") == "ZERO"
@@ -523,7 +551,7 @@ def main():
         "totals": {"PASS": passed_count, "FAIL": len(failed), "total": len(checks)},
         "generated_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
-    with open(os.path.join(ev, "independent-gate.json"), "w", encoding="utf-8") as f:
+    with open(_validated_path(os.path.join(ev, "independent-gate.json")), "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
     print(f"INDEPENDENT GATE [{mode}]: {result} ({passed_count}/{len(checks)} checks)")
     for c in failed:

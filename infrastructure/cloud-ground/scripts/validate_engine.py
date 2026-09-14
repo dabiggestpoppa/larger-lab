@@ -31,6 +31,8 @@ VERSION = "3.6.0"
 YAML_GLOB = "*.yaml"
 COMPOSE_RENDER_NAME = "Compose foundation renders"
 ADVERSARIAL_RESULTS_NAME = "adversarial-results.json"
+STAGE_STATUS_NAME = "stage-status.json"
+JSON_PARSE_LABEL = "JSON contract files parse"
 YML_GLOB = "*.yml"
 META_TEST_EVIDENCE_NAME = "Meta-test rejection evidence complete"
 CHECK_COST_THRESHOLDS = "Cost thresholds match ratification"
@@ -445,11 +447,11 @@ class Validator:
                 details.append(f"{f.name}: {msg}")
         total = passed + failed
         if total == 0:
-            self.add("JSON-PARSE", "JSON contract files parse", True, "BLOCKED", "No JSON files", "0 files")
+            self.add("JSON-PARSE", JSON_PARSE_LABEL, True, "BLOCKED", "No JSON files", "0 files")
         elif failed == 0:
-            self.add("JSON-PARSE", "JSON contract files parse", True, "PASS", f"{passed}/{total}", "All parse")
+            self.add("JSON-PARSE", JSON_PARSE_LABEL, True, "PASS", f"{passed}/{total}", "All parse")
         else:
-            self.add("JSON-PARSE", "JSON contract files parse", True, "FAIL", f"{passed}/{total}",
+            self.add("JSON-PARSE", JSON_PARSE_LABEL, True, "FAIL", f"{passed}/{total}",
                       "\n".join(details[:10]))
 
     def check_schema_validity(self):
@@ -1359,7 +1361,7 @@ class Validator:
         for fname, label in [
             (STATIC_RESULTS_NAME, "static-validation-results"),
             (ADVERSARIAL_RESULTS_NAME, "adversarial-results"),
-            ("stage-status.json", "stage-status"),
+            (STAGE_STATUS_NAME, "stage-status"),
         ]:
             path = ev_dir / fname
             if path.exists():
@@ -1619,7 +1621,7 @@ class Validator:
             STATIC_RESULTS_NAME,
             "static-validation-summary.md",
             ADVERSARIAL_RESULTS_NAME,
-            "stage-status.json",
+            STAGE_STATUS_NAME,
             "worktree-cleanup.json",
             "regression-output.txt",
             "stage-log.txt",
@@ -1779,7 +1781,7 @@ class Validator:
                     "dependency": r.output,
                 })
         self._atomic_write(
-            ev_dir / "stage-status.json",
+            ev_dir / STAGE_STATUS_NAME,
             json.dumps(status, indent=2, ensure_ascii=False),
         )
 

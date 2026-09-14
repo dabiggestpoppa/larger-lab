@@ -11,6 +11,7 @@ from oce_control.worker_fabric import (WorkerAuthority, WorkerIdentity, Capabili
                                        SessionExpired, SessionRevoked, WorkerDraining,
                                        FabricScheduler, JobEnvelope, InMemoryLeaseStore,
                                        StaleFence, LateResult, DuplicateEffect)
+from oce_control.worker_leases import LeaseFencingError
 
 
 def _admitted_authority() -> WorkerAuthority:
@@ -167,7 +168,7 @@ class TestFencedLeases:
         assert c1["fence"] == 1
         assert len(c1["lease_id"]) >= 32
         # concurrent duplicate claim rejected
-        with pytest.raises(Exception):
+        with pytest.raises(LeaseFencingError):
             fs.claim(j, "wkr-2")
 
     def test_stale_fence_rejected(self):

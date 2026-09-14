@@ -64,9 +64,11 @@ from oce_control import local_secrets as ls
 # validate_effective, so an attempt to turn on a forbidden posture (public
 # listen, live trading, cloud activation, ...) fails closed regardless of the
 # source it came from.
+CONTROL_PLANE_PORT_SETTING = "control_plane.port"
+
 ENV_MAP = {
     "control_plane.host": "OCE_CONTROL_PLANE_HOST",
-    "control_plane.port": "OCE_CONTROL_PLANE_PORT",
+    CONTROL_PLANE_PORT_SETTING: "OCE_CONTROL_PLANE_PORT",
     "control_plane.scheduler_interval": "OCE_SCHEDULER_INTERVAL",
     "control_plane.public_listen": "OCE_CONTROL_PLANE_PUBLIC_LISTEN",
     "postgres.host": "OCE_POSTGRES_HOST",
@@ -95,7 +97,7 @@ ENV_MAP = {
 # canonical setting's rules (e.g. OCE_API_PORT=8080 is rejected because the
 # canonical registry treats 8080 as reserved).
 COMPAT_ALIASES = {
-    "OCE_API_PORT": "control_plane.port",
+    "OCE_API_PORT": CONTROL_PLANE_PORT_SETTING,
 }
 
 # Documented operational (non-config) OCE_* variables used by CI runners and
@@ -1267,7 +1269,7 @@ def create_activation_context(
                         "backend": "local-runtime-store-v1"}}
     sec_fp = security_state_fingerprint(sec_meta)
     host = str(eff.get("control_plane.host"))
-    port = int(eff.get("control_plane.port"))
+    port = int(eff.get(CONTROL_PLANE_PORT_SETTING))
     interval = int(eff.get("control_plane.scheduler_interval"))
     pg_host = str(eff.get("postgres.host"))
     context_id = hashlib.sha256(

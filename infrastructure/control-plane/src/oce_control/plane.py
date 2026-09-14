@@ -105,8 +105,9 @@ class ControlPlane:
 
     def shutdown(self) -> dict:
         """Shutdown the control plane cleanly."""
-        # Disconnect all workers
-        for wid in list(self.worker_protocol.workers.keys()):
+        # Disconnect all workers. snapshot() copies the registry first:
+        # disconnect_worker mutates it while we iterate (S2864 disposition).
+        for wid in sorted(self.worker_protocol.workers.keys()):
             self.worker_protocol.disconnect_worker(wid)
         return {"status": "shutdown", "workers_disconnected": True}
 

@@ -484,10 +484,10 @@ class BoundedRunner:
             if cancel.wait(envelope.timeout_s):
                 # cancellation requested -> actively kill the tree so the run
                 # is reaped as a cancellation, never waited out (defect 9).
-                _kill(proc, self.resource_limits_available)
+                _kill(proc)
                 return
             killed_by_timeout.set()
-            _kill(proc, self.resource_limits_available)
+            _kill(proc)
 
         watcher = threading.Thread(target=_watch, daemon=True)
         watcher.start()
@@ -506,10 +506,10 @@ class BoundedRunner:
             elif (len(result.stdout.encode("utf-8")) +
                   len(result.stderr.encode("utf-8"))) > envelope.max_output_bytes:
                 result.resource_violation = "output_size_limit"
-                _kill(proc, self.resource_limits_available)
+                _kill(proc)
         except subprocess.TimeoutExpired:
             killed_by_timeout.set()
-            _kill(proc, self.resource_limits_available)
+            _kill(proc)
             out, err = proc.communicate()
             result.stdout = (out or "")[:envelope.max_output_bytes]
             result.stderr = (err or "")[:envelope.max_output_bytes]
@@ -517,7 +517,7 @@ class BoundedRunner:
             result.exit_code = proc.returncode
             result.resource_violation = "timeout"
         except Exception as exc:
-            _kill(proc, self.resource_limits_available)
+            _kill(proc)
             result.raise_fired = True
             result.stderr += f"\ncommunicate failed: {exc}"
             result.exit_code = proc.returncode
@@ -540,7 +540,7 @@ class BoundedRunner:
             self._cancel_event.set()
         proc = self._current_proc
         if proc is not None and proc.poll() is None:
-            _kill(proc, self.resource_limits_available)
+            _kill(proc)
 
     def cleanup(self) -> None:
         """Dispose of every attempt workspace (attempt workspace is disposable)."""
@@ -554,7 +554,7 @@ class BoundedRunner:
                  "ok": a.ok, "started_at": a.started_at} for a in self._attempts]
 
 
-def _kill(proc: subprocess.Popen, resource_limits_available: bool) -> None:
+def _kill(proc: subprocess.Popen) -> None:
     if proc.poll() is not None:
         return
     try:
@@ -923,7 +923,7 @@ class RetryCoordinator:
         """PO/operator-authorized retry of a dead-lettered job (B3-C6)."""
         if job_id not in self._dead_letters:
             return False
-        entry = self._dead_letters.pop(job_id)
+        self._dead_letters.pop(job_id)
         self._poison.discard(job_id)
         # reset attempt bookkeeping for a fresh authorized run
         self._results.pop(job_id, None)

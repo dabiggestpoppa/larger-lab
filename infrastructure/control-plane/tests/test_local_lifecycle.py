@@ -422,7 +422,8 @@ def test_cxr5r1_migrate_argv_has_no_password(monkeypatch):
     ll.migrate(ctx=None)
     argv = " ".join(seen["cmd"])
     pw = json.loads(ls.SECRETS_FILE.read_text(encoding="utf-8"))["postgres_password"]
-    assert "--db" not in argv and "--dsn" not in argv
+    assert "--db" not in argv
+    assert "--dsn" not in argv
     assert "postgresql://" not in argv
     assert pw not in argv               # canary: password bytes never in argv
 

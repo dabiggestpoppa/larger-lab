@@ -15,85 +15,109 @@ from pathlib import Path
 from typing import Any
 
 
+def _type_ok(t: str, inst: Any) -> bool:
+    """Does *inst* satisfy the declared JSON-schema *type*?"""
+    return ((t == "object" and isinstance(inst, dict))
+            or (t == "array" and isinstance(inst, list))
+            or (t == "string" and isinstance(inst, str))
+            or (t == "number" and isinstance(inst, (int, float)) and not isinstance(inst, bool))
+            or (t == "boolean" and isinstance(inst, bool))
+            or (t == "integer" and isinstance(inst, int) and not isinstance(inst, bool)))
+
+
+def _validate_object(inst: dict, sch: dict, path: str) -> list[str]:
+    """Object keywords: properties, required, enum/const, if/then/else, allOf."""
+    errors: list[str] = []
+    if sch.get("additionalProperties") is False:
+        extra = set(inst) - set(sch.get("properties", {}))
+        if extra:
+            errors.append(f"{path}: unexpected properties {sorted(extra)}")
+
+    for req in sch.get("required", []):
+        if req not in inst:
+            errors.append(f"{path}: missing required '{req}'")
+
+    if "enum" in sch and inst not in sch["enum"]:
+        errors.append(f"{path}: value '{inst}' not in enum {sch['enum']}")
+
+    if "const" in sch and inst != sch["const"]:
+        errors.append(f"{path}: expected const {sch['const']!r}, got {inst!r}")
+
+    for k, subs in sch.get("properties", {}).items():
+        if k in inst:
+            errors.extend(mini_validate(inst[k], subs, f"{path}.{k}"))
+
+    if "if" in sch:
+        if_errors = mini_validate(inst, sch["if"], path)
+        if not if_errors:
+            errors.extend(mini_validate(inst, sch.get("then", {}), path))
+        elif "else" in sch:
+            errors.extend(mini_validate(inst, sch["else"], path))
+
+    if "allOf" in sch:
+        for sub in sch["allOf"]:
+            errors.extend(mini_validate(inst, sub, path))
+    return errors
+
+
+def _validate_array(inst: list, sch: dict, path: str) -> list[str]:
+    """Array keywords: minItems and per-item schema recursion."""
+    errors: list[str] = []
+    if "minItems" in sch and len(inst) < sch["minItems"]:
+        errors.append(f"{path}: minItems {sch['minItems']}, got {len(inst)}")
+    if "items" in sch:
+        for i, item in enumerate(inst):
+            errors.extend(mini_validate(item, sch["items"], f"{path}[{i}]"))
+    return errors
+
+
+def _validate_string(inst: str, sch: dict, path: str) -> list[str]:
+    """String keywords: pattern (ReDoS-guarded), minLength, enum, const."""
+    errors: list[str] = []
+    if "pattern" in sch:
+        # B4-CXR7U9R12 (S2639 ReDoS guard): an instance longer than the
+        # bound can never be a governed value; refuse it before the
+        # regex runs instead of matching attacker-controlled input.
+        if len(inst) > _MAX_PATTERN_INPUT:
+            errors.append(
+                f"{path}: length {len(inst)} exceeds pattern-input bound "
+                f"{_MAX_PATTERN_INPUT}; not validated against pattern")
+        elif not re.match(sch["pattern"], inst):
+            errors.append(
+                f"{path}: string '{inst}' does not match pattern {sch['pattern']}")
+    if "minLength" in sch and len(inst) < sch["minLength"]:
+        errors.append(f"{path}: minLength {sch['minLength']}, got {len(inst)}")
+    if "enum" in sch and inst not in sch["enum"]:
+        errors.append(f"{path}: value '{inst}' not in enum {sch['enum']}")
+    if "const" in sch and inst != sch["const"]:
+        errors.append(f"{path}: expected const {sch['const']!r}, got {inst!r}")
+    return errors
+
+
+def _validate_number(inst: Any, sch: dict, path: str) -> list[str]:
+    """Numeric keywords: minimum/maximum bounds (bools never reach here)."""
+    errors: list[str] = []
+    if "minimum" in sch and inst < sch["minimum"]:
+        errors.append(f"{path}: minimum {sch['minimum']}, got {inst}")
+    if "maximum" in sch and inst > sch["maximum"]:
+        errors.append(f"{path}: maximum {sch['maximum']}, got {inst}")
+    return errors
+
+
 def mini_validate(inst: Any, sch: dict, path: str = "$") -> list[str]:
     """Validate instance against schema. Returns list of error strings (empty if valid)."""
-    errors: list[str] = []
-
-    if "type" in sch:
-        t = sch["type"]
-        ok = ((t == "object" and isinstance(inst, dict))
-              or (t == "array" and isinstance(inst, list))
-              or (t == "string" and isinstance(inst, str))
-              or (t == "number" and isinstance(inst, (int, float)) and not isinstance(inst, bool))
-              or (t == "boolean" and isinstance(inst, bool))
-              or (t == "integer" and isinstance(inst, int) and not isinstance(inst, bool)))
-        if not ok:
-            return [f"{path}: expected {t}, got {type(inst).__name__}"]
+    if "type" in sch and not _type_ok(sch["type"], inst):
+        return [f"{path}: expected {sch['type']}, got {type(inst).__name__}"]
 
     if isinstance(inst, dict):
-        if sch.get("additionalProperties") is False:
-            extra = set(inst) - set(sch.get("properties", {}))
-            if extra:
-                errors.append(f"{path}: unexpected properties {sorted(extra)}")
-
-        for req in sch.get("required", []):
-            if req not in inst:
-                errors.append(f"{path}: missing required '{req}'")
-
-        if "enum" in sch and inst not in sch["enum"]:
-            errors.append(f"{path}: value '{inst}' not in enum {sch['enum']}")
-
-        if "const" in sch and inst != sch["const"]:
-            errors.append(f"{path}: expected const {sch['const']!r}, got {inst!r}")
-
-        for k, subs in sch.get("properties", {}).items():
-            if k in inst:
-                errors.extend(mini_validate(inst[k], subs, f"{path}.{k}"))
-
-        if "if" in sch:
-            if_errors = mini_validate(inst, sch["if"], path)
-            if not if_errors:
-                errors.extend(mini_validate(inst, sch.get("then", {}), path))
-            elif "else" in sch:
-                errors.extend(mini_validate(inst, sch["else"], path))
-
-        if "allOf" in sch:
-            for sub in sch["allOf"]:
-                errors.extend(mini_validate(inst, sub, path))
-
-    elif isinstance(inst, list):
-        if "minItems" in sch and len(inst) < sch["minItems"]:
-            errors.append(f"{path}: minItems {sch['minItems']}, got {len(inst)}")
-        if "items" in sch:
-            for i, item in enumerate(inst):
-                errors.extend(mini_validate(item, sch["items"], f"{path}[{i}]"))
-
+        return _validate_object(inst, sch, path)
+    if isinstance(inst, list):
+        return _validate_array(inst, sch, path)
     if isinstance(inst, str):
-        if "pattern" in sch:
-            # B4-CXR7U9R12 (S2639 ReDoS guard): an instance longer than the
-            # bound can never be a governed value; refuse it before the
-            # regex runs instead of matching attacker-controlled input.
-            if len(inst) > _MAX_PATTERN_INPUT:
-                errors.append(
-                    f"{path}: length {len(inst)} exceeds pattern-input bound "
-                    f"{_MAX_PATTERN_INPUT}; not validated against pattern")
-            elif not re.match(sch["pattern"], inst):
-                errors.append(
-                    f"{path}: string '{inst}' does not match pattern {sch['pattern']}")
-        if "minLength" in sch and len(inst) < sch["minLength"]:
-            errors.append(f"{path}: minLength {sch['minLength']}, got {len(inst)}")
-        if "enum" in sch and inst not in sch["enum"]:
-            errors.append(f"{path}: value '{inst}' not in enum {sch['enum']}")
-        if "const" in sch and inst != sch["const"]:
-            errors.append(f"{path}: expected const {sch['const']!r}, got {inst!r}")
-
+        return _validate_string(inst, sch, path)
     if isinstance(inst, (int, float)) and not isinstance(inst, bool):
-        if "minimum" in sch and inst < sch["minimum"]:
-            errors.append(f"{path}: minimum {sch['minimum']}, got {inst}")
-        if "maximum" in sch and inst > sch["maximum"]:
-            errors.append(f"{path}: maximum {sch['maximum']}, got {inst}")
-
-    return errors
+        return _validate_number(inst, sch, path)
+    return []
 
 
 def validate(instance: Any, schema: dict) -> tuple[bool, list[str]]:

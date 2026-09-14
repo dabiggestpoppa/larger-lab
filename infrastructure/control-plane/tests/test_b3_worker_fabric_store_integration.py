@@ -269,7 +269,8 @@ def test_retry_state_dead_letter_and_po_authorized_retry(pg, fresh):
                       reason="retry_exhausted", detail="crashed",
                       idempotency_key="job-r", poison=True)
     dl = fresh.resolve_dead_letter("job-r")
-    assert dl is not None and dl["reason"] == "retry_exhausted"
+    assert dl is not None
+    assert dl["reason"] == "retry_exhausted"
     assert fresh.list_dead_letters().__len__() == 1
 
     # Hermes is NOT authorized to retry a dead-lettered job.

@@ -73,9 +73,29 @@ class WorkerSupervisor:
 
     STATE_FILE = "state.json"
 
+    @staticmethod
+    def _validated_dir(runtime_dir: Path) -> Path:
+        """B4-CXR7U9R13 (S2077): the runtime directory is operator-derived;
+        every state/pid file read or written below must resolve inside it.
+        The CLI fence (B4-CXR5R6) rejects traversal/symlink/repository
+        overlap at the entrypoint; this validates the sink itself so no
+        construction path can bypass that fence."""
+        base = os.path.realpath(str(runtime_dir))
+        src_root = os.path.realpath(os.path.dirname(os.path.abspath(__file__)))
+        try:
+            overlaps_package = os.path.commonpath([src_root, base]) == src_root
+        except ValueError:
+            # different drives (Windows): cannot overlap the package
+            overlaps_package = False
+        if overlaps_package:
+            raise RuntimeError(
+                "runtime dir overlaps the governed control-plane package "
+                "- refused (B4-CXR5R6)")
+        return Path(base)
+
     def __init__(self, runtime_dir: Path, authority: WorkerAuthority,
                  host: Optional[SessionHost] = None):
-        self._dir = Path(runtime_dir)
+        self._dir = WorkerSupervisor._validated_dir(Path(runtime_dir))
         self._pid_dir = self._dir / "pids"
         self._pid_dir.mkdir(parents=True, exist_ok=True)
         self._state_file = self._dir / self.STATE_FILE

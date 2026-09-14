@@ -21,11 +21,11 @@ EXPECTED_TREE="${3:-}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONTRACT_PATH="$SCRIPT_DIR/../contracts/checkpoint-identity-data.json"
 
-if [ -z "$EVIDENCE_DIR" ] || [ -z "$EXPECTED_COMMIT" ] || [ -z "$EXPECTED_TREE" ]; then
+if [[ -z "$EVIDENCE_DIR" || -z "$EXPECTED_COMMIT" || -z "$EXPECTED_TREE" ]]; then
     echo "GATE-FAIL: usage: final-gate.sh <evidence-dir> <expected-commit> <expected-tree>" >&2
     exit 1
 fi
-if [ ! -f "$CONTRACT_PATH" ]; then
+if [[ ! -f "$CONTRACT_PATH" ]]; then
     echo "GATE-FAIL: contract not found at $CONTRACT_PATH" >&2
     exit 1
 fi

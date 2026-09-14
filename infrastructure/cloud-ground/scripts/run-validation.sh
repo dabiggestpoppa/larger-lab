@@ -155,6 +155,7 @@ if not os.path.exists(stage_path):
     with open(stage_path, "w", encoding="utf-8") as f:
         json.dump(stage, f, indent=2)
 PYF
+    return 0
 }
 
 write_worktree_cleanup_evidence() {

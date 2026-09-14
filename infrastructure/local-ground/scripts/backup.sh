@@ -70,7 +70,7 @@ if [ -d "$VAR_DIR" ]; then
 fi
 cp "$VAR_DIR/state.json" "$CONTENT/state.json" 2>/dev/null || echo '{}' > "$CONTENT/state.json"
 
-if [ "$SCOPE" = "state-only" ]; then
+if [[ "$SCOPE" = "state-only" ]]; then
   DCR=false
   INCLUDES="state"
 else
@@ -103,7 +103,7 @@ else
     echo "BLOCKED: cannot copy pg archive out" >&2; exit 3
   fi
   docker exec oce-local-postgresql rm -f "/tmp/oce_pg_backup_$BACKUP_ID.dump" 2>/dev/null || true
-  [ -s "$ARCHIVE" ] || { echo "BLOCKED: empty postgres archive" >&2; exit 3; }
+  [[ -s "$ARCHIVE" ]] || { echo "BLOCKED: empty postgres archive" >&2; exit 3; }
 
   # PostgreSQL: hash-protected database inventory (schemas/tables/counts)
   if ! python3 "$BIN/pg-inventory.py" --out "$CONTENT/postgres/inventory.json" \

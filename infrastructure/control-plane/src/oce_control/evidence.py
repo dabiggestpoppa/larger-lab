@@ -174,7 +174,7 @@ class TruthPromotionLedger:
         self._claims[claim_id] = to_level
         return to_level
 
-    def demote(self, claim_id: str, to_level: str, reason: str) -> str:
+    def demote(self, claim_id: str, to_level: str) -> str:
         """Demote a claim (e.g., staleness)."""
         if to_level not in TRUTH_LEVELS:
             raise ValueError(f"Invalid truth level: {to_level}")

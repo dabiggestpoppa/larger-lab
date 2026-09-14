@@ -157,14 +157,12 @@ class TestProductionJobTypeGate:
         prep_line = next(l for l in src.splitlines()
                          if "prepare_workspace(ws" in l)
         assert src.index(prog_line) < src.index(claim_line) < src.index(prep_line)
-        # the gate itself: an unknown type raises KeyError before anything else
+        # the gate itself: an unknown type raises KeyError before anything
+        # else, so prepare_workspace is never reached through this type and
+        # the workspace is never seeded
         with pytest.raises(KeyError):
             program_for("attacker-chosen-type")
         seeded = tmp_path / "never-seeded"
-        with pytest.raises(KeyError):
-            # prepare_workspace would only be reached after the gate passes
-            program_for("attacker-chosen-type") or prepare_workspace(
-                seeded, "attacker-chosen-type", {})
         assert not seeded.exists()
 
     def test_runtime_code_never_loaded_from_attempt_workspace(self):
@@ -383,9 +381,10 @@ class TestTruthfulIsolationReporting:
         ws = tmp_path / "ws"
         ws.mkdir()
         from oce_control.execution_runtime import PathEscapeError
+        envelope = JobResourceEnvelope(timeout_s=5)
         with pytest.raises(PathEscapeError):
             runner.run(["python", "-c", "print(1)"],
-                       envelope=JobResourceEnvelope(timeout_s=5),
+                       envelope=envelope,
                        workspace=ws, input_paths=[outside])
 
     def test_production_cannot_select_test_dependency_seam(self, tmp_path):

@@ -39,8 +39,9 @@ from oce_control.audit_sink import (  # noqa: E402
     safe_audit_text,
 )
 
-# B4-CXR7U9R12: single definition of the governed egress setting name
+# B4-CXR7U9R12: single definitions of governed setting names
 EGRESS_SETTING_NAME = "workers.egress"
+CAPITAL_AUTHORITY_SETTING_NAME = "capital.authority"
 
 
 # --------------------------------------------------------------------------- #
@@ -160,12 +161,11 @@ class Setting:
     def validate_value(self, value: object) -> None:
         if self.validate is not None:
             self.validate(value)
-        if self.value_type == "enum" and self.enum:
-            if value not in self.enum:
-                # never echo the candidate value (B4-R3R6)
-                raise ValidationError(
-                    f"setting '{self.name}': value rejected; rule: one of "
-                    f"{list(self.enum)} (error class: enum-rejection)")
+        # never echo the candidate value (B4-R3R6)
+        if self.value_type == "enum" and self.enum and value not in self.enum:
+            raise ValidationError(
+                f"setting '{self.name}': value rejected; rule: one of "
+                f"{list(self.enum)} (error class: enum-rejection)")
 
 
 _NO_DEFAULT = object()
@@ -352,7 +352,7 @@ def build_default_registry() -> SettingsRegistry:
                 owner="policy", enum=("disabled",), default="disabled",
                 validation_rule="only 'disabled' is a legal mode",
                 mutability="immutable", tags=("live", "deny-by-default")))
-    reg(Setting(name="capital.authority", value_type="enum", owner="operator(po)",
+    reg(Setting(name=CAPITAL_AUTHORITY_SETTING_NAME, value_type="enum", owner="operator(po)",
                 enum=("none", "approved"), default="none",
                 validation_rule="locked to 'none' in Book 4 (future-locked "
                                 "'approved')",
@@ -721,7 +721,7 @@ def validate_effective(effective: EffectiveConfig) -> None:
     # capital authority stays ZERO in Book 4 (CXR3-06): no environment
     # variable, config file, CLI source, alias, operator override, Hermes
     # call, PO helper, or malformed value may produce live-capital authority.
-    if effective.get("capital.authority") != "none":
+    if effective.get(CAPITAL_AUTHORITY_SETTING_NAME) != "none":
         raise ValidationError(
             "capital.authority must be 'none' — live-capital authority does "
             "not exist in Book 4 (future-locked)")
@@ -974,7 +974,7 @@ class ConfigAuthorization:
         # B4-CXR3R5 (CXR3-06): capital.authority is future-locked to 'none'
         # in Book 4 — even operator:po cannot activate live-capital authority
         # through the override path.
-        if setting_name == "capital.authority" and validated != "none":
+        if setting_name == CAPITAL_AUTHORITY_SETTING_NAME and validated != "none":
             raise PermissionError(
                 "capital.authority is locked to 'none' in Book 4 — live-capital "
                 "authority does not exist at this stage (operator:po included)")

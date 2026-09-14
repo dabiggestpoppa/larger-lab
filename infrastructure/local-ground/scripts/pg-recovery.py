@@ -134,7 +134,7 @@ def psql(container, db, user, sql, stdin_bytes=None):
                                    "-c", sql], stdin_bytes=stdin_bytes)
 
 
-def psql_ok(container, db, user, sql, stdin_bytes=None, timeout=600):
+def psql_ok(container, db, user, sql, stdin_bytes=None):
     r = psql(container, db, user, sql, stdin_bytes=stdin_bytes)
     if r.returncode != 0:
         raise RuntimeError(f"psql {db} rc={r.returncode}: "

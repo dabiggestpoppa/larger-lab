@@ -440,7 +440,8 @@ def test_rejects_stale_evidence_from_another_run_id():
             json.dump(fake_adv, f)
         run_engine("--only", "RUN-ID-CONSISTENCY", "--evidence-dir", tmpdir, env={"OCE_RUN_ID": run_id})
         check = get_check_result(tmpdir, "RUN-ID-CONSISTENCY")
-        assert check and check["result"] == "FAIL", f"Expected FAIL for stale RUN_ID, got {check}"
+        assert check, f"Expected RUN-ID-CONSISTENCY check, got none"
+        assert check["result"] == "FAIL", f"Expected FAIL for stale RUN_ID, got {check}"
         print("PASS: Stale evidence from another RUN_ID rejected")
 
 
@@ -566,7 +567,8 @@ def test_authoritative_requires_evidence_dir():
         env={"OCE_RUN_ID": make_run_id()},
     )
     combined = (out + err).lower()
-    assert rc != 0 and "evidence-dir" in combined, f"Expected evidence-dir rejection, got rc={rc} {combined}"
+    assert rc != 0, f"Expected rejection, got rc={rc} {combined}"
+    assert "evidence-dir" in combined, f"Expected evidence-dir reason, got {combined}"
     print("PASS: Authoritative mode requires --evidence-dir outside the repository")
 
 

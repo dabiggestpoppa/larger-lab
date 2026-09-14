@@ -188,9 +188,11 @@ class TestAdversarialFabric:
     def test_path_traversal_blocked(self, tmp_path):
         outside = tmp_path.parent / "secret.txt"
         outside.write_text("s", encoding="utf-8")
+        runner = BoundedRunner(workspace_base=tmp_path)
+        envelope = JobResourceEnvelope()
         with pytest.raises(PathEscapeError):
-            BoundedRunner(workspace_base=tmp_path).run(
-                ["python", "-c", "pass"], envelope=JobResourceEnvelope(),
+            runner.run(
+                ["python", "-c", "pass"], envelope=envelope,
                 input_paths=[outside])
 
     def test_retry_exhaustion_dead_letters(self):

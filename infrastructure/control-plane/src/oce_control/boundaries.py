@@ -148,7 +148,7 @@ class POOrchestrator:
         }
         return escalation
 
-    def check_po_boundaries(self, po_agent_id: str, action: str) -> bool:
+    def check_po_boundaries(self, po_agent_id: str) -> bool:
         """Check if PO is attempting to bypass a boundary."""
         # PO cannot bypass environment locks
         # PO cannot bypass approval requirements

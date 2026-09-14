@@ -94,14 +94,18 @@ def test_restore_rejects_absolute_manifest_path(tmp_path):
     bk = _make_backup(tmp_path)
     _write_manifest(bk, [f"{'0' * 64}  1024  /etc/evil"])
     r = _run_restore(bk)
-    assert r.returncode != 0 and ("unsafe" in r.stdout + r.stderr.lower() or "CORRUPT" in r.stdout + r.stderr)
+    assert r.returncode != 0
+    combined = r.stdout + r.stderr
+    assert ("unsafe" in combined.lower() or "CORRUPT" in combined)
 
 
 def test_restore_rejects_parent_traversal_manifest_path(tmp_path):
     bk = _make_backup(tmp_path)
     _write_manifest(bk, [f"{'0' * 64}  1024  ../outside"])
     r = _run_restore(bk)
-    assert r.returncode != 0 and ("unsafe" in r.stdout + r.stderr.lower() or "CORRUPT" in r.stdout + r.stderr)
+    assert r.returncode != 0
+    combined = r.stdout + r.stderr
+    assert ("unsafe" in combined.lower() or "CORRUPT" in combined)
 
 
 def test_restore_rejects_duplicate_manifest_path(tmp_path):
@@ -124,7 +128,8 @@ def test_restore_rejects_backup_without_protected_metadata(tmp_path):
     (bk / ".backup-content" / "backup-info.json").unlink()
     # keep manifest referencing state.json only (metadata no longer hash-protected)
     r = _run_restore(bk)
-    assert r.returncode != 0 and "backup-info" in (r.stdout + r.stderr).lower()
+    assert r.returncode != 0
+    assert "backup-info" in (r.stdout + r.stderr).lower()
 
 
 def test_restore_rejects_tampered_metadata_hash(tmp_path):

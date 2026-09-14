@@ -147,6 +147,12 @@ class SecretStoreCorrupt(RuntimeError):
     overwrites it; manual remediation is required."""
 
 
+_UNREADABLE_STORE_MSG = (
+    "approved secret store exists but is unreadable/corrupt — "
+    "manual remediation required; OCE never overwrites an "
+    "existing store (B4-CXR4R1)")
+
+
 class SecretStoreUnreadable(SecretStoreCorrupt):
     """Approved secret authority exists but cannot be read (OS error) —
     FAIL CLOSED; OCE never rewrites it (B4-CXR7U8-07)."""
@@ -586,9 +592,7 @@ def initialize_runtime_secret(environ: dict | None = None) -> str:
         existing = load_runtime_secret()
         if existing is None:
             raise RuntimeError(
-                "approved secret store exists but is unreadable/corrupt — "
-                "manual remediation required; OCE never overwrites an "
-                "existing store (B4-CXR4R1)")
+                _UNREADABLE_STORE_MSG)
         env_pw = env.get("POSTGRES_PASSWORD")
         if env_pw and env_pw != existing:
             raise RuntimeError(
@@ -670,14 +674,10 @@ def initialize_worker_token() -> str:
             parsed = json.loads(raw)
         except json.JSONDecodeError:
             raise SecretStoreCorrupt(
-                "approved secret store exists but is unreadable/corrupt — "
-                "manual remediation required; OCE never overwrites an "
-                "existing store (B4-CXR4R1)")
+                _UNREADABLE_STORE_MSG)
         except OSError:
             raise SecretStoreUnreadable(
-                "approved secret store exists but is unreadable/corrupt — "
-                "manual remediation required; OCE never overwrites an "
-                "existing store (B4-CXR4R1)")
+                _UNREADABLE_STORE_MSG)
         if not isinstance(parsed, dict):
             raise SecretStoreCorrupt(
                 "approved secret store is not a JSON object — manual "

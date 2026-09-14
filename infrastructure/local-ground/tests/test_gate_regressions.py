@@ -18,6 +18,7 @@ import pytest
 BASE_DIR = Path(__file__).resolve().parent.parent
 SCRIPTS = BASE_DIR / "scripts"
 GATE = SCRIPTS / "independent-gate.py"
+
 VERIFY = SCRIPTS / "final-package-verify.sh"
 REPO = "dabiggestpoppa/larger-lab"
 BRANCH = "oce-program-build"
@@ -209,8 +210,9 @@ def _refresh_manifest(ev):
 
 
 def run_gate(ev, expect_fail=False, env=None):
+    merged = dict(ENV_OK, OCE_EVIDENCE_DIR=str(ev), **(env or {}))
     r = subprocess.run([sys.executable, str(GATE), str(ev), COMMIT, TREE],
-                       env=dict(ENV_OK, **(env or {})), capture_output=True, text=True, timeout=60)
+                       env=merged, capture_output=True, text=True, timeout=60)
     if expect_fail:
         assert r.returncode != 0, f"gate should have failed\n{r.stdout}\n{r.stderr}"
     else:
@@ -275,14 +277,14 @@ def test_gate_rejects_wrong_commit(tmp_path):
     ev = build_valid_evidence(tmp_path)
     # call gate with a commit argument that differs from the tested checkout
     r = subprocess.run([sys.executable, str(GATE), str(ev), "d" * 40, TREE],
-                       env=ENV_OK, capture_output=True, text=True, timeout=60)
+                       env=dict(ENV_OK, OCE_EVIDENCE_DIR=str(ev)), capture_output=True, text=True, timeout=60)
     assert r.returncode != 0
 
 
 def test_gate_rejects_wrong_tree(tmp_path):
     ev = build_valid_evidence(tmp_path)
     r = subprocess.run([sys.executable, str(GATE), str(ev), COMMIT, "u" * 40],
-                       env=ENV_OK, capture_output=True, text=True, timeout=60)
+                       env=dict(ENV_OK, OCE_EVIDENCE_DIR=str(ev)), capture_output=True, text=True, timeout=60)
     assert r.returncode != 0
 
 

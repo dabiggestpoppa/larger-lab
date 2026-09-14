@@ -71,7 +71,7 @@ async function refreshAll() {
     const hs = h.data && h.data.overall;
     document.getElementById('health').innerHTML =
       '<span class="' + (hs === 'healthy' ? 'ok' : 'degraded') + '">' + esc(hs) + '</span> · PG ' + esc(h.data && h.data.postgresql) + ' · Redis ' + esc(h.data && h.data.redis);
-  } catch (e) {
+  } catch {
     document.getElementById('health').innerHTML = '<span class="bad">unreachable</span>';
   }
   try {

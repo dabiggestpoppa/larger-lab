@@ -76,6 +76,7 @@ class TestSupervisor:
 
     def test_operator_view_shows_fabric_state(self, sup):
         view = sup.operator_view()
-        assert "admitted" in view and "capabilities" in view
+        assert "admitted" in view
+        assert "capabilities" in view
         assert "sessions" in view and "workers" in view
         assert view["cloud"] == "dormant"

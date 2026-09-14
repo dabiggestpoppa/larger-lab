@@ -92,8 +92,9 @@ class TestOwnershipRegistry:
     def test_dup_registration_rejected(self):
         reg = SettingsRegistry()
         reg.register(Setting(name="a.b", value_type="int", default=1))
+        dup = Setting(name="a.b", value_type="int", default=2)
         with pytest.raises(ValueError):
-            reg.register(Setting(name="a.b", value_type="int", default=2))
+            reg.register(dup)
 
     def test_no_default_with_value_rejected(self):
         reg = SettingsRegistry()
@@ -746,9 +747,10 @@ class TestAdversarialMatrix:
             s.resolve("secret:not-provisioned")
 
     def test_secret_in_plain_config_denied(self):
+        resolver = ConfigResolver(build_default_registry())
+        payload = {"file": {"postgres.password_ref": TEST_SECRET}}
         with pytest.raises(ValidationError):
-            ConfigResolver(build_default_registry()).resolve(
-                {"file": {"postgres.password_ref": TEST_SECRET}})
+            resolver.resolve(payload)
 
     def test_worker_capability_unchanged_by_spine(self):
         # The spine policy must not relax Book 3 worker capability admission.
@@ -961,10 +963,11 @@ class TestR3R6ErrorLeakageCanary:
 
     def test_resolver_exception_never_echoes_candidate_value(self):
         reg = build_default_registry()
+        resolver = ConfigResolver(reg)
+        payload = {"file": {"control_plane.port": CANARY,
+                            "postgres.password_ref": REF_PG}}
         with pytest.raises(ValidationError) as exc:
-            ConfigResolver(reg).resolve(
-                {"file": {"control_plane.port": CANARY,
-                          "postgres.password_ref": REF_PG}})
+            resolver.resolve(payload)
         assert CANARY not in str(exc.value)
         assert "control_plane.port" in str(exc.value)
 
@@ -2491,7 +2494,8 @@ class TestCXR7U9R6AuthorityLifecycle:
         sink = PostgresAuditSink(conn, governed_database="oce_control",
                                  governed_user="oce_control_admin")
         back = sink.read_back()
-        assert len(back) == 1 and back[0]["request_id"] == "a1"
+        assert len(back) == 1
+        assert back[0]["request_id"] == "a1"
         assert conn.tx_status == 0  # TX_IDLE
         assert conn.rolled_back == 2  # gate probe rollback + read cleanup
 

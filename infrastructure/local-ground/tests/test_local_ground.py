@@ -468,7 +468,8 @@ def test_27_windows_wsl2_path_handling_detected():
     assert fp_path.is_file(), r.stdout
     fp = json.loads(fp_path.read_text(encoding="utf-8", errors="replace"))
     assert fp["runtime_target"] == "local"
-    assert "os" in fp and fp["tools"]["python"] != "absent"
+    assert "os" in fp
+    assert fp["tools"]["python"] != "absent"
 
 
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
