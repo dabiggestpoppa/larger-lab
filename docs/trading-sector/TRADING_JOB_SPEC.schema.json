@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://larger-lab.local/schemas/trading-job-spec-v0.1.json",
+  "title": "TradingJobSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "job_id",
+    "source",
+    "package_id",
+    "objective",
+    "source_platform",
+    "target_platform",
+    "asset_classes",
+    "timeframes",
+    "acceptance_criteria",
+    "deliverables",
+    "explicit_non_goals",
+    "price",
+    "revision_allowance",
+    "internal_ip_boundary",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "job_id": {"type": "string", "minLength": 1},
+    "external_opportunity_id": {"type": ["string", "null"]},
+    "source": {
+      "type": "string",
+      "enum": ["UPWORK", "FIVERR", "DIRECT", "OPPORTUNITY_EXCHANGE", "OTHER"]
+    },
+    "client_reference": {"type": ["string", "null"]},
+    "package_id": {
+      "type": "string",
+      "enum": [
+        "TS-PKG-01", "TS-PKG-02", "TS-PKG-03", "TS-PKG-04", "TS-PKG-05",
+        "TS-PKG-06", "TS-PKG-07", "TS-PKG-08", "TS-PKG-09", "TS-PKG-10",
+        "CUSTOM_SCOPE"
+      ]
+    },
+    "research_depth": {"type": "string", "enum": ["R1", "R2", "R3", "R4"]},
+    "objective": {"type": "string", "minLength": 1},
+    "source_platform": {
+      "type": "string",
+      "enum": ["PINE", "PYTHON", "NINJATRADER", "NONE", "OTHER"]
+    },
+    "target_platform": {
+      "type": "string",
+      "enum": ["PINE", "PYTHON", "NINJATRADER_PILOT", "REPORT_ONLY", "OTHER"]
+    },
+    "asset_classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "symbols": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "timeframes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "timezone": {"type": ["string", "null"]},
+    "strategy_or_indicator": {
+      "type": "string",
+      "enum": ["INDICATOR", "STRATEGY", "RESEARCH", "AUDIT", "TRANSLATION", "INFRASTRUCTURE", "OTHER"]
+    },
+    "current_inputs": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "required_logic": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "ambiguities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question", "materiality", "status"],
+        "properties": {
+          "question": {"type": "string"},
+          "materiality": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH"]},
+          "status": {"type": "string", "enum": ["OPEN", "RESOLVED", "ASSUMPTION_APPROVED"]},
+          "resolution": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "data_source": {"type": ["string", "null"]},
+    "data_date_range": {"type": ["string", "null"]},
+    "data_rights": {
+      "type": "string",
+      "enum": ["CLIENT_PROVIDED_AUTHORIZED", "PUBLIC", "LICENSED", "TO_BE_VERIFIED", "NOT_APPLICABLE"]
+    },
+    "transaction_cost_assumptions": {"type": ["string", "null"]},
+    "acceptance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "deliverables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "explicit_non_goals": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "price": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currency", "gross_amount"],
+      "properties": {
+        "currency": {"type": "string", "default": "USD"},
+        "gross_amount": {"type": "number", "minimum": 0},
+        "pricing_type": {"type": "string", "enum": ["FIXED", "HOURLY", "MILESTONE", "RETAINER"]}
+      }
+    },
+    "platform_fees_estimate": {"type": ["number", "null"], "minimum": 0},
+    "proposal_cost_estimate": {"type": ["number", "null"], "minimum": 0},
+    "expected_internal_cost": {"type": ["number", "null"], "minimum": 0},
+    "expected_human_minutes": {"type": ["number", "null"], "minimum": 0},
+    "deadline": {"type": ["string", "null"]},
+    "qcae_dependency": {
+      "type": "string",
+      "enum": ["NONE", "POSSIBLE", "REQUIRED", "BLOCKING"]
+    },
+    "research_mesh_dependency": {
+      "type": "string",
+      "enum": ["NONE", "POSSIBLE", "REQUIRED"]
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "revision_allowance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["included_rounds"],
+      "properties": {
+        "included_rounds": {"type": "integer", "minimum": 0},
+        "scope_change_requote": {"type": "boolean", "const": true}
+      }
+    },
+    "internal_ip_boundary": {
+      "type": "string",
+      "enum": ["NO_INTERNAL_PROPRIETARY_IP", "GENERAL_CAPABILITY_ONLY", "OPERATOR_APPROVAL_REQUIRED"]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DISCOVERED", "QUALIFIED", "SCOPING", "READY_TO_PROPOSE", "PROPOSED",
+        "WON", "LOST", "EXPIRED", "ACTIVE", "QA", "DELIVERED",
+        "REVISION", "ACCEPTED", "DISPUTED", "CLOSED", "DECLINED"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "not": {
+        "properties": {
+          "source_platform": {"const": "OTHER"},
+          "target_platform": {"const": "OTHER"}
+        },
+        "required": ["source_platform", "target_platform"]
+      }
+    }
+  ]
+}
