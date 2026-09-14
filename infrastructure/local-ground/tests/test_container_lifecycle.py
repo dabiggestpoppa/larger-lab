@@ -255,7 +255,8 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
                 "--archive", str(dump), "--inventory", str(inv),
                 "--inventory-sha", str(invsha),
                 "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
-                "--receipt-out", str(promote_receipt)], check=False)
+                "--receipt-out", str(promote_receipt)],
+               env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
     assert r.returncode == 0, r.stdout + r.stderr
     pr = json.loads(promote_receipt.read_text(encoding="utf-8"))
     assert pr.get("promoted") is True, pr
@@ -272,7 +273,8 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
                  "--receipt-in", str(promote_receipt),
                  "--inventory", str(inv), "--inventory-sha", str(invsha),
                  "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
-                 "--receipt-out", str(final_receipt)], check=False)
+                 "--receipt-out", str(final_receipt)],
+                env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
     assert r2.returncode != 0, "finalize must fail when canonical truth is broken"
     fr = json.loads(final_receipt.read_text(encoding="utf-8"))
     assert fr.get("rollback_required") is True, fr
@@ -341,7 +343,8 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
                 "--archive", str(dump), "--inventory", str(inv),
                 "--inventory-sha", str(invsha),
                 "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
-                "--receipt-out", str(promote_receipt)], check=False)
+                "--receipt-out", str(promote_receipt)],
+               env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
     assert r.returncode == 0, r.stdout + r.stderr
     pr = json.loads(promote_receipt.read_text(encoding="utf-8"))
     q = pr.get("quarantine_database")
@@ -357,7 +360,8 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
                  "--receipt-in", str(promote_receipt),
                  "--inventory", str(inv), "--inventory-sha", str(invsha),
                  "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
-                 "--receipt-out", str(final_receipt)], check=False)
+                 "--receipt-out", str(final_receipt)],
+                env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
     assert r2.returncode != 0, "rollback failure must return nonzero"
     fr = json.loads(final_receipt.read_text(encoding="utf-8"))
     assert fr.get("rollback_required") is True

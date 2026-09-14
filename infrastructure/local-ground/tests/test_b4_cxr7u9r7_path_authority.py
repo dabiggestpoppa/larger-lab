@@ -160,8 +160,9 @@ class TestGateOpsRootContainment:
 
 class TestApprovedRootArtifactInputs:
     """Artifact paths are contained: the approved roots are the program
-    identity (engine directory) plus operator-declared OCE_BACKUP_ROOTS.
-    A CLI argument can never approve its own containment root."""
+    identity (engine directory plus the engine's own var/recovery state
+    directory) plus operator-declared OCE_BACKUP_ROOTS. A CLI argument
+    can never approve its own containment root."""
 
     @pytest.fixture(autouse=True)
     def _approve_tmp_root(self, tmp_path, monkeypatch):

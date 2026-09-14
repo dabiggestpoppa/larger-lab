@@ -37,17 +37,23 @@ USER = _PG.USER
 
 
 def _approved_roots() -> list:
-    """Approved roots for artifact inputs (B4-CXR7U9R12).
+    """Approved roots for artifact inputs (B4-CXR7U9R12/U9X2).
 
     Containment authority comes from TWO channels, neither of which the
     artifact path itself can influence:
-      1. program identity - the directory holding this engine;
+      1. program identity - the directory holding this engine AND the
+         engine's own durable recovery-state directory (var/recovery,
+         where restore.sh stages its phase receipts). Both are derived
+         from this file's real location, never from CLI or artifact
+         data.
       2. the operator-declared OCE_BACKUP_ROOTS list (os.pathsep
          separated), exported by restore.sh for the backup store it
          opened, or supplied by a test harness. CLI arguments can never
          approve their own containment root.
     """
-    roots = [os.path.dirname(os.path.realpath(__file__))]
+    here = os.path.dirname(os.path.realpath(__file__))
+    roots = [here,
+             os.path.join(os.path.dirname(here), "var", "recovery")]
     for part in os.environ.get("OCE_BACKUP_ROOTS", "").split(os.pathsep):
         cand = part.strip()
         if cand and os.path.isdir(cand):

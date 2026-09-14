@@ -207,7 +207,8 @@ def test_full_outbound_path_with_separate_worker_process(pg, store, service, tmp
 def test_capability_escalation_rejected(pg, store, service):
     _admit(store)
     url, server = service
-    from oce_control.worker_client import OutboundWorkerClient, _hmac, wire_key
+    from oce_control.worker_client import (OutboundWorkerClient, _hmac,
+                                           wire_key, WorkerClientError)
     cli = OutboundWorkerClient(url, WORKER_ID, SECRET)
     cli.connect()
     job = {"job_id": "j-escal", "job_type": "b3.analysis-artifact",
