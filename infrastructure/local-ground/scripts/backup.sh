@@ -54,7 +54,10 @@ BACKUP_ID="$(python3 -c 'import uuid,sys;sys.stdout.write(uuid.uuid4().hex)')"
 DCR=""
 INCLUDES="state"
 
-have_docker() { command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; }
+have_docker() {
+  command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1
+  return $?
+}
 
 # ── var/ working set (deterministic by relpath) ────────────────────────────
 if [ -d "$VAR_DIR" ]; then
@@ -122,7 +125,7 @@ fi
 PGVERSION=""
 DUMPFMT=""
 PGVER_NUM=""
-if [ "$SCOPE" = "full" ] && have_docker; then
+if [[ "$SCOPE" == "full" ]] && have_docker; then
   PGVERSION="$(docker exec oce-local-postgresql pg_dump --version 2>/dev/null | head -1)"
   DUMPFMT="custom"
   PGVER_NUM="$(docker exec oce-local-postgresql psql -X -A -t -U "$PG_USER" -d "$PG_DB" \
@@ -134,8 +137,8 @@ cat > "$CONTENT/backup-info.json" <<JSON
   "hash_algorithm": "sha256", "scope": "$SCOPE", "backup_id": "$BACKUP_ID",
   "disaster_recovery_capable": $DCR, "includes": "$INCLUDES",
   "database": "$PG_DB", "pg_dump_version": "$([[ -n "$PGVERSION" ]] && printf '%s' "$PGVERSION" || echo null)",
-  "pg_dump_format": "$([ -n "$DUMPFMT" ] && printf '%s' "$DUMPFMT" || echo null)",
-  "pg_version_num": "$([ -n "$PGVER_NUM" ] && printf '%s' "$PGVER_NUM" || echo null)",
+  "pg_dump_format": "$([[ -n "$DUMPFMT" ]] && printf '%s' "$DUMPFMT" || echo null)",
+  "pg_version_num": "$([[ -n "$PGVER_NUM" ]] && printf '%s' "$PGVER_NUM" || echo null)",
   "source_commit": "$COMMIT", "run_id": "${OCE_RUN_ID:-not-set}",
   "created_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" }
 JSON

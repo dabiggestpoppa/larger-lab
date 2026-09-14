@@ -385,8 +385,27 @@ def _atomic_write_json(path, data):
 
 
 def _load_receipt(path):
-    with open(path, encoding="utf-8") as f:
+    with open(_validated_open_path(path), encoding="utf-8") as f:
         return json.load(f)
+
+
+def _approved_roots() -> list:
+    """Approved roots for artifact inputs (B4-CXR7U9R12).
+
+    Containment authority comes from TWO channels, neither of which the
+    artifact path itself can influence:
+      1. program identity - the directory holding this engine;
+      2. the operator-declared OCE_BACKUP_ROOTS list (os.pathsep
+         separated), exported by restore.sh for the backup store it
+         opened, or supplied by a test harness. CLI arguments can never
+         approve their own containment root.
+    """
+    roots = [os.path.dirname(os.path.realpath(__file__))]
+    for part in os.environ.get("OCE_BACKUP_ROOTS", "").split(os.pathsep):
+        cand = part.strip()
+        if cand and os.path.isdir(cand):
+            roots.append(os.path.realpath(cand))
+    return roots
 
 
 def _validated_open_path(path: str) -> str:
@@ -410,6 +429,19 @@ def _validated_open_path(path: str) -> str:
     real = os.path.realpath(path)
     if real != os.path.abspath(path):
         raise RuntimeError(f"path uses symlink indirection: {path}")
+    roots = _approved_roots()
+    contained = False
+    for root in roots:
+        try:
+            if os.path.commonpath([root, real]) == root:
+                contained = True
+                break
+        except ValueError:
+            pass
+    if not contained:
+        raise RuntimeError(
+            "path is outside every approved backup root "
+            f"(program identity or OCE_BACKUP_ROOTS): {path}")
     if not os.path.isfile(real):
         raise RuntimeError(f"not a regular file: {path}")
     return real
@@ -500,7 +532,9 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
     try:
         # 1. protected inventory validated (hash + parse + non-empty truth)
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
-        receipt["inventory_sha256"] = open(inventory_sha_path, encoding="utf-8").read().strip()
+        receipt["inventory_sha256"] = open(
+            _validated_open_path(inventory_sha_path), encoding="utf-8"
+        ).read().strip()
         probe = parse_probe_spec(probe_spec)
         if not (capture_inventory_rows(inventory) or probe):
             raise RuntimeError("database inventory lists no tables to verify (incomplete backup)")
@@ -520,7 +554,7 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         receipt["staging_database"] = staging
         receipt["phases"].append("staging_created")
         # 4. restore into staging with exit-on-error
-        with open(archive, "rb") as f:
+        with open(_validated_open_path(archive), "rb") as f:
             data = f.read()
         r = docker_exec(container, ["pg_restore", "-U", user, "--exit-on-error",
                                     "--no-owner", "--no-privileges", "--dbname", staging, remote],

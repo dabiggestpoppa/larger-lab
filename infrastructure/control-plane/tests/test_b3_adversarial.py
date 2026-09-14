@@ -80,12 +80,13 @@ class TestAdversarialFabric:
     def test_unsupported_protocol_rejected(self):
         au = _auth()
         from oce_control.worker_identity import AdmissionRequest
+        req = AdmissionRequest(
+            worker_id="w3", public_key_or_nonce="z" * 16,
+            requested_capabilities=["hash"], protocol_version="99.0",
+            host_os_class="linux", runtime_class="python",
+            trust_zone="worker-local", worker_version="1.0")
         with pytest.raises(ValueError):
-            au.approve(AdmissionRequest(
-                worker_id="w3", public_key_or_nonce="z" * 16,
-                requested_capabilities=["hash"], protocol_version="99.0",
-                host_os_class="linux", runtime_class="python",
-                trust_zone="worker-local", worker_version="1.0"), "operator:po")
+            au.approve(req, "operator:po")
 
     def test_unknown_capability_fails_closed(self):
         reg = CapabilityRegistry()

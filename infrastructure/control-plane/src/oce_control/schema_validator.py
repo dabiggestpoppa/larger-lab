@@ -7,6 +7,10 @@ additionalProperties, minimum, minItems, and if/then/else.
 from __future__ import annotations
 import json
 import re
+
+# B4-CXR7U9R12 (S2639): inputs longer than this bound are never governed
+# values; they are refused before any regex runs (ReDoS fails closed).
+_MAX_PATTERN_INPUT = 4096
 from pathlib import Path
 from typing import Any
 
@@ -65,8 +69,17 @@ def mini_validate(inst: Any, sch: dict, path: str = "$") -> list[str]:
                 errors.extend(mini_validate(item, sch["items"], f"{path}[{i}]"))
 
     if isinstance(inst, str):
-        if "pattern" in sch and not re.match(sch["pattern"], inst):
-            errors.append(f"{path}: string '{inst}' does not match pattern {sch['pattern']}")
+        if "pattern" in sch:
+            # B4-CXR7U9R12 (S2639 ReDoS guard): an instance longer than the
+            # bound can never be a governed value; refuse it before the
+            # regex runs instead of matching attacker-controlled input.
+            if len(inst) > _MAX_PATTERN_INPUT:
+                errors.append(
+                    f"{path}: length {len(inst)} exceeds pattern-input bound "
+                    f"{_MAX_PATTERN_INPUT}; not validated against pattern")
+            elif not re.match(sch["pattern"], inst):
+                errors.append(
+                    f"{path}: string '{inst}' does not match pattern {sch['pattern']}")
         if "minLength" in sch and len(inst) < sch["minLength"]:
             errors.append(f"{path}: minLength {sch['minLength']}, got {len(inst)}")
         if "enum" in sch and inst not in sch["enum"]:

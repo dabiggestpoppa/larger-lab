@@ -132,8 +132,7 @@ def _contained_path(name: str, value: str, default: str) -> Path:
     return p
 
 
-def run(deps: WorkerDependencies, *, url: str,
-        worker_id: str, environ: dict | None = None) -> int:
+def run(deps: WorkerDependencies, *, url: str, worker_id: str) -> int:
     """Execute one outbound worker round under an explicit dependency
     object (B4-CXR6R2). The production CLI calls this with
     ProductionWorkerDependencies; tests call it with

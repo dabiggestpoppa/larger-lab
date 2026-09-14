@@ -39,6 +39,9 @@ from oce_control.audit_sink import (  # noqa: E402
     safe_audit_text,
 )
 
+# B4-CXR7U9R12: single definition of the governed egress setting name
+EGRESS_SETTING_NAME = "workers.egress"
+
 
 # --------------------------------------------------------------------------- #
 # Sensitive value semantics
@@ -319,7 +322,7 @@ def build_default_registry() -> SettingsRegistry:
                 enum=("transport", "cache"), default="transport",
                 validation_rule="redis is disposable transport only",
                 mutability="immutable", tags=("durability",)))
-    reg(Setting(name="workers.egress", value_type="enum", owner="policy",
+    reg(Setting(name=EGRESS_SETTING_NAME, value_type="enum", owner="policy",
                 enum=("deny", "loopback"), default="deny",
                 validation_rule="network disabled by default",
                 mutability="immutable", tags=("network", "sandbox")))
@@ -699,8 +702,8 @@ def validate_effective(effective: EffectiveConfig) -> None:
         raise ValidationError("redis.mode must be 'transport' (disposable)")
 
     # workers: network disabled by default
-    if effective.get("workers.egress") != "deny" and \
-       effective.get("workers.egress") != "loopback":
+    if effective.get(EGRESS_SETTING_NAME) != "deny" and \
+       effective.get(EGRESS_SETTING_NAME) != "loopback":
         raise ValidationError("workers.egress must be 'deny' or 'loopback'")
 
     # sandbox: strict isolation is mandatory

@@ -216,7 +216,8 @@ class TestSandboxB3R5:
         assert "timeout" in report["enforced"]
         assert "output_size" in report["enforced"]
         assert report["network"] == "denied"
-        assert "enforced" in report and "unavailable" in report
+        assert "enforced" in report
+        assert "unavailable" in report
 
     def test_strict_mode_blocks_when_isolation_unavailable(self, tmp_path, monkeypatch):
         # B4-CXR7U8X1: force the LIVE resource_limits_available property

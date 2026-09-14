@@ -773,8 +773,7 @@ class RetryPolicy:
     terminal_on: tuple = ("timeout", "resource_violation")
     retryable_exit_codes: tuple = ()   # empty → only explicit retryable failures retry
 
-    def should_retry(self, attempt: int, classified: str,
-                     reason: Optional[str] = None) -> bool:
+    def should_retry(self, attempt: int, classified: str) -> bool:
         if classified == "ok":
             return False
         if attempt >= self.max_retries:
@@ -884,7 +883,7 @@ class RetryCoordinator:
                 self._results[job_id] = outcome
                 return outcome
             # not ok → maybe retry
-            if self._policy.should_retry(attempt, classified, reason):
+            if self._policy.should_retry(attempt, classified):
                 delay = backoff_delay(attempt, self._policy.base_backoff_s)
                 lines.append(f"attempt {attempt} {classified}, backoff {delay:.2f}s")
                 continue

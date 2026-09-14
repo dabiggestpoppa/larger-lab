@@ -129,7 +129,7 @@ failure_cleanup() {
     done
     case "$net" in *oce_local_internal*) networks="false" ;; *) networks="true" ;; esac
     if printf '%s\n' "$vol" | grep -q '^oce_local_'; then volumes="false"; else volumes="true"; fi
-    if [ "$rc" -eq 0 ] && [ "$containers" = "true" ] && [ "$networks" = "true" ] && [ "$volumes" = "true" ]; then
+    if [[ "$rc" -eq 0 && "$containers" == "true" && "$networks" == "true" && "$volumes" == "true" ]]; then
       result="ok"
     fi
   else
@@ -320,6 +320,7 @@ manifest = {"block": "B1", "stage": "B1-LOCAL-GROUND-CLOSURE", "run_id": os.envi
             "cloud_activation_state": "DEFERRED_BY_OPERATOR", "artifacts": artifacts,
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
 json.dump(manifest, open(os.path.join(ev, "evidence-manifest.json"), "w", encoding="utf-8"), indent=2)
+  return 0
 PY
 }
 write_manifest

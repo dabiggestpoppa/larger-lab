@@ -302,6 +302,7 @@ export OCE_EVIDENCE_DIR="${OCE_EVIDENCE_DIR:-}"
 PROMOTE_RECEIPT="$RECEIPT_DIR/promote-receipt.json"
 ROLLBACK_RECEIPT="$RECEIPT_DIR/rollback-receipt.json"
 RECEIPT_OUT="$RECEIPT_DIR/postgres-recovery-receipt.json"  # finalize receipt
+export OCE_BACKUP_ROOTS="$FROM"
 PG_COMMON=(--inventory "$CONTENT/postgres/inventory.json"
            --inventory-sha "$CONTENT/postgres/inventory.json.sha256"
            --db "$PG_DB" --user "$PG_USER" --container oce-local-postgresql)
@@ -314,6 +315,7 @@ save_pg_receipt() { # one or more receipt files -> evidence (never clobbered)
       cp "$src" "$EV_DIR/$(basename "$src" .json)-$(date +%s%N).json" 2>/dev/null || true
     fi
   done
+  return 0
 }
 if [[ -f "$CONTENT/postgres/archive.dump" && -f "$CONTENT/postgres/inventory.json" \
    && -f "$CONTENT/postgres/inventory.json.sha256" ]]; then

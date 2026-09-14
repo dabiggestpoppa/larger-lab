@@ -90,9 +90,9 @@ class TestGateOpsRootContainment:
             gate._validated_subprocess_path(candidate, str(tmp_path))
 
     def test_arbitrary_absolute_external_rejected(self, tmp_path):
+        external = str(Path(os.environ.get("SYSTEMROOT", "/etc")))
         with pytest.raises(RuntimeError, match="escapes approved root"):
-            gate._validated_subprocess_path(
-                str(Path(os.environ.get("SYSTEMROOT", "/etc"))), str(tmp_path))
+            gate._validated_subprocess_path(external, str(tmp_path))
 
     @needs_symlink
     def test_symlink_file_candidate_rejected(self, tmp_path):
@@ -155,10 +155,19 @@ class TestGateOpsRootContainment:
 
 
 # --------------------------------------------------------------------- #
-# pg-recovery / pg-verify OPERATOR_TRUSTED_INPUT honesty
+# pg-recovery / pg-verify APPROVED-ROOT CONTAINMENT (B4-CXR7U9R12)
 # --------------------------------------------------------------------- #
 
-class TestOperatorTrustedArtifactInputs:
+class TestApprovedRootArtifactInputs:
+    """Artifact paths are contained: the approved roots are the program
+    identity (engine directory) plus operator-declared OCE_BACKUP_ROOTS.
+    A CLI argument can never approve its own containment root."""
+
+    @pytest.fixture(autouse=True)
+    def _approve_tmp_root(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("OCE_BACKUP_ROOTS", str(tmp_path))
+        self.root = tmp_path
+
     def test_regular_file_accepted_and_canonical(self, tmp_path):
         f = tmp_path / "inventory.json"
         f.write_text("{}")
@@ -191,10 +200,34 @@ class TestOperatorTrustedArtifactInputs:
             with pytest.raises(RuntimeError, match="not a regular file"):
                 mod._validated_open_path(str(d))
 
-    def test_no_containment_claim_is_truthful(self, tmp_path):
-        """The classifier does NOT pretend containment: an artifact
-        anywhere on disk is accepted if it is a regular, non-symlink
-        file - the honest OPERATOR_TRUSTED_INPUT model."""
-        f = tmp_path / "anywhere.json"
+    def test_path_outside_every_approved_root_rejected(self, tmp_path):
+        f = tmp_path.parent / "outside-approved-roots.json"
         f.write_text("{}")
-        assert pgrec._validated_open_path(str(f)) == os.path.realpath(str(f))
+        try:
+            for mod in (pgrec, pgver):
+                with pytest.raises(RuntimeError, match="approved backup root"):
+                    mod._validated_open_path(str(f))
+        finally:
+            f.unlink()
+
+    def test_empty_roots_reject_everything(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("OCE_BACKUP_ROOTS", "")
+        f = tmp_path / "inventory.json"
+        f.write_text("{}")
+        for mod in (pgrec, pgver):
+            with pytest.raises(RuntimeError, match="approved backup root"):
+                mod._validated_open_path(str(f))
+
+    def test_cli_argument_cannot_approve_its_own_root(self, tmp_path, monkeypatch):
+        # A root named in the artifact's own path (or any argv channel)
+        # grants nothing: only the engine directory and OCE_BACKUP_ROOTS
+        # are consulted. A rogue directory outside both is rejected even
+        # when the artifact path "looks" absolute and canonical.
+        rogue = tmp_path.parent / "rogue-u9r12"
+        rogue.mkdir(exist_ok=True)
+        f = rogue / "inventory.json"
+        f.write_text("{}")
+        monkeypatch.setenv("OCE_BACKUP_ROOTS", str(tmp_path))
+        for mod in (pgrec, pgver):
+            with pytest.raises(RuntimeError, match="approved backup root"):
+                mod._validated_open_path(str(f))

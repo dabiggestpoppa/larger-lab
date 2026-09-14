@@ -267,11 +267,13 @@ def cmd_up(dsn: str, directory: Path) -> int:
         conn.close()
 
 
-def cmd_down(dsn: str, directory: Path) -> int:
+def cmd_down(dsn: str) -> int:
     # CXR5-02: previously ``dict(discover_migrations(...))`` crashed on the
     # three-item tuples — key by version so the real rollback works when
     # invoked (production CLI is future-locked; tests exercise the engine).
-    migrations = {v: (up, down) for v, up, down in discover_migrations(directory)}
+    # B4-CXR7U9R12: rollback ALWAYS operates on the canonical repository-
+    # owned migration set; no caller may nominate a directory (S2076).
+    migrations = {v: (up, down) for v, up, down in discover_migrations()}
     conn = connect(dsn)
     try:
         applied = applied_versions(conn)

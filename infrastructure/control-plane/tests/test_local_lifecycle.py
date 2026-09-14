@@ -480,8 +480,10 @@ def test_cxr5r1_sanitized_environment_strips_secrets(monkeypatch):
                 "OCE_WORKER_TOKEN", "OCE_WORKER_SECRET"):
         assert var not in env, var
     cenv = ls.compose_environment()  # no store -> no secret vars at all
-    assert "POSTGRES_PASSWORD" not in cenv and "POSTGRES_DSN" not in cenv
-    assert "OCE_WORKER_TOKEN" not in cenv and "OCE_WORKER_SECRET" not in cenv
+    assert "POSTGRES_PASSWORD" not in cenv
+    assert "POSTGRES_DSN" not in cenv
+    assert "OCE_WORKER_TOKEN" not in cenv
+    assert "OCE_WORKER_SECRET" not in cenv
     # explicit INIT may honor an operator password; afterwards an ambient
     # rewrite attempt must be ignored — the store (and compose env) is the
     # ONLY source of secret material.

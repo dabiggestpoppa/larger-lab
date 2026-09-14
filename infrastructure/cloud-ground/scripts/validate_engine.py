@@ -23,6 +23,10 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
+# B4-CXR7U9R12: single definition of gate-check message literals
+MSG_GITLEAKS_OK = "Secret scan passes (gitleaks)"
+MSG_SCHEMA_OK = "JSON Schemas valid Draft 2020-12"
+
 VERSION = "3.6.0"
 YAML_GLOB = "*.yaml"
 COMPOSE_RENDER_NAME = "Compose foundation renders"
@@ -459,7 +463,7 @@ class Validator:
                 jsonschema.Draft202012Validator.check_schema(schema)
                 passed += 1
             except ImportError:
-                self.add("SCHEMA-VALID", "JSON Schemas valid Draft 2020-12", True, "BLOCKED",
+                self.add("SCHEMA-VALID", MSG_SCHEMA_OK, True, "BLOCKED",
                           "jsonschema not installed", "")
                 return
             except Exception as e:
@@ -467,11 +471,11 @@ class Validator:
                 details.append(f"{s.name}: {e}")
         total = passed + failed
         if total == 0:
-            self.add("SCHEMA-VALID", "JSON Schemas valid Draft 2020-12", True, "BLOCKED", "No schemas", "0 schemas")
+            self.add("SCHEMA-VALID", MSG_SCHEMA_OK, True, "BLOCKED", "No schemas", "0 schemas")
         elif failed == 0:
-            self.add("SCHEMA-VALID", "JSON Schemas valid Draft 2020-12", True, "PASS", f"{passed}/{total}", "All valid")
+            self.add("SCHEMA-VALID", MSG_SCHEMA_OK, True, "PASS", f"{passed}/{total}", "All valid")
         else:
-            self.add("SCHEMA-VALID", "JSON Schemas valid Draft 2020-12", True, "FAIL", f"{passed}/{total}",
+            self.add("SCHEMA-VALID", MSG_SCHEMA_OK, True, "FAIL", f"{passed}/{total}",
                       "\n".join(details))
 
     def check_schema_fixtures(self):
@@ -1107,16 +1111,16 @@ class Validator:
                 capture_output=True, text=True, timeout=60,
             )
             if r.returncode == 0:
-                self.add("GITLEAKS", "Secret scan passes (gitleaks)", True, "PASS",
+                self.add("GITLEAKS", MSG_GITLEAKS_OK, True, "PASS",
                           "gitleaks clean", "No secrets found")
             else:
-                self.add("GITLEAKS", "Secret scan passes (gitleaks)", True, "FAIL",
+                self.add("GITLEAKS", MSG_GITLEAKS_OK, True, "FAIL",
                           "gitleaks found secrets", (r.stdout + r.stderr)[:500])
         except FileNotFoundError:
-            self.add("GITLEAKS", "Secret scan passes (gitleaks)", True, "BLOCKED",
+            self.add("GITLEAKS", MSG_GITLEAKS_OK, True, "BLOCKED",
                       "gitleaks not installed", "")
         except subprocess.TimeoutExpired:
-            self.add("GITLEAKS", "Secret scan passes (gitleaks)", True, "BLOCKED", "timeout", "")
+            self.add("GITLEAKS", MSG_GITLEAKS_OK, True, "BLOCKED", "timeout", "")
 
     def _collect_scaffold_violations(self):
         """Collect unresolved scaffold markers from executable scripts."""

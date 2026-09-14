@@ -36,6 +36,25 @@ DB = _PG.DB
 USER = _PG.USER
 
 
+def _approved_roots() -> list:
+    """Approved roots for artifact inputs (B4-CXR7U9R12).
+
+    Containment authority comes from TWO channels, neither of which the
+    artifact path itself can influence:
+      1. program identity - the directory holding this engine;
+      2. the operator-declared OCE_BACKUP_ROOTS list (os.pathsep
+         separated), exported by restore.sh for the backup store it
+         opened, or supplied by a test harness. CLI arguments can never
+         approve their own containment root.
+    """
+    roots = [os.path.dirname(os.path.realpath(__file__))]
+    for part in os.environ.get("OCE_BACKUP_ROOTS", "").split(os.pathsep):
+        cand = part.strip()
+        if cand and os.path.isdir(cand):
+            roots.append(os.path.realpath(cand))
+    return roots
+
+
 def _validated_open_path(path: str) -> str:
     """Canonicalize an OPERATOR-TRUSTED artifact path (B4-CXR7U9R7).
 
@@ -52,6 +71,19 @@ def _validated_open_path(path: str) -> str:
     real = os.path.realpath(path)
     if real != os.path.abspath(path):
         raise RuntimeError(f"path uses symlink indirection: {path}")
+    roots = _approved_roots()
+    contained = False
+    for root in roots:
+        try:
+            if os.path.commonpath([root, real]) == root:
+                contained = True
+                break
+        except ValueError:
+            pass
+    if not contained:
+        raise RuntimeError(
+            "path is outside every approved backup root "
+            f"(program identity or OCE_BACKUP_ROOTS): {path}")
     if not os.path.isfile(real):
         raise RuntimeError(f"not a regular file: {path}")
     return real

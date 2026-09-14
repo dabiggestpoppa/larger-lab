@@ -151,9 +151,10 @@ def test_full_outbound_path_with_separate_worker_process(pg, store, service, tmp
     job_id = job.job_id
 
     # Replay/forgery must fail before process launch.
-    from oce_control.worker_client import OutboundWorkerClient, _hmac, wire_key
+    from oce_control.worker_client import (OutboundWorkerClient, _hmac,
+                                           wire_key, WorkerClientError)
     bad = OutboundWorkerClient(url, WORKER_ID, "wrong-secret")
-    with pytest.raises(Exception):
+    with pytest.raises(WorkerClientError):
         bad.hello()
     bad.close()
 
@@ -214,7 +215,7 @@ def test_capability_escalation_rejected(pg, store, service):
            "trust_zone": "worker-local", "resource_envelope": {
                "cpu_limit": 1, "memory_bytes": 1, "disk_bytes": 1,
                "timeout_s": 5}}
-    with pytest.raises(Exception):
+    with pytest.raises(WorkerClientError):
         cli.claim(job)
     cli.close()
 

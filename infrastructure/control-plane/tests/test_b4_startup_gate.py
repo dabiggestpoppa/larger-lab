@@ -1296,7 +1296,7 @@ class TestCXR5R2CanonicalMigrationProgram:
         orig_connect = mig.connect
         mig.connect = lambda dsn: conn  # type: ignore[assignment]
         try:
-            rc = mig.cmd_down("governed-dsn", mig.MIGRATIONS_DIR)
+            rc = mig.cmd_down("governed-dsn")
         finally:
             mig.connect = orig_connect
         assert rc == 0
@@ -1571,9 +1571,11 @@ class TestCXR5R3ActivationLineage:
             raise RuntimeError("would-connect")
 
         monkeypatch.setattr(mig, "connect", fake_connect)
+        run_up = lambda: mig.main(["up"])  # noqa: E731
         with pytest.raises(RuntimeError, match="would-connect"):
-            mig.main(["up"])
-        assert seen and "k" * 40 in seen[0]  # governed secret in derived DSN
+            run_up()
+        assert seen  # governed DSN derived and captured
+        assert "k" * 40 in seen[0]  # governed secret in derived DSN
         out, err = capsys.readouterr()
         assert "k" * 40 not in (out + err)  # never echoed
 
@@ -1649,8 +1651,9 @@ class TestCXR5R6AuthorityInputs:
         monkeypatch.setattr(ls, "read_worker_token",
                             lambda: (_ for _ in ()).throw(
                                 RuntimeError("no token")))
+        deps = w.ProductionWorkerDependencies()
         with pytest.raises(SystemExit, match="secret unavailable"):
-            w.ProductionWorkerDependencies().shared_secret()
+            deps.shared_secret()
 
     def test_ci_mode_never_consumes_ambient_secret(self, monkeypatch):
         # B4-CXR6R2: even with OCE_CI_MODE=true the ambient worker secret is

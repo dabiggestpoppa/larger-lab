@@ -97,9 +97,10 @@ class TestOwnershipRegistry:
 
     def test_no_default_with_value_rejected(self):
         reg = SettingsRegistry()
+        bad = Setting(name="a.b", value_type="int",
+                      has_default=False, default=1)
         with pytest.raises(ValueError):
-            reg.register(Setting(name="a.b", value_type="int",
-                                 has_default=False, default=1))
+            reg.register(bad)
 
     def test_enum_without_allowed_values_rejected(self):
         reg = SettingsRegistry()
@@ -219,8 +220,9 @@ class TestDeterministicResolution:
 
     def test_conflicting_enum_rejected(self):
         reg = build_default_registry()
+        resolver = ConfigResolver(reg)
         with pytest.raises(ValidationError):
-            ConfigResolver(reg).resolve(
+            resolver.resolve(
                 {"file": {"postgres.password_ref": REF_PG,
                           "execution.live_order_mode": "paper"}})
 
@@ -468,9 +470,9 @@ class TestRedaction:
     def test_exception_from_sensitive_config_is_redacted(self):
         reg = build_default_registry()
         # force a validation error and make sure it never carries the secret
+        resolver = ConfigResolver(reg)
         with pytest.raises(ValidationError) as exc:
-            ConfigResolver(reg).resolve(
-                {"file": {"postgres.password_ref": TEST_SECRET}})
+            resolver.resolve({"file": {"postgres.password_ref": TEST_SECRET}})
         assert TEST_SECRET not in str(exc.value)
 
     def test_committed_source_has_no_test_secret(self):
@@ -617,8 +619,9 @@ class TestDenialGates:
                                  "postgres.password_ref": REF_PG}})
 
     def test_live_mode_via_cli_denied(self):
+        resolver = ConfigResolver(build_default_registry())
         with pytest.raises(ValidationError):
-            ConfigResolver(build_default_registry()).resolve(
+            resolver.resolve(
                 HAPPY, cli={"execution.live_order_mode": "paper"})
 
     def test_live_mode_via_malformed_enum_denied(self):
@@ -1285,8 +1288,9 @@ class TestCXR3R5CapitalAuthorityLocked:
             new_value="approved")
         assert p.authorized is False
         assert "locked to 'none'" in p.reason_code
+        authz_proven = TestCXR3R5CapitalAuthorityLocked._proven(reg)
         with pytest.raises(PermissionError, match="locked to 'none'"):
-            TestCXR3R5CapitalAuthorityLocked._proven(reg).operator_override(
+            authz_proven.operator_override(
                 eff, actor="operator:po", setting_name="capital.authority",
                 requested_change="activate capital", reason="po decision",
                 new_value="approved")
@@ -2184,10 +2188,11 @@ class TestCXR7U9R2GovernedIdentityAuthority:
     def _deny_blocked(self, sink):
         """authoritative proof False AND the canonical apply path BLOCKED."""
         authz = self._authz(sink)
+        eff = self._eff()
         assert authz.audit_durable is False
         with pytest.raises(RuntimeError, match="BLOCKED"):
             authz.operator_override(
-                self._eff(), actor="operator:po",
+                eff, actor="operator:po",
                 setting_name="control_plane.port",
                 requested_change="x", reason="r", new_value="9131")
         return authz

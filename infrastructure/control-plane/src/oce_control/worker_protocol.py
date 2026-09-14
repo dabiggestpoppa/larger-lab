@@ -250,7 +250,7 @@ class WorkerProtocolServer:
                 f"worker '{sess['worker_id']}' tried to claim capabilities "
                 f"{sorted(set(required) - have)} beyond admission")
         if sess["trust_zone"] != job.get("trust_zone", "worker-local"):
-            raise WrongTrustZone(f"trust zone mismatch on claim")
+            raise WrongTrustZone("trust zone mismatch on claim")
         envelope = JobEnvelope(
             job_id=job["job_id"], job_type=job.get("job_type", ""),
             required_capabilities=required,

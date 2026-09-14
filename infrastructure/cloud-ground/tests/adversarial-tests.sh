@@ -64,6 +64,7 @@ TOTAL_COUNT=0
 
 win_path() {
     if command -v cygpath &>/dev/null; then cygpath -m "$1"; else echo "$1"; fi
+    return 0
 }
 ENGINE_WIN=$(win_path "$ENGINE")
 EVIDENCE_DIR_WIN=$(win_path "$EVIDENCE_DIR")
@@ -192,7 +193,7 @@ run_one() {
         cp "$BACKUP_DIR/pre-${test_id}.bak" "$target"
         write_result "$test_id" "FAIL" "$desc" "$expect" "MUTATION_ERROR" \
             "PASS" "0" "MUTATION_ERROR" "$mut_rc" "NOT_RUN" "0" "" "" "mutation code failed"
-        return
+        return 0
     fi
 
     run_check "$expect"
@@ -670,4 +671,4 @@ with open(out_path, 'w') as fp:
 print(f'Written {len(negative_tests)} negative + {len(meta_tests)} meta tests to {out_path}')
 " "$RESULTS_DIR" "$RUN_ID" "$SUITE_RESULT" "$EVIDENCE_DIR/adversarial-results.json" "$ENGINE_VERSION"
 
-[ "$SUITE_RESULT" = "PASS" ] && exit 0 || exit 1
+[[ "$SUITE_RESULT" == "PASS" ]] && exit 0 || exit 1

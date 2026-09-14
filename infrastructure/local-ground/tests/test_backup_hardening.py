@@ -302,7 +302,8 @@ def test_full_replace_requires_confirm_local_target(tmp_path):
 def test_full_replace_rejects_wrong_local_target(tmp_path):
     bk = _make_backup(tmp_path, scope="full", include_artifacts=True)
     r = _run_restore(bk, mode="full-replace", extra=["--confirm-local-target", "other_db"])
-    assert r.returncode != 0 and "confirm-local-target" in r.stdout + r.stderr
+    assert r.returncode != 0
+    assert "confirm-local-target" in r.stdout + r.stderr
 
 
 def test_incomplete_full_backup_rejected():
@@ -486,12 +487,15 @@ def test_row_count_only_receipt_is_rejected():
     assert any("missing fingerprint evidence" in p for p in probs)
 
 
-def test_inventory_fingerprint_tamper_rejected():
+def test_inventory_fingerprint_tamper_rejected(monkeypatch):
     """Tampering with the protected inventory (e.g. replacing a fingerprint)
     breaks the inventory SHA and must be rejected before any recovery."""
     pr = _load_pr()
     import tempfile
     with tempfile.TemporaryDirectory() as td:
+        # R12: the pg engine now enforces approved-root containment, so the
+        # harness must declare its own backup root (split-channel authority).
+        monkeypatch.setenv("OCE_BACKUP_ROOTS", td)
         invp = os.path.join(td, "inventory.json")
         shap = os.path.join(td, "inventory.json.sha256")
         doc = _fingerprinted_inventory({"public.backup_probe": 2})

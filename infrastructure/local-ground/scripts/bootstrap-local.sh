@@ -33,7 +33,7 @@ test -w "$VAR_DIR" || { echo "BLOCKED: $VAR_DIR not writable" >&2; exit 3; }
 
 # Compose .env: create from example only if absent; NEVER overwrite existing.
 mkdir -p "$COMPOSE_DIR"
-if [ ! -f "$COMPOSE_DIR/.env" ]; then
+if [[ ! -f "$COMPOSE_DIR/.env" ]]; then
   if [ -f "$COMPOSE_DIR/examples/oce.env.example" ]; then
     cp "$COMPOSE_DIR/examples/oce.env.example" "$COMPOSE_DIR/.env"
     echo "created placeholder $COMPOSE_DIR/.env (EDIT BEFORE USE; never commit)"
