@@ -242,14 +242,14 @@ class Validator:
         errors = []
 
         if not IDENTITY_DATA.exists():
-            self.add("SOURCE-IDENTITY", "Source identity verification", True, "BLOCKED",
+            self.add("SOURCE-IDENTITY", self.MSG_SOURCE_IDENTITY, True, "BLOCKED",
                       "checkpoint-identity-data.json not found", "")
             return
 
         try:
             contract = json.loads(IDENTITY_DATA.read_text(encoding="utf-8"))
         except Exception as e:
-            self.add("SOURCE-IDENTITY", "Source identity verification", True, "BLOCKED",
+            self.add("SOURCE-IDENTITY", self.MSG_SOURCE_IDENTITY, True, "BLOCKED",
                       f"Cannot parse identity contract: {e}", "")
             return
 
@@ -391,7 +391,7 @@ class Validator:
                 )
 
         if errors:
-            self.add("SOURCE-IDENTITY", "Source identity verification", True, "FAIL",
+            self.add("SOURCE-IDENTITY", self.MSG_SOURCE_IDENTITY, True, "FAIL",
                       f"{len(errors)} mismatches", "\n".join(errors))
         else:
             evidence_parts = [
@@ -405,7 +405,7 @@ class Validator:
             if gha_repo:
                 evidence_parts.append(f"gha_repo={gha_repo}")
                 evidence_parts.append(f"gha_sha={gha_sha[:12]}")
-            self.add("SOURCE-IDENTITY", "Source identity verification", True, "PASS",
+            self.add("SOURCE-IDENTITY", self.MSG_SOURCE_IDENTITY, True, "PASS",
                       ", ".join(evidence_parts), "All identity checks passed")
 
         self.source_identity_passed = any(
@@ -663,6 +663,11 @@ class Validator:
     MSG_NO_EXTERNAL_NET = "No external networks"
     MSG_ANSIBLE_LINT = "Ansible lint passes"
     MSG_COMPOSE_NOT_FOUND = "compose.foundation.yml not found"
+    # B4-CXR7U9R15: single definitions of repeated check messages
+    MSG_SOURCE_IDENTITY = "Source identity verification"
+    MSG_ROLES_TASKS = "All Ansible roles have tasks"
+    MSG_RUNBOOKS = "Operator runbooks present"
+    MSG_EVIDENCE_IDENTITY = "Evidence identity matches checkpoint"
 
     def check_digest_registry(self):
         evidence_path = EVIDENCE_DIR / "image-digests.json"
@@ -967,7 +972,7 @@ class Validator:
     def check_roles_have_tasks(self):
         roles_dir = ANSIBLE_DIR / "roles"
         if not roles_dir.exists():
-            self.add("ROLES-TASKS", "All Ansible roles have tasks", True, "BLOCKED", "No roles dir", "")
+            self.add("ROLES-TASKS", self.MSG_ROLES_TASKS, True, "BLOCKED", "No roles dir", "")
             return
         empty = [
             role.name for role in sorted(roles_dir.iterdir())
@@ -975,10 +980,10 @@ class Validator:
         ]
         total = len([d for d in roles_dir.iterdir() if d.is_dir()])
         if empty:
-            self.add("ROLES-TASKS", "All Ansible roles have tasks", True, "FAIL",
+            self.add("ROLES-TASKS", self.MSG_ROLES_TASKS, True, "FAIL",
                       f"{len(empty)} empty", f"Empty: {', '.join(empty)}")
         else:
-            self.add("ROLES-TASKS", "All Ansible roles have tasks", True, "PASS",
+            self.add("ROLES-TASKS", self.MSG_ROLES_TASKS, True, "PASS",
                       f"{total} roles", "All have tasks/main.yml")
 
     def check_evidence_structure(self):
@@ -996,12 +1001,12 @@ class Validator:
         if rb_dir.exists():
             count = len(list(rb_dir.glob("*.md")))
             if count >= 1:
-                self.add("RUNBOOKS", "Operator runbooks present", True, "PASS",
+                self.add("RUNBOOKS", self.MSG_RUNBOOKS, True, "PASS",
                           f"{count} runbooks", "Present")
             else:
-                self.add("RUNBOOKS", "Operator runbooks present", True, "FAIL", "0 runbooks", "No .md")
+                self.add("RUNBOOKS", self.MSG_RUNBOOKS, True, "FAIL", "0 runbooks", "No .md")
         else:
-            self.add("RUNBOOKS", "Operator runbooks present", True, "FAIL", "No runbooks dir", "Missing")
+            self.add("RUNBOOKS", self.MSG_RUNBOOKS, True, "FAIL", "No runbooks dir", "Missing")
 
     def check_single_infra_root(self):
         roots = [r for r in REPO_ROOT.rglob("cloud-ground") if r.is_dir()]
@@ -1432,7 +1437,7 @@ class Validator:
         except FileNotFoundError:
             payload = self._build_results_payload(git)
         except Exception as e:
-            self.add("EVIDENCE-CONSISTENCY", "Evidence identity matches checkpoint", True, "FAIL",
+            self.add("EVIDENCE-CONSISTENCY", self.MSG_EVIDENCE_IDENTITY, True, "FAIL",
                       f"Cannot read evidence: {e}", "")
             return
 
@@ -1462,10 +1467,10 @@ class Validator:
             errors.append(f"TOTALS_MATH: {ev_p} != {ev_total}")
 
         if errors:
-            self.add("EVIDENCE-CONSISTENCY", "Evidence identity matches checkpoint", True, "FAIL",
+            self.add("EVIDENCE-CONSISTENCY", self.MSG_EVIDENCE_IDENTITY, True, "FAIL",
                       f"{len(errors)} mismatches", "\n".join(errors))
         else:
-            self.add("EVIDENCE-CONSISTENCY", "Evidence identity matches checkpoint", True, "PASS",
+            self.add("EVIDENCE-CONSISTENCY", self.MSG_EVIDENCE_IDENTITY, True, "PASS",
                       "All identity fields match", "Evidence is self-consistent (atomic)")
 
     def _build_results_payload(self, git_info):
@@ -1733,7 +1738,7 @@ class Validator:
         ev_dir = ev_dir or self._evidence_dir()
         ident = self._identity_provenance()
         lines = [
-            f"# B1-I1R3H Static Validation Summary",
+            "# B1-I1R3H Static Validation Summary",
             "",
             f"- **Run ID:** `{self.run_uid}`",
             f"- **Validator:** v{VERSION}",
@@ -1744,7 +1749,7 @@ class Validator:
             f"- **Checkout state:** `{ident['checkout_state']}`",
             f"- **Branch provenance:** `{ident['branch_provenance']}`",
             f"- **Expected branch:** `{ident['expected_branch']}`",
-            f"- **Repository:** `dabiggestpoppa/larger-lab`",
+            "- **Repository:** `dabiggestpoppa/larger-lab`",
             f"- **Start:** {self.start_time}",
             f"- **End:** {utc_now()}",
             f"- **Gate:** `{gate}`",
@@ -1774,7 +1779,7 @@ class Validator:
                               f"- {r.evidence}", f"- {r.output}", ""])
         else:
             lines.extend(["None.", ""])
-        lines.extend([f"---", f"*Generated by validate_engine.py v{VERSION} — {utc_now()}*"])
+        lines.extend(["---", f"*Generated by validate_engine.py v{VERSION} — {utc_now()}*"])
         self._atomic_write(ev_dir / "static-validation-summary.md", "\n".join(lines) + "\n")
 
     def write_stage_status(self, git_info, totals, gate, ev_dir=None):

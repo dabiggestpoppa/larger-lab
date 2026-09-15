@@ -418,7 +418,7 @@ def validate_setting_value(setting: Setting, value: object) -> object:
         elif setting.value_type == "json":
             if isinstance(value, str):
                 value = json.loads(value)
-    except (TypeError, ValueError, json.JSONDecodeError):
+    except (TypeError, ValueError):  # JSONDecodeError derives from ValueError
         # coerce failed: the message must NOT contain the raw candidate value
         raise ValidationError(
             f"setting '{setting.name}': invalid {setting.value_type}; rule: "

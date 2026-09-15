@@ -21,7 +21,6 @@ Env:   OCE_RUN_ID (required, 12+ hex), OCE_EVIDENCE_DIR, OCE_CI_MODE,
 """
 from __future__ import annotations
 
-MANIFEST_NAME = "evidence-manifest.json"
 import hashlib
 import json
 import os
@@ -48,6 +47,11 @@ from b2_registry import (  # noqa: E402
     category_of,
     expected_counts,
 )
+
+# B4-CXR7U9R15: single definitions of the evidence file names
+MANIFEST_NAME = "evidence-manifest.json"
+SOURCE_CLEANLINESS_NAME = "source-cleanliness.json"
+STAGE_STATUS_NAME = "stage-status.json"
 
 COMPOSE_FILE = BASE_DIR / "compose" / "compose.yml"
 RUN_ID_RE = re.compile(r"^[0-9a-f]{12,}$")
@@ -363,7 +367,7 @@ class Runner:
         """Step 20: final stage status reflecting the actual result."""
         gate = json.loads((self.evidence / "independent-gate.json").read_text())
         status = "PASS" if gate.get("gate") == "PASS" else "FAIL"
-        self._write_json("stage-status.json", {
+        self._write_json(STAGE_STATUS_NAME, {
             "block": block_label(),
             "stage": stage_label(),
             "stage_status": status,
@@ -382,7 +386,7 @@ class Runner:
     def step_summary(self) -> None:
         """validation-summary.md — human-readable reconciliation (pre-manifest)."""
         reg = json.loads((self.evidence / "test-registry.json").read_text())
-        stage = json.loads((self.evidence / "stage-status.json").read_text())
+        stage = json.loads((self.evidence / STAGE_STATUS_NAME).read_text())
         cleanup = json.loads((self.evidence / "cleanup-results.json").read_text())
         lines = [
             f"# OCE {book_label()} — Validation Summary",
@@ -490,7 +494,7 @@ def write_failure_evidence(evidence: Path, run_id: str, ctx: dict, reason: str,
         "recorded_at": now_iso(),
         **ctx,
     }
-    (evidence / "stage-status.json").write_text(json.dumps(stage, indent=2),
+    (evidence / STAGE_STATUS_NAME).write_text(json.dumps(stage, indent=2),
                                                 encoding="utf-8")
     manifest = {"manifest_version": "1.0.0", "run_id": run_id, "files": {}}
     for name in sorted(p.name for p in evidence.iterdir() if p.is_file()):

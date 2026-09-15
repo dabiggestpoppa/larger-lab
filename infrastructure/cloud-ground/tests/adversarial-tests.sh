@@ -164,6 +164,8 @@ with open(sys.argv[10], 'w') as f: json.dump(t, f, indent=2)
 # Run one negative mutation test: backup -> mutate -> detect -> restore -> verify
 readonly HR='=============================================='
 readonly EXPECT_WORKER_NO_DB='WORKER-NO-DB'
+# B4-CXR7U9R15: single definition of the repeated failure label
+readonly FAIL_LABEL='    FAIL'
 
 run_one() {
     local test_id="$1" desc="$2" target="$3" expect="$4" mut_code="$5"
@@ -269,7 +271,7 @@ if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "ID-03" "PASS" "Wrong --target-branch rejected"         "cli-input" "--target-branch=definitely-wrong-branch does not match observed branch"         "FAIL" "FAIL" "$rc" "Validator correctly rejected wrong target branch"
 else
-    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_meta_result "ID-03" "FAIL" "Wrong --target-branch rejected"         "cli-input" "--target-branch=definitely-wrong-branch does not match observed branch"         "FAIL" "PASS" "0" "Validator accepted wrong target branch"
 fi
 run_one "ID-04" "Wrong base SHA" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['authoritative_base_sha']='0'*40;json.dump(d,open(p,'w'),indent=2)"
@@ -336,7 +338,7 @@ if [[ "$br" == "PASS" && "$be" -eq 0 && "$mr" == "FAIL" && "$me" -ne 0 && "$pr" 
     write_result "EV-01" "PASS" "Wrong repository rejected" "SOURCE-IDENTITY" "FAIL" \
         "PASS" "0" "FAIL" "$me" "PASS" "0" "$orig_h" "$rest_h" "Correctly rejected"
 else
-    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_result "EV-01" "FAIL" "Wrong repository rejected" "SOURCE-IDENTITY" "$mr" \
         "$br" "$be" "$mr" "$me" "$pr" "$pe" "$orig_h" "$rest_h" "Not rejected"
 fi
@@ -492,7 +494,7 @@ if [[ "$rc" -ne 0 ]]; then
         "cli-input" "authoritative mode without --target-commit/--target-tree/--target-branch" \
         "FAIL" "BLOCKED" "$rc" "Validator correctly rejected missing mandatory CLI arguments"
 else
-    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_meta_result "CLI-01" "FAIL" "Missing authoritative inputs" \
         "cli-input" "authoritative mode without --target-commit/--target-tree/--target-branch" \
         "FAIL" "PASS" "0" "Validator accepted missing arguments"
@@ -508,7 +510,7 @@ if [[ "$rc" -ne 0 ]]; then
         "cli-input" "--target-commit=0000...0000 does not match HEAD" \
         "FAIL" "FAIL" "$rc" "Validator correctly rejected mismatched commit"
 else
-    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_meta_result "CLI-02" "FAIL" "Wrong target commit" \
         "cli-input" "--target-commit=0000...0000 does not match HEAD" \
         "FAIL" "PASS" "0" "Validator accepted wrong commit"
@@ -524,7 +526,7 @@ if [[ "$rc" -ne 0 ]]; then
         "cli-input" "--target-branch=wrong-branch does not match authorized branch" \
         "FAIL" "FAIL" "$rc" "Validator correctly rejected mismatched branch"
 else
-    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_meta_result "CLI-03" "FAIL" "Wrong branch" \
         "cli-input" "--target-branch=wrong-branch does not match authorized branch" \
         "FAIL" "PASS" "0" "Validator accepted wrong branch"
@@ -542,7 +544,7 @@ if [[ "$rc" -ne 0 ]]; then
         "cli-input" "GITHUB_REPOSITORY=wrong/repo does not match expected" \
         "FAIL" "FAIL" "$rc" "Validator correctly rejected wrong repository"
 else
-    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_meta_result "CLI-04" "FAIL" "Wrong repository" \
         "cli-input" "GITHUB_REPOSITORY=wrong/repo does not match expected" \
         "FAIL" "PASS" "0" "Validator accepted wrong repository"
@@ -585,7 +587,7 @@ if [[ "$rc" -ne 0 ]]; then
         "state-condition" "untracked file present in authoritative checkout" \
         "FAIL" "FAIL" "$rc" "Validator correctly rejected dirty worktree"
 else
-    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_meta_result "ST-02" "FAIL" "Dirty worktree rejected" \
         "state-condition" "untracked file present in authoritative checkout" \
         "FAIL" "PASS" "0" "Validator accepted dirty worktree"
@@ -601,7 +603,7 @@ if [[ "$rc" -ne 0 ]]; then
         "cli-input" "--target-tree=000...000 does not match HEAD tree" \
         "FAIL" "FAIL" "$rc" "Validator correctly rejected wrong tree"
 else
-    echo "    FAIL"; FAIL_COUNT=$((FAIL_COUNT + 1))
+    echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_meta_result "ST-03" "FAIL" "Wrong tree rejected" \
         "cli-input" "--target-tree=000...000 does not match HEAD tree" \
         "FAIL" "PASS" "0" "Validator accepted wrong tree"

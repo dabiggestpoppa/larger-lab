@@ -29,7 +29,7 @@ fi
 
 # Deterministic working dir (gitignored via var/)
 mkdir -p "$VAR_DIR"
-test -w "$VAR_DIR" || { echo "BLOCKED: $VAR_DIR not writable" >&2; exit 3; }
+[[ -w "$VAR_DIR" ]] || { echo "BLOCKED: $VAR_DIR not writable" >&2; exit 3; }
 
 # Compose .env: create from example only if absent; NEVER overwrite existing.
 mkdir -p "$COMPOSE_DIR"

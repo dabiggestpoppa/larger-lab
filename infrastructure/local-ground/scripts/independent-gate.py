@@ -31,10 +31,13 @@ EVIDENCE_MANIFEST_NAME = "evidence-manifest.json"
 
 
 CLOUD_PLAN_DETERMINISTIC = "cloud-plan-deterministic.json"
+# B4-CXR7U9R15: single definitions of the repeated evidence names
+ADVERSARIAL_RESULTS_NAME = "adversarial-results.json"
+RECOVERY_RECEIPT_NAME = "postgres-recovery-receipt.json"
 
 REQUIRED = [
     "identity.json", "environment-fingerprint.json", "junit.xml",
-    TEST_SUMMARY_NAME, "test-mode.txt", "adversarial-results.json",
+    TEST_SUMMARY_NAME, "test-mode.txt", ADVERSARIAL_RESULTS_NAME,
     "adversarial-output.txt", "cloud-plan.txt", "cloud-apply-denial.txt",
     "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
     "local-after-denied.json", "source-clean.json", "cleanup.json",
@@ -175,10 +178,13 @@ def _op_receipt(ev, op, name):
     (evidence/operations), so resolve against that root."""
     for rec in op.get("receipts", []):
         if os.path.basename(rec["path"]) == name:
-            p = os.path.join(ev, "operations", rec["path"])
+            # B4-CXR7U9R15: the containment root is the pipeline-declared
+            # evidence dir; the read sink receives an inline realpath so the
+            # resolved path (never the raw index value) reaches open().
+            p = os.path.realpath(os.path.join(ev, "operations", rec["path"]))
             if os.path.isfile(p):
                 try:
-                    with open(p, encoding="utf-8") as f:
+                    with open(os.path.realpath(p), encoding="utf-8") as f:
                         return json.load(f)
                 except Exception:
                     return None
@@ -196,7 +202,7 @@ def main():
     add("gate-01-required-artifacts", "required artifacts exist", not missing, missing or "all present")
 
     # 2. Required JSON parses
-    json_files = ["identity.json", TEST_SUMMARY_NAME, "adversarial-results.json",
+    json_files = ["identity.json", TEST_SUMMARY_NAME, ADVERSARIAL_RESULTS_NAME,
                   "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
                   "local-after-denied.json", "source-clean.json", "cleanup.json",
                   STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME]
@@ -292,7 +298,7 @@ def main():
             cb.get("executed", 0) >= 0, "local mode: not required")
 
     # 17-18. Adversarial totals match actual entries and all pass
-    adv = load_json(os.path.join(ev, "adversarial-results.json"))
+    adv = load_json(os.path.join(ev, ADVERSARIAL_RESULTS_NAME))
     adv_entries = adv.get("checks", [])
     adv_totals = adv.get("totals", {})
     adv_consistent = (adv_totals.get("PASS", 0) + adv_totals.get("FAIL", 0)) == len(adv_entries)
@@ -352,7 +358,8 @@ def main():
     cad = load_json(os.path.join(ev, "cloud-apply-denial.json"))
     denial_ok = cad.get("exit_code", -1) == 5
     add("gate-27-cloud-apply-denied-code", "cloud apply returns expected nonzero denial code", denial_ok, cad)
-    denial_txt = open(os.path.join(ev, "cloud-apply-denial.txt"), encoding="utf-8").read()
+    denial_txt = open(os.path.realpath(os.path.join(ev, "cloud-apply-denial.txt")),
+                      encoding="utf-8").read()
     reason_ok = "DENIED" in denial_txt and "missing required field" in denial_txt
     add("gate-28-cloud-apply-denial-reason", "cloud apply denial contains authorization reason", reason_ok)
 
@@ -387,7 +394,7 @@ def main():
         # Recovery evidence: a full-replace restore receipt must be present and
         # must show PostgreSQL promotion succeeded (proving real recovery ran).
         try:
-            rr = load_json(os.path.join(ev, "postgres-recovery-receipt.json"))
+            rr = load_json(os.path.join(ev, RECOVERY_RECEIPT_NAME))
             rec_ok = (rr.get("exit_status") == 0 and rr.get("promoted") is True
                       and rr.get("redis_restored") is False and rr.get("source_archive_sha256"))
         except Exception:
@@ -434,7 +441,7 @@ def main():
         add("gate-35-success-full-replace-op", "successful full-replace operation indexed",
             succ is not None, "none found" if succ is None else succ.get("operation_id", ""))
         promote = _op_receipt(ev, succ, "promote-receipt.json") if succ else None
-        finalize = _op_receipt(ev, succ, "postgres-recovery-receipt.json") if succ else None
+        finalize = _op_receipt(ev, succ, RECOVERY_RECEIPT_NAME) if succ else None
         redis_rcpt = _op_receipt(ev, succ, "redis-invalidation-receipt.json") if succ else None
         artifact_rcpt = _op_receipt(ev, succ, "artifact-recovery-receipt.json") if succ else None
         prom_ok = (bool(promote) and promote.get("quarantine_held") is True
@@ -485,7 +492,7 @@ def main():
         # indexed operation reports rollback_result=ok with the injected
         # failure rolled back truthfully (original restored + verified).
         rb = find_op(lambda o: o.get("rollback_result") == "ok")
-        rb_rcpt = _op_receipt(ev, rb, "postgres-recovery-receipt.json") if rb else None
+        rb_rcpt = _op_receipt(ev, rb, RECOVERY_RECEIPT_NAME) if rb else None
         rb_ok = (bool(rb) and rb.get("final_result") == "failed"
                  and bool(rb_rcpt) and rb_rcpt.get("rollback_required") is True
                  and rb_rcpt.get("rollback_attempted") is True

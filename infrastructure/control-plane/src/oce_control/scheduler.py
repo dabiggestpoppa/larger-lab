@@ -237,11 +237,11 @@ class Scheduler:
             if sched.next_run_at:
                 next_dt = datetime.fromisoformat(sched.next_run_at)
                 if next_dt < now and sched.recurring:
-                    if sched.miss_policy == "run_once":
-                        next_run = sched.compute_next_run(now)
-                        sched.next_run_at = next_run.isoformat() if next_run else None
-                        recovered += 1
-                    elif sched.miss_policy == "skip":
+                    # B4-CXR7U9R15: run_once and skip both advance the schedule
+                    # to its next occurrence; the only difference is that skip
+                    # does not back-fill the missed run, so the action here is
+                    # identical and the branches are merged.
+                    if sched.miss_policy in ("run_once", "skip"):
                         next_run = sched.compute_next_run(now)
                         sched.next_run_at = next_run.isoformat() if next_run else None
                         recovered += 1

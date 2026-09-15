@@ -262,7 +262,7 @@ ev, rc = sys.argv[1], int(sys.argv[2])
 json.dump({"exit_code": rc, "expected_nonzero": rc != 0},
           open(ev + "/cloud-apply-denial.json", "w", encoding="utf-8"), indent=2)
 PY
-if [ "$RC" -eq 0 ]; then echo "FATAL: cloud apply unexpectedly allowed"; fail cloud-apply 1; fi
+if [[ "$RC" -eq 0 ]]; then echo "FATAL: cloud apply unexpectedly allowed"; fail cloud-apply 1; fi
 OCE_RUNTIME_TARGET=local bash "$SCRIPT_DIR/oce-ctl" local status > "$EVIDENCE/local-after-denied.txt" 2>&1
 RC=$?
 python3 - "$EVIDENCE" "$RC" <<'PY'
@@ -281,7 +281,7 @@ d["post"] = ${DIRTY} == 0
 d["dirty_post"] = ${DIRTY}
 json.dump(d, open(sys.argv[1], "w", encoding="utf-8"), indent=2)
 PY
-[ "$DIRTY" -ne 0 ] && fail clean-source-post 1
+[[ "$DIRTY" -ne 0 ]] && fail clean-source-post 1
 record "source clean (post)"
 
 # â”€â”€ cleanup record â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

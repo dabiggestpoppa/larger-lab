@@ -460,7 +460,8 @@ def _validated_read_text(path: str) -> str:
     what reaches the open() sink, so the reading sink only ever sees a
     realpath-resolved, approved-root-contained path.
     """
-    return open(_validated_open_path(path), encoding="utf-8").read()
+    return open(os.path.realpath(_validated_open_path(path)),
+                encoding="utf-8").read()
 
 
 def _load_protected_inventory(inventory_path, inventory_sha_path):
@@ -568,7 +569,8 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         receipt["staging_database"] = staging
         receipt["phases"].append("staging_created")
         # 4. restore into staging with exit-on-error
-        with open(_validated_open_path(archive), "rb") as f:
+        with open(os.path.realpath(_validated_open_path(archive)),
+                  "rb") as f:
             data = f.read()
         r = docker_exec(container, ["pg_restore", "-U", user, "--exit-on-error",
                                     "--no-owner", "--no-privileges", "--dbname", staging, remote],
