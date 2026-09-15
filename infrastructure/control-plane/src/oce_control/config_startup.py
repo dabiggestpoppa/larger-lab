@@ -69,6 +69,16 @@ CONTROL_PLANE_PORT_SETTING = "control_plane.port"
 POSTGRES_HOST_SETTING = "postgres.host"
 POSTGRES_PASSWORD_REF_SETTING = "postgres.password_ref"
 
+# B4-CXR7U9R16: the only hosts a control-plane endpoint may name. Book 4's
+# durable control plane is a loopback service (no TLS terminator), so the
+# value that reaches a "http://" URL is canonicalised to an entry of THIS
+# tuple rather than interpolated from the authenticated payload or the
+# environment. CP_BIND_HOSTS additionally carries the wildcard bind literals
+# for defensive comparison only; the governed config enum already restricts
+# control_plane.host to the loopback pair.
+CP_LOOPBACK_HOSTS = ("127.0.0.1", "localhost")
+CP_BIND_HOSTS = ("127.0.0.1", "localhost", "0.0.0.0", "::")
+
 ENV_MAP = {
     "control_plane.host": "OCE_CONTROL_PLANE_HOST",
     CONTROL_PLANE_PORT_SETTING: "OCE_CONTROL_PLANE_PORT",
@@ -1109,7 +1119,15 @@ def _verify_activation_capability(raw: str, env: dict, role: str | None,
     # TLS terminator (http_api.py documents this), the port binds 127.0.0.1
     # only, and the single-principal trusted computing base makes an
     # on-host TLS endpoint pointless. Do not switch to https here.
-    derived_url = (f"http://{envelope.control_plane_host}:"
+    cp_host = envelope.control_plane_host
+    if cp_host not in CP_LOOPBACK_HOSTS:
+        raise SystemExit(
+            "OCE activation lineage BLOCKED: capability control-plane host is "
+            "not an approved loopback endpoint — a non-local target is refused "
+            "before any socket activity (B4-CXR6R1)")
+    # the value that reaches the URL is the approved allowlist entry itself
+    approved_cp_host = next(h for h in CP_LOOPBACK_HOSTS if h == cp_host)
+    derived_url = (f"http://{approved_cp_host}:"
                    f"{envelope.control_plane_port}")
     if envelope.canonical_control_plane_url != derived_url:
         raise SystemExit(
@@ -1393,7 +1411,16 @@ def outbound_cp_url(environ: dict | None = None,
         # indistinguishable in a strict-match comparison).
         _h = eff.get('control_plane.host')
         _port = eff.get('control_plane.port')
-        _host = f'[{_h}]' if _h in ('0.0.0.0', '::') else _h
+        if _h not in CP_BIND_HOSTS:
+            raise SystemExit(
+                "OCE startup BLOCKED: control_plane.host is not an approved "
+                "loopback/bind literal — the worker target is never derived "
+                "from an unapproved host (B4-CXR3R3)")
+        # the host reaching the URL is the approved allowlist entry, never a
+        # value interpolated from the environment
+        _approved = next(h for h in CP_BIND_HOSTS if h == _h)
+        _host = (f'[{_approved}]' if _approved in ('0.0.0.0', '::')
+                 else _approved)
         canonical = f"http://{_host}:{_port}"
     url = env.get("OCE_CP_URL")
     if not url:

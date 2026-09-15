@@ -80,6 +80,28 @@ def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _canonical_sql_path(path: Path) -> Path:
+    """B4-CXR7U9R16: map a validated migration file onto the canonical root.
+
+    The returned path is rebuilt from the repository-owned canonical
+    migrations root constant plus the file's own (already regex-validated)
+    basename, and must resolve strictly inside that root. The value handed to
+    open() therefore never derives from a caller-supplied directory, and no
+    symlink can redirect it out of the canonical set.
+    """
+    root = _canonical_dir()
+    resolved = Path(os.path.realpath(path))
+    try:
+        contained = os.path.commonpath([str(resolved), str(root)]) == str(root)
+    except ValueError:
+        contained = False  # different drives / mixed absolute-relative
+    if not contained:
+        raise RuntimeError(
+            f"migration path escapes the canonical migrations root: "
+            f"{path.name} (B4-CXR7U9R16)")
+    return root / resolved.name
+
+
 def _parse_migration_name(fname: str) -> tuple[str, bool] | None:
     """Return (version, is_down) for a canonical migration filename, else
     None for an unrecognized form (CXR5-02: fail closed on unknown forms)."""
@@ -240,8 +262,13 @@ def cmd_up(dsn: str, directory: Path) -> int:
                 if prior not in applied:
                     print(f"FAIL: out-of-order migration {version}: {prior} not applied")
                     return 2
-            checksum = sha256_file(up_path)
-            sql = up_path.read_text(encoding="utf-8")
+            # B4-CXR7U9R16: the path reaching open() is rebuilt from the
+            # canonical migrations-root constant and realpath-resolved before
+            # any read, so the SQL executed against the governed database is
+            # always the canonical repository-owned program.
+            sql_path = _canonical_sql_path(up_path)
+            checksum = sha256_file(sql_path)
+            sql = open(os.path.realpath(sql_path), encoding="utf-8").read()
             try:
                 with conn.cursor() as cur:
                     cur.execute(sql)
