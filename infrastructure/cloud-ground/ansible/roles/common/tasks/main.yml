@@ -61,7 +61,7 @@
     path: /etc/apt/apt.conf.d/20auto-upgrades
     regexp: 'APT::Periodic::Update-Package-Lists'
     line: 'APT::Periodic::Update-Package-Lists "1";'
-    mode: "0644"
+    mode: "0640"
     create: true
   tags: [common, security]
 

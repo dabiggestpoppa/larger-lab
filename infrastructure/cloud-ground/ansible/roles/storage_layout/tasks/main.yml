@@ -8,7 +8,7 @@
     state: directory
     owner: root
     group: oce-operator
-    mode: '0755'
+    mode: '0750'
   tags: [storage]
 
 - name: Create OCE subdirectories
@@ -17,7 +17,7 @@
     state: directory
     owner: root
     group: oce-operator
-    mode: '0755'
+    mode: '0750'
   loop:
     - /opt/oce/data
     - /opt/oce/data/postgres

@@ -498,8 +498,17 @@ def test_ci_dependencies_are_pinned():
     req = (BASE_DIR / "requirements-ci.txt").read_text(encoding="utf-8")
     assert "pytest==" in req, "pytest must be pinned (==)"
     assert "latest" not in req
+    # B4-CXR7U9R18: the direct-dependency list stays pinned AND CI installs
+    # the RESOLVED set from the hash-locked file derived from it, so a
+    # substituted artifact or a drifted transitive cannot slip past the
+    # pin list.
+    lock = (BASE_DIR / "requirements-ci.lock.txt").read_text(encoding="utf-8")
+    assert "pytest==9.0.3" in lock, "lock must carry the pinned pytest version"
+    assert "--hash=sha256:" in lock, "lock must carry artifact hashes"
     wf = (BASE_DIR.parents[1] / ".github" / "workflows" / "b1-local-ground.yml").read_text(encoding="utf-8")
-    assert "requirements-ci.txt" in wf, "workflow must install from the pinned requirements"
+    assert "requirements-ci.lock.txt" in wf, ("workflow must install from "
+                                              "the hash-locked requirements")
+    assert "--require-hashes" in wf, "workflow must enforce the lock's hashes"
 
 
 # ── R9: final recovery truth regressions (operation index + gate) ─────────

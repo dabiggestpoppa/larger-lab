@@ -1,0 +1,26 @@
+# OCE Local Ground — fully pinned, hash-verified CI lock.
+# B4-CXR7U9R18: CI must install RESOLVED, integrity-checked versions.
+# requirements-ci.txt remains the human-facing direct-dependency list;
+# this file is the install source.
+#
+# Install with:
+#   pip install --require-hashes --only-binary ':all:' -r <this file>
+#
+# Regenerate after changing requirements-ci.txt:
+#   pip download --only-binary ':all:' --dest /tmp/lock \
+#       --platform manylinux2014_x86_64 --python-version 3.12 \
+#       --implementation cp --abi cp312 -r requirements-ci.txt
+#   for w in /tmp/lock/*.whl; do pip hash "$w"; done
+
+colorama==0.4.6 \
+    --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
+iniconfig==2.3.0 \
+    --hash=sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12
+packaging==26.3 \
+    --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+pluggy==1.6.0 \
+    --hash=sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746
+pygments==2.21.0 \
+    --hash=sha256:2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9
+pytest==9.0.3 \
+    --hash=sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9

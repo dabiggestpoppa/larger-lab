@@ -57,5 +57,5 @@
         - Unknown
     owner: root
     group: oce-operator
-    mode: '0644'
+    mode: '0640'
   tags: [monitoring, config]

@@ -23,7 +23,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install pinned Python test dependencies
-        run: pip install -r infrastructure/local-ground/requirements-ci.txt
+        run: pip install --require-hashes --only-binary ':all:' -r infrastructure/local-ground/requirements-ci.lock.txt
 
       - name: Confirm pinned actions/dependencies contract
         run: |

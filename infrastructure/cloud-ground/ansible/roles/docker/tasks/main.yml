@@ -6,7 +6,7 @@
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/ubuntu/gpg
     dest: /tmp/docker-archive-keyring.asc
-    mode: '0644'
+    mode: '0600'
   tags: [docker, install]
 
 - name: Dearmor Docker GPG key
@@ -68,7 +68,7 @@
         "live-restore": true,
         "userland-proxy": false
       }
-    mode: '0644'
+    mode: '0640'
   notify: Restart docker
   tags: [docker, config]
 
@@ -78,5 +78,5 @@
     state: directory
     owner: root
     group: docker
-    mode: '0755'
+    mode: '0750'
   tags: [docker, storage]
