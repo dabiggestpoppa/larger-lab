@@ -67,6 +67,24 @@ def _evidence_root() -> str:
     return os.path.normcase(os.path.realpath(os.path.abspath(root)))
 
 
+def _resolve_evidence_dir(argv_value):
+    """Bind the gate's evidence directory to pipeline-declared authority.
+
+    B4-CXR7U9R17: the CLI argument is NOT a path authority. It is only
+    checked for agreement with the directory the validation pipeline
+    declared in OCE_EVIDENCE_DIR; every filesystem sink in this gate is
+    then fed from the returned canonical pipeline root, so no
+    caller-supplied string can steer a read or a write.
+    """
+    declared = _evidence_root()
+    candidate = os.path.normcase(os.path.realpath(os.path.abspath(argv_value)))
+    if candidate != declared:
+        raise RuntimeError(
+            "argv evidence directory is not the pipeline-declared "
+            f"OCE_EVIDENCE_DIR boundary: {argv_value}")
+    return declared
+
+
 def _validated_path(path):
     real = os.path.normcase(os.path.realpath(os.path.abspath(path)))
     root = _evidence_root()
@@ -178,13 +196,16 @@ def _op_receipt(ev, op, name):
     (evidence/operations), so resolve against that root."""
     for rec in op.get("receipts", []):
         if os.path.basename(rec["path"]) == name:
-            # B4-CXR7U9R15: the containment root is the pipeline-declared
-            # evidence dir; the read sink receives an inline realpath so the
-            # resolved path (never the raw index value) reaches open().
-            p = os.path.realpath(os.path.join(ev, "operations", rec["path"]))
+            # B4-CXR7U9R17: the index-declared receipt path is CONTAINED
+            # inside the pipeline-declared evidence boundary, not merely
+            # realpath'd, so an index value cannot escape the boundary.
+            try:
+                p = _validated_path(os.path.join(ev, "operations", rec["path"]))
+            except RuntimeError:
+                return None
             if os.path.isfile(p):
                 try:
-                    with open(os.path.realpath(p), encoding="utf-8") as f:
+                    with open(p, encoding="utf-8") as f:
                         return json.load(f)
                 except Exception:
                     return None
@@ -195,7 +216,14 @@ def main():
     if len(sys.argv) != 4:
         print("usage: independent-gate.py <evidence-dir> <commit> <tree>", file=sys.stderr)
         sys.exit(2)
-    ev, commit, tree = sys.argv[1], sys.argv[2], sys.argv[3]
+    commit, tree = sys.argv[2], sys.argv[3]
+    # B4-CXR7U9R17: bind the evidence directory to the pipeline-declared
+    # authority; argv may only agree with it, never define it.
+    try:
+        ev = _resolve_evidence_dir(sys.argv[1])
+    except RuntimeError as exc:
+        print(f"FATAL: {exc}", file=sys.stderr)
+        sys.exit(2)
 
     # 1. Required artifacts exist
     missing = [r for r in REQUIRED if not os.path.isfile(os.path.join(ev, r))]
@@ -525,7 +553,13 @@ def main():
     # 31. Manifest hashes and sizes match final files
     manifest_ok = True
     for art in man.get("artifacts", []):
-        p = os.path.join(ev, art["path"])
+        # B4-CXR7U9R17: a manifest-declared artifact path is contained
+        # inside the pipeline-declared boundary before any read.
+        try:
+            p = _validated_path(os.path.join(ev, str(art.get("path", ""))))
+        except RuntimeError:
+            manifest_ok = False
+            continue
         if not os.path.isfile(p):
             manifest_ok = False
             continue

@@ -1294,6 +1294,17 @@ def create_activation_context(
                         "backend": "local-runtime-store-v1"}}
     sec_fp = security_state_fingerprint(sec_meta)
     host = str(eff.get("control_plane.host"))
+    # B4-CXR7U9R17: the canonical control-plane URL is built from the
+    # APPROVED loopback allowlist entry, never from the configured string
+    # itself, so no unapproved host can reach the URL sink. The governed
+    # spine already restricts this enum to the loopback pair; keeping the
+    # check here makes the guarantee fail closed locally as well.
+    if host not in CP_LOOPBACK_HOSTS:
+        raise SystemExit(
+            "OCE startup BLOCKED: control_plane.host is not an approved "
+            "loopback endpoint — the canonical control-plane URL is "
+            "never derived from an unapproved host (B4-CXR7U9R17)")
+    host = next(h for h in CP_LOOPBACK_HOSTS if h == host)
     port = int(eff.get(CONTROL_PLANE_PORT_SETTING))
     interval = int(eff.get("control_plane.scheduler_interval"))
     pg_host = str(eff.get(POSTGRES_HOST_SETTING))

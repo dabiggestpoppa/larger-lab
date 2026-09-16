@@ -39,7 +39,7 @@
     path: "{{ item }}"
     owner: root
     group: docker
-    mode: '0775'
+    mode: '0770'
     recurse: false
   loop:
     - /opt/oce/data/postgres
@@ -60,7 +60,7 @@
           notifempty
           create 0640 root docker
       }
-    mode: '0644'
+    mode: '0640'
   tags: [storage, logrotate]
 
 - name: Reserve emergency disk headroom (10 GB)
