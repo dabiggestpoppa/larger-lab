@@ -1,3 +1,10 @@
 # OCE Local Ground — pinned CI test dependencies (immutable contract).
 # Do not silently upgrade during the repair cycle; bump deliberately.
+# B4-CXR7U9R18 - CI installs the .lock file (the resolved, hash-verified
+# set); this list stays the direct-dependency source. Regenerate the lock
+# after editing this list:
+#   pip download --only-binary ':all:' --dest /tmp/lock \
+#       --platform manylinux2014_x86_64 --python-version 3.12 \
+#       --implementation cp --abi cp312 -r <this file>
+#   then record `pip hash` for each downloaded wheel in the .lock file.
 pytest==9.0.3

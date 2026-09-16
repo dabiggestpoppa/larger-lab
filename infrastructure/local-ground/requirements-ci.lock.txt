@@ -1,17 +1,6 @@
-# OCE Local Ground — fully pinned, hash-verified CI lock.
-# B4-CXR7U9R18: CI must install RESOLVED, integrity-checked versions.
-# requirements-ci.txt remains the human-facing direct-dependency list;
-# this file is the install source.
-#
-# Install with:
-#   pip install --require-hashes --only-binary ':all:' -r <this file>
-#
-# Regenerate after changing requirements-ci.txt:
-#   pip download --only-binary ':all:' --dest /tmp/lock \
-#       --platform manylinux2014_x86_64 --python-version 3.12 \
-#       --implementation cp --abi cp312 -r requirements-ci.txt
-#   for w in /tmp/lock/*.whl; do pip hash "$w"; done
-
+# OCE Local Ground - resolved, hash-verified CI install set.
+# Regenerated from requirements-ci.txt, which owns the recipe.
+# Install: pip install --require-hashes --only-binary ':all:' -r <this file>
 colorama==0.4.6 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
 iniconfig==2.3.0 \

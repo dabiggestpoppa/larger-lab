@@ -36,18 +36,10 @@ jobs:
           python-version: '3.12'
 
       - name: Install pinned Python test dependencies
-        # uv enforces exact versions AND artifact hashes from the lock file;
-        # bare pip would silently accept and resolve beyond the pin list.
-        run: |
-          # uv is a pinned, wheel-only build tool that exists solely to
-          # enforce the pinned contract; it is uninstalled immediately after
-          # the hash-verified install (B4-CXR7U9R14/R18/R19), so it never
-          # remains in the runtime environment.
-          UV_VERSION=0.12.15
-          pipx install --pip-args='--only-binary :all:' "uv==$UV_VERSION" 2>/dev/null \
-            || pip install --quiet --only-binary ':all:' "uv==$UV_VERSION"
-          uv pip install --system --require-hashes -r infrastructure/control-plane/requirements-ci.lock.txt
-          pip uninstall -y uv 2>/dev/null || pipx uninstall uv 2>/dev/null || true
+        # B4-CXR7U9R18/R20: the lock carries every resolved version and every
+        # artifact hash, so plain pip is as strict as the uv bootstrap it
+        # replaces - and installs no unpinned tool to get there.
+        run: pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
 
       - name: Confirm pinned actions/dependencies contract
         run: |

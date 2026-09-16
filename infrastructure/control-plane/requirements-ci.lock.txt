@@ -1,17 +1,6 @@
-# OCE Book 2 control plane — fully pinned, hash-verified CI lock.
-# B4-CXR7U9R18: CI must install RESOLVED, integrity-checked versions.
-# requirements-ci.txt remains the human-facing direct-dependency list;
-# this file is the install source.
-#
-# Install with:
-#   pip install --require-hashes --only-binary ':all:' -r <this file>
-#
-# Regenerate after changing requirements-ci.txt:
-#   pip download --only-binary ':all:' --dest /tmp/lock \
-#       --platform manylinux2014_x86_64 --python-version 3.12 \
-#       --implementation cp --abi cp312 -r requirements-ci.txt
-#   for w in /tmp/lock/*.whl; do pip hash "$w"; done
-
+# OCE Book 2 control plane - resolved, hash-verified CI install set.
+# Regenerated from requirements-ci.txt, which owns the recipe.
+# Install: pip install --require-hashes --only-binary ':all:' -r <this file>
 annotated-doc==0.0.5 \
     --hash=sha256:117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101
 annotated-types==0.8.0 \

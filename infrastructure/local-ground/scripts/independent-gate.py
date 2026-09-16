@@ -9,6 +9,20 @@ every applicable condition holds.
 Usage: independent-gate.py <evidence-dir> <commit> <tree>
 Env:   OCE_RUN_ID, OCE_CI_MODE (true|false), OCE_EXPECTED_REPO,
        OCE_EXPECTED_BRANCH, GITHUB_REPOSITORY, GITHUB_REF_NAME
+
+Structure (B4-CXR7U9R20):
+    EvidenceBoundary  sole owner of the approved evidence root and of every
+                      read/write inside the package (bind/path/exists/json/
+                      text); constructed once in main(), and no other code
+                      resolves or extends the boundary.
+    contained_path()  the single containment algorithm, shared by package
+                      reads, indexed receipts, manifest artifacts and the
+                      subprocess --ops-root.
+    _validated_subprocess_path()
+                      policy wrapper adding the directory requirement for the
+                      subprocess argument.
+    sha256()/size()   pure measurement of an already-resolved path.
+    add()/checks      result accumulation; main() renders the report.
 """
 import hashlib
 import importlib.util
@@ -51,53 +65,75 @@ def add(cid, name, ok, detail=""):
     checks.append({"id": cid, "name": name, "ok": bool(ok), "detail": str(detail)})
 
 
-def _evidence_root() -> str:
-    """Pipeline-declared evidence boundary (B4-CXR7U9R13, S2077).
+def _canonical(path: str) -> str:
+    """Absolute, symlink-resolved path.
 
-    The evidence directory this gate may read/write is the one the
-    validation pipeline exported as OCE_EVIDENCE_DIR before launching
-    the gate - never the raw argv value alone. The artifact path cannot
-    self-approve its own containment; test harnesses declare their own
-    root through the same channel."""
-    root = os.environ.get("OCE_EVIDENCE_DIR", "")
-    if not root:
-        raise RuntimeError(
-            "OCE_EVIDENCE_DIR is not set: the evidence boundary must be "
-            "declared by the pipeline, not by argv")
-    return os.path.normcase(os.path.realpath(os.path.abspath(root)))
-
-
-def _resolve_evidence_dir(argv_value):
-    """Bind the gate's evidence directory to pipeline-declared authority.
-
-    B4-CXR7U9R17: the CLI argument is NOT a path authority. It is only
-    checked for agreement with the directory the validation pipeline
-    declared in OCE_EVIDENCE_DIR; every filesystem sink in this gate is
-    then fed from the returned canonical pipeline root, so no
-    caller-supplied string can steer a read or a write.
+    Case is preserved in the result (callers compare resolved paths as
+    strings); containment comparisons case-fold separately below.
     """
-    declared = _evidence_root()
-    candidate = os.path.normcase(os.path.realpath(os.path.abspath(argv_value)))
-    if candidate != declared:
-        raise RuntimeError(
-            "argv evidence directory is not the pipeline-declared "
-            f"OCE_EVIDENCE_DIR boundary: {argv_value}")
-    return declared
+    return os.path.realpath(os.path.abspath(path))
 
 
-def _validated_path(path):
-    real = os.path.normcase(os.path.realpath(os.path.abspath(path)))
-    root = _evidence_root()
-    if not real.startswith(root + os.sep) and real != root:
-        raise RuntimeError(
-            f"evidence path outside the declared OCE_EVIDENCE_DIR "
-            f"boundary: {path}")
+def contained_path(path: str, root: str) -> str:
+    """THE containment owner: canonical *path*, proven inside *root*.
+
+    One algorithm for every caller - package reads, indexed receipts,
+    manifest artifacts and the subprocess --ops-root. The comparison is
+    separator-anchored and case-folded, so a sibling that merely shares a
+    name prefix with the root, a parent traversal, an absolute escape and a
+    symlink substitution are all refused. Denial is a pure predicate with no
+    durable side effects. Raises RuntimeError on every escape.
+    """
+    approved, real = _canonical(root), _canonical(path)
+    if (os.path.normcase(real) != os.path.normcase(approved)
+            and not os.path.normcase(real).startswith(
+                os.path.normcase(approved) + os.sep)):
+        raise RuntimeError(f"path escapes approved root containment: {path}")
     return real
 
 
-def load_json(path):
-    with open(_validated_path(path), "r", encoding="utf-8") as f:
-        return json.load(f)
+class EvidenceBoundary:
+    """The evidence package this gate may read and write.
+
+    Sole owner of the approved root: resolved ONCE from the pipeline
+    declaration (OCE_EVIDENCE_DIR), with the CLI argument admitted only when
+    it agrees with that declaration (B4-CXR7U9R17). Every filesystem access
+    to the package goes through path()/exists()/json()/text(), so no
+    caller-supplied string can steer a read or a write and containment
+    policy lives in exactly one place.
+    """
+
+    def __init__(self, root: str):
+        self.root = _canonical(root)
+
+    @classmethod
+    def bind(cls, argv_value: str) -> "EvidenceBoundary":
+        declared = os.environ.get("OCE_EVIDENCE_DIR", "")
+        if not declared:
+            raise RuntimeError(
+                "OCE_EVIDENCE_DIR is not set: the evidence boundary must be "
+                "declared by the pipeline, not by argv")
+        boundary = cls(declared)
+        if _canonical(argv_value) != boundary.root:
+            raise RuntimeError(
+                "argv evidence directory is not the pipeline-declared "
+                f"OCE_EVIDENCE_DIR boundary: {argv_value}")
+        return boundary
+
+    def path(self, *parts: str) -> str:
+        """Resolved path of a package member, proven inside the boundary."""
+        return contained_path(os.path.join(self.root, *parts), self.root)
+
+    def exists(self, *parts: str) -> bool:
+        return os.path.isfile(self.path(*parts))
+
+    def json(self, *parts: str):
+        with open(self.path(*parts), encoding="utf-8") as f:
+            return json.load(f)
+
+    def text(self, *parts: str) -> str:
+        with open(self.path(*parts), encoding="utf-8") as f:
+            return f.read()
 
 
 def sha256(path):
@@ -130,7 +166,7 @@ def _pg_recovery_source():
 def _ops_index(ev):
     """Load the authoritative operation index from the evidence package.
     Returns (ok, idx, problem)."""
-    p = os.path.join(ev, "operations", "index.json")
+    p = ev.path("operations", "index.json")
     if not os.path.isfile(p):
         return False, {}, "operation index missing (operations/index.json)"
     try:
@@ -142,26 +178,14 @@ def _ops_index(ev):
 
 
 def _validated_subprocess_path(path: str, root: str) -> str:
-    """Enforce REAL containment of *path* inside approved *root*
-    (B4-CXR7U9R7; replaces the former realpath-only check, S1091).
-
-    The approved root is the evidence directory supplied on the command
-    line; the operations root handed to a subprocess argument list MUST
-    resolve inside it. Rejected on every escape:
-      * parent traversal ("..") that normalizes outside the root;
-      * absolute paths outside the root;
-      * symlink substitution of the candidate or any parent directory;
-      * prefix collisions (/root/evidence-evil does not contain
-        /root/evidence - commonpath comparison, not prefix strings).
-    Existence and directory type are checked on the CANONICAL path.
+    """Policy: the subprocess --ops-root must be an EXISTING DIRECTORY inside
+    the approved root (B4-CXR7U9R7). Containment itself is owned by
+    contained_path; this wrapper adds only the directory requirement.
     Denial has zero durable side effects: this is a pure predicate.
     """
     if not os.path.isdir(root):
         raise RuntimeError(f"approved root is not a directory: {root}")
-    approved = os.path.realpath(root)
-    real = os.path.realpath(path)
-    if os.path.commonpath([approved, real]) != approved:
-        raise RuntimeError(f"path escapes approved root containment: {path}")
+    real = contained_path(path, root)
     if not os.path.isdir(real):
         raise RuntimeError(f"not a directory: {path}")
     return real
@@ -182,8 +206,7 @@ def _ops_verify(ev):
     # OCE_EVIDENCE_DIR boundary (never raw argv) and is realpath-validated
     # into that boundary at creation, so the subprocess argument carries a
     # contained path by construction.
-    ops_root = _validated_subprocess_path(os.path.join(ev, "operations"),
-                                          os.path.abspath(ev))
+    ops_root = _validated_subprocess_path(ev.path("operations"), ev.root)
     rops = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recovery-ops.py")
     r = subprocess.run([sys.executable, rops, "verify", "--ops-root", ops_root],
                        capture_output=True, text=True, timeout=60)
@@ -200,7 +223,7 @@ def _op_receipt(ev, op, name):
             # inside the pipeline-declared evidence boundary, not merely
             # realpath'd, so an index value cannot escape the boundary.
             try:
-                p = _validated_path(os.path.join(ev, "operations", rec["path"]))
+                p = ev.path("operations", rec["path"])
             except RuntimeError:
                 return None
             if os.path.isfile(p):
@@ -220,13 +243,13 @@ def main():
     # B4-CXR7U9R17: bind the evidence directory to the pipeline-declared
     # authority; argv may only agree with it, never define it.
     try:
-        ev = _resolve_evidence_dir(sys.argv[1])
+        ev = EvidenceBoundary.bind(sys.argv[1])
     except RuntimeError as exc:
         print(f"FATAL: {exc}", file=sys.stderr)
         sys.exit(2)
 
     # 1. Required artifacts exist
-    missing = [r for r in REQUIRED if not os.path.isfile(os.path.join(ev, r))]
+    missing = [r for r in REQUIRED if not ev.exists(r)]
     add("gate-01-required-artifacts", "required artifacts exist", not missing, missing or "all present")
 
     # 2. Required JSON parses
@@ -236,23 +259,21 @@ def main():
                   STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME]
     parse_ok = True
     for jf in json_files:
-        p = os.path.join(ev, jf)
-        if os.path.isfile(p):
-            try:
-                load_json(p)
-            except Exception as e:
-                parse_ok = False
-                add(f"gate-02-parse-{jf}", f"json parses: {jf}", False, repr(e))
+        if not ev.exists(jf):
+            continue
+        try:
+            ev.json(jf)
+        except Exception as e:
+            parse_ok = False
+            add(f"gate-02-parse-{jf}", f"json parses: {jf}", False, repr(e))
     add("gate-02-json-parses", "all required json parses", parse_ok)
 
     # 3. One nonempty OCE_RUN_ID everywhere
     run_env = os.environ.get("OCE_RUN_ID", "")
     run_ids = set()
     for jf in ["identity.json", STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME]:
-        p = os.path.join(ev, jf)
-        if os.path.isfile(p):
-            d = load_json(p)
-            run_ids.add(d.get("run_id", ""))
+        if ev.exists(jf):
+            run_ids.add(ev.json(jf).get("run_id", ""))
     run_ids.add(run_env)
     run_ok = len(run_ids) == 1 and "" not in run_ids
     add("gate-03-run-id-consistent", "one nonempty RUN_ID everywhere", run_ok, run_ids)
@@ -261,7 +282,7 @@ def main():
     add("gate-04-expected-repo", "expected repository exact", EXPECTED_REPO == "dabiggestpoppa/larger-lab", EXPECTED_REPO)
 
     # 5. Observed remote identity matches expected
-    ident = load_json(os.path.join(ev, "identity.json"))
+    ident = ev.json("identity.json")
     observed = ident.get("repository", "")
     add("gate-05-observed-repo", "observed remote identity matches", observed == EXPECTED_REPO, observed)
 
@@ -282,7 +303,7 @@ def main():
     # 9-11. Commit/tree arguments used and match
     commit_ok = ident.get("commit", "") == commit == ident.get("tested_commit", commit)
     tree_ok = ident.get("tree", "") == tree
-    man = load_json(os.path.join(ev, EVIDENCE_MANIFEST_NAME))
+    man = ev.json(EVIDENCE_MANIFEST_NAME)
     commit_ok = commit_ok and man.get("implementation_commit", "") == commit
     tree_ok = tree_ok and man.get("implementation_tree", "") == tree
     add("gate-09-implementation-commit", "implementation commit matches tested checkout", commit_ok, commit)
@@ -292,7 +313,7 @@ def main():
 
     # 12. Source clean before/after
     try:
-        sc = load_json(os.path.join(ev, "source-clean.json"))
+        sc = ev.json("source-clean.json")
         sc_ok = sc.get("pre") is True and sc.get("post") is True
     except Exception:
         sc_ok = False
@@ -300,7 +321,7 @@ def main():
     add("gate-12-source-clean", "source clean before and after", sc_ok, sc)
 
     # 13-16. Test totals from machine-readable registry
-    ts = load_json(os.path.join(ev, TEST_SUMMARY_NAME))
+    ts = ev.json(TEST_SUMMARY_NAME)
     t = ts.get("totals", {})
     cb = ts.get("container_backed", {})
     collected, executed = t.get("collected", 0), t.get("executed", 0)
@@ -319,14 +340,14 @@ def main():
     if CI_MODE:
         cb_executed_all = cb.get("executed", 0) == cb.get("collected", 0)
         add("gate-16-container-tests-executed", "container-backed tests execute in CI", cb_executed_all, cb)
-        mode_txt = open(os.path.join(ev, "test-mode.txt"), encoding="utf-8").read().strip()
+        mode_txt = ev.text("test-mode.txt").strip()
         add("gate-16b-authoritative-mode", "CI mode is AUTHORITATIVE_CI", mode_txt == "AUTHORITATIVE_CI", mode_txt)
     else:
         add("gate-16-container-tests-executed", "container-backed tests execute in CI",
             cb.get("executed", 0) >= 0, "local mode: not required")
 
     # 17-18. Adversarial totals match actual entries and all pass
-    adv = load_json(os.path.join(ev, ADVERSARIAL_RESULTS_NAME))
+    adv = ev.json(ADVERSARIAL_RESULTS_NAME)
     adv_entries = adv.get("checks", [])
     adv_totals = adv.get("totals", {})
     adv_consistent = (adv_totals.get("PASS", 0) + adv_totals.get("FAIL", 0)) == len(adv_entries)
@@ -371,29 +392,28 @@ def main():
 
     # 25-26. Cloud plan deterministic + zero mutation (parse machine lines)
     try:
-        cpd = load_json(os.path.join(ev, CLOUD_PLAN_DETERMINISTIC))
+        cpd = ev.json(CLOUD_PLAN_DETERMINISTIC)
         det_ok = cpd.get("deterministic") is True
     except Exception:
         det_ok = False
         cpd = {}
     add("gate-25-cloud-plan-deterministic", "cloud plan deterministic", det_ok, cpd)
-    plan_txt = open(os.path.join(ev, "cloud-plan.txt"), encoding="utf-8").read()
+    plan_txt = ev.text("cloud-plan.txt")
     zero_mut = ("provider contacts: 0" in plan_txt and "resources changed: 0" in plan_txt
                 and "cost incurred: ZERO" in plan_txt)
     add("gate-26-cloud-plan-zero-mutation", "cloud plan reports zero mutation", zero_mut)
 
     # 27-28. Cloud apply denial code + reason (machine-readable)
-    cad = load_json(os.path.join(ev, "cloud-apply-denial.json"))
+    cad = ev.json("cloud-apply-denial.json")
     denial_ok = cad.get("exit_code", -1) == 5
     add("gate-27-cloud-apply-denied-code", "cloud apply returns expected nonzero denial code", denial_ok, cad)
-    denial_txt = open(os.path.realpath(os.path.join(ev, "cloud-apply-denial.txt")),
-                      encoding="utf-8").read()
+    denial_txt = ev.text("cloud-apply-denial.txt")
     reason_ok = "DENIED" in denial_txt and "missing required field" in denial_txt
     add("gate-28-cloud-apply-denial-reason", "cloud apply denial contains authorization reason", reason_ok)
 
     # 29. Local mode works after denied cloud action
     try:
-        lad = load_json(os.path.join(ev, "local-after-denied.json"))
+        lad = ev.json("local-after-denied.json")
         local_ok = lad.get("exit_code") == 0
     except Exception:
         local_ok = False
@@ -402,7 +422,7 @@ def main():
 
     # 30. Cleanup succeeds
     try:
-        cl = load_json(os.path.join(ev, "cleanup.json"))
+        cl = ev.json("cleanup.json")
         cleanup_ok = cl.get("cleanup") == "ok" or (cl.get("removed") is True and cl.get("pruned") is True)
     except Exception:
         cleanup_ok = False
@@ -412,7 +432,7 @@ def main():
     # disposable containers, network, and test volumes (missing evidence blocks).
     if CI_MODE:
         try:
-            cc = load_json(os.path.join(ev, "container-cleanup.json"))
+            cc = ev.json("container-cleanup.json")
             cc_ok = (cc.get("cleanup") == "ok" and cc.get("containers_removed") is True
                      and cc.get("networks_removed") is True and cc.get("volumes_removed") is True)
         except Exception:
@@ -422,7 +442,7 @@ def main():
         # Recovery evidence: a full-replace restore receipt must be present and
         # must show PostgreSQL promotion succeeded (proving real recovery ran).
         try:
-            rr = load_json(os.path.join(ev, RECOVERY_RECEIPT_NAME))
+            rr = ev.json(RECOVERY_RECEIPT_NAME)
             rec_ok = (rr.get("exit_status") == 0 and rr.get("promoted") is True
                       and rr.get("redis_restored") is False and rr.get("source_archive_sha256"))
         except Exception:
@@ -556,7 +576,7 @@ def main():
         # B4-CXR7U9R17: a manifest-declared artifact path is contained
         # inside the pipeline-declared boundary before any read.
         try:
-            p = _validated_path(os.path.join(ev, str(art.get("path", ""))))
+            p = ev.path(str(art.get("path", "")))
         except RuntimeError:
             manifest_ok = False
             continue
@@ -568,7 +588,7 @@ def main():
     add("gate-31-manifest-hashes-sizes", "manifest hashes and sizes match final files", manifest_ok)
 
     # 32. Cloud fields remain deferred / not deployed / zero / 0 mutations
-    st = load_json(os.path.join(ev, STAGE_STATUS_NAME))
+    st = ev.json(STAGE_STATUS_NAME)
     cloud_ok = (st.get("cloud_activation_state") == "DEFERRED_BY_OPERATOR"
                 and st.get("cloud_deployment_state") == "NOT_DEPLOYED"
                 and st.get("cloud_cost_state") == "ZERO"
@@ -598,7 +618,7 @@ def main():
         "totals": {"PASS": passed_count, "FAIL": len(failed), "total": len(checks)},
         "generated_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
-    with open(_validated_path(os.path.join(ev, "independent-gate.json")), "w", encoding="utf-8") as f:
+    with open(ev.path("independent-gate.json"), "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
     print(f"INDEPENDENT GATE [{mode}]: {result} ({passed_count}/{len(checks)} checks)")
     for c in failed:

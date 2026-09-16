@@ -1,24 +1,6 @@
-# OCE Cloud Ground — fully pinned, hash-verified dependency lock.
-#
-# B4-CXR7U9R17: CI must install RESOLVED, integrity-checked versions, not a
-# floating resolution of a human-facing pin list. Every direct and transitive
-# requirement is pinned to an exact version with the sha256 of the artifact
-# the CI platform actually resolves (cp312 / manylinux x86_64, the
-# ubuntu-latest + actions/setup-python 3.12 combination used by
-# b1-i1r-validation.yml and b1-i1r3-validation.yml).
-#
-# requirements.txt remains the human-facing list of DIRECT dependencies.
-# This file is the install source. Install with:
-#
-#   pip install --require-hashes --only-binary ':all:' -r <this file>
-#
-# Regenerate after changing requirements.txt:
-#
-#   pip download --only-binary ':all:' --dest /tmp/lock \
-#       --platform manylinux2014_x86_64 --python-version 3.12 \
-#       --implementation cp --abi cp312 -r requirements.txt
-#   for w in /tmp/lock/*.whl; do pip hash "$w"; done
-
+# OCE Cloud Ground - resolved, hash-verified CI install set.
+# Regenerated from requirements.txt, which owns the recipe.
+# Install: pip install --require-hashes --only-binary ':all:' -r <this file>
 attrs==26.1.0 \
     --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309
 jsonschema==4.25.1 \
