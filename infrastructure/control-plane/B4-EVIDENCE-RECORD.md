@@ -1,7 +1,8 @@
 # OCE Book 4 — Configuration & Security Control Spine Evidence Record
 
-**Status:** `B4-CXR7U9 IN PROGRESS — GATE OPEN` (only the SonarQube gate remains; see the CXR7U9R23+ section below)
-**CXR7U9 quality gate:** SonarQube Security D / Reliability C on new code on the current head (required A/A) — credential-blocked; see the CXR7U9R23+ section below
+**Status:** `IMPLEMENTATION CONVERGED — CLOSURE BLOCKED` (only the SonarQube gate remains; see the CXR7U9R28–R30 superseding section at the end of this record)
+**Final implementation commit:** `8ce72fb86c88a2d7768dc1c9a2bd9568f60d6aa1`, tree `4e14b63fb69fcae9ecf18941ff40731143626344` — six workflows green on it
+**CXR7U9 quality gate:** SonarQube Security D / Reliability C on new code on the current head (required A/A) — credential- and disposition-blocked; see the CXR7U9R28–R30 section at the end of this record
 **Branch:** `oce-program-build`
 **B4-CXR5 repair start SHA:** `047b5eb6afd7e46a48024726fbbb1e83b2d876cd`
 **Book 4 start SHA:** `acddeb696e6b5df1828fc7baf8c7bfbd2eb43e90`
@@ -1189,4 +1190,197 @@ execution blocked (4); resource/network/OS enforcement reported literally
 closed (7); audit retry proven through the real PostgreSQL sink (8); explicit
 initialization complete-or-nothing (9); no mandatory security test passes
 vacuously (10); final evidence claims only what the implementation proves
-(11). Book 4 remains closed at the CXR7U sequence.
+(11). Book 4 was closed at the CXR7U sequence; that closure is superseded by the
+later B4-CXR7 / CXR7U9 repair sequence, so it is no longer the current status.
+The current status is `IMPLEMENTATION CONVERGED — CLOSURE BLOCKED` (see the
+CXR7U9R28–R30 section below).
+
+## B4-CXR7U9R28–R30 — SUPERSEDING EXACT-HEAD EVIDENCE — `IMPLEMENTATION CONVERGED — CLOSURE BLOCKED`
+
+**Gate:** B4-CXR7U9R30 · **Branch:** `oce-program-build` · **R30 start SHA:** `8ce72fb86c88a2d7768dc1c9a2bd9568f60d6aa1`
+**PR #4:** OPEN, **not merged**, `MERGEABLE` (previously CONFLICTING), base `main` (`d09941e7`), head
+`8ce72fb8`; the title remains *IN PROGRESS — NOT MERGE AUTHORIZED*.
+
+### Why this section exists — it supersedes the finality claim above
+
+`13d19acc3` (B4-CXR7U9-EVIDENCE) was valid evidence for implementation `b6054cf2`
+(tree `b171cd3f`), and it stays historically valid for exactly what it tested.
+Two implementation commits followed it, so it is **historical, not final**:
+
+| Commit | Message |
+|---|---|
+| `25c7cef64` | B4-CXR7U9R28: make path-authority prose match enforcement |
+| `8ce72fb86` | B4-CXR7U9R29: one containment owner, and its proof runs in CI |
+
+**Final implementation commit:** `8ce72fb86c88a2d7768dc1c9a2bd9568f60d6aa1`,
+tree `4e14b63fb69fcae9ecf18941ff40731143626344`.
+
+R30 changed no implementation, test or workflow file — it is proof and evidence
+only. No amend, squash, rebase, force push or history rewrite was performed;
+`main` is untouched and is an ancestor of this head.
+
+### What R28 and R29 changed
+
+- **R28 (prose must match enforcement).** `_validated_open_path` in
+  `pg-recovery.py` enforced `realpath == abspath` (symlink rejection),
+  approved-root containment and a regular-file check while its own docstring
+  said *"there is NO fixed approved root, so NO containment check is claimed"*
+  and called its inputs `OPERATOR_TRUSTED_INPUT`. The byte-identical paragraph
+  had been copied into `pg-verify.py`, and the path-authority suite repeated the
+  claim — a third site the request had not named. All three now state the
+  enforcement order the code implements (paths are data, never authority; the
+  content SHA check still fails closed). The duplicated symlink probe in
+  `test_worker_supervisor.py` was replaced with the inline `try/except OSError`
+  idiom its two sibling tests already use, leaving one named probe project-wide
+  (`needs_symlink` in the path-authority suite).
+- **R29 (one owner, and the proof runs in CI).** `pg-verify.py` carried
+  byte-identical copies of `pg-recovery.py`'s `_approved_roots`,
+  `_validated_open_path` and `_validated_read_text` (63 lines) in a file that
+  already loads `pg-recovery` as `_PG`, and re-implemented its inventory tamper
+  check; it now binds those three from `_PG` and calls
+  `_PG._load_protected_inventory` (−66 lines). That duplication is *why* the
+  false docstring existed twice. `pg-recovery.py`'s documented step 2 no longer
+  re-enumerates the roots `_approved_roots` owns, and the suite asserts the
+  single-owner invariant (`test_containment_has_exactly_one_owner`) instead of
+  looping every case over both modules. R29 also selected
+  `test_b4_cxr7u9r7_path_authority.py` in the local-ground runner
+  (`PATH_AUTHORITY_TEST`, beside the seven existing paths), so the containment
+  proofs execute in CI rather than only on a workstation.
+
+### Authoritative CI on the final implementation `8ce72fb8` — six workflows, all success
+
+| Workflow | Run | Event | Tested identity | OCE_RUN_ID | Result | Artifact / digest | Manifest |
+|---|---|---|---|---|---|---|---|
+| b1-local-ground-validation | `35235034640` | push | commit = tested_commit = `8ce72fb8`, tree `4e14b63f`, branch `oce-program-build` | `d404adfb2910` | 185 collected / 185 executed / 185 passed / 0 failed / 0 errors / 0 skipped; independent gate PASS (60 checks, 0 failing) | `10502387873` `b1-local-ground-evidence-d404adfb2910` sha256:636784c162cfa5dead2a58864de08b7e6d3b14d7cc6666a4d98d1f863f475af9 | 37/37 |
+| b1-i1r3-validation | `35261014346` | workflow_dispatch | commit = tested_commit = `8ce72fb8`, tree `4e14b63f`, attached checkout | `5f923dbc54e2` | final gate `{PASS: 35, FAIL: 0, BLOCKED: 0, SKIPPED: 0}`; regressions 67/67; adversarial 49/49 | `10514967859` `b1-i1r3h-evidence-5f923dbc54e2` sha256:bb0731167eba574c194ff9f561b10ae714d3d63a224ae0175f90d8b7d55e1dd3 | 7/7 |
+| B1-I1R Validation | `35235039845` | pull_request | tests the PR merge ref `f18d17d6` (parents `d09941e7` + `8ce72fb8`), implementation_tree `4e14b63f` | `268190abb498` | final gate `{PASS: 35, FAIL: 0, BLOCKED: 0, SKIPPED: 0}`; regressions 67/67; adversarial 49/49 | `10503093307` `b1-i1r-evidence-268190abb498` sha256:b9dc05edc105caee842c9705fde737cc30dd27656d805c2492b4030b2f4ae304 | 7/7 |
+| b2-control-plane-validation | `35235034603` | push | `8ce72fb8` / `4e14b63f`, ci_ref `oce-program-build` | `46414348160f` | 905/905/905/0/0/0; independent gate PASS (137 checks, 0 failing) + final verifier PASS (144 checks, 0 failing) | `10502327671` `b2-control-plane-evidence-46414348160f` sha256:fb0ef33cbd97de08908878d1616c9236628e29a20154c6d5c702b93efcfdc4aa | 33/33 |
+| b3-worker-fabric-validation | `35235034573` | push | `8ce72fb8` / `4e14b63f`, ci_ref `oce-program-build` | `a9c677c71226` | 905/905/905/0/0/0; both gates PASS | `10502883096` `b3-worker-fabric-evidence-a9c677c71226` sha256:7a3be7e0fe139c97ba4b2a9bb9dee2da39029c7f88a6097af1c42b9c5688efb3 | 33/33 |
+| b4-config-spine-validation | `35235034620` | push | `8ce72fb8` / `4e14b63f`, ci_ref `oce-program-build` | `56fb88c3281e` | 905/905/905/0/0/0; both gates PASS | `10502967772` `b4-config-spine-evidence-56fb88c3281e` sha256:002705a70299639f5eacda39be5c4322c6ba2320c3a372710206b09e6839b69d | 33/33 |
+
+Every job step of every one of the six runs concluded `success` (12/12 in the four
+push workflows, 15/15 in both B1 workflows), including *Install pinned Python
+dependencies*, *Install Ansible and ansible-lint*, *Install Gitleaks (verified
+checksum, outside the workspace)*, *Run shared validation runner* and *Upload
+evidence artifact*. b2/b3/b4 report `source-cleanliness` clean **before and
+after**; b1-local-ground writes `source-clean.json`; B1-I1R logs `STEP d: source
+clean` and `STEP j: source still clean` with `worktree-cleanup {removed: true,
+pruned: true}`. Cleanup: `compose_down_rc 0`, `containers_remaining []`,
+`networks_removed true`, durable Postgres volume preserved.
+
+Manifest verification was performed by downloading each artifact, not copied:
+every zip's sha256 equals the digest GitHub reports, and every manifest entry
+(37 + 7 + 7 + 33 + 33 + 33 = **150**) matches the extracted file's sha256 and
+size — **0 problems**. Entries are matched on exact paths because these
+artifacts legitimately hold same-named receipts in nested `operations/`
+directories; a basename-only matcher reports three false mismatches.
+
+### Path-authority proof now executes in CI (R29)
+
+Run `35235034640` executed the suite at **19 collected / 19 executed / 19 passed
+/ 0 skipped**, including `test_symlink_file_rejected`,
+`test_symlink_parent_directory_rejected`,
+`test_cli_argument_cannot_approve_its_own_root`,
+`test_denial_has_zero_durable_side_effects` and
+`test_containment_has_exactly_one_owner`. The local-ground runner's selection is
+185 collected/executed/passed, up from 166 before the wiring; the earlier
+statement in this record that the traversal sinks were "backed by executable
+proofs (R27)" is only now literally true for the `pg-recovery.py` sink.
+
+### Mandatory registry
+
+`infrastructure/control-plane/scripts/b2_registry.py` holds **905 unique full
+node ids with zero duplicates** (two further quoted strings containing `::` are
+category prefixes, not node ids) and the runner fails closed on duplicates.
+b2/b3/b4 collected exactly 905 and passed 905/905 on this head — independent
+proof that the committed registry matches actual collection. R28/R29/R30 changed
+no collected node id, so no regeneration was required.
+
+### SonarQube quality gate — unresolved; requires operator credentials and a disposition decision
+
+Check-run `105249956178` on `8ce72fb8`: **D Security Rating on New Code / C
+Reliability Rating on New Code** (required ≥ A) — gate failed. Classification of
+what is obtainable:
+
+- **EXTERNAL_OR_UNAVAILABLE_EVIDENCE (the inventory itself).** The GitHub
+  annotation channel returns exactly 50 entries — GitHub's cap — and rotates as
+  the head moves, so it is a window, not an inventory. No Sonar token exists in
+  this environment; the repository exposes no secret and carries no scanner
+  configuration (SonarCloud analyzes through its GitHub App); and the
+  unauthenticated issues API returns `total: 0` for this project **and** for
+  unrelated public projects, so it cannot enumerate anything.
+- **OPERATOR_ACCEPTED_RISK_REQUIRED.** Two `python:S5332` "Using HTTP protocol
+  is insecure" findings at `config_startup.py:1130` and `:1435` match Book 4's
+  deliberate loopback-HTTP architecture (127.0.0.1 bind, no TLS terminator,
+  operator-accepted single-principal TCB). They were not silenced and cannot be
+  cleared from this workstation.
+- **Containment proof the analyzer cannot follow.** One "Path Traversal via
+  faulty LLM-supplied CLI arguments" at `pg-recovery.py:584`. Trace performed on
+  the source: taint enters as the `--archive` CLI argument and reaches
+  `open(os.path.realpath(_validated_open_path(archive)), "rb")`;
+  `_validated_open_path` enforces, in order, `realpath(path) == abspath(path)`
+  (symlink indirection rejected), containment in `_approved_roots()` (program
+  identity from `realpath(__file__)` plus the operator-declared
+  `OCE_BACKUP_ROOTS`), and existing-regular-file. The artifact path cannot
+  supply its own containment root and denial has no durable side effect — all
+  four properties are executed by the 19 CI tests above. The remaining
+  discrepancy is the analyzer's inability to follow containment implemented
+  inside a helper (the earlier inline `realpath`/`commonpath` repairs are what
+  cleared two equivalent findings). Clearing it in Sonar therefore needs either
+  a false-positive disposition or an inline repair; an inline repair is a source
+  change that would invalidate all six proofs above while leaving the `S5332`
+  items — and hence the failing Security rating — in place.
+- The 13 failure-level entries in the window are duplicate-literal,
+  cognitive-complexity, shell-idiom and composite-assertion items; the
+  operator's standing direction is that they are code smells and are not to be
+  chased for this gate.
+
+No NOSONAR, exclusion, severity change, quality-profile or gate-policy edit was
+made. **Operator action required:** SonarCloud credentials for the exact
+inventory plus an accepted-risk decision on the loopback-HTTP findings.
+
+### Kilo Code Review — external sandbox failure, not a finding about this branch
+
+`Kilo Code Review` check-run `105248679429` failed on `8ce72fb8` with `Review
+failed: Workspace setup failed: sandbox storage full: termination nonzero exit,
+exit code 128`, raised inside `git-lfs` while smudging main's LFS object
+(`.../ALT_DATA_1_1_ASSET_MULTISCALE_FEATURES_V2.parquet: smudge filter lfs
+failed`; `Clone succeeded, but checkout failed`). It published **zero
+annotations**: the reviewer never reached the branch, so this is a
+review-*service* capacity failure, re-verified on this head rather than assumed
+from the earlier one. One retry was requested with `POST
+/repos/dabiggestpoppa/larger-lab/check-runs/105248679429/rerequest` (accepted by
+the API; no new Kilo check-run was created), so the failing check-run remains the
+only Kilo result. main's `*.parquet filter=lfs` rule was retained and no LFS
+history was rewritten to satisfy it.
+
+### Invariants
+
+cloud mutations = 0 · broker mutations = 0 · capital mutations = 0 ·
+execution-authority mutations = 0 · recurring cost = $0 · `main` unchanged at
+`d09941e75f3da6040254e0e6193dcf670207273b` · PR #4 OPEN and unmerged · Book 5 not
+begun · no unrelated branch pushed · no stash or worktree destroyed.
+
+### Unresolved limitations
+
+1. The Sonar gate (exit-gate statements 6 and 7) is unsatisfied: it needs
+   credentials for the exact inventory and an operator accepted-risk decision
+   for the deliberate loopback-HTTP findings.
+2. Kilo Code Review cannot complete inside its own sandbox while the
+   repository's LFS objects exceed that sandbox's storage; external, and the one
+   permitted retry did not change it.
+3. `b1-i1r3-validation` runs the contract-scoped B1 increment on a non-`oce` ref
+   through the explicit `OCE_EXPECTED_BRANCH` override (X3). Its artifact
+   records `expected_branch=oce`, `observed_git_branch=oce-program-build`,
+   `branch_provenance=git-symbolic-ref`, and the gate accepted it. Disclosed for
+   operator ratification; it is a contract question, not a code change.
+4. Windows hosts without the symlink privilege skip the platform-dependent
+   symlink cases locally; Linux CI executes them (19/19 above).
+5. The annotation channel's 50-entry cap means the visible Sonar list is a
+   window; no claim is made about findings outside it.
+
+### Final commit discipline
+
+This section is documentation/evidence only. Its parent is the final
+implementation commit `8ce72fb86c88a2d7768dc1c9a2bd9568f60d6aa1`; it changes no
+Python, shell, workflow, registry, migration or executable file.
