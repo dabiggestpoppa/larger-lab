@@ -1062,9 +1062,29 @@ def test_expected_branch_override_still_wins_and_is_logged(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     assert result.stdout.strip() == (
         "pr-head-branch|OCE_EXPECTED_BRANCH (caller override)"), result.stdout
-    wf = _workflow_text("b1-i1r-validation.yml")
-    assert "OCE_EXPECTED_BRANCH: ${{ github.ref_name }}" in wf, (
-        "the PR workflow relies on the override; it must keep passing it")
+
+
+def test_both_b1_workflows_pin_the_expected_branch_to_the_trusted_ref():
+    """Both B1 workflows hand the runner the Actions-provided ref as the
+    expected branch — the caller override R8 documented — and neither stops
+    exporting the trusted ref the engine compares against it.
+
+    The override cannot move the contract's own branch: b1-i1r3-validation is
+    triggered by pushes to that branch, where github.ref_name resolves to the
+    contract's authorized_branch exactly (proven below), so its oce-branch
+    runs are unchanged while a dispatch on any other head can execute.
+    """
+    contract = json.loads((REPO_ROOT / CONTRACT_REL).read_text(encoding="utf-8"))
+    for name in B1_WORKFLOWS:
+        wf = _workflow_text(name)
+        assert "OCE_EXPECTED_BRANCH: ${{ github.ref_name }}" in wf, (
+            f"{name} must pin the expected branch to the run's trusted ref")
+        assert "GITHUB_REF_NAME: ${{ github.ref_name }}" in wf, (
+            f"{name} must keep exporting the trusted ref")
+    scoped = _workflow_text("b1-i1r3-validation.yml")
+    assert f"branches: [{contract['authorized_branch']}]" in scoped, (
+        "b1-i1r3-validation is the contract branch's own workflow; on that "
+        "branch github.ref_name and the contract resolve identically")
 
 
 @requires_bash
