@@ -1384,3 +1384,142 @@ begun · no unrelated branch pushed · no stash or worktree destroyed.
 This section is documentation/evidence only. Its parent is the final
 implementation commit `8ce72fb86c88a2d7768dc1c9a2bd9568f60d6aa1`; it changes no
 Python, shell, workflow, registry, migration or executable file.
+
+## ERRATUM — correction of remote-state claims, current-head check state, and R28 scope
+
+**Observation basis:** every live-state fact in this erratum was read in one pass
+from the GitHub REST API, the GitHub CLI and `git ls-remote` at
+**2026-09-17T19:31:25Z**, and each is anchored to the commit it was read for.
+Nothing below is inferred from an earlier reading.
+
+**Why an erratum and not an edit:** the claims corrected here were committed in
+`a932e8e5`. They were not fabrications — they were *unanchored* observations
+whose refs moved (this campaign has now seen `main` advance and PR mergeability
+flip twice) — so they are corrected in place without deleting or rewriting any
+text of this record, including the sentences quoted below.
+
+### E1 — PR #4 is `CONFLICTING`, not `MERGEABLE` (supersedes line 1201)
+
+Quoted, as committed (line 1201): "**PR #4:** OPEN, **not merged**, `MERGEABLE`
+(previously CONFLICTING), base `main` (`d09941e7`), head `8ce72fb8`".
+
+Corrected, read at 2026-09-17T19:31:25Z for head
+`a932e8e56d3d88acc728fb06727edc36bec33b60`:
+
+| Field | Value at 2026-09-17T19:31:25Z |
+|---|---|
+| `state` | `OPEN` |
+| `merged` / `merged_at` | `false` / `null` |
+| `mergeable` | `CONFLICTING` (REST `mergeable=false`, `mergeable_state=dirty`) |
+| `mergeStateStatus` | `DIRTY` |
+| `baseRefOid` | `d09941e75f3da6040254e0e6193dcf670207273b` |
+| `headRefOid` | `a932e8e56d3d88acc728fb06727edc36bec33b60` |
+| `title` | unchanged, `IN PROGRESS — NOT MERGE AUTHORIZED` |
+| `url` | `https://github.com/dabiggestpoppa/larger-lab/pull/4` |
+
+So `base main (d09941e7)` was correct **as GitHub's `baseRefOid`** and stays
+correct at that field; `MERGEABLE` is the wrong value. It was true when read
+before this branch's own evidence push and became false when `main` moved, which
+is precisely the failure mode this erratum exists to stop.
+
+### E2 — `main` is `7c7816f3`, not `d09941e7` (supersedes line 1360 and line 13)
+
+Quoted, as committed (line 1360): "execution-authority mutations = 0 · recurring
+cost = $0 · `main` unchanged at `d09941e75f3da6040254e0e6193dcf670207273b`".
+Quoted, as committed (line 13): "**main:**
+`d09941e75f3da6040254e0e6193dcf670207273b` (untouched; the CXR7U9 start SHA
+`583614ff…` was reconciled into this branch)".
+
+Corrected, read at 2026-09-17T19:31:25Z: `refs/heads/main` =
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. The advance is two commits,
+`813f8da8` ("docs(oce): record unified OCE convergence end state") and
+`7c7816f3` ("docs(oce): point main at convergence end state"), touching only
+`docs/oce-golden-system/OCE_CONVERGENCE_END_STATE_AND_BRANCH_ROLES_v1.0.md` and
+`docs/oce-golden-system/README.md`.
+
+Facts that remain true and are **not** corrected: this branch never wrote to
+`main` (every CXR7U9 push targeted `refs/heads/oce-program-build`, at
+2026-09-17T19:31:25Z = `a932e8e56d3d88acc728fb06727edc36bec33b60`); `d09941e7` is
+a strict ancestor of `7c7816f3`; `7c7816f3` is not an ancestor of this head; no
+PR merge was performed.
+
+### E3 — the evidence head `a932e8e5` has its own check state, recorded here for the first time
+
+Read at 2026-09-17T19:31:25Z for
+`a932e8e56d3d88acc728fb06727edc36bec33b60`; the commit carries **five
+check-runs and no SonarCloud check-run**:
+
+| Check | Conclusion | Check-run id | Run / URL |
+|---|---|---|---|
+| `validate` (b1-local-ground-validation) | success | 105341155715 | run 35262414558 |
+| `validate` (b2-control-plane-validation) | success | 105341155605 | run 35262414545 |
+| `validate` (b3-worker-fabric-validation) | success | 105341155728 | run 35262414735 |
+| `validate` (b4-config-spine-validation) | success | 105341156122 | run 35262414638 |
+| `Kilo Code Review` | **failure** | 105341155513 | https://github.com/dabiggestpoppa/larger-lab/runs/105341155513 |
+| `SonarCloud Code Analysis` | **absent** | — | — |
+
+- Kilo, exact reason as published for this head: title `Kilo Code Review failed`,
+  summary `Review failed: Workspace setup failed`, **0 annotations**, started
+  `2026-09-17T19:01:51Z`, completed `2026-09-17T19:21:08Z`, review detail
+  `https://app.kilo.ai/code-reviews/209e56d1-366c-483a-ace9-a6c13df74c1c`. This is
+  the same failure class as `8ce72fb8` (check-run `105248679429`: `Review failed:
+  Workspace setup failed: sandbox storage full`, exit 128 in `git-lfs` while
+  smudging main's Parquet object, review detail
+  `https://app.kilo.ai/code-reviews/1bddc74d-c6a6-4798-9a16-e988aecbd291`), but
+  *this* output carries less detail, so the shared class is inferred from the
+  identical title and the workspace-setup stage, not asserted from this text.
+- **No SonarCloud check-run exists on `a932e8e5`**, so the evidence commit has no
+  Sonar verdict at all — neither pass nor fail. The only Sonar verdict in this
+  campaign remains check-run `105249956178` on `8ce72fb8` (`Quality Gate failed`,
+  `D Security Rating on New Code` / `C Reliability Rating on New Code`,
+  completed `2026-09-17T14:42:51Z`, detail
+  `https://sonarcloud.io/dashboard?id=dabiggestpoppa_larger-lab&pullRequest=4`).
+- Consequence: "all six required workflows pass on the final implementation"
+  holds for `8ce72fb8` and does **not** transfer to the evidence commit. B1-I1R
+  Validation cannot run on `a932e8e5` while the PR is conflicting, because a
+  `pull_request` workflow needs a merge ref that GitHub does not build for a
+  conflicting PR.
+
+### E4 — R28's real scope (corrects its description in the R28–R30 section above)
+
+The section above describes R28 as the path-authority prose commit plus the
+symlink-probe collapse. Its actual diff is **8 files, +80 / −112**, tree
+`5da5593f5e1b3350c2da78a455735391222b77d8`:
+
+| File | + | − |
+|---|---|---|
+| `.github/workflows/b1-i1r3-validation.yml` | 4 | 12 |
+| `infrastructure/cloud-ground/scripts/install-gitleaks.sh` | 10 | 20 |
+| `infrastructure/cloud-ground/scripts/run-validation.sh` | 6 | 15 |
+| `infrastructure/control-plane/tests/test_worker_supervisor.py` | 4 | 16 |
+| `infrastructure/local-ground/scripts/pg-recovery.py` | 23 | 21 |
+| `infrastructure/local-ground/scripts/pg-verify.py` | 16 | 13 |
+| `infrastructure/local-ground/tests/test_b4_cxr7u9r7_path_authority.py` | 11 | 8 |
+| `infrastructure/local-ground/tests/test_gate_regressions.py` | 6 | 7 |
+
+The unrecorded content is the clarity pass carried in the same commit: comment
+trims in `b1-i1r3-validation.yml`, `install-gitleaks.sh` and `run-validation.sh`,
+and the consolidation of the installer-contract assertions in
+`test_gate_regressions.py` into the test that owns them. Recorded here because
+the CI evidence on `8ce72fb8` depends on these files, and a reader auditing what
+R28 changed could not see this from the previous description. For completeness,
+R29's diff is 4 files, +40 / −102 (`pg-verify.py` −65 net, the rest the suite and
+the runner's selection line).
+
+### E5 — rule for citing remote state in this record
+
+Remote state is an **observation with an as-of time**, never an invariant. Every
+citable remote fact is written as `value, read at <UTC timestamp>, for <SHA>`.
+Before citing `mergeable`, `mergeStateStatus`, `baseRefOid`, `headRefOid`,
+`refs/heads/main`, or which check-runs exist on a head, re-read them and state
+the new timestamp. The three claims corrected above were all true when first
+read; they became false because refs moved, and nothing in this record said when
+they had been read.
+
+### E6 — scope of this erratum
+
+Documentation only. It changes no implementation, test, workflow, registry,
+migration or expected-branch file, and it merges nothing. No text of this record
+is deleted or rewritten, including the claims quoted in E1–E4. Parent commit:
+`a932e8e56d3d88acc728fb06727edc36bec33b60`; `refs/heads/main` at write time:
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`, untouched by this branch.
