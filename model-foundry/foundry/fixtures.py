@@ -13,7 +13,15 @@ from pathlib import Path
 from typing import Any
 
 from .core import FrozenMap, PolicyBlocked, fingerprint
-from .data import ContaminationGraph, ContaminationRelation, RightsDisposition, SourceRecord, SourceRegistry
+from .data import (
+    ContaminationGraph,
+    ContaminationRelation,
+    RightsDisposition,
+    RightsEvidence,
+    RightsEvidenceRegister,
+    SourceRecord,
+    SourceRegistry,
+)
 from .enums import (
     ContaminationType,
     EvaluationTier,
@@ -52,18 +60,61 @@ def load_observations(name: str = "provider_offers.json") -> tuple[RawProviderOb
     )
 
 
-def load_sources(name: str = "sources.json") -> tuple[SourceRecord, ...]:
+def load_rights_evidence(name: str = "rights_evidence.json") -> RightsEvidenceRegister:
+    """The governed record of rights evidence that dispositions are resolved against."""
+
     payload = load_json(name)
+    return RightsEvidenceRegister(
+        evidence=tuple(
+            RightsEvidence(
+                basis_ref=entry["basis_ref"],
+                subject=entry["subject"],
+                basis=RightsBasis(entry["basis"]),
+                scope=entry.get("scope", ""),
+                recorded_by=entry["recorded_by"],
+                recorded_utc=entry["recorded_utc"],
+            )
+            for entry in payload["evidence"]
+        )
+    )
+
+
+def load_sources(
+    name: str = "sources.json", *, rights_evidence: RightsEvidenceRegister | None = None
+) -> tuple[SourceRecord, ...]:
+    """Load sources; a source's declared rights basis is *checked against* the
+    recorded evidence rather than trusted. An unrecorded basis, or a declaration
+    that disagrees with what was recorded, fails the load closed."""
+
+    payload = load_json(name)
+    register = rights_evidence or load_rights_evidence()
     records = []
     for entry in payload["sources"]:
         rights = RightsDisposition(
             subject=entry["source_id"],
-            basis=RightsBasis(entry["rights_basis"]),
             basis_ref=entry["rights_basis_ref"],
-            basis_resolved=bool(entry["rights_basis_resolved"]),
             basis_scope=entry.get("rights_basis_scope", ""),
             decided_utc=entry["rights_decided_utc"],
         )
+        resolved = rights.resolve(register)
+        if resolved.evidence is None:
+            raise PolicyBlocked(
+                "RIGHTS_BASIS_UNRECORDED",
+                (
+                    f"{entry['source_id']}: no recorded rights evidence for "
+                    f"{entry['rights_basis_ref']!r}"
+                ),
+            )
+        declared = RightsBasis(entry["rights_basis"])
+        if resolved.evidence.basis is not declared or resolved.scope != rights.basis_scope:
+            raise PolicyBlocked(
+                "RIGHTS_DECLARATION_MISMATCH",
+                (
+                    f"{entry['source_id']}: declared basis {declared.value!r}/"
+                    f"{rights.basis_scope!r} disagrees with recorded evidence "
+                    f"{resolved.evidence.basis.value!r}/{resolved.scope!r}"
+                ),
+            )
         records.append(
             SourceRecord(
                 source_id=entry["source_id"],
@@ -98,8 +149,9 @@ def load_sources(name: str = "sources.json") -> tuple[SourceRecord, ...]:
 
 
 def build_registry(name: str = "sources.json") -> SourceRegistry:
-    registry = SourceRegistry()
-    for record in load_sources(name):
+    register = load_rights_evidence()
+    registry = SourceRegistry(rights_evidence=register)
+    for record in load_sources(name, rights_evidence=register):
         registry.register(record, actor="fixture.loader", reason="deterministic fixture load")
     return registry
 
@@ -210,7 +262,7 @@ class FixtureBundle:
 def load_bundle() -> FixtureBundle:
     return FixtureBundle(
         observations=load_observations(),
-        sources=load_sources(),
+        sources=load_sources(rights_evidence=load_rights_evidence()),
         contamination=load_contamination(),
         items=load_items(),
         benchmark=load_benchmark(),
@@ -230,5 +282,6 @@ __all__ = [
     "load_json",
     "load_observations",
     "load_protocol",
+    "load_rights_evidence",
     "load_sources",
 ]

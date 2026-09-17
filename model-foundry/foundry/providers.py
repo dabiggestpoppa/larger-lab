@@ -21,7 +21,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .core import OceTestDouble, PolicyBlocked, fingerprint
+from .core import OceTestDouble, PolicyBlocked
 
 PROVIDER_OFFER_DOUBLE = OceTestDouble(
     fixture="FoundryLocalOfferNormalizer",

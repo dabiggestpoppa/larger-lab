@@ -9,6 +9,7 @@ import pytest
 from foundry.constitution import ReproducibilityClaim
 from foundry.core import FrozenMap, PolicyBlocked, Unauthorized
 from foundry.enums import (
+    BenchmarkStatus,
     CapabilityEvidenceState,
     ContaminationClass,
     EvaluationTier,
@@ -342,6 +343,68 @@ def test_cross_framework_agreement_is_required_for_pass() -> None:
     assert agreed.terminal_conclusion is TerminalConclusion.PASS
     assert agreed.framework_dependence == "CROSS_FRAMEWORK_AGREED"
     assert agreed.evidence_state is CapabilityEvidenceState.REPRODUCED
+
+
+def test_an_unrecognised_benchmark_status_cannot_read_as_healthy() -> None:
+    """The audited fail-open: ``status="COMPROMISEDD"`` used to reach PASS.
+
+    The status vocabulary has one owner. A misspelling is neither a valid status
+    nor a healthy one: it fails closed at construction instead of falling
+    through the degraded check.
+    """
+
+    benchmark = load_benchmark()
+    assert benchmark.status is BenchmarkStatus.FROZEN
+    assert benchmark.degraded() is False
+
+    with pytest.raises(PolicyBlocked) as exc:
+        dataclasses.replace(benchmark, status="COMPROMISEDD")
+    assert exc.value.code == "BENCHMARK_STATUS_UNKNOWN"
+
+    compromised = dataclasses.replace(benchmark, status=BenchmarkStatus.COMPROMISED)
+    assert compromised.degraded() is True
+
+    frozen = freeze_protocol(
+        dataclasses.replace(load_protocol(), benchmark=compromised),
+        registrar="test",
+        freeze_reason="criteria frozen before outcomes",
+        candidate_outcomes_observed=False,
+        actor_is_builder=False,
+    )
+    degraded_run = dataclasses.replace(_run(), frozen_protocol=frozen)
+    assessment = assess_capability(
+        degraded_run,
+        baseline={"accuracy": 0.6},
+        replication=ReproductionEvidence(
+            frameworks=("fixture-framework", "other-framework"),
+            metric_agreement=FrozenMap({"accuracy": True}),
+            max_delta=0.001,
+            tolerance=0.02,
+            evidence_ref="evidence://agreement",
+        ),
+        limitations=(),
+        oce_review_ref=None,
+        reproducibility=_reproducibility(),
+    )
+    # the same replication evidence that reaches PASS for a healthy benchmark
+    # cannot carry a degraded one
+    assert assessment.terminal_conclusion is TerminalConclusion.INCONCLUSIVE
+    assert assessment.evidence_state is CapabilityEvidenceState.MEASURED
+    healthy = assess_capability(
+        _run(),
+        baseline={"accuracy": 0.6},
+        replication=ReproductionEvidence(
+            frameworks=("fixture-framework", "other-framework"),
+            metric_agreement=FrozenMap({"accuracy": True}),
+            max_delta=0.001,
+            tolerance=0.02,
+            evidence_ref="evidence://agreement",
+        ),
+        limitations=(),
+        oce_review_ref=None,
+        reproducibility=_reproducibility(),
+    )
+    assert healthy.terminal_conclusion is TerminalConclusion.PASS
 
 
 def test_capability_is_vector_valued_with_no_master_score() -> None:

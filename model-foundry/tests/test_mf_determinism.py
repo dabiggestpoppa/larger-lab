@@ -13,7 +13,7 @@ from foundry.core import Receipt, VersionedRegistry
 from foundry.data import SourceRegistry
 from foundry.enums import SourceRole
 from foundry.evaluation import freeze_protocol
-from foundry.fixtures import build_registry, load_protocol
+from foundry.fixtures import build_registry, load_protocol, load_rights_evidence
 
 
 def test_receipt_fingerprint_ignores_wall_clock() -> None:
@@ -34,9 +34,14 @@ def test_registry_digest_is_reproducible_for_identical_content() -> None:
 def _independent_registry() -> SourceRegistry:
     """Rebuild the fixture registry through a different code path than the loader."""
 
-    registry = SourceRegistry()
-    for record in build_registry().source_ids():
-        registry.register(record=build_registry().get(record), actor="fixture.loader", reason="deterministic fixture load")
+    source = build_registry()
+    registry = SourceRegistry(rights_evidence=load_rights_evidence())
+    for source_id in source.source_ids():
+        registry.register(
+            record=source.get(source_id),
+            actor="fixture.loader",
+            reason="deterministic fixture load",
+        )
     return registry
 
 

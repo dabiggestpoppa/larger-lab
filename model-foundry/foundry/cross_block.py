@@ -204,7 +204,6 @@ def scenario_f2() -> ScenarioResult:
     registry = world["registry"]
     refusals: list[dict[str, Any]] = []
 
-    train_blocked = registry.get("SRC_RIGHTS_UNKNOWN")
     refusals.append(
         _refuse(
             lambda: registry.transition_role(
@@ -240,13 +239,13 @@ def scenario_f2() -> ScenarioResult:
     )
 
     observed = {
-        "unknown_rights_state": train_blocked.rights_state().value,
-        "unknown_rights_permits_training": train_blocked.trainable(),
+        "unknown_rights_state": registry.rights_state("SRC_RIGHTS_UNKNOWN").value,
+        "unknown_rights_permits_training": registry.trainable("SRC_RIGHTS_UNKNOWN"),
         "rights_blocked": registry.rights_blocked_sources(),
         "rights_permissive_but_role_forbidden": registry.rights_permissive_but_role_forbidden(),
         "eligible_for_training": list(registry.trainable_sources()),
         "refusal_codes": [r["code"] for r in refusals],
-        "negative_control_can_train": world["registry"].get("SRC_NEWS_ALPHA").eligible_for_training(),
+        "negative_control_can_train": registry.eligible_for_training("SRC_NEWS_ALPHA"),
     }
     expected_codes = {
         "RIGHTS_BLOCKED",

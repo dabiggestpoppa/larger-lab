@@ -23,7 +23,6 @@ from .constitution import (
 )
 from .core import (
     Contradiction,
-    FrozenMap,
     OceTestDouble,
     PolicyBlocked,
     Unauthorized,

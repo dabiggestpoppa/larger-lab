@@ -35,7 +35,6 @@ from .core import (
 )
 from .data import ContaminationGraph, SourceRecord, SourceRegistry
 from .enums import (
-    CONTAMINATION_SEVERITY,
     ContaminationClass,
     RefineryFailure,
     RightsState,
@@ -442,14 +441,18 @@ class DatasetRefinery:
     def _rights_summary(self, records: list[SourceRecord]) -> dict[str, Any]:
         states: dict[str, int] = {}
         for record in records:
-            state = record.rights_state().value
+            state = self.registry.rights_state(record.source_id).value
             states[state] = states.get(state, 0) + 1
         return {
             "by_state": states,
             "unknown_rights_sources": sorted(
-                r.source_id for r in records if r.rights_state() is RightsState.RIGHTS_UNKNOWN
+                record.source_id
+                for record in records
+                if self.registry.rights_state(record.source_id) is RightsState.RIGHTS_UNKNOWN
             ),
-            "all_sources_train_permissive": all(r.trainable() for r in records),
+            "all_sources_train_permissive": all(
+                self.registry.trainable(record.source_id) for record in records
+            ),
         }
 
     def _contamination_summary(self, source_ids: list[str]) -> dict[str, Any]:
@@ -531,12 +534,12 @@ class DatasetRefinery:
                 )
                 continue
 
-            if role in TRAIN_ROLES and not record.trainable():
+            if role in TRAIN_ROLES and not self.registry.trainable(source_id):
                 excluded.append(
                     {
                         "source_id": source_id,
                         "reason": RefineryFailure.RIGHTS_BLOCKED.value,
-                        "detail": f"rights state {record.rights_state().value}",
+                        "detail": f"rights state {self.registry.rights_state(source_id).value}",
                     }
                 )
                 continue
@@ -632,7 +635,7 @@ class DatasetRefinery:
                 {
                     "source_id": source_id,
                     "role": self.registry.get(source_id).role.value,
-                    "rights_state": self.registry.get(source_id).rights_state().value,
+                    "rights_state": self.registry.rights_state(source_id).value,
                     "lineage": self.registry.get(source_id).authoritative_lineage,
                 }
                 for source_id in usable_ids
@@ -726,22 +729,14 @@ def assert_manifest_covers_sources(manifest: DatasetManifest, registry: SourceRe
                 "MANIFEST_MISMATCH",
                 f"manifest references unresolved source {source_id!r}",
             )
-        record = registry.get(source_id)
-        if manifest.role in TRAIN_ROLES and not record.trainable():
+        if manifest.role in TRAIN_ROLES and not registry.trainable(source_id):
             raise Contradiction(
                 f"{source_id}: manifest is a training dataset but source rights do not permit training"
             )
-        if record.carries_withheld_doctrine():
+        if registry.get(source_id).carries_withheld_doctrine():
             raise Contradiction(
                 f"{source_id}: withheld doctrine appears in a materialized dataset"
             )
-
-
-def total_contamination_grade(graph: ContaminationGraph, source_ids: list[str]) -> ContaminationClass:
-    if not source_ids:
-        return ContaminationClass.C0_NO_OBSERVED_OVERLAP
-    grades = [(sid, graph.worst_grade(sid)) for sid in source_ids]
-    return max(grades, key=lambda pair: CONTAMINATION_SEVERITY[pair[1]])[1]
 
 
 __all__ = [
@@ -761,5 +756,4 @@ __all__ = [
     "audit_point_in_time",
     "dedup",
     "scan_secrets",
-    "total_contamination_grade",
 ]

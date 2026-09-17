@@ -27,10 +27,14 @@ from .core import (
     fingerprint,
 )
 from .enums import (
+    ArtifactLifecycleState,
+    BenchmarkStatus,
+    CapabilityEvidenceState,
     ClaimClass,
     EvaluationTier,
     IdentityDimension,
     ReproducibilityClass,
+    RunState,
     SourceRole,
     SubjectKind,
     TerminalConclusion,
@@ -675,35 +679,18 @@ class DependencyPin:
 # --------------------------------------------------------------------------
 
 
+def _states(enum: Any) -> tuple[str, ...]:
+    """One machine per declared vocabulary: the enum is the only owner."""
+
+    return tuple(member.value for member in enum)
+
+
 LIFECYCLE_MACHINES: dict[str, tuple[str, ...]] = {
-    "source_role": tuple(r.value for r in SourceRole),
-    "experiment_run": ("PLANNED", "FROZEN", "RUNNING", "COMPLETED", "FAILED", "CANCELLED", "UNDERPOWERED", "OPERATOR_HOLD"),
-    "cognitive_artifact": (
-        "REGISTERED",
-        "BASELINED",
-        "EXPERIMENTAL",
-        "DOMAIN_VALIDATED",
-        "DORMANT",
-        "REJECTED",
-        "REOPENED",
-    ),
-    "benchmark": (
-        "DRAFT",
-        "VALIDATED",
-        "FROZEN",
-        "ACTIVE",
-        "DEGRADED",
-        "COMPROMISED",
-        "SATURATED",
-        "STALE",
-        "RETIRED",
-    ),
-    "capability_evidence": (
-        "UNASSESSED",
-        "MEASURED",
-        "REPRODUCED",
-        "READY_FOR_OCE_CAPABILITY_REVIEW",
-    ),
+    "source_role": _states(SourceRole),
+    "experiment_run": _states(RunState),
+    "cognitive_artifact": _states(ArtifactLifecycleState),
+    "benchmark": _states(BenchmarkStatus),
+    "capability_evidence": _states(CapabilityEvidenceState),
     "oce_authority": ("NONE",),  # owned outside the Foundry lifecycle
 }
 

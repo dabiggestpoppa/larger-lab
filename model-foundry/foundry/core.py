@@ -22,6 +22,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Iterator, Mapping
+from copy import deepcopy
 from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -74,10 +75,6 @@ def fingerprint(value: Any) -> str:
     return f"sha256:{digest}"
 
 
-def digest_of_bytes(payload: bytes) -> str:
-    return f"sha256:{hashlib.sha256(payload).hexdigest()}"
-
-
 class FrozenMap(Mapping[str, Any]):
     """Immutable mapping with no supported path back to a mutable backing store.
 
@@ -110,6 +107,17 @@ class FrozenMap(Mapping[str, Any]):
 
     def __contains__(self, key: object) -> bool:
         return key in self._proxy
+
+    def __copy__(self) -> FrozenMap:
+        return self
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> FrozenMap:
+        # Rebuild through the public constructor so a copy never carries a
+        # mappingproxy (which cannot be deep-copied or pickled).
+        return FrozenMap({k: deepcopy(v, memo) for k, v in self._proxy.items()})
+
+    def __reduce__(self) -> tuple[Any, ...]:
+        return (FrozenMap, (self.to_dict(),))
 
     def __repr__(self) -> str:  # pragma: no cover - debug aid
         return f"FrozenMap({dict(self._proxy)!r})"
@@ -433,55 +441,3 @@ GENERIC_SERVICE_DOUBLES: dict[str, OceTestDouble] = {
         retirement_evidence="budget holds are issued by canonical budget service",
     ),
 }
-
-
-# --------------------------------------------------------------------------
-# Independence
-# --------------------------------------------------------------------------
-
-
-@dataclass(frozen=True)
-class IndependenceVector:
-    """Multi-axis independence. UNKNOWN is never favorable.
-
-    Dimensions are recorded as ``VERIFIED`` / ``ABSENT`` / ``UNKNOWN`` so that
-    unknown ancestry can never be silently counted as independence.
-    """
-
-    axes: FrozenMap
-
-    UNKNOWN = "UNKNOWN"
-    VERIFIED = "VERIFIED"
-    ABSENT = "ABSENT"
-
-    @classmethod
-    def build(cls, **axes: str) -> IndependenceVector:
-        normalized = {k: str(v).upper() for k, v in axes.items()}
-        for key, value in normalized.items():
-            if value not in {cls.VERIFIED, cls.ABSENT, cls.UNKNOWN}:
-                raise PolicyBlocked(
-                    "INDEPENDENCE_STATE_INVALID",
-                    f"{key}={value!r} is not one of VERIFIED/ABSENT/UNKNOWN",
-                )
-        return cls(axes=FrozenMap(normalized))
-
-    def state(self, axis: str) -> str:
-        return str(self.axes.get(axis, self.UNKNOWN))
-
-    @property
-    def verified_axes(self) -> tuple[str, ...]:
-        return tuple(sorted(k for k, v in self.axes.items() if v == self.VERIFIED))
-
-    @property
-    def unknown_axes(self) -> tuple[str, ...]:
-        return tuple(sorted(k for k, v in self.axes.items() if v == self.UNKNOWN))
-
-    def is_independent_on(self, axis: str) -> bool:
-        return self.state(axis) == self.VERIFIED
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "axes": dict(self.axes),
-            "verified_axes": list(self.verified_axes),
-            "unknown_axes": list(self.unknown_axes),
-        }

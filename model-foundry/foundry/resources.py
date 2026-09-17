@@ -33,7 +33,6 @@ from .core import (
     FrozenMap,
     OceTestDouble,
     PolicyBlocked,
-    Receipt,
     Unauthorized,
     fingerprint,
 )
@@ -691,41 +690,6 @@ def assert_checkpoint_portable(checkpoint: PortableCheckpoint) -> None:
             )
 
 
-@dataclass(frozen=True)
-class ResumeProof:
-    """A simulated provider-loss recovery, proven on fixtures."""
-
-    checkpoint_ref: str
-    lost_provider: str
-    resumed_provider: str
-    resumed_request_fingerprint: str
-    same_request: bool
-    scientific_semantics_changed: bool
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "checkpoint_ref": self.checkpoint_ref,
-            "lost_provider": self.lost_provider,
-            "resumed_provider": self.resumed_provider,
-            "resumed_request_fingerprint": self.resumed_request_fingerprint,
-            "same_request": self.same_request,
-            "scientific_semantics_changed": self.scientific_semantics_changed,
-        }
-
-
-def resource_receipt(decision: PlacementDecision, *, request: ComputeRequest) -> Receipt:
-    return Receipt(
-        kind="compute.placement.simulated",
-        subject=request.request_id,
-        payload={
-            "request": request.to_dict(),
-            "decision": decision.to_dict(),
-            "provider_offer_is_guarantee": False,
-            "cost_model": "cost_to_close",
-        },
-    )
-
-
 __all__ = [
     "BUDGET_DOUBLE",
     "FAILURE_TAXONOMY",
@@ -741,12 +705,10 @@ __all__ = [
     "OperatorGrant",
     "PlacementDecision",
     "PortableCheckpoint",
-    "ResumeProof",
     "assert_checkpoint_portable",
     "assert_within_budget",
     "classify_failure",
     "estimate_cost_to_close",
-    "resource_receipt",
     "simulate_launch",
     "simulate_placement",
     "verify_operator_grant",

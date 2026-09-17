@@ -31,7 +31,6 @@ from foundry.constitution import (
     CONSTITUTION,
     EVALUATION_TIER_CONTRACT,
     FOUNDRY_DOCTRINE,
-    LIFECYCLE_MACHINES,
     LifecycleSnapshot,
     ReproducibilityClaim,
     ResourceBudget,
@@ -39,7 +38,7 @@ from foundry.constitution import (
     self_promotion_blocked,
     undeclared_generic_services,
 )
-from foundry.core import Contradiction, PolicyBlocked, Unauthorized
+from foundry.core import PolicyBlocked, Unauthorized
 from foundry.enums import (
     ClaimClass,
     ContaminationClass,
@@ -307,6 +306,37 @@ def test_reliability_cannot_be_reported_from_survivors_only() -> None:
     assert_failure_lineage(total_runs=10, successes=6, failures_recorded=4) is None
 
 
+def test_frozen_map_survives_copying_and_serialization() -> None:
+    """Immutability must not make a record unusable.
+
+    The mappingproxy backing store cannot be deep-copied or pickled, which broke
+    ``copy.deepcopy``, ``pickle``, and ``dataclasses.asdict`` on every record that
+    contained a FrozenMap (dataset manifests, receipts, capability vectors).
+    """
+
+    import copy
+    import dataclasses
+    import json
+    import pickle
+
+    from foundry.core import FrozenMap
+
+    frozen = FrozenMap({"dimensions": {"accuracy": 0.71}, "sources": ["SRC_A", "SRC_B"]})
+    assert copy.deepcopy(frozen).to_dict() == frozen.to_dict()
+    assert pickle.loads(pickle.dumps(frozen)).to_dict() == frozen.to_dict()
+    assert copy.copy(frozen) is frozen
+
+    @dataclasses.dataclass(frozen=True)
+    class Record:
+        payload: FrozenMap
+
+    record = Record(payload=frozen)
+    # this used to raise TypeError: cannot pickle 'mappingproxy' object
+    payload = dataclasses.asdict(record)["payload"]
+    assert payload.to_dict() == frozen.to_dict()
+    assert json.loads(json.dumps(frozen.to_dict()))["dimensions"]["accuracy"] == 0.71
+
+
 def test_operator_preference_cannot_alter_the_frozen_evaluator() -> None:
     with pytest.raises(Unauthorized) as exc:
         assert_operator_preference_does_not_alter_evaluator(
@@ -427,9 +457,11 @@ def test_gate_report_verdict_and_accounting() -> None:
 
 def test_secret_bearing_source_cannot_hold_a_training_role() -> None:
     from foundry.data import DATA_DOUBLE, RightsDisposition, SourceRecord, SourceRegistry
-    from foundry.enums import RightsBasis, TrustClass
+    from foundry.enums import TrustClass
+    from foundry.fixtures import load_rights_evidence
 
-    registry = SourceRegistry()
+    register = load_rights_evidence()
+    registry = SourceRegistry(rights_evidence=register)
     record = SourceRecord(
         source_id="SRC",
         title="t",
@@ -447,9 +479,7 @@ def test_secret_bearing_source_cannot_hold_a_training_role() -> None:
         trust_class=TrustClass.PRIVATE_OPERATOR,
         rights=RightsDisposition(
             subject="SRC",
-            basis=RightsBasis.OPERATOR_OWNED,
             basis_ref="ownership://op",
-            basis_resolved=True,
             basis_scope="op",
             decided_utc="2026-01-01T00:00:00Z",
         ),

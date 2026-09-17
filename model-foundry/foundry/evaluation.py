@@ -36,15 +36,14 @@ from .core import (
 from .enums import (
     CLAIM_DEGRADING_CONTAMINATION,
     EXPOSURE_BUDGET_BY_TIER,
+    BenchmarkStatus,
     CapabilityEvidenceState,
-    ClaimClass,
     ContaminationClass,
     EvaluationTier,
     ExposureType,
     SubjectKind,
     TIER_RANK,
     TerminalConclusion,
-    TrustClass,
 )
 
 EVAL_DOUBLE = OceTestDouble(
@@ -93,6 +92,18 @@ class BenchmarkItem:
         }
 
 
+#: Statuses that degrade a benchmark's claims. Derived from the declared
+#: vocabulary so the check cannot drift from the enum it belongs to.
+CLAIM_DEGRADING_BENCHMARK_STATUS: frozenset[BenchmarkStatus] = frozenset(
+    {
+        BenchmarkStatus.DEGRADED,
+        BenchmarkStatus.COMPROMISED,
+        BenchmarkStatus.STALE,
+        BenchmarkStatus.RETIRED,
+    }
+)
+
+
 @dataclass(frozen=True)
 class BenchmarkSpec:
     """Benchmark identity and lifecycle. Relabeling is not an upgrade."""
@@ -102,9 +113,25 @@ class BenchmarkSpec:
     task_class: str
     items: tuple[BenchmarkItem, ...]
     tier: EvaluationTier
-    status: str = "DRAFT"
+    status: BenchmarkStatus = BenchmarkStatus.DRAFT
     contamination_grade: ContaminationClass = ContaminationClass.C0_NO_OBSERVED_OVERLAP
     exposure_count: int = 0
+
+    def __post_init__(self) -> None:
+        # The declared status vocabulary is the only one this field may hold. A
+        # typo ("COMPROMISEDD") used to read as healthy and could still reach
+        # PASS; now an unrecognised status fails closed at construction.
+        try:
+            status = BenchmarkStatus(self.status)
+        except ValueError as exc:
+            raise PolicyBlocked(
+                "BENCHMARK_STATUS_UNKNOWN",
+                (
+                    f"{self.benchmark_id}: {self.status!r} is not a declared benchmark "
+                    "status; an unrecognised status cannot read as healthy"
+                ),
+            ) from exc
+        object.__setattr__(self, "status", status)
 
     @property
     def fingerprint(self) -> str:
@@ -126,19 +153,17 @@ class BenchmarkSpec:
             "item_count": len(self.items),
             "item_ids": [i.item_id for i in self.items],
             "tier": self.tier.value,
-            "status": self.status,
+            "status": self.status.value,
             "contamination_grade": self.contamination_grade.value,
             "exposure_count": self.exposure_count,
             "fingerprint": self.fingerprint,
         }
 
     def degraded(self) -> bool:
-        return self.contamination_grade in CLAIM_DEGRADING_CONTAMINATION or self.status in {
-            "DEGRADED",
-            "COMPROMISED",
-            "STALE",
-            "RETIRED",
-        }
+        return (
+            self.contamination_grade in CLAIM_DEGRADING_CONTAMINATION
+            or self.status in CLAIM_DEGRADING_BENCHMARK_STATUS
+        )
 
 
 @dataclass(frozen=True)
@@ -930,10 +955,6 @@ def assert_conclusion_supported(
         )
 
 
-def tier_of(benchmark: BenchmarkSpec) -> EvaluationTier:
-    return benchmark.tier
-
-
 def elevate_tier(
     benchmark: BenchmarkSpec,
     requested: EvaluationTier,
@@ -960,27 +981,12 @@ def elevate_tier(
     return replace(benchmark, tier=requested)
 
 
-def claim_class_for(run: EvaluationRun, *, doctrine_exposed: bool) -> ClaimClass:
-    """Sealed/doctrine exposure collapses the strongest rediscovery claim."""
-
-    if doctrine_exposed:
-        return ClaimClass.POST_REVEAL_REPRODUCTION
-    if run.contamination_grade in CLAIM_DEGRADING_CONTAMINATION:
-        return ClaimClass.POST_REVEAL_REPRODUCTION
-    return ClaimClass.BLIND_TASK_PERFORMANCE
-
-
-def trust_class_admissible_for_remote(trust: TrustClass) -> bool:
-    from .enums import REMOTE_INADMISSIBLE_TRUST
-
-    return trust not in REMOTE_INADMISSIBLE_TRUST
-
-
 __all__ = [
     "BUILDER_ROLES",
     "EVAL_DOUBLE",
     "NEGATIVE_KNOWLEDGE_DOUBLE",
     "SEALED_ACCESS_ROLES",
+    "CLAIM_DEGRADING_BENCHMARK_STATUS",
     "BenchmarkItem",
     "BenchmarkSpec",
     "CapabilityAssessment",
@@ -999,11 +1005,8 @@ __all__ = [
     "assert_no_master_score",
     "assert_protocol_unchanged",
     "assess_capability",
-    "claim_class_for",
     "credit_assessment",
     "elevate_tier",
     "freeze_protocol",
     "submit_for_oce_review",
-    "tier_of",
-    "trust_class_admissible_for_remote",
 ]

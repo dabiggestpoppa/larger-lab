@@ -23,7 +23,6 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .core import (
-    FrozenMap,
     OceTestDouble,
     PolicyBlocked,
     VersionedRegistry,
@@ -63,59 +62,163 @@ CEREBUS_FAMILY_PROHIBITED_PAYLOAD_CLASSES: tuple[str, ...] = (
 # --------------------------------------------------------------------------
 
 
-@dataclass(frozen=True)
-class RightsDisposition:
-    """A rights decision and the evidence that produced it.
+#: Bases that a recorded rights decision can conclude with. ``UNKNOWN`` and
+#: ``RIGHTS_REVIEW_REQUIRED`` are conclusions too: a review may legitimately end
+#: without a permission, and that is exactly what the register records.
+TRAINING_PERMISSIVE_BASES: frozenset[RightsBasis] = frozenset(
+    {
+        RightsBasis.EXPLICIT_OPEN_LICENSE,
+        RightsBasis.PUBLIC_DOMAIN,
+        RightsBasis.OPERATOR_OWNED,
+        RightsBasis.DIRECT_PERMISSION,
+    }
+)
 
-    ``basis_ref`` must resolve inside the registry; a bare basis string is a
-    *claim*, not a disposition. This mirrors MF-B4's claim-vs-verified split.
+
+@dataclass(frozen=True)
+class RightsEvidence:
+    """One recorded rights decision, bound to the subject it was assessed for.
+
+    Evidence is *relevant* only to the subject recorded here. Citing a real
+    licence that was assessed for a different source does not transfer it.
     """
 
+    basis_ref: str
     subject: str
     basis: RightsBasis
+    scope: str
+    recorded_by: str
+    recorded_utc: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "basis_ref": self.basis_ref,
+            "subject": self.subject,
+            "basis": self.basis.value,
+            "scope": self.scope,
+            "recorded_by": self.recorded_by,
+            "recorded_utc": self.recorded_utc,
+        }
+
+
+@dataclass(frozen=True)
+class RightsEvidenceRegister:
+    """The governed record of rights evidence.
+
+    This is the *only* thing that can justify a rights state. A disposition is a
+    claim ("this is the evidence I rely on"); the register answers what that
+    evidence actually says. Nothing else may decide whether a source is
+    train-permissive, so the invariant has one owner rather than a per-call-site
+    check.
+    """
+
+    evidence: tuple[RightsEvidence, ...]
+
+    def resolve(self, *, subject: str, basis_ref: str) -> RightsEvidence | None:
+        """Recorded evidence for *this* subject and ref, or ``None`` (fail closed)."""
+
+        for entry in self.evidence:
+            if entry.subject == subject and entry.basis_ref == basis_ref:
+                return entry
+        return None
+
+    def subjects(self) -> tuple[str, ...]:
+        return tuple(sorted({entry.subject for entry in self.evidence}))
+
+    @property
+    def fingerprint(self) -> str:
+        return fingerprint([entry.to_dict() for entry in self.evidence])
+
+
+@dataclass(frozen=True)
+class ResolvedRights:
+    """What recorded evidence says about a claim. Never constructed by a caller."""
+
+    subject: str
     basis_ref: str
-    basis_resolved: bool
-    basis_scope: str
-    decided_utc: str
+    evidence: RightsEvidence | None
+
+    @property
+    def resolved(self) -> bool:
+        return self.evidence is not None
+
+    @property
+    def basis(self) -> RightsBasis | None:
+        return self.evidence.basis if self.evidence else None
+
+    @property
+    def scope(self) -> str:
+        return self.evidence.scope if self.evidence else ""
 
     @property
     def state(self) -> RightsState:
-        if not self.basis_resolved:
+        evidence = self.evidence
+        if evidence is None:
+            # No relevant recorded evidence: a claim is not a permission.
             return RightsState.REVIEW_REQUIRED
-        if self.basis is RightsBasis.PROHIBITED:
+        if evidence.basis is RightsBasis.PROHIBITED:
             return RightsState.EXCLUDED_BY_POLICY
-        if self.basis is RightsBasis.UNKNOWN:
+        if evidence.basis is RightsBasis.UNKNOWN:
             return RightsState.RIGHTS_UNKNOWN
-        if self.basis is RightsBasis.RIGHTS_REVIEW_REQUIRED:
+        if evidence.basis is RightsBasis.RIGHTS_REVIEW_REQUIRED:
             return RightsState.REVIEW_REQUIRED
-        if self.basis in {
-            RightsBasis.EXPLICIT_OPEN_LICENSE,
-            RightsBasis.PUBLIC_DOMAIN,
-            RightsBasis.OPERATOR_OWNED,
-            RightsBasis.DIRECT_PERMISSION,
-        }:
+        if evidence.basis in TRAINING_PERMISSIVE_BASES:
             return RightsState.RIGHTS_VERIFIED_BY_POLICY
-        # PROVIDER_TERMS_ALLOW verifies only when the terms scope is recorded
-        # and non-empty; otherwise it is restricted.
+        # PROVIDER_TERMS_ALLOW verifies only when the recorded terms scope is
+        # non-empty; otherwise it is restricted.
         return (
             RightsState.RIGHTS_VERIFIED_BY_POLICY
-            if self.basis_scope.strip()
+            if evidence.scope.strip()
             else RightsState.RIGHTS_RESTRICTED
         )
 
     def permits_training(self) -> bool:
-        return self.state == RightsState.RIGHTS_VERIFIED_BY_POLICY
+        return self.state is RightsState.RIGHTS_VERIFIED_BY_POLICY
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "subject": self.subject,
-            "basis": self.basis.value,
             "basis_ref": self.basis_ref,
-            "basis_resolved": self.basis_resolved,
-            "basis_scope": self.basis_scope,
-            "decided_utc": self.decided_utc,
+            "resolved": self.resolved,
+            "basis": self.basis.value if self.basis else None,
+            "scope": self.scope,
             "derived_state": self.state.value,
             "permits_training": self.permits_training(),
+        }
+
+
+@dataclass(frozen=True)
+class RightsDisposition:
+    """A rights *claim*: which recorded evidence is cited, and when.
+
+    The claim deliberately carries no basis and no resolved flag. A decision can
+    only be derived by resolving ``basis_ref`` against a
+    :class:`RightsEvidenceRegister`, so a bare claim can never make a source
+    train-permissive. A missing entry, or an entry recorded for another subject,
+    resolves to ``REVIEW_REQUIRED``. This mirrors MF-B4's claim-vs-verified
+    split.
+    """
+
+    subject: str
+    basis_ref: str
+    basis_scope: str
+    decided_utc: str
+
+    def resolve(self, register: RightsEvidenceRegister) -> ResolvedRights:
+        return ResolvedRights(
+            subject=self.subject,
+            basis_ref=self.basis_ref,
+            evidence=register.resolve(subject=self.subject, basis_ref=self.basis_ref),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "subject": self.subject,
+            "basis_ref": self.basis_ref,
+            "basis_scope": self.basis_scope,
+            "decided_utc": self.decided_utc,
+            "claim_only": True,
+            "state_resolution": "requires RightsEvidenceRegister.resolve()",
         }
 
 
@@ -242,15 +345,15 @@ class SourceRecord:
 
         return self.lineage_key or self.mirror_of or self.upstream_ancestry or self.source_id
 
-    def rights_state(self) -> RightsState:
-        return self.rights.state
+    def rights_state(self, register: RightsEvidenceRegister) -> RightsState:
+        return self.rights.resolve(register).state
 
-    def trainable(self) -> bool:
-        """Rights alone permit training. Role may still forbid it."""
+    def trainable(self, register: RightsEvidenceRegister) -> bool:
+        """Rights alone permit training, per recorded evidence. Role may still forbid it."""
 
         from .boundary import rights_permit_training
 
-        return rights_permit_training(self.rights.state)
+        return rights_permit_training(self.rights_state(register))
 
     def role_permits_training(self) -> bool:
         return self.role in {
@@ -259,10 +362,10 @@ class SourceRecord:
             SourceRole.TRAIN_PREFERENCE,
         }
 
-    def eligible_for_training(self) -> bool:
+    def eligible_for_training(self, register: RightsEvidenceRegister) -> bool:
         """Both rights and role must allow it; either alone is insufficient."""
 
-        return self.trainable() and self.role_permits_training()
+        return self.trainable(register) and self.role_permits_training()
 
     def carries_withheld_doctrine(self) -> bool:
         return bool(
@@ -329,33 +432,48 @@ ROLE_TRANSITIONS_REQUIRING_RIGHTS_REVERIFICATION: frozenset[tuple[SourceRole, So
 
 
 def assert_role_transition_allowed(
-    previous: SourceRole,
+    previous: SourceRole | None,
     requested: SourceRole,
     *,
     rights: RightsDisposition,
+    register: RightsEvidenceRegister,
     actor: str,
     human_review_ref: str | None = None,
 ) -> None:
-    """Role transitions create history and cannot silently launder restrictions."""
+    """Admission guard for any record that may hold a role.
 
+    ``previous=None`` means the record is not changing role (first registration,
+    or a content-only re-registration). The rights/role invariant applies to
+    every path; the no-op, review-evidence, and sealed-retirement rules apply
+    only when a role is actually changing.
+
+    The rights side is resolved against recorded evidence here and nowhere else,
+    so no caller can assert its way into a training role.
+    """
+
+    resolved = rights.resolve(register)
+    if requested in {
+        SourceRole.TRAIN_CPT,
+        SourceRole.TRAIN_SFT,
+        SourceRole.TRAIN_PREFERENCE,
+    } and not resolved.permits_training():
+        raise PolicyBlocked(
+            "RIGHTS_BLOCKED",
+            (
+                f"role {requested.value} requires recorded rights evidence permitting "
+                f"training; {rights.basis_ref!r} resolves to {resolved.state.value}"
+            ),
+            rights_state=resolved.state.value,
+            basis_ref=rights.basis_ref,
+            basis_resolved=resolved.resolved,
+        )
+    if previous is None:
+        return
     if requested == previous:
         raise PolicyBlocked(
             "ROLE_TRANSITION_NOOP",
             "a role transition must change the role; no-op transitions pollute provenance",
         )
-    if requested in {
-        SourceRole.TRAIN_CPT,
-        SourceRole.TRAIN_SFT,
-        SourceRole.TRAIN_PREFERENCE,
-    }:
-        from .boundary import rights_permit_training
-
-        if not rights_permit_training(rights.state):
-            raise PolicyBlocked(
-                "RIGHTS_BLOCKED",
-                f"role {requested.value} requires a rights disposition permitting training",
-                rights_state=rights.state.value,
-            )
     if (previous, requested) in ROLE_TRANSITIONS_REQUIRING_RIGHTS_REVERIFICATION:
         if not human_review_ref:
             raise PolicyBlocked(
@@ -379,8 +497,14 @@ def assert_role_transition_allowed(
 
 @dataclass
 class SourceRegistry:
-    """Versioned source registry with role history and provenance-preserving edits."""
+    """Versioned source registry with role history and provenance-preserving edits.
 
+    The registry owns the rights-evidence register, so *every* entry path — first
+    registration, re-registration, and role transition — resolves rights the same
+    way and refuses the same illegal states through one guard.
+    """
+
+    rights_evidence: RightsEvidenceRegister
     double: OceTestDouble = field(default=DATA_DOUBLE)
     _registry: VersionedRegistry = field(init=False)
     _role_history: dict[str, list[tuple[SourceRole, str, str, str | None]]] = field(
@@ -390,7 +514,17 @@ class SourceRegistry:
     def __post_init__(self) -> None:
         self._registry = VersionedRegistry("source_registry", self.double)
 
-    def register(self, record: SourceRecord, *, actor: str, reason: str) -> Any:
+    def _commit(
+        self,
+        record: SourceRecord,
+        *,
+        actor: str,
+        reason: str,
+        previous: SourceRole | None,
+        human_review_ref: str | None = None,
+    ) -> Any:
+        """The single entry guard. Every write path goes through here."""
+
         if not record.integrity_digest.strip():
             raise PolicyBlocked(
                 "SOURCE_INTEGRITY_DIGEST_REQUIRED",
@@ -405,11 +539,33 @@ class SourceRegistry:
                 "SECRET_BEARING_SOURCE_TRAIN_ROLE_REFUSED",
                 f"{record.source_id}: secret-bearing material cannot hold a training role",
             )
+        assert_role_transition_allowed(
+            previous,
+            record.role,
+            rights=record.rights,
+            register=self.rights_evidence,
+            actor=actor,
+            human_review_ref=human_review_ref,
+        )
         entry = self._registry.put(record.source_id, record, actor=actor, reason=reason)
         self._role_history.setdefault(record.source_id, []).append(
-            (record.role, reason, actor, None)
+            (record.role, reason, actor, human_review_ref)
         )
         return entry
+
+    def register(self, record: SourceRecord, *, actor: str, reason: str) -> Any:
+        """First registration, or a re-registration of the same source.
+
+        A re-registration that *changes the role* is a role transition, so it is
+        held to the transition contract rather than slipping past it.
+        """
+
+        previous = self.get(record.source_id).role if self.resolve(record.source_id) else None
+        if previous is not None and previous is not record.role:
+            return self._commit(
+                record, actor=actor, reason=reason, previous=previous, human_review_ref=None
+            )
+        return self._commit(record, actor=actor, reason=reason, previous=None)
 
     def get(self, source_id: str) -> SourceRecord:
         return self._registry.get(source_id)
@@ -439,25 +595,35 @@ class SourceRegistry:
         actor: str,
         reason: str,
         human_review_ref: str | None = None,
-        rights: RightsDisposition | None = None,
     ) -> SourceRecord:
+        """Change a source's role.
+
+        The rights claim is *not* a parameter: a transition cannot swap in a more
+        favorable disposition while it changes the role. Rights are resolved from
+        the registry's evidence, and a new disposition requires a new record.
+        """
+
         import dataclasses
 
         current = self.get(source_id)
-        effective_rights = rights or current.rights
-        assert_role_transition_allowed(
-            current.role,
-            requested,
-            rights=effective_rights,
+        updated = dataclasses.replace(current, role=requested)
+        self._commit(
+            updated,
             actor=actor,
+            reason=reason,
+            previous=current.role,
             human_review_ref=human_review_ref,
         )
-        updated = dataclasses.replace(current, role=requested, rights=effective_rights)
-        self._registry.put(source_id, updated, actor=actor, reason=reason)
-        self._role_history.setdefault(source_id, []).append(
-            (requested, reason, actor, human_review_ref)
-        )
         return updated
+
+    def rights_state(self, source_id: str) -> RightsState:
+        return self.get(source_id).rights_state(self.rights_evidence)
+
+    def trainable(self, source_id: str) -> bool:
+        return self.get(source_id).trainable(self.rights_evidence)
+
+    def eligible_for_training(self, source_id: str) -> bool:
+        return self.get(source_id).eligible_for_training(self.rights_evidence)
 
     def digest(self) -> str:
         return self._registry.digest()
@@ -527,9 +693,7 @@ class SourceRegistry:
         """Sources that are eligible: rights permit training *and* the role allows it."""
 
         return tuple(
-            source_id
-            for source_id in self.source_ids()
-            if self.get(source_id).eligible_for_training()
+            source_id for source_id in self.source_ids() if self.eligible_for_training(source_id)
         )
 
     def rights_permissive_but_role_forbidden(self) -> dict[str, str]:
@@ -538,19 +702,20 @@ class SourceRegistry:
         return {
             source_id: self.get(source_id).role.value
             for source_id in self.source_ids()
-            if self.get(source_id).trainable()
-            and not self.get(source_id).role_permits_training()
+            if self.trainable(source_id) and not self.get(source_id).role_permits_training()
         }
 
     def rights_blocked_sources(self) -> dict[str, str]:
         """Every registered source whose rights do NOT authorize training."""
 
-        blocked = {}
-        for source_id in self.source_ids():
-            record = self.get(source_id)
-            if not record.trainable():
-                blocked[source_id] = record.rights_state().value
-        return blocked
+        return {
+            source_id: self.rights_state(source_id).value
+            for source_id in self.source_ids()
+            if not self.trainable(source_id)
+        }
+
+    def rights_evidence_fingerprint(self) -> str:
+        return self.rights_evidence.fingerprint
 
     def doctrine_bearing_sources(self) -> tuple[str, ...]:
         return tuple(
@@ -588,22 +753,18 @@ class SourceRegistry:
         }
 
 
-def fixture_registry(*records: SourceRecord) -> SourceRegistry:
-    registry = SourceRegistry()
-    for record in records:
-        registry.register(record, actor="mf-b2-fixture", reason="fixture load")
-    return registry
-
-
 __all__ = [
     "CEREBUS_FAMILY_PROHIBITED_PAYLOAD_CLASSES",
     "DATA_DOUBLE",
     "ROLE_TRANSITIONS_REQUIRING_RIGHTS_REVERIFICATION",
+    "TRAINING_PERMISSIVE_BASES",
     "ContaminationGraph",
     "ContaminationRelation",
+    "ResolvedRights",
     "RightsDisposition",
+    "RightsEvidence",
+    "RightsEvidenceRegister",
     "SourceRecord",
     "SourceRegistry",
     "assert_role_transition_allowed",
-    "fixture_registry",
 ]

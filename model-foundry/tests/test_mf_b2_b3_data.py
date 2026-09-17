@@ -10,7 +10,8 @@ from foundry.core import Contradiction, PolicyBlocked
 from foundry.data import (
     ContaminationRelation,
     RightsDisposition,
-    SourceRecord,
+    RightsEvidence,
+    RightsEvidenceRegister,
     SourceRegistry,
     assert_role_transition_allowed,
 )
@@ -23,7 +24,12 @@ from foundry.enums import (
     SourceRole,
     TrustClass,
 )
-from foundry.fixtures import build_registry, load_bundle, load_contamination
+from foundry.fixtures import (
+    build_registry,
+    load_bundle,
+    load_contamination,
+    load_rights_evidence,
+)
 from foundry.refinery import (
     DEFAULT_RECIPE,
     DatasetRefinery,
@@ -38,85 +44,194 @@ from foundry.refinery import (
 PIT_INSTANT = "2026-01-02T00:00:00Z"
 
 
-def _rights(basis: RightsBasis, *, resolved: bool = True, scope: str = "") -> RightsDisposition:
-    return RightsDisposition(
-        subject="SRC",
+def _rights_evidence(
+    basis: RightsBasis, *, scope: str = "", subject: str = "SRC", ref: str = "ref://x"
+) -> RightsEvidence:
+    return RightsEvidence(
+        basis_ref=ref,
+        subject=subject,
         basis=basis,
-        basis_ref="ref://x",
-        basis_resolved=resolved,
-        basis_scope=scope,
-        decided_utc="2026-01-01T00:00:00Z",
+        scope=scope,
+        recorded_by="test",
+        recorded_utc="2026-01-01T00:00:00Z",
     )
 
 
+def _claim_and_register(
+    basis: RightsBasis, *, scope: str = "", recorded: bool = True
+) -> tuple[RightsDisposition, RightsEvidenceRegister]:
+    """A rights *claim* plus the recorded evidence it cites (or none)."""
+
+    claim = RightsDisposition(
+        subject="SRC",
+        basis_ref="ref://x",
+        basis_scope=scope,
+        decided_utc="2026-01-01T00:00:00Z",
+    )
+    register = RightsEvidenceRegister(
+        evidence=(_rights_evidence(basis, scope=scope),) if recorded else ()
+    )
+    return claim, register
+
+
 @pytest.mark.parametrize(
-    ("basis", "resolved", "scope", "expected"),
+    ("basis", "scope", "expected"),
     [
-        (RightsBasis.EXPLICIT_OPEN_LICENSE, True, "train", RightsState.RIGHTS_VERIFIED_BY_POLICY),
-        (RightsBasis.PUBLIC_DOMAIN, True, "", RightsState.RIGHTS_VERIFIED_BY_POLICY),
-        (RightsBasis.OPERATOR_OWNED, True, "", RightsState.RIGHTS_VERIFIED_BY_POLICY),
-        (RightsBasis.DIRECT_PERMISSION, True, "", RightsState.RIGHTS_VERIFIED_BY_POLICY),
-        (RightsBasis.PROVIDER_TERMS_ALLOW, True, "scope recorded", RightsState.RIGHTS_VERIFIED_BY_POLICY),
-        (RightsBasis.PROVIDER_TERMS_ALLOW, True, "", RightsState.RIGHTS_RESTRICTED),
-        (RightsBasis.UNKNOWN, True, "", RightsState.RIGHTS_UNKNOWN),
-        (RightsBasis.RIGHTS_REVIEW_REQUIRED, True, "", RightsState.REVIEW_REQUIRED),
-        (RightsBasis.PROHIBITED, True, "", RightsState.EXCLUDED_BY_POLICY),
-        (RightsBasis.EXPLICIT_OPEN_LICENSE, False, "", RightsState.REVIEW_REQUIRED),
+        (RightsBasis.EXPLICIT_OPEN_LICENSE, "train", RightsState.RIGHTS_VERIFIED_BY_POLICY),
+        (RightsBasis.PUBLIC_DOMAIN, "", RightsState.RIGHTS_VERIFIED_BY_POLICY),
+        (RightsBasis.OPERATOR_OWNED, "", RightsState.RIGHTS_VERIFIED_BY_POLICY),
+        (RightsBasis.DIRECT_PERMISSION, "", RightsState.RIGHTS_VERIFIED_BY_POLICY),
+        (RightsBasis.PROVIDER_TERMS_ALLOW, "scope recorded", RightsState.RIGHTS_VERIFIED_BY_POLICY),
+        (RightsBasis.PROVIDER_TERMS_ALLOW, "", RightsState.RIGHTS_RESTRICTED),
+        (RightsBasis.UNKNOWN, "", RightsState.RIGHTS_UNKNOWN),
+        (RightsBasis.RIGHTS_REVIEW_REQUIRED, "", RightsState.REVIEW_REQUIRED),
+        (RightsBasis.PROHIBITED, "", RightsState.EXCLUDED_BY_POLICY),
     ],
 )
-def test_rights_state_is_derived_from_evidence(
-    basis: RightsBasis, resolved: bool, scope: str, expected: RightsState
+def test_rights_state_is_derived_from_recorded_evidence(
+    basis: RightsBasis, scope: str, expected: RightsState
 ) -> None:
-    disposition = _rights(basis, resolved=resolved, scope=scope)
-    assert disposition.state is expected
-    assert disposition.permits_training() is (expected is RightsState.RIGHTS_VERIFIED_BY_POLICY)
+    claim, register = _claim_and_register(basis, scope=scope)
+    resolved = claim.resolve(register)
+    assert resolved.resolved is True
+    assert resolved.state is expected
+    assert resolved.permits_training() is (expected is RightsState.RIGHTS_VERIFIED_BY_POLICY)
 
 
-def test_claiming_rights_without_resolving_the_basis_does_not_grant_them() -> None:
-    unresolved = _rights(RightsBasis.EXPLICIT_OPEN_LICENSE, resolved=False)
-    assert unresolved.state is RightsState.REVIEW_REQUIRED
-    assert unresolved.to_dict()["permits_training"] is False
+def test_a_claim_without_recorded_evidence_is_not_a_permission() -> None:
+    """A bare claim cannot make anything train-permissive: nothing to assert."""
+
+    claim, register = _claim_and_register(RightsBasis.PUBLIC_DOMAIN, recorded=False)
+    resolved = claim.resolve(register)
+    assert resolved.resolved is False
+    assert resolved.state is RightsState.REVIEW_REQUIRED
+    assert resolved.permits_training() is False
+    assert resolved.to_dict()["permits_training"] is False
+
+
+def test_the_claim_carries_no_basis_and_no_resolved_flag() -> None:
+    """The two fields the audit forged through do not exist on the claim."""
+
+    fields = set(RightsDisposition.__dataclass_fields__)
+    assert fields == {"subject", "basis_ref", "basis_scope", "decided_utc"}
+    assert "basis" not in fields and "basis_resolved" not in fields
+    assert RightsDisposition(
+        subject="SRC", basis_ref="ref://x", basis_scope="", decided_utc="2026-01-01T00:00:00Z"
+    ).to_dict()["claim_only"] is True
+
+
+def test_evidence_recorded_for_another_subject_does_not_transfer() -> None:
+    """Resolving is not enough: the recorded evidence must be *relevant* to this subject."""
+
+    claim = RightsDisposition(
+        subject="SRC_OTHER",
+        basis_ref="license://CC-BY-4.0/alpha",
+        basis_scope="train",
+        decided_utc="2026-01-01T00:00:00Z",
+    )
+    register = RightsEvidenceRegister(
+        evidence=(
+            _rights_evidence(
+                RightsBasis.EXPLICIT_OPEN_LICENSE,
+                scope="train",
+                subject="SRC_NEWS_ALPHA",
+                ref="license://CC-BY-4.0/alpha",
+            ),
+        )
+    )
+    assert register.resolve(
+        subject="SRC_NEWS_ALPHA", basis_ref="license://CC-BY-4.0/alpha"
+    ) is not None
+    resolved = claim.resolve(register)
+    assert resolved.resolved is False
+    assert resolved.state is RightsState.REVIEW_REQUIRED
 
 
 def test_unknown_rights_cannot_transition_into_a_training_role() -> None:
+    claim, register = _claim_and_register(RightsBasis.UNKNOWN)
     with pytest.raises(PolicyBlocked) as exc:
         assert_role_transition_allowed(
             SourceRole.RETRIEVAL_ONLY,
             SourceRole.TRAIN_CPT,
-            rights=_rights(RightsBasis.UNKNOWN),
+            rights=claim,
+            register=register,
             actor="builder",
         )
     assert exc.value.code == "RIGHTS_BLOCKED"
+    assert exc.value.context["rights_state"] == "RIGHTS_UNKNOWN"
+
+
+def test_an_unrecorded_basis_cannot_transition_into_a_training_role() -> None:
+    claim, register = _claim_and_register(RightsBasis.PUBLIC_DOMAIN, recorded=False)
+    with pytest.raises(PolicyBlocked) as exc:
+        assert_role_transition_allowed(
+            SourceRole.RETRIEVAL_ONLY,
+            SourceRole.TRAIN_CPT,
+            rights=claim,
+            register=register,
+            actor="builder",
+            human_review_ref="review://operator/44",
+        )
+    assert exc.value.code == "RIGHTS_BLOCKED"
+    assert exc.value.context["basis_resolved"] is False
 
 
 def test_retrieval_only_to_train_requires_review_evidence_even_with_permissive_rights() -> None:
-    rights = _rights(RightsBasis.OPERATOR_OWNED)
+    claim, register = _claim_and_register(RightsBasis.OPERATOR_OWNED)
     with pytest.raises(PolicyBlocked) as exc:
         assert_role_transition_allowed(
-            SourceRole.RETRIEVAL_ONLY, SourceRole.TRAIN_CPT, rights=rights, actor="builder"
+            SourceRole.RETRIEVAL_ONLY,
+            SourceRole.TRAIN_CPT,
+            rights=claim,
+            register=register,
+            actor="builder",
         )
     assert exc.value.code == "ROLE_LAUNDERING_REFUSED"
     assert_role_transition_allowed(
         SourceRole.RETRIEVAL_ONLY,
         SourceRole.TRAIN_CPT,
-        rights=rights,
+        rights=claim,
+        register=register,
         actor="operator",
         human_review_ref="review://operator/44",
     ) is None
 
 
 def test_role_noop_and_sealed_retirement_are_refused() -> None:
-    rights = _rights(RightsBasis.OPERATOR_OWNED)
+    claim, register = _claim_and_register(RightsBasis.OPERATOR_OWNED)
     with pytest.raises(PolicyBlocked) as exc:
         assert_role_transition_allowed(
-            SourceRole.TRAIN_CPT, SourceRole.TRAIN_CPT, rights=rights, actor="builder"
+            SourceRole.TRAIN_CPT,
+            SourceRole.TRAIN_CPT,
+            rights=claim,
+            register=register,
+            actor="builder",
         )
     assert exc.value.code == "ROLE_TRANSITION_NOOP"
     with pytest.raises(PolicyBlocked) as exc2:
         assert_role_transition_allowed(
-            SourceRole.SEALED_CONFIRMATION, SourceRole.EXCLUDED, rights=rights, actor="builder"
+            SourceRole.SEALED_CONFIRMATION,
+            SourceRole.EXCLUDED,
+            rights=claim,
+            register=register,
+            actor="builder",
         )
     assert exc2.value.code == "SEALED_ROLE_RETIREMENT_REQUIRES_OPERATOR"
+
+
+def test_initial_registration_into_a_training_role_also_needs_recorded_rights() -> None:
+    """The rule is about the role, not the path: first entry is guarded too."""
+
+    claim, register = _claim_and_register(RightsBasis.UNKNOWN)
+    with pytest.raises(PolicyBlocked) as exc:
+        assert_role_transition_allowed(
+            None,
+            SourceRole.TRAIN_CPT,
+            rights=claim,
+            register=register,
+            actor="builder",
+        )
+    assert exc.value.code == "RIGHTS_BLOCKED"
 
 
 def test_registry_versions_role_changes_and_keeps_history() -> None:
@@ -138,7 +253,7 @@ def test_registry_versions_role_changes_and_keeps_history() -> None:
 
 
 def test_registry_requires_integrity_digest_and_actor_reason() -> None:
-    registry = SourceRegistry()
+    registry = SourceRegistry(rights_evidence=load_rights_evidence())
     record = dataclasses.replace(
         build_registry().get("SRC_NEWS_ALPHA"), source_id="SRC_NO_DIGEST", integrity_digest=""
     )
@@ -162,9 +277,9 @@ def test_mirror_aliases_do_not_manufacture_diversity() -> None:
 
 def test_rights_permission_is_not_the_same_as_role_permission() -> None:
     registry = build_registry()
-    assert registry.get("SRC_BENCH_CORE").trainable() is True
+    assert registry.trainable("SRC_BENCH_CORE") is True
     assert registry.get("SRC_BENCH_CORE").role_permits_training() is False
-    assert registry.get("SRC_BENCH_CORE").eligible_for_training() is False
+    assert registry.eligible_for_training("SRC_BENCH_CORE") is False
     assert "SRC_BENCH_CORE" in registry.rights_permissive_but_role_forbidden()
     assert set(registry.trainable_sources()) == {
         "SRC_AGENT_TRACE",
@@ -460,7 +575,113 @@ def test_contamination_relation_requires_incidence() -> None:
 
 
 def test_source_record_registration_is_not_a_cleanliness_claim() -> None:
-    record = build_registry().get("SRC_NEWS_ALPHA")
+    registry = build_registry()
+    record = registry.get("SRC_NEWS_ALPHA")
     assert record.to_dict()["registration_is_cleanliness_claim"] is False
     assert record.trust_class is TrustClass.PUBLIC_RESEARCH
-    assert record.eligible_for_training() is True
+    assert registry.eligible_for_training("SRC_NEWS_ALPHA") is True
+
+
+def test_a_forged_rights_claim_cannot_make_a_source_trainable() -> None:
+    """The audited exploit: forge a basis for a source whose rights are UNKNOWN.
+
+    The claim carries no basis and no resolved flag, the transition has no
+    ``rights`` parameter to launder one through, and a ref that resolved nowhere
+    cannot become a permission. Both the transition and the admission of a
+    forged record are refused, and the registry is unchanged afterwards.
+    """
+
+    registry = build_registry()
+    assert registry.rights_state("SRC_RIGHTS_UNKNOWN") is RightsState.RIGHTS_UNKNOWN
+
+    forged_claim = RightsDisposition(
+        subject="SRC_RIGHTS_UNKNOWN",
+        basis_ref="rights://does-not-exist/forged",
+        basis_scope="",
+        decided_utc="2026-01-03T00:00:00Z",
+    )
+    # there is no parameter through which a caller-supplied disposition enters
+    with pytest.raises(TypeError):
+        registry.transition_role(
+            "SRC_RIGHTS_UNKNOWN",
+            SourceRole.TRAIN_CPT,
+            actor="attacker",
+            reason="forged rights",
+            human_review_ref="EV_MADE_UP",
+            rights=forged_claim,
+        )
+    with pytest.raises(PolicyBlocked) as exc:
+        registry.transition_role(
+            "SRC_RIGHTS_UNKNOWN",
+            SourceRole.TRAIN_CPT,
+            actor="attacker",
+            reason="forged rights",
+            human_review_ref="EV_MADE_UP",
+        )
+    assert exc.value.code == "RIGHTS_BLOCKED"
+
+    # nor can a forged record be admitted directly into a training role
+    forged_record = dataclasses.replace(
+        registry.get("SRC_RIGHTS_UNKNOWN"),
+        source_id="SRC_FORGED",
+        role=SourceRole.TRAIN_CPT,
+        rights=dataclasses.replace(forged_claim, subject="SRC_FORGED"),
+    )
+    with pytest.raises(PolicyBlocked) as exc2:
+        registry.register(forged_record, actor="attacker", reason="forge the basis")
+    assert exc2.value.code == "RIGHTS_BLOCKED"
+    assert registry.resolve("SRC_FORGED") is False
+
+    # the source the forged claim was modelled on is untouched
+    assert registry.rights_state("SRC_RIGHTS_UNKNOWN") is RightsState.RIGHTS_UNKNOWN
+    assert registry.trainable("SRC_RIGHTS_UNKNOWN") is False
+    assert registry.get("SRC_RIGHTS_UNKNOWN").role is SourceRole.RETRIEVAL_ONLY
+
+
+def test_a_source_citing_unrecorded_evidence_is_refused_at_admission() -> None:
+    registry = build_registry()
+    unresolvable = dataclasses.replace(
+        registry.get("SRC_AGENT_TRACE"),
+        source_id="SRC_UNRECORDED",
+        rights=RightsDisposition(
+            subject="SRC_UNRECORDED",
+            basis_ref="ownership://larger-lab/unrecorded",
+            basis_scope="",
+            decided_utc="2026-01-03T00:00:00Z",
+        ),
+    )
+    with pytest.raises(PolicyBlocked) as exc:
+        registry.register(unresolvable, actor="builder", reason="cite unrecorded evidence")
+    assert exc.value.code == "RIGHTS_BLOCKED"
+
+
+def test_re_registration_cannot_change_a_role_without_the_transition_contract() -> None:
+    """Both entry paths refuse the same illegal role changes."""
+
+    registry = build_registry()
+    laundered = dataclasses.replace(registry.get("SRC_RIGHTS_UNKNOWN"), role=SourceRole.TRAIN_CPT)
+    with pytest.raises(PolicyBlocked) as exc:
+        registry.register(laundered, actor="builder", reason="just because")
+    assert exc.value.code == "RIGHTS_BLOCKED"
+    assert registry.get("SRC_RIGHTS_UNKNOWN").role is SourceRole.RETRIEVAL_ONLY
+
+    # with permissive rights the review-evidence rule still applies through
+    # register(): a role change cannot invent its own review
+    permissive = dataclasses.replace(registry.get("SRC_AGENT_TRACE"), role=SourceRole.DEV)
+    registry.register(permissive, actor="operator", reason="hold out for development")
+    assert registry.get("SRC_AGENT_TRACE").role is SourceRole.DEV
+    expansion = dataclasses.replace(registry.get("SRC_AGENT_TRACE"), role=SourceRole.TRAIN_CPT)
+    with pytest.raises(PolicyBlocked) as exc2:
+        registry.register(expansion, actor="builder", reason="role change via register")
+    assert exc2.value.code == "ROLE_LAUNDERING_REFUSED"
+    assert registry.get("SRC_AGENT_TRACE").role is SourceRole.DEV
+
+
+def test_re_registration_without_a_role_change_still_versions() -> None:
+    """The guard must not block legitimate content re-registration."""
+
+    registry = build_registry()
+    updated = dataclasses.replace(registry.get("SRC_NEWS_ALPHA"), notes="metadata update")
+    registry.register(updated, actor="operator", reason="metadata update")
+    assert registry.get("SRC_NEWS_ALPHA").notes == "metadata update"
+    assert registry.version("SRC_NEWS_ALPHA") == 2
