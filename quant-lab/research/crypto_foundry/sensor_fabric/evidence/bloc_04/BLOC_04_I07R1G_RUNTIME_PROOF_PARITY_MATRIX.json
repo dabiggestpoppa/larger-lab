@@ -1,0 +1,153 @@
+{
+  "cases": [
+    {
+      "case": "proof_missing",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "proof_version_unknown",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "proof_version_missing",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "floor_missing",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "floor_unknown",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "acquisition_anchor_mismatch",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "blob_anchor_mismatch",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "manifest_anchor_mismatch",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "raw_manifest_contradiction",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "manifest_missing_anchor",
+      "corruption_wrote_nothing": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "proof_wrong_type",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt",
+      "variants": [
+        "proof-wrong-type",
+        "proof-empty-mapping",
+        "proof-string",
+        "proof-integer",
+        "proof-bool",
+        "proof-extra-field"
+      ],
+      "variants_rejected": 6
+    },
+    {
+      "case": "same_blob_wrong_acquisition",
+      "corruption_wrote_nothing": true,
+      "different_request_identity": true,
+      "forged_anchors_internally_consistent": true,
+      "identical_blob_sha256": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "blob_anchor_matches": true,
+      "case": "valid_raw_cross_constructor_retry",
+      "gate_events": 1,
+      "last_manifest_id": null,
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED"
+    },
+    {
+      "blob_anchor_matches": true,
+      "case": "valid_manifest_cross_constructor_retry",
+      "gate_events": 1,
+      "last_manifest_id": "pm-vman",
+      "persisted_proof_floor": "MANIFEST_COMMITTED",
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1G",
+  "doctrine": "I07R1G \u00a73-\u00a715 \u2014 proof existence is not proof validity: runtime exact-retry and restart replay validate a persisted checkpoint proof through one authority and reject exactly the same malformed proofs as typed JobCatalogCorrupt",
+  "matrix": "BLOC_04_I07R1G_RUNTIME_PROOF_PARITY_MATRIX"
+}
