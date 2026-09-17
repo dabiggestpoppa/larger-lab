@@ -1,0 +1,42 @@
+{
+  "cases": [
+    {
+      "cache_matches_disk": true,
+      "case": "refresh_commit_same_catalog",
+      "false_corruption_errors": 0,
+      "new_record_visible": true,
+      "result": "PASS"
+    },
+    {
+      "case": "different_jobs_same_repository",
+      "committed_chains": 2,
+      "concurrent_errors": 0,
+      "gate_events_per_chain": [
+        1,
+        1
+      ],
+      "restart_reconstructs_both": true,
+      "result": "PASS"
+    },
+    {
+      "case": "refresh_vanished_fail_closed",
+      "result": "PASS"
+    },
+    {
+      "case": "refresh_divergence_fail_closed",
+      "result": "PASS"
+    },
+    {
+      "case": "cross_repo_refresh_regression",
+      "observed_chain": [
+        "ACQUIRING",
+        "RAW_STAGED",
+        "RAW_COMMITTED"
+      ],
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1F",
+  "doctrine": "I07R1F \u00a79-\u00a714 \u2014 a shared catalog cache is internally synchronized; durable truth stays fail-closed",
+  "matrix": "BLOC_04_I07R1F_CATALOG_CONCURRENCY_MATRIX"
+}

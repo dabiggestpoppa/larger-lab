@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "adopted_blob_matches": true,
+      "adopted_manifest_id": null,
+      "case": "raw_persisted_manifest_constructor_retry",
+      "constructor_floor": "MANIFEST_COMMITTED",
+      "gate_event_count": 1,
+      "persisted_floor": "RAW_COMMITTED",
+      "result": "PASS"
+    },
+    {
+      "adopted_manifest_id": "pm-pf-man",
+      "case": "manifest_persisted_raw_constructor_retry",
+      "constructor_floor": "RAW_COMMITTED",
+      "gate_event_count": 1,
+      "persisted_floor": "MANIFEST_COMMITTED",
+      "persisted_proof_floor": "MANIFEST_COMMITTED",
+      "result": "PASS"
+    },
+    {
+      "case": "new_raw_uses_current_floor",
+      "constructor_floor": "RAW_COMMITTED",
+      "contradictory_anchor_rejected": "PASS",
+      "result": "PASS",
+      "stored_manifest_id": null
+    },
+    {
+      "case": "new_manifest_uses_current_floor",
+      "constructor_floor": "MANIFEST_COMMITTED",
+      "missing_manifest_rejected": "PASS",
+      "result": "PASS",
+      "stored_manifest_id": "pm-new-man"
+    },
+    {
+      "case": "divergent_historical_retry_rejected",
+      "chain_events": 7,
+      "divergent_variants": 3,
+      "rejected_variants": 3,
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1F",
+  "doctrine": "I07R1F \u00a73-\u00a78 \u2014 constructor config governs NEW checkpoints; persisted proof governs durable history",
+  "matrix": "BLOC_04_I07R1F_PERSISTED_FLOOR_MATRIX"
+}
