@@ -65,6 +65,17 @@ evidence.  What changed is the truth contract:
   raw reads) before any state is read, so long-lived repositories never
   act on stale views; cross-repository races cannot fork the chain.
 
+- **One checkpoint-proof authority (I07R1G §3-§9)** — proof EXISTENCE is
+  not proof VALIDITY.  The runtime exact-retry path and restart replay
+  both validate a persisted checkpoint proof through the SAME authority
+  (:func:`validate_checkpoint_proof` + ``_validate_checkpoint_proof``):
+  closed V1 schema (wrong type, missing field, unknown version), durability
+  floor, proof↔resulting-state anchor binding, and durable re-proof under
+  the floor persisted in the proof.  A long-lived repository whose
+  post-lock refresh adopts a forged head must reject exactly what a fresh
+  restart rejects — typed :class:`JobCatalogCorrupt`, never a raw
+  ``KeyError``/``ValueError`` and never a silent adoption.
+
 LOCAL filesystem truth only.  No network, no provider code, no I08
 recovery scanner, no quota, no DuckDB/Postgres (later checkpoints).
 """
@@ -103,6 +114,8 @@ __all__ = [
     "JobResumeGateError",
     "JobCatalogCorrupt",
     "MIN_DURABLE_STATES",
+    "CHECKPOINT_PROOF_VERSION",
+    "validate_checkpoint_proof",
     "DurableJobStateRepository",
 ]
 
@@ -175,6 +188,98 @@ MIN_DURABLE_STATES: frozenset[StorageJobStatus] = frozenset(
 
 #: Closed V1 checkpoint-proof schema version (I07R1 §16).
 CHECKPOINT_PROOF_VERSION = 1
+
+#: Closed V1 checkpoint-proof field set (I07R1G §5): exactly these five.
+CHECKPOINT_PROOF_FIELDS: frozenset[str] = frozenset(
+    {
+        "proof_version",
+        "minimum_durable_status",
+        "acquisition_id",
+        "blob_sha256",
+        "manifest_id",
+    }
+)
+
+
+def validate_checkpoint_proof(
+    event_id: str, proof: Any
+) -> tuple[StorageJobStatus, str, str, str | None]:
+    """THE authoritative checkpoint-proof contract (I07R1G §4-§8, pure).
+
+    Returns ``(floor, acquisition_id, blob_sha256, manifest_id)``.  Every
+    failure mode of a persisted proof — absent, wrong Python type, not the
+    closed V1 field set, unknown version, missing/unknown/non-durability
+    floor, empty anchors, RAW floor contradicting a manifest anchor,
+    MANIFEST floor without one — is typed :class:`JobCatalogCorrupt`.  No
+    Python implementation exception (``KeyError``/``TypeError``/
+    ``ValueError``) may escape as the public corruption classification
+    (I07R1G §8), and the SAME rules serve runtime retry and restart replay
+    so the two can never drift (I07R1G §4/§10/§15).
+    """
+    label = f"checkpoint {event_id[:12]}..."
+    if proof is None:
+        # I07R1 §18: a checkpoint without its immutable proof is corruption.
+        raise JobCatalogCorrupt(f"{label} carries no checkpoint_proof")
+    if not isinstance(proof, dict):
+        raise JobCatalogCorrupt(
+            f"{label} proof is not a mapping "
+            f"({type(proof).__name__})"
+        )
+    supplied = set(proof)
+    if supplied != CHECKPOINT_PROOF_FIELDS:
+        raise JobCatalogCorrupt(
+            f"{label} proof is not the closed V1 schema: missing "
+            f"{sorted(CHECKPOINT_PROOF_FIELDS - supplied)}, unexpected "
+            f"{sorted(supplied - CHECKPOINT_PROOF_FIELDS)}"
+        )
+    version = proof["proof_version"]
+    if isinstance(version, bool) or version != CHECKPOINT_PROOF_VERSION:
+        # §16: closed V1 — no silent future-version reading.
+        raise JobCatalogCorrupt(
+            f"{label} carries unknown checkpoint proof_version {version!r}"
+        )
+    floor_value = proof["minimum_durable_status"]
+    if not isinstance(floor_value, str):
+        raise JobCatalogCorrupt(
+            f"{label} proof carries a non-string minimum_durable_status "
+            f"{floor_value!r}"
+        )
+    try:
+        floor = StorageJobStatus(floor_value)
+    except ValueError as exc:
+        raise JobCatalogCorrupt(
+            f"{label} proof carries unknown minimum_durable_status "
+            f"{floor_value!r}"
+        ) from exc
+    if floor not in MIN_DURABLE_STATES:
+        raise JobCatalogCorrupt(
+            f"{label} proof carries non-durability floor {floor.value}"
+        )
+    acquisition_id = proof["acquisition_id"]
+    blob_sha = proof["blob_sha256"]
+    if (
+        not isinstance(acquisition_id, str)
+        or not acquisition_id
+        or not isinstance(blob_sha, str)
+        or not blob_sha
+    ):
+        raise JobCatalogCorrupt(
+            f"{label} proof carries invalid acquisition/blob anchors"
+        )
+    manifest_id = proof["manifest_id"]
+    if floor is StorageJobStatus.RAW_COMMITTED and manifest_id is not None:
+        raise JobCatalogCorrupt(
+            f"{label} was authorized at the RAW floor but persists a "
+            "manifest anchor (I07R1 §12)"
+        )
+    if floor is StorageJobStatus.MANIFEST_COMMITTED and (
+        not isinstance(manifest_id, str) or not manifest_id
+    ):
+        raise JobCatalogCorrupt(
+            f"{label} was authorized at the MANIFEST floor but persists no "
+            "manifest anchor (I07R1 §13)"
+        )
+    return floor, acquisition_id, blob_sha, manifest_id
 
 
 def _progress_rank(status: StorageJobStatus) -> int | None:
@@ -720,14 +825,34 @@ class DurableJobStateRepository:
         adopted; divergent semantics stay a typed conflict (I07R1 §8/§35).
         """
         last = self._latest_event(job_id)
-        if last is None or not last.get("checkpoint_proof"):
-            # I07R1 §18: a CHECKPOINT_ADVANCED head without its immutable
-            # proof is corruption — never a silently adoptable success.
+        if last is None:
+            # Cannot happen for a CHECKPOINT_ADVANCED head, but prove it.
             raise JobCatalogCorrupt(
-                f"job {job_id!r} is CHECKPOINT_ADVANCED but its committed "
-                "checkpoint event carries no checkpoint_proof"
+                f"job {job_id!r} is CHECKPOINT_ADVANCED with no durable "
+                "event record"
             )
-        committed = StorageJobState.model_validate(last["resulting_state"])
+        try:
+            committed = StorageJobState.model_validate(
+                last.get("resulting_state")
+            )
+        except Exception as exc:
+            raise JobCatalogCorrupt(
+                f"job {job_id!r} checkpoint event carries an invalid "
+                f"resulting state: {exc}"
+            ) from exc
+        # I07R1G §3/§4/§9: the SAME proof authority restart replay uses.
+        # Proof EXISTENCE is not proof VALIDITY — schema, closed version,
+        # persisted floor, proof↔result anchors and the durable re-proof are
+        # all re-validated BEFORE any retry can be adopted (never a raw
+        # KeyError/ValueError, never a silently adopted forged head).
+        self._validate_checkpoint_proof(
+            event_id=str(last.get("transition_id", job_id)),
+            job_id=job_id,
+            proof=last.get("checkpoint_proof"),
+            resulting=committed,
+        )
+        # §9 step 4 / §14: a valid proof plus a DIVERGENT caller request is a
+        # typed transition conflict — a valid record is not a corrupt one.
         same_batch = (
             committed.last_committed_acquisition_id == acquisition_id
             and committed.last_manifest_id == manifest_id
@@ -739,15 +864,6 @@ class DurableJobStateRepository:
                 "the next batch continues via an annotated ACQUIRING "
                 "transition, not another checkpoint advancement"
             )
-        persisted_floor = StorageJobStatus(
-            last["checkpoint_proof"]["minimum_durable_status"]
-        )
-        self._prove_batch_durable(
-            job_id=job_id,
-            acquisition_id=acquisition_id,
-            manifest_id=manifest_id,
-            floor=persisted_floor,
-        )
         return committed
 
     def _require_checkpoint_eligible(
@@ -1137,22 +1253,15 @@ class DurableJobStateRepository:
                 transition.to_status is StorageJobStatus.CHECKPOINT_ADVANCED
             )
             if is_checkpoint:
-                if not isinstance(proof, dict):
-                    # §18: a checkpoint without durable proof is corruption.
-                    raise JobCatalogCorrupt(
-                        f"event {event_id[:12]}... targets "
-                        "CHECKPOINT_ADVANCED without checkpoint_proof"
-                    )
-                if (
-                    proof.get("proof_version")
-                    != CHECKPOINT_PROOF_VERSION
-                ):
-                    # §16: closed V1 — no silent future-version reading.
-                    raise JobCatalogCorrupt(
-                        f"event {event_id[:12]}... carries unknown "
-                        f"checkpoint proof_version "
-                        f"{proof.get('proof_version')!r}"
-                    )
+                # I07R1G §4: the ONE proof authority — the very same call
+                # the runtime exact-retry path makes, so reader and writer
+                # can never disagree about a persisted proof (§18/§25).
+                self._validate_checkpoint_proof(
+                    event_id=event_id,
+                    job_id=job_id,
+                    proof=proof,
+                    resulting=resulting,
+                )
             elif proof is not None:
                 # §18: proof metadata belongs only to checkpoint events.
                 raise JobCatalogCorrupt(
@@ -1172,12 +1281,6 @@ class DurableJobStateRepository:
                     f"event {event_id[:12]}... violates the frozen "
                     f"transition graph: {exc}"
                 ) from exc
-            # Per-event durable anchoring: checkpoint events are re-proved
-            # against durable truth below; ordinary events must not carry
-            # anchors (they never legitimately write any, §5/§24).
-            if is_checkpoint:
-                assert proof is not None
-                self._reprove_checkpoint(event_id, job_id, proof, resulting)
         # Per-job chain validation: contiguity, linkage, chronology,
         # ordinary-event pointer immutability.
         for job_id, birth in seen_jobs.items():
@@ -1228,60 +1331,31 @@ class DurableJobStateRepository:
                             )
                 previous = resulting
 
-    def _reprove_checkpoint(
+    def _validate_checkpoint_proof(
         self,
+        *,
         event_id: str,
         job_id: str,
-        proof: dict[str, Any],
+        proof: Any,
         resulting: StorageJobState,
     ) -> None:
-        """Re-prove ONE historical checkpoint from its PERSISTED floor.
+        """THE one checkpoint-proof authority for runtime AND restart (I07R1G §4).
 
-        I07R1 §19/§25: the durability policy that authorized the
-        checkpoint is the one stored in its own proof — the repository
-        constructor's current configuration governs only NEW checkpoints.
-        Re-proves: exact durable acquisition, job identity, usable
-        provenance, physical verification, proof↔result anchor binding,
-        and (at the persisted MANIFEST_COMMITTED floor) exact manifest
-        binding.  A RAW-floor checkpoint must carry manifest_id=None.
+        The pure :func:`validate_checkpoint_proof` owns structure, the closed
+        V1 version, the durability floor and the floor↔manifest rule; this
+        method adds the proof↔resulting-state anchor binding (I07R1 §17) and
+        the durable batch re-proof under the floor PERSISTED IN THE PROOF
+        (I07R1 §19/§25) — the repository constructor's current configuration
+        governs only NEW checkpoints.
+
+        Called by the exact-retry path (before any adoption) and by restart
+        replay, so a long-lived repository that refreshes a forged head
+        rejects EXACTLY what a fresh restart rejects (I07R1G §9/§10).
         """
-        acquisition_id = proof.get("acquisition_id")
-        blob_sha = proof.get("blob_sha256")
-        manifest_id = proof.get("manifest_id")
-        floor_value = proof.get("minimum_durable_status")
-        if (
-            not isinstance(acquisition_id, str)
-            or not isinstance(blob_sha, str)
-        ):
-            raise JobCatalogCorrupt(
-                f"checkpoint {event_id[:12]}... proof carries invalid "
-                "acquisition/blob anchors"
-            )
-        try:
-            floor = StorageJobStatus(floor_value)
-        except ValueError as exc:
-            raise JobCatalogCorrupt(
-                f"checkpoint {event_id[:12]}... proof carries unknown "
-                f"minimum_durable_status {floor_value!r}"
-            ) from exc
-        if floor not in MIN_DURABLE_STATES:
-            raise JobCatalogCorrupt(
-                f"checkpoint {event_id[:12]}... proof carries "
-                f"non-durability floor {floor.value}"
-            )
-        if floor is StorageJobStatus.RAW_COMMITTED and manifest_id is not None:
-            raise JobCatalogCorrupt(
-                f"checkpoint {event_id[:12]}... was authorized at the RAW "
-                "floor but persists a manifest anchor (I07R1 §12)"
-            )
-        if floor is StorageJobStatus.MANIFEST_COMMITTED and not isinstance(
-            manifest_id, str
-        ):
-            raise JobCatalogCorrupt(
-                f"checkpoint {event_id[:12]}... was authorized at the "
-                "MANIFEST floor but persists no manifest anchor (I07R1 §13)"
-            )
-        # §17: the proof must bind EXACTLY to the resulting state.
+        floor, acquisition_id, blob_sha, manifest_id = (
+            validate_checkpoint_proof(event_id, proof)
+        )
+        # §17: the proof must bind EXACTLY to the resulting state's anchors.
         if (
             acquisition_id != resulting.last_committed_acquisition_id
             or blob_sha != resulting.last_committed_blob_sha256
