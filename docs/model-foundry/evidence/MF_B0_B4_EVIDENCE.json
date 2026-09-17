@@ -56,6 +56,7 @@
       "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
       "SRC_VENDOR_TERMS": "RIGHTS_RESTRICTED"
     },
+    "rights_evidence_fingerprint": "sha256:58003351106736901f3d235ba10bd7d2d67e1045bfa63c7701f3653ecb5a33f9",
     "role_distribution": {
       "DEV": 1,
       "EXCLUDED": 1,
@@ -653,7 +654,7 @@
     "NEGATIVE RESULT != FAILED PROJECT",
     "UNKNOWN != FAVORABLE"
   ],
-  "evidence_fingerprint": "sha256:e24db2d91cd957de2f91410b3c9faeedb114caf1e51228f52d2cf42c5c14199b",
+  "evidence_fingerprint": "sha256:77618a9a2d4341d149b0a5686653b92b8ee8cdac3c4808224d2aabb6ccc5f899",
   "external_operations": {
     "capital_operations": 0,
     "cloud_mutations": 0,

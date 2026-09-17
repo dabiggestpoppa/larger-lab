@@ -122,9 +122,6 @@ class RightsEvidenceRegister:
                 return entry
         return None
 
-    def subjects(self) -> tuple[str, ...]:
-        return tuple(sorted({entry.subject for entry in self.evidence}))
-
     @property
     def fingerprint(self) -> str:
         return fingerprint([entry.to_dict() for entry in self.evidence])

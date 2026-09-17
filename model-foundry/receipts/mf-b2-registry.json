@@ -30,6 +30,7 @@
     "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
     "SRC_VENDOR_TERMS": "RIGHTS_RESTRICTED"
   },
+  "rights_evidence_fingerprint": "sha256:58003351106736901f3d235ba10bd7d2d67e1045bfa63c7701f3653ecb5a33f9",
   "role_distribution": {
     "DEV": 1,
     "EXCLUDED": 1,

@@ -132,6 +132,9 @@ def cmd_b2_registry(_: argparse.Namespace) -> int:
         "diversity": registry.effective_diversity(),
         "doctrine_bearing": list(registry.doctrine_bearing_sources()),
         "registry_digest": registry.digest(),
+        # Rights decisions are resolved against this record, so the receipt has
+        # to cover it: a digest that depends on evidence must publish the evidence.
+        "rights_evidence_fingerprint": registry.rights_evidence_fingerprint(),
     }
     _emit("mf-b2-registry", payload)
     print(json.dumps(payload, indent=2, sort_keys=True))
@@ -422,6 +425,7 @@ def evidence_payload() -> dict[str, Any]:
         },
         "b2_registry": {
             "registry_digest": registry.digest(),
+            "rights_evidence_fingerprint": registry.rights_evidence_fingerprint(),
             "role_distribution": registry.role_distribution(),
             "rights_blocked": registry.rights_blocked_sources(),
             "eligible_for_training": list(registry.trainable_sources()),
