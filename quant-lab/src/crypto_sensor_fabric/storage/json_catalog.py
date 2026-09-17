@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 import uuid
 from enum import Enum
 from pathlib import Path
@@ -197,6 +198,12 @@ class DurableJsonCatalog:
         self._fault_hooks = fault_hooks
         self._ops = ops
         ensure_durable_directory(self._root)
+        # I07R1F §9-§10: per-job locks let DIFFERENT jobs drive this ONE
+        # cache-backed catalog object from separate threads, so every
+        # ``_cache`` critical section is guarded by an internal REENTRANT
+        # lock.  RLock (not Lock) so the validated reload/commit helpers
+        # can reuse it internally without self-deadlocking.
+        self._cache_lock = threading.RLock()
         # logical_id -> payload (as persisted, canonical form)
         self._cache: dict[str, dict[str, Any]] = {}
         self._load_all()
@@ -252,9 +259,10 @@ class DurableJsonCatalog:
         return logical_id, payload
 
     def _load_all(self) -> None:
-        self._cache = {}
-        for path in sorted(self._root.glob("*.json")):
-            self._load_fragment(path)
+        with self._cache_lock:
+            self._cache = {}
+            for path in sorted(self._root.glob("*.json")):
+                self._load_fragment(path)
 
     def _load_fragment(self, path: Path) -> None:
         logical_id, payload = self._parse_fragment(path)
@@ -281,8 +289,15 @@ class DurableJsonCatalog:
         corruption, never a silent de-registration (I05R1 doctrine).
         No writes, no overwrites; purely a fresh view of durable truth for
         long-lived repository instances that must observe other writers
-        (I07R1 §30/§33-§35).
+        (I07R1 §30/§33-§35).  Cache synchronization (I07R1F §10): the whole
+        scan/compare/adopt sequence holds the internal reentrant lock, so a
+        concurrent ``commit`` can neither be observed half-applied nor be
+        misread as a vanished cached record.
         """
+        with self._cache_lock:
+            self._refresh_locked()
+
+    def _refresh_locked(self) -> None:
         on_disk: dict[str, tuple[bytes, dict[str, Any]]] = {}
         for path in sorted(self._root.glob("*.json")):
             logical_id, payload = self._parse_fragment(path)
@@ -314,16 +329,20 @@ class DurableJsonCatalog:
 
     def get(self, logical_id: str) -> dict[str, Any] | None:
         """Return the committed payload for ``logical_id``, or None."""
-        return self._cache.get(logical_id)
+        with self._cache_lock:
+            return self._cache.get(logical_id)
 
     def has(self, logical_id: str) -> bool:
-        return logical_id in self._cache
+        with self._cache_lock:
+            return logical_id in self._cache
 
     def list_ids(self) -> list[str]:
-        return sorted(self._cache.keys())
+        with self._cache_lock:
+            return sorted(self._cache.keys())
 
     def __len__(self) -> int:
-        return len(self._cache)
+        with self._cache_lock:
+            return len(self._cache)
 
     # -- commit --------------------------------------------------------------
 
@@ -336,6 +355,10 @@ class DurableJsonCatalog:
           publish -> parent-dir fsync -> success.
 
         Returns the committed payload (the existing one on idempotent reuse).
+
+        Cache synchronization (I07R1F §10): the cache-read / adopt / publish
+        / cache-write sequence runs under the internal reentrant lock, so an
+        interleaved ``refresh`` scans a consistent view.
         """
         if not isinstance(logical_id, str) or not logical_id:
             raise JsonCatalogInvalidIdentity(
@@ -350,6 +373,12 @@ class DurableJsonCatalog:
                 f"match the committed logical_id={logical_id!r}"
             )
 
+        with self._cache_lock:
+            return self._commit_locked(logical_id, payload)
+
+    def _commit_locked(
+        self, logical_id: str, payload: dict[str, Any]
+    ) -> dict[str, Any]:
         canonical = canonical_json_bytes(payload)
 
         if logical_id in self._cache:

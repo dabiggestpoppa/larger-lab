@@ -546,7 +546,7 @@ class DurableJobStateRepository:
         acquisition_id: str,
         manifest_id: str | None = None,
     ) -> StorageJobState:
-        """Persist ``resume_token`` as the active resume point (§16).
+        """Persist        ``resume_token`` as the active resume point (§16).
 
         The ONLY way a chain reaches ``CHECKPOINT_ADVANCED``.  Allowed
         only when the batch's T0 evidence is durably proven at or above
@@ -556,65 +556,33 @@ class DurableJobStateRepository:
         an exactly source-bound manifest.  At the RAW_COMMITTED floor the
         caller must pass ``manifest_id=None``; at MANIFEST_COMMITTED the
         manifest_id is mandatory.  Failure NEVER advances the cursor.
+
+        Floor authority splits by checkpoint age (I07R1F §3-§7): the
+        CONSTRUCTOR floor shapes only a NEW checkpoint's caller input and
+        proof; an ALREADY-committed checkpoint is retried and re-proved
+        under the floor persisted in its own proof, so a restart with a
+        different ``min_durable_status`` can neither reinterpret nor
+        refuse durable history.
         """
-        floor = self._min_durable_status
-        if floor is StorageJobStatus.RAW_COMMITTED and manifest_id is not None:
-            # §12: a RAW floor does not index manifests; contradictory
-            # input is rejected rather than silently anchored.
-            raise JobResumeGateError(
-                "min_durable_status is RAW_COMMITTED: checkpoint takes "
-                "manifest_id=None (no manifest anchor exists at this floor)"
-            )
-        if floor is StorageJobStatus.MANIFEST_COMMITTED and manifest_id is None:
-            # §13: the manifest-committed floor REQUIRES the exact manifest.
-            raise JobResumeGateError(
-                "min_durable_status is MANIFEST_COMMITTED: checkpoint "
-                "requires the exact durable manifest_id"
-            )
         with self._job_lock(job_id):
             current = self.get_job(job_id)
             if current.status is StorageJobStatus.CHECKPOINT_ADVANCED:
-                # Exact retry of the SAME batch after a lost-return crash is
-                # idempotence (§68), not a second advancement: refresh has
-                # already shown us the committed event; re-prove durable
-                # truth under the PERSISTED floor, then adopt.  Divergent
-                # semantics are a typed conflict (I07R1 §35).
-                last = self._latest_event(job_id)
-                if last is not None and last.get("checkpoint_proof"):
-                    committed = StorageJobState.model_validate(
-                        last["resulting_state"]
-                    )
-                    proof = last["checkpoint_proof"]
-                    same_batch = (
-                        committed.last_committed_acquisition_id
-                        == acquisition_id
-                        and committed.last_manifest_id == manifest_id
-                        and committed.resume_token == resume_token
-                    )
-                    if same_batch:
-                        # §19: re-prove under the floor PERSISTED IN THE
-                        # PROOF — the retrying process's constructor
-                        # configuration never reinterprets history.
-                        persisted_floor = StorageJobStatus(
-                            proof["minimum_durable_status"]
-                        )
-                        self._prove_batch_durable(
-                            job_id=job_id,
-                            acquisition_id=acquisition_id,
-                            manifest_id=manifest_id,
-                            floor=persisted_floor,
-                        )
-                        return committed
-                raise JobTransitionConflict(
-                    "job is already CHECKPOINT_ADVANCED for a different "
-                    "batch; the next batch continues via an annotated "
-                    "ACQUIRING transition, not another checkpoint "
-                    "advancement"
+                # I07R1F §3-§4: detect an existing checkpoint FIRST.  The
+                # current-floor shape rules below must never run against
+                # an old retry — durable history outranks restarted config.
+                return self._retry_committed_checkpoint(
+                    job_id=job_id,
+                    resume_token=resume_token,
+                    acquisition_id=acquisition_id,
+                    manifest_id=manifest_id,
                 )
             if current.status is StorageJobStatus.COMPLETE:
                 raise JobTransitionConflict(
                     "COMPLETE is terminal; the job chain is frozen"
                 )
+            # NEW checkpoint: the CURRENT constructor floor governs (§7).
+            floor = self._min_durable_status
+            self._require_checkpoint_shape(floor, manifest_id)
             self._require_checkpoint_eligible(current.status, floor)
             blob_sha = self._prove_batch_durable(
                 job_id=job_id,
@@ -710,6 +678,77 @@ class DurableJobStateRepository:
         return next_state
 
     # -- durability floor + proof (I07R1 §7-§13, §19, §25) --------------------
+
+    def _require_checkpoint_shape(
+        self, floor: StorageJobStatus, manifest_id: str | None
+    ) -> None:
+        """Reject a NEW-checkpoint caller shape that contradicts the floor.
+
+        §12: at RAW_COMMITTED there IS no manifest anchor, so a supplied
+        ``manifest_id`` is contradictory input (never a dummy string).
+        §13: MANIFEST_COMMITTED requires the exact durable manifest.  This
+        applies to NEW checkpoints ONLY — a historical retry is governed by
+        its persisted proof, not by this process's configuration
+        (I07R1F §3).
+        """
+        if floor is StorageJobStatus.RAW_COMMITTED and manifest_id is not None:
+            raise JobResumeGateError(
+                "min_durable_status is RAW_COMMITTED: checkpoint takes "
+                "manifest_id=None (no manifest anchor exists at this floor)"
+            )
+        if floor is StorageJobStatus.MANIFEST_COMMITTED and manifest_id is None:
+            raise JobResumeGateError(
+                "min_durable_status is MANIFEST_COMMITTED: checkpoint "
+                "requires the exact durable manifest_id"
+            )
+
+    def _retry_committed_checkpoint(
+        self,
+        *,
+        job_id: str,
+        resume_token: Any,
+        acquisition_id: str,
+        manifest_id: str | None,
+    ) -> StorageJobState:
+        """Adopt an EXACT retry of an already-committed checkpoint (I07R1F §3).
+
+        Validation and re-proof use the durability floor PERSISTED IN THAT
+        CHECKPOINT'S OWN PROOF (I07R1 §19): a process restarted with a
+        different ``min_durable_status`` must never reinterpret — nor
+        refuse to re-confirm — durable history.  Only an exact batch match
+        (same resume token, acquisition anchor and manifest anchor) is
+        adopted; divergent semantics stay a typed conflict (I07R1 §8/§35).
+        """
+        last = self._latest_event(job_id)
+        if last is None or not last.get("checkpoint_proof"):
+            # I07R1 §18: a CHECKPOINT_ADVANCED head without its immutable
+            # proof is corruption — never a silently adoptable success.
+            raise JobCatalogCorrupt(
+                f"job {job_id!r} is CHECKPOINT_ADVANCED but its committed "
+                "checkpoint event carries no checkpoint_proof"
+            )
+        committed = StorageJobState.model_validate(last["resulting_state"])
+        same_batch = (
+            committed.last_committed_acquisition_id == acquisition_id
+            and committed.last_manifest_id == manifest_id
+            and committed.resume_token == resume_token
+        )
+        if not same_batch:
+            raise JobTransitionConflict(
+                "job is already CHECKPOINT_ADVANCED for a different batch; "
+                "the next batch continues via an annotated ACQUIRING "
+                "transition, not another checkpoint advancement"
+            )
+        persisted_floor = StorageJobStatus(
+            last["checkpoint_proof"]["minimum_durable_status"]
+        )
+        self._prove_batch_durable(
+            job_id=job_id,
+            acquisition_id=acquisition_id,
+            manifest_id=manifest_id,
+            floor=persisted_floor,
+        )
+        return committed
 
     def _require_checkpoint_eligible(
         self, status: StorageJobStatus, floor: StorageJobStatus
