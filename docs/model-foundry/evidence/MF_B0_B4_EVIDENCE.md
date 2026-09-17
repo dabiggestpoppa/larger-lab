@@ -12,14 +12,14 @@ produced by that command; none is transcribed by hand from a narrative.
 | One-OCE boundary | `sha256:98cb4c61a3eb5856944f54f4495686701263bbc46c8e70928f22e3e41eb7627d` |
 | MF-B0 adversarial gate report | `sha256:60a9694ff3b8541564a14945e87ca6fa486d7f7605abc9a6b5c7894606bd6d0f` |
 | Cross-block F0–F11 report | `sha256:1eee59bc236a4262c6bfee2eafdbcad40c38bc9f53466d3fa978993be79b283f` |
-| Fixture source registry | `sha256:479ea7d31d31a1d6dc55f2ccd8d5d318df9c1152c94c3c08f2d459918f34f8b6` |
+| Fixture source registry | `sha256:2ce1ce0ef5f985e94b4374b00b626aea447293214b70a99e61c1b01e3ca4b533` |
 | Fixture train manifest lineage | `sha256:1b731fac408ceddab1aebb97b2d00e4e0a32869d268dfd6614abe68083dcacad` |
 | Fixture benchmark | `sha256:9892b9431b095deaa6ec9bc09b9541e9314bbffd5ee840e0d6f393503c8cd280` |
 | Fixture protocol | `sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35` |
-| Evidence package | `sha256:1ea9bacc96e7e4d5d99d16abb5b125060a217234dabedf47644dfb389a0bdfbb` |
+| Evidence package | `sha256:a6128ccc11c0fe5ccf13d0760931b8db527994d83e0d7df712c09a729d982441` |
 
-Tested at commit `5ac46b5ee4bfeebdfa96884eb7891e9f97918d92`
-(`cd model-foundry && python -m pytest tests -q` → **142 passed**).
+Tested at commit `07ed66173422f7b6b1ec144abd731310db174c3c`
+(`cd model-foundry && python -m pytest tests -q` → **148 passed**).
 
 ## Acceptance claims and how each is checked
 
@@ -42,7 +42,7 @@ Tested at commit `5ac46b5ee4bfeebdfa96884eb7891e9f97918d92`
 | 15 | `CapabilityAssessment` is vector-valued | dimensions map; `master_score: null` |
 | 16 | Negative results and reopen conditions are first-class | F10; `NEGATIVE_RESULT_IMMUTABLE`, `REOPEN_REQUIRES_NEW_EVIDENCE` |
 | 17 | Generic OCE replacement targets are explicit | boundary declarations fixture + `integration-map.md` |
-| 18 | Full authoritative suite is green | 142 passed at tested SHA |
+| 18 | Full authoritative suite is green | 148 passed at tested SHA |
 | 19 | No paid resource was launched | external-operations accounting all zero |
 | 20 | Receipts truthfully describe what happened | receipts regenerated from the tested tree; `test_cross_block_receipt_matches_the_runtime_report` |
 
@@ -70,6 +70,10 @@ PYTHONIOENCODING=utf-8 python -m foundry.cli report   # all block receipts
 PYTHONIOENCODING=utf-8 python -m foundry.cli evidence # this package, regenerated
 ```
 
-Everything is deterministic, offline, and free. Regenerating the evidence should
-reproduce the fingerprints above byte-for-byte; if it does not, that is a
-finding, not a formatting nuisance.
+Everything is deterministic, offline, and free. Regenerating the evidence must
+reproduce every fingerprint above exactly; if it does not, that is a finding, not
+a formatting nuisance. This is not theoretical: the first regeneration produced a
+different registry digest because the digest included entry wall-clock time, and
+that defect was fixed in `07ed6617` with regression tests
+(`tests/test_mf_determinism.py`). Receipt files still carry the time they were
+recorded — that is event evidence — but no fingerprint depends on it.

@@ -2,10 +2,11 @@
 
 * **Branch:** `agent/model-foundry-mf-b0-b4-build`
 * **Start SHA:** `c55e379df3de2c6bb643afc90c10c0a861fa8c8a`
-* **Tested SHA (code):** `5ac46b5ee4bfeebdfa96884eb7891e9f97918d92`
+* **Tested SHA (code):** `07ed66173422f7b6b1ec144abd731310db174c3c`
 * **Authoritative test command:** `cd model-foundry && PYTHONIOENCODING=utf-8 python -m pytest tests -q`
-* **Result:** `142 passed` (identical at the archive head `246afe8b`, which is documentation only)
+* **Result:** `148 passed` (38 MF-B0, 19 MF-B1, 37 MF-B2/B3, 26 MF-B4, 22 boundary/cross-block, 6 determinism)
 * **Invocation from repo root also works:** `python -m pytest model-foundry/tests -q`
+* Later documentation-only commits do not change test results.
 
 Status vocabulary: **implemented** (real, deterministic code), **simulated**
 (fixture-executed, declares `noncanonical: true`), **declaration only** (owned by
@@ -77,7 +78,8 @@ graded, typed relation graph where absence of an edge is explicitly *not* a
 cleanliness certificate. CEREBUS-family material is withheld operationally.
 
 Fixture registry digest:
-`sha256:479ea7d31d31a1d6dc55f2ccd8d5d318df9c1152c94c3c08f2d459918f34f8b6`.
+`sha256:2ce1ce0ef5f985e94b4374b00b626aea447293214b70a99e61c1b01e3ca4b533`
+(replay-stable; see the resolved defect below).
 Rights-blocked: `SRC_RIGHTS_UNKNOWN` (RIGHTS_UNKNOWN),
 `SRC_VENDOR_TERMS` (RIGHTS_RESTRICTED), `SRC_PROHIBITED` (EXCLUDED_BY_POLICY).
 Eligible for training: `SRC_AGENT_TRACE`, `SRC_NEWS_ALPHA`, `SRC_NEWS_ALPHA_MIRROR`.
@@ -160,7 +162,23 @@ by test.
 * sealed-evaluation exposures: 0 (refusals recorded)
 * negative results recorded: 1 (plus 3 refused dataset builds)
 * evidence package: `evidence/MF_B0_B4_EVIDENCE.json`, fingerprint
-  `sha256:1ea9bacc96e7e4d5d99d16abb5b125060a217234dabedf47644dfb389a0bdfbb`
+  `sha256:a6128ccc11c0fe5ccf13d0760931b8db527994d83e0d7df712c09a729d982441`
+  (replay-stable)
+
+## Defect found and fixed during the build
+
+Regenerating the evidence package produced a **different registry digest for
+identical content**: `VersionedRegistry.digest()` included each entry's
+wall-clock `recorded_utc`. A substrate whose premise is content-addressed
+provenance cannot have a digest that moves when nothing scientific changed — the
+same registry could not be proved to be the same registry.
+
+Fixed in `07ed6617`: entry digest payloads exclude recorded time while keeping it
+in the serialized record, receipts capture their timestamp at creation rather
+than at serialization, protocol freezes accept an explicit replay clock, and the
+evidence aggregate strips run timestamps before fingerprinting. Six regression
+tests in `tests/test_mf_determinism.py` hold this, including one that fails if a
+wall-clock key reappears anywhere the evidence fingerprint covers.
 
 ## Contradictions and ambiguities carried forward
 
