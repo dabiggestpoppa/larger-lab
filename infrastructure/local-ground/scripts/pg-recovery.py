@@ -437,10 +437,8 @@ def _validated_open_path(path: str) -> str:
     Enforced here, in order:
       1. no symlink indirection - realpath(path) must equal abspath(path),
          so the artifact must BE the named file, not a pointer elsewhere;
-      2. containment - the real path must sit inside an approved root,
-         from _approved_roots(): this engine's own directory, its durable
-         recovery-state directory, or an OCE_BACKUP_ROOTS entry declared
-         by the caller;
+      2. containment - the real path must sit inside an approved root
+         (_approved_roots owns which roots and where they come from);
       3. the path must be an existing regular file.
 
     Canonical-open race note: the open follows validation; on POSIX the

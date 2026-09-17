@@ -6,8 +6,9 @@ Proves the authority model claimed for every path input:
 * independent-gate.py _validated_subprocess_path enforces REAL
   containment inside the approved evidence root (traversal, absolute
   escape, symlink substitution, prefix collisions all rejected);
-* pg-recovery.py / pg-verify.py _validated_open_path enforce the same
-  real-time containment discipline: no symlink indirection (realpath
+* pg-recovery.py's _validated_open_path enforces the containment
+  discipline both engines use (pg-verify.py reuses it, and the suite
+  proves they are the same function): no symlink indirection (realpath
   must equal abspath), the canonical path must sit inside an approved
   root, and the target must be an existing regular file; denial has
   zero durable side effects (pure predicates).
@@ -172,12 +173,21 @@ class TestApprovedRootArtifactInputs:
         monkeypatch.setenv("OCE_BACKUP_ROOTS", str(tmp_path))
         self.root = tmp_path
 
+    def test_containment_has_exactly_one_owner(self):
+        """pg-verify exposes the policy it imported from pg-recovery instead of
+        restating it, so the two engines cannot drift apart. (Each test load
+        execs its own module object, so the check is against pg-verify's own
+        import, not against this file's second load of pg-recovery.)"""
+        for name in ("_approved_roots", "_validated_open_path",
+                     "_validated_read_text"):
+            assert getattr(pgver, name) is getattr(pgver._PG, name), (
+                f"{name} must be pg-recovery's function, not a second copy")
+
     def test_regular_file_accepted_and_canonical(self, tmp_path):
         f = tmp_path / "inventory.json"
         f.write_text("{}")
-        for mod in (pgrec, pgver):
-            out = mod._validated_open_path(str(f))
-            assert Path(out) == Path(os.path.realpath(str(f)))
+        out = pgrec._validated_open_path(str(f))
+        assert Path(out) == Path(os.path.realpath(str(f)))
 
     @needs_symlink
     def test_symlink_file_rejected(self, tmp_path):
@@ -186,31 +196,27 @@ class TestApprovedRootArtifactInputs:
         link = tmp_path / "inventory.json"
         os.symlink(str(real), str(link))
         try:
-            for mod in (pgrec, pgver):
-                with pytest.raises(RuntimeError, match="symlink indirection"):
-                    mod._validated_open_path(str(link))
+            with pytest.raises(RuntimeError, match="symlink indirection"):
+                pgrec._validated_open_path(str(link))
         finally:
             link.unlink()
 
     def test_missing_path_rejected(self, tmp_path):
-        for mod in (pgrec, pgver):
-            with pytest.raises(RuntimeError, match="not a regular file"):
-                mod._validated_open_path(str(tmp_path / "nope.json"))
+        with pytest.raises(RuntimeError, match="not a regular file"):
+            pgrec._validated_open_path(str(tmp_path / "nope.json"))
 
     def test_wrong_type_directory_rejected(self, tmp_path):
         d = tmp_path / "adir"
         d.mkdir()
-        for mod in (pgrec, pgver):
-            with pytest.raises(RuntimeError, match="not a regular file"):
-                mod._validated_open_path(str(d))
+        with pytest.raises(RuntimeError, match="not a regular file"):
+            pgrec._validated_open_path(str(d))
 
     def test_path_outside_every_approved_root_rejected(self, tmp_path):
         f = tmp_path.parent / "outside-approved-roots.json"
         f.write_text("{}")
         try:
-            for mod in (pgrec, pgver):
-                with pytest.raises(RuntimeError, match="approved backup root"):
-                    mod._validated_open_path(str(f))
+            with pytest.raises(RuntimeError, match="approved backup root"):
+                pgrec._validated_open_path(str(f))
         finally:
             f.unlink()
 
@@ -218,9 +224,8 @@ class TestApprovedRootArtifactInputs:
         monkeypatch.setenv("OCE_BACKUP_ROOTS", "")
         f = tmp_path / "inventory.json"
         f.write_text("{}")
-        for mod in (pgrec, pgver):
-            with pytest.raises(RuntimeError, match="approved backup root"):
-                mod._validated_open_path(str(f))
+        with pytest.raises(RuntimeError, match="approved backup root"):
+            pgrec._validated_open_path(str(f))
 
     def test_cli_argument_cannot_approve_its_own_root(self, tmp_path, monkeypatch):
         # A root named in the artifact's own path (or any argv channel)
@@ -232,6 +237,5 @@ class TestApprovedRootArtifactInputs:
         f = rogue / "inventory.json"
         f.write_text("{}")
         monkeypatch.setenv("OCE_BACKUP_ROOTS", str(tmp_path))
-        for mod in (pgrec, pgver):
-            with pytest.raises(RuntimeError, match="approved backup root"):
-                mod._validated_open_path(str(f))
+        with pytest.raises(RuntimeError, match="approved backup root"):
+            pgrec._validated_open_path(str(f))
