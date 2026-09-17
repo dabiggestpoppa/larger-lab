@@ -59,6 +59,7 @@ JobStack = _base.JobStack
 _create = _base._create
 _drive_to_manifest = _base._drive_to_manifest
 _full_batch = _base._full_batch
+_checkpoint = _base._checkpoint
 FIXED = _base.FIXED
 
 TOKEN = ResumeToken(mode="PAGE", provider_cursor="c", page_number=1)
@@ -544,3 +545,66 @@ def test_event_catalog_shared_by_two_repositories_stays_valid(
     repo_b.advance_status("job-xr", to_status=StorageJobStatus.RAW_STAGED)
     assert len(repo_b.list_transitions("job-xr")) == 2
     assert JobCatalogCorrupt is not None  # imported for the fail-closed surface
+
+
+# ---------------------------------------------------------------------------
+# §18: an unproven checkpoint head is corruption, never an adoptable success
+# ---------------------------------------------------------------------------
+
+
+def test_checkpoint_head_without_proof_fails_closed(tmp_path: Path) -> None:
+    """§18: a CHECKPOINT_ADVANCED head carrying no committed proof is corruption.
+
+    Reached the way an attacker actually would reach it: the repository is
+    constructed BEFORE the fabrication, so the validated post-lock refresh
+    ADOPTS the new fragment (a fresh logical id — there is no divergence for
+    refresh to detect) instead of the restart validator refusing the chain at
+    construction.  The runtime retry path must therefore fail closed rather
+    than adopt an unproven checkpoint.
+    """
+    clock = LockedClock()
+    stack = JobStack(tmp_path, clock=clock)
+    repo = stack.repo
+    _create(repo, "job-noproof")
+    _drive_to_manifest(repo, "job-noproof")
+    _full_batch(stack, "acq-noproof", "pm-noproof", b'{"rows": ["np"]}')
+    committed = _checkpoint(repo, "job-noproof", "acq-noproof", "pm-noproof")
+    assert committed.status is StorageJobStatus.CHECKPOINT_ADVANCED
+
+    events_dir = _events_dir(tmp_path)
+    genuine: dict[str, Any] | None = None
+    for path in sorted(events_dir.glob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if payload.get("job_id") == "job-noproof" and payload.get(
+            "checkpoint_proof"
+        ):
+            genuine = payload
+    assert genuine is not None, "committed checkpoint event not found"
+
+    # Forge a LATER head that keeps every anchor but drops the proof, written
+    # at the correct hashed physical key so the refresh adopts it.
+    forged = json.loads(json.dumps(genuine))
+    sequence = int(genuine["sequence"]) + 1
+    forged["sequence"] = sequence
+    forged["transition_id"] = f"job-noproof:{sequence:06d}"
+    forged["transition"]["transition_id"] = forged["transition_id"]
+    del forged["checkpoint_proof"]
+    forged_path = events_dir / (
+        hashlib.sha256(forged["transition_id"].encode("utf-8")).hexdigest()
+        + ".json"
+    )
+    forged_path.write_bytes(json.dumps(forged).encode("utf-8"))
+
+    # Runtime path: refresh adopts the forged head, so the retry logic — not
+    # the restart validator — is what must refuse it.
+    with pytest.raises(JobCatalogCorrupt):
+        repo.advance_checkpoint(
+            "job-noproof",
+            resume_token=TOKEN,
+            acquisition_id="acq-noproof",
+            manifest_id="pm-noproof",
+        )
+
+    # Restart path: the same forged chain must not load either.
+    with pytest.raises(JobCatalogCorrupt):
+        JobStack(tmp_path, clock=clock)
