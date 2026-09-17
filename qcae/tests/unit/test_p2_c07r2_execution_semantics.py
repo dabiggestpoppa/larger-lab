@@ -187,6 +187,7 @@ class TestCrashWindows:
         key = "job-12345678:s-1"
         store.reserve_execution(key, "job-12345678", "s-1",
                                 ReplaySafety.REPLAY_SAFE, clock())
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         assert report["unresolved_executions"][0]["idempotency_key"] == key
         assert report["unresolved_executions"][0]["requires_operator_resolution"] is False
@@ -207,6 +208,7 @@ class TestCrashWindows:
         with pytest.raises(RuntimeError):
             engine.execute_step(lease)
         # EXECUTING record unresolved; recovery reports it.
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         unresolved = {u["idempotency_key"]: u for u in report["unresolved_executions"]}
         assert unresolved["job-12345678:s-1"]["state"] == "EXECUTING"
@@ -294,16 +296,18 @@ class TestCrashWindows:
         lease = _drive_ready(store, queue, engine, clock)
         with pytest.raises(RuntimeError):
             engine.execute_step(lease)
+        clock.advance(120)  # process death outlives the lease TTL
         engine.recover_job("job-12345678")
-        # Re-lease after recovery; the unresolved EXECUTING record must route
-        # the retry into explicit WAITING_INPUT escalation — NOT a rerun.
+        # P2-R3-C03: recovery itself routes the unresolved NON_REPLAY_SAFE
+        # execution into explicit WAITING_INPUT — the step never re-enters
+        # READY, so no lease can exist (fail closed before claim, not at
+        # execute).
+        assert store.get_step("s-1").status is RuntimeStepStatus.WAITING_INPUT
         engine._workers["GENERIC"] = worker
         engine.ready_steps("job-12345678")
-        lease2 = engine.lease_next("job-12345678", "w2")
-        result = engine.execute_step(lease2)
-        assert result.status is WorkerStatus.BLOCKED_INPUT
-        assert store.get_step("s-1").status is RuntimeStepStatus.WAITING_INPUT
+        assert engine.lease_next("job-12345678", "w2") is None
         assert worker.executions == 0  # never re-executed the ambiguous effect
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         flagged = [
             u for u in report["unresolved_executions"]

@@ -221,14 +221,30 @@ class SqliteStepQueue:
         step = self._store.get_step(step_id)
         self._store.update_step(step, lease_owner="", lease_token="", lease_expires_at="")
 
-    def expire_stale_leases(self) -> List[str]:
-        """Recover steps whose leases expired; returns recovered step ids."""
+    def expire_stale_leases(self, job_id: Optional[str] = None) -> List[str]:
+        """Release TTL-expired claims; returns expired step ids (P2-R3-C03).
+
+        This is the ONLY recovery expiry path: it checks the TTL, so an
+        active lease is never stolen. ``job_id`` scopes the release to one
+        job's claims (job-scoped recovery must not touch other jobs).
+        Callers MUST reconcile the returned steps through
+        ``OrchestratorEngine.recover_leased_steps`` — a claim deletion
+        alone leaves the durable step RUNNING (that is exactly the
+        recovery-surface split this method exists to end).
+        """
         now = self._now()
-        rows = self._conn.execute(
-            "SELECT step_id FROM runtime_queue_claim"
-            " WHERE acknowledged = 0 AND lease_expires_at <= ?",
-            (now,),
-        ).fetchall()
+        if job_id is not None:
+            rows = self._conn.execute(
+                "SELECT step_id FROM runtime_queue_claim"
+                " WHERE acknowledged = 0 AND lease_expires_at <= ? AND job_id = ?",
+                (now, job_id),
+            ).fetchall()
+        else:
+            rows = self._conn.execute(
+                "SELECT step_id FROM runtime_queue_claim"
+                " WHERE acknowledged = 0 AND lease_expires_at <= ?",
+                (now,),
+            ).fetchall()
         recovered: List[str] = []
         for (step_id,) in rows:
             self._conn.execute(

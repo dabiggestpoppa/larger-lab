@@ -266,24 +266,26 @@ class TestCrashRecovery:
 
             # Restart: fresh engine over the same database.
             store2, queue2, engine2, clock2, conn2 = self._full_setup(db)
+            clock2.advance(120)  # process death outlives the lease TTL
             report = engine2.recover_job("job-12345678")
             assert report["completed_steps"] == ["s-A"]
             assert "s-B" in report["recovered_lease_steps"]
             assert store2.get_step("s-B").status is RuntimeStepStatus.READY
 
-            # B is claimable again by a new worker; A is never re-executed.
+            # B and C are both READY again (A is never re-executed); the
+            # queue may hand them out in either order (C waited longer).
             engine2.ready_steps("job-12345678")
             assert store2.get_step("s-A").status is RuntimeStepStatus.SUCCEEDED
-            lease_b2 = engine2.lease_next("job-12345678", "w2")
-            assert lease_b2 is not None
-            assert lease_b2.step_id == "s-B"
-            engine2.execute_step(lease_b2)
+            executed = []
+            while True:
+                lease = engine2.lease_next("job-12345678", "w2")
+                if lease is None:
+                    break
+                engine2.execute_step(lease)
+                executed.append(lease.step_id)
+                engine2.ready_steps("job-12345678")
+            assert sorted(executed) == ["s-B", "s-C"]
             assert store2.get_step("s-B").status is RuntimeStepStatus.SUCCEEDED
-
-            # Finish C; job completes.
-            engine2.ready_steps("job-12345678")
-            lease_c = engine2.lease_next("job-12345678", "w2")
-            engine2.execute_step(lease_c)
             assert store2.get_step("s-C").status is RuntimeStepStatus.SUCCEEDED
             conn2.close()
 
@@ -296,7 +298,9 @@ class TestCrashRecovery:
         lease = engine.lease_next("job-12345678", "w1")
         with pytest.raises(RuntimeError):
             engine.execute_step(lease)
-        # The step is still RUNNING under an active lease -> recovery recovers it.
+        # The step is still RUNNING under an expired lease -> recovery
+        # reconciles it (active leases are protected; death outlives TTL).
+        clock.advance(120)
         report = engine.recover_job("job-12345678")
         assert "s-1" in report["recovered_lease_steps"]
         assert store.get_step("s-1").status is RuntimeStepStatus.READY or True
@@ -318,6 +322,7 @@ class TestCrashRecovery:
         lease = engine.lease_next("job-12345678", "w1")
         # Simulate crash: lease exists, then recovery. Before resuming, the
         # policy tightened — the gate now requires approval for this action.
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         engine._authority_gate = StaticStepAuthorityGate(
             require_approval=("execute.GENERIC",)

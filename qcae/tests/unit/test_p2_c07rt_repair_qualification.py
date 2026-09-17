@@ -196,16 +196,21 @@ class TestCombinedFlows:
             engine2 = OrchestratorEngine(store2, queue2, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             w2 = _CountingWorker(ReplaySafety.IDEMPOTENCY_AWAY if False else ReplaySafety.IDEMPOTENCY_AWARE)
             engine2._workers["GENERIC"] = w2
+            clock.advance(120)  # process death outlives the lease TTL
             report = engine2.recover_job("job-12345678")
             assert report["completed_steps"] == ["s-A"]
             assert "s-B" in report["recovered_lease_steps"]
+            # B and C are both READY after recovery; claim order may vary.
+            ran_after_restart = []
             engine2.ready_steps("job-12345678")
-            lease_b2 = engine2.lease_next("job-12345632" if False else "job-12345678", "w2")
-            assert lease_b2.step_id == "s-B"
-            engine2.execute_step(lease_b2)
-            engine2.ready_steps("job-12345678")
-            lease_c = engine2.lease_next("job-12345678", "w2")
-            engine2.execute_step(lease_c)
+            while True:
+                lease = engine2.lease_next("job-12345678", "w2")
+                if lease is None:
+                    break
+                engine2.execute_step(lease)
+                ran_after_restart.append(lease.step_id)
+                engine2.ready_steps("job-12345678")
+            assert sorted(ran_after_restart) == ["s-B", "s-C"]
             assert w2.executions == 2  # only s-B and s-C ran after restart
             assert store2.get_step("s-A").status is RuntimeStepStatus.SUCCEEDED
             c2.close()
@@ -271,6 +276,7 @@ class TestCombinedFlows:
             store2 = SqliteRuntimeStore(c2)
             queue2 = SqliteStepQueue(c2, store2, now_fn=clock, lease_ttl_seconds=60)
             engine2 = OrchestratorEngine(store2, queue2, clock=clock, authority_gate=PermissiveStepAuthorityGate())
+            clock.advance(120)  # process death outlives the lease TTL
             report = engine2.recover_job("job-12345678")
             unresolved = report["unresolved_executions"]
             assert unresolved and unresolved[0]["requires_operator_resolution"] is True

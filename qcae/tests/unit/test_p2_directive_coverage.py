@@ -169,6 +169,7 @@ class TestPolicyChangeBetweenCrashAndResume:
         # "Policy change during the crash window": swap in a tightened gate
         # before resuming; the next evaluation is a real provider call.
         engine._authority_gate = StaticStepAuthorityGate(allowed=())
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         assert "job-12345678:s-1" in report["recovered_lease_steps"]
         engine.ready_steps("job-12345678")

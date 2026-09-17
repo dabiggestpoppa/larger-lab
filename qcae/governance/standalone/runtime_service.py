@@ -177,7 +177,20 @@ class LocalRuntimeService:
         return self._engine.recover_job(job_id)
 
     def recover_expired_leases(self) -> List[str]:
-        return self._queue.expire_stale_leases()
+        """P2-R3-C03 (finding C): global recovery owns BOTH layers.
+
+        TTL-expired queue claims are released AND their durable runtime
+        steps are reconciled to a safe state by the same authoritative law
+        (`OrchestratorEngine.recover_leased_steps`). A claim deletion that
+        leaves the step RUNNING forever is not recovery. Returns the
+        reconciled step ids.
+        """
+        expired = self._queue.expire_stale_leases()
+        return self._engine.recover_leased_steps(expired)
+
+    def recover_orphan_steps(self, job_id: str) -> dict:
+        """Classify RUNNING steps with no queue claim (orphan state)."""
+        return self._engine.recover_orphan_steps(job_id)
 
     # -- cancellation --------------------------------------------------------
 

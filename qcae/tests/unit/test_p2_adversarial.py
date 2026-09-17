@@ -114,8 +114,9 @@ class TestAdversarial:
         assert store.latest_checkpoint_for_job("job-12345678") == checkpoint
         assert store.get_step("job-12345678:s-1").status is RuntimeStepStatus.SUCCEEDED
         assert store.get_step("job-12345678:s-2").status is RuntimeStepStatus.RUNNING
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
-        assert "job-12345678:s-2" in report["requeued_steps"]
+        assert "job-12345678:s-2" in report["recovered_lease_steps"]
         assert store.get_step("job-12345678:s-2").status is RuntimeStepStatus.READY
 
     def test_duplicate_completion_is_idempotent(self, env):
@@ -295,8 +296,9 @@ class TestAdversarial:
             queue2 = SqliteStepQueue(c2, store2, now_fn=clock, lease_ttl_seconds=60)
             engine2 = OrchestratorEngine(store2, queue2, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             engine2._workers["GENERIC"] = DeterministicSuccessWorker()
+            clock.advance(120)  # process death outlives the lease TTL
             report = engine2.recover_job("job-12345678")
-            assert "s-1" in report["requeued_steps"]
+            assert "s-1" in report["recovered_lease_steps"]
             engine2.ready_steps("job-12345678")
             lease2 = engine2.lease_next("job-12345678", "w2")
             engine2.execute_step(lease2)

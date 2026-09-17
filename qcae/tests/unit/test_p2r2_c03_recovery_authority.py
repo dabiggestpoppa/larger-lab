@@ -117,6 +117,7 @@ class TestRecoveryReevaluation:
 
         # Policy tightens while the process is "down".
         engine._authority_gate = StaticStepAuthorityGate(allowed=())
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         assert "job-12345678:s-1" in report["recovered_lease_steps"]
         engine.ready_steps("job-12345678")
@@ -139,6 +140,7 @@ class TestRecoveryReevaluation:
         engine.ready_steps("job-12345678")
         lease = engine.lease_next("job-12345678", "w1")
         # Crash before the worker runs (the reservation is the crash point).
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         assert "job-12345678:s-1" in report["recovered_lease_steps"]
 
@@ -192,6 +194,7 @@ class TestRecoveryReevaluation:
         assert after.state is ExecutionState.COMMITTED
         assert after.result_json == record.result_json
         # s-1 is NOT requeued by recovery.
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         assert "job-12345678:job-12345678:s-1" not in report["requeued_steps"]
         assert store.get_step("job-12345678:s-1").status is RuntimeStepStatus.SUCCEEDED
@@ -230,6 +233,7 @@ class TestRecoveryReportTruthfulness:
         lease = engine.lease_next("job-12345678", "w1")
         with pytest.raises(RuntimeError):
             engine.execute_step(lease)  # crash with RESERVED/EXECUTING record
+        clock.advance(120)  # process death outlives the lease TTL
         report = engine.recover_job("job-12345678")
         # The unresolved record is visible for operator resolution.
         assert isinstance(report["unresolved_executions"], list)
@@ -243,6 +247,7 @@ class TestRecoveryReportTruthfulness:
         engine.mark_running("job-12345678")
         engine.ready_steps("job-12345678")
         engine.lease_next("job-12345678", "w1")
+        clock.advance(120)  # process death outlives the lease TTL
         engine.recover_job("job-12345678")  # crash + recovery
         engine._authority_gate = StaticStepAuthorityGate(
             require_approval=("execute.GENERIC",)

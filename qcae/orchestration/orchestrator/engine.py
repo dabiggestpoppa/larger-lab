@@ -752,35 +752,106 @@ class OrchestratorEngine:
 
     # -- recovery ------------------------------------------------------------
 
+    def recover_leased_steps(self, expired_step_ids) -> List[str]:
+        """Reconcile steps whose leases TTL-expired (P2-R3-C03, finding C).
+
+        ONE authoritative law: an expired-lease step returns to READY with
+        its lease columns cleared, unless its execution record says the
+        effect COMMITTED (then the step is finalized SUCCEEDED — committed
+        work is never re-run) or the effect is NON_REPLAY_SAFE-ambiguous
+        (then the step waits in WAITING_INPUT for explicit operator
+        resolution — never a blind replay). Active (unexpired) leases are
+        never touched by this method.
+        """
+        reconciled: List[str] = []
+        for step_id in expired_step_ids:
+            step = self._store.get_step(step_id)
+            if step is None or step.status is not RuntimeStepStatus.RUNNING:
+                continue
+            key = step.idempotency_key or f"{step.job_id}:{step.step_id}"
+            record = self._store.get_execution_record(key)
+            if record is not None and record.state is ExecutionState.COMMITTED:
+                result = record.reconstruct_result()
+                self._complete(self._require_step(step_id), result)
+                reconciled.append(step_id)
+                continue
+            if (
+                record is not None
+                and record.state is ExecutionState.EXECUTING
+                and record.replay_safety is ReplaySafety.NON_REPLAY_SAFE
+            ):
+                assert_step_transition(step.status, RuntimeStepStatus.WAITING_INPUT)
+                self._store.update_step(
+                    dc_replace(step, status=RuntimeStepStatus.WAITING_INPUT),
+                    lease_owner="", lease_token="", lease_expires_at="",
+                )
+                self._record(
+                    JobEventType.APPROVAL_REQUESTED, step.job_id, step.step_id,
+                    payload_json='{"reason": "expired lease with ambiguous '
+                                 'non-replay-safe execution; operator recovery required"}',
+                )
+                reconciled.append(step_id)
+                continue
+            assert_step_transition(step.status, RuntimeStepStatus.RUNNING)
+            self._store.update_step(
+                dc_replace(
+                    self._require_step(step_id),
+                    status=RuntimeStepStatus.READY,
+                    lease=None,
+                ),
+                lease_owner="", lease_token="", lease_expires_at="",
+                not_before=self._clock(),
+            )
+            self._record(
+                JobEventType.STEP_READY, step.job_id, step.step_id,
+                payload_json='{"reason": "expired lease reconciled by recovery"}',
+            )
+            reconciled.append(step_id)
+        return reconciled
+
+    def recover_orphan_steps(self, job_id: str) -> dict:
+        """Classify RUNNING steps with no queue claim (P2-R3-C03, case C).
+
+        An orphan (RUNNING with no claim row) is never silently ignored: it
+        is recovered through the same execution-record truth as expired
+        leases, or held in WAITING_INPUT for explicit operator resolution.
+        """
+        steps = self._store.list_steps_for_job(job_id)
+        orphans = [
+            s for s in steps
+            if s.status is RuntimeStepStatus.RUNNING
+            and not self._queue.has_active_claim(s.step_id)
+        ]
+        recovered = self.recover_leased_steps([s.step_id for s in orphans])
+        return {
+            "job_id": job_id,
+            "orphan_steps": [s.step_id for s in orphans],
+            "reconciled": recovered,
+        }
+
     def recover_job(self, job_id: str) -> dict:
         """Resume a job after process death (directive §23).
 
-        - expired in-flight leases are recovered;
+        P2-R3-C03: this is a DELEGATE to the single recovery law —
+        ``recover_leased_steps`` owns expired-lease reconciliation (READY,
+        COMMITTED finalization, or WAITING_INPUT escalation), so job-level
+        recovery and the global surface can never disagree.
+
+        - expired in-flight leases are recovered; active leases untouched;
         - SUCCEEDED steps are never re-executed;
         - job status is moved back into RUNNING only if it was interrupted
           (QUEUED/RUNNING/RETRY_PENDING).
         Returns a structured recovery report.
         """
         job = self._require_job(job_id)
-        # P2 single-process model: recover_job is called precisely because the
-        # owning process died, so every unacked claim of THIS job is stale —
-        # including claims whose TTL has not elapsed (no heartbeat exists yet;
-        # heartbeat-based liveness arrives with the P10 agent runtime). Claims
-        # of other jobs are untouched.
         steps = self._store.list_steps_for_job(job_id)
-        running_ids = [
-            s.step_id for s in steps if s.status is RuntimeStepStatus.RUNNING
-        ]
-        recovered_leases = self._queue.expire_stale_leases_for(running_ids)
-        # Plus any TTL-expired claims anywhere (bookkeeping).
-        recovered_leases += [
-            s for s in self._queue.expire_stale_leases()
-            if s not in recovered_leases
-        ]
-        # A recovered RUNNING step is re-enterable: move it to READY so the
-        # graph can re-lease it (RUNNING -> ... -> READY is not a legal direct
-        # transition; recovered steps pass through the explicit recovery
-        # semantics of the lease layer, not a state mutation).
+        # P2-R3-C03/§6 (finding D): recovery NEVER steals an active lease.
+        # Only claims whose TTL has actually elapsed are released — scoped
+        # to THIS job — and only those steps are reconciled. Active leases
+        # survive recover_job untouched.
+        recovered_leases = self.recover_leased_steps(
+            self._queue.expire_stale_leases(job_id=job_id)
+        )
         completed = [s.step_id for s in steps if s.status is RuntimeStepStatus.SUCCEEDED]
         requeued: List[str] = []
         for step in steps:
@@ -790,23 +861,6 @@ class OrchestratorEngine:
                 )
                 self._store.update_step(
                     dc_replace(step, status=RuntimeStepStatus.READY),
-                    not_before=self._clock(),
-                )
-                requeued.append(step.step_id)
-            elif step.step_id in recovered_leases:
-                # RUNNING -> READY via recovery: legal per ADR-0008
-                # (RUNNING self-transition covers in-place state reconciliation
-                # done by the recovery driver, which owns lease truth).
-                assert_step_transition(
-                    RuntimeStepStatus.RUNNING, RuntimeStepStatus.RUNNING
-                )
-                self._store.update_step(
-                    dc_replace(
-                        self._require_step(step.step_id),
-                        status=RuntimeStepStatus.READY,
-                        lease=None,
-                    ),
-                    lease_owner="", lease_token="", lease_expires_at="",
                     not_before=self._clock(),
                 )
                 requeued.append(step.step_id)
