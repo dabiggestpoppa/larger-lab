@@ -11,15 +11,26 @@ produced by that command; none is transcribed by hand from a narrative.
 | Constitution | `sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420` |
 | One-OCE boundary | `sha256:98cb4c61a3eb5856944f54f4495686701263bbc46c8e70928f22e3e41eb7627d` |
 | MF-B0 adversarial gate report | `sha256:60a9694ff3b8541564a14945e87ca6fa486d7f7605abc9a6b5c7894606bd6d0f` |
-| Cross-block F0–F11 report | `sha256:1eee59bc236a4262c6bfee2eafdbcad40c38bc9f53466d3fa978993be79b283f` |
-| Fixture source registry | `sha256:2ce1ce0ef5f985e94b4374b00b626aea447293214b70a99e61c1b01e3ca4b533` |
+| Cross-block F0–F11 report | `sha256:2011c87edf570d3202d038de5a464f1493347ea7698ddfc0ac85d021e9e12a41` |
+| Fixture source registry | `sha256:45a8ca061214e7a925876840edd4fe17f2d61970f68a156e444b021c78e807d1` |
+| Fixture rights evidence | `sha256:58003351106736901f3d235ba10bd7d2d67e1045bfa63c7701f3653ecb5a33f9` |
 | Fixture train manifest lineage | `sha256:1b731fac408ceddab1aebb97b2d00e4e0a32869d268dfd6614abe68083dcacad` |
 | Fixture benchmark | `sha256:9892b9431b095deaa6ec9bc09b9541e9314bbffd5ee840e0d6f393503c8cd280` |
 | Fixture protocol | `sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35` |
-| Evidence package | `sha256:a6128ccc11c0fe5ccf13d0760931b8db527994d83e0d7df712c09a729d982441` |
+| Evidence package | `sha256:e24db2d91cd957de2f91410b3c9faeedb114caf1e51228f52d2cf42c5c14199b` |
 
-Tested at commit `07ed66173422f7b6b1ec144abd731310db174c3c`
-(`cd model-foundry && python -m pytest tests -q` → **148 passed**).
+The constitution (`0bc713f0…`), B3 lineage (`1b731fac…`), benchmark
+(`9892b943…`), protocol (`824fb9ae…`) and gate-report (`60a9694f…`) fingerprints
+are unchanged by the audit-closure repairs; the registry, cross-block report and
+evidence-package fingerprints moved because a rights decision is no longer
+carried as caller-settable state, and F2's refusal detail now names the ref and
+the resolved state.
+
+Tested at commit `9742cfc24d771d116b722a49c89a6006c4c81889` by the authoritative
+command `cd model-foundry && python -m pytest tests -q` → **157 passed** (39
+MF-B0, 19 MF-B1, 44 MF-B2/B3, 27 MF-B4, 22 boundary/cross-block, 6 determinism).
+The same command works from the repository root as
+`python -m pytest model-foundry/tests -q`.
 
 ## Acceptance claims and how each is checked
 
@@ -30,7 +41,7 @@ Tested at commit `07ed66173422f7b6b1ec144abd731310db174c3c`
 | 3 | Two provider offer semantics normalize into one contract | `test_two_provider_dialects_normalize_to_the_same_contract` |
 | 4 | Cost-to-close is simulable without spending money | B1 placement receipt; `paid_compute_consumed: false` |
 | 5 | Source + rights + roles + contamination are operational | registry digest; rights-block map; contamination edges |
-| 6 | UNKNOWN rights cannot enter training | F2 refusals (`RIGHTS_BLOCKED`), B2 tests |
+| 6 | UNKNOWN rights cannot enter training | F2 refusals (`RIGHTS_BLOCKED`); `test_a_forged_rights_claim_cannot_make_a_source_trainable`, `test_a_source_citing_unrecorded_evidence_is_refused_at_admission`, `test_a_claim_without_recorded_evidence_is_not_a_permission`, `test_evidence_recorded_for_another_subject_does_not_transfer` |
 | 7 | CEREBUS withholding is operationally testable | F6 refusals (`CEREBUS_FAMILY_WITHHELD`) |
 | 8 | Governed sources produce a deterministic `DatasetManifest` | B3 lineage fingerprint reproduced across runs |
 | 9 | Aliases/duplicates do not become fake diversity | `effective_lineages` 1 for 2 mirror sources; `cross_source_duplicate_count` ≥ 1 |
@@ -42,9 +53,9 @@ Tested at commit `07ed66173422f7b6b1ec144abd731310db174c3c`
 | 15 | `CapabilityAssessment` is vector-valued | dimensions map; `master_score: null` |
 | 16 | Negative results and reopen conditions are first-class | F10; `NEGATIVE_RESULT_IMMUTABLE`, `REOPEN_REQUIRES_NEW_EVIDENCE` |
 | 17 | Generic OCE replacement targets are explicit | boundary declarations fixture + `integration-map.md` |
-| 18 | Full authoritative suite is green | 148 passed at tested SHA |
+| 18 | Full authoritative suite is green | 157 passed via the authoritative command (count is printed by that command; see `pyproject.toml`) |
 | 19 | No paid resource was launched | external-operations accounting all zero |
-| 20 | Receipts truthfully describe what happened | receipts regenerated from the tested tree; `test_cross_block_receipt_matches_the_runtime_report` |
+| 20 | Receipts truthfully describe what happened | receipts regenerated from the tested tree; `test_cross_block_receipt_matches_the_runtime_report`; fingerprint/count statements in this file updated with the code |
 
 ## What the substrates prove, and what they do not
 
@@ -65,7 +76,7 @@ simulated on fixtures and are labelled as such everywhere they appear.
 
 ```bash
 cd model-foundry
-PYTHONIOENCODING=utf-8 python -m pytest tests -q      # 142 passed
+PYTHONIOENCODING=utf-8 python -m pytest tests -q      # 157 passed
 PYTHONIOENCODING=utf-8 python -m foundry.cli report   # all block receipts
 PYTHONIOENCODING=utf-8 python -m foundry.cli evidence # this package, regenerated
 ```
@@ -77,3 +88,9 @@ different registry digest because the digest included entry wall-clock time, and
 that defect was fixed in `07ed6617` with regression tests
 (`tests/test_mf_determinism.py`). Receipt files still carry the time they were
 recorded — that is event evidence — but no fingerprint depends on it.
+
+A rights decision is resolved the same way: `fixtures/rights_evidence.json` is
+the record, a `RightsDisposition` is a claim about it, and the loader refuses a
+source whose declared basis disagrees with the record. That fixture is as much
+evidence as this package is, which is why its fingerprint is published here and
+in the B2 receipt.

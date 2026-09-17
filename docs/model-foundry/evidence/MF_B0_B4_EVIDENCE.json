@@ -50,7 +50,7 @@
       "SRC_NEWS_ALPHA",
       "SRC_NEWS_ALPHA_MIRROR"
     ],
-    "registry_digest": "sha256:2ce1ce0ef5f985e94b4374b00b626aea447293214b70a99e61c1b01e3ca4b533",
+    "registry_digest": "sha256:45a8ca061214e7a925876840edd4fe17f2d61970f68a156e444b021c78e807d1",
     "rights_blocked": {
       "SRC_PROHIBITED": "EXCLUDED_BY_POLICY",
       "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
@@ -263,7 +263,7 @@
   ],
   "constitution_fingerprint": "sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420",
   "cross_block": {
-    "report_fingerprint": "sha256:1eee59bc236a4262c6bfee2eafdbcad40c38bc9f53466d3fa978993be79b283f",
+    "report_fingerprint": "sha256:2011c87edf570d3202d038de5a464f1493347ea7698ddfc0ac85d021e9e12a41",
     "scenarios": [
       {
         "held": true,
@@ -413,7 +413,7 @@
         "refusals": [
           {
             "code": "RIGHTS_BLOCKED",
-            "detail": "RIGHTS_BLOCKED: role TRAIN_CPT requires a rights disposition permitting training",
+            "detail": "RIGHTS_BLOCKED: role TRAIN_CPT requires recorded rights evidence permitting training; 'rights://unresolved/web-crawl-sample-a' resolves to RIGHTS_UNKNOWN",
             "refused_by": "PolicyBlocked"
           },
           {
@@ -653,7 +653,7 @@
     "NEGATIVE RESULT != FAILED PROJECT",
     "UNKNOWN != FAVORABLE"
   ],
-  "evidence_fingerprint": "sha256:a6128ccc11c0fe5ccf13d0760931b8db527994d83e0d7df712c09a729d982441",
+  "evidence_fingerprint": "sha256:e24db2d91cd957de2f91410b3c9faeedb114caf1e51228f52d2cf42c5c14199b",
   "external_operations": {
     "capital_operations": 0,
     "cloud_mutations": 0,

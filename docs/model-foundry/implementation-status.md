@@ -2,9 +2,9 @@
 
 * **Branch:** `agent/model-foundry-mf-b0-b4-build`
 * **Start SHA:** `c55e379df3de2c6bb643afc90c10c0a861fa8c8a`
-* **Tested SHA (code):** `07ed66173422f7b6b1ec144abd731310db174c3c`
+* **Tested SHA (code):** `9742cfc24d771d116b722a49c89a6006c4c81889` (the audit-closure repair commit; earlier code was tested at `07ed66173422f7b6b1ec144abd731310db174c3c`)
 * **Authoritative test command:** `cd model-foundry && PYTHONIOENCODING=utf-8 python -m pytest tests -q`
-* **Result:** `148 passed` (38 MF-B0, 19 MF-B1, 37 MF-B2/B3, 26 MF-B4, 22 boundary/cross-block, 6 determinism)
+* **Result:** `157 passed` (39 MF-B0, 19 MF-B1, 44 MF-B2/B3, 27 MF-B4, 22 boundary/cross-block, 6 determinism)
 * **Invocation from repo root also works:** `python -m pytest model-foundry/tests -q`
 * Later documentation-only commits do not change test results.
 
@@ -65,12 +65,20 @@ Evidence: `receipts/mf-b1-placement.json`, tests `tests/test_mf_b1_resources.py`
 
 ### MF-B2 — Data constitution + source registry — implemented
 
-`foundry/data.py`. Rights states are derived from recorded basis evidence, not
-from strings: an unresolved basis becomes `REVIEW_REQUIRED`, a terms claim with
-no recorded scope becomes `RIGHTS_RESTRICTED`, `UNKNOWN` stays `UNKNOWN` and
-never authorizes training. Roles are versioned; expanding from retrieval-only to
-a training role requires review evidence; no-op transitions are refused;
-secret-bearing sources cannot hold training roles. Mirror aliases resolve to one
+`foundry/data.py`. A `RightsDisposition` is a *claim*: it names a
+`basis_ref` and carries no basis and no resolved flag. The state is derived by
+resolving that ref against `fixtures/rights_evidence.json` (a
+`RightsEvidenceRegister`), so a basis that was never recorded, or that was
+recorded for a different subject, resolves to `REVIEW_REQUIRED` and can never
+make a source train-permissive. An unrecognised basis becomes
+`REVIEW_REQUIRED`, a terms claim with no recorded scope becomes
+`RIGHTS_RESTRICTED`, `UNKNOWN` stays `UNKNOWN`. Sources declare their basis in
+`sources.json`, and the loader fails closed (`RIGHTS_BASIS_UNRECORDED` /
+`RIGHTS_DECLARATION_MISMATCH`) if a declaration disagrees with the record.
+Roles are versioned; a training role requires recorded evidence permitting
+training *on every entry path*; expanding from retrieval-only to a training role
+requires review evidence; no-op transitions are refused; secret-bearing sources
+cannot hold training roles. Mirror aliases resolve to one
 lineage (`SRC_NEWS_ALPHA`/`SRC_NEWS_ALPHA_MIRROR` → 1 effective lineage for 2
 requested sources). Rights permission is kept distinct from role permission
 (`SRC_BENCH_CORE`: rights permit, `HIDDEN_EVAL` role forbids). Contamination is a
@@ -78,8 +86,13 @@ graded, typed relation graph where absence of an edge is explicitly *not* a
 cleanliness certificate. CEREBUS-family material is withheld operationally.
 
 Fixture registry digest:
-`sha256:2ce1ce0ef5f985e94b4374b00b626aea447293214b70a99e61c1b01e3ca4b533`
-(replay-stable; see the resolved defect below).
+`sha256:45a8ca061214e7a925876840edd4fe17f2d61970f68a156e444b021c78e807d1`
+(replay-stable; the digest covers the rights *claim* per source, which is why it
+changed when the claim stopped carrying caller-settable derived fields — see the
+audit-closure defects below). Rights-evidence register fingerprint:
+`sha256:58003351106736901f3d235ba10bd7d2d67e1045bfa63c7701f3653ecb5a33f9`, and
+it is published as `b2_registry.rights_evidence_fingerprint`, so the evidence the
+digest depends on is itself covered by the receipt.
 Rights-blocked: `SRC_RIGHTS_UNKNOWN` (RIGHTS_UNKNOWN),
 `SRC_VENDOR_TERMS` (RIGHTS_RESTRICTED), `SRC_PROHIBITED` (EXCLUDED_BY_POLICY).
 Eligible for training: `SRC_AGENT_TRACE`, `SRC_NEWS_ALPHA`, `SRC_NEWS_ALPHA_MIRROR`.
@@ -125,7 +138,10 @@ protocol `PROTO_RESEARCH_BENCH_V0_V1`
 
 ### Cross-block scenarios F0–F11 — PASS (12/12 HELD)
 
-Report fingerprint `sha256:1eee59bc236a4262c6bfee2eafdbcad40c38bc9f53466d3fa978993be79b283f`.
+Report fingerprint `sha256:2011c87edf570d3202d038de5a464f1493347ea7698ddfc0ac85d021e9e12a41`.
+The behaviour is unchanged (12/12 `HELD`, same verdict, same refusal codes); the
+fingerprint moved because F2's `RIGHTS_BLOCKED` refusal detail now names the ref
+and the resolved state instead of asserting a disposition.
 F0 constitution+boundary · F1 provider-neutral placement · F2 rights/roles/
 permissions · F3 governed corpus · F4 PIT leakage · F5 contamination gating ·
 F6 withheld doctrine · F7 evaluation freeze · F8 sealed boundary · F9 subject
@@ -162,7 +178,7 @@ by test.
 * sealed-evaluation exposures: 0 (refusals recorded)
 * negative results recorded: 1 (plus 3 refused dataset builds)
 * evidence package: `evidence/MF_B0_B4_EVIDENCE.json`, fingerprint
-  `sha256:a6128ccc11c0fe5ccf13d0760931b8db527994d83e0d7df712c09a729d982441`
+  `sha256:e24db2d91cd957de2f91410b3c9faeedb114caf1e51228f52d2cf42c5c14199b`
   (replay-stable)
 
 ## Defect found and fixed during the build
@@ -179,6 +195,59 @@ than at serialization, protocol freezes accept an explicit replay clock, and the
 evidence aggregate strips run timestamps before fingerprinting. Six regression
 tests in `tests/test_mf_determinism.py` hold this, including one that fails if a
 wall-clock key reappears anywhere the evidence fingerprint covers.
+
+## Defects found and fixed in the audit-closure pass
+
+An external audit of this build found that the package documented stronger
+guarantees than it enforced. All three load-bearing findings were reproduced
+before being fixed, and each now has a regression test that fails against the
+old behaviour.
+
+1. **A forged rights basis could make a rights-unknown source train-permissive.**
+   `RightsDisposition.basis_resolved` was a caller-written boolean that nothing
+   resolved, and `SourceRegistry.transition_role(..., rights=...)` accepted a
+   caller-supplied disposition. Constructing
+   `RightsDisposition(basis=PUBLIC_DOMAIN, basis_ref='rights://does-not-exist/forged', basis_resolved=True)`
+   and passing it through the transition produced a training dataset whose
+   `rights_summary` claimed `RIGHTS_VERIFIED_BY_POLICY` and
+   `all_sources_train_permissive: true` for a source whose rights are `UNKNOWN`.
+   Fixed by making the claim carry no basis and no resolved flag, deriving state
+   only through `RightsEvidenceRegister.resolve()` bound to the subject, failing
+   closed to `REVIEW_REQUIRED` for unrecorded or non-relevant evidence, and
+   removing the `rights=` parameter so a transition cannot swap in a more
+   favorable disposition. The invariant now has one owner — the registry's single
+   `_commit` guard — rather than a per-method check.
+2. **`register()` skipped the role contract that `transition_role()` enforced.**
+   A record could be registered directly with `role=TRAIN_CPT`, with no review
+   evidence, and `_role_history` recorded it indistinguishably from a legitimate
+   transition. Fixed by routing both entry paths through `_commit`; a
+   re-registration that changes the role is now held to the same transition
+   contract, while a content-only re-registration still versions normally.
+3. **The authoritative test command could not be audited for its own count.**
+   `model-foundry/pyproject.toml` set `addopts = "-q"`, so the documented
+   command `python -m pytest tests -q` ran as `-qq` and printed progress dots but
+   no summary line. `addopts` is now `-ra`, and the command reports
+   `157 passed`.
+
+Three further defects the audit ranked were also closed: a benchmark status was a
+free string compared against a hand-copied literal set, so
+`status="COMPROMISEDD"` read as healthy and could still reach `PASS` — the field
+is now a `BenchmarkStatus`, an unrecognised status raises
+`BENCHMARK_STATUS_UNKNOWN` at construction, and `LIFECYCLE_MACHINES` is derived
+from the declared enums instead of duplicating them; `FrozenMap` could not be
+deep-copied or pickled (`TypeError: cannot pickle 'mappingproxy' object`), which
+broke `copy.deepcopy`, `pickle`, and `dataclasses.asdict` on any record holding
+one; and eight exported helpers with no caller anywhere (`IndependenceVector`,
+`digest_of_bytes`, `ResumeProof`, `resource_receipt`, `tier_of`,
+`claim_class_for`, `trust_class_admissible_for_remote`,
+`total_contamination_grade`, `fixture_registry`) were removed rather than left to
+inflate the apparent API.
+
+What did **not** change: the constitution fingerprint (`0bc713f0…`), the B3
+lineage fingerprint (`1b731fac…`), the 20-attack gate result, the 12/12 cross-block
+verdict, and every external/live-operation count in the table below. The scope
+limit is intact — no new capability, no training, no provider call, no paid
+compute, no new third-party tooling.
 
 ## Contradictions and ambiguities carried forward
 

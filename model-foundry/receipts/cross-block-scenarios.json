@@ -1,5 +1,5 @@
 {
-  "report_fingerprint": "sha256:1eee59bc236a4262c6bfee2eafdbcad40c38bc9f53466d3fa978993be79b283f",
+  "report_fingerprint": "sha256:2011c87edf570d3202d038de5a464f1493347ea7698ddfc0ac85d021e9e12a41",
   "scenarios": [
     {
       "held": true,
@@ -149,7 +149,7 @@
       "refusals": [
         {
           "code": "RIGHTS_BLOCKED",
-          "detail": "RIGHTS_BLOCKED: role TRAIN_CPT requires a rights disposition permitting training",
+          "detail": "RIGHTS_BLOCKED: role TRAIN_CPT requires recorded rights evidence permitting training; 'rights://unresolved/web-crawl-sample-a' resolves to RIGHTS_UNKNOWN",
           "refused_by": "PolicyBlocked"
         },
         {
