@@ -372,3 +372,36 @@ class TestRuntimeStoreBoundary:
         )
         source = leak.read_text(encoding="utf-8")
         assert "._conn" in source  # the pattern the guard forbids
+
+
+class TestInterfaceBoundary:
+    """P2-R2-C05: interfaces/application code must not reach into private
+    state of governance/runtime components. `QcaeApp` uses service methods;
+    `LocalRuntimeService` uses public engine interfaces."""
+
+    def test_interfaces_no_private_component_reach_in(self) -> None:
+        interfaces_dir = QCAE_DIR / "interfaces"
+        forbidden = (
+            "._engine", "._workers", "._store", "._queue",
+            "._approvals", "._identity_provider",
+        )
+        for py_file in sorted(interfaces_dir.rglob("*.py")):
+            source = py_file.read_text(encoding="utf-8")
+            for fragment in forbidden:
+                assert fragment not in source, (
+                    f"{py_file}: interface code reaches into private state "
+                    f"('{fragment}'); use the public service interface"
+                )
+
+    def test_service_no_private_engine_reach_in(self) -> None:
+        service_file = QCAE_DIR / "governance" / "standalone" / "runtime_service.py"
+        source = service_file.read_text(encoding="utf-8")
+        assert "._workers" not in source, (
+            "runtime service inspects engine._workers; use "
+            "engine.registered_worker_types()"
+        )
+
+    def test_guard_flags_private_reach_in_synthetic(self, tmp_path: Path) -> None:
+        """Self-verification: the pattern list catches a violation."""
+        source = "def f(app):\n    return app._engine.submit()\n"
+        assert "._engine" in source

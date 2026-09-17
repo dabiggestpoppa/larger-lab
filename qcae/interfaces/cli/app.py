@@ -205,9 +205,9 @@ class QcaeApp:
 
         submission.validate()
         if submitted_by is not None:
-            self._rt.identity.require(submitted_by)
+            self._rt.service.require_identity(submitted_by)
         elif submission.submitted_by:
-            self._rt.identity.require(submission.submitted_by)
+            self._rt.service.require_identity(submission.submitted_by)
         clock = self._clock
         job_id = f"job-{submission.job_kind}-{submission.idempotency_key}"
         if not job_id.replace("-", "").isalnum():
@@ -274,7 +274,7 @@ class QcaeApp:
     # -- governance ----------------------------------------------------------
 
     def authority_decision(self, request):
-        return self._rt.authority.decide(request)
+        return self._rt.service.authority_decide(request)
 
     def runtime_identity(self):
         return self._rt.service.identity()

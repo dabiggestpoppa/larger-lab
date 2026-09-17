@@ -99,9 +99,20 @@ class LocalRuntimeService:
             schema_version=self._schema_version,
             policy_version=self._policy_version,
             oce_mode=OCE_MODE,
-            registered_workers=tuple(sorted(self._engine._workers)),
+            # P2-R2-C05: public engine interface (registered_worker_types),
+            # never a private attribute read.
+            registered_workers=tuple(self._engine.registered_worker_types()),
             storage_location=self._storage_location,
         )
+
+    def require_identity(self, identity_id: str) -> None:
+        """Public identity check (P2-R2-C05): interfaces never reach into
+        the identity provider directly."""
+        self._identity.require(identity_id)
+
+    def authority_decide(self, request):
+        """Governance surface: one authority decision for one request."""
+        return self._authority.decide(request)
 
     # -- job lifecycle -------------------------------------------------------
 
