@@ -1,0 +1,15 @@
+[
+  {
+    "mechanism_id": "MECH_ORPHAN_1",
+    "proposed_mechanism": "sign-asymmetric post-overhang decay driven by informed flow absorption",
+    "observable_inputs": ["news_surprise_z", "overhang_size", "post_news_volume"],
+    "constraints": ["asia session only", "low-vol regime only", "no high-impact news overlap"],
+    "state_transition_hypothesis": "overhang absorbed at regime-dependent rate; residual decays sign-asymmetrically",
+    "realization_conditions": ["sensor: price+volume+news timestamp at 5m resolution", "OOS holdout frozen"],
+    "failure_conditions": ["decay symmetry restored under OOS", "microstructure family explains on upgraded data"],
+    "domain": "FX",
+    "evidence_refs": ["IND_1", "IND_2", "IND_3"],
+    "alternative_explanations": ["microstructure family residual", "data artifact from stale news timestamps"],
+    "falsifiers": ["vanishing under OOS holdout", "explained by known family on cleaner data"]
+  }
+]

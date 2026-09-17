@@ -1,0 +1,6 @@
+{
+  "counterexamples": [],
+  "failed_sensitivity_cases": [],
+  "failed_metamorphic_relations": [],
+  "note": "empty register = every relation held under perturbation; a failure is preserved, never patched"
+}

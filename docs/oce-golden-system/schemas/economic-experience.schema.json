@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "oce://schemas/economic-experience/v1.0",
+  "title": "EconomicExperienceRecord",
+  "type": "object",
+  "required": ["schema_version", "experience_id", "source_id", "objective_type", "economics", "outcome", "data_rights", "promotion_state", "recorded_at"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "experience_id": {"type": "string", "minLength": 1},
+    "source_id": {"type": "string", "minLength": 1},
+    "opportunity_id": {"type": ["string", "null"]},
+    "objective_type": {"type": "string", "minLength": 1},
+    "economics": {
+      "type": "object",
+      "required": ["gross_payout", "direct_cost", "compute_cost", "tool_cost"],
+      "properties": {
+        "gross_payout": {"type": "number"},
+        "currency": {"type": ["string", "null"]},
+        "direct_cost": {"type": "number", "minimum": 0},
+        "compute_cost": {"type": "number", "minimum": 0},
+        "tool_cost": {"type": "number", "minimum": 0},
+        "human_cost": {"type": ["number", "null"], "minimum": 0},
+        "net_contribution": {"type": ["number", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "human_intervention_minutes": {"type": "number", "minimum": 0},
+    "execution_time_seconds": {"type": "number", "minimum": 0},
+    "capabilities_used": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "research_used": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "knowledge_gaps_found": {"type": "array", "items": {"type": "string"}},
+    "capability_gaps_found": {"type": "array", "items": {"type": "string"}},
+    "errors_encountered": {"type": "array", "items": {"type": "string"}},
+    "client_revisions": {"type": "integer", "minimum": 0},
+    "qa_result": {"enum": ["PASS", "PASS_WITH_CAVEATS", "FAIL", "NOT_RUN", "UNKNOWN"]},
+    "customer_acceptance": {"enum": ["ACCEPTED", "REJECTED", "REVISED", "TIMED_OUT", "DISPUTED", "NOT_APPLICABLE", "UNKNOWN"]},
+    "outcome": {"enum": ["DELIVERED_PAID", "DELIVERED_UNPAID", "REJECTED", "ABANDONED", "FAILED", "DISPUTED", "CANCELLED", "DECLINED_STRATEGICALLY", "UNKNOWN"]},
+    "reusability_score": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "transferability_score": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "lesson_candidates": {"type": "array", "items": {"type": "string"}},
+    "data_rights": {"enum": ["PUBLIC", "LICENSED", "CLIENT_CONFIDENTIAL", "INTERNAL", "RESTRICTED", "UNKNOWN"]},
+    "contains_client_specific_material": {"type": "boolean"},
+    "promotion_state": {"enum": ["RAW", "RIGHTS_FILTERED", "DEIDENTIFIED", "ABSTRACTED", "CLASSIFIED", "REPRODUCED", "VALIDATED", "SUBMITTED_FOR_INSTITUTIONAL_REVIEW", "PROMOTED", "REJECTED", "ARCHIVED"]},
+    "owning_routes": {"type": "array", "uniqueItems": true, "items": {"enum": ["RESEARCH_MESH", "QCAE", "ENGINEERING", "INSTITUTION", "OPPORTUNITY_EXCHANGE"]}},
+    "promotion_refs": {"type": "array", "items": {"type": "string"}},
+    "recorded_at": {"type": "string", "format": "date-time"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"contains_client_specific_material": {"const": true}}},
+      "then": {"not": {"properties": {"promotion_state": {"const": "PROMOTED"}}}}
+    }
+  ],
+  "additionalProperties": false
+}

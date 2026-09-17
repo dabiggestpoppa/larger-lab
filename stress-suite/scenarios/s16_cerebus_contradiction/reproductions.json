@@ -1,0 +1,71 @@
+[
+  {
+    "reproduction_id": "REPRO_CLEAN_1",
+    "claim_id": "CEREBUS_V4_P90_TARGET_METRICS",
+    "protocol": {
+      "protocol_id": "REPRO_CLEAN_1",
+      "claim_ref": "CEREBUS_V4_P90_TARGET_METRICS",
+      "dataset_lineage": "synthetic fixture: exact manual conditions (P90 protocol, filters, tier sizing)",
+      "implementation_version": "cerebus_p90_sim_1.0.0",
+      "session_window": "00:00-08:00 UTC (Asia)",
+      "tier_constraints": ["TIER_1_100%", "TIER_2_75%", "TIER_3_50%", "NO_GO_>45p"],
+      "feature_definitions": ["news_surprise_z", "asian_range_pips", "activation_window_flag"],
+      "pit_rules": ["availability_before_decision", "as_of_query_only", "no_future_leakage"],
+      "sample_definition": "M5 candles in activation window, P90 filtered regime",
+      "metric_definition": "filtered_win_rate = wins / filtered activations",
+      "execution_assumptions": ["2bp round-trip", "limit fills inside spreads to 90%"],
+      "evaluation_criterion": "filtered_win_rate inside doctrine band",
+      "independence_lineage": "independent lineage L2 (different estimator, same governed conditions)",
+      "falsification_criterion": "filtered_win_rate outside [0.85, 0.90] at high confidence",
+      "frozen_before_result": true
+    },
+    "observed_result": {
+      "metric": "filtered_win_rate",
+      "estimate": 0.72,
+      "uncertainty_interval": [0.68, 0.76],
+      "sample_size": 2400,
+      "units": "RATE",
+      "source_refs": ["REPRO_CLEAN_1"]
+    },
+    "sample_size": 2400,
+    "result": "CONTRADICTS_CLAIM",
+    "uncertainty": "HIGH_CONFIDENCE",
+    "independence_lineage": "independent lineage L2 (different estimator, same governed conditions)",
+    "known_deviations": []
+  },
+  {
+    "reproduction_id": "REPRO_FLAWED_1",
+    "claim_id": "CEREBUS_V4_P90_TARGET_METRICS",
+    "protocol": {
+      "protocol_id": "REPRO_FLAWED_1",
+      "claim_ref": "CEREBUS_V4_P90_TARGET_METRICS",
+      "dataset_lineage": "synthetic fixture with documented deviation",
+      "implementation_version": "cerebus_p90_sim_debug_0.1",
+      "session_window": "13:00-17:00 UTC (EU)",
+      "tier_constraints": ["TIER_1_100%"],
+      "feature_definitions": ["news_surprise_z"],
+      "pit_rules": [],
+      "sample_definition": "EU session candles only",
+      "metric_definition": "filtered_win_rate",
+      "execution_assumptions": ["zero-cost guaranteed fills"],
+      "evaluation_criterion": "filtered_win_rate inside doctrine band",
+      "independence_lineage": "same lineage as production run",
+      "falsification_criterion": "filtered_win_rate outside [0.85, 0.90]",
+      "frozen_before_result": true
+    },
+    "observed_result": {
+      "metric": "filtered_win_rate",
+      "estimate": 0.60,
+      "uncertainty_interval": [0.55, 0.65],
+      "sample_size": 300,
+      "units": "RATE",
+      "source_refs": ["REPRO_FLAWED_1"]
+    },
+    "protocol_fingerprint": "frozen-before-evaluation:proto-repro-2",
+    "sample_size": 300,
+    "result": "CONTRADICTS_CLAIM",
+    "uncertainty": "LOW_CONFIDENCE",
+    "independence_lineage": "same lineage as production run",
+    "known_deviations": ["timestamp_leakage_in_label", "wrong_session_window", "zero_cost_fills"]
+  }
+]

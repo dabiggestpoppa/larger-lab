@@ -1,0 +1,16 @@
+{
+  "phases": [
+    {"phase": "ACTION_GRANT_RECORDED"},
+    {"phase": "OPERATOR_UNAVAILABLE"},
+    {"phase": "MAY_CONTINUE"},
+    {"phase": "OPERATOR_HOLD"},
+    {"phase": "OPERATOR_HOLD"},
+    {"phase": "OPERATOR_HOLD"},
+    {"phase": "OPERATOR_HOLD"},
+    {"phase": "ACTION_GRANT_RECORDED"},
+    {"phase": "OPERATOR_HOLD"},
+    {"phase": "MAY_CONTINUE"},
+    {"phase": "ACTION_GRANT_REVOKED"},
+    {"phase": "OPERATOR_HOLD"}
+  ]
+}

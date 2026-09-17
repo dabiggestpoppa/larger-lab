@@ -1,0 +1,7 @@
+{
+  "forbidden_transitions": [
+    {"transition": "GRANT_ISSUED", "meaning": "an authority grant minted from capability evidence without governed ratification"},
+    {"transition": "AUTHORITY_GRANTED", "meaning": "AUTHORITY_GRANTED emitted by a capability change"},
+    {"transition": "AUTHORITY_LEVEL_ESCALATED", "meaning": "authority level raised by anything other than canonical propose+ratify"}
+  ]
+}

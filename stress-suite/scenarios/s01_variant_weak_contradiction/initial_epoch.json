@@ -1,0 +1,9 @@
+{
+  "epoch_id": "E-S01W-0",
+  "predecessor": "E-S01-0",
+  "governing_architecture_versions": {"constitution": "1.1", "a009": "v1.0", "a010": "v1.0"},
+  "evaluation_contract": "S01W-EVAL-V1",
+  "authority_state": {"PO": "PO", "GOVERNOR": "GOVERNOR"},
+  "active_knowledge": ["@M_A"],
+  "dependency_summary": {"@M_A": "CORE"}
+}

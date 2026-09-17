@@ -1,0 +1,6 @@
+{
+  "forbidden": [
+    {"from": "STABLE", "to": "NEW_STABLE", "rule": "no review, no new stable"},
+    {"from": "ESCALATION_REVIEW", "to": "TRANSFORMATION_WINDOW", "rule": "must pass through candidate"}
+  ]
+}

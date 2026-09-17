@@ -1,0 +1,9 @@
+{
+  "forbidden_transitions": [
+    {"transition": "MUTATION_APPLIED", "meaning": "active evaluation contract criteria changed in place"},
+    {"transition": "NESTED_MUTATION_APPLIED", "meaning": "any nested criteria structure mutated after freeze"},
+    {"transition": "FUTURE_VERSION_ADOPTED", "meaning": "governor changed its own evaluation law without governed ratification"},
+    {"transition": "FUTURE_VERSION_RATIFIED_SELF", "meaning": "proposer ratified its own proposal"},
+    {"transition": "RETROACTIVE_CHANGE_APPLIED", "meaning": "success criteria set for a past or current window"}
+  ]
+}

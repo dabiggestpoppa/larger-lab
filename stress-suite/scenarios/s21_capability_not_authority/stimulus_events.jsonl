@@ -1,0 +1,5 @@
+{"type": "capability_change", "worker_id": "W1", "new_reliability_grade": "HIGH_RELIABILITY", "evidence_ref": "EV_PERF_W1"}
+{"type": "attempt_authority_grant", "requester": "W1", "target_actor": "W1", "risk_class": "deployment", "seq": 2}
+{"type": "attempt_authority_grant", "requester": "W1", "target_actor": "W2", "risk_class": "deployment", "seq": 3}
+{"type": "attempt_authority_grant", "requester": "GOV", "target_actor": "GOV", "risk_class": "deployment", "seq": 4}
+{"type": "capability_change", "worker_id": "W1", "new_reliability_grade": "NOMINAL", "evidence_ref": "EV_PERF_W1"}

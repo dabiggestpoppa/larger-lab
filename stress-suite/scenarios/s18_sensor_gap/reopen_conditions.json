@@ -1,0 +1,18 @@
+[
+  {
+    "condition_id": "RC_S18_SENSOR_AVAILABLE",
+    "condition_type": "FIELD_PREDICATE",
+    "subject_ref": "MECH_LIQUIDATION_FLOW_1",
+    "field": "sensor_available",
+    "operator": "EQ",
+    "expected_value": true,
+    "evidence_required": true,
+    "evidence_refs": ["EV_S18_SENSOR"],
+    "scope": "MECH_LIQUIDATION_FLOW_1",
+    "scope_match_mode": "EXACT",
+    "subject_scope": "OBJECT_SPECIFIC",
+    "domain": "CRYPTO",
+    "created_under_contract": "G5_DOMAIN_EPISTEMIC_POLICY:1.0.0",
+    "version_tag": "1.0.0"
+  }
+]

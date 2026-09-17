@@ -1,0 +1,14 @@
+[
+  {"reviewer_id": "R_CUR_A", "role": "reviewer", "model_family": "FAM_X", "provider": "PROV_1",
+   "runtime_lineage": "RT_1", "sources": ["S_A"], "retrieval_bundle": "BUNDLE_A",
+   "prompt_context": "CTX_1", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_1",
+   "experiment_design_origin": "DESIGN_1", "allocator": "PO", "visible_information": "EVIDENCE_ONLY",
+   "conclusion": "BETA", "confidence": "MEDIUM", "evidence_refs": ["E_S07_A"], "cost_units": 2,
+   "latency_units": 1, "capability_tier": "ADEQUATE"},
+  {"reviewer_id": "R_CUR_B", "role": "reviewer", "model_family": "FAM_Y", "provider": "PROV_2",
+   "runtime_lineage": "RT_2", "sources": ["S_B"], "retrieval_bundle": "BUNDLE_B",
+   "prompt_context": "CTX_2", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_2",
+   "experiment_design_origin": "DESIGN_2", "allocator": "PO", "visible_information": "EVIDENCE_ONLY",
+   "conclusion": "BETA", "confidence": "MEDIUM", "evidence_refs": ["E_S07_B"], "cost_units": 2,
+   "latency_units": 1, "capability_tier": "ADEQUATE"}
+]

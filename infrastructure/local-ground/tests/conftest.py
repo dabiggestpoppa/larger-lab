@@ -9,8 +9,8 @@ Lifecycle ownership (Defect B):
   * stale Book 1 resources are detected and safely removed before startup;
   * the stack starts once for the session and waits for every mandatory
     service to reach truthful readiness;
-  * teardown runs in `finally` semantics — even when setup or readiness
-    fails before `yield` — performing `down -v --remove-orphans`, verifying
+  * teardown runs in `finally` semantics â€” even when setup or readiness
+    fails before `yield` â€” performing `down -v --remove-orphans`, verifying
     container/network/test-volume removal, and recording cleanup evidence.
   * never touches unrelated containers, networks, or volumes (only the
     fixed oce-local-* names, the oce_local_internal network, and
@@ -113,14 +113,18 @@ def pytest_runtest_makereport(item, call):
     """When a container-backed test fails during its call phase, capture
     bounded container diagnostics (compose ps, inspect, health, logs,
     networks, volumes, failing node id / phase / assertion) into
-    OCE_EVIDENCE_DIR/failure-diagnostics BEFORE the session fixture teardown
-    removes the containers. Diagnostics must not mask the original result."""
+    OCE_EVIDENCE_DIR/failure-diagnostics/pre-teardown/<sanitized-nodeid>/
+    BEFORE the session fixture teardown removes the containers. Each failing
+    test gets its own immutable namespace; runner-level post-cleanup
+    diagnostics write to failure-diagnostics/post-cleanup/ and NEVER overwrite
+    these. Diagnostics never mask the original result."""
     outcome = yield
     rep = outcome.get_result()
     if rep.when == "call" and rep.failed and item.get_closest_marker("container") is not None:
         ev_dir = os.environ.get("OCE_EVIDENCE_DIR")
         if ev_dir:
-            d = Path(ev_dir) / "failure-diagnostics"
+            node = "".join(c if c.isalnum() or c in "-_." else "_" for c in item.nodeid)[:80] or "unknown"
+            d = Path(ev_dir) / "failure-diagnostics" / "pre-teardown" / node
             d.mkdir(parents=True, exist_ok=True)
             (d / "failing-nodeid.txt").write_text(item.nodeid, encoding="utf-8")
             err = rep.longrepr.reprcrash.message if getattr(rep, "longrepr", None) and getattr(rep.longrepr, "reprcrash", None) else str(rep.longrepr)[:4000]
@@ -128,13 +132,14 @@ def pytest_runtest_makereport(item, call):
             ps = subprocess.run(["docker", "compose", "-f", str(oc.COMPOSE_FILE), "ps", "--format", "json"],
                                 cwd=str(oc.COMPOSE), env=_docker_env(), capture_output=True, text=True)
             (d / "compose-ps.json").write_text(ps.stdout, encoding="utf-8")
-            oc.write_health_diagnostics(d)
+            snap = oc.write_health_diagnostics(d)
             net = subprocess.run(["docker", "network", "ls", "--format", "{{.Name}}"],
                                  capture_output=True, text=True)
             (d / "networks.txt").write_text(net.stdout, encoding="utf-8")
             vol = subprocess.run(["docker", "volume", "ls", "--format", "{{.Name}}"],
                                  capture_output=True, text=True)
             (d / "volumes.txt").write_text(vol.stdout, encoding="utf-8")
+            (d / "phase.txt").write_text("pre-teardown", encoding="utf-8")
 
 
 @pytest.fixture(scope="session")

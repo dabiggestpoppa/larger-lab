@@ -1,0 +1,1076 @@
+{
+  "format": "oce-test-summary-v1",
+  "generated_at": "2026-08-30T12:33:50Z",
+  "environment": {
+    "docker_available": "true",
+    "ci_mode": "true"
+  },
+  "totals": {
+    "collected": 150,
+    "executed": 150,
+    "passed": 150,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "container_backed": {
+    "collected": 21,
+    "executed": 21,
+    "passed": 21,
+    "failed": 0,
+    "skipped": 0
+  },
+  "mandatory_skipped": 0,
+  "tests": [
+    {
+      "name": "test_01_fresh_local_bootstrap_succeeds",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_01_fresh_local_bootstrap_succeeds",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 6.131
+    },
+    {
+      "name": "test_02_repeated_bootstrap_is_idempotent",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_02_repeated_bootstrap_is_idempotent",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.355
+    },
+    {
+      "name": "test_03_services_reach_health_or_unknown",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_03_services_reach_health_or_unknown",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 3.31
+    },
+    {
+      "name": "test_04_postgres_state_survives_service_restart",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_04_postgres_state_survives_service_restart",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 12.817
+    },
+    {
+      "name": "test_05_postgres_state_survives_compose_restart",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_05_postgres_state_survives_compose_restart",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 13.312
+    },
+    {
+      "name": "test_06_isolated_redis_loss_preserves_postgres_truth",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_06_isolated_redis_loss_preserves_postgres_truth",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 9.902
+    },
+    {
+      "name": "test_07_artifact_round_trip_preserves_hashes",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_07_artifact_round_trip_preserves_hashes",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_08_backup_completes",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_08_backup_completes",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.098
+    },
+    {
+      "name": "test_09_clean_room_local_restore_succeeds",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_09_clean_room_local_restore_succeeds",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.176
+    },
+    {
+      "name": "test_10_restore_meets_declared_recovery_targets",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_10_restore_meets_declared_recovery_targets",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.234
+    },
+    {
+      "name": "test_11_corrupt_backup_is_rejected",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_11_corrupt_backup_is_rejected",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.121
+    },
+    {
+      "name": "test_12_missing_required_configuration_fails_closed",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_12_missing_required_configuration_fails_closed",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.018
+    },
+    {
+      "name": "test_13_missing_optional_cloud_config_does_not_block_local_mode",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_13_missing_optional_cloud_config_does_not_block_local_mode",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.028
+    },
+    {
+      "name": "test_14_local_worker_admission_succeeds",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_14_local_worker_admission_succeeds",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.029
+    },
+    {
+      "name": "test_15_unauthorized_worker_is_rejected",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_15_unauthorized_worker_is_rejected",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.029
+    },
+    {
+      "name": "test_16_logs_are_structured",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_16_logs_are_structured",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.028
+    },
+    {
+      "name": "test_17_missing_telemetry_renders_unknown_not_healthy",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_17_missing_telemetry_renders_unknown_not_healthy",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.098
+    },
+    {
+      "name": "test_18_local_shutdown_is_safe",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_18_local_shutdown_is_safe",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 10.019
+    },
+    {
+      "name": "test_19_repeated_runs_are_isolated",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_19_repeated_runs_are_isolated",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.206
+    },
+    {
+      "name": "test_20_secret_scan_passes",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_20_secret_scan_passes",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.002
+    },
+    {
+      "name": "test_repository_identity_has_no_typo",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_repository_identity_has_no_typo",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.01
+    },
+    {
+      "name": "test_21_repository_remains_clean",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_21_repository_remains_clean",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.01
+    },
+    {
+      "name": "test_22_no_public_application_port_unintentionally_exposed",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_22_no_public_application_port_unintentionally_exposed",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_23_cloud_plan_produces_deterministic_output",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_23_cloud_plan_produces_deterministic_output",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.05
+    },
+    {
+      "name": "test_24_cloud_plan_performs_zero_cloud_mutations",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_24_cloud_plan_performs_zero_cloud_mutations",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.025
+    },
+    {
+      "name": "test_25_cloud_apply_fails_without_authorization",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_25_cloud_apply_fails_without_authorization",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.054
+    },
+    {
+      "name": "test_26_local_runtime_works_after_failed_cloud_plan",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_26_local_runtime_works_after_failed_cloud_plan",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.081
+    },
+    {
+      "name": "test_27_windows_wsl2_path_handling_detected",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_27_windows_wsl2_path_handling_detected",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.484
+    },
+    {
+      "name": "test_28_cleanup_removes_disposable_test_resources",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_28_cleanup_removes_disposable_test_resources",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_29_evidence_hashes_reconcile",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_29_evidence_hashes_reconcile",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_30_documented_operator_walkthrough_passes",
+      "nodeid": "infrastructure/local-ground/tests/test_local_ground.py::test_30_documented_operator_walkthrough_passes",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.533
+    },
+    {
+      "name": "test_local_ground_contract_matches_schema",
+      "nodeid": "infrastructure/local-ground/tests/test_contracts.py::test_local_ground_contract_matches_schema",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_runtime_profile_schema_accepts_local",
+      "nodeid": "infrastructure/local-ground/tests/test_contracts.py::test_runtime_profile_schema_accepts_local",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_runtime_profile_schema_rejects_unhardened_cloud",
+      "nodeid": "infrastructure/local-ground/tests/test_contracts.py::test_runtime_profile_schema_rejects_unhardened_cloud",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_deployment_target_schema_accepts_authorized_apply_and_readonly_plan",
+      "nodeid": "infrastructure/local-ground/tests/test_contracts.py::test_deployment_target_schema_accepts_authorized_apply_and_readonly_plan",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_deployment_target_schema_rejects_mutating_plan_and_no_cost_apply",
+      "nodeid": "infrastructure/local-ground/tests/test_contracts.py::test_deployment_target_schema_rejects_mutating_plan_and_no_cost_apply",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_frozen_contract_enforces_deferral",
+      "nodeid": "infrastructure/local-ground/tests/test_contracts.py::test_frozen_contract_enforces_deferral",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_no_provider_hardcoded_in_domain_logic",
+      "nodeid": "infrastructure/local-ground/tests/test_contracts.py::test_no_provider_hardcoded_in_domain_logic",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_ctl_compose_config_validates",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_compose_config_validates",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 0.073
+    },
+    {
+      "name": "test_ctl_images_are_pinned",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_images_are_pinned",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_ctl_all_services_healthy",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_all_services_healthy",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 3.103
+    },
+    {
+      "name": "test_ctl_prometheus_readiness_endpoint",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_prometheus_readiness_endpoint",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 3.114
+    },
+    {
+      "name": "test_ctl_invalid_prometheus_config_fails_closed",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_invalid_prometheus_config_fails_closed",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 27.554
+    },
+    {
+      "name": "test_ctl_no_forbidden_public_ports",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_no_forbidden_public_ports",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 0.077
+    },
+    {
+      "name": "test_ctl_postgres_authoritative_row_survives_restart",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_postgres_authoritative_row_survives_restart",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 12.692
+    },
+    {
+      "name": "test_ctl_artifact_round_trip_against_live_store",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_artifact_round_trip_against_live_store",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 0.029
+    },
+    {
+      "name": "test_ctl_clean_room_database_artifact_restore",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_clean_room_database_artifact_restore",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 22.594
+    },
+    {
+      "name": "test_ctl_full_replace_into_populated_target",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_full_replace_into_populated_target",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 16.638
+    },
+    {
+      "name": "test_ctl_post_promotion_failure_rolls_back_original",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_post_promotion_failure_rolls_back_original",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 7.175
+    },
+    {
+      "name": "test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 6.584
+    },
+    {
+      "name": "test_ctl_redis_invalidation_failure_blocks_success",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_redis_invalidation_failure_blocks_success",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 16.265
+    },
+    {
+      "name": "test_ctl_corrupt_backup_rejected_against_running_stack",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_corrupt_backup_rejected_against_running_stack",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 1.504
+    },
+    {
+      "name": "test_ctl_structured_logs_use_json_file_driver",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_structured_logs_use_json_file_driver",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 0.031
+    },
+    {
+      "name": "test_ctl_safe_shutdown_and_verified_cleanup",
+      "nodeid": "infrastructure/local-ground/tests/test_container_lifecycle.py::test_ctl_safe_shutdown_and_verified_cleanup",
+      "container_backed": true,
+      "outcome": "passed",
+      "duration_s": 10.008
+    },
+    {
+      "name": "test_gate_passes_on_valid_package",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_passes_on_valid_package",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.14
+    },
+    {
+      "name": "test_verify_passes_on_valid_package",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_verify_passes_on_valid_package",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.209
+    },
+    {
+      "name": "test_gate_rejects_wrong_repository",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_wrong_repository",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.144
+    },
+    {
+      "name": "test_gate_rejects_repository_typo",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_repository_typo",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.141
+    },
+    {
+      "name": "test_gate_rejects_wrong_branch",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_wrong_branch",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.165
+    },
+    {
+      "name": "test_gate_rejects_wrong_commit",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_wrong_commit",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.155
+    },
+    {
+      "name": "test_gate_rejects_wrong_tree",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_wrong_tree",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.137
+    },
+    {
+      "name": "test_gate_rejects_mixed_run_id",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_mixed_run_id",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.139
+    },
+    {
+      "name": "test_gate_rejects_missing_trusted_ci_identity",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_missing_trusted_ci_identity",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.138
+    },
+    {
+      "name": "test_gate_rejects_malformed_json",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_malformed_json",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.11
+    },
+    {
+      "name": "test_gate_rejects_missing_required_artifact",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_missing_required_artifact",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.139
+    },
+    {
+      "name": "test_gate_rejects_stale_manifest",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_stale_manifest",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.137
+    },
+    {
+      "name": "test_gate_rejects_tampered_hash",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_tampered_hash",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.141
+    },
+    {
+      "name": "test_gate_rejects_incorrect_size",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_incorrect_size",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.144
+    },
+    {
+      "name": "test_gate_rejects_skipped_mandatory_test_in_ci",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_skipped_mandatory_test_in_ci",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.144
+    },
+    {
+      "name": "test_gate_rejects_unexecuted_container_test_in_ci",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_unexecuted_container_test_in_ci",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.144
+    },
+    {
+      "name": "test_gate_rejects_mismatched_test_totals",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_mismatched_test_totals",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.143
+    },
+    {
+      "name": "test_gate_rejects_false_adversarial_total",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_false_adversarial_total",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.144
+    },
+    {
+      "name": "test_gate_rejects_adversarial_failure",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_adversarial_failure",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.142
+    },
+    {
+      "name": "test_gate_rejects_cloud_apply_zero_exit",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_cloud_apply_zero_exit",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.14
+    },
+    {
+      "name": "test_gate_rejects_wrong_cloud_denial_code",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_wrong_cloud_denial_code",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.138
+    },
+    {
+      "name": "test_gate_rejects_cloud_plan_mutation",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_cloud_plan_mutation",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.137
+    },
+    {
+      "name": "test_gate_rejects_cloud_cost_not_zero",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_cloud_cost_not_zero",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.137
+    },
+    {
+      "name": "test_gate_rejects_cloud_not_deferred",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_cloud_not_deferred",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.139
+    },
+    {
+      "name": "test_gate_rejects_dirty_source_before",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_dirty_source_before",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.139
+    },
+    {
+      "name": "test_gate_rejects_dirty_source_after",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_dirty_source_after",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.14
+    },
+    {
+      "name": "test_gate_rejects_cleanup_failure",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_cleanup_failure",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.141
+    },
+    {
+      "name": "test_verify_rejects_post_gate_status_mutation",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_verify_rejects_post_gate_status_mutation",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.209
+    },
+    {
+      "name": "test_verify_rejects_post_gate_log_mutation",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_verify_rejects_post_gate_log_mutation",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.204
+    },
+    {
+      "name": "test_verify_rejects_missing_independent_gate_artifact",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_verify_rejects_missing_independent_gate_artifact",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.175
+    },
+    {
+      "name": "test_verify_rejects_tampered_final_artifact",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_verify_rejects_tampered_final_artifact",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.204
+    },
+    {
+      "name": "test_ci_workflow_uses_shared_runner",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_ci_workflow_uses_shared_runner",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_ci_dependencies_are_pinned",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_ci_dependencies_are_pinned",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_gate_rejects_missing_operation_index",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_missing_operation_index",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.139
+    },
+    {
+      "name": "test_gate_rejects_latest_only_without_index",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_latest_only_without_index",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.138
+    },
+    {
+      "name": "test_gate_rejects_tampered_indexed_receipt",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_tampered_indexed_receipt",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.14
+    },
+    {
+      "name": "test_gate_rejects_missing_indexed_receipt",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_missing_indexed_receipt",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.139
+    },
+    {
+      "name": "test_gate_rejects_missing_rollback_operation",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_missing_rollback_operation",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.14
+    },
+    {
+      "name": "test_gate_rejects_redis_not_invalidated",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_redis_not_invalidated",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.14
+    },
+    {
+      "name": "test_gate_rejects_fingerprints_missing",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_fingerprints_missing",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.14
+    },
+    {
+      "name": "test_gate_rejects_unavailable_service_test_skipped",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_unavailable_service_test_skipped",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.145
+    },
+    {
+      "name": "test_gate_rejects_invalid_rollback_syntax",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_invalid_rollback_syntax",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.174
+    },
+    {
+      "name": "test_gate_rejects_ci_skips_even_with_green_totals",
+      "nodeid": "infrastructure/local-ground/tests/test_gate_regressions.py::test_gate_rejects_ci_skips_even_with_green_totals",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.14
+    },
+    {
+      "name": "test_parses_json_array",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_parses_json_array",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_parses_single_json_object",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_parses_single_json_object",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_parses_ndjson_lines",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_parses_ndjson_lines",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_parses_empty_output",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_parses_empty_output",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_rejects_malformed_output",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_rejects_malformed_output",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_rejects_incomplete_array",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_rejects_incomplete_array",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_rejects_malformed_ndjson_line",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_rejects_malformed_ndjson_line",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_rejects_non_object_array_entry",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_rejects_non_object_array_entry",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_published_ports_detected",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_published_ports_detected",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_legacy_ports_string_detected",
+      "nodeid": "infrastructure/local-ground/tests/test_compose_output.py::test_legacy_ports_string_detected",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_scripts_have_executable_git_modes",
+      "nodeid": "infrastructure/local-ground/tests/test_portability.py::test_scripts_have_executable_git_modes",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.002
+    },
+    {
+      "name": "test_ctl_works_from_working_dir_outside_repo",
+      "nodeid": "infrastructure/local-ground/tests/test_portability.py::test_ctl_works_from_working_dir_outside_repo",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.187
+    },
+    {
+      "name": "test_restore_accepts_pristine_backup",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_accepts_pristine_backup",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.071
+    },
+    {
+      "name": "test_restore_rejects_missing_manifest_file",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_rejects_missing_manifest_file",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.007
+    },
+    {
+      "name": "test_restore_rejects_absolute_manifest_path",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_rejects_absolute_manifest_path",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.013
+    },
+    {
+      "name": "test_restore_rejects_parent_traversal_manifest_path",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_rejects_parent_traversal_manifest_path",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.013
+    },
+    {
+      "name": "test_restore_rejects_duplicate_manifest_path",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_rejects_duplicate_manifest_path",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.018
+    },
+    {
+      "name": "test_restore_rejects_malformed_manifest_line",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_rejects_malformed_manifest_line",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.013
+    },
+    {
+      "name": "test_restore_rejects_backup_without_protected_metadata",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_rejects_backup_without_protected_metadata",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.018
+    },
+    {
+      "name": "test_restore_rejects_tampered_metadata_hash",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_rejects_tampered_metadata_hash",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.022
+    },
+    {
+      "name": "test_restore_rejects_unsafe_artifact_member",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_restore_rejects_unsafe_artifact_member",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.109
+    },
+    {
+      "name": "test_unknown_backup_scope_fails_closed",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_unknown_backup_scope_fails_closed",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_backup_requires_scope",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_backup_requires_scope",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.004
+    },
+    {
+      "name": "test_unknown_restore_mode_fails_closed",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_unknown_restore_mode_fails_closed",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_full_backup_blocked_without_docker_or_services",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_full_backup_blocked_without_docker_or_services",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.072
+    },
+    {
+      "name": "test_full_backup_blocked_when_postgres_unavailable",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_full_backup_blocked_when_postgres_unavailable",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.075
+    },
+    {
+      "name": "test_full_backup_blocked_when_artifact_store_unavailable",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_full_backup_blocked_when_artifact_store_unavailable",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.078
+    },
+    {
+      "name": "test_state_only_backup_still_works_without_docker",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_state_only_backup_still_works_without_docker",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.157
+    },
+    {
+      "name": "test_state_only_backup_never_claims_disaster_recovery",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_state_only_backup_never_claims_disaster_recovery",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.001
+    },
+    {
+      "name": "test_full_backup_cannot_use_state_only_restore",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_full_backup_cannot_use_state_only_restore",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.078
+    },
+    {
+      "name": "test_state_only_backup_cannot_use_full_replace_restore",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_state_only_backup_cannot_use_full_replace_restore",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.063
+    },
+    {
+      "name": "test_full_replace_requires_confirm_local_target",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_full_replace_requires_confirm_local_target",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.078
+    },
+    {
+      "name": "test_full_replace_rejects_wrong_local_target",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_full_replace_rejects_wrong_local_target",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.078
+    },
+    {
+      "name": "test_incomplete_full_backup_rejected",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_incomplete_full_backup_rejected",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.22
+    },
+    {
+      "name": "test_inventory_verification_pure",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_inventory_verification_pure",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_sha256_file_is_deterministic",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_sha256_file_is_deterministic",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_pg_recovery_source_has_no_invalid_database_syntax",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_pg_recovery_source_has_no_invalid_database_syntax",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.0
+    },
+    {
+      "name": "test_promote_phase_prefix_is_valid",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_promote_phase_prefix_is_valid",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_finalize_phase_prefix_is_valid",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_finalize_phase_prefix_is_valid",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_rollback_receipt_truthfulness_contract",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_rollback_receipt_truthfulness_contract",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_recovery_succeeded_never_overrides_failed_invariant",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_recovery_succeeded_never_overrides_failed_invariant",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_fingerprint_mismatch_rejected_despite_matching_counts",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_fingerprint_mismatch_rejected_despite_matching_counts",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.005
+    },
+    {
+      "name": "test_value_altered_after_staging_verification_is_caught",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_value_altered_after_staging_verification_is_caught",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_row_count_only_receipt_is_rejected",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_row_count_only_receipt_is_rejected",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_inventory_fingerprint_tamper_rejected",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_inventory_fingerprint_tamper_rejected",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_two_restores_preserve_two_receipt_sets",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_two_restores_preserve_two_receipt_sets",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.087
+    },
+    {
+      "name": "test_later_operation_cannot_overwrite_earlier_evidence",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_later_operation_cannot_overwrite_earlier_evidence",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.058
+    },
+    {
+      "name": "test_duplicate_operation_id_fails",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_duplicate_operation_id_fails",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.057
+    },
+    {
+      "name": "test_verify_detects_missing_indexed_receipt",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_verify_detects_missing_indexed_receipt",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.056
+    },
+    {
+      "name": "test_verify_detects_receipt_hash_mismatch",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_verify_detects_receipt_hash_mismatch",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.057
+    },
+    {
+      "name": "test_collect_observed_fingerprints_decodes_bytes_stdout",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_collect_observed_fingerprints_decodes_bytes_stdout",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_collect_observed_rows_decodes_bytes_stdout",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_collect_observed_rows_decodes_bytes_stdout",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.006
+    },
+    {
+      "name": "test_latest_pointer_is_not_authoritative",
+      "nodeid": "infrastructure/local-ground/tests/test_backup_hardening.py::test_latest_pointer_is_not_authoritative",
+      "container_backed": false,
+      "outcome": "passed",
+      "duration_s": 0.028
+    }
+  ]
+}

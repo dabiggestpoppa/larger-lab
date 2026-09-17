@@ -1,0 +1,12 @@
+{"type": "issue_action_grant", "grant_id": "GR_SAFE", "grantee": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "issued_seq": 2, "authority_basis": "pre-existing operator grant"}
+{"type": "operator_unavailable", "seq": 3}
+{"type": "request_action", "action_id": "ACT_EXACT", "actor": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "grant_id": "GR_SAFE", "current_seq": 5}
+{"type": "request_action", "action_id": "ACT_NEAR", "actor": "OP_AGENT", "action": "sandbox_rebalance_reversible_v2", "target_scope": "sandbox://portfolio_minor", "grant_id": "GR_SAFE", "current_seq": 5}
+{"type": "request_action", "action_id": "ACT_CAPITAL", "actor": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "risk_class": "capital", "grant_id": "GR_SAFE", "current_seq": 5}
+{"type": "request_action", "action_id": "ACT_IRREV", "actor": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "reversible": false, "grant_id": "GR_SAFE", "current_seq": 5}
+{"type": "request_action", "action_id": "ACT_SURFACE", "actor": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "affected_surface": "HIGH_AFFECTED_SURFACE", "grant_id": "GR_SAFE", "current_seq": 5}
+{"type": "issue_action_grant", "grant_id": "GR_POSTHOC", "grantee": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "issued_seq": 5, "authority_basis": "issued during the hold"}
+{"type": "request_action", "action_id": "ACT_POSTHOC", "actor": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "grant_id": "GR_POSTHOC", "current_seq": 5}
+{"type": "request_action", "action_id": "ACT_REVOKED", "actor": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "grant_id": "GR_SAFE", "current_seq": 6}
+{"type": "revoke_action_grant", "grant_id": "GR_SAFE"}
+{"type": "request_action", "action_id": "ACT_AFTER_REVOKE", "actor": "OP_AGENT", "action": "sandbox_rebalance_reversible", "target_scope": "sandbox://portfolio_minor", "grant_id": "GR_SAFE", "current_seq": 7}

@@ -52,6 +52,29 @@ Every failed attempt remains truthful evidence. Agents do not merge, deploy, pur
 
 Planning, development, debugging, ordinary execution and validation run locally. Cloud is a later surface for deployment, durability, remote availability, observability, backups and heavy compute. Telegram is an interface, not canonical state. Core OCE/PO operation must not depend on Telegram or cloud availability.
 
+## Institutional extensions
+
+The institutional-architecture planning branch also contains proposed extensions for controlled learning, transformation, and external economic interaction. They do not authorize implementation merely by existing.
+
+Current Opportunity Exchange package:
+
+1. `OCE_ARCHITECTURE_AMENDMENT_A011_EXTERNAL_ECONOMIC_ENVIRONMENT_AND_OPPORTUNITY_EXCHANGE_v1.0.md` — governing architecture.
+2. `OCE_AGENT_ECONOMY_SOURCE_REGISTRY_v0.1.json` — original machine-readable source registry.
+3. `OCE_AGENT_ECONOMY_MARKET_MAP_v0.1.md` — initial agent-native market research.
+4. `OCE_OPPORTUNITY_EXCHANGE_BUILD_PLAN_v0.1.md` — phased source-neutral build plan from read-only observation through bounded autonomy.
+5. `OCE_AGENT_ECONOMY_MARKET_MAP_SUPPLEMENT_01_UPWORK_FIVERR_v0.1.md` — current Upwork/Fiverr human-freelance research and initial operating model.
+6. `OCE_AGENT_ECONOMY_SOURCE_REGISTRY_SUPPLEMENT_01_UPWORK_FIVERR_v0.1.json` — machine-readable Upwork/Fiverr source metadata.
+
+### Opportunity-source doctrine
+
+Opportunity Exchange follows:
+
+> **OBSERVE BROADLY → QUALIFY EMPIRICALLY → EXECUTE SELECTIVELY → LEARN FROM RESULTS → REVISIT DORMANT SOURCES**
+
+No venue is permanently discarded merely because desk research suggests poor current economics, high competition, low liquidity, or manual checkpoints. Observation authority, transaction authority, source priority, and source existence are separate concepts. Negative results remain durable knowledge with explicit re-entry conditions.
+
+Upwork and Fiverr are first-class source candidates alongside agent-native venues. Their integration mode differs according to current platform rules: official machine interfaces are preferred when supported; human-first/operator-mediated workflows remain valid institutional surfaces when autonomous interaction is not permitted.
+
 ## Current checkpoint
 
 - Canonical integration branch: `oce`

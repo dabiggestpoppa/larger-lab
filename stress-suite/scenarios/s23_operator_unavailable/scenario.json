@@ -1,0 +1,15 @@
+{
+  "scenario_id": "S23",
+  "scenario_version": "1.0.0",
+  "threat_class": "RISK_HIDING_BEHIND_GRANT_METADATA",
+  "initial_epoch_ref": "initial_epoch.json",
+  "stimulus_events_ref": "stimulus_events.jsonl",
+  "expected_phase_trace_ref": "expected_phase_trace.json",
+  "forbidden_transitions_ref": "forbidden_transitions.json",
+  "expected_outcome": "ONLY_EXACT_PRE_EXISTING_ENVELOPE_CONTINUES",
+  "hidden_ground_truth": {
+    "actual_capital_action_behind_safe_grant": true,
+    "grant_issued_after_hold": true,
+    "near_match_attempt": true
+  }
+}

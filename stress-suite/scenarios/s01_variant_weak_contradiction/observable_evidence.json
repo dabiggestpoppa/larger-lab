@@ -1,0 +1,9 @@
+{
+  "records": [
+    {"record_id": "W1", "kind": "OBSERVATION", "claim": "weak single-period contradiction (MEDIUM), not reproduced", "lineage": "LINEAGE_A"},
+    {"record_id": "W2", "kind": "OBSERVATION", "claim": "next period contradiction evaporates", "lineage": "LINEAGE_A"},
+    {"record_id": "W3", "kind": "OBSERVATION", "claim": "single blip again", "lineage": "LINEAGE_A"},
+    {"record_id": "W4", "kind": "OBSERVATION", "claim": "recovery", "lineage": "LINEAGE_A"},
+    {"record_id": "W5", "kind": "OBSERVATION", "claim": "steady state; no persistent independent contradiction", "lineage": "LINEAGE_A"}
+  ]
+}

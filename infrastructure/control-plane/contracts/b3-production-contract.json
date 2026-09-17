@@ -1,0 +1,74 @@
+{
+  "contract_id": "OCE-B3-WORKER-FABRIC-PRODUCTION-CONTRACT-v1.0",
+  "stage": "B3-R1",
+  "status": "IN_PROGRESS / CLOSURE_REPAIR",
+  "supersedes": "OCE-B3-WORKER-FABRIC (premature closure claimed — superseded, defects audited)",
+  "authority": {
+    "authoritative_state": "postgresql",
+    "redis": "disposable transport and coordination ONLY, never sole truth, reconstructable from PostgreSQL",
+    "workers": "outbound-only, NO public inbound port on any worker",
+    "durable_sessions": true,
+    "durable_leases": true,
+    "durable_fencing": "monotonic fence generation, unguessable lease tokens",
+    "durable_artifacts": "content-addressed, immutable, PostgreSQL-backed references",
+    "durable_retries": true,
+    "durable_dead_letters": true,
+    "one_effect_per_logical_job": "duplicate delivery must never duplicate material effects",
+    "missing_mandatory_isolation": "BLOCKS execution before job code runs — never silently degrades a mandatory boundary"
+  },
+  "outbound_protocol": {
+    "initiation": "worker dials OUT to the loopback control plane",
+    "worker_public_port": "forbidden",
+    "all_endpoints": "authenticated",
+    "fail_closed_on": [
+      "replay", "revocation", "stale session", "forged lease token",
+      "wrong worker identity", "capability escalation", "expired credential"
+    ]
+  },
+  "capability_and_authority": {
+    "workers_cannot_self_authorize": true,
+    "capabilities": "OCE-admitted only; unknown capabilities fail closed",
+    "unsupported_versions_fail_closed": true,
+    "identity_separate_from_instance": true,
+    "credentials": "hashed at rest or secure local secret handling",
+    "rotation_and_revocation": true,
+    "immutable_audit_trail": "per admitted worker",
+    "worker_authority_never_exceeds_authorized_job_envelope": true
+  },
+  "execution": {
+    "fresh_workspace_per_attempt": true,
+    "explicit_task_allowlist": true,
+    "explicit_executable_and_interpreter_policy": true,
+    "bounded_resources": ["cpu", "memory", "disk", "output-size", "timeout"],
+    "active_cancellation": true,
+    "network_disabled_by_default": true,
+    "read_only_inputs": true,
+    "process_tree_termination": true,
+    "not_an_unrestricted_arbitrary_shell": true,
+    "unavailable_isolation_reported_truthfully": true,
+    "mandatory_security_gap_remains_BLOCKED": true
+  },
+  "cloud": {
+    "state": "DORMANT",
+    "authoritative": false,
+    "recurring_cost": "$0",
+    "mutations": 0,
+    "purchase": "forbidden",
+    "provisioning": "forbidden",
+    "deployment": "forbidden",
+    "public_ports": "forbidden",
+    "cloud_credential_requirement": "forbidden for local operation",
+    "future_provider_adapters": "disabled and unconfigured"
+  },
+  "role_boundaries": {
+    "po": "high-level OCE/Quant Lab operator and only CEO-level authority",
+    "hermes": "one supplemental/personal Telegram agent; may display status, submit low-risk requests, route to PO; may NOT admit workers, grant capabilities, retry dead letters, release quarantined results, approve deployment/capital/trading, or mutate PO-only governance state",
+    "no_second_hermes": true,
+    "openclaw": "inactive; not reactivated"
+  },
+  "schema_versions": {
+    "control_plane_schema": "2.0.0",
+    "book3_contract_schema": "1.0.0",
+    "migration_format": "NNN_description.sql, numbered, reversible via NNN_down.sql"
+  }
+}

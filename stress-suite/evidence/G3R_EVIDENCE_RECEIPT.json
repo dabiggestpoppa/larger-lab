@@ -1,0 +1,132 @@
+{
+  "gate_id": "G3R",
+  "status": "PASS_G3R_COGNITIVE_ECOLOGY_HARDENING",
+  "authorization": "G3R ONLY — DO NOT BEGIN G4",
+  "starting_sha": "0f1ccaaa0f33b8b3317f764d393baa51ca51577a",
+  "receipt_lineage": {
+    "artifacts_head_sha": "546d23c4671bd5c4755a1dc027f94b8a02fce1e6",
+    "receipt_content_parent_sha": "546d23c4671bd5c4755a1dc027f94b8a02fce1e6",
+    "externally_verified_branch_head": null,
+    "self_pin_attempted": false,
+    "note": "G3-P0-C semantics: a receipt cannot contain the SHA of the commit that contains it. artifacts_head_sha pins the commit holding all engine/scenario/test artifacts; receipt_content_parent_sha is the parent of the G3R evidence commit; externally_verified_branch_head is filled only by an external push/verify step."
+  },
+  "commits": [
+    "113da0d5 STRESS-G3R1: harden counter-attractor budget and method enforcement",
+    "dba2829d STRESS-G3R2: generalize correlation-risk friction triggers (shared policy V2)",
+    "37335c49 STRESS-G3R3: consensus-strength facts, independent-design provenance, tri-state overlaps, provenance registry",
+    "0aede9f9 STRESS-G3R4: explicit capability contract and recommended-vs-executed topology semantics",
+    "ed5f2702 STRESS-G3R5: bind scenario reviewers to the governed provenance registry",
+    "6e5c546d STRESS-G3RX: adversarial G3R regression suite + documented legacy upgrades",
+    "546d23c4 STRESS-G3R6: regenerate per-scenario receipts under the hardened pipeline",
+    "<STRESS-G3RR>: archive G3R evidence package (this commit)"
+  ],
+  "defect_ids": ["G3R-01", "G3R-02", "G3R-03", "G3R-04", "G3R-05", "G3R-06", "G3R-07", "G3R-08", "G3R-09", "G3R-10"],
+  "tests": {
+    "old_tests_preserved": 354,
+    "new_adversarial_tests": 48,
+    "total_pass": 402,
+    "legacy_upgrades_with_rationale": [
+      "test_g3p0::test_p0_axes_distinct_in_pairwise_graph — boolean overlap -> tri-state SAME/DIFFERENT/UNKNOWN (G3R-08)",
+      "test_g3_s08::test_high_consequence_review_triggers_friction — rule id eco.friction.context_correlation -> eco.friction.correlation_risk (G3R-04)",
+      "test_g3_cross_scenario::test_all_four_scenarios_run_under_the_same_policy_object — shared policy version V1 -> V2"
+    ]
+  },
+  "per_defect_regressions": {
+    "G3R-01_counter_attractor_budget": [
+      "test_contradiction_after_budget_is_ignored",
+      "test_contradiction_within_budget_is_honored",
+      "test_evidence_produced_contains_only_consumed_findings",
+      "test_cost_equals_consumed_authorized_methods",
+      "test_zero_findings_does_not_fake_budget_consumption"
+    ],
+    "G3R-02_method_enforcement": [
+      "test_unauthorized_method_cannot_support_challenge",
+      "test_authorized_method_can_support_challenge",
+      "test_unknown_method_recorded_but_not_counted",
+      "test_method_budget_and_finding_count_are_consistent"
+    ],
+    "G3R-03_consensus_strength": [
+      "test_eight_of_eight_independent_consensus_may_trigger",
+      "test_three_two_split_does_not_trigger_strong_consensus",
+      "test_reviewer_count_alone_cannot_trigger_counter_attractor",
+      "test_duplicate_correlated_votes_do_not_create_independent_support",
+      "test_three_two_split_at_runner_level_no_counter_attractor"
+    ],
+    "G3R-04_correlation_without_exposure": [
+      "test_case_a_monoculture_no_exposure_still_triggers_friction",
+      "test_case_a_friction_trigger_fires_without_exposure",
+      "test_case_b_3_3_split_is_not_strong_consensus_and_no_unneeded_friction",
+      "test_case_c_diversified_topology_no_exposure_no_friction",
+      "test_case_d_disagreement_alone_no_friction"
+    ],
+    "G3R-05_friction_execution_governance": [
+      "test_unauthorized_friction_method_ignored_or_rejected",
+      "test_friction_budget_bounds_actions",
+      "test_fresh_context_action_consumes_budget",
+      "test_no_trigger_means_zero_actions",
+      "test_disagreement_does_not_create_actions_without_trigger"
+    ],
+    "G3R-06_fresh_vs_design": [
+      "test_fresh_context_satisfies_fresh_or_design_requirement",
+      "test_independent_design_satisfies_requirement_without_fresh_context",
+      "test_duplicated_design_does_not_satisfy",
+      "test_unknown_design_does_not_count_favorably"
+    ],
+    "G3R-07_provenance_registry": [
+      "test_worker_claims_fake_model_lineage",
+      "test_worker_claims_fake_source_lineage",
+      "test_worker_claims_fake_retrieval_bundle",
+      "test_worker_claims_blind_but_registry_records_prior_exposure",
+      "test_unknown_registry_provenance_remains_unknown",
+      "test_registered_truth_changes_independence_profile",
+      "test_missing_registry_entry_does_not_promote_claims"
+    ],
+    "G3R-08_tri_state_unknown": [
+      "test_unknown_unknown_dependency_is_unknown",
+      "test_known_same_is_shared",
+      "test_known_different_is_distinct",
+      "test_unknown_axis_cannot_satisfy_independence_requirement"
+    ],
+    "G3R-09_capability_contract": [
+      "test_one_high_plus_basic_fails_all_required_capability",
+      "test_all_required_roles_capability_explicit_key",
+      "test_any_reviewer_capability_semantics"
+    ],
+    "G3R-10_recommended_vs_executed": [
+      "test_recommended_topology_not_confused_with_executed_evidence",
+      "test_receipt_artifact_records_recommended_vs_executed"
+    ]
+  },
+  "cross_case_matrix": {
+    "CASE_A_monoculture_no_exposure": "PASS — friction triggers and correlated support stays visible (exposure=0 cannot bypass)",
+    "CASE_B_3_3_independent_split": "PASS — not strong consensus; counter-attractor route does not fire",
+    "CASE_C_budget_3_contradiction_at_4": "PASS — 4th finding cannot alter terminal state",
+    "CASE_D_two_independent_designs_no_fresh": "PASS — fresh-or-design constraint satisfied via provenance-verified designs",
+    "CASE_E_claims_3_lineages_registry_1": "PASS — one verified lineage wins, conflicts recorded"
+  },
+  "scenario_results_shared_policy": {
+    "policy_id": "G3_COGNITIVE_ECOLOGY_POLICY",
+    "policy_version": "V2",
+    "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+    "S06": {"pass": true, "disposition": "SUPPORTED_BUT_CORRELATED", "behavior_fingerprint": "bf79e784e3c42264ba13ade8cf3b4626"},
+    "S07": {"pass": true, "disposition": "REQUIRES_INDEPENDENT_REVIEW", "behavior_fingerprint": "ecfe8a491912ca9462316f5d37ec0e3b"},
+    "S08": {"pass": true, "disposition": "SUPPORTED_BUT_CORRELATED", "behavior_fingerprint": "096242936df013ac703b7386cad8d7fa"},
+    "S09": {"pass": true, "disposition": "INDEPENDENTLY_SUPPORTED", "behavior_fingerprint": "346ea900dcbac91ccb8f5b1dc0dec421"}
+  },
+  "sealing": {
+    "expected_accessed_during_run": false,
+    "hidden_ground_truth_accessed": false,
+    "behavior_fingerprints_byte_reproducible": true,
+    "scenario_rename_invariance_retained": true,
+    "reviewer_rename_invariance_retained": true
+  },
+  "carried": {
+    "contradictions": ["CON-02", "CON-03"],
+    "ambiguities": ["AMB-03", "AMB-08", "AMB-11", "AMB-13"],
+    "new_contradictions": [],
+    "new_ambiguities": []
+  },
+  "cost": {"usd": 0, "model_calls": 0, "local_only": true},
+  "mutations": {"cloud": 0, "production": 0, "capital": 0, "authority_changes": "NONE"},
+  "next_gate": "G4"
+}
