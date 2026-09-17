@@ -1,0 +1,175 @@
+{
+  "$defs": {
+    "ContractType": {
+      "description": "Contract settlement construction (linear vs inverse vs quanto).",
+      "enum": [
+        "LINEAR",
+        "INVERSE",
+        "QUANTO",
+        "OTHER"
+      ],
+      "title": "ContractType",
+      "type": "string"
+    },
+    "MarketType": {
+      "description": "Economic market type (spot / futures / perpetual / option).",
+      "enum": [
+        "SPOT",
+        "FUTURE",
+        "PERPETUAL",
+        "OPTION",
+        "OTHER"
+      ],
+      "title": "MarketType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Canonical economic contract identity for one observation.\n\n`provider` and `venue` are preserved alongside canonical fields: fallback\nnever erases provider identity (F3).",
+  "properties": {
+    "base_asset": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Base Asset"
+    },
+    "contract_multiplier": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Contract Multiplier"
+    },
+    "contract_type": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ContractType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "identity_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Identity Version"
+    },
+    "instrument_end": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Instrument End"
+    },
+    "instrument_id_canonical": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Instrument Id Canonical"
+    },
+    "instrument_native": {
+      "title": "Instrument Native",
+      "type": "string"
+    },
+    "instrument_start": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Instrument Start"
+    },
+    "is_inverse": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Is Inverse"
+    },
+    "market_type": {
+      "$ref": "#/$defs/MarketType"
+    },
+    "provider": {
+      "title": "Provider",
+      "type": "string"
+    },
+    "quote_asset": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Quote Asset"
+    },
+    "settlement_asset": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Settlement Asset"
+    },
+    "venue": {
+      "title": "Venue",
+      "type": "string"
+    }
+  },
+  "required": [
+    "provider",
+    "venue",
+    "market_type",
+    "instrument_native"
+  ],
+  "title": "InstrumentIdentity",
+  "type": "object"
+}

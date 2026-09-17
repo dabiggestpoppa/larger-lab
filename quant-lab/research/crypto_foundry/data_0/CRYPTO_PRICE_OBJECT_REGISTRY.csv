@@ -1,0 +1,16 @@
+price_object,description,available_on,typical_use,notes
+AMM_POOL_PRICE,Pool swap execution price (reserves ratio),Uniswap/Aerodrome/PancakeSwap/Raydium/Orca,AMM swap execution,not an order book mid. includes fee. varies by pool depth.
+SPOT_MID,Midpoint of best bid/ask on order book,Kraken/Coinbase/Hyperliquid spot,Benchmark reference,requires order book access. reliable for deep markets.
+SPOT_BID,Best executable buy price,Kraken/Coinbase/Hyperliquid spot,Execution planning,reflects real spread.
+SPOT_ASK,Best executable sell price,Kraken/Coinbase/Hyperliquid spot,Execution planning,reflects real spread.
+PERP_LAST,Last traded price on perp venue,Hyperliquid/Drift/Binance/Kraken,Benchmark + execution,may be stale in thin markets.
+PERP_MARK,Mark price (fair value estimate),Hyperliquid/Drift/Binance/Deribit,Reference + liquidation,Hyperliquid mark uses oracle + EMA. Avoids manipulation.
+INDEX_PRICE,Composite index across venues,Hyperliquid/Deribit/Binance,Benchmark reference,fewer venues = less reliable.
+ORACLE_PRICE,External oracle price (Pyth/Chainlink),Hyperliquid (Pyth),Funding reference,Pyth network feeds for HL. Some delay.
+EXECUTABLE_BID,Realistic price for market sell order,all venues,Execution,slippage-adjusted. depends on book depth.
+EXECUTABLE_ASK,Realistic price for market buy order,all venues,Execution,slippage-adjusted. depends on book depth.
+IMPACT_PRICE,Estimated price after expected order size,all venues with depth,Position sizing,requires order book or depth model.
+OPTION_BID,Option contract best bid,Deribit/Aevo,Options execution,specific strike/expiry.
+OPTION_ASK,Option contract best ask,Deribit/Aevo,Options execution,specific strike/expiry.
+OPTION_IV,Implied volatility from option price,Deribit/Derive,Vol research,annualized percentage.
+OPTION_MID,Option mid price (bid+ask)/2,Deribit/Aevo,Options reference,may be stale in illiquid strikes.

@@ -1,0 +1,7 @@
+distance_metric,n,point_biserial_vs_contagion,p,purged_auc_contagion
+rel_membership_proximity,3646,0.003,0.837,0.4808
+rel_corr_proximity,3647,-0.002,0.914,0.4897
+rel_overlap,2226,-0.012,0.573,0.4889
+rel_state_transition_distance,3647,-0.009,0.605,0.4879
+rel_peer_dispersion,3647,0.018,0.279,0.4665
+VERDICT,3647,,,weak: best AUC 0.4897 (rel_corr_proximity); all < 0.52

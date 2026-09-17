@@ -1,0 +1,3 @@
+side,n,true_loner_freq,false_loner_freq,median_abs_amplitude,median_sigma,p_rejoin_or_normalize_7d,p_persistent_displacement_7d,p_rank_repair_30d,p_price_repair_30d,median_vol_63d
+DOWN,2462,0.7949,0.0662,0.12134,2.484,0.4947,0.4947,0.5747,0.171,0.045151
+UP,1185,0.8793,0.0388,0.15769,2.791,0.3527,0.6397,0.6312,0.1165,0.053388

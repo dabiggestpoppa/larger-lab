@@ -1,0 +1,8 @@
+result,status,note
+BREADTH_ACCELERATION incremental,NULL,"no material increment beyond breadth level (M6, M7 audit)"
+VOLATILITY success/failure gate,NULL,volatility not incremental for upper-field route selection
+SHMC tail activation,NULL,lowest tail at every depth; mean-reversion role only
+RETEST_RELOAD structural separability,NULL,not separable on current observables
+EARLY_DECAY broad signal,NULL,not reproduced; vol-first local decay only
+SECTOR/CHAIN residual displacement,NULL,0 BH-sig cells after band/vol/age centering (LF2)
+ACCUMULATION-LIKE incremental,NULL,absorbed by breadth (M4 audit)

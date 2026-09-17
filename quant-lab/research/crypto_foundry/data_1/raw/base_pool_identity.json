@@ -1,0 +1,24 @@
+{
+  "discovery": {
+    "factory": "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
+    "expected": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+    "discovered": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+    "match": true
+  },
+  "identity": {
+    "pool_address": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+    "verified": true,
+    "expected_token0": "0x4200000000000000000000000000000000000006",
+    "expected_token1": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "expected_fee_tier": 500,
+    "checks": {
+      "code_exists": true,
+      "token0": "0x4200000000000000000000000000000000000006",
+      "token1": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "tick_spacing": 10,
+      "token0_match": true,
+      "token1_match": true,
+      "tick_spacing_match": true
+    }
+  }
+}

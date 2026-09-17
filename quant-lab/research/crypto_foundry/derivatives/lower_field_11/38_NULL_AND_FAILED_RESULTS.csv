@@ -1,0 +1,12 @@
+result,status,n,reason
+leverage_liquidation_mechanics_for_sign_asymmetry,DATA_BLOCKED,0,funding / open interest / liquidation / margin data absent from the free-only LF5/8/9/10 substrate; constitution forbids paying or scraping restricted sources (27).
+order_book_depth_spread_asymmetry,DATA_BLOCKED,0,no order-book / depth / spread series in substrate; only volume-based liq_proxy available.
+sell_side_order_flow_urgency_proxy,DATA_BLOCKED,0,no taker/maker flow or imbalance data.
+mechanical_explanation_of_sign_asymmetry,DATA_BLOCKED-UNRESOLVED,0,"only correlation-compression + volume-pressure proxies local; the rest blocked, so the sign gap cannot be fully attributed to mechanics (28: IRREDUCIBLE_AFTER_MECHANICS)."
+damage_accumulation_superlinear_fragility,NULL,0,measured path burden in this panel did NOT monotonically raise absorption failure (10: NO_FRAGILITY_ACCELERATION); repeated events are partly a compositional artifact of event-rich liquid assets.
+early_contagion_discrete_singleton_species,DISSOLVED,0,"EARLY_CONTAGION sits in the contagion continuous space (silhouette vs rest ~ -0.05); it is a high-speed region / earlier member of the same continuous object, not a discrete disjoint species (19)."
+radius_power_law_stable_scaling,NULL_WEAK,0,"radius~t^alpha alpha ~0.13 with r2 ~0.55 — WEAK_SCALING, no stable clean power law (22)."
+biological_causality_contagion_generations,NOT_CLAIMED,0,generation / branching language is descriptive timing-order only; no infection causality claimed (20/21/39).
+downside_to_upside_mirror,NOT_ASSUMED,0,upside functions analysed per-function; no mechanical sign inversion (31-34).
+relational_state_forecast_resurrection,NULL_FROZEN,3,LF9 relational-state predictive null remains frozen; LF11 uses relational state only as descriptive object.
+static_peer_graph_resurrection,NOT_RESURRECTED,0,no static peer graph; churn/topology handled dynamically.

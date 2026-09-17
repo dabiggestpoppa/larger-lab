@@ -1,0 +1,14 @@
+{
+  "checkpoint": "MECH-12",
+  "commit": "TBD",
+  "verdict": "PASS_MECH12_LIFECYCLE_CONSTRAINTS_WITH_LIMITATIONS",
+  "failure_geometry": "4/4 cells separated",
+  "broad_sequences": "0 COMMON",
+  "partial_order": "2 REQUIRED",
+  "constraint_entropy": "ENTROPY_COLLAPSE",
+  "waterfall": "THRESHOLD_HIERARCHY_EARNED",
+  "metastability": "1 metastable-like",
+  "potential_realization": "LOCAL_CONVERSION_PATH",
+  "human_review_required": true,
+  "next_checkpoint_authorized": false
+}

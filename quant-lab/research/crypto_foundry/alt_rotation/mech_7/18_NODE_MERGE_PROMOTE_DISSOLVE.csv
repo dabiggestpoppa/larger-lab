@@ -1,0 +1,12 @@
+node,operation,evidence,status
+ISOLATED_DOWNSIDE_EXTREME,NEW_NODE,"n=1023 events, 812 dates, reversal geometry (LF2)",CONFIRMED_AS_LOCAL_NODE
+COORDINATED_UPSIDE_PUSH,NEW_NODE,"n=100445 events, 2110 dates, giveback geometry (LF2)",CONFIRMED_AS_LOCAL_NODE
+BREADTH_ROUTE_GATE,PROMOTE,breadth level dominant in M5/M6 and cross-field gate in LF2,STRONGEST_SINGLE_COORDINATE
+BREADTH_OSCILLATION,PROMOTE,M6 two-state attractor; revisit against 2x2 plane,CANDIDATE_METASTABLE_STATE
+HIGH_BRD_HIGH_DISP_TAIL_STATE,NEW_NODE,LF2 DISP_HI|BRD_HI +14-18pp tail lift; lifecycle here,LOCAL_NODE_UNDER_LIFECYCLE_AUDIT
+BREADTH_ACCELERATION,DISSOLVE,"no material increment beyond level (M6, this audit)",NULL
+VOLATILITY_INCREMENTAL_GATE,DISSOLVE,not incremental for success/failure; ignition-intensity role only,NULL
+SHMC_TAIL_ACTIVATION,DISSOLVE,LF2 lowest tail at every depth; recheck mean-reversion role,DISSOLVED_LOCAL_REINTERPRETATION
+RETEST_RELOAD_STRUCTURE,DESCRIPTIVE_ONLY,not structurally separable; needs breadth-retention sensor,LOCAL_MOTIF
+EARLY_DECAY_SEQUENCE,DISSOLVE,not reproduced broadly; vol-first local only,LOCAL_NODE_VOL_FIRST
+ACCUMULATION_LIKE,MERGE,absorbed by breadth (M4 audit),MERGED_INTO_BREADTH

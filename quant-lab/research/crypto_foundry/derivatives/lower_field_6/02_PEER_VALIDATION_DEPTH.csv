@@ -1,0 +1,6 @@
+peer_family,event_coverage,median_peer_count,jaccard_persistence,membership_turnover,future_corr_stability,cycle_stability_cov,rankdepth_stability_cov,lf5_pre_event_similarity,lf5_next_window_similarity,lf5_basket_correlation,lf5_peer_missing_rate,lf5_status
+BEHAVIORAL_10,1.0,10.0,0.1484,0.8516,-0.0436,0.0,0.0,0.039,NOT_ESTIMATED,NOT_ESTIMATED,0.131,VALID
+CORR_60_10,0.9764,10.0,0.0816,0.9184,-0.049,0.0087,0.0276,,NOT_ESTIMATED,NOT_ESTIMATED,1.0,VALID
+CORR_120_10,0.931,10.0,0.1544,0.8456,-0.0455,0.0328,0.0287,,NOT_ESTIMATED,NOT_ESTIMATED,1.0,VALID
+STATE,0.9314,10.0,0.07,0.93,-0.0187,0.0092,0.0211,0.0297,NOT_ESTIMATED,NOT_ESTIMATED,0.0,VALID
+HYBRID_10,1.0,10.0,0.2224,0.7776,-0.0296,0.0,0.0,0.0347,NOT_ESTIMATED,NOT_ESTIMATED,0.0267,VALID

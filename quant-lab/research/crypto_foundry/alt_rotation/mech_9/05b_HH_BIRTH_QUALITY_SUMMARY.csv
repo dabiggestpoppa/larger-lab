@@ -1,0 +1,2 @@
+n_episodes,n_long_lived,n_short_lived,cv_auc,cv_logloss,cv_brier,n_folds,perm_p
+79,29,50,0.6746233766233767,0.6692515044183331,0.23262794093920877,5,0.8006644518272426

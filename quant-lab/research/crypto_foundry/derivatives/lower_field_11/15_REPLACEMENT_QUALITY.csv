@@ -1,0 +1,6 @@
+quality_quartile,n,med_quality_delta,p_absorbed,p_propagated,quality_auc_absorbed,turnover_auc_absorbed,note
+0,549,-0.0678,0.1311,0.2696,,,
+1,548,-0.0146,0.1405,0.2847,,,
+2,548,0.0106,0.1168,0.2993,,,
+3,548,0.0605,0.1204,0.3066,,,
+VERDICT,2193,,,,0.5068,0.718,quality vs quantity of replacement for absorption

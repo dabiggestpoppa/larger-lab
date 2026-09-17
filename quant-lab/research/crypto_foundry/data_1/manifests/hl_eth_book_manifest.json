@@ -1,0 +1,20 @@
+{
+  "dataset_id": "hl_eth_book",
+  "venue": "hyperliquid",
+  "market": "ETH-PERP",
+  "source": "hyperliquid_rest",
+  "source_endpoint_or_contract": "https://api.hyperliquid.xyz/info (l2Book)",
+  "collector_version": "1.1.0",
+  "schema_version": "1.0.0",
+  "first_timestamp": null,
+  "last_timestamp": null,
+  "row_count": 1,
+  "sha256": "d816eb3ebab1f634fb83d20c9cc861c88bcb635a31e6a44beed6e84d076e736a",
+  "created_at_utc": "2026-08-21T16:54:13.500952+00:00",
+  "duplicate_count": 0,
+  "missing_interval_summary": null,
+  "known_limitations": [
+    "Single L2 snapshot"
+  ],
+  "status": "VALID"
+}

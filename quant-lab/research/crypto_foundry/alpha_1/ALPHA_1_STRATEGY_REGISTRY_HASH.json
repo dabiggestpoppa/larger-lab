@@ -1,0 +1,11 @@
+{
+  "hash_algorithm": "SHA-256",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "reason": "ALPHA-1.1 repairs BEFORE PnL",
+  "no_results_seen": true,
+  "contract_count": 13,
+  "new_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "old_registry_hash": "5f7c3b6024a6e5767cd49b49084c84795ef0b89ca8fcf65feb42eaa17bcbf5a7",
+  "new_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "old_hash": "5f7c3b6024a6e5767cd49b49084c84795ef0b89ca8fcf65feb42eaa17bcbf5a7"
+}

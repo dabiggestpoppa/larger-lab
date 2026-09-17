@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "dexpaprika_pairs_weth_usdc",
+  "method": "GET",
+  "url": "https://api.dexpaprika.com/api/v1/pairs/ethereum/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+  "request_params": null,
+  "request_json": null,
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:06:28+00:00",
+  "http_status": 404,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "8699bf1eda7e016dec3efeff8db5e3400183e9ebf6ce42355b97b843def2b035",
+  "bytes": 24,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "probe may 404 if pair address unknown; recorded as-is",
+  "notes": "specific pair detail (created_at / liquidity history?)",
+  "final_url": "https://api.dexpaprika.com/api/v1/pairs/ethereum/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+  "response_headers_safe": {
+    "Date": "Mon, 24 Aug 2026 14:06:27 GMT",
+    "Content-Type": "application/json",
+    "Content-Length": "24",
+    "Connection": "keep-alive",
+    "CF-Ray": "a302eaec1bc57ac0-EWR",
+    "CF-Cache-Status": "BYPASS",
+    "Server": "cloudflare",
+    "Vary": "Origin, accept-encoding",
+    "h-hap": "01",
+    "x-api-plan": "keyless",
+    "Report-To": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=HpPwXmybmsLx0L7WzaIzAos0qWkOuEC16YbdbDcG8WAfFOiMx%2FypGZbwUaESk0IdCgkOtQkbTO%2FfGiE%2Fl3%2B2kjxThpoIlSrRJq2qGWSFxwlrE3HvruJM7NY1%2Fktsus5xgBDSuQ%3D%3D\"}]}",
+    "Nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  }
+}

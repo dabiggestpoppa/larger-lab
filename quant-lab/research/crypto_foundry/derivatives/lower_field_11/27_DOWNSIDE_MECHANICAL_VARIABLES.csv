@@ -1,0 +1,7 @@
+mechanical_family,need,status,n,reason
+LEVERAGE/LIQUIDATION,"funding rate, open interest, liquidation data",DATA_BLOCKED,0,No funding/OI/liquidation series in the free-only LF5/8/9/10 substrate (only price/rank/volume/liq_proxy). Constitution forbids paying or scraping restricted sources.
+LIQUIDITY_WITHDRAWAL,"spread/depth asymmetry, order-book depth",DATA_BLOCKED,0,No order-book / spread / depth series in the substrate. volume_24h_usd + vol_prev7_med is the only liquidity proxy available.
+ORDER_FLOW_URGENCY,sell-side imbalance proxies,DATA_BLOCKED,0,No taker/maker flow or imbalance data.
+COLLATERAL/MARGIN,forced-selling / margin-pressure proxies,DATA_BLOCKED,0,No margin/collateral data; liquidation proxies unavailable.
+CORRELATION_COMPRESSION,rising peer correlation under stress,LOCAL,1,peer_corr measured; reused in 29_CORRELATION_COMPRESSION.csv
+VOLUME_PRESSURE,volume surge proxy,LOCAL,1,volume_24h_usd / vol_prev7_med ratio available as a free PIT-safe proxy

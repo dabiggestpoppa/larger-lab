@@ -1,0 +1,9 @@
+law,key_primitives,capacity_dependencies,path_history,shock_species,timescale,rank_dependence,global_dependence,sign_dependence,confidence,status
+ABSORPTION,struct integrity + liquidity + membership stability + prior burden,"struct_integrity, liq_proxy",accumulates (reduces absorption),all; weakest deep-illiquid-stressed,event-naive; kernels exp/power,deeper worse,thin,symmetric; downside contagious,MED-HIGH,SUPPORTED
+REORGANIZATION,physical magnitude + churn + rank migration,low struct integrity,recent reorg raises risk,deep-illiquid-stressed,days-weeks,all,thin,bidirectional,MED,SUPPORTED
+PROPAGATION,peer touch + peer stress + sign asymmetry,weak liq + damaged rank,accumulated burden raises spread,downside stressed,"T1 1-3d, peak 7d",deep more,partial,downside >> upside,HIGH,SUPPORTED
+CONTAINMENT,"liq + rank health (modest), distinct feature set","liq_proxy, rank_vel_7d",partial,local,after peak,weak,none,n/a,LOW-MED,LOCAL
+DECAY,post-peak peer-negative decay,LIQ_NORM,n/a,downside,14-30d half-life,weak,none,downside measured,MED,LOCAL
+REJOIN,rejoin velocity + membership stabilization + rank repair,RECOVERY,faster if prior rejoin,shallow-quiet,days-weeks,weak,partial,upside-favored,MED,SUPPORTED
+DECOUPLING,rank health decay + liquidity + topology replacement + duration,damaged rank + thin liq,multi-mechanism,deep stressed,persistent 30d+,deep,weak,downside,MED,SUPPORTED
+UPSIDE_RECRUITMENT,rejoin + rank recovery + accumulation,RECOVERY+STRUCTURAL,state-local accumulation,all-positive,slow,mid,permission high-breadth,upside-only,LOW,LOCAL

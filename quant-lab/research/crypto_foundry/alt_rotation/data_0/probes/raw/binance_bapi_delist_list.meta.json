@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_bapi_delist_list",
+  "method": "GET",
+  "url": "https://www.binance.com/bapi/futures/v1/public/future/common/delist-list",
+  "request_params": null,
+  "request_json": null,
+  "retrieved_at": "2026-08-24T14:10:59+00:00",
+  "http_status": 404,
+  "ok": true,
+  "error": null,
+  "row_count": 0,
+  "first_record": null,
+  "last_record": null,
+  "sha256": "799b50471e61490e986bfdd869efe6500c5480b8308b22204e51a6ad8c1da3be",
+  "bytes": 139,
+  "access_class": "WEB_ONLY",
+  "notes": "delisted futures archive guess",
+  "known_limitations": "guess at bapi path"
+}

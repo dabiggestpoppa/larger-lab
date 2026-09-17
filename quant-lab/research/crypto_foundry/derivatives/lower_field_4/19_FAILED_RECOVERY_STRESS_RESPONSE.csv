@@ -1,0 +1,6 @@
+class,status,n,reason
+HEALTHY_RESPONSE,DATA_BLOCKED,0,Future rank-health and complete neighbor context are unavailable in LF2 cache
+PRICE_ONLY_RESPONSE,DATA_BLOCKED,0,Future rank-health observations are unavailable
+RANK_ONLY_RESPONSE,DATA_BLOCKED,0,Future rank-health observations are unavailable
+WEAK_RESPONSE,DESCRIPTIVE_ONLY,0,No preregistered joint stress model was run
+NO_RESPONSE,DATA_BLOCKED,0,Future rank-health and peer-basket response are unavailable

@@ -1,0 +1,44 @@
+{
+  "checkpoint": "CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY",
+  "base_commit": "381681fd395b6396fd11e426750038004d614197",
+  "created_at_utc": "2026-08-23T15:13:50.969388+00:00",
+  "decision": "PASS_STATE_TAXONOMY",
+  "reasons": [
+    "MECH-1 parent verified (freeze hashes + PASS decision)",
+    "State definitions preregistered and frozen",
+    "No future leakage (perturbation + truncation invariance)",
+    "Transition matrices completed (1h/4h/8h/24h)",
+    "Path taxonomy completed",
+    "Survival analysis completed (KM, censoring reported)",
+    "Information gain measured (entropy reduction, JS, effect size)",
+    "Null comparisons completed (4 null models)",
+    "Sparse states demoted (fail-closed)",
+    "Redundant states demoted (incremental info gate)",
+    "Convergence family truthfully evaluated (conditional re-test)",
+    "BTC/ETH systemic states analyzed",
+    "No strategy PnL",
+    "No return optimization",
+    "No ML",
+    "No execution",
+    "Promotion registry produced",
+    "Promotion/falsification closure: 25 promoted, 55 falsified",
+    "MECH-1 MARK_INDEX_STRESS reclassified (PROVISIONAL_SUPPORTED)"
+  ],
+  "blocking_issues": [],
+  "evidence": {
+    "freeze_verified": true,
+    "parent_ok": true,
+    "definitions_hash": "171673b82a7249642a7dfe69bf8d87879dfb3591f18352b00a94e05208c658d0",
+    "state_ledger_rows": 6802,
+    "n_promoted": 25,
+    "n_falsified": 55,
+    "registry_rows": 107
+  },
+  "prohibited_verification": {
+    "strategy_pnl_computed": false,
+    "optimization_performed": false,
+    "ml_performed": false,
+    "execution_authorized": false,
+    "alpha_research_started": false
+  }
+}

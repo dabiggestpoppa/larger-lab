@@ -1,0 +1,8 @@
+result,status,reason
+behavioral nearest-neighbor map,DATA_BLOCKED,cache lacks complete PIT feature set required for pre-event matching
+correlation nearest-neighbor map,DATA_BLOCKED,no trailing return matrix in supplied cache
+state-neighbor map,DATA_BLOCKED,complete state/liquidity buckets unavailable
+future rank-health clocks,DATA_BLOCKED,event cache contains pre-event rank velocity but not future rank observations
+true contagion direction,DATA_BLOCKED,peer maps unavailable
+LF3 basket dispersion,DISSOLVE_PRIOR_ARTIFACT,LF4 rebuild uses finite same-date raw returns
+triangle high conditional values,DISSOLVE_PRIOR_LABELING,repaired output labels correlations and residual variance ratios explicitly

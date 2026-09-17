@@ -1,0 +1,3 @@
+result,status,n,reason
+false_loner_sequence_timing,LOW_N,0,insufficient effective false-loner events with peer stress
+shmc_shhm_peer_placement,LOCAL_NODE,0,no incremental value beyond loner x 4-state matrix

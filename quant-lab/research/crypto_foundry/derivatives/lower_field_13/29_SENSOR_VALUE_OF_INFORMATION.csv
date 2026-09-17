@@ -1,0 +1,10 @@
+sensor,question_it_resolves,voi_rank,why,free_source_status,material_to_sign_law
+FUNDING,funding-rate pressure as downside amplifier,HIGH,would directly test leverage-driven forced selling,DATA_BLOCKED (no free-only verified source),YES
+OPEN_INTEREST,OI change around shocks,HIGH,would test position build-up before cascade,DATA_BLOCKED (no free-only verified source),YES
+LIQUIDATIONS,liquidation cascade volumes,HIGH,would directly test forced-selling mechanics,DATA_BLOCKED (no free-only verified source),YES
+ORDER_BOOK_DEPTH,depth at shock time,MEDIUM,would test liquidity withdrawal timing,DATA_BLOCKED (no free-only verified source),PARTIAL
+SPREAD,bid-ask spread at shock time,MEDIUM,would test thin-market amplification,DATA_BLOCKED (no free-only verified source),PARTIAL
+ORDER_FLOW_IMBALANCE,sell-side urgency proxy,HIGH,would test order-flow urgency asymmetry,DATA_BLOCKED (no free-only verified source),YES
+COLLATERAL_MARGIN,collateral stress / margin calls,MEDIUM,would test collateral-driven selling,DATA_BLOCKED (no free-only verified source),PARTIAL
+STABLECOIN_FLOWS,stablecoin in/outflows,LOW,would test aggregate liquidity permission,DATA_BLOCKED (no free-only verified source),PARTIAL
+VERDICT,,HIGHEST=LIQUIDATIONS/ORDER_FLOW/OI/FUNDING,these directly test the forced-selling and urgency hypotheses that the downside gap currently attributes to unknown mechanics,DATA_BLOCKED,

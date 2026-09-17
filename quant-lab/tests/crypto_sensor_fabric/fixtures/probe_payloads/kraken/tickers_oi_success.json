@@ -1,0 +1,18 @@
+{
+  "result": {
+    "tickers": [
+      {
+        "tag": "perpetual",
+        "pair": "XBT:USD",
+        "symbol": "pi_xbtusd",
+        "markPrice": "29510.5",
+        "last": "29508.2",
+        "openInterest": 218.0032,
+        "volumeQuote24h": 118230394.5,
+        "fundingRate": 0.000101,
+        "fundingRatePrediction": 0.000089
+      }
+    ],
+    "serverTime": 1788048000000
+  }
+}

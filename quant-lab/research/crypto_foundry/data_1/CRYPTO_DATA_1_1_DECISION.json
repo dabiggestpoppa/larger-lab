@@ -1,0 +1,28 @@
+{
+  "checkpoint": "CRYPTO-DATA-1.1",
+  "base_commit": "f41e9c09",
+  "timestamp": "2026-08-21T14:58:11.862212+00:00",
+  "decision": "PASS_CANONICAL_CRYPTO_DATA_FOUNDATION",
+  "lanes": {
+    "A_hyperliquid_perp_state": "PASS",
+    "B_binance_historical": "PASS",
+    "C_uniswap_v3": "PASS",
+    "D_base_amm": "PASS"
+  },
+  "quality": {
+    "gates": 19,
+    "passed": 14,
+    "failed": 5,
+    "blocked": 0
+  },
+  "truth_repairs": [
+    "HL funding: flat format + startTime (req=422)",
+    "ETH AMM: direct RPC",
+    "Base: removed malformed URL"
+  ],
+  "prohibited": {
+    "pnl": false,
+    "optimization": false,
+    "alpha": false
+  }
+}

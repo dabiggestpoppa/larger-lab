@@ -1,0 +1,15 @@
+metric,value,definition
+panel_rows_primary_bands,3290806.0,rows ranks 501-2000 (feature frame)
+n_with_sigma,2989851.0,rows with finite continuous causal 1D sigma_t0
+p_ge1sigma_1d,0.1834,unconditional |ret_1d|>=1 sigma
+p_ge2sigma_1d,0.05408,unconditional |ret_1d|>=2 sigma
+p_ge3sigma_1d,0.02248,TRUE unconditional |ret_1d|>=3 sigma
+p_ge4sigma_1d,0.01198,unconditional |ret_1d|>=4 sigma
+p_raw_move_ge10pct,0.151,unconditional |ret_1d|>=10%
+p_raw_move_ge15pct,0.0851,unconditional |ret_1d|>=15%
+count_lensB_sigma3,73881.0,rows passing sigma>=3 lens
+count_lensC_raw15,280060.0,rows passing raw>=15% lens
+count_union_lensB_or_C,186521.0,UNION (sigma>=3 OR raw>=15%)  <-- comparable to ~329k figure
+count_sigma3_and_raw15,58611.0,rows passing BOTH lenses
+share_of_union_that_is_sigma3,0.3961,fraction of union event rows genuinely >=3sigma
+lf1_prior_329k_claim,,"DISSOLVED: 329k = union-of-lenses, not >=3sigma count"

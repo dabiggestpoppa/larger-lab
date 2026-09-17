@@ -1,0 +1,218 @@
+{
+  "n_nodes": 12,
+  "density": 0.0909,
+  "n_edges": 6,
+  "n_components": 8,
+  "components": [
+    [
+      "Tron"
+    ],
+    [
+      "Arbitrum",
+      "Avalanche",
+      "Ethereum",
+      "Polygon",
+      "Solana"
+    ],
+    [
+      "OP Mainnet"
+    ],
+    [
+      "Bitcoin"
+    ],
+    [
+      "Sui"
+    ],
+    [
+      "Hyperliquid L1"
+    ],
+    [
+      "PulseChain"
+    ],
+    [
+      "Cronos"
+    ]
+  ],
+  "articulation_points": [
+    "Ethereum"
+  ],
+  "mean_abs_corr": 0.218,
+  "subperiods": [
+    {
+      "subperiod": "2020-2021",
+      "n_components": 10,
+      "components": [
+        [
+          "Ethereum",
+          "Polygon",
+          "Tron"
+        ],
+        [
+          "Solana"
+        ],
+        [
+          "Arbitrum"
+        ],
+        [
+          "Avalanche"
+        ],
+        [
+          "OP Mainnet"
+        ],
+        [
+          "Bitcoin"
+        ],
+        [
+          "Sui"
+        ],
+        [
+          "Hyperliquid L1"
+        ],
+        [
+          "PulseChain"
+        ],
+        [
+          "Cronos"
+        ]
+      ]
+    },
+    {
+      "subperiod": "2022",
+      "n_components": 12,
+      "components": [
+        [
+          "Tron"
+        ],
+        [
+          "Ethereum"
+        ],
+        [
+          "Solana"
+        ],
+        [
+          "Arbitrum"
+        ],
+        [
+          "Avalanche"
+        ],
+        [
+          "Polygon"
+        ],
+        [
+          "OP Mainnet"
+        ],
+        [
+          "Bitcoin"
+        ],
+        [
+          "Sui"
+        ],
+        [
+          "Hyperliquid L1"
+        ],
+        [
+          "PulseChain"
+        ],
+        [
+          "Cronos"
+        ]
+      ]
+    },
+    {
+      "subperiod": "2023",
+      "n_components": 11,
+      "components": [
+        [
+          "Tron"
+        ],
+        [
+          "Ethereum"
+        ],
+        [
+          "Bitcoin",
+          "Solana"
+        ],
+        [
+          "Arbitrum"
+        ],
+        [
+          "Avalanche"
+        ],
+        [
+          "Polygon"
+        ],
+        [
+          "OP Mainnet"
+        ],
+        [
+          "Sui"
+        ],
+        [
+          "Hyperliquid L1"
+        ],
+        [
+          "PulseChain"
+        ],
+        [
+          "Cronos"
+        ]
+      ]
+    },
+    {
+      "subperiod": "2024",
+      "n_components": 3,
+      "components": [
+        [
+          "Arbitrum",
+          "Avalanche",
+          "Cronos",
+          "Ethereum",
+          "Hyperliquid L1",
+          "Polygon",
+          "PulseChain",
+          "Solana",
+          "Sui",
+          "Tron"
+        ],
+        [
+          "OP Mainnet"
+        ],
+        [
+          "Bitcoin"
+        ]
+      ]
+    },
+    {
+      "subperiod": "2025-2026",
+      "n_components": 7,
+      "components": [
+        [
+          "Tron"
+        ],
+        [
+          "Arbitrum",
+          "Avalanche",
+          "Bitcoin",
+          "Ethereum",
+          "Polygon",
+          "Solana"
+        ],
+        [
+          "OP Mainnet"
+        ],
+        [
+          "Sui"
+        ],
+        [
+          "Hyperliquid L1"
+        ],
+        [
+          "PulseChain"
+        ],
+        [
+          "Cronos"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+feature,target,spearman,p,static,note
+abs_ret,early_reach_1d,0.0501,0.0028,1D,
+cap_structural,early_reach_1d,-0.0201,0.2303,1D,
+cap_liquidity,early_reach_1d,-0.0155,0.3565,1D,
+cap_rankhealth,early_reach_1d,-0.0299,0.075,1D,
+peer_stress,early_reach_1d,0.0086,0.6092,1D,
+roll_peer_neg_frac_3D,early_reach_1d,-0.0126,0.4526,ROLLING,
+roll_peer_neg_frac_7D,early_reach_1d,-0.0002,0.9884,ROLLING,
+roll_peer_neg_frac_14D,early_reach_1d,0.001,0.9533,ROLLING,
+DOWNSIDE_vs_UPSIDE,early_reach_1d,-0.0075,0.4367,SIGN_GAP,
+VERDICT,,FAST_REACH_DETERMINANTS,,,"early reach is driven by shock magnitude and local stress more than capacity coordinates; rolling reach tracks it — fast propagation begins when peers already co-move, before capacity exhaustion"

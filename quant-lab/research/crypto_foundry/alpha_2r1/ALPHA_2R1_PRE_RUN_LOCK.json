@@ -1,0 +1,21 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-2R1-PRICE-PATH-ENGINE-TRUTH-SEAL-AND-FINAL-REPLAY",
+  "lock_timestamp": "2026-08-24T14:00:00Z",
+  "base_sha": "e3090083a5aa99d205c34f4047382482ed663ce8",
+  "scientific_parent": "5a6a4407b042b0ca6013a1c71e0241c6fefae433",
+  "sealed_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "registry_hash_verified": true,
+  "no_strategy_contract_changed": true,
+  "engine_repairs": [
+    "PRICE_SOURCE_FIX: strict (asset, market_type, source) key isolation",
+    "EXIT_PRICE_FIX: next_bar_open instead of current bar close",
+    "FUNDING_SIGN_FIX: LONG pays when funding > 0",
+    "FUNDING_FREQUENCY_FIX: hourly settlements using actual observations",
+    "F8_CONTROL_GATE_FIX: mechanical PF comparison",
+    "SIGNAL_LEDGER_FREEZE: signals frozen before execution replay"
+  ],
+  "quarantined_runs": {
+    "ALPHA2_21a426f1": "QUARANTINED_ENGINE_ERROR",
+    "ALPHA2R_e3090083": "QUARANTINED_REPLAY_INTEGRITY"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "hyperliquid_funding_btc_oldest",
+  "method": "POST",
+  "url": "https://api.hyperliquid.xyz/info",
+  "request_params": null,
+  "request_json": {
+    "type": "fundingHistory",
+    "coin": "BTC",
+    "startTime": 0,
+    "endTime": 2000000000000
+  },
+  "request_headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+    "Accept": "application/json"
+  },
+  "retrieved_at": "2026-08-24T14:06:51+00:00",
+  "http_status": 200,
+  "ok": true,
+  "error": null,
+  "row_count": 500,
+  "first_record": {
+    "coin": "BTC",
+    "fundingRate": "-0.0006133368",
+    "premium": "-0.0009133368",
+    "time": 1683849600048
+  },
+  "last_record": {
+    "coin": "BTC",
+    "fundingRate": "0.0000197945",
+    "premium": "0.0001583562",
+    "time": 1687687200201
+  },
+  "sha256": "aff6213fba21d02999686abd7f69f427f67233fe856359876c1ff98815db7999",
+  "bytes": 44817,
+  "access_class": "PUBLIC",
+  "historical_date": null,
+  "known_limitations": "500-row window; oldest returned when startTime=0",
+  "notes": "oldest BTC funding records (INFERRED first-existence lower bound)",
+  "final_url": "https://api.hyperliquid.xyz/info",
+  "response_headers_safe": {
+    "Content-Type": "application/json",
+    "Content-Length": "44817",
+    "Connection": "keep-alive",
+    "Server": "nginx/1.22.1",
+    "Date": "Mon, 24 Aug 2026 14:06:50 GMT",
+    "access-control-expose-headers": "*",
+    "access-control-allow-origin": "*",
+    "vary": "origin, access-control-request-method, access-control-request-headers",
+    "X-Cache": "Miss from cloudfront",
+    "Via": "1.1 27d6451eef68b8beda74f9749214fe2c.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Pop": "BOS50-P1",
+    "X-Amz-Cf-Id": "6CN0wjwBUfTVOrxivHNZLIg8AnLZHNpn9kgqGeM7Fx7yupVSujAiFw=="
+  }
+}

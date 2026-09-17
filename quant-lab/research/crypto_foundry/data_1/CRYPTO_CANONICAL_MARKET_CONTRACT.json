@@ -1,0 +1,119 @@
+{
+  "contract_version": "1.0.0",
+  "registered_at": "2026-08-20",
+  "lanes": {
+    "A_PERP_STATE": {
+      "venue": "Hyperliquid",
+      "chain": "Hyperliquid L1",
+      "access": "PUBLIC_DATA_NO_EXECUTION",
+      "markets": [
+        {
+          "market_id": "BTC-PERP",
+          "base_asset": "BTC",
+          "quote_asset": "USD",
+          "instrument_type": "perpetual",
+          "margin_type": "cross",
+          "max_leverage": 40,
+          "tick_size": "0.1",
+          "size_increment": "0.00001",
+          "taker_fee": "0.00025",
+          "maker_fee": "0.00020",
+          "funding_interval_hours": 1
+        },
+        {
+          "market_id": "ETH-PERP",
+          "base_asset": "ETH",
+          "quote_asset": "USD",
+          "instrument_type": "perpetual",
+          "margin_type": "cross",
+          "max_leverage": 25,
+          "tick_size": "0.01",
+          "size_increment": "0.0001",
+          "taker_fee": "0.00025",
+          "maker_fee": "0.00020",
+          "funding_interval_hours": 1
+        }
+      ]
+    },
+    "B_SPOT_REFERENCE": {
+      "venue": "Binance",
+      "chain": "CEX",
+      "access": "RESEARCH_DATA_ONLY",
+      "markets": [
+        {
+          "market_id": "BTCUSDT",
+          "base_asset": "BTC",
+          "quote_asset": "USDT",
+          "instrument_type": "spot",
+          "historical_available": "2017-07",
+          "existing_local_file": "btc_usdt_1460d.json",
+          "existing_sha256": "e9c977e3ba9a027dcc6be35ee1d57acc3dcc4fc2ca5853b547f33fd02d8c9625"
+        },
+        {
+          "market_id": "ETHUSDT",
+          "base_asset": "ETH",
+          "quote_asset": "USDT",
+          "instrument_type": "spot",
+          "historical_available": "2017-07",
+          "existing_local_file": "eth_usdt_1460d.json",
+          "existing_sha256": "88fbaae38587b822cd568832f0e12f07788dae2c258de0d663373cb9b2a32299"
+        }
+      ]
+    },
+    "C_ETHEREUM_AMM": {
+      "venue": "Uniswap v3",
+      "chain": "Ethereum",
+      "chain_id": 1,
+      "access": "PERMISSIONLESS",
+      "pools": [
+        {
+          "market_id": "WETH-USDC-500",
+          "base_asset": "WETH",
+          "quote_asset": "USDC",
+          "pool_address": "0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640",
+          "fee_tier": "0.05%",
+          "fee_tick_spacing": 10,
+          "token0": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "token1": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "token0_name": "USDC",
+          "token1_name": "WETH",
+          "launch_date": "2021-05-05",
+          "status": "TO_VERIFY_IN_DATA1"
+        },
+        {
+          "market_id": "WBTC-USDC-3000",
+          "base_asset": "WBTC",
+          "quote_asset": "USDC",
+          "pool_address": "0x99ac8cA7087fA4A2A1FB6357269965A2014ABc35",
+          "fee_tier": "0.30%",
+          "fee_tick_spacing": 60,
+          "launch_date": "2021-05-05",
+          "status": "TO_VERIFY_IN_DATA1",
+          "wrapper_note": "WBTC is custodial wrapped BTC (BitGo). Wrapper risk documented."
+        }
+      ]
+    },
+    "D_BASE_AMM": {
+      "venue": "Aerodrome / Uniswap v3",
+      "chain": "Base",
+      "chain_id": 8453,
+      "access": "PERMISSIONLESS",
+      "candidates": [
+        {
+          "market_id": "WETH-USDC",
+          "status": "SELECTION_PENDING",
+          "note": "Verify deepest canonical pool between Aerodrome CL and Uniswap v3 on Base"
+        },
+        {
+          "market_id": "cbBTC-USDC",
+          "status": "SELECTION_PENDING",
+          "note": "Verify pool addresses and fee tiers in DATA-1"
+        }
+      ]
+    }
+  },
+  "options_lp": {
+    "status": "DATA-2_CANDIDATE",
+    "not_in_scope": "DATA-1"
+  }
+}

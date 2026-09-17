@@ -1,0 +1,27 @@
+{
+  "contract_id": "ALPHA1_METRIC_V1",
+  "frozen_at": "2026-08-23T15:51:23Z",
+  "description": "Metrics to be computed by ALPHA-2 for each strategy. These are preregistered; do NOT compute them in ALPHA-1.",
+  "metrics": [
+    "trade_count",
+    "trade_frequency_per_day",
+    "win_rate",
+    "mean_R",
+    "median_R",
+    "gross_profit_factor",
+    "net_profit_factor",
+    "payoff_ratio",
+    "p5_outcome_R",
+    "worst_outcome_R",
+    "max_drawdown_R",
+    "max_losing_streak",
+    "mean_MAE_R",
+    "mean_MFE_R",
+    "mean_holding_time_hours",
+    "cost_share_of_PnL",
+    "funding_contribution_R",
+    "subperiod_PF (split by month)",
+    "state_concentration (Herfindahl across states)",
+    "asset_concentration"
+  ]
+}

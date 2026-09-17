@@ -1,0 +1,13 @@
+node,role,evidence
+STATE_AGE,STRUCTURAL_CORE,age overlays state but is not a universal clock (MECH-16 UNSTABLE_CLOCK)
+ENTROPY_RESPONSE,ADAPTIVE_LAW,entropy topology survives; response drifts (MECH-16 ENTROPY_RESPONSE_DRIFT)
+COMMON_FORCING,ADAPTIVE_LAW,single scalar drifts; family decomposition preferred (MECH-16 FULL_FORCING_DRIFT)
+THRESHOLD_HIERARCHY,ADAPTIVE_LAW,subperiod half-sat drift span mean=2.813
+PHYSICAL_VS_SIGMA_EFFECT,LOCAL_PHYSICS,"regime-modulated, patch-local"
+BIRTH_GEOMETRY,ADAPTIVE_LAW,birth geometry drifts; stage-dependent trajectory
+SATURATION_LAW,ADAPTIVE_LAW,node-drift half-sat std=1.339
+TRAFFIC_DEMAND,ADAPTIVE_LAW,composite participation/recruitment descriptor
+CAPACITY,LOCAL_PHYSICS,state-local response ceiling
+CONGESTION,LOCAL_PHYSICS,demand/capacity within state
+EXIT_PRESSURE,STRUCTURAL_CORE,branch geometry; directional-narrowing input
+TRANSFER_EFFICIENCY,ADAPTIVE_LAW,realized propagation per unit demand; drifts

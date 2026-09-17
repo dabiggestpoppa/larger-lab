@@ -1,0 +1,6 @@
+species,n,mem_auc_absorbed,abs_spearman,p,note
+SHALLOW_QUIET,1676,0.5849,0.12,0.0,
+DEEP_ILLIQ_STRESSED,198,0.6846,0.195,0.006,
+UPSIDE,611,0.4616,0.105,0.009,
+DOWNSIDE,1263,0.5868,0.122,0.0,
+VERDICT,3647,SPECIES_DEPENDENT_MEMORY,,,memory-AUC range across species = 0.223; downside memory (0.59) > upside (0.46) - no universal local clock

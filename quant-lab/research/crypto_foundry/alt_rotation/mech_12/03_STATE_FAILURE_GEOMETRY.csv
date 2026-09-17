@@ -1,0 +1,5 @@
+cell,verdict,first_lag_d,first_coord,n_sig_pairs,n_sig_at_first_lag
+HIGH_BREADTH_HIGH_DISP,DIFFERENT_AT_BIRTH,0,top500_breadth_30d,24,6
+HIGH_BREADTH_LOW_DISP,DIFFERENT_AT_BIRTH,0,top500_breadth_30d,18,4
+LOW_BREADTH_HIGH_DISP,DIFFERENT_AT_BIRTH,0,vol_med,6,2
+LOW_BREADTH_LOW_DISP,DIFFERENT_AT_BIRTH,0,top500_dispersion_30d,10,2

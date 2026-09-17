@@ -1,0 +1,6 @@
+exit,n,share,static_rank_vel_7d,static_recovery_index,roll_peer_neg_30D,timescale,note
+REJOIN_OLD,0,0.0,n/a,n/a,n/a,30-60D window,
+JOIN_NEW,684,0.6726,60.9751,0.7899,0.5039,30-60D window,
+RANK_DETERIORATION,349,0.3432,-11.788,0.6373,0.4871,30-60D window,
+CONTINUED_ISOLATION,495,0.4867,0.8889,0.5204,0.4943,30-60D window,
+VERDICT,,DOMINATED_BY_ISOLATION_AND_RANK_DECAY,,,,,"continued isolation and rank deterioration dominate exits; REJOIN_OLD=0 is a partition artifact (rejoin and decouple are mutually exclusive same-window outcomes in LF8), so rejoin must be measured on a later window — decoupling reads as terminal asset-health placement in this panel; no universal clock"

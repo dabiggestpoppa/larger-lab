@@ -1,0 +1,72 @@
+{
+  "contract_id": "ALPHA1_1_FALSIFICATION_V2",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "description": "Automatic rejection conditions for ALPHA-2. A strategy is FALSIFIED if any condition is met.",
+  "rules": [
+    {
+      "rule_id": "F1",
+      "condition": "trade_count < 20",
+      "reason": "INSUFFICIENT_EVENTS"
+    },
+    {
+      "rule_id": "F2",
+      "condition": "trade_count < 50 (FLAG, not auto-falsify)",
+      "reason": "SPARSE_EVENTS (flagged but not automatic rejection if net edge > 0)"
+    },
+    {
+      "rule_id": "F3",
+      "condition": "net_profit_factor <= 1.0 at BASE_COST",
+      "reason": "NO_NET_EDGE"
+    },
+    {
+      "rule_id": "F4",
+      "condition": "gross_profit_factor <= 1.0",
+      "reason": "NO_GROSS_EDGE"
+    },
+    {
+      "rule_id": "F5",
+      "condition": "net_profit_factor drops >30% at STRESS_COST_2X",
+      "reason": "COST_FRAGILITY"
+    },
+    {
+      "rule_id": "F6",
+      "condition": "single_trade_dominates_gt_50pct_total_R",
+      "reason": "SINGLE_EVENT_DOMINATION"
+    },
+    {
+      "rule_id": "F7",
+      "condition": "single_month_dominates_gt_50pct_total_R",
+      "reason": "ONE_PERIOD_DOMINATION"
+    },
+    {
+      "rule_id": "F8",
+      "condition": "control_net_PF >= strategy_net_PF (CI overlap)",
+      "reason": "STATE_ADDS_NO_VALUE",
+      "method": "paired_bootstrap_difference",
+      "n_resamples": 10000,
+      "seed": 31082026,
+      "ci_level": 0.95
+    },
+    {
+      "rule_id": "F9",
+      "condition": "future_perturbation_breaks_state_labels",
+      "reason": "FUTURE_LEAKAGE"
+    },
+    {
+      "rule_id": "F10",
+      "condition": "mean_holding_time < 2 bar periods",
+      "reason": "UNEXECUTABLE_TIMING"
+    },
+    {
+      "rule_id": "F11",
+      "condition": "causal_violation_detected",
+      "reason": "CAUSALITY_BREACH"
+    },
+    {
+      "rule_id": "F12",
+      "condition": "turnover > 100 roundtrips per month",
+      "reason": "UNREASONABLE_TURNOVER"
+    }
+  ],
+  "no_changing_rules_after_results": true
+}

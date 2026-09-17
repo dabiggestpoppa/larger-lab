@@ -1,0 +1,21 @@
+driver,feature,outcome,spearman,p,purged_auc,n,layer,status,note,best_abs_auc,n_links
+structural_integrity,struct_integrity,absorbed,0.24,0.0,0.7601,3647.0,,,,,
+structural_integrity,struct_integrity,propagated,-0.025,0.136,0.5129,3647.0,,,,,
+current_shock_load,abs_ret,reorganized,0.107,0.0,0.5248,3647.0,,,,,
+current_shock_load,abs_ret,propagated,-0.071,0.0,0.5599,3647.0,,,,,
+accumulated_load,mem_exp_sum,absorbed,0.116,0.0,0.5937,1874.0,,,,,
+accumulated_load,cnt_prev_90d,persistent,-0.02,0.501,0.4948,1128.0,,,,,
+absorption_capacity,liq_proxy,absorbed,0.166,0.0,0.6752,3556.0,,,,,
+absorption_capacity,peer_corr,absorbed,0.014,0.389,0.5136,3647.0,,,,,
+relational_reorganization,roll_turnover_30d,reorganized,0.229,0.0,0.6318,3646.0,,,,,
+propagation_susceptibility,peer_stress,propagated,-0.003,0.835,0.4839,3647.0,,,,,
+propagation_susceptibility,peer_touch_frac1,propagated,-0.004,0.801,0.4698,3647.0,,,,,
+containment_decay,liq_proxy,propagated,-0.1,0.0,0.5642,3556.0,,,,,
+containment_decay,rank_vel_7d,propagated,-0.171,0.0,0.6064,3647.0,,,,,
+,,,,,,,structural_integrity,SUPPORTED,measured link(s),0.7601,2.0
+,,,,,,,current_shock_load,LOCAL,measured link(s),0.5599,2.0
+,,,,,,,accumulated_load,SUPPORTED,measured link(s),0.5937,2.0
+,,,,,,,absorption_capacity,SUPPORTED,measured link(s),0.6752,2.0
+,,,,,,,relational_reorganization,SUPPORTED,measured link(s),0.6318,1.0
+,,,,,,,propagation_susceptibility,LOCAL,measured link(s),0.4839,2.0
+,,,,,,,containment_decay,SUPPORTED,measured link(s),0.6064,2.0

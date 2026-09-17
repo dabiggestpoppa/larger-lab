@@ -1,0 +1,7 @@
+family_id,strategies,gross_EV_range,net_EV_range,gross_positive_count,net_positive_count,f8_triggered_count,dominant_falsification_rules,state_beats_control,directional_vs_rv_observation
+FAM_A,ALPHA1_S001;ALPHA1_S002;ALPHA1_S003,-1.01 to 13.45,-5.93 to 1.28,2,2,0,F10(2);F6(2);F7(2),PARTIAL,DEFER_TO_ALPHA3
+FAM_B,ALPHA1_S004;ALPHA1_S005;ALPHA1_S006,-17.28 to 0.55,-21.47 to -4.24,1,0,1,F3(3);F2(2);F4(2),PARTIAL,DEFER_TO_ALPHA3
+FAM_C,ALPHA1_S007;ALPHA1_S008,-9.18 to 3.05,-21.33 to -1.75,1,0,0,F3(2);F6(1);F7(1),PARTIAL,DEFER_TO_ALPHA3
+FAM_D,ALPHA1_S009;ALPHA1_S010,-7.46 to 0.59,-12.29 to -11.82,1,0,0,F3(2);F4(1),PARTIAL,DEFER_TO_ALPHA3
+FAM_E,ALPHA1_S011;ALPHA1_S012,4.76 to 7.90,-4.48 to -0.19,2,0,2,F3(2);F6(2);F7(2),NO,DEFER_TO_ALPHA3
+FAM_X,ALPHA1_S013,3.94 to 3.94,-1.18 to -1.18,1,0,0,F3(1);F6(1);F7(1),PARTIAL,DEFER_TO_ALPHA3

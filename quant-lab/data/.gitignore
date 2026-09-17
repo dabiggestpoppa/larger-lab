@@ -1,0 +1,6 @@
+# Raw live probe evidence captures (SENSOR-B2-I13).
+# These are probe-run artifacts with timestamps/hashes/params, not the sanitized
+# packet. The sanitized evidence packet lives under research/sensor_fabric/evidence
+# and IS committed. The raw captures are repro/audit scratch and must not be committed.
+*
+!.gitignore

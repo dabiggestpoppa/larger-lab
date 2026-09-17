@@ -1,0 +1,21 @@
+{
+  "$schema_comment": "Machine-readable semantic contract for BINANCE_USDM isBuyerMaker -> aggressor_side. Frozen by operator repair SENSOR-B1-R01. The transformation implementation belongs to Bloc 2/5 provider semantics; Bloc 1 only freezes the direction.",
+  "provider": "BINANCE_USDM",
+  "source_metric": "isBuyerMaker",
+  "canonical_sensor": "MECHANICAL_TRADE",
+  "canonical_field": "aggressor_side",
+  "methodology_id": "AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1",
+  "status": "PROVISIONAL",
+  "cases": [
+    {
+      "isBuyerMaker": true,
+      "economic_meaning": "buyer is maker; seller is taker/aggressor",
+      "expected_aggressor_side": "SELL"
+    },
+    {
+      "isBuyerMaker": false,
+      "economic_meaning": "buyer is taker/aggressor",
+      "expected_aggressor_side": "BUY"
+    }
+  ]
+}

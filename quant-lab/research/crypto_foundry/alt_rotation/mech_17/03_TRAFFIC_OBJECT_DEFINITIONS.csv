@@ -1,0 +1,9 @@
+object,definition,inputs,pit_safe,response,object_type,provisional,final_verdict
+TRAFFIC_DEMAND,"daily composite of participation (breadth_vel, pos_ret_share), rank recruitment (rank_depth_rel), dispersion growth, spatial activation","breadth_vel,pos_ret_share,rank_depth_rel,top500_dispersion_7d,spatial_activation",True,none (state descriptor),DEMAND,CANDIDATE,PROMOTE
+CAPACITY,per-surface-cell response ceiling: logistic ceiling of field activation vs demand/forcing within the cell,"activation(FIELD), demand, forcing",True,none,CAPACITY,CANDIDATE,PROMOTE
+CONGESTION,standardized demand relative to cell capacity (demand/capacity ratio within state),"demand, capacity",True,none,CONGESTION,CANDIDATE,LOCAL
+EXIT_PRESSURE,"branch structure of forward 6-cell exits: branch entropy, dominant share p1, k, concentration",grp6 next-7 window,True,none,EXIT,CANDIDATE,PROMOTE
+TRANSFER_EFFICIENCY,"realized propagation per unit demand/forcing (prop7/demand, incremental breadth/demand)","prop7, demand, forcing",True,prop7,EFFICIENCY,CANDIDATE,PROMOTE
+SATURATION_LAW,"per-patch activation-vs-forcing logistic half-sat x0, slope k, ceiling","act[patch], forcing",True,act[patch],SATURATION,CANDIDATE,PROMOTE
+THRESHOLD_BAND,forcing levels at P_act = 0.10/0.30/0.70/0.90 per patch -> DORMANT/LOW/TRANSITION/HIGH/SATURATED,"pact[patch], forcing",True,pact[patch],THRESHOLD,CANDIDATE,PROMOTE
+HYSTERESIS,activation under rising vs falling forcing at same forcing level,"act[patch], forcing diff",True,act[patch],SATURATION,PILOT,PILOT

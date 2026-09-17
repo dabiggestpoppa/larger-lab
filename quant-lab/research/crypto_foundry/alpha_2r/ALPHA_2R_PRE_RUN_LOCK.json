@@ -1,0 +1,31 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-2R-ENGINE-TRUTH-REPAIR-AND-SEALED-REPLAY",
+  "lock_timestamp": "2026-08-24T12:00:00Z",
+  "scientific_parent": "5a6a4407b042b0ca6013a1c71e0241c6fefae433",
+  "branch_head_start": "922ddf48",
+  "quarantined_alpha2_commit": "21a426f1c33445e33f51cdc86c6d2dfed2b7ddd5",
+  "sealed_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "registry_hash_verified": true,
+  "no_strategy_contract_changed": true,
+  "old_results_status": "QUARANTINED_ENGINE_ERROR",
+  "repairs": [
+    "FUNDING_SIGN: LONG pays when funding > 0 (Hyperliquid venue convention)",
+    "FUNDING_FREQUENCY: hourly settlements using actual Hyperliquid observations",
+    "F8_CONTROL_GATE: mechanical PF comparison trigger",
+    "CONTROL_MAPPING: all 13 strategies audited for F8 applicability"
+  ],
+  "frozen_artifacts": {
+    "ALPHA_1_STRATEGY_CONTRACTS.json": "UNTOUCHED",
+    "ALPHA_1_STRATEGY_HYPOTHESIS_REGISTRY.csv": "UNTOUCHED",
+    "ALPHA_1_CONTROL_REGISTRY.csv": "UNTOUCHED",
+    "ALPHA_1_FALSIFICATION_RULES.json": "UNTOUCHED",
+    "ALPHA_1_STRATEGY_REGISTRY_HASH.json": "UNTOUCHED",
+    "ALPHA_1_1_THRESHOLD_CONTRACT.json": "UNTOUCHED",
+    "ALPHA_1_1_CONTROL_SAMPLING_CONTRACT.json": "UNTOUCHED",
+    "ALPHA_1_1_EXECUTION_CONTRACT.json": "UNTOUCHED",
+    "ALPHA_1_1_FUNDING_ACCOUNTING_CONTRACT.json": "UNTOUCHED",
+    "ALPHA_1_1_COST_ACCOUNTING_CONTRACT.json": "UNTOUCHED",
+    "ALPHA_1_1_BACKTEST_CONTRACT.json": "UNTOUCHED",
+    "ALPHA_1_1_STATE_COVERAGE_MATRIX.csv": "UNTOUCHED"
+  }
+}

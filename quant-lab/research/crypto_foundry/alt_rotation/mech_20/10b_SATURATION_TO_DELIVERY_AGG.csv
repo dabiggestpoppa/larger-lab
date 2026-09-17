@@ -1,0 +1,7 @@
+first_changed,n_episodes,frac
+threshold,45,0.308
+forcing,44,0.301
+exit_pressure,40,0.274
+gain,9,0.062
+transfer,5,0.034
+ceiling,3,0.021

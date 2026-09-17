@@ -1,0 +1,10 @@
+feature,n,absorption_pointbiserial,containment_pointbiserial,absorption_purged_auc,containment_purged_auc,law_separation,note,verdict
+peer_corr,3647,0.013,-0.051,0.5136,0.524,-0.0104,,
+liq_proxy,3556,0.162,0.107,0.6752,0.5642,0.111,,
+roll_turnover_30d,3646,-0.303,0.003,0.8318,0.4808,0.3511,,
+peer_stress,3647,-0.094,0.003,0.5713,0.4839,0.0874,,
+vol_30d,3647,-0.012,0.02,0.6099,0.5539,0.056,,
+rank,3647,-0.173,-0.079,0.7136,0.547,0.1666,,
+struct_integrity,3647,0.244,0.033,0.7601,0.5129,0.2472,,
+mem_exp_sum,1874,0.065,0.035,0.5937,0.5128,0.0809,,
+VERDICT,3647,,,,,,feature-rank distinctness=0.625,DISTINCT_LAWS

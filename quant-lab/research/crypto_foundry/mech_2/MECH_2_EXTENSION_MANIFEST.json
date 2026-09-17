@@ -1,0 +1,18 @@
+{
+  "checkpoint": "CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY",
+  "policy": "preregistered 30d AMM extensions; frozen window 2026-07-21..2026-08-21",
+  "files": {
+    "eth_weth_usdc_swap_30d": {
+      "sha256": "218ef921ce05e46d449295845f522d647ac687fbebe05dfd488f8d5e401a5d49",
+      "records": 144697
+    },
+    "eth_wbtc_usdc_swap_30d": {
+      "sha256": "6bcd9a2096957e1129ec3b92e5996669d0251dbd8f70881948643b6cd7721857",
+      "records": 4864
+    },
+    "base_weth_usdc_swap_30d": {
+      "sha256": "046c804e4818389b192aeadbcb9c0f366cd5143b8b4a03204999545052795829",
+      "records": 150195
+    }
+  }
+}

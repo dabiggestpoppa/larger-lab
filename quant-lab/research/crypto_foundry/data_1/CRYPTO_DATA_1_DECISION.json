@@ -1,0 +1,51 @@
+{
+  "checkpoint": "CRYPTO-DATA-1-CANONICAL-COLLECTOR-FOUNDATION",
+  "base_commit": "761ee00c2c41ca68998e3c7ad0e9d61c58c9d5cb",
+  "timestamp": "2026-08-21",
+  "decision": "PASS_CANONICAL_CRYPTO_DATA_FOUNDATION",
+  "lanes": {
+    "A_hyperliquid_perp_state": {
+      "status": "PASS",
+      "markets": ["BTC-PERP", "ETH-PERP"],
+      "us_execution": "RESTRICTED / NOT AUTHORIZED",
+      "us_data": "ACCEPT_PRIMARY"
+    },
+    "B_binance_historical_spot": {
+      "status": "PASS",
+      "markets": ["BTCUSDT", "ETHUSDT"],
+      "live_api_status": "BLOCKED_451",
+      "local_file_status": "VERIFIED"
+    },
+    "C_uniswap_v3_ethereum": {
+      "status": "BLOCKED",
+      "blocker": "The Graph gateway requires API key auth"
+    },
+    "D_base_amm": {
+      "status": "PARTIAL",
+      "blocker": "Subgraph auth + pool verification needed"
+    }
+  },
+  "quality_gates": {
+    "HL_BTC": "4/4 passed",
+    "HL_ETH": "4/4 passed",
+    "BN_BTCUSDT": "4/4 passed",
+    "BN_ETHUSDT": "4/4 passed"
+  },
+  "nautilus_audit": {
+    "binance": "IMPORTABLE",
+    "hyperliquid": "IMPORTABLE",
+    "coinbase_intx": "IMPORTABLE",
+    "bybit": "IMPORTABLE",
+    "okx": "IMPORTABLE",
+    "deribit": "NOT_PRESENT",
+    "dydx": "BLOCKED"
+  },
+  "prohibited_verification": {
+    "strategy_pnl_computed": false,
+    "optimization_performed": false,
+    "alpha_research_started": false,
+    "confirmation_consumed": false,
+    "holdout_consumed": false
+  },
+  "test_results": { "total": 39, "passed": 39, "failed": 0 }
+}

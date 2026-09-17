@@ -1,0 +1,54 @@
+# SENSOR PRIORITY REGISTRY — frozen from bloc_01/02 §14
+#
+# Priority means preferred evidence ordering, NOT fallback substitution
+# without venue identity.  Fallback improves economic sensor coverage; it never
+# rewrites history by pretending another venue is the missing venue.
+#
+# All capability claims remain UNVERIFIED until Bloc 2 probes pass.
+schema_version: "1.0"
+
+critical:
+  LIQUIDATION_STATE:
+    min_preferred_sources: 2
+    source_priority:
+      - KRAKEN_FUTURES
+      - GATE_FUTURES
+      - DERIBIT
+      - COINALYZE
+      - BITFINEX_COMMUNITY_ARCHIVE
+
+  OPEN_INTEREST_STATE:
+    min_preferred_sources: 2
+    source_priority:
+      - BYBIT_LINEAR
+      - GATE_FUTURES
+      - KRAKEN_FUTURES
+      - BINANCE_USDM
+      - COINALYZE
+
+  FUNDING_STATE:
+    min_preferred_sources: 2
+    source_priority:
+      - BYBIT_LINEAR
+      - KRAKEN_FUTURES
+      - GATE_FUTURES
+      - BINANCE_USDM
+      - OKX_SWAP
+      - DERIBIT
+      - COINALYZE
+
+  ORDER_FLOW_STATE:
+    min_preferred_sources: 2
+    source_priority:
+      - BINANCE_USDM
+      - KRAKEN_FUTURES
+      - GATE_FUTURES
+      - BYBIT_LINEAR
+      - OKX_SWAP
+
+  LIQUIDITY_STATE:
+    min_preferred_sources: 2
+    source_priority:
+      - OKX_SWAP
+      - KRAKEN_FUTURES
+      - BINANCE_USDM

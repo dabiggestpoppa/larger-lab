@@ -1,0 +1,8 @@
+{
+  "v1_feature_hash": "12655965882ffe6ab1083e96a65dd06c299b6425c39660fa733e00506fa15189",
+  "v2_feature_hash": "0d666e74c0cf76adf6e6e6f2a6c47b1f52116f070fd1376c83274e6b077703ba",
+  "max_abs_diff_btc": 0.9497154097060907,
+  "max_abs_diff_eth": 0.8133984506158569,
+  "changed_rows": 1049060,
+  "identity_test_pass": true
+}

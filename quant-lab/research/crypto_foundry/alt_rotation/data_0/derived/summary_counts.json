@@ -1,0 +1,23 @@
+{
+  "snapshot_dates": [
+    "2024-06-01",
+    "2025-01-01",
+    "2025-06-01",
+    "2026-01-01",
+    "2026-08-20"
+  ],
+  "rows_per_snapshot": {
+    "2024-06-01": 500,
+    "2025-01-01": 500,
+    "2025-06-01": 500,
+    "2026-01-01": 500,
+    "2026-08-20": 500
+  },
+  "identity_rows": 949,
+  "ticker_reuse_symbols": 597,
+  "hl_coins": 232,
+  "hl_delisted_with_funding": 55,
+  "okx_swaps_current": 454,
+  "okx_earliest_list_time": "2018-08-28T02:43:23Z",
+  "maturity_rule_days": 30
+}

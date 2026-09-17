@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_archive_btcusdt_funding_202406",
+  "http_status": 200,
+  "retrieved_at": "2026-08-24T14:22:25+00:00",
+  "sha256": "43fc4473820d1fb4fe340d1b1951a87555f6841aa352e684fa95d6adffce04c6",
+  "bytes": 721,
+  "request_params": {
+    "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2024-06.zip"
+  }
+}

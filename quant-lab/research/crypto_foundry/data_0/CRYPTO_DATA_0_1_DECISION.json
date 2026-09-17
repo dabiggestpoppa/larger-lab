@@ -1,0 +1,64 @@
+{
+  "checkpoint": "CRYPTO-DATA-0.1-TRUTH-REPAIR-AND-DATA1-PREREGISTRATION",
+  "branch": "agent/crypto-quant-foundry",
+  "base_commit": "e46dff3feae6e2deaebb3fd6c7ac426cd18ef98e",
+  "decision": "PASS_TRUTH_REPAIRED_DATA1_PREREGISTERED",
+  "timestamp_utc": "2026-08-20T00:00:00Z",
+  "truth_repairs": [
+    {
+      "repair": "HYPERLIQUID_US_ACCESS",
+      "finding": "DATA-0 incorrectly stated Hyperliquid US-accessible for execution",
+      "action": "Updated all artifacts. US_EXECUTION=RESTRICTED. Data=ACCEPT_PRIMARY.",
+      "artifacts_repaired": ["CRYPTO_VENUE_REGISTRY.csv", "CRYPTO_US_ACCESS_NOTES.md", "CRYPTO_DATA_0_REPORT.md", "CRYPTO_DATA_0_DECISION.json", "CURRENT_RESEARCH_STATE.md"]
+    },
+    {
+      "repair": "BTC_5M_4YR_PROVENANCE",
+      "finding": "btc_5m_4yr.json pre-dates Hyperliquid by 11 months. Identical OHLCV to Binance file. RELABELED_ORIGIN.",
+      "action": "Quarantined. DO NOT use as Hyperliquid history. Use btc_usdt_1460d.json as canonical Binance source.",
+      "sha256": "2f76a9ad142c09283749c308d46e9f3117448650086473a63e3ed4a56c989550"
+    },
+    {
+      "repair": "DRIFT_STATUS",
+      "finding": "Drift operational/security status unverified",
+      "action": "Classified as WATCH/RESEARCH_ONLY. Execution NOT_APPROVED.",
+      "artifacts_repaired": ["CRYPTO_ACCESS_REGISTRY_V2.csv"]
+    },
+    {
+      "repair": "ACCESS_TAXONOMY",
+      "finding": "Simplistic YES/NO access logic insufficient",
+      "action": "Created CRYPTO_ACCESS_REGISTRY_V2.csv with explicit data vs execution fields."
+    },
+    {
+      "repair": "SOURCE_AUTHORITY",
+      "finding": "Operational facts lacked source attribution",
+      "action": "Created CRYPTO_SOURCE_AUTHORITY_REGISTRY.csv with source/source_date/verified_at."
+    }
+  ],
+  "local_data_provenance": {
+    "btc_5m_4yr.json": {"status": "RELABELED_ORIGIN", "sha256": "2f76a9ad...", "verdict": "QUARANTINED"},
+    "btc_usdt_1460d.json": {"status": "VERIFIED_BINANCE", "sha256": "e9c977e3...", "rows": 420464},
+    "eth_usdt_1460d.json": {"status": "VERIFIED_BINANCE", "sha256": "88fbaae3...", "rows": 420464},
+    "sol_usdt_1460d.json": {"status": "VERIFIED_BINANCE", "sha256": "da79caa9...", "rows": 420464}
+  },
+  "nautilus_adapter_audit": {
+    "binance": {"status": "IMPORTABLE", "data_client": true, "exec_client": true, "historical_loader": true},
+    "hyperliquid": {"status": "IMPORTABLE", "data_client": true, "exec_client": true},
+    "coinbase_intx": {"status": "IMPORTABLE", "data_client": true, "exec_client": true, "note": "module name is coinbase_intx"},
+    "bybit": {"status": "IMPORTABLE", "data_client": true, "exec_client": true},
+    "okx": {"status": "IMPORTABLE", "data_client": true, "exec_client": true},
+    "deribit": {"status": "NOT_PRESENT", "note": "DATA-0 was wrong - no Deribit adapter in Nautilus 1.221.0"},
+    "dydx": {"status": "BLOCKED_DEPENDENCY", "error": "missing v4_proto"}
+  },
+  "data_1_preregistered_lanes": [
+    {"lane": "A", "name": "PERP_STATE", "primary_venue": "Hyperliquid", "markets": ["BTC-PERP", "ETH-PERP"]},
+    {"lane": "B", "name": "DEEP_HISTORICAL_SPOT", "primary_venue": "Binance", "markets": ["BTCUSDT", "ETHUSDT"], "role": "RESEARCH_DATA_ONLY"},
+    {"lane": "C", "name": "ETHEREUM_AMM", "primary_venue": "Uniswap v3", "markets": ["WETH/USDC", "WBTC/USDC"]},
+    {"lane": "D", "name": "BASE_AMM", "primary_venue": "Aerodrome or Base Uniswap", "markets": ["WETH/USDC", "cbBTC/USDC"]}
+  ],
+  "data_1_options_lp": "DATA-2_CANDIDATE",
+  "strategy_pnl_computed": false,
+  "optimization_performed": false,
+  "alpha_research_started": false,
+  "live_capital_deployed": false,
+  "execution_authorized": false
+}

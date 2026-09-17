@@ -1,0 +1,82 @@
+[
+  {
+    "case": "clean_no_h3",
+    "durable_acquisition_count": 1,
+    "expected_error": null,
+    "manifest_allowed": true,
+    "provider_expected_error": "UnearnedProviderIntegrityClaim",
+    "provider_integrity_allowed": false,
+    "test_name": "test_usable_provenance_matrix_artifact_written[clean_no_h3]",
+    "usable_acquisition_count": 1
+  },
+  {
+    "case": "clean_h3_true",
+    "durable_acquisition_count": 1,
+    "expected_error": null,
+    "manifest_allowed": true,
+    "provider_expected_error": null,
+    "provider_integrity_allowed": true,
+    "test_name": "test_usable_provenance_matrix_artifact_written[clean_h3_true]",
+    "usable_acquisition_count": 1
+  },
+  {
+    "case": "failed_h3_false",
+    "durable_acquisition_count": 1,
+    "expected_error": "NoUsableAcquisitionProvenance",
+    "manifest_allowed": false,
+    "provider_expected_error": null,
+    "provider_integrity_allowed": false,
+    "test_name": "test_usable_provenance_matrix_artifact_written[failed_h3_false]",
+    "usable_acquisition_count": 0
+  },
+  {
+    "case": "failed_http_with_body",
+    "durable_acquisition_count": 1,
+    "expected_error": "NoUsableAcquisitionProvenance",
+    "manifest_allowed": false,
+    "provider_expected_error": null,
+    "provider_integrity_allowed": false,
+    "test_name": "test_usable_provenance_matrix_artifact_written[failed_http_with_body]",
+    "usable_acquisition_count": 0
+  },
+  {
+    "case": "failure_ref_with_body",
+    "durable_acquisition_count": 1,
+    "expected_error": "NoUsableAcquisitionProvenance",
+    "manifest_allowed": false,
+    "provider_expected_error": null,
+    "provider_integrity_allowed": false,
+    "test_name": "test_usable_provenance_matrix_artifact_written[failure_ref_with_body]",
+    "usable_acquisition_count": 0
+  },
+  {
+    "case": "failed_plus_clean",
+    "durable_acquisition_count": 2,
+    "expected_error": null,
+    "manifest_allowed": true,
+    "provider_expected_error": null,
+    "provider_integrity_allowed": false,
+    "test_name": "test_usable_provenance_matrix_artifact_written[failed_plus_clean]",
+    "usable_acquisition_count": 1
+  },
+  {
+    "case": "wrong_provider_clean",
+    "durable_acquisition_count": 1,
+    "expected_error": "MissingAcquisitionProvenance",
+    "manifest_allowed": false,
+    "provider_expected_error": null,
+    "provider_integrity_allowed": false,
+    "test_name": "test_usable_provenance_matrix_artifact_written[wrong_provider_clean]",
+    "usable_acquisition_count": 0
+  },
+  {
+    "case": "provider_integrity_clean_h3",
+    "durable_acquisition_count": 1,
+    "expected_error": null,
+    "manifest_allowed": true,
+    "provider_expected_error": null,
+    "provider_integrity_allowed": true,
+    "test_name": "test_usable_provenance_matrix_artifact_written[provider_integrity_clean_h3]",
+    "usable_acquisition_count": 1
+  }
+]

@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "coinpaprika_crosscheck_20260820",
+  "retrieved_at": "2026-08-24T14:19:05+00:00",
+  "coins": {
+    "BTC": {
+      "http_status": 200,
+      "rows": [
+        {
+          "timestamp": "2026-08-19T00:00:00Z",
+          "price": 66006.48,
+          "volume_24h": 19927475769,
+          "market_cap": 1324908668603
+        },
+        {
+          "timestamp": "2026-08-20T00:00:00Z",
+          "price": 71273.02,
+          "volume_24h": 47615478426,
+          "market_cap": 1430649392625
+        }
+      ]
+    },
+    "ETH": {
+      "http_status": 200,
+      "rows": [
+        {
+          "timestamp": "2026-08-19T00:00:00Z",
+          "price": 2002.95,
+          "volume_24h": 8585356428,
+          "market_cap": 241208416435
+        },
+        {
+          "timestamp": "2026-08-20T00:00:00Z",
+          "price": 2287.3,
+          "volume_24h": 25972370163,
+          "market_cap": 275451143547
+        }
+      ]
+    },
+    "LUNC": {
+      "http_status": 200,
+      "rows": [
+        {
+          "timestamp": "2026-08-19T00:00:00Z",
+          "price": 4.836e-05,
+          "volume_24h": 5725481,
+          "market_cap": 328357243
+        },
+        {
+          "timestamp": "2026-08-20T00:00:00Z",
+          "price": 5.138e-05,
+          "volume_24h": 8846580,
+          "market_cap": 348825679
+        }
+      ]
+    },
+    "FTT": {
+      "http_status": 200,
+      "rows": [
+        {
+          "timestamp": "2026-08-19T00:00:00Z",
+          "price": 0.200997,
+          "volume_24h": 850237,
+          "market_cap": 27161766
+        },
+        {
+          "timestamp": "2026-08-20T00:00:00Z",
+          "price": 0.210711,
+          "volume_24h": 1204421,
+          "market_cap": 28474461
+        }
+      ]
+    },
+    "HOT": {
+      "http_status": 200,
+      "rows": [
+        {
+          "timestamp": "2026-08-19T00:00:00Z",
+          "price": 0.000328,
+          "volume_24h": 557897,
+          "market_cap": 58260623
+        },
+        {
+          "timestamp": "2026-08-20T00:00:00Z",
+          "price": 0.000344,
+          "volume_24h": 1250115,
+          "market_cap": 61054804
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+metric,value,n,note
+REACT_RATE_AFTER_CONTAGION,0.558,638.0,
+SAME_CAPACITY_REGION,0.5408,,
+SAME_DIRECTION,0.6755,,downside share among post-contagion events
+BASELINE_REACT,0.5097,3647.0,
+VERDICT,SAME_MECHANISM_RECURRENCE,638.0,"post-contagion events are mostly downside (same direction) and stay in the same capacity region -> recurrence of the same local mechanism, not an independent new event"

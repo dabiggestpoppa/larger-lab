@@ -1,0 +1,78 @@
+{
+  "cases": [
+    {
+      "boundary": "BEFORE_STAGED_WRITE",
+      "dir_fsyncs_before_fault": 8,
+      "error": "FaultError",
+      "file_fsyncs_before_fault": 0,
+      "final_exists_after": false,
+      "fragment_visible_after_restart": false,
+      "staging_dir_exists_after": true,
+      "success_returned": false
+    },
+    {
+      "boundary": "AFTER_WRITE_BEFORE_FSYNC",
+      "dir_fsyncs_before_fault": 6,
+      "error": "FaultError",
+      "file_fsyncs_before_fault": 0,
+      "final_exists_after": false,
+      "fragment_visible_after_restart": false,
+      "staging_dir_exists_after": true,
+      "success_returned": false
+    },
+    {
+      "boundary": "AFTER_FSYNC_BEFORE_VERIFY",
+      "dir_fsyncs_before_fault": 6,
+      "error": "FaultError",
+      "file_fsyncs_before_fault": 1,
+      "final_exists_after": false,
+      "fragment_visible_after_restart": false,
+      "staging_dir_exists_after": true,
+      "success_returned": false
+    },
+    {
+      "boundary": "AFTER_VERIFY_BEFORE_PUBLISH",
+      "dir_fsyncs_before_fault": 6,
+      "error": "FaultError",
+      "file_fsyncs_before_fault": 1,
+      "final_exists_after": false,
+      "fragment_visible_after_restart": false,
+      "staging_dir_exists_after": true,
+      "success_returned": false
+    },
+    {
+      "boundary": "AFTER_PUBLISH_BEFORE_DIR_FSYNC",
+      "dir_fsyncs_before_fault": 6,
+      "error": "FaultError",
+      "file_fsyncs_before_fault": 1,
+      "final_exists_after": true,
+      "fragment_visible_after_restart": true,
+      "staging_dir_exists_after": true,
+      "success_returned": false
+    },
+    {
+      "boundary": "AFTER_DIR_FSYNC_BEFORE_RETURN",
+      "dir_fsyncs_before_fault": 7,
+      "error": "FaultError",
+      "file_fsyncs_before_fault": 1,
+      "final_exists_after": true,
+      "fragment_visible_after_restart": true,
+      "staging_dir_exists_after": true,
+      "success_returned": false
+    },
+    {
+      "boundary": "NONE_UNFAULTED_CONTROL",
+      "dir_fsyncs_before_fault": 8,
+      "error": null,
+      "file_fsyncs_before_fault": 1,
+      "final_exists_after": true,
+      "fragment_visible_after_restart": true,
+      "staging_dir_exists_after": true,
+      "success_returned": true
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R2",
+  "clock": "injected-fixed",
+  "fsync_proof": "spy-counted real os-level fsync operations",
+  "matrix": "BLOC_04_I05R2_CRASH_BOUNDARY_MATRIX"
+}

@@ -1,0 +1,8 @@
+primitive,proxy,purged_auc_contagion_down,spearman,p,n
+correlation_compression,peer_corr,0.4777,-0.0,0.998,2462
+liquidity_withdrawal,liq_proxy,0.5394,-0.077,0.0,2394
+peer_stress,peer_stress,0.4964,0.016,0.413,2462
+crowded_exits,peer_neg_frac1,0.4682,0.003,0.871,2462
+rank_health_damage,rank_vel_7d,0.5283,-0.066,0.001,2462
+topology_churn,roll_turnover_30d,0.4771,-0.008,0.677,2461
+fast_propagation,peer_touch_frac1,0.4721,0.01,0.614,2462

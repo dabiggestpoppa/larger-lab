@@ -1,0 +1,7 @@
+node,valid_region,invalid_region,state_context,rank_context,time_age_context,perturbation_sensitivity,propagation_relevance,confidence
+HH_STATE_AGE_MATURITY,HH age >= 8D (fwd7 prop rises with age),HH age <= 3D,HIGH_BREADTH_HIGH_DISP,global top-500 field,age 1-30D within cell,young HH leaves readily; mature HH persists,mature HH strongest propagation cell,LOW_SAMPLE
+BIFURCATION_REGION_top500_breadth_30d,axis=top500_breadth_30d (jump 0.263),outside binned jump region,raw-coordinate binned surface,global,all,SHARP_TRANSITION_REGION,route-gate projection,SHARP_TRANSITION_REGION
+BIFURCATION_REGION_top500_dispersion_30d,axis=top500_dispersion_30d (jump 0.149),outside binned jump region,raw-coordinate binned surface,global,all,SHARP_TRANSITION_REGION,route-gate projection,SHARP_TRANSITION_REGION
+BIFURCATION_REGION_rank_depth_rel,axis=rank_depth_rel (jump 0.310),outside binned jump region,raw-coordinate binned surface,global,all,BIFURCATION_CANDIDATE,route-gate projection,BIFURCATION_CANDIDATE
+BIFURCATION_REGION_top3_share,axis=top3_share (jump 0.179),outside binned jump region,raw-coordinate binned surface,global,all,SHARP_TRANSITION_REGION,route-gate projection,SHARP_TRANSITION_REGION
+BIFURCATION_REGION_vol_med,axis=vol_med (jump 0.219),outside binned jump region,raw-coordinate binned surface,global,all,SHARP_TRANSITION_REGION,route-gate projection,SHARP_TRANSITION_REGION

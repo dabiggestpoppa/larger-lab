@@ -1,0 +1,6 @@
+layer,definition,clearance_est,n,class,note
+PEER_REACH,reach stable 14->30d (no further decline),0.6474,1021,14-30D_WINDOW,
+REACTIVATION_RISK,share with reactivation (risk persists),0.6866,1021,PERSISTS_BEYOND_30D,
+RANK_HEALTH_DISPLACEMENT,share with negative rank velocity at 7d,0.5926,1021,STILL_DISPLACED_AT_7D,
+DECOUPLING_RISK,share decoupling within 30d,0.2135,1021,30D_WINDOW,
+VERDICT,,MULTIPLE_LAYER_CLEARANCES,,DESCRIPTIVE,"peer reach normalizes by ~14-30d but reactivation and decoupling risk persist longer — contagion has multiple layer-specific clearances, not one clock; no forced analogy to global SURFACE-vs-LAW recovery"

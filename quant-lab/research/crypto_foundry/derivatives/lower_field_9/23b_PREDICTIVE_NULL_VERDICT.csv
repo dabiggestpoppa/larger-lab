@@ -1,0 +1,5 @@
+outcome,relational_state_auc,best_other_auc,relational_state_incremental,conclusion
+recovery,0.5081,0.5626,NO,NULL_FREEZE_APPLIES
+contagion,0.4981,0.5512,NO,NULL_FREEZE_APPLIES
+decoupling,0.5131,0.5734,NO,NULL_FREEZE_APPLIES
+FINAL,,,n/a,FREEZE_NULL_RELATIONAL_STATE_NOT_INCREMENTAL_PREDICTOR

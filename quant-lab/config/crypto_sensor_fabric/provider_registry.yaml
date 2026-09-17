@@ -1,0 +1,299 @@
+# PROVIDER REGISTRY — frozen candidate set from bloc_01/02 §12-13 and
+# bloc_01/04 §4 (frozen provider candidate set for first fabric build).
+#
+# Doctrine:
+#   - No provider is canonical truth; providers are interchangeable evidence
+#     sources beneath canonical contracts.
+#   - `claimed` capability is a planning claim only.  `verified` stays false
+#     until Bloc 2 capability probes prove actual free access, history depth,
+#     units and semantics.
+#   - Bloc 1 does NOT mark historical access verified.
+#   - Fallback candidates improve ECONOMIC SENSOR COVERAGE; they never
+#     rewrite history by pretending another venue is the missing venue.
+#
+# Status vocabulary: CANDIDATE | ACTIVE | DEMOTED | EXCLUDED
+schema_version: "1.0"
+
+providers:
+  KRAKEN_FUTURES:
+    evidence_class: FIRST_PARTY_EXCHANGE
+    status: CANDIDATE
+    access:
+      access_class: UNVERIFIED
+      verified_at: null
+      verification_method: null
+      cost_usd_required: 0
+      payment_method_required: false
+      staking_required: false
+      transaction_required: false
+      api_key_required: null
+      rate_limit: null
+      historical_access_claimed: true
+      historical_access_verified: false
+      terms_reference: null
+    capabilities:
+      liquidations:
+        claimed: true
+        verified: false
+        equivalence_default: NORMALIZABLE_COMPARABLE
+      open_interest:
+        claimed: true
+        verified: false
+      funding:
+        claimed: true
+        verified: false
+      order_flow:
+        claimed: true
+        verified: false
+      order_book:
+        claimed: true
+        verified: false
+      basis:
+        claimed: true
+        verified: false
+    fallback_candidates:
+      liquidations: [GATE_FUTURES, DERIBIT, COINALYZE, BITFINEX_COMMUNITY_ARCHIVE]
+      open_interest: [BYBIT_LINEAR, GATE_FUTURES, BINANCE_USDM, COINALYZE]
+      funding: [BYBIT_LINEAR, GATE_FUTURES, BINANCE_USDM, OKX_SWAP, DERIBIT, COINALYZE]
+      order_flow: [BINANCE_USDM, GATE_FUTURES, BYBIT_LINEAR, OKX_SWAP]
+      order_book: [OKX_SWAP, BINANCE_USDM]
+
+  GATE_FUTURES:
+    evidence_class: FIRST_PARTY_EXCHANGE
+    status: CANDIDATE
+    access:
+      access_class: UNVERIFIED
+      verified_at: null
+      verification_method: null
+      cost_usd_required: 0
+      payment_method_required: false
+      staking_required: false
+      transaction_required: false
+      api_key_required: null
+      rate_limit: null
+      historical_access_claimed: true
+      historical_access_verified: false
+      terms_reference: null
+    capabilities:
+      liquidations:
+        claimed: true
+        verified: false
+        equivalence_default: NORMALIZABLE_COMPARABLE
+      open_interest:
+        claimed: true
+        verified: false
+      funding:
+        claimed: true
+        verified: false
+      order_flow:
+        claimed: true
+        verified: false
+      positioning:
+        claimed: true
+        verified: false
+    fallback_candidates:
+      liquidations: [KRAKEN_FUTURES, DERIBIT, COINALYZE, BITFINEX_COMMUNITY_ARCHIVE]
+      open_interest: [BYBIT_LINEAR, KRAKEN_FUTURES, BINANCE_USDM, COINALYZE]
+      funding: [BYBIT_LINEAR, KRAKEN_FUTURES, BINANCE_USDM, OKX_SWAP, DERIBIT, COINALYZE]
+      order_flow: [BINANCE_USDM, KRAKEN_FUTURES, BYBIT_LINEAR, OKX_SWAP]
+
+  BINANCE_USDM:
+    evidence_class: FIRST_PARTY_EXCHANGE
+    status: CANDIDATE
+    access:
+      access_class: UNVERIFIED
+      verified_at: null
+      verification_method: null
+      cost_usd_required: 0
+      payment_method_required: false
+      staking_required: false
+      transaction_required: false
+      api_key_required: null
+      rate_limit: null
+      historical_access_claimed: true
+      historical_access_verified: false
+      terms_reference: null
+    capabilities:
+      liquidations:
+        claimed: false
+        verified: false
+        equivalence_default: null
+      open_interest:
+        claimed: true
+        verified: false
+      funding:
+        claimed: true
+        verified: false
+      order_flow:
+        claimed: true
+        verified: false
+      order_book:
+        claimed: true
+        verified: false
+    notes: "Historical liquidation begins as UNVERIFIED_OR_UNAVAILABLE, not assumed (bloc_01/02 §13)."
+    fallback_candidates:
+      open_interest: [BYBIT_LINEAR, GATE_FUTURES, KRAKEN_FUTURES, COINALYZE]
+      funding: [BYBIT_LINEAR, KRAKEN_FUTURES, GATE_FUTURES, OKX_SWAP, DERIBIT, COINALYZE]
+      order_flow: [KRAKEN_FUTURES, GATE_FUTURES, BYBIT_LINEAR, OKX_SWAP]
+      order_book: [OKX_SWAP, KRAKEN_FUTURES]
+
+  BYBIT_LINEAR:
+    evidence_class: FIRST_PARTY_EXCHANGE
+    status: CANDIDATE
+    access:
+      access_class: UNVERIFIED
+      verified_at: null
+      verification_method: null
+      cost_usd_required: 0
+      payment_method_required: false
+      staking_required: false
+      transaction_required: false
+      api_key_required: null
+      rate_limit: null
+      historical_access_claimed: true
+      historical_access_verified: false
+      terms_reference: null
+    capabilities:
+      open_interest:
+        claimed: true
+        verified: false
+      funding:
+        claimed: true
+        verified: false
+      order_flow:
+        claimed: true
+        verified: false
+      order_book:
+        claimed: true
+        verified: false
+    fallback_candidates:
+      open_interest: [GATE_FUTURES, KRAKEN_FUTURES, BINANCE_USDM, COINALYZE]
+      funding: [KRAKEN_FUTURES, GATE_FUTURES, BINANCE_USDM, OKX_SWAP, DERIBIT, COINALYZE]
+      order_flow: [BINANCE_USDM, KRAKEN_FUTURES, GATE_FUTURES, OKX_SWAP]
+      order_book: [OKX_SWAP, KRAKEN_FUTURES, BINANCE_USDM]
+
+  OKX_SWAP:
+    evidence_class: FIRST_PARTY_EXCHANGE
+    status: CANDIDATE
+    access:
+      access_class: UNVERIFIED
+      verified_at: null
+      verification_method: null
+      cost_usd_required: 0
+      payment_method_required: false
+      staking_required: false
+      transaction_required: false
+      api_key_required: null
+      rate_limit: null
+      historical_access_claimed: true
+      historical_access_verified: false
+      terms_reference: null
+    capabilities:
+      funding:
+        claimed: true
+        verified: false
+      order_flow:
+        claimed: true
+        verified: false
+      order_book:
+        claimed: true
+        verified: false
+    fallback_candidates:
+      funding: [BYBIT_LINEAR, KRAKEN_FUTURES, GATE_FUTURES, BINANCE_USDM, DERIBIT, COINALYZE]
+      order_flow: [BINANCE_USDM, KRAKEN_FUTURES, GATE_FUTURES, BYBIT_LINEAR]
+      order_book: [KRAKEN_FUTURES, BINANCE_USDM]
+
+  DERIBIT:
+    evidence_class: FIRST_PARTY_EXCHANGE
+    status: CANDIDATE
+    access:
+      access_class: UNVERIFIED
+      verified_at: null
+      verification_method: null
+      cost_usd_required: 0
+      payment_method_required: false
+      staking_required: false
+      transaction_required: false
+      api_key_required: null
+      rate_limit: null
+      historical_access_claimed: true
+      historical_access_verified: false
+      terms_reference: null
+    capabilities:
+      liquidations:
+        claimed: true
+        verified: false
+        equivalence_default: CORROBORATION_ONLY
+      funding:
+        claimed: true
+        verified: false
+      order_flow:
+        claimed: true
+        verified: false
+      order_book:
+        claimed: true
+        verified: false
+    fallback_candidates:
+      liquidations: [KRAKEN_FUTURES, GATE_FUTURES, COINALYZE, BITFINEX_COMMUNITY_ARCHIVE]
+      funding: [BYBIT_LINEAR, KRAKEN_FUTURES, GATE_FUTURES, BINANCE_USDM, OKX_SWAP, COINALYZE]
+      order_flow: [BINANCE_USDM, KRAKEN_FUTURES, GATE_FUTURES, BYBIT_LINEAR, OKX_SWAP]
+      order_book: [OKX_SWAP, KRAKEN_FUTURES, BINANCE_USDM]
+
+  COINALYZE:
+    evidence_class: THIRD_PARTY_AGGREGATOR
+    status: CANDIDATE
+    access:
+      access_class: UNVERIFIED
+      verified_at: null
+      verification_method: null
+      cost_usd_required: 0
+      payment_method_required: false
+      staking_required: false
+      transaction_required: false
+      api_key_required: null
+      rate_limit: null
+      historical_access_claimed: true
+      historical_access_verified: false
+      terms_reference: null
+    capabilities:
+      liquidations:
+        claimed: true
+        verified: false
+        equivalence_default: NORMALIZABLE_COMPARABLE
+      open_interest:
+        claimed: true
+        verified: false
+      funding:
+        claimed: true
+        verified: false
+      positioning:
+        claimed: true
+        verified: false
+    fallback_candidates:
+      liquidations: [KRAKEN_FUTURES, GATE_FUTURES, DERIBIT, BITFINEX_COMMUNITY_ARCHIVE]
+      open_interest: [BYBIT_LINEAR, GATE_FUTURES, KRAKEN_FUTURES, BINANCE_USDM]
+      funding: [BYBIT_LINEAR, KRAKEN_FUTURES, GATE_FUTURES, BINANCE_USDM, OKX_SWAP, DERIBIT]
+
+  BITFINEX_COMMUNITY_ARCHIVE:
+    evidence_class: COMMUNITY_ARCHIVE
+    status: CANDIDATE
+    access:
+      access_class: UNVERIFIED
+      verified_at: null
+      verification_method: null
+      cost_usd_required: 0
+      payment_method_required: false
+      staking_required: false
+      transaction_required: false
+      api_key_required: null
+      rate_limit: null
+      historical_access_claimed: true
+      historical_access_verified: false
+      terms_reference: null
+    capabilities:
+      liquidations:
+        claimed: true
+        verified: false
+        equivalence_default: CORROBORATION_ONLY
+    fallback_candidates:
+      liquidations: [KRAKEN_FUTURES, GATE_FUTURES, DERIBIT, COINALYZE]

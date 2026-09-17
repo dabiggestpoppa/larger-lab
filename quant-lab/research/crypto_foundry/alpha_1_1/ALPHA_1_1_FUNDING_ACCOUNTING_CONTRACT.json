@@ -1,0 +1,9 @@
+{
+  "contract_id": "ALPHA1_1_FUNDING_ACCOUNTING_V1",
+  "frozen_at": "2026-08-23T16:35:20Z",
+  "sign": "LONG receives when funding>0",
+  "settlements": "00,08,16 UTC (8h)",
+  "entry_on_settlement": "NOT accrued",
+  "exit_on_settlement": "IS accrued",
+  "partial": "pro-rated"
+}

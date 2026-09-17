@@ -1,0 +1,6 @@
+node_a,node_b,mean_abs_corr,n_pairs
+slope,ceiling,0.459,64
+slope,onset,0.247,64
+ceiling,onset,0.694,64
+PCA,all,0.594,24
+PCA,cum3,0.822,24

@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_archive_btcusdt_taker_202406",
+  "http_status": 404,
+  "retrieved_at": "2026-08-24T14:22:26+00:00",
+  "sha256": "10f958930573457b6ad87afacb637bbe16d67f411cb01fb5d494c2e037cc1039",
+  "bytes": 382,
+  "request_params": {
+    "url": "https://data.binance.vision/data/futures/um/monthly/takerlongshortRatio/BTCUSDT/BTCUSDT-takerlongshortRatio-2024-06.zip"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "checkpoint": "CRYPTO-ALPHA-2R-ENGINE-TRUTH-REPAIR-AND-SEALED-REPLAY",
+  "parent": "CRYPTO-ALPHA-1.1-CONTRACT-INTEGRITY-AND-BACKTEST-READINESS-SEAL",
+  "parent_sha": "5a6a4407b042b0ca6013a1c71e0241c6fefae433",
+  "quarantined_alpha2": "21a426f1c33445e33f51cdc86c6d2dfed2b7ddd5",
+  "registry_hash_verified": true,
+  "sealed_registry_hash": "2abaf8c21200a67e5b06d8ccf42ceb19574a12df21916d314a3c80b47f9a419e",
+  "decision": "PASS_ALPHA2R_CORRECTED_FALSIFICATION_COMPLETE",
+  "timestamp": "2026-08-24T17:24:20.748210+00:00",
+  "old_result_status": "QUARANTINED_ENGINE_ERROR",
+  "repairs": {
+    "funding_sign": "CORRECTED (LONG pays when funding > 0)",
+    "funding_frequency": "CORRECTED (hourly, actual observations)",
+    "f8_control_gate": "CORRECTED (mechanical PF comparison)",
+    "control_mapping": "COMPLETE (all 13 strategies mapped)"
+  },
+  "strategies_run": 13,
+  "controls_run": 6,
+  "total_raw_trades": 3015,
+  "total_effective_events": 1160,
+  "results": {
+    "SURVIVES_DEVELOPMENT": 0,
+    "WEAK_DEVELOPMENT": 0,
+    "FALSIFIED": 13,
+    "INSUFFICIENT_EVENTS": 0,
+    "CONTROL_EQUIVALENT": 0,
+    "COST_FRAGILE": 0
+  },
+  "falsification_counts": {
+    "F1": 0,
+    "F2": 2,
+    "F3": 13,
+    "F4": 9,
+    "F5": 3,
+    "F6": 3,
+    "F7": 5,
+    "F8": 11,
+    "F9": 0,
+    "F10": 3,
+    "F11": 0,
+    "F12": 1
+  },
+  "forward_candidates": 0,
+  "engine_integrity": "PASS",
+  "future_perturbation": "PASS",
+  "next_checkpoint": "CRYPTO-ALPHA-3-FAILURE-ANATOMY-AND-NEW-HYPOTHESES"
+}

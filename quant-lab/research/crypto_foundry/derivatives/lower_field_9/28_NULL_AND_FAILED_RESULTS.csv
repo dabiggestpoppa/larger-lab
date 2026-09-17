@@ -1,0 +1,15 @@
+result,status,n,reason
+continuous_daily_peer_map_rederivation,DATA_BLOCKED,0,daily behavioral/correlation peer maps would reinvent LF5; continuous panel carries the frozen PIT snapshot state forward instead
+mech12_constraint_entropy_join,DATA_BLOCKED,0,mech_12 constraint-entropy artifact unavailable in this checkout (carried from LF8)
+corr_family_peer_return_relational_metrics,DATA_BLOCKED,0,CORR peer maps carry no peer_return (LF5 quality row 1.0); return-based relational metrics restricted to BEHAVIORAL_10/STATE/HYBRID_10
+relational_state_as_predictor,NULL_FROZEN,3,final audit: relational state adds no incremental purged-AUC over exact peer identity / best-other for recovery/contagion/decoupling -> RELATIONAL_STATE_NOT_INCREMENTAL_PREDICTOR; forecast testing halted
+metastability_attractors,NOT_CLAIMED,0,transition lattice classes reported descriptively (COMMON/LOCAL/RARE/NEAR_ZERO); no attractor/metastability language
+static_peer_topology,NOT_RESURRECTED,0,LF9 confirms topology rewires while role persists; static peer set not revived
+triangle_hypergraph_work,NOT_RESURRECTED,0,out of scope per mission governance
+prd_subtype_BETA_RESCUE,DISSOLVED,33,fails validation (cycles/FDR/chronological)
+prd_subtype_PEER_RESCUE,DISSOLVED,33,fails validation (cycles/FDR/chronological)
+prd_subtype_DELAYED_REHAB,DISSOLVED,46,fails validation (cycles/FDR/chronological)
+transfer_law_abs_to_turnover,FIELD_CONDITIONAL_DRIFT,5,local perturbation-response law drifts across subperiods
+transfer_law_abs_to_decoupling,FIELD_CONDITIONAL_DRIFT,5,local perturbation-response law drifts across subperiods
+transfer_law_abs_to_contagion,FIELD_CONDITIONAL_DRIFT,5,local perturbation-response law drifts across subperiods
+transfer_law_abs_to_rejoin,FIELD_CONDITIONAL_DRIFT,5,local perturbation-response law drifts across subperiods

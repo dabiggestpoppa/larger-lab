@@ -1,0 +1,22 @@
+node,operation,evidence,status
+HH_HA_HE,MERGE,merged into HH_LA_HE at 6-cell cut,MERGED
+HH_HA_LE,MERGE,merged into HH_LA_LE at 6-cell cut,MERGED
+HH_LA_HE,PROMOTE,"rep of HH_HA_HE, HH_LA_HE at 6-cell cut; grade=ROBUST n=160 sp=5",PROMOTE
+HH_LA_LE,LOCAL_NODE,"rep of HH_HA_LE, HH_LA_LE at 6-cell cut; grade=LOCAL n=260 sp=5",LOCAL_NODE
+HL_HA_HE,LOCAL_NODE,"rep of HL_HA_HE, HL_HA_LE at 6-cell cut; grade=LOCAL n=74 sp=4",LOCAL_NODE
+HL_HA_LE,MERGE,merged into HL_HA_HE at 6-cell cut,MERGED
+HL_LA_HE,MERGE,merged into LL_LA_HE at 6-cell cut,MERGED
+HL_LA_LE,MERGE,merged into LL_LA_HE at 6-cell cut,MERGED
+LH_HA_HE,MERGE,merged into LH_LA_LE at 6-cell cut,MERGED
+LH_HA_LE,MERGE,merged into LH_LA_LE at 6-cell cut,MERGED
+LH_LA_HE,MERGE,merged into LH_LA_LE at 6-cell cut,MERGED
+LH_LA_LE,PROMOTE,"rep of LH_HA_HE, LH_HA_LE, LH_LA_HE, LH_LA_LE at 6-cell cut; grade=ROBUST n=100 sp=5",PROMOTE
+LL_HA_HE,MERGE,merged into LL_LA_HE at 6-cell cut,MERGED
+LL_HA_LE,MERGE,merged into LL_LA_LE at 6-cell cut,MERGED
+LL_LA_HE,PROMOTE,"rep of HL_LA_HE, HL_LA_LE, LL_HA_HE, LL_LA_HE at 6-cell cut; grade=ROBUST n=204 sp=5",PROMOTE
+LL_LA_LE,PROMOTE,"rep of LL_HA_LE, LL_LA_LE at 6-cell cut; grade=ROBUST n=313 sp=5",PROMOTE
+16-CELL_MATRIX,DISSOLVE,76/105 DISTINCT pairs; null=MATRIX_SURVIVES_FALSIFICATION; heldout=PARTIAL_MATRIX,PASS_MECH15_REDUCED_MATRIX
+12-CELL_REDUCED,DESCRIPTIVE,retention (mean) = 0.982,NOT_SELECTED
+8-CELL_REDUCED,DESCRIPTIVE,retention (mean) = 0.967,NOT_SELECTED
+6-CELL_REDUCED,PROMOTE,retention (mean) = 0.915,CANDIDATE
+4-CELL_REDUCED,DESCRIPTIVE,retention (mean) = 0.841,NOT_SELECTED

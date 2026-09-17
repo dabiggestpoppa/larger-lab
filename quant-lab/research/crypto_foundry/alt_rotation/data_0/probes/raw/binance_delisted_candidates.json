@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0.0",
+  "probe": "binance_delisted_candidates",
+  "description": "Binance USD-M delisted-contract recovery probe",
+  "retrieved_at": "2026-08-24T14:06:37+00:00",
+  "access_class": "PUBLIC",
+  "rows": [
+    {
+      "label": "SRMUSDT-funding",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate",
+      "params": {
+        "symbol": "SRMUSDT",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "SRMUSDT-klines",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/klines",
+      "params": {
+        "symbol": "SRMUSDT",
+        "interval": "1d",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "FTTUSDT-funding",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate",
+      "params": {
+        "symbol": "FTTUSDT",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "FTTUSDT-klines",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/klines",
+      "params": {
+        "symbol": "FTTUSDT",
+        "interval": "1d",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "BTCSTUSDT-funding",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate",
+      "params": {
+        "symbol": "BTCSTUSDT",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "BTCSTUSDT-klines",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/klines",
+      "params": {
+        "symbol": "BTCSTUSDT",
+        "interval": "1d",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "LUNA2USDT-funding",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate",
+      "params": {
+        "symbol": "LUNA2USDT",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "HOTUSDT-klines",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/klines",
+      "params": {
+        "symbol": "HOTUSDT",
+        "interval": "1d",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "BTSUSDT-klines",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/klines",
+      "params": {
+        "symbol": "BTSUSDT",
+        "interval": "1d",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    },
+    {
+      "label": "DREPUSDT-klines",
+      "method": "GET",
+      "url": "https://fapi.binance.com/fapi/v1/klines",
+      "params": {
+        "symbol": "DREPUSDT",
+        "interval": "1d",
+        "limit": 3
+      },
+      "json_body": null,
+      "http_status": 451,
+      "ok": true,
+      "error": null,
+      "row_count": 0,
+      "first_record": null,
+      "last_record": null,
+      "sha256": "79c1db471a4cdc1c8565b5dfc52e0ed2d29962738ee4d28597696fcd0920e348",
+      "bytes": 224
+    }
+  ],
+  "known_limitations": "Composite probe; per-row status recorded."
+}

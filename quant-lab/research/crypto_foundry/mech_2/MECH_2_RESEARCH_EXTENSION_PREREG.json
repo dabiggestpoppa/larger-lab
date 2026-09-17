@@ -1,0 +1,55 @@
+{
+  "checkpoint": "CRYPTO-MECH-2-STATE-AND-DISLOCATION-TAXONOMY",
+  "schema_version": "1.0.0",
+  "preregistered_at_utc": "2026-08-21T00:00:00+00:00",
+  "policy": "Extensions use ONLY frozen DATA-1 collectors. Windows frozen BEFORE download. No window selected after observing favorable results. No alpha statement is implied by any extension.",
+  "extensions": [
+    {
+      "dataset": "eth_weth_usdc_swap_30d",
+      "reason": "AMM pilot in MECH-1 was days only (2026-08-14..20); a 30-day window gives enough swaps for an AMM state pilot (AMM_LEADS/LAGS/FLOW).",
+      "source": "ethereum_rpc (frozen collector 1.3.0, drpc)",
+      "pool": "0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640",
+      "chain_id": 1,
+      "start": "2026-07-21T00:00:00+00:00",
+      "end": "2026-08-21T23:59:59+00:00",
+      "expected_fields": ["block_number", "block_hash", "tx_hash", "log_index", "amount0", "amount1", "sqrtPriceX96", "tick", "liquidity", "event_time_utc"],
+      "no_alpha_statement": true
+    },
+    {
+      "dataset": "eth_wbtc_usdc_swap_30d",
+      "reason": "WBTC/USDC AMM pilot was only 205 swaps; 30-day window extends the BTC AMM lane if activity permits.",
+      "source": "ethereum_rpc (frozen collector 1.3.0, drpc)",
+      "pool": "0x99ac8cA7087fA4A2A1FB6357269965A2014ABc35",
+      "chain_id": 1,
+      "start": "2026-07-21T00:00:00+00:00",
+      "end": "2026-08-21T23:59:59+00:00",
+      "expected_fields": ["block_number", "block_hash", "tx_hash", "log_index", "amount0", "amount1", "sqrtPriceX96", "tick", "liquidity", "event_time_utc"],
+      "no_alpha_statement": true
+    },
+    {
+      "dataset": "base_weth_usdc_swap_30d",
+      "reason": "Base WETH/USDC pilot was 1 day (4,035 swaps); 30-day window tests Base AMM state stability.",
+      "source": "base_rpc (frozen collector 1.3.0, mainnet.base.org)",
+      "pool": "0xd0b53d9277642d899df5c87a3966a349a798f224",
+      "chain_id": 8453,
+      "start": "2026-07-21T00:00:00+00:00",
+      "end": "2026-08-21T23:59:59+00:00",
+      "expected_fields": ["block_number", "block_hash", "tx_hash", "log_index", "amount0", "amount1", "sqrtPriceX96", "tick", "liquidity", "event_time_utc"],
+      "no_alpha_statement": true
+    }
+  ],
+  "not_available": [
+    {
+      "dataset": "hl_mark_index_history",
+      "reason": "HL API has no public historical mark/index endpoint; metaAndAssetCtxs is snapshot-only. oiHistory/markHistory/indexHistory all rejected by API."
+    },
+    {
+      "dataset": "hl_oi_history",
+      "reason": "HL API has no public historical OI endpoint. OI_STATE = DEFERRED."
+    },
+    {
+      "dataset": "hl_l2_book_history",
+      "reason": "No public historical L2 book endpoint on HL."
+    }
+  ]
+}

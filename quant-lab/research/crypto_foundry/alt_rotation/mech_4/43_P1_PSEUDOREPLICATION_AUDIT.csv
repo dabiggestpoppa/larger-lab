@@ -1,0 +1,5 @@
+sample,n,pct_conc7,pct_prop30,pct_prop30_mean,ci95_lo,ci95_hi,pct_prop30_min,pct_prop30_max
+CHAIN_LEVEL,797,0.3006,0.2043,,,,,
+GLOBAL_DEDUP,72,0.2361,0.1944,,,,,
+CHAIN_BOOTSTRAP_95CI,797,,,0.2032,0.1779,0.2212,,
+LEAVE_ONE_CHAIN_OUT,12,,,0.2042,,,0.1946,0.2095

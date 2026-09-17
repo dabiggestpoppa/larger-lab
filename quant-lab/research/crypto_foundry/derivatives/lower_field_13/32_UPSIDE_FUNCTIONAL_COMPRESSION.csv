@@ -1,0 +1,8 @@
+group,n,rejoin_rate,lift_pp,compression,note
+BASE_REJOIN_RATE,3647,0.1393,0.0,,
+STRUCTURAL_SUPPORT,2339,0.1471,0.7779,kept,
+LIQUIDITY_SUPPORT,3051,0.1442,0.4922,kept,
+POSITIVE_HISTORY,1255,0.1458,0.6524,kept,
+STATE_COHERENCE,1824,0.1338,-0.5521,kept,
+RANK_HEALTH_CURRENT,1826,0.155,1.5691,kept,
+VERDICT,,2-3_WEAK_AMPLIFIERS,,,"structural support, liquidity support and positive history each add a few pp of rejoin probability — upside compresses to 2-3 weak amplifier coordinates; no hard permission gate"

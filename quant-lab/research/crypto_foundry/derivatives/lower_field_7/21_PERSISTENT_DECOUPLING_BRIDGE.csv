@@ -1,0 +1,4 @@
+horizon,n,p_price_deterioration,p_rank_deterioration,median_peer_return,median_asset_return,p_activity_decline,p_rejoin_later_30d
+7,624,1.0,0.5337,0.02849,-0.06833,0.3446,0.0577
+14,624,0.7708,0.4936,0.0166,-0.03878,0.3446,0.0577
+30,624,0.6619,0.4375,0.00219,-0.01321,0.3446,0.0577

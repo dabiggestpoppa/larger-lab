@@ -1,0 +1,56 @@
+{
+  "cases": [
+    {
+      "case": "reversion_three_segments",
+      "expected": [
+        1,
+        2,
+        3
+      ],
+      "observed": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "case": "reversion_states",
+      "expected": [
+        "STABLE",
+        "SOURCE_MUTATION",
+        "SOURCE_MUTATION"
+      ],
+      "observed": [
+        "STABLE",
+        "SOURCE_MUTATION",
+        "SOURCE_MUTATION"
+      ]
+    },
+    {
+      "case": "identical_refetch_no_new_segment",
+      "expected": 3,
+      "observed": 3
+    },
+    {
+      "case": "out_of_order_fails_closed",
+      "expected": true,
+      "observed": true
+    },
+    {
+      "case": "same_time_conflict_fails_closed",
+      "expected": true,
+      "observed": true
+    },
+    {
+      "case": "re_registration_after_corruption_fails",
+      "expected": true,
+      "observed": true
+    },
+    {
+      "case": "restart_preserves_chain",
+      "expected": true,
+      "observed": true
+    }
+  ],
+  "matrix": "BLOC_04_I06_MUTATION_MATRIX"
+}

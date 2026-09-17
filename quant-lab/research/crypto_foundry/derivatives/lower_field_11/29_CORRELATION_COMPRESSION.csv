@@ -1,0 +1,5 @@
+metric,down_med,up_med,ranksums_p,n,note
+peer_corr_level,-0.0069,-0.1794,0.0,,
+DOWN_peer_dispersion,0.0342,0.0305,,2462.0,
+reach_width,0.5,0.5,0.107,,
+VERDICT,DOWN_SPECIFIC_CORRELATION,,,,correlation-compression proxy = peer_corr x neg-frac; gross mechanical spread/depth DATA_BLOCKED

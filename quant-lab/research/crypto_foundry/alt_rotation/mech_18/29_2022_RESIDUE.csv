@@ -1,0 +1,15 @@
+variable,pre_event_mean_absz,post_event_mean_absz,residue_mean_absz,post_max_absz,any_post_breach,verdict
+slope_FIELD,0.674,3.322,2.648,5.375,True,RESIDUE
+ceiling_FIELD,0.674,1.017,0.343,3.375,True,RESIDUE
+onset_FIELD,0.674,0.868,0.194,2.853,False,NO_RESIDUE
+slope_patch_mean,0.674,3.087,2.413,5.007,True,RESIDUE
+ceiling_patch_mean,0.674,0.924,0.249,2.742,False,NO_RESIDUE
+onset_patch_mean,0.674,0.809,0.134,2.419,False,NO_RESIDUE
+exit_entropy,0.674,1.002,0.327,3.129,True,RESIDUE
+exit_p1,0.674,0.677,0.003,1.135,False,NO_RESIDUE
+recruitment,0.674,0.337,-0.337,0.674,False,NO_RESIDUE
+demand,0.674,0.726,0.052,1.433,False,NO_RESIDUE
+propagation,0.674,0.899,0.224,1.574,False,NO_RESIDUE
+reentry,0.674,0.585,-0.09,0.674,False,NO_RESIDUE
+volatility,0.674,0.646,-0.028,2.282,False,NO_RESIDUE
+breadth,0.674,0.632,-0.042,2.257,False,NO_RESIDUE

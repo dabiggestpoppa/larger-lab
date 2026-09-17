@@ -1,0 +1,4 @@
+phenomenon,inc_r2_mkt_ret_1d,inc_r2_btc_return_30d,inc_r2_top500_breadth_30d,inc_r2_stablecoin_change_30d,inc_r2_chain_tvl_med_chg7,inc_r2_top3_share,inc_r2_vol_med,inc_r2_eth_btc_relative_return_30d,n_days
+CHAIN_EXPANSION,0.0001,0.1524,0.1971,0.2093,0.2882,0.2885,0.2912,0.292,2196
+ROUTING_FLIP_REALIZED,0.0001,0.0046,0.037,0.037,0.0409,0.0414,0.0387,0.0403,2196
+CONCENTRATION_EXIT_7D,0.0001,0.0487,0.0517,0.0729,0.076,0.0763,0.0708,0.0747,2196

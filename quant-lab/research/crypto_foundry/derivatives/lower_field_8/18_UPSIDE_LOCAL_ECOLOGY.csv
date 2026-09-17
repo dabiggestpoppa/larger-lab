@@ -1,0 +1,5 @@
+ecology,n,p_membership_stable,median_membership_entropy,median_member_turnover,field_state_mode,rank_patch_mode,median_abs_shock,median_sigma_shock,median_state_age_d,p_rejoin_30d,p_price_repair
+LOCAL_CONTAGION,86,0.4884,3.3219,0.8235,LL,26-100,0.0896,2.6825,0.0,0.2791,0.1163
+OTHER,571,0.4046,3.3219,0.8889,LL,26-100,0.154,2.7706,0.0,0.2154,0.1051
+PEER_CATCHUP,176,0.3807,3.3219,0.9474,LL,26-100,0.1465,2.6594,0.0,0.4375,0.3864
+PERSISTENT_DECOUPLING,352,0.3352,3.3219,0.9474,LL,26-100,0.1902,2.8879,0.0,0.0,0.0

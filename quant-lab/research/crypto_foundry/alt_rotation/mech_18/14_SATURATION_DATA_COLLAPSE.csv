@@ -1,0 +1,9 @@
+patch,n_train,n_test,local_normalized_test_rmse,pooled_normalized_test_rmse,ratio_pooled_over_local,verdict
+26-100,1446,600,0.4648,,,
+101-250,1446,600,0.4562,,,
+251-500,1446,600,0.4043,,,
+501-750,1446,600,0.3624,,,
+751-1000,1446,600,0.3366,,,
+1001-1500,1446,600,0.2913,,,
+1501-2000,1446,600,0.254,,,
+POOLED,10122,4200,,0.3744,1.02,UNIVERSALISH_RESPONSE_SHAPE

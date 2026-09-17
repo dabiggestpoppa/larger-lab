@@ -1,0 +1,5 @@
+venue,chain,option_type,chain_data,historical_chain,bid_ask,volume,OI,IV,Greeks,forward_index,term_structure,skew,websocket,execution_api,nautilus_support,notes
+Deribit,CEX,perp+options,yes REST full,yes since 2018,yes per strike/expiry,yes per contract,yes per contract,yes implied,yes delta/gamma/vega/theta,yes index+mark,yes term structure,yes skew via IV surface,yes WebSocket,yes full,NOT_RELEVANT,Primary options reference. BTC/ETH. No U.S. access. Most liquid crypto options venue.
+Derive,On-chain,options+perp,limited API,limited,no full chain,no reliable history,limited,limited,no real-time Greeks,no proper index,limited,limited,yes API,limited,NOT_RELEVANT,Early stage. Growing but thin data. Less reliable for research.
+Aevo,On-chain,options,limited API,limited,limited,limited,limited,limited,no real-time Greeks,no proper index,limited,limited,yes API,limited,NOT_RELEVANT,More ETH-focused. BTC options thinner.
+GammaSwap,On-chain,options+LP,fund-level only,limited,no strike-level,no chain data,no,n/a,n/a,no,n/a,no,no,NOT_RELEVANT,Niche. LP gamma products. Not standard options chain.

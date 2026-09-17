@@ -1,0 +1,4 @@
+level,coordinate,abs_spearman,p,purged_auc,note
+LOCAL_SHOCK_MEMORY,mem_exp_sum,0.1161,0.0,0.5937,
+GLOBAL_FIELD_MEMORY,ent_resid_day,0.0174,0.295,0.5235,
+VERDICT,SEPARATE_LOCAL_GLOBAL_MEMORY,,,0.5937,local AUC 0.5937 vs global AUC 0.5235

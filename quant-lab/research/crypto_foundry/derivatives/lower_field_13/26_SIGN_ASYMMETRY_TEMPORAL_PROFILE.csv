@@ -1,0 +1,11 @@
+window,down_val,up_val,gap,note
+static_1D,0.5,0.5,0.0,
+static_3D,0.5,0.5,0.0,
+static_7D,0.5,0.5,0.0,
+static_14D,0.5,0.5,0.0,
+static_30D,0.5,0.6,-0.1,
+rolling_3D,0.4833,0.5333,-0.05,
+rolling_7D,0.4933,0.519,-0.0257,
+rolling_14D,0.4947,0.5108,-0.0161,
+rolling_30D,0.4912,0.5083,-0.0171,
+VERDICT,NO_EARLY_PEER_REACH_GAP_IN_MEDIANS,,,"at full-sample median level the peer-reach gap is ~0 at 1-14d and slightly NEGATIVE at 30d/rolling (upside shows marginally higher peer reach) — the downside propagation gap lives in the RATE (out_contagion, stage analysis) not in median peer-reach; static and rolling agree there is no early reach advantage for downside in this partition"

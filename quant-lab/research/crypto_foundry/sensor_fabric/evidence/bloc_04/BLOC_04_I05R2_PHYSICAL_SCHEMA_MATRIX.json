@@ -1,0 +1,73 @@
+{
+  "cases": [
+    {
+      "case": "exact_schema",
+      "expected_error": null,
+      "gate": "exact_schema",
+      "rejected": false
+    },
+    {
+      "case": "wrong_native_type",
+      "expected_error": "ProjectionCorruption",
+      "gate": "native_type",
+      "rejected": true
+    },
+    {
+      "case": "wrong_native_nullability",
+      "expected_error": "ProjectionCorruption",
+      "gate": "nullability",
+      "rejected": true
+    },
+    {
+      "case": "wrong_native_order",
+      "expected_error": "ProjectionCorruption",
+      "gate": "field_order",
+      "rejected": true
+    },
+    {
+      "case": "wrong_nested_type",
+      "expected_error": "ProjectionCorruption",
+      "gate": "nested_child",
+      "rejected": true
+    },
+    {
+      "case": "wrong_t0_provider",
+      "expected_error": "ProjectionCorruption",
+      "gate": "resolver",
+      "rejected": true
+    },
+    {
+      "case": "wrong_t0_parser",
+      "expected_error": "ProjectionCorruption",
+      "gate": "resolver",
+      "rejected": true
+    },
+    {
+      "case": "wrong_projection_id",
+      "expected_error": "ProjectionCorruption",
+      "gate": "resolver",
+      "rejected": true
+    },
+    {
+      "case": "bad_row_ordinal",
+      "expected_error": "ProjectionCorruption",
+      "gate": "resolver",
+      "rejected": true
+    },
+    {
+      "case": "bad_single_source_lineage",
+      "expected_error": "ProjectionCorruption",
+      "gate": "resolver",
+      "rejected": true
+    },
+    {
+      "case": "bad_multi_source_pair",
+      "expected_error": "ProjectionCorruption",
+      "gate": "resolver",
+      "rejected": true
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I05R2",
+  "clock": "injected-fixed",
+  "matrix": "BLOC_04_I05R2_PHYSICAL_SCHEMA_MATRIX"
+}
