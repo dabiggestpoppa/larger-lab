@@ -2,9 +2,10 @@
 
 * **Branch:** `agent/model-foundry-mf-b0-b4-build`
 * **Start SHA:** `c55e379df3de2c6bb643afc90c10c0a861fa8c8a`
-* **Tested SHA:** `5ac46b5ee4bfeebdfa96884eb7891e9f97918d92`
+* **Tested SHA (code):** `5ac46b5ee4bfeebdfa96884eb7891e9f97918d92`
 * **Authoritative test command:** `cd model-foundry && PYTHONIOENCODING=utf-8 python -m pytest tests -q`
-* **Result:** `142 passed`
+* **Result:** `142 passed` (identical at the archive head `246afe8b`, which is documentation only)
+* **Invocation from repo root also works:** `python -m pytest model-foundry/tests -q`
 
 Status vocabulary: **implemented** (real, deterministic code), **simulated**
 (fixture-executed, declares `noncanonical: true`), **declaration only** (owned by
