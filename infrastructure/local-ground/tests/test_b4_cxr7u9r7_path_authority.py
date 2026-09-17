@@ -13,6 +13,7 @@ Proves the authority model claimed for every path input:
   root, and the target must be an existing regular file; denial has
   zero durable side effects (pure predicates).
 """
+import ast
 import hashlib
 import importlib.util
 import json
@@ -387,3 +388,100 @@ class TestPromoteSinkRefusal:
         assert calls, "the container bridge was never reached for an approved archive"
         assert "approved backup root" not in receipt.get("error", "")
         assert "container temp directory" in receipt["error"]
+
+
+class TestPromoteSinkInputsAreValidatorOutput:
+    """The same finding anchors on different lines of this one flow depending
+    on the window (the `open()` at :584, or `sha256_file`'s parameter sink at
+    :294). Both are fed by the `--archive` argument, so the disposition rests
+    on what each sink RECEIVES, not only on the guard preceding it. These
+    tests observe those values during a real promote, and pin the property that
+    makes the raw argument safe at the `docker cp` source as well: every
+    spelling the guard admits resolves to the canonical file inside an
+    approved root.
+    """
+
+    def _approved(self, tmp_path, monkeypatch):
+        roots = tmp_path / "roots"
+        (roots / "sub").mkdir(parents=True)
+        inv = roots / "inventory.json"
+        inv.write_text(INVENTORY_DOC, encoding="utf-8")
+        sha = roots / "inventory.sha256"
+        sha.write_text(hashlib.sha256(INVENTORY_DOC.encode()).hexdigest(),
+                       encoding="utf-8")
+        archive = roots / "real.dump"
+        archive.write_bytes(b"PGDMP")
+        monkeypatch.setenv("OCE_BACKUP_ROOTS", str(roots))
+        return roots, inv, sha, archive
+
+    def test_values_reaching_the_hash_and_copy_sinks_are_contained(
+            self, tmp_path, monkeypatch):
+        roots, inv, sha, archive = self._approved(tmp_path, monkeypatch)
+        hashed, copied = [], []
+        real_sha256 = pgrec.sha256_file
+
+        def record_hash(path):
+            hashed.append(path)
+            return real_sha256(path)
+
+        def record_copy(container, archive_path):
+            copied.append(archive_path)
+            return "/tmp/probe/archive.dump"
+
+        monkeypatch.setattr(pgrec, "sha256_file", record_hash)
+        monkeypatch.setattr(pgrec, "clone_archive_into_container", record_copy)
+        monkeypatch.setattr(pgrec, "docker_exec",
+                            lambda *a, **k: subprocess.CompletedProcess([], 3, b"", b"probe"))
+        receipt = pgrec.phase_promote(str(archive), str(inv), str(sha),
+                                      "oce_local", "oce_local_admin",
+                                      "oce-local-postgresql", None)
+
+        expected = os.path.realpath(str(archive))
+        # sha256_file's parameter (Sonar's :294 anchor) receives the validator's
+        # canonical path, never the raw CLI string.
+        assert hashed == [expected], hashed
+        # The `docker cp` source (:571) is the raw argument, so what matters is
+        # that the guard admitted it: its realpath is the same contained file.
+        assert copied, "the container copy sink was never reached"
+        for value in copied:
+            assert os.path.realpath(value) == expected
+            assert os.path.commonpath([str(roots), os.path.realpath(value)]) == str(roots)
+        assert receipt["source_archive_sha256"] == real_sha256(str(archive))
+
+    def test_every_admitted_spelling_resolves_inside_an_approved_root(
+            self, tmp_path, monkeypatch):
+        roots, _, _, archive = self._approved(tmp_path, monkeypatch)
+        for spelling in (str(archive), str(roots / "." / "real.dump"),
+                         str(roots) + os.sep + "real.dump",
+                         str(roots / "sub" / ".." / "real.dump")):
+            resolved = pgrec._validated_open_path(spelling)
+            assert os.path.commonpath([str(roots), resolved]) == str(roots)
+            assert resolved == os.path.realpath(str(archive)), spelling
+            assert os.path.samefile(resolved, str(archive)), spelling
+
+    def test_prefix_sibling_outside_the_root_is_refused(self, tmp_path, monkeypatch):
+        """The sharpest edge of canonical containment: a sibling whose name only
+        shares the root's text prefix (`roots-evil` beside `roots`) is not
+        contained. A startswith() containment check would admit it."""
+        self._approved(tmp_path, monkeypatch)
+        sibling = tmp_path / "roots-evil"
+        sibling.mkdir()
+        (sibling / "real.dump").write_bytes(b"PGDMP")
+        with pytest.raises(RuntimeError, match="approved backup root"):
+            pgrec._validated_open_path(str(sibling / "real.dump"))
+
+    def test_sha256_file_parameter_sink_has_no_unvalidated_call_site(self):
+        """`sha256_file(path)` constrains nothing by itself, so its safety is a
+        property of its call sites: the engine's production call must hand it
+        the validator's output. A future call site bypassing the validator
+        fails here rather than silently widening the sink."""
+        tree = ast.parse((SCRIPTS / "pg-recovery.py").read_text(encoding="utf-8"))
+        sites = [n for n in ast.walk(tree)
+                 if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                 and n.func.id == "sha256_file"]
+        assert sites, "expected at least one sha256_file call site"
+        for call in sites:
+            assert call.args, "sha256_file called without a path"
+            inner = call.args[0]
+            assert (isinstance(inner, ast.Call) and isinstance(inner.func, ast.Name)
+                    and inner.func.id == "_validated_open_path"), ast.dump(inner)
