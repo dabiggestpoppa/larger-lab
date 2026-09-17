@@ -272,21 +272,12 @@ if [[ "$CHECKOUT_STATE" == "attached" ]]; then
     IDENTITY_BRANCH="$OBSERVED_BRANCH"
 fi
 
-# B4-CXR7U9R8: the expected branch comes from the checkpoint contract by
-# default (authoritative oce-branch runs are unchanged). A caller MAY pin a
-# different expected branch via OCE_EXPECTED_BRANCH — used by the PR
-# validation workflow, where the engine's identity check must validate the
-# branch the PR was actually raised from (GITHUB_REF_NAME), matching the
-# engine's own --target-branch "$OBSERVED_BRANCH" model. The override is
-# an explicit, logged caller contract — never an ambient silent default.
-#
-# B4-CXR7U9X2: the contract default is read HERE, in this branch. The R8 edit
-# that added the override dropped the read, so every run that passed no
-# override died at the next line under `set -u` with "EXPECTED_BRANCH:
-# unbound variable" (b1-i1r3 dispatch run 35174658732) — that is every
-# push/dispatch run of this workflow, because only the PR workflow passes an
-# override. The path is passed as argv rather than interpolated into the
-# program so no caller-controlled string is ever parsed as Python source.
+# The expected branch is the checkpoint contract's, unless a caller pins one
+# explicitly with OCE_EXPECTED_BRANCH (the PR workflow pins the branch the PR
+# was raised from). Both paths must ASSIGN: reading it only inside the
+# override branch leaves it unbound under `set -u` for every run that passes
+# no override. The contract is passed to python as argv, never interpolated
+# into the program, so no caller-controlled string is parsed as source.
 if [[ -n "${OCE_EXPECTED_BRANCH:-}" ]]; then
     EXPECTED_BRANCH="$OCE_EXPECTED_BRANCH"
     BRANCH_EXPECT_PROVENANCE="OCE_EXPECTED_BRANCH (caller override)"

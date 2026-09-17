@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import pathlib
 import sys
-import time
 import pytest
 
 from oce_control.worker_identity import WorkerAuthority, CapabilityRegistry
@@ -89,18 +88,6 @@ def _state_doc(admitted):
                        "saved_at": "2026-01-01T00:00:00Z"})
 
 
-def _symlinks_available(tmp_path):
-    """Same truthful probe the path-authority suite uses: Windows without
-    SeCreateSymbolicLinkPrivilege cannot create one, Linux CI always can."""
-    probe = tmp_path / "probe-link"
-    try:
-        probe.symlink_to(tmp_path / "probe-target")
-    except (OSError, NotImplementedError):
-        return False
-    probe.unlink()
-    return True
-
-
 class TestStateFileContainment:
     """B4-CXR7U9R14 containment on the durable-admission read sink.
 
@@ -118,13 +105,14 @@ class TestStateFileContainment:
         assert "wkr-keep" in sup.operator_view()["admitted"]
 
     def test_state_file_resolving_outside_the_runtime_dir_is_refused(self, tmp_path):
-        if not _symlinks_available(tmp_path):
-            pytest.skip("no symlink privilege in this environment")
         elsewhere = tmp_path / "elsewhere.json"
         elsewhere.write_text(_state_doc(["wkr-outside"]), encoding="utf-8")
         runtime = tmp_path / "runtime"
         runtime.mkdir()
-        (runtime / "state.json").symlink_to(elsewhere)
+        try:
+            (runtime / "state.json").symlink_to(elsewhere)
+        except OSError:
+            pytest.skip("symlinks unavailable on this platform")
         sup = WorkerSupervisor(runtime, WorkerAuthority(CapabilityRegistry()))
         assert sup.operator_view()["admitted"] == [], (
             "a state file that resolves outside the fenced runtime dir must "

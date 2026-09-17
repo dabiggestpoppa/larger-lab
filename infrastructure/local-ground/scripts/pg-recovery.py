@@ -348,13 +348,10 @@ def terminate_local_connections(container, user, *dbs):
 
 
 def clone_archive_into_container(container, archive_path):
-    """Copy the custom archive into a private container directory; return path.
-
-    The destination is created by the container's own mktemp (exclusive,
-    mode 0700) rather than named into a fixed, shared temp directory: a
-    predictable name in a world-writable directory lets anything already
-    running in the container pre-create that path, so the copy would land on
-    an attacker-chosen file or symlink (python:S5443 on this line).
+    """Copy the custom archive into a directory the CONTAINER creates
+    exclusively (mktemp -d, mode 0700) and return that path. Naming a path
+    inside a shared temp directory would let anything else in the container
+    pre-create it, so the copy could land on a chosen file or symlink.
     """
     made = docker_exec(container, ["mktemp", "-d"])
     remote_dir = made.stdout.decode(errors="replace").strip()
@@ -427,20 +424,25 @@ def _approved_roots() -> list:
 
 
 def _validated_open_path(path: str) -> str:
-    """Canonicalize an OPERATOR-TRUSTED artifact path (B4-CXR7U9R7).
+    """Canonicalize an operator-selected artifact path and ENFORCE
+    containment on it (B4-CXR7U9R7/R12).
 
-    AUTHORITY MODEL - truthful, not "containment": recovery-tool inputs
-    name backup artifacts the operator selects; there is NO fixed approved
-    root, so NO containment check is claimed. These paths are DATA, never
-    authority: they cannot alter executable identity (docker/pg_restore
-    are driven by this engine itself), credentials, the governed database
-    destination, or any decision authority; their content is SHA-verified
-    before use (tamper fails closed). They are supplied by the operator or
-    the governed restore pipeline - never by untrusted runtime data - and
-    the OCE_* environment inputs feed provenance strings only, no paths.
+    These paths are DATA, never authority: they cannot alter executable
+    identity (docker/pg_restore are driven by this engine itself),
+    credentials, the governed database destination, or any decision
+    authority; their content is SHA-verified before use (tamper fails
+    closed). They come from the operator or the governed restore pipeline,
+    never from untrusted runtime data.
 
-    Refused here: symlink indirection (the artifact must BE the named
-    file, not a pointer elsewhere), non-regular files, missing paths.
+    Enforced here, in order:
+      1. no symlink indirection - realpath(path) must equal abspath(path),
+         so the artifact must BE the named file, not a pointer elsewhere;
+      2. containment - the real path must sit inside an approved root,
+         from _approved_roots(): this engine's own directory, its durable
+         recovery-state directory, or an OCE_BACKUP_ROOTS entry declared
+         by the caller;
+      3. the path must be an existing regular file.
+
     Canonical-open race note: the open follows validation; on POSIX the
     content SHA check still fails closed against any replacement.
     """

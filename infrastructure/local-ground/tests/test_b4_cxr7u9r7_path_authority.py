@@ -6,10 +6,11 @@ Proves the authority model claimed for every path input:
 * independent-gate.py _validated_subprocess_path enforces REAL
   containment inside the approved evidence root (traversal, absolute
   escape, symlink substitution, prefix collisions all rejected);
-* pg-recovery.py / pg-verify.py _validated_open_path honestly classify
-  their inputs as OPERATOR_TRUSTED_INPUT (no containment claim) and
-  still refuse symlink indirection, non-regular files and missing
-  paths; denial has zero durable side effects (pure predicates).
+* pg-recovery.py / pg-verify.py _validated_open_path enforce the same
+  real-time containment discipline: no symlink indirection (realpath
+  must equal abspath), the canonical path must sit inside an approved
+  root, and the target must be an existing regular file; denial has
+  zero durable side effects (pure predicates).
 """
 import importlib.util
 import os
@@ -40,10 +41,12 @@ def _symlink_creatable() -> bool:
 
     Windows without SeCreateSymbolicLinkPrivilege (or Developer Mode)
     raises OSError WinError 1314; Linux CI (where these adversarial
-    proofs are mandatory) always can. The skip is TRUTHFUL: it names
-    the missing capability, never hides a failure of the code under
-    test (the containment logic itself is exercised on every platform
-    through the traversal/absolute/prefix-collision cases).
+    proofs are mandatory) always can. This is the project's only symlink
+    capability probe: the control-plane suites call os.symlink at the
+    point of use and skip on OSError. The skip is TRUTHFUL - it names the
+    missing capability, never hides a failure of the code under test (the
+    containment logic itself is exercised on every platform through the
+    traversal/absolute/prefix-collision cases).
     """
     import tempfile
     try:

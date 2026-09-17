@@ -678,6 +678,12 @@ def test_ci_gitleaks_install_path_is_shared_and_redirect_capable():
         assert "releases/download/" not in active, (
             f"{name} must not carry its own download URL: the URL and its "
             "checksum belong to the single installer")
+
+
+def test_gitleaks_installer_verifies_digest_before_extraction():
+    """The digest is the trust anchor: it is checked before any extraction,
+    nothing is fetched from the network to establish trust, and the archive
+    is unpacked outside the repository."""
     installer = _installer_text()
     assert GITLEAKS_SHA256 in installer, "installer must pin the digest"
     assert "GITLEAKS_VERSION=8.18.1" in installer, "installer must pin the version"
@@ -687,13 +693,6 @@ def test_ci_gitleaks_install_path_is_shared_and_redirect_capable():
     assert "curl -fsSL" in installer, "fetch must follow redirects and fail closed"
     assert "--proto '=https'" in installer, "fetch must be HTTPS only"
     assert "http://" not in installer, "no cleartext fetch anywhere"
-
-
-def test_gitleaks_installer_verifies_digest_before_extraction():
-    """The digest is the trust anchor: it is checked before any extraction,
-    nothing is fetched from the network to establish trust, and the archive
-    is unpacked outside the repository."""
-    installer = _installer_text()
     verify_at = installer.index("sha256sum")
     extract_at = installer.index("tar xzf")
     assert verify_at < extract_at, "checksum must be verified BEFORE extraction"

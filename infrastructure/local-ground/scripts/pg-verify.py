@@ -19,9 +19,7 @@ or query failure exits nonzero (fail closed).
 """
 import hashlib
 import importlib.util
-import json
 import os
-import subprocess
 import sys
 import time
 
@@ -62,17 +60,22 @@ def _approved_roots() -> list:
 
 
 def _validated_open_path(path: str) -> str:
-    """Canonicalize an OPERATOR-TRUSTED artifact path (B4-CXR7U9R7).
+    """Canonicalize an operator-selected verification artifact path and
+    ENFORCE containment on it (B4-CXR7U9R7/R12).
 
-    AUTHORITY MODEL - truthful, not "containment": verification inputs
-    name backup artifacts the operator selects; there is NO fixed approved
-    root, so NO containment check is claimed. These paths are DATA, never
-    authority: they cannot alter executable identity, credentials, the
-    governed database destination, or any decision authority; their
-    content is SHA-verified before use (tamper fails closed). Supplied by
-    the operator or the governed restore pipeline only.
+    These paths are DATA, never authority: they cannot alter executable
+    identity, credentials, the governed database destination, or any
+    decision authority; their content is SHA-verified before use (tamper
+    fails closed). Supplied by the operator or the governed restore
+    pipeline only.
 
-    Refused here: symlink indirection, non-regular files, missing paths.
+    Enforced here, in order:
+      1. no symlink indirection - realpath(path) must equal abspath(path);
+      2. containment - the real path must sit inside an approved root,
+         from _approved_roots(): this engine's own directory, its durable
+         recovery-state directory, or an OCE_BACKUP_ROOTS entry declared
+         by the caller;
+      3. the path must be an existing regular file.
     """
     real = os.path.realpath(path)
     if real != os.path.abspath(path):
