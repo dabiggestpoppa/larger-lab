@@ -1,7 +1,7 @@
 # OCE Book 4 — Configuration & Security Control Spine Evidence Record
 
-**Status:** `B4-CXR7U9 IN PROGRESS — GATE OPEN` (supersedes the CXR7U closure label below; CXR7U implementation history and CXR7-BLOCKED preserved)
-**CXR7U9 quality gate:** SonarQube Security E / Reliability C on new code (required A/A) — credential-blocked; see the CXR7U9 section below
+**Status:** `B4-CXR7U9 IN PROGRESS — GATE OPEN` (only the SonarQube gate remains; see the CXR7U9R23+ section below)
+**CXR7U9 quality gate:** SonarQube Security D / Reliability C on new code on the current head (required A/A) — credential-blocked; see the CXR7U9R23+ section below
 **Branch:** `oce-program-build`
 **B4-CXR5 repair start SHA:** `047b5eb6afd7e46a48024726fbbb1e83b2d876cd`
 **Book 4 start SHA:** `acddeb696e6b5df1828fc7baf8c7bfbd2eb43e90`
@@ -9,7 +9,7 @@
 **B4-CXR3 repair start SHA:** `27a21c9ae2a089dbc324b356407237751082c9d5`
 **B4-CXR4 repair start SHA:** `adeeadaafbb4388e37a97a587f9fd2a1349ce9c4`
 **Book 2:** `RATIFIED / GATED_COMPLETE` · **Book 3:** `COMPLETE / GATED_COMPLETE`
-**main:** `7e7ef7222c4ecdea568b34583fd81406165cc9b6` (untouched)
+**main:** `d09941e75f3da6040254e0e6193dcf670207273b` (untouched; the CXR7U9 start SHA `583614ff…` was reconciled into this branch)
 
 ## Core invariant (this repair)
 
@@ -24,43 +24,6 @@ repairs every enumerated escape path. Each is closed with a real proof.
 ## Ordered repair commits (all pushed, `oce-program-build`)
 
 | Commit | Message | Defect |
-|
-## B4-CXR7U9 — PRE-MERGE PROOF AND QUALITY REPAIR (IN PROGRESS)
-
-Start SHA: `caa1791e0f35f8975150577975867a96eafa7fc4` (CXR7U evidence head; not amended).
-PR: #4 (base main, head oce-program-build, OPEN, not merged).
-
-### Implemented repairs (CI-green on final head `3fef6615`)
-
-- `b5b53de5` R1+R2: audit-proof transaction cleanup unconditional (every negative branch leaves TX_IDLE) + governed-identity binding (`proven_authoritative()`; structure-only `inspect_structure()` can never authorize an override).
-- `c3e226a3` R3: production configure no longer consumes `CXR7U8_CONFIGURE_*` ambient variables; interruption instrumentation is a private in-process seam only.
-- `9e3bf98f` R4: first Sonar repair round (28 findings).
-- `15e116fd` R5: mandatory registry regenerated (875 unique full node IDs, zero duplicates).
-- `bce3283e` X3: missing `PostgresAuditSink` import in shared `_pinned` helper (run 34590833387: 21 container failures, all one NameError).
-- `db14871e` X4: MinIO artifact-store image repointed to `quay.io/minio/minio` with the identical pinned release tag after Docker Hub removed it (b1-local-ground runs 34698877725 + rerun failed on pull-access-denied; quay.io registry API verified the tag exists).
-- `1a81dd7d` X5: all 25 visible Sonar failure-level findings — realpath fail-closed taint guards (pg-recovery, pg-verify, independent-gate), 4 cognitive-complexity extractions (oce_worker.main, validate_engine check_scaffold_scan/check_meta_test_evidence, recovery-ops.cmd_add), duplicate-literal constants, 15 shell `[[` conversions, restore.sh case default.
-- `3fef6615` X6: S5734 — lifecycle CLI dispatcher no longer swallows `SystemExit`; it propagates to the `sys.exit(main())` boundary (behavior unchanged end-to-end; 771 local tests green).
-
-### Authoritative CI on `3fef6615`
-
-- b1-local-ground-validation: run 34703724053 — success.
-- b2-control-plane-validation: run 34703724028 — success.
-- b3-worker-fabric-validation: run 34703724068 — success.
-- b4-config-spine-validation: run 34703724055 — success.
-- B1-I1R Validation: pre-existing failure on every branch commit (stale Book-1 cloud-ground workflow requiring absent evidence); b1-local-ground is the in-force Book 1 regression and is green.
-
-### Unresolved gate: SonarQube Security E / Reliability C (exit-gate statements 6 and 7)
-
-The SonarCloud quality gate on new code remains Security E / Reliability C after two full repair rounds (X5, X6) covering every visible failure-level finding. The remaining gap is credential-blocked:
-
-1. No Sonar token exists anywhere reachable: repository and organization secrets are empty, no scanner configuration exists, and SonarCloud analyzes the repository through its GitHub App.
-2. The SonarCloud issues API returns an empty 200 response for this private project when unauthenticated — verified by sending the same request to a bogus project key and receiving an identical empty response — so the exact issue inventory cannot be enumerated.
-3. The GitHub check-run annotation channel is capped at 50 issues and the visible set rotates as the head moves; findings visible across rounds were repaired, but ratings did not move, proving gate-driving findings exist beyond the visible cap.
-4. Dispositions (true-positive fix vs false-positive marking) for the unseen findings — including the four AI-taint Path Traversal findings whose canonical disposition under the single-principal threat model is false-positive — require SonarCloud API write access.
-5. Quality-gate weakening (NOSONAR suppression, exclusion patterns, severity downgrades, project policy changes) is prohibited by the CXR7U9 mission and was not performed.
-
-Operator action required: provide SonarCloud API credentials for exact inventory and FP disposition, or explicitly accept the gate state. PR #4 remains OPEN and unmerged.
-
 ---|---|---|
 | `0e44617c` | B4-CXR3R1: separate secret initialization from runtime authority | CXR3-01 |
 | `c17b7142` | B4-CXR3R2: remove arbitrary runtime DSN injection paths | CXR3-02 |
@@ -996,6 +959,224 @@ Final implementation SHA/tree: `b1f7a07881df1173ca7bb20183f99e04acc3cf6f` /
   of atomic rename and is NOT separately proven.
 - The AST anti-vacuity gate is static and cannot prove arbitrary test
   correctness; behavioral proofs remain authoritative.
+
+
+## B4-CXR7U9 — PRE-MERGE PROOF AND QUALITY REPAIR (SUPERSEDED by the CXR7U9R23+ section below)
+
+
+Start SHA: `caa1791e0f35f8975150577975867a96eafa7fc4` (CXR7U evidence head; not amended).
+PR: #4 (base main, head oce-program-build, OPEN, not merged).
+
+### Implemented repairs (CI-green on final head `3fef6615`)
+
+- `b5b53de5` R1+R2: audit-proof transaction cleanup unconditional (every negative branch leaves TX_IDLE) + governed-identity binding (`proven_authoritative()`; structure-only `inspect_structure()` can never authorize an override).
+- `c3e226a3` R3: production configure no longer consumes `CXR7U8_CONFIGURE_*` ambient variables; interruption instrumentation is a private in-process seam only.
+- `9e3bf98f` R4: first Sonar repair round (28 findings).
+- `15e116fd` R5: mandatory registry regenerated (875 unique full node IDs, zero duplicates).
+- `bce3283e` X3: missing `PostgresAuditSink` import in shared `_pinned` helper (run 34590833387: 21 container failures, all one NameError).
+- `db14871e` X4: MinIO artifact-store image repointed to `quay.io/minio/minio` with the identical pinned release tag after Docker Hub removed it (b1-local-ground runs 34698877725 + rerun failed on pull-access-denied; quay.io registry API verified the tag exists).
+- `1a81dd7d` X5: all 25 visible Sonar failure-level findings — realpath fail-closed taint guards (pg-recovery, pg-verify, independent-gate), 4 cognitive-complexity extractions (oce_worker.main, validate_engine check_scaffold_scan/check_meta_test_evidence, recovery-ops.cmd_add), duplicate-literal constants, 15 shell `[[` conversions, restore.sh case default.
+- `3fef6615` X6: S5734 — lifecycle CLI dispatcher no longer swallows `SystemExit`; it propagates to the `sys.exit(main())` boundary (behavior unchanged end-to-end; 771 local tests green).
+
+### Authoritative CI on `3fef6615`
+
+- b1-local-ground-validation: run 34703724053 — success.
+- b2-control-plane-validation: run 34703724028 — success.
+- b3-worker-fabric-validation: run 34703724068 — success.
+- b4-config-spine-validation: run 34703724055 — success.
+- B1-I1R Validation: pre-existing failure on every branch commit (stale Book-1 cloud-ground workflow requiring absent evidence); b1-local-ground is the in-force Book 1 regression and is green.
+
+### Unresolved gate: SonarQube Security E / Reliability C (exit-gate statements 6 and 7)
+
+The SonarCloud quality gate on new code remains Security E / Reliability C after two full repair rounds (X5, X6) covering every visible failure-level finding. The remaining gap is credential-blocked:
+
+1. No Sonar token exists anywhere reachable: repository and organization secrets are empty, no scanner configuration exists, and SonarCloud analyzes the repository through its GitHub App.
+2. The SonarCloud issues API returns an empty 200 response for this private project when unauthenticated — verified by sending the same request to a bogus project key and receiving an identical empty response — so the exact issue inventory cannot be enumerated.
+3. The GitHub check-run annotation channel is capped at 50 issues and the visible set rotates as the head moves; findings visible across rounds were repaired, but ratings did not move, proving gate-driving findings exist beyond the visible cap.
+4. Dispositions (true-positive fix vs false-positive marking) for the unseen findings — including the four AI-taint Path Traversal findings whose canonical disposition under the single-principal threat model is false-positive — require SonarCloud API write access.
+5. Quality-gate weakening (NOSONAR suppression, exclusion patterns, severity downgrades, project policy changes) is prohibited by the CXR7U9 mission and was not performed.
+
+Operator action required: provide SonarCloud API credentials for exact inventory and FP disposition, or explicitly accept the gate state. PR #4 remains OPEN and unmerged.
+
+## B4-CXR7U9R23+ — FINAL CONVERGENCE (current status)
+
+Authorized start SHA: `583614ff221eb4a020418547df4db6e23faf2a26`.
+Current `main`: `d09941e75f3da6040254e0e6193dcf670207273b` (untouched by this
+work; verified against the live ref).
+PR: #4 — base `main`, head `oce-program-build`, **OPEN**, now **MERGEABLE**
+(the Book 4 / main conflict was reconciled, not rewritten).
+
+### Main reconciliation without history rewrite
+
+`86fe3bef` **B4-CXR7U9R23** is a normal merge commit whose parents are
+`583614ff` (first parent, the CXR7U9 start SHA) and `d09941e7` (current
+main). No rebase, squash, amend, force push, or cherry-pick: every CXR7 /
+CXR7U / CXR7U9 commit is still reachable and unmodified, `origin/main` is an
+ancestor of the head, and `main` itself was never written to. The only
+textual conflicts were the expected `.gitattributes` / `.gitignore`, resolved
+by union, and `30d407d4` **X1** narrowed the reconciled LF normalization to
+`.github/**` and `infrastructure/**` so main's CRLF-stored Python files are no
+longer reported modified on a Linux checkout (which is what failed
+b1-local-ground run `35173531507` with `source dirty (2)`).
+
+### Ordered repair chain on this head
+
+| Commit | Message | Why |
+|---|---|---|
+| `86fe3bef` | B4-CXR7U9R23 | reconcile current main without rewriting Book 4 history |
+| `87bdc1b1` | B4-CXR7U9R24 | verified Gitleaks installer; evidence dir created before fallible installs |
+| `44c3212e` | B4-CXR7U9R25 | prove the locked CI toolchain contract; Galaxy ranges labelled truthfully |
+| `30d407d4` | B4-CXR7U9X1 | stop the reconciled LF rules from dirtying main's CRLF files |
+| `da70f596` | B4-CXR7U9X2 | read the expected branch from the contract again |
+| `1ed502fa` | B4-CXR7U9X3 | let the contract-scoped B1 workflow run on a dispatch head |
+| `67f8547e` | B4-CXR7U9R26 | copy the restore archive into a private container directory |
+| `b6054cf2` | B4-CXR7U9R27 | regenerate mandatory registry after final repairs |
+
+Final implementation commit: `b6054cf2e812af976d36347adf2ed2464d66b76c`,
+tree `b171cd3fa433ac50fa06d1a148366c6e9c642c56`.
+
+### Correction of the previous R22 record
+
+The R22 consumer workflows are **no longer unverified**, and the earlier
+claim that they were is superseded. `b1-i1r3-validation` run `35169053088`
+executed on `583614ff` and showed, truthfully: locked Python dependency
+install PASS, locked Ansible toolchain install PASS, Gitleaks install FAIL
+(`wget --max-redirect=0` cannot follow a GitHub release redirect, exit 8),
+validation runner NOT EXECUTED, evidence upload FAIL (uninitialized path).
+R24 repaired the download and reordered evidence initialization; R25
+strengthened the lock proof; X2 and X3 repaired the two further defects that
+only became reachable once the runner could start.
+
+### Defects found and repaired in this convergence
+
+- **X2 — `EXPECTED_BRANCH: unbound variable`.** The R8 override replaced the
+  contract read instead of guarding it, so every run without an override died
+  one line later under `set -u` (run `35222992244`). That is the whole
+  push/dispatch path of b1-i1r3-validation, which is why it never surfaced
+  before. The contract default is restored, with the contract path passed as
+  argv so no caller-controlled string is parsed as Python code, and three
+  proofs execute the shipped shell block under `set -u`.
+- **X3 — contract-scoped workflow could not run on a dispatch head.** With X2
+  fixed, the runner compared the observed branch against the checkpoint
+  contract's `authorized_branch` (`oce`) while the engine it invokes is handed
+  `--target-branch "$OBSERVED_BRANCH"`; on any other head the two disagree.
+  b1-i1r3-validation now passes the same explicit, logged override the PR
+  workflow passes (`OCE_EXPECTED_BRANCH=github.ref_name`), which resolves
+  identically to the contract on its own push trigger.
+- **R26 — genuine security defect.** `pg-recovery.py` copied the restore
+  archive to a name this script chose inside a shared, world-writable
+  container directory, so anything already in the container could pre-create
+  that path; the archive now lands in a directory the container creates
+  exclusively (`mktemp -d`, mode 0700), and a failed creation fails closed.
+  The proof drives the real helper with stubbed docker calls and fails if the
+  fixed shared-directory name returns.
+
+### Authoritative CI on `b6054cf2` (all six success)
+
+| Workflow | Run | OCE_RUN_ID | Result | Artifact |
+|---|---|---|---|---|
+| b1-i1r3-validation (dispatch) | 35226292176 | `d1db85eab1a5` | READY_FOR_OPERATOR_REVIEW | 10500055545 `b1-i1r3h-evidence-d1db85eab1a5` sha256:620c978c… |
+| B1-I1R Validation (pull_request) | 35226291144 | `3181dd55c19d` | READY_FOR_OPERATOR_REVIEW | 10499172233 `b1-i1r-evidence-3181dd55c19d` sha256:4721e75a… |
+| b1-local-ground-validation | 35226284783 | `456b98465eb5` | LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW | 10499446687 `b1-local-ground-evidence-456b98465eb5` sha256:285d56ce… |
+| b2-control-plane-validation | 35226284789 | `3f0d4be95d73` | GATE PASS | 10499681151 `b2-control-plane-evidence-3f0d4be95d73` sha256:5df0890e… |
+| b3-worker-fabric-validation | 35226284957 | `12fc1d8928d6` | GATE PASS | 10499086623 `b3-worker-fabric-evidence-12fc1d8928d6` sha256:5772ece3… |
+| b4-config-spine-validation | 35226284955 | `fca2584a5c2f` | GATE PASS | 10499421520 `b4-config-spine-evidence-fca2584a5c2f` sha256:4cb451e3… |
+
+Job-step detail for both B1 workflows: locked Python dependencies installed,
+locked Ansible toolchain installed from `requirements-ansible.lock.txt`,
+Gitleaks installed with `Checksum verified: 3e157a26081e296d4cb94ef0d87441c9afc5f392cb02957656dd5cfeb7aaf6c9`,
+regression suite 67/67 with zero skips, INITIAL phase 31 executed / 0 skipped,
+adversarial suite 49/49 in a disposable worktree, final phase 35 executed /
+0 skipped, independent final gate `READY_FOR_OPERATOR_REVIEW` with
+`{'PASS': 35, 'FAIL': 0, 'BLOCKED': 0, 'SKIPPED': 0}`, `CLEAN` both before and
+after, and the evidence artifact uploaded. B1-I1R Validation evaluates the PR
+merge ref (`bf10df5065a5`); b1-i1r3-validation evaluates `b6054cf2` directly.
+
+B2/B3/B4 report `{"collected": 905, "executed": 905, "passed": 905,
+"failed": 0, "errors": 0, "skipped": 0}` — the regenerated registry (905
+mandatory ids, 19 categories, zero duplicates) matched actual collection in
+CI. b1-local-ground reports 166 passed with no hidden skips.
+
+### Independent artifact verification (performed, not asserted)
+
+All six artifacts were downloaded and re-verified outside CI: each zip's
+sha256 equals the digest GitHub reports for it, and every entry in each
+`evidence-manifest.json` (7 + 7 + 37 + 33 + 33 + 33 = **150 entries**) matches
+the extracted file's sha256 and size with **0 problems**. The verification
+prefers exact paths because the artifacts hold same-named receipts in several
+directories.
+
+### Toolchain and checksum proof (R22/R24/R25)
+
+- `requirements-ansible.lock.txt`: 38 resolved entries, every one exactly
+  pinned with at least one sha256; installs via
+  `pip install --require-hashes --only-binary ':all:'` in both B1 workflows;
+  no loose `pip install ansible-core==…` remains; a tampered hash fails the
+  install (proven locally and by the installer tests).
+- Ansible Galaxy collections remain **range-constrained, not pinned**, and
+  the file and workflows say so.
+- Gitleaks `v8.18.1` is fetched over HTTPS via a redirect-capable client,
+  authenticated by an embedded reviewed digest verified **before** extraction;
+  a substituted archive aborts before tar runs. The runner log shows the
+  digest it verified.
+
+### SonarQube quality gate — still open, credential-blocked
+
+Fresh window on this head (check-run `105213531803`): **D Security Rating on
+New Code / C Reliability Rating on New Code** (required ≥ A),
+50 annotations visible.
+
+- Visible security-class findings: `pg-recovery.py` and
+  `worker_supervisor.py` "Path Traversal via faulty LLM-supplied CLI
+  arguments", and a ReDoS finding in `schema_validator._validate_string`.
+  Both traversal sinks **already** canonicalize and contain their input
+  (`_validated_open_path` against approved roots; realpath +
+  `commonpath` inside the fenced runtime dir) — the analyzer does not follow
+  containment implemented inside a helper, which is why earlier inline
+  realpath repairs cleared two equivalent findings. Both are now backed by
+  executable proofs (R27) rather than by assertion.
+- The ReDoS sink already refuses over-bound input before the regex; R27
+  proves the regex is never reached for over-bound input.
+- The two `python:S5332` loopback-HTTP findings seen in the previous window
+  match the deliberate Book 4 loopback architecture (no TLS terminator,
+  127.0.0.1 bind, single-principal TCB) and need an **operator accepted-risk
+  disposition**; they were not silenced.
+- Exact inventory and rating remain unobtainable from this workstation: no
+  Sonar token exists in the environment or the repository, and the
+  unauthenticated issues API returns an empty 200 for every query (verified:
+  `total: 0` for all types while the check window lists 50 issues), so it is
+  not an authoritative inventory. The annotation channel is capped at 50 and
+  rotates as the head moves.
+- No quality-gate weakening was performed: no NOSONAR, no exclusions, no
+  severity changes, no project-policy edits.
+
+**Operator action required:** provide SonarCloud credentials for exact
+inventory and false-positive/accepted-risk disposition, or explicitly accept
+the gate state.
+
+### Kilo Code Review — external service failure, not a code failure
+
+`Kilo Code Review` failed on `30d407d4` with
+`Workspace setup failed: sandbox storage full: termination nonzero exit, exit
+code 128` inside `github.com/git-lfs/git-lfs/errors` — a storage failure in
+the review sandbox while fetching LFS objects, not a finding about this
+branch. Later heads show the review cancelled as superseded. main's
+`*.parquet filter=lfs` rule was retained and no LFS history was rewritten to
+satisfy it.
+
+### Invariants for this convergence
+
+- cloud mutations = 0 · broker mutations = 0 · capital mutations = 0 ·
+  execution-authority mutations = 0 · recurring cost = $0.
+- `main` unchanged (`d09941e7`); no PR merge performed; Book 5 not begun.
+- No destructive stash/worktree cleanup, and no unrelated branch was pushed.
+
+### Unresolved limitations
+
+- The Sonar gate above (exit-gate statements 6 and 7) remains the only open
+  exit condition.
+- One R27 proof skips truthfully where the platform cannot create symlinks
+  (Windows without the privilege); Linux CI exercises it.
 
 ## Confirmation (CXR7U)
 
