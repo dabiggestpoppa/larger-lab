@@ -493,6 +493,10 @@ class OrchestratorEngine:
             lease_owner="", lease_token="", lease_expires_at="",
         )
         self._granted_keys.add(f"{job_id}:{step_id}")
+        # Clear any stale queue claim so the released step is claimable now
+        # (the WAITING_POLICY entry cleared the step's lease columns but the
+        # claim row may persist until TTL; release law mirrors the retry path).
+        self._queue.expire_stale_leases_for([step_id])
         self._record(
             JobEventType.APPROVAL_GRANTED, job_id, step_id,
             payload_json='{"release": "exact-scope grant"}',

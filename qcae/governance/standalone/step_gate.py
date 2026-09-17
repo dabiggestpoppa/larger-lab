@@ -103,12 +103,35 @@ class PolicyStepAuthorityGate:
 
 
 class ApprovalRegistrySink:
-    """Persist REQUIRE_APPROVAL verdicts as durable, exact-bound requests."""
+    """Persist REQUIRE_APPROVAL verdicts as durable, exact-bound requests.
 
-    def __init__(self, approval_registry, *, clock) -> None:
+    Every request carries an explicit approval window (directive §13-14:
+    grants are bounded, never indefinite). The default window is 24h;
+    ``effective_grant`` returns None past it, so stale grants cannot execute.
+    """
+
+    DEFAULT_WINDOW_SECONDS = 24 * 3600
+
+    def __init__(self, approval_registry, *, clock,
+                 window_seconds: int = DEFAULT_WINDOW_SECONDS) -> None:
         self._registry = approval_registry
         self._clock = clock
+        self._window = window_seconds
         self._counter = 0
+
+    def _expires_at(self) -> str:
+        from datetime import datetime, timedelta, timezone
+
+        now = self._clock()
+        try:
+            base = datetime.strptime(now, "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=timezone.utc
+            )
+        except ValueError:
+            return ""  # non-ISO clock: caller must manage windows explicitly
+        return (base + timedelta(seconds=self._window)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
 
     def record_authority_request(self, verdict: StepAuthorityVerdict) -> str:
         self._counter += 1
@@ -123,6 +146,7 @@ class ApprovalRegistrySink:
                 budget_ref=verdict.scope,  # exact binding; budget joins scope
                 justification=verdict.reason or "step requires approval",
                 created_at=self._clock(),
+                expires_at=self._expires_at(),
             )
         )
         return request_id
