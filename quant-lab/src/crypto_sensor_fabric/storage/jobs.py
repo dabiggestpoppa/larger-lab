@@ -1249,9 +1249,24 @@ class DurableJobStateRepository:
                     f"{transition.transitioned_at}"
                 )
             proof = payload.get("checkpoint_proof")
-            is_checkpoint = (
-                transition.to_status is StorageJobStatus.CHECKPOINT_ADVANCED
-            )
+            # ONE owner for the predicate: the module-level
+            # ``is_checkpoint_event`` the per-job loop below also uses.
+            is_checkpoint = is_checkpoint_event(payload)
+            # §20: replay enforces the EXACT graph the writer enforces, and
+            # the CHEAP pure check runs FIRST — the durable re-proof below
+            # (repository + physical-blob I/O) never precedes it.
+            try:
+                validate_transition(
+                    transition.from_status,
+                    transition.to_status,
+                    transition.reason,
+                    checkpoint=is_checkpoint,
+                )
+            except JobTransitionConflict as exc:
+                raise JobCatalogCorrupt(
+                    f"event {event_id[:12]}... violates the frozen "
+                    f"transition graph: {exc}"
+                ) from exc
             if is_checkpoint:
                 # I07R1G §4: the ONE proof authority — the very same call
                 # the runtime exact-retry path makes, so reader and writer
@@ -1268,19 +1283,6 @@ class DurableJobStateRepository:
                     f"non-checkpoint event {event_id[:12]}... carries "
                     "checkpoint_proof"
                 )
-            # §20: replay enforces the EXACT graph the writer enforces.
-            try:
-                validate_transition(
-                    transition.from_status,
-                    transition.to_status,
-                    transition.reason,
-                    checkpoint=is_checkpoint,
-                )
-            except JobTransitionConflict as exc:
-                raise JobCatalogCorrupt(
-                    f"event {event_id[:12]}... violates the frozen "
-                    f"transition graph: {exc}"
-                ) from exc
         # Per-job chain validation: contiguity, linkage, chronology,
         # ordinary-event pointer immutability.
         for job_id, birth in seen_jobs.items():

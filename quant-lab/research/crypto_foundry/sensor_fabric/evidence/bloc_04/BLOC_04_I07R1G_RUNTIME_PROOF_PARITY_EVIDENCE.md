@@ -197,8 +197,8 @@ intact-proof control + the same-bytes premise test — plus 2 read-only evidence
 | Item | Result |
 |---|---|
 | `ruff check` (changed scope: `jobs.py`, `test_job_state_r1g.py`, `test_i07r1g_evidence.py`) | clean — `All checks passed!` |
-| `mypy src/.../storage/jobs.py` | clean except the documented pre-existing `probes/planner.py:79` baseline error (out of scope, unchanged) |
-| `mypy` on the new test modules | only `import-not-found` noise for `_sibling_import` / the package modules — **the identical pre-existing class** produced by `test_job_state_r1f.py`; the same `ResumeToken(mode="PAGE")` arg-type note already exists in `test_job_state_r1f.py`. No new class of typing error; the production change itself is clean. |
+| `mypy src/.../storage/jobs.py` | **1 error**: the documented pre-existing `probes/planner.py:79` `call-overload` baseline (out of scope, unchanged). The production change itself is clean. |
+| `mypy` on the new test modules (PRECISE, not optimistic) | Exactly **7** errors in `test_job_state_r1g.py` + `test_i07r1g_evidence.py`, and every one is `import-not-found` (`_sibling_import` ×2, `crypto_sensor_fabric.providers.base.models` ×2, `…storage.enums` ×2, `…storage.jobs` ×1). The pre-existing sibling pair (`test_job_state_r1f.py` + `test_i07r1f_evidence.py`) reports **11** errors of that same class. When the source root is resolved in the same mypy invocation the pre-existing `ResumeToken(mode="PAGE")` `arg-type` note appears in BOTH the r1g and the r1f module (measured: `mypy src/.../jobs.py tests/.../test_job_state_r1f.py` and the r1g equivalent each report it). So the new test files add **instances of an existing noise class, not a new class of typing error** — but the hard-gate line "mypy changed scope clean" is literally unmet for them, and this file says so rather than claiming otherwise. |
 | Network calls | 0 — every proof runs against the local durable stack |
 | Provider source | unchanged — no file under `providers/` touched |
 | Catalog RLock / new-checkpoint floor authority | unchanged (I07R1F behaviour preserved) |
@@ -219,7 +219,62 @@ to `\r\n`. Content is byte-identical and all seven were restored with
 `git checkout HEAD --` before committing, so this commit carries **zero** historical-
 evidence changes. Per §19 this is not counted as an I07R1G behavioural failure.
 
-## 12. Proposed ledger state
+## 12. Post-audit repair pass (this commit)
+
+A read-only four-dimension audit of this checkpoint named two small defects **inside the lines this
+pass touched**, plus two record-keeping facts. Both defects are closed here; nothing else changed, and
+the spec's prohibitions (no module split, no fixture cleanup, no event-model redesign, no I08) remain
+in force.
+
+| Item | Before | After |
+|---|---|---|
+| Replay validation order | unifying the proof contract moved the durable re-proof (repository + physical-blob I/O) AHEAD of the pure `validate_transition` check — an inverted, gratuitous order | the CHEAP pure graph check runs FIRST; the durable re-proof follows it (replay loop, `jobs.py:1255`–`jobs.py:1286`) |
+| Checkpoint predicate | the per-event loop recomputed `is_checkpoint = transition.to_status is CHECKPOINT_ADVANCED` inline while the module already defined `is_checkpoint_event` and used it in the neighbouring per-job loop | the per-event loop calls `is_checkpoint_event(payload)`; both loops share the one predicate, and no inline duplicate remains anywhere in the file (verified by grep) |
+
+Both edits are ordering/ownership refactors only — every rejection still classifies as
+`JobCatalogCorrupt`. Verified by re-running the full job/resume surface (135 passed) including the 17
+forged cases (all still fail closed on BOTH paths), the intact-proof control (still accepted on both
+paths) and the read-only matrix byte comparison: the committed
+`BLOC_04_I07R1G_RUNTIME_PROOF_PARITY_MATRIX.json` regenerates **byte-identically**, so these two source
+edits required **no evidence change**. Re-measured at the final repaired tree: **storage 1101 collected /
+1098 passed / 0 failed / 3 skipped**, **full 2481 collected / 2477 passed / 0 failed / 4 skipped** —
+identical to the pre-repair counts in §10, because the two edits change no test outcome. `ruff check` on
+`jobs.py` is clean and `mypy src/.../storage/jobs.py` still reports only the documented
+`probes/planner.py:79` baseline.
+
+### Facts the operator may want to veto
+
+**1. The closed field-set check is stricter than the enumerated attack list.** §5 states the proof
+schema is "exactly" the five fields, so rejecting a proof carrying an unexpected field follows from
+it — but §11's letters A–L asked only for non-mapping proofs (`[]`, `{}`). A proof with an extra field
+was ACCEPTED before this checkpoint (measured: `NO_ERROR (adopted)` at runtime, table in §5) and is
+now `JobCatalogCorrupt` on both paths.
+
+*Is any legitimate writer at risk? No — measured, not assumed.* `checkpoint_proof` has exactly ONE
+write site in the entire `src/` tree: `jobs.py:770` inside `_append_checkpoint_event`, which emits the
+five closed fields and nothing else; no other module reads or writes the proof, and the adoption path
+(`_commit_adopting`) only compares event semantics. A genuine checkpoint produced by the real stack was
+inspected: its proof key set is exactly
+`{acquisition_id, blob_sha256, manifest_id, minimum_durable_status, proof_version}` — equal to
+`CHECKPOINT_PROOF_FIELDS`, zero extras. Only TWO paths can reach the extra-field rejection, and both
+read the proof from the DURABLE catalog rather than accept one from a caller:
+
+| Path | Entry | Reaches the rule through |
+|---|---|---|
+| Runtime exact retry | `advance_checkpoint` on a `CHECKPOINT_ADVANCED` head | `_retry_committed_checkpoint` → `_validate_checkpoint_proof` |
+| Restart replay | `DurableJobStateRepository.__init__` | `_validate_cross_constraints` → `_validate_checkpoint_proof` |
+
+**Therefore only forged or hand-edited durable records are at risk**: no code path that writes a proof
+through the normal API can be rejected by the closed field-set rule.
+
+**2. Two test/matrix variants were not requested.** §11 K/L asked for `[]` and `{}`; the committed case
+table and the matrix additionally carry a `bool` proof (`True`) and an extra-field proof. Both are
+additions to the requested surface: they change no production behaviour beyond the closed field-set
+rule above (measured: `JobCatalogCorrupt` on both paths, aggregated under the `proof_wrong_type`
+matrix case as six schema variants), and they are recorded here so the operator can veto them without
+diffing the test files.
+
+## 13. Proposed ledger state
 
 ```
 Current checkpoint = SENSOR-B4-I07R1G
