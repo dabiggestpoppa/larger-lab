@@ -1,0 +1,35 @@
+{
+  "cases": [
+    {
+      "case": "ordinary_cursor_rejected",
+      "outcome": "PASS"
+    },
+    {
+      "case": "ordinary_anchor_rejected",
+      "outcome": "PASS"
+    },
+    {
+      "case": "private_gate_parameter_unavailable",
+      "outcome": "PASS"
+    },
+    {
+      "case": "checkpoint_only_through_gate",
+      "planted_flag_outcome": "PASS"
+    },
+    {
+      "bad_targets": [
+        "RAW_STAGED:CONFLICT",
+        "RAW_COMMITTED:CONFLICT",
+        "PROJECTION_PENDING:CONFLICT",
+        "PROJECTION_COMMITTED:CONFLICT",
+        "MANIFEST_COMMITTED:CONFLICT"
+      ],
+      "case": "failed_retryable_only_to_acquiring",
+      "result": "PASS",
+      "resume_outcome": "ACCEPTED"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1",
+  "doctrine": "I07R1 \u00a73/\u00a74/\u00a75/\u00a721 \u2014 gate-only cursor mutation, single retry edge",
+  "matrix": "BLOC_04_I07R1_PUBLIC_API_MATRIX"
+}

@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "case": "safe_lock_path_traversal",
+      "result": "PASS"
+    },
+    {
+      "case": "safe_lock_unicode_long",
+      "result": "PASS"
+    },
+    {
+      "case": "lock_key_collision",
+      "distinct_keys": 5,
+      "result": "PASS",
+      "total_ids": 5
+    },
+    {
+      "case": "two_repo_refresh",
+      "observed_chain": [
+        "ACQUIRING",
+        "RAW_STAGED",
+        "RAW_COMMITTED"
+      ],
+      "result": "PASS"
+    },
+    {
+      "case": "two_repo_sequence",
+      "committed_chain": [
+        "ACQUIRING",
+        "RAW_STAGED"
+      ],
+      "loser_errors": 1,
+      "result": "PASS"
+    },
+    {
+      "adopted_status": "CHECKPOINT_ADVANCED",
+      "case": "external_checkpoint_retry",
+      "gate_event_count": 1,
+      "result": "PASS"
+    },
+    {
+      "case": "refresh_fail_closed_on_vanish",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1",
+  "doctrine": "I07R1 \u00a728-\u00a736 \u2014 logical IDs never become paths; locks refresh truth",
+  "matrix": "BLOC_04_I07R1_COORDINATION_MATRIX"
+}

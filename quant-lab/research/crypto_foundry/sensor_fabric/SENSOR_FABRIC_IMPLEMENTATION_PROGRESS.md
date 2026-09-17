@@ -1121,3 +1121,22 @@ I07 current state: durable job state + resume coupling sealed per 03 doc §15/§
 with the frozen I01 vocabulary. next_checkpoint_authorized=FALSE pending operator
 review of PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED. I08+ NOT authorized,
 NOT started. Research NOT resumed.
+
+## BLOC 4 — I07R1 RESUME-TRUTH HARDENING SEAL
+
+Operator review set PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED =
+OPERATOR_HOLD pending I07R1 (gates/identity/replay/coordination seams A-H).
+Historical I07 evidence remains chronological truth for the pre-I07R1
+implementation; its baseline wording ("storage 939 / full 2318") used the older
+pre-I06R1 counts — the authoritative fresh baseline at exact head 42cdfe09 was
+storage 1000 / full 2318 (I07R1E evidence §9).
+
+| Commit | Stage | Tests | Verdict | Notes |
+|---|---|---|---|---|
+| SENSOR-B4-I07R1A/B/C/D | cbb93b15 | Sealed checkpoint API + identity-bound proof + replay=writer + safe locks + post-lock refresh: public advance_status narrowed to (job_id, *, to_status, reason, evidence_ref, expected_from); CHECKPOINT_ADVANCED reachable ONLY via private _append_checkpoint_event (no caller-settable flag); ordinary transitions preserve all four pointers exactly; states fully re-validated pre-durability; checkpoint proof resolves durable acquisition with EXACT job identity (provider/sensor/request_fingerprint) + authoritative I04R2 is_usable_manifest_provenance + MANIFEST-floor exact manifest↔acquisition binding (provider/venue/sensor/instrument/granularity); RAW floor requires manifest_id=None (no dummy anchors); exact blob anchor sealed; durable V1 checkpoint_proof persisted and re-proved under the floor persisted in each proof; ONE pure transition graph drives write path AND restart replay (forward skips, ungated checkpoints, bad retry edges, reason-less failures = corruption); birth identity / ordinary-event pointers / canonical event ids / result-time binding replay-validated; lock key = sha256(utf8(job_id)).lock (raw IDs never become paths; traversal/Unicode/long-ID safe); DurableJsonCatalog.refresh() validated read-only reload at OUTERMOST lock acquisition (two-repo refresh / sequence race / external checkpoint retry proven, no chain fork, no raw-JSON bypass) | 53 new I07R1 tests (storage 1056 passed / 0 failed / 3 skipped) | PASS |
+| SENSOR-B4-I07R1E | (this commit) | 4 deterministic matrices (public API / checkpoint identity / restart replay / coordination — 39 cases) published once, pytest READ-ONLY vs committed bytes; evidence MD BLOC_04_I07R1_GATE_IDENTITY_REPLAY_EVIDENCE.md incl. historical I07 baseline correction + fresh exact-head baseline; ledger reconciliation | — | proposed PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED, then PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED for operator acceptance; DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE; RECOVERY_SCANNER_IMPLEMENTED=FALSE; next_checkpoint_authorized=FALSE; recommended next SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY after operator acceptance (NOT authorized, NOT started) |
+
+I07R1 current state: PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED =
+OPERATOR_HOLD (hardening executed). Proposed verdicts await operator review.
+next_checkpoint_authorized=FALSE. I08 (RECOVERY / QUARANTINE) NOT authorized,
+NOT started. Research NOT resumed.

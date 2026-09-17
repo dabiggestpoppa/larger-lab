@@ -1,0 +1,72 @@
+{
+  "cases": [
+    {
+      "case": "valid_chain",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "forward_skip",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "ungated_checkpoint",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "checkpoint_proof_missing",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "checkpoint_proof_mismatch",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "failure_without_reason",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "failed_retryable_bad_target",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "job_identity_tamper",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "ordinary_cursor_tamper",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "ordinary_anchor_tamper",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "blob_anchor_tamper",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "manifest_anchor_tamper",
+      "restart": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "event_identity_tamper",
+      "restart": "PASS",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1",
+  "doctrine": "I07R1 \u00a719-\u00a727 \u2014 the reader enforces the writer's state machine",
+  "matrix": "BLOC_04_I07R1_RESTART_REPLAY_MATRIX"
+}

@@ -1,0 +1,81 @@
+{
+  "cases": [
+    {
+      "blob_sha256": "e473291b358bd412b7e1e8c62acd7abc489805462f86a222182cba5bb8c2f999",
+      "case": "job_acquisition_exact",
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED"
+    },
+    {
+      "case": "provider_mismatch",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "sensor_mismatch",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "request_fingerprint_mismatch",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "cross_job_same_blob",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "forensic_acquisition_rejected",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "manifest_exact",
+      "manifest_id": "pm-mexact",
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED"
+    },
+    {
+      "case": "manifest_provider_mismatch",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "manifest_venue_mismatch",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "manifest_sensor_mismatch",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "manifest_instrument_mismatch",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "manifest_granularity_mismatch",
+      "rejected": "PASS",
+      "result": "PASS"
+    },
+    {
+      "case": "raw_floor_no_manifest",
+      "contradictory_anchor_rejected": "PASS",
+      "none_form_status": "CHECKPOINT_ADVANCED",
+      "result": "PASS",
+      "stored_manifest_id": null
+    },
+    {
+      "case": "manifest_floor_required",
+      "missing_manifest_rejected": "PASS",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1",
+  "doctrine": "I07R1 \u00a77-\u00a713 \u2014 evidence belongs to the exact job/request",
+  "matrix": "BLOC_04_I07R1_CHECKPOINT_IDENTITY_MATRIX"
+}
