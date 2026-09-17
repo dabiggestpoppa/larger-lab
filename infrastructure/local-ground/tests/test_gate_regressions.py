@@ -925,3 +925,60 @@ def test_collection_requirements_state_range_truth_honestly():
         wf = _workflow_text(name)
         assert "constrains these by RANGE" in wf, (
             f"{name} must not present the collections as pinned")
+
+
+# ── X1: the reconciled line-ending rules must not dirty the checkout ─────
+def _git_lines(*args):
+    result = subprocess.run(["git", *args], cwd=REPO_ROOT, capture_output=True,
+                            text=True, timeout=120)
+    if result.returncode != 0:
+        pytest.skip(f"git cannot answer here: {result.stderr.strip()[:120]}")
+    return result.stdout.splitlines()
+
+
+def test_committed_content_respects_the_line_ending_rules():
+    """Every tracked file covered by a text/eol normalization rule must
+    already be LF in the index.
+
+    A CRLF-stored blob under such a rule is reported modified on every Linux
+    checkout (core.eol=native=lf) immediately after `git checkout`, because
+    the clean filter normalizes the working tree while the indexed blob stays
+    CRLF. That is how the reconciled .gitattributes broke b1-local-ground run
+    35173531507 ('FATAL: source dirty (2)') on the merge commit.
+    """
+    covered, offenders = 0, []
+    for line in _git_lines("ls-files", "--eol"):
+        left = line.split("\t", 1)[0].split()
+        if len(left) < 3:
+            continue
+        attrs = left[2:]
+        if any(a.startswith("attr/-text") for a in attrs):
+            continue
+        if not any(a.startswith("attr/text") for a in attrs):
+            continue
+        covered += 1
+        # 'i/none' is an empty file: no line endings to normalize.
+        if left[0] not in ("i/lf", "i/none"):
+            offenders.append(line)
+    assert covered >= 1000, (
+        f"the normalization rules must still cover the tree (saw {covered})")
+    assert offenders == [], (
+        "a file covered by a text/eol rule must already be LF in the index, "
+        f"or it reads as modified on every Linux checkout: {offenders}")
+
+
+def test_gitattributes_keeps_both_reconciled_policies():
+    """main's Parquet LFS rule and this project's LF normalization both
+    survive the reconciliation, and the normalization is scoped rather than
+    repository-wide."""
+    attrs = (REPO_ROOT / ".gitattributes").read_text(encoding="utf-8")
+    assert "*.parquet filter=lfs diff=lfs merge=lfs -text" in attrs, (
+        "main's LFS rule must survive the reconciliation")
+    assert "infrastructure/cloud-ground/scripts/* text eol=lf" in attrs, (
+        "the cloud-ground entrypoint rule must survive")
+    for ext in ("py", "sh", "yml", "yaml"):
+        assert f"infrastructure/**/*.{ext} text eol=lf" in attrs, (
+            f"this project's *.{ext} normalization must survive")
+        assert f"\n*.{ext} text eol=lf" not in attrs, (
+            f"a repository-wide *.{ext} rule marks main's CRLF-stored files "
+            "dirty on a Linux checkout (b1-local-ground run 35173531507)")
