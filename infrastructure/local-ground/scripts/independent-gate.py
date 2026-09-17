@@ -21,7 +21,7 @@ Structure (B4-CXR7U9R20):
     _validated_subprocess_path()
                       policy wrapper adding the directory requirement for the
                       subprocess argument.
-    sha256()/size()   pure measurement of an already-resolved path.
+    sha256()          pure measurement of an already-resolved path.
     add()/checks      result accumulation; main() renders the report.
 """
 import hashlib
@@ -66,23 +66,16 @@ def add(cid, name, ok, detail=""):
 
 
 def _canonical(path: str) -> str:
-    """Absolute, symlink-resolved path.
-
-    Case is preserved in the result (callers compare resolved paths as
-    strings); containment comparisons case-fold separately below.
-    """
+    """Absolute, symlink-resolved path; case preserved for callers that
+    compare resolved paths as strings (containment case-folds itself)."""
     return os.path.realpath(os.path.abspath(path))
 
 
 def contained_path(path: str, root: str) -> str:
-    """THE containment owner: canonical *path*, proven inside *root*.
-
-    One algorithm for every caller - package reads, indexed receipts,
-    manifest artifacts and the subprocess --ops-root. The comparison is
-    separator-anchored and case-folded, so a sibling that merely shares a
-    name prefix with the root, a parent traversal, an absolute escape and a
-    symlink substitution are all refused. Denial is a pure predicate with no
-    durable side effects. Raises RuntimeError on every escape.
+    """Canonical *path*, proven inside *root*; raises RuntimeError on every
+    escape. The comparison is separator-anchored and case-folded, so a
+    name-prefix sibling, a parent traversal, an absolute escape and a symlink
+    substitution are all refused, and denial has no side effects.
     """
     approved, real = _canonical(root), _canonical(path)
     if (os.path.normcase(real) != os.path.normcase(approved)
@@ -95,12 +88,9 @@ def contained_path(path: str, root: str) -> str:
 class EvidenceBoundary:
     """The evidence package this gate may read and write.
 
-    Sole owner of the approved root: resolved ONCE from the pipeline
-    declaration (OCE_EVIDENCE_DIR), with the CLI argument admitted only when
-    it agrees with that declaration (B4-CXR7U9R17). Every filesystem access
-    to the package goes through path()/exists()/json()/text(), so no
-    caller-supplied string can steer a read or a write and containment
-    policy lives in exactly one place.
+    Sole owner of the approved root (B4-CXR7U9R17): every access goes through
+    path()/exists()/json()/text(), so no caller-supplied string can steer a
+    read or a write.
     """
 
     def __init__(self, root: str):
@@ -137,15 +127,8 @@ class EvidenceBoundary:
 
 
 def sha256(path):
-    h = hashlib.sha256()
     with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def size(path):
-    return os.path.getsize(path)
+        return hashlib.file_digest(f, "sha256").hexdigest()
 
 
 def _load_pg_recovery():
@@ -166,22 +149,17 @@ def _pg_recovery_source():
 def _ops_index(ev):
     """Load the authoritative operation index from the evidence package.
     Returns (ok, idx, problem)."""
-    p = ev.path("operations", "index.json")
-    if not os.path.isfile(p):
-        return False, {}, "operation index missing (operations/index.json)"
     try:
-        with open(p, encoding="utf-8") as f:
-            idx = json.load(f)
+        return True, ev.json("operations", "index.json"), ""
+    except FileNotFoundError:
+        return False, {}, "operation index missing (operations/index.json)"
     except Exception as e:
         return False, {}, f"operation index unreadable: {e}"
-    return True, idx, ""
 
 
 def _validated_subprocess_path(path: str, root: str) -> str:
-    """Policy: the subprocess --ops-root must be an EXISTING DIRECTORY inside
-    the approved root (B4-CXR7U9R7). Containment itself is owned by
-    contained_path; this wrapper adds only the directory requirement.
-    Denial has zero durable side effects: this is a pure predicate.
+    """The subprocess --ops-root: an existing directory inside *root*
+    (B4-CXR7U9R7). A pure predicate; denial has no side effects.
     """
     if not os.path.isdir(root):
         raise RuntimeError(f"approved root is not a directory: {root}")
@@ -192,20 +170,12 @@ def _validated_subprocess_path(path: str, root: str) -> str:
 
 
 def _ops_verify(ev):
-    """Run recovery-ops verify over the evidence package's operations root.
+    """Run recovery-ops verify over the package's operations root.
 
-    B4-CXR7U9R7: the evidence directory is the approved root; the
-    subprocess --ops-root argument is enforced contained within it.
-    The executable itself is NEVER path-controlled: recovery-ops.py is
-    derived from this script's own location and sys.executable is the
-    interpreter running this gate. The --ops-root argument derives only
-    from the pipeline-declared OCE_EVIDENCE_DIR boundary, never from
-    raw argv.
+    Only --ops-root is path-derived, and the boundary contains it; the
+    executable comes from this script's own directory and sys.executable,
+    never from input.
     """
-    # B4-CXR7U9R14: --ops-root is derived from the pipeline-declared
-    # OCE_EVIDENCE_DIR boundary (never raw argv) and is realpath-validated
-    # into that boundary at creation, so the subprocess argument carries a
-    # contained path by construction.
     ops_root = _validated_subprocess_path(ev.path("operations"), ev.root)
     rops = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recovery-ops.py")
     r = subprocess.run([sys.executable, rops, "verify", "--ops-root", ops_root],
@@ -219,19 +189,10 @@ def _op_receipt(ev, op, name):
     (evidence/operations), so resolve against that root."""
     for rec in op.get("receipts", []):
         if os.path.basename(rec["path"]) == name:
-            # B4-CXR7U9R17: the index-declared receipt path is CONTAINED
-            # inside the pipeline-declared evidence boundary, not merely
-            # realpath'd, so an index value cannot escape the boundary.
             try:
-                p = ev.path("operations", rec["path"])
-            except RuntimeError:
+                return ev.json("operations", rec["path"])
+            except Exception:
                 return None
-            if os.path.isfile(p):
-                try:
-                    with open(p, encoding="utf-8") as f:
-                        return json.load(f)
-                except Exception:
-                    return None
     return None
 
 
@@ -520,7 +481,7 @@ def main():
             pg_mod = _load_pg_recovery()
             phase_ok = (pg_mod.valid_phase_prefix(pr_phases, pg_mod.PHASES_PROMOTE)
                         and pg_mod.valid_phase_prefix(fz_phases, pg_mod.PHASES_FINALIZE))
-        except Exception as e:
+        except Exception:
             phase_ok = False
         add("gate-35c-phase-ordering-valid", "promotion/finalize phase ordering is valid",
             phase_ok, f"promote={pr_phases} finalize={fz_phases}")
@@ -558,7 +519,7 @@ def main():
             sql_ok = ("ALTER DATABASE IF EXISTS" not in pg_src
                       and "DROP DATABASE IF EXISTS" not in pg_src
                       and "pg_database" in pg_src)
-        except Exception as e:
+        except Exception:
             sql_ok = False
         add("gate-37-no-invalid-rollback-syntax",
             "invalid ALTER/DROP DATABASE IF EXISTS syntax absent (catalog checks used)",
@@ -573,8 +534,6 @@ def main():
     # 31. Manifest hashes and sizes match final files
     manifest_ok = True
     for art in man.get("artifacts", []):
-        # B4-CXR7U9R17: a manifest-declared artifact path is contained
-        # inside the pipeline-declared boundary before any read.
         try:
             p = ev.path(str(art.get("path", "")))
         except RuntimeError:
@@ -583,7 +542,7 @@ def main():
         if not os.path.isfile(p):
             manifest_ok = False
             continue
-        if sha256(p) != art.get("sha256") or size(p) != art.get("size"):
+        if sha256(p) != art.get("sha256") or os.path.getsize(p) != art.get("size"):
             manifest_ok = False
     add("gate-31-manifest-hashes-sizes", "manifest hashes and sizes match final files", manifest_ok)
 
