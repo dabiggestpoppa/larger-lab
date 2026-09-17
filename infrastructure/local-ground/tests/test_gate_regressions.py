@@ -806,3 +806,122 @@ def test_ci_evidence_initialization_precedes_fallible_installs():
         assert wf.count("actions/upload-artifact") == \
             wf.count("steps.evidence.outputs.evidence_dir != ''"), (
             f"{name} must guard every artifact upload on a present evidence path")
+
+
+# ── R25: the locked CI toolchain contract ────────────────────────────────
+def _validate_hash_locked_requirements(text):
+    """Return (requirements, problems) for a pip --require-hashes file.
+
+    A conforming file pins every entry with `==`, gives each entry at least
+    one sha256, and contains no editable, VCS, local-path or bare-URL
+    requirement (pip cannot hash-lock those).
+    """
+    problems = []
+    reqs = []
+    current = None
+    for raw in text.splitlines():
+        line = raw.strip().rstrip("\\").strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("--hash="):
+            if current is None:
+                problems.append(f"orphan hash line: {line}")
+            elif not line.startswith("--hash=sha256:"):
+                problems.append(f"non-sha256 hash: {line}")
+            else:
+                current["hashes"] += 1
+            continue
+        if line.split("#", 1)[0].strip().startswith(
+                ("-e ", "--editable", "git+", "file:", "http://", "https://")):
+            problems.append(f"unhashable requirement: {line}")
+            current = None
+            continue
+        spec = line.split(" ", 1)[0]
+        if spec.count("==") != 1 or not spec.split("==")[1]:
+            problems.append(f"not exactly pinned: {spec}")
+        current = {"spec": spec, "hashes": 0}
+        reqs.append(current)
+    for req in reqs:
+        if req["hashes"] == 0:
+            problems.append(f"no sha256 for {req['spec']}")
+    return reqs, problems
+
+
+def test_ci_ansible_install_contract_is_exact():
+    """Both B1 workflows install the resolved ansible toolchain from the
+    hash-locked set with the hash requirement enforced, and neither may fall
+    back to a loose direct install."""
+    for name in B1_WORKFLOWS:
+        wf = _workflow_text(name)
+        assert ANSIBLE_INSTALL_CMD in wf, (
+            f"{name} must install the lock with --require-hashes and "
+            "--only-binary ':all:'")
+        assert "pip install ansible-core==" not in wf, (
+            f"{name} must not install the ansible tools from loose pins")
+        assert "pip install ansible-lint==" not in wf
+
+
+def test_ansible_lock_entries_are_exactly_pinned_and_hashed():
+    """Every resolved entry is exactly pinned and carries at least one
+    sha256; the three direct requirements are the intended versions."""
+    reqs, problems = _validate_hash_locked_requirements(
+        (REPO_ROOT / ANSIBLE_LOCK_REL).read_text(encoding="utf-8"))
+    assert problems == [], f"lock contract violations: {problems}"
+    assert len(reqs) == 38, (
+        f"lock must carry the full resolved set (38 entries), got {len(reqs)}")
+    specs = {r["spec"] for r in reqs}
+    for direct in ("ansible-core==2.16.0", "ansible-lint==6.22.0",
+                   "ansible-compat==4.1.11"):
+        assert direct in specs, f"lock must pin {direct} exactly"
+
+
+def test_ansible_lock_validator_rejects_mutations():
+    """The proof above is not vacuous: removing a hash, unpinning an entry,
+    or adding an unhashable requirement each fails it."""
+    original = (REPO_ROOT / ANSIBLE_LOCK_REL).read_text(encoding="utf-8")
+    _, clean = _validate_hash_locked_requirements(original)
+    assert clean == []
+    # Strip EVERY hash of the first requirement, not merely one of them: an
+    # entry legitimately carries the hashes of several wheels.
+    kept, entries = [], 0
+    for line in original.splitlines():
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#"):
+            if stripped.startswith("--hash="):
+                if entries == 1:
+                    continue
+            else:
+                entries += 1
+        kept.append(line)
+    without_hash = "\n".join(kept)
+    assert without_hash != original, "the mutation must actually change the file"
+    reqs, problems = _validate_hash_locked_requirements(without_hash)
+    assert any("no sha256 for" in p for p in problems), (problems, reqs[:1])
+    unpinned = original.replace("ansible-core==2.16.0", "ansible-core>=2.16")
+    _, problems = _validate_hash_locked_requirements(unpinned)
+    assert any("not exactly pinned" in p for p in problems), problems
+    for addition in ("-e .", "git+https://example.invalid/x.git",
+                     "file:///tmp/thing.whl"):
+        _, problems = _validate_hash_locked_requirements(original + addition + "\n")
+        assert any("unhashable requirement" in p for p in problems), (addition, problems)
+    bad_hash = original.replace("--hash=sha256:", "--hash=md5:", 1)
+    _, problems = _validate_hash_locked_requirements(bad_hash)
+    assert any("non-sha256 hash" in p for p in problems), problems
+
+
+def test_collection_requirements_state_range_truth_honestly():
+    """Ansible Galaxy collections are range-constrained, not pinned. The file
+    and the workflows that consume it must say so rather than implying a
+    hash-locked pin that does not exist."""
+    req = (REPO_ROOT / "infrastructure/cloud-ground/ansible/"
+           "requirements.yml").read_text(encoding="utf-8")
+    assert "Pinned collection requirements" not in req
+    assert "RANGE-CONSTRAINED" in req
+    assert "not" in req and "hash-lock" in req, (
+        "the file must state that this class is not hash-locked")
+    for collection in ("community.general", "community.docker", "ansible.posix"):
+        assert collection in req
+    for name in B1_WORKFLOWS:
+        wf = _workflow_text(name)
+        assert "constrains these by RANGE" in wf, (
+            f"{name} must not present the collections as pinned")
