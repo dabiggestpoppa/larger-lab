@@ -141,14 +141,24 @@ class OrchestratorEngine:
 
     def submit(self, job: RuntimeJob, steps: List[RuntimeStep], *,
                not_before: str = "") -> RuntimeJob:
-        """Persist a new job + its graph atomically in CREATED state.
+        """Persist a new job + its graph atomically, durably QUEUED.
 
         P2-C07R3 (repair directive §2.3): job identity, every step, the
         initial events, and queue metadata commit in ONE transaction on the
         store's connection — any failure rolls back to no job, no steps, no
         partial event history. Re-submission of the same deterministic_id is
         refused (idempotency at the job boundary).
+
+        P2-R3-C01 (lifecycle truth): submission represents BOTH lifecycle
+        facts — JOB_CREATED and JOB_QUEUED — and the durable snapshot
+        committed after the transaction is QUEUED. The snapshot and the
+        event stream can never disagree about whether a submitted job is
+        queued.
         """
+        if not steps:
+            raise QcaeValidationError(
+                "job submission requires at least one step (empty graph is fail-closed)"
+            )
         job.validate()
         for step in steps:
             step.validate()
@@ -157,8 +167,9 @@ class OrchestratorEngine:
             raise QcaeValidationError(
                 f"job with deterministic_id {job.deterministic_id!r} already exists"
             )
+        queued = dc_replace(job, status=RuntimeJobStatus.QUEUED)
         with self._store.transaction() as tx:
-            tx.add_job(job, queued_at=self._clock(), not_before=not_before)
+            tx.add_job(queued, queued_at=self._clock(), not_before=not_before)
             tx.append_event(
                 JobEvent(
                     event_seq=0, event_id="",
@@ -182,18 +193,38 @@ class OrchestratorEngine:
         return job
 
     def mark_running(self, job_id: str) -> RuntimeJob:
-        """Move CREATED -> QUEUED -> RUNNING through legal transitions."""
+        """Move CREATED -> QUEUED -> RUNNING through legal transitions.
+
+        Kept for explicit callers; the lease path promotes the job itself
+        (``_ensure_running``) so the natural submit → run flow reaches
+        RUNNING exactly when executable work actually runs (P2-R3-C01).
+        """
+        self._ensure_running(job_id)
+        return self._require_job(job_id)
+
+    def _ensure_running(self, job_id: str) -> None:
+        """Promote CREATED -> QUEUED -> RUNNING through legal transitions.
+
+        Called only from paths where executable work is actually going to
+        run (a granted lease) or where recovery re-opens the job, never from
+        readiness derivation — a job whose dependencies are unready, whose
+        not_before has not elapsed, or that has no compatible worker stays
+        QUEUED (P2-R3-C01).
+        """
         job = self._require_job(job_id)
+        if is_terminal(job.status):
+            return  # terminal history is immutable
         if job.status is RuntimeJobStatus.CREATED:
             assert_job_transition(job.status, RuntimeJobStatus.QUEUED)
             job = dc_replace(job, status=RuntimeJobStatus.QUEUED,
                              updated_at=self._clock())
             self._store.update_job(job)
-        assert_job_transition(job.status, RuntimeJobStatus.RUNNING)
-        job = dc_replace(job, status=RuntimeJobStatus.RUNNING,
-                         updated_at=self._clock())
-        self._store.update_job(job)
-        return job
+        if job.status is not RuntimeJobStatus.RUNNING:
+            assert_job_transition(job.status, RuntimeJobStatus.RUNNING)
+            self._store.update_job(
+                dc_replace(job, status=RuntimeJobStatus.RUNNING,
+                           updated_at=self._clock())
+            )
 
     def _require_job(self, job_id: str) -> RuntimeJob:
         job = self._store.get_job(job_id)
@@ -263,6 +294,10 @@ class OrchestratorEngine:
             lease_token=lease.lease_token,
             lease_expires_at=lease.lease_expires_at,
         )
+        # P2-R3-C01: a granted lease means executable work is actually
+        # running — the job's durable snapshot moves to RUNNING here (once),
+        # so job status and the step graph tell the same truth.
+        self._ensure_running(job_id)
         # Retry economics: attempts consume the job's attempt budget (directive
         # §28: retries consume budget; recovery never resets it).
         if self._budgets is not None:
@@ -539,21 +574,44 @@ class OrchestratorEngine:
         self._succeed_job_if_graph_done(step.job_id)
 
     def _succeed_job_if_graph_done(self, job_id: str) -> None:
-        """Job-level completion when every step reached a terminal state."""
+        """Job-level completion when every step reached a terminal state.
+
+        P2-R3-C01: the finalizer is reachable from ANY non-terminal job
+        state (a crash can land the last completion while the snapshot is
+        still QUEUED); it promotes through the legal transitions to
+        RUNNING and then SUCCEEDED so the snapshot and event stream agree.
+        Called only from the step-completion path, so JOB_SUCCEEDED is
+        emitted exactly once per job (completion records are idempotent;
+        a second finalization attempt sees a terminal job and returns).
+        """
         job = self._store.get_job(job_id)
-        if job is None or job.status is not RuntimeJobStatus.RUNNING:
+        if job is None or is_terminal(job.status):
             return
         steps = self._store.list_steps_for_job(job_id)
-        if steps and all(
+        if not steps or not all(
             s.status in (RuntimeStepStatus.SUCCEEDED, RuntimeStepStatus.CANCELLED)
             for s in steps
         ):
-            assert_job_transition(job.status, RuntimeJobStatus.SUCCEEDED)
+            return
+        if job.status is not RuntimeJobStatus.RUNNING:
+            # The work ran even if the snapshot lagged (crash window); the
+            # lifecycle truth is RUNNING -> SUCCEEDED at completion.
+            current = job.status
+            if current is RuntimeJobStatus.CREATED:
+                assert_job_transition(current, RuntimeJobStatus.QUEUED)
+                current = RuntimeJobStatus.QUEUED
+            assert_job_transition(current, RuntimeJobStatus.RUNNING)
             self._store.update_job(
-                dc_replace(job, status=RuntimeJobStatus.SUCCEEDED,
+                dc_replace(job, status=RuntimeJobStatus.RUNNING,
                            updated_at=self._clock())
             )
-            self._record(JobEventType.JOB_SUCCEEDED, job_id)
+            job = self._store.get_job(job_id)
+        assert_job_transition(job.status, RuntimeJobStatus.SUCCEEDED)
+        self._store.update_job(
+            dc_replace(job, status=RuntimeJobStatus.SUCCEEDED,
+                       updated_at=self._clock())
+        )
+        self._record(JobEventType.JOB_SUCCEEDED, job_id)
 
     def _ack_safely(self, step: RuntimeStep) -> None:
         try:
