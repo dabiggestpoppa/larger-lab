@@ -672,3 +672,45 @@ def test_latest_pointer_is_not_authoritative(tmp_path):
                         "--ops-root", str(root)], capture_output=True, text=True, timeout=60)
     assert v.returncode != 0
     assert "index missing" in (v.stdout + v.stderr).lower()
+
+
+def test_container_archive_copy_lands_in_a_private_exclusive_directory(monkeypatch):
+    """The restore archive must be copied to a directory the CONTAINER created
+    exclusively, not to a name this script picked inside a shared temp
+    directory (python:S5443 flagged exactly that on the old line).
+
+    The stubs make the order observable: mktemp -d is issued first, and the
+    docker cp destination is the path mktemp reported.
+    """
+    pr = _load_pr()
+    calls = []
+
+    class Done:
+        def __init__(self, rc=0, out=b"", err=b""):
+            self.returncode, self.stdout, self.stderr = rc, out, err
+
+    def fake_exec(container, cmd, *a, **kw):
+        calls.append(("exec", container, list(cmd)))
+        return Done(out=b"/tmp/tmp.private123\n")
+
+    def fake_run(cmd, *a, **kw):
+        calls.append(("run", list(cmd)))
+        return Done()
+
+    monkeypatch.setattr(pr, "docker_exec", fake_exec)
+    monkeypatch.setattr(pr.subprocess, "run", fake_run)
+    remote = pr.clone_archive_into_container("oce-pg", "backup.dump")
+
+    assert calls[0] == ("exec", "oce-pg", ["mktemp", "-d"]), (
+        "the container must create the destination directory itself, first")
+    assert remote == "/tmp/tmp.private123/archive.dump", remote
+    assert ("run", ["docker", "cp", "backup.dump",
+                    "oce-pg:/tmp/tmp.private123/archive.dump"]) in calls, calls
+
+    monkeypatch.setattr(pr, "docker_exec", lambda *a, **kw: Done(rc=1, err=b"no mktemp"))
+    with pytest.raises(RuntimeError, match="private container temp"):
+        pr.clone_archive_into_container("oce-pg", "backup.dump")
+
+    source = (SCRIPTS / "pg-recovery.py").read_text(encoding="utf-8")
+    assert '"/tmp/oce_restore_"' not in source, (
+        "a fixed name in a shared temp directory is what S5443 flagged")

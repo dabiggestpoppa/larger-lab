@@ -348,8 +348,20 @@ def terminate_local_connections(container, user, *dbs):
 
 
 def clone_archive_into_container(container, archive_path):
-    """Copy the custom archive into the container tmp; return container path."""
-    remote = "/tmp/oce_restore_" + hashlib.sha256(os.urandom(8)).hexdigest() + ".dump"
+    """Copy the custom archive into a private container directory; return path.
+
+    The destination is created by the container's own mktemp (exclusive,
+    mode 0700) rather than named into a fixed, shared temp directory: a
+    predictable name in a world-writable directory lets anything already
+    running in the container pre-create that path, so the copy would land on
+    an attacker-chosen file or symlink (python:S5443 on this line).
+    """
+    made = docker_exec(container, ["mktemp", "-d"])
+    remote_dir = made.stdout.decode(errors="replace").strip()
+    if made.returncode != 0 or not remote_dir:
+        raise RuntimeError("cannot create a private container temp directory: "
+                           + made.stderr.decode(errors="replace"))
+    remote = remote_dir + "/archive.dump"
     subprocess.run(["docker", "cp", archive_path, f"{container}:{remote}"],
                    check=True, capture_output=True, timeout=120)
     return remote
