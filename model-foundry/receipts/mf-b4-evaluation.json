@@ -1,0 +1,334 @@
+{
+  "assessment": {
+    "assessment_id": "cap:RUN-FIXTURE-0001",
+    "baseline_delta": {
+      "accuracy": 0.08999999999999997,
+      "calibration_error": -0.039999999999999994
+    },
+    "baseline_reference": "baseline://research-bench-v0/naive-retrieval",
+    "dimensions": {
+      "accuracy": {
+        "baseline": 0.6,
+        "delta": 0.08999999999999997,
+        "direction": "HIGHER_IS_BETTER",
+        "item_count": 6,
+        "seed": 2,
+        "value": 0.69
+      },
+      "calibration_error": {
+        "baseline": 0.12,
+        "delta": -0.039999999999999994,
+        "direction": "LOWER_IS_BETTER",
+        "item_count": 6,
+        "seed": 1,
+        "value": 0.08
+      },
+      "instruction_adherence": {
+        "baseline": null,
+        "delta": null,
+        "direction": "HIGHER_IS_BETTER",
+        "item_count": 6,
+        "seed": 1,
+        "value": 0.97
+      },
+      "refusal_precision": {
+        "baseline": null,
+        "delta": null,
+        "direction": "HIGHER_IS_BETTER",
+        "item_count": 6,
+        "seed": 2,
+        "value": 0.88
+      }
+    },
+    "evidence_state": "MEASURED",
+    "framework_dependence": "CROSS_FRAMEWORK_AGREED_SIMULATED",
+    "limitations": [
+      "fixture benchmark with six items",
+      "cross-runtime agreement is simulated on fixtures, not an independent implementation",
+      "single framework: no independent runtime replication"
+    ],
+    "master_score": null,
+    "master_score_is_forbidden": true,
+    "negative_result": null,
+    "oce_review_ref": null,
+    "reproducibility": {
+      "claimed": "R1_FRESH_ENVIRONMENT_REPLAY",
+      "container_digest": "sha256:container-fixture",
+      "environment_recorded": true,
+      "framework": "fixture-framework",
+      "provider_details": "fixture-provider-abstracted",
+      "replication_evidence": {
+        "evidence_ref": "receipts/mf-b4-evaluation.json#simulation_run",
+        "frameworks": [
+          "fixture-framework",
+          "independent-fixture-framework"
+        ],
+        "max_delta": 0.0,
+        "metric_agreement": {
+          "accuracy": true,
+          "calibration_error": true,
+          "instruction_adherence": true
+        },
+        "simulated": true,
+        "tolerance": 0.02,
+        "within_tolerance": true
+      },
+      "supported": "R1_FRESH_ENVIRONMENT_REPLAY"
+    },
+    "run_id": "RUN-FIXTURE-0001",
+    "subject_id": "RT-FIXTURE-A",
+    "subject_kind": "COGNITIVE_RUNTIME",
+    "terminal_conclusion": "INCONCLUSIVE",
+    "tier": "PROMOTION",
+    "writes_global_capability_status": false
+  },
+  "builder_refusal": {
+    "detail": "SEALED_ACCESS_BUILDER_REFUSED: sealed confirmation material is never available through the builder surface",
+    "type": "Unauthorized"
+  },
+  "frozen_protocol": {
+    "criteria_frozen_before_outcomes": true,
+    "exposure_at_freeze": 2,
+    "freeze_reason": "criteria frozen before any candidate outcome existed",
+    "frozen_utc": "2026-09-17T19:48:53+00:00",
+    "protocol": {
+      "author": "foundry.evaluation.fixture",
+      "baseline_reference": "baseline://research-bench-v0/naive-retrieval",
+      "benchmark": {
+        "benchmark_id": "RESEARCH_BENCH_V0",
+        "contamination_grade": "C0_NO_OBSERVED_OVERLAP",
+        "exposure_count": 2,
+        "fingerprint": "sha256:9892b9431b095deaa6ec9bc09b9541e9314bbffd5ee840e0d6f393503c8cd280",
+        "item_count": 6,
+        "item_ids": [
+          "B-01",
+          "B-02",
+          "B-03",
+          "B-04",
+          "B-05",
+          "B-06"
+        ],
+        "status": "FROZEN",
+        "task_class": "reasoning.short_answer",
+        "tier": "PROMOTION",
+        "version": "0.1"
+      },
+      "decision_rules": [
+        "a dimension may only be reported with its sample size and seed count",
+        "no dimension may be aggregated into a single master score",
+        "an improvement is only claimed when the delta exceeds the declared tolerance and the run is powered"
+      ],
+      "fingerprint": "sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35",
+      "framework_lock": null,
+      "frozen_at_utc": "2026-09-17T19:48:53+00:00",
+      "metrics": [
+        {
+          "description": "fraction of items answered correctly",
+          "direction": "HIGHER_IS_BETTER",
+          "name": "accuracy",
+          "reported_weight": 0.4
+        },
+        {
+          "description": "mean absolute deviation between stated confidence and correctness",
+          "direction": "LOWER_IS_BETTER",
+          "name": "calibration_error",
+          "reported_weight": 0.2
+        },
+        {
+          "description": "fraction of items respecting the declared answer format",
+          "direction": "HIGHER_IS_BETTER",
+          "name": "instruction_adherence",
+          "reported_weight": 0.2
+        },
+        {
+          "description": "fraction of refusals that were appropriate",
+          "direction": "HIGHER_IS_BETTER",
+          "name": "refusal_precision",
+          "reported_weight": 0.2
+        }
+      ],
+      "min_items_for_power": 4,
+      "protocol_id": "PROTO_RESEARCH_BENCH_V0_V1",
+      "required_seeds": 2,
+      "tier": "PROMOTION",
+      "tier_contract": {
+        "answer_key_access": "restricted",
+        "exposure_counted": true,
+        "may_influence_training": false,
+        "tier": "PROMOTION",
+        "visible_to_builder": "dimensions and high-level rules visible; unrestricted answer keys not visible"
+      },
+      "tolerance": 0.02,
+      "version": "1.0"
+    },
+    "protocol_fingerprint": "sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35",
+    "registrar": "foundry.evaluation.fixture"
+  },
+  "negative_knowledge": {
+    "kind": "negative_knowledge.store",
+    "receipt_fingerprint": "sha256:34697a7fe082daef23f09c4830573ad0a8cab79432cbaeb6b145f1f8c96d71f3",
+    "recorded_utc": "2026-09-17T19:48:53+00:00",
+    "reopens": [],
+    "results": [
+      {
+        "conclusion": "UNDERPOWERED",
+        "dogma_risk": "ACCEPTABLE",
+        "evidence": {
+          "delta": -0.004,
+          "item_count": 6,
+          "seeds_used": 2
+        },
+        "hypothesis": "longer continued pretraining improves calibration on the fixture benchmark",
+        "negative_id": "NEG-FIXTURE-0001",
+        "negative_result_is_project_failure": false,
+        "outcome": "calibration_error did not move beyond the declared tolerance",
+        "recorded_utc": "2026-01-03T02:00:00Z",
+        "reopen_conditions": [
+          "a powered run with >= 40 items and >= 3 seeds shows a calibration delta beyond tolerance"
+        ],
+        "reopen_state": "OPEN_FOR_REOPEN",
+        "scope": "fixture benchmark RESEARCH_BENCH_V0 only",
+        "subject_id": "RT-FIXTURE-B",
+        "subject_kind": "COGNITIVE_RUNTIME"
+      }
+    ],
+    "subject": "negative_knowledge"
+  },
+  "run": {
+    "completed_utc": "2026-01-03T00:42:00Z",
+    "contamination_grade": "C0_NO_OBSERVED_OVERLAP",
+    "failures": [],
+    "framework": "fixture-framework",
+    "framework_version": "0.1",
+    "observations": [
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "accuracy",
+        "seed": 1,
+        "value": 0.71
+      },
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "accuracy",
+        "seed": 2,
+        "value": 0.69
+      },
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "calibration_error",
+        "seed": 1,
+        "value": 0.08
+      },
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "instruction_adherence",
+        "seed": 1,
+        "value": 0.97
+      },
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "refusal_precision",
+        "seed": 2,
+        "value": 0.88
+      }
+    ],
+    "power_adequate": true,
+    "protocol_fingerprint": "sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35",
+    "run_id": "RUN-FIXTURE-0001",
+    "run_is_capability_truth": false,
+    "runtime_identity": "sha256:4ee2d739dec1347300237a0fa435ed2cf69f26a57a6597d9084f4c0e449db07e",
+    "sample_size": 6,
+    "seeds_used": 2,
+    "started_utc": "2026-01-03T00:00:00Z",
+    "subject_id": "RT-FIXTURE-A",
+    "subject_kind": "COGNITIVE_RUNTIME",
+    "tier": "PROMOTION"
+  },
+  "sealed_store": {
+    "builder_surface_contains_contents": false,
+    "exposures": [],
+    "kind": "sealed_eval.store",
+    "payloads": [
+      {
+        "answer_key_digest": "sha256:sealed-answer-key-fixture",
+        "benchmark_id": "RESEARCH_BENCH_V0",
+        "contents_available_to_builder": false,
+        "doctrine_bearing": false,
+        "item_count": 2,
+        "payload_id": "SEALED-RB-V0",
+        "tier": "SEALED_CONFIRMATION"
+      }
+    ],
+    "receipt_fingerprint": "sha256:dc584bf5523078595d5525eacf0c24b6457105c678b1fde6482ab2d09d9304bc",
+    "recorded_utc": "2026-09-17T19:48:53+00:00",
+    "refusals": [
+      {
+        "actor": "builder-agent",
+        "payload_id": "SEALED-RB-V0",
+        "reason": "BUILDER_SURFACE",
+        "role": "BUILDER_AGENT"
+      }
+    ],
+    "subject": "sealed_store"
+  },
+  "simulation_run": {
+    "completed_utc": "2026-01-03T01:40:00Z",
+    "contamination_grade": "C0_NO_OBSERVED_OVERLAP",
+    "failures": [],
+    "framework": "independent-fixture-framework",
+    "framework_version": "0.1",
+    "observations": [
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "accuracy",
+        "seed": 1,
+        "value": 0.71
+      },
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "accuracy",
+        "seed": 2,
+        "value": 0.69
+      },
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "calibration_error",
+        "seed": 1,
+        "value": 0.08
+      },
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "instruction_adherence",
+        "seed": 1,
+        "value": 0.97
+      },
+      {
+        "detail": "",
+        "item_count": 6,
+        "metric": "refusal_precision",
+        "seed": 2,
+        "value": 0.88
+      }
+    ],
+    "power_adequate": true,
+    "protocol_fingerprint": "sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35",
+    "run_id": "RUN-FIXTURE-0001-SIM",
+    "run_is_capability_truth": false,
+    "runtime_identity": "sha256:4ee2d739dec1347300237a0fa435ed2cf69f26a57a6597d9084f4c0e449db07e",
+    "sample_size": 6,
+    "seeds_used": 2,
+    "started_utc": "2026-01-03T01:00:00Z",
+    "subject_id": "RT-FIXTURE-A",
+    "subject_kind": "COGNITIVE_RUNTIME",
+    "tier": "PROMOTION"
+  }
+}

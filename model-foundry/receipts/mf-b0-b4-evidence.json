@@ -1,0 +1,776 @@
+{
+  "b0_gate": {
+    "attacks_contained": 5,
+    "attacks_failed_open": 0,
+    "attacks_refused": 15,
+    "attacks_total": 20,
+    "report_fingerprint": "sha256:60a9694ff3b8541564a14945e87ca6fa486d7f7605abc9a6b5c7894606bd6d0f",
+    "verdict": "PASS"
+  },
+  "b1_placement": {
+    "cheapest_hourly_eligible": "octa_fixture:octa-gpu-4471",
+    "cost_to_close_usd": 3.873333,
+    "hourly_trap_detected": true,
+    "offers_observed": 4,
+    "providers": [
+      "local_cpu",
+      "octa_fixture",
+      "runpod_fixture"
+    ],
+    "selected_offer_id": "runpod_fixture:runpod-secure-8891"
+  },
+  "b2_registry": {
+    "diversity": {
+      "collapsed_aliases": [
+        "SRC_NEWS_ALPHA_MIRROR"
+      ],
+      "distinct_families": 9,
+      "diversity_is_claimed_not_effective": true,
+      "effective_lineages": 9,
+      "families_with_multiple_lineages": [],
+      "lineage_map": {
+        "SRC_AGENT_TRACE": "generated://scaffold-v0",
+        "SRC_BENCH_CORE": "operator://bench-authoring",
+        "SRC_CEREBUS_RULES": "withheld://origin-unknown",
+        "SRC_MARKET_TICKS_PIT": "exchange://public-ticks",
+        "SRC_NEWS_ALPHA": "wire://alpha",
+        "SRC_NEWS_ALPHA_MIRROR": "wire://alpha",
+        "SRC_PROHIBITED": "prohibited://unknown",
+        "SRC_RIGHTS_UNKNOWN": "crawl://unknown",
+        "SRC_SECRET_INCIDENT": "operator://notes",
+        "SRC_VENDOR_TERMS": "vendor://sample-b"
+      },
+      "requested_sources": 10
+    },
+    "doctrine_bearing": [
+      "SRC_CEREBUS_RULES"
+    ],
+    "eligible_for_training": [
+      "SRC_AGENT_TRACE",
+      "SRC_NEWS_ALPHA",
+      "SRC_NEWS_ALPHA_MIRROR"
+    ],
+    "registry_digest": "sha256:479ea7d31d31a1d6dc55f2ccd8d5d318df9c1152c94c3c08f2d459918f34f8b6",
+    "rights_blocked": {
+      "SRC_PROHIBITED": "EXCLUDED_BY_POLICY",
+      "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
+      "SRC_VENDOR_TERMS": "RIGHTS_RESTRICTED"
+    },
+    "role_distribution": {
+      "DEV": 1,
+      "EXCLUDED": 1,
+      "HIDDEN_EVAL": 1,
+      "RETRIEVAL_ONLY": 4,
+      "TRAIN_CPT": 2,
+      "TRAIN_SFT": 1
+    }
+  },
+  "b3_manifest": {
+    "contamination": {
+      "claim_blocking_sources": [
+        "SRC_NEWS_ALPHA",
+        "SRC_NEWS_ALPHA_MIRROR"
+      ],
+      "dataset_worst_grade": "C4_DIRECT_ITEM_OR_ANSWER_OVERLAP",
+      "observed_absence_is_not_cleanliness": true,
+      "per_source_worst_grade": {
+        "SRC_AGENT_TRACE": "C1_SOURCE_FAMILY_PROXIMITY",
+        "SRC_NEWS_ALPHA": "C4_DIRECT_ITEM_OR_ANSWER_OVERLAP",
+        "SRC_NEWS_ALPHA_MIRROR": "C4_DIRECT_ITEM_OR_ANSWER_OVERLAP"
+      }
+    },
+    "dataset_id": "ds.evidence.train.v0",
+    "dedup": {
+      "collapsed_to_lineage": {
+        "ALPHA-0001-DUP": "ALPHA-0001",
+        "ALPHA-0002-NEAR": "ALPHA-0002",
+        "MIRROR-0001": "ALPHA-0001"
+      },
+      "cross_source_duplicate_count": 1,
+      "duplicates_do_not_add_diversity": true,
+      "exact_duplicates_collapsed": 1,
+      "kept_items": [
+        "TRACE-0001",
+        "ALPHA-0001",
+        "ALPHA-0002"
+      ],
+      "near_duplicate_count": 2,
+      "near_duplicates_collapsed": [
+        {
+          "cross_source": false,
+          "duplicate_of": "ALPHA-0002",
+          "item_id": "ALPHA-0002-NEAR",
+          "similarity": 0.875
+        },
+        {
+          "cross_source": true,
+          "duplicate_of": "ALPHA-0001",
+          "item_id": "MIRROR-0001",
+          "similarity": 1.0
+        }
+      ]
+    },
+    "excluded_sources": [
+      {
+        "detail": "rights state RIGHTS_UNKNOWN",
+        "reason": "RIGHTS_BLOCKED",
+        "source_id": "SRC_RIGHTS_UNKNOWN"
+      }
+    ],
+    "item_count": 3,
+    "lineage_fingerprint": "sha256:1b731fac408ceddab1aebb97b2d00e4e0a32869d268dfd6614abe68083dcacad",
+    "manifest_is_capability_claim": false,
+    "notes": "derived artifacts inherit ancestor restrictions",
+    "pit_audit": {
+      "checked": 6,
+      "decision_reference_utc": null,
+      "passed": true,
+      "pit_is_a_leak_when_unknown": true,
+      "violations": []
+    },
+    "provenance_summary": {
+      "claim_strength_penalty": true,
+      "sources": 3,
+      "unknown_ancestry_sources": [
+        "SRC_AGENT_TRACE"
+      ],
+      "unknown_is_not_favorable": true
+    },
+    "purpose": "evidence corpus",
+    "recipe": {
+      "dedup_jaccard_threshold": 0.85,
+      "dedup_shingle_size": 5,
+      "description": "canonical text refinement chain",
+      "deterministic": true,
+      "model_inference_used": false,
+      "pit_enforce": true,
+      "recipe_id": "recipe.text.v1",
+      "secret_scan": true,
+      "steps": [
+        "normalize_whitespace",
+        "exact_dedup",
+        "near_dedup",
+        "secret_scan",
+        "pit_audit",
+        "split_by_source"
+      ]
+    },
+    "rights_summary": {
+      "all_sources_train_permissive": true,
+      "by_state": {
+        "RIGHTS_VERIFIED_BY_POLICY": 3
+      },
+      "unknown_rights_sources": []
+    },
+    "role": "TRAIN_CPT",
+    "secret_scan": {
+      "hits": [],
+      "passed": true,
+      "scanned": 6
+    },
+    "sources": [
+      {
+        "lineage": "generated://scaffold-v0",
+        "rights_state": "RIGHTS_VERIFIED_BY_POLICY",
+        "role": "TRAIN_SFT",
+        "source_id": "SRC_AGENT_TRACE"
+      },
+      {
+        "lineage": "wire://alpha",
+        "rights_state": "RIGHTS_VERIFIED_BY_POLICY",
+        "role": "TRAIN_CPT",
+        "source_id": "SRC_NEWS_ALPHA"
+      },
+      {
+        "lineage": "SRC_NEWS_ALPHA",
+        "rights_state": "RIGHTS_VERIFIED_BY_POLICY",
+        "role": "TRAIN_CPT",
+        "source_id": "SRC_NEWS_ALPHA_MIRROR"
+      }
+    ],
+    "splits": {
+      "held_out": {
+        "items": 0,
+        "sources": []
+      },
+      "item_level_random_split_used": false,
+      "strategy": "BY_SOURCE",
+      "train": {
+        "items": 3,
+        "sources": [
+          "SRC_AGENT_TRACE",
+          "SRC_NEWS_ALPHA"
+        ]
+      }
+    },
+    "trainable": true,
+    "transformations": [
+      "normalize_whitespace",
+      "exact_dedup",
+      "near_dedup",
+      "secret_scan",
+      "pit_audit",
+      "split_by_source"
+    ],
+    "version": 1
+  },
+  "b3_receipt": {
+    "available_data_is_not_trainable_data": true,
+    "excluded_sources": [
+      {
+        "detail": "rights state RIGHTS_UNKNOWN",
+        "reason": "RIGHTS_BLOCKED",
+        "source_id": "SRC_RIGHTS_UNKNOWN"
+      }
+    ],
+    "item_count": 3,
+    "kind": "dataset.refined",
+    "lineage_fingerprint": "sha256:1b731fac408ceddab1aebb97b2d00e4e0a32869d268dfd6614abe68083dcacad",
+    "manifest_fingerprint": "sha256:c042cb71516aeed67b699360bd6a62e2f59aaeb5d081d7e56e4ab2c3498a2cb6",
+    "receipt_fingerprint": "sha256:7fab4c33803cdb7ae4baef0f0d37918f6302ab0ced3e50239c203ec7c98a3a02",
+    "recorded_utc": "2026-09-17T19:48:54+00:00",
+    "role": "TRAIN_CPT",
+    "subject": "ds.evidence.train.v0"
+  },
+  "b4": {
+    "benchmark": {
+      "benchmark_id": "RESEARCH_BENCH_V0",
+      "contamination_grade": "C0_NO_OBSERVED_OVERLAP",
+      "exposure_count": 2,
+      "fingerprint": "sha256:9892b9431b095deaa6ec9bc09b9541e9314bbffd5ee840e0d6f393503c8cd280",
+      "item_count": 6,
+      "item_ids": [
+        "B-01",
+        "B-02",
+        "B-03",
+        "B-04",
+        "B-05",
+        "B-06"
+      ],
+      "status": "FROZEN",
+      "task_class": "reasoning.short_answer",
+      "tier": "PROMOTION",
+      "version": "0.1"
+    },
+    "note": "freeze/refusal behaviour is exercised in the block receipt and cross-block F7/F8",
+    "protocol_fingerprint": "sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35"
+  },
+  "blocks": [
+    "MF-B0",
+    "MF-B1",
+    "MF-B2",
+    "MF-B3",
+    "MF-B4"
+  ],
+  "constitution_fingerprint": "sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420",
+  "cross_block": {
+    "report_fingerprint": "sha256:1eee59bc236a4262c6bfee2eafdbcad40c38bc9f53466d3fa978993be79b283f",
+    "scenarios": [
+      {
+        "held": true,
+        "intent": "the substrate may not become a second OCE and may not own truth or authority",
+        "observed": {
+          "attacks_allowed": [],
+          "attacks_held": 20,
+          "attacks_total": 20,
+          "boundary_fixtures": 10,
+          "constitution_fingerprint": "sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420",
+          "doctrine_count": 12,
+          "ownership_conflicts": [],
+          "undeclared_generic_services": []
+        },
+        "refusals": [],
+        "scenario_id": "F0",
+        "status": "HELD",
+        "title": "constitution + one-OCE boundary"
+      },
+      {
+        "held": true,
+        "intent": "provider identity must not change scientific semantics, and hourly price is not cost-to-close",
+        "observed": {
+          "cheapest_hourly_eligible": "octa_fixture:octa-gpu-4471",
+          "cheapest_hourly_usd": 0.25,
+          "cost_to_close_stable_under_provider_rename": true,
+          "hourly_trap_detected": true,
+          "rejected_reasons": {
+            "local_cpu:local-workstation-0": "INSUFFICIENT_VRAM",
+            "runpod_fixture:runpod-secure-2200-stale": "OFFER_OBSERVATION_STALE"
+          },
+          "request_has_no_provider_field": true,
+          "selected_cost_to_close_usd": 3.873333,
+          "selected_offer_id": "runpod_fixture:runpod-secure-8891"
+        },
+        "refusals": [],
+        "scenario_id": "F1",
+        "status": "HELD",
+        "title": "provider-neutral placement"
+      },
+      {
+        "held": true,
+        "intent": "negative findings are first-class, reopening requires new evidence, and impossible reopen conditions stay visible as dogma risk",
+        "observed": {
+          "dogma_risk_of_unreachable_condition": "CRITICAL_UNREACHABLE",
+          "refusal_codes": [
+            "REOPEN_REQUIRES_NEW_EVIDENCE",
+            "NEGATIVE_RESULT_IMMUTABLE"
+          ],
+          "reopen_preserves_prior_conclusion": "INCONCLUSIVE",
+          "reopen_requires_new_evidence_record": true
+        },
+        "refusals": [
+          {
+            "code": "REOPEN_REQUIRES_NEW_EVIDENCE",
+            "detail": "REOPEN_REQUIRES_NEW_EVIDENCE: NEG-CROSS-1 may not be reopened without new evidence",
+            "refused_by": "PolicyBlocked"
+          },
+          {
+            "code": "NEGATIVE_RESULT_IMMUTABLE",
+            "detail": "NEGATIVE_RESULT_IMMUTABLE: NEG-CROSS-1: negative results are appended, never overwritten",
+            "refused_by": "PolicyBlocked"
+          }
+        ],
+        "scenario_id": "F10",
+        "status": "HELD",
+        "title": "negative results and reopen"
+      },
+      {
+        "held": true,
+        "intent": "no paid path exists, an accepted provider is not an authorization, checkpoints survive framework loss, secrets are detected",
+        "observed": {
+          "budget_consumed_usd": 3.1515,
+          "checkpoint_fingerprint": "sha256:dba36a9e5e7ae37f480a5c13c9aa5522c78c7218d3119818a0a253aab55d4cca",
+          "cost_to_close_with_checkpoint": 3.151515,
+          "framework_locked_checkpoint_refused": "CHECKPOINT_FORMAT_NOT_PORTABLE",
+          "paid_compute_consumed": false,
+          "provider_identity_in_scientific_result": false,
+          "refusal_codes": [
+            "LIVE_LAUNCH_NOT_AUTHORIZED",
+            "OPERATOR_HOLD",
+            "GRANT_ISSUER_NOT_OPERATOR",
+            "BUDGET_EXCEEDED"
+          ],
+          "secret_hits": [
+            "aws_access_key",
+            "api_key_assignment"
+          ],
+          "secret_scan_passed": false,
+          "simulated_mode": "SIMULATE"
+        },
+        "refusals": [
+          {
+            "code": "LIVE_LAUNCH_NOT_AUTHORIZED",
+            "detail": "LIVE_LAUNCH_NOT_AUTHORIZED: real provider launch is outside MF-B0..B4 scope; a live path requires explicit operator authorization and a costed MF-B5 gate",
+            "refused_by": "PolicyBlocked"
+          },
+          {
+            "code": "OPERATOR_HOLD",
+            "detail": "OPERATOR_HOLD: no operator grant for paid compute on REQ-CROSS-BLOCK; Foundry may not authorize its own spending",
+            "refused_by": "Unauthorized"
+          },
+          {
+            "code": "GRANT_ISSUER_NOT_OPERATOR",
+            "detail": "GRANT_ISSUER_NOT_OPERATOR: grant GRANT-CROSS-1 was issued by 'BUILDER_AGENT', not the operator actor",
+            "refused_by": "Unauthorized"
+          },
+          {
+            "code": "BUDGET_EXCEEDED",
+            "detail": "BUDGET_EXCEEDED: cost-to-close 3.15 USD would exceed authorized 1.00 USD (spent 0.00)",
+            "refused_by": "Unauthorized"
+          }
+        ],
+        "scenario_id": "F11",
+        "status": "HELD",
+        "title": "provider loss, portability, and secret discipline"
+      },
+      {
+        "held": true,
+        "intent": "ACCESS != RIGHTS: unknown rights fail away from training, and permissions are not roles",
+        "observed": {
+          "eligible_for_training": [
+            "SRC_AGENT_TRACE",
+            "SRC_NEWS_ALPHA",
+            "SRC_NEWS_ALPHA_MIRROR"
+          ],
+          "negative_control_can_train": true,
+          "refusal_codes": [
+            "RIGHTS_BLOCKED",
+            "ROLE_TRANSITION_NOOP",
+            "SECRET_BEARING_SOURCE_TRAIN_ROLE_REFUSED"
+          ],
+          "rights_blocked": {
+            "SRC_PROHIBITED": "EXCLUDED_BY_POLICY",
+            "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
+            "SRC_VENDOR_TERMS": "RIGHTS_RESTRICTED"
+          },
+          "rights_permissive_but_role_forbidden": {
+            "SRC_BENCH_CORE": "HIDDEN_EVAL",
+            "SRC_CEREBUS_RULES": "RETRIEVAL_ONLY",
+            "SRC_MARKET_TICKS_PIT": "DEV",
+            "SRC_SECRET_INCIDENT": "RETRIEVAL_ONLY"
+          },
+          "unknown_rights_permits_training": false,
+          "unknown_rights_state": "RIGHTS_UNKNOWN"
+        },
+        "refusals": [
+          {
+            "code": "RIGHTS_BLOCKED",
+            "detail": "RIGHTS_BLOCKED: role TRAIN_CPT requires a rights disposition permitting training",
+            "refused_by": "PolicyBlocked"
+          },
+          {
+            "code": "ROLE_TRANSITION_NOOP",
+            "detail": "ROLE_TRANSITION_NOOP: a role transition must change the role; no-op transitions pollute provenance",
+            "refused_by": "PolicyBlocked"
+          },
+          {
+            "code": "SECRET_BEARING_SOURCE_TRAIN_ROLE_REFUSED",
+            "detail": "SECRET_BEARING_SOURCE_TRAIN_ROLE_REFUSED: SRC_SECRET_TRAIN: secret-bearing material cannot hold a training role",
+            "refused_by": "PolicyBlocked"
+          }
+        ],
+        "scenario_id": "F2",
+        "status": "HELD",
+        "title": "data rights, roles, and permissions"
+      },
+      {
+        "held": true,
+        "intent": "governed sources produce a deterministic manifest, and aliases are not diversity",
+        "observed": {
+          "exact_duplicates_collapsed": 1,
+          "excluded_sources": [
+            "SRC_RIGHTS_UNKNOWN"
+          ],
+          "item_count": 3,
+          "item_level_random_split_used": false,
+          "lineage_fingerprint": "sha256:e06c2ccd61f3f88fecfb10505b7708f30f0671ae2fdf26a36006e2f251a9b1bb",
+          "lineage_reproducible": true,
+          "mirror_collapsed": true,
+          "mirror_lineages": 1,
+          "near_duplicates_collapsed": 2,
+          "split_strategy": "BY_SOURCE",
+          "unknown_rights_excluded": true
+        },
+        "refusals": [],
+        "scenario_id": "F3",
+        "status": "HELD",
+        "title": "governed corpus construction"
+      },
+      {
+        "held": true,
+        "intent": "future information at the decision instant is detected and blocks a training dataset",
+        "observed": {
+          "clean_subset_passes": true,
+          "dataset_refused": true,
+          "failure": "PIT_INVALID",
+          "violation_reasons": [
+            "FUTURE_INFORMATION_AT_DECISION_INSTANT",
+            "KNOWLEDGE_PRECEDES_EVENT"
+          ],
+          "violations": 2
+        },
+        "refusals": [],
+        "scenario_id": "F4",
+        "status": "HELD",
+        "title": "point-in-time leakage"
+      },
+      {
+        "held": true,
+        "intent": "a train source contaminated against an eval set degrades the claim and blocks the strongest labels",
+        "observed": {
+          "adjacent_source_grade_not_inherited": "C0_NO_OBSERVED_OVERLAP",
+          "claim_blocking_edges": 1,
+          "combined_grade": "C3_PARAPHRASE_OR_SOLUTION_OVERLAP",
+          "unobserved_is_not_clean": "absence is not cleanliness",
+          "worst_grade_for_bench_core": "C3_PARAPHRASE_OR_SOLUTION_OVERLAP"
+        },
+        "refusals": [],
+        "scenario_id": "F5",
+        "status": "HELD",
+        "title": "contamination gating"
+      },
+      {
+        "held": true,
+        "intent": "CEREBUS-family material is operationally withheld from every model-facing path",
+        "observed": {
+          "blocked_sources": [
+            "SRC_CEREBUS_RULES"
+          ],
+          "dataset_refused": true,
+          "doctrine_bearing_sources": [
+            "SRC_CEREBUS_RULES"
+          ],
+          "failure": "CONTAMINATION_BLOCKED",
+          "refusal_codes": [
+            "CEREBUS_FAMILY_WITHHELD",
+            "CEREBUS_FAMILY_WITHHELD"
+          ],
+          "reopen_condition": "reopen when a rights disposition, provenance record, or decontaminated source set is registered and re-audited under the same recipe"
+        },
+        "refusals": [
+          {
+            "code": "CEREBUS_FAMILY_WITHHELD",
+            "detail": "CEREBUS_FAMILY_WITHHELD: SRC_CEREBUS_RULES carries withheld doctrine and cannot enter model-facing paths",
+            "refused_by": "PolicyBlocked"
+          },
+          {
+            "code": "CEREBUS_FAMILY_WITHHELD",
+            "detail": "CEREBUS_FAMILY_WITHHELD: SRC_CEREBUS_RULES carries withheld doctrine and cannot enter model-facing paths",
+            "refused_by": "PolicyBlocked"
+          }
+        ],
+        "scenario_id": "F6",
+        "status": "HELD",
+        "title": "withheld doctrine boundary"
+      },
+      {
+        "held": true,
+        "intent": "criteria are frozen before outcomes, builders cannot author the freeze that judges them, freeze is immutable",
+        "observed": {
+          "frozen_at_utc_present": true,
+          "protocol_fingerprint": "sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35",
+          "refusal_codes": [
+            "FREEZE_AFTER_OUTCOMES_REFUSED",
+            "SEALED_FREEZE_BUILDER_REFUSED",
+            "PROTOCOL_MUTATION_REFUSED"
+          ],
+          "tier": "PROMOTION"
+        },
+        "refusals": [
+          {
+            "code": "FREEZE_AFTER_OUTCOMES_REFUSED",
+            "detail": "FREEZE_AFTER_OUTCOMES_REFUSED: criteria must be frozen before candidate outcomes are observed",
+            "refused_by": "PolicyBlocked"
+          },
+          {
+            "code": "SEALED_FREEZE_BUILDER_REFUSED",
+            "detail": "SEALED_FREEZE_BUILDER_REFUSED: a builder cannot author the sealed freeze that will judge it",
+            "refused_by": "Unauthorized"
+          },
+          {
+            "code": "PROTOCOL_MUTATION_REFUSED",
+            "detail": "PROTOCOL_MUTATION_REFUSED: a frozen protocol cannot be edited; register a new version through the tier contract",
+            "refused_by": "Unauthorized"
+          }
+        ],
+        "scenario_id": "F7",
+        "status": "HELD",
+        "title": "evaluation freeze"
+      },
+      {
+        "held": true,
+        "intent": "sealed answers are unreachable from the builder surface, every attempt is recorded, access requires operator authority",
+        "observed": {
+          "authorised_read_items": 2,
+          "builder_view_exposes_contents": false,
+          "exposure_budget_ok": true,
+          "exposures_recorded": [
+            "ACCESSED_SEALED_PAYLOAD"
+          ],
+          "refusal_codes": [
+            "SEALED_ACCESS_BUILDER_REFUSED",
+            "SEALED_ACCESS_BUILDER_REFUSED",
+            "SEALED_ACCESS_TOKEN_REQUIRED",
+            "SEALED_REGISTRATION_ROLE_REFUSED"
+          ],
+          "refusals_recorded": 3
+        },
+        "refusals": [
+          {
+            "code": "SEALED_ACCESS_BUILDER_REFUSED",
+            "detail": "SEALED_ACCESS_BUILDER_REFUSED: sealed confirmation material is never available through the builder surface",
+            "refused_by": "Unauthorized"
+          },
+          {
+            "code": "SEALED_ACCESS_BUILDER_REFUSED",
+            "detail": "SEALED_ACCESS_BUILDER_REFUSED: sealed confirmation material is never available through the builder surface",
+            "refused_by": "Unauthorized"
+          },
+          {
+            "code": "SEALED_ACCESS_TOKEN_REQUIRED",
+            "detail": "SEALED_ACCESS_TOKEN_REQUIRED: sealed access requires an operator-issued token for this payload",
+            "refused_by": "Unauthorized"
+          },
+          {
+            "code": "SEALED_REGISTRATION_ROLE_REFUSED",
+            "detail": "SEALED_REGISTRATION_ROLE_REFUSED: 'BUILDER_AGENT' may not register sealed material",
+            "refused_by": "Unauthorized"
+          }
+        ],
+        "scenario_id": "F8",
+        "status": "HELD",
+        "title": "sealed evaluation boundary"
+      },
+      {
+        "held": true,
+        "intent": "a system result cannot be credited as an artifact result, and capability evidence promotes only through OCE review",
+        "observed": {
+          "attribution_study_permits_narrower_credit": true,
+          "framework_dependence": "CROSS_FRAMEWORK_AGREED",
+          "master_score": null,
+          "refusal_codes": [
+            "SUBJECT_CREDIT_COLLAPSE_REFUSED",
+            "CAPABILITY_SELF_PROMOTION_REFUSED"
+          ],
+          "subject_kind": "COGNITIVE_SYSTEM",
+          "terminal_conclusion": "PASS",
+          "vector_dimensions": [
+            "accuracy"
+          ],
+          "writes_global_capability_status": false
+        },
+        "refusals": [
+          {
+            "code": "SUBJECT_CREDIT_COLLAPSE_REFUSED",
+            "detail": "SUBJECT_CREDIT_COLLAPSE_REFUSED: COGNITIVE_SYSTEM result cannot be credited as COGNITIVE_ARTIFACT",
+            "refused_by": "PolicyBlocked"
+          },
+          {
+            "code": "CAPABILITY_SELF_PROMOTION_REFUSED",
+            "detail": "CAPABILITY_SELF_PROMOTION_REFUSED: Foundry capability evidence cannot become institutional capability truth without OCE review",
+            "refused_by": "Unauthorized"
+          }
+        ],
+        "scenario_id": "F9",
+        "status": "HELD",
+        "title": "artifact / runtime / system separation"
+      }
+    ],
+    "scenarios_failed": [],
+    "scenarios_held": 12,
+    "scenarios_total": 12,
+    "verdict": "PASS"
+  },
+  "doctrine": [
+    "MODEL OUTPUT != INSTITUTIONAL TRUTH",
+    "WEIGHTS != CANONICAL MEMORY",
+    "CAPABILITY != AUTHORITY",
+    "ACCESS != RIGHTS",
+    "AVAILABLE DATA != TRAINABLE DATA",
+    "BENCHMARK SCORE != CAPABILITY",
+    "PROVIDER OFFER != GUARANTEE",
+    "HOURLY PRICE != COST-TO-CLOSE",
+    "REGISTERED SOURCE != CLEAN SOURCE",
+    "HIDDEN EVAL != DEVELOPMENT DATA",
+    "NEGATIVE RESULT != FAILED PROJECT",
+    "UNKNOWN != FAVORABLE"
+  ],
+  "evidence_fingerprint": "sha256:1ea9bacc96e7e4d5d99d16abb5b125060a217234dabedf47644dfb389a0bdfbb",
+  "external_operations": {
+    "capital_operations": 0,
+    "cloud_mutations": 0,
+    "model_api_calls": 0,
+    "paid_compute": 0,
+    "production_mutations": 0,
+    "provider_launches": 0,
+    "public_read_only_calls": 0
+  },
+  "generated_by": "python -m foundry.cli evidence",
+  "limits": [
+    "compute, evaluation, sealed confirmation and recovery are simulated on fixtures",
+    "no provider adapter performs live reads in this build",
+    "no model was trained; nothing here is a capability claim"
+  ],
+  "scientific_integrity": {
+    "cerebus_exposures": 0,
+    "contamination_edges": 4,
+    "negative_results": 1,
+    "rights_blocks": {
+      "SRC_PROHIBITED": "EXCLUDED_BY_POLICY",
+      "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
+      "SRC_VENDOR_TERMS": "RIGHTS_RESTRICTED"
+    },
+    "sealed_eval_exposures": 0
+  },
+  "temporary_oce_fixtures": [
+    {
+      "canonical_oce_target": "OCE artifact registry + artifact-manifest envelope",
+      "fixture": "FoundryLocalArtifactStore",
+      "module": "declaration-only",
+      "noncanonical": true,
+      "present_scope": "declaration only",
+      "replacement_condition": "replace when OCE artifact service is exposed on the convergence branch",
+      "retirement_evidence": "artifact digests resolve through OCE artifact registry"
+    },
+    {
+      "canonical_oce_target": "OCE AuthorityState / capability grants (A-009/A-010 lineage)",
+      "fixture": "FoundryLocalAuthorityProjection",
+      "module": "declaration-only",
+      "noncanonical": true,
+      "present_scope": "declaration only",
+      "replacement_condition": "replace when canonical OCE authority projection is available",
+      "retirement_evidence": "no Foundry-local grant may authorize an action once OCE projection is bound"
+    },
+    {
+      "canonical_oce_target": "OCE resource budget service",
+      "fixture": "FoundryLocalBudgetLedger",
+      "module": "foundry.resources.BUDGET_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "explicit operator budget arithmetic only; no spend path",
+      "replacement_condition": "replace when OCE budget authority is consumable",
+      "retirement_evidence": "budget holds are issued by canonical budget service"
+    },
+    {
+      "canonical_oce_target": "OCE recovery/resume service",
+      "fixture": "FoundryLocalCheckpointRecovery",
+      "module": "foundry.resources.RECOVERY_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "portable checkpoint manifests + simulated resume only",
+      "replacement_condition": "replace when generic recovery exists",
+      "retirement_evidence": "provider-loss recovery runs through canonical recovery service"
+    },
+    {
+      "canonical_oce_target": "OCE B6 Evaluation Service / CEREBUS-governed evaluator freeze (G6 lineage)",
+      "fixture": "FoundryLocalEvaluationFreeze",
+      "module": "foundry.evaluation.EVAL_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "protocol freeze + sealed access boundary only",
+      "replacement_condition": "replace when OCE owns evaluator freeze/ratification authority",
+      "retirement_evidence": "protocol freeze receipts are issued by the canonical evaluator service"
+    },
+    {
+      "canonical_oce_target": "OCE EvidenceGraph / evidence registry",
+      "fixture": "FoundryLocalEvidenceLedger",
+      "module": "foundry.data.DATA_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "MF-B2/B3 provenance links only; no generic evidence graph",
+      "replacement_condition": "replace when convergence branch exposes canonical evidence graph",
+      "retirement_evidence": "evidence refs carry canonical OCE envelope ids"
+    },
+    {
+      "canonical_oce_target": "OCE identity / actor registry",
+      "fixture": "FoundryLocalIdentity",
+      "module": "declaration-only",
+      "noncanonical": true,
+      "present_scope": "declaration only",
+      "replacement_condition": "replace when convergence branch exposes canonical identity service",
+      "retirement_evidence": "Foundry actor references resolve through OCE identity adapter"
+    },
+    {
+      "canonical_oce_target": "OCE NegativeKnowledge with governed reopen semantics (A-004/A-009 lineage)",
+      "fixture": "FoundryLocalNegativeKnowledge",
+      "module": "foundry.evaluation.NEGATIVE_KNOWLEDGE_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "negative results + reopen records only",
+      "replacement_condition": "replace when canonical NegativeKnowledge service is consumable",
+      "retirement_evidence": "reopen conditions evaluated by canonical lifecycle, not locally"
+    },
+    {
+      "canonical_oce_target": "OCE B10 Resource Intelligence (COMPUTE.GPU.RENT)",
+      "fixture": "FoundryLocalOfferNormalizer",
+      "module": "foundry.providers.PROVIDER_OFFER_DOUBLE,foundry.resources.RESOURCE_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "read-only offer normalization + placement; no provider API calls",
+      "replacement_condition": "replace when B10 exposes provider-neutral offer/routing",
+      "retirement_evidence": "Foundry submits ComputeRequest to B10 and consumes routing receipts"
+    },
+    {
+      "canonical_oce_target": "OCE WorkGraph / governed workflow",
+      "fixture": "FoundryLocalRunLifecycle",
+      "module": "foundry.refinery.REFINERY_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "dataset/experiment run records only; no scheduler",
+      "replacement_condition": "replace when generic workflow service exists",
+      "retirement_evidence": "experiment runs admitted through canonical workflow nodes"
+    }
+  ]
+}

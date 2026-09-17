@@ -1,0 +1,15 @@
+[project]
+name = "larger-lab-model-foundry"
+version = "0.1.0"
+description = "Larger Lab Model Foundry — governed scientific substrate (MF-B0..MF-B4)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8.0.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"

@@ -1,0 +1,47 @@
+{
+  "diversity": {
+    "collapsed_aliases": [
+      "SRC_NEWS_ALPHA_MIRROR"
+    ],
+    "distinct_families": 9,
+    "diversity_is_claimed_not_effective": true,
+    "effective_lineages": 9,
+    "families_with_multiple_lineages": [],
+    "lineage_map": {
+      "SRC_AGENT_TRACE": "generated://scaffold-v0",
+      "SRC_BENCH_CORE": "operator://bench-authoring",
+      "SRC_CEREBUS_RULES": "withheld://origin-unknown",
+      "SRC_MARKET_TICKS_PIT": "exchange://public-ticks",
+      "SRC_NEWS_ALPHA": "wire://alpha",
+      "SRC_NEWS_ALPHA_MIRROR": "wire://alpha",
+      "SRC_PROHIBITED": "prohibited://unknown",
+      "SRC_RIGHTS_UNKNOWN": "crawl://unknown",
+      "SRC_SECRET_INCIDENT": "operator://notes",
+      "SRC_VENDOR_TERMS": "vendor://sample-b"
+    },
+    "requested_sources": 10
+  },
+  "doctrine_bearing": [
+    "SRC_CEREBUS_RULES"
+  ],
+  "registry_digest": "sha256:357188b2976eccf8bdd2114892fb431433667c6c2e6a7a477fbd3c7e905b7399",
+  "rights_blocked": {
+    "SRC_PROHIBITED": "EXCLUDED_BY_POLICY",
+    "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
+    "SRC_VENDOR_TERMS": "RIGHTS_RESTRICTED"
+  },
+  "role_distribution": {
+    "DEV": 1,
+    "EXCLUDED": 1,
+    "HIDDEN_EVAL": 1,
+    "RETRIEVAL_ONLY": 4,
+    "TRAIN_CPT": 2,
+    "TRAIN_SFT": 1
+  },
+  "source_count": 10,
+  "trainable": [
+    "SRC_AGENT_TRACE",
+    "SRC_NEWS_ALPHA",
+    "SRC_NEWS_ALPHA_MIRROR"
+  ]
+}
