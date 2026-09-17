@@ -252,20 +252,63 @@ class DurableJsonCatalog:
         return logical_id, payload
 
     def _load_all(self) -> None:
+        self._cache = {}
+        for path in sorted(self._root.glob("*.json")):
+            self._load_fragment(path)
+
+    def _load_fragment(self, path: Path) -> None:
+        logical_id, payload = self._parse_fragment(path)
+        if logical_id in self._cache:
+            # Two files claiming one logical id cannot both bind to the
+            # same physical key, so this only triggers if the cache was
+            # pre-populated — treat divergence as corruption.
+            if canonical_json_bytes(self._cache[logical_id]) != canonical_json_bytes(
+                payload
+            ):
+                raise JsonCatalogCorrupt(
+                    f"duplicate divergent fragments for logical_id="
+                    f"{logical_id!r}"
+                )
+        self._cache[logical_id] = payload
+
+    def refresh(self) -> None:
+        """Validated read-only reload of committed truth (I07R1 §31).
+
+        Re-scans committed ``*.json`` fragments through the existing
+        corruption validator (exact parse + physical-key binding), adopts
+        newly committed objects, and FAILS CLOSED when a cached record
+        diverges from disk or has vanished — a missing committed object is
+        corruption, never a silent de-registration (I05R1 doctrine).
+        No writes, no overwrites; purely a fresh view of durable truth for
+        long-lived repository instances that must observe other writers
+        (I07R1 §30/§33-§35).
+        """
+        on_disk: dict[str, tuple[bytes, dict[str, Any]]] = {}
         for path in sorted(self._root.glob("*.json")):
             logical_id, payload = self._parse_fragment(path)
-            if logical_id in self._cache:
-                # Two files claiming one logical id cannot both bind to the
-                # same physical key, so this only triggers if the cache was
-                # pre-populated — treat divergence as corruption.
-                if canonical_json_bytes(self._cache[logical_id]) != canonical_json_bytes(
-                    payload
-                ):
-                    raise JsonCatalogCorrupt(
-                        f"duplicate divergent fragments for logical_id="
-                        f"{logical_id!r}"
-                    )
-            self._cache[logical_id] = payload
+            on_disk[logical_id] = (
+                canonical_json_bytes(payload), payload
+            )
+        # Previously cached committed records must still exist (fail closed
+        # on vanished durable truth).
+        for logical_id, cached in self._cache.items():
+            if logical_id not in on_disk:
+                raise JsonCatalogCorrupt(
+                    f"cached committed record logical_id={logical_id!r} has "
+                    "vanished from disk; committed catalog truth may never "
+                    "silently disappear"
+                )
+            disk_bytes, _ = on_disk[logical_id]
+            if disk_bytes != canonical_json_bytes(cached):
+                raise JsonCatalogCorrupt(
+                    f"cached committed record logical_id={logical_id!r} "
+                    "diverges from disk; immutable catalogs never change "
+                    "committed content"
+                )
+        # Adopt newly committed objects.
+        for logical_id, (_, payload) in on_disk.items():
+            if logical_id not in self._cache:
+                self._cache[logical_id] = payload
 
     # -- reads ---------------------------------------------------------------
 

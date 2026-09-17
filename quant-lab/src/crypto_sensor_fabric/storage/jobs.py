@@ -1,41 +1,69 @@
-"""SENSOR-B4-I07 — durable job state + resume coupling.
+"""SENSOR-B4-I07R1 — durable job state + sealed resume coupling.
 
-Implements the frozen job-durability doctrine of
-``bloc_04/03_INTEGRITY_ATOMICITY_REVISION_AND_RECOVERY.md``:
+Hardens the accepted I07 architecture (operator review seams A-H closed;
+I07R1 §0).  The broad design is PRESERVED — frozen vocabulary, append-only
+birth + transition chain, durable cursor advancement, crash/idempotence
+handling, local per-job coordination, restart validation, read-only
+evidence.  What changed is the truth contract:
 
-- **§15 job durability** — ``StorageJobState`` survives process restart.
-  The state machine uses the FROZEN ``storage.enums.StorageJobStatus``
-  vocabulary and the FROZEN ``storage.models.StorageJobState`` /
-  ``StorageJobTransition`` models (one canonical vocabulary, I06R1 §3-§5
-  doctrine).  Persistence is append-only immutable catalogs: a birth
-  record per job plus one immutable event record per transition; the
-  current state is MATERIALIZED from the chain, never mutated in place.
+- **Gate-only cursor mutation (I07R1 §3/§4)** — the public
+  ``advance_status`` signature carries ONLY ``(job_id, *, to_status,
+  reason, evidence_ref, expected_from)``.  Resume-token and
+  checkpoint-anchor fields are unreachable by callers, and no
+  ``_via_checkpoint_gate``-style flag exists anywhere: ordinary
+  transitions can never enter ``CHECKPOINT_ADVANCED`` nor mutate the
+  cursor/anchors, and the gated path is a PRIVATE primitive that receives
+  an already-proven, fully validated resulting state.
 
-- **A job may not move backward silently.**  Forward progression along
-  the frozen linear order is always allowed.  Entering a failure state
-  requires an explicit reason.  Leaving ``FAILED_RETRYABLE`` (or an
-  annotated continuation from ``CHECKPOINT_ADVANCED``) is a backward move
-  that is legal ONLY when the transition carries a nonempty reason —
-  i.e. a new, explicit chain record explaining the repair/continuation.
+- **Ordinary transitions preserve pointers (I07R1 §5)** — for every
+  non-checkpoint transition the resulting state keeps
+  ``resume_token``, ``last_committed_acquisition_id``,
+  ``last_committed_blob_sha256`` and ``last_manifest_id`` exactly as they
+  were.  Durable states are re-validated (never trusted from
+  ``model_copy``) before publication (I07R1 §6).
 
-- **§16 resume invariant** — ``resume_token`` may become the active
-  resume point only if the batch's required T0 evidence has reached
-  ``MANIFEST_COMMITTED`` (frozen recommended default) or the explicitly
-  configured minimum durable state.  The proof is resolved from durable
-  truth (acquisition exists, blob physically verified, manifest exists
-  and contains the batch blob) — never from caller claims.  A failed
-  gate never advances the cursor (fail closed).
+- **Evidence belongs to the job (I07R1 §7-§13)** — checkpoint proof
+  resolves the durable acquisition and requires exact job identity
+  (provider / sensor_family / request_fingerprint), the authoritative
+  I04R2 ``is_usable_manifest_provenance`` predicate (no duplicated
+  eligibility logic — a forensic acquisition stays durable history but
+  never moves the cursor), physical blob verification, and — at the
+  MANIFEST_COMMITTED floor — exact manifest↔acquisition source identity
+  (provider, venue, sensor_family, native_instrument,
+  source_granularity, blob in refs).  Same bytes under another job or
+  source are rejected: content equality does not transfer identity.
+  The RAW_COMMITTED floor requires ``manifest_id is None`` (no dummy
+  anchors) and stores the exact acquisition/blob; the MANIFEST_COMMITTED
+  floor requires the exact proven manifest.  All anchors describe the
+  same batch.
 
-- **Crash semantics** — every state change is ONE atomic durable catalog
-  commit (staging -> fsync -> verify -> no-clobber publish -> dir fsync).
-  A crash leaves either the old chain or the new chain, never an
-  intermediate.  An exact retry after a lost publication race adopts the
-  already-committed record when semantics (excluding operational clock
-  fields) match, and fails typed on any real divergence.
+- **Checkpoint proof is durable (I07R1 §15-§18)** — every
+  ``CHECKPOINT_ADVANCED`` event carries repository-internal immutable
+  ``checkpoint_proof`` metadata (closed ``proof_version == 1``: floor,
+  acquisition_id, blob_sha256, manifest_id) bound exactly to the
+  resulting state's anchors.  Proof on a non-checkpoint event, or a
+  checkpoint without proof, is corruption.
 
-- **Coordination** — per-job local filesystem lock + in-process lock
-  (I06 §43 pattern).  Locks are never auto-deleted; I08 owns stale-lock
-  recovery.  LOCAL truth only: not distributed coordination.
+- **One transition validator (I07R1 §20-§22)** — the exact V1 transition
+  graph (single forward steps, checkpoint-only entry, the single
+  retry-resume edge ``FAILED_RETRYABLE -> ACQUIRING``, the annotated
+  continuation edge, reason requirements, terminal closure) is ONE pure
+  rule function reused by both the write path and restart replay.  The
+  reader enforces the same state machine the writer did.
+
+- **Restart replay is the writer's validator (I07R1 §19/§23-§27)** —
+  birth identity is immutable across every event; ordinary events
+  preserve pointers exactly; event IDs bind ``job_id:sequence``;
+  ``resulting.updated_at == transition.transitioned_at``; historical
+  checkpoints are re-proved under the floor PERSISTED IN THEIR OWN
+  PROOF (constructor configuration governs only NEW checkpoints).
+
+- **Safe coordination (I07R1 §28-§36)** — lock filenames are
+  ``sha256(utf8(job_id)).hexdigest() + ".lock"`` (raw logical IDs never
+  become filesystem paths), and acquiring the OUTERMOST per-job file
+  lock REFRESHES the durable catalogs from disk (validated reload, no
+  raw reads) before any state is read, so long-lived repositories never
+  act on stale views; cross-repository races cannot fork the chain.
 
 LOCAL filesystem truth only.  No network, no provider code, no I08
 recovery scanner, no quota, no DuckDB/Postgres (later checkpoints).
@@ -43,15 +71,20 @@ recovery scanner, no quota, no DuckDB/Postgres (later checkpoints).
 
 from __future__ import annotations
 
-import json
+import hashlib
 import threading
 import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from pydantic import ValidationError
+
 from .atomic import ensure_durable_directory
-from .catalog import AcquisitionRepository, CatalogError
+from .catalog import (
+    AcquisitionRepository,
+    is_usable_manifest_provenance,
+)
 from .enums import StorageJobStatus
 from .json_catalog import (
     CatalogFaultHook,
@@ -108,7 +141,7 @@ class JobCatalogCorrupt(JobError):
 
 
 # ---------------------------------------------------------------------------
-# Frozen transition rules
+# Frozen transition rules (I07R1 §20-§22): ONE validator, two callers
 # ---------------------------------------------------------------------------
 
 #: The frozen linear progress order (03 doc §15).  Failure/quarantine
@@ -140,6 +173,9 @@ MIN_DURABLE_STATES: frozenset[StorageJobStatus] = frozenset(
     {StorageJobStatus.RAW_COMMITTED, StorageJobStatus.MANIFEST_COMMITTED}
 )
 
+#: Closed V1 checkpoint-proof schema version (I07R1 §16).
+CHECKPOINT_PROOF_VERSION = 1
+
 
 def _progress_rank(status: StorageJobStatus) -> int | None:
     try:
@@ -148,8 +184,118 @@ def _progress_rank(status: StorageJobStatus) -> int | None:
         return None
 
 
+def _nonempty(reason: str | None) -> bool:
+    return reason is not None and bool(reason.strip())
+
+
+def validate_transition(
+    current: StorageJobStatus,
+    target: StorageJobStatus,
+    reason: str | None,
+    *,
+    checkpoint: bool,
+) -> None:
+    """THE exact V1 transition graph (I07R1 §21) — pure, no repository state.
+
+    ``checkpoint=True`` marks the gated resume edge: only that edge may
+    target ``CHECKPOINT_ADVANCED`` (the proof authorizes the cursor jump
+    past intermediate operational states).  The write path raises
+    :class:`JobTransitionConflict`; restart replay converts failures to
+    :class:`JobCatalogCorrupt` so persisted events must pass the SAME
+    graph that would have authorized them originally (I07R1 §20).
+    """
+    if current in (StorageJobStatus.COMPLETE, StorageJobStatus.FAILED_TERMINAL):
+        raise JobTransitionConflict(
+            f"{current.value} is terminal; no exits from a frozen job chain"
+        )
+    if current is StorageJobStatus.QUARANTINED:
+        # I08 owns recovery; v1 treats quarantine as terminal here.
+        raise JobTransitionConflict(
+            "QUARANTINED jobs are recovered by I08, not by I07 transitions"
+        )
+    if checkpoint != (target is StorageJobStatus.CHECKPOINT_ADVANCED):
+        if target is StorageJobStatus.CHECKPOINT_ADVANCED:
+            raise JobTransitionConflict(
+                "CHECKPOINT_ADVANCED is entered only via advance_checkpoint "
+                "(durable-proof gate), never via a plain transition"
+            )
+        raise JobTransitionConflict(
+            "the gated checkpoint edge must target CHECKPOINT_ADVANCED"
+        )
+    if current is target:
+        raise JobTransitionConflict("noop transition is not recorded")
+    if target in _FAILURE_STATES:
+        # Entering any failure state requires an explicit reason
+        # (I07R1 §22) — replay enforces the same (§39-29).
+        if not _nonempty(reason):
+            raise JobTransitionConflict(
+                f"entering {target.value} requires a nonempty failure "
+                "reason (no silent failure transitions)"
+            )
+        return
+    if current is StorageJobStatus.FAILED_RETRYABLE:
+        # The ONLY retry-resume edge: FAILED_RETRYABLE -> ACQUIRING with a
+        # nonempty reason.  No direct jumps back into staged/committed
+        # states (I07R1 §21).
+        if target is StorageJobStatus.ACQUIRING:
+            if not _nonempty(reason):
+                raise JobTransitionConflict(
+                    "retry resume from FAILED_RETRYABLE requires a nonempty "
+                    "reason (backward moves are never silent)"
+                )
+            return
+        raise JobTransitionConflict(
+            f"FAILED_RETRYABLE may only resume to ACQUIRING, not "
+            f"{target.value}"
+        )
+    current_rank = _progress_rank(current)
+    target_rank = _progress_rank(target)
+    if current_rank is None or target_rank is None:
+        raise JobTransitionConflict(
+            f"cannot transition {current.value} -> {target.value}"
+        )
+    if target_rank - current_rank == 1:
+        return
+    if target_rank > current_rank:
+        if checkpoint and target is StorageJobStatus.CHECKPOINT_ADVANCED:
+            # The gated edge IS the proof: durable evidence at or above the
+            # floor authorizes the cursor jump past intermediate states.
+            return
+        raise JobTransitionConflict(
+            f"state machine advances one step at a time; "
+            f"{current.value} -> {target.value} skips states"
+        )
+    # Backward move between progress states: only the annotated
+    # batch-continuation edge CHECKPOINT_ADVANCED -> ACQUIRING.
+    if (
+        current is StorageJobStatus.CHECKPOINT_ADVANCED
+        and target is StorageJobStatus.ACQUIRING
+    ):
+        if not _nonempty(reason):
+            raise JobTransitionConflict(
+                "CHECKPOINT_ADVANCED -> ACQUIRING is a backward move and "
+                "requires a nonempty continuation reason"
+            )
+        return
+    raise JobTransitionConflict(
+        f"silent backward move {current.value} -> {target.value} is "
+        "forbidden (03 doc §15)"
+    )
+
+
 def _clock_now() -> datetime:
     return datetime.now(UTC)
+
+
+def _validated_state(state: StorageJobState) -> StorageJobState:
+    """Round-trip a durable state through FULL pydantic validation (I07R1 §6).
+
+    ``model_copy(update=...)`` results are never persisted unvalidated: the
+    JSON dump forces every nested model (ResumeToken), enum, datetime and
+    semantic validator to re-run, so a malformed token/blob SHA/state
+    fails BEFORE the event becomes durable.
+    """
+    return StorageJobState.model_validate(state.model_dump(mode="json"))
 
 
 def _event_semantics(event: dict[str, Any]) -> dict[str, Any]:
@@ -157,7 +303,9 @@ def _event_semantics(event: dict[str, Any]) -> dict[str, Any]:
 
     Two committed events with identical semantics are the same logical
     event (exact retry after a lost publication race adopts the existing
-    record); a difference in anything else is a real conflict.
+    record); a difference in anything else is a real conflict.  The
+    checkpoint proof is semantic (it binds the proof to the anchors), so
+    it participates in comparison.
     """
 
     def scrub(payload: Any) -> Any:
@@ -196,17 +344,23 @@ def _build_event_record(
     }
 
 
+def _event_id(job_id: str, sequence: int) -> str:
+    """Canonical event identity: ``{job_id}:{sequence:06d}`` (I07R1 §26)."""
+    return f"{job_id}:{sequence:06d}"
+
+
 # ---------------------------------------------------------------------------
 # Repository
 # ---------------------------------------------------------------------------
 
 
 class DurableJobStateRepository:
-    """Durable, restart-safe ``StorageJobState`` + resume coupling (I07).
+    """Durable, restart-safe ``StorageJobState`` + sealed resume coupling.
 
     Append-only chain per job: birth record (status PLANNED) + immutable
     event records.  Current state is materialized from the chain on load
-    and validated against cross-constraints (fail closed).
+    and validated against cross-constraints (fail closed) using the SAME
+    transition graph the write path enforces (I07R1 §20).
     """
 
     def __init__(
@@ -239,9 +393,9 @@ class DurableJobStateRepository:
         self._lock_timeout_seconds = lock_timeout_seconds
         self._process_lock = threading.Lock()
         self._job_locks: dict[str, threading.RLock] = {}
-        self._file_locks: dict[str, Any] = {}
         # Per-job file-lock ownership for re-entrancy within one thread
-        # (advance_checkpoint calls advance_status under the same job lock).
+        # (advance_checkpoint appends its event under the same job lock;
+        # I07R1 §32: nested entries never re-refresh).
         self._lock_owners: dict[str, dict[str, Any]] = {}
         self._births = DurableJsonCatalog(
             self._jobs_root,
@@ -309,13 +463,15 @@ class DurableJobStateRepository:
                         "identity semantics"
                     )
                 return self.get_job(job_id)
-            birth_state = StorageJobState(
-                job_id=job_id,
-                provider_id=provider_id,
-                sensor_family=sensor_family,
-                request_fingerprint=request_fingerprint,
-                status=StorageJobStatus.PLANNED,
-                updated_at=self._clock(),
+            birth_state = _validated_state(
+                StorageJobState(
+                    job_id=job_id,
+                    provider_id=provider_id,
+                    sensor_family=sensor_family,
+                    request_fingerprint=request_fingerprint,
+                    status=StorageJobStatus.PLANNED,
+                    updated_at=self._clock(),
+                )
             )
             payload = {
                 "record_kind": "job_birth",
@@ -335,19 +491,16 @@ class DurableJobStateRepository:
         reason: str | None = None,
         evidence_ref: Any = None,
         expected_from: StorageJobStatus | None = None,
-        resume_token: Any = None,
-        last_committed_acquisition_id: str | None = None,
-        last_committed_blob_sha256: str | None = None,
-        last_manifest_id: str | None = None,
-        _via_checkpoint_gate: bool = False,
     ) -> StorageJobState:
-        """Append one explicit transition and return the new current state.
+        """Append one explicit ORDINARY transition and return the new state.
 
-        Forward progression is always allowed.  Entering a failure state
-        and any backward move (retry resume / annotated continuation)
-        require a nonempty ``reason`` — backward moves are never silent.
-        ``_via_checkpoint_gate`` is internal: only the durable-proof
-        checkpoint path may target CHECKPOINT_ADVANCED.
+        The public signature is exactly ``(job_id, *, to_status, reason,
+        evidence_ref, expected_from)`` (I07R1 §3): no resume token, no
+        checkpoint anchors, no gate flag.  ``CHECKPOINT_ADVANCED`` is
+        unreachable here (§4) and every ordinary transition PRESERVES the
+        cursor/anchor pointers exactly (§5).  Forward progression is
+        single-step; failure entries and the two annotated backward edges
+        require a nonempty ``reason``.
         """
         with self._job_lock(job_id):
             current = self.get_job(job_id)
@@ -356,12 +509,13 @@ class DurableJobStateRepository:
                     f"job {job_id!r} is {current.status.value}, caller "
                     f"expected {expected_from.value}"
                 )
-            self._check_transition_allowed(
-                current.status, to_status, reason,
-                via_gate=_via_checkpoint_gate,
+            validate_transition(
+                current.status, to_status, reason, checkpoint=False
             )
             transition = StorageJobTransition(
-                transition_id=self._event_id(job_id, self._next_sequence(job_id)),
+                transition_id=_event_id(
+                    job_id, self._next_sequence(job_id)
+                ),
                 job_id=job_id,
                 from_status=current.status,
                 to_status=to_status,
@@ -369,36 +523,20 @@ class DurableJobStateRepository:
                 reason=reason,
                 evidence_ref=evidence_ref,
             )
-            next_state = current.model_copy(
-                update={
-                    "status": to_status,
-                    "updated_at": transition.transitioned_at,
-                    "resume_token": (
-                        resume_token
-                        if resume_token is not None
-                        else current.resume_token
-                    ),
-                    "last_committed_acquisition_id": (
-                        last_committed_acquisition_id
-                        if last_committed_acquisition_id is not None
-                        else current.last_committed_acquisition_id
-                    ),
-                    "last_committed_blob_sha256": (
-                        last_committed_blob_sha256
-                        if last_committed_blob_sha256 is not None
-                        else current.last_committed_blob_sha256
-                    ),
-                    "last_manifest_id": (
-                        last_manifest_id
-                        if last_manifest_id is not None
-                        else current.last_manifest_id
-                    ),
-                }
+            # §5/§6: pointers preserved EXACTLY, state fully re-validated
+            # (never a bare model_copy) before durability.
+            next_state = _validated_state(
+                current.model_copy(
+                    update={
+                        "status": to_status,
+                        "updated_at": transition.transitioned_at,
+                    }
+                )
             )
             self._append_event(transition, next_state)
             return next_state
 
-    # -- §16 resume coupling --------------------------------------------------
+    # -- §16 sealed resume coupling (I07R1 §4: private, gate-only) -----------
 
     def advance_checkpoint(
         self,
@@ -406,28 +544,47 @@ class DurableJobStateRepository:
         *,
         resume_token: Any,
         acquisition_id: str,
-        manifest_id: str,
+        manifest_id: str | None = None,
     ) -> StorageJobState:
         """Persist ``resume_token`` as the active resume point (§16).
 
-        Allowed only when the batch's T0 evidence is durably proven at or
-        above the configured minimum state: the acquisition exists, its
-        blob is physically verified, and (for the default
-        ``MANIFEST_COMMITTED`` floor) the manifest exists durably and
-        contains the batch blob.  Failure NEVER advances the cursor.
+        The ONLY way a chain reaches ``CHECKPOINT_ADVANCED``.  Allowed
+        only when the batch's T0 evidence is durably proven at or above
+        the configured floor AND belongs to THIS exact job (I07R1 §7-§13):
+        acquisition identity-bound, authoritative-usable provenance,
+        physically verified blob, and — at the MANIFEST_COMMITTED floor —
+        an exactly source-bound manifest.  At the RAW_COMMITTED floor the
+        caller must pass ``manifest_id=None``; at MANIFEST_COMMITTED the
+        manifest_id is mandatory.  Failure NEVER advances the cursor.
         """
+        floor = self._min_durable_status
+        if floor is StorageJobStatus.RAW_COMMITTED and manifest_id is not None:
+            # §12: a RAW floor does not index manifests; contradictory
+            # input is rejected rather than silently anchored.
+            raise JobResumeGateError(
+                "min_durable_status is RAW_COMMITTED: checkpoint takes "
+                "manifest_id=None (no manifest anchor exists at this floor)"
+            )
+        if floor is StorageJobStatus.MANIFEST_COMMITTED and manifest_id is None:
+            # §13: the manifest-committed floor REQUIRES the exact manifest.
+            raise JobResumeGateError(
+                "min_durable_status is MANIFEST_COMMITTED: checkpoint "
+                "requires the exact durable manifest_id"
+            )
         with self._job_lock(job_id):
             current = self.get_job(job_id)
             if current.status is StorageJobStatus.CHECKPOINT_ADVANCED:
                 # Exact retry of the SAME batch after a lost-return crash is
-                # idempotence (§68), not a second advancement: re-prove the
-                # durable chain, then return the already-committed state.
-                # Divergent semantics are a typed conflict.
+                # idempotence (§68), not a second advancement: refresh has
+                # already shown us the committed event; re-prove durable
+                # truth under the PERSISTED floor, then adopt.  Divergent
+                # semantics are a typed conflict (I07R1 §35).
                 last = self._latest_event(job_id)
-                if last is not None:
+                if last is not None and last.get("checkpoint_proof"):
                     committed = StorageJobState.model_validate(
                         last["resulting_state"]
                     )
+                    proof = last["checkpoint_proof"]
                     same_batch = (
                         committed.last_committed_acquisition_id
                         == acquisition_id
@@ -435,9 +592,18 @@ class DurableJobStateRepository:
                         and committed.resume_token == resume_token
                     )
                     if same_batch:
-                        # Idempotence is not permission to trust stale
-                        # evidence (I05R3 §10 doctrine): re-prove.
-                        self._prove_batch_durable(acquisition_id, manifest_id)
+                        # §19: re-prove under the floor PERSISTED IN THE
+                        # PROOF — the retrying process's constructor
+                        # configuration never reinterprets history.
+                        persisted_floor = StorageJobStatus(
+                            proof["minimum_durable_status"]
+                        )
+                        self._prove_batch_durable(
+                            job_id=job_id,
+                            acquisition_id=acquisition_id,
+                            manifest_id=manifest_id,
+                            floor=persisted_floor,
+                        )
                         return committed
                 raise JobTransitionConflict(
                     "job is already CHECKPOINT_ADVANCED for a different "
@@ -449,108 +615,107 @@ class DurableJobStateRepository:
                 raise JobTransitionConflict(
                     "COMPLETE is terminal; the job chain is frozen"
                 )
-            self._require_checkpoint_eligible(current.status)
-            self._prove_batch_durable(acquisition_id, manifest_id)
-            return self.advance_status(
-                job_id,
-                to_status=StorageJobStatus.CHECKPOINT_ADVANCED,
-                reason=(
-                    f"resume advanced after durable proof: acquisition "
-                    f"{acquisition_id}, manifest {manifest_id}"
-                ),
+            self._require_checkpoint_eligible(current.status, floor)
+            blob_sha = self._prove_batch_durable(
+                job_id=job_id,
+                acquisition_id=acquisition_id,
+                manifest_id=manifest_id,
+                floor=floor,
+            )
+            return self._append_checkpoint_event(
+                job_id=job_id,
+                current=current,
                 resume_token=resume_token,
-                last_committed_acquisition_id=acquisition_id,
-                last_manifest_id=manifest_id,
-                _via_checkpoint_gate=True,
+                acquisition_id=acquisition_id,
+                blob_sha=blob_sha,
+                manifest_id=manifest_id,
+                floor=floor,
             )
 
-    # -- transition rules (§15) ----------------------------------------------
-
-    def _check_transition_allowed(
+    def _append_checkpoint_event(
         self,
-        current: StorageJobStatus,
-        target: StorageJobStatus,
-        reason: str | None,
         *,
-        via_gate: bool = False,
-    ) -> None:
-        if current in _FAILURE_STATES and target is current:
-            # unreachable via frozen noop guard, kept for clarity
-            raise JobTransitionConflict("noop transition is not recorded")
-        if current in (StorageJobStatus.COMPLETE, StorageJobStatus.FAILED_TERMINAL):
-            raise JobTransitionConflict(
-                f"{current.value} is terminal; no exits from a frozen "
-                "job chain"
-            )
-        if current is StorageJobStatus.QUARANTINED:
-            # I08 owns recovery; v1 treats quarantine as terminal here.
-            raise JobTransitionConflict(
-                "QUARANTINED jobs are recovered by I08, not by I07 transitions"
-            )
-        entering_failure = target in _FAILURE_STATES
-        if entering_failure:
-            if not reason or not reason.strip():
-                raise JobTransitionConflict(
-                    f"entering {target.value} requires a nonempty failure "
-                    "reason (no silent failure transitions)"
-                )
-            return
-        if target is StorageJobStatus.CHECKPOINT_ADVANCED and not via_gate:
-            # §16: the resume point may only move through the gated path.
-            raise JobTransitionConflict(
-                "CHECKPOINT_ADVANCED is entered only via advance_checkpoint "
-                "(durable-proof gate), never via a plain transition"
-            )
-        current_rank = _progress_rank(current)
-        target_rank = _progress_rank(target)
-        if current_rank is None:
-            # retry resume: FAILED_RETRYABLE -> a progress state
-            if current is StorageJobStatus.FAILED_RETRYABLE:
-                if not reason or not reason.strip():
-                    raise JobTransitionConflict(
-                        "retry resume from FAILED_RETRYABLE requires a "
-                        "nonempty reason (backward moves are never silent)"
-                    )
-                return
-            raise JobTransitionConflict(
-                f"cannot leave {current.value} to {target.value}"
-            )
-        if target_rank is None:
-            raise JobTransitionConflict(
-                f"cannot enter {target.value} without a failure reason"
-            )
-        if target_rank - current_rank == 1:
-            return
-        if target_rank > current_rank:
-            if via_gate and target is StorageJobStatus.CHECKPOINT_ADVANCED:
-                # The gated edge IS the proof: durable evidence at or above
-                # the configured floor authorizes the cursor jump past the
-                # intermediate operational states.
-                return
-            raise JobTransitionConflict(
-                f"state machine advances one step at a time; "
-                f"{current.value} -> {target.value} skips states"
-            )
-        # Backward move between progress states: only the annotated
-        # batch-continuation edge CHECKPOINT_ADVANCED -> ACQUIRING.
-        if (
-            current is StorageJobStatus.CHECKPOINT_ADVANCED
-            and target is StorageJobStatus.ACQUIRING
-        ):
-            if not reason or not reason.strip():
-                raise JobTransitionConflict(
-                    "CHECKPOINT_ADVANCED -> ACQUIRING is a backward move "
-                    "and requires a nonempty continuation reason"
-                )
-            return
-        raise JobTransitionConflict(
-            f"silent backward move {current.value} -> {target.value} is "
-            "forbidden (03 doc §15)"
-        )
+        job_id: str,
+        current: StorageJobState,
+        resume_token: Any,
+        acquisition_id: str,
+        blob_sha: str,
+        manifest_id: str | None,
+        floor: StorageJobStatus,
+    ) -> StorageJobState:
+        """PRIVATE gated primitive (I07R1 §4): append a proven checkpoint.
 
-    def _require_checkpoint_eligible(self, status: StorageJobStatus) -> None:
+        Receives an already-proven batch and constructs the resulting
+        state EXPLICITLY (no caller-settable flag exists), fully
+        validated, with the immutable checkpoint proof attached to the
+        event record (I07R1 §15/§17).
+        """
+        transitioned_at = self._clock()
+        transition = StorageJobTransition(
+            transition_id=_event_id(job_id, self._next_sequence(job_id)),
+            job_id=job_id,
+            from_status=current.status,
+            to_status=StorageJobStatus.CHECKPOINT_ADVANCED,
+            transitioned_at=transitioned_at,
+            reason=(
+                f"resume advanced after durable proof: acquisition "
+                f"{acquisition_id}"
+                + (
+                    f", manifest {manifest_id}"
+                    if manifest_id is not None
+                    else " (raw floor: no manifest required)"
+                )
+            ),
+        )
+        try:
+            next_state = _validated_state(
+                StorageJobState(
+                    job_id=job_id,
+                    provider_id=current.provider_id,
+                    sensor_family=current.sensor_family,
+                    request_fingerprint=current.request_fingerprint,
+                    resume_token=resume_token,
+                    last_committed_acquisition_id=acquisition_id,
+                    last_committed_blob_sha256=blob_sha,
+                    last_manifest_id=manifest_id,
+                    status=StorageJobStatus.CHECKPOINT_ADVANCED,
+                    updated_at=transitioned_at,
+                )
+            )
+        except ValidationError as exc:
+            # §6: a malformed resume token / invalid state fails BEFORE the
+            # event becomes durable.
+            raise JobResumeGateError(
+                f"checkpoint produced an invalid job state: {exc}"
+            ) from exc
+        event = _build_event_record(
+            job_id=job_id,
+            sequence=int(transition.transition_id.rsplit(":", 1)[-1]),
+            transition=transition,
+            resulting_state=next_state,
+        )
+        event["checkpoint_proof"] = {
+            "proof_version": CHECKPOINT_PROOF_VERSION,
+            "minimum_durable_status": floor.value,
+            "acquisition_id": acquisition_id,
+            "blob_sha256": blob_sha,
+            "manifest_id": manifest_id,
+        }
+        self._commit_adopting(
+            self._events,
+            transition.transition_id,
+            event,
+            conflict_error=JobTransitionConflict,
+        )
+        return next_state
+
+    # -- durability floor + proof (I07R1 §7-§13, §19, §25) --------------------
+
+    def _require_checkpoint_eligible(
+        self, status: StorageJobStatus, floor: StorageJobStatus
+    ) -> None:
         current_rank = _progress_rank(status)
-        floor_rank = _progress_rank(self._min_durable_status)
+        floor_rank = _progress_rank(floor)
         if (
             current_rank is not None
             and floor_rank is not None
@@ -558,27 +723,72 @@ class DurableJobStateRepository:
         ):
             return
         raise JobResumeGateError(
-            f"resume advancement requires batch evidence at "
-            f"{self._min_durable_status.value}; job status is "
-            f"{status.value} (§16: the cursor never advances past "
-            "unindexed evidence)"
+            f"resume advancement requires batch evidence at {floor.value}; "
+            f"job status is {status.value} (§16: the cursor never advances "
+            "past unindexed evidence)"
         )
 
-    def _prove_batch_durable(self, acquisition_id: str, manifest_id: str) -> None:
-        """Resolve §16 proof from durable truth (never caller claims)."""
+    def _prove_batch_durable(
+        self,
+        *,
+        job_id: str,
+        acquisition_id: str,
+        manifest_id: str | None,
+        floor: StorageJobStatus,
+    ) -> str:
+        """Resolve §16 proof from durable truth (never caller claims).
+
+        Returns the exact proven ``blob_sha256``.  Enforces, in order:
+        durable acquisition resolution; job↔acquisition identity (§7);
+        the authoritative I04R2 usable-provenance predicate (§8); physical
+        blob verification; and at the MANIFEST_COMMITTED floor the exact
+        manifest↔acquisition source identity (§10).  The SAME routine
+        re-proves historical checkpoints at restart under the floor
+        persisted in each proof (I07R1 §19/§25).
+        """
         try:
             acquisition = self._acquisitions.get_acquisition(acquisition_id)
-        except CatalogError as exc:
+        except Exception as exc:  # noqa: BLE001 — fail closed on any probe error
             raise JobResumeGateError(
                 f"batch acquisition {acquisition_id!r} is not durable: {exc}"
             ) from exc
+        job_birth = self._births.get(job_id)
+        if job_birth is None:
+            raise JobResumeGateError(
+                f"job {job_id!r} has no durable birth record"
+            )
+        birth = StorageJobState.model_validate(job_birth["job_state"])
+        if (
+            acquisition.provider_id != birth.provider_id
+            or acquisition.sensor_family != birth.sensor_family
+            or acquisition.request_fingerprint != birth.request_fingerprint
+        ):
+            # §7: evidence must belong to THIS exact job/request.  Same
+            # bytes from another job never transfer identity (§11).
+            raise JobResumeGateError(
+                f"acquisition {acquisition_id!r} does not belong to job "
+                f"{job_id!r} (identity mismatch: provider "
+                f"{acquisition.provider_id!r} vs {birth.provider_id!r}, "
+                f"sensor {acquisition.sensor_family} vs "
+                f"{birth.sensor_family}, request_fingerprint "
+                f"{acquisition.request_fingerprint!r} vs "
+                f"{birth.request_fingerprint!r})"
+            )
+        if not is_usable_manifest_provenance(acquisition):
+            # §8: the ONE authoritative I04R2 rule.  A forensic failed
+            # acquisition stays durable T0A history but may NOT move the
+            # active cursor.
+            raise JobResumeGateError(
+                f"acquisition {acquisition_id!r} does not carry usable "
+                "manifest provenance (I04R2 §5): forensic/failed evidence "
+                "never advances the resume cursor"
+            )
         blob_sha = acquisition.blob_sha256
         if not blob_sha:
             raise JobResumeGateError(
                 f"batch acquisition {acquisition_id!r} carries no blob — "
                 "nothing durable to anchor the resume point to"
             )
-        verified = False
         try:
             verified = bool(
                 self._blob_metadata.has_verified_physical(blob_sha)
@@ -593,24 +803,45 @@ class DurableJobStateRepository:
                 f"blob {blob_sha} is not physically verified — resume "
                 "point may not advance past unverified evidence"
             )
-        if self._min_durable_status is StorageJobStatus.RAW_COMMITTED:
-            return
+        if floor is StorageJobStatus.RAW_COMMITTED:
+            # §12: at the raw floor there IS no manifest anchor; the exact
+            # acquisition + exact blob are the whole proof.
+            return blob_sha
+        assert manifest_id is not None  # enforced by advance_checkpoint
         try:
             manifest = self._manifests.get_manifest(manifest_id)
         except Exception as exc:
             raise JobResumeGateError(
                 f"batch manifest {manifest_id!r} is not durable: {exc}"
             ) from exc
+        if (
+            manifest.provider != acquisition.provider_id
+            or manifest.venue != acquisition.venue
+            or manifest.sensor_family != acquisition.sensor_family
+            or manifest.native_instrument != acquisition.native_instrument
+            or manifest.source_granularity != acquisition.native_granularity
+        ):
+            # §10: a manifest reference is not proof until it is bound to
+            # the acquisition it claims to index.
+            raise JobResumeGateError(
+                f"manifest {manifest_id} does not describe the batch "
+                f"acquisition source (provider {manifest.provider!r} vs "
+                f"{acquisition.provider_id!r}, venue {manifest.venue!r} vs "
+                f"{acquisition.venue!r}, sensor "
+                f"{manifest.sensor_family} vs {acquisition.sensor_family}, "
+                f"instrument {manifest.native_instrument!r} vs "
+                f"{acquisition.native_instrument!r}, granularity "
+                f"{manifest.source_granularity} vs "
+                f"{acquisition.native_granularity})"
+            )
         if blob_sha not in manifest.blob_refs:
             raise JobResumeGateError(
                 f"manifest {manifest_id} does not contain batch blob "
                 f"{blob_sha} — the batch is not manifest-committed"
             )
+        return blob_sha
 
     # -- chain plumbing --------------------------------------------------------
-
-    def _event_id(self, job_id: str, sequence: int) -> str:
-        return f"{job_id}:{sequence:06d}"
 
     def _job_events(self, job_id: str) -> list[dict[str, Any]]:
         events = []
@@ -661,38 +892,46 @@ class DurableJobStateRepository:
         retry re-derives the same logical id; if the committed payload
         matches on all semantics except operational clocks, adopt it.
         Any other divergence raises ``conflict_error`` (typed) — divergence
-        is visible, never silently adopted, never silently generic.
+        is visible, never silently adopted.  Disk truth is read ONLY
+        through the catalog's validated refresh/get path (I07R1 §36) —
+        never a raw JSON read that bypasses integrity parsing.
         """
         try:
             return catalog.commit(logical_id, payload)
         except JsonCatalogConflict as exc:
             existing = catalog.get(logical_id)
+            if existing is not None:
+                if _event_semantics(existing) == _event_semantics(payload):
+                    return existing
+                raise conflict_error(
+                    f"durable record {logical_id!r} diverges from the retry "
+                    "payload (semantic conflict, no adoption)"
+                ) from exc
+            # The winner may exist only on disk (committed by a lost-race
+            # writer this process never cached): validated refresh first.
+            catalog.refresh()
+            existing = catalog.get(logical_id)
             if existing is not None and _event_semantics(
                 existing
             ) == _event_semantics(payload):
                 return existing
-            # The conflicting record may exist only on disk (committed by a
-            # lost-race writer this process never cached).
-            from .json_catalog import catalog_physical_key
-
-            on_disk = catalog.root / catalog_physical_key(logical_id)
-            if existing is None and on_disk.is_file():
-                try:
-                    disk_payload = json.loads(
-                        on_disk.read_text(encoding="utf-8")
-                    )
-                except (OSError, ValueError):
-                    disk_payload = None
-                if disk_payload is not None and _event_semantics(
-                    disk_payload
-                ) == _event_semantics(payload):
-                    return disk_payload
             raise conflict_error(
                 f"durable record {logical_id!r} diverges from the retry "
-                f"payload (semantic conflict, no adoption)"
+                "payload (semantic conflict, no adoption)"
             ) from exc
 
-    # -- coordination (I06 §43/§44 pattern) ------------------------------------
+    # -- coordination (I06 §43/§44 pattern + I07R1 §28-§32) --------------------
+
+    def _lock_path(self, job_id: str) -> Path:
+        """Safe physical lock key (I07R1 §28): sha256(utf8(job_id)).lock.
+
+        Raw logical IDs NEVER become filesystem paths — traversal,
+        drive letters, separators, Unicode or unbounded-length IDs cannot
+        escape the locks root, and distinct IDs map to distinct full
+        digests (§29).
+        """
+        key = hashlib.sha256(job_id.encode("utf-8")).hexdigest()
+        return self._locks_root / f"{key}.lock"
 
     def _job_lock(self, job_id: str) -> Any:
         outer = self._job_locks.setdefault(job_id, threading.RLock())
@@ -701,7 +940,7 @@ class DurableJobStateRepository:
     def _acquire_file_lock(self, job_id: str) -> Any:
         if not self._locks_root.exists():
             ensure_durable_directory(self._locks_root)
-        lock_path = self._locks_root / f"{job_id}.lock"
+        lock_path = self._lock_path(job_id)
         deadline = time.monotonic() + self._lock_timeout_seconds
         while True:
             try:
@@ -721,15 +960,34 @@ class DurableJobStateRepository:
     def _release_file_lock(self, handle: Any, job_id: str) -> None:
         try:
             handle.close()
-            (self._locks_root / f"{job_id}.lock").unlink(missing_ok=True)
+            self._lock_path(job_id).unlink(missing_ok=True)
         except OSError:
             # A crash mid-release leaves recovery evidence for I08.
             pass
 
-    # -- restart validation -----------------------------------------------------
+    def _refresh_durable_truth(self) -> None:
+        """Validated post-lock reload of durable births + events (§30-§31).
+
+        Called on OUTERMOST per-job file-lock acquisition only (§32): the
+        cache-backed catalogs re-scan committed fragments through the
+        existing corruption validator, adopt newly committed objects, and
+        fail closed on any divergence or vanished record — so state
+        reads, sequence selection, CAS checks and retry classification
+        always see current durable truth, never a stale view.
+        """
+        self._births.refresh()
+        self._events.refresh()
+
+    # -- restart validation (I07R1 §19-§27) --------------------------------------
 
     def _validate_cross_constraints(self) -> None:
-        """Fail closed on any chain that violates the frozen doctrine."""
+        """Fail closed on any chain that violates the frozen doctrine.
+
+        Replay uses the SAME :func:`validate_transition` graph as the
+        write path (I07R1 §20): forward skips, ungated checkpoints,
+        missing/divergent proofs, silent backward moves and reason-less
+        failure entries are corruption, not merely "unexpected".
+        """
         seen_jobs: dict[str, dict[str, Any]] = {}
         for job_id in self._births.list_ids():
             birth = self._births.get(job_id)
@@ -785,6 +1043,14 @@ class DurableJobStateRepository:
                     f"event {event_id[:12]}... has invalid sequence "
                     f"{sequence!r}"
                 )
+            # §26: exact canonical event identity — job_id + zero-padded
+            # sequence, bound consistently across the top-level logical id
+            # (catalog-verified against the filename) and the transition.
+            if event_id != _event_id(job_id, sequence):
+                raise JobCatalogCorrupt(
+                    f"event {event_id[:12]}... claims non-canonical "
+                    f"identity for job {job_id!r} sequence {sequence!r}"
+                )
             if transition.transition_id != event_id:
                 raise JobCatalogCorrupt(
                     f"event {event_id[:12]}... claims transition_id="
@@ -806,51 +1072,79 @@ class DurableJobStateRepository:
                     f"{resulting.status.value} != transition target "
                     f"{transition.to_status.value}"
                 )
-            # Durable re-anchoring (I06R1 §11 doctrine): a checkpoint-bearing
-            # state is only truthful if its committed pointers still resolve
-            # to durable evidence.  Internal consistency is not enough.
-            anchor_acq = resulting.last_committed_acquisition_id
-            if anchor_acq is not None:
-                try:
-                    acquisition = self._acquisitions.get_acquisition(anchor_acq)
-                except Exception as exc:
+            # §23: birth identity is immutable through every event.
+            birth_state = StorageJobState.model_validate(
+                seen_jobs[job_id]["job_state"]
+            )
+            if (
+                resulting.provider_id != birth_state.provider_id
+                or resulting.sensor_family != birth_state.sensor_family
+                or resulting.request_fingerprint
+                != birth_state.request_fingerprint
+            ):
+                raise JobCatalogCorrupt(
+                    f"event {event_id[:12]}... mutates the immutable birth "
+                    f"identity of job {job_id!r}"
+                )
+            # §27: the resulting state is written AT the transition instant.
+            if resulting.updated_at != transition.transitioned_at:
+                raise JobCatalogCorrupt(
+                    f"event {event_id[:12]}... resulting updated_at "
+                    f"{resulting.updated_at} != transition instant "
+                    f"{transition.transitioned_at}"
+                )
+            proof = payload.get("checkpoint_proof")
+            is_checkpoint = (
+                transition.to_status is StorageJobStatus.CHECKPOINT_ADVANCED
+            )
+            if is_checkpoint:
+                if not isinstance(proof, dict):
+                    # §18: a checkpoint without durable proof is corruption.
                     raise JobCatalogCorrupt(
-                        f"event {event_id[:12]}... anchors acquisition "
-                        f"{anchor_acq!r} which is not durable: {exc}"
-                    ) from exc
-                blob_sha = acquisition.blob_sha256
-                try:
-                    verified = (
-                        bool(blob_sha)
-                        and self._blob_metadata.has_verified_physical(blob_sha)
+                        f"event {event_id[:12]}... targets "
+                        "CHECKPOINT_ADVANCED without checkpoint_proof"
                     )
-                except Exception as exc:
+                if (
+                    proof.get("proof_version")
+                    != CHECKPOINT_PROOF_VERSION
+                ):
+                    # §16: closed V1 — no silent future-version reading.
                     raise JobCatalogCorrupt(
-                        f"event {event_id[:12]}... anchored blob could not "
-                        f"be verified: {exc}"
-                    ) from exc
-                if not verified:
-                    raise JobCatalogCorrupt(
-                        f"event {event_id[:12]}... anchors acquisition "
-                        f"{anchor_acq!r} whose blob is not physically "
-                        "verified"
+                        f"event {event_id[:12]}... carries unknown "
+                        f"checkpoint proof_version "
+                        f"{proof.get('proof_version')!r}"
                     )
-            anchor_manifest = resulting.last_manifest_id
-            if anchor_manifest is not None:
-                try:
-                    self._manifests.get_manifest(anchor_manifest)
-                except Exception as exc:
-                    raise JobCatalogCorrupt(
-                        f"event {event_id[:12]}... anchors manifest "
-                        f"{anchor_manifest!r} which is not durable: {exc}"
-                    ) from exc
-        # Per-job chain validation: contiguity, linkage, chronology.
+            elif proof is not None:
+                # §18: proof metadata belongs only to checkpoint events.
+                raise JobCatalogCorrupt(
+                    f"non-checkpoint event {event_id[:12]}... carries "
+                    "checkpoint_proof"
+                )
+            # §20: replay enforces the EXACT graph the writer enforces.
+            try:
+                validate_transition(
+                    transition.from_status,
+                    transition.to_status,
+                    transition.reason,
+                    checkpoint=is_checkpoint,
+                )
+            except JobTransitionConflict as exc:
+                raise JobCatalogCorrupt(
+                    f"event {event_id[:12]}... violates the frozen "
+                    f"transition graph: {exc}"
+                ) from exc
+            # Per-event durable anchoring: checkpoint events are re-proved
+            # against durable truth below; ordinary events must not carry
+            # anchors (they never legitimately write any, §5/§24).
+            if is_checkpoint:
+                assert proof is not None
+                self._reprove_checkpoint(event_id, job_id, proof, resulting)
+        # Per-job chain validation: contiguity, linkage, chronology,
+        # ordinary-event pointer immutability.
         for job_id, birth in seen_jobs.items():
             events = self._job_events(job_id)
             birth_state = StorageJobState.model_validate(birth["job_state"])
-            previous_status = birth_state.status
-            previous_time = birth_state.updated_at
-            previous_rank = _progress_rank(previous_status)
+            previous = birth_state
             expected_sequence = 1
             for event in events:
                 if event["sequence"] != expected_sequence:
@@ -866,50 +1160,133 @@ class DurableJobStateRepository:
                 resulting = StorageJobState.model_validate(
                     event["resulting_state"]
                 )
-                if transition.from_status is not previous_status:
+                if transition.from_status is not previous.status:
                     raise JobCatalogCorrupt(
                         f"job {job_id!r} chain break at "
                         f"{transition.transition_id}: from_status "
                         f"{transition.from_status.value} != previous "
-                        f"{previous_status.value}"
+                        f"{previous.status.value}"
                     )
-                if transition.transitioned_at < previous_time:
+                if transition.transitioned_at < previous.updated_at:
                     raise JobCatalogCorrupt(
                         f"job {job_id!r} transition chronology moves "
                         "backward at " + transition.transition_id
                     )
-                if resulting.updated_at < transition.transitioned_at:
-                    raise JobCatalogCorrupt(
-                        f"job {job_id!r} state updated_at precedes its "
-                        f"transition at {transition.transition_id}"
-                    )
-                rank = _progress_rank(resulting.status)
-                if (
-                    previous_rank is not None
-                    and rank is not None
-                    and rank < previous_rank
-                ):
-                    reason = transition.reason
-                    allowed_backward = (
-                        previous_status is StorageJobStatus.CHECKPOINT_ADVANCED
-                        and resulting.status is StorageJobStatus.ACQUIRING
-                    ) or (previous_status is StorageJobStatus.FAILED_RETRYABLE)
-                    if not (allowed_backward and reason and reason.strip()):
-                        raise JobCatalogCorrupt(
-                            f"job {job_id!r} contains a silent backward "
-                            f"move at {transition.transition_id}"
-                        )
-                previous_status = resulting.status
-                previous_time = resulting.updated_at
-                previous_rank = rank
+                if not is_checkpoint_event(event):
+                    # §24: ordinary events preserve the cursor/anchors
+                    # exactly — a tampered pointer is corruption.
+                    for field in (
+                        "resume_token",
+                        "last_committed_acquisition_id",
+                        "last_committed_blob_sha256",
+                        "last_manifest_id",
+                    ):
+                        if getattr(resulting, field) != getattr(previous, field):
+                            raise JobCatalogCorrupt(
+                                f"ordinary event {event['transition_id']} "
+                                f"mutates {field} (I07R1 §24: only "
+                                "checkpoint events move the cursor)"
+                            )
+                previous = resulting
+
+    def _reprove_checkpoint(
+        self,
+        event_id: str,
+        job_id: str,
+        proof: dict[str, Any],
+        resulting: StorageJobState,
+    ) -> None:
+        """Re-prove ONE historical checkpoint from its PERSISTED floor.
+
+        I07R1 §19/§25: the durability policy that authorized the
+        checkpoint is the one stored in its own proof — the repository
+        constructor's current configuration governs only NEW checkpoints.
+        Re-proves: exact durable acquisition, job identity, usable
+        provenance, physical verification, proof↔result anchor binding,
+        and (at the persisted MANIFEST_COMMITTED floor) exact manifest
+        binding.  A RAW-floor checkpoint must carry manifest_id=None.
+        """
+        acquisition_id = proof.get("acquisition_id")
+        blob_sha = proof.get("blob_sha256")
+        manifest_id = proof.get("manifest_id")
+        floor_value = proof.get("minimum_durable_status")
+        if (
+            not isinstance(acquisition_id, str)
+            or not isinstance(blob_sha, str)
+        ):
+            raise JobCatalogCorrupt(
+                f"checkpoint {event_id[:12]}... proof carries invalid "
+                "acquisition/blob anchors"
+            )
+        try:
+            floor = StorageJobStatus(floor_value)
+        except ValueError as exc:
+            raise JobCatalogCorrupt(
+                f"checkpoint {event_id[:12]}... proof carries unknown "
+                f"minimum_durable_status {floor_value!r}"
+            ) from exc
+        if floor not in MIN_DURABLE_STATES:
+            raise JobCatalogCorrupt(
+                f"checkpoint {event_id[:12]}... proof carries "
+                f"non-durability floor {floor.value}"
+            )
+        if floor is StorageJobStatus.RAW_COMMITTED and manifest_id is not None:
+            raise JobCatalogCorrupt(
+                f"checkpoint {event_id[:12]}... was authorized at the RAW "
+                "floor but persists a manifest anchor (I07R1 §12)"
+            )
+        if floor is StorageJobStatus.MANIFEST_COMMITTED and not isinstance(
+            manifest_id, str
+        ):
+            raise JobCatalogCorrupt(
+                f"checkpoint {event_id[:12]}... was authorized at the "
+                "MANIFEST floor but persists no manifest anchor (I07R1 §13)"
+            )
+        # §17: the proof must bind EXACTLY to the resulting state.
+        if (
+            acquisition_id != resulting.last_committed_acquisition_id
+            or blob_sha != resulting.last_committed_blob_sha256
+            or manifest_id != resulting.last_manifest_id
+        ):
+            raise JobCatalogCorrupt(
+                f"checkpoint {event_id[:12]}... proof anchors diverge from "
+                "the resulting state anchors"
+            )
+        # §25: full durable re-proof under the persisted floor.
+        try:
+            proven_blob = self._prove_batch_durable(
+                job_id=job_id,
+                acquisition_id=acquisition_id,
+                manifest_id=manifest_id,
+                floor=floor,
+            )
+        except JobResumeGateError as exc:
+            raise JobCatalogCorrupt(
+                f"checkpoint {event_id[:12]}... no longer re-proves against "
+                f"durable truth: {exc}"
+            ) from exc
+        if proven_blob != blob_sha:
+            raise JobCatalogCorrupt(
+                f"checkpoint {event_id[:12]}... re-proved blob "
+                f"{proven_blob} != persisted anchor {blob_sha}"
+            )
+
+
+def is_checkpoint_event(event: dict[str, Any]) -> bool:
+    """True when the event's target is CHECKPOINT_ADVANCED (proof-bearing)."""
+    to_status = (event.get("transition") or {}).get("to_status")
+    return to_status == StorageJobStatus.CHECKPOINT_ADVANCED.value
 
 
 class _NestedFileLock:
     """Acquires the per-job file lock while holding the in-process lock.
 
-    Re-entrant within one thread: the gated checkpoint path calls the
-    transition path under the already-held job lock, so a nested entry
-    only bumps a depth counter instead of deadlocking on its own file.
+    Re-entrant within one thread: the gated checkpoint path appends its
+    event under the already-held job lock, so a nested entry only bumps a
+    depth counter instead of deadlocking on its own file.  On OUTERMOST
+    acquisition (I07R1 §30-§32) the durable catalogs are refreshed from
+    disk BEFORE any state is read, so long-lived repositories and
+    cross-process contenders always classify against current truth.
     """
 
     def __init__(
@@ -937,6 +1314,10 @@ class _NestedFileLock:
                     "depth": 1,
                 }
                 self._nested = False
+                # I07R1 §30: the lock serializes writers; the REFRESH
+                # makes the serialized view truthful.  (§32: outermost
+                # entries only — nested entries reuse the fresh view.)
+                self._repo._refresh_durable_truth()
         except BaseException:
             self._process_lock.release()
             raise

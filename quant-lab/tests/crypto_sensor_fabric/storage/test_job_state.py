@@ -190,7 +190,10 @@ def _create(repo: DurableJobStateRepository, job_id: str) -> None:
         job_id=job_id,
         provider_id="KRAKEN_FUTURES",
         sensor_family=SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint=f"fp-{job_id}",
+        # I07R1 §9: job/request identity is EXACT — acquisitions seeded by
+        # JobStack.seed_acquisition carry fp-job, so every job created for
+        # those acquisitions must present the same fingerprint.
+        request_fingerprint="fp-job",
     )
 
 
@@ -573,9 +576,10 @@ def test_checkpoint_advancement_from_weak_floor(tmp_path: Path) -> None:
         "job-weakfloor",
         resume_token=RT(mode="PAGE", provider_cursor="c", page_number=1),
         acquisition_id="acq-weak",
-        manifest_id="pm-not-required",
+        manifest_id=None,  # I07R1 §12: RAW floor takes no manifest anchor
     )
     assert state.status is StorageJobStatus.CHECKPOINT_ADVANCED
+    assert state.last_manifest_id is None
 
 
 def test_checkpoint_double_advance_rejected(tmp_path: Path) -> None:
@@ -704,11 +708,14 @@ def test_crash_before_publication_leaves_old_chain(tmp_path: Path) -> None:
 
 
 def test_stale_job_lock_never_auto_deleted(tmp_path: Path) -> None:
+    """I07R1 §28: the physical lock key is sha256(utf8(job_id)).lock —
+    raw logical IDs never become filesystem paths."""
     stack = JobStack(tmp_path)
     _create(stack.repo, "job-lock")
     locks_root = tmp_path / "catalogs" / "jobs_state" / "locks"
     locks_root.mkdir(parents=True, exist_ok=True)
-    lock_path = locks_root / "job-lock.lock"
+    lock_key = hashlib.sha256("job-lock".encode("utf-8")).hexdigest()
+    lock_path = locks_root / f"{lock_key}.lock"
     lock_path.write_text("stale\n", encoding="utf-8")
     stale_repo = JobStack(tmp_path, lock_timeout_seconds=0.0).repo
     with pytest.raises(JobLockHeld):

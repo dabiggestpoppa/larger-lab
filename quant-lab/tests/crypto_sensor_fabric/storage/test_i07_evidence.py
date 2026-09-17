@@ -97,7 +97,7 @@ def build_job_state_matrix(tmp: Path) -> dict:
         job_id="ev-forward",
         provider_id="KRAKEN_FUTURES",
         sensor_family=base.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-forward",
+        request_fingerprint="fp-job",  # I07R1 §9: exact job/acquisition identity
     )
     for status in (
         StorageJobStatus.ACQUIRING,
@@ -124,7 +124,7 @@ def build_job_state_matrix(tmp: Path) -> dict:
         job_id="ev-skip",
         provider_id="KRAKEN_FUTURES",
         sensor_family=base.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-skip",
+        request_fingerprint="fp-job",
     )
     jobs_repo2.advance_status("ev-skip", to_status=StorageJobStatus.ACQUIRING)
     try:
@@ -150,7 +150,7 @@ def build_job_state_matrix(tmp: Path) -> dict:
         job_id="ev-rules",
         provider_id="KRAKEN_FUTURES",
         sensor_family=base.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-rules",
+        request_fingerprint="fp-job",
     )
     jobs_repo3.advance_status("ev-rules", to_status=StorageJobStatus.ACQUIRING)
     # Silent backward move ACQUIRING -> PLANNED: conflict (with or without
@@ -225,7 +225,7 @@ def build_job_state_matrix(tmp: Path) -> dict:
         job_id="ev-terminal",
         provider_id="KRAKEN_FUTURES",
         sensor_family=base.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-terminal",
+        request_fingerprint="fp-job",
     )
     jobs_repo4.advance_status("ev-terminal", to_status=StorageJobStatus.ACQUIRING)
     jobs_repo4.advance_status(
@@ -257,7 +257,7 @@ def build_job_state_matrix(tmp: Path) -> dict:
         job_id="ev-cas",
         provider_id="KRAKEN_FUTURES",
         sensor_family=base.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-cas",
+        request_fingerprint="fp-job",
     )
     cas_reject = "PASS"
     try:
@@ -292,7 +292,7 @@ def build_job_state_matrix(tmp: Path) -> dict:
         job_id="ev-crash",
         provider_id="KRAKEN_FUTURES",
         sensor_family=base.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-crash",
+        request_fingerprint="fp-job",
     )
     faulted = JobStack(
         tmp / "crash",
@@ -305,7 +305,7 @@ def build_job_state_matrix(tmp: Path) -> dict:
             job_id="ev-crash-new",
             provider_id="KRAKEN_FUTURES",
             sensor_family=base.SensorFamily.MECHANICAL_FUNDING,
-            request_fingerprint="fp-ev-crash-new",
+            request_fingerprint="fp-job",
         )
         crash_clean = "FAIL"
     except base.FaultError:
@@ -364,7 +364,7 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         job_id="ev-gate",
         provider_id="KRAKEN_FUTURES",
         sensor_family=adv.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-gate",
+        request_fingerprint="fp-job",
     )
     _drive_to_manifest(repo, "ev-gate")
     acq, man = _batch(stack, "ev-gate", "evg", b'{"rows": ["evg"]}')
@@ -456,7 +456,7 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         job_id="ev-below",
         provider_id="KRAKEN_FUTURES",
         sensor_family=adv.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-below",
+        request_fingerprint="fp-job",
     )
     repo3.advance_status("ev-below", to_status=StorageJobStatus.ACQUIRING)
     repo3.advance_status("ev-below", to_status=StorageJobStatus.RAW_STAGED)
@@ -481,7 +481,8 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         )
     )
 
-    # weak_floor_raw_committed: explicit RAW_COMMITTED floor is honored.
+    # weak_floor_raw_committed: explicit RAW_COMMITTED floor is honored
+    # (I07R1 §12: manifest_id=None is the only valid form at this floor).
     from crypto_sensor_fabric.storage.enums import StorageJobStatus as S
 
     stack4 = JobStack(tmp / "weak")
@@ -497,7 +498,7 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         job_id="ev-weak",
         provider_id="KRAKEN_FUTURES",
         sensor_family=adv.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-weak",
+        request_fingerprint="fp-job",
     )
     weak_repo.advance_status("ev-weak", to_status=StorageJobStatus.ACQUIRING)
     weak_repo.advance_status("ev-weak", to_status=StorageJobStatus.RAW_STAGED)
@@ -507,7 +508,7 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         "ev-weak",
         resume_token=ResumeToken(mode="PAGE", provider_cursor="c", page_number=1),
         acquisition_id=acq4,
-        manifest_id="pm-not-required",
+        manifest_id=None,
     )
     cases.append(
         _case(
@@ -529,7 +530,7 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         job_id="ev-c6",
         provider_id="KRAKEN_FUTURES",
         sensor_family=adv.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-c6",
+        request_fingerprint="fp-job",
     )
     _drive_to_manifest(repo5, "ev-c6")
     acq5, man5 = _batch(stack5, "ev-c6", "evc6", b'{"rows": ["evc6"]}')
@@ -581,7 +582,7 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         job_id="ev-c6b",
         provider_id="KRAKEN_FUTURES",
         sensor_family=adv.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-c6b",
+        request_fingerprint="fp-job",
     )
     _drive_to_manifest(repo6, "ev-c6b")
     acq6, man6 = _batch(stack6, "ev-c6b", "evc6b", b'{"rows": ["evc6b"]}')
@@ -638,7 +639,7 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         job_id="ev-dv",
         provider_id="KRAKEN_FUTURES",
         sensor_family=adv.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-dv",
+        request_fingerprint="fp-job",
     )
     _drive_to_manifest(repo7, "ev-dv")
     acq7, man7 = _batch(stack7, "ev-dv", "evdv", b'{"rows": ["evdv"]}')
@@ -697,7 +698,7 @@ def build_resume_coupling_matrix(tmp: Path) -> dict:
         job_id="ev-re",
         provider_id="KRAKEN_FUTURES",
         sensor_family=adv.SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint="fp-ev-re",
+        request_fingerprint="fp-job",
     )
     _drive_to_manifest(repo8, "ev-re")
     acq8, man8 = _batch(stack8, "ev-re", "evre", b'{"rows": ["evre"]}')

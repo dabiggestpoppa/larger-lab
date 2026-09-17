@@ -8,6 +8,7 @@ corruption/adoption fail-closed behavior.
 
 from __future__ import annotations
 
+import hashlib
 import threading
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -172,7 +173,10 @@ def _create(repo: DurableJobStateRepository, job_id: str) -> None:
         job_id=job_id,
         provider_id="KRAKEN_FUTURES",
         sensor_family=SensorFamily.MECHANICAL_FUNDING,
-        request_fingerprint=f"fp-{job_id}",
+        # I07R1 §9: job/request identity is EXACT — acquisitions seeded by
+        # JobStack.seed_batch carry fp-job, so every job created for those
+        # acquisitions must present the same fingerprint.
+        request_fingerprint="fp-job",
     )
 
 
@@ -571,10 +575,12 @@ def test_lock_blocks_cross_process_writer(tmp_path: Path) -> None:
     shared_clock = TickingClock()
     stack = JobStack(tmp_path, clock=shared_clock)
     _create(stack.repo, "job-xlock")
-    # Simulate an external writer holding the lock file.
+    # Simulate an external writer holding the lock file (I07R1 §28: the
+    # physical key is the sha256 of the logical job id).
     locks_root = tmp_path / "catalogs" / "jobs_state" / "locks"
     locks_root.mkdir(parents=True, exist_ok=True)
-    (locks_root / "job-xlock.lock").write_text("external\n", encoding="utf-8")
+    lock_key = hashlib.sha256("job-xlock".encode("utf-8")).hexdigest()
+    (locks_root / f"{lock_key}.lock").write_text("external\n", encoding="utf-8")
     contender = JobStack(tmp_path, clock=shared_clock)
     zero_timeout_repo = DurableJobStateRepository(
         tmp_path / "catalogs" / "jobs_state",
