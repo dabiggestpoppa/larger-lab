@@ -13,6 +13,7 @@ import json
 import sys
 from typing import List, Optional
 
+from qcae.core.errors import QcaeValidationError
 from qcae.interfaces.cli.app import QcaeApp, build_local_runtime
 
 
@@ -131,6 +132,34 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _known_error_exit(exc: BaseException) -> Optional[int]:
+    """Map expected QCAE operator errors to stable exit codes (P2-R3-C05).
+
+    Exit codes: 2 = rejected/unknown (validation), 3 = worker unavailable,
+    4 = budget exhausted. Anything unlisted is a programming error and
+    must traceback, not be swallowed.
+    """
+    from qcae.core.errors import QcaeValidationError
+    from qcae.orchestration.orchestrator.budgets import BudgetExhaustedError
+    from qcae.orchestration.orchestrator.worker_availability import (
+        WorkerUnavailableError,
+    )
+
+    if isinstance(exc, WorkerUnavailableError):
+        return 3
+    if isinstance(exc, BudgetExhaustedError):
+        return 4
+    if isinstance(exc, QcaeValidationError):
+        return 2
+    return None
+
+
+def _print_operator_error(exc: BaseException) -> None:
+    print(json.dumps(
+        {"error": type(exc).__name__, "message": str(exc)}, indent=2,
+    ), file=sys.stderr)
+
+
 def main(argv: Optional[List[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -138,6 +167,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     app = session.app
     try:
         return _dispatch(app, args)
+    except Exception as exc:
+        code = _known_error_exit(exc)
+        if code is None:
+            raise  # unexpected: a programming error must traceback
+        _print_operator_error(exc)
+        return code
     finally:
         session.close()
 
@@ -159,7 +194,9 @@ def _dispatch(app: QcaeApp, args) -> int:
                     not_before=args.not_before,
                 ), submitted_by=args.submitted_by)
                 _print(job)
-            except Exception as exc:
+            except (QcaeValidationError, ValueError) as exc:
+                # Expected rejection (malformed input / duplicate identity).
+                # Programming errors propagate to main's typed mapping.
                 print(f"submission rejected: {exc}", file=sys.stderr)
                 return 2
         elif args.job_command == "status":
@@ -171,7 +208,7 @@ def _dispatch(app: QcaeApp, args) -> int:
         elif args.job_command == "events":
             try:
                 _print(app.job_events(args.job_id))
-            except Exception:
+            except QcaeValidationError:
                 print(f"unknown job {args.job_id}", file=sys.stderr)
                 return 2
         elif args.job_command == "resume":
@@ -210,7 +247,7 @@ def _dispatch(app: QcaeApp, args) -> int:
                     decided_by=args.decided_by, job_id=args.job_id,
                     reason=args.reason,
                 ))
-            except Exception as exc:
+            except QcaeValidationError as exc:
                 print(f"approval decision rejected: {exc}", file=sys.stderr)
                 return 2
         return 0

@@ -276,7 +276,11 @@ class QcaeApp:
         return self._rt.service.execute_step(lease, worker_id=worker_id)
 
     def job_resume(self, job_id: str):
-        self._rt.service.mark_running(job_id)
+        """Resume a job through the ONE recovery law (P2-R3-C03/C05).
+
+        Delegates to the engine's authoritative recovery; never mutates
+        lease or step state directly, never bypasses TTL protection.
+        """
         return self._rt.service.resume(job_id)
 
     def job_cancel(self, job_id: str, *, reason: str = ""):
@@ -286,7 +290,12 @@ class QcaeApp:
         return self._rt.service.job_events(job_id)
 
     def recover(self, job_id: str | None = None):
-        """Recover expired leases (all jobs) or resume one job."""
+        """Global recovery through the single authoritative law.
+
+        Expired queue claims are released AND their steps reconciled by
+        ``recover_leased_steps`` — the same law ``job_resume`` delegates
+        to, so the two surfaces cannot disagree (P2-R3-C03/C05).
+        """
         if job_id is not None:
             return self._rt.service.resume(job_id)
         return self._rt.service.recover_expired_leases()
