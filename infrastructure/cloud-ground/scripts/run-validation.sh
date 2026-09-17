@@ -279,10 +279,19 @@ fi
 # branch the PR was actually raised from (GITHUB_REF_NAME), matching the
 # engine's own --target-branch "$OBSERVED_BRANCH" model. The override is
 # an explicit, logged caller contract — never an ambient silent default.
+#
+# B4-CXR7U9X2: the contract default is read HERE, in this branch. The R8 edit
+# that added the override dropped the read, so every run that passed no
+# override died at the next line under `set -u` with "EXPECTED_BRANCH:
+# unbound variable" (b1-i1r3 dispatch run 35174658732) — that is every
+# push/dispatch run of this workflow, because only the PR workflow passes an
+# override. The path is passed as argv rather than interpolated into the
+# program so no caller-controlled string is ever parsed as Python source.
 if [[ -n "${OCE_EXPECTED_BRANCH:-}" ]]; then
     EXPECTED_BRANCH="$OCE_EXPECTED_BRANCH"
     BRANCH_EXPECT_PROVENANCE="OCE_EXPECTED_BRANCH (caller override)"
 else
+    EXPECTED_BRANCH=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["authorized_branch"])' "$CONTRACT_WIN")
     BRANCH_EXPECT_PROVENANCE="contract"
 fi
 

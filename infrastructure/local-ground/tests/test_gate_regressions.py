@@ -982,3 +982,108 @@ def test_gitattributes_keeps_both_reconciled_policies():
         assert f"\n*.{ext} text eol=lf" not in attrs, (
             f"a repository-wide *.{ext} rule marks main's CRLF-stored files "
             "dirty on a Linux checkout (b1-local-ground run 35173531507)")
+
+
+# ── X2: the expected-branch contract default must resolve ────────────────
+RUN_VALIDATION_REL = "infrastructure/cloud-ground/scripts/run-validation.sh"
+CONTRACT_REL = "infrastructure/cloud-ground/contracts/checkpoint-identity-data.json"
+BRANCH_BLOCK_ANCHOR = 'if [[ -n "${OCE_EXPECTED_BRANCH:-}" ]]; then'
+
+requires_bash = pytest.mark.skipif(shutil.which("bash") is None,
+                                   reason="no bash available")
+
+
+def _branch_resolution_block():
+    """The shipped text of the block that resolves EXPECTED_BRANCH, lifted
+    out of the real runner rather than restated in this file."""
+    lines = (REPO_ROOT / RUN_VALIDATION_REL).read_text(encoding="utf-8").splitlines()
+    start = lines.index(BRANCH_BLOCK_ANCHOR)
+    for end in range(start + 1, len(lines)):
+        if lines[end] == "fi":
+            return "\n".join(lines[start:end + 1])
+    raise AssertionError("the expected-branch block is not terminated by a bare 'fi'")
+
+
+def _run_branch_resolution(tmp_path, block, override=None):
+    """Execute a block of real runner shell under `set -u` and report the
+    resolved EXPECTED_BRANCH plus its provenance.
+
+    A `python3` shim pointing at this interpreter is put first on PATH: the
+    runner calls python3 by name, and the check must be about the block, not
+    about which Python alias happens to exist on the machine.
+    """
+    shim = tmp_path / "shim"
+    shim.mkdir(exist_ok=True)
+    (shim / "python3").write_bytes(
+        f'#!/bin/sh\nexec "{sys.executable.replace(chr(92), "/")}" "$@"\n'.encode("utf-8"))
+    os.chmod(shim / "python3", 0o755)
+    harness = tmp_path / "resolve-branch.sh"
+    harness.write_bytes(
+        ("set -u\n"
+         f'CONTRACT_WIN="{(REPO_ROOT / CONTRACT_REL).as_posix()}"\n'
+         + block + "\n"
+         + 'printf "%s|%s\\n" "$EXPECTED_BRANCH" "$BRANCH_EXPECT_PROVENANCE"\n'
+         ).encode("utf-8"))
+    env = dict(os.environ, PATH=f"{shim}{os.pathsep}{os.environ.get('PATH', '')}")
+    env.pop("OCE_EXPECTED_BRANCH", None)
+    if override is not None:
+        env["OCE_EXPECTED_BRANCH"] = override
+    return subprocess.run([shutil.which("bash"), str(harness)], capture_output=True,
+                          text=True, timeout=60, env=env)
+
+
+@requires_bash
+def test_expected_branch_defaults_to_the_contract_under_set_u(tmp_path):
+    """With no override, the shipped block must resolve EXPECTED_BRANCH from
+    the checkpoint contract.
+
+    Run 35174658732 (b1-i1r3-validation on 30d407d4) died one line after the
+    override was introduced, at `EXPECTED_BRANCH: unbound variable`, because
+    the R8 edit kept only the override branch: every push/dispatch run of that
+    workflow passes no override, so the contract path was the only path it
+    ever took, and it was never exercisable before this run.
+    """
+    contract = json.loads((REPO_ROOT / CONTRACT_REL).read_text(encoding="utf-8"))
+    result = _run_branch_resolution(tmp_path, _branch_resolution_block())
+    assert result.returncode == 0, (
+        f"the contract default must resolve, not crash under set -u: "
+        f"{result.stdout}{result.stderr}")
+    assert result.stdout.strip() == f"{contract['authorized_branch']}|contract", (
+        "the resolved branch must be the contract's own authorized branch, "
+        f"got {result.stdout.strip()!r}")
+
+
+@requires_bash
+def test_expected_branch_override_still_wins_and_is_logged(tmp_path):
+    """Positive control: the documented caller override is unchanged and still
+    reports its own provenance, so the repair did not displace it."""
+    result = _run_branch_resolution(tmp_path, _branch_resolution_block(),
+                                    override="pr-head-branch")
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.stdout.strip() == (
+        "pr-head-branch|OCE_EXPECTED_BRANCH (caller override)"), result.stdout
+    wf = _workflow_text("b1-i1r-validation.yml")
+    assert "OCE_EXPECTED_BRANCH: ${{ github.ref_name }}" in wf, (
+        "the PR workflow relies on the override; it must keep passing it")
+
+
+@requires_bash
+def test_expected_branch_default_proof_rejects_the_regression(tmp_path):
+    """The proof above is not vacuous: the pre-X2 block — the override with
+    the assignment deleted from the else branch — must fail the same check
+    with the unbound-variable error seen in run 35174658732."""
+    block = _branch_resolution_block()
+    assignment = [ln for ln in block.splitlines() if "authorized_branch" in ln]
+    assert len(assignment) == 1, (
+        "the contract default lives in exactly one assignment, "
+        f"got {assignment}")
+    regressed = block.replace(assignment[0] + "\n", "")
+    assert regressed != block
+    assert "authorized_branch" not in regressed
+    result = _run_branch_resolution(tmp_path, regressed)
+    assert result.returncode != 0, "the defect must be detectable"
+    assert "unbound variable" in (result.stdout + result.stderr), (
+        result.stdout + result.stderr)
+    assert (REPO_ROOT / RUN_VALIDATION_REL).read_text(
+        encoding="utf-8").count(BRANCH_BLOCK_ANCHOR) == 1, (
+        "exactly one block resolves the expected branch")
