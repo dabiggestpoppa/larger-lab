@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P2 — REPAIR OPEN: P2-R2 governance-wiring tranche (operator-directed)** — C07R structural repairs were sealed in P2-R1; operator review of `a8b20a6c` found the governance *wiring* layer incomplete: authority/approval/policy decisions were not operationally bound into normal step execution. **P3 NOT started**
+**P2 — FROZEN / OPERATOR-REVIEWED + R1 & R2 COMPLETE (LOCAL TEST EVIDENCE: 1000/1000 at `4395aaa8`)** — Job Runtime + Local Governance; C07R structural repairs (P2-R1) and governance-wiring repairs (P2-R2) sealed; **P3 NOT started**
 
 Prior phases: P0 FROZEN+RECONCILED · P0-A001 FROZEN · P1 FROZEN / OPERATOR-REVIEWED + R1 COMPLETE (incl. ADR-0007 identity/revision repair).
 
@@ -80,6 +80,33 @@ Repair plan (narrow commits, additive, no redesign of accepted subsystems):
   full regression.
 - **P2-R2-FREEZE** — superseding freeze manifest (P2 and P2-R1 manifests
   preserved), fail-closed test capture, ledger update.
+
+### P2-R2 — Governance-Wiring Repair Tranche (SEALED at `4395aaa8`)
+
+All six operator-directed repairs committed as narrow tranche commits:
+
+- **I0 `30cebe27`** — audit findings + repair plan recorded.
+- **C01 `407b7de9`** — `StepAuthorityGate` port + typed verdicts wired into
+  `execute_step`; `authority_ok` bypass removed; fail-closed default gate;
+  composition root wires the policy-backed gate + approval sink; runtime
+  worker principal is a registered identity; policy action matcher fixed.
+- **C02 `7f6bccb7`** — durable exact-bound AuthorityRequests with explicit
+  approval windows; verified grant release (deny/expiry/mismatch/forged
+  cannot release; laundering rejected at write AND service-side).
+- **C03 `e93f41dd`** — recovery re-evaluates the LIVE gate; committed
+  execution records untouched; terminal steps never re-leased.
+- **C04 `3a7783ea`** — canonical `JobSubmission` (validate-before-persist)
+  + `QcaeApp.job_submit` + durable CLI `job submit`.
+- **C05 `4b88cbd7`** — private-boundary leaks removed; public service/engine
+  interfaces; self-verifying `TestInterfaceBoundary` architecture guard.
+- **C06 `f1e02304`** — authority cannot widen budget; action permission ≠
+  secret permission; constrained grants stay constrained across retries.
+- **T01 `8e8b9431`** — 17 adversarial governance scenarios, all fail-closed.
+- **FREEZE `4395aaa8`** — `P2-R2-freeze-manifest.json` sealed by the
+  fail-closed generator (`p2r2_freeze_manifest.py`) with captured results:
+  **1000 collected / 1000 passed / 0 failed / 0 skipped** (LOCAL TEST
+  EVIDENCE, tested commit `4395aaa8`). P2 and P2-R1 manifests preserved
+  unchanged; blockers `[]`.
 
 ### P2 — Job Runtime + Local Governance (opened)
 
