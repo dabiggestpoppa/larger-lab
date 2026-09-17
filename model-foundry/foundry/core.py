@@ -90,6 +90,8 @@ class FrozenMap(Mapping[str, Any]):
 
     __slots__ = ("_proxy",)
 
+    _proxy: Mapping[str, Any]
+
     def __init__(self, data: Mapping[str, Any] | None = None) -> None:
         from types import MappingProxyType
 
