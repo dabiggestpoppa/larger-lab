@@ -1523,3 +1523,165 @@ migration or expected-branch file, and it merges nothing. No text of this record
 is deleted or rewritten, including the claims quoted in E1–E4. Parent commit:
 `a932e8e56d3d88acc728fb06727edc36bec33b60`; `refs/heads/main` at write time:
 `7c7816f382947bbc8a1f2154435fc436f2428fa8`, untouched by this branch.
+
+## B4-CXR7U9R32–R33 — ADJUDICATION OF THE SONAR TRAVERSAL FINDING AND SINK-BINDING PROOF — `IMPLEMENTATION CONVERGED — CLOSURE BLOCKED`
+
+Appended after the erratum above, under the same rule: every remote-state
+statement below is written as *value, read at UTC timestamp, for SHA* — re-read
+before citing. No earlier section of this record is modified; where an earlier
+section is superseded, that is stated here rather than edited there. Docs-only:
+no source, test, workflow, registry, migration or expected-branch file.
+
+### R34.1 — adjudication: DEMONSTRATED_FALSE_POSITIVE (no TRUE_DEFECT repaired)
+
+The failure-level Sonar annotation "Path Traversal via faulty LLM-supplied CLI
+arguments" on `infrastructure/local-ground/scripts/pg-recovery.py` is ONE taint
+finding whose anchor moves between analysis windows:
+
+* `:584` — the `open(os.path.realpath(_validated_open_path(archive)), "rb")`
+  sink in `phase_promote` (annotation window read 2026-09-17T19:40Z for
+  `a932e8e5`);
+* `:294` — `sha256_file`'s unconstrained `path` parameter, reached by the same
+  flow's `sha256_file(_validated_open_path(archive))` call at :570 (window read
+  2026-09-17T20:15Z for `a856c1a6`, check-run `105362413305`);
+* `:397` — `_load_receipt`'s `open(_validated_open_path(path))`, the same
+  flow's receipt-input branch (window read 2026-09-17T21:01:47Z for
+  `54f5193b`, check-run `105374693997`).
+
+All three anchors sit on one source-to-sink flow: the `--archive`/`--receipt-in`
+CLI arguments (LLM-supplied) reach the container-bridge and `open()` sinks only
+through `_validated_open_path` — single owner, shared with `pg-verify.py` via
+the R29 import binding — whose enforcement order is (1) `realpath == abspath`
+(symlink indirection refused), (2) containment in `_approved_roots()` (program
+identity: engine dir + `var/recovery`, plus the operator-declared
+`OCE_BACKUP_ROOTS`; a CLI/artifact argument can never approve its own root),
+(3) existing regular file. Adjudication: **DEMONSTRATED_FALSE_POSITIVE** —
+containment proof Sonar's taint engine cannot follow. No TRUE_DEFECT exists in
+this flow, so no source repair was made; the anchors moved because the engine
+re-anchors within the guarded flow, not because three defects were found and
+left open. The window's other traversal-class item,
+`independent-gate-b2.py:275` (read for `54f5193b`, see 21:01:47Z above), is the
+same class in a different file, covered by `TestGateOpsRootContainment` in the
+same CI-executed suite; the loopback-HTTP `python:S5332` findings remain an
+operator-disposition item, unchanged.
+
+### R34.2 — the four adjudication conditions, each proven at the shipped surface
+
+Suite `infrastructure/local-ground/tests/test_b4_cxr7u9r7_path_authority.py`,
+selected by the real local-ground runner since R29:
+
+1. **Approved-root authority cannot be supplied by the artifact path** —
+   `_approved_roots()` consults only `__file__`-derived identity and the
+   `OCE_BACKUP_ROOTS` env channel; proven by `test_cli_argument_cannot_approve_its_own_root`
+   and the CLI `self-declared-root` refusal case.
+2. **Canonical containment** — probe matrix (out-of-band, Windows host,
+   2026-09-17 ~19:50Z): dot-slash, double-slash, in-root `..` all resolve to
+   the same contained file; escape `..`, absolute-outside, and the
+   prefix-sibling root (`roots-evil` beside `roots`, which a `startswith`
+   containment check would admit) are refused. Pinned in CI by
+   `test_every_admitted_spelling_resolves_inside_an_approved_root` (R33) and
+   `test_prefix_sibling_outside_the_root_is_refused` (R33).
+3. **Symlink rejection** — `test_symlink_file_rejected` plus the CLI
+   `symlink-into-root` case whose target IS inside an approved root and is
+   still refused; executed on Linux CI with zero skips (see R34.4).
+4. **Denial with zero durable side effects** — the four hostile-archive CLI
+   refusals (R32: outside-root, dot-dot, self-declared root, symlink-into-root)
+   each assert exit 1, `phases == ["inventory_validated"]`, `promoted is False`,
+   `quarantine_dropped is False`, and that the caller's receipt is the only
+   file created anywhere (`set(after) - set(before) == {receipt}`);
+   instrumented-`phase_promote` cases prove the guard precedes every docker
+   call, with a vacuity control showing the instrumentation DOES observe calls
+   for an approved archive.
+
+### R34.3 — the two proof commits
+
+* `a856c1a6c58c43cfa4d0c5f34e4e5ef7b0c08cb8` — `B4-CXR7U9R32: prove the
+  promote sink refuses hostile archives` (+6 tests driving the real CLI and
+  `phase_promote`; red-green verified out-of-band in a scratch tree: with the
+  guard removed, 9 tests fail including hostile archives reaching the container
+  bridge with 3 recorded `mktemp -d` calls).
+* `54f5193b336bc34d4313fc8231cd4c767a0ad376` — `B4-CXR7U9R33: prove every
+  promote sink receives the validator's contained path` (+4 tests binding the
+  VALUES the sinks receive: `sha256_file`'s parameter and the `docker cp`
+  source observed during a real promote equal the validator's canonical
+  contained path; every admitted spelling resolves to that file; prefix-sibling
+  refused; the engine's only `sha256_file` call site AST-bound to the validator,
+  red-green verified out-of-band — a scratch copy with the wrapper removed or a
+  second raw call added fails the invariant; shipped source passes).
+
+Tree at `54f5193b`: `84fe43b3cc85f8522c55ce9aa1de7089fae71d88`.
+
+### R34.4 — re-run evidence on `54f5193b` (all five runs verified from artifacts)
+
+| Workflow | Run | Event | Result |
+|---|---|---|---|
+| b1-local-ground-validation | 35272160396 | push | junit **195/195/0/0/0** (was 185: +4 R33, +6 R32, +4 net from R29/R30-era drift), manifest **37/37** exact-matched (hash+size; the 3 basename-collision receipts resolved by exact-name matching, the R30 lesson), path-authority **29/29, 0 failed, 0 skipped** XML-parsed, all 4 R33 tests executed by name |
+| b2-control-plane-validation | 35272160470 | push | 905/905/0/0/0 |
+| b3-worker-fabric-validation | 35272160448 | push | 905/905/0/0/0 |
+| b4-config-spine-validation | 35272160318 | push | 905/905/0/0/0 |
+| b1-i1r3-validation | 35272231471 | workflow_dispatch | regressions 67/67, adversarial 49/49, OCE_RUN_ID `e14c8008b740`, `tested_commit == 54f5193b`, tree `84fe43b3` in `initial-validation-results.json` |
+
+All five: conclusion success, zero non-success and zero skipped steps (per-step
+API read 2026-09-17T20:55–20:58Z for `54f5193b`); identity records prove
+`commit == tested_commit == 54f5193b…` and `tested_tree == 84fe43b3…`.
+Registry regeneration is a verified no-op: `collected 905 mandatory ids,
+registry OK: total=905 categories=19`, zero duplicate node IDs, zero
+local-ground node ids (local-ground is collected by the runner, not the
+control-plane registry), file unchanged — no separate registry commit required.
+Local fresh suites (Windows host, 2026-09-17 ~20:30Z): path-authority 25
+passed / 4 truthful Windows symlink skips, gate regressions 58 passed,
+backup-hardening 42 passed; `py_compile` + `ruff` clean; no docker stack left.
+
+The sixth authoritative workflow, `b1-i1r-validation`, has NO sanctioned
+execution path on this head: its triggers are `push:
+oce/block-1-i1r-truth-repair` and `pull_request: branches: [main]` with no
+`workflow_dispatch` (source read at `54f5193b`), and PR #4 is CONFLICTING, so
+no merge ref exists for a pull_request run to build. Its latest green run
+(`35235039845`, PR merge-ref `f18d17d6`, tree `4e14b63f`, R30-era) predates
+R32/R33 and is **historical**.
+
+### R34.5 — historical relabel (mission section 6)
+
+All run evidence recorded for earlier heads — the 8ce72fb8 five-run set and
+`35261014346`, the a856c1a6 five-run set (`35268241881` b1-i1r3,
+`35268236276` b4, `35268236273` b3, `35268236275` b1, `35268236324` b2), and
+every run cited in sections above — is **historical**: it proves the trees it
+tested and no longer the current head. The runs in R34.4 on `54f5193b` are the
+current authoritative set. R32/R33 changed tests and proof only (no production
+source, workflow, or registry file), so the control-plane/worker-fabric/config-
+spine binaries they exercised are unchanged; the b2/b3/b4 re-runs on
+`54f5193b` confirm 905/905 on the new tree regardless.
+
+### R34.6 — current check-run state on `54f5193b` (fresh read 2026-09-17T21:01:47Z for `54f5193b`)
+
+* `SonarCloud Code Analysis` — **failure**, check-run `105374693997`,
+  completed 2026-09-17T20:42:12Z; Quality Gate D Security / C Reliability on
+  new code; 30 annotations in the exposed window; the only traversal-class
+  items are `pg-recovery.py:397` (adjudicated R34.1) and
+  `independent-gate-b2.py:275` (same class, same suite coverage).
+* `Kilo Code Review` — **queued** at read time ("Waiting for a review slot…",
+  check-run `105373959340`). Prior exact-head observations: on `a932e8e5` it
+  failed `Review failed: Workspace setup failed` with 0 annotations (check-run
+  `105341155513`), and on `8ce72fb8` it failed in its own sandbox with storage
+  full during LFS smudge, 0 annotations — external review-service capacity,
+  not source findings.
+* `validate` × 5 — success (ids `105373921246`, `105373921529`,
+  `105373921715`, `105373922122`, `105374153614`), one per R34.4 run.
+
+### R34.7 — status
+
+**IMPLEMENTATION CONVERGED — CLOSURE BLOCKED.** Book 4 is not closed. The
+remaining blockers, unchanged by R32/R33: (1) the Sonar quality gate reports
+D/C against required A/A — the pg-recovery traversal finding is adjudicated
+false-positive with executable CI proof, but the loopback-HTTP `python:S5332`
+findings need an attributable operator accepted-risk disposition or an
+authorized TLS architecture change, and no Sonar credentials exist on this
+machine for an authoritative full inventory; (2) `b1-i1r-validation` cannot
+fire on this branch while PR #4 is CONFLICTING (main advanced externally to
+`7c7816f3…`, read 2026-09-17T21:01:47Z; `main` remains untouched by this
+branch) and has no workflow_dispatch trigger; (3) PR #4 remains OPEN,
+unmerged, title `IN PROGRESS — NOT MERGE AUTHORIZED`. PR #4 state: open,
+merged=false, mergeable=CONFLICTING, mergeStateStatus=DIRTY, base
+`d09941e7…`, head `54f5193b…` (GraphQL read 2026-09-17T21:01:47Z for
+`54f5193b`). Cloud mutations 0; broker mutations 0; capital mutations 0;
+execution-authority mutations 0; recurring cost $0. Book 5 not begun.
