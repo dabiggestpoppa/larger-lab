@@ -26,7 +26,7 @@ evidence-package fingerprints moved because a rights decision is no longer
 carried as caller-settable state, and F2's refusal detail now names the ref and
 the resolved state.
 
-Tested at commit `400af0291deb9ccaf34c8038f82565170a4f6f92` by the authoritative
+Tested at commit `41257f3712123d9e624218f62a57ecdf501a422f` by the authoritative
 command `cd model-foundry && python -m pytest tests -q` → **157 passed** (39
 MF-B0, 19 MF-B1, 44 MF-B2/B3, 27 MF-B4, 22 boundary/cross-block, 6 determinism).
 The same command works from the repository root as

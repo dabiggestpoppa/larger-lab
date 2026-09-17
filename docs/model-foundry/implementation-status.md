@@ -2,7 +2,7 @@
 
 * **Branch:** `agent/model-foundry-mf-b0-b4-build`
 * **Start SHA:** `c55e379df3de2c6bb643afc90c10c0a861fa8c8a`
-* **Tested SHA (code):** `400af0291deb9ccaf34c8038f82565170a4f6f92` (earlier code was tested at `9742cfc2…` for the audit-closure repair and `07ed6617…` before it)
+* **Tested SHA (code):** `41257f3712123d9e624218f62a57ecdf501a422f` (the last commit that changes code; documentation commits after it do not change test results). Earlier code was tested at `400af029…`, `9742cfc2…` for the audit-closure repair, and `07ed6617…` before that.
 * **Authoritative test command:** `cd model-foundry && PYTHONIOENCODING=utf-8 python -m pytest tests -q`
 * **Result:** `157 passed` (39 MF-B0, 19 MF-B1, 44 MF-B2/B3, 27 MF-B4, 22 boundary/cross-block, 6 determinism)
 * **Invocation from repo root also works:** `python -m pytest model-foundry/tests -q`
