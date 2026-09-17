@@ -1,0 +1,181 @@
+{
+  "phase": "P2-R3 \u2014 Operator Loop + Recovery + Identity Closure (superseding)",
+  "supersedes": {
+    "original_freeze_artifact": "qcae/implementation/P2-freeze-manifest.json",
+    "original_freeze_commit": "4cca8729",
+    "original_freeze_digest": "sha256:0c2c7a1df104a58c70c528f99ffeb59c4560124e9d021a75709a0a4b47b272f1",
+    "r1_freeze_artifact": "qcae/implementation/P2-R1-freeze-manifest.json",
+    "r1_freeze_digest": "sha256:2329eea9e9ef14338c5c1484ff726623392a5814488c9c78ae1f24d166d40410",
+    "r2_freeze_artifact": "qcae/implementation/P2-R2-freeze-manifest.json",
+    "r2_freeze_digest": "sha256:b637fea164101509e3e63da369ede72934cef416146f4947e349e2cfbb58d2b8",
+    "relationship": "superseding repair manifest; the original P2 freeze and the P2-R1/P2-R2 repair manifests are preserved unchanged as historical truth"
+  },
+  "operator_review_trigger": "Post-freeze live operator testing of P2-R2 head a11d380a: the 1000-test suite passed while the real operator journey was broken \u2014 submit/run never finalized the job (finding A), no worker was registered so `job run` stranded a lease with a raw traceback (B), recovery deleted claims without reconciling steps and split across three disagreeing surfaces (C), recovery could force-expire ACTIVE leases (D), and unregistered id-* principals gained execution authority via policy string-match (E)",
+  "canon_version": "0.1",
+  "active_amendments": [
+    "A-001 v1.0"
+  ],
+  "branch": "qcae-capability-acquisition-engine",
+  "head_commit": "6f0218c023657a5e97b11dc0c6a9951fa95d2bd1",
+  "tested_commit": "6f0218c023657a5e97b11dc0c6a9951fa95d2bd1",
+  "phase_commits": {
+    "original_p2_build": [
+      "ab0098c5",
+      "52be767f",
+      "534f7864",
+      "766efa0d",
+      "cb047e4a",
+      "e1936d06",
+      "fbe93cef",
+      "21bc4466",
+      "0603b882",
+      "38e6ca66",
+      "c531e12f",
+      "49f6fdbc",
+      "61488273",
+      "afdbaa84",
+      "8022b61d",
+      "4cca8729"
+    ],
+    "p2_r1_structural_repairs": [
+      "425ac5f6",
+      "3b5aaed0",
+      "bfead6f6",
+      "acf31b6f",
+      "cb1cede4",
+      "6ea6dcef",
+      "ac0dd3c2",
+      "ea493b8e",
+      "a8b20a6c"
+    ],
+    "p2_r2_governance_wiring": [
+      "30cebe27",
+      "407b7de9",
+      "7f6bccb7",
+      "e93f41dd",
+      "3a7783ea",
+      "4b88cbd7",
+      "f1e02304",
+      "8e8b9431",
+      "4395aaa8",
+      "a11d380a"
+    ],
+    "p2_r3_operator_loop_closure": [
+      "07626a08",
+      "7ac5b80f",
+      "66abe540",
+      "50256c6b",
+      "f3ceec59",
+      "c7fa5744",
+      "205b7b46",
+      "6f0218c0"
+    ]
+  },
+  "adr_refs": [
+    "qcae/implementation/decisions/ADR-0006-persistence-architecture.md",
+    "qcae/implementation/decisions/ADR-0007-repository-identity-vs-revision-identity.md",
+    "qcae/implementation/decisions/ADR-0008-p2-runtime-state-vocabulary.md",
+    "qcae/implementation/decisions/ADR-0009-policy-vs-authority-vocabularies.md"
+  ],
+  "prior_freeze_refs": [
+    "qcae/implementation/P1-R1-freeze-manifest.json",
+    "qcae/implementation/P2-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R1-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R2-freeze-manifest.json (historical, superseded by this manifest)"
+  ],
+  "repairs": {
+    "c01_job_lifecycle_truth": {
+      "finding": "A \u2014 submit left the snapshot CREATED; JOB_SUCCEEDED unreachable in the natural flow",
+      "repair": "submission commits the durable snapshot QUEUED with JOB_CREATED + JOB_QUEUED exactly once and returns the committed truth; a granted lease promotes the job RUNNING (only when executable work actually runs); the finalizer is reachable from any live state and emits JOB_SUCCEEDED exactly once; empty graphs refused",
+      "tests": "qcae/tests/unit/test_p2r3_c01_job_lifecycle.py"
+    },
+    "c02_worker_availability_before_lease": {
+      "finding": "B \u2014 lease -> RUNNING -> missing worker -> raw traceback stranded the lease",
+      "repair": "typed WorkerUnavailableError raised BEFORE any claim, state mutation, attempt, budget, or STEP_STARTED; per-step coverage (covered work proceeds while uncovered steps stay READY); CLI renders WORKER_UNAVAILABLE as exit 3 with structured output and no traceback; no default production worker added (P3 supplies workers)",
+      "tests": "qcae/tests/unit/test_p2r3_c02_worker_availability.py"
+    },
+    "c03_single_recovery_law": {
+      "finding": "C/D \u2014 claim deletion without step reconciliation; three disagreeing surfaces; active leases stolen",
+      "repair": "OrchestratorEngine.recover_leased_steps is the ONE authoritative law: TTL-expired claims are released (job-scoped) and their steps reconciled \u2014 READY if replay-safe, COMMITTED finalized without replay, NON_REPLAY_SAFE ambiguity escalates to WAITING_INPUT; orphan RUNNING steps are explicitly classified; active leases survive recover/resume; global recover and job resume both delegate to this law",
+      "tests": "qcae/tests/unit/test_p2r3_c03_recovery_law.py"
+    },
+    "c04_identity_binding": {
+      "finding": "E \u2014 unregistered id-* principals matched policy by string; claim/execute principals unbound",
+      "repair": "identity provider wired at the composition root; require_worker_identity refuses unknown principals BEFORE any claim row exists; execute_step enforces claim-principal == execution-principal (no A-claim/B-execute swap); identity semantics proven across restart",
+      "tests": "qcae/tests/unit/test_p2r3_c04_identity_binding.py"
+    },
+    "c05_cli_typed_errors_and_recovery_convergence": {
+      "finding": "expected operator errors surfaced as raw tracebacks; recovery surfaces disagreed",
+      "repair": "stable exit codes (2 rejected/unknown, 3 worker unavailable, 4 budget exhausted) with structured stderr; unexpected programming errors still traceback; job_resume and global recover delegate to the same law",
+      "tests": "qcae/tests/unit/test_p2r3_c05_cli_typed_errors.py"
+    }
+  },
+  "persistence": {
+    "engine": "SQLite (stdlib sqlite3)",
+    "metadata_schema_version": 4,
+    "artifact_hash_algorithm": "sha256",
+    "recovery_expiry": "TTL-checked only; force-expire reserved for governed internal paths"
+  },
+  "operator_acceptance_evidence": {
+    "artifact": "qcae/implementation/P2-R3-operator-acceptance.json",
+    "summary": {
+      "artifact": "qcae/implementation/P2-R3-operator-acceptance.json",
+      "journeys": [
+        "A_lifecycle_and_restart",
+        "B_no_worker_safety",
+        "C_active_lease_then_expired_recovery",
+        "D_identity_fail_closed",
+        "E_approval_round_trip"
+      ],
+      "evidence_label": "LOCAL TEST EVIDENCE"
+    }
+  },
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "qcae/tests",
+    "-q"
+  ],
+  "test_results": {
+    "collected": 1060,
+    "passed": 1060,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 19.45,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-09-17T20:02:49.405002+00:00",
+    "tested_commit": "6f0218c023657a5e97b11dc0c6a9951fa95d2bd1"
+  },
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "architecture_guard_evidence": {
+    "core_stdlib_only": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "engine_confined_to_infrastructure": true,
+    "runtime_store_boundary": "orchestrator knows no _conn/table names",
+    "interface_boundary": "TestInterfaceBoundary (no private reach-ins)",
+    "oce_absent": "runtime reports OCE_ABSENT; no OCE import in qcae/"
+  },
+  "known_external_failures": [
+    "tests/forge/phase_00/test_extension_docs.py: 2 pre-existing failures external to qcae/ (documented since P1; unchanged)"
+  ],
+  "deferred_design_debt": {
+    "classification": "MINOR / DESIGN_DEBT_PARKED",
+    "items": [
+      "OrchestratorEngine decomposition (~850 lines, one owner per concern)",
+      "QcaeApp vs LocalRuntimeService facade consolidation",
+      "freeze-generator parameterization/deduplication across phases",
+      "Permissive/FailClosed test gates moved out of the production module"
+    ],
+    "trigger": "P10 Agent Orchestration preparation, or earlier only if P3-P5 provide evidence it is needed"
+  },
+  "blockers": [],
+  "generated_at": "2026-09-17T20:02:49Z"
+}

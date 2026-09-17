@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P2 — REPAIR OPEN: P2-R3 Operator Loop Closure (LOCAL TEST EVIDENCE: 1060/1060 at `205b7b46`)** — C01–C05 repairs, acceptance harness, adversarial qualification committed; freeze pending; **P3 NOT started**
+**P2 — FROZEN / OPERATOR-REVIEWED + R1, R2 & R3 COMPLETE (LOCAL TEST EVIDENCE: 1060/1060 at `6f0218c0`)** — Job Runtime + Local Governance; C07R structural repairs (P2-R1), governance-wiring repairs (P2-R2), and operator-loop closure (P2-R3) sealed; **P3 NOT started**
 
 Prior phases: P0 FROZEN+RECONCILED · P0-A001 FROZEN · P1 FROZEN / OPERATOR-REVIEWED + R1 COMPLETE (incl. ADR-0007 identity/revision repair).
 
@@ -81,7 +81,45 @@ Repair plan (narrow commits, additive, no redesign of accepted subsystems):
 - **P2-R2-FREEZE** — superseding freeze manifest (P2 and P2-R1 manifests
   preserved), fail-closed test capture, ledger update.
 
-### P2-R3 — Operator Loop + Recovery + Identity Closure (REPAIR OPEN at reviewed head `a11d380a`)
+### P2-R3 — Operator Loop + Recovery + Identity Closure (SEALED at `6f0218c0`)
+
+All five findings closed with narrow commits, plus a real-surface acceptance
+harness (the class of gap the unit suite cannot see):
+
+- **I0 `6f0218c0`** — findings A–E + repair law recorded (this entry).
+- **C01 `07626a08`** — lifecycle truth: submit commits QUEUED (JOB_CREATED +
+  JOB_QUEUED exactly once, committed truth returned), granted lease promotes
+  RUNNING, finalizer reachable from any live state, JOB_SUCCEEDED exactly
+  once, empty graphs refused.
+- **C02 `7ac5b80f`** — typed `WorkerUnavailableError` BEFORE any claim/state/
+  attempt/budget/STEP_STARTED; per-step coverage; CLI exit 3 structured, no
+  traceback; no default worker added (P3 supplies real workers).
+- **C03 `66abe540`** — one recovery law (`recover_leased_steps`): TTL-checked
+  job-scoped expiry → READY (replay-safe) / COMMITTED finalized (never
+  replayed) / WAITING_INPUT (non-replay-safe ambiguity); orphan RUNNING
+  classified; active leases never stolen by recover or resume; both CLI
+  surfaces delegate to the same law.
+- **C04 `50256c6b`** — identity wired at composition root; unknown principals
+  refused before claim (policy string-match confers nothing); claim principal
+  == execution principal enforced.
+- **C05 `f3ceec59`** — CLI stable exit codes 2/3/4 with structured stderr;
+  programming errors still traceback; recovery surfaces converge.
+- **A01 `c7fa5744`** — acceptance harness `qcae/tests/acceptance/
+  test_p2_operator_loop.py`: five journeys over real SQLite + subprocess CLI
+  (lifecycle+restart, CLI no-worker, crash/TTL recovery, identity
+  fail-closed, approval deny); evidence emitted to
+  `P2-R3-operator-acceptance.json`.
+- **T01 `205b7b46`** — 14 adversarial cases (lease theft, idempotent
+  convergence both orders, orphan classification, committed no-replay,
+  ambiguity escalation, no-worker tracelessness, identity matrix, terminal
+  truth, CLI no-traceback).
+- **FREEZE `6f0218c0`** — `P2-R3-freeze-manifest.json` superseding manifest
+  (preserves P2/P2-R1/P2-R2 manifests with digests) sealed by the fail-closed
+  generator (`p2r3_freeze_manifest.py`): **1060 collected / 1060 passed /
+  0 failed / 0 skipped** (LOCAL TEST EVIDENCE, tested commit `6f0218c0`).
+  Blockers `[]`; design debt parked (MINOR) with P10 trigger.
+
+### P2-R2 — Governance-Wiring Repair Tranche (SEALED at `4395aaa8`)
 
 Post-freeze live operator testing of the P2-R2 head exposed a class of defect
 the 1000-test suite could not see: every internal subsystem passed, but the
