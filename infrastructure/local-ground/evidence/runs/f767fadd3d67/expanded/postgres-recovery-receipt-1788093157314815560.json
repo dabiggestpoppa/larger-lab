@@ -1,0 +1,46 @@
+{
+  "format": "oce-pg-recovery-receipt-v1",
+  "operation_phase": "finalize",
+  "database": "oce_local",
+  "source_database": "oce_local",
+  "target_database": "oce_local",
+  "source_commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f",
+  "source_tree": "85cb2379f614dde118670194dc6a08c59b1f3f54",
+  "run_id": "f767fadd3d67",
+  "inventory_path": "/tmp/pytest-of-runner/pytest-0/test_ctl_clean_room_database_a0/bk/.backup-content/postgres/inventory.json",
+  "phases": [
+    "final_canonical_verified",
+    "quarantine_dropped",
+    "quarantine_removal_verified"
+  ],
+  "started_at": "2026-08-30T12:32:36Z",
+  "promote_receipt": "/home/runner/work/larger-lab/larger-lab/infrastructure/local-ground/var/recovery/promote-receipt.json",
+  "stamp": "d2729f0023e2",
+  "staging_database": "oce_local_restore_d2729f0023e2",
+  "quarantine_database": "oce_local_quarantine_d2729f0023e2",
+  "source_archive_sha256": "c56685ae64dde94a3154b7693e360f4f0e5e392443d4e3297b9934d07b9a9e4b",
+  "promoted": true,
+  "rollback_required": false,
+  "rollback_attempted": false,
+  "rollback_succeeded": null,
+  "rollback_failed": false,
+  "original_canonical_restored": false,
+  "promoted_candidate_removed": false,
+  "quarantine_retained": false,
+  "final_verification": {
+    "result": "ok",
+    "tables": {
+      "public.backup_probe": 2,
+      "public.state_probe": 4
+    },
+    "fingerprints": {
+      "public.backup_probe": "e2aacec2fe98e981dc9f3941062345be",
+      "public.state_probe": "333d8b545eeb4d0bb63fa6dd6842c081"
+    }
+  },
+  "quarantine_dropped": true,
+  "quarantine_removal_verified": true,
+  "finished_at": "2026-08-30T12:32:37Z",
+  "exit_status": 0,
+  "redis_restored": false
+}

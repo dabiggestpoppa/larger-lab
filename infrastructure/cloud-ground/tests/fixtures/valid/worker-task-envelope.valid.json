@@ -1,0 +1,48 @@
+{
+  "task_id": "task-abc12345-def6",
+  "attempt_id": "att-abc12345-def6",
+  "project_id": "proj-test",
+  "actor_id": "actor-test-01",
+  "intent_ref": "spec/backtest-v1",
+  "worker_class": "local",
+  "container_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000001",
+  "input_artifacts": [
+    {
+      "artifact_id": "art-abc12345",
+      "hash": "sha256:0000000000000000000000000000000000000000000000000000000000000002",
+      "size_bytes": 1024
+    }
+  ],
+  "resource_limits": {
+    "cpu_cores": 2,
+    "memory_mb": 4096,
+    "disk_gb": 20,
+    "max_runtime_seconds": 3600,
+    "network_outbound": true
+  },
+  "sensitivity_class": "internal",
+  "heartbeat_config": {
+    "interval_seconds": 30,
+    "timeout_seconds": 120
+  },
+  "cancellation_config": {
+    "grace_period_seconds": 30
+  },
+  "output_spec": {
+    "output_schema": "spec/output-v1",
+    "artifact_class": "report",
+    "max_size_bytes": 104857600
+  },
+  "cost_ceiling": {
+    "max_usd": 0,
+    "currency": "USD"
+  },
+  "deadline": "2026-12-31T23:59:59Z",
+  "cleanup_requirements": {
+    "delete_on_complete": true,
+    "remote_volume_cleanup": true,
+    "retention_hours": 24
+  },
+  "version": "1.0.0",
+  "schema_version": "1.0.0"
+}

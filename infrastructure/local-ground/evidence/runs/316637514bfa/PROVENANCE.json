@@ -1,0 +1,79 @@
+{
+  "run_id": "316637514bfa",
+  "repository": "dabiggestpoppa/larger-lab",
+  "branch": "oce-program-build",
+  "implementation_commit": "3fcc2c715451b34820d821eb3abaea3fc7892b6f",
+  "implementation_tree": "7499b6b30a6808c9acc1eb6403160f1e3d1e0aa8",
+  "gate_result": "PASS",
+  "gate_mode": "LOCAL_STATIC",
+  "gate_totals": {
+    "PASS": 34,
+    "FAIL": 0,
+    "total": 34
+  },
+  "test_totals": {
+    "collected": 81,
+    "executed": 81,
+    "passed": 67,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 14
+  },
+  "container_backed": {
+    "collected": 14,
+    "executed": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 14
+  },
+  "mandatory_skipped": 14,
+  "final_status": "LOCAL_STATIC_READY_CI_REQUIRED",
+  "cloud": {
+    "mutations": 0,
+    "cost": "ZERO",
+    "activation": "DEFERRED_BY_OPERATOR"
+  },
+  "environment_fingerprint": {
+    "os": "Windows",
+    "platform_release": "10",
+    "machine": "AMD64",
+    "runtime_target": "local",
+    "tools": {
+      "python": "Python 3.11.9",
+      "git": "git version 2.54.0.windows.1",
+      "docker": "absent",
+      "docker_compose": "absent",
+      "ansible": "absent",
+      "ansible_lint": "absent",
+      "shellcheck": "ShellCheck - shell script analysis tool",
+      "gitleaks": "absent",
+      "wsl": "not-installed"
+    }
+  },
+  "artifact_hashes": {
+    "acceptance-output.txt": "39f5833c463ed439f890a9791c8913d0fea332f3accfd57bfc5512c0d0ec02b2",
+    "adversarial-output.txt": "0fdee19a0981b26e17aaaf29d373d69e2363d1fd69c0bd35c4cc8e70d51085dd",
+    "adversarial-results.json": "e2e777d48c7cfd78f7839398bd55ca55ebaa68aeacc4d05897381c909130e5f2",
+    "cleanup.json": "382da6348eb9f820e60fe1531a212d64899913d7ccb88722427912a93490ef1a",
+    "cloud-apply-denial.json": "7b0b753f17182b4dd57f83fd52cc495100112e254355ba635cf3e29181ab41b5",
+    "cloud-apply-denial.txt": "b1c480359d4d38fb949db72fa7ede2006730a19292d57617345e3ffb483c71ec",
+    "cloud-plan-2.txt": "32ac617b554a8ecbca778e3e741a9320a7e25030eb6610e85f974895d764c907",
+    "cloud-plan-deterministic.json": "0ad6ae73d80ae7e50d499d75b354756d5b109bb2a7cec269548eb5669b2b74a3",
+    "cloud-plan.txt": "32ac617b554a8ecbca778e3e741a9320a7e25030eb6610e85f974895d764c907",
+    "environment-fingerprint.json": "785c8895baa8a2d199a00bebae5091d66d89909a95bd1158650ab259f1ad2731",
+    "evidence-dir.path": "df5c93afb10e4bf8dc97ec8a42dededb9254a5b231fe3df13660d4f788024f6b",
+    "identity.json": "594461aef7048cd9f4cadf2d6df5fa50f2296f1ba3e7028e971522460bc0b3bb",
+    "independent-gate.json": "81333a2202236f2c795a3b3229a17b683ef9a6c117474c74973b7569c7d49c51",
+    "junit.xml": "0fe30e4b4d24a835aac7b668f363e04eb11d5db3444ae99d4a1582860c6dee86",
+    "local-after-denied.json": "615b528c5c005c3fa1f565a5f58bb0f9fb327229716a5ea9a8143c5524daf9b8",
+    "local-after-denied.txt": "047565bec2d43cb9ac3147a3e9c151119b44c4d2275be3b0eb7c1150da289243",
+    "source-clean.json": "546b81839721ecaebd81f40dbec11559cc00aeabff1c397a898b3be40d5c0733",
+    "stage-log.txt": "cab09291301de695d4b401bfb2f11a08a9878279caa0a7191b1262b0d47ff1cf",
+    "stage-status.json": "b78658cea6d18942c5505d276bddc8d7561c6d984e8f49a6281b9f408d190eae",
+    "test-mode.txt": "6f16a25214d540f109471d617910d932d5c76bf6c3d9ddf77a8f9f27ba3767e5",
+    "test-summary.json": "025096c7c07be04f5cac46a0dbfb393024107b338a477521767ee7321ffba6bf"
+  },
+  "evidence_location": "external (outside repository; redacted copy committed)",
+  "redaction_note": "No host identity, credentials, IPs, or secrets appear here; raw evidence preserved externally.",
+  "ci_status": "TRIGGERED_ON_PUSH_OPERATOR_CONFIRMATION_REQUIRED"
+}

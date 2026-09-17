@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/local-ground/deployment-target.schema.json",
+  "title": "OCE Local Ground — Deployment Target",
+  "description": "Machine contract that separates deployment validation from planning from apply. encode phase in a single field so local startup, tests, and CI can never invoke cloud apply, and cloud apply is denied when required authorization or cost inputs are absent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "kind", "phase", "mutates_external", "public_exposure", "requires_authorization_fields", "cost_ceiling_usd"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["local", "cloud"] },
+    "phase": { "enum": ["validate", "plan", "apply"] },
+    "mutates_external": { "type": "boolean" },
+    "public_exposure": { "type": "boolean" },
+    "requires_authorization_fields": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "cost_ceiling_usd": { "type": "number", "minimum": 0 }
+  },
+  "allOf": [
+    {
+      "description": "validate and plan are read-only; only apply may mutate",
+      "$comment": "mutates_external must be false unless phase == apply",
+      "if": { "properties": { "phase": { "enum": ["validate", "plan"] } }, "required": ["phase"] },
+      "then": { "properties": { "mutates_external": { "const": false } } }
+    },
+    {
+      "description": "cloud apply requires the authorization fields present",
+      "if": { "properties": { "kind": { "const": "cloud" }, "phase": { "const": "apply" } }, "required": ["kind", "phase"] },
+      "then": {
+        "properties": {
+          "requires_authorization_fields": { "minItems": 1 },
+          "cost_ceiling_usd": { "minimum": 1 }
+        }
+      }
+    }
+  ]
+}

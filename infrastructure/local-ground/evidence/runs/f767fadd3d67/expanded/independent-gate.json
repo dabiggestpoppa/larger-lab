@@ -1,0 +1,382 @@
+{
+  "format": "oce-independent-gate-v1",
+  "run_id": "f767fadd3d67",
+  "mode": "AUTHORITATIVE_CI",
+  "result": "PASS",
+  "expected_repository": "dabiggestpoppa/larger-lab",
+  "observed_repository": "dabiggestpoppa/larger-lab",
+  "trusted_ci_repository": "dabiggestpoppa/larger-lab",
+  "expected_branch": "oce-program-build",
+  "observed_branch": "oce-program-build",
+  "trusted_ci_ref": "oce-program-build",
+  "implementation_commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f",
+  "implementation_tree": "85cb2379f614dde118670194dc6a08c59b1f3f54",
+  "checks": [
+    {
+      "id": "gate-01-required-artifacts",
+      "name": "required artifacts exist",
+      "ok": true,
+      "detail": "all present"
+    },
+    {
+      "id": "gate-02-json-parses",
+      "name": "all required json parses",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "gate-03-run-id-consistent",
+      "name": "one nonempty RUN_ID everywhere",
+      "ok": true,
+      "detail": "{'f767fadd3d67'}"
+    },
+    {
+      "id": "gate-04-expected-repo",
+      "name": "expected repository exact",
+      "ok": true,
+      "detail": "dabiggestpoppa/larger-lab"
+    },
+    {
+      "id": "gate-05-observed-repo",
+      "name": "observed remote identity matches",
+      "ok": true,
+      "detail": "dabiggestpoppa/larger-lab"
+    },
+    {
+      "id": "gate-06-trusted-ci-repo",
+      "name": "trusted CI repository matches",
+      "ok": true,
+      "detail": "dabiggestpoppa/larger-lab"
+    },
+    {
+      "id": "gate-07-expected-branch",
+      "name": "expected branch",
+      "ok": true,
+      "detail": "oce-program-build"
+    },
+    {
+      "id": "gate-08-ref-satisfies-branch-rules",
+      "name": "observed/trusted ref branch rule",
+      "ok": true,
+      "detail": "observed=oce-program-build ci_ref=oce-program-build"
+    },
+    {
+      "id": "gate-09-implementation-commit",
+      "name": "implementation commit matches tested checkout",
+      "ok": true,
+      "detail": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f"
+    },
+    {
+      "id": "gate-10-implementation-tree",
+      "name": "implementation tree matches tested checkout",
+      "ok": true,
+      "detail": "85cb2379f614dde118670194dc6a08c59b1f3f54"
+    },
+    {
+      "id": "gate-11-commit-tree-args-used",
+      "name": "gate commit/tree arguments used",
+      "ok": true,
+      "detail": "compared against identity.json and evidence-manifest.json"
+    },
+    {
+      "id": "gate-12-source-clean",
+      "name": "source clean before and after",
+      "ok": true,
+      "detail": "{'pre': True, 'dirty_pre': 0, 'post': True, 'dirty_post': 0}"
+    },
+    {
+      "id": "gate-13-test-totals-consistent",
+      "name": "test totals match parsed entries",
+      "ok": true,
+      "detail": "{'collected': 150, 'executed': 150, 'passed': 150, 'failed': 0, 'errors': 0, 'skipped': 0}"
+    },
+    {
+      "id": "gate-14-zero-failures-errors",
+      "name": "zero mandatory test failures/errors",
+      "ok": true,
+      "detail": "{'failed': 0, 'errors': 0}"
+    },
+    {
+      "id": "gate-15-zero-mandatory-skips-ci",
+      "name": "zero mandatory CI skips",
+      "ok": true,
+      "detail": "0"
+    },
+    {
+      "id": "gate-16-container-tests-executed",
+      "name": "container-backed tests execute in CI",
+      "ok": true,
+      "detail": "{'collected': 21, 'executed': 21, 'passed': 21, 'failed': 0, 'skipped': 0}"
+    },
+    {
+      "id": "gate-16b-authoritative-mode",
+      "name": "CI mode is AUTHORITATIVE_CI",
+      "ok": true,
+      "detail": "AUTHORITATIVE_CI"
+    },
+    {
+      "id": "gate-17-adversarial-totals-match",
+      "name": "adversarial totals match entries",
+      "ok": true,
+      "detail": "{'PASS': 8, 'FAIL': 0}"
+    },
+    {
+      "id": "gate-18-adversarial-all-pass",
+      "name": "every adversarial test passes",
+      "ok": true,
+      "detail": "{'PASS': 8, 'FAIL': 0}"
+    },
+    {
+      "id": "gate-test_04_postgres_state_survives_service_restart",
+      "name": "postgres persistence tested",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_05_postgres_state_survives_compose_restart",
+      "name": "postgres survives compose restart",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_06_isolated_redis_loss_preserves_postgres_truth",
+      "name": "isolated redis loss preserves postgres truth",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_07_artifact_round_trip_preserves_hashes",
+      "name": "artifact round trip",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_08_backup_completes",
+      "name": "backup executes",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_09_clean_room_local_restore_succeeds",
+      "name": "clean-room restore executes",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_10_restore_meets_declared_recovery_targets",
+      "name": "recovery targets",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_11_corrupt_backup_is_rejected",
+      "name": "corrupt backup rejected",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_03_services_reach_health_or_unknown",
+      "name": "all services reach health",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_ctl_all_services_healthy",
+      "name": "entire stack simultaneously healthy",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_ctl_prometheus_readiness_endpoint",
+      "name": "prometheus /-/ready endurance",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_ctl_clean_room_database_artifact_restore",
+      "name": "real clean-room database+artifact restore",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_ctl_corrupt_backup_rejected_against_running_stack",
+      "name": "running-stack corrupt backup rejected",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_ctl_structured_logs_use_json_file_driver",
+      "name": "structured json-file logs verified",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_ctl_safe_shutdown_and_verified_cleanup",
+      "name": "safe shutdown + restore + cleanup",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-test_ctl_no_forbidden_public_ports",
+      "name": "no forbidden public ports",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-25-cloud-plan-deterministic",
+      "name": "cloud plan deterministic",
+      "ok": true,
+      "detail": "{'deterministic': True}"
+    },
+    {
+      "id": "gate-26-cloud-plan-zero-mutation",
+      "name": "cloud plan reports zero mutation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "gate-27-cloud-apply-denied-code",
+      "name": "cloud apply returns expected nonzero denial code",
+      "ok": true,
+      "detail": "{'exit_code': 5, 'expected_nonzero': True}"
+    },
+    {
+      "id": "gate-28-cloud-apply-denial-reason",
+      "name": "cloud apply denial contains authorization reason",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "gate-29-local-after-denied",
+      "name": "local mode works after denied cloud action",
+      "ok": true,
+      "detail": "{'exit_code': 0}"
+    },
+    {
+      "id": "gate-30-cleanup-succeeds",
+      "name": "cleanup succeeds",
+      "ok": true,
+      "detail": "{'cleanup': 'ok', 'disposable_removed': True}"
+    },
+    {
+      "id": "gate-30b-container-cleanup-verified",
+      "name": "container cleanup verified in CI",
+      "ok": true,
+      "detail": "{'cleanup': 'ok', 'containers_removed': True, 'networks_removed': True, 'volumes_removed': True, 'disposable_removed': True}"
+    },
+    {
+      "id": "gate-30c-postgres-recovery-receipt",
+      "name": "verified postgres promotion receipt in CI",
+      "ok": true,
+      "detail": "{'format': 'oce-pg-recovery-receipt-v1', 'operation_phase': 'finalize', 'database': 'oce_local', 'source_database': 'oce_local', 'target_database': 'oce_local', 'source_commit': '7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f', 'source_tree': '85cb2379f614dde118670194dc6a08c59b1f3f54', 'run_id': 'f767fadd3d67', 'inventory_path': '/tmp/pytest-of-runner/pytest-0/test_ctl_redis_invalidation_fa0/bk/.backup-content/postgres/inventory.json', 'phases': ['final_canonical_verified', 'quarantine_dropped', 'quarantine_removal_verified'], 'started_at': '2026-08-30T12:33:23Z', 'promote_receipt': '/home/runner/work/larger-lab/larger-lab/infrastructure/local-ground/var/recovery/promote-receipt.json', 'stamp': '5babbb9f2a8b', 'staging_database': 'oce_local_restore_5babbb9f2a8b', 'quarantine_database': 'oce_local_quarantine_5babbb9f2a8b', 'source_archive_sha256': '15e2fde6880f36885b8ac919d0dfe192028432c9a81664ea4e54e70e0adbbf47', 'promoted': True, 'rollback_required': False, 'rollback_attempted': False, 'rollback_succeeded': None, 'rollback_failed': False, 'original_canonical_restored': False, 'promoted_candidate_removed': False, 'quarantine_retained': False, 'final_verification': {'result': 'ok', 'tables': {'public.backup_probe': 2, 'public.replace_probe': 2, 'public.state_probe': 4}, 'fingerprints': {'public.backup_probe': 'e2aacec2fe98e981dc9f3941062345be', 'public.replace_probe': '358c8f468382cfe16d17654f10c40905', 'public.state_probe': '333d8b545eeb4d0bb63fa6dd6842c081'}}, 'quarantine_dropped': True, 'quarantine_removal_verified': True, 'finished_at': '2026-08-30T12:33:24Z', 'exit_status': 0, 'redis_restored': False}"
+    },
+    {
+      "id": "gate-33-test_full_backup_blocked_without_docker_or_services",
+      "name": "unavailable-service negative path executed and passed",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-33-test_full_backup_blocked_when_postgres_unavailable",
+      "name": "unavailable-service negative path executed and passed",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-33-test_full_backup_blocked_when_artifact_store_unavailable",
+      "name": "unavailable-service negative path executed and passed",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-33-test_state_only_backup_still_works_without_docker",
+      "name": "unavailable-service negative path executed and passed",
+      "ok": true,
+      "detail": "passed"
+    },
+    {
+      "id": "gate-34-operation-index",
+      "name": "immutable operation index present with unique IDs",
+      "ok": true,
+      "detail": "ops=23"
+    },
+    {
+      "id": "gate-34b-operation-index-verified",
+      "name": "indexed receipts exist and hash-match",
+      "ok": true,
+      "detail": "operation index verified (23 operations)"
+    },
+    {
+      "id": "gate-35-success-full-replace-op",
+      "name": "successful full-replace operation indexed",
+      "ok": true,
+      "detail": "e96f3eb844174d5eb01f2b7d36a89166"
+    },
+    {
+      "id": "gate-35a-promote-quarantine-held-fingerprints",
+      "name": "promotion held quarantine and verified protected fingerprints",
+      "ok": true,
+      "detail": "{'result': 'ok', 'tables': {'public.backup_probe': 2, 'public.state_probe': 4}, 'fingerprints': {'public.backup_probe': 'e2aacec2fe98e981dc9f3941062345be', 'public.state_probe': '333d8b545eeb4d0bb63fa6dd6842c081'}}"
+    },
+    {
+      "id": "gate-35b-finalize-quarantine-dropped-after-verification",
+      "name": "quarantine dropped only after final verification (fingerprints ok)",
+      "ok": true,
+      "detail": "{'promoted': True, 'exit_status': 0, 'quarantine_dropped': True, 'quarantine_removal_verified': True}"
+    },
+    {
+      "id": "gate-35c-phase-ordering-valid",
+      "name": "promotion/finalize phase ordering is valid",
+      "ok": true,
+      "detail": "promote=['inventory_validated', 'archive_validated', 'staging_created', 'staging_restored', 'staging_verified', 'canonical_quarantined', 'promoted', 'canonical_verified'] finalize=['final_canonical_verified', 'quarantine_dropped', 'quarantine_removal_verified']"
+    },
+    {
+      "id": "gate-35d-redis-invalidated-not-restored",
+      "name": "Redis not restored and invalidated after successful full replacement",
+      "ok": true,
+      "detail": "{'format': 'oce-redis-invalidation-receipt-v1', 'redis_restored': False, 'redis_invalidation_required': True, 'redis_invalidation_attempted': True, 'redis_invalidated': True, 'redis_verification': 'ok', 'redis_failure': None, 'postgres_promoted': True, 'postgres_exit_status': 0, 'started_at': '2026-08-30T12:32:37Z', 'finished_at': '2026-08-30T12:32:37Z'}"
+    },
+    {
+      "id": "gate-35e-artifact-replaced",
+      "name": "artifact snapshot replaced and receipted",
+      "ok": true,
+      "detail": "{'format': 'oce-artifact-recovery-receipt-v1', 'artifact_archive_sha256': '1637093a9fe706b5e5e557b2b2f517c811bba20a703dd643f052a6956c21b9e3', 'artifact_archive_size': 3281, 'artifact_replaced': True, 'artifact_verify': 'ok', 'timestamp': '2026-08-30T12:32:33Z'}"
+    },
+    {
+      "id": "gate-36-rollback-regression-executed",
+      "name": "post-promotion rollback regression executed with verified rollback",
+      "ok": true,
+      "detail": "{'result': 'ok', 'fingerprints': {'public.backup_probe': 'e2aacec2fe98e981dc9f3941062345be', 'public.replace_probe': '358c8f468382cfe16d17654f10c40905', 'public.state_probe': '333d8b545eeb4d0bb63fa6dd6842c081'}, 'tables': {'public.backup_probe': 2, 'public.replace_probe': 2, 'public.state_probe': 4}}"
+    },
+    {
+      "id": "gate-37-no-invalid-rollback-syntax",
+      "name": "invalid ALTER/DROP DATABASE IF EXISTS syntax absent (catalog checks used)",
+      "ok": true,
+      "detail": "source scan of pg-recovery.py"
+    },
+    {
+      "id": "gate-41-ci-zero-skips",
+      "name": "zero skipped tests in CI (collected==executed)",
+      "ok": true,
+      "detail": "{'skipped': 0, 'executed': 150, 'collected': 150}"
+    },
+    {
+      "id": "gate-31-manifest-hashes-sizes",
+      "name": "manifest hashes and sizes match final files",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "id": "gate-32-cloud-fields",
+      "name": "cloud fields deferred/not deployed/zero/0",
+      "ok": true,
+      "detail": "{'cloud_activation_state': 'DEFERRED_BY_OPERATOR', 'cloud_deployment_state': 'NOT_DEPLOYED', 'cloud_cost_state': 'ZERO', 'cloud_mutations': 0}"
+    }
+  ],
+  "totals": {
+    "PASS": 60,
+    "FAIL": 0,
+    "total": 60
+  },
+  "generated_at": "2026-08-30T12:33:51Z"
+}

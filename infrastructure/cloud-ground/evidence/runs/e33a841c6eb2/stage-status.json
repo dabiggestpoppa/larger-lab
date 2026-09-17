@@ -1,0 +1,27 @@
+{
+  "block": "B1",
+  "increment": "B1-I1R3H",
+  "run_id": "e33a841c6eb2",
+  "validator_version": "3.6.0",
+  "phase": "final",
+  "implementation_commit": "50bf8fe4acc3a0f0750065dfec67c17fc8c5a3d7",
+  "implementation_tree": "93cfd6e656c8e22dc8db60dda6163f29fb462bf0",
+  "implementation_branch": "oce",
+  "observed_git_branch": "oce",
+  "trusted_ci_ref": "oce",
+  "branch_provenance": "git-symbolic-ref",
+  "checkout_state": "attached",
+  "evidence_commit": null,
+  "gate_status": "READY_FOR_OPERATOR_REVIEW",
+  "totals": {
+    "PASS": 35,
+    "FAIL": 0,
+    "BLOCKED": 0,
+    "SKIPPED": 0,
+    "total": 35
+  },
+  "unresolved_blockers": [],
+  "cost_impact_usd": 0,
+  "cloud_mutations": 0,
+  "next_authorized_action": "Operator review of B1-I1R3H evidence"
+}
