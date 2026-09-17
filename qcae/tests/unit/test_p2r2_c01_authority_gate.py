@@ -326,16 +326,18 @@ class TestCompositionRootWiring:
         result = rt.engine.execute_step(lease, worker_id="id-worker-runtime")
         assert result.status is WorkerStatus.SUCCESS
 
-        # Unknown principal on a fresh job: policy denies.
+        # Unknown principal on a fresh job: identity binding refuses the
+        # claim outright (P2-R3-C04) — policy string-matching never grants
+        # an unregistered identity execution authority.
+        from qcae.core.errors import QcaeValidationError
+
         job2 = _job("job-aaaaaaaa")
         step2 = _step("s-1", job_id="job-aaaaaaaa")
         rt.engine.submit(job2, [step2])
         rt.engine.mark_running(job2.job_id)
         rt.engine.ready_steps(job2.job_id)
-        lease2 = rt.engine.lease_next(job2.job_id, "ghost")
-        result2 = rt.engine.execute_step(lease2)
-        assert result2.status is WorkerStatus.FAILED
-        assert result2.failure_class == "POLICY_DENIED"
+        with pytest.raises(QcaeValidationError, match="unknown identity"):
+            rt.engine.lease_next(job2.job_id, "ghost")
 
     def test_identity_registration_is_idempotent(self, tmp_path):
         rt1 = build_local_runtime(tmp_path / "m4.sqlite3")

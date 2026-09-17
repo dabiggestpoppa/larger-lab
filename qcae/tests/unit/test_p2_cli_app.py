@@ -118,13 +118,16 @@ class TestAppService:
         assert result.status.value == "SUCCESS"
 
     def test_run_step_unknown_principal_fails_closed(self, app):
-        """A lease claimed by an identity with no policy rule cannot execute."""
+        """An unregistered principal fails closed BEFORE the claim (P2-R3-C04):
+        no lease, no RUNNING step, no policy round-trip."""
         app.submit_job(_job(), [_step("s-1")])
-        app._rt.service.mark_running("job-12345678")
-        result = app.job_run_step("job-12345678", "ghost-worker")
-        assert result is not None
-        assert result.status.value == "FAILED"
-        assert result.failure_class == "POLICY_DENIED"
+        with pytest.raises(Exception) as excinfo:
+            app.job_run_step("job-12345678", "ghost-worker")
+        assert "unknown identity" in str(excinfo.value)
+        # Nothing mutated: the step never left its queued-side state.
+        view = app.job_status("job-12345678")
+        statuses = {s.step_id: s.status.value for s in view["steps"]}
+        assert statuses["job-12345678:s-1"] != "RUNNING"
 
     def test_authority_decision_via_app(self, app):
         from qcae.core.decisions.authority import AuthorityRequest, PolicyAction

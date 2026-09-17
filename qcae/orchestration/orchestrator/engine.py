@@ -90,6 +90,7 @@ class OrchestratorEngine:
         budget_service: Optional["BudgetService"] = None,
         authority_gate: Optional[StepAuthorityGate] = None,
         authority_request_sink: Optional[AuthorityRequestSink] = None,
+        identity_provider=None,
     ) -> None:
         self._store = runtime_store
         self._queue = queue
@@ -97,6 +98,12 @@ class OrchestratorEngine:
         self._workers = workers or {}
         self._emit = event_emitter or (lambda event, payload: None)
         self._budgets = budget_service
+        # P2-R3-C04 (finding E): identity provenance for lease/execute. The
+        # provider is duck-typed (a ``require(identity_id)`` method) so the
+        # orchestrator does not import governance; the composition root
+        # wires the real provider. Unknown principals fail closed BEFORE
+        # any claim or state mutation — string matching is not identity.
+        self._identity = identity_provider
         # P2-R2-C01: authority is part of the execution path. No gate means
         # nothing executes (fail closed) — governance is wired explicitly at
         # the composition root, never implicitly absent.
@@ -262,6 +269,20 @@ class OrchestratorEngine:
             )
         return out
 
+    # -- identity ------------------------------------------------------------
+
+    def require_worker_identity(self, worker_id: str) -> None:
+        """Prove ``worker_id`` exists in the identity provider (P2-R3-C04).
+
+        Called before lease creation and before execution. With no provider
+        wired (bare engine in legacy composition), identity binding still
+        holds through the lease-owner/principal equality check in
+        ``execute_step`` — the provider is defense in depth, not the only
+        gate.
+        """
+        if self._identity is not None:
+            self._identity.require(worker_id)
+
     def eligible_steps_for_claim(self, job_id: str) -> List[RuntimeStep]:
         """READY steps of one job a lease could currently grant.
 
@@ -288,7 +309,11 @@ class OrchestratorEngine:
 
         Budget gate: an exhausted job budget blocks leasing (BudgetExhausted
         is surfaced as an explicit failure, never silent continuation).
+        Identity gate (P2-R3-C04): an unregistered principal fails closed
+        BEFORE any claim row exists — policy string-matching never confers
+        execution authority on an unknown identity.
         """
+        self.require_worker_identity(worker_id)
         if self._budgets is not None:
             job_budget = self._budgets.snapshot(f"bud-{job_id}")
             if job_budget is not None and job_budget.state is BudgetState.EXHAUSTED:
@@ -391,6 +416,18 @@ class OrchestratorEngine:
             raise QcaeValidationError("lease token does not match current owner")
 
         principal = worker_id or lease.lease_owner or "unknown-worker"
+        # P2-R3-C04: claim principal == execution principal. A worker cannot
+        # claim under A and execute under B; the durable lease owner is the
+        # provenance of authority for this attempt.
+        current_owner_check = self._store.read_lease_columns(step.step_id)
+        if current_owner_check is not None and current_owner_check["lease_owner"] \
+                and principal != current_owner_check["lease_owner"]:
+            raise QcaeValidationError(
+                f"execution principal {principal!r} does not match the lease "
+                f"owner {current_owner_check['lease_owner']!r}; identity binding "
+                "refuses the swap"
+            )
+        self.require_worker_identity(principal)
         job = self._require_job(step.job_id)
         verdict = self._authority_gate.evaluate_step_authority(
             step, job, worker_id=principal
