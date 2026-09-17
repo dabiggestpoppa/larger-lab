@@ -184,10 +184,42 @@ def build_local_runtime(
 class QcaeApp:
     """Stable application-service boundary (Book V 13.7 CLI/API)."""
 
-    def __init__(self, runtime: LocalRuntime) -> None:
+    def __init__(self, runtime: LocalRuntime, *, clock=None) -> None:
         self._rt = runtime
+        self._clock = clock or (lambda: __import__("datetime").datetime.now(
+            __import__("datetime").timezone.utc
+        ).strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     # -- jobs ----------------------------------------------------------------
+
+    def job_submit(self, submission, *, submitted_by: Optional[str] = None):
+        """Validate + durably submit a canonical JobSubmission (P2-R2-C04).
+
+        Validation precedes persistence (malformed input persists nothing);
+        persistence is the engine's atomic path (no partial submission).
+        """
+        from qcae.interfaces.submission import (
+            make_submission_job,
+            make_submission_steps,
+        )
+
+        submission.validate()
+        if submitted_by is not None:
+            self._rt.identity.require(submitted_by)
+        elif submission.submitted_by:
+            self._rt.identity.require(submission.submitted_by)
+        clock = self._clock
+        job_id = f"job-{submission.job_kind}-{submission.idempotency_key}"
+        if not job_id.replace("-", "").isalnum():
+            raise QcaeValidationError(
+                "submission idempotency_key/job_kind must be slug-safe"
+            )
+        job = make_submission_job(submission, created_at=clock(), job_id=job_id)
+        steps = make_submission_steps(submission, created_at=clock(), job_id=job_id)
+        return self._rt.service.submit(
+            job, steps, submitted_by=submitted_by or submission.submitted_by or None,
+            not_before=submission.not_before,
+        )
 
     def submit_job(self, job, steps, *, submitted_by=None, not_before=""):
         return self._rt.service.submit(job, steps, submitted_by=submitted_by, not_before=not_before)

@@ -58,6 +58,22 @@ def _print(payload) -> None:
     print(json.dumps(payload, indent=2, default=str))
 
 
+def _parse_step_specs(specs):
+    """Parse 'id:type[:dep1,dep2]' step specs into canonical dicts."""
+    parsed = []
+    for spec in specs:
+        parts = spec.split(":")
+        if len(parts) < 2 or not parts[0] or not parts[1]:
+            raise ValueError(
+                f"invalid step spec {spec!r}; expected 'id:type[:dep1,dep2]'"
+            )
+        deps = parts[2].split(",") if len(parts) > 2 and parts[2] else []
+        parsed.append({
+            "step_id": parts[0], "step_type": parts[1], "dependencies": deps,
+        })
+    return parsed
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="qcae", description="QCAE standalone runtime CLI"
@@ -68,6 +84,17 @@ def build_parser() -> argparse.ArgumentParser:
     job = sub.add_parser("job", help="job operations")
     job_sub = job.add_subparsers(dest="job_command", required=True)
     job_sub.add_parser("list", help="list jobs")
+
+    submit = job_sub.add_parser("submit", help="submit a bounded job (canonical)")
+    submit.add_argument("--kind", required=True, help="job kind (e.g. discovery)")
+    submit.add_argument("--subject", required=True, help="subject capability/candidate id")
+    submit.add_argument("--key", required=True, help="submission idempotency key")
+    submit.add_argument(
+        "--step", action="append", required=True,
+        help="step spec 'id:type[:dep1,dep2]' (repeatable; order = graph)",
+    )
+    submit.add_argument("--submitted-by", default="id-operator-local")
+    submit.add_argument("--not-before", default="")
 
     status = job_sub.add_parser("status", help="inspect a job")
     status.add_argument("job_id")
@@ -120,6 +147,21 @@ def _dispatch(app: QcaeApp, args) -> int:
     if args.command == "job":  # noqa: SIM114 - readable argparse dispatch
         if args.job_command == "list":
             _print(app.job_list())
+        elif args.job_command == "submit":
+            try:
+                steps = _parse_step_specs(args.step)
+                from qcae.interfaces.submission import JobSubmission
+
+                job = app.job_submit(JobSubmission(
+                    job_kind=args.kind, subject_ref=args.subject,
+                    idempotency_key=args.key, steps=steps,
+                    submitted_by=args.submitted_by,
+                    not_before=args.not_before,
+                ), submitted_by=args.submitted_by)
+                _print(job)
+            except Exception as exc:
+                print(f"submission rejected: {exc}", file=sys.stderr)
+                return 2
         elif args.job_command == "status":
             view = app.job_status(args.job_id)
             if view is None:
