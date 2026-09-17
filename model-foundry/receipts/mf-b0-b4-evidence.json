@@ -50,7 +50,7 @@
       "SRC_NEWS_ALPHA",
       "SRC_NEWS_ALPHA_MIRROR"
     ],
-    "registry_digest": "sha256:479ea7d31d31a1d6dc55f2ccd8d5d318df9c1152c94c3c08f2d459918f34f8b6",
+    "registry_digest": "sha256:2ce1ce0ef5f985e94b4374b00b626aea447293214b70a99e61c1b01e3ca4b533",
     "rights_blocked": {
       "SRC_PROHIBITED": "EXCLUDED_BY_POLICY",
       "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
@@ -228,7 +228,6 @@
     "lineage_fingerprint": "sha256:1b731fac408ceddab1aebb97b2d00e4e0a32869d268dfd6614abe68083dcacad",
     "manifest_fingerprint": "sha256:c042cb71516aeed67b699360bd6a62e2f59aaeb5d081d7e56e4ab2c3498a2cb6",
     "receipt_fingerprint": "sha256:7fab4c33803cdb7ae4baef0f0d37918f6302ab0ced3e50239c203ec7c98a3a02",
-    "recorded_utc": "2026-09-17T19:48:54+00:00",
     "role": "TRAIN_CPT",
     "subject": "ds.evidence.train.v0"
   },
@@ -654,7 +653,7 @@
     "NEGATIVE RESULT != FAILED PROJECT",
     "UNKNOWN != FAVORABLE"
   ],
-  "evidence_fingerprint": "sha256:1ea9bacc96e7e4d5d99d16abb5b125060a217234dabedf47644dfb389a0bdfbb",
+  "evidence_fingerprint": "sha256:a6128ccc11c0fe5ccf13d0760931b8db527994d83e0d7df712c09a729d982441",
   "external_operations": {
     "capital_operations": 0,
     "cloud_mutations": 0,
@@ -670,6 +669,8 @@
     "no provider adapter performs live reads in this build",
     "no model was trained; nothing here is a capability claim"
   ],
+  "note": "replay-stable: wall-clock receipt timestamps are excluded from the fingerprint",
+  "receipt_timestamps_excluded": true,
   "scientific_integrity": {
     "cerebus_exposures": 0,
     "contamination_edges": 4,
@@ -772,5 +773,6 @@
       "replacement_condition": "replace when generic workflow service exists",
       "retirement_evidence": "experiment runs admitted through canonical workflow nodes"
     }
-  ]
+  ],
+  "verdict": "PASS"
 }

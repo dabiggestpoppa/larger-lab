@@ -230,11 +230,17 @@ def utc_now_iso() -> str:
 
 @dataclass
 class Receipt:
-    """Truthful record of what a Foundry operation actually did."""
+    """Truthful record of what a Foundry operation actually did.
+
+    ``recorded_utc`` is captured when the receipt is *created*, not when it is
+    serialized: re-printing a receipt must never rewrite the event time or the
+    fingerprint.
+    """
 
     kind: str
     subject: str
     payload: dict[str, Any] = field(default_factory=dict)
+    recorded_utc: str = field(default_factory=utc_now_iso)
 
     def to_dict(self) -> dict[str, Any]:
         body = {
@@ -242,7 +248,7 @@ class Receipt:
             "subject": self.subject,
             **self.payload,
         }
-        body.setdefault("recorded_utc", utc_now_iso())
+        body["recorded_utc"] = body.pop("recorded_utc", self.recorded_utc)
         body["receipt_fingerprint"] = fingerprint(
             {k: v for k, v in body.items() if k != "recorded_utc"}
         )
@@ -284,6 +290,19 @@ class VersionedEntry:
             "record_fingerprint": fingerprint(record),
             "record": record,
         }
+
+    def digest_payload(self) -> dict[str, Any]:
+        """Entry content for fingerprinting, with wall-clock time removed.
+
+        A registry digest must answer "is this the same registry?", not "when was
+        it read?". Recorded timestamps stay in the serialized record for humans;
+        they are excluded from every digest, exactly as receipts exclude their own
+        ``recorded_utc``.
+        """
+
+        payload = self.to_dict()
+        payload.pop("recorded_utc", None)
+        return payload
 
 
 class VersionedRegistry:
@@ -339,7 +358,7 @@ class VersionedRegistry:
     def digest(self) -> str:
         return fingerprint(
             {
-                key: [entry.to_dict() for entry in entries]
+                key: [entry.digest_payload() for entry in entries]
                 for key, entries in self._history.items()
             }
         )

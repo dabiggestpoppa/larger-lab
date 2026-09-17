@@ -90,7 +90,7 @@
     "criteria_frozen_before_outcomes": true,
     "exposure_at_freeze": 2,
     "freeze_reason": "criteria frozen before any candidate outcome existed",
-    "frozen_utc": "2026-09-17T19:48:53+00:00",
+    "frozen_utc": "2026-01-03T00:00:00Z",
     "protocol": {
       "author": "foundry.evaluation.fixture",
       "baseline_reference": "baseline://research-bench-v0/naive-retrieval",
@@ -120,7 +120,7 @@
       ],
       "fingerprint": "sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35",
       "framework_lock": null,
-      "frozen_at_utc": "2026-09-17T19:48:53+00:00",
+      "frozen_at_utc": "2026-01-03T00:00:00Z",
       "metrics": [
         {
           "description": "fraction of items answered correctly",
@@ -167,7 +167,7 @@
   "negative_knowledge": {
     "kind": "negative_knowledge.store",
     "receipt_fingerprint": "sha256:34697a7fe082daef23f09c4830573ad0a8cab79432cbaeb6b145f1f8c96d71f3",
-    "recorded_utc": "2026-09-17T19:48:53+00:00",
+    "recorded_utc": "2026-09-17T20:00:17+00:00",
     "reopens": [],
     "results": [
       {
@@ -265,7 +265,7 @@
       }
     ],
     "receipt_fingerprint": "sha256:dc584bf5523078595d5525eacf0c24b6457105c678b1fde6482ab2d09d9304bc",
-    "recorded_utc": "2026-09-17T19:48:53+00:00",
+    "recorded_utc": "2026-09-17T20:00:17+00:00",
     "refusals": [
       {
         "actor": "builder-agent",

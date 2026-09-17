@@ -24,7 +24,7 @@
   "doctrine_bearing": [
     "SRC_CEREBUS_RULES"
   ],
-  "registry_digest": "sha256:357188b2976eccf8bdd2114892fb431433667c6c2e6a7a477fbd3c7e905b7399",
+  "registry_digest": "sha256:2ce1ce0ef5f985e94b4374b00b626aea447293214b70a99e61c1b01e3ca4b533",
   "rights_blocked": {
     "SRC_PROHIBITED": "EXCLUDED_BY_POLICY",
     "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",

@@ -38,7 +38,7 @@
       "kind": "dataset.refused",
       "negative_result_recorded": true,
       "receipt_fingerprint": "sha256:f353da2e025b6dc284b8f27f540d634c75bfa09886bfa2e3e339acf1de372ee6",
-      "recorded_utc": "2026-09-17T19:48:53+00:00",
+      "recorded_utc": "2026-09-17T20:00:17+00:00",
       "subject": "ds.market.pit.v0"
     }
   },
@@ -64,7 +64,7 @@
       "kind": "dataset.refused",
       "negative_result_recorded": true,
       "receipt_fingerprint": "sha256:7fb8b32997356d77cf82fa45438ad55e8b3ce9722cd57e6b1bd2d2460ae56d50",
-      "recorded_utc": "2026-09-17T19:48:53+00:00",
+      "recorded_utc": "2026-09-17T20:00:17+00:00",
       "subject": "ds.secret.v0"
     }
   },
@@ -243,7 +243,7 @@
       "lineage_fingerprint": "sha256:79a42d18d2bc79243a89072043363ba608e635e5f1037f4ef82756a25f2636bb",
       "manifest_fingerprint": "sha256:c4c4ae6fb8574827ae099866422088cc417edb175d21fcfbb80bed0a7292f2e5",
       "receipt_fingerprint": "sha256:a0c7b806197589c12c7dcb4be29753dbdf501e011c10f0c1c8a892b48e63fc39",
-      "recorded_utc": "2026-09-17T19:48:53+00:00",
+      "recorded_utc": "2026-09-17T20:00:17+00:00",
       "role": "TRAIN_CPT",
       "subject": "ds.tier0.cpt.v0"
     }
@@ -270,7 +270,7 @@
       "kind": "dataset.refused",
       "negative_result_recorded": true,
       "receipt_fingerprint": "sha256:9785d48f3968fb81ecf828caeb60762aa0d91937b1e789cef284614fdef97d8a",
-      "recorded_utc": "2026-09-17T19:48:53+00:00",
+      "recorded_utc": "2026-09-17T20:00:17+00:00",
       "subject": "ds.withheld.v0"
     }
   }

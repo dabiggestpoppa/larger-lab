@@ -211,6 +211,7 @@ def cmd_b4_run(_: argparse.Namespace) -> int:
         freeze_reason="criteria frozen before any candidate outcome existed",
         candidate_outcomes_observed=False,
         actor_is_builder=False,
+        now_iso="2026-01-03T00:00:00Z",  # fixture clock: receipts must be replayable
     )
     observations = (
         EvaluationObservation("accuracy", 0.71, item_count=6, seed=1),
@@ -346,8 +347,26 @@ def cmd_cross_block(_: argparse.Namespace) -> int:
     return 0 if report["verdict"] == "PASS" else 1
 
 
-def cmd_evidence(_: argparse.Namespace) -> int:
-    """Aggregate the whole build into one reviewable evidence artifact."""
+def _strip_run_timestamps(value: Any) -> Any:
+    """Remove wall-clock stamps so a replay produces an identical digest.
+
+    Event time is recorded in the receipts themselves; it must not change the
+    fingerprint of the evidence that describes the substrate.
+    """
+
+    if isinstance(value, dict):
+        return {
+            key: _strip_run_timestamps(item)
+            for key, item in value.items()
+            if key != "recorded_utc"
+        }
+    if isinstance(value, list):
+        return [_strip_run_timestamps(item) for item in value]
+    return value
+
+
+def evidence_payload() -> dict[str, Any]:
+    """Aggregate the whole build into one reviewable, replay-stable artifact."""
 
     from .boundary import mf_b0_gate_report
     from .cross_block import cross_block_report
@@ -381,6 +400,7 @@ def cmd_evidence(_: argparse.Namespace) -> int:
     cross = cross_block_report()
     payload: dict[str, Any] = {
         "generated_by": "python -m foundry.cli evidence",
+        "note": "replay-stable: wall-clock receipt timestamps are excluded from the fingerprint",
         "blocks": ["MF-B0", "MF-B1", "MF-B2", "MF-B3", "MF-B4"],
         "constitution_fingerprint": CONSTITUTION.fingerprint,
         "doctrine": list(FOUNDRY_DOCTRINE),
@@ -439,13 +459,23 @@ def cmd_evidence(_: argparse.Namespace) -> int:
             "no model was trained; nothing here is a capability claim",
         ],
     }
+    payload["receipt_timestamps_excluded"] = True
+    payload = _strip_run_timestamps(payload)
     payload["evidence_fingerprint"] = fingerprint(payload)
+    payload["verdict"] = "PASS" if (gate["verdict"] == "PASS" and cross["verdict"] == "PASS") else "FAIL"
+    return payload
+
+
+def cmd_evidence(_: argparse.Namespace) -> int:
+    """Write the evidence package to receipts and to the docs tree."""
+
+    payload = evidence_payload()
     _emit("mf-b0-b4-evidence", payload)
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
     write_json(EVIDENCE_DIR / "MF_B0_B4_EVIDENCE.json", payload)
     print(f"wrote {EVIDENCE_DIR / 'MF_B0_B4_EVIDENCE.json'}")
     print(f"evidence fingerprint: {payload['evidence_fingerprint']}")
-    return 0 if (gate["verdict"] == "PASS" and cross["verdict"] == "PASS") else 1
+    return 0 if payload["verdict"] == "PASS" else 1
 
 
 def cmd_report(_: argparse.Namespace) -> int:

@@ -245,8 +245,14 @@ def freeze_protocol(
     freeze_reason: str,
     candidate_outcomes_observed: bool,
     actor_is_builder: bool,
+    now_iso: str | None = None,
 ) -> FrozenEvaluationProtocol:
-    """Freeze criteria. A protocol cannot be frozen after peeking at outcomes."""
+    """Freeze criteria. A protocol cannot be frozen after peeking at outcomes.
+
+    ``now_iso`` exists so a replay can freeze on a fixed clock and produce
+    byte-identical receipts; the real clock is only used when a caller does not
+    supply one.
+    """
 
     if not str(freeze_reason).strip():
         raise PolicyBlocked("FREEZE_REASON_REQUIRED", "a freeze must record why it happens")
@@ -265,10 +271,11 @@ def freeze_protocol(
             "DECISION_RULES_REQUIRED",
             "a protocol without pre-declared decision rules cannot support a conclusion",
         )
-    frozen = replace(protocol, frozen_at_utc=utc_now_iso())
+    stamp = now_iso or utc_now_iso()
+    frozen = replace(protocol, frozen_at_utc=stamp)
     return FrozenEvaluationProtocol(
         protocol=frozen,
-        frozen_utc=frozen.frozen_at_utc or utc_now_iso(),
+        frozen_utc=frozen.frozen_at_utc or stamp,
         freeze_reason=freeze_reason,
         exposure_at_freeze=protocol.benchmark.exposure_count,
         registrar=registrar,
@@ -858,6 +865,7 @@ class NegativeKnowledgeStore:
         new_evidence_ref: str | None,
         actor: str,
         operator_approval_ref: str | None = None,
+        now_iso: str | None = None,
     ) -> dict[str, Any]:
         """Reopening requires new evidence; a bare wish is not a reopen condition."""
 
@@ -876,7 +884,7 @@ class NegativeKnowledgeStore:
             "prior_conclusion": result.conclusion.value,
             "scope": result.scope,
             "provenance_preserved": True,
-            "recorded_utc": utc_now_iso(),
+            "recorded_utc": now_iso or utc_now_iso(),
         }
         self._reopens.append(record)
         self._results[negative_id] = replace(result, reopen_state="REOPENED")
