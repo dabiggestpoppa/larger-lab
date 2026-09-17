@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P2 — FROZEN / REPAIRED (P2-R1; LOCAL TEST EVIDENCE: 921/921 at `ea493b8e`)** — Job Runtime + Local Governance with operator-directed C07R repair tranche complete; **P3 NOT started**
+**P2 — REPAIR OPEN: P2-R2 governance-wiring tranche (operator-directed)** — C07R structural repairs were sealed in P2-R1; operator review of `a8b20a6c` found the governance *wiring* layer incomplete: authority/approval/policy decisions were not operationally bound into normal step execution. **P3 NOT started**
 
 Prior phases: P0 FROZEN+RECONCILED · P0-A001 FROZEN · P1 FROZEN / OPERATOR-REVIEWED + R1 COMPLETE (incl. ADR-0007 identity/revision repair).
 
@@ -35,6 +35,51 @@ Prior phases: P0 FROZEN+RECONCILED · P0-A001 FROZEN · P1 FROZEN / OPERATOR-REV
 
 All directive §44 criteria satisfied with committed evidence: durable jobs/steps with explicit transitions; graph dependencies (A→B→C and fan-out/fan-in) proven; queue uses single-owner leases with expiry recovery; crash/restart resumes without repeating committed steps; retries bounded by class and max_attempts; budgets conserved; local identity/policy deterministic and versioned; REQUIRE_APPROVAL blocks execution and approval scope cannot be laundered; secrets are references with value-free audit; Context Packets are least-context; worker handoffs typed; escalation durable; cancellation safe; P1→P2 migration preserves registry/evidence state; backup/restore preserves runtime state; runtime runs with OCE completely absent (`OCE_ABSENT`); architecture guards green (engine confined to infrastructure; core stdlib-only).Freeze manifest: `qcae/implementation/P2-freeze-manifest.json` — test results captured from an actual full-suite run by the fail-closed generator (`qcae/implementation/tools/p2_freeze_manifest.py`), never hardcoded.
 
+
+### P2-R2 — Governance-Wiring Repair Tranche (opened at reviewed head `a8b20a6c`)
+
+Operator review accepted the P2-R1 structural repairs but identified that
+local governance was built as *components* without being bound into the
+*execution path*: the engine exposed a public `authority_ok=True` bypass
+instead of evaluating the AuthorityProvider, REQUIRE_APPROVAL never reached
+WAITING_POLICY on the normal path, recovery re-evaluation was caller-modeled,
+`QcaeApp`/`RuntimeService` reached into private attributes (`service._engine`,
+`engine._workers`), and `QcaeApp` had no `job submit` (CLI could not durably
+submit a job).
+
+Repair plan (narrow commits, additive, no redesign of accepted subsystems):
+
+- **P2-R2-I0** — this audit/plan record.
+- **P2-R2-C01** — `StepAuthorityGate` port (core/ports) + engine wiring:
+  every `execute_step` evaluation is a typed provider call binding
+  principal → action → resource → scope; ALLOW / DENY / REQUIRE_APPROVAL /
+  ALLOW_WITH_CONSTRAINTS become operational (WAITING_POLICY + durable
+  AuthorityRequest; DENY = POLICY_DENIED failure); the `authority_ok`
+  bypass is removed; test gate provided for deterministic qualification.
+- **P2-R2-C02** — approval → execution round trip: REQUIRE_APPROVAL persists
+  an exact-scope AuthorityRequest, step waits in WAITING_POLICY, an operator
+  GRANT (bound to the request's exact action/resource/scope/budget) releases
+  the step to READY; deny/expiry/mismatched grant cannot execute.
+- **P2-R2-C03** — crash/recovery re-evaluation through the real provider:
+  resumed execution re-evaluates authority, so policy changes between crash
+  and resume affect the resumed run; committed/idempotent execution records
+  are preserved untouched by re-evaluation.
+- **P2-R2-C04** — canonical `JobSubmission` validation record +
+  `QcaeApp.job_submit` + CLI `qcae job submit`; durable submission across
+  CLI process close; no partial persistence (reuses the C07R3 atomic path).
+- **P2-R2-C05** — remove private-attribute leaks: `RuntimeService.mark_running`
+  public method replaces `QcaeApp`'s use of `service._engine`; registered
+  worker ids exposed via `engine.registered_worker_types()` replacing
+  `engine._workers` inspection; architecture guard test added.
+- **P2-R2-C06** — authority × budget × secrets integration: authority cannot
+  widen budget, action permission does not imply secret permission,
+  constrained grants remain constrained.
+- **P2-R2-T01** — governance adversarial qualification: DENY, approval
+  mismatch/replay/expiry, unknown principal, unknown requirement, crash +
+  changed policy, budget escalation, secret escalation, CLI bypass attempts,
+  full regression.
+- **P2-R2-FREEZE** — superseding freeze manifest (P2 and P2-R1 manifests
+  preserved), fail-closed test capture, ledger update.
 
 ### P2 — Job Runtime + Local Governance (opened)
 
