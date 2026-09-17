@@ -1,5 +1,6 @@
 """Book 3 — local worker supervisor and operator controls (B3-C7)."""
 from __future__ import annotations
+import json
 import pathlib
 import sys
 import time
@@ -80,3 +81,51 @@ class TestSupervisor:
         assert "capabilities" in view
         assert "sessions" in view and "workers" in view
         assert view["cloud"] == "dormant"
+
+
+def _state_doc(admitted):
+    return json.dumps({"workers": [], "admitted": admitted,
+                       "capabilities": [],
+                       "saved_at": "2026-01-01T00:00:00Z"})
+
+
+def _symlinks_available(tmp_path):
+    """Same truthful probe the path-authority suite uses: Windows without
+    SeCreateSymbolicLinkPrivilege cannot create one, Linux CI always can."""
+    probe = tmp_path / "probe-link"
+    try:
+        probe.symlink_to(tmp_path / "probe-target")
+    except (OSError, NotImplementedError):
+        return False
+    probe.unlink()
+    return True
+
+
+class TestStateFileContainment:
+    """B4-CXR7U9R14 containment on the durable-admission read sink.
+
+    The sink itself (not only the CLI fence) must hold: a state file whose
+    real path leaves the operator-fenced runtime directory is not read, so
+    a relocated or symlinked state document can never inject admissions.
+    """
+
+    def test_state_file_inside_the_runtime_dir_is_adopted(self, tmp_path):
+        runtime = tmp_path / "runtime"
+        runtime.mkdir()
+        (runtime / "state.json").write_text(_state_doc(["wkr-keep"]),
+                                           encoding="utf-8")
+        sup = WorkerSupervisor(runtime, WorkerAuthority(CapabilityRegistry()))
+        assert "wkr-keep" in sup.operator_view()["admitted"]
+
+    def test_state_file_resolving_outside_the_runtime_dir_is_refused(self, tmp_path):
+        if not _symlinks_available(tmp_path):
+            pytest.skip("no symlink privilege in this environment")
+        elsewhere = tmp_path / "elsewhere.json"
+        elsewhere.write_text(_state_doc(["wkr-outside"]), encoding="utf-8")
+        runtime = tmp_path / "runtime"
+        runtime.mkdir()
+        (runtime / "state.json").symlink_to(elsewhere)
+        sup = WorkerSupervisor(runtime, WorkerAuthority(CapabilityRegistry()))
+        assert sup.operator_view()["admitted"] == [], (
+            "a state file that resolves outside the fenced runtime dir must "
+            "start empty, not adopt the outside admissions")

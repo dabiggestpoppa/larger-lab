@@ -163,3 +163,47 @@ def test_denial_envelope_rejects_invalid_reason():
     }
     ok, _ = validate(instance, schema)
     assert not ok
+
+
+# ── B4-CXR7U9R12: the pattern-input bound is real, not decorative ────────
+def test_pattern_is_never_run_on_over_bound_input(monkeypatch):
+    """An instance longer than the bound is refused BEFORE the regex runs.
+
+    The rule that flags this sink (a schema-supplied pattern matched against
+    caller-supplied text) cannot see the length guard from outside, so the
+    guard is proven here instead: the module's own `re.match` is replaced by
+    a recorder that fails the test if it is ever reached.
+    """
+    import oce_control.schema_validator as sv
+
+    reached = []
+
+    def recorder(pattern, string, *a, **kw):
+        reached.append((pattern, len(string)))
+        raise AssertionError("the pattern must not run on over-bound input")
+
+    monkeypatch.setattr(sv.re, "match", recorder)
+    over = "x" * (sv._MAX_PATTERN_INPUT + 1)
+    errors = sv._validate_string(over, {"pattern": "^(a|aa)+$"}, "$.field")
+    assert reached == [], reached
+    assert any("exceeds pattern-input bound" in e for e in errors), errors
+
+
+def test_pattern_still_runs_and_decides_within_the_bound(monkeypatch):
+    """Positive control: at or under the bound the pattern is evaluated and
+    still decides the outcome, so the guard bounds work without weakening it."""
+    import oce_control.schema_validator as sv
+
+    seen = []
+    real_match = sv.re.match
+
+    def recorder(pattern, string, *a, **kw):
+        seen.append((pattern, string))
+        return real_match(pattern, string, *a, **kw)
+
+    monkeypatch.setattr(sv.re, "match", recorder)
+    at_bound = "a" * sv._MAX_PATTERN_INPUT
+    assert sv._validate_string(at_bound, {"pattern": "^a+$"}, "$.field") == []
+    assert seen, "the pattern must be evaluated within the bound"
+    bad = sv._validate_string("b", {"pattern": "^a+$"}, "$.field")
+    assert any("does not match pattern" in e for e in bad), bad
