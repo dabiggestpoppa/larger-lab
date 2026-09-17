@@ -633,3 +633,176 @@ def test_gate_rejects_ci_skips_even_with_green_totals(tmp_path):
     write_json(ev / "test-summary.json", d)
     _refresh_manifest(ev)
     run_gate(ev, expect_fail=True)
+
+
+# ── R24: CI tool bootstrap and truthful failure evidence ─────────────────
+REPO_ROOT = BASE_DIR.parents[1]
+B1_WORKFLOWS = ("b1-i1r-validation.yml", "b1-i1r3-validation.yml")
+GITLEAKS_REL = "infrastructure/cloud-ground/scripts/install-gitleaks.sh"
+# Independently recomputed from the upstream release asset (2,891,432 bytes)
+# before it was written into the installer.
+GITLEAKS_SHA256 = "3e157a26081e296d4cb94ef0d87441c9afc5f392cb02957656dd5cfeb7aaf6c9"
+ANSIBLE_LOCK_REL = "infrastructure/cloud-ground/requirements-ansible.lock.txt"
+ANSIBLE_INSTALL_CMD = ("pip install --require-hashes --only-binary ':all:' -r "
+                       + ANSIBLE_LOCK_REL)
+
+
+def _workflow_text(name):
+    return (REPO_ROOT / ".github" / "workflows" / name).read_text(encoding="utf-8")
+
+
+def _installer_text():
+    return (REPO_ROOT / GITLEAKS_REL).read_text(encoding="utf-8")
+
+
+def _active_lines(text):
+    """Lines that do something: comments and blank lines are excluded, so a
+    regression test cannot be satisfied by prose alone."""
+    return [ln for ln in text.splitlines()
+            if ln.strip() and not ln.strip().startswith("#")]
+
+
+def test_ci_gitleaks_install_path_is_shared_and_redirect_capable():
+    """Both B1 workflows install Gitleaks through one installer, and no
+    workflow reintroduces the redirect-hostile wget form that made run
+    35169053088 die with exit code 8 before anything was installed."""
+    for name in B1_WORKFLOWS:
+        wf = _workflow_text(name)
+        active = "\n".join(_active_lines(wf))
+        assert "install-gitleaks.sh" in active, (
+            f"{name} must use the shared verified installer")
+        assert "wget" not in active, (
+            f"{name} must not fetch tool archives itself (the redirect-hostile "
+            "wget form is what failed in run 35169053088)")
+        assert "max-redirect" not in active
+        assert "releases/download/" not in active, (
+            f"{name} must not carry its own download URL: the URL and its "
+            "checksum belong to the single installer")
+    installer = _installer_text()
+    assert GITLEAKS_SHA256 in installer, "installer must pin the digest"
+    assert "GITLEAKS_VERSION=8.18.1" in installer, "installer must pin the version"
+    assert ("https://github.com/gitleaks/gitleaks/releases/download/"
+            "v${GITLEAKS_VERSION}/${GITLEAKS_ASSET}") in installer, (
+        "the release URL must be built from the pinned version and asset name")
+    assert "curl -fsSL" in installer, "fetch must follow redirects and fail closed"
+    assert "--proto '=https'" in installer, "fetch must be HTTPS only"
+    assert "http://" not in installer, "no cleartext fetch anywhere"
+
+
+def test_gitleaks_installer_verifies_digest_before_extraction():
+    """The digest is the trust anchor: it is checked before any extraction,
+    nothing is fetched from the network to establish trust, and the archive
+    is unpacked outside the repository."""
+    installer = _installer_text()
+    verify_at = installer.index("sha256sum")
+    extract_at = installer.index("tar xzf")
+    assert verify_at < extract_at, "checksum must be verified BEFORE extraction"
+    assert "exit 1" in installer[verify_at:extract_at], (
+        "a digest mismatch must abort non-zero before extraction")
+    assert "mktemp -d" in installer, "work must happen outside the repo"
+    assert '-C "$tmp"' in installer, (
+        "the release's own README/LICENSE must not land in the checkout")
+    for fetched in ("sha256sum.txt", "checksums", "SHASUMS"):
+        assert fetched not in installer, (
+            "a checksum downloaded at install time is not a trust anchor")
+    fetches = [ln for ln in _active_lines(installer) if "curl " in ln]
+    assert len(fetches) == 1, (
+        f"exactly one network fetch: the archive itself, got {fetches}")
+
+
+def _stub_installer_env(tmp_path, archive_bytes):
+    """A PATH whose curl writes `archive_bytes` and whose tar records that it
+    ran. The real sha256sum decides, so verification is genuinely exercised."""
+    stub = tmp_path / "stub"
+    stub.mkdir()
+    (stub / "curl").write_text(
+        '#!/bin/sh\n'
+        'out=\n'
+        'while [ $# -gt 0 ]; do\n'
+        '  case "$1" in -o) out=$2; shift 2 ;; *) shift ;; esac\n'
+        'done\n'
+        'cp "$STUB_ARCHIVE" "$out"\n', encoding="utf-8")
+    (stub / "tar").write_text(
+        '#!/bin/sh\n'
+        'printf ran > "$STUB_MARKER"\n'
+        'for last in "$@"; do :; done\n'
+        'cp "$STUB_BINARY" "$last/gitleaks"\n'
+        'chmod +x "$last/gitleaks"\n', encoding="utf-8")
+    for name in ("curl", "tar"):
+        os.chmod(stub / name, 0o755)
+    archive = tmp_path / "archive.bin"
+    archive.write_bytes(archive_bytes)
+    binary = tmp_path / "gitleaks-stub"
+    binary.write_text('#!/bin/sh\necho "stub gitleaks 8.18.1"\n', encoding="utf-8")
+    os.chmod(binary, 0o755)
+    env = dict(os.environ,
+               PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}",
+               STUB_ARCHIVE=str(archive),
+               STUB_MARKER=str(tmp_path / "tar-ran"),
+               STUB_BINARY=str(binary))
+    return env
+
+
+def _run_installer(shell, tmp_path, source_text):
+    script = tmp_path / "installer.sh"
+    script.write_text(source_text, encoding="utf-8")
+    (tmp_path / "bin").mkdir(exist_ok=True)
+    return subprocess.run([shell, str(script), str(tmp_path / "bin")],
+                          capture_output=True, text=True, timeout=60,
+                          env=_stub_installer_env(tmp_path, b"tampered archive"))
+
+
+requires_shell = pytest.mark.skipif(shutil.which("sh") is None,
+                                    reason="no POSIX shell available")
+
+
+@requires_shell
+def test_gitleaks_installer_rejects_tampered_artifact_before_extraction(tmp_path):
+    """A substituted archive must abort before extraction or execution: the
+    real installer is run against a stubbed download that cannot match the
+    pinned digest, and tar must never be reached."""
+    result = _run_installer(shutil.which("sh"), tmp_path, _installer_text())
+    assert result.returncode != 0, "a digest mismatch must fail closed"
+    assert "checksum mismatch" in (result.stdout + result.stderr)
+    assert not (tmp_path / "tar-ran").exists(), (
+        "a rejected archive must never be extracted")
+    assert not (tmp_path / "bin" / "gitleaks").exists(), (
+        "a rejected archive must never be installed or executed")
+
+
+@requires_shell
+def test_gitleaks_installer_proceeds_only_on_a_matching_digest(tmp_path):
+    """Positive control for the rejection test: with the trust anchor set to
+    the real digest of the archive the stub serves, the SAME installer runs
+    through verification, extraction, installation and execution."""
+    archive = b"tampered archive"
+    text = _installer_text().replace(
+        GITLEAKS_SHA256, hashlib.sha256(archive).hexdigest())
+    assert text != _installer_text(), "the digest anchor must be replaceable"
+    result = _run_installer(shutil.which("sh"), tmp_path, text)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Checksum verified" in result.stdout
+    assert (tmp_path / "tar-ran").exists(), "a matching digest proceeds"
+    assert "stub gitleaks 8.18.1" in result.stdout, (
+        "the installed binary must be the one the verified archive provided")
+
+
+def test_ci_evidence_initialization_precedes_fallible_installs():
+    """Run identity and evidence directory exist before any step that can
+    fail, and the artifact upload can never be handed an unset path."""
+    for name in B1_WORKFLOWS:
+        wf = _workflow_text(name)
+        evidence_at = wf.index("Prepare evidence directory")
+        run_id_at = wf.index("Generate single OCE_RUN_ID")
+        assert run_id_at < wf.index("Install pinned Python dependencies"), (
+            f"{name} must generate the run id before installing anything")
+        assert evidence_at < wf.index("Install pinned Python dependencies"), (
+            f"{name} must create the evidence directory before installs")
+        assert evidence_at < wf.index("Install Gitleaks"), (
+            f"{name} must create the evidence directory before tool installs")
+        assert "run-context.json" in wf, (
+            f"{name} must bootstrap the evidence directory so the artifact is "
+            "never empty when an installer fails")
+        assert wf.count("actions/upload-artifact") == \
+            wf.count("steps.evidence.outputs.evidence_dir != ''"), (
+            f"{name} must guard every artifact upload on a present evidence path")

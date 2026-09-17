@@ -45,30 +45,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install pinned Python dependencies
-        run: pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements.lock.txt
-
-      - name: Install Ansible and ansible-lint
-        run: |
-          # ansible-compat pinned per b1-i1r3-validation.yml: newer ansible-compat
-          # drops a stray .ansible/ into the checkout and trips clean-source.
-          # B4-CXR7U9R22: install the resolved, hash-verified set. Version
-          # pins alone let a substituted artifact or a drifted transitive in.
-          pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements-ansible.lock.txt
-          ansible-galaxy collection install -r infrastructure/cloud-ground/ansible/requirements.yml
-
-      - name: Install ShellCheck and Docker Compose
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y shellcheck docker-compose-v2
-
-      - name: Install Gitleaks (outside the workspace)
-        run: |
-          mkdir -p "$RUNNER_TEMP/gitleaks"
-          wget -q --max-redirect=0 -O "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz
-          tar xzf "$RUNNER_TEMP/gitleaks/gitleaks.tar.gz" -C "$RUNNER_TEMP/gitleaks"
-          sudo mv "$RUNNER_TEMP/gitleaks/gitleaks" /usr/local/bin/
-
+      # B4-CXR7U9R24: run identity and evidence directory are created BEFORE
+      # any fallible install step.  Previously they came after the tool
+      # installs, so an installer failure (run 35169053088) left no evidence
+      # directory and the `if: always()` upload could only fail again on a
+      # non-existent path.
       - name: Generate single OCE_RUN_ID
         id: run_id
         run: |
@@ -81,7 +62,41 @@ jobs:
         run: |
           EVIDENCE_DIR="$RUNNER_TEMP/oce-evidence-${{ steps.run_id.outputs.oce_run_id }}"
           mkdir -p "$EVIDENCE_DIR"
+          # A bootstrap record is written immediately, so a failure in any
+          # later step still uploads truthful evidence rather than nothing.
+          # The runner's evidence-manifest.json hashes a fixed artifact list,
+          # so this file does not disturb the manifest.
+          printf '{"oce_run_id":"%s","repository":"%s","ref":"%s","sha":"%s","workflow":"b1-i1r-validation","event":"%s"}\n' \
+            "${{ steps.run_id.outputs.oce_run_id }}" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" "$GITHUB_EVENT_NAME" \
+            > "$EVIDENCE_DIR/run-context.json"
           echo "evidence_dir=$EVIDENCE_DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Install pinned Python dependencies
+        run: pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements.lock.txt
+
+      - name: Install Ansible and ansible-lint
+        run: |
+          # ansible-compat pinned per b1-i1r3-validation.yml: newer ansible-compat
+          # drops a stray .ansible/ into the checkout and trips clean-source.
+          # B4-CXR7U9R22: install the resolved, hash-verified set. Version
+          # pins alone let a substituted artifact or a drifted transitive in.
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements-ansible.lock.txt
+          # NOTE (B4-CXR7U9R25): requirements.yml constrains these by RANGE,
+          # not by exact version or hash -- see the honest statement in that
+          # file. This is the one CI input class R22 did not hash-lock.
+          ansible-galaxy collection install -r infrastructure/cloud-ground/ansible/requirements.yml
+
+      - name: Install ShellCheck and Docker Compose
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck docker-compose-v2
+
+      - name: Install Gitleaks (verified checksum, outside the workspace)
+        # B4-CXR7U9R24: shared installer, used identically by b1-i1r3.
+        # `wget --max-redirect=0` could never work against a GitHub release
+        # asset (GitHub redirects to the objects host), which is why run
+        # 35169053088 died here with exit code 8 before extracting anything.
+        run: sh infrastructure/cloud-ground/scripts/install-gitleaks.sh
 
       - name: Run shared authoritative validation runner
         env:
@@ -106,7 +121,10 @@ jobs:
           exit "$rc"
 
       - name: Upload evidence artifact
-        if: always()
+        # B4-CXR7U9R24: only when the evidence directory was actually created.
+        # An unset path would add a second, misleading artifact error on top of
+        # the real failure.
+        if: always() && steps.evidence.outputs.evidence_dir != ''
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
         with:
           name: b1-i1r-evidence-${{ steps.run_id.outputs.oce_run_id }}
