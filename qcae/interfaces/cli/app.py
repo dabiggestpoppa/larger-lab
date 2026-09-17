@@ -262,6 +262,11 @@ class QcaeApp:
             worker_availability_for,
         )
 
+        # P2-R3-C04: identity precedes availability (runtime chain §31:
+        # request -> identity -> policy -> authority -> budget -> queue ->
+        # worker). An unregistered principal is refused before any surface
+        # probe, regardless of worker presence.
+        self._rt.service.require_identity(worker_id)
         self._rt.service.ready_steps(job_id)
         availability = worker_availability_for(self._rt.engine, job_id)
         if availability.uncovered_step_ids and not availability.covered_step_ids:

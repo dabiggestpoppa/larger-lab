@@ -203,7 +203,9 @@ class OrchestratorEngine:
                     f'"graph_version": "{job.step_graph_version}"}}'
                 ),
             )
-        return job
+        # Return the committed truth (QUEUED), not the caller's pre-submit
+        # object — the snapshot and every reported view must agree (P2-R3-C01).
+        return self._store.get_job(job.job_id) if self._store.get_job(job.job_id) is not None else queued
 
     def mark_running(self, job_id: str) -> RuntimeJob:
         """Move CREATED -> QUEUED -> RUNNING through legal transitions.
