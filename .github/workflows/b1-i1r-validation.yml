@@ -52,7 +52,9 @@ jobs:
         run: |
           # ansible-compat pinned per b1-i1r3-validation.yml: newer ansible-compat
           # drops a stray .ansible/ into the checkout and trips clean-source.
-          pip install ansible-core==2.16.0 ansible-lint==6.22.0 ansible-compat==4.1.11
+          # B4-CXR7U9R22: install the resolved, hash-verified set. Version
+          # pins alone let a substituted artifact or a drifted transitive in.
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements-ansible.lock.txt
           ansible-galaxy collection install -r infrastructure/cloud-ground/ansible/requirements.yml
 
       - name: Install ShellCheck and Docker Compose

@@ -509,6 +509,17 @@ def test_ci_dependencies_are_pinned():
     assert "requirements-ci.lock.txt" in wf, ("workflow must install from "
                                               "the hash-locked requirements")
     assert "--require-hashes" in wf, "workflow must enforce the lock's hashes"
+    # B4-CXR7U9R22: the ansible toolchain is installed by the two b1-i1r
+    # workflows. Loose version pins there let a substituted artifact or a
+    # drifted transitive through, so they must install a hash-locked set too.
+    for name in ("b1-i1r-validation.yml", "b1-i1r3-validation.yml"):
+        i1r = (BASE_DIR.parents[1] / ".github" / "workflows" /
+               name).read_text(encoding="utf-8")
+        assert "requirements-ansible.lock.txt" in i1r, (
+            f"{name} must install the hash-locked ansible set")
+        assert "--require-hashes" in i1r, f"{name} must enforce the lock's hashes"
+        assert "pip install ansible-core==" not in i1r, (
+            f"{name} must not install the ansible tools from loose pins")
 
 
 # ── R9: final recovery truth regressions (operation index + gate) ─────────
