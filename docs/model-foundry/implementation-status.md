@@ -2,7 +2,7 @@
 
 * **Branch:** `agent/model-foundry-mf-b0-b4-build`
 * **Start SHA:** `c55e379df3de2c6bb643afc90c10c0a861fa8c8a`
-* **Tested SHA (code):** `9742cfc24d771d116b722a49c89a6006c4c81889` (the audit-closure repair commit; earlier code was tested at `07ed66173422f7b6b1ec144abd731310db174c3c`)
+* **Tested SHA (code):** `400af0291deb9ccaf34c8038f82565170a4f6f92` (earlier code was tested at `9742cfc2…` for the audit-closure repair and `07ed6617…` before it)
 * **Authoritative test command:** `cd model-foundry && PYTHONIOENCODING=utf-8 python -m pytest tests -q`
 * **Result:** `157 passed` (39 MF-B0, 19 MF-B1, 44 MF-B2/B3, 27 MF-B4, 22 boundary/cross-block, 6 determinism)
 * **Invocation from repo root also works:** `python -m pytest model-foundry/tests -q`
@@ -178,7 +178,7 @@ by test.
 * sealed-evaluation exposures: 0 (refusals recorded)
 * negative results recorded: 1 (plus 3 refused dataset builds)
 * evidence package: `evidence/MF_B0_B4_EVIDENCE.json`, fingerprint
-  `sha256:e24db2d91cd957de2f91410b3c9faeedb114caf1e51228f52d2cf42c5c14199b`
+  `sha256:77618a9a2d4341d149b0a5686653b92b8ee8cdac3c4808224d2aabb6ccc5f899`
   (replay-stable)
 
 ## Defect found and fixed during the build
@@ -237,7 +237,7 @@ is now a `BenchmarkStatus`, an unrecognised status raises
 from the declared enums instead of duplicating them; `FrozenMap` could not be
 deep-copied or pickled (`TypeError: cannot pickle 'mappingproxy' object`), which
 broke `copy.deepcopy`, `pickle`, and `dataclasses.asdict` on any record holding
-one; and eight exported helpers with no caller anywhere (`IndependenceVector`,
+one; and nine exported helpers with no caller anywhere (`IndependenceVector`,
 `digest_of_bytes`, `ResumeProof`, `resource_receipt`, `tier_of`,
 `claim_class_for`, `trust_class_admissible_for_remote`,
 `total_contamination_grade`, `fixture_registry`) were removed rather than left to

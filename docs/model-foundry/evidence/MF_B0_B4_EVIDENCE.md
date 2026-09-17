@@ -17,7 +17,7 @@ produced by that command; none is transcribed by hand from a narrative.
 | Fixture train manifest lineage | `sha256:1b731fac408ceddab1aebb97b2d00e4e0a32869d268dfd6614abe68083dcacad` |
 | Fixture benchmark | `sha256:9892b9431b095deaa6ec9bc09b9541e9314bbffd5ee840e0d6f393503c8cd280` |
 | Fixture protocol | `sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35` |
-| Evidence package | `sha256:e24db2d91cd957de2f91410b3c9faeedb114caf1e51228f52d2cf42c5c14199b` |
+| Evidence package | `sha256:77618a9a2d4341d149b0a5686653b92b8ee8cdac3c4808224d2aabb6ccc5f899` |
 
 The constitution (`0bc713f0…`), B3 lineage (`1b731fac…`), benchmark
 (`9892b943…`), protocol (`824fb9ae…`) and gate-report (`60a9694f…`) fingerprints
@@ -26,7 +26,7 @@ evidence-package fingerprints moved because a rights decision is no longer
 carried as caller-settable state, and F2's refusal detail now names the ref and
 the resolved state.
 
-Tested at commit `9742cfc24d771d116b722a49c89a6006c4c81889` by the authoritative
+Tested at commit `400af0291deb9ccaf34c8038f82565170a4f6f92` by the authoritative
 command `cd model-foundry && python -m pytest tests -q` → **157 passed** (39
 MF-B0, 19 MF-B1, 44 MF-B2/B3, 27 MF-B4, 22 boundary/cross-block, 6 determinism).
 The same command works from the repository root as
