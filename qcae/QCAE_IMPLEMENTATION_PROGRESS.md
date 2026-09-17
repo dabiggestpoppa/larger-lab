@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P2 — FROZEN / OPERATOR-REVIEWED + R1 & R2 COMPLETE (LOCAL TEST EVIDENCE: 1000/1000 at `4395aaa8`)** — Job Runtime + Local Governance; C07R structural repairs (P2-R1) and governance-wiring repairs (P2-R2) sealed; **P3 NOT started**
+**P2 — REPAIR OPEN: P2-R3 Operator Loop Closure (LOCAL TEST EVIDENCE: 1060/1060 at `205b7b46`)** — C01–C05 repairs, acceptance harness, adversarial qualification committed; freeze pending; **P3 NOT started**
 
 Prior phases: P0 FROZEN+RECONCILED · P0-A001 FROZEN · P1 FROZEN / OPERATOR-REVIEWED + R1 COMPLETE (incl. ADR-0007 identity/revision repair).
 
@@ -80,6 +80,36 @@ Repair plan (narrow commits, additive, no redesign of accepted subsystems):
   full regression.
 - **P2-R2-FREEZE** — superseding freeze manifest (P2 and P2-R1 manifests
   preserved), fail-closed test capture, ledger update.
+
+### P2-R3 — Operator Loop + Recovery + Identity Closure (REPAIR OPEN at reviewed head `a11d380a`)
+
+Post-freeze live operator testing of the P2-R2 head exposed a class of defect
+the 1000-test suite could not see: every internal subsystem passed, but the
+real operator journey was broken. Operator findings, all confirmed by audit:
+
+- **Finding A (job finalization)** — natural `submit → job run → job run`
+  left every step SUCCEEDED while the durable job stayed CREATED forever;
+  no JOB_SUCCEEDED. The finalizer only fired from an already-RUNNING job and
+  nothing promoted the job on the run path.
+- **Finding B (worker availability)** — `job run` created a lease, moved the
+  step RUNNING, then discovered no worker existed and raised a raw traceback,
+  stranding the lease. The composition root registered no workers at all.
+- **Finding C (recovery surface split)** — global recovery deleted expired
+  queue claims but left the durable step RUNNING; resume could no longer tell
+  which RUNNING steps came from expired leases. Orphan RUNNING steps (no
+  claim) were silently ignored.
+- **Finding D (active-lease preemption)** — `recover_job` force-expired claims
+  for ALL RUNNING steps regardless of TTL; recovery could steal a live lease.
+- **Finding E (unknown principal)** — policy `principal_match="id-*"` matched
+  unregistered strings; identity existence was never proven before lease or
+  execution; claim and execution principals were not bound.
+
+Repair law: one authoritative recovery owner; worker availability before any
+ownership mutation; identity before availability (request → identity →
+policy → authority → budget → queue → worker); lifecycle truth (snapshot and
+event stream must agree); CLI expected errors are typed, never tracebacks.
+Design debt (774-line engine, façade consolidation, test gates in production
+module) is RECORDED and DEFERRED to P10 preparation — not this tranche.
 
 ### P2-R2 — Governance-Wiring Repair Tranche (SEALED at `4395aaa8`)
 
