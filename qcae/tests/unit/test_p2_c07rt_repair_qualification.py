@@ -213,6 +213,15 @@ class TestCombinedFlows:
     def test_adversarial_wrong_token_cannot_advance_repaired_queue(self, env):
         """R1: the repaired claim path still enforces token-guarded acks."""
         store, queue, engine, clock, _ = env
+        # P2-R3-C02: a lease requires a registered worker; this test only
+        # exercises ack token law, so a minimal worker satisfies availability.
+        class _PresentWorker:
+            replay_safety = ReplaySafety.REPLAY_SAFE
+
+            def execute(self, request, packet):  # pragma: no cover - never runs
+                raise AssertionError("this test must not execute work")
+
+        engine.register_worker_type("GENERIC", _PresentWorker())
         engine.submit(_job(), [_step("s-1")])
         lease = _drive(store, queue, engine, clock)
         with pytest.raises(QcaeValidationError, match="not the owner"):

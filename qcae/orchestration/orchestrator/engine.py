@@ -48,10 +48,16 @@ from qcae.orchestration.authority_gate import (
     StepAuthorityGate,
     StepAuthorityVerdict,
 )
+from qcae.orchestration.orchestrator.worker_availability import WorkerUnavailableError
 from qcae.orchestration.workers.base import Worker
 from qcae.orchestration.workers.contracts import WorkerRequest, WorkerResult, WorkerStatus
 
-__all__ = ["OrchestratorEngine", "RETRYABLE_FAILURE_CLASSES", "NON_RETRYABLE_FAILURE_CLASSES"]
+__all__ = [
+    "OrchestratorEngine",
+    "RETRYABLE_FAILURE_CLASSES",
+    "NON_RETRYABLE_FAILURE_CLASSES",
+    "WorkerUnavailableError",
+]
 
 RETRYABLE_FAILURE_CLASSES = {
     FailureClass.TRANSIENT.value,
@@ -256,6 +262,27 @@ class OrchestratorEngine:
             )
         return out
 
+    def eligible_steps_for_claim(self, job_id: str) -> List[RuntimeStep]:
+        """READY steps of one job a lease could currently grant.
+
+        Readiness derivation (``ready_steps``) is the caller's first move;
+        this is the authoritative "what could actually be leased now" view:
+        READY, not_before elapsed, and no active claim. Public so worker
+        availability and the CLI can classify the surface without touching
+        lease state (P2-R3-C02).
+        """
+        now = self._clock()
+        out: List[RuntimeStep] = []
+        for step in self._store.list_steps_for_job(job_id):
+            if step.status is not RuntimeStepStatus.READY:
+                continue
+            if step.not_before and step.not_before > now:
+                continue
+            if self._queue.has_active_claim(step.step_id):
+                continue
+            out.append(step)
+        return out
+
     def lease_next(self, job_id: str, worker_id: str) -> Optional:
         """Claim the next READY step of this job for ``worker_id``.
 
@@ -269,14 +296,28 @@ class OrchestratorEngine:
                     f"job {job_id!r} budget is exhausted; refusing to lease work"
                 )
         steps = self._store.list_steps_for_job(job_id)
-        ready_ids = {s.step_id for s in steps if s.status is RuntimeStepStatus.READY}
-        if not ready_ids:
+        ready = [s for s in steps if s.status is RuntimeStepStatus.READY]
+        if not ready:
             return None
+        # P2-R3-C02 (operator-loop finding B): worker availability is known
+        # BEFORE any ownership or state mutation. Leasing without a
+        # compatible worker would strand the step RUNNING; instead the step
+        # stays READY and the caller gets a typed outcome. Coverage is
+        # per-step: covered work proceeds while uncovered steps wait READY.
+        covered_ids = {
+            s.step_id for s in ready if s.step_type in self._workers
+        }
+        if not covered_ids:
+            missing = sorted({s.step_type for s in ready})
+            raise WorkerUnavailableError(
+                f"no registered worker for step type(s) {missing}; "
+                f"nothing leased, step remains READY"
+            )
         # P2-C07R1 (directive §2.1): eligibility is enforced inside the atomic
         # claim — the queue can only ever hand back a step from this job's
         # ready set. No global claim-then-filter, no claim-then-release.
         lease = self._queue.claim_next(
-            worker_id, eligible_step_ids=ready_ids, job_id=job_id
+            worker_id, eligible_step_ids=covered_ids, job_id=job_id
         )
         if lease is None:
             return None

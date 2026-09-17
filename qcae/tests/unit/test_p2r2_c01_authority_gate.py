@@ -315,13 +315,14 @@ class TestCompositionRootWiring:
         """Registered worker principal executes; unknown principal denies."""
         clock = _Clock()
         rt = build_local_runtime(tmp_path / "m3.sqlite3", clock=clock)
+        # P2-R3-C02: availability precedes leasing, so register first.
+        rt.engine.register_worker_type("GENERIC", DeterministicSuccessWorker())
         job = _job()
         step = _step("s-1")
         rt.engine.submit(job, [step])
         rt.engine.mark_running(job.job_id)
         rt.engine.ready_steps(job.job_id)
         lease = rt.engine.lease_next(job.job_id, "id-worker-runtime")
-        rt.engine.register_worker_type("GENERIC", DeterministicSuccessWorker())
         result = rt.engine.execute_step(lease, worker_id="id-worker-runtime")
         assert result.status is WorkerStatus.SUCCESS
 

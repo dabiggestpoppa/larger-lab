@@ -40,9 +40,27 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
     SqliteStepQueue,
 )
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
+from qcae.orchestration.orchestrator.worker_availability import WorkerUnavailableError
 from qcae.orchestration.workers.base import Worker
 
-__all__ = ["LocalRuntime", "build_local_runtime", "QcaeApp"]
+__all__ = [
+    "LocalRuntime",
+    "build_local_runtime",
+    "QcaeApp",
+    "WorkerUnavailableError",
+]
+
+
+def _missing_types_from_error(message: str) -> tuple:
+    """Extract step-type names from a typed availability error message."""
+    import re
+
+    match = re.search(r"step type\(s\) \[([^\]]+)\]", message)
+    if not match:
+        return ()
+    return tuple(
+        t.strip().strip("'").strip('"') for t in match.group(1).split(",")
+    )
 
 
 @dataclass
@@ -231,12 +249,30 @@ class QcaeApp:
         return self._rt.service.list_jobs(status=status)
 
     def job_run_step(self, job_id: str, worker_id: str):
-        # Derive readiness first (engine-owned graph logic), then claim.
+        """Run one eligible step of a job (P2-R3-C02/C05).
+
+        Worker availability is checked BEFORE any lease or state mutation:
+        no compatible worker returns a typed ``WorkerUnavailable`` outcome
+        (no claim, no attempt, no budget, no STEP_STARTED) so the CLI can
+        render a stable operator error instead of stranding a lease.
+        """
+        from qcae.orchestration.orchestrator.worker_availability import (
+            WorkerUnavailable,
+            worker_availability_for,
+        )
+
         self._rt.service.ready_steps(job_id)
-        lease = self._rt.service.lease_next(job_id, worker_id)
+        availability = worker_availability_for(self._rt.engine, job_id)
+        if availability.uncovered_step_ids and not availability.covered_step_ids:
+            return WorkerUnavailable(job_id, availability.missing_step_types)
+        try:
+            lease = self._rt.service.lease_next(job_id, worker_id)
+        except WorkerUnavailableError as exc:
+            # Narrow race: coverage existed at the probe, gone at the claim.
+            return WorkerUnavailable(job_id, _missing_types_from_error(str(exc)))
         if lease is None:
             return None
-        return self._rt.service.execute_step(lease)
+        return self._rt.service.execute_step(lease, worker_id=worker_id)
 
     def job_resume(self, job_id: str):
         self._rt.service.mark_running(job_id)

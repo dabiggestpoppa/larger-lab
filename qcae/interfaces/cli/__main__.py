@@ -184,6 +184,15 @@ def _dispatch(app: QcaeApp, args) -> int:
             if result is None:
                 print("no eligible step to run", file=sys.stderr)
                 return 1
+            if getattr(result, "reason", "") == "WORKER_UNAVAILABLE":
+                # Typed operator outcome (P2-R3-C02/C05): deterministic exit
+                # code, structured output, no traceback, nothing leased.
+                print(json.dumps({
+                    "error": "WORKER_UNAVAILABLE",
+                    "job_id": result.job_id,
+                    "missing_step_types": list(result.missing_step_types),
+                }, indent=2), file=sys.stderr)
+                return 3
             _print(result)
         return 0
 
