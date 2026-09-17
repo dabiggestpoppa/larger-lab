@@ -108,11 +108,23 @@ class TestAppService:
         assert cancelled.status.value == "CANCELLED"
 
     def test_run_step_and_complete(self, app):
+        # P2-R2-C01: execution runs under a governed principal — the runtime
+        # worker identity registered at composition. Unknown principals fail
+        # policy evaluation closed (no rule match).
         app.submit_job(_job(), [_step("s-1")])
-        app._rt.service._engine.mark_running("job-12345678")
-        result = app.job_run_step("job-12345678", "w1")
+        app._rt.service.mark_running("job-12345678")
+        result = app.job_run_step("job-12345678", "id-worker-runtime")
         assert result is not None
         assert result.status.value == "SUCCESS"
+
+    def test_run_step_unknown_principal_fails_closed(self, app):
+        """A lease claimed by an identity with no policy rule cannot execute."""
+        app.submit_job(_job(), [_step("s-1")])
+        app._rt.service.mark_running("job-12345678")
+        result = app.job_run_step("job-12345678", "ghost-worker")
+        assert result is not None
+        assert result.status.value == "FAILED"
+        assert result.failure_class == "POLICY_DENIED"
 
     def test_authority_decision_via_app(self, app):
         from qcae.core.decisions.authority import AuthorityRequest, PolicyAction
@@ -127,7 +139,7 @@ class TestAppService:
     def test_identity_via_app(self, app):
         ident = app.runtime_identity()
         assert ident.oce_mode == "OCE_ABSENT"
-        assert ident.policy_version == "1.0.0"
+        assert ident.policy_version == "1.1.0"  # P2-R2-C01 default policy
 
 
 class TestCLI:

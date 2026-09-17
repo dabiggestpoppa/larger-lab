@@ -17,6 +17,10 @@ from qcae.governance.standalone.authority import LocalAuthorityProvider
 from qcae.governance.standalone.identity import LocalIdentityProvider
 from qcae.governance.standalone.policy import LocalPolicyEngine, PolicySet
 from qcae.governance.standalone.runtime_service import LocalRuntimeService
+from qcae.governance.standalone.step_gate import (
+    ApprovalRegistrySink,
+    PolicyStepAuthorityGate,
+)
 from qcae.infrastructure.persistence.sqlite_approval_registry import (
     APPROVAL_DDL,
     SqliteApprovalRegistry,
@@ -70,7 +74,7 @@ def _default_policy_set() -> PolicySet:
 
     return PolicySet(
         policy_id="pol-standalone-default",
-        policy_version="1.0.0",
+        policy_version="1.1.0",
         rules=(
             PolicyRule(
                 rule_id="allow-discover",
@@ -100,6 +104,16 @@ def _default_policy_set() -> PolicySet:
                 action="may_access_production_credentials",
                 reason="outside standalone authority",
             ),
+            # P2-R2-C01: the derived baseline worker action. Registered
+            # worker principals may execute their own step type inside the
+            # job scope; everything else still fails closed (NO_MATCH).
+            PolicyRule(
+                rule_id="allow-baseline-worker-execute",
+                effect=PolicyEffect.ALLOW,
+                action="execute.*",
+                principal_match="id-*",
+                reason="registered workers may execute their contracted step type",
+            ),
         ),
     )
 
@@ -111,6 +125,7 @@ def build_local_runtime(
     policy_set: Optional[PolicySet] = None,
     clock: Optional[Callable[[], str]] = None,
     lease_ttl_seconds: int = 300,
+    worker_principal: str = "id-worker-runtime",
 ) -> LocalRuntime:
     clock = clock or _default_clock()
     conn = open_metadata_db(db_path)
@@ -119,12 +134,33 @@ def build_local_runtime(
 
     store = SqliteRuntimeStore(conn)
     queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=lease_ttl_seconds)
-    engine = OrchestratorEngine(store, queue, clock=clock, workers=dict(workers or {}))
     identity = LocalIdentityProvider()
+    # P2-R2-C01: the runtime's own worker/service principal is a registered
+    # identity so lease owners bind to a governed principal (Book V 13.1);
+    # unknown principals fail policy evaluation closed.
+    if identity.get(worker_principal) is None:
+        from qcae.governance.standalone.identity import IdentityKind, LocalIdentity
+
+        identity.register(LocalIdentity(
+            identity_id=worker_principal,
+            kind=IdentityKind.WORKER if worker_principal.startswith("id-worker-")
+            else IdentityKind.SERVICE,
+            display_name="runtime worker principal",
+        ))
     policy = LocalPolicyEngine(policy_set or _default_policy_set())
     policy_log = SqlitePolicyDecisionLog(conn)
     authority = LocalAuthorityProvider(policy, policy_log, clock=clock)
     approvals = SqliteApprovalRegistry(conn)
+    # P2-R2-C01: governance is bound into the execution path at the
+    # composition root. The gate evaluates every step before a worker runs
+    # (principal -> action -> resource -> scope -> requirement); REQUIRE_APPROVAL
+    # verdicts persist durable requests through the approval registry sink.
+    gate = PolicyStepAuthorityGate(policy, authority, clock=clock)
+    engine = OrchestratorEngine(
+        store, queue, clock=clock, workers=dict(workers or {}),
+        authority_gate=gate,
+        authority_request_sink=ApprovalRegistrySink(approvals, clock=clock),
+    )
 
     # Identity snapshot for schema/policy versions comes from the policy set.
     service = LocalRuntimeService(
@@ -171,7 +207,7 @@ class QcaeApp:
         return self._rt.service.execute_step(lease)
 
     def job_resume(self, job_id: str):
-        self._rt.service._engine.mark_running(job_id)
+        self._rt.service.mark_running(job_id)
         return self._rt.service.resume(job_id)
 
     def job_cancel(self, job_id: str, *, reason: str = ""):

@@ -41,6 +41,13 @@ from qcae.orchestration.jobs.runtime import (
     assert_job_transition,
     assert_step_transition,
 )
+from qcae.orchestration.authority_gate import (
+    AuthorityRequestSink,
+    FailClosedStepAuthorityGate,
+    StepAuthorityDecision,
+    StepAuthorityGate,
+    StepAuthorityVerdict,
+)
 from qcae.orchestration.workers.base import Worker
 from qcae.orchestration.workers.contracts import WorkerRequest, WorkerResult, WorkerStatus
 
@@ -75,6 +82,8 @@ class OrchestratorEngine:
         workers: Optional[Dict[str, Worker]] = None,
         event_emitter: Optional[Callable[[JobEvent, str], None]] = None,
         budget_service: Optional["BudgetService"] = None,
+        authority_gate: Optional[StepAuthorityGate] = None,
+        authority_request_sink: Optional[AuthorityRequestSink] = None,
     ) -> None:
         self._store = runtime_store
         self._queue = queue
@@ -82,6 +91,29 @@ class OrchestratorEngine:
         self._workers = workers or {}
         self._emit = event_emitter or (lambda event, payload: None)
         self._budgets = budget_service
+        # P2-R2-C01: authority is part of the execution path. No gate means
+        # nothing executes (fail closed) — governance is wired explicitly at
+        # the composition root, never implicitly absent.
+        self._authority_gate: StepAuthorityGate = (
+            authority_gate or FailClosedStepAuthorityGate()
+        )
+        self._authority_sink = authority_request_sink
+        # Steps released by an exact-scope operator grant (P2-R2-C02).
+        self._granted_keys: set = set()
+
+    # -- explicit interfaces (P2-R2-C05: no private-attribute reach-ins) -----
+
+    def register_worker_type(self, worker_type: str, worker: Worker) -> None:
+        """Register a worker implementation for one step_type."""
+        if not worker_type or not isinstance(worker_type, str):
+            raise QcaeValidationError("worker_type must be a non-empty string")
+        if worker is None:
+            raise QcaeValidationError("worker must not be None")
+        self._workers[worker_type] = worker
+
+    def registered_worker_types(self) -> List[str]:
+        """Sorted step_types with registered workers (identity surface)."""
+        return sorted(self._workers)
 
     # -- events --------------------------------------------------------------
 
@@ -237,7 +269,9 @@ class OrchestratorEngine:
             self._charge_attempt(job_id, started.attempt)
         self._record(JobEventType.STEP_LEASED, job_id, lease.step_id,
                      payload_json=f'{{"worker": "{worker_id}"}}')
-        self._record(JobEventType.STEP_STARTED, job_id, lease.step_id)
+        # STEP_STARTED is emitted by execute_step carrying the typed authority
+        # decision payload (P2-R2-C01): one STARTED per attempt, with the
+        # verdict that admitted it.
         return lease
 
     def _charge_attempt(self, job_id: str, attempt: int) -> None:
@@ -255,12 +289,21 @@ class OrchestratorEngine:
 
     # -- execution -----------------------------------------------------------
 
-    def execute_step(self, lease, *, authority_ok: bool = True) -> WorkerResult:
-        """Execute a leased step; authority is rechecked by the caller.
+    def execute_step(self, lease, *, worker_id: Optional[str] = None) -> WorkerResult:
+        """Execute a leased step under a typed authority evaluation.
 
-        ``authority_ok=False`` models a failed policy re-check after recovery:
-        the step moves to WAITING_POLICY and nothing executes (directive §23:
-        never assume pre-crash authority is still valid).
+        P2-R2-C01: authority is evaluated HERE, by the gate, before any
+        worker runs — never assumed by the caller. The evaluation binds
+        principal -> action -> resource -> scope -> requirement (directive
+        P2-R2-C01) and one of ALLOW / DENY / REQUIRE_APPROVAL /
+        ALLOW_WITH_CONSTRAINTS becomes operational:
+
+        - ALLOW / ALLOW_WITH_CONSTRAINTS: the worker runs (constraints are
+          carried on the WorkerRequest so the worker cannot exceed them);
+        - DENY: nothing executes; the step fails POLICY_DENIED;
+        - REQUIRE_APPROVAL: nothing executes; a durable AuthorityRequest is
+          recorded through the sink and the step waits in WAITING_POLICY
+          until an exact-scope grant releases it (P2-R2-C02).
         """
         step = self._require_step(lease.step_id)
         if step.status is not RuntimeStepStatus.RUNNING:
@@ -271,22 +314,65 @@ class OrchestratorEngine:
         if current is None or current["lease_token"] != lease.lease_token:
             raise QcaeValidationError("lease token does not match current owner")
 
-        if not authority_ok:
-            assert_step_transition(step.status, RuntimeStepStatus.WAITING_POLICY)
-            self._store.update_step(
-                dc_replace(step, status=RuntimeStepStatus.WAITING_POLICY),
-                lease_owner="", lease_token="", lease_expires_at="",
+        principal = worker_id or lease.lease_owner or "unknown-worker"
+        job = self._require_job(step.job_id)
+        verdict = self._authority_gate.evaluate_step_authority(
+            step, job, worker_id=principal
+        )
+        verdict.validate()
+        if verdict.step_id != step.step_id or verdict.job_id != job.job_id:
+            raise QcaeValidationError(
+                "authority verdict binding does not match the leased step; "
+                "refusing to execute (replay/mismatch guard)"
             )
-            self._record(
-                JobEventType.APPROVAL_REQUESTED, step.job_id, step.step_id,
-                payload_json='{"reason": "authority recheck failed after recovery"}',
+        if verdict.principal != principal:
+            raise QcaeValidationError(
+                "authority verdict principal does not match the claiming worker"
             )
+        self._record(
+            JobEventType.STEP_STARTED, step.job_id, step.step_id,
+            payload_json=(
+                f'{{"authority_decision": "{verdict.decision.value}", '
+                f'"decision_ref": "{verdict.decision_ref}", '
+                f'"policy_version": "{verdict.policy_version}"}}'
+            ),
+        )
+
+        if verdict.decision is StepAuthorityDecision.DENY:
+            # Nothing executes; the RUNNING step fails POLICY_DENIED. _fail
+            # asserts the transition and clears the lease columns.
+            self._fail(self._require_step(step.step_id), FailureClass.POLICY_DENIED.value)
             return WorkerResult(
                 step_id=step.step_id, job_id=step.job_id,
-                status=WorkerStatus.BLOCKED_POLICY,
-                failure_class=FailureClass.APPROVAL_REQUIRED.value,
-                error_summary="authority recheck failed after recovery",
+                status=WorkerStatus.FAILED,
+                failure_class=FailureClass.POLICY_DENIED.value,
+                error_summary=f"authority denied: {verdict.reason}",
             )
+        if verdict.decision is StepAuthorityDecision.REQUIRE_APPROVAL:
+            granted_key = f"{step.job_id}:{step.step_id}"
+            if granted_key not in self._granted_keys:
+                request_id = self._persist_authority_request(verdict)
+                assert_step_transition(step.status, RuntimeStepStatus.WAITING_POLICY)
+                self._store.update_step(
+                    dc_replace(step, status=RuntimeStepStatus.WAITING_POLICY),
+                    lease_owner="", lease_token="", lease_expires_at="",
+                )
+                self._record(
+                    JobEventType.APPROVAL_REQUESTED, step.job_id, step.step_id,
+                    payload_json=(
+                        f'{{"authority_request_id": "{request_id}", '
+                        f'"action": "{verdict.action}", '
+                        f'"resource": "{verdict.resource}", '
+                        f'"scope": "{verdict.scope}"}}'
+                    ),
+                )
+                return WorkerResult(
+                    step_id=step.step_id, job_id=step.job_id,
+                    status=WorkerStatus.BLOCKED_POLICY,
+                    failure_class=FailureClass.APPROVAL_REQUIRED.value,
+                    error_summary=f"approval required: {verdict.reason}",
+                )
+            # An exact-scope grant released this step (P2-R2-C02); proceed.
 
         worker = self._workers.get(step.step_type)
         if worker is None:
@@ -299,6 +385,8 @@ class OrchestratorEngine:
             step_id=step.step_id,
             worker_type=step.step_type,
             idempotency_key=key,
+            constraints=tuple(verdict.constraints) if verdict.constraints else (),
+            policy_context_ref=verdict.decision_ref,
         )
 
         # P2-C07R2 (directive §2.2): the key is durably RESERVED before the
@@ -375,6 +463,40 @@ class OrchestratorEngine:
                 lease_owner="", lease_token="", lease_expires_at="",
             )
         return result
+
+    def _persist_authority_request(self, verdict: StepAuthorityVerdict) -> str:
+        """Durable AuthorityRequest for a REQUIRE_APPROVAL verdict (P2-R2-C02)."""
+        if self._authority_sink is None:
+            # No sink configured: the wait is still durable in the step row
+            # and the event log; there is simply no request artifact to grant.
+            return "unsinked"
+        return self._authority_sink.record_authority_request(verdict)
+
+    def record_exact_scope_grant(self, job_id: str, step_id: str) -> None:
+        """Release one WAITING_POLICY step after an exact-scope operator grant.
+
+        Called by the runtime service ONLY after it has verified the grant
+        binds the same action/resource/scope the step requested (no approval
+        laundering — P2-R2-C02). The step returns to READY and may be leased
+        again; the grant key is consumed by the next execute_step.
+        """
+        step = self._require_step(step_id)
+        if step.job_id != job_id:
+            raise QcaeValidationError("step/job mismatch in grant release")
+        if step.status is not RuntimeStepStatus.WAITING_POLICY:
+            raise QcaeValidationError(
+                f"step {step_id!r} is not WAITING_POLICY; nothing to release"
+            )
+        assert_step_transition(step.status, RuntimeStepStatus.READY)
+        self._store.update_step(
+            dc_replace(step, status=RuntimeStepStatus.READY),
+            lease_owner="", lease_token="", lease_expires_at="",
+        )
+        self._granted_keys.add(f"{job_id}:{step_id}")
+        self._record(
+            JobEventType.APPROVAL_GRANTED, job_id, step_id,
+            payload_json='{"release": "exact-scope grant"}',
+        )
 
     def _complete(self, step: RuntimeStep, result: WorkerResult) -> None:
         # P2-C07R2: commit is durable and carries the result payload, closing

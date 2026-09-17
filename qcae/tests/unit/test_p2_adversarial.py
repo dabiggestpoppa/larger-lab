@@ -41,6 +41,7 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
 from qcae.orchestration.jobs.runtime import RuntimeJob, RuntimeStep, RuntimeStepStatus
 from qcae.orchestration.orchestrator.budget_service import BudgetService
 from qcae.orchestration.orchestrator.budgets import BudgetExhaustedError
+from qcae.orchestration.authority_gate import PermissiveStepAuthorityGate
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
 from qcae.orchestration.workers.base import CrashWorker, DeterministicSuccessWorker
 from qcae.orchestration.workers.contracts import WorkerStatus
@@ -84,7 +85,7 @@ def env():
         conn.executescript(ddl)
     store = SqliteRuntimeStore(conn)
     queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=60)
-    engine = OrchestratorEngine(store, queue, clock=clock)
+    engine = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
     engine._workers["GENERIC"] = DeterministicSuccessWorker()
     return store, queue, engine, clock, conn
 
@@ -274,7 +275,7 @@ class TestAdversarial:
                 c1.executescript(ddl)
             store1 = SqliteRuntimeStore(c1)
             queue1 = SqliteStepQueue(c1, store1, now_fn=clock, lease_ttl_seconds=60)
-            engine1 = OrchestratorEngine(store1, queue1, clock=clock)
+            engine1 = OrchestratorEngine(store1, queue1, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             engine1._workers["GENERIC"] = CrashWorker()
             engine1.submit(_job(), [_step("s-1")])
             engine1.mark_running("job-12345678")
@@ -292,7 +293,7 @@ class TestAdversarial:
             c2.executescript(QUEUE_INTEGRITY_DDL)
             store2 = SqliteRuntimeStore(c2)
             queue2 = SqliteStepQueue(c2, store2, now_fn=clock, lease_ttl_seconds=60)
-            engine2 = OrchestratorEngine(store2, queue2, clock=clock)
+            engine2 = OrchestratorEngine(store2, queue2, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             engine2._workers["GENERIC"] = DeterministicSuccessWorker()
             report = engine2.recover_job("job-12345678")
             assert "s-1" in report["requeued_steps"]

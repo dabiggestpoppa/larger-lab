@@ -26,6 +26,7 @@ from qcae.orchestration.orchestrator.budgets import (
     BudgetExhaustedError,
     BudgetState,
 )
+from qcae.orchestration.authority_gate import PermissiveStepAuthorityGate
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
 from qcae.orchestration.workers.base import DeterministicSuccessWorker
 from qcae.core.jobs import deterministic_job_id
@@ -179,7 +180,7 @@ class TestEngineIntegration:
         store = SqliteRuntimeStore(conn)
         queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=60)
         svc = BudgetService(SqliteBudgetLedger(conn))
-        engine = OrchestratorEngine(store, queue, clock=clock, budget_service=svc)
+        engine = OrchestratorEngine(store, queue, clock=clock, budget_service=svc, authority_gate=PermissiveStepAuthorityGate())
         return store, queue, engine, svc, clock, conn
 
     def _job(self, job_id="job-12345678"):
@@ -242,7 +243,7 @@ class TestEngineIntegration:
 
     def test_no_budget_service_is_optional(self):
         store, queue, engine, svc, clock, conn = self._env()
-        engine2 = OrchestratorEngine(store, queue, clock=clock)
+        engine2 = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
         engine2._workers["GENERIC"] = DeterministicSuccessWorker()
         engine2.submit(self._job(), [self._step("s-1")])
         engine2.mark_running("job-12345678")

@@ -29,6 +29,7 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
     SqliteStepQueue,
 )
 from qcae.orchestration.jobs.runtime import RuntimeJob, RuntimeStep, RuntimeStepStatus
+from qcae.orchestration.authority_gate import PermissiveStepAuthorityGate
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
 from qcae.orchestration.orchestrator.execution import ExecutionState, ReplaySafety
 from qcae.orchestration.workers.base import DeterministicSuccessWorker
@@ -94,7 +95,7 @@ def env():
     conn.executescript(QUEUE_INTEGRITY_DDL)
     store = SqliteRuntimeStore(conn)
     queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=60)
-    engine = OrchestratorEngine(store, queue, clock=clock)
+    engine = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
     return store, queue, engine, clock, conn
 
 
@@ -175,7 +176,7 @@ class TestCombinedFlows:
             c1.executescript(QUEUE_INTEGRITY_DDL)
             store1 = SqliteRuntimeStore(c1)
             queue1 = SqliteStepQueue(c1, store1, now_fn=clock, lease_ttl_seconds=60)
-            engine1 = OrchestratorEngine(store1, queue1, clock=clock)
+            engine1 = OrchestratorEngine(store1, queue1, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             w1 = _CountingWorker(ReplaySafety.IDEMPOTENCY_AWARE)
             engine1._workers["GENERIC"] = w1
             engine1.submit(_job(), [
@@ -192,7 +193,7 @@ class TestCombinedFlows:
             c2 = open_metadata_db(db)
             store2 = SqliteRuntimeStore(c2)
             queue2 = SqliteStepQueue(c2, store2, now_fn=clock, lease_ttl_seconds=60)
-            engine2 = OrchestratorEngine(store2, queue2, clock=clock)
+            engine2 = OrchestratorEngine(store2, queue2, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             w2 = _CountingWorker(ReplaySafety.IDEMPOTENCY_AWAY if False else ReplaySafety.IDEMPOTENCY_AWARE)
             engine2._workers["GENERIC"] = w2
             report = engine2.recover_job("job-12345678")
@@ -241,7 +242,7 @@ class TestCombinedFlows:
             c1.executescript(QUEUE_INTEGRITY_DDL)
             store1 = SqliteRuntimeStore(c1)
             queue1 = SqliteStepQueue(c1, store1, now_fn=clock, lease_ttl_seconds=60)
-            engine1 = OrchestratorEngine(store1, queue1, clock=clock)
+            engine1 = OrchestratorEngine(store1, queue1, clock=clock, authority_gate=PermissiveStepAuthorityGate())
 
             class _CrashWorker:
                 replay_safety = ReplaySafety.NON_REPLAY_SAFE
@@ -260,7 +261,7 @@ class TestCombinedFlows:
             c2 = open_metadata_db(db)
             store2 = SqliteRuntimeStore(c2)
             queue2 = SqliteStepQueue(c2, store2, now_fn=clock, lease_ttl_seconds=60)
-            engine2 = OrchestratorEngine(store2, queue2, clock=clock)
+            engine2 = OrchestratorEngine(store2, queue2, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             report = engine2.recover_job("job-12345678")
             unresolved = report["unresolved_executions"]
             assert unresolved and unresolved[0]["requires_operator_resolution"] is True

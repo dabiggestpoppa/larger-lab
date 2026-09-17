@@ -25,6 +25,7 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
     SqliteStepQueue,
 )
 from qcae.orchestration.jobs.runtime import RuntimeJob, RuntimeStep, RuntimeStepStatus
+from qcae.orchestration.authority_gate import PermissiveStepAuthorityGate
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
 from qcae.orchestration.orchestrator.execution import (
     ExecutionRecord,
@@ -114,7 +115,7 @@ def env():
     conn.executescript(QUEUE_INTEGRITY_DDL)
     store = SqliteRuntimeStore(conn)
     queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=60)
-    engine = OrchestratorEngine(store, queue, clock=clock)
+    engine = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
     return store, queue, engine, clock, conn
 
 
@@ -243,7 +244,7 @@ class TestCrashWindows:
 
         # "Crash" before the graph advanced. New engine over same DB; the
         # execution record is COMMITTED so the retry reconstructs.
-        engine2 = OrchestratorEngine(store, queue, clock=clock)
+        engine2 = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
         engine2._workers["GENERIC"] = worker
         engine2.mark_running("job-12345678")
         # s-1 already succeeded; s-2 becomes ready. Give s-2 the same
@@ -323,7 +324,7 @@ class TestCrashWindows:
             c1.executescript(QUEUE_INTEGRITY_DDL)
             store1 = SqliteRuntimeStore(c1)
             queue1 = SqliteStepQueue(c1, store1, now_fn=clock, lease_ttl_seconds=60)
-            engine1 = OrchestratorEngine(store1, queue1, clock=clock)
+            engine1 = OrchestratorEngine(store1, queue1, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             worker = _CounterWorker(ReplaySafety.IDEMPOTENCY_AWARE)
             engine1._workers["GENERIC"] = worker
             engine1.submit(_job(), [_step("s-1")])

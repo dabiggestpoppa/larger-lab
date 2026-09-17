@@ -18,6 +18,7 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
     SqliteStepQueue,
 )
 from qcae.orchestration.jobs.runtime import RuntimeJob, RuntimeStep, RuntimeStepStatus
+from qcae.orchestration.authority_gate import PermissiveStepAuthorityGate
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
 from qcae.orchestration.workers.base import (
     CrashWorker,
@@ -73,7 +74,7 @@ def env():
     conn.executescript(QUEUE_INTEGRITY_DDL)
     store = SqliteRuntimeStore(conn)
     queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=60)
-    engine = OrchestratorEngine(store, queue, clock=clock)
+    engine = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
     return store, queue, engine, clock, conn
 
 
@@ -200,7 +201,7 @@ class TestIdempotencyAndCheckpoints:
             c1.executescript(QUEUE_INTEGRITY_DDL)
             store = SqliteRuntimeStore(c1)
             queue = SqliteStepQueue(c1, store, now_fn=clock, lease_ttl_seconds=60)
-            engine = OrchestratorEngine(store, queue, clock=clock)
+            engine = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
             engine._workers["GENERIC"] = DeterministicSuccessWorker()
             engine.submit(_job(), [_step("s-1")])
             engine.mark_running("job-12345678")
@@ -227,7 +228,7 @@ class TestCrashRecovery:
         conn.executescript(QUEUE_INTEGRITY_DDL)
         store = SqliteRuntimeStore(conn)
         queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=60)
-        engine = OrchestratorEngine(store, queue, clock=clock)
+        engine = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
         engine._workers["GENERIC"] = DeterministicSuccessWorker()
         return store, queue, engine, clock, conn
 
@@ -301,20 +302,30 @@ class TestCrashRecovery:
         assert store.get_step("s-1").status is RuntimeStepStatus.READY or True
 
     def test_authority_recheck_after_recovery(self, env):
-        """Recovery must not assume pre-crash authority (directive §23)."""
+        """Recovery must not assume pre-crash authority (directive §23).
+
+        P2-R2-C01: the recheck is a real gate evaluation — a gate that now
+        requires approval yields REQUIRE_APPROVAL, the step waits in
+        WAITING_POLICY, and the worker never runs.
+        """
+        from qcae.orchestration.authority_gate import StaticStepAuthorityGate
+
         store, queue, engine, clock, _ = env
         engine._workers["GENERIC"] = DeterministicSuccessWorker()
         engine.submit(_job(), [_step("s-1")])
         engine.mark_running("job-12345678")
         engine.ready_steps("job-12345678")
         lease = engine.lease_next("job-12345678", "w1")
-        # Simulate crash: lease exists, then recovery, then execution with
-        # authority_ok=False -> step goes WAITING_POLICY, nothing executes.
+        # Simulate crash: lease exists, then recovery. Before resuming, the
+        # policy tightened — the gate now requires approval for this action.
         report = engine.recover_job("job-12345678")
+        engine._authority_gate = StaticStepAuthorityGate(
+            require_approval=("execute.GENERIC",)
+        )
         engine2 = engine
         engine2.ready_steps("job-12345678")
         lease2 = engine2.lease_next("job-12345678", "w2")
-        result = engine2.execute_step(lease2, authority_ok=False)
+        result = engine2.execute_step(lease2)
         assert result.status is WorkerStatus.BLOCKED_POLICY
         assert store.get_step("s-1").status is RuntimeStepStatus.WAITING_POLICY
         # The worker never ran.

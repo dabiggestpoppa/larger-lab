@@ -140,8 +140,26 @@ class LocalRuntimeService:
     def lease_next(self, job_id: str, worker_id: str):
         return self._engine.lease_next(job_id, worker_id)
 
-    def execute_step(self, lease, *, authority_ok: bool = True):
-        return self._engine.execute_step(lease, authority_ok=authority_ok)
+    def execute_step(self, lease, *, worker_id: Optional[str] = None):
+        """Execute under the engine's typed authority gate (P2-R2-C01).
+
+        Authority is evaluated by the gate inside the engine — the service
+        neither bypasses nor pre-approves it.
+        """
+        return self._engine.execute_step(lease, worker_id=worker_id)
+
+    def mark_running(self, job_id: str):
+        """Public job-state driver (P2-R2-C05: no private-attribute reach-in)."""
+        return self._engine.mark_running(job_id)
+
+    def release_granted_step(self, job_id: str, step_id: str) -> None:
+        """Release one WAITING_POLICY step after a verified exact-scope grant.
+
+        The service verifies the grant binds the step's recorded request
+        (action/resource/scope/budget) BEFORE delegating to the engine
+        (P2-R2-C02; directive §14 — no approval laundering).
+        """
+        self._release_with_verified_grant(job_id, step_id)
 
     def resume(self, job_id: str) -> dict:
         """Recover a job after interruption (directive §23)."""
@@ -296,6 +314,80 @@ class LocalRuntimeService:
         )
         return {"decision_id": decision_id, "state": state.value,
                 "request_id": request_id}
+
+    # -- P2-R2-C02: verified grant release -----------------------------------
+
+    def _release_with_verified_grant(self, job_id: str, step_id: str) -> None:
+        """Verify an exact-scope grant exists for the step's request, then release.
+
+        The step's APPROVAL_REQUESTED event names the authority request; the
+        registry must hold a GRANTED decision bound to the same
+        (action, resource, scope, budget_ref) and not expired. Anything else
+        fails closed.
+        """
+        from qcae.governance.standalone.approvals import ApprovalState
+
+        step = self._store.get_step(step_id)
+        if step is None or step.job_id != job_id:
+            raise QcaeValidationError(f"unknown step {step_id!r} for job {job_id!r}")
+        if step.status is not RuntimeStepStatus.WAITING_POLICY:
+            raise QcaeValidationError(
+                f"step {step_id!r} is not WAITING_POLICY; nothing to release"
+            )
+        # Find the durable authority request recorded for this step.
+        request_id = self._latest_authority_request_for_step(job_id, step_id)
+        if request_id is None:
+            raise QcaeValidationError(
+                f"no authority request recorded for step {step_id!r}; refusing release"
+            )
+        request = self._approvals.get_request(request_id)
+        if request is None:
+            raise QcaeValidationError(
+                f"authority request {request_id!r} not found; refusing release"
+            )
+        grant = self._approvals.effective_grant(request_id, now=self._clock())
+        if grant is None:
+            raise QcaeValidationError(
+                f"no effective grant for request {request_id!r} "
+                "(pending, denied, or expired); refusing release"
+            )
+        if grant.state is not ApprovalState.GRANTED:
+            raise QcaeValidationError("grant is not GRANTED; refusing release")
+        # Exact binding (directive §14): every bound element must equal the
+        # request the step raised. A grant for another action/scope/budget
+        # cannot release this step.
+        if (
+            grant.bound_action != request.action
+            or grant.bound_resource != request.resource
+            or grant.bound_scope != request.scope
+            or grant.bound_budget_ref != request.budget_ref
+        ):
+            raise QcaeValidationError(
+                "grant binding does not match the step's request; "
+                "approval laundering rejected"
+            )
+        self._engine.record_exact_scope_grant(job_id, step_id)
+
+    def _latest_authority_request_for_step(
+        self, job_id: str, step_id: str
+    ) -> Optional[str]:
+        """The request id from the step's latest APPROVAL_REQUESTED event."""
+        for _seq, _ev, payload in reversed(self._store.events_for_job(job_id)):
+            if (
+                _ev.event_type is JobEventType.APPROVAL_REQUESTED
+                and _ev.step_id == step_id
+                and payload
+            ):
+                import json
+
+                try:
+                    data = json.loads(payload)
+                except ValueError:
+                    continue
+                rid = data.get("authority_request_id", "")
+                if rid and rid != "unsinked":
+                    return rid
+        return None
 
     def _already_decided(self, request_id: str) -> bool:
         """True if any durable decision exists for the request.

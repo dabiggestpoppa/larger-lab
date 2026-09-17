@@ -24,6 +24,7 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
     SqliteStepQueue,
 )
 from qcae.orchestration.jobs.runtime import RuntimeJob, RuntimeStep, RuntimeStepStatus
+from qcae.orchestration.authority_gate import PermissiveStepAuthorityGate
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
 
 
@@ -69,7 +70,7 @@ def env():
     conn.executescript(QUEUE_INTEGRITY_DDL)
     store = SqliteRuntimeStore(conn)
     queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=60)
-    engine = OrchestratorEngine(store, queue, clock=clock)
+    engine = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
     return store, queue, engine, clock, conn
 
 

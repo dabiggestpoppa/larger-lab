@@ -47,6 +47,10 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
 from qcae.orchestration.jobs.runtime import RuntimeJob, RuntimeStep, RuntimeStepStatus
 from qcae.orchestration.orchestrator.budget_service import BudgetService
 from qcae.orchestration.orchestrator.budgets import BudgetExhaustedError
+from qcae.orchestration.authority_gate import (
+    PermissiveStepAuthorityGate,
+    StaticStepAuthorityGate,
+)
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
 from qcae.orchestration.orchestrator.execution import ReplaySafety
 from qcae.orchestration.workers.base import DeterministicSuccessWorker
@@ -97,7 +101,7 @@ def env():
         conn.executescript(ddl)
     store = SqliteRuntimeStore(conn)
     queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=60)
-    engine = OrchestratorEngine(store, queue, clock=clock)
+    engine = OrchestratorEngine(store, queue, clock=clock, authority_gate=PermissiveStepAuthorityGate())
     conn.commit()
     return store, queue, engine, clock, conn
 
@@ -148,7 +152,12 @@ class TestBudgetConcurrentReservation:
 class TestPolicyChangeBetweenCrashAndResume:
     def test_resume_after_policy_tightens_rechecks_authority(self, env):
         """A step approved under old policy must not run after the policy
-        tightened during the crash window (recovery re-evaluates, §23)."""
+        tightened during the crash window (recovery re-evaluates, §23).
+
+        P2-R2-C01: the re-evaluation is a real gate call — the recovered
+        step is leased under a tightened gate whose verdict is DENY, and the
+        worker never runs.
+        """
         store, queue, engine, clock, conn = env
         engine._workers["GENERIC"] = DeterministicSuccessWorker()
         engine.submit(_job(), [_step("s-1")])
@@ -157,16 +166,18 @@ class TestPolicyChangeBetweenCrashAndResume:
         lease = engine.lease_next("job-12345678", "w1")
         # Pre-crash, policy allowed; the step was leased (RUNNING).
 
-        # "Policy change during the crash window": the recovered step is
-        # re-evaluated via execute_step's authority gate.
+        # "Policy change during the crash window": swap in a tightened gate
+        # before resuming; the next evaluation is a real provider call.
+        engine._authority_gate = StaticStepAuthorityGate(allowed=())
         report = engine.recover_job("job-12345678")
         assert "job-12345678:s-1" in report["recovered_lease_steps"]
         engine.ready_steps("job-12345678")
         lease2 = engine.lease_next("job-12345678", "w2")
-        result = engine.execute_step(lease2, authority_ok=False)
-        assert result.status is WorkerStatus.BLOCKED_POLICY
-        assert store.get_step(f"job-12345678:s-1").status \
-            is RuntimeStepStatus.WAITING_POLICY
+        result = engine.execute_step(lease2)
+        assert result.status is WorkerStatus.FAILED
+        assert result.failure_class == "POLICY_DENIED"
+        assert store.get_step("job-12345678:s-1").status \
+            is RuntimeStepStatus.FAILED
         assert engine._workers["GENERIC"].calls == 0
 
     def test_policy_engine_is_immutable_after_crash(self, env):

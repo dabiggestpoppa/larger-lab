@@ -201,7 +201,12 @@ class LocalPolicyEngine:
     def evaluate(self, request: PolicyRequest, *, decision_id: str, created_at: str) -> PolicyDecision:
         request.validate()
         for rule in self._policy.rules:
-            if rule.action != request.action:
+            # Action matching uses the same discipline as the other matchers
+            # (exact, prefix-star, or '*'). An earlier exact-only comparison
+            # silently made action wildcards unusable; P2-R2-C01 derives
+            # baseline actions (execute.<step_type>) that versioned policies
+            # declare with prefix rules.
+            if not _matches(rule.action, request.action):
                 continue
             if not _matches(rule.principal_match, request.principal):
                 continue

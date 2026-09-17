@@ -87,7 +87,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     run = job_sub.add_parser("run", help="run one eligible step of a job")
     run.add_argument("job_id")
-    run.add_argument("--worker", default="id-runtime-local")
+    run.add_argument("--worker", default="id-worker-runtime")
 
     approval = sub.add_parser("approval", help="approval operations")
     approval_sub = approval.add_subparsers(dest="approval_command", required=True)
