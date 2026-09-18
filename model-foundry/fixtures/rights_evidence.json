@@ -1,0 +1,89 @@
+{
+  "fixture": "rights-evidence",
+  "noncanonical": true,
+  "canonical_oce_target": "OCE rights/consent evidence registry (B2 data constitution)",
+  "replacement_condition": "replace when the convergence branch exposes canonical rights evidence",
+  "notes": "Recorded rights evidence. A RightsDisposition is a claim only: it names a basis_ref, and the resolved basis/scope come from the entry recorded here for that subject. A missing entry, or an entry recorded for a different subject, fails closed to REVIEW_REQUIRED and can never make a source train-permissive.",
+  "evidence": [
+    {
+      "basis_ref": "license://CC-BY-4.0/alpha",
+      "subject": "SRC_NEWS_ALPHA",
+      "basis": "EXPLICIT_OPEN_LICENSE",
+      "scope": "redistribution and training permitted with attribution",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T00:10:00Z"
+    },
+    {
+      "basis_ref": "license://CC-BY-4.0/alpha",
+      "subject": "SRC_NEWS_ALPHA_MIRROR",
+      "basis": "EXPLICIT_OPEN_LICENSE",
+      "scope": "redistribution and training permitted with attribution",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T01:10:00Z"
+    },
+    {
+      "basis_ref": "ownership://larger-lab/generated",
+      "subject": "SRC_AGENT_TRACE",
+      "basis": "OPERATOR_OWNED",
+      "scope": "operator-owned generated traces",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T02:10:00Z"
+    },
+    {
+      "basis_ref": "rights://unresolved/web-crawl-sample-a",
+      "subject": "SRC_RIGHTS_UNKNOWN",
+      "basis": "UNKNOWN",
+      "scope": "",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T04:05:00Z"
+    },
+    {
+      "basis_ref": "terms://vendor/sample-b",
+      "subject": "SRC_VENDOR_TERMS",
+      "basis": "PROVIDER_TERMS_ALLOW",
+      "scope": "",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T05:05:00Z"
+    },
+    {
+      "basis_ref": "policy://prohibited-list/sample",
+      "subject": "SRC_PROHIBITED",
+      "basis": "PROHIBITED",
+      "scope": "",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T06:05:00Z"
+    },
+    {
+      "basis_ref": "ownership://larger-lab/withheld",
+      "subject": "SRC_CEREBUS_RULES",
+      "basis": "OPERATOR_OWNED",
+      "scope": "internal only; never model-facing",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T07:05:00Z"
+    },
+    {
+      "basis_ref": "ownership://larger-lab/notes",
+      "subject": "SRC_SECRET_INCIDENT",
+      "basis": "OPERATOR_OWNED",
+      "scope": "internal notes",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T08:05:00Z"
+    },
+    {
+      "basis_ref": "ownership://larger-lab/market-fixture",
+      "subject": "SRC_MARKET_TICKS_PIT",
+      "basis": "OPERATOR_OWNED",
+      "scope": "operator-owned fixture data",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T09:05:00Z"
+    },
+    {
+      "basis_ref": "ownership://larger-lab/bench-core",
+      "subject": "SRC_BENCH_CORE",
+      "basis": "OPERATOR_OWNED",
+      "scope": "operator-owned evaluation items",
+      "recorded_by": "operator.rights-review",
+      "recorded_utc": "2026-01-02T10:05:00Z"
+    }
+  ]
+}

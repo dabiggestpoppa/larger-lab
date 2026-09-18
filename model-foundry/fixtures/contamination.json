@@ -1,0 +1,37 @@
+{
+  "fixture": "contamination",
+  "noncanonical": true,
+  "canonical_oce_target": "OCE EvidenceGraph contamination relationships",
+  "replacement_condition": "replace when canonical contamination relationships are consumable",
+  "notes": "Observed relations only. Absence of an edge is not a cleanliness claim, and C0 plus C5 does not equal proven clean.",
+  "relations": [
+    {
+      "left": "SRC_NEWS_ALPHA",
+      "right": "SRC_BENCH_CORE",
+      "contamination_type": "PARAPHRASE_OR_DERIVATIVE",
+      "evidence_ref": "evidence://dedup/alpha-vs-core-0001",
+      "detected_by": "deterministic.shingle_overlap"
+    },
+    {
+      "left": "SRC_NEWS_ALPHA",
+      "right": "SRC_NEWS_ALPHA_MIRROR",
+      "contamination_type": "EXACT_DUPLICATE",
+      "evidence_ref": "evidence://dedup/alpha-vs-mirror-0002",
+      "detected_by": "deterministic.content_digest"
+    },
+    {
+      "left": "SRC_MARKET_TICKS_PIT",
+      "right": "SRC_AGENT_TRACE",
+      "contamination_type": "SOURCE_FAMILY_OVERLAP",
+      "evidence_ref": "evidence://provenance/family-overlap-0003",
+      "detected_by": "deterministic.family_index"
+    },
+    {
+      "left": "SRC_VENDOR_TERMS",
+      "right": "SRC_BENCH_CORE",
+      "contamination_type": "BENCHMARK_DISCUSSION",
+      "evidence_ref": "evidence://scan/vendor-bench-discussion-0004",
+      "detected_by": "deterministic.keyword_scan"
+    }
+  ]
+}

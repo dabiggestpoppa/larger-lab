@@ -1,0 +1,178 @@
+{
+  "decision": {
+    "cheapest_hourly_offer_id": "octa_fixture:octa-gpu-4471",
+    "cheapest_hourly_usd": 0.25,
+    "cheapest_observed_hourly_offer_id": "local_cpu:local-workstation-0",
+    "considered": [
+      {
+        "assumptions": {
+          "checkpoint_credit_applied": false,
+          "cost_model": "setup+throughput+preemption+storage+egress",
+          "price_is_usd_per_hour_observed": true,
+          "retention_days": 30.0,
+          "throughput_coefficient": 4.4
+        },
+        "compute_usd": 3.073333,
+        "cost_to_close_usd": 3.873333,
+        "effective_wall_hours": 2.793939,
+        "egress_usd": 0.0,
+        "expected_preemption_retries": 0.0,
+        "hourly_usd": 1.1,
+        "offer_id": "runpod_fixture:runpod-secure-8891",
+        "provider": "runpod_fixture",
+        "setup_usd": 0.073333,
+        "storage_usd": 0.8
+      },
+      {
+        "assumptions": {
+          "checkpoint_credit_applied": false,
+          "cost_model": "setup+throughput+preemption+storage+egress",
+          "price_is_usd_per_hour_observed": true,
+          "retention_days": 30.0,
+          "throughput_coefficient": 2.2
+        },
+        "compute_usd": 4.124242,
+        "cost_to_close_usd": 4.924242,
+        "effective_wall_hours": 16.49697,
+        "egress_usd": 0.0,
+        "expected_preemption_retries": 2.0,
+        "hourly_usd": 0.25,
+        "offer_id": "octa_fixture:octa-gpu-4471",
+        "provider": "octa_fixture",
+        "setup_usd": 0.033333,
+        "storage_usd": 0.8
+      }
+    ],
+    "hourly_trap_detected": true,
+    "hourly_trap_scope": "cheapest hourly price among eligible offers did not win on cost-to-close",
+    "rationale": "hourly-cheapest eligible offer loses on cost-to-close; provider hours are not the cost of finishing",
+    "rejected": [
+      {
+        "offer_id": "local_cpu:local-workstation-0",
+        "provider": "local_cpu",
+        "reason": "INSUFFICIENT_VRAM"
+      },
+      {
+        "offer_id": "runpod_fixture:runpod-secure-2200-stale",
+        "provider": "runpod_fixture",
+        "reason": "OFFER_OBSERVATION_STALE"
+      }
+    ],
+    "request_fingerprint": "sha256:0c07f1ee915d90cd4e5b385727dfdda0447aece2cadfe2e582d4943416934ebb",
+    "selected_cost_to_close_usd": 3.873333,
+    "selected_offer_id": "runpod_fixture:runpod-secure-8891",
+    "within_budget": true
+  },
+  "offers": [
+    {
+      "accelerator": "A6000",
+      "accelerator_count": 1,
+      "adapter": "octa_fixture",
+      "container_support": "docker",
+      "egress_usd_per_gb": 0.0,
+      "freshness_window_s": 3600,
+      "guarantee": "OBSERVED_ONLY_NOT_GUARANTEED",
+      "normalization_losses": [
+        "provider_advertised_reliability_not_mapped"
+      ],
+      "observed_at_epoch_s": 1767225600,
+      "offer_id": "octa_fixture:octa-gpu-4471",
+      "preempt_probability_per_hour": 0.5,
+      "preemptible": true,
+      "price_usd_per_hour": 0.25,
+      "provider": "octa_fixture",
+      "region": "eu-central",
+      "scratch_gb": 200.0,
+      "setup_overhead_minutes": 8.0,
+      "storage_usd_per_gb_month": 0.02,
+      "system_ram_gb": 64.0,
+      "trust_class": "PUBLIC_RESEARCH",
+      "vram_gb": 48.0
+    },
+    {
+      "accelerator": "A100_80G",
+      "accelerator_count": 1,
+      "adapter": "runpod_fixture",
+      "container_support": "docker",
+      "egress_usd_per_gb": 0.0,
+      "freshness_window_s": 3600,
+      "guarantee": "OBSERVED_ONLY_NOT_GUARANTEED",
+      "normalization_losses": [],
+      "observed_at_epoch_s": 1767225600,
+      "offer_id": "runpod_fixture:runpod-secure-8891",
+      "preempt_probability_per_hour": 0.0,
+      "preemptible": false,
+      "price_usd_per_hour": 1.1,
+      "provider": "runpod_fixture",
+      "region": "us-east",
+      "scratch_gb": 40.0,
+      "setup_overhead_minutes": 4.0,
+      "storage_usd_per_gb_month": 0.02,
+      "system_ram_gb": 64.0,
+      "trust_class": "PUBLIC_RESEARCH",
+      "vram_gb": 80.0
+    },
+    {
+      "accelerator": "A100_80G",
+      "accelerator_count": 1,
+      "adapter": "runpod_fixture",
+      "container_support": "docker",
+      "egress_usd_per_gb": 0.0,
+      "freshness_window_s": 3600,
+      "guarantee": "OBSERVED_ONLY_NOT_GUARANTEED",
+      "normalization_losses": [],
+      "observed_at_epoch_s": 1760000000,
+      "offer_id": "runpod_fixture:runpod-secure-2200-stale",
+      "preempt_probability_per_hour": 0.0,
+      "preemptible": false,
+      "price_usd_per_hour": 0.9,
+      "provider": "runpod_fixture",
+      "region": "us-east",
+      "scratch_gb": 40.0,
+      "setup_overhead_minutes": 4.0,
+      "storage_usd_per_gb_month": 0.02,
+      "system_ram_gb": 64.0,
+      "trust_class": "PUBLIC_RESEARCH",
+      "vram_gb": 80.0
+    },
+    {
+      "accelerator": "cpu-only",
+      "accelerator_count": 1,
+      "adapter": "local_cpu",
+      "container_support": "process",
+      "egress_usd_per_gb": 0.0,
+      "freshness_window_s": 86400,
+      "guarantee": "OBSERVED_ONLY_NOT_GUARANTEED",
+      "normalization_losses": [],
+      "observed_at_epoch_s": 1767225600,
+      "offer_id": "local_cpu:local-workstation-0",
+      "preempt_probability_per_hour": 0.0,
+      "preemptible": false,
+      "price_usd_per_hour": 0.0,
+      "provider": "local_cpu",
+      "region": "local",
+      "scratch_gb": 400.0,
+      "setup_overhead_minutes": 0.5,
+      "storage_usd_per_gb_month": 0.0,
+      "system_ram_gb": 64.0,
+      "trust_class": "PRIVATE_OPERATOR",
+      "vram_gb": 0.0
+    }
+  ],
+  "request": {
+    "accelerator_class_required": "ANY",
+    "accelerator_count": 1,
+    "checkpoint_required": false,
+    "data_transfer_gb": 0.0,
+    "expected_wall_hours": 12.0,
+    "experiment_fingerprint": "sha256:e6b666403562c5ed7400840fb06630a5a76708d8b2e54eabc508f3c5408d5794",
+    "failure_tolerance": "RETRYABLE",
+    "max_cost_to_close_usd": 10.0,
+    "notes": "",
+    "provider_field_present": false,
+    "request_id": "REQ-FIXTURE-SMOKE",
+    "scratch_gb_required": 40.0,
+    "vram_gb_required": 40.0,
+    "workload_class": "RESEARCH_SMOKE"
+  }
+}

@@ -1,0 +1,277 @@
+{
+  "pit_attempt": {
+    "manifest": null,
+    "negative_result": {
+      "blocked_sources": [],
+      "dataset_id": "ds.market.pit.v0",
+      "detail": "point-in-time leakage detected; future information present at decision instant",
+      "evidence": {
+        "checked": 4,
+        "decision_reference_utc": "2026-01-02T00:00:00Z",
+        "passed": false,
+        "pit_is_a_leak_when_unknown": true,
+        "violations": [
+          {
+            "decision_reference_utc": "2026-01-02T00:00:00Z",
+            "item_id": "MARKET-LEAK-0003",
+            "known_at_utc": "2026-01-03T09:32:00Z",
+            "reason": "FUTURE_INFORMATION_AT_DECISION_INSTANT",
+            "severity": "LEAK"
+          },
+          {
+            "event_time_utc": "2026-01-01T09:33:00Z",
+            "item_id": "MARKET-IMPLAUSIBLE-0004",
+            "known_at_utc": "2026-01-01T09:30:00Z",
+            "reason": "KNOWLEDGE_PRECEDES_EVENT",
+            "severity": "IMPLAUSIBLE"
+          }
+        ]
+      },
+      "failure": "PIT_INVALID",
+      "kind": "refinery_negative_result",
+      "negative_result_is_project_failure": false,
+      "reopen_condition": "reopen when a rights disposition, provenance record, or decontaminated source set is registered and re-audited under the same recipe"
+    },
+    "receipt": {
+      "detail": "point-in-time leakage detected; future information present at decision instant",
+      "failure": "PIT_INVALID",
+      "kind": "dataset.refused",
+      "negative_result_recorded": true,
+      "receipt_fingerprint": "sha256:f353da2e025b6dc284b8f27f540d634c75bfa09886bfa2e3e339acf1de372ee6",
+      "recorded_utc": "2026-09-17T20:54:29+00:00",
+      "subject": "ds.market.pit.v0"
+    }
+  },
+  "secret_attempt": {
+    "manifest": null,
+    "negative_result": {
+      "blocked_sources": [
+        "SRC_SECRET_INCIDENT"
+      ],
+      "dataset_id": "ds.secret.v0",
+      "detail": "no governed source survived rights/contamination gating: SRC_SECRET_INCIDENT (SCHEMA_INVALID: secret-bearing source)",
+      "evidence": {
+        "detail": "[{'source_id': 'SRC_SECRET_INCIDENT', 'reason': 'SCHEMA_INVALID', 'detail': 'secret-bearing source'}]"
+      },
+      "failure": "SCHEMA_INVALID",
+      "kind": "refinery_negative_result",
+      "negative_result_is_project_failure": false,
+      "reopen_condition": "reopen when a rights disposition, provenance record, or decontaminated source set is registered and re-audited under the same recipe"
+    },
+    "receipt": {
+      "detail": "no governed source survived rights/contamination gating: SRC_SECRET_INCIDENT (SCHEMA_INVALID: secret-bearing source)",
+      "failure": "SCHEMA_INVALID",
+      "kind": "dataset.refused",
+      "negative_result_recorded": true,
+      "receipt_fingerprint": "sha256:7fb8b32997356d77cf82fa45438ad55e8b3ce9722cd57e6b1bd2d2460ae56d50",
+      "recorded_utc": "2026-09-17T20:54:29+00:00",
+      "subject": "ds.secret.v0"
+    }
+  },
+  "train_dataset": {
+    "manifest": {
+      "contamination": {
+        "claim_blocking_sources": [
+          "SRC_NEWS_ALPHA",
+          "SRC_NEWS_ALPHA_MIRROR"
+        ],
+        "dataset_worst_grade": "C4_DIRECT_ITEM_OR_ANSWER_OVERLAP",
+        "observed_absence_is_not_cleanliness": true,
+        "per_source_worst_grade": {
+          "SRC_AGENT_TRACE": "C1_SOURCE_FAMILY_PROXIMITY",
+          "SRC_NEWS_ALPHA": "C4_DIRECT_ITEM_OR_ANSWER_OVERLAP",
+          "SRC_NEWS_ALPHA_MIRROR": "C4_DIRECT_ITEM_OR_ANSWER_OVERLAP"
+        }
+      },
+      "dataset_id": "ds.tier0.cpt.v0",
+      "dedup": {
+        "collapsed_to_lineage": {
+          "ALPHA-0001-DUP": "ALPHA-0001",
+          "ALPHA-0002-NEAR": "ALPHA-0002",
+          "MIRROR-0001": "ALPHA-0001"
+        },
+        "cross_source_duplicate_count": 1,
+        "duplicates_do_not_add_diversity": true,
+        "exact_duplicates_collapsed": 1,
+        "kept_items": [
+          "TRACE-0001",
+          "ALPHA-0001",
+          "ALPHA-0002"
+        ],
+        "near_duplicate_count": 2,
+        "near_duplicates_collapsed": [
+          {
+            "cross_source": false,
+            "duplicate_of": "ALPHA-0002",
+            "item_id": "ALPHA-0002-NEAR",
+            "similarity": 0.875
+          },
+          {
+            "cross_source": true,
+            "duplicate_of": "ALPHA-0001",
+            "item_id": "MIRROR-0001",
+            "similarity": 1.0
+          }
+        ]
+      },
+      "excluded_sources": [
+        {
+          "detail": "withheld CEREBUS-family doctrine",
+          "reason": "CONTAMINATION_BLOCKED",
+          "source_id": "SRC_CEREBUS_RULES"
+        },
+        {
+          "detail": "rights state RIGHTS_UNKNOWN",
+          "reason": "RIGHTS_BLOCKED",
+          "source_id": "SRC_RIGHTS_UNKNOWN"
+        }
+      ],
+      "item_count": 3,
+      "lineage_fingerprint": "sha256:79a42d18d2bc79243a89072043363ba608e635e5f1037f4ef82756a25f2636bb",
+      "manifest_is_capability_claim": false,
+      "notes": "derived artifacts inherit ancestor restrictions",
+      "pit_audit": {
+        "checked": 6,
+        "decision_reference_utc": null,
+        "passed": true,
+        "pit_is_a_leak_when_unknown": true,
+        "violations": []
+      },
+      "provenance_summary": {
+        "claim_strength_penalty": true,
+        "sources": 3,
+        "unknown_ancestry_sources": [
+          "SRC_AGENT_TRACE"
+        ],
+        "unknown_is_not_favorable": true
+      },
+      "purpose": "continued pretraining corpus for scratch-model research",
+      "recipe": {
+        "dedup_jaccard_threshold": 0.85,
+        "dedup_shingle_size": 5,
+        "description": "canonical text refinement chain",
+        "deterministic": true,
+        "model_inference_used": false,
+        "pit_enforce": true,
+        "recipe_id": "recipe.text.v1",
+        "secret_scan": true,
+        "steps": [
+          "normalize_whitespace",
+          "exact_dedup",
+          "near_dedup",
+          "secret_scan",
+          "pit_audit",
+          "split_by_source"
+        ]
+      },
+      "rights_summary": {
+        "all_sources_train_permissive": true,
+        "by_state": {
+          "RIGHTS_VERIFIED_BY_POLICY": 3
+        },
+        "unknown_rights_sources": []
+      },
+      "role": "TRAIN_CPT",
+      "secret_scan": {
+        "hits": [],
+        "passed": true,
+        "scanned": 6
+      },
+      "sources": [
+        {
+          "lineage": "generated://scaffold-v0",
+          "rights_state": "RIGHTS_VERIFIED_BY_POLICY",
+          "role": "TRAIN_SFT",
+          "source_id": "SRC_AGENT_TRACE"
+        },
+        {
+          "lineage": "wire://alpha",
+          "rights_state": "RIGHTS_VERIFIED_BY_POLICY",
+          "role": "TRAIN_CPT",
+          "source_id": "SRC_NEWS_ALPHA"
+        },
+        {
+          "lineage": "SRC_NEWS_ALPHA",
+          "rights_state": "RIGHTS_VERIFIED_BY_POLICY",
+          "role": "TRAIN_CPT",
+          "source_id": "SRC_NEWS_ALPHA_MIRROR"
+        }
+      ],
+      "splits": {
+        "held_out": {
+          "items": 0,
+          "sources": []
+        },
+        "item_level_random_split_used": false,
+        "strategy": "BY_SOURCE",
+        "train": {
+          "items": 3,
+          "sources": [
+            "SRC_AGENT_TRACE",
+            "SRC_NEWS_ALPHA"
+          ]
+        }
+      },
+      "trainable": true,
+      "transformations": [
+        "normalize_whitespace",
+        "exact_dedup",
+        "near_dedup",
+        "secret_scan",
+        "pit_audit",
+        "split_by_source"
+      ],
+      "version": 1
+    },
+    "negative_result": null,
+    "receipt": {
+      "available_data_is_not_trainable_data": true,
+      "excluded_sources": [
+        {
+          "detail": "withheld CEREBUS-family doctrine",
+          "reason": "CONTAMINATION_BLOCKED",
+          "source_id": "SRC_CEREBUS_RULES"
+        },
+        {
+          "detail": "rights state RIGHTS_UNKNOWN",
+          "reason": "RIGHTS_BLOCKED",
+          "source_id": "SRC_RIGHTS_UNKNOWN"
+        }
+      ],
+      "item_count": 3,
+      "kind": "dataset.refined",
+      "lineage_fingerprint": "sha256:79a42d18d2bc79243a89072043363ba608e635e5f1037f4ef82756a25f2636bb",
+      "manifest_fingerprint": "sha256:c4c4ae6fb8574827ae099866422088cc417edb175d21fcfbb80bed0a7292f2e5",
+      "receipt_fingerprint": "sha256:a0c7b806197589c12c7dcb4be29753dbdf501e011c10f0c1c8a892b48e63fc39",
+      "recorded_utc": "2026-09-17T20:54:29+00:00",
+      "role": "TRAIN_CPT",
+      "subject": "ds.tier0.cpt.v0"
+    }
+  },
+  "withheld_attempt": {
+    "manifest": null,
+    "negative_result": {
+      "blocked_sources": [
+        "SRC_CEREBUS_RULES"
+      ],
+      "dataset_id": "ds.withheld.v0",
+      "detail": "no governed source survived rights/contamination gating: SRC_CEREBUS_RULES (CONTAMINATION_BLOCKED: withheld CEREBUS-family doctrine)",
+      "evidence": {
+        "detail": "[{'source_id': 'SRC_CEREBUS_RULES', 'reason': 'CONTAMINATION_BLOCKED', 'detail': 'withheld CEREBUS-family doctrine'}]"
+      },
+      "failure": "CONTAMINATION_BLOCKED",
+      "kind": "refinery_negative_result",
+      "negative_result_is_project_failure": false,
+      "reopen_condition": "reopen when a rights disposition, provenance record, or decontaminated source set is registered and re-audited under the same recipe"
+    },
+    "receipt": {
+      "detail": "no governed source survived rights/contamination gating: SRC_CEREBUS_RULES (CONTAMINATION_BLOCKED: withheld CEREBUS-family doctrine)",
+      "failure": "CONTAMINATION_BLOCKED",
+      "kind": "dataset.refused",
+      "negative_result_recorded": true,
+      "receipt_fingerprint": "sha256:9785d48f3968fb81ecf828caeb60762aa0d91937b1e789cef284614fdef97d8a",
+      "recorded_utc": "2026-09-17T20:54:29+00:00",
+      "subject": "ds.withheld.v0"
+    }
+  }
+}

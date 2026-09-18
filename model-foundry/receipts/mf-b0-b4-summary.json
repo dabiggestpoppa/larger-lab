@@ -1,0 +1,35 @@
+{
+  "b0_attacks_contained": 5,
+  "b0_attacks_held": 20,
+  "b0_attacks_refused": 15,
+  "b0_verdict": "PASS",
+  "blocks": {
+    "b0_gate": "ok",
+    "b1_cost_close": "ok",
+    "b2_registry": "ok",
+    "b3_refine": "ok",
+    "b4_run": "ok",
+    "cross_block": "ok",
+    "doctrine": [
+      "MODEL OUTPUT != INSTITUTIONAL TRUTH",
+      "WEIGHTS != CANONICAL MEMORY",
+      "CAPABILITY != AUTHORITY",
+      "ACCESS != RIGHTS",
+      "AVAILABLE DATA != TRAINABLE DATA",
+      "BENCHMARK SCORE != CAPABILITY",
+      "PROVIDER OFFER != GUARANTEE",
+      "HOURLY PRICE != COST-TO-CLOSE",
+      "REGISTERED SOURCE != CLEAN SOURCE",
+      "HIDDEN EVAL != DEVELOPMENT DATA",
+      "NEGATIVE RESULT != FAILED PROJECT",
+      "UNKNOWN != FAVORABLE"
+    ],
+    "evidence": "ok"
+  },
+  "capital_operations": 0,
+  "cloud_mutations": 0,
+  "constitution_fingerprint": "sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420",
+  "paid_compute_launched": false,
+  "production_mutations": 0,
+  "receipt_fingerprint": "sha256:ec1964e324e85cf793ae8c2f93ffde552218361b1be2cfc658dec9efb1e6e26d"
+}

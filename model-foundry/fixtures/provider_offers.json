@@ -1,0 +1,99 @@
+{
+  "fixture": "provider_offers",
+  "noncanonical": true,
+  "canonical_oce_target": "OCE B10 Resource Intelligence (COMPUTE.GPU.RENT)",
+  "replacement_condition": "replace when B10 exposes provider-neutral offer/routing",
+  "notes": "Hand-written observations in two different provider dialects (USD/hour + GB, and cents/hour + MB). No network call was made to produce these.",
+  "observations": [
+    {
+      "provider": "octa_fixture",
+      "observed_at_epoch_s": 1767225600,
+      "freshness_window_s": 3600,
+      "raw": {
+        "offer_id": "octa-gpu-4471",
+        "accelerator": "A6000",
+        "accelerator_count": 1,
+        "vram_gb": 48,
+        "system_ram_gb": 64,
+        "scratch_gb": 200,
+        "price_usd_per_hour": 0.25,
+        "storage_usd_per_gb_month": 0.02,
+        "egress_usd_per_gb": 0.0,
+        "region": "eu-central",
+        "preemptible": true,
+        "preempt_probability_per_hour": 0.5,
+        "setup_minutes": 8,
+        "container_support": "docker",
+        "trust_class": "PUBLIC_RESEARCH",
+        "normalization_losses": ["provider_advertised_reliability_not_mapped"]
+      }
+    },
+    {
+      "provider": "runpod_fixture",
+      "observed_at_epoch_s": 1767225600,
+      "freshness_window_s": 3600,
+      "raw": {
+        "offer_id": "runpod-secure-8891",
+        "accelerator": "A100_80G",
+        "gpu_count": 1,
+        "vram_mb": 81920,
+        "ram_mb": 65536,
+        "container_disk_gb": 40,
+        "price_cents_per_hour": 110,
+        "storage_usd_per_gb_month": 0.02,
+        "egress_usd_per_gb": 0.0,
+        "region": "us-east",
+        "preemptible": false,
+        "interrupt_probability_per_hour": 0.0,
+        "startup_seconds": 240,
+        "container_support": "docker",
+        "trust_class": "PUBLIC_RESEARCH",
+        "normalization_losses": []
+      }
+    },
+    {
+      "provider": "runpod_fixture",
+      "observed_at_epoch_s": 1760000000,
+      "freshness_window_s": 3600,
+      "raw": {
+        "offer_id": "runpod-secure-2200-stale",
+        "accelerator": "A100_80G",
+        "gpu_count": 1,
+        "vram_mb": 81920,
+        "ram_mb": 65536,
+        "container_disk_gb": 40,
+        "price_cents_per_hour": 90,
+        "storage_usd_per_gb_month": 0.02,
+        "egress_usd_per_gb": 0.0,
+        "region": "us-east",
+        "preemptible": false,
+        "interrupt_probability_per_hour": 0.0,
+        "startup_seconds": 240,
+        "container_support": "docker",
+        "trust_class": "PUBLIC_RESEARCH",
+        "normalization_losses": []
+      }
+    },
+    {
+      "provider": "local_cpu",
+      "observed_at_epoch_s": 1767225600,
+      "freshness_window_s": 86400,
+      "raw": {
+        "offer_id": "local-workstation-0",
+        "accelerator": "cpu-only",
+        "accelerator_count": 1,
+        "vram_gb": 0,
+        "system_ram_gb": 64,
+        "scratch_gb": 400,
+        "price_usd_per_hour": 0.0,
+        "storage_usd_per_gb_month": 0.0,
+        "egress_usd_per_gb": 0.0,
+        "region": "local",
+        "preemptible": false,
+        "container_support": "process",
+        "trust_class": "PRIVATE_OPERATOR",
+        "normalization_losses": []
+      }
+    }
+  ]
+}
