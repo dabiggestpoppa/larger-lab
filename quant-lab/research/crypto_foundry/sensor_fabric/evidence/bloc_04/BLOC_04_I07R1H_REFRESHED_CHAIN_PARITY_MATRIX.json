@@ -1,0 +1,158 @@
+{
+  "cases": [
+    {
+      "case": "from_status_chain_break",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "transition_job_id_mismatch",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "result_status_mismatch",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "provider_identity_mismatch",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "sensor_identity_mismatch",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "request_identity_mismatch",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "updated_at_transition_mismatch",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "backward_chronology",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "sequence_gap",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "event_identity_mismatch",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "ordinary_resume_pointer_mutation",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "ordinary_anchor_mutation",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "proof_on_ordinary_event",
+      "chain_unchanged": true,
+      "restart_path_error": "JobCatalogCorrupt",
+      "restart_rejected": true,
+      "result": "PASS",
+      "runtime_path_error": "JobCatalogCorrupt",
+      "runtime_rejected": true,
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "adoption_proven": true,
+      "case": "intact_refreshed_control",
+      "restart_accepted": true,
+      "result": "PASS",
+      "runtime_adopted": true
+    },
+    {
+      "blob_anchor_matches": true,
+      "case": "valid_raw_cross_constructor_retry",
+      "last_manifest_id": null,
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED"
+    },
+    {
+      "blob_anchor_matches": true,
+      "case": "valid_manifest_cross_constructor_retry",
+      "last_manifest_id": "pm-valid_manifest_cross_constructor_retry",
+      "result": "PASS",
+      "status": "CHECKPOINT_ADVANCED"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1H",
+  "doctrine": "I07R1H \u00a73-\u00a728 \u2014 catalog integrity is not job-chain validity: a record adopted by outer-lock refresh must satisfy the same durable job contract a restart would enforce before it can influence runtime state",
+  "matrix": "BLOC_04_I07R1H_REFRESHED_CHAIN_PARITY_MATRIX"
+}

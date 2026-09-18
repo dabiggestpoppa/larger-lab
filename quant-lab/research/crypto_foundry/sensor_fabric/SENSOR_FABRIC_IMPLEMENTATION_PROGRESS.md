@@ -11,10 +11,10 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I07R1G (this commit): the runtime exact-retry path and restart replay now validate a persisted checkpoint proof through ONE authority — closed V1 schema (absent / non-mapping / missing field / unknown version), durability floor, proof↔result-state anchor binding, and the durable re-proof under the floor persisted in the proof itself — so a long-lived repository whose post-lock refresh adopts a forged checkpoint head can no longer silently adopt it where a fresh restart would refuse it, and a malformed proof can no longer escape as a raw KeyError/ValueError/TypeError. Measured before → after: 6 forged heads silently ADOPTED at runtime, 5 raw Python exceptions, 3 wrong typed errors → 17/17 forged cases JobCatalogCorrupt on BOTH paths, chain unchanged. PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED=PENDING_OPERATOR_REVIEW (proposed PASS after implementation); PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED=OPERATOR_HOLD; DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE; RECOVERY_SCANNER_IMPLEMENTED=FALSE; next_checkpoint_authorized=FALSE. Prior governance record (historical — I07R1F, NOT rewritten): the persisted checkpoint-proof floor governs HISTORICAL checkpoint retries while constructor configuration governs NEW checkpoints only (a restart with a different min_durable_status can no longer reject or reinterpret durable history), and the shared DurableJsonCatalog cache is internally synchronized by one REENTRANT lock so concurrent per-job writers can never race refresh/commit into a false vanished-record corruption. Prior RATIFIED governance record (historical — I06R1-RATIFY): operator ACCEPTED the complete I05→I06→I06R1 chain — PASS_SENSOR_B4_I05_RAW_PROJECTION_LINEAGE, PASS_SENSOR_B4_I05R1_DURABLE_END_TO_END_LINEAGE_SEALED, PASS_SENSOR_B4_I05R2_FAIL_CLOSED_PUBLIC_API_SEALED, PASS_SENSOR_B4_I05R3_LINEAGE_IDENTITY_TIME_SEALED, PASS_SENSOR_B4_I05R4_EVIDENCE_INTERFACE_RETRY_SEALED, PASS_SENSOR_B4_I06_SOURCE_REVISION_MUTATION_REGISTRY, PASS_SENSOR_B4_I06R1_CANONICAL_CONTRACT_DECLARATION_SEALED = OPERATOR_ACCEPTED; G4-04_REVISION_GATE = IMPLEMENTATION_PASS; T0A_EVIDENCE_PIPELINE_COMPLETE=TRUE, T0B_PROJECTION_SCHEMA_READY=TRUE, T0B_PHYSICAL_PROJECTION_WRITER_READY=TRUE, T0B_PROJECTION_CATALOG_IMPLEMENTED=TRUE, T0B_LINEAGE_REPOSITORY_IMPLEMENTED=TRUE, T0B_TO_T0A_LINEAGE_COMPLETE=TRUE, T0B_STORAGE_IMPLEMENTED=TRUE, SOURCE_REVISION_REGISTRY_IMPLEMENTED=TRUE, SOURCE_MUTATION_EXPLICIT=TRUE, REVISION_RESOLUTION_READY=TRUE, REVISION_CANONICAL_CONTRACT_SEALED=TRUE, PROVIDER_DECLARATION_DURABILITY_SEALED=TRUE, DURABLE_RESUME_IMPLEMENTED=FALSE, RECOVERY_SCANNER_IMPLEMENTED=FALSE; branch agent/crypto-sensor-fabric-build fast-forwarded to main d09941e7 (no content change, no force); historical checkpoint entries/evidence NOT rewritten; AUTHORIZED: SENSOR-B4-I07 DURABLE JOB STATE + RESUME COUPLING ONLY; I08+ NOT authorized. |
+| Current checkpoint | SENSOR-B4-I07R1H (this commit): the outermost per-job lock refreshes the birth/event catalogs and now re-proves the LOCKED job's chain through the SAME per-job validation authority restart uses (_validate_job_chain) — canonical event identity, transition/result binding, immutable birth identity, time binding, the frozen transition graph, contiguity/linkage/chronology and ordinary pointer immutability — so a long-lived repository can no longer consume as runtime state an event a fresh restart would reject; catalog-fragment integrity is no longer mistaken for job-chain validity. Measured: 13 chain-corrupt forged heads (from_status break, transition job_id mismatch, result-status mismatch, 3 birth-identity mutations, time-binding break, backward chronology, sequence gap, event-identity mismatch, ordinary pointer/anchor mutation, proof on ordinary event) rejected JobCatalogCorrupt on BOTH the runtime refresh path and fresh restart, chain unchanged, with the intact refreshed control adopted (adoption proven by the probe's own +1 event). Historical — I07R1G (NOT rewritten): the runtime exact-retry path and restart replay validate a persisted checkpoint proof through ONE authority — closed V1 schema (absent / non-mapping / missing field / unknown version), durability floor, proof↔result-state anchor binding, and the durable re-proof under the floor persisted in the proof itself — so a long-lived repository whose post-lock refresh adopts a forged checkpoint head can no longer silently adopt it where a fresh restart would refuse it, and a malformed proof can no longer escape as a raw KeyError/ValueError/TypeError. Measured before → after: 6 forged heads silently ADOPTED at runtime, 5 raw Python exceptions, 3 wrong typed errors → 17/17 forged cases JobCatalogCorrupt on BOTH paths, chain unchanged. PASS_SENSOR_B4_I07R1H_REFRESHED_CHAIN_VALIDATION_PARITY_SEALED=PENDING_OPERATOR_REVIEW (proposed PASS after implementation); PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED=OPERATOR_HOLD; DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE; RECOVERY_SCANNER_IMPLEMENTED=FALSE; next_checkpoint_authorized=FALSE. Prior governance record (historical — I07R1F, NOT rewritten): the persisted checkpoint-proof floor governs HISTORICAL checkpoint retries while constructor configuration governs NEW checkpoints only (a restart with a different min_durable_status can no longer reject or reinterpret durable history), and the shared DurableJsonCatalog cache is internally synchronized by one REENTRANT lock so concurrent per-job writers can never race refresh/commit into a false vanished-record corruption. Prior RATIFIED governance record (historical — I06R1-RATIFY): operator ACCEPTED the complete I05→I06→I06R1 chain — PASS_SENSOR_B4_I05_RAW_PROJECTION_LINEAGE, PASS_SENSOR_B4_I05R1_DURABLE_END_TO_END_LINEAGE_SEALED, PASS_SENSOR_B4_I05R2_FAIL_CLOSED_PUBLIC_API_SEALED, PASS_SENSOR_B4_I05R3_LINEAGE_IDENTITY_TIME_SEALED, PASS_SENSOR_B4_I05R4_EVIDENCE_INTERFACE_RETRY_SEALED, PASS_SENSOR_B4_I06_SOURCE_REVISION_MUTATION_REGISTRY, PASS_SENSOR_B4_I06R1_CANONICAL_CONTRACT_DECLARATION_SEALED = OPERATOR_ACCEPTED; G4-04_REVISION_GATE = IMPLEMENTATION_PASS; T0A_EVIDENCE_PIPELINE_COMPLETE=TRUE, T0B_PROJECTION_SCHEMA_READY=TRUE, T0B_PHYSICAL_PROJECTION_WRITER_READY=TRUE, T0B_PROJECTION_CATALOG_IMPLEMENTED=TRUE, T0B_LINEAGE_REPOSITORY_IMPLEMENTED=TRUE, T0B_TO_T0A_LINEAGE_COMPLETE=TRUE, T0B_STORAGE_IMPLEMENTED=TRUE, SOURCE_REVISION_REGISTRY_IMPLEMENTED=TRUE, SOURCE_MUTATION_EXPLICIT=TRUE, REVISION_RESOLUTION_READY=TRUE, REVISION_CANONICAL_CONTRACT_SEALED=TRUE, PROVIDER_DECLARATION_DURABILITY_SEALED=TRUE, DURABLE_RESUME_IMPLEMENTED=FALSE, RECOVERY_SCANNER_IMPLEMENTED=FALSE; branch agent/crypto-sensor-fabric-build fast-forwarded to main d09941e7 (no content change, no force); historical checkpoint entries/evidence NOT rewritten; AUTHORIZED: SENSOR-B4-I07 DURABLE JOB STATE + RESUME COUPLING ONLY; I08+ NOT authorized. | — closed V1 schema (absent / non-mapping / missing field / unknown version), durability floor, proof↔result-state anchor binding, and the durable re-proof under the floor persisted in the proof itself — so a long-lived repository whose post-lock refresh adopts a forged checkpoint head can no longer silently adopt it where a fresh restart would refuse it, and a malformed proof can no longer escape as a raw KeyError/ValueError/TypeError. Measured before → after: 6 forged heads silently ADOPTED at runtime, 5 raw Python exceptions, 3 wrong typed errors → 17/17 forged cases JobCatalogCorrupt on BOTH paths, chain unchanged. PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED=PENDING_OPERATOR_REVIEW (proposed PASS after implementation); PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED=OPERATOR_HOLD; DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE; RECOVERY_SCANNER_IMPLEMENTED=FALSE; next_checkpoint_authorized=FALSE. Prior governance record (historical — I07R1F, NOT rewritten): the persisted checkpoint-proof floor governs HISTORICAL checkpoint retries while constructor configuration governs NEW checkpoints only (a restart with a different min_durable_status can no longer reject or reinterpret durable history), and the shared DurableJsonCatalog cache is internally synchronized by one REENTRANT lock so concurrent per-job writers can never race refresh/commit into a false vanished-record corruption. Prior RATIFIED governance record (historical — I06R1-RATIFY): operator ACCEPTED the complete I05→I06→I06R1 chain — PASS_SENSOR_B4_I05_RAW_PROJECTION_LINEAGE, PASS_SENSOR_B4_I05R1_DURABLE_END_TO_END_LINEAGE_SEALED, PASS_SENSOR_B4_I05R2_FAIL_CLOSED_PUBLIC_API_SEALED, PASS_SENSOR_B4_I05R3_LINEAGE_IDENTITY_TIME_SEALED, PASS_SENSOR_B4_I05R4_EVIDENCE_INTERFACE_RETRY_SEALED, PASS_SENSOR_B4_I06_SOURCE_REVISION_MUTATION_REGISTRY, PASS_SENSOR_B4_I06R1_CANONICAL_CONTRACT_DECLARATION_SEALED = OPERATOR_ACCEPTED; G4-04_REVISION_GATE = IMPLEMENTATION_PASS; T0A_EVIDENCE_PIPELINE_COMPLETE=TRUE, T0B_PROJECTION_SCHEMA_READY=TRUE, T0B_PHYSICAL_PROJECTION_WRITER_READY=TRUE, T0B_PROJECTION_CATALOG_IMPLEMENTED=TRUE, T0B_LINEAGE_REPOSITORY_IMPLEMENTED=TRUE, T0B_TO_T0A_LINEAGE_COMPLETE=TRUE, T0B_STORAGE_IMPLEMENTED=TRUE, SOURCE_REVISION_REGISTRY_IMPLEMENTED=TRUE, SOURCE_MUTATION_EXPLICIT=TRUE, REVISION_RESOLUTION_READY=TRUE, REVISION_CANONICAL_CONTRACT_SEALED=TRUE, PROVIDER_DECLARATION_DURABILITY_SEALED=TRUE, DURABLE_RESUME_IMPLEMENTED=FALSE, RECOVERY_SCANNER_IMPLEMENTED=FALSE; branch agent/crypto-sensor-fabric-build fast-forwarded to main d09941e7 (no content change, no force); historical checkpoint entries/evidence NOT rewritten; AUTHORIZED: SENSOR-B4-I07 DURABLE JOB STATE + RESUME COUPLING ONLY; I08+ NOT authorized. |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN; Bloc 4 planning frozen (PASS_BLOC_04_PLAN_FROZEN); complete I05 chain (I05, I05R1–I05R4) OPERATOR_ACCEPTED (SENSOR-B4-I05R4-RATIFY); SENSOR-B4-I06 SOURCE REVISION / MUTATION REGISTRY OPERATOR_ACCEPTED and SENSOR-B4-I06R1 CANONICAL CONTRACT + DECLARATION DURABILITY OPERATOR_ACCEPTED (SENSOR-B4-I06R1-RATIFY, this commit); G4-04_REVISION_GATE = IMPLEMENTATION_PASS. Current Bloc-4 review state: SENSOR-B4-I07R1G = PENDING_OPERATOR_REVIEW (the runtime checkpoint-proof-schema / replay-parity microseal proposed in this commit), with PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED = OPERATOR_HOLD, PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED = OPERATOR_HOLD and PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED = OPERATOR_HOLD. Full per-checkpoint review chains remain recorded in the checkpoint sections and commit log below — no historical entries rewritten. |
+| Operator review state | RATIFIED — Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN; Bloc 4 planning frozen (PASS_BLOC_04_PLAN_FROZEN); complete I05 chain (I05, I05R1–I05R4) OPERATOR_ACCEPTED (SENSOR-B4-I05R4-RATIFY); SENSOR-B4-I06 SOURCE REVISION / MUTATION REGISTRY OPERATOR_ACCEPTED and SENSOR-B4-I06R1 CANONICAL CONTRACT + DECLARATION DURABILITY OPERATOR_ACCEPTED (SENSOR-B4-I06R1-RATIFY); G4-04_REVISION_GATE = IMPLEMENTATION_PASS. Current Bloc-4 review state: SENSOR-B4-I07R1H = PENDING_OPERATOR_REVIEW (the runtime refreshed-chain / restart validation parity microseal proposed in this commit), with PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED = OPERATOR_HOLD, PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED = OPERATOR_HOLD, PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED = OPERATOR_HOLD and PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED = OPERATOR_HOLD. Full per-checkpoint review chains remain recorded in the checkpoint sections and commit log below — no historical entries rewritten. |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
@@ -25,7 +25,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE — SENSOR-B4-I07R1G = PENDING_OPERATOR_REVIEW with PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED = OPERATOR_HOLD, PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED = OPERATOR_HOLD and PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED = OPERATOR_HOLD; DURABLE_RESUME_IMPLEMENTED = PENDING_OPERATOR_ACCEPTANCE; recommended_next = SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY AFTER operator acceptance. I08+ NOT authorized and NOT started. |
+| next_checkpoint_authorized | FALSE — SENSOR-B4-I07R1H = PENDING_OPERATOR_REVIEW with PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED = OPERATOR_HOLD, PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED = OPERATOR_HOLD, PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED = OPERATOR_HOLD and PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED = OPERATOR_HOLD; DURABLE_RESUME_IMPLEMENTED = PENDING_OPERATOR_ACCEPTANCE; recommended_next = SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY AFTER operator acceptance. I08+ NOT authorized and NOT started. |
 
 ## Test counts (cumulative)
 
@@ -1301,3 +1301,86 @@ review. `PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED = PENDI
 ONLY AFTER operator acceptance.
 
 **STOP GATE honored:** I08 (recovery / quarantine) NOT started. Research NOT resumed.
+
+---
+
+## SENSOR-B4-I07R1H — runtime refreshed-chain + restart validation parity
+
+Prompt: `SENSOR-B4-I07R1H` (runtime refreshed-event chain + restart
+validation parity), starting at `7a7d576c056693a49cf261753af886a5b4df4e0c`
+on `agent/crypto-sensor-fabric-build` (clean tree; lineage
+`3c838e4d` → `b24ef884` → `7a7d576c` verified).
+
+Operator finding closed: the outermost per-job lock refreshed the
+birth/event catalogs and then materialized the newest `resulting_state`
+directly — but `DurableJsonCatalog.refresh()` proves fragment parse and
+physical-key binding only, NOT that an adopted event satisfies the
+job-state contract (canonical event identity, transition/result binding,
+immutable birth identity, time binding, the frozen transition graph,
+contiguity/linkage/chronology, ordinary pointer immutability).  A
+long-lived repository could therefore consume as runtime state an event a
+fresh restart would reject.  ONE per-job chain authority
+(`_validate_job_chain`) now serves BOTH callers: the outer lock runs it
+for the LOCKED job after both refreshes complete (targeted, never a
+global all-job rescan), and restart (`_validate_cross_constraints`)
+reuses it per job plus the global unknown-job check — no rule duplicated,
+same `validate_transition` graph, same `is_checkpoint_event` predicate,
+same I07R1G proof authority.
+
+| Commit | SHA | Content | Tests | Verdict |
+|---|---|---|---|---|
+| SENSOR-B4-I07R1H-A | 765ed1a2 | Shared per-job chain authority (`_validate_job_chain`) wired into outer-lock refresh (job-targeted, post-refresh) and restart replay; monolithic `_validate_cross_constraints` reduced to the global unknown-job check + per-job sweep. New adversarial surface `test_job_state_r1h.py` (13 chain-corrupt cases + intact control + job-local proof) | see SENSOR-B4-I07R1H-B row for final counts | proposed |
+| SENSOR-B4-I07R1H-B | (this commit) | Machine matrix `BLOC_04_I07R1H_REFRESHED_CHAIN_PARITY_MATRIX.json` (16 cases, all PASS) published once, pytest READ-ONLY vs committed bytes; evidence MD `BLOC_04_I07R1H_REFRESHED_CHAIN_VALIDATION_PARITY_EVIDENCE.md`; top-level operator ledger advanced to I07R1H truth | fresh exact-head baseline at 7a7d576c: storage 1098/0/3 (1101 collected), full 2477/0/4 (2481 collected); final: storage 1115 passed / 0 failed / 3 skipped (1118 collected), full 2494 passed / 0 failed / 4 skipped (2498 collected); delta +17, zero failures | proposed `PASS_SENSOR_B4_I07R1H_REFRESHED_CHAIN_VALIDATION_PARITY_SEALED`; then operator may accept `PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED`, `PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED`, `PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED` and `PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED`; `DURABLE_RESUME_IMPLEMENTED = PENDING_OPERATOR_ACCEPTANCE`; `RECOVERY_SCANNER_IMPLEMENTED = FALSE`; `next_checkpoint_authorized = FALSE`; recommended next SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY AFTER operator acceptance (NOT authorized, NOT started) |
+
+Adversarial outcome (13 chain-corrupt heads, each published at its CORRECT
+hashed physical key so catalog refresh adopts it, each with a fully valid
+proof where present — only chain semantics corrupted): `from_status_chain_break`,
+`transition_job_id_mismatch`, `result_status_mismatch`,
+`provider_identity_mismatch`, `sensor_identity_mismatch`,
+`request_identity_mismatch`, `updated_at_transition_mismatch`,
+`backward_chronology`, `sequence_gap`, `event_identity_mismatch`,
+`ordinary_resume_pointer_mutation`, `ordinary_anchor_mutation`,
+`proof_on_ordinary_event` — ALL rejected `JobCatalogCorrupt` on BOTH the
+runtime refresh path and fresh restart, chain unchanged (corruption never
+writes).  Intact refreshed control ADOPTED at runtime (adoption proven by
+the probe's own +1 event) and accepted at restart.  Load-bearing proof:
+neutralizing only the runtime gate (`_validate_job_chain` removed from
+`_refresh_durable_truth`) failed 14 of 15 r1h tests with the predicted
+mode (corrupt heads adopted at runtime, restart still refusing), then the
+source was restored byte-identically and re-verified green.  I07R1G
+forged-proof parity (17 cases + control) remains green and its committed
+matrix regenerates byte-identically; RAW/MANIFEST persisted-floor
+cross-config retries remain green; catalog RLock unchanged;
+constructor-floor authority for NEW checkpoints unchanged.
+
+Precision notes: ruff clean on all changed scope.  mypy stated precisely
+per §31: `jobs.py` introduces no new error beyond the documented
+pre-existing `probes/planner.py:79` baseline; the repository defines no
+`[tool.mypy]` policy, and the two new test modules were type-checked with
+the source root configured (`MYPYPATH="quant-lab/src;
+quant-lab/tests/crypto_sensor_fabric/storage"`) and are fully clean (zero
+errors, no `import-not-found`, no arg-type notes).  Network = 0; provider
+source unchanged.  One earlier full-suite run observed a single failure in
+the pre-existing `test_blob_store_adversarial.py` concurrency test
+(threading, code untouched by this checkpoint); it passes in isolation and
+in the recorded final run.  Historical I07/I07R1/I07R1F/I07R1G evidence
+and the historical ledger sections untouched.
+
+### Governance reconciliation note (I07R1H §32)
+
+The operator-facing **Current state** table is advanced in this commit to
+`SENSOR-B4-I07R1H` with
+`PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED = OPERATOR_HOLD`,
+`PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED = OPERATOR_HOLD`,
+`PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED = OPERATOR_HOLD`,
+`PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED = OPERATOR_HOLD`,
+`DURABLE_RESUME_IMPLEMENTED = PENDING_OPERATOR_ACCEPTANCE`,
+`RECOVERY_SCANNER_IMPLEMENTED = FALSE` and
+`next_checkpoint_authorized = FALSE`.  No self-ratification: every verdict
+this checkpoint proposes stays `PENDING_OPERATOR_REVIEW`.  Historical
+checkpoint entries and evidence in this ledger are NOT rewritten; the
+superseded I07R1G top-level text is retained in the same rows, explicitly
+labeled a historical governance record.
+
+**STOP GATE honored:** I08 (recovery / quarantine) NOT started.  Research
+NOT resumed.
