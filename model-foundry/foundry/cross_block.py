@@ -224,13 +224,18 @@ def scenario_f2() -> ScenarioResult:
             )
         )
     )
+    incident = registry.get("SRC_SECRET_INCIDENT")
     refusals.append(
         _refuse(
             lambda: registry.register(
+                # The copied record rebinds the claim's subject to the new id,
+                # so this probe isolates the secret-bearing rule; the
+                # claim/record subject binding is exercised by its own test.
                 dataclasses.replace(
-                    registry.get("SRC_SECRET_INCIDENT"),
+                    incident,
                     source_id="SRC_SECRET_TRAIN",
                     role=SourceRole.TRAIN_CPT,
+                    rights=dataclasses.replace(incident.rights, subject="SRC_SECRET_TRAIN"),
                 ),
                 actor="builder",
                 reason="try to train on incident notes",
@@ -386,15 +391,26 @@ def scenario_f5() -> ScenarioResult:
     grade = grade_contamination(
         (("bench", worst), ("unrelated", ContaminationClass.C0_NO_OBSERVED_OVERLAP))
     )
+    # The graph object itself must still assert that absence of an observed edge
+    # is not a cleanliness certificate; if that guarantee silently disappears
+    # from the contract, the scenario fails instead of misreporting it.
+    unobserved_is_not_clean = graph.to_dict()["unobserved_overlap_is_not_cleanliness"] is True
     observed = {
         "worst_grade_for_bench_core": worst.value,
         "claim_blocking_edges": len(blocked_edges),
         "combined_grade": grade.value,
         "adjacent_source_grade_not_inherited": empty_graph_grade.value,
-        "unobserved_is_not_clean": "absence is not cleanliness"
-        or graph.to_dict()["unobserved_overlap_is_not_cleanliness"],
+        "unobserved_is_not_clean": unobserved_is_not_clean,
     }
-    status = "HELD" if (blocked_edges and grade is ContaminationClass.C3_PARAPHRASE_OR_SOLUTION_OVERLAP) else "FAILED"
+    status = (
+        "HELD"
+        if (
+            blocked_edges
+            and grade is ContaminationClass.C3_PARAPHRASE_OR_SOLUTION_OVERLAP
+            and unobserved_is_not_clean
+        )
+        else "FAILED"
+    )
     return ScenarioResult(
         "F5",
         "contamination gating",

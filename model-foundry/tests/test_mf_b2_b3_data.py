@@ -6,7 +6,7 @@ import dataclasses
 
 import pytest
 
-from foundry.core import Contradiction, PolicyBlocked
+from foundry.core import Contradiction, PolicyBlocked, Unauthorized
 from foundry.data import (
     ContaminationRelation,
     RightsDisposition,
@@ -155,7 +155,6 @@ def test_unknown_rights_cannot_transition_into_a_training_role() -> None:
             SourceRole.TRAIN_CPT,
             rights=claim,
             register=register,
-            actor="builder",
         )
     assert exc.value.code == "RIGHTS_BLOCKED"
     assert exc.value.context["rights_state"] == "RIGHTS_UNKNOWN"
@@ -169,7 +168,6 @@ def test_an_unrecorded_basis_cannot_transition_into_a_training_role() -> None:
             SourceRole.TRAIN_CPT,
             rights=claim,
             register=register,
-            actor="builder",
             human_review_ref="review://operator/44",
         )
     assert exc.value.code == "RIGHTS_BLOCKED"
@@ -184,7 +182,6 @@ def test_retrieval_only_to_train_requires_review_evidence_even_with_permissive_r
             SourceRole.TRAIN_CPT,
             rights=claim,
             register=register,
-            actor="builder",
         )
     assert exc.value.code == "ROLE_LAUNDERING_REFUSED"
     assert_role_transition_allowed(
@@ -192,7 +189,6 @@ def test_retrieval_only_to_train_requires_review_evidence_even_with_permissive_r
         SourceRole.TRAIN_CPT,
         rights=claim,
         register=register,
-        actor="operator",
         human_review_ref="review://operator/44",
     ) is None
 
@@ -205,18 +201,17 @@ def test_role_noop_and_sealed_retirement_are_refused() -> None:
             SourceRole.TRAIN_CPT,
             rights=claim,
             register=register,
-            actor="builder",
         )
     assert exc.value.code == "ROLE_TRANSITION_NOOP"
-    with pytest.raises(PolicyBlocked) as exc2:
+    with pytest.raises(Unauthorized) as exc2:
         assert_role_transition_allowed(
             SourceRole.SEALED_CONFIRMATION,
             SourceRole.EXCLUDED,
             rights=claim,
             register=register,
-            actor="builder",
         )
-    assert exc2.value.code == "SEALED_ROLE_RETIREMENT_REQUIRES_OPERATOR"
+    assert exc2.value.code == "OPERATOR_HOLD"
+    assert exc2.value.context == {"operator_hold": True}
 
 
 def test_initial_registration_into_a_training_role_also_needs_recorded_rights() -> None:
@@ -229,7 +224,6 @@ def test_initial_registration_into_a_training_role_also_needs_recorded_rights() 
             SourceRole.TRAIN_CPT,
             rights=claim,
             register=register,
-            actor="builder",
         )
     assert exc.value.code == "RIGHTS_BLOCKED"
 
@@ -264,6 +258,51 @@ def test_registry_requires_integrity_digest_and_actor_reason() -> None:
         registry.register(
             build_registry().get("SRC_NEWS_ALPHA"), actor="", reason="no actor"
         )
+
+
+def test_rights_claim_mismatched_to_source_subject_is_refused_with_no_side_effects() -> None:
+    """A valid claim recorded for one subject cannot be replayed for another.
+
+    Admission binds the rights claim's subject to the record being admitted;
+    without that binding, copying SRC_NEWS_ALPHA's rights onto a new source_id
+    would replay another source's evidence and make the copy train-permissive.
+    """
+
+    registry = build_registry()
+    legitimate = registry.get("SRC_NEWS_ALPHA")
+    assert legitimate.rights.subject == legitimate.source_id
+    forged = dataclasses.replace(
+        legitimate, source_id="SRC_FORGED", title="subject-confusion probe"
+    )
+    assert forged.rights.subject != forged.source_id
+
+    with pytest.raises(PolicyBlocked) as exc:
+        registry.register(forged, actor="builder", reason="subject-confusion probe")
+    assert exc.value.code == "RIGHTS_CLAIM_SUBJECT_MISMATCH"
+    assert exc.value.context["record_source_id"] == "SRC_FORGED"
+    assert exc.value.context["claimed_rights_subject"] == "SRC_NEWS_ALPHA"
+
+    # Rejection is side-effect free: nothing about the forged record exists.
+    assert registry.resolve("SRC_FORGED") is False
+    assert registry.version("SRC_FORGED") == 0
+    assert "SRC_FORGED" not in registry.source_ids()
+    assert registry.role_history("SRC_FORGED") == ()
+    assert registry.trainable_sources() == (
+        "SRC_AGENT_TRACE",
+        "SRC_NEWS_ALPHA",
+        "SRC_NEWS_ALPHA_MIRROR",
+    )
+    assert "SRC_FORGED" not in registry.digest()
+
+    # A record whose own rights evidence matches its subject is still admitted.
+    own_subject = dataclasses.replace(
+        forged,
+        rights=dataclasses.replace(forged.rights, subject="SRC_FORGED"),
+    )
+    with pytest.raises(PolicyBlocked):
+        # The subject now matches, but the *evidence* is recorded for
+        # SRC_NEWS_ALPHA, so resolution fails closed to REVIEW_REQUIRED.
+        registry.register(own_subject, actor="builder", reason="no evidence for subject")
 
 
 def test_mirror_aliases_do_not_manufacture_diversity() -> None:

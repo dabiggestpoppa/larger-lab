@@ -14,7 +14,8 @@ Doctrine enforced here:
 
 Deterministic and fixture-based: no network calls, no semantic model judgment.
 Rights decisions come from recorded *basis evidence*; an unresolved basis can
-never become a training permission simply because a record mentions a licence.
+never become a training permission simply because a record mentions a licence,
+and evidence recorded for one source is not evidence for another.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from typing import Any
 from .core import (
     OceTestDouble,
     PolicyBlocked,
+    Unauthorized,
     VersionedRegistry,
     fingerprint,
 )
@@ -434,7 +436,6 @@ def assert_role_transition_allowed(
     *,
     rights: RightsDisposition,
     register: RightsEvidenceRegister,
-    actor: str,
     human_review_ref: str | None = None,
 ) -> None:
     """Admission guard for any record that may hold a role.
@@ -445,7 +446,10 @@ def assert_role_transition_allowed(
     only when a role is actually changing.
 
     The rights side is resolved against recorded evidence here and nowhere else,
-    so no caller can assert its way into a training role.
+    so no caller can assert its way into a training role. Actor authority is
+    deliberately not a parameter: the Foundry cannot authenticate actors locally
+    (see ``FoundryLocalIdentity``'s OCE replacement declaration), so role
+    admission derives from recorded evidence and structural rules only.
     """
 
     resolved = rights.resolve(register)
@@ -481,9 +485,14 @@ def assert_role_transition_allowed(
                 ),
             )
     if requested is SourceRole.EXCLUDED and previous is SourceRole.SEALED_CONFIRMATION:
-        raise PolicyBlocked(
-            "SEALED_ROLE_RETIREMENT_REQUIRES_OPERATOR",
-            "sealed confirmation material may only be retired through the operator",
+        raise Unauthorized(
+            "OPERATOR_HOLD",
+            (
+                "sealed confirmation material may only be retired through the operator; "
+                "the Foundry cannot authenticate operators locally, so this is a hold "
+                "for operator action, not a grantable permission"
+            ),
+            operator_hold=True,
         )
 
 
@@ -527,6 +536,18 @@ class SourceRegistry:
                 "SOURCE_INTEGRITY_DIGEST_REQUIRED",
                 f"{record.source_id}: a source without an integrity digest cannot be registered",
             )
+        if record.rights.subject != record.source_id:
+            raise PolicyBlocked(
+                "RIGHTS_CLAIM_SUBJECT_MISMATCH",
+                (
+                    f"{record.source_id}: the rights claim cites evidence for subject "
+                    f"{record.rights.subject!r}; evidence recorded for one source is "
+                    "not evidence for another"
+                ),
+                record_source_id=record.source_id,
+                claimed_rights_subject=record.rights.subject,
+                basis_ref=record.rights.basis_ref,
+            )
         if record.secret_bearing and record.role in {
             SourceRole.TRAIN_CPT,
             SourceRole.TRAIN_SFT,
@@ -541,7 +562,6 @@ class SourceRegistry:
             record.role,
             rights=record.rights,
             register=self.rights_evidence,
-            actor=actor,
             human_review_ref=human_review_ref,
         )
         entry = self._registry.put(record.source_id, record, actor=actor, reason=reason)

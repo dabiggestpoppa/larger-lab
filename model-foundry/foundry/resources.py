@@ -268,8 +268,10 @@ def estimate_cost_to_close(
     if offer.preemptible:
         # Checkpointing converts lost work into overhead rather than total restart.
         loss_fraction = 0.35 if request.checkpoint_required else 1.0
-        retry_fraction = min(2.0, q / max(1e-9, 1.0 - q))
-        expected_retries = retry_fraction if retry_fraction == retry_fraction else 0.0
+        # q is capped below 1 by construction (max(1e-9, 1 - q)), so the
+        # geometric-loss ratio stays finite; NaN cannot reach here because
+        # max(0.0, rate * hours) floors the exponent input at 0.
+        expected_retries = min(2.0, q / max(1e-9, 1.0 - q))
         effective_wall_hours = base_wall_hours + (base_wall_hours * loss_fraction * expected_retries)
     else:
         expected_retries = 0.0

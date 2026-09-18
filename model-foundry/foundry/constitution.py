@@ -603,10 +603,15 @@ class ReproducibilityClaim:
     provider_details: str | None = None
 
     def supported_class(self) -> ReproducibilityClass:
+        # A run whose environment was not recorded, or whose environment record
+        # is incomplete, supports no claim stronger than R0; R0 here means "the
+        # strongest thing this evidence supports is an exact replay of the same
+        # machine", not "the claim is verified". R3/R2/R1 require recorded,
+        # complete environment evidence.
         if not self.environment_recorded or not all(
             (self.framework, self.dependency_lock_digest, self.accelerator_identity, self.driver_stack)
         ):
-            return ReproducibilityClass.R0_EXACT_REPLAY if self.environment_recorded else ReproducibilityClass.R0_EXACT_REPLAY
+            return ReproducibilityClass.R0_EXACT_REPLAY
         if self.external_replication:
             return ReproducibilityClass.R3_EXTERNAL_DOMAIN_REPLICATION
         if self.independent_implementation:
