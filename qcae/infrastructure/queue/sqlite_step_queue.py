@@ -82,6 +82,11 @@ class SqliteStepQueue:
         self._store.update_step(step, not_before=not_before)
 
     def _not_before_passed(self, nb: str) -> bool:
+        """P2-R4-C04: ``nb`` is an EFFECTIVE schedule (max of job and step).
+
+        Kept for non-claim callers; claim selection enforces the same rule
+        atomically in SQL (see claim_next).
+        """
         return (not nb) or (nb <= self._now())
 
     def claim_next(
@@ -127,21 +132,28 @@ class SqliteStepQueue:
             params.extend(eligible)
 
         now = now or self._now()
+        # P2-R4-C04 (§12, finding I — one scheduling truth): the effective
+        # schedule is max(job.not_before, step.not_before), enforced ATOMICALLY
+        # inside the claim selection SQL. LEFT JOIN + COALESCE: a step with no
+        # durable job row (bare-queue usage) is scheduled by its own field.
+        # A future-dated job cannot become claimable; ordering below only
+        # orders candidates that already passed this gate.
         rows = self._conn.execute(
             "SELECT s.step_id, s.job_id, c.lease_token, c.lease_expires_at,"
-            " s.not_before"
+            " MAX(s.not_before, COALESCE(j.not_before, ''))"
             " FROM runtime_step s"
+            " LEFT JOIN runtime_job j ON j.job_id = s.job_id"
             " LEFT JOIN runtime_queue_claim c ON c.step_id = s.step_id"
             " WHERE s.status = ?" + eligibility_sql +
-            " ORDER BY s.not_before ASC, s.step_id ASC",
-            params,
+            "   AND MAX(s.not_before, COALESCE(j.not_before, '')) <= ?"
+            " ORDER BY MAX(s.not_before, COALESCE(j.not_before, '')) ASC,"
+            " s.step_id ASC",
+            params + [now],
         ).fetchall()
 
         for r in rows:
-            step_id, step_job_id, claim_token, claim_expiry, s_nb = r
+            step_id, step_job_id, claim_token, claim_expiry, effective_nb = r
             if step_types and self._store.get_step(step_id).step_type not in step_types:
-                continue
-            if not self._not_before_passed(s_nb):
                 continue
             # Active unexpired, unacknowledged claim blocks a new owner.
             if claim_token and claim_expiry > now and not self._acknowledged(step_id):

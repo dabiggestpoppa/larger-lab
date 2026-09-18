@@ -223,6 +223,14 @@ class SqliteRuntimeStore:
                 f"job {job.job_id!r} already exists (duplicate canonical identity)"
             ) from exc
 
+    def job_not_before(self, job_id: str) -> str:
+        """The job-level schedule (P2-R4-C04: scheduling truth, job side)."""
+        row = self._conn.execute(
+            "SELECT not_before FROM runtime_job WHERE job_id = ?",
+            (job_id,),
+        ).fetchone()
+        return row[0] if row else ""
+
     def get_job(self, job_id: str) -> Optional[RuntimeJob]:
         row = self._conn.execute(
             "SELECT payload_json, payload_digest FROM runtime_job WHERE job_id = ?",

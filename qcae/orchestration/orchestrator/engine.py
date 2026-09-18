@@ -263,6 +263,15 @@ class OrchestratorEngine:
     # -- scheduling ----------------------------------------------------------
 
     def ready_steps(self, job_id: str) -> List[RuntimeStep]:
+        """Promote dependency-satisfied PENDING steps to READY.
+
+        P2-R4-C04 (finding I, §12 — one scheduling truth): the step's
+        ``not_before`` is NEVER overwritten with the clock. The effective
+        schedule is ``max(job.not_before, step.not_before)`` and it is
+        enforced at claim time; readiness derivation only records the
+        state transition. A future-dated job therefore cannot become
+        claimable by being made ready.
+        """
         steps = self._store.list_steps_for_job(job_id)
         graph = StepGraph(steps)
         runnable = graph.runnable()
@@ -271,12 +280,27 @@ class OrchestratorEngine:
             if step.status is not RuntimeStepStatus.PENDING:
                 continue
             out.append(dc_replace(step, status=RuntimeStepStatus.READY))
-            self._store.update_step(out[-1], not_before=self._clock())
+            self._store.update_step(out[-1])
             self._record(
                 JobEventType.STEP_READY, job_id, step.step_id,
                 payload_json='{"reason": "dependencies satisfied"}',
             )
         return out
+
+    def effective_not_before(self, job_id: str, step: RuntimeStep) -> str:
+        """ONE scheduling truth (P2-R4-C04, §12): max(job, step) not_before.
+
+        The job-level schedule (JobSubmission.not_before, persisted on
+        runtime_job) and the step-level schedule compose by max; an empty
+        side is neutral. Priority and recovery cannot bypass this — claim
+        selection, worker-availability probes, and recovery all use it.
+        """
+        job = self._store.get_job(job_id)
+        job_nb = self._store.job_not_before(job_id) if job is not None else ""
+        step_nb = step.not_before or ""
+        if job_nb and step_nb:
+            return max(job_nb, step_nb)
+        return job_nb or step_nb
 
     # -- identity ------------------------------------------------------------
 
@@ -306,7 +330,9 @@ class OrchestratorEngine:
         for step in self._store.list_steps_for_job(job_id):
             if step.status is not RuntimeStepStatus.READY:
                 continue
-            if step.not_before and step.not_before > now:
+            # P2-R4-C04: the SAME effective schedule the queue enforces —
+            # worker-availability probes must not disagree with claim law.
+            if self.effective_not_before(job_id, step) > now:
                 continue
             if self._queue.has_active_claim(step.step_id):
                 continue
@@ -329,8 +355,15 @@ class OrchestratorEngine:
                 raise BudgetExhaustedError(
                     f"job {job_id!r} budget is exhausted; refusing to lease work"
                 )
+        now = self._clock()
         steps = self._store.list_steps_for_job(job_id)
-        ready = [s for s in steps if s.status is RuntimeStepStatus.READY]
+        # P2-R4-C04: a future-dated job/step is not claimable at all —
+        # "no currently eligible work", never an early lease.
+        ready = [
+            s for s in steps
+            if s.status is RuntimeStepStatus.READY
+            and self.effective_not_before(job_id, s) <= now
+        ]
         if not ready:
             return None
         # P2-R3-C02 (operator-loop finding B): worker availability is known
@@ -937,14 +970,20 @@ class OrchestratorEngine:
                 reconciled.append(step_id)
                 continue
             assert_step_transition(step.status, RuntimeStepStatus.RUNNING)
+            # P2-R4-C04: recovery re-availability never erases a future
+            # step-level schedule floor (recovery cannot bypass not_before).
+            reconciled_step = self._require_step(step_id)
+            floor = max(
+                reconciled_step.not_before or "", self._clock()
+            ) if reconciled_step.not_before else self._clock()
             self._store.update_step(
                 dc_replace(
-                    self._require_step(step_id),
+                    reconciled_step,
                     status=RuntimeStepStatus.READY,
                     lease=None,
                 ),
                 lease_owner="", lease_token="", lease_expires_at="",
-                not_before=self._clock(),
+                not_before=floor,
             )
             self._record(
                 JobEventType.STEP_READY, step.job_id, step.step_id,
@@ -1003,9 +1042,11 @@ class OrchestratorEngine:
                 assert_step_transition(
                     RuntimeStepStatus.RETRY_SCHEDULED, RuntimeStepStatus.READY
                 )
+                # P2-R4-C04: keep the retry's own schedule floor — recovery
+                # does not bypass the backoff the retry was scheduled with.
                 self._store.update_step(
                     dc_replace(step, status=RuntimeStepStatus.READY),
-                    not_before=self._clock(),
+                    not_before=step.not_before or self._clock(),
                 )
                 requeued.append(step.step_id)
         # P2-R4-C02 (directive §10, finding H.A, refresh-after-reconcile law):
