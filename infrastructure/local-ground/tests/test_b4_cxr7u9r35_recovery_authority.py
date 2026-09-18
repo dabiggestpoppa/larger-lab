@@ -236,6 +236,73 @@ def test_genuine_lifecycle_finalize_and_rollback_are_accepted(bridge, tmp_path, 
 
 
 # --------------------------------------------------------------------- #
+# R35: the restored bytes are the admitted bytes
+# --------------------------------------------------------------------- #
+
+def test_substituted_archive_blocks_and_agreed_bytes_proceed(bridge, tmp_path, monkeypatch):
+    """The restore consumes the CONTAINER's copy, so a substitution between
+    admission and copy must block before any staging database or canonical
+    rename exists. The seam is deterministic: the copy lands different bytes
+    whose REAL hash is then compared, and the control case lands the admitted
+    bytes and must proceed past the archive step (so the block is a real
+    observation, not a stub that always fails)."""
+    inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
+    substitute = tmp_path / "substituted.dump"
+    substitute.write_bytes(b"PGDMP-substituted")
+    monkeypatch.setattr(pgrec, "sha256_remote_file",
+                        lambda container, remote: pgrec.sha256_file(remote))
+
+    monkeypatch.setattr(pgrec, "clone_archive_into_container",
+                        lambda container, archive_path: str(substitute))
+    out = pgrec.phase_promote(str(archive), str(inv), str(sha), pgrec.DB,
+                              pgrec.USER, pgrec.CONTAINER, None)
+    assert out["exit_status"] == 1, out
+    assert "does not match the admitted source" in out["error"], out["error"]
+    assert out["phases"] == ["inventory_validated"], out["phases"]
+    assert not out.get("promoted"), out
+    # no staging database was ever named, because none was ever created
+    assert "staging_database" not in out, out
+    assert bridge.staged == [], bridge.staged
+    assert bridge.dropped == [] and bridge.renamed == []
+
+    # control: the admitted bytes make the same flow proceed
+    monkeypatch.setattr(pgrec, "clone_archive_into_container",
+                        lambda container, archive_path: str(archive))
+    ok = pgrec.phase_promote(str(archive), str(inv), str(sha), pgrec.DB,
+                             pgrec.USER, pgrec.CONTAINER, None)
+    assert ok["archive_validated"] is True, ok
+    assert ok["remote_archive_sha256"] == ok["source_archive_sha256"], ok
+
+
+# --------------------------------------------------------------------- #
+# denial discipline: no filesystem, receipt, docker or catalog side effect
+# --------------------------------------------------------------------- #
+
+def _tree_state(root):
+    """Every file under a root with its content hash: the snapshot a denial
+    must leave byte-identical."""
+    return {str(p): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sorted(Path(root).rglob("*")) if p.is_file()}
+
+
+def test_denial_snapshots_filesystem_receipts_and_every_call(bridge, tmp_path, monkeypatch):
+    inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
+    bridge.remote_sha = pgrec.sha256_file(str(archive))
+    receipt, path = _promote_receipt(bridge, inv, sha, archive)
+    forged = _mutated(receipt, lambda r: r.__setitem__("quarantine_database", pgrec.DB), path)
+    bridge.reset()
+    before_files = _tree_state(tmp_path)
+    before_catalogs = set(bridge.dbs)
+    out = _transition(bridge, "finalize", forged, inv, sha)
+    assert out["exit_status"] == 1, out
+    assert _tree_state(tmp_path) == before_files
+    assert set(bridge.dbs) == before_catalogs
+    assert bridge.docker == [], bridge.docker
+    assert bridge.dropped == [] and bridge.renamed == [] and bridge.staged == []
+    assert bridge.terminated == [], bridge.terminated
+
+
+# --------------------------------------------------------------------- #
 # R37: the destructive target is GOVERNED
 # --------------------------------------------------------------------- #
 
@@ -298,7 +365,8 @@ def test_receipt_out_escape_is_refused_and_writes_nothing(tmp_path, monkeypatch)
     sibling = tmp_path / "recovery-state-evil"
     sibling.mkdir()
     escapes = {
-        "absolute-external": str(Path(os.sep) / "tmp" / "oce-escape.json"),
+        "absolute-volume-root": str(Path(os.path.abspath(os.sep)) / "oce-u9r35-escape.json"),
+        "absolute-sibling": str(tmp_path / "outside-the-state-dir.json"),
         "dot-dot": str(state / ".." / ".." / "escape.json"),
         "prefix-sibling": str(sibling / "receipt.json"),
         "unrelated-existing": str(unrelated),
