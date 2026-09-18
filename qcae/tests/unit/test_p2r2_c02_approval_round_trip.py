@@ -97,6 +97,9 @@ def env():
         store, queue, clock=clock,
         authority_gate=PermissiveStepAuthorityGate(),
         authority_request_sink=ApprovalRegistrySink(approvals, clock=clock),
+        # P2-R4-C03: execution-side grant admission consumes the durable
+        # registry (no in-memory granted-key set exists anymore).
+        approval_registry=approvals,
     )
     identities = LocalIdentityProvider.__new__(LocalIdentityProvider)
     identities._identities = {}
@@ -290,8 +293,9 @@ class TestApprovalRoundTrip:
             service.release_granted_step("job-12345678", "job-12345678:s-1")
 
     def test_grant_key_single_use(self, env):
-        """The engine's grant key is consumed by one execute_step; a second
-        execution of a re-entered WAITING_POLICY step requires a new grant."""
+        """The durable grant is consumed by one execute_step; a second
+        execution of a re-entered WAITING_POLICY step requires a new grant
+        (P2-R4-C03: consumption is durable, never an in-memory key)."""
         store, _q, engine, clock, _c, approvals, service = env
         request_id = _reach_waiting_policy(service, store, _job(), _step("s-1"))
         service.decide_approval(
@@ -299,7 +303,8 @@ class TestApprovalRoundTrip:
             decided_by="id-operator-1", job_id="job-12345678", reason="ok",
         )
         service.release_granted_step("job-12345678", "job-12345678:s-1")
-        assert "job-12345678:job-12345678:s-1" in engine._granted_keys
+        decision = approvals.decisions_for_request(request_id)[-1]
+        assert approvals.uses_for_decision(decision.decision_id) == []
 
     def test_events_record_request_and_grant(self, env):
         store, _q, _e, clock, _c, approvals, service = env

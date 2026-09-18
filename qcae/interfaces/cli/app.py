@@ -179,6 +179,7 @@ def build_local_runtime(
         authority_gate=gate,
         authority_request_sink=ApprovalRegistrySink(approvals, clock=clock),
         identity_provider=identity,
+        approval_registry=approvals,
     )
 
     # Identity snapshot for schema/policy versions comes from the policy set.

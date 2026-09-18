@@ -25,6 +25,7 @@ from qcae.governance.standalone.approvals import (
     EscalationDecision,
     EscalationRecord,
     EscalationState,
+    GrantUse,
 )
 
 __all__ = ["SqliteApprovalRegistry", "APPROVAL_DDL"]
@@ -49,6 +50,16 @@ CREATE TABLE IF NOT EXISTS governance_approval_decision (
 );
 CREATE INDEX IF NOT EXISTS ix_approval_decision_request
     ON governance_approval_decision(request_ref);
+
+CREATE TABLE IF NOT EXISTS governance_approval_use (
+    use_id            TEXT PRIMARY KEY,
+    decision_ref      TEXT NOT NULL,
+    step_id           TEXT NOT NULL,
+    used_at           TEXT NOT NULL
+);
+-- Single-use law (P2-R4-C03 §7): ONE consumption row per grant decision.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_approval_use_decision
+    ON governance_approval_use(decision_ref);
 
 CREATE TABLE IF NOT EXISTS governance_escalation (
     escalation_id     TEXT PRIMARY KEY,
@@ -188,6 +199,36 @@ class SqliteApprovalRegistry:
         if expiry and now > expiry:
             return None
         return latest
+
+    # -- P2-R4-C03: durable single-use grant consumption ---------------------
+
+    def mark_grant_used(self, use: GrantUse) -> bool:
+        """Consume one grant atomically (single-execution-admission law).
+
+        INSERT-only: the first use row for a decision wins; a second use of
+        the same grant is refused. Durable, so consumption survives restart
+        and cannot be replayed in any process.
+        """
+        use.validate()
+        try:
+            self._conn.execute(
+                "INSERT INTO governance_approval_use (use_id, decision_ref,"
+                " step_id, used_at) VALUES (?, ?, ?, ?)",
+                (use.use_id, use.decision_ref, use.step_id, use.used_at),
+            )
+            return True
+        except sqlite3.IntegrityError:
+            return False
+
+    def uses_for_decision(self, decision_id: str) -> List[GrantUse]:
+        """All consumption records for one grant (oldest first)."""
+        rows = self._conn.execute(
+            "SELECT use_id, decision_ref, step_id, used_at"
+            " FROM governance_approval_use WHERE decision_ref = ?"
+            " ORDER BY used_at, use_id",
+            (decision_id,),
+        ).fetchall()
+        return [GrantUse(*row) for row in rows]
 
     # -- Escalations ---------------------------------------------------------
 

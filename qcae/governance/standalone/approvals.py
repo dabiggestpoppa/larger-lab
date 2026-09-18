@@ -35,6 +35,7 @@ __all__ = [
     "EscalationTrigger",
     "ApprovalRequest",
     "ApprovalDecision",
+    "GrantUse",
     "EscalationRecord",
     "EscalationDecision",
     "ApprovalRegistry",
@@ -144,6 +145,32 @@ class ApprovalDecision(SerializableRecord):
 def require_non_empty_str_strict(value, what):
     if not isinstance(value, str) or not value.strip():
         raise QcaeValidationError(f"{what} must be a non-empty string")
+
+
+@dataclass(frozen=True)
+class GrantUse(SerializableRecord):
+    """Durable single-use consumption record for one grant (P2-R4-C03).
+
+    P2 grant law — SINGLE EXECUTION ADMISSION: after one admitted attempt
+    begins under a grant, the grant cannot silently authorize another.
+    The use record is written atomically with the admission decision, so
+    consumption survives restart and can never be replayed (unlike the
+    superseded in-memory ``_granted_keys`` set, which vanished on restart
+    and was never consumed).
+    """
+
+    SCHEMA_VERSION = 1
+
+    use_id: str
+    decision_ref: str
+    step_id: str
+    used_at: str
+
+    def validate(self) -> None:
+        require_identifier(self.use_id, "use_id")
+        require_identifier(self.decision_ref, "decision_ref")
+        require_non_empty_str(self.step_id, "step_id")
+        require_non_empty_str(self.used_at, "used_at")
 
 
 @dataclass(frozen=True)

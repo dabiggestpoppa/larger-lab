@@ -20,6 +20,9 @@ laundering, directive §14).
 
 from __future__ import annotations
 
+import hashlib
+import secrets
+
 from qcae.core.errors import QcaeValidationError
 from qcae.governance.standalone.approvals import ApprovalRequest
 from qcae.governance.standalone.authority import LocalAuthorityProvider
@@ -117,7 +120,6 @@ class ApprovalRegistrySink:
         self._registry = approval_registry
         self._clock = clock
         self._window = window_seconds
-        self._counter = 0
 
     def _expires_at(self) -> str:
         from datetime import datetime, timedelta, timezone
@@ -134,8 +136,17 @@ class ApprovalRegistrySink:
         )
 
     def record_authority_request(self, verdict: StepAuthorityVerdict) -> str:
-        self._counter += 1
-        request_id = f"authreq-{verdict.step_id}-{self._counter}"
+        # P2-R4-C03 (directive §8): request identity is RESTART-SAFE — an
+        # in-memory counter resets on restart and can collide with durable
+        # rows. The id is a digest over the request's exact semantics plus a
+        # uniqueness suffix for genuinely distinct repeat requests (retry
+        # after failure); it never depends on process-local state.
+        semantics = (
+            f"{verdict.step_id}|{verdict.principal}|{verdict.action}|"
+            f"{verdict.resource}|{verdict.scope}"
+        )
+        semantic_digest = hashlib.sha256(semantics.encode("utf-8")).hexdigest()[:12]
+        request_id = f"authreq-{verdict.step_id}-{semantic_digest}-{secrets.token_hex(4)}"
         self._registry.add_request(
             ApprovalRequest(
                 request_id=request_id,

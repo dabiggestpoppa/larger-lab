@@ -362,6 +362,16 @@ CREATE TABLE IF NOT EXISTS governance_approval_decision (
 CREATE INDEX IF NOT EXISTS ix_approval_decision_request
     ON governance_approval_decision(request_ref);
 
+CREATE TABLE IF NOT EXISTS governance_approval_use (
+    use_id            TEXT PRIMARY KEY,
+    decision_ref      TEXT NOT NULL,
+    step_id           TEXT NOT NULL,
+    used_at           TEXT NOT NULL
+);
+-- Single-use law (P2-R4-C03 §7): ONE consumption row per grant decision.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_approval_use_decision
+    ON governance_approval_use(decision_ref);
+
 CREATE TABLE IF NOT EXISTS governance_escalation (
     escalation_id     TEXT PRIMARY KEY,
     job_id            TEXT NOT NULL,

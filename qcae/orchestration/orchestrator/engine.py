@@ -16,6 +16,7 @@ Semantics proven here:
 
 from __future__ import annotations
 
+import secrets
 from dataclasses import replace as dc_replace
 from typing import Callable, Dict, List, Optional
 
@@ -41,6 +42,7 @@ from qcae.orchestration.jobs.runtime import (
     assert_job_transition,
     assert_step_transition,
 )
+from qcae.governance.standalone.approvals import GrantUse
 from qcae.orchestration.authority_gate import (
     AuthorityRequestSink,
     FailClosedStepAuthorityGate,
@@ -91,6 +93,7 @@ class OrchestratorEngine:
         authority_gate: Optional[StepAuthorityGate] = None,
         authority_request_sink: Optional[AuthorityRequestSink] = None,
         identity_provider=None,
+        approval_registry=None,
     ) -> None:
         self._store = runtime_store
         self._queue = queue
@@ -111,8 +114,12 @@ class OrchestratorEngine:
             authority_gate or FailClosedStepAuthorityGate()
         )
         self._authority_sink = authority_request_sink
-        # Steps released by an exact-scope operator grant (P2-R2-C02).
-        self._granted_keys: set = set()
+        # P2-R4-C03 (finding G): approval authority is a DURABLE grant
+        # consumed atomically at admission — never process-memory state.
+        # The registry is duck-typed (effective_grant / mark_grant_used) so
+        # the orchestrator does not import infrastructure; the composition
+        # root wires the real one.
+        self._approvals = approval_registry
 
     # -- explicit interfaces (P2-R2-C05: no private-attribute reach-ins) -----
 
@@ -470,8 +477,8 @@ class OrchestratorEngine:
                 error_summary=f"authority denied: {verdict.reason}",
             )
         if verdict.decision is StepAuthorityDecision.REQUIRE_APPROVAL:
-            granted_key = f"{step.job_id}:{step.step_id}"
-            if granted_key not in self._granted_keys:
+            if not self._grant_admits(job_id=step.job_id, step_id=step.step_id,
+                                      principal=principal):
                 request_id = self._persist_authority_request(verdict)
                 assert_step_transition(step.status, RuntimeStepStatus.WAITING_POLICY)
                 self._store.update_step(
@@ -610,13 +617,41 @@ class OrchestratorEngine:
             return "unsinked"
         return self._authority_sink.record_authority_request(verdict)
 
+    def _latest_authority_request_for_step(
+        self, job_id: str, step_id: str
+    ) -> Optional[str]:
+        """The request id from the step's latest APPROVAL_REQUESTED event.
+
+        Same truth the runtime service verifies grants against (P2-R2-C02);
+        the engine reads it so grant admission consumes the RIGHT durable
+        request, never a memory-cached key.
+        """
+        import json
+
+        for _seq, _ev, payload in reversed(self._store.events_for_job(job_id)):
+            if (
+                _ev.event_type is JobEventType.APPROVAL_REQUESTED
+                and _ev.step_id == step_id
+                and payload
+            ):
+                try:
+                    data = json.loads(payload)
+                except ValueError:
+                    continue
+                rid = data.get("authority_request_id", "")
+                if rid and rid != "unsinked":
+                    return rid
+        return None
+
     def record_exact_scope_grant(self, job_id: str, step_id: str) -> None:
         """Release one WAITING_POLICY step after an exact-scope operator grant.
 
-        Called by the runtime service ONLY after it has verified the grant
-        binds the same action/resource/scope the step requested (no approval
-        laundering — P2-R2-C02). The step returns to READY and may be leased
-        again; the grant key is consumed by the next execute_step.
+        Called by the runtime service ONLY after it has verified the durable
+        grant binds the same action/resource/scope the step requested (no
+        approval laundering — P2-R2-C02). P2-R4-C03 (finding G): the grant
+        itself stays in the durable approval registry — this method records
+        NO execution-side authority; the single-use consumption happens
+        atomically inside ``_grant_admits`` when the admitted attempt begins.
         """
         step = self._require_step(step_id)
         if step.job_id != job_id:
@@ -630,7 +665,6 @@ class OrchestratorEngine:
             dc_replace(step, status=RuntimeStepStatus.READY),
             lease_owner="", lease_token="", lease_expires_at="",
         )
-        self._granted_keys.add(f"{job_id}:{step_id}")
         # Clear any stale queue claim so the released step is claimable now
         # (the WAITING_POLICY entry cleared the step's lease columns but the
         # claim row may persist until TTL; release law mirrors the retry path).
@@ -639,6 +673,56 @@ class OrchestratorEngine:
             JobEventType.APPROVAL_GRANTED, job_id, step_id,
             payload_json='{"release": "exact-scope grant"}',
         )
+        self._store.flush()
+
+    # -- P2-R4-C03: durable single-use grant admission -----------------------
+
+    def _grant_admits(self, *, job_id: str, step_id: str, principal: str) -> bool:
+        """Whether a durable grant admits this execution — consuming it if so.
+
+        Law (directive §6/§7, finding G): authority comes from the durable
+        approval registry, verified against the step's own recorded request
+        and consumed atomically (single execution admission). With no
+        registry wired the answer is NO — fail closed; grants cannot live
+        in process memory.
+
+        Consumption semantics: exactly one use row per grant decision.
+        The first admitted attempt consumes it; a second attempt under the
+        same grant is refused (a retry that still requires approval performs
+        a new authority evaluation and needs a new grant).
+        """
+        if self._approvals is None:
+            return False
+        # The durable request this step raised (recorded by the sink).
+        request_id = self._latest_authority_request_for_step(job_id, step_id)
+        if not request_id:
+            return False
+        try:
+            request = self._approvals.get_request(request_id)
+        except QcaeValidationError:
+            return False
+        if request is None:
+            return False
+        try:
+            grant = self._approvals.effective_grant(request_id, now=self._clock())
+        except QcaeValidationError:
+            return False
+        if grant is None:
+            # No GRANTED decision, or the approval window has expired.
+            return False
+        if request.principal != principal:
+            # The grant admits the principal who requested it — never a
+            # different execution identity (identity binding law).
+            return False
+        # Single-use consumption, atomically: the INSERT wins for exactly
+        # one caller; concurrent/replayed admissions read it as consumed.
+        use = GrantUse(
+            use_id=f"use-{secrets.token_hex(8)}",
+            decision_ref=grant.decision_id,
+            step_id=step_id,
+            used_at=self._clock(),
+        )
+        return self._approvals.mark_grant_used(use)
 
     def _complete(self, step: RuntimeStep, result: WorkerResult) -> None:
         # P2-C07R2: commit is durable and carries the result payload, closing
