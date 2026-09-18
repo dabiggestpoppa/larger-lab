@@ -11,20 +11,26 @@ produced by that command; none is transcribed by hand from a narrative.
 | Constitution | `sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420` |
 | One-OCE boundary | `sha256:98cb4c61a3eb5856944f54f4495686701263bbc46c8e70928f22e3e41eb7627d` |
 | MF-B0 adversarial gate report | `sha256:60a9694ff3b8541564a14945e87ca6fa486d7f7605abc9a6b5c7894606bd6d0f` |
-| Cross-block F0–F11 report | `sha256:2011c87edf570d3202d038de5a464f1493347ea7698ddfc0ac85d021e9e12a41` |
+| Cross-block F0–F11 report | `sha256:f85bee7526c074a13fb7867b631eb0860a25144059ff9e494352d1f88ab79d04` |
 | Fixture source registry | `sha256:45a8ca061214e7a925876840edd4fe17f2d61970f68a156e444b021c78e807d1` |
 | Fixture rights evidence | `sha256:58003351106736901f3d235ba10bd7d2d67e1045bfa63c7701f3653ecb5a33f9` |
 | Fixture train manifest lineage | `sha256:1b731fac408ceddab1aebb97b2d00e4e0a32869d268dfd6614abe68083dcacad` |
 | Fixture benchmark | `sha256:9892b9431b095deaa6ec9bc09b9541e9314bbffd5ee840e0d6f393503c8cd280` |
 | Fixture protocol | `sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35` |
-| Evidence package | `sha256:77618a9a2d4341d149b0a5686653b92b8ee8cdac3c4808224d2aabb6ccc5f899` |
+| Evidence package | `sha256:2e4586e2f1f3755c35089888724eb0576771793215d77e54e709c04127b8f8a4` |
 
 The constitution (`0bc713f0…`), B3 lineage (`1b731fac…`), benchmark
 (`9892b943…`), protocol (`824fb9ae…`) and gate-report (`60a9694f…`) fingerprints
 are unchanged by the audit-closure repairs; the registry, cross-block report and
 evidence-package fingerprints moved because a rights decision is no longer
-carried as caller-settable state, and F2's refusal detail now names the ref and
-the resolved state.
+carried as caller-settable state, admission now binds a rights claim to its
+record's own subject, F2's refusal detail names the ref and the resolved state,
+and F5's `unobserved_is_not_clean` marker became a verified boolean.
+
+Tested at commit `bac88d27be31074c117f1c3670a3cbadf6cb5db7` by the authoritative
+command `cd model-foundry && python -m pytest tests -q` → **157 passed**; after
+the subject-binding and constant-condition repairs the same command reports
+**158 passed**.
 
 Tested at commit `41257f3712123d9e624218f62a57ecdf501a422f` by the authoritative
 command `cd model-foundry && python -m pytest tests -q` → **157 passed** (39

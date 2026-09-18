@@ -264,7 +264,7 @@
   ],
   "constitution_fingerprint": "sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420",
   "cross_block": {
-    "report_fingerprint": "sha256:2011c87edf570d3202d038de5a464f1493347ea7698ddfc0ac85d021e9e12a41",
+    "report_fingerprint": "sha256:f85bee7526c074a13fb7867b631eb0860a25144059ff9e494352d1f88ab79d04",
     "scenarios": [
       {
         "held": true,
@@ -480,7 +480,7 @@
           "adjacent_source_grade_not_inherited": "C0_NO_OBSERVED_OVERLAP",
           "claim_blocking_edges": 1,
           "combined_grade": "C3_PARAPHRASE_OR_SOLUTION_OVERLAP",
-          "unobserved_is_not_clean": "absence is not cleanliness",
+          "unobserved_is_not_clean": true,
           "worst_grade_for_bench_core": "C3_PARAPHRASE_OR_SOLUTION_OVERLAP"
         },
         "refusals": [],
@@ -654,7 +654,7 @@
     "NEGATIVE RESULT != FAILED PROJECT",
     "UNKNOWN != FAVORABLE"
   ],
-  "evidence_fingerprint": "sha256:77618a9a2d4341d149b0a5686653b92b8ee8cdac3c4808224d2aabb6ccc5f899",
+  "evidence_fingerprint": "sha256:2e4586e2f1f3755c35089888724eb0576771793215d77e54e709c04127b8f8a4",
   "external_operations": {
     "capital_operations": 0,
     "cloud_mutations": 0,

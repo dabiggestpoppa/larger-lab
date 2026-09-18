@@ -138,10 +138,11 @@ protocol `PROTO_RESEARCH_BENCH_V0_V1`
 
 ### Cross-block scenarios F0–F11 — PASS (12/12 HELD)
 
-Report fingerprint `sha256:2011c87edf570d3202d038de5a464f1493347ea7698ddfc0ac85d021e9e12a41`.
+Report fingerprint `sha256:f85bee7526c074a13fb7867b631eb0860a25144059ff9e494352d1f88ab79d04`.
 The behaviour is unchanged (12/12 `HELD`, same verdict, same refusal codes); the
 fingerprint moved because F2's `RIGHTS_BLOCKED` refusal detail now names the ref
-and the resolved state instead of asserting a disposition.
+and the resolved state instead of asserting a disposition, and F5's
+`unobserved_is_not_clean` marker became a verified boolean.
 F0 constitution+boundary · F1 provider-neutral placement · F2 rights/roles/
 permissions · F3 governed corpus · F4 PIT leakage · F5 contamination gating ·
 F6 withheld doctrine · F7 evaluation freeze · F8 sealed boundary · F9 subject
@@ -178,7 +179,7 @@ by test.
 * sealed-evaluation exposures: 0 (refusals recorded)
 * negative results recorded: 1 (plus 3 refused dataset builds)
 * evidence package: `evidence/MF_B0_B4_EVIDENCE.json`, fingerprint
-  `sha256:77618a9a2d4341d149b0a5686653b92b8ee8cdac3c4808224d2aabb6ccc5f899`
+  `sha256:2e4586e2f1f3755c35089888724eb0576771793215d77e54e709c04127b8f8a4`
   (replay-stable)
 
 ## Defect found and fixed during the build
