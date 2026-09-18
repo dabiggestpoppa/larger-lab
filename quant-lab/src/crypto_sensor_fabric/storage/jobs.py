@@ -1120,8 +1120,8 @@ class DurableJobStateRepository:
             # A crash mid-release leaves recovery evidence for I08.
             pass
 
-    def _refresh_durable_truth(self) -> None:
-        """Validated post-lock reload of durable births + events (§30-§31).
+    def _refresh_durable_truth(self, job_id: str) -> None:
+        """Validated post-lock reload + chain proof for the LOCKED job.
 
         Called on OUTERMOST per-job file-lock acquisition only (§32): the
         cache-backed catalogs re-scan committed fragments through the
@@ -1129,70 +1129,122 @@ class DurableJobStateRepository:
         fail closed on any divergence or vanished record — so state
         reads, sequence selection, CAS checks and retry classification
         always see current durable truth, never a stale view.
+
+        I07R1H §3/§12/§13: catalog-fragment integrity is NOT job-chain
+        validity, so after BOTH refreshes complete (one post-refresh
+        snapshot, never a half-refreshed view) the locked job's chain is
+        re-proven through the SAME per-job authority restart uses — a
+        corrupt refreshed tail fails BEFORE it can influence any runtime
+        decision.  Targeted to the locked job only (§5): never a global
+        all-job rescan under every lock.
         """
         self._births.refresh()
         self._events.refresh()
+        self._validate_job_chain(job_id)
 
     # -- restart validation (I07R1 §19-§27) --------------------------------------
 
     def _validate_cross_constraints(self) -> None:
-        """Fail closed on any chain that violates the frozen doctrine.
+        """Fail closed on any chain that violates the frozen doctrine (restart).
 
         Replay uses the SAME :func:`validate_transition` graph as the
         write path (I07R1 §20): forward skips, ungated checkpoints,
         missing/divergent proofs, silent backward moves and reason-less
         failure entries are corruption, not merely "unexpected".
+
+        I07R1H §4/§14: the per-event and per-job rules live in ONE shared
+        authority — :meth:`_validate_job_chain` — which the outermost
+        per-job lock also runs after refresh, so a long-lived repository
+        can never adopt as runtime state an event a fresh restart would
+        reject.  This entry point adds only the two GLOBAL checks the
+        per-job view cannot make: unknown-job event rejection (§15) and
+        the complete per-job sweep over every known job.
         """
-        seen_jobs: dict[str, dict[str, Any]] = {}
-        for job_id in self._births.list_ids():
-            birth = self._births.get(job_id)
-            assert birth is not None
-            if birth.get("record_kind") != "job_birth":
-                raise JobCatalogCorrupt(
-                    f"jobs/{job_id[:12]}... is not a job_birth record"
-                )
-            try:
-                state = StorageJobState.model_validate(birth["job_state"])
-            except Exception as exc:
-                raise JobCatalogCorrupt(
-                    f"birth state for job {job_id!r} is invalid: {exc}"
-                ) from exc
-            if state.job_id != job_id:
-                raise JobCatalogCorrupt(
-                    f"birth record for {job_id!r} carries job_id="
-                    f"{state.job_id!r}"
-                )
-            if state.status is not StorageJobStatus.PLANNED:
-                raise JobCatalogCorrupt(
-                    f"birth state for job {job_id!r} must be PLANNED, got "
-                    f"{state.status.value}"
-                )
-            seen_jobs[job_id] = birth
+        known_jobs: set[str] = set(self._births.list_ids())
         for event_id in self._events.list_ids():
             payload = self._events.get(event_id)
             assert payload is not None
             event_job_id = payload.get("job_id")
             if (
                 not isinstance(event_job_id, str)
-                or event_job_id not in seen_jobs
+                or event_job_id not in known_jobs
             ):
                 raise JobCatalogCorrupt(
                     f"event {event_id[:12]}... references unknown job "
                     f"{event_job_id!r}"
                 )
-            job_id = event_job_id
+        for job_id in sorted(known_jobs):
+            self._validate_job_chain(job_id)
+
+    def _validate_job_chain(self, job_id: str) -> None:
+        """THE one per-job chain authority for runtime refresh AND restart.
+
+        I07R1H §4: catalog refresh proves fragment parse + physical-key
+        binding only; it does NOT prove that an adopted event satisfies
+        the job-state contract.  Both callers — the outermost per-job
+        lock (after both catalog refreshes complete, §12/§13) and full
+        restart replay (§14) — validate through THIS method, so runtime
+        and restart can never disagree about a durable chain (§7-§11):
+
+        - birth contract: record_kind, exact job_id, valid state, PLANNED
+          (§6); the legitimate new-job path (no birth, no events) passes;
+        - every event: valid frozen models, canonical event identity,
+          transition/result binding, immutable birth identity, time
+          binding, the exact writer transition graph, the I07R1G proof
+          authority on checkpoint events and proof on NO other event;
+        - chain: contiguity from 1, from_status linkage, forward
+          chronology, and ordinary-event pointer immutability.
+
+        The durable checkpoint re-proof (repository + physical-blob I/O)
+        runs LAST per event; every pure check precedes it.
+        """
+        birth = self._births.get(job_id)
+        events = self._job_events(job_id)
+        if birth is None:
+            if events:
+                raise JobCatalogCorrupt(
+                    f"{len(events)} event(s) reference job {job_id!r} "
+                    "without a durable birth record"
+                )
+            # §6: the legitimate new-job path — create_job takes the job
+            # lock before any birth/event exists.
+            return
+        if birth.get("record_kind") != "job_birth":
+            raise JobCatalogCorrupt(
+                f"jobs/{job_id[:12]}... is not a job_birth record"
+            )
+        try:
+            birth_state = StorageJobState.model_validate(birth["job_state"])
+        except Exception as exc:
+            raise JobCatalogCorrupt(
+                f"birth state for job {job_id!r} is invalid: {exc}"
+            ) from exc
+        if birth_state.job_id != job_id:
+            raise JobCatalogCorrupt(
+                f"birth record for {job_id!r} carries job_id="
+                f"{birth_state.job_id!r}"
+            )
+        if birth_state.status is not StorageJobStatus.PLANNED:
+            raise JobCatalogCorrupt(
+                f"birth state for job {job_id!r} must be PLANNED, got "
+                f"{birth_state.status.value}"
+            )
+        previous = birth_state
+        expected_sequence = 1
+        for event in events:
+            event_id = str(event.get("transition_id", job_id))
             try:
                 transition = StorageJobTransition.model_validate(
-                    payload["transition"]
+                    event["transition"]
                 )
                 resulting = StorageJobState.model_validate(
-                    payload["resulting_state"]
+                    event["resulting_state"]
                 )
             except Exception as exc:
                 raise JobCatalogCorrupt(
                     f"event {event_id[:12]}... is invalid: {exc}"
                 ) from exc
-            sequence = payload.get("sequence")
+            sequence = event.get("sequence")
             if not isinstance(sequence, int) or sequence < 1:
                 raise JobCatalogCorrupt(
                     f"event {event_id[:12]}... has invalid sequence "
@@ -1228,9 +1280,6 @@ class DurableJobStateRepository:
                     f"{transition.to_status.value}"
                 )
             # §23: birth identity is immutable through every event.
-            birth_state = StorageJobState.model_validate(
-                seen_jobs[job_id]["job_state"]
-            )
             if (
                 resulting.provider_id != birth_state.provider_id
                 or resulting.sensor_family != birth_state.sensor_family
@@ -1248,10 +1297,9 @@ class DurableJobStateRepository:
                     f"{resulting.updated_at} != transition instant "
                     f"{transition.transitioned_at}"
                 )
-            proof = payload.get("checkpoint_proof")
             # ONE owner for the predicate: the module-level
-            # ``is_checkpoint_event`` the per-job loop below also uses.
-            is_checkpoint = is_checkpoint_event(payload)
+            # ``is_checkpoint_event`` (I07R1G post-audit repair).
+            is_checkpoint = is_checkpoint_event(event)
             # §20: replay enforces the EXACT graph the writer enforces, and
             # the CHEAP pure check runs FIRST — the durable re-proof below
             # (repository + physical-blob I/O) never precedes it.
@@ -1267,10 +1315,47 @@ class DurableJobStateRepository:
                     f"event {event_id[:12]}... violates the frozen "
                     f"transition graph: {exc}"
                 ) from exc
+            # Chain contiguity, linkage and chronology (I07R1H §10).
+            if sequence != expected_sequence:
+                raise JobCatalogCorrupt(
+                    f"job {job_id!r} chain expects sequence "
+                    f"{expected_sequence}, found {sequence!r} "
+                    "(contiguity violated)"
+                )
+            expected_sequence += 1
+            if transition.from_status is not previous.status:
+                raise JobCatalogCorrupt(
+                    f"job {job_id!r} chain break at "
+                    f"{transition.transition_id}: from_status "
+                    f"{transition.from_status.value} != previous "
+                    f"{previous.status.value}"
+                )
+            if transition.transitioned_at < previous.updated_at:
+                raise JobCatalogCorrupt(
+                    f"job {job_id!r} transition chronology moves "
+                    "backward at " + transition.transition_id
+                )
+            if not is_checkpoint:
+                # §24: ordinary events preserve the cursor/anchors
+                # exactly — a tampered pointer is corruption.
+                for field in (
+                    "resume_token",
+                    "last_committed_acquisition_id",
+                    "last_committed_blob_sha256",
+                    "last_manifest_id",
+                ):
+                    if getattr(resulting, field) != getattr(previous, field):
+                        raise JobCatalogCorrupt(
+                            f"ordinary event {event['transition_id']} "
+                            f"mutates {field} (I07R1 §24: only "
+                            "checkpoint events move the cursor)"
+                        )
+            proof = event.get("checkpoint_proof")
             if is_checkpoint:
                 # I07R1G §4: the ONE proof authority — the very same call
                 # the runtime exact-retry path makes, so reader and writer
                 # can never disagree about a persisted proof (§18/§25).
+                # EXPENSIVE (durable re-proof): deliberately LAST.
                 self._validate_checkpoint_proof(
                     event_id=event_id,
                     job_id=job_id,
@@ -1283,55 +1368,7 @@ class DurableJobStateRepository:
                     f"non-checkpoint event {event_id[:12]}... carries "
                     "checkpoint_proof"
                 )
-        # Per-job chain validation: contiguity, linkage, chronology,
-        # ordinary-event pointer immutability.
-        for job_id, birth in seen_jobs.items():
-            events = self._job_events(job_id)
-            birth_state = StorageJobState.model_validate(birth["job_state"])
-            previous = birth_state
-            expected_sequence = 1
-            for event in events:
-                if event["sequence"] != expected_sequence:
-                    raise JobCatalogCorrupt(
-                        f"job {job_id!r} chain expects sequence "
-                        f"{expected_sequence}, found {event['sequence']!r} "
-                        "(contiguity violated)"
-                    )
-                expected_sequence += 1
-                transition = StorageJobTransition.model_validate(
-                    event["transition"]
-                )
-                resulting = StorageJobState.model_validate(
-                    event["resulting_state"]
-                )
-                if transition.from_status is not previous.status:
-                    raise JobCatalogCorrupt(
-                        f"job {job_id!r} chain break at "
-                        f"{transition.transition_id}: from_status "
-                        f"{transition.from_status.value} != previous "
-                        f"{previous.status.value}"
-                    )
-                if transition.transitioned_at < previous.updated_at:
-                    raise JobCatalogCorrupt(
-                        f"job {job_id!r} transition chronology moves "
-                        "backward at " + transition.transition_id
-                    )
-                if not is_checkpoint_event(event):
-                    # §24: ordinary events preserve the cursor/anchors
-                    # exactly — a tampered pointer is corruption.
-                    for field in (
-                        "resume_token",
-                        "last_committed_acquisition_id",
-                        "last_committed_blob_sha256",
-                        "last_manifest_id",
-                    ):
-                        if getattr(resulting, field) != getattr(previous, field):
-                            raise JobCatalogCorrupt(
-                                f"ordinary event {event['transition_id']} "
-                                f"mutates {field} (I07R1 §24: only "
-                                "checkpoint events move the cursor)"
-                            )
-                previous = resulting
+            previous = resulting
 
     def _validate_checkpoint_proof(
         self,
@@ -1432,7 +1469,10 @@ class _NestedFileLock:
                 # I07R1 §30: the lock serializes writers; the REFRESH
                 # makes the serialized view truthful.  (§32: outermost
                 # entries only — nested entries reuse the fresh view.)
-                self._repo._refresh_durable_truth()
+                # I07R1H §12: after both refreshes, the LOCKED job's chain
+                # is re-proven through the shared authority before any
+                # runtime decision reads it.
+                self._repo._refresh_durable_truth(self._job_id)
         except BaseException:
             self._process_lock.release()
             raise
