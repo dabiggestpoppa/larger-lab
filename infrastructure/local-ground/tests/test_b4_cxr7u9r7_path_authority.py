@@ -281,9 +281,10 @@ class TestPromoteSinkRefusal:
         monkeypatch.setenv("OCE_BACKUP_ROOTS", str(roots))
         return roots, inv, sha
 
-    def _cli(self, archive, inv, sha, receipt):
+    def _cli(self, archive, inv, sha, receipt, state):
         env = dict(os.environ)
         env["PYTHONIOENCODING"] = "utf-8"
+        env["OCE_RECOVERY_STATE_DIR"] = str(state)
         return subprocess.run(
             [sys.executable, str(CLI), "--phase", "promote",
              "--archive", str(archive), "--inventory", str(inv),
@@ -318,9 +319,12 @@ class TestPromoteSinkRefusal:
             archive = rogue / "outside.dump"
             archive.write_bytes(b"PGDMP")
 
+        # the engine's own state directory (receipt-write authority, R37)
+        state = tmp_path / "recovery-state"
+        state.mkdir()
         before = sorted(str(p) for p in tmp_path.rglob("*"))
-        receipt = tmp_path / "promote-receipt.json"
-        run = self._cli(archive, inv, sha, receipt)
+        receipt = state / "promote-receipt.json"
+        run = self._cli(archive, inv, sha, receipt, state)
 
         assert run.returncode == 1, (run.returncode, run.stdout, run.stderr)
         assert "BLOCKED:" in run.stderr
@@ -482,14 +486,13 @@ class TestPromoteSinkInputsAreValidatorOutput:
         tree = ast.parse((SCRIPTS / "pg-recovery.py").read_text(encoding="utf-8"))
         promote = next(n for n in ast.walk(tree)
                        if isinstance(n, ast.FunctionDef) and n.name == "phase_promote")
-        raw_uses = [[a.id for a in c.args if isinstance(a, ast.Name)]
-                    for c in ast.walk(promote) if isinstance(c, ast.Call)]
-        admitted = [c for c in ast.walk(promote)
-                    if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)
-                    and c.func.id == "_validated_open_path"]
+        calls = [c for c in ast.walk(promote) if isinstance(c, ast.Call)]
+        raw_uses = [c for c in calls
+                    if [a.id for a in c.args if isinstance(a, ast.Name)] == ["archive"]]
+        admitted = [c for c in raw_uses
+                    if isinstance(c.func, ast.Name) and c.func.id == "_validated_open_path"]
         assert len(admitted) == 1, "the archive must be admitted exactly once"
-        assert [a.id for a in admitted[0].args] == ["archive"], ast.dump(admitted[0])
-        assert [u for u in raw_uses if "archive" in u].count(["archive"]) == 1, (
+        assert raw_uses == admitted, (
             "the raw archive argument must reach only the admission call")
         # and the local read that Sonar anchored on is gone: the restore
         # consumes the container's hash-bound copy, which needs no host read

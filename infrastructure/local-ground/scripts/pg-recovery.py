@@ -45,6 +45,15 @@ Usage:
   pg-recovery.py --phase rollback --receipt-in <promote-receipt.json>
                  --inventory <inv.json> --inventory-sha <inv.sha256>
                  [--db] [--user] [--container] [--receipt-out <file>]
+
+Recovery targets are GOVERNED (B4-CXR7U9R36/37): --db, --user and
+--container are compatibility assertions that must equal the local identity
+above - an alternate value is refused, so no CLI value can redirect a
+destructive recovery. --receipt-out is data, not authority: it must name a
+file inside this engine's recovery state directory (var/recovery, where
+restore.sh stages its phase receipts, or the operator-declared
+OCE_RECOVERY_STATE_DIR), so a receipt can never overwrite configuration,
+source, secrets or evidence outside that directory.
 """
 import hashlib
 import json
@@ -66,6 +75,7 @@ STAGING_PREFIX = f"{DB}_restore_"
 RECEIPT_FORMAT = "oce-pg-recovery-receipt-v1"
 STAMP_RE = re.compile(r"[0-9a-f]{12}\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
+RECEIPT_STATE_ENV = "OCE_RECOVERY_STATE_DIR"
 
 PHASES_PROMOTE = [
     "inventory_validated",
@@ -431,13 +441,56 @@ def _governed_identity_problems(db, user, container) -> list:
             if supplied != canon]
 
 
+def _recovery_state_dir() -> str:
+    """RECEIPT-WRITE AUTHORITY (B4-CXR7U9R37). The one directory this engine
+    owns for its OWN transition receipts: program identity's var/recovery
+    (where restore.sh stages its phase receipts), or a directory the caller
+    declared through OCE_RECOVERY_STATE_DIR - the same operator channel that
+    declares OCE_BACKUP_ROOTS for inputs. A --receipt-out value can never widen
+    this boundary."""
+    declared = os.environ.get(RECEIPT_STATE_ENV, "").strip()
+    if declared:
+        return os.path.realpath(declared)
+    here = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(os.path.dirname(here), "var", "recovery")
+
+
+def _validated_write_path(path: str) -> str:
+    """Canonicalize a receipt OUTPUT path and enforce the write boundary: no
+    symlink indirection, contained in the recovery state directory, and an
+    existing parent directory. Nothing about the phase can influence where its
+    own receipt lands."""
+    real = os.path.realpath(path)
+    if real != os.path.abspath(path):
+        raise RuntimeError(f"receipt output uses symlink indirection: {path}")
+    root = _recovery_state_dir()
+    try:
+        contained = os.path.commonpath([root, real]) == root
+    except ValueError:
+        contained = False
+    if not contained:
+        raise RuntimeError("receipt output is outside the recovery state "
+                           f"directory: {path}")
+    parent = os.path.dirname(real)
+    if not os.path.isdir(parent):
+        raise RuntimeError(f"receipt output directory does not exist: {parent}")
+    return real
+
+
 def _atomic_write_json(path, data):
     """Commit a receipt atomically (tmp + rename) so a partial write can never
-    be read as truth."""
+    be read as truth, and leave no .tmp residue when the commit fails."""
     tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
-    os.replace(tmp, path)
+    try:
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        os.replace(tmp, path)
+    except Exception:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
 
 
 def _load_receipt(path):
@@ -954,14 +1007,26 @@ def _validate_cli(phase, kw):
     if phase in ("finalize", "rollback") and not kw.get("receipt_in"):
         print(f"USAGE_ERROR: --phase {phase} requires --receipt-in", file=sys.stderr)
         sys.exit(2)
+    targets = _governed_identity_problems(kw.get("db", DB), kw.get("user", USER),
+                                          kw.get("container", CONTAINER))
+    if targets:
+        print("USAGE_ERROR: recovery targets are governed: " + "; ".join(targets),
+              file=sys.stderr)
+        sys.exit(2)
 
 
 def main():
     phase, probe, kw = _parse_cli(sys.argv[1:])
     _validate_cli(phase, kw)
-    db = kw.get("db", DB)
-    user = kw.get("user", USER)
-    container = kw.get("container", CONTAINER)
+    out = kw.get("receipt_out")
+    if out:
+        try:
+            out = _validated_write_path(out)
+        except RuntimeError as e:
+            print(f"USAGE_ERROR: {e}", file=sys.stderr)
+            sys.exit(2)
+    # the destructive destination is the governed identity, full stop
+    db, user, container = DB, USER, CONTAINER
     if phase == "promote":
         receipt = phase_promote(kw["archive"], kw["inventory"], kw["inventory_sha"],
                                 db, user, container, probe)
@@ -971,7 +1036,6 @@ def main():
     else:
         receipt = phase_rollback(kw["receipt_in"], kw["inventory"], kw["inventory_sha"],
                                  db, user, container, probe)
-    out = kw.get("receipt_out")
     if out:
         _atomic_write_json(out, receipt)
         print("receipt ->", out)

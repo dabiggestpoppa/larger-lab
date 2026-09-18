@@ -28,6 +28,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -232,6 +233,134 @@ def test_genuine_lifecycle_finalize_and_rollback_are_accepted(bridge, tmp_path, 
     assert rollback["exit_status"] == 0, rollback
     assert rollback["quarantine_database"] == promoted2["quarantine_database"]
     assert (promoted2["quarantine_database"], pgrec.DB) in bridge.renamed, bridge.renamed
+
+
+# --------------------------------------------------------------------- #
+# R37: the destructive target is GOVERNED
+# --------------------------------------------------------------------- #
+
+@pytest.mark.parametrize("flag", ["--db", "--user", "--container"])
+def test_alternate_cli_target_is_refused_by_the_real_cli(tmp_path, monkeypatch, flag):
+    """A direct invocation with an alternate recovery destination must be
+    refused outright: no phase runs, so no docker call and no receipt exist."""
+    inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
+    state = tmp_path / "recovery-state"
+    state.mkdir()
+    receipt = state / "promote-receipt.json"
+    r = _run_cli(["--phase", "promote", "--archive", str(archive),
+                  "--inventory", str(inv), "--inventory-sha", str(sha),
+                  flag, "other_value", "--receipt-out", str(receipt)],
+                 state=state)
+    assert r.returncode == 2, (r.returncode, r.stdout, r.stderr)
+    assert "governed" in r.stderr, r.stderr
+    assert not receipt.exists(), "a refused invocation must not write a receipt"
+
+
+def test_governed_target_cannot_be_redirected_in_process(bridge, tmp_path, monkeypatch):
+    """Even called directly (bypassing the CLI), the phases refuse a target
+    that is not the governed local identity, and they do it before any call."""
+    inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
+    for db, user, container, needle in (("postgres", pgrec.USER, pgrec.CONTAINER, "database"),
+                                        (pgrec.DB, "postgres", pgrec.CONTAINER, "user"),
+                                        (pgrec.DB, pgrec.USER, "other-pg", "container"),
+                                        ("", "", "", "database")):
+        out = pgrec.phase_promote(str(archive), str(inv), str(sha), db, user,
+                                  container, None)
+        assert out["exit_status"] == 1, out
+        assert "refusing recovery target" in out["error"], out
+        assert needle in out["error"], out["error"]
+        assert bridge.docker == [], bridge.docker
+        assert bridge.staged == [] and bridge.dropped == [] and bridge.renamed == []
+
+
+# --------------------------------------------------------------------- #
+# R37: --receipt-out can only write inside the engine's state directory
+# --------------------------------------------------------------------- #
+
+def _run_cli(argv, state=None, monkeypatch=None):
+    env = dict(os.environ)
+    env["PYTHONIOENCODING"] = "utf-8"
+    if state is not None:
+        env["OCE_RECOVERY_STATE_DIR"] = str(state)
+    return subprocess.run([sys.executable, str(CLI)] + argv,
+                          capture_output=True, text=True, env=env, timeout=300)
+
+
+def test_receipt_out_escape_is_refused_and_writes_nothing(tmp_path, monkeypatch):
+    """Every way out of the recovery-state directory: an external absolute
+    path, a dot-dot escape, and a prefix sibling whose name only shares the
+    root's text. An unrelated existing file must also stay byte-identical."""
+    inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
+    state = tmp_path / "recovery-state"
+    state.mkdir()
+    unrelated = tmp_path / "unrelated.json"
+    unrelated.write_bytes(b'{"keep": "me"}')
+    sibling = tmp_path / "recovery-state-evil"
+    sibling.mkdir()
+    escapes = {
+        "absolute-external": str(Path(os.sep) / "tmp" / "oce-escape.json"),
+        "dot-dot": str(state / ".." / ".." / "escape.json"),
+        "prefix-sibling": str(sibling / "receipt.json"),
+        "unrelated-existing": str(unrelated),
+    }
+    for label, target in escapes.items():
+        r = _run_cli(["--phase", "promote", "--archive", str(archive),
+                      "--inventory", str(inv), "--inventory-sha", str(sha),
+                      "--receipt-out", target], state=state)
+        assert r.returncode == 2, (label, r.returncode, r.stderr)
+        assert "recovery state directory" in r.stderr, (label, r.stderr)
+        assert not os.path.exists(target) or label == "unrelated-existing", label
+    assert unrelated.read_bytes() == b'{"keep": "me"}'
+    assert not list(state.glob("*.tmp")), "a refused write left .tmp residue"
+
+
+def test_receipt_out_symlink_is_refused(tmp_path, monkeypatch):
+    inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
+    state = tmp_path / "recovery-state"
+    state.mkdir()
+    outside = tmp_path / "outside-target.json"
+    outside.write_text("{}", encoding="utf-8")
+    link = state / "link.json"
+    try:
+        os.symlink(str(outside), str(link))
+    except (OSError, NotImplementedError):
+        pytest.skip("symlink creation requires privilege on this platform")
+    r = _run_cli(["--phase", "promote", "--archive", str(archive),
+                  "--inventory", str(inv), "--inventory-sha", str(sha),
+                  "--receipt-out", str(link)], state=state)
+    assert r.returncode == 2, (r.returncode, r.stdout, r.stderr)
+    assert "symlink indirection" in r.stderr, r.stderr
+    assert outside.read_text(encoding="utf-8") == "{}"
+
+
+def test_governed_receipt_output_succeeds_and_leaves_no_residue(tmp_path, monkeypatch):
+    """Control: the same invocation with a governed receipt path writes its
+    receipt inside the state directory (the hostile archive is refused, and the
+    refusal is recorded there), atomically."""
+    inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
+    state = tmp_path / "recovery-state"
+    state.mkdir()
+    receipt = state / "promote-receipt.json"
+    hostile = tmp_path / "outside.dump"
+    hostile.write_bytes(b"PGDMP")
+    r = _run_cli(["--phase", "promote", "--archive", str(hostile),
+                  "--inventory", str(inv), "--inventory-sha", str(sha),
+                  "--receipt-out", str(receipt)], state=state)
+    assert r.returncode == 1, (r.returncode, r.stdout, r.stderr)
+    assert receipt.is_file(), r.stderr
+    assert not list(state.glob("*.tmp")), "atomic write left .tmp residue"
+
+
+def test_failed_receipt_write_leaves_no_tmp_residue(bridge, tmp_path, monkeypatch):
+    """A write that fails mid-serialization must not leave a partial .tmp file
+    behind: the receipt is either complete or absent."""
+    state = tmp_path / "recovery-state"
+    state.mkdir()
+    target = state / "receipt.json"
+    with pytest.raises(TypeError):
+        pgrec._atomic_write_json(str(target), {"unserializable": object()})
+    assert not target.exists()
+    assert not list(state.glob("*.tmp")), list(state.iterdir())
 
 
 # --------------------------------------------------------------------- #
