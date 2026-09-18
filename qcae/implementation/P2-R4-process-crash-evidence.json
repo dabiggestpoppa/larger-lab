@@ -1,0 +1,30 @@
+{
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "evidence_kind": "observed (subprocess children os._exit at crash windows)",
+  "tested_commit": "f2fc77572a3e83e6a44e5636f6e407b95c3c351d",
+  "recorded_at": "2026-09-18T18:09:52Z",
+  "command": [
+    "python",
+    "-m",
+    "pytest",
+    "qcae/tests/acceptance",
+    "-q"
+  ],
+  "exit_code": 0,
+  "collected": 14,
+  "passed": 14,
+  "failed": 0,
+  "skipped": 0,
+  "duration_seconds": 7.1,
+  "source": "qcae/tests/acceptance/test_p2_process_crash.py",
+  "no_pre_crash_manual_commit": true,
+  "crash_window_law": {
+    "A": "lease/RUNNING/attempt truth durable before any execution",
+    "B": "execution reservation durable before the worker runs",
+    "C": "EXECUTING state durable before the external effect",
+    "D": "effect may occur while DB holds only EXECUTING (truth for recovery)",
+    "E": "COMMITTED result survives; recovery reconstructs canonical state",
+    "F_to_I": "marker/step/checkpoint/job finalization each close their window via the post-effect flush and the idempotent recovery finalization sweep"
+  },
+  "replay_safety_disclosure": "REPLAY_SAFE work is at-least-once with durable dedup by reservation; NON_REPLAY_SAFE ambiguity escalates to WAITING_INPUT; NO exactly-once claim is made anywhere"
+}

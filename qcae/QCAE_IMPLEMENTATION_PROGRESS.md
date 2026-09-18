@@ -9,7 +9,19 @@
 
 ## Current Phase
 
-**P2 — REPAIR OPEN: P2-R4 TRUE CRASH DURABILITY** (R1/R2/R3 accepted in substance; 1060/1060 LOCAL TEST EVIDENCE at `6f0218c0`) — operator audit found a deeper durability layer: clean-restart correctness is proven, abrupt process death is not; **P3 NOT started**
+**P2 — FROZEN / OPERATOR-REVIEWED + R1, R2, R3 & R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`)** — Job Runtime + Local Governance; C07R structural repairs (P2-R1), governance-wiring repairs (P2-R2), operator-loop closure (P2-R3), and true-crash-durability closure (P2-R4) sealed; **P3 NOT started**
+
+### P2-R4 — True Crash Durability + Durable Approval + Scheduling Closure (SEALED at `f2fc7757`)
+
+All five operator audit findings (F–J, recorded in I0 before implementation) closed:
+
+- **C01+C02 `5bc38d18`** — `SqliteRuntimeStore.flush()` explicit durability boundaries: lease/RUNNING/attempt/admission committed before execution, no DB write transaction spans `worker.execute()`, post-effect writes committed before return; `_complete` reconstructs canonical truth from COMMITTED whether or not the legacy marker exists; `recover_job` reloads job AND steps after reconciliation (stale snapshots can never regress terminal truth) and finalizes an all-steps-done job idempotently.
+- **C03 `1e04778d`** — durable single-use grants: `_granted_keys` removed; admission verifies the grant against the step's recorded authority request and consumes it atomically (`governance_approval_use`, unique `decision_ref`); consumption survives restart and cannot replay; expired/denied/wrong-principal grants admit nothing; authority-request ids are semantics-digest + uniqueness suffix (no restart-reset counter).
+- **C04 `081f20c8`** — one scheduling truth: `effective_not_before = max(job, step)`, enforced atomically in claim SQL; `ready_steps` no longer overwrites schedules; availability probes and recovery use the same rule; priority cannot bypass; CLI `--not-before` proven end-to-end.
+- **A01 `b283a63e`** — real abrupt-process-death acceptance: subprocess children `os._exit(1)` at crash windows A–E with no pre-crash manual commit; parent verifies durable truth via independent connection; cross-process recovery completes with the external effect executed exactly once; NON_REPLAY_SAFE ambiguity escalates to WAITING_INPUT.
+- **A02 `467c6714`** — durable grant acceptance journey (finding J): grant → restart → still discoverable → release → execute once → consumed → terminal truth survives restart → replay decision refused. Original denial journey preserved unchanged.
+- **T01 `f2fc7757`** — 14 adversarial cases over the repair laws, all failing closed.
+- **FREEZE `f2fc7757`** — `P2-R4-freeze-manifest.json` superseding manifest (P2/R1/R2/R3 manifests + R3 acceptance preserved unchanged with digests, blockers `[]`) plus **observed** evidence artifacts `P2-R4-operator-acceptance.json` and `P2-R4-process-crash-evidence.json` captured from actual pytest runs (full suite 1108/1108, acceptance 14/14).
 
 ### P2-R4 operator audit findings (recorded BEFORE implementation; commit I0)
 
