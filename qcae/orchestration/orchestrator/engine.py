@@ -1074,6 +1074,12 @@ class OrchestratorEngine:
                 dc_replace(job, status=RuntimeJobStatus.RUNNING,
                            updated_at=self._clock())
             )
+        # P2-R4 (crash window H): the process may have died after the last
+        # step was finalized but before job finalization. The finalizer is
+        # idempotent (terminal jobs return immediately) and emits
+        # JOB_SUCCEEDED exactly once — recovery completes the graph's truth.
+        self._succeed_job_if_graph_done(job_id)
+        self._store.flush()
         # P2-C07R2: surface unresolved execution records — the crash-window
         # truth. NON_REPLAY_SAFE ambiguity is never silently rerun; recovery
         # reports it for explicit operator resolution (directive §2.2).
