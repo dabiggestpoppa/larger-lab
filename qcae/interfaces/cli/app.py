@@ -323,6 +323,15 @@ class QcaeApp:
             job_id=job_id, reason=reason,
         )
 
+    def approval_release(self, job_id: str, step_id: str) -> None:
+        """Release a WAITING_POLICY step after verifying its durable grant.
+
+        Thin pass-through to the verified-release law (P2-R2-C02 binding
+        check + P2-R4-C03 durable consumption) — the operator surface must
+        be able to drive the same grant path the service tests exercise.
+        """
+        self._rt.service.release_granted_step(job_id, step_id)
+
     # -- governance ----------------------------------------------------------
 
     def authority_decision(self, request):
