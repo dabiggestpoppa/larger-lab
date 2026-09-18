@@ -180,6 +180,23 @@ class SqliteRuntimeStore:
         """
         return _StoreTransaction(self)
 
+    def flush(self) -> None:
+        """Make every prior write durable at a semantic boundary (P2-R4-C01).
+
+        This is NOT a global autocommit switch (directive §3 forbids solving
+        crash durability by silently changing connection semantics): the
+        multi-row atomicity groups still use ``transaction()``. ``flush()``
+        is the explicit durability law between phases of one logical
+        operation — the engine calls it at the pre-effect boundary (lease /
+        RUNNING / attempt / authority admission / idempotency reservation /
+        EXECUTING) so an abrupt process death leaves exactly that truth
+        recoverable, and again at the post-effect boundary after the worker
+        has returned. Crash windows A-I (directive §4) are closed by the
+        existence of these two commit points, proven by the process-kill
+        acceptance harness (test_p2_process_crash.py).
+        """
+        self._conn.commit()
+
     # -- RuntimeJob ----------------------------------------------------------
 
     def add_job(self, job: RuntimeJob, *, queued_at: str = "", not_before: str = "") -> None:

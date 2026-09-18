@@ -372,6 +372,11 @@ class OrchestratorEngine:
             self._charge_attempt(job_id, started.attempt)
         self._record(JobEventType.STEP_LEASED, job_id, lease.step_id,
                      payload_json=f'{{"worker": "{worker_id}"}}')
+        # P2-R4-C01 (crash window A): lease + RUNNING + attempt + budget
+        # charge are durable BEFORE any execution is attempted. A process
+        # death here leaves exactly that truth; recovery (P2-R3-C03 law)
+        # reconciles the expired lease without repeating committed work.
+        self._store.flush()
         # STEP_STARTED is emitted by execute_step carrying the typed authority
         # decision payload (P2-R2-C01): one STARTED per attempt, with the
         # verdict that admitted it.
@@ -457,6 +462,7 @@ class OrchestratorEngine:
             # Nothing executes; the RUNNING step fails POLICY_DENIED. _fail
             # asserts the transition and clears the lease columns.
             self._fail(self._require_step(step.step_id), FailureClass.POLICY_DENIED.value)
+            self._store.flush()
             return WorkerResult(
                 step_id=step.step_id, job_id=step.job_id,
                 status=WorkerStatus.FAILED,
@@ -481,6 +487,7 @@ class OrchestratorEngine:
                         f'"scope": "{verdict.scope}"}}'
                     ),
                 )
+                self._store.flush()
                 return WorkerResult(
                     step_id=step.step_id, job_id=step.job_id,
                     status=WorkerStatus.BLOCKED_POLICY,
@@ -523,6 +530,7 @@ class OrchestratorEngine:
                     JobEventType.STEP_SUCCEEDED, step.job_id, step.step_id,
                     payload_json='{"idempotent_reconstruct": true}',
                 )
+                self._store.flush()
                 return prior.reconstruct_result()
             if prior is not None and prior.state is ExecutionState.EXECUTING \
                     and replay_safety is ReplaySafety.NON_REPLAY_SAFE:
@@ -537,6 +545,7 @@ class OrchestratorEngine:
                     JobEventType.APPROVAL_REQUESTED, step.job_id, step.step_id,
                     payload_json='{"reason": "non-replay-safe execution ambiguous after crash"}',
                 )
+                self._store.flush()
                 return WorkerResult(
                     step_id=step.step_id, job_id=step.job_id,
                     status=WorkerStatus.BLOCKED_INPUT,
@@ -554,8 +563,21 @@ class OrchestratorEngine:
                 dc_replace(record, state=ExecutionState.EXECUTING)
             )
 
+        # P2-R4-C01 PRE-EFFECT DURABLE COMMIT (directive §3, crash windows
+        # B/C): the idempotency reservation, EXECUTING execution state, and
+        # every admission write (lease, RUNNING, attempt, authority verdict
+        # event) are committed HERE — the write transaction is closed before
+        # the worker performs external work. No DB write transaction spans
+        # worker.execute(); a process death mid-effect leaves the durable
+        # EXECUTING truth from which recovery classifies the outcome.
+        self._store.flush()
+
         result = worker.execute(request, _minimal_packet(step))
 
+        # P2-R4-C01 POST-EFFECT DURABLE COMMIT (crash windows D-I): result,
+        # COMMITTED execution record, step finalization, outputs/evidence,
+        # checkpoint, and job finalization are written and flushed as one
+        # semantic group before this method returns.
         if result.status is WorkerStatus.SUCCESS:
             self._complete(step, result)
         elif result.status is WorkerStatus.RETRYABLE:
@@ -577,6 +599,7 @@ class OrchestratorEngine:
                 dc_replace(step, status=RuntimeStepStatus.WAITING_INPUT),
                 lease_owner="", lease_token="", lease_expires_at="",
             )
+        self._store.flush()
         return result
 
     def _persist_authority_request(self, verdict: StepAuthorityVerdict) -> str:
@@ -623,17 +646,15 @@ class OrchestratorEngine:
         # C/D: effect committed + marker lost ⇒ reconstruct, never re-execute).
         key = step.idempotency_key or f"{step.job_id}:{step.step_id}"
         self._store.commit_execution(key, result, self._clock())
-        first = self._store.record_idempotent_completion(
+        self._store.record_idempotent_completion(
             key, step.job_id, step.step_id, self._clock()
         )
-        if not first:
-            # Already completed via the legacy marker — treat as complete
-            # without re-running effects.
-            self._record(
-                JobEventType.STEP_SUCCEEDED, step.job_id, step.step_id,
-                payload_json='{"idempotent_skip": true}',
-            )
-            return
+        # P2-R4-C02 (directive §11): the completion marker is supporting
+        # evidence, never canonical state — a False return (marker already
+        # present because the process died between marker and step-state
+        # finalization) must NOT skip canonical reconstruction. The transition
+        # assertion below is state-based: an already-SUCCEEDED step is a
+        # no-op replay, a RUNNING/READY step is repaired to SUCCEEDED here.
         assert_step_transition(step.status, RuntimeStepStatus.SUCCEEDED)
         # Acknowledge the claim BEFORE clearing the lease columns — ack needs
         # the current token, and clearing first would orphan the claim row.
@@ -903,6 +924,21 @@ class OrchestratorEngine:
                     not_before=self._clock(),
                 )
                 requeued.append(step.step_id)
+        # P2-R4-C02 (directive §10, finding H.A, refresh-after-reconcile law):
+        # reconciliation above (recover_leased_steps → _complete) may have
+        # finalized the last step and the job itself. The snapshot loaded at
+        # entry is now stale — writing it back would regress terminal truth.
+        # RELOAD and only apply the recovery transition to a non-terminal job.
+        steps = self._store.list_steps_for_job(job_id)  # reload for truth
+        completed = sorted({*completed, *(s.step_id for s in steps if s.status is RuntimeStepStatus.SUCCEEDED)})
+        # P2-R4-C02 (directive §10, finding H.A, refresh-after-reconcile law):
+        # reconciliation above (recover_leased_steps → _complete) may have
+        # finalized the last step and the job itself. The snapshot loaded at
+        # entry is now stale — writing it back would regress terminal truth.
+        # RELOAD and only apply the recovery transition to a non-terminal job.
+        job = self._store.get_job(job_id)  # reload after reconciliation
+        if job is None:
+            raise QcaeValidationError(f"job {job_id!r} vanished during recovery")
         if job.status in (
             RuntimeJobStatus.QUEUED,
             RuntimeJobStatus.RUNNING,
