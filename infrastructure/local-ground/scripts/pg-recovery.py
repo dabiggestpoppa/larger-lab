@@ -58,6 +58,15 @@ CONTAINER = "oce-local-postgresql"
 DB = "oce_local"
 USER = "oce_local_admin"
 
+# The destructive recovery destination is the GOVERNED local identity, and the
+# engine's own transition names are derived from it, so those names have one
+# owner: the constants above (B4-CXR7U9R36).
+QUARANTINE_PREFIX = f"{DB}_quarantine_"
+STAGING_PREFIX = f"{DB}_restore_"
+RECEIPT_FORMAT = "oce-pg-recovery-receipt-v1"
+STAMP_RE = re.compile(r"[0-9a-f]{12}\Z")
+SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
+
 PHASES_PROMOTE = [
     "inventory_validated",
     "archive_validated",
@@ -335,7 +344,7 @@ def rename_db(container, user, from_name, to_name):
 
 
 def create_staging_db(container, user, base_db, stamp):
-    name = f"oce_local_restore_{stamp}"
+    name = STAGING_PREFIX + stamp
     psql_ok(container, base_db, user,
             f'CREATE DATABASE "{name}" OWNER "{user}";')
     return name
@@ -388,16 +397,38 @@ def sha256_remote_file(container, remote):
     return digest
 
 
-def _base_receipt(kind, db, inventory_path):
-    return {"format": "oce-pg-recovery-receipt-v1",
+def _base_receipt(kind, db, user, container, inventory_path):
+    return {"format": RECEIPT_FORMAT,
             "operation_phase": kind,
             "database": db, "source_database": db, "target_database": db,
+            "user": user, "container": container,
             "source_commit": os.environ.get("OCE_COMMIT", "unknown"),
             "source_tree": os.environ.get("OCE_TREE", "unknown"),
             "run_id": os.environ.get("OCE_RUN_ID", "not-set"),
             "inventory_path": inventory_path,
             "phases": [],
             "started_at": now_iso()}
+
+
+def _blocked(receipt, message):
+    """Record a fail-closed refusal: the caller keeps a truthful receipt and
+    no recovery step was taken (no docker call, no catalog mutation)."""
+    receipt["error"] = message
+    receipt["finished_at"] = now_iso()
+    receipt["exit_status"] = 1
+    return receipt
+
+
+def _governed_identity_problems(db, user, container) -> list:
+    """Recovery targets are GOVERNED, not selected (B4-CXR7U9R36/37): the
+    public --db/--user/--container values are compatibility assertions that
+    must equal the canonical local identity, so no CLI or environment value
+    can redirect a destructive recovery. One owner for that policy."""
+    return [f"{label} '{supplied}' is not the governed local value '{canon}'"
+            for label, supplied, canon in (("database", db, DB),
+                                           ("user", user, USER),
+                                           ("container", container, CONTAINER))
+            if supplied != canon]
 
 
 def _atomic_write_json(path, data):
@@ -412,6 +443,74 @@ def _atomic_write_json(path, data):
 def _load_receipt(path):
     with open(_validated_open_path(path), encoding="utf-8") as f:
         return json.load(f)
+
+
+def _validated_transition_receipt(path, db, user, container, inventory_path,
+                                  inventory_sha_path):
+    """RECOVERY TRANSITION AUTHORITY (B4-CXR7U9R36).
+
+    A promote receipt is the authority to mutate recovery TRANSITION state -
+    drop the quarantine, rename a database back over the canonical name - so
+    its CONTENT is authorized, not just its location: filesystem containment
+    proves where the bytes came from, never what they may order. Everything
+    here fails closed BEFORE any docker or catalog call, so a contained but
+    forged, substituted, replayed or incomplete receipt cannot direct a
+    destructive step. Separate from BACKUP ARTIFACT PATH AUTHORITY, which owns
+    the archive/inventory inputs (_validated_open_path).
+
+    Returns (promote, stamp, quarantine, staging).
+    """
+    promote = _load_receipt(path)
+    if not isinstance(promote, dict):
+        raise RuntimeError("receipt is not a JSON object")
+    if promote.get("format") != RECEIPT_FORMAT:
+        raise RuntimeError(f"receipt format is not {RECEIPT_FORMAT}")
+    if promote.get("operation_phase") != "promote":
+        raise RuntimeError("receipt is not a promote receipt "
+                           f"(got {promote.get('operation_phase')!r})")
+    if promote.get("exit_status") != 0:
+        raise RuntimeError("receipt records a failed promote (exit_status != 0)")
+    if promote.get("promoted") is not True:
+        raise RuntimeError("receipt does not record a completed promotion")
+    phases = promote.get("phases")
+    if not isinstance(phases, list) or len(phases) != len(PHASES_PROMOTE) \
+            or not valid_phase_prefix(phases, PHASES_PROMOTE):
+        raise RuntimeError("receipt phase sequence is incomplete or out of order")
+    for label, got, canon in (("database", promote.get("database"), db),
+                              ("source_database", promote.get("source_database"), db),
+                              ("target_database", promote.get("target_database"), db),
+                              ("user", promote.get("user"), user),
+                              ("container", promote.get("container"), container)):
+        if got != canon:
+            raise RuntimeError(f"receipt {label} {got!r} is not this recovery's "
+                               f"governed value {canon!r}")
+    stamp = promote.get("stamp")
+    if not isinstance(stamp, str) or not STAMP_RE.match(stamp):
+        raise RuntimeError(f"receipt stamp {stamp!r} is missing or malformed")
+    quarantine = promote.get("quarantine_database")
+    staging = promote.get("staging_database")
+    if quarantine != QUARANTINE_PREFIX + stamp:
+        raise RuntimeError(f"receipt quarantine {quarantine!r} is not bound to "
+                           "its stamp")
+    if staging != STAGING_PREFIX + stamp:
+        raise RuntimeError(f"receipt staging {staging!r} is not bound to its stamp")
+    for label, name in (("quarantine", quarantine), ("staging", staging)):
+        if name == db:
+            raise RuntimeError(f"receipt {label} names the canonical database")
+    if not SHA256_RE.match(str(promote.get("source_archive_sha256", ""))):
+        raise RuntimeError("receipt records no archive identity")
+    recorded_inventory = promote.get("inventory_path")
+    if not isinstance(recorded_inventory, str) or \
+            os.path.realpath(recorded_inventory) != _validated_open_path(inventory_path):
+        raise RuntimeError("receipt inventory is not this recovery's inventory")
+    if promote.get("inventory_sha256") != _validated_read_text(inventory_sha_path).strip():
+        raise RuntimeError("receipt inventory SHA is not this recovery's inventory SHA")
+    recorded_run = promote.get("run_id")
+    live_run = os.environ.get("OCE_RUN_ID")
+    if live_run and recorded_run not in (None, "", "not-set", "unknown") \
+            and recorded_run != live_run:
+        raise RuntimeError("receipt was produced by a different recovery run")
+    return promote, stamp, quarantine, staging
 
 
 def _approved_roots() -> list:
@@ -569,9 +668,12 @@ def rollback_recovery(container, user, db, quarantine, inventory, probe):
 # ── phase: promote ───────────────────────────────────────────────────────
 def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
                   container, probe_spec):
-    receipt = _base_receipt("promote", db, inventory_path)
+    receipt = _base_receipt("promote", db, user, container, inventory_path)
+    targets = _governed_identity_problems(db, user, container)
+    if targets:
+        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
     stamp = hashlib.sha256(os.urandom(8)).hexdigest()[:12]
-    quarantine = f"oce_local_quarantine_{stamp}"
+    quarantine = QUARANTINE_PREFIX + stamp
     receipt["stamp"] = stamp
     receipt["quarantine_database"] = quarantine
     receipt["quarantine_held"] = True
@@ -583,6 +685,7 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
     try:
         # 1. protected inventory validated (hash + parse + non-empty truth)
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
+        receipt["inventory_path"] = _validated_open_path(inventory_path)
         receipt["inventory_sha256"] = _validated_read_text(inventory_sha_path).strip()
         probe = parse_probe_spec(probe_spec)
         if not (capture_inventory_rows(inventory) or probe):
@@ -686,17 +789,18 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
 # ── phase: finalize ──────────────────────────────────────────────────────
 def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
                    user, container, probe_spec):
-    promote = _load_receipt(receipt_in_path)
-    if promote.get("operation_phase") != "promote" or promote.get("promoted") is not True:
-        raise RuntimeError("finalize requires a successful promote receipt "
-                           f"(got phase={promote.get('operation_phase')})")
-    quarantine = promote.get("quarantine_database")
-    if not quarantine:
-        raise RuntimeError("promote receipt lacks quarantine_database")
-    receipt = _base_receipt("finalize", db, inventory_path)
+    receipt = _base_receipt("finalize", db, user, container, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
-    receipt["stamp"] = promote.get("stamp")
-    receipt["staging_database"] = promote.get("staging_database")
+    targets = _governed_identity_problems(db, user, container)
+    if targets:
+        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+    try:
+        promote, stamp, quarantine, staging = _validated_transition_receipt(
+            receipt_in_path, db, user, container, inventory_path, inventory_sha_path)
+    except Exception as e:
+        return _blocked(receipt, f"refusing recovery transition authority: {e}")
+    receipt["stamp"] = stamp
+    receipt["staging_database"] = staging
     receipt["quarantine_database"] = quarantine
     receipt["source_archive_sha256"] = promote.get("source_archive_sha256")
     receipt["promoted"] = True
@@ -773,13 +877,17 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
 # ── phase: rollback (explicit) ───────────────────────────────────────────
 def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
                    user, container, probe_spec):
-    promote = _load_receipt(receipt_in_path)
-    quarantine = promote.get("quarantine_database")
-    if not quarantine:
-        raise RuntimeError("rollback requires a promote receipt with quarantine_database")
-    receipt = _base_receipt("rollback", db, inventory_path)
+    receipt = _base_receipt("rollback", db, user, container, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
-    receipt["stamp"] = promote.get("stamp")
+    targets = _governed_identity_problems(db, user, container)
+    if targets:
+        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+    try:
+        promote, stamp, quarantine, staging = _validated_transition_receipt(
+            receipt_in_path, db, user, container, inventory_path, inventory_sha_path)
+    except Exception as e:
+        return _blocked(receipt, f"refusing recovery transition authority: {e}")
+    receipt["stamp"] = stamp
     receipt["quarantine_database"] = quarantine
     receipt["rollback_required"] = True
     inventory = None
