@@ -49,6 +49,7 @@ Usage:
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -372,6 +373,21 @@ def validate_archive(container, remote):
     return r.stdout.decode(errors="replace")
 
 
+def sha256_remote_file(container, remote):
+    """SHA-256 of the file the CONTAINER holds at `remote` (R35). The restore
+    reads that remote path, not this host's copy, so the bytes that are
+    restored are the bytes this must be compared against the admitted source."""
+    r = docker_exec(container, ["sha256sum", remote])
+    if r.returncode != 0:
+        raise RuntimeError("cannot hash the container copy of the archive: "
+                           + r.stderr.decode(errors="replace"))
+    fields = r.stdout.decode(errors="replace").split()
+    digest = fields[0] if fields else ""
+    if not re.fullmatch(r"[0-9a-f]{64}", digest):
+        raise RuntimeError(f"container sha256sum returned no usable digest: {digest!r}")
+    return digest
+
+
 def _base_receipt(kind, db, inventory_path):
     return {"format": "oce-pg-recovery-receipt-v1",
             "operation_phase": kind,
@@ -441,8 +457,14 @@ def _validated_open_path(path: str) -> str:
          (_approved_roots owns which roots and where they come from);
       3. the path must be an existing regular file.
 
-    Canonical-open race note: the open follows validation; on POSIX the
-    content SHA check still fails closed against any replacement.
+    Single-admission note (B4-CXR7U9R35): every phase admits the artifact path
+    ONCE and hands the returned canonical path to every later sink (hashing,
+    the container copy, the container-side re-hash), so no sink sees the raw
+    CLI string. A replacement of the admitted host file between admission and
+    the container copy is inside the single-principal trusted computing base
+    and is NOT detected; what IS enforced is that the bytes the container
+    holds are the bytes of this admitted path (the container re-hash must
+    equal the recorded source hash before any staging or canonical mutation).
     """
     real = os.path.realpath(path)
     if real != os.path.abspath(path):
@@ -566,10 +588,22 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         if not (capture_inventory_rows(inventory) or probe):
             raise RuntimeError("database inventory lists no tables to verify (incomplete backup)")
         receipt["phases"].append("inventory_validated")
-        # 2. archive validated + hashed
-        receipt["source_archive_sha256"] = sha256_file(_validated_open_path(archive))
-        remote = clone_archive_into_container(container, archive)
+        # 2. archive admitted ONCE: this one canonical identity feeds the hash,
+        #    the container copy and the container-side re-hash (R35). Every
+        #    later sink consumes `archive_path`; the raw CLI string is never
+        #    handed to a sink again.
+        archive_path = _validated_open_path(archive)
+        source_sha = sha256_file(archive_path)
+        receipt["source_archive_sha256"] = source_sha
+        remote = clone_archive_into_container(container, archive_path)
         validate_archive(container, remote)
+        # the restore consumes the CONTAINER's copy: prove it is the admitted
+        # bytes before any staging or canonical mutation exists to make
+        remote_sha = sha256_remote_file(container, remote)
+        receipt["remote_archive_sha256"] = remote_sha
+        if remote_sha != source_sha:
+            raise RuntimeError("the container copy of the archive does not match "
+                               "the admitted source (SHA mismatch)")
         receipt["archive_validated"] = True
         receipt["phases"].append("archive_validated")
         # postgres version
@@ -580,13 +614,12 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         staging = create_staging_db(container, user, db, stamp)
         receipt["staging_database"] = staging
         receipt["phases"].append("staging_created")
-        # 4. restore into staging with exit-on-error
-        with open(os.path.realpath(_validated_open_path(archive)),
-                  "rb") as f:
-            data = f.read()
+        # 4. restore into staging with exit-on-error. pg_restore consumes the
+        #    container path, so no host-side read (and no stdin payload) is
+        #    involved: the bytes restored are the bytes re-hashed above (R35).
         r = docker_exec(container, ["pg_restore", "-U", user, "--exit-on-error",
                                     "--no-owner", "--no-privileges", "--dbname", staging, remote],
-                        stdin_bytes=data, timeout=1800)
+                        timeout=1800)
         if r.returncode != 0:
             raise RuntimeError("pg_restore into staging failed: "
                                + r.stderr.decode(errors="replace"))

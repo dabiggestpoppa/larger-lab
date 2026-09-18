@@ -393,12 +393,12 @@ class TestPromoteSinkRefusal:
 class TestPromoteSinkInputsAreValidatorOutput:
     """The same finding anchors on different lines of this one flow depending
     on the window (the `open()` at :584, or `sha256_file`'s parameter sink at
-    :294). Both are fed by the `--archive` argument, so the disposition rests
-    on what each sink RECEIVES, not only on the guard preceding it. These
-    tests observe those values during a real promote, and pin the property that
-    makes the raw argument safe at the `docker cp` source as well: every
-    spelling the guard admits resolves to the canonical file inside an
-    approved root.
+    :294). Both were fed by the `--archive` argument, so the disposition rests
+    on what each sink RECEIVES. Since B4-CXR7U9R35 the phase admits the path
+    ONCE and passes that single canonical identity to hashing and to the
+    container copy, so these tests use a NONCANONICAL but admitted spelling and
+    require the sinks to receive the validator's return value itself - not
+    merely a path whose realpath happens to compare equal afterwards.
     """
 
     def _approved(self, tmp_path, monkeypatch):
@@ -414,7 +414,7 @@ class TestPromoteSinkInputsAreValidatorOutput:
         monkeypatch.setenv("OCE_BACKUP_ROOTS", str(roots))
         return roots, inv, sha, archive
 
-    def test_values_reaching_the_hash_and_copy_sinks_are_contained(
+    def test_every_sink_receives_the_one_admitted_canonical_path(
             self, tmp_path, monkeypatch):
         roots, inv, sha, archive = self._approved(tmp_path, monkeypatch)
         hashed, copied = [], []
@@ -432,20 +432,21 @@ class TestPromoteSinkInputsAreValidatorOutput:
         monkeypatch.setattr(pgrec, "clone_archive_into_container", record_copy)
         monkeypatch.setattr(pgrec, "docker_exec",
                             lambda *a, **k: subprocess.CompletedProcess([], 3, b"", b"probe"))
-        receipt = pgrec.phase_promote(str(archive), str(inv), str(sha),
-                                      "oce_local", "oce_local_admin",
-                                      "oce-local-postgresql", None)
+        # an admitted but NONCANONICAL spelling: only a resolver could turn it
+        # into the canonical file, so equality here cannot come from luck
+        spelling = str(roots / "sub" / ".." / "real.dump")
+        assert spelling != os.path.realpath(str(archive))
+        receipt = pgrec.phase_promote(spelling, str(inv), str(sha),
+                                     "oce_local", "oce_local_admin",
+                                     "oce-local-postgresql", None)
 
-        expected = os.path.realpath(str(archive))
-        # sha256_file's parameter (Sonar's :294 anchor) receives the validator's
-        # canonical path, never the raw CLI string.
-        assert hashed == [expected], hashed
-        # The `docker cp` source (:571) is the raw argument, so what matters is
-        # that the guard admitted it: its realpath is the same contained file.
-        assert copied, "the container copy sink was never reached"
-        for value in copied:
-            assert os.path.realpath(value) == expected
-            assert os.path.commonpath([str(roots), os.path.realpath(value)]) == str(roots)
+        admitted = pgrec._validated_open_path(spelling)
+        assert admitted == os.path.realpath(str(archive))
+        # sha256_file's parameter (Sonar's :294 anchor) and the `docker cp`
+        # source are the SAME single admitted identity - not the raw argument,
+        # and not two independently resolved copies of it.
+        assert hashed == [admitted], hashed
+        assert copied == [admitted], copied
         assert receipt["source_archive_sha256"] == real_sha256(str(archive))
 
     def test_every_admitted_spelling_resolves_inside_an_approved_root(
@@ -470,18 +471,28 @@ class TestPromoteSinkInputsAreValidatorOutput:
         with pytest.raises(RuntimeError, match="approved backup root"):
             pgrec._validated_open_path(str(sibling / "real.dump"))
 
-    def test_sha256_file_parameter_sink_has_no_unvalidated_call_site(self):
-        """`sha256_file(path)` constrains nothing by itself, so its safety is a
-        property of its call sites: the engine's production call must hand it
-        the validator's output. A future call site bypassing the validator
-        fails here rather than silently widening the sink."""
+    def test_the_raw_archive_argument_reaches_exactly_one_sink(self):
+        """`sha256_file(path)` and `docker cp` constrain nothing by themselves,
+        so the safety of the archive flow is a property of its call sites. In
+        `phase_promote` the raw `archive` argument must be admitted exactly
+        once and every other call must consume the admitted value, so a future
+        sink added against the raw argument fails here instead of silently
+        widening the flow (B4-CXR7U9R35).
+        """
         tree = ast.parse((SCRIPTS / "pg-recovery.py").read_text(encoding="utf-8"))
-        sites = [n for n in ast.walk(tree)
-                 if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
-                 and n.func.id == "sha256_file"]
-        assert sites, "expected at least one sha256_file call site"
-        for call in sites:
-            assert call.args, "sha256_file called without a path"
-            inner = call.args[0]
-            assert (isinstance(inner, ast.Call) and isinstance(inner.func, ast.Name)
-                    and inner.func.id == "_validated_open_path"), ast.dump(inner)
+        promote = next(n for n in ast.walk(tree)
+                       if isinstance(n, ast.FunctionDef) and n.name == "phase_promote")
+        raw_uses = [[a.id for a in c.args if isinstance(a, ast.Name)]
+                    for c in ast.walk(promote) if isinstance(c, ast.Call)]
+        admitted = [c for c in ast.walk(promote)
+                    if isinstance(c, ast.Call) and isinstance(c.func, ast.Name)
+                    and c.func.id == "_validated_open_path"]
+        assert len(admitted) == 1, "the archive must be admitted exactly once"
+        assert [a.id for a in admitted[0].args] == ["archive"], ast.dump(admitted[0])
+        assert [u for u in raw_uses if "archive" in u].count(["archive"]) == 1, (
+            "the raw archive argument must reach only the admission call")
+        # and the local read that Sonar anchored on is gone: the restore
+        # consumes the container's hash-bound copy, which needs no host read
+        assert not [n for n in ast.walk(promote)
+                    if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                    and n.func.id == "open"], "promote must not read the archive on the host"
