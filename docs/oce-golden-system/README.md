@@ -82,3 +82,16 @@ Upwork and Fiverr are first-class source candidates alongside agent-native venue
 - Block 1 remains the active implementation block.
 - Blocks 2–10 are planned but build-locked.
 - Main is not changed by this planning package.
+
+## Model-sparse and cognitive-continuation planning package
+
+The institutional branch also carries a non-ratified research-to-architecture package for model-sparse cognition, continuation, and cognitive-primitives research:
+
+1. `../oce-autonomy/OPH_CADENCE_SOPHONTIC_INSTITUTIONAL_SYNTHESIS_v0.1.md` — source synthesis and hierarchy.
+2. `OCE_OPH_CADENCE_SOPHONTIC_ARCHITECTURE_IMPACT_REVIEW_v0.1.md` — contradiction and ownership review.
+3. `OCE_OPH_CADENCE_SOPHONTIC_EXISTING_AMENDMENT_PATCHSET_v0.1.md` — narrow proposed deltas to A-004, A-005, A-007, A-009, and A-010.
+4. `OCE_ARCHITECTURE_AMENDMENT_A012_MODEL_SPARSE_INSTITUTIONAL_INTELLIGENCE_v0.1.md` — cross-OCE dependency and routing doctrine proposal.
+5. `LARGER_LAB_MODEL_FOUNDRY_ARCHITECTURE_AMENDMENT_MF_A002_COGNITIVE_PRIMITIVES_v0.1.md` — proposed System-One/cognitive-primitives Foundry lane.
+6. `../oce-autonomy/OCE_CONTINUATION_AND_PRIVATE_IMAGINATION_TEST_EXTENSION_v0.1.md` — future autonomy falsification extension.
+
+These documents do not alter the current MF-B0 through MF-B4 build, completed stress-suite receipts, or the current G8 → G9 → G10 sequence. They authorize no implementation, training, runtime migration, or production change.

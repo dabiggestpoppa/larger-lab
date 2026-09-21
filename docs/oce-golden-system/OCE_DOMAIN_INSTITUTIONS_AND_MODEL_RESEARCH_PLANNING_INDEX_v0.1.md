@@ -373,6 +373,30 @@ No A004+ institutional feature is considered production OCE merely because a Mod
 
 ---
 
+# PROGRAM F — MODEL-SPARSE INTELLIGENCE + COGNITIVE CONTINUATION
+
+## Planning package
+
+- `OCE_OPH_CADENCE_SOPHONTIC_ARCHITECTURE_IMPACT_REVIEW_v0.1.md`;
+- `OCE_OPH_CADENCE_SOPHONTIC_EXISTING_AMENDMENT_PATCHSET_v0.1.md`;
+- `OCE_ARCHITECTURE_AMENDMENT_A012_MODEL_SPARSE_INSTITUTIONAL_INTELLIGENCE_v0.1.md`;
+- `LARGER_LAB_MODEL_FOUNDRY_ARCHITECTURE_AMENDMENT_MF_A002_COGNITIVE_PRIMITIVES_v0.1.md`;
+- `../oce-autonomy/OCE_CONTINUATION_AND_PRIVATE_IMAGINATION_TEST_EXTENSION_v0.1.md`.
+
+## Ownership
+
+- A-012 owns cross-OCE cognitive dependency, routing, public/private state, obstruction, substitution, and morphology doctrine.
+- MF-A002 owns manufacture and evaluation of cognitive primitives under Foundry evidence controls.
+- the continuation test extension owns future falsification of private-imagination, false-equivalence, morphology, self-change, consensus, and critical-dependency failure.
+
+## Sequence
+
+This program is parallel planning only until current G8 → G9 → G10 completes and the operator ratifies surviving contracts.
+
+MF-B0 through MF-B4 remain unchanged. Cadence, OpenJev, OPH, RLT, PC-ALM, and other architectures remain research donors or candidates rather than OCE dependencies.
+
+---
+
 ## 2. Book creation order
 
 Create the full books in this order:
