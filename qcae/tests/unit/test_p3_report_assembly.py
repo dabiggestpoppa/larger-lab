@@ -172,7 +172,7 @@ def _outcome(query_id, *, source_class=SourceClass.GITHUB_REPOSITORY_CODE,
 
     The execution record derives from the given plan the same way a real
     runner derives it: query identity/family/atom/semantics/concrete query
-    from the plan's own hypothesis -> family -> query lineage. Repeated
+    from the plan own hypothesis -> family -> query lineage. Repeated
     executions of one planned query carry an ordinal suffix (``-exec2``,
     ``-exec3``, ...); ``ordinal=False`` forces the bare base id (used by the
     single-use refusal tests, which bind one record twice on purpose).
@@ -461,7 +461,7 @@ class TestStopAuthority:
 
         ``marginal_novelty_rate`` is 0.0 when nothing was inspected, so a naive
         reading would satisfy any declared threshold; the derivation refuses to
-        call that saturation unless the caller's typed reason stands beside it,
+        call that saturation unless the caller typed reason stands beside it,
         and here the caller declares none.
         """
         plan = make_discovery_plan(**plan_kwargs(stop_rules=(
@@ -606,12 +606,75 @@ class TestNegativeKnowledge:
         assert report.stop_recommendation.state.value == "CONTINUE"
 
 
-class TestNoClaimOutrunsItsEvidence:
-    """A claim in the artifact must not survive beside evidence that refutes it.
+class TestDeepImmutability:
+    """P3-R4C5 — evidence records are deeply immutable and self-verifying."""
 
-    Each case here is a state the real pieces reach: the report's own contents
-    contradict a note, a status, or a stop recommendation. The phase's rule is
-    that such a claim is refused or recorded, never left standing silently.
+    def test_mutating_the_callers_dict_cannot_mutate_the_record(self) -> None:
+        """Q: a frozen record holding a caller-owned dict is not evidence."""
+        activity = {"stars": 4100, "recent_commit": True}
+        item = lead("lead-gh-1", "github:owner/lib", activity_signals=activity)
+        before = item.to_dict()
+        activity["stars"] = 999999
+        activity["injected"] = "after-construction"
+        assert item.activity_signals["stars"] == 4100
+        assert "injected" not in item.activity_signals
+        assert item.to_dict() == before  # byte-identical evidence
+
+    def test_nested_values_cannot_change_after_validation(self) -> None:
+        from types import MappingProxyType
+
+        item = lead("lead-gh-1", "github:owner/lib",
+                    popularity_signals={"forks": 12})
+        assert isinstance(item.activity_signals, MappingProxyType)
+        with pytest.raises(TypeError):
+            item.popularity_signals["forks"] = 13
+
+    def test_a_mutable_escalation_entry_cannot_be_mutated(self) -> None:
+        """The ``dimension_scores`` map rides the queue: it must be frozen."""
+        from types import MappingProxyType
+
+        candidates = merge_leads([lead("lead-gh-1", "github:owner/lib")])
+        ranking = rank_candidates(candidates=candidates, plan=baseline_plan(),
+                                  policy=policy())
+        assert ranking.queue
+        for entry in ranking.queue:
+            assert isinstance(entry.dimension_scores, MappingProxyType)
+            with pytest.raises(TypeError):
+                entry.dimension_scores["semantic_fit"] = 0.0
+
+    def test_records_survive_json_round_trip_with_bindings_intact(self) -> None:
+        """R: bindings, negative knowledge and assessments survive the trip."""
+        from qcae.core.ports.discovery import ExecutedDiscoveryQuery
+
+        leads, outcomes = _two_adapter_run()
+        report, _c, _r = _run(leads=leads, outcomes=outcomes)
+        reloaded = type(report).from_dict(json.loads(json.dumps(report.to_dict())))
+        assert reloaded == report
+        # The outcome still binds to its execution record after the trip.
+        record = ExecutedDiscoveryQuery.from_dict(
+            outcomes[0].execution_record.to_dict())
+        assert record == outcomes[0].execution_record
+        assert record.discovery_plan_id == report.discovery_plan_id
+
+    def test_the_report_verifies_its_own_claims_after_reloading(self) -> None:
+        """No hidden process memory is needed to validate a previous report."""
+        leads, outcomes = _two_adapter_run()
+        report, _c, _r = _run(leads=leads, outcomes=outcomes)
+        reloaded = type(report).from_dict(json.loads(json.dumps(report.to_dict())))
+        # The artifact carries everything its own validation reads.
+        reloaded.validate()
+        assert reloaded.known_candidates_ids == report.known_candidates_ids
+        assert reloaded.negative_observations == report.negative_observations
+        assert (reloaded.stop_recommendation.assessments
+                == report.stop_recommendation.assessments)
+
+
+class TestNoClaimOutrunsItsEvidence:
+    """A claim must not survive beside evidence that refutes it.
+
+    Each case here is a state the real pieces reach: the report contents
+    contradict a note, a status, or a stop recommendation. The rule is that
+    such a claim is refused or recorded, never left standing silently.
     """
 
     def test_external_search_though_the_baseline_assigned_no_atom_is_disclosed(self) -> None:
@@ -642,7 +705,7 @@ class TestNoClaimOutrunsItsEvidence:
     def test_a_completed_search_that_is_not_exhaustive_is_recorded_partial(self) -> None:
         """Canon 2.2.13: a partial search is never represented as exhaustive.
 
-        The port's own standing is what makes a search partial: ``exhaustive``
+        The port standing is what makes a search partial: ``exhaustive``
         holds only for a completed search carrying no qualification, so a search
         that returned results *and* qualified its completeness is partial even
         though its status reads OK.
@@ -664,7 +727,7 @@ class TestNoClaimOutrunsItsEvidence:
         assert report.partial_search_notes == ()
 
     def test_a_stop_on_a_set_the_report_does_not_contain_is_refused(self) -> None:
-        """A sufficiency declaration the artifact's own contents refute.
+        """A sufficiency declaration the artifact contents refute.
 
         With no candidate from this pass and none known from an earlier one,
         there is no non-dominated set to be sufficient: the report would
@@ -677,7 +740,7 @@ class TestNoClaimOutrunsItsEvidence:
     def test_a_counter_history_without_the_knowledge_it_measured_is_disclosed(self) -> None:
         """The natural multi-pass handoff, and the one that inflates novelty.
 
-        A previous pass's counters are what the artifact carries
+        A previous pass counters are what the artifact carries
         (``report.saturation_metrics``), so feeding them into the next pass is
         the obvious handoff; the candidate records they were measured against are
         not in that artifact. Carrying the counters without the candidates makes

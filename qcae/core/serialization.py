@@ -22,6 +22,7 @@ import hashlib
 import json
 from dataclasses import fields, is_dataclass
 from enum import Enum
+from types import MappingProxyType
 from typing import Any, ClassVar, Dict, Tuple, Type, TypeVar, get_origin, get_type_hints
 
 from qcae.core.errors import (
@@ -52,6 +53,21 @@ def sha256_of(data: Any) -> str:
     return hashlib.sha256(canonical_json_bytes(data)).hexdigest()
 
 
+def _deep_freeze(value: Any) -> Any:
+    """Deeply freeze a JSON-native structure (P3-R4C5 deep immutability).
+
+    Dicts become ``MappingProxyType`` copies whose values are themselves
+    frozen, lists become tuples, and scalars pass through. Mutating a caller's
+    original mapping after construction can no longer mutate the record.
+    """
+    if isinstance(value, dict):
+        return MappingProxyType(
+            {key: _deep_freeze(item) for key, item in value.items()})
+    if isinstance(value, list):
+        return tuple(_deep_freeze(item) for item in value)
+    return value
+
+
 class SerializableRecord:
     """Base for versioned, canonically serializable QCAE domain records.
 
@@ -76,12 +92,15 @@ class SerializableRecord:
     _TYPE_HINTS_CACHE: ClassVar[Dict[type, Any]] = {}
 
     def __post_init__(self) -> None:
-        """Canonicalize declared sequence types so equal records compare equal.
+        """Canonicalize declared sequence types and deeply freeze mappings.
 
         JSON flattens tuples to arrays and callers may pass either form; a
         tuple-declared field therefore always holds a tuple in memory, and a
-        list-declared field always a list. This keeps digests and equality
-        deterministic regardless of how the record was constructed.
+        list-declared field always a list. Mapping fields are defensively
+        frozen: a frozen dataclass holding a caller-owned dict is not immutable
+        evidence (P3-R4C5), so mappings are copied into a frozen Mapping
+        proxy whose values are themselves deeply frozen, keeping digests and
+        equality deterministic regardless of how the record was constructed.
         """
         cls = type(self)
         hints = cls._hints()
@@ -96,6 +115,8 @@ class SerializableRecord:
                 object.__setattr__(self, fld.name, tuple(value))
             elif origin is list and isinstance(value, tuple):
                 object.__setattr__(self, fld.name, list(value))
+            elif origin is dict and isinstance(value, dict):
+                object.__setattr__(self, fld.name, _deep_freeze(value))
 
     @classmethod
     def _hints(cls) -> Dict[str, Any]:
@@ -219,7 +240,7 @@ def _to_jsonable(value: Any) -> Any:
         return {field.name: _to_jsonable(getattr(value, field.name)) for field in fields(value)}
     if isinstance(value, (list, tuple)):
         return [_to_jsonable(item) for item in value]
-    if isinstance(value, dict):
+    if isinstance(value, (dict, MappingProxyType)):
         return {str(key): _to_jsonable(item) for key, item in value.items()}
     if value is None or isinstance(value, (str, int, float, bool)):
         return value

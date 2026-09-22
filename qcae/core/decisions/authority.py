@@ -16,7 +16,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Optional, Protocol, runtime_checkable
+from types import MappingProxyType
+from typing import Protocol, runtime_checkable
 
 from qcae.core.errors import QcaeValidationError
 from qcae.core.serialization import SerializableRecord, coerce_enum
@@ -70,7 +71,7 @@ class AuthorityRequest(SerializableRecord):
         require_identifier(self.subject_id, "subject_id")
         require_non_empty_str(self.justification, "justification")
         require_non_empty_str(self.requested_by, "requested_by")
-        if not isinstance(self.context, dict):
+        if not isinstance(self.context, (dict, MappingProxyType)):
             raise QcaeValidationError("context must be a dict")
 
 

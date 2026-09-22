@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
+from types import MappingProxyType
 from typing import Optional, Tuple
 
 from qcae.core.amendments.a001.gaps import GapType
@@ -299,7 +300,7 @@ class ResearchCapabilityHandoff(SerializableRecord):
                     f"required_outputs entries must be RequiredOutput members, "
                     f"got {output!r}"
                 )
-        if not isinstance(self.capability_context, dict):
+        if not isinstance(self.capability_context, (dict, MappingProxyType)):
             raise QcaeValidationError("capability_context must be an object")
 
 

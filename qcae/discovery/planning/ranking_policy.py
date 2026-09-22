@@ -27,6 +27,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from types import MappingProxyType
 from typing import Dict, Tuple
 
 from qcae.core.errors import QcaeValidationError
@@ -98,7 +99,7 @@ class RankingPolicy(SerializableRecord):
 
     def validate(self) -> None:
         require_non_empty_str(self.policy_version, "policy_version")
-        if not isinstance(self.weights, dict):
+        if not isinstance(self.weights, (dict, MappingProxyType)):
             raise QcaeValidationError("weights must be a mapping of dimension to weight")
         missing = sorted(d.value for d in DIMENSIONS if d.value not in self.weights)
         if missing:

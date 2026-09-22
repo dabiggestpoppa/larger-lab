@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
+from types import MappingProxyType
 from typing import Dict, Tuple
 
 from qcae.core.discovery.candidate import CanonicalCandidate
@@ -325,7 +326,7 @@ class EscalationEntry(SerializableRecord):
                 raise QcaeValidationError(f"{name} must be within [0, 1], got {value!r}")
         if float(self.expected_cost_units) < 0:
             raise QcaeValidationError("expected_cost_units must be >= 0")
-        if not isinstance(self.dimension_scores, dict):
+        if not isinstance(self.dimension_scores, (dict, MappingProxyType)):
             raise QcaeValidationError("dimension_scores must be a mapping")
         for name, value in self.dimension_scores.items():
             require_non_empty_str(name, "dimension_scores key")

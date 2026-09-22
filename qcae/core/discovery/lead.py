@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
+from types import MappingProxyType
 from typing import Dict, Tuple
 
 from qcae.core.discovery.vocabulary import SourceClass
@@ -135,10 +136,14 @@ class QueryLineage(SerializableRecord):
 
 
 def _require_signal_map(value: object, what: str) -> None:
-    """Signals are flat observed facts, never nested interpretation."""
-    if not isinstance(value, dict):
-        raise QcaeValidationError(f"{what} must be a flat mapping, got {value!r}")
-    for key, item in value.items():
+    """Signals are flat observed facts, never nested interpretation.
+
+    Records freeze mappings on construction (P3-R4C5), so a frozen mapping is
+    the expected shape here; ``dict(...)`` reads either a dict or a proxy.
+    """
+    if not isinstance(value, (dict, MappingProxyType)):
+        raise QcaeValidationError(f"{what} must be a flat mapping, got {type(value).__name__}")
+    for key, item in dict(value).items():
         if not isinstance(key, str) or not key.strip():
             raise QcaeValidationError(f"{what} keys must be non-empty strings, got {key!r}")
         if isinstance(item, bool) or isinstance(item, (str, int, float)):

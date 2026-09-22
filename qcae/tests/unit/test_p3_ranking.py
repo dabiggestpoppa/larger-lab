@@ -92,6 +92,8 @@ def lead(
     novelty_family: str = "",
     conflicts=(),
     query_lineage: QueryLineage | None = None,
+    activity_signals=None,
+    popularity_signals=None,
 ) -> CandidateLead:
     # ``claims`` become ``claimed_capabilities`` (canon 2.1.11) and ``atoms`` become
     # ``possible_atom_matches``. Most fixtures pass atom ids for both, which is why the
@@ -112,6 +114,10 @@ def lead(
                                     atoms[0] if atoms else ATOM_A)),
         claimed_capabilities=tuple(claims),
         possible_atom_matches=tuple(atoms),
+        **({"activity_signals": activity_signals}
+           if activity_signals is not None else {}),
+        **({"popularity_signals": popularity_signals}
+           if popularity_signals is not None else {}),
         retrieved_revision=revision,
         license_claim=license_claim,
         completeness=completeness,

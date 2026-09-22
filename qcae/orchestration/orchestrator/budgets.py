@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
+from types import MappingProxyType
 from typing import Dict, Tuple
 
 from qcae.core.errors import QcaeValidationError
@@ -76,7 +77,7 @@ class Budget(SerializableRecord):
         if self.owner_kind not in ("job", "step"):
             raise QcaeValidationError("owner_kind must be 'job' or 'step'")
         require_identifier(self.owner_id, "owner_id")
-        if not isinstance(self.allocation, dict) or not isinstance(self.used, dict):
+        if not isinstance(self.allocation, (dict, MappingProxyType)) or not isinstance(self.used, (dict, MappingProxyType)):
             raise QcaeValidationError("allocation/used must be dicts")
         for dim, amount in self.allocation.items():
             require_non_empty_str(dim, "dimension")

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
+from types import MappingProxyType
 from typing import FrozenSet, Optional, Tuple
 
 from qcae.core.errors import QcaeStateTransitionError, QcaeValidationError
@@ -348,8 +349,8 @@ class RuntimeStep(SerializableRecord):
             )
         if self.lease is not None:
             self.lease.validate()
-        if not isinstance(self.budget_allocation, dict) or not isinstance(
-            self.budget_used, dict
+        if not isinstance(self.budget_allocation, (dict, MappingProxyType)) or not isinstance(
+            self.budget_used, (dict, MappingProxyType)
         ):
             raise QcaeValidationError("budget fields must be dicts")
         for dim, used in self.budget_used.items():

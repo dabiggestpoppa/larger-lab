@@ -13,7 +13,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Optional, Tuple
+from types import MappingProxyType
+from typing import Tuple
 
 from qcae.core.errors import QcaeValidationError
 from qcae.core.serialization import SerializableRecord, coerce_enum
@@ -128,7 +129,7 @@ class WorkerResult(SerializableRecord):
         require_no_duplicates(self.output_artifact_refs, "output_artifact_refs")
         require_no_duplicates(self.evidence_refs, "evidence_refs")
         require_no_duplicates(self.contradictions, "contradictions")
-        if not isinstance(self.budget_used, dict):
+        if not isinstance(self.budget_used, (dict, MappingProxyType)):
             raise QcaeValidationError("budget_used must be a dict")
         if self.status in (WorkerStatus.FAILED, WorkerStatus.RETRYABLE):
             if not self.failure_class:
