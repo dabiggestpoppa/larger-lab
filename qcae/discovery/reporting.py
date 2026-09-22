@@ -53,7 +53,10 @@ from qcae.core.errors import QcaeValidationError
 from qcae.core.ports.discovery import AdapterOutcome, AdapterStatus
 
 from qcae.discovery.internal.baseline import InternalBaselineRecord
-from qcae.discovery.planning.canonical import merge_leads
+from qcae.discovery.planning.canonical import (
+    merge_canonical_candidates,
+    merge_leads,
+)
 from qcae.discovery.planning.families import family_identity_for
 from qcae.discovery.planning.ranking import RankingResult
 from qcae.discovery.planning.saturation import (
@@ -71,6 +74,7 @@ def assemble_discovery_report(
     baseline: InternalBaselineRecord,
     ranking: RankingResult,
     outcomes: Sequence[AdapterOutcome] = (),
+    previous_report: Optional[DiscoveryReport] = None,
     previous_metrics: Optional[SaturationMetrics] = None,
     previously_known_candidates: Sequence[CanonicalCandidate] = (),
     saturated: bool = False,
@@ -85,17 +89,26 @@ def assemble_discovery_report(
     """Assemble one discovery pass into its terminal report (canon 2.7.15).
 
     ``outcomes`` are the adapter results that ran; ``ranking`` is the pass over
-    the candidates those outcomes produced. For a later pass, pass the previous
-    pass's ``saturation_metrics`` as ``previous_metrics`` and the candidates it
-    already saw as ``previously_known_candidates``, so novelty stays measured
-    against what was known (2.1.10). The judgement flags are the caller's
+    the candidates those outcomes produced. The judgement flags are the caller's
     declarations and are never inferred from the other pieces.
 
-    A caller holding only the previous report can carry its ``saturation_metrics``
-    but not the candidate records those counters measured — the artifact carries
-    ids, not records. That half is *disclosed* in ``coverage_notes`` rather than
+    For a later pass, hand the previous artifact over as ``previous_report``: the
+    report carries both the counters and the canonical candidates they measured,
+    so novelty stays measured against what was known (2.1.10) with no bookkeeping
+    in the caller — which is the only reliable way to do it, since a caller whose
+    records are gone (a durable loop restarting from the artifact) cannot
+    reconstruct them. ``previous_metrics`` and ``previously_known_candidates``
+    remain available for a caller that holds the pieces itself; supplying them
+    alongside ``previous_report`` is refused, because the history has one owner.
+    A counters-only handoff is still *disclosed* in ``coverage_notes`` rather than
     left to inflate the novelty the stop law reads.
     """
+    _require_one_history_source(previous_report, previous_metrics,
+                               previously_known_candidates)
+    if previous_report is not None:
+        previous_metrics = previous_report.saturation_metrics
+        previously_known_candidates = previous_report.known_candidates
+
     _require_baseline_matches_plan(baseline, plan)
 
     ran = tuple(outcomes)
@@ -110,6 +123,11 @@ def assemble_discovery_report(
     }))
     discovered = merge_leads([lead for outcome in ran for lead in outcome.leads])
     _require_discovered_accounted_for(discovered, canonical_ids)
+    # What is known as of this pass: everything an earlier pass knew plus what this
+    # one found, aggregated by the canonical owner so one identity stays one
+    # record (2.1.12) — the set the next pass measures novelty against (2.1.10).
+    known_candidates = merge_canonical_candidates(
+        [*previously_known_candidates, *discovered])
     _require_sufficiency_claim_has_a_set(
         enough_non_dominated=enough_non_dominated,
         canonical_ids=canonical_ids,
@@ -155,6 +173,7 @@ def assemble_discovery_report(
         escalation_queue=tuple(ranking.queue),
         saturation_metrics=metrics,
         stop_recommendation=verdict,
+        known_candidates=known_candidates,
         coverage_notes=_coverage_notes(
             plan, baseline, ran,
             previous_metrics=previous_metrics,
@@ -172,6 +191,35 @@ def assemble_discovery_report(
 
 
 # -- fail-closed consistency laws -------------------------------------------
+
+
+def _require_one_history_source(
+    previous_report: Optional[DiscoveryReport],
+    previous_metrics: Optional[SaturationMetrics],
+    previously_known_candidates: Sequence[CanonicalCandidate],
+) -> None:
+    """One owner per piece of state: the artifact, or the records (canon 2.1.10).
+
+    Combining them would let one pass's counters meet another pass's candidates —
+    the arithmetic that inflated novelty in the first place — so it is refused
+    rather than resolved by precedence.
+    """
+    if previous_report is None:
+        return
+    conflicting = [
+        name
+        for name, supplied in (
+            ("previous_metrics", previous_metrics is not None),
+            ("previously_known_candidates", bool(previously_known_candidates)),
+        )
+        if supplied
+    ]
+    if conflicting:
+        raise QcaeValidationError(
+            f"previous_report was given together with {conflicting}: the pass history has "
+            "one owner (canon 2.1.10), so hand over either the previous artifact or the "
+            "explicit counters and candidates it carries, never both"
+        )
 
 
 def _require_baseline_matches_plan(

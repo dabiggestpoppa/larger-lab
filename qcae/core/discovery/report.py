@@ -11,7 +11,12 @@ encode that boundary:
   itself required sufficient evidence strength (2.7.3);
 - a stop recommendation is either CONTINUE with no satisfied stop condition, or
   STOP with at least one satisfied condition drawn from the plan's own declared
-  stop rules (2.1.9) — an unexplained "stop" is not representable.
+  stop rules (2.1.9) — an unexplained "stop" is not representable;
+- the artifact carries the canonical candidate set it counted, not only its ids
+  (2.7.15), because canon 2.1.10 measures novelty against what was already known
+  and the report is what a later pass has to hand over. Carrying ids alone made
+  the durable handoff — feed the previous pass's metrics forward — re-count an
+  already-known candidate as new, inflating the very rate the stop law reads.
 """
 
 from __future__ import annotations
@@ -20,6 +25,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Dict, Tuple
 
+from qcae.core.discovery.candidate import CanonicalCandidate
 from qcae.core.discovery.plan import (
     ContractAmendmentProposal,
     SaturationMetrics,
@@ -282,7 +288,11 @@ class StopRecommendation(SerializableRecord):
 class DiscoveryReport(SerializableRecord):
     """Block 2 terminal artifact (canon 2.7.15)."""
 
-    SCHEMA_VERSION = 1
+    #: Bumped when the persisted shape gained ``known_candidates``: the reader
+    #: refuses an older payload with a version error rather than a missing-field
+    #: one, so an artifact predating the change is distinguishable from a
+    #: corrupted one.
+    SCHEMA_VERSION = 2
 
     report_id: str
     discovery_plan_id: str
@@ -297,6 +307,11 @@ class DiscoveryReport(SerializableRecord):
     escalation_queue: Tuple[EscalationEntry, ...]
     saturation_metrics: SaturationMetrics
     stop_recommendation: StopRecommendation
+    #: Every canonical candidate known as of this pass — 2.7.15's canonical
+    #: candidate set, accumulated across passes because 2.1.10 measures novelty
+    #: against everything already known. This is the field a later pass reads to
+    #: keep its counters honest; the ranking's own set is ``canonical_candidate_ids``.
+    known_candidates: Tuple[CanonicalCandidate, ...] = ()
     coverage_notes: Tuple[str, ...] = ()
     partial_search_notes: Tuple[str, ...] = ()
     prefilter_decisions: Tuple[PrefilterDecisionRecord, ...] = ()
@@ -312,6 +327,7 @@ class DiscoveryReport(SerializableRecord):
         "sources_searched": lambda v: coerce_enum_tuple(v, SourceClass),
         "query_families_executed": tuple,
         "canonical_candidate_ids": tuple,
+        "known_candidates": tuple,
         "coverage_notes": tuple,
         "partial_search_notes": tuple,
         "negative_findings": tuple,
@@ -319,6 +335,7 @@ class DiscoveryReport(SerializableRecord):
     }
 
     _NESTED_RECORDS = {
+        "known_candidates": CanonicalCandidate,
         "saturation_metrics": SaturationMetrics,
         "stop_recommendation": StopRecommendation,
         "candidate_families": CandidateFamily,
@@ -352,6 +369,17 @@ class DiscoveryReport(SerializableRecord):
 
         require_str_list(self.canonical_candidate_ids, "canonical_candidate_ids")
         require_no_duplicates(self.canonical_candidate_ids, "canonical_candidate_ids")
+        for candidate in self.known_candidates:
+            candidate.validate()
+        require_no_duplicates(self.known_candidates_ids, "known_candidates canonical_id")
+        unknown = sorted(set(self.canonical_candidate_ids) - set(self.known_candidates_ids))
+        if unknown:
+            raise QcaeValidationError(
+                f"canonical candidates absent from known_candidates: {unknown} "
+                "(canon 2.7.15/2.1.10: the artifact must carry the candidates it counted "
+                "as known, or a later pass cannot measure novelty against them and "
+                "re-counts them as new)"
+            )
         known = set(self.canonical_candidate_ids)
 
         family_ids: set = set()
@@ -395,6 +423,11 @@ class DiscoveryReport(SerializableRecord):
                 raise QcaeValidationError(
                     "amendment proposals must reference this report's discovery plan"
                 )
+
+    @property
+    def known_candidates_ids(self) -> Tuple[str, ...]:
+        """Canonical ids of every candidate this report knows (canon 2.1.10)."""
+        return tuple(candidate.canonical_id for candidate in self.known_candidates)
 
     @property
     def external_scope_atoms(self) -> Tuple[str, ...]:

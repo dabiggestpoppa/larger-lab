@@ -267,6 +267,114 @@ class TestNoClaimOutrunsItsEvidence:
         assert report.stop_recommendation.state.value == "STOP"
 
 
+class TestTheArtifactIsItsOwnHandoff:
+    """A pass assembled from the previous report must count as honestly as a caller
+    who hand-supplies the previous counters *and* the records they measured.
+
+    Canon 2.7.15 lists the canonical candidate set among the artifact's contents and
+    canon 2.1.10 measures novelty against what was already known, so the artifact is
+    where the next pass's history has to come from — otherwise the natural durable
+    handoff publishes an inflated novelty rate to the stop law.
+    """
+
+    def test_handing_off_from_the_artifact_matches_hand_supplied_history(self) -> None:
+        leads, outcomes = _two_adapter_run()
+        first, candidates, _r = _run(leads=leads, outcomes=outcomes)
+
+        control, _c1, _r1 = _run(
+            leads=leads, outcomes=outcomes,
+            previous_metrics=first.saturation_metrics,
+            previously_known_candidates=candidates)
+        handed_off, _c2, _r2 = _run(leads=leads, outcomes=outcomes,
+                                    previous_report=first)
+
+        assert handed_off.saturation_metrics == control.saturation_metrics
+        assert (handed_off.stop_recommendation.state
+                == control.stop_recommendation.state)
+        assert (handed_off.stop_recommendation.satisfied_conditions
+                == control.stop_recommendation.satisfied_conditions)
+        # The honest number, not the inflated one: a repeat pass discovers nothing.
+        assert (handed_off.saturation_metrics.new_candidates
+                == first.saturation_metrics.new_candidates)
+        assert (handed_off.saturation_metrics.new_atoms_covered
+                == first.saturation_metrics.new_atoms_covered)
+        assert (handed_off.saturation_metrics.marginal_novelty_rate
+                < first.saturation_metrics.marginal_novelty_rate)
+
+    def test_the_loop_stays_honest_when_only_the_artifact_travels(self) -> None:
+        """Three passes, each handed over as the artifact alone.
+
+        Accumulating the history in the caller is the bookkeeping a durable loop
+        cannot do (the artifact carries ids, not records), so the artifact itself
+        has to know what was already known — otherwise pass three re-counts what
+        pass one found.
+        """
+        leads, outcomes = _two_adapter_run()
+        first, _c, _r = _run(leads=leads, outcomes=outcomes)
+        second, _c2, _r2 = _run(leads=leads, outcomes=outcomes, previous_report=first)
+        third, _c3, _r3 = _run(leads=leads, outcomes=outcomes, previous_report=second)
+
+        assert (second.saturation_metrics.new_candidates
+                == first.saturation_metrics.new_candidates)
+        assert (third.saturation_metrics.new_candidates
+                == second.saturation_metrics.new_candidates)
+        assert (third.saturation_metrics.new_atoms_covered
+                == first.saturation_metrics.new_atoms_covered)
+        assert (third.saturation_metrics.marginal_novelty_rate
+                < second.saturation_metrics.marginal_novelty_rate)
+        # The known set accumulates identities, not duplicates of them.
+        assert (second.known_candidates_ids == third.known_candidates_ids
+                == first.known_candidates_ids)
+
+    def test_the_artifact_carries_the_known_set_it_counted(self) -> None:
+        leads, outcomes = _two_adapter_run()
+        report, candidates, _r = _run(leads=leads, outcomes=outcomes)
+        assert report.known_candidates == tuple(candidates)
+        assert set(report.canonical_candidate_ids) <= {
+            c.canonical_id for c in report.known_candidates}
+
+    def test_the_artifact_carries_what_an_earlier_pass_already_knew(self) -> None:
+        """A later pass's report knows both its own discoveries and the earlier ones."""
+        leads, outcomes = _two_adapter_run()
+        first, candidates, _r = _run(leads=leads, outcomes=outcomes)
+        later, _c, _r2 = _run(leads=leads, outcomes=outcomes, previous_report=first)
+        assert set(later.known_candidates_ids) == set(first.known_candidates_ids)
+        assert later.known_candidates == first.known_candidates
+        assert set(first.known_candidates_ids) == {c.canonical_id for c in candidates}
+
+    def test_mixing_the_artifact_with_explicit_history_is_refused(self) -> None:
+        """One owner for the pass history, so the two cannot be combined. """
+        leads, outcomes = _two_adapter_run()
+        first, candidates, _r = _run(leads=leads, outcomes=outcomes)
+        with pytest.raises(QcaeValidationError, match="previous_report"):
+            _run(leads=leads, outcomes=outcomes, previous_report=first,
+                 previous_metrics=first.saturation_metrics)
+        with pytest.raises(QcaeValidationError, match="previous_report"):
+            _run(leads=leads, outcomes=outcomes, previous_report=first,
+                 previously_known_candidates=candidates)
+
+    def test_a_report_whose_known_set_omits_a_reported_candidate_is_refused(self) -> None:
+        """The artifact's own validation owns that law, not only the assembler."""
+        leads, outcomes = _two_adapter_run()
+        report, _c, _r = _run(leads=leads, outcomes=outcomes)
+        assert report.known_candidates
+        with pytest.raises(QcaeValidationError, match="known_candidates"):
+            replace(report, known_candidates=()).validate()
+
+    def test_the_disclosure_still_fires_when_only_the_counters_are_carried(self) -> None:
+        """The note stays as a belt-and-braces signal beside the working handoff."""
+        leads, outcomes = _two_adapter_run()
+        first, _c, _r = _run(leads=leads, outcomes=outcomes)
+        partial_handoff, _c2, _r2 = _run(
+            leads=leads, outcomes=outcomes, previous_metrics=first.saturation_metrics)
+        assert any("previously_known_candidates" in note
+                   for note in partial_handoff.coverage_notes)
+        handed_off, _c3, _r3 = _run(leads=leads, outcomes=outcomes,
+                                    previous_report=first)
+        assert not any("previously_known_candidates" in note
+                       for note in handed_off.coverage_notes)
+
+
 class TestAssembledReportMatchesItsPieces:
     def test_report_is_consistent_with_the_inputs_it_came_from(self) -> None:
         leads, outcomes = _two_adapter_run()
@@ -451,14 +559,17 @@ class TestStopVerdictIsDerived:
     def test_budget_exhaustion_is_derived_from_the_counters(self) -> None:
         leads = [lead("lead-gh-1", "github:owner/lib")]
         outcomes = [_outcome("q-1", results=1, leads=leads)]
-        report, _candidates, _ranking = _run(leads=leads, outcomes=outcomes)
+        report, candidates, _ranking = _run(leads=leads, outcomes=outcomes)
         assert report.stop_recommendation.state.value == "CONTINUE"
         assert report.stop_recommendation.satisfied_conditions == ()
 
-        # max_queries is 10 in the plan; 11 executed searches exhaust it.
+        # max_queries is 10 in the plan; 11 executed searches exhaust it. The
+        # candidate is known from the earlier pass, so this pass discovers
+        # nothing: the counters advance, the discovery set does not.
         spent = [_outcome(f"q-{i}", status=AdapterStatus.NO_RESULTS, results=0)
                  for i in range(11)]
-        report_spent, _c2, _r2 = _run(leads=leads, outcomes=spent)
+        report_spent, _c2, _r2 = _run(leads=leads, outcomes=spent,
+                                      previously_known_candidates=candidates)
         assert report_spent.saturation_metrics.queries_executed >= 10
         assert report_spent.stop_recommendation.state.value == "STOP"
         assert [c.value for c in report_spent.stop_recommendation.satisfied_conditions] == [
