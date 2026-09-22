@@ -64,6 +64,9 @@ def derive_dimensions(
 ) -> Tuple[Dict[RankingDimension, float], float, float]:
     """Return (dimension scores, popularity blend input, cost units)."""
     requested = set(plan.atom_ids)
+    # Only atom claims count here: the candidate's capability claims are a
+    # different vocabulary, and the intersection below asks which of *this* plan's
+    # atoms the candidate matches — relevance, not claim kind.
     claimed = set(candidate.claims_atoms)
     coverage = len(requested & claimed) / len(requested) if requested else 0.0
 

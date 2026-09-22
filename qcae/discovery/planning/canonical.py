@@ -102,6 +102,8 @@ def merge_canonical_candidates(
                 set(previous.source_classes) | set(candidate.source_classes),
                 key=lambda sc: sc.value,
             )),
+            claimed_capabilities=tuple(sorted(set(previous.claimed_capabilities)
+                                              | set(candidate.claimed_capabilities))),
             claims_atoms=tuple(sorted(set(previous.claims_atoms)
                                      | set(candidate.claims_atoms))),
             retrieved_revisions=tuple(sorted(set(previous.retrieved_revisions)
@@ -120,7 +122,14 @@ def merge_canonical_candidates(
 
 
 def merge_leads(leads: Sequence[CandidateLead]) -> Tuple[CanonicalCandidate, ...]:
-    """Merge discovery paths into canonical candidates (canon 2.1.12)."""
+    """Merge discovery paths into canonical candidates (canon 2.1.12).
+
+    This is the one place that decides what counts as an atom claim: the intake
+    record's ``possible_atom_matches`` (canon 2.1.11), never its
+    ``claimed_capabilities``. The two kinds are merged into their own fields, so a
+    capability id cannot be read as an atom by coverage, the atom counters, or
+    the candidate the report carries forward.
+    """
     groups: Dict[str, List[CandidateLead]] = {}
     for lead in leads:
         lead.validate()
@@ -135,16 +144,20 @@ def merge_leads(leads: Sequence[CandidateLead]) -> Tuple[CanonicalCandidate, ...
         canonical_locator = min(
             locators, key=lambda value: (canonical_key_for(kind, value), value)
         )
-        claims: List[str] = []
+        capabilities: List[str] = []
+        atom_claims: List[str] = []
         conflicts: List[str] = []
         licenses: List[str] = []
         languages: List[str] = []
         families: List[str] = []
         revisions: List[str] = []
         for member in members:
-            for claim in member.claimed_capabilities + member.possible_atom_matches:
-                if claim not in claims:
-                    claims.append(claim)
+            for capability in member.claimed_capabilities:
+                if capability not in capabilities:
+                    capabilities.append(capability)
+            for atom in member.possible_atom_matches:
+                if atom not in atom_claims:
+                    atom_claims.append(atom)
             for conflict in member.initial_constraint_conflicts:
                 if conflict not in conflicts:
                     conflicts.append(conflict)
@@ -167,7 +180,8 @@ def merge_leads(leads: Sequence[CandidateLead]) -> Tuple[CanonicalCandidate, ...
             source_classes=tuple(
                 sorted({m.source_class for m in members}, key=lambda sc: sc.value)
             ),
-            claims_atoms=tuple(sorted(claims)),
+            claimed_capabilities=tuple(sorted(capabilities)),
+            claims_atoms=tuple(sorted(atom_claims)),
             ready_lead_ids=tuple(m.lead_id for m in members if m.deeper_intelligence_ready),
             retrieved_revisions=tuple(sorted(revisions)),
             license_claims=tuple(licenses),

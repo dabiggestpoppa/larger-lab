@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P3 — IN PROGRESS (I0 + C01–C05 landed, plus R1–R3 repairs + A1/A2 structure passes + C06–C10; 1301/1301 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation, and the terminal artifact assembler. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
+**P3 — IN PROGRESS (I0 + C01–C05 landed, plus R1–R3 repairs + A1/A2 structure passes + C06–C11; 1309/1309 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation, and the terminal artifact assembler. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
 
 ### P3-I0 — Phase Start / Plan Lock (this commit)
 
@@ -213,6 +213,29 @@ P3-C09's playtest proved the artifact could not feed the phase's own loop: it ca
 **One existing fixture had to state its intent honestly.** `test_budget_exhaustion_is_derived_from_the_counters` ranked a candidate that no outcome of that pass returned and no earlier pass knew — under the new law that call is refused. The fixture now passes the candidate as `previously_known_candidates` and says so in a comment: the candidate was found by the earlier pass, this pass runs eleven empty searches. The assertion it exists for (budget exhaustion derived from the counters) is unchanged.
 
 **Verified:** 7 new tests, red first (`TypeError: assemble_discovery_report() got an unexpected keyword argument 'previous_report'`) then green; the whole loop driven over the real P1 registry with a **JSON round-trip between passes** — three passes handing over the reloaded artifact alone, with the artifact path's metrics *and* stop recommendation equal to a control built from the caller's own accumulated records at every pass, and that control's records equal to the artifact's `known_candidates` (`rate 4.0 → 2.333 → 1.667` as each pass adds less); the first-pass path unchanged (1 query, 1 known, 1 canonical, same two notes); full suite **1301 passed**, ruff clean.
+
+### P3-C11 — A capability claim is not an atom claim
+
+An audit proved that `CanonicalCandidate.claims_atoms` held capability ids: the merge folded canon 2.1.11's two intake fields — `claimed_capabilities` and `possible_atom_matches` — into one, and canon 2.1.11 lists them separately precisely because they are different vocabularies. Atom coverage is what the ranking's coverage dimension, the baseline's attributed coverage and the report's carried candidates rest on, so a claim set carrying contract ids credited coverage to something that is not an atom. Suite 1301 → 1309.
+
+**The input shape that produced it, and what a caller saw.** A lead shaped the way the adapter port documents — `claimed_capabilities=('CAP-REPLAY-001',)`, `possible_atom_matches=('atom-causal-ordering',)` — merged to `claims_atoms=('CAP-REPLAY-001', 'atom-causal-ordering')`. A single hit matching **1 of the plan's 2 atoms** then reported `new_atoms_covered=2`, i.e. the whole atom scope, because saturation counts that field as atoms; scoring, which intersects it with the plan's atoms, silently ignored the same id — two readers deciding claim kind differently from one ambiguous field.
+
+**The mask.** The repo's own fixture helper fed atom ids into `claimed_capabilities` too, so in every existing test the two sets coincided and the union hid the conflation; a correctly built adapter — the only kind that will exist in production — triggers it. The helper now says so where it builds leads, and the real shape has its own tests.
+
+**One owner.** Every derivation now lives in the merge (`canonical.merge_leads`, `merge_canonical_candidates`): atoms come from `possible_atom_matches` and only from there, capability claims from `claimed_capabilities` and only from there, into their own fields. Nothing downstream re-checks kind — `saturation` and `reporting` read an atoms-only field, and `scoring`'s intersection with the plan's atoms now answers *relevance* (which of this plan's atoms does the candidate match), not kind.
+
+**Fail-closed direction.** A capability-only hit stays an acquisition object (canon 0.2.1 needs a claim, not specifically an atom claim — the port already allows that lead) but earns **no** atom coverage: measured `new_atoms_covered=0` and `coverage_potential=0.00`. A malformed claim is refused by the record (`claims_atoms entry`/`claimed_capabilities entry` must be identifiers) rather than counted.
+
+**The new `known_candidates` hand-off did carry it — confirmed, and closed.** `report.known_candidates[0].claims_atoms` was `('CAP-REPLAY-001', 'atom-causal-ordering')` before this pass, and `reporting.py` builds `previous_covered_atoms` from that field, so a contract id was handed to the next pass as a known atom. Now the carried record holds `claims_atoms=('atom-causal-ordering',)` beside `claimed_capabilities=('CAP-REPLAY-001',)`, and a test round-trips the artifact through serialization to prove the second pass's `new_atoms_covered` does not shift. The hand-off's cross-capability acceptance, the two candidate collections, the assembler's note policy and the baseline are untouched.
+
+**Observable contract changes:**
+
+1. `CanonicalCandidate.claimed_capabilities` (new) and `claims_atoms` now atoms-only.
+2. `CanonicalCandidate.SCHEMA_VERSION` **1 → 2** — the persisted shape changed and the reader matches versions exactly, so a record whose atom claims may hold capability ids is refused by version rather than misread. It is nested in `DiscoveryReport.known_candidates`, so an artifact written before either bump is refused.
+3. The acquisition-object law relaxed from "`claims_atoms` non-empty" to "at least one claim kind non-empty", because the old form only admitted capability-only hits *by* the conflation.
+4. Atom claims must be identifier-shaped (previously any string list was accepted).
+
+**Verified:** 8 new tests, red first in both files (`assert ('CAP-REPLAY-001', 'atom-causal-ordering') == ('atom-causal-ordering',)` and the report-level counter), then green; the affected path driven end to end over the real P1 registry — three hits (capability-only, capability + one atom, capability + one atom from another source kind) → `claims_atoms` per candidate holding only atoms, `coverage_potential` 0.00 for the capability-only hit, `new_atoms_covered=2` of 2 plan atoms from two one-atom hits, carried kinds apart through a JSON round-trip with the candidate record at schema 2, and an unchanged `new_atoms_covered` on the handed-over second pass. Full suite **1309 passed**, ruff clean.
 
 ### P2-R4 — True Crash Durability + Durable Approval + Scheduling Closure (SEALED at `f2fc7757`)
 

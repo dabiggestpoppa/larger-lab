@@ -596,6 +596,46 @@ class TestStopVerdictIsDerived:
                 < first.saturation_metrics.marginal_novelty_rate)
 
 
+class TestClaimKindsReachTheArtifact:
+    """What a caller sees when a hit claims a capability and matches an atom.
+
+    Canon 2.1.11 separates the two claim kinds at intake, so a capability id
+    must never be read as an atom downstream — not by the counters the stop law
+    reads, and not by the candidates the artifact hands to the next pass.
+    """
+
+    def test_a_capability_claim_is_not_counted_as_an_atom(self) -> None:
+        item = lead("lead-cap", "github:owner/lib", claims=(CAP,), atoms=(ATOM_A,))
+        report, _c, _r = _run(
+            leads=[item], outcomes=[_outcome("q-1", results=1, leads=[item])])
+        assert report.saturation_metrics.new_atoms_covered == 1
+        assert report.known_candidates[0].claims_atoms == (ATOM_A,)
+        assert report.known_candidates[0].claimed_capabilities == (CAP,)
+
+    def test_a_capability_only_claim_earns_no_atom_coverage(self) -> None:
+        """Fail-closed: naming the capability is not evidence of covering it."""
+        item = lead("lead-cap", "github:owner/lib", claims=(CAP,), atoms=())
+        report, _c, _r = _run(
+            leads=[item], outcomes=[_outcome("q-1", results=1, leads=[item])])
+        assert report.saturation_metrics.new_atoms_covered == 0
+        assert report.escalation_queue[0].dimension_scores["coverage_potential"] == 0.0
+
+    def test_the_handoff_carries_atoms_and_capabilities_apart(self) -> None:
+        """The carried candidate keeps the kinds apart through the artifact."""
+        item = lead("lead-cap", "github:owner/lib", claims=(CAP,), atoms=(ATOM_A,))
+        first, _c, _r = _run(
+            leads=[item], outcomes=[_outcome("q-1", results=1, leads=[item])])
+        handed = type(first).from_dict(first.to_dict())
+        carried = handed.known_candidates[0]
+        assert carried.claims_atoms == (ATOM_A,)
+        assert carried.claimed_capabilities == (CAP,)
+        second, _c2, _r2 = _run(
+            leads=[item], outcomes=[_outcome("q-1", results=1, leads=[item])],
+            previous_report=handed)
+        assert second.saturation_metrics.new_atoms_covered \
+            == first.saturation_metrics.new_atoms_covered
+
+
 class TestNoEgress:
     def test_the_assembler_has_no_egress_path(self) -> None:
         """Assembly is a pure function of records: no adapter, no network."""

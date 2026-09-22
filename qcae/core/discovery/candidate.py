@@ -47,9 +47,22 @@ __all__ = ["CanonicalCandidate", "make_canonical_candidate"]
 
 @dataclass(frozen=True)
 class CanonicalCandidate(SerializableRecord):
-    """One canonical candidate backed by every discovery path that found it."""
+    """One canonical candidate backed by every discovery path that found it.
 
-    SCHEMA_VERSION = 1
+    The two claim kinds canon 2.1.11 captures at intake stay apart here:
+    ``claimed_capabilities`` names the capabilities or contract scopes a path
+    claims, and ``claims_atoms`` names the atoms it matches. They are different
+    vocabularies, and only one of them is coverage: a capability claim is not
+    evidence that an atom is covered, because a claim of the whole capability
+    proves no particular atom of it. The merge is the single place that decides
+    which is which, so no reader downstream has to re-derive it from an opaque
+    identifier.
+    """
+
+    #: Bumped when the claims split into ``claimed_capabilities`` +
+    #: ``claims_atoms``: the reader refuses an older payload by version, so a
+    #: record whose atom claims may hold capability ids is never misread.
+    SCHEMA_VERSION = 2
 
     canonical_id: str
     canonical_key: str
@@ -58,6 +71,9 @@ class CanonicalCandidate(SerializableRecord):
     merged_locators: Tuple[str, ...]
     lead_ids: Tuple[str, ...]
     source_classes: Tuple[SourceClass, ...]
+    #: Capability/contract ids the discovery paths claim (canon 2.1.11).
+    claimed_capabilities: Tuple[str, ...]
+    #: Atoms the discovery paths match, and only those (canon 2.1.11).
     claims_atoms: Tuple[str, ...]
     ready_lead_ids: Tuple[str, ...] = ()
     retrieved_revisions: Tuple[str, ...] = ()
@@ -72,6 +88,7 @@ class CanonicalCandidate(SerializableRecord):
         "merged_locators": tuple,
         "lead_ids": tuple,
         "source_classes": lambda v: coerce_enum_tuple(v, SourceClass),
+        "claimed_capabilities": tuple,
         "claims_atoms": tuple,
         "ready_lead_ids": tuple,
         "retrieved_revisions": tuple,
@@ -120,13 +137,21 @@ class CanonicalCandidate(SerializableRecord):
             )
         require_no_duplicates([sc.value for sc in self.source_classes], "source_classes")
 
+        require_str_list(self.claimed_capabilities, "claimed_capabilities")
+        require_no_duplicates(self.claimed_capabilities, "claimed_capabilities")
+        for ref in self.claimed_capabilities:
+            require_identifier(ref, "claimed_capabilities entry")
         require_str_list(self.claims_atoms, "claims_atoms")
-        if not self.claims_atoms:
+        require_no_duplicates(self.claims_atoms, "claims_atoms")
+        # An atom claim must be identifiable, so a malformed one is refused here
+        # rather than counted as coverage downstream.
+        for ref in self.claims_atoms:
+            require_identifier(ref, "claims_atoms entry")
+        if not self.claimed_capabilities and not self.claims_atoms:
             raise QcaeValidationError(
                 "a candidate with no capability claim is not an acquisition object "
-                "(canon 0.2.1)"
+                "(canon 0.2.1): claim a capability or match at least one atom"
             )
-        require_no_duplicates(self.claims_atoms, "claims_atoms")
         for name in ("retrieved_revisions", "license_claims", "constraint_conflicts",
                      "languages"):
             require_str_list(getattr(self, name), name)

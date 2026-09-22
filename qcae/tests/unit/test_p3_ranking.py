@@ -32,6 +32,7 @@ from qcae.core.discovery import (
     StopCondition,
     StopRule,
     make_candidate_lead,
+    make_canonical_candidate,
     make_discovery_plan,
 )
 from qcae.core.discovery.lead import QueryLineage
@@ -88,6 +89,10 @@ def lead(
     novelty_family: str = "",
     conflicts=(),
 ) -> CandidateLead:
+    # ``claims`` become ``claimed_capabilities`` (canon 2.1.11) and ``atoms`` become
+    # ``possible_atom_matches``. Most fixtures pass atom ids for both, which is why the
+    # two kinds read alike here; the shape a real adapter emits — a contract id claimed
+    # beside the atoms matched — is covered in TestCanonicalMerge.
     return make_candidate_lead(
         lead_id=lead_id,
         source_class=source_class,
@@ -95,7 +100,9 @@ def lead(
         candidate_kind=kind,
         source_locator=locator,
         discovered_at="2026-09-21T12:00:00Z",
-        query_lineage=lineage(source_class, adapter_id, atoms[0]),
+        # A lead may claim a capability without matching any atom yet (canon
+        # 2.1.11), in which case its lineage still names the query's anchor.
+        query_lineage=lineage(source_class, adapter_id, atoms[0] if atoms else ATOM_A),
         claimed_capabilities=tuple(claims),
         possible_atom_matches=tuple(atoms),
         retrieved_revision=revision,
@@ -225,6 +232,68 @@ class TestCanonicalMerge:
             lead("lead-2", "owner/thing", kind=CandidateKind.SPECIFICATION, license_claim=""),
         ])
         assert len(merged) == 2
+
+    def test_a_capability_claim_is_not_an_atom_claim(self) -> None:
+        """Canon 2.1.11 keeps the two claim kinds apart; the merge must too.
+
+        A lead shaped the way the adapter port documents carries the capability
+        it claims in ``claimed_capabilities`` and the atoms it matches in
+        ``possible_atom_matches``. Folding both into one field made a contract id
+        an atom claim: coverage, the atom counters and the report's carried
+        candidates all read that field as atoms, so a capability id was credited
+        as atom coverage — a claim outliving its evidence at the level of kind.
+        """
+        item = lead("lead-cap", "github:owner/lib", claims=(CAP,), atoms=(ATOM_A,))
+        candidate = merge_leads([item])[0]
+        assert candidate.claimed_capabilities == (CAP,)
+        assert candidate.claims_atoms == (ATOM_A,)
+        assert CAP not in candidate.claims_atoms
+
+    def test_the_two_claim_kinds_are_unioned_separately(self) -> None:
+        """Every discovery path survives (2.1.12), in the kind it arrived as."""
+        merged = merge_leads([
+            lead("lead-1", "github:owner/repo", claims=(CAP,), atoms=(ATOM_A,)),
+            lead("lead-2", "github:owner/repo", claims=("CAP-OTHER-002",),
+                 atoms=(ATOM_B,)),
+        ])
+        candidate = merged[0]
+        assert candidate.claimed_capabilities == ("CAP-OTHER-002", CAP)
+        assert candidate.claims_atoms == (ATOM_A, ATOM_B)
+
+    def test_a_candidate_claiming_only_a_capability_is_still_an_object(self) -> None:
+        """Canon 0.2.1 needs a claim, not specifically an atom claim.
+
+        The intake record allows a hit that claims the capability before anyone
+        can attribute it to an atom (canon 2.1.11). It stays an acquisition
+        object — and claims no atoms, so nothing may credit it with coverage.
+        """
+        candidate = merge_leads([
+            lead("lead-cap", "github:owner/lib", claims=(CAP,), atoms=()),
+        ])[0]
+        assert candidate.claimed_capabilities == (CAP,)
+        assert candidate.claims_atoms == ()
+
+    def test_a_candidate_with_no_claim_of_either_kind_is_refused(self) -> None:
+        """The acquisition-object law still holds after the split."""
+        with pytest.raises(QcaeValidationError, match="acquisition object"):
+            make_canonical_candidate(
+                canonical_id="cand-1", canonical_key="repo:github:owner/lib",
+                candidate_kind=CandidateKind.REPOSITORY,
+                canonical_locator="github:owner/lib", merged_locators=("github:owner/lib",),
+                lead_ids=("lead-1",), source_classes=(SourceClass.GITHUB_REPOSITORY_CODE,),
+                claimed_capabilities=(), claims_atoms=(),
+            )
+
+    def test_an_atom_claim_must_be_an_identifier(self) -> None:
+        """A malformed claim is refused, never silently counted as an atom."""
+        with pytest.raises(QcaeValidationError, match="claims_atoms"):
+            make_canonical_candidate(
+                canonical_id="cand-1", canonical_key="repo:github:owner/lib",
+                candidate_kind=CandidateKind.REPOSITORY,
+                canonical_locator="github:owner/lib", merged_locators=("github:owner/lib",),
+                lead_ids=("lead-1",), source_classes=(SourceClass.GITHUB_REPOSITORY_CODE,),
+                claimed_capabilities=(), claims_atoms=("not an atom id",),
+            )
 
     def test_claims_are_unioned_and_readiness_requires_an_anchor(self) -> None:
         merged = merge_leads([
