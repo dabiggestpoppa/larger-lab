@@ -39,16 +39,17 @@ from qcae.core.discovery.report import PrefilterDecision
 from qcae.core.errors import QcaeValidationError
 from qcae.core.ports.discovery import AdapterOutcome
 from qcae.core.vocabulary import EvidenceClass, VerificationLevel
-from qcae.discovery.planning.ranking import (
+from qcae.discovery.planning.canonical import canonical_key_for, merge_leads
+from qcae.discovery.planning.families import build_families
+from qcae.discovery.planning.prefilter import apply_hard_prefilter
+from qcae.discovery.planning.ranking import rank_candidates
+from qcae.discovery.planning.ranking_policy import (
     DIMENSIONS,
     POPULARITY_WEIGHT_CAP,
     RankingDimension,
     RankingPolicy,
-    apply_hard_prefilter,
-    build_families,
-    canonical_key_for,
-    merge_leads,
-    rank_candidates,
+)
+from qcae.discovery.planning.saturation import (
     stop_recommendation,
     update_saturation,
 )
@@ -261,7 +262,7 @@ class TestFamilies:
         by_locator = {c.canonical_locator: c for c in candidates}
         scores = {c.canonical_id: 0.1 for c in candidates}
         scores[by_locator["github:owner/original"].canonical_id] = 0.9
-        families = build_families(candidates, scores, policy())
+        families = build_families(candidates, scores)
         assert len(families) == 1
         assert families[0].representative_candidate_id == \
             by_locator["github:owner/original"].canonical_id
@@ -270,7 +271,7 @@ class TestFamilies:
 
     def test_singleton_is_its_own_independent_family(self) -> None:
         candidates = merge_leads([lead("lead-1", "github:owner/repo")])
-        families = build_families(candidates, {candidates[0].canonical_id: 0.5}, policy())
+        families = build_families(candidates, {candidates[0].canonical_id: 0.5})
         assert families[0].independent_family is True
         assert families[0].representative_candidate_id == candidates[0].canonical_id
 
@@ -626,7 +627,7 @@ class TestMultiSourceAggregationRegression:
         ]
 
     def test_aggregation_preserves_every_discovery_path(self) -> None:
-        from qcae.discovery.planning.ranking import merge_canonical_candidates
+        from qcae.discovery.planning.canonical import merge_canonical_candidates
 
         github_pass, registry_pass = self._two_passes()
         aggregated = merge_canonical_candidates(list(github_pass) + list(registry_pass))
@@ -636,7 +637,7 @@ class TestMultiSourceAggregationRegression:
         assert aggregated[0].duplicate_path_count == 1
 
     def test_aggregation_is_deterministic_and_idempotent(self) -> None:
-        from qcae.discovery.planning.ranking import merge_canonical_candidates
+        from qcae.discovery.planning.canonical import merge_canonical_candidates
 
         github_pass, registry_pass = self._two_passes()
         combined = list(github_pass) + list(registry_pass)

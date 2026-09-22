@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P3 — IN PROGRESS at `236ca195` (I0 + C01–C04 landed, plus R1–R3 repairs + A1 structure pass; 1258/1258 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, report assembler, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
+**P3 — IN PROGRESS (I0 + C01–C04 landed, plus R1–R3 repairs + A1/A2 structure passes; 1258/1258 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, report assembler, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
 
 ### P3-I0 — Phase Start / Plan Lock (this commit)
 
@@ -70,6 +70,24 @@ No capability added; behavior preserved except three wiring shapes that previous
 **Normalizations (the only behavior changes), both in shapes that previously raised:** (1) `internal_first_findings` no longer crashes when capabilities are wired but negatives are not — it now answers the documented empty shape, completing the policy above; (2) `known_capability_state` returns the same key set under every wiring shape, so callers never branch on configuration. Construction contract is unchanged: four positional components remain required (all typed `Optional`), so `SqliteRegistryQuery()` still rejects. Regression guard: `test_every_wiring_shape_answers_without_raising`.
 
 **Deferred (unchanged, already classified):** the freshness lookup in `SqliteRegistryQuery._stale_evidence_ids` reads the lifecycle log's connection directly, because the frozen `LifecycleLogRepository` port exposes no enumeration — recorded in the P1-R1 freeze manifest as MINOR with trigger "P2 job runtime". Collapsing it requires widening a frozen port; do that as its own reviewed change, not inside a shape pass.
+
+### P3-A2 — Structure pass: one module per ranking concern (shape only)
+
+`discovery/planning/ranking.py` had grown to 876 lines owning six behavioural concerns. It is now seven modules, each with one owner and one canon anchor. No capability added, no test count change (1258/1258), and the whole pipeline was re-run end to end afterwards: plan → merge → prefilter → rank → saturation → stop, with repeat passes contributing zero new specifications and `NEGLIGIBLE_NOVELTY` firing.
+
+| Module | Owns | Canon |
+| --- | --- | --- |
+| `ranking_policy.py` | the dimension vocabulary, the popularity cap, `RankingPolicy` validation | 2.7.10/2.7.11 |
+| `canonical.py` | locator normalization, canonical identity, merge/dedup, `descending_id` tie-break | 2.1.12 |
+| `families.py` | what a family is (`family_identity_for`), who represents it | 2.7.6/2.7.9 |
+| `scoring.py` | dimension derivation, kind priors, the popularity-bounded blend | 2.7.2/2.7.8/2.7.10 |
+| `prefilter.py` | the prefilter evidence floor | 2.7.3 |
+| `saturation.py` | pass-over-pass counters and stop recommendations | 2.1.9/2.1.10 |
+| `ranking.py` | the pass itself: ordering, waves, next action, priority, `RankingResult` | 2.7.5/2.7.14 |
+
+**Dependency direction is one-way**, which is why the split holds: `ranking_policy` ← `canonical` ← `families` ← `scoring` ← `ranking`, with `prefilter` and `saturation` depending only on `families`/core. A later change to any concern lands in exactly one file, and the two properties the R1/R2 repairs established are now structurally enforced rather than incidentally true — `family_identity_for` is the single family identity every module compares (re-verified at runtime: the ids ranking emits equal the ids saturation matches), and candidates are aggregated in `canonical` before either grouping or ranking sees them.
+
+**Two small cleanups:** `build_families` accepted a `RankingPolicy` it never read (the wave limits it looked like it governed actually live in `ranking`), so that parameter is gone; and the one consumer (`test_p3_ranking.py`) now imports each name from its owner instead of from a single catch-all module — no re-export façade, so "where does this live" has one answer.
 
 ### P2-R4 — True Crash Durability + Durable Approval + Scheduling Closure (SEALED at `f2fc7757`)
 
