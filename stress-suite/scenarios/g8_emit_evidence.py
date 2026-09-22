@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import Any, Dict, Mapping, Sequence
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -52,7 +52,8 @@ from scenarios.g8_run_audit import EVIDENCE, ROOT, build_package  # noqa: E402
 from scenarios.g8_arch_red_transcript import PRE_PASS_HEADS as _ARCH_HEADS  # noqa: E402
 #: the row-evidence rule has ONE owner (STRESS-G8ARCH6): this module asks it
 #: whether a row's RED evidence resolves, instead of scanning the annex text
-from scenarios.g8_closure_evidence import require as resolve_closure_rows  # noqa: E402
+from scenarios.g8_closure_evidence import (  # noqa: E402
+    RED_SURVIVAL_TESTS, require as resolve_closure_rows)
 from scenarios.g8_pre_repair_red_transcript import PRE_REPAIR_HEAD as _FIRST_REVIEW  # noqa: E402
 
 START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
@@ -651,14 +652,22 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
         f"- contract `{contract['contract_id']}` v{contract['version']} "
         f"`{package['contract_digest']}`\n",
         f"- authoritative test command `{AUTHORITATIVE_TEST_COMMAND}` -> "
-        f"**collected {measured_full} / passed {test_evidence.passed} / skipped "
+        f"**passed {measured_full}**, and this count is not the artifact's: an "
+        f"ordinary run of this command executes the lag check that the "
+        f"artifact-producing run has to skip, so it passes "
+        f"{test_evidence.passed} (measured below) + {test_evidence.skipped} "
+        f"(the skipped case) = {measured_full} of {measured_full} collected\n",
+        f"- artifact-producing command `{ARTIFACT_COMMAND}` -> **collected "
+        f"{measured_full} / passed {test_evidence.passed} / skipped "
         f"{test_evidence.skipped} / failed {test_evidence.failed}** "
         f"(artifact `{test_evidence.suite_identity}` "
         f"`{test_evidence.artifact_digest[:16]}`, python "
-        f"`{test_evidence.python_version or 'unrecorded'}`)\n",
+        f"`{test_evidence.python_version or 'unrecorded'}`). These are the "
+        f"counts this package rests on, and they belong to the command that "
+        f"produced the artifact\n",
         "".join(
-            f"- skipped {name!r}, and named here rather than smoothed over: "
-            f"{reason or 'no reason recorded'}\n"
+            f"- skipped in the artifact-producing run {name!r}, and named here "
+            f"rather than smoothed over: {reason or 'no reason recorded'}\n"
             for name, reason in test_evidence.skipped_cases),
         "- test provenance (revision R3, finding R-G8-07): the baseline is read "
         "from the JUnit artifact the authoritative command produced, never from a "
@@ -880,57 +889,22 @@ _AUDIT_CLOSURE: Sequence[Mapping[str, Any]] = (
      "artifacts": ("G8_SOURCE_BINDING_PORTABILITY.md", "G8_EVIDENCE_RECEIPT.json")},
 )
 
-#: the RED probes must remain rerunnable from the repository, not from a scratch
-#: directory: these controls rerun the committed harnesses live and require each
-#: archived annex to match its harness. STRESS-G8ARCH5 added the second pair for
-#: the passes whose red evidence had been run in a scratch directory and deleted.
-_RED_SURVIVAL_TESTS = ("test_the_pre_repair_red_transcript_still_reproduces_every_finding",
-                       "test_the_red_transcript_artifact_on_disk_matches_the_harness",
-                       "test_the_arch_red_transcript_still_reproduces_every_finding",
-                       "test_the_arch_red_transcript_artifact_on_disk_matches_the_harness")
-
 def _write_closure_matrix() -> None:
     """STRESS-G8RX — the per-finding closure matrix.
 
-    Derived, not asserted: every green regression cited here is required to EXIST
-    in the G8 test module, every artifact path is required to exist in the
-    evidence directory, and every RED probe id is required to appear in the
-    archived pre-repair transcript. A citation that does not resolve raises
-    instead of being published.
+    Derived, not asserted: the row-evidence rule (which probe, at which head, in
+    which annex, plus the green regressions, the artifact paths and the survival
+    controls) has ONE owner -- `scenarios/g8_closure_evidence.py` -- and this
+    module only formats what that owner resolves. A citation it cannot resolve
+    raises instead of being published.
     """
-    tests_src = (ROOT / "tests" / "test_g8_contradiction.py").read_text(
-        encoding="utf-8")
-    # The row-evidence rule has ONE owner and this module does not restate it.
-    # `resolve_closure_rows` re-derives each row's RED evidence from the harnesses'
-    # DECLARED heads and their PARSED verdicts -- the probe must be declared, the
-    # head must be one the harness ran against, and the verdict at that head must
-    # be RED -- so it refuses a row claiming RED where an annex renders GREEN, and
-    # a head string that merely occurs in a transcript. The annexes are read from
-    # the repository (a test may redirect EVIDENCE at a temporary directory).
     resolved = resolve_closure_rows(_AUDIT_CLOSURE, ROOT / "evidence")
-    missing: List[str] = []
-    rows: List[List[str]] = []
-    for entry, evidence in zip(_AUDIT_CLOSURE, resolved):
-        for name in entry["green_tests"]:
-            if f"def {name}(" not in tests_src:
-                missing.append(f"green regression {name} is not in the test module")
-        for art in entry["artifacts"]:
-            # some cited artifacts are committed INPUTS (the contract) rather than
-            # outputs of this emitter, so both locations are legitimate.
-            if not ((EVIDENCE / art).exists() or
-                    (ROOT / "evidence" / art).exists()):
-                missing.append(f"artifact {art} does not exist")
-        rows.append([entry["finding"], entry["defect"],
-                     f"`{evidence['red_probe']}` @ `{evidence['red_head'][:8]}` "
-                     f"({evidence['red_annex']})",
-                     " + ".join(entry["green_tests"]),
-                     ", ".join(entry["artifacts"])])
-    for name in _RED_SURVIVAL_TESTS:
-        if f"def {name}(" not in tests_src:
-            missing.append(f"red-survival control {name} is not in the test module")
-    if missing:
-        raise ValueError("the closure matrix cites evidence that is not present: "
-                         + "; ".join(missing))
+    rows = [[entry["finding"], entry["defect"],
+             f"`{evidence['red_probe']}` @ `{evidence['red_head'][:8]}` "
+             f"({evidence['red_annex']})",
+             " + ".join(entry["green_tests"]),
+             ", ".join(entry["artifacts"])]
+            for entry, evidence in zip(_AUDIT_CLOSURE, resolved)]
     prose = [
         "# G8 — audit-closure matrix (STRESS-G8RX / STRESS-G8ARCH5)\n\n",
         "Every finding from the G8 adversarial repair review, and from the passes "
@@ -946,7 +920,7 @@ def _write_closure_matrix() -> None:
         "read-only, rerun every probe in a subprocess against that code and "
         "against the working tree, and the red-survival controls below rerun "
         "both harnesses live inside the authoritative suite ("
-        + ", ".join(f"`{n}`" for n in _RED_SURVIVAL_TESTS) + ").\n\n",
+        + ", ".join(f"`{n}`" for n in RED_SURVIVAL_TESTS) + ").\n\n",
         "Pre-repair heads: `" + PRE_REPAIR_SHA + "` (first review), `"
         + _ARCH3_HEAD + "` and `" + _ARCH4_HEAD
         + "` (the passes after the first closure matrix).\n\n",

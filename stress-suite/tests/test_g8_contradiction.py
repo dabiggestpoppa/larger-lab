@@ -1461,6 +1461,51 @@ def test_a_closure_row_can_only_cite_evidence_that_is_red_at_the_head_it_names(
     assert "is absent from" in reason([rows[9]], tmp_path / "nowhere")
     # a row may not cite an ambiguous harness without naming a head
     assert "must name one of" in reason(tampered(red_head=""))
+    # The GREEN half is resolved by the SAME call (STRESS-G8ARCH7). RED BEFORE
+    # REPAIR, live: `resolve_closure_rows` ACCEPTED all three of these ("16 rows
+    # accepted") while the emitter's own write path refused the first two, so a
+    # maintainer calling the resolver named resolve got false assurance that the
+    # row was fully resolved. The rule now has one answer.
+    assert "is not in the test module" in reason(
+        tampered(green_tests=("test_this_regression_does_not_exist",)))
+    assert "does not exist" in reason(
+        tampered(artifacts=("G8_NO_SUCH_ARTIFACT.md",)))
+    assert "cites no green regression" in reason(tampered(green_tests=()))
+    # ...and the same refusal comes from the single-row entry point, not only from
+    # the aggregate one, because that is the call a maintainer reaches for.
+    with pytest.raises(ValueError) as err:
+        CLOSURE.resolve(tampered(green_tests=("test_this_regression_does_not_exist",))[15],
+                        ROOT / "evidence")
+    assert "is not in the test module" in str(err.value)
+
+
+def test_the_row_resolver_derives_each_row_exactly_once(monkeypatch):
+    """RED BEFORE REPAIR (STRESS-G8ARCH7, live: 14 verdict derivations for 7 ARCH
+    rows). `require` called `problems` -- one resolve per row -- and then resolved
+    every row AGAIN, so each row was evaluated twice and the rows it returned were
+    the second evaluation's, which the aggregate refusal had never inspected.
+    """
+    calls = {"n": 0}
+    # patch the harness object the RESOLVER holds -- the suite imports these
+    # scripts both top-level and as package members, and the resolver is the
+    # consumer whose derivation count this test is about.
+    harness = CLOSURE.ARCH
+    real = harness.verdicts
+
+    def counted(text, head=None):
+        calls["n"] += 1
+        return real(text, head)
+
+    monkeypatch.setattr(harness, "verdicts", counted)
+    rows = list(EMIT._AUDIT_CLOSURE)
+    arch_rows = [r for r in rows if r["red_probe"].startswith("ARCH-")]
+    resolved = CLOSURE.require(rows, ROOT / "evidence")
+    assert len(resolved) == len(rows)
+    assert calls["n"] == len(arch_rows)
+    # the survival controls are resolved by the same gate, and a control the suite
+    # does not collect is refused there too.
+    assert CLOSURE.survival_problems() == []
+    assert CLOSURE.survival_problems("def test_something_else():") != []
 
 
 def test_the_canonical_rule_name_resolves_to_its_declared_definition_and_pinned_fingerprint(
