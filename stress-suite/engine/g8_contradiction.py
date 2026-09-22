@@ -1363,7 +1363,8 @@ def audit_gate_claim(*, receipt_path: str, receipt: Mapping[str, Any],
         ancestor = git_probe(["merge-base", "--is-ancestor", sha, head_sha])
         add("TESTED_SHA_IN_HISTORY", f"tested SHA {sha} is in branch history",
             "ancestor-of-head" if ancestor != "NOT_ANCESTOR" else "NOT_ANCESTOR",
-            ancestor == "NOT_ANCESTOR", "RECEIPT_OR_CLAIM_DEFECT", "HIGH",
+            ancestor == "NOT_ANCESTOR", "RECEIPT_OR_CLAIM_DEFECT",
+            "HIGH" if ancestor == "NOT_ANCESTOR" else "INFO",
             "tested SHA must be reachable from the audited branch head" if
             ancestor == "NOT_ANCESTOR" else
             "tested SHA is reachable from the audited branch head",
@@ -1389,7 +1390,8 @@ def audit_gate_claim(*, receipt_path: str, receipt: Mapping[str, Any],
                 add("TESTED_SHA_PRECEDES_EVIDENCE_COMMIT",
                     "tested SHA is distinct from the evidence archive commit",
                     f"archive={archive[:12]} tested={sha[:12]}",
-                    self_certifying, "RECEIPT_OR_CLAIM_DEFECT", "BLOCKING",
+                    self_certifying, "RECEIPT_OR_CLAIM_DEFECT",
+                    "BLOCKING" if self_certifying else "INFO",
                     "a receipt may not name its own containing commit as tested "
                     "evidence (self-certification)" if self_certifying else
                     "tested SHA is distinct from the commit that archived the receipt",

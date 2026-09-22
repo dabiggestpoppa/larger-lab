@@ -700,8 +700,11 @@ def carried_items() -> Dict[str, Any]:
         "AMB-G5R-02": {"status": "OPEN", "note": "mechanism-mediated claim linkage"},
         "ER02": {"status": "OPEN_DOCTRINE_SPACE",
                  "note": "who may ratify future evaluation law"},
-        "anomaly_spam": {str(n): anomaly_spam_surface(n)["to_state"]
-                         for n in (1, 10, 100, 1000)},
+        "anomaly_spam": {
+            str(n): {"action": anomaly_spam_surface(n).get("action"),
+                     "rule_id": anomaly_spam_surface(n).get("rule_id"),
+                     "to_state": anomaly_spam_surface(n).get("to_state") or None}
+            for n in (1, 10, 100, 1000)},
         "centrality_inertia": {
             "core_medium_1": centrality_rigor_verdict("CORE", "MEDIUM", 1),
             "core_high_2": centrality_rigor_verdict("CORE", "HIGH", 2)},

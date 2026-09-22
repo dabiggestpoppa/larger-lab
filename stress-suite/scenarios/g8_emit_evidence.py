@@ -28,7 +28,7 @@ from engine.g8_contradiction import (  # noqa: E402
 from scenarios.g8_run_audit import EVIDENCE, ROOT, build_package  # noqa: E402
 
 START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
-TESTED_SHA = "1ed3fc881d6c0984adad87f05e8a185f3dbaecc2"
+TESTED_SHA = "788b1e5920b67791b2553394f0cb77cb965df3c4"
 EVIDENCE_COMMIT_LABEL = "STRESS-G8R"
 AUTHORITATIVE_TEST_COMMAND = (
     "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q")
@@ -298,10 +298,15 @@ def emit(measured_full: int) -> Dict[str, Any]:
     # ------------------------------------------------------------------ gate claims
     rows = []
     for f in gate_findings:
+        if f["superseded_by"]:
+            resolution = f"superseded by {f['superseded_by']}"
+        elif f["is_defect"]:
+            resolution = f["observed"][:60]
+        else:
+            resolution = "ok"
         rows.append([f["receipt_path"].rsplit("/", 1)[-1], f["finding_id"],
                      f["classification"], f["severity"],
-                     "yes" if f["blocks_gate"] else "no",
-                     f["superseded_by"] or f["observed"][:40]])
+                     "yes" if f["blocks_gate"] else "no", resolution])
     chain_rows = [[e["gate"], e["declared_full"], e["new"], e["superseded"],
                    e["recomputed_full"] if e["recomputed_full"] is not None else "-",
                    e["note"], e["source"]] for e in lineage["chain"]]
