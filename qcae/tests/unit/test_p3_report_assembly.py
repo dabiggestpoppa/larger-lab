@@ -370,6 +370,57 @@ class TestScopeTruth:
         assert report.saturation_metrics.new_atoms_covered == 0
 
 
+class TestOutcomeBindingRefusals:
+    """P3-R4C1/C3 refusals that must not touch any durable state (law S)."""
+
+    def test_an_outcome_from_an_unknown_query_is_refused(self) -> None:
+        """A: an outcome whose query the plan never planned is refused."""
+        import qcae.core.ports.discovery as port
+
+        leads = [lead("lead-gh-1", "github:owner/lib")]
+        planned = _planned_query_id(SourceClass.GITHUB_REPOSITORY_CODE)
+        outcome = _outcome(planned, leads=leads)
+        # Rebind to a query id no plan ever declared.
+        foreign = port.AdapterOutcome(
+            adapter_id="adapter-github",
+            source_class=SourceClass.GITHUB_REPOSITORY_CODE,
+            query_id="fam-ghost:never-planned-query",
+            status=AdapterStatus.OK,
+            leads=tuple(leads),
+            pages_inspected=1,
+            results_inspected=1,
+            execution_record=replace(
+                outcome.execution_record, query_id="fam-ghost:never-planned-query"),
+        )
+        with pytest.raises(QcaeValidationError, match="never planned"):
+            _run(leads=leads, outcomes=(foreign,))
+
+    def test_every_denied_path_leaves_durable_state_unchanged(self) -> None:
+        """S: refusals raise before any record is created or counter advanced."""
+        leads, outcomes = _two_adapter_run()
+        before = (
+            tuple(leads),
+            tuple(outcomes),
+            tuple(baseline_plan().query_ids),
+            _baseline().to_dict(),
+        )
+        # A refused assembly must not mutate the inputs it was handed.
+        with pytest.raises(QcaeValidationError):
+            _run(leads=leads, outcomes=outcomes, saturated=True,
+                 saturation_reason="undeclared")
+        after = (
+            tuple(leads),
+            tuple(outcomes),
+            tuple(baseline_plan().query_ids),
+            _baseline().to_dict(),
+        )
+        assert before == after
+        # And the records themselves are still intact and valid.
+        for o in outcomes:
+            o.validate()
+            assert o.execution_record is not None
+
+
 class TestStopAuthority:
     """P3-R4C3 — no naked caller boolean may create a STOP."""
 
