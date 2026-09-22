@@ -152,7 +152,17 @@ def read_test_evidence(
         root = ET.fromstring(blob)
     except ET.ParseError as exc:
         raise UnverifiableTestEvidence(f"malformed test artifact {path}: {exc}") from exc
-    if root.tag != "testsuite":
+    if root.tag == "testsuites":
+        # pytest's JUnit writer wraps its single suite in a <testsuites> root.
+        # Exactly one suite is expected: more than one means the artifact is not
+        # one run of one suite, and none means there is nothing to certify.
+        children = [child for child in root if child.tag == "testsuite"]
+        if len(children) != 1:
+            raise UnverifiableTestEvidence(
+                f"malformed test artifact {path}: <testsuites> wraps "
+                f"{len(children)} <testsuite> elements, expected exactly 1")
+        root = children[0]
+    elif root.tag != "testsuite":
         raise UnverifiableTestEvidence(
             f"malformed test artifact {path}: root element is <{root.tag}>, "
             "expected <testsuite>")
