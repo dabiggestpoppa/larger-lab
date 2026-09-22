@@ -44,6 +44,7 @@ from qcae.core.validation import (
     require_identifier,
     require_non_empty_str,
     require_no_duplicates,
+    require_rfc3339_utc,
     require_str_list,
 )
 from qcae.core.vocabulary import EVIDENCE_STRENGTH_ORDER, EvidenceClass
@@ -253,25 +254,123 @@ class EscalationEntry(SerializableRecord):
 
 
 @dataclass(frozen=True)
-class StopRecommendation(SerializableRecord):
-    """Saturation-driven stop/continue recommendation (canon 2.1.9, 2.7.14)."""
+class StopConditionAssessment(SerializableRecord):
+    """One attributable stop-condition judgement (P3-R4C3; canon 2.1.9).
+
+    A STOP can no longer be created by a naked caller boolean: each satisfied
+    condition is a typed record naming who evaluated it, under which policy,
+    over exactly which subjects, derived how, and on what evidence. A
+    recommendation grants no acquisition authority — it is what a human reads.
+    """
 
     SCHEMA_VERSION = 1
 
+    condition: StopCondition
+    discovery_plan_id: str
+    contract_id: str
+    contract_version: int
+    #: Who produced this assessment — an evaluator identity, never "the caller".
+    evaluator_id: str
+    #: The ranking/stop policy version the derivation ran under.
+    policy_version: str
+    assessed_at: str
+    #: The exact subject set the condition was evaluated over — candidate ids
+    #: for sufficiency, class/query ids for hard constraints, and so on.
+    subject_ids: Tuple[str, ...] = ()
+    #: How the assessment was derived from the subjects (re-derived under the
+    #: current policy, counted from typed accounting, ...), not a conclusion.
+    derivation_method: str = ""
+    #: Durable evidence references backing the derivation (evidence ids,
+    #: prefilter decision ids, proposal ids, accounting record ids).
+    evidence_ids: Tuple[str, ...] = ()
+    #: A proposal id is mandatory evidence for
+    #: CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT (law 5).
+    amendment_proposal_id: str = ""
+    rationale: str = ""
+
+    _COERCIONS = {
+        "condition": lambda v: coerce_enum(v, StopCondition),
+        "subject_ids": tuple,
+        "evidence_ids": tuple,
+    }
+
+    def validate(self) -> None:
+        require_enum(self.condition, StopCondition, "condition")
+        require_identifier(self.discovery_plan_id, "discovery_plan_id")
+        require_identifier(self.contract_id, "contract_id")
+        if not isinstance(self.contract_version, int) or isinstance(
+            self.contract_version, bool
+        ) or self.contract_version < 1:
+            raise QcaeValidationError("contract_version must be an integer >= 1")
+        require_identifier(self.evaluator_id, "evaluator_id")
+        require_non_empty_str(self.policy_version, "policy_version")
+        require_rfc3339_utc(self.assessed_at, "assessed_at")
+        require_str_list(self.subject_ids, "subject_ids")
+        require_str_list(self.evidence_ids, "evidence_ids")
+        require_non_empty_str(self.rationale, "rationale")
+        # The subject set is the exact set the condition was evaluated over; a
+        # sufficiency or elimination claim with no subjects asserts nothing.
+        if not self.subject_ids:
+            raise QcaeValidationError(
+                f"stop assessment for {self.condition.value} must name the exact "
+                "subject set it evaluated (P3-R4C3 law 2/4): an assessment over no "
+                "subjects attributes nothing"
+            )
+        if not self.derivation_method.strip():
+            raise QcaeValidationError(
+                f"stop assessment for {self.condition.value} must state its "
+                "derivation method (P3-R4C3 law 8): the derivation, not the "
+                "assertion, is the evidence"
+            )
+        if self.condition == StopCondition.CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT:
+            require_identifier(self.amendment_proposal_id, "amendment_proposal_id")
+            if self.amendment_proposal_id not in self.evidence_ids:
+                raise QcaeValidationError(
+                    "CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT must cite its amendment "
+                    "proposal among the evidence ids (P3-R4C3 law 5)"
+                )
+
+
+@dataclass(frozen=True)
+class StopRecommendation(SerializableRecord):
+    """Saturation-driven stop/continue recommendation (canon 2.1.9, 2.7.14)."""
+
+    SCHEMA_VERSION = 2
+
     state: StopRecommendationState
     satisfied_conditions: Tuple[StopCondition, ...] = ()
+    #: The attributable assessments behind every satisfied condition. A STOP is
+    #: only representable when each satisfied condition carries its own typed
+    #: assessment — there is no boolean path to a STOP anymore (P3-R4C3).
+    assessments: Tuple[StopConditionAssessment, ...] = ()
     rationale: str = ""
 
     _COERCIONS = {
         "state": lambda v: coerce_enum(v, StopRecommendationState),
         "satisfied_conditions": lambda v: coerce_enum_tuple(v, StopCondition),
+        "assessments": tuple,
     }
+
+    _NESTED_RECORDS = {"assessments": StopConditionAssessment}
 
     def validate(self) -> None:
         require_enum(self.state, StopRecommendationState, "state")
         require_enum_tuple(self.satisfied_conditions, StopCondition, "satisfied_conditions")
         require_no_duplicates(self.satisfied_conditions, "satisfied_conditions")
         require_non_empty_str(self.rationale, "rationale")
+        seen: set = set()
+        for assessment in self.assessments:
+            assessment.validate()
+            if assessment.condition in seen:
+                raise QcaeValidationError(
+                    f"duplicate stop assessment for {assessment.condition.value}"
+                )
+            seen.add(assessment.condition)
+            if assessment.condition not in self.satisfied_conditions:
+                raise QcaeValidationError(
+                    f"stop assessment for {assessment.condition.value} names a "
+                    "condition the recommendation does not report as satisfied"
+                )
         if self.state == StopRecommendationState.STOP and not self.satisfied_conditions:
             raise QcaeValidationError(
                 "STOP requires at least one satisfied declared stop condition "
@@ -281,6 +380,15 @@ class StopRecommendation(SerializableRecord):
             raise QcaeValidationError(
                 "CONTINUE cannot report satisfied stop conditions; revise the "
                 "declared rules or stop (canon 2.1.9)"
+            )
+        # P3-R4C3: every satisfied condition needs its attributable assessment.
+        unassessed = sorted(
+            c.value for c in self.satisfied_conditions if c not in seen
+        )
+        if unassessed:
+            raise QcaeValidationError(
+                f"satisfied stop conditions without an attributable assessment: "
+                f"{unassessed} (P3-R4C3: no raw caller boolean may create a STOP)"
             )
 
 

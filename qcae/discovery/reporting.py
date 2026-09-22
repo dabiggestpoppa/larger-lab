@@ -41,7 +41,6 @@ from typing import List, Optional, Sequence, Tuple
 from qcae.core.discovery.candidate import CanonicalCandidate
 from qcae.core.discovery.lead import FAILURE_STATUSES
 from qcae.core.discovery.plan import (
-    DiscoveryBudget,
     DiscoveryPlan,
     SaturationMetrics,
 )
@@ -49,6 +48,8 @@ from qcae.core.discovery.vocabulary import SourceClass
 from qcae.core.discovery.report import (
     DiscoveryReport,
     PrefilterDecision,
+    StopCondition,
+    StopConditionAssessment,
     make_discovery_report,
 )
 from qcae.core.errors import QcaeValidationError
@@ -257,9 +258,7 @@ def assemble_discovery_report(
     previously_known_candidates: Sequence[CanonicalCandidate] = (),
     saturated: bool = False,
     saturation_reason: str = "",
-    enough_non_dominated: bool = False,
-    hard_constraints_eliminated_class: bool = False,
-    contract_amendment_required: bool = False,
+    stop_assessments: Sequence[StopConditionAssessment] = (),
     stop_rationale: str = "",
     created_at: str = "",
     created_by: str = "",
@@ -315,7 +314,10 @@ def assemble_discovery_report(
     known_candidates = merge_canonical_candidates(
         [*previously_known_candidates, *discovered])
     _require_sufficiency_claim_has_a_set(
-        enough_non_dominated=enough_non_dominated,
+        enough_non_dominated=any(
+            a.condition is StopCondition.NON_DOMINATED_SET_SUFFICIENT
+            for a in tuple(stop_assessments)
+        ),
         canonical_ids=canonical_ids,
         previously_known_candidates=previously_known_candidates,
     )
@@ -342,10 +344,8 @@ def assemble_discovery_report(
     verdict = stop_recommendation(
         plan,
         metrics,
-        budget_exhausted=_budget_exhausted(plan.budget, metrics),
-        enough_non_dominated=enough_non_dominated,
-        hard_constraints_eliminated_class=hard_constraints_eliminated_class,
-        contract_amendment_required=contract_amendment_required,
+        assessments=tuple(stop_assessments),
+        assessed_at=created_at or "1970-01-01T00:00:00Z",
         rationale=stop_rationale,
     )
 
@@ -541,20 +541,6 @@ def _require_discovered_accounted_for(
 
 
 # -- derivations -------------------------------------------------------------
-
-
-def _budget_exhausted(budget: DiscoveryBudget, metrics: SaturationMetrics) -> bool:
-    """Only the ceilings the metrics can evidence are compared here.
-
-    ``max_source_calls``, ``max_wall_clock_seconds`` and ``max_cost_usd`` have no
-    counterpart in the counters, so exhaustion of those is never inferred: a
-    caller that reached them declares the stop. Claiming a ceiling we cannot
-    evidence would be worse than not claiming it (canon 2.1.9).
-    """
-    return (
-        metrics.queries_executed >= budget.max_queries
-        or metrics.results_inspected >= budget.max_results_inspected
-    )
 
 
 def _sources_searched(outcomes: Sequence[AdapterOutcome]) -> Tuple[SourceClass, ...]:

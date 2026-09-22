@@ -36,7 +36,10 @@ from qcae.core.discovery import (
     make_discovery_plan,
 )
 from qcae.core.discovery.lead import QueryLineage
-from qcae.core.discovery.report import PrefilterDecision
+from qcae.core.discovery.report import (
+    PrefilterDecision,
+    StopConditionAssessment,
+)
 from qcae.core.errors import QcaeValidationError
 from qcae.core.ports.discovery import AdapterOutcome
 from qcae.core.vocabulary import EvidenceClass, VerificationLevel
@@ -634,10 +637,25 @@ class TestStopRecommendation:
         assert recommendation.satisfied_conditions == ()
 
     def test_budget_ceiling_stops_the_search(self) -> None:
-        recommendation = stop_recommendation(plan(), SaturationMetrics(),
-                                             budget_exhausted=True)
+        """Budget exhaustion is derived from typed accounting (P3-R4C3 law 1).
+
+        The old call asserted a boolean; now the counter itself crosses the
+        plan's declared ceiling, and the STOP carries the derived assessment.
+        """
+        budget = plan().budget
+        recommendation = stop_recommendation(
+            plan(),
+            SaturationMetrics(queries_executed=budget.max_queries,
+                              results_inspected=1),
+        )
         assert recommendation.state.value == "STOP"
         assert StopCondition.BUDGET_CEILING_REACHED in recommendation.satisfied_conditions
+        assessment = next(
+            a for a in recommendation.assessments
+            if a.condition is StopCondition.BUDGET_CEILING_REACHED
+        )
+        assert assessment.derivation_method
+        assert assessment.subject_ids
 
     def test_saturation_without_a_declared_threshold_cannot_stop(self) -> None:
         no_novelty_rule = make_discovery_plan(**plan_kwargs(stop_rules=(
@@ -661,9 +679,21 @@ class TestStopRecommendation:
         assert StopCondition.NEGLIGIBLE_NOVELTY in recommendation.satisfied_conditions
 
     def test_undeclared_stop_condition_is_refused(self) -> None:
+        """The assessment exists, but the plan never declared the condition."""
+        assessment = StopConditionAssessment(
+            condition=StopCondition.HARD_CONSTRAINTS_ELIMINATE_CLASS,
+            discovery_plan_id="plan-001",
+            contract_id="CAP-REPLAY-001",
+            contract_version=1,
+            evaluator_id="evaluator-rgs-01",
+            policy_version="rank-policy-1.0",
+            assessed_at="2026-09-21T13:00:00Z",
+            subject_ids=("class-package-ecosystem",),
+            derivation_method="counted typed prefilter rejections covering the class",
+            rationale="every candidate in the class was hard-rejected",
+        )
         with pytest.raises(QcaeValidationError, match="not declared by the plan"):
-            stop_recommendation(plan(), SaturationMetrics(),
-                                hard_constraints_eliminated_class=True)
+            stop_recommendation(plan(), SaturationMetrics(), assessments=(assessment,))
 
 
 # -- regressions from the tranche-1 audit -----------------------------------

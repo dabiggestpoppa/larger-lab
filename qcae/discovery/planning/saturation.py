@@ -28,6 +28,7 @@ from qcae.core.discovery.plan import (
     StopCondition,
 )
 from qcae.core.discovery.report import (
+    StopConditionAssessment,
     StopRecommendation,
     StopRecommendationState,
 )
@@ -128,25 +129,48 @@ def stop_recommendation(
     plan: DiscoveryPlan,
     metrics: SaturationMetrics,
     *,
-    budget_exhausted: bool = False,
-    enough_non_dominated: bool = False,
-    hard_constraints_eliminated_class: bool = False,
-    contract_amendment_required: bool = False,
+    assessments: Sequence[StopConditionAssessment] = (),
+    assessed_at: str = "1970-01-01T00:00:00Z",
     rationale: str = "",
 ) -> StopRecommendation:
-    """Recommend stop/continue using only the plan's declared stop rules (2.1.9)."""
+    """Recommend stop/continue from attributable assessments (canon 2.1.9).
+
+    P3-R4C3: there is no boolean path to a STOP. Each satisfied condition must
+    arrive as a typed ``StopConditionAssessment`` naming its evaluator, policy,
+    subject set, derivation and evidence; the budget condition is additionally
+    derived from the typed counters here, and NEGLIGIBLE_NOVELTY is derived
+    from the metrics under the plan's declared threshold. The recommendation
+    that results is advice only — it grants no acquisition authority.
+    """
     metrics.validate()
     declared = {rule.condition for rule in plan.stop_rules}
     satisfied: List[StopCondition] = []
 
-    if budget_exhausted:
+    # Law 1: budget exhaustion is derived from typed accounting, not asserted.
+    if (
+        metrics.queries_executed >= plan.budget.max_queries
+        or metrics.results_inspected >= plan.budget.max_results_inspected
+        or metrics.new_failure_information >= plan.budget.max_source_calls
+    ):
         satisfied.append(StopCondition.BUDGET_CEILING_REACHED)
-    if enough_non_dominated:
+
+    # Caller-supplied attributable assessments for the judgement conditions.
+    supplied: dict = {}
+    for assessment in assessments:
+        if assessment.condition in supplied:
+            raise QcaeValidationError(
+                f"duplicate stop assessment for {assessment.condition.value}"
+            )
+        supplied[assessment.condition] = assessment
+
+    if StopCondition.NON_DOMINATED_SET_SUFFICIENT in supplied:
         satisfied.append(StopCondition.NON_DOMINATED_SET_SUFFICIENT)
-    if hard_constraints_eliminated_class:
+    if StopCondition.HARD_CONSTRAINTS_ELIMINATE_CLASS in supplied:
         satisfied.append(StopCondition.HARD_CONSTRAINTS_ELIMINATE_CLASS)
-    if contract_amendment_required:
+    if StopCondition.CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT in supplied:
         satisfied.append(StopCondition.CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT)
+
+    # Law 6: negligible novelty is derived from the (in-scope) observations.
     if metrics.saturated:
         negligible_rule = next(
             (r for r in plan.stop_rules if r.condition == StopCondition.NEGLIGIBLE_NOVELTY),
@@ -160,6 +184,69 @@ def stop_recommendation(
             )
         if metrics.marginal_novelty_rate < float(negligible_rule.threshold):
             satisfied.append(StopCondition.NEGLIGIBLE_NOVELTY)
+
+    # Every satisfied condition must carry its attributable assessment. The
+    # two derived conditions are synthesized here from the typed accounting
+    # they were derived from; the judgement conditions come from the caller.
+    def _assessment_for(condition: StopCondition) -> StopConditionAssessment:
+        if condition is StopCondition.BUDGET_CEILING_REACHED:
+            return StopConditionAssessment(
+                condition=condition,
+                discovery_plan_id=plan.discovery_plan_id,
+                contract_id=plan.contract_id,
+                contract_version=plan.contract_version,
+                evaluator_id="qcae-saturation-accounting",
+                policy_version=plan.policy_version,
+                assessed_at=assessed_at,
+                subject_ids=(
+                    f"queries_executed:{metrics.queries_executed}",
+                    f"results_inspected:{metrics.results_inspected}",
+                    f"max_queries:{plan.budget.max_queries}",
+                    f"max_results_inspected:{plan.budget.max_results_inspected}",
+                ),
+                derivation_method=(
+                    "derived from typed saturation counters against the plan's "
+                    "declared budget envelope"
+                ),
+                rationale=(
+                    f"executed {metrics.queries_executed}/{plan.budget.max_queries} "
+                    f"queries, inspected {metrics.results_inspected}/"
+                    f"{plan.budget.max_results_inspected} results"
+                ),
+            )
+        if condition is StopCondition.NEGLIGIBLE_NOVELTY:
+            threshold = next(
+                float(r.threshold) for r in plan.stop_rules
+                if r.condition is StopCondition.NEGLIGIBLE_NOVELTY
+            )
+            return StopConditionAssessment(
+                condition=condition,
+                discovery_plan_id=plan.discovery_plan_id,
+                contract_id=plan.contract_id,
+                contract_version=plan.contract_version,
+                evaluator_id="qcae-saturation-accounting",
+                policy_version=plan.policy_version,
+                assessed_at=assessed_at,
+                subject_ids=(
+                    f"marginal_novelty_rate:{metrics.marginal_novelty_rate:.6f}",
+                    f"results_inspected:{metrics.results_inspected}",
+                    f"threshold:{threshold}",
+                ),
+                derivation_method=(
+                    "derived the marginal novelty rate from the typed in-scope "
+                    "observations and compared it with the plan's declared "
+                    "NEGLIGIBLE_NOVELTY threshold"
+                ),
+                rationale=(
+                    f"marginal novelty {metrics.marginal_novelty_rate:.3f} is below "
+                    f"the declared threshold {threshold}"
+                ),
+            )
+        return supplied[condition]
+
+    validated_assessments = tuple(_assessment_for(c) for c in satisfied)
+    for assessment in validated_assessments:
+        assessment.validate()
 
     undeclared = sorted(c.value for c in satisfied if c not in declared)
     if undeclared:
@@ -182,7 +269,10 @@ def stop_recommendation(
             f"{metrics.marginal_novelty_rate:.3f})"
         )
     recommendation = StopRecommendation(
-        state=state, satisfied_conditions=tuple(satisfied), rationale=detail
+        state=state,
+        satisfied_conditions=tuple(satisfied),
+        assessments=validated_assessments,
+        rationale=detail,
     )
     recommendation.validate()
     return recommendation

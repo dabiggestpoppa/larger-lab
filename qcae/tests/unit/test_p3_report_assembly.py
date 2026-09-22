@@ -24,8 +24,13 @@ from qcae.core.discovery.lead import (
 from qcae.core.discovery.plan import (
     ContractAmendmentProposal,
     HardPrefilter,
+    StopRule,
 )
-from qcae.core.discovery.report import PrefilterDecision
+from qcae.core.discovery.report import (
+    PrefilterDecision,
+    StopCondition,
+    StopConditionAssessment,
+)
 from qcae.core.discovery.vocabulary import SourceClass
 from qcae.core.errors import QcaeValidationError
 from qcae.core.ports.discovery import (
@@ -67,6 +72,30 @@ CREATED_BY = "qcae-discovery-run"
 # planned query bind as -exec2, -exec3, ... The autouse fixture gives every
 # test a fresh ledger so numbering stays deterministic per test.
 _EXECUTION_ORDINALS: dict = {}
+
+
+def _sufficiency_assessment(*, subject_ids=("cand-set-current",), plan=None,
+                            condition="NON_DOMINATED_SET_SUFFICIENT",
+                            evaluator="evaluator-rgs-01", evidence_ids=(),
+                            amendment_proposal_id="",
+                            derivation_method="re-derived the evaluated candidate "
+                                              "set under the current ranking policy"):
+    """An attributable stop assessment as a real evaluator would file it."""
+    plan = plan or baseline_plan()
+    return StopConditionAssessment(
+        condition=StopCondition(condition),
+        discovery_plan_id=plan.discovery_plan_id,
+        contract_id=plan.contract_id,
+        contract_version=plan.contract_version,
+        evaluator_id=evaluator,
+        policy_version="rank-policy-1.0",
+        assessed_at=CREATED_AT,
+        subject_ids=tuple(subject_ids),
+        derivation_method=derivation_method,
+        evidence_ids=tuple(evidence_ids),
+        amendment_proposal_id=amendment_proposal_id,
+        rationale="evaluated set judged sufficient under the declared rule",
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -341,6 +370,120 @@ class TestScopeTruth:
         assert report.saturation_metrics.new_atoms_covered == 0
 
 
+class TestStopAuthority:
+    """P3-R4C3 — no naked caller boolean may create a STOP."""
+
+    def test_naked_sufficiency_and_saturation_booleans_are_gone(self) -> None:
+        """J: the boolean parameters no longer exist to accept."""
+        import inspect
+
+        signature = inspect.signature(assemble_discovery_report)
+        for gone in ("enough_non_dominated", "hard_constraints_eliminated_class",
+                     "contract_amendment_required"):
+            assert gone not in signature.parameters
+
+    def test_stop_without_an_assessment_is_unrepresentable(self) -> None:
+        """A STOP recommendation refuses a satisfied condition with no record."""
+        from qcae.core.discovery.report import StopRecommendation, StopRecommendationState
+
+        with pytest.raises(QcaeValidationError, match="attributable assessment"):
+            StopRecommendation(
+                state=StopRecommendationState.STOP,
+                satisfied_conditions=(StopCondition.NON_DOMINATED_SET_SUFFICIENT,),
+                rationale="caller says so",
+            ).validate()
+
+    def test_historical_candidates_cannot_justify_sufficiency(self) -> None:
+        """K: sufficiency names the set evaluated under the current policy."""
+        assessment = _sufficiency_assessment(
+            subject_ids=("cand-from-a-previous-pass-never-re-evaluated",),
+            derivation_method="carried over from the previous pass's queue",
+        )
+        with pytest.raises(QcaeValidationError, match="no candidate set"):
+            _run(leads=(), outcomes=(), stop_assessments=(assessment,))
+
+    def test_amendment_stop_without_a_matching_proposal_is_refused(self) -> None:
+        """O: the condition must cite its proposal among its evidence."""
+        with pytest.raises(QcaeValidationError, match="amendment_proposal_id"):
+            _sufficiency_assessment(
+                condition="CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT",
+                subject_ids=("ordering-semantics-clause",),
+            ).validate()
+
+    def test_amendment_stop_with_a_matching_proposal_stops(self) -> None:
+        proposal = ContractAmendmentProposal(
+            proposal_id="prop-001",
+            contract_id=CAP,
+            contract_version=1,
+            plan_id="plan-001",
+            discovered_need="ordering semantics are ambiguous",
+            proposed_change="add the ordering constraint clause",
+            evidence_ids=("ev-1",),
+        )
+        plan = make_discovery_plan(**plan_kwargs(
+            amendment_proposals=(proposal,),
+            stop_rules=(
+                StopRule(condition=StopCondition.BUDGET_CEILING_REACHED),
+                StopRule(condition=StopCondition.NON_DOMINATED_SET_SUFFICIENT),
+                StopRule(condition=StopCondition.CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT),
+            ),
+        ))
+        assessment = _sufficiency_assessment(
+            plan=plan,
+            condition="CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT",
+            subject_ids=("ordering-semantics-clause",),
+            evidence_ids=("prop-001", "ev-1"),
+            amendment_proposal_id="prop-001",
+        )
+        report, _c, _r = _run(leads=(), outcomes=(), plan=plan,
+                              stop_assessments=(assessment,))
+        assert report.stop_recommendation.state.value == "STOP"
+
+    def test_hard_constraint_stop_without_class_decisions_is_refused(self) -> None:
+        """P: the class elimination must name the decisions covering it."""
+        plan = make_discovery_plan(**plan_kwargs(stop_rules=(
+            StopRule(condition=StopCondition.BUDGET_CEILING_REACHED),
+            StopRule(condition=StopCondition.NON_DOMINATED_SET_SUFFICIENT),
+            StopRule(condition=StopCondition.HARD_CONSTRAINTS_ELIMINATE_CLASS),
+        )))
+        assessment = _sufficiency_assessment(
+            plan=plan,
+            condition="HARD_CONSTRAINTS_ELIMINATE_CLASS",
+            subject_ids=(),
+            derivation_method="",
+            evidence_ids=(),
+        )
+        with pytest.raises(QcaeValidationError, match="subject set"):
+            _run(leads=(), outcomes=(), plan=plan, stop_assessments=(assessment,))
+
+    def test_failure_only_pass_cannot_be_declared_saturated_for_a_stop(self) -> None:
+        """L: zero results inspected cannot manufacture a negligible-novelty STOP.
+
+        ``marginal_novelty_rate`` is 0.0 when nothing was inspected, so a naive
+        reading would satisfy any declared threshold; the derivation refuses to
+        call that saturation unless the caller's typed reason stands beside it,
+        and here the caller declares none.
+        """
+        plan = make_discovery_plan(**plan_kwargs(stop_rules=(
+            StopRule(condition=StopCondition.BUDGET_CEILING_REACHED),
+            StopRule(condition=StopCondition.NON_DOMINATED_SET_SUFFICIENT),
+            StopRule(condition=StopCondition.NEGLIGIBLE_NOVELTY, threshold=0.1),
+        )))
+        outcomes = [_outcome("q-1", status=AdapterStatus.RATE_LIMITED, results=0)]
+        report, _c, _r = _run(leads=(), outcomes=outcomes, plan=plan)
+        assert report.stop_recommendation.state.value == "CONTINUE"
+
+    def test_a_declared_stop_is_recommendation_only(self) -> None:
+        """STOP grants no acquisition authority; the artifact says what it is."""
+        known = merge_leads(_two_adapter_run()[0])
+        report, _, _ = _run(leads=(), outcomes=(),
+                           stop_assessments=(_sufficiency_assessment(
+                               subject_ids=tuple(c.canonical_id for c in known)),),
+                           previously_known_candidates=known)
+        assert report.stop_recommendation.state.value == "STOP"
+        assert all(a.rationale for a in report.stop_recommendation.assessments)
+
+
 class TestNoClaimOutrunsItsEvidence:
     """A claim in the artifact must not survive beside evidence that refutes it.
 
@@ -407,7 +550,7 @@ class TestNoClaimOutrunsItsEvidence:
         """
         with pytest.raises(QcaeValidationError, match="no candidate set"):
             _run(leads=(), outcomes=(), baseline=_baseline(),
-                 enough_non_dominated=True)
+                 stop_assessments=(_sufficiency_assessment(),))
 
     def test_a_counter_history_without_the_knowledge_it_measured_is_disclosed(self) -> None:
         """The natural multi-pass handoff, and the one that inflates novelty.
@@ -471,9 +614,13 @@ class TestNoClaimOutrunsItsEvidence:
         """
         known = merge_leads(_two_adapter_run()[0])
         report, _, _ = _run(leads=(), outcomes=(), baseline=_baseline(),
-                           enough_non_dominated=True,
+                           stop_assessments=(_sufficiency_assessment(
+                               subject_ids=tuple(c.canonical_id for c in known)),),
                            previously_known_candidates=known)
         assert report.stop_recommendation.state.value == "STOP"
+        # The STOP carries the attributable assessment, not a bare assertion.
+        assert (report.stop_recommendation.assessments[0].condition.value
+                == "NON_DOMINATED_SET_SUFFICIENT")
 
 
 class TestTheArtifactIsItsOwnHandoff:
