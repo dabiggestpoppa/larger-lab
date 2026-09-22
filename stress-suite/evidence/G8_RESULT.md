@@ -3,10 +3,10 @@
 **GATE STATUS:** `PASS_G8_CROSS_SCENARIO_COHERENCE`
 
 - starting SHA `661878e7df4c5b8f7bcb2479ceebabd79d8c28b3`
-- tested SHA `7b422648015b4bb33be9f28c1a48e7458a3b6956`
+- tested SHA `492e46dbc3d82728e4d08630d75a55456180314e`
 - evidence commit `STRESS-G8RR` (this package; not self-hashed)
 - contract `G8-EQUIVALENCE-CONTRACT-001` v1.2.0 `525b18bcea68d23584097c8b740d2d23`
-- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1022 / passed 1021 / skipped 1 / failed 0** (artifact `pytest` `23ba268fc1955c8e`, python `3.11.9`)
+- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1023 / passed 1022 / skipped 1 / failed 0** (artifact `pytest` `120df93289afe2b5`, python `3.11.9`)
 - skipped 'stress-suite.tests.test_g8_contradiction::test_the_committed_package_names_the_derived_code_tree', and named here rather than smoothed over: artifact-producing run: the archive for this tree cannot exist yet, so a lag is expected here and is checked by every ordinary run (and by test_the_lag_rule_detects_a_lagging_tree_...)
 - test provenance (revision R3, finding R-G8-07): the baseline is read from the JUnit artifact the authoritative command produced, never from a self-reported integer. The receipt records the artifact digest, the suite identity, the tested tree, the command and the environment; a missing, malformed, stale or failing artifact refuses emission. No exit status is published, because a JUnit document cannot show the producing process's exit code -- a claim where an observation is impossible is not evidence, and the refusal it drove is driven by the counts MEASURED from the artifact instead (STRESS-G8ARCH4).
 
