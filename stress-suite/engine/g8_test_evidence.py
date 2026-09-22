@@ -18,6 +18,21 @@ measured count. This module replaces that with a JUnit XML result artifact:
 
 The reader is deliberately strict: it never repairs, never infers and never
 turns a missing fact into a favourable one.
+
+Structure. This module is the SINGLE OWNER of the test-baseline contract: which
+artifact is the baseline, the command that produces it, the canonical-digest rule,
+and whether a parsed artifact may be published at all::
+
+    pytest --junitxml -> ARTIFACT_RELATIVE_PATH (inside the repository)
+                      -> read_test_evidence()  artifact-level facts; raises
+                      -> TestEvidence          the sole carrier of one baseline
+                      -> check_baseline()      the sole publishability policy
+                         |- emit()             refuses to publish an unverified one
+                         `- decide_gate()      records that verdict in the package
+
+`scenarios/g8_emit_evidence.py` owns PRESENTATION (the receipt and its prose) and
+the declared tree (`TESTED_SHA`); it keeps no copy of any rule declared here, and
+no other module may re-decide whether an artifact is acceptable.
 """
 from __future__ import annotations
 
@@ -37,13 +52,24 @@ class UnverifiableTestEvidence(RuntimeError):
 #: the stress-suite `tests` package, not an unrelated or partial collection.
 REQUIRED_SUITE_IDENTITY_PREFIXES = ("tests", "pytest")
 
-#: The suite command that PRODUCES the artifact the receipt cites. The artifact
-#: must be written inside the repository (repo-relative), so a reviewer anywhere
-#: can obtain the exact bytes the baseline was read from.
+#: The suite command the mission names as authoritative. It is the command the
+#: artifact's own record cites, and the prefix of the artifact-producing command.
+PACKAGE_DIR = "stress-suite"
 AUTHORITATIVE_TEST_COMMAND = (
-    "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q "
-    "--junitxml=evidence/G8_TEST_RESULTS.xml")
-ARTIFACT_RELATIVE_PATH = "stress-suite/evidence/G8_TEST_RESULTS.xml"
+    f"cd {PACKAGE_DIR} && PYTHONIOENCODING=utf-8 python -m pytest tests -q")
+
+#: The ONE declared location of the baseline artifact. It must lie inside the
+#: repository so a reviewer anywhere can obtain the exact bytes the baseline was
+#: read from and resolve the citation without trusting the generator (R-G8-07).
+#: The location is declared once, here: the reader admits no other path, `emit`
+#: refuses to publish an artifact from any other path, and the receipt cites this
+#: one. Callers validate against the declaration rather than restating it.
+ARTIFACT_PATH_IN_PACKAGE = "evidence/G8_TEST_RESULTS.xml"
+ARTIFACT_RELATIVE_PATH = f"{PACKAGE_DIR}/{ARTIFACT_PATH_IN_PACKAGE}"
+#: the same command that writes the declared artifact, run from the package
+#: directory; derived so the two can never drift apart
+ARTIFACT_COMMAND = (f"{AUTHORITATIVE_TEST_COMMAND} "
+                    f"--junitxml={ARTIFACT_PATH_IN_PACKAGE}")
 
 #: Attributes JUnit's writer stamps per RUN rather than per RESULT. They are why a
 #: raw artifact digest cannot be reproduced by re-running: the bytes differ even
@@ -217,6 +243,16 @@ def read_test_evidence(
                 f"{Path(repo_root).resolve()}; a baseline cited at a "
                 "machine-local path cannot be obtained or re-checked by a "
                 "reviewer, so it is refused rather than published")
+        if relative != ARTIFACT_RELATIVE_PATH:
+            # one declared location: an artifact inside the tree but somewhere
+            # else would publish a citation the authoritative command never
+            # writes, so the receipt and the command would disagree
+            raise UnverifiableTestEvidence(
+                f"test artifact {path} resolves to {relative!r} inside the "
+                f"declared tree, but the authoritative build publishes "
+                f"{ARTIFACT_RELATIVE_PATH!r}. Produce it with "
+                f"`{ARTIFACT_COMMAND}` so the receipt cites a path a reviewer "
+                "can resolve")
     blob = path.read_bytes()
     if not blob.strip():
         raise UnverifiableTestEvidence(f"test artifact {path} is empty")
@@ -314,8 +350,23 @@ def read_test_evidence(
 
 
 def check_baseline(test_evidence: TestEvidence, *, tested_sha: str) -> Dict[str, Any]:
-    """The gate-facing view of the baseline plus its verifiability verdict."""
+    """The baseline plus its verifiability verdict: the SOLE policy for whether a
+    baseline may be published or rested on.
+
+    Consumers do not restate any part of it — `emit` refuses to publish an
+    unverified baseline and `decide_gate` records this verdict in the package.
+    """
     problems = []
+    if not test_evidence.in_tree:
+        problems.append(
+            f"the bound artifact is cited at {test_evidence.artifact_path!r}, "
+            "which is outside the declared tree, so the citation could not be "
+            "resolved by a reviewer")
+    elif test_evidence.repo_relative_path != ARTIFACT_RELATIVE_PATH:
+        problems.append(
+            f"the bound artifact resolves to "
+            f"{test_evidence.repo_relative_path!r}, not the declared evidence "
+            f"path {ARTIFACT_RELATIVE_PATH!r}")
     if not test_evidence.honest_baseline:
         problems.append(
             f"artifact reports collected={test_evidence.collected} "
@@ -327,7 +378,6 @@ def check_baseline(test_evidence: TestEvidence, *, tested_sha: str) -> Dict[str,
             f"artifact was produced against {test_evidence.tested_sha}, not "
             f"{tested_sha}")
     return {"verified": not problems, "problems": problems,
-            "measured_full": test_evidence.collected,
             "collected_full": test_evidence.collected,
             "declared_tested_sha": tested_sha,
             "artifact_bound_tested_sha": test_evidence.tested_sha,

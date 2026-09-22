@@ -945,7 +945,6 @@ def guarded_derivation_coverage(contract: Mapping[str, Any],
             "closure_required_properties": required,
             "per_property": {k: by_property[k] for k in sorted(by_property)},
             "unexercised_required_properties": unexercised,
-            "required_never_holding": unexercised,
             "required_never_derived": sorted(p for p in required
                                              if p not in touched),
             "declared_observations": len(observations)}

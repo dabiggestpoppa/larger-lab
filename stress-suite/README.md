@@ -46,6 +46,33 @@ stress-suite/
 9. Deterministic replay: same inputs + same contract versions ⇒ same output.
 10. No production / cloud / capital mutation surface (test-guarded).
 
+## Where each G8 rule lives
+
+A rule is stated in exactly one layer; the other layers consume it. Data flows one
+way — engine → scenarios → evidence — and never back.
+
+| layer | owns |
+| --- | --- |
+| `engine/g8_*` | the rules themselves: comparison + equivalence classes, guarded properties, the gate decision, the contradiction register, and the test-baseline contract |
+| `scenarios/g8_*` | running the surface and publishing: it declares the tested tree and renders the receipt, matrix and prose. It keeps no copy of any engine rule |
+| `tests/` | the adversarial controls; fixtures bind to the tree the emitter **declares**, never to a scenario name or a call site's expectation |
+
+The test-baseline path has one owner per step, so no two components can disagree
+about which artifact is the baseline:
+
+```
+pytest --junitxml  -> evidence/G8_TEST_RESULTS.xml   declared once (engine/g8_test_evidence)
+                   -> read_test_evidence()           admits only that path, inside the tree
+                   -> TestEvidence                   the sole carrier of one baseline
+                   -> check_baseline()               the sole publishability policy
+                      |- emit()                      refuses to publish an unverified one
+                      `- decide_gate()               records it and blocks on it
+```
+
+Consumers validate against the declaration rather than restating it: a second copy
+of a path, command, digest rule or publishability check is a defect, not a
+convenience.
+
 ## Running
 
 ```bash

@@ -47,6 +47,7 @@ from engine.g8_contradiction import (  # noqa: E402
     validate_contract,
 )
 from engine.g8_test_evidence import (  # noqa: E402
+    ARTIFACT_RELATIVE_PATH,
     UnverifiableTestEvidence,
     check_baseline,
     junit_document,
@@ -93,14 +94,18 @@ def sealed_test_evidence(tmp_path_factory) -> Any:
     the authoritative artifact is, so the gate's baseline check compares a
     declared tree against a bound tree rather than against itself.
     """
-    path = tmp_path_factory.mktemp("g8ev") / "pytest.xml"
+    root = tmp_path_factory.mktemp("g8ev")
+    path = root / ARTIFACT_RELATIVE_PATH
+    path.parent.mkdir(parents=True)
     path.write_text(junit_document(cases=973, tested_sha=EMIT.TESTED_SHA),
                     encoding="utf-8")
-    # the artifact declares THIS temporary directory as its tree, which is what
-    # makes it "in tree". The authoritative build declares the repository, so its
-    # citation is a repo-relative path a reviewer can resolve (R-G8-07).
+    # the fixture declares THIS temporary directory as its tree, which is what
+    # makes the citation checkable, and it uses the one declared evidence path so
+    # it exercises the same rule the authoritative build does. The authoritative
+    # build declares the repository, so its citation is a repo-relative path a
+    # reviewer can resolve (R-G8-07).
     return read_test_evidence(str(path), expected_tested_sha=EMIT.TESTED_SHA,
-                              repo_root=path.parent,
+                              repo_root=root,
                               python_version=sys.version.split()[0])
 
 
@@ -1100,9 +1105,11 @@ def test_r07_absent_failing_stale_and_malformed_artifacts_all_refuse(tmp_path):
 
 def test_r07_a_clean_artifact_yields_a_verifiable_baseline(tmp_path):
     sha = AUDIT.head_sha()
-    p = tmp_path / "ok.xml"
+    p = tmp_path / ARTIFACT_RELATIVE_PATH
+    p.parent.mkdir(parents=True)
     p.write_text(junit_document(cases=7, tested_sha=sha), encoding="utf-8")
-    ev = read_test_evidence(str(p), expected_tested_sha=sha, python_version="3.11.0")
+    ev = read_test_evidence(str(p), expected_tested_sha=sha, repo_root=tmp_path,
+                            python_version="3.11.0")
     assert ev.honest_baseline and ev.measured_full == 7
     assert check_baseline(ev, tested_sha=sha)["verified"] is True
     assert ev.artifact_digest and ev.artifact_bytes > 0
@@ -1363,14 +1370,12 @@ def test_f2_a_required_property_that_never_holds_blocks_closure(
     assert decision["exit"] == "BLOCKED_G8_MISSING_EVIDENCE"
     cov = decision["guarded_coverage"]
     assert target in cov["unexercised_required_properties"]
-    assert target in cov["required_never_holding"]
     # it was TOUCHED but never held — the distinction F2 turns on
     assert target not in cov["required_never_derived"]
     assert any("never returned HOLDS" in r for r in decision["reasons"])
     # the live package still proves every closure-required property
     live = package["guarded_coverage"]
     assert live["unexercised_required_properties"] == []
-    assert live["required_never_holding"] == []
     assert "must return HOLDS" in live["closure_rule"]
 
 
@@ -1378,16 +1383,42 @@ def test_r07_the_artifact_must_live_inside_the_declared_tree(tmp_path):
     """R-G8-07 provenance gap: the receipt used to cite a machine-local temp path
     with a per-run digest, so no reviewer on another machine could obtain or
     re-check the baseline the gate rested on. An artifact outside the declared
-    tree is now refused outright."""
+    tree is refused outright.
+
+    STRESS-G8ARCH: the rule has ONE owner. The reader admits only the declared
+    evidence path, so no caller -- CLI included -- can publish a citation the
+    reader itself would refuse."""
     sha = AUDIT.head_sha()
-    p = tmp_path / "pytest.xml"
-    p.write_text(junit_document(cases=5, tested_sha=sha), encoding="utf-8")
+    doc = junit_document(cases=5, tested_sha=sha)
+    outside = tmp_path / "pytest.xml"
+    outside.write_text(doc, encoding="utf-8")
     with pytest.raises(UnverifiableTestEvidence):
-        read_test_evidence(str(p), expected_tested_sha=sha, repo_root=ROOT.parent)
-    ev = read_test_evidence(str(p), expected_tested_sha=sha, repo_root=tmp_path)
-    assert ev.in_tree and ev.repo_relative_path == "pytest.xml"
-    assert ev.to_dict()["artifact_path"] == "pytest.xml"
+        read_test_evidence(str(outside), expected_tested_sha=sha,
+                           repo_root=ROOT.parent)
+
+    # inside the declared tree, but not at the declared evidence path
+    tree = tmp_path / "tree"
+    elsewhere = tree / "scenarios" / "pytest.xml"
+    elsewhere.parent.mkdir(parents=True)
+    elsewhere.write_text(doc, encoding="utf-8")
+    with pytest.raises(UnverifiableTestEvidence) as refused:
+        read_test_evidence(str(elsewhere), expected_tested_sha=sha, repo_root=tree)
+    assert ARTIFACT_RELATIVE_PATH in str(refused.value)
+
+    declared = tree / ARTIFACT_RELATIVE_PATH
+    declared.parent.mkdir(parents=True)
+    declared.write_text(doc, encoding="utf-8")
+    ev = read_test_evidence(str(declared), expected_tested_sha=sha, repo_root=tree)
+    assert ev.in_tree and ev.repo_relative_path == ARTIFACT_RELATIVE_PATH
+    assert ev.to_dict()["artifact_path"] == ARTIFACT_RELATIVE_PATH
     assert ev.to_dict()["artifact_path_scope"] == "REPO_RELATIVE"
+    assert check_baseline(ev, tested_sha=sha)["verified"] is True
+
+    # the same artifact read with no declared tree is parseable but NOT
+    # publishable: nothing may rest on a baseline a reviewer cannot reach
+    loose = read_test_evidence(str(declared), expected_tested_sha=sha)
+    assert loose.in_tree is False
+    assert check_baseline(loose, tested_sha=sha)["verified"] is False
 
 
 def test_r07_the_emitter_refuses_an_artifact_outside_the_declared_tree(tmp_path):
@@ -1427,7 +1458,6 @@ def test_r07_the_emitted_citation_resolves_in_tree_and_matches_the_bytes(
     assert hashlib.sha256(blob).hexdigest() == cited["artifact_digest"]
     assert len(blob) == cited["artifact_bytes"]
     assert canonical_artifact_digest(blob) == cited["artifact_canonical_digest"]
-    assert out["receipt"]["declared_tested_sha"] == EMIT.TESTED_SHA
     bound = out["receipt"]["baseline_check"]
     assert bound["declared_tested_sha"] == EMIT.TESTED_SHA
     assert bound["artifact_bound_tested_sha"] == EMIT.TESTED_SHA
@@ -1449,10 +1479,14 @@ def test_r07_raw_and_canonical_artifact_digests_are_distinct_and_declared(tmp_pa
             '<testsuite name="tests" tests="5">',
             f'<testsuite name="tests" tests="5" time="{elapsed}" '
             f'timestamp="2026-01-0{i + 1}T00:00:00" hostname="{host}">')
-        path = tmp_path / f"run{i}.xml"
+        # one run per declared tree: the artifact is admitted only at the
+        # declared evidence path, so two runs cannot share a tree
+        tree = tmp_path / f"run{i}"
+        path = tree / ARTIFACT_RELATIVE_PATH
+        path.parent.mkdir(parents=True)
         path.write_text(doc, encoding="utf-8")
         stamped.append(read_test_evidence(str(path), expected_tested_sha=sha,
-                                         repo_root=tmp_path))
+                                         repo_root=tree))
     first, second = stamped
     assert first.artifact_digest != second.artifact_digest, "raw bytes differ per run"
     assert first.artifact_canonical_digest == second.artifact_canonical_digest
@@ -1463,16 +1497,25 @@ def test_r07_raw_and_canonical_artifact_digests_are_distinct_and_declared(tmp_pa
     assert cited["artifact_canonicalization_rule"] == ARTIFACT_CANONICALIZATION_RULE
     assert "RAW sha256" in cited["artifact_digest_semantics"]
     assert canonical_artifact_digest(
-        (tmp_path / "run0.xml").read_bytes()) == first.artifact_canonical_digest
+        (tmp_path / "run0" / ARTIFACT_RELATIVE_PATH).read_bytes()
+    ) == first.artifact_canonical_digest
 
 
 def test_r07_the_authoritative_command_writes_the_cited_artifact_path():
     """The receipt cites one repo-relative path; the command that produces it must
     name that same path, run from the package directory, so the citation is
-    obtainable rather than aspirational."""
-    from engine.g8_test_evidence import ARTIFACT_RELATIVE_PATH
+    obtainable rather than aspirational.
+
+    STRESS-G8ARCH: the path, the command and the derived artifact command are
+    declared ONCE in engine.g8_test_evidence. The emitter publishes those objects;
+    it does not restate them (identity, not equality: a rebuilt copy fails here).
+    """
+    from engine.g8_test_evidence import (ARTIFACT_COMMAND,
+                                         AUTHORITATIVE_TEST_COMMAND)
     assert ARTIFACT_RELATIVE_PATH == "stress-suite/evidence/G8_TEST_RESULTS.xml"
-    assert EMIT.ARTIFACT_RELATIVE_PATH == ARTIFACT_RELATIVE_PATH
-    assert f"--junitxml=evidence/{Path(ARTIFACT_RELATIVE_PATH).name}" in \
-        EMIT.ARTIFACT_COMMAND
-    assert EMIT.ARTIFACT_COMMAND.startswith("cd stress-suite && ")
+    assert AUTHORITATIVE_TEST_COMMAND == \
+        "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q"
+    assert ARTIFACT_COMMAND == (AUTHORITATIVE_TEST_COMMAND
+                                + " --junitxml=evidence/G8_TEST_RESULTS.xml")
+    assert EMIT.ARTIFACT_COMMAND is ARTIFACT_COMMAND
+    assert EMIT.ARTIFACT_RELATIVE_PATH is ARTIFACT_RELATIVE_PATH
