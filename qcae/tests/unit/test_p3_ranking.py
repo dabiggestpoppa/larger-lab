@@ -9,6 +9,8 @@ and never promotes a candidate (2.7.4, 2.7.16 invariant 1).
 
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 
 from qcae.core.discovery import (
@@ -588,3 +590,120 @@ class TestStopRecommendation:
         with pytest.raises(QcaeValidationError, match="not declared by the plan"):
             stop_recommendation(plan(), SaturationMetrics(),
                                 hard_constraints_eliminated_class=True)
+
+
+# -- regressions from the tranche-1 audit -----------------------------------
+#
+# Both defects shipped because every other test in this file runs a single merged
+# batch and a single saturation pass. Real runs merge per adapter outcome and
+# repeat searches until a stop rule fires, so these two paths are exercised here.
+
+
+class TestMultiSourceAggregationRegression:
+    """Audit finding 1 — aggregation of separate merge passes crashed.
+
+    ``merge_leads(outcome_a) + merge_leads(outcome_b)`` is how multi-source runs
+    combine results, and canon 2.1.12 exists precisely so that the same project
+    found twice stays one candidate.
+    """
+
+    def _two_passes(self):
+        github_pass = merge_leads([lead("lead-gh", "github:owner/repo")])
+        registry_pass = merge_leads([
+            lead("lead-pypi", "github:owner/repo",
+                 source_class=SourceClass.PACKAGE_ECOSYSTEM, adapter_id="adapter-pypi")
+        ])
+        return github_pass, registry_pass
+
+    def test_separate_passes_for_one_project_rank_as_a_single_candidate(self) -> None:
+        github_pass, registry_pass = self._two_passes()
+        assert github_pass[0].canonical_id == registry_pass[0].canonical_id
+        combined = list(github_pass) + list(registry_pass)
+        result = rank_candidates(candidates=combined, plan=plan(), policy=policy())
+        assert [entry.candidate_id for entry in result.queue] == [github_pass[0].canonical_id]
+        assert [family.member_candidate_ids for family in result.families] == [
+            (github_pass[0].canonical_id,)
+        ]
+
+    def test_aggregation_preserves_every_discovery_path(self) -> None:
+        from qcae.discovery.planning.ranking import merge_canonical_candidates
+
+        github_pass, registry_pass = self._two_passes()
+        aggregated = merge_canonical_candidates(list(github_pass) + list(registry_pass))
+        assert len(aggregated) == 1
+        assert aggregated[0].lead_ids == ("lead-gh", "lead-pypi")
+        assert aggregated[0].independent_path_count == 2
+        assert aggregated[0].duplicate_path_count == 1
+
+    def test_aggregation_is_deterministic_and_idempotent(self) -> None:
+        from qcae.discovery.planning.ranking import merge_canonical_candidates
+
+        github_pass, registry_pass = self._two_passes()
+        combined = list(github_pass) + list(registry_pass)
+        once = merge_canonical_candidates(combined)
+        twice = merge_canonical_candidates(list(once))
+        assert once == twice
+        assert merge_canonical_candidates(list(reversed(combined))) == once
+
+
+class TestRepeatedPassSaturationRegression:
+    """Audit finding 2 — repeated passes inflated novelty so STOP never fired.
+
+    ``marginal_novelty_rate`` is cumulative (novel items / results inspected), so
+    a counter that increments for *known* candidates keeps the rate above the
+    declared ``NEGLIGIBLE_NOVELTY`` threshold no matter how exhausted the search
+    becomes, and the saturated search runs to budget instead of stopping
+    (canon 2.1.9/2.1.10).
+    """
+
+    PAPER_LEAD = lead("lead-1", "arxiv:2020.1", kind=CandidateKind.PAPER,
+                      license_claim="", source_class=SourceClass.RESEARCH_LITERATURE,
+                      adapter_id="adapter-arxiv", novelty_family="family-spec")
+
+    def _search_outcome(self):
+        """A search that keeps returning the one paper already discovered."""
+        return AdapterOutcome(
+            adapter_id="adapter-arxiv",
+            source_class=SourceClass.RESEARCH_LITERATURE,
+            query_id="qry-paper",
+            status=AdapterStatus.OK,
+            leads=(self.PAPER_LEAD,),
+            pages_inspected=1,
+            results_inspected=10,
+        )
+
+    def _twenty_passes(self) -> SaturationMetrics:
+        specs = merge_leads([self.PAPER_LEAD])
+        candidate_id = specs[0].canonical_id
+        metrics = update_saturation(
+            SaturationMetrics(),
+            outcomes=(self._search_outcome(),),
+            canonical_candidates=specs,
+        )
+        for _ in range(19):
+            metrics = update_saturation(
+                metrics,
+                outcomes=(self._search_outcome(),),
+                canonical_candidates=specs,
+                previous_candidate_ids=(candidate_id,),
+                previous_family_ids=("family-spec",),
+                previous_covered_atoms=(ATOM_A,),
+            )
+        return metrics
+
+    def test_repeat_passes_over_known_candidates_do_not_inflate_novelty(self) -> None:
+        metrics = self._twenty_passes()
+        assert metrics.new_candidates == 1
+        assert metrics.new_specifications == 1
+        assert metrics.new_implementation_families == 1
+
+    def test_saturated_search_can_satisfy_the_declared_stop_rule(self) -> None:
+        metrics = self._twenty_passes()
+        saturated = dataclasses.replace(
+            metrics,
+            saturated=True,
+            saturation_reason="twenty passes returned only the already-known candidate",
+        )
+        recommendation = stop_recommendation(plan(), saturated)
+        assert recommendation.state.value == "STOP"
+        assert StopCondition.NEGLIGIBLE_NOVELTY in recommendation.satisfied_conditions

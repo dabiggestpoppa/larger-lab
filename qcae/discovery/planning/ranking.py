@@ -79,6 +79,7 @@ __all__ = [
     "apply_hard_prefilter",
     "build_families",
     "canonical_key_for",
+    "merge_canonical_candidates",
     "merge_leads",
     "rank_candidates",
     "update_saturation",
@@ -260,6 +261,59 @@ def _canonical_id_for(key: str) -> str:
     return "cand-" + hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
 
 
+def merge_canonical_candidates(
+    candidates: Sequence[CanonicalCandidate],
+) -> Tuple[CanonicalCandidate, ...]:
+    """Aggregate candidate records that share one canonical identity (2.1.12).
+
+    Real runs merge leads per adapter outcome and then aggregate the passes, so
+    the same project can arrive as two records carrying the same
+    content-addressed ``canonical_id``. Aggregating unions the fields that
+    preserve discovery paths — lead ids, locators, source classes, claims,
+    revisions, readiness and conflicts — rather than dropping a record, because
+    canon 2.1.12 requires every path that found the candidate to survive. The
+    first record for an identity supplies its kind and canonical locator (both
+    are functions of that identity). Every unioned field is order-insensitive and
+    record order follows first appearance, so aggregating is idempotent and
+    independent of the order in which adapter passes happen to complete.
+    """
+    aggregated: Dict[str, CanonicalCandidate] = {}
+    for candidate in candidates:
+        previous = aggregated.get(candidate.canonical_id)
+        if previous is None:
+            aggregated[candidate.canonical_id] = candidate
+            continue
+        aggregated[candidate.canonical_id] = CanonicalCandidate(
+            canonical_id=previous.canonical_id,
+            canonical_key=previous.canonical_key,
+            candidate_kind=previous.candidate_kind,
+            canonical_locator=previous.canonical_locator,
+            merged_locators=tuple(sorted(set(previous.merged_locators)
+                                         | set(candidate.merged_locators))),
+            lead_ids=tuple(sorted(set(previous.lead_ids) | set(candidate.lead_ids))),
+            ready_lead_ids=tuple(sorted(
+                set(previous.ready_lead_ids) | set(candidate.ready_lead_ids))),
+            source_classes=tuple(sorted(
+                set(previous.source_classes) | set(candidate.source_classes),
+                key=lambda sc: sc.value,
+            )),
+            claims_atoms=tuple(sorted(set(previous.claims_atoms)
+                                     | set(candidate.claims_atoms))),
+            retrieved_revisions=tuple(sorted(set(previous.retrieved_revisions)
+                                             | set(candidate.retrieved_revisions))),
+            license_claims=tuple(sorted(set(previous.license_claims)
+                                       | set(candidate.license_claims))),
+            constraint_conflicts=tuple(sorted(set(previous.constraint_conflicts)
+                                             | set(candidate.constraint_conflicts))),
+            languages=tuple(sorted(set(previous.languages) | set(candidate.languages))),
+            novelty_family=previous.novelty_family or candidate.novelty_family,
+            notes=previous.notes or candidate.notes,
+        )
+    for candidate in aggregated.values():
+        candidate.validate()
+    return tuple(aggregated.values())
+
+
 def merge_leads(leads: Sequence[CandidateLead]) -> Tuple[CanonicalCandidate, ...]:
     """Merge discovery paths into canonical candidates (canon 2.1.12)."""
     groups: Dict[str, List[CandidateLead]] = {}
@@ -330,6 +384,7 @@ def build_families(
     policy: RankingPolicy,
 ) -> Tuple[CandidateFamily, ...]:
     """Cluster candidates around representatives (canon 2.7.6)."""
+    candidates = merge_canonical_candidates(candidates)
     groups: Dict[str, List[CanonicalCandidate]] = {}
     for candidate in candidates:
         group_id = candidate.novelty_family or f"singleton:{candidate.canonical_id}"
@@ -503,6 +558,9 @@ def rank_candidates(
 ) -> RankingResult:
     """Rank canonical candidates into an escalation queue (canon 2.7)."""
     policy.validate()
+    # Aggregate first: candidates that arrived through separate merge passes must
+    # rank as the one candidate canon 2.1.12 defines them to be.
+    candidates = merge_canonical_candidates(candidates)
     if not candidates:
         return RankingResult(
             policy_version=policy.policy_version,
@@ -700,12 +758,21 @@ def update_saturation(
     new_specifications = 0
     new_atoms: set = set()
     for candidate in canonical_candidates:
-        if candidate.canonical_id not in known_candidates:
+        is_new = candidate.canonical_id not in known_candidates
+        if is_new:
             new_candidates += 1
         family = candidate.novelty_family or f"singleton:{candidate.canonical_id}"
         if family not in known_families:
             new_families.add(family)
-        if candidate.candidate_kind in (CandidateKind.SPECIFICATION, CandidateKind.PAPER):
+        # Canon 2.1.10 measures novelty against what was already known: a repeat
+        # pass over an already-discovered paper is not a newly discovered
+        # specification. Counting it inflates marginal_novelty_rate until the
+        # declared NEGLIGIBLE_NOVELTY stop rule can never fire and a saturated
+        # search runs to budget instead of stopping (canon 2.1.9).
+        if is_new and candidate.candidate_kind in (
+            CandidateKind.SPECIFICATION,
+            CandidateKind.PAPER,
+        ):
             new_specifications += 1
         new_atoms.update(set(candidate.claims_atoms) - known_atoms)
 
