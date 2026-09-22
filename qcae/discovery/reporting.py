@@ -103,11 +103,10 @@ def assemble_discovery_report(
     A counters-only handoff is still *disclosed* in ``coverage_notes`` rather than
     left to inflate the novelty the stop law reads.
 
-    The history is bound to the capability it measured: a report assembled for
-    another contract or another revision of it (canon 2.1.10) is refused rather
-    than accepted as this pass's past, since its known set would otherwise be
-    counted as this capability's knowledge in the counters and the stop verdict.
-    A re-cut plan for the *same* capability is accepted and disclosed.
+    The history is bound to the capability it measured: a report from another
+    contract, or another revision of it, is refused rather than counted as this
+    pass's past (canon 2.1.10); a re-cut plan for the *same* capability is
+    disclosed instead (``coverage_notes``).
     """
     _require_one_history_source(previous_report, previous_metrics,
                                previously_known_candidates)
@@ -235,10 +234,9 @@ def _require_history_is_for_this_capability(
 ) -> None:
     """Canon 2.1.10: the history is this capability's past, or it is not a history.
 
-    The artifact states the identity it measured (contract and revision), so the
-    binding is checkable without carrying anything new: refusing an unverifiable
-    handoff is right, accepting it silently would put another capability's known
-    candidates into this pass's novelty accounting and its stop verdict.
+    The artifact states the identity it measured, so the binding needs nothing
+    carried: accepted silently, another capability's known candidates would enter
+    this pass's novelty accounting and its stop verdict.
     """
     if previous_report is None:
         return
@@ -258,10 +256,8 @@ def _require_history_is_for_this_capability(
             "the handed-over pass history belongs to a different capability: "
             + "; ".join(mismatches)
             + " (canon 2.1.10: novelty is measured against what was already known for "
-            "this capability, so another capability's or revision's known set would be "
-            "counted as this pass's past in new_candidates/new_atoms_covered and in the "
-            "stop verdict — hand over the report this capability's previous pass "
-            "produced, or the counters and candidates that belong to it)"
+            "this capability, so another contract's known set would be counted as this "
+            "pass's past in new_candidates/new_atoms_covered and in the stop verdict)"
         )
 
 
@@ -444,37 +440,25 @@ def _coverage_notes(
             "2.1.10: the terminal artifact carries the metrics, not the candidate "
             "records, so pass the previously_known_candidates alongside them)"
         )
-    if _history_is_a_recut_search(previous_report, plan):
+    # A plan is a search document, not the capability: it is re-cut between passes
+    # (amended contracts, refocused scope) while the counters keep reading candidate
+    # identity, family and claimed atoms — all the capability's. So a differing plan
+    # or atom scope is a re-cut search to disclose, not a mismatch to refuse (only a
+    # differing contract or revision is refused, by the law above).
+    recut = previous_report is not None and (
+        previous_report.discovery_plan_id != plan.discovery_plan_id
+        or tuple(previous_report.atom_ids) != tuple(plan.atom_ids)
+    )
+    if recut:
         notes.append(
             f"pass history {previous_report.report_id} was measured for a re-cut plan "
             f"scope: plan {previous_report.discovery_plan_id!r} over "
             f"{list(previous_report.atom_ids)} vs this pass's "
-            f"{plan.discovery_plan_id!r} over {list(plan.atom_ids)} — the carrier is "
-            "this capability's accumulated knowledge, so novelty stays measured "
-            "against it (canon 2.1.10) and the scope change is recorded rather than "
-            "left to be inferred from two reports"
+            f"{plan.discovery_plan_id!r} over {list(plan.atom_ids)} — this capability's "
+            "accumulated knowledge still carries, so novelty stays measured against it "
+            "(canon 2.1.10)"
         )
     return tuple(notes)
-
-
-def _history_is_a_recut_search(
-    previous_report: Optional[DiscoveryReport], plan: DiscoveryPlan
-) -> bool:
-    """Is this history the same capability searched over a different plan?
-
-    A plan is a search document, not the capability: it is re-cut between passes
-    (amended contracts, refocused scope), and the counters read candidate
-    identity, family and claimed atoms — all the capability's. So a differing
-    plan id or atom scope is disclosed rather than refused; refusing it would
-    refuse a verifiable history. A differing contract or revision is a different
-    comparison and is refused by ``_require_history_is_for_this_capability``.
-    """
-    if previous_report is None:
-        return False
-    return (
-        previous_report.discovery_plan_id != plan.discovery_plan_id
-        or tuple(previous_report.atom_ids) != tuple(plan.atom_ids)
-    )
 
 
 def _previous_knowledge_is_missing(
