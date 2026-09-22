@@ -73,8 +73,19 @@ evidence.  What changed is the truth contract:
   floor, proof↔resulting-state anchor binding, and durable re-proof under
   the floor persisted in the proof.  A long-lived repository whose
   post-lock refresh adopts a forged head must reject exactly what a fresh
-  restart rejects — typed :class:`JobCatalogCorrupt`, never a raw
-  ``KeyError``/``ValueError`` and never a silent adoption.
+  restart rejects —  typed :class:`JobCatalogCorrupt`, never a raw ``KeyError``/``ValueError``
+  and never a silent adoption.
+
+- **Failed-gate atomicity + validated public reads (I07R1I §4-§17)** — a
+  failed OUTER lock entry rolls back its OWN owner record and physical
+  lock before the original error escapes, so a rejected gate can never
+  leave behind state that makes the next same-thread call classify
+  itself as nested and skip validation (§4/§5); foreign/stale locks are
+  never auto-deleted (§6) and cleanup failure never replaces the
+  corruption diagnosis (§7).  The public ``get_job`` / ``list_transitions``
+  reads cross that SAME per-job gate, so durable-but-invalid state a
+  long-lived repository has just adopted from disk is never returned as
+  validated runtime truth (§13-§16).
 
 LOCAL filesystem truth only.  No network, no provider code, no I08
 recovery scanner, no quota, no DuckDB/Postgres (later checkpoints).
@@ -517,7 +528,27 @@ class DurableJobStateRepository:
     # -- reads ---------------------------------------------------------------
 
     def get_job(self, job_id: str) -> StorageJobState:
-        """Materialized current ``StorageJobState`` (frozen model)."""
+        """Materialized current ``StorageJobState`` (frozen model).
+
+        I07R1I §14: a PUBLIC read crosses the SAME per-job validation
+        boundary a write does.  The outermost job lock refreshes both
+        catalogs and re-proves the locked job's chain, so durable state a
+        long-lived repository has just adopted from disk is never returned
+        as validated runtime truth unless it satisfies the job contract —
+        a refresh-adopted forged head raises :class:`JobCatalogCorrupt`
+        here exactly as it would on restart.
+        """
+        with self._job_lock(job_id):
+            return self._get_job_unlocked(job_id)
+
+    def _get_job_unlocked(self, job_id: str) -> StorageJobState:
+        """Materialize the current state under an ALREADY-HELD job lock.
+
+        I07R1I §16/§17: internal callers that are inside a successfully
+        entered outer job lock read through this helper, so a nested read
+        neither re-refreshes nor re-validates.  It is never the entry point
+        of a public read (see :meth:`get_job`).
+        """
         birth = self._births.get(job_id)
         if birth is None:
             raise JobUnknown(f"job {job_id!r} has no durable birth record")
@@ -533,7 +564,18 @@ class DurableJobStateRepository:
         return self._births.list_ids()
 
     def list_transitions(self, job_id: str) -> list[StorageJobTransition]:
-        """Frozen ``StorageJobTransition`` records in chain order."""
+        """Frozen ``StorageJobTransition`` records in chain order.
+
+        I07R1I §15: gated exactly like :meth:`get_job` — an invalid
+        transition list must never become readable runtime truth.
+        """
+        with self._job_lock(job_id):
+            return self._list_transitions_unlocked(job_id)
+
+    def _list_transitions_unlocked(
+        self, job_id: str
+    ) -> list[StorageJobTransition]:
+        """Transition list under an ALREADY-HELD job lock (I07R1I §16)."""
         if not self._births.has(job_id):
             raise JobUnknown(f"job {job_id!r} has no durable birth record")
         events = self._job_events(job_id)
@@ -567,7 +609,7 @@ class DurableJobStateRepository:
                         f"job {job_id!r} already exists with different "
                         "identity semantics"
                     )
-                return self.get_job(job_id)
+                return self._get_job_unlocked(job_id)
             birth_state = _validated_state(
                 StorageJobState(
                     job_id=job_id,
@@ -608,7 +650,7 @@ class DurableJobStateRepository:
         require a nonempty ``reason``.
         """
         with self._job_lock(job_id):
-            current = self.get_job(job_id)
+            current = self._get_job_unlocked(job_id)
             if expected_from is not None and current.status is not expected_from:
                 raise JobTransitionConflict(
                     f"job {job_id!r} is {current.status.value}, caller "
@@ -670,7 +712,7 @@ class DurableJobStateRepository:
         refuse durable history.
         """
         with self._job_lock(job_id):
-            current = self.get_job(job_id)
+            current = self._get_job_unlocked(job_id)
             if current.status is StorageJobStatus.CHECKPOINT_ADVANCED:
                 # I07R1F §3-§4: detect an existing checkpoint FIRST.  The
                 # current-floor shape rules below must never run against
@@ -1439,6 +1481,13 @@ class _NestedFileLock:
     acquisition (I07R1 §30-§32) the durable catalogs are refreshed from
     disk BEFORE any state is read, so long-lived repositories and
     cross-process contenders always classify against current truth.
+
+    A failed OUTER entry is NOT a live reentrant context (I07R1I §4/§5):
+    when the post-acquisition refresh or chain validation raises, this
+    attempt rolls back its OWN owner record and physical lock before
+    re-raising.  Without that rollback a surviving owner record would make
+    the next same-thread call classify itself as nested and skip the very
+    gate that just failed.
     """
 
     def __init__(
@@ -1472,11 +1521,44 @@ class _NestedFileLock:
                 # I07R1H §12: after both refreshes, the LOCKED job's chain
                 # is re-proven through the shared authority before any
                 # runtime decision reads it.
-                self._repo._refresh_durable_truth(self._job_id)
+                # I07R1I §5: __exit__ never runs after a failed __enter__,
+                # so a gate that rejects the refreshed head must undo this
+                # attempt's ownership itself before the error escapes.
+                try:
+                    self._repo._refresh_durable_truth(self._job_id)
+                except BaseException:
+                    self._rollback_outer_entry()
+                    raise
         except BaseException:
             self._process_lock.release()
             raise
         return self
+
+    def _rollback_outer_entry(self) -> None:
+        """Undo THIS attempt's owner record and physical job lock (I07R1I).
+
+        Order (§5): owner entry first, then this attempt's lock handle and
+        lock file.  Both were installed under the process lock this thread
+        still holds, so the removal is exact — no other writer can have
+        replaced them in between.
+
+        Only what THIS attempt installed is undone (§6): when
+        ``_acquire_file_lock`` itself failed, no handle and no owner entry
+        were installed, so a pre-existing lock file survives untouched as
+        foreign/stale recovery evidence belonging to I08.
+
+        Cleanup failure never replaces the original diagnosis (§7): the
+        validation error stays authoritative and a lock that could not be
+        released simply remains recovery evidence.
+        """
+        self._repo._lock_owners.pop(self._job_id, None)
+        handle, self._handle = self._handle, None
+        if handle is None:
+            return
+        try:
+            self._repo._release_file_lock(handle, self._job_id)
+        except OSError:
+            pass
 
     def __exit__(self, *exc_info: Any) -> None:
         try:
