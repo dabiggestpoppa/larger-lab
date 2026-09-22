@@ -90,6 +90,11 @@ def assemble_discovery_report(
     already saw as ``previously_known_candidates``, so novelty stays measured
     against what was known (2.1.10). The judgement flags are the caller's
     declarations and are never inferred from the other pieces.
+
+    A caller holding only the previous report can carry its ``saturation_metrics``
+    but not the candidate records those counters measured — the artifact carries
+    ids, not records. That half is *disclosed* in ``coverage_notes`` rather than
+    left to inflate the novelty the stop law reads.
     """
     _require_baseline_matches_plan(baseline, plan)
 
@@ -150,7 +155,11 @@ def assemble_discovery_report(
         escalation_queue=tuple(ranking.queue),
         saturation_metrics=metrics,
         stop_recommendation=verdict,
-        coverage_notes=_coverage_notes(plan, baseline, ran),
+        coverage_notes=_coverage_notes(
+            plan, baseline, ran,
+            previous_metrics=previous_metrics,
+            previously_known_candidates=previously_known_candidates,
+        ),
         partial_search_notes=_partial_search_notes(ran),
         prefilter_decisions=tuple(ranking.prefilter_decisions),
         negative_findings=_negative_findings(ran, baseline),
@@ -295,6 +304,9 @@ def _coverage_notes(
     plan: DiscoveryPlan,
     baseline: InternalBaselineRecord,
     outcomes: Sequence[AdapterOutcome],
+    *,
+    previous_metrics: Optional[SaturationMetrics] = None,
+    previously_known_candidates: Sequence[CanonicalCandidate] = (),
 ) -> Tuple[str, ...]:
     notes: List[str] = [
         f"internal baseline {baseline.baseline_id}: coverage basis "
@@ -332,7 +344,37 @@ def _coverage_notes(
             "the internal baseline reports sufficient_without_discovery, yet external "
             "search ran (canon 2.6.7): the report records both rather than choosing"
         )
+    if _previous_knowledge_is_missing(previous_metrics, previously_known_candidates):
+        notes.append(
+            "counters carried forward from a previous pass without the candidates they "
+            "measured, so this pass's novelty is counted as if nothing were known before "
+            "and new_candidates/new_specifications/new_atoms_covered overstate it (canon "
+            "2.1.10: the terminal artifact carries the metrics, not the candidate "
+            "records, so pass the previously_known_candidates alongside them)"
+        )
     return tuple(notes)
+
+
+def _previous_knowledge_is_missing(
+    previous_metrics: Optional[SaturationMetrics],
+    previously_known_candidates: Sequence[CanonicalCandidate],
+) -> bool:
+    """Was a previous pass carried by its counters alone?
+
+    Only a real loss is disclosed: counters recording no candidate, atom or
+    specification carry no knowledge to measure against, so a first pass with an
+    empty history stays quiet. This is disclosed rather than refused because the
+    report is what a caller has to hand over — its counters travel, its candidate
+    records do not — so the metrics-only handoff is reachable by following the
+    artifact rather than by being careless.
+    """
+    if previous_metrics is None or previously_known_candidates:
+        return False
+    return bool(
+        previous_metrics.new_candidates
+        or previous_metrics.new_atoms_covered
+        or previous_metrics.new_specifications
+    )
 
 
 def _partial_search_notes(outcomes: Sequence[AdapterOutcome]) -> Tuple[str, ...]:

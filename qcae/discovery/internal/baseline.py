@@ -143,11 +143,17 @@ def _coverage_supports(classification, covered_atoms, missing_atoms) -> bool:
     by the covered/missing split alone. A category may not raise that answer
     above what coverage supports — a record that out-claims its coverage is how
     a fail-closed phase ends up suppressing the search it exists to perform.
+
+    Each gate here is the clause ``_verdict`` derives that classification from,
+    so a category can only ever restate the verdict instead of contradicting it:
+    partial satisfaction means *some* atom is covered and *some* is not, so a
+    fully covered record cannot report it alongside full satisfaction
+    (``SUFFICIENCY_VERDICTS``: exactly one of the three is the verdict).
     """
     if classification is InternalBaselineClassification.FULLY_SATISFIED_INTERNAL:
         return not missing_atoms
     if classification is InternalBaselineClassification.PARTIALLY_SATISFIED_INTERNAL:
-        return bool(covered_atoms)
+        return bool(covered_atoms) and bool(missing_atoms)
     if classification is InternalBaselineClassification.NO_INTERNAL_CAPABILITY_FOUND:
         return not covered_atoms
     return True

@@ -32,6 +32,7 @@ from qcae.core.receipts import ReceiptState
 from qcae.core.vocabulary import VerificationLevel
 from qcae.discovery.internal.baseline import (
     NON_DERIVABLE_CLASSIFICATIONS,
+    SUFFICIENCY_VERDICTS,
     InternalBaselineClassification as C,
     InternalBaselineRecord,
     InternalDiscoveryBaselineService,
@@ -556,6 +557,31 @@ class TestRealRegistryWiring:
         # The basis for the coverage claim is named, so the record is auditable
         # without re-reading the registry.
         assert record.internal_candidate_refs == ("rcpt-001",)
+
+    def test_the_sufficiency_findings_are_mutually_exclusive(self) -> None:
+        """One verdict means the others are not also reported.
+
+        ``SUFFICIENCY_VERDICTS`` documents that *exactly one* of the three is the
+        baseline's verdict (canon 2.6.1). This is the shape P1 stores most often
+        — contract + atoms + an active receipt, no candidate rows — where P1's
+        ``DEFINITION_WITHOUT_IMPLEMENTATION`` category maps to
+        ``PARTIALLY_SATISFIED_INTERNAL``. That mapping was emitted whenever any
+        coverage existed, so a fully covered record reported full and partial
+        satisfaction at once and a consumer could not tell which held.
+        """
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            receipts=(("rcpt-001", (ATOM_A, ATOM_B)),))
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.sufficiency_verdict is C.FULLY_SATISFIED_INTERNAL
+        assert record.missing_atoms == ()
+        assert SUFFICIENCY_VERDICTS & set(record.classifications) == {
+            C.FULLY_SATISFIED_INTERNAL
+        }
 
     def test_a_receipt_scoped_to_one_atom_covers_only_that_atom(self) -> None:
         """Coverage is bounded by the scope the receipt itself declares.

@@ -200,6 +200,39 @@ class TestNoClaimOutrunsItsEvidence:
             _run(leads=(), outcomes=(), baseline=_baseline(),
                  enough_non_dominated=True)
 
+    def test_a_counter_history_without_the_knowledge_it_measured_is_disclosed(self) -> None:
+        """The natural multi-pass handoff, and the one that inflates novelty.
+
+        A previous pass's counters are what the artifact carries
+        (``report.saturation_metrics``), so feeding them into the next pass is
+        the obvious handoff; the candidate records they were measured against are
+        not in that artifact. Carrying the counters without the candidates makes
+        the executed count cumulative while novelty is counted as if this were
+        the first pass, so the report publishes an inflated marginal novelty rate
+        — the very number the stop law reads (canon 2.1.10).
+        """
+        leads, outcomes = _two_adapter_run()
+        first, candidates, _r = _run(leads=leads, outcomes=outcomes)
+
+        honest, _c1, _r1 = _run(
+            leads=leads, outcomes=outcomes,
+            previous_metrics=first.saturation_metrics,
+            previously_known_candidates=candidates)
+        inflated, _c2, _r2 = _run(
+            leads=leads, outcomes=outcomes,
+            previous_metrics=first.saturation_metrics)
+
+        # The same repeat pass: honest novelty is zero, the half-carried one
+        # re-counts what the previous pass already covered.
+        assert (inflated.saturation_metrics.new_atoms_covered
+                > honest.saturation_metrics.new_atoms_covered)
+        assert (inflated.saturation_metrics.marginal_novelty_rate
+                > honest.saturation_metrics.marginal_novelty_rate)
+        assert any("previously_known_candidates" in note
+                   for note in inflated.coverage_notes)
+        assert not any("previously_known_candidates" in note
+                       for note in honest.coverage_notes)
+
     def test_a_family_deferral_the_report_does_not_contain_is_refused(self) -> None:
         """Already law-guarded by the artifact's own validation, not by this module.
 
