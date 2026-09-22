@@ -29,7 +29,7 @@ from dataclasses import dataclass
 from typing import Tuple
 
 from qcae.core.discovery.lead import CandidateKind
-from qcae.core.discovery.plan import SourceClass
+from qcae.core.discovery.vocabulary import SourceClass
 from qcae.core.errors import QcaeValidationError
 from qcae.core.serialization import SerializableRecord, coerce_enum, coerce_enum_tuple
 from qcae.core.validation import (

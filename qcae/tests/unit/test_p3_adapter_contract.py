@@ -32,11 +32,11 @@ from qcae.core.discovery import (
 from qcae.core.errors import QcaeValidationError
 from qcae.core.ports.discovery import (
     AdapterOutcome,
-    DiscoveryAdapterRegistry,
     DiscoveryQuery,
     DiscoverySourceAdapter,
     make_discovery_query,
 )
+from qcae.discovery.adapter_registry import DiscoveryAdapterRegistry
 
 ATOM = "atom-causal-ordering"
 
@@ -120,6 +120,25 @@ class FakeGitHubAdapter(DiscoverySourceAdapter):
 
     def close(self) -> None:
         self.closed = True
+
+
+class StatelessAdapter(DiscoverySourceAdapter):
+    """An adapter holding no provider resources: it declares no cleanup of its own.
+
+    It exists so the port's ``close`` contract is exercised by an adapter that
+    does not override it.
+    """
+
+    @property
+    def adapter_id(self) -> str:
+        return "adapter-stateless"
+
+    @property
+    def source_class(self) -> SourceClass:
+        return SourceClass.PACKAGE_ECOSYSTEM
+
+    def search(self, query: DiscoveryQuery) -> AdapterOutcome:
+        return self.unsupported(query)
 
 
 def minimal_plan():
@@ -372,3 +391,15 @@ class TestAdapterHelpersAndRegistry:
         registry.register(adapter)
         assert registry.close_all() == ["adapter-github"]
         assert adapter.closed is True
+
+    def test_a_stateless_adapter_closes_through_the_port_contract(self) -> None:
+        """Closure is part of the adapter contract, not a hook the registry probes.
+
+        The registry used to reach for ``close`` with ``getattr``, so an adapter
+        that declared no cleanup of its own was silently omitted from
+        ``close_all``. ``DiscoverySourceAdapter.close`` is now declared, so a
+        stateless adapter is released through its own interface like any other.
+        """
+        registry = DiscoveryAdapterRegistry()
+        registry.register(StatelessAdapter())
+        assert registry.close_all() == ["adapter-stateless"]

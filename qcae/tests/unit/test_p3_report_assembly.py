@@ -19,9 +19,9 @@ from qcae.core.discovery.lead import CandidateKind
 from qcae.core.discovery.plan import (
     ContractAmendmentProposal,
     HardPrefilter,
-    SourceClass,
 )
 from qcae.core.discovery.report import PrefilterDecision
+from qcae.core.discovery.vocabulary import SourceClass
 from qcae.core.errors import QcaeValidationError
 from qcae.core.ports.discovery import AdapterOutcome, AdapterStatus
 from qcae.core.vocabulary import EvidenceClass

@@ -23,9 +23,9 @@ from typing import Dict, Tuple
 from qcae.core.discovery.plan import (
     ContractAmendmentProposal,
     SaturationMetrics,
-    SourceClass,
     StopCondition,
 )
+from qcae.core.discovery.vocabulary import SourceClass
 from qcae.core.errors import QcaeValidationError
 from qcae.core.serialization import (
     SerializableRecord,

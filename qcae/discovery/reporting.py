@@ -39,8 +39,8 @@ from qcae.core.discovery.plan import (
     DiscoveryBudget,
     DiscoveryPlan,
     SaturationMetrics,
-    SourceClass,
 )
+from qcae.core.discovery.vocabulary import SourceClass
 from qcae.core.discovery.report import (
     DiscoveryReport,
     PrefilterDecision,

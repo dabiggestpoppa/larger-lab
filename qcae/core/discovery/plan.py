@@ -28,11 +28,17 @@ Boundaries this module deliberately does not cross:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import IntEnum, StrEnum
+from enum import StrEnum
 from typing import Optional, Tuple
 
+from qcae.core.discovery.vocabulary import CostTier, SourceClass
 from qcae.core.errors import QcaeValidationError
-from qcae.core.serialization import SerializableRecord, coerce_enum, coerce_enum_tuple
+from qcae.core.serialization import (
+    SerializableRecord,
+    coerce_enum,
+    coerce_enum_tuple,
+    coerce_int_enum,
+)
 from qcae.core.validation import (
     require_enum,
     require_enum_tuple,
@@ -49,7 +55,6 @@ __all__ = [
     "REQUIRED_STOP_CONDITIONS",
     "AmendmentProposalStatus",
     "ContractAmendmentProposal",
-    "CostTier",
     "DiscoveryBudget",
     "DiscoveryPlan",
     "DiversityRequirement",
@@ -60,29 +65,10 @@ __all__ = [
     "SearchHypothesis",
     "SearchHypothesisKind",
     "SourceAllocation",
-    "SourceClass",
     "StopCondition",
     "StopRule",
     "make_discovery_plan",
 ]
-
-
-class SourceClass(StrEnum):
-    """Discovery source classes (canon 2.1.5 source portfolio).
-
-    The portfolio is a set of classes, not a vendor list (Book V 15.1: folders
-    and classes reflect responsibility; ``github`` is an adapter beneath the
-    ``GITHUB_REPOSITORY_CODE`` class).
-    """
-
-    INTERNAL_REGISTRY_CODE = "INTERNAL_REGISTRY_CODE"
-    GITHUB_REPOSITORY_CODE = "GITHUB_REPOSITORY_CODE"
-    CURATED_SENSOR = "CURATED_SENSOR"
-    PACKAGE_ECOSYSTEM = "PACKAGE_ECOSYSTEM"
-    RESEARCH_LITERATURE = "RESEARCH_LITERATURE"
-    STANDARDS_SPECIFICATIONS = "STANDARDS_SPECIFICATIONS"
-    PROJECT_DOCUMENTATION = "PROJECT_DOCUMENTATION"
-    WEB_DISCOVERY = "WEB_DISCOVERY"
 
 
 class SearchHypothesisKind(StrEnum):
@@ -134,18 +120,6 @@ REQUIRED_STOP_CONDITIONS: frozenset = frozenset(
 )
 
 
-class CostTier(IntEnum):
-    """Progressive discovery cost tiers (canon 2.1.8)."""
-
-    TIER_0_MEMORY_LOOKUP = 0
-    TIER_1_METADATA_SNIPPETS = 1
-    TIER_2_DOCS_PACKAGE_METADATA = 2
-    TIER_3_SOURCE_TREE = 3
-    TIER_4_REPOSITORY_INTELLIGENCE = 4
-    TIER_5_CAPABILITY_FORENSICS = 5
-    TIER_6_PROVING_LAB = 6
-
-
 #: Block 2 controls tiers 0–3 and decides what merits Block 3/4 escalation
 #: (canon 2.1.8). A DiscoveryPlan whose ceiling is above tier 3 has silently
 #: absorbed repository intelligence or forensics work.
@@ -169,28 +143,6 @@ DIVERSITY_FAMILY_KINDS: frozenset = frozenset(
 SEMANTIC_FAMILY_KINDS: frozenset = frozenset(
     {QueryFamilyKind.BEHAVIORAL, QueryFamilyKind.DOMAIN_TERM}
 )
-
-
-def _coerce_cost_tier(value: object) -> object:
-    """Rebuild a CostTier from its serialized int (or name) form.
-
-    ``CostTier`` is an ``IntEnum``, so ``to_dict`` writes the integer and the
-    standard string-only coercion cannot restore it. Unknown values pass through
-    so ``validate()`` raises the domain error.
-    """
-    if isinstance(value, CostTier):
-        return value
-    if isinstance(value, int) and not isinstance(value, bool):
-        try:
-            return CostTier(value)
-        except ValueError:
-            return value
-    if isinstance(value, str):
-        try:
-            return CostTier[value]
-        except KeyError:
-            return value
-    return value
 
 
 @dataclass(frozen=True)
@@ -272,7 +224,7 @@ class SourceAllocation(SerializableRecord):
 
     _COERCIONS = {
         "source_class": lambda v: coerce_enum(v, SourceClass),
-        "max_tier": _coerce_cost_tier,
+        "max_tier": lambda v: coerce_int_enum(v, CostTier),
     }
 
     def validate(self) -> None:
@@ -561,7 +513,7 @@ class DiscoveryPlan(SerializableRecord):
         "security_data_constraints": tuple,
         "accepted_acquisition_forms": tuple,
         "known_prior_evaluation_ids": tuple,
-        "cost_tier_ceiling": _coerce_cost_tier,
+        "cost_tier_ceiling": lambda v: coerce_int_enum(v, CostTier),
     }
 
     _NESTED_RECORDS = {

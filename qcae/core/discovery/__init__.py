@@ -34,7 +34,6 @@ from qcae.core.discovery.plan import (
     REQUIRED_STOP_CONDITIONS,
     AmendmentProposalStatus,
     ContractAmendmentProposal,
-    CostTier,
     DiscoveryBudget,
     DiscoveryPlan,
     DiversityRequirement,
@@ -45,7 +44,6 @@ from qcae.core.discovery.plan import (
     SearchHypothesis,
     SearchHypothesisKind,
     SourceAllocation,
-    SourceClass,
     StopCondition,
     StopRule,
     make_discovery_plan,
@@ -57,6 +55,7 @@ from qcae.core.discovery.report import (
     Priority,
     StopRecommendation,
 )
+from qcae.core.discovery.vocabulary import CostTier, SourceClass
 
 __all__ = [
     "BLOCK_2_MAX_TIER",

@@ -256,3 +256,26 @@ def coerce_enum_tuple(value: Any, enum_cls: Type[Enum]) -> Any:
     if isinstance(value, (list, tuple)):
         return tuple(coerce_enum(item, enum_cls) for item in value)
     return value
+
+
+def coerce_int_enum(value: Any, enum_cls: Type[Enum]) -> Any:
+    """Coerce a serialized value back to an ``IntEnum`` member.
+
+    The single owner of this rule: an ``IntEnum`` serializes to its *integer*
+    value, so the string-only :func:`coerce_enum` cannot restore it. The name
+    form is accepted as well. Unknown values pass through untouched so the
+    record's own ``validate()`` raises the domain-level error with context.
+    """
+    if isinstance(value, enum_cls):
+        return value
+    if isinstance(value, int) and not isinstance(value, bool):
+        try:
+            return enum_cls(value)
+        except ValueError:
+            return value
+    if isinstance(value, str):
+        try:
+            return enum_cls[value]
+        except KeyError:
+            return value
+    return value

@@ -29,7 +29,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import Optional, Tuple
 
 from qcae.core.discovery.lead import (
     FAILURE_STATUSES,
@@ -38,9 +38,13 @@ from qcae.core.discovery.lead import (
     CandidateLead,
     QueryLineage,
 )
-from qcae.core.discovery.plan import CostTier, SourceClass
+from qcae.core.discovery.vocabulary import CostTier, SourceClass
 from qcae.core.errors import QcaeValidationError
-from qcae.core.serialization import SerializableRecord, coerce_enum
+from qcae.core.serialization import (
+    SerializableRecord,
+    coerce_enum,
+    coerce_int_enum,
+)
 from qcae.core.validation import (
     require_enum,
     require_identifier,
@@ -50,7 +54,6 @@ from qcae.core.validation import (
 
 __all__ = [
     "AdapterOutcome",
-    "DiscoveryAdapterRegistry",
     "DiscoveryQuery",
     "DiscoverySourceAdapter",
     "make_discovery_query",
@@ -80,7 +83,7 @@ class DiscoveryQuery(SerializableRecord):
 
     _COERCIONS = {
         "source_class": lambda v: coerce_enum(v, SourceClass),
-        "max_tier": lambda v: _coerce_tier(v),
+        "max_tier": lambda v: coerce_int_enum(v, CostTier),
     }
 
     def validate(self) -> None:
@@ -108,23 +111,6 @@ class DiscoveryQuery(SerializableRecord):
             source_class=self.source_class,
             adapter_id=adapter_id,
         )
-
-
-def _coerce_tier(value: object) -> object:
-    """Restore a CostTier from its serialized int/name form (see plan.py)."""
-    if isinstance(value, CostTier):
-        return value
-    if isinstance(value, int) and not isinstance(value, bool):
-        try:
-            return CostTier(value)
-        except ValueError:
-            return value
-    if isinstance(value, str):
-        try:
-            return CostTier[value]
-        except KeyError:
-            return value
-    return value
 
 
 @dataclass(frozen=True)
@@ -273,6 +259,16 @@ class DiscoverySourceAdapter(ABC):
     def search(self, query: DiscoveryQuery) -> AdapterOutcome:
         """Run one bounded normalized search and return a typed outcome."""
 
+    def close(self) -> None:
+        """Release provider resources; the default holds none.
+
+        Declared on the port so composition releases adapters through their own
+        interface instead of probing their internals: a ``getattr`` probe
+        silently skipped cleanup whenever an adapter's hook was named or shaped
+        differently, and nothing recorded that it had been skipped. An adapter
+        that does hold resources must override this and must not raise.
+        """
+
     # -- shared helpers: uniform standalone/failure reporting ---------------
 
     def not_configured(
@@ -320,67 +316,6 @@ class DiscoverySourceAdapter(ABC):
         )
         outcome.validate()
         return outcome
-
-
-class DiscoveryAdapterRegistry:
-    """Composition-wired map from source class to configured adapter (15.3).
-
-    A single adapter serves exactly one source class, and an unregistered class
-    is representable as missing rather than as an empty search: the planner must
-    be able to report a gap in coverage instead of reporting a finished search
-    (canon 2.2.15 "GitHub is not the universe", 2.1.13).
-    """
-
-    def __init__(self) -> None:
-        self._adapters: Dict[SourceClass, DiscoverySourceAdapter] = {}
-
-    def register(self, adapter: DiscoverySourceAdapter) -> None:
-        """Register an adapter, refusing silent replacement of an existing one."""
-        if not isinstance(adapter, DiscoverySourceAdapter):  # pragma: no cover - misuse guard
-            raise QcaeValidationError("only DiscoverySourceAdapter instances may be registered")
-        if adapter.source_class in self._adapters:
-            raise QcaeValidationError(
-                f"source class {adapter.source_class.value} already has adapter "
-                f"{self._adapters[adapter.source_class].adapter_id!r}; "
-                "replacing it must be an explicit composition decision"
-            )
-        if not adapter.adapter_id.strip():  # pragma: no cover - adapter contract
-            raise QcaeValidationError("adapter_id must be non-empty")
-        self._adapters[adapter.source_class] = adapter
-
-    def adapter_for(self, source_class: SourceClass) -> Optional[DiscoverySourceAdapter]:
-        """The adapter for a source class, or None when none is configured."""
-        return self._adapters.get(source_class)
-
-    def configured_source_classes(self) -> Tuple[SourceClass, ...]:
-        """Every source class with a configured adapter, in registration order."""
-        return tuple(self._adapters)
-
-    def missing_source_classes(self, plan) -> Tuple[SourceClass, ...]:
-        """Enabled plan source classes with no adapter — reported, never faked.
-
-        The planner uses this to emit coverage gaps (``NOT_CONFIGURED``) so that
-        an unconfigured surface is never mistaken for a capability absence.
-        """
-        return tuple(
-            source_class
-            for source_class in plan.enabled_source_classes()
-            if source_class not in self._adapters
-        )
-
-    def close_all(self) -> List[str]:
-        """Release every adapter that holds resources, returning their ids.
-
-        Adapters may implement ``close()``; anything else is a no-op. Kept here
-        so composition code never reaches into adapter internals.
-        """
-        closed: List[str] = []
-        for adapter in self._adapters.values():
-            close = getattr(adapter, "close", None)
-            if callable(close):
-                close()
-                closed.append(adapter.adapter_id)
-        return closed
 
 
 def make_discovery_query(**kwargs) -> DiscoveryQuery:
