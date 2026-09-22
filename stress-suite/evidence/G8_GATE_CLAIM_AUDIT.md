@@ -93,7 +93,7 @@ Each completed gate receipt is checked against the surface, SHA, count lineage, 
 | G7_SENSITIVITY_METAMORPH | 938 | 39 | None | - | arithmetic_not_declared_by_this_receipt | full_test_count |
 
 - declared lineage monotone: **True**  ·  arithmetic defects: **0**
-- terminal declared count **938** vs live collected **1000** -> matches: **False**
+- terminal declared count **938** vs live collected **1007** -> matches: **False**
 
 ## SHA-vocabulary handling
 
