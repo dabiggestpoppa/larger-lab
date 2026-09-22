@@ -64,7 +64,7 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Seque
 
 from .base import deterministic_hex
 from .g8_chronology import STAGES, ChronologyError, validate_chronology
-from .g8_test_evidence import TestEvidence, check_baseline
+from .g8_test_evidence import TestEvidence, check_baseline, verify_citation
 
 # --------------------------------------------------------------------------- #
 # Sealed-field discipline
@@ -1227,7 +1227,6 @@ def decide_gate(contract: Mapping[str, Any],
                 *, test_evidence: TestEvidence,
                 expected_tested_sha: str,
                 observations: Sequence[InstitutionalObservation] = (),
-                citation_check: Optional[Mapping[str, Any]] = None,
                 ) -> Dict[str, Any]:
     """Gate decision computed from the evidence, never asserted. BLOCKING items are
     architectural contradictions, guarded-property violations, gate-claim defects,
@@ -1247,10 +1246,16 @@ def decide_gate(contract: Mapping[str, Any],
     artifact. The previous call site passed `test_evidence.tested_sha` as its own
     expectation, which made the check unfalsifiable: a forged tree certified.
 
-    STRESS-G8ARCH2: a `citation_check` that does not verify BLOCKS the gate. A
-    citation whose bytes no longer hash to what the package publishes, or whose
-    recorded tree is not the tree the caller rests on, is stale evidence and may
-    not be counted as evidence at all.
+    STRESS-G8ARCH2: a citation that does not verify BLOCKS the gate. A citation
+    whose bytes no longer hash to what the package publishes, or whose recorded
+    tree is not the tree the caller rests on, is stale evidence and may not be
+    counted as evidence at all.
+
+    STRESS-G8ARCH4: that check is DERIVED here from the record and the bytes on
+    disk. It used to be an optional `citation_check` argument, which made it a check
+    a caller could omit -- and the CLI omitted it, so the gate passed on an
+    unverified citation. The record carries its own tree and `repo_root`, so there
+    is nothing left to supply: a check that cannot be omitted cannot be skipped.
     """
     policy = contract.get("blocks_gate_policy", {})
     hard = set(policy.get("blocking_classifications", ()))
@@ -1273,7 +1278,9 @@ def decide_gate(contract: Mapping[str, Any],
     gate_superseded = [f for f in gate_findings if f.superseded_by]
 
     baseline = check_baseline(test_evidence, tested_sha=expected_tested_sha)
-    citation = dict(citation_check) if citation_check else None
+    citation = verify_citation(test_evidence.to_dict(),
+                               repo_root=test_evidence.repo_root,
+                               expected_tested_sha=expected_tested_sha)
     mandate = mandate_coverage_flags(contract, families)
     coverage = guarded_derivation_coverage(contract, observations, guarded)
     unexercised = coverage["unexercised_required_properties"]
@@ -1291,7 +1298,7 @@ def decide_gate(contract: Mapping[str, Any],
         exit_label = "BLOCKED_G8_BASELINE_FAILURE"
         reasons.append("unverifiable test baseline: "
                        + "; ".join(baseline["problems"]))
-    if citation is not None and not citation.get("verified"):
+    if not citation.get("verified"):
         # 'no detected violation therefore verified' does not apply to a citation:
         # bytes that no longer match the published digest are stale evidence
         exit_label = "BLOCKED_G8_BASELINE_FAILURE"

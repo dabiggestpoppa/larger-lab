@@ -65,13 +65,28 @@ pytest --junitxml  -> evidence/G8_TEST_RESULTS.xml   declared once (engine/g8_te
                    -> read_test_evidence()           admits only that path, inside the tree
                    -> TestEvidence                   the sole carrier of one baseline
                    -> check_baseline()               the sole publishability policy
-                      |- emit()                      refuses to publish an unverified one
-                      `- decide_gate()               records it and blocks on it
+                   -> verify_citation()               re-derives the citation from the bytes on disk
+                      |- emit()                      refuses to publish an unverified baseline
+                      `- decide_gate()               derives both checks itself, blocks on either
 ```
 
 Consumers validate against the declaration rather than restating it: a second copy
 of a path, command, digest rule or publishability check is a defect, not a
 convenience.
+
+**No verification input may be absent, empty or favourable by default**
+(STRESS-G8ARCH4). The tree a package is archived for is required, with no default,
+at every entry point: `check_baseline(tested_sha="")` and
+`verify_citation(expected_tested_sha="")` refuse rather than skip their comparison
+or fall back to the citation's own recorded tree — a check that verifies the
+evidence against the evidence's self-report is the defect this gate exists to
+forbid. An underivable tree is reported as an unverifiable tree, not as the absence
+of a lag, and the gate derives its own citation check instead of accepting one,
+because a check a caller can omit is a check that does not run. The reader accepts
+no exit-status claim either: a JUnit document cannot show the producing process's
+exit code, so the refusal that claim drove is driven by the counts measured from
+the artifact, and the one honest partial case — a skipped test — is named in the
+receipt and in the result prose rather than smoothed into a count.
 
 The tested tree is DERIVED from Git — the newest commit that changed code or tests —
 by that one owner, so the emitter, the harness (`conftest`) and the audit entry

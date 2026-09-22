@@ -1637,10 +1637,17 @@ def _lagging_tested_tree(receipt_tree: str, derived_tree: str) -> str:
     """The one rule for 'the committed package no longer describes the code': empty
     when the package is current, otherwise the problem to report.
 
-    An environment that cannot derive the tree is NOT evidence of a lag -- the
-    publish path refuses that case separately (`require_clean`) -- so it returns "".
+    An UNDERIVABLE tree is not a current one (STRESS-G8ARCH4): it used to return ""
+    -- i.e. 'I could not check this' was reported as 'nothing to report', which is
+    the favourable reading of an unknown. The publish path already refused that
+    case (`require_clean`); this guard now refuses it too, instead of standing
+    aside for it.
     """
-    if not derived_tree or receipt_tree == derived_tree:
+    if not derived_tree:
+        return ("unverifiable tested tree: the code/test tree could not be derived, "
+                "so the committed package cannot be shown to describe this "
+                "checkout. A tree that cannot be derived is not a tree that matches.")
+    if receipt_tree == derived_tree:
         return ""
     return (f"lagging tested tree: the committed package names "
             f"{receipt_tree or 'NOTHING'} but the code/test tree is now "
@@ -1658,7 +1665,9 @@ def test_the_lag_rule_detects_a_lagging_tree_and_accepts_a_current_one():
     assert seeded.startswith("lagging tested tree")
     assert "0" * 40 in seeded and derived in seeded
     assert _lagging_tested_tree("", derived).startswith("lagging tested tree")
-    assert _lagging_tested_tree(derived, "") == ""
+    # a tree that cannot be derived is not a match, and it is not a silent pass
+    assert _lagging_tested_tree(derived, "").startswith("unverifiable tested tree")
+    assert _lagging_tested_tree("", "").startswith("unverifiable tested tree")
 
 
 def test_the_committed_package_names_the_derived_code_tree(pytestconfig):
@@ -1704,8 +1713,12 @@ def test_the_committed_citation_still_matches_the_bytes_it_cites(tmp_path):
     or regenerating one without the other, makes this refuse instead of passing."""
     import hashlib
     receipt, citation, staged = _staged_committed_pair(tmp_path)
+    # the tree rested on is the PACKAGE-level declaration, not the citation's own
+    # field: two independently written halves of the receipt must agree, and
+    # tree-against-code is the lag check's job (STRESS-G8ARCH4).
+    assert citation["tested_sha"] == receipt["tested_sha"]
     check = verify_citation(citation, repo_root=staged,
-                            expected_tested_sha=citation["tested_sha"])
+                            expected_tested_sha=receipt["tested_sha"])
     assert check["verified"], check["problems"]
     assert check["artifact_digest"] == citation["artifact_digest"]
     assert hashlib.sha256(
@@ -1764,13 +1777,15 @@ def test_a_citation_recorded_against_another_tree_blocks_the_gate(
     assert check["verified"] is False
     assert any("stale citation" in p for p in check["problems"])
 
+    # and the gate reaches the same refusal WITHOUT being handed one: resting on a
+    # different tree blocks for both reasons, because the baseline is bound
+    # elsewhere and the citation does not record the tree rested on
     families = package["families"]
     guarded = [g for fam in families for g in fam.guarded]
     decision = decide_gate(contract, families, guarded, [],
                            test_evidence=sealed_test_evidence,
-                           expected_tested_sha=sealed_test_evidence.tested_sha,
-                           observations=package["observations"],
-                           citation_check=check)
+                           expected_tested_sha=other,
+                           observations=package["observations"])
     assert decision["exit"] == "BLOCKED_G8_BASELINE_FAILURE"
     assert any("stale-citation" in r for r in decision["reasons"])
     assert decision["citation"]["verified"] is False
@@ -1784,15 +1799,63 @@ def test_a_verifying_citation_keeps_the_gate_passing(contract, package,
     check = verify_citation(citation, repo_root=sealed_test_evidence.repo_root,
                             expected_tested_sha=sealed_test_evidence.tested_sha)
     assert check["verified"] is True and check["problems"] == []
+    # the SAME call that proves the refusal above supplies no citation verdict at
+    # all, so the check that runs here is the one the gate derived itself
     families = package["families"]
     guarded = [g for fam in families for g in fam.guarded]
     decision = decide_gate(contract, families, guarded, [],
                            test_evidence=sealed_test_evidence,
                            expected_tested_sha=sealed_test_evidence.tested_sha,
-                           observations=package["observations"],
-                           citation_check=check)
+                           observations=package["observations"])
     assert decision["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
     assert decision["citation"]["verified"] is True
+
+
+def test_no_verification_input_can_be_omitted_or_left_empty(
+        contract, package, sealed_test_evidence, tmp_path):
+    """RED BEFORE REPAIR (STRESS-G8ARCH4). Each of these was a check a caller could
+    omit or satisfy with a favourable default while the gate still passed:
+
+      1. `citation_check` was an optional argument -- the CLI omitted it, so the
+         citation this package publishes was never verified at all. The parameter
+         no longer exists, which is the only form of 'cannot be omitted'.
+      2. `verify_citation(expected_tested_sha="")` fell back to the CITATION'S OWN
+         recorded tree: it verified the evidence against the evidence's self-report.
+      3. `check_baseline(tested_sha="")` SKIPPED the tree comparison, reading an
+         undeclared tree as 'any tree will do'.
+      4. A record whose citation cannot be resolved on disk could still be rested
+         on: the gate must block, not pass, on a citation it cannot re-derive.
+    """
+    # 1. nothing left to omit: no such parameter exists on either entry point
+    assert "citation_check" not in inspect.signature(decide_gate).parameters
+    assert "citation_check" not in inspect.signature(AUDIT.build_package).parameters
+
+    # 2. the tree is required with no default, and an empty one refuses
+    tree_param = inspect.signature(verify_citation).parameters["expected_tested_sha"]
+    assert tree_param.default is inspect.Parameter.empty
+    assert tree_param.kind is inspect.Parameter.KEYWORD_ONLY
+    unlabelled = verify_citation(sealed_test_evidence.to_dict(),
+                                 repo_root=sealed_test_evidence.repo_root,
+                                 expected_tested_sha="")
+    assert unlabelled["verified"] is False
+    assert any("self-report" in p for p in unlabelled["problems"])
+
+    # 3. an undeclared tree refuses the baseline instead of skipping the comparison
+    undeclared = check_baseline(sealed_test_evidence, tested_sha="")
+    assert undeclared["verified"] is False
+    assert any("no tree was declared" in p for p in undeclared["problems"])
+
+    # 4. a citation that cannot be re-derived from disk blocks the gate
+    orphaned = replace(sealed_test_evidence,
+                       repo_root=str(tmp_path / "tree-without-the-artifact"))
+    decision = decide_gate(contract, package["families"],
+                           [g for fam in package["families"] for g in fam.guarded],
+                           [], test_evidence=orphaned,
+                           expected_tested_sha=sealed_test_evidence.tested_sha,
+                           observations=package["observations"])
+    assert decision["exit"] == "BLOCKED_G8_BASELINE_FAILURE"
+    assert any("stale-citation" in r for r in decision["reasons"])
+    assert decision["citation"]["verified"] is False
 
 
 def test_emit_publishes_a_citation_check_it_re_derived(monkeypatch, tmp_path,

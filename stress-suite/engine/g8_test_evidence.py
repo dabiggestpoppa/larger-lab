@@ -97,6 +97,12 @@ ARTIFACT_COMMAND = (f"{AUTHORITATIVE_TEST_COMMAND} "
 _VOLATILE_JUNIT_ATTRIBUTES = ("time", "timestamp", "hostname")
 ARTIFACT_CANONICALIZATION_RULE = "JUNIT_XML_MINUS_TIME_TIMESTAMP_HOSTNAME"
 
+#: the declared rule a citation must satisfy, stated once so the reader, the
+#: verifier and the receipt cannot describe it differently (STRESS-G8ARCH4).
+CITATION_RULE = ("the cited path must resolve inside the declared tree and its "
+                 "on-disk raw and canonical digests must equal the published ones, "
+                 "and it must record the tree the caller declares")
+
 
 def _ordered(element: ET.Element) -> ET.Element:
     """Rebuild an element with its attributes in sorted order, so the canonical
@@ -147,7 +153,9 @@ class TestEvidence:
     failed: int
     skipped: int
     errors: int
-    exit_status: int
+    #: (test, recorded reason) for every skip, so a partial run is NAMED in the
+    #: record rather than smoothed into a bare `skipped` count (STRESS-G8ARCH4).
+    skipped_cases: tuple[tuple[str, str], ...] = ()
 
     @property
     def measured_full(self) -> int:
@@ -164,8 +172,7 @@ class TestEvidence:
     def honest_baseline(self) -> bool:
         """Only a clean, complete artifact certifies a baseline."""
         return (self.failed == 0 and self.errors == 0
-                and self.collected == self.passed + self.skipped
-                and self.exit_status == 0)
+                and self.collected == self.passed + self.skipped)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -189,7 +196,11 @@ class TestEvidence:
             "pytest_version": self.pytest_version,
             "collected": self.collected, "passed": self.passed,
             "failed": self.failed, "skipped": self.skipped,
-            "errors": self.errors, "exit_status": self.exit_status,
+            "errors": self.errors,
+            # no exit_status: it cannot be observed from a JUnit document, so
+            # publishing one could only publish a claim (STRESS-G8ARCH4)
+            "skipped_cases": [{"test": name, "reason": reason or "not recorded"}
+                              for name, reason in self.skipped_cases],
             "honest_baseline": self.honest_baseline,
         }
 
@@ -235,7 +246,6 @@ def read_test_evidence(
     command: str = AUTHORITATIVE_TEST_COMMAND,
     python_version: str = "",
     pytest_version: str = "",
-    exit_status: int = 0,
     expected_artifact_digest: Optional[str] = None,
     expected_artifact_bytes: Optional[int] = None,
 ) -> TestEvidence:
@@ -246,6 +256,16 @@ def read_test_evidence(
     produced against a different tree; documents whose bytes changed since the
     run; documents that lie OUTSIDE the declared tree (`repo_root`), which a
     reviewer could not obtain; and any document reporting failures or errors.
+
+    STRESS-G8ARCH4: this reader accepts no exit-status CLAIM. The producing
+    process's exit code cannot be observed from a JUnit document, so a
+    caller-supplied integer could only be a self-report -- and the old default of
+    0 read an unobserved outcome as a favourable one. The refusal it drove is
+    already driven by facts MEASURED from the artifact (`failed`, `errors`,
+    `collected == passed + skipped`), which is strictly stronger evidence, so the
+    record now publishes no exit status at all instead of an assumed success.
+    Skips are the one honest exception, so they are NAMED rather than counted:
+    `skipped_cases` carries each skipped test and its recorded reason.
 
     When `repo_root` is given, the returned record carries the artifact's
     repo-relative citation, which is the path the receipt publishes.
@@ -339,12 +359,19 @@ def read_test_evidence(
             "did not actually collect anything")
 
     collected = _int_attr(root, "tests", str(path))
-    passed = collected - sum(1 for c in cases if c.find("failure") is not None) \
-        - sum(1 for c in cases if c.find("error") is not None) \
-        - sum(1 for c in cases if c.find("skipped") is not None)
     failed = sum(1 for c in cases if c.find("failure") is not None)
     errors = sum(1 for c in cases if c.find("error") is not None)
-    skipped = sum(1 for c in cases if c.find("skipped") is not None)
+    skipped_nodes = [c for c in cases if c.find("skipped") is not None]
+    skipped = len(skipped_nodes)
+    skipped_cases: List[tuple[str, str]] = []
+    for node in skipped_nodes:
+        case_class = str(node.get("classname", ""))
+        case_name = str(node.get("name", "")) or "UNNAMED"
+        skipped_el = node.find("skipped")
+        reason = "" if skipped_el is None else str(skipped_el.get("message", ""))
+        skipped_cases.append(
+            (f"{case_class}::{case_name}" if case_class else case_name, reason))
+    passed = collected - failed - errors - skipped
 
     if failed or errors:
         raise UnverifiableTestEvidence(
@@ -354,10 +381,6 @@ def read_test_evidence(
         raise UnverifiableTestEvidence(
             f"malformed test artifact {path}: <testsuite tests={collected}> does "
             f"not match the {len(cases)} recorded <testcase> elements")
-    if exit_status != 0:
-        raise UnverifiableTestEvidence(
-            f"refusing to archive an unsuccessful baseline: authoritative "
-            f"command exit status {exit_status}")
 
     return TestEvidence(
         artifact_path=relative or str(path), artifact_digest=digest,
@@ -368,7 +391,7 @@ def read_test_evidence(
         command=command, suite_identity=suite_identity, tested_sha=expected_tested_sha,
         python_version=python_version, pytest_version=pytest_version,
         collected=collected, passed=passed, failed=failed, skipped=skipped,
-        errors=errors, exit_status=exit_status)
+        errors=errors, skipped_cases=tuple(skipped_cases))
 
 
 def check_baseline(test_evidence: TestEvidence, *, tested_sha: str) -> Dict[str, Any]:
@@ -393,9 +416,16 @@ def check_baseline(test_evidence: TestEvidence, *, tested_sha: str) -> Dict[str,
         problems.append(
             f"artifact reports collected={test_evidence.collected} "
             f"passed={test_evidence.passed} skipped={test_evidence.skipped} "
-            f"failed={test_evidence.failed} errors={test_evidence.errors} "
-            f"exit_status={test_evidence.exit_status}")
-    if tested_sha and test_evidence.tested_sha != tested_sha:
+            f"failed={test_evidence.failed} errors={test_evidence.errors}")
+    if not tested_sha:
+        # STRESS-G8ARCH4: an UNDECLARED tree used to skip the comparison below,
+        # which read an unknown tree as 'any tree will do'. UNKNOWN is not
+        # favourable: a package that names no tree is not verified, it is unbound.
+        problems.append(
+            "no tree was declared for this baseline: the caller must name the tree "
+            "the package is archived for, because a missing declaration cannot "
+            "stand in for evidence")
+    elif test_evidence.tested_sha != tested_sha:
         problems.append(
             f"artifact was produced against {test_evidence.tested_sha}, not "
             f"{tested_sha}")
@@ -413,7 +443,7 @@ def check_baseline(test_evidence: TestEvidence, *, tested_sha: str) -> Dict[str,
 
 
 def verify_citation(citation: Mapping[str, Any], *, repo_root: str | Path,
-                    expected_tested_sha: str = "") -> Dict[str, Any]:
+                    expected_tested_sha: str) -> Dict[str, Any]:
     """Re-derive a PUBLISHED citation from the bytes on disk.
 
     A package may not merely assert that its baseline is checkable. The citation a
@@ -427,10 +457,24 @@ def verify_citation(citation: Mapping[str, Any], *, repo_root: str | Path,
     `read_test_evidence` is reused for the path, scope and tree rules, so they are
     not restated here; `expected_tested_sha` is the tree the CALLER rests on, and a
     citation recorded against any other tree is refused rather than reconciled.
+
+    STRESS-G8ARCH4: `expected_tested_sha` is REQUIRED and may not be empty. It used
+    to default to "", on which the check silently fell back to the citation's own
+    recorded tree -- i.e. it verified the evidence against the evidence's own
+    self-report, the very defect this function exists to forbid. An omitted or
+    empty declaration now refuses instead of degrading to a weaker check.
     """
     problems: List[str] = []
     path = str(citation.get("artifact_path", ""))
     scope = str(citation.get("artifact_path_scope", ""))
+    if not expected_tested_sha:
+        problems.append(
+            "no tree was declared for this citation: it cannot be re-derived "
+            "against its own recorded tree, because that would trust the "
+            "evidence's self-report")
+        return {"verified": False, "problems": problems, "artifact_path": path,
+                "recorded_tested_sha": "",
+                "citation_rule": CITATION_RULE}
     if scope != "REPO_RELATIVE":
         problems.append(
             f"the citation is scoped {scope or 'UNKNOWN'!r}: a location outside "
@@ -438,16 +482,15 @@ def verify_citation(citation: Mapping[str, Any], *, repo_root: str | Path,
     if not path:
         problems.append("the citation names no artifact path")
         return {"verified": False, "problems": problems, "artifact_path": "",
-                "recorded_tested_sha": ""}
-    declared = expected_tested_sha or str(citation.get("tested_sha", ""))
+                "recorded_tested_sha": "", "citation_rule": CITATION_RULE}
     try:
         evidence = read_test_evidence(Path(repo_root) / path,
-                                      expected_tested_sha=declared,
+                                      expected_tested_sha=expected_tested_sha,
                                       repo_root=repo_root)
     except UnverifiableTestEvidence as exc:
         problems.append(f"stale citation: {exc}")
         return {"verified": False, "problems": problems, "artifact_path": path,
-                "recorded_tested_sha": ""}
+                "recorded_tested_sha": "", "citation_rule": CITATION_RULE}
     if evidence.artifact_digest != citation.get("artifact_digest"):
         problems.append(
             f"stale citation: the bytes at {path} hash to "
@@ -467,9 +510,7 @@ def verify_citation(citation: Mapping[str, Any], *, repo_root: str | Path,
             "recorded_tested_sha": evidence.tested_sha,
             "artifact_digest": evidence.artifact_digest,
             "artifact_canonical_digest": evidence.artifact_canonical_digest,
-            "citation_rule": ("the cited path must resolve inside the declared "
-                              "tree and its on-disk raw and canonical digests "
-                              "must equal the published ones")}
+            "citation_rule": CITATION_RULE}
 
 
 def junit_document(*, cases: int, name: str = "tests", tested_sha: str,

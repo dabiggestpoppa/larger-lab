@@ -40,7 +40,6 @@ from engine.g8_test_evidence import (  # noqa: E402
     TestEvidence,
     UnverifiableTestEvidence,
     check_baseline,
-    verify_citation,
 )
 #: the tested tree has ONE owner. This module publishes what that owner derives; it
 #: holds no Git access and no second derivation of its own (STRESS-G8ARCH3).
@@ -187,15 +186,13 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
         raise UnverifiableTestEvidence(
             "refusing to publish an unverified baseline: "
             + "; ".join(baseline["problems"]))
-    # the citation this package will publish, re-derived from the bytes on disk:
-    # the gate BLOCKS on a stale citation instead of counting it as evidence
-    citation_check = verify_citation(test_evidence.to_dict(),
-                                     repo_root=test_evidence.repo_root,
-                                     expected_tested_sha=TESTED_SHA)
+    # the citation this package publishes is re-derived from the bytes on disk
+    # INSIDE the gate (decision["citation"]), which BLOCKS on a stale one instead
+    # of counting it as evidence. It is not computed here: a check this module had
+    # to remember to perform was one a caller could omit (STRESS-G8ARCH4).
     measured_full = test_evidence.collected
     package = build_package(test_evidence=test_evidence,
-                            expected_tested_sha=TESTED_SHA,
-                            citation_check=citation_check)
+                            expected_tested_sha=TESTED_SHA)
     contract = package["contract"]
     families = package["families"]
     register = package["register"]
@@ -642,11 +639,19 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
         f"(artifact `{test_evidence.suite_identity}` "
         f"`{test_evidence.artifact_digest[:16]}`, python "
         f"`{test_evidence.python_version or 'unrecorded'}`)\n",
+        "".join(
+            f"- skipped {name!r}, and named here rather than smoothed over: "
+            f"{reason or 'no reason recorded'}\n"
+            for name, reason in test_evidence.skipped_cases),
         "- test provenance (revision R3, finding R-G8-07): the baseline is read "
         "from the JUnit artifact the authoritative command produced, never from a "
         "self-reported integer. The receipt records the artifact digest, the suite "
-        "identity, the tested tree, the command, the environment and the exit "
-        "status; a missing, malformed, stale or failing artifact refuses emission.\n\n",
+        "identity, the tested tree, the command and the environment; a missing, "
+        "malformed, stale or failing artifact refuses emission. No exit status is "
+        "published, because a JUnit document cannot show the producing process's "
+        "exit code -- a claim where an observation is impossible is not evidence, "
+        "and the refusal it drove is driven by the counts MEASURED from the "
+        "artifact instead (STRESS-G8ARCH4).\n\n",
         "## What was asked\n\n",
         "Not whether each scenario works, but whether EQUIVALENT institutional facts "
         "produce CONSISTENT phase, authority, evidence, lifecycle, recovery and "
