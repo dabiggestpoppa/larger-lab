@@ -33,7 +33,7 @@ START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
 #: the last code/test commit. The provisional first pass was tested at
 #: aae1e2e6; the repaired pass is tested at the commit below, and the receipt
 #: names the pre-repair head it corrects.
-TESTED_SHA = "24f6164a80083be7886dcf8e3844cff994be4fb1"
+TESTED_SHA = "8efa99e71da8b8fa351eebacccfb84bdaf6523d5"
 PRE_REPAIR_SHA = "6c015f86408a56721f8999e4aa39b218fab0fd4d"
 EVIDENCE_COMMIT_LABEL = "STRESS-G8RR"
 AUTHORITATIVE_TEST_COMMAND = (

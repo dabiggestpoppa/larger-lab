@@ -5,7 +5,7 @@
     "findings": "R-G8-01..R-G8-09",
     "pre_repair_head": "6c015f86408a56721f8999e4aa39b218fab0fd4d",
     "red_evidence": "stress-suite/evidence/G8_PRE_REPAIR_RED_TRANSCRIPT.md (regenerable: scenarios/g8_pre_repair_red_transcript.py)",
-    "repaired_head": "24f6164a80083be7886dcf8e3844cff994be4fb1",
+    "repaired_head": "8efa99e71da8b8fa351eebacccfb84bdaf6523d5",
     "verdict_scope": "the first G8 PASS was PROVISIONAL: it reported 20/20 mandated coverage while mandated pairs returned NOT_COMPARABLE, and several guarded properties passed on non-derivations. The repair makes the audit stricter; no scenario expectation and no A-004..A-012 text was changed."
   },
   "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
@@ -331,8 +331,8 @@
     }
   ],
   "test_evidence_artifact": {
-    "artifact_bytes": 127070,
-    "artifact_digest": "ae1febc41bad9acf188a3f651d255792fd96da03eff8546be55e4a7302ee7a32",
+    "artifact_bytes": 127069,
+    "artifact_digest": "c77b1158aec47092373ee37725eeac3d2030f0fb32103f2d73bbea514e4a8904",
     "artifact_path": "C:\\Users\\wifik\\AppData\\Local\\Temp\\g8art\\pytest.xml",
     "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q --junitxml=<artifact>",
     "collected": 1000,
@@ -345,9 +345,9 @@
     "python_version": "3.11.9",
     "skipped": 0,
     "suite_identity": "pytest",
-    "tested_sha": "24f6164a80083be7886dcf8e3844cff994be4fb1"
+    "tested_sha": "8efa99e71da8b8fa351eebacccfb84bdaf6523d5"
   },
-  "tested_sha": "24f6164a80083be7886dcf8e3844cff994be4fb1",
+  "tested_sha": "8efa99e71da8b8fa351eebacccfb84bdaf6523d5",
   "uncovered_mandated_pairs": [],
   "verdict": "PASS_G8_CROSS_SCENARIO_COHERENCE",
   "verdicts_by_verdict": {
