@@ -1,0 +1,154 @@
+{
+  "detected_and_recorded": [
+    "G4 declared tested surface is not an object in the repository",
+    "G6 historical receipt collapsed simulated authority transitions into NONE"
+  ],
+  "false_positives_refuted": [
+    "G2R TESTED_SHA_PRECEDES_EVIDENCE_COMMIT"
+  ],
+  "note": "every counterexample this audit produced, including the findings it later refuted and the contract revisions those findings forced. A refuted finding is kept: the audit is judged on what it can detect, not on a clean sheet.",
+  "post_revision_audit_state": {
+    "contract_digest": "71c9583c4ac74bd1bf7c97d3aca2394d",
+    "contract_version": "1.1.0",
+    "exit": "PASS_G8_CROSS_SCENARIO_COHERENCE",
+    "gate_counts": {
+      "blocking_count": 0,
+      "defect_count": 1,
+      "recorded_not_blocking_count": 1,
+      "superseded_count": 1
+    },
+    "reasons": [],
+    "register_counts": {
+      "RECEIPT_OR_CLAIM_DEFECT": 1,
+      "SUPERSEDED_BY_LATER_ARTIFACT": 1
+    }
+  },
+  "pre_revision_audit_state": {
+    "contract_version": "1.0.0",
+    "exit": "BLOCKED_G8_MISSING_EVIDENCE",
+    "gap_entries": [
+      {
+        "classification": "INSUFFICIENT_EVIDENCE",
+        "family_id": "F4",
+        "left": "G4:S10",
+        "reason": "UNDISCRIMINATED DIVERGENCE: the declared vector for this family is identically satisfied yet the outcome classes differ (REOPEN_ADMITTED vs NEGATIVE_KNOWLEDGE_RETAINED); with an equivalence_basis of PARTIAL the audit cannot establish whether the facts are equivalent",
+        "right": "G4:S11",
+        "severity": "HIGH"
+      },
+      {
+        "classification": "INSUFFICIENT_EVIDENCE",
+        "family_id": "F5",
+        "left": "G5:S14",
+        "reason": "UNDISCRIMINATED DIVERGENCE: the declared vector for this family is identically satisfied yet the outcome classes differ (DOMAIN_VALIDATION_REFUSED vs DOMAIN_CONTRADICTION_OPEN); with an equivalence_basis of PARTIAL the audit cannot establish whether the facts are equivalent",
+        "right": "G5:S16",
+        "severity": "HIGH"
+      }
+    ],
+    "gate_findings": [
+      {
+        "classification": "RECEIPT_OR_CLAIM_DEFECT",
+        "disposition": "REFUTED as a false positive: `ending_sha`/ `receipt_terminal_commit` declare a TERMINAL HEAD of record, not a tested surface. The audit had inferred a tested surface from a key that never claimed to be one (revision R2).",
+        "finding_id": "TESTED_SHA_PRECEDES_EVIDENCE_COMMIT",
+        "reason": "a receipt may not name its own containing commit as tested evidence (self-certification)",
+        "receipt": "G2R_EVIDENCE_RECEIPT.json",
+        "severity": "BLOCKING"
+      },
+      {
+        "classification": "INSUFFICIENT_EVIDENCE",
+        "disposition": "CONFIRMED and refined: the identifier really is not an object, and the abbreviation the same receipt declares (490e078d) resolves to exactly one commit whose subject matches the receipt's declared subject verbatim. Now recorded as RECEIPT_OR_CLAIM_DEFECT / MEDIUM.",
+        "finding_id": "TESTED_SHA_UNRESOLVABLE",
+        "reason": "the declared tested surface 490e078d1e2e6f1c31e88944de9cf2dcd99a4609 is absent from EVERY ref in the repository",
+        "receipt": "G4_EVIDENCE_RECEIPT.json",
+        "severity": "BLOCKING"
+      },
+      {
+        "classification": "RECEIPT_OR_CLAIM_DEFECT",
+        "disposition": "CONFIRMED and resolved by supersession: the later G6_TRUTH_CLOSURE_RECEIPT.json declares external=0, production=0 and measures scenario_internal_authority_events per scenario.",
+        "finding_id": "AUTHORITY_ACCOUNTING_VOCABULARY",
+        "reason": "receipt collapsed simulated scenario-internal authority transitions into 'NONE'",
+        "receipt": "G6_EVIDENCE_RECEIPT.json",
+        "severity": "MEDIUM"
+      }
+    ],
+    "reasons": [
+      "3 gate-claim defect(s)",
+      "2 evidence gap(s) where equivalence could not be established"
+    ],
+    "revision_record": {
+      "R1": "widened the F4/F5 derivations (reopen-target class; claim-scope ladder derived from each pack's declared claim_type). Both gaps were caused by a declared outcome-relevant field being DERIVED AS A CONSTANT, which is a defect of the audit's own equipment.",
+      "R2": "split the tested-surface key vocabulary from the terminal-head key vocabulary, added abbreviation resolution and the declared blocks_gate policy.",
+      "no_relaxation": "no verdict rule, token vocabulary, order invariant or outcome permissiveness rank was relaxed; the changes add derivations and reclassify findings."
+    }
+  },
+  "reclassified_pairs": [
+    {
+      "family_id": "F4",
+      "left": "G4:S10",
+      "post_revision": {
+        "classification": "",
+        "comparison_id": "aba2af36cf9dc5b0a42f",
+        "differing_fields": [
+          "reopen_target_class"
+        ],
+        "discriminator_ids": [
+          "D-REOPEN-TARGET"
+        ],
+        "family_id": "F4",
+        "governing_contract_refs": [
+          "A-009 \u00a79/\u00a711; G4 policy mem.reopen.*; Book \u00a717 blocker resolution"
+        ],
+        "left_id": "G4:S10",
+        "left_outcome_class": "REOPEN_ADMITTED",
+        "left_ref": "G4:S10",
+        "mandated": true,
+        "reason": "different outcomes are explained by declared material discriminators on verified derivations",
+        "right_id": "G4:S11",
+        "right_outcome_class": "NEGATIVE_KNOWLEDGE_RETAINED",
+        "right_ref": "G4:S11",
+        "severity": "",
+        "undeclared_fields": [],
+        "unverifiable_order_fields": [],
+        "verdict": "MATERIAL_DISCRIMINATOR"
+      },
+      "pre_revision": "INSUFFICIENT_EVIDENCE (undiscriminated divergence)",
+      "right": "G4:S11",
+      "why_the_change_is_not_a_pass_by_construction": "the two packs declare materially different reopen targets: S10 carries a dormant positive record whose FIELD_PREDICATE fires, S11 carries a rejected claim with an unresolved SENSOR_UNAVAILABLE blocker and a BLOCKER_RESOLVED condition. Book \u00a717 names blocker resolution as an outcome-relevant memory dimension, so the divergence is explained by a real difference, not excused by a new field."
+    },
+    {
+      "family_id": "F5",
+      "left": "G5:S14",
+      "post_revision": {
+        "classification": "",
+        "comparison_id": "6ef53f6a3ee21d952257",
+        "differing_fields": [
+          "claim_scope_class"
+        ],
+        "discriminator_ids": [
+          "D-SCOPE"
+        ],
+        "family_id": "F5",
+        "governing_contract_refs": [
+          "A-010 \u00a77 (scope ladder); S03/S04"
+        ],
+        "left_id": "G5:S14",
+        "left_outcome_class": "DOMAIN_VALIDATION_REFUSED",
+        "left_ref": "G5:S14",
+        "mandated": false,
+        "reason": "different outcomes are explained by declared material discriminators on verified derivations",
+        "right_id": "G5:S16",
+        "right_outcome_class": "DOMAIN_CONTRADICTION_OPEN",
+        "right_ref": "G5:S16",
+        "severity": "",
+        "undeclared_fields": [],
+        "unverifiable_order_fields": [],
+        "verdict": "MATERIAL_DISCRIMINATOR"
+      },
+      "pre_revision": "INSUFFICIENT_EVIDENCE (undiscriminated divergence)",
+      "right": "G5:S16",
+      "why_the_change_is_not_a_pass_by_construction": "the packs declare different claim types (ALPHA_CANDIDATE vs DOCTRINE_CLAIM), which map to different rungs of the declared scope ladder; the field had been derived as a CONSTANT, so a declared outcome-relevant field with a JUSTIFIES_DIVERGENCE rule was being ignored. The defect was in the audit's derivation."
+    }
+  ],
+  "register_id": "G8-COUNTEREXAMPLE-REGISTER-001",
+  "seeded_control_detected": true,
+  "seeded_control_note": "the intentionally inconsistent synthetic control is built on a COPY of the frozen contract and is proven to land in the register, so an empty register would be a hard failure rather than a clean result."
+}

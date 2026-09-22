@@ -28,7 +28,7 @@ from engine.g8_contradiction import (  # noqa: E402
 from scenarios.g8_run_audit import EVIDENCE, ROOT, build_package  # noqa: E402
 
 START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
-TESTED_SHA = "788b1e5920b67791b2553394f0cb77cb965df3c4"
+TESTED_SHA = "aae1e2e62022b7c37a21cdb4316de731584a3ac8"
 EVIDENCE_COMMIT_LABEL = "STRESS-G8R"
 AUTHORITATIVE_TEST_COMMAND = (
     "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q")

@@ -1,0 +1,104 @@
+{
+  "blocks_gate_policy": {
+    "blocking_classifications": [
+      "ARCHITECTURE_CONTRADICTION",
+      "AUTHORITY_AMBIGUITY",
+      "FIXTURE_DEFECT",
+      "IMPLEMENTATION_DEFECT"
+    ],
+    "blocking_when_unresolvable": [
+      "RECEIPT_OR_CLAIM_DEFECT",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "never_blocking_classifications": [
+      "NOT_EQUIVALENT",
+      "FUTURE_PLANNING_IMPACT",
+      "SUPERSEDED_BY_LATER_ARTIFACT"
+    ],
+    "note": "declared in revision R2 so the gate decision is a function of this contract, not of an ad-hoc judgement. A finding blocks the gate when it makes the claimed result unverifiable AS DECLARED. A finding does not block when the referent is unambiguously locatable from another declaration in the same receipt and the substantive result is independently reproducible; it is still recorded and still requires operator authority before ratification.",
+    "resolvable_narrowly": {
+      "INSUFFICIENT_EVIDENCE": "a comparison gap where the declared vector cannot establish equivalence blocks when severity is HIGH; a LOW-severity gap (differences that are only coarse proxies for the family) is recorded without blocking",
+      "RECEIPT_OR_CLAIM_DEFECT": "blocks unless the declared identifier resolves through an abbreviation the same receipt declares AND the resolved object's own subject matches the receipt's declared subject verbatim; then severity is capped at MEDIUM, blocks_gate=false, and the entry stays in the register with the resolution recorded"
+    }
+  },
+  "classification_vocabulary": [
+    "NOT_EQUIVALENT",
+    "IMPLEMENTATION_DEFECT",
+    "FIXTURE_DEFECT",
+    "RECEIPT_OR_CLAIM_DEFECT",
+    "ARCHITECTURE_CONTRADICTION",
+    "AUTHORITY_AMBIGUITY",
+    "INSUFFICIENT_EVIDENCE",
+    "FUTURE_PLANNING_IMPACT"
+  ],
+  "counts": {
+    "comparison_contradictions": 0,
+    "gate_findings_blocking": 0,
+    "gate_findings_recorded_not_blocking": 1,
+    "gate_findings_total": 65,
+    "guarded_property_violations": 0
+  },
+  "counts_by_classification": {
+    "RECEIPT_OR_CLAIM_DEFECT": 1,
+    "SUPERSEDED_BY_LATER_ARTIFACT": 1
+  },
+  "entries": [
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "RECEIPT_OR_CLAIM_DEFECT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "e936c1f1a95bc255f02f",
+      "family_id": "F7",
+      "governing_contract_refs": [
+        "G8 \u00a77 cross-gate claims"
+      ],
+      "kind": "GATE_CLAIM_FINDING",
+      "left": "stress-suite/evidence/G4_EVIDENCE_RECEIPT.json",
+      "preserved_evidence": {
+        "candidate_count": 1,
+        "declaration": "artifacts_head_sha",
+        "declared_sha": "490e078d1e2e6f1c31e88944de9cf2dcd99a4609",
+        "declared_subject": "STRESS-G4X: adversarial cross-scenario and metamorphic regression suite (66 tests)",
+        "declared_subject_matches": true,
+        "prefix": "490e078d",
+        "resolved_candidate": "490e078d2b5c4360ca71f062e3736b7555c9f627",
+        "resolved_subject": "STRESS-G4X: adversarial cross-scenario and metamorphic regression suite (66 tests)"
+      },
+      "reason": "the receipt declares the full-length identifier 490e078d1e2e6f1c31e88944de9cf2dcd99a4609, which is not an object in this repository. Its own abbreviation 490e078d resolves to exactly one commit, 490e078d2b5c4360ca71f062e3736b7555c9f627, whose recorded subject is 'STRESS-G4X: adversarial cross-scenario and metamorphic regression suite (66 tests)' and matches the receipt's declared subject verbatim, so the substantive result is locatable and reproducible. The declared identifier is a transcription defect in a historical receipt; G8 records it and does not rewrite the receipt \u00a711.",
+      "required_next_authority": "operator/architecture review",
+      "right": "",
+      "severity": "MEDIUM",
+      "superseded_by": "",
+      "supersession_detail": "",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "SUPERSEDED_BY_LATER_ARTIFACT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "4f8dfba3523b46a4c211",
+      "family_id": "F7",
+      "governing_contract_refs": [
+        "G6-TC09 authority-mutation accounting"
+      ],
+      "kind": "GATE_CLAIM_FINDING_SUPERSEDED",
+      "left": "stress-suite/evidence/G6_EVIDENCE_RECEIPT.json",
+      "preserved_evidence": {},
+      "reason": "receipt collapsed simulated scenario-internal authority transitions into 'NONE' | superseded by G6_TRUTH_CLOSURE_RECEIPT.json which declares: CONFIRMED -> external=0, production=0, scenario_internal_authority_events measured per scenario",
+      "required_next_authority": "none \u2014 corrected by a later recorded artifact",
+      "right": "",
+      "severity": "MEDIUM",
+      "superseded_by": "G6_TRUTH_CLOSURE_RECEIPT.json",
+      "supersession_detail": "CONFIRMED -> external=0, production=0, scenario_internal_authority_events measured per scenario",
+      "undeclared_fields": []
+    }
+  ],
+  "gate_exit": "PASS_G8_CROSS_SCENARIO_COHERENCE",
+  "note": "an entry with classification NOT_EQUIVALENT or FUTURE_PLANNING_IMPACT is not an institutional contradiction; every other class requires authority review before ratification",
+  "open_entries": 2,
+  "register_id": "G8-CONTRADICTION-REGISTER-001"
+}
