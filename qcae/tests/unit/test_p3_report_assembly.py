@@ -41,7 +41,10 @@ from qcae.core.vocabulary import EvidenceClass
 from qcae.discovery.planning.canonical import merge_leads
 from qcae.discovery.planning.prefilter import apply_hard_prefilter
 from qcae.discovery.planning.ranking import rank_candidates
-from qcae.discovery.reporting import assemble_discovery_report
+from qcae.discovery.reporting import (
+    assert_external_execution_authorized,
+    assemble_discovery_report,
+)
 from qcae.tests.unit.test_p3_internal_baseline import (
     ATOM_A,
     ATOM_B,
@@ -74,14 +77,21 @@ def _fresh_execution_ordinals():
 
 
 def _baseline(**overrides):
-    """A real baseline record from the baseline service, not a hand-built one."""
+    """A real baseline record from the baseline service, not a hand-built one.
+
+    The default is the standard externally-searching state: the registry holds
+    no internal capability for the requested atoms (canon 2.6.1
+    NO_INTERNAL_CAPABILITY_FOUND), so every requested atom is an external
+    target. Tests that need internal coverage pass explicit evidence — a
+    baseline covering an atom is inconsistent with externally searching it
+    (P3-R4C2), so coverage is never the silent default here.
+    """
     atom_ids = overrides.pop("atom_ids", [ATOM_A, ATOM_B])
-    evidence = overrides.pop(
-        "evidence", {atom_id: ["cand-internal-1"] for atom_id in atom_ids})
+    evidence = overrides.pop("evidence", {})
     registry = FakeRegistryQuery(
-        categories=overrides.pop("categories", ["CAPABILITY_ACTIVE"]),
+        categories=overrides.pop("categories", ["NO_INTERNAL_KNOWLEDGE"]),
         atom_ids=atom_ids,
-        candidate_refs=overrides.pop("candidate_refs", ["cand-internal-1"]),
+        candidate_refs=overrides.pop("candidate_refs", []),
         detail=overrides.pop("detail", None),
         reuse=overrides.pop("reuse", None),
         evidence=evidence,
@@ -263,6 +273,72 @@ def _two_adapter_run(plan=None):
                  adapter_id="adapter-arxiv", leads=(paper,), plan=plan),
     ]
     return [github, registry, paper], outcomes
+
+
+class TestScopeTruth:
+    """P3-R4C2 — the report's external scope is the baseline's, not the plan's."""
+
+    def test_the_report_separates_requested_covered_target_and_executed(self) -> None:
+        """Narrowed baseline preserves requested and external target separately."""
+        leads = [lead("lead-gh-1", "github:owner/lib")]
+        outcomes = [_outcome("q-1", leads=leads)]
+        narrowed = _baseline(atom_ids=[ATOM_A, ATOM_B],
+                             evidence={ATOM_A: ["cand-internal-1"]})
+        report, _c, _r = _run(leads=leads, outcomes=outcomes, baseline=narrowed)
+        assert report.requested_atom_ids == (ATOM_A, ATOM_B)
+        assert report.internally_covered_atom_ids == (ATOM_A,)
+        assert report.external_target_atom_ids == (ATOM_B,)
+        assert report.actually_executed_atom_ids == (ATOM_A,)  # what actually ran
+        assert report.external_scope_atoms == (ATOM_B,)  # not the requested set
+
+    def test_a_fully_satisfied_baseline_owns_the_empty_external_scope(self) -> None:
+        report, _, _ = _run(leads=(), outcomes=(),
+                            baseline=_baseline(
+                                evidence={ATOM_A: ["c-a"], ATOM_B: ["c-b"]}))
+        assert report.external_scope_atoms == ()
+        assert report.actually_executed_atom_ids == ()
+
+    def test_external_queries_for_a_covered_atom_are_refused_at_the_gate(self) -> None:
+        """A covered atom cannot be externally re-searched (2.6.8)."""
+        covered = _baseline(atom_ids=[ATOM_A, ATOM_B],
+                            evidence={ATOM_A: ["c-a"]})
+        with pytest.raises(QcaeValidationError, match="already covers"):
+            assert_external_execution_authorized(covered, [ATOM_A])
+        # The uncovered remainder is still authorized.
+        assert_external_execution_authorized(covered, [ATOM_B])
+
+    def test_a_fully_satisfied_baseline_blocks_external_execution_at_the_gate(self) -> None:
+        """Blocking happens before the adapter call, not in the report after it."""
+        satisfied = _baseline(evidence={ATOM_A: ["c-a"], ATOM_B: ["c-b"]})
+        with pytest.raises(QcaeValidationError, match="blocks external execution"):
+            assert_external_execution_authorized(satisfied, [ATOM_A, ATOM_B])
+
+    def test_an_out_of_plan_atom_mention_cannot_inflate_novelty(self) -> None:
+        """A provider may mention an out-of-scope atom; it cannot earn coverage."""
+        # A proper lead for the query's atom whose provider text claims an atom
+        # this plan never requested — the mention rides on legitimate evidence.
+        leads = [lead("lead-gh-1", "github:owner/lib",
+                      atoms=(ATOM_A, "atom-elsewhere"),
+                      claims=(ATOM_A, "atom-elsewhere"))]
+        outcomes = [_outcome("q-1", results=1, leads=leads)]
+        report, _c, _r = _run(leads=leads, outcomes=outcomes)
+        assert report.saturation_metrics.new_atoms_covered == 1
+
+    def test_negligible_novelty_cannot_fire_on_out_of_scope_novelty_alone(self) -> None:
+        """A pass whose only claimed atom is out of scope earns no coverage: the
+        rate the stop law reads stays scoped truth."""
+        # The lead rides a planned query (its lineage anchor is the query's atom)
+        # but the provider only ever named an out-of-scope atom.
+        leads = [lead("lead-gh-1", "github:owner/lib",
+                      atoms=("atom-elsewhere",), claims=("atom-elsewhere",),
+                      query_lineage=QueryLineage(
+                          atom_id=ATOM_A, semantic_concept="causal ordering",
+                          family_id="fam-behavioral", concrete_query="causal ordering",
+                          source_class=SourceClass.GITHUB_REPOSITORY_CODE,
+                          adapter_id="adapter-github"))]
+        outcomes = [_outcome("q-1", results=1, leads=leads)]
+        report, _c, _r = _run(leads=leads, outcomes=outcomes)
+        assert report.saturation_metrics.new_atoms_covered == 0
 
 
 class TestNoClaimOutrunsItsEvidence:
@@ -580,8 +656,10 @@ class TestTheArtifactIsItsOwnHandoff:
         """
         leads, outcomes = _two_adapter_run()
         narrow = _narrow_plan()
-        narrow_baseline = _baseline(plan=narrow, atom_ids=[ATOM_A],
-                                    evidence={ATOM_A: ["cand-internal-1"]})
+        # The narrow pass's baseline: no internal capability for ATOM_A, so the
+        # atom is an external target — a covered atom could not be externally
+        # searched at all (P3-R4C2).
+        narrow_baseline = _baseline(plan=narrow, atom_ids=[ATOM_A])
         first, _c, _r = _run(leads=leads[:1], outcomes=outcomes[:1],
                              plan=narrow, baseline=narrow_baseline)
         assert first.saturation_metrics.new_atoms_covered == 1  # atom A only

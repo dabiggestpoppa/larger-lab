@@ -288,11 +288,12 @@ class StopRecommendation(SerializableRecord):
 class DiscoveryReport(SerializableRecord):
     """Block 2 terminal artifact (canon 2.7.15)."""
 
-    #: Bumped when the persisted shape gained ``known_candidates``: the reader
-    #: refuses an older payload with a version error rather than a missing-field
-    #: one, so an artifact predating the change is distinguishable from a
-    #: corrupted one.
-    SCHEMA_VERSION = 2
+    #: Bumped when the persisted shape gained the scope quadruple
+    #: (``requested_/internally_covered_/external_target_/actually_executed_atom_ids``):
+    #: the reader refuses an older payload with a version error rather than a
+    #: missing-field one, so an artifact predating the change is distinguishable
+    #: from a corrupted one.
+    SCHEMA_VERSION = 3
 
     report_id: str
     discovery_plan_id: str
@@ -307,6 +308,17 @@ class DiscoveryReport(SerializableRecord):
     escalation_queue: Tuple[EscalationEntry, ...]
     saturation_metrics: SaturationMetrics
     stop_recommendation: StopRecommendation
+    #: The scope quadruple (P3-R4C2). ``atom_ids`` states the plan's requested
+    #: scope; the four fields below separate what was requested from what the
+    #: internal baseline already covers, what the baseline authorizes for
+    #: external search, and what external search actually executed — because
+    #: internal reuse narrows external discovery, and a report that named the
+    #: requested set as its external scope would claim searches it never
+    #: needed to run (canon 2.6.8).
+    requested_atom_ids: Tuple[str, ...] = ()
+    internally_covered_atom_ids: Tuple[str, ...] = ()
+    external_target_atom_ids: Tuple[str, ...] = ()
+    actually_executed_atom_ids: Tuple[str, ...] = ()
     #: Every canonical candidate known as of this pass — 2.7.15's canonical
     #: candidate set, accumulated across passes because 2.1.10 measures novelty
     #: against everything already known. This is the field a later pass reads to
@@ -324,6 +336,10 @@ class DiscoveryReport(SerializableRecord):
 
     _COERCIONS = {
         "atom_ids": tuple,
+        "requested_atom_ids": tuple,
+        "internally_covered_atom_ids": tuple,
+        "external_target_atom_ids": tuple,
+        "actually_executed_atom_ids": tuple,
         "sources_searched": lambda v: coerce_enum_tuple(v, SourceClass),
         "query_families_executed": tuple,
         "canonical_candidate_ids": tuple,
@@ -354,6 +370,41 @@ class DiscoveryReport(SerializableRecord):
         require_str_list(self.atom_ids, "atom_ids")
         if not self.atom_ids:
             raise QcaeValidationError("a discovery report must state its atom scope")
+        # The scope quadruple must state one coherent scope (canon 2.6.8):
+        # requested matches the stated scope, coverage stays inside it, the
+        # external target is exactly the uncovered remainder, and execution
+        # never left the requested scope.
+        if tuple(self.requested_atom_ids) != tuple(self.atom_ids):
+            raise QcaeValidationError(
+                f"requested_atom_ids {list(self.requested_atom_ids)} must equal the "
+                f"report's atom scope {list(self.atom_ids)} (P3-R4C2)"
+            )
+        for name in ("internally_covered_atom_ids", "external_target_atom_ids",
+                     "actually_executed_atom_ids"):
+            require_no_duplicates(getattr(self, name), name)
+        outside = sorted(
+            set(self.internally_covered_atom_ids) - set(self.requested_atom_ids))
+        if outside:
+            raise QcaeValidationError(
+                f"internally_covered_atom_ids outside the requested scope: {outside}"
+            )
+        expected_targets = tuple(
+            a for a in self.requested_atom_ids
+            if a not in set(self.internally_covered_atom_ids)
+        )
+        if tuple(self.external_target_atom_ids) != expected_targets:
+            raise QcaeValidationError(
+                f"external_target_atom_ids must be the requested atoms minus the "
+                f"internally covered ones (canon 2.6.8): expected {list(expected_targets)}, "
+                f"got {list(self.external_target_atom_ids)}"
+            )
+        executed_outside = sorted(
+            set(self.actually_executed_atom_ids) - set(self.requested_atom_ids))
+        if executed_outside:
+            raise QcaeValidationError(
+                f"actually_executed_atom_ids outside the requested scope: "
+                f"{executed_outside}"
+            )
         require_str_list(self.query_families_executed, "query_families_executed")
         require_enum_tuple(self.sources_searched, SourceClass, "sources_searched")
         require_str_list(self.coverage_notes, "coverage_notes")
@@ -431,12 +482,14 @@ class DiscoveryReport(SerializableRecord):
 
     @property
     def external_scope_atoms(self) -> Tuple[str, ...]:
-        """Atoms this report is still searching for (canon 2.6.8 partial reuse).
+        """The baseline-authorized external target scope (canon 2.6.8).
 
-        The narrowing law lives with the internal baseline; the report simply
-        states the scope it actually searched, which is what Block 3 receives.
+        Internal reuse narrows the external request, so the scope Block 3
+        receives is what the baseline authorized for external search — not the
+        requested set, which would claim a wider search than the baseline
+        required (P3-R4C2).
         """
-        return tuple(self.atom_ids)
+        return tuple(self.external_target_atom_ids)
 
     @property
     def rejected_candidate_ids(self) -> Tuple[str, ...]:

@@ -47,6 +47,7 @@ def update_saturation(
     previous_candidate_ids: Iterable[str] = (),
     previous_family_ids: Iterable[str] = (),
     previous_covered_atoms: Iterable[str] = (),
+    novel_atom_scope: Iterable[str] = (),
     saturated: bool = False,
     saturation_reason: str = "",
 ) -> SaturationMetrics:
@@ -55,10 +56,16 @@ def update_saturation(
     Only searches that actually ran advance the counters (a rate-limited or
     unauthenticated adapter contributes failure information, not coverage), and
     novelty is measured against what was already known.
+
+    ``novel_atom_scope`` is this plan's authorized external scope (P3-R4C2): a
+    candidate that claims an atom outside it is an observation about another
+    plan's scope — a provider may mention it, but it cannot increase
+    ``new_atoms_covered`` or satisfy this plan.
     """
     known_candidates = set(previous_candidate_ids)
     known_families = set(previous_family_ids)
     known_atoms = set(previous_covered_atoms)
+    in_scope = set(novel_atom_scope)
 
     new_candidates = 0
     new_families: set = set()
@@ -81,7 +88,14 @@ def update_saturation(
             CandidateKind.PAPER,
         ):
             new_specifications += 1
-        new_atoms.update(set(candidate.claims_atoms) - known_atoms)
+        # P3-R4C2: only atoms inside the plan's authorized external scope can
+        # become newly covered here — an out-of-scope mention is not this
+        # plan's evidence. Callers that pass no scope keep the unscoped
+        # accounting (the assembler always passes the baseline-authorized one).
+        claimed = set(candidate.claims_atoms)
+        if in_scope:
+            claimed &= in_scope
+        new_atoms.update(claimed - known_atoms)
 
     inspected = 0
     failure_information = 0

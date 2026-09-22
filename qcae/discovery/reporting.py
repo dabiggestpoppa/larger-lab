@@ -70,12 +70,46 @@ from qcae.discovery.planning.saturation import (
     update_saturation,
 )
 
-__all__ = ["assemble_discovery_report"]
+__all__ = [
+    "assemble_discovery_report",
+    "assert_external_execution_authorized",
+]
+
+
+def assert_external_execution_authorized(baseline, atom_ids) -> None:
+    """The pre-adapter-call egress gate (canon 2.6.5/2.6.8; P3-R4C2).
+
+    A runner calls this BEFORE issuing any external query: a fully satisfied
+    internal baseline assigns no atom to external search, so no external query
+    may run for that plan at all, and a partially satisfied baseline narrows
+    the external request to its uncovered atoms — re-searching an internally
+    covered atom externally is wasted burden the baseline already foreclosed.
+    Blocking here is fail-closed egress authority; the report, by contrast,
+    can only tell the truth about what already ran.
+    """
+    requested = tuple(atom_ids)
+    if not requested:
+        return
+    if not baseline.external_target_atoms:
+        raise QcaeValidationError(
+            f"the internal baseline assigns no atom to external search, so external "
+            f"queries for {list(requested)} are unauthorized (canon 2.6.5/2.6.8: a "
+            "fully satisfied baseline blocks external execution before the adapter "
+            "call)"
+        )
+    covered = set(baseline.covered_atoms)
+    unauthorized = tuple(sorted(set(requested) & covered))
+    if unauthorized:
+        raise QcaeValidationError(
+            f"the internal baseline already covers {list(unauthorized)}: external "
+            "queries for internally covered atom(s) are unauthorized (canon 2.6.8 "
+            "partial reuse narrows the external request to the uncovered atoms)"
+        )
 
 
 def _require_outcomes_bound_to_plan(
     outcomes: Sequence[AdapterOutcome], plan: DiscoveryPlan
-) -> Tuple[ExecutedDiscoveryQuery, ...]:
+) -> Tuple[Tuple[ExecutedDiscoveryQuery, ...], set]:
     """Every outcome binds to exactly one executed query of *this* plan (canon
     2.1.4/2.1.17 invariant 4).
 
@@ -100,6 +134,7 @@ def _require_outcomes_bound_to_plan(
     planned_query_ids = set(plan.query_ids)
     bound: List[ExecutedDiscoveryQuery] = []
     seen_query_ids: set = set()
+    executed_atoms: set = set()
     for outcome in outcomes:
         record = outcome.execution_record
         if record is None:
@@ -198,8 +233,13 @@ def _require_outcomes_bound_to_plan(
                         f"with the execution record of query {record.query_id!r} "
                         f"({expected!r}); a lead belongs to the query that found it"
                     )
+        # The executed scope is the *external* execution footprint: the registry
+        # class is the internal side (canon 2.6), whose coverage the baseline
+        # already states, so only non-internal queries narrow or extend it.
+        if record.source_class is not SourceClass.INTERNAL_REGISTRY_CODE:
+            executed_atoms.add(record.atom_id)
         bound.append(record)
-    return tuple(bound)
+    return tuple(bound), executed_atoms
 
 
 
@@ -259,7 +299,8 @@ def assemble_discovery_report(
     for outcome in ran:
         outcome.validate()
     _require_sources_allocated(ran, plan)
-    _require_outcomes_bound_to_plan(ran, plan)
+    _bound_records, executed_atom_set = _require_outcomes_bound_to_plan(ran, plan)
+    executed_scope = tuple(sorted(executed_atom_set))
 
     # The ranking piece is the authority on canonical identity; the outcomes are
     # checked against it so a discovered path cannot vanish between the two.
@@ -288,8 +329,12 @@ def assemble_discovery_report(
             family_identity_for(c) for c in previously_known_candidates
         ],
         previous_covered_atoms=[
-            atom for c in previously_known_candidates for atom in c.claims_atoms
+            *baseline.covered_atoms,
+            *(atom for c in previously_known_candidates for atom in c.claims_atoms),
         ],
+        # P3-R4C2: novelty only accrues inside the baseline-authorized external
+        # scope — an out-of-scope mention is not this plan's evidence.
+        novel_atom_scope=tuple(baseline.external_target_atoms),
         saturated=saturated,
         saturation_reason=saturation_reason,
     )
@@ -310,6 +355,10 @@ def assemble_discovery_report(
         contract_id=plan.contract_id,
         contract_version=plan.contract_version,
         atom_ids=tuple(plan.atom_ids),
+        requested_atom_ids=tuple(plan.atom_ids),
+        internally_covered_atom_ids=tuple(baseline.covered_atoms),
+        external_target_atom_ids=tuple(baseline.external_target_atoms),
+        actually_executed_atom_ids=executed_scope,
         internal_baseline_ref=baseline.baseline_id,
         sources_searched=_sources_searched(ran),
         query_families_executed=_query_families_executed(ran),
