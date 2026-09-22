@@ -7,6 +7,8 @@ Provider-neutral, stdlib-only domain objects for the Discovery Vertical Slice:
   (canon 2.1.11/2.1.4, Book V 15.3).
 - :mod:`qcae.core.discovery.report` — DiscoveryReport and escalation entries
   (canon 2.7.9/2.7.15).
+- :mod:`qcae.core.discovery.candidate` — the canonical merged candidate identity
+  that preserves every discovery path (canon 2.1.12).
 
 These records live at the dependency center (core) for the same reason evidence
 and knowledge records do (P1): every higher layer consumes one canonical
@@ -14,6 +16,10 @@ vocabulary, and no adapter can invent its own (Book V 15.1 invariant 5, 15.2
 invariant 4).
 """
 
+from qcae.core.discovery.candidate import (
+    CanonicalCandidate,
+    make_canonical_candidate,
+)
 from qcae.core.discovery.lead import (
     AdapterStatus,
     CandidateKind,
@@ -78,6 +84,8 @@ __all__ = [
     "StopRecommendation",
     "StopRule",
     "make_discovery_plan",
+    "CanonicalCandidate",
+    "make_canonical_candidate",
     "AdapterStatus",
     "CandidateKind",
     "CandidateLead",

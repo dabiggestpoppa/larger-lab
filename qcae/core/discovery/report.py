@@ -16,9 +16,9 @@ encode that boundary:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Tuple
+from typing import Dict, Tuple
 
 from qcae.core.discovery.plan import (
     ContractAmendmentProposal,
@@ -34,6 +34,7 @@ from qcae.core.serialization import (
 )
 from qcae.core.validation import (
     require_enum,
+    require_enum_tuple,
     require_identifier,
     require_non_empty_str,
     require_no_duplicates,
@@ -187,10 +188,14 @@ class EscalationEntry(SerializableRecord):
     priority: Priority
     wave: int
     rationale: str
+    score: float = 0.0
     expected_information_gain: float = 0.0
     expected_cost_units: float = 0.0
     prefilter_decision: PrefilterDecision = PrefilterDecision.ACCEPT
     deferred_pending: str = ""
+    #: Per-dimension score inputs, kept so a ranking decision is auditable
+    #: (canon 2.7.16 invariant 7: ranking policy is versioned and auditable).
+    dimension_scores: Dict[str, float] = field(default_factory=dict)
 
     _COERCIONS = {
         "next_action": lambda v: coerce_enum(v, NextAction),
@@ -209,12 +214,20 @@ class EscalationEntry(SerializableRecord):
                 f"wave must be one of {sorted(WAVES)}, got {self.wave!r} (canon 2.7.14)"
             )
         require_non_empty_str(self.rationale, "rationale")
-        for name in ("expected_information_gain",):
+        for name in ("expected_information_gain", "score"):
             value = getattr(self, name)
             if not (0.0 <= float(value) <= 1.0):
                 raise QcaeValidationError(f"{name} must be within [0, 1], got {value!r}")
         if float(self.expected_cost_units) < 0:
             raise QcaeValidationError("expected_cost_units must be >= 0")
+        if not isinstance(self.dimension_scores, dict):
+            raise QcaeValidationError("dimension_scores must be a mapping")
+        for name, value in self.dimension_scores.items():
+            require_non_empty_str(name, "dimension_scores key")
+            if not (0.0 <= float(value) <= 1.0):
+                raise QcaeValidationError(
+                    f"dimension_scores[{name!r}] must be within [0, 1], got {value!r}"
+                )
         if self.next_action == NextAction.REJECT_HARD_CONSTRAINT:
             if self.prefilter_decision != PrefilterDecision.REJECT:
                 raise QcaeValidationError(
