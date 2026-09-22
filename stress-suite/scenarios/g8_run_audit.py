@@ -571,11 +571,23 @@ def _receipt_gate_label(name: str, data: Mapping[str, Any]) -> str:
         "_TRUTH_CLOSURE_RECEIPT.json", "-closure")
 
 
+#: A gate may not audit its own evidence as if it were a completed prior gate, and
+#: its own package must not change the input it audits (which would make evidence
+#: generation self-referential and non-reproducible). G8 therefore audits G1-G7
+#: only, and says so rather than relying on the file not existing yet.
+OWN_GATE_RECEIPT_PREFIX = "G8_"
+
+
+def prior_gate_receipts() -> List[Path]:
+    return [p for p in sorted(EVIDENCE.glob("*RECEIPT*.json"))
+            if not p.name.startswith(OWN_GATE_RECEIPT_PREFIX)]
+
+
 def _declared_count_lineage(repo: Path) -> List[Dict[str, Any]]:
     """DERIVE the gate test-count lineage from the receipts' own declarations,
     ordered by the commit that archived each receipt. Nothing is hand-authored."""
     entries = []
-    for path in sorted(EVIDENCE.glob("*RECEIPT*.json")):
+    for path in prior_gate_receipts():
         rel = str(path.relative_to(repo)).replace("\\", "/")
         sha, ts = _archive_commit(repo, rel)
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -601,7 +613,7 @@ def _declared_count_lineage(repo: Path) -> List[Dict[str, Any]]:
 def gate_audit(contract: Mapping[str, Any], head: str, measured_full: int) -> Dict[str, Any]:
     probe = _git_probe(REPO)
     findings = []
-    paths = sorted(EVIDENCE.glob("*RECEIPT*.json"))
+    paths = prior_gate_receipts()
     for path in paths:
         data = json.loads(path.read_text(encoding="utf-8"))
         rel = str(path.relative_to(REPO)).replace("\\", "/")
@@ -644,6 +656,8 @@ def gate_audit(contract: Mapping[str, Any], head: str, measured_full: int) -> Di
             1 for f in findings if f.is_defect and not f.blocks_gate),
         "superseded_count": sum(1 for f in findings if f.superseded_by),
         "receipts_audited": [p.name for p in paths],
+        "own_receipts_excluded": [p.name for p in sorted(EVIDENCE.glob("*RECEIPT*.json"))
+                                 if p.name.startswith(OWN_GATE_RECEIPT_PREFIX)],
         "declared_count_lineage": _declared_count_lineage(REPO),
         "count_lineage": audit_count_lineage(contract,
                                              _declared_count_lineage(REPO),

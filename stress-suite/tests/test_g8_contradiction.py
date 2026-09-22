@@ -474,6 +474,44 @@ def test_carried_items_are_re_derived_live_not_quoted(package):
     assert carried["AMB-08"]["status"] == "OPEN_HOLD_IS_A_HOLD"
 
 
+def test_c22_the_audit_excludes_its_own_gate_receipt(package):
+    """A gate may not audit its own package as a completed prior gate, and its own
+    output must not change the input it audits — otherwise evidence generation is
+    self-referential and stops being reproducible."""
+    gate = package["gate"]
+    assert "G8_EVIDENCE_RECEIPT.json" not in gate["receipts_audited"]
+    assert all(not n.startswith("G8_") for n in gate["receipts_audited"])
+    assert "G8_EVIDENCE_RECEIPT.json" in gate["own_receipts_excluded"]
+    assert all(not str(e["gate"]).startswith("G8") for e in gate["count_lineage"]["chain"])
+    assert gate["count_lineage"]["chain"], "the prior-gate lineage must not be empty"
+
+
+def test_c14_the_emitted_evidence_package_is_byte_reproducible(tmp_path, monkeypatch):
+    """Two consecutive generator runs must produce byte-identical artifacts, and
+    the generator must carry no wall-clock field.
+
+    The test redirects the generator at a TEMPORARY directory: a test must never
+    rewrite the shipped evidence package with a different measured count, or the
+    artifact under review stops matching the run that produced it."""
+    import scenarios.g8_emit_evidence as EMIT
+    shipped = {p.name: p.read_bytes() for p in (ROOT / "evidence").glob("G8_*")}
+    monkeypatch.setattr(EMIT, "EVIDENCE", tmp_path)
+    first = EMIT.emit(938)
+    digests = {p.name: p.read_bytes() for p in tmp_path.glob("G8_*")}
+    EMIT.emit(938)
+    for name, before in digests.items():
+        assert (tmp_path / name).read_bytes() == before, name
+    source = (ROOT / "scenarios" / "g8_emit_evidence.py").read_text(encoding="utf-8")
+    for forbidden in ("datetime", "time.time", "utcnow", "recorded_utc",
+                      "strftime"):
+        assert forbidden not in source, forbidden
+    assert first["receipt"]["collected"] == 938
+    assert first["decision"]["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
+    # the shipped package is untouched by the test
+    for name, before in shipped.items():
+        assert (ROOT / "evidence" / name).read_bytes() == before, name
+
+
 def test_the_audit_does_not_modify_canonical_fixtures(contract):
     before = CONTRACT_PATH.read_bytes()
     AUDIT.build_package(measured_full=938)
