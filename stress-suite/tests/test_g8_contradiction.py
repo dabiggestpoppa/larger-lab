@@ -1269,7 +1269,9 @@ def test_the_pre_repair_red_transcript_still_reproduces_every_finding():
     assert "FROZEN_AT_STRESS-G8P0" in text
     assert "authored BEFORE any cross-scenario comparison runs" in text
     assert "contract declares contract_chronology -> False" in text
-    assert "f5482e3e STRESS-G8P0" in text
+    # full object name: a short abbreviation is chosen per repository, so
+    # asserting one would make this regression depend on which clone it ran in
+    assert "f5482e3e77e49ee279e4ecf5e58db5a2a694f5bb STRESS-G8P0" in text
 
 
 def test_the_red_transcript_artifact_on_disk_matches_the_harness():

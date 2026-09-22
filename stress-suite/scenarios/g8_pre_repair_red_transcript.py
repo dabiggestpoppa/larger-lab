@@ -256,8 +256,11 @@ def transcript(with_git_log: bool = True) -> str:
                  "Snapshot of the history as of the commit that archived this "
                  "transcript; the list grows if the contract is amended again, "
                  "which is itself the recorded finding.\n\n```\n")
-    lines.append("$ git log --all --oneline -- %s\n" % CONTRACT_REL)
-    log_text = _git("log", "--all", "--oneline", "--", CONTRACT_REL) or ""
+    # full object names, not `--oneline`: Git chooses the abbreviation length per
+    # repository, so a short form makes this artifact (and the regression that
+    # reads it) depend on WHICH CLONE it ran in. Full SHAs are checkout-stable.
+    lines.append("$ git log --all --format='%%H %%s' -- %s\n" % CONTRACT_REL)
+    log_text = _git("log", "--all", "--format=%H %s", "--", CONTRACT_REL) or ""
     lines.append((log_text or "(no commit)") + "\n")
     lines.append("```\n\n")
     # the commit count is DERIVED from the log above, never asserted: an earlier

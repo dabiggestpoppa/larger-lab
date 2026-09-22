@@ -48,13 +48,13 @@ R-G8-09: contract declares contract_chronology -> False
 Snapshot of the history as of the commit that archived this transcript; the list grows if the contract is amended again, which is itself the recorded finding.
 
 ```
-$ git log --all --oneline -- stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json
-6fed82c3 STRESS-G8R1..RX: close the audit-integrity defects in the provisional G8 PASS
-f5482e3e STRESS-G8P0: freeze equivalence and contradiction audit contract
+$ git log --all --format='%H %s' -- stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json
+6fed82c3e00105f6728e5da06547ff16dd932d59 STRESS-G8R1..RX: close the audit-integrity defects in the provisional G8 PASS
+f5482e3e77e49ee279e4ecf5e58db5a2a694f5bb STRESS-G8P0: freeze equivalence and contradiction audit contract
 ```
 
 Git resolves 2 commit(s) touching the contract; the earliest is
-`f5482e3e`. That earliest snapshot already carries the revisions motivated
+`f5482e3e77e49ee279e4ecf5e58db5a2a694f5bb`. That earliest snapshot already carries the revisions motivated
 by the first run's own findings, so Git cannot show that those verdict
 rules were frozen before the first comparison ran. The claim recorded
 in the pre-repair contract (`FROZEN_AT_STRESS-G8P0`, `authored BEFORE
