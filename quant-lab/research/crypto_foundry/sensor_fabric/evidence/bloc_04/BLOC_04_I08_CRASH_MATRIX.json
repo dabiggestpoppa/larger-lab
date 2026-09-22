@@ -1,0 +1,83 @@
+{
+  "cases": [
+    {
+      "case": "crash_halfway_through_blob_write",
+      "classified": "UNCOMMITTED_STAGING",
+      "no_committed_claim": true,
+      "no_cursor_movement": true,
+      "quarantined": true,
+      "result": "OK"
+    },
+    {
+      "case": "crash_after_blob_rename_before_metadata",
+      "classified": "ORPHAN_DURABLE_BLOB",
+      "result": "OK",
+      "unknown_context_quarantine": true
+    },
+    {
+      "case": "crash_after_acquisition_before_projection",
+      "no_findings": true,
+      "projection_absent": true,
+      "result": "OK",
+      "t0a_valid": true
+    },
+    {
+      "case": "crash_after_projection_write_before_manifest",
+      "classified": "ORPHAN_PROJECTION",
+      "result": "OK"
+    },
+    {
+      "case": "crash_before_manifest_current_pointer_update",
+      "classified": "ORPHAN_MANIFEST",
+      "current_pointer_unchanged": true,
+      "result": "OK",
+      "unresolved_recorded": true
+    },
+    {
+      "case": "crash_before_resume_advancement",
+      "durable_batch_valid": true,
+      "no_findings": true,
+      "result": "OK",
+      "resume_not_skipped": true
+    },
+    {
+      "case": "identical_refetch",
+      "existing_semantics_preserved": true,
+      "result": "OK",
+      "same_content_identity": true
+    },
+    {
+      "case": "same_source_mutated_bytes",
+      "result": "OK",
+      "revision_records": true
+    },
+    {
+      "case": "corrupted_stored_blob",
+      "integrity_quarantine": true,
+      "no_silent_overwrite": true,
+      "result": "OK"
+    },
+    {
+      "case": "missing_manifest_target",
+      "fail_closed": true,
+      "recovery_evidence_planned": true,
+      "result": "OK"
+    },
+    {
+      "case": "parser_bug_invalid_projection",
+      "no_source_rewrite": true,
+      "projection_quarantined": true,
+      "result": "OK",
+      "t0a_retained": true
+    },
+    {
+      "cas_refusal": true,
+      "case": "concurrent_writers_cas_preserved",
+      "no_silent_overwrite": true,
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08",
+  "doctrine": "I08 \u00a724 \u2014 all 12 frozen crash scenarios proven against real durable truth: staging/orphan/projection/manifest classifications, resume never skips, no silent overwrite, CAS preserved",
+  "matrix": "BLOC_04_I08_CRASH_MATRIX"
+}

@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "case": "clean_root",
+      "findings": 0,
+      "has_blockers": false,
+      "result": "OK"
+    },
+    {
+      "case": "uncommitted_staging",
+      "findings": 1,
+      "result": "OK"
+    },
+    {
+      "case": "orphan_durable_blob",
+      "findings": 1,
+      "result": "OK"
+    },
+    {
+      "case": "orphan_projection",
+      "findings": 1,
+      "result": "OK"
+    },
+    {
+      "case": "orphan_manifest",
+      "findings": 1,
+      "result": "OK"
+    },
+    {
+      "case": "missing_manifest_blob",
+      "findings": 1,
+      "result": "OK"
+    },
+    {
+      "case": "quarantined_blob_dependency",
+      "findings": 1,
+      "result": "OK"
+    },
+    {
+      "case": "job_durability_divergence",
+      "findings": 1,
+      "result": "OK",
+      "typed_error": "JobCatalogCorrupt"
+    },
+    {
+      "case": "lock_owner_unproven",
+      "findings": 1,
+      "result": "OK"
+    },
+    {
+      "case": "unknown_context",
+      "findings": 1,
+      "result": "OK"
+    },
+    {
+      "case": "scan_deterministic_sorted",
+      "identical": true,
+      "result": "OK",
+      "sorted_keys": true
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08",
+  "doctrine": "I08 \u00a74/\u00a75/\u00a726 \u2014 the read-only scan classifies every frozen recovery class (staging, orphan blob/projection/manifest, missing manifest target, acquisition dependency, job divergence, unproven locks, unknown context) with zero mutation and deterministic sorted output",
+  "matrix": "BLOC_04_I08_RECOVERY_SCAN_MATRIX"
+}

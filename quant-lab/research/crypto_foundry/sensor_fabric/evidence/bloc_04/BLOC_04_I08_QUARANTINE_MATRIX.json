@@ -1,0 +1,61 @@
+{
+  "cases": [
+    {
+      "acquisition_history_intact": true,
+      "bytes_preserved": true,
+      "canonical_absent": true,
+      "case": "corrupt_blob_quarantined",
+      "quarantined": true,
+      "result": "OK"
+    },
+    {
+      "byte_identity": true,
+      "case": "quarantine_bytes_preserved",
+      "quarantined": true,
+      "result": "OK"
+    },
+    {
+      "canonical_read_fails_closed": true,
+      "case": "canonical_bad_object_unusable",
+      "result": "OK"
+    },
+    {
+      "case": "no_overwrite",
+      "different_bytes_conflict": true,
+      "exact_retry_adopted": true,
+      "first_move": true,
+      "result": "OK"
+    },
+    {
+      "case": "exact_retry_idempotent",
+      "first_apply": 1,
+      "result": "OK",
+      "second_apply": 0,
+      "single_artifact": true
+    },
+    {
+      "case": "different_bytes_conflict",
+      "conflict": true,
+      "result": "OK"
+    },
+    {
+      "case": "unknown_context_quarantine",
+      "quarantined": true,
+      "result": "OK"
+    },
+    {
+      "case": "path_escape_rejected",
+      "outside_created": false,
+      "rejected": true,
+      "result": "OK"
+    },
+    {
+      "case": "symlink_escape_rejected",
+      "result": "SKIPPED_ON_WINDOWS",
+      "skipped": "posix_symlink_semantics_required"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08",
+  "doctrine": "I08 \u00a710/\u00a711/\u00a729/\u00a730 \u2014 quarantined artifacts preserve forensic bytes under deterministic no-clobber locators, the canonical location fails closed, and path/symlink escapes are refused",
+  "matrix": "BLOC_04_I08_QUARANTINE_MATRIX"
+}

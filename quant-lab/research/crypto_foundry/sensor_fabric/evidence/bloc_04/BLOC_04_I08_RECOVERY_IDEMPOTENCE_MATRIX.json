@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "byte_census_identical": true,
+      "case": "scan_read_only",
+      "result": "OK"
+    },
+    {
+      "case": "repeat_scan_same_findings",
+      "identical": true,
+      "result": "OK"
+    },
+    {
+      "case": "repeat_apply_idempotent",
+      "first_apply": 1,
+      "result": "OK",
+      "second_apply": 0
+    },
+    {
+      "case": "stale_plan_conflict",
+      "conflict": true,
+      "result": "OK"
+    },
+    {
+      "adopted_existing": true,
+      "case": "recovery_action_exact_retry",
+      "divergence_typed": true,
+      "result": "OK"
+    },
+    {
+      "case": "foreign_lock_not_auto_deleted",
+      "lock_present": true,
+      "recorded": true,
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08",
+  "doctrine": "I08 \u00a727/\u00a728/\u00a720 \u2014 scan is read-only and repeatable, apply is idempotent with typed stale-plan conflicts, exact journal retries adopt and divergences stay typed, foreign locks are never auto-deleted",
+  "matrix": "BLOC_04_I08_RECOVERY_IDEMPOTENCE_MATRIX"
+}
