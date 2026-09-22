@@ -3,10 +3,10 @@
 **GATE STATUS:** `PASS_G8_CROSS_SCENARIO_COHERENCE`
 
 - starting SHA `661878e7df4c5b8f7bcb2479ceebabd79d8c28b3`
-- tested SHA `8efa99e71da8b8fa351eebacccfb84bdaf6523d5`
+- tested SHA `07b3279a41ba9d3b3e7785c4750d6f9cc574bf28`
 - evidence commit `STRESS-G8RR` (this package; not self-hashed)
 - contract `G8-EQUIVALENCE-CONTRACT-001` v1.2.0 `525b18bcea68d23584097c8b740d2d23`
-- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1000 / passed 1000 / skipped 0 / failed 0** (artifact `pytest` `c77b1158aec47092`, python `3.11.9`)
+- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1000 / passed 1000 / skipped 0 / failed 0** (artifact `pytest` `ac03df5fa0c42918`, python `3.11.9`)
 - test provenance (revision R3, finding R-G8-07): the baseline is read from the JUnit artifact the authoritative command produced, never from a self-reported integer. The receipt records the artifact digest, the suite identity, the tested tree, the command, the environment and the exit status; a missing, malformed, stale or failing artifact refuses emission.
 
 ## What was asked
