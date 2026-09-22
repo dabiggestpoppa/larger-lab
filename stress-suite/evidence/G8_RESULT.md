@@ -3,10 +3,10 @@
 **GATE STATUS:** `PASS_G8_CROSS_SCENARIO_COHERENCE`
 
 - starting SHA `661878e7df4c5b8f7bcb2479ceebabd79d8c28b3`
-- tested SHA `4d80828f03ae964466506c387db3e271dc1f7e9b`
+- tested SHA `30d4ff4f3687ce28e8a5c3d4114619921197d9ed`
 - evidence commit `STRESS-G8RR` (this package; not self-hashed)
 - contract `G8-EQUIVALENCE-CONTRACT-001` v1.2.0 `525b18bcea68d23584097c8b740d2d23`
-- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1014 / passed 1014 / skipped 0 / failed 0** (artifact `pytest` `ff1b3e76f97bdb31`, python `3.11.9`)
+- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1017 / passed 1016 / skipped 1 / failed 0** (artifact `pytest` `aaf42dc33290f3f9`, python `3.11.9`)
 - test provenance (revision R3, finding R-G8-07): the baseline is read from the JUnit artifact the authoritative command produced, never from a self-reported integer. The receipt records the artifact digest, the suite identity, the tested tree, the command, the environment and the exit status; a missing, malformed, stale or failing artifact refuses emission.
 
 ## What was asked
@@ -48,6 +48,14 @@ Two defects in the audit itself were found by running it, and each is recorded a
 - no verdict rule, token vocabulary, order invariant or outcome permissiveness rank was relaxed; the changes add derivations and reclassify findings.
 
 The pre-revision verdict was `BLOCKED_G8_MISSING_EVIDENCE` with reasons `["3 gate-claim defect(s)", "2 evidence gap(s) where equivalence could not be established"]`. Those entries are preserved verbatim in `G8_COUNTEREXAMPLE_REGISTER.json`, together with the refuted false positive and the post-revision comparison for each reclassified pair. A reviewer can therefore see exactly what changed and judge whether the revision was justified.
+
+## Claim defects recorded, not rewritten
+
+A claim published by this line of work that the evidence later FALSIFIED is recorded here. Commit messages already pushed are not rewritten to make an earlier claim read better: the register entry is the durable record, and the corrected statement stands in the field it belongs to.
+
+| claim | classification | severity | status | disposition |
+|---|---|---|---|---|
+| commit 950e6efb (STRESS-G8ARCH2-R): 'the same package regenerates byte-identically from here' | RECEIPT_OR_CLAIM_DEFECT | INFO | FALSIFIED_THEN_SUPERSEDED | superseded by the corrected `reproducibility` field, added at 4d80828f; the commit message was NOT rewritten because it is already pushed, and this register entry is the durable record |
 
 ## What this PASS does not mean
 
