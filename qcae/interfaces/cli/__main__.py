@@ -163,10 +163,14 @@ def _print_operator_error(exc: BaseException) -> None:
 def main(argv: Optional[List[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    session = _Session(args.db)
-    app = session.app
+    # Runtime construction is inside the boundary on purpose: an unopenable
+    # database is an operator error, and it must reach the same typed-exit
+    # mapping as every other expected failure instead of surfacing as a
+    # driver traceback.
+    session: Optional[_Session] = None
     try:
-        return _dispatch(app, args)
+        session = _Session(args.db)
+        return _dispatch(session.app, args)
     except Exception as exc:
         code = _known_error_exit(exc)
         if code is None:
@@ -174,7 +178,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         _print_operator_error(exc)
         return code
     finally:
-        session.close()
+        if session is not None:
+            session.close()
 
 
 def _dispatch(app: QcaeApp, args) -> int:

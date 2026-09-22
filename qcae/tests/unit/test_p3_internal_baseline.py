@@ -368,6 +368,52 @@ class TestFailClosed:
         assert ("known_capability_state", CAP) in registry.calls
 
 
+# -- real registry wiring ---------------------------------------------------
+
+
+class TestRealRegistryWiring:
+    """The baseline service over the real P1 registry query (not a fake).
+
+    P1 documents partial wiring as a valid shape ("shape is stable regardless of
+    wiring") and constructs the query with absent repositories in its own tests.
+    A discovery attempt on that wiring must produce a baseline, not crash.
+    """
+
+    def _real_query(self):
+        from qcae.infrastructure.persistence.sqlite_capability_registry import (
+            CAPABILITY_REGISTRY_DDL,
+            SqliteCapabilityRegistry,
+        )
+        from qcae.infrastructure.persistence.sqlite_knowledge_store import (
+            KNOWLEDGE_DDL,
+            SqliteNegativeKnowledgeRepository,
+            SqliteRegistryQuery,
+        )
+        from qcae.infrastructure.persistence.sqlite_repository_registry import (
+            REPOSITORY_REGISTRY_DDL,
+            SqliteRepositoryRegistry,
+        )
+        from qcae.infrastructure.persistence.store_factory import open_metadata_db
+
+        conn = open_metadata_db(":memory:")
+        for ddl in (CAPABILITY_REGISTRY_DDL, REPOSITORY_REGISTRY_DDL, KNOWLEDGE_DDL):
+            conn.executescript(ddl)
+        return conn, SqliteRegistryQuery(
+            None, None, SqliteNegativeKnowledgeRepository(conn), None,
+            capability_registry=SqliteCapabilityRegistry(conn),
+            repository_registry=SqliteRepositoryRegistry(conn),
+        )
+
+    def test_partially_wired_registry_produces_a_baseline(self) -> None:
+        conn, query = self._real_query()
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+        assert record.sufficiency_verdict is C.NO_INTERNAL_CAPABILITY_FOUND
+        assert record.external_target_atoms == (ATOM_A, ATOM_B)
+
+
 # -- record laws ------------------------------------------------------------
 
 

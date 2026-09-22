@@ -250,17 +250,25 @@ class SqliteRegistryQuery(RegistryQuery):
         self._repositories = repository_registry
 
     def decision_reuse_findings(self, capability_id: str, contract_id: str, contract_version: str) -> dict:
-        active = self._receipts.active_for_capability(capability_id)
+        # Absent repositories contribute empty findings, not an AttributeError:
+        # this is the third consumer of the same optional wiring, and
+        # ``internal_first_findings``/``known_capability_state`` already treat a
+        # partially wired query as a valid shape (§9/§11).
+        active = self._receipts.active_for_capability(capability_id) \
+            if self._receipts is not None else []
         matched_receipts = [
             r for r in active
             if r.contract_id == contract_id and r.contract_version == contract_version
         ]
         pos = [
-            k for k in self._positive.find_by_contract(contract_id, contract_version)
+            k for k in (self._positive.find_by_contract(contract_id, contract_version)
+                        if self._positive is not None else ())
             if k.material
         ]
         blocks = [
-            n for n in self._negative.active() if not n.retry_allowed
+            n for n in (self._negative.active()
+                        if self._negative is not None else ())
+            if not n.retry_allowed
         ]
         stale = [
             ev_id for ev_id in self._stale_evidence_ids()

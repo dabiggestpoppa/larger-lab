@@ -95,6 +95,29 @@ class TestRepositoryRevisionInventory:
         assert state["repository_revisions"] == {"repo-dr": ["revA", "revB"]}
         assert state["candidate_refs"] == ["cand-dr"]
 
+    def test_partial_wiring_returns_stable_decision_reuse_findings(self, env) -> None:
+        """Absent repositories contribute empty findings, not an AttributeError.
+
+        ``internal_first_findings`` and ``known_capability_state`` both tolerate
+        absent components; ``decision_reuse_findings`` is the third consumer of
+        the same optional wiring, so its shape must be stable too.
+        """
+        conn, caps, repos, neg = env
+        caps.add_contract(_contract())
+        caps.add_atom(_atom())
+        caps.add_candidate(_candidate())
+        conn.commit()
+
+        query = SqliteRegistryQuery(None, None, neg, None, capability_registry=caps)
+        findings = query.decision_reuse_findings("CAP-DR-001", "CAP-DR-001", "1")
+        assert findings == {
+            "active_receipts": [],
+            "positive_knowledge": [],
+            "negative_blocks": [],
+            "stale_evidence": [],
+            "sufficient_without_discovery": False,
+        }
+
     def test_no_repository_registry_returns_empty_inventory(self, env) -> None:
         """Without a repository registry wired, the key is present but empty —
         shape is stable regardless of wiring."""

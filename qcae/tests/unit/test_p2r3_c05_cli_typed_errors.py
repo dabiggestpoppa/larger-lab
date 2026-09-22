@@ -194,6 +194,31 @@ class TestRecoveryConvergence:
             authority_gate=PermissiveStepAuthorityGate(),
         ), conn
 
+    def test_unopenable_db_path_reports_a_typed_error(self, tmp_path):
+        """A careless ``--db`` value is an operator error, not a traceback.
+
+        The first real user typo is pointing ``--db`` at a directory or at a
+        stale file that is not a database; sqlite's own exception is not
+        actionable feedback.
+        """
+        directory = tmp_path / "not-a-db"
+        directory.mkdir()
+        junk = tmp_path / "junk.db"
+        junk.write_text("this is not a sqlite file", encoding="utf-8")
+        afile = tmp_path / "afile"
+        afile.write_text("x", encoding="utf-8")
+        # Third careless shape: a path component that is a regular file, so
+        # creating the parent directory fails before sqlite is ever reached.
+        under_a_file = afile / "child.db"
+
+        for target in (directory, junk, under_a_file):
+            proc = _run_cli("identity", db=target)
+            assert proc.returncode == 2, (target, proc.stderr)
+            assert "Traceback" not in proc.stderr
+            payload = json.loads(proc.stderr)
+            assert payload["error"] == "QcaeValidationError"
+            assert str(target) in payload["message"]
+
     def test_programming_error_still_tracebacks(self, tmp_db, monkeypatch):
         """Unexpected exceptions must NOT be swallowed into exit-code maps."""
         app = QcaeApp(build_local_runtime(tmp_db))
