@@ -9,7 +9,42 @@
 
 ## Current Phase
 
-**P2 — FROZEN / OPERATOR-REVIEWED + R1, R2, R3 & R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`)** — Job Runtime + Local Governance; C07R structural repairs (P2-R1), governance-wiring repairs (P2-R2), operator-loop closure (P2-R3), and true-crash-durability closure (P2-R4) sealed; **P3 NOT started**
+**P3 — IN PROGRESS (opened at P2-R4-FREEZE head `65ca004b`)** — Discovery Vertical Slice; tranche 1 = I0 plan lock → C01 DiscoveryPlan domain → C02 discovery adapter contract + candidate leads → C03 internal-first baseline → C04 dedup/family/ranking → T01 adversarial qualification. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
+
+### P3-I0 — Phase Start / Plan Lock (this commit)
+
+**Predecessor freeze:** `P2-R4-freeze-manifest.json` at `65ca004b`, blockers `[]`. P3 entry criteria (canon 18.2) checked at this head:
+
+| Entry criterion | Status | Evidence |
+| --- | --- | --- |
+| predecessor phase freeze exists | PASS | `P2-R4-freeze-manifest.json` (supersedes P2/R1/R2/R3 manifests, digests preserved) |
+| required canon chapters frozen | PASS | Book II Block 2 read in full (2.1–2.7) + Book V 15.1/15.3 + Book VI 18.1/18.2 + A-001 §4–§7, §13, §14 |
+| unresolved blockers classified | PASS | P2 blockers `[]`; P3 risks classified below (BLOCKER/MAJOR/MINOR) |
+| planned files/modules/tests listed | PASS | tranche plan below |
+| phase risks and authority needs explicit | PASS | risks + authority section below |
+| baseline suite green or known failures documented | PASS | `python -m pytest qcae/tests -q` → **1108 passed / 0 failed / 0 skipped** at `65ca004b` (LOCAL TEST EVIDENCE) |
+
+**Canon P3 definition** (Book VI 18.1): *Discovery Vertical Slice* — internal baseline lookup plus GitHub repository/code discovery, DiscoveryPlan, candidate normalization/deduplication, ranking, budgets, stop rules, provenance. A-001 §13 adds one obligation: capability prior-art discovery stays, and an **explicit Research Mesh delegation seam** is added.
+
+**Planned modules (tranche 1):**
+
+- `qcae/core/discovery/plan.py` — DiscoveryPlan + hypotheses/query families/source portfolio/diversity/stop rules/cost tiers/saturation/budget/amendment proposals (canon 2.1). Domain records live at the dependency center (precedent: P1 put evidence/knowledge/receipts in `core/`); stdlib-only, provider-neutral.
+- `qcae/core/discovery/lead.py` — CandidateLead normalization + query lineage (canon 2.1.11/2.1.4, Book V 15.3) that carries provider output into the frozen candidate ontology **without** any verification level (leads are `DISCOVERED` by construction).
+- `qcae/core/ports/discovery.py` — `DiscoverySourceAdapter` port + `DiscoveryQuery`/`AdapterOutcome` with typed failure semantics (15.3: `NO_RESULTS`/`PARTIAL_RESULTS`/`RATE_LIMITED`/`AUTH_FAILURE`/`PROVIDER_FAILURE`/`UNSUPPORTED_QUERY` + standalone `NOT_CONFIGURED`).
+- `qcae/discovery/internal/baseline.py` — internal-first baseline over the existing P1 `RegistryQuery` port (2.6): classification, partial-reuse narrowing of external scope, prior-decision lookup, internal trust firewall.
+- `qcae/discovery/planning/ranking.py` — canonical-candidate merge/dedup (2.1.12), family clustering (2.7.6), hard prefilters with evidence-strength floors (2.7.3), versioned diversity-aware ranking policy with popularity cap (2.7.5/2.7.10/2.7.11), escalation queue + waves (2.7.9/2.7.14), saturation + stop recommendation (2.1.9/2.1.10).
+- tests: `qcae/tests/unit/test_p3_plan_domain.py`, `test_p3_adapter_contract.py`, `test_p3_internal_baseline.py`, `test_p3_ranking.py`, `test_p3_t01_adversarial.py`.
+
+**Planned modules (later tranches, recorded so nothing is hidden in prose):** `discovery/planning/planner.py` (contract → reproducible plan), `discovery/github/` adapter over an injectable transport (pagination, rate budget, partial labeling, immutable review anchor), `discovery/research/` Research Mesh delegation seam + bounded `LOCAL_FALLBACK_RESEARCH`, `discovery/planning/report.py` DiscoveryReport (2.7.15), `P3-IT01` integration, `P3-FREEZE` manifest + acceptance.
+
+**Risks / blockers (canon 18.2 severity):**
+
+- **MAJOR (open) — GitHub egress authority.** Canon 2.2 requires live GitHub repository/code search; A-001 §5 and Book III 5.6 require capability-specific egress to be policy-controlled and fail closed. Tranche 1 therefore builds the *provider-neutral* contract plus internal-first baseline only; the GitHub adapter lands with an injectable transport and an explicit authority/egress gate, never as a silent default. Until then an absent provider is reported as `NOT_CONFIGURED`, never as an empty-but-successful search.
+- **MAJOR (open) — popularity/README firewall enforcement.** Encoded as policy laws (bounded popularity weight, `REJECT` evidence-strength floor, leads carry no verification level) and to be re-proved adversarially in `P3-T01`.
+- **MINOR (accepted) — internal classification mapping.** P1's `internal_first_findings` categories are mapped to canon 2.6.1 classifications by a documented retrieval-only table; `INTERNAL_IMPLEMENTATION_SUPERIOR/INFERIOR` are *not* derivable from durable state at P3 and are deliberately not emitted (they need evidence-level comparison, Book IV Block 9/11). Recorded as a derived point for operator review.
+- **MINOR (accepted) — P1 surface maturity.** The plan consumes `RegistryQuery` only; no new persistence engine is added in P3 tranche 1 (ADR-0006 remains the single metadata engine).
+
+**Authority needs:** no new authority class. Discovery is read-only against local durable state and (later) policy-gated egress; it can propose, never enact, contract changes (2.1.14) and can never approve acquisition (2.7.4).
 
 ### P2-R4 — True Crash Durability + Durable Approval + Scheduling Closure (SEALED at `f2fc7757`)
 
