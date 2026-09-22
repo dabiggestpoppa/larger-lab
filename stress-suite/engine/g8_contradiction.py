@@ -915,9 +915,17 @@ def guarded_derivation_coverage(contract: Mapping[str, Any],
                                 ) -> Dict[str, Any]:
     """Per-property derivation coverage plus the closure gate.
 
-    `closure_required_properties` names the properties G8 must exercise at least
-    once. A property that is required for closure and receives no derivation with
-    real evidence has NOT been proved by the absence of a violation: it blocks.
+    `closure_required_properties` names the properties G8 must PROVE at least
+    once. A property that is required for closure and never returns HOLDS has not
+    been proved by the absence of a violation: it blocks.
+
+    STRESS-G8RX6, enforcement gap F2: the closure rule used to accept any finding
+    whose derivation_kind was not NOT_DERIVABLE, whatever its verdict, so a
+    required property exercised only as UNKNOWN_NOT_FAVORABLE still satisfied
+    closure. A HOLDS finding carries its derivation evidence by construction
+    (GuardedPropertyValue refuses to build one without it), so requiring a HOLDS
+    makes the requirement enforceable rather than decorative. Properties that
+    were touched but never held are reported separately from those never touched.
     """
     required = list(contract.get("closure_required_properties", []))
     by_property: Dict[str, Dict[str, int]] = {}
@@ -927,12 +935,19 @@ def guarded_derivation_coverage(contract: Mapping[str, Any],
         kind = slot.setdefault("kinds", {})  # type: ignore[assignment]
         if isinstance(kind, dict):
             kind[f.derivation_kind] = kind.get(f.derivation_kind, 0) + 1
-    unexercised = [p for p in required
-                   if not any(f.property_id == p and f.derivation_kind != "NOT_DERIVABLE"
-                              for f in findings)]
-    return {"closure_required_properties": required,
+    holds = {f.property_id for f in findings if f.verdict == "HOLDS"}
+    touched = {f.property_id for f in findings
+               if f.derivation_kind != "NOT_DERIVABLE"}
+    unexercised = sorted(p for p in required if p not in holds)
+    return {"closure_rule": ("a closure-required property must return HOLDS at "
+                             "least once, with the derivation evidence a HOLDS "
+                             "finding is required to carry"),
+            "closure_required_properties": required,
             "per_property": {k: by_property[k] for k in sorted(by_property)},
-            "unexercised_required_properties": sorted(unexercised),
+            "unexercised_required_properties": unexercised,
+            "required_never_holding": unexercised,
+            "required_never_derived": sorted(p for p in required
+                                             if p not in touched),
             "declared_observations": len(observations)}
 
 
@@ -1211,6 +1226,7 @@ def decide_gate(contract: Mapping[str, Any],
                 guarded: Sequence[GuardedPropertyFinding],
                 gate_findings: Sequence[GateClaimFinding],
                 *, test_evidence: TestEvidence,
+                expected_tested_sha: str,
                 observations: Sequence[InstitutionalObservation] = (),
                 ) -> Dict[str, Any]:
     """Gate decision computed from the evidence, never asserted. BLOCKING items are
@@ -1224,6 +1240,12 @@ def decide_gate(contract: Mapping[str, Any],
     used to be bare integers now come from a provenance-bearing test-result
     artifact, and the gate no longer infers 'no detected violation therefore
     property proved'.
+
+    STRESS-G8RX6, enforcement gap F1: `expected_tested_sha` is the tree the caller
+    DECLARES this package is archived for. The baseline check compares the
+    artifact's bound tree against it, so the gate can detect a stale or foreign
+    artifact. The previous call site passed `test_evidence.tested_sha` as its own
+    expectation, which made the check unfalsifiable: a forged tree certified.
     """
     policy = contract.get("blocks_gate_policy", {})
     hard = set(policy.get("blocking_classifications", ()))
@@ -1245,7 +1267,7 @@ def decide_gate(contract: Mapping[str, Any],
     gate_recorded = [f for f in gate_findings if f.is_defect and not f.blocks_gate]
     gate_superseded = [f for f in gate_findings if f.superseded_by]
 
-    baseline = check_baseline(test_evidence, tested_sha=test_evidence.tested_sha)
+    baseline = check_baseline(test_evidence, tested_sha=expected_tested_sha)
     mandate = mandate_coverage_flags(contract, families)
     coverage = guarded_derivation_coverage(contract, observations, guarded)
     unexercised = coverage["unexercised_required_properties"]
@@ -1284,9 +1306,10 @@ def decide_gate(contract: Mapping[str, Any],
     if unexercised:
         # 'no detected violation' is not 'property proved'
         _block("BLOCKED_G8_MISSING_EVIDENCE",
-               f"{len(unexercised)} closure-required guarded propert(ies) were "
-               f"never exercised with a real derivation: {unexercised}")
+               f"{len(unexercised)} closure-required guarded propert(ies) never "
+               f"returned HOLDS with derivation evidence: {unexercised}")
     return {"exit": exit_label, "reasons": reasons,
+            "declared_tested_sha": expected_tested_sha,
             "counts": {"comparisons": len(comparisons),
                        "blocking_contradictions": len(blocking),
                        "evidence_gaps": len(gaps),

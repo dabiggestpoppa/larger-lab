@@ -37,9 +37,48 @@ class UnverifiableTestEvidence(RuntimeError):
 #: the stress-suite `tests` package, not an unrelated or partial collection.
 REQUIRED_SUITE_IDENTITY_PREFIXES = ("tests", "pytest")
 
+#: The suite command that PRODUCES the artifact the receipt cites. The artifact
+#: must be written inside the repository (repo-relative), so a reviewer anywhere
+#: can obtain the exact bytes the baseline was read from.
 AUTHORITATIVE_TEST_COMMAND = (
     "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q "
-    "--junitxml=<artifact>")
+    "--junitxml=evidence/G8_TEST_RESULTS.xml")
+ARTIFACT_RELATIVE_PATH = "stress-suite/evidence/G8_TEST_RESULTS.xml"
+
+#: Attributes JUnit's writer stamps per RUN rather than per RESULT. They are why a
+#: raw artifact digest cannot be reproduced by re-running: the bytes differ even
+#: when every test outcome is identical. This rule names exactly what the
+#: canonical form removes, so `artifact_digest` (raw, checkable against the
+#: committed bytes) and `artifact_canonical_digest` (re-derivable by re-running)
+#: keep distinct declared meanings and neither redefines "content digest".
+_VOLATILE_JUNIT_ATTRIBUTES = ("time", "timestamp", "hostname")
+ARTIFACT_CANONICALIZATION_RULE = "JUNIT_XML_MINUS_TIME_TIMESTAMP_HOSTNAME"
+
+
+def _ordered(element: ET.Element) -> ET.Element:
+    """Rebuild an element with its attributes in sorted order, so the canonical
+    bytes do not depend on the order the parser happened to see them in."""
+    clone = ET.Element(element.tag,
+                       {k: element.attrib[k] for k in sorted(element.attrib)})
+    clone.text, clone.tail = element.text, element.tail
+    for child in element:
+        clone.append(_ordered(child))
+    return clone
+
+
+def canonical_junit_bytes(blob: bytes) -> bytes:
+    """The canonical form of a JUnit artifact under
+    `ARTIFACT_CANONICALIZATION_RULE`. Two runs over the same tree produce the same
+    canonical bytes; the raw bytes legitimately differ."""
+    root = ET.fromstring(blob)
+    for element in root.iter():
+        for attribute in _VOLATILE_JUNIT_ATTRIBUTES:
+            element.attrib.pop(attribute, None)
+    return ET.tostring(_ordered(root), encoding="utf-8")
+
+
+def canonical_artifact_digest(blob: bytes) -> str:
+    return hashlib.sha256(canonical_junit_bytes(blob)).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -49,6 +88,8 @@ class TestEvidence:
     artifact_path: str
     artifact_digest: str
     artifact_bytes: int
+    artifact_canonical_digest: str
+    repo_relative_path: str
     command: str
     suite_identity: str
     tested_sha: str
@@ -66,6 +107,13 @@ class TestEvidence:
         return self.collected
 
     @property
+    def in_tree(self) -> bool:
+        """Whether the artifact lives inside the tree the caller declared. A
+        baseline whose artifact is outside the tree cannot be re-checked by a
+        reviewer and is not evidence (review finding R-G8-07)."""
+        return bool(self.repo_relative_path)
+
+    @property
     def honest_baseline(self) -> bool:
         """Only a clean, complete artifact certifies a baseline."""
         return (self.failed == 0 and self.errors == 0
@@ -74,7 +122,17 @@ class TestEvidence:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            "artifact_path": self.artifact_path,
+            # the CITATION is repo-relative: a machine-local path is not evidence
+            # and would make the receipt non-portable, so it is not serialised.
+            "artifact_path": self.repo_relative_path or self.artifact_path,
+            "artifact_path_scope": ("REPO_RELATIVE" if self.in_tree
+                                    else "OUTSIDE_DECLARED_TREE"),
+            "artifact_canonicalization_rule": ARTIFACT_CANONICALIZATION_RULE,
+            "artifact_canonical_digest": self.artifact_canonical_digest,
+            "artifact_digest_semantics": (
+                "artifact_digest is the RAW sha256 of the artifact as produced, so "
+                "it changes with run timings; artifact_canonical_digest applies "
+                "the declared rule above and is re-derivable by re-running."),
             "artifact_digest": self.artifact_digest,
             "artifact_bytes": self.artifact_bytes,
             "authoritative_test_command": self.command,
@@ -111,10 +169,21 @@ def _tree_properties(root: ET.Element) -> Dict[str, str]:
     return props
 
 
+def _repo_relative(path: Path, repo_root: str | Path) -> str:
+    """The artifact's path relative to the declared tree, or "" when it lies
+    outside that tree. Resolution is realpath-based so a symlinked temp directory
+    cannot smuggle an artifact in."""
+    try:
+        return path.resolve().relative_to(Path(repo_root).resolve()).as_posix()
+    except ValueError:
+        return ""
+
+
 def read_test_evidence(
     artifact: str | Path,
     *,
     expected_tested_sha: str,
+    repo_root: Optional[str | Path] = None,
     expected_suite_identity: str = "tests",
     command: str = AUTHORITATIVE_TEST_COMMAND,
     python_version: str = "",
@@ -128,13 +197,26 @@ def read_test_evidence(
     Refuses: absent, empty, unparsable, non-`testsuite` documents; documents with
     no test cases; documents whose suite identity does not match; documents
     produced against a different tree; documents whose bytes changed since the
-    run; and any document reporting failures or errors.
+    run; documents that lie OUTSIDE the declared tree (`repo_root`), which a
+    reviewer could not obtain; and any document reporting failures or errors.
+
+    When `repo_root` is given, the returned record carries the artifact's
+    repo-relative citation, which is the path the receipt publishes.
     """
     path = Path(artifact)
     if not path.is_file():
         raise UnverifiableTestEvidence(
             f"test artifact {path} does not exist; a test baseline cannot be "
             "certified without the artifact the authoritative command produced")
+    relative = ""
+    if repo_root is not None:
+        relative = _repo_relative(path, repo_root)
+        if not relative:
+            raise UnverifiableTestEvidence(
+                f"test artifact {path} is not inside the declared tree "
+                f"{Path(repo_root).resolve()}; a baseline cited at a "
+                "machine-local path cannot be obtained or re-checked by a "
+                "reviewer, so it is refused rather than published")
     blob = path.read_bytes()
     if not blob.strip():
         raise UnverifiableTestEvidence(f"test artifact {path} is empty")
@@ -221,7 +303,10 @@ def read_test_evidence(
             f"command exit status {exit_status}")
 
     return TestEvidence(
-        artifact_path=str(path), artifact_digest=digest, artifact_bytes=len(blob),
+        artifact_path=relative or str(path), artifact_digest=digest,
+        artifact_bytes=len(blob),
+        artifact_canonical_digest=canonical_artifact_digest(blob),
+        repo_relative_path=relative,
         command=command, suite_identity=suite_identity, tested_sha=expected_tested_sha,
         python_version=python_version, pytest_version=pytest_version,
         collected=collected, passed=passed, failed=failed, skipped=skipped,
@@ -244,8 +329,12 @@ def check_baseline(test_evidence: TestEvidence, *, tested_sha: str) -> Dict[str,
     return {"verified": not problems, "problems": problems,
             "measured_full": test_evidence.collected,
             "collected_full": test_evidence.collected,
+            "declared_tested_sha": tested_sha,
+            "artifact_bound_tested_sha": test_evidence.tested_sha,
             "artifact_digest": test_evidence.artifact_digest,
+            "artifact_canonical_digest": test_evidence.artifact_canonical_digest,
             "artifact_path": test_evidence.artifact_path,
+            "artifact_in_tree": test_evidence.in_tree,
             "authoritative_test_command": test_evidence.command,
             "suite_identity": test_evidence.suite_identity,
             "tested_sha": test_evidence.tested_sha}

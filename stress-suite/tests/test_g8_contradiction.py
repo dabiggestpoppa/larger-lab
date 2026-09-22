@@ -87,17 +87,27 @@ def contract() -> Dict[str, Any]:
 def sealed_test_evidence(tmp_path_factory) -> Any:
     """A SEALED JUnit fixture document, so the regressions never re-invoke pytest
     inside pytest. The authoritative package build consumes a live artifact; a unit
-    test consumes a document it fully controls."""
+    test consumes a document it fully controls.
+
+    It is bound to the tree the emitter DECLARES (`EMIT.TESTED_SHA`), exactly as
+    the authoritative artifact is, so the gate's baseline check compares a
+    declared tree against a bound tree rather than against itself.
+    """
     path = tmp_path_factory.mktemp("g8ev") / "pytest.xml"
-    path.write_text(junit_document(cases=973, tested_sha=AUDIT.head_sha()),
+    path.write_text(junit_document(cases=973, tested_sha=EMIT.TESTED_SHA),
                     encoding="utf-8")
-    return read_test_evidence(str(path), expected_tested_sha=AUDIT.head_sha(),
+    # the artifact declares THIS temporary directory as its tree, which is what
+    # makes it "in tree". The authoritative build declares the repository, so its
+    # citation is a repo-relative path a reviewer can resolve (R-G8-07).
+    return read_test_evidence(str(path), expected_tested_sha=EMIT.TESTED_SHA,
+                              repo_root=path.parent,
                               python_version=sys.version.split()[0])
 
 
 @pytest.fixture(scope="module")
 def package(sealed_test_evidence) -> Dict[str, Any]:
-    return AUDIT.build_package(test_evidence=sealed_test_evidence)
+    return AUDIT.build_package(test_evidence=sealed_test_evidence,
+                              expected_tested_sha=sealed_test_evidence.tested_sha)
 
 
 def _obs(contract, oid, **kw):
@@ -368,9 +378,13 @@ def test_c13_seeded_inconsistent_control_is_detected_and_registered(contract):
 # C14 / C15 — byte reproducibility and the self-certification guard
 # --------------------------------------------------------------------------- #
 def test_c14_report_generation_is_byte_reproducible(sealed_test_evidence):
-    first = json.dumps(AUDIT.build_package(test_evidence=sealed_test_evidence)["register"],
+    first = json.dumps(AUDIT.build_package(
+        test_evidence=sealed_test_evidence,
+        expected_tested_sha=sealed_test_evidence.tested_sha)["register"],
                        sort_keys=True)
-    second = json.dumps(AUDIT.build_package(test_evidence=sealed_test_evidence)["register"],
+    second = json.dumps(AUDIT.build_package(
+        test_evidence=sealed_test_evidence,
+        expected_tested_sha=sealed_test_evidence.tested_sha)["register"],
                         sort_keys=True)
     assert first == second
 
@@ -574,7 +588,8 @@ def test_c14_the_emitted_evidence_package_is_byte_reproducible(
 
 def test_the_audit_does_not_modify_canonical_fixtures(contract, sealed_test_evidence):
     before = CONTRACT_PATH.read_bytes()
-    AUDIT.build_package(test_evidence=sealed_test_evidence)
+    AUDIT.build_package(test_evidence=sealed_test_evidence,
+                       expected_tested_sha=sealed_test_evidence.tested_sha)
     assert CONTRACT_PATH.read_bytes() == before
 
 
@@ -758,11 +773,14 @@ def test_c21_the_declared_blocks_gate_policy_governs_the_exit(
     families = package["families"]
     obs = package["observations"]
     guarded = [g for fam in families for g in fam.guarded]
+    declared = sealed_test_evidence.tested_sha
     blocked = decide_gate(contract, families, guarded, [high],
-                          test_evidence=sealed_test_evidence, observations=obs)
+                          test_evidence=sealed_test_evidence,
+                          expected_tested_sha=declared, observations=obs)
     assert blocked["exit"] == "BLOCKED_G8_MISSING_EVIDENCE"
     passed = decide_gate(contract, families, guarded, [quiet],
-                         test_evidence=sealed_test_evidence, observations=obs)
+                         test_evidence=sealed_test_evidence,
+                         expected_tested_sha=declared, observations=obs)
     assert passed["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
     assert passed["counts"]["gate_claim_superseded"] == 1
     # a recorded-but-non-blocking defect is still counted, never dropped
@@ -770,13 +788,15 @@ def test_c21_the_declared_blocks_gate_policy_governs_the_exit(
         finding_id="R", receipt_path="z", claim="c", observed="o", is_defect=True,
         classification="RECEIPT_OR_CLAIM_DEFECT", severity="MEDIUM",
         governing_contract="g", detail="d", blocks_gate=False)],
-        test_evidence=sealed_test_evidence, observations=obs)
+        test_evidence=sealed_test_evidence, expected_tested_sha=declared,
+        observations=obs)
     assert recorded["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
     assert recorded["counts"]["gate_claim_recorded_not_blocking"] == 1
-    # R-G8-05: an EMPTY guarded-property surface proves nothing, so the gate must
-    # block instead of passing by absence of a violation
+    # R-G8-05/R-G8RX6 F2: an EMPTY guarded-property surface proves nothing, so the
+    # gate must block instead of passing by absence of a violation
     empty = decide_gate(contract, families, [], [quiet],
-                        test_evidence=sealed_test_evidence, observations=obs)
+                        test_evidence=sealed_test_evidence,
+                        expected_tested_sha=declared, observations=obs)
     assert empty["exit"] == "BLOCKED_G8_MISSING_EVIDENCE"
     assert empty["counts"]["unexercised_required_properties"] == len(
         contract["closure_required_properties"])
@@ -821,6 +841,7 @@ def test_r01_a_mandated_pair_never_compared_blocks_the_gate(
     guarded = [g for f in package["families"] for g in f.guarded]
     decision = decide_gate(contract, stripped, guarded, [],
                            test_evidence=sealed_test_evidence,
+                           expected_tested_sha=sealed_test_evidence.tested_sha,
                            observations=package["observations"])
     assert decision["exit"] == "BLOCKED_G8_MISSING_EVIDENCE"
     assert decision["counts"]["mandated_not_adjudicated"] > 0
@@ -1285,3 +1306,173 @@ def test_the_red_transcript_artifact_on_disk_matches_the_harness():
     assert marker in archived, "the annex must record the contract's Git history"
     assert archived.split(marker)[0].rstrip() == \
         RED.transcript(with_git_log=False).rstrip()
+
+
+# =========================================================================== #
+# STRESS-G8RX6 — the two enforcement gaps the closure audit proved (F1, F2) and
+# the artifact-provenance gap in R-G8-07's baseline citation.
+# =========================================================================== #
+def test_f1_the_gate_refuses_a_baseline_bound_to_a_different_tree(
+        contract, package, sealed_test_evidence):
+    """F1 RED BEFORE REPAIR: decide_gate called
+    `check_baseline(test_evidence, tested_sha=test_evidence.tested_sha)`, comparing
+    the artifact against ITSELF, so a forged tested tree certified and
+    baseline.verified stayed True. The declared tree is now a required argument
+    and the gate can detect a stale or foreign artifact."""
+    params = inspect.signature(decide_gate).parameters
+    assert "expected_tested_sha" in params
+    assert params["expected_tested_sha"].default is inspect.Parameter.empty, \
+        "the declared tree may not default: an inferred tree reintroduces F1"
+    families = package["families"]
+    guarded = [g for fam in families for g in fam.guarded]
+    obs = package["observations"]
+    declared = sealed_test_evidence.tested_sha
+    ok = decide_gate(contract, families, guarded, [],
+                     test_evidence=sealed_test_evidence,
+                     expected_tested_sha=declared, observations=obs)
+    assert ok["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
+    assert ok["baseline"]["verified"] is True
+    forged = replace(sealed_test_evidence, tested_sha="0" * 40)
+    bad = decide_gate(contract, families, guarded, [], test_evidence=forged,
+                      expected_tested_sha=declared, observations=obs)
+    assert bad["exit"] == "BLOCKED_G8_BASELINE_FAILURE"
+    assert bad["baseline"]["verified"] is False
+    assert bad["declared_tested_sha"] == declared
+    assert bad["baseline"]["artifact_bound_tested_sha"] == "0" * 40
+
+
+def test_f2_a_required_property_that_never_holds_blocks_closure(
+        contract, package, sealed_test_evidence):
+    """F2 RED BEFORE REPAIR: closure accepted any finding whose derivation_kind was
+    not NOT_DERIVABLE, whatever its verdict, so a required property exercised only
+    as UNKNOWN_NOT_FAVORABLE satisfied closure and the gate PASSED on
+    non-derivations. A HOLDS finding carries its derivation evidence by
+    construction, so HOLDS is now the requirement."""
+    target = "P5"
+    families = package["families"]
+    guarded = [g for fam in families for g in fam.guarded]
+    obs = package["observations"]
+    declared = sealed_test_evidence.tested_sha
+    assert any(g.property_id == target and g.verdict == "HOLDS" for g in guarded)
+    stripped = [replace(g, value=None, verdict="UNKNOWN_NOT_FAVORABLE",
+                        derivation_kind="DIRECT_TRACE")
+                if g.property_id == target else g for g in guarded]
+    decision = decide_gate(contract, families, stripped, [],
+                           test_evidence=sealed_test_evidence,
+                           expected_tested_sha=declared, observations=obs)
+    assert decision["exit"] == "BLOCKED_G8_MISSING_EVIDENCE"
+    cov = decision["guarded_coverage"]
+    assert target in cov["unexercised_required_properties"]
+    assert target in cov["required_never_holding"]
+    # it was TOUCHED but never held — the distinction F2 turns on
+    assert target not in cov["required_never_derived"]
+    assert any("never returned HOLDS" in r for r in decision["reasons"])
+    # the live package still proves every closure-required property
+    live = package["guarded_coverage"]
+    assert live["unexercised_required_properties"] == []
+    assert live["required_never_holding"] == []
+    assert "must return HOLDS" in live["closure_rule"]
+
+
+def test_r07_the_artifact_must_live_inside_the_declared_tree(tmp_path):
+    """R-G8-07 provenance gap: the receipt used to cite a machine-local temp path
+    with a per-run digest, so no reviewer on another machine could obtain or
+    re-check the baseline the gate rested on. An artifact outside the declared
+    tree is now refused outright."""
+    sha = AUDIT.head_sha()
+    p = tmp_path / "pytest.xml"
+    p.write_text(junit_document(cases=5, tested_sha=sha), encoding="utf-8")
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(p), expected_tested_sha=sha, repo_root=ROOT.parent)
+    ev = read_test_evidence(str(p), expected_tested_sha=sha, repo_root=tmp_path)
+    assert ev.in_tree and ev.repo_relative_path == "pytest.xml"
+    assert ev.to_dict()["artifact_path"] == "pytest.xml"
+    assert ev.to_dict()["artifact_path_scope"] == "REPO_RELATIVE"
+
+
+def test_r07_the_emitter_refuses_an_artifact_outside_the_declared_tree(tmp_path):
+    sha = AUDIT.head_sha()
+    p = tmp_path / "pytest.xml"
+    p.write_text(junit_document(cases=5, tested_sha=sha), encoding="utf-8")
+    undeclared = read_test_evidence(str(p), expected_tested_sha=sha)
+    assert undeclared.in_tree is False
+    with pytest.raises(UnverifiableTestEvidence):
+        EMIT.emit(undeclared)
+
+
+def test_r07_the_emitted_citation_resolves_in_tree_and_matches_the_bytes(
+        tmp_path, monkeypatch):
+    """End-to-end on the MECHANISM: emit into a redirected package and check the
+    CITATION rather than the prose. The cited path must resolve inside the declared
+    tree and its raw digest must equal the digest of the bytes on disk, so the
+    baseline is re-checkable without trusting the generator."""
+    import hashlib
+    from engine.g8_test_evidence import canonical_artifact_digest
+    tree = tmp_path / "tree"
+    evdir = tree / "stress-suite" / "evidence"
+    evdir.mkdir(parents=True)
+    doc = evdir / "G8_TEST_RESULTS.xml"
+    doc.write_text(junit_document(cases=7, tested_sha=EMIT.TESTED_SHA),
+                   encoding="utf-8")
+    evidence = read_test_evidence(str(doc), expected_tested_sha=EMIT.TESTED_SHA,
+                                 repo_root=tree)
+    monkeypatch.setattr(EMIT, "EVIDENCE", evdir)
+    out = EMIT.emit(evidence)
+    cited = out["receipt"]["test_evidence_artifact"]
+    assert cited["artifact_path_scope"] == "REPO_RELATIVE"
+    assert cited["artifact_path"] == "stress-suite/evidence/G8_TEST_RESULTS.xml"
+    target = tree / cited["artifact_path"]
+    assert target.is_file(), "the cited citation must resolve in the declared tree"
+    blob = target.read_bytes()
+    assert hashlib.sha256(blob).hexdigest() == cited["artifact_digest"]
+    assert len(blob) == cited["artifact_bytes"]
+    assert canonical_artifact_digest(blob) == cited["artifact_canonical_digest"]
+    assert out["receipt"]["declared_tested_sha"] == EMIT.TESTED_SHA
+    bound = out["receipt"]["baseline_check"]
+    assert bound["declared_tested_sha"] == EMIT.TESTED_SHA
+    assert bound["artifact_bound_tested_sha"] == EMIT.TESTED_SHA
+    assert bound["artifact_in_tree"] is True
+
+
+def test_r07_raw_and_canonical_artifact_digests_are_distinct_and_declared(tmp_path):
+    """The raw digest is per-RUN (JUnit stamps time/timestamp/hostname) and so
+    cannot be reproduced by re-running; the canonical digest applies the declared
+    rule and is. Both are published under distinct names, so 'content digest' is
+    not silently redefined."""
+    from engine.g8_test_evidence import (ARTIFACT_CANONICALIZATION_RULE,
+                                         canonical_artifact_digest)
+    sha = AUDIT.head_sha()
+    base = junit_document(cases=5, tested_sha=sha)
+    stamped = []
+    for i, (elapsed, host) in enumerate((("1.23", "host-a"), ("9.87", "host-b"))):
+        doc = base.replace(
+            '<testsuite name="tests" tests="5">',
+            f'<testsuite name="tests" tests="5" time="{elapsed}" '
+            f'timestamp="2026-01-0{i + 1}T00:00:00" hostname="{host}">')
+        path = tmp_path / f"run{i}.xml"
+        path.write_text(doc, encoding="utf-8")
+        stamped.append(read_test_evidence(str(path), expected_tested_sha=sha,
+                                         repo_root=tmp_path))
+    first, second = stamped
+    assert first.artifact_digest != second.artifact_digest, "raw bytes differ per run"
+    assert first.artifact_canonical_digest == second.artifact_canonical_digest
+    assert ARTIFACT_CANONICALIZATION_RULE == "JUNIT_XML_MINUS_TIME_TIMESTAMP_HOSTNAME"
+    cited = first.to_dict()
+    assert cited["artifact_digest"] == first.artifact_digest
+    assert cited["artifact_canonical_digest"] == first.artifact_canonical_digest
+    assert cited["artifact_canonicalization_rule"] == ARTIFACT_CANONICALIZATION_RULE
+    assert "RAW sha256" in cited["artifact_digest_semantics"]
+    assert canonical_artifact_digest(
+        (tmp_path / "run0.xml").read_bytes()) == first.artifact_canonical_digest
+
+
+def test_r07_the_authoritative_command_writes_the_cited_artifact_path():
+    """The receipt cites one repo-relative path; the command that produces it must
+    name that same path, run from the package directory, so the citation is
+    obtainable rather than aspirational."""
+    from engine.g8_test_evidence import ARTIFACT_RELATIVE_PATH
+    assert ARTIFACT_RELATIVE_PATH == "stress-suite/evidence/G8_TEST_RESULTS.xml"
+    assert EMIT.ARTIFACT_RELATIVE_PATH == ARTIFACT_RELATIVE_PATH
+    assert f"--junitxml=evidence/{Path(ARTIFACT_RELATIVE_PATH).name}" in \
+        EMIT.ARTIFACT_COMMAND
+    assert EMIT.ARTIFACT_COMMAND.startswith("cd stress-suite && ")

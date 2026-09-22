@@ -972,7 +972,12 @@ def collect_observations(contract: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 def build_package(contract_path: Optional[Path] = None,
-                  test_evidence: Optional[TestEvidence] = None) -> Dict[str, Any]:
+                  test_evidence: Optional[TestEvidence] = None,
+                  *, expected_tested_sha: str) -> Dict[str, Any]:
+    """`expected_tested_sha` is the tree the caller DECLARES this package is
+    archived for. It is required, never inferred from the evidence: a gate that
+    compares the artifact to itself cannot notice a stale or foreign artifact
+    (STRESS-G8RX6, enforcement gap F1)."""
     if test_evidence is None:
         raise ValueError(
             "build_package requires a provenance-bearing JUnit test artifact; a "
@@ -1004,6 +1009,7 @@ def build_package(contract_path: Optional[Path] = None,
     observation_sequence = [all_obs[k] for k in sorted(all_obs)]
     decision = decide_gate(contract, families, guarded, gate_findings,
                            test_evidence=test_evidence,
+                           expected_tested_sha=expected_tested_sha,
                            observations=observation_sequence)
     limits = derivation_limitations(contract, families, all_obs)
     return {"contract": contract, "contract_digest": contract_digest(contract),
@@ -1019,8 +1025,10 @@ def build_package(contract_path: Optional[Path] = None,
             "carried": carried_items()}
 
 
-def main(test_evidence: Optional[TestEvidence] = None) -> Dict[str, Any]:
-    pkg = build_package(test_evidence=test_evidence)
+def main(test_evidence: Optional[TestEvidence] = None, *,
+         expected_tested_sha: str) -> Dict[str, Any]:
+    pkg = build_package(test_evidence=test_evidence,
+                        expected_tested_sha=expected_tested_sha)
     print("contract digest:", pkg["contract_digest"])
     print("observations:", len(pkg["observations"]))
     for fam in pkg["families"]:
@@ -1044,8 +1052,7 @@ def main(test_evidence: Optional[TestEvidence] = None) -> Dict[str, Any]:
 if __name__ == "__main__":
     from engine.g8_test_evidence import read_test_evidence
     artifact = sys.argv[1] if len(sys.argv) > 1 else ""
-    main(test_evidence=read_test_evidence(artifact, expected_tested_sha=head_sha()))
-
-
-if __name__ == "__main__":
-    main()
+    tested = head_sha()
+    main(test_evidence=read_test_evidence(artifact, expected_tested_sha=tested,
+                                         repo_root=ROOT.parent),
+         expected_tested_sha=tested)
