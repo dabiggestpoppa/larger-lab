@@ -6,22 +6,22 @@
     "findings": "R-G8-01..R-G8-09",
     "pre_repair_head": "6c015f86408a56721f8999e4aa39b218fab0fd4d",
     "red_evidence": "stress-suite/evidence/G8_PRE_REPAIR_RED_TRANSCRIPT.md (regenerable: scenarios/g8_pre_repair_red_transcript.py)",
-    "repaired_head": "ed42d30aa122485898b67f7ecde77f9312350550",
+    "repaired_head": "4d80828f03ae964466506c387db3e271dc1f7e9b",
     "verdict_scope": "the first G8 PASS was PROVISIONAL: it reported 20/20 mandated coverage while mandated pairs returned NOT_COMPARABLE, and several guarded properties passed on non-derivations. The repair makes the audit stricter; no scenario expectation and no A-004..A-012 text was changed."
   },
   "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
   "baseline_check": {
-    "artifact_bound_tested_sha": "ed42d30aa122485898b67f7ecde77f9312350550",
-    "artifact_canonical_digest": "650b745c3eb703681f3d9657a59562948b651ce2b2a91ce1670a696581d9197e",
-    "artifact_digest": "19d4dd90c81ec792cd8fb53ac8bf245320f217084ebdbffcecccbf2492da802a",
+    "artifact_bound_tested_sha": "4d80828f03ae964466506c387db3e271dc1f7e9b",
+    "artifact_canonical_digest": "e637fb1165df568a6d386ef3a598650de3136882757ac1a1fa9e89568ce17037",
+    "artifact_digest": "ff1b3e76f97bdb3130d4694a17e86ce8579536ab57fcf43c77c8486466506553",
     "artifact_in_tree": true,
     "artifact_path": "stress-suite/evidence/G8_TEST_RESULTS.xml",
     "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
     "collected_full": 1014,
-    "declared_tested_sha": "ed42d30aa122485898b67f7ecde77f9312350550",
+    "declared_tested_sha": "4d80828f03ae964466506c387db3e271dc1f7e9b",
     "problems": [],
     "suite_identity": "pytest",
-    "tested_sha": "ed42d30aa122485898b67f7ecde77f9312350550",
+    "tested_sha": "4d80828f03ae964466506c387db3e271dc1f7e9b",
     "verified": true
   },
   "capital_mutations": 0,
@@ -34,12 +34,12 @@
     "ER02": "OPEN_DOCTRINE_SPACE"
   },
   "citation_check": {
-    "artifact_canonical_digest": "650b745c3eb703681f3d9657a59562948b651ce2b2a91ce1670a696581d9197e",
-    "artifact_digest": "19d4dd90c81ec792cd8fb53ac8bf245320f217084ebdbffcecccbf2492da802a",
+    "artifact_canonical_digest": "e637fb1165df568a6d386ef3a598650de3136882757ac1a1fa9e89568ce17037",
+    "artifact_digest": "ff1b3e76f97bdb3130d4694a17e86ce8579536ab57fcf43c77c8486466506553",
     "artifact_path": "stress-suite/evidence/G8_TEST_RESULTS.xml",
     "citation_rule": "the cited path must resolve inside the declared tree and its on-disk raw and canonical digests must equal the published ones",
     "problems": [],
-    "recorded_tested_sha": "ed42d30aa122485898b67f7ecde77f9312350550",
+    "recorded_tested_sha": "4d80828f03ae964466506c387db3e271dc1f7e9b",
     "verified": true
   },
   "cloud_mutations": 0,
@@ -218,7 +218,7 @@
   "production_mutations": 0,
   "receipt_id": "G8-EVIDENCE-RECEIPT-001",
   "recommended_next_gate": "G9 \u2014 NOT AUTHORIZED",
-  "reproducibility": "the package is regenerated from the tree by scenarios/g8_emit_evidence.py; two consecutive builds are byte-identical and the generator carries no wall-clock field",
+  "reproducibility": "the package is regenerated from the tree by scenarios/g8_emit_evidence.py; two consecutive builds of the SAME artifact are byte-identical and the generator carries no wall-clock field. The JUnit artifact's RAW bytes are per-RUN by design -- its writer stamps time/timestamp/hostname -- so a fresh test run yields different raw bytes and therefore a different raw digest. The CANONICAL digest under JUNIT_XML_MINUS_TIME_TIMESTAMP_HOSTNAME is the run-invariant identity: it matched across independent runs and across LF and CRLF checkouts. The tested tree is derived from the CODE tree, so an evidence-only commit does not move it and the package remains re-derivable from any later commit.",
   "scenario_internal_authority_events": "not re-counted by G8; measured by the G6 truth closure and unchanged by this gate (G8 registers a container/source and terminates them; it does not propose, ratify or revoke authority)",
   "skipped": 0,
   "starting_sha": "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3",
@@ -358,9 +358,9 @@
   ],
   "test_evidence_artifact": {
     "artifact_bytes": 129089,
-    "artifact_canonical_digest": "650b745c3eb703681f3d9657a59562948b651ce2b2a91ce1670a696581d9197e",
+    "artifact_canonical_digest": "e637fb1165df568a6d386ef3a598650de3136882757ac1a1fa9e89568ce17037",
     "artifact_canonicalization_rule": "JUNIT_XML_MINUS_TIME_TIMESTAMP_HOSTNAME",
-    "artifact_digest": "19d4dd90c81ec792cd8fb53ac8bf245320f217084ebdbffcecccbf2492da802a",
+    "artifact_digest": "ff1b3e76f97bdb3130d4694a17e86ce8579536ab57fcf43c77c8486466506553",
     "artifact_digest_semantics": "artifact_digest is the RAW sha256 of the artifact as produced, so it changes with run timings; artifact_canonical_digest applies the declared rule above and is re-derivable by re-running.",
     "artifact_path": "stress-suite/evidence/G8_TEST_RESULTS.xml",
     "artifact_path_scope": "REPO_RELATIVE",
@@ -375,9 +375,9 @@
     "python_version": "3.11.9",
     "skipped": 0,
     "suite_identity": "pytest",
-    "tested_sha": "ed42d30aa122485898b67f7ecde77f9312350550"
+    "tested_sha": "4d80828f03ae964466506c387db3e271dc1f7e9b"
   },
-  "tested_sha": "ed42d30aa122485898b67f7ecde77f9312350550",
+  "tested_sha": "4d80828f03ae964466506c387db3e271dc1f7e9b",
   "uncovered_mandated_pairs": [],
   "verdict": "PASS_G8_CROSS_SCENARIO_COHERENCE",
   "verdicts_by_verdict": {
