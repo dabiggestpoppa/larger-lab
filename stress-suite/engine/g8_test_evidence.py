@@ -43,6 +43,7 @@ no other module may re-decide whether an artifact is acceptable.
 from __future__ import annotations
 
 import hashlib
+import json
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
@@ -94,8 +95,29 @@ ARTIFACT_COMMAND = (f"{AUTHORITATIVE_TEST_COMMAND} "
 #: canonical form removes, so `artifact_digest` (raw, checkable against the
 #: committed bytes) and `artifact_canonical_digest` (re-derivable by re-running)
 #: keep distinct declared meanings and neither redefines "content digest".
-_VOLATILE_JUNIT_ATTRIBUTES = ("time", "timestamp", "hostname")
-ARTIFACT_CANONICALIZATION_RULE = "JUNIT_XML_MINUS_TIME_TIMESTAMP_HOSTNAME"
+#:
+#: STRESS-G8ARCH5: a rule is a VERSIONED DEFINITION, not a label. The published
+#: name resolves in `CANONICALIZATION_RULES` below, `canonical_junit_bytes`
+#: implements the fields of that same object, and the receipt publishes the
+#: DEFINITION's fingerprint. A definition therefore cannot move while the name
+#: stays put, which is how a published digest could silently change meaning: the
+#: label would still read the same while the bytes it describes did not.
+CANONICALIZATION_RULES: Dict[str, Mapping[str, Any]] = {
+    "JUNIT_XML_MINUS_VOLATILE_ATTRS_V1": {
+        "strips_attributes": ("time", "timestamp", "hostname"),
+        "sorts_attributes": True,
+        "note": ("strips the attributes JUnit stamps per RUN and orders "
+                 "attributes deterministically. Newline identity is STRUCTURAL "
+                 "rather than configured -- the serializer normalises character "
+                 "data and escapes CR/LF inside attribute values, so the "
+                 "canonical bytes cannot contain a raw CR -- which is why there "
+                 "is no newline-normalisation step to declare here: an "
+                 "unimplemented declaration would be a description, not a rule"),
+    },
+}
+
+#: the versioned name this package publishes; the name IS the version
+ARTIFACT_CANONICALIZATION_RULE = "JUNIT_XML_MINUS_VOLATILE_ATTRS_V1"
 
 #: the declared rule a citation must satisfy, stated once so the reader, the
 #: verifier and the receipt cannot describe it differently (STRESS-G8ARCH4).
@@ -115,15 +137,45 @@ def _ordered(element: ET.Element) -> ET.Element:
     return clone
 
 
+def canonical_rule(name: str = ARTIFACT_CANONICALIZATION_RULE) -> Mapping[str, Any]:
+    """The DEFINITION a published rule NAME stands for.
+
+    An unknown name refuses rather than defaulting: a digest whose declared rule
+    cannot be resolved is not a documented digest."""
+    try:
+        return CANONICALIZATION_RULES[name]
+    except KeyError:
+        raise UnverifiableTestEvidence(
+            f"unknown canonicalization rule {name!r}: a published rule name must "
+            f"resolve to a declared definition (declared: "
+            f"{sorted(CANONICALIZATION_RULES)})")
+
+
+def canonical_rule_fingerprint(
+        name: str = ARTIFACT_CANONICALIZATION_RULE) -> str:
+    """A digest of the rule's DECLARED DEFINITION, published beside its name so a
+    reader can tell whether the meaning behind a fixed label has moved."""
+    definition = canonical_rule(name)
+    body = {k: definition[k] for k in sorted(definition)}
+    return hashlib.sha256(
+        json.dumps({"name": name, **body}, sort_keys=True,
+                   separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
 def canonical_junit_bytes(blob: bytes) -> bytes:
     """The canonical form of a JUnit artifact under
     `ARTIFACT_CANONICALIZATION_RULE`. Two runs over the same tree produce the same
-    canonical bytes; the raw bytes legitimately differ."""
+    canonical bytes; the raw bytes legitimately differ.
+
+    Every declared field of the rule is IMPLEMENTED here, because a declaration
+    that does not drive the implementation is a description, not a definition."""
+    rule = canonical_rule()
     root = ET.fromstring(blob)
     for element in root.iter():
-        for attribute in _VOLATILE_JUNIT_ATTRIBUTES:
+        for attribute in rule["strips_attributes"]:
             element.attrib.pop(attribute, None)
-    return ET.tostring(_ordered(root), encoding="utf-8")
+    canonical = _ordered(root) if rule["sorts_attributes"] else root
+    return ET.tostring(canonical, encoding="utf-8")
 
 
 def canonical_artifact_digest(blob: bytes) -> str:
@@ -182,6 +234,8 @@ class TestEvidence:
             "artifact_path_scope": ("REPO_RELATIVE" if self.in_tree
                                     else "OUTSIDE_DECLARED_TREE"),
             "artifact_canonicalization_rule": ARTIFACT_CANONICALIZATION_RULE,
+            "artifact_canonicalization_rule_fingerprint":
+                canonical_rule_fingerprint(),
             "artifact_canonical_digest": self.artifact_canonical_digest,
             "artifact_digest_semantics": (
                 "artifact_digest is the RAW sha256 of the artifact as produced, so "

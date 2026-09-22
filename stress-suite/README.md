@@ -88,6 +88,17 @@ exit code, so the refusal that claim drove is driven by the counts measured from
 the artifact, and the one honest partial case — a skipped test — is named in the
 receipt and in the result prose rather than smoothed into a count.
 
+The red evidence for every finding is a committed harness, not prose: two
+harnesses (`scenarios/g8_pre_repair_red_transcript.py` for the first review,
+`scenarios/g8_arch_red_transcript.py` for the passes after the closure matrix)
+extract their named commits read-only, run the same probes against that code and
+against the working tree, and archive the transcript they print. Each probe line
+ends in `verdict=RED` or `verdict=GREEN`, and the closure matrix cites an id from
+one of those annexes, so a row cannot cite evidence that no longer reproduces.
+The canonicalization rule is a versioned NAME whose definition is data and whose
+fingerprint is published, so the meaning behind a published label cannot move
+while the label stays.
+
 The tested tree is DERIVED from Git — the newest commit that changed code or tests —
 by that one owner, so the emitter, the harness (`conftest`) and the audit entry
 point cannot disagree about it, and a package stays re-derivable from any later

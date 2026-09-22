@@ -49,8 +49,13 @@ from engine.g8_contradiction import (  # noqa: E402
     validate_contract,
 )
 from engine.g8_test_evidence import (  # noqa: E402
+    ARTIFACT_CANONICALIZATION_RULE,
     ARTIFACT_RELATIVE_PATH,
+    CANONICALIZATION_RULES,
     UnverifiableTestEvidence,
+    canonical_junit_bytes,
+    canonical_rule,
+    canonical_rule_fingerprint,
     check_baseline,
     junit_document,
     read_test_evidence,
@@ -80,6 +85,7 @@ import g8_run_audit as AUDIT  # noqa: E402
 import g8_concept_projection as CP  # noqa: E402
 import g8_emit_evidence as EMIT  # noqa: E402
 import g8_pre_repair_red_transcript as RED  # noqa: E402
+import g8_arch_red_transcript as ARCH  # noqa: E402
 from engine.g8_contradiction import GuardedPropertyFinding  # noqa: E402
 
 CONTRACT_PATH = ROOT / "evidence" / "G8_EQUIVALENCE_CONTRACT.json"
@@ -1322,6 +1328,131 @@ def test_the_red_transcript_artifact_on_disk_matches_the_harness():
 
 
 # =========================================================================== #
+# STRESS-G8ARCH5 — durable red evidence for the passes AFTER the closure matrix,
+# and the canonicalization rule pinned to its definition.
+#
+# The red proofs for these passes were originally run in a scratch directory and
+# deleted, which left them in prose. The mission requires red regressions or
+# executable transcripts, and a deleted file is neither, so the ARCH harness is
+# committed and these two controls rerun it live.
+# =========================================================================== #
+def test_the_arch_red_transcript_still_reproduces_every_finding():
+    """Every ARCH-era finding must still be RED against the code that carried it
+    and GREEN against the tree being published. The harness extracts each named
+    pre-pass commit read-only and runs the SAME probes against both, so this is
+    rerunnable red evidence rather than a description of one."""
+    text = ARCH.transcript()
+    assert "PROBE EXIT" not in text, "a probe must run clean against every tree"
+    for head in (h for _, h in ARCH.PRE_PASS_HEADS):
+        before = ARCH.verdicts(text, head)
+        assert set(before) == set(ARCH.PROBE_IDS), head
+
+    # the head before the tree rule existed: no lag rule at all, and a citation
+    # verified with an empty declared tree that defaulted to ""
+    before_arch3 = ARCH.verdicts(text, ARCH.PRE_PASS_HEADS[0][1])
+    assert before_arch3["ARCH-B"] == "RED"
+    assert before_arch3["ARCH-E"] == "RED"
+    assert before_arch3["ARCH-F"] == "RED"
+
+    # the head before the omission-hazard repair: every hazard still present, and
+    # the lag rule itself working (so ARCH-E and ARCH-F are genuinely different
+    # findings rather than one repeated)
+    before_arch4 = ARCH.verdicts(text, ARCH.PRE_PASS_HEADS[1][1])
+    for probe in ("ARCH-A", "ARCH-B", "ARCH-C", "ARCH-D", "ARCH-F", "ARCH-G"):
+        assert before_arch4[probe] == "RED", probe
+    assert before_arch4["ARCH-E"] == "GREEN"
+
+    # the tree being published: nothing RED, and the underivable tree refuses
+    now = ARCH.verdicts(text)
+    assert set(now) == set(ARCH.PROBE_IDS)
+    assert set(now.values()) == {"GREEN"}, now
+    assert "unverifiable tested tree" in text
+    # the must-refuse control: a tree with no Git is refused, not reviewed
+    assert "reviewer command exit=1 accepted=False" in text
+    assert "derived tested tree: ''" in text or "no derivation available" in text
+
+
+def test_the_arch_red_transcript_artifact_on_disk_matches_the_harness():
+    """The committed ARCH annex must be the harness's own output, so the matrix's
+    ARCH rows cannot cite red evidence that no longer reproduces. The annex has no
+    Git-history section, so this comparison is byte-for-byte in full."""
+    archived = (ROOT / "evidence" /
+                "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md").read_text(encoding="utf-8")
+    assert archived.rstrip() == ARCH.transcript().rstrip()
+
+
+def test_no_exit_status_is_published_because_none_can_be_observed(
+        sealed_test_evidence, tmp_path):
+    """RED BEFORE REPAIR (ARCH-C, live: `to_dict()['exit_status'] == 0`): the
+    reader took `exit_status: int = 0`, so the emitter published a successful run
+    outcome it had never observed -- an unobserved value read as a favourable one.
+    A JUnit document cannot show the producing process's exit code, so the claim is
+    gone and the refusal it drove is driven by the counts MEASURED from the
+    artifact instead."""
+    cited = sealed_test_evidence.to_dict()
+    assert "exit_status" not in cited
+    assert "exit_status" not in inspect.signature(read_test_evidence).parameters
+    assert cited["honest_baseline"] is True
+    # a failing run still refuses, on measurement rather than on a claim
+    tree = tmp_path / "measured"
+    path = tree / ARTIFACT_RELATIVE_PATH
+    path.parent.mkdir(parents=True)
+    path.write_text(junit_document(cases=4, failures=1,
+                                   tested_sha=sealed_test_evidence.tested_sha),
+                    encoding="utf-8")
+    with pytest.raises(UnverifiableTestEvidence) as err:
+        read_test_evidence(path, expected_tested_sha=sealed_test_evidence.tested_sha,
+                           repo_root=tree)
+    assert "failing baseline" in str(err.value)
+
+
+def test_the_canonical_rule_name_resolves_to_its_declared_definition_and_pinned_fingerprint(
+        monkeypatch):
+    """RED BEFORE REPAIR (ARCH-G, live: `resolvable definition=False`): the
+    published `artifact_canonicalization_rule` was a LABEL. Nothing resolved it, so
+    the definition could move while the published name stayed put and the receipt
+    would keep describing a rule it no longer used.
+
+    The name is now a version whose DEFINITION is data, whose fields drive the
+    implementation, and whose fingerprint is published and pinned here. Changing
+    any declared field requires a new name.
+    """
+    assert ARTIFACT_CANONICALIZATION_RULE in CANONICALIZATION_RULES
+    definition = canonical_rule()
+    assert canonical_rule_fingerprint() == (
+        "eae28317d14ded9ab85e7f4684e3ec55cee2f363f05f2c1b623fc26bc1756687")
+    # the declaration is not decorative: the attributes it names are the ones the
+    # implementation strips, and attribute ORDER cannot change the canonical bytes
+    one = b'<testsuite name="tests" tests="0" time="0.1" hostname="h">' \
+          b'<properties><property name="tested_sha" value="a"/></properties></testsuite>'
+    two = b'<testsuite hostname="h" time="0.2" name="tests" tests="0">' \
+          b'<properties><property name="tested_sha" value="a"/></properties></testsuite>'
+    assert canonical_junit_bytes(one) == canonical_junit_bytes(two)
+    assert b"time=" not in canonical_junit_bytes(one)
+    assert b"hostname=" not in canonical_junit_bytes(one)
+    # the rule's newline portability is STRUCTURAL, not a configured step: no
+    # declaration here promises normalisation, so this asserts the property itself
+    # over adversarial documents -- CRLF in character data, and CRLF smuggled in
+    # through an attribute value as character references
+    for doc in (b'<testsuite name="tests" tests="0">\r\n<properties/>\r\n</testsuite>',
+                b'<testsuite name="a&#13;&#10;b" tests="0"><properties/></testsuite>',
+                b'<testsuite name="tests" tests="1"><testcase classname="t" '
+                b'name="x"><failure message="l1&#13;&#10;l2"/></testcase></testsuite>'):
+        assert b"\r" not in canonical_junit_bytes(doc)
+    # ... and every declared field DRIVES the implementation: a definition change
+    # moves the fingerprint, which is what forces a new name rather than a quiet
+    # edit, and the field really is what the digest applies
+    monkeypatch.setitem(CANONICALIZATION_RULES, ARTIFACT_CANONICALIZATION_RULE,
+                        {**definition, "strips_attributes": ("time",)})
+    assert canonical_rule_fingerprint() != (
+        "eae28317d14ded9ab85e7f4684e3ec55cee2f363f05f2c1b623fc26bc1756687")
+    assert b"hostname" in canonical_junit_bytes(one)
+    # an unpublished name refuses rather than defaulting to the declared rule
+    with pytest.raises(UnverifiableTestEvidence):
+        canonical_rule("NOT_A_DECLARED_RULE")
+
+
+# =========================================================================== #
 # STRESS-G8RX6 — the two enforcement gaps the closure audit proved (F1, F2) and
 # the artifact-provenance gap in R-G8-07's baseline citation.
 # =========================================================================== #
@@ -1496,8 +1627,11 @@ def test_r07_raw_and_canonical_artifact_digests_are_distinct_and_declared(tmp_pa
     first, second = stamped
     assert first.artifact_digest != second.artifact_digest, "raw bytes differ per run"
     assert first.artifact_canonical_digest == second.artifact_canonical_digest
-    assert ARTIFACT_CANONICALIZATION_RULE == "JUNIT_XML_MINUS_TIME_TIMESTAMP_HOSTNAME"
+    # the published rule is a VERSIONED NAME that must resolve to a definition
+    assert ARTIFACT_CANONICALIZATION_RULE in CANONICALIZATION_RULES
     cited = first.to_dict()
+    assert cited["artifact_canonicalization_rule_fingerprint"] == \
+        canonical_rule_fingerprint()
     assert cited["artifact_digest"] == first.artifact_digest
     assert cited["artifact_canonical_digest"] == first.artifact_canonical_digest
     assert cited["artifact_canonicalization_rule"] == ARTIFACT_CANONICALIZATION_RULE
