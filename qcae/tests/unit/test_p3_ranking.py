@@ -646,6 +646,81 @@ class TestMultiSourceAggregationRegression:
         assert merge_canonical_candidates(list(reversed(combined))) == once
 
 
+class TestSaturationFamilyIdentityRegression:
+    """Audit finding 3 — saturation compared a family label ranking never emits.
+
+    ``build_families`` publishes hashed ``fam-…`` identities while
+    ``update_saturation`` compared the raw novelty label (``family-x`` or
+    ``singleton:<id>``). A caller driving saturation with the ids it actually got
+    from ranking therefore never matched, so repeat families stayed invisible and
+    the same cumulative inflation the specification repair removed came back
+    through the family counter — enough to keep a saturated search running to
+    budget.
+    """
+
+    PAPER_LEAD = lead("lead-1", "arxiv:2020.1", kind=CandidateKind.PAPER,
+                      license_claim="", source_class=SourceClass.RESEARCH_LITERATURE,
+                      adapter_id="adapter-arxiv")
+
+    def _ranked_family_ids(self):
+        """Family identities exactly as the ranking surface produced them."""
+        candidates = merge_leads([self.PAPER_LEAD])
+        result = rank_candidates(candidates=candidates, plan=plan(), policy=policy())
+        return candidates, result
+
+    def _search_outcome(self):
+        return AdapterOutcome(
+            adapter_id="adapter-arxiv",
+            source_class=SourceClass.RESEARCH_LITERATURE,
+            query_id="qry-paper",
+            status=AdapterStatus.OK,
+            leads=(self.PAPER_LEAD,),
+            pages_inspected=1,
+            results_inspected=10,
+        )
+
+    def test_family_ids_from_ranking_are_recognised_by_saturation(self) -> None:
+        candidates, result = self._ranked_family_ids()
+        family_ids = tuple(family.family_id for family in result.families)
+        assert family_ids and all(fid.startswith("fam-") for fid in family_ids)
+        metrics = update_saturation(
+            SaturationMetrics(results_inspected=10),
+            canonical_candidates=candidates,
+            previous_candidate_ids=[c.canonical_id for c in candidates],
+            previous_family_ids=family_ids,
+            previous_covered_atoms=(ATOM_A,),
+        )
+        assert metrics.new_implementation_families == 0
+
+    def test_repeated_passes_with_real_family_ids_cannot_inflate_novelty(self) -> None:
+        candidates, result = self._ranked_family_ids()
+        candidate_id = candidates[0].canonical_id
+        family_ids = tuple(family.family_id for family in result.families)
+        metrics = update_saturation(
+            SaturationMetrics(),
+            outcomes=(self._search_outcome(),),
+            canonical_candidates=candidates,
+        )
+        for _ in range(19):
+            metrics = update_saturation(
+                metrics,
+                outcomes=(self._search_outcome(),),
+                canonical_candidates=candidates,
+                previous_candidate_ids=(candidate_id,),
+                previous_family_ids=family_ids,
+                previous_covered_atoms=(ATOM_A,),
+            )
+        assert metrics.new_implementation_families == 1
+        saturated = dataclasses.replace(
+            metrics,
+            saturated=True,
+            saturation_reason="twenty passes returned only the already-known candidate",
+        )
+        recommendation = stop_recommendation(plan(), saturated)
+        assert recommendation.state.value == "STOP"
+        assert StopCondition.NEGLIGIBLE_NOVELTY in recommendation.satisfied_conditions
+
+
 class TestRepeatedPassSaturationRegression:
     """Audit finding 2 — repeated passes inflated novelty so STOP never fired.
 
@@ -658,7 +733,7 @@ class TestRepeatedPassSaturationRegression:
 
     PAPER_LEAD = lead("lead-1", "arxiv:2020.1", kind=CandidateKind.PAPER,
                       license_claim="", source_class=SourceClass.RESEARCH_LITERATURE,
-                      adapter_id="adapter-arxiv", novelty_family="family-spec")
+                      adapter_id="adapter-arxiv")
 
     def _search_outcome(self):
         """A search that keeps returning the one paper already discovered."""
@@ -675,6 +750,12 @@ class TestRepeatedPassSaturationRegression:
     def _twenty_passes(self) -> SaturationMetrics:
         specs = merge_leads([self.PAPER_LEAD])
         candidate_id = specs[0].canonical_id
+        # Family identity comes from the ranking surface, not from a hand-declared
+        # label: the caller only ever holds the ids ranking published.
+        family_ids = tuple(
+            family.family_id
+            for family in rank_candidates(candidates=specs, plan=plan(), policy=policy()).families
+        )
         metrics = update_saturation(
             SaturationMetrics(),
             outcomes=(self._search_outcome(),),
@@ -686,7 +767,7 @@ class TestRepeatedPassSaturationRegression:
                 outcomes=(self._search_outcome(),),
                 canonical_candidates=specs,
                 previous_candidate_ids=(candidate_id,),
-                previous_family_ids=("family-spec",),
+                previous_family_ids=family_ids,
                 previous_covered_atoms=(ATOM_A,),
             )
         return metrics

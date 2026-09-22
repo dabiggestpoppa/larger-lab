@@ -378,6 +378,17 @@ def merge_leads(leads: Sequence[CandidateLead]) -> Tuple[CanonicalCandidate, ...
 # -- families (2.7.6) -------------------------------------------------------
 
 
+def family_identity_for(candidate: CanonicalCandidate) -> str:
+    """The one family identity this module publishes and compares (canon 2.7.6).
+
+    Clustering, novelty sizing and saturation accounting must agree on what
+    "the same family" means, or a caller using the ids ranking actually emitted
+    can never match them and repeat families stay invisible to saturation.
+    """
+    label = candidate.novelty_family or f"singleton:{candidate.canonical_id}"
+    return "fam-" + hashlib.sha256(label.encode("utf-8")).hexdigest()[:16]
+
+
 def build_families(
     candidates: Sequence[CanonicalCandidate],
     scores: Mapping[str, float],
@@ -387,8 +398,7 @@ def build_families(
     candidates = merge_canonical_candidates(candidates)
     groups: Dict[str, List[CanonicalCandidate]] = {}
     for candidate in candidates:
-        group_id = candidate.novelty_family or f"singleton:{candidate.canonical_id}"
-        groups.setdefault(group_id, []).append(candidate)
+        groups.setdefault(family_identity_for(candidate), []).append(candidate)
 
     families: List[CandidateFamily] = []
     for group_id in sorted(groups):
@@ -399,11 +409,11 @@ def build_families(
         )
         singleton = len(members) == 1
         family = CandidateFamily(
-            family_id="fam-" + hashlib.sha256(group_id.encode("utf-8")).hexdigest()[:16],
+            family_id=group_id,
             representative_candidate_id=representative.canonical_id,
             member_candidate_ids=tuple(m.canonical_id for m in members),
             shared_lineage=(
-                f"adapter-declared novelty family {group_id!r}"
+                f"adapter-declared novelty family {representative.novelty_family!r}"
                 if not singleton
                 else "singleton candidate (no shared lineage declared)"
             ),
@@ -438,8 +448,7 @@ def _derive_dimensions(
 
     evidence_availability = 1.0 if candidate.deeper_intelligence_ready else 0.4
 
-    family_key = candidate.novelty_family or f"singleton:{candidate.canonical_id}"
-    family_size = max(1, int(family_sizes.get(family_key, 1)))
+    family_size = max(1, int(family_sizes.get(family_identity_for(candidate), 1)))
     novelty = 1.0 / family_size
 
     extractability = _EXTRACTABILITY_PRIOR.get(
@@ -572,7 +581,7 @@ def rank_candidates(
 
     family_sizes: Dict[str, int] = {}
     for candidate in candidates:
-        key = candidate.novelty_family or f"singleton:{candidate.canonical_id}"
+        key = family_identity_for(candidate)
         family_sizes[key] = family_sizes.get(key, 0) + 1
 
     popularity_map = popularity or {}
@@ -761,7 +770,7 @@ def update_saturation(
         is_new = candidate.canonical_id not in known_candidates
         if is_new:
             new_candidates += 1
-        family = candidate.novelty_family or f"singleton:{candidate.canonical_id}"
+        family = family_identity_for(candidate)
         if family not in known_families:
             new_families.add(family)
         # Canon 2.1.10 measures novelty against what was already known: a repeat
