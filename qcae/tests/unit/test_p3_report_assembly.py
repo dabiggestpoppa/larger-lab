@@ -24,8 +24,14 @@ from qcae.core.discovery.lead import (
 from qcae.core.discovery.plan import (
     ContractAmendmentProposal,
     HardPrefilter,
+    SaturationMetrics,
     StopRule,
 )
+from qcae.discovery.planning.saturation import (
+    stop_recommendation,
+    update_saturation,
+)
+from qcae.discovery.planning.families import family_identity_for
 from qcae.core.discovery.report import (
     PrefilterDecision,
     StopCondition,
@@ -404,10 +410,17 @@ class TestOutcomeBindingRefusals:
             tuple(baseline_plan().query_ids),
             _baseline().to_dict(),
         )
-        # A refused assembly must not mutate the inputs it was handed.
-        with pytest.raises(QcaeValidationError):
-            _run(leads=leads, outcomes=outcomes, saturated=True,
-                 saturation_reason="undeclared")
+        # A refused assembly must not mutate the inputs it was handed: the
+        # foreign outcome below carries a query the plan never planned (the
+        # A refusal), and the raise must leave every handed record intact.
+        foreign = replace(
+            outcomes[0],
+            execution_record=replace(
+                outcomes[0].execution_record,
+                query_id="fam-ghost:never-planned-query"),
+        )
+        with pytest.raises(QcaeValidationError, match="never planned"):
+            _run(leads=leads, outcomes=[*outcomes, foreign])
         after = (
             tuple(leads),
             tuple(outcomes),
@@ -421,16 +434,137 @@ class TestOutcomeBindingRefusals:
             assert o.execution_record is not None
 
 
+class TestNoBooleanPathToStop:
+    """P3-R4-R1 — the audit's top gap, closed and pinned by shape and behavior."""
+
+    def test_the_saturated_parameter_no_longer_exists(self) -> None:
+        """The audit's channel: removed from the caller-facing signature."""
+        import inspect
+
+        signature = inspect.signature(assemble_discovery_report)
+        for gone in ("saturated", "saturation_reason"):
+            assert gone not in signature.parameters
+
+    def test_assembly_flags_cannot_create_a_stop(self) -> None:
+        """A saturated-looking flag is inert in assembly: only the typed
+        accounting or an attributable assessment can satisfy a condition."""
+        report, _c, _r = _run(leads=(), outcomes=())
+        assert report.stop_recommendation.state.value == "CONTINUE"
+        assert report.stop_recommendation.satisfied_conditions == ()
+        assert report.saturation_metrics.saturated is False
+
+    def test_derived_saturation_requires_every_authorized_source(self) -> None:
+        """Partial execution never derives saturation, so never derives a stop."""
+        outcomes = (_outcome("q-1", results=0,
+                             status=AdapterStatus.NO_RESULTS),)
+        metrics = update_saturation(SaturationMetrics(), outcomes=outcomes,
+                                    plan=baseline_plan())
+        assert metrics.saturated is False
+        assert metrics.saturation_reason == ""
+
+    def test_genuine_exhaustion_still_derives_a_stop(self) -> None:
+        """The honest path survives: exhausted families may still stop the pass.
+
+        Every authorized class executed a real payload-bearing search, and
+        everything found was already known: the accounting itself derives
+        saturation, and the plan's declared NEGLIGIBLE_NOVELTY threshold stops
+        the pass — with no caller boolean anywhere in the flow.
+        """
+        plan = make_discovery_plan(**plan_kwargs(stop_rules=(
+            StopRule(condition=StopCondition.BUDGET_CEILING_REACHED),
+            StopRule(condition=StopCondition.NON_DOMINATED_SET_SUFFICIENT),
+            StopRule(condition=StopCondition.NEGLIGIBLE_NOVELTY, threshold=0.1),
+        )))
+        leads = (
+            lead("lead-gh-1", "github:owner/lib"),
+            lead("lead-reg-1", "github:owner/Lib.git",
+                 source_class=SourceClass.INTERNAL_REGISTRY_CODE,
+                 adapter_id="adapter-registry"),
+            lead("lead-pkg-1", "pypi:some-lib",
+                 source_class=SourceClass.PACKAGE_ECOSYSTEM,
+                 adapter_id="adapter-pypi",
+                 claims=(ATOM_B,), atoms=(ATOM_B,),
+                 query_lineage=QueryLineage(
+                     atom_id=ATOM_B, semantic_concept="dedup specification",
+                     family_id="fam-synonym", concrete_query="dedup",
+                     source_class=SourceClass.PACKAGE_ECOSYSTEM,
+                     adapter_id="adapter-pypi")),
+        )
+        outcomes = (
+            _outcome("q-1", leads=(leads[0],), results=2, plan=plan),
+            _outcome("q-2", source_class=SourceClass.INTERNAL_REGISTRY_CODE,
+                     adapter_id="adapter-registry", leads=(leads[1],),
+                     results=2, plan=plan),
+            _outcome("q-3", source_class=SourceClass.PACKAGE_ECOSYSTEM,
+                     adapter_id="adapter-pypi", leads=(leads[2],),
+                     results=2, plan=plan),
+        )
+        candidates = merge_leads(leads)
+        metrics = update_saturation(
+            SaturationMetrics(),
+            plan=plan,
+            outcomes=outcomes,
+            canonical_candidates=candidates,
+            previous_candidate_ids=[c.canonical_id for c in candidates],
+            previous_family_ids=[family_identity_for(c) for c in candidates],
+            previous_covered_atoms=[
+                atom for c in candidates for atom in c.claims_atoms],
+        )
+        assert metrics.saturated is True
+        assert metrics.saturation_reason.startswith("derived: ")
+        report, _c, _r = _run(leads=leads, outcomes=outcomes, plan=plan,
+                              previously_known_candidates=candidates)
+        assert report.stop_recommendation.state.value == "STOP"
+        assert StopCondition.NEGLIGIBLE_NOVELTY in (
+            report.stop_recommendation.satisfied_conditions)
+
+    def test_failure_only_pass_cannot_derive_saturation_or_a_stop(self) -> None:
+        """L, residual hole: failure-only has no observations to derive from.
+
+        The audit found the derived negligible-novelty path satisfiable on a
+        pass where every query failed or returned nothing: an exhaustion rate
+        of 0.0 over zero inspected results would meet any threshold. The
+        derivation requires inspected results — observations to derive a rate
+        *from* — so the pass derives no saturation and the recommendation is
+        CONTINUE, even though the failures were still recorded as knowledge.
+        """
+        plan = make_discovery_plan(**plan_kwargs(stop_rules=(
+            StopRule(condition=StopCondition.BUDGET_CEILING_REACHED),
+            StopRule(condition=StopCondition.NON_DOMINATED_SET_SUFFICIENT),
+            StopRule(condition=StopCondition.NEGLIGIBLE_NOVELTY, threshold=0.1),
+        )))
+        outcomes = (
+            _outcome("q-1", status=AdapterStatus.RATE_LIMITED, results=0,
+                     plan=plan),
+            _outcome("q-2", source_class=SourceClass.INTERNAL_REGISTRY_CODE,
+                     status=AdapterStatus.NO_RESULTS, results=0, plan=plan),
+        )
+        metrics = update_saturation(SaturationMetrics(), outcomes=outcomes,
+                                    plan=plan)
+        assert metrics.new_failure_information > 0
+        assert metrics.saturated is False
+        recommendation = stop_recommendation(plan, metrics)
+        assert recommendation.state.value == "CONTINUE"
+        assert StopCondition.NEGLIGIBLE_NOVELTY not in (
+            recommendation.satisfied_conditions)
+
+
 class TestStopAuthority:
     """P3-R4C3 — no naked caller boolean may create a STOP."""
 
     def test_naked_sufficiency_and_saturation_booleans_are_gone(self) -> None:
-        """J: the boolean parameters no longer exist to accept."""
+        """J: the boolean parameters no longer exist to accept.
+
+        ``saturated`` joined the removed set (P3-R4-R1): the audit found it
+        flowing through the metrics into the NEGLIGIBLE_NOVELTY derivation —
+        the last boolean channel to a STOP.
+        """
         import inspect
 
         signature = inspect.signature(assemble_discovery_report)
         for gone in ("enough_non_dominated", "hard_constraints_eliminated_class",
-                     "contract_amendment_required"):
+                     "contract_amendment_required", "saturated",
+                     "saturation_reason"):
             assert gone not in signature.parameters
 
     def test_stop_without_an_assessment_is_unrepresentable(self) -> None:
@@ -511,9 +645,9 @@ class TestStopAuthority:
         """L: zero results inspected cannot manufacture a negligible-novelty STOP.
 
         ``marginal_novelty_rate`` is 0.0 when nothing was inspected, so a naive
-        reading would satisfy any declared threshold; the derivation refuses to
-        call that saturation unless the caller typed reason stands beside it,
-        and here the caller declares none.
+        reading would satisfy any declared threshold; the derivation requires
+        inspected results — observations to derive a rate *from* — so an empty
+        or failed pass stays CONTINUE regardless of any threshold (§5 law 7).
         """
         plan = make_discovery_plan(**plan_kwargs(stop_rules=(
             StopRule(condition=StopCondition.BUDGET_CEILING_REACHED),
@@ -1207,13 +1341,27 @@ class TestAssemblyFailsClosed:
             _run(leads=leads, outcomes=outcomes)
 
     def test_no_stop_can_rest_on_a_condition_the_plan_never_declared(self) -> None:
-        leads = [lead("lead-gh-1", "github:owner/lib")]
-        outcomes = [_outcome("q-1", results=1, leads=leads)]
-        # The baseline plan declares BUDGET_CEILING_REACHED and
-        # NON_DOMINATED_SET_SUFFICIENT, but no NEGLIGIBLE_NOVELTY rule.
+        """An *asserted* saturated record cannot invent an undeclared condition.
+
+        Was exercised via the removed ``saturated`` kwarg; now proven at the
+        recommendation itself: a caller-supplied saturated record meeting a
+        plan that declares no NEGLIGIBLE_NOVELTY rule is refused outright —
+        while the accounting's own derived measurement on such a plan simply
+        continues (its declared choice), with no exception.
+        """
+        metrics = SaturationMetrics(
+            results_inspected=10, new_candidates=0, saturated=True,
+            saturation_reason="three families returned known candidates",
+        )
         with pytest.raises(QcaeValidationError, match="NEGLIGIBLE_NOVELTY"):
-            _run(leads=leads, outcomes=outcomes, saturated=True,
-                 saturation_reason="nothing new is appearing")
+            stop_recommendation(baseline_plan(), metrics)
+        derived = SaturationMetrics(
+            results_inspected=10, new_candidates=0, saturated=True,
+            saturation_reason=(
+                "derived: this pass inspected results and discovered nothing "
+                "new (no new candidates, specifications, families or atoms)"),
+        )
+        assert stop_recommendation(baseline_plan(), derived).state.value == "CONTINUE"
 
 
 class TestAssembledEvidence:

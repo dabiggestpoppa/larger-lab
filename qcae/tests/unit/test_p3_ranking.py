@@ -9,7 +9,6 @@ and never promotes a candidate (2.7.4, 2.7.16 invariant 1).
 
 from __future__ import annotations
 
-import dataclasses
 
 import pytest
 
@@ -602,6 +601,7 @@ class TestSaturation:
         candidates = merge_leads([lead("lead-1", "github:owner/repo")])
         metrics = update_saturation(
             SaturationMetrics(),
+            plan=plan(),
             outcomes=(
                 adapter_outcome("q1", results=2, leads=(lead("lead-1", "github:owner/repo"),)),
                 adapter_outcome("q2", status=AdapterStatus.RATE_LIMITED, leads=()),
@@ -620,6 +620,7 @@ class TestSaturation:
         known = candidates[0].canonical_id
         metrics = update_saturation(
             SaturationMetrics(),
+            plan=plan(),
             canonical_candidates=candidates,
             previous_candidate_ids=(known,),
             previous_covered_atoms=(ATOM_A,),
@@ -628,8 +629,9 @@ class TestSaturation:
         assert metrics.new_atoms_covered == 0
         assert metrics.marginal_novelty_rate == 0.0
 
-    def test_saturation_requires_a_reason(self) -> None:
-        with pytest.raises(QcaeValidationError, match="recorded reason"):
+    def test_saturation_cannot_be_asserted(self) -> None:
+        """P3-R4-R1: no raw caller boolean may reach a stop recommendation."""
+        with pytest.raises(TypeError, match="saturated"):
             update_saturation(SaturationMetrics(), saturated=True)
 
 
@@ -795,6 +797,7 @@ class TestSaturationFamilyIdentityRegression:
         assert family_ids and all(fid.startswith("fam-") for fid in family_ids)
         metrics = update_saturation(
             SaturationMetrics(results_inspected=10),
+            plan=plan(),
             canonical_candidates=candidates,
             previous_candidate_ids=[c.canonical_id for c in candidates],
             previous_family_ids=family_ids,
@@ -808,12 +811,14 @@ class TestSaturationFamilyIdentityRegression:
         family_ids = tuple(family.family_id for family in result.families)
         metrics = update_saturation(
             SaturationMetrics(),
+            plan=plan(),
             outcomes=(self._search_outcome(),),
             canonical_candidates=candidates,
         )
         for _ in range(19):
             metrics = update_saturation(
                 metrics,
+                plan=plan(),
                 outcomes=(self._search_outcome(),),
                 canonical_candidates=candidates,
                 previous_candidate_ids=(candidate_id,),
@@ -821,12 +826,14 @@ class TestSaturationFamilyIdentityRegression:
                 previous_covered_atoms=(ATOM_A,),
             )
         assert metrics.new_implementation_families == 1
-        saturated = dataclasses.replace(
+        metrics = update_saturation(
             metrics,
-            saturated=True,
-            saturation_reason="twenty passes returned only the already-known candidate",
+            outcomes=(self._search_outcome(),),
+            plan=plan(),
         )
-        recommendation = stop_recommendation(plan(), saturated)
+        assert metrics.saturated is True
+        assert metrics.saturation_reason
+        recommendation = stop_recommendation(plan(), metrics)
         assert recommendation.state.value == "STOP"
         assert StopCondition.NEGLIGIBLE_NOVELTY in recommendation.satisfied_conditions
 
@@ -868,12 +875,14 @@ class TestRepeatedPassSaturationRegression:
         )
         metrics = update_saturation(
             SaturationMetrics(),
+            plan=plan(),
             outcomes=(self._search_outcome(),),
             canonical_candidates=specs,
         )
         for _ in range(19):
             metrics = update_saturation(
                 metrics,
+                plan=plan(),
                 outcomes=(self._search_outcome(),),
                 canonical_candidates=specs,
                 previous_candidate_ids=(candidate_id,),
@@ -890,11 +899,13 @@ class TestRepeatedPassSaturationRegression:
 
     def test_saturated_search_can_satisfy_the_declared_stop_rule(self) -> None:
         metrics = self._twenty_passes()
-        saturated = dataclasses.replace(
+        metrics = update_saturation(
             metrics,
-            saturated=True,
-            saturation_reason="twenty passes returned only the already-known candidate",
+            outcomes=(self._search_outcome(),),
+            plan=plan(),
         )
-        recommendation = stop_recommendation(plan(), saturated)
+        assert metrics.saturated is True
+        assert metrics.saturation_reason
+        recommendation = stop_recommendation(plan(), metrics)
         assert recommendation.state.value == "STOP"
         assert StopCondition.NEGLIGIBLE_NOVELTY in recommendation.satisfied_conditions

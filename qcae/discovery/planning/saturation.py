@@ -9,7 +9,9 @@ stop rule could never fire and a saturated search would run to budget instead of
 stopping (2.1.9).
 
 A STOP recommendation is only representable when a stop condition the plan
-itself declared is satisfied: stop rules exist before the search, not after.
+itself declared is satisfied: stop rules exist before the search, not after,
+and no raw caller boolean may create one (P3-R4-R1) — saturation is derived
+from the typed counters the accounting itself advances.
 """
 
 from __future__ import annotations
@@ -43,6 +45,7 @@ __all__ = ["stop_recommendation", "update_saturation"]
 def update_saturation(
     previous: SaturationMetrics,
     *,
+    plan: DiscoveryPlan,
     outcomes: Sequence[AdapterOutcome] = (),
     canonical_candidates: Sequence[CanonicalCandidate] = (),
     previous_candidate_ids: Iterable[str] = (),
@@ -51,14 +54,15 @@ def update_saturation(
     novel_atom_scope: Iterable[str] = (),
     negative_observation_ids: Iterable[str] = (),
     previous_negative_observation_ids: Iterable[str] = (),
-    saturated: bool = False,
-    saturation_reason: str = "",
 ) -> SaturationMetrics:
     """Advance the marginal-novelty counters (canon 2.1.10, 2.2.12).
 
     Only searches that actually ran advance the counters (a rate-limited or
     unauthenticated adapter contributes failure information, not coverage), and
-    novelty is measured against what was already known.
+    novelty is measured against what was already known. Saturation is derived
+    here, never asserted (P3-R4-R1: no raw caller boolean may create a STOP) —
+    a caller who judges the families exhausted files a
+    NON_DOMINATED_SET_SUFFICIENT assessment instead.
 
     ``novel_atom_scope`` is this plan's authorized external scope (P3-R4C2): a
     candidate that claims an atom outside it is an observation about another
@@ -122,6 +126,19 @@ def update_saturation(
             if o.status == AdapterStatus.NO_RESULTS or o.status in FAILURE_STATUSES
         })
 
+    # P3-R4-R1: derived, not asserted. This pass derived "saturated" when its
+    # searches actually carried observations — at least one result inspected —
+    # and found nothing new. The reason is the same derivation, so the record
+    # always stands on the counters it was computed from. A pass with no
+    # payload (only empty or failed searches) is never saturation: it produced
+    # no observations for the rate to be a rate over.
+    derived_saturated = (
+        inspected > 0
+        and not new_candidates
+        and not new_specifications
+        and not new_families
+        and not new_atoms
+    )
     metrics = SaturationMetrics(
         queries_executed=previous.queries_executed + len(outcomes),
         results_inspected=previous.results_inspected + inspected,
@@ -133,8 +150,11 @@ def update_saturation(
         # post-forensics), so this counter is not incremented here.
         new_acquisition_forms=previous.new_acquisition_forms,
         new_failure_information=previous.new_failure_information + failure_information,
-        saturated=saturated,
-        saturation_reason=saturation_reason,
+        saturated=derived_saturated,
+        saturation_reason=(
+            "derived: this pass inspected results and discovered nothing new "
+            "(no new candidates, specifications, families or atoms)"
+        ) if derived_saturated else "",
     )
     metrics.validate()
     return metrics
@@ -156,6 +176,11 @@ def stop_recommendation(
     derived from the typed counters here, and NEGLIGIBLE_NOVELTY is derived
     from the metrics under the plan's declared threshold. The recommendation
     that results is advice only — it grants no acquisition authority.
+
+    P3-R4-R1 (§5 law 8): ``SaturationMetrics.saturated`` is derived from the
+    typed accounting, never caller-asserted. NEGLIGIBLE_NOVELTY additionally
+    requires inspected results — an exhaustion rate is a rate over
+    observations, and a pass where nothing carried a payload has none.
     """
     metrics.validate()
     declared = {rule.condition for rule in plan.stop_rules}
@@ -186,18 +211,30 @@ def stop_recommendation(
         satisfied.append(StopCondition.CONTRACT_AMBIGUITY_REQUIRES_AMENDMENT)
 
     # Law 6: negligible novelty is derived from the (in-scope) observations.
-    if metrics.saturated:
+    # An exhaustion rate is a rate over observations: a pass where nothing
+    # carried a payload (empty or failed searches only) has no observations to
+    # derive a rate from, so it cannot satisfy any threshold (§5 law 7) — no
+    # boolean may stand in for the missing evidence.
+    if metrics.saturated and metrics.results_inspected > 0:
+        # The undeclared-condition tripwire is for *asserted* saturation: the
+        # accounting derives saturation with a ``derived: `` reason, so a
+        # derived measurement never trips it — a plan that declares no
+        # NEGLIGIBLE_NOVELTY rule simply continues (its own declared choice),
+        # while an externally supplied saturated record still cannot invent
+        # the condition.
+        asserted = not metrics.saturation_reason.startswith("derived: ")
         negligible_rule = next(
             (r for r in plan.stop_rules if r.condition == StopCondition.NEGLIGIBLE_NOVELTY),
             None,
         )
-        if negligible_rule is None or negligible_rule.threshold is None:
+        if asserted and (negligible_rule is None or negligible_rule.threshold is None):
             raise QcaeValidationError(
                 "saturation was declared but the plan declares no NEGLIGIBLE_NOVELTY "
                 "rule with a threshold; a stop cannot be justified by an undeclared "
                 "condition (canon 2.1.9)"
             )
-        if metrics.marginal_novelty_rate < float(negligible_rule.threshold):
+        if (negligible_rule is not None and negligible_rule.threshold is not None
+                and metrics.marginal_novelty_rate < float(negligible_rule.threshold)):
             satisfied.append(StopCondition.NEGLIGIBLE_NOVELTY)
 
     # Every satisfied condition must carry its attributable assessment. The
@@ -248,13 +285,16 @@ def stop_recommendation(
                     f"threshold:{threshold}",
                 ),
                 derivation_method=(
-                    "derived the marginal novelty rate from the typed in-scope "
-                    "observations and compared it with the plan's declared "
-                    "NEGLIGIBLE_NOVELTY threshold"
+                    "derived saturation from the typed accounting (this pass "
+                    "inspected results and discovered nothing new), derived "
+                    "the marginal novelty rate from the in-scope observations "
+                    "and compared it with the plan's declared NEGLIGIBLE_NOVELTY "
+                    "threshold"
                 ),
                 rationale=(
-                    f"marginal novelty {metrics.marginal_novelty_rate:.3f} is below "
-                    f"the declared threshold {threshold}"
+                    "the pass inspected results with no new discoveries; "
+                    f"marginal novelty {metrics.marginal_novelty_rate:.3f} is "
+                    f"below the declared threshold {threshold}"
                 ),
             )
         return supplied[condition]

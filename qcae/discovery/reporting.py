@@ -259,8 +259,6 @@ def assemble_discovery_report(
     previous_report: Optional[DiscoveryReport] = None,
     previous_metrics: Optional[SaturationMetrics] = None,
     previously_known_candidates: Sequence[CanonicalCandidate] = (),
-    saturated: bool = False,
-    saturation_reason: str = "",
     stop_assessments: Sequence[StopConditionAssessment] = (),
     stop_rationale: str = "",
     created_at: str = "",
@@ -269,8 +267,11 @@ def assemble_discovery_report(
     """Assemble one discovery pass into its terminal report (canon 2.7.15).
 
     ``outcomes`` are the adapter results that ran; ``ranking`` is the pass over
-    the candidates those outcomes produced. The judgement flags are the caller's
-    declarations and are never inferred from the other pieces.
+    the candidates those outcomes produced. No raw caller boolean reaches a STOP
+    recommendation (P3-R4-R1): budget exhaustion and negligible novelty are
+    derived from the typed accounting, and a judgement stop — sufficiency, a
+    class eliminated by hard constraints, contract ambiguity — arrives only as
+    its own attributable ``StopConditionAssessment``.
 
     For a later pass, hand the previous artifact over as ``previous_report``: the
     report carries both the counters and the canonical candidates they measured,
@@ -332,6 +333,7 @@ def assemble_discovery_report(
     )
     metrics = update_saturation(
         previous_metrics if previous_metrics is not None else SaturationMetrics(),
+        plan=plan,
         outcomes=ran,
         canonical_candidates=discovered,
         previous_candidate_ids=[c.canonical_id for c in previously_known_candidates],
@@ -349,8 +351,6 @@ def assemble_discovery_report(
         previous_negative_observation_ids=(
             o.observation_id for o in previous_report.negative_observations
         ) if previous_report is not None else (),
-        saturated=saturated,
-        saturation_reason=saturation_reason,
     )
 
     verdict = stop_recommendation(
