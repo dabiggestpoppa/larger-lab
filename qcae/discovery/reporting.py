@@ -21,8 +21,11 @@ Two rules govern what it does with each piece:
   justify a stop, because ``stop_recommendation`` owns that law (2.1.9).
 - **Fail closed instead of dropping a piece.** A discovered candidate the ranking
   never saw, a baseline belonging to another plan or atom scope, a search that
-  reached a source the plan never allocated, and an unlabelled partial search are
-  refused rather than assembled into a report that quietly omits them.
+  reached a source the plan never allocated, an unlabelled partial search, and a
+  sufficiency declaration with no candidate set to be sufficient are refused
+  rather than assembled into a report that quietly omits them. A contradiction
+  the artifact cannot refuse — search that ran for atoms the baseline had already
+  satisfied internally — is *disclosed* in its notes instead.
 
 Owned elsewhere, deliberately not reimplemented here: canonical identity and merge
 (``planning.canonical``), family identity (``planning.families``), the counting
@@ -102,6 +105,11 @@ def assemble_discovery_report(
     }))
     discovered = merge_leads([lead for outcome in ran for lead in outcome.leads])
     _require_discovered_accounted_for(discovered, canonical_ids)
+    _require_sufficiency_claim_has_a_set(
+        enough_non_dominated=enough_non_dominated,
+        canonical_ids=canonical_ids,
+        previously_known_candidates=previously_known_candidates,
+    )
 
     metrics = update_saturation(
         previous_metrics if previous_metrics is not None else SaturationMetrics(),
@@ -204,6 +212,32 @@ def _require_sources_allocated(
         )
 
 
+def _require_sufficiency_claim_has_a_set(
+    *,
+    enough_non_dominated: bool,
+    canonical_ids: Sequence[str],
+    previously_known_candidates: Sequence[CanonicalCandidate],
+) -> None:
+    """A sufficiency declaration must be about a set the artifact contains (2.1.9).
+
+    ``NON_DOMINATED_SET_SUFFICIENT`` is the caller's judgement, but a judgement
+    needs a subject: with no candidate from this pass and none seen by an earlier
+    one, the report would recommend stopping on the strength of a set it does not
+    contain. That is the one stop claim the artifact's own contents refute; every
+    other stop condition is read off the plan or the counters, which cannot
+    disagree with themselves. Candidates an earlier pass already saw are a real
+    set, so a later pass that adds nothing may still be the pass that judges the
+    accumulated set sufficient (2.1.10).
+    """
+    if enough_non_dominated and not canonical_ids and not previously_known_candidates:
+        raise QcaeValidationError(
+            "the non-dominated set is declared sufficient, but the report contains no "
+            "candidate set to be sufficient: this pass found no candidate and none was "
+            "known from an earlier pass (canon 2.1.9/2.7.15: a sufficiency claim must be "
+            "about a set the artifact actually contains)"
+        )
+
+
 def _require_discovered_accounted_for(
     discovered: Sequence[CanonicalCandidate], canonical_ids: Sequence[str]
 ) -> None:
@@ -269,6 +303,14 @@ def _coverage_notes(
     ]
     requested = tuple(plan.atom_ids)
     targets = tuple(baseline.external_target_atoms)
+    searched = tuple(o for o in outcomes if o.counts_toward_saturation)
+    if not targets and searched:
+        notes.append(
+            f"{len(searched)} external search(es) ran while the internal baseline assigns "
+            "no atom to external search (canon 2.6.5/2.6.8): every requested atom is "
+            "internally satisfied, so the searches were not required by the baseline. "
+            "The report records both facts rather than implying the effort was needed"
+        )
     if targets and len(targets) < len(requested):
         notes.append(
             f"external search narrowed to {len(targets)} of {len(requested)} requested "
@@ -296,13 +338,19 @@ def _coverage_notes(
 def _partial_search_notes(outcomes: Sequence[AdapterOutcome]) -> Tuple[str, ...]:
     """Partial searches stay labelled partial (canon 2.2.13).
 
-    The completeness note itself is required by the adapter contract, so this
-    module carries it rather than re-deriving or summarizing it.
+    What counts as partial is the port's own finding (``exhaustive``), not the
+    status label alone: a search that ran and qualified its completeness is
+    partial whether its status reads PARTIAL_RESULTS or reads OK because it
+    returned results from pages it did not finish. Its own completeness note is
+    carried, never summarized. A failure is not a partial search — it is a
+    negative finding.
     """
     return tuple(
         f"{o.source_class.value} {o.query_id}: {o.completeness_note}"
         for o in outcomes
-        if o.status == AdapterStatus.PARTIAL_RESULTS
+        if o.counts_toward_saturation
+        and not o.exhaustive
+        and o.completeness_note.strip()
     )
 
 

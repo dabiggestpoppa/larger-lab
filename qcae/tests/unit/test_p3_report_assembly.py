@@ -133,6 +133,107 @@ def _two_adapter_run():
     return [github, registry, paper], outcomes
 
 
+class TestNoClaimOutrunsItsEvidence:
+    """A claim in the artifact must not survive beside evidence that refutes it.
+
+    Each case here is a state the real pieces reach: the report's own contents
+    contradict a note, a status, or a stop recommendation. The phase's rule is
+    that such a claim is refused or recorded, never left standing silently.
+    """
+
+    def test_external_search_though_the_baseline_assigned_no_atom_is_disclosed(self) -> None:
+        """Searches ran for atoms the baseline says are already held internally.
+
+        ``external_target_atoms`` empty means every requested atom is internally
+        satisfied, so canon 2.6.5/2.6.8 makes external search on them wasted work.
+        The report carries both facts, and says so.
+        """
+        leads, outcomes = _two_adapter_run()
+        report, _, _ = _run(
+            leads=leads, outcomes=outcomes,
+            baseline=_baseline(evidence={ATOM_A: ["c-a"], ATOM_B: ["c-b"]}),
+        )
+        assert report.candidate_families  # the searches did return candidates
+        assert any("assigns no atom to external search" in note
+                   for note in report.coverage_notes)
+
+    def test_a_fully_satisfied_baseline_with_no_search_records_no_contradiction(self) -> None:
+        """The disclosure above is about a contradiction, not noise."""
+        report, _, _ = _run(
+            leads=(), outcomes=(),
+            baseline=_baseline(evidence={ATOM_A: ["c-a"], ATOM_B: ["c-b"]}),
+        )
+        assert not any("assigns no atom to external search" in note
+                       for note in report.coverage_notes)
+
+    def test_a_completed_search_that_is_not_exhaustive_is_recorded_partial(self) -> None:
+        """Canon 2.2.13: a partial search is never represented as exhaustive.
+
+        The port's own standing is what makes a search partial: ``exhaustive``
+        holds only for a completed search carrying no qualification, so a search
+        that returned results *and* qualified its completeness is partial even
+        though its status reads OK.
+        """
+        leads, _ = _two_adapter_run()
+        qualified = _outcome("q-qualified", leads=(leads[0],),
+                             completeness_note="stopped after page 3 of 10")
+        assert qualified.status is AdapterStatus.OK
+        assert qualified.exhaustive is False
+
+        report, _, _ = _run(leads=(leads[0],), outcomes=(qualified,))
+        assert any("stopped after page 3 of 10" in note
+                   for note in report.partial_search_notes)
+
+    def test_an_exhaustive_search_records_no_partial_note(self) -> None:
+        leads, outcomes = _two_adapter_run()
+        report, _, _ = _run(leads=leads, outcomes=outcomes)
+        assert report.partial_search_notes == ()
+
+    def test_a_stop_on_a_set_the_report_does_not_contain_is_refused(self) -> None:
+        """A sufficiency declaration the artifact's own contents refute.
+
+        With no candidate from this pass and none known from an earlier one,
+        there is no non-dominated set to be sufficient: the report would
+        recommend stopping on the strength of a set it does not contain.
+        """
+        with pytest.raises(QcaeValidationError, match="no candidate set"):
+            _run(leads=(), outcomes=(), baseline=_baseline(),
+                 enough_non_dominated=True)
+
+    def test_a_family_deferral_the_report_does_not_contain_is_refused(self) -> None:
+        """Already law-guarded by the artifact's own validation, not by this module.
+
+        A ranking row naming a family outside ``candidate_families`` would leave
+        the deferrals disagreeing with the reported families. No ranking pass
+        produces that, and the artifact refuses it rather than carrying it, so
+        this item was never an open contradiction.
+        """
+        leads, outcomes = _two_adapter_run()
+        _, _, ranking = _run(leads=leads, outcomes=outcomes)
+        assert ranking.queue  # the rows exist to be contradicted
+        tampered = replace(ranking, queue=tuple(
+            replace(entry, family_id="fam-not-in-families") for entry in ranking.queue
+        ))
+        with pytest.raises(QcaeValidationError, match="unknown family"):
+            assemble_discovery_report(
+                report_id="report-001", plan=baseline_plan(), baseline=_baseline(),
+                ranking=tampered, outcomes=tuple(outcomes),
+                created_at=CREATED_AT, created_by=CREATED_BY,
+            )
+
+    def test_a_stop_on_candidates_known_from_an_earlier_pass_is_allowed(self) -> None:
+        """The guard covers the declaration, not the multi-pass flow.
+
+        A later pass that adds nothing can still be the pass that judges the
+        accumulated set sufficient, so previously known candidates count.
+        """
+        known = merge_leads(_two_adapter_run()[0])
+        report, _, _ = _run(leads=(), outcomes=(), baseline=_baseline(),
+                           enough_non_dominated=True,
+                           previously_known_candidates=known)
+        assert report.stop_recommendation.state.value == "STOP"
+
+
 class TestAssembledReportMatchesItsPieces:
     def test_report_is_consistent_with_the_inputs_it_came_from(self) -> None:
         leads, outcomes = _two_adapter_run()
