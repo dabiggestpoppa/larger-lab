@@ -405,10 +405,15 @@ class InternalDiscoveryBaselineService:
 
         internal_atoms = tuple(state.get("atom_ids") or ())
         candidate_refs = tuple(sorted(state.get("candidate_refs") or ()))
+        # The registry's two internal-candidate records: known candidates, and
+        # active receipts under this exact contract (the same fact that makes
+        # CAPABILITY_ACTIVE fire). Coverage and verdict read one basis.
+        active_receipt_refs = tuple(sorted(reuse.get("active_receipts") or ()))
+        internal_refs = tuple(sorted(set(candidate_refs) | set(active_receipt_refs)))
 
         if atom_coverage is None:
             covered_atoms, coverage_basis, coverage_refs = self._capability_granularity_coverage(
-                plan, internal_atoms, candidate_refs
+                plan, internal_atoms, internal_refs
             )
             duplicate_atom_refs: Tuple[Tuple[str, ...], ...] = ()
         else:
@@ -490,20 +495,31 @@ class InternalDiscoveryBaselineService:
         return tuple(raw)
 
     @staticmethod
-    def _capability_granularity_coverage(plan, internal_atoms, candidate_refs):
+    def _capability_granularity_coverage(plan, internal_atoms, internal_refs):
         """Derive coverage from registry state, labelled as capability-granularity.
 
+        ``internal_refs`` is the registry's evidence that QCAE already holds an
+        implementation of this capability: its known candidates *and* any active
+        receipt issued under this exact contract (canon 2.6.12 internal candidate
+        records). Both are needed, because coverage and the sufficiency verdict
+        must read one basis: ``CAPABILITY_ACTIVE`` maps to
+        ``FULLY_SATISFIED_INTERNAL``, so a proven implementation with a still-empty
+        candidate inventory must not read as no coverage — that combination claims
+        full satisfaction with every atom uncovered and the record's own laws
+        refuse it, which left the strongest internal state unable to state a
+        baseline at all.
+
         The P1 ports expose which atoms a capability defines and which candidates
-        exist, but not a per-atom candidate attribution. When candidates exist,
-        the internal atoms in the plan's scope are therefore reported as covered
-        *at capability granularity*, with the candidate refs recorded as the
-        basis — a weaker, explicitly labelled claim rather than an invented one.
+        exist, but not a per-atom candidate attribution. When internal evidence
+        exists, the internal atoms in the plan's scope are therefore reported as
+        covered *at capability granularity*, with those refs recorded as the basis
+        — a weaker, explicitly labelled claim rather than an invented one.
         """
         atoms_in_scope = set(plan.atom_ids)
-        if not candidate_refs:
+        if not internal_refs:
             return (), _COVERAGE_CAPABILITY_GRANULARITY, ()
         covered = tuple(a for a in plan.atom_ids if a in (set(internal_atoms) & atoms_in_scope))
-        return covered, _COVERAGE_CAPABILITY_GRANULARITY, candidate_refs
+        return covered, _COVERAGE_CAPABILITY_GRANULARITY, internal_refs
 
     @staticmethod
     def _attributed_coverage(plan, atom_coverage: Mapping[str, Iterable[str]]):

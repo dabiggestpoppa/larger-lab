@@ -413,6 +413,81 @@ class TestRealRegistryWiring:
         assert record.sufficiency_verdict is C.NO_INTERNAL_CAPABILITY_FOUND
         assert record.external_target_atoms == (ATOM_A, ATOM_B)
 
+    def _real_query_with_active_receipt(self):
+        """Real wiring whose capability is proven implemented by a receipt.
+
+        No candidate rows are added: P1 stores receipts without candidates in
+        four of its own suites, so this is a first-class registry state, not a
+        degenerate one.
+        """
+        from qcae.core.capabilities.atom import AtomType, CapabilityAtom
+        from qcae.core.contracts.contract import CapabilityContract
+        from qcae.infrastructure.persistence.sqlite_capability_registry import (
+            CAPABILITY_REGISTRY_DDL,
+            SqliteCapabilityRegistry,
+        )
+        from qcae.infrastructure.persistence.sqlite_knowledge_store import (
+            KNOWLEDGE_DDL,
+            SqliteNegativeKnowledgeRepository,
+            SqliteReceiptRepository,
+            SqliteRegistryQuery,
+        )
+        from qcae.infrastructure.persistence.sqlite_repository_registry import (
+            REPOSITORY_REGISTRY_DDL,
+            SqliteRepositoryRegistry,
+        )
+        from qcae.infrastructure.persistence.store_factory import open_metadata_db
+        from qcae.tests.unit.test_p1_receipt import _receipt
+
+        conn = open_metadata_db(":memory:")
+        for ddl in (CAPABILITY_REGISTRY_DDL, REPOSITORY_REGISTRY_DDL, KNOWLEDGE_DDL):
+            conn.executescript(ddl)
+        caps = SqliteCapabilityRegistry(conn)
+        receipts = SqliteReceiptRepository(conn)
+        caps.add_contract(CapabilityContract(
+            capability_id=CAP, contract_version=1, request_id="req-replay",
+            title="replay", problem_statement="replay", intent="replay",
+            required_behaviors=("replay",)))
+        for atom_id in (ATOM_A, ATOM_B):
+            caps.add_atom(CapabilityAtom(
+                atom_id=atom_id, atom_version=1, name=atom_id,
+                atom_type=AtomType.COMPUTATIONAL, description=atom_id,
+                parent_capabilities=(CAP,)))
+        receipts.add(_receipt(contract_version="1"))
+        conn.commit()
+        return conn, SqliteRegistryQuery(
+            receipts, None, SqliteNegativeKnowledgeRepository(conn), None,
+            capability_registry=caps,
+            repository_registry=SqliteRepositoryRegistry(conn),
+        )
+
+    def test_an_active_receipt_without_candidates_still_yields_a_baseline(self) -> None:
+        """A proven internal implementation is coverage, not an empty inventory.
+
+        ``CAPABILITY_ACTIVE`` maps to ``FULLY_SATISFIED_INTERNAL`` (canon 2.6.1)
+        and coverage used to be derived from known candidates alone, so a
+        capability whose only internal evidence is an active receipt produced a
+        record claiming full satisfaction while every atom was uncovered — and
+        ``validate()`` refused it. The phase could not state a baseline for its
+        strongest internal state at all.
+        """
+        conn, query = self._real_query_with_active_receipt()
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.sufficiency_verdict is C.FULLY_SATISFIED_INTERNAL
+        assert record.covered_atoms == (ATOM_A, ATOM_B)
+        assert record.missing_atoms == ()
+        # Recognized internal knowledge narrows the external request; it must
+        # never be the thing that authorizes external discovery.
+        assert record.external_target_atoms == ()
+        assert record.external_search_required is False
+        # The basis for the coverage claim is named, so the record is auditable
+        # without re-reading the registry.
+        assert record.internal_candidate_refs == ("rcpt-001",)
+
 
 # -- record laws ------------------------------------------------------------
 
