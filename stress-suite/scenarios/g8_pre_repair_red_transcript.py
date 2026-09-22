@@ -202,8 +202,18 @@ HEADER = (
 
 
 def _extract(sha: str, dest: Path) -> None:
+    """Extract the named commit's bytes DETERMINISTICALLY.
+
+    `git archive` is subject to the invoker's newline conversion (`core.autocrlf`),
+    so on a CRLF checkout the same commit would export CRLF bytes and the probe
+    would report a different digest of the very artifact this transcript is
+    about — the harness would inherit exactly the defect it documents (R-G8-08).
+    The conversions are therefore pinned off for the extraction: the transcript
+    is byte-identical in any checkout.
+    """
     archive = subprocess.run(
-        ["git", "archive", "--format=tar", sha, *ARCHIVE_PATHS],
+        ["git", "-c", "core.autocrlf=false", "-c", "core.eol=lf",
+         "archive", "--format=tar", sha, *ARCHIVE_PATHS],
         cwd=str(REPO_ROOT), check=True, capture_output=True)
     with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as tar:
         tar.extractall(str(dest))
