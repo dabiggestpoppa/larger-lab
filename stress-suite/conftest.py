@@ -21,13 +21,27 @@ FIXTURES_SMOKE_DIR = _HERE / "fixtures" / "smoke"
 
 def _tested_sha() -> str:
     """The tree this run is measuring. `OCE_TESTED_SHA` wins so a caller can bind
-    an artifact to a revision explicitly; otherwise the live HEAD is used."""
+    an artifact to a revision explicitly; otherwise the tree is DERIVED from Git
+    under the rule the baseline contract declares (`TESTED_TREE_PATHS`: the newest
+    commit that changed code or tests). Stamping the live HEAD instead would make
+    the artifact's binding depend on WHEN the suite ran rather than on WHICH code
+    it measured, so a later evidence commit would invalidate an unchanged tree
+    (STRESS-G8ARCH2).
+    """
     override = os.environ.get("OCE_TESTED_SHA", "").strip()
     if override:
         return override
-    proc = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(_HERE),
+    from engine.g8_test_evidence import TESTED_TREE_GIT_ARGS
+    proc = subprocess.run(["git", *TESTED_TREE_GIT_ARGS], cwd=str(_HERE.parent),
                           capture_output=True, text=True, check=False)
-    return proc.stdout.strip()
+    tree = proc.stdout.strip()
+    if tree:
+        return tree
+    # no Git (an exported tree): fall back to the live HEAD, which is what the
+    # previous revision stamped unconditionally
+    fallback = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(_HERE),
+                              capture_output=True, text=True, check=False)
+    return fallback.stdout.strip()
 
 
 @pytest.fixture(scope="session", autouse=True)

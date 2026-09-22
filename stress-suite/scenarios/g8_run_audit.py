@@ -973,11 +973,17 @@ def collect_observations(contract: Mapping[str, Any]) -> Dict[str, Any]:
 
 def build_package(contract_path: Optional[Path] = None,
                   test_evidence: Optional[TestEvidence] = None,
-                  *, expected_tested_sha: str) -> Dict[str, Any]:
+                  *, expected_tested_sha: str,
+                  citation_check: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
     """`expected_tested_sha` is the tree the caller DECLARES this package is
     archived for. It is required, never inferred from the evidence: a gate that
     compares the artifact to itself cannot notice a stale or foreign artifact
-    (STRESS-G8RX6, enforcement gap F1)."""
+    (STRESS-G8RX6, enforcement gap F1).
+
+    `citation_check` is the caller's verdict on the citation this package
+    publishes, from `engine.g8_test_evidence.verify_citation`. It is passed
+    through to the gate so that a stale citation blocks rather than verifies
+    (STRESS-G8ARCH2)."""
     if test_evidence is None:
         raise ValueError(
             "build_package requires a provenance-bearing JUnit test artifact; a "
@@ -1010,7 +1016,8 @@ def build_package(contract_path: Optional[Path] = None,
     decision = decide_gate(contract, families, guarded, gate_findings,
                            test_evidence=test_evidence,
                            expected_tested_sha=expected_tested_sha,
-                           observations=observation_sequence)
+                           observations=observation_sequence,
+                           citation_check=citation_check)
     limits = derivation_limitations(contract, families, all_obs)
     return {"contract": contract, "contract_digest": contract_digest(contract),
             "head_sha": head,

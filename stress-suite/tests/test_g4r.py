@@ -656,7 +656,7 @@ def test_successor_creation_still_works():
 # --------------------------------------------------------------------------- #
 def _s13_pack_and_registry(with_artifacts=True, bad_eval=False, wrong_epoch=False,
                            wrong_auth=False):
-    from tests.test_g4 import _s13_epoch, _s13_artifacts  # reuse G4 fixtures
+    from test_g4 import _s13_epoch, _s13_artifacts  # reuse G4 fixtures
     pack = G4ScenarioPack(scenario_id="S13", epochs=[_s13_epoch()],
                           artifacts=_s13_artifacts())
     m = EpochManifest(**_s13_epoch())
@@ -714,7 +714,7 @@ def test_evaluation_contract_ref_must_resolve():
     # drop the evaluation contract only
     for data in []:
         pass
-    from tests.test_g4 import _s13_artifacts, _s13_epoch
+    from test_g4 import _s13_artifacts, _s13_epoch
     m = EpochManifest(**_s13_epoch())
     m.seal()
     reg2.register_manifest(m)
@@ -727,7 +727,7 @@ def test_evaluation_contract_ref_must_resolve():
 
 
 def test_lifecycle_contract_ref_must_resolve():
-    from tests.test_g4 import _s13_artifacts, _s13_epoch
+    from test_g4 import _s13_artifacts, _s13_epoch
     m = EpochManifest(**_s13_epoch())
     m.seal()
     reg = CanonicalArtifactRegistry()
@@ -741,7 +741,7 @@ def test_lifecycle_contract_ref_must_resolve():
 
 
 def test_negative_knowledge_ref_must_resolve():
-    from tests.test_g4 import _s13_artifacts, _s13_epoch
+    from test_g4 import _s13_artifacts, _s13_epoch
     m = EpochManifest(**_s13_epoch())
     m.seal()
     reg = CanonicalArtifactRegistry()
@@ -755,7 +755,7 @@ def test_negative_knowledge_ref_must_resolve():
 
 
 def test_operator_ratification_ref_must_resolve():
-    from tests.test_g4 import _s13_artifacts, _s13_epoch
+    from test_g4 import _s13_artifacts, _s13_epoch
     m = EpochManifest(**_s13_epoch())
     m.seal()
     reg = CanonicalArtifactRegistry()
@@ -769,7 +769,7 @@ def test_operator_ratification_ref_must_resolve():
 
 
 def test_transformation_evidence_ref_must_resolve():
-    from tests.test_g4 import _s13_artifacts, _s13_epoch
+    from test_g4 import _s13_artifacts, _s13_epoch
     m = EpochManifest(**_s13_epoch())
     m.seal()
     reg = CanonicalArtifactRegistry()
@@ -805,7 +805,7 @@ def test_wrong_authority_snapshot_fails():
 
 
 def test_artifact_with_correct_id_wrong_fingerprint_fails():
-    from tests.test_g4 import _s13_artifacts, _s13_epoch
+    from test_g4 import _s13_artifacts, _s13_epoch
     m = EpochManifest(**_s13_epoch())
     m.seal()
     reg = CanonicalArtifactRegistry()
@@ -832,7 +832,7 @@ def test_artifact_with_correct_id_wrong_fingerprint_fails():
 
 def test_evaluation_and_lifecycle_contracts_are_separate():
     """G4R-14: lifecycle version is NEVER inferred from evaluation version."""
-    from tests.test_g4 import _s13_epoch
+    from test_g4 import _s13_epoch
     epoch = _s13_epoch()
     epoch["lifecycle_contract_version"] = ""      # evaluation present, lifecycle absent
     m = EpochManifest(**epoch)
@@ -844,7 +844,7 @@ def test_evaluation_and_lifecycle_contracts_are_separate():
 
 def test_reconstruction_validates_content_not_emptiness():
     """G4R-20: a fake non-empty object cannot satisfy a contract surface."""
-    from tests.test_g4 import _s13_epoch
+    from test_g4 import _s13_epoch
     m = EpochManifest(**_s13_epoch())
     m.seal()
     reg = CanonicalArtifactRegistry()
@@ -1059,7 +1059,7 @@ def test_runner_exposes_provenance_conflicts():
 
 def test_reconstruction_conflicts_are_missing_surfaces():
     """Reconstruction gaps are explicit report surfaces, never silent."""
-    from tests.test_g4 import _s13_epoch
+    from test_g4 import _s13_epoch
     m = EpochManifest(**_s13_epoch())
     m.seal()
     reg = CanonicalArtifactRegistry()

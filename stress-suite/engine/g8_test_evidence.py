@@ -29,6 +29,12 @@ and whether a parsed artifact may be published at all::
                       -> check_baseline()      the sole publishability policy
                          |- emit()             refuses to publish an unverified one
                          `- decide_gate()      records that verdict in the package
+    verify_citation()  re-derives a published citation from the bytes ON DISK, so
+                       a stale citation blocks instead of verifying
+
+The TESTED TREE is derived from Git under the rule declared below
+(`TESTED_TREE_PATHS`), never typed in by hand: a hand-declared tree is the same
+self-reporting defect the artifact exists to forbid.
 
 `scenarios/g8_emit_evidence.py` owns PRESENTATION (the receipt and its prose) and
 the declared tree (`TESTED_SHA`); it keeps no copy of any rule declared here, and
@@ -40,7 +46,7 @@ import hashlib
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 
 class UnverifiableTestEvidence(RuntimeError):
@@ -51,6 +57,17 @@ class UnverifiableTestEvidence(RuntimeError):
 #: root <testsuite> after the invocation; the archive requires the suite to be
 #: the stress-suite `tests` package, not an unrelated or partial collection.
 REQUIRED_SUITE_IDENTITY_PREFIXES = ("tests", "pytest")
+
+#: The paths that define the CODE tree under test. The TESTED TREE is the newest
+#: commit that changed any of them, which is what the baseline certifies: a later
+#: commit that touches only docs or evidence cannot move the identity of the code
+#: the artifact was measured on, so the package stays reproducible from any later
+#: commit instead of depending on a hand-bumped constant. Declared once here; the
+#: harness (conftest) and the emitter both ask Git this same question.
+TESTED_TREE_PATHS = ("stress-suite/engine", "stress-suite/scenarios",
+                     "stress-suite/tests")
+#: the `git` invocation that resolves it, declared next to the rule it implements
+TESTED_TREE_GIT_ARGS = ("log", "-1", "--format=%H", "--", *TESTED_TREE_PATHS)
 
 #: The suite command the mission names as authoritative. It is the command the
 #: artifact's own record cites, and the prefix of the artifact-producing command.
@@ -116,6 +133,10 @@ class TestEvidence:
     artifact_bytes: int
     artifact_canonical_digest: str
     repo_relative_path: str
+    #: the tree the citation is relative to. Machine-local, so it is deliberately
+    #: NOT serialised: the receipt publishes the repo-relative path only, and this
+    #: field is what lets a caller re-derive that citation from disk.
+    repo_root: str
     command: str
     suite_identity: str
     tested_sha: str
@@ -343,6 +364,7 @@ def read_test_evidence(
         artifact_bytes=len(blob),
         artifact_canonical_digest=canonical_artifact_digest(blob),
         repo_relative_path=relative,
+        repo_root=str(Path(repo_root).resolve()) if repo_root is not None else "",
         command=command, suite_identity=suite_identity, tested_sha=expected_tested_sha,
         python_version=python_version, pytest_version=pytest_version,
         collected=collected, passed=passed, failed=failed, skipped=skipped,
@@ -388,6 +410,66 @@ def check_baseline(test_evidence: TestEvidence, *, tested_sha: str) -> Dict[str,
             "authoritative_test_command": test_evidence.command,
             "suite_identity": test_evidence.suite_identity,
             "tested_sha": test_evidence.tested_sha}
+
+
+def verify_citation(citation: Mapping[str, Any], *, repo_root: str | Path,
+                    expected_tested_sha: str = "") -> Dict[str, Any]:
+    """Re-derive a PUBLISHED citation from the bytes on disk.
+
+    A package may not merely assert that its baseline is checkable. The citation a
+    receipt publishes is evidence only while the bytes at the cited repo-relative
+    path still resolve inside the declared tree, still hash to the published raw
+    and canonical digests, and still record the tree the caller is resting on.
+    Anything else is a STALE CITATION, and a stale citation must BLOCK rather than
+    verify (STRESS-G8ARCH2): publishing a digest that no longer describes the tree
+    is exactly the self-reporting defect R-G8-07 forbids.
+
+    `read_test_evidence` is reused for the path, scope and tree rules, so they are
+    not restated here; `expected_tested_sha` is the tree the CALLER rests on, and a
+    citation recorded against any other tree is refused rather than reconciled.
+    """
+    problems: List[str] = []
+    path = str(citation.get("artifact_path", ""))
+    scope = str(citation.get("artifact_path_scope", ""))
+    if scope != "REPO_RELATIVE":
+        problems.append(
+            f"the citation is scoped {scope or 'UNKNOWN'!r}: a location outside "
+            "the declared tree cannot be resolved by a reviewer")
+    if not path:
+        problems.append("the citation names no artifact path")
+        return {"verified": False, "problems": problems, "artifact_path": "",
+                "recorded_tested_sha": ""}
+    declared = expected_tested_sha or str(citation.get("tested_sha", ""))
+    try:
+        evidence = read_test_evidence(Path(repo_root) / path,
+                                      expected_tested_sha=declared,
+                                      repo_root=repo_root)
+    except UnverifiableTestEvidence as exc:
+        problems.append(f"stale citation: {exc}")
+        return {"verified": False, "problems": problems, "artifact_path": path,
+                "recorded_tested_sha": ""}
+    if evidence.artifact_digest != citation.get("artifact_digest"):
+        problems.append(
+            f"stale citation: the bytes at {path} hash to "
+            f"{evidence.artifact_digest}, but the package publishes "
+            f"{citation.get('artifact_digest')}")
+    if evidence.artifact_canonical_digest != citation.get("artifact_canonical_digest"):
+        problems.append(
+            f"stale citation: the canonical digest of {path} is "
+            f"{evidence.artifact_canonical_digest}, but the package publishes "
+            f"{citation.get('artifact_canonical_digest')}")
+    if evidence.tested_sha != citation.get("tested_sha", evidence.tested_sha):
+        problems.append(
+            f"stale citation: {path} records tree {evidence.tested_sha}, but the "
+            f"package publishes {citation.get('tested_sha')}")
+    return {"verified": not problems, "problems": problems,
+            "artifact_path": path,
+            "recorded_tested_sha": evidence.tested_sha,
+            "artifact_digest": evidence.artifact_digest,
+            "artifact_canonical_digest": evidence.artifact_canonical_digest,
+            "citation_rule": ("the cited path must resolve inside the declared "
+                              "tree and its on-disk raw and canonical digests "
+                              "must equal the published ones")}
 
 
 def junit_document(*, cases: int, name: str = "tests", tested_sha: str,

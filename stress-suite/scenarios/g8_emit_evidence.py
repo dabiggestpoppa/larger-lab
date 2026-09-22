@@ -17,6 +17,7 @@ authored by hand.
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence
@@ -35,20 +36,68 @@ from engine.g8_test_evidence import (  # noqa: E402
     ARTIFACT_COMMAND,
     ARTIFACT_RELATIVE_PATH,
     AUTHORITATIVE_TEST_COMMAND,
+    TESTED_TREE_GIT_ARGS,
+    TESTED_TREE_PATHS,
     TestEvidence,
     UnverifiableTestEvidence,
     check_baseline,
+    verify_citation,
 )
 from scenarios.g8_run_audit import EVIDENCE, ROOT, build_package  # noqa: E402
 
 START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
-#: the last code/test commit. The provisional first pass was tested at
-#: aae1e2e6; the repaired pass is tested at the commit below, and the receipt
-#: names the pre-repair head it corrects.
-TESTED_SHA = "df4fd5ae6ac1dbca8baf3aa0bad5c0764250d371"
 PRE_REPAIR_SHA = "6c015f86408a56721f8999e4aa39b218fab0fd4d"
 CONTRACT_REL = "stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json"
 EVIDENCE_COMMIT_LABEL = "STRESS-G8RR"
+
+
+def _git(args: Sequence[str], repo_root: Path) -> str:
+    """A read-only Git query, run in the tree it describes. The ENGINE layer may not
+    shell out (tests/test_no_mutation_surface.py guards that), so Git access lives
+    in the scenarios layer next to the tree it is about."""
+    proc = subprocess.run(["git", *args], cwd=str(repo_root),
+                          capture_output=True, text=True, check=False)
+    return proc.stdout.strip()
+
+
+def declared_tested_sha(repo_root: Path = ROOT.parent, *,
+                       require_clean: bool = False) -> str:
+    """The tree this package is tested against, DERIVED from Git.
+
+    The rule is declared once, in `engine.g8_test_evidence.TESTED_TREE_PATHS`: the
+    tested tree is the newest commit that changed code or tests. A revision typed
+    into this module would be a hand-declared tree -- the same self-reporting defect
+    R-G8-07 forbids -- and would silently keep claiming an older revision after the
+    code moved. Because the rule is about the CODE tree, a later commit that only
+    touches docs or evidence does not move it, so the package is reproducible from
+    any such commit rather than only from the one that happened to be HEAD.
+
+    `require_clean` is what the authoritative entry point uses: if the code or test
+    tree has uncommitted changes, the tree being archived is not the tree that was
+    tested, so emission is refused. The cited artifact is deliberately NOT part of
+    the cleanliness rule -- it is regenerated immediately before emission, and its
+    bytes are bound by the citation check instead.
+    """
+    derived = _git(TESTED_TREE_GIT_ARGS, repo_root)
+    if not require_clean:
+        return derived
+    if not derived:
+        raise UnverifiableTestEvidence(
+            "the tested tree cannot be derived: no commit touching "
+            f"{list(TESTED_TREE_PATHS)} resolves in {repo_root}")
+    dirty = _git(("status", "--porcelain", "--", *TESTED_TREE_PATHS), repo_root)
+    if dirty:
+        raise UnverifiableTestEvidence(
+            "refusing to publish a package for a dirty tree: the code or tests "
+            "have uncommitted changes, so the tree being archived is not the tree "
+            f"that was tested\n{dirty}")
+    return derived
+
+
+#: the tested tree, DERIVED -- never a hand-declared revision. Regressions bind
+#: their sealed fixture to it; the authoritative entry point re-derives it with
+#: `require_clean=True` before it will publish anything.
+TESTED_SHA = declared_tested_sha()
 #: The artifact-producing command and the canonicalization rule the receipt
 #: publishes are both imported from engine.g8_test_evidence, so the command, the
 #: cited path and the reader that enforces it cannot disagree.
@@ -179,9 +228,15 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
         raise UnverifiableTestEvidence(
             "refusing to publish an unverified baseline: "
             + "; ".join(baseline["problems"]))
+    # the citation this package will publish, re-derived from the bytes on disk:
+    # the gate BLOCKS on a stale citation instead of counting it as evidence
+    citation_check = verify_citation(test_evidence.to_dict(),
+                                     repo_root=test_evidence.repo_root,
+                                     expected_tested_sha=TESTED_SHA)
     measured_full = test_evidence.collected
     package = build_package(test_evidence=test_evidence,
-                            expected_tested_sha=TESTED_SHA)
+                            expected_tested_sha=TESTED_SHA,
+                            citation_check=citation_check)
     contract = package["contract"]
     families = package["families"]
     register = package["register"]
@@ -470,10 +525,14 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
         "tested_sha": TESTED_SHA,
         "evidence_commit": EVIDENCE_COMMIT_LABEL,
         "artifact_sha_semantics": (
-            "tested_sha is the last code/test commit; this receipt is archived by a "
-            "LATER commit and records that commit only by its label, so nothing here "
-            "hashes its own containing commit. Scenario run_receipt digests are "
-            "content digests of generated bytes."),
+            "tested_sha is DERIVED from Git, never declared by hand: it is the "
+            "newest commit that changed the code/test tree "
+            f"({list(TESTED_TREE_PATHS)}, rule TESTED_TREE_PATHS). This receipt is "
+            "archived by a LATER commit and records that commit only by its label, "
+            "so nothing here hashes its own containing commit; because the rule "
+            "names the code tree, the package regenerates identically from any "
+            "later commit that touches only docs or evidence. Scenario run_receipt "
+            "digests are content digests of generated bytes."),
         # derived from the engine's declaration; the canonicalization rule and the
         # declared tree are published by test_evidence_artifact and baseline_check
         # below rather than restated at this level
@@ -560,6 +619,7 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
                             "AMB-G8-02 bounded field discrimination"],
         "new_contradictions": [e["reason"] for e in register["entries"]],
         "test_count_lineage": lineage["chain"],
+        "citation_check": decision["citation"],
         "reproducibility": ("the package is regenerated from the tree by "
                             "scenarios/g8_emit_evidence.py; two consecutive builds "
                             "are byte-identical and the generator carries no "
@@ -967,9 +1027,13 @@ def main(argv: Sequence[str]) -> Dict[str, Any]:
     this function -- enforces."""
     from engine.g8_test_evidence import read_test_evidence
     artifact = argv[1] if len(argv) > 1 else ""
-    # the reader refuses an artifact outside the declared tree or at any path
-    # other than the declared one, so no path policy is repeated here
-    evidence = read_test_evidence(artifact, expected_tested_sha=TESTED_SHA,
+    # the tree is DERIVED, not typed in, and the authoritative entry point refuses
+    # a dirty code/test tree: a package must never be published for a tree that is
+    # not the tree that was tested (STRESS-G8ARCH2). The reader refuses an artifact
+    # outside the declared tree or at any path other than the declared one, so no
+    # path policy is repeated here.
+    tested = declared_tested_sha(require_clean=True)
+    evidence = read_test_evidence(artifact, expected_tested_sha=tested,
                                  repo_root=ROOT.parent,
                                  python_version=sys.version.split()[0])
     out = emit(evidence)

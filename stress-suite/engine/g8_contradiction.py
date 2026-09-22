@@ -1227,6 +1227,7 @@ def decide_gate(contract: Mapping[str, Any],
                 *, test_evidence: TestEvidence,
                 expected_tested_sha: str,
                 observations: Sequence[InstitutionalObservation] = (),
+                citation_check: Optional[Mapping[str, Any]] = None,
                 ) -> Dict[str, Any]:
     """Gate decision computed from the evidence, never asserted. BLOCKING items are
     architectural contradictions, guarded-property violations, gate-claim defects,
@@ -1245,6 +1246,11 @@ def decide_gate(contract: Mapping[str, Any],
     artifact's bound tree against it, so the gate can detect a stale or foreign
     artifact. The previous call site passed `test_evidence.tested_sha` as its own
     expectation, which made the check unfalsifiable: a forged tree certified.
+
+    STRESS-G8ARCH2: a `citation_check` that does not verify BLOCKS the gate. A
+    citation whose bytes no longer hash to what the package publishes, or whose
+    recorded tree is not the tree the caller rests on, is stale evidence and may
+    not be counted as evidence at all.
     """
     policy = contract.get("blocks_gate_policy", {})
     hard = set(policy.get("blocking_classifications", ()))
@@ -1267,6 +1273,7 @@ def decide_gate(contract: Mapping[str, Any],
     gate_superseded = [f for f in gate_findings if f.superseded_by]
 
     baseline = check_baseline(test_evidence, tested_sha=expected_tested_sha)
+    citation = dict(citation_check) if citation_check else None
     mandate = mandate_coverage_flags(contract, families)
     coverage = guarded_derivation_coverage(contract, observations, guarded)
     unexercised = coverage["unexercised_required_properties"]
@@ -1284,6 +1291,12 @@ def decide_gate(contract: Mapping[str, Any],
         exit_label = "BLOCKED_G8_BASELINE_FAILURE"
         reasons.append("unverifiable test baseline: "
                        + "; ".join(baseline["problems"]))
+    if citation is not None and not citation.get("verified"):
+        # 'no detected violation therefore verified' does not apply to a citation:
+        # bytes that no longer match the published digest are stale evidence
+        exit_label = "BLOCKED_G8_BASELINE_FAILURE"
+        reasons.append(f"{len(citation.get('problems', []))} stale-citation "
+                       "problem(s): " + "; ".join(citation.get("problems", [])))
     if blocking:
         exit_label = "BLOCKED_G8_ARCHITECTURE_CONTRADICTION"
         reasons.append(f"{len(blocking)} BLOCKING contradiction(s)")
@@ -1324,6 +1337,7 @@ def decide_gate(contract: Mapping[str, Any],
                        "gate_claim_recorded_not_blocking": len(gate_recorded),
                        "gate_claim_superseded": len(gate_superseded)},
             "baseline": baseline,
+            "citation": citation,
             "blocks_gate_policy_ref": contract.get("blocks_gate_policy", {}).get(
                 "note", ""),
             "mandated": mandate,

@@ -12,6 +12,8 @@ from __future__ import annotations
 import copy
 import inspect
 import json
+import re
+import subprocess
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -52,6 +54,7 @@ from engine.g8_test_evidence import (  # noqa: E402
     check_baseline,
     junit_document,
     read_test_evidence,
+    verify_citation,
 )
 from engine.g8_contradiction import (  # noqa: E402
     DERIVATION_KINDS,
@@ -1519,3 +1522,209 @@ def test_r07_the_authoritative_command_writes_the_cited_artifact_path():
                                 + " --junitxml=evidence/G8_TEST_RESULTS.xml")
     assert EMIT.ARTIFACT_COMMAND is ARTIFACT_COMMAND
     assert EMIT.ARTIFACT_RELATIVE_PATH is ARTIFACT_RELATIVE_PATH
+
+
+# =========================================================================== #
+# STRESS-G8ARCH2 — the two offers the closure audit left open.
+#
+# (1) A committed artifact whose bytes no longer hash to the digest the package
+#     publishes, or whose recorded tree is not the tree the gate rests on, was
+#     published and then never re-checked: it must BLOCK, not verify.
+# (2) The tested tree the receipt published was a string typed into the emitter --
+#     the same self-reporting defect R-G8-07 exists to forbid. It is now derived
+#     from Git under the rule declared in engine.g8_test_evidence.
+# =========================================================================== #
+def _temp_git_repo(tmp_path):
+    """A throwaway repository whose code/test tree can be moved at will."""
+    repo = tmp_path / "repo"
+    (repo / "stress-suite" / "engine").mkdir(parents=True)
+    (repo / "stress-suite" / "tests").mkdir(parents=True)
+    (repo / "docs").mkdir()
+    (repo / "stress-suite" / "engine" / "core.py").write_text(
+        "x = 1\n", encoding="utf-8")
+    (repo / "docs" / "note.md").write_text("doc\n", encoding="utf-8")
+
+    def _git(*args: str) -> str:
+        return subprocess.run(
+            ["git", "-c", "user.email=t@example.invalid", "-c", "user.name=t",
+             *args], cwd=str(repo), capture_output=True, text=True,
+            check=True).stdout.strip()
+
+    _git("init", "-q")
+    _git("add", "-A")
+    _git("commit", "-q", "-m", "code")
+    return repo, _git
+
+
+def test_the_tested_tree_is_derived_from_git_not_declared_by_hand(tmp_path):
+    """RED BEFORE REPAIR: `TESTED_SHA` was a 40-hex literal in the emitter, so the
+    package kept claiming whatever revision a human last typed there. It is now the
+    newest commit that changed code or tests -- and because the rule names the CODE
+    tree, a later commit that touches only docs or evidence cannot move it, which is
+    what lets the package regenerate identically from any later commit."""
+    repo, git = _temp_git_repo(tmp_path)
+    code = EMIT.declared_tested_sha(repo)
+    assert code == git("rev-parse", "HEAD")
+    assert EMIT.declared_tested_sha(repo, require_clean=True) == code
+
+    # a commit that touches ONLY evidence/docs must not move the tested tree
+    (repo / "docs" / "note.md").write_text("doc changed\n", encoding="utf-8")
+    git("add", "-A")
+    git("commit", "-q", "-m", "docs: evidence only")
+    assert git("rev-parse", "HEAD") != code
+    assert EMIT.declared_tested_sha(repo, require_clean=True) == code
+
+    # ... but an uncommitted change to the CODE tree is not the tested tree
+    (repo / "stress-suite" / "tests" / "test_x.py").write_text(
+        "def test_x():\n    assert True\n", encoding="utf-8")
+    with pytest.raises(UnverifiableTestEvidence) as refused:
+        EMIT.declared_tested_sha(repo, require_clean=True)
+    assert "dirty tree" in str(refused.value)
+    # the same tree still resolves without the cleanliness requirement, so the
+    # sealed fixtures and the read path are unaffected by a dirty working tree
+    assert EMIT.declared_tested_sha(repo) == code
+
+
+def test_the_emitter_holds_no_hand_typed_tested_tree():
+    """Tripwire: a 40-hex literal assigned to TESTED_SHA would reintroduce exactly
+    the defect the test above closes, so the assignment must stay derived."""
+    source = Path(EMIT.__file__).read_text(encoding="utf-8")
+    assert not re.search(r"TESTED_SHA\s*=\s*[\"'][0-9a-f]{40}", source)
+    assert "TESTED_SHA = declared_tested_sha()" in source
+    assert EMIT.TESTED_SHA == EMIT.declared_tested_sha()
+    assert EMIT.TESTED_SHA
+
+
+def _committed_blob(relative: str) -> bytes:
+    """The bytes of a path AS COMMITTED. The reviewer's question is about the
+    committed tree, and a pass legitimately regenerates the artifact before it
+    re-emits, so comparing against the working tree would be red exactly while the
+    package is one emission behind -- and would then block the very run that fixes
+    it."""
+    return subprocess.run(["git", "show", f"HEAD:{relative}"], cwd=str(ROOT.parent),
+                          capture_output=True, check=True).stdout
+
+
+def _staged_committed_pair(tmp_path):
+    """The COMMITTED receipt and the COMMITTED artifact, staged in a throwaway tree
+    at the declared relative path -- what a reviewer gets from a clone."""
+    receipt = json.loads(
+        _committed_blob("stress-suite/evidence/G8_EVIDENCE_RECEIPT.json"))
+    citation = receipt["test_evidence_artifact"]
+    staged = tmp_path / "tree"
+    target = staged / citation["artifact_path"]
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(_committed_blob(citation["artifact_path"]))
+    return receipt, citation, staged
+
+
+def test_the_committed_citation_still_matches_the_bytes_it_cites(tmp_path):
+    """The reviewer-facing guard for gap (1): the citation the COMMITTED receipt
+    publishes must re-derive from the COMMITTED bytes. Tampering with either half,
+    or regenerating one without the other, makes this refuse instead of passing."""
+    import hashlib
+    receipt, citation, staged = _staged_committed_pair(tmp_path)
+    check = verify_citation(citation, repo_root=staged,
+                            expected_tested_sha=citation["tested_sha"])
+    assert check["verified"], check["problems"]
+    assert check["artifact_digest"] == citation["artifact_digest"]
+    assert hashlib.sha256(
+        (staged / citation["artifact_path"]).read_bytes()).hexdigest() \
+        == citation["artifact_digest"]
+    if receipt["tested_sha"] == EMIT.TESTED_SHA:
+        # a receipt naming the CURRENT tested tree is not one emission behind, so
+        # it must carry the verdict it publishes. (The emitter's behaviour is
+        # proven directly by test_emit_publishes_a_citation_check_it_re_derived,
+        # and a receipt regenerated after this commit is covered here.)
+        recorded = receipt["citation_check"]
+        assert recorded["verified"] is True and recorded["problems"] == []
+        assert recorded["artifact_digest"] == check["artifact_digest"]
+
+
+def test_a_rewritten_artifact_is_a_stale_citation(tmp_path):
+    """RED BEFORE REPAIR: the citation was published and never re-checked, so a
+    package could keep citing a digest whose bytes no longer existed."""
+    _, citation, staged = _staged_committed_pair(tmp_path)
+    tree = citation["tested_sha"]
+
+    # 1. the cited bytes change under the citation (a re-run that overwrote the
+    #    artifact without re-emitting): the published raw digest no longer holds
+    (staged / citation["artifact_path"]).write_text(
+        junit_document(cases=7, tested_sha=tree), encoding="utf-8")
+    rewritten = verify_citation(citation, repo_root=staged, expected_tested_sha=tree)
+    assert rewritten["verified"] is False
+    assert any("hash to" in problem for problem in rewritten["problems"])
+
+    # 2. a tampered citation whose digests describe nothing on disk
+    _, citation, staged = _staged_committed_pair(tmp_path)
+    tampered = dict(citation, artifact_digest="0" * 64)
+    check = verify_citation(tampered, repo_root=staged, expected_tested_sha=tree)
+    assert check["verified"] is False
+    assert any("hash to" in problem for problem in check["problems"])
+    canonical = dict(citation, artifact_canonical_digest="0" * 64)
+    assert verify_citation(canonical, repo_root=staged,
+                           expected_tested_sha=tree)["verified"] is False
+
+    # 3. a citation the reviewer could not resolve at all
+    loose = dict(citation, artifact_path_scope="OUTSIDE_DECLARED_TREE")
+    outside = verify_citation(loose, repo_root=staged, expected_tested_sha=tree)
+    assert outside["verified"] is False
+    assert any("outside the declared tree" in p for p in outside["problems"])
+
+
+def test_a_citation_recorded_against_another_tree_blocks_the_gate(
+        contract, package, sealed_test_evidence):
+    """'A committed artifact whose recorded tree no longer matches the tree the gate
+    is resting on must BLOCK, not verify.' The fixture is bound to the declared
+    tree; resting on a different one must refuse it."""
+    citation = sealed_test_evidence.to_dict()
+    other = "0" * 40
+    check = verify_citation(citation, repo_root=sealed_test_evidence.repo_root,
+                            expected_tested_sha=other)
+    assert check["verified"] is False
+    assert any("stale citation" in p for p in check["problems"])
+
+    families = package["families"]
+    guarded = [g for fam in families for g in fam.guarded]
+    decision = decide_gate(contract, families, guarded, [],
+                           test_evidence=sealed_test_evidence,
+                           expected_tested_sha=sealed_test_evidence.tested_sha,
+                           observations=package["observations"],
+                           citation_check=check)
+    assert decision["exit"] == "BLOCKED_G8_BASELINE_FAILURE"
+    assert any("stale-citation" in r for r in decision["reasons"])
+    assert decision["citation"]["verified"] is False
+
+
+def test_a_verifying_citation_keeps_the_gate_passing(contract, package,
+                                                     sealed_test_evidence):
+    """The control for the block above: a citation that DOES re-derive must not be
+    turned into a failure, so the new check is strict without being unconditional."""
+    citation = sealed_test_evidence.to_dict()
+    check = verify_citation(citation, repo_root=sealed_test_evidence.repo_root,
+                            expected_tested_sha=sealed_test_evidence.tested_sha)
+    assert check["verified"] is True and check["problems"] == []
+    families = package["families"]
+    guarded = [g for fam in families for g in fam.guarded]
+    decision = decide_gate(contract, families, guarded, [],
+                           test_evidence=sealed_test_evidence,
+                           expected_tested_sha=sealed_test_evidence.tested_sha,
+                           observations=package["observations"],
+                           citation_check=check)
+    assert decision["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
+    assert decision["citation"]["verified"] is True
+
+
+def test_emit_publishes_a_citation_check_it_re_derived(monkeypatch, tmp_path,
+                                                       sealed_test_evidence):
+    """The package must carry the verdict, not just the claim: emit re-derives the
+    citation it is about to publish from the bytes on disk and records that check."""
+    evdir = tmp_path / "ev"
+    evdir.mkdir()
+    monkeypatch.setattr(EMIT, "EVIDENCE", evdir)
+    out = EMIT.emit(sealed_test_evidence)
+    check = out["receipt"]["citation_check"]
+    assert check["verified"] is True and check["problems"] == []
+    assert check["recorded_tested_sha"] == sealed_test_evidence.tested_sha
+    assert out["decision"]["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
+
