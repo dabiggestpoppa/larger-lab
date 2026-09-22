@@ -33,6 +33,7 @@ from engine.g8_contradiction import (  # noqa: E402
 #: the baseline contract is owned by engine.g8_test_evidence: this module
 #: publishes it, and holds no copy of any rule or command of its own
 from engine.g8_test_evidence import (  # noqa: E402
+    ARTIFACT_CANONICALIZATION_RULE,
     ARTIFACT_COMMAND,
     ARTIFACT_RELATIVE_PATH,
     AUTHORITATIVE_TEST_COMMAND,
@@ -620,10 +621,18 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
         "new_contradictions": [e["reason"] for e in register["entries"]],
         "test_count_lineage": lineage["chain"],
         "citation_check": decision["citation"],
-        "reproducibility": ("the package is regenerated from the tree by "
-                            "scenarios/g8_emit_evidence.py; two consecutive builds "
-                            "are byte-identical and the generator carries no "
-                            "wall-clock field"),
+        "reproducibility": (
+            "the package is regenerated from the tree by "
+            "scenarios/g8_emit_evidence.py; two consecutive builds of the SAME "
+            "artifact are byte-identical and the generator carries no wall-clock "
+            "field. The JUnit artifact's RAW bytes are per-RUN by design -- its "
+            "writer stamps time/timestamp/hostname -- so a fresh test run yields "
+            "different raw bytes and therefore a different raw digest. The "
+            f"CANONICAL digest under {ARTIFACT_CANONICALIZATION_RULE} is the "
+            "run-invariant identity: it matched across independent runs and across "
+            "LF and CRLF checkouts. The tested tree is derived from the CODE tree, "
+            "so an evidence-only commit does not move it and the package remains "
+            "re-derivable from any later commit."),
         "external_verification": ("NONE. The package is self-generated and this "
                                   "receipt does not claim independent external "
                                   "verification."),
