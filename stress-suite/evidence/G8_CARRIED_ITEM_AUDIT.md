@@ -35,7 +35,7 @@ These are limitations of the AUDIT's own discriminating power, recorded so that 
 | F1 | object_class | CONSTANT_DERIVATION | INSTITUTIONAL_PHASE |
 | F1 | runtime_relevance | CONSTANT_DERIVATION | RUNTIME_NEUTRAL |
 | F1 | state_machine | CONSTANT_DERIVATION | M5_PHASE |
-| F2 | reversibility | IDENTICALLY_UNKNOWN | UNKNOWN |
+| F2 | conceptual_provenance_attached | CONSTANT_DERIVATION | PRESERVED |
 | F3 | authority_pre_state | CONSTANT_DERIVATION | NONE |
 | F3 | claim_scope_class | CONSTANT_DERIVATION | BOUNDED_SCOPE |
 | F3 | consequence_class | CONSTANT_DERIVATION | IRREVERSIBLE |
@@ -57,7 +57,10 @@ These are limitations of the AUDIT's own discriminating power, recorded so that 
 | F6 | environment_shift | CONSTANT_DERIVATION | NONE |
 | F6 | evidence_scope_binding | IDENTICALLY_UNKNOWN | UNKNOWN |
 | F6 | runtime_relevance | CONSTANT_DERIVATION | RUNTIME_NEUTRAL |
+| F8 | consequence_class | CONSTANT_DERIVATION | IRREVERSIBLE |
+| F8 | evidence_provenance | CONSTANT_DERIVATION | GOVERNED_REGISTRY |
+| F8 | reversibility | CONSTANT_DERIVATION | LOW |
 
 - `AMB-G8-01` — the declared `domain` token vocabulary covers only part of the domain labels the domain machine actually uses, so some real domain differences collapse to `UNKNOWN` on both sides. Recorded per family as `PARTIALLY_UNDECLARED`; not fixed here, because widening a token vocabulary is a contract decision and the collapse currently favours neither side (`UNKNOWN` is never favourable).
-- `AMB-G8-02` — of 66 declared verified fields, **36** actually varied inside their family in this run; the rest are constant or identically UNKNOWN. G8's coverage is therefore real but bounded, and this audit does not claim otherwise.
+- `AMB-G8-02` — of 69 declared verified fields, **36** actually varied inside their family in this run; the rest are constant or identically UNKNOWN. G8's coverage is therefore real but bounded, and this audit does not claim otherwise.
 - `ER02` remains a doctrine-space item: G8 did not decide who may ratify future evaluation law.

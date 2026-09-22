@@ -2,12 +2,14 @@
 
 Every comparison G8 performed, in the order the frozen contract declares its families. Verdicts are a pure function of the declared equivalence vector, the declared discriminator rules and the declared outcome-class map: no row is decided by a scenario identifier, an expected outcome or a fixture name.
 
-- contract `G8-EQUIVALENCE-CONTRACT-001` v1.1.0 (71c9583c4ac74bd1bf7c97d3aca2394d)
-- observations: **29**  ·  comparisons: **53**  ·  equivalence classes: **27**
-- verdicts: {"CONSISTENT": 1, "MATERIAL_DISCRIMINATOR": 47, "NOT_COMPARABLE": 5}
-- mandated pairs compared: **20 / 20**  ·  uncovered: []
+- contract `G8-EQUIVALENCE-CONTRACT-001` v1.2.0 (525b18bcea68d23584097c8b740d2d23)
+- observations: **35**  ·  comparisons: **65**  ·  equivalence classes: **33**
+- verdicts: {"CONSISTENT": 1, "MATERIAL_DISCRIMINATOR": 58, "NOT_COMPARABLE": 6}
+- mandated pairs compared: **21 / 21**  ·  substantively adjudicated: **21**  ·  uncovered: **0**
 
-`NOT_COMPARABLE` is not a pass: it records that two observations came from different state machines, whose terminal vocabulary is never treated as interchangeable (contract rule N8).
+Revision R3 (finding R-G8-01): a mandated relationship counts as covered only when its comparison returned a SUBSTANTIVE verdict (CONSISTENT or MATERIAL_DISCRIMINATOR). Merely running the comparator is not coverage, so `NOT_COMPARABLE`, an unmapped member and an unadjudicated pair are all listed as UNCOVERED and block the gate.
+
+`NOT_COMPARABLE` is never a pass: it records that two observations came from different state machines, whose terminal vocabulary is never treated as interchangeable (contract rule N8). The mandated cross-machine relationships are adjudicated in family F2 through the shared conceptual projection; the machine-local finding is retained as diagnostic family F9 and carries no mandated pair.
 
 ## Verdict matrix
 
@@ -17,18 +19,23 @@ Every comparison G8 performed, in the order the frozen contract declares its fam
 | F1 | G2:S01 | G2:S02 | MATERIAL_DISCRIMINATOR | dependency_centrality, evidence_lineage, persistence | D-LINEAGE, D-PERSISTENCE | - | - | mandated |
 | F1 | G2:S01 | G2:S03 | MATERIAL_DISCRIMINATOR | dependency_centrality, evidence_lineage, evidence_quality | D-LINEAGE, D-QUALITY | - | - |  |
 | F1 | G2:S01 | G2:S04 | MATERIAL_DISCRIMINATOR | dependency_centrality, evidence_lineage, evidence_quality, persistence | D-LINEAGE, D-QUALITY, D-PERSISTENCE | - | - |  |
+| F1 | G2:S01 | G2:S05 | MATERIAL_DISCRIMINATOR | dependency_centrality, persistence | D-PERSISTENCE | - | - |  |
 | F1 | G2:S01_WEAK | G2:S02 | MATERIAL_DISCRIMINATOR | dependency_centrality | - | - | - |  |
 | F1 | G2:S01_WEAK | G2:S03 | MATERIAL_DISCRIMINATOR | dependency_centrality, evidence_quality, persistence | D-QUALITY, D-PERSISTENCE | - | - |  |
 | F1 | G2:S01_WEAK | G2:S04 | MATERIAL_DISCRIMINATOR | dependency_centrality, evidence_quality | D-QUALITY | - | - |  |
+| F1 | G2:S01_WEAK | G2:S05 | MATERIAL_DISCRIMINATOR | dependency_centrality, evidence_lineage | D-LINEAGE | - | - |  |
 | F1 | G2:S02 | G2:S03 | MATERIAL_DISCRIMINATOR | evidence_quality, persistence | D-QUALITY, D-PERSISTENCE | - | - |  |
 | F1 | G2:S02 | G2:S04 | MATERIAL_DISCRIMINATOR | evidence_quality | D-QUALITY | - | - | mandated |
+| F1 | G2:S02 | G2:S05 | MATERIAL_DISCRIMINATOR | evidence_lineage | D-LINEAGE | - | - |  |
 | F1 | G2:S03 | G2:S04 | MATERIAL_DISCRIMINATOR | persistence | D-PERSISTENCE | - | - | mandated |
-| F2 | F2::G2:S05 | F2::G5:S16 | NOT_COMPARABLE | - | - | - | - | mandated |
-| F2 | F2::G2:S05 | F2::G6:S22 | NOT_COMPARABLE | - | - | - | - |  |
-| F2 | F2::G2:S05 | F2::G6:S24 | NOT_COMPARABLE | - | - | - | - |  |
-| F2 | F2::G5:S16 | F2::G6:S22 | NOT_COMPARABLE | - | - | - | - | mandated |
-| F2 | F2::G5:S16 | F2::G6:S24 | NOT_COMPARABLE | - | - | - | - |  |
-| F2 | F2::G6:S22 | F2::G6:S24 | MATERIAL_DISCRIMINATOR | authority_pre_state, consequence_class, evidence_lineage | D-AUTHORITY-PRESTATE, D-CONSEQUENCE, D-LINEAGE | - | - | mandated |
+| F1 | G2:S03 | G2:S05 | MATERIAL_DISCRIMINATOR | evidence_lineage, evidence_quality, persistence | D-LINEAGE, D-QUALITY, D-PERSISTENCE | - | - |  |
+| F1 | G2:S04 | G2:S05 | MATERIAL_DISCRIMINATOR | evidence_lineage, evidence_quality | D-LINEAGE, D-QUALITY | - | - |  |
+| F2 | F2::CONCEPT::G2:S05 | F2::CONCEPT::G5:S16 | MATERIAL_DISCRIMINATOR | conceptual_authority_not_empirical | D-CONCEPT-AUTHORITY | - | - | mandated |
+| F2 | F2::CONCEPT::G2:S05 | F2::CONCEPT::G6:S22 | MATERIAL_DISCRIMINATOR | conceptual_authority_not_empirical, conceptual_plural_not_collapsed, conceptual_preference_not_empirical, conceptual_unresolved_representable | D-CONCEPT-AUTHORITY, D-CONCEPT-PLURAL, D-CONCEPT-PREFERENCE, D-CONCEPT-UNRESOLVED | - | - |  |
+| F2 | F2::CONCEPT::G2:S05 | F2::CONCEPT::G6:S24 | MATERIAL_DISCRIMINATOR | conceptual_plural_not_collapsed | D-CONCEPT-PLURAL | - | - |  |
+| F2 | F2::CONCEPT::G5:S16 | F2::CONCEPT::G6:S22 | MATERIAL_DISCRIMINATOR | conceptual_plural_not_collapsed, conceptual_preference_not_empirical, conceptual_unresolved_representable | D-CONCEPT-PLURAL, D-CONCEPT-PREFERENCE, D-CONCEPT-UNRESOLVED | - | - | mandated |
+| F2 | F2::CONCEPT::G5:S16 | F2::CONCEPT::G6:S24 | MATERIAL_DISCRIMINATOR | conceptual_authority_not_empirical, conceptual_plural_not_collapsed | D-CONCEPT-AUTHORITY, D-CONCEPT-PLURAL | - | - |  |
+| F2 | F2::CONCEPT::G6:S22 | F2::CONCEPT::G6:S24 | MATERIAL_DISCRIMINATOR | conceptual_authority_not_empirical, conceptual_preference_not_empirical, conceptual_unresolved_representable | D-CONCEPT-AUTHORITY, D-CONCEPT-PREFERENCE, D-CONCEPT-UNRESOLVED | - | - | mandated |
 | F3 | G3:S06 | G3:S07 | MATERIAL_DISCRIMINATOR | evidence_lineage, evidence_quality, independence | D-LINEAGE, D-QUALITY, D-INDEPENDENCE | - | - | mandated |
 | F3 | G3:S06 | G3:S08 | CONSISTENT | - | - | - | - |  |
 | F3 | G3:S06 | G3:S09 | MATERIAL_DISCRIMINATOR | evidence_lineage, evidence_quality, independence | D-LINEAGE, D-QUALITY, D-INDEPENDENCE | - | - | mandated |
@@ -66,61 +73,60 @@ Every comparison G8 performed, in the order the frozen contract declares its fam
 | F6 | G6:S22 | G6:S23 | MATERIAL_DISCRIMINATOR | authority_pre_state, consequence_class, evidence_lineage, evidence_provenance, evidence_quality, evidence_subject_binding, grant_mandate_state, operator_availability, reversibility | D-AUTHORITY-PRESTATE, D-CONSEQUENCE, D-LINEAGE, D-SUBJECT-BINDING, D-GRANT-STATE, D-OPERATOR-AVAILABILITY-ACTION | - | - | mandated |
 | F6 | G6:S22 | G6:S24 | MATERIAL_DISCRIMINATOR | authority_pre_state, consequence_class, evidence_lineage | D-AUTHORITY-PRESTATE, D-CONSEQUENCE, D-LINEAGE | - | - |  |
 | F6 | G6:S23 | G6:S24 | MATERIAL_DISCRIMINATOR | authority_pre_state, consequence_class, evidence_lineage, evidence_provenance, evidence_quality, evidence_subject_binding, grant_mandate_state, operator_availability, reversibility | D-AUTHORITY-PRESTATE, D-CONSEQUENCE, D-LINEAGE, D-SUBJECT-BINDING, D-GRANT-STATE, D-OPERATOR-AVAILABILITY-ACTION | - | - | mandated |
+| F8 | G7:OA_AVAILABLE | G7:OA_UNAVAILABLE | MATERIAL_DISCRIMINATOR | authority_pre_state, grant_mandate_state, operator_availability | D-AUTHORITY-PRESTATE, D-GRANT-STATE, D-OPERATOR-AVAILABILITY-ACTION | - | - | mandated |
+| F9 | F9::LOCAL::G2:S05 | F9::LOCAL::G5:S16 | NOT_COMPARABLE | - | - | - | - |  |
+| F9 | F9::LOCAL::G2:S05 | F9::LOCAL::G6:S22 | NOT_COMPARABLE | - | - | - | - |  |
+| F9 | F9::LOCAL::G2:S05 | F9::LOCAL::G6:S24 | NOT_COMPARABLE | - | - | - | - |  |
+| F9 | F9::LOCAL::G5:S16 | F9::LOCAL::G6:S22 | NOT_COMPARABLE | - | - | - | - |  |
+| F9 | F9::LOCAL::G5:S16 | F9::LOCAL::G6:S24 | NOT_COMPARABLE | - | - | - | - |  |
+| F9 | F9::LOCAL::G6:S22 | F9::LOCAL::G6:S24 | NOT_COMPARABLE | - | - | NOT_EQUIVALENT | INFO |  |
 
 ## Equivalence classes with more than one outcome class
 
-None. Every class whose declared vector is identically satisfied produced exactly one outcome class.
+| family | class | members | outcome classes |
+|---|---|---|---|
+| F9 | 4ce81bfa02b8c6b992d9 | F9::LOCAL::G6:S22, F9::LOCAL::G6:S24 | ACTION_AUTHORIZED_BY_OPERATOR, UNRESOLVED_HELD |
+
+Each of the above is required to have a matching register entry; the assertion is enforced by the regression suite.
 
 ## Guarded properties
 
 | family | observation | property | verdict |
 |---|---|---|---|
-| F1 | G2:S01 | P12 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S01 | P6 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S01_WEAK | P12 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S01_WEAK | P6 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S02 | P12 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S02 | P6 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S03 | P12 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S03 | P6 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S04 | P12 | UNKNOWN_NOT_FAVORABLE |
-| F1 | G2:S04 | P6 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G2:S05 | P2 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G2:S05 | P3 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G2:S05 | P4 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G2:S05 | P7 | HOLDS |
-| F2 | F2::G5:S16 | P2 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G5:S16 | P3 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G5:S16 | P4 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G5:S16 | P7 | HOLDS |
-| F2 | F2::G6:S22 | P2 | HOLDS |
-| F2 | F2::G6:S22 | P3 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G6:S22 | P4 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G6:S22 | P7 | HOLDS |
-| F2 | F2::G6:S24 | P2 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G6:S24 | P3 | HOLDS |
-| F2 | F2::G6:S24 | P4 | UNKNOWN_NOT_FAVORABLE |
-| F2 | F2::G6:S24 | P7 | HOLDS |
-| F3 | G3:S06 | P12 | UNKNOWN_NOT_FAVORABLE |
+| F1 | G2:S01 | P12 | HOLDS |
+| F1 | G2:S01 | P4 | UNKNOWN_NOT_FAVORABLE |
+| F1 | G2:S01 | P7 | HOLDS |
+| F1 | G2:S01_WEAK | P12 | HOLDS |
+| F1 | G2:S01_WEAK | P4 | UNKNOWN_NOT_FAVORABLE |
+| F1 | G2:S01_WEAK | P7 | HOLDS |
+| F1 | G2:S02 | P12 | HOLDS |
+| F1 | G2:S02 | P4 | UNKNOWN_NOT_FAVORABLE |
+| F1 | G2:S02 | P7 | HOLDS |
+| F1 | G2:S03 | P12 | HOLDS |
+| F1 | G2:S03 | P4 | UNKNOWN_NOT_FAVORABLE |
+| F1 | G2:S03 | P7 | HOLDS |
+| F1 | G2:S04 | P12 | HOLDS |
+| F1 | G2:S04 | P4 | UNKNOWN_NOT_FAVORABLE |
+| F1 | G2:S04 | P7 | HOLDS |
+| F1 | G2:S05 | P12 | HOLDS |
+| F1 | G2:S05 | P4 | HOLDS |
+| F1 | G2:S05 | P7 | HOLDS |
 | F3 | G3:S06 | P6 | HOLDS |
-| F3 | G3:S07 | P12 | UNKNOWN_NOT_FAVORABLE |
 | F3 | G3:S07 | P6 | UNKNOWN_NOT_FAVORABLE |
-| F3 | G3:S08 | P12 | UNKNOWN_NOT_FAVORABLE |
 | F3 | G3:S08 | P6 | HOLDS |
-| F3 | G3:S09 | P12 | UNKNOWN_NOT_FAVORABLE |
 | F3 | G3:S09 | P6 | UNKNOWN_NOT_FAVORABLE |
-| F4 | G4:S10 | P11 | HOLDS |
-| F4 | G4:S10 | P7 | HOLDS |
-| F4 | G4:S11 | P11 | HOLDS |
-| F4 | G4:S11 | P7 | HOLDS |
-| F4 | G4:S12 | P11 | HOLDS |
-| F4 | G4:S12 | P7 | HOLDS |
+| F4 | G4:S10 | P11 | UNKNOWN_NOT_FAVORABLE |
+| F4 | G4:S10 | P7 | UNKNOWN_NOT_FAVORABLE |
+| F4 | G4:S11 | P11 | UNKNOWN_NOT_FAVORABLE |
+| F4 | G4:S11 | P7 | UNKNOWN_NOT_FAVORABLE |
+| F4 | G4:S12 | P11 | UNKNOWN_NOT_FAVORABLE |
+| F4 | G4:S12 | P7 | UNKNOWN_NOT_FAVORABLE |
 | F4 | G4:S13 | P11 | HOLDS |
 | F4 | G4:S13 | P7 | UNKNOWN_NOT_FAVORABLE |
 | F5 | G5:S14 | P10 | UNKNOWN_NOT_FAVORABLE |
 | F5 | G5:S14 | P5 | HOLDS |
 | F5 | G5:S15 | P10 | UNKNOWN_NOT_FAVORABLE |
-| F5 | G5:S15 | P5 | HOLDS |
+| F5 | G5:S15 | P5 | UNKNOWN_NOT_FAVORABLE |
 | F5 | G5:S16 | P10 | UNKNOWN_NOT_FAVORABLE |
 | F5 | G5:S16 | P5 | UNKNOWN_NOT_FAVORABLE |
 | F5 | G5:S17 | P10 | UNKNOWN_NOT_FAVORABLE |
@@ -131,21 +137,25 @@ None. Every class whose declared vector is identically satisfied produced exactl
 | F5 | G5:S19 | P5 | UNKNOWN_NOT_FAVORABLE |
 | F6 | G6:S20 | P1 | HOLDS |
 | F6 | G6:S20 | P2 | UNKNOWN_NOT_FAVORABLE |
-| F6 | G6:S20 | P8 | HOLDS |
-| F6 | G6:S20 | P9 | HOLDS |
+| F6 | G6:S20 | P3 | UNKNOWN_NOT_FAVORABLE |
+| F6 | G6:S20 | P8 | UNKNOWN_NOT_FAVORABLE |
 | F6 | G6:S21 | P1 | HOLDS |
 | F6 | G6:S21 | P2 | UNKNOWN_NOT_FAVORABLE |
+| F6 | G6:S21 | P3 | UNKNOWN_NOT_FAVORABLE |
 | F6 | G6:S21 | P8 | HOLDS |
-| F6 | G6:S21 | P9 | HOLDS |
 | F6 | G6:S22 | P1 | HOLDS |
 | F6 | G6:S22 | P2 | HOLDS |
-| F6 | G6:S22 | P8 | HOLDS |
-| F6 | G6:S22 | P9 | HOLDS |
+| F6 | G6:S22 | P3 | UNKNOWN_NOT_FAVORABLE |
+| F6 | G6:S22 | P8 | UNKNOWN_NOT_FAVORABLE |
 | F6 | G6:S23 | P1 | HOLDS |
 | F6 | G6:S23 | P2 | UNKNOWN_NOT_FAVORABLE |
-| F6 | G6:S23 | P8 | HOLDS |
-| F6 | G6:S23 | P9 | HOLDS |
+| F6 | G6:S23 | P3 | UNKNOWN_NOT_FAVORABLE |
+| F6 | G6:S23 | P8 | UNKNOWN_NOT_FAVORABLE |
 | F6 | G6:S24 | P1 | HOLDS |
 | F6 | G6:S24 | P2 | UNKNOWN_NOT_FAVORABLE |
-| F6 | G6:S24 | P8 | HOLDS |
-| F6 | G6:S24 | P9 | HOLDS |
+| F6 | G6:S24 | P3 | HOLDS |
+| F6 | G6:S24 | P8 | UNKNOWN_NOT_FAVORABLE |
+| F8 | G7:OA_AVAILABLE | P2 | HOLDS |
+| F8 | G7:OA_AVAILABLE | P9 | HOLDS |
+| F8 | G7:OA_UNAVAILABLE | P2 | HOLDS |
+| F8 | G7:OA_UNAVAILABLE | P9 | HOLDS |

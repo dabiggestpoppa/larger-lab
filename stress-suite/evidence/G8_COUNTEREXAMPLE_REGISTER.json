@@ -8,8 +8,8 @@
   ],
   "note": "every counterexample this audit produced, including the findings it later refuted and the contract revisions those findings forced. A refuted finding is kept: the audit is judged on what it can detect, not on a clean sheet.",
   "post_revision_audit_state": {
-    "contract_digest": "71c9583c4ac74bd1bf7c97d3aca2394d",
-    "contract_version": "1.1.0",
+    "contract_digest": "525b18bcea68d23584097c8b740d2d23",
+    "contract_version": "1.2.0",
     "exit": "PASS_G8_CROSS_SCENARIO_COHERENCE",
     "gate_counts": {
       "blocking_count": 0,
@@ -19,6 +19,7 @@
     },
     "reasons": [],
     "register_counts": {
+      "NOT_EQUIVALENT": 6,
       "RECEIPT_OR_CLAIM_DEFECT": 1,
       "SUPERSEDED_BY_LATER_ARTIFACT": 1
     }

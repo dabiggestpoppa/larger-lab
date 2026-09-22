@@ -3,10 +3,11 @@
 **GATE STATUS:** `PASS_G8_CROSS_SCENARIO_COHERENCE`
 
 - starting SHA `661878e7df4c5b8f7bcb2479ceebabd79d8c28b3`
-- tested SHA `aae1e2e62022b7c37a21cdb4316de731584a3ac8`
-- evidence commit `STRESS-G8R` (this package; not self-hashed)
-- contract `G8-EQUIVALENCE-CONTRACT-001` v1.1.0 `71c9583c4ac74bd1bf7c97d3aca2394d`
-- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **973 passed**
+- tested SHA `24f6164a80083be7886dcf8e3844cff994be4fb1`
+- evidence commit `STRESS-G8RR` (this package; not self-hashed)
+- contract `G8-EQUIVALENCE-CONTRACT-001` v1.2.0 `525b18bcea68d23584097c8b740d2d23`
+- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1000 / passed 1000 / skipped 0 / failed 0** (artifact `pytest` `ae1febc41bad9acf`, python `3.11.9`)
+- test provenance (revision R3, finding R-G8-07): the baseline is read from the JUnit artifact the authoritative command produced, never from a self-reported integer. The receipt records the artifact digest, the suite identity, the tested tree, the command, the environment and the exit status; a missing, malformed, stale or failing artifact refuses emission.
 
 ## What was asked
 
@@ -14,9 +15,9 @@ Not whether each scenario works, but whether EQUIVALENT institutional facts prod
 
 ## What was done
 
-One observation per scenario was derived by RUNNING that scenario through its OWN canonical runner (G2 phase machine, G3 ecology, G4 memory, G5 domain, G6 governance), with every evaluator handed a decision-grade projection whose sealed fields are asserted empty first. Those observations were then compared inside the contract's families: **53 comparisons over 29 observations**, **20/20** of them declared mandated relationships.
+One observation per scenario was derived by RUNNING that scenario through its OWN canonical runner (G2 phase machine, G3 ecology, G4 memory, G5 domain, G6 governance), with every evaluator handed a decision-grade projection whose sealed fields are asserted empty first. Those observations were then compared inside the contract's families: **65 comparisons over 35 observations**, **21/21** of them declared mandated relationships.
 
-Verdicts: `{"CONSISTENT": 1, "MATERIAL_DISCRIMINATOR": 47, "NOT_COMPARABLE": 5}`.
+Verdicts: `{"CONSISTENT": 1, "MATERIAL_DISCRIMINATOR": 58, "NOT_COMPARABLE": 6}`.
 
 ## Gate decision
 
@@ -50,7 +51,7 @@ The pre-revision verdict was `BLOCKED_G8_MISSING_EVIDENCE` with reasons `["3 gat
 
 ## What this PASS does not mean
 
-It does not mean the audit is unbounded. Of 66 declared verified fields, 36 actually varied inside their family in this run; the rest are constant or identically UNKNOWN and are listed as limitations (`AMB-G8-01`, `AMB-G8-02`). It does not mean S13 proves the proposed continuation-equivalence contract, which is an unratified future document. It does not resolve `CON-02`, `CON-03` or `AMB-08`. It does not claim independent external verification.
+It does not mean the audit is unbounded. Of 69 declared verified fields, 36 actually varied inside their family in this run; the rest are constant or identically UNKNOWN and are listed as limitations (`AMB-G8-01`, `AMB-G8-02`). It does not mean S13 proves the proposed continuation-equivalence contract, which is an unratified future document. It does not resolve `CON-02`, `CON-03` or `AMB-08`. It does not claim independent external verification.
 
 ## Boundary
 

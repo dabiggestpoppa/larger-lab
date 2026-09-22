@@ -39,10 +39,149 @@
     "guarded_property_violations": 0
   },
   "counts_by_classification": {
+    "NOT_EQUIVALENT": 6,
     "RECEIPT_OR_CLAIM_DEFECT": 1,
     "SUPERSEDED_BY_LATER_ARTIFACT": 1
   },
   "entries": [
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "2cdd903dac199159ca9e",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G2:S05",
+      "preserved_evidence": {
+        "left_outcome_class": "STABLE_PRESERVED",
+        "right_outcome_class": "DOMAIN_CONTRADICTION_OPEN"
+      },
+      "reason": "different state machines (M5_PHASE vs DOMAIN_MACHINE): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G5:S16",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "fe5d7e429847df5f04d0",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G2:S05",
+      "preserved_evidence": {
+        "left_outcome_class": "STABLE_PRESERVED",
+        "right_outcome_class": "ACTION_AUTHORIZED_BY_OPERATOR"
+      },
+      "reason": "different state machines (M5_PHASE vs AUTHORITY): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S22",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "ded8ac599e30eb82859f",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G2:S05",
+      "preserved_evidence": {
+        "left_outcome_class": "STABLE_PRESERVED",
+        "right_outcome_class": "UNRESOLVED_HELD"
+      },
+      "reason": "different state machines (M5_PHASE vs AUTHORITY): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S24",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "23a01a5b86091e2c966b",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G5:S16",
+      "preserved_evidence": {
+        "left_outcome_class": "DOMAIN_CONTRADICTION_OPEN",
+        "right_outcome_class": "ACTION_AUTHORIZED_BY_OPERATOR"
+      },
+      "reason": "different state machines (DOMAIN_MACHINE vs AUTHORITY): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S22",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "eaf4272416698d3e30fe",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G5:S16",
+      "preserved_evidence": {
+        "left_outcome_class": "DOMAIN_CONTRADICTION_OPEN",
+        "right_outcome_class": "UNRESOLVED_HELD"
+      },
+      "reason": "different state machines (DOMAIN_MACHINE vs AUTHORITY): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S24",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "1cc7b1cf83e87259aa17",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G6:S22",
+      "preserved_evidence": {
+        "left_outcome_class": "ACTION_AUTHORIZED_BY_OPERATOR",
+        "right_outcome_class": "UNRESOLVED_HELD"
+      },
+      "reason": "diagnostic family: no equivalence verdict is claimed. The machine-local tokens ('DIRECTIVE_AUTHORIZED' vs 'UNRESOLVED_GOVERNANCE_EVENT') come from different vocabularies and are not interchangeable (rule N8); the mandated relationship is adjudicated in F2 through the conceptual projection.",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S24",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
     {
       "blocks_gate": false,
       "changes_historical_meaning": false,
@@ -99,6 +238,6 @@
   ],
   "gate_exit": "PASS_G8_CROSS_SCENARIO_COHERENCE",
   "note": "an entry with classification NOT_EQUIVALENT or FUTURE_PLANNING_IMPACT is not an institutional contradiction; every other class requires authority review before ratification",
-  "open_entries": 2,
+  "open_entries": 8,
   "register_id": "G8-CONTRADICTION-REGISTER-001"
 }
