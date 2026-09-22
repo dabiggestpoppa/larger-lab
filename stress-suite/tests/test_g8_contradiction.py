@@ -51,6 +51,7 @@ from engine.g8_contradiction import (  # noqa: E402
 from engine.g8_test_evidence import (  # noqa: E402
     ARTIFACT_CANONICALIZATION_RULE,
     ARTIFACT_RELATIVE_PATH,
+    CANONICALIZATION_RULE_NOTES,
     CANONICALIZATION_RULES,
     UnverifiableTestEvidence,
     canonical_junit_bytes,
@@ -86,6 +87,7 @@ import g8_concept_projection as CP  # noqa: E402
 import g8_emit_evidence as EMIT  # noqa: E402
 import g8_pre_repair_red_transcript as RED  # noqa: E402
 import g8_arch_red_transcript as ARCH  # noqa: E402
+import g8_closure_evidence as CLOSURE  # noqa: E402
 from engine.g8_contradiction import GuardedPropertyFinding  # noqa: E402
 
 CONTRACT_PATH = ROOT / "evidence" / "G8_EQUIVALENCE_CONTRACT.json"
@@ -1274,41 +1276,32 @@ def test_the_projection_adapters_refuse_a_sealed_truth_trace():
 # R-G8-01..09 — the red evidence is EXECUTABLE, not a static annex
 # --------------------------------------------------------------------------- #
 def test_the_pre_repair_red_transcript_still_reproduces_every_finding():
-    """Reruns the committed harness against the pre-repair commit and asserts the
-    transcript still shows each finding RED. This is what makes the red evidence
-    survive: a reviewer runs this test, or the harness directly, rather than
-    trusting an archived file."""
+    """Reruns the committed harness against the pre-repair commit and requires
+    every finding to be RED by the harness's OWN declared criteria. This is what
+    makes the red evidence survive: a reviewer runs this test, or the harness
+    directly, rather than trusting an archived file.
+
+    The criteria are NOT restated here (STRESS-G8ARCH6): they live with the
+    harness that produces the observations, and the row-evidence resolver reads
+    the same map, so a control, a matrix row and a resolver cannot hold three
+    opinions about what RED means.
+    """
     text = RED.transcript()
     assert "PROBE EXIT" not in text, "the probe must run clean against the old tree"
-    # R-G8-01 — coverage claimed while mandated pairs were NOT_COMPARABLE, gate PASS
-    assert "mandated_observed=20/20" in text
-    assert "NOT_COMPARABLE(mandated)=2" in text
-    assert "gate=PASS_G8_CROSS_SCENARIO_COHERENCE" in text
-    # R-G8-02 — the `... or True` tautology on an adverse profit surface
-    assert "-> True" in text and "'VALIDATED'" in text
-    assert 'or True' in text
-    # R-G8-03 — key-name provenance
-    assert "'evidence_provenance': 'UNKNOWN'" in text
-    # R-G8-04 — a scenario identifier and a nonexistent scenario both derived True
-    assert "_g4_runtime_neutral('S99_NO_SUCH_SCENARIO') -> True" in text
-    # R-G8-05 — refusal presence, a literal True, and token recognition
-    assert "single refusal phase, nothing else) -> True" in text
-    assert "refusal AFTER an escalation phase) -> True" in text
-    assert 'P8 declared in the G6 observation as: ["True"]' in text
-    assert "{'_operator_availability'" not in text  # guard against a typo'd probe
-    assert "'UNAVAILABLE'}) -> True" in text
-    # R-G8-06 — P6 derived from counts
-    assert "p6 = (True if (raw_reviewers > 1 and sources == 1) else None)" in text
-    # R-G8-07 — a bare scalar certified the baseline
-    assert "(measured_full: 'int')" in text
-    assert "collected=9999 passed=9999 failed=0" in text
-    assert "receipt records a test-results artifact -> False" in text
-    # R-G8-08 — the checkout decided the source binding
-    assert "fixture digest == LF digest -> False ; == CRLF digest -> True" in text
-    # R-G8-09 — the freeze claim Git could not support
-    assert "FROZEN_AT_STRESS-G8P0" in text
-    assert "authored BEFORE any cross-scenario comparison runs" in text
-    assert "contract declares contract_chronology -> False" in text
+    verdicts = RED.verdicts(text, RED.PRE_REPAIR_HEAD)
+    assert set(verdicts) == set(RED.PROBE_IDS)
+    assert set(verdicts.values()) == {"RED"}, verdicts
+    # every declared probe must carry the observations that demonstrate it, and
+    # the committed annex must agree with the live run
+    assert all(RED.RED_CRITERIA[p] for p in RED.PROBE_IDS)
+    # a three-valued verdict: a probe that renders no line is ABSENT, which a row
+    # may not cite either ("not rendered" is not "not red")
+    renamed = text.replace("R-G8-03:", "R-G8-03RENAMED:")
+    assert RED.verdicts(renamed, RED.PRE_REPAIR_HEAD)["R-G8-03"] == "ABSENT"
+    # R-G8-09 also rests on the annex's Git section, which is a snapshot of the
+    # history rather than probe output, so it is asserted here and NOT as a probe
+    # criterion (counting it there made the probe read GREEN: the resolver caught
+    # exactly that when it was first asked to re-derive the row)
     # full object name: a short abbreviation is chosen per repository, so
     # asserting one would make this regression depend on which clone it ran in
     assert "f5482e3e77e49ee279e4ecf5e58db5a2a694f5bb STRESS-G8P0" in text
@@ -1406,6 +1399,70 @@ def test_no_exit_status_is_published_because_none_can_be_observed(
     assert "failing baseline" in str(err.value)
 
 
+def test_a_closure_row_can_only_cite_evidence_that_is_red_at_the_head_it_names(
+        tmp_path):
+    """RED BEFORE REPAIR (STRESS-G8ARCH6). The row-evidence check was a SUBSTRING
+    SCAN inside the emitter, so it accepted a row claiming RED where an annex
+    rendered GREEN at the head it named, and a head string that merely OCCURRED
+    anywhere in the transcript (`'a'*40`, the synthetic probe tree). Both are the
+    "no detected violation therefore proved" pattern this gate exists to forbid --
+    the same class as R-G8-01, where merely invoking the comparator counted as
+    coverage.
+
+    The rule now has ONE owner and re-derives the verdict from the harnesses'
+    declared heads and their parsed verdicts. Each tamper below is refused, and
+    the real rows all resolve.
+    """
+    arch4 = ARCH.PRE_PASS_HEADS[1][1]
+    rows = list(EMIT._AUDIT_CLOSURE)
+
+    def tampered(**kw):
+        edited = list(rows)
+        edited[15] = {**edited[15], **kw}
+        return edited
+
+    # the shipped rows resolve, and the ANNEX is DERIVED rather than declared:
+    # no row carries an annex name at all, so the eight literal copies are gone
+    resolved = CLOSURE.require(rows, ROOT / "evidence")
+    assert len(resolved) == len(rows) == 16
+    assert [e for e in rows if "red_annex" in e] == []
+    assert resolved[0]["red_annex"] == RED.ANNEX
+    assert resolved[15]["red_annex"] == ARCH.ANNEX
+    assert resolved[15]["annex_verdict"] == "RED"
+    assert resolved[15]["red_head"] == ARCH.PRE_PASS_HEADS[1][1]
+
+    def reason(edited, evidence=None):
+        found = CLOSURE.problems(edited, evidence or (ROOT / "evidence"))
+        assert found, "this tamper must be refused"
+        return found[0]
+
+    # a probe id no harness declares
+    assert "not declared by any red-evidence harness" in reason(
+        tampered(red_probe="ARCH-ZZ"))
+    # a head the harness never ran against
+    assert "is not declared by" in reason(tampered(red_head="f" * 40))
+    # a head that merely OCCURS in the transcript text
+    assert "is not declared by" in reason(tampered(red_head="a" * 40))
+    # a probe the annex renders GREEN at the head the row names
+    green = reason(tampered(red_probe="ARCH-E", red_head=arch4))
+    assert "renders GREEN there" in green and "ARCH-E" in green
+    # a probe whose line is absent from its annex
+    evdir = tmp_path / "ev"
+    evdir.mkdir()
+    for harness in (RED, ARCH):
+        text = (ROOT / "evidence" / harness.ANNEX).read_text(encoding="utf-8")
+        if harness is ARCH:
+            text = "\n".join(ln for ln in text.splitlines()
+                              if not ln.startswith("ARCH-A:")) + "\n"
+        (evdir / harness.ANNEX).write_text(text, encoding="utf-8", newline="\n")
+    assert "renders ABSENT there" in reason([rows[9]], evdir)
+    # an annex that cannot be found is a diagnostic, not a bare KeyError: the row
+    # no longer names one, so the lookup that raised KeyError cannot be reached
+    assert "is absent from" in reason([rows[9]], tmp_path / "nowhere")
+    # a row may not cite an ambiguous harness without naming a head
+    assert "must name one of" in reason(tampered(red_head=""))
+
+
 def test_the_canonical_rule_name_resolves_to_its_declared_definition_and_pinned_fingerprint(
         monkeypatch):
     """RED BEFORE REPAIR (ARCH-G, live: `resolvable definition=False`): the
@@ -1419,8 +1476,17 @@ def test_the_canonical_rule_name_resolves_to_its_declared_definition_and_pinned_
     """
     assert ARTIFACT_CANONICALIZATION_RULE in CANONICALIZATION_RULES
     definition = canonical_rule()
-    assert canonical_rule_fingerprint() == (
-        "eae28317d14ded9ab85e7f4684e3ec55cee2f363f05f2c1b623fc26bc1756687")
+    pinned = "0aa12afabf2ecfedbc401ff14de4eae6e551a7bc28c4cb997ee92edd3049f670"
+    assert canonical_rule_fingerprint() == pinned
+    # documentation is NOT part of the pin (STRESS-G8ARCH6): a prose-only edit
+    # must not move the fingerprint, because hashing prose would make a typo fix
+    # demand a new rule NAME -- inverting the point of pinning a name to a
+    # definition. The note is published beside the rule, not inside it.
+    assert ARTIFACT_CANONICALIZATION_RULE in CANONICALIZATION_RULE_NOTES
+    monkeypatch.setitem(CANONICALIZATION_RULE_NOTES,
+                        ARTIFACT_CANONICALIZATION_RULE,
+                        "reworded for clarity, behaviour unchanged")
+    assert canonical_rule_fingerprint() == pinned
     # the declaration is not decorative: the attributes it names are the ones the
     # implementation strips, and attribute ORDER cannot change the canonical bytes
     one = b'<testsuite name="tests" tests="0" time="0.1" hostname="h">' \
@@ -1444,8 +1510,7 @@ def test_the_canonical_rule_name_resolves_to_its_declared_definition_and_pinned_
     # edit, and the field really is what the digest applies
     monkeypatch.setitem(CANONICALIZATION_RULES, ARTIFACT_CANONICALIZATION_RULE,
                         {**definition, "strips_attributes": ("time",)})
-    assert canonical_rule_fingerprint() != (
-        "eae28317d14ded9ab85e7f4684e3ec55cee2f363f05f2c1b623fc26bc1756687")
+    assert canonical_rule_fingerprint() != pinned
     assert b"hostname" in canonical_junit_bytes(one)
     # an unpublished name refuses rather than defaulting to the declared rule
     with pytest.raises(UnverifiableTestEvidence):

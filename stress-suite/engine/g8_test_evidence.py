@@ -106,14 +106,23 @@ CANONICALIZATION_RULES: Dict[str, Mapping[str, Any]] = {
     "JUNIT_XML_MINUS_VOLATILE_ATTRS_V1": {
         "strips_attributes": ("time", "timestamp", "hostname"),
         "sorts_attributes": True,
-        "note": ("strips the attributes JUnit stamps per RUN and orders "
-                 "attributes deterministically. Newline identity is STRUCTURAL "
-                 "rather than configured -- the serializer normalises character "
-                 "data and escapes CR/LF inside attribute values, so the "
-                 "canonical bytes cannot contain a raw CR -- which is why there "
-                 "is no newline-normalisation step to declare here: an "
-                 "unimplemented declaration would be a description, not a rule"),
     },
+}
+
+#: Prose about each rule, kept OUT of the definition ON PURPOSE (STRESS-G8ARCH6).
+#: A note is documentation, not semantics: hashing it would make a typo fix move
+#: the pinned fingerprint and therefore demand a new rule NAME, which inverts the
+#: point of pinning a name to its definition. The definition holds behaviour only,
+#: so the fingerprint answers exactly one question -- has the meaning changed?
+CANONICALIZATION_RULE_NOTES: Dict[str, str] = {
+    "JUNIT_XML_MINUS_VOLATILE_ATTRS_V1":
+        ("strips the attributes JUnit stamps per RUN and orders attributes "
+         "deterministically. Newline identity is STRUCTURAL rather than "
+         "configured -- the serializer normalises character data and escapes "
+         "CR/LF inside attribute values, so the canonical bytes cannot contain a "
+         "raw CR -- which is why there is no newline-normalisation step to "
+         "declare here: an unimplemented declaration would be a description, not "
+         "a rule"),
 }
 
 #: the versioned name this package publishes; the name IS the version

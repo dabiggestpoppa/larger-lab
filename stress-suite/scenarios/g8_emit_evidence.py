@@ -50,9 +50,15 @@ from scenarios.g8_run_audit import EVIDENCE, ROOT, build_package  # noqa: E402
 #: list (it is the thing that extracts and runs against them); this module cites
 #: what that owner declares instead of keeping a second copy of the SHAs.
 from scenarios.g8_arch_red_transcript import PRE_PASS_HEADS as _ARCH_HEADS  # noqa: E402
+#: the row-evidence rule has ONE owner (STRESS-G8ARCH6): this module asks it
+#: whether a row's RED evidence resolves, instead of scanning the annex text
+from scenarios.g8_closure_evidence import require as resolve_closure_rows  # noqa: E402
+from scenarios.g8_pre_repair_red_transcript import PRE_REPAIR_HEAD as _FIRST_REVIEW  # noqa: E402
 
 START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
-PRE_REPAIR_SHA = "6c015f86408a56721f8999e4aa39b218fab0fd4d"
+#: the first-review head is owned by the harness that extracts and runs against
+#: it; this module publishes what that owner declares rather than a second copy
+PRE_REPAIR_SHA = _FIRST_REVIEW
 _ARCH3_HEAD = _ARCH_HEADS[0][1]
 _ARCH4_HEAD = _ARCH_HEADS[1][1]
 CONTRACT_REL = "stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json"
@@ -831,49 +837,45 @@ _AUDIT_CLOSURE: Sequence[Mapping[str, Any]] = (
     # -- the passes AFTER the first closure matrix (STRESS-G8ARCH..ARCH5) ------ #
     # These rows exist because their red evidence used to live only in prose: the
     # two-tree probes that reproduced them were run in a scratch directory and
-    # deleted. Each now cites a rerunnable probe in the ARCH annex.
+    # deleted. Each now cites a rerunnable probe, and the ANNEX it lives in is
+    # derived from which harness declares the probe id (STRESS-G8ARCH6) -- so a
+    # row cannot name an annex, and `red_head` is required only where the harness
+    # renders the probe against more than one head.
     {"finding": "ARCH-A",
      "defect": "an UNDECLARED tree silently skipped the baseline's tree comparison",
      "red_probe": "ARCH-A", "red_head": _ARCH4_HEAD,
-     "red_annex": "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md",
      "green_tests": ("test_no_verification_input_can_be_omitted_or_left_empty",),
      "artifacts": ("G8_EVIDENCE_RECEIPT.json",)},
     {"finding": "ARCH-B",
      "defect": "a citation re-derived against its OWN recorded tree (the evidence's self-report)",
      "red_probe": "ARCH-B", "red_head": _ARCH3_HEAD,
-     "red_annex": "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md",
      "green_tests": ("test_no_verification_input_can_be_omitted_or_left_empty",
                      "test_a_citation_recorded_against_another_tree_blocks_the_gate"),
      "artifacts": ("G8_EVIDENCE_RECEIPT.json",)},
     {"finding": "ARCH-C",
      "defect": "an exit status nobody observed was published as a successful run",
      "red_probe": "ARCH-C", "red_head": _ARCH4_HEAD,
-     "red_annex": "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md",
      "green_tests": ("test_no_exit_status_is_published_because_none_can_be_observed",),
      "artifacts": ("G8_EVIDENCE_RECEIPT.json",)},
     {"finding": "ARCH-D",
      "defect": "the citation check was an input a caller could omit (the CLI omitted it)",
      "red_probe": "ARCH-D", "red_head": _ARCH4_HEAD,
-     "red_annex": "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md",
      "green_tests": ("test_no_verification_input_can_be_omitted_or_left_empty",),
      "artifacts": ("G8_EVIDENCE_RECEIPT.json",)},
     {"finding": "ARCH-E",
      "defect": "a lagging tested tree was invisible: no tree rule existed for the suite to apply",
      "red_probe": "ARCH-E", "red_head": _ARCH3_HEAD,
-     "red_annex": "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md",
      "green_tests": ("test_the_lag_rule_detects_a_lagging_tree_and_accepts_a_current_one",
                      "test_the_committed_package_names_the_derived_code_tree"),
      "artifacts": ("G8_EVIDENCE_RECEIPT.json",)},
     {"finding": "ARCH-F",
      "defect": "an underivable tree was reported as 'no lag' instead of refusing",
      "red_probe": "ARCH-F", "red_head": _ARCH4_HEAD,
-     "red_annex": "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md",
      "green_tests": ("test_the_lag_rule_detects_a_lagging_tree_and_accepts_a_current_one",),
      "artifacts": ("G8_EVIDENCE_RECEIPT.json",)},
     {"finding": "ARCH-G",
      "defect": "the published canonicalization rule was a LABEL with no resolvable definition",
      "red_probe": "ARCH-G", "red_head": _ARCH4_HEAD,
-     "red_annex": "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md",
      "green_tests": ("test_the_canonical_rule_name_resolves_to_its_declared_definition_and_pinned_fingerprint",),
      "artifacts": ("G8_SOURCE_BINDING_PORTABILITY.md", "G8_EVIDENCE_RECEIPT.json")},
 )
@@ -887,12 +889,6 @@ _RED_SURVIVAL_TESTS = ("test_the_pre_repair_red_transcript_still_reproduces_ever
                        "test_the_arch_red_transcript_still_reproduces_every_finding",
                        "test_the_arch_red_transcript_artifact_on_disk_matches_the_harness")
 
-#: the archived red-evidence annexes, and the harness that renders each one. A
-#: closure row cites its probe from exactly one of these.
-_RED_ANNEXES = ("G8_PRE_REPAIR_RED_TRANSCRIPT.md",
-                "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md")
-
-
 def _write_closure_matrix() -> None:
     """STRESS-G8RX — the per-finding closure matrix.
 
@@ -904,25 +900,17 @@ def _write_closure_matrix() -> None:
     """
     tests_src = (ROOT / "tests" / "test_g8_contradiction.py").read_text(
         encoding="utf-8")
-    # the annexes are produced by the red-transcript harnesses, not by this
-    # emitter, so they are read from the repository rather than from the emission
-    # target (a test may redirect EVIDENCE at a temporary directory).
-    annexes = {name: (ROOT / "evidence" / name).read_text(encoding="utf-8")
-               for name in _RED_ANNEXES}
+    # The row-evidence rule has ONE owner and this module does not restate it.
+    # `resolve_closure_rows` re-derives each row's RED evidence from the harnesses'
+    # DECLARED heads and their PARSED verdicts -- the probe must be declared, the
+    # head must be one the harness ran against, and the verdict at that head must
+    # be RED -- so it refuses a row claiming RED where an annex renders GREEN, and
+    # a head string that merely occurs in a transcript. The annexes are read from
+    # the repository (a test may redirect EVIDENCE at a temporary directory).
+    resolved = resolve_closure_rows(_AUDIT_CLOSURE, ROOT / "evidence")
     missing: List[str] = []
     rows: List[List[str]] = []
-    for entry in _AUDIT_CLOSURE:
-        annex_name = entry.get("red_annex", _RED_ANNEXES[0])
-        head = entry.get("red_head", PRE_REPAIR_SHA)
-        annex = annexes[annex_name]
-        if f"{entry['red_probe']}:" not in annex:
-            missing.append(f"RED probe {entry['red_probe']} absent from {annex_name}")
-        # the head a row rests on must itself be cited by that annex: a row may
-        # not claim to reproduce a finding against a commit the transcript never
-        # ran (the same resolvability rule applied to tests and artifacts below)
-        if head[:12] not in annex:
-            missing.append(f"RED head {head[:12]} cited by {entry['finding']} "
-                           f"is absent from {annex_name}")
+    for entry, evidence in zip(_AUDIT_CLOSURE, resolved):
         for name in entry["green_tests"]:
             if f"def {name}(" not in tests_src:
                 missing.append(f"green regression {name} is not in the test module")
@@ -933,7 +921,8 @@ def _write_closure_matrix() -> None:
                     (ROOT / "evidence" / art).exists()):
                 missing.append(f"artifact {art} does not exist")
         rows.append([entry["finding"], entry["defect"],
-                     f"`{entry['red_probe']}` @ `{head[:8]}` ({annex_name})",
+                     f"`{evidence['red_probe']}` @ `{evidence['red_head'][:8]}` "
+                     f"({evidence['red_annex']})",
                      " + ".join(entry["green_tests"]),
                      ", ".join(entry["artifacts"])])
     for name in _RED_SURVIVAL_TESTS:

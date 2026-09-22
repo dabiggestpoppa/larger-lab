@@ -23,7 +23,7 @@ import sys
 import tarfile
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Sequence, Tuple
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -31,6 +31,71 @@ REPO_ROOT = ROOT.parent
 
 #: the head under review, i.e. the PROVISIONAL first G8 PASS this repair corrects
 PRE_REPAIR_HEAD = "6c015f86408a56721f8999e4aa39b218fab0fd4d"
+
+# --------------------------------------------------------------------------- #
+# The declared interface (STRESS-G8ARCH6). Both red-evidence harnesses expose
+# these four names so that the rule deciding whether a closure row's evidence
+# resolves has ONE owner (scenarios/g8_closure_evidence.py) instead of a substring
+# scan per row. That scan accepted a row claiming RED where an annex said GREEN.
+# --------------------------------------------------------------------------- #
+ANNEX = "G8_PRE_REPAIR_RED_TRANSCRIPT.md"
+PRE_PASS_HEADS: Tuple[Tuple[str, str], ...] = (("STRESS-G8R0", PRE_REPAIR_HEAD),)
+PROBE_IDS: Tuple[str, ...] = ("R-G8-01", "R-G8-02", "R-G8-03", "R-G8-04",
+                              "R-G8-05", "R-G8-06", "R-G8-07", "R-G8-08",
+                              "R-G8-09")
+
+#: What it MEANS for each probe to be RED: the observations that demonstrate the
+#: defect in the pre-repair output. These criteria are the red evidence itself, so
+#: they live with the harness that produces the observations, and both the
+#: resolver and the survival control read this one map rather than keeping a
+#: private second opinion about what "RED" means.
+RED_CRITERIA: Dict[str, Tuple[str, ...]] = {
+    "R-G8-01": ("mandated_observed=20/20", "NOT_COMPARABLE(mandated)=2",
+                "gate=PASS_G8_CROSS_SCENARIO_COHERENCE"),
+    "R-G8-02": ("'VALIDATED'", "or True"),
+    "R-G8-03": ("'evidence_provenance': 'UNKNOWN'",),
+    "R-G8-04": ("_g4_runtime_neutral('S99_NO_SUCH_SCENARIO') -> True",),
+    "R-G8-05": ("single refusal phase, nothing else) -> True",
+                "refusal AFTER an escalation phase) -> True",
+                'P8 declared in the G6 observation as: ["True"]',
+                "'UNAVAILABLE'}) -> True"),
+    "R-G8-06": ("p6 = (True if (raw_reviewers > 1 and sources == 1) else None)",),
+    "R-G8-07": ("(measured_full: 'int')", "collected=9999 passed=9999 failed=0",
+                "receipt records a test-results artifact -> False"),
+    "R-G8-08": ("fixture digest == LF digest -> False ; == CRLF digest -> True",),
+    # R-G8-09's red evidence is what the PROBE prints about the contract. The
+    # Git log that follows is a different section of the annex (a snapshot of
+    # history, not probe output) and is asserted as annex-level evidence by the
+    # survival control -- counting it here made the probe read GREEN, which the
+    # row-evidence resolver caught the moment it was asked to re-derive it.
+    "R-G8-09": ("FROZEN_AT_STRESS-G8P0",
+                "authored BEFORE any cross-scenario comparison runs",
+                "contract declares contract_chronology -> False"),
+}
+
+#: the section of the annex the probes are rendered into
+PROBE_SECTION = "## Probes against the pre-repair code"
+
+
+def verdicts(text: str, head: str | None = None) -> Dict[str, str]:
+    """RED / GREEN / ABSENT per probe id, re-derived from the transcript.
+
+    A probe is RED only when EVERY criterion its entry declares is present in its
+    OWN lines: the defect must be demonstrated, not merely referred to, and this
+    harness renders exactly one section (the pre-repair head), so `head` is
+    accepted for interface symmetry and the caller checks its identity.
+    """
+    section = text[text.index(PROBE_SECTION):]
+    found: Dict[str, str] = {}
+    for probe in PROBE_IDS:
+        own = [ln for ln in section.splitlines() if ln.startswith(probe + ":")]
+        if not own:
+            found[probe] = "ABSENT"
+        elif all(c in "\n".join(own) for c in RED_CRITERIA[probe]):
+            found[probe] = "RED"
+        else:
+            found[probe] = "GREEN"
+    return found
 
 #: the paths the probes need. `quant-lab/.../CEREBUS_v4_Manual_EXTRACTED.txt`
 #: is included because R-G8-08 is a statement about that source binding.

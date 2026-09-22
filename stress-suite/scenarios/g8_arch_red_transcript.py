@@ -48,6 +48,11 @@ PRE_PASS_HEADS: Tuple[Tuple[str, str], ...] = (
     ("STRESS-G8ARCH4", "36a84563ccaa0d132c56cda2802ed7996098ae05"),
 )
 
+#: the declared interface both red-evidence harnesses expose (STRESS-G8ARCH6),
+#: consumed by the single owner of 'does a closure row's evidence resolve?' --
+#: scenarios/g8_closure_evidence.py -- so no consumer scans text for substrings
+ANNEX = "G8_ARCH_PRE_REPAIR_RED_TRANSCRIPT.md"
+
 #: every probe id this harness can render, in report order
 PROBE_IDS: Tuple[str, ...] = ("ARCH-A", "ARCH-B", "ARCH-C", "ARCH-D",
                               "ARCH-E", "ARCH-F", "ARCH-G")
@@ -312,6 +317,10 @@ def verdicts(text: str, head: str | None = None) -> Dict[str, str]:
         for probe in PROBE_IDS:
             if line.startswith(probe + ":") and "verdict=" in line:
                 found[probe] = line.rsplit("verdict=", 1)[1].strip()
+    # a probe with no line is ABSENT, never GREEN: 'not rendered' and 'not red'
+    # are different facts and a row may cite neither
+    for probe in PROBE_IDS:
+        found.setdefault(probe, "ABSENT")
     return found
 
 

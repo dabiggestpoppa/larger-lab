@@ -59,7 +59,7 @@ ARCH-C: the citation publishes exit_status='<absent>' | verdict=GREEN
 ARCH-D: decide_gate declares citation_check=False | verdict=GREEN
 ARCH-E: rule(package=aaaaaaaa.., code=bbbbbbbb..) -> 'lagging tested tree: the committed package names aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa but the code/test tree is now bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb. Re-produce the artifact at the new tree and re-emit.' | verdict=GREEN
 ARCH-F: rule(package=aaaaaaaa.., code='') -> 'unverifiable tested tree: the code/test tree could not be derived, so the committed package cannot be shown to describe this checkout. A tree that cannot be derived is not a tree that matches.' | verdict=GREEN
-ARCH-G: published rule 'JUNIT_XML_MINUS_VOLATILE_ATTRS_V1' : resolvable definition=True fingerprint='eae28317d14ded9a' | verdict=GREEN
+ARCH-G: published rule 'JUNIT_XML_MINUS_VOLATILE_ATTRS_V1' : resolvable definition=True fingerprint='0aa12afabf2ecfed' | verdict=GREEN
 CONTROL: derived tested tree: ''
 reviewer command exit=1 accepted=False
 engine.g8_test_evidence.UnverifiableTestEvidence: baseline/tree mismatch: artifact was produced against aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, this evidence is being archived for
