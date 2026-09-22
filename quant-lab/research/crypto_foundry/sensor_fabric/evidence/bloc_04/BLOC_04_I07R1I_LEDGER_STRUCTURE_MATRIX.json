@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "case": "current_state_table_two_columns",
+      "cell_counts": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "malformed_rows": 0,
+      "result": "PASS",
+      "row_count": 16
+    },
+    {
+      "case": "current_checkpoint_exactly_one_row",
+      "checkpoint_row_count": 1,
+      "result": "PASS"
+    },
+    {
+      "case": "no_duplicate_trailing_current_checkpoint_cell",
+      "checkpoint_cell_count": 2,
+      "result": "PASS"
+    },
+    {
+      "case": "i07_hold_chain_truthful",
+      "hold_keys": [
+        "PASS_SENSOR_B4_I07R1H_REFRESHED_CHAIN_VALIDATION_PARITY_SEALED",
+        "PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED",
+        "PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED",
+        "PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED",
+        "PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED"
+      ],
+      "proposal_pending": true,
+      "result": "PASS"
+    },
+    {
+      "case": "durable_resume_pending_acceptance",
+      "durable_resume_implemented": "PENDING_OPERATOR_ACCEPTANCE",
+      "recovery_scanner_implemented": false,
+      "result": "PASS"
+    },
+    {
+      "case": "next_checkpoint_not_authorized",
+      "next_checkpoint_authorized": false,
+      "recommended_next": "SENSOR-B4-I08 (operator acceptance first)",
+      "result": "PASS"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1I",
+  "doctrine": "I07R1I \u00a722-\u00a724 \u2014 the top-level Current state table is a two-column Field|Value schema; the Current checkpoint row carries exactly one cell of operator truth",
+  "matrix": "BLOC_04_I07R1I_LEDGER_STRUCTURE_MATRIX"
+}

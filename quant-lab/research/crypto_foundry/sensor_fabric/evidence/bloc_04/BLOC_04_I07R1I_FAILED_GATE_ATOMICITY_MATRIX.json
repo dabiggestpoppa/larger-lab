@@ -1,0 +1,128 @@
+{
+  "cases": [
+    {
+      "case": "first_corrupt_attempt",
+      "error": "JobCatalogCorrupt",
+      "result": "PASS",
+      "typed": true
+    },
+    {
+      "case": "same_thread_second_attempt",
+      "error": "JobCatalogCorrupt",
+      "forged_head_not_adopted": true,
+      "result": "PASS",
+      "typed": true
+    },
+    {
+      "case": "second_attempt_revalidated",
+      "nested_shortcut_taken": false,
+      "refreshes_after_second": 2,
+      "result": "PASS",
+      "validations_after_first": 1,
+      "validations_after_second": 2
+    },
+    {
+      "case": "owner_state_rolled_back",
+      "owner_present": false,
+      "result": "PASS"
+    },
+    {
+      "case": "owned_physical_lock_rolled_back",
+      "lock_file_present": false,
+      "result": "PASS"
+    },
+    {
+      "case": "other_thread_no_leaked_lock",
+      "error": "JobCatalogCorrupt",
+      "locked_out": false,
+      "result": "PASS"
+    },
+    {
+      "case": "birth_catalog_refresh_failure_rollback",
+      "error": "JsonCatalogCorrupt",
+      "fresh_outer_entry_after": true,
+      "owned_lock_rolled_back": true,
+      "owner_rolled_back": true,
+      "refreshes": 2,
+      "result": "PASS",
+      "typed": true,
+      "validations": 1
+    },
+    {
+      "case": "event_catalog_refresh_failure_rollback",
+      "error": "JsonCatalogCorrupt",
+      "fresh_outer_entry_after": true,
+      "owned_lock_rolled_back": true,
+      "owner_rolled_back": true,
+      "refreshes": 2,
+      "result": "PASS",
+      "typed": true,
+      "validations": 1
+    },
+    {
+      "case": "direct_get_job_corruption_rejected",
+      "error": "JobCatalogCorrupt",
+      "result": "PASS",
+      "typed": true,
+      "validation_required_by_read": true
+    },
+    {
+      "case": "direct_list_transitions_corruption_rejected",
+      "error": "JobCatalogCorrupt",
+      "invalid_transition_exposed": false,
+      "result": "PASS",
+      "typed": true
+    },
+    {
+      "case": "valid_get_job",
+      "result": "PASS",
+      "status": "ACQUIRING"
+    },
+    {
+      "case": "valid_list_transitions",
+      "result": "PASS",
+      "transition_count": 8
+    },
+    {
+      "case": "cross_repo_valid_get_job",
+      "error": "NO_ERROR",
+      "refreshed_head_visible": true,
+      "result": "PASS"
+    },
+    {
+      "case": "cross_repo_valid_list_transitions",
+      "result": "PASS",
+      "transitions_after": 9,
+      "transitions_before": 8
+    },
+    {
+      "case": "create_job_empty_path",
+      "create_error": "NO_ERROR",
+      "gated_read_error": "NO_ERROR",
+      "no_lock_left": true,
+      "result": "PASS"
+    },
+    {
+      "case": "counterfactual_rollback_disabled",
+      "first_error": "JobCatalogCorrupt",
+      "owned_lock_file_leaked": true,
+      "owner_leaked": true,
+      "result": "PASS",
+      "second_attempt_adopted_forged_head": true,
+      "second_attempt_skipped_validation": true,
+      "second_error": "NO_ERROR",
+      "validations_after_first": 1,
+      "validations_after_second": 1
+    },
+    {
+      "adoption_proven": true,
+      "case": "i07r1h_intact_refreshed_control",
+      "restart_error": "NO_ERROR",
+      "result": "PASS",
+      "runtime_error": "NO_ERROR"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I07R1I",
+  "doctrine": "I07R1I \u00a74-\u00a721 \u2014 a failed gate entry is not a live reentrant context: validation failure must never weaken the next validation attempt, and public reads must cross the same per-job gate as writes",
+  "matrix": "BLOC_04_I07R1I_FAILED_GATE_ATOMICITY_MATRIX"
+}
