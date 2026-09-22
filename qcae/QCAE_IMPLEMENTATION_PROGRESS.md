@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P3 — IN PROGRESS (opened at P2-R4-FREEZE head `65ca004b`)** — Discovery Vertical Slice; tranche 1 = I0 plan lock → C01 DiscoveryPlan domain → C02 discovery adapter contract + candidate leads → C03 internal-first baseline → C04 dedup/family/ranking → T01 adversarial qualification. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
+**P3 — IN PROGRESS at `c2174553` (I0 + C01–C04 landed; 1247/1247 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, report assembler, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
 
 ### P3-I0 — Phase Start / Plan Lock (this commit)
 
@@ -35,7 +35,14 @@
 - `qcae/discovery/planning/ranking.py` — canonical-candidate merge/dedup (2.1.12), family clustering (2.7.6), hard prefilters with evidence-strength floors (2.7.3), versioned diversity-aware ranking policy with popularity cap (2.7.5/2.7.10/2.7.11), escalation queue + waves (2.7.9/2.7.14), saturation + stop recommendation (2.1.9/2.1.10).
 - tests: `qcae/tests/unit/test_p3_plan_domain.py`, `test_p3_adapter_contract.py`, `test_p3_internal_baseline.py`, `test_p3_ranking.py`, `test_p3_t01_adversarial.py`.
 
-**Planned modules (later tranches, recorded so nothing is hidden in prose):** `discovery/planning/planner.py` (contract → reproducible plan), `discovery/github/` adapter over an injectable transport (pagination, rate budget, partial labeling, immutable review anchor), `discovery/research/` Research Mesh delegation seam + bounded `LOCAL_FALLBACK_RESEARCH`, `discovery/planning/report.py` DiscoveryReport (2.7.15), `P3-IT01` integration, `P3-FREEZE` manifest + acceptance.
+**Landed in tranche 1 (LOCAL TEST EVIDENCE: 1247 passed / 0 failed / 0 skipped):**
+
+- **C01 `bfda42b7`** — `qcae/core/discovery/{plan,lead,report}.py`: DiscoveryPlan schema 2.1.15 with anti-capture laws (atom scope, internal-first queries, multi-route per atom, route→family→source coverage, diversity cap 2.1.7, no dead budget, stop-rule completeness incl. `BUDGET_CEILING_REACHED`, hard-prefilter evidence floor 2.7.3, Block 2 tier-3 ceiling 2.1.8) and proposal-only `CONTRACT_AMENDMENT_PROPOSAL` (2.1.14). Task `2.1.16` failure modes are unrepresentable rather than documented.
+- **C02 `937cec68`** — `qcae/core/ports/discovery.py`: `DiscoverySourceAdapter` port, `DiscoveryQuery`, `AdapterOutcome` with typed failure semantics (15.3) and `DiscoveryAdapterRegistry.missing_source_classes` so an unconfigured surface is reported `NOT_CONFIGURED`, never imitated. Leads carry no verification field at all (2.1.11/2.3.12); failure statuses cannot carry leads (2.1.13); `PARTIAL_RESULTS` requires its completeness note (2.2.13).
+- **C03 `810d4ddc`** — `qcae/discovery/internal/baseline.py`: internal-first baseline over the P1 `RegistryQuery` with canon 2.6.1 classifications, exact partial-reuse narrowing (2.6.8), prior-decision lookup (2.6.5), internal trust firewall (2.6.3/2.6.10), fail-closed unknown-state handling (2.6.11), and comparative/abandoned classifications that retrieval state may not invent.
+- **C04 `c2174553`** — `qcae/core/discovery/candidate.py` + `qcae/discovery/planning/ranking.py`: canonical merge/dedup preserving every path (2.1.12), family clustering with representative-first deferral (2.7.6), versioned ranking policy with capped popularity (2.7.10/2.7.11), auditable per-dimension queue rows (2.7.16 invariant 7), wave assignment bounded per family/source class (2.7.14), saturation accounting that only advances on searches that ran (2.1.10), and STOP only from declared stop rules (2.1.9).
+
+**Remaining P3 work (recorded, not hidden):** `discovery/planning/planner.py` (contract → reproducible plan), `discovery/github/` adapter over an injectable transport with pagination/rate budget/partial labeling/immutable anchor, egress authority + policy gate (MAJOR risk above), `discovery/research/` Research Mesh delegation seam + bounded `LOCAL_FALLBACK_RESEARCH` (A-001 §5/§13), report assembly (`DiscoveryReport` is built in core; the assembler that turns plan + baseline + outcomes + ranking into it is still open), `P3-IT01` integration, `P3-T01` adversarial qualification, `P3-FREEZE` manifest + acceptance.
 
 **Risks / blockers (canon 18.2 severity):**
 
