@@ -28,7 +28,8 @@ external provider wired, and must say so rather than return a silent empty plan.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from enum import StrEnum
 from typing import Optional, Tuple
 
 from qcae.core.discovery.lead import (
@@ -47,6 +48,7 @@ from qcae.core.serialization import (
 )
 from qcae.core.validation import (
     require_enum,
+    require_hex_hash,
     require_identifier,
     require_non_empty_str,
     require_str_list,
@@ -56,7 +58,11 @@ __all__ = [
     "AdapterOutcome",
     "DiscoveryQuery",
     "DiscoverySourceAdapter",
+    "ExecutionStatus",
+    "ExecutedDiscoveryQuery",
+    "execution_record_for",
     "make_discovery_query",
+    "make_executed_query",
 ]
 
 
@@ -145,6 +151,12 @@ class AdapterOutcome(SerializableRecord):
 
     _NESTED_RECORDS = {"leads": CandidateLead}
 
+    #: The one execution record this outcome belongs to. A typed immutable
+    #: ``ExecutedDiscoveryQuery`` set at assembly time; ``None`` until a caller
+    #: binds it. Reporting refuses an outcome without one — an unattributed
+    #: outcome is not this plan's evidence, whatever it claims to have found.
+    execution_record: Optional["ExecutedDiscoveryQuery"] = None
+
     def validate(self) -> None:
         require_non_empty_str(self.adapter_id, "adapter_id")
         require_enum(self.source_class, SourceClass, "source_class")
@@ -231,10 +243,233 @@ class AdapterOutcome(SerializableRecord):
         """True when no search conclusion may be drawn from this outcome."""
         return self.status in FAILURE_STATUSES
 
+    def bind_execution_record(
+        self, record: "ExecutedDiscoveryQuery"
+    ) -> "AdapterOutcome":
+        """Return this outcome bound to exactly one execution record.
+
+        Dataclasses are frozen, so binding is a validated replacement: the
+        record must be an ``ExecutedDiscoveryQuery`` whose query identity and
+        envelope match the outcome's own claims, otherwise the binding itself
+        is refused instead of legitimizing a forged pairing.
+        """
+        if not isinstance(record, ExecutedDiscoveryQuery):
+            raise QcaeValidationError(
+                f"an outcome binds to an ExecutedDiscoveryQuery, got {type(record).__name__}"
+            )
+        if record.source_class != self.source_class:
+            raise QcaeValidationError(
+                f"execution record for query {record.query_id!r} declares source class "
+                f"{record.source_class.value}, the outcome claims {self.source_class.value}"
+            )
+        if record.adapter_id != self.adapter_id:
+            raise QcaeValidationError(
+                f"execution record for query {record.query_id!r} names adapter "
+                f"{record.adapter_id!r}, the outcome came from {self.adapter_id!r}"
+            )
+        bound = replace(self, execution_record=record)
+        return bound
+
     @property
     def counts_toward_saturation(self) -> bool:
         """Saturation counters only advance on searches that actually ran."""
         return self.status in PAYLOAD_STATUSES or self.status == AdapterStatus.NO_RESULTS
+
+
+class ExecutionStatus(StrEnum):
+    """Typed execution states for one planned query (canon 2.1.4/2.1.17)."""
+
+    EXECUTED = "EXECUTED"
+    FAILED = "FAILED"
+
+
+def _require_rfc3339_utc(value: str, what: str) -> None:
+    """Authoritative timestamps are validated UTC RFC3339 (canon 0.4.6 class)."""
+    import re
+
+    pattern = r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$"
+    if not isinstance(value, str) or not re.fullmatch(pattern, value):
+        raise QcaeValidationError(
+            f"{what} must be an RFC3339 UTC timestamp (YYYY-MM-DDTHH:MM:SSZ), got {value!r}"
+        )
+
+
+@dataclass(frozen=True)
+class ExecutedDiscoveryQuery(SerializableRecord):
+    """The immutable record of one planned query that was actually run.
+
+    Every ``AdapterOutcome`` must bind to exactly one of these (canon 2.1.4/2.1.17
+    invariant 4: search provenance is retained end to end). The record binds the
+    plan's authorization to the adapter's execution so a caller can never smuggle
+    an outcome in without the query that produced it:
+
+    - identity: which plan/contract authorized the query, which family and atom
+      it served, its semantic concept and its concrete query (or a safe
+      deterministic digest when the raw query is not carried);
+    - envelope: which source class, adapter, result limit and cost tier the plan
+      authorized;
+    - execution: what happened, when, against which provider revision, with which
+      evidence artifacts, and which outcome identity it produced.
+
+    The query digest is ``sha256`` over the canonical encoding of the query that
+    ran (``sha256_of``), so the same query always carries the same digest and a
+    different query can never inherit one's lineage.
+    """
+
+    SCHEMA_VERSION = 1
+
+    discovery_plan_id: str
+    contract_id: str
+    contract_version: int
+    query_id: str
+    family_id: str
+    atom_id: str
+    semantic_concept: str
+    concrete_query: str
+    source_class: SourceClass
+    adapter_id: str
+    result_limit: int
+    max_tier: CostTier
+    status: ExecutionStatus
+    executed_at: str
+    query_digest: str = ""
+    completed_at: str = ""
+    provider_revision: str = ""
+    evidence_refs: Tuple[str, ...] = ()
+    outcome_id: str = ""
+
+    _COERCIONS = {
+        "source_class": lambda v: coerce_enum(v, SourceClass),
+        "max_tier": lambda v: coerce_int_enum(v, CostTier),
+        "status": lambda v: coerce_enum(v, ExecutionStatus),
+        "evidence_refs": tuple,
+    }
+
+    def validate(self) -> None:
+        require_identifier(self.discovery_plan_id, "discovery_plan_id")
+        require_identifier(self.contract_id, "contract_id")
+        if not isinstance(self.contract_version, int) or isinstance(
+            self.contract_version, bool
+        ) or self.contract_version < 1:
+            raise QcaeValidationError("contract_version must be an integer >= 1")
+        # One planned query, one execution: a repeated execution of the same
+        # planned query carries an ordinal suffix (#2, #3, ...) so two outcomes
+        # can never bind one record. The base stays a stable identifier.
+        base_query_id, _, ordinal = self.query_id.partition("#")
+        require_identifier(base_query_id, "query_id")
+        if ordinal and not (
+            ordinal.isdigit() and len(ordinal) <= 4 and int(ordinal) >= 2
+        ):
+            raise QcaeValidationError(
+                f"query_id {self.query_id!r} carries an invalid execution ordinal; "
+                "repeated executions of one planned query are numbered from #2"
+            )
+        require_identifier(self.family_id, "family_id")
+        require_identifier(self.atom_id, "atom_id")
+        require_non_empty_str(self.semantic_concept, "semantic_concept")
+        # The query is carried either verbatim or as a deterministic digest;
+        # an execution record with neither has no lineage to check leads against.
+        if not self.concrete_query.strip() and not self.query_digest.strip():
+            raise QcaeValidationError(
+                "an execution record must carry its concrete query or a deterministic "
+                "query digest; lineage without a query is not verifiable (canon 2.1.4)"
+            )
+        if self.query_digest.strip():
+            require_hex_hash(self.query_digest, "query_digest", min_length=16)
+        require_enum(self.source_class, SourceClass, "source_class")
+        require_non_empty_str(self.adapter_id, "adapter_id")
+        if not isinstance(self.result_limit, int) or isinstance(
+            self.result_limit, bool
+        ) or self.result_limit < 1:
+            raise QcaeValidationError(f"result_limit must be an integer >= 1, got {self.result_limit!r}")
+        require_enum(self.max_tier, CostTier, "max_tier")
+        if not isinstance(self.status, ExecutionStatus):
+            raise QcaeValidationError(f"status must be an ExecutionStatus member, got {self.status!r}")
+        _require_rfc3339_utc(self.executed_at, "executed_at")
+        if self.completed_at:
+            _require_rfc3339_utc(self.completed_at, "completed_at")
+            if self.completed_at < self.executed_at:
+                raise QcaeValidationError(
+                    "completed_at cannot precede executed_at: the record would claim "
+                    "the search finished before it started"
+                )
+        require_str_list(self.evidence_refs, "evidence_refs")
+        if self.outcome_id:
+            require_identifier(self.outcome_id, "outcome_id")
+
+    @property
+    def lineage(self) -> QueryLineage:
+        """The canon 2.1.4 lineage step this execution stamps on its leads."""
+        return QueryLineage(
+            atom_id=self.atom_id,
+            semantic_concept=self.semantic_concept,
+            family_id=self.family_id,
+            concrete_query=self.concrete_query,
+            source_class=self.source_class,
+            adapter_id=self.adapter_id,
+        )
+
+
+def make_executed_query(**kwargs) -> ExecutedDiscoveryQuery:
+    """Build and validate an execution record in one call."""
+    record = ExecutedDiscoveryQuery(**kwargs)
+    record.validate()
+    return record
+
+
+def execution_record_for(
+    query: DiscoveryQuery,
+    plan,
+    *,
+    adapter_id: str,
+    status: ExecutionStatus,
+    executed_at: str,
+    result_limit: Optional[int] = None,
+    provider_revision: str = "",
+    evidence_refs: Tuple[str, ...] = (),
+    outcome_id: str = "",
+    completed_at: str = "",
+    query_digest: str = "",
+) -> ExecutedDiscoveryQuery:
+    """Bind one planned query to its plan's authorization and execution truth.
+
+    The plan supplies the authorization (plan id, contract identity, tier
+    ceiling); the query supplies the semantics (family, atom, concept, query,
+    source class); the caller supplies what only it knows — the adapter that
+    ran, when, with which status, provider revision and evidence references.
+    The result limit is the query's own unless the adapter narrowed it, and it
+    can never exceed what the plan authorized.
+    """
+    limit = query.max_results if result_limit is None else result_limit
+    if limit > query.max_results:
+        raise QcaeValidationError(
+            f"execution result_limit {limit} exceeds the planned query's "
+            f"max_results {query.max_results}; an adapter may narrow but never widen "
+            "the plan's envelope"
+        )
+    record = ExecutedDiscoveryQuery(
+        discovery_plan_id=plan.discovery_plan_id,
+        contract_id=plan.contract_id,
+        contract_version=plan.contract_version,
+        query_id=query.query_id,
+        family_id=query.family_id,
+        atom_id=query.atom_id,
+        semantic_concept=query.semantic_concept,
+        concrete_query=query.concrete_query,
+        source_class=query.source_class,
+        adapter_id=adapter_id,
+        result_limit=limit,
+        max_tier=min(query.max_tier, plan.cost_tier_ceiling),
+        status=ExecutionStatus(status),
+        executed_at=executed_at,
+        query_digest=query_digest,
+        completed_at=completed_at,
+        provider_revision=provider_revision,
+        evidence_refs=tuple(evidence_refs),
+        outcome_id=outcome_id,
+    )
+    record.validate()
+    return record
 
 
 class DiscoverySourceAdapter(ABC):

@@ -769,7 +769,6 @@ class DiscoveryPlan(SerializableRecord):
             seen.add(prefilter.prefilter_id)
 
     def _validate_proposals(self) -> None:
-        seen: set = set()
         for proposal in self.amendment_proposals:
             proposal.validate()
             if proposal.plan_id != self.discovery_plan_id:
@@ -784,6 +783,22 @@ class DiscoveryPlan(SerializableRecord):
                 )
 
     # -- queries ------------------------------------------------------------
+
+    @property
+    def query_ids(self) -> Tuple[str, ...]:
+        """The query identities this plan authorized, derived from its families.
+
+        Canon 2.1.3/2.1.4: the planner owns query identity, so an execution
+        record can only claim a query the plan actually declared. A planned
+        identity is ``<family_id>:<term>`` (terms slugified, since identifiers
+        exclude whitespace); derived, not stored — the plan stays the single
+        source of authorization.
+        """
+        return tuple(
+            f"{family.family_id}:{term.strip().replace(' ', '-')}"
+            for family in self.query_families
+            for term in family.terms
+        )
 
     def hypotheses_for_atom(self, atom_id: str) -> Tuple[SearchHypothesis, ...]:
         """Search routes covering one atom (canon 2.1.2)."""

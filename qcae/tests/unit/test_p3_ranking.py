@@ -88,6 +88,7 @@ def lead(
     license_claim: str = "MIT",
     novelty_family: str = "",
     conflicts=(),
+    query_lineage: QueryLineage | None = None,
 ) -> CandidateLead:
     # ``claims`` become ``claimed_capabilities`` (canon 2.1.11) and ``atoms`` become
     # ``possible_atom_matches``. Most fixtures pass atom ids for both, which is why the
@@ -102,7 +103,10 @@ def lead(
         discovered_at="2026-09-21T12:00:00Z",
         # A lead may claim a capability without matching any atom yet (canon
         # 2.1.11), in which case its lineage still names the query's anchor.
-        query_lineage=lineage(source_class, adapter_id, atoms[0] if atoms else ATOM_A),
+        query_lineage=(query_lineage
+                       if query_lineage is not None
+                       else lineage(source_class, adapter_id,
+                                    atoms[0] if atoms else ATOM_A)),
         claimed_capabilities=tuple(claims),
         possible_atom_matches=tuple(atoms),
         retrieved_revision=revision,

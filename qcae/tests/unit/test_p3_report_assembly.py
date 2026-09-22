@@ -16,7 +16,11 @@ from pathlib import Path
 import pytest
 
 import qcae.discovery.reporting as reporting
-from qcae.core.discovery.lead import CandidateKind
+from qcae.core.discovery.lead import (
+    FAILURE_STATUSES,
+    CandidateKind,
+    QueryLineage,
+)
 from qcae.core.discovery.plan import (
     ContractAmendmentProposal,
     HardPrefilter,
@@ -24,7 +28,15 @@ from qcae.core.discovery.plan import (
 from qcae.core.discovery.report import PrefilterDecision
 from qcae.core.discovery.vocabulary import SourceClass
 from qcae.core.errors import QcaeValidationError
-from qcae.core.ports.discovery import AdapterOutcome, AdapterStatus
+from qcae.core.ports.discovery import (
+    AdapterOutcome,
+    AdapterStatus,
+    make_discovery_query,
+)
+from qcae.core.ports.discovery import (
+    ExecutionStatus,
+    execution_record_for,
+)
 from qcae.core.vocabulary import EvidenceClass
 from qcae.discovery.planning.canonical import merge_leads
 from qcae.discovery.planning.prefilter import apply_hard_prefilter
@@ -47,6 +59,18 @@ from qcae.tests.unit.test_p3_ranking import (
 
 CREATED_AT = "2026-09-21T13:00:00Z"
 CREATED_BY = "qcae-discovery-run"
+
+# Execution-ordinal ledger for the fixture runner: repeated executions of one
+# planned query bind as -exec2, -exec3, ... The autouse fixture gives every
+# test a fresh ledger so numbering stays deterministic per test.
+_EXECUTION_ORDINALS: dict = {}
+
+
+@pytest.fixture(autouse=True)
+def _fresh_execution_ordinals():
+    _EXECUTION_ORDINALS.clear()
+    yield
+    _EXECUTION_ORDINALS.clear()
 
 
 def _baseline(**overrides):
@@ -85,18 +109,95 @@ def _narrow_plan():
     )
 
 
+def _slug(term: str) -> str:
+    """Query ids are stable identifiers; terms slugify into them."""
+    return term.strip().replace(" ", "-")
+
+
+def _planned_query_id(source_class, term="causal ordering", plan=None):
+    """A real planned query identity: the plan derives them from its families."""
+    plan = plan or baseline_plan()
+    for family in plan.query_families:
+        if source_class in family.source_classes:
+            return f"{family.family_id}:{_slug(family.terms[0])}"
+    return f"{plan.query_families[0].family_id}:{_slug(term)}"
+
+
 def _outcome(query_id, *, source_class=SourceClass.GITHUB_REPOSITORY_CODE,
              adapter_id="adapter-github", results=1, leads=(),
-             status=AdapterStatus.OK, completeness_note="", message=""):
-    """An outcome as a caller would have it: the record an adapter returned."""
+             status=AdapterStatus.OK, completeness_note="", message="",
+             plan=None, ordinal=None):
+    """An outcome as a caller would have it: the record an adapter returned,
+    bound to the typed execution record of the planned query that produced it
+    (P3-R4: every outcome binds to exactly one executed query).
+
+    The execution record derives from the given plan the same way a real
+    runner derives it: query identity/family/atom/semantics/concrete query
+    from the plan's own hypothesis -> family -> query lineage. Repeated
+    executions of one planned query carry an ordinal suffix (``-exec2``,
+    ``-exec3``, ...); ``ordinal=False`` forces the bare base id (used by the
+    single-use refusal tests, which bind one record twice on purpose).
+    """
     if not message and status != AdapterStatus.OK:
         # The port requires a typed message whenever a search did not simply
         # succeed, so a caller's record always carries one.
         message = f"typed {status.value} from {adapter_id}"
-    return AdapterOutcome(
+
+    plan = plan or baseline_plan()
+    family = next(
+        (f for f in plan.query_families if source_class in f.source_classes), None)
+    if family is None:
+        # No planned family serves this source class: the record cannot be
+        # built (a plan never authorized it). Return the unbound outcome —
+        # the assembler's unallocated-source law is what refuses it.
+        return AdapterOutcome(
+            adapter_id=adapter_id,
+            source_class=source_class,
+            query_id=query_id,
+            status=status,
+            leads=tuple(leads),
+            pages_inspected=1,
+            results_inspected=results,
+            completeness_note=completeness_note,
+            message=message,
+        )
+    family_id = family.family_id
+    term = family.terms[0]
+    base_query_id = f"{family_id}:{_slug(term)}"
+    if ordinal is None:
+        key = (plan.discovery_plan_id, base_query_id)
+        ordinal = _EXECUTION_ORDINALS.get(key, 0) + 1
+        _EXECUTION_ORDINALS[key] = ordinal
+    bound_query_id = (
+        base_query_id if not ordinal else f"{base_query_id}-exec{ordinal}")
+    hypothesis = next(
+        h for h in plan.search_hypotheses if h.hypothesis_id == family.hypothesis_ids[0]
+    )
+    atom_id = (leads[0].query_lineage.atom_id if leads else hypothesis.atom_ids[0])
+    allocation = next(
+        a for a in plan.source_allocations if a.source_class == source_class
+    )
+    record = execution_record_for(
+        make_discovery_query(
+            query_id=bound_query_id,
+            family_id=family_id,
+            atom_id=atom_id,
+            semantic_concept=family.terms[0] if family.terms else family.family_id,
+            concrete_query=term,
+            source_class=source_class,
+            max_results=20,
+            max_tier=allocation.max_tier,
+        ),
+        plan,
+        adapter_id=adapter_id,
+        status=(ExecutionStatus.FAILED if status in FAILURE_STATUSES
+                else ExecutionStatus.EXECUTED),
+        executed_at="2026-09-21T13:00:00Z",
+    )
+    outcome = AdapterOutcome(
         adapter_id=adapter_id,
         source_class=source_class,
-        query_id=query_id,
+        query_id=bound_query_id,
         status=status,
         leads=tuple(leads),
         pages_inspected=1,
@@ -104,6 +205,7 @@ def _outcome(query_id, *, source_class=SourceClass.GITHUB_REPOSITORY_CODE,
         completeness_note=completeness_note,
         message=message,
     )
+    return outcome.bind_execution_record(record)
 
 
 def _run(*, leads=(), outcomes=(), plan=None, baseline=None, candidates=None,
@@ -129,12 +231,13 @@ def _run(*, leads=(), outcomes=(), plan=None, baseline=None, candidates=None,
     return assemble_discovery_report(**kwargs), candidates, ranking
 
 
-def _two_adapter_run():
+def _two_adapter_run(plan=None):
     """One project found by two adapters, plus a paper from a third.
 
     Each lead sits in the outcome its own adapter returned: an outcome's leads
     must come from the adapters that responded (port law), so a multi-source hit
-    is two outcomes that merge, not one outcome carrying both.
+    is two outcomes that merge, not one outcome carrying both. ``plan`` threads
+    through so the same run can be executed under a re-cut or foreign plan.
     """
     github = lead("lead-gh-1", "github:owner/lib", claims=(ATOM_A,), atoms=(ATOM_A,))
     registry = lead("lead-reg-1", "github:owner/Lib.git",
@@ -143,13 +246,21 @@ def _two_adapter_run():
                     claims=(ATOM_A, ATOM_B), atoms=(ATOM_A, ATOM_B))
     paper = lead("lead-paper-1", "arxiv:2401.00001", kind=CandidateKind.PAPER,
                  source_class=SourceClass.RESEARCH_LITERATURE, adapter_id="adapter-arxiv",
-                 claims=(ATOM_B,), atoms=(ATOM_B,), license_claim="")
+                 claims=(ATOM_B,), atoms=(ATOM_B,), license_claim="",
+                 query_lineage=QueryLineage(
+                     atom_id=ATOM_B, semantic_concept="ordering specification",
+                     family_id="fam-spec", concrete_query="ordering specification",
+                     source_class=SourceClass.RESEARCH_LITERATURE,
+                     adapter_id="adapter-arxiv"))
     outcomes = [
-        _outcome("q-gh", leads=(github,)),
-        _outcome("q-reg", source_class=SourceClass.INTERNAL_REGISTRY_CODE,
-                 adapter_id="adapter-registry", leads=(registry,)),
-        _outcome("q-arxiv", source_class=SourceClass.RESEARCH_LITERATURE,
-                 adapter_id="adapter-arxiv", leads=(paper,)),
+        _outcome(_planned_query_id(SourceClass.GITHUB_REPOSITORY_CODE, plan=plan),
+                 leads=(github,), plan=plan),
+        _outcome(_planned_query_id(SourceClass.INTERNAL_REGISTRY_CODE, plan=plan),
+                 source_class=SourceClass.INTERNAL_REGISTRY_CODE,
+                 adapter_id="adapter-registry", leads=(registry,), plan=plan),
+        _outcome(_planned_query_id(SourceClass.RESEARCH_LITERATURE, plan=plan),
+                 source_class=SourceClass.RESEARCH_LITERATURE,
+                 adapter_id="adapter-arxiv", leads=(paper,), plan=plan),
     ]
     return [github, registry, paper], outcomes
 
@@ -196,8 +307,9 @@ class TestNoClaimOutrunsItsEvidence:
         though its status reads OK.
         """
         leads, _ = _two_adapter_run()
-        qualified = _outcome("q-qualified", leads=(leads[0],),
-                             completeness_note="stopped after page 3 of 10")
+        qualified = _outcome(
+            _planned_query_id(SourceClass.GITHUB_REPOSITORY_CODE), leads=(leads[0],),
+            completeness_note="stopped after page 3 of 10")
         assert qualified.status is AdapterStatus.OK
         assert qualified.exhaustive is False
 
@@ -374,8 +486,9 @@ class TestTheArtifactIsItsOwnHandoff:
         """
         leads, outcomes = _two_adapter_run()
         elsewhere = replace(baseline_plan(), contract_id="CAP-OTHER-001")
+        foreign_leads, foreign_outcomes = _two_adapter_run(plan=elsewhere)
         foreign, _c, _r = _run(
-            leads=leads, outcomes=outcomes, plan=elsewhere,
+            leads=foreign_leads, outcomes=foreign_outcomes, plan=elsewhere,
             baseline=_baseline(plan=elsewhere, atom_ids=[ATOM_A, ATOM_B]))
 
         with pytest.raises(QcaeValidationError, match="CAP-OTHER-001"):
@@ -410,8 +523,9 @@ class TestTheArtifactIsItsOwnHandoff:
         leads, outcomes = _two_adapter_run()
         first, _c, _r = _run(leads=leads, outcomes=outcomes)
         recut = replace(baseline_plan(), discovery_plan_id="plan-002")
+        recut_leads, recut_outcomes = _two_adapter_run(plan=recut)
         handed_off, _c2, _r2 = _run(
-            leads=leads, outcomes=outcomes, plan=recut,
+            leads=recut_leads, outcomes=recut_outcomes, plan=recut,
             baseline=_baseline(plan=recut, atom_ids=[ATOM_A, ATOM_B]),
             previous_report=first)
         assert handed_off.discovery_plan_id == "plan-002"
@@ -547,9 +661,17 @@ class TestAssembledReportMatchesItsPieces:
             lead("lead-rep", "github:owner/lib", claims=(ATOM_A, ATOM_B),
                  atoms=(ATOM_A, ATOM_B), novelty_family="family-ordering"),
             lead("lead-fam", "github:owner/other", claims=(ATOM_B,), atoms=(ATOM_B,),
-                 novelty_family="family-ordering"),
+                 novelty_family="family-ordering",
+                 query_lineage=QueryLineage(
+                     atom_id=ATOM_A, semantic_concept="causal ordering",
+                     family_id="fam-behavioral", concrete_query="causal ordering",
+                     source_class=SourceClass.GITHUB_REPOSITORY_CODE,
+                     adapter_id="adapter-github")),
         ]
-        outcomes = [_outcome("q-1", results=len(leads), leads=leads)]
+        outcomes = [
+            _outcome(_planned_query_id(SourceClass.GITHUB_REPOSITORY_CODE),
+                     results=len(leads), leads=leads),
+        ]
         report, _candidates, _ranking = _run(leads=leads, outcomes=outcomes)
 
         deferred = [e for e in report.escalation_queue
@@ -660,8 +782,10 @@ class TestAssembledEvidence:
         ]
         report, _candidates, _ranking = _run(leads=leads, outcomes=outcomes)
         joined = "\n".join(report.negative_findings)
-        assert "q-empty" in joined and "NO_RESULTS" in joined
-        assert "q-limited" in joined and "RATE_LIMITED" in joined
+        # Notes carry the executed-query identity, not the caller's label.
+        assert "NO_RESULTS" in joined and "RATE_LIMITED" in joined
+        assert ("causal-ordering-exec2" in joined
+                and "causal-ordering-exec3" in joined)
 
     def test_remaining_uncertainties_come_from_the_baseline(self) -> None:
         baseline = _baseline(categories=["EVIDENCE_STALE"],

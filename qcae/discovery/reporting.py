@@ -34,6 +34,8 @@ rule (``planning.saturation``) and the report's own laws (``core.discovery.repor
 
 from __future__ import annotations
 
+import re
+
 from typing import List, Optional, Sequence, Tuple
 
 from qcae.core.discovery.candidate import CanonicalCandidate
@@ -50,7 +52,11 @@ from qcae.core.discovery.report import (
     make_discovery_report,
 )
 from qcae.core.errors import QcaeValidationError
-from qcae.core.ports.discovery import AdapterOutcome, AdapterStatus
+from qcae.core.ports.discovery import (
+    AdapterOutcome,
+    AdapterStatus,
+    ExecutedDiscoveryQuery,
+)
 
 from qcae.discovery.internal.baseline import InternalBaselineRecord
 from qcae.discovery.planning.canonical import (
@@ -65,6 +71,138 @@ from qcae.discovery.planning.saturation import (
 )
 
 __all__ = ["assemble_discovery_report"]
+
+
+def _require_outcomes_bound_to_plan(
+    outcomes: Sequence[AdapterOutcome], plan: DiscoveryPlan
+) -> Tuple[ExecutedDiscoveryQuery, ...]:
+    """Every outcome binds to exactly one executed query of *this* plan (canon
+    2.1.4/2.1.17 invariant 4).
+
+    A binding is refused unless the record proves, field by field, that the
+    query belonged to this plan, targeted an externally authorized atom, came
+    from a declared family, used an enabled allocated source with the expected
+    adapter, stayed inside the declared tier/result envelope, and that every
+    returned lead's lineage is that record's lineage. NO_RESULTS and every
+    failure status keep full query lineage — provenance is not a function of
+    whether anything was found. A duplicate binding (two outcomes, one record)
+    is refused: a record is single-use evidence.
+    """
+    allocated = {
+        allocation.source_class: allocation
+        for allocation in plan.source_allocations if allocation.enabled
+    }
+    family_ids = {family.family_id for family in plan.query_families}
+    family_sources: dict = {}
+    for family in plan.query_families:
+        for source_class in family.source_classes:
+            family_sources.setdefault(family.family_id, set()).add(source_class)
+    planned_query_ids = set(plan.query_ids)
+    bound: List[ExecutedDiscoveryQuery] = []
+    seen_query_ids: set = set()
+    for outcome in outcomes:
+        record = outcome.execution_record
+        if record is None:
+            raise QcaeValidationError(
+                f"outcome {outcome.query_id!r} from {outcome.adapter_id!r} carries no "
+                "execution record: every outcome binds to exactly one executed query "
+                "of this plan, so an unattributed boolean payload is not reportable "
+                "evidence (canon 2.1.4/2.1.17 invariant 4)"
+            )
+        # Repeated executions of one planned query carry an ordinal suffix
+        # (-exec2, -exec3, ...): single-use law binds the full record identity,
+        # while plan authorization compares the base planned identity.
+        base_query_id = re.sub(r"-exec\d+$", "", record.query_id)
+        if record.query_id in seen_query_ids:
+            raise QcaeValidationError(
+                f"execution record {record.query_id!r} bound by more than one outcome: "
+                "a record is single-use evidence; a repeated execution carries its "
+                "own ordinal suffix (canon 2.1.4)"
+            )
+        seen_query_ids.add(record.query_id)
+        if record.outcome_id and record.outcome_id != outcome.query_id:
+            raise QcaeValidationError(
+                f"execution record {record.query_id!r} names outcome "
+                f"{record.outcome_id!r}, but was bound to {outcome.query_id!r}"
+            )
+        if record.discovery_plan_id != plan.discovery_plan_id:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} was executed for plan "
+                f"{record.discovery_plan_id!r}, not this plan {plan.discovery_plan_id!r}"
+            )
+        if (
+            record.contract_id != plan.contract_id
+            or record.contract_version != plan.contract_version
+        ):
+            raise QcaeValidationError(
+                f"query {record.query_id!r} was executed under contract "
+                f"{record.contract_id!r}v{record.contract_version}, not this plan's "
+                f"{plan.contract_id!r}v{plan.contract_version}"
+            )
+        if record.family_id not in family_ids:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} claims family {record.family_id!r}, which "
+                "the plan never declared"
+            )
+        family_record = next(
+            f for f in plan.query_families if f.family_id == record.family_id
+        )
+        if record.concrete_query not in family_record.terms:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} ran a concrete query the plan's family "
+                f"{record.family_id!r} never declared: {record.concrete_query!r} "
+                "(canon 2.1.3/2.1.15: the plan owns what may be searched)"
+            )
+        if base_query_id not in planned_query_ids:
+            raise QcaeValidationError(
+                f"query {base_query_id!r} was never planned: outcomes may only bind "
+                "to queries the plan authorized (canon 2.1.3/2.1.15)"
+            )
+        if record.atom_id not in plan.atom_ids:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} targets atom {record.atom_id!r}, outside "
+                "the plan's authorized scope"
+            )
+        allocation = allocated.get(record.source_class)
+        if allocation is None:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} used source class "
+                f"{record.source_class.value}, which has no enabled allocation in this plan"
+            )
+        if record.source_class not in family_sources.get(record.family_id, set()):
+            raise QcaeValidationError(
+                f"query {record.query_id!r} pairs family {record.family_id!r} with "
+                f"source class {record.source_class.value}, which that family never declared"
+            )
+        if record.max_tier > allocation.max_tier:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} ran at tier {record.max_tier.name}, above "
+                f"the allocation's {allocation.max_tier.name}"
+            )
+        if record.result_limit > plan.budget.max_results_inspected:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} declares result_limit "
+                f"{record.result_limit} above the plan's envelope"
+            )
+        for lead in outcome.leads:
+            lineage = lead.query_lineage
+            for field_name, expected, actual in (
+                ("atom", record.atom_id, lineage.atom_id),
+                ("family", record.family_id, lineage.family_id),
+                ("adapter", record.adapter_id, lineage.adapter_id),
+                ("source class", record.source_class, lineage.source_class),
+            ):
+                if str(actual) != str(expected):
+                    raise QcaeValidationError(
+                        f"lead {lead.lead_id!r} lineage {field_name} {actual!r} disagrees "
+                        f"with the execution record of query {record.query_id!r} "
+                        f"({expected!r}); a lead belongs to the query that found it"
+                    )
+        bound.append(record)
+    return tuple(bound)
+
+
+
 
 
 def assemble_discovery_report(
@@ -121,6 +259,7 @@ def assemble_discovery_report(
     for outcome in ran:
         outcome.validate()
     _require_sources_allocated(ran, plan)
+    _require_outcomes_bound_to_plan(ran, plan)
 
     # The ranking piece is the authority on canonical identity; the outcomes are
     # checked against it so a discovered path cannot vanish between the two.
@@ -378,12 +517,19 @@ def _sources_searched(outcomes: Sequence[AdapterOutcome]) -> Tuple[SourceClass, 
 
 
 def _query_families_executed(outcomes: Sequence[AdapterOutcome]) -> Tuple[str, ...]:
-    """Families attributable from lead lineage (canon 2.1.4/2.1.17 invariant 4)."""
+    """Families actually executed, from typed query-execution records.
+
+    Derived from the execution bindings, not from returned leads: an empty or
+    failed search is still a family the plan executed, and its lineage must
+    survive into the artifact (canon 2.1.17 invariant 4). This is the law that
+    makes the report self-verifying — planned/attempted/completed coverage is
+    read off records, so a later pass never needs hidden process memory.
+    """
     return tuple(sorted({
-        lead.query_lineage.family_id
+        record.family_id
         for outcome in outcomes
-        for lead in outcome.leads
-        if lead.query_lineage.family_id
+        for record in [outcome.execution_record]
+        if record is not None
     }))
 
 
@@ -421,9 +567,9 @@ def _coverage_notes(
     ]
     if unattributed:
         notes.append(
-            f"{len(unattributed)} executed search(es) carried no lead lineage, so their "
-            "query families are absent from query_families_executed: "
-            f"{unattributed} (the executed count is disclosed rather than implied)"
+            f"{len(unattributed)} executed search(es) returned no leads: "
+            f"{unattributed} (their families still count as executed through their "
+            "typed execution records)"
         )
     if baseline.sufficient_without_discovery and any(
         o.counts_toward_saturation for o in outcomes
