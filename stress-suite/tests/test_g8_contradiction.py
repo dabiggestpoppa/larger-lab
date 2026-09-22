@@ -56,6 +56,9 @@ from engine.g8_test_evidence import (  # noqa: E402
     read_test_evidence,
     verify_citation,
 )
+#: the tested tree has ONE owner (STRESS-G8ARCH3); the tests consume it, they do not
+#: derive it
+from scenarios.g8_tested_tree import derived_tested_tree  # noqa: E402
 from engine.g8_contradiction import (  # noqa: E402
     DERIVATION_KINDS,
     ComparisonResult,
@@ -1563,35 +1566,57 @@ def test_the_tested_tree_is_derived_from_git_not_declared_by_hand(tmp_path):
     tree, a later commit that touches only docs or evidence cannot move it, which is
     what lets the package regenerate identically from any later commit."""
     repo, git = _temp_git_repo(tmp_path)
-    code = EMIT.declared_tested_sha(repo)
+    code = derived_tested_tree(repo)
     assert code == git("rev-parse", "HEAD")
-    assert EMIT.declared_tested_sha(repo, require_clean=True) == code
+    assert derived_tested_tree(repo, require_clean=True) == code
 
     # a commit that touches ONLY evidence/docs must not move the tested tree
     (repo / "docs" / "note.md").write_text("doc changed\n", encoding="utf-8")
     git("add", "-A")
     git("commit", "-q", "-m", "docs: evidence only")
     assert git("rev-parse", "HEAD") != code
-    assert EMIT.declared_tested_sha(repo, require_clean=True) == code
+    assert derived_tested_tree(repo, require_clean=True) == code
 
     # ... but an uncommitted change to the CODE tree is not the tested tree
     (repo / "stress-suite" / "tests" / "test_x.py").write_text(
         "def test_x():\n    assert True\n", encoding="utf-8")
     with pytest.raises(UnverifiableTestEvidence) as refused:
-        EMIT.declared_tested_sha(repo, require_clean=True)
+        derived_tested_tree(repo, require_clean=True)
     assert "dirty tree" in str(refused.value)
     # the same tree still resolves without the cleanliness requirement, so the
     # sealed fixtures and the read path are unaffected by a dirty working tree
-    assert EMIT.declared_tested_sha(repo) == code
+    assert derived_tested_tree(repo) == code
+
+
+def test_the_tested_tree_has_exactly_one_implementation():
+    """STRESS-G8ARCH3. Three layers used to derive this privately -- the emitter, the
+    harness (`conftest`, with a DIFFERENT fallback) and the audit entry point (which
+    used live HEAD) -- so at an archive commit the audit refused its own package. The
+    owner is `scenarios/g8_tested_tree.py`; everyone else consumes it."""
+    owner = Path(ROOT / "scenarios" / "g8_tested_tree.py").read_text(encoding="utf-8")
+    assert owner.count("def derived_tested_tree(") == 1
+    consumers = {
+        Path(EMIT.__file__): "from scenarios.g8_tested_tree import derived_tested_tree",
+        Path(ROOT / "conftest.py"): "from scenarios.g8_tested_tree import derived_tested_tree",
+        Path(ROOT / "scenarios" / "g8_run_audit.py"):
+            "from scenarios.g8_tested_tree import derived_tested_tree",
+    }
+    for path, delegation in consumers.items():
+        source = path.read_text(encoding="utf-8")
+        assert delegation in source, f"{path.name} does not use the one owner"
+        assert 'subprocess.run(["git"' not in source or path.name == "g8_run_audit.py", \
+            f"{path.name} still carries its own Git access for the tree rule"
 
 
 def test_the_emitter_holds_no_hand_typed_tested_tree():
     """Tripwire: a 40-hex literal assigned to TESTED_SHA would reintroduce exactly
-    the defect the test above closes, so the assignment must stay derived."""
+    the defect the test above closes, so the assignment must stay derived -- and it
+    must be derived by the one owner, not by a private copy in the emitter."""
     source = Path(EMIT.__file__).read_text(encoding="utf-8")
     assert not re.search(r"TESTED_SHA\s*=\s*[\"'][0-9a-f]{40}", source)
-    assert "TESTED_SHA = declared_tested_sha()" in source
-    assert EMIT.TESTED_SHA == EMIT.declared_tested_sha()
+    assert "TESTED_SHA = derived_tested_tree()" in source
+    assert "def declared_tested_sha" not in source
+    assert EMIT.TESTED_SHA == derived_tested_tree(ROOT.parent)
     assert EMIT.TESTED_SHA
 
 
@@ -1603,6 +1628,61 @@ def _committed_blob(relative: str) -> bytes:
     it."""
     return subprocess.run(["git", "show", f"HEAD:{relative}"], cwd=str(ROOT.parent),
                           capture_output=True, check=True).stdout
+
+
+RECEIPT_REL = "stress-suite/evidence/G8_EVIDENCE_RECEIPT.json"
+
+
+def _lagging_tested_tree(receipt_tree: str, derived_tree: str) -> str:
+    """The one rule for 'the committed package no longer describes the code': empty
+    when the package is current, otherwise the problem to report.
+
+    An environment that cannot derive the tree is NOT evidence of a lag -- the
+    publish path refuses that case separately (`require_clean`) -- so it returns "".
+    """
+    if not derived_tree or receipt_tree == derived_tree:
+        return ""
+    return (f"lagging tested tree: the committed package names "
+            f"{receipt_tree or 'NOTHING'} but the code/test tree is now "
+            f"{derived_tree}. Re-produce the artifact at the new tree and re-emit.")
+
+
+def test_the_lag_rule_detects_a_lagging_tree_and_accepts_a_current_one():
+    """The DETECTION LOGIC is exercised in every run, including the artifact-producing
+    run where the end-to-end check below must skip: a seeded code commit after the
+    archive must be caught, and a current package must not be."""
+    derived = derived_tested_tree(ROOT.parent)
+    assert derived
+    assert _lagging_tested_tree(derived, derived) == ""
+    seeded = _lagging_tested_tree("0" * 40, derived)
+    assert seeded.startswith("lagging tested tree")
+    assert "0" * 40 in seeded and derived in seeded
+    assert _lagging_tested_tree("", derived).startswith("lagging tested tree")
+    assert _lagging_tested_tree(derived, "") == ""
+
+
+def test_the_committed_package_names_the_derived_code_tree(pytestconfig):
+    """RED BEFORE REPAIR (proved by seeding a code commit after the archive): the
+    committed-citation guard passed `expected_tested_sha` from the CITATION'S OWN
+    CLAIM, so it compared bytes against the citation and never the tree against the
+    code -- trusting the evidence's own self-report, which is the R-G8-07 defect this
+    gate exists to forbid. A code commit after the archive therefore left the whole
+    module green while the package lagged.
+
+    One exception, and it is structural rather than convenient: an archive cannot
+    exist before the tree it archives. The run that WRITES the artifact (`--junitxml`)
+    happens before the re-emission, so the committed package is one emission behind
+    by construction there. Every ordinary run -- including a reviewer's clone --
+    executes this check, and the detection logic itself is exercised unconditionally
+    by the test above.
+    """
+    if getattr(pytestconfig.option, "xmlpath", None):
+        pytest.skip("artifact-producing run: the archive for this tree cannot exist "
+                    "yet, so a lag is expected here and is checked by every ordinary "
+                    "run (and by test_the_lag_rule_detects_a_lagging_tree_...)")
+    receipt = json.loads(_committed_blob(RECEIPT_REL))
+    problem = _lagging_tested_tree(receipt["tested_sha"], derived_tested_tree(ROOT.parent))
+    assert not problem, problem
 
 
 def _staged_committed_pair(tmp_path):

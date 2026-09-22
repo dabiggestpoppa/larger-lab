@@ -54,8 +54,8 @@ way — engine → scenarios → evidence — and never back.
 | layer | owns |
 | --- | --- |
 | `engine/g8_*` | the rules themselves: comparison + equivalence classes, guarded properties, the gate decision, the contradiction register, and the test-baseline contract |
-| `scenarios/g8_*` | running the surface and publishing: it declares the tested tree and renders the receipt, matrix and prose. It keeps no copy of any engine rule |
-| `tests/` | the adversarial controls; fixtures bind to the tree the emitter **declares**, never to a scenario name or a call site's expectation |
+| `scenarios/g8_*` | running the surface and publishing: it renders the receipt, matrix and prose, and it derives the tested tree through its one owner (`scenarios/g8_tested_tree.py`). It keeps no copy of any engine rule |
+| `tests/` | the adversarial controls; fixtures bind to the tree that owner derives, never to a scenario name or a call site's expectation |
 
 The test-baseline path has one owner per step, so no two components can disagree
 about which artifact is the baseline:
@@ -72,6 +72,14 @@ pytest --junitxml  -> evidence/G8_TEST_RESULTS.xml   declared once (engine/g8_te
 Consumers validate against the declaration rather than restating it: a second copy
 of a path, command, digest rule or publishability check is a defect, not a
 convenience.
+
+The tested tree is DERIVED from Git — the newest commit that changed code or tests —
+by that one owner, so the emitter, the harness (`conftest`) and the audit entry
+point cannot disagree about it, and a package stays re-derivable from any later
+evidence commit. A code commit after the archive is caught by
+`test_the_committed_package_names_the_derived_code_tree`; that check is skipped only
+in the artifact-producing run (`--junitxml`), which necessarily runs before the
+archive it produces exists.
 
 ## Running
 

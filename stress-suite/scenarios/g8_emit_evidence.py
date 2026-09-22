@@ -17,7 +17,6 @@ authored by hand.
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence
@@ -37,13 +36,15 @@ from engine.g8_test_evidence import (  # noqa: E402
     ARTIFACT_COMMAND,
     ARTIFACT_RELATIVE_PATH,
     AUTHORITATIVE_TEST_COMMAND,
-    TESTED_TREE_GIT_ARGS,
     TESTED_TREE_PATHS,
     TestEvidence,
     UnverifiableTestEvidence,
     check_baseline,
     verify_citation,
 )
+#: the tested tree has ONE owner. This module publishes what that owner derives; it
+#: holds no Git access and no second derivation of its own (STRESS-G8ARCH3).
+from scenarios.g8_tested_tree import derived_tested_tree  # noqa: E402
 from scenarios.g8_run_audit import EVIDENCE, ROOT, build_package  # noqa: E402
 
 START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
@@ -52,53 +53,10 @@ CONTRACT_REL = "stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json"
 EVIDENCE_COMMIT_LABEL = "STRESS-G8RR"
 
 
-def _git(args: Sequence[str], repo_root: Path) -> str:
-    """A read-only Git query, run in the tree it describes. The ENGINE layer may not
-    shell out (tests/test_no_mutation_surface.py guards that), so Git access lives
-    in the scenarios layer next to the tree it is about."""
-    proc = subprocess.run(["git", *args], cwd=str(repo_root),
-                          capture_output=True, text=True, check=False)
-    return proc.stdout.strip()
-
-
-def declared_tested_sha(repo_root: Path = ROOT.parent, *,
-                       require_clean: bool = False) -> str:
-    """The tree this package is tested against, DERIVED from Git.
-
-    The rule is declared once, in `engine.g8_test_evidence.TESTED_TREE_PATHS`: the
-    tested tree is the newest commit that changed code or tests. A revision typed
-    into this module would be a hand-declared tree -- the same self-reporting defect
-    R-G8-07 forbids -- and would silently keep claiming an older revision after the
-    code moved. Because the rule is about the CODE tree, a later commit that only
-    touches docs or evidence does not move it, so the package is reproducible from
-    any such commit rather than only from the one that happened to be HEAD.
-
-    `require_clean` is what the authoritative entry point uses: if the code or test
-    tree has uncommitted changes, the tree being archived is not the tree that was
-    tested, so emission is refused. The cited artifact is deliberately NOT part of
-    the cleanliness rule -- it is regenerated immediately before emission, and its
-    bytes are bound by the citation check instead.
-    """
-    derived = _git(TESTED_TREE_GIT_ARGS, repo_root)
-    if not require_clean:
-        return derived
-    if not derived:
-        raise UnverifiableTestEvidence(
-            "the tested tree cannot be derived: no commit touching "
-            f"{list(TESTED_TREE_PATHS)} resolves in {repo_root}")
-    dirty = _git(("status", "--porcelain", "--", *TESTED_TREE_PATHS), repo_root)
-    if dirty:
-        raise UnverifiableTestEvidence(
-            "refusing to publish a package for a dirty tree: the code or tests "
-            "have uncommitted changes, so the tree being archived is not the tree "
-            f"that was tested\n{dirty}")
-    return derived
-
-
-#: the tested tree, DERIVED -- never a hand-declared revision. Regressions bind
-#: their sealed fixture to it; the authoritative entry point re-derives it with
-#: `require_clean=True` before it will publish anything.
-TESTED_SHA = declared_tested_sha()
+#: the tested tree, DERIVED by its single owner -- never a hand-declared revision.
+#: Regressions bind their sealed fixture to it; the authoritative entry point
+#: re-derives it with `require_clean=True` before it will publish anything.
+TESTED_SHA = derived_tested_tree()
 #: The artifact-producing command and the canonicalization rule the receipt
 #: publishes are both imported from engine.g8_test_evidence, so the command, the
 #: cited path and the reader that enforces it cannot disagree.
@@ -619,6 +577,24 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
         "new_ambiguities": ["AMB-G8-01 partial domain token vocabulary",
                             "AMB-G8-02 bounded field discrimination"],
         "new_contradictions": [e["reason"] for e in register["entries"]],
+        # a claim THIS line of work published and then FALSIFIED, recorded instead of
+        # rewritten: the commit is pushed, and re-writing pushed history to make an
+        # earlier claim look better is the opposite of what a claim register is for
+        "claim_defects_recorded": [
+            {"claim": ("commit 950e6efb (STRESS-G8ARCH2-R): 'the same package "
+                       "regenerates byte-identically from here'"),
+             "classification": "RECEIPT_OR_CLAIM_DEFECT",
+             "severity": "INFO",
+             "status": "FALSIFIED_THEN_SUPERSEDED",
+             "evidence": ("a clean clone at that commit produced a fresh artifact "
+                          "whose RAW digest differed from the committed one while its "
+                          "CANONICAL digest matched: JUnit stamps time/timestamp/"
+                          "hostname, so a re-run cannot reproduce raw bytes"),
+             "disposition": ("superseded by the corrected `reproducibility` field, "
+                             "added at 4d80828f; the commit message was NOT rewritten "
+                             "because it is already pushed, and this register entry is "
+                             "the durable record")},
+        ],
         "test_count_lineage": lineage["chain"],
         "citation_check": decision["citation"],
         "reproducibility": (
@@ -734,7 +710,16 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
         "false positive and the post-revision comparison for each reclassified "
         "pair. A reviewer can therefore see exactly what changed and judge whether "
         "the revision was justified.\n\n",
-        "## What this PASS does not mean\n\n",
+        "## Claim defects recorded, not rewritten\n\n",
+        "A claim published by this line of work that the evidence later FALSIFIED is "
+        "recorded here. Commit messages already pushed are not rewritten to make an "
+        "earlier claim read better: the register entry is the durable record, and the "
+        "corrected statement stands in the field it belongs to.\n\n",
+        _md_table([[c["claim"], c["classification"], c["severity"], c["status"],
+                    c["disposition"]] for c in receipt["claim_defects_recorded"]],
+                  ["claim", "classification", "severity", "status", "disposition"])
+        if receipt["claim_defects_recorded"] else "None.\n",
+        "\n## What this PASS does not mean\n\n",
         "It does not mean the audit is unbounded. Of "
         f"{derivation['declared_verified_field_count']} declared verified fields, "
         f"{derivation['discriminating_field_count']} actually varied inside their "
@@ -1041,7 +1026,7 @@ def main(argv: Sequence[str]) -> Dict[str, Any]:
     # not the tree that was tested (STRESS-G8ARCH2). The reader refuses an artifact
     # outside the declared tree or at any path other than the declared one, so no
     # path policy is repeated here.
-    tested = declared_tested_sha(require_clean=True)
+    tested = derived_tested_tree(require_clean=True)
     evidence = read_test_evidence(artifact, expected_tested_sha=tested,
                                  repo_root=ROOT.parent,
                                  python_version=sys.version.split()[0])

@@ -1058,8 +1058,16 @@ def main(test_evidence: Optional[TestEvidence] = None, *,
 
 if __name__ == "__main__":
     from engine.g8_test_evidence import read_test_evidence
+    from scenarios.g8_tested_tree import derived_tested_tree
+
     artifact = sys.argv[1] if len(sys.argv) > 1 else ""
-    tested = head_sha()
+    # STRESS-G8ARCH3: 'the tree this package is for' has ONE owner. This entry point
+    # used live HEAD, which at an ARCHIVE commit is the archive commit itself while
+    # the artifact is bound to the last code/test commit -- so the audit refused its
+    # own package at exactly the commit a reviewer runs it at. `head_sha()` remains
+    # the audit's "head we ran at" fact for the gate-claim findings, which is a
+    # different question.
+    tested = derived_tested_tree(ROOT.parent)
     main(test_evidence=read_test_evidence(artifact, expected_tested_sha=tested,
                                          repo_root=ROOT.parent),
          expected_tested_sha=tested)
