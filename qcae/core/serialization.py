@@ -23,7 +23,17 @@ import json
 from dataclasses import fields, is_dataclass
 from enum import Enum
 from types import MappingProxyType
-from typing import Any, ClassVar, Dict, Tuple, Type, TypeVar, get_origin, get_type_hints
+from typing import (
+    Any,
+    ClassVar,
+    Dict,
+    Mapping,
+    Tuple,
+    Type,
+    TypeVar,
+    get_origin,
+    get_type_hints,
+)
 
 from qcae.core.errors import (
     QcaeSerializationError,
@@ -68,6 +78,42 @@ def _deep_freeze(value: Any) -> Any:
     return value
 
 
+def _freeze_set(value: Any) -> Any:
+    """Freeze a set-shaped value deterministically.
+
+    A ``frozenset`` is already immutable, so it passes through; a mutable set
+    is copied to one. Ordering is value-determined (hash order), so a digest
+    over the frozenset content is independent of the caller's construction
+    order.
+    """
+    if isinstance(value, frozenset):
+        return value
+    return frozenset(value)
+
+
+def _declares_mapping(hint: Any) -> bool:
+    """Whether a field annotation declares a mapping in any form.
+
+    Every ``dict``/``Mapping`` spelling counts — typed, bare, or protocol —
+    because ``get_origin(dict)`` is ``None``: an origin-only test is exactly
+    the hole that left bare-``dict`` fields holding the caller's mapping.
+    """
+    origin = get_origin(hint)
+    return (
+        origin is dict
+        or (isinstance(origin, type) and issubclass(origin, Mapping))
+        or (isinstance(hint, type) and issubclass(hint, Mapping))
+    )
+
+
+def _declares_set(hint: Any) -> bool:
+    """Whether a field annotation declares a set in any form."""
+    origin = get_origin(hint)
+    return origin is set or (
+        isinstance(hint, type) and issubclass(hint, (set, frozenset))
+    )
+
+
 class SerializableRecord:
     """Base for versioned, canonically serializable QCAE domain records.
 
@@ -92,31 +138,54 @@ class SerializableRecord:
     _TYPE_HINTS_CACHE: ClassVar[Dict[type, Any]] = {}
 
     def __post_init__(self) -> None:
-        """Canonicalize declared sequence types and deeply freeze mappings.
+        """Canonicalize declared sequence types and deeply freeze collections.
 
         JSON flattens tuples to arrays and callers may pass either form; a
         tuple-declared field therefore always holds a tuple in memory, and a
-        list-declared field always a list. Mapping fields are defensively
-        frozen: a frozen dataclass holding a caller-owned dict is not immutable
-        evidence (P3-R4C5), so mappings are copied into a frozen Mapping
-        proxy whose values are themselves deeply frozen, keeping digests and
-        equality deterministic regardless of how the record was constructed.
+        list-declared field always a list. Every declared field holding a
+        mutable collection is defensively frozen by the value's nature, not
+        the annotation's specificity (P3-R4-R2): ``get_origin(dict)`` is
+        ``None``, so an annotation-gated rule silently skipped bare ``dict``
+        fields and left the caller's own mapping inside a frozen record — a
+        post-construction caller mutation reached the record and even moved
+        its digest. Mappings are copied into a frozen proxy whose values are
+        themselves deeply frozen; sets become ``frozenset``. Digests and
+        equality stay deterministic regardless of how the record was built.
         """
         cls = type(self)
         hints = cls._hints()
         if not hints:
             return
         for fld in fields(cls):
-            origin = get_origin(hints.get(fld.name))
-            if origin is None:
-                continue
+            hint = hints.get(fld.name)
+            origin = get_origin(hint)
             value = getattr(self, fld.name)
             if origin is tuple and isinstance(value, list):
                 object.__setattr__(self, fld.name, tuple(value))
             elif origin is list and isinstance(value, tuple):
                 object.__setattr__(self, fld.name, list(value))
-            elif origin is dict and isinstance(value, dict):
-                object.__setattr__(self, fld.name, _deep_freeze(value))
+            else:
+                # P3-R4-R2: mapping- and set-declared fields are frozen by
+                # their declaration (any ``dict``/``Mapping``/set form, typed
+                # or bare) and by the value's nature, so a mapping a caller
+                # mutated into the constructor is copied, whatever the
+                # annotation said.
+                if _declares_mapping(hint):
+                    if isinstance(value, dict):
+                        object.__setattr__(self, fld.name, _deep_freeze(value))
+                    elif not isinstance(value, Mapping):
+                        raise QcaeSerializationError(
+                            f"field {fld.name!r} is declared as a mapping but holds "
+                            f"{type(value).__name__}; domain records carry real mappings"
+                        )
+                elif _declares_set(hint):
+                    if isinstance(value, (set, frozenset)):
+                        object.__setattr__(self, fld.name, _freeze_set(value))
+                    else:
+                        raise QcaeSerializationError(
+                            f"field {fld.name!r} is declared as a set but holds "
+                            f"{type(value).__name__}; domain records carry real sets"
+                        )
 
     @classmethod
     def _hints(cls) -> Dict[str, Any]:
@@ -197,6 +266,15 @@ class SerializableRecord:
         for field_name, coerce in cls._COERCIONS.items():
             if field_name in kwargs:
                 kwargs[field_name] = coerce(kwargs[field_name])
+        # P3-R4-R2: a serialized set returns as a sorted array (JSON has no
+        # set form); rebuild the frozenset the declared field carries so the
+        # round trip preserves exact meaning. Mappings arrive as JSON objects
+        # and are frozen again by __post_init__.
+        for field_ in fields(cls):
+            if _declares_set(cls._hints().get(field_.name)):
+                value = kwargs.get(field_.name)
+                if isinstance(value, list):
+                    kwargs[field_.name] = frozenset(value)
         for field_name, nested_cls in cls._NESTED_RECORDS.items():
             if isinstance(nested_cls, str):
                 # Forward reference by class name; resolve in the declaring
@@ -240,6 +318,10 @@ def _to_jsonable(value: Any) -> Any:
         return {field.name: _to_jsonable(getattr(value, field.name)) for field in fields(value)}
     if isinstance(value, (list, tuple)):
         return [_to_jsonable(item) for item in value]
+    if isinstance(value, frozenset):
+        # JSON has no set form; the sorted array is the deterministic lossless
+        # encoding for the homogeneous scalar sets domain records carry.
+        return sorted(_to_jsonable(item) for item in value)
     if isinstance(value, (dict, MappingProxyType)):
         return {str(key): _to_jsonable(item) for key, item in value.items()}
     if value is None or isinstance(value, (str, int, float, bool)):

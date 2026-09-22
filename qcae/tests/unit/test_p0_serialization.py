@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass
+from typing import List, Mapping
 
 import pytest
 
@@ -21,6 +21,8 @@ from qcae.core.serialization import (
     canonical_json_bytes,
     sha256_of,
 )
+from qcae.orchestration.orchestrator.budgets import Budget
+from qcae.orchestration.workers.contracts import WorkerResult, WorkerStatus
 
 
 @dataclass(frozen=True)
@@ -171,3 +173,108 @@ class TestErrorTaxonomy:
     def test_errors_are_catchable_and_message_preserved(self) -> None:
         with pytest.raises(QcaeError, match="boom"):
             raise QcaeValidationError("boom")
+
+
+# -- P3-R4-R2: deep freeze by declaration, not annotation specificity --------
+
+
+class TestDeepFreezeCoversEveryDeclaredCollection:
+    """P3-R4-R2 — the audit's annotation-gating hole, closed.
+
+    ``get_origin(dict)`` is ``None``, so C5's origin-gated freeze silently
+    skipped bare ``dict`` fields: a frozen record held the caller's own
+    mapping, and a post-construction caller mutation reached into the record
+    — empirically demonstrated on ``AuthorityRequest.context``, and it even
+    moved the record's digest. Freezing now keys on the declaration (any
+    ``dict``/``Mapping``/set spelling) and the value's nature, so every
+    declared mutable collection is frozen whatever the annotation says.
+    """
+
+    def test_bare_dict_field_survives_caller_mutation(self) -> None:
+        caller = {"tenant": "t1"}
+        rec = _SampleRecord(record_id="r-6", tags=[], attrs=caller)
+        digest = rec.digest()
+        caller["tenant"] = "TAMPERED"
+        assert rec.attrs == {"tenant": "t1"}
+        assert rec.digest() == digest
+
+    def test_typed_dict_field_stays_frozen(self) -> None:
+        caller = {"attempts": 1}
+        budget = Budget(
+            budget_id="b-1", owner_kind="job", owner_id="job-1",
+            allocation=caller,
+        )
+        caller["attempts"] = 99
+        assert budget.allocation == {"attempts": 1}
+
+    def test_freeze_is_deep(self) -> None:
+        caller = {"scope": {"nested": [1, 2]}}
+        rec = _SampleRecord(record_id="r-7", tags=[], attrs=caller)
+        caller["scope"]["nested"].append(3)
+        assert rec.attrs["scope"]["nested"] == (1, 2)
+
+    def test_mapping_annotated_field_is_frozen(self) -> None:
+        @dataclass(frozen=True)
+        class _Scoped(SerializableRecord):
+            SCHEMA_VERSION = 1
+
+            record_id: str
+            scopes: Mapping[str, int]
+
+        caller = {"read": 1}
+        rec = _Scoped(record_id="r-8", scopes=caller)
+        caller["read"] = 99
+        assert rec.scopes == {"read": 1}
+
+    def test_mapping_declared_field_rejects_a_non_mapping(self) -> None:
+        @dataclass(frozen=True)
+        class _Scoped(SerializableRecord):
+            SCHEMA_VERSION = 1
+
+            record_id: str
+            scopes: Mapping[str, int]
+
+        with pytest.raises(QcaeSerializationError, match="declared as a mapping"):
+            _Scoped(record_id="r-9", scopes=("read",))
+
+    def test_set_declared_field_freezes_and_round_trips(self) -> None:
+        @dataclass(frozen=True)
+        class _Tagged(SerializableRecord):
+            SCHEMA_VERSION = 1
+
+            record_id: str
+            labels: set
+
+        caller = {"alpha", "beta"}
+        rec = _Tagged(record_id="r-10", labels=caller)
+        caller.add("GAMMA")
+        assert rec.labels == frozenset({"alpha", "beta"})
+        # JSON has no set form: the sorted array is the deterministic
+        # encoding, and from_dict rebuilds the frozenset it declares.
+        assert rec.to_dict()["labels"] == ["alpha", "beta"]
+        rebuilt = _Tagged.from_dict(rec.to_dict())
+        assert rebuilt.labels == frozenset({"alpha", "beta"})
+        assert rebuilt == rec
+
+    def test_worker_result_budget_used_holds_under_freezing(self) -> None:
+        """The audit's flagged path, as a real record.
+
+        ``WorkerResult.validate`` checks ``budget_used`` with a subclass
+        ``getattr`` check outside the base-class loop; the probe showed a
+        caller mutation previously reached the field and moved the digest.
+        Freezing must hold while that validator keeps accepting the frozen
+        shape and the round trip stays exact.
+        """
+        caller = {"attempts": 3}
+        result = WorkerResult(
+            step_id="step-1", job_id="job-1", status=WorkerStatus.SUCCESS,
+            budget_used=caller,
+        )
+        digest = result.digest()
+        caller["attempts"] = 99
+        result.validate()
+        assert dict(result.budget_used) == {"attempts": 3}
+        assert result.digest() == digest
+        rebuilt = WorkerResult.from_dict(result.to_dict())
+        assert rebuilt == result
+        assert dict(rebuilt.budget_used) == {"attempts": 3}
