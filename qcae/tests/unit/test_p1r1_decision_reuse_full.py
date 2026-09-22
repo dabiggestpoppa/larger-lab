@@ -118,6 +118,44 @@ class TestRepositoryRevisionInventory:
             "sufficient_without_discovery": False,
         }
 
+    def test_every_wiring_shape_answers_without_raising(self, env) -> None:
+        """No wiring shape may raise, and the inventory keys must not vary.
+
+        Regression guard for the defect class this policy produced: one
+        retrieval method guarded an absent component and its sibling did not.
+        The policy now has a single owner, so every shape answers.
+        """
+        conn, caps, repos, neg = env
+        caps.add_contract(_contract())
+        caps.add_atom(_atom())
+        caps.add_candidate(_candidate())
+        conn.commit()
+
+        shapes = {
+            "all components absent": SqliteRegistryQuery(None, None, None, None),
+            "capabilities only": SqliteRegistryQuery(
+                None, None, None, None, capability_registry=caps),
+            "capabilities and repositories, no negatives": SqliteRegistryQuery(
+                None, None, None, None, capability_registry=caps,
+                repository_registry=repos),
+            "negatives only": SqliteRegistryQuery(None, None, neg, None),
+        }
+        reference_keys = None
+        for label, query in shapes.items():
+            findings = query.internal_first_findings(
+                "CAP-DR-001", "CAP-DR-001", "1")
+            assert findings["capability_id"] == "CAP-DR-001", label
+            assert set(findings) == {"capability_id", "categories", "detail"}, label
+            assert set(query.decision_reuse_findings(
+                "CAP-DR-001", "CAP-DR-001", "1")) == {
+                    "active_receipts", "positive_knowledge", "negative_blocks",
+                    "stale_evidence", "sufficient_without_discovery",
+                }, label
+            keys = set(query.known_capability_state("CAP-DR-001"))
+            if reference_keys is None:
+                reference_keys = keys
+            assert keys == reference_keys, label
+
     def test_no_repository_registry_returns_empty_inventory(self, env) -> None:
         """Without a repository registry wired, the key is present but empty —
         shape is stable regardless of wiring."""

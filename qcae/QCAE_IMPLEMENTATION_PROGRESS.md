@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P3 — IN PROGRESS at `c2174553` (I0 + C01–C04 landed; 1247/1247 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, report assembler, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
+**P3 — IN PROGRESS at `236ca195` (I0 + C01–C04 landed, plus R1–R3 repairs + A1 structure pass; 1258/1258 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, report assembler, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
 
 ### P3-I0 — Phase Start / Plan Lock (this commit)
 
@@ -52,6 +52,24 @@
 - **MINOR (accepted) — P1 surface maturity.** The plan consumes `RegistryQuery` only; no new persistence engine is added in P3 tranche 1 (ADR-0006 remains the single metadata engine).
 
 **Authority needs:** no new authority class. Discovery is read-only against local durable state and (later) policy-gated egress; it can propose, never enact, contract changes (2.1.14) and can never approve acquisition (2.7.4).
+
+### P3-A1 — Structure pass: retrieval query + error boundary (shape only)
+
+No capability added; behavior preserved except three wiring shapes that previously raised.
+
+**Ownership, as it now stands.** Later passes should extend these owners rather than adding parallel machinery:
+
+| Concern | Owner |
+| --- | --- |
+| **Partial-wiring policy** (an absent component contributes empty findings, never `AttributeError`) | `SqliteRegistryQuery._optional_call` — the single owner. No retrieval method may branch on wiring. |
+| Shared derivations over durable state: matched active receipts, contract versions, atom ids, repository revisions, `repo:` source-ref parse | `SqliteRegistryQuery` private accessors + module-level `_repo_id` |
+| 9.7 retrieval-order query (three read-only findings methods) | `SqliteRegistryQuery`, typed against the `core/ports` abstractions, not concrete SQLite repos |
+| Connection open: path validation, pragmas, schema, version guard, typed open failures | `open_metadata_db` (`store_factory`) |
+| Mapping expected operator errors to stable exit codes (2 = rejected/unknown, 3 = worker unavailable, 4 = budget) | `main()` in `interfaces/cli/__main__.py`; runtime construction sits **inside** that boundary |
+
+**Normalizations (the only behavior changes), both in shapes that previously raised:** (1) `internal_first_findings` no longer crashes when capabilities are wired but negatives are not — it now answers the documented empty shape, completing the policy above; (2) `known_capability_state` returns the same key set under every wiring shape, so callers never branch on configuration. Construction contract is unchanged: four positional components remain required (all typed `Optional`), so `SqliteRegistryQuery()` still rejects. Regression guard: `test_every_wiring_shape_answers_without_raising`.
+
+**Deferred (unchanged, already classified):** the freshness lookup in `SqliteRegistryQuery._stale_evidence_ids` reads the lifecycle log's connection directly, because the frozen `LifecycleLogRepository` port exposes no enumeration — recorded in the P1-R1 freeze manifest as MINOR with trigger "P2 job runtime". Collapsing it requires widening a frozen port; do that as its own reviewed change, not inside a shape pass.
 
 ### P2-R4 — True Crash Durability + Durable Approval + Scheduling Closure (SEALED at `f2fc7757`)
 

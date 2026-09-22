@@ -13,12 +13,15 @@ from typing import List, Optional
 from qcae.core.errors import QcaeValidationError
 from qcae.core.knowledge import NegativeKnowledge, PositiveKnowledge
 from qcae.core.knowledge.memory import NegativeKnowledgeType
+from qcae.core.ports.capability_registry import CapabilityRegistryPort
+from qcae.core.ports.evidence_registry import LifecycleLogRepository
 from qcae.core.ports.knowledge_registry import (
     NegativeKnowledgeRepository,
     PositiveKnowledgeRepository,
     ReceiptRepository,
     RegistryQuery,
 )
+from qcae.core.ports.repository_registry import RepositoryRegistryPort
 from qcae.core.receipts import CapabilityReceipt, ReceiptState
 
 __all__ = [
@@ -61,6 +64,11 @@ CREATE TABLE IF NOT EXISTS capability_receipt (
 CREATE INDEX IF NOT EXISTS ix_rcpt_capability ON capability_receipt(capability_id);
 CREATE INDEX IF NOT EXISTS ix_rcpt_state ON capability_receipt(state);
 """
+
+
+def _repo_id(source_ref: str) -> Optional[str]:
+    """Repository id from a ``repo:<id>`` candidate source ref, else ``None``."""
+    return source_ref[len("repo:"):] if source_ref.startswith("repo:") else None
 
 
 def _decode(row, record_id: str, builder):
@@ -231,16 +239,29 @@ class SqliteReceiptRepository(ReceiptRepository):
 
 
 class SqliteRegistryQuery(RegistryQuery):
-    """Composes the repositories into the 9.7 retrieval-order query."""
+    """Composes the repositories into the 9.7 retrieval-order query.
+
+    Every component is optional, because **partial wiring is a valid shape**
+    (P1-R1 continuation §9/§11): a query assembled with only some repositories
+    present answers with empty findings for the absent ones rather than raising.
+    That rule has exactly one owner, :meth:`_optional_call`, so no retrieval
+    method branches on wiring and none can forget to. The shared derivations
+    below (matched receipts, contract versions, atom ids, repository revisions)
+    are likewise defined once and read by every method that needs them.
+
+    Deferred debt (P1-R1 freeze manifest, MINOR): the freshness lookup reads
+    the lifecycle log's connection directly, because the frozen
+    ``LifecycleLogRepository`` port exposes no enumeration.
+    """
 
     def __init__(
         self,
-        receipts: SqliteReceiptRepository,
-        positive: SqlitePositiveKnowledgeRepository,
-        negative: SqliteNegativeKnowledgeRepository,
-        evidence_freshness,  # LifecycleLogRepository
-        capability_registry=None,  # CapabilityRegistryPort (P1-R1 §11)
-        repository_registry=None,  # RepositoryRegistryPort (P1-R1 continuation §8)
+        receipts: Optional[ReceiptRepository],
+        positive: Optional[PositiveKnowledgeRepository],
+        negative: Optional[NegativeKnowledgeRepository],
+        evidence_freshness: Optional[LifecycleLogRepository],
+        capability_registry: Optional[CapabilityRegistryPort] = None,
+        repository_registry: Optional[RepositoryRegistryPort] = None,
     ) -> None:
         self._receipts = receipts
         self._positive = positive
@@ -249,36 +270,83 @@ class SqliteRegistryQuery(RegistryQuery):
         self._capabilities = capability_registry
         self._repositories = repository_registry
 
-    def decision_reuse_findings(self, capability_id: str, contract_id: str, contract_version: str) -> dict:
-        # Absent repositories contribute empty findings, not an AttributeError:
-        # this is the third consumer of the same optional wiring, and
-        # ``internal_first_findings``/``known_capability_state`` already treat a
-        # partially wired query as a valid shape (§9/§11).
-        active = self._receipts.active_for_capability(capability_id) \
-            if self._receipts is not None else []
-        matched_receipts = [
-            r for r in active
+    # -- partial-wiring policy, in one place ---------------------------------
+
+    @staticmethod
+    def _optional_call(component, method: str, *args, default=()):
+        """Ask an optional component; absent wiring contributes ``default``."""
+        if component is None:
+            return default
+        return getattr(component, method)(*args)
+
+    # -- shared derivations --------------------------------------------------
+
+    def _matched_active_receipts(self, capability_id: str, contract_id: str,
+                                 contract_version: str) -> List[CapabilityReceipt]:
+        """Active receipts of this capability issued under this exact contract."""
+        return [
+            r for r in self._optional_call(
+                self._receipts, "active_for_capability", capability_id)
             if r.contract_id == contract_id and r.contract_version == contract_version
         ]
-        pos = [
-            k for k in (self._positive.find_by_contract(contract_id, contract_version)
-                        if self._positive is not None else ())
+
+    def _contract_versions(self, capability_id: str) -> List[str]:
+        return [
+            c.contract_version for c in self._optional_call(
+                self._capabilities, "list_contract_versions", capability_id)
+        ]
+
+    def _atom_ids(self, capability_id: str) -> List[str]:
+        """Atoms defining this capability, de-duplicated and ordered."""
+        atoms = self._optional_call(
+            self._capabilities, "list_atoms_for_capability", capability_id)
+        return sorted({a.atom_id for a in atoms})
+
+    def _candidates_for_atom(self, atom_id: str) -> list:
+        return list(self._optional_call(
+            self._capabilities, "list_candidates_for_atom", atom_id))
+
+    def _stored_revisions(self, repo_id: str) -> List[str]:
+        """Revisions this repository registry holds for one repository."""
+        return sorted(
+            r.revision for r in self._optional_call(
+                self._repositories, "list_revisions", repo_id)
+        )
+
+    def _repository_revisions(self, atom_ids: List[str]) -> dict:
+        """Revisions stored for the repositories the known candidates sit in."""
+        revisions: dict = {}
+        for atom_id in atom_ids:
+            for cand in self._candidates_for_atom(atom_id):
+                repo_id = _repo_id(cand.source_ref)
+                if repo_id is None:
+                    continue
+                stored = self._stored_revisions(repo_id)
+                if stored:
+                    revisions[repo_id] = stored
+        return revisions
+
+    def decision_reuse_findings(self, capability_id: str, contract_id: str,
+                                contract_version: str) -> dict:
+        """9.7 retrieval-order layers for one request."""
+        matched = self._matched_active_receipts(
+            capability_id, contract_id, contract_version)
+        positive = [
+            k for k in self._optional_call(
+                self._positive, "find_by_contract", contract_id, contract_version)
             if k.material
         ]
-        blocks = [
-            n for n in (self._negative.active()
-                        if self._negative is not None else ())
+        blocking = [
+            n for n in self._optional_call(self._negative, "active")
             if not n.retry_allowed
         ]
-        stale = [
-            ev_id for ev_id in self._stale_evidence_ids()
-        ]
         return {
-            "active_receipts": [r.receipt_id for r in matched_receipts],
-            "positive_knowledge": [k.record_id for k in pos],
-            "negative_blocks": [n.record_id for n in blocks],
-            "stale_evidence": stale,
-            "sufficient_without_discovery": bool(matched_receipts) and bool(pos) and not blocks,
+            "active_receipts": [r.receipt_id for r in matched],
+            "positive_knowledge": [k.record_id for k in positive],
+            "negative_blocks": [n.record_id for n in blocking],
+            "stale_evidence": self._stale_evidence_ids(),
+            "sufficient_without_discovery": (
+                bool(matched) and bool(positive) and not blocking),
         }
 
     def known_capability_state(self, capability_id: str) -> dict:
@@ -287,60 +355,42 @@ class SqliteRegistryQuery(RegistryQuery):
         Pure retrieval over durable registries; never mutates, never searches
         externally, never invents capability semantics.
         """
-        state: dict = {
-            "contract_versions": [],
-            "latest_contract_version": None,
-            "atom_ids": [],
-            "composite_member_count": None,
-            "candidate_refs": [],
+        versions = self._contract_versions(capability_id)
+        latest = max(versions) if versions else None
+        atom_ids = self._atom_ids(capability_id)
+        composite = None
+        if latest is not None:
+            composite = self._optional_call(
+                self._capabilities, "get_composite", capability_id, latest,
+                default=None)
+        # Every wiring shape returns the same keys, absent components included:
+        # callers read this inventory without branching on configuration.
+        return {
+            "contract_versions": versions,
+            "latest_contract_version": latest,
+            "atom_ids": atom_ids,
+            "composite_member_count": (
+                len(composite.members) if composite is not None else None),
+            "candidate_refs": sorted({
+                cand.candidate_id
+                for atom_id in atom_ids
+                for cand in self._candidates_for_atom(atom_id)
+            }),
+            "repository_revisions": self._repository_revisions(atom_ids),
         }
-        if self._capabilities is None:
-            return state
-        contracts = self._capabilities.list_contract_versions(capability_id)
-        state["contract_versions"] = [c.contract_version for c in contracts]
-        state["latest_contract_version"] = (
-            max(state["contract_versions"]) if state["contract_versions"] else None
-        )
-        atoms = self._capabilities.list_atoms_for_capability(capability_id)
-        state["atom_ids"] = sorted({a.atom_id for a in atoms})
-        if state["latest_contract_version"] is not None:
-            composite = self._capabilities.get_composite(
-                capability_id, state["latest_contract_version"])
-            if composite is not None:
-                state["composite_member_count"] = len(composite.members)
-        candidate_ids = set()
-        for atom_id in state["atom_ids"]:
-            for cand in self._capabilities.list_candidates_for_atom(atom_id):
-                candidate_ids.add(cand.candidate_id)
-        state["candidate_refs"] = sorted(candidate_ids)
-        # repository revisions the known candidates are located in (ADR-0007)
-        repo_revisions: dict = {}
-        if self._repositories is not None:
-            for atom_id in state["atom_ids"]:
-                for cand in self._capabilities.list_candidates_for_atom(atom_id):
-                    ref = cand.source_ref
-                    if ref.startswith("repo:"):
-                        repo_id = ref[len("repo:"):]
-                        revs = self._repositories.list_revisions(repo_id)
-                        if revs:
-                            repo_revisions[repo_id] = sorted(
-                                r.revision for r in revs)
-        state["repository_revisions"] = repo_revisions
-        return state
 
     def internal_first_findings(self, capability_id: str, contract_id: str,
                                 contract_version: str) -> dict:
         """P1-R1 continuation §9: structured A–F internal-first classification.
-        Pure retrieval; the P3 planner decides what to do with it."""
+
+        Pure retrieval; the P3 planner decides what to do with it.
+        """
         categories: List[str] = []
         detail: dict = {}
 
-        # A — capability active
-        active = self._receipts.active_for_capability(capability_id) \
-            if self._receipts is not None else []
-        matched = [r for r in active
-                   if r.contract_id == contract_id
-                   and r.contract_version == contract_version]
+        # A — capability active under this contract
+        matched = self._matched_active_receipts(
+            capability_id, contract_id, contract_version)
         if matched:
             categories.append("CAPABILITY_ACTIVE")
             detail["CAPABILITY_ACTIVE"] = [r.receipt_id for r in matched]
@@ -351,51 +401,40 @@ class SqliteRegistryQuery(RegistryQuery):
             categories.append("EVIDENCE_STALE")
             detail["EVIDENCE_STALE"] = stale
 
-        # C — candidate previously failed
-        blocked: List[str] = []
-        if self._capabilities is not None:
-            atoms = self._capabilities.list_atoms_for_capability(capability_id)
-            atom_ids = sorted({a.atom_id for a in atoms})
-            for n in self._negative.active():
-                if not n.retry_allowed and n.subject_id in atom_ids:
-                    blocked.append(n.record_id)
-            if blocked:
-                categories.append("CANDIDATE_PREVIOUSLY_FAILED")
-                detail["CANDIDATE_PREVIOUSLY_FAILED"] = blocked
+        atom_ids = self._atom_ids(capability_id)
 
-            # D — revision changed (ADR-0007): candidate's claimed revision is
-            # absent from the located repository's stored revisions
-            revision_changed: List[str] = []
-            if self._repositories is not None:
-                for atom_id in atom_ids:
-                    for cand in self._capabilities.list_candidates_for_atom(atom_id):
-                        ref = cand.source_ref
-                        if not ref.startswith("repo:"):
-                            continue
-                        repo_id = ref[len("repo:"):]
-                        stored = {r.revision
-                                  for r in self._repositories.list_revisions(repo_id)}
-                        if stored and cand.revision not in stored:
-                            revision_changed.append(cand.candidate_id)
-            if revision_changed:
-                categories.append("REVISION_CHANGED")
-                detail["REVISION_CHANGED"] = sorted(set(revision_changed))
+        # C — candidate previously failed for one of this capability's atoms
+        blocked = [
+            n.record_id
+            for n in self._optional_call(self._negative, "active")
+            if not n.retry_allowed and n.subject_id in atom_ids
+        ]
+        if blocked:
+            categories.append("CANDIDATE_PREVIOUSLY_FAILED")
+            detail["CANDIDATE_PREVIOUSLY_FAILED"] = blocked
 
-            # E — definition without implementation
-            if atom_ids and not any(
-                self._capabilities.list_candidates_for_atom(a) for a in atom_ids
-            ):
-                categories.append("DEFINITION_WITHOUT_IMPLEMENTATION")
-                detail["DEFINITION_WITHOUT_IMPLEMENTATION"] = atom_ids
-        else:
-            atom_ids = []
+        # D — revision changed (ADR-0007): a candidate's claimed revision is
+        # absent from the located repository's stored revisions
+        revision_changed: List[str] = []
+        for atom_id in atom_ids:
+            for cand in self._candidates_for_atom(atom_id):
+                repo_id = _repo_id(cand.source_ref)
+                if repo_id is None:
+                    continue
+                stored = set(self._stored_revisions(repo_id))
+                if stored and cand.revision not in stored:
+                    revision_changed.append(cand.candidate_id)
+        if revision_changed:
+            categories.append("REVISION_CHANGED")
+            detail["REVISION_CHANGED"] = sorted(set(revision_changed))
+
+        # E — definition without implementation
+        if atom_ids and not any(self._candidates_for_atom(a) for a in atom_ids):
+            categories.append("DEFINITION_WITHOUT_IMPLEMENTATION")
+            detail["DEFINITION_WITHOUT_IMPLEMENTATION"] = atom_ids
 
         # F — no internal knowledge at all
-        contracts_known = (
-            self._capabilities.list_contract_versions(capability_id)
-            if self._capabilities is not None else []
-        )
-        if not categories and not contracts_known:
+        if not categories and not self._contract_versions(capability_id):
             categories.append("NO_INTERNAL_KNOWLEDGE")
             detail["NO_INTERNAL_KNOWLEDGE"] = []
 
@@ -403,11 +442,13 @@ class SqliteRegistryQuery(RegistryQuery):
                 "detail": detail}
 
     def _stale_evidence_ids(self) -> List[str]:
-        rows = self._conn_freshness_rows()
-        return [r for r in rows]
+        """Evidence whose latest logged freshness is stale/revalidation-required.
 
-    def _conn_freshness_rows(self) -> List[str]:
-        # Freshness log holds only non-current states as latest entries.
+        The log holds only non-current states as latest entries, so current
+        evidence has no qualifying row. Reads the log's connection directly
+        because the frozen ``LifecycleLogRepository`` port exposes no
+        enumeration (P1-R1 freeze manifest, MINOR).
+        """
         conn = getattr(self._freshness, "_conn", None)
         if conn is None:
             return []

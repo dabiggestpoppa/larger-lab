@@ -53,17 +53,19 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
     SQLite database) is an operator error, not a crash: it surfaces as a typed
     ``QcaeValidationError`` naming the path so the CLI reports it.
     """
-    p = Path(path)
-    if path != ":memory:":
-        if p.is_dir():
-            raise QcaeValidationError(
-                f"metadata database path {p} is a directory, not a database file"
-            )
+    # ``target`` is None exactly for the in-memory database; ``label`` is what
+    # operator-facing messages call it.
+    target: Optional[Path] = None if path == ":memory:" else Path(path)
+    label = ":memory:" if target is None else str(target)
+    if target is not None and target.is_dir():
+        raise QcaeValidationError(
+            f"metadata database path {target} is a directory, not a database file"
+        )
     conn: Optional[sqlite3.Connection] = None
     try:
-        if path != ":memory:":
-            p.parent.mkdir(parents=True, exist_ok=True)
-        conn = sqlite3.connect(str(p) if path != ":memory:" else ":memory:")
+        if target is not None:
+            target.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(label)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA foreign_keys=ON")
@@ -88,6 +90,6 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
         if conn is not None:
             conn.close()
         raise QcaeValidationError(
-            f"metadata database at {p} could not be opened: {exc}"
+            f"metadata database at {label} could not be opened: {exc}"
         ) from exc
     return conn
