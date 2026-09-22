@@ -202,7 +202,7 @@ def test_postgres_promotion_failure_leaves_database_and_artifacts_unchanged(
     oc.assert_stack_converged(timeout_s=180, stable=2)
     bk = _seed_and_backup(tmp_path)
     _tamper_inventory_row_count(bk)
-    pg_before, art_before = _pg_truth(), _artifact_volume_sha()
+    art_before = _artifact_volume_sha()
     oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
                            "UPDATE backup_probe SET v='current' WHERE k='b1';"])
     pg_live = _pg_truth()

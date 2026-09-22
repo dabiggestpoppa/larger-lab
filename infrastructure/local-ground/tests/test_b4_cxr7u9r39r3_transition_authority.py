@@ -17,21 +17,28 @@ The bridge and the genuine promote/deny helpers are the ones proven in
 test_b4_cxr7u9r35_recovery_authority.py; this suite imports them rather than
 growing a second copy.
 """
+import hashlib
 import json
-import os
 from pathlib import Path
 
 import pytest
 
 from test_b4_cxr7u9r35_recovery_authority import (  # noqa: F401 — fixtures
-    _mutated, _promote_receipt, _write_inputs, bridge,
-    production_recovery_identity, pgrec)
+    _Bridge, _mutated, _promote_receipt, production_recovery_identity, pgrec)
 
 TRANSITION_FORMAT = pgrec.TRANSITION_FORMAT
 
 
+@pytest.fixture
+def bridge(monkeypatch):
+    """The deterministic engine bridge proven in the R35 suite, reused here:
+    every denial must be judged on the calls the refused invocation made."""
+    b = _Bridge()
+    b.install(monkeypatch)
+    return b
+
+
 def _tree_state(root):
-    import hashlib
     return {str(p): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in sorted(Path(root).rglob("*")) if p.is_file()}
 
@@ -45,10 +52,9 @@ def _transition(bridge, phase, path, inv, sha):
     return fn(str(path), str(inv), str(sha), pgrec.DB, pgrec.USER, pgrec.CONTAINER, None)
 
 
-def _promoted(bridge, tmp_path, monkeypatch, name="promote.json"):
-    """One genuine promotion in this test's approved backup root. Safe to call
-    more than once in a test: the root is reused, each promotion gets its own
-    operation, and each receipt gets its own name."""
+def _inputs(tmp_path, monkeypatch):
+    """This test's approved backup root: inventory + its SHA + an archive.
+    Reusable within one test, so several promotions can be driven."""
     roots = tmp_path / "roots"
     roots.mkdir(exist_ok=True)
     inv = roots / "inventory.json"
@@ -56,13 +62,18 @@ def _promoted(bridge, tmp_path, monkeypatch, name="promote.json"):
                                "table_count": 1,
                                "tables": [{"name": "public.widgets", "row_count": 3,
                                            "fingerprint": "deadbeef"}]}), encoding="utf-8")
-    import hashlib
     sha = roots / "inventory.sha256"
     sha.write_text(hashlib.sha256(inv.read_text(encoding="utf-8").encode()).hexdigest(),
                    encoding="utf-8")
     archive = roots / "archive.dump"
     archive.write_bytes(b"PGDMP")
     monkeypatch.setenv("OCE_BACKUP_ROOTS", str(roots))
+    return inv, sha, archive
+
+
+def _promoted(bridge, tmp_path, monkeypatch, name="promote.json"):
+    """One genuine promotion, with the receipt written under `name`."""
+    inv, sha, archive = _inputs(tmp_path, monkeypatch)
     bridge.remote_sha = pgrec.sha256_file(str(archive))
     receipt, path = _promote_receipt(bridge, inv, sha, archive, name)
     return receipt, path, inv, sha
@@ -237,7 +248,7 @@ def test_a_preflight_refusal_opens_no_operation_state_at_all(
     """A promotion refused BEFORE it touches recovery-durable state is not an
     operation: its receipt names an operation id, but no record exists, so it
     holds no transition authority and leaves the governed store empty."""
-    inv, sha, _archive = _write_inputs(tmp_path, monkeypatch)
+    inv, sha, _archive = _inputs(tmp_path, monkeypatch)
     governed = Path(pgrec._recovery_state_dir())
     out = pgrec.phase_promote(str(tmp_path / "outside.dump"), str(inv), str(sha),
                               pgrec.DB, pgrec.USER, pgrec.CONTAINER, None)
@@ -258,7 +269,7 @@ def test_a_promotion_that_fails_after_staging_records_a_terminal_failure(
         bridge, tmp_path, monkeypatch):
     """Once the promotion has begun, a failure is a FAILED operation: the
     record offers no transition, and its receipt is refused by content too."""
-    inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
+    inv, sha, archive = _inputs(tmp_path, monkeypatch)
     bridge.remote_sha = pgrec.sha256_file(str(archive))
     monkeypatch.setattr(pgrec, "_verify_db",
                         lambda *a, **k: (False, ["staging truth broken"], {}, None))

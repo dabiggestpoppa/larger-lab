@@ -307,6 +307,13 @@ def main():
         add("gate-16-container-tests-executed", "container-backed tests execute in CI",
             cb.get("executed", 0) >= 0, "local mode: not required")
 
+    # 16c. The test registry is generated from REAL collection: duplicate node
+    # ids would make every count above ambiguous, so they are refused here.
+    node_ids = [r.get("nodeid", "") for r in ts.get("tests", [])]
+    add("gate-16c-unique-node-ids", "test registry has no duplicate node IDs",
+        bool(node_ids) and len(node_ids) == len(set(node_ids)) and all(node_ids),
+        f"collected={len(node_ids)} unique={len(set(node_ids))}")
+
     # 17-18. Adversarial totals match actual entries and all pass
     adv = ev.json(ADVERSARIAL_RESULTS_NAME)
     adv_entries = adv.get("checks", [])
@@ -335,6 +342,36 @@ def main():
         "test_ctl_structured_logs_use_json_file_driver": "structured json-file logs verified",
         "test_ctl_safe_shutdown_and_verified_cleanup": "safe shutdown + restore + cleanup",
         "test_ctl_no_forbidden_public_ports": "no forbidden public ports",
+        # R39: the recovery-transaction closure proofs are part of the
+        # authoritative selection, not merely present in the suite.
+        "test_hostile_recovery_state_dir_cannot_grant_write_authority":
+            "receipt-write authority is program identity",
+        "test_existing_receipt_is_refused_before_any_destructive_step":
+            "an existing receipt is never overwritten",
+        "test_precreated_predictable_temporary_is_never_used":
+            "no predictable receipt temporary identity",
+        "test_promotion_mints_one_durable_operation_in_the_governed_boundary":
+            "one durable recovery operation per promotion",
+        "test_replaying_a_transition_with_the_same_receipt_is_denied_before_any_call":
+            "a replayed transition is denied with no mutation",
+        "test_structurally_valid_substitution_is_denied_by_the_content_binding":
+            "receipt substitution denied by content binding",
+        "test_unregistered_receipt_is_denied":
+            "an unregistered receipt is not authority",
+        "test_an_interrupted_transition_leaves_the_authority_spent":
+            "an interrupted transition spends its authority",
+        "test_successful_full_replace_sources_both_stores_from_one_backup":
+            "both durable stores committed from one backup",
+        "test_postgres_promotion_failure_leaves_database_and_artifacts_unchanged":
+            "promotion failure leaves both stores untouched",
+        "test_artifact_switch_failure_restores_both_stores":
+            "artifact switch failure restores both stores",
+        "test_artifact_verification_failure_restores_both_stores":
+            "artifact verification failure restores both stores",
+        "test_interrupted_full_replace_commits_nothing":
+            "interrupted full replace commits nothing",
+        "test_finalize_replay_against_the_real_stack_is_denied":
+            "replayed finalize denied against the real stack",
     }
     for tname, label in must_pass.items():
         outcome = test_outcomes.get(tname, "missing")
