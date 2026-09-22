@@ -49,6 +49,8 @@ def update_saturation(
     previous_family_ids: Iterable[str] = (),
     previous_covered_atoms: Iterable[str] = (),
     novel_atom_scope: Iterable[str] = (),
+    negative_observation_ids: Iterable[str] = (),
+    previous_negative_observation_ids: Iterable[str] = (),
     saturated: bool = False,
     saturation_reason: str = "",
 ) -> SaturationMetrics:
@@ -99,13 +101,26 @@ def update_saturation(
         new_atoms.update(claimed - known_atoms)
 
     inspected = 0
-    failure_information = 0
     for outcome in outcomes:
         outcome.validate()
         if outcome.counts_toward_saturation:
             inspected += outcome.results_inspected
-        if outcome.status == AdapterStatus.NO_RESULTS or outcome.status in FAILURE_STATUSES:
-            failure_information += 1
+    # P3-R4C4: failure information is identity-deduplicated. The caller hands
+    # over the deduplicated observation ids seen this pass and the ones already
+    # known; only identities not known before are new negative knowledge, so a
+    # repeated identical failure or empty search cannot inflate the
+    # marginal-novelty numerator the negligible-novelty stop law reads. A
+    # caller without typed observations still gets within-pass identity dedup
+    # over (query, adapter, status) instead of a raw per-outcome count.
+    if negative_observation_ids:
+        failure_information = len(
+            set(negative_observation_ids) - set(previous_negative_observation_ids))
+    else:
+        failure_information = len({
+            (o.query_id, o.adapter_id, o.status.value)
+            for o in outcomes
+            if o.status == AdapterStatus.NO_RESULTS or o.status in FAILURE_STATUSES
+        })
 
     metrics = SaturationMetrics(
         queries_executed=previous.queries_executed + len(outcomes),

@@ -26,6 +26,7 @@ from enum import StrEnum
 from typing import Dict, Tuple
 
 from qcae.core.discovery.candidate import CanonicalCandidate
+from qcae.core.discovery.lead import AdapterStatus
 from qcae.core.discovery.plan import (
     ContractAmendmentProposal,
     SaturationMetrics,
@@ -37,6 +38,7 @@ from qcae.core.serialization import (
     SerializableRecord,
     coerce_enum,
     coerce_enum_tuple,
+    sha256_of,
 )
 from qcae.core.validation import (
     require_enum,
@@ -53,14 +55,110 @@ __all__ = [
     "CandidateFamily",
     "DiscoveryReport",
     "EscalationEntry",
+    "NegativeObservation",
     "NextAction",
     "PrefilterDecision",
     "PrefilterDecisionRecord",
     "Priority",
+    "StopConditionAssessment",
     "StopRecommendation",
     "StopRecommendationState",
     "make_discovery_report",
 ]
+
+
+@dataclass(frozen=True)
+class NegativeObservation(SerializableRecord):
+    """One identity-deduplicated negative result (P3-R4C4; canon 2.1.13).
+
+    A repeated observation of the same condition is not new knowledge: the
+    record's ``observation_id`` is derived from the safe applicable combination
+    of query identity, atom/family, source class, adapter, provider revision,
+    status and bounded query scope, so two identical observations share one id
+    and a materially new state derives a different one. ``NO_RESULTS`` stays a
+    distinct status from provider failure, and an observation never proves
+    capability absence — it is negative knowledge, not evidence of nonexistence.
+    """
+
+    SCHEMA_VERSION = 1
+
+    query_id: str
+    atom_id: str
+    family_id: str
+    source_class: SourceClass
+    adapter_id: str
+    status: AdapterStatus
+    discovery_plan_id: str
+    #: Optional safe scope dimensions: two observations only share an identity
+    #: when these also agree.
+    provider_revision: str = ""
+    bounded_query_scope: str = ""
+    evidence_refs: Tuple[str, ...] = ()
+    #: Derived last, from everything above (see ``identity_fields``).
+    observation_id: str = ""
+    first_seen_at: str = ""
+    last_seen_at: str = ""
+    observed_count: int = 1
+
+    _COERCIONS = {
+        "source_class": lambda v: coerce_enum(v, SourceClass),
+        "status": lambda v: coerce_enum(v, AdapterStatus),
+        "evidence_refs": tuple,
+    }
+
+    #: The fields the stable identity derives from. Prose (notes, rationale) is
+    #: deliberately excluded: identity is what was observed, not what was said.
+    @property
+    def identity_fields(self) -> dict:
+        return {
+            "query_id": self.query_id,
+            "atom_id": self.atom_id,
+            "family_id": self.family_id,
+            "source_class": self.source_class.value,
+            "adapter_id": self.adapter_id,
+            "provider_revision": self.provider_revision,
+            "status": self.status.value,
+            "bounded_query_scope": self.bounded_query_scope,
+        }
+
+    def __post_init__(self) -> None:
+        if not self.observation_id:
+            object.__setattr__(
+                self, "observation_id", f"neg-{sha256_of(self.identity_fields)[:24]}"
+            )
+
+    def validate(self) -> None:
+        require_identifier(self.observation_id, "observation_id")
+        require_identifier(self.query_id, "query_id")
+        require_identifier(self.atom_id, "atom_id")
+        require_identifier(self.family_id, "family_id")
+        require_enum(self.source_class, SourceClass, "source_class")
+        require_non_empty_str(self.adapter_id, "adapter_id")
+        require_enum(self.status, AdapterStatus, "status")
+        require_identifier(self.discovery_plan_id, "discovery_plan_id")
+        require_str_list(self.evidence_refs, "evidence_refs")
+        if not isinstance(self.observed_count, int) or isinstance(
+            self.observed_count, bool
+        ) or self.observed_count < 1:
+            raise QcaeValidationError(
+                f"observed_count must be an integer >= 1, got {self.observed_count!r}"
+            )
+        if self.first_seen_at:
+            require_rfc3339_utc(self.first_seen_at, "first_seen_at")
+        if self.last_seen_at:
+            require_rfc3339_utc(self.last_seen_at, "last_seen_at")
+            if self.first_seen_at and self.last_seen_at < self.first_seen_at:
+                raise QcaeValidationError(
+                    "last_seen_at cannot precede first_seen_at"
+                )
+        # Identity integrity: the carried id must still derive from the fields.
+        if self.observation_id != f"neg-{sha256_of(self.identity_fields)[:24]}":
+            raise QcaeValidationError(
+                f"observation_id {self.observation_id!r} does not derive from the "
+                "observation's identity fields; negative knowledge with a foreign "
+                "identity cannot be deduplicated"
+            )
+
 
 #: Investigation waves (canon 2.7.14): 1 = cheap/high-information, 2 = promising
 #: and diverse, 3 = expensive/uncertain only if still needed.
@@ -435,6 +533,10 @@ class DiscoveryReport(SerializableRecord):
     coverage_notes: Tuple[str, ...] = ()
     partial_search_notes: Tuple[str, ...] = ()
     prefilter_decisions: Tuple[PrefilterDecisionRecord, ...] = ()
+    #: Identity-deduplicated negative knowledge (P3-R4C4): one typed record per
+    #: distinct NO_RESULTS / failure condition, with repeat counts — the report
+    #: carries the observations themselves, not only prose strings.
+    negative_observations: Tuple[NegativeObservation, ...] = ()
     negative_findings: Tuple[str, ...] = ()
     remaining_uncertainties: Tuple[str, ...] = ()
     amendment_proposals: Tuple[ContractAmendmentProposal, ...] = ()
@@ -454,6 +556,7 @@ class DiscoveryReport(SerializableRecord):
         "known_candidates": tuple,
         "coverage_notes": tuple,
         "partial_search_notes": tuple,
+        "negative_observations": tuple,
         "negative_findings": tuple,
         "remaining_uncertainties": tuple,
     }
@@ -464,6 +567,7 @@ class DiscoveryReport(SerializableRecord):
         "stop_recommendation": StopRecommendation,
         "candidate_families": CandidateFamily,
         "escalation_queue": EscalationEntry,
+        "negative_observations": NegativeObservation,
         "prefilter_decisions": PrefilterDecisionRecord,
         "amendment_proposals": ContractAmendmentProposal,
     }
@@ -567,6 +671,21 @@ class DiscoveryReport(SerializableRecord):
                 )
         seen_candidates = [entry.candidate_id for entry in self.escalation_queue]
         require_no_duplicates(seen_candidates, "escalation_queue candidate_id")
+
+        negative_ids: set = set()
+        for observation in self.negative_observations:
+            observation.validate()
+            if observation.observation_id in negative_ids:
+                raise QcaeValidationError(
+                    f"duplicate negative observation {observation.observation_id!r}"
+                )
+            negative_ids.add(observation.observation_id)
+            if observation.discovery_plan_id != self.discovery_plan_id:
+                raise QcaeValidationError(
+                    f"negative observation {observation.observation_id!r} was made "
+                    f"for plan {observation.discovery_plan_id!r}, not this report's "
+                    f"{self.discovery_plan_id!r}"
+                )
 
         for decision in self.prefilter_decisions:
             decision.validate()

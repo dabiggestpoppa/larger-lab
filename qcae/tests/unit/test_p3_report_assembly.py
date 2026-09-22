@@ -484,6 +484,128 @@ class TestStopAuthority:
         assert all(a.rationale for a in report.stop_recommendation.assessments)
 
 
+class TestNegativeKnowledge:
+    """P3-R4C4 — repeated observations are not new knowledge."""
+
+    def _spent_pass(self, *, status=AdapterStatus.NO_RESULTS, n=3):
+        outcomes = tuple(
+            _outcome(f"q-{i}", status=status, results=0) for i in range(n))
+        report, _c, _r = _run(leads=(), outcomes=outcomes)
+        return report
+
+    def test_repeated_identical_no_results_is_one_observation(self) -> None:
+        """N: the same planned query, repeated, is one negative observation."""
+        outcomes = tuple(
+            _outcome("q-repeat", status=AdapterStatus.NO_RESULTS, results=0)
+            for _ in range(4))
+        report, _c, _r = _run(leads=(), outcomes=outcomes)
+        assert len(report.negative_observations) == 1
+        observation = report.negative_observations[0]
+        assert observation.observed_count == 4
+        assert observation.status is AdapterStatus.NO_RESULTS
+
+    def test_repeated_failure_information_does_not_inflate_novelty(self) -> None:
+        """M: repeating one failing condition adds zero new failure information."""
+        first = self._spent_pass()
+        assert first.saturation_metrics.new_failure_information == 1
+        # Second pass over the same condition (same status, same query),
+        # handing off from the artifact: the identity repeats, so nothing new.
+        second_outcomes = tuple(
+            _outcome(f"q-{i}", status=AdapterStatus.NO_RESULTS, results=0)
+            for i in range(3))
+        second, _c, _r = _run(leads=(), outcomes=second_outcomes,
+                              previous_report=first)
+        assert (second.saturation_metrics.new_failure_information
+                == first.saturation_metrics.new_failure_information)
+        # A materially new condition (different status) IS new information.
+        third_outcomes = tuple(
+            _outcome(f"q-{i}", status=AdapterStatus.RATE_LIMITED, results=0)
+            for i in range(3))
+        third, _c2, _r2 = _run(leads=(), outcomes=third_outcomes,
+                               previous_report=second)
+        assert (third.saturation_metrics.new_failure_information
+                == second.saturation_metrics.new_failure_information + 1)
+
+    def test_repeated_identical_observations_carry_one_record(self) -> None:
+        """The deduplicated record carries its repeat count, not prose strings."""
+        report = self._spent_pass()
+        assert len(report.negative_observations) == 1
+        assert report.negative_observations[0].observed_count == 3
+
+    def test_materially_new_state_creates_a_new_observation(self) -> None:
+        """A different provider revision or status derives a different identity."""
+        from qcae.core.discovery.report import NegativeObservation
+
+        def _observation(**overrides):
+            fields = dict(
+                query_id="fam-behavioral:causal-ordering",
+                atom_id=ATOM_A,
+                family_id="fam-behavioral",
+                source_class=SourceClass.GITHUB_REPOSITORY_CODE,
+                adapter_id="adapter-github",
+                status=AdapterStatus.NO_RESULTS,
+                discovery_plan_id="plan-001",
+            )
+            fields.update(overrides)
+            return NegativeObservation(**fields)
+
+        base = _observation()
+        revised = _observation(provider_revision="abc123")
+        failed = _observation(status=AdapterStatus.PROVIDER_FAILURE)
+        assert (len({base.observation_id, revised.observation_id,
+                     failed.observation_id}) == 3)
+
+    def test_no_results_stays_distinct_from_provider_failure(self) -> None:
+        """An empty search is not a provider failure: status is in the identity."""
+        empty = self._spent_pass(status=AdapterStatus.NO_RESULTS)
+        failed = self._spent_pass(status=AdapterStatus.PROVIDER_FAILURE)
+        assert (empty.negative_observations[0].status
+                is AdapterStatus.NO_RESULTS)
+        assert (failed.negative_observations[0].status
+                is AdapterStatus.PROVIDER_FAILURE)
+        assert (empty.negative_observations[0].observation_id
+                != failed.negative_observations[0].observation_id)
+
+    def test_negative_knowledge_survives_serialization(self) -> None:
+        """The observations ride the artifact's JSON round trip intact."""
+        report = self._spent_pass()
+        reloaded = type(report).from_dict(json.loads(json.dumps(report.to_dict())))
+        assert reloaded.negative_observations == report.negative_observations
+        assert (reloaded.negative_observations[0].observation_id
+                == report.negative_observations[0].observation_id)
+
+    def test_observation_identity_is_verified_against_its_fields(self) -> None:
+        """A foreign or tampered identity is refused at validation."""
+        from qcae.core.discovery.report import NegativeObservation
+
+        observation = NegativeObservation(
+            query_id="fam-behavioral:causal-ordering",
+            atom_id=ATOM_A,
+            family_id="fam-behavioral",
+            source_class=SourceClass.GITHUB_REPOSITORY_CODE,
+            adapter_id="adapter-github",
+            status=AdapterStatus.NO_RESULTS,
+            discovery_plan_id="plan-001",
+        )
+        observation.validate()
+        with pytest.raises(QcaeValidationError, match="observation_id"):
+            replace(observation, observation_id="neg-forged").validate()
+
+    def test_failed_searches_cannot_manufacture_a_negligible_novelty_stop(
+            self) -> None:
+        """L (regression): failure-only passes stay CONTINUE."""
+        plan = make_discovery_plan(**plan_kwargs(stop_rules=(
+            StopRule(condition=StopCondition.BUDGET_CEILING_REACHED),
+            StopRule(condition=StopCondition.NON_DOMINATED_SET_SUFFICIENT),
+            StopRule(condition=StopCondition.NEGLIGIBLE_NOVELTY, threshold=0.1),
+        )))
+        outcomes = tuple(
+            _outcome(f"q-{i}", status=AdapterStatus.RATE_LIMITED, results=0)
+            for i in range(3))
+        report, _c, _r = _run(leads=(), outcomes=outcomes, plan=plan)
+        assert report.stop_recommendation.state.value == "CONTINUE"
+
+
 class TestNoClaimOutrunsItsEvidence:
     """A claim in the artifact must not survive beside evidence that refutes it.
 

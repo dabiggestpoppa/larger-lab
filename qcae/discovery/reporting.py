@@ -47,6 +47,7 @@ from qcae.core.discovery.plan import (
 from qcae.core.discovery.vocabulary import SourceClass
 from qcae.core.discovery.report import (
     DiscoveryReport,
+    NegativeObservation,
     PrefilterDecision,
     StopCondition,
     StopConditionAssessment,
@@ -110,7 +111,7 @@ def assert_external_execution_authorized(baseline, atom_ids) -> None:
 
 def _require_outcomes_bound_to_plan(
     outcomes: Sequence[AdapterOutcome], plan: DiscoveryPlan
-) -> Tuple[Tuple[ExecutedDiscoveryQuery, ...], set]:
+) -> Tuple[Tuple[ExecutedDiscoveryQuery, ...], set, dict]:
     """Every outcome binds to exactly one executed query of *this* plan (canon
     2.1.4/2.1.17 invariant 4).
 
@@ -136,6 +137,7 @@ def _require_outcomes_bound_to_plan(
     bound: List[ExecutedDiscoveryQuery] = []
     seen_query_ids: set = set()
     executed_atoms: set = set()
+    records_by_outcome: dict = {}
     for outcome in outcomes:
         record = outcome.execution_record
         if record is None:
@@ -239,8 +241,9 @@ def _require_outcomes_bound_to_plan(
         # already states, so only non-internal queries narrow or extend it.
         if record.source_class is not SourceClass.INTERNAL_REGISTRY_CODE:
             executed_atoms.add(record.atom_id)
+        records_by_outcome[id(outcome)] = record
         bound.append(record)
-    return tuple(bound), executed_atoms
+    return tuple(bound), executed_atoms, records_by_outcome
 
 
 
@@ -298,7 +301,8 @@ def assemble_discovery_report(
     for outcome in ran:
         outcome.validate()
     _require_sources_allocated(ran, plan)
-    _bound_records, executed_atom_set = _require_outcomes_bound_to_plan(ran, plan)
+    _bound_records, executed_atom_set, records_by_outcome = (
+        _require_outcomes_bound_to_plan(ran, plan))
     executed_scope = tuple(sorted(executed_atom_set))
 
     # The ranking piece is the authority on canonical identity; the outcomes are
@@ -322,6 +326,10 @@ def assemble_discovery_report(
         previously_known_candidates=previously_known_candidates,
     )
 
+    negative_observations = _negative_observations(
+        ran, records_by_outcome,
+        observed_at=created_at or "1970-01-01T00:00:00Z",
+    )
     metrics = update_saturation(
         previous_metrics if previous_metrics is not None else SaturationMetrics(),
         outcomes=ran,
@@ -337,6 +345,10 @@ def assemble_discovery_report(
         # P3-R4C2: novelty only accrues inside the baseline-authorized external
         # scope — an out-of-scope mention is not this plan's evidence.
         novel_atom_scope=tuple(baseline.external_target_atoms),
+        negative_observation_ids=(o.observation_id for o in negative_observations),
+        previous_negative_observation_ids=(
+            o.observation_id for o in previous_report.negative_observations
+        ) if previous_report is not None else (),
         saturated=saturated,
         saturation_reason=saturation_reason,
     )
@@ -376,6 +388,7 @@ def assemble_discovery_report(
         ),
         partial_search_notes=_partial_search_notes(ran),
         prefilter_decisions=tuple(ranking.prefilter_decisions),
+        negative_observations=negative_observations,
         negative_findings=_negative_findings(ran, baseline),
         remaining_uncertainties=_remaining_uncertainties(baseline, ranking),
         amendment_proposals=tuple(plan.amendment_proposals),
@@ -662,6 +675,67 @@ def _previous_knowledge_is_missing(
         or previous_metrics.new_atoms_covered
         or previous_metrics.new_specifications
     )
+
+
+def _negative_observations(
+    outcomes: Sequence[AdapterOutcome],
+    records_by_outcome: dict,
+    *,
+    observed_at: str,
+) -> Tuple[NegativeObservation, ...]:
+    """Identity-deduplicated negative knowledge (P3-R4C4; canon 2.1.13).
+
+    Every NO_RESULTS and failed search yields an observation whose stable
+    identity derives from the safe applicable combination of query identity,
+    atom/family, source class, adapter, provider revision, status and bounded
+    query scope. Two materially identical searches deduplicate into one record
+    (with a raised ``observed_count``), so repeated failures and repeated empty
+    searches cannot inflate ``new_failure_information`` — the marginal-novelty
+    numerator the negligible-novelty stop law reads. NO_RESULTS stays distinct
+    from provider failure because status is part of the identity.
+    """
+    merged: dict = {}
+    for outcome in outcomes:
+        if outcome.status is not AdapterStatus.NO_RESULTS and outcome.status not in FAILURE_STATUSES:
+            continue
+        record = records_by_outcome.get(id(outcome))
+        if record is None:
+            raise QcaeValidationError(
+                f"outcome {outcome.query_id!r} carries no execution record; a "
+                "negative observation without query lineage cannot be deduplicated"
+            )
+        observation = NegativeObservation(
+            # Negative knowledge is about the *planned* query condition, so the
+            # identity uses the base query id with any execution ordinal
+            # (-exec2, #3) stripped: the same planned query repeated under new
+            # ordinals is one condition, not four.
+            query_id=re.sub(r"(-exec\d+|#\d+)$", "", record.query_id),
+            atom_id=record.atom_id,
+            family_id=record.family_id,
+            source_class=record.source_class,
+            adapter_id=record.adapter_id,
+            status=outcome.status,
+            discovery_plan_id=record.discovery_plan_id,
+            provider_revision=record.provider_revision,
+            bounded_query_scope=(
+                f"limit:{record.result_limit};tier:{record.max_tier.value}"),
+            evidence_refs=tuple(record.evidence_refs),
+            first_seen_at=observed_at,
+            last_seen_at=observed_at,
+        )
+        observation.validate()
+        existing = merged.get(observation.observation_id)
+        if existing is None:
+            merged[observation.observation_id] = observation
+        else:
+            # Same identity: the repeat advances the counters, it does not
+            # create new negative knowledge.
+            merged[observation.observation_id] = (
+                NegativeObservation.from_dict({
+                    **existing.to_dict(),
+                    "observed_count": existing.observed_count + 1,
+                }))
+    return tuple(sorted(merged.values(), key=lambda o: o.observation_id))
 
 
 def _partial_search_notes(outcomes: Sequence[AdapterOutcome]) -> Tuple[str, ...]:
