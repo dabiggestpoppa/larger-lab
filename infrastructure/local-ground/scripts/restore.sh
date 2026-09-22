@@ -24,6 +24,17 @@
 #                canonical is restored from quarantine and verified.
 # Quarantine remains available until every fallible verification passes.
 #
+# Full-replace is a STAGED TWO-RESOURCE RECOVERY (R39-R1), not one atomic
+# commit: PostgreSQL and the artifact volume cannot commit together. Both
+# stores are staged with a held rollback source (PostgreSQL quarantine, and a
+# byte-for-byte copy of the live artifact volume taken before replacement),
+# both are verified against the selected backup, and only then is the
+# transaction committed by finalizing PostgreSQL and releasing the artifact
+# rollback source. Any failure before commitment restores BOTH stores from
+# those sources, leaves Redis untouched, writes a transaction rollback receipt
+# and exits nonzero. A failure AFTER commitment (Redis invalidation) is a
+# cleanup failure: it reports nonzero but does not roll the stores back.
+#
 # Integrity is fail-closed: BACKUP_MANIFEST.sha256 must reference existing,
 # hash/size-matching files; every manifest path must be safe (relative, no '..',
 # no absolute, no duplicate, no missing); a state-only backup claims
@@ -241,65 +252,148 @@ register_op() { # EXIT trap: index this restore operation immutably (idempotent)
     --cloud-mutations 0 --cloud-cost-state ZERO \
     "${op_receipts[@]}" >/dev/null 2>&1 || echo "WARNING: restore operation registration failed" >&2
 }
-trap 'rc=$?; register_op "$rc"; exit "$rc"' EXIT
-
-# ── controlled artifact replacement (R24) ──────────────────────────────────
+# ── staged two-resource recovery (R39-R1) ──────────────────────────────────
+# A full replace covers TWO durable stores - PostgreSQL and the artifact
+# volume - and they cannot be committed in one filesystem/database
+# transaction. The protocol is therefore:
+#   1. preflight: validate every input (nothing durable has changed yet);
+#   2. STAGE the artifact snapshot in host temp space, then SNAPSHOT the live
+#      artifact truth as this transaction's artifact rollback source;
+#   3. promote PostgreSQL, retaining its quarantine (the PG rollback source);
+#   4. SWITCH the staged artifact state, then verify BOTH stores against the
+#      selected backup (independent PG verifier + staged-vs-restored identity);
+#   5. only after both verifications pass, COMMIT: finalize PostgreSQL
+#      (release the quarantine) and release the artifact rollback source.
+# Redis is transient, is never restored, and is invalidated last.
+# Any failure before commitment lands in rollback_precommit exactly once: the
+# original artifact volume and the original PostgreSQL database are restored
+# from their held sources, Redis is left untouched, a truthful rollback
+# receipt is written, and the run exits nonzero. "Atomic" is deliberately NOT
+# claimed for a cross-store commit that does not exist.
+PG_PROMOTED=false
+PG_FINALIZED=false
+ARTIFACT_STAGED=false
+ARTIFACT_LIVE_SNAPSHOT=false
+ARTIFACT_SWITCHED=false
 ARTIFACT_APPLIED=false
-if [[ -f "$CONTENT/artifacts/artifacts.tar.gz" ]]; then
-  TMP_X="$(mktemp -d)"
-  if ! docker inspect oce-local-artifact >/dev/null 2>&1; then
-    echo "BLOCKED: artifact container unavailable" >&2
-    rm -rf "$TMP_X"
-    exit 3
-  fi
-  # quiesce: stop the artifact service so replacement is not a live merge
-  docker stop oce-local-artifact >/dev/null 2>&1 || true
-  if ! tar xzf "$CONTENT/artifacts/artifacts.tar.gz" -C "$TMP_X"; then
-    echo "BLOCKED: artifact extraction failed" >&2
-    docker start oce-local-artifact >/dev/null 2>&1 || true
-    rm -rf "$TMP_X"
-    exit 3
-  fi
-  # wipe the artifact data volume to a clean state, then restore from snapshot
-  # (replace, never merge)
-  if ! docker run --rm -v oce_local_artifact_data:/data \
-       postgres:16.2-alpine sh -c "rm -rf /data/* /data/.[!.]* 2>/dev/null; true"; then
-    echo "BLOCKED: cannot clear artifact volume" >&2
-    docker start oce-local-artifact >/dev/null 2>&1 || true
-    rm -rf "$TMP_X"
-    exit 3
-  fi
-  if ! docker cp "$TMP_X/." oce-local-artifact:/data/; then
-    echo "BLOCKED: artifact restore into container failed" >&2
-    docker start oce-local-artifact >/dev/null 2>&1 || true
-    rm -rf "$TMP_X"
-    exit 3
-  fi
-  rm -rf "$TMP_X"
-  docker start oce-local-artifact >/dev/null 2>&1 || true
-  ARTIFACT_APPLIED=true
-  # artifact-replacement evidence (R8): archive identity + replace result
-  python3 - "$RECEIPT_DIR/artifact-recovery-receipt.json" "$CONTENT/artifacts/artifacts.tar.gz" "$ARTIFACT_APPLIED" "$(date -u +"$TS_FMT")" <<'PY'
-import hashlib, json, os, sys
-p, archive, applied, ts = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-h = hashlib.sha256()
-with open(archive, "rb") as f:
-    for chunk in iter(lambda: f.read(8192), b""):
-        h.update(chunk)
-json.dump({"format": "oce-artifact-recovery-receipt-v1",
-           "artifact_archive_sha256": h.hexdigest(),
-           "artifact_archive_size": os.path.getsize(archive),
-           "artifact_replaced": applied == "true",
-           "artifact_verify": "ok" if applied == "true" else "not-applied",
+COMMITTED=false
+STAGE_DIR=""
+LIVE_SNAPSHOT_DIR=""
+STAGED_SHA=""
+ARTIFACT_BEFORE_SHA=""
+ARTIFACT_AFTER_SHA=""
+PG_COMMON=()
+PROMOTE_RECEIPT="$RECEIPT_DIR/promote-receipt.json"
+ROLLBACK_RECEIPT="$RECEIPT_DIR/rollback-receipt.json"
+RECEIPT_OUT="$RECEIPT_DIR/postgres-recovery-receipt.json"  # finalize receipt
+TRANSACTION_RECEIPT="$RECEIPT_DIR/transaction-rollback-receipt.json"
+ARTIFACT_ARCHIVE="$CONTENT/artifacts/artifacts.tar.gz"
+
+artifact_volume_sha() { # content identity of the LIVE artifact volume
+  docker run --rm -v oce_local_artifact_data:/data postgres:16.2-alpine \
+    sh -c 'cd /data 2>/dev/null || exit 0; find . -type f -exec sha256sum {} + 2>/dev/null' \
+    2>/dev/null | LC_ALL=C sort | sha256sum | awk '{print $1}'
+}
+staged_tree_sha() { # the same identity for a staged snapshot on the host
+  (cd "$1" && find . -type f -exec sha256sum {} + 2>/dev/null) \
+    2>/dev/null | LC_ALL=C sort | sha256sum | awk '{print $1}'
+}
+artifact_wipe() {
+  docker run --rm -v oce_local_artifact_data:/data postgres:16.2-alpine \
+    sh -c "rm -rf /data/* /data/.[!.]* 2>/dev/null; true"
+}
+artifact_restore_from() { # host dir -> live volume (replace, never merge)
+  artifact_wipe && docker cp "$1/." oce-local-artifact:/data/
+}
+pg_rollback_from_quarantine() { # explicit rollback of the held quarantine
+  [ -n "$PROMOTE_RECEIPT" ] || return 1
+  python3 "$BIN/pg-recovery.py" --phase rollback --receipt-in "$PROMOTE_RECEIPT" \
+    "${PG_COMMON[@]}" --receipt-out "$ROLLBACK_RECEIPT"
+}
+write_transaction_rollback_receipt() { # truthful account of what was restored
+  python3 - "$TRANSACTION_RECEIPT" "$1" "$ARTIFACT_BEFORE_SHA" "$2" "$3" \
+           "$(date -u +"$TS_FMT")" <<'PY'
+import json, sys
+p, reason, before, after, pg_ok, ts = sys.argv[1:7]
+json.dump({"format": "oce-restore-transaction-rollback-receipt-v1",
+           "reason": reason,
+           "committed": False,
+           "artifact_switched": bool(before),
+           "artifact_sha256_before": before or None,
+           "artifact_sha256_after": after or None,
+           "artifact_restored": bool(before) and after == before,
+           "postgres_rolled_back": pg_ok == "true",
+           "redis_untouched": True,
            "timestamp": ts},
           open(p, "w", encoding="utf-8"), indent=2)
 PY
-  if [[ -n "$EV_DIR" ]]; then
-    cp "$RECEIPT_DIR/artifact-recovery-receipt.json" "$EV_DIR/artifact-recovery-receipt.json" 2>/dev/null || true
+}
+rollback_precommit() { # single owner of every pre-commit rollback
+  local reason="$1"
+  [[ "$COMMITTED" == "true" ]] && return 0
+  [[ "$ARTIFACT_SWITCHED" == "true" || "$PG_PROMOTED" == "true" ]] || return 0
+  local art_after=""
+  if [[ "$ARTIFACT_SWITCHED" == "true" && "$ARTIFACT_LIVE_SNAPSHOT" == "true" ]]; then
+    echo "rollback: restoring the original artifact volume from its snapshot..." >&2
+    if artifact_restore_from "$LIVE_SNAPSHOT_DIR"; then
+      ARTIFACT_SWITCHED=false
+    else
+      echo "WARNING: artifact rollback FAILED; the volume is not the original" >&2
+    fi
+    docker start oce-local-artifact >/dev/null 2>&1 || true
+    art_after="$(artifact_volume_sha)"
   fi
+  local pg_ok=false
+  if [[ "$PG_PROMOTED" == "true" && "$PG_FINALIZED" != "true" ]]; then
+    echo "rollback: restoring the original PostgreSQL database from quarantine..." >&2
+    pg_rollback_from_quarantine && pg_ok=true
+  fi
+  write_transaction_rollback_receipt "$reason" "$art_after" "$pg_ok"
+  if [[ "$ARTIFACT_LIVE_SNAPSHOT" == "true" && "$art_after" != "$ARTIFACT_BEFORE_SHA" ]]; then
+    echo "BLOCKED: pre-commit rollback could not restore the artifact volume" >&2
+  fi
+}
+trap 'rc=$?; if [ "$rc" -ne 0 ]; then rollback_precommit "restore exited $rc before transaction commitment"; fi; register_op "$rc"; exit "$rc"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+# ── preflight: every required input validated before ANY durable mutation ──
+if [[ -f "$ARTIFACT_ARCHIVE" ]] && ! docker inspect oce-local-artifact >/dev/null 2>&1; then
+  echo "BLOCKED: artifact container unavailable (nothing was replaced)" >&2
+  exit 3
+fi
+if [[ "$SCOPE" == "full" && ( ! -f "$CONTENT/postgres/archive.dump" \
+     || ! -f "$CONTENT/postgres/inventory.json" \
+     || ! -f "$CONTENT/postgres/inventory.json.sha256" ) ]]; then
+  echo "BLOCKED: full backup is missing required PostgreSQL archive/inventory" >&2
+  exit 3
 fi
 
-# ── PostgreSQL verified staging promotion (R25: phase-safe + rollback) ─────
+# ── step 2: STAGE the artifact snapshot; SNAPSHOT the live truth ───────────
+if [[ -f "$ARTIFACT_ARCHIVE" ]]; then
+  STAGE_DIR="$(mktemp -d)"
+  LIVE_SNAPSHOT_DIR="$(mktemp -d)"
+  if ! tar xzf "$ARTIFACT_ARCHIVE" -C "$STAGE_DIR"; then
+    echo "BLOCKED: artifact extraction failed (live artifacts untouched)" >&2
+    rm -rf "$STAGE_DIR" "$LIVE_SNAPSHOT_DIR"
+    exit 3
+  fi
+  STAGED_SHA="$(staged_tree_sha "$STAGE_DIR")"
+  ARTIFACT_STAGED=true
+  ARTIFACT_BEFORE_SHA="$(artifact_volume_sha)"
+  # The artifact ROLLBACK SOURCE: the live truth, copied out BEFORE it is
+  # replaced, so a later failure can put the volume back byte for byte.
+  if ! docker cp oce-local-artifact:/data/. "$LIVE_SNAPSHOT_DIR/"; then
+    echo "BLOCKED: cannot snapshot the live artifact volume (nothing was replaced)" >&2
+    rm -rf "$STAGE_DIR" "$LIVE_SNAPSHOT_DIR"
+    exit 3
+  fi
+  ARTIFACT_LIVE_SNAPSHOT=true
+  echo "  artifacts: staged ${STAGED_SHA:0:12} (live snapshot ${ARTIFACT_BEFORE_SHA:0:12})"
+fi
+
+
+# ── step 3: PostgreSQL verified staging promotion (R25: phase-safe) ────────
 export OCE_COMMIT="$(git -C "$PROJ_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
 export OCE_TREE="$(git -C "$PROJ_ROOT" rev-parse HEAD^{tree} 2>/dev/null || echo unknown)"
 # R39-R3: a recovery TRANSITION needs an authoritative run identity, and one
@@ -307,9 +401,6 @@ export OCE_TREE="$(git -C "$PROJ_ROOT" rev-parse HEAD^{tree} 2>/dev/null || echo
 # The same id then binds promote, finalize and rollback of this operation.
 export OCE_RUN_ID="${OCE_RUN_ID:-$(python3 -c 'import uuid,sys;sys.stdout.write(uuid.uuid4().hex)')}"
 export OCE_EVIDENCE_DIR="${OCE_EVIDENCE_DIR:-}"
-PROMOTE_RECEIPT="$RECEIPT_DIR/promote-receipt.json"
-ROLLBACK_RECEIPT="$RECEIPT_DIR/rollback-receipt.json"
-RECEIPT_OUT="$RECEIPT_DIR/postgres-recovery-receipt.json"  # finalize receipt
 export OCE_BACKUP_ROOTS="$FROM"
 PG_COMMON=(--inventory "$CONTENT/postgres/inventory.json"
            --inventory-sha "$CONTENT/postgres/inventory.json.sha256"
@@ -327,8 +418,10 @@ save_pg_receipt() { # one or more receipt files -> evidence (never clobbered)
 }
 if [[ -f "$CONTENT/postgres/archive.dump" && -f "$CONTENT/postgres/inventory.json" \
    && -f "$CONTENT/postgres/inventory.json.sha256" ]]; then
-  # PHASE 1 — promote: staging restore + verify, canonical->quarantine,
-  # promote, canonical verify. The quarantine (rollback source) is HELD.
+  # promote: staging restore + verify, canonical->quarantine, promote,
+  # canonical verify. The quarantine (this transaction's PG rollback source)
+  # is HELD until every fallible check - including the artifact switch and its
+  # verification - has passed.
   if ! python3 "$BIN/pg-recovery.py" --phase promote \
        --archive "$CONTENT/postgres/archive.dump" \
        "${PG_COMMON[@]}" --receipt-out "$PROMOTE_RECEIPT"; then
@@ -336,37 +429,82 @@ if [[ -f "$CONTENT/postgres/archive.dump" && -f "$CONTENT/postgres/inventory.jso
     echo "BLOCKED: PostgreSQL promotion failed (original preserved / rolled back)" >&2
     exit 1
   fi
+  PG_PROMOTED=true
   save_pg_receipt "$PROMOTE_RECEIPT"
 
-  # PHASE 2 — external restore-boundary verification: the canonical target is
-  # re-checked by a FRESH, independent process (pg-verify.py) against the
-  # hash-protected inventory — exact row counts AND value fingerprints. The
-  # quarantine stays held until this and every other fallible check passes.
+  # external restore-boundary verification: the canonical target is re-checked
+  # by a FRESH, independent process (pg-verify.py) against the hash-protected
+  # inventory - exact row counts AND value fingerprints.
   if ! python3 "$BIN/pg-verify.py" --inventory "$CONTENT/postgres/inventory.json" \
        --inventory-sha "$CONTENT/postgres/inventory.json.sha256" \
        --db "$PG_DB" --user "$PG_USER" --container oce-local-postgresql --stable 2; then
     echo "UNVERIFIED: canonical target failed independent durable verification (counts+fingerprints)" >&2
-    echo "BLOCKED: canonical target failed independent durable verification after restore" >&2
-    # Roll back: restore the ORIGINAL canonical from the held quarantine.
-    python3 "$BIN/pg-recovery.py" --phase rollback \
-      --receipt-in "$PROMOTE_RECEIPT" "${PG_COMMON[@]}" --receipt-out "$ROLLBACK_RECEIPT" \
-      || echo "WARNING: explicit rollback reported failure; see rollback receipt" >&2
-    save_pg_receipt "$ROLLBACK_RECEIPT"
-    exit 1
+    echo "BLOCKED: PostgreSQL verification failed after promote" >&2
+    exit 1  # the EXIT trap restores BOTH stores from their held sources
   fi
+fi
 
-  # PHASE 3 — finalize: FINAL canonical re-verification (quarantine still
-  # held), then quarantine dropped and removal verified. Any failure rolls
-  # the original back from quarantine.
+# ── step 4: SWITCH the staged artifact state, then verify it ───────────────
+if [[ "$ARTIFACT_STAGED" == "true" ]]; then
+  # quiesce: stop the artifact service so replacement is not a live merge
+  docker stop oce-local-artifact >/dev/null 2>&1 || true
+  # The switch BEGINS with the first destructive step (the wipe), not with the
+  # copy: if the copy fails the live volume is already empty, so the snapshot is
+  # the only way back and the rollback must run for a HALF-switched volume too.
+  ARTIFACT_SWITCHED=true
+  if ! artifact_restore_from "$STAGE_DIR"; then
+    echo "BLOCKED: artifact restore into the container failed" >&2
+    exit 1  # the EXIT trap restores BOTH stores from their held sources
+  fi
+  docker start oce-local-artifact >/dev/null 2>&1 || true
+  ARTIFACT_AFTER_SHA="$(artifact_volume_sha)"
+  if [[ "$ARTIFACT_AFTER_SHA" != "$STAGED_SHA" ]]; then
+    echo "BLOCKED: the restored artifact volume is not the staged snapshot" >&2
+    exit 1  # the EXIT trap restores BOTH stores from their held sources
+  fi
+  ARTIFACT_APPLIED=true
+  # artifact-replacement evidence (R8): archive + staged/restored identities
+  python3 - "$RECEIPT_DIR/artifact-recovery-receipt.json" "$ARTIFACT_ARCHIVE" \
+           "$ARTIFACT_APPLIED" "$STAGED_SHA" "$ARTIFACT_BEFORE_SHA" "$ARTIFACT_AFTER_SHA" \
+           "$(date -u +"$TS_FMT")" <<'PY'
+import hashlib, json, os, sys
+(p, archive, applied, staged, before, after, ts) = sys.argv[1:8]
+h = hashlib.sha256()
+with open(archive, "rb") as f:
+    for chunk in iter(lambda: f.read(8192), b""):
+        h.update(chunk)
+json.dump({"format": "oce-artifact-recovery-receipt-v1",
+           "artifact_archive_sha256": h.hexdigest(),
+           "artifact_archive_size": os.path.getsize(archive),
+           "artifact_staged_sha256": staged,
+           "artifact_volume_sha256_before": before,
+           "artifact_volume_sha256_after": after,
+           "artifact_replaced": applied == "true",
+           "artifact_verify": ("ok" if staged == after else "mismatch") if applied == "true" else "not-applied",
+           "artifact_rollback_source_held": True,
+           "timestamp": ts},
+          open(p, "w", encoding="utf-8"), indent=2)
+PY
+  if [[ -n "$EV_DIR" ]]; then
+    cp "$RECEIPT_DIR/artifact-recovery-receipt.json" "$EV_DIR/artifact-recovery-receipt.json" 2>/dev/null || true
+  fi
+fi
+
+# ── step 5: finalize PostgreSQL (final re-verification, then quarantine) ───
+if [[ "$PG_PROMOTED" == "true" ]]; then
   if ! python3 "$BIN/pg-recovery.py" --phase finalize \
        --receipt-in "$PROMOTE_RECEIPT" \
        "${PG_COMMON[@]}" --receipt-out "$RECEIPT_OUT"; then
     save_pg_receipt "$RECEIPT_OUT" "$ROLLBACK_RECEIPT"
-    echo "BLOCKED: PostgreSQL finalization failed (rollback attempted)" >&2
-    exit 1
+    echo "BLOCKED: PostgreSQL finalization failed" >&2
+    exit 1  # the EXIT trap restores BOTH stores from their held sources
   fi
+  PG_FINALIZED=true
   save_pg_receipt "$RECEIPT_OUT"
 fi
+
+# ── step 6: COMMIT — both durable stores verified against the backup ──────
+COMMITTED=true
 
 # ── transient Redis invalidation (R27) ─────────────────────────────────────
 # Redis is transient and non-authoritative: it is NEVER restored from backup,
@@ -426,18 +564,14 @@ PY
   fi
 fi
 
-if [[ "$SCOPE" == "full" && ( ! -f "$CONTENT/postgres/archive.dump" \
-     || ! -f "$CONTENT/postgres/inventory.json" \
-     || ! -f "$CONTENT/postgres/inventory.json.sha256" ) ]]; then
-  echo "BLOCKED: full backup is missing required PostgreSQL archive/inventory" >&2
-  exit 3
-fi
-
 END_TS=$(date -u +"$TS_FMT")
 cp "$RECEIPT_OUT" "$RECEIPT_DIR/restore-receipt.json" 2>/dev/null || true
 if [[ -n "$EV_DIR" ]]; then
   cp "$RECEIPT_DIR/restore-receipt.json" "$EV_DIR/restore-receipt.json" 2>/dev/null || true
 fi
+# the transaction is committed: the rollback sources are released here and
+# nowhere earlier (nothing fallible is left to run)
+rm -rf "$STAGE_DIR" "$LIVE_SNAPSHOT_DIR"
 echo "full-replace restore complete <- $FROM"
 echo "  postgres: verified staging promotion | artifacts: $ARTIFACT_APPLIED | redis: invalidated (not restored)"
 exit 0
