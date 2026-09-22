@@ -9,7 +9,7 @@
 
 ## Current Phase
 
-**P3 — IN PROGRESS (I0 + C01–C05 landed, plus R1–R3 repairs + A1/A2 structure passes + C06–C11; 1309/1309 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation, and the terminal artifact assembler. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
+**P3 — IN PROGRESS (I0 + C01–C05 landed, plus R1–R3 repairs + A1/A2 structure passes + C06–C12; 1315/1315 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation, and the terminal artifact assembler. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
 
 ### P3-I0 — Phase Start / Plan Lock (this commit)
 
@@ -236,6 +236,25 @@ An audit proved that `CanonicalCandidate.claims_atoms` held capability ids: the 
 4. Atom claims must be identifier-shaped (previously any string list was accepted).
 
 **Verified:** 8 new tests, red first in both files (`assert ('CAP-REPLAY-001', 'atom-causal-ordering') == ('atom-causal-ordering',)` and the report-level counter), then green; the affected path driven end to end over the real P1 registry — three hits (capability-only, capability + one atom, capability + one atom from another source kind) → `claims_atoms` per candidate holding only atoms, `coverage_potential` 0.00 for the capability-only hit, `new_atoms_covered=2` of 2 plan atoms from two one-atom hits, carried kinds apart through a JSON round-trip with the candidate record at schema 2, and an unchanged `new_atoms_covered` on the handed-over second pass. Full suite **1309 passed**, ruff clean.
+
+### P3-C12 — A pass history is bound to the capability it measured
+
+P3-C10 made the artifact sufficient to hand over; an audit then showed it was *sufficient but not safe to accept*. Nothing bound the handed-over report to the identity it measured, so a report assembled for another contract, or another revision of it, could be handed in as this pass's past: its known candidates entered this capability's novelty accounting and its stop verdict. A fail-open path of the same class as the P3-C07 over-claim. Suite 1309 → 1315.
+
+**What a caller saw, before anything changed.** Reproduced through the public API against the current code: a report assembled for `CAP-OTHER-001` handed to a pass searching `CAP-REPLAY-001` was accepted, and its `known_candidates` were merged into this pass's known set — silently, and before this pass's counters were computed. A report whose `contract_version` differed was accepted the same way. The artifact already stated both identities (`contract_id`, `contract_version`), so nothing new had to be carried; the binding was simply never checked.
+
+**Where the binding belongs, and why.** The assembler, not the artifact: the assembler already owns history derivation (`previous_report` → metrics + known candidates) and every other fail-closed law (`_require_one_history_source`, `_require_baseline_matches_plan`, `_require_sources_allocated`), while the artifact's own `validate()` has no view of the plan being assembled. `_require_history_is_for_this_capability` therefore runs beside `_require_one_history_source`, before the history is used.
+
+**The two choices, settled by evidence.**
+
+1. *Contract identity is refused; plan scope is disclosed.* `_require_history_is_for_this_capability` refuses a differing `contract_id` or `contract_version`, naming both sides (canon 2.1.10: novelty is measured against what was already known *for this capability*). A differing plan id or atom scope for the **same** capability is accepted and disclosed instead — in `_coverage_notes` via `_history_is_a_recut_search`, naming both scopes. The counters read candidate identity, family and claimed atoms, all the capability's, and a plan is a search document that is re-cut between passes (amended contracts, refocused scope); refusing a narrower or wider scope would refuse a verifiable history, and a wider one is not a re-count either — the atom the history never saw is still new.
+2. *The binding is the assembler's.* The artifact already states the identity; the assembler already owns history derivation and every other fail-closed law, and the artifact's own `validate()` has no view of the plan being assembled. No field was added and `SCHEMA_VERSION` did not move.
+
+The binding reads only stated fields, so it survives the JSON round trip the durable loop uses — asserted, not assumed.
+
+**Verified:** 6 new tests, red first (`Failed: DID NOT RAISE` for the cross-capability and revision hand-offs), then green — the cross-capability refusal, the revision refusal, the JSON round trip, the re-cut plan id accepted + disclosed, a narrower scope accepted + disclosed with counters equal to a hand-supplied control, and a **wider** scope where the atom the history never saw is still counted as new (`new_atoms_covered` 1 → 2, the covered atom not re-credited). The durable loop re-driven end to end over the real P1 registry: three passes, each artifact serialized to JSON and reloaded before being handed on — `queries 3/6/9`, `new_candidates` steady at 2, rate decaying `2.333 → 1.167 → 0.778`, stop `CONTINUE`, no history disclosure on a clean hand-off; the foreign-capability and foreign-revision hand-offs refused with the identity named; the re-cut scope accepted with the scope change disclosed. Full suite **1315 passed**, ruff clean.
+
+**Observable contract changes:** one new refusal and one new note in `coverage_notes`; the artifact's shape is unchanged (no schema bump), and `known_candidates`, the port addition, the baseline, the claim-kind laws and the assembler's existing note policy are untouched.
 
 ### P2-R4 — True Crash Durability + Durable Approval + Scheduling Closure (SEALED at `f2fc7757`)
 

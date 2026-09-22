@@ -9,6 +9,7 @@ the pieces it came from* rather than merely constructible.
 from __future__ import annotations
 
 import ast
+import json
 from dataclasses import replace
 from pathlib import Path
 
@@ -62,6 +63,26 @@ def _baseline(**overrides):
         evidence=evidence,
     )
     return build_baseline(registry, **overrides)
+
+
+def _narrow_plan():
+    """The same capability and contract version, searched over one atom instead of two.
+
+    A plan re-cut for the same capability: the scope changed, the identity did not.
+    The portfolio shrinks to the classes the remaining family queries, rebalanced.
+    """
+    wide = baseline_plan()
+    queried = {SourceClass.INTERNAL_REGISTRY_CODE, SourceClass.GITHUB_REPOSITORY_CODE}
+    return replace(
+        wide,
+        atom_ids=(ATOM_A,),
+        search_hypotheses=(wide.search_hypotheses[0],),
+        query_families=(wide.query_families[0],),
+        source_allocations=tuple(
+            replace(allocation, budget_share=0.5)
+            for allocation in wide.source_allocations
+            if allocation.source_class in queried),
+    )
 
 
 def _outcome(query_id, *, source_class=SourceClass.GITHUB_REPOSITORY_CODE,
@@ -341,6 +362,122 @@ class TestTheArtifactIsItsOwnHandoff:
         assert set(later.known_candidates_ids) == set(first.known_candidates_ids)
         assert later.known_candidates == first.known_candidates
         assert set(first.known_candidates_ids) == {c.canonical_id for c in candidates}
+
+    def test_history_from_another_capability_is_refused(self) -> None:
+        """A handed-over report belongs to the capability it measured (2.1.10).
+
+        Nothing bound the history to its identity, so a report assembled for
+        another contract could be handed in as this pass's past: its known
+        candidates entered this pass's novelty accounting, and a search for one
+        capability would be judged against knowledge about a different one —
+        including at the stop verdict. Fail closed instead.
+        """
+        leads, outcomes = _two_adapter_run()
+        elsewhere = replace(baseline_plan(), contract_id="CAP-OTHER-001")
+        foreign, _c, _r = _run(
+            leads=leads, outcomes=outcomes, plan=elsewhere,
+            baseline=_baseline(plan=elsewhere, atom_ids=[ATOM_A, ATOM_B]))
+
+        with pytest.raises(QcaeValidationError, match="CAP-OTHER-001"):
+            _run(leads=leads, outcomes=outcomes, previous_report=foreign)
+
+    def test_history_from_another_contract_revision_is_refused(self) -> None:
+        """A different contract version is a different comparison, as for the baseline."""
+        leads, outcomes = _two_adapter_run()
+        first, _c, _r = _run(leads=leads, outcomes=outcomes)
+        older = replace(first, contract_version=first.contract_version + 1)
+        with pytest.raises(QcaeValidationError, match="contract version"):
+            _run(leads=leads, outcomes=outcomes, previous_report=older)
+
+    def test_history_survives_the_json_round_trip_the_durable_loop_uses(self) -> None:
+        """The binding reads the artifact's stated identity, so it must survive it."""
+        leads, outcomes = _two_adapter_run()
+        first, _c, _r = _run(leads=leads, outcomes=outcomes)
+        reloaded = type(first).from_dict(json.loads(json.dumps(first.to_dict())))
+        handed_off, _c2, _r2 = _run(leads=leads, outcomes=outcomes,
+                                    previous_report=reloaded)
+        assert reloaded.contract_id == first.contract_id
+        assert (handed_off.saturation_metrics.new_candidates
+                == first.saturation_metrics.new_candidates)
+
+    def test_history_from_another_plan_for_the_same_capability_is_accepted(self) -> None:
+        """A plan re-cut between passes is still this capability's history.
+
+        The accounting reads candidate identity, family and claimed atoms — all
+        the capability's — so a plan id the counters never touch is not an
+        identity to bind on; refusing it would refuse a verifiable history.
+        """
+        leads, outcomes = _two_adapter_run()
+        first, _c, _r = _run(leads=leads, outcomes=outcomes)
+        recut = replace(baseline_plan(), discovery_plan_id="plan-002")
+        handed_off, _c2, _r2 = _run(
+            leads=leads, outcomes=outcomes, plan=recut,
+            baseline=_baseline(plan=recut, atom_ids=[ATOM_A, ATOM_B]),
+            previous_report=first)
+        assert handed_off.discovery_plan_id == "plan-002"
+        assert (handed_off.saturation_metrics.new_candidates
+                == first.saturation_metrics.new_candidates)
+        # Accepted, and said out loud: the plan id changed, the capability did not.
+        assert any("re-cut plan scope" in note and "plan-001" in note
+                   for note in handed_off.coverage_notes)
+
+    def test_history_from_a_narrower_scope_is_accepted_and_stays_honest(self) -> None:
+        """The same capability searched over fewer atoms keeps honest counters.
+
+        A narrower plan is a re-cut search, not another capability: the atoms the
+        previous pass already covered stay known, so a repeat hit still earns no
+        new atom, and the counters match what a caller who supplied the previous
+        metrics and candidates by hand would get.
+        """
+        leads, outcomes = _two_adapter_run()
+        first, _c, _r = _run(leads=leads, outcomes=outcomes)
+        narrow = _narrow_plan()
+        narrow_baseline = _baseline(plan=narrow, atom_ids=[ATOM_A],
+                                    evidence={ATOM_A: ["cand-internal-1"]})
+        # The narrowed portfolio no longer searches the literature class, so the
+        # re-cut pass's own outcomes are the two the remaining family queries.
+        narrow_leads, narrow_outcomes = leads[:2], outcomes[:2]
+
+        handed_off, _c2, _r2 = _run(
+            leads=narrow_leads, outcomes=narrow_outcomes, plan=narrow,
+            baseline=narrow_baseline, previous_report=first)
+        control, _c3, _r3 = _run(
+            leads=narrow_leads, outcomes=narrow_outcomes, plan=narrow,
+            baseline=narrow_baseline,
+            previous_metrics=first.saturation_metrics,
+            previously_known_candidates=first.known_candidates)
+
+        assert handed_off.atom_ids == (ATOM_A,)  # the report states its own scope
+        assert handed_off.saturation_metrics == control.saturation_metrics
+        # Nothing is re-discovered: the atoms the wider pass already covered stay
+        # known, and the counter is the capability's, not the narrower plan's.
+        assert (handed_off.saturation_metrics.new_atoms_covered
+                == first.saturation_metrics.new_atoms_covered)
+        # A narrower scope is disclosed as such, both sides of the change named.
+        assert any("re-cut plan scope" in note and ATOM_B in note
+                   for note in handed_off.coverage_notes)
+
+    def test_history_from_a_wider_scope_is_accepted_and_stays_honest(self) -> None:
+        """The other direction: a history searched fewer atoms than this pass.
+
+        The atom the history never saw is genuinely new and must be counted as
+        such, while the atom it did cover stays known — a wider scope is a re-cut
+        search, not a reason to re-count what was already held.
+        """
+        leads, outcomes = _two_adapter_run()
+        narrow = _narrow_plan()
+        narrow_baseline = _baseline(plan=narrow, atom_ids=[ATOM_A],
+                                    evidence={ATOM_A: ["cand-internal-1"]})
+        first, _c, _r = _run(leads=leads[:1], outcomes=outcomes[:1],
+                             plan=narrow, baseline=narrow_baseline)
+        assert first.saturation_metrics.new_atoms_covered == 1  # atom A only
+
+        wider, _c2, _r2 = _run(leads=leads, outcomes=outcomes,
+                               previous_report=first)
+        # B is covered for the first time here; A is not re-credited.
+        assert wider.saturation_metrics.new_atoms_covered == 2
+        assert any("re-cut plan scope" in note and ATOM_B in note
+                   for note in wider.coverage_notes)
 
     def test_mixing_the_artifact_with_explicit_history_is_refused(self) -> None:
         """One owner for the pass history, so the two cannot be combined. """
