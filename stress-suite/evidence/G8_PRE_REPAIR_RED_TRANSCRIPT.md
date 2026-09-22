@@ -45,8 +45,11 @@ R-G8-09: contract declares contract_chronology -> False
 
 ## Git evidence for R-G8-09 (contract chronology)
 
+Snapshot of the history as of the commit that archived this transcript; the list grows if the contract is amended again, which is itself the recorded finding.
+
 ```
 $ git log --all --oneline -- stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json
+6fed82c3 STRESS-G8R1..RX: close the audit-integrity defects in the provisional G8 PASS
 f5482e3e STRESS-G8P0: freeze equivalence and contradiction audit contract
 ```
 

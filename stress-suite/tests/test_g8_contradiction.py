@@ -1273,7 +1273,13 @@ def test_the_pre_repair_red_transcript_still_reproduces_every_finding():
 
 
 def test_the_red_transcript_artifact_on_disk_matches_the_harness():
-    """The committed annex must be the harness's own output, so it cannot drift."""
+    """The committed annex must be the harness's own PROBE output, so it cannot
+    drift. Only the probe section is compared byte-for-byte: the annex's Git
+    section is a snapshot of the history as of its archive commit, and it grows
+    (correctly) whenever the contract is amended again."""
     archived = (ROOT / "evidence" / "G8_PRE_REPAIR_RED_TRANSCRIPT.md").read_text(
         encoding="utf-8")
-    assert archived == RED.transcript()
+    marker = "## Git evidence for R-G8-09"
+    assert marker in archived, "the annex must record the contract's Git history"
+    assert archived.split(marker)[0].rstrip() == \
+        RED.transcript(with_git_log=False).rstrip()

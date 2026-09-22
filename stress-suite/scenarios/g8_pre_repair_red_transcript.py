@@ -214,8 +214,15 @@ def _git(*args: str) -> str:
                           capture_output=True, text=True).stdout.strip()
 
 
-def transcript() -> str:
-    """Build the whole transcript. Deterministic by construction."""
+def transcript(with_git_log: bool = True) -> str:
+    """Build the transcript.
+
+    The PROBE section is deterministic: it depends only on the pre-repair commit,
+    never on this repository's later history. The Git-evidence section is a
+    snapshot of the history AS OF the archive commit and therefore grows when the
+    contract is amended again (which is the point of R-G8-09), so callers that
+    need a stable comparison ask for the probe section alone.
+    """
     revision = _git("rev-parse", PRE_REPAIR_HEAD)
     subject = _git("log", "-1", "--format=%s", PRE_REPAIR_HEAD)
     lines: List[str] = [HEADER,
@@ -232,7 +239,13 @@ def transcript() -> str:
         lines.append(probe.stdout.strip() + "\n")
         if probe.returncode != 0:
             lines.append(f"PROBE EXIT {probe.returncode}\n{probe.stderr.strip()}\n")
-    lines.append("```\n\n## Git evidence for R-G8-09 (contract chronology)\n\n```\n")
+    lines.append("```\n")
+    if not with_git_log:
+        return "".join(lines)
+    lines.append("\n## Git evidence for R-G8-09 (contract chronology)\n\n"
+                 "Snapshot of the history as of the commit that archived this "
+                 "transcript; the list grows if the contract is amended again, "
+                 "which is itself the recorded finding.\n\n```\n")
     lines.append("$ git log --all --oneline -- %s\n" % CONTRACT_REL)
     lines.append((_git("log", "--all", "--oneline", "--", CONTRACT_REL) or
                   "(no commit)") + "\n")
