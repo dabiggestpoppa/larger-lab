@@ -477,6 +477,34 @@ class G6ScenarioResult:
     artifacts: Dict[str, Any] = field(default_factory=dict)
 
 
+#: G8 revision R3 — additive observability. The G8 guarded properties P1, P8 and
+#: P9 must compare the run's ACTUAL canonical before/after state rather than
+#: infer a verdict from a phase name, a literal or the presence of a token. These
+#: projections are pure reads of the scenario's own temporary objects; they add no
+#: decision, change no phase, and cannot alter any expectation.
+def _authority_projection(authority: Any) -> Dict[str, Any]:
+    return {"levels": dict(sorted(authority.actors.items())),
+            "registry_events": list(authority.registry.event_log())}
+
+
+def _evidence_projection(state: "_ReplayState") -> Dict[str, str]:
+    grades = {g.evidence_id: g.empirical_grade for g in state.evidence_graph.grades}
+    for rid in state.registry.ids:
+        grades.setdefault(rid, "UNVERIFIED")
+    return dict(sorted(grades.items()))
+
+
+def _capability_projection(state: "_ReplayState") -> Dict[str, str]:
+    return {k: v.reliability_grade
+            for k, v in sorted(state.capability.items())}
+
+
+def canonical_state_trace(state: "_ReplayState") -> Dict[str, Any]:
+    return {"authority": _authority_projection(state.authority),
+            "evidence_grades": _evidence_projection(state),
+            "capability": _capability_projection(state)}
+
+
 def run_g6_scenario(decision: Dict[str, Any]) -> G6ScenarioResult:
     state = _ReplayState(
         seq=int(decision["initial_epoch"].get("seq", 0)),
@@ -487,6 +515,7 @@ def run_g6_scenario(decision: Dict[str, Any]) -> G6ScenarioResult:
         state.authority.seed_level(actor, level)
     state.authority.freeze_initialization()
     _register_evidence(state, decision.get("evidence_objects", []))
+    state_before = canonical_state_trace(state)
 
     phases: List[Dict[str, Any]] = []
     for ev in decision["stimulus_events"]:
@@ -510,7 +539,10 @@ def run_g6_scenario(decision: Dict[str, Any]) -> G6ScenarioResult:
         artifacts={"allocator_concentration":
                    state.allocator_ledger.allocator_concentration(),
                    "authority_event_summary":
-                   state.authority.authority_event_summary()})
+                   state.authority.authority_event_summary(),
+                   "canonical_state_trace": {
+                       "before": state_before,
+                       "after": canonical_state_trace(state)}})
 
 
 def evaluate_g6_expectation(res: G6ScenarioResult, pack: G6Pack) -> Dict[str, Any]:

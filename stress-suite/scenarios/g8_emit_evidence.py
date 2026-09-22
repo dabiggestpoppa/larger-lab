@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence
 
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from engine.g8_contradiction import (  # noqa: E402
@@ -25,6 +26,7 @@ from engine.g8_contradiction import (  # noqa: E402
     assert_not_self_certifying,
     extract_claims,
 )
+from engine.g8_test_evidence import TestEvidence  # noqa: E402
 from scenarios.g8_run_audit import EVIDENCE, ROOT, build_package  # noqa: E402
 
 START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
@@ -137,8 +139,17 @@ def _sealed_audit(package: Mapping[str, Any]) -> Dict[str, Any]:
                      "the projection is asserted sealed-free before the call")}
 
 
-def emit(measured_full: int) -> Dict[str, Any]:
-    package = build_package(measured_full=measured_full, collected_full=measured_full)
+def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
+    """Build the package from a PROVENANCE-BEARING test artifact.
+
+    Revision R3 (finding R-G8-07): the previous signature accepted a bare integer
+    and wrote `collected = N, passed = N, failed = 0` from it, so 1 certified just
+    as well as the measured count. The baseline now comes from the JUnit document
+    the authoritative command produced, together with its own identity, command,
+    digest, tested tree and exit status.
+    """
+    measured_full = test_evidence.collected
+    package = build_package(test_evidence=test_evidence)
     contract = package["contract"]
     families = package["families"]
     register = package["register"]
@@ -203,11 +214,22 @@ def emit(measured_full: int) -> Dict[str, Any]:
         f"- verdicts: {json.dumps(verdict_counts, sort_keys=True)}\n",
         f"- mandated pairs compared: "
         f"**{package['mandated_coverage']['mandated_comparisons_observed']} / "
-        f"{package['mandated_coverage']['mandated_pairs']}**  ·  uncovered: "
-        f"{package['mandated_coverage']['uncovered_mandated_pairs']}\n\n",
-        "`NOT_COMPARABLE` is not a pass: it records that two observations came from "
-        "different state machines, whose terminal vocabulary is never treated as "
-        "interchangeable (contract rule N8).\n\n",
+        f"{package['mandated_coverage']['mandated_pairs']}**  ·  substantively "
+        f"adjudicated: **"
+        f"{package['mandated_coverage']['mandated_pairs_substantively_adjudicated']}"
+        f"**  ·  uncovered: "
+        f"**{len(package['mandated_coverage']['uncovered_mandated_pairs'])}**\n\n",
+        "Revision R3 (finding R-G8-01): a mandated relationship counts as covered "
+        "only when its comparison returned a SUBSTANTIVE verdict (CONSISTENT or "
+        "MATERIAL_DISCRIMINATOR). Merely running the comparator is not coverage, so "
+        "`NOT_COMPARABLE`, an unmapped member and an unadjudicated pair are all "
+        "listed as UNCOVERED and block the gate.\n\n",
+        "`NOT_COMPARABLE` is never a pass: it records that two observations came "
+        "from different state machines, whose terminal vocabulary is never treated "
+        "as interchangeable (contract rule N8). The mandated cross-machine "
+        "relationships are adjudicated in family F2 through the shared conceptual "
+        "projection; the machine-local finding is retained as diagnostic family "
+        "F9 and carries no mandated pair.\n\n",
         "## Verdict matrix\n\n",
         _md_table(rows, matrix_head),
         "\n## Equivalence classes with more than one outcome class\n\n",
@@ -426,12 +448,22 @@ def emit(measured_full: int) -> Dict[str, Any]:
         "inherited_test_count": inherited,
         "new_g8_test_count": measured_full - inherited,
         "collected": measured_full,
-        "passed": measured_full,
-        "failed": 0,
+        "passed": test_evidence.passed,
+        "failed": test_evidence.failed,
+        "skipped": test_evidence.skipped,
+        "errors": test_evidence.errors,
+        "test_evidence_artifact": test_evidence.to_dict(),
         "comparisons_completed": len(comparisons),
         "mandated_pairs": package["mandated_coverage"]["mandated_pairs"],
-        "mandated_pairs_covered":
+        "mandated_pairs_compared":
             package["mandated_coverage"]["mandated_comparisons_observed"],
+        "mandated_pairs_substantively_adjudicated": (
+            package["mandated_coverage"]["mandated_pairs_substantively_adjudicated"]),
+        "mandated_pairs_not_comparable": len(
+            package["mandated_coverage"]["mandated_pairs_not_comparable"]),
+        "uncovered_mandated_pairs": (
+            package["mandated_coverage"]["uncovered_mandated_pairs"]),
+        "guarded_derivation_coverage": package["guarded_coverage"],
         "observations": len(package["observations"]),
         "equivalence_classes": len(classes),
         "coherent_equivalence_classes": sum(1 for c in classes if c.coherent),
@@ -501,7 +533,16 @@ def emit(measured_full: int) -> Dict[str, Any]:
         f"- contract `{contract['contract_id']}` v{contract['version']} "
         f"`{package['contract_digest']}`\n",
         f"- authoritative test command `{AUTHORITATIVE_TEST_COMMAND}` -> "
-        f"**{measured_full} passed**\n\n",
+        f"**collected {measured_full} / passed {test_evidence.passed} / skipped "
+        f"{test_evidence.skipped} / failed {test_evidence.failed}** "
+        f"(artifact `{test_evidence.suite_identity}` "
+        f"`{test_evidence.artifact_digest[:16]}`, python "
+        f"`{test_evidence.python_version or 'unrecorded'}`)\n",
+        "- test provenance (revision R3, finding R-G8-07): the baseline is read "
+        "from the JUnit artifact the authoritative command produced, never from a "
+        "self-reported integer. The receipt records the artifact digest, the suite "
+        "identity, the tested tree, the command, the environment and the exit "
+        "status; a missing, malformed, stale or failing artifact refuses emission.\n\n",
         "## What was asked\n\n",
         "Not whether each scenario works, but whether EQUIVALENT institutional facts "
         "produce CONSISTENT phase, authority, evidence, lifecycle, recovery and "
@@ -585,12 +626,128 @@ def emit(measured_full: int) -> Dict[str, Any]:
         "evidence.\n",
     ]
     _write(EVIDENCE / "G8_RESULT.md", "".join(result))
+    _write_chronology(contract, decision)
+    _write_source_binding(contract)
     return {"package": package, "receipt": receipt, "decision": decision}
 
 
+def _write_chronology(contract: Mapping[str, Any], decision: Mapping[str, Any]) -> None:
+    """STRESS-G8R4 (R-G8-09) — the contract's own chronology, as a declared
+    artifact rather than as prose inside another document."""
+    from engine.g8_chronology import validate_chronology
+    record = contract["contract_chronology"]
+    info = validate_chronology(record)
+    rows = [[a["artifact_id"], a["stage"],
+             str(a.get("claims_pre_run_freeze")),
+             str(a.get("introducing_commit_ref") or "-")]
+            for a in record["artifacts"]]
+    prose = [
+        "# G8 — contract amendment chronology\n\n",
+        "A verdict rule set that was chosen after seeing the outcome is not a gate, "
+        "it is a summary. This artifact records what is PROVABLE about when the G8 "
+        "verdict rules were fixed, in three declared stages, and refuses to "
+        "summarise itself as stronger than its weakest element.\n\n",
+        _md_table(rows, ["artifact", "stage", "claims_pre_run_freeze",
+                         "introducing_commit"]),
+        f"\nOverall classification: **{info['classification']}**.\n\n",
+        f"Gate blocking policy source: {record['gate_blocking_policy_source']}\n\n",
+        "## Git evidence\n\n",
+        f"{record['git_evidence']}\n\n",
+        "## Retraction\n\n",
+        "The pre-repair contract declared `status: FROZEN_AT_STRESS-G8P0` and a "
+        "`freeze_note` stating it was *authored BEFORE any cross-scenario "
+        "comparison runs*. Git shows exactly one commit ever touching that file "
+        "and that blob already carries the revisions motivated by the first run's "
+        "own findings, so the freeze claim is **not supportable** and is recorded "
+        "here as retracted rather than softened. The unsupported phrases "
+        "('preserved verbatim', 'frozen before any comparison ran') are removed "
+        "from the contract of record.\n\n",
+        "## Forward rule\n\n",
+        f"{record['forward_rule']}\n\n",
+        f"Gate exit for this run: `{decision['exit']}`.\n",
+    ]
+    _write(EVIDENCE / "G8_CONTRACT_CHRONOLOGY.md", "".join(prose))
+
+
+def _write_source_binding(contract: Mapping[str, Any]) -> None:
+    """STRESS-G8R3 (R-G8-08) — the declared canonical source-byte rule and the
+    two digests it distinguishes."""
+    from engine.g5r import (CANONICAL_SOURCE_NEWLINE_RULE, canonical_source_bytes,
+                            canonical_source_digest, sha256_hex)
+    manual = EVIDENCE.parent.parent / "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt"
+    # A build that runs outside the repository (a sealed fixture tree, for
+    # instance) cannot compute a digest of a file it was not given. That is
+    # recorded as NOT_PRESENT rather than silently reported as a verified value.
+    if not manual.is_file():
+        _write(EVIDENCE / "G8_SOURCE_BINDING_PORTABILITY.md", "".join([
+            "# G8 — source-binding portability (R-G8-08)\n\n",
+            "The bound source is NOT_PRESENT in the tree this build ran from, so no "
+            "digest was computed and no claim is made. The declared rule is "
+            f"`{CANONICAL_SOURCE_NEWLINE_RULE}`: `canonical_source_bytes(blob)` "
+            "normalises CRLF to LF and `canonical_source_digest(blob)` is the "
+            "SHA-256 of those bytes. `content_digest` remains the raw working-tree "
+            "digest and keeps its original meaning; `canonical_digest` and "
+            "`source_blob_sha` are the repository-stable identity.\n",
+            "\nThe live verification of this rule is executable: "
+            "`tests/test_g5r.py::test_source_binding_is_checkout_invariant` and "
+            "`tests/test_g8_contradiction.py::test_r08_the_s16_source_binding_is_"
+            "checkout_invariant`.\n",
+        ]))
+        return
+    raw = manual.read_bytes()
+    lf = raw.replace(b"\r\n", b"\n")
+    crlf = lf.replace(b"\n", b"\r\n")
+    rows = [
+        ["working tree, as checked out", len(raw), sha256_hex(raw),
+         canonical_source_digest(raw)],
+        ["synthetic LF", len(lf), sha256_hex(lf), canonical_source_digest(lf)],
+        ["synthetic CRLF", len(crlf), sha256_hex(crlf), canonical_source_digest(crlf)],
+    ]
+    prose = [
+        "# G8 — source-binding portability (R-G8-08)\n\n",
+        "A digest taken over raw working-tree bytes is a statement about a CHECKOUT, "
+        "not about a source. Before the repair the S16 fixture declared the CRLF "
+        "digest, the live comparison compared against raw working-tree bytes and "
+        "the receipt published that value, so the same source bound to different "
+        "digests in an LF and a CRLF checkout — and the whole suite's result "
+        "depended on `core.autocrlf`.\n\n",
+        "## Declared rule\n\n",
+        f"`canonical_source_bytes(blob)` normalises CRLF to LF and "
+        f"`canonical_source_digest(blob)` is the SHA-256 of those bytes. The rule is "
+        f"declared as `{CANONICAL_SOURCE_NEWLINE_RULE}` and travels with every "
+        f"binding record as `canonical_newline_rule`.\n\n",
+        "The two digests are reported under DISTINCT field names: `content_digest` "
+        "remains the raw working-tree digest and keeps its original meaning; "
+        "`canonical_digest` (and `source_blob_sha`) is the repository-stable "
+        "identity. Nothing was silently re-labelled.\n\n",
+        _md_table([[a, str(b), c, d] for a, b, c, d in rows],
+                  ["representation", "bytes", "raw sha256", "canonical sha256"]),
+        "\n## Live verification\n\n",
+        f"- canonical digest LF vs CRLF identical: "
+        f"**{canonical_source_digest(lf) == canonical_source_digest(crlf)}**\n",
+        f"- canonical digest of the live file: "
+        f"`{canonical_source_digest(raw)}`\n",
+        f"- the S16 fixture declares exactly that canonical digest: "
+        f"**verified by tests/test_g5r.py::test_source_binding_is_checkout_invariant "
+        f"and tests/test_g8_contradiction.py::test_r08_the_s16_source_binding_is_"
+        f"checkout_invariant**\n",
+        "\n## Not touched\n\n",
+        "The G5R / G5RER receipts are historical and are not rewritten. Their "
+        "published digest is a raw working-tree digest of the checkout that produced "
+        "them; the canonical identity of the same artifact is recorded here so the "
+        "distinction is explicit rather than discovered later.\n",
+    ]
+    _write(EVIDENCE / "G8_SOURCE_BINDING_PORTABILITY.md", "".join(prose))
+
+
 def main(argv: Sequence[str]) -> Dict[str, Any]:
-    measured = int(argv[1]) if len(argv) > 1 else 0
-    out = emit(measured)
+    """argv[1] is the JUnit XML artifact produced by the authoritative command.
+    There is deliberately no path that accepts a bare count."""
+    from engine.g8_test_evidence import read_test_evidence
+    from scenarios.g8_run_audit import head_sha
+    artifact = argv[1] if len(argv) > 1 else ""
+    out = emit(read_test_evidence(artifact, expected_tested_sha=TESTED_SHA,
+                                  python_version=sys.version.split()[0]))
     print("exit:", out["decision"]["exit"])
     print("written:", ", ".join(sorted(p.name for p in EVIDENCE.glob("G8_*"))))
     return out

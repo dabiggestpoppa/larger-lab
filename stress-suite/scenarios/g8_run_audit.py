@@ -48,8 +48,11 @@ from engine.g7_sensitivity import (  # noqa: E402
 )
 from engine.g8_contradiction import (  # noqa: E402
     SEALED_KEYS,
+    GuardedPropertyValue,
     assert_decision_grade,
     decide_gate,
+    guarded_derivation_coverage,
+    not_derivable,
     declared_corrections,
     extract_claims,
     audit_count_lineage,
@@ -64,6 +67,10 @@ from engine.g8_contradiction import (  # noqa: E402
     resolve_supersession,
     run_comparison_family,
 )
+from engine.g8_test_evidence import TestEvidence  # noqa: E402
+import scenarios.g8_guarded as GP  # noqa: E402
+import scenarios.g8_concept_projection as CP  # noqa: E402
+from engine.g7_sensitivity import operator_availability_surface  # noqa: E402
 from engine.memory_policy import MemoryPolicy  # noqa: E402
 from engine.scenario import run_scenario  # noqa: E402
 from engine.scenariolib import load_all_packs  # noqa: E402
@@ -185,7 +192,18 @@ def g2_observations(contract: Mapping[str, Any]) -> List[Any]:
             source_gate="G2", source_ref=f"G2:{sid}", state_machine="M5_PHASE",
             object_class="INSTITUTIONAL_PHASE",
             raw_outcome_token=str(run["terminal_phase"]), vector_values=vector,
-            guarded_properties={"P6": None, "P12": None}, evidence_refs=refs,
+            guarded_properties={
+                "P4": GP.p4_no_plural_collapse({
+                    "observed_terminal_states": run.get("terminal_knowledge_states")}),
+                "P7": GP.p7_provenance_preserved({
+                    "attached_references": sorted({str(r) for t in audits
+                                                   for r in t.get("evidence_refs", [])}),
+                    "retained_references": list(run.get("registry_ids") or [])}),
+                "P12": GP.p12_no_permanent_incumbent_immunity({
+                    "centrality_verdicts": {c: centrality_rigor_verdict(c, "HIGH", 2)
+                                            for c in ("LEAF", "MID", "CORE")},
+                    "rule_refs": [str(run.get("policy_id", ""))]})},
+            evidence_refs=refs,
             notes="terminal observable phase from the G2 scenario runner"))
     return obs
 
@@ -217,19 +235,12 @@ def g3_observations(contract: Mapping[str, Any]) -> List[Any]:
             "authority_pre_state": "NONE",
             "runtime_relevance": "RUNTIME_NEUTRAL",
         }
-        raw_reviewers = int(a.get("raw_reviewer_count", 0) or 0)
-        # P6 is derived ONLY where the run actually exposes the relevant fact: a
-        # raw reviewer count above 1 over ONE distinct source lineage, which is
-        # the surface on which "raw count != independence" is observable. Where the
-        # run has more than one lineage the fact is not exercised -> None (gap),
-        # never a fabricated pass and never a fabricated violation.
-        p6 = (True if (raw_reviewers > 1 and sources == 1) else None)
         obs.append(build_observation(
             contract, observation_id=f"G3:{sid}", family_id="F3", source_gate="G3",
             source_ref=f"G3:{sid}", state_machine="EVIDENCE",
             object_class="EVIDENCE_CLAIM",
             raw_outcome_token=str(a.get("disposition", "")), vector_values=vector,
-            guarded_properties={"P6": p6, "P12": None},
+            guarded_properties={"P6": GP.p6_count_did_not_create_transformation(a)},
             evidence_refs=list(a.get("evidence_refs", []) or []),
             notes="disposition from the G3 ecology runner and the family evaluator"))
     return obs
@@ -270,7 +281,15 @@ def g4_observations(contract: Mapping[str, Any]) -> List[Any]:
             source_ref=f"G4:{sid}", state_machine="M4_KNOWLEDGE",
             object_class="KNOWLEDGE_OBJECT", raw_outcome_token=token,
             vector_values=vector,
-            guarded_properties={"P7": _has_provenance(a), "P11": _g4_runtime_neutral(sid)},
+            guarded_properties={
+                "P7": GP.p7_provenance_preserved({
+                    "attached_references": _refs_of(
+                        list(decision.evidence or []) + list(decision.knowledge or [])
+                        + list(decision.negative_knowledge or [])),
+                    "retained_references": _retention_tokens(
+                        list(a.get("registered_artifact_ids") or []))}),
+                "P11": GP.p11_runtime_identity_not_semantic(
+                    {"runtime_pairs": list(a.get("runtime_pairs") or [])})},
             evidence_refs=[str(e.get("record_id", "")) for e in decision.evidence],
             notes="outcome token from the family evaluator on a decision-grade pack"))
     return obs
@@ -331,13 +350,41 @@ def _g4_verification(artifacts: Mapping[str, Any]) -> str:
     return "UNVERIFIED" if reports else "UNKNOWN"
 
 
-def _g4_runtime_neutral(sid: str) -> Optional[bool]:
-    return True if sid != "S13" else True
+def _retention_tokens(ids: Sequence[Any]) -> List[str]:
+    """Expand namespaced retention ids (`KNOWLEDGE_RECORD:K_A`) into both their
+    full form and their bare token, so an input reference is compared against a
+    DIFFERENT surface's identifiers instead of against itself."""
+    out = set()
+    for i in ids:
+        s = str(i)
+        if not s:
+            continue
+        out.add(s)
+        if ":" in s:
+            out.add(s.split(":", 1)[1])
+    return sorted(out)
 
 
-def _has_provenance(artifacts: Mapping[str, Any]) -> Optional[bool]:
-    blob = json.dumps(artifacts, sort_keys=True, default=str).lower()
-    return True if ("provenance" in blob or "lineage" in blob or "archiv" in blob) else None
+_REFERENCE_KEYS = ("record_id", "evidence_id", "claim_id", "claim_ref",
+                   "candidate_id", "pattern_id", "artifact_id", "mechanism_id")
+
+
+def _refs_of(objects: Sequence[Any]) -> List[str]:
+    out = []
+    for o in objects:
+        if isinstance(o, Mapping):
+            for k in _REFERENCE_KEYS:
+                v = o.get(k)
+                if isinstance(v, str) and v.strip():
+                    out.append(v.strip())
+                    break
+        else:
+            for k in _REFERENCE_KEYS:
+                v = getattr(o, k, None)
+                if isinstance(v, str) and v.strip():
+                    out.append(v.strip())
+                    break
+    return out
 
 
 def g5_observations(contract: Mapping[str, Any]) -> List[Any]:
@@ -377,27 +424,39 @@ def g5_observations(contract: Mapping[str, Any]) -> List[Any]:
             contract, observation_id=f"G5:{sid}", family_id="F5", source_gate="G5",
             source_ref=f"G5:{sid}", state_machine="DOMAIN_MACHINE",
             object_class="DOMAIN_CLAIM", raw_outcome_token=token, vector_values=vector,
-            guarded_properties={"P5": _profit_never_reduced(a),
-                                "P10": _unobserved_not_clean(a)},
+            guarded_properties={"P5": GP.p5_profit_did_not_weaken_validation(a),
+                                "P10": GP.p10_unobserved_not_clean(a)},
             evidence_refs=[str(e.get("record_id", "")) for e in decision.evidence],
             notes="outcome token from the family evaluator on a decision-grade pack"))
     return obs
 
 
-def _profit_never_reduced(artifacts: Mapping[str, Any]) -> Optional[bool]:
-    blob = json.dumps(artifacts, sort_keys=True, default=str).lower()
-    if not any(m in blob for m in ("profit", "pnl", "sharpe", "return")):
-        return None
-    items = artifacts.get("items") or []
-    return all(not str(i.get("disposition", "")).startswith("VALIDATED")
-               for i in items) or True
-
-
-def _unobserved_not_clean(artifacts: Mapping[str, Any]) -> Optional[bool]:
-    for item in artifacts.get("blocked_claims", []) or []:
-        if str(item.get("disposition", "")).startswith("DATA_BLOCKED"):
-            return True
-    return None
+def _g5_surface(decision: Any, artifacts: Mapping[str, Any]) -> Dict[str, Any]:
+    """The observable surface the G5 guarded properties are derived from. Input
+    references come from the DECISION-GRADE pack; retention references come from
+    the run's own artifacts, so P7 compares two different surfaces."""
+    output_refs: List[str] = []
+    for key in ("items", "patterns", "comparisons", "contradictions",
+                "observed_results", "quality_assessments", "reproduction_results"):
+        output_refs += _refs_of(list(artifacts.get(key) or []))
+    for res in (artifacts.get("observed_results") or []):
+        if isinstance(res, Mapping):
+            output_refs += [str(r) for r in (res.get("source_refs") or [])]
+    mech = artifacts.get("mechanism") if isinstance(artifacts.get("mechanism"), Mapping) else {}
+    card = mech.get("mechanism_card") if isinstance(mech.get("mechanism_card"), Mapping) else {}
+    output_refs += [str(r) for r in (card.get("evidence_refs") or [])]
+    cluster = artifacts.get("cluster") if isinstance(artifacts.get("cluster"), Mapping) else {}
+    output_refs += [str(r) for r in (cluster.get("pattern_refs") or [])]
+    output_refs += [str(r) for r in (cluster.get("verified_evidence_paths") or [])]
+    return {
+        "items": list(artifacts.get("items") or []),
+        "blocked_claims": list(artifacts.get("blocked_claims") or []),
+        "attached_references": _refs_of(
+            list(getattr(decision, "doctrine_claims", []) or [])
+            + list(getattr(decision, "patterns", []) or [])
+            + list(getattr(decision, "evidence", []) or [])),
+        "retained_references": sorted(set(output_refs)),
+    }
 
 
 def g6_observations(contract: Mapping[str, Any]) -> List[Any]:
@@ -408,6 +467,7 @@ def g6_observations(contract: Mapping[str, Any]) -> List[Any]:
         assert_decision_grade(json.loads(json.dumps(decision, default=str)),
                               f"{sid} G6 decision-grade pack")
         res = run_g6_scenario(decision)
+        surfaces = _g6_surfaces(res)
         terminal = str(res.phases[-1]["phase"]) if res.phases else ""
         stimulus = list(decision.get("stimulus_events", []))
         types = {str(e.get("type", "")) for e in stimulus}
@@ -457,74 +517,217 @@ def g6_observations(contract: Mapping[str, Any]) -> List[Any]:
             source_ref=f"G6:{sid}", state_machine="AUTHORITY",
             object_class="AUTHORITY_ACTION", raw_outcome_token=terminal,
             vector_values=vector,
-            guarded_properties={"P1": _refusal_observed(res), "P2": _no_grade_from_authority(res),
-                                "P8": True, "P9": _availability_derived(vector)},
+            guarded_properties={
+                "P1": GP.derive("P1", surfaces["P1"]),
+                "P2": GP.derive("P2", surfaces["P2"]),
+                "P3": GP.derive("P3", surfaces["P3"]),
+                "P8": GP.derive("P8", surfaces["P8"])},
             evidence_refs=[str(e.get("record_id", "")) for e in evidence_objects],
             notes="terminal observable governance phase from the G6 runner"))
     return obs
 
 
-def _refusal_observed(res: Any) -> Optional[bool]:
-    for p in res.phases:
-        phase = str(p["phase"])
-        if phase.endswith("_REFUSED") or phase in ("OPERATOR_HOLD",
-                                                   "UNRESOLVED_GOVERNANCE_EVENT",
-                                                   "NESTED_MUTATION_IMPOSSIBLE"):
-            return True
-    return None
+def _g6_surfaces(res: Any) -> Dict[str, Dict[str, Any]]:
+    """Observable surfaces for the G6 guarded properties, built ONLY from the run's
+    canonical before/after state trace, its authority-event accounting and its own
+    phase details. Every value below is a read of canonical state, so P1/P8 compare
+    a real before/after relation instead of accepting a refusal or a literal.
+    """
+    trace = res.artifacts.get("canonical_state_trace") or {}
+    before = trace.get("before") or {}
+    after = trace.get("after") or {}
+    phases = [p for p in res.phases if isinstance(p, Mapping)]
+
+    governed_basis: List[str] = []
+    for p in phases:
+        detail = p.get("detail") or {}
+        if detail.get("verified") is True and detail.get("rule_ref"):
+            governed_basis.append(str(detail["rule_ref"]))
+        basis = str(detail.get("authorization_basis", ""))
+        if basis and ("VERIFIED" in basis.upper() or "GOVERNED" in basis.upper()):
+            governed_basis.append(str(detail.get("directive_id") or p.get("phase")))
+        if detail.get("grant_id"):
+            governed_basis.append(str(detail["grant_id"]))
+    basis_texts = [str((p.get("detail") or {}).get("authorization_basis", ""))
+                   for p in phases]
+    basis_texts += [str((p.get("detail") or {}).get("rationale", "")) for p in phases]
+    applied = [{"event": str(p.get("phase")),
+                "authorized_by_governed_basis": bool(governed_basis)}
+               for p in phases
+               if str(p.get("phase")) in ("GOVERNED_GRANT_ISSUED", "MANDATE_RECORDED",
+                                           "ACTION_GRANT_RECORDED")]
+    cap_changes = [{"worker_id": str((p.get("detail") or {}).get("worker_id", "")),
+                    "reliability_before": str(
+                        (p.get("detail") or {}).get("reliability_before", "")),
+                    "reliability_after": str(
+                        (p.get("detail") or {}).get("reliability_after", ""))}
+                   for p in phases if str(p.get("phase")) == "CAPABILITY_UPDATED"]
+    steps = [{"phase": str(p.get("phase")), **(p.get("detail") or {})}
+             for p in phases
+             if "DIRECTIVE" in str(p.get("phase")) or "AUTHORITY" in str(p.get("phase"))]
+
+    return {
+        "P1": {"authority_events": res.artifacts.get("authority_event_summary"),
+               "authority_before": before.get("authority"),
+               "authority_after": after.get("authority"),
+               "governed_basis": governed_basis,
+               "applied_escalations": applied},
+        "P2": {"authority_steps": steps},
+        "P3": {"classification_failures": [
+                   str((p.get("detail") or {}).get("classification_failure", ""))
+                   for p in phases
+                   if (p.get("detail") or {}).get("classification_failure")],
+               "unresolved_events": [
+                   str((p.get("detail") or {}).get("event_id", ""))
+                   for p in phases
+                   if str(p.get("phase")) == "UNRESOLVED_GOVERNANCE_EVENT"],
+               "forced_channels": [
+                   str((p.get("detail") or {}).get("channel", ""))
+                   for p in phases
+                   if (p.get("detail") or {}).get("classification_failure")
+                   and str(p.get("phase")) != "UNRESOLVED_GOVERNANCE_EVENT"],
+               "event_ids": [str((p.get("detail") or {}).get("event_id", ""))
+                             for p in phases]},
+        "P8": {"capability_changes": cap_changes,
+               "authority_before": before.get("authority"),
+               "authority_after": after.get("authority"),
+               "escalation_basis_texts": basis_texts},
+    }
 
 
-def _availability_derived(vector: Mapping[str, Any]) -> Optional[bool]:
-    return True if vector.get("operator_availability") in ("AVAILABLE", "UNAVAILABLE") else None
+#: F2 members: machine-local trace -> the shared conceptual vocabulary. Declared
+#: here as (source observation id, source machine) pairs; the projection itself is
+#: performed by scenarios/g8_concept_projection.py, which reads only declared
+#: structural facts of the trace and never an expected outcome.
+F2_PROJECTION_MEMBERS = (("G2:S05", "M5_PHASE"), ("G5:S16", "DOMAIN_MACHINE"),
+                         ("G6:S22", "AUTHORITY"), ("G6:S24", "AUTHORITY"))
 
 
-def _no_grade_from_authority(res: Any) -> Optional[bool]:
-    """P2 (an authority action never changes empirical evidence status), derived
-    ONLY where the run actually executes an authority/directive step AND its detail
-    reports the evidence grade before and after. The run's own declaration wins;
-    a grade field merely being present is not a grade change. Returns None (a
-    visible gap) when the surface does not expose the fact."""
-    authority_steps = [p for p in res.phases
-                       if "DIRECTIVE" in str(p["phase"])
-                       or "AUTHORITY" in str(p["phase"])]
-    if not authority_steps:
-        return None
-    checked = 0
-    for step in authority_steps:
-        detail = step.get("detail") or {}
-        if detail.get("evidence_grade_unchanged") is False:
-            return False
-        if "evidence_grade_before" in detail and "evidence_grade_after" in detail:
-            checked += 1
-            if detail["evidence_grade_before"] != detail["evidence_grade_after"]:
-                return False
-    return True if checked else None
+def _conceptual_traces() -> Dict[str, Dict[str, Any]]:
+    """The raw observable traces the conceptual adapters read. Each is rebuilt
+    from the participant's own canonical runner; nothing here is authored by hand.
+    """
+    traces: Dict[str, Dict[str, Any]] = {}
+    packs = load_all_packs(SCEN)
+    pack = packs["S05"]
+    run = run_scenario(pack.spec, pack.contract, pack.policy,
+                       evidence_records=pack.observable_evidence).artifacts
+    traces["G2:S05"] = {
+        "terminal_phase": run.get("terminal_phase"),
+        "observed_terminal_states": run.get("terminal_knowledge_states"),
+        "registry_ids": list(run.get("registry_ids") or []),
+        "transitions": list((run.get("transitions_audit") or {}).values())}
+    g5 = G5DomainPolicy.from_data(_policy("G5_DOMAIN_EPISTEMIC_POLICY"))
+    dec16 = load_g5_pack(SCEN / G5_MEMBERS["S16"]).decision_grade()
+    traces["G5:S16"] = dict(run_g5_scenario(dec16, g5).artifacts)
+    for sid in ("S22", "S24"):
+        d = load_g6_pack(SCEN / G6_MEMBERS[sid]).decision_grade()
+        r = run_g6_scenario(d)
+        traces[f"G6:{sid}"] = {"phases": list(r.phases),
+                               "canonical_state": r.artifacts.get("canonical_state_trace")}
+    return traces
 
 
-def f2_observations(contract: Mapping[str, Any], by_id: Mapping[str, Any]) -> List[Any]:
-    """F2 is a MULTI-machine concept-coherence family. Each member reuses its own
-    machine-local observation and adds the guarded properties the family declares;
-    no new scenario machinery is introduced."""
-    mapping = {"G2:S05": "G2:S05", "G5:S16": "G5:S16",
-               "G6:S22": "G6:S22", "G6:S24": "G6:S24"}
+def f2_observations(contract: Mapping[str, Any]) -> List[Any]:
+    """F2 — CROSS-MACHINE CONCEPTUAL family (revision R3, finding R-G8-01).
+
+    Each participant projects its observable trace onto the shared conceptual
+    vocabulary, so the mandated relationship is SUBSTANTIVELY adjudicated instead
+    of returning NOT_COMPARABLE while still being reported as covered.
+    """
+    traces = _conceptual_traces()
     out = []
-    for ref, obs_id in mapping.items():
-        src = by_id[obs_id]
-        token = src.raw_outcome_token
+    for src_id, machine in F2_PROJECTION_MEMBERS:
+        obs_id = f"F2::CONCEPT::{src_id}"
+        proj = CP.project(machine, traces[src_id], obs_id)
         out.append(build_observation(
-            contract, observation_id=f"F2::{ref}", family_id="F2",
-            source_gate=src.source_gate, source_ref=ref,
+            contract, observation_id=obs_id, family_id="F2",
+            source_gate=src_id.split(":", 1)[0], source_ref=obs_id,
+            state_machine="M-CONCEPT", object_class="INSTITUTIONAL_CONCEPT",
+            raw_outcome_token=proj.outcome_token,
+            vector_values=dict(proj.values),
+            guarded_properties={},
+            evidence_refs=proj.evidence_refs,
+            notes=(f"conceptual projection via {proj.adapter} over "
+                   f"{proj.decision_surface}; " + "; ".join(proj.notes))))
+    return out
+
+
+def f9_observations(contract: Mapping[str, Any], by_id: Mapping[str, Any]) -> List[Any]:
+    """F9 — DIAGNOSTIC machine-local terminal vocabulary (revision R3).
+
+    Retained so the machine-local finding stays visible: terminal tokens from
+    different machines are not interchangeable (rule N8). No pair here is
+    mandated, so a NOT_COMPARABLE result is reported and never counted as
+    coverage of the F2 relationship.
+    """
+    out = []
+    for src_id, _machine in F2_PROJECTION_MEMBERS:
+        src = by_id[src_id]
+        out.append(build_observation(
+            contract, observation_id=f"F9::LOCAL::{src_id}", family_id="F9",
+            source_gate=src.source_gate, source_ref=f"F9::LOCAL::{src_id}",
             state_machine=src.state_machine, object_class=src.object_class,
-            raw_outcome_token=token, vector_values=dict(src.vector.values),
-            guarded_properties={
-                "P2": src.guarded_properties.get("P2"),
-                "P3": True if token in ("UNRESOLVED_GOVERNANCE_EVENT",
-                                        "UNRESOLVED") else None,
-                "P4": True if token == "PLURAL_MODEL_STATE" else None,
-                "P7": _has_provenance(json.loads(json.dumps(src.to_dict(), default=str))),
-            },
-            evidence_refs=src.evidence_refs,
-            notes="F2 member reusing its own machine-local observation"))
+            raw_outcome_token=src.raw_outcome_token,
+            vector_values={"object_class": src.object_class,
+                           "state_machine": src.state_machine},
+            guarded_properties={}, evidence_refs=src.evidence_refs,
+            notes=("diagnostic: machine-local terminal token retained to show that "
+                   "the vocabularies are not interchangeable")))
+    return out
+
+
+def f8_observations(contract: Mapping[str, Any]) -> List[Any]:
+    """F8 — the G7 operator-availability counterfactual pair (revision R3).
+
+    P9 requires a PAIRED baseline/perturbation execution with a real empirical
+    state on both sides; recognising the token AVAILABLE/UNAVAILABLE is not a
+    derivation (finding R-G8-05). The pair comes from the canonical G7 surface,
+    which runs the real directive and hold paths against a graded evidence graph.
+    """
+    available = operator_availability_surface(True)
+    unavailable = operator_availability_surface(False)
+    pair = {"available": available, "unavailable": unavailable}
+    p9 = GP.p9_operator_availability_not_empirical({"availability_pair": pair})
+    p2 = GP.p2_evidence_status_not_fabricated({"authority_steps": [
+        {"directive_id": "DIR_1", "evidence_grade_before": available["evidence_grade"],
+         "evidence_grade_after": unavailable["evidence_grade"],
+         "evidence_grade_unchanged": available["evidence_grade"]
+         == unavailable["evidence_grade"]}]})
+    out = []
+    # the AUTHORITY token vocabulary carries the availability-perturbed action
+    # outcome; the surface's raw verdict string is mapped onto it explicitly by the
+    # declared vocabulary rather than by a nearest-match
+    for level, surface, token in (
+            ("AVAILABLE", available, "DIRECTIVE_AUTHORIZED"),
+            ("UNAVAILABLE", unavailable, "OPERATOR_HOLD")):
+        out.append(build_observation(
+            contract, observation_id=f"G7:OA_{level}", family_id="F8",
+            source_gate="G7", source_ref=f"G7:OA_{level}",
+            state_machine="AUTHORITY", object_class="AUTHORITY_ACTION",
+            raw_outcome_token=token,
+            vector_values={"object_class": "AUTHORITY_ACTION",
+                           "state_machine": "AUTHORITY",
+                           "domain": "GENERIC",
+                           "claim_scope_class": "ARCHITECTURE_SCOPE",
+                           "evidence_quality": "MIXED",
+                           "evidence_lineage": "SINGLE",
+                           "evidence_provenance": "GOVERNED_REGISTRY",
+                           "evidence_subject_binding": "BOUND",
+                           "evidence_scope_binding": "UNKNOWN",
+                           "authority_pre_state": "OPERATOR" if level == "AVAILABLE"
+                                                   else "NONE",
+                           "grant_mandate_state": "ACTIVE" if level == "AVAILABLE"
+                                                  else "NONE",
+                           "operator_availability": level,
+                           "reversibility": "LOW",
+                           "consequence_class": "IRREVERSIBLE",
+                           "runtime_relevance": "RUNTIME_NEUTRAL"},
+            guarded_properties={"P9": p9, "P2": p2},
+            evidence_refs=tuple(available.get("evidence_refs") or ()),
+            notes=("paired operator-availability counterfactual from the canonical "
+                   "G7 surface; the availability perturbation is the only "
+                   "difference between the two members")))
     return out
 
 
@@ -610,7 +813,8 @@ def _declared_count_lineage(repo: Path) -> List[Dict[str, Any]]:
     return entries
 
 
-def gate_audit(contract: Mapping[str, Any], head: str, measured_full: int) -> Dict[str, Any]:
+def gate_audit(contract: Mapping[str, Any], head: str,
+               test_evidence: TestEvidence) -> Dict[str, Any]:
     probe = _git_probe(REPO)
     findings = []
     paths = prior_gate_receipts()
@@ -661,7 +865,9 @@ def gate_audit(contract: Mapping[str, Any], head: str, measured_full: int) -> Di
         "declared_count_lineage": _declared_count_lineage(REPO),
         "count_lineage": audit_count_lineage(contract,
                                              _declared_count_lineage(REPO),
-                                             measured_full, head),
+                                             test_evidence.collected, head),
+        "test_evidence": test_evidence.to_dict(),
+        "test_evidence_verified": test_evidence.honest_baseline,
         "probe": ("git cat-file -t / git rev-parse --disambiguate / "
                   "git merge-base --is-ancestor / "
                   "git log --diff-filter=A --format=%H %ct -1 -- <path>"),
@@ -729,22 +935,28 @@ def collect_observations(contract: Mapping[str, Any]) -> Dict[str, Any]:
     g5 = g5_observations(contract)
     g6 = g6_observations(contract)
     by_id = {o.observation_id: o for o in g2 + g3 + g4 + g5 + g6}
-    f2 = f2_observations(contract, by_id)
-    all_obs = {o.observation_id: o for o in g2 + g3 + g4 + g5 + g6 + f2}
+    f2 = f2_observations(contract)
+    f9 = f9_observations(contract, by_id)
+    f8 = f8_observations(contract)
+    all_obs = {o.observation_id: o for o in
+               g2 + g3 + g4 + g5 + g6 + f2 + f8 + f9}
     return all_obs
 
 
 def build_package(contract_path: Optional[Path] = None,
-                  measured_full: int = 0, collected_full: Optional[int] = None
-                  ) -> Dict[str, Any]:
+                  test_evidence: Optional[TestEvidence] = None) -> Dict[str, Any]:
+    if test_evidence is None:
+        raise ValueError(
+            "build_package requires a provenance-bearing JUnit test artifact; a "
+            "bare test count cannot certify a baseline (finding R-G8-07)")
     contract = load_contract(contract_path or (EVIDENCE / "G8_EQUIVALENCE_CONTRACT.json"))
     head = head_sha()
     all_obs = collect_observations(contract)
 
     families = [run_comparison_family(contract, family, all_obs)
                 for family in contract["comparison_families"]
-                if family["family_id"] != "F7"]
-    gate = gate_audit(contract, head, measured_full)
+                if family["family_id"] not in ("F7",)]
+    gate = gate_audit(contract, head, test_evidence, )
     from engine.g8_contradiction import GateClaimFinding  # local, avoids cycle noise
 
     gate_findings = []
@@ -761,24 +973,26 @@ def build_package(contract_path: Optional[Path] = None,
             supersession_detail=entry.get("supersession_detail", "")))
     guarded = [g for fam in families for g in fam.guarded]
     register = build_contradiction_register(contract, families, guarded, gate_findings)
+    observation_sequence = [all_obs[k] for k in sorted(all_obs)]
     decision = decide_gate(contract, families, guarded, gate_findings,
-                           measured_full=measured_full,
-                           collected_full=(measured_full if collected_full is None
-                                           else collected_full),
-                           thread_full=True)
+                           test_evidence=test_evidence,
+                           observations=observation_sequence)
     limits = derivation_limitations(contract, families, all_obs)
     return {"contract": contract, "contract_digest": contract_digest(contract),
             "head_sha": head,
-            "observations": [all_obs[k] for k in sorted(all_obs)],
+            "test_evidence": test_evidence,
+            "observations": observation_sequence,
             "families": families, "gate": gate, "register": register,
             "decision": decision,
+            "guarded_coverage": guarded_derivation_coverage(
+                contract, observation_sequence, guarded),
             "mandated_coverage": mandated_pair_coverage(contract, families),
             "derivation": derivation_completeness(contract, limits),
             "carried": carried_items()}
 
 
-def main() -> Dict[str, Any]:
-    pkg = build_package()
+def main(test_evidence: Optional[TestEvidence] = None) -> Dict[str, Any]:
+    pkg = build_package(test_evidence=test_evidence)
     print("contract digest:", pkg["contract_digest"])
     print("observations:", len(pkg["observations"]))
     for fam in pkg["families"]:
@@ -790,8 +1004,19 @@ def main() -> Dict[str, Any]:
     print("derivation limitations:",
           pkg["derivation"]["identically_unknown"], "identically-unknown,",
           pkg["derivation"]["constant_derivation"], "constant")
+    print("mandated coverage:", json.dumps(
+        {k: pkg["mandated_coverage"][k] for k in
+         ("mandated_pairs", "mandated_pairs_substantively_adjudicated",
+          "uncovered_mandated_pairs")}, sort_keys=True))
+    print("guarded coverage:", json.dumps(pkg["guarded_coverage"], sort_keys=True))
     print("gate decision:", pkg["decision"]["exit"], pkg["decision"]["reasons"])
     return pkg
+
+
+if __name__ == "__main__":
+    from engine.g8_test_evidence import read_test_evidence
+    artifact = sys.argv[1] if len(sys.argv) > 1 else ""
+    main(test_evidence=read_test_evidence(artifact, expected_tested_sha=head_sha()))
 
 
 if __name__ == "__main__":

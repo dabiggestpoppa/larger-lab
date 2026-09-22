@@ -6,7 +6,7 @@
     "source_path": "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt",
     "section": "PART_1_CORE_MANUAL / Target Metric table",
     "page": "PAGE 4-5",
-    "source_fingerprint": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+    "source_fingerprint": "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb",
     "exact_claim_representation": "Target Metric table (bounded fragment): Win Rate (Filtered) 85% - 90%; Daily Goal 1.0% - 1.5%; Max Daily Drawdown < 0.50%; Prop Firm Circuit Breaker: hard constraint boundary at 0.40% loss.",
     "numeric_parameters": {
       "win_rate_band": [0.85, 0.90],

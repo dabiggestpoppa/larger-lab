@@ -10,8 +10,10 @@ family on a COPY of the frozen contract.
 from __future__ import annotations
 
 import copy
+import inspect
 import json
 import sys
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, Dict
 
@@ -44,9 +46,34 @@ from engine.g8_contradiction import (  # noqa: E402
     scan_for_sealed,
     validate_contract,
 )
+from engine.g8_test_evidence import (  # noqa: E402
+    UnverifiableTestEvidence,
+    check_baseline,
+    junit_document,
+    read_test_evidence,
+)
+from engine.g8_contradiction import (  # noqa: E402
+    DERIVATION_KINDS,
+    ComparisonResult,
+    FamilyAuditResult,
+    GuardedContractError,
+    GuardedPropertyValue,
+    check_guarded_properties,
+    validate_guarded_finding,
+)
+from engine.g8_chronology import (  # noqa: E402
+    STAGES,
+    ChronologyError,
+    validate_chronology,
+)
+import g8_guarded as GP  # noqa: E402
 from engine.registry import EvidenceRegistry  # noqa: E402
 
 import g8_run_audit as AUDIT  # noqa: E402
+import g8_concept_projection as CP  # noqa: E402
+import g8_emit_evidence as EMIT  # noqa: E402
+import g8_pre_repair_red_transcript as RED  # noqa: E402
+from engine.g8_contradiction import GuardedPropertyFinding  # noqa: E402
 
 CONTRACT_PATH = ROOT / "evidence" / "G8_EQUIVALENCE_CONTRACT.json"
 
@@ -57,8 +84,20 @@ def contract() -> Dict[str, Any]:
 
 
 @pytest.fixture(scope="module")
-def package() -> Dict[str, Any]:
-    return AUDIT.build_package(measured_full=938)
+def sealed_test_evidence(tmp_path_factory) -> Any:
+    """A SEALED JUnit fixture document, so the regressions never re-invoke pytest
+    inside pytest. The authoritative package build consumes a live artifact; a unit
+    test consumes a document it fully controls."""
+    path = tmp_path_factory.mktemp("g8ev") / "pytest.xml"
+    path.write_text(junit_document(cases=973, tested_sha=AUDIT.head_sha()),
+                    encoding="utf-8")
+    return read_test_evidence(str(path), expected_tested_sha=AUDIT.head_sha(),
+                              python_version=sys.version.split()[0])
+
+
+@pytest.fixture(scope="module")
+def package(sealed_test_evidence) -> Dict[str, Any]:
+    return AUDIT.build_package(test_evidence=sealed_test_evidence)
 
 
 def _obs(contract, oid, **kw):
@@ -328,10 +367,10 @@ def test_c13_seeded_inconsistent_control_is_detected_and_registered(contract):
 # --------------------------------------------------------------------------- #
 # C14 / C15 — byte reproducibility and the self-certification guard
 # --------------------------------------------------------------------------- #
-def test_c14_report_generation_is_byte_reproducible():
-    first = json.dumps(AUDIT.build_package(measured_full=938)["register"],
+def test_c14_report_generation_is_byte_reproducible(sealed_test_evidence):
+    first = json.dumps(AUDIT.build_package(test_evidence=sealed_test_evidence)["register"],
                        sort_keys=True)
-    second = json.dumps(AUDIT.build_package(measured_full=938)["register"],
+    second = json.dumps(AUDIT.build_package(test_evidence=sealed_test_evidence)["register"],
                         sort_keys=True)
     assert first == second
 
@@ -353,16 +392,21 @@ def test_c15_receipt_cannot_certify_itself():
 # Mandated families, coverage, decision
 # --------------------------------------------------------------------------- #
 def test_all_observations_have_a_mapped_outcome_class(package):
-    assert len(package["observations"]) == 29
+    assert len(package["observations"]) == 35
     for obs in package["observations"]:
         assert obs.outcome_mapped, (obs.observation_id, obs.raw_outcome_token)
         assert obs.outcome_class, obs.observation_id
 
 
-def test_every_mandated_comparison_pair_was_actually_compared(package):
+def test_every_mandated_comparison_pair_was_substantively_adjudicated(package):
+    """R-G8-01: coverage is a SUBSTANTIVE verdict, never merely invoking the
+    comparator. A mandatory pair whose only comparison was NOT_COMPARABLE, or which
+    was never compared, must appear in `uncovered_mandated_pairs`."""
     coverage = package["mandated_coverage"]
     assert coverage["uncovered_mandated_pairs"] == []
-    assert coverage["mandated_comparisons_observed"] == coverage["mandated_pairs"] > 0
+    assert coverage["mandated_pairs"] > 0
+    assert coverage["mandated_pairs_substantively_adjudicated"] == coverage["mandated_pairs"]
+    assert coverage["mandated_comparisons_observed"] == coverage["mandated_pairs"]
 
 
 def test_every_family_completed_its_comparisons(package):
@@ -380,7 +424,8 @@ def test_an_incoherent_equivalence_class_is_never_silent(package):
     matching recorded entry. Incoherence may be reported, never dropped."""
     registered = {(e["family_id"], frozenset((e["left"], e["right"])))
                   for e in package["register"]["entries"]
-                  if e["kind"] == "COMPARISON_CONTRADICTION"}
+                  if e["kind"] in ("COMPARISON_CONTRADICTION",
+                                   "DIAGNOSTIC_NON_COMPARABILITY")}
     for cls in build_equivalence_classes(package["observations"]):
         if cls.coherent or len(cls.members) < 2:
             continue
@@ -392,7 +437,8 @@ def test_no_observation_pair_was_compared_across_state_machines(package):
     for fam in package["families"]:
         for cmp in fam.comparisons:
             if cmp.verdict == "NOT_COMPARABLE":
-                assert "different state machines" in cmp.reason
+                assert ("different state machines" in cmp.reason
+                        or "diagnostic family" in cmp.reason), cmp.reason
 
 
 def test_gate_decision_is_derived_from_the_counts_not_asserted(package):
@@ -400,17 +446,30 @@ def test_gate_decision_is_derived_from_the_counts_not_asserted(package):
     assert decision["counts"]["blocking_contradictions"] == 0
     assert decision["counts"]["guarded_violations"] == 0
     blocking = (decision["counts"]["gate_claim_blocking"]
-                + decision["counts"]["evidence_gaps"])
+                + decision["counts"]["evidence_gaps"]
+                + decision["counts"]["mandated_not_adjudicated"]
+                + decision["counts"]["unexercised_required_properties"])
     if blocking or decision["counts"]["blocking_contradictions"]:
         assert decision["exit"] != "PASS_G8_CROSS_SCENARIO_COHERENCE"
     assert decision["mandated"]["uncovered"] == []
+    # 'no detected violation' is not 'property proved'
+    assert decision["counts"]["unexercised_required_properties"] == 0
+    assert decision["counts"]["mandated_not_adjudicated"] == 0
+    # and the baseline is only certified by a verified artifact
+    assert decision["baseline"]["verified"] is True
 
 
 def test_gate_claim_audit_locates_each_receipt_surface_and_recomputes_lineage(package):
     gate = package["gate"]
     assert gate["receipts_audited"], "no receipts audited"
     lineage = gate["count_lineage"]
-    assert lineage["terminal_matches_measured"] is True
+    # the declared lineage is checked on its own terms: the prior gates terminate at
+    # the inherited count, the chain is monotone and carries no arithmetic defect.
+    # Whether the LIVE count equals the declared terminal is recorded separately
+    # (a gate that adds tests legitimately differs from its predecessor's terminal).
+    assert lineage["terminal_declared_full"] == 938
+    assert lineage["monotone"] is True
+    assert lineage["arithmetic_defects"] == []
     # every audited receipt produced at least one finding, so nothing is missing
     assert len(gate["findings"]) > len(gate["receipts_audited"])
     assert lineage["monotone"] is True
@@ -486,7 +545,8 @@ def test_c22_the_audit_excludes_its_own_gate_receipt(package):
     assert gate["count_lineage"]["chain"], "the prior-gate lineage must not be empty"
 
 
-def test_c14_the_emitted_evidence_package_is_byte_reproducible(tmp_path, monkeypatch):
+def test_c14_the_emitted_evidence_package_is_byte_reproducible(
+        tmp_path, monkeypatch, sealed_test_evidence):
     """Two consecutive generator runs must produce byte-identical artifacts, and
     the generator must carry no wall-clock field.
 
@@ -496,25 +556,25 @@ def test_c14_the_emitted_evidence_package_is_byte_reproducible(tmp_path, monkeyp
     import scenarios.g8_emit_evidence as EMIT
     shipped = {p.name: p.read_bytes() for p in (ROOT / "evidence").glob("G8_*")}
     monkeypatch.setattr(EMIT, "EVIDENCE", tmp_path)
-    first = EMIT.emit(938)
+    first = EMIT.emit(sealed_test_evidence)
     digests = {p.name: p.read_bytes() for p in tmp_path.glob("G8_*")}
-    EMIT.emit(938)
+    EMIT.emit(sealed_test_evidence)
     for name, before in digests.items():
         assert (tmp_path / name).read_bytes() == before, name
     source = (ROOT / "scenarios" / "g8_emit_evidence.py").read_text(encoding="utf-8")
     for forbidden in ("datetime", "time.time", "utcnow", "recorded_utc",
                       "strftime"):
         assert forbidden not in source, forbidden
-    assert first["receipt"]["collected"] == 938
+    assert first["receipt"]["collected"] == sealed_test_evidence.collected
     assert first["decision"]["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
     # the shipped package is untouched by the test
     for name, before in shipped.items():
         assert (ROOT / "evidence" / name).read_bytes() == before, name
 
 
-def test_the_audit_does_not_modify_canonical_fixtures(contract):
+def test_the_audit_does_not_modify_canonical_fixtures(contract, sealed_test_evidence):
     before = CONTRACT_PATH.read_bytes()
-    AUDIT.build_package(measured_full=938)
+    AUDIT.build_package(test_evidence=sealed_test_evidence)
     assert CONTRACT_PATH.read_bytes() == before
 
 
@@ -677,7 +737,8 @@ def test_c20_contract_validation_rejects_duplicate_outcome_classes(contract):
         validate_contract(bad)
 
 
-def test_c21_the_declared_blocks_gate_policy_governs_the_exit(contract, package):
+def test_c21_the_declared_blocks_gate_policy_governs_the_exit(
+        contract, package, sealed_test_evidence):
     """The gate exit must follow the DECLARED policy: a HIGH-severity evidence gap
     and a RECEIPT_OR_CLAIM_DEFECT that cannot be resolved block; a LOW-severity
     coarse-proxy gap and a superseded finding do not."""
@@ -695,16 +756,524 @@ def test_c21_the_declared_blocks_gate_policy_governs_the_exit(contract, package)
             governing_contract="g", detail="d", blocks_gate=False,
             superseded_by="LATER_CLOSURE_RECEIPT.json")
     families = package["families"]
-    blocked = decide_gate(contract, families, [], [high], measured_full=1, collected_full=1)
+    obs = package["observations"]
+    guarded = [g for fam in families for g in fam.guarded]
+    blocked = decide_gate(contract, families, guarded, [high],
+                          test_evidence=sealed_test_evidence, observations=obs)
     assert blocked["exit"] == "BLOCKED_G8_MISSING_EVIDENCE"
-    passed = decide_gate(contract, families, [], [quiet], measured_full=1, collected_full=1)
+    passed = decide_gate(contract, families, guarded, [quiet],
+                         test_evidence=sealed_test_evidence, observations=obs)
     assert passed["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
     assert passed["counts"]["gate_claim_superseded"] == 1
     # a recorded-but-non-blocking defect is still counted, never dropped
-    recorded = decide_gate(contract, families, [], [GateClaimFinding(
+    recorded = decide_gate(contract, families, guarded, [GateClaimFinding(
         finding_id="R", receipt_path="z", claim="c", observed="o", is_defect=True,
         classification="RECEIPT_OR_CLAIM_DEFECT", severity="MEDIUM",
         governing_contract="g", detail="d", blocks_gate=False)],
-        measured_full=1, collected_full=1)
+        test_evidence=sealed_test_evidence, observations=obs)
     assert recorded["exit"] == "PASS_G8_CROSS_SCENARIO_COHERENCE"
     assert recorded["counts"]["gate_claim_recorded_not_blocking"] == 1
+    # R-G8-05: an EMPTY guarded-property surface proves nothing, so the gate must
+    # block instead of passing by absence of a violation
+    empty = decide_gate(contract, families, [], [quiet],
+                        test_evidence=sealed_test_evidence, observations=obs)
+    assert empty["exit"] == "BLOCKED_G8_MISSING_EVIDENCE"
+    assert empty["counts"]["unexercised_required_properties"] == len(
+        contract["closure_required_properties"])
+
+
+# =========================================================================== #
+# STRESS-G8R0 — the adversarial controls the closure review requires, one group
+# per finding. Every one of them was proved RED against 6c015f86 before the
+# repair; that red transcript is archived in G8_CONTRADICTION_REGISTER.json.
+# =========================================================================== #
+def _declared_pairs(contract, family_id):
+    return next(f for f in contract["comparison_families"]
+                if f["family_id"] == family_id)["declared_pairs"]
+
+
+def test_r01_mandatory_not_comparable_is_not_coverage(contract, package):
+    """R-G8-01 RED BEFORE REPAIR: F2 reported 20/20 mandated coverage and the gate
+    PASSED while five mandated pairs returned NOT_COMPARABLE. Invoking the
+    comparator is not coverage."""
+    fam = next(f for f in package["families"] if f.family_id == "F2")
+    pair = sorted(_declared_pairs(contract, "F2")[0])
+    comp = ComparisonResult(
+        comparison_id="SYN:NC", family_id="F2", left_id=pair[0], right_id=pair[1],
+        left_ref=pair[0], right_ref=pair[1], verdict="NOT_COMPARABLE",
+        reason="SYNTHETIC CONTROL: terminal vocabularies differ",
+        differing_fields=(), mandated=True)
+    cov = mandated_pair_coverage(contract, [replace(fam, comparisons=(comp,))])
+    assert cov["mandated_comparisons_observed"] >= 1
+    assert cov["mandated_pairs_substantively_adjudicated"] == 0
+    assert cov["mandated_pairs_not_comparable"]
+    entry = [e for e in cov["uncovered_mandated_pairs"]
+             if e["family_id"] == "F2" and pair[0] in e["pair"]]
+    assert entry, "a NOT_COMPARABLE mandated pair must be reported UNCOVERED"
+    assert "NOT_COMPARABLE" in entry[0]["verdicts"]
+
+
+def test_r01_a_mandated_pair_never_compared_blocks_the_gate(
+        contract, package, sealed_test_evidence):
+    """R-G8-01: dropping every comparison leaves mandated relationships
+    unadjudicated, and the gate must block instead of passing."""
+    stripped = [replace(f, comparisons=()) for f in package["families"]]
+    guarded = [g for f in package["families"] for g in f.guarded]
+    decision = decide_gate(contract, stripped, guarded, [],
+                           test_evidence=sealed_test_evidence,
+                           observations=package["observations"])
+    assert decision["exit"] == "BLOCKED_G8_MISSING_EVIDENCE"
+    assert decision["counts"]["mandated_not_adjudicated"] > 0
+    assert any("not substantively adjudicated" in r for r in decision["reasons"])
+
+
+def test_r01_the_live_package_adjudicates_every_mandated_pair(contract, package):
+    """The repaired audit must substantively adjudicate every mandated pair, or
+    report it as an uncovered evidence gap. Neither is a silent equivalence."""
+    cov = mandated_pair_coverage(contract, package["families"])
+    live = package["mandated_coverage"]
+    assert cov["mandated_pairs"] == live["mandated_pairs"]
+    assert (cov["mandated_pairs_substantively_adjudicated"]
+            + len(cov["uncovered_mandated_pairs"]) == cov["mandated_pairs"])
+    assert live["uncovered_mandated_pairs"] == []
+    assert live["mandated_pairs_substantively_adjudicated"] == live["mandated_pairs"]
+    assert live["mandated_pairs_not_comparable"] == []
+
+
+def test_r02_p5_tautology_is_gone(contract):
+    """R-G8-02 RED BEFORE REPAIR: p5({'profit': 10, 'items': [{'disposition':
+    'VALIDATED'}]}) returned True. The shape lives in the real contract so the
+    control and the derivation stay in step."""
+    red = contract["pre_repair_red_register"]["red_before_repair"]
+    # the exact surface that used to return True: it cannot DEMONSTRATE the
+    # relation, so the honest post-repair answer is unknown, never HOLDS
+    minimal = GP.p5_profit_did_not_weaken_validation(red["R-G8-02_p5_adverse_surface"])
+    assert minimal.verdict() == "UNKNOWN_NOT_FAVORABLE"
+    assert minimal.verdict() != "HOLDS"
+    assert red["R-G8-02_post_repair_expected"].startswith("UNKNOWN_NOT_FAVORABLE")
+    # and once the profit-bearing claim is identifiable, the same construction
+    # that reached VALIDATED with no gate surface is a VIOLATION
+    identified = GP.p5_profit_did_not_weaken_validation(
+        red["R-G8-02_p5_identified_surface"])
+    assert identified.verdict() == "VIOLATED"
+    assert identified.derivation_kind == "DIRECT_TRACE"
+
+
+def test_r02_p5_holds_only_on_an_exercised_gate_surface():
+    gp = GP.p5_profit_did_not_weaken_validation({
+        "profit": 10,
+        "items": [{"candidate_id": "CAND_1", "disposition": "REJECTED",
+                   "gate_vector": [{"gate_id": "G1", "passed": False,
+                                    "material": True}]}]})
+    assert gp.verdict() == "HOLDS"
+    assert gp.derivation_kind == "DIRECT_TRACE"
+    quiet = GP.p5_profit_did_not_weaken_validation({"items": [{"disposition": "FLAGGED"}]})
+    assert quiet.verdict() == "UNKNOWN_NOT_FAVORABLE"
+
+
+def test_r03_p7_unknown_and_key_names_are_not_provenance(contract):
+    """R-G8-03 RED BEFORE REPAIR: {'evidence_provenance': 'UNKNOWN',
+    'evidence_lineage': 'UNKNOWN'} returned True."""
+    surface = contract["pre_repair_red_register"]["red_before_repair"][
+        "R-G8-03_provenance_adverse_surface"]
+    gp = GP.p7_provenance_preserved(surface)
+    assert gp.verdict() == "UNKNOWN_NOT_FAVORABLE"
+    assert gp.derivation_kind == "NOT_DERIVABLE"
+    key_names_only = GP.p7_provenance_preserved({
+        "attached_references": ["UNKNOWN", ""], "retained_references": ["UNKNOWN"]})
+    assert key_names_only.verdict() == "UNKNOWN_NOT_FAVORABLE"
+    dropped = GP.p7_provenance_preserved({
+        "attached_references": ["EV_1", "EV_2"], "retained_references": ["EV_1"]})
+    assert dropped.verdict() == "VIOLATED"
+    kept = GP.p7_provenance_preserved({
+        "attached_references": ["EV_1"], "retained_references": ["EV_1"]})
+    assert kept.verdict() == "HOLDS"
+
+
+def test_r04_p11_scenario_identity_cannot_derive_runtime_neutrality(contract):
+    """R-G8-04 RED BEFORE REPAIR: g4_runtime_neutral('S13') and
+    g4_runtime_neutral('S99_NO_SUCH_SCENARIO') BOTH returned True."""
+    for sid in ("S13", "S99_NO_SUCH_SCENARIO", ""):
+        gp = GP.p11_runtime_identity_not_semantic({"scenario_id": sid})
+        assert gp.verdict() == "UNKNOWN_NOT_FAVORABLE", sid
+    assert contract["pre_repair_red_register"]["red_before_repair"][
+        "R-G8-04_scenario_identifier"] == "S13"
+
+
+def test_r04_p11_unpaired_and_mismatched_runtime_replacements():
+    unpaired = GP.p11_runtime_identity_not_semantic({
+        "runtime_pairs": [{"artifact_id": "ART_1", "baseline_runtime": "RUNTIME_A",
+                           "replacement_runtime": "RUNTIME_A",
+                           "baseline_fingerprint": "FP_1",
+                           "replacement_fingerprint": "FP_1"}]})
+    assert unpaired.verdict() == "UNKNOWN_NOT_FAVORABLE"
+    mismatched = GP.p11_runtime_identity_not_semantic({
+        "runtime_pairs": [{"artifact_id": "ART_1", "baseline_runtime": "RUNTIME_A",
+                           "replacement_runtime": "RUNTIME_B",
+                           "baseline_fingerprint": "FP_1",
+                           "replacement_fingerprint": "FP_2",
+                           "semantic_fingerprint_equal": False}]})
+    assert mismatched.verdict() == "VIOLATED"
+    paired = GP.p11_runtime_identity_not_semantic({
+        "runtime_pairs": [{"artifact_id": "ART_1", "baseline_runtime": "RUNTIME_A",
+                           "replacement_runtime": "RUNTIME_B",
+                           "baseline_fingerprint": "FP_1",
+                           "replacement_fingerprint": "FP_1",
+                           "semantic_fingerprint_equal": True}]})
+    assert paired.verdict() == "HOLDS"
+    assert paired.derivation_kind == "PAIRED_COUNTERFACTUAL"
+
+
+def test_r05_p1_a_refusal_elsewhere_is_not_an_authority_proof():
+    """R-G8-05 RED BEFORE REPAIR: P1 returned HOLDS whenever any refusal was
+    observed. An ungoverned escalation earlier in the same trace must still be a
+    violation."""
+    gp = GP.p1_authority_not_escalated({
+        "authority_before": {"ACTOR_1": "WORKER"},
+        "authority_after": {"ACTOR_1": "OPERATOR"},
+        "authority_events": {"refusals": 1},
+        "applied_escalations": [{"event": "EV_ESCALATE",
+                                 "authorized_by_governed_basis": False}]})
+    assert gp.verdict() == "VIOLATED"
+    assert gp.derivation_kind == "CANONICAL_STATE_COMPARISON"
+    governed = GP.p1_authority_not_escalated({
+        "authority_before": {"ACTOR_1": "WORKER"},
+        "authority_after": {"ACTOR_1": "OPERATOR"},
+        "authority_events": {"ratifications": 1},
+        "governed_basis": ["GRANT_1"],
+        "applied_escalations": [{"event": "EV_ESCALATE",
+                                 "authorized_by_governed_basis": True}]})
+    assert governed.verdict() == "HOLDS"
+
+
+def test_r05_p8_capability_caused_authority_change_is_a_violation():
+    gp = GP.p8_capability_not_authority({
+        "capability_changes": [{"worker_id": "WORKER_1",
+                                "reliability_before": 0.4,
+                                "reliability_after": 0.9}],
+        "authority_before": {"WORKER_1": "WORKER"},
+        "authority_after": {"WORKER_1": "OPERATOR"},
+        "escalation_basis_texts": ["capability improved"]})
+    assert gp.verdict() == "VIOLATED"
+    assert gp.derivation_kind == "PAIRED_COUNTERFACTUAL"
+    unchanged = GP.p8_capability_not_authority({
+        "capability_changes": [{"worker_id": "WORKER_1",
+                                "reliability_before": 0.4,
+                                "reliability_after": 0.9}],
+        "authority_before": {"WORKER_1": "WORKER"},
+        "authority_after": {"WORKER_1": "WORKER"}})
+    assert unchanged.verdict() == "HOLDS"
+
+
+def test_r05_p9_availability_caused_empirical_change_is_a_violation():
+    gp = GP.p9_operator_availability_not_empirical({
+        "availability_pair": {
+            "available": {"action_verdict": "EXECUTE",
+                          "evidence_projection": {"GRADE": "STRONG"},
+                          "evidence_refs": ["EV_1"]},
+            "unavailable": {"action_verdict": "HOLD",
+                            "evidence_projection": {"GRADE": "WEAK"},
+                            "evidence_refs": ["EV_1"]}}})
+    assert gp.verdict() == "VIOLATED"
+    unchanged = GP.p9_operator_availability_not_empirical({
+        "availability_pair": {
+            "available": {"action_verdict": "EXECUTE",
+                          "evidence_projection": {"GRADE": "STRONG"},
+                          "evidence_refs": ["EV_1"]},
+            "unavailable": {"action_verdict": "HOLD",
+                            "evidence_projection": {"GRADE": "STRONG"},
+                            "evidence_refs": ["EV_1"]}}})
+    assert unchanged.verdict() == "HOLDS"
+
+
+def test_r06_p6_raw_count_over_one_lineage_is_a_violation():
+    """R-G8-06: the derivation must inspect the ACTUAL disposition, not merely
+    observe that several reviewers existed."""
+    gp = GP.p6_count_did_not_create_transformation({
+        "raw_reviewer_count": 10, "distinct_source_lineages": 1,
+        "disposition": "TRANSFORMATION_ADMITTED",
+        "claim_id": "CLAIM_1", "policy_id": "POLICY_1"})
+    assert gp.verdict() == "VIOLATED"
+    assert gp.derivation_kind == "DIRECT_TRACE"
+    held = GP.p6_count_did_not_create_transformation({
+        "raw_reviewer_count": 10, "distinct_source_lineages": 1,
+        "disposition": "REVIEW_OPEN",
+        "claim_id": "CLAIM_1", "policy_id": "POLICY_1"})
+    assert held.verdict() == "HOLDS"
+
+
+def test_r05_a_holds_finding_without_derivation_evidence_is_rejected():
+    for kwargs in ({"derivation_kind": "NOT_DERIVABLE", "evidence_refs": ("X",)},):
+        with pytest.raises(GuardedContractError):
+            validate_guarded_finding(GuardedPropertyFinding(
+                property_id="P8", property_name="capability is not authority",
+                governing_contract="g", observation_id="O", family_id="F1",
+                value=True, verdict="HOLDS", before_state="a", after_state="b",
+                decision_surface="s", reason="r", **kwargs))
+    with pytest.raises(GuardedContractError):
+        validate_guarded_finding(GuardedPropertyFinding(
+            property_id="P1", property_name="no authority escalation",
+            governing_contract="g", observation_id="O", family_id="F1",
+            value=True, verdict="HOLDS",
+            derivation_kind="CANONICAL_STATE_COMPARISON",
+            evidence_refs=(), before_state="a", after_state="b",
+            decision_surface="s", reason="r"))
+
+
+def test_r05_a_bare_boolean_cannot_certify_a_guarded_property(contract):
+    obs = _obs(contract, "SYN:BARE", guarded_properties={"P1": True})
+    with pytest.raises(GuardedContractError):
+        check_guarded_properties(contract, [obs])
+
+
+# --------------------------------------------------------------------------- #
+# R-G8-07 — a test count must be a provenance-bearing artifact, never a scalar
+# --------------------------------------------------------------------------- #
+def test_r07_the_emitter_cannot_consume_a_bare_count():
+    """R-G8-07 RED BEFORE REPAIR: the emitter signature was
+    `emit(measured_full: int)` and built collected=passed=that number, failed=0.
+    A bare integer can no longer certify anything."""
+    params = inspect.signature(EMIT.emit).parameters
+    assert list(params) == ["test_evidence"]
+    assert params["test_evidence"].annotation is not inspect.Parameter.empty
+    for n in (1, 973, 9999):
+        with pytest.raises((TypeError, AttributeError)):
+            EMIT.emit(n)
+
+
+def test_r07_absent_failing_stale_and_malformed_artifacts_all_refuse(tmp_path):
+    sha = AUDIT.head_sha()
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(tmp_path / "absent.xml"), expected_tested_sha=sha)
+
+    def _write(name, text):
+        p = tmp_path / name
+        p.write_text(text, encoding="utf-8")
+        return p
+
+    failing = _write("fail.xml", junit_document(cases=5, tested_sha=sha, failures=1))
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(failing), expected_tested_sha=sha)
+    other_tree = _write("other.xml", junit_document(cases=5, tested_sha="deadbeef"))
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(other_tree), expected_tested_sha=sha)
+    wrong_suite = _write("suite.xml", junit_document(cases=5, name="unrelated_suite",
+                                                    tested_sha=sha))
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(wrong_suite), expected_tested_sha=sha)
+    malformed = _write("bad.xml", "<not-a-testsuite/>")
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(malformed), expected_tested_sha=sha)
+    empty = _write("empty.xml", "   ")
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(empty), expected_tested_sha=sha)
+    counts_mismatch = _write("counts.xml", junit_document(cases=5, tested_sha=sha)
+                             .replace('tests="5"', 'tests="9"'))
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(counts_mismatch), expected_tested_sha=sha)
+    stale = _write("stale.xml", junit_document(cases=5, tested_sha=sha))
+    with pytest.raises(UnverifiableTestEvidence):
+        read_test_evidence(str(stale), expected_tested_sha=sha,
+                           expected_artifact_digest="0" * 64)
+
+
+def test_r07_a_clean_artifact_yields_a_verifiable_baseline(tmp_path):
+    sha = AUDIT.head_sha()
+    p = tmp_path / "ok.xml"
+    p.write_text(junit_document(cases=7, tested_sha=sha), encoding="utf-8")
+    ev = read_test_evidence(str(p), expected_tested_sha=sha, python_version="3.11.0")
+    assert ev.honest_baseline and ev.measured_full == 7
+    assert check_baseline(ev, tested_sha=sha)["verified"] is True
+    assert ev.artifact_digest and ev.artifact_bytes > 0
+
+
+# --------------------------------------------------------------------------- #
+# R-G8-08 — a source binding must not depend on the checkout's newline policy
+# --------------------------------------------------------------------------- #
+def test_r08_the_s16_source_binding_is_checkout_invariant():
+    """R-G8-08 RED BEFORE REPAIR: the CRLF working tree produced 366841 bytes /
+    72ba79d7... and the git-stored LF blob 354913 bytes / af5941c3..., and the
+    fixture, the live comparison and the receipt all used the raw working-tree
+    digest, so the same source bound differently in different checkouts."""
+    from engine.g5r import (CANONICAL_SOURCE_NEWLINE_RULE, canonical_source_bytes,
+                            canonical_source_digest)
+    manual = ROOT.parent / "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt"
+    lf = manual.read_bytes().replace(b"\r\n", b"\n")
+    crlf = lf.replace(b"\n", b"\r\n")
+    assert lf != crlf
+    assert len(lf) == 354913 and len(crlf) == 366841
+    assert canonical_source_digest(lf) == canonical_source_digest(crlf)
+    assert len(canonical_source_bytes(lf)) == len(canonical_source_bytes(crlf)) == 354913
+    assert CANONICAL_SOURCE_NEWLINE_RULE == "LF_NORMALIZED"
+    declared = json.loads(
+        (ROOT / "scenarios/s16_cerebus_contradiction/doctrine_claims.json")
+        .read_text(encoding="utf-8"))[0]["source_fingerprint"]
+    assert declared == canonical_source_digest(manual.read_bytes())
+
+
+def test_r08_the_live_s16_run_binds_the_canonical_digest():
+    """The live binding path must resolve to the canonical digest on whatever
+    checkout this runs in, so the suite cannot pass on one and be STALE on
+    another."""
+    from engine.g5_runner import run_g5_scenario
+    from engine.g5_runner import load_g5_pack
+    from engine.domain_policy import G5DomainPolicy
+    pack = load_g5_pack(AUDIT.SCEN / AUDIT.G5_MEMBERS["S16"]).decision_grade()
+    policy = G5DomainPolicy.from_data(AUDIT._policy("G5_DOMAIN_EPISTEMIC_POLICY"))
+    res = run_g5_scenario(pack, policy)
+    claim = res.artifacts["doctrine_claims"][0]
+    assert claim["source_binding_status"] == "BOUND"
+    assert claim["source_binding"]["canonical_digest"] == \
+        "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb"
+    assert claim["source_binding"]["canonical_newline_rule"] == "LF_NORMALIZED"
+
+
+# --------------------------------------------------------------------------- #
+# R-G8-09 — contract chronology is recorded, not asserted
+# --------------------------------------------------------------------------- #
+def test_r09_a_reconstruction_cannot_claim_a_pre_run_freeze():
+    base = {"classification": "RETROSPECTIVE_RECONSTRUCTION",
+            "gate_blocking_policy_source": "X",
+            "artifacts": [{"artifact_id": "A",
+                           "stage": "RETROSPECTIVE_RECONSTRUCTION",
+                           "claims_pre_run_freeze": False,
+                           "reconstruction_basis": "b"}]}
+    assert validate_chronology(base)["weakest_stage"] == \
+        "RETROSPECTIVE_RECONSTRUCTION"
+    claimed = copy.deepcopy(base)
+    claimed["artifacts"][0]["claims_pre_run_freeze"] = True
+    with pytest.raises(ChronologyError):
+        validate_chronology(claimed)
+
+
+def test_r09_a_record_cannot_be_summarised_stronger_than_its_weakest_artifact():
+    mixed = {"classification": "PRE_RUN_FROZEN_ARTIFACT",
+             "gate_blocking_policy_source": "X",
+             "artifacts": [
+                 {"artifact_id": "OLD", "stage": "RETROSPECTIVE_RECONSTRUCTION",
+                  "claims_pre_run_freeze": False, "reconstruction_basis": "b"},
+                 {"artifact_id": "NEW", "stage": "PRE_RUN_FROZEN_ARTIFACT",
+                  "claims_pre_run_freeze": True, "introducing_commit_ref": "c",
+                  "pre_run_baseline_ref": "e"}]}
+    with pytest.raises(ChronologyError):
+        validate_chronology(mixed)
+    mixed["classification"] = "RETROSPECTIVE_RECONSTRUCTION"
+    assert validate_chronology(mixed)["classification"] == \
+        "RETROSPECTIVE_RECONSTRUCTION"
+    for bad in ({"artifact_id": "A", "stage": "NOT_A_STAGE"},
+                {"artifact_id": "A", "stage": "PRE_RUN_FROZEN_ARTIFACT",
+                 "claims_pre_run_freeze": True, "introducing_commit_ref": "c",
+                 "pre_run_baseline_ref": ""}):
+        with pytest.raises(ChronologyError):
+            validate_chronology({"classification": "RETROSPECTIVE_RECONSTRUCTION",
+                                 "gate_blocking_policy_source": "X",
+                                 "artifacts": [bad]})
+
+
+def test_r09_the_live_contract_declares_its_own_chronology(contract):
+    record = contract["contract_chronology"]
+    info = validate_chronology(record)
+    assert info["weakest_stage"] == "RETROSPECTIVE_RECONSTRUCTION"
+    assert info["classification"] == "RETROSPECTIVE_RECONSTRUCTION"
+    assert "PRE_RUN_FROZEN_ARTIFACT" in info["stages"]
+    assert "POST_FINDING_AMENDMENT" in info["stages"]
+    assert "PRE-RUN FROZEN ARTIFACT" in record["gate_blocking_policy_source"]
+    # the unsupported historical claim is retracted in the artifact itself
+    assert "NOT supportable" in record["git_evidence"]
+
+
+# --------------------------------------------------------------------------- #
+# F2 — a seeded cross-machine semantic divergence is never silently equivalent
+# --------------------------------------------------------------------------- #
+def _authority_trace(*, grade_changed, artifact_ref):
+    return {"phases": [
+        {"phase": "DIRECTIVE", "detail": {
+            "event_id": "EV_DIRECTIVE_1",
+            "evidence_grade_before": "WEAK",
+            "evidence_grade_after": "STRONG" if grade_changed else "WEAK",
+            "evidence_grade_unchanged": (not grade_changed),
+            "preserved": {"evidence_refs": [artifact_ref]}}}],
+        "canonical_state": {"before": {"evidence_grades": {"CLAIM_1": "WEAK"}}},
+        "terminal_phase": "WATCH"}
+
+
+def test_seeded_cross_machine_semantic_contradiction_is_detected(contract):
+    """A machine-local comparison would call these two traces identical — same
+    phase vocabulary, same terminal token. The shared conceptual projection must
+    separate them, and the F2 comparison must record the divergence instead of
+    reporting equivalence."""
+    clean = CP.project("AUTHORITY", _authority_trace(grade_changed=False,
+                                                    artifact_ref="EV_KEPT"),
+                       "SYN:CONCEPT:CLEAN")
+    dirty = CP.project("AUTHORITY", _authority_trace(grade_changed=True,
+                                                    artifact_ref="EV_KEPT"),
+                       "SYN:CONCEPT:DIRTY")
+    assert clean.outcome_token != dirty.outcome_token
+    assert clean.values["conceptual_authority_not_empirical"] == "PRESERVED"
+    assert dirty.values["conceptual_authority_not_empirical"] == "VIOLATED"
+    left = _obs(contract, "SYN:CONCEPT:CLEAN", family_id="F2", state_machine="M-CONCEPT",
+                object_class="INSTITUTIONAL_CONCEPT",
+                raw_outcome_token=clean.outcome_token, vector_values=dict(clean.values))
+    right = _obs(contract, "SYN:CONCEPT:DIRTY", family_id="F2", state_machine="M-CONCEPT",
+                 object_class="INSTITUTIONAL_CONCEPT",
+                 raw_outcome_token=dirty.outcome_token, vector_values=dict(dirty.values))
+    assert left.outcome_mapped and right.outcome_mapped
+    result = compare_observations(contract, left, right, mandated=True)
+    assert result.verdict != "CONSISTENT", result.to_dict()
+    assert result.differing_fields
+    assert "conceptual_authority_not_empirical" in result.differing_fields
+
+
+def test_the_projection_adapters_refuse_a_sealed_truth_trace():
+    with pytest.raises(ValueError):
+        CP.project("AUTHORITY", {**{k: "x" for k in ("expected_outcome",)}},
+                   "SYN:SEALED")
+
+
+# --------------------------------------------------------------------------- #
+# R-G8-01..09 — the red evidence is EXECUTABLE, not a static annex
+# --------------------------------------------------------------------------- #
+def test_the_pre_repair_red_transcript_still_reproduces_every_finding():
+    """Reruns the committed harness against the pre-repair commit and asserts the
+    transcript still shows each finding RED. This is what makes the red evidence
+    survive: a reviewer runs this test, or the harness directly, rather than
+    trusting an archived file."""
+    text = RED.transcript()
+    assert "PROBE EXIT" not in text, "the probe must run clean against the old tree"
+    # R-G8-01 — coverage claimed while mandated pairs were NOT_COMPARABLE, gate PASS
+    assert "mandated_observed=20/20" in text
+    assert "NOT_COMPARABLE(mandated)=2" in text
+    assert "gate=PASS_G8_CROSS_SCENARIO_COHERENCE" in text
+    # R-G8-02 — the `... or True` tautology on an adverse profit surface
+    assert "-> True" in text and "'VALIDATED'" in text
+    assert 'or True' in text
+    # R-G8-03 — key-name provenance
+    assert "'evidence_provenance': 'UNKNOWN'" in text
+    # R-G8-04 — a scenario identifier and a nonexistent scenario both derived True
+    assert "_g4_runtime_neutral('S99_NO_SUCH_SCENARIO') -> True" in text
+    # R-G8-05 — refusal presence, a literal True, and token recognition
+    assert "single refusal phase, nothing else) -> True" in text
+    assert "refusal AFTER an escalation phase) -> True" in text
+    assert 'P8 declared in the G6 observation as: ["True"]' in text
+    assert "{'_operator_availability'" not in text  # guard against a typo'd probe
+    assert "'UNAVAILABLE'}) -> True" in text
+    # R-G8-06 — P6 derived from counts
+    assert "p6 = (True if (raw_reviewers > 1 and sources == 1) else None)" in text
+    # R-G8-07 — a bare scalar certified the baseline
+    assert "(measured_full: 'int')" in text
+    assert "collected=9999 passed=9999 failed=0" in text
+    assert "receipt records a test-results artifact -> False" in text
+    # R-G8-08 — the checkout decided the source binding
+    assert "fixture digest == LF digest -> False ; == CRLF digest -> True" in text
+    # R-G8-09 — the freeze claim Git could not support
+    assert "FROZEN_AT_STRESS-G8P0" in text
+    assert "authored BEFORE any cross-scenario comparison runs" in text
+    assert "contract declares contract_chronology -> False" in text
+    assert "f5482e3e STRESS-G8P0" in text
+
+
+def test_the_red_transcript_artifact_on_disk_matches_the_harness():
+    """The committed annex must be the harness's own output, so it cannot drift."""
+    archived = (ROOT / "evidence" / "G8_PRE_REPAIR_RED_TRANSCRIPT.md").read_text(
+        encoding="utf-8")
+    assert archived == RED.transcript()

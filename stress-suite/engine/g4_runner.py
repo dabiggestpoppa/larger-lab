@@ -490,6 +490,19 @@ def run_s13(pack: G4ScenarioPack, policy: MemoryPolicy,
         "runtime_rename_semantic_stable": [
             r.reconstruction_semantic_fingerprint == rr.reconstruction_semantic_fingerprint
             for r, rr in zip(reports, rename_reports)],
+        # G8 revision R3 — the paired baseline / runtime-replacement execution
+        # itself, so runtime neutrality is derived from two real fingerprints
+        # rather than from a scenario identifier or a boolean list.
+        "runtime_pairs": [
+            {"artifact_id": str(getattr(r, "epoch_id", "")),
+             "baseline_runtime": current_runtime,
+             "replacement_runtime": "ANOTHER_RUNTIME",
+             "baseline_fingerprint": r.reconstruction_semantic_fingerprint,
+             "replacement_fingerprint": rr.reconstruction_semantic_fingerprint,
+             "semantic_fingerprint_equal": (
+                 r.reconstruction_semantic_fingerprint
+                 == rr.reconstruction_semantic_fingerprint)}
+            for r, rr in zip(reports, rename_reports)],
         "registered_artifact_ids": list(registry.all_ids()),
         "behavior_fingerprint": fp,
         "fingerprint": deterministic_hex("g4_run", pack.scenario_id, fp, length=32),

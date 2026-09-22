@@ -320,6 +320,12 @@ def decide_mechanism_admission(
 # --------------------------------------------------------------------------- #
 # G5R-04 — CEREBUS source binding (digest recomputed from the actual file)
 # --------------------------------------------------------------------------- #
+# STRESS-G8R3 (R-G8-08) — the declared canonical newline rule. It is defined
+# before the binding record so the record can declare which rule produced its
+# canonical digest.
+CANONICAL_SOURCE_NEWLINE_RULE = "LF_NORMALIZED"
+
+
 @dataclass(frozen=True)
 class DoctrineSourceBinding:
     """Binding of a doctrine claim to an actual source file. The digest is
@@ -334,13 +340,20 @@ class DoctrineSourceBinding:
     locator: str = ""
     claim_fragment_digest: str = ""
     source_blob_sha: str = ""
+    # STRESS-G8R3 (R-G8-08): checkout-invariant companion of content_digest.
+    canonical_digest: str = ""
+    canonical_length: int = 0
+    canonical_newline_rule: str = CANONICAL_SOURCE_NEWLINE_RULE
 
     def to_dict(self) -> Dict[str, Any]:
         return {"source_path": self.source_path, "hash_algorithm": self.hash_algorithm,
                 "content_digest": self.content_digest, "content_length": self.content_length,
                 "manual_version": self.manual_version, "locator": self.locator,
                 "claim_fragment_digest": self.claim_fragment_digest,
-                "source_blob_sha": self.source_blob_sha}
+                "source_blob_sha": self.source_blob_sha,
+                "canonical_digest": self.canonical_digest,
+                "canonical_length": self.canonical_length,
+                "canonical_newline_rule": self.canonical_newline_rule}
 
 
 _SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
@@ -348,6 +361,32 @@ _SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
 
 def sha256_hex(blob: bytes) -> str:
     return hashlib.sha256(blob).hexdigest()
+
+
+# STRESS-G8R3 (R-G8-08) — canonical source-byte rule.
+#
+# A raw working-tree digest is CHECKOUT-DEPENDENT: a Git clone with
+# core.autocrlf=true materialises the same repository blob with CRLF newlines
+# and therefore a different byte length and a different SHA-256. Source binding
+# that hashed raw working-tree bytes would silently mean different things in
+# different checkouts.
+#
+# Declared rule (one rule, applied everywhere a source digest is bound):
+#   canonical_source_bytes(blob) == blob with CRLF normalised to LF
+#   canonical_source_digest(blob) == SHA-256 of canonical_source_bytes(blob)
+#
+# `canonical_digest` is the repository-stable identity of a source artifact.
+# `content_digest` remains the RAW working-tree digest and keeps its original
+# meaning; the two are always reported under distinct field names so that no
+# reader has to guess which one a number is.
+def canonical_source_bytes(blob: bytes) -> bytes:
+    """Working-tree bytes normalised to the declared canonical newline form."""
+    return blob.replace(b"\r\n", b"\n")
+
+
+def canonical_source_digest(blob: bytes) -> str:
+    """Checkout-invariant SHA-256 of a source artifact."""
+    return sha256_hex(canonical_source_bytes(blob))
 
 
 def validate_sha256_digest(digest: str) -> None:
@@ -367,6 +406,8 @@ def recompute_source_binding(
     blob = open(source_path, "rb").read()
     digest = sha256_hex(blob)
     validate_sha256_digest(digest)
+    canonical = canonical_source_digest(blob)
+    validate_sha256_digest(canonical)
     frag = sha256_hex(claim_fragment.encode("utf-8")) if claim_fragment else ""
     return DoctrineSourceBinding(
         source_path=source_path,
@@ -376,7 +417,13 @@ def recompute_source_binding(
         manual_version=manual_version,
         locator=locator,
         claim_fragment_digest=frag,
-        source_blob_sha=digest,
+        # source_blob_sha is the REPOSITORY-STABLE identity of the source blob
+        # (STRESS-G8R3): it is the canonical digest, not the checkout-dependent
+        # raw working-tree digest.
+        source_blob_sha=canonical,
+        canonical_digest=canonical,
+        canonical_length=len(canonical_source_bytes(blob)),
+        canonical_newline_rule=CANONICAL_SOURCE_NEWLINE_RULE,
     )
 
 

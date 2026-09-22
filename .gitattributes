@@ -6,3 +6,11 @@
 # never break shellcheck SC1017 on them.
 infrastructure/cloud-ground/scripts/* text eol=lf
 infrastructure/cloud-ground/scripts/*.py text eol=lf
+# Evidence artifacts are bytes-in, bytes-out: the stress-suite evidence tree is
+# LF everywhere, so a clean checkout is byte-identical on every platform. This is
+# the same rule R-G8-08 applies to bound sources (see
+# stress-suite/evidence/G8_SOURCE_BINDING_PORTABILITY.md). G8_EQUIVALENCE_CONTRACT.json
+# is included deliberately: it was committed with CRLF at f5482e3e and is
+# normalised here so the contract of record is checkout-invariant like the
+# evidence it governs.
+stress-suite/evidence/* text eol=lf

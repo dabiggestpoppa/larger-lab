@@ -490,7 +490,11 @@ def run_s16(pack: G5ScenarioPack, policy: G5DomainPolicy,
             # SHA-256 and must equal the recomputed file digest
             if claim.source_fingerprint:
                 validate_sha256_digest(claim.source_fingerprint)
-                if claim.source_fingerprint != binding.content_digest:
+                # STRESS-G8R3 (R-G8-08): the declared fingerprint is compared
+                # against the canonical (checkout-invariant) digest, so a CRLF
+                # working tree cannot read as STALE_DIGEST and an LF working tree
+                # cannot silently accept a different artifact.
+                if claim.source_fingerprint != binding.canonical_digest:
                     binding_status = "STALE_DIGEST"
         except Exception as exc:  # pragma: no cover - defensive
             binding_status = f"UNBOUND:{type(exc).__name__}"

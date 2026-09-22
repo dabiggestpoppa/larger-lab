@@ -1,9 +1,134 @@
 {
   "contract_id": "G8-EQUIVALENCE-CONTRACT-001",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "gate": "G8_CROSS_SCENARIO_CONTRADICTION_AUDIT",
-  "status": "FROZEN_AT_STRESS-G8P0 + DECLARED_REVISIONS",
+  "status": "CONTRACT_OF_RECORD_FOR_THE_REPAIRED_G8 (see contract_chronology)",
+  "non_exercising_tokens": [
+    "UNKNOWN",
+    "NOT_EXERCISED",
+    "NOT_APPLICABLE"
+  ],
+  "pre_repair_red_register": {
+    "note": "STRESS-G8R0. The exact adverse surface or identifier that was RED against the pre-repair head, recorded here so each regression reads its input from declared state instead of restating it. The raw command/output transcript that proved each one red is committed at stress-suite/evidence/G8_PRE_REPAIR_RED_TRANSCRIPT.md and is regenerable by scenarios/g8_pre_repair_red_transcript.py against the pre-repair commit below.",
+    "pre_repair_head": "6c015f86408a56721f8999e4aa39b218fab0fd4d",
+    "red_transcript": "stress-suite/evidence/G8_PRE_REPAIR_RED_TRANSCRIPT.md",
+    "red_transcript_regenerator": "stress-suite/scenarios/g8_pre_repair_red_transcript.py",
+    "red_before_repair": {
+      "R-G8-01_mandated_coverage": "mandated_pair_coverage claimed 20/20 observed with 5 NOT_COMPARABLE comparison results, and decide_gate returned PASS_G8_CROSS_SCENARIO_COHERENCE with those pairs counted as covered",
+      "R-G8-02_p5_adverse_surface": {
+        "profit": 10,
+        "items": [
+          {
+            "disposition": "VALIDATED"
+          }
+        ]
+      },
+      "R-G8-02_observed": "p5 returned True through the `... or True` tautology",
+      "R-G8-02_post_repair_expected": "UNKNOWN_NOT_FAVORABLE — the surface cannot demonstrate that profit left the validation state intact, so it must not read as HOLDS; it is not VIOLATED either, because it cites no concrete candidate reference",
+      "R-G8-02_p5_identified_surface": {
+        "profit": 10,
+        "items": [
+          {
+            "candidate_id": "CAND_FORGED",
+            "disposition": "VALIDATED"
+          }
+        ]
+      },
+      "R-G8-02_p5_identified_expected": "VIOLATED — a validated profit-bearing claim that exposes no gate surface at all",
+      "R-G8-03_provenance_adverse_surface": {
+        "evidence_provenance": "UNKNOWN",
+        "evidence_lineage": "UNKNOWN"
+      },
+      "R-G8-03_observed": "the provenance check returned True from key-name presence alone",
+      "R-G8-04_scenario_identifier": "S13",
+      "R-G8-04_observed": "the runtime-neutrality check returned True both for S13 and for S99_NO_SUCH_SCENARIO",
+      "R-G8-05_observed": "P1 held on refusal presence alone, P8 returned a literal True, P9 recognised the AVAILABLE/UNAVAILABLE token without a paired comparison",
+      "R-G8-06_observed": "P6 derived from the count conditions instead of the resulting disposition",
+      "R-G8-07_scalar_self_report": [1, 973, 9999],
+      "R-G8-07_observed": "emit(measured_full: int) built collected=passed=the scalar with failed=0 and consumed no artifact",
+      "R-G8-08_observed": "the LF blob (354913 bytes, af5941c3...) and the CRLF working tree (366841 bytes, 72ba79d7...) both bound the same S16 source to different digests, and the fixture, live comparison and receipt all used the raw working-tree digest",
+      "R-G8-08_raw_digests": {
+        "lf_bytes": 354913,
+        "lf_sha256": "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb",
+        "crlf_bytes": 366841,
+        "crlf_sha256": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233"
+      },
+      "R-G8-09_chronology": {
+        "commits_touching_this_contract": ["f5482e3e"],
+        "v1_0_0_bytes": "NOT RECOVERABLE from any object",
+        "retracted_claim": "that the v1.0.0 text was 'preserved verbatim' and 'frozen before any comparison ran'",
+        "disposition": "RETRACTED_AS_UNSUPPORTED; replaced by the explicit PRE-RUN FROZEN / POST-FINDING AMENDMENT / RETROSPECTIVE RECONSTRUCTION record in contract_chronology"
+      }
+    }
+  },
+  "closure_required_properties": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "P7",
+    "P8",
+    "P9",
+    "P10",
+    "P11",
+    "P12"
+  ],
+  "closure_required_properties_note": "A property listed here is MANDATORY for the G8 closure verdict. It may only contribute HOLDS when its observation carries the derivation evidence its declared derivation_kind requires. Declaring no violation is NOT proving the property: a closure-required property that is never exercised with a real derivation blocks the gate as BLOCKED_G8_MISSING_EVIDENCE rather than passing by absence of a violation.",
+  "contract_chronology": {
+    "classification": "RETROSPECTIVE_RECONSTRUCTION",
+    "classification_note": "STRESS-G8R4 (R-G8-09). The overall classification is the WEAKEST stage recorded below, not the most convenient one. The first G8 run's contract text is NOT recoverable as a pre-run artifact, and that fact makes the whole chronology record weaker than the repaired R3 policy taken alone. The R3 policy of record IS a genuine pre-run frozen artifact relative to the R3 evidence commit, and it is named as such below — that is what the gate's blocking status is derived from.",
+    "git_evidence": "`git log --all -- stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json` returns exactly one commit, f5482e3e (STRESS-G8P0), and that commit's blob already carries version 1.1.0 WITH the R1/R2 revisions. Git therefore does NOT establish that the v1.0.0 verdict rules were frozen before the first comparison ran. The earlier wording 'preserved verbatim' / 'frozen before any comparison ran' was NOT supportable and has been removed rather than softened.",
+    "gate_blocking_policy_source": "G8-EQUIVALENCE-CONTRACT v1.2.0 (revision R3) — committed by STRESS-G8R1, i.e. a PRE-RUN FROZEN ARTIFACT relative to the STRESS-G8RR evidence commit that archives the repaired result. The gate's blocking status is therefore derived from a policy that predates the repaired run, NOT from any rule authored after seeing the repaired outcome.",
+    "artifacts": [
+      {
+        "artifact_id": "G8-EQUIVALENCE-CONTRACT v1.0.0 (superseded)",
+        "stage": "RETROSPECTIVE_RECONSTRUCTION",
+        "introducing_commit_ref": null,
+        "claims_pre_run_freeze": false,
+        "reconstruction_basis": "the pre-revision audit state preserved in G8_COUNTEREXAMPLE_REGISTER.json as PRE_REVISION_STATE, plus the R1/R2 revision entries below; the original bytes are in no object reachable from this repository",
+        "note": "the earlier claim that these bytes were 'preserved verbatim' and 'frozen before any comparison ran' is retracted here as unsupported"
+      },
+      {
+        "artifact_id": "G8-EQUIVALENCE-CONTRACT v1.1.0 @ f5482e3e (STRESS-G8P0)",
+        "stage": "POST_FINDING_AMENDMENT",
+        "introducing_commit_ref": "f5482e3e (STRESS-G8P0)",
+        "claims_pre_run_freeze": false,
+        "amendment_revision_refs": ["R1", "R2"],
+        "note": "carries revisions motivated by the first run's own findings, so it is a post-finding amendment and not evidence of a pre-run freeze"
+      },
+      {
+        "artifact_id": "G8-EQUIVALENCE-CONTRACT v1.2.0 (revision R3)",
+        "stage": "PRE_RUN_FROZEN_ARTIFACT",
+        "introducing_commit_ref": "STRESS-G8R1 (the repaired audit-contract commit)",
+        "claims_pre_run_freeze": true,
+        "pre_run_baseline_ref": "STRESS-G8RR (the evidence commit that archives the repaired G8 result)",
+        "note": "the only artifact relative to which a freeze is actually provable"
+      }
+    ],
+    "forward_rule": "future gates must commit the pre-run contract BEFORE executing the audit; this gate records the chronology defect instead of rewriting it away"
+  },
   "revisions": [
+    {
+      "revision": "R3",
+      "authored_at": "STRESS-G8R1..STRESS-G8R4",
+      "motivated_by": "adversarial repair review of the first G8 PASS (findings R-G8-01 through R-G8-09). The first pass overclaimed: five mandatory cross-machine relationships were counted as covered while returning NOT_COMPARABLE, several guarded properties returned HOLDS from a key-name search, a substring search, a scenario identifier, an unconditional literal or a `... or True` tautology, test counts were self-reported scalars, the CEREBUS source binding differed between LF and CRLF checkouts, and the freeze chronology was asserted rather than provable.",
+      "changes": [
+        "mandatory coverage now counts only SUBSTANTIVE verdicts (CONSISTENT / MATERIAL_DISCRIMINATOR); NOT_COMPARABLE, missing and never-adjudicated relationships are UNCOVERED and block the gate (R-G8-01)",
+        "added the cross-machine CONCEPTUAL projection family (F2, state machine M-CONCEPT) with per-machine adapters projecting observable traces into a shared, genuinely shared conceptual vocabulary; the previous machine-local F2 is retained as diagnostic family F9 and no longer carries mandated pairs (R-G8-01)",
+        "every guarded-property observation must now carry value + derivation_kind + evidence_refs + before_state + after_state + decision_surface + reason; a HOLDS record lacking that shape is a hard failure (R-G8-02..R-G8-06)",
+        "P5 no longer ends in a tautology: a validated profit-bearing claim with a materially failed or absent gate surface is a VIOLATION (R-G8-02)",
+        "P7 requires a CONCRETE retained provenance reference, not a key name or the literal 'UNKNOWN' (R-G8-03)",
+        "P11 requires a real paired baseline/runtime-replacement execution with two fingerprints (R-G8-04)",
+        "P1/P8/P9 compare canonical before/after state instead of accepting a refusal, a literal True or a recognised token (R-G8-05)",
+        "P6 inspects the ACTUAL resulting disposition, so a count-driven transformation is a VIOLATION (R-G8-06)",
+        "the test baseline is a provenance-bearing JUnit artifact (command, digest, suite identity, tested tree, exit status), not a self-reported scalar (R-G8-07)",
+        "the source binding hashes a declared canonical representation and additionally records the raw working-tree digest, so the binding no longer depends on core.autocrlf (R-G8-08)",
+        "the freeze chronology is corrected to POST-FINDING AMENDMENT with an explicit PRE-RUN / POST-FINDING / RETROSPECTIVE classification (R-G8-09)"
+      ],
+      "not_a_goalpost_move_because": "every change makes the audit STRICTER. No verdict rule, token vocabulary, order invariant, permissiveness rank or scenario expectation was relaxed; the only coverage number that moves is mandatory adjudication, which moves from 20/20 claimed to the honestly adjudicated count. The pre-revision NOT_COMPARABLE outcomes and the pre-revision audit state are preserved in G8_COUNTEREXAMPLE_REGISTER.json."
+    },
     {
       "revision": "R1",
       "authored_at": "STRESS-G8C1",
@@ -38,13 +163,14 @@
     "stress-suite/planning/G0_ARCHITECTURE_INGESTION.md",
     "stress-suite/planning/G0_ADVERSARIAL_REVIEW.md"
   ],
-  "freeze_note": "This contract is authored BEFORE any cross-scenario comparison runs. It declares the equivalence vector, the normalization rules, the comparison families, the discriminator rules, the outcome-class vocabulary and the classification vocabulary. No verdict rule below depends on which scenario produced a token; verdict logic is a pure function of the declared fields. The later planning package (A-012 / MF-A002 / OPH / Cadence / continuation extension) is deliberately NOT an input to this contract and cannot define an expected G8 outcome.",
+  "freeze_note": "CHRONOLOGY (corrected in revision R3, finding R-G8-09): this artifact is a POST-FINDING AMENDMENT, not a pre-run frozen artifact, and the claim below is now scoped to what is PROVABLE. The Git history of this file contains exactly one commit (STRESS-G8P0, f5482e3e), and that blob already carries version 1.1.0 together with the R1/R2 revisions that were motivated by the first run's own findings, so Git cannot show that these verdict rules predate the first comparison; the v1.0.0 bytes are not recoverable from any object in this repository and are recorded as a RETROSPECTIVE_RECONSTRUCTION. Relative to the REPAIRED R3 audit this contract's commit does precede the evidence commit that archives the R3 result, so for R3 it is a genuine PRE-RUN FROZEN ARTIFACT. It declares the equivalence vector, the normalization rules, the comparison families, the discriminator rules, the outcome-class vocabulary and the classification vocabulary. No verdict rule below depends on which scenario produced a token; verdict logic is a pure function of the declared fields. The later planning package (A-012 / MF-A002 / OPH / Cadence / continuation extension) is deliberately NOT an input to this contract and cannot define an expected G8 outcome.",
   "state_machines": [
     "M5_PHASE",
     "M4_KNOWLEDGE",
     "M1_CAPABILITY",
     "AUTHORITY",
-    "EVIDENCE"
+    "EVIDENCE",
+    "M-CONCEPT"
   ],
   "equivalence_fields": [
     {
@@ -73,6 +199,7 @@
         "M1_CAPABILITY",
         "AUTHORITY",
         "EVIDENCE",
+        "M-CONCEPT",
         "UNKNOWN"
       ],
       "note": "which machine asserted the outcome; comparisons never cross machines"
@@ -346,6 +473,66 @@
         "UNKNOWN"
       ],
       "note": "added by revision R1: what a reopen condition is attached to — a dormant positive record, or a rejected claim whose blocker must be resolved. Book §17 names blocker resolution as an outcome-relevant G4 dimension; the G4 policy's mem.reopen.* rules bind to it."
+    },
+    {
+      "field": "conceptual_unresolved_representable",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "COLLAPSED",
+        "NOT_EXERCISED",
+        "UNKNOWN"
+      ],
+      "note": "projection of a machine-local trace onto the shared concept 'an unresolved or ambiguous fact remains representable'. NOT_EXERCISED means this run surface did not exercise the concept; it never means the concept holds."
+    },
+    {
+      "field": "conceptual_plural_not_collapsed",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "COLLAPSED",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ],
+      "note": "projection onto 'a non-dominated plurality is not collapsed into a single winner'"
+    },
+    {
+      "field": "conceptual_authority_not_empirical",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "VIOLATED",
+        "NOT_EXERCISED",
+        "UNKNOWN"
+      ],
+      "note": "projection onto 'an authority action does not change the empirical evidence state'"
+    },
+    {
+      "field": "conceptual_provenance_attached",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "ABSENT",
+        "NOT_EXERCISED",
+        "UNKNOWN"
+      ],
+      "note": "projection onto 'the observation retains a concrete reference to its origin'"
+    },
+    {
+      "field": "conceptual_preference_not_empirical",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "VIOLATED",
+        "NOT_EXERCISED",
+        "UNKNOWN"
+      ],
+      "note": "projection onto 'operator preference cannot rewrite the empirical evidence state'"
     }
   ],
   "normalization_rules": [
@@ -390,7 +577,7 @@
       "detail": "observations whose state_machine differs are NOT_COMPARABLE; terminal strings from different machines are never treated as equivalent vocabulary"
     }
   ],
-  "outcome_classes_note": "revision R1 removed a duplicated DOMAIN_VALIDATION_REFUSED entry and validate_contract now fails closed on duplicates in this list; no class was added or removed by the revision.",
+  "outcome_classes_note": "revision R1 removed a duplicated DOMAIN_VALIDATION_REFUSED entry and validate_contract now fails closed on duplicates in this list. Revision R3 added exactly four classes, all of them for the cross-machine CONCEPTUAL family (state machine M-CONCEPT): CONCEPTUAL_COHERENCE_RETAINED, CONCEPTUAL_PARTIAL_COVERAGE, CONCEPTUAL_INVARIANT_VIOLATED, CONCEPTUAL_UNDER_EXERCISED. No pre-existing class was removed or redefined.",
   "outcome_classes": [
     "STABLE_PRESERVED",
     "WATCH_OBSERVED",
@@ -418,7 +605,11 @@
     "DOMAIN_DATA_BLOCKED",
     "AUTHORITY_HELD_FUTURE_ISOLATED",
     "CAPABILITY_ONLY_UPDATED",
-    "ACTION_AUTHORIZED_BY_OPERATOR"
+    "ACTION_AUTHORIZED_BY_OPERATOR",
+    "CONCEPTUAL_COHERENCE_RETAINED",
+    "CONCEPTUAL_PARTIAL_COVERAGE",
+    "CONCEPTUAL_INVARIANT_VIOLATED",
+    "CONCEPTUAL_UNDER_EXERCISED"
   ],
   "outcome_token_map": [
     {
@@ -575,6 +766,26 @@
       "token": "UNRESOLVED_GOVERNANCE_EVENT",
       "outcome_class": "UNRESOLVED_HELD",
       "machine": "AUTHORITY"
+    },
+    {
+      "token": "CONCEPTUAL_COHERENT",
+      "outcome_class": "CONCEPTUAL_COHERENCE_RETAINED",
+      "machine": "M-CONCEPT"
+    },
+    {
+      "token": "CONCEPTUAL_PARTIAL_COVERAGE",
+      "outcome_class": "CONCEPTUAL_PARTIAL_COVERAGE",
+      "machine": "M-CONCEPT"
+    },
+    {
+      "token": "CONCEPTUAL_VIOLATION",
+      "outcome_class": "CONCEPTUAL_INVARIANT_VIOLATED",
+      "machine": "M-CONCEPT"
+    },
+    {
+      "token": "CONCEPTUAL_UNDER_EXERCISED",
+      "outcome_class": "CONCEPTUAL_UNDER_EXERCISED",
+      "machine": "M-CONCEPT"
     }
   ],
   "outcome_token_map_note": "Token vocabulary authored AFTER enumerating the family runners' observable outcome tokens, so that no run token silently falls outside the map. Rule N7 still fails closed for any token not listed here. WHICH scenario produces WHICH token is not an input to any verdict rule; only the token->class map is an input.",
@@ -664,7 +875,8 @@
         "G2:S01_WEAK",
         "G2:S02",
         "G2:S03",
-        "G2:S04"
+        "G2:S04",
+        "G2:S05"
       ],
       "declared_pairs": [
         [
@@ -705,28 +917,37 @@
     },
     {
       "family_id": "F2",
-      "family_class": "PLURALITY_AND_AUTHORITY",
-      "state_machine": "MULTI",
-      "object_class": "KNOWLEDGE_OBJECT",
+      "family_class": "PLURALITY_AND_AUTHORITY_CONCEPTUAL",
+      "state_machine": "M-CONCEPT",
+      "object_class": "INSTITUTIONAL_CONCEPT",
+      "adjudication_requires": [
+        "conceptual_unresolved_representable",
+        "conceptual_plural_not_collapsed",
+        "conceptual_authority_not_empirical",
+        "conceptual_provenance_attached",
+        "conceptual_preference_not_empirical"
+      ],
+      "adjudication_requires_note": "revision R3 (finding R-G8-01): a mandatory relationship is substantively adjudicated only when at least one side exercises at least one of these fields. If every one of them is non-exercising on BOTH sides the comparison is an INSUFFICIENT_EVIDENCE gap that BLOCKS, instead of an equivalence verdict.",
+      "projection_note": "revision R3 (finding R-G8-01): these members are CROSS-MACHINE CONCEPTUAL PROJECTIONS of machine-local traces, not machine-local observations. A machine-local terminal string is never compared against another machine's terminal vocabulary (rule N8); each participating machine projects its observable trace into this shared conceptual vocabulary through a declared adapter in scenarios/g8_concept_projection.py, and the adapters are tested independently and never read expected outcomes. The former machine-local F2 is retained as diagnostic family F9.",
       "question": "is a non-dominated or unresolved fact ever collapsed, forced into a category, or rewritten by authority preference?",
       "members": [
-        "G2:S05",
-        "G5:S16",
-        "G6:S22",
-        "G6:S24"
+        "F2::CONCEPT::G2:S05",
+        "F2::CONCEPT::G5:S16",
+        "F2::CONCEPT::G6:S22",
+        "F2::CONCEPT::G6:S24"
       ],
       "declared_pairs": [
         [
-          "G2:S05",
-          "G5:S16"
+          "F2::CONCEPT::G2:S05",
+          "F2::CONCEPT::G5:S16"
         ],
         [
-          "G5:S16",
-          "G6:S22"
+          "F2::CONCEPT::G5:S16",
+          "F2::CONCEPT::G6:S22"
         ],
         [
-          "G6:S22",
-          "G6:S24"
+          "F2::CONCEPT::G6:S22",
+          "F2::CONCEPT::G6:S24"
         ]
       ],
       "guarded_properties": [
@@ -737,14 +958,11 @@
       ],
       "default_classification": "ARCHITECTURE_CONTRADICTION",
       "verified_fields": [
-        "authority_pre_state",
-        "grant_mandate_state",
-        "operator_availability",
-        "reversibility",
-        "consequence_class",
-        "evidence_provenance",
-        "evidence_lineage",
-        "claim_scope_class"
+        "conceptual_unresolved_representable",
+        "conceptual_plural_not_collapsed",
+        "conceptual_authority_not_empirical",
+        "conceptual_provenance_attached",
+        "conceptual_preference_not_empirical"
       ],
       "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
       "equivalence_basis": "PARTIAL",
@@ -984,6 +1202,60 @@
       "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
       "equivalence_basis": "NOT_APPLICABLE",
       "equivalence_basis_note": "F7 compares a receipt against the claims it makes, not two observations against each other, so no equivalence vector applies. Findings are produced by the gate-claim audit and classified one at a time."
+    },
+    {
+      "family_id": "F8",
+      "family_class": "G7_RELATIONAL_SURFACES",
+      "state_machine": "AUTHORITY",
+      "object_class": "AUTHORITY_ACTION",
+      "question": "does an operator-availability perturbation change what may execute without changing the empirical evidence state?",
+      "members": [
+        "G7:OA_AVAILABLE",
+        "G7:OA_UNAVAILABLE"
+      ],
+      "declared_pairs": [
+        [
+          "G7:OA_AVAILABLE",
+          "G7:OA_UNAVAILABLE"
+        ]
+      ],
+      "guarded_properties": [
+        "P2",
+        "P9"
+      ],
+      "default_classification": "ARCHITECTURE_CONTRADICTION",
+      "verified_fields": [
+        "operator_availability",
+        "authority_pre_state",
+        "grant_mandate_state",
+        "evidence_provenance",
+        "reversibility",
+        "consequence_class"
+      ],
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family.",
+      "equivalence_basis": "PARTIAL",
+      "equivalence_basis_note": "PARTIAL: these two members are the SAME governed institutional inputs under one availability perturbation, so an identical vector would establish nothing; the pair exists to exercise P9 and P2. Added by revision R3 (finding R-G8-05) because P9 requires a real paired baseline/perturbation execution with a non-empty empirical state on both sides, which the G6 scenario surfaces do not expose."
+    },
+    {
+      "family_id": "F9",
+      "diagnostic": true,
+      "family_class": "MACHINE_LOCAL_TERMINAL_VOCABULARY",
+      "state_machine": "MULTI",
+      "object_class": "KNOWLEDGE_OBJECT",
+      "question": "DIAGNOSTIC ONLY (revision R3): do the participating machines' machine-local terminal tokens ever look interchangeable? They do not, and this family records that fact instead of silently counting it as coverage. No pair is mandated here; the mandated cross-machine relationship is adjudicated in F2 through the conceptual projection.",
+      "members": [
+        "F9::LOCAL::G2:S05",
+        "F9::LOCAL::G5:S16",
+        "F9::LOCAL::G6:S22",
+        "F9::LOCAL::G6:S24"
+      ],
+      "declared_pairs": [],
+      "guarded_properties": [],
+      "default_classification": "NOT_EQUIVALENT",
+      "verified_fields": [],
+      "verified_fields_note": "no field carries an equivalence verdict in a diagnostic vocabulary family.",
+      "equivalence_basis": "NOT_APPLICABLE",
+      "equivalence_basis_note": "machine-local terminal vocabularies are not interchangeable (rule N8), so no equivalence basis exists. Every such comparison is NOT_COMPARABLE and NOT_EQUIVALENT; it is reported and never counted as mandated coverage."
     }
   ],
   "discriminator_rules": [
@@ -1166,6 +1438,41 @@
       "kind": "JUSTIFIES_DIVERGENCE",
       "governing_contract": "A-009 §9/§11; G4 policy mem.reopen.*; Book §17 blocker resolution",
       "note": "added by revision R1: a dormant positive record whose field predicate fires and a rejected claim whose blocker is still unresolved are materially different memory situations and may legitimately route differently"
+    },
+    {
+      "discriminator_id": "D-CONCEPT-UNRESOLVED",
+      "field": "conceptual_unresolved_representable",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §20/§21; S24; S05",
+      "note": "added by revision R3 for the cross-machine conceptual family: whether a run surface exercises 'an unresolved fact remains representable' is a materially different fact, so a difference in it may justify a different conceptual class. NOT_EXERCISED is recorded and is never favourable."
+    },
+    {
+      "discriminator_id": "D-CONCEPT-PLURAL",
+      "field": "conceptual_plural_not_collapsed",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §16; Book §11; S05",
+      "note": "added by revision R3 for the cross-machine conceptual family"
+    },
+    {
+      "discriminator_id": "D-CONCEPT-AUTHORITY",
+      "field": "conceptual_authority_not_empirical",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §10; Art. I/§9; S22",
+      "note": "added by revision R3 for the cross-machine conceptual family"
+    },
+    {
+      "discriminator_id": "D-CONCEPT-PROVENANCE",
+      "field": "conceptual_provenance_attached",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-009 §9/§11; Book §1 rule 8",
+      "note": "added by revision R3 for the cross-machine conceptual family"
+    },
+    {
+      "discriminator_id": "D-CONCEPT-PREFERENCE",
+      "field": "conceptual_preference_not_empirical",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §14; Art. X; S22/S24",
+      "note": "added by revision R3 for the cross-machine conceptual family: an operator-preference surface and a non-preference surface are materially different, so a difference in whether preference was exercised may justify a different conceptual class"
     }
   ],
   "outcome_permissiveness": {
@@ -1197,7 +1504,11 @@
       "INDEPENDENT_SUPPORT": 3,
       "EPOCH_RECONSTRUCTED": 3,
       "TRANSFORMATION_ADMITTED": 3,
-      "NEW_STABLE_ESTABLISHED": 4
+      "NEW_STABLE_ESTABLISHED": 4,
+      "CONCEPTUAL_INVARIANT_VIOLATED": 0,
+      "CONCEPTUAL_UNDER_EXERCISED": 1,
+      "CONCEPTUAL_PARTIAL_COVERAGE": 2,
+      "CONCEPTUAL_COHERENCE_RETAINED": 2
     }
   },
   "classification_vocabulary": [

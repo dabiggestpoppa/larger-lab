@@ -57,11 +57,13 @@ from engine.g5_runner import (  # noqa: E402
     run_s19,
 )
 from engine.g5r import (  # noqa: E402
+    CANONICAL_SOURCE_NEWLINE_RULE,
     DoctrineAmendmentProposal, DoctrineClaimAtom, DoctrineComparison,
     ObservedResult, ReproductionProtocol, SensorCapabilityChangeRecord,
-    assess_sensor_adequacy, compare_measured_result, decide_mechanism_admission,
+    assess_sensor_adequacy, canonical_source_bytes, canonical_source_digest,
+    compare_measured_result, decide_mechanism_admission,
     derive_independence, derive_reproduction_quality,
-    govern_amendment_ratification, recompute_source_binding,
+    govern_amendment_ratification, recompute_source_binding, sha256_hex,
     validate_sha256_digest, validate_transfer_map,
 )
 from engine.registry import EvidenceRegistry
@@ -366,7 +368,10 @@ def test_correct_source_binding_passes():
     assert len(binding.content_digest) == 64
     assert binding.hash_algorithm == "SHA-256"
     assert binding.content_length == MANUAL.stat().st_size
-    assert binding.source_blob_sha == binding.content_digest
+    # STRESS-G8R3: the repository-stable identity is the CANONICAL digest.
+    assert binding.source_blob_sha == binding.canonical_digest
+    assert binding.canonical_newline_rule == CANONICAL_SOURCE_NEWLINE_RULE
+    assert binding.canonical_length == len(canonical_source_bytes(MANUAL.read_bytes()))
 
 
 def test_wrong_manual_digest_rejected():
@@ -391,8 +396,31 @@ def test_source_file_unchanged():
     binding = recompute_source_binding(str(MANUAL), "v4", "tbl")
     after = MANUAL.read_bytes()
     assert before == after
-    # and matches the digest the fixture claims (the true file digest)
-    assert binding.content_digest == "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233"
+    # STRESS-G8R3 (R-G8-08): the declared fingerprint is the CANONICAL digest —
+    # the value that does not depend on the checkout's newline policy.
+    assert binding.canonical_digest == "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb"
+    assert binding.canonical_length == 354913
+    # the RAW working-tree digest is reported separately and keeps its meaning
+    assert binding.content_digest == sha256_hex(before)
+
+
+def test_source_binding_is_checkout_invariant():
+    """STRESS-G8R3 (R-G8-08): the same repository blob materialised with CRLF
+    newlines (core.autocrlf=true) and with LF newlines (core.autocrlf=false)
+    must produce the SAME canonical binding, while the raw digest legitimately
+    differs. A checkout-dependent binding would let one working tree read as
+    STALE_DIGEST and another accept a different artifact."""
+    lf = MANUAL.read_bytes().replace(b"\r\n", b"\n")
+    crlf = lf.replace(b"\n", b"\r\n")
+    assert lf != crlf                                   # materially different bytes
+    assert sha256_hex(lf) != sha256_hex(crlf)           # ...and different raw digests
+    assert canonical_source_digest(lf) == canonical_source_digest(crlf)
+    assert canonical_source_digest(lf) == "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb"
+    assert len(canonical_source_bytes(lf)) == len(canonical_source_bytes(crlf)) == 354913
+    # the live binding of the file on this checkout resolves to the same
+    # canonical identity the S16 fixture declares
+    binding = recompute_source_binding(str(MANUAL), "v4", "tbl")
+    assert binding.canonical_digest == "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb"
 
 
 def test_exact_claim_atoms_preserve_section_boundaries():
@@ -541,7 +569,7 @@ def _claim():
         "doctrine": "CEREBUS", "manual_version": "v4",
         "source_path": "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt",
         "section": "PART_1", "page": "PAGE 4-5",
-        "source_fingerprint": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+        "source_fingerprint": "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb",
         "exact_claim_representation": "Target Metric table (bounded).",
         "numeric_parameters": {
             "win_rate_band": [0.85, 0.90],
