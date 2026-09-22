@@ -79,8 +79,17 @@ USER = "oce_local_admin"
 QUARANTINE_PREFIX = f"{DB}_quarantine_"
 STAGING_PREFIX = f"{DB}_restore_"
 RECEIPT_FORMAT = "oce-pg-recovery-receipt-v1"
+TRANSITION_FORMAT = "oce-pg-recovery-transition-v1"
 STAMP_RE = re.compile(r"[0-9a-f]{12}\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
+OPERATION_ID_RE = re.compile(r"[0-9a-f]{32}\Z")
+REVISION_RE = re.compile(r"[0-9a-f]{7,64}\Z")
+
+# One durable recovery-operation state machine (B4-CXR7U9R39-R3). PROMOTED is
+# the ONLY state that still offers transition authority, and a transition
+# consumes it exactly once, so FINALIZED and ROLLED_BACK are terminal.
+TRANSITION_STATE_PROMOTED = "PROMOTED"
+TRANSITIONS_ALLOWED_FROM_PROMOTED = ("finalize", "rollback")
 
 PHASES_PROMOTE = [
     "inventory_validated",
@@ -576,8 +585,127 @@ def _load_receipt(path):
         return json.load(f)
 
 
+# ── durable recovery-operation state (B4-CXR7U9R39-R3) ───────────────────
+# A JSON receipt states what happened; it must not, on its own, be reusable
+# authority to mutate recovery state again. Each promotion mints ONE
+# high-entropy operation id and records it under the governed recovery
+# boundary; a transition is permitted only while that record says PROMOTED and
+# only once. Records are authority STATE (so they are updated in place), never
+# evidence (receipts are evidence and are never overwritten).
+
+def _operation_id() -> str:
+    return os.urandom(16).hex()
+
+
+def _transitions_dir() -> str:
+    return os.path.join(_recovery_state_dir(), "transitions")
+
+
+def _receipt_digest(receipt) -> str:
+    """Content binding between a receipt and its operation record. Canonical
+    (sorted keys, no padding) so the digest is independent of file
+    whitespace and therefore checkable across processes."""
+    canonical = json.dumps(receipt, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _transition_record_path(operation_id) -> str:
+    return os.path.join(_transitions_dir(), operation_id + ".json")
+
+
+def _write_transition_record(operation_id, record) -> None:
+    """Crash-safe update: full write + flush into the same directory, then an
+    atomic replace, so a reader never sees a half-written record."""
+    directory = _transitions_dir()
+    os.makedirs(directory, mode=0o700, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(prefix=".oce-transition-", suffix=".tmp", dir=directory)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(record, f, indent=2, sort_keys=True)
+            f.flush()
+            os.fsync(f.fileno())
+        os.chmod(tmp, 0o600)
+        os.replace(tmp, _transition_record_path(operation_id))
+        _fsync_dir(directory)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def _load_transition_record(operation_id):
+    path = _transition_record_path(operation_id)
+    if not os.path.isfile(path):
+        raise RuntimeError("no durable recovery operation record for operation "
+                           f"{operation_id}")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _record_transition(operation_id, state, receipt, extra=None) -> None:
+    """Advance the operation record. `receipt` binds the record to the exact
+    promote receipt whose content authorized it."""
+    record = {
+        "format": TRANSITION_FORMAT,
+        "operation_id": operation_id,
+        "state": state,
+        "database": receipt.get("database"),
+        "user": receipt.get("user"),
+        "container": receipt.get("container"),
+        "source_commit": receipt.get("source_commit"),
+        "source_tree": receipt.get("source_tree"),
+        "run_id": receipt.get("run_id"),
+        "stamp": receipt.get("stamp"),
+        "quarantine_database": receipt.get("quarantine_database"),
+        "staging_database": receipt.get("staging_database"),
+        "source_archive_sha256": receipt.get("source_archive_sha256"),
+        "inventory_sha256": receipt.get("inventory_sha256"),
+        "receipt_sha256": _receipt_digest(receipt),
+        "permitted_next": (list(TRANSITIONS_ALLOWED_FROM_PROMOTED)
+                           if state == TRANSITION_STATE_PROMOTED else []),
+        "updated_at": now_iso(),
+    }
+    # first-seen time is carried forward across every state update
+    created = None
+    path = _transition_record_path(operation_id)
+    if os.path.isfile(path):
+        try:
+            with open(path, encoding="utf-8") as f:
+                created = json.load(f).get("created_at")
+        except (OSError, ValueError):
+            created = None
+    record["created_at"] = created or record["updated_at"]
+    if extra:
+        record.update(extra)
+    _write_transition_record(operation_id, record)
+
+
+def _claim_transition(operation_id, transition) -> None:
+    """Consume this operation's one-time authority for `transition` BEFORE any
+    docker or catalog call. Exclusive creation makes the claim atomic, so two
+    callers cannot both proceed, and a claim left behind by an interrupted
+    transition truthfully means the authority is already spent."""
+    directory = _transitions_dir()
+    os.makedirs(directory, mode=0o700, exist_ok=True)
+    claim = os.path.join(directory, f"{operation_id}.{transition}.claim")
+    try:
+        fd = os.open(claim, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except FileExistsError:
+        raise RuntimeError(
+            f"recovery operation {operation_id} has already consumed its "
+            f"{transition} authority")
+    try:
+        os.write(fd, f"{transition} claimed at {now_iso()}\n".encode("utf-8"))
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+    _fsync_dir(directory)
+
+
 def _validated_transition_receipt(path, db, user, container, inventory_path,
-                                  inventory_sha_path):
+                                  inventory_sha_path, transition):
     """RECOVERY TRANSITION AUTHORITY (B4-CXR7U9R36).
 
     A promote receipt is the authority to mutate recovery TRANSITION state -
@@ -589,7 +717,14 @@ def _validated_transition_receipt(path, db, user, container, inventory_path,
     destructive step. Separate from BACKUP ARTIFACT PATH AUTHORITY, which owns
     the archive/inventory inputs (_validated_open_path).
 
-    Returns (promote, stamp, quarantine, staging).
+    Then it binds the receipt to the ONE durable operation that produced it
+    (B4-CXR7U9R39-R3): the operation record must exist, its content digest must
+    match this receipt, its state must still be PROMOTED, and the requested
+    `transition` must be permitted from that state. A receipt is therefore not
+    reusable authority: a replay, a substitution and a cross-operation receipt
+    are all refused here, before any docker or catalog call.
+
+    Returns (promote, stamp, quarantine, staging, operation_id).
     """
     promote = _load_receipt(path)
     if not isinstance(promote, dict):
@@ -641,7 +776,38 @@ def _validated_transition_receipt(path, db, user, container, inventory_path,
     if live_run and recorded_run not in (None, "", "not-set", "unknown") \
             and recorded_run != live_run:
         raise RuntimeError("receipt was produced by a different recovery run")
-    return promote, stamp, quarantine, staging
+    # In production a recovery carries its revision and run identity; an
+    # unknown one is not authority for a destructive transition.
+    for label in ("source_commit", "source_tree"):
+        value = promote.get(label)
+        if not isinstance(value, str) or not REVISION_RE.match(value):
+            raise RuntimeError(f"receipt {label} is not a known revision: {value!r}")
+    if recorded_run in (None, "", "not-set", "unknown"):
+        raise RuntimeError("receipt records no authoritative run identity")
+    operation_id = promote.get("operation_id")
+    if not isinstance(operation_id, str) or not OPERATION_ID_RE.match(operation_id):
+        raise RuntimeError(f"receipt operation id {operation_id!r} is missing or malformed")
+    record = _load_transition_record(operation_id)
+    if record.get("format") != TRANSITION_FORMAT:
+        raise RuntimeError("durable recovery operation record has an unknown format")
+    if record.get("receipt_sha256") != _receipt_digest(promote):
+        raise RuntimeError("receipt content does not match its durable operation "
+                           "record (substituted or altered receipt)")
+    for label in ("database", "user", "container", "source_commit", "source_tree",
+                  "run_id", "stamp", "quarantine_database", "staging_database",
+                  "source_archive_sha256", "inventory_sha256"):
+        if record.get(label) != promote.get(label):
+            raise RuntimeError(f"receipt {label} does not match its durable "
+                               "operation record")
+    state = record.get("state")
+    if state != TRANSITION_STATE_PROMOTED:
+        raise RuntimeError(
+            f"recovery operation {operation_id} is {state!r}: its "
+            f"{transition} authority is no longer available")
+    if transition not in (record.get("permitted_next") or ()):
+        raise RuntimeError(f"recovery operation {operation_id} does not permit "
+                           f"{transition}")
+    return promote, stamp, quarantine, staging, operation_id
 
 
 def _approved_roots() -> list:
@@ -810,6 +976,13 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
     receipt["quarantine_held"] = True
     receipt["quarantine_dropped"] = False
     receipt["promoted"] = False
+    # ONE durable operation per promotion (R39-R3). The id is minted now so
+    # every receipt can name its operation, but the durable record is opened
+    # only when the promotion starts touching recovery-durable state: an
+    # invocation refused during preflight writes NO operation state at all.
+    operation_id = _operation_id()
+    receipt["operation_id"] = operation_id
+    operation_started = False
     staging = None
     quarantined = False
     remote = None
@@ -844,7 +1017,10 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         ver = psql(container, db, user, "SHOW server_version;")
         receipt["postgres_version"] = (ver.stdout.decode(errors="replace").strip()
                                        if ver.returncode == 0 else "")
-        # 3. staging created
+        # 3. staging created - the first recovery-durable mutation, so the
+        #    operation record (and with it any transition authority) begins here
+        _record_transition(operation_id, "CREATED", receipt)
+        operation_started = True
         staging = create_staging_db(container, user, db, stamp)
         receipt["staging_database"] = staging
         receipt["phases"].append("staging_created")
@@ -867,6 +1043,7 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         if not ok:
             raise RuntimeError("staging verification FAILED: " + "; ".join(problems))
         receipt["phases"].append("staging_verified")
+        _record_transition(operation_id, "STAGED", receipt)
         # 6. terminate ONLY local canonical-target connections
         terminate_local_connections(container, user, db)
         # 7. canonical -> quarantine (catalog-checked rename)
@@ -891,6 +1068,9 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 0
         receipt["redis_restored"] = False
+        # PROMOTED is the state that still offers transition authority; hold the
+        # record's digest and identity to this exact receipt.
+        _record_transition(operation_id, TRANSITION_STATE_PROMOTED, receipt)
         return receipt
     except Exception as e:
         receipt["error"] = str(e)
@@ -914,6 +1094,11 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
                     receipt["staging_cleanup_error"] = str(e2)
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 1
+        # A failed promotion offers no transition authority at all (and a
+        # preflight refusal has no operation to record).
+        if operation_started:
+            _record_transition(operation_id, "FAILED", receipt,
+                               extra={"error": str(e)})
         return receipt
 
 
@@ -926,8 +1111,12 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
     if targets:
         return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
     try:
-        promote, stamp, quarantine, staging = _validated_transition_receipt(
-            receipt_in_path, db, user, container, inventory_path, inventory_sha_path)
+        promote, stamp, quarantine, staging, operation_id = _validated_transition_receipt(
+            receipt_in_path, db, user, container, inventory_path, inventory_sha_path,
+            "finalize")
+        # Consume this operation's ONE-TIME finalize authority before any docker
+        # or catalog call exists to make.
+        _claim_transition(operation_id, "finalize")
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
     receipt["stamp"] = stamp
@@ -969,6 +1158,7 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 0
         receipt["redis_restored"] = False
+        _record_transition(operation_id, "FINALIZED", promote)
         return receipt
     except Exception as e:
         receipt["error"] = str(e)
@@ -1002,6 +1192,12 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
             receipt["quarantine_retained"] = False
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 1
+        # The authority was consumed before the work: it is spent either way,
+        # and the record states which of finalize/rollback actually happened.
+        _record_transition(operation_id,
+                           "ROLLED_BACK" if receipt.get("rollback_succeeded") is True
+                           else "FAILED", promote,
+                           extra={"error": str(e)})
         return receipt
 
 
@@ -1014,8 +1210,12 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
     if targets:
         return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
     try:
-        promote, stamp, quarantine, staging = _validated_transition_receipt(
-            receipt_in_path, db, user, container, inventory_path, inventory_sha_path)
+        promote, stamp, quarantine, staging, operation_id = _validated_transition_receipt(
+            receipt_in_path, db, user, container, inventory_path, inventory_sha_path,
+            "rollback")
+        # Consume this operation's ONE-TIME rollback authority before any docker
+        # or catalog call exists to make.
+        _claim_transition(operation_id, "rollback")
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
     receipt["stamp"] = stamp
@@ -1033,6 +1233,7 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
             receipt["rollback_error"] = "; ".join(problems)
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 0 if ok else 1
+        _record_transition(operation_id, "ROLLED_BACK" if ok else "FAILED", promote)
         return receipt
     except Exception as e:
         receipt["rollback_attempted"] = True
@@ -1042,6 +1243,7 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
         receipt["rollback_error"] = str(e)
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 1
+        _record_transition(operation_id, "FAILED", promote, extra={"error": str(e)})
         return receipt
 
 

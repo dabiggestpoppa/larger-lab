@@ -25,6 +25,18 @@ import pytest
 import oce_compose as oc
 import recovery_cli
 
+
+def _recovery_env(tmp_path):
+    """Environment for a REAL recovery driven through the CLI: the approved
+    backup root, plus the revision and run identity a production recovery
+    carries (B4-CXR7U9R39-R3). Without an authoritative identity the engine
+    refuses a transition - correctly - so the test supplies one, exactly as
+    restore.sh does."""
+    return {"OCE_BACKUP_ROOTS": str(tmp_path),
+            "OCE_COMMIT": "c0ffee1234" * 4,
+            "OCE_TREE": "d00dfeed99" * 4,
+            "OCE_RUN_ID": "0123456789abcdef"}
+
 pytestmark = pytest.mark.container
 
 
@@ -257,7 +269,7 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
                     "--inventory", str(inv), "--inventory-sha", str(invsha),
                     "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
                     "--receipt-out", str(promote_receipt)], tmp_path),
-               env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
+               env_extra=_recovery_env(tmp_path), check=False)
     assert r.returncode == 0, r.stdout + r.stderr
     pr = json.loads(promote_receipt.read_text(encoding="utf-8"))
     assert pr.get("promoted") is True, pr
@@ -275,7 +287,7 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
                      "--inventory", str(inv), "--inventory-sha", str(invsha),
                      "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
                      "--receipt-out", str(final_receipt)], tmp_path),
-                env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
+                env_extra=_recovery_env(tmp_path), check=False)
     assert r2.returncode != 0, "finalize must fail when canonical truth is broken"
     fr = json.loads(final_receipt.read_text(encoding="utf-8"))
     assert fr.get("rollback_required") is True, fr
@@ -345,7 +357,7 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
                     "--inventory", str(inv), "--inventory-sha", str(invsha),
                     "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
                     "--receipt-out", str(promote_receipt)], tmp_path),
-               env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
+               env_extra=_recovery_env(tmp_path), check=False)
     assert r.returncode == 0, r.stdout + r.stderr
     pr = json.loads(promote_receipt.read_text(encoding="utf-8"))
     q = pr.get("quarantine_database")
@@ -362,7 +374,7 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
                      "--inventory", str(inv), "--inventory-sha", str(invsha),
                      "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
                      "--receipt-out", str(final_receipt)], tmp_path),
-                env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
+                env_extra=_recovery_env(tmp_path), check=False)
     assert r2.returncode != 0, "rollback failure must return nonzero"
     fr = json.loads(final_receipt.read_text(encoding="utf-8"))
     assert fr.get("rollback_required") is True

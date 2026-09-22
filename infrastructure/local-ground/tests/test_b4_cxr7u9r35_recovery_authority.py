@@ -161,6 +161,20 @@ def _write_inputs(tmp_path, monkeypatch):
     return inv, sha, archive
 
 
+@pytest.fixture(autouse=True)
+def production_recovery_identity(tmp_path, monkeypatch):
+    """A production recovery carries its run identity, and its durable
+    operation state lives inside the governed recovery boundary (R39-R3).
+    Tests construct both explicitly: the identities, and the boundary through
+    the in-process seam - a test dependency, never an environment channel."""
+    monkeypatch.setenv("OCE_COMMIT", "cafe0123" * 5)
+    monkeypatch.setenv("OCE_TREE", "beef4567" * 5)
+    monkeypatch.setenv("OCE_RUN_ID", "0123456789abcdef")
+    pgrec._bind_test_recovery_root(str(tmp_path / "governed-recovery"))
+    yield
+    pgrec._unbind_test_recovery_root()
+
+
 @pytest.fixture
 def bridge(monkeypatch):
     b = _Bridge()

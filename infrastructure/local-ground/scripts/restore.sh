@@ -302,6 +302,10 @@ fi
 # ── PostgreSQL verified staging promotion (R25: phase-safe + rollback) ─────
 export OCE_COMMIT="$(git -C "$PROJ_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
 export OCE_TREE="$(git -C "$PROJ_ROOT" rev-parse HEAD^{tree} 2>/dev/null || echo unknown)"
+# R39-R3: a recovery TRANSITION needs an authoritative run identity, and one
+# restore is ONE operation, so mint one when the caller has not supplied it.
+# The same id then binds promote, finalize and rollback of this operation.
+export OCE_RUN_ID="${OCE_RUN_ID:-$(python3 -c 'import uuid,sys;sys.stdout.write(uuid.uuid4().hex)')}"
 export OCE_EVIDENCE_DIR="${OCE_EVIDENCE_DIR:-}"
 PROMOTE_RECEIPT="$RECEIPT_DIR/promote-receipt.json"
 ROLLBACK_RECEIPT="$RECEIPT_DIR/rollback-receipt.json"
