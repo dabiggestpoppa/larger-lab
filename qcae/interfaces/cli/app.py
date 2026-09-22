@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, Optional, Union
 
-from qcae.governance.standalone.approvals import ApprovalRequest
+from qcae.core.errors import QcaeValidationError
 from qcae.governance.standalone.authority import LocalAuthorityProvider
 from qcae.governance.standalone.identity import LocalIdentityProvider
 from qcae.governance.standalone.policy import LocalPolicyEngine, PolicySet
@@ -251,17 +251,33 @@ class QcaeApp:
         return self._rt.service.list_jobs(status=status)
 
     def job_run_step(self, job_id: str, worker_id: str):
-        """Run one eligible step of a job (P2-R3-C02/C05).
+        """Run one eligible step of a job (P2-R3-C02/C05; truth repaired P2-R5).
 
         Worker availability is checked BEFORE any lease or state mutation:
         no compatible worker returns a typed ``WorkerUnavailable`` outcome
         (no claim, no attempt, no budget, no STEP_STARTED) so the CLI can
         render a stable operator error instead of stranding a lease.
+        An unknown job returns the typed unknown-job standing instead of a
+        bare null, so a mistyped id cannot read as "nothing to do".
         """
+        from qcae.governance.standalone.typed_outcomes import (
+            JobMissingOutcome,
+            NotReadyReason,
+            StepNotReadyOutcome,
+        )
+        from qcae.orchestration.jobs.runtime import RuntimeStepStatus
         from qcae.orchestration.orchestrator.worker_availability import (
             WorkerUnavailable,
             worker_availability_for,
         )
+
+        # P2-R5 (operator playtest finding): identity precedes everything,
+        # then job existence. An unknown job must return the same standing
+        # `job status` answers (exit 2 unknown job) — never lease state on a
+        # job that does not exist, and never "no eligible step to run",
+        # which claims the job exists but has nothing to do.
+        if self._rt.store.get_job(job_id) is None:
+            return JobMissingOutcome(job_id)
 
         # P2-R3-C04: identity precedes availability (runtime chain §31:
         # request -> identity -> policy -> authority -> budget -> queue ->
@@ -269,6 +285,44 @@ class QcaeApp:
         # probe, regardless of worker presence.
         self._rt.service.require_identity(worker_id)
         self._rt.service.ready_steps(job_id)
+
+        # P2-R5: a claimable-now check drives a typed NOT_READY outcome.
+        # The engine's public eligible-steps law (READY, schedule elapsed, no
+        # active claim) is the authority; the reason is derived from durable
+        # step rows and the public queue surface, never lease state.
+        steps = self._rt.store.list_steps_for_job(job_id)
+        ready = [step for step in steps if step.status is RuntimeStepStatus.READY]
+        claimable_ids = {
+            step.step_id
+            for step in self._rt.engine.eligible_steps_for_claim(job_id)
+        }
+        if not claimable_ids:
+            unclaimed_ready = [
+                step for step in ready
+                if not self._rt.queue.has_active_claim(step.step_id)
+            ]
+            if unclaimed_ready:
+                # READY, unclaimed, yet not claimable: only the schedule
+                # remains (P2-R4-C04 effective_not_before law).
+                reason = NotReadyReason.SCHEDULE_NOT_ELAPSED
+            elif any(
+                step.status is RuntimeStepStatus.WAITING_POLICY
+                for step in steps
+            ):
+                reason = NotReadyReason.STEP_WAITING_POLICY
+            elif any(
+                step.status is RuntimeStepStatus.WAITING_INPUT
+                for step in steps
+            ):
+                reason = NotReadyReason.STEP_WAITING_INPUT
+            elif any(
+                step.status is RuntimeStepStatus.RETRY_SCHEDULED
+                for step in steps
+            ):
+                reason = NotReadyReason.STEP_RETRY_SCHEDULED
+            else:
+                reason = NotReadyReason.NO_ELIGIBLE_STEP
+            return StepNotReadyOutcome(job_id, reason)
         availability = worker_availability_for(self._rt.engine, job_id)
         if availability.uncovered_step_ids and not availability.covered_step_ids:
             return WorkerUnavailable(job_id, availability.missing_step_types)

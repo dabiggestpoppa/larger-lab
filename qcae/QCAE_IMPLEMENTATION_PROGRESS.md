@@ -256,6 +256,22 @@ The binding reads only stated fields, so it survives the JSON round trip the dur
 
 **Observable contract changes:** one new refusal and one new note in `coverage_notes`; the artifact's shape is unchanged (no schema bump), and `known_candidates`, the port addition, the baseline, the claim-kind laws and the assembler's existing note policy are untouched.
 
+### P2-R5 — Predecessor operator-gate reconciliation + CLI run truth (this commit)
+
+P3-R4 requires the earlier P2-R5 operator requirements reconciled against executable evidence before P3 continues. Four were already proven; one had no standing anywhere in the tree and is repaired here. **P2-R4 remains preserved as historical evidence; this entry supersedes only its "no P2 repair is open" clause** — P2-R5 was the open repair, and it is now closed at this commit.
+
+| Operator requirement | Classification | Evidence |
+| --- | --- | --- |
+| evidence attribution | **PROVEN** | `EvidenceRef` canonical digests (`core/evidence_ref.py`, P0-C04/P1-C01 `d5e8882e`); receipts cannot exist without attributed proof refs (`core/receipts/receipt.py` proof firewall, P1-C05 `3aaddeea`). Executable: `test_p2r5_reconciliation.py::TestEvidenceAttribution` (digest identity binds the payload; malformed digest refused; proofless receipt refused). |
+| schema authority + migration truth | **PROVEN** | Versioned serialization envelopes fail closed on unknown versions (`core/serialization.py`, Book V 15.2); `PRAGMA user_version` + append-only `schema_migration_ledger` with pre/post digests, no backward/skip (`infrastructure/persistence/migrations.py`, P1-C10 `55ba326d`, P2-C12 v3→v4 `61488273`). Executable: `TestSchemaAuthorityAndMigrationTruth` (envelope refuses schema_version 99; ledger pins versions and digests). |
+| live grant binding | **PROVEN** | Durable single-use grants consumed atomically at admission (`governance_approval_use` unique index, `SqliteApprovalRegistry.mark_grant_used`, P2-R4-C03 `1e04778d`); process-memory `_granted_keys` removed. Executable: `TestLiveGrantBinding` (second consumption of the same grant refused; consumption durable). |
+| backup/restore truth | **PROVEN** | Digest-verified restore of metadata + artifacts + registry rows (`infrastructure/persistence/backup_restore.py`, P1-C11 `772ab794`, P1-R1-C05 `1817ed57`/`0a3bd46b`, P2-C12 runtime state `61488273`). Executable: `TestBackupRestoreTruth` (round trip restores verified state; a tampered artifact fails the digest check and restore refuses). |
+| typed NOT_READY behavior | **UNRESOLVED → repaired here** | No standing existed before this commit (grep: NOT_READY appears only in canon prose, Book V 15.12). New: `governance/standalone/typed_outcomes.py` — `StepNotReadyOutcome` (typed reason from `NOT_READY_REASONS`, standing `CONTRACT_NOT_READY`) and `JobMissingOutcome` (same unknown-job standing as `job status`/`job events`). Executable: `TestTypedNotReadyBehavior`. |
+
+**CLI truth defect repaired (the P3-C09 reported finding).** `qcae job run <unknown-job-id>` returned "no eligible step to run" (exit 1) because `job_run_step` returned `None` for an unknown job *and* for a job with nothing runnable, while `job status`/`job events` say `unknown job` (exit 2) — a mistyped id read as "the job exists but has nothing to do". `QcaeApp.job_run_step` now answers, in order: unknown job → typed `JobMissingOutcome` (CLI exit 2, message byte-identical to `job status`); no claimable step → typed `StepNotReadyOutcome` with the reason derived from durable step rows (`SCHEDULE_NOT_ELAPSED` / `STEP_WAITING_POLICY` / `STEP_WAITING_INPUT` / `STEP_RETRY_SCHEDULED` / `NO_ELIGIBLE_STEP`); missing worker → the existing `WORKER_UNAVAILABLE` outcome (exit 3, unchanged). The claimable check reads the engine's public `eligible_steps_for_claim` law and the queue's public `has_active_claim` — no private reach-in (architecture guard green), no lease/claim/event/budget mutation on any denied path. Executable: `TestCLIRunTruth` (status/events/run agree on one standing for one identifier; a future-dated job reports `NOT_READY`/`SCHEDULE_NOT_ELAPSED` structured with exit 1; nothing leased).
+
+**Boundaries held:** execution mutations 0 on every refused path; no worker registered; no scheduler/ACL/startup artifact created. Suite after this tranche: **1329 passed / 0 failed / 0 skipped** (LOCAL TEST EVIDENCE, this commit).
+
 ### P2-R4 — True Crash Durability + Durable Approval + Scheduling Closure (SEALED at `f2fc7757`)
 
 All five operator audit findings (F–J, recorded in I0 before implementation) closed:

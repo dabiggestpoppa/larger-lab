@@ -14,6 +14,7 @@ import sys
 from typing import List, Optional
 
 from qcae.core.errors import QcaeValidationError
+from qcae.governance.standalone.typed_outcomes import StepNotReadyOutcome
 from qcae.interfaces.cli.app import QcaeApp, build_local_runtime
 
 
@@ -128,7 +129,7 @@ def build_parser() -> argparse.ArgumentParser:
     decide.add_argument("--job-id", default="")
     decide.add_argument("--reason", default="")
 
-    identity = sub.add_parser("identity", help="show runtime identity")
+    sub.add_parser("identity", help="show runtime identity")
     return parser
 
 
@@ -223,6 +224,22 @@ def _dispatch(app: QcaeApp, args) -> int:
             _print(job)
         elif args.job_command == "run":
             result = app.job_run_step(args.job_id, args.worker)
+            # P2-R5: an unknown job carries the same standing `job status`
+            # answers (exit 2) — never "no eligible step to run", which
+            # would claim a nonexistent job exists but has nothing to do.
+            if getattr(result, "reason", "") == "JOB_NOT_FOUND":
+                print(result.message(), file=sys.stderr)
+                return 2
+            if isinstance(result, StepNotReadyOutcome):
+                # Typed NOT_READY (canon 15.12 CONTRACT_NOT_READY standing):
+                # structured output, stable exit code, nothing mutated.
+                print(json.dumps({
+                    "error": "NOT_READY",
+                    "standing": result.standing,
+                    "job_id": result.job_id,
+                    "reason": result.reason,
+                }, indent=2), file=sys.stderr)
+                return 1
             if result is None:
                 print("no eligible step to run", file=sys.stderr)
                 return 1
@@ -261,8 +278,10 @@ def _dispatch(app: QcaeApp, args) -> int:
         _print(app.runtime_identity())
         return 0
 
-    parser.error(f"unknown command {args.command}")
-    return 2
+    # Unreachable with the current argparse set (subparsers are required and
+    # every job/approval subcommand is handled above); kept as the boundary's
+    # fail-closed tail so a future unhandled command cannot exit 0.
+    raise SystemExit(2)
 
 
 if __name__ == "__main__":
