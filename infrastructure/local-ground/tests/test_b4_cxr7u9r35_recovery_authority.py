@@ -16,8 +16,10 @@ it. These proofs cover the authority that containment does not:
   receipts cannot mutate database state;
 * GOVERNED TARGETS (R37): the destructive destination is the governed local
   identity; alternate --db/--user/--container values are refused;
-* RECEIPT-WRITE AUTHORITY (R37): --receipt-out can only name a file inside the
-  engine's own recovery-state directory;
+* RECEIPT-WRITE AUTHORITY (R37, hardened R39-R2): --receipt-out can only name
+  a file inside the engine's own recovery-state directory, whose location is
+  PROGRAM IDENTITY; the ambient environment cannot grant it, and a test that
+  needs another root constructs the seam in process (see recovery_cli.py);
 * ONE ARCHIVE IDENTITY (R35): admission happens once and the container copy is
   hash-bound to the admitted bytes before any staging or canonical mutation.
 
@@ -33,6 +35,8 @@ import sys
 from pathlib import Path
 
 import pytest
+
+import recovery_cli
 
 BASE = Path(__file__).resolve().parent.parent
 SCRIPTS = BASE / "scripts"
@@ -344,13 +348,12 @@ def test_governed_target_cannot_be_redirected_in_process(bridge, tmp_path, monke
 # R37: --receipt-out can only write inside the engine's state directory
 # --------------------------------------------------------------------- #
 
-def _run_cli(argv, state=None, monkeypatch=None):
-    env = dict(os.environ)
-    env["PYTHONIOENCODING"] = "utf-8"
-    if state is not None:
-        env["OCE_RECOVERY_STATE_DIR"] = str(state)
-    return subprocess.run([sys.executable, str(CLI)] + argv,
-                          capture_output=True, text=True, env=env, timeout=300)
+def _run_cli(argv, state=None):
+    """Run the real CLI. ``state`` is bound as the receipt-write root by the
+    TEST'S OWN in-process seam (B4-CXR7U9R39-R2) - no environment variable can
+    grant that authority any more; omitting it runs the engine exactly as a
+    production caller runs it."""
+    return recovery_cli.run_cli(argv, write_root=state)
 
 
 def test_receipt_out_escape_is_refused_and_writes_nothing(tmp_path, monkeypatch):
@@ -426,9 +429,9 @@ def test_failed_receipt_write_leaves_no_tmp_residue(bridge, tmp_path, monkeypatc
     state.mkdir()
     target = state / "receipt.json"
     with pytest.raises(TypeError):
-        pgrec._atomic_write_json(str(target), {"unserializable": object()})
+        pgrec._commit_receipt(str(target), {"unserializable": object()})
     assert not target.exists()
-    assert not list(state.glob("*.tmp")), list(state.iterdir())
+    assert list(state.iterdir()) == [], list(state.iterdir())
 
 
 # --------------------------------------------------------------------- #

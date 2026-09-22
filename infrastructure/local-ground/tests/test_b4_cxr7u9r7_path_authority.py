@@ -24,6 +24,8 @@ from pathlib import Path
 
 import pytest
 
+import recovery_cli
+
 BASE = Path(__file__).resolve().parent.parent
 SCRIPTS = BASE / "scripts"
 
@@ -282,14 +284,13 @@ class TestPromoteSinkRefusal:
         return roots, inv, sha
 
     def _cli(self, archive, inv, sha, receipt, state):
-        env = dict(os.environ)
-        env["PYTHONIOENCODING"] = "utf-8"
-        env["OCE_RECOVERY_STATE_DIR"] = str(state)
-        return subprocess.run(
-            [sys.executable, str(CLI), "--phase", "promote",
-             "--archive", str(archive), "--inventory", str(inv),
-             "--inventory-sha", str(sha), "--receipt-out", str(receipt)],
-            capture_output=True, text=True, env=env, timeout=300)
+        """Run the real CLI with ``state`` bound by the TEST'S OWN in-process
+        seam (B4-CXR7U9R39-R2): receipt-write authority is program identity, so
+        no environment variable can grant it any more."""
+        return recovery_cli.run_cli(
+            ["--phase", "promote", "--archive", str(archive),
+             "--inventory", str(inv), "--inventory-sha", str(sha),
+             "--receipt-out", str(receipt)], write_root=state)
 
     @pytest.mark.parametrize("kind,needle", [
         ("outside-root", "outside every approved backup root"),

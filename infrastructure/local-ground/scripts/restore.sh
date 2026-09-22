@@ -199,8 +199,6 @@ if ! have_docker; then
   exit 3
 fi
 
-RECEIPT_DIR="$VAR_DIR/recovery"
-mkdir -p "$RECEIPT_DIR"
 EV_DIR="${OCE_EVIDENCE_DIR:-}"
 TS_FMT='%Y-%m-%dT%H:%M:%SZ'
 START_TS=$(date -u +"$TS_FMT")
@@ -210,6 +208,12 @@ START_TS=$(date -u +"$TS_FMT")
 # the append-only index with their hashes; later operations cannot overwrite
 # earlier evidence, and a convenience latest.json is never authoritative.
 OPERATION_ID="$(python3 -c 'import uuid,sys;sys.stdout.write(uuid.uuid4().hex)')"
+# R39-R2: this operation's receipts live in ITS OWN directory inside the
+# governed recovery boundary. The engine refuses to overwrite an existing
+# receipt (a receipt is evidence), so a repeated restore must never be pointed
+# at the previous operation's files.
+RECEIPT_DIR="$VAR_DIR/recovery/ops/$OPERATION_ID"
+mkdir -p "$RECEIPT_DIR"
 OPS_ROOT="${OCE_EVIDENCE_DIR:-$VAR_DIR}/operations"
 BACKUP_ID="$(python3 -c "import json,sys;d=json.load(open(sys.argv[1],encoding='utf-8'));print(d.get('backup_id',''))" "$INFO" 2>/dev/null || echo unknown)"
 register_op() { # EXIT trap: index this restore operation immutably (idempotent)

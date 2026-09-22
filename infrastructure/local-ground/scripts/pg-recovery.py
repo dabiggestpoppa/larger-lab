@@ -51,16 +51,22 @@ Recovery targets are GOVERNED (B4-CXR7U9R36/37): --db, --user and
 above - an alternate value is refused, so no CLI value can redirect a
 destructive recovery. --receipt-out is data, not authority: it must name a
 file inside this engine's recovery state directory (var/recovery, where
-restore.sh stages its phase receipts, or the operator-declared
-OCE_RECOVERY_STATE_DIR), so a receipt can never overwrite configuration,
-source, secrets or evidence outside that directory.
+restore.sh stages its phase receipts), so a receipt can never overwrite
+configuration, source, secrets or evidence outside that directory.
+
+RECEIPT-WRITE AUTHORITY (B4-CXR7U9R37, hardened B4-CXR7U9R39-R2) is PROGRAM
+IDENTITY: the directory is derived from where this engine file lives, so no
+environment variable - including the former OCE_RECOVERY_STATE_DIR - can grant
+write authority. An existing receipt is REFUSED, never silently replaced.
 """
 import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 
 CONTAINER = "oce-local-postgresql"
@@ -75,7 +81,6 @@ STAGING_PREFIX = f"{DB}_restore_"
 RECEIPT_FORMAT = "oce-pg-recovery-receipt-v1"
 STAMP_RE = re.compile(r"[0-9a-f]{12}\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
-RECEIPT_STATE_ENV = "OCE_RECOVERY_STATE_DIR"
 
 PHASES_PROMOTE = [
     "inventory_validated",
@@ -441,25 +446,46 @@ def _governed_identity_problems(db, user, container) -> list:
             if supplied != canon]
 
 
+_TEST_RECOVERY_ROOT = None
+
+
+def _bind_test_recovery_root(path) -> None:
+    """TEST DEPENDENCY SEAM (B4-CXR7U9R39-R2).
+
+    Receipt-write authority is program identity, so no ambient environment can
+    grant it. A test that genuinely needs different storage CONSTRUCTS this
+    seam itself, in process, by importing this module and calling this
+    function; it is not reachable through the production CLI, it reads no
+    environment variable, and it cannot change the production default -
+    unbinding restores program identity.
+    """
+    global _TEST_RECOVERY_ROOT
+    _TEST_RECOVERY_ROOT = os.path.realpath(path)
+
+
+def _unbind_test_recovery_root() -> None:
+    global _TEST_RECOVERY_ROOT
+    _TEST_RECOVERY_ROOT = None
+
+
 def _recovery_state_dir() -> str:
-    """RECEIPT-WRITE AUTHORITY (B4-CXR7U9R37). The one directory this engine
-    owns for its OWN transition receipts: program identity's var/recovery
-    (where restore.sh stages its phase receipts), or a directory the caller
-    declared through OCE_RECOVERY_STATE_DIR - the same operator channel that
-    declares OCE_BACKUP_ROOTS for inputs. A --receipt-out value can never widen
-    this boundary."""
-    declared = os.environ.get(RECEIPT_STATE_ENV, "").strip()
-    if declared:
-        return os.path.realpath(declared)
+    """RECEIPT-WRITE AUTHORITY (B4-CXR7U9R37, B4-CXR7U9R39-R2). The one
+    directory this engine may write its OWN transition receipts into: the
+    `var/recovery` directory of the program identity that owns this engine
+    file. Authority derives from where the engine IS - never from the ambient
+    environment - so neither the environment nor a --receipt-out value can
+    widen it."""
+    if _TEST_RECOVERY_ROOT is not None:
+        return _TEST_RECOVERY_ROOT
     here = os.path.dirname(os.path.realpath(__file__))
     return os.path.join(os.path.dirname(here), "var", "recovery")
 
 
 def _validated_write_path(path: str) -> str:
     """Canonicalize a receipt OUTPUT path and enforce the write boundary: no
-    symlink indirection, contained in the recovery state directory, and an
-    existing parent directory. Nothing about the phase can influence where its
-    own receipt lands."""
+    symlink indirection in the target or in any parent component, containment
+    in the recovery state directory, and an existing parent directory. Nothing
+    about the phase can influence where its own receipt lands."""
     real = os.path.realpath(path)
     if real != os.path.abspath(path):
         raise RuntimeError(f"receipt output uses symlink indirection: {path}")
@@ -477,15 +503,67 @@ def _validated_write_path(path: str) -> str:
     return real
 
 
-def _atomic_write_json(path, data):
-    """Commit a receipt atomically (tmp + rename) so a partial write can never
-    be read as truth, and leave no .tmp residue when the commit fails."""
-    tmp = path + ".tmp"
+def _fsync_dir(directory):
+    """Flush a directory entry where the platform supports it (Windows does
+    not, and a platform that cannot must not fail the commit)."""
     try:
-        with open(tmp, "w", encoding="utf-8") as f:
+        dfd = os.open(directory, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(dfd)
+    except OSError:
+        pass
+    finally:
+        os.close(dfd)
+
+
+def _exclusive_copy(src, dst):
+    """Fallback for filesystems without hard links: create the target
+    EXCLUSIVELY (so an existing receipt is refused) and flush before closing."""
+    out = os.open(dst, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    try:
+        with os.fdopen(out, "wb") as f, open(src, "rb") as s:
+            shutil.copyfileobj(s, f)
+            f.flush()
+            os.fsync(f.fileno())
+    except BaseException:
+        try:
+            os.unlink(dst)
+        except OSError:
+            pass
+        raise
+
+
+def _commit_receipt(path, data):
+    """Commit a receipt without ever overwriting existing evidence.
+
+    OVERWRITE POLICY (B4-CXR7U9R39-R2): a receipt file is evidence, so an
+    EXISTING target is REFUSED - never silently replaced. The new receipt is
+    serialized into a collision-resistant, exclusively created temporary in the
+    SAME directory, flushed to disk, then linked into place exclusively, so the
+    target is either complete or absent. Any failure removes the temporary and
+    preserves whatever was already at the target.
+    """
+    directory = os.path.dirname(path)
+    fd, tmp = tempfile.mkstemp(prefix=".oce-receipt-", suffix=".tmp",
+                               dir=directory)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
-        os.replace(tmp, path)
-    except Exception:
+            f.flush()
+            os.fsync(f.fileno())
+        os.chmod(tmp, 0o600)
+        try:
+            os.link(tmp, path)          # exclusive: refuses an existing target
+        except FileExistsError:
+            raise RuntimeError(
+                f"refusing to overwrite an existing receipt: {path}")
+        except OSError:
+            _exclusive_copy(tmp, path)
+        os.unlink(tmp)
+        _fsync_dir(directory)
+    except BaseException:
         try:
             os.unlink(tmp)
         except OSError:
@@ -1013,6 +1091,13 @@ def _validate_cli(phase, kw):
         print("USAGE_ERROR: recovery targets are governed: " + "; ".join(targets),
               file=sys.stderr)
         sys.exit(2)
+    in_path, out_path = kw.get("receipt_in"), kw.get("receipt_out")
+    if in_path and out_path and os.path.realpath(in_path) == os.path.realpath(out_path):
+        # A receipt is evidence: it may not be both the authority for a
+        # transition and the file that transition rewrites.
+        print("USAGE_ERROR: --receipt-in and --receipt-out are the same file; "
+              "a receipt cannot be its own output", file=sys.stderr)
+        sys.exit(2)
 
 
 def main():
@@ -1024,6 +1109,12 @@ def main():
             out = _validated_write_path(out)
         except RuntimeError as e:
             print(f"USAGE_ERROR: {e}", file=sys.stderr)
+            sys.exit(2)
+        if os.path.exists(out):
+            # Preflight: a receipt is evidence, so an existing one is refused
+            # BEFORE any destructive step runs, not after it.
+            print("USAGE_ERROR: refusing to overwrite an existing receipt: "
+                  f"{out}", file=sys.stderr)
             sys.exit(2)
     # the destructive destination is the governed identity, full stop
     db, user, container = DB, USER, CONTAINER
@@ -1037,7 +1128,11 @@ def main():
         receipt = phase_rollback(kw["receipt_in"], kw["inventory"], kw["inventory_sha"],
                                  db, user, container, probe)
     if out:
-        _atomic_write_json(out, receipt)
+        try:
+            _commit_receipt(out, receipt)
+        except Exception as e:  # the operation ran: a lost receipt is BLOCKED, not silent
+            print(f"BLOCKED: cannot commit receipt {out}: {e}", file=sys.stderr)
+            sys.exit(1)
         print("receipt ->", out)
     if receipt.get("exit_status") != 0:
         print("BLOCKED:", receipt.get("error", f"postgres {phase} failed"),

@@ -23,6 +23,7 @@ from pathlib import Path
 import pytest
 
 import oce_compose as oc
+import recovery_cli
 
 pytestmark = pytest.mark.container
 
@@ -251,13 +252,12 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
     dump = bk / ".backup-content" / "postgres" / "archive.dump"
     # PHASE 1 — promote (quarantine HELD; canonical replaced by candidate)
     promote_receipt = tmp_path / "promote.json"
-    r = oc.run(["python3", str(oc.SCRIPTS / "pg-recovery.py"), "--phase", "promote",
-                "--archive", str(dump), "--inventory", str(inv),
-                "--inventory-sha", str(invsha),
-                "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
-                "--receipt-out", str(promote_receipt)],
-               env_extra={"OCE_BACKUP_ROOTS": str(tmp_path),
-                          "OCE_RECOVERY_STATE_DIR": str(tmp_path)}, check=False)
+    r = oc.run(recovery_cli.cli_argv(
+                   ["--phase", "promote", "--archive", str(dump),
+                    "--inventory", str(inv), "--inventory-sha", str(invsha),
+                    "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
+                    "--receipt-out", str(promote_receipt)], tmp_path),
+               env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
     assert r.returncode == 0, r.stdout + r.stderr
     pr = json.loads(promote_receipt.read_text(encoding="utf-8"))
     assert pr.get("promoted") is True, pr
@@ -270,13 +270,12 @@ def test_ctl_post_promotion_failure_rolls_back_original(oce_stack, tmp_path):
                            "UPDATE backup_probe SET v='evil' WHERE k='b1';"])
     # PHASE 2 — finalize: canonical re-verification FAILS -> rollback
     final_receipt = tmp_path / "final.json"
-    r2 = oc.run(["python3", str(oc.SCRIPTS / "pg-recovery.py"), "--phase", "finalize",
-                 "--receipt-in", str(promote_receipt),
-                 "--inventory", str(inv), "--inventory-sha", str(invsha),
-                 "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
-                 "--receipt-out", str(final_receipt)],
-                env_extra={"OCE_BACKUP_ROOTS": str(tmp_path),
-                          "OCE_RECOVERY_STATE_DIR": str(tmp_path)}, check=False)
+    r2 = oc.run(recovery_cli.cli_argv(
+                    ["--phase", "finalize", "--receipt-in", str(promote_receipt),
+                     "--inventory", str(inv), "--inventory-sha", str(invsha),
+                     "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
+                     "--receipt-out", str(final_receipt)], tmp_path),
+                env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
     assert r2.returncode != 0, "finalize must fail when canonical truth is broken"
     fr = json.loads(final_receipt.read_text(encoding="utf-8"))
     assert fr.get("rollback_required") is True, fr
@@ -341,13 +340,12 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
     invsha = bk / ".backup-content" / "postgres" / "inventory.json.sha256"
     dump = bk / ".backup-content" / "postgres" / "archive.dump"
     promote_receipt = tmp_path / "promote.json"
-    r = oc.run(["python3", str(oc.SCRIPTS / "pg-recovery.py"), "--phase", "promote",
-                "--archive", str(dump), "--inventory", str(inv),
-                "--inventory-sha", str(invsha),
-                "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
-                "--receipt-out", str(promote_receipt)],
-               env_extra={"OCE_BACKUP_ROOTS": str(tmp_path),
-                          "OCE_RECOVERY_STATE_DIR": str(tmp_path)}, check=False)
+    r = oc.run(recovery_cli.cli_argv(
+                   ["--phase", "promote", "--archive", str(dump),
+                    "--inventory", str(inv), "--inventory-sha", str(invsha),
+                    "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
+                    "--receipt-out", str(promote_receipt)], tmp_path),
+               env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
     assert r.returncode == 0, r.stdout + r.stderr
     pr = json.loads(promote_receipt.read_text(encoding="utf-8"))
     q = pr.get("quarantine_database")
@@ -359,13 +357,12 @@ def test_ctl_rollback_failure_returns_nonzero_and_preserves_evidence(oce_stack, 
     oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", oc.PG_DB, "-c",
                            "UPDATE backup_probe SET v='evil' WHERE k='b1';"])
     final_receipt = tmp_path / "final.json"
-    r2 = oc.run(["python3", str(oc.SCRIPTS / "pg-recovery.py"), "--phase", "finalize",
-                 "--receipt-in", str(promote_receipt),
-                 "--inventory", str(inv), "--inventory-sha", str(invsha),
-                 "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
-                 "--receipt-out", str(final_receipt)],
-                env_extra={"OCE_BACKUP_ROOTS": str(tmp_path),
-                          "OCE_RECOVERY_STATE_DIR": str(tmp_path)}, check=False)
+    r2 = oc.run(recovery_cli.cli_argv(
+                    ["--phase", "finalize", "--receipt-in", str(promote_receipt),
+                     "--inventory", str(inv), "--inventory-sha", str(invsha),
+                     "--db", oc.PG_DB, "--user", oc.PG_USER, "--container", oc.POSTGRES,
+                     "--receipt-out", str(final_receipt)], tmp_path),
+                env_extra={"OCE_BACKUP_ROOTS": str(tmp_path)}, check=False)
     assert r2.returncode != 0, "rollback failure must return nonzero"
     fr = json.loads(final_receipt.read_text(encoding="utf-8"))
     assert fr.get("rollback_required") is True
