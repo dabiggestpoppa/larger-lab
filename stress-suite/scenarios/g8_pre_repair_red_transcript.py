@@ -257,17 +257,23 @@ def transcript(with_git_log: bool = True) -> str:
                  "transcript; the list grows if the contract is amended again, "
                  "which is itself the recorded finding.\n\n```\n")
     lines.append("$ git log --all --oneline -- %s\n" % CONTRACT_REL)
-    lines.append((_git("log", "--all", "--oneline", "--", CONTRACT_REL) or
-                  "(no commit)") + "\n")
-    lines.append("```\n\n"
-                 "One commit ever touched the contract, and that commit's blob\n"
-                 "already carries the revisions motivated by the first run's own\n"
-                 "findings, so Git cannot show that those verdict rules were frozen\n"
-                 "before the first comparison ran. The claim recorded in the\n"
-                 "pre-repair contract (`FROZEN_AT_STRESS-G8P0`, `authored BEFORE any\n"
-                 "cross-scenario comparison runs`) is therefore retracted as\n"
-                 "unsupported and replaced by the staged chronology record in\n"
-                 "`contract_chronology`.\n")
+    log_text = _git("log", "--all", "--oneline", "--", CONTRACT_REL) or ""
+    lines.append((log_text or "(no commit)") + "\n")
+    lines.append("```\n\n")
+    # the commit count is DERIVED from the log above, never asserted: an earlier
+    # revision of this harness hardcoded "one commit", which the live log
+    # falsified as soon as the repair itself amended the contract.
+    touched = [ln for ln in log_text.splitlines() if ln.strip()]
+    earliest = touched[-1].split(" ", 1)[0] if touched else "none"
+    lines.append(
+        "Git resolves %d commit(s) touching the contract; the earliest is\n"
+        "`%s`. That earliest snapshot already carries the revisions motivated\n"
+        "by the first run's own findings, so Git cannot show that those verdict\n"
+        "rules were frozen before the first comparison ran. The claim recorded\n"
+        "in the pre-repair contract (`FROZEN_AT_STRESS-G8P0`, `authored BEFORE\n"
+        "any cross-scenario comparison runs`) is therefore retracted as\n"
+        "unsupported and replaced by the staged chronology record in\n"
+        "`contract_chronology`.\n" % (len(touched), earliest))
     return "".join(lines)
 
 

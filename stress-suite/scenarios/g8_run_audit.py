@@ -746,6 +746,34 @@ def _git_probe(repo: Path) -> Callable[[Sequence[str]], str]:
     return probe
 
 
+def contract_touch_commits(repo: Path, rel_path: str) -> List[str]:
+    """DERIVE every commit that touches ``rel_path``, as `<sha> <subject>`.
+
+    STRESS-G8RX (R-G8-09). A chronology record's Git claim is a statement about
+    the repository, so it is READ from the repository at emission time rather
+    than asserted in prose: the first revision of that artifact hardcoded "one
+    commit ever touched the contract" and was falsified by its own next
+    amendment. Git is probed only from this layer: `engine/` is forbidden from
+    importing `subprocess` by tests/test_no_mutation_surface.py.
+
+    Returns an empty list when Git cannot answer, so callers render
+    "unresolved" instead of publishing a stale count.
+    """
+    proc = subprocess.run(["git", "log", "--all", "--format=%H %s", "--", rel_path],
+                          cwd=str(repo), capture_output=True, text=True, check=False)
+    if proc.returncode != 0:
+        return []
+    return [ln for ln in proc.stdout.splitlines() if ln.strip()]
+
+
+def contract_touch_fact(repo: Path, rel_path: str) -> Dict[str, Any]:
+    """The derived Git fact about a contract path, shaped for the prose."""
+    commits = contract_touch_commits(repo, rel_path)
+    return {"count": len(commits), "commits": commits,
+            "earliest_sha": commits[-1].split(" ", 1)[0] if commits else "",
+            "resolved": bool(commits)}
+
+
 def _evidence_commit_of(repo: Path, rel_path: str) -> str:
     proc = subprocess.run(["git", "log", "--diff-filter=A", "--format=%H", "-1", "--",
                            rel_path], cwd=str(repo), capture_output=True, text=True,

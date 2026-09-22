@@ -5,7 +5,10 @@ tree and the same measured test count produce byte-identical artifacts. There is
 no wall-clock field anywhere, no timestamp, and no self-referential digest of the
 commit that contains the output (the audit's own C15 control refuses that).
 
-    PYTHONIOENCODING=utf-8 python scenarios/g8_emit_evidence.py <measured_full_tests>
+    PYTHONIOENCODING=utf-8 python scenarios/g8_emit_evidence.py <junit-xml-artifact>
+
+The argument is the JUnit XML artifact produced by the authoritative command; a
+bare test count is refused (finding R-G8-07).
 
 Everything the package asserts is derived from the run or from the receipts it
 audits. Nothing here re-states a count, a fingerprint or a verdict that was
@@ -35,6 +38,7 @@ START_SHA = "661878e7df4c5b8f7bcb2479ceebabd79d8c28b3"
 #: names the pre-repair head it corrects.
 TESTED_SHA = "8efa99e71da8b8fa351eebacccfb84bdaf6523d5"
 PRE_REPAIR_SHA = "6c015f86408a56721f8999e4aa39b218fab0fd4d"
+CONTRACT_REL = "stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json"
 EVIDENCE_COMMIT_LABEL = "STRESS-G8RR"
 AUTHORITATIVE_TEST_COMMAND = (
     "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q")
@@ -652,19 +656,180 @@ def emit(test_evidence: TestEvidence) -> Dict[str, Any]:
     _write(EVIDENCE / "G8_RESULT.md", "".join(result))
     _write_chronology(contract, decision)
     _write_source_binding(contract)
+    _write_closure_matrix()
     return {"package": package, "receipt": receipt, "decision": decision}
+
+
+#: STRESS-G8RX — the closure matrix. Each review finding is closed by a RED probe
+#: captured against the pre-repair head and a GREEN regression that runs in the
+#: authoritative suite. The named regressions and artifacts are CHECKED to exist
+#: below, so the matrix cannot cite evidence that is not in the tree.
+_AUDIT_CLOSURE: Sequence[Mapping[str, Any]] = (
+    {"finding": "R-G8-01",
+     "defect": "mandated NOT_COMPARABLE pairs counted as coverage while the gate passed",
+     "red_probe": "R-G8-01",
+     "green_tests": ("test_r01_mandatory_not_comparable_is_not_coverage",
+                     "test_r01_a_mandated_pair_never_compared_blocks_the_gate",
+                     "test_r01_the_live_package_adjudicates_every_mandated_pair",
+                     "test_every_mandated_comparison_pair_was_substantively_adjudicated"),
+     "artifacts": ("G8_CROSS_SCENARIO_MATRIX.md",
+                   "G8_EQUIVALENCE_CLASS_REGISTER.json")},
+    {"finding": "R-G8-02",
+     "defect": "`... or True` tautology returned HOLDS on an adverse profit surface",
+     "red_probe": "R-G8-02",
+     "green_tests": ("test_r02_p5_tautology_is_gone",
+                     "test_r02_p5_holds_only_on_an_exercised_gate_surface"),
+     "artifacts": ("G8_EQUIVALENCE_CONTRACT.json",
+                   "G8_CONTRADICTION_REGISTER.json")},
+    {"finding": "R-G8-03",
+     "defect": "a provenance KEY NAME counted as provenance evidence",
+     "red_probe": "R-G8-03",
+     "green_tests": ("test_r03_p7_unknown_and_key_names_are_not_provenance",),
+     "artifacts": ("G8_EQUIVALENCE_CONTRACT.json",)},
+    {"finding": "R-G8-04",
+     "defect": "runtime neutrality derived from a scenario identifier (S13) and True for any id",
+     "red_probe": "R-G8-04",
+     "green_tests": ("test_r04_p11_scenario_identity_cannot_derive_runtime_neutrality",
+                     "test_r04_p11_unpaired_and_mismatched_runtime_replacements"),
+     "artifacts": ("G8_EQUIVALENCE_CONTRACT.json",)},
+    {"finding": "R-G8-05",
+     "defect": "P1/P8/P9 accepted a refusal token, a literal True, and token recognition",
+     "red_probe": "R-G8-05",
+     "green_tests": ("test_r05_p1_a_refusal_elsewhere_is_not_an_authority_proof",
+                     "test_r05_p8_capability_caused_authority_change_is_a_violation",
+                     "test_r05_p9_availability_caused_empirical_change_is_a_violation",
+                     "test_r05_a_holds_finding_without_derivation_evidence_is_rejected",
+                     "test_r05_a_bare_boolean_cannot_certify_a_guarded_property"),
+     "artifacts": ("G8_EQUIVALENCE_CONTRACT.json",
+                   "G8_EVIDENCE_RECEIPT.json")},
+    {"finding": "R-G8-06",
+     "defect": "P6 inferred from raw reviewer counts rather than the resulting disposition",
+     "red_probe": "R-G8-06",
+     "green_tests": ("test_r06_p6_raw_count_over_one_lineage_is_a_violation",),
+     "artifacts": ("G8_EQUIVALENCE_CONTRACT.json",)},
+    {"finding": "R-G8-07",
+     "defect": "a bare scalar self-reported as collected=passed (1 / 973 / 9999 all certified)",
+     "red_probe": "R-G8-07",
+     "green_tests": ("test_r07_the_emitter_cannot_consume_a_bare_count",
+                     "test_r07_absent_failing_stale_and_malformed_artifacts_all_refuse",
+                     "test_r07_a_clean_artifact_yields_a_verifiable_baseline"),
+     "artifacts": ("G8_EVIDENCE_RECEIPT.json",)},
+    {"finding": "R-G8-08",
+     "defect": "the source binding was a raw working-tree digest, so core.autocrlf decided it",
+     "red_probe": "R-G8-08",
+     "green_tests": ("test_r08_the_s16_source_binding_is_checkout_invariant",
+                     "test_r08_the_live_s16_run_binds_the_canonical_digest"),
+     "artifacts": ("G8_SOURCE_BINDING_PORTABILITY.md",)},
+    {"finding": "R-G8-09",
+     "defect": "the contract claimed a pre-run freeze Git could not support",
+     "red_probe": "R-G8-09",
+     "green_tests": ("test_r09_a_reconstruction_cannot_claim_a_pre_run_freeze",
+                     "test_r09_a_record_cannot_be_summarised_stronger_than_its_weakest_artifact",
+                     "test_r09_the_live_contract_declares_its_own_chronology"),
+     "artifacts": ("G8_CONTRACT_CHRONOLOGY.md",)},
+)
+
+#: the RED probes must remain rerunnable from the repository, not from a scratch
+#: directory: these two controls rerun the committed harness live and require the
+#: archived annex to match it.
+_RED_SURVIVAL_TESTS = ("test_the_pre_repair_red_transcript_still_reproduces_every_finding",
+                       "test_the_red_transcript_artifact_on_disk_matches_the_harness")
+
+
+def _write_closure_matrix() -> None:
+    """STRESS-G8RX — the per-finding closure matrix.
+
+    Derived, not asserted: every green regression cited here is required to EXIST
+    in the G8 test module, every artifact path is required to exist in the
+    evidence directory, and every RED probe id is required to appear in the
+    archived pre-repair transcript. A citation that does not resolve raises
+    instead of being published.
+    """
+    tests_src = (ROOT / "tests" / "test_g8_contradiction.py").read_text(
+        encoding="utf-8")
+    # the annex is produced by the red-transcript harness, not by this emitter,
+    # so it is read from the repository rather than from the emission target (a
+    # test may redirect EVIDENCE at a temporary directory).
+    annex = (ROOT / "evidence" / "G8_PRE_REPAIR_RED_TRANSCRIPT.md").read_text(
+        encoding="utf-8")
+    missing: List[str] = []
+    rows: List[List[str]] = []
+    for entry in _AUDIT_CLOSURE:
+        if f"{entry['red_probe']}:" not in annex:
+            missing.append(f"RED probe {entry['red_probe']} absent from the annex")
+        for name in entry["green_tests"]:
+            if f"def {name}(" not in tests_src:
+                missing.append(f"green regression {name} is not in the test module")
+        for art in entry["artifacts"]:
+            # some cited artifacts are committed INPUTS (the contract) rather than
+            # outputs of this emitter, so both locations are legitimate.
+            if not ((EVIDENCE / art).exists() or
+                    (ROOT / "evidence" / art).exists()):
+                missing.append(f"artifact {art} does not exist")
+        rows.append([entry["finding"], entry["defect"],
+                     " + ".join(entry["green_tests"]),
+                     ", ".join(entry["artifacts"])])
+    for name in _RED_SURVIVAL_TESTS:
+        if f"def {name}(" not in tests_src:
+            missing.append(f"red-survival control {name} is not in the test module")
+    if missing:
+        raise ValueError("the closure matrix cites evidence that is not present: "
+                         + "; ".join(missing))
+    prose = [
+        "# G8 — audit-closure matrix (STRESS-G8RX)\n\n",
+        "Every finding from the G8 adversarial repair review, with the executable "
+        "evidence that closes it. The RED column is a probe rendered from the "
+        "PRE-REPAIR code; the GREEN column is a regression that runs in the "
+        "authoritative suite. The matrix is generated by the evidence emitter, "
+        "which refuses to publish a citation it cannot resolve in the tree, so "
+        "this document cannot drift away from the tests it names.\n\n",
+        "The RED evidence is not a scratch transcript: "
+        "`scenarios/g8_pre_repair_red_transcript.py` extracts the pre-repair "
+        "commit read-only, reruns every probe in a subprocess, and the two "
+        "red-survival controls below rerun it live inside the authoritative "
+        "suite (" + ", ".join(f"`{n}`" for n in _RED_SURVIVAL_TESTS) + ").\n\n",
+        f"Pre-repair head: `{PRE_REPAIR_SHA}`.\n\n",
+        _md_table(rows, ["finding", "defect", "green regression(s)",
+                         "artifact(s)"]),
+        "\nEvery named regression is collected by the authoritative command "
+        f"`{AUTHORITATIVE_TEST_COMMAND}`.\n",
+    ]
+    _write(EVIDENCE / "G8_AUDIT_CLOSURE_MATRIX.md", "".join(prose))
 
 
 def _write_chronology(contract: Mapping[str, Any], decision: Mapping[str, Any]) -> None:
     """STRESS-G8R4 (R-G8-09) — the contract's own chronology, as a declared
     artifact rather than as prose inside another document."""
     from engine.g8_chronology import validate_chronology
+    from scenarios.g8_run_audit import contract_touch_fact
     record = contract["contract_chronology"]
     info = validate_chronology(record)
     rows = [[a["artifact_id"], a["stage"],
              str(a.get("claims_pre_run_freeze")),
              str(a.get("introducing_commit_ref") or "-")]
             for a in record["artifacts"]]
+    # the Git fact is DERIVED from the repository, never restated from prose: a
+    # hardcoded count is falsified by the very next amendment to the contract.
+    fact = contract_touch_fact(ROOT.parent, CONTRACT_REL)
+    if fact["resolved"]:
+        git_lines = [
+            f"`git log --all -- {CONTRACT_REL}` resolves "
+            f"**{fact['count']}** commit(s) at this evidence commit, the earliest "
+            f"being `{fact['earliest_sha']}` (STRESS-G8P0):\n\n"]
+        git_lines += [f"- `{c}`\n" for c in fact["commits"]]
+        git_lines.append(
+            "\nThe earliest of them already carries the revisions motivated by "
+            "the first run's own findings, so Git does NOT establish that the "
+            "v1.0.0 verdict rules were frozen before the first comparison ran; "
+            "each later entry is itself a recorded amendment.\n\n")
+    else:
+        git_lines = [
+            "Git could not resolve the contract's history in this checkout, so "
+            "the commit count is recorded as **unresolved** rather than assumed.\n\n"]
+    git_lines.append(
+        "Observation recorded when the chronology was first written (a statement "
+        "about the PRE-REPAIR head, kept as the record of what motivated R-G8-09):\n\n"
+        f"{record['git_evidence']}\n\n")
     prose = [
         "# G8 — contract amendment chronology\n\n",
         "A verdict rule set that was chosen after seeing the outcome is not a gate, "
@@ -676,16 +841,16 @@ def _write_chronology(contract: Mapping[str, Any], decision: Mapping[str, Any]) 
         f"\nOverall classification: **{info['classification']}**.\n\n",
         f"Gate blocking policy source: {record['gate_blocking_policy_source']}\n\n",
         "## Git evidence\n\n",
-        f"{record['git_evidence']}\n\n",
+    ] + git_lines + [
         "## Retraction\n\n",
         "The pre-repair contract declared `status: FROZEN_AT_STRESS-G8P0` and a "
         "`freeze_note` stating it was *authored BEFORE any cross-scenario "
-        "comparison runs*. Git shows exactly one commit ever touching that file "
-        "and that blob already carries the revisions motivated by the first run's "
-        "own findings, so the freeze claim is **not supportable** and is recorded "
-        "here as retracted rather than softened. The unsupported phrases "
-        "('preserved verbatim', 'frozen before any comparison ran') are removed "
-        "from the contract of record.\n\n",
+        "comparison runs*. The Git history derived above shows that the contract's "
+        "own earliest reachable blob already carries the revisions motivated by "
+        "the first run's own findings, so the freeze claim is **not supportable** "
+        "and is recorded here as retracted rather than softened. The unsupported "
+        "phrases ('preserved verbatim', 'frozen before any comparison ran') are "
+        "removed from the contract of record.\n\n",
         "## Forward rule\n\n",
         f"{record['forward_rule']}\n\n",
         f"Gate exit for this run: `{decision['exit']}`.\n",

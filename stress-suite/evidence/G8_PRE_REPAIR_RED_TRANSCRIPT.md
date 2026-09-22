@@ -53,11 +53,11 @@ $ git log --all --oneline -- stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json
 f5482e3e STRESS-G8P0: freeze equivalence and contradiction audit contract
 ```
 
-One commit ever touched the contract, and that commit's blob
-already carries the revisions motivated by the first run's own
-findings, so Git cannot show that those verdict rules were frozen
-before the first comparison ran. The claim recorded in the
-pre-repair contract (`FROZEN_AT_STRESS-G8P0`, `authored BEFORE any
-cross-scenario comparison runs`) is therefore retracted as
+Git resolves 2 commit(s) touching the contract; the earliest is
+`f5482e3e`. That earliest snapshot already carries the revisions motivated
+by the first run's own findings, so Git cannot show that those verdict
+rules were frozen before the first comparison ran. The claim recorded
+in the pre-repair contract (`FROZEN_AT_STRESS-G8P0`, `authored BEFORE
+any cross-scenario comparison runs`) is therefore retracted as
 unsupported and replaced by the staged chronology record in
 `contract_chronology`.
