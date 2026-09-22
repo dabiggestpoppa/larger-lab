@@ -3,11 +3,12 @@
 **GATE STATUS:** `PASS_G8_CROSS_SCENARIO_COHERENCE`
 
 - starting SHA `661878e7df4c5b8f7bcb2479ceebabd79d8c28b3`
-- tested SHA `30d4ff4f3687ce28e8a5c3d4114619921197d9ed`
+- tested SHA `45f729fd2dd33987969796d14682ee562e8c1e83`
 - evidence commit `STRESS-G8RR` (this package; not self-hashed)
 - contract `G8-EQUIVALENCE-CONTRACT-001` v1.2.0 `525b18bcea68d23584097c8b740d2d23`
-- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1017 / passed 1016 / skipped 1 / failed 0** (artifact `pytest` `aaf42dc33290f3f9`, python `3.11.9`)
-- test provenance (revision R3, finding R-G8-07): the baseline is read from the JUnit artifact the authoritative command produced, never from a self-reported integer. The receipt records the artifact digest, the suite identity, the tested tree, the command, the environment and the exit status; a missing, malformed, stale or failing artifact refuses emission.
+- authoritative test command `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **collected 1018 / passed 1017 / skipped 1 / failed 0** (artifact `pytest` `bfdb7f539c162bd2`, python `3.11.9`)
+- skipped 'stress-suite.tests.test_g8_contradiction::test_the_committed_package_names_the_derived_code_tree', and named here rather than smoothed over: artifact-producing run: the archive for this tree cannot exist yet, so a lag is expected here and is checked by every ordinary run (and by test_the_lag_rule_detects_a_lagging_tree_...)
+- test provenance (revision R3, finding R-G8-07): the baseline is read from the JUnit artifact the authoritative command produced, never from a self-reported integer. The receipt records the artifact digest, the suite identity, the tested tree, the command and the environment; a missing, malformed, stale or failing artifact refuses emission. No exit status is published, because a JUnit document cannot show the producing process's exit code -- a claim where an observation is impossible is not evidence, and the refusal it drove is driven by the counts MEASURED from the artifact instead (STRESS-G8ARCH4).
 
 ## What was asked
 
