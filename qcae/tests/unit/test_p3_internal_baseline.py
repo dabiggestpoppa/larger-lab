@@ -28,6 +28,7 @@ from qcae.core.discovery import (
 )
 from qcae.core.errors import QcaeValidationError
 from qcae.core.ports.knowledge_registry import RegistryQuery
+from qcae.core.receipts import ReceiptState
 from qcae.core.vocabulary import VerificationLevel
 from qcae.discovery.internal.baseline import (
     NON_DERIVABLE_CLASSIFICATIONS,
@@ -55,7 +56,9 @@ class FakeRegistryQuery(RegistryQuery):
         atom_ids=(),
         candidate_refs=(),
         reuse=None,
+        evidence=None,
     ) -> None:
+        self._evidence = {a: tuple(refs) for a, refs in (evidence or {}).items()}
         self._findings = {"capability_id": CAP, "categories": list(categories),
                           "detail": dict(detail or {})}
         self._state = {
@@ -85,6 +88,11 @@ class FakeRegistryQuery(RegistryQuery):
     def decision_reuse_findings(self, capability_id, contract_id, contract_version):
         self.calls.append(("decision_reuse_findings", capability_id, contract_id, contract_version))
         return self._reuse
+
+    def internal_evidence_by_atom(self, capability_id, contract_id, contract_version):
+        self.calls.append(
+            ("internal_evidence_by_atom", capability_id, contract_id, contract_version))
+        return dict(self._evidence)
 
 
 def plan():
@@ -186,6 +194,7 @@ class TestBaselineClassification:
                 detail={"CAPABILITY_ACTIVE": ["rcpt-001"]},
                 atom_ids=[ATOM_A, ATOM_B],
                 candidate_refs=["cand-1"],
+                evidence={ATOM_A: ["cand-1", "rcpt-001"], ATOM_B: ["rcpt-001"]},
             )
         )
         assert record.sufficiency_verdict is C.FULLY_SATISFIED_INTERNAL
@@ -199,6 +208,7 @@ class TestBaselineClassification:
                 categories=[],
                 atom_ids=[ATOM_A],
                 candidate_refs=["cand-1"],
+                evidence={ATOM_A: ["cand-1"]},
             )
         )
         assert record.sufficiency_verdict is C.PARTIALLY_SATISFIED_INTERNAL
@@ -206,7 +216,7 @@ class TestBaselineClassification:
         assert record.missing_atoms == (ATOM_B,)
         assert record.external_target_atoms == (ATOM_B,)
         assert record.partial_reuse is True
-        assert record.coverage_basis == "CAPABILITY_GRANULARITY_FROM_REGISTRY_STATE"
+        assert record.coverage_basis == "ATOM_ATTRIBUTED_BY_REGISTRY_STATE"
 
     def test_stale_evidence_marks_component_reusable_and_revalidation(self) -> None:
         record = baseline(
@@ -250,14 +260,22 @@ class TestBaselineClassification:
         assert record.requires_revalidation is True
         assert record.revision_change_refs == ("cand-9",)
 
-    def test_definition_without_implementation_is_partial(self) -> None:
+    def test_definition_without_implementation_claims_no_satisfaction(self) -> None:
+        """A definition nothing implements is not partial satisfaction.
+
+        ``DEFINITION_WITHOUT_IMPLEMENTATION`` maps to PARTIALLY_SATISFIED_INTERNAL,
+        but a record covering no atom cannot claim partial coverage — the same
+        "claim more than the evidence names" error as claiming full satisfaction.
+        Coverage keeps the one vote on how much is satisfied; the category still
+        reaches the reader through the verdict and the reference fields.
+        """
         record = baseline(
             FakeRegistryQuery(
                 categories=["DEFINITION_WITHOUT_IMPLEMENTATION"],
                 detail={"DEFINITION_WITHOUT_IMPLEMENTATION": [ATOM_A, ATOM_B]},
             )
         )
-        assert C.PARTIALLY_SATISFIED_INTERNAL in record.classifications
+        assert C.PARTIALLY_SATISFIED_INTERNAL not in record.classifications
         assert record.sufficiency_verdict is C.NO_INTERNAL_CAPABILITY_FOUND
         assert record.external_target_atoms == (ATOM_A, ATOM_B)
 
@@ -278,10 +296,18 @@ class TestBaselineClassification:
                                             candidate_refs=["cand-1", "cand-2"]))
         assert not (set(record.classifications) & NON_DERIVABLE_CLASSIFICATIONS)
 
-    def test_capability_granularity_candidate_count_is_not_duplication(self) -> None:
+    def test_registry_evidence_does_not_seed_duplicate_implementations(self) -> None:
+        """Only caller attribution seeds 2.6.9 duplication, not registry refs.
+
+        Attributed registry evidence now *could* prove duplication (two records
+        scoped to one atom), but that is a derivation this phase does not make:
+        ``duplicate_atom_refs`` stays caller-supplied, so the classification is
+        never invented from state alone.
+        """
         record = baseline(
             FakeRegistryQuery(atom_ids=[ATOM_A, ATOM_B],
-                              candidate_refs=["cand-1", "cand-2"])
+                              candidate_refs=["cand-1", "cand-2"],
+                              evidence={ATOM_A: ["cand-1", "cand-2"]})
         )
         assert C.DUPLICATE_IMPLEMENTATIONS not in record.classifications
 
@@ -293,6 +319,55 @@ class TestBaselineClassification:
         assert C.DUPLICATE_IMPLEMENTATIONS in record.classifications
         assert record.coverage_basis == "ATOM_ATTRIBUTED_BY_CALLER"
         assert record.internal_candidate_refs == ("cand-1", "cand-2", "cand-3")
+
+
+class TestEvidenceBoundedCoverage:
+    """No record may claim more coverage than its evidence names.
+
+    Coverage is the requested atoms some internal record is scoped to. A
+    category can *find* something; it cannot raise the coverage claim above what
+    the evidence supports, because a record that out-claims its evidence is how
+    a fail-closed phase ends up suppressing the search it exists to perform.
+    """
+
+    def test_a_category_cannot_claim_satisfaction_coverage_cannot_support(self) -> None:
+        record = baseline(
+            FakeRegistryQuery(
+                categories=["CAPABILITY_ACTIVE"],
+                detail={"CAPABILITY_ACTIVE": ["rcpt-001"]},
+                atom_ids=[ATOM_A, ATOM_B],
+                evidence={ATOM_A: ["rcpt-001"]},
+            )
+        )
+        assert record.covered_atoms == (ATOM_A,)
+        assert record.sufficiency_verdict is C.PARTIALLY_SATISFIED_INTERNAL
+        assert record.external_target_atoms == (ATOM_B,)
+        assert C.FULLY_SATISFIED_INTERNAL not in record.classifications
+
+    def test_evidence_naming_no_requested_atom_covers_nothing(self) -> None:
+        record = baseline(
+            FakeRegistryQuery(
+                categories=["CAPABILITY_ACTIVE"],
+                detail={"CAPABILITY_ACTIVE": ["rcpt-001"]},
+                atom_ids=[ATOM_A, ATOM_B],
+                evidence={"atom-elsewhere": ["rcpt-001"]},
+            )
+        )
+        assert record.covered_atoms == ()
+        assert record.sufficiency_verdict is C.NO_INTERNAL_CAPABILITY_FOUND
+        assert record.external_target_atoms == (ATOM_A, ATOM_B)
+        assert C.FULLY_SATISFIED_INTERNAL not in record.classifications
+
+    def test_coverage_basis_and_basis_refs_name_the_attribution(self) -> None:
+        record = baseline(
+            FakeRegistryQuery(
+                atom_ids=[ATOM_A, ATOM_B],
+                evidence={ATOM_A: ["cand-1"], ATOM_B: ["cand-1", "cand-2"]},
+            )
+        )
+        assert record.coverage_basis == "ATOM_ATTRIBUTED_BY_REGISTRY_STATE"
+        assert record.covered_atoms == (ATOM_A, ATOM_B)
+        assert record.internal_candidate_refs == ("cand-1", "cand-2")
 
 
 # -- trust firewall / policy ------------------------------------------------
@@ -323,6 +398,7 @@ class TestTrustFirewall:
             FakeRegistryQuery(
                 atom_ids=[ATOM_A],
                 candidate_refs=["cand-1"],
+                evidence={ATOM_A: ["cand-1", "rcpt-1"]},
                 reuse={
                     "active_receipts": ["rcpt-1"],
                     "positive_knowledge": ["pk-1"],
@@ -365,7 +441,7 @@ class TestFailClosed:
         baseline(registry)
         assert ("internal_first_findings", CAP, CAP, "1") in registry.calls
         assert ("decision_reuse_findings", CAP, CAP, "1") in registry.calls
-        assert ("known_capability_state", CAP) in registry.calls
+        assert ("internal_evidence_by_atom", CAP, CAP, "1") in registry.calls
 
 
 # -- real registry wiring ---------------------------------------------------
@@ -379,49 +455,21 @@ class TestRealRegistryWiring:
     A discovery attempt on that wiring must produce a baseline, not crash.
     """
 
-    def _real_query(self):
-        from qcae.infrastructure.persistence.sqlite_capability_registry import (
-            CAPABILITY_REGISTRY_DDL,
-            SqliteCapabilityRegistry,
-        )
-        from qcae.infrastructure.persistence.sqlite_knowledge_store import (
-            KNOWLEDGE_DDL,
-            SqliteNegativeKnowledgeRepository,
-            SqliteRegistryQuery,
-        )
-        from qcae.infrastructure.persistence.sqlite_repository_registry import (
-            REPOSITORY_REGISTRY_DDL,
-            SqliteRepositoryRegistry,
-        )
-        from qcae.infrastructure.persistence.store_factory import open_metadata_db
+    def _real_query(self, *, wire_receipts=False, atoms=(), receipts=(),
+                    candidates=(), receipt_state=ReceiptState.ACTIVE,
+                    receipt_contract_version="1"):
+        """A real metadata database and a registry query over it.
 
-        conn = open_metadata_db(":memory:")
-        for ddl in (CAPABILITY_REGISTRY_DDL, REPOSITORY_REGISTRY_DDL, KNOWLEDGE_DDL):
-            conn.executescript(ddl)
-        return conn, SqliteRegistryQuery(
-            None, None, SqliteNegativeKnowledgeRepository(conn), None,
-            capability_registry=SqliteCapabilityRegistry(conn),
-            repository_registry=SqliteRepositoryRegistry(conn),
-        )
-
-    def test_partially_wired_registry_produces_a_baseline(self) -> None:
-        conn, query = self._real_query()
-        try:
-            record = baseline(query)
-        finally:
-            conn.close()
-        assert record.sufficiency_verdict is C.NO_INTERNAL_CAPABILITY_FOUND
-        assert record.external_target_atoms == (ATOM_A, ATOM_B)
-
-    def _real_query_with_active_receipt(self):
-        """Real wiring whose capability is proven implemented by a receipt.
-
-        No candidate rows are added: P1 stores receipts without candidates in
-        four of its own suites, so this is a first-class registry state, not a
-        degenerate one.
+        ``wire_receipts`` includes the receipt repository — absent by default, so
+        the partial-wiring shape stays exercisable. ``atoms`` declares the
+        capability contract and its atoms; ``receipts`` are ``(receipt_id, atoms)``
+        and ``candidates`` are ``(candidate_id, atom_id)``, each scoped by its own
+        atoms exactly as the model requires.
         """
         from qcae.core.capabilities.atom import AtomType, CapabilityAtom
+        from qcae.core.capabilities.candidate import Candidate, CandidateSourceKind
         from qcae.core.contracts.contract import CapabilityContract
+        from qcae.core.vocabulary import VerificationLevel
         from qcae.infrastructure.persistence.sqlite_capability_registry import (
             CAPABILITY_REGISTRY_DDL,
             SqliteCapabilityRegistry,
@@ -443,35 +491,56 @@ class TestRealRegistryWiring:
         for ddl in (CAPABILITY_REGISTRY_DDL, REPOSITORY_REGISTRY_DDL, KNOWLEDGE_DDL):
             conn.executescript(ddl)
         caps = SqliteCapabilityRegistry(conn)
-        receipts = SqliteReceiptRepository(conn)
-        caps.add_contract(CapabilityContract(
-            capability_id=CAP, contract_version=1, request_id="req-replay",
-            title="replay", problem_statement="replay", intent="replay",
-            required_behaviors=("replay",)))
-        for atom_id in (ATOM_A, ATOM_B):
-            caps.add_atom(CapabilityAtom(
-                atom_id=atom_id, atom_version=1, name=atom_id,
-                atom_type=AtomType.COMPUTATIONAL, description=atom_id,
-                parent_capabilities=(CAP,)))
-        receipts.add(_receipt(contract_version="1"))
+        if atoms:
+            caps.add_contract(CapabilityContract(
+                capability_id=CAP, contract_version=1, request_id="req-replay",
+                title="replay", problem_statement="replay", intent="replay",
+                required_behaviors=("replay",)))
+            for atom_id in atoms:
+                caps.add_atom(CapabilityAtom(
+                    atom_id=atom_id, atom_version=1, name=atom_id,
+                    atom_type=AtomType.COMPUTATIONAL, description=atom_id,
+                    parent_capabilities=(CAP,)))
+        for candidate_id, atom_id in candidates:
+            caps.add_candidate(Candidate(
+                candidate_id=candidate_id, name=candidate_id,
+                source_kind=CandidateSourceKind.REPOSITORY,
+                source_ref="repo:repo-1", revision="revA",
+                claims_atoms=(atom_id,), claim_verification=VerificationLevel.DISCOVERED))
+        receipts_repo = SqliteReceiptRepository(conn) if wire_receipts else None
+        for receipt_id, atom_ids in receipts:
+            receipts_repo.add(_receipt(
+                receipt_id=receipt_id, contract_version=receipt_contract_version,
+                atom_ids=tuple(atom_ids), state=receipt_state))
         conn.commit()
         return conn, SqliteRegistryQuery(
-            receipts, None, SqliteNegativeKnowledgeRepository(conn), None,
+            receipts_repo, None, SqliteNegativeKnowledgeRepository(conn), None,
             capability_registry=caps,
             repository_registry=SqliteRepositoryRegistry(conn),
         )
 
-    def test_an_active_receipt_without_candidates_still_yields_a_baseline(self) -> None:
-        """A proven internal implementation is coverage, not an empty inventory.
+    def test_partially_wired_registry_produces_a_baseline(self) -> None:
+        conn, query = self._real_query()
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+        assert record.sufficiency_verdict is C.NO_INTERNAL_CAPABILITY_FOUND
+        assert record.external_target_atoms == (ATOM_A, ATOM_B)
 
-        ``CAPABILITY_ACTIVE`` maps to ``FULLY_SATISFIED_INTERNAL`` (canon 2.6.1)
-        and coverage used to be derived from known candidates alone, so a
-        capability whose only internal evidence is an active receipt produced a
-        record claiming full satisfaction while every atom was uncovered — and
-        ``validate()`` refused it. The phase could not state a baseline for its
-        strongest internal state at all.
+    def test_a_receipt_scoped_to_the_scope_is_fully_satisfied(self) -> None:
+        """A proven internal implementation covers the atoms its receipt names.
+
+        ``CAPABILITY_ACTIVE`` maps to ``FULLY_SATISFIED_INTERNAL`` (canon 2.6.1),
+        and coverage used to come from known candidates alone — so this shape
+        (P1 stores receipts with no candidate rows in four of its own suites)
+        produced a record claiming full satisfaction with every atom uncovered,
+        and ``validate()`` refused it. The phase could not state a baseline for
+        its strongest internal state at all.
         """
-        conn, query = self._real_query_with_active_receipt()
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            receipts=(("rcpt-001", (ATOM_A, ATOM_B)),))
         try:
             record = baseline(query)
         finally:
@@ -487,6 +556,132 @@ class TestRealRegistryWiring:
         # The basis for the coverage claim is named, so the record is auditable
         # without re-reading the registry.
         assert record.internal_candidate_refs == ("rcpt-001",)
+
+    def test_a_receipt_scoped_to_one_atom_covers_only_that_atom(self) -> None:
+        """Coverage is bounded by the scope the receipt itself declares.
+
+        ``CapabilityReceipt.atom_ids`` is required and scope-bounded ("receipt
+        must reference at least one atom"), so a receipt scoped to one atom
+        proves that atom and no other. Reading it as proof of the whole
+        capability suppressed the external search for an atom nothing internal
+        proves — the dangerous direction for a fail-closed phase.
+        """
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            receipts=(("rcpt-b", (ATOM_B,)),))
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.covered_atoms == (ATOM_B,)
+        assert record.missing_atoms == (ATOM_A,)
+        assert record.sufficiency_verdict is C.PARTIALLY_SATISFIED_INTERNAL
+        assert record.external_target_atoms == (ATOM_A,)
+        assert record.external_search_required is True
+        assert record.internal_candidate_refs == ("rcpt-b",)
+
+    def test_a_candidate_covers_only_the_atom_it_claims(self) -> None:
+        """The same bound applies to a known candidate.
+
+        A candidate's ``claims_atoms`` is its own scope, so candidate evidence
+        is attributed per atom like receipt evidence rather than read as proof
+        of the capability's whole atom set.
+        """
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            candidates=(("cand-a", ATOM_A),))
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.covered_atoms == (ATOM_A,)
+        assert record.sufficiency_verdict is C.PARTIALLY_SATISFIED_INTERNAL
+        assert record.external_target_atoms == (ATOM_B,)
+        assert record.internal_candidate_refs == ("cand-a",)
+
+    def test_two_receipts_are_both_named_as_the_basis(self) -> None:
+        """Every record that supports a coverage claim is named in the record."""
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            receipts=(("rcpt-a", (ATOM_A,)), ("rcpt-b", (ATOM_B,))))
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.covered_atoms == (ATOM_A, ATOM_B)
+        assert record.external_target_atoms == ()
+        assert record.internal_candidate_refs == ("rcpt-a", "rcpt-b")
+
+    def test_receipt_and_candidate_covering_different_atoms_are_combined(self) -> None:
+        """Evidence from both sources is attributed and unioned per atom."""
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            receipts=(("rcpt-b", (ATOM_B,)),),
+            candidates=(("cand-a", ATOM_A),))
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.covered_atoms == (ATOM_A, ATOM_B)
+        assert record.missing_atoms == ()
+        assert record.external_target_atoms == ()
+        assert record.internal_candidate_refs == ("cand-a", "rcpt-b")
+
+    def test_a_receipt_scoped_outside_the_requested_atoms_claims_nothing(self) -> None:
+        """A receipt that names no requested atom covers no requested atom.
+
+        The record must not upgrade a matched contract into a coverage claim: no
+        request atom is covered, so the full external search still stands, and
+        the unsatisfiable full-satisfaction finding is not emitted.
+        """
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            receipts=(("rcpt-x", ("atom-elsewhere",)),))
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.covered_atoms == ()
+        assert record.sufficiency_verdict is C.NO_INTERNAL_CAPABILITY_FOUND
+        assert record.external_target_atoms == (ATOM_A, ATOM_B)
+        assert record.external_search_required is True
+        assert C.FULLY_SATISFIED_INTERNAL not in record.classifications
+
+    def test_a_superseded_receipt_is_not_evidence(self) -> None:
+        """Only ACTIVE receipts are internal-candidate records."""
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            receipts=(("rcpt-old", (ATOM_A, ATOM_B)),),
+            receipt_state=ReceiptState.SUPERSEDED)
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.covered_atoms == ()
+        assert record.sufficiency_verdict is C.NO_INTERNAL_CAPABILITY_FOUND
+        assert record.external_target_atoms == (ATOM_A, ATOM_B)
+        assert record.internal_candidate_refs == ()
+
+    def test_a_receipt_for_another_contract_version_is_not_evidence(self) -> None:
+        """Receipt matching stays exact on contract and version."""
+        conn, query = self._real_query(
+            wire_receipts=True, atoms=(ATOM_A, ATOM_B),
+            receipts=(("rcpt-v2", (ATOM_A, ATOM_B)),),
+            receipt_contract_version="2")
+        try:
+            record = baseline(query)
+        finally:
+            conn.close()
+
+        assert record.covered_atoms == ()
+        assert record.external_target_atoms == (ATOM_A, ATOM_B)
+        assert record.internal_candidate_refs == ()
 
 
 # -- record laws ------------------------------------------------------------

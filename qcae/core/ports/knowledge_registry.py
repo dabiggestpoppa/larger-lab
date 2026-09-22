@@ -160,3 +160,22 @@ class RegistryQuery(ABC):
         ``detail`` carries the supporting durable record references per
         category. F is reported alone; A–E may combine.
         """
+
+    @abstractmethod
+    def internal_evidence_by_atom(self, capability_id: str, contract_id: str,
+                                  contract_version: str) -> dict:
+        """Which internal records are scoped to which atom (canon 2.6.12).
+
+        Returns ``{atom_id: (ref, ...)}``: the internal candidate records QCAE
+        holds whose *own* scope names that atom — known candidates via the atoms
+        they claim, and ACTIVE receipts of this capability/contract via the atoms
+        each receipt's ``atom_ids`` is bounded to. Atoms with no internal
+        evidence are absent.
+
+        ``known_capability_state`` reports the same records flattened into one
+        list, and a flat list cannot support a per-atom claim: a consumer reading
+        it as evidence for every atom either claims coverage no record supports
+        or refuses to answer. The attribution is part of the records themselves
+        (a receipt's ``atom_ids`` is required and scope-bounded), so it is
+        surfaced rather than discarded. Pure retrieval; no discovery logic.
+        """

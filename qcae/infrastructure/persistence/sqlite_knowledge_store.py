@@ -379,6 +379,29 @@ class SqliteRegistryQuery(RegistryQuery):
             "repository_revisions": self._repository_revisions(atom_ids),
         }
 
+    def internal_evidence_by_atom(self, capability_id: str, contract_id: str,
+                                  contract_version: str) -> dict:
+        """Per-atom attribution over the same records the other methods report.
+
+        Pure retrieval: each record is attributed by its own declared scope, so a
+        consumer can claim exactly the atoms the evidence names instead of the
+        whole capability. Built from the derivations above rather than new
+        queries, so absent components contribute nothing (partial wiring).
+        """
+        evidence: dict = {}
+
+        for atom_id in self._atom_ids(capability_id):
+            for candidate in self._candidates_for_atom(atom_id):
+                evidence.setdefault(atom_id, set()).add(candidate.candidate_id)
+
+        for receipt in self._matched_active_receipts(
+                capability_id, contract_id, contract_version):
+            for atom_id in receipt.atom_ids:
+                evidence.setdefault(atom_id, set()).add(receipt.receipt_id)
+
+        return {atom_id: tuple(sorted(refs))
+                for atom_id, refs in sorted(evidence.items())}
+
     def internal_first_findings(self, capability_id: str, contract_id: str,
                                 contract_version: str) -> dict:
         """P1-R1 continuation §9: structured A–F internal-first classification.

@@ -155,6 +155,12 @@ class TestRepositoryRevisionInventory:
             if reference_keys is None:
                 reference_keys = keys
             assert keys == reference_keys, label
+            # Attribution is the fourth consumer of the same optional wiring: an
+            # absent component contributes no evidence rather than raising.
+            evidence = query.internal_evidence_by_atom("CAP-DR-001", "CAP-DR-001", "1")
+            assert isinstance(evidence, dict), label
+            for atom_id, refs in evidence.items():
+                assert refs and all(isinstance(ref, str) for ref in refs), label
 
     def test_no_repository_registry_returns_empty_inventory(self, env) -> None:
         """Without a repository registry wired, the key is present but empty —

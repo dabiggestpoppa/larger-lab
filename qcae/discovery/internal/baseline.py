@@ -117,7 +117,10 @@ INTERNAL_FIRST_CATEGORIES: frozenset = frozenset(
 
 #: Category → baseline classification, retrieval-only mapping (documented in the
 #: P3-I0 ledger). Categories that also carry reference lists are kept as
-#: first-class record fields rather than folded into the classification.
+#: first-class record fields rather than folded into the classification. The
+#: sufficiency members of that mapping (FULLY/PARTIALLY/NO_INTERNAL) are emitted
+#: only when the record's coverage supports them: how much is satisfied is
+#: settled by the covered/missing split, never by what a category found.
 CATEGORY_CLASSIFICATIONS: Mapping[str, InternalBaselineClassification] = {
     "CAPABILITY_ACTIVE": InternalBaselineClassification.FULLY_SATISFIED_INTERNAL,
     "DEFINITION_WITHOUT_IMPLEMENTATION": InternalBaselineClassification.PARTIALLY_SATISFIED_INTERNAL,
@@ -129,8 +132,25 @@ CATEGORY_CLASSIFICATIONS: Mapping[str, InternalBaselineClassification] = {
 
 BASELINE_POLICY_VERSION = "internal-discovery-policy-1.0"
 
-_COVERAGE_CAPABILITY_GRANULARITY = "CAPABILITY_GRANULARITY_FROM_REGISTRY_STATE"
+_COVERAGE_REGISTRY_ATTRIBUTED = "ATOM_ATTRIBUTED_BY_REGISTRY_STATE"
 _COVERAGE_ATOM_ATTRIBUTED = "ATOM_ATTRIBUTED_BY_CALLER"
+
+
+def _coverage_supports(classification, covered_atoms, missing_atoms) -> bool:
+    """Whether coverage can support a category's sufficiency finding.
+
+    A category reports what retrieval *found*; how much is satisfied is settled
+    by the covered/missing split alone. A category may not raise that answer
+    above what coverage supports — a record that out-claims its coverage is how
+    a fail-closed phase ends up suppressing the search it exists to perform.
+    """
+    if classification is InternalBaselineClassification.FULLY_SATISFIED_INTERNAL:
+        return not missing_atoms
+    if classification is InternalBaselineClassification.PARTIALLY_SATISFIED_INTERNAL:
+        return bool(covered_atoms)
+    if classification is InternalBaselineClassification.NO_INTERNAL_CAPABILITY_FOUND:
+        return not covered_atoms
+    return True
 
 
 @dataclass(frozen=True)
@@ -169,6 +189,12 @@ class InternalBaselineRecord(SerializableRecord):
     classifications: Tuple[InternalBaselineClassification, ...]
     sufficiency_verdict: InternalBaselineClassification
 
+    #: References to the internal candidate records that *support this record's
+    #: coverage claim* — for each covered atom, the records whose own scope names
+    #: it (a candidate's claimed atoms, an ACTIVE receipt's ``atom_ids``), or the
+    #: caller's refs when the caller supplied per-atom coverage. It is the basis
+    #: of the claim, not an inventory: a reference that names no covered atom is
+    #: not recorded here, and an empty tuple means nothing supports coverage.
     internal_candidate_refs: Tuple[str, ...] = ()
     prior_rejection_refs: Tuple[str, ...] = ()
     stale_evidence_refs: Tuple[str, ...] = ()
@@ -176,7 +202,7 @@ class InternalBaselineRecord(SerializableRecord):
     requires_revalidation: bool = False
     sufficient_without_discovery: bool = False
     comparison_basis: str = ""
-    coverage_basis: str = _COVERAGE_CAPABILITY_GRANULARITY
+    coverage_basis: str = _COVERAGE_REGISTRY_ATTRIBUTED
     access_classification: str = "INTERNAL"
     query_provenance: Tuple[str, ...] = ()
     policy_version: str = BASELINE_POLICY_VERSION
@@ -383,15 +409,14 @@ class InternalDiscoveryBaselineService:
         """Assemble the baseline for a plan's atom scope.
 
         ``atom_coverage`` (optional) supplies per-atom internal references when
-        the caller can attribute them; without it, coverage is derived at
-        capability granularity from registry state and labelled as such, so the
-        narrower claim is never silently overstated.
+        the caller can attribute them; without it, coverage is taken from the
+        registry's own per-atom attribution, so a claim never exceeds the atoms
+        its evidence names.
         """
         capability_id = plan.contract_id
         findings = self._registry.internal_first_findings(
             capability_id, plan.contract_id, str(plan.contract_version)
         )
-        state = self._registry.known_capability_state(capability_id)
         reuse = self._registry.decision_reuse_findings(
             capability_id, plan.contract_id, str(plan.contract_version)
         )
@@ -403,18 +428,17 @@ class InternalDiscoveryBaselineService:
                 "registry internal-first findings returned a non-object detail block"
             )
 
-        internal_atoms = tuple(state.get("atom_ids") or ())
-        candidate_refs = tuple(sorted(state.get("candidate_refs") or ()))
-        # The registry's two internal-candidate records: known candidates, and
-        # active receipts under this exact contract (the same fact that makes
-        # CAPABILITY_ACTIVE fire). Coverage and verdict read one basis.
-        active_receipt_refs = tuple(sorted(reuse.get("active_receipts") or ()))
-        internal_refs = tuple(sorted(set(candidate_refs) | set(active_receipt_refs)))
+        # Which internal records are scoped to which atom: the registry's own
+        # attribution, not a flattened list. A claim is bounded by its evidence.
+        evidence_by_atom = self._registry.internal_evidence_by_atom(
+            capability_id, plan.contract_id, str(plan.contract_version)
+        )
 
         if atom_coverage is None:
-            covered_atoms, coverage_basis, coverage_refs = self._capability_granularity_coverage(
-                plan, internal_atoms, internal_refs
+            covered_atoms, coverage_refs = self._registry_attributed_coverage(
+                plan, evidence_by_atom
             )
+            coverage_basis = _COVERAGE_REGISTRY_ATTRIBUTED
             duplicate_atom_refs: Tuple[Tuple[str, ...], ...] = ()
         else:
             covered_atoms, coverage_refs = self._attributed_coverage(plan, atom_coverage)
@@ -433,12 +457,11 @@ class InternalDiscoveryBaselineService:
             categories=categories,
             covered_atoms=covered_atoms,
             missing_atoms=missing_atoms,
-            candidate_refs=candidate_refs,
             stale_evidence=stale_evidence,
             rejections=rejections,
             duplicate_atom_refs=duplicate_atom_refs,
         )
-        verdict = self._verdict(classifications, covered_atoms, missing_atoms)
+        verdict = self._verdict(covered_atoms, missing_atoms)
         # The verdict is always carried in the classification set, so a reader can
         # never see a sufficiency claim that its own findings do not support.
         if verdict not in classifications:
@@ -455,7 +478,7 @@ class InternalDiscoveryBaselineService:
             external_target_atoms=missing_atoms,
             classifications=classifications,
             sufficiency_verdict=verdict,
-            internal_candidate_refs=tuple(sorted(set(candidate_refs) | set(coverage_refs))),
+            internal_candidate_refs=tuple(sorted(set(coverage_refs))),
             prior_rejection_refs=tuple(sorted(set(rejections) | set(negative_blocks))),
             stale_evidence_refs=stale_evidence,
             revision_change_refs=revision_changes,
@@ -495,31 +518,26 @@ class InternalDiscoveryBaselineService:
         return tuple(raw)
 
     @staticmethod
-    def _capability_granularity_coverage(plan, internal_atoms, internal_refs):
-        """Derive coverage from registry state, labelled as capability-granularity.
+    def _registry_attributed_coverage(plan, evidence_by_atom: Mapping[str, Iterable[str]]):
+        """Coverage is exactly the requested atoms an internal record names.
 
-        ``internal_refs`` is the registry's evidence that QCAE already holds an
-        implementation of this capability: its known candidates *and* any active
-        receipt issued under this exact contract (canon 2.6.12 internal candidate
-        records). Both are needed, because coverage and the sufficiency verdict
-        must read one basis: ``CAPABILITY_ACTIVE`` maps to
-        ``FULLY_SATISFIED_INTERNAL``, so a proven implementation with a still-empty
-        candidate inventory must not read as no coverage — that combination claims
-        full satisfaction with every atom uncovered and the record's own laws
-        refuse it, which left the strongest internal state unable to state a
-        baseline at all.
-
-        The P1 ports expose which atoms a capability defines and which candidates
-        exist, but not a per-atom candidate attribution. When internal evidence
-        exists, the internal atoms in the plan's scope are therefore reported as
-        covered *at capability granularity*, with those refs recorded as the basis
-        — a weaker, explicitly labelled claim rather than an invented one.
+        Each internal candidate record declares its own scope (canon 2.6.12): a
+        candidate's claimed atoms, a receipt's required and scope-bounded
+        ``atom_ids``. Reading that evidence as proof of the whole capability
+        suppressed the external search for every atom no record proves — and
+        claiming full satisfaction while leaving atoms uncovered is a record
+        ``validate()`` refuses. Bounding the claim by the evidence fixes both
+        directions at once: coverage and the sufficiency verdict read one basis,
+        and neither can exceed what the registry actually names.
         """
-        atoms_in_scope = set(plan.atom_ids)
-        if not internal_refs:
-            return (), _COVERAGE_CAPABILITY_GRANULARITY, ()
-        covered = tuple(a for a in plan.atom_ids if a in (set(internal_atoms) & atoms_in_scope))
-        return covered, _COVERAGE_CAPABILITY_GRANULARITY, internal_refs
+        covered: List[str] = []
+        refs: List[str] = []
+        for atom_id in plan.atom_ids:
+            atom_refs = tuple(evidence_by_atom.get(atom_id) or ())
+            if atom_refs:
+                covered.append(atom_id)
+                refs.extend(atom_refs)
+        return tuple(covered), tuple(sorted(set(refs)))
 
     @staticmethod
     def _attributed_coverage(plan, atom_coverage: Mapping[str, Iterable[str]]):
@@ -543,7 +561,6 @@ class InternalDiscoveryBaselineService:
         categories,
         covered_atoms,
         missing_atoms,
-        candidate_refs,
         stale_evidence,
         rejections,
         duplicate_atom_refs: Tuple[Tuple[str, ...], ...] = (),
@@ -551,6 +568,11 @@ class InternalDiscoveryBaselineService:
         found: List[InternalBaselineClassification] = []
         for category in categories:
             mapped = CATEGORY_CLASSIFICATIONS[category]
+            # A category maps to the sufficiency finding it would imply; that
+            # finding is emitted only when coverage supports it, so no category
+            # can assert more satisfaction than the evidence names.
+            if not _coverage_supports(mapped, covered_atoms, missing_atoms):
+                continue
             if mapped not in found:
                 found.append(mapped)
         # Canon 2.6.9 duplicate seed: only emitted when the caller could actually
@@ -570,12 +592,18 @@ class InternalDiscoveryBaselineService:
         return tuple(found)
 
     @staticmethod
-    def _verdict(classifications, covered_atoms, missing_atoms):
-        if InternalBaselineClassification.FULLY_SATISFIED_INTERNAL in classifications:
-            return InternalBaselineClassification.FULLY_SATISFIED_INTERNAL
-        if covered_atoms:
+    def _verdict(covered_atoms, missing_atoms):
+        """How much is internally satisfied — the one owner of that answer.
+
+        Derived from coverage and nothing else, so ``build()`` cannot assemble a
+        record whose sufficiency claim outruns its covered atoms and leave
+        ``validate()`` as the only place the invariant holds.
+        """
+        if not covered_atoms:
+            return InternalBaselineClassification.NO_INTERNAL_CAPABILITY_FOUND
+        if missing_atoms:
             return InternalBaselineClassification.PARTIALLY_SATISFIED_INTERNAL
-        return InternalBaselineClassification.NO_INTERNAL_CAPABILITY_FOUND
+        return InternalBaselineClassification.FULLY_SATISFIED_INTERNAL
 
 
 def make_internal_baseline(**kwargs) -> InternalBaselineRecord:

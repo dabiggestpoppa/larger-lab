@@ -50,12 +50,16 @@ CREATED_BY = "qcae-discovery-run"
 
 def _baseline(**overrides):
     """A real baseline record from the baseline service, not a hand-built one."""
+    atom_ids = overrides.pop("atom_ids", [ATOM_A, ATOM_B])
+    evidence = overrides.pop(
+        "evidence", {atom_id: ["cand-internal-1"] for atom_id in atom_ids})
     registry = FakeRegistryQuery(
         categories=overrides.pop("categories", ["CAPABILITY_ACTIVE"]),
-        atom_ids=overrides.pop("atom_ids", [ATOM_A, ATOM_B]),
+        atom_ids=atom_ids,
         candidate_refs=overrides.pop("candidate_refs", ["cand-internal-1"]),
         detail=overrides.pop("detail", None),
         reuse=overrides.pop("reuse", None),
+        evidence=evidence,
     )
     return build_baseline(registry, **overrides)
 
