@@ -208,3 +208,43 @@ v0.1) are strictly UNTOUCHED.
 ```
 
 No old commit history was altered; these errata are recorded here as the append-only correction.
+
+---
+
+# SESSION-4 CHECKPOINT — PROGRAM LEDGER AUTHORITY ACTIVATED (2026-09-23; appended; history above preserved)
+
+## Operator decisions received and recorded
+
+All seven decisions were supplied explicitly by the operator and are recorded verbatim in `CSIA_OPERATOR_DECISION_LOG.md`:
+
+```text
+D1 = RATIFY AS WRITTEN    D2 = ACCEPT    D3 = ACCEPT
+D4 = CONFIRM              D5 = CONFIRM   D6 = CONFIRM
+R-1A-5 = C (REALIZATION model)
+```
+
+## Authority activation (per D1 + D6)
+
+```text
+PROGRAM_LEDGER_AUTHORITY = RATIFIED
+
+CSIA_PLANNING_PROGRESS.md is now the CANONICAL program-state and
+next-authorized-step record (Constitution v0.2 §G, ratified via D1;
+ledger authority confirmed via D6).
+
+Historical NEXT statements in this and all other documents remain
+preserved as historical text and are NON-AUTHORITATIVE.
+Earlier caveats describing this ledger as PROPOSED_NEXT_STEP_AUTHORITY
+are historical records of the pre-ratification bootstrap state and are
+superseded by this activation — they are retained, not rewritten.
+```
+
+## Effective ratification statuses
+
+```text
+CONSTITUTION v0.2 = RATIFIED   (CSIA_CONSTITUTION_RATIFICATION_RECORD_v0.2.md)
+BOOK 0            = RATIFIED   (CSIA_BOOK_0_RATIFICATION_RECORD_v0.1.md)
+```
+
+Deferred decisions D7 (Capital Field, gate: Book 5) and D8 (Sensor seams,
+gate: Book 8) remain open and operator-reserved.
