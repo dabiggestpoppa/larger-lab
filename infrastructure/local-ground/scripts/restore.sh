@@ -343,7 +343,7 @@ json.dump({"format": "oce-restore-transaction-rollback-receipt-v1",
 PY
 }
 rollback_precommit() { # single owner of every pre-commit rollback
-  local reason="$1"
+  local reason="${FAIL_NOTE:-$1}"
   [[ "$COMMITTED" == "true" ]] && return 0
   [[ "$ARTIFACT_SWITCHED" == "true" || "$PG_PROMOTED" == "true" ]] || return 0
   local art_after=""
@@ -372,7 +372,8 @@ rollback_precommit() { # single owner of every pre-commit rollback
     echo "BLOCKED: pre-commit rollback could not restore the artifact volume" >&2
   fi
 }
-trap 'rc=$?; if [ "$rc" -ne 0 ]; then rollback_precommit "restore exited $rc before transaction commitment"; fi; register_op "$rc"; exit "$rc"' EXIT
+trap 'rc=$?; if [ "$rc" -ne 0 ]; then rollback_precommit "${FAIL_NOTE:-restore exited $rc} before transaction commitment"; fi; register_op "$rc"; exit "$rc"' EXIT
+FAIL_NOTE=""  # each BLOCKED exit names its own failure site
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
@@ -473,14 +474,16 @@ if [[ "$ARTIFACT_STAGED" == "true" ]]; then
   # the only way back and the rollback must run for a HALF-switched volume too.
   ARTIFACT_SWITCHED=true
   if ! artifact_restore_from "$STAGE_DIR"; then
-    echo "BLOCKED: artifact restore into the container failed" >&2
+    FAIL_NOTE="artifact restore into the container failed"
+    echo "BLOCKED: $FAIL_NOTE" >&2
     exit 1  # the EXIT trap restores BOTH stores from their held sources
   fi
   # identity is verified while the service is still stopped: the volume must
   # be byte-identical to the staged snapshot BEFORE MinIO touches it again
   ARTIFACT_AFTER_SHA="$(artifact_volume_sha)"
   if [[ "$ARTIFACT_AFTER_SHA" != "$STAGED_SHA" ]]; then
-    echo "BLOCKED: the restored artifact volume is not the staged snapshot" >&2
+    FAIL_NOTE="the restored artifact volume is not the staged snapshot"
+    echo "BLOCKED: $FAIL_NOTE" >&2
     exit 1  # the EXIT trap restores BOTH stores from their held sources
   fi
   artifact_start

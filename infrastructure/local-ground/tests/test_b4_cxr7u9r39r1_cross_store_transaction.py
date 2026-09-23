@@ -173,8 +173,11 @@ def test_successful_full_replace_sources_both_stores_from_one_backup(oce_stack, 
     assert art["artifact_replaced"] is True, art
     assert art["artifact_verify"] == "ok", art
     assert art["artifact_volume_sha256_after"] == art["artifact_staged_sha256"], art
-    assert art["artifact_volume_sha256_after"] == _artifact_volume_sha()
     assert art["artifact_volume_sha256_before"] != art["artifact_volume_sha256_after"]
+    # the committed identity is a STOPPED-state identity (MinIO rewrites its
+    # own format metadata into /data on start), so the independent check
+    # re-derives it with the service stopped, exactly as the engine does
+    assert art["artifact_volume_sha256_after"] == _artifact_volume_sha()
     # a committed transaction writes no rollback receipt
     assert _evidence(tmp_path, "transaction-rollback-receipt.json") is None
     # Redis is transient: invalidated, never restored
@@ -244,6 +247,8 @@ def _assert_both_restored(tmp_path, pg_before, art_before, expect_reason):
     assert tx["artifact_restored"] is True, tx
     assert tx["redis_untouched"] is True, tx
     assert tx["artifact_sha256_before"] == tx["artifact_sha256_after"], tx
+    # the receipt's reason names THIS failure site (the blocked step, echoed
+    # through the EXIT trap's rollback), not a generic exit note
     assert expect_reason in (tx["reason"] or ""), tx
 
 
