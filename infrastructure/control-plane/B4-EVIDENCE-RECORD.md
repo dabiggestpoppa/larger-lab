@@ -1685,3 +1685,94 @@ merged=false, mergeable=CONFLICTING, mergeStateStatus=DIRTY, base
 `d09941e7…`, head `54f5193b…` (GraphQL read 2026-09-17T21:01:47Z for
 `54f5193b`). Cloud mutations 0; broker mutations 0; capital mutations 0;
 execution-authority mutations 0; recurring cost $0. Book 5 not begun.
+
+---
+
+## B4-CXR7U9R39 — SUPERSEDING SECTION (2026-09-23)
+
+This section supersedes everything above it as CURRENT TRUTH. The R34 and
+earlier sections remain valid HISTORICAL evidence for their own exact heads;
+they do not describe the current implementation.
+
+### R39 scope
+
+Independent review found four closure gaps after R35–R38: (A) a cross-store
+partial restore (the artifact volume was replaced before PostgreSQL
+recovery, so a PG failure left the two durable stores from different
+snapshots); (B) ambient receipt-write authority (`OCE_RECOVERY_STATE_DIR`
+could grant the write root); (C) receipts were structurally valid but
+replayable (no durable one-time transition authority); (D) main and build
+were not converged (two reviewed strategic-documentation commits absent).
+
+### R39 commits (all pushed, `oce-program-build`, none amended or squashed)
+
+| Commit | Message |
+|---|---|
+| `87792340` | B4-CXR7U9R39M1: reconcile current main doctrine into build branch (merge of origin/main `7c7816f3`; README.md resolved semantically — main's convergence doctrine preserved, stale `oce`-branch and Block-1 claims historical-labeled) |
+| `a7287175` | B4-CXR7U9R39R1: make full replacement rollback-coherent across durable stores (staged two-resource protocol: artifact staged + live snapshot, PG promoted with quarantine held, both verified, then commit; any pre-commit failure restores both stores and writes a truthful transaction-rollback receipt) |
+| `56c99c10` | B4-CXR7U9R39R2: make receipt persistence governed and collision safe (write authority is program identity `var/recovery`; no environment override; symlink rejection in target and parents; receipt-in == receipt-out refused; exclusive O_CREAT, no overwrite of an existing receipt; collision-resistant same-directory temporaries; flush + directory fsync; residue cleaned on failure) |
+| `e36a4878` | B4-CXR7U9R39R3: make recovery transition authority durable and single use (per-promotion high-entropy operation id; durable record under `var/recovery/transitions`; CREATED→STAGED→PROMOTED→FINALIZED/ROLLED_BACK/FAILED; content-digest binding receipt↔record; replay/substitution/cross-operation/cross-run denied before any docker or catalog call; exclusive claim files make the one-time consumption atomic) |
+| `d9399c9b` | B4-CXR7U9R39R4: prove the recovery transaction and transition invariants (container-backed cross-store cases, gate-selection wiring, registry regeneration from real collection) |
+| `7f7a852b` | B4-CXR7U9R39X: repair the CI-exposed recovery-transaction defects (see below) |
+| `f69f8aa7` | B4-CXR7U9R39X: create the evidence directory restore.sh writes receipts into |
+| `351fe6a6` | B4-CXR7U9R39X: name the failure site in the rollback receipt and align the stopped-state identity check |
+| `4f362b7d` | **CURRENT R39 IMPLEMENTATION HEAD** — B4-CXR7U9R39X: prove restored user-data truth, not MinIO's runtime bookkeeping; tree `e3e24484bea90fe251e55566b6549ce277948c60` |
+
+### CI-exposed repairs (R39X) — what CI proved beyond the local suite
+
+CI run `35770877299` (head `d9399c9b`, 14 failures, artifact-reproduced)
+proved two production defects and two harness defects:
+
+1. **Artifact identity was hashed after `docker start`**: MinIO reformats
+   its pool on startup (writes format metadata into /data), so the restored
+   volume could never verify against the staged snapshot — the SUCCESS path
+   itself blocked. Every identity restore.sh compares is now captured while
+   the artifact service is stopped; the service starts only after
+   verification passes.
+2. **Rollback verified the restored original against the backup's
+   inventory**, but a full replace exists precisely because the original can
+   differ from the backup (PG logs: `relation "public.backup_probe" does not
+   exist` after a correct restore). Promotions now capture a pre-promotion
+   ROLLBACK FLOOR before any durable mutation, persist it in the durable
+   operation record, and every rollback verifies the restored original
+   against the floor, never the backup. This also fixed the finalize
+   rollback path (the quarantine was being dropped by the failing finalize
+   before `phase_rollback` could use it — the earlier "quarantine database
+   missing" failures).
+3. restore.sh never created `OCE_EVIDENCE_DIR` — best-effort evidence copies
+   silently discarded receipts (run `35869637929`); the run now creates it.
+4. Each BLOCKED exit inside the transaction names its failure site in the
+   rollback receipt reason (run `35871528334`: the physical rollback already
+   passed; only the receipt's generic reason failed the binding check).
+
+### Final CI truth (exact head `4f362b7d`, all five workflows)
+
+```
+35874437326  b1-local-ground-validation  success
+35874437336  b2-control-plane-validation success
+35874437355  b3-worker-fabric-validation success
+35874437497  b4-config-spine-validation success
+35874446142  B1-I1R Validation           success (after one transient
+             runner-DNS failure against galaxy.ansible.com on the first
+             attempt of this run; the identical step succeeded on the two
+             previous heads; failed-job rerun per GitHub policy; cloud-ground
+             untouched by R39)
+```
+
+Local-ground suite at this head: 276 collected / 276 executed / 262+ passed,
+0 failed (per CI artifact test-summary.json; the container-backed recovery
+transaction cases all pass, including interrupted full-replace and finalize
+replay). Gate-regression synthetic-package failures from the earlier R4 gate
+wiring are fixed (the fixture now carries the R39 must-pass selection).
+
+### R39 exit-gate truth
+
+- main doctrine converged: origin/main `7c7816f3` merged as `87792340`; main itself untouched
+- PR #4: OPEN, MERGEABLE, head `4f362b7d` (NOT merge-authorized; no merge performed)
+- cross-store coherence: proven container-backed (failure cases restore both stores; success commits both stores from one backup)
+- ambient receipt-write authority: removed (program identity only; hostile `OCE_RECOVERY_STATE_DIR` proof passes)
+- receipt writes: no symlink following, no overwrite, exclusive creation, residue-free failure
+- transition authority: durable, one-time, digest-bound; replay/substitution/cross-operation denied before mutation
+- SonarCloud: unchanged blocker (credentials/operator disposition still required; not weakened, no NOSONAR added)
+- cloud mutations 0; broker mutations 0; capital mutations 0; execution-authority mutations 0; recurring cost $0
+- Book 5 not begun; Atlas Program Block 4 not begun
