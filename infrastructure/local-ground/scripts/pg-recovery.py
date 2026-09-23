@@ -85,11 +85,35 @@ SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 OPERATION_ID_RE = re.compile(r"[0-9a-f]{32}\Z")
 REVISION_RE = re.compile(r"[0-9a-f]{7,64}\Z")
 
-# One durable recovery-operation state machine (B4-CXR7U9R39-R3). PROMOTED is
-# the ONLY state that still offers transition authority, and a transition
-# consumes it exactly once, so FINALIZED and ROLLED_BACK are terminal.
+# One durable recovery-operation state machine (B4-CXR7U9R39-R3, made
+# operation-wide by R40-R1). PROMOTED is the ONLY state that still offers
+# transition authority. ONE operation-wide claim (not one file per transition)
+# selects the branch — exactly one of finalize or rollback can win it — and the
+# selected transition is durably recorded, so the winner is attributable after
+# a crash. States only ever move FORWARD along the ladder below; a record can
+# never regress from FINALIZING/ROLLING_BACK to PROMOTED.
 TRANSITION_STATE_PROMOTED = "PROMOTED"
+TRANSITION_STATE_FINALIZING = "FINALIZING"
+TRANSITION_STATE_ROLLING_BACK = "ROLLING_BACK"
+TRANSITION_STATE_COMMIT_POINT = "COMMIT_POINT_REACHED"
 TRANSITIONS_ALLOWED_FROM_PROMOTED = ("finalize", "rollback")
+# forward-only ladder: from -> states it may advance to. A same-state rewrite
+# is allowed (idempotent); anything else not listed here is a regression and
+# is refused.
+_TRANSITION_LADDER = {
+    "CREATED": {"STAGED", "FAILED"},
+    "STAGED": {TRANSITION_STATE_PROMOTED, "FAILED"},
+    TRANSITION_STATE_PROMOTED: {TRANSITION_STATE_FINALIZING,
+                                TRANSITION_STATE_ROLLING_BACK},
+    TRANSITION_STATE_FINALIZING: {TRANSITION_STATE_COMMIT_POINT, "FINALIZED",
+                                  "ROLLED_BACK", "FAILED"},
+    TRANSITION_STATE_ROLLING_BACK: {"ROLLED_BACK", "FAILED"},
+    TRANSITION_STATE_COMMIT_POINT: {"FINALIZED"},
+    "FINALIZED": set(),
+    "ROLLED_BACK": set(),
+    "FAILED": set(),
+}
+_CLAIM_FORMAT = "oce-transition-claim-v1"
 
 PHASES_PROMOTE = [
     "inventory_validated",
@@ -646,7 +670,11 @@ def _load_transition_record(operation_id):
 
 def _record_transition(operation_id, state, receipt, extra=None) -> None:
     """Advance the operation record. `receipt` binds the record to the exact
-    promote receipt whose content authorized it."""
+    promote receipt whose content authorized it. The forward-only ladder is
+    enforced here: a rewrite that would move the record BACKWARD (or off the
+    ladder) is refused, so a crashed FINALIZING can never be re-opened as
+    PROMOTED authority by any process, and concurrent callers cannot overwrite
+    one another with a lower state."""
     record = {
         "format": TRANSITION_FORMAT,
         "operation_id": operation_id,
@@ -670,38 +698,126 @@ def _record_transition(operation_id, state, receipt, extra=None) -> None:
     # first-seen time is carried forward across every state update
     created = None
     path = _transition_record_path(operation_id)
+    prior = None
     if os.path.isfile(path):
         try:
             with open(path, encoding="utf-8") as f:
-                created = json.load(f).get("created_at")
+                prior = json.load(f)
+            created = prior.get("created_at")
         except (OSError, ValueError):
-            created = None
+            prior = None
     record["created_at"] = created or record["updated_at"]
+    # DURABLE keys recorded by earlier states (commit_point, rollback_floor,
+    # selected_transition, ...) are carried forward: a state advance may not
+    # silently erase facts the transaction still depends on.
+    if isinstance(prior, dict):
+        for key, value in prior.items():
+            if key not in record:
+                record[key] = value
     if extra:
         record.update(extra)
+    # FORWARD-ONLY: read the durable record and refuse any regression before
+    # writing. A same-state rewrite is idempotent; any move not permitted by
+    # the ladder from the CURRENT durable state (FINALIZING -> PROMOTED,
+    # terminal -> anything, etc.) is refused.
+    if created is not None:
+        try:
+            with open(path, encoding="utf-8") as f:
+                current = json.load(f).get("state")
+        except (OSError, ValueError):
+            current = None
+        if current is not None and state != current \
+                and state not in _TRANSITION_LADDER.get(current, set()):
+            raise RuntimeError(
+                f"refusing to move recovery operation {operation_id} backward: "
+                f"{current!r} -> {state!r}")
     _write_transition_record(operation_id, record)
 
 
-def _claim_transition(operation_id, transition) -> None:
-    """Consume this operation's one-time authority for `transition` BEFORE any
-    docker or catalog call. Exclusive creation makes the claim atomic, so two
-    callers cannot both proceed, and a claim left behind by an interrupted
-    transition truthfully means the authority is already spent."""
+def _claim_transition(operation_id, transition, promote=None) -> dict:
+    """Consume this operation's ONE-TIME transition authority BEFORE any docker
+    or catalog call — OPERATION-WIDE, not per-transition (B4-CXR7U9R40-R1).
+
+    The claim is one file per OPERATION, exclusively created: finalize and
+    rollback contend on the SAME name, so exactly one branch can ever win.
+    The winning branch and its binding are recorded IN the claim file, so the
+    selection is durably attributable after a crash. A loser fails here, before
+    any docker, catalog or receipt mutation exists to make.
+    """
+    if transition not in TRANSITIONS_ALLOWED_FROM_PROMOTED:
+        raise RuntimeError(f"unknown transition {transition!r}")
     directory = _transitions_dir()
     os.makedirs(directory, mode=0o700, exist_ok=True)
-    claim = os.path.join(directory, f"{operation_id}.{transition}.claim")
+    claim_path = os.path.join(directory, f"{operation_id}.claim")
+    claim = {"format": _CLAIM_FORMAT,
+             "operation_id": operation_id,
+             "transition": transition,
+             "claimed_at": now_iso()}
+    if promote is not None:
+        claim["receipt_sha256"] = _receipt_digest(promote)
+    payload = json.dumps(claim, sort_keys=True, indent=2) + "\n"
     try:
-        fd = os.open(claim, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        fd = os.open(claim_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     except FileExistsError:
+        winner = _load_claim(operation_id)
+        chosen = winner.get("transition") if winner else "unknown"
         raise RuntimeError(
-            f"recovery operation {operation_id} has already consumed its "
-            f"{transition} authority")
+            f"recovery operation {operation_id} was already claimed for a "
+            f"different or earlier transition ({chosen!r}); the "
+            f"{transition!r} authority is spent")
     try:
-        os.write(fd, f"{transition} claimed at {now_iso()}\n".encode("utf-8"))
+        os.write(fd, payload.encode("utf-8"))
         os.fsync(fd)
     finally:
         os.close(fd)
     _fsync_dir(directory)
+    # The record is moved to the IN-FLIGHT state only after the claim file won:
+    # state validation happened in _validated_transition_receipt, the claim is
+    # the atomic selection, and this write is forward-only (enforced in
+    # _record_transition), so a crash here leaves PROMOTED + a claim file — an
+    # attributable, spent authority — never a re-opened PROMOTED.
+    _record_transition(operation_id,
+                       TRANSITION_STATE_FINALIZING if transition == "finalize"
+                       else TRANSITION_STATE_ROLLING_BACK,
+                       promote, extra={"selected_transition": transition})
+    return claim
+
+
+def _load_claim(operation_id):
+    """The durable operation-wide claim, or None if none was ever taken."""
+    path = os.path.join(_transitions_dir(), f"{operation_id}.claim")
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return None
+
+
+def _bound_operation(promote):
+    """Bind a promote receipt to its ONE durable operation record: the record
+    must exist, its format must be known, its content digest must match this
+    receipt, and every identity field must agree. Shared by the transition
+    gate (which then checks state/permission) and by RECONCILIATION (which
+    must read the durable truth WITHOUT consuming any authority). Returns
+    (operation_id, record)."""
+    operation_id = promote.get("operation_id")
+    if not isinstance(operation_id, str) or not OPERATION_ID_RE.match(operation_id):
+        raise RuntimeError(f"receipt operation id {operation_id!r} is missing or malformed")
+    record = _load_transition_record(operation_id)
+    if record.get("format") != TRANSITION_FORMAT:
+        raise RuntimeError("durable recovery operation record has an unknown format")
+    if record.get("receipt_sha256") != _receipt_digest(promote):
+        raise RuntimeError("receipt content does not match its durable operation "
+                           "record (substituted or altered receipt)")
+    for label in ("database", "user", "container", "source_commit", "source_tree",
+                  "run_id", "stamp", "quarantine_database", "staging_database",
+                  "source_archive_sha256", "inventory_sha256"):
+        if record.get(label) != promote.get(label):
+            raise RuntimeError(f"receipt {label} does not match its durable "
+                               "operation record")
+    return operation_id, record
 
 
 def _validated_transition_receipt(path, db, user, container, inventory_path,
@@ -787,18 +903,7 @@ def _validated_transition_receipt(path, db, user, container, inventory_path,
     operation_id = promote.get("operation_id")
     if not isinstance(operation_id, str) or not OPERATION_ID_RE.match(operation_id):
         raise RuntimeError(f"receipt operation id {operation_id!r} is missing or malformed")
-    record = _load_transition_record(operation_id)
-    if record.get("format") != TRANSITION_FORMAT:
-        raise RuntimeError("durable recovery operation record has an unknown format")
-    if record.get("receipt_sha256") != _receipt_digest(promote):
-        raise RuntimeError("receipt content does not match its durable operation "
-                           "record (substituted or altered receipt)")
-    for label in ("database", "user", "container", "source_commit", "source_tree",
-                  "run_id", "stamp", "quarantine_database", "staging_database",
-                  "source_archive_sha256", "inventory_sha256"):
-        if record.get(label) != promote.get(label):
-            raise RuntimeError(f"receipt {label} does not match its durable "
-                               "operation record")
+    operation_id, record = _bound_operation(promote)
     state = record.get("state")
     if state != TRANSITION_STATE_PROMOTED:
         raise RuntimeError(
@@ -1198,8 +1303,9 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
             receipt_in_path, db, user, container, inventory_path, inventory_sha_path,
             "finalize")
         # Consume this operation's ONE-TIME finalize authority before any docker
-        # or catalog call exists to make.
-        _claim_transition(operation_id, "finalize")
+        # or catalog call exists to make. OPERATION-WIDE claim: a concurrent
+        # rollback (or another finalize) loses HERE, before any mutation.
+        _claim_transition(operation_id, "finalize", promote)
         floor = _floor_from_record(operation_id)
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
@@ -1235,6 +1341,17 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
         drop_db(container, user, quarantine)
         receipt["quarantine_dropped"] = True
         receipt["phases"].append("quarantine_dropped")
+        # THE IRREVERSIBLE POINT (B4-CXR7U9R40-R2), durably recorded BEFORE any
+        # further fallible step: once the quarantine is gone the original
+        # canonical cannot be restored, so PostgreSQL is committed to the
+        # promoted snapshot from here on. Everything downstream (including the
+        # shell's EXIT trap) must consult this durable state before deciding
+        # that an artifact-only rollback is legal — it is NOT.
+        _record_transition(operation_id, TRANSITION_STATE_COMMIT_POINT, promote,
+                           extra={"commit_point": {
+                               "marker": "quarantine_dropped",
+                               "at": now_iso()}})
+        receipt["commit_point_recorded"] = True
         if db_exists(container, user, quarantine):
             raise RuntimeError("quarantine database still present after DROP")
         receipt["quarantine_removal_verified"] = True
@@ -1271,17 +1388,29 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
                     receipt["rollback_failed"] = True
                     receipt["rollback_error"] = f"rollback raised: {e2}"
         else:
-            # Quarantine already dropped; data is promoted+verified. This is a
-            # cleanup/evidence failure, not a data failure — still nonzero.
+            # Quarantine already dropped: PostgreSQL is COMMITTED to the
+            # promoted snapshot (the commit point was durably recorded above).
+            # This is a cleanup/evidence failure, NOT a data failure — the
+            # committed result must stay FINALIZING (never "FAILED", which
+            # would invite a rollback that can no longer happen and must not).
             receipt["quarantine_retained"] = False
+            receipt["postgres_committed"] = True
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 1
-        # The authority was consumed before the work: it is spent either way,
-        # and the record states which of finalize/rollback actually happened.
-        _record_transition(operation_id,
-                           "ROLLED_BACK" if receipt.get("rollback_succeeded") is True
-                           else "FAILED", promote,
-                           extra={"error": str(e)})
+        # The authority was consumed before the work. Forward-only recording:
+        # post-commit failures keep the durable COMMIT_POINT_REACHED/FINALIZING
+        # truth (FINALIZED is only written by a reconcile that re-proved the
+        # catalog, or by the success path), and a pre-commit rollback records
+        # ROLLED_BACK truthfully. _record_transition refuses any regression.
+        if receipt.get("quarantine_dropped") is True:
+            _record_transition(operation_id, receipt.get("_post_commit_state",
+                                  TRANSITION_STATE_COMMIT_POINT), promote,
+                               extra={"error": str(e)})
+        else:
+            _record_transition(operation_id,
+                               "ROLLED_BACK" if receipt.get("rollback_succeeded") is True
+                               else "FAILED", promote,
+                               extra={"error": str(e)})
         return receipt
 
 
@@ -1298,8 +1427,9 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
             receipt_in_path, db, user, container, inventory_path, inventory_sha_path,
             "rollback")
         # Consume this operation's ONE-TIME rollback authority before any docker
-        # or catalog call exists to make.
-        _claim_transition(operation_id, "rollback")
+        # or catalog call exists to make. OPERATION-WIDE claim: a concurrent
+        # finalize (or another rollback) loses HERE, before any mutation.
+        _claim_transition(operation_id, "rollback", promote)
         floor = _floor_from_record(operation_id)
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
@@ -1332,6 +1462,106 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
         return receipt
 
 
+# ── phase: reconcile (crash recovery) ────────────────────────────────
+def _quarantine_present(container, user, quarantine):
+    return db_exists(container, user, quarantine)
+
+
+def _canonical_matches_inventory(container, db, user, inventory, probe):
+    ok, _problems, _rows, _fps = _verify_db(container, db, user, inventory, probe)
+    return ok
+
+
+def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
+                    user, container, probe_spec):
+    """B4-CXR7U9R40-R2: resolve an AMBIGUOUS restart without guessing.
+
+    A crash/interrupt between PostgreSQL's irreversible commit point (the
+    quarantine drop) and restore.sh's volatile `PG_FINALIZED=true` can leave
+    the shell without commit knowledge. Reconciliation reads the DURABLE
+    truth — the transition record, the quarantine's presence in the catalog,
+    canonical-database content, and the receipt's own committed evidence —
+    and reports the coherent result; it never mutates either store.
+    """
+    receipt = _base_receipt("reconcile", db, user, container, inventory_path)
+    receipt["promote_receipt"] = receipt_in_path
+    targets = _governed_identity_problems(db, user, container)
+    if targets:
+        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+    try:
+        # Read-only authority inspection: NO claim is taken, nothing consumed.
+        promote = _load_receipt(receipt_in_path)
+        if promote.get("operation_phase") != "promote" \
+                or promote.get("exit_status") != 0:
+            raise RuntimeError("reconcile requires a successful promote receipt")
+        operation_id, record = _bound_operation(promote)
+    except Exception as e:
+        return _blocked(receipt, f"refusing reconcile authority: {e}")
+    receipt["operation_id"] = operation_id
+    state = record.get("state")
+    receipt["durable_state"] = state
+    try:
+        inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
+        probe = parse_probe_spec(probe_spec)
+    except Exception as e:
+        receipt["error"] = f"reconcile could not verify its inputs: {e}"
+        receipt["finished_at"] = now_iso()
+        receipt["exit_status"] = 1
+        return receipt
+    quarantine = record.get("quarantine_database")
+    # 1. Durable state and 2. catalog observation, fail-closed.
+    observation = {"durable_state": state,
+                   "quarantine_present": None,
+                   "canonical_matches_inventory": None}
+    try:
+        observation["quarantine_present"] = \
+            _quarantine_present(container, user, quarantine)
+        observation["canonical_matches_inventory"] = \
+            _canonical_matches_inventory(container, db, user, inventory, probe)
+    except Exception as e:
+        receipt["error"] = f"reconcile could not observe durable truth: {e}"
+        receipt["observation"] = observation
+        receipt["finished_at"] = now_iso()
+        receipt["exit_status"] = 1
+        return receipt
+    receipt["observation"] = observation
+    # 3. Decide WITHOUT guessing — every accepted combination is named here;
+    #    anything else is reported as unreconciled and exits nonzero.
+    if state in ("FINALIZED",):
+        verdict = "committed"
+    elif state == TRANSITION_STATE_COMMIT_POINT:
+        # The commit point was durably recorded: the quarantine drop happened.
+        if observation["quarantine_present"] is False \
+                and observation["canonical_matches_inventory"] is True:
+            verdict = "committed"
+        else:
+            verdict = "unreconciled"
+    elif state in (TRANSITION_STATE_FINALIZING, TRANSITION_STATE_ROLLING_BACK):
+        # Claim taken, commit point not reached. Quarantine presence decides:
+        # it is the physical rollback source.
+        if observation["quarantine_present"] is False \
+                and observation["canonical_matches_inventory"] is True:
+            # Durable record says the commit point was NOT reached, yet the
+            # quarantine is gone: the two authorities disagree — fail closed.
+            verdict = "unreconciled"
+        elif observation["quarantine_present"] is True:
+            verdict = "rolled_back_available"   # original still restorable
+        else:
+            verdict = "unreconciled"
+    elif state == TRANSITION_STATE_PROMOTED:
+        verdict = "rolled_back_available"
+    elif state in ("ROLLED_BACK", "FAILED"):
+        verdict = "rolled_back" if state == "ROLLED_BACK" else "unreconciled"
+    else:
+        verdict = "unreconciled"
+    receipt["verdict"] = verdict
+    receipt["committed"] = verdict == "committed"
+    receipt["finished_at"] = now_iso()
+    receipt["exit_status"] = 0 if verdict in ("committed", "rolled_back",
+                                              "rolled_back_available") else 1
+    return receipt
+
+
 def _parse_cli(argv):
     """Parse the recovery CLI into (phase, probe, kw). Exits 2 on unknown args."""
     kw = {}
@@ -1360,8 +1590,9 @@ def _parse_cli(argv):
 
 def _validate_cli(phase, kw):
     """Fail closed on incomplete recovery invocations (usage errors, exit 2)."""
-    if phase not in ("promote", "finalize", "rollback"):
-        print("USAGE_ERROR: --phase <promote|finalize|rollback> required", file=sys.stderr)
+    if phase not in ("promote", "finalize", "rollback", "reconcile"):
+        print("USAGE_ERROR: --phase <promote|finalize|rollback|reconcile> required",
+              file=sys.stderr)
         sys.exit(2)
     if not kw.get("inventory") or not kw.get("inventory_sha"):
         print("USAGE_ERROR: --inventory and --inventory-sha required", file=sys.stderr)
@@ -1369,7 +1600,7 @@ def _validate_cli(phase, kw):
     if phase == "promote" and not kw.get("archive"):
         print("USAGE_ERROR: --phase promote requires --archive", file=sys.stderr)
         sys.exit(2)
-    if phase in ("finalize", "rollback") and not kw.get("receipt_in"):
+    if phase in ("finalize", "rollback", "reconcile") and not kw.get("receipt_in"):
         print(f"USAGE_ERROR: --phase {phase} requires --receipt-in", file=sys.stderr)
         sys.exit(2)
     targets = _governed_identity_problems(kw.get("db", DB), kw.get("user", USER),
@@ -1411,6 +1642,9 @@ def main():
     elif phase == "finalize":
         receipt = phase_finalize(kw["receipt_in"], kw["inventory"], kw["inventory_sha"],
                                  db, user, container, probe)
+    elif phase == "reconcile":
+        receipt = phase_reconcile(kw["receipt_in"], kw["inventory"], kw["inventory_sha"],
+                                  db, user, container, probe)
     else:
         receipt = phase_rollback(kw["receipt_in"], kw["inventory"], kw["inventory_sha"],
                                  db, user, container, probe)

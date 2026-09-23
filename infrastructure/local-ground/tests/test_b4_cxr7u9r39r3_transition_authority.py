@@ -296,14 +296,21 @@ def test_an_interrupted_transition_leaves_the_authority_spent(
         bridge, tmp_path, monkeypatch):
     """A claim is taken BEFORE the work, so an interruption (the claim exists,
     the work never finished) truthfully means the authority is already spent -
-    it can never be replayed to repeat a destructive step."""
+    it can never be replayed to repeat a destructive step. The operation-wide
+    claim durably names the selected transition and moves the record to the
+    matching in-flight state, so the interruption is ATTRIBUTABLE."""
     receipt, path, inv, sha = _promoted(bridge, tmp_path, monkeypatch)
-    pgrec._claim_transition(receipt["operation_id"], "finalize")
+    pgrec._claim_transition(receipt["operation_id"], "finalize", receipt)
     bridge.reset()
     out = _transition(bridge, "finalize", path, inv, sha)
-    _assert_refused_without_mutation(bridge, out, "already consumed")
-    # the failed claim did not rewrite the record: state stays truthful
-    assert _record(receipt["operation_id"])["state"] == pgrec.TRANSITION_STATE_PROMOTED
+    _assert_refused_without_mutation(bridge, out, "its finalize authority is "
+                                     "no longer available")
+    # the claim durably named the selection; the record is FINALIZING, never
+    # re-opened as PROMOTED authority
+    claim = pgrec._load_claim(receipt["operation_id"])
+    assert claim["transition"] == "finalize"
+    assert claim["receipt_sha256"] == pgrec._receipt_digest(receipt)
+    assert _record(receipt["operation_id"])["state"] == pgrec.TRANSITION_STATE_FINALIZING
 
 
 def test_a_transition_survives_a_receipt_json_round_trip(bridge, tmp_path, monkeypatch):
