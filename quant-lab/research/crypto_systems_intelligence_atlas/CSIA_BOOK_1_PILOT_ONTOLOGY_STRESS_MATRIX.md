@@ -298,7 +298,48 @@ Cross-cutting anchor case: **USDC** (multi-chain token with native + bridged dep
 | ICP | No | No | Canister identity, subnets, executable governance | E-5, E-10, E-11 |
 | DAG | No | No | Finality semantics, tag composition | E-12 |
 
-**Verdict:** The Book 1 v0.1 ontology structure (primary class + role tags + family slots + marker-variant deployments + hyperedges + bitemporal fields) survives all seven pilots with **zero structural failures**. Twelve amendment candidates (E-1..E-13, minus confirmed-none) are required — all are extensions within the constitutional extension mechanism, none are architectural rework. E-13 requires an operator decision (R-1A-5).
+**Verdict:** The Book 1 v0.1 ontology structure (primary class + role tags + family slots + marker-variant deployments + hyperedges + bitemporal fields) survives all seven pilots with **zero STRUCTURAL MODEL FAILURES** (no foundational redesign required). The verdict is limited strictly to structural-model survival; see ERRATA below for the authoritative E-series accounting and the required qualification categories.
+
+---
+
+# ERRATA v0.1.1 (2026-09-23 — reconciliation checkpoint)
+
+This errata corrects the original session report and tightens the verdict wording above. Identifiers are **not renumbered**; the E-1..E-13 scheme stands as published.
+
+## E-series authoritative count
+
+The stress matrix contains **13 identifiers (E-1..E-13)**, of which:
+
+- **4 are no-amendment confirmations** (the pilot validated existing contract coverage and explicitly required nothing):
+  - E-3 (native-marker deployment — already in 1A.6)
+  - E-4 (Ethereum — sequencer class already present)
+  - E-6 (trustline family slot — provided Bloc 1B family slots exist; confirmation item)
+  - E-9 (ICS shared security — HE-SECURITY-SHARE already in 1C.6; confirmation item)
+- **9 are actual amendment candidates**: E-1, E-2, E-5, E-7, E-8, E-10, E-11, E-12, E-13.
+
+The prior session report's phrase "Twelve amendment candidates (E-1..E-13, minus confirmed-none)" was **incorrect**. Canonical statement: **13 identifiers / 9 amendment candidates / 4 confirmations.** Adjudication of each candidate is recorded in `CSIA_BOOK_1_EXTENSION_ADJUDICATION_v0.1.md`.
+
+## Verdict qualification (replaces the undifferentiated "zero structural failures" phrasing)
+
+Pilot results must be read in five distinct categories:
+
+```text
+STRUCTURAL MODEL FAILURE       = 0   (no pilot required reworking the primary-class
+                                      + role-tag + family-slot + bitemporal model)
+ONTOLOGY EXTENSION REQUIRED    = 9   (E-1, E-2, E-5, E-7, E-8, E-10, E-11, E-12, E-13;
+                                      all within the constitutional extension mechanism)
+UNRESOLVED OPERATOR DECISION   = 1   (R-1A-5 — IBC voucher representation, E-13)
+CONTRACT DEFECT                = 1   (E-13 also exposed that the v0.1 DeploymentIdentity
+                                      status enum lacks a channel-bound class — a genuine
+                                      schema defect, not merely an extension)
+INFORMATION GAP                = 2   (finality-device registry left to Book 3B by design,
+                                      E-12; IBC channel-attribute registry left to
+                                      family slots, E-8 — both deliberately deferred
+                                      detail, but they mean the ontology is NOT fully
+                                      sealed at Book 1 close)
+```
+
+**Corrected verdict:** no foundational redesign is required, AND the Book 1 ontology is not sealed: 9 amendments must be adjudicated and 1 operator decision (R-1A-5) plus the deferred registries (E-8, E-12) must be resolved or explicitly accepted as deferred before bloc exit gates can pass. "No structural failure" does not mean "fully sealed."
 
 ---
 

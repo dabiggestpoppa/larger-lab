@@ -2,9 +2,9 @@
 ## PROGRAM LEDGER / PLANNING PROGRESS
 
 **Document ID:** CSIA-LEDGER-001
-**Version:** 0.1
-**Constitutional role:** Per Constitution v0.2 §G, this ledger is the **sole authoritative record** of the current authorized next step and program state. "NEXT" statements in other CSIA documents are non-authoritative pointers.
-**Last updated:** 2026-09-23
+**Version:** 0.2
+**Constitutional role:** Per Constitution v0.2 §G (UNRATIFIED), this ledger is **PROPOSED_NEXT_STEP_AUTHORITY** — the designated candidate for the sole next-step record once Constitution v0.2 is operator-ratified via decision D6. Until D6 is recorded in the Operator Decision Log, the ledger carries **no binding constitutional authority**; it is the program's bookkeeping record and a proposal to the operator. "NEXT" statements in other CSIA documents remain non-authoritative pointers regardless.
+**Last updated:** 2026-09-23 (reconciliation checkpoint appended — see bottom)
 
 ---
 
@@ -18,7 +18,7 @@
 | Constitution v0.2 | DRAFT — NOT RATIFIED | All CR-01..CR-07 addressed; awaits operator D1 |
 | Book 0 ratification packet v0.1 | FROZEN_FOR_REVIEW | READY_FOR_OPERATOR_RATIFICATION = TRUE; decisions D1–D6 |
 | Book 1 detailed plan v0.1 | PLANNED — FROZEN_FOR_REVIEW | Blocs 1A–1D fully contracted; planning only |
-| Book 1 pilot stress matrix v0.1 | COMPLETE (planning) | 7 pilots; 0 structural failures; 12 amendment candidates; R-1A-5 open |
+| Book 1 pilot stress matrix v0.1 | COMPLETE (planning) + ERRATA v0.1.1 | 7 pilots; 0 structural-model failures; 13 identifiers = 9 amendment candidates + 4 confirmations; 1 contract defect (E-13); 1 operator decision open (R-1A-5) |
 | Books 2–9 | NOT STARTED | Roadmap v0.1 only |
 | Implementation | NOT AUTHORIZED | BLOC_IMPLEMENTATION_AUTHORITY = FALSE |
 
@@ -71,7 +71,7 @@ All prior planning docs (IACER, Constitution v0.1, Roadmap v0.1) preserved unmod
 | D1–D6 | Book 0 packet decisions (constitution ratification + 5 confirmations) | YES — for Book 0 closure and Book 1 ratification path |
 | R-1A-5 | IBC voucher representation (CHANNEL_REPRESENTATIVE deployment status vs WRAPS+mechanism) | For Bloc 1A sealing |
 | R-1A-1..4, R-1B-1..4, R-1C-1..4, R-1D-1..4 | Bloc review points (ratify at bloc review, after Book 0) | For bloc exit gates |
-| E-1..E-13 | Stress-matrix amendment candidates (fold into bloc plans or Constitution amendments as noted) | Fold before bloc sealing |
+| E-1..E-13 | 13 identifiers: 9 amendment candidates (E-1, E-2, E-5, E-7, E-8, E-10, E-11, E-12, E-13) + 4 no-amendment confirmations (E-3, E-4, E-6, E-9). Adjudicated in CSIA_BOOK_1_EXTENSION_ADJUDICATION_v0.1.md | Fold before bloc sealing |
 | D7 | Capital Field reconciliation | Before Book 5 planning only |
 | D8 | CSIA↔Sensor shared-seam ownership | Before Book 8 planning only |
 
@@ -120,4 +120,49 @@ NO SILENT RATIFICATION      = TRUE (v0.2 explicitly NOT ratified)
 NO SKIPPING OPERATOR REVIEW = TRUE (all review points enumerated)
 PRIOR DOCS PRESERVED        = TRUE
 SMALL LOGICAL COMMITS       = TRUE (one commit per artifact)
+```
+
+---
+
+# RECONCILIATION CHECKPOINT — 2026-09-23 (session 2, appended; history above preserved)
+
+## Verified local state
+
+```text
+BRANCH:      agent/crypto-systems-intelligence-atlas-plan
+HEAD:        75dd6f0e5b3f3440ca7c612e4a0dd9de16f0977d
+WORKING TREE: CLEAN at session start
+SESSION-1 COMMITS VERIFIED: 9bdbfbdb, ed59697b, 2465eacf, 1bf0a76a, 8cce42ff, 75dd6f0e
+ALL 9 PLANNING ARTIFACTS PRESENT AND READ DIRECTLY (not trusted from reports)
+```
+
+## Discrepancy resolutions
+
+**A. E-series count — RESOLVED.** The stress matrix contains 13 identifiers (E-1..E-13): 9 actual amendment candidates (E-1, E-2, E-5, E-7, E-8, E-10, E-11, E-12, E-13) and 4 explicit no-amendment confirmations (E-3, E-4, E-6, E-9). The session-1 report's "12 amendment candidates" was wrong. No renumbering performed; ERRATA v0.1.1 added to the stress matrix; adjudication in `CSIA_BOOK_1_EXTENSION_ADJUDICATION_v0.1.md`.
+
+**B. Program Ledger authority — REPAIRED.** The ledger previously claimed "sole authoritative record per Constitution v0.2 §G" while v0.2 is unratified — a bootstrap authority problem. Header corrected: the ledger is **PROPOSED_NEXT_STEP_AUTHORITY** until D6 records ratification in the Operator Decision Log. The NEXT section below is likewise a proposal.
+
+**C. "Zero structural failures" — REQUALIFIED.** Verdict now distinguishes: STRUCTURAL MODEL FAILURE (0) / ONTOLOGY EXTENSION REQUIRED (9) / UNRESOLVED OPERATOR DECISION (1: R-1A-5) / CONTRACT DEFECT (1: E-13 exposed a missing deployment-status class in v0.1) / INFORMATION GAP (2: E-8 and E-12 registries deferred by design). No structural-model failure ≠ ontology sealed.
+
+## Status after reconciliation
+
+```text
+CONSTITUTION v0.2            = DRAFT — NOT RATIFIED (D1 pending)
+BOOK 0                       = FROZEN_FOR_REVIEW; readiness restated in packet v0.2
+OPERATOR DECISIONS REMAINING = D1..D6 (Book 0) + R-1A-5 (Bloc 1A)
+BOOK 1 PLAN                  = v0.2 reconciled (v0.1 preserved unchanged)
+BLOC 1A-1D RATIFICATION      = NOT_RATIFIED (planned records created; awaiting operator)
+E-SERIES ADJUDICATION        = COMPLETE (no auto-adoption; see adjudication doc)
+ADVERSARIAL PRE-RAT REVIEW   = COMPLETE (see CSIA_BOOK_1_PRE_RATIFICATION_ADVERSARIAL_REVIEW.md)
+```
+
+## PROPOSED_NEXT_OPERATOR_ACTION (non-binding until D6)
+
+```text
+PROPOSED_NEXT = OPERATOR reviews CSIA_OPERATOR_DECISION_PACKET_BOOK0_BOOK1_v0.1.md
+                and issues decisions D1..D6 + R-1A-5 (or instructions to the contrary)
+THEN          = bloc ratification records completed per operator outcomes
+THEN          = operator authorization decision for any Book 1 implementation
+NOTE          = this ledger is PROPOSED_NEXT_STEP_AUTHORITY until D6 ratifies
+                Constitution v0.2; nothing above binds the operator
 ```
