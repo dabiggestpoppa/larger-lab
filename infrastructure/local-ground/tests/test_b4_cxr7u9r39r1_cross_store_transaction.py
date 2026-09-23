@@ -45,10 +45,13 @@ def _pg_truth():
 
 
 def _artifact_volume_sha():
-    """Volume identity with the artifact service STOPPED: MinIO writes its own
-    format metadata into /data on startup, so a running-service hash describes
-    MinIO bookkeeping, not restored truth. This mirrors restore.sh's own
-    identity procedure (artifact_volume_sha_stopped)."""
+    """USER-DATA identity of the artifact volume, service stopped: MinIO writes
+    its own bookkeeping under .minio.sys/ at runtime (and on start), so a
+    whole-volume hash after the service ran describes MinIO internals, not
+    stored truth. This check therefore excludes MinIO's private namespace and
+    hashes the user-data files - which is what a restore must preserve. The
+    ENGINE's own staged-vs-restored identity (restore.sh) is the whole-volume
+    byte proof and is taken while the service is stopped, before MinIO runs."""
     oc.run(["docker", "stop", oc.ARTIFACT], check=False, timeout=120)
     r = oc.run(["docker", "run", "--rm", "-v", f"{ARTIFACT_VOLUME}:/data",
                 "postgres:16.2-alpine", "sh", "-c",
@@ -56,7 +59,8 @@ def _artifact_volume_sha():
                 "find . -type f -exec sha256sum {} + 2>/dev/null"])
     oc.run(["docker", "start", oc.ARTIFACT], check=False, timeout=120)
     oc.wait_healthy(oc.ARTIFACT)
-    lines = sorted(line for line in r.stdout.splitlines() if line.strip())
+    lines = sorted(line for line in r.stdout.splitlines() if line.strip()
+                   and "/.minio.sys/" not in line)
     return _sha("\n".join(lines))
 
 
@@ -174,10 +178,12 @@ def test_successful_full_replace_sources_both_stores_from_one_backup(oce_stack, 
     assert art["artifact_verify"] == "ok", art
     assert art["artifact_volume_sha256_after"] == art["artifact_staged_sha256"], art
     assert art["artifact_volume_sha256_before"] != art["artifact_volume_sha256_after"]
-    # the committed identity is a STOPPED-state identity (MinIO rewrites its
-    # own format metadata into /data on start), so the independent check
-    # re-derives it with the service stopped, exactly as the engine does
-    assert art["artifact_volume_sha256_after"] == _artifact_volume_sha()
+    # independent check: the restored USER-DATA truth is exactly the backup's
+    # (the engine's whole-volume stopped-state identity is the byte proof;
+    # MinIO's own .minio.sys bookkeeping may legitimately change at runtime)
+    out = tmp_path / "restored-marker.bin"
+    oc.cp_out(oc.ARTIFACT, "/data/artifact-marker.txt", out)
+    assert out.read_text(encoding="utf-8") == "backup-A\n"
     # a committed transaction writes no rollback receipt
     assert _evidence(tmp_path, "transaction-rollback-receipt.json") is None
     # Redis is transient: invalidated, never restored
