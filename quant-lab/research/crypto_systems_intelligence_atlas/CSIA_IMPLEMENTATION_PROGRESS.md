@@ -114,3 +114,77 @@ a8a72e22  public kernel operations + weak-test conversion
 5d51c277  liveness assertion + holds_at simplification
 <HEAD>    hardening matrix + evidence addendum + this ledger entry
 ```
+---
+
+# CHECKPOINT 3 — BOOK 1 HARDENING R2 (2026-09-23)
+
+Checkpoint 2 above is preserved unchanged.
+
+## Audit seam closed
+
+GitHub code review found one remaining hardening seam: public lifecycle
+operations and validation/history preservation. R2 seals it.
+
+## Findings + repairs
+
+```text
+F-1  model_copy(update=...) bypasses ALL pydantic validators.
+     close_realization could mint IR-6 violations (close before valid_from)
+     through the public op. FIXED via _replace_validated(): model_copy
+     payload + full model_validate reconstruction (identity.py).
+F-2  apply_rebrand dropped the old canonical name — Constitution v0.2 §8.3
+     requires the old name be ADDED TO ALIASES. FIXED: HISTORICAL alias
+     window (valid_from=object valid_from, valid_to=rebrand instant).
+F-3  Rebrand temporal validation absent: backdated instants, same-instant
+     double rebrand, same-name rebrand, backdated new tickers — all now
+     rejected fail-closed at the kernel.
+F-4  deprecate chronology unvalidated — naive/before-valid_from/repeat now
+     rejected.
+Disproved: none (RecordStore.get overlay and mark_historical audited clean;
+dispositions proven by executable tests).
+```
+
+## Tests (test-first: 18 R2 tests failed on 2f2bdb9d before repairs)
+
+```text
+python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/ -q
+    → 107 passed   (78 → 107; +29 R2 tests)
+python -m pytest quant-lab/tests/crypto_sensor_fabric -q
+    → 2339 passed, 4 skipped
+ruff: All checks passed!      mypy: Success (5 source files)
+```
+
+## Machine evidence
+
+```text
+CSIA_BOOK_1_HARDENING_MATRIX_R2.json  — 6 gates, all PASS
+  MODEL_COPY_AUDIT, PUBLIC_UPDATE_VALIDATION, REALIZATION_CLOSURE_VALIDATION,
+  REBRAND_NAME_HISTORY, REBRAND_TEMPORAL_WINDOWS, LIFECYCLE_HISTORY_PRESERVATION
+R1 matrix preserved unchanged.
+```
+
+## Remaining limitations (non-blocking)
+
+- Registry layer is a mutable current-state container with additive validated
+  history windows — NOT event sourcing (explicitly out of scope; doctrine
+  documented in the R2 evidence addendum).
+- Same-instant double-rebrand guard is registry-level metadata
+  (per-object committed instants), not a persisted ledger.
+
+## Exit status
+
+```text
+BOOK_1_IMPLEMENTATION = COMPLETE_HARDENED
+BLOCKING_CORRECTNESS_ISSUES = 0
+EXIT_GATE = PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_TEMPORAL_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+```
+
+Commits (this checkpoint):
+
+```text
+6754b3eb  R2 failing tests (18 failing pre-fix)
+d4c4add6  lifecycle hardening: validated replacement, §8.3 rebrand history, closure chronology
+13f0428b  Alias accepts UNKNOWN bound (R9)
+2f2bdb9d+ matrix, evidence addendum, and this ledger entry (see git log for exact HEAD)
+```

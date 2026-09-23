@@ -230,3 +230,76 @@ PASS, generated from the executed commands above).
 PROPOSED EXIT GATE: PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_TEMPORAL_KERNEL
 STATUS: READY_FOR_OPERATOR_REVIEW   (NOT self-ratified)
 ```
+
+# HARDENING R2 ADDENDUM (2026-09-23) — public lifecycle operations seal
+
+Scope: model_copy validation-bypass audit, close_realization chronology,
+rebrand history semantics (Constitution §8.3), rebrand temporal validation,
+lifecycle history preservation. R1 addendum above is preserved unchanged.
+
+## model_copy(update=...) audit — all production sites
+
+| Site | Classification | Disposition |
+|---|---|---|
+| `identity.py` `close_realization` | VALIDATION_BYPASS_RISK | FIXED — replacement now built via `_replace_validated()` (model_copy payload + full `model_validate` reconstruction, so every `model_validator` runs) |
+| `identity.py` `apply_rebrand` ticker-window close | VALIDATION_BYPASS_RISK | FIXED — same `_replace_validated()` path |
+| `temporal.py` `RecordStore.get` supersession overlay | SAFE_IMMUTABLE_VIEW | PROVEN by test — overlay never mutates the committed record; view is validation-equivalent |
+
+Note: Pydantic `model_copy(update=...)` runs NO validators. Before R2 the
+public op `close_realization(..., at=before valid_from)` could mint an IR-6
+violation that direct construction would reject. Reproduced test-first
+(`test_close_realization_cannot_bypass_ir6`), then closed.
+
+## Repairs (code follows tests; 18 R2 tests failed on 2f2bdb9d)
+
+1. `close_realization`: validated state replacement; rejects naive instants,
+   closure before valid_from (IR-6), re-closure of CLOSED/MIGRATED
+   realizations; nonexistent realization/object raise KeyError.
+2. `apply_rebrand` (Constitution v0.2 §8.3): now appends the old canonical
+   name as `Alias(name, valid_from=obj.valid_from, valid_to=at,
+   name_state="HISTORICAL")` — old name historically queryable, object_id
+   unchanged, new name becomes current. `Alias.valid_from` widened to
+   `Timestamp | UnknownBound` (a rebrand history window inherits the
+   object's bound; UNKNOWN is never silently converted — R9).
+3. Rebrand fail-closed rules: instant before object valid_from, instant
+   before an open ticker window's valid_from, naive instants, same-name
+   rebrand, same-instant double rebrand (registry-level committed-instant
+   metadata), new tickers backdated before the rebrand instant.
+4. `deprecate`: rejects naive instants, instants before valid_from, and
+   repeat deprecation (valid_to world-change already committed).
+
+## Immutability semantics clarification (Phase 6)
+
+Two distinct levels, now stated explicitly:
+- **TemporalRecord (store layer): STRICTLY immutable once committed** —
+  supersession metadata is store-level; `get()` overlays without mutation.
+- **CanonicalObject / RealizationIdentity (registry layer): mutable
+  current-state containers whose HISTORY is preserved through additive,
+  validated windows** (aliases, ticker windows, closed realizations).
+  Lifecycle operations replace fields only through validated paths and never
+  destroy prior windows; they are NOT claimed to be in-place-immutable.
+
+## Post-R2 verification (executed 2026-09-23)
+
+```text
+python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/ -q
+    → 107 passed   (was 78; +29 R2 tests, 18 failed pre-fix)
+python -m pytest quant-lab/tests/crypto_sensor_fabric -q
+    → 2339 passed, 4 skipped (regression, untouched)
+python -m ruff check quant-lab/src/... quant-lab/tests/...
+    → All checks passed!
+python -m mypy quant-lab/src/crypto_systems_intelligence_atlas/ --ignore-missing-imports
+    → Success: no issues found in 5 source files
+```
+
+Machine-readable matrix: `CSIA_BOOK_1_HARDENING_MATRIX_R2.json` (6 gates,
+all PASS). R1 matrix (`CSIA_BOOK_1_HARDENING_MATRIX.json`) preserved.
+
+## Exit status (restated post-R2)
+
+```text
+EXIT GATE: PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_TEMPORAL_KERNEL
+BOOK_1_IMPLEMENTATION = COMPLETE_HARDENED
+BLOCKING_CORRECTNESS_ISSUES = 0
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+```
