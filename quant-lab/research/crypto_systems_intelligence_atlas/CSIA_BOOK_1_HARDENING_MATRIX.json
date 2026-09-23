@@ -1,0 +1,151 @@
+{
+  "document_id": "CSIA-B1-HARDENING-MATRIX-001",
+  "title": "Book 1 Kernel Hardening Matrix R1",
+  "date": "2026-09-23",
+  "branch": "agent/crypto-systems-intelligence-atlas-build",
+  "authority": "Book 1 RATIFIED kernel-scope implementation authority; hardening per operator-directed audit",
+  "conventions": {
+    "test_command": "python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/ -q",
+    "regression_command": "python -m pytest quant-lab/tests/crypto_sensor_fabric -q",
+    "lint_command": "python -m ruff check quant-lab/src/crypto_systems_intelligence_atlas/ quant-lab/tests/crypto_systems_intelligence_atlas/",
+    "typecheck_command": "python -m mypy quant-lab/src/crypto_systems_intelligence_atlas/ --ignore-missing-imports"
+  },
+  "gates": [
+    {
+      "id": "REALIZATION_LIVENESS",
+      "finding": "A: is_live() ignored valid_to when status=CLOSED, claiming liveness after closure",
+      "invariant": "INV-1A-10; R6 as-of; liveness is valid-time-driven, never status-driven",
+      "test_ids": [
+        "test_hardening_r1.py::TestRealizationLiveness::test_1_active_no_valid_to_is_live",
+        "test_hardening_r1.py::TestRealizationLiveness::test_2_active_future_valid_to",
+        "test_hardening_r1.py::TestRealizationLiveness::test_3_closed_past_valid_to_before_closure_true",
+        "test_hardening_r1.py::TestRealizationLiveness::test_4_closed_past_valid_to_after_closure_false",
+        "test_hardening_r1.py::TestRealizationLiveness::test_5_migrated_with_valid_to",
+        "test_hardening_r1.py::TestRealizationLiveness::test_6_unknown_valid_to_never_certain",
+        "test_hardening_r1.py::TestRealizationLiveness::test_closed_before_valid_from_not_live",
+        "test_pilots.py::test_channel_closure_preserves_history"
+      ],
+      "expected": "CLOSED+valid_to=T1: is_live(T0<T1)=True, is_live(T2>T1)=False; UNKNOWN valid_to inside bounds=None; beyond latest bound=False",
+      "actual": "matches expected",
+      "result": "PASS"
+    },
+    {
+      "id": "UNKNOWN_VALID_FROM",
+      "finding": "B: holds_at() returned True inside a start-uncertainty window",
+      "invariant": "R9; Constitution 12.2: unknown valid time explicit, never fabricated",
+      "test_ids": [
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_known_start_open_end",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_known_start_known_end",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_unknown_start_open_end_before_earliest_false",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_unknown_start_open_end_within_bounds_undecidable",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_unknown_start_open_end_at_or_after_latest_true",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_unknown_start_known_end",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_unknown_start_unknown_end",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_known_start_unknown_end",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_unknown_start_only_latest_bound",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_unknown_start_only_earliest_bound",
+        "test_adversarial.py::test_unknown_bounded_valid_time_never_fabricated"
+      ],
+      "expected": "query<earliest=False; earliest<=query<latest=None; query>=latest=True; UNKNOWN end windows yield None where end uncertain, False after latest end bound",
+      "actual": "matches expected (full 5-row truth table)",
+      "result": "PASS"
+    },
+    {
+      "id": "UNKNOWN_VALID_TO",
+      "finding": "covered by truth-table rows 3-5 and realization liveness case 6",
+      "invariant": "R9",
+      "test_ids": [
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_unknown_start_unknown_end",
+        "test_hardening_r1.py::TestHoldsAtTruthTable::test_known_start_unknown_end",
+        "test_hardening_r1.py::TestRealizationLiveness::test_6_unknown_valid_to_never_certain"
+      ],
+      "expected": "None within end uncertainty; False after latest end bound",
+      "actual": "matches expected",
+      "result": "PASS"
+    },
+    {
+      "id": "UNKNOWN_BOUND_VALIDATION",
+      "finding": "UnknownBound accepted naive datetimes and inverted bounds",
+      "invariant": "R9 construction invariants; UTC normalization",
+      "test_ids": [
+        "test_hardening_r1.py::TestUnknownBoundValidation::test_naive_earliest_rejected",
+        "test_hardening_r1.py::TestUnknownBoundValidation::test_naive_latest_rejected",
+        "test_hardening_r1.py::TestUnknownBoundValidation::test_earliest_after_latest_rejected",
+        "test_hardening_r1.py::TestUnknownBoundValidation::test_equal_bounds_allowed",
+        "test_hardening_r1.py::TestUnknownBoundValidation::test_aware_bounds_normalized_to_utc",
+        "test_hardening_r1.py::TestUnknownBoundValidation::test_all_explicit_states_allowed"
+      ],
+      "expected": "naive bounds rejected; earliest>latest rejected; aware bounds normalized to UTC; all four explicit states allowed",
+      "actual": "matches expected",
+      "result": "PASS"
+    },
+    {
+      "id": "ACYCLIC_INSERTION",
+      "finding": "cycles were insertable; only post-hoc validate_acyclic() reported them",
+      "invariant": "IR-3/IR-4 fail-closed at write time",
+      "test_ids": [
+        "test_hardening_r1.py::TestAcyclicInsertion::test_third_edge_closing_cycle_rejected_atomically",
+        "test_hardening_r1.py::TestAcyclicInsertion::test_settles_to_second_insertion_rejected",
+        "test_hardening_r1.py::TestAcyclicInsertion::test_diamond_is_not_a_cycle",
+        "test_adversarial.py::test_forked_from_cycle_invalid"
+      ],
+      "expected": "A->B, B->C pass; C->A rejected atomically (edge absent, prior graph intact); SETTLES_TO back-edge rejected; diamonds accepted",
+      "actual": "matches expected",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION_LINEAGE",
+      "finding": "cycle detection lived in test-local pointer-chasing, not the kernel",
+      "invariant": "INV-1A-11: no self-migration, no cycles, coherent lineage",
+      "test_ids": [
+        "test_hardening_r1.py::TestMigrationLineageEnforcement::test_self_migration_rejected",
+        "test_hardening_r1.py::TestMigrationLineageEnforcement::test_two_node_cycle_rejected",
+        "test_hardening_r1.py::TestMigrationLineageEnforcement::test_three_node_cycle_rejected",
+        "test_hardening_r1.py::TestMigrationLineageEnforcement::test_valid_chain_accepted",
+        "test_hardening_r1.py::TestMigrationLineageEnforcement::test_incoherent_pair_rejected",
+        "test_adversarial.py::test_migration_lineage_cycle_invalid",
+        "test_adversarial.py::test_migration_creates_lineage_not_replacement"
+      ],
+      "expected": "kernel raises on self-migration, 2-node and 3-node cycles, incoherent pairs; valid chains accepted with full history retained",
+      "actual": "matches expected",
+      "result": "PASS"
+    },
+    {
+      "id": "SUPERSESSION_IMMUTABILITY",
+      "finding": "RecordStore.supersede() mutated the committed record's superseded_at in place",
+      "invariant": "INV-1D-1 (plan v0.3/v0.1 1D.7: 'no record is ever deleted or mutated in place') — strict immutability is the ratified reading",
+      "test_ids": [
+        "test_hardening_r1.py::TestSupersessionImmutability::test_supersede_does_not_mutate_old_record",
+        "test_hardening_r1.py::TestSupersessionImmutability::test_as_known_still_uses_supersession_metadata",
+        "test_adversarial.py::test_superseded_records_queryable_forever",
+        "test_adversarial.py::test_record_store_has_no_delete_or_overwrite"
+      ],
+      "expected": "committed record object unmutated after supersede; store-level metadata drives current()/as_known(); R4/R5/R7 semantics unchanged",
+      "actual": "matches expected (metadata-envelope pattern)",
+      "result": "PASS"
+    },
+    {
+      "id": "PUBLIC_API_PROOF",
+      "finding": "Phase 7: tests wrote registry._objects directly (rebrand) and mutated realizations in place (closure) — false proofs",
+      "invariant": "tests must exercise public kernel operations",
+      "test_ids": [
+        "test_adversarial.py::test_rebrand_preserves_identity",
+        "test_pilots.py::test_channel_closure_preserves_history"
+      ],
+      "expected": "rebrand and closure exercised via new public operations IdentityRegistry.apply_rebrand() and IdentityRegistry.close_realization(); no private-state access in tests",
+      "actual": "matches expected",
+      "result": "PASS"
+    }
+  ],
+  "summary": {
+    "csia_tests_before_hardening": 45,
+    "csia_tests_after_hardening": 78,
+    "csia_tests_passing": 78,
+    "regression_tests": "2339 passed, 4 skipped (crypto_sensor_fabric, untouched)",
+    "ruff": "All checks passed!",
+    "mypy": "Success: no issues found in 5 source files",
+    "findings_reproduced": 6,
+    "findings_disproved": 0,
+    "blocking_issues_open": 0
+  }
+}

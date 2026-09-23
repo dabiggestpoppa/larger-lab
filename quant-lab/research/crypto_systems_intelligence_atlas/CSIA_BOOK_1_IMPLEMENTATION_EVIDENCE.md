@@ -170,6 +170,62 @@ No network used. No Sensor/Capital Field files modified.
 
 ## 9. Exit status
 
+> **HARDENING R1 CORRECTION (2026-09-23):** sections 3–6 above describe the
+> v1 kernel as reviewed. The operator-directed audit found real correctness
+> gaps the original tests missed (see the Hardening R1 addendum below, which
+> supersedes any claim contradicted there). Historical text preserved.
+
+---
+
+# HARDENING R1 ADDENDUM (2026-09-23) — supersedes contradicted claims above
+
+A direct code audit reproduced **6 findings** the original 45-test matrix did
+not catch. All were fixed test-first (tests committed failing at `62c2a406`,
+fixes at `ac14a991` + follow-ups).
+
+## Findings reproduced (all real defects)
+
+| # | Finding | Original claim contradicted | Repair |
+|---|---|---|---|
+| A | `RealizationIdentity.is_live()` ignored `valid_to` when `status=CLOSED` — claimed liveness AFTER closure | §3 "liveness/closure" semantics were wrong in code | `is_live()` now delegates to `holds_at()` — liveness is valid-time-driven, never status-driven; returns True/False/None |
+| B | `holds_at()` returned **True** inside a start-uncertainty window (UNKNOWN valid_from) | §3 "never fabricates dates" — the old code fabricated certainty | Full 5-row truth table implemented: False before earliest; None inside start uncertainty; True at/after latest start; None inside end uncertainty; False after latest end bound |
+| C | `UnknownBound` accepted naive datetimes and `earliest > latest` | — (construction was unvalidated) | Fail-closed construction invariants + UTC normalization |
+| D | Acyclic edge families (FORKED_FROM, SETTLES_TO) accepted cycle-closing insertions; `validate_acyclic()` was post-hoc only | §3 "acyclicity (IR-3/IR-4)" overstated enforcement | Insertion-time fail-closed rejection; invalid edge never becomes graph state; audit method retained |
+| E | Migration-lineage cycle detection lived in TEST-local pointer-chasing, not the kernel | §5 "cycle detection tested" was a false proof of kernel enforcement | Kernel raises at attach time: self-migration, 2-node and 3-node cycles, incoherent lineage pairs; valid chains accepted |
+| F | `RecordStore.supersede()` mutated the committed record's `superseded_at` in place | §3 "append-only, no in-place mutation path" was FALSE for supersession | Strict-immutable disposition per INV-1D-1 ("no record is ever deleted or mutated in place"): supersession timestamps now live in store-level metadata envelopes; committed records are never written to after `add()` |
+
+## Findings disproved
+
+None — every suspected gap reproduced as a real defect.
+
+## Phase 7 weak-test audit results
+
+| Test | Classification | Disposition |
+|---|---|---|
+| `test_rebrand_preserves_identity` (wrote `registry._objects[...]`) | FALSE PROOF | New public `IdentityRegistry.apply_rebrand()`; test now exercises it |
+| `test_channel_closure_preserves_history` (mutated `obj.realizations` in place) | FALSE PROOF | New public `IdentityRegistry.close_realization()`; test now exercises it |
+| `test_migration_lineage_cycle_invalid` (test-local cycle detection) | FALSE PROOF | Kernel now enforces; test asserts kernel rejection + graph intact |
+| `test_forked_from_cycle_invalid` (relied on post-hoc check) | WEAK TEST | Rewritten: insertion rejected atomically, prior graph intact |
+| pilot `model_copy(update={"role_tags": ...})` constructions | VALID WHITE-BOX | Retained — immutable-copy construction + registry validation is the tested behavior |
+
+## Post-hardening verification (executed 2026-09-23)
+
+```text
+python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/ -q
+    → 78 passed   (was 45; +33 hardening/public-API tests)
+python -m pytest quant-lab/tests/crypto_sensor_fabric -q
+    → 2339 passed, 4 skipped (regression, untouched)
+python -m ruff check quant-lab/src/... quant-lab/tests/...
+    → All checks passed!
+python -m mypy quant-lab/src/crypto_systems_intelligence_atlas/ --ignore-missing-imports
+    → Success: no issues found in 5 source files
+```
+
+Machine-readable matrix: `CSIA_BOOK_1_HARDENING_MATRIX.json` (8 gates, all
+PASS, generated from the executed commands above).
+
+## 9. Exit status (restated post-hardening)
+
 ```text
 PROPOSED EXIT GATE: PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_TEMPORAL_KERNEL
 STATUS: READY_FOR_OPERATOR_REVIEW   (NOT self-ratified)
