@@ -69,3 +69,60 @@ EXPLICITLY PROHIBITED DOWNSTREAM SCOPE
 
 =====================================================================
 ```
+
+---
+
+# BLOC 1B REVIEW — APPENDED 2026-09-23 (post-ratification review; prior NOT_RATIFIED history above preserved)
+
+**Review context:** plan v0.3; registry final at 42 classes (REALIZATION adopted via R-1A-5=C).
+
+## R-1B-1 — Ratify the 42-class initial registry
+- **Requirement:** complete, defined primary-class registry.
+- **Plan evidence:** v0.3 §1B.6 (42 classes incl. REALIZATION definition); INV-1B-6 (every entry carries a definition).
+- **Invariants:** INV-1B-1, INV-1B-6, INV-1B-8.
+- **Adversarial cases:** ADV-1B-A..K.
+- **Tests:** T-1B-1.
+- **Limitations:** family-specific sub-object schemas (subnets, shards) are Book 3B content; registry reserves the slots.
+- **Verdict: PASS**
+
+## R-1B-2 — Role-tag registry and primary/role separation
+- **Requirement:** role tags never substitute for primary class; no family parameters on tags.
+- **Plan evidence:** v0.3 §1B.6 role registry (incl. STATE_CHANNEL, MEV clarification); Constitution §9.1.
+- **Invariants:** INV-1B-2.
+- **Adversarial cases:** ADV-1B-A/C (multi-role composition), ADV-1B-K (state-channel L2 without VM).
+- **Tests:** T-1B-5, T-1B-7.
+- **Limitations:** none declared.
+- **Verdict: PASS**
+
+## R-1B-3 — Unresolved-object doctrine
+- **Requirement:** unknown objects are first-class, never forced into nearest class.
+- **Plan evidence:** §1B.6 UnresolvedObject schema; INV-1B-4.
+- **Adversarial cases:** any unresolved discovery path (stress matrix P1–P7 discovery rules).
+- **Tests:** T-1B-2, T-1B-3.
+- **Limitations:** none declared.
+- **Verdict: PASS**
+
+## R-1B-4 — Extension-mechanism workflow
+- **Requirement:** class additions/deprecations only via proposal → operator review → Decision Log → version bump.
+- **Plan evidence:** §1B.6 extension mechanism; Constitution §9.3 (ratified); INV-1B-3, INV-1B-7 (slot reservations cannot self-populate).
+- **Adversarial cases:** slot inflation guard (T-1B-8); REALIZATION adoption itself was executed through this mechanism (R-1A-5 decision record) — a live walkthrough.
+- **Tests:** T-1B-8.
+- **Limitations:** none declared.
+- **Verdict: PASS**
+
+## REALIZATION class placement (R-1A-5=C interaction, explicit check)
+- REALIZATION is a primary class (not a role tag) because it carries independent identity, lifecycle, route, and provenance — per INV-1B-8 it is disjoint from DeploymentIdentity. Aggregation to canonical assets is derived-only (INV-1C-7). Ontology inflation check: +1 class for a cross-cutting, repeatedly stress-exposed concept (E-13), accepted under minimum-sufficient doctrine; no other class was added across all 13 E-identifiers.
+
+## Bloc 1B review summary
+
+```text
+R-1B-1  PASS
+R-1B-2  PASS
+R-1B-3  PASS
+R-1B-4  PASS
+REALIZATION placement: PASS (class disjoint from deployment; inflation-bounded)
+
+BLOC 1B REVIEW VERDICT: READY_FOR_OPERATOR_RATIFICATION
+Blocking items: NONE
+STATUS = READY_FOR_OPERATOR_RATIFICATION (NOT RATIFIED)
+```

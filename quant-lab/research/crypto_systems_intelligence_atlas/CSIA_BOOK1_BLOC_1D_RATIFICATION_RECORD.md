@@ -75,3 +75,58 @@ EXPLICITLY PROHIBITED DOWNSTREAM SCOPE
 
 =====================================================================
 ```
+
+---
+
+# BLOC 1D REVIEW — APPENDED 2026-09-23 (post-ratification review; prior NOT_RATIFIED history above preserved)
+
+**Review context:** plan v0.3; realization lifecycle semantics added; R1–R10 unchanged and confirmed.
+
+## R-1D-1 — Bitemporal field semantics (§12.2 instantiation)
+- **Requirement:** valid time vs transaction time as separate axes; six timestamps precisely defined.
+- **Plan evidence:** v0.3 §1D.6 rules R1–R10; Constitution §12 (ratified).
+- **Invariants:** INV-1D-1..3.
+- **Adversarial cases:** ADV-1D-A (triple-time late discovery), ADV-1D-F (bulk backfill).
+- **Tests:** T-1D-1, T-1D-2, T-1D-7.
+- **Limitations:** none declared.
+- **Verdict: PASS**
+
+## R-1D-2 — Stale policy as derived-only
+- **Requirement:** STALE computed from fields + policy, never authored.
+- **Plan evidence:** §1D.6 stale-state policy; Constitution §7.1 (ratified via D2).
+- **Invariants:** INV-1D-5.
+- **Adversarial cases:** ADV-1D-G (stale but true).
+- **Tests:** T-1D-8.
+- **Limitations:** re-verification windows (W) are Book 2 policy — deferred by design.
+- **Verdict: PASS_WITH_DECLARED_LIMITATION**
+
+## R-1D-3 — Replay contract as binding Book 7D input
+- **Requirement:** RC-1..RC-4 (as-of, as-known, unretrofitted states, schema-versioned replay).
+- **Plan evidence:** §1D.6 replay contract; INV-1D-6.
+- **Adversarial cases:** ADV-1D-H (schema v2 field), ADV-1D-I (superseded-then-revalidated), ADV-1D-L (realization closure/migration replay).
+- **Tests:** T-1D-9, T-1D-12.
+- **Limitations:** machinery ownership is Book 7D (MA-13 scoping) — the contract binds it.
+- **Verdict: PASS**
+
+## R-1D-4 — Schema-migration doctrine
+- **Requirement:** additive-first migrations; destructive changes require operator Decision Log + dual-write verification.
+- **Plan evidence:** §1D.6 schema-migration doctrine; RC-4.
+- **Tests:** T-1D-9.
+- **Limitations:** none declared.
+- **Verdict: PASS**
+
+## Realization lifecycle check (R-1A-5=C interaction)
+- Lifecycle states ACTIVE/CLOSED/MIGRATED/HISTORICAL/UNKNOWN map onto the record-level temporal model (valid_to = world change; lineage pointers, never rewrite). Unknown valid time (R9/UNKNOWN(bounded)) applies to realization route/time uncertainty. Consistent status vocabulary — no new temporal concepts invented.
+
+## Bloc 1D review summary
+
+```text
+R-1D-1  PASS
+R-1D-2  PASS_WITH_DECLARED_LIMITATION (verification windows = Book 2 policy)
+R-1D-3  PASS
+R-1D-4  PASS
+
+BLOC 1D REVIEW VERDICT: READY_FOR_OPERATOR_RATIFICATION
+Blocking items: NONE
+STATUS = READY_FOR_OPERATOR_RATIFICATION (NOT RATIFIED)
+```

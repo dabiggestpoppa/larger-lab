@@ -73,3 +73,68 @@ EXPLICITLY PROHIBITED DOWNSTREAM SCOPE
 
 =====================================================================
 ```
+
+---
+
+# BLOC 1C REVIEW — APPENDED 2026-09-23 (post-ratification review; prior NOT_RATIFIED history above preserved)
+
+**Review context:** plan v0.3; REALIZES/RECEIVED_VIA contractual; IR-13 and INV-1C-7 in force.
+
+## R-1C-1 — Edge dictionary semantics (DEPENDS_ON vs INTEGRATES_WITH vs BUILT_WITH)
+- **Requirement:** no junk-drawer edges; requirement/data/mimicry semantically separated.
+- **Plan evidence:** v0.3 §1C.6 dictionary entries with junk-drawer guard; IR-7.
+- **Invariants:** INV-1C-1, INV-1C-2.
+- **Adversarial cases:** ADV-1C-A (E4 announcement), ADV-1C-B (deployed but unused), ADV-1C-C (late-discovered dependency).
+- **Tests:** T-1C-3, T-1C-4, T-1C-8, T-1C-9.
+- **Limitations:** BUILT_WITH remains the weakest edge; boundary cases route to operator review.
+- **Verdict: PASS**
+
+## R-1C-2 — Settlement vs bridge distinction rule
+- **Requirement:** SETTLES_TO (trust root) vs BRIDGES_TO (connectivity) never conflated.
+- **Plan evidence:** dictionary definitions + notes; settlement-DAG rule IR-4.
+- **Adversarial cases:** ADV-1C-D (competing bridges), ADV-1C-E (dual settlement).
+- **Tests:** T-1C-2, T-1C-10.
+- **Limitations:** none declared.
+- **Verdict: PASS**
+
+## R-1C-3 — Hyperedge class registry
+- **Requirement:** multi-party facts atomic; decomposition only as derived views.
+- **Plan evidence:** §1C.7 registry (5 classes) + route_attributes group (E-8); Constitution §11.1.
+- **Invariants:** INV-1C-5, INV-1C-6 (attribute groups are temporal per record).
+- **Adversarial cases:** ADV-1C-K (two channels, one closes), ADV-1C-F (oracle derivation cycles).
+- **Tests:** T-1C-6, T-1C-12.
+- **Limitations:** attribute VALUE population deferred to Book 3B/4B (recorded information gap).
+- **Verdict: PASS_WITH_DECLARED_LIMITATION**
+
+## R-1C-4 — Evidence bar for competitor/complement edges
+- **Requirement:** E2+ or INFERRED+methodology; E4-only invalid.
+- **Plan evidence:** dictionary COMPETES_WITH/COMPLEMENTS entries; IR-8.
+- **Tests:** T-1C-4.
+- **Limitations:** none declared.
+- **Verdict: PASS**
+
+## R-1C-5 — Route attributes + mechanism enum ratification
+- **Requirement:** security mechanism mandatory on SECURED_BY; route_attributes mandatory on bridge-route hyperedges.
+- **Plan evidence:** v0.3 §1C.6 (SECURED_BY mechanism, E-1), §1C.7 (route_attributes, E-8), IR-11/IR-12.
+- **Invariants:** INV-1C-6.
+- **Adversarial cases:** ADV-1C-L (mechanism change over valid time), ADV-1C-K.
+- **Tests:** T-1C-11, T-1C-12, T-1C-13 (chain_scope), T-1C-14 (REALIZES/RECEIVED_VIA — now contractual).
+- **Limitations:** enum value refinement is family-populated (Book 3B).
+- **Verdict: PASS_WITH_DECLARED_LIMITATION**
+
+## REALIZATION relationship check (R-1A-5=C interaction)
+- REALIZES (realization→canonical, domain/range enforced by IR-13), RECEIVED_VIA (route binding), MIGRATED_FROM/TO (lineage, no new vocabulary invented); pairwise-flattening prohibition IR-9 unaffected; capability-vs-flow separation INV-1C-4 unaffected — realization-level flow inspection is a realization-property, not an edge magnitude.
+
+## Bloc 1C review summary
+
+```text
+R-1C-1  PASS
+R-1C-2  PASS
+R-1C-3  PASS_WITH_DECLARED_LIMITATION (attribute values deferred to Book 3B/4B)
+R-1C-4  PASS
+R-1C-5  PASS_WITH_DECLARED_LIMITATION (enum refinement family-populated)
+
+BLOC 1C REVIEW VERDICT: READY_FOR_OPERATOR_RATIFICATION
+Blocking items: NONE
+STATUS = READY_FOR_OPERATOR_RATIFICATION (NOT RATIFIED)
+```
