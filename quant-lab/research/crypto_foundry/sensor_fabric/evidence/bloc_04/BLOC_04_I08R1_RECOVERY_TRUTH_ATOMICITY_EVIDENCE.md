@@ -3,7 +3,8 @@
 **Checkpoint:** SENSOR-B4-I08R1 — recovery effect atomicity + frozen crash-matrix truth + lock-clear authority + run-identity seal
 **Branch:** agent/crypto-sensor-fabric-build
 **Starting SHA:** 00898d666fa4a595af02321e1eedbf543717a455
-**Ending SHA:** 8c2ec3f4 (this freeze commit; see commit chain below)
+**Ending SHA:** the final commit of the chain below (a documentation
+correction commit; the evidence-freeze commit itself is `ab15fd9d`)
 **Operator review state at freeze:** `PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED = OPERATOR_HOLD`; I08R1 is `PENDING_OPERATOR_REVIEW` (proposed, not self-ratified); the complete I07 chain remains `OPERATOR_ACCEPTED`; `DURABLE_RESUME_IMPLEMENTED = TRUE`; `next_checkpoint_authorized = FALSE`; I09 NOT started. Historical I08/I07 evidence untouched.
 
 ## -1. Commit chain (I08R1A-D, no squash)
@@ -11,7 +12,10 @@
 - `b83d65ef` SENSOR-B4-I08R1A: make recovery effects journal-first replayable and stream quarantine bytes
 - `906ae137` SENSOR-B4-I08R1B: rebuild frozen crash scenarios with true I06 I07 projection and manifest boundaries
 - `077494be` SENSOR-B4-I08R1C: seal explicit lock-clear authority generated run identity and typed job scanning
-- `8c2ec3f4` SENSOR-B4-I08R1D: freeze I08R1 evidence and reconcile ledger (this commit)
+- `ab15fd9d` SENSOR-B4-I08R1D: freeze I08R1 evidence and reconcile ledger
+- (final commit) docs correction: replace the pre-written predicted freeze
+  SHA in this MD with the actual freeze commit `ab15fd9d` (the freeze SHA
+  could not be known before committing; correction commit is the ending SHA)
 
 ## 0. Operator defects addressed (§0)
 
