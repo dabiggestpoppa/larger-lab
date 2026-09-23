@@ -22,7 +22,7 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from enum import Enum
-from typing import Literal
+from typing import Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -33,10 +33,38 @@ from .temporal import (
     Timestamp,
     UnknownBound,
     holds_at,
+    normalize_utc,
     utc_now,
 )
 
 _SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9_-]*$")
+
+
+def _require_aware(value: datetime, what: str) -> datetime:
+    """Reject naive lifecycle timestamps; normalize aware values to UTC.
+    Hardening R2: model_copy bypasses field validation, so public lifecycle
+    operations enforce timestamp hygiene explicitly (no silent local-time
+    assumptions)."""
+    try:
+        return normalize_utc(value)
+    except ValueError as exc:
+        raise ValueError(f"{what}: {exc}") from exc
+
+
+_M = TypeVar("_M", bound=BaseModel)
+
+
+def _replace_validated(model: _M, updates: dict[str, object]) -> _M:
+    """Hardening R2: validated state replacement.
+
+    ``model_copy(update=...)`` bypasses ALL validators, so a lifecycle
+    transition could mint states direct construction would reject (e.g.
+    IR-6 violations on close). This helper reconstructs through the full
+    validated model path instead: ``model_copy`` for the payload, then
+    ``model_validate`` so every model_validator runs on the result.
+    """
+    draft = model.model_copy(update=updates)
+    return type(model).model_validate(draft.model_dump())
 
 
 class ObjectType(str, Enum):
@@ -398,6 +426,9 @@ class IdentityRegistry:
     def __init__(self) -> None:
         self._objects: dict[str, CanonicalObject] = {}
         self._resolution_events: list[IdentityResolutionEvent] = []
+        # committed rebrand/closure instants per object (history ambiguity
+        # guard, hardening R2 — store-level metadata, not record mutation)
+        self._rebrand_instants: dict[str, tuple[datetime, ...]] = {}
 
     # -- minting ----------------------------------------------------------
 
@@ -580,36 +611,119 @@ class IdentityRegistry:
         new_name: str,
         new_tickers: tuple[TickerSymbol, ...] = (),
         *,
-        at: datetime | None = None,
+        at: datetime,
     ) -> CanonicalObject:
-        """Public rebrand operation (§8.1/plan §1A.7 rule 4): the identity is
-        immutable — a rebrand adds a new name/ticker window on the SAME
-        object_id and closes prior windows. Old windows are retained for
-        history; the object is never replaced."""
+        """Public rebrand operation (Constitution v0.2 §8.3, plan §1A.7 rule 4).
+
+        The identity is immutable: the SAME object_id keeps its referent. The
+        rebrand closes the prior name/ticker windows at ``at`` and adds the
+        old canonical_name to ``aliases`` as a HISTORICAL window (§8.3: "a
+        rebrand changes canonical_name and adds the old name to aliases").
+        History is retained, never destroyed; the object is never replaced.
+
+        Fail-closed (hardening R2): rejects naive timestamps, ``at`` before
+        the object's valid_from or an open ticker window's valid_from, same
+        name rebrands, and a second rebrand at an instant already used as a
+        rebrand/closure instant (ambiguous history).
+        """
+        at = _require_aware(at, "rebrand instant")
         obj = self.require(object_id)
-        if at is not None:
-            obj.ticker_symbols = tuple(
-                t if t.valid_to is not None else t.model_copy(update={"valid_to": at})
-                for t in obj.ticker_symbols
+        start = _bound_start(obj.valid_from)
+        if start is not None and at < start:
+            raise ValueError(
+                f"rebrand instant {at.isoformat()} precedes object valid_from "
+                f"{start.isoformat()} (IR-6): would create a window before the "
+                "object existed"
             )
+        if new_name == obj.canonical_name:
+            raise ValueError(
+                f"rebrand to the same canonical name {new_name!r} is not a "
+                "rebrand: it would mint a zero-length alias window"
+            )
+        for t in obj.ticker_symbols:
+            if t.valid_to is None:
+                t_start = _bound_start(t.valid_from)
+                if t_start is not None and at < t_start:
+                    raise ValueError(
+                        f"rebrand instant precedes open ticker window "
+                        f"{t.symbol!r} valid_from {t_start.isoformat()} (IR-6)"
+                    )
+        if any(
+            a.name == new_name and _bound_end(a.valid_to) is None
+            for a in obj.aliases
+        ):
+            raise ValueError(
+                f"{new_name!r} already exists as an open alias window; "
+                "contradictory name history (INV-1A-5)"
+            )
+        if at in self._rebrand_instants.get(object_id, ()):
+            raise ValueError(
+                f"a rebrand at {at.isoformat()} is already committed history "
+                "for this object: an ambiguous same-instant rebrand is "
+                "rejected (fail-closed)"
+            )
+        for t in new_tickers:
+            t_start = _bound_start(t.valid_from)
+            if t_start is None or t_start < at:
+                raise ValueError(
+                    f"new ticker {t.symbol!r} valid_from must be >= the "
+                    "rebrand instant (no silent backdating)"
+                )
+        # close prior windows and retain the old name as alias history (§8.3)
+        closed_tickers = tuple(
+            t if t.valid_to is not None else _replace_validated(t, {"valid_to": at})
+            for t in obj.ticker_symbols
+        )
+        old_alias = Alias(
+            name=obj.canonical_name,
+            valid_from=obj.valid_from,
+            valid_to=at,
+            name_state="HISTORICAL",
+        )
+        obj.aliases = obj.aliases + (old_alias,)
         obj.canonical_name = new_name
-        obj.ticker_symbols = obj.ticker_symbols + new_tickers
+        obj.ticker_symbols = closed_tickers + new_tickers
+        instants = self._rebrand_instants.setdefault(object_id, ())
+        self._rebrand_instants[object_id] = instants + (at,)
         return obj
 
-    def close_realization(self, asset_object_id: str, realization_id: str, at: datetime) -> RealizationIdentity:
+    def close_realization(
+        self, asset_object_id: str, realization_id: str, at: datetime
+    ) -> RealizationIdentity:
         """Public closure operation (INV-1A-10): sets status=CLOSED and
         valid_to=at on the named realization as a world-change. The closed
         realization remains in the graph, queryable forever; all other
-        realizations are untouched."""
+        realizations are untouched.
+
+        Fail-closed (hardening R2): model_copy skips validators, so the new
+        state is built through ``_replace_validated`` — full model
+        revalidation — and additionally rejects naive timestamps, closure
+        before valid_from (IR-6), and re-closure of an already-terminal
+        (CLOSED/MIGRATED) realization.
+        """
+        at = _require_aware(at, "closure instant")
         obj = self.require(asset_object_id)
         updated: list[RealizationIdentity] = []
         found = False
         for r in obj.realizations:
             if r.realization_id == realization_id:
                 found = True
+                if r.status in (RealizationStatus.CLOSED, RealizationStatus.MIGRATED):
+                    raise ValueError(
+                        f"realization {realization_id} is already "
+                        f"{r.status.value}: re-closure would contradict "
+                        "committed history (INV-1A-10)"
+                    )
+                start = _bound_start(r.valid_from)
+                if start is not None and at < start:
+                    raise ValueError(
+                        f"closure instant {at.isoformat()} precedes valid_from "
+                        f"{start.isoformat()} (IR-6)"
+                    )
                 updated.append(
-                    r.model_copy(
-                        update={"status": RealizationStatus.CLOSED, "valid_to": at}
+                    _replace_validated(
+                        r,
+                        {"status": RealizationStatus.CLOSED, "valid_to": at},
                     )
                 )
             else:
@@ -622,11 +736,28 @@ class IdentityRegistry:
         return next(r for r in obj.realizations if r.realization_id == realization_id)
 
     def deprecate(self, object_id: str, at: datetime | None = None) -> None:
-        """Lifecycle transition — never a deletion (INV-1A-4)."""
+        """Lifecycle transition — never a deletion (INV-1A-4).
+
+        Fail-closed (hardening R2): rejects naive timestamps, instants before
+        the object's valid_from (IR-6), and repeat deprecation (the valid_to
+        world-change is already committed history).
+        """
         obj = self.require(object_id)
-        obj.lifecycle_state = ObjectLifecycle.DEPRECATED
-        if at is not None and obj.valid_to is None:
+        if at is not None:
+            at = _require_aware(at, "deprecation instant")
+            if obj.valid_to is not None:
+                raise ValueError(
+                    f"{object_id} already carries valid_to: re-deprecation "
+                    "would contradict committed history (INV-1A-4)"
+                )
+            start = _bound_start(obj.valid_from)
+            if start is not None and at < start:
+                raise ValueError(
+                    f"deprecation instant {at.isoformat()} precedes valid_from "
+                    f"{start.isoformat()} (IR-6)"
+                )
             obj.valid_to = at
+        obj.lifecycle_state = ObjectLifecycle.DEPRECATED
 
     def mark_historical(self, object_id: str) -> None:
         obj = self.require(object_id)
