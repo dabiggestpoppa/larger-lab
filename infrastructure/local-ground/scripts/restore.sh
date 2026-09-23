@@ -211,6 +211,9 @@ if ! have_docker; then
 fi
 
 EV_DIR="${OCE_EVIDENCE_DIR:-}"
+# every evidence copy below is best-effort (`cp ... || true`) - but a missing
+# evidence directory would silently discard receipts, so create it up front
+[[ -n "$EV_DIR" ]] && mkdir -p "$EV_DIR"
 TS_FMT='%Y-%m-%dT%H:%M:%SZ'
 START_TS=$(date -u +"$TS_FMT")
 

@@ -206,8 +206,10 @@ def test_precreated_predictable_temporary_is_never_used(tmp_path):
     assert victim.read_text(encoding="utf-8") == '{"victim": true}'
     # the planted symlink is the test's own input, not engine residue: the
     # engine must have neither followed nor removed it
-    assert planted.is_symlink() and str(planted) in _residue(state)
-    engine_residue = [name for name in _residue(state) if name != planted.name]
+    assert planted.is_symlink()
+    assert "receipt.json.tmp" in _residue(state), _residue(state)
+    engine_residue = [name for name in _residue(state)
+                      if name != "receipt.json.tmp"]
     assert not engine_residue, engine_residue
 
 
