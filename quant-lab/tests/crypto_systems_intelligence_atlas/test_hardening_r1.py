@@ -6,7 +6,7 @@ fail first). Contract references: plan v0.3 §1A/§1D; INV-1A-9..11, INV-1D-1..5
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 
 import pytest
 
@@ -16,6 +16,7 @@ from crypto_systems_intelligence_atlas.identity import (
     ObjectType,
     RealizationIdentity,
     RealizationRoute,
+    RealizationStatus,
     RepresentationMechanism,
     mint_object_id,
 )
@@ -45,6 +46,7 @@ class TestRealizationLiveness:
         status,
         valid_from=datetime(2025, 1, 1, tzinfo=UTC),
         valid_to=OPEN,
+        migration_from=None,
     ) -> RealizationIdentity:
         return RealizationIdentity(
             realization_id="csia:stablecoin:x@csia:blockchain:ch:mk",
@@ -55,6 +57,7 @@ class TestRealizationLiveness:
             valid_from=valid_from,
             valid_to=valid_to,
             status=status,
+            migration_from=migration_from,
         )
 
     def test_1_active_no_valid_to_is_live(self):
@@ -80,10 +83,7 @@ class TestRealizationLiveness:
         r = self._real(
             RealizationStatus.MIGRATED,
             valid_to=self.T1,
-        ).model_copy(
-            update={
-                "migration_from": "csia:stablecoin:x@csia:blockchain:ch:old"
-            }
+            migration_from="csia:stablecoin:x@csia:blockchain:ch:old",
         )
         assert r.is_live(self.T0) is True
         assert r.is_live(self.T2) is False
@@ -226,8 +226,9 @@ class TestUnknownBoundValidation:
 
     def test_aware_bounds_normalized_to_utc(self):
         # +02:00 timezone normalizes to UTC
+        tz_plus2 = timezone(timedelta(hours=2))
         ub = UnknownBound(
-            earliest_bound=datetime(2020, 1, 1, 12, 0, tzinfo=timedelta(hours=2)),
+            earliest_bound=datetime(2020, 1, 1, 12, 0, tzinfo=tz_plus2),
         )
         assert ub.earliest_bound.utcoffset() == timedelta(0)
         assert ub.earliest_bound.hour == 10
@@ -356,7 +357,7 @@ class TestAcyclicInsertion:
 # ==========================================================================
 
 
-def _real(rid, chain, lineage_from=None, lineage_to=None, status="ACTIVE"):
+def _real(rid, canonical, chain, lineage_from=None, lineage_to=None, status="ACTIVE"):
     kwargs = {}
     if status in ("CLOSED", "MIGRATED"):
         kwargs["valid_to"] = NOW
@@ -365,7 +366,7 @@ def _real(rid, chain, lineage_from=None, lineage_to=None, status="ACTIVE"):
         kwargs["migration_to"] = lineage_to
     return RealizationIdentity(
         realization_id=rid,
-        canonical_asset_id="csia:stablecoin:usdc",
+        canonical_asset_id=canonical,
         chain_id=chain,
         local_asset_identifier="denom-" + rid[-4:],
         representation_mechanism=RepresentationMechanism.IBC,
@@ -381,7 +382,7 @@ class TestMigrationLineageEnforcement:
         usdc = make_token(registry, "usdc-lin", "USD Coin", otype=ObjectType.STABLECOIN)
         osmosis = registry.require(mint_object_id(ObjectType.BLOCKCHAIN, "osmosis"))
         rid = f"{usdc.object_id}@{osmosis.object_id}:self"
-        r = _real(rid, osmosis.object_id, lineage_to=rid, status="MIGRATED")
+        r = _real(rid, usdc.object_id, osmosis.object_id, lineage_to=rid, status="MIGRATED")
         with pytest.raises(ValueError, match="self-migration"):
             registry.attach_realization(usdc.object_id, r)
 
@@ -390,8 +391,8 @@ class TestMigrationLineageEnforcement:
         osmosis = registry.require(mint_object_id(ObjectType.BLOCKCHAIN, "osmosis"))
         a = f"{usdc.object_id}@{osmosis.object_id}:a"
         b = f"{usdc.object_id}@{osmosis.object_id}:b"
-        ra = _real(a, osmosis.object_id, lineage_to=b, status="MIGRATED")
-        rb = _real(b, osmosis.object_id, lineage_to=a, status="MIGRATED")
+        ra = _real(a, usdc.object_id, osmosis.object_id, lineage_to=b, status="MIGRATED")
+        rb = _real(b, usdc.object_id, osmosis.object_id, lineage_to=a, status="MIGRATED")
         registry.attach_realization(usdc.object_id, ra)
         with pytest.raises(ValueError, match="cycle"):
             registry.attach_realization(usdc.object_id, rb)
@@ -402,10 +403,10 @@ class TestMigrationLineageEnforcement:
         a = f"{usdc.object_id}@{osmosis.object_id}:a"
         b = f"{usdc.object_id}@{osmosis.object_id}:b"
         c = f"{usdc.object_id}@{osmosis.object_id}:c"
-        registry.attach_realization(usdc.object_id, _real(a, osmosis.object_id, lineage_to=b, status="MIGRATED"))
-        registry.attach_realization(usdc.object_id, _real(b, osmosis.object_id, lineage_to=c, status="MIGRATED"))
+        registry.attach_realization(usdc.object_id, _real(a, usdc.object_id, osmosis.object_id, lineage_to=b, status="MIGRATED"))
+        registry.attach_realization(usdc.object_id, _real(b, usdc.object_id, osmosis.object_id, lineage_to=c, status="MIGRATED"))
         with pytest.raises(ValueError, match="cycle"):
-            registry.attach_realization(usdc.object_id, _real(c, osmosis.object_id, lineage_to=a, status="MIGRATED"))
+            registry.attach_realization(usdc.object_id, _real(c, usdc.object_id, osmosis.object_id, lineage_to=a, status="MIGRATED"))
 
     def test_valid_chain_accepted(self, registry):
         usdc = make_token(registry, "usdc-chain", "USD Coin", otype=ObjectType.STABLECOIN)
@@ -413,9 +414,9 @@ class TestMigrationLineageEnforcement:
         a = f"{usdc.object_id}@{osmosis.object_id}:a"
         b = f"{usdc.object_id}@{osmosis.object_id}:b"
         c = f"{usdc.object_id}@{osmosis.object_id}:c"
-        registry.attach_realization(usdc.object_id, _real(a, osmosis.object_id, lineage_to=b, status="MIGRATED"))
-        registry.attach_realization(usdc.object_id, _real(b, osmosis.object_id, lineage_to=c, status="MIGRATED"))
-        registry.attach_realization(usdc.object_id, _real(c, osmosis.object_id, status="ACTIVE"))
+        registry.attach_realization(usdc.object_id, _real(a, usdc.object_id, osmosis.object_id, lineage_to=b, status="MIGRATED"))
+        registry.attach_realization(usdc.object_id, _real(b, usdc.object_id, osmosis.object_id, lineage_to=c, status="MIGRATED"))
+        registry.attach_realization(usdc.object_id, _real(c, usdc.object_id, osmosis.object_id, status="ACTIVE"))
         assert len(registry.get(usdc.object_id).realizations) == 3  # history kept
 
     def test_incoherent_pair_rejected(self, registry):
@@ -425,10 +426,11 @@ class TestMigrationLineageEnforcement:
         a = f"{usdc.object_id}@{osmosis.object_id}:a"
         b = f"{usdc.object_id}@{osmosis.object_id}:b"
         c = f"{usdc.object_id}@{osmosis.object_id}:c"
-        registry.attach_realization(usdc.object_id, _real(a, osmosis.object_id, lineage_to=b, status="MIGRATED"))
+        registry.attach_realization(usdc.object_id, _real(a, usdc.object_id, osmosis.object_id, lineage_to=b, status="MIGRATED"))
         with pytest.raises(ValueError, match="coherent"):
             registry.attach_realization(
-                usdc.object_id, _real(b, osmosis.object_id, lineage_from=c, status="MIGRATED")
+                usdc.object_id,
+                _real(b, usdc.object_id, osmosis.object_id, lineage_from=c, status="MIGRATED"),
             )
 
 

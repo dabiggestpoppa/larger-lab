@@ -129,13 +129,17 @@ def test_fork_creates_distinct_identity(registry):
 
 
 def test_forked_from_cycle_invalid(registry):
-    """IR-3: FORKED_FROM must be acyclic."""
+    """IR-3: FORKED_FROM must be acyclic — enforced at INSERTION (hardening
+    R1: fail-closed, the cycle never becomes graph state)."""
     validator = GraphValidator(registry)
     a = registry.require(mint_object_id(ObjectType.BLOCKCHAIN, "bitcoin"))
     b = registry.require(mint_object_id(ObjectType.BLOCKCHAIN, "ethereum"))
     validator.add_edge(_edge("f1", EdgeType.FORKED_FROM, a.object_id, b.object_id))
-    validator.add_edge(_edge("f2", EdgeType.FORKED_FROM, b.object_id, a.object_id))
-    assert not validator.validate_acyclic(EdgeType.FORKED_FROM)
+    with pytest.raises(ValueError, match="cycle"):
+        validator.add_edge(_edge("f2", EdgeType.FORKED_FROM, b.object_id, a.object_id))
+    # graph intact: only f1 present, audit method confirms DAG
+    assert set(validator.edges) == {"f1"}
+    assert validator.validate_acyclic(EdgeType.FORKED_FROM)
 
 
 # --------------------------------------------------------------------------
@@ -194,7 +198,9 @@ def test_migrated_realization_requires_lineage():
 
 
 def test_migration_lineage_cycle_invalid(registry):
-    """INV-1A-11: lineage cycles are invalid (validator-level check)."""
+    """INV-1A-11: lineage cycles are rejected by the KERNEL at attach time
+    (hardening R1: enforcement lives in production, not in test-local
+    pointer-chasing)."""
     usdc = make_token(registry, "usdc-cyc", "USD Coin", otype=ObjectType.STABLECOIN)
     osmosis = registry.require(mint_object_id(ObjectType.BLOCKCHAIN, "osmosis"))
     a = f"{usdc.object_id}@{osmosis.object_id}:a"
@@ -222,19 +228,10 @@ def test_migration_lineage_cycle_invalid(registry):
         valid_to=NOW,
     )
     registry.attach_realization(usdc.object_id, ra)
-    registry.attach_realization(usdc.object_id, rb)
-    lineage = {r.realization_id: r.migration_to for r in registry.get(usdc.object_id).realizations}
-    # detect cycle via pointer chase
-    seen, node = set(), a
-    while node in lineage and lineage[node]:
-        if node in seen:
-            cycle = True
-            break
-        seen.add(node)
-        node = lineage[node]
-    else:
-        cycle = False
-    assert cycle
+    with pytest.raises(ValueError, match="cycle"):
+        registry.attach_realization(usdc.object_id, rb)  # kernel rejects
+    # graph intact: only the first realization was attached
+    assert len(registry.get(usdc.object_id).realizations) == 1
 
 
 # --------------------------------------------------------------------------
@@ -355,10 +352,12 @@ def test_unknown_bounded_valid_time_never_fabricated():
     )
     assert isinstance(rec.valid_from, UnknownBound)
     assert rec.valid_from.kind == "UNKNOWN"
-    # as-of inside the bounds is undecidable — explicit, not False
+    # as-of inside the start bounds is UNDECIDABLE (hardening R1 Finding B:
+    # never fabricate certainty — 2020-03-01 may precede the actual start)
     from crypto_systems_intelligence_atlas.temporal import holds_at
 
-    assert holds_at(rec.valid_from, rec.valid_to, datetime(2020, 3, 1, tzinfo=UTC)) is True
+    assert holds_at(rec.valid_from, rec.valid_to, datetime(2020, 3, 1, tzinfo=UTC)) is None
+    assert holds_at(rec.valid_from, rec.valid_to, datetime(2020, 6, 1, tzinfo=UTC)) is True
     # inside a valid_from UNKNOWN bound the as-of answer is undecidable
     rec2 = TemporalRecord(
         observed_at=NOW,

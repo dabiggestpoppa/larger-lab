@@ -348,7 +348,12 @@ _SELF_EDGE_PERMITTED: frozenset[EdgeType] = frozenset({EdgeType.WRAPS})
 
 class GraphValidator:
     """Validates edges against the dictionary + graph-level rules over an
-    :class:`IdentityRegistry` (so domain/range checks resolve real classes)."""
+    :class:`IdentityRegistry` (so domain/range checks resolve real classes).
+
+    Acyclic edge families (EdgeSpec.acyclic: FORKED_FROM, SETTLES_TO) are
+    fail-closed: an edge whose insertion would create a cycle is rejected
+    BEFORE it can become graph state (IR-3/IR-4 enforced at write time).
+    """
 
     def __init__(self, registry) -> None:  # IdentityRegistry — avoids import cycle
         self._registry = registry
@@ -367,8 +372,35 @@ class GraphValidator:
             )
         if edge.subject_id == edge.object_id and edge.edge_type not in _SELF_EDGE_PERMITTED:
             raise ValueError(f"self-edge {edge.edge_type.value} invalid (IR-5)")
+        if spec.acyclic and self._creates_cycle(
+            edge.edge_type, edge.subject_id, edge.object_id
+        ):
+            raise ValueError(
+                f"inserting {edge.edge_type.value} {edge.subject_id} -> "
+                f"{edge.object_id} would create a cycle; acyclic edge families "
+                "are fail-closed (IR-3/IR-4)"
+            )
         self._edges[edge.edge_id] = edge
         return edge
+
+    def _creates_cycle(self, edge_type: EdgeType, subject: str, obj: str) -> bool:
+        """Would adding subject -> obj introduce a cycle in this edge family?
+        A cycle exists iff obj can already reach subject via existing edges."""
+        adj: dict[str, list[str]] = {}
+        for e in self._edges.values():
+            if e.edge_type is edge_type:
+                adj.setdefault(e.subject_id, []).append(e.object_id)
+        # BFS from obj looking for subject
+        queue, seen = [obj], {obj}
+        while queue:
+            node = queue.pop()
+            if node == subject:
+                return True
+            for nxt in adj.get(node, ()):
+                if nxt not in seen:
+                    seen.add(nxt)
+                    queue.append(nxt)
+        return False
 
     def edge(self, edge_id: str) -> TypedEdge:
         return self._edges[edge_id]
@@ -378,8 +410,9 @@ class GraphValidator:
         return dict(self._edges)
 
     def validate_acyclic(self, edge_type: EdgeType) -> bool:
-        """IR-3: acyclic-declared edge families (FORKED_FROM, SETTLES_TO) must
-        form DAGs."""
+        """Audit method (kept per hardening R1): full-graph DFS check that an
+        acyclic-declared family currently forms a DAG. Insertion-time
+        enforcement (add_edge) is the primary guarantee."""
         spec = edge_spec(edge_type)
         if not spec.acyclic:
             return True

@@ -32,6 +32,7 @@ from .temporal import (
     RealizationStatus,
     Timestamp,
     UnknownBound,
+    holds_at,
     utc_now,
 )
 
@@ -291,16 +292,17 @@ class RealizationIdentity(BaseModel):
                 )
         return self
 
-    def is_live(self, at: datetime) -> bool:
-        """True when this realization held at valid-time ``at`` (R6 as-of)."""
-        if self.status is RealizationStatus.CLOSED or self.valid_to is None:
-            ended: bool = False
-        else:
-            end = _bound_end(self.valid_to)
-            ended = end is not None and end <= at
-        start = _bound_start(self.valid_from)
-        began = start is None or start <= at
-        return began and not ended
+    def is_live(self, at: datetime) -> bool | None:
+        """Liveness at valid-time ``at`` (R6 as-of, R9-aware).
+
+        Liveness is determined by VALID TIME, never by lifecycle status —
+        a CLOSED realization with valid_to = T1 was live at every T < T1
+        (closure is a world-change recorded at T1, not a retroactive erasure).
+
+        Returns True (live), False (not live), or None (undecidable when an
+        UNKNOWN bound covers ``at``) — mirroring :func:`holds_at`.
+        """
+        return holds_at(self.valid_from, self.valid_to, at)
 
 
 class IdentityResolutionEvent(BaseModel):
@@ -455,8 +457,9 @@ class IdentityRegistry:
     def attach_realization(self, object_id: str, realization: RealizationIdentity) -> None:
         """Attach a realization to its canonical asset object.
 
-        Enforces INV-1A-9: the target must be an asset-class object (never a
-        REALIZATION — no chains of realizations; multi-hop lives in route).
+        Enforces INV-1A-9 (asset-class target; no realization chains) and
+        INV-1A-11 (migration lineage: no self-migration, no cycles, coherent
+        lineage pointers) at write time — fail-closed, not test-side.
         """
         obj = self.require(object_id)
         if obj.object_type is ObjectType.REALIZATION:
@@ -474,7 +477,90 @@ class IdentityRegistry:
                 "realization.canonical_asset_id must reference the attaching object"
             )
         self._require_chain_object(realization.chain_id)
+        self._validate_migration_lineage(realization, obj)
         obj.realizations = obj.realizations + (realization,)
+
+    def _validate_migration_lineage(
+        self, realization: RealizationIdentity, obj: CanonicalObject
+    ) -> None:
+        """INV-1A-11 fail-closed enforcement over ALL realizations of this
+        canonical asset (existing + the one being attached)."""
+        rid = realization.realization_id
+        if realization.migration_from == rid:
+            raise ValueError(
+                f"self-migration invalid: {rid} declares migration_from itself "
+                "(INV-1A-11)"
+            )
+        if realization.migration_to == rid:
+            raise ValueError(
+                f"self-migration invalid: {rid} declares migration_to itself "
+                "(INV-1A-11)"
+            )
+        # build lineage graph over existing siblings + the candidate
+        lineage: dict[str, str | None] = {
+            r.realization_id: r.migration_to for r in obj.realizations
+        }
+        for r in obj.realizations:
+            if r.realization_id == rid:
+                raise ValueError(
+                    f"realization {rid} already attached (minted once)"
+                )
+        if realization.migration_from is not None:
+            lineage[realization.migration_from] = rid
+        if realization.migration_to is not None:
+            lineage[rid] = realization.migration_to
+        elif rid not in lineage:
+            lineage[rid] = None
+        # incoherence: X declares migration_to=Y but Y declares migration_from=Z
+        # (checked over existing siblings AND the incoming realization, incl.
+        # lineage the candidate introduces toward already-attached targets)
+        known: dict[str, RealizationIdentity] = {
+            r.realization_id: r for r in obj.realizations
+        }
+        if rid not in known and (
+            realization.migration_from or realization.migration_to
+        ):
+            known[rid] = realization
+        for x_id, x in known.items():
+            if x.migration_to is None:
+                continue
+            target = known.get(x.migration_to)
+            if target is not None and (
+                target.migration_from is not None
+                and target.migration_from != x_id
+            ):
+                raise ValueError(
+                    f"incoherent lineage: {x_id} -> {x.migration_to}, but the "
+                    f"target declares migration_from={target.migration_from} "
+                    "(INV-1A-11)"
+                )
+            # also: target with migration_from but the declared predecessor
+            # never points at it
+            if target is None and x.migration_to is not None:
+                for other_id, other in known.items():
+                    if (
+                        other.migration_from == x.migration_to
+                        and other_id != x_id
+                    ):
+                        raise ValueError(
+                            f"incoherent lineage: {x_id} declares "
+                            f"migration_to={x.migration_to}, but "
+                            f"{other_id} also declares that id as its own "
+                            "migration_from source (INV-1A-11)"
+                        )
+        # cycle detection over the lineage graph
+        for start in list(lineage):
+            seen: set[str] = set()
+            node: str | None = start
+            while node is not None and node in lineage:
+                if node in seen:
+                    raise ValueError(
+                        f"migration lineage cycle detected at {node} starting "
+                        f"from {start} (INV-1A-11: lineage must be acyclic)"
+                    )
+                seen.add(node)
+                node = lineage[node]
+
 
     def _require_chain_object(self, chain_id: str) -> None:
         chain = self._objects.get(chain_id)

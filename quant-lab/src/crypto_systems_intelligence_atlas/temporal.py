@@ -35,6 +35,15 @@ class UnknownBound(BaseModel):
     Queries must treat UNKNOWN bounds explicitly — never as ``null`` and never
     as ``open``. Carries bounded uncertainty plus an optional evidence pointer
     for the confidence claim.
+
+    Construction invariants (fail-closed):
+
+    - naive (timezone-less) bounds are rejected;
+    - aware bounds are normalized to UTC;
+    - ``earliest_bound <= latest_bound`` whenever both are present.
+
+    Allowed explicit states: both bounds, earliest only, latest only, both
+    absent. UNKNOWN never converts to OPEN and never fabricates a date.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -43,6 +52,30 @@ class UnknownBound(BaseModel):
     earliest_bound: datetime | None = None
     latest_bound: datetime | None = None
     confidence_ref: str | None = None  # evidence pointer for the confidence claim
+
+    def model_post_init(self, __context: object) -> None:
+        earliest = self.earliest_bound
+        latest = self.latest_bound
+        if earliest is not None:
+            if earliest.tzinfo is None:
+                raise ValueError(
+                    "UnknownBound.earliest_bound must be timezone-aware "
+                    "(no naive datetimes)"
+                )
+            object.__setattr__(self, "earliest_bound", normalize_utc(earliest))
+            earliest = self.earliest_bound
+        if latest is not None:
+            if latest.tzinfo is None:
+                raise ValueError(
+                    "UnknownBound.latest_bound must be timezone-aware "
+                    "(no naive datetimes)"
+                )
+            object.__setattr__(self, "latest_bound", normalize_utc(latest))
+            latest = self.latest_bound
+        if earliest is not None and latest is not None and earliest > latest:
+            raise ValueError(
+                "UnknownBound invariant violated: earliest_bound > latest_bound"
+            )
 
     def __str__(self) -> str:  # pragma: no cover - display only
         return (
@@ -182,33 +215,76 @@ def holds_at(
     valid_to: Timestamp | UnknownBound | None,
     at: datetime,
 ) -> bool | None:
-    """R6 as-of predicate.
+    """R6 as-of predicate with explicit UNKNOWN-bound semantics (R9).
 
-    Returns True/False where decidable; ``None`` where UNKNOWN bounds make the
-    answer undecidable at ``at`` (R9: queries see the uncertainty explicitly).
+    Truth table (no fabricated certainty):
+
+    ============  ===========  ==========================================
+    start         end          semantics
+    ============  ===========  ==========================================
+    KNOWN         KNOWN        normal interval logic (start inclusive)
+    KNOWN         OPEN         True at/after start, False before
+    KNOWN         UNKNOWN      False before start; None inside end
+                               uncertainty; False after latest end bound
+    UNKNOWN       OPEN         False before earliest start bound; None
+                               within [earliest, latest) start bounds;
+                               True at/after latest start bound
+    UNKNOWN       UNKNOWN      False before earliest start; None while
+                               start OR end uncertain; False after
+                               latest end bound
+    ============  ===========  ==========================================
+
+    Returns True/False where decidable; ``None`` where UNKNOWN bounds make
+    the answer undecidable at ``at`` (R9: queries see the uncertainty
+    explicitly — never a silently-fabricated True).
     """
-    start = known_start(valid_from)
-    if start is not None and start > at:
-        return False
+    # -- resolve start ------------------------------------------------------
     if isinstance(valid_from, UnknownBound):
         earliest = valid_from.earliest_bound
+        latest_start = valid_from.latest_bound
         if earliest is not None and earliest > at:
+            return False  # start certainly has not occurred yet
+        if latest_start is None:
+            start_known = False  # no upper certainty bound: may or may not have begun
+            start_decided = None
+        elif latest_start <= at:
+            start_decided = True  # start has necessarily occurred by at
+            start_known = True
+        else:
+            return None  # earliest <= at < latest: start uncertain
+    else:
+        if valid_from > at:
             return False
+        start_decided = True
+        start_known = True
+
+    # -- resolve end --------------------------------------------------------
     if valid_to is None:
-        return True
+        return True if start_decided else None
     if isinstance(valid_to, UnknownBound):
-        latest = valid_to.latest_bound
-        if latest is not None and latest < at:
-            return False
-        return None  # bounded uncertainty covers `at` — undecidable
-    end = valid_to
-    return end > at
+        latest_end = valid_to.latest_bound
+        if latest_end is not None and latest_end <= at:
+            return False  # ended certainly before at
+        earliest_end = valid_to.earliest_bound
+        if earliest_end is not None and earliest_end > at:
+            # end certainly has not occurred yet — start decision stands
+            return True if start_decided else None
+        # end is uncertain at `at`: the fact may still hold or may have ended
+        # inside the UNKNOWN window — undecidable regardless of start state.
+        return None
+    # KNOWN end
+    if valid_to <= at:
+        return False
+    return True if start_decided else None
 
 
 class RecordStore:
     """Append-only record store implementing R4/R5/R7/RC-1..RC-4 semantics.
 
     - ``add`` only; no delete or in-place mutation path exists (INV-1D-1);
+    - records are STRICTLY immutable once committed — supersession metadata
+      lives in store-level envelopes, never as in-place edits of a committed
+      record (INV-1D-1: "no record is ever deleted or mutated in place");
     - corrections are *new records* with ``supersedes`` pointers;
     - ``current()`` = transaction-time filter R5;
     - ``as_known()`` = R7; ``as_of()`` filters valid time via :func:`holds_at`;
@@ -217,6 +293,7 @@ class RecordStore:
 
     def __init__(self, schema_version: str = "book1-v0.3") -> None:
         self._records: dict[str, TemporalRecord] = {}
+        self._superseded_at: dict[str, datetime] = {}  # store-level txn metadata
         self._schema_version = schema_version
 
     @property
@@ -234,34 +311,46 @@ class RecordStore:
         self._records[record_id] = record
 
     def get(self, record_id: str) -> TemporalRecord:
-        return self._records[record_id]  # R4: every record stays queryable forever
+        """Return the record (R4: queryable forever). ``superseded_at`` is
+        overlaid from store metadata WITHOUT mutating the committed object."""
+        record = self._records[record_id]
+        ts = self._superseded_at.get(record_id)
+        if ts is None or record.superseded_at == ts:
+            return record
+        return record.model_copy(update={"superseded_at": ts})
+
+    def superseded_at(self, record_id: str) -> datetime | None:
+        """Transaction-time supersession metadata for a record."""
+        return self._superseded_at.get(record_id, self._records[record_id].superseded_at)
 
     def all_records(self) -> dict[str, TemporalRecord]:
-        return dict(self._records)
+        return {rid: self.get(rid) for rid in self._records}
 
     def supersede(self, old_id: str, new_id: str, new_record: TemporalRecord) -> None:
         """Record-level supersession: new record replaces the old *about the
-        same claim*; chain preserved, nothing rewritten."""
+        same claim*. The old record object is NEVER mutated — the supersession
+        timestamp is recorded in store-level metadata (INV-1D-1)."""
         if old_id not in self._records:
             raise KeyError(f"unknown record {old_id}")
         if new_record.supersedes != old_id:
             raise ValueError("new_record.supersedes must reference the superseded id")
         self.add(new_id, new_record)
-        old = self._records[old_id]
-        if old.superseded_at is None:
-            old.superseded_at = new_record.observed_at
+        self._superseded_at[old_id] = new_record.observed_at
 
     def current(self) -> list[tuple[str, TemporalRecord]]:
-        """R5: current view = records with superseded_at = None."""
+        """R5: current view = records not superseded (metadata view)."""
         return [
-            (rid, r) for rid, r in self._records.items() if r.superseded_at is None
+            (rid, self.get(rid))
+            for rid in self._records
+            if rid not in self._superseded_at
         ]
 
     def as_known(self, at: datetime) -> list[tuple[str, TemporalRecord]]:
         """R7: as-known view at transaction time ``at``."""
         at = normalize_utc(at)
         out: list[tuple[str, TemporalRecord]] = []
-        for rid, r in self._records.items():
+        for rid in self._records:
+            r = self.get(rid)
             if r.observed_at <= at and (
                 r.superseded_at is None or r.superseded_at > at
             ):
