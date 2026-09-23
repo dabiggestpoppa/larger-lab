@@ -45,10 +45,17 @@ def _pg_truth():
 
 
 def _artifact_volume_sha():
+    """Volume identity with the artifact service STOPPED: MinIO writes its own
+    format metadata into /data on startup, so a running-service hash describes
+    MinIO bookkeeping, not restored truth. This mirrors restore.sh's own
+    identity procedure (artifact_volume_sha_stopped)."""
+    oc.run(["docker", "stop", oc.ARTIFACT], check=False, timeout=120)
     r = oc.run(["docker", "run", "--rm", "-v", f"{ARTIFACT_VOLUME}:/data",
                 "postgres:16.2-alpine", "sh", "-c",
                 "cd /data 2>/dev/null || exit 0; "
                 "find . -type f -exec sha256sum {} + 2>/dev/null"])
+    oc.run(["docker", "start", oc.ARTIFACT], check=False, timeout=120)
+    oc.wait_healthy(oc.ARTIFACT)
     lines = sorted(line for line in r.stdout.splitlines() if line.strip())
     return _sha("\n".join(lines))
 
@@ -95,7 +102,10 @@ def _evidence(tmp_path, name):
 
 def _docker_shim(tmp_path, injection):
     """A PATH-first `docker` that delegates to the real one, except for the
-    single injected fault this test is about."""
+    single injected fault this test is about. The injection fires EXACTLY ONCE:
+    restore.sh's own rollback path legitimately repeats the same docker shapes
+    (and must NOT be sabotaged by the test's fault), so after the first hit the
+    shim marks its state file and becomes a pure pass-through."""
     real = shutil.which("docker")
     assert real, "the container marker should have skipped without Docker"
     shim = tmp_path / "shim"
@@ -105,14 +115,16 @@ def _docker_shim(tmp_path, injection):
         "#!/usr/bin/env bash\n"
         "set -uo pipefail\n"
         f"REAL='{real}'\n"
+        f"STATE='{shim / 'injection-spent'}'\n"
+        "if [[ -e \"$STATE\" ]]; then exec \"$REAL\" \"$@\"; fi\n"
         "if [[ \"${1:-}\" == \"cp\" && \"${3:-}\" == *\"oce-local-artifact:/data/\"* ]]; then\n"
         "  case \"" + injection + "\" in\n"
         "    artifact-copy-fail)\n"
         "      # the wipe has already run: the live volume is empty and the\n"
         "      # snapshot is the only way back\n"
-        "      echo 'shim: injected artifact copy failure' >&2; exit 1 ;;\n"
+        "      touch \"$STATE\"; echo 'shim: injected artifact copy failure' >&2; exit 1 ;;\n"
         "    artifact-extra-file)\n"
-        "      \"$REAL\" \"$@\" || exit $?\n"
+        "      touch \"$STATE\"; \"$REAL\" \"$@\" || exit $?\n"
         "      \"$REAL\" run --rm -v oce_local_artifact_data:/data \\\n"
         "        postgres:16.2-alpine sh -c 'echo injected > /data/injected.txt'\n"
         "      exit 0 ;;\n"
@@ -280,18 +292,19 @@ def test_interrupted_full_replace_commits_nothing(oce_stack, tmp_path):
     oc.assert_stack_converged(timeout_s=180, stable=2)
     bk = _seed_and_backup(tmp_path)
     pg_before, art_before = _pg_truth(), _artifact_volume_sha()
+    evidence = tmp_path / "evidence"
     proc = subprocess.Popen(
         ["bash", str(oc.SCRIPTS / "restore.sh"), "--mode", "full-replace",
          "--from", str(bk), "--confirm-local-target", oc.PG_DB],
-        env=dict(os.environ, **oc.TEST_SECRETS, **{
-            "OCE_RUNTIME_TARGET": "local",
-            "OCE_EVIDENCE_DIR": str(tmp_path / "evidence")}),
+        env=dict(os.environ, **oc.TEST_SECRETS, **_env(tmp_path, evidence)),
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    # interrupt only once the promotion is durable (the quarantine is held)
+    # interrupt only once the promotion is durable (the quarantine is held):
+    # this run's own promote receipt reaches ITS evidence dir right after the
+    # promote phase exits
     deadline = time.time() + 240
     promoted = False
     while time.time() < deadline and proc.poll() is None:
-        if list((VAR / "recovery" / "ops").glob("*/promote-receipt.json")):
+        if (evidence / "promote-receipt.json").is_file():
             promoted = True
             break
         time.sleep(1)

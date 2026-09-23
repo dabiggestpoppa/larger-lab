@@ -810,6 +810,24 @@ def _validated_transition_receipt(path, db, user, container, inventory_path,
     return promote, stamp, quarantine, staging, operation_id
 
 
+def _floor_from_record(operation_id):
+    """The durably recorded pre-promotion floor for this operation (B4-CXR7U9R39X).
+    A transition process verifies the restored ORIGINAL against what the
+    original WAS, never against the backup's description of it. A record
+    without a floor predates the floor law and yields None (the fallback
+    verification stays backup-based and loud, as before)."""
+    try:
+        record = _load_transition_record(operation_id)
+    except Exception:
+        return None
+    floor = record.get("rollback_floor")
+    if not isinstance(floor, dict) or not floor.get("tables"):
+        return None
+    if not isinstance(floor.get("rows"), dict):
+        return None
+    return floor
+
+
 def _approved_roots() -> list:
     """Approved roots for artifact inputs (B4-CXR7U9R12/U9X2).
 
@@ -915,7 +933,51 @@ def _verify_db(container, db, user, inventory, probe):
     return ok, problems, rows, fps
 
 
-def rollback_recovery(container, user, db, quarantine, inventory, probe):
+def _capture_floor(container, db, user, inventory, probe):
+    """ROLLBACK FLOOR (B4-CXR7U9R39X): capture the pre-promotion canonical
+    truth as IT is, not as the backup describes it. A full replace exists
+    precisely because the live database may legitimately differ from the
+    backup (probe tables absent, newer rows, drifted values) - so a rollback
+    verified against the BACKUP's inventory would fail on a correctly restored
+    original. The floor is a small in-memory spec (row counts + fingerprints
+    of exactly the tables the backup verifies) captured BEFORE any durable
+    mutation, and never claims the original matched the backup."""
+    watch = sorted(set(capture_inventory_rows(inventory)) | set(probe))
+    if not watch:
+        return None
+    rows = collect_observed_rows(container, db, user, watch)
+    fps = collect_observed_fingerprints(container, db, user, watch)
+    return {"tables": watch, "rows": rows, "fingerprints": fps}
+
+
+def _verify_against_floor(container, db, user, floor):
+    """Verify one database against a captured floor: every watched table must
+    exist with the floor's exact row count and content fingerprint. Returns
+    (ok, problems, detail) in the same shape as rollback_recovery's detail."""
+    rows = collect_observed_rows(container, db, user, floor["tables"])
+    fps = collect_observed_fingerprints(container, db, user, floor["tables"])
+    problems = []
+    for name in floor["tables"]:
+        expected = floor["rows"].get(name)
+        got = rows.get(name)
+        if got == -1 or got is None:
+            problems.append(f"table {name} unreadable after rollback (got {got})")
+        elif expected is not None and got != expected:
+            problems.append(f"row count mismatch {name}: expected {expected} got {got}")
+        expected_fp = (floor["fingerprints"] or {}).get(name)
+        got_fp = (fps or {}).get(name)
+        if got_fp == "-err-" or got_fp is None:
+            problems.append(f"missing fingerprint for {name}")
+        elif expected_fp is not None and got_fp != expected_fp:
+            problems.append(f"value fingerprint mismatch {name}")
+    detail = {"rollback_verification": {"result": "ok" if not problems else "failed",
+                                        "tables": rows, "floor_verified": True}}
+    if fps is not None:
+        detail["rollback_verification"]["fingerprints"] = fps
+    return not problems, problems, detail
+
+
+def rollback_recovery(container, user, db, quarantine, inventory, probe, floor=None):
     """Restore the pre-promotion canonical truth from quarantine and verify it.
     Returns (ok, problems, detail). Never raises for reportable rollback
     outcomes; a rollback that cannot restore the original returns ok=False."""
@@ -943,11 +1005,20 @@ def rollback_recovery(container, user, db, quarantine, inventory, probe):
             detail["promoted_candidate_removed"] = True
         rename_db(container, user, quarantine, db)
         detail["original_canonical_restored"] = True
-        ok, vprobs, rows, fps = _verify_db(container, db, user, inventory, probe)
-        detail["rollback_verification"] = {"result": "ok" if ok else "failed"}
-        if fps is not None:
-            detail["rollback_verification"]["fingerprints"] = fps
-        detail["rollback_verification"]["tables"] = rows
+        # A rollback proves the ORIGINAL was restored, never that the original
+        # equals the backup: verification compares against the pre-promotion
+        # floor when one was captured, and only falls back to the backup's
+        # inventory when no floor exists (an unverified rollback then stays
+        # loud, as before).
+        if floor is not None:
+            ok, vprobs, vdetail = _verify_against_floor(container, db, user, floor)
+        else:
+            ok, vprobs, rows, fps = _verify_db(container, db, user, inventory, probe)
+            vdetail = {"rollback_verification": {"result": "ok" if ok else "failed"}}
+            if fps is not None:
+                vdetail["rollback_verification"]["fingerprints"] = fps
+            vdetail["rollback_verification"]["tables"] = rows
+        detail.update(vdetail)
         if not ok:
             problems.extend(vprobs)
             detail["rollback_failed"] = True
@@ -1013,6 +1084,13 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
                                "the admitted source (SHA mismatch)")
         receipt["archive_validated"] = True
         receipt["phases"].append("archive_validated")
+        # ROLLBACK FLOOR: captured now - after the archive is admitted (so a
+        # hostile-artifact refusal still makes ZERO container calls, R7) and
+        # before ANY durable mutation - so a rollback verifies the restored
+        # ORIGINAL against what the original was, not against the backup (a
+        # full replace exists because they can differ).
+        floor = _capture_floor(container, db, user, inventory, probe)
+        receipt["rollback_floor_captured"] = floor is not None
         # postgres version
         ver = psql(container, db, user, "SHOW server_version;")
         receipt["postgres_version"] = (ver.stdout.decode(errors="replace").strip()
@@ -1069,16 +1147,21 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         receipt["exit_status"] = 0
         receipt["redis_restored"] = False
         # PROMOTED is the state that still offers transition authority; hold the
-        # record's digest and identity to this exact receipt.
-        _record_transition(operation_id, TRANSITION_STATE_PROMOTED, receipt)
+        # record's digest and identity to this exact receipt. The pre-promotion
+        # floor is durably part of the record: the later finalize/rollback
+        # processes verify the restored original against THIS, in their own
+        # process, without trusting the backup to describe the original.
+        _record_transition(operation_id, TRANSITION_STATE_PROMOTED, receipt,
+                           extra={"rollback_floor": floor})
         return receipt
     except Exception as e:
         receipt["error"] = str(e)
         if quarantined:
             # Failure after canonical->quarantine began: ROLL BACK now. The
-            # rollback source (quarantine) is still present by construction.
+            # rollback source (quarantine) is still present by construction,
+            # and the pre-promotion floor defines what "restored" means.
             ok_rb, rb_problems, rb_detail = rollback_recovery(
-                container, user, db, quarantine, inventory, probe)
+                container, user, db, quarantine, inventory, probe, floor=floor)
             receipt["rollback_required"] = True
             receipt.update(rb_detail)
             if not ok_rb:
@@ -1117,6 +1200,7 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
         # Consume this operation's ONE-TIME finalize authority before any docker
         # or catalog call exists to make.
         _claim_transition(operation_id, "finalize")
+        floor = _floor_from_record(operation_id)
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
     receipt["stamp"] = stamp
@@ -1176,7 +1260,7 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
             else:
                 try:
                     ok_rb, rb_problems, rb_detail = rollback_recovery(
-                        container, user, db, quarantine, inventory, probe)
+                        container, user, db, quarantine, inventory, probe, floor=floor)
                     receipt["rollback_attempted"] = True
                     receipt.update(rb_detail)
                     if not ok_rb:
@@ -1216,6 +1300,7 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
         # Consume this operation's ONE-TIME rollback authority before any docker
         # or catalog call exists to make.
         _claim_transition(operation_id, "rollback")
+        floor = _floor_from_record(operation_id)
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
     receipt["stamp"] = stamp
@@ -1227,7 +1312,7 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
         probe = parse_probe_spec(probe_spec)
         ok, problems, detail = rollback_recovery(container, user, db, quarantine,
-                                                 inventory, probe)
+                                                 inventory, probe, floor=floor)
         receipt.update(detail)
         if not ok:
             receipt["rollback_error"] = "; ".join(problems)

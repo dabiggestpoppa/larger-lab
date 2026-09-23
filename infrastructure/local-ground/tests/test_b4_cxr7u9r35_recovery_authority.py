@@ -116,6 +116,12 @@ class _Bridge:
     def verify(self, container, db, user, inventory, probe):
         return True, [], {"public.widgets": 3}, {"public.widgets": "deadbeef"}
 
+    def observed_rows(self, container, db, user, tables):
+        return {t: 3 for t in tables}
+
+    def observed_fps(self, container, db, user, tables):
+        return {t: "deadbeef" for t in tables}
+
     def psql(self, container, db, user, sql, stdin_bytes=None):
         return _Done(0, b"16.2\n")
 
@@ -137,6 +143,8 @@ class _Bridge:
                          ("rename_db", self.rename),
                          ("terminate_local_connections", self.terminate),
                          ("_verify_db", self.verify),
+                         ("collect_observed_rows", self.observed_rows),
+                         ("collect_observed_fingerprints", self.observed_fps),
                          ("_catalog_names", self.catalog),
                          ("psql", self.psql),
                          ("docker_exec", self.docker_exec)):

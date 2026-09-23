@@ -195,7 +195,8 @@ def test_precreated_predictable_temporary_is_never_used(tmp_path):
     victim = tmp_path / "victim.json"
     victim.write_text('{"victim": true}', encoding="utf-8")
     target = state / "receipt.json"
-    os.symlink(str(victim), str(state / "receipt.json.tmp"))
+    planted = state / "receipt.json.tmp"  # the ATTACK's own artifact
+    os.symlink(str(victim), str(planted))
     r = recovery_cli.run_cli(_promote_argv(hostile, inv, sha, target),
                              write_root=state,
                              env_extra={"OCE_BACKUP_ROOTS": str(roots)})
@@ -203,7 +204,11 @@ def test_precreated_predictable_temporary_is_never_used(tmp_path):
     assert target.is_file() and not target.is_symlink(), "receipt not committed"
     assert json.loads(target.read_text(encoding="utf-8"))["format"] == pgrec.RECEIPT_FORMAT
     assert victim.read_text(encoding="utf-8") == '{"victim": true}'
-    assert not _residue(state), _residue(state)
+    # the planted symlink is the test's own input, not engine residue: the
+    # engine must have neither followed nor removed it
+    assert planted.is_symlink() and str(planted) in _residue(state)
+    engine_residue = [name for name in _residue(state) if name != planted.name]
+    assert not engine_residue, engine_residue
 
 
 # --------------------------------------------------------------------- #

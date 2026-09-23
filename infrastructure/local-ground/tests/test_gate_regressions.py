@@ -71,7 +71,16 @@ def build_valid_evidence(tmp):
                        "test_ctl_corrupt_backup_rejected_against_running_stack",
                        "test_ctl_structured_logs_use_json_file_driver",
                        "test_ctl_safe_shutdown_and_verified_cleanup",
-                       "test_ctl_no_forbidden_public_ports"]
+                       "test_ctl_no_forbidden_public_ports",
+                       # R39: the recovery-transaction closure proofs execute
+                       # against the real stack and are part of the gate's
+                       # authoritative selection (CI-runnable, so container-backed).
+                       "test_successful_full_replace_sources_both_stores_from_one_backup",
+                       "test_postgres_promotion_failure_leaves_database_and_artifacts_unchanged",
+                       "test_artifact_switch_failure_restores_both_stores",
+                       "test_artifact_verification_failure_restores_both_stores",
+                       "test_interrupted_full_replace_commits_nothing",
+                       "test_finalize_replay_against_the_real_stack_is_denied"]
     non_container_names = ["test_07_artifact_round_trip_preserves_hashes",
                            "test_08_backup_completes",
                            "test_09_clean_room_local_restore_succeeds",
@@ -80,7 +89,17 @@ def build_valid_evidence(tmp):
                            "test_full_backup_blocked_without_docker_or_services",
                            "test_full_backup_blocked_when_postgres_unavailable",
                            "test_full_backup_blocked_when_artifact_store_unavailable",
-                           "test_state_only_backup_still_works_without_docker"]
+                           "test_state_only_backup_still_works_without_docker",
+                           # R39 receipt-authority and transition proofs (in-process,
+                           # no container needed to prove the authority law)
+                           "test_hostile_recovery_state_dir_cannot_grant_write_authority",
+                           "test_existing_receipt_is_refused_before_any_destructive_step",
+                           "test_precreated_predictable_temporary_is_never_used",
+                           "test_promotion_mints_one_durable_operation_in_the_governed_boundary",
+                           "test_replaying_a_transition_with_the_same_receipt_is_denied_before_any_call",
+                           "test_structurally_valid_substitution_is_denied_by_the_content_binding",
+                           "test_unregistered_receipt_is_denied",
+                           "test_an_interrupted_transition_leaves_the_authority_spent"]
     tests = []
     for n in container_names:
         tests.append({"name": n, "nodeid": n, "container_backed": True, "outcome": "passed", "duration_s": 0.1})

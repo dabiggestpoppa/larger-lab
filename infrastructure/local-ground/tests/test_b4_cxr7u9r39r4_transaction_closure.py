@@ -50,10 +50,14 @@ def test_finalize_replay_against_the_real_stack_is_denied(oce_stack, tmp_path):
     inv, invsha = content / "inventory.json", content / "inventory.json.sha256"
     dump = content / "archive.dump"
     # the write root is the seam the TEST constructs (never an environment
-    # channel); the receipts themselves are the engine's own
+    # channel); the receipts themselves are the engine's own, and every
+    # --receipt-out lives INSIDE that governed root (the R2 write boundary)
     root = tmp_path / "recovery"
+    (root / "transitions").mkdir(parents=True)
     common = ["--inventory", str(inv), "--inventory-sha", str(invsha)]
-    promote_receipt = tmp_path / "promote.json"
+    promote_receipt = root / "promote.json"
+    finalize_receipt = root / "finalize.json"
+    replay_receipt = root / "replay.json"
 
     promoted = recovery_cli.run_cli(
         ["--phase", "promote", "--archive", str(dump)] + common
@@ -66,10 +70,10 @@ def test_finalize_replay_against_the_real_stack_is_denied(oce_stack, tmp_path):
 
     first = recovery_cli.run_cli(
         ["--phase", "finalize", "--receipt-in", str(promote_receipt)] + common
-        + ["--receipt-out", str(tmp_path / "finalize.json")],
+        + ["--receipt-out", str(finalize_receipt)],
         write_root=root, env_extra=_env(tmp_path), timeout=900)
     assert first.returncode == 0, first.stdout + first.stderr
-    fr = json.loads((tmp_path / "finalize.json").read_text(encoding="utf-8"))
+    fr = json.loads(finalize_receipt.read_text(encoding="utf-8"))
     assert fr["quarantine_dropped"] is True, fr
     committed = _pg_truth()
     names = oc.dexec(oc.POSTGRES, ["psql", "-U", oc.PG_USER, "-d", "postgres", "-tAc",
@@ -79,10 +83,10 @@ def test_finalize_replay_against_the_real_stack_is_denied(oce_stack, tmp_path):
     # REPLAY: the same receipt is presented again - it is spent authority
     replay = recovery_cli.run_cli(
         ["--phase", "finalize", "--receipt-in", str(promote_receipt)] + common
-        + ["--receipt-out", str(tmp_path / "replay.json")],
+        + ["--receipt-out", str(replay_receipt)],
         write_root=root, env_extra=_env(tmp_path), timeout=900)
     assert replay.returncode != 0, replay.stdout + replay.stderr
-    rf = json.loads((tmp_path / "replay.json").read_text(encoding="utf-8"))
+    rf = json.loads(replay_receipt.read_text(encoding="utf-8"))
     assert rf["exit_status"] == 1, rf
     assert "refusing recovery transition authority" in rf["error"], rf
     assert "no longer available" in rf["error"], rf

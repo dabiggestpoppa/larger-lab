@@ -305,6 +305,17 @@ artifact_wipe() {
 artifact_restore_from() { # host dir -> live volume (replace, never merge)
   artifact_wipe && docker cp "$1/." oce-local-artifact:/data/
 }
+artifact_stop() { docker stop oce-local-artifact >/dev/null 2>&1 || true; }
+artifact_start() { docker start oce-local-artifact >/dev/null 2>&1 || true; }
+# Volume identity is only meaningful while the artifact service is STOPPED:
+# MinIO writes its own format metadata into /data on startup, so a hash taken
+# after `docker start` describes MinIO's bookkeeping, not the restored truth.
+# Every identity this transaction compares (staged vs restored, before vs
+# after rollback) is therefore captured with the service stopped.
+artifact_volume_sha_stopped() {
+  artifact_stop
+  artifact_volume_sha
+}
 pg_rollback_from_quarantine() { # explicit rollback of the held quarantine
   [ -n "$PROMOTE_RECEIPT" ] || return 1
   python3 "$BIN/pg-recovery.py" --phase rollback --receipt-in "$PROMOTE_RECEIPT" \
@@ -335,13 +346,15 @@ rollback_precommit() { # single owner of every pre-commit rollback
   local art_after=""
   if [[ "$ARTIFACT_SWITCHED" == "true" && "$ARTIFACT_LIVE_SNAPSHOT" == "true" ]]; then
     echo "rollback: restoring the original artifact volume from its snapshot..." >&2
+    # stopped-state restore + identity (see artifact_volume_sha_stopped)
+    artifact_stop
     if artifact_restore_from "$LIVE_SNAPSHOT_DIR"; then
       ARTIFACT_SWITCHED=false
     else
       echo "WARNING: artifact rollback FAILED; the volume is not the original" >&2
     fi
-    docker start oce-local-artifact >/dev/null 2>&1 || true
     art_after="$(artifact_volume_sha)"
+    artifact_start
   fi
   local pg_ok=false
   if [[ "$PG_PROMOTED" == "true" && "$PG_FINALIZED" != "true" ]]; then
@@ -349,6 +362,9 @@ rollback_precommit() { # single owner of every pre-commit rollback
     pg_rollback_from_quarantine && pg_ok=true
   fi
   write_transaction_rollback_receipt "$reason" "$art_after" "$pg_ok"
+  if [[ -n "$EV_DIR" ]]; then
+    cp "$TRANSACTION_RECEIPT" "$EV_DIR/transaction-rollback-receipt.json" 2>/dev/null || true
+  fi
   if [[ "$ARTIFACT_LIVE_SNAPSHOT" == "true" && "$art_after" != "$ARTIFACT_BEFORE_SHA" ]]; then
     echo "BLOCKED: pre-commit rollback could not restore the artifact volume" >&2
   fi
@@ -380,7 +396,7 @@ if [[ -f "$ARTIFACT_ARCHIVE" ]]; then
   fi
   STAGED_SHA="$(staged_tree_sha "$STAGE_DIR")"
   ARTIFACT_STAGED=true
-  ARTIFACT_BEFORE_SHA="$(artifact_volume_sha)"
+  ARTIFACT_BEFORE_SHA="$(artifact_volume_sha_stopped)"
   # The artifact ROLLBACK SOURCE: the live truth, copied out BEFORE it is
   # replaced, so a later failure can put the volume back byte for byte.
   if ! docker cp oce-local-artifact:/data/. "$LIVE_SNAPSHOT_DIR/"; then
@@ -389,6 +405,7 @@ if [[ -f "$ARTIFACT_ARCHIVE" ]]; then
     exit 3
   fi
   ARTIFACT_LIVE_SNAPSHOT=true
+  artifact_start
   echo "  artifacts: staged ${STAGED_SHA:0:12} (live snapshot ${ARTIFACT_BEFORE_SHA:0:12})"
 fi
 
@@ -456,12 +473,14 @@ if [[ "$ARTIFACT_STAGED" == "true" ]]; then
     echo "BLOCKED: artifact restore into the container failed" >&2
     exit 1  # the EXIT trap restores BOTH stores from their held sources
   fi
-  docker start oce-local-artifact >/dev/null 2>&1 || true
+  # identity is verified while the service is still stopped: the volume must
+  # be byte-identical to the staged snapshot BEFORE MinIO touches it again
   ARTIFACT_AFTER_SHA="$(artifact_volume_sha)"
   if [[ "$ARTIFACT_AFTER_SHA" != "$STAGED_SHA" ]]; then
     echo "BLOCKED: the restored artifact volume is not the staged snapshot" >&2
     exit 1  # the EXIT trap restores BOTH stores from their held sources
   fi
+  artifact_start
   ARTIFACT_APPLIED=true
   # artifact-replacement evidence (R8): archive + staged/restored identities
   python3 - "$RECEIPT_DIR/artifact-recovery-receipt.json" "$ARTIFACT_ARCHIVE" \
