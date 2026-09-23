@@ -71,6 +71,8 @@ __all__ = [
     "Alias",
     "ArchitectureSlot",
     "CanonicalObject",
+    "ChainScope",
+    "ChainScopeKind",
     "ClaimBinding",
     "DeploymentIdentity",
     "DeploymentMarkerKind",

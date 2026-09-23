@@ -19,9 +19,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field
 
 Timestamp = datetime
 """An aware, UTC datetime (naive datetimes are rejected at the edges)."""

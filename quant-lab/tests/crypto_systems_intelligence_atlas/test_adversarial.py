@@ -15,7 +15,6 @@ from crypto_systems_intelligence_atlas.identity import (
     DeploymentIdentity,
     DeploymentMarkerKind,
     DeploymentStatus,
-    IdentityRegistry,
     IdentityResolutionEvent,
     ObjectType,
     RealizationIdentity,
@@ -25,8 +24,6 @@ from crypto_systems_intelligence_atlas.identity import (
     mint_object_id,
 )
 from crypto_systems_intelligence_atlas.relationships import (
-    ChainScope,
-    ChainScopeKind,
     EdgeType,
     GraphValidator,
     Hyperedge,
@@ -34,7 +31,6 @@ from crypto_systems_intelligence_atlas.relationships import (
     HyperedgeRole,
     RouteAttributes,
     RouteMechanism,
-    SecurityMechanism,
     TypedEdge,
 )
 from crypto_systems_intelligence_atlas.temporal import (

@@ -19,15 +19,13 @@ from crypto_systems_intelligence_atlas.identity import (
     RealizationStatus,
     RepresentationMechanism,
     RouteHop,
-    TickerSymbol,
     mint_object_id,
     mint_realization_id,
 )
 from crypto_systems_intelligence_atlas.ontology import RoleTag, validate_role_tags
-from crypto_systems_intelligence_atlas.temporal import UnknownBound, utc_now
 from datetime import timedelta
 
-from .conftest import NOW, contract_deployment, make_chain, make_token, native_deployment
+from .conftest import NOW, contract_deployment, make_token, native_deployment
 
 
 # --------------------------------------------------------------------------
@@ -52,7 +50,6 @@ def test_bitcoin_native_identity_no_contracts(registry):
 def test_bitcoin_pow_not_pos_tagged(registry):
     """E-1: security mechanism is data on edges, not class assumptions."""
     from crypto_systems_intelligence_atlas.relationships import (
-        GraphValidator,
         SecurityMechanism,
         TypedEdge,
         edge_spec,

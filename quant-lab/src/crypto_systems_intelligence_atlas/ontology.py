@@ -12,10 +12,8 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .identity import CanonicalObject, ObjectType
-from .temporal import UnknownBound
 
 
 class RoleTag(str, Enum):
