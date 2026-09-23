@@ -1776,3 +1776,116 @@ wiring are fixed (the fixture now carries the R39 must-pass selection).
 - SonarCloud: unchanged blocker (credentials/operator disposition still required; not weakened, no NOSONAR added)
 - cloud mutations 0; broker mutations 0; capital mutations 0; execution-authority mutations 0; recurring cost $0
 - Book 5 not begun; Atlas Program Block 4 not begun
+
+---
+
+## R40 SUPERSEDING SECTION — ATOMIC TRANSITION SELECTION + CRASH-SAFE CROSS-STORE COMMIT (B4-CXR7U9R40)
+
+**Status:** PENDING_OPERATOR_REVIEW (append-only supersession; all R39 and earlier sections above remain historical truth, not rewritten).
+
+**Start SHA (authorized):** `c6844d4ca1b2d5f78501c81caf29b251275df42e` (R39 evidence head).
+**Implementation head:** `bc6f2e84d1d7426ffd9368b04a8d7081bf72ec0a` (B4-CXR7U9R40R4).
+**origin/main:** `7c7816f382947bbc8a1f2154435fc436f2428fa8` (untouched).
+**PR #4:** OPEN, unmerged, base `main` ← head `oce-program-build`; mergeable=true, mergeStateStatus=UNSTABLE (SonarCloud failure + Kilo external failure keep it unstable; mergeable is NOT reported as "all required checks passed").
+
+### Commit chain (append-only, no amend/squash/rebase/force-push)
+
+```
+febafe4f  B4-CXR7U9R40R1  make recovery transition selection operation-wide and atomic
+80959860  B4-CXR7U9R40R2  make the cross-store commit boundary crash coherent
+bc6f2e84  B4-CXR7U9R40R4  prove transition, commit-boundary and evidence invariants adversarially
+```
+
+R40-03 (immutable transaction-rollback-receipt registration) landed inside
+`B4-CXR7U9R40R2`'s restore.sh changes: `register_op` now indexes
+`transaction-rollback-receipt.json` with hash and size exactly like every
+other registered receipt, so the visible chain has three R40 commits. This is
+stated here rather than rewritten into history.
+
+### R40-01 — operation-wide atomic transition claim
+
+Before: finalize and rollback claimed DIFFERENT files
+(`<op>.finalize.claim` vs `<op>.rollback.claim`); two processes could both win
+O_EXCL and concurrently mutate one recovery operation (reproduced against the
+published R39 code). After: ONE operation-wide claim file; the durable state
+check and the exclusive claim acquisition are one inseparable CAS boundary;
+the selected transition is durably recorded in the claim; the state ladder
+rejects any regression from FINALIZING/ROLLING_BACK to PROMOTED; a losing
+transition fails before any Docker/PostgreSQL/catalog/receipt mutation.
+
+Proofs (`test_b4_cxr7u9r40r1_operation_wide_claim.py`,
+`test_b4_cxr7u9r40r1_claim_race_inprocess.py`): real OS-level O_EXCL races
+from separately loaded engine modules contending through real threads —
+finalize-vs-rollback, finalize-vs-finalize, rollback-vs-rollback: exactly one
+winner each; the loser performs zero docker calls, zero catalog calls, zero
+receipt writes, zero durable-state rewrites; interruption after claim leaves
+the opposite transition without fresh authority; restart shows the durable
+selected transition and cannot replace it.
+
+### R40-02 — durable cross-store commit boundary
+
+PostgreSQL's irreversible point (quarantine drop) is now durably recorded in
+the transition record (`commit_point`), written by load-bearing code in the
+engine, not by a volatile shell flag. restore.sh's EXIT trap consults the
+durable record (`durable_precommit`) before deciding whether artifact
+rollback is legal; `PG_FINALIZED`/`COMMITTED` are no longer commit authority.
+Post-commit failures are never reported as `FAILED` (which would mislabel
+committed data); ambiguous restarts go through the new fail-closed
+`pg-recovery.py reconcile` phase, which inspects the durable transition state,
+quarantine presence and canonical truth and records the committed result
+without guessing. `_record_transition` was fixed to MERGE into the durable
+record instead of rebuilding it (it previously wiped durable keys such as
+`commit_point` and `rollback_floor`).
+
+Proofs (`test_b4_cxr7u9r40r2_commit_boundary.py`): pre-commit failure → both
+stores restored; post-commit-point failure → artifact rollback refused with
+both stores left on the promoted snapshot; reconcile refuse/guess states.
+
+### R40-03 — immutable transaction rollback evidence
+
+`register_op` indexes `transaction-rollback-receipt.json` into
+`operations/<operation-id>/` with its hash and size, bound to the same
+operation/run/commit/tree; registration is idempotent and append-only, so a
+later recovery cannot replace it; index-vs-receipt mismatch is detected by
+`recovery-ops verify`.
+
+### R40-04 — negative controls
+
+`test_b4_cxr7u9r40r4_negative_controls.py` proves the tests FAIL when the
+protections are removed: different claim filenames re-admit the both-win race;
+state-check-before-claim re-admits the separable race; EXIT-trap rollback
+ignoring the durable commit state restores artifacts post-commit;
+PG_FINALIZED-only authority restores artifacts after the irreversible point;
+removing the transaction receipt from registration loses the evidence.
+
+### Fresh CI truth (exact implementation head `bc6f2e84`, all five validation workflows)
+
+```
+35911572906  b1-local-ground-validation  success
+35911572914  b2-control-plane-validation success
+35911572985  b3-worker-fabric-validation success
+35911572944  b4-config-spine-validation success
+35911578831  B1-I1R Validation           success (pull_request; ran against the real merge ref)
+```
+
+Earlier R40 runs on intermediate heads (e.g. 35911567455 b3 cancelled on
+push-supersede) are historical; the runs above are the exact-head authority.
+SonarCloud Code Analysis: **failure** (unchanged gate; D Security / C
+Reliability findings not suppressed, not excluded, no NOSONAR added, no
+thresholds modified). Kilo Code Review: **external failure** (workspace-setup;
+not called green). PR #4 mergeable=true but mergeStateStatus=UNSTABLE.
+
+### R40 exit-gate truth
+
+1. finalize and rollback cannot both claim one operation (operation-wide atomic claim, real-process proof)
+2. transition winner chosen by one durable, operation-wide, atomic authority change
+3. failure/int interruption cannot produce cross-store old/new divergence (durable commit boundary, container-backed suite green)
+4. PostgreSQL's irreversible commit point durably observable and controls artifact rollback legality
+5. post-commit evidence failure does not roll back only one store
+6. crash/restart reconciliation does not guess (fail-closed `reconcile` phase)
+7. transaction-level rollback evidence immutably indexed
+8. documentation distinguishes implementation-head (`bc6f2e84`), evidence-head (this commit), and external-check truth (Sonar fail, Kilo fail)
+
+cloud mutations 0; broker mutations 0; capital mutations 0; execution-authority
+mutations 0; recurring cost $0. Book 5 not begun; Atlas Program Block 4 not
+begun; PR #4 not merged; main untouched.

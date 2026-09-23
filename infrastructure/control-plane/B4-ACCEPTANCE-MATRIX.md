@@ -208,3 +208,35 @@ sequence; see `B4-EVIDENCE-RECORD.md`.*
   erasing the finding.
 - Intermediate failed runs `33979406177` (U8X1 repairs) and `33986527406`
   (U8X2 repairs) are preserved as truthful historical evidence.
+
+### R39/R40 superseding status (append-only, do not rewrite the sections above)
+
+- **Book 4 status:** `IN_PROGRESS / CLOSURE_REPAIR` — recovery-transaction
+  closure through R40; the book is NOT closed and no self-ratification is
+  claimed.
+- **R39 (B4-CXR7U9R39):** main doctrine reconciled (`87792340`), cross-store
+  rollback-coherent full replacement, governed collision-safe receipt
+  persistence, durable single-use transition authority, adversarial/container
+  proofs, four R39X CI-exposure repairs. Implementation head `4f362b7d` and
+  evidence head `c6844d4c` both carried five green validation workflows (exact
+  IDs in B4-EVIDENCE-RECORD.md's R39 section).
+- **R40 (B4-CXR7U9R40):** atomic operation-wide transition selection
+  (`febafe4f`), crash-coherent irreversible commit boundary + immutable
+  transaction-rollback-receipt registration (`80959860`), adversarial
+  transition/commit-boundary/evidence invariants and negative controls
+  (`bc6f2e84`). Concurrency proofs use real OS-level O_EXCL races from
+  separately loaded engine modules; commit-boundary proofs inject failure
+  before/after the durable commit point; negative controls prove the suites
+  fail when each protection is removed.
+- **CI truth (exact R40 implementation head `bc6f2e84`):** all five validation
+  workflows success — b1-local-ground 35911572906, b2-control-plane
+  35911572914, b3-worker-fabric 35911572985, b4-config-spine 35911572944,
+  B1-I1R 35911578831 (pull_request against the real merge ref). SonarCloud =
+  failure (gate unchanged, not suppressed); Kilo = external workspace-setup
+  failure (not called green). PR #4: mergeable=true, mergeStateStatus=UNSTABLE
+  — mergeable is NOT "all required checks passed".
+- **R7-op status:** satisfied in substance — authoritative exact-head runs,
+  artifact verification, and the superseding evidence record now exist through
+  R40; the final R40-EVIDENCE documentation commit carries this section.
+- **Still open before book close:** operator acceptance of R39/R40; SonarCloud
+  credential/operator disposition; Kilo external service recovery.
