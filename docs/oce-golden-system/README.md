@@ -95,3 +95,10 @@ The institutional branch also carries a non-ratified research-to-architecture pa
 6. `../oce-autonomy/OCE_CONTINUATION_AND_PRIVATE_IMAGINATION_TEST_EXTENSION_v0.1.md` — future autonomy falsification extension.
 
 These documents do not alter the current MF-B0 through MF-B4 build, completed stress-suite receipts, or the current G8 → G9 → G10 sequence. They authorize no implementation, training, runtime migration, or production change.
+
+### OPH × IT³ research handoff
+
+- `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md` maps the external research packet's Section 13 A–H obligations to existing stress-suite owners, experiments, custody rules, and nonauthoritative claim limits.
+- `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md` is a copy-ready instruction for a separately authorized implementing agent.
+
+These are planning artifacts. No OPH × IT³ research substrate is implemented or ratified by this addition.
