@@ -574,6 +574,53 @@ class IdentityRegistry:
 
     # -- lifecycle / merge ----------------------------------------------------
 
+    def apply_rebrand(
+        self,
+        object_id: str,
+        new_name: str,
+        new_tickers: tuple[TickerSymbol, ...] = (),
+        *,
+        at: datetime | None = None,
+    ) -> CanonicalObject:
+        """Public rebrand operation (§8.1/plan §1A.7 rule 4): the identity is
+        immutable — a rebrand adds a new name/ticker window on the SAME
+        object_id and closes prior windows. Old windows are retained for
+        history; the object is never replaced."""
+        obj = self.require(object_id)
+        if at is not None:
+            obj.ticker_symbols = tuple(
+                t if t.valid_to is not None else t.model_copy(update={"valid_to": at})
+                for t in obj.ticker_symbols
+            )
+        obj.canonical_name = new_name
+        obj.ticker_symbols = obj.ticker_symbols + new_tickers
+        return obj
+
+    def close_realization(self, asset_object_id: str, realization_id: str, at: datetime) -> RealizationIdentity:
+        """Public closure operation (INV-1A-10): sets status=CLOSED and
+        valid_to=at on the named realization as a world-change. The closed
+        realization remains in the graph, queryable forever; all other
+        realizations are untouched."""
+        obj = self.require(asset_object_id)
+        updated: list[RealizationIdentity] = []
+        found = False
+        for r in obj.realizations:
+            if r.realization_id == realization_id:
+                found = True
+                updated.append(
+                    r.model_copy(
+                        update={"status": RealizationStatus.CLOSED, "valid_to": at}
+                    )
+                )
+            else:
+                updated.append(r)
+        if not found:
+            raise KeyError(
+                f"realization {realization_id} not attached to {asset_object_id}"
+            )
+        obj.realizations = tuple(updated)
+        return next(r for r in obj.realizations if r.realization_id == realization_id)
+
     def deprecate(self, object_id: str, at: datetime | None = None) -> None:
         """Lifecycle transition — never a deletion (INV-1A-4)."""
         obj = self.require(object_id)

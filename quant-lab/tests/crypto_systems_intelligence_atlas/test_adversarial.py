@@ -89,21 +89,25 @@ def test_same_ticker_unrelated_assets_not_merged(registry):
 
 
 def test_rebrand_preserves_identity(registry):
+    """Public kernel operation (hardening R1 Phase 7: no private-state writes)."""
+    from crypto_systems_intelligence_atlas.identity import TickerSymbol
+
     obj = make_token(registry, "rebrand-case", "Old Name", tickers=(("OLD", "spot"),))
-    # rebrand = new ticker window on the SAME object_id (old window kept)
-    rebranded = obj.model_copy(
-        update={
-            "ticker_symbols": obj.ticker_symbols
-            + (
-                TickerSymbol(symbol="NEW", context="spot", valid_from=NOW, collision_group="spot"),
-            )
-        }
+    later = NOW + __import__("datetime", fromlist=["timedelta"]).timedelta(days=365)
+    registry.apply_rebrand(
+        obj.object_id,
+        "New Name",
+        new_tickers=(
+            TickerSymbol(symbol="NEW", context="spot", valid_from=later, collision_group="spot"),
+        ),
+        at=later,
     )
-    registry._objects[obj.object_id] = rebranded
     got = registry.get(obj.object_id)
-    assert got.canonical_name == "Old Name"  # same identity
+    assert got.object_id == obj.object_id  # SAME identity — never replaced
+    assert got.canonical_name == "New Name"
     assert any(t.symbol == "OLD" for t in got.ticker_symbols)  # old window kept
     assert any(t.symbol == "NEW" for t in got.ticker_symbols)  # new window added
+    assert any(t.valid_to is not None for t in got.ticker_symbols if t.symbol == "OLD")
 
 
 # --------------------------------------------------------------------------

@@ -302,17 +302,14 @@ def test_channel_closure_preserves_history(registry):
     registry.attach_realization(usdc.object_id, r1)
     registry.attach_realization(usdc.object_id, r2)
 
-    # channel-20 closes: world-change on ONE realization only
+    # channel-20 closes: world-change on ONE realization only, via the
+    # public kernel operation (hardening R1 Phase 7)
     later = NOW + timedelta(days=30)
-    closed = r1.model_copy(
-        update={"status": RealizationStatus.CLOSED, "valid_to": later}
-    )
+    closed = registry.close_realization(usdc.object_id, r1.realization_id, later)
     assert closed.status is RealizationStatus.CLOSED
-    obj = registry.get(usdc.object_id)
-    obj.realizations = tuple(
-        closed if r.realization_id == r1.realization_id else r for r in obj.realizations
-    )
-    by_id = {r.realization_id: r for r in obj.realizations}
+    assert closed.valid_to == later
+    # closed realization remains in the graph, queryable (INV-1A-10)
+    by_id = {r.realization_id: r for r in registry.get(usdc.object_id).realizations}
     assert by_id[r1.realization_id].valid_to == later  # history kept, not deleted
     assert by_id[r2.realization_id].valid_to is None  # other channel unaffected
 
