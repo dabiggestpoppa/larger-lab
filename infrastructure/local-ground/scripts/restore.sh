@@ -239,9 +239,14 @@ register_op() { # EXIT trap: index this restore operation immutably (idempotent)
     rollback="$(python3 -c "import json;d=json.load(open(r'$RECEIPT_DIR/rollback-receipt.json',encoding='utf-8'));print('ok' if d.get('rollback_succeeded') is True else 'failed')" 2>/dev/null || echo failed)"
   fi
   local op_receipts=()
+  # R40-R3: the TRANSACTION-level rollback receipt is durable recovery
+  # evidence exactly like the per-store receipts, so it is indexed with its
+  # hash and size like every other registered receipt (a cross-store rollback
+  # that left no index entry would be invisible to the evidence chain).
   for f in "$RECEIPT_DIR/restore-receipt.json" "$RECEIPT_DIR/postgres-recovery-receipt.json" \
            "$RECEIPT_DIR/promote-receipt.json" "$RECEIPT_DIR/artifact-recovery-receipt.json" \
-           "$RECEIPT_DIR/redis-invalidation-receipt.json" "$RECEIPT_DIR/rollback-receipt.json"; do
+           "$RECEIPT_DIR/redis-invalidation-receipt.json" "$RECEIPT_DIR/rollback-receipt.json" \
+           "$RECEIPT_DIR/transaction-rollback-receipt.json"; do
     [ -f "$f" ] && op_receipts+=(--receipt "$f")
   done
   [ "${#op_receipts[@]}" -gt 0 ] || return 0
@@ -342,9 +347,58 @@ json.dump({"format": "oce-restore-transaction-rollback-receipt-v1",
           open(p, "w", encoding="utf-8"), indent=2)
 PY
 }
+# DURABLE COMMIT STATE (R40-R2): the shell's volatile flags (PG_FINALIZED,
+# COMMITTED) can die with the process; the engine's transition record cannot.
+# Whether an artifact-only rollback is LEGAL is a fact about the durable
+# transaction state, so the EXIT trap reads it from the operation record.
+# Returns 0 when the durable truth says the transaction is still pre-commit
+# (rollback of BOTH stores is legal), 1 otherwise.
+# The interpreter used for durable-state reads is the SAME python restore.sh
+# otherwise uses: OCE_PYTHON may pin it (tests), python3 is the default.
+OCE_PYTHON="${OCE_PYTHON:-python3}"
+_promote_op_id() { # this transaction's durable operation id, from the promote receipt
+  [[ -f "$PROMOTE_RECEIPT" ]] || return 1
+  "$OCE_PYTHON" -c "import json,sys;print(json.load(open(sys.argv[1],encoding='utf-8')).get('operation_id',''))" \
+    "$PROMOTE_RECEIPT" 2>/dev/null
+}
+durable_precommit() {
+  if [[ ! -f "$PROMOTE_RECEIPT" ]]; then
+    return 0   # nothing was ever promoted: pre-commit by construction
+  fi
+  local opid; opid="$(_promote_op_id)"
+  if [[ -z "$opid" ]]; then
+    return 0   # unreadable receipt and nothing durable says otherwise
+  fi
+  local rec="$VAR_DIR/recovery/transitions/${opid}.json"
+  [[ -f "$rec" ]] || return 0                        # no durable record: pre-commit by construction
+  "$OCE_PYTHON" - "$rec" <<'PY'
+import json, sys
+rec = json.load(open(sys.argv[1], encoding="utf-8"))
+state = rec.get("state", "")
+# pre-commit states: the quarantine (the PG rollback source) still exists.
+# COMMIT_POINT_REACHED or later means PostgreSQL is irreversibly committed.
+precommit = {"CREATED", "STAGED", "PROMOTED", "FINALIZING", "ROLLING_BACK"}
+postcommit = {"COMMIT_POINT_REACHED", "FINALIZED"}
+if state in postcommit:
+    print("BLOCKED: PostgreSQL passed its irreversible commit point (durable "
+          "transition state); artifact-only rollback is forbidden — both stores "
+          "remain on the promoted snapshot; run: pg-recovery.py --phase reconcile",
+          file=sys.stderr)
+    sys.exit(1)
+sys.exit(0 if state in precommit else 1)
+PY
+}
 rollback_precommit() { # single owner of every pre-commit rollback
   local reason="${FAIL_NOTE:-$1}"
   [[ "$COMMITTED" == "true" ]] && return 0
+  # DURABLE authority first: once the engine durably passed the irreversible
+  # PostgreSQL commit point, an artifact-only rollback is FORBIDDEN even if a
+  # volatile flag died with the process. durable_precommit prints the
+  # reconciliation guidance to stderr and refuses; both stores stay on the
+  # promoted snapshot.
+  if ! durable_precommit; then
+    return 1
+  fi
   [[ "$ARTIFACT_SWITCHED" == "true" || "$PG_PROMOTED" == "true" ]] || return 0
   local art_after=""
   if [[ "$ARTIFACT_SWITCHED" == "true" && "$ARTIFACT_LIVE_SNAPSHOT" == "true" ]]; then
@@ -364,6 +418,10 @@ rollback_precommit() { # single owner of every pre-commit rollback
     echo "rollback: restoring the original PostgreSQL database from quarantine..." >&2
     pg_rollback_from_quarantine && pg_ok=true
   fi
+  # R40-R2: a post-commit receipt write failure (finalize exited nonzero but
+  # durably committed) must NOT reach this function at all — durable_precommit
+  # already refused. Belt and braces: if PG_FINALIZED is set, never restore.
+  [[ "$PG_FINALIZED" == "true" ]] && pg_ok=true
   write_transaction_rollback_receipt "$reason" "$art_after" "$pg_ok"
   if [[ -n "$EV_DIR" ]]; then
     cp "$TRANSACTION_RECEIPT" "$EV_DIR/transaction-rollback-receipt.json" 2>/dev/null || true
