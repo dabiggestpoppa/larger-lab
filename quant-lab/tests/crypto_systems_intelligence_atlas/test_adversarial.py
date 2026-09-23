@@ -90,7 +90,6 @@ def test_same_ticker_unrelated_assets_not_merged(registry):
 
 def test_rebrand_preserves_identity(registry):
     """Public kernel operation (hardening R1 Phase 7: no private-state writes)."""
-    from crypto_systems_intelligence_atlas.identity import TickerSymbol
 
     obj = make_token(registry, "rebrand-case", "Old Name", tickers=(("OLD", "spot"),))
     later = NOW + __import__("datetime", fromlist=["timedelta"]).timedelta(days=365)

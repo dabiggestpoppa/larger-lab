@@ -245,22 +245,19 @@ def holds_at(
         if earliest is not None and earliest > at:
             return False  # start certainly has not occurred yet
         if latest_start is None:
-            start_known = False  # no upper certainty bound: may or may not have begun
-            start_decided = None
+            start_decided = None  # no upper certainty bound: may or may not have begun
         elif latest_start <= at:
             start_decided = True  # start has necessarily occurred by at
-            start_known = True
         else:
             return None  # earliest <= at < latest: start uncertain
     else:
         if valid_from > at:
             return False
         start_decided = True
-        start_known = True
 
     # -- resolve end --------------------------------------------------------
     if valid_to is None:
-        return True if start_decided else None
+        return start_decided
     if isinstance(valid_to, UnknownBound):
         latest_end = valid_to.latest_bound
         if latest_end is not None and latest_end <= at:
@@ -268,14 +265,14 @@ def holds_at(
         earliest_end = valid_to.earliest_bound
         if earliest_end is not None and earliest_end > at:
             # end certainly has not occurred yet — start decision stands
-            return True if start_decided else None
+            return start_decided
         # end is uncertain at `at`: the fact may still hold or may have ended
         # inside the UNKNOWN window — undecidable regardless of start state.
         return None
     # KNOWN end
     if valid_to <= at:
         return False
-    return True if start_decided else None
+    return start_decided
 
 
 class RecordStore:

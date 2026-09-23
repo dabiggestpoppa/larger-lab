@@ -308,6 +308,10 @@ def test_channel_closure_preserves_history(registry):
     closed = registry.close_realization(usdc.object_id, r1.realization_id, later)
     assert closed.status is RealizationStatus.CLOSED
     assert closed.valid_to == later
+    # liveness is valid-time-driven (hardening R1 Finding A): the closed
+    # realization was live BEFORE closure, dead after — status never hides time
+    assert closed.is_live(NOW + timedelta(days=1)) is True
+    assert closed.is_live(NOW + timedelta(days=60)) is False
     # closed realization remains in the graph, queryable (INV-1A-10)
     by_id = {r.realization_id: r for r in registry.get(usdc.object_id).realizations}
     assert by_id[r1.realization_id].valid_to == later  # history kept, not deleted

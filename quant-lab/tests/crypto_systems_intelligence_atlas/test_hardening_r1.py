@@ -12,7 +12,6 @@ import pytest
 
 from crypto_systems_intelligence_atlas.identity import (
     CanonicalObject,
-    DeploymentMarkerKind,
     ObjectType,
     RealizationIdentity,
     RealizationRoute,
