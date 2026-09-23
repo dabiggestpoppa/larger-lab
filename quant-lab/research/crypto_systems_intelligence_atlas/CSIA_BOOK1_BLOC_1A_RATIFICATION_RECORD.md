@@ -137,3 +137,18 @@ Exit gate PASS_CSIA_B1A_IDENTITY_SEALED: all requirements met pending
 explicit operator bloc ratification (recorded in Decision Log).
 STATUS = READY_FOR_OPERATOR_RATIFICATION (NOT RATIFIED)
 ```
+
+---
+
+# BLOC 1A RATIFICATION — APPENDED 2026-09-23 (operator bloc ratification)
+
+Operator explicitly authorized `BLOC_1A = RATIFY` in the 2026-09-23 build-authorization session (see `CSIA_OPERATOR_DECISION_LOG.md` and `CSIA_BOOK_1_RATIFICATION_RECORD_v0.1.md`). Prior READY_FOR_OPERATOR_RATIFICATION state above preserved.
+
+```text
+BLOC 1A = RATIFIED (2026-09-23)
+PLAN UNDER RATIFICATION: Book 1 plan v0.3
+CONSTITUTION ANCHOR: v0.2 RATIFIED
+REVIEW BASIS: R-1A-1..5 complete (4 PASS, 1 PASS_WITH_DECLARED_LIMITATION:
+              realization marker value registries → Book 3B)
+BOOK_1_IMPLEMENTATION_AUTHORITY = TRUE (kernel scope only)
+```

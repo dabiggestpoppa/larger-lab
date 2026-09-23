@@ -312,3 +312,56 @@ Book 2 planning remains unauthorized until a separate operator decision.
 LOCAL vs ORIGIN: ahead (session-4 commits unpushed; operator has not
 authorized push). See final session report for exact count.
 ```
+
+---
+
+# SESSION-5 CHECKPOINT — BOOK 1 RATIFIED (2026-09-23; appended; history above preserved)
+
+Operator explicitly authorized, in this session:
+
+```text
+BOOK_1 = RATIFY    BLOC_1A = RATIFY    BLOC_1B = RATIFY
+BLOC_1C = RATIFY   BLOC_1D = RATIFY
+BOOK_1_IMPLEMENTATION_AUTHORITY = TRUE (kernel scope only)
+```
+
+## Effective ratification statuses
+
+```text
+CONSTITUTION v0.2 = RATIFIED
+BOOK 0            = RATIFIED
+BOOK 1 (plan v0.3)= RATIFIED   (CSIA_BOOK_1_RATIFICATION_RECORD_v0.1.md)
+BLOC_1A/1B/1C/1D  = RATIFIED   (append-only bloc records updated)
+PROGRAM_LEDGER_AUTHORITY = RATIFIED
+```
+
+Pre-ratification verification: packet READY = TRUE; zero HOLD/FAIL across
+bloc reviews, cross-bloc review (PASS), and post-decision stress review
+(PASS). D5 anti-drift audit for Book 1 executed: 13/13 PASS — recorded in
+the ratification record.
+
+Implementation authority scope (exactly as authorized): canonical identity,
+node ontology, relationship ontology, hyperedge model, temporal/bitemporal
+model, Book 1 provenance hooks, REALIZATION doctrine. NOT authorized: Book 2
+implementation, live collectors, API adapters, databases beyond Book 1 unit
+-test needs, Crypto Sensor mutation, Capital Field, trading/execution logic,
+Book 3 chain population, production deployment.
+
+## Build governance
+
+```text
+PLANNING BRANCH:  agent/crypto-systems-intelligence-atlas-plan
+                  (governance/history only — no implementation)
+BUILD BRANCH:     agent/crypto-systems-intelligence-atlas-build
+                  (created from ratified planning HEAD; all
+                  implementation work happens here)
+```
+
+## NEXT (canonical per ratified §G / D6)
+
+```text
+NEXT = EXECUTE BOOK 1 IMPLEMENTATION on the build branch, per the
+kernel scope above; exit gate PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_
+TEMPORAL_KERNEL; final implementation status = READY_FOR_OPERATOR_
+REVIEW (implementation is NOT self-ratifiable).
+```

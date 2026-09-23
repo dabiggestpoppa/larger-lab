@@ -130,3 +130,19 @@ BLOC 1D REVIEW VERDICT: READY_FOR_OPERATOR_RATIFICATION
 Blocking items: NONE
 STATUS = READY_FOR_OPERATOR_RATIFICATION (NOT RATIFIED)
 ```
+
+---
+
+# BLOC 1D RATIFICATION — APPENDED 2026-09-23 (operator bloc ratification)
+
+Operator explicitly authorized `BLOC_1D = RATIFY` in the 2026-09-23 build-authorization session (see `CSIA_OPERATOR_DECISION_LOG.md` and `CSIA_BOOK_1_RATIFICATION_RECORD_v0.1.md`). Prior READY_FOR_OPERATOR_RATIFICATION state above preserved.
+
+```text
+BLOC 1D = RATIFIED (2026-09-23)
+PLAN UNDER RATIFICATION: Book 1 plan v0.3
+CONSTITUTION ANCHOR: v0.2 RATIFIED
+REVIEW BASIS: R-1D-1..4 complete (R-1D-2 PASS_WITH_DECLARED_LIMITATION:
+              concrete stale-window values deferred to Book 2; bitemporal
+              semantics contractual)
+BOOK_1_IMPLEMENTATION_AUTHORITY = TRUE (kernel scope only)
+```

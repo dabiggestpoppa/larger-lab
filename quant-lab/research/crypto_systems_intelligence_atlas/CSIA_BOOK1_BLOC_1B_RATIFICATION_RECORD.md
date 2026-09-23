@@ -126,3 +126,18 @@ BLOC 1B REVIEW VERDICT: READY_FOR_OPERATOR_RATIFICATION
 Blocking items: NONE
 STATUS = READY_FOR_OPERATOR_RATIFICATION (NOT RATIFIED)
 ```
+
+---
+
+# BLOC 1B RATIFICATION — APPENDED 2026-09-23 (operator bloc ratification)
+
+Operator explicitly authorized `BLOC_1B = RATIFY` in the 2026-09-23 build-authorization session (see `CSIA_OPERATOR_DECISION_LOG.md` and `CSIA_BOOK_1_RATIFICATION_RECORD_v0.1.md`). Prior READY_FOR_OPERATOR_RATIFICATION state above preserved.
+
+```text
+BLOC 1B = RATIFIED (2026-09-23)
+PLAN UNDER RATIFICATION: Book 1 plan v0.3
+CONSTITUTION ANCHOR: v0.2 RATIFIED
+REVIEW BASIS: R-1B-1..4 complete (all PASS); REALIZATION class placement
+              confirmed (INV-1B-8 deployment/realization separation)
+BOOK_1_IMPLEMENTATION_AUTHORITY = TRUE (kernel scope only)
+```
