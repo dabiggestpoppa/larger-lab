@@ -58,13 +58,13 @@ Residual: none at contract level; exact family-slot schemas are Book 3B content 
 
 # Q5. Can Cosmos distinguish Cosmos Hub, ATOM, Cosmos SDK, CometBFT and IBC?
 
-**Verdict: PASS**
+**Verdict: PASS_CONDITIONAL** — overall verdict is conditional because the IBC voucher representation sub-case remains dependent on operator decision R-1A-5. Sub-verdicts: Cosmos base separations (Hub/ATOM/SDK/CometBFT/IBC as distinct objects) = **PASS**; IBC voucher representation = **PASS_CONDITIONAL** (mechanism exists per chosen option but is not contract until R-1A-5 is decided).
 Evidence:
 - Each appchain = own BLOCKCHAIN object; ATOM = TOKEN (`NATIVE_TO` Cosmos Hub); IBC = INTEROP_PROTOCOL object (distinct from any chain); SDK/CometBFT = family attributes/slots (stress matrix P5; plan 1B.6).
 - This is the IACER §A2 founding example (ATOM ≠ Cosmos SDK ≠ IBC ≠ Cosmos Hub), verified structurally in P5.
 - IBC channels: HE-BRIDGE-ROUTE + route_attributes (E-8, C-3); ICS: HE-SECURITY-SHARE (E-9 confirmation).
-- IBC vouchers specifically: **PASS_CONDITIONAL** — representation pending R-1A-5 (see Q13/Q15 note; Option B rejected because it would break Q12's temporal requirements).
-Residual: voucher representation conditional on R-1A-5.
+- IBC vouchers specifically: the representation mechanism (realization or channel-deployment) is fully specified per option in the decision packet but becomes contract **only when R-1A-5 is decided**; Option B was rejected because it would break Q12's temporal requirements.
+Residual: voucher representation conditional on R-1A-5 — hence the overall Q5 verdict is PASS_CONDITIONAL, not PASS.
 
 # Q6. Can ICP represent canisters/subnets/compute without pretending they are smart contracts on an EVM chain?
 
@@ -155,7 +155,8 @@ Q1  Bitcoin native modeling            PASS
 Q2  Ethereum separations               PASS
 Q3  XRPL separations                   PASS
 Q4  Solana programs/accounts           PASS
-Q5  Cosmos separations                 PASS (voucher form: PASS_CONDITIONAL -> R-1A-5)
+Q5  Cosmos separations                 PASS_CONDITIONAL (base separations PASS;
+                                       voucher representation pending R-1A-5)
 Q6  ICP canisters/subnets              PASS
 Q7  DAG non-block assumptions          PASS
 Q8  Chain migration w/ history         PASS

@@ -3,7 +3,7 @@
 ## Ratification Packet v0.2 (Reconciled)
 
 **Document ID:** CSIA-B0-PACKET-001
-**Version:** 0.2
+**Version:** 0.2 (accounting corrected — session 3 governance cleanup)
 **Status:** FROZEN_FOR_REVIEW — AWAITING OPERATOR RATIFICATION — **NOT RATIFIED**
 **Supersedes:** `CSIA_BOOK_0_RATIFICATION_PACKET.md` (v0.1, preserved unmodified)
 **Depends on:** `CSIA_CONSTITUTION_v0.2.md` (unratified), `CSIA_CONSTITUTION_REVIEW_v0.1.md`, `CSIA_OPERATOR_DECISION_PACKET_BOOK0_BOOK1_v0.1.md`
@@ -89,13 +89,20 @@ CONSTITUTION_TEXT_DEFECTS_REMAINING = 0
     addressed or consciously accepted as reviewed; they do not block
     ratification.
 
-OPERATOR_DECISIONS_REMAINING = 7
+OPERATOR_DECISIONS_REMAINING (corrected accounting — session 3):
 
-    D1, D2, D3, D4, D5, D6  (Book 0 blocking set)
-    R-1A-5                  (Book 1 Bloc 1A freeze; decided immediately after)
+    BOOK_0_OPERATOR_DECISIONS_REMAINING      = 6
+        (D1, D2, D3, D4, D5, D6 — the Book 0 blocking set)
 
-    (D7, D8 are deferred by design and not counted as remaining for
-    ratification purposes.)
+    BOOK_1_OPERATOR_DECISIONS_REMAINING      = 1
+        (R-1A-5 — blocks Book 1 Bloc 1A freeze ONLY; it does NOT
+         block Book 0 ratification. It is listed here because it is
+         an immediate, open operator decision, not a Book 0 one.)
+
+    TOTAL_OPEN_IMMEDIATE_OPERATOR_DECISIONS  = 7
+
+    (D7, D8 are deferred by design — scheduled before Book 5 / Book 8
+    respectively — and are not counted as immediate.)
 
 BOOK_0_READY_FOR_OPERATOR_RATIFICATION = TRUE
 ```
@@ -112,7 +119,7 @@ OPERATOR_RATIFIED               = FALSE    (no decision has been provided
 
 `OPERATOR_RATIFIED = TRUE` may be set **only** when the operator explicitly provides decisions D1–D6 (accepting, objecting to, or returning the underlying texts), recorded per Constitution §5.4 in the Operator Decision Log. No agent session may set it. Silence is not ratification (Constitution §0).
 
-**If the operator ratifies:** the exact decisions to make are D1–D6 per §11.1 (options in the decision packet), then R-1A-5 per §11.2, each recorded in the Operator Decision Log in the format specified by the decision packet.
+**If the operator ratifies:** the exact decisions to make are D1–D6 per §11.1 (options in the decision packet) — these six close Book 0. R-1A-5 (§11.2) is a separate, Book 1 decision: deciding it is recommended immediately after, but Book 0 ratification is complete without it. Each decision is recorded in the Operator Decision Log in the format specified by the decision packet.
 
 **If any decision is objected/returned:** the affected text returns to revision; this packet's readiness counters are recomputed in a v0.3; no partial ratification shortcuts.
 

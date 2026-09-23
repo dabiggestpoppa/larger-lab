@@ -166,3 +166,45 @@ THEN          = operator authorization decision for any Book 1 implementation
 NOTE          = this ledger is PROPOSED_NEXT_STEP_AUTHORITY until D6 ratifies
                 Constitution v0.2; nothing above binds the operator
 ```
+
+---
+
+# SESSION-3 GOVERNANCE CLEANUP CHECKPOINT — 2026-09-23 (appended; history above preserved)
+
+## Remote truth verified (session 3)
+
+```text
+BRANCH:            agent/crypto-systems-intelligence-atlas-plan
+LOCAL HEAD:        b98238db006431ca4f698f1554e9edf08affa983
+REMOTE HEAD:       b98238db006431ca4f698f1554e9edf08affa983 (verified via ls-remote)
+TRACKING:          in sync with origin — NOTHING is local-only or unpushed
+VS MAIN:           16 ahead / 0 behind (origin/main)
+WORKING TREE:      CLEAN
+NOTE:              prior session-2 chat report described commits as "local only;
+                   not pushed" — that state ended when the operator authorized
+                   push; all commits through b98238db are now on GitHub.
+```
+
+## Errata (session-2 report bookkeeping)
+
+**E-1 (file count):** the session-2 final report claimed "Created (8)" while its own list named 10 created files (operator decision packet, extension adjudication, Book 1 plan v0.2, Book 0 packet v0.2, ratification record template, four bloc ratification records, adversarial review). Actual count: **10 created, 2 updated**. This ledger entry is the corrective record; old commit history is not modified.
+
+**E-2 (preservation semantics):** the report's "preserved untouched" requires clarification for two files:
+
+```text
+CSIA_BOOK_1_PILOT_ONTOLOGY_STRESS_MATRIX.md
+  PRESERVED in the versioned sense: original v0.1 content intact, ERRATA
+  v0.1.1 APPENDED (additive; no historical lines rewritten).
+  Correct classification: UPDATED APPEND-ONLY.
+
+CSIA_PLANNING_PROGRESS.md
+  PRESERVED in the same sense: v0.1 entries intact, session-2 reconciliation
+  checkpoint APPENDED, header amended with traceability note.
+  Correct classification: UPDATED APPEND-ONLY.
+
+All other historical artifacts (IACER, Constitution v0.1, Roadmap v0.1,
+Constitutional review, Constitution v0.2, Book 0 packet v0.1, Book 1 plan
+v0.1) are strictly UNTOUCHED.
+```
+
+No old commit history was altered; these errata are recorded here as the append-only correction.
