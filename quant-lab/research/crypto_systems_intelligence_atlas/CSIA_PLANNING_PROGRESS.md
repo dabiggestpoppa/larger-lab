@@ -248,3 +248,67 @@ BOOK 0            = RATIFIED   (CSIA_BOOK_0_RATIFICATION_RECORD_v0.1.md)
 
 Deferred decisions D7 (Capital Field, gate: Book 5) and D8 (Sensor seams,
 gate: Book 8) remain open and operator-reserved.
+
+---
+
+# SESSION-4 FINAL CHECKPOINT — BOOK 1 RATIFICATION READY (2026-09-23; appended; history above preserved)
+
+## Decisions (recorded in CSIA_OPERATOR_DECISION_LOG.md)
+
+```text
+D1 = RATIFIED AS WRITTEN      D2 = ACCEPTED     D3 = ACCEPTED
+D4 = CONFIRMED                D5 = CONFIRMED    D6 = CONFIRMED
+R-1A-5 = C (REALIZATION model)
+```
+
+## Effective statuses
+
+```text
+CONSTITUTION_v0.2             = RATIFIED
+BOOK_0                        = RATIFIED
+PROGRAM_LEDGER_AUTHORITY      = RATIFIED
+BOOK_1_PLAN                   = v0.3 (R-1A-5 resolved; all PENDING markers cleared)
+```
+
+## Bloc review outcomes (append-only records updated)
+
+```text
+BLOC_1A = READY_FOR_OPERATOR_RATIFICATION
+          (R-1A-1..4 PASS; R-1A-5 PASS_WITH_DECLARED_LIMITATION:
+           Book 3B family value registries)
+BLOC_1B = READY_FOR_OPERATOR_RATIFICATION (R-1B-1..4 PASS)
+BLOC_1C = READY_FOR_OPERATOR_RATIFICATION
+          (R-1C-1/2/4 PASS; R-1C-3/5 PASS_WITH_DECLARED_LIMITATION:
+           attribute values deferred to Book 3B/4B)
+BLOC_1D = READY_FOR_OPERATOR_RATIFICATION
+          (R-1D-1/3/4 PASS; R-1D-2 PASS_WITH_DECLARED_LIMITATION:
+           Book 2 verification windows)
+CROSS_BLOC_REVIEW             = PASS (13 checks, 0 HOLD/FAIL)
+POST_DECISION_STRESS_REVIEW   = PASS (7 pilots + USDC, 0 HOLD/FAIL)
+```
+
+## Book 1 ratification readiness
+
+```text
+BOOK_1_READY_FOR_OPERATOR_RATIFICATION = TRUE
+BOOK_1_OPERATOR_RATIFIED = FALSE
+BOOK_1_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_2_PLANNING_AUTHORITY = FALSE
+```
+
+## NEXT (canonical per ratified §G / D6)
+
+```text
+NEXT = OPERATOR REVIEW OF BOOK 1 RATIFICATION PACKET
+       (CSIA_BOOK_1_RATIFICATION_PACKET_v0.1.md)
+If ratified: Bloc Ratification Records seal per Constitution 34.1;
+D5 anti-drift audit for Book 1 is due at that review.
+Book 2 planning remains unauthorized until a separate operator decision.
+```
+
+## Push state
+
+```text
+LOCAL vs ORIGIN: ahead (session-4 commits unpushed; operator has not
+authorized push). See final session report for exact count.
+```
