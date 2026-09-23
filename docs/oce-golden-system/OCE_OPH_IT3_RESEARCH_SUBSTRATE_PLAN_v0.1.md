@@ -2,7 +2,7 @@
 
 **Status:** proposed research handoff; no ratification, gate PASS, or implementation claim.  
 **Planning base:** `agent/oce-institutional-stress-suite-build` at `31c68da2b53e899cf64fed393be468f758760008` (2026-09-23). Recheck the authenticated remote head before building.  
-**Source:** *OCE OPH IT3 Cross Realization Ingestion Packet*, especially Sections 13–16. The packet is an external research specification, not OCE doctrine.  
+**Source:** [full OPH × IT³ ingestion packet](OCE_OPH_IT3_INGESTION_PACKET_2026-09-23.md), especially Sections 13–16; [original DOCX](research-sources/OCE_OPH_IT3_Cross_Realization_Ingestion_Packet_2026-09-23.docx). The packet is an external research specification, not OCE doctrine.  
 **Execution prompt:** [OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md](OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md).
 
 ## Purpose and authority boundary

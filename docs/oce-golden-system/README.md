@@ -98,6 +98,7 @@ These documents do not alter the current MF-B0 through MF-B4 build, completed st
 
 ### OPH × IT³ research handoff
 
+- `OCE_OPH_IT3_INGESTION_PACKET_2026-09-23.md` — full text and table transcription of the user-supplied external research packet; the original DOCX is retained under `research-sources/` for exact source custody. Its claims are source statements, not OCE-verified results.
 - `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md` maps the external research packet's Section 13 A–H obligations to existing stress-suite owners, experiments, custody rules, and nonauthoritative claim limits.
 - `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md` is a copy-ready instruction for a separately authorized implementing agent.
 
