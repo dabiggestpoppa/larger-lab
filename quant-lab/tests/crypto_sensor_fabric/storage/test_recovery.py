@@ -15,7 +15,9 @@ import hashlib
 import json
 import os
 import sys
+import threading
 from datetime import UTC, datetime
+from typing import Any
 from pathlib import Path
 
 import pytest
@@ -647,18 +649,43 @@ def test_lock_scan_records_never_deletes(stack_t0: Path) -> None:
     assert lock_path.exists(), "lock file must NEVER be auto-deleted"
 
 
+class _ClearOwnerRepo:
+    """Minimal owner-repository shape for lock-clear authority tests:
+    the two pieces of live ownership truth the clear authority reads
+    (I08R1 §24) — the owner map and the per-job RLock table."""
+
+    def __init__(self) -> None:
+        self._lock_owners: dict[str, dict[str, Any]] = {}
+        self._job_locks: dict[str, threading.RLock] = {}
+
+    def lock_for(self, job_id: str) -> threading.RLock:
+        return self._job_locks.setdefault(job_id, threading.RLock())
+
+
 def test_explicit_clear_requires_matching_fingerprint(stack_t0: Path) -> None:
     stack = Stack(stack_t0)
     engine = stack.engine()
-    with pytest.raises(rec.RecoveryConfigurationError):
+    # I08R1 §23: the owner repository is MANDATORY — no job repository, no
+    # clear (the historical optional-owner premise is corrected here).
+    # Omission is a Python-contract refusal (TypeError); an explicit None
+    # is a typed configuration refusal.
+    with pytest.raises(TypeError):
         engine.clear_job_lock(
             "f" * 64, expected_job_id="other-job", run_id="run-clear"
+        )
+    with pytest.raises(rec.RecoveryConfigurationError):
+        engine.clear_job_lock(
+            "f" * 64,
+            expected_job_id="other-job",
+            owner_repository=object(),
+            run_id="run-clear",
         )
     # Correct fingerprint but absent lock -> conflict, no action.
     with pytest.raises(RecoveryPlanConflict):
         engine.clear_job_lock(
             hashlib.sha256(b"ghost-job").hexdigest(),
             expected_job_id="ghost-job",
+            owner_repository=object(),
             run_id="run-clear",
         )
 
@@ -669,11 +696,19 @@ def test_explicit_clear_journals_then_removes(stack_t0: Path) -> None:
     _write(lock_path, b"{}")
     stack = Stack(stack_t0)
     engine = stack.engine()
+    owner = _ClearOwnerRepo()
     action = engine.clear_job_lock(
-        lock_id, expected_job_id="job-clear-me", run_id="run-clear"
+        lock_id,
+        expected_job_id="job-clear-me",
+        owner_repository=owner,
+        run_id="run-clear",
     )
     assert action is None  # semantic JOB_LOCK -> internal envelope (no frozen model)
     assert not lock_path.exists()
+    # I08R1 §5: the explicit clear carries a durable INTENT phase before
+    # the irreversible unlink.
+    ops = engine.operations.list_for_object(rec.SEMANTIC_JOB_LOCK, lock_id)
+    assert ops, "clear operation must be replayable-durable"
     records = engine.journal.list_for_object(rec.SEMANTIC_JOB_LOCK, lock_id)
     assert len(records) == 1
     assert json.loads(records[0]["after_state"]) == {

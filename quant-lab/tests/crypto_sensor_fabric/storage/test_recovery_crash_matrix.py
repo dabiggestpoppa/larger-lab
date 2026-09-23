@@ -35,7 +35,6 @@ import pytest
 from crypto_sensor_fabric.providers.base.enums import Granularity
 from crypto_sensor_fabric.storage import recovery as rec
 from crypto_sensor_fabric.contracts.enums import SensorFamily
-from crypto_sensor_fabric.providers.base.enums import Granularity
 from crypto_sensor_fabric.storage.enums import (
     CoverageState,
     DateBasis,
@@ -722,12 +721,24 @@ def test_foreign_lock_not_auto_deleted_and_explicit_clear_gate(
     _engine(stack).apply_plan(result, recovery_run_id="run-lock2")
     assert lock_path.exists(), "foreign lock must NEVER be auto-deleted"
     # Explicit clear: fingerprint mismatch refuses; match + absent-owner works.
-    with pytest.raises(rec.RecoveryConfigurationError):
+    # I08R1 §23: the owner repository (the REAL job repository here) is
+    # mandatory — its _lock_owners truth must show no live owner.
+    with pytest.raises(TypeError):
         _engine(stack).clear_job_lock(
             lock_id, expected_job_id="not-the-job", run_id="run-clear2"
         )
+    with pytest.raises(rec.RecoveryConfigurationError):
+        _engine(stack).clear_job_lock(
+            lock_id,
+            expected_job_id="foreign-job",
+            owner_repository=None,
+            run_id="run-clear2",
+        )
     _engine(stack).clear_job_lock(
-        lock_id, expected_job_id="foreign-job", run_id="run-clear2"
+        lock_id,
+        expected_job_id="foreign-job",
+        owner_repository=stack.repo,
+        run_id="run-clear2",
     )
     assert not lock_path.exists()
     # TWO records exist: the scan-apply RECORD_LOCK_ONLY evidence from

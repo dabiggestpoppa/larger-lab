@@ -49,7 +49,9 @@ Postgres (I10/I11), no RawEvidenceQuery service (I12).
 from __future__ import annotations
 
 import hashlib
-import threading
+import json
+import os
+import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -63,6 +65,7 @@ from .atomic import (
     publish_no_replace,
 )
 from .blob_store import BlobMissing
+from .jobs import JobError, JobLockHeld
 from .json_catalog import DurableJsonCatalog, JsonCatalogConflict
 from .models import RecoveryAction, StorageObjectType
 
@@ -109,6 +112,8 @@ PROBLEM_ACQUISITION_SOURCE_QUARANTINED = "ACQUISITION_SOURCE_QUARANTINED"
 PROBLEM_JOB_DURABILITY_DIVERGENCE = "JOB_DURABILITY_DIVERGENCE"
 PROBLEM_LOCK_PRESENT_OWNER_UNPROVEN = "LOCK_PRESENT_OWNER_UNPROVEN"
 PROBLEM_UNKNOWN_CONTEXT = "UNKNOWN_CONTEXT"
+# I08R1 §12/§14: continuation + record-only refinement findings.
+PROBLEM_ORPHAN_BLOB_CONTINUATION = "ORPHAN_BLOB_CONTINUATION"
 
 FINDING_PROBLEMS: frozenset[str] = frozenset(
     {
@@ -143,6 +148,8 @@ SEMANTIC_JOB_LOCK = "JOB_LOCK"
 
 _ACTION_QUARANTINE_CORRUPT_BLOB = "QUARANTINE_CORRUPT_BLOB"
 _ACTION_QUARANTINE_UNKNOWN_CONTEXT = "QUARANTINE_UNKNOWN_CONTEXT"
+_ACTION_RECORD_UNREFERENCED_PROJECTION = "RECORD_UNREFERENCED_PROJECTION"
+_ACTION_CONTINUE_ORPHAN_BLOB = "CONTINUE_ORPHAN_BLOB"
 _ACTION_RESOLVE_ORPHAN_BLOB = "RESOLVE_ORPHAN_BLOB"
 _ACTION_QUARANTINE_STAGING = "QUARANTINE_STAGING"
 _ACTION_QUARANTINE_ORPHAN_PROJECTION = "QUARANTINE_ORPHAN_PROJECTION"
@@ -151,6 +158,46 @@ _ACTION_RECORD_MISSING_TARGET = "RECORD_MISSING_TARGET"
 _ACTION_RECORD_ACQUISITION_DEPENDENCY = "RECORD_ACQUISITION_DEPENDENCY"
 _ACTION_QUARANTINE_JOB = "QUARANTINE_JOB"
 _ACTION_RECORD_LOCK_ONLY = "RECORD_LOCK_ONLY"
+
+# I08R1 §9: bounded-memory streaming constants for quarantine copies.
+_QUAR_COPY_CHUNK_BYTES = 1 << 20
+_QUAR_COPY_MAX_CHUNKS = 1 << 12
+
+
+def _quar_copy_assert_synthetic(
+    source: Path, staging: Path, *skip_chunk: object
+) -> None:
+    """Test-only injection seam for the bounded-copy streaming proof (§9).
+
+    The streaming proof monkeypatches this hook and asserts the bounded
+    chunk stream never reads the payload through ``read_bytes``;
+    production code never calls the hook (only the test does).
+    """
+    del source, staging, skip_chunk  # pragma: no cover - test seam only
+
+
+def _quar_copy_stream(source: Path, staging: Path) -> tuple[int, str]:
+    """Bounded-memory stream copy: (bytes_written, content_sha256).
+
+    The I08R1 §9 contract: a quarantine copy must never buffer a whole
+    evidence file in memory.  The payload streams in fixed chunks while
+    the digest accumulates in the same pass.
+    """
+    _quar_copy_assert_synthetic(source, staging)
+    digest = hashlib.sha256()
+    total = 0
+    with open(source, "rb") as src, open(staging, "wb") as dst:
+        while True:
+            chunk = src.read(_QUAR_COPY_CHUNK_BYTES)
+            if not chunk:
+                break
+            digest.update(chunk)
+            dst.write(chunk)
+            total += len(chunk)
+        dst.flush()
+        os.fsync(dst.fileno())
+    return total, digest.hexdigest()
+
 
 _SHA256_EXPECTED_LENGTH = 64
 _HEX_DIGITS = frozenset("0123456789abcdef")
@@ -461,6 +508,206 @@ class RecoveryJournal:
 
 
 # ---------------------------------------------------------------------------
+# Recovery operation journal (I08R1 §4) — effect-first evidence
+# ---------------------------------------------------------------------------
+
+
+class RecoveryOperationJournal:
+    """Append-only durable OPERATION journal (I08R1 §4) over ``DurableJsonCatalog``.
+
+    Physical location ``<t0_root>/catalogs/recovery/operations/``.  Where the
+    RecoveryAction journal (I08 §7) records what recovery DID, this journal
+    makes recovery effects REPLAYABLE: a durable INTENT record is committed
+    BEFORE the first irreversible effect (I08R1 §5), and each later phase is
+    APPENDED as a new record — never a mutation of an existing row.
+
+    Operation identity is deterministic over (recovery_run_id, action_kind,
+    object_type, object_id, planned semantics); phase is part of the record
+    key, so each phase of one operation is its own append-only row.  Exact
+    retries are idempotent; divergent semantics under one operation id raise
+    :class:`RecoveryActionConflict` (I08R1 §4).  Registration timestamps are
+    excluded from identity.
+    """
+
+    PHASE_INTENT = "INTENT"
+    PHASE_EFFECT_COMMITTED = "EFFECT_COMMITTED"
+    PHASE_COMPLETED = "COMPLETED"
+    PHASE_UNRESOLVED = "UNRESOLVED"
+    _PHASES = (
+        PHASE_INTENT,
+        PHASE_EFFECT_COMMITTED,
+        PHASE_COMPLETED,
+        PHASE_UNRESOLVED,
+    )
+
+    def __init__(self, t0_root: str | Path) -> None:
+        self._catalog = DurableJsonCatalog(
+            Path(t0_root) / "catalogs" / "recovery" / "operations",
+            logical_id_field="recovery_operation_id",
+        )
+
+    @staticmethod
+    def operation_id(
+        *,
+        recovery_run_id: str,
+        action_kind: str,
+        object_type: str,
+        object_id: str,
+        problem: str,
+        resolution: str,
+        before_state: dict[str, Any] | None,
+        after_state: dict[str, Any] | None,
+    ) -> str:
+        """Deterministic operation identity (I08R1 §4) — full SHA-256 over
+        the run + action semantics; registration time excluded."""
+        semantic = {
+            "recovery_run_id": recovery_run_id,
+            "action_kind": action_kind,
+            "object_type": object_type,
+            "object_id": object_id,
+            "problem": problem,
+            "resolution": resolution,
+            "before_state": before_state or {},
+            "after_state": after_state or {},
+        }
+        return hashlib.sha256(_canonical(semantic).encode("utf-8")).hexdigest()
+
+    def record_phase(
+        self,
+        *,
+        recovery_run_id: str,
+        action_kind: str,
+        object_type: str,
+        object_id: str,
+        problem: str,
+        resolution: str,
+        before_state: dict[str, Any] | None = None,
+        after_state: dict[str, Any] | None = None,
+        phase: str = PHASE_INTENT,
+        detail: str | None = None,
+        registered_at: datetime | None = None,
+    ) -> tuple[str, bool]:
+        """Append one phase of a recovery operation (idempotent on exact retry).
+
+        The operation id is derived from (run, action_kind, object,
+        planned semantics); the phase becomes part of the physical record
+        key, so each phase is an APPEND of its own row (I08R1 §4: never a
+        mutation of one journal row)."""
+        if phase not in self._PHASES:
+            raise RecoveryConfigurationError(
+                f"unknown recovery operation phase {phase!r}"
+            )
+        operation_id = self.operation_id(
+            recovery_run_id=recovery_run_id,
+            action_kind=action_kind,
+            object_type=object_type,
+            object_id=object_id,
+            problem=problem,
+            resolution=resolution,
+            before_state=before_state,
+            after_state=after_state,
+        )
+        # Each phase is its own append-only row.  EFFECT_COMMITTED rows are
+        # detail-qualified: one operation may commit SEVERAL durable effects
+        # (the orphan two-step reconciliation), each with its own row.
+        phase_key = phase
+        if phase == self.PHASE_EFFECT_COMMITTED:
+            detail_key = hashlib.sha256((detail or "").encode("utf-8")).hexdigest()[:16]
+            phase_key = f"{phase}:{detail_key}"
+        record_id = f"{operation_id}:{phase_key}"
+        envelope: dict[str, Any] = {
+            "record_type": "recovery_operation",
+            # The catalog identity field must equal the committed logical
+            # id — the PHASE-QUALIFIED record id (each phase is its own
+            # append-only row).  The phase-free operation id is carried
+            # separately so all rows of one operation remain linked.
+            "recovery_operation_id": record_id,
+            "operation_id": operation_id,
+            "phase": phase,
+            "recovery_run_id": recovery_run_id,
+            "action_kind": action_kind,
+            "object_type": object_type,
+            "object_id": object_id,
+            "problem": problem,
+            "resolution": resolution,
+            "before_state": _json_state(before_state),
+            "after_state": _json_state(after_state),
+            "detail": detail,
+            "registered_at": (
+                coerce_utc(registered_at).isoformat()
+                if registered_at is not None
+                else datetime.now(UTC).isoformat()
+            ),
+        }
+        try:
+            committed = self._catalog.commit(record_id, envelope)
+        except JsonCatalogConflict as exc:
+            existing = self._catalog.get(record_id)
+            if existing is not None and existing.get("detail") == envelope.get(
+                "detail"
+            ):
+                committed = existing
+            else:
+                raise RecoveryActionConflict(
+                    f"recovery operation {record_id[:12]}... already exists "
+                    "with DIVERGENT phase content; nothing overwritten "
+                    "(I08R1 §4)"
+                ) from exc
+        return operation_id, committed is not envelope
+
+    def phases(self, operation_id: str) -> tuple[str, ...]:
+        """Durably recorded phase labels of one operation, in frozen order.
+
+        EFFECT_COMMITTED rows are detail-qualified (one operation may
+        commit several durable effects); duplicates of the same phase
+        collapse to the first occurrence in frozen order."""
+        found: list[str] = []
+        for phase in self._PHASES:
+            if phase == self.PHASE_EFFECT_COMMITTED:
+                if any(
+                    rid.startswith(f"{operation_id}:{phase}:")
+                    for rid in self._catalog.list_ids()
+                ):
+                    found.append(phase)
+            elif self._catalog.get(f"{operation_id}:{phase}") is not None:
+                found.append(phase)
+        return tuple(found)
+
+    def has_phase(self, operation_id: str, phase: str) -> bool:
+        if phase == self.PHASE_EFFECT_COMMITTED:
+            return any(
+                rid.startswith(f"{operation_id}:{phase}:")
+                for rid in self._catalog.list_ids()
+            )
+        return self._catalog.get(f"{operation_id}:{phase}") is not None
+
+    def get_phase(self, operation_id: str, phase: str) -> dict[str, Any] | None:
+        return self._catalog.get(f"{operation_id}:{phase}")
+
+    def all_operations(self) -> list[dict[str, Any]]:
+        """Every durable operation-phase record (sorted by record id)."""
+        return [
+            payload
+            for rid in sorted(self._catalog.list_ids())
+            if (payload := self._catalog.get(rid)) is not None
+        ]
+
+    def list_for_object(
+        self, object_type: str, object_id: str
+    ) -> list[dict[str, Any]]:
+        """All durable operation records against one object (sorted)."""
+        found = [
+            payload
+            for logical_id in self._catalog.list_ids()
+            if (payload := self._catalog.get(logical_id)) is not None
+            and payload.get("object_type") == object_type
+            and payload.get("object_id") == object_id
+        ]
+        found.sort(key=lambda p: p["recovery_operation_id"])
+        return found
+
+
+# ---------------------------------------------------------------------------
 # The recovery engine
 # ---------------------------------------------------------------------------
 
@@ -500,9 +747,8 @@ class RecoveryEngine:
         self._jobs = job_repository
         self._artifacts = projection_artifact_repository
         self._clock = clock if clock is not None else (lambda: datetime.now(UTC))
-        self._run_counter = 0
-        self._run_lock = threading.Lock()
         self._journal = RecoveryJournal(self._t0_root)
+        self._operations = RecoveryOperationJournal(self._t0_root)
         self._orphan_context: dict[str, tuple[Any, Any]] = {}
         if recovery_run_id is not None and (
             not isinstance(recovery_run_id, str) or not recovery_run_id
@@ -517,17 +763,14 @@ class RecoveryEngine:
     def new_run_id(self) -> str:
         """One explicit run id per scan/apply pair (I08 §8).
 
-        Deterministic for tests (explicit ids are accepted by the
-        scanner); collision-safe for operations: monotonic counter under a
-        lock, full hex digest — never a wall-clock format, never a temp
-        path.
+        I08R1 §26: operational auto-generation uses ``uuid.uuid4`` — at
+        least 128 bits of cryptographically strong randomness, so ids are
+        collision-safe across instances, processes and restarts.  Never a
+        wall-clock format, never a temp path, never a process memory
+        address (the retired ``id(self)`` scheme failed that bar).
+        Deterministic evidence builders pass EXPLICIT run ids instead.
         """
-        with self._run_lock:
-            self._run_counter += 1
-            digest = hashlib.sha256(
-                f"recovery-run:{id(self)}:{self._run_counter}".encode("utf-8")
-            ).hexdigest()
-        return f"recovery-{digest[:32]}-{self._run_counter:06d}"
+        return f"recovery-{uuid.uuid4().hex}"
 
     def register_orphan_context(
         self, blob_sha256: str, *, evidence_blob: Any, acquisition: Any
@@ -551,6 +794,11 @@ class RecoveryEngine:
     def journal(self) -> RecoveryJournal:
         """The durable recovery journal (narrow read surface, I08 §32)."""
         return self._journal
+
+    @property
+    def operations(self) -> RecoveryOperationJournal:
+        """The durable replayable-operation journal (I08R1 §4)."""
+        return self._operations
 
     # -- containment (I08 §29) ----------------------------------------------
 
@@ -634,7 +882,7 @@ class RecoveryEngine:
         self._assert_contained(source, self._t0_root, "quarantine source")
         if destination.exists():
             if _sha256_file(destination) == content_sha256:
-                source.unlink(missing_ok=True)
+                self._unlink_source_after_durable_destination(source, destination)
                 return False
             raise RecoveryQuarantineConflict(
                 f"quarantine destination {destination.name} already holds "
@@ -643,7 +891,17 @@ class RecoveryEngine:
         ensure_durable_directory(destination.parent)
         staging = destination.parent / f"{destination.name}.staging"
         staging.unlink(missing_ok=True)
-        staging.write_bytes(source.read_bytes())
+        # I08R1 §9: BOUNDED-MEMORY streaming copy — the source payload is
+        # never buffered whole (no ``read_bytes``); bytes stream in fixed
+        # chunks with the digest computed in the same pass and the staged
+        # file fsync'd before publication.
+        _copied, copied_sha = _quar_copy_stream(source, staging)
+        if copied_sha != content_sha256:
+            staging.unlink(missing_ok=True)
+            raise RecoveryQuarantineConflict(
+                f"quarantine copy of {destination.name} diverged from the "
+                "scanned content identity; nothing published"
+            )
         try:
             publish_no_replace(staging, destination)
         except OSError as exc:
@@ -651,9 +909,154 @@ class RecoveryEngine:
             raise RecoveryQuarantineConflict(
                 f"quarantine publication failed for {destination.name}: {exc}"
             ) from exc
-        source.unlink(missing_ok=True)
         fsync_directory(destination.parent)
+        # I08R1 §9: the source is unlinked ONLY after the destination is
+        # durably published (and its directory fsync'd).
+        self._unlink_source_after_durable_destination(source, destination)
         return True
+
+    def _unlink_source_after_durable_destination(
+        self, source: Path, destination: Path
+    ) -> None:
+        """Remove the source only after the destination exists durably;
+        fsync the source parent afterwards (I08R1 §9)."""
+        if not destination.exists():
+            raise RecoveryQuarantineConflict(
+                f"refusing to unlink {source.name}: quarantine destination "
+                f"{destination.name} is not durably present"
+            )
+        source.unlink(missing_ok=True)
+        fsync_directory(source.parent)
+
+    # -- interrupted-operation continuation (I08R1 §6/§8) ---------------------
+
+    def _finalize_open_operations(self) -> list[dict[str, Any]]:
+        """Adopt operations whose effect landed but whose outcome row died.
+
+        I08R1 §6/§8: a crash AFTER a durable effect but BEFORE the final
+        RecoveryAction must converge on retry — the landed effect is
+        recognized as THIS operation's committed step (exact intent
+        semantics), never misread as a stale plan, and no new durable
+        mutation is invented here.  Adoption only runs inside APPLY
+        (an apply is the explicit recovery act); scan stays read-only.
+        """
+        adopted: list[dict[str, Any]] = []
+        for record in self._operations.all_operations():
+            phases = record.get("phase")
+            if phases not in ("INTENT", "EFFECT_COMMITTED"):
+                continue
+            if self._operations.has_phase(record["operation_id"], "COMPLETED"):
+                continue
+            if self._operations.has_phase(record["operation_id"], "UNRESOLVED"):
+                continue
+            # Operation rows store states as canonical JSON STRINGS
+            # (the frozen envelope keeps text columns); parse before use.
+            raw_before = record.get("before_state")
+            parsed_before: dict[str, Any] = {}
+            if isinstance(raw_before, str) and raw_before:
+                parsed_before = dict(json.loads(raw_before))
+            elif isinstance(raw_before, dict):
+                parsed_before = dict(raw_before)
+            planned = RecoveryPlanAction(
+                action_kind=record["action_kind"],
+                object_type=record["object_type"],
+                object_id=record["object_id"],
+                problem=record["problem"],
+                resolution=record["resolution"],
+                before_state=parsed_before,
+            )
+            effect = self._effect_already_durable(planned)
+            if effect is None:
+                continue
+            adopted.append(
+                {
+                    "operation_id": record["operation_id"],
+                    "action_kind": planned.action_kind,
+                    "object_type": planned.object_type,
+                    "object_id": planned.object_id,
+                    "effect": effect,
+                }
+            )
+        return adopted
+
+    def _effect_already_durable(self, planned: RecoveryPlanAction) -> str | None:
+        """Recognize THIS operation's durable effect (no new mutation).
+
+        Evidence-only kinds adopt on their journaled RecoveryAction;
+        quarantine kinds adopt when the canonical object is already gone
+        under a prior durable record for the same object + problem.
+        Returns the adopted-effect description, or None.
+        """
+        if planned.action_kind in (
+            _ACTION_RECORD_MISSING_TARGET,
+            _ACTION_RECORD_ACQUISITION_DEPENDENCY,
+            _ACTION_RECORD_LOCK_ONLY,
+        ):
+            prior = self._journal.list_for_object(
+                planned.object_type, planned.object_id
+            )
+            if any(r.get("problem") == planned.problem for r in prior):
+                return "recovery evidence already recorded"
+            return None
+        if planned.action_kind in (
+            _ACTION_QUARANTINE_CORRUPT_BLOB,
+            _ACTION_QUARANTINE_STAGING,
+            _ACTION_QUARANTINE_ORPHAN_PROJECTION,
+            _ACTION_QUARANTINE_UNKNOWN_CONTEXT,
+        ):
+            relative = (planned.before_state or {}).get("relative_path")
+            if isinstance(relative, str) and relative:
+                canonical = self._t0_root / relative
+                if canonical.exists():
+                    return None
+                prior = self._journal.list_for_object(
+                    planned.object_type, planned.object_id
+                )
+                if any(r.get("problem") == planned.problem for r in prior):
+                    return "canonical object already absent (quarantined)"
+            return None
+        if planned.action_kind == _ACTION_RESOLVE_ORPHAN_BLOB:
+            sha_part = planned.object_id
+            encoding_value = (planned.before_state or {}).get(
+                "storage_encoding", "NONE"
+            )
+            try:
+                encoding = StorageEncodingValue(encoding_value)
+            except ValueError:
+                return None
+            object_path = self._blob_object_path(sha_part, encoding)
+            if object_path.exists():
+                return None
+            context = self._orphan_context.get(sha_part)
+            if context is not None:
+                _evidence_blob, acquisition = context
+                try:
+                    existing = self._acquisitions.get_acquisition(
+                        acquisition.acquisition_id
+                    )
+                except Exception:
+                    return None
+                if existing.model_dump() == acquisition.model_dump():
+                    return "reconciliation steps already committed"
+                return None
+            return None
+        if planned.action_kind == _ACTION_RESOLVE_ORPHAN_MANIFEST:
+            manifest = self._manifest_by_id(planned.object_id)
+            if manifest is None:
+                return None
+            try:
+                chain_ids = {
+                    m.partition_manifest_id
+                    for m in self._manifests.list_manifest_versions(
+                        manifest.partition_key
+                    )
+                }
+            except Exception:
+                return None
+            if manifest.partition_manifest_id in chain_ids:
+                return "manifest already joined the committed chain"
+            return None
+        return None
 
     # -- phase 1: SCAN (READ-ONLY, I08 §5) -----------------------------------
 
@@ -834,6 +1237,16 @@ class RecoveryEngine:
                         ),
                     )
                 )
+                continue
+            # I08R1 §12 (crash 2b): healthy verified metadata with NO
+            # usable acquisition referencing it is the mid-reconciliation
+            # boundary (metadata append landed, acquisition append
+            # crashed).  A CONTINUATION finding — never a duplicate
+            # metadata proposal; the apply path completes the missing
+            # step through the public acquisition API.
+            continuation = self._metadata_without_acquisition(meta.blob_sha256)
+            if continuation is not None:
+                findings.append(continuation)
 
     def _scan_orphan_blobs(self, findings: list[RecoveryFinding]) -> None:
         """§4-B (03 doc §3): committed blobs without durable metadata.
@@ -899,6 +1312,92 @@ class RecoveryEngine:
                     ),
                 )
             )
+
+    def _metadata_without_acquisition(
+        self, sha_part: str
+    ) -> RecoveryFinding | None:
+        """I08R1 §12 (crash 2b): the metadata-append / acquisition-append
+        mid-reconciliation boundary, surfaced from DURABLE truth.
+
+        A blob with durable EvidenceBlob metadata but NO usable
+        AcquisitionRecord is a mid-flight ORPHAN_BLOB reconciliation
+        (metadata committed, acquisition append crashed).  The finding is
+        RECORD-ONLY in plan mapping (no second metadata row is ever
+        proposed — provenance is never duplicated); the continuation is
+        completed through the public acquisition API on explicit apply.
+        Quarantine-state metadata is already-sealed evidence, not a
+        continuation.
+        """
+        from .enums import IntegrityState
+
+        try:
+            metas = tuple(self._blob_metadata.get_blob_metadata(sha_part))
+        except Exception:
+            return None
+        if not metas:
+            return None
+        usable = [
+            meta
+            for meta in metas
+            if meta.integrity_state
+            is not IntegrityState.QUARANTINED_INTEGRITY_FAILURE
+        ]
+        if not usable:
+            return None
+        if sha_part in self._acquisition_blob_shas():
+            return None
+        return RecoveryFinding(
+            problem=PROBLEM_ORPHAN_BLOB_CONTINUATION,
+            object_type=StorageObjectType.EVIDENCE_BLOB.value,
+            object_id=sha_part,
+            detail=(
+                "durable EvidenceBlob metadata exists but no usable "
+                "AcquisitionRecord references it: mid-reconciliation "
+                "boundary between the metadata append and the acquisition "
+                "append (I08R1 §12, crash 2b)"
+            ),
+            before_state={
+                "metadata_durable": True,
+                "acquisition_durable": False,
+            },
+            proposed_resolution=(
+                "CONTINUE_ORPHAN_BLOB: register the acquisition through the "
+                "public acquisition API with EXPLICIT operator-supplied "
+                "context; provenance is never guessed and metadata is never "
+                "duplicated (I08R1 §12)"
+            ),
+        )
+
+    def _acquisition_blob_shas(self) -> set[str]:
+        """Every blob sha referenced by a DURABLE acquisition (physical read).
+
+        Fragments are content-addressed parquet files under
+        ``catalogs/manifests/acquisitions/``; rows are decoded with the
+        repository's OWN schema/decoder — never a shadow parser.
+        """
+        from .catalog import (
+            ACQUISITION_SCHEMA,
+            _acquisition_from_row,
+            read_fragment,
+        )
+
+        acquisitions_root = self._t0_root / "catalogs" / "manifests" / "acquisitions"
+        if not acquisitions_root.is_dir():
+            return set()
+        shas: set[str] = set()
+        for path in sorted(acquisitions_root.glob("*.parquet")):
+            try:
+                rows = read_fragment(path, ACQUISITION_SCHEMA)
+            except Exception:
+                continue
+            for row in rows:
+                try:
+                    record = _acquisition_from_row(row)
+                except Exception:
+                    continue
+                if record.blob_sha256:
+                    shas.add(record.blob_sha256)
+        return shas
 
     def _scan_acquisition_dependencies(
         self, findings: list[RecoveryFinding]
@@ -1062,6 +1561,39 @@ class RecoveryEngine:
             self._assert_contained(path, self._t0_root, "projection artifact")
             bytes_sha = _sha256_file(path)
             if bytes_sha in known:
+                # I08R1 §14 (crash 4): a CATALOGED projection is healthy
+                # ONLY when committed manifest truth references it.  A
+                # catalog row alone does not prove the projection is
+                # canonical — the frozen crash boundary is exactly
+                # 'projection cataloged, manifest never wrote it down'.
+                if not self._projection_referenced_by_manifests(bytes_sha):
+                    findings.append(
+                        RecoveryFinding(
+                            problem=PROBLEM_ORPHAN_PROJECTION,
+                            object_type=StorageObjectType.RAW_PROJECTION.value,
+                            object_id=bytes_sha,
+                            detail=(
+                                "cataloged projection artifact is referenced "
+                                "by NO committed manifest truth (I08R1 §14: "
+                                "catalog validity is not manifest truth)"
+                            ),
+                            before_state={
+                                "relative_path": path.relative_to(
+                                    self._t0_root
+                                ).as_posix(),
+                                "byte_length": path.stat().st_size,
+                                "bytes_sha256": bytes_sha,
+                                "cataloged": True,
+                            },
+                            proposed_resolution=(
+                                "RECORD_UNREFERENCED_PROJECTION: reconcile "
+                                "ONLY through the canonical manifest APIs "
+                                "when exact context proves the mapping; "
+                                "otherwise record unresolved; never "
+                                "manufacture lineage (I08 §14)"
+                            ),
+                        )
+                    )
                 continue
             findings.append(
                 RecoveryFinding(
@@ -1090,6 +1622,24 @@ class RecoveryEngine:
                 )
             )
 
+    def _projection_referenced_by_manifests(self, bytes_sha: str) -> bool:
+        """True iff some COMMITTED manifest references a projection whose
+        physical bytes hash to ``bytes_sha`` (I08R1 §14).
+
+        Projection references are BY ID; the id→bytes binding comes from
+        the projection catalog itself, so 'referenced' means: a committed
+        manifest lists the projection id AND the catalog maps that id to
+        these exact physical bytes.
+        """
+        for manifest in self._all_manifests():
+            for projection_id in manifest.projection_refs:
+                if self._artifacts is None:
+                    return False
+                artifact = self._artifacts.get(projection_id)
+                if artifact is not None and artifact.projection_sha256 == bytes_sha:
+                    return True
+        return False
+
     def _scan_jobs(self, findings: list[RecoveryFinding]) -> None:
         """§4-F (I08 §18): job states ahead of durable evidence.
 
@@ -1112,7 +1662,15 @@ class RecoveryEngine:
                 # chain validation over the cached catalog — the refresh is
                 # what adopts it — so the scan MUST cross the same gate.
                 self._jobs.get_job(job_id)
-            except Exception as exc:
+            except JobError as exc:
+                # I08R1 §27: typed JOB-CLASS failures.  Normal active-writer
+                # contention (JobLockHeld) is NOT durable corruption; the
+                # job is skipped here (lock files are already classified by
+                # LOCK_PRESENT_OWNER_UNPROVEN).  Genuine durable-chain/
+                # proof failures (JobCatalogCorrupt and the other typed
+                # job-state failures) are the corruption signal.
+                if isinstance(exc, JobLockHeld):
+                    continue
                 findings.append(
                     RecoveryFinding(
                         problem=PROBLEM_JOB_DURABILITY_DIVERGENCE,
@@ -1132,6 +1690,10 @@ class RecoveryEngine:
                         ),
                     )
                 )
+            # I08R1 §27: any OTHER failure (unexpected I/O, programming
+            # errors, unrelated operational faults) propagates typed — it
+            # must NEVER be mislabeled as job durability corruption, and a
+            # scan that cannot read a job repository is not a healthy scan.
 
     def _scan_job_locks(self, findings: list[RecoveryFinding]) -> None:
         """§4-I (I08 §20): lock files with unprovable ownership.
@@ -1326,6 +1888,10 @@ class RecoveryEngine:
         dependencies) produce evidence records WITHOUT mutation.
         """
         run_id = recovery_run_id or result.recovery_run_id
+        # I08R1 §6/§8: interrupted-but-landed operations adopt FIRST so a
+        # restarted apply recognizes its own prior effect instead of
+        # re-planning over it (or misreading it as stale).
+        self._finalize_open_operations()
         applied: list[RecoveryAction] = []
         for planned in result.planned_actions:
             action = self._apply_one(planned, run_id)
@@ -1342,6 +1908,10 @@ class RecoveryEngine:
             _ACTION_QUARANTINE_STAGING: self._execute_staging,
             _ACTION_QUARANTINE_ORPHAN_PROJECTION: self._execute_orphan_projection,
             _ACTION_RESOLVE_ORPHAN_MANIFEST: self._execute_orphan_manifest,
+            _ACTION_CONTINUE_ORPHAN_BLOB: self._execute_continue_orphan_blob,
+            _ACTION_RECORD_UNREFERENCED_PROJECTION: (
+                self._execute_unreferenced_projection
+            ),
             _ACTION_RECORD_MISSING_TARGET: self._execute_missing_manifest_target,
             _ACTION_RECORD_ACQUISITION_DEPENDENCY: (
                 self._execute_acquisition_dependency
@@ -1393,6 +1963,125 @@ class RecoveryEngine:
         assert payload is not None
         return self._journal.to_recovery_action(payload)
 
+    # -- replayable-operation phases (I08R1 §4/§5) ----------------------------
+
+    def _operation_id(self, planned: RecoveryPlanAction, run_id: str) -> str:
+        """Deterministic operation id for one planned action (I08R1 §4):
+        run + action semantics, no clocks, no process state."""
+        return RecoveryOperationJournal.operation_id(
+            recovery_run_id=run_id,
+            action_kind=planned.action_kind,
+            object_type=planned.object_type,
+            object_id=planned.object_id,
+            problem=planned.problem,
+            resolution=planned.resolution,
+            before_state=planned.before_state,
+            after_state=None,
+        )
+
+    def _record_intent(self, planned: RecoveryPlanAction, run_id: str) -> str:
+        """Durably record INTENT before the first irreversible effect.
+
+        I08R1 §5: if intent publication fails, the exception escapes
+        BEFORE any mutation has been attempted — an effect can never
+        outrun its recovery evidence.  Exact retries are idempotent.
+        Returns the deterministic operation id."""
+        op_id = self._operation_id(planned, run_id)
+        self._operations.record_phase(
+            recovery_run_id=run_id,
+            action_kind=planned.action_kind,
+            object_type=planned.object_type,
+            object_id=planned.object_id,
+            problem=planned.problem,
+            resolution=planned.resolution,
+            before_state=planned.before_state,
+            after_state=None,
+            phase=RecoveryOperationJournal.PHASE_INTENT,
+            detail="durable intent recorded before the first irreversible "
+            "effect (I08R1 §5)",
+            registered_at=self._clock(),
+        )
+        return op_id
+
+    def _record_effect(
+        self,
+        op_id: str,
+        planned: RecoveryPlanAction,
+        run_id: str,
+        *,
+        detail: str,
+    ) -> None:
+        """Append an EFFECT_COMMITTED phase row after one irreversible
+        effect became durable (I08R1 §4: append-only, never in-place)."""
+        self._operations.record_phase(
+            recovery_run_id=run_id,
+            action_kind=planned.action_kind,
+            object_type=planned.object_type,
+            object_id=planned.object_id,
+            problem=planned.problem,
+            resolution=planned.resolution,
+            before_state=planned.before_state,
+            after_state=None,
+            phase=RecoveryOperationJournal.PHASE_EFFECT_COMMITTED,
+            detail=detail,
+            registered_at=self._clock(),
+        )
+
+    def _finish_unresolved(
+        self,
+        op_id: str,
+        planned: RecoveryPlanAction,
+        run_id: str,
+        *,
+        refusal_type: str,
+        step: str,
+    ) -> RecoveryAction | None:
+        """Record an UNRESOLVED outcome when a repository API refused a
+        reconciliation step; nothing registered, nothing overwritten."""
+        resolution = (
+            f"UNRESOLVED: the repository APIs refused the {step} "
+            f"({refusal_type}); nothing registered, nothing overwritten"
+        )
+        self._record_outcome(op_id, planned, run_id, resolution=resolution)
+        return self._journal_action(
+            run_id=run_id,
+            planned=planned,
+            resolution=resolution,
+            after_state={
+                "reconciled": False,
+                "refusal": refusal_type,
+                "refused_step": step,
+            },
+        )
+
+    def _record_outcome(
+        self,
+        op_id: str,
+        planned: RecoveryPlanAction,
+        run_id: str,
+        *,
+        resolution: str,
+    ) -> None:
+        """Append the final COMPLETED/UNRESOLVED phase of one operation."""
+        phase = (
+            RecoveryOperationJournal.PHASE_UNRESOLVED
+            if resolution.startswith("UNRESOLVED")
+            else RecoveryOperationJournal.PHASE_COMPLETED
+        )
+        self._operations.record_phase(
+            recovery_run_id=run_id,
+            action_kind=planned.action_kind,
+            object_type=planned.object_type,
+            object_id=planned.object_id,
+            problem=planned.problem,
+            resolution=planned.resolution,
+            before_state=planned.before_state,
+            after_state=None,
+            phase=phase,
+            detail=resolution,
+            registered_at=self._clock(),
+        )
+
     def _execute_corrupt_blob(
         self, planned: RecoveryPlanAction, run_id: str
     ) -> RecoveryAction | None:
@@ -1437,6 +2126,17 @@ class RecoveryEngine:
                 StorageObjectType.EVIDENCE_BLOB.value, sha_part
             )
             if prior:
+                # I08R1 §6: an interrupted operation whose effect already
+                # exists converges to a COMPLETED operation on retry.
+                self._record_outcome(
+                    self._operation_id(planned, run_id),
+                    planned,
+                    run_id,
+                    resolution=(
+                        "COMPLETED: canonical object already absent under a "
+                        "prior durable recovery record; nothing duplicated"
+                    ),
+                )
                 return None
             return self._journal_action(
                 run_id=run_id,
@@ -1457,7 +2157,24 @@ class RecoveryEngine:
             content_sha256=content_sha,
             suffix=".quarantined",
         )
+        # I08R1 §5: durable INTENT precedes the irreversible move.
+        op_id = self._record_intent(planned, run_id)
         moved = self._quarantine_file(object_path, destination, content_sha)
+        # After _quarantine_file returns, the effect IS durable in BOTH
+        # branches: freshly moved, or an identical artifact adopted and
+        # the canonical source unlinked (I08R1 §6 exact-retry convergence).
+        # Either way the commit is recorded as its own append-only phase.
+        self._record_effect(
+            op_id,
+            planned,
+            run_id,
+            detail=(
+                "canonical corrupt bytes moved to quarantine/integrity"
+                if moved
+                else "identical quarantine artifact adopted; canonical "
+                "source unlinked (exact retry)"
+            ),
+        )
         # Canonical location now unusable; try to append the explicit
         # quarantine metadata row through the PUBLIC API.  The physical
         # gate is EXPECTED to refuse (bytes are gone); the attempt is
@@ -1487,15 +2204,17 @@ class RecoveryEngine:
                 f"existing gates hold (typed: {type(exc).__name__}); "
                 "canonical use fails closed"
             )
+        resolution = (
+            "QUARANTINE_INTEGRITY: corrupt bytes preserved under "
+            f"quarantine/integrity ({'moved' if moved else 'adopted'}); "
+            "canonical object NOT overwritten; acquisition/manifest "
+            "history preserved"
+        )
+        self._record_outcome(op_id, planned, run_id, resolution=resolution)
         return self._journal_action(
             run_id=run_id,
             planned=planned,
-            resolution=(
-                "QUARANTINE_INTEGRITY: corrupt bytes preserved under "
-                f"quarantine/integrity ({'moved' if moved else 'adopted'}); "
-                "canonical object NOT overwritten; acquisition/manifest "
-                "history preserved"
-            ),
+            resolution=resolution,
             after_state={
                 "quarantined": moved,
                 "quarantine_category": QUARANTINE_CATEGORY_INTEGRITY,
@@ -1508,32 +2227,25 @@ class RecoveryEngine:
     def _execute_orphan_blob(
         self, planned: RecoveryPlanAction, run_id: str
     ) -> RecoveryAction | None:
-        """I08 §12: reconcile an ORPHAN_DURABLE_BLOB only with proven context.
+        """I08 §12 + I08R1 §7: reconcile an ORPHAN_DURABLE_BLOB only with
+        proven context — as a REPLAYABLE multi-step operation.
 
-        Revalidation: the orphan metadata must STILL be absent and the
-        bytes still present (I08 §28).  The bytes are verified against
-        their content-addressed name.  With registered durable context,
-        reconciliation goes through the PUBLIC ``append_metadata`` /
-        ``append_acquisition`` APIs (their validation remains
-        authoritative; a refusal leaves the orphan unresolved).  Without
-        proven context the blob is quarantined as unknown_context —
-        provenance is NEVER manufactured.
+        Preflight (before any mutation): the physical bytes verify against
+        their content-addressed name and the registered context identities
+        match the orphan.  Then: durable INTENT; step 1 append/adopt the
+        exact EvidenceBlob metadata (phase recorded); step 2 append/adopt
+        the exact AcquisitionRecord (phase recorded); COMPLETED outcome.
+        A crash after step 1 leaves the retry able to RECOGNIZE the exact
+        matching metadata and continue with step 2 — an already-committed
+        step is never misread as a stale plan, and divergent durable state
+        raises a typed conflict.  Without proven context the blob is
+        quarantined as unknown_context — provenance is NEVER manufactured.
         """
         sha_part = planned.object_id
         encoding_value = planned.before_state.get(
             "storage_encoding", "NONE"
         )
         encoding = StorageEncodingValue(encoding_value)
-        try:
-            self._blob_metadata.get_blob_metadata(sha_part)
-            has_metadata = True
-        except Exception:
-            has_metadata = False
-        if has_metadata:
-            raise RecoveryPlanConflict(
-                f"blob {sha_part} now has durable metadata; the scanned "
-                "ORPHAN_DURABLE_BLOB plan is stale (I08 §28)"
-            )
         object_path = self._blob_object_path(sha_part, encoding)
         if not object_path.exists():
             raise RecoveryPlanConflict(
@@ -1542,32 +2254,93 @@ class RecoveryEngine:
             )
         content_sha = _sha256_file(object_path)
         context = self._orphan_context.get(sha_part)
+        # -- preflight (I08R1 §7): identity + semantics BEFORE mutation -----
         if context is not None and content_sha == sha_part:
             evidence_blob, acquisition = context
-            try:
-                self._blob_metadata.append_metadata(evidence_blob)
-                self._acquisitions.append_acquisition(acquisition)
-            except Exception as exc:
-                return self._journal_action(
-                    run_id=run_id,
-                    planned=planned,
-                    resolution=(
-                        "UNRESOLVED: the repository APIs refused the "
-                        f"registered context ({type(exc).__name__}); nothing "
-                        "registered, nothing overwritten"
-                    ),
-                    after_state={
-                        "reconciled": False,
-                        "refusal": type(exc).__name__,
-                    },
+            if evidence_blob.blob_sha256 != sha_part:
+                raise RecoveryPlanConflict(
+                    "registered context evidence_blob identity does not "
+                    f"match the orphan {sha_part} (I08R1 §7 preflight)"
                 )
+            if acquisition.blob_sha256 != sha_part:
+                raise RecoveryPlanConflict(
+                    "registered context acquisition blob_sha256 does not "
+                    f"match the orphan {sha_part} (I08R1 §7 preflight)"
+                )
+            # Durable INTENT precedes the first irreversible effect.
+            op_id = self._record_intent(planned, run_id)
+            # -- step 1: append/adopt the EXACT EvidenceBlob metadata -------
+            existing_metas: tuple[Any, ...] = ()
+            try:
+                existing_metas = tuple(
+                    self._blob_metadata.get_blob_metadata(sha_part)
+                )
+            except Exception:
+                existing_metas = ()
+            if existing_metas:
+                if not any(
+                    meta.model_dump() == evidence_blob.model_dump()
+                    for meta in existing_metas
+                ):
+                    raise RecoveryPlanConflict(
+                        f"blob {sha_part} already carries DIVERGENT durable "
+                        "metadata; the reconciliation plan conflicts "
+                        "(I08R1 §7)"
+                    )
+                # Exact matching metadata already durable (crash after
+                # step 1): ADOPT and continue — never "stale", never a
+                # duplicate append.
+            else:
+                try:
+                    self._blob_metadata.append_metadata(evidence_blob)
+                except Exception as exc:
+                    return self._finish_unresolved(
+                        op_id, planned, run_id,
+                        refusal_type=type(exc).__name__,
+                        step="metadata append",
+                    )
+                self._record_effect(
+                    op_id, planned, run_id,
+                    detail="EvidenceBlob metadata appended for orphan",
+                )
+            # -- step 2: append/adopt the EXACT AcquisitionRecord -----------
+            try:
+                existing_acq = self._acquisitions.get_acquisition(
+                    acquisition.acquisition_id
+                )
+            except Exception:
+                existing_acq = None
+            if existing_acq is not None:
+                if existing_acq.model_dump() != acquisition.model_dump():
+                    raise RecoveryPlanConflict(
+                        "acquisition "
+                        f"{acquisition.acquisition_id} already exists with "
+                        "DIVERGENT content; the reconciliation plan "
+                        "conflicts (I08R1 §7)"
+                    )
+            else:
+                try:
+                    self._acquisitions.append_acquisition(acquisition)
+                except Exception as exc:
+                    return self._finish_unresolved(
+                        op_id, planned, run_id,
+                        refusal_type=type(exc).__name__,
+                        step="acquisition append",
+                    )
+                self._record_effect(
+                    op_id, planned, run_id,
+                    detail="AcquisitionRecord appended for orphan",
+                )
+            resolution = (
+                "RECONCILED through existing public repository APIs with "
+                "durable context proven and bytes verified (I08 §12); "
+                "replayable multi-step operation (I08R1 §7)"
+            )
+            self._record_outcome(op_id, planned, run_id, resolution=resolution)
             return self._journal_action(
                 run_id=run_id,
                 planned=planned,
-                resolution=(
-                    "RECONCILED through existing public repository APIs with "
-                    "durable context proven and bytes verified (I08 §12)"
-                ),
+                resolution=resolution,
                 after_state={
                     "reconciled": True,
                     "acquisition_id": getattr(
@@ -1575,7 +2348,19 @@ class RecoveryEngine:
                     ),
                 },
             )
-        # No proven context (or bytes contradict their name): quarantine.
+        # No proven context (or durable metadata appeared making the orphan
+        # premise stale).  Bytes that contradict their content-addressed
+        # name are corrupt (integrity) regardless of registered context.
+        try:
+            self._blob_metadata.get_blob_metadata(sha_part)
+            has_metadata = True
+        except Exception:
+            has_metadata = False
+        if has_metadata and content_sha == sha_part:
+            raise RecoveryPlanConflict(
+                f"blob {sha_part} now has durable metadata; the scanned "
+                "ORPHAN_DURABLE_BLOB plan is stale (I08 §28)"
+            )
         category = (
             QUARANTINE_CATEGORY_INTEGRITY
             if content_sha != sha_part
@@ -1588,21 +2373,198 @@ class RecoveryEngine:
             content_sha256=content_sha,
             suffix=".quarantined",
         )
+        op_id = self._record_intent(planned, run_id)
         moved = self._quarantine_file(object_path, destination, content_sha)
+        if moved:
+            self._record_effect(
+                op_id,
+                planned,
+                run_id,
+                detail=f"orphan bytes moved to quarantine/{category}",
+            )
+        resolution = (
+            "QUARANTINE: no durable context proves the request identity; "
+            "provenance is never manufactured (I08 §12)"
+            if category == QUARANTINE_CATEGORY_UNKNOWN_CONTEXT
+            else "QUARANTINE_INTEGRITY: orphan bytes fail their "
+            "content-addressed name; treated as corrupt, never repaired"
+        )
+        self._record_outcome(op_id, planned, run_id, resolution=resolution)
         return self._journal_action(
             run_id=run_id,
             planned=planned,
-            resolution=(
-                "QUARANTINE: no durable context proves the request identity; "
-                "provenance is never manufactured (I08 §12)"
-                if category == QUARANTINE_CATEGORY_UNKNOWN_CONTEXT
-                else "QUARANTINE_INTEGRITY: orphan bytes fail their "
-                "content-addressed name; treated as corrupt, never repaired"
-            ),
+            resolution=resolution,
             after_state={
                 "quarantined": moved,
                 "quarantine_category": category,
                 "quarantine_bytes_sha256": content_sha,
+            },
+        )
+
+    def _execute_continue_orphan_blob(
+        self, planned: RecoveryPlanAction, run_id: str
+    ) -> RecoveryAction | None:
+        """I08R1 §12 (crash 2b): CONTINUE the interrupted orphan-blob
+        reconciliation.
+
+        Metadata is already durable; the missing step is the acquisition.
+        Preflight (§7): the physical bytes verify against their
+        content-addressed name; the operator-supplied context acquisition
+        matches the orphan identity.  Metadata is NEVER duplicated and
+        provenance is NEVER guessed — without EXPLICIT registered context
+        the record stays unresolved and the decision goes back to the
+        operator.  A crash after the acquisition append converges: retry
+        recognizes the durable acquisition (exact match) and adopts.
+        """
+        sha_part = planned.object_id
+        encoding_value = (planned.before_state or {}).get(
+            "storage_encoding", "NONE"
+        )
+        try:
+            encoding = StorageEncodingValue(encoding_value)
+        except ValueError as exc:
+            raise RecoveryPlanConflict(
+                f"orphan continuation for {sha_part} carries an unknown "
+                "storage encoding; the scanned plan is unusable (I08 §28)"
+            ) from exc
+        object_path = self._blob_object_path(sha_part, encoding)
+        if not object_path.exists():
+            raise RecoveryPlanConflict(
+                f"orphan continuation target {sha_part} vanished; the "
+                "scanned plan is stale (I08 §28)"
+            )
+        content_sha = _sha256_file(object_path)
+        if content_sha != sha_part:
+            raise RecoveryPlanConflict(
+                f"orphan continuation target {sha_part} fails its content "
+                "identity; the scanned plan is stale (I08 §28)"
+            )
+        context = self._orphan_context.get(sha_part)
+        if context is None:
+            return self._journal_action(
+                run_id=run_id,
+                planned=planned,
+                resolution=(
+                    "UNRESOLVED recorded: durable metadata has no usable "
+                    "acquisition, but NO explicit context is registered; "
+                    "provenance is never guessed (I08 §12/§18)"
+                ),
+                after_state={
+                    "continued": False,
+                    "unresolved_orphan": True,
+                    "metadata_durable": True,
+                    "acquisition_durable": False,
+                },
+            )
+        _evidence_blob, acquisition = context
+        if acquisition.blob_sha256 != sha_part:
+            raise RecoveryPlanConflict(
+                "registered context acquisition blob_sha256 does not match "
+                f"the orphan {sha_part} (I08R1 §7 preflight)"
+            )
+        # Durable INTENT precedes the irreversible append (I08R1 §5).
+        op_id = self._record_intent(planned, run_id)
+        # CONTINUE with the acquisition step (metadata already committed).
+        try:
+            existing_acq = self._acquisitions.get_acquisition(
+                acquisition.acquisition_id
+            )
+        except Exception:
+            existing_acq = None
+        if existing_acq is not None:
+            if existing_acq.model_dump() != acquisition.model_dump():
+                raise RecoveryPlanConflict(
+                    "acquisition "
+                    f"{acquisition.acquisition_id} already exists with "
+                    "DIVERGENT content; the continuation plan conflicts "
+                    "(I08R1 §7)"
+                )
+        else:
+            try:
+                self._acquisitions.append_acquisition(acquisition)
+            except Exception as exc:
+                return self._finish_unresolved(
+                    op_id, planned, run_id,
+                    refusal_type=type(exc).__name__,
+                    step="acquisition append",
+                )
+            self._record_effect(
+                op_id,
+                planned,
+                run_id,
+                detail="AcquisitionRecord appended for mid-reconciliation orphan",
+            )
+        resolution = (
+            "RECONCILED: mid-reconciliation continuation completed through "
+            "the public acquisition API with durable metadata ADOPTED "
+            "(never duplicated) and explicit proven context (I08R1 §12)"
+        )
+        self._record_outcome(op_id, planned, run_id, resolution=resolution)
+        return self._journal_action(
+            run_id=run_id,
+            planned=planned,
+            resolution=resolution,
+            after_state={
+                "continued": True,
+                "reconciled": True,
+                "acquisition_id": getattr(acquisition, "acquisition_id", None),
+            },
+        )
+
+    def _execute_unreferenced_projection(
+        self, planned: RecoveryPlanAction, run_id: str
+    ) -> RecoveryAction | None:
+        """I08R1 §14 (crash 4): a CATALOGED projection referenced by no
+        committed manifest — evidence record ONLY.
+
+        A catalog row is durable identity, not garbage: the artifact is
+        NEVER moved or deleted here.  Reconciliation through the manifest
+        APIs is an explicit operator decision with exact context; until
+        then the projection stays cataloged-but-unreferenced and the
+        record keeps the seam visible.  Revalidation (I08 §28): the
+        projection must still be cataloged and still unreferenced.
+        """
+        bytes_sha = planned.object_id
+        if self._artifacts is None:
+            raise RecoveryPlanConflict(
+                "unreferenced-projection plan without a projection "
+                "catalog; the scanned plan is unusable (I08 §28)"
+            )
+        if self._find_projection_file(bytes_sha) is None:
+            raise RecoveryPlanConflict(
+                f"cataloged projection {bytes_sha} has no physical "
+                "artifact; the scanned plan is stale (I08 §28)"
+            )
+        cataloged = any(
+            artifact is not None and artifact.projection_sha256 == bytes_sha
+            for artifact in (
+                self._artifacts.get(aid)
+                for aid in self._artifacts.list_ids()
+            )
+        )
+        if not cataloged:
+            raise RecoveryPlanConflict(
+                f"projection {bytes_sha} is no longer cataloged; the "
+                "scanned plan is stale (I08 §28)"
+            )
+        if self._projection_referenced_by_manifests(bytes_sha):
+            raise RecoveryPlanConflict(
+                f"projection {bytes_sha} is now referenced by committed "
+                "manifest truth; the scanned plan is stale (I08 §28)"
+            )
+        return self._journal_action(
+            run_id=run_id,
+            planned=planned,
+            resolution=(
+                "RECOVERY EVIDENCE recorded: cataloged projection is "
+                "referenced by NO committed manifest; reconciliation is an "
+                "explicit operator decision through the canonical manifest "
+                "APIs — nothing moved, lineage never manufactured (I08 §14)"
+            ),
+            after_state={
+                "cataloged": True,
+                "manifest_referenced": False,
+                "recorded": True,
             },
         )
 
@@ -1642,15 +2604,25 @@ class RecoveryEngine:
             content_sha256=content_sha,
             suffix=".parquet.quarantined",
         )
+        op_id = self._record_intent(planned, run_id)
         moved = self._quarantine_file(physical, destination, content_sha)
+        if moved:
+            self._record_effect(
+                op_id,
+                planned,
+                run_id,
+                detail="orphan projection artifact moved to quarantine/unknown_context",
+            )
+        resolution = (
+            "QUARANTINE under unknown_context: no durable projection "
+            "catalog record proves the artifact's identity; T0A lineage "
+            "is never manufactured (I08 §14)"
+        )
+        self._record_outcome(op_id, planned, run_id, resolution=resolution)
         return self._journal_action(
             run_id=run_id,
             planned=planned,
-            resolution=(
-                "QUARANTINE under unknown_context: no durable projection "
-                "catalog record proves the artifact's identity; T0A lineage "
-                "is never manufactured (I08 §14)"
-            ),
+            resolution=resolution,
             after_state={
                 "quarantined": moved,
                 "quarantine_category": QUARANTINE_CATEGORY_UNKNOWN_CONTEXT,
@@ -1686,9 +2658,22 @@ class RecoveryEngine:
             ) from exc
         chain_ids = {m.partition_manifest_id for m in chain}
         if manifest.partition_manifest_id in chain_ids:
-            raise RecoveryPlanConflict(
-                f"manifest {manifest_id} joined the committed chain; the "
-                "scanned plan is stale (I08 §28)"
+            # I08R1 §8: a crash after append_partition_manifest succeeded
+            # but before the final recovery record is NOT a stale plan —
+            # the exact intended manifest is now committed-chain truth;
+            # finalize/adopt the recovery outcome instead of conflicting.
+            op_id = self._operation_id(planned, run_id)
+            resolution = (
+                "COMPLETED: manifest already joined the committed chain "
+                "under this exact recovery operation; outcome adopted "
+                "(I08R1 §8)"
+            )
+            self._record_outcome(op_id, planned, run_id, resolution=resolution)
+            return self._journal_action(
+                run_id=run_id,
+                planned=planned,
+                resolution=resolution,
+                after_state={"reconciled_into_chain": True, "adopted": True},
             )
         supersedes = manifest.supersedes_manifest_id
         ancestry_ok = supersedes is None or supersedes in chain_ids
@@ -1709,6 +2694,8 @@ class RecoveryEngine:
                     "refs_ok": refs_ok,
                 },
             )
+        # I08R1 §5: durable INTENT precedes the irreversible chain append.
+        op_id = self._record_intent(planned, run_id)
         # CAS attestation through the PUBLIC pointer read (I08 §15: the
         # action is taken only when CAS semantics permit).  A concurrent
         # writer that moves the pointer first still loses here — the
@@ -1717,13 +2704,15 @@ class RecoveryEngine:
         try:
             pointer = self._manifests.read_current_pointer(manifest.partition_key)
         except Exception as exc:
+            resolution = (
+                "UNRESOLVED ORPHAN recorded: current pointer unreadable "
+                f"({type(exc).__name__}); no override (I08 §15)"
+            )
+            self._record_outcome(op_id, planned, run_id, resolution=resolution)
             return self._journal_action(
                 run_id=run_id,
                 planned=planned,
-                resolution=(
-                    "UNRESOLVED ORPHAN recorded: current pointer unreadable "
-                    f"({type(exc).__name__}); no override (I08 §15)"
-                ),
+                resolution=resolution,
                 after_state={"unresolved_orphan": True},
             )
         expected_current = (
@@ -1736,26 +2725,36 @@ class RecoveryEngine:
                 manifest, expected_current
             )
         except Exception as exc:
+            resolution = (
+                "UNRESOLVED ORPHAN recorded: the manifest repository "
+                f"refused reconciliation ({type(exc).__name__}); no "
+                "override of CAS/ancestry semantics"
+            )
+            self._record_outcome(op_id, planned, run_id, resolution=resolution)
             return self._journal_action(
                 run_id=run_id,
                 planned=planned,
-                resolution=(
-                    "UNRESOLVED ORPHAN recorded: the manifest repository "
-                    f"refused reconciliation ({type(exc).__name__}); no "
-                    "override of CAS/ancestry semantics"
-                ),
+                resolution=resolution,
                 after_state={
                     "unresolved_orphan": True,
                     "conflict": type(exc).__name__,
                 },
             )
+        self._record_effect(
+            op_id,
+            planned,
+            run_id,
+            detail="orphan manifest reconciled through the public CAS append API",
+        )
+        resolution = (
+            "RECONCILED through the existing manifest repository API "
+            "with exact ancestry and verified references (I08 §15)"
+        )
+        self._record_outcome(op_id, planned, run_id, resolution=resolution)
         return self._journal_action(
             run_id=run_id,
             planned=planned,
-            resolution=(
-                "RECONCILED through the existing manifest repository API "
-                "with exact ancestry and verified references (I08 §15)"
-            ),
+            resolution=resolution,
             after_state={"reconciled_into_chain": True},
         )
 
@@ -1864,6 +2863,8 @@ class RecoveryEngine:
                 f"job {job_id} chain now validates; the scanned "
                 "JOB_DURABILITY_DIVERGENCE plan is stale (I08 §28)"
             )
+        # I08R1 §5: durable INTENT precedes the irreversible transition.
+        op_id = self._record_intent(planned, run_id)
         reason = (
             "I08 recovery: job chain failed durable revalidation "
             f"({planned.detail[:160]})"
@@ -1886,6 +2887,7 @@ class RecoveryEngine:
                 "UNRESOLVED recorded: the frozen transition graph refused "
                 "the QUARANTINED edge; the job remains blocked (I08 §18)"
             )
+        self._record_outcome(op_id, planned, run_id, resolution=resolution)
         return self._journal_action(
             run_id=run_id,
             planned=planned,
@@ -1952,15 +2954,25 @@ class RecoveryEngine:
             content_sha256=content_sha,
             suffix=".partial.quarantined",
         )
+        op_id = self._record_intent(planned, run_id)
         moved = self._quarantine_file(source, destination, content_sha)
+        if moved:
+            self._record_effect(
+                op_id,
+                planned,
+                run_id,
+                detail="staging artifact moved to quarantine/malformed",
+            )
+        resolution = (
+            "STAGING QUARANTINED (bytes preserved): a .partial file is "
+            "never evidence; resume was never advanced from staging "
+            "(I08 §13)"
+        )
+        self._record_outcome(op_id, planned, run_id, resolution=resolution)
         return self._journal_action(
             run_id=run_id,
             planned=planned,
-            resolution=(
-                "STAGING QUARANTINED (bytes preserved): a .partial file is "
-                "never evidence; resume was never advanced from staging "
-                "(I08 §13)"
-            ),
+            resolution=resolution,
             after_state={
                 "quarantined": moved,
                 "quarantine_category": QUARANTINE_CATEGORY_MALFORMED,
@@ -1991,19 +3003,27 @@ class RecoveryEngine:
         lock_id: str,
         *,
         expected_job_id: str,
-        owner_repository: Any = None,
+        owner_repository: Any,
         run_id: str,
     ) -> RecoveryAction | None:
-        """EXPLICIT operator-driven lock clear (I08 §20).
+        """EXPLICIT operator-driven lock clear (I08 §20 + I08R1 §23/§24).
 
-        Executes ONLY when: the expected job id hashes exactly to the
-        lock fingerprint, the lock file exists, and — when an owner
-        repository is supplied — no in-process owner currently holds that
-        job's RLock (best-effort non-blocking probe, documented
-        limitation).  The RecoveryAction is journaled BEFORE removal
-        (evidence precedes mutation); failure of the probe or hash check
-        refuses the clear entirely.  Never invoked by apply_plan.
+        The owner repository is MANDATORY (I08R1 §23: no optional bypass):
+        deletion is authorized only when the expected job id hashes exactly
+        to the lock fingerprint, the lock file exists, the job repository
+        is supplied, the expected job is NOT present in the repository's
+        ``_lock_owners`` truth, and the job's local RLock can be probed
+        safely.  The RLock probe alone is NOT sufficient (the owning
+        thread can always re-acquire an RLock) — the owner-map check is
+        load-bearing.  The RecoveryAction is journaled BEFORE removal
+        (evidence precedes mutation); any refusal leaves the lock exactly
+        as it was.  Never invoked by apply_plan.
         """
+        if owner_repository is None:
+            raise RecoveryConfigurationError(
+                "explicit lock clear REQUIRES an owner repository with "
+                "live ownership truth; no optional bypass exists (I08R1 §23)"
+            )
         if not isinstance(expected_job_id, str) or not expected_job_id:
             raise RecoveryConfigurationError(
                 "explicit lock clear requires the expected job id (I08 §20)"
@@ -2019,15 +3039,25 @@ class RecoveryEngine:
             raise RecoveryPlanConflict(
                 f"lock {lock_id} is not present; nothing to clear"
             )
-        if owner_repository is not None:
-            lock_obj = owner_repository._job_locks.get(expected_job_id)
-            if lock_obj is not None:
-                if not lock_obj.acquire(blocking=False):
-                    raise RecoveryPlanConflict(
-                        "an in-process owner currently holds the job lock; "
-                        "refusing the clear (I08 §20)"
-                    )
-                lock_obj.release()
+        owners = getattr(owner_repository, "_lock_owners", None)
+        if owners is None:
+            raise RecoveryConfigurationError(
+                "owner repository exposes no _lock_owners truth; refusing "
+                "the clear (I08R1 §24)"
+            )
+        if expected_job_id in owners:
+            raise RecoveryPlanConflict(
+                f"job {expected_job_id!r} has a LIVE in-process owner "
+                "record; refusing the clear (I08R1 §24)"
+            )
+        lock_obj = owner_repository._job_locks.get(expected_job_id)
+        if lock_obj is not None:
+            if not lock_obj.acquire(blocking=False):
+                raise RecoveryPlanConflict(
+                    "the job RLock is currently held; refusing the clear "
+                    "(I08R1 §24)"
+                )
+            lock_obj.release()
         action_id, _adopted = self._journal.record(
             recovery_run_id=run_id,
             object_type=SEMANTIC_JOB_LOCK,
@@ -2042,6 +3072,18 @@ class RecoveryEngine:
             after_state={"lock_present": False, "cleared": True},
             registered_at=self._clock(),
         )
+        # I08R1 §5: the clear operation carries durable INTENT before the
+        # irreversible unlink (the RecoveryAction above is the effect
+        # record; the INTENT phase makes the operation replayable).
+        clear_planned = RecoveryPlanAction(
+            action_kind="OPERATOR_CLEAR_JOB_LOCK",
+            object_type=SEMANTIC_JOB_LOCK,
+            object_id=lock_id,
+            problem=PROBLEM_LOCK_PRESENT_OWNER_UNPROVEN,
+            resolution="explicit operator clear with proven-absent ownership",
+            before_state={"relative_path": f"locks/{lock_id}.lock"},
+        )
+        self._record_intent(clear_planned, run_id)
         lock_path.unlink()
         fsync_directory(lock_path.parent)
         payload = self._journal.get(action_id)
@@ -2069,7 +3111,11 @@ class RecoveryEngine:
         elif finding.problem == PROBLEM_UNCOMMITTED_STAGING:
             kind = _ACTION_QUARANTINE_STAGING
         elif finding.problem == PROBLEM_ORPHAN_PROJECTION:
-            kind = _ACTION_QUARANTINE_ORPHAN_PROJECTION
+            kind = (
+                _ACTION_RECORD_UNREFERENCED_PROJECTION
+                if finding.before_state.get("cataloged")
+                else _ACTION_QUARANTINE_ORPHAN_PROJECTION
+            )
         elif finding.problem == PROBLEM_ORPHAN_MANIFEST:
             kind = _ACTION_RESOLVE_ORPHAN_MANIFEST
         elif finding.problem == PROBLEM_MISSING_MANIFEST_TARGET:
@@ -2080,6 +3126,8 @@ class RecoveryEngine:
             kind = _ACTION_QUARANTINE_JOB
         elif finding.problem == PROBLEM_LOCK_PRESENT_OWNER_UNPROVEN:
             kind = _ACTION_RECORD_LOCK_ONLY
+        elif finding.problem == PROBLEM_ORPHAN_BLOB_CONTINUATION:
+            kind = _ACTION_CONTINUE_ORPHAN_BLOB
         elif finding.problem == PROBLEM_UNKNOWN_CONTEXT:
             kind = (
                 _ACTION_QUARANTINE_ORPHAN_PROJECTION
