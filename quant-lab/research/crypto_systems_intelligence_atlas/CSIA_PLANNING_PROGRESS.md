@@ -365,3 +365,29 @@ kernel scope above; exit gate PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_
 TEMPORAL_KERNEL; final implementation status = READY_FOR_OPERATOR_
 REVIEW (implementation is NOT self-ratifiable).
 ```
+
+---
+
+# CHECKPOINT — BOOK 1 IMPLEMENTATION ACCEPTED (2026-09-23)
+
+Governance bridge from Book 1 build completion to Book 2 planning. No Book 1
+source code is copied onto this branch; the implementation lives on the
+build branch only.
+
+```text
+BOOK_1_IMPLEMENTATION = ACCEPTED
+ACCEPTED BUILD BRANCH COMMIT = 7c2419f00b9f5f5f105708b067848909fa4da609
+EXIT_GATE = PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_TEMPORAL_KERNEL (ACCEPTED)
+HARDENING_R1 = PASS
+HARDENING_R2 = PASS
+EVIDENCE = CSIA tests 107 PASS; Sensor regression 2339 PASS / 4 SKIPPED;
+           ruff PASS; mypy PASS
+BLOCKING_CORRECTNESS_ISSUES = 0
+
+BOOK_2_PLANNING_AUTHORITY = TRUE
+BOOK_2_IMPLEMENTATION_AUTHORITY = FALSE
+```
+
+The accepted implementation record lives on the build branch:
+`CSIA_BOOK_1_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md` (commit 7c2419f0).
+Acceptance does not grant production deployment authority.
