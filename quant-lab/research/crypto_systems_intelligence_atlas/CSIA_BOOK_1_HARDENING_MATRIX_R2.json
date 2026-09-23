@@ -5,7 +5,8 @@
   "supersedes": "CSIA_BOOK_1_HARDENING_MATRIX.json (R1, version 1.0, commit 2f2bdb9d)",
   "r1_preserved": true,
   "note": "R1 evidence is preserved unchanged in CSIA_BOOK_1_HARDENING_MATRIX.json. This file adds the R2 checkpoint only.",
-  "generated_from_commit": "local build branch HEAD at matrix generation time",
+  "code_under_review_commit": "13f0428b26e14ccd7b94e5c34c7470d16111b450",
+  "evidence_commit": "c0f19fe03aae03707801d083c269b919e38ed868",
   "branch": "agent/crypto-systems-intelligence-atlas-build",
   "command_baseline": "python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/ -q",
   "gates": [
@@ -138,7 +139,11 @@
       "ruff": "All checks passed",
       "mypy": "Success: no issues found in 5 source files"
     },
-    "dispositions_summary": "3 model_copy sites: 1 VALIDATION_BYPASS_RISK fixed, 2 proven safe with executable tests"
+    "dispositions_summary": "3 model_copy sites audited: 2 VALIDATION_BYPASS_RISK found and fixed (close_realization, apply_rebrand), 1 already safe (RecordStore.get, SAFE_IMMUTABLE_VIEW)",
+    "PRODUCTION_MODEL_COPY_SITES_AUDITED": 3,
+    "VALIDATION_BYPASS_RISKS_FOUND": 2,
+    "VALIDATION_BYPASS_RISKS_FIXED": 2,
+    "ALREADY_SAFE_SITES": 1
   },
   "exit_gate": "PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_TEMPORAL_KERNEL",
   "status": "READY_FOR_OPERATOR_ACCEPTANCE"

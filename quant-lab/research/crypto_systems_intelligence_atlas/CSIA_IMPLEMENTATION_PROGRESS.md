@@ -186,5 +186,5 @@ Commits (this checkpoint):
 6754b3eb  R2 failing tests (18 failing pre-fix)
 d4c4add6  lifecycle hardening: validated replacement, §8.3 rebrand history, closure chronology
 13f0428b  Alias accepts UNKNOWN bound (R9)
-2f2bdb9d+ matrix, evidence addendum, and this ledger entry (see git log for exact HEAD)
+c0f19fe0  R2 matrix + evidence addendum + Checkpoint 3
 ```
