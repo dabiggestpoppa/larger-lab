@@ -163,8 +163,11 @@ class Alias(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str = Field(min_length=1)
-    valid_from: Timestamp
-    valid_to: Timestamp | None = None  # None = still holds
+    # Hardening R2: rebrand history windows inherit the object's valid_from,
+    # which may be an explicit UNKNOWN bound (never silently converted to a
+    # known instant — R9: no fabricated certainty).
+    valid_from: Timestamp | UnknownBound
+    valid_to: Timestamp | UnknownBound | None = None  # None = still holds
     name_state: Literal["ACTIVE", "HISTORICAL"]
 
 
