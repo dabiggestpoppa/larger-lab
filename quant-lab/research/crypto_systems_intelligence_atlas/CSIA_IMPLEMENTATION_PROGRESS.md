@@ -188,3 +188,36 @@ d4c4add6  lifecycle hardening: validated replacement, §8.3 rebrand history, clo
 13f0428b  Alias accepts UNKNOWN bound (R9)
 c0f19fe0  R2 matrix + evidence addendum + Checkpoint 3
 ```
+
+---
+
+# CHECKPOINT 4 — BOOK 1 IMPLEMENTATION ACCEPTED (2026-09-23)
+
+Checkpoints 1–3 above are preserved unchanged.
+
+The operator explicitly ACCEPTS `PASS_CSIA_BOOK1_IDENTITY_ONTOLOGY_TEMPORAL_KERNEL`.
+
+```text
+BOOK_1_IMPLEMENTATION = ACCEPTED
+EXIT_GATE = ACCEPTED
+HARDENING_R1 = PASS
+HARDENING_R2 = PASS
+CSIA_TESTS = 107 PASS
+SENSOR_REGRESSION = 2339 PASS / 4 SKIPPED
+RUFF = PASS
+MYPY = PASS
+BLOCKING_CORRECTNESS_ISSUES = 0
+
+NEXT_BUILD_SCOPE = NONE
+```
+
+Book 2 has NO implementation authority yet. Accepted scope, deferred
+limitations, and governance flags are recorded in
+`CSIA_BOOK_1_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md`.
+
+Commits (this checkpoint):
+
+```text
+0b06e8ca  R2 evidence reconciliation (provenance SHAs, disposition counts)
+<this>    Book 1 implementation acceptance record + this ledger entry
+```
