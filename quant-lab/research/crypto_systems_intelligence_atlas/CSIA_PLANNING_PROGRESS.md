@@ -391,3 +391,32 @@ BOOK_2_IMPLEMENTATION_AUTHORITY = FALSE
 The accepted implementation record lives on the build branch:
 `CSIA_BOOK_1_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md` (commit 7c2419f0).
 Acceptance does not grant production deployment authority.
+
+---
+
+# PLANNING LEDGER — BOOK 2 (2026-09-23)
+
+All prior checkpoints preserved.
+
+```text
+BOOK_1_IMPLEMENTATION = ACCEPTED          (build commit 7c2419f0)
+BOOK_2_PLANNING = COMPLETE
+BOOK_2_READY_FOR_OPERATOR_REVIEW = TRUE
+BOOK_2_OPERATOR_RATIFIED = FALSE
+BOOK_2_IMPLEMENTATION_AUTHORITY = FALSE   (NOT authorized)
+
+NEXT = OPERATOR REVIEW OF BOOK 2
+       (plan v0.1 + source authority matrix v0.1 + evidence stress
+       matrix v0.1 + pre-ratification review v0.1)
+```
+
+Book 2 planning artifacts (commits this entry):
+
+```text
+51f4b201  Book 2 plan v0.1 — Blocs 2A-2I, planning only
+fdc82515  Source authority matrix v0.1
+b828bfc0  Evidence stress matrix v0.1 (15 scenarios, 0 structural failures)
+<this>    Pre-ratification review v0.1 + this ledger entry
+```
+
+No Book 2 implementation is authorized or begun.
