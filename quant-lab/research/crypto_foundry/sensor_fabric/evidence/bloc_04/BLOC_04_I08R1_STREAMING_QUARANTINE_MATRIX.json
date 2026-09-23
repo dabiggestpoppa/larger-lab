@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "case": "large_source_chunked",
+      "chunk_bytes": 262144,
+      "copied_artifacts": 1,
+      "result": "OK",
+      "source_bytes": 4194313
+    },
+    {
+      "case": "path_read_bytes_not_used",
+      "payload_reads_via_read_bytes": 0,
+      "result": "OK",
+      "small_file_reads": 6
+    },
+    {
+      "case": "destination_hash_exact",
+      "destination_sha_matches": true,
+      "result": "OK"
+    },
+    {
+      "canonical_gone": true,
+      "case": "source_removed_only_after_durable_destination",
+      "destination_durable": true,
+      "result": "OK",
+      "staging_consumed": true
+    },
+    {
+      "artifacts_after": 1,
+      "artifacts_before": 1,
+      "case": "retry_adopts_identical_destination",
+      "no_duplicate_movement": true,
+      "result": "OK"
+    },
+    {
+      "case": "different_destination_bytes_conflict",
+      "foreign_bytes_intact": true,
+      "result": "OK",
+      "typed_conflict": true
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R1",
+  "doctrine": "I08R1 \u00a79/\u00a731 \u2014 quarantine copies stream in bounded chunks with the digest computed in the same pass; the source payload is never buffered whole (Path.read_bytes never touches it); the destination is durable (fsync + no-clobber publish) before the source is unlinked; exact retries adopt and divergent destinations stay typed conflicts",
+  "matrix": "BLOC_04_I08R1_STREAMING_QUARANTINE_MATRIX"
+}

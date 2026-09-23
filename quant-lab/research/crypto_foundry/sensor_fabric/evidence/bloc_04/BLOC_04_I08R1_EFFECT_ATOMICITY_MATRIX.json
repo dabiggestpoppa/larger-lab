@@ -1,0 +1,66 @@
+{
+  "cases": [
+    {
+      "canonical_still_present": true,
+      "case": "quarantine_crash_before_publish",
+      "intent_durable": true,
+      "no_effect_row": true,
+      "quarantine_empty": true,
+      "result": "OK",
+      "typed_conflict": true
+    },
+    {
+      "case": "quarantine_crash_after_publish_before_source_unlink",
+      "injected_death": true,
+      "no_duplicate_movement": true,
+      "restart_converged": true,
+      "result": "OK"
+    },
+    {
+      "case": "quarantine_crash_after_source_unlink_before_final_action",
+      "injected_death": true,
+      "one_forensic_artifact": true,
+      "operation_completed": false,
+      "recovery_action_durable": true,
+      "result": "OK"
+    },
+    {
+      "acquisition_completed": true,
+      "case": "orphan_blob_crash_after_metadata_before_acquisition",
+      "continuation_finding": true,
+      "journal_records": 1,
+      "result": "OK"
+    },
+    {
+      "case": "orphan_blob_retry_completes_acquisition",
+      "journal_records_stable": true,
+      "no_duplicate_acquisition": true,
+      "result": "OK",
+      "retry_reconciled": true
+    },
+    {
+      "case": "manifest_reconcile_crash_after_repository_commit_before_final_action",
+      "commit_durable": true,
+      "injected_death": true,
+      "pointer_advanced_v2": true,
+      "pointer_stable_across_retry": true,
+      "result": "OK",
+      "retry_no_stale_conflict": true
+    },
+    {
+      "artifacts_stable": false,
+      "case": "repeat_restart_converges",
+      "final_apply_clean": true,
+      "result": "OK"
+    },
+    {
+      "case": "no_unjournaled_completed_effect",
+      "completed_operations": 0,
+      "effects_without_journal": 0,
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R1",
+  "doctrine": "I08R1 \u00a73-\u00a78/\u00a728 \u2014 every mutating recovery operation carries a durable INTENT before its first irreversible effect; an interrupted effect is restart-replayable and converges to one forensic artifact and one completed logical operation; no completed effect exists without durable recovery evidence",
+  "matrix": "BLOC_04_I08R1_EFFECT_ATOMICITY_MATRIX"
+}

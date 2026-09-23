@@ -1,0 +1,248 @@
+{
+  "cases": [
+    {
+      "case": "half_blob_write",
+      "constructed_pre_crash_state": "process death during chunked blob write (partial staging)",
+      "cursor_effect": "none",
+      "frozen_scenario": "1: crash halfway through blob write",
+      "history_effect": "no committed object claim",
+      "injected_crash_boundary": "process death during chunked blob write (partial staging)",
+      "post_restart_state": {
+        "committed_claim": false,
+        "staging_present": true
+      },
+      "recovery_result": {
+        "finding": true,
+        "quarantined": true,
+        "resume_never_advanced": true,
+        "staging_gone": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "blob_rename_before_metadata_unknown_context",
+      "constructed_pre_crash_state": "blob renamed into place; metadata transaction never ran",
+      "cursor_effect": "none",
+      "frozen_scenario": "2a: crash after blob rename before metadata (no context)",
+      "history_effect": "unknown-context quarantine",
+      "injected_crash_boundary": "blob renamed into place; metadata transaction never ran",
+      "post_restart_state": {
+        "bytes_present": true,
+        "metadata_absent": true
+      },
+      "recovery_result": {
+        "finding": true,
+        "quarantine_category": "unknown_context",
+        "quarantined_unknown_context": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "metadata_before_acquisition_registered_context",
+      "constructed_pre_crash_state": "blob renamed into place; metadata transaction never ran",
+      "cursor_effect": "none",
+      "frozen_scenario": "2b: crash after blob rename before metadata (registered context; crash between metadata append and acquisition append)",
+      "history_effect": "replayable metadata+acquisition reconciliation",
+      "injected_crash_boundary": "blob renamed into place; metadata transaction never ran",
+      "post_restart_state": {
+        "bytes_present": true,
+        "metadata_absent": true
+      },
+      "recovery_result": {
+        "acquisition_durable": true,
+        "continuation_finding": true,
+        "metadata_adopted_not_duplicated": true,
+        "reconciled": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "acquisition_before_projection",
+      "constructed_pre_crash_state": "acquisition durable; projection commit never started",
+      "cursor_effect": "none",
+      "frozen_scenario": "3: crash after acquisition commit before projection",
+      "history_effect": "T0A valid, projection rebuildable",
+      "injected_crash_boundary": "acquisition durable; projection commit never started",
+      "post_restart_state": {
+        "projections_absent": true,
+        "t0a_valid": true
+      },
+      "recovery_result": {
+        "acquisition_readable": true,
+        "clean_scan": true,
+        "projection_manufactured": false
+      },
+      "result": "OK"
+    },
+    {
+      "case": "projection_commit_before_manifest",
+      "constructed_pre_crash_state": "projection committed + cataloged; manifest never referenced it",
+      "cursor_effect": "none",
+      "frozen_scenario": "4: crash after projection write before manifest",
+      "history_effect": "cataloged projection detected as unreferenced",
+      "injected_crash_boundary": "projection committed + cataloged; manifest never referenced it",
+      "post_restart_state": {
+        "cataloged": true,
+        "manifest_count": 0,
+        "physical": true
+      },
+      "recovery_result": {
+        "artifact_never_moved": true,
+        "cataloged_yet_finding": true,
+        "finding": true,
+        "record_only": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "manifest_fragment_before_current_pointer",
+      "constructed_pre_crash_state": "valid v2 fragment published; pointer update never ran",
+      "cursor_effect": "pointer advances ONLY through exact CAS",
+      "frozen_scenario": "5: crash before manifest-current pointer update",
+      "history_effect": "valid orphan reconciled through public API",
+      "injected_crash_boundary": "valid v2 fragment published; pointer update never ran",
+      "post_restart_state": {
+        "current_version": 1,
+        "fragment_durable": true
+      },
+      "recovery_result": {
+        "finding": true,
+        "pointer_version": 2,
+        "reconciled": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "before_resume_advancement",
+      "constructed_pre_crash_state": "process death BEFORE advance_checkpoint; resume never advanced",
+      "cursor_effect": "resume does NOT advance; re-fetch may occur",
+      "frozen_scenario": "6: crash before resume advancement",
+      "history_effect": "durable batch remains valid",
+      "injected_crash_boundary": "process death BEFORE advance_checkpoint; resume never advanced",
+      "post_restart_state": {
+        "resume_advanced": false
+      },
+      "recovery_result": {
+        "checkpoint_anchors": [
+          null,
+          null
+        ],
+        "clean_scan": true,
+        "cursor_auto_advanced": false,
+        "job_status": "MANIFEST_COMMITTED"
+      },
+      "result": "OK"
+    },
+    {
+      "case": "identical_refetch",
+      "constructed_pre_crash_state": "identical refetch of the same source identity (new acquisition)",
+      "cursor_effect": "none",
+      "frozen_scenario": "7: identical refetch",
+      "history_effect": "I06 IDENTICAL_REFETCH classification",
+      "injected_crash_boundary": "identical refetch of the same source identity (new acquisition)",
+      "post_restart_state": {
+        "first_observation": "FIRST_REGISTRATION"
+      },
+      "recovery_result": {
+        "identical_refetch": true,
+        "observation_state": "IDENTICAL_REFETCH"
+      },
+      "result": "OK"
+    },
+    {
+      "case": "same_source_mutated_bytes",
+      "constructed_pre_crash_state": "same source identity observed with DIFFERENT bytes",
+      "cursor_effect": "none",
+      "frozen_scenario": "8: same source/request with mutated bytes",
+      "history_effect": "I06 SOURCE_MUTATION classification",
+      "injected_crash_boundary": "same source identity observed with DIFFERENT bytes",
+      "post_restart_state": {
+        "first_observation": "FIRST_REGISTRATION"
+      },
+      "recovery_result": {
+        "different_bytes": true,
+        "observation_state": "SOURCE_MUTATION",
+        "source_mutation": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "corrupted_stored_blob",
+      "constructed_pre_crash_state": "stored blob bytes no longer verify against their content identity",
+      "cursor_effect": "none",
+      "frozen_scenario": "9: corrupted stored blob",
+      "history_effect": "integrity quarantine; restart-convergent",
+      "injected_crash_boundary": "stored blob bytes no longer verify against their content identity",
+      "post_restart_state": {
+        "verifies": true
+      },
+      "recovery_result": {
+        "bytes_preserved": true,
+        "canonical_unusable": true,
+        "converged_no_duplicate": true,
+        "finding": true,
+        "history_preserved": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "missing_manifest_target",
+      "constructed_pre_crash_state": "manifest target blob physically missing; manifest history immutable",
+      "cursor_effect": "none",
+      "frozen_scenario": "10: missing manifest target",
+      "history_effect": "manifest immutable; fail closed + evidence",
+      "injected_crash_boundary": "manifest target blob physically missing; manifest history immutable",
+      "post_restart_state": {
+        "target_missing": true
+      },
+      "recovery_result": {
+        "finding": true,
+        "manifest_untouched": true,
+        "recorded": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "parser_bug_projection_invalidation",
+      "constructed_pre_crash_state": "projection durable + cataloged; the invalidating condition would require a public projection-invalidation API (measured CONTRACT GAP, recorded by test_crash_11_projection_contract_gap_is_explicit)",
+      "cursor_effect": "none",
+      "frozen_scenario": "11: parser bug / projection invalidation (contract gap)",
+      "history_effect": "T0A retained; invalidation API gap recorded",
+      "injected_crash_boundary": "projection durable + cataloged; the invalidating condition would require a public projection-invalidation API (measured CONTRACT GAP, recorded by test_crash_11_projection_contract_gap_is_explicit)",
+      "post_restart_state": {
+        "cataloged": true,
+        "t0a_intact": true
+      },
+      "recovery_result": {
+        "projection_still_cataloged": true,
+        "rebuildable": true,
+        "source_never_rewritten": true,
+        "t0a_retained": true
+      },
+      "result": "OK"
+    },
+    {
+      "case": "concurrent_writers_cas",
+      "constructed_pre_crash_state": "two writers append from the SAME current pointer; one must lose",
+      "cursor_effect": "CAS: exactly one winner",
+      "frozen_scenario": "12: concurrent writers to same logical partition",
+      "history_effect": "loser receives typed conflict; no silent branch",
+      "injected_crash_boundary": "two writers append from the SAME current pointer; one must lose",
+      "post_restart_state": {
+        "current": [
+          "pm-c12",
+          1
+        ]
+      },
+      "recovery_result": {
+        "loser_error": "ManifestCASConflict",
+        "no_silent_branch": true,
+        "winner_current": true
+      },
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R1",
+  "doctrine": "I08R1 \u00a710-\u00a722/\u00a729 \u2014 the authoritative crash-boundary proof: every row instantiates the ACTUAL frozen \u00a720 crash state (not a similarly named condition), emits the crash at that boundary, probes post-restart truth through fresh repositories and runs recovery through a NEW engine.  The historical I08 crash matrix is first-pass evidence; several of its scenarios did not instantiate the frozen boundary (I08R1 \u00a733)",
+  "matrix": "BLOC_04_I08R1_CRASH_TRUTH_MATRIX"
+}

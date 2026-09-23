@@ -11,7 +11,7 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I08 (during repair): the I07 chain (I07, I07R1, I07R1F, I07R1G, I07R1H, I07R1I) is OPERATOR_ACCEPTED (SENSOR-B4-I07R1I-RATIFY); DURABLE_RESUME_IMPLEMENTED=TRUE; RECOVERY_SCANNER_IMPLEMENTED=IN_PROGRESS; next_checkpoint_authorized=FALSE; I09+ NOT authorized. Recovery/quarantine scanner implemented as scan != apply with no silent repair: read-only deterministic scan producing a typed finding vocabulary (UNCOMMITTED_STAGING, ORPHAN_DURABLE_BLOB, ORPHAN_PROJECTION, ORPHAN_MANIFEST, CORRUPT_BLOB, MISSING_MANIFEST_TARGET, ACQUISITION_SOURCE_QUARANTINED, JOB_DURABILITY_DIVERGENCE, LOCK_PRESENT_OWNER_UNPROVEN, UNKNOWN_CONTEXT); append-only RecoveryAction journal with SHA-256 semantic identity (registration time excluded - exact retry idempotent, divergent retry typed conflict); quarantine under <t0_root>/quarantine/{integrity,malformed,unknown_context} with no-clobber deterministic locators and byte preservation; corrupt blobs quarantined, never overwritten; orphan reconciliation only through existing public repository APIs when context proves identity, otherwise unknown-context quarantine - provenance never manufactured; no latest-wins manifest repair (crash-5: current pointer stays old valid truth); job durability divergence detected through the public gated read and refused at the runtime gate (journaled UNRESOLVED per the frozen permission - checkpoint events never mutated); job locks never auto-deleted (LOCK_PRESENT_OWNER_UNPROVEN; explicit fingerprint-verified clear only); every apply revalidated against the scanned before-state (typed RecoveryPlanConflict on drift); path-traversal and symlink escapes rejected; all 12 frozen crash scenarios green; all 4 machine matrices generated in tmp and byte-compared, pytest read-only. PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED=PENDING_OPERATOR_REVIEW (proposed PASS after implementation); DURABLE_RESUME_IMPLEMENTED=TRUE; RECOVERY_SCANNER_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE; recommended_next=SENSOR-B4-I09 QUOTA / STORAGE ESTIMATOR; next_checkpoint_authorized=FALSE. Historical - I07R1I-RATIFY (state at that commit, NOT rewritten): operator ratification of the complete I07 chain - all six I07-chain verdicts OPERATOR_ACCEPTED; DURABLE_RESUME_IMPLEMENTED=TRUE; RECOVERY_SCANNER_IMPLEMENTED=FALSE; next_checkpoint_authorized=TRUE authorizing SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY. Historical -  the operator has reviewed and ACCEPTED the complete I07 chain — PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED, PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED, PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED, PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED, PASS_SENSOR_B4_I07R1H_REFRESHED_CHAIN_VALIDATION_PARITY_SEALED and PASS_SENSOR_B4_I07R1I_FAILED_GATE_ATOMICITY_VALIDATED_READ_SEALED are all OPERATOR_ACCEPTED; DURABLE_RESUME_IMPLEMENTED=TRUE; RECOVERY_SCANNER_IMPLEMENTED=FALSE; next_checkpoint_authorized=TRUE authorizing SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY (I09+ NOT authorized). Governance-only ratification commit: no source, test or historical-evidence change. Historical — I07R1I (state at that checkpoint, NOT rewritten): failed-gate atomicity + validated public reads. `_NestedFileLock.__enter__` acquires the per-job physical lock and then runs `_refresh_durable_truth` (both catalog refreshes + the shared `_validate_job_chain` authority); when that gate raised, `__exit__` never ran, so the owner record and the physical lock survived and the NEXT same-thread operation classified itself as NESTED and skipped acquire/refresh/validate — a rejected gate became a live reentrant context, and validation failure weakened the next validation attempt. A failed outer entry now rolls back its OWN owner entry, physical lock handle and lock file before the ORIGINAL error escapes: cleanup faults never replace the corruption diagnosis (an unreleased lock remains I08 evidence) and a pre-existing foreign/stale lock is never auto-deleted. Separately the PUBLIC reads `get_job` / `list_transitions` now cross the SAME per-job gate as the writers (job lock → refresh + `_validate_job_chain` → unlocked internal helper), so durable-but-invalid state a long-lived repository has just adopted from disk by refresh can never be returned as validated runtime truth. Measured: the first corrupt operation and the immediate SAME-THREAD retry both JobCatalogCorrupt with TWO real refresh+validation passes (before: the retry took the nested shortcut and skipped validation on the leaked owner record, and a second thread saw JobLockHeld instead of the corruption); owner map and owned lock file clean after the failure; second thread JobCatalogCorrupt; both catalog-refresh failure points (births, events) roll back identically with the typed ORIGINAL catalog error; direct `get_job` and `list_transitions` after a corrupt external publication both JobCatalogCorrupt with no prior write; valid public reads, cross-repository refreshed reads, successful nested reentrancy and the legitimate create_job empty path all green; the top-level Current-checkpoint row repaired from three logical cells to two. Historical — I07R1H (NOT rewritten): the outermost per-job lock refreshes the birth/event catalogs and re-proved the LOCKED job's chain through the SAME per-job validation authority restart uses (_validate_job_chain) — canonical event identity, transition/result binding, immutable birth identity, time binding, the frozen transition graph, contiguity/linkage/chronology and ordinary pointer immutability — so a long-lived repository can no longer consume as runtime state an event a fresh restart would reject; catalog-fragment integrity is no longer mistaken for job-chain validity. Measured: 13 chain-corrupt forged heads (from_status break, transition job_id mismatch, result-status mismatch, 3 birth-identity mutations, time-binding break, backward chronology, sequence gap, event-identity mismatch, ordinary pointer/anchor mutation, proof on ordinary event) rejected JobCatalogCorrupt on BOTH the runtime refresh path and fresh restart, chain unchanged, with the intact refreshed control adopted (adoption proven by the probe's own +1 event). Historical — I07R1G (NOT rewritten): the runtime exact-retry path and restart replay validate a persisted checkpoint proof through ONE authority — closed V1 schema (absent / non-mapping / missing field / unknown version), durability floor, proof↔result-state anchor binding, and the durable re-proof under the floor persisted in the proof itself — so a long-lived repository whose post-lock refresh adopts a forged checkpoint head can no longer silently adopt it where a fresh restart would refuse it, and a malformed proof can no longer escape as a raw KeyError/ValueError/TypeError. Measured before → after: 6 forged heads silently ADOPTED at runtime, 5 raw Python exceptions, 3 wrong typed errors → 17/17 forged cases JobCatalogCorrupt on BOTH paths, chain unchanged. PASS_SENSOR_B4_I07R1I_FAILED_GATE_ATOMICITY_VALIDATED_READ_SEALED=PENDING_OPERATOR_REVIEW (proposed PASS after implementation); PASS_SENSOR_B4_I07R1H_REFRESHED_CHAIN_VALIDATION_PARITY_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED=OPERATOR_HOLD; DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE; RECOVERY_SCANNER_IMPLEMENTED=FALSE; next_checkpoint_authorized=FALSE. Prior governance record (historical — I07R1F, NOT rewritten): the persisted checkpoint-proof floor governs HISTORICAL checkpoint retries while constructor configuration governs NEW checkpoints only (a restart with a different min_durable_status can no longer reject or reinterpret durable history), and the shared DurableJsonCatalog cache is internally synchronized by one REENTRANT lock so concurrent per-job writers can never race refresh/commit into a false vanished-record corruption. Prior RATIFIED governance record (historical — I06R1-RATIFY): operator ACCEPTED the complete I05→I06→I06R1 chain — PASS_SENSOR_B4_I05_RAW_PROJECTION_LINEAGE, PASS_SENSOR_B4_I05R1_DURABLE_END_TO_END_LINEAGE_SEALED, PASS_SENSOR_B4_I05R2_FAIL_CLOSED_PUBLIC_API_SEALED, PASS_SENSOR_B4_I05R3_LINEAGE_IDENTITY_TIME_SEALED, PASS_SENSOR_B4_I05R4_EVIDENCE_INTERFACE_RETRY_SEALED, PASS_SENSOR_B4_I06_SOURCE_REVISION_MUTATION_REGISTRY, PASS_SENSOR_B4_I06R1_CANONICAL_CONTRACT_DECLARATION_SEALED = OPERATOR_ACCEPTED; G4-04_REVISION_GATE = IMPLEMENTATION_PASS; T0A_EVIDENCE_PIPELINE_COMPLETE=TRUE, T0B_PROJECTION_SCHEMA_READY=TRUE, T0B_PHYSICAL_PROJECTION_WRITER_READY=TRUE, T0B_PROJECTION_CATALOG_IMPLEMENTED=TRUE, T0B_LINEAGE_REPOSITORY_IMPLEMENTED=TRUE, T0B_TO_T0A_LINEAGE_COMPLETE=TRUE, T0B_STORAGE_IMPLEMENTED=TRUE, SOURCE_REVISION_REGISTRY_IMPLEMENTED=TRUE, SOURCE_MUTATION_EXPLICIT=TRUE, REVISION_RESOLUTION_READY=TRUE, REVISION_CANONICAL_CONTRACT_SEALED=TRUE, PROVIDER_DECLARATION_DURABILITY_SEALED=TRUE, DURABLE_RESUME_IMPLEMENTED=FALSE, RECOVERY_SCANNER_IMPLEMENTED=FALSE; branch agent/crypto-sensor-fabric-build fast-forwarded to main d09941e7 (no content change, no force); historical checkpoint entries/evidence NOT rewritten; AUTHORIZED: SENSOR-B4-I07 DURABLE JOB STATE + RESUME COUPLING ONLY; I08+ NOT authorized. |
+| Current checkpoint | SENSOR-B4-I08R1 (during hardening): operator review of I08 found four load-bearing defects (A: recovery effects mutate durable truth before the RecoveryAction is durable; B: the committed crash matrix did not faithfully instantiate several frozen boundaries; C: clear_job_lock could delete without proving owner absence; D: generated run ids derived from id(self)+counter) plus two hardening seams (E: quarantine copies buffered whole files via read_bytes; F: _scan_jobs labeled every exception JOB_DURABILITY_DIVERGENCE). All six sealed in I08R1: a durable INTENT now precedes every irreversible recovery effect (append-only RecoveryOperationJournal at catalogs/recovery/operations/, phases INTENT/EFFECT_COMMITTED/COMPLETED/UNRESOLVED, deterministic SHA-256 identity excluding registration time, phase-qualified rows never mutated in place, exact retry idempotent, divergent retry typed conflict); interrupted effects are restart-replayable (apply adopts landed effects - quarantine kinds by canonical-absence under a prior durable record, reconciliation kinds by exact committed metadata/acquisition/manifest - never re-planned, never false stale conflicts); the orphan two-step reconciliation records each step (metadata, acquisition) with detail-qualified EFFECT rows and a mid-reconciliation ORPHAN_BLOB_CONTINUATION scan finding completes step 2 after a crash; manifest reconciliation after a post-commit crash adopts the landed commit instead of raising a false stale-plan conflict (CAS and exact ancestry remain authoritative); quarantine copies stream in bounded 1 MiB chunks with the digest computed in the same pass (no Path.read_bytes of the payload, proven by a size-guarded monkeypatch over a 4 MiB corrupt artifact at a 256 KiB chunk), destination durable before source unlink, exact retry adopts, different destination bytes typed conflict; the authoritative BLOC_04_I08R1_CRASH_TRUTH_MATRIX (13 rows: frozen 1-12 + crash-2b) instantiates the ACTUAL boundaries - crash 2 both branches (unknown-context quarantine AND registered-context replay), crash 4 a real CATALOGED projection before any manifest reference (catalog row alone is NOT health), crash 5 a VALID v2 fragment (supersedes==durable v1, refs verify) before the pointer update reconciled through public CAS (invalid ancestry stays UNRESOLVED - no latest-wins), crash 6 BEFORE advance_checkpoint (anchors (None,None), cursor never auto-advanced), crash 7 actual I06 IDENTICAL_REFETCH, crash 8 actual I06 SOURCE_MUTATION with genuinely different bytes at a strictly later response_observed_at (I06 40 same-seen_at fails closed) appended ONCE with final facts (I04 28 first-append-wins), crash 10 stale-plan conflict when the target reappears (restored to the ORIGINAL content sha), crash 11 an EXPLICIT measured contract gap (no public projection-invalidation API exists; T0A retained, rebuildable, source never rewritten - no junk file disguised as parser invalidation), crash 12 typed ManifestCASConflict for the CAS loser; clear_job_lock owner repository is MANDATORY (TypeError on omission, typed RecoveryConfigurationError on None or owner without _lock_owners truth, fingerprint mismatch refused, live owner record refused, same-thread RLock reentrancy cannot bypass the owner-map check, unowned matching lock succeeds with INTENT journaled before unlink); generated run ids are uuid4-backed 128-bit cryptographic identity (64 ids across two engines, zero collisions; no id(self), no wall clock); _scan_jobs catches ONLY typed job failures (JobLockHeld contention skipped and classified via lock files, unexpected exceptions propagate - never mislabeled JOB_DURABILITY_DIVERGENCE); PASS_SENSOR_B4_I08R1_CRASH_TRUTH_EFFECT_ATOMICITY_LOCK_AUTHORITY_SEALED=PENDING_OPERATOR_REVIEW (proposed, not self-ratified); PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED=OPERATOR_HOLD; RECOVERY_SCANNER_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE; DURABLE_RESUME_IMPLEMENTED=TRUE; next_checkpoint_authorized=FALSE; I09 NOT authorized. Historical - SENSOR-B4-I08 (state at that checkpoint, NOT rewritten): recovery/quarantine scanner implemented as scan != apply with no silent repair; read-only deterministic scan, typed finding vocabulary, append-only RecoveryAction journal with SHA-256 semantic identity, quarantine under {integrity,malformed,unknown_context} with no-clobber deterministic locators, corrupt blobs quarantined never overwritten, orphan reconciliation only through public APIs when context proves identity, no latest-wins manifest repair, job locks never auto-deleted, every apply revalidated (typed RecoveryPlanConflict on drift), all 12 frozen crash scenarios green. PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED=OPERATOR_HOLD (awaiting operator acceptance alongside I08R1 review). Historical - I07R1I-RATIFY (NOT rewritten): operator ratification of the complete I07 chain - all six I07-chain verdicts OPERATOR_ACCEPTED; next_checkpoint_authorized=TRUE authorizing SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY.
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
 | Operator review state | RATIFIED - Bloc 2 ratified; Bloc 3 COMPLETE + OPERATOR_ACCEPTED + FROZEN; Bloc 4 planning frozen (PASS_BLOC_04_PLAN_FROZEN); complete I05 chain (I05, I05R1-I05R4) OPERATOR_ACCEPTED (SENSOR-B4-I05R4-RATIFY); SENSOR-B4-I06 SOURCE REVISION / MUTATION REGISTRY OPERATOR_ACCEPTED and SENSOR-B4-I06R1 CANONICAL CONTRACT + DECLARATION DURABILITY OPERATOR_ACCEPTED (SENSOR-B4-I06R1-RATIFY); G4-04_REVISION_GATE = IMPLEMENTATION_PASS. Current Bloc-4 review state: SENSOR-B4-I08 - the recovery/quarantine scanner is implemented (scan != apply, no silent repair, append-only RecoveryAction journal, no-clobber quarantine); the I07 chain is OPERATOR_ACCEPTED (SENSOR-B4-I07R1I-RATIFY); DURABLE_RESUME_IMPLEMENTED = TRUE; RECOVERY_SCANNER_IMPLEMENTED = PENDING_OPERATOR_ACCEPTANCE; PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED = PENDING_OPERATOR_REVIEW; next_checkpoint_authorized = FALSE; I09+ NOT authorized and NOT started. Historical review chains remain in the checkpoint sections below - not rewritten. Historical - SENSOR-B4-I07R1I-RATIFY (state at that commit, NOT rewritten): the operator ACCEPTED the complete I07 chain (I07, I07R1, I07R1F, I07R1G, I07R1H and I07R1I all OPERATOR_ACCEPTED); DURABLE_RESUME_IMPLEMENTED = TRUE; RECOVERY_SCANNER_IMPLEMENTED = FALSE; next_checkpoint_authorized = TRUE authorizing SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY; I09+ NOT authorized. Historical review chains remain in the checkpoint sections below — not rewritten. Full per-checkpoint review chains remain recorded in the checkpoint sections and commit log below — no historical entries rewritten. |
@@ -25,7 +25,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE - I08 recovery/quarantine is implemented but NOT accepted; the proposed verdict PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED awaits operator review (PENDING_OPERATOR_REVIEW); next checkpoint requires operator authorization. Historical - at SENSOR-B4-I07R1I-RATIFY (NOT rewritten): TRUE authorizing SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY. |
+| next_checkpoint_authorized | FALSE - I08R1 recovery-truth hardening is implemented but NOT accepted; the proposed verdict PASS_SENSOR_B4_I08R1_CRASH_TRUTH_EFFECT_ATOMICITY_LOCK_AUTHORITY_SEALED awaits operator review (PENDING_OPERATOR_REVIEW) and PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED remains OPERATOR_HOLD; next checkpoint (I09) requires operator authorization. Historical - at SENSOR-B4-I08 (NOT rewritten): I08 proposed PENDING_OPERATOR_REVIEW. Historical - at SENSOR-B4-I07R1I-RATIFY (NOT rewritten): TRUE authorizing SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY. |
 
 ## Test counts (cumulative)
 
@@ -1599,6 +1599,145 @@ commit (zero content delta).
 
 PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED =
 PENDING_OPERATOR_REVIEW (proposed PASS after implementation).
+RECOVERY_SCANNER_IMPLEMENTED = PENDING_OPERATOR_ACCEPTANCE.
+recommended_next = SENSOR-B4-I09 QUOTA / STORAGE ESTIMATOR.
+next_checkpoint_authorized = FALSE.  DURABLE_RESUME_IMPLEMENTED = TRUE.
+
+**STOP GATE honored:** I09/I10/I11/I12/I13/I14/I15/I16/I17 NOT started;
+research NOT resumed.
+
+## SENSOR-B4-I08R1 - RECOVERY TRUTH HARDENING (effect atomicity + crash truth + lock authority + run identity)
+
+Starting SHA 00898d666fa4a595af02321e1eedbf543717a455 (I08 head, clean tree,
+lineage abcc1b40 RATIFY / efde153e I08A / ae348941 I08B / 00898d66 I08C
+verified). Operator review found FOUR load-bearing defects (A: recovery
+effects mutated durable truth before the RecoveryAction was durable; B: the
+committed crash matrix did not faithfully instantiate several frozen
+boundaries; C: clear_job_lock could delete without proving owner absence;
+D: generated run ids derived from id(self)+counter) plus TWO hardening
+seams (E: quarantine copies buffered whole files via read_bytes; F:
+_scan_jobs labeled every exception JOB_DURABILITY_DIVERGENCE). All six
+sealed in I08R1; no I08 architecture change; historical I08/I07 evidence
+untouched.
+
+DELIVERED in the preferred four-commit chain (no squash):
+
+- b83d65ef SENSOR-B4-I08R1A: journal-first replayable effects + streamed quarantine.
+  New RecoveryOperationJournal at catalogs/recovery/operations/ over the
+  shared DurableJsonCatalog primitive: phases INTENT / EFFECT_COMMITTED /
+  COMPLETED / UNRESOLVED; operation identity = SHA-256 over the canonical
+  semantic set (run id, action kind, object, problem, resolution, before/
+  after states) with registration time EXCLUDED; each phase its own
+  append-only physical row (phase-qualified key, EFFECT rows detail-
+  qualified because one operation may commit several effects); exact retry
+  idempotent, divergent retry typed RecoveryActionConflict, rows never
+  mutated in place. Every mutating handler resequences: revalidate (I08 28)
+  -> durable INTENT -> irreversible effect -> EFFECT row -> COMPLETED/
+  UNRESOLVED outcome -> frozen RecoveryAction; if INTENT publication fails
+  nothing was mutated. apply_plan first FINALIZES open operations: a landed
+  effect under an open operation is ADOPTED on restart (quarantine kinds by
+  canonical-absence under a prior durable record; reconciliation kinds by
+  exact committed metadata/acquisition/manifest), so a post-commit crash
+  converges instead of becoming a false stale-plan conflict. Orphan-blob
+  reconciliation is a replayable two-step operation (metadata EFFECT row ->
+  acquisition EFFECT row -> COMPLETED) with a typed mid-reconciliation
+  ORPHAN_BLOB_CONTINUATION scan finding that completes step 2 after a
+  crash; metadata conflict/acquisition conflict stay typed. Manifest
+  reconciliation: post-commit-crash retry recognizes the committed exact
+  manifest (CAS + exact ancestry authoritative, no latest-wins).
+  Quarantine copy: _quar_copy_stream - bounded 1 MiB chunks, SHA-256 in
+  the same pass, staged file fsync, publish_no_replace, directory fsync,
+  source unlinked ONLY after durable destination (parent fsync); exact
+  retry adopts identical destination; different destination bytes typed
+  RecoveryQuarantineConflict. Run ids: new_run_id = recovery-<uuid4.hex>
+  (128 bits cryptographic; no id(self), no counter, no wall clock, no temp
+  paths); explicit deterministic ids preserved for evidence runs.
+
+- 906ae137 SENSOR-B4-I08R1B: true frozen crash boundaries. New authoritative
+  BLOC_04_I08R1_CRASH_TRUTH_MATRIX.json (13 rows: frozen 1-12 + crash-2b)
+  built by test_i08r1_crash_truth.py on the real stack with typed injected
+  faults and fresh-repository restart probes. Crash 2 proven in BOTH
+  branches (no context -> unknown_context quarantine; registered context
+  -> replayable metadata+acquisition reconciliation, crash BETWEEN the two
+  appends surfaces as a typed continuation finding and completes on
+  retry). Crash 4 constructs a real CATALOGED projection (physical
+  artifact + catalog row + T0A lineage) with NO manifest reference and
+  proves a catalog row alone is NOT health (cataloged_yet_finding=True;
+  record-only action; artifact never moved). Crash 5 publishes a VALID v2
+  fragment (supersedes == durable v1, refs verify) before the pointer
+  update, reconciled through the public CAS API; a separate invalid-
+  ancestry case stays UNRESOLVED (no latest-wins). Crash 6 occurs BEFORE
+  advance_checkpoint: job stays MANIFEST_COMMITTED with anchors
+  (None, None); recovery neither advances the cursor nor mints anchors.
+  Crash 7 uses the accepted I06 registry: same source identity + same
+  exact bytes -> IDENTICAL_REFETCH (not blob-store dedupe). Crash 8 uses
+  I06 SOURCE_MUTATION with genuinely DIFFERENT bytes (distinct sha) at a
+  strictly later response_observed_at (I06 40: same-seen_at mutation
+  fails closed) - the mutated acquisition is appended ONCE with final
+  facts (I04 28 first-append-wins). Crash 9 keeps the corruption path and
+  adds restart-convergent phases. Crash 10 adds the target-reappears
+  stale-plan conflict (bytes restored to the ORIGINAL content sha - a
+  mutated restore would be a different blob, not staleness). Crash 11
+  reports the MEASURED contract gap: no public projection-invalidation API
+  exists in src/ (asserted; test fails if an API appears, forcing a real
+  INVALID_PARSER upgrade) - T0A retained, projection still cataloged,
+  rebuildable, source never rewritten; no junk file disguised as parser
+  invalidation. Crash 12: typed ManifestCASConflict for the CAS loser,
+  exactly one winner, no silent branch. Historical honesty (I08R1 33):
+  BLOC_04_I08_CRASH_MATRIX.json is untouched on disk but is now
+  documented as a first-pass approximation - several rows (4, 5, 6, 7, 8,
+  11) did not instantiate the frozen boundary and must not be read as
+  12/12 authoritative after I08R1.
+
+- 077494be SENSOR-B4-I08R1C: lock-clear authority, run identity, typed job scan.
+  clear_job_lock owner repository is MANDATORY (omission = TypeError,
+  None or owner without _lock_owners truth = typed
+  RecoveryConfigurationError; fingerprint mismatch refused; live owner
+  record refused; same-thread RLock reentrancy CANNOT bypass the owner-map
+  check - probe-alone is insufficient because the owning thread can always
+  re-acquire an RLock; unowned matching lock succeeds with RecoveryAction
+  + INTENT journaled BEFORE the unlink). apply_plan never clears locks; no
+  TTL; no process-death inference; foreign locks never auto-deleted
+  (scan/apply record lock_present=True, cleared=False). _scan_jobs catches
+  ONLY typed job failures: JobLockHeld (healthy-writer contention) is
+  skipped and the physical lock classifies separately; genuine durable-
+  chain failures classify JOB_DURABILITY_DIVERGENCE; unexpected I/O or
+  programming errors PROPAGATE (never mislabeled). Proven: healthy job +
+  held lock -> no divergence finding; forged chain -> divergence finding;
+  injected OSError -> propagates typed.
+
+- SENSOR-B4-I08R1D: evidence freeze + ledger. Four deterministic matrices
+  (BLOC_04_I08R1_EFFECT_ATOMICITY_MATRIX.json 8 cases,
+  BLOC_04_I08R1_CRASH_TRUTH_MATRIX.json 13 cases,
+  BLOC_04_I08R1_LOCK_RUN_ID_MATRIX.json 7 cases,
+  BLOC_04_I08R1_STREAMING_QUARANTINE_MATRIX.json 6 cases - all cases OK,
+  byte-stable regeneration under test_generated_matches_committed), the
+  chronological evidence MD
+  BLOC_04_I08R1_RECOVERY_TRUTH_ATOMICITY_EVIDENCE.md, and this ledger row.
+
+Evidence governance: builders pure; normal pytest generates to tmp and
+byte-compares; pytest never writes the committed evidence tree; the
+documented legacy CRLF-churn evidence files were restored after the final
+suites (zero content delta).
+
+Fresh baseline at 00898d66 (measured): storage 1191/0/4, full 2570/0/5.
+Final recorded runs at the I08R1 tree: storage 1235 passed / 0 failed /
+4 skipped (+44); full 2614 passed / 0 failed / 5 skipped (+44); zero
+failures; the documented unrelated blob-store concurrency flake did not
+reproduce. Ruff: All checks passed! on the full changed scope. Mypy:
+production recovery.py carries ONLY the documented pre-existing
+probes/planner.py:79 baseline; the three new test modules (source root
+configured via MYPYPATH + --explicit-package-bases, the established
+convention) carry the same method-assign class as the pre-existing
+injected-fault tests and no import-not-found/arg-type residue - tests are
+not part of a repo mypy gate policy (no [tool.mypy] exists); stated
+precisely, not claimed clean. network=0; provider source unchanged; no
+I09; no quota; no DuckDB; no Postgres; no RawEvidenceQuery; research NOT
+resumed.
+
+PASS_SENSOR_B4_I08R1_CRASH_TRUTH_EFFECT_ATOMICITY_LOCK_AUTHORITY_SEALED =
+PENDING_OPERATOR_REVIEW (proposed PASS; NOT self-ratified).
+PASS_SENSOR_B4_I08_RECOVERY_QUARANTINE_SEALED = OPERATOR_HOLD.
 RECOVERY_SCANNER_IMPLEMENTED = PENDING_OPERATOR_ACCEPTANCE.
 recommended_next = SENSOR-B4-I09 QUOTA / STORAGE ESTIMATOR.
 next_checkpoint_authorized = FALSE.  DURABLE_RESUME_IMPLEMENTED = TRUE.

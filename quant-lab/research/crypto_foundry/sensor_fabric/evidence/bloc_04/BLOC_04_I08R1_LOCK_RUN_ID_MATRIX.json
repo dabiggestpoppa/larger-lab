@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "case": "generated_run_ids_cross_instance_unique",
+      "derived_from_object_addresses": false,
+      "result": "OK",
+      "sampled": 64,
+      "unique": 64
+    },
+    {
+      "call_site_override": true,
+      "case": "explicit_deterministic_run_id_preserved",
+      "constructor_id_survives": true,
+      "result": "OK"
+    },
+    {
+      "case": "clear_without_job_repository_rejected",
+      "lock_untouched": true,
+      "refusals": 3,
+      "result": "OK"
+    },
+    {
+      "case": "clear_live_owner_rejected",
+      "lock_untouched": true,
+      "result": "OK",
+      "typed_conflict": true
+    },
+    {
+      "case": "clear_same_thread_reentrant_owner_rejected",
+      "lock_untouched": true,
+      "probe_reentrant_true": true,
+      "result": "OK",
+      "typed_conflict": true
+    },
+    {
+      "case": "clear_unowned_matching_lock_succeeds",
+      "intent_phase_durable": true,
+      "journal_after_state": {
+        "cleared": true,
+        "lock_present": false
+      },
+      "lock_removed": true,
+      "result": "OK"
+    },
+    {
+      "case": "foreign_lock_not_auto_deleted",
+      "classified": true,
+      "journal_after_state": {
+        "cleared": false,
+        "lock_present": true
+      },
+      "lock_still_present": true,
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R1",
+  "doctrine": "I08R1 \u00a723-\u00a726/\u00a730 \u2014 the explicit lock clear REQUIRES owner authority (no optional bypass, no RLock-probe-only check); generated run ids carry >=128 bits of cryptographic randomness and never derive from process memory or wall-clock formatting",
+  "matrix": "BLOC_04_I08R1_LOCK_RUN_ID_MATRIX"
+}
