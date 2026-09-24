@@ -150,7 +150,7 @@ def build_priority_pause_matrix() -> dict[str, Any]:
         rows.append(
             _case(
                 name,
-                ["expected_disposition", "blocked_code_consistent"],
+                ["actual_disposition_matches", "blocked_code_consistent"],
                 pressure=_state(used).pressure_state.value,
                 priority=priority.value,
                 projected_write_bytes=write,
@@ -158,6 +158,7 @@ def build_priority_pause_matrix() -> dict[str, Any]:
                 absolute_free_floor_bytes=decision.absolute_free_floor_bytes,
                 expected_disposition=expected.value,
                 actual_disposition=decision.disposition.value,
+                actual_disposition_matches=decision.disposition is expected,
                 blocked_code=decision.blocked_code,
                 blocked_code_consistent=(decision.blocked_code == STORAGE_CAPACITY_BLOCKED) if blocked else decision.blocked_code is None,
             )
