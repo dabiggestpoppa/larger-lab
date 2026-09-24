@@ -321,9 +321,14 @@ def test_the_loser_mutates_nothing(oce_stack, tmp_path):
     # operation. Both must lose — and lose with zero mutations.
     results = _race(tmp_path, root, promote, inv, invsha, ["rollback", "rollback"])
     assert all(rc != 0 for _, rc in results), results
-    # zero receipt writes by the losers: exactly the drain's receipt may exist
+    # zero receipt MINTS by the losers: the only new .json files are the
+    # losers' own --receipt-out refusal receipts (truthful refusal evidence
+    # the CLI writes at its caller-chosen path), never an engine-minted
+    # receipt beyond the drain's.
+    expected = set(receipts_before) | {"drain-finalize.json",
+                                       "rollback-0.json", "rollback-1.json"}
     mints = [p.name for p in root.iterdir() if p.suffix == ".json"
-             and p.name not in receipts_before + ["drain-finalize.json"]]
+             and p.name not in expected]
     assert mints == [], sorted(mints)
     # zero durable-record rewrites by the losers: the record moved only by the
     # drain (identical to its post-drain content)
