@@ -419,7 +419,7 @@ def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
     suffix = f"/{key}" if key else "/"
     canonical_headers = (f"host:{host_header}\n"
                          f"x-amz-content-sha256:{payload_hash}\n"
-                         f"x-amz-date:{now}\n")
+                         f"x-amz-date:{now}")
     signed_headers = "host;x-amz-content-sha256;x-amz-date"
     canonical = "\n".join([
         method, f"/{bucket}{suffix}", "", canonical_headers, signed_headers,
