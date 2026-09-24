@@ -135,3 +135,21 @@ __all__ = [
     "G5ScenarioPack", "G5RunResult", "load_g5_pack", "run_g5_scenario",
     "evaluate_g5_expectation",
 ]
+# OPH x IT3 confluence (Path M Increment 1, diagnostic) — re-export only, no new logic in this package root
+from .confluence import (
+    ActionIdentity,
+    ClaimLedgerView,
+    VALID_SCHEDULE_BOUND,
+    confluence_protected_digest,
+    forensic_fingerprint,
+    schedule_enumerator,
+    schedule_seq_hash,
+    schedule_to_replay_events,
+    spec_to_action_identities,
+    verify_confluence,
+    r1_candidate_table,
+    select_workflow_via_R1,
+    make_claim_ledger_view,
+    seeded_failure_control_verdict,
+    dependency_digest,
+)
