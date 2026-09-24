@@ -1,0 +1,73 @@
+{
+  "schema_version": "csia-book3-implementation-matrix-v0.1",
+  "book": 3,
+  "status": "READY_FOR_OPERATOR_REVIEW",
+  "ratified_planning_anchor": "21fdd79763c745034d34946896756efb430dc11a",
+  "accepted_book2_base": "cadc1e7e4378248da0a9aeefbe12909918656433",
+  "implementation_authority": "DETERMINISTIC_OFFLINE_BOOK3_NATIVE_ARCHITECTURE_KERNEL_ONLY",
+  "network": false,
+  "live_acquisition": false,
+  "persistence": false,
+  "database": false,
+  "graph_database": false,
+  "self_accepted": false,
+  "gates": {
+    "FAMILY_REGISTRY": {
+      "status": "PASS",
+      "invariants": ["15 ratified namespaces", "stable namespaced IDs", "operator admission for new namespace", "canonical Book 2 claim evidence", "semantic collision escalation", "vendor-only rejection", "explicit UNKNOWN", "append-only supersession"]
+    },
+    "ARCHITECTURE_DOSSIER": {
+      "status": "PASS",
+      "invariants": ["all 14 architecture value fields", "family-native absence", "explicit UNKNOWN", "bitemporal envelope", "typed modular components"]
+    },
+    "BOOK2_PROVENANCE": {
+      "status": "PASS",
+      "invariants": ["canonical current claim required", "Book 2 graph-promotable states only", "unknown detached forged rejected", "stale rejected for current truth", "rejected contested unresolved superseded rejected", "no second epistemic engine"]
+    },
+    "ARCHITECTURE_RELATIONS": {
+      "status": "PASS",
+      "invariants": ["EXECUTES_WITH", "USES_DA", "SEQUENCED_BY", "temporal", "Book 2 provenance", "no DEPENDS_ON alias"]
+    },
+    "NETWORK_IDENTITY": {
+      "status": "PASS",
+      "invariants": ["continuation SAME_OBJECT", "persistent divergence separate objects plus FORKED_FROM", "temporary split UNKNOWN", "new genesis NEW_OBJECT", "family-native exception operator-reviewed", "ticker name chain ID not identity authority"]
+    },
+    "ARCHITECTURE_HISTORY": {
+      "status": "PASS",
+      "invariants": ["14 ratified change classes", "append-only", "old truth queryable", "security change not identity replacement"]
+    },
+    "MODULAR_COMPONENTS": {
+      "status": "PASS",
+      "invariants": ["execution", "sequencing", "settlement", "DA", "security", "consensus", "bridge/messaging", "roles remain distinct"]
+    },
+    "PILOTS_ANTI_EVM": {
+      "status": "PASS",
+      "invariants": ["17 deterministic offline fixtures", "not live observations", "12 anti-EVM executable proofs"]
+    },
+    "REALIZATION": {
+      "status": "PASS",
+      "invariants": ["economic asset distinct from realization", "native wrapped bridged issued distinct", "history preserved through migration"]
+    },
+    "FREEZE": {
+      "status": "PASS",
+      "book1_accepted_contract_mutations": 0,
+      "book2_accepted_contract_mutations": 0
+    }
+  },
+  "tests": {
+    "baseline_csia_total": 215,
+    "baseline_book1": 107,
+    "baseline_book2": 108,
+    "book3_total": 56,
+    "csia_total": 271,
+    "crypto_sensor_regression_passed": 2339,
+    "crypto_sensor_regression_skipped": 4,
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "mypy_source_files": 22
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL",
+  "book3_acceptance": "NOT_SELF_ACCEPTED",
+  "book4": "NOT_STARTED",
+  "live_acquisition_authority": false
+}

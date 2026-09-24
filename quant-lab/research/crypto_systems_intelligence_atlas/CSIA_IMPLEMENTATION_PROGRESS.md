@@ -468,3 +468,48 @@ Acceptance record:
 Book 2 is `FROZEN_ACCEPTED`. Future changes require a concrete downstream
 integration defect, an explicit amendment, or a newly discovered correctness
 failure. Do not perform further generic Book 2 hardening or optimize test counts.
+
+
+---
+
+# CHECKPOINT 11 — BOOK 3 OFFLINE IMPLEMENTATION (2026-09-24)
+
+The operator authorized only the deterministic offline Book 3 Native Chain /
+Ledger Atlas kernel. This checkpoint records implementation evidence; it does
+not self-accept Book 3 and does not authorize Book 4 or live acquisition.
+
+```text
+RATIFIED_PLANNING_ANCHOR = 21fdd79763c745034d34946896756efb430dc11a
+ACCEPTED_BOOK2_BASE = cadc1e7e4378248da0a9aeefbe12909918656433
+BUILD_BRANCH = agent/crypto-systems-intelligence-atlas-book3-build
+BUILD_WORKTREE = C:/Users/wifik/Desktop/larger-lab-csia-book3-build
+
+BOOK_3_IMPLEMENTATION = COMPLETE
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+STRUCTURAL_FAILURE_COUNT = 0
+BLOCKING_OPERATOR_DECISION_COUNT = 0
+
+BASELINE_CSIA = 215 PASS (107 BOOK 1 + 108 BOOK 2)
+BOOK_3_TESTS = 56 PASS
+TOTAL_CSIA = 271 PASS
+CRYPTO_SENSOR_REGRESSION = 2339 PASS / 4 SKIPPED
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (22 source files)
+
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL
+STATUS = READY_FOR_OPERATOR_REVIEW
+BOOK_3_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_4 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Artifacts:
+
+- `CSIA_BOOK_3_IMPLEMENTATION_MATRIX.json`
+- `CSIA_BOOK_3_IMPLEMENTATION_EVIDENCE_v0.1.md`
+- this checkpoint
+
+Exact next operator action: review the Book 3 matrix and evidence, then
+explicitly accept or reject the proposed exit gate. Do not start Book 4 or
+enable live acquisition before a separate authorization.
