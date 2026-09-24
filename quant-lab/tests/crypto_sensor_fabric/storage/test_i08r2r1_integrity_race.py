@@ -47,9 +47,10 @@ def _empty(engine: rec.RecoveryEngine, run_id: str) -> None:
     )
 
 
-def test_clear_holds_job_authority_through_unlink_and_fsync(
+def measure_lock_clear_race(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+) -> dict[str, Any]:
+    """Measure a contender at both irreversible clear boundaries."""
     stack = Stack(tmp_path)
     job_id = "job-final-boundary-race"
     lock_id, lock_path = _truth._lock(tmp_path, job_id)
@@ -100,11 +101,26 @@ def test_clear_holds_job_authority_through_unlink_and_fsync(
         owner_repository=owner,
         run_id="lock-boundary",
     )
+    return {
+        "unlink_attempted": "unlink" in attempts,
+        "fsync_attempted": "fsync" in attempts,
+        "contender_acquisitions": acquired,
+        "lock_absent": not lock_path.exists(),
+        "owner_map_empty": not owner._lock_owners,
+    }
 
-    assert attempts == ["unlink", "fsync"]
-    assert acquired == [False, False]
-    assert not lock_path.exists()
-    assert not owner._lock_owners
+
+def test_clear_holds_job_authority_through_unlink_and_fsync(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    measured = measure_lock_clear_race(tmp_path, monkeypatch)
+    assert measured == {
+        "unlink_attempted": True,
+        "fsync_attempted": True,
+        "contender_acquisitions": [False, False],
+        "lock_absent": True,
+        "owner_map_empty": True,
+    }
 
 
 def test_operation_timestamp_requires_zero_utc_offset(tmp_path: Path) -> None:

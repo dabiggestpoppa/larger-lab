@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "case": "contender_blocked_at_unlink_and_fsync",
+      "contender_acquisitions": [
+        false,
+        false
+      ],
+      "contender_never_acquired": true,
+      "fsync_attempted": true,
+      "lock_absent": true,
+      "owner_map_empty": true,
+      "required_invariants": [
+        "unlink_attempted",
+        "fsync_attempted",
+        "contender_never_acquired",
+        "lock_absent",
+        "owner_map_empty"
+      ],
+      "result": "OK",
+      "unlink_attempted": true
+    },
+    {
+      "case": "successful_clear_exact_durable_order",
+      "exact_order": true,
+      "lock_absent": true,
+      "observed_order": [
+        "INTENT",
+        "UNLINK",
+        "FSYNC",
+        "EFFECT",
+        "ACTION",
+        "COMPLETED"
+      ],
+      "one_action": true,
+      "required_invariants": [
+        "exact_order",
+        "lock_absent",
+        "one_action"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "held_job_rlock_refused_without_unlink",
+      "lock_intact": true,
+      "required_invariants": [
+        "typed_refusal",
+        "lock_intact"
+      ],
+      "result": "OK",
+      "typed_refusal": true
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R2R1",
+  "doctrine": "The same per-job RLock remains held across final owner-map validation, unlink, and directory fsync; a contender can be refused but can never become a live owner under an unlink",
+  "matrix": "BLOC_04_I08R2R1_LOCK_CLEAR_RACE_MATRIX"
+}

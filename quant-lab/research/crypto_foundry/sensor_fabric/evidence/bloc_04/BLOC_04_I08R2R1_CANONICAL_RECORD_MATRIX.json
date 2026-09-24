@@ -1,0 +1,70 @@
+{
+  "cases": [
+    {
+      "case": "canonical_zero_utc_accepted",
+      "registered_at": "2026-01-01T00:00:00+00:00",
+      "required_invariants": [
+        "typed_validation"
+      ],
+      "result": "OK",
+      "typed_validation": true
+    },
+    {
+      "case": "naive_timestamp_rejected",
+      "required_invariants": [
+        "typed_corruption"
+      ],
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "case": "aware_non_utc_timestamp_rejected",
+      "registered_at": "2026-01-01T05:00:00+05:00",
+      "required_invariants": [
+        "typed_corruption"
+      ],
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "case": "malformed_before_state_rejected",
+      "required_invariants": [
+        "typed_corruption"
+      ],
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "case": "malformed_after_state_rejected",
+      "required_invariants": [
+        "typed_corruption"
+      ],
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "case": "coarse_tuple_wrong_action_rejected",
+      "divergent_after_state": true,
+      "divergent_resolution": true,
+      "required_invariants": [
+        "typed_corruption"
+      ],
+      "result": "OK",
+      "same_coarse_tuple": true,
+      "typed_corruption": true
+    },
+    {
+      "case": "exact_bound_action_with_divergent_outcome_rejected",
+      "claimed_outcome_matches_action": false,
+      "exact_operation_binding": true,
+      "required_invariants": [
+        "typed_corruption"
+      ],
+      "result": "OK",
+      "typed_corruption": true
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R2R1",
+  "doctrine": "Durable operation rows require zero-offset UTC, typed state parsing, exact operation binding, and a canonical full outcome equal to the named final RecoveryAction",
+  "matrix": "BLOC_04_I08R2R1_CANONICAL_RECORD_MATRIX"
+}

@@ -1,0 +1,102 @@
+{
+  "cases": [
+    {
+      "case": "historical_crash_false_green_preserved",
+      "false_green_confirmed": true,
+      "historical_bytes_preserved": true,
+      "historical_replay_closed": false,
+      "historical_result": "OK",
+      "historical_sha256": "a119bfa98367552ed77cc35015513532305a274d4c634df041c9cc65dd043713",
+      "required_invariants": [
+        "false_green_confirmed",
+        "historical_bytes_preserved"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "historical_present_lock_false_green_preserved",
+      "false_green_confirmed": true,
+      "historical_bytes_preserved": true,
+      "historical_no_action": false,
+      "historical_report_left_open": false,
+      "historical_result": "OK",
+      "required_invariants": [
+        "false_green_confirmed",
+        "historical_bytes_preserved"
+      ],
+      "result": "OK"
+    },
+    {
+      "apply_return_is_not_replay_report": true,
+      "case": "corrected_crash_after_unlink_closes_from_replay_report",
+      "completed": true,
+      "injected_death": true,
+      "lock_absent": true,
+      "one_action": true,
+      "original_run": true,
+      "replay_closed": true,
+      "required_invariants": [
+        "injected_death",
+        "lock_absent",
+        "original_run",
+        "completed",
+        "one_action",
+        "replay_closed",
+        "apply_return_is_not_replay_report"
+      ],
+      "result": "OK"
+    },
+    {
+      "apply_return_is_not_replay_report": true,
+      "case": "corrected_present_lock_stays_open_without_action",
+      "left_open": true,
+      "lock_intact": true,
+      "no_action": true,
+      "report_left_open": true,
+      "required_invariants": [
+        "left_open",
+        "no_action",
+        "lock_intact",
+        "report_left_open",
+        "apply_return_is_not_replay_report"
+      ],
+      "result": "OK"
+    },
+    {
+      "apply_return_is_not_replay_report": true,
+      "case": "counterfactual_crash_replay_not_closed",
+      "completed": true,
+      "injected_death": true,
+      "lock_absent": true,
+      "one_action": true,
+      "original_run": true,
+      "replay_closed": false,
+      "required_invariants": [
+        "injected_death",
+        "lock_absent",
+        "original_run",
+        "completed",
+        "one_action",
+        "replay_closed",
+        "apply_return_is_not_replay_report"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R2R1",
+  "doctrine": "A measured R2R1 row is OK only when every declared invariant is true; last_replay_report owns restart truth, while apply_plan's return lists only newly applied actions",
+  "historical_matrix_sha256": {
+    "BLOC_04_I08R1_CRASH_TRUTH_MATRIX.json": "d951399cfdb09e5164be8a38515744baf3ebb3f56f6b07c48fb23d79579d829d",
+    "BLOC_04_I08R1_EFFECT_ATOMICITY_MATRIX.json": "21b0ea691448fbe16a00982838864c0e064c0187808c2f3d4fe09c398fb29e35",
+    "BLOC_04_I08R1_LOCK_RUN_ID_MATRIX.json": "c71d06fe14f7c15137a8ae57529af51289cea4d1cbe823ce21e5976917efc8a8",
+    "BLOC_04_I08R1_STREAMING_QUARANTINE_MATRIX.json": "4f2146f415dfc5fed3b6f5e71d57b2f7ff55af9d415046f70de2c84cc5d37c06",
+    "BLOC_04_I08R2_LOCK_CLEAR_ATOMICITY_MATRIX.json": "a119bfa98367552ed77cc35015513532305a274d4c634df041c9cc65dd043713",
+    "BLOC_04_I08R2_OPERATION_RECORD_INTEGRITY_MATRIX.json": "c3983023de941edc220abb51d6bb2a9095ab34b44e8b3a7c822bed40b712beb3",
+    "BLOC_04_I08R2_OPERATION_TERMINALITY_MATRIX.json": "86625d2df8ea329df61420f29f56e070f40bbafb149ca917c6855946c1d40ba8",
+    "BLOC_04_I08_CRASH_MATRIX.json": "cc5c71694a9177314c2a872a28463c7c0d531a6805bc6a9f26083949f195d63f",
+    "BLOC_04_I08_QUARANTINE_MATRIX.json": "4f501f64da491fb62003377fdd7999c35983b7f4119be70b44563bc713fcc9e0",
+    "BLOC_04_I08_RECOVERY_IDEMPOTENCE_MATRIX.json": "7a82d6c52bd0acfd59e682684128d4f8c8b9f672ae7c7aa5399c303a57251913",
+    "BLOC_04_I08_RECOVERY_SCAN_MATRIX.json": "8a288e8bbe6ddbd39a03480b08bc573e54b92a59b1cf08f72d8dc2817aabb237"
+  },
+  "matrix": "BLOC_04_I08R2R1_EVIDENCE_TRUTH_MATRIX"
+}
