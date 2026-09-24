@@ -1,0 +1,86 @@
+{
+  "checkpoint": "SENSOR-B4-I10R1",
+  "matrix": "I10R1_SCHEMA_CONTRACT",
+  "rows": [
+    {
+      "build_succeeded": true,
+      "case": "populated_view_exact_schema",
+      "metadata_row_equal": true,
+      "required_invariants": [
+        "build_succeeded",
+        "schema_equal",
+        "metadata_row_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    },
+    {
+      "case": "empty_view_exact_schema",
+      "empty_schemas_equal": true,
+      "metadata_row_equal": true,
+      "required_invariants": [
+        "empty_schemas_equal",
+        "metadata_row_equal"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "nullable_first_row_keeps_contract_type",
+      "nullable_first_row_keeps_bigint": true,
+      "required_invariants": [
+        "nullable_first_row_keeps_bigint"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "missing_column_refused",
+      "extra_column_refused": true,
+      "missing_column_refused": true,
+      "required_invariants": [
+        "missing_column_refused"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "extra_column_refused",
+      "extra_column_refused": true,
+      "missing_column_refused": true,
+      "required_invariants": [
+        "extra_column_refused"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "stale_schema_version_refused",
+      "duplicate_metadata_refused": true,
+      "future_version_refused": true,
+      "required_invariants": [
+        "stale_version_refused",
+        "future_version_refused",
+        "wrong_role_refused",
+        "duplicate_metadata_refused"
+      ],
+      "result": "OK",
+      "stale_version_refused": true,
+      "wrong_role_refused": true
+    },
+    {
+      "case": "counterfactual_shape_accepts_stripped_rows",
+      "extra_column_refused": false,
+      "missing_column_refused": false,
+      "required_invariants": [
+        "missing_column_refused",
+        "extra_column_refused"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "schema_authority": "VIEW_SCHEMAS ordered contract",
+  "schema_version": "1.0",
+  "summary": {
+    "fail": 1,
+    "ok": 6,
+    "rows": 7
+  }
+}

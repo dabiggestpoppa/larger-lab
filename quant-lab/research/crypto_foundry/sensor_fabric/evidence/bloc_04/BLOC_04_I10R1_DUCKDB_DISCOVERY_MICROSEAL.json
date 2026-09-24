@@ -1,0 +1,33 @@
+{
+  "api": "crypto_sensor_fabric.storage.duckdb_catalog.rebuild_duckdb_catalog",
+  "catalog_role": "rebuildable_discovery_non_authoritative",
+  "checkpoint": "SENSOR-B4-I10R1",
+  "governance": {
+    "G4-09_CATALOG_REBUILD_GATE": "IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW",
+    "PASS_SENSOR_B4_I10R1_SCHEMA_EVIDENCE_DISCOVERY_SEALED": "PENDING_OPERATOR_REVIEW",
+    "PASS_SENSOR_B4_I10_DUCKDB_DISCOVERY_SEALED": "OPERATOR_HOLD",
+    "next_checkpoint_authorized": false,
+    "recommended_next": "OPERATOR REVIEW OF COMPLETE I10 -> I10R1 CHAIN"
+  },
+  "historical_i10_evidence": "preserved byte-for-byte; never rewritten",
+  "matrices": {
+    "discovery_cost_rows": 6,
+    "durable_relation_rows": 5,
+    "runtime_evidence_truth_rows": 4,
+    "schema_contract_rows": 7,
+    "storage_usage_dimension_rows": 5
+  },
+  "measured_evidence": "every boolean observed from executed production behavior in temp roots",
+  "schema_authority": "VIEW_SCHEMAS (single ordered contract)",
+  "schema_version": "1.0",
+  "views": [
+    "v_t0_blobs",
+    "v_t0_acquisitions",
+    "v_t0_projections",
+    "v_t0_partitions",
+    "v_t0_gaps",
+    "v_t0_revisions",
+    "v_t0_quarantine",
+    "v_t0_storage_usage"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "checkpoint": "SENSOR-B4-I10R1",
+  "matrix": "I10R1_DISCOVERY_COST",
+  "rows": [
+    {
+      "case": "verify_blob_not_called_by_default_rebuild",
+      "missing_physical_blob_refused": true,
+      "raw_payload_not_loaded": true,
+      "required_invariants": [
+        "raw_payload_not_loaded"
+      ],
+      "result": "OK",
+      "stored_size_divergence_refused": true
+    },
+    {
+      "case": "source_decoder_not_called",
+      "missing_physical_blob_refused": true,
+      "raw_payload_not_loaded": true,
+      "required_invariants": [
+        "raw_payload_not_loaded"
+      ],
+      "result": "OK",
+      "stored_size_divergence_refused": true
+    },
+    {
+      "case": "missing_physical_blob_still_refused",
+      "missing_physical_blob_refused": true,
+      "raw_payload_not_loaded": true,
+      "required_invariants": [
+        "missing_physical_blob_refused"
+      ],
+      "result": "OK",
+      "stored_size_divergence_refused": true
+    },
+    {
+      "case": "stored_size_divergence_still_refused",
+      "missing_physical_blob_refused": true,
+      "raw_payload_not_loaded": true,
+      "required_invariants": [
+        "stored_size_divergence_refused"
+      ],
+      "result": "OK",
+      "stored_size_divergence_refused": true
+    },
+    {
+      "case": "large_blob_metadata_discovery_without_payload_read",
+      "missing_physical_blob_refused": true,
+      "raw_payload_not_loaded": true,
+      "required_invariants": [
+        "raw_payload_not_loaded"
+      ],
+      "result": "OK",
+      "stored_size_divergence_refused": true
+    },
+    {
+      "case": "counterfactual_full_rescan_cost",
+      "raw_payload_not_loaded": false,
+      "required_invariants": [
+        "raw_payload_not_loaded"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 5,
+    "rows": 6
+  }
+}

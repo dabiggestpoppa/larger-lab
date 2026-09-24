@@ -1,0 +1,59 @@
+{
+  "checkpoint": "SENSOR-B4-I10R1",
+  "matrix": "I10R1_STORAGE_USAGE_DIMENSION",
+  "rows": [
+    {
+      "case": "two_providers_same_state_stay_separate",
+      "object_totals_reconcile": true,
+      "provider_groups_separate": true,
+      "required_invariants": [
+        "provider_groups_separate"
+      ],
+      "result": "OK",
+      "t0a_provider_null": true
+    },
+    {
+      "case": "two_sensors_same_state_stay_separate",
+      "object_totals_reconcile": true,
+      "provider_groups_separate": true,
+      "required_invariants": [
+        "provider_groups_separate"
+      ],
+      "result": "OK",
+      "t0a_provider_null": true
+    },
+    {
+      "case": "t0a_provider_stays_null_where_not_durably_owned",
+      "object_totals_reconcile": true,
+      "provider_groups_separate": true,
+      "required_invariants": [
+        "t0a_provider_null"
+      ],
+      "result": "OK",
+      "t0a_provider_null": true
+    },
+    {
+      "case": "object_and_byte_totals_reconcile",
+      "object_totals_reconcile": true,
+      "provider_groups_separate": true,
+      "required_invariants": [
+        "object_totals_reconcile"
+      ],
+      "result": "OK",
+      "t0a_provider_null": true
+    },
+    {
+      "case": "counterfactual_collapsed_dimensions",
+      "provider_groups_separate": false,
+      "required_invariants": [
+        "provider_groups_separate"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 4,
+    "rows": 5
+  }
+}

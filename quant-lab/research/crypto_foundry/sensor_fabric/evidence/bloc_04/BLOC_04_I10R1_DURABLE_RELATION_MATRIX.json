@@ -1,0 +1,61 @@
+{
+  "checkpoint": "SENSOR-B4-I10R1",
+  "matrix": "I10R1_DURABLE_RELATION",
+  "rows": [
+    {
+      "case": "malformed_recovery_action_refused",
+      "malformed_recovery_action_refused": true,
+      "orphan_lineage_refused": true,
+      "required_invariants": [
+        "malformed_recovery_action_refused"
+      ],
+      "result": "OK",
+      "valid_chain_accepted": true
+    },
+    {
+      "case": "orphan_lineage_refused",
+      "malformed_recovery_action_refused": true,
+      "orphan_lineage_refused": true,
+      "required_invariants": [
+        "orphan_lineage_refused"
+      ],
+      "result": "OK",
+      "valid_chain_accepted": true
+    },
+    {
+      "case": "artifact_context_lineage_valid_chain_accepted",
+      "malformed_recovery_action_refused": true,
+      "orphan_lineage_refused": true,
+      "required_invariants": [
+        "valid_chain_accepted"
+      ],
+      "result": "OK",
+      "valid_chain_accepted": true
+    },
+    {
+      "case": "frozen_missingness_states_preserved",
+      "complete_boundary_not_a_gap": true,
+      "frozen_states_preserved": true,
+      "no_zero_fill_or_generic_missing": true,
+      "required_invariants": [
+        "frozen_states_preserved",
+        "complete_boundary_not_a_gap",
+        "no_zero_fill_or_generic_missing"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "counterfactual_silent_orphan_adoption",
+      "orphan_lineage_refused": false,
+      "required_invariants": [
+        "orphan_lineage_refused"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 4,
+    "rows": 5
+  }
+}

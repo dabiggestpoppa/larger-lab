@@ -1,0 +1,56 @@
+{
+  "checkpoint": "SENSOR-B4-I10R1",
+  "matrix": "I10R1_RUNTIME_EVIDENCE_TRUTH",
+  "rows": [
+    {
+      "all_view_rows_equal": true,
+      "case": "measured_destroy_rebuild",
+      "catalog_deleted": true,
+      "rebuild_succeeded": true,
+      "required_invariants": [
+        "rebuild_succeeded",
+        "all_view_rows_equal"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "measured_failed_build_preservation",
+      "existing_catalog_unchanged": true,
+      "required_invariants": [
+        "typed_corruption_raised",
+        "existing_catalog_unchanged"
+      ],
+      "result": "OK",
+      "typed_corruption_raised": true
+    },
+    {
+      "case": "original_static_builder_false_green_negative_control",
+      "required_invariants": [
+        "static_builder_still_ok_with_broken_production",
+        "static_schema_equal_is_literal",
+        "static_row_count_equal_is_literal",
+        "static_canonical_rows_equal_is_literal"
+      ],
+      "result": "OK",
+      "static_builder_still_ok_with_broken_production": true,
+      "static_canonical_rows_equal_is_literal": true,
+      "static_row_count_equal_is_literal": true,
+      "static_schema_equal_is_literal": true
+    },
+    {
+      "all_view_rows_equal": false,
+      "case": "counterfactual_measured_builder_detects_broken_production",
+      "rebuild_succeeded": false,
+      "required_invariants": [
+        "rebuild_succeeded",
+        "all_view_rows_equal"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 3,
+    "rows": 4
+  }
+}
