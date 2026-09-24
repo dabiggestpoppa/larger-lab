@@ -392,11 +392,61 @@ def _rollback_disabled_counterfactual(tmp: Path) -> dict:
 # Matrix 2 — the top-level operator ledger structure (§22-§24)
 # ---------------------------------------------------------------------------
 
+# Frozen semantic projection of the exact ``## Current state`` section at
+# SENSOR-B4-I07R1I-B commit fd961604.  The source section was normalized to
+# LF and hashed to 412da2f97b5d9627101e35ad6ebd68be6bd4aa1e8b643cc4400858feb26cb824.
+# This projection preserves every Field and every value consumed by the matrix
+# while deliberately decoupling historical evidence from the LIVE governance
+# ledger, which is chronological and must advance at later checkpoints.
+_FROZEN_I07R1I_SOURCE_COMMIT = "fd961604"
+_FROZEN_I07R1I_SECTION_SHA256 = (
+    "412da2f97b5d9627101e35ad6ebd68be6bd4aa1e8b643cc4400858feb26cb824"
+)
+_FROZEN_I07R1I_CURRENT_STATE_ROWS = (
+    ("Current Bloc", "4 — IMMUTABLE T0 RAW EVIDENCE LAKE"),
+    (
+        "Current checkpoint",
+        "SENSOR-B4-I07R1I (this commit): failed-gate atomicity + validated "
+        "public reads. PASS_SENSOR_B4_I07R1I_FAILED_GATE_ATOMICITY_VALIDATED_READ_SEALED="
+        "PENDING_OPERATOR_REVIEW (proposed PASS after implementation); "
+        "PASS_SENSOR_B4_I07R1H_REFRESHED_CHAIN_VALIDATION_PARITY_SEALED=OPERATOR_HOLD; "
+        "PASS_SENSOR_B4_I07R1G_RUNTIME_PROOF_SCHEMA_REPLAY_PARITY_SEALED=OPERATOR_HOLD; "
+        "PASS_SENSOR_B4_I07R1F_PERSISTED_FLOOR_CATALOG_CONCURRENCY_LEDGER_SEALED=OPERATOR_HOLD; "
+        "PASS_SENSOR_B4_I07R1_GATE_IDENTITY_REPLAY_SEALED=OPERATOR_HOLD; "
+        "PASS_SENSOR_B4_I07_DURABLE_JOB_STATE_RESUME_SEALED=OPERATOR_HOLD; "
+        "DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE; "
+        "RECOVERY_SCANNER_IMPLEMENTED=FALSE; next_checkpoint_authorized=FALSE.",
+    ),
+    ("Bloc 2 verdict", "PASS_BLOC_02_WITH_SENSOR_GAPS"),
+    ("Bloc 1 verdict", "PASS_BLOC_01_CONTRACTS_FROZEN"),
+    ("Operator review state", "SENSOR-B4-I07R1I = PENDING_OPERATOR_REVIEW"),
+    ("human_review_required", "TRUE"),
+    ("Bloc 2 implementation_authorized", "TRUE"),
+    ("Bloc 3 implementation_authorized", "TRUE"),
+    ("Common foundation status", "COMMON_FRAMEWORK_READY=TRUE"),
+    ("Bloc 3 adapter status", "BLOCK_03_IMPLEMENTATION_COMPLETE=TRUE"),
+    ("Last successful commit SHA", "(see commit log below)"),
+    ("Branch", "agent/crypto-sensor-fabric-build"),
+    ("Base planning commit", "4bb677f9e0266f4dc48405181696019f359ae49f"),
+    (
+        "Planning head (frozen)",
+        "agent/crypto-sensor-fabric-plan @ 4bb677f9e0266f4dc48405181696019f359ae49f",
+    ),
+    ("next_provider_authorized", "FALSE"),
+    (
+        "next_checkpoint_authorized",
+        "FALSE — SENSOR-B4-I07R1I = PENDING_OPERATOR_REVIEW; "
+        "recommended_next = SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY AFTER "
+        "operator acceptance. I08+ NOT authorized and NOT started.",
+    ),
+)
+
 
 def build_ledger_structure_matrix(tmp: Path) -> dict:
-    """The top-level ``## Current state`` table only (§23)."""
+    """Frozen I07R1I Current-state structure, independent of the live ledger."""
+    del tmp
     r1i = _load_r1i()
-    rows = r1i._current_state_rows()
+    rows = [list(row) for row in _FROZEN_I07R1I_CURRENT_STATE_ROWS]
     cell_counts = [len(row) for row in rows]
     checkpoint_rows = [row for row in rows if row[0] == "Current checkpoint"]
     table = "\n".join("|".join(row) for row in rows).replace(" = ", "=")

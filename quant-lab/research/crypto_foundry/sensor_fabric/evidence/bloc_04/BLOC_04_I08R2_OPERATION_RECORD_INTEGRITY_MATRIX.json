@@ -1,0 +1,77 @@
+{
+  "cases": [
+    {
+      "case": "empty_recovery_run_id",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "missing_required_operation_id",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "unknown_schema_marker",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "wrong_record_type",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "unknown_phase",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "naive_registered_at",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "malformed_registered_at",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "non_object_state_field",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "operation_identity_mismatch",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "phase_qualified_identity_mismatch",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "effect_missing_identity",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "effect_detail_digest_mismatch",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "truncated_effect_detail_key",
+      "rejected_closed": true,
+      "result": "OK"
+    },
+    {
+      "case": "terminal_missing_final_action_id",
+      "rejected_closed": true,
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R2",
+  "doctrine": "I08R2 \u00a7\u00a713-14,23 \u2014 complete envelopes are recomputed and validated; exact retry compares every semantic field except registration time; malformed/tampered records fail closed",
+  "matrix": "BLOC_04_I08R2_OPERATION_RECORD_INTEGRITY_MATRIX"
+}

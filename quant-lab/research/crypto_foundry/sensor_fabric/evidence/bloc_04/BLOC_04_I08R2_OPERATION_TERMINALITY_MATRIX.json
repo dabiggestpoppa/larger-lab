@@ -1,0 +1,104 @@
+{
+  "cases": [
+    {
+      "case": "intent_source_present_destination_absent",
+      "left_open": true,
+      "no_action": true,
+      "result": "OK",
+      "source_intact": true
+    },
+    {
+      "case": "intent_destination_present_source_present",
+      "completed": true,
+      "one_action": true,
+      "result": "OK",
+      "source_unlinked": true
+    },
+    {
+      "case": "intent_destination_present_source_absent",
+      "completed": true,
+      "one_action": true,
+      "original_run": true,
+      "result": "OK"
+    },
+    {
+      "case": "intent_source_absent_destination_absent",
+      "left_open": true,
+      "no_action": true,
+      "result": "OK"
+    },
+    {
+      "case": "intent_destination_different_bytes",
+      "foreign_bytes_intact": true,
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "case": "effect_without_action_replays_original",
+      "completed": true,
+      "one_action": true,
+      "original_operation": true,
+      "result": "OK"
+    },
+    {
+      "action_preserved": true,
+      "case": "action_without_terminal_adopts_exact_action",
+      "completed": true,
+      "one_action": true,
+      "result": "OK"
+    },
+    {
+      "case": "terminal_without_named_action_fails_closed",
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "case": "terminal_names_action_from_other_operation",
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "case": "both_terminal_phases_fail_closed",
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "case": "effect_without_intent_fails_closed",
+      "result": "OK",
+      "typed_corruption": true
+    },
+    {
+      "actions_stable": true,
+      "case": "repeated_restart_artifacts_stable",
+      "landed_open_operations": 0,
+      "operations_stable": true,
+      "result": "OK"
+    },
+    {
+      "case": "cross_run_replay_closes_original_run",
+      "one_action": true,
+      "one_quarantine_artifact": true,
+      "original_run_preserved": true,
+      "result": "OK",
+      "run_b_operations_absent": true
+    },
+    {
+      "case": "intent_without_effect_fingerprint_stays_open",
+      "left_open": true,
+      "no_action": true,
+      "result": "OK",
+      "source_intact": true
+    },
+    {
+      "case": "historical_i08r1_false_green_is_preserved",
+      "historical_completed_operations": 0,
+      "historical_operation_completed": false,
+      "historical_result": "OK",
+      "live_matrix_replaces_false_semantics": true,
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R2",
+  "doctrine": "I08R2 \u00a7\u00a73-12,22 \u2014 restart closes the ORIGINAL operation from INTENT plus storage truth; every landed effect ends with one final RecoveryAction and one terminal phase; no effect is invented",
+  "matrix": "BLOC_04_I08R2_OPERATION_TERMINALITY_MATRIX"
+}

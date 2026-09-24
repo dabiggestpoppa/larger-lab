@@ -1,0 +1,75 @@
+{
+  "cases": [
+    {
+      "case": "successful_clear_order",
+      "lock_absent": true,
+      "order": [
+        "INTENT",
+        "EFFECT",
+        "ACTION",
+        "TERMINAL"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "missing_owner_repository_refused",
+      "lock_intact": true,
+      "result": "OK",
+      "typed_refusal": true
+    },
+    {
+      "case": "wrong_lock_fingerprint_refused",
+      "lock_intact": true,
+      "result": "OK",
+      "typed_refusal": true
+    },
+    {
+      "case": "live_owner_refused",
+      "lock_intact": true,
+      "result": "OK",
+      "typed_refusal": true
+    },
+    {
+      "case": "held_job_rlock_refused",
+      "lock_intact": true,
+      "result": "OK",
+      "typed_refusal": true
+    },
+    {
+      "case": "ownership_revalidated_after_intent",
+      "intent_durable": true,
+      "lock_intact": true,
+      "no_action": true,
+      "result": "OK",
+      "typed_refusal": true
+    },
+    {
+      "case": "crash_after_unlink_replays_original",
+      "completed": true,
+      "injected_death": true,
+      "lock_absent": true,
+      "one_action": true,
+      "original_run": true,
+      "replay_closed": false,
+      "result": "OK"
+    },
+    {
+      "case": "repeated_lock_restart_stable",
+      "one_action": true,
+      "one_operation": true,
+      "original_run_preserved": true,
+      "result": "OK"
+    },
+    {
+      "case": "present_lock_intent_not_false_completed",
+      "left_open": true,
+      "lock_intact": true,
+      "no_action": false,
+      "report_left_open": false,
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I08R2",
+  "doctrine": "I08R2 \u00a7\u00a717-18,24 \u2014 explicit lock clear is INTENT \u2192 live owner revalidation \u2192 unlink/fsync \u2192 EFFECT \u2192 final action \u2192 COMPLETED; restart recognizes absence only from the exact INTENT fingerprint",
+  "matrix": "BLOC_04_I08R2_LOCK_CLEAR_ATOMICITY_MATRIX"
+}

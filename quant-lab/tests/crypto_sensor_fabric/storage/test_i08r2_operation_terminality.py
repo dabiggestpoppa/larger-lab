@@ -8,6 +8,7 @@ its effect. Historical I08R1 matrices remain frozen and are not regenerated.
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import sys
@@ -138,6 +139,36 @@ def test_quarantine_effect_without_action_replays_original_operation(
     assert len(quarantined) == 1
     assert quarantined[0].read_bytes() == b"tampered terminality bytes"
     del planned
+
+
+def test_operation_exact_retry_compares_every_semantic_field(
+    tmp_path: Path,
+) -> None:
+    engine = Stack(tmp_path).engine("retry")
+    planned = rec.RecoveryPlanAction(
+        action_kind=rec._ACTION_RECORD_LOCK_ONLY,
+        object_type=rec.SEMANTIC_JOB_LOCK,
+        object_id="retry-lock",
+        problem=rec.PROBLEM_LOCK_PRESENT_OWNER_UNPROVEN,
+        resolution="record only",
+        before_state={"relative_path": "locks/retry-lock.lock"},
+    )
+    op_id = engine._record_intent(planned, "retry")
+    record = engine.operations.load_record(f"{op_id}:INTENT")
+    later = copy.deepcopy(record)
+    later["registered_at"] = "2030-01-01T00:00:00+00:00"
+    assert engine.operations._exact_retry(record, later)
+    for field_name in rec._OPERATION_RECORD_FIELDS:
+        if field_name == "registered_at":
+            continue
+        divergent = copy.deepcopy(record)
+        if field_name in {"recovery_operation_id", "operation_id", "phase"}:
+            # These identity-bound fields are independently covered by the
+            # canonical validator; mutating them alone would first violate
+            # the phase-qualified identity recomputation.
+            continue
+        divergent[field_name] = "DIVERGENT"
+        assert not engine.operations._exact_retry(record, divergent), field_name
 
 
 def test_action_without_terminal_is_adopted_not_duplicated(
