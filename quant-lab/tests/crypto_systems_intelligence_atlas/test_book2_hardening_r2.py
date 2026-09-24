@@ -104,11 +104,8 @@ def test_non_equivalent_states_require_graph_promotion_adapter(state: ClaimState
     ).model_copy(update={"claim_state": state})
     with pytest.raises(ValueError, match="graph promotion adapter"):
         Book2ClaimBinding.from_claim(claim)
-    if state is ClaimState.CORROBORATED:
-        assert Book2ClaimBinding.for_graph(claim).book2_claim_state is state
-    else:
-        with pytest.raises(ValueError, match="cannot create a current graph fact"):
-            Book2ClaimBinding.for_graph(claim)
+    with pytest.raises(ValueError, match="canonical|current graph fact"):
+        Book2ClaimBinding.for_graph(claim, service.claim_store)
 
 
 def test_graph_promotion_gate_rejects_non_promotable_states() -> None:
@@ -129,9 +126,9 @@ def test_graph_promotion_gate_rejects_non_promotable_states() -> None:
     )
     for state in (ClaimState.DECLARED, ClaimState.CONTESTED, ClaimState.UNRESOLVED, ClaimState.STALE, ClaimState.REJECTED, ClaimState.SUPERSEDED):
         candidate = claim.model_copy(update={"claim_state": state})
-        assert not can_promote_to_graph(candidate)
-        with pytest.raises(ValueError, match="cannot create a current graph fact"):
-            promote_claim_to_graph(candidate)
+        assert not can_promote_to_graph(candidate, service.claim_store)
+        with pytest.raises(ValueError, match="canonical|current graph fact"):
+            promote_claim_to_graph(candidate, service.claim_store)
 
 
 def test_graph_fact_promoter_rejects_non_promotable_claim_before_graph_insertion() -> None:
@@ -147,8 +144,8 @@ def test_graph_fact_promoter_rejects_non_promotable_claim_before_graph_insertion
         valid_from=NOW,
     )
     rejected = claim.model_copy(update={"claim_state": ClaimState.REJECTED})
-    with pytest.raises(ValueError, match="cannot create a current graph fact"):
-        GraphFactPromoter(GraphValidator(registry)).add(claim=rejected, edge=edge)
+    with pytest.raises(ValueError, match="canonical|current graph fact"):
+        GraphFactPromoter(GraphValidator(registry), service).add(claim=rejected, edge=edge)
 
 
 def test_inferred_graph_fact_preserves_book2_origin_and_lineage() -> None:
@@ -160,9 +157,9 @@ def test_inferred_graph_fact_preserves_book2_origin_and_lineage() -> None:
     for claim_id, ref, subject, obj in (("r2-p1-claim", p1_ref, protocol.object_id, oracle.object_id), ("r2-p2-claim", p2_ref, oracle.object_id, chain.object_id)):
         parents.append(service.add_observed(Claim(claim_id=claim_id, evidence_refs=(ref,), source_refs=(source.source_id,), object_refs=(subject, obj), proposition=Proposition(subject_refs=(subject,), predicate="relates", object_ref=obj), claim_family=__import__("crypto_systems_intelligence_atlas.types", fromlist=["ClaimFamily"]).ClaimFamily.CHAIN_ARCHITECTURE, claim_state=ClaimState.OBSERVED, valid_time_hypothesis=NOW, observed_time=NOW, methodology=Methodology(methodology_ref="direct", version="v1", description="direct"))))
     inferred = InferenceEngine(service).create(parent_claim_refs=tuple(p.claim_id for p in parents), methodology=Methodology(methodology_ref="r2-method", version="v1", description="qualified inference"), proposition=Proposition(subject_refs=(protocol.object_id,), predicate="depends_on", object_ref=oracle.object_id), valid_time_hypothesis=NOW, valid_time_derivation="parent windows", observed_time=NOW, object_refs=(protocol.object_id, oracle.object_id), relationship_refs=(EdgeType.DEPENDS_ON.value,))
-    binding = promote_claim_to_graph(inferred)
+    binding = promote_claim_to_graph(inferred, service.claim_store)
     edge = TypedEdge(edge_id="r2-inferred-edge", edge_type=EdgeType.DEPENDS_ON, subject_id=protocol.object_id, object_id=oracle.object_id, claim_binding=binding.book1, observed_at=NOW, valid_from=NOW)
-    GraphFactPromoter(GraphValidator(registry)).add(claim=inferred, edge=edge)
+    GraphFactPromoter(GraphValidator(registry), service).add(claim=inferred, edge=edge)
     assert binding.book2_claim_state is ClaimState.INFERRED
     assert edge.claim_binding.claim_id == inferred.claim_id
     assert set(inferred.parent_claim_refs) == {p.claim_id for p in parents}
@@ -176,4 +173,4 @@ def test_inferred_without_lineage_cannot_promote() -> None:
     from crypto_systems_intelligence_atlas.claims import Methodology, Proposition
     claim = service.add_observed(Claim(claim_id="bad-inferred", evidence_refs=(evidence_id,), source_refs=(source.source_id,), proposition=Proposition(subject_refs=("x",), predicate="p", object_ref="y"), claim_family=__import__("crypto_systems_intelligence_atlas.types", fromlist=["ClaimFamily"]).ClaimFamily.CHAIN_ARCHITECTURE, claim_state=ClaimState.OBSERVED, valid_time_hypothesis=NOW, observed_time=NOW, methodology=Methodology(methodology_ref="direct", version="v1", description="direct"))).model_copy(update={"claim_state": ClaimState.INFERRED})
     with pytest.raises(ValueError):
-        promote_claim_to_graph(claim)
+        promote_claim_to_graph(claim, service.claim_store)

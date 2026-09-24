@@ -198,7 +198,7 @@ def test_inferred_claim_binding_preserves_methodology_parent_and_raw_lineage() -
         object_refs=(protocol.object_id, oracle.object_id),
         relationship_refs=(EdgeType.DEPENDS_ON.value,),
     )
-    binding = promote_claim_to_graph(inferred)
+    binding = promote_claim_to_graph(inferred, service.claim_store)
     assert binding.book2_claim_state is ClaimState.INFERRED
     assert inferred.parent_claim_refs == (p1.claim_id, p2.claim_id)
     assert set(service.lineage_evidence(inferred)) == {p1_ref, p2_ref}
