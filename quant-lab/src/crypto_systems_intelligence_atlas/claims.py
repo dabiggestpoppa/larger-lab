@@ -138,6 +138,8 @@ class GraphFactPromoter:
                 and event.new_state is ClaimState.CORROBORATED
                 and event.resulting_claim == canonical
                 and event.triggering_evidence_refs
+                and event.corroborating_claim_id is not None
+                and self._claim_service.claim_store.history(event.corroborating_claim_id)
                 for event in self._claim_service.claim_store.transitions
             ):
                 raise ValueError("CORROBORATED requires a recorded transition")
@@ -180,6 +182,16 @@ class Proposition(BaseModel):
     def text(self) -> str:
         suffix = f" [{self.qualifier}]" if self.qualifier else ""
         return f"{','.join(self.subject_refs)} {self.predicate} {self.object_ref}{suffix}"
+
+
+def same_proposition(left: Proposition, right: Proposition) -> bool:
+    """Return exact structured proposition equivalence without fuzzy matching."""
+    return (
+        left.subject_refs == right.subject_refs
+        and left.predicate == right.predicate
+        and left.object_ref == right.object_ref
+        and left.qualifier == right.qualifier
+    )
 
 
 class SupersessionLineage(BaseModel):
@@ -332,6 +344,7 @@ class TransitionEvent(BaseModel):
     new_state: ClaimState
     triggering_evidence_refs: tuple[str, ...] = Field(min_length=1)
     resulting_claim: Claim
+    corroborating_claim_id: str | None = None
     transitioned_at: datetime
     operator_involvement: str | None = None
 
@@ -527,6 +540,7 @@ __all__ = [
     "Methodology",
     "MethodologyParameter",
     "Proposition",
+    "same_proposition",
     "SupersessionLineage",
     "TransitionEvent",
 ]

@@ -126,7 +126,7 @@ def make_claim(
             evidence_refs=(captured.evidence_id,),
             source_refs=(source.source_id,),
             proposition=Proposition(
-                subject_refs=(f"object-{claim_id}",), predicate="has_state", object_ref="true"
+                subject_refs=("corroborated-proposition",), predicate="has_state", object_ref="true"
             ),
             claim_family=family,
             claim_state=state,

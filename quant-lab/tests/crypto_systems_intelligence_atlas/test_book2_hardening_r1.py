@@ -80,7 +80,7 @@ def make_claim(service, evidence, source, claim_id, *, state=ClaimState.OBSERVED
         claim_id=claim_id,
         evidence_refs=(captured.evidence_id,),
         source_refs=(source.source_id,),
-        proposition=Proposition(subject_refs=(claim_id,), predicate="state", object_ref="true"),
+        proposition=Proposition(subject_refs=("corroborated-proposition",), predicate="state", object_ref="true"),
         claim_family=ClaimFamily.CHAIN_ARCHITECTURE,
         claim_state=state,
         valid_time_hypothesis=NOW,

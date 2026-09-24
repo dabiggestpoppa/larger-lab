@@ -6,8 +6,16 @@ import hashlib
 from datetime import datetime
 from typing import Final
 
-from .claims import Claim, ClaimService, ClaimState, ClaimStore, SupersessionLineage, TransitionEvent
-from .temporal import normalize_utc
+from .claims import (
+    Claim,
+    ClaimService,
+    ClaimState,
+    ClaimStore,
+    SupersessionLineage,
+    TransitionEvent,
+    same_proposition,
+)
+from .temporal import UnknownBound, normalize_utc
 
 LEGAL_TRANSITIONS: Final[dict[ClaimState, frozenset[ClaimState]]] = {
     ClaimState.DECLARED: frozenset({ClaimState.OBSERVED, ClaimState.REJECTED, ClaimState.UNRESOLVED}),
@@ -71,6 +79,20 @@ class ClaimStateEngine:
             corroborating = self.store.require(corroborating_claim_id)
             if corroborating.claim_id == claim_id:
                 raise ValueError("a claim cannot corroborate itself")
+            if not same_proposition(current.proposition, corroborating.proposition):
+                raise ValueError("corroboration requires proposition equivalence")
+            if current.claim_family is not corroborating.claim_family:
+                raise ValueError("corroboration requires matching claim family")
+            if corroborating.claim_state not in (ClaimState.OBSERVED, ClaimState.CORROBORATED):
+                raise ValueError("corroborating claim state must be OBSERVED or CORROBORATED")
+            if not set(triggering_evidence_refs).issubset(corroborating.evidence_refs):
+                raise ValueError("triggering evidence must belong to the corroborating claim")
+            if isinstance(current.valid_time_hypothesis, UnknownBound) or isinstance(
+                corroborating.valid_time_hypothesis, UnknownBound
+            ):
+                raise ValueError("valid time compatibility is unknown")
+            if current.valid_time_hypothesis != corroborating.valid_time_hypothesis:
+                raise ValueError("corroboration requires compatible valid time")
             current_evidence = [self.service.evidence_store.require(ref) for ref in current.evidence_refs]
             corroborating_evidence = [self.service.evidence_store.require(ref) for ref in corroborating.evidence_refs]
             current_sources = {item.source_id for item in current_evidence}
@@ -124,6 +146,7 @@ class ClaimStateEngine:
                 *(sorted(triggering_evidence_refs)),
                 normalize_utc(transitioned_at).isoformat(),
                 replacement_claim_id or "",
+                corroborating_claim_id or "",
             )
         )
         event = TransitionEvent(
@@ -133,6 +156,7 @@ class ClaimStateEngine:
             new_state=new_state,
             triggering_evidence_refs=triggering_evidence_refs,
             resulting_claim=updated,
+            corroborating_claim_id=corroborating_claim_id,
             transitioned_at=transitioned_at,
             operator_involvement=operator_involvement,
         )
