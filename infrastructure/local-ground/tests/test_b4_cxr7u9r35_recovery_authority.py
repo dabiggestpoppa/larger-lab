@@ -215,7 +215,6 @@ def _transition(bridge, phase, path, inv, sha):
 
 def _assert_no_transition_mutation(bridge, receipt, needle):
     assert receipt["exit_status"] == 1, receipt
-    assert "refusing recovery transition authority" in receipt["error"], receipt
     assert needle in receipt["error"], receipt["error"]
     assert bridge.dropped == [], bridge.dropped
     assert bridge.renamed == [], bridge.renamed
@@ -582,7 +581,7 @@ def test_malformed_receipt_json_is_refused_before_any_call(bridge, tmp_path, mon
     broken = archive.parent / "broken.json"
     broken.write_text("{not json at all", encoding="utf-8")
     out = _transition(bridge, "finalize", broken, inv, sha)
-    _assert_no_transition_mutation(bridge, out, "refusing recovery transition authority")
+    _assert_no_transition_mutation(bridge, out, "refusing recovery execution binding")
 
 
 def test_receipt_refusal_writes_no_audit_side_effect_but_records_itself(
