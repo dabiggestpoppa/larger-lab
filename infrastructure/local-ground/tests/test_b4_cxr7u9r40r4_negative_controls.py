@@ -113,14 +113,20 @@ def test_control_state_check_before_nonatomic_claim_loses_the_race(
         old = 'fd = os.open(claim_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)'
         new = ('if os.path.exists(claim_path):\n'
                '            raise RuntimeError("claimed")\n'
+               '        _neg_control_barrier.wait()\n'
                '        fd = os.open(claim_path, '
                'os.O_CREAT | os.O_WRONLY, 0o600)')
         assert old in source
         return source.replace(old, new)
 
     weakened = _load_weakened(tmp_path, _weaken_source(weaken))
+    # The claim primitive is the subject of this control. Neutralize the
+    # subsequent record rewrite so the two claims cannot race on os.replace
+    # after both have already demonstrated the lost atomic boundary.
+    weakened._record_transition = lambda *args, **kwargs: None
     outcomes = []
     start = threading.Barrier(2)
+    weakened._neg_control_barrier = start
 
     def attempt():
         start.wait()
@@ -135,12 +141,10 @@ def test_control_state_check_before_nonatomic_claim_loses_the_race(
         t.start()
     for t in threads:
         t.join(60)
-    # TOCTOU can double-win (both check before either creates): at minimum the
-    # weakened code no longer guarantees exactly-one. If it happened to be
-    # atomic on this run, skip honestly rather than claim a false proof.
-    assert sum(outcomes) in (1, 2), outcomes
-    if sum(outcomes) == 1:
-        pytest.skip("filesystem happened to serialize the non-atomic check")
+    # The weakened code has no atomic primitive: both threads are forced past
+    # the existence check before either creates, so the double-win is a
+    # deterministic behavioral result rather than a timing observation.
+    assert sum(outcomes) == 2, outcomes
 
 
 # --------------------------------------------------------------------- #
