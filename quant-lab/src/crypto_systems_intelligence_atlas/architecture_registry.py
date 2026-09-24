@@ -325,8 +325,8 @@ class ArchitectureRegistryBook:
 
     def history(self, namespace: str, semantic_key: str) -> tuple[RegistryValue, ...]:
         values = [
-            value
-            for value in self._values.values()
+            self.require(registry_id)
+            for registry_id, value in self._values.items()
             if value.namespace == namespace
             and value.semantic_key.casefold() == semantic_key.casefold()
         ]

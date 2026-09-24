@@ -14,6 +14,11 @@ from crypto_systems_intelligence_atlas.architecture import (
     ComponentRole,
     ModularArchitecture,
 )
+from crypto_systems_intelligence_atlas.architecture_registry import (
+    ArchitectureRegistryBook,
+    RegistryAdmission,
+    mint_registry_id,
+)
 from crypto_systems_intelligence_atlas.architecture_relations import (
     ArchitectureRelation,
     ArchitectureRelationBook,
@@ -118,7 +123,25 @@ def kernel():
     claim_store = ClaimStore()
     evidence_ref = capture_evidence(evidence, "claim-current")
     claim_store.add_initial(make_claim("claim-current", evidence_ref=evidence_ref))
-    return evidence, claim_store, Book2ArchitectureProvenance(claim_store, evidence)
+    registry = ArchitectureRegistryBook()
+    for namespace, name in (("EXECUTION_MODEL", "utxo"), ("STATE_MODEL", "utxo"), ("CONSENSUS_MODEL", "pow")):
+        registry.add(
+            RegistryAdmission(
+                value={
+                    "registry_id": mint_registry_id(namespace, namespace, name),
+                    "namespace": namespace,
+                    "family": namespace,
+                    "name": name,
+                    "definition": f"fixture {name}",
+                    "semantic_key": name,
+                    "valid_from": NOW,
+                    "source_claim_refs": ("claim-current",),
+                },
+                decision_reason="Book 3 fixture",
+            ),
+            claim_store,
+        )
+    return evidence, claim_store, Book2ArchitectureProvenance(claim_store, evidence, registry)
 
 
 def service_with_evidence() -> ClaimService:
@@ -136,9 +159,9 @@ def dossier(**updates) -> ArchitectureDossier:
         "canonical_name": "Bitcoin",
         "architecture_family": "UTXO_CHAIN",
         "network_namespace": "bitcoin-mainnet-fixture",
-        "execution_model_ref": "registry:execution:utxo",
-        "state_model_ref": "registry:state:utxo",
-        "consensus_model_ref": "registry:consensus:pow",
+        "execution_model_ref": mint_registry_id("EXECUTION_MODEL", "EXECUTION_MODEL", "utxo"),
+        "state_model_ref": mint_registry_id("STATE_MODEL", "STATE_MODEL", "utxo"),
+        "consensus_model_ref": mint_registry_id("CONSENSUS_MODEL", "CONSENSUS_MODEL", "pow"),
         "source_claim_refs": ("claim-current",),
         "field_claim_refs": {
             "execution_model_ref": ("claim-current",),

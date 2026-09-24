@@ -8,9 +8,10 @@ from typing import Final
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from .architecture_registry import ArchitectureRegistryBook, RegistryStatus
 from .claims import Claim, ClaimStore, can_promote_to_graph
 from .evidence import EvidenceStore
-from .temporal import Timestamp, UnknownBound, normalize_utc
+from .temporal import Timestamp, UnknownBound, holds_at, normalize_utc
 from .types import ClaimFamily
 
 ARCHITECTURE_REFERENCE_FIELDS: Final = (
@@ -31,6 +32,22 @@ ARCHITECTURE_REFERENCE_FIELDS: Final = (
 )
 """All architecture value fields; ``None`` means family-native absence."""
 
+ARCHITECTURE_FIELD_NAMESPACES: Final = {
+    "execution_model_ref": "EXECUTION_MODEL",
+    "state_model_ref": "STATE_MODEL",
+    "consensus_model_ref": "CONSENSUS_MODEL",
+    "finality_model_ref": "FINALITY_MODEL",
+    "data_availability_model_ref": "DA_MODEL",
+    "settlement_model_ref": "SETTLEMENT_MODEL",
+    "governance_model_ref": "GOVERNANCE_MODEL",
+    "fee_model_ref": "FEE_MODEL",
+    "upgrade_model_ref": "UPGRADE_MODEL",
+    "interoperability_model_ref": "INTEROP_MODEL",
+    "deployment_model_ref": "DEPLOYMENT_MODEL",
+    "security_model_ref": "SECURITY_MODEL",
+    "sequencing_model_ref": "SEQUENCING_MODEL",
+}
+
 
 class ArchitectureDossier(BaseModel):
     """Envelope for one native architecture truth window."""
@@ -44,6 +61,10 @@ class ArchitectureDossier(BaseModel):
     network_identity_anchor_refs: tuple[str, ...] = ()
     genesis_or_origin_anchor_refs: tuple[str, ...] = ()
     native_asset_refs: tuple[str, ...] = ()
+
+    network_identity_claim_refs: tuple[str, ...] = ()
+    genesis_or_origin_claim_refs: tuple[str, ...] = ()
+    native_asset_claim_refs: tuple[str, ...] = ()
 
     execution_model_ref: str | None = None
     state_model_ref: str | None = None
@@ -75,6 +96,18 @@ class ArchitectureDossier(BaseModel):
             for name in ARCHITECTURE_REFERENCE_FIELDS
             if getattr(self, name) is not None
         }
+        explicit_groups = (
+            (self.network_identity_anchor_refs, self.network_identity_claim_refs, "network identity"),
+            (self.genesis_or_origin_anchor_refs, self.genesis_or_origin_claim_refs, "genesis/origin"),
+            (self.native_asset_refs, self.native_asset_claim_refs, "native asset"),
+        )
+        for anchor_refs, claim_refs, label in explicit_groups:
+            if anchor_refs and not claim_refs:
+                raise ValueError(f"{label} anchors require explicit Book 2 claim refs")
+            if claim_refs and not anchor_refs:
+                raise ValueError(f"{label} claim refs require corresponding anchors")
+            if not set(claim_refs).issubset(self.source_claim_refs):
+                raise ValueError(f"{label} claim refs must belong to source_claim_refs")
         for field_name, refs in self.field_claim_refs.items():
             if field_name not in known_fields:
                 raise ValueError(f"field_claim_refs contains absent field {field_name}")
@@ -98,9 +131,15 @@ class ArchitectureProvenanceError(ValueError):
 class Book2ArchitectureProvenance:
     """Validate pointers against the accepted Book 2 claim/evidence engines."""
 
-    def __init__(self, claim_store: ClaimStore, evidence_store: EvidenceStore) -> None:
+    def __init__(
+        self,
+        claim_store: ClaimStore,
+        evidence_store: EvidenceStore,
+        registry: ArchitectureRegistryBook | None = None,
+    ) -> None:
         self.claim_store = claim_store
         self.evidence_store = evidence_store
+        self.registry = registry
 
     def resolve_claim(
         self,
@@ -139,29 +178,106 @@ class Book2ArchitectureProvenance:
         dossier: ArchitectureDossier,
         *,
         supplied_claims: dict[str, Claim] | None = None,
+        historical: bool = False,
     ) -> ArchitectureDossier:
         supplied_claims = supplied_claims or {}
-        allowed_identity_families: tuple[ClaimFamily, ...] = (
+        identity_families = (
             ClaimFamily.IDENTITY_ATTRIBUTES,
             ClaimFamily.HISTORICAL_GENESIS_SPEC,
             ClaimFamily.CHAIN_ARCHITECTURE,
         )
-        for claim_ref in dossier.source_claim_refs:
-            field_names = tuple(
-                name for name, refs in dossier.field_claim_refs.items() if claim_ref in refs
-            )
-            if dossier.network_namespace in field_names:
-                allowed = allowed_identity_families
-            elif field_names:
-                allowed = (ClaimFamily.CHAIN_ARCHITECTURE,)
-            else:
-                allowed = allowed_identity_families + (ClaimFamily.CHAIN_ARCHITECTURE,)
-            self.resolve_claim(
-                claim_ref,
-                expected_claim=supplied_claims.get(claim_ref),
-                allowed_families=allowed,
+        genesis_families = (
+            ClaimFamily.HISTORICAL_GENESIS_SPEC,
+            ClaimFamily.IDENTITY_ATTRIBUTES,
+            ClaimFamily.CHAIN_ARCHITECTURE,
+        )
+        native_asset_families = (
+            ClaimFamily.TOKEN_ROLE_MECHANICS,
+            ClaimFamily.IDENTITY_ATTRIBUTES,
+            ClaimFamily.CHAIN_ARCHITECTURE,
+        )
+        explicit_groups = (
+            (dossier.network_identity_claim_refs, identity_families),
+            (dossier.genesis_or_origin_claim_refs, genesis_families),
+            (dossier.native_asset_claim_refs, native_asset_families),
+        )
+        for claim_refs, allowed_families in explicit_groups:
+            for claim_ref in claim_refs:
+                self.resolve_claim(
+                    claim_ref,
+                    expected_claim=supplied_claims.get(claim_ref),
+                    allowed_families=allowed_families,
+                )
+        for field_name, claim_refs in dossier.field_claim_refs.items():
+            for claim_ref in claim_refs:
+                self.resolve_claim(
+                    claim_ref,
+                    expected_claim=supplied_claims.get(claim_ref),
+                    allowed_families=(ClaimFamily.CHAIN_ARCHITECTURE,),
+                )
+            self._validate_registry_reference(dossier, field_name, historical=historical)
+        declared = set(
+            ref
+            for refs in explicit_groups
+            for ref in refs[0]
+        ) | {ref for refs in dossier.field_claim_refs.values() for ref in refs}
+        if declared != set(dossier.source_claim_refs):
+            raise ArchitectureProvenanceError(
+                "source_claim_refs must exactly match explicit anchor and field claim bindings"
             )
         return dossier
+
+    def _validate_registry_reference(
+        self,
+        dossier: ArchitectureDossier,
+        field_name: str,
+        *,
+        historical: bool,
+    ) -> None:
+        if self.registry is None:
+            raise ArchitectureProvenanceError("dossier validation requires an architecture registry")
+        registry_ref = getattr(dossier, field_name)
+        if registry_ref is None:
+            return
+        try:
+            registry_value = self.registry.require(registry_ref)
+        except KeyError as exc:
+            raise ArchitectureProvenanceError(f"unknown registry value {registry_ref}") from exc
+        expected_namespaces = (
+            ("VALIDATOR_MODEL", "PARTICIPANT_MODEL")
+            if field_name == "validator_or_participant_model_ref"
+            else (ARCHITECTURE_FIELD_NAMESPACES[field_name],)
+        )
+        if registry_value.namespace not in expected_namespaces:
+            raise ArchitectureProvenanceError(
+                f"registry namespace {registry_value.namespace} is invalid for {field_name}"
+            )
+        for claim_ref in registry_value.source_claim_refs:
+            self.resolve_claim(
+                claim_ref,
+                allowed_families=(ClaimFamily.CHAIN_ARCHITECTURE,),
+            )
+        if not historical and registry_value.status not in (
+            RegistryStatus.ACTIVE,
+            RegistryStatus.UNKNOWN,
+        ):
+            raise ArchitectureProvenanceError(
+                f"registry value {registry_ref} is superseded, not current truth"
+            )
+        if historical and registry_value.status is RegistryStatus.SUPERSEDED:
+            if isinstance(dossier.valid_time, UnknownBound):
+                raise ArchitectureProvenanceError(
+                    "historical superseded registry value requires a known dossier valid_time"
+                )
+            holds = holds_at(
+                registry_value.valid_from,
+                registry_value.valid_to,
+                dossier.valid_time,
+            )
+            if holds is not True:
+                raise ArchitectureProvenanceError(
+                    f"registry value {registry_ref} does not hold at dossier valid_time"
+                )
 
 
 class ComponentRole(str, Enum):
@@ -209,6 +325,7 @@ class ModularArchitecture(BaseModel):
 
 
 __all__ = [
+    "ARCHITECTURE_FIELD_NAMESPACES",
     "ARCHITECTURE_REFERENCE_FIELDS",
     "ArchitectureComponent",
     "ArchitectureDossier",
