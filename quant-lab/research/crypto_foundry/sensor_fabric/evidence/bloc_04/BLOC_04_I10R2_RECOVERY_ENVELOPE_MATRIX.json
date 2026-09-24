@@ -1,0 +1,173 @@
+{
+  "checkpoint": "SENSOR-B4-I10R2",
+  "evidence_truth": "Every non-counterfactual evidence predicate is mechanically observed from executed production behavior; deliberate counterfactual predicates are explicitly synthetic and must evaluate FAIL.",
+  "matrix": "I10R2_RECOVERY_ENVELOPE",
+  "rows": [
+    {
+      "case": "valid_recovery_action_accepted",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "valid_recovery_action_accepted"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "wrong_record_type_refused",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "wrong_record_type_refused"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "missing_record_type_refused",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "missing_record_type_refused"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "storage_mapping_contradiction_refused",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "storage_mapping_contradiction_refused"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "invalid_action_kind_refused",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "invalid_action_kind_refused"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "invalid_operation_id_refused",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "invalid_operation_id_refused"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "malformed_before_state_refused",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "malformed_before_state_refused"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "malformed_after_state_refused",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "malformed_after_state_refused"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "malformed_registered_at_refused",
+      "internal_object_type_with_null_mapping_accepted": true,
+      "invalid_action_kind_refused": true,
+      "invalid_operation_id_refused": true,
+      "malformed_after_state_refused": true,
+      "malformed_before_state_refused": true,
+      "malformed_registered_at_refused": true,
+      "missing_record_type_refused": true,
+      "required_invariants": [
+        "malformed_registered_at_refused"
+      ],
+      "result": "OK",
+      "storage_mapping_contradiction_refused": true,
+      "valid_recovery_action_accepted": true,
+      "wrong_record_type_refused": true
+    },
+    {
+      "case": "counterfactual_accept_wrong_recovery_record_type",
+      "required_invariants": [
+        "wrong_record_type_refused"
+      ],
+      "result": "FAIL",
+      "wrong_record_type_refused": false
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 9,
+    "rows": 10
+  }
+}

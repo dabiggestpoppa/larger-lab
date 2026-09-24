@@ -1,0 +1,138 @@
+{
+  "checkpoint": "SENSOR-B4-I10R2",
+  "evidence_truth": "Every non-counterfactual evidence predicate is mechanically observed from executed production behavior; deliberate counterfactual predicates are explicitly synthetic and must evaluate FAIL.",
+  "matrix": "I10R2_MEASUREMENT_PARITY",
+  "measured_view_row_counts": {
+    "v_t0_acquisitions": 1,
+    "v_t0_blobs": 1,
+    "v_t0_gaps": 1,
+    "v_t0_partitions": 1,
+    "v_t0_projections": 1,
+    "v_t0_quarantine": 1,
+    "v_t0_revisions": 1,
+    "v_t0_storage_usage": 4
+  },
+  "receipt_view_names": [
+    "v_t0_blobs",
+    "v_t0_acquisitions",
+    "v_t0_projections",
+    "v_t0_partitions",
+    "v_t0_gaps",
+    "v_t0_revisions",
+    "v_t0_quarantine",
+    "v_t0_storage_usage"
+  ],
+  "rows": [
+    {
+      "actual_counts_equal_receipt_counts": true,
+      "actual_schemas_equal_view_schemas": true,
+      "case": "actual_counts_equal_receipt_counts",
+      "default_rebuild_zero_t0a_verify_decode_calls": true,
+      "historical_i10_unchanged": true,
+      "historical_i10r1_unchanged": true,
+      "implementation_ledger_current_state_parity": true,
+      "metadata_stamp_exact": true,
+      "required_invariants": [
+        "actual_counts_equal_receipt_counts"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_counts_equal_receipt_counts": true,
+      "actual_schemas_equal_view_schemas": true,
+      "case": "actual_schemas_equal_view_schemas",
+      "default_rebuild_zero_t0a_verify_decode_calls": true,
+      "historical_i10_unchanged": true,
+      "historical_i10r1_unchanged": true,
+      "implementation_ledger_current_state_parity": true,
+      "metadata_stamp_exact": true,
+      "required_invariants": [
+        "actual_schemas_equal_view_schemas"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_counts_equal_receipt_counts": true,
+      "actual_schemas_equal_view_schemas": true,
+      "case": "metadata_stamp_exact",
+      "default_rebuild_zero_t0a_verify_decode_calls": true,
+      "historical_i10_unchanged": true,
+      "historical_i10r1_unchanged": true,
+      "implementation_ledger_current_state_parity": true,
+      "metadata_stamp_exact": true,
+      "required_invariants": [
+        "metadata_stamp_exact"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_counts_equal_receipt_counts": true,
+      "actual_schemas_equal_view_schemas": true,
+      "case": "default_rebuild_zero_t0a_verify_decode_calls",
+      "default_rebuild_zero_t0a_verify_decode_calls": true,
+      "historical_i10_unchanged": true,
+      "historical_i10r1_unchanged": true,
+      "implementation_ledger_current_state_parity": true,
+      "metadata_stamp_exact": true,
+      "required_invariants": [
+        "default_rebuild_zero_t0a_verify_decode_calls"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_counts_equal_receipt_counts": true,
+      "actual_schemas_equal_view_schemas": true,
+      "case": "historical_i10_unchanged",
+      "default_rebuild_zero_t0a_verify_decode_calls": true,
+      "historical_i10_unchanged": true,
+      "historical_i10r1_unchanged": true,
+      "implementation_ledger_current_state_parity": true,
+      "metadata_stamp_exact": true,
+      "required_invariants": [
+        "historical_i10_unchanged"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_counts_equal_receipt_counts": true,
+      "actual_schemas_equal_view_schemas": true,
+      "case": "historical_i10r1_unchanged",
+      "default_rebuild_zero_t0a_verify_decode_calls": true,
+      "historical_i10_unchanged": true,
+      "historical_i10r1_unchanged": true,
+      "implementation_ledger_current_state_parity": true,
+      "metadata_stamp_exact": true,
+      "required_invariants": [
+        "historical_i10r1_unchanged"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_counts_equal_receipt_counts": true,
+      "actual_schemas_equal_view_schemas": true,
+      "case": "implementation_ledger_current_state_parity",
+      "default_rebuild_zero_t0a_verify_decode_calls": true,
+      "historical_i10_unchanged": true,
+      "historical_i10r1_unchanged": true,
+      "implementation_ledger_current_state_parity": true,
+      "metadata_stamp_exact": true,
+      "required_invariants": [
+        "implementation_ledger_current_state_parity"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_counts_equal_receipt_counts": false,
+      "case": "counterfactual_claim_count_parity_without_measurement",
+      "required_invariants": [
+        "actual_counts_equal_receipt_counts"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 7,
+    "rows": 8
+  }
+}

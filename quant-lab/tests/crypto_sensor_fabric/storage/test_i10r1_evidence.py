@@ -1,5 +1,7 @@
 """SENSOR-B4-I10R1D — measured R1 evidence builders and evidence-truth matrix.
 
+# ruff: noqa: E402
+
 Doctrine (I08R2R1 / I09R1 / I10R1 §14-§15): every reported boolean is an
 OBSERVED fact from executing production behavior in deterministic temp
 roots.  Nothing is ``True`` because a separate pytest supposedly covered
@@ -11,6 +13,8 @@ artifacts are new, append-only files byte-compared by the normal pytest.
 """
 
 from __future__ import annotations
+
+# ruff: noqa: E402
 
 import hashlib
 import json
@@ -107,6 +111,10 @@ def _schema_row(root: Path, output: Path) -> tuple[dict[str, Any], dict[str, str
         metadata = con.execute(
             "SELECT schema_version, data_root_role FROM catalog_metadata"
         ).fetchall()
+        actual_counts = {
+            view: con.execute(f"SELECT count(*) FROM {view}").fetchone()[0]
+            for view in VIEW_NAMES
+        }
     finally:
         con.close()
     facts = {
@@ -114,7 +122,8 @@ def _schema_row(root: Path, output: Path) -> tuple[dict[str, Any], dict[str, str
         "schema_equal": schemas_equal,
         "metadata_row_equal": metadata == [("1.0", "rebuildable_discovery_non_authoritative")],
         "row_count_equal": all(
-            receipt.view_row_counts[view] >= 0 for view in VIEW_NAMES
+            actual_counts[view] == receipt.view_row_counts[view]
+            for view in VIEW_NAMES
         ),
     }
     sha = {view: hashlib.sha256(str(sorted(str(row) for row in _all_rows(output, view))).encode()).hexdigest() for view in VIEW_NAMES}

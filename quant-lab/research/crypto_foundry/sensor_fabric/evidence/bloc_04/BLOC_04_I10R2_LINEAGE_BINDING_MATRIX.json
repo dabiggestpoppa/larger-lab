@@ -1,0 +1,164 @@
+{
+  "checkpoint": "SENSOR-B4-I10R2",
+  "evidence_truth": "Every non-counterfactual evidence predicate is mechanically observed from executed production behavior; deliberate counterfactual predicates are explicitly synthetic and must evaluate FAIL.",
+  "matrix": "I10R2_LINEAGE_BINDING",
+  "rows": [
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "valid_lineage_chain_accepted",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "valid_lineage_chain_accepted"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "entry_manifest_id_mismatch_refused",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "entry_manifest_id_mismatch_refused"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "context_manifest_id_mismatch_refused",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "context_manifest_id_mismatch_refused"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "artifact_source_list_mismatch_refused",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "artifact_source_list_mismatch_refused"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "missing_source_acquisition_refused",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "missing_source_acquisition_refused"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "acquisition_blob_mismatch_refused",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "acquisition_blob_mismatch_refused"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "noncontiguous_source_order_refused",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "noncontiguous_source_order_refused"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "invalid_row_bounds_refused",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "invalid_row_bounds_refused"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "acquisition_blob_mismatch_refused": true,
+      "artifact_source_list_mismatch_refused": true,
+      "case": "wrong_lineage_record_type_refused",
+      "context_manifest_id_mismatch_refused": true,
+      "entry_manifest_id_mismatch_refused": true,
+      "invalid_row_bounds_refused": true,
+      "missing_source_acquisition_refused": true,
+      "noncontiguous_source_order_refused": true,
+      "required_invariants": [
+        "wrong_lineage_record_type_refused"
+      ],
+      "result": "OK",
+      "valid_lineage_chain_accepted": true,
+      "wrong_lineage_record_type_refused": true
+    },
+    {
+      "case": "counterfactual_accept_entry_manifest_mismatch",
+      "entry_manifest_id_mismatch_refused": false,
+      "required_invariants": [
+        "entry_manifest_id_mismatch_refused"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 9,
+    "rows": 10
+  }
+}
