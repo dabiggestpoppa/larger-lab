@@ -14,6 +14,7 @@ from crypto_systems_intelligence_atlas.architecture_history import (
 )
 from crypto_systems_intelligence_atlas.claims import Claim, ClaimState, ClaimStore, Methodology, Proposition
 from crypto_systems_intelligence_atlas.evidence import EvidenceStore, RawEvidence
+from crypto_systems_intelligence_atlas.types import ClaimFamily
 from crypto_systems_intelligence_atlas.network_identity import (
     NetworkIdentityEngine,
     NetworkIdentityEvidence,
@@ -35,13 +36,17 @@ def bundle(**updates) -> NetworkIdentityEvidence:
         "persistent_divergence": False,
         "temporary_ambiguous_split": False,
         "new_genesis": False,
+        "canonical_network_continuation_claim_refs": ("claim-history",),
+        "state_continuity_claim_refs": ("claim-history",),
+        "consensus_continuity_claim_refs": ("claim-history",),
+        "deployment_continuity_claim_refs": ("claim-history",),
     }
     data.update(updates)
     return NetworkIdentityEvidence.model_validate(data)
 
 
 def test_a_same_genesis_continuing_upgrade_is_same_object() -> None:
-    decision = NetworkIdentityEngine().decide(
+    decision = NetworkIdentityEngine(provenance()).decide(
         bundle(genesis_or_origin_anchor_refs=("genesis:one",))
     )
     assert decision.outcome is NetworkIdentityOutcome.SAME_OBJECT
@@ -49,11 +54,21 @@ def test_a_same_genesis_continuing_upgrade_is_same_object() -> None:
 
 
 def test_b_persistent_divergence_is_fork_with_separate_new_objects() -> None:
-    decision = NetworkIdentityEngine().decide(
+    decision = NetworkIdentityEngine(provenance()).decide(
         bundle(
             evidence_id="persistent-fork",
             canonical_network_continues=False,
+            canonical_network_continuation_claim_refs=(),
+            state_history_continuity=False,
+            consensus_continuity=False,
+            deployment_continuity=False,
+            state_continuity_claim_refs=(),
+            consensus_continuity_claim_refs=(),
+            deployment_continuity_claim_refs=(),
             persistent_divergence=True,
+            shared_ancestry_claim_refs=("claim-history",),
+            divergence_claim_refs=("claim-history",),
+            unrelated_network_claim_refs=("claim-history",),
         )
     )
     assert decision.outcome is NetworkIdentityOutcome.FORK
@@ -62,13 +77,15 @@ def test_b_persistent_divergence_is_fork_with_separate_new_objects() -> None:
 
 
 def test_c_temporary_split_is_unknown() -> None:
-    decision = NetworkIdentityEngine().decide(bundle(temporary_ambiguous_split=True))
+    decision = NetworkIdentityEngine(provenance()).decide(
+        bundle(temporary_ambiguous_split=True, temporary_split_claim_refs=("claim-history",))
+    )
     assert decision.outcome is NetworkIdentityOutcome.UNKNOWN
 
 
 def test_d_new_genesis_is_new_object() -> None:
-    decision = NetworkIdentityEngine().decide(
-        bundle(new_genesis=True, genesis_or_origin_anchor_refs=("genesis:new",))
+    decision = NetworkIdentityEngine(provenance()).decide(
+        bundle(new_genesis=True, genesis_claim_refs=("claim-history",), genesis_or_origin_anchor_refs=("genesis:new",))
     )
     assert decision.outcome is NetworkIdentityOutcome.NEW_OBJECT
     assert decision.resulting_object_ids == ("object:candidate",)
@@ -84,23 +101,25 @@ def test_e_same_ticker_unrelated_networks_remain_distinct() -> None:
         deployment_continuity=False,
         genesis_or_origin_anchor_refs=("genesis:left", "genesis:right"),
         unrelated_network_evidence=True,
+        unrelated_network_claim_refs=("claim-history",),
     )
-    assert NetworkIdentityEngine().decide(evidence).outcome is NetworkIdentityOutcome.NEW_OBJECT
+    assert NetworkIdentityEngine(provenance()).decide(evidence).outcome is NetworkIdentityOutcome.NEW_OBJECT
     assert evidence.ticker_refs  # retained as evidence, never used as a key
 
 
 def test_f_rename_with_preserved_identity_evidence_remains_same() -> None:
-    decision = NetworkIdentityEngine().decide(
+    decision = NetworkIdentityEngine(provenance()).decide(
         bundle(name_refs=("name:old", "name:renamed"), genesis_or_origin_anchor_refs=("genesis:one",))
     )
     assert decision.outcome is NetworkIdentityOutcome.SAME_OBJECT
 
 
 def test_g_chain_id_change_with_migration_does_not_decide_from_chain_id_alone() -> None:
-    decision = NetworkIdentityEngine().decide(
+    decision = NetworkIdentityEngine(provenance()).decide(
         bundle(
             chain_or_network_id_refs=("chain-id:old", "chain-id:new"),
             migration_evidence_refs=("migration:evidence",),
+            migration_claim_refs=("claim-history",),
         )
     )
     assert decision.outcome is NetworkIdentityOutcome.MIGRATION
@@ -108,7 +127,7 @@ def test_g_chain_id_change_with_migration_does_not_decide_from_chain_id_alone() 
 
 
 def test_h_security_provider_change_is_history_not_automatic_replacement() -> None:
-    decision = NetworkIdentityEngine().decide(bundle())
+    decision = NetworkIdentityEngine(provenance()).decide(bundle())
     assert decision.outcome is NetworkIdentityOutcome.SAME_OBJECT
 
 
@@ -117,11 +136,12 @@ def test_family_native_continuation_requires_operator_review() -> None:
         evidence_id="family-native",
         family_native_continuation=True,
         family_native_identity_refs=("family-anchor:one",),
+        family_native_continuation_claim_refs=("claim-history",),
     )
-    pending = NetworkIdentityEngine().decide(evidence)
+    pending = NetworkIdentityEngine(provenance()).decide(evidence)
     assert pending.outcome is NetworkIdentityOutcome.UNKNOWN
     assert pending.operator_review_required
-    reviewed = NetworkIdentityEngine().decide(
+    reviewed = NetworkIdentityEngine(provenance()).decide(
         evidence.model_copy(update={"operator_reviewed_family_native_continuation": True})
     )
     assert reviewed.outcome is NetworkIdentityOutcome.SAME_OBJECT
@@ -138,7 +158,7 @@ def test_chain_id_name_and_ticker_alone_never_collapse_identity() -> None:
         name_refs=("same",),
         chain_or_network_id_refs=("1",),
     )
-    assert NetworkIdentityEngine().decide(weak).outcome is NetworkIdentityOutcome.UNKNOWN
+    assert NetworkIdentityEngine(provenance()).decide(weak).outcome is NetworkIdentityOutcome.UNKNOWN
 
 
 def provenance() -> Book2ArchitectureProvenance:
@@ -165,7 +185,7 @@ def provenance() -> Book2ArchitectureProvenance:
             predicate="changes",
             object_ref="architecture:new",
         ),
-        claim_family="CHAIN_ARCHITECTURE",
+        claim_family=ClaimFamily.CHAIN_ARCHITECTURE,
         claim_state=ClaimState.OBSERVED,
         valid_time_hypothesis=NOW,
         observed_time=NOW,

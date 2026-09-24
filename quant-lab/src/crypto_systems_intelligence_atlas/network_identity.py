@@ -6,6 +6,29 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from .architecture import ArchitectureProvenanceError, Book2ArchitectureProvenance
+from .types import ClaimFamily
+
+IDENTITY_CLAIM_FAMILIES: tuple[ClaimFamily, ...] = (
+    ClaimFamily.IDENTITY_ATTRIBUTES,
+    ClaimFamily.HISTORICAL_GENESIS_SPEC,
+    ClaimFamily.CHAIN_ARCHITECTURE,
+    ClaimFamily.DEPLOYMENT_ACTIVATION,
+)
+CONTINUITY_CLAIM_FAMILIES: dict[str, tuple[ClaimFamily, ...]] = {
+    "canonical-network continuation": IDENTITY_CLAIM_FAMILIES,
+    "state continuation": (ClaimFamily.CHAIN_ARCHITECTURE, ClaimFamily.HISTORICAL_GENESIS_SPEC),
+    "consensus continuation": (ClaimFamily.CHAIN_ARCHITECTURE, ClaimFamily.HISTORICAL_GENESIS_SPEC),
+    "deployment continuation": (
+        ClaimFamily.DEPLOYMENT_ACTIVATION,
+        ClaimFamily.CHAIN_ARCHITECTURE,
+        ClaimFamily.GOVERNANCE_EXECUTION,
+    ),
+    "migration": IDENTITY_CLAIM_FAMILIES,
+    "temporary split": IDENTITY_CLAIM_FAMILIES,
+    "family-native continuation": IDENTITY_CLAIM_FAMILIES,
+}
+
 
 class NetworkIdentityOutcome(str, Enum):
     SAME_OBJECT = "SAME_OBJECT"
@@ -17,7 +40,7 @@ class NetworkIdentityOutcome(str, Enum):
 
 
 class NetworkIdentityEvidence(BaseModel):
-    """Evidence bundle; names, tickers, and chain IDs are never identity keys."""
+    """Decision assertions and their fact-specific canonical claim support."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -41,6 +64,18 @@ class NetworkIdentityEvidence(BaseModel):
     migration_evidence_refs: tuple[str, ...] = ()
     family_native_continuation: bool | None = None
     operator_reviewed_family_native_continuation: bool = False
+
+    canonical_network_continuation_claim_refs: tuple[str, ...] = ()
+    state_continuity_claim_refs: tuple[str, ...] = ()
+    consensus_continuity_claim_refs: tuple[str, ...] = ()
+    deployment_continuity_claim_refs: tuple[str, ...] = ()
+    shared_ancestry_claim_refs: tuple[str, ...] = ()
+    divergence_claim_refs: tuple[str, ...] = ()
+    unrelated_network_claim_refs: tuple[str, ...] = ()
+    genesis_claim_refs: tuple[str, ...] = ()
+    migration_claim_refs: tuple[str, ...] = ()
+    temporary_split_claim_refs: tuple[str, ...] = ()
+    family_native_continuation_claim_refs: tuple[str, ...] = ()
 
     @model_validator(mode="after")
     def _bundle_rules(self) -> "NetworkIdentityEvidence":
@@ -67,9 +102,13 @@ class NetworkIdentityDecision(BaseModel):
 
 
 class NetworkIdentityEngine:
-    """Pure deterministic decision function; no network or persistence."""
+    """Pure decision function over canonical Book 2 identity evidence."""
+
+    def __init__(self, provenance: Book2ArchitectureProvenance) -> None:
+        self.provenance = provenance
 
     def decide(self, evidence: NetworkIdentityEvidence) -> NetworkIdentityDecision:
+        self._validate_assertions(evidence)
         candidate = evidence.candidate_object_id
         prior = evidence.prior_object_id
         if evidence.temporary_ambiguous_split:
@@ -112,7 +151,7 @@ class NetworkIdentityEngine:
                 resulting_object_ids=(candidate,),
                 reason="new genesis creates a new object by default",
             )
-        if evidence.migration_evidence_refs:
+        if evidence.migration_evidence_refs or evidence.migration_claim_refs:
             if not prior or not candidate:
                 return self._unknown(evidence, "migration evidence is incomplete")
             same = self._continuity_complete(evidence)
@@ -145,6 +184,49 @@ class NetworkIdentityEngine:
             )
         return self._unknown(evidence, "insufficient canonical continuity evidence")
 
+    def _validate_assertions(self, evidence: NetworkIdentityEvidence) -> None:
+        checks = (
+            (evidence.persistent_divergence is True, evidence.divergence_claim_refs, "divergence"),
+            (evidence.unrelated_network_evidence, evidence.unrelated_network_claim_refs, "unrelated-network"),
+            (evidence.new_genesis is True, evidence.genesis_claim_refs, "genesis"),
+            (
+                evidence.canonical_network_continues is True,
+                evidence.canonical_network_continuation_claim_refs,
+                "canonical-network continuation",
+            ),
+            (evidence.state_history_continuity is True, evidence.state_continuity_claim_refs, "state continuation"),
+            (evidence.consensus_continuity is True, evidence.consensus_continuity_claim_refs, "consensus continuation"),
+            (evidence.deployment_continuity is True, evidence.deployment_continuity_claim_refs, "deployment continuation"),
+            (bool(evidence.migration_evidence_refs) or bool(evidence.migration_claim_refs), evidence.migration_claim_refs, "migration"),
+            (evidence.temporary_ambiguous_split is True, evidence.temporary_split_claim_refs, "temporary split"),
+            (
+                evidence.family_native_continuation is True,
+                evidence.family_native_continuation_claim_refs,
+                "family-native continuation",
+            ),
+        )
+        for asserted, refs, label in checks:
+            if asserted and not refs:
+                raise ArchitectureProvenanceError(f"{label} assertion lacks canonical Book 2 claim support")
+            allowed_families = CONTINUITY_CLAIM_FAMILIES.get(label, IDENTITY_CLAIM_FAMILIES)
+            for claim_ref in refs:
+                self.provenance.resolve_claim(
+                    claim_ref,
+                    allowed_families=allowed_families,
+                )
+        if evidence.persistent_divergence is True:
+            for refs, label in (
+                (evidence.shared_ancestry_claim_refs, "shared ancestry"),
+                (evidence.unrelated_network_claim_refs, "distinct network identity"),
+            ):
+                if not refs:
+                    raise ArchitectureProvenanceError(f"{label} lacks canonical Book 2 claim support")
+                for claim_ref in refs:
+                    self.provenance.resolve_claim(
+                        claim_ref,
+                        allowed_families=IDENTITY_CLAIM_FAMILIES,
+                    )
+
     @staticmethod
     def _continuity_complete(evidence: NetworkIdentityEvidence) -> bool:
         return bool(
@@ -158,11 +240,7 @@ class NetworkIdentityEngine:
             and evidence.temporary_ambiguous_split is False
         )
 
-    def _same(
-        self,
-        evidence: NetworkIdentityEvidence,
-        reason: str,
-    ) -> NetworkIdentityDecision:
+    def _same(self, evidence: NetworkIdentityEvidence, reason: str) -> NetworkIdentityDecision:
         prior = evidence.prior_object_id
         if not prior:
             return self._unknown(evidence, reason)
@@ -193,6 +271,8 @@ class NetworkIdentityEngine:
 
 
 __all__ = [
+    "CONTINUITY_CLAIM_FAMILIES",
+    "IDENTITY_CLAIM_FAMILIES",
     "NetworkIdentityDecision",
     "NetworkIdentityEngine",
     "NetworkIdentityEvidence",
