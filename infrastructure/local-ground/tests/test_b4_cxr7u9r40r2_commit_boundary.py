@@ -78,6 +78,7 @@ def shell_law(tmp_path):
         script = (
             "set -uo pipefail\n"
             f"OCE_PYTHON=\"{python_exe}\"\n"
+            f"BIN='{SCRIPTS.as_posix()}'\n"
             f"PROMOTE_RECEIPT='{promote}'\n"
             f"VAR_DIR='{tmp_path / 'shell'}'\n"
             + functions +

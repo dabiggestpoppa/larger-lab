@@ -1562,6 +1562,48 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     return receipt
 
 
+def _classify_state_for_shell(path):
+    """ONE authority for the shell's commit law (B4-CXR7U9R41-R2): classify a
+    durable transition record WITHOUT docker or catalog access, so restore.sh's
+    EXIT trap never re-encodes the transition ladder itself.
+
+    Exit codes:
+      0  pre-commit   — the quarantine (the PG rollback source) still exists;
+                        both durable stores are restorable to original truth
+      3  post-commit  — PostgreSQL is irreversibly committed to the promoted
+                        snapshot; artifact-only rollback is FORBIDDEN
+      4  unknowable   — the record cannot be classified: fail closed, refuse
+                        the rollback, demand `--phase reconcile`
+
+    The drop-before-record crash window is closed here: FINALIZING normally
+    means the quarantine still exists, but if the durable record was written
+    with a commit_point marker the quarantine drop ALREADY happened and the
+    state advance simply never landed — that is post-commit, not pre-commit.
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            record = json.load(f)
+        state = record.get("state", "")
+    except (OSError, ValueError):
+        return 4
+    if state in (TRANSITION_STATE_COMMIT_POINT, "FINALIZED"):
+        return 3
+    if state in ("CREATED", "STAGED", TRANSITION_STATE_PROMOTED,
+                 TRANSITION_STATE_ROLLING_BACK, "ROLLED_BACK", "FAILED"):
+        # ROLLED_BACK/FAILED are terminal rollback outcomes, not rollback
+        # targets: nothing is left to restore, so the shell treats them as
+        # pre-commit (no artifact-only rollback is pending or forbidden).
+        return 0
+    if state == TRANSITION_STATE_FINALIZING:
+        # Crash-window discrimination WITHOUT the catalog: a durable
+        # commit_point marker proves the quarantine drop already happened.
+        commit_point = record.get("commit_point")
+        if isinstance(commit_point, dict) and commit_point.get("marker"):
+            return 3
+        return 0
+    return 4
+
+
 def _parse_cli(argv):
     """Parse the recovery CLI into (phase, probe, kw). Exits 2 on unknown args."""
     kw = {}
@@ -1572,7 +1614,7 @@ def _parse_cli(argv):
         a = argv[i]
         if a in ("--phase", "--archive", "--inventory", "--inventory-sha", "--db",
                  "--user", "--container", "--receipt-out", "--receipt-in",
-                 "--verify-tables"):
+                 "--verify-tables", "--classify-state"):
             i += 1
             val = argv[i] if i < len(argv) else None
             if a == "--phase":
@@ -1620,6 +1662,10 @@ def _validate_cli(phase, kw):
 
 def main():
     phase, probe, kw = _parse_cli(sys.argv[1:])
+    # Shell-support mode (B4-CXR7U9R41-R2): classify a durable transition
+    # record by exit code, no docker/catalog access. Not a recovery phase.
+    if kw.get("classify_state"):
+        sys.exit(_classify_state_for_shell(kw["classify_state"]))
     _validate_cli(phase, kw)
     out = kw.get("receipt_out")
     if out:

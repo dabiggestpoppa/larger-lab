@@ -29,20 +29,35 @@ _BOOTSTRAP = (
     "sys.modules['pgrec_seam'] = mod\n"
     "spec.loader.exec_module(mod)\n"
     "mod._bind_test_recovery_root(sys.argv[2])\n"
-    "sys.argv = [sys.argv[1]] + sys.argv[3:]\n"
+    "if len(sys.argv) > 3 and sys.argv[3] == '--test-bridge':\n"
+    "    bspec = u.spec_from_file_location('race_bridge', sys.argv[4])\n"
+    "    bmod = u.module_from_spec(bspec)\n"
+    "    sys.modules['race_bridge'] = bmod\n"
+    "    bspec.loader.exec_module(bmod)\n"
+    "    bmod.install(mod)\n"
+    "    sys.argv = [sys.argv[1]] + sys.argv[5:]\n"
+    "else:\n"
+    "    sys.argv = [sys.argv[1]] + sys.argv[3:]\n"
     "mod.main()\n"
 )
 
 
-def cli_argv(argv, write_root):
-    """The real CLI, with `write_root` bound by the in-process test seam."""
-    return ([sys.executable, "-c", _BOOTSTRAP, str(CLI), str(write_root)]
-            + [str(a) for a in argv])
+def cli_argv(argv, write_root, bridge_path=None):
+    """The real CLI, with `write_root` bound by the in-process test seam.
+    With `bridge_path`, the child additionally loads a container-bridge module
+    (explicitly constructed test dependency, same seam discipline as the
+    write root: never reachable from the production CLI, no environment
+    channel) so filesystem-only proofs can run the REAL engine phases."""
+    base = [sys.executable, "-c", _BOOTSTRAP, str(CLI), str(write_root)]
+    if bridge_path is not None:
+        base += ["--test-bridge", str(bridge_path)]
+    return base + [str(a) for a in argv]
 
 
-def run_cli(argv, write_root=None, env_extra=None, timeout=300):
+def run_cli(argv, write_root=None, env_extra=None, timeout=300, bridge=None):
     """Run the real CLI. With `write_root` the seam binds that root; without it
-    the engine runs exactly as a production caller runs it."""
+    the engine runs exactly as a production caller runs it. With `bridge` the
+    child loads the named container-bridge module (test-only; see cli_argv)."""
     env = dict(os.environ)
     env["PYTHONIOENCODING"] = "utf-8"
     if env_extra:
@@ -51,5 +66,5 @@ def run_cli(argv, write_root=None, env_extra=None, timeout=300):
     if write_root is None:
         return subprocess.run([sys.executable, str(CLI)] + argv,
                               capture_output=True, text=True, env=env, timeout=timeout)
-    return subprocess.run(cli_argv(argv, write_root),
+    return subprocess.run(cli_argv(argv, write_root, bridge),
                           capture_output=True, text=True, env=env, timeout=timeout)

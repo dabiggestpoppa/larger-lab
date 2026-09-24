@@ -370,23 +370,25 @@ durable_precommit() {
     return 0   # unreadable receipt and nothing durable says otherwise
   fi
   local rec="$VAR_DIR/recovery/transitions/${opid}.json"
-  [[ -f "$rec" ]] || return 0                        # no durable record: pre-commit by construction
-  "$OCE_PYTHON" - "$rec" <<'PY'
-import json, sys
-rec = json.load(open(sys.argv[1], encoding="utf-8"))
-state = rec.get("state", "")
-# pre-commit states: the quarantine (the PG rollback source) still exists.
-# COMMIT_POINT_REACHED or later means PostgreSQL is irreversibly committed.
-precommit = {"CREATED", "STAGED", "PROMOTED", "FINALIZING", "ROLLING_BACK"}
-postcommit = {"COMMIT_POINT_REACHED", "FINALIZED"}
-if state in postcommit:
-    print("BLOCKED: PostgreSQL passed its irreversible commit point (durable "
-          "transition state); artifact-only rollback is forbidden — both stores "
-          "remain on the promoted snapshot; run: pg-recovery.py --phase reconcile",
-          file=sys.stderr)
-    sys.exit(1)
-sys.exit(0 if state in precommit else 1)
-PY
+  if [[ ! -f "$rec" ]]; then
+    return 0                        # no durable record: pre-commit by construction
+  fi
+  # ONE authority for the commit law: the ENGINE classifies the durable state
+  # (the shell never re-encodes the transition ladder — a state added in
+  # pg-recovery.py cannot silently disagree here).
+  "$OCE_PYTHON" "$BIN/pg-recovery.py" --phase reconcile --classify-state "$rec" 2>/dev/null
+  local cls=$?
+  if [[ "$cls" -eq 0 ]]; then
+    return 0                        # pre-commit: both stores restorable
+  elif [[ "$cls" -eq 3 ]]; then
+    echo "BLOCKED: PostgreSQL passed its irreversible commit point (durable " \
+         "transition state); artifact-only rollback is forbidden — both stores " \
+         "remain on the promoted snapshot; run: pg-recovery.py --phase reconcile" >&2
+    return 1
+  fi
+  echo "BLOCKED: durable transition state is UNKNOWABLE (classification " \
+       "failed); refusing artifact-only rollback — run: pg-recovery.py --phase reconcile" >&2
+  return 1
 }
 rollback_precommit() { # single owner of every pre-commit rollback
   local reason="${FAIL_NOTE:-$1}"

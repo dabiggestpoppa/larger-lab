@@ -164,6 +164,7 @@ def _shell_law_from_source(source, tmp_path):
         promote.write_text(json.dumps({"operation_id": opid}), encoding="utf-8")
         script = ("set -uo pipefail\n"
                   f'OCE_PYTHON="{python_exe}"\n'
+                  f"BIN='{SCRIPTS.as_posix()}'\n"
                   f"PROMOTE_RECEIPT='{promote}'\n"
                   f"VAR_DIR='{tmp_path / 'ctl'}'\n"
                   + m2.group(1) + "\n" + m.group(1) +

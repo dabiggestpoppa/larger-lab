@@ -38,6 +38,11 @@ RECEIPT_WRITE_TEST="$BASE_DIR/tests/test_b4_cxr7u9r39r2_receipt_write_authority.
 TRANSITION_AUTHORITY_TEST="$BASE_DIR/tests/test_b4_cxr7u9r39r3_transition_authority.py"
 CROSS_STORE_TEST="$BASE_DIR/tests/test_b4_cxr7u9r39r1_cross_store_transaction.py"
 TRANSACTION_CLOSURE_TEST="$BASE_DIR/tests/test_b4_cxr7u9r39r4_transaction_closure.py"
+CLAIM_RACE_PROOF_TEST="$BASE_DIR/tests/test_b4_cxr7u9r40r1_operation_wide_claim.py"
+CLAIM_RACE_INPROCESS_TEST="$BASE_DIR/tests/test_b4_cxr7u9r40r1_claim_race_inprocess.py"
+COMMIT_BOUNDARY_TEST="$BASE_DIR/tests/test_b4_cxr7u9r40r2_commit_boundary.py"
+NEGATIVE_CONTROL_TEST="$BASE_DIR/tests/test_b4_cxr7u9r40r4_negative_controls.py"
+SHELL_COMMIT_LAW_TEST="$BASE_DIR/tests/test_b4_cxr7u9r41r2_shell_commit_law.py"
 ADV_SH="$BASE_DIR/tests/adversarial-local.sh"
 COMPOSE_DIR="$BASE_DIR/compose"
 EXPECTED_REPO="dabiggestpoppa/larger-lab"
@@ -237,7 +242,7 @@ record "doctor fingerprint captured"
 
 # â”€â”€ acceptance + contract tests (machine-readable) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 OCE_CI_MODE="${OCE_CI_MODE:-false}" OCE_RUNNER_ACTIVE=1
-python3 -m pytest "$TEST_FILE" "$CONTRACT_TEST" "$LIFECYCLE_TEST" "$GATE_TEST" "$COMPOSE_OUT_TEST" "$PORTABILITY_TEST" "$BACKUP_HARDEN_TEST" "$PATH_AUTHORITY_TEST" "$RECOVERY_AUTHORITY_TEST" "$RECEIPT_WRITE_TEST" "$TRANSITION_AUTHORITY_TEST" "$CROSS_STORE_TEST" "$TRANSACTION_CLOSURE_TEST" -v --tb=short \
+python3 -m pytest "$TEST_FILE" "$CONTRACT_TEST" "$LIFECYCLE_TEST" "$GATE_TEST" "$COMPOSE_OUT_TEST" "$PORTABILITY_TEST" "$BACKUP_HARDEN_TEST" "$PATH_AUTHORITY_TEST" "$RECOVERY_AUTHORITY_TEST" "$RECEIPT_WRITE_TEST" "$TRANSITION_AUTHORITY_TEST" "$CROSS_STORE_TEST" "$TRANSACTION_CLOSURE_TEST" "$CLAIM_RACE_PROOF_TEST" "$CLAIM_RACE_INPROCESS_TEST" "$COMMIT_BOUNDARY_TEST" "$NEGATIVE_CONTROL_TEST" "$SHELL_COMMIT_LAW_TEST" -v --tb=short \
   --junitxml="$EVIDENCE/junit.xml" > "$EVIDENCE/acceptance-output.txt" 2>&1
 RC=$?
 tail -25 "$EVIDENCE/acceptance-output.txt"
