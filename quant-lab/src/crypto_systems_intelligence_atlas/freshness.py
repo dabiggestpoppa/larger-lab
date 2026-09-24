@@ -10,6 +10,20 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .temporal import normalize_utc
 
 
+class FreshnessOutcome(str, Enum):
+    FRESH = "FRESH"
+    STALE = "STALE"
+    REQUIRES_CHAIN_CONTEXT = "REQUIRES_CHAIN_CONTEXT"
+
+
+class ChainFreshnessContext(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    window_id: str = Field(min_length=1)
+    observed_window: str = Field(min_length=1)
+    current_window: str = Field(min_length=1)
+
+
 class StalenessKind(str, Enum):
     SOURCE_STALE = "SOURCE_STALE"
     EVIDENCE_STALE = "EVIDENCE_STALE"
@@ -55,7 +69,8 @@ class FreshnessEvaluation(BaseModel):
     kind: StalenessKind
     policy_id: str
     policy_version: str
-    stale: bool
+    stale: bool | None
+    outcome: FreshnessOutcome
     evaluated_at: datetime
     reason: str
 
@@ -92,31 +107,50 @@ class FreshnessPolicyBook:
         observed_at: datetime,
         now: datetime,
         version: str | None = None,
+        chain_context: ChainFreshnessContext | None = None,
     ) -> FreshnessEvaluation:
         policy = self.require(policy_id, version)
         observed_at = normalize_utc(observed_at)
         now = normalize_utc(now)
         if now < observed_at:
             raise ValueError("evaluation time cannot precede observed time")
-        if policy.mode in (FreshnessMode.EVENT_DRIVEN, FreshnessMode.SUPERSESSION_ORIENTED, FreshnessMode.HISTORICAL_NO_DECAY):
+        if policy.mode is FreshnessMode.CHAIN_SPECIFIC:
+            if chain_context is None:
+                stale = None
+                outcome = FreshnessOutcome.REQUIRES_CHAIN_CONTEXT
+                reason = "chain-specific policy requires deterministic chain context"
+            elif chain_context.window_id != policy.chain_specific_window:
+                stale = None
+                outcome = FreshnessOutcome.REQUIRES_CHAIN_CONTEXT
+                reason = "chain context does not match the policy window"
+            else:
+                stale = chain_context.observed_window != chain_context.current_window
+                outcome = FreshnessOutcome.STALE if stale else FreshnessOutcome.FRESH
+                reason = "chain window changed" if stale else "chain window unchanged"
+        elif policy.mode in (FreshnessMode.EVENT_DRIVEN, FreshnessMode.SUPERSESSION_ORIENTED, FreshnessMode.HISTORICAL_NO_DECAY):
             stale = False
+            outcome = FreshnessOutcome.FRESH
             reason = f"{policy.mode.value} does not decay by elapsed time"
         else:
             assert policy.max_age_seconds is not None
             stale = now > observed_at + timedelta(seconds=policy.max_age_seconds)
+            outcome = FreshnessOutcome.STALE if stale else FreshnessOutcome.FRESH
             reason = "elapsed time exceeds policy max age" if stale else "within policy max age"
         return FreshnessEvaluation(
             kind=policy.kind,
             policy_id=policy.policy_id,
             policy_version=policy.version,
             stale=stale,
+            outcome=outcome,
             evaluated_at=now,
             reason=reason,
         )
 
 
 __all__ = [
+    "ChainFreshnessContext",
     "FreshnessEvaluation",
+    "FreshnessOutcome",
     "FreshnessMode",
     "FreshnessPolicy",
     "FreshnessPolicyBook",
