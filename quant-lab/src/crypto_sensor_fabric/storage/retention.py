@@ -55,6 +55,10 @@ class RetentionConfig:
     def __post_init__(self) -> None:
         if not self.schema_version:
             raise RetentionConfigurationError("schema_version must be nonempty")
+        if self.automatic_t0a_destructive_actions:
+            raise RetentionConfigurationError(
+                "automatic T0A destructive actions are forbidden in v1"
+            )
         for name in ("max_estimate_bytes", "high_confidence_sample_seconds", "medium_confidence_sample_seconds"):
             value = getattr(self, name)
             if isinstance(value, bool) or not isinstance(value, int) or value <= 0:

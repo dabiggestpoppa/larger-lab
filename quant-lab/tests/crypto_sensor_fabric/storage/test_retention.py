@@ -23,6 +23,7 @@ from crypto_sensor_fabric.storage.retention import (
     StorageEstimateInput,
     StorageEstimationError,
     UniverseTier,
+    RetentionConfigurationError,
     assess_destructive_retention,
     estimate_storage,
     load_retention_config,
@@ -192,6 +193,11 @@ def test_only_rebuildable_non_t0a_is_evictable() -> None:
     p2 = assess_destructive_retention(priority=StoragePriority.P2, is_t0a=False)
     assert p3.allowed is True
     assert p2.allowed is False
+
+
+def test_config_cannot_enable_automatic_t0a_destruction() -> None:
+    with pytest.raises(RetentionConfigurationError, match="forbidden"):
+        RetentionConfig(automatic_t0a_destructive_actions=True)
 
 
 def test_retention_config_loads_with_safe_defaults() -> None:
