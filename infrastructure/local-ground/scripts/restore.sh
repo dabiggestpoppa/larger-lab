@@ -356,27 +356,16 @@ PY
 # The interpreter used for durable-state reads is the SAME python restore.sh
 # otherwise uses: OCE_PYTHON may pin it (tests), python3 is the default.
 OCE_PYTHON="${OCE_PYTHON:-python3}"
-_promote_op_id() { # this transaction's durable operation id, from the promote receipt
-  [[ -f "$PROMOTE_RECEIPT" ]] || return 1
-  "$OCE_PYTHON" -c "import json,sys;print(json.load(open(sys.argv[1],encoding='utf-8')).get('operation_id',''))" \
-    "$PROMOTE_RECEIPT" 2>/dev/null
-}
 durable_precommit() {
   if [[ ! -f "$PROMOTE_RECEIPT" ]]; then
-    return 0   # nothing was ever promoted: pre-commit by construction
+    return 0   # no operation ever started: there is nothing to roll back
   fi
-  local opid; opid="$(_promote_op_id)"
-  if [[ -z "$opid" ]]; then
-    return 0   # unreadable receipt and nothing durable says otherwise
-  fi
-  local rec="$VAR_DIR/recovery/transitions/${opid}.json"
-  if [[ ! -f "$rec" ]]; then
-    return 0                        # no durable record: pre-commit by construction
-  fi
-  # ONE authority for the commit law: the ENGINE classifies the durable state
-  # (the shell never re-encodes the transition ladder — a state added in
-  # pg-recovery.py cannot silently disagree here).
-  "$OCE_PYTHON" "$BIN/pg-recovery.py" --phase reconcile --classify-state "$rec" 2>/dev/null
+  # ONE authority for the commit law: the engine binds the exact promote
+  # receipt to its durable record, claim and intent. A missing/corrupt receipt,
+  # missing/malformed record, digest mismatch, or unknown state returns 4.
+  "$OCE_PYTHON" "$BIN/pg-recovery.py" --phase reconcile \
+    --classify-rollback "$PROMOTE_RECEIPT" \
+    --transition-dir "$VAR_DIR/recovery/transitions" 2>/dev/null
   local cls=$?
   if [[ "$cls" -eq 0 ]]; then
     return 0                        # pre-commit: both stores restorable
