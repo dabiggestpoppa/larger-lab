@@ -487,3 +487,34 @@ acquisition remains unauthorized.
 Future Book 2 changes require a concrete downstream integration defect, an
 explicit amendment, or a newly discovered correctness failure. No further generic
 Book 2 hardening is authorized.
+
+
+---
+
+# PLANNING LEDGER — BOOK 3 NATIVE CHAIN / LEDGER ATLAS v0.1 (2026-09-24)
+
+This is a planning-only checkpoint. Book 1 and accepted Book 2 remain frozen; no
+Book 3 source code, live acquisition, or implementation authority is created here.
+
+```text
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3_PLAN_VERSION = v0.1
+BOOK_3_PLANNING = COMPLETE / HOLD
+BOOK_3_READY_FOR_OPERATOR_REVIEW = TRUE
+BOOK_3_OPERATOR_RATIFIED = FALSE
+BOOK_3_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Artifacts:
+
+- `CSIA_BOOK_3_NATIVE_CHAIN_LEDGER_ATLAS_PLAN_v0.1.md`
+- `CSIA_BOOK_3_NATIVE_ARCHITECTURE_PILOT_MATRIX_v0.1.md`
+- `CSIA_BOOK_3_ANTI_EVM_ADVERSARIAL_REVIEW_v0.1.md`
+- `CSIA_BOOK_3_NETWORK_IDENTITY_STRESS_MATRIX_v0.1.md`
+- `CSIA_BOOK_3_ARCHITECTURE_EVIDENCE_MATRIX_v0.1.md`
+- `CSIA_BOOK_3_PRE_RATIFICATION_REVIEW_v0.1.md`
+
+The packet has zero structural failures in its pilot and anti-EVM scope, but remains
+on HOLD for operator decisions D3-1 through D3-7. This session does not plan Book 3
+implementation, acquire live data, or amend Book 1.
