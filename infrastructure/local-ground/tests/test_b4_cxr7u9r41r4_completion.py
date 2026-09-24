@@ -409,7 +409,7 @@ def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
     suffix = f"/{key}" if key else "/"
     url = f"http://localhost:9000/{bucket}{suffix}"
     response_path = "/tmp/oce-s3-response"
-    command = ["docker", "exec", oc.ARTIFACT, "curl", "-sS", "-o",
+    command = ["docker", "exec", "-i", oc.ARTIFACT, "curl", "-sS", "-o",
                response_path, "-w", "%{http_code}", "-X", method,
                "--aws-sigv4", "aws:amz:us-east-1:s3", "--user", f"{access}:{secret}"]
     if method == "PUT":
