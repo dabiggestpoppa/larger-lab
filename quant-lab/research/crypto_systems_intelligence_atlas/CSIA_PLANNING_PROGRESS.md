@@ -420,3 +420,38 @@ b828bfc0  Evidence stress matrix v0.1 (15 scenarios, 0 structural failures)
 ```
 
 No Book 2 implementation is authorized or begun.
+
+---
+
+# PLANNING LEDGER — BOOK 2 RATIFIED (2026-09-24)
+
+All prior checkpoints preserved. Ratification seals the reconciled planning
+artifacts only.
+
+```text
+BOOK_1_IMPLEMENTATION          = ACCEPTED (build commit 7c2419f0)
+BOOK_2                         = RATIFIED
+BOOK_2_PLAN                    = v0.2
+BLOC_2A                        = RATIFIED
+BLOC_2B                        = RATIFIED
+BLOC_2C                        = RATIFIED
+BLOC_2D                        = RATIFIED
+BLOC_2E                        = RATIFIED
+BLOC_2F                        = RATIFIED
+BLOC_2G                        = RATIFIED
+BLOC_2H                        = RATIFIED
+BLOC_2I                        = RATIFIED
+SOURCE_AUTHORITY_MATRIX         = v0.2 RATIFIED
+EVIDENCE_STRESS_MATRIX          = v0.2 ACCEPTED
+PRE_RATIFICATION_REVIEW         = v0.2 PASS
+STRUCTURAL_FAILURE              = 0
+BLOCKING_OPERATOR_DECISIONS     = 0
+BOOK_2_EXIT_GATE               = PASS
+BOOK_2_IMPLEMENTATION_AUTHORITY = FALSE
+
+NEXT = BOOK 2 IMPLEMENTATION AUTHORIZATION + BUILD PLAN
+```
+
+The next action requires a separate explicit operator authorization. No Book
+2 implementation, collector, database, graph database, live source access,
+Book 3 work, Sensor mutation, or Capital Field mutation is authorized.
