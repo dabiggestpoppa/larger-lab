@@ -759,7 +759,18 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
     try:
         fd = os.open(claim_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     except FileExistsError:
-        winner = _load_claim(operation_id)
+        # The claim file exists but the winner may not have finished writing
+        # it yet (O_EXCL create precedes the payload write). Spin briefly so
+        # the refusal can NAME the winning transition truthfully; if it is
+        # still unreadable, fail closed with 'unknown' — the authority is
+        # spent either way.
+        import time
+        winner = None
+        for _ in range(50):
+            winner = _load_claim(operation_id)
+            if winner:
+                break
+            time.sleep(0.01)
         chosen = winner.get("transition") if winner else "unknown"
         raise RuntimeError(
             f"recovery operation {operation_id} was already claimed for a "
