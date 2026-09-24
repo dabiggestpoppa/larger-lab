@@ -1,0 +1,134 @@
+{
+  "checkpoint": "SENSOR-B4-I09",
+  "doctrine": "NO AUTOMATIC DESTRUCTIVE T0A RETENTION IN V1",
+  "matrix": "NONDESTRUCTIVE_RETENTION",
+  "rows": [
+    {
+      "actual_policy": "SELECTIVE",
+      "case": "book_policy_u0",
+      "expected_policy": "SELECTIVE",
+      "policy_matches": true,
+      "required_invariants": [
+        "policy_matches",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true,
+      "universe_tier": "U0"
+    },
+    {
+      "actual_policy": "COARSE_OR_METRICS",
+      "case": "book_policy_u1",
+      "expected_policy": "COARSE_OR_METRICS",
+      "policy_matches": true,
+      "required_invariants": [
+        "policy_matches",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true,
+      "universe_tier": "U1"
+    },
+    {
+      "actual_policy": "DISABLED_DEFAULT",
+      "case": "book_policy_u2",
+      "expected_policy": "DISABLED_DEFAULT",
+      "policy_matches": true,
+      "required_invariants": [
+        "policy_matches",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true,
+      "universe_tier": "U2"
+    },
+    {
+      "case": "t0a_old_refused",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "OLD"
+      ],
+      "reason": "T0A is authoritative; age, duplicate appearance, size, and revision never authorize deletion",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "t0a_huge_refused",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "LARGE"
+      ],
+      "reason": "T0A is authoritative; age, duplicate appearance, size, and revision never authorize deletion",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "t0a_provider_repeatable_looking_refused",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "DUPLICATE_LOOKING"
+      ],
+      "reason": "T0A is authoritative; age, duplicate appearance, size, and revision never authorize deletion",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "t0a_duplicate_looking_refused",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "DUPLICATE_LOOKING",
+        "REVISION"
+      ],
+      "reason": "T0A is authoritative; age, duplicate appearance, size, and revision never authorize deletion",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "t0a_revised_refused",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "REVISION"
+      ],
+      "reason": "T0A is authoritative; age, duplicate appearance, size, and revision never authorize deletion",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "only_p3_non_t0a_evictable",
+      "p2_allowed": false,
+      "p2_not_evictable": true,
+      "p3_allowed": true,
+      "p3_evictable": true,
+      "required_invariants": [
+        "p3_evictable",
+        "p2_not_evictable"
+      ],
+      "result": "OK"
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 9,
+    "rows": 9
+  }
+}

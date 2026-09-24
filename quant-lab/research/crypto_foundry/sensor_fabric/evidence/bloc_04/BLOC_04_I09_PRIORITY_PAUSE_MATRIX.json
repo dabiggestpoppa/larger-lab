@@ -1,0 +1,279 @@
+{
+  "absolute_floor_rule": "safe iff free_bytes - projected_write_bytes >= absolute_free_floor_bytes",
+  "checkpoint": "SENSOR-B4-I09",
+  "matrix": "PRIORITY_PAUSE",
+  "rows": [
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "PROCEED",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "normal_p0",
+      "expected_disposition": "PROCEED",
+      "pressure": "NORMAL",
+      "priority": "P0",
+      "projected_free_bytes": 8900,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "PROCEED",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "normal_p2",
+      "expected_disposition": "PROCEED",
+      "pressure": "NORMAL",
+      "priority": "P2",
+      "projected_free_bytes": 8900,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "WARN",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "watch_p2_safe",
+      "expected_disposition": "WARN",
+      "pressure": "WATCH",
+      "priority": "P2",
+      "projected_free_bytes": 2900,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "PROCEED",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "constrained_p0_safe",
+      "expected_disposition": "PROCEED",
+      "pressure": "CONSTRAINED",
+      "priority": "P0",
+      "projected_free_bytes": 1400,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "PROCEED",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "constrained_p1_safe",
+      "expected_disposition": "PROCEED",
+      "pressure": "CONSTRAINED",
+      "priority": "P1",
+      "projected_free_bytes": 1400,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "DEFER",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "constrained_p2_deferred",
+      "expected_disposition": "DEFER",
+      "pressure": "CONSTRAINED",
+      "priority": "P2",
+      "projected_free_bytes": 1400,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "PAUSE",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "constrained_p3_paused",
+      "expected_disposition": "PAUSE",
+      "pressure": "CONSTRAINED",
+      "priority": "P3",
+      "projected_free_bytes": 1400,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "WARN",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "critical_p0_safe",
+      "expected_disposition": "WARN",
+      "pressure": "CRITICAL",
+      "priority": "P0",
+      "projected_free_bytes": 400,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "BLOCK",
+      "actual_disposition_matches": true,
+      "blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "blocked_code_consistent": true,
+      "case": "critical_p1_blocked",
+      "expected_disposition": "BLOCK",
+      "pressure": "CRITICAL",
+      "priority": "P1",
+      "projected_free_bytes": 400,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "BLOCK",
+      "actual_disposition_matches": true,
+      "blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "blocked_code_consistent": true,
+      "case": "critical_p2_blocked",
+      "expected_disposition": "BLOCK",
+      "pressure": "CRITICAL",
+      "priority": "P2",
+      "projected_free_bytes": 400,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "BLOCK",
+      "actual_disposition_matches": true,
+      "blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "blocked_code_consistent": true,
+      "case": "critical_p3_blocked",
+      "expected_disposition": "BLOCK",
+      "pressure": "CRITICAL",
+      "priority": "P3",
+      "projected_free_bytes": 400,
+      "projected_write_bytes": 100,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "PROCEED",
+      "actual_disposition_matches": true,
+      "blocked_code": null,
+      "blocked_code_consistent": true,
+      "case": "p0_floor_equality_safe",
+      "expected_disposition": "PROCEED",
+      "pressure": "CONSTRAINED",
+      "priority": "P0",
+      "projected_free_bytes": 20,
+      "projected_write_bytes": 980,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "BLOCK",
+      "actual_disposition_matches": true,
+      "blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "blocked_code_consistent": true,
+      "case": "p0_one_byte_floor_breach_blocked",
+      "expected_disposition": "BLOCK",
+      "pressure": "CONSTRAINED",
+      "priority": "P0",
+      "projected_free_bytes": 19,
+      "projected_write_bytes": 981,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "BLOCK",
+      "actual_disposition_matches": true,
+      "blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "blocked_code_consistent": true,
+      "case": "zero_free_blocks_p0",
+      "expected_disposition": "BLOCK",
+      "pressure": "CRITICAL",
+      "priority": "P0",
+      "projected_free_bytes": 0,
+      "projected_write_bytes": 0,
+      "required_invariants": [
+        "actual_disposition_matches",
+        "blocked_code_consistent"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "PROCEED",
+      "blocked_at_floor_breach": false,
+      "case": "counterfactual_p0_allowed_one_byte_below_floor",
+      "floor_respected": false,
+      "pressure": "NORMAL",
+      "priority": "P0",
+      "projected_free_bytes": 19,
+      "required_invariants": [
+        "floor_respected",
+        "blocked_at_floor_breach"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 14,
+    "rows": 15
+  }
+}

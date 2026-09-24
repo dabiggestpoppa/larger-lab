@@ -1,0 +1,108 @@
+{
+  "arithmetic": "integer cross-products; equality belongs to higher pressure",
+  "checkpoint": "SENSOR-B4-I09",
+  "matrix": "WATERMARK_BOUNDARY",
+  "policy": {
+    "constrained_percent": 85,
+    "critical_percent": 95,
+    "watch_percent": 70
+  },
+  "rows": [
+    {
+      "actual_pressure": "NORMAL",
+      "byte_derived_utilization_millionths": 699900,
+      "capacity_bytes": 10000,
+      "case": "just_below_70_normal",
+      "exact_classification": true,
+      "expected_pressure": "NORMAL",
+      "required_invariants": [
+        "exact_classification"
+      ],
+      "result": "OK",
+      "used_bytes": 6999
+    },
+    {
+      "actual_pressure": "WATCH",
+      "byte_derived_utilization_millionths": 700000,
+      "capacity_bytes": 10000,
+      "case": "at_70_watch",
+      "exact_classification": true,
+      "expected_pressure": "WATCH",
+      "required_invariants": [
+        "exact_classification"
+      ],
+      "result": "OK",
+      "used_bytes": 7000
+    },
+    {
+      "actual_pressure": "WATCH",
+      "byte_derived_utilization_millionths": 849900,
+      "capacity_bytes": 10000,
+      "case": "just_below_85_watch",
+      "exact_classification": true,
+      "expected_pressure": "WATCH",
+      "required_invariants": [
+        "exact_classification"
+      ],
+      "result": "OK",
+      "used_bytes": 8499
+    },
+    {
+      "actual_pressure": "CONSTRAINED",
+      "byte_derived_utilization_millionths": 850000,
+      "capacity_bytes": 10000,
+      "case": "at_85_constrained",
+      "exact_classification": true,
+      "expected_pressure": "CONSTRAINED",
+      "required_invariants": [
+        "exact_classification"
+      ],
+      "result": "OK",
+      "used_bytes": 8500
+    },
+    {
+      "actual_pressure": "CONSTRAINED",
+      "byte_derived_utilization_millionths": 949900,
+      "capacity_bytes": 10000,
+      "case": "just_below_95_constrained",
+      "exact_classification": true,
+      "expected_pressure": "CONSTRAINED",
+      "required_invariants": [
+        "exact_classification"
+      ],
+      "result": "OK",
+      "used_bytes": 9499
+    },
+    {
+      "actual_pressure": "CRITICAL",
+      "byte_derived_utilization_millionths": 950000,
+      "capacity_bytes": 10000,
+      "case": "at_95_critical",
+      "exact_classification": true,
+      "expected_pressure": "CRITICAL",
+      "required_invariants": [
+        "exact_classification"
+      ],
+      "result": "OK",
+      "used_bytes": 9500
+    },
+    {
+      "actual_pressure": "CRITICAL",
+      "byte_derived_utilization_millionths": 1000000,
+      "capacity_bytes": 10000,
+      "case": "at_100_critical",
+      "exact_classification": true,
+      "expected_pressure": "CRITICAL",
+      "required_invariants": [
+        "exact_classification"
+      ],
+      "result": "OK",
+      "used_bytes": 10000
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 7,
+    "rows": 7
+  }
+}

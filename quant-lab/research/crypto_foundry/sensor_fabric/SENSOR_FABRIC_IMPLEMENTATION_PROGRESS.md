@@ -1911,3 +1911,58 @@ I09/quota/storage-estimator diff from `311fd52b` are zero; network = 0.
 
 This is a governance-only ratification checkpoint. I09 was not begun in this
 prompt; its authorization begins only after this commit is pushed.
+
+## SENSOR-B4-I09 - QUOTA / STORAGE ESTIMATOR
+
+Mandatory start: `0fcf0d954295cfd9bb07649f819e44e59ea76cc9` on
+`agent/crypto-sensor-fabric-build`; remote main remains
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`.
+
+| Commit | Content | Verdict |
+|---|---|---|
+| `9da63026` | SENSOR-B4-I09A: config-driven quota classification, integer watermarks, hard absolute floor, typed side-effect-free write decisions | implementation |
+| `8b4a5065` | SENSOR-B4-I09B: integer-byte estimator, coverage confidence labels, U0/U1/U2 policy, T0A non-deletion | implementation |
+| `f3bdfdcc` | SENSOR-B4-I09C: adversarial matrices, required-invariant evaluator, deliberate counterfactuals, deterministic byte comparison | evidence builders/tests |
+| `632cc339` | SENSOR-B4-I09C-R1: repair priority evidence to derive verdicts from measured booleans | repair |
+| `054f5b64` | SENSOR-B4-I09C-R2: align watermark invariant name and floor scenario inputs | repair |
+| `a2588179` | SENSOR-B4-I09C-R3: target exactly-floor and one-byte-below boundary | repair |
+| `457f596e` | SENSOR-B4-I09B-R1: reject configuration that enables automatic T0A destruction | safety repair |
+| D (this commit) | Publish five deterministic JSON artifacts, evidence narrative, and governance reconciliation | proposed seal |
+
+Frozen `StorageQuotaState`, `DiskPressure`, `StoragePriority`, and `SensorFamily`
+are reused. Watermarks remain config-driven: `<70% NORMAL`, `>=70% WATCH`,
+`>=85% CONSTRAINED`, `>=95% CRITICAL`, with equality in the higher state.
+A write is safe iff `free - projected >= absolute_free_floor_bytes`; exactly at
+the floor is allowed, one byte below blocks, and P0 has no bypass. P2 defers and
+P3 pauses under constrained pressure; all non-essential writes block at
+critical pressure; actual filesystem safety always wins.
+
+The estimator uses separate integer ceiling division for raw and projection
+components, then exact total reconciliation. Confidence is an evidence-coverage
+label based on measured sample duration and empty samples, not an invented
+statistical interval. U2 full-depth books remain off by default and no storage
+policy changes evidence semantics. T0A is never automatically destroyed; an
+unsafe config override is rejected.
+
+Machine evidence: watermark 7/7 OK; priority pause 14 OK plus one deliberate
+FAIL; estimator 7 OK plus one deliberate FAIL; non-destructive retention 9/9 OK;
+quota simulation contains six side-effect-free scenarios. Every measured row
+declares `required_invariants`, and `OK` iff all named predicates are boolean
+true. Normal pytest regenerates and byte-compares without writing committed
+evidence.
+
+Final local gates: focused I09 52 passed; required I07/I08 regression slice 241
+passed / 1 skipped; storage 1315 passed / 4 skipped / one known Windows
+pointer-visibility warning; complete project `pytest tests/ -q --maxfail=1`
+2694 passed / 5 skipped. Ruff and compileall passed. Mypy reports only the
+pre-existing `src/crypto_sensor_fabric/probes/planner.py:79 [call-overload]`
+dependency error and no I09 error. Historical I08 hash/read-only gates passed.
+Provider source diff = 0; I10 DuckDB, I11 PostgreSQL, and I12 RawEvidenceQuery
+implementation diffs = 0; network = 0. Seven known CRLF-only evidence files were
+restored. Unscoped root pytest is not claimed because of the known research
+`sys.exit(0)` import.
+
+`PASS_SENSOR_B4_I09_QUOTA_STORAGE_ESTIMATOR_SEALED = PENDING_OPERATOR_REVIEW`.
+`G4-08_STORAGE_PRESSURE_GATE = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW`.
+`next_checkpoint_authorized = FALSE`; `recommended_next = OPERATOR REVIEW OF
+SENSOR-B4-I09`. I10 remains unauthorized and research remains frozen.

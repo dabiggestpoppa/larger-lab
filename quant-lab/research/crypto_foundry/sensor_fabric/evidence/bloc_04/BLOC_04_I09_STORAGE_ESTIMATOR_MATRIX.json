@@ -1,0 +1,107 @@
+{
+  "checkpoint": "SENSOR-B4-I09",
+  "confidence_basis": "sample coverage labels only; no unsupported statistical interval",
+  "math": "ceil(sample_component_bytes * 86400 / sample_duration), then total = (raw_per_day + projection_per_day) * expected_days",
+  "matrix": "STORAGE_ESTIMATOR",
+  "rows": [
+    {
+      "bytes_per_day_projection": 8641,
+      "bytes_per_day_raw": 86401,
+      "case": "deterministic_reconciliation",
+      "components_reconcile": true,
+      "estimated_total": 950420,
+      "expected_projection_per_day": 8641,
+      "expected_raw_per_day": 86401,
+      "integer_ceil_math": true,
+      "required_invariants": [
+        "same_inputs_same_output",
+        "components_reconcile",
+        "integer_ceil_math"
+      ],
+      "result": "OK",
+      "same_inputs_same_output": true
+    },
+    {
+      "case": "expected_days_monotonic",
+      "longer_not_smaller": true,
+      "longer_total": 1045462,
+      "required_invariants": [
+        "longer_not_smaller"
+      ],
+      "result": "OK",
+      "shorter_total": 950420
+    },
+    {
+      "available_budget_bytes": 1,
+      "budget_excess_bytes": 950419,
+      "case": "budget_overrun_visible",
+      "estimated_total": 950420,
+      "excess_reconciles": true,
+      "overrun_detected": true,
+      "required_invariants": [
+        "overrun_detected",
+        "excess_reconciles"
+      ],
+      "result": "OK",
+      "within_budget": false
+    },
+    {
+      "bands": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "case": "confidence_is_coverage_label",
+      "expected_bands": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "required_invariants": [
+        "truthful_coverage_labels"
+      ],
+      "result": "OK",
+      "truthful_coverage_labels": true
+    },
+    {
+      "case": "zero_duration_typed_failure",
+      "invalid_input_fails_typed": true,
+      "required_invariants": [
+        "invalid_input_fails_typed"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "negative_raw_typed_failure",
+      "invalid_input_fails_typed": true,
+      "required_invariants": [
+        "invalid_input_fails_typed"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "negative_projection_typed_failure",
+      "invalid_input_fails_typed": true,
+      "required_invariants": [
+        "invalid_input_fails_typed"
+      ],
+      "result": "OK"
+    },
+    {
+      "bytes_per_day_projection": 8641,
+      "bytes_per_day_raw": 86401,
+      "case": "counterfactual_components_do_not_reconcile",
+      "components_reconcile": false,
+      "estimated_total": 950421,
+      "required_invariants": [
+        "components_reconcile"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 7,
+    "rows": 8
+  }
+}

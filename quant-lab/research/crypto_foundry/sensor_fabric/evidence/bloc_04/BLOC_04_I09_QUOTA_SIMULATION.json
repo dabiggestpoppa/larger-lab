@@ -1,0 +1,68 @@
+{
+  "checkpoint": "SENSOR-B4-I09",
+  "filesystem_mutated": false,
+  "network_accessed": false,
+  "scenarios": [
+    {
+      "absolute_free_floor_bytes": 20,
+      "blocked_code": null,
+      "disposition": "PROCEED",
+      "pressure": "NORMAL",
+      "priority": "P0",
+      "projected_free_bytes": 8900,
+      "projected_write_bytes": 100,
+      "scenario": "normal_safe"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "blocked_code": null,
+      "disposition": "WARN",
+      "pressure": "WATCH",
+      "priority": "P2",
+      "projected_free_bytes": 2900,
+      "projected_write_bytes": 100,
+      "scenario": "watch_safe"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "blocked_code": null,
+      "disposition": "DEFER",
+      "pressure": "CONSTRAINED",
+      "priority": "P2",
+      "projected_free_bytes": 1400,
+      "projected_write_bytes": 100,
+      "scenario": "constrained_p2_deferred"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "blocked_code": null,
+      "disposition": "PROCEED",
+      "pressure": "CONSTRAINED",
+      "priority": "P0",
+      "projected_free_bytes": 1400,
+      "projected_write_bytes": 100,
+      "scenario": "constrained_p0_safe"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "disposition": "BLOCK",
+      "pressure": "CRITICAL",
+      "priority": "P1",
+      "projected_free_bytes": 400,
+      "projected_write_bytes": 100,
+      "scenario": "critical_p1_blocked"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "blocked_code": null,
+      "disposition": "PROCEED",
+      "pressure": "NORMAL",
+      "priority": "P0",
+      "projected_free_bytes": 8000,
+      "projected_write_bytes": 1000,
+      "scenario": "floor_breach_p0_blocked"
+    }
+  ],
+  "schema_version": "1.0"
+}
