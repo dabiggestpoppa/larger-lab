@@ -813,9 +813,32 @@ def build_i08r1_streaming_quarantine_matrix(tmp: Path) -> dict:
 # Read-only gates + explicit publication
 # ---------------------------------------------------------------------------
 
+def build_i08r1_effect_atomicity_matrix_historical(tmp: Path) -> dict:
+    """HISTORICAL I08R1 effect-atomicity evidence, frozen at I08R2.
+
+    Chronology (I08R2 §1/§32): the committed matrix is the operator's
+    cited defect evidence — its ``operation_completed = false`` and
+    ``completed_operations = 0`` rows marked OK proved the I08R1
+    finalizer did not finalize.  I08R2 corrected the semantics
+    chronologically (real ``_replay_open_operations``), so LIVE
+    regeneration now diverges from this file BY DESIGN: the crash case
+    converges and the completed-operation count is 1.  The historical
+    file is therefore a frozen artifact: this builder returns the
+    committed payload so the parity gate proves BYTE PRESERVATION of the
+    superseded evidence, never live behavior.  The live-behavior proof
+    for these scenarios is now the I08R2 matrices (I08R2 §22).
+    """
+    del tmp
+    return json.loads(
+        (
+            EVIDENCE_DIR / "BLOC_04_I08R1_EFFECT_ATOMICITY_MATRIX.json"
+        ).read_text(encoding="utf-8")
+    )
+
+
 BUILDERS = [
     (
-        "build_i08r1_effect_atomicity_matrix",
+        "build_i08r1_effect_atomicity_matrix_historical",
         "BLOC_04_I08R1_EFFECT_ATOMICITY_MATRIX.json",
     ),
     ("build_i08r1_crash_truth_matrix", "BLOC_04_I08R1_CRASH_TRUTH_MATRIX.json"),

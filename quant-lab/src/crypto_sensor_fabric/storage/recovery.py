@@ -94,6 +94,17 @@ class RecoveryQuarantineConflict(RecoveryError):
     """Different bytes target one deterministic quarantine locator (I08 §30)."""
 
 
+class RecoveryOperationCorrupt(RecoveryError):
+    """A durable recovery-operation record failed canonical validation
+    (I08R2 §13/§14) or a terminal record lacks the exact final-action
+    evidence needed to reconstruct it (I08R2 §6).
+
+    Loading, retrying or replaying over such a record FAILS CLOSED —
+    a tampered or unreconstructable operation is never silently skipped,
+    healed by invention, or mistaken for a healthy one.
+    """
+
+
 class RecoveryPathSafetyError(RecoveryError):
     """A discovered path or planned destination escapes its root (I08 §29)."""
 
@@ -158,6 +169,243 @@ _ACTION_RECORD_MISSING_TARGET = "RECORD_MISSING_TARGET"
 _ACTION_RECORD_ACQUISITION_DEPENDENCY = "RECORD_ACQUISITION_DEPENDENCY"
 _ACTION_QUARANTINE_JOB = "QUARANTINE_JOB"
 _ACTION_RECORD_LOCK_ONLY = "RECORD_LOCK_ONLY"
+# I08R2 §18: the operator clear is a real mutating operation kind so its
+# replayable operation carries the same fingerprint doctrine as every
+# other effect (the constant was previously inline in clear_job_lock).
+_ACTION_OPERATE_CLEAR_JOB_LOCK = "OPERATOR_CLEAR_JOB_LOCK"
+
+# ---------------------------------------------------------------------------
+# Canonical operation-record validation (I08R2 §13/§14)
+# ---------------------------------------------------------------------------
+
+#: The operation-record envelope schema marker.  I08R1 records carry no
+#: marker and are validated with the identical canonical rules under the
+#: grandfathered marker "I08R1"; an UNKNOWN marker fails closed.
+_OP_SCHEMA_I08R1 = "I08R1"
+_OP_SCHEMA_I08R2 = "I08R2"
+_OP_SCHEMA_VALUES = (_OP_SCHEMA_I08R1, _OP_SCHEMA_I08R2)
+
+#: Full semantic field set of one operation-phase record.  An exact retry
+#: compares EVERY field here except ``registered_at`` (I08R2 §14) — the
+#: retired I08R1 adoption rule compared ``detail`` only, which let a
+#: divergent retry adopt a row that differed in any semantic field.
+_OPERATION_RECORD_FIELDS = (
+    "record_type",
+    "recovery_operation_id",
+    "operation_id",
+    "phase",
+    "op_schema",
+    "recovery_run_id",
+    "action_kind",
+    "object_type",
+    "object_id",
+    "problem",
+    "resolution",
+    "before_state",
+    "after_state",
+    "effect_identity",
+    "effect_detail_sha256",
+    "final_action_id",
+    "detail",
+    "registered_at",
+)
+
+#: EFFECT_COMMITTED physical record ids are detail-qualified with the
+#: FULL SHA-256 of the effect detail (I08R2 §14: the retired 16-hex-char
+#: truncation was a gratuitous collision surface).
+_EFFECT_DETAIL_KEY_LENGTH = 64
+
+
+def _effect_detail_key(detail: str | None) -> str:
+    """Full-digest physical key component for one EFFECT_COMMITTED row."""
+    return hashlib.sha256((detail or "").encode("utf-8")).hexdigest()
+
+
+def _validate_effect_detail_key(detail_key: str) -> None:
+    """A stored EFFECT key must be a FULL 64-hex-char SHA-256 (I08R2 §14)."""
+    if len(detail_key) != _EFFECT_DETAIL_KEY_LENGTH:
+        raise RecoveryOperationCorrupt(
+            f"EFFECT record key component is {len(detail_key)} chars; the "
+            "canonical schema requires the FULL 64-char SHA-256 effect "
+            "detail key (I08R2 §14: no truncated collision surface)"
+        )
+    try:
+        int(detail_key, 16)
+    except ValueError as exc:
+        raise RecoveryOperationCorrupt(
+            "EFFECT record key component is not hexadecimal; the record "
+            "is not canonically shaped (I08R2 §14)"
+        ) from exc
+
+
+def validate_operation_record(payload: Any) -> dict[str, Any]:
+    """Canonical validation of one durable recovery-operation record
+    (I08R2 §13/§14).
+
+    The operation id is RECOMPUTED from the payload's own semantic
+    fields and must equal the recorded phase-free ``operation_id``; the
+    phase-qualified logical id must match the stored physical identity;
+    every field is type-checked; registration time must parse as an
+    aware UTC timestamp; the schema marker must be known.  Any
+    divergence raises :class:`RecoveryOperationCorrupt` — a tampered or
+    malformed record fails closed on load, retry and replay.
+    """
+    if not isinstance(payload, dict):
+        raise RecoveryOperationCorrupt(
+            "recovery operation record is not a mapping (I08R2 §13)"
+        )
+    for field_name in _OPERATION_RECORD_FIELDS:
+        if field_name not in payload:
+            # I08R1 grandfathering: the records added in I08R2 are absent
+            # from legacy rows; everything else is mandatory.
+            if field_name in (
+                "op_schema",
+                "effect_identity",
+                "effect_detail_sha256",
+                "final_action_id",
+            ):
+                continue
+            raise RecoveryOperationCorrupt(
+                f"recovery operation record is missing required field "
+                f"{field_name!r} (I08R2 §13)"
+            )
+    schema = payload.get("op_schema", _OP_SCHEMA_I08R1)
+    if schema not in _OP_SCHEMA_VALUES:
+        raise RecoveryOperationCorrupt(
+            f"recovery operation record carries unknown schema marker "
+            f"{schema!r} (I08R2 §13)"
+        )
+    if payload["record_type"] != "recovery_operation":
+        raise RecoveryOperationCorrupt(
+            f"record_type {payload['record_type']!r} is not a recovery "
+            "operation record (I08R2 §13)"
+        )
+    phase = payload["phase"]
+    if phase not in RecoveryOperationJournal._PHASES:  # noqa: SLF001
+        raise RecoveryOperationCorrupt(
+            f"recovery operation record carries unknown phase {phase!r} "
+            "(I08R2 §12: illegal phase shape)"
+        )
+    for field_name in (
+        "recovery_run_id",
+        "action_kind",
+        "object_type",
+        "object_id",
+        "problem",
+        "resolution",
+    ):
+        value = payload[field_name]
+        if not isinstance(value, str) or not value:
+            raise RecoveryOperationCorrupt(
+                f"field {field_name!r} must be a nonempty string; got "
+                f"{value!r} (I08R2 §13)"
+            )
+    effect_identity = payload.get("effect_identity")
+    if effect_identity is not None and not isinstance(effect_identity, str):
+        raise RecoveryOperationCorrupt(
+            "effect_identity must be a string when present (I08R2 §9)"
+        )
+    if phase == RecoveryOperationJournal.PHASE_EFFECT_COMMITTED:
+        if effect_identity is None:
+            raise RecoveryOperationCorrupt(
+                "EFFECT_COMMITTED row without a durable effect_identity "
+                "fingerprint; the effect cannot be re-recognized "
+                "(I08R2 §9)"
+            )
+        if not isinstance(payload.get("effect_detail_sha256"), str):
+            raise RecoveryOperationCorrupt(
+                "EFFECT_COMMITTED row without effect_detail_sha256 "
+                "(I08R2 §14)"
+            )
+        recomputed_key = _effect_detail_key(payload.get("detail"))
+        if payload["effect_detail_sha256"] != recomputed_key:
+            raise RecoveryOperationCorrupt(
+                "EFFECT detail digest does not match the recorded detail; "
+                "the row was tampered (I08R2 §14)"
+            )
+        if not isinstance(payload.get("detail"), str) or not payload["detail"]:
+            raise RecoveryOperationCorrupt(
+                "EFFECT_COMMITTED row requires a nonempty detail "
+                "(I08R2 §14)"
+            )
+    final_action_id = payload.get("final_action_id")
+    if final_action_id is not None and not isinstance(final_action_id, str):
+        raise RecoveryOperationCorrupt(
+            "final_action_id must be a string when present (I08R2 §5)"
+        )
+    if phase in (
+        RecoveryOperationJournal.PHASE_COMPLETED,
+        RecoveryOperationJournal.PHASE_UNRESOLVED,
+    ):
+        # A terminal phase must name the exact final RecoveryAction it
+        # was sealed with (I08R2 §5): the terminal record carries enough
+        # durable final-outcome data to reconstruct the action.
+        if not final_action_id:
+            raise RecoveryOperationCorrupt(
+                f"{phase} terminal row without final_action_id; a terminal "
+                "operation cannot truthfully exist without its final "
+                "RecoveryAction (I08R2 §5/§6)"
+            )
+    try:
+        registered_at = datetime.fromisoformat(str(payload["registered_at"]))
+    except ValueError as exc:
+        raise RecoveryOperationCorrupt(
+            "registered_at is not an ISO-8601 timestamp (I08R2 §13)"
+        ) from exc
+    if registered_at.tzinfo is None:
+        raise RecoveryOperationCorrupt(
+            "registered_at must be timezone-aware UTC (I08R2 §13)"
+        )
+    # The identity is RECOMPUTED from the payload semantics (I08R2 §14:
+    # never trusted from the stored fields).
+    recomputed = RecoveryOperationJournal.operation_id(
+        recovery_run_id=payload["recovery_run_id"],
+        action_kind=payload["action_kind"],
+        object_type=payload["object_type"],
+        object_id=payload["object_id"],
+        problem=payload["problem"],
+        resolution=payload["resolution"],
+        before_state=_parse_state_field(payload.get("before_state")),
+        after_state=_parse_state_field(payload.get("after_state")),
+    )
+    if recomputed != payload["operation_id"]:
+        raise RecoveryOperationCorrupt(
+            "recovery operation identity does not match its semantic "
+            "payload; the record was tampered or is not canonical "
+            "(I08R2 §14)"
+        )
+    record_id = payload["recovery_operation_id"]
+    if phase == RecoveryOperationJournal.PHASE_EFFECT_COMMITTED:
+        expected_id = (
+            f"{payload['operation_id']}:"
+            f"{phase}:{payload['effect_detail_sha256']}"
+        )
+    else:
+        expected_id = f"{payload['operation_id']}:{phase}"
+    if record_id != expected_id:
+        raise RecoveryOperationCorrupt(
+            "phase-qualified record id does not match the canonical "
+            "identity of this row (I08R2 §13)"
+        )
+    return payload
+
+
+def _parse_state_field(raw: Any) -> dict[str, Any]:
+    """Operation rows store states as canonical JSON strings; parse typed."""
+    if raw is None:
+        return {}
+    if isinstance(raw, dict):
+        return dict(raw)
+    if isinstance(raw, str) and raw:
+        parsed = json.loads(raw)
+        if not isinstance(parsed, dict):
+            raise RecoveryOperationCorrupt(
+                "state field is not a JSON object (I08R2 §13)"
+            )
+        return dict(parsed)
+    raise RecoveryOperationCorrupt(
+        f"state field has unusable type {type(raw).__name__} (I08R2 §13)"
+    )
 
 # I08R1 §9: bounded-memory streaming constants for quarantine copies.
 _QUAR_COPY_CHUNK_BYTES = 1 << 20
@@ -228,6 +476,66 @@ def _sha256_file(path: Path) -> str:
 
 def _json_state(state: dict[str, Any] | None) -> str | None:
     return None if state is None else _canonical(state)
+
+
+def _relative_posix(path: Path, root: Path) -> str | None:
+    """POSIX relative form of ``path`` under ``root``, or None when the
+    path is not under the root (I08R2 §9 fingerprint fields never invent
+    a value they cannot derive)."""
+    try:
+        return path.relative_to(root).as_posix()
+    except ValueError:
+        return None
+
+
+def _intent_effect_kind(action_kind: str) -> str:
+    """Effect kind for one action kind (I08R2 §9 fingerprint fields)."""
+    if action_kind in (
+        _ACTION_QUARANTINE_CORRUPT_BLOB,
+        _ACTION_QUARANTINE_STAGING,
+        _ACTION_QUARANTINE_ORPHAN_PROJECTION,
+        _ACTION_QUARANTINE_UNKNOWN_CONTEXT,
+        _ACTION_QUARANTINE_JOB,
+        _ACTION_OPERATE_CLEAR_JOB_LOCK,
+    ):
+        return "QUARANTINE" if action_kind != _ACTION_OPERATE_CLEAR_JOB_LOCK else "LOCK_CLEAR"
+    if action_kind in (
+        _ACTION_RESOLVE_ORPHAN_BLOB,
+        _ACTION_RESOLVE_ORPHAN_MANIFEST,
+        _ACTION_CONTINUE_ORPHAN_BLOB,
+    ):
+        return "RECONCILE"
+    return "RECORD"
+
+
+def _intent_effect_category(action_kind: str) -> str | None:
+    """Quarantine category planned for one action kind (I08R2 §9)."""
+    if action_kind in (
+        _ACTION_QUARANTINE_CORRUPT_BLOB,
+        _ACTION_QUARANTINE_UNKNOWN_CONTEXT,
+    ):
+        # The corrupt-blob handler falls back to integrity quarantine for
+        # bytes failing their content identity even under the unknown-
+        # context action; the recorded plan states both truthfully.
+        return (
+            QUARANTINE_CATEGORY_INTEGRITY
+            if action_kind == _ACTION_QUARANTINE_CORRUPT_BLOB
+            else QUARANTINE_CATEGORY_UNKNOWN_CONTEXT
+        )
+    if action_kind == _ACTION_QUARANTINE_STAGING:
+        return QUARANTINE_CATEGORY_MALFORMED
+    if action_kind == _ACTION_QUARANTINE_ORPHAN_PROJECTION:
+        return QUARANTINE_CATEGORY_UNKNOWN_CONTEXT
+    return None
+
+
+def _intent_effect_suffix(action_kind: str) -> str:
+    """Deterministic quarantine file suffix planned for one action."""
+    if action_kind == _ACTION_QUARANTINE_STAGING:
+        return ".partial.quarantined"
+    if action_kind == _ACTION_QUARANTINE_ORPHAN_PROJECTION:
+        return ".parquet.quarantined"
+    return ".quarantined"
 
 
 @dataclass(frozen=True)
@@ -585,6 +893,8 @@ class RecoveryOperationJournal:
         after_state: dict[str, Any] | None = None,
         phase: str = PHASE_INTENT,
         detail: str | None = None,
+        effect_identity: str | None = None,
+        final_action_id: str | None = None,
         registered_at: datetime | None = None,
     ) -> tuple[str, bool]:
         """Append one phase of a recovery operation (idempotent on exact retry).
@@ -592,11 +902,28 @@ class RecoveryOperationJournal:
         The operation id is derived from (run, action_kind, object,
         planned semantics); the phase becomes part of the physical record
         key, so each phase is an APPEND of its own row (I08R1 §4: never a
-        mutation of one journal row)."""
+        mutation of one journal row).
+
+        I08R2 §5/§9/§14: terminal rows carry the exact
+        ``final_action_id`` they were sealed with; EFFECT rows carry the
+        canonical ``effect_identity`` fingerprint and are detail-keyed
+        with the FULL SHA-256 of the effect detail; every committed row
+        passes canonical validation before it is returned.
+        """
         if phase not in self._PHASES:
             raise RecoveryConfigurationError(
                 f"unknown recovery operation phase {phase!r}"
             )
+        if phase == self.PHASE_EFFECT_COMMITTED:
+            if not isinstance(detail, str) or not detail:
+                raise RecoveryConfigurationError(
+                    "EFFECT_COMMITTED rows require a nonempty effect detail"
+                )
+            if effect_identity is None:
+                raise RecoveryConfigurationError(
+                    "EFFECT_COMMITTED rows require the durable effect "
+                    "identity fingerprint (I08R2 §9)"
+                )
         operation_id = self.operation_id(
             recovery_run_id=recovery_run_id,
             action_kind=action_kind,
@@ -610,10 +937,13 @@ class RecoveryOperationJournal:
         # Each phase is its own append-only row.  EFFECT_COMMITTED rows are
         # detail-qualified: one operation may commit SEVERAL durable effects
         # (the orphan two-step reconciliation), each with its own row.
+        # I08R2 §14: the detail key is the FULL SHA-256 — the retired
+        # 16-char truncation was a gratuitous collision surface.
+        effect_detail_sha: str | None = None
         phase_key = phase
         if phase == self.PHASE_EFFECT_COMMITTED:
-            detail_key = hashlib.sha256((detail or "").encode("utf-8")).hexdigest()[:16]
-            phase_key = f"{phase}:{detail_key}"
+            effect_detail_sha = _effect_detail_key(detail)
+            phase_key = f"{phase}:{effect_detail_sha}"
         record_id = f"{operation_id}:{phase_key}"
         envelope: dict[str, Any] = {
             "record_type": "recovery_operation",
@@ -624,6 +954,7 @@ class RecoveryOperationJournal:
             "recovery_operation_id": record_id,
             "operation_id": operation_id,
             "phase": phase,
+            "op_schema": _OP_SCHEMA_I08R2,
             "recovery_run_id": recovery_run_id,
             "action_kind": action_kind,
             "object_type": object_type,
@@ -632,6 +963,9 @@ class RecoveryOperationJournal:
             "resolution": resolution,
             "before_state": _json_state(before_state),
             "after_state": _json_state(after_state),
+            "effect_identity": effect_identity,
+            "effect_detail_sha256": effect_detail_sha,
+            "final_action_id": final_action_id,
             "detail": detail,
             "registered_at": (
                 coerce_utc(registered_at).isoformat()
@@ -639,35 +973,58 @@ class RecoveryOperationJournal:
                 else datetime.now(UTC).isoformat()
             ),
         }
+        validate_operation_record(envelope)
         try:
             committed = self._catalog.commit(record_id, envelope)
         except JsonCatalogConflict as exc:
             existing = self._catalog.get(record_id)
-            if existing is not None and existing.get("detail") == envelope.get(
-                "detail"
+            if existing is not None and self._exact_retry(
+                existing, envelope
             ):
                 committed = existing
             else:
                 raise RecoveryActionConflict(
                     f"recovery operation {record_id[:12]}... already exists "
                     "with DIVERGENT phase content; nothing overwritten "
-                    "(I08R1 §4)"
+                    "(I08R1 §4 / I08R2 §14)"
                 ) from exc
         return operation_id, committed is not envelope
+
+    @staticmethod
+    def _exact_retry(existing: dict[str, Any], envelope: dict[str, Any]) -> bool:
+        """Exact-retry adoption compares EVERY semantic field except the
+        registration time (I08R2 §14) — the retired I08R1 rule compared
+        ``detail`` only and could adopt a divergent row."""
+        for field_name in _OPERATION_RECORD_FIELDS:
+            if field_name == "registered_at":
+                continue
+            if existing.get(field_name) != envelope.get(field_name):
+                return False
+        return True
+
+    def load_record(self, record_id: str) -> dict[str, Any]:
+        """Typed load of one operation record; canonical validation fails
+        closed on a tampered or malformed row (I08R2 §13/§14)."""
+        payload = self._catalog.get(record_id)
+        if payload is None:
+            raise RecoveryOperationCorrupt(
+                f"recovery operation record {record_id[:24]}... is absent"
+            )
+        return validate_operation_record(payload)
 
     def phases(self, operation_id: str) -> tuple[str, ...]:
         """Durably recorded phase labels of one operation, in frozen order.
 
         EFFECT_COMMITTED rows are detail-qualified (one operation may
         commit several durable effects); duplicates of the same phase
-        collapse to the first occurrence in frozen order."""
+        collapse to the first occurrence in frozen order.  I08R2 §14:
+        EFFECT keys are the FULL SHA-256 of the effect detail (legacy
+        I08R1 rows with truncated keys still match the prefix scan and
+        surface as corrupt on typed load)."""
         found: list[str] = []
         for phase in self._PHASES:
             if phase == self.PHASE_EFFECT_COMMITTED:
-                if any(
-                    rid.startswith(f"{operation_id}:{phase}:")
-                    for rid in self._catalog.list_ids()
-                ):
+                if self.effect_rows(operation_id):
                     found.append(phase)
             elif self._catalog.get(f"{operation_id}:{phase}") is not None:
                 found.append(phase)
@@ -675,14 +1032,26 @@ class RecoveryOperationJournal:
 
     def has_phase(self, operation_id: str, phase: str) -> bool:
         if phase == self.PHASE_EFFECT_COMMITTED:
-            return any(
-                rid.startswith(f"{operation_id}:{phase}:")
-                for rid in self._catalog.list_ids()
-            )
+            return bool(self.effect_rows(operation_id))
         return self._catalog.get(f"{operation_id}:{phase}") is not None
 
     def get_phase(self, operation_id: str, phase: str) -> dict[str, Any] | None:
+        if phase == self.PHASE_EFFECT_COMMITTED:
+            rows = self.effect_rows(operation_id)
+            return rows[0] if rows else None
         return self._catalog.get(f"{operation_id}:{phase}")
+
+    def effect_rows(self, operation_id: str) -> list[dict[str, Any]]:
+        """All durable EFFECT_COMMITTED rows of one operation, sorted by
+        their full detail-key (I08R2 §14)."""
+        prefix = f"{operation_id}:{self.PHASE_EFFECT_COMMITTED}:"
+        rows = [
+            payload
+            for rid in sorted(self._catalog.list_ids())
+            if rid.startswith(prefix)
+            and (payload := self._catalog.get(rid)) is not None
+        ]
+        return rows
 
     def all_operations(self) -> list[dict[str, Any]]:
         """Every durable operation-phase record (sorted by record id)."""
@@ -750,6 +1119,10 @@ class RecoveryEngine:
         self._journal = RecoveryJournal(self._t0_root)
         self._operations = RecoveryOperationJournal(self._t0_root)
         self._orphan_context: dict[str, tuple[Any, Any]] = {}
+        # I08R2 §2/§3: the report of the last open-operation replay —
+        # durable work the replayer performed, retained for evidence.
+        self._last_replay_report: list[dict[str, Any]] = []
+        self._last_action_id: str | None = None
         if recovery_run_id is not None and (
             not isinstance(recovery_run_id, str) or not recovery_run_id
         ):
@@ -799,6 +1172,12 @@ class RecoveryEngine:
     def operations(self) -> RecoveryOperationJournal:
         """The durable replayable-operation journal (I08R1 §4)."""
         return self._operations
+
+    @property
+    def last_replay_report(self) -> list[dict[str, Any]]:
+        """What the open-operation replay durably did at the last apply
+        (I08R2 §2/§3: durable work, never an ignored advisory list)."""
+        return list(self._last_replay_report)
 
     # -- containment (I08 §29) ----------------------------------------------
 
@@ -864,6 +1243,49 @@ class RecoveryEngine:
         self._assert_contained(destination, self._t0_root, "quarantine destination")
         return destination
 
+    def _intent_effect_destination(
+        self, planned: RecoveryPlanAction, content_sha: str | None
+    ) -> str | None:
+        """Deterministic quarantine destination RELPATH for one planned
+        effect (I08R2 §9): the exact locator the mutation will produce,
+        derived before the first irreversible byte moves."""
+        if _intent_effect_kind(planned.action_kind) != "QUARANTINE":
+            return None
+        if not content_sha:
+            return None
+        category = _intent_effect_category(planned.action_kind)
+        if category is None:
+            return None
+        relative = str((planned.before_state or {}).get("relative_path", ""))
+        suffix = _intent_effect_suffix(planned.action_kind)
+        if planned.action_kind == _ACTION_QUARANTINE_STAGING:
+            object_type = "staging"
+            object_id = relative
+        elif planned.action_kind == _ACTION_QUARANTINE_ORPHAN_PROJECTION:
+            object_type = "projection"
+            object_id = planned.object_id
+        elif planned.action_kind == _ACTION_QUARANTINE_UNKNOWN_CONTEXT:
+            # Unknown-context quarantine of a BLOB uses object_type
+            # "blob" with the blob sha as object id (the handler's own
+            # locator call); the projection variant carries the
+            # projection action kind and is handled above.
+            object_type = "blob"
+            object_id = planned.object_id
+        else:
+            object_type = "blob"
+            object_id = planned.object_id
+        try:
+            destination = self.quarantine_destination(
+                category,
+                object_type=object_type,
+                object_id=object_id,
+                content_sha256=content_sha,
+                suffix=suffix,
+            )
+        except RecoveryError:
+            return None
+        return _relative_posix(destination, self._t0_root)
+
     def _quarantine_file(
         self, source: Path, destination: Path, content_sha256: str
     ) -> bool:
@@ -928,135 +1350,652 @@ class RecoveryEngine:
         source.unlink(missing_ok=True)
         fsync_directory(source.parent)
 
-    # -- interrupted-operation continuation (I08R1 §6/§8) ---------------------
+    # -- interrupted-operation replay (I08R2 §3-§8) ---------------------------
 
-    def _finalize_open_operations(self) -> list[dict[str, Any]]:
-        """Adopt operations whose effect landed but whose outcome row died.
+    def _replay_open_operations(self) -> list[dict[str, Any]]:
+        """The ONE authoritative open-operation replayer (I08R2 §3).
 
-        I08R1 §6/§8: a crash AFTER a durable effect but BEFORE the final
-        RecoveryAction must converge on retry — the landed effect is
-        recognized as THIS operation's committed step (exact intent
-        semantics), never misread as a stale plan, and no new durable
-        mutation is invented here.  Adoption only runs inside APPLY
-        (an apply is the explicit recovery act); scan stays read-only.
+        Loads every durable recovery-operation record, VALIDATES it
+        canonically (tampered rows fail closed), groups rows by the
+        ORIGINAL operation id, determines each operation's durable
+        phase, inspects current storage truth and closes every operation
+        whose effect is MECHANICALLY PROVEN landed:
+
+        - missing EFFECT row appended (adopt, never re-execute);
+        - missing final RecoveryAction materialized from the exact
+          terminal/intent evidence;
+        - missing terminal phase appended (action-without-terminal);
+        - the ORIGINAL operation id and recovery_run_id are preserved —
+          a restart NEVER opens a second logical recovery operation for
+          an effect its original run already landed (I08R2 §8).
+
+        Genuinely incomplete INTENT-only operations (no proven effect)
+        stay OPEN or resolve typed-conflicted; an effect is never
+        invented here.  Returns the replay report (apply CONSUMES it as
+        durable work — the retired I08R1 finalizer returned an advisory
+        list that apply_plan ignored, I08R2 §2).
         """
-        adopted: list[dict[str, Any]] = []
+        report: list[dict[str, Any]] = []
+        grouped: dict[str, list[dict[str, Any]]] = {}
         for record in self._operations.all_operations():
-            phases = record.get("phase")
-            if phases not in ("INTENT", "EFFECT_COMMITTED"):
-                continue
-            if self._operations.has_phase(record["operation_id"], "COMPLETED"):
-                continue
-            if self._operations.has_phase(record["operation_id"], "UNRESOLVED"):
-                continue
-            # Operation rows store states as canonical JSON STRINGS
-            # (the frozen envelope keeps text columns); parse before use.
-            raw_before = record.get("before_state")
-            parsed_before: dict[str, Any] = {}
-            if isinstance(raw_before, str) and raw_before:
-                parsed_before = dict(json.loads(raw_before))
-            elif isinstance(raw_before, dict):
-                parsed_before = dict(raw_before)
-            planned = RecoveryPlanAction(
-                action_kind=record["action_kind"],
-                object_type=record["object_type"],
-                object_id=record["object_id"],
-                problem=record["problem"],
-                resolution=record["resolution"],
-                before_state=parsed_before,
+            # Canonical validation FAILS CLOSED on load (I08R2 §13/§14):
+            # a tampered operation row aborts the replay, never skipped.
+            validate_operation_record(record)
+            grouped.setdefault(record["operation_id"], []).append(record)
+        for operation_id, rows in sorted(grouped.items()):
+            phases = {row["phase"] for row in rows}
+            if RecoveryOperationJournal.PHASE_COMPLETED in phases and (
+                RecoveryOperationJournal.PHASE_UNRESOLVED in phases
+            ):
+                raise RecoveryOperationCorrupt(
+                    f"operation {operation_id[:16]}... carries BOTH terminal "
+                    "phases; the durable operation journal is corrupt "
+                    "(I08R2 §12)"
+                )
+            terminal = (
+                RecoveryOperationJournal.PHASE_COMPLETED
+                if RecoveryOperationJournal.PHASE_COMPLETED in phases
+                else (
+                    RecoveryOperationJournal.PHASE_UNRESOLVED
+                    if RecoveryOperationJournal.PHASE_UNRESOLVED in phases
+                    else None
+                )
             )
-            effect = self._effect_already_durable(planned)
+            # The INTENT row is the semantic base of the operation: its
+            # §9 fingerprint names the exact planned effect.  (Record-id
+            # order alone is NOT enough — EFFECT keys sort before INTENT.)
+            intent_rows = [
+                r
+                for r in rows
+                if r["phase"] == RecoveryOperationJournal.PHASE_INTENT
+            ]
+            if not intent_rows:
+                # EFFECT-without-INTENT and terminal-less foreign rows are
+                # illegal shapes (I08R2 §12): typed corruption, never skip.
+                raise RecoveryOperationCorrupt(
+                    f"operation {operation_id[:16]}... has no INTENT row "
+                    f"(phases {sorted(phases)}); EFFECT-without-INTENT is an "
+                    "illegal operation shape (I08R2 §12)"
+                )
+            base = intent_rows[0]
+            if terminal is not None:
+                self._replay_verify_terminal(operation_id, rows, terminal)
+                continue
+            run_id = base["recovery_run_id"]
+            planned = self._planned_from_record(base)
+            effect = self._recognize_landed_effect(base, planned)
             if effect is None:
+                # No-effect INTENT: genuinely incomplete work stays OPEN
+                # (or resolves typed-conflicted on a real retry) — an
+                # effect is never invented (I08R2 §3 step 9/§10).
+                report.append(
+                    {
+                        "operation_id": operation_id,
+                        "recovery_run_id": run_id,
+                        "disposition": "LEFT_OPEN_NO_PROVEN_EFFECT",
+                        "action_kind": base["action_kind"],
+                        "object_type": base["object_type"],
+                        "object_id": base["object_id"],
+                    }
+                )
                 continue
-            adopted.append(
-                {
-                    "operation_id": record["operation_id"],
-                    "action_kind": planned.action_kind,
-                    "object_type": planned.object_type,
-                    "object_id": planned.object_id,
-                    "effect": effect,
-                }
+            report.append(
+                self._close_landed_operation(
+                    operation_id, base, planned, run_id, effect
+                )
             )
-        return adopted
+        return report
 
-    def _effect_already_durable(self, planned: RecoveryPlanAction) -> str | None:
-        """Recognize THIS operation's durable effect (no new mutation).
+    def _replay_verify_terminal(
+        self,
+        operation_id: str,
+        rows: list[dict[str, Any]],
+        terminal: str,
+    ) -> None:
+        """Terminal-without-action must heal or FAIL CLOSED (I08R2 §6).
 
-        Evidence-only kinds adopt on their journaled RecoveryAction;
-        quarantine kinds adopt when the canonical object is already gone
-        under a prior durable record for the same object + problem.
-        Returns the adopted-effect description, or None.
+        The terminal row names its exact ``final_action_id``; the named
+        RecoveryAction must exist durably and belong to THIS operation
+        (same run, kind, object, problem).  A terminal row without a
+        final_action_id is corrupt; a named-but-absent action fails
+        closed — neither is silently considered healthy.
         """
-        if planned.action_kind in (
+        terminal_rows = [r for r in rows if r["phase"] == terminal]
+        for row in terminal_rows:
+            final_action_id = row.get("final_action_id")
+            if not final_action_id:
+                raise RecoveryOperationCorrupt(
+                    f"operation {operation_id[:16]}... has a {terminal} row "
+                    "without final_action_id; a terminal operation cannot "
+                    "truthfully exist without its final RecoveryAction "
+                    "(I08R2 §6)"
+                )
+            payload = self._journal.get(final_action_id)
+            if payload is None:
+                raise RecoveryOperationCorrupt(
+                    f"operation {operation_id[:16]}... names final RecoveryAction "
+                    f"{final_action_id[:16]}... which is NOT durable; exact "
+                    "reconstruction is impossible and the terminal record "
+                    "fails closed (I08R2 §6)"
+                )
+            if (
+                payload.get("recovery_run_id") != row.get("recovery_run_id")
+                or payload.get("action_kind") != row.get("action_kind")
+                or payload.get("object_type") != row.get("object_type")
+                or payload.get("object_id") != row.get("object_id")
+                or payload.get("problem") != row.get("problem")
+            ):
+                raise RecoveryOperationCorrupt(
+                    f"operation {operation_id[:16]}... names a final "
+                    "RecoveryAction belonging to a DIFFERENT operation; "
+                    "the journal is corrupt (I08R2 §6)"
+                )
+
+    def _planned_from_record(self, record: dict[str, Any]) -> RecoveryPlanAction:
+        """Rebuild the planned action from a validated record's semantics."""
+        return RecoveryPlanAction(
+            action_kind=record["action_kind"],
+            object_type=record["object_type"],
+            object_id=record["object_id"],
+            problem=record["problem"],
+            resolution=record["resolution"],
+            before_state=_parse_state_field(record.get("before_state")),
+        )
+
+    def _close_landed_operation(
+        self,
+        operation_id: str,
+        first: dict[str, Any],
+        planned: RecoveryPlanAction,
+        run_id: str,
+        effect: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Close one operation whose effect is mechanically proven landed
+        (I08R2 §7/§8) — under the ORIGINAL id, with no new run id and no
+        re-execution.
+
+        Order: missing EFFECT row appended (adopt) → final RecoveryAction
+        materialized from the exact durable evidence → terminal phase
+        appended sealed with that action id.  After this returns, the
+        operation satisfies the full terminality invariant.
+        """
+        if not self._operations.has_phase(
+            operation_id, RecoveryOperationJournal.PHASE_EFFECT_COMMITTED
+        ):
+            self._operations.record_phase(
+                recovery_run_id=run_id,
+                action_kind=planned.action_kind,
+                object_type=planned.object_type,
+                object_id=planned.object_id,
+                problem=planned.problem,
+                resolution=planned.resolution,
+                before_state=planned.before_state,
+                after_state=None,
+                phase=RecoveryOperationJournal.PHASE_EFFECT_COMMITTED,
+                detail=effect["detail"],
+                effect_identity=_canonical(
+                    {
+                        "planned": {
+                            "action_kind": planned.action_kind,
+                            "object_type": planned.object_type,
+                            "object_id": planned.object_id,
+                            "problem": planned.problem,
+                            "resolution": planned.resolution,
+                            "before_state": planned.before_state,
+                        },
+                        "effect": effect["fingerprint"],
+                        "detail": effect["detail"],
+                    }
+                ),
+                registered_at=self._clock(),
+            )
+        resolution = effect["resolution"]
+        action = self._journal_action(
+            run_id=run_id,
+            planned=planned,
+            resolution=resolution,
+            after_state=effect["after_state"],
+        )
+        self._record_outcome(
+            operation_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return {
+            "operation_id": operation_id,
+            "recovery_run_id": run_id,
+            "disposition": "CLOSED_EFFECT_PROVEN_LANDED",
+            "action_kind": planned.action_kind,
+            "object_type": planned.object_type,
+            "object_id": planned.object_id,
+            "effect": effect["detail"],
+            "final_action_id": self._final_id(action),
+            "terminal_phase": RecoveryOperationJournal.PHASE_COMPLETED,
+        }
+
+    def _recognize_landed_effect(
+        self, record: dict[str, Any], planned: RecoveryPlanAction
+    ) -> dict[str, Any] | None:
+        """Derive effect recognition from the INTENT fingerprint plus
+        CURRENT STORAGE TRUTH (I08R2 §10/§11).
+
+        The retired I08R1 ``_effect_already_durable`` required a prior
+        RecoveryAction to recognize an effect — circular, because the
+        crash case this replayer exists for is exactly the one where the
+        action never became durable.  Recognition here is mechanical:
+        the effect landed iff the durable bytes state matches the INTENT
+        plan exactly.  Returns the close-plan (detail, fingerprint,
+        resolution, after_state) or None when the effect is NOT proven.
+        """
+        kind = planned.action_kind
+        if kind in (
             _ACTION_RECORD_MISSING_TARGET,
             _ACTION_RECORD_ACQUISITION_DEPENDENCY,
             _ACTION_RECORD_LOCK_ONLY,
+            _ACTION_RECORD_UNREFERENCED_PROJECTION,
+            _ACTION_QUARANTINE_UNKNOWN_CONTEXT,
         ):
-            prior = self._journal.list_for_object(
-                planned.object_type, planned.object_id
-            )
-            if any(r.get("problem") == planned.problem for r in prior):
-                return "recovery evidence already recorded"
+            # I08R2 §20: record-only actions never carry an EFFECT row and
+            # are never replay-closed as completed effects; their evidence
+            # row (if the retry re-plans them) is the RecoveryAction.
             return None
-        if planned.action_kind in (
+        if kind in (
             _ACTION_QUARANTINE_CORRUPT_BLOB,
             _ACTION_QUARANTINE_STAGING,
             _ACTION_QUARANTINE_ORPHAN_PROJECTION,
-            _ACTION_QUARANTINE_UNKNOWN_CONTEXT,
         ):
-            relative = (planned.before_state or {}).get("relative_path")
-            if isinstance(relative, str) and relative:
-                canonical = self._t0_root / relative
-                if canonical.exists():
-                    return None
-                prior = self._journal.list_for_object(
-                    planned.object_type, planned.object_id
-                )
-                if any(r.get("problem") == planned.problem for r in prior):
-                    return "canonical object already absent (quarantined)"
+            return self._recognize_quarantine_effect(record, planned)
+        if kind == _ACTION_RESOLVE_ORPHAN_BLOB:
+            return self._recognize_orphan_blob_effect(record, planned)
+        if kind == _ACTION_RESOLVE_ORPHAN_MANIFEST:
+            return self._recognize_manifest_effect(record, planned)
+        if kind == _ACTION_QUARANTINE_JOB:
+            return self._recognize_job_divergence_effect(planned)
+        if kind == _ACTION_OPERATE_CLEAR_JOB_LOCK:
+            return self._recognize_lock_clear_effect(planned)
+        return None
+
+    def _recognize_lock_clear_effect(
+        self, planned: RecoveryPlanAction
+    ) -> dict[str, Any] | None:
+        """Lock-clear replay (I08R2 §18): the effect is proven ONLY by the
+        lock file's ABSENCE at the INTENT-fingerprinted path — storage
+        truth, never a journaled claim (the I08R1 order journaled
+        ``cleared: true`` BEFORE the unlink, which is exactly the false
+        evidence this replay refuses to trust)."""
+        relative = str((planned.before_state or {}).get("relative_path", ""))
+        if not relative:
             return None
-        if planned.action_kind == _ACTION_RESOLVE_ORPHAN_BLOB:
-            sha_part = planned.object_id
+        lock_path = self._t0_root / relative
+        if lock_path.exists():
+            # The clear never happened: the operation stays open (a real
+            # re-clear re-executes through clear_job_lock authority).
+            return None
+        fingerprint = {
+            "kind": "LOCK_CLEAR",
+            "lock_fingerprint": planned.object_id,
+            "expected_job_id": None,
+            "relative_path": relative,
+        }
+        return {
+            "detail": (
+                "lock file verified absent at the INTENT-fingerprinted "
+                "path (I08R2 §18)"
+            ),
+            "fingerprint": fingerprint,
+            "resolution": (
+                "COMPLETED: explicit lock clear adopted from the original "
+                "operation's INTENT fingerprint — the lock file is absent "
+                "at the planned path (I08R2 §18)"
+            ),
+            "after_state": {
+                "lock_present": False,
+                "cleared": True,
+                "replayed": True,
+            },
+        }
+
+    def _recognize_quarantine_effect(
+        self, record: dict[str, Any], planned: RecoveryPlanAction
+    ) -> dict[str, Any] | None:
+        """Quarantine replay truth table (I08R2 §10, cases A-E).
+
+        The destination is re-derived from the INTENT plan (category,
+        object ids, suffix) and the CURRENT bytes; the source state is
+        read from disk.  Only the EXACT planned artifact at the EXACT
+        planned locator proves the effect.
+        """
+        category = _intent_effect_category(planned.action_kind)
+        if category is None:
+            return None
+        suffix = _intent_effect_suffix(planned.action_kind)
+        relative = str((planned.before_state or {}).get("relative_path", ""))
+        if planned.action_kind == _ACTION_QUARANTINE_STAGING:
+            object_type = "staging"
+            object_id = relative
+        elif planned.action_kind == _ACTION_QUARANTINE_ORPHAN_PROJECTION:
+            object_type = "projection"
+            object_id = planned.object_id
+        else:
+            object_type = "blob"
+            object_id = planned.object_id
+        source = self._t0_root / relative if relative else None
+        if source is None and object_type == "blob" and object_id:
+            # CORRUPT_BLOB findings carry no relative_path: the canonical
+            # location is content-addressed (object id + encoding).
             encoding_value = (planned.before_state or {}).get(
                 "storage_encoding", "NONE"
             )
             try:
-                encoding = StorageEncodingValue(encoding_value)
+                source = self._blob_object_path(
+                    object_id, StorageEncodingValue(encoding_value)
+                )
             except ValueError:
-                return None
-            object_path = self._blob_object_path(sha_part, encoding)
-            if object_path.exists():
-                return None
-            context = self._orphan_context.get(sha_part)
-            if context is not None:
-                _evidence_blob, acquisition = context
-                try:
-                    existing = self._acquisitions.get_acquisition(
-                        acquisition.acquisition_id
-                    )
-                except Exception:
-                    return None
-                if existing.model_dump() == acquisition.model_dump():
-                    return "reconciliation steps already committed"
-                return None
-            return None
-        if planned.action_kind == _ACTION_RESOLVE_ORPHAN_MANIFEST:
-            manifest = self._manifest_by_id(planned.object_id)
-            if manifest is None:
-                return None
+                source = None
+        destination_rel = None
+        destination = None
+        # Case E (destination durable but bytes differ) is decided per
+        # candidate locator below; first derive the planned locator from
+        # the actual source bytes when the source still exists.
+        source_sha: str | None = None
+        if source is not None and source.exists():
             try:
-                chain_ids = {
-                    m.partition_manifest_id
-                    for m in self._manifests.list_manifest_versions(
-                        manifest.partition_key
-                    )
-                }
-            except Exception:
+                source_sha = _sha256_file(source)
+            except OSError:
+                source_sha = None
+        if source_sha is not None:
+            try:
+                destination = self.quarantine_destination(
+                    category,
+                    object_type=object_type,
+                    object_id=object_id,
+                    content_sha256=source_sha,
+                    suffix=suffix,
+                )
+                destination_rel = _relative_posix(destination, self._t0_root)
+            except RecoveryError:
+                destination = None
+        fingerprint = {
+            "kind": "QUARANTINE",
+            "quarantine_category": category,
+            "source_relative_path": relative or None,
+            "expected_source_byte_length": (
+                planned.before_state or {}
+            ).get("byte_length"),
+            "source_content_sha256": source_sha,
+            "destination_relative_path": destination_rel,
+            "destination_content_sha256": (
+                source_sha if destination is not None else None
+            ),
+        }
+        # -- case A: INTENT durable, source present, no destination -------
+        if source is not None and source.exists() and destination is not None:
+            if not destination.exists():
                 return None
-            if manifest.partition_manifest_id in chain_ids:
-                return "manifest already joined the committed chain"
+            dest_sha = _sha256_file(destination)
+            # -- case D: destination exists with DIFFERENT bytes ----------
+            if dest_sha != source_sha:
+                raise RecoveryOperationCorrupt(
+                    f"quarantine destination {destination.name} holds bytes "
+                    "that differ from the INTENT-fingerprinted source; the "
+                    "durable effect state conflicts (I08R2 §10 case D)"
+                )
+            # -- case B: destination durable AND source still present -----
+            # The exact planned artifact is durable; the source unlink is
+            # the remaining mechanical step: finish it, then close the
+            # ORIGINAL operation (I08R2 §10 case B).
+            self._unlink_source_after_durable_destination(source, destination)
+            return {
+                "detail": (
+                    "quarantine destination verified from the INTENT "
+                    "fingerprint; remaining source unlink finished by "
+                    "replay (I08R2 §10 case B)"
+                ),
+                "fingerprint": fingerprint,
+                "resolution": (
+                    "COMPLETED: quarantine effect verified durable from the "
+                    "original operation's INTENT fingerprint and the "
+                    "remaining source unlink finished (I08R2 §10 case B)"
+                ),
+                "after_state": {
+                    "quarantined": True,
+                    "quarantine_category": category,
+                    "quarantine_bytes_sha256": source_sha,
+                    "canonical_state": "ABSENT_QUARANTINED",
+                    "replayed": True,
+                },
+            }
+        # Source absent: the effect is proven ONLY by the exact planned
+        # artifact at the exact planned locator — which requires the
+        # source bytes' sha.  The INTENT recorded the source content sha
+        # when it was known; use it, never a guess (I08R2 §10 case C).
+        intent_identity = record.get("effect_identity")
+        if not isinstance(intent_identity, str) or not intent_identity:
             return None
-        return None
+        try:
+            intent_effect = json.loads(intent_identity)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(intent_effect, dict):
+            return None
+        intent_sha = intent_effect.get("source_content_sha256")
+        if not isinstance(intent_sha, str) or not _is_sha256_hex(intent_sha):
+            # No exact content identity in the INTENT: the effect cannot
+            # be PROVEN — never invented (I08R2 §10 case C guard).
+            return None
+        try:
+            destination = self.quarantine_destination(
+                category,
+                object_type=object_type,
+                object_id=object_id,
+                content_sha256=intent_sha,
+                suffix=suffix,
+            )
+        except RecoveryError:
+            return None
+        if not destination.exists():
+            # -- case E': BOTH absent — the operation stays open or
+            # resolves typed-corrupt on a real retry; it NEVER falsely
+            # completes (I08R2 §10 case E).
+            return None
+        dest_sha = _sha256_file(destination)
+        if dest_sha != intent_sha:
+            raise RecoveryOperationCorrupt(
+                f"quarantine destination {destination.name} holds bytes that "
+                "differ from the INTENT fingerprint; the durable effect "
+                "state conflicts (I08R2 §10 case D)"
+            )
+        fingerprint = {
+            "kind": "QUARANTINE",
+            "quarantine_category": category,
+            "source_relative_path": relative or None,
+            "expected_source_byte_length": (
+                planned.before_state or {}
+            ).get("byte_length"),
+            "source_content_sha256": intent_sha,
+            "destination_relative_path": _relative_posix(
+                destination, self._t0_root
+            ),
+            "destination_content_sha256": intent_sha,
+        }
+        # -- case C: destination durable, source absent --------------------
+        return {
+            "detail": (
+                "quarantine artifact verified byte-exact at the "
+                "INTENT-planned locator with the source absent "
+                "(I08R2 §10 case C)"
+            ),
+            "fingerprint": fingerprint,
+            "resolution": (
+                "COMPLETED: quarantine effect adopted from the original "
+                "operation's INTENT fingerprint — destination byte-exact, "
+                "source absent (I08R2 §10 case C)"
+            ),
+            "after_state": {
+                "quarantined": True,
+                "quarantine_category": category,
+                "quarantine_bytes_sha256": intent_sha,
+                "canonical_state": "ABSENT_QUARANTINED",
+                "replayed": True,
+            },
+        }
+
+    def _recognize_orphan_blob_effect(
+        self, record: dict[str, Any], planned: RecoveryPlanAction
+    ) -> dict[str, Any] | None:
+        """Orphan-blob reconciliation replay (I08R2 §10/§11): the effect
+        is proven only by the EXACT durable metadata/acquisition named in
+        the INTENT fingerprint."""
+        intent_identity = record.get("effect_identity")
+        if not isinstance(intent_identity, str) or not intent_identity:
+            return None
+        try:
+            intent_effect = json.loads(intent_identity)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(intent_effect, dict):
+            return None
+        plan = intent_effect.get("effect_plan") or {}
+        if plan.get("reconciliation") != "ORPHAN_BLOB":
+            return None
+        blob_sha = plan.get("blob_sha256")
+        acquisition_id = plan.get("expected_acquisition_id")
+        acquisition_fp = plan.get("acquisition_fingerprint")
+        if not isinstance(blob_sha, str) or blob_sha != planned.object_id:
+            return None
+        if not isinstance(acquisition_id, str) or not acquisition_id:
+            return None
+        # Mechanical proof: the exact acquisition named by the INTENT is
+        # durable with EXACTLY the fingerprinted semantics.
+        try:
+            existing = self._acquisitions.get_acquisition(acquisition_id)
+        except Exception:
+            return None
+        if _canonical(existing.model_dump()) != (acquisition_fp or ""):
+            return None
+        fingerprint = {
+            "kind": "RECONCILE",
+            "reconciliation": "ORPHAN_BLOB",
+            "blob_sha256": blob_sha,
+            "expected_acquisition_id": acquisition_id,
+            "acquisition_fingerprint": acquisition_fp,
+        }
+        return {
+            "detail": (
+                "reconciliation steps verified durable from the INTENT "
+                "fingerprint (exact metadata + acquisition) (I08R2 §10)"
+            ),
+            "fingerprint": fingerprint,
+            "resolution": (
+                "COMPLETED: orphan reconciliation adopted from the original "
+                "operation's INTENT fingerprint — the exact acquisition "
+                "named there is durable with exact semantics (I08R2 §10)"
+            ),
+            "after_state": {
+                "reconciled": True,
+                "acquisition_id": acquisition_id,
+                "replayed": True,
+            },
+        }
+
+    def _recognize_manifest_effect(
+        self, record: dict[str, Any], planned: RecoveryPlanAction
+    ) -> dict[str, Any] | None:
+        """Manifest reconciliation replay (I08R2 §10/§11): the effect is
+        proven only when the EXACT manifest named by the INTENT is in the
+        committed chain."""
+        intent_identity = record.get("effect_identity")
+        if not isinstance(intent_identity, str) or not intent_identity:
+            return None
+        try:
+            intent_effect = json.loads(intent_identity)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(intent_effect, dict):
+            return None
+        plan = intent_effect.get("effect_plan") or {}
+        if plan.get("reconciliation") != "ORPHAN_MANIFEST":
+            return None
+        manifest_id = plan.get("manifest_id")
+        if not isinstance(manifest_id, str) or manifest_id != planned.object_id:
+            return None
+        manifest = self._manifest_by_id(manifest_id)
+        if manifest is None:
+            return None
+        try:
+            chain_ids = {
+                m.partition_manifest_id
+                for m in self._manifests.list_manifest_versions(
+                    manifest.partition_key
+                )
+            }
+        except Exception:
+            return None
+        if manifest.partition_manifest_id not in chain_ids:
+            return None
+        fingerprint = {
+            "kind": "RECONCILE",
+            "reconciliation": "ORPHAN_MANIFEST",
+            "partition_key": plan.get("partition_key"),
+            "manifest_id": manifest_id,
+            "manifest_version": plan.get("manifest_version"),
+            "supersedes_id": plan.get("supersedes_id"),
+        }
+        return {
+            "detail": (
+                "manifest verified in the committed chain from the INTENT "
+                "fingerprint (I08R2 §10)"
+            ),
+            "fingerprint": fingerprint,
+            "resolution": (
+                "COMPLETED: manifest reconciliation adopted from the "
+                "original operation's INTENT fingerprint — the exact "
+                "manifest named there is committed-chain truth (I08R2 §10)"
+            ),
+            "after_state": {
+                "reconciled_into_chain": True,
+                "replayed": True,
+            },
+        }
+
+    def _recognize_job_divergence_effect(
+        self, planned: RecoveryPlanAction
+    ) -> dict[str, Any] | None:
+        """Job-quarantine replay (I08R2 §10/§11): the effect is proven
+        only when the job's CURRENT durable status is QUARANTINED."""
+        if self._jobs is None:
+            return None
+        try:
+            job = self._jobs.get_job(planned.object_id)
+        except Exception:
+            return None
+        status = getattr(job, "status", None)
+        if getattr(status, "value", status) != "QUARANTINED":
+            return None
+        fingerprint = {
+            "kind": "RECONCILE",
+            "reconciliation": "JOB_QUARANTINE",
+            "job_id": planned.object_id,
+            "status": "QUARANTINED",
+        }
+        return {
+            "detail": (
+                "job verified QUARANTINED in durable status from the INTENT "
+                "plan (I08R2 §10)"
+            ),
+            "fingerprint": fingerprint,
+            "resolution": (
+                "COMPLETED: job quarantine adopted from the original "
+                "operation's INTENT fingerprint — the durable status is "
+                "QUARANTINED (I08R2 §10)"
+            ),
+            "after_state": {
+                "status": "QUARANTINED",
+                "replayed": True,
+            },
+        }
 
     # -- phase 1: SCAN (READ-ONLY, I08 §5) -----------------------------------
 
@@ -1888,10 +2827,12 @@ class RecoveryEngine:
         dependencies) produce evidence records WITHOUT mutation.
         """
         run_id = recovery_run_id or result.recovery_run_id
-        # I08R1 §6/§8: interrupted-but-landed operations adopt FIRST so a
-        # restarted apply recognizes its own prior effect instead of
-        # re-planning over it (or misreading it as stale).
-        self._finalize_open_operations()
+        # I08R2 §2/§3: interrupted-but-landed operations are REPLAYED —
+        # durable work (missing effects adopted, final RecoveryActions
+        # materialized, terminal phases appended, ORIGINAL operation ids
+        # closed) — and the report is retained, never an ignored
+        # advisory return like the retired I08R1 finalizer.
+        self._last_replay_report = self._replay_open_operations()
         applied: list[RecoveryAction] = []
         for planned in result.planned_actions:
             action = self._apply_one(planned, run_id)
@@ -1959,9 +2900,22 @@ class RecoveryEngine:
             registered_at=self._clock(),
             action_kind=planned.action_kind,
         )
+        # I08R2 §5: the durable action id is retained so the terminal
+        # operation phase can be sealed with the EXACT final RecoveryAction.
+        self._last_action_id = action_id
         payload = self._journal.get(action_id)
         assert payload is not None
         return self._journal.to_recovery_action(payload)
+
+    def _final_id(self, action: RecoveryAction | None) -> str | None:
+        """The durable id of the last journaled RecoveryAction (I08R2 §5).
+
+        The frozen-model conversion of an internal envelope (staging,
+        job locks) returns None, but the durable row EXISTS — its id is
+        the terminal seal, regardless of the frozen-model projection.
+        """
+        del action
+        return self._last_action_id
 
     # -- replayable-operation phases (I08R1 §4/§5) ----------------------------
 
@@ -1979,14 +2933,51 @@ class RecoveryEngine:
             after_state=None,
         )
 
-    def _record_intent(self, planned: RecoveryPlanAction, run_id: str) -> str:
+    def _record_intent(
+        self,
+        planned: RecoveryPlanAction,
+        run_id: str,
+        *,
+        effect_plan: dict[str, Any] | None = None,
+        content_sha: str | None = None,
+    ) -> str:
         """Durably record INTENT before the first irreversible effect.
 
         I08R1 §5: if intent publication fails, the exception escapes
         BEFORE any mutation has been attempted — an effect can never
         outrun its recovery evidence.  Exact retries are idempotent.
-        Returns the deterministic operation id."""
+        I08R2 §9: the INTENT carries the EFFECT PLAN fingerprint (kind,
+        category, source/destination identity + content shas) so the
+        exact landed effect is re-recognizable from the INTENT plus
+        storage truth alone — never from a RecoveryAction that may not
+        exist yet.  Returns the deterministic operation id."""
         op_id = self._operation_id(planned, run_id)
+        intent_effect = {
+            "kind": _intent_effect_kind(planned.action_kind),
+            "quarantine_category": _intent_effect_category(
+                planned.action_kind
+            ),
+            "source_relative_path": _relative_posix(
+                self._t0_root
+                / str(
+                    (planned.before_state or {}).get("relative_path", "")
+                ),
+                self._t0_root,
+            )
+            if _intent_effect_kind(planned.action_kind) == "QUARANTINE"
+            else None,
+            "expected_source_byte_length": (
+                planned.before_state or {}
+            ).get("byte_length"),
+            "source_content_sha256": content_sha,
+            "destination_relative_path": (
+                self._intent_effect_destination(planned, content_sha)
+                if content_sha
+                else None
+            ),
+            "destination_content_sha256": content_sha,
+            "effect_plan": effect_plan or {},
+        }
         self._operations.record_phase(
             recovery_run_id=run_id,
             action_kind=planned.action_kind,
@@ -1998,7 +2989,8 @@ class RecoveryEngine:
             after_state=None,
             phase=RecoveryOperationJournal.PHASE_INTENT,
             detail="durable intent recorded before the first irreversible "
-            "effect (I08R1 §5)",
+            "effect (I08R1 §5; effect fingerprint I08R2 §9)",
+            effect_identity=_canonical(intent_effect),
             registered_at=self._clock(),
         )
         return op_id
@@ -2010,9 +3002,30 @@ class RecoveryEngine:
         run_id: str,
         *,
         detail: str,
+        effect: dict[str, Any] | None = None,
     ) -> None:
         """Append an EFFECT_COMMITTED phase row after one irreversible
-        effect became durable (I08R1 §4: append-only, never in-place)."""
+        effect became durable (I08R1 §4: append-only, never in-place).
+
+        I08R2 §9: the row carries the CANONICAL effect identity — the
+        full planned semantics plus the effect plan fingerprint — so the
+        landed effect is re-recognizable from durable evidence alone,
+        never from a RecoveryAction that may not exist yet.
+        """
+        identity = _canonical(
+            {
+                "planned": {
+                    "action_kind": planned.action_kind,
+                    "object_type": planned.object_type,
+                    "object_id": planned.object_id,
+                    "problem": planned.problem,
+                    "resolution": planned.resolution,
+                    "before_state": planned.before_state,
+                },
+                "effect": effect or {},
+                "detail": detail,
+            }
+        )
         self._operations.record_phase(
             recovery_run_id=run_id,
             action_kind=planned.action_kind,
@@ -2024,6 +3037,7 @@ class RecoveryEngine:
             after_state=None,
             phase=RecoveryOperationJournal.PHASE_EFFECT_COMMITTED,
             detail=detail,
+            effect_identity=identity,
             registered_at=self._clock(),
         )
 
@@ -2042,8 +3056,7 @@ class RecoveryEngine:
             f"UNRESOLVED: the repository APIs refused the {step} "
             f"({refusal_type}); nothing registered, nothing overwritten"
         )
-        self._record_outcome(op_id, planned, run_id, resolution=resolution)
-        return self._journal_action(
+        action = self._journal_action(
             run_id=run_id,
             planned=planned,
             resolution=resolution,
@@ -2053,6 +3066,15 @@ class RecoveryEngine:
                 "refused_step": step,
             },
         )
+        # I08R2 §5: final RecoveryAction durable BEFORE the terminal phase.
+        self._record_outcome(
+            op_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     def _record_outcome(
         self,
@@ -2061,13 +3083,25 @@ class RecoveryEngine:
         run_id: str,
         *,
         resolution: str,
+        final_action_id: str | None = None,
     ) -> None:
-        """Append the final COMPLETED/UNRESOLVED phase of one operation."""
+        """Append the final COMPLETED/UNRESOLVED phase of one operation.
+
+        I08R2 §5: the terminal row is sealed with the exact
+        ``final_action_id`` of the durable final RecoveryAction, so a
+        terminal operation can never naturally exist without its final
+        action and a restart can reconstruct the action exactly."""
         phase = (
             RecoveryOperationJournal.PHASE_UNRESOLVED
             if resolution.startswith("UNRESOLVED")
             else RecoveryOperationJournal.PHASE_COMPLETED
         )
+        detail = resolution
+        if final_action_id:
+            detail = (
+                f"{resolution} | final RecoveryAction {final_action_id} "
+                "durable before this terminal phase (I08R2 §5)"
+            )
         self._operations.record_phase(
             recovery_run_id=run_id,
             action_kind=planned.action_kind,
@@ -2078,7 +3112,8 @@ class RecoveryEngine:
             before_state=planned.before_state,
             after_state=None,
             phase=phase,
-            detail=resolution,
+            detail=detail,
+            final_action_id=final_action_id,
             registered_at=self._clock(),
         )
 
@@ -2126,17 +3161,12 @@ class RecoveryEngine:
                 StorageObjectType.EVIDENCE_BLOB.value, sha_part
             )
             if prior:
-                # I08R1 §6: an interrupted operation whose effect already
-                # exists converges to a COMPLETED operation on retry.
-                self._record_outcome(
-                    self._operation_id(planned, run_id),
-                    planned,
-                    run_id,
-                    resolution=(
-                        "COMPLETED: canonical object already absent under a "
-                        "prior durable recovery record; nothing duplicated"
-                    ),
-                )
+                # I08R2 §8: the landed effect already belongs to its
+                # ORIGINAL operation — the replay at apply start closed
+                # that operation under its original id (INTENT
+                # fingerprint + storage truth), so a restarted run must
+                # NOT open a second logical recovery operation for the
+                # same landed effect.  Nothing to do here.
                 return None
             return self._journal_action(
                 run_id=run_id,
@@ -2148,6 +3178,7 @@ class RecoveryEngine:
                 ),
                 after_state={"physical_present": False},
             )
+
         self._assert_contained(object_path, self._t0_root, "canonical blob")
         content_sha = _sha256_file(object_path)
         destination = self.quarantine_destination(
@@ -2158,7 +3189,10 @@ class RecoveryEngine:
             suffix=".quarantined",
         )
         # I08R1 §5: durable INTENT precedes the irreversible move.
-        op_id = self._record_intent(planned, run_id)
+        # I08R2 §9: the INTENT carries the exact effect fingerprint
+        # (source relpath, byte length, content sha, category, planned
+        # destination relpath + content sha) derived BEFORE the move.
+        op_id = self._record_intent(planned, run_id, content_sha=content_sha)
         moved = self._quarantine_file(object_path, destination, content_sha)
         # After _quarantine_file returns, the effect IS durable in BOTH
         # branches: freshly moved, or an identical artifact adopted and
@@ -2174,6 +3208,21 @@ class RecoveryEngine:
                 else "identical quarantine artifact adopted; canonical "
                 "source unlinked (exact retry)"
             ),
+            effect={
+                "kind": "QUARANTINE",
+                "quarantine_category": QUARANTINE_CATEGORY_INTEGRITY,
+                "source_relative_path": _relative_posix(
+                    object_path, self._t0_root
+                ),
+                "expected_source_byte_length": planned.before_state.get(
+                    "byte_length"
+                ),
+                "source_content_sha256": content_sha,
+                "destination_relative_path": _relative_posix(
+                    destination, self._t0_root
+                ),
+                "destination_content_sha256": content_sha,
+            },
         )
         # Canonical location now unusable; try to append the explicit
         # quarantine metadata row through the PUBLIC API.  The physical
@@ -2210,8 +3259,10 @@ class RecoveryEngine:
             "canonical object NOT overwritten; acquisition/manifest "
             "history preserved"
         )
-        self._record_outcome(op_id, planned, run_id, resolution=resolution)
-        return self._journal_action(
+        # I08R2 §5: final RecoveryAction durable BEFORE the terminal phase
+        # (a crash between the two leaves an EFFECT-only operation the
+        # replayer closes under the ORIGINAL id — never a bare terminal).
+        action = self._journal_action(
             run_id=run_id,
             planned=planned,
             resolution=resolution,
@@ -2223,6 +3274,14 @@ class RecoveryEngine:
                 "metadata_gate": metadata_gate,
             },
         )
+        self._record_outcome(
+            op_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     def _execute_orphan_blob(
         self, planned: RecoveryPlanAction, run_id: str
@@ -2268,7 +3327,25 @@ class RecoveryEngine:
                     f"match the orphan {sha_part} (I08R1 §7 preflight)"
                 )
             # Durable INTENT precedes the first irreversible effect.
-            op_id = self._record_intent(planned, run_id)
+            # I08R2 §9: the INTENT fingerprint names the blob sha, the
+            # expected EvidenceBlob semantic fingerprint, the expected
+            # acquisition id and the expected AcquisitionRecord semantic
+            # fingerprint.
+            op_id = self._record_intent(
+                planned,
+                run_id,
+                effect_plan={
+                    "reconciliation": "ORPHAN_BLOB",
+                    "blob_sha256": sha_part,
+                    "evidence_blob_fingerprint": _canonical(
+                        evidence_blob.model_dump()
+                    ),
+                    "expected_acquisition_id": acquisition.acquisition_id,
+                    "acquisition_fingerprint": _canonical(
+                        acquisition.model_dump()
+                    ),
+                },
+            )
             # -- step 1: append/adopt the EXACT EvidenceBlob metadata -------
             existing_metas: tuple[Any, ...] = ()
             try:
@@ -2336,8 +3413,8 @@ class RecoveryEngine:
                 "durable context proven and bytes verified (I08 §12); "
                 "replayable multi-step operation (I08R1 §7)"
             )
-            self._record_outcome(op_id, planned, run_id, resolution=resolution)
-            return self._journal_action(
+            # I08R2 §5: action first, terminal second.
+            action = self._journal_action(
                 run_id=run_id,
                 planned=planned,
                 resolution=resolution,
@@ -2348,6 +3425,14 @@ class RecoveryEngine:
                     ),
                 },
             )
+            self._record_outcome(
+                op_id,
+                planned,
+                run_id,
+                resolution=resolution,
+                final_action_id=self._final_id(action),
+            )
+            return action
         # No proven context (or durable metadata appeared making the orphan
         # premise stale).  Bytes that contradict their content-addressed
         # name are corrupt (integrity) regardless of registered context.
@@ -2373,7 +3458,7 @@ class RecoveryEngine:
             content_sha256=content_sha,
             suffix=".quarantined",
         )
-        op_id = self._record_intent(planned, run_id)
+        op_id = self._record_intent(planned, run_id, content_sha=content_sha)
         moved = self._quarantine_file(object_path, destination, content_sha)
         if moved:
             self._record_effect(
@@ -2381,6 +3466,21 @@ class RecoveryEngine:
                 planned,
                 run_id,
                 detail=f"orphan bytes moved to quarantine/{category}",
+                effect={
+                    "kind": "QUARANTINE",
+                    "quarantine_category": category,
+                    "source_relative_path": _relative_posix(
+                        object_path, self._t0_root
+                    ),
+                    "expected_source_byte_length": (
+                        planned.before_state or {}
+                    ).get("byte_length"),
+                    "source_content_sha256": content_sha,
+                    "destination_relative_path": _relative_posix(
+                        destination, self._t0_root
+                    ),
+                    "destination_content_sha256": content_sha,
+                },
             )
         resolution = (
             "QUARANTINE: no durable context proves the request identity; "
@@ -2389,8 +3489,8 @@ class RecoveryEngine:
             else "QUARANTINE_INTEGRITY: orphan bytes fail their "
             "content-addressed name; treated as corrupt, never repaired"
         )
-        self._record_outcome(op_id, planned, run_id, resolution=resolution)
-        return self._journal_action(
+        # I08R2 §5: action first, terminal second.
+        action = self._journal_action(
             run_id=run_id,
             planned=planned,
             resolution=resolution,
@@ -2400,6 +3500,14 @@ class RecoveryEngine:
                 "quarantine_bytes_sha256": content_sha,
             },
         )
+        self._record_outcome(
+            op_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     def _execute_continue_orphan_blob(
         self, planned: RecoveryPlanAction, run_id: str
@@ -2463,7 +3571,21 @@ class RecoveryEngine:
                 f"the orphan {sha_part} (I08R1 §7 preflight)"
             )
         # Durable INTENT precedes the irreversible append (I08R1 §5).
-        op_id = self._record_intent(planned, run_id)
+        # I08R2 §9: the INTENT fingerprint names the expected acquisition
+        # id + AcquisitionRecord semantic fingerprint (the metadata step
+        # is already durable when this action is planned).
+        op_id = self._record_intent(
+            planned,
+            run_id,
+            effect_plan={
+                "reconciliation": "ORPHAN_BLOB_CONTINUATION",
+                "blob_sha256": sha_part,
+                "expected_acquisition_id": acquisition.acquisition_id,
+                "acquisition_fingerprint": _canonical(
+                    acquisition.model_dump()
+                ),
+            },
+        )
         # CONTINUE with the acquisition step (metadata already committed).
         try:
             existing_acq = self._acquisitions.get_acquisition(
@@ -2499,8 +3621,7 @@ class RecoveryEngine:
             "the public acquisition API with durable metadata ADOPTED "
             "(never duplicated) and explicit proven context (I08R1 §12)"
         )
-        self._record_outcome(op_id, planned, run_id, resolution=resolution)
-        return self._journal_action(
+        action = self._journal_action(
             run_id=run_id,
             planned=planned,
             resolution=resolution,
@@ -2510,6 +3631,14 @@ class RecoveryEngine:
                 "acquisition_id": getattr(acquisition, "acquisition_id", None),
             },
         )
+        self._record_outcome(
+            op_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     def _execute_unreferenced_projection(
         self, planned: RecoveryPlanAction, run_id: str
@@ -2604,7 +3733,7 @@ class RecoveryEngine:
             content_sha256=content_sha,
             suffix=".parquet.quarantined",
         )
-        op_id = self._record_intent(planned, run_id)
+        op_id = self._record_intent(planned, run_id, content_sha=content_sha)
         moved = self._quarantine_file(physical, destination, content_sha)
         if moved:
             self._record_effect(
@@ -2612,14 +3741,28 @@ class RecoveryEngine:
                 planned,
                 run_id,
                 detail="orphan projection artifact moved to quarantine/unknown_context",
+                effect={
+                    "kind": "QUARANTINE",
+                    "quarantine_category": QUARANTINE_CATEGORY_UNKNOWN_CONTEXT,
+                    "source_relative_path": _relative_posix(
+                        physical, self._t0_root
+                    ),
+                    "expected_source_byte_length": (
+                        planned.before_state or {}
+                    ).get("byte_length"),
+                    "source_content_sha256": content_sha,
+                    "destination_relative_path": _relative_posix(
+                        destination, self._t0_root
+                    ),
+                    "destination_content_sha256": content_sha,
+                },
             )
         resolution = (
             "QUARANTINE under unknown_context: no durable projection "
             "catalog record proves the artifact's identity; T0A lineage "
             "is never manufactured (I08 §14)"
         )
-        self._record_outcome(op_id, planned, run_id, resolution=resolution)
-        return self._journal_action(
+        action = self._journal_action(
             run_id=run_id,
             planned=planned,
             resolution=resolution,
@@ -2629,6 +3772,14 @@ class RecoveryEngine:
                 "quarantine_bytes_sha256": content_sha,
             },
         )
+        self._record_outcome(
+            op_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     def _execute_orphan_manifest(
         self, planned: RecoveryPlanAction, run_id: str
@@ -2658,23 +3809,14 @@ class RecoveryEngine:
             ) from exc
         chain_ids = {m.partition_manifest_id for m in chain}
         if manifest.partition_manifest_id in chain_ids:
-            # I08R1 §8: a crash after append_partition_manifest succeeded
-            # but before the final recovery record is NOT a stale plan —
-            # the exact intended manifest is now committed-chain truth;
-            # finalize/adopt the recovery outcome instead of conflicting.
-            op_id = self._operation_id(planned, run_id)
-            resolution = (
-                "COMPLETED: manifest already joined the committed chain "
-                "under this exact recovery operation; outcome adopted "
-                "(I08R1 §8)"
-            )
-            self._record_outcome(op_id, planned, run_id, resolution=resolution)
-            return self._journal_action(
-                run_id=run_id,
-                planned=planned,
-                resolution=resolution,
-                after_state={"reconciled_into_chain": True, "adopted": True},
-            )
+            # I08R2 §8: a crash after append_partition_manifest succeeded
+            # but before the final recovery records is NOT a stale plan —
+            # the landed effect belongs to its ORIGINAL operation.  The
+            # replay at apply start closed that operation under its
+            # original id (INTENT fingerprint + committed-chain truth),
+            # so a restarted run must NOT open a second logical recovery
+            # operation for the same landed effect.  Nothing to do here.
+            return None
         supersedes = manifest.supersedes_manifest_id
         ancestry_ok = supersedes is None or supersedes in chain_ids
         refs_ok = all(
@@ -2694,32 +3836,63 @@ class RecoveryEngine:
                     "refs_ok": refs_ok,
                 },
             )
-        # I08R1 §5: durable INTENT precedes the irreversible chain append.
-        op_id = self._record_intent(planned, run_id)
         # CAS attestation through the PUBLIC pointer read (I08 §15: the
         # action is taken only when CAS semantics permit).  A concurrent
         # writer that moves the pointer first still loses here — the
         # repository's own ManifestCASConflict refuses, and the refusal is
-        # recorded, never overridden.
+        # recorded, never overridden.  The pointer WITNESS is read BEFORE
+        # the INTENT so the §9 fingerprint is complete before any
+        # irreversible effect (an unreadable witness is carried into the
+        # INTENT truthfully — the operation still resolves UNRESOLVED,
+        # never skipped).
+        pointer_unreadable: str | None = None
         try:
             pointer = self._manifests.read_current_pointer(manifest.partition_key)
         except Exception as exc:
-            resolution = (
-                "UNRESOLVED ORPHAN recorded: current pointer unreadable "
-                f"({type(exc).__name__}); no override (I08 §15)"
-            )
-            self._record_outcome(op_id, planned, run_id, resolution=resolution)
-            return self._journal_action(
-                run_id=run_id,
-                planned=planned,
-                resolution=resolution,
-                after_state={"unresolved_orphan": True},
-            )
+            pointer = None
+            pointer_unreadable = type(exc).__name__
         expected_current = (
             None
             if pointer is None
             else (pointer.partition_manifest_id, pointer.manifest_version)
         )
+        # I08R1 §5: durable INTENT precedes the irreversible chain append.
+        # I08R2 §9: the INTENT fingerprint names the partition, manifest
+        # identity/version, supersedes id, expected current pointer (the
+        # CAS witness) and the blob/projection reference identities.
+        op_id = self._record_intent(
+            planned,
+            run_id,
+            effect_plan={
+                "reconciliation": "ORPHAN_MANIFEST",
+                "partition_key": manifest.partition_key,
+                "manifest_id": manifest.partition_manifest_id,
+                "manifest_version": manifest.manifest_version,
+                "supersedes_id": manifest.supersedes_manifest_id,
+                "expected_current_pointer": expected_current,
+                "pointer_unreadable": pointer_unreadable,
+                "blob_refs": list(manifest.blob_refs),
+            },
+        )
+        if pointer_unreadable is not None:
+            resolution = (
+                "UNRESOLVED ORPHAN recorded: current pointer unreadable "
+                f"({pointer_unreadable}); no override (I08 §15)"
+            )
+            action = self._journal_action(
+                run_id=run_id,
+                planned=planned,
+                resolution=resolution,
+                after_state={"unresolved_orphan": True},
+            )
+            self._record_outcome(
+                op_id,
+                planned,
+                run_id,
+                resolution=resolution,
+                final_action_id=self._final_id(action),
+            )
+            return action
         try:
             self._manifests.append_partition_manifest(
                 manifest, expected_current
@@ -2730,8 +3903,7 @@ class RecoveryEngine:
                 f"refused reconciliation ({type(exc).__name__}); no "
                 "override of CAS/ancestry semantics"
             )
-            self._record_outcome(op_id, planned, run_id, resolution=resolution)
-            return self._journal_action(
+            action = self._journal_action(
                 run_id=run_id,
                 planned=planned,
                 resolution=resolution,
@@ -2740,23 +3912,47 @@ class RecoveryEngine:
                     "conflict": type(exc).__name__,
                 },
             )
+            self._record_outcome(
+                op_id,
+                planned,
+                run_id,
+                resolution=resolution,
+                final_action_id=self._final_id(action),
+            )
+            return action
         self._record_effect(
             op_id,
             planned,
             run_id,
             detail="orphan manifest reconciled through the public CAS append API",
+            effect={
+                "kind": "RECONCILE",
+                "reconciliation": "ORPHAN_MANIFEST",
+                "partition_key": manifest.partition_key,
+                "manifest_id": manifest.partition_manifest_id,
+                "manifest_version": manifest.manifest_version,
+                "supersedes_id": manifest.supersedes_manifest_id,
+                "expected_current_pointer": expected_current,
+            },
         )
         resolution = (
             "RECONCILED through the existing manifest repository API "
             "with exact ancestry and verified references (I08 §15)"
         )
-        self._record_outcome(op_id, planned, run_id, resolution=resolution)
-        return self._journal_action(
+        action = self._journal_action(
             run_id=run_id,
             planned=planned,
             resolution=resolution,
             after_state={"reconciled_into_chain": True},
         )
+        self._record_outcome(
+            op_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     def _execute_missing_manifest_target(
         self, planned: RecoveryPlanAction, run_id: str
@@ -2864,7 +4060,18 @@ class RecoveryEngine:
                 "JOB_DURABILITY_DIVERGENCE plan is stale (I08 §28)"
             )
         # I08R1 §5: durable INTENT precedes the irreversible transition.
-        op_id = self._record_intent(planned, run_id)
+        op_id = self._record_intent(
+            planned,
+            run_id,
+            effect_plan={
+                "reconciliation": "JOB_QUARANTINE",
+                "job_id": job_id,
+                "transition": "QUARANTINED",
+                "reason_sha256": hashlib.sha256(
+                    planned.detail.encode("utf-8")
+                ).hexdigest(),
+            },
+        )
         reason = (
             "I08 recovery: job chain failed durable revalidation "
             f"({planned.detail[:160]})"
@@ -2887,13 +4094,20 @@ class RecoveryEngine:
                 "UNRESOLVED recorded: the frozen transition graph refused "
                 "the QUARANTINED edge; the job remains blocked (I08 §18)"
             )
-        self._record_outcome(op_id, planned, run_id, resolution=resolution)
-        return self._journal_action(
+        action = self._journal_action(
             run_id=run_id,
             planned=planned,
             resolution=resolution,
             after_state=after,
         )
+        self._record_outcome(
+            op_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     def _execute_lock_finding(
         self, planned: RecoveryPlanAction, run_id: str
@@ -2954,7 +4168,7 @@ class RecoveryEngine:
             content_sha256=content_sha,
             suffix=".partial.quarantined",
         )
-        op_id = self._record_intent(planned, run_id)
+        op_id = self._record_intent(planned, run_id, content_sha=content_sha)
         moved = self._quarantine_file(source, destination, content_sha)
         if moved:
             self._record_effect(
@@ -2962,14 +4176,26 @@ class RecoveryEngine:
                 planned,
                 run_id,
                 detail="staging artifact moved to quarantine/malformed",
+                effect={
+                    "kind": "QUARANTINE",
+                    "quarantine_category": QUARANTINE_CATEGORY_MALFORMED,
+                    "source_relative_path": relative_path,
+                    "expected_source_byte_length": (
+                        planned.before_state or {}
+                    ).get("byte_length"),
+                    "source_content_sha256": content_sha,
+                    "destination_relative_path": _relative_posix(
+                        destination, self._t0_root
+                    ),
+                    "destination_content_sha256": content_sha,
+                },
             )
         resolution = (
             "STAGING QUARANTINED (bytes preserved): a .partial file is "
             "never evidence; resume was never advanced from staging "
             "(I08 §13)"
         )
-        self._record_outcome(op_id, planned, run_id, resolution=resolution)
-        return self._journal_action(
+        action = self._journal_action(
             run_id=run_id,
             planned=planned,
             resolution=resolution,
@@ -2979,6 +4205,14 @@ class RecoveryEngine:
                 "quarantine_bytes_sha256": content_sha,
             },
         )
+        self._record_outcome(
+            op_id,
+            planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     def _execute_unknown_context(
         self, planned: RecoveryPlanAction, run_id: str
@@ -3058,37 +4292,90 @@ class RecoveryEngine:
                     "(I08R1 §24)"
                 )
             lock_obj.release()
-        action_id, _adopted = self._journal.record(
-            recovery_run_id=run_id,
-            object_type=SEMANTIC_JOB_LOCK,
-            object_id=lock_id,
-            problem=PROBLEM_LOCK_PRESENT_OWNER_UNPROVEN,
-            resolution=(
-                "EXPLICIT OPERATOR CLEAR: expected job fingerprint supplied, "
-                "no in-process owner (probed), RecoveryAction written before "
-                "removal (I08 §20)"
-            ),
-            before_state={"relative_path": f"locks/{lock_id}.lock"},
-            after_state={"lock_present": False, "cleared": True},
-            registered_at=self._clock(),
-        )
-        # I08R1 §5: the clear operation carries durable INTENT before the
-        # irreversible unlink (the RecoveryAction above is the effect
-        # record; the INTENT phase makes the operation replayable).
+        # I08R2 §17/§18 — the retired I08R1 order journaled a FALSE
+        # after_state ({lock_present: false, cleared: true}) BEFORE the
+        # unlink, so a crash in between left durable evidence claiming a
+        # clear that never happened.  The sealed order:
+        #   validate → INTENT (with the effect fingerprint) → live
+        #   ownership revalidated IMMEDIATELY before the unlink → unlink
+        #   → fsync → EFFECT → final RecoveryAction with the ACTUAL
+        #   after_state → COMPLETED.
         clear_planned = RecoveryPlanAction(
-            action_kind="OPERATOR_CLEAR_JOB_LOCK",
+            action_kind=_ACTION_OPERATE_CLEAR_JOB_LOCK,
             object_type=SEMANTIC_JOB_LOCK,
             object_id=lock_id,
             problem=PROBLEM_LOCK_PRESENT_OWNER_UNPROVEN,
             resolution="explicit operator clear with proven-absent ownership",
             before_state={"relative_path": f"locks/{lock_id}.lock"},
         )
-        self._record_intent(clear_planned, run_id)
+        self._record_intent(
+            clear_planned,
+            run_id,
+            effect_plan={
+                "reconciliation": "OPERATOR_LOCK_CLEAR",
+                "lock_fingerprint": lock_id,
+                "expected_job_id": expected_job_id,
+                "relative_path": f"locks/{lock_id}.lock",
+            },
+        )
+        # Live revalidation IMMEDIATELY before the irreversible unlink
+        # (I08R2 §18): the earlier checks are necessary but not
+        # sufficient — ownership must be re-proven at the last moment.
+        if not lock_path.exists():
+            raise RecoveryPlanConflict(
+                f"lock {lock_id} vanished after the INTENT was recorded; "
+                "refusing a phantom clear (I08R2 §18)"
+            )
+        if expected_job_id in getattr(owner_repository, "_lock_owners", {}):
+            raise RecoveryPlanConflict(
+                f"job {expected_job_id!r} acquired a LIVE in-process owner "
+                "record after the INTENT; refusing the clear (I08R2 §18)"
+            )
+        lock_obj = owner_repository._job_locks.get(expected_job_id)
+        if lock_obj is not None and not lock_obj.acquire(blocking=False):
+            raise RecoveryPlanConflict(
+                "the job RLock became held after the INTENT; refusing the "
+                "clear (I08R2 §18)"
+            )
+        if lock_obj is not None:
+            lock_obj.release()
+        # The irreversible unlink happens ONLY now.
         lock_path.unlink()
         fsync_directory(lock_path.parent)
-        payload = self._journal.get(action_id)
-        assert payload is not None
-        return self._journal.to_recovery_action(payload)
+        # EFFECT row: the actual durable mutation, fingerprinted.
+        op_id = self._operation_id(clear_planned, run_id)
+        self._record_effect(
+            op_id,
+            clear_planned,
+            run_id,
+            detail="stale lock file unlinked under explicit operator authority",
+            effect={
+                "kind": "LOCK_CLEAR",
+                "lock_fingerprint": lock_id,
+                "expected_job_id": expected_job_id,
+                "relative_path": f"locks/{lock_id}.lock",
+            },
+        )
+        resolution = (
+            "EXPLICIT OPERATOR CLEAR: expected job fingerprint supplied, "
+            "no in-process owner (revalidated immediately before the "
+            "unlink), lock file unlinked (I08 §20 / I08R2 §18)"
+        )
+        action = self._journal_action(
+            run_id=run_id,
+            planned=clear_planned,
+            resolution=resolution,
+            after_state={"lock_present": False, "cleared": True},
+        )
+        # Terminal phase sealed with the exact final RecoveryAction.
+        self._record_outcome(
+            op_id,
+            clear_planned,
+            run_id,
+            resolution=resolution,
+            final_action_id=self._final_id(action),
+        )
+        return action
 
     # -- plan mapping ---------------------------------------------------------
 
