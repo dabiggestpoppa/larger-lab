@@ -455,3 +455,35 @@ NEXT = BOOK 2 IMPLEMENTATION AUTHORIZATION + BUILD PLAN
 The next action requires a separate explicit operator authorization. No Book
 2 implementation, collector, database, graph database, live source access,
 Book 3 work, Sensor mutation, or Capital Field mutation is authorized.
+
+
+---
+
+# PLANNING GOVERNANCE BRIDGE — BOOK 2 ACCEPTED (2026-09-24)
+
+The operator explicitly accepted the deterministic/offline Book 2 epistemics kernel.
+This planning-branch checkpoint records the accepted build anchor and governance
+state only. No Book 2 source code is copied onto the planning branch.
+
+```text
+BOOK_2_IMPLEMENTATION = ACCEPTED
+BOOK_2_ACCEPTED_BUILD_HEAD = cadc1e7e4378248da0a9aeefbe12909918656433
+BOOK_2_EXIT_GATE = PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL (ACCEPTED)
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_2_BLOCKING_ISSUES = 0
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_3_PLANNING_AUTHORITY = TRUE
+BOOK_3_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+NEXT_BUILD_SCOPE = NONE
+```
+
+The accepted build commit is on
+`agent/crypto-systems-intelligence-atlas-book2-build`; this branch contains no
+Book 2 implementation source. Book 3 planning authority is recorded as true only
+as a governance state; this session does not plan or implement Book 3. Live
+acquisition remains unauthorized.
+
+Future Book 2 changes require a concrete downstream integration defect, an
+explicit amendment, or a newly discovered correctness failure. No further generic
+Book 2 hardening is authorized.
