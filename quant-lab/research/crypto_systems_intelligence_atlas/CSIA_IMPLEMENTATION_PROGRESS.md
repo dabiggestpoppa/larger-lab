@@ -221,3 +221,56 @@ Commits (this checkpoint):
 0b06e8ca  R2 evidence reconciliation (provenance SHAs, disposition counts)
 <this>    Book 1 implementation acceptance record + this ledger entry
 ```
+
+---
+
+# CHECKPOINT 5 — BOOK 2 IMPLEMENTATION (2026-09-24)
+
+Checkpoints 1–4 above are preserved unchanged. This checkpoint records a
+ deterministic in-memory Book 2 epistemics kernel only; it is not a
+ self-acceptance and contains no live integration.
+
+```text
+BLOC_2A_IMPLEMENTED = TRUE
+BLOC_2B_IMPLEMENTED = TRUE
+BLOC_2C_IMPLEMENTED = TRUE
+BLOC_2D_IMPLEMENTED = TRUE
+BLOC_2E_IMPLEMENTED = TRUE
+BLOC_2F_IMPLEMENTED = TRUE
+BLOC_2G_IMPLEMENTED = TRUE
+BLOC_2H_IMPLEMENTED = TRUE
+BLOC_2I_IMPLEMENTED = TRUE
+
+BOOK_2_IMPLEMENTATION = COMPLETE
+STATUS                 = READY_FOR_OPERATOR_REVIEW
+STRUCTURAL_FAILURE     = 0
+BOOK1_PROVENANCE_INTEGRATION = PASS
+BOOK_2_EXIT_GATE       = PROPOSED
+BOOK_2_ACCEPTANCE      = NOT SELF-ACCEPTED
+```
+
+Quality gates:
+
+```text
+CSIA tests             = 161 passed (107 Book 1 + 54 Book 2)
+Crypto Sensor          = 2339 passed / 4 skipped
+ruff                   = PASS
+mypy                   = PASS (16 source files)
+```
+
+Machine and narrative evidence:
+
+```text
+CSIA_BOOK_2_IMPLEMENTATION_MATRIX.json
+CSIA_BOOK_2_IMPLEMENTATION_EVIDENCE_v0.1.md
+```
+
+The shared Book 1 lifecycle enum was minimally extended with the ratified Book
+2 states after the reuse audit found that the accepted `ClaimBinding` could not
+represent `INFERRED` without a lossy mapping. All prior Book 1 values and
+contracts remain intact; the Book 1 regression suite remains green.
+
+Deferred: live collectors/network/RPC/scraping, databases/graph databases,
+schedulers/persistence, credentials, live Research Mesh/QCAE/OCE integration,
+Book 3, Sensor/Capital Field mutation, trading logic, and productiondeployment. The proposed operator exit gate is
+`PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`.

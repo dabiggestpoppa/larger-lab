@@ -1,0 +1,78 @@
+{
+  "schema_version": "csia-book2-implementation-matrix-v0.1",
+  "book": 2,
+  "status": "READY_FOR_OPERATOR_REVIEW",
+  "planning_anchor": "637e0908376004895476e65592d5f9cda0d3e85d",
+  "book1_base": "7c2419f00b9f5f5f105708b067848909fa4da609",
+  "implementation_authority": "DETERMINISTIC_BOOK2_EPISTEMICS_KERNEL_ONLY",
+  "network": false,
+  "persistence": false,
+  "database": false,
+  "graph_database": false,
+  "self_accepted": false,
+  "gates": {
+    "SOURCE_REGISTRY": {
+      "status": "PASS",
+      "invariants": ["stable source_id", "locator churn appends version", "evidence-backed updates", "14 source classes", "no global trust score"]
+    },
+    "RAW_EVIDENCE": {
+      "status": "PASS",
+      "invariants": ["immutable evidence", "append-only store", "deterministic sha256 content hash", "derived parser lineage", "source death preserves history"]
+    },
+    "ACQUISITION_CONTRACT": {
+      "status": "PASS",
+      "invariants": ["11 acquisition types", "data-only contract", "failure observations representable", "no fetching"]
+    },
+    "CLAIM_OBJECT": {
+      "status": "PASS",
+      "invariants": ["claim evidence required", "source refs derived from evidence", "no Book 1 object auto-mint", "immutable claim versions"]
+    },
+    "CREATE_INFERRED": {
+      "status": "PASS",
+      "invariants": ["I-1 through I-10", "new claim_id", "eligible parents", "mandatory methodology", "terminating raw lineage", "parents unchanged", "no INFERRED to OBSERVED"]
+    },
+    "PROMOTION_ENGINE": {
+      "status": "PASS",
+      "invariants": ["legal transition table", "evidence-referenced transitions", "timestamp", "operator metadata", "illegal transitions fail closed", "supersession lineage"]
+    },
+    "AUTHORITY_POLICY": {
+      "status": "PASS",
+      "invariants": ["SOURCE x CLAIM_FAMILY x VALID_TIME", "unregistered source fail closed", "aggregator structural exclusion", "family-scoped reversible downgrade", "no scalar trust score"]
+    },
+    "CONTRADICTION_ENGINE": {
+      "status": "PASS",
+      "invariants": ["time split first", "family authority second", "authority tie contested", "both evidence lines preserved", "never average"]
+    },
+    "FRESHNESS_ENGINE": {
+      "status": "PASS",
+      "invariants": ["four staleness kinds", "versioned policy", "no universal duration", "historical no decay", "stale not rejected"]
+    },
+    "CHANGE_CANDIDATES": {
+      "status": "PASS",
+      "invariants": ["13 ratified change classes", "evidence or claim context required", "candidate is not graph truth"]
+    },
+    "RESEARCH_INTERFACE": {
+      "status": "PASS",
+      "allowed_operations": ["DISCOVER", "RETRIEVE", "PARSE", "PROPOSE", "CORROBORATE"],
+      "forbidden_operations": ["PROMOTE", "SET_STATE", "SET_AUTHORITY", "MUTATE_GRAPH", "MUTATE_TIME", "BYPASS_PROVENANCE"]
+    },
+    "BOOK1_PROVENANCE_INTEGRATION": {
+      "status": "PASS",
+      "invariants": ["ClaimBinding supports INFERRED", "RawEvidence to Claim to ClaimBinding to TypedEdge", "inferred methodology and parent lineage", "no Book 1 contract mutation beyond shared lifecycle enum amendment"]
+    }
+  },
+  "tests": {
+    "csia_total": 161,
+    "csia_existing_book1": 107,
+    "book2_total": 54,
+    "book2_core": 19,
+    "book2_stress": 16,
+    "book2_adversarial": 16,
+    "book1_provenance_integration": 3,
+    "crypto_sensor_regression_passed": 2339,
+    "crypto_sensor_regression_skipped": 4,
+    "ruff": "PASS",
+    "mypy": "PASS"
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL"
+}
