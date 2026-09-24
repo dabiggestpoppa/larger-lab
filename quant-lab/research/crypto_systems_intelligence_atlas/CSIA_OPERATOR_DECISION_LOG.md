@@ -332,6 +332,192 @@ DECISION LOG ENTRY {
 
 ---
 
+# BOOK 3 DECISIONS (D3-1–D3-7)
+
+**Decision session:** 2026-09-24
+
+**Operator authorization:** explicit narrow Book 3 v0.2 reconciliation and
+ratification decisions D3-1 through D3-7.
+
+**Binding planning artifact:** `CSIA_BOOK_3_NATIVE_CHAIN_LEDGER_ATLAS_PLAN_v0.2.md`
+
+## D3-1 — BRANCH-SENSITIVE FORK IDENTITY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D3-1
+  decision:               ACCEPT WITH BRANCH-SENSITIVE RULE
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 3 Blocs 3A, 3M, 3O, 3Q
+  invariant:              Shared history establishes ancestry; shared history
+                          alone does not establish the same current network
+                          identity.
+  consequence:            Non-branching upgrade -> SAME_OBJECT plus
+                          HISTORICAL_CONTINUATION. Persistent divergent branch
+                          -> NEW_OBJECT plus FORKED_FROM with shared ancestry
+                          and pre-fork history preserved. Temporary unresolved
+                          split -> UNKNOWN until evidence resolves it.
+  reversibility:          Reversible only by a later recorded operator decision
+                          with evidence and migration consequences stated.
+  evidence_basis:         CSIA_BOOK_3_NETWORK_IDENTITY_STRESS_MATRIX v0.1
+                          reconciliation; accepted Book 1 FORKED_FROM;
+                          Book 2 evidence-backed architecture-change claims.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D3-2 — NEW-GENESIS RESTART
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D3-2
+  decision:               ACCEPT CONSERVATIVE NEW-OBJECT DEFAULT
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 3 Blocs 3A, 3O, 3Q
+  invariant:              New genesis does not inherit current network identity
+                          from branding or labels.
+  consequence:            New genesis -> NEW_OBJECT by default. Preserve
+                          MIGRATED_FROM, MIGRATED_TO, SUPERSESSION, and
+                          historical claims. Same name, ticker, operator, or
+                          branding is insufficient. Any family-native
+                          continuation exception is surfaced for operator
+                          review.
+  reversibility:          Case-level continuation requires explicit later
+                          operator review; the conservative default changes
+                          only by recorded operator decision.
+  evidence_basis:         Book 2 network-change, deployment, genesis, and
+                          state-history evidence requirements; Book 1
+                          migration and supersession foundations.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D3-3 — MODULAR COMPONENT IDENTITY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D3-3
+  decision:               ACCEPT TYPED COMPONENT DOSSIERS
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 3 Blocs 3A, 3B, 3D, 3H, 3M
+  invariant:              A modular architecture is not forced into one
+                          monolithic object or trust domain.
+  consequence:            Execution, sequencing, settlement, DA, security,
+                          consensus, and bridge/messaging roles may be distinct
+                          typed component dossiers joined by faithful Book 1
+                          edges or Book 3-local typed relations.
+  reversibility:          Reversible only by later recorded operator decision;
+                          existing component identities and history remain
+                          immutable.
+  evidence_basis:         Native architecture pilot matrix; anti-EVM review;
+                          accepted Book 1 modular object and relationship
+                          foundations.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D3-4 — SHARED SECURITY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D3-4
+  decision:               ACCEPT TYPED SECURED_BY DOCTRINE
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 3 Blocs 3A, 3D, 3G, 3H, 3M, 3P
+  invariant:              Security-provider semantics remain distinct from
+                          execution, settlement, DA, and messaging semantics.
+  consequence:            Use accepted Book 1 SECURED_BY where faithful.
+                          SECURED_BY is not RUNS_ON, SETTLES_TO, USES_DA, or
+                          MESSAGES_TO. Security changes remain temporal history.
+  reversibility:          Reversible only by later recorded operator decision;
+                          historical security relationships are never erased.
+  evidence_basis:         Accepted Book 1 EdgeType SECURED_BY and mechanism
+                          contract; Book 2 security evidence matrix.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D3-5 — NETWORK IDENTITY ANCHOR PRIORITY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D3-5
+  decision:               ACCEPT FAMILY-NATIVE EVIDENCE BUNDLE
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 3 Blocs 3A, 3B, 3C–3L, 3O
+  invariant:              No universal single identity anchor exists; all
+                          identity claims remain Book 2 evidence-backed.
+  consequence:            Evaluate genesis/origin, chain/network ID, namespace,
+                          deployment ID, state-history continuity, consensus
+                          continuity, and family-native identifiers as a bundle.
+                          Ticker and name are never sufficient; chain ID is not
+                          universal; genesis is strong but not universally
+                          sufficient. Unresolved conflict remains UNKNOWN /
+                          CONTESTED.
+  reversibility:          Evidence policy may evolve only by recorded operator
+                          decision; no unresolved identity may be auto-promoted.
+  evidence_basis:         Architecture evidence matrix; Book 2 canonical claim,
+                          authority, valid-time, and contradiction controls.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D3-6 — FAMILY REGISTRY GOVERNANCE
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D3-6
+  decision:               ACCEPT TWO-TIER ADMISSION
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 3 Blocs 3A, 3B, 3C–3M
+  invariant:              Registry admission is namespaced, temporal,
+                          provenance-preserving, and Book 2 evidence-backed.
+  consequence:            Tier 1 new family or semantic namespace requires
+                          explicit operator approval. Tier 2 new value in a
+                          ratified registry may be admitted when canonical Book
+                          2 evidence, stable namespaced ID, temporal validity,
+                          provenance, and no-collision conditions are satisfied.
+                          Semantic collision, family ambiguity, taxonomy drift,
+                          out-of-namespace mechanism, or universal fallback is
+                          escalated. Vendor naming alone is insufficient.
+  reversibility:          Values are never silently reclassified; changes require
+                          a later recorded operator decision and retain history.
+  evidence_basis:         Book 2 canonical claims and promotion doctrine; Book 3
+                          namespaced family registry design.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D3-7 — STATE MIGRATION CONTINUITY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D3-7
+  decision:               ACCEPT TYPED MIGRATION PLUS HISTORICAL OBJECTS
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 3 Blocs 3A, 3N, 3O, 3Q
+  invariant:              Migration preserves source and destination identity and
+                          never overwrites the source object.
+  consequence:            Preserve MIGRATED_FROM, MIGRATED_TO, valid-time
+                          history, migration evidence, SUPERSESSION/historical
+                          status, and asset REALIZES lineage.
+  reversibility:          Migration records are append-only; reversal requires a
+                          later recorded decision and new lineage, never rewrite.
+  evidence_basis:         Accepted Book 1 MIGRATED_FROM/MIGRATED_TO and REALIZES;
+                          Book 2 temporal and state-transition evidence rules.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+---
+
 # DEFERRED DECISIONS (OPEN — NOT DECIDED THIS SESSION)
 
 ```text
@@ -346,7 +532,8 @@ reserved to the operator and appear in the Book 1 packet as deferred items.
 
 # SESSION INTEGRITY STATEMENT
 
-All seven decisions were supplied explicitly by the operator in the decision
-session. No decision was inferred from silence. No default was applied
-automatically. No decision scope was expanded beyond the canonical packet.
-Operator wording is recorded verbatim above.
+All seven original Book 0/Book 1 decisions were supplied explicitly by the
+operator in the decision session. D3-1 through D3-7 were separately supplied
+explicitly for the Book 3 v0.2 reconciliation. No decision was inferred from
+silence. No default was applied automatically. No decision scope was expanded
+beyond the authorized packet.
