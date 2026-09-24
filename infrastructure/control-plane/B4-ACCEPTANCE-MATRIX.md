@@ -240,3 +240,25 @@ sequence; see `B4-EVIDENCE-RECORD.md`.*
   R40; the final R40-EVIDENCE documentation commit carries this section.
 - **Still open before book close:** operator acceptance of R39/R40; SonarCloud
   credential/operator disposition; Kilo external service recovery.
+
+### R41 truth correction (append-only)
+
+- **R41 (B4-CXR7U9R41):** the R40 proof files are now selected by the single
+  authoritative local-ground pytest invocation. The real-process claim races
+  execute without Docker; the container-backed loser proof remains truthfully
+  container-marked. The non-atomic negative control now uses a deterministic
+  barrier and proves a double-win rather than skipping.
+- **R41 implementation head:** `057d25dd`; focused local result `37 passed,
+  1 skipped`; Ruff clean. The skip is the local Windows container gate, not a
+  hidden CI skip.
+- **Exact-head validation runs:** `36008618657` b3 success,
+  `36008618689` b2 success, `36008618870` b4 success, `36008626072`
+  B1-I1R success. `36008618864` b1-local-ground is blocked before the
+  container proofs by Docker registry `unauthorized`; its sanctioned rerun
+  reproduced the same external startup failure. It is not called green.
+- **External checks:** SonarCloud remains failure/unsuppressed; Kilo is pending
+  in the live PR view and is not called green. PR #4 remains OPEN,
+  `MERGEABLE`, `UNSTABLE`, and NOT MERGE AUTHORIZED.
+- **R41 status:** `IN_PROGRESS / EXTERNAL-CI-BLOCKED`. No cloud, broker,
+  capital, or execution authority was introduced; recurring cost is $0. Book 5
+  and Atlas Program Block 4 remain untouched.

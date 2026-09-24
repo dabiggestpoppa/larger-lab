@@ -1889,3 +1889,92 @@ not called green). PR #4 mergeable=true but mergeStateStatus=UNSTABLE.
 cloud mutations 0; broker mutations 0; capital mutations 0; execution-authority
 mutations 0; recurring cost $0. Book 5 not begun; Atlas Program Block 4 not
 begun; PR #4 not merged; main untouched.
+
+---
+
+## R41 TRUTH-CORRECTION SECTION — AUTHORITATIVE R40 EXECUTION + CI REPAIR (B4-CXR7U9R41)
+
+**Status:** `IN_PROGRESS / EXTERNAL-CI-BLOCKED` (append-only; R40 and all earlier sections remain historical truth and are not rewritten).
+
+**Authorized start SHA:** `23ba4baa6b2f32df6d4dc4d2d1b69d49ac0920cc` (R40 evidence head).
+**R41 implementation head:** `057d25dd78dbafdde462dbcee681b6d62a474791` (`B4-CXR7U9R41X`).
+**origin/main:** `7c7816f382947bbc8a1f2154435fc436f2428fa8` (untouched).
+**PR #4:** OPEN, unmerged, base `main` ← head `oce-program-build`; `mergeable=MERGEABLE`, `mergeStateStatus=UNSTABLE`. Mergeable is not reported as all required checks passing.
+
+### R41 append-only commit chain
+
+```
+1e22ed01  B4-CXR7U9R41R1  execute the repaired R40 proofs in authoritative CI
+18db4c66  B4-CXR7U9R41X  name the winning transition in the claim refusal truthfully
+fabb135c  B4-CXR7U9R41X  count only engine-minted receipts in the loser-mutation proof
+057d25dd  B4-CXR7U9R41X  make the non-atomic claim negative control deterministic
+```
+
+The R41 repair is intentionally narrow. It wires the five repaired R40/R41
+proof files into the single existing local-ground pytest invocation, keeps the
+real process races on the governed filesystem and O_EXCL, repairs the
+multi-process test harness, and makes the non-atomic negative control prove its
+double-win deterministically. The weakened control forces both callers past
+the existence check, neutralizes only the subsequent record rewrite, and then
+observes two successful claims. It no longer skips when scheduling happens to
+serialize the race.
+
+### R41 local proof results
+
+At the R41 implementation head, the focused selection produced:
+
+```
+37 passed, 1 skipped in 7.77s
+Ruff: clean on all changed Python files
+```
+
+The one skip is the truthful container-gated loser-mutation test in the local
+Windows environment; the three real-process race tests execute without Docker
+and are included in the authoritative runner selection. The complete
+local-ground runner selection is now explicitly named in
+`infrastructure/local-ground/scripts/run-validation.sh`; no second pytest
+invocation or new workflow was introduced.
+
+### R41 exact-head CI truth
+
+The implementation head `057d25dd` produced these exact-head validation runs:
+
+```
+36008618657  b3-worker-fabric-validation  success
+36008618689  b2-control-plane-validation  success
+36008618870  b4-config-spine-validation  success
+36008626072  B1-I1R Validation            success
+36008618864  b1-local-ground-validation  failure (Docker registry unauthorized)
+```
+
+The `b1-local-ground-validation` failure is an external runner/container
+startup failure before the acceptance proofs: Docker reported
+`Error response from daemon: unauthorized: access to the requested resource is
+not authorized` while pulling the existing compose services. The run reported
+`3 failed, 283 passed, 28 errors`; the errors are the container-backed tests
+whose shared `local up` could not authenticate to the registry. This is not
+reported as a source failure and was not hidden by changing the selection.
+
+The failed workflow was rerun through GitHub's sanctioned
+`gh run rerun --failed` path (run `36008618864`, attempt 2). It reproduced the
+same Docker registry `unauthorized` startup failure. No source change was made
+to appease the unavailable registry.
+
+### R41 external-check truth
+
+- SonarCloud Code Analysis: **failure**, unchanged and unsuppressed; no NOSONAR,
+  exclusions, severity changes, or threshold weakening.
+- Kilo Code Review: **pending** in the current live PR check view; it is not
+  called green.
+- PR #4 remains OPEN, unmerged, and `UNSTABLE`; it was not merged.
+- `main` remains at `7c7816f3`; main was not modified or pushed.
+- cloud mutations = 0; broker mutations = 0; capital mutations = 0;
+  execution-authority mutations = 0; recurring cost = $0.
+- Book 5 and Atlas Program Block 4 were not begun.
+
+### R41 exit-gate status
+
+The R41 source and proof-repair requirements are implemented and locally
+validated. R41 cannot be marked closed until the authoritative local-ground
+workflow completes with the container stack available, and the external
+Sonar/Kilo dispositions are resolved. No self-ratification is claimed.
