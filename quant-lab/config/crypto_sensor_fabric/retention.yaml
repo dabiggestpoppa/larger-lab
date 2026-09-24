@@ -1,0 +1,15 @@
+# SENSOR-B4-I09 — retention and dry-run estimator policy.
+schema_version: "1.0"
+
+# Frozen v1 safety: no automatic destructive T0A retention.
+automatic_t0a_destructive_actions: false
+
+# U2 full-depth high-frequency order books are off unless explicitly promoted.
+u2_full_depth_books_enabled: false
+
+# Fail safely rather than constructing an unbounded integer estimate.
+max_estimate_bytes: 9223372036854775807
+
+# Confidence labels describe measured sample coverage, not a statistical CI.
+high_confidence_sample_seconds: 86400
+medium_confidence_sample_seconds: 3600
