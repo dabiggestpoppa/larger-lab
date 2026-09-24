@@ -432,7 +432,7 @@ def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
     kdate = _sign(("AWS4" + secret).encode(), date)
     kregion = _sign(kdate, date_only)
     kservice = _sign(kregion, "us-east-1")
-    ksigning = _sign(kservice, "s3")
+    ksigning = _sign(kservice, "aws4_request")
     signature = _sign(ksigning, string_to_sign).hex()
     auth = (f"AWS4-HMAC-SHA256 Credential={access}/{scope}, "
             f"SignedHeaders={signed_headers}, Signature={signature}")
