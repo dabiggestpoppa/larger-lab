@@ -1567,6 +1567,7 @@ class RecoveryEngine:
             and payload.get("action_kind") == planned.action_kind
             and payload.get("problem") == planned.problem
         ]
+        final_action_id: str | None
         if len(prior_actions) > 1:
             raise RecoveryOperationCorrupt(
                 f"operation {operation_id[:16]}... has {len(prior_actions)} "
