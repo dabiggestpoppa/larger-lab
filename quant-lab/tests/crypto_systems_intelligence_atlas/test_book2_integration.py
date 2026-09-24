@@ -8,6 +8,7 @@ import pytest
 
 from crypto_systems_intelligence_atlas.authority import AuthorityPolicy
 from crypto_systems_intelligence_atlas.claims import (
+    Book2ClaimBinding,
     Claim,
     ClaimService,
     ClaimState,
@@ -30,7 +31,7 @@ from crypto_systems_intelligence_atlas.sources import (
     SourceRegistry,
     VerificationStatus,
 )
-from crypto_systems_intelligence_atlas.temporal import ClaimBinding
+from crypto_systems_intelligence_atlas.temporal import ClaimBinding, RecordLifecycle
 from crypto_systems_intelligence_atlas.types import AuthoritySeed, AuthorityTier, ClaimFamily, SourceClass
 
 NOW = datetime(2026, 9, 24, 12, 0, tzinfo=UTC)
@@ -108,7 +109,7 @@ def capture(service: ClaimService, evidence: EvidenceStore, source: Source, clai
 def test_raw_evidence_claim_binding_and_typed_edge_chain_is_reconstructable() -> None:
     registry, chain, protocol, _, evidence, service, source = setup_integration()
     evidence_id = capture(service, evidence, source, "direct", b"direct")
-    claim = service.add(
+    claim = service.add_observed(
         Claim(
             claim_id="direct-claim",
             evidence_refs=(evidence_id,),
@@ -119,7 +120,7 @@ def test_raw_evidence_claim_binding_and_typed_edge_chain_is_reconstructable() ->
                 subject_refs=(protocol.object_id,), predicate="runs_on", object_ref=chain.object_id
             ),
             claim_family=ClaimFamily.CHAIN_ARCHITECTURE,
-            claim_state=ClaimState.OBSERVED,
+            claim_state=RecordLifecycle.OBSERVED,
             valid_time_hypothesis=NOW,
             observed_time=NOW,
             methodology=Methodology(methodology_ref="direct", version="v1", description="direct capture"),
@@ -155,7 +156,7 @@ def test_inferred_claim_binding_preserves_methodology_parent_and_raw_lineage() -
     _, _, protocol, oracle, evidence, service, source = setup_integration()
     p1_ref = capture(service, evidence, source, "dependency", b"dependency")
     p2_ref = capture(service, evidence, source, "outage", b"outage")
-    p1 = service.add(
+    p1 = service.add_observed(
         Claim(
             claim_id="parent-dependency",
             evidence_refs=(p1_ref,),
@@ -169,7 +170,7 @@ def test_inferred_claim_binding_preserves_methodology_parent_and_raw_lineage() -
             methodology=Methodology(methodology_ref="direct", version="v1", description="direct"),
         )
     )
-    p2 = service.add(
+    p2 = service.add_observed(
         Claim(
             claim_id="parent-outage",
             evidence_refs=(p2_ref,),
@@ -197,20 +198,11 @@ def test_inferred_claim_binding_preserves_methodology_parent_and_raw_lineage() -
         object_refs=(protocol.object_id, oracle.object_id),
         relationship_refs=(EdgeType.DEPENDS_ON.value,),
     )
-    binding = ClaimBinding(
-        claim_id=inferred.claim_id,
-        source_id=source.source_id,
-        source_locator="fixture://inference",
-        evidence_type="DERIVED_CLAIM",
-        retrieval_time=NOW,
-        extractor_version="integration-extractor",
-        transformation_lineage=(*inferred.lineage_evidence_refs, inferred.methodology_ref),
-        claim_state=ClaimState.INFERRED,
-    )
-    assert binding.claim_state is ClaimState.INFERRED
+    binding = Book2ClaimBinding.from_claim(inferred)
+    assert binding.book2_claim_state is ClaimState.INFERRED
     assert inferred.parent_claim_refs == (p1.claim_id, p2.claim_id)
     assert set(service.lineage_evidence(inferred)) == {p1_ref, p2_ref}
-    assert binding.transformation_lineage[-1] == "oracle-risk"
+    assert binding.book1.transformation_lineage[-1] == "oracle-risk"
     assert (evidence.require(p1_ref).content_hash, evidence.require(p2_ref).content_hash) == (
         evidence.require(p1_ref).content_hash,
         evidence.require(p2_ref).content_hash,
@@ -221,7 +213,7 @@ def test_claim_service_does_not_auto_mint_unknown_book1_objects() -> None:
     _, _, _, _, evidence, service, source = setup_integration()
     evidence_id = capture(service, evidence, source, "unknown-object", b"unknown")
     with pytest.raises(KeyError):
-        service.add(
+        service.add_observed(
             Claim(
                 claim_id="unknown-object-claim",
                 evidence_refs=(evidence_id,),

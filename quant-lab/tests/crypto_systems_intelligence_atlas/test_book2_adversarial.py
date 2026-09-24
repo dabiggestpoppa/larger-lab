@@ -78,8 +78,7 @@ def observed_claim(service: ClaimService, evidence: EvidenceStore, src: Source, 
         parser_version="p1",
         evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
     )
-    return service.add(
-        Claim(
+    claim = Claim(
             claim_id=claim_id,
             evidence_refs=(item.evidence_id,),
             source_refs=(src.source_id,),
@@ -90,7 +89,7 @@ def observed_claim(service: ClaimService, evidence: EvidenceStore, src: Source, 
             observed_time=NOW,
             methodology=Methodology(methodology_ref="direct", version="v1", description="direct"),
         )
-    )
+    return service.add_declared(claim) if claim.claim_state is ClaimState.DECLARED else service.add_observed(claim)
 
 
 def test_press_release_attempting_structural_promotion_fails() -> None:

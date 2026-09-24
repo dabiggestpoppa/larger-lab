@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 from datetime import datetime
+from enum import Enum
 from typing import Iterable
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -20,7 +21,46 @@ from .temporal import (
 )
 from .types import AuthorityTier, ClaimFamily
 
-ClaimState = RecordLifecycle
+class Book2ClaimState(str, Enum):
+    """Book 2 ratified claim machine, separate from Book 1 temporal kernel."""
+
+    DECLARED = "DECLARED"
+    OBSERVED = "OBSERVED"
+    INFERRED = "INFERRED"
+    CORROBORATED = "CORROBORATED"
+    CONTESTED = "CONTESTED"
+    UNRESOLVED = "UNRESOLVED"
+    STALE = "STALE"
+    REJECTED = "REJECTED"
+    SUPERSEDED = "SUPERSEDED"
+
+
+ClaimState = Book2ClaimState
+
+
+class Book2ClaimBinding(BaseModel):
+    """Book 2 claim projection; Book 1 receives only its compatible pointer."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    book1: ClaimBinding
+    book2_claim_state: Book2ClaimState
+
+    @classmethod
+    def from_claim(cls, claim: "Claim") -> "Book2ClaimBinding":
+        source_id = claim.source_refs[0]
+        evidence_ref = claim.evidence_refs[0]
+        lineage = (*claim.lineage_evidence_refs, claim.methodology_ref) if claim.methodology_ref else claim.lineage_evidence_refs
+        return cls(
+            book1=ClaimBinding(
+                claim_id=claim.claim_id,
+                source_id=source_id,
+                source_locator=evidence_ref,
+                transformation_lineage=lineage,
+                claim_state=RecordLifecycle.OBSERVED,
+            ),
+            book2_claim_state=claim.claim_state,
+        )
 
 
 class MethodologyParameter(BaseModel):
@@ -192,6 +232,7 @@ class ClaimService:
         authority_policy: AuthorityPolicy | None = None,
     ) -> None:
         self.evidence_store = evidence_store
+        self.source_registry = getattr(evidence_store, "_source_registry", None)
         self.claim_store = claim_store or ClaimStore()
         self.identity_registry = identity_registry
         self.authority_policy = authority_policy
@@ -210,13 +251,24 @@ class ClaimService:
                 self.identity_registry.require(object_ref)
         return tuple(sorted(derived_sources))
 
-    def add(self, claim: Claim, *, allow_inferred: bool = False) -> Claim:
-        if claim.claim_state is ClaimState.INFERRED and not allow_inferred:
-            raise ValueError("INFERRED claims must be created by CREATE_INFERRED")
+    def _add_validated(self, claim: Claim) -> Claim:
         self._validate_evidence(claim)
         if claim.claim_state in (ClaimState.OBSERVED, ClaimState.CORROBORATED):
             self._require_promotion_authority(claim)
         return self.claim_store.add(claim)
+
+    def add(self, claim: Claim) -> Claim:
+        raise ValueError("raw claim insertion is closed; use add_declared, add_observed, or CREATE_INFERRED")
+
+    def add_declared(self, claim: Claim) -> Claim:
+        if claim.claim_state is not ClaimState.DECLARED:
+            raise ValueError("add_declared accepts only DECLARED claims")
+        return self._add_validated(claim)
+
+    def add_observed(self, claim: Claim) -> Claim:
+        if claim.claim_state is not ClaimState.OBSERVED:
+            raise ValueError("add_observed accepts only OBSERVED claims")
+        return self._add_validated(claim)
 
     def _require_promotion_authority(self, claim: Claim) -> None:
         if claim.claim_family is ClaimFamily.NARRATIVE:
@@ -339,10 +391,12 @@ class InferenceEngine:
         for parent, snapshot in zip(parents, parent_snapshots, strict=True):
             if parent.model_dump(mode="json") != snapshot:
                 raise AssertionError("CREATE_INFERRED mutated a parent claim")
-        return self.service.add(inferred, allow_inferred=True)
+        return self.service._add_validated(inferred)
 
 
 __all__ = [
+    "Book2ClaimBinding",
+    "Book2ClaimState",
     "Claim",
     "ClaimService",
     "ClaimState",

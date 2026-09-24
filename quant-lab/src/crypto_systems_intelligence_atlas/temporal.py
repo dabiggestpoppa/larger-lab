@@ -102,24 +102,13 @@ class RealizationStatus(str, Enum):
 
 
 class RecordLifecycle(str, Enum):
-    """Shared record/claim lifecycle for Book 1 bindings and Book 2 claims.
-
-    Book 1 originally exposed the Constitution §7 subset used by its
-    kernel. Book 2's ratified state machine adds explicit inference,
-    corroboration, unresolved, freshness, and supersession states. Keeping
-    one enum prevents a provenance binding from silently losing that state.
-    """
+    """Record claim lifecycle (Constitution §7 vocabulary, subset used here)."""
 
     DECLARED = "DECLARED"
     OBSERVED = "OBSERVED"
-    INFERRED = "INFERRED"
     VERIFIED = "VERIFIED"
-    CORROBORATED = "CORROBORATED"
     CONTESTED = "CONTESTED"
-    UNRESOLVED = "UNRESOLVED"
-    STALE = "STALE"
     REJECTED = "REJECTED"
-    SUPERSEDED = "SUPERSEDED"
 
 
 class TemporalRecord(BaseModel):

@@ -91,8 +91,7 @@ def make_claim(
         parser_version="test-parser",
         evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
     )
-    return service.add(
-        Claim(
+    claim = Claim(
             claim_id=claim_id,
             evidence_refs=(captured.evidence_id,),
             source_refs=(source.source_id,),
@@ -107,7 +106,7 @@ def make_claim(
                 methodology_ref="direct-capture", version="v1", description="direct fixture observation"
             ),
         )
-    )
+    return service.add_declared(claim) if claim.claim_state is ClaimState.DECLARED else service.add_observed(claim)
 
 
 def test_01_spec_supersession_after_upgrade() -> None:

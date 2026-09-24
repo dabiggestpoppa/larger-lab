@@ -29,7 +29,6 @@ LEGAL_TRANSITIONS: Final[dict[ClaimState, frozenset[ClaimState]]] = {
     ClaimState.STALE: frozenset({ClaimState.OBSERVED, ClaimState.SUPERSEDED}),
     ClaimState.REJECTED: frozenset(),
     ClaimState.SUPERSEDED: frozenset(),
-    ClaimState.VERIFIED: frozenset(),
 }
 
 
@@ -55,6 +54,7 @@ class ClaimStateEngine:
         replacement_claim_id: str | None = None,
         supersession_reason: str | None = None,
         operator_involvement: str | None = None,
+        corroborating_claim_id: str | None = None,
     ) -> Claim:
         current = self.store.require(claim_id)
         if not self.can_transition(current.claim_state, new_state):
@@ -65,6 +65,41 @@ class ClaimStateEngine:
             raise ValueError("every transition requires triggering evidence")
         for evidence_ref in triggering_evidence_refs:
             self.service.evidence_store.require(evidence_ref)
+        if new_state is ClaimState.CORROBORATED:
+            if not corroborating_claim_id:
+                raise ValueError("CORROBORATED requires a corroborating claim")
+            corroborating = self.store.require(corroborating_claim_id)
+            if corroborating.claim_id == claim_id:
+                raise ValueError("a claim cannot corroborate itself")
+            current_evidence = [self.service.evidence_store.require(ref) for ref in current.evidence_refs]
+            corroborating_evidence = [self.service.evidence_store.require(ref) for ref in corroborating.evidence_refs]
+            current_sources = {item.source_id for item in current_evidence}
+            corroborating_sources = {item.source_id for item in corroborating_evidence}
+            if current_sources & corroborating_sources:
+                raise ValueError("P-4: corroboration requires a distinct source")
+            if any(
+                self.service.evidence_store.require(left_ref).content_hash
+                == self.service.evidence_store.require(right_ref).content_hash
+                and (
+                    self.service.evidence_store.require(left_ref).evidence_tier.value == "NARRATIVE"
+                    or self.service.evidence_store.require(right_ref).evidence_tier.value == "NARRATIVE"
+                )
+                for left_ref in current.evidence_refs
+                for right_ref in corroborating.evidence_refs
+            ):
+                raise ValueError("P-4: narrative copies are not independent evidence")
+            registry = self.service.source_registry
+            if registry is None:
+                raise ValueError("P-4: source ownership metadata is unavailable")
+            # Ownership/mechanism are explicit source metadata, never URL counts.
+            current_owners = {registry.require(source_id).owner_entity_ref for source_id in current_sources}
+            corroborating_owners = {registry.require(source_id).owner_entity_ref for source_id in corroborating_sources}
+            if current_owners & corroborating_owners:
+                raise ValueError("P-4: corroboration requires distinct owners")
+            current_mechanisms = {(registry.require(source_id).source_class, registry.require(source_id).locator.access_method) for source_id in current_sources}
+            corroborating_mechanisms = {(registry.require(source_id).source_class, registry.require(source_id).locator.access_method) for source_id in corroborating_sources}
+            if current_mechanisms & corroborating_mechanisms:
+                raise ValueError("P-4: corroboration requires distinct mechanisms/providers")
         normalize_utc(transitioned_at)
         lineage = current.supersession_lineage
         if new_state is ClaimState.SUPERSEDED:

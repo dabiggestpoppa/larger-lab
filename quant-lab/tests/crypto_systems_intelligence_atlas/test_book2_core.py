@@ -121,8 +121,7 @@ def make_claim(
         parser_version="test-parser",
         evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
     )
-    return service.add(
-        Claim(
+    claim = Claim(
             claim_id=claim_id,
             evidence_refs=(captured.evidence_id,),
             source_refs=(source.source_id,),
@@ -137,7 +136,7 @@ def make_claim(
                 methodology_ref="direct-capture", version="v1", description="direct fixture observation"
             ),
         )
-    )
+    return service.add_declared(claim) if claim.claim_state is ClaimState.DECLARED else service.add_observed(claim)
 
 
 def test_source_locator_churn_preserves_identity_and_requires_evidence() -> None:
@@ -314,11 +313,18 @@ def test_inference_rejects_missing_parent_declared_parent_and_methodology() -> N
 def test_claim_state_transitions_preserve_history_and_reject_illegal_paths() -> None:
     _, _, evidence, service, source = build_kernel()
     claim = make_claim(service, evidence, source, "claim-transition")
+    second = make_source("csia:source:second", SourceClass.RPC).model_copy(update={"owner_entity_ref": "owner:second"})
+    sources, authority, evidence, service, source = build_kernel()
+    claim = make_claim(service, evidence, source, "claim-transition")
+    sources.register(second)
+    authority.register_source(second)
+    corroborating = make_claim(service, evidence, second, "claim-corroborating")
     engine = ClaimStateEngine(service)
     corroborated = engine.transition(
         claim.claim_id,
         ClaimState.CORROBORATED,
-        triggering_evidence_refs=claim.evidence_refs,
+        triggering_evidence_refs=corroborating.evidence_refs,
+        corroborating_claim_id=corroborating.claim_id,
         transitioned_at=LATER,
     )
     assert corroborated.claim_state is ClaimState.CORROBORATED
