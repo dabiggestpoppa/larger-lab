@@ -106,7 +106,7 @@ def build_watermark_boundary_matrix() -> dict[str, Any]:
         rows.append(
             _case(
                 name,
-                ["exact_integer_classification"],
+                ["exact_classification"],
                 capacity_bytes=10_000,
                 used_bytes=used,
                 byte_derived_utilization_millionths=(used * 1_000_000) // 10_000,
@@ -138,8 +138,8 @@ def build_priority_pause_matrix() -> dict[str, Any]:
         ("critical_p1_blocked", 9_500, 100, StoragePriority.P1, WriteDisposition.BLOCK, True),
         ("critical_p2_blocked", 9_500, 100, StoragePriority.P2, WriteDisposition.BLOCK, True),
         ("critical_p3_blocked", 9_500, 100, StoragePriority.P3, WriteDisposition.BLOCK, True),
-        ("p0_floor_equality_safe", 1_000, 1_000, StoragePriority.P0, WriteDisposition.PROCEED, False),
-        ("p0_one_byte_floor_breach_blocked", 1_000, 1_001, StoragePriority.P0, WriteDisposition.BLOCK, True),
+        ("p0_floor_equality_safe", 9_000, 1_000, StoragePriority.P0, WriteDisposition.PROCEED, False),
+        ("p0_one_byte_floor_breach_blocked", 9_000, 1_001, StoragePriority.P0, WriteDisposition.BLOCK, True),
         ("zero_free_blocks_p0", 10_000, 0, StoragePriority.P0, WriteDisposition.BLOCK, True),
     )
     rows = []
