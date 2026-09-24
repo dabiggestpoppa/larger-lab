@@ -448,7 +448,7 @@ def test_crash_08_after_finalize_receipt_before_shell_commit_flag(tmp_path):
         + shlex.join(command) + "\n"
         + f"test -f {shlex.quote(output.as_posix())}\n"
         + f": > {shlex.quote(h.signal.as_posix())}\n"
-        + "sleep 300\n"
+        + "exec sleep 300\n"
         + "PG_FINALIZED=true\n",
         encoding="utf-8")
     process = subprocess.Popen([BASH, str(worker)], env=h.env,
