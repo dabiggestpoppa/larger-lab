@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """B4-CXR7U9R41R4 — executable pre-intent recovery and artifact source authority."""
 import hashlib
-import hmac
 import json
 import re
 import shutil
@@ -405,52 +404,28 @@ def test_artifact_source_authority_is_exact_and_registry_independent():
     assert "-mod=readonly" in dockerfile and "GOSUMDB=sum.golang.org" in dockerfile
 
 
-def _sign(key, msg):
-    return hmac.new(key, msg.encode(), hashlib.sha256).digest()
-
-
 def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
                  secret="test-secret-artifact-001"):
-    now = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-    date = now[:8]
-    date_only = date.split("T")[0]
-    host_header = "localhost:9000"
-    payload_hash = hashlib.sha256(body).hexdigest()
     suffix = f"/{key}" if key else "/"
-    canonical_headers = (f"host:{host_header}\n"
-                         f"x-amz-content-sha256:{payload_hash}\n"
-                         f"x-amz-date:{now}")
-    signed_headers = "host;x-amz-content-sha256;x-amz-date"
-    canonical = "\n".join([
-        method, f"/{bucket}{suffix}", "", canonical_headers, signed_headers,
-        payload_hash,
-    ])
-    scope = f"{date}/{date_only}/us-east-1/s3/aws4_request"
-    string_to_sign = "\n".join([
-        "AWS4-HMAC-SHA256", now, scope,
-        hashlib.sha256(canonical.encode()).hexdigest()])
-    kdate = _sign(("AWS4" + secret).encode(), date)
-    kregion = _sign(kdate, date_only)
-    kservice = _sign(kregion, "us-east-1")
-    ksigning = _sign(kservice, "aws4_request")
-    signature = _sign(ksigning, string_to_sign).hex()
-    auth = (f"AWS4-HMAC-SHA256 Credential={access}/{scope}, "
-            f"SignedHeaders={signed_headers}, Signature={signature}")
-    url = f"http://{host_header}/{bucket}{suffix}"
-    command = ["docker", "exec"]
+    url = f"http://localhost:9000/{bucket}{suffix}"
+    response_path = "/tmp/oce-s3-response"
+    command = ["docker", "exec", oc.ARTIFACT, "curl", "-sS", "-o",
+               response_path, "-w", "%{http_code}", "-X", method,
+               "--aws-sigv4", "aws:amz:us-east-1:s3", "--user", f"{access}:{secret}"]
     if method == "PUT":
-        command += ["-i", oc.ARTIFACT, "curl", "-sS", "-o", "/dev/null",
-                    "-w", "%{http_code}", "-X", "PUT", "--data-binary", "@-",
-                    "-H", f"Host: {host_header}", "-H", f"x-amz-date: {now}",
-                    "-H", f"x-amz-content-sha256: {payload_hash}",
-                    "-H", f"Authorization: {auth}", url]
+        command += ["--data-binary", "@-", url]
     else:
-        command += [oc.ARTIFACT, "curl", "-sS", "-w", "\n%{http_code}",
-                    "-H", f"Host: {host_header}", "-H", f"x-amz-date: {now}",
-                    "-H", f"x-amz-content-sha256: {payload_hash}",
-                    "-H", f"Authorization: {auth}", url]
-    return subprocess.run(command, input=body if method == "PUT" else None,
-                          capture_output=True)
+        command += [url]
+    result = subprocess.run(command, input=body if method == "PUT" else None,
+                            capture_output=True, timeout=30)
+    response = subprocess.run(["docker", "exec", oc.ARTIFACT, "cat", response_path],
+                              capture_output=True, timeout=30)
+    stdout = result.stdout if method == "PUT" else response.stdout + b"\n" + result.stdout
+    diagnostics = result.stderr
+    if result.stdout != b"200":
+        diagnostics += b"\nS3 response: " + response.stdout + response.stderr
+    return subprocess.CompletedProcess(result.args, result.returncode, stdout,
+                                       diagnostics)
 
 
 def test_official_source_image_health_s3_and_persistence(oce_stack, tmp_path):
