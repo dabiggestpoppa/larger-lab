@@ -263,7 +263,7 @@ def test_finalize_versus_rollback_exactly_one_wins(tmp_path):
                        .read_text(encoding="utf-8"))
     assert claim["transition"] == winner, claim
     assert rec["state"] in {"FINALIZED", "ROLLED_BACK", "FAILED",
-                            "COMMIT_POINT_REACHED",
+                            "COMMIT_INTENT_RECORDED", "COMMIT_POINT_REACHED",
                             "FINALIZING" if winner == "finalize" else "ROLLING_BACK"}, rec
     assert rec.get("selected_transition") == winner, rec
 
@@ -315,8 +315,9 @@ def test_the_loser_mutates_nothing(oce_stack, tmp_path):
     assert drain_rc in (0, 1), drain_rc   # winner or clean refusal, not a crash
     record_after_drain = json.loads((root / "transitions" / f"{opid}.json")
                                     .read_text(encoding="utf-8"))
-    assert record_after_drain["state"] in ("FINALIZING", "COMMIT_POINT_REACHED",
-                                           "FINALIZED"), record_after_drain
+    assert record_after_drain["state"] in (
+        "FINALIZING", "COMMIT_INTENT_RECORDED", "COMMIT_POINT_REACHED",
+        "FINALIZED"), record_after_drain
     # RACE: two real rollback processes contend for the ALREADY-CLAIMED
     # operation. Both must lose — and lose with zero mutations.
     results = _race(tmp_path, root, promote, inv, invsha, ["rollback", "rollback"])

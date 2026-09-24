@@ -154,24 +154,58 @@ def test_control_state_check_before_nonatomic_claim_loses_the_race(
 def _shell_law_from_source(source, tmp_path):
     text = source
     m = re.search(r"(durable_precommit\(\) \{.*?\n\})\n", text, re.S)
-    m2 = re.search(r"(_promote_op_id\(\) \{.*?\n\})\n", text, re.S)
-    assert m and m2
+    assert m
     python_exe = sys.executable.replace("\\", "/")
 
     def run(record_state):
         transitions = tmp_path / "ctl" / "recovery" / "transitions"
         transitions.mkdir(parents=True, exist_ok=True)
         opid = "0123456789abcdef0123456789abcdef"
+        authority = {
+            "format": pgrec.RECEIPT_FORMAT, "operation_phase": "promote",
+            "exit_status": 0, "promoted": True, "operation_id": opid,
+            "database": pgrec.DB, "user": pgrec.USER,
+            "container": pgrec.CONTAINER, "source_commit": "a" * 40,
+            "source_tree": "b" * 40, "run_id": "0123456789abcdef",
+            "stamp": "0123456789ab",
+            "quarantine_database": pgrec.QUARANTINE_PREFIX + "0123456789ab",
+            "staging_database": pgrec.STAGING_PREFIX + "0123456789ab",
+            "source_archive_sha256": "c" * 64, "inventory_sha256": "d" * 64,
+        }
+        digest = pgrec._receipt_digest(authority)
+        record = {
+            "format": pgrec.TRANSITION_FORMAT, "state": record_state,
+            "operation_id": opid, "database": pgrec.DB, "user": pgrec.USER,
+            "container": pgrec.CONTAINER, "source_commit": "a" * 40,
+            "source_tree": "b" * 40, "run_id": "0123456789abcdef",
+            "stamp": "0123456789ab",
+            "quarantine_database": authority["quarantine_database"],
+            "staging_database": authority["staging_database"],
+            "source_archive_sha256": "c" * 64, "inventory_sha256": "d" * 64,
+            "receipt_sha256": digest, "selected_transition": "finalize",
+            "commit_intent": {
+                "marker": "forward_commit", "operation_id": opid,
+                "receipt_sha256": digest, "database": pgrec.DB,
+                "user": pgrec.USER, "container": pgrec.CONTAINER,
+                "quarantine_database": authority["quarantine_database"],
+                "at": "2026-09-24T00:00:00Z",
+            },
+            "commit_point": {
+                "marker": "quarantine_dropped",
+                "at": "2026-09-24T00:00:01Z",
+            },
+        }
         (transitions / f"{opid}.json").write_text(
-            json.dumps({"state": record_state}), encoding="utf-8")
+            json.dumps(record), encoding="utf-8")
         promote = tmp_path / "ctl" / "promote.json"
-        promote.write_text(json.dumps({"operation_id": opid}), encoding="utf-8")
+        promote.write_text(json.dumps(authority), encoding="utf-8")
         script = ("set -uo pipefail\n"
                   f'OCE_PYTHON="{python_exe}"\n'
                   f"BIN='{SCRIPTS.as_posix()}'\n"
                   f"PROMOTE_RECEIPT='{promote}'\n"
                   f"VAR_DIR='{tmp_path / 'ctl'}'\n"
-                  + m2.group(1) + "\n" + m.group(1) +
+                  f"export OCE_BACKUP_ROOTS='{tmp_path / 'ctl'}'\n"
+                  + m.group(1) +
                   "\ndurable_precommit\n")
         r = subprocess.run([BASH, "-c", script], capture_output=True, text=True,
                            timeout=60)

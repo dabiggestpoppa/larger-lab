@@ -47,9 +47,7 @@ def _extract_durable_precommit_bash():
     text = (SCRIPTS / "restore.sh").read_text(encoding="utf-8")
     m = re.search(r"(durable_precommit\(\) \{.*?\n\})\n", text, re.S)
     assert m, "durable_precommit not found in restore.sh"
-    m2 = re.search(r"(_promote_op_id\(\) \{.*?\n\})\n", text, re.S)
-    assert m2, "_promote_op_id not found in restore.sh"
-    return m2.group(1) + "\n" + m.group(1)
+    return m.group(1)
 
 
 @pytest.fixture
@@ -63,7 +61,6 @@ def shell_law(tmp_path):
 
     def run(promote_receipt, record_state):
         receipts = tmp_path / "shell" / "receipts"
-        # restore.sh reads $VAR_DIR/recovery/transitions/<opid>.json
         transitions = tmp_path / "shell" / "recovery" / "transitions"
         receipts.mkdir(parents=True, exist_ok=True)
         transitions.mkdir(parents=True, exist_ok=True)
@@ -71,16 +68,66 @@ def shell_law(tmp_path):
         if promote_receipt is not None:
             promote = receipts / "promote-receipt.json"
             promote.write_text(promote_receipt, encoding="utf-8")
-        opid = "0123456789abcdef0123456789abcdef"
         if record_state is not None:
+            opid = "0123456789abcdef0123456789abcdef"
+            authority = {
+                "format": pgrec.RECEIPT_FORMAT,
+                "operation_phase": "promote",
+                "exit_status": 0,
+                "promoted": True,
+                "operation_id": opid,
+                "database": pgrec.DB,
+                "user": pgrec.USER,
+                "container": pgrec.CONTAINER,
+                "source_commit": "a" * 40,
+                "source_tree": "b" * 40,
+                "run_id": "0123456789abcdef",
+                "stamp": "0123456789ab",
+                "quarantine_database": pgrec.QUARANTINE_PREFIX + "0123456789ab",
+                "staging_database": pgrec.STAGING_PREFIX + "0123456789ab",
+                "source_archive_sha256": "c" * 64,
+                "inventory_sha256": "d" * 64,
+            }
+            record = {
+                "format": pgrec.TRANSITION_FORMAT,
+                "state": record_state,
+                **{key: authority[key] for key in (
+                    "operation_id", "database", "user", "container",
+                    "source_commit", "source_tree", "run_id", "stamp",
+                    "quarantine_database", "staging_database",
+                    "source_archive_sha256", "inventory_sha256")},
+                "receipt_sha256": pgrec._receipt_digest(authority),
+            }
+            if record_state in (pgrec.TRANSITION_STATE_COMMIT_INTENT,
+                                pgrec.TRANSITION_STATE_COMMIT_POINT,
+                                "FINALIZED"):
+                record["selected_transition"] = "finalize"
+                record["commit_intent"] = {
+                    "marker": "forward_commit",
+                    "operation_id": opid,
+                    "receipt_sha256": record["receipt_sha256"],
+                    "database": pgrec.DB,
+                    "user": pgrec.USER,
+                    "container": pgrec.CONTAINER,
+                    "quarantine_database": authority["quarantine_database"],
+                    "at": "2026-09-24T00:00:00Z",
+                }
+            if record_state in (pgrec.TRANSITION_STATE_COMMIT_POINT,
+                                "FINALIZED"):
+                record["commit_point"] = {
+                    "marker": "quarantine_dropped",
+                    "at": "2026-09-24T00:00:01Z",
+                }
+            promote.write_text(json.dumps(authority), encoding="utf-8")
             (transitions / f"{opid}.json").write_text(
-                json.dumps({"state": record_state}), encoding="utf-8")
+                json.dumps(record), encoding="utf-8")
         script = (
             "set -uo pipefail\n"
             f"OCE_PYTHON=\"{python_exe}\"\n"
             f"BIN='{SCRIPTS.as_posix()}'\n"
             f"PROMOTE_RECEIPT='{promote}'\n"
             f"VAR_DIR='{tmp_path / 'shell'}'\n"
+            f"export OCE_BACKUP_ROOTS='{tmp_path / 'shell'}'\n"
             + functions +
             "\ndurable_precommit\n"
         )
@@ -104,6 +151,7 @@ def test_no_promotion_means_precommit(shell_law):
     ("PROMOTED", True),
     ("FINALIZING", True),
     ("ROLLING_BACK", True),
+    (pgrec.TRANSITION_STATE_COMMIT_INTENT, False),
     ("COMMIT_POINT_REACHED", False),
     ("FINALIZED", False),
 ])
@@ -121,6 +169,21 @@ def test_unknowable_durable_state_fails_closed(shell_law):
     rc, _err = shell_law(json.dumps({"operation_id": "0123456789abcdef0123456789abcdef"}),
                          "SOMETHING_ELSE")
     assert rc == 1
+
+
+def test_existing_promote_receipt_with_missing_record_fails_closed(shell_law):
+    """Once a promote receipt exists, absence of its record is unknowable—not
+    evidence that no operation happened."""
+    rc, err = shell_law(
+        json.dumps({"operation_id": "0123456789abcdef0123456789abcdef"}), None)
+    assert rc == 1
+    assert "UNKNOWABLE" in err
+
+
+def test_unreadable_existing_promote_receipt_fails_closed(shell_law):
+    rc, err = shell_law("{not json", None)
+    assert rc == 1
+    assert "UNKNOWABLE" in err
 
 
 # --------------------------------------------------------------------- #
@@ -215,7 +278,19 @@ def test_reconcile_reads_the_durable_commit_point(
     receipt, path, inv, sha = _promoted(bridge, tmp_path, monkeypatch)
     opid = receipt["operation_id"]
     pgrec._claim_transition(opid, "finalize", receipt)
-    pgrec._record_transition(opid, pgrec.TRANSITION_STATE_COMMIT_POINT, receipt)
+    pgrec._record_transition(
+        opid, pgrec.TRANSITION_STATE_COMMIT_INTENT, receipt,
+        extra={"commit_intent": {
+            "marker": "forward_commit", "operation_id": opid,
+            "receipt_sha256": pgrec._receipt_digest(receipt),
+            "database": pgrec.DB, "user": pgrec.USER,
+            "container": pgrec.CONTAINER,
+            "quarantine_database": receipt["quarantine_database"],
+            "at": "2026-09-24T00:00:00Z"}})
+    pgrec._record_transition(opid, pgrec.TRANSITION_STATE_COMMIT_POINT, receipt,
+                             extra={"commit_point": {
+                                 "marker": "quarantine_dropped",
+                                 "at": "2026-09-24T00:00:01Z"}})
     bridge.reset()
     out = _reconcile(bridge, tmp_path, monkeypatch, receipt, path, inv, sha,
                      quarantine_present=False, canonical_ok=True)

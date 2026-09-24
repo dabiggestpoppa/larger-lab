@@ -10,10 +10,10 @@ in a child process, exactly as the shell does, against REAL durable records:
 1. every non-finalizing pre-commit state classifies 0;
 2. COMMIT_POINT_REACHED and FINALIZED classify 3;
 3. FAILED and ROLLED_BACK (terminal, not in the shell's old sets) classify 0;
-4. the drop-before-record crash window: FINALIZING **with** a durable
-   commit_point marker classifies 3 — the state advance never landed but the
-   quarantine drop happened, so artifact-only rollback is forbidden;
-5. FINALIZING without a marker classifies 0;
+4. the former drop-before-record state is no longer trusted: FINALIZING with
+   an impossible commit marker classifies 4 (malformed/fail closed);
+5. FINALIZING without intent classifies 0, while the explicit durable
+   COMMIT_INTENT_RECORDED state classifies 3;
 6. a corrupt/unreadable record classifies 4 (fail closed).
 
 The mirror of this file's law is exercised by
@@ -29,7 +29,8 @@ TESTS = Path(__file__).resolve().parent
 CLI = TESTS.parent / "scripts" / "pg-recovery.py"
 
 PRECOMMIT_STATES = ["CREATED", "STAGED", "PROMOTED", "ROLLING_BACK"]
-POSTCOMMIT_STATES = ["COMMIT_POINT_REACHED", "FINALIZED"]
+POSTCOMMIT_STATES = ["COMMIT_INTENT_RECORDED", "COMMIT_POINT_REACHED",
+                     "FINALIZED"]
 TERMINAL_STATES = ["ROLLED_BACK", "FAILED"]
 
 
@@ -49,7 +50,24 @@ def test_every_precommit_state_classifies_zero(tmp_path):
 
 def test_postcommit_states_classify_three(tmp_path):
     for state in POSTCOMMIT_STATES:
-        assert _classify({"state": state}, tmp_path) == 3, state
+        record = {"state": state}
+        if state in ("COMMIT_INTENT_RECORDED", "FINALIZED"):
+            record["commit_intent"] = {
+                "marker": "forward_commit",
+                "operation_id": "0123456789abcdef0123456789abcdef",
+                "receipt_sha256": "a" * 64,
+                "database": "oce_local",
+                "user": "oce_local_admin",
+                "container": "oce-local-postgresql",
+                "quarantine_database": "oce_rollback_0123456789ab",
+                "at": "2026-09-24T00:00:00Z",
+            }
+        if state in ("COMMIT_POINT_REACHED", "FINALIZED"):
+            record["commit_point"] = {
+                "marker": "quarantine_dropped",
+                "at": "2026-09-24T00:00:01Z",
+            }
+        assert _classify(record, tmp_path) == 3, state
 
 
 def test_terminal_states_classify_zero(tmp_path):
@@ -59,14 +77,14 @@ def test_terminal_states_classify_zero(tmp_path):
         assert _classify({"state": state}, tmp_path) == 0, state
 
 
-def test_crash_window_finalizing_with_commit_point_marker_is_postcommit(tmp_path):
-    """The drop-before-record window: the quarantine drop happened but the
-    state advance to COMMIT_POINT_REACHED never landed. The durable marker
-    makes the truth classifiable — post-commit, rollback FORBIDDEN."""
+def test_impossible_finalizing_commit_marker_fails_closed(tmp_path):
+    """The old ordering allowed a marker to be injected before COMMIT_POINT.
+    Under the explicit ladder that marker is structurally impossible, so the
+    engine refuses to infer either pre-commit or post-commit truth from it."""
     rc = _classify({"state": "FINALIZING",
                     "commit_point": {"marker": "quarantine_dropped",
                                      "at": "2026-09-23T00:00:00Z"}}, tmp_path)
-    assert rc == 3, rc
+    assert rc == 4, rc
 
 
 def test_finalizing_without_marker_is_precommit(tmp_path):
@@ -81,3 +99,20 @@ def test_unknowable_record_fails_closed(tmp_path):
                        capture_output=True, text=True, timeout=60)
     assert r.returncode == 4, r.returncode
     assert _classify({"state": "SOME_FUTURE_STATE"}, tmp_path) == 4
+
+
+def test_unreadable_record_path_fails_closed(tmp_path):
+    unreadable = tmp_path / "not-a-record"
+    unreadable.mkdir()
+    r = subprocess.run([sys.executable, str(CLI), "--phase", "reconcile",
+                        "--classify-state", str(unreadable)],
+                       capture_output=True, text=True, timeout=60)
+    assert r.returncode == 4
+
+
+def test_malformed_commit_intent_fails_closed(tmp_path):
+    assert _classify({
+        "state": "COMMIT_INTENT_RECORDED",
+        "commit_intent": {"marker": "almost_forward_commit"},
+    }, tmp_path) == 4
+    assert _classify({"state": "COMMIT_INTENT_RECORDED"}, tmp_path) == 4
