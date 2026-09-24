@@ -2129,3 +2129,159 @@ self-ratified closed: the authoritative local-ground workflow remains blocked
 by Docker registry authorization, and SonarCloud remains failed. The evidence
 head is this evidence-only commit; the implementation head remains
 `af69345d`.
+
+
+---
+
+## R41R4 SUPERSEDING SECTION — EXECUTABLE PRE-INTENT ABORT + EXACT LOCAL ARTIFACT AUTHORITY (B4-CXR7U9R41-EVIDENCE-3)
+
+**Status:** `READY_FOR_OPERATOR_REVIEW` (append-only supersession; R41, R41R2, and all earlier sections remain historical truth and are not rewritten).
+
+**Authorized start SHA:** `02f6899a5e95260fd5e130d85dbe5a4428b87c93`.
+**R41R4 implementation head:** `bba377a857c5747f320e56fec5d41ac60f597f4a`.
+**Implementation tree:** `28fb0952c76cd001cba16169046a661b61e26ec4`.
+**origin/main:** `7c7816f382947bbc8a1f2154435fc436f2428fa8` (untouched).
+**PR #4:** OPEN, unmerged, `mergeStateStatus=UNSTABLE`; merge authorization was not granted or exercised.
+
+### R41R4 append-only implementation and narrow-repair chain
+
+```text
+bb098bec  B4-CXR7U9R41R4   governed executable pre-intent abort
+76d88c4a  B4-CXR7U9R41R4   build the artifact image from official pinned source
+c6aeab7d  B4-CXR7U9R41R4   add adversarial completion proofs
+7cd1de8f  B4-CXR7U9R41R4   wire proofs into the single local-ground runner
+6698f825  B4-CXR7U9R41R4X  initialize immutable source authority
+d8818973  B4-CXR7U9R41R4X  pin the available Alpine package revisions
+2bc18b9a  B4-CXR7U9R41R4X  pin both multi-architecture base indexes
+43d071ed  B4-CXR7U9R41R4X  make build authority executable
+e127c328  B4-CXR7U9R41R4X  canonicalize the S3 signing headers
+360e4778  B4-CXR7U9R41R4X  terminate the canonical signed-header set
+305bf950  B4-CXR7U9R41R4X  derive the SigV4 final key correctly
+c247a5c0  B4-CXR7U9R41R4X  use curl native AWS SigV4
+bba377a8  B4-CXR7U9R41R4X  preserve stdin for the containerized S3 PUT
+```
+
+No amend, squash, rebase, reset, force-push, PR merge, or main modification was
+performed. The R41R2 chain (`6afb849a`, `9f47e541`, `af69345d`, `02f6899a`) remains
+intact and is neither rewritten nor replaced.
+
+### Governed executable pre-intent abort
+
+The finalize crash gap is now closed by a program-owned `preintent-rollback`
+transition, not by interpreting a spent finalize claim as fresh rollback
+authority. The engine:
+
+- takes one operation-scoped OS advisory execution lock shared by finalize resume
+  and pre-intent abort;
+- admits abort only before `COMMIT_INTENT_RECORDED`, with exact operation ID,
+  promote-receipt digest, canonical database/user/container identity, archive
+  identity, and existing finalize-claim binding;
+- revalidates the complete admission tuple and durable phase while holding the
+  lock immediately before any recovery mutation;
+- restores the old PostgreSQL canonical first, restores the old artifact store
+  second, and verifies both old digests before recording a terminal `ROLLED_BACK`
+  receipt;
+- refuses a fresh rollback after the forward boundary, and gives a conflict loser
+  no execution authority and no receipt write.
+
+`restore.sh` now delegates crash classification and admission to the engine,
+executes the production pre-intent route, and reports only facts established by
+the run: `converged_old_old`, `postgres_rolled_back`, `artifact_restored`, and the
+reconciliation command. Partial or failed work returns nonzero and is never
+labelled converged.
+
+The R41R4 proof module contributes exactly 13 node IDs to the one existing
+authoritative pytest invocation. It proves: spent finalize claim is not fresh
+rollback authority; admitted pre-intent abort converges old/old; forward-boundary
+abort refusal; finalize/abort exclusion; two-abort and resume/abort single
+executor behavior; duplicate resume-finalize serialization; both production-shell
+pre-intent crash points; the R41R2 negative control; exact registry-independent
+source authority; and live source-built MinIO health, S3 round trip, and restart
+persistence.
+
+### Correction to the R41R2 external-blocker diagnosis
+
+R41R2 cases 01 and 02 proved classifier and shell-reconciliation behavior only;
+they did not execute production old/old rollback after the finalize claim had
+already been spent. The earlier statement that the inaccessible Quay MinIO image
+was merely an external runner problem is superseded. Repeated authorization
+failures established that the reference itself was not a viable distribution
+dependency, and official MinIO source distribution is source-only. R41R4
+therefore removes the registry dependency rather than suppressing or relabeling
+that failure.
+
+The artifact store is built locally from the exact official MinIO release:
+
+```text
+release:        RELEASE.2024-05-28T17-19-04Z
+peeled commit:  f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531
+source SHA-256: 558275de8aaf5fa04cca55cfd712ea76886e34b47458a591e2754b3caeaab2c3
+image:          oce-local/artifact-store:RELEASE.2024-05-28T17-19-04Z-f79a4ef4d0dc
+Go index:       sha256:cdc86d9f363e8786845bea2040312b4efa321b828acdeb26f393faa864d887b0
+Alpine index:   sha256:b89d9c93e9ed3597455c90a0b88a8bbb5cb7188438f70953fede212a0c4394e0
+```
+
+The build peels the annotated tag, verifies the archive checksum before use,
+pins both base indexes and the Alpine package revisions, records executable
+version/revision evidence, and uses `pull_policy: never`. No image was published
+to a private registry and no new credential was introduced.
+
+### Exact implementation-head CI truth
+
+All five validation workflows completed successfully on the exact R41R4
+implementation head `bba377a857c5747f320e56fec5d41ac60f597f4a`:
+
+```text
+36059471143  b1-local-ground-validation   success
+36059471084  b2-control-plane-validation  success
+36059471054  b3-worker-fabric-validation  success
+36059471058  b4-config-spine-validation   success
+36059477563  B1-I1R Validation             success
+```
+
+The b1 evidence artifact `b1-local-ground-evidence-4b9980d9c97d` was downloaded
+and reconciled:
+
+```text
+identity commit:       bba377a857c5747f320e56fec5d41ac60f597f4a
+identity tree:         28fb0952c76cd001cba16169046a661b61e26ec4
+OCE_RUN_ID:            4b9980d9c97d
+JUnit/test summary:    348 collected / 348 executed / 348 passed
+failures/errors/skips: 0 / 0 / 0
+container-backed:      27 collected / 27 executed / 27 passed / 0 skipped
+independent gate:      75 PASS / 0 FAIL
+adversarial suite:     8 PASS / 0 FAIL
+evidence manifest:     37 artifacts; independent gate verified hashes and sizes
+source cleanliness:    clean before and after
+cleanup:               disposable, containers, networks, and volumes removed
+final status:          LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW
+```
+
+The 13 R41R4 node IDs are present and passed in that single run. In particular,
+the official-source image test reached live MinIO health, bucket creation,
+authenticated object PUT, exact-body authenticated GET, and persistence after
+service restart. The source-authority proof independently checked the exact
+release, peeled revision, source checksum, pinned base indexes, local image name,
+and registry-independent build route.
+
+### External-check, scope, and cost truth
+
+- SonarCloud Code Analysis is **failure**, unchanged and unsuppressed; no
+  exclusion, NOSONAR marker, threshold weakening, or severity change was made.
+- Kilo Code Review was **in progress** when this evidence section was authored;
+  it is not called green.
+- PR #4 remains OPEN, unmerged, and UNSTABLE. It was not merged.
+- `main` remains `7c7816f3`; main was not modified or pushed.
+- Cloud mutations = 0; broker mutations = 0; capital mutations = 0;
+  execution-authority mutations = 0; recurring cost = $0.
+- No remote database, broker, paper/live trading, capital, or execution mutation
+  occurred. Book 5 and Atlas Program Block 4 remain untouched.
+- `.bu_tmp/` remains untracked and is excluded from the evidence commit.
+
+### R41R4 exit-gate status
+
+The governed pre-intent abort, exact official-source artifact image, live S3 and
+restart proof, single-runner wiring, and exact-head CI requirements are complete.
+The result is `READY_FOR_OPERATOR_REVIEW`; Book 4 closure is not self-ratified,
+PR #4 is not merged, and the external Sonar/Kilo dispositions remain operator
+review facts.

@@ -289,3 +289,35 @@ status remains `IN_PROGRESS / EXTERNAL-CI-BLOCKED`. SonarCloud is failure and
 unsuppressed; Kilo is queued; PR #4 is OPEN, unmerged, MERGEABLE, and UNSTABLE.
 No cloud, broker, capital, or execution-authority mutation occurred; recurring
 cost is $0. Book 5 and Atlas Program Block 4 remain untouched.
+
+### R41R4 completion repair (append-only)
+
+| Repair | Commit | Scope | Evidence |
+|---|---|---|---|
+| B4-CXR7U9R41R4 | `bb098bec` | governed operation-scoped `preintent-rollback`, exact admission/identity/digest binding, old/old convergence, truthful terminal receipt, and finalize/abort serialization | 13 R41R4 node IDs in the single authoritative local-ground invocation |
+| B4-CXR7U9R41R4-S | `76d88c4a` | replace the inaccessible registry image with an exact local build from official pinned MinIO source | release `RELEASE.2024-05-28T17-19-04Z`, peeled `f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531`, source SHA-256 `558275de8aaf5fa04cca55cfd712ea76886e34b47458a591e2754b3caeaab2c3` |
+| B4-CXR7U9R41R4-X1..X9 | `6698f825`..`bba377a8` | immutable source/base authority, executable build evidence, canonical S3 signing, native curl SigV4, and container stdin preservation | source-built image health, bucket/object PUT, exact-body GET, and restart persistence passed |
+
+**R41 implementation head:** `bba377a857c5747f320e56fec5d41ac60f597f4a`.
+**Implementation tree:** `28fb0952c76cd001cba16169046a661b61e26ec4`.
+**OCE_RUN_ID:** `4b9980d9c97d`.
+
+**Exact implementation-head validation:** all five workflows succeeded: b1
+`36059471143`, b2 `36059471084`, b3 `36059471054`, b4 `36059471058`, and B1-I1R
+`36059477563`. B1 reports 348 collected / 348 executed / 348 passed, 0 failures,
+0 errors, 0 skips, 27/27 container-backed tests passed, and independent gate
+75 PASS / 0 FAIL over 37 manifested artifacts. Source was clean before/after and
+container cleanup removed all disposable containers, networks, and volumes.
+
+**Truth correction:** R41R2 crash cases 01/02 established classification and
+reconciliation only, not executable old/old rollback after a spent finalize
+claim. The prior Quay `unauthorized` diagnosis as a merely external runner issue
+is superseded: the registry reference itself was not viable. R41R4 builds the
+exact official source locally and removes that dependency without publication or
+new credentials.
+
+**Exit-gate truth:** `READY_FOR_OPERATOR_REVIEW`; no self-ratification or merge.
+SonarCloud is failure/unsuppressed; Kilo was in progress and is not called green.
+PR #4 is OPEN, unmerged, and UNSTABLE. `main` remains `7c7816f3`. Cloud, broker,
+capital, and execution-authority mutations are 0; recurring cost is $0; Book 5
+and Atlas Program Block 4 remain untouched.
