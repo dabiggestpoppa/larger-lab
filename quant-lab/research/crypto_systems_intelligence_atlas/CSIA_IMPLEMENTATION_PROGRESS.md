@@ -438,3 +438,33 @@ Artifacts:
 Exact next operator action: review the R4 corroboration semantic matrix and
 explicitly accept or reject the proposed Book 2 exit gate. Do not start Book 3
 before that decision.
+
+
+# CHECKPOINT 10 — BOOK 2 IMPLEMENTATION ACCEPTED (2026-09-24)
+
+The operator explicitly accepted the deterministic/offline Book 2 epistemics kernel
+and the proposed exit gate. This checkpoint records acceptance and freezes Book 2;
+it does not authorize Book 3 implementation or deferred live scope.
+
+```text
+BOOK_2_IMPLEMENTATION = ACCEPTED
+BOOK_2_EXIT_GATE = ACCEPTED
+BOOK_2_HARDENING_R1 = PASS
+BOOK_2_HARDENING_R2 = PASS
+BOOK_2_HARDENING_R3 = PASS
+BOOK_2_HARDENING_R4 = PASS
+BOOK_2_BLOCKING_ISSUES = 0
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+NEXT_BUILD_SCOPE = NONE
+BOOK_3_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Accepted exit gate: `PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`
+
+Acceptance record:
+`CSIA_BOOK_2_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md`
+
+Book 2 is `FROZEN_ACCEPTED`. Future changes require a concrete downstream
+integration defect, an explicit amendment, or a newly discovered correctness
+failure. Do not perform further generic Book 2 hardening or optimize test counts.
