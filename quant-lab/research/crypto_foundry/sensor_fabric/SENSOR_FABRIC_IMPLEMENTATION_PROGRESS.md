@@ -1977,8 +1977,8 @@ Mandatory start: `71ccb0c7fbd110edf6d431140009254f90c37722` on
 |---|---|---|
 | `683f5d7a` | SENSOR-B4-I09R1A: remove essential bypass; reconcile and rederive untrusted quota state | repair |
 | `fa38e779` | SENSOR-B4-I09R1B: explicit estimate admission; strict retention boolean and schema types | repair |
-| `fe7cd0d3` | SENSOR-B4-I09R1C: adversarial tests and deterministic required-invariant builders | evidence builders/tests |
 | `ed2a7569` | SENSOR-B4-I09R1A-R1: require explicit config and matching floor authority | repair |
+| `fe7cd0d3` | SENSOR-B4-I09R1C: adversarial tests and deterministic required-invariant builders | evidence builders/tests |
 | `ec1eff5f` | SENSOR-B4-I09R1B-R1: require explicit admission config authority | repair |
 | D (this commit) | Publish four R1 matrices, microseal, and operator-hold reconciliation | proposed seal |
 
