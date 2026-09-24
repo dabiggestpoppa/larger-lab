@@ -386,3 +386,55 @@ Artifacts:
 Exact next operator action: review the R3 canonical claim authority matrix and
 explicitly accept or reject the proposed Book 2 exit gate. Do not start Book 3
 before that decision.
+
+
+# CHECKPOINT 9 — BOOK 2 HARDENING R4 (2026-09-24)
+
+Checkpoints 1–8 are preserved. This narrow checkpoint records the corroboration
+semantic seal only; it does not accept Book 2 or authorize Book 3/live systems.
+
+```text
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_HARDENING_R4 = PASS
+BOOK_2_IMPLEMENTATION = COMPLETE_HARDENED
+BOOK_2_EXIT_GATE = PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_2_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_3 = NOT_STARTED
+LIVE_COLLECTORS = NOT_STARTED
+```
+
+Machine-readable gates:
+
+```text
+PROPOSITION_EQUIVALENCE = PASS
+CLAIM_FAMILY_MATCH = PASS
+CORROBORATOR_STATE = PASS
+CANONICAL_CORROBORATOR = PASS
+EVIDENCE_BINDING = PASS
+VALID_TIME_COMPATIBILITY = PASS
+INDEPENDENCE = PASS
+CORROBORATION_TRANSITION_PROVENANCE = PASS
+GRAPH_PROMOTION_RECHECK = PASS
+BOOK1_FREEZE = PASS
+```
+
+Quality gates:
+
+```text
+CSIA tests             = 215 passed (107 Book 1 + 108 Book 2/hardening/integration)
+R4 focused tests       = 16 passed
+Crypto Sensor          = 2339 passed / 4 skipped
+ruff (CSIA scope)      = PASS
+mypy                   = PASS (16 source files)
+```
+
+Artifacts:
+
+- `CSIA_BOOK_2_HARDENING_R4_MATRIX.json`
+- `CSIA_BOOK_2_IMPLEMENTATION_EVIDENCE_v0.1.md` (HARDENING R4 — CORROBORATION SEMANTIC SEAL)
+- this checkpoint
+
+Exact next operator action: review the R4 corroboration semantic matrix and
+explicitly accept or reject the proposed Book 2 exit gate. Do not start Book 3
+before that decision.

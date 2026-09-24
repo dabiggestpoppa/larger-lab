@@ -249,3 +249,46 @@ R3 evidence:
 The proposed exit gate remains
 `PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`. Operator acceptance is still
 required; Book 3 and all live/infrastructure scope remain deferred.
+
+
+## HARDENING R4 — CORROBORATION SEMANTIC SEAL
+
+Book 2 Hardening R4 closes the remaining agreement gap in `CORROBORATED`
+transitions without mutating accepted Book 1. Corroboration now requires structured
+proposition equivalence, matching claim family, a canonical observation-bearing
+corroborator, and triggering evidence bound to that corroborator. The R1 P-4
+independence checks remain active.
+
+The current `Claim` model exposes `valid_time_hypothesis` as either one known
+UTC timestamp or `UnknownBound`; it does not expose a valid-time interval. Therefore
+known hypotheses must agree exactly for automatic corroboration, while any
+`UnknownBound` fails closed rather than fabricating temporal certainty. No fuzzy
+semantic matching was added.
+
+`TransitionEvent` now retains `corroborating_claim_id` alongside the triggering
+evidence, resulting claim version, and transition time. `GraphFactPromoter` requires
+that provenance and a corroborating claim resolvable in ClaimStore history. The
+corroborator need not remain currently `OBSERVED` forever, but the historical
+transition record remains auditable.
+
+R4 evidence:
+
+- `PROPOSITION_EQUIVALENCE = PASS`
+- `CLAIM_FAMILY_MATCH = PASS`
+- `CORROBORATOR_STATE = PASS`
+- `CANONICAL_CORROBORATOR = PASS`
+- `EVIDENCE_BINDING = PASS`
+- `VALID_TIME_COMPATIBILITY = PASS`
+- `INDEPENDENCE = PASS`
+- `CORROBORATION_TRANSITION_PROVENANCE = PASS`
+- `GRAPH_PROMOTION_RECHECK = PASS`
+- `BOOK1_FREEZE = PASS` with **0** accepted Book 1 mutations
+- CSIA: **215 passed** (107 Book 1 + 108 Book 2/hardening/integration)
+- R4 focused tests: **16 passed**
+- Crypto Sensor regression: **2339 passed, 4 skipped**; the full suite passed
+- CSIA Ruff: **PASS**
+- Mypy: **PASS**, 16 source files
+
+The proposed exit gate remains
+`PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`. Operator acceptance is still
+required; Book 3 and all live/infrastructure scope remain deferred.

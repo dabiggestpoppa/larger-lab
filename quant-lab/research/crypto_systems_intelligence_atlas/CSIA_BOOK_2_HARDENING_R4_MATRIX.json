@@ -1,0 +1,45 @@
+{
+  "artifact": "CSIA_BOOK_2_HARDENING_R4_MATRIX",
+  "version": "0.1",
+  "date": "2026-09-24",
+  "branch": "agent/crypto-systems-intelligence-atlas-book2-build",
+  "scope": "Narrow Book 2 corroboration semantic seal; no Book 1 mutation, Book 3, live collectors, network, database, graph DB, Sensor, or Capital Field",
+  "starting_head": "0c17189f3300d11c7acb9df32828054e18231fbf",
+  "book1_anchor": "7c2419f00b9f5f5f105708b067848909fa4da609",
+  "gates": {
+    "PROPOSITION_EQUIVALENCE": "PASS — exact subject_refs, predicate, object_ref, and qualifier equality; no fuzzy matching",
+    "CLAIM_FAMILY_MATCH": "PASS — current and corroborating claim families must match",
+    "CORROBORATOR_STATE": "PASS — only canonical current OBSERVED or CORROBORATED claims may corroborate",
+    "CANONICAL_CORROBORATOR": "PASS — corroborating_claim_id resolves through ClaimStore.require; historical state is rejected at transition time",
+    "EVIDENCE_BINDING": "PASS — triggering evidence must be a subset of the canonical corroborating claim evidence",
+    "VALID_TIME_COMPATIBILITY": "PASS — known point hypotheses must match; UnknownBound fails closed because the current Claim model has no interval-overlap representation",
+    "INDEPENDENCE": "PASS — R1 P-4 distinct source, owner, mechanism/provider, and narrative-copy checks remain active",
+    "CORROBORATION_TRANSITION_PROVENANCE": "PASS — TransitionEvent retains corroborating_claim_id, triggering evidence, resulting claim version, and transition time",
+    "GRAPH_PROMOTION_RECHECK": "PASS — GraphFactPromoter requires a matching current transition and a corroborating claim resolvable in history",
+    "BOOK1_FREEZE": "PASS — zero diff across accepted Book 1 temporal, package, identity, ontology, and relationship files"
+  },
+  "invalid_cases": {
+    "unrelated_proposition": "REJECTED",
+    "same_subject_different_predicate": "REJECTED",
+    "same_predicate_different_object": "REJECTED",
+    "different_claim_family": "REJECTED",
+    "declared_corroborator": "REJECTED",
+    "contested_rejected_stale_superseded_corroborator": "REJECTED",
+    "historical_corroborator": "REJECTED",
+    "unrelated_triggering_evidence": "REJECTED",
+    "incompatible_or_unknown_valid_time": "REJECTED"
+  },
+  "quality_gates": {
+    "all_csia": "215 passed",
+    "book1_only": "107 passed",
+    "book2_and_hardening": "108 passed",
+    "r4_focused": "16 passed",
+    "sensor_regression": "2339 passed, 4 skipped; full suite passed",
+    "ruff_csia": "PASS",
+    "mypy": "PASS; 16 source files",
+    "full_repository_ruff": "PRE-EXISTING FINDINGS outside CSIA scope"
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "operator_acceptance": "NOT_SELF_ACCEPTED"
+}
