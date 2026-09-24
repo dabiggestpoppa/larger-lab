@@ -84,6 +84,11 @@ cmd_local_up() {
     return 4
   fi
   require docker
+  bash "$SCRIPT_DIR/build-artifact-image.sh" || {
+    echo "BLOCKED: official-source artifact image build failed" >&2
+    log_op "local up" false
+    return 6
+  }
   (cd "$COMPOSE_DIR" || exit 1
    # Env-injected secrets win over .env placeholders (secure local injection).
    if [ -f .env ]; then
