@@ -1,0 +1,26 @@
+{
+  "api": "crypto_sensor_fabric.storage.duckdb_catalog.rebuild_duckdb_catalog",
+  "catalog_role": "rebuildable_discovery_non_authoritative",
+  "checkpoint": "SENSOR-B4-I10R2",
+  "governance": {
+    "G4-09_CATALOG_REBUILD_GATE": "IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW",
+    "I11": "UNAUTHORIZED",
+    "I12_plus": "UNAUTHORIZED",
+    "PASS_SENSOR_B4_I10R1_SCHEMA_EVIDENCE_DISCOVERY_SEALED": "OPERATOR_HOLD",
+    "PASS_SENSOR_B4_I10R2_RELATION_GOVERNANCE_PARITY_SEALED": "PENDING_OPERATOR_REVIEW",
+    "PASS_SENSOR_B4_I10_DUCKDB_DISCOVERY_SEALED": "OPERATOR_HOLD",
+    "next_checkpoint_authorized": false,
+    "recommended_next": "OPERATOR REVIEW OF COMPLETE I10 -> I10R1 -> I10R2 CHAIN",
+    "research": "FROZEN"
+  },
+  "historical_evidence": "I10 and I10R1 preserved byte-for-byte; never rewritten",
+  "lineage_law": "metadata-only frozen I05 model, manifest/context/artifact binding, ordered source parity, durable blob/acquisition linkage, usable provenance, and metadata identity/granularity agreement",
+  "matrices": {
+    "lineage_binding_rows": 10,
+    "measurement_parity_rows": 9,
+    "recovery_envelope_rows": 10
+  },
+  "measured_evidence": "Every non-counterfactual evidence predicate is mechanically observed from executed production behavior; deliberate counterfactual predicates are explicitly synthetic and must evaluate FAIL.",
+  "schema_version": "1.0",
+  "t0a_payload_rescan": false
+}
