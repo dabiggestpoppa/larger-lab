@@ -289,3 +289,69 @@ def test_legitimate_corroboration_and_graph_promotion_pass() -> None:
     result = GraphFactPromoter(GraphValidator(registry), service).add(claim=current, edge=edge)
     assert result.claim_binding.claim_id == current.claim_id
     assert service.claim_store.transitions[-1].corroborating_claim_id == right.claim_id
+
+
+def test_historical_corroborator_provenance_remains_graph_recheckable() -> None:
+    registry, chain, protocol, _, evidence, service, source = setup_integration()
+    second = independent_source()
+    evidence._source_registry.register(second)
+    service.authority_policy.register_source(second)
+    same = proposition(protocol.object_id, EdgeType.RUNS_ON.value, chain.object_id)
+    left = make_claim(service, evidence, source, "r4-provenance-left", same)
+    right = make_claim(service, evidence, second, "r4-provenance-right", same)
+    engine = ClaimStateEngine(service)
+    current = engine.transition(
+        left.claim_id,
+        ClaimState.CORROBORATED,
+        triggering_evidence_refs=right.evidence_refs,
+        corroborating_claim_id=right.claim_id,
+        transitioned_at=LATER,
+    )
+    engine.transition(
+        right.claim_id,
+        ClaimState.CONTESTED,
+        triggering_evidence_refs=right.evidence_refs,
+        transitioned_at=LATER,
+    )
+    binding = promote_claim_to_graph(current, service.claim_store)
+    edge = TypedEdge(
+        edge_id="r4-provenance-edge",
+        edge_type=EdgeType.RUNS_ON,
+        subject_id=protocol.object_id,
+        object_id=chain.object_id,
+        claim_binding=binding.book1,
+        observed_at=NOW,
+        valid_from=NOW,
+    )
+    result = GraphFactPromoter(GraphValidator(registry), service).add(claim=current, edge=edge)
+    assert result.claim_binding.claim_id == current.claim_id
+
+
+def test_graph_promoter_rejects_missing_corroboration_provenance() -> None:
+    registry, chain, protocol, _, evidence, service, source = setup_integration()
+    second = independent_source()
+    evidence._source_registry.register(second)
+    service.authority_policy.register_source(second)
+    same = proposition(protocol.object_id, EdgeType.RUNS_ON.value, chain.object_id)
+    left = make_claim(service, evidence, source, "r4-missing-provenance-left", same)
+    right = make_claim(service, evidence, second, "r4-missing-provenance-right", same)
+    current = ClaimStateEngine(service).transition(
+        left.claim_id,
+        ClaimState.CORROBORATED,
+        triggering_evidence_refs=right.evidence_refs,
+        corroborating_claim_id=right.claim_id,
+        transitioned_at=LATER,
+    )
+    service.claim_store._transitions.clear()
+    binding = promote_claim_to_graph(current, service.claim_store)
+    edge = TypedEdge(
+        edge_id="r4-missing-provenance-edge",
+        edge_type=EdgeType.RUNS_ON,
+        subject_id=protocol.object_id,
+        object_id=chain.object_id,
+        claim_binding=binding.book1,
+        observed_at=NOW,
+        valid_from=NOW,
+    )
+    with pytest.raises(ValueError, match="recorded transition"):
+        GraphFactPromoter(GraphValidator(registry), service).add(claim=current, edge=edge)
