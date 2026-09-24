@@ -417,9 +417,14 @@ def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
     host_header = "localhost:9000"
     payload_hash = hashlib.sha256(body).hexdigest()
     suffix = f"/{key}" if key else "/"
-    canonical = "\n".join([method, f"/{bucket}{suffix}", "", host_header,
-                           f"{date}/{date_only}/us-east-1/s3/aws4_request",
-                           payload_hash])
+    canonical_headers = (f"host:{host_header}\n"
+                         f"x-amz-content-sha256:{payload_hash}\n"
+                         f"x-amz-date:{now}\n")
+    signed_headers = "host;x-amz-content-sha256;x-amz-date"
+    canonical = "\n".join([
+        method, f"/{bucket}{suffix}", "", canonical_headers, signed_headers,
+        payload_hash,
+    ])
     scope = f"{date}/{date_only}/us-east-1/s3/aws4_request"
     string_to_sign = "\n".join([
         "AWS4-HMAC-SHA256", now, scope,
@@ -430,8 +435,7 @@ def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
     ksigning = _sign(kservice, "s3")
     signature = _sign(ksigning, string_to_sign).hex()
     auth = (f"AWS4-HMAC-SHA256 Credential={access}/{scope}, "
-            "SignedHeaders=host;x-amz-content-sha256;x-amz-date, "
-            f"Signature={signature}")
+            f"SignedHeaders={signed_headers}, Signature={signature}")
     url = f"http://{host_header}/{bucket}{suffix}"
     command = ["docker", "exec"]
     if method == "PUT":
