@@ -818,10 +818,11 @@ class _OperationExecutionAuthority:
 
     The lock file is persistent evidence, not the authority. The operating
     system owns the exclusive byte-range lock and releases it on process death,
-    so a killed executor cannot leave a permanent lease. Once locked, metadata
-    is rewritten with the exact operation, selected transition, receipt digest,
-    process id, and random token. A contender never trusts stale metadata when
-    the OS says the lock is held.
+    so a killed executor cannot leave a permanent lease. Lock acquisition is
+    silent; after complete authorization, metadata is published with the exact
+    operation, selected transition, receipt digest, process id, and random
+    token. A denied contender restores the prior payload, and a contender never
+    trusts stale metadata when the OS says the lock is held.
     """
     def __init__(self, operation_id, transition, promote):
         self.operation_id = operation_id
@@ -829,13 +830,21 @@ class _OperationExecutionAuthority:
         self.promote = promote
         self.fd = None
         self.path = os.path.join(_transitions_dir(), f"{operation_id}.execution.lock")
+        self.original_payload = None
+        self.activated = False
+        self.created_transitions_dir = False
 
     def acquire(self):
+        self.created_transitions_dir = not os.path.isdir(_transitions_dir())
         os.makedirs(_transitions_dir(), mode=0o700, exist_ok=True)
         fd = os.open(self.path, os.O_CREAT | os.O_RDWR, 0o600)
         try:
-            if os.fstat(fd).st_size == 0:
+            size = os.fstat(fd).st_size
+            if size == 0:
                 os.write(fd, b"\0")
+                size = 1
+            os.lseek(fd, 0, os.SEEK_SET)
+            self.original_payload = os.read(fd, size)
             os.lseek(fd, 0, os.SEEK_SET)
             if os.name == "nt":
                 import msvcrt
@@ -857,6 +866,18 @@ class _OperationExecutionAuthority:
                 f"operation {self.operation_id} already has execution authority "
                 f"for {owner!r}; {self.transition!r} refused") from e
         self.fd = fd
+        return self
+
+    def activate(self):
+        """Publish metadata only after complete authorization under the lock.
+
+        Binding and the OS lock are intentionally silent. A denial restores the
+        exact prior lock payload (or removes the lock file), so malformed,
+        substituted, replayed, and state-ineligible receipts have no durable
+        execution-authority side effect.
+        """
+        if self.fd is None:
+            raise RuntimeError("execution authority is not locked")
         metadata = {
             "format": "oce-operation-execution-authority-v1",
             "operation_id": self.operation_id,
@@ -872,7 +893,7 @@ class _OperationExecutionAuthority:
         os.write(self.fd, payload.encode("utf-8"))
         os.fsync(self.fd)
         _fsync_dir(_transitions_dir())
-        return self
+        self.activated = True
 
     def __enter__(self):
         return self.acquire()
@@ -880,17 +901,37 @@ class _OperationExecutionAuthority:
     def __exit__(self, exc_type, exc, tb):
         if self.fd is None:
             return False
+        fd = self.fd
         try:
-            os.lseek(self.fd, 0, os.SEEK_SET)
+            os.lseek(fd, 0, os.SEEK_SET)
             if os.name == "nt":
                 import msvcrt
-                msvcrt.locking(self.fd, msvcrt.LK_UNLCK, 1)
+                msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
             else:
                 import fcntl
-                fcntl.flock(self.fd, fcntl.LOCK_UN)
+                fcntl.flock(fd, fcntl.LOCK_UN)
         finally:
-            os.close(self.fd)
+            os.close(fd)
             self.fd = None
+        if not self.activated:
+            try:
+                if self.original_payload in (None, b"\0"):
+                    os.unlink(self.path)
+                else:
+                    restore = os.open(self.path, os.O_WRONLY | os.O_TRUNC, 0o600)
+                    try:
+                        os.write(restore, self.original_payload)
+                        os.fsync(restore)
+                    finally:
+                        os.close(restore)
+                _fsync_dir(_transitions_dir())
+                if self.created_transitions_dir:
+                    try:
+                        os.rmdir(_transitions_dir())
+                    except OSError:
+                        pass
+            except FileNotFoundError:
+                pass
         return False
 
 
@@ -907,6 +948,19 @@ def _execution_receipt_binding(receipt_path):
     if not isinstance(operation_id, str) or not OPERATION_ID_RE.match(operation_id):
         raise RuntimeError("promote receipt operation id is missing or malformed")
     return promote, operation_id
+
+
+def _execution_binding_blocked(phase, receipt_in_path, inventory_path, db, user,
+                               container, exc):
+    """Return a receipt for a binding denial without entering a mutation body.
+
+    This path performs no claim, transition rewrite, catalog observation, or
+    Docker call. Its only purpose is to preserve a truthful phase denial when a
+    receipt cannot even supply the operation id needed to name the OS lock.
+    """
+    receipt = _base_receipt(phase, db, user, container, inventory_path)
+    receipt["promote_receipt"] = receipt_in_path
+    return _blocked(receipt, f"refusing recovery execution binding: {exc}")
 
 
 def _bound_operation(promote, transition_dir=None):
@@ -1493,7 +1547,8 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
 
 # ── phase: finalize ──────────────────────────────────────────────────────
 def _phase_finalize_locked(receipt_in_path, inventory_path, inventory_sha_path, db,
-                           user, container, probe_spec, resume_only=False):
+                           user, container, probe_spec, execution_authority,
+                           resume_only=False):
     receipt = _base_receipt("resume-finalize" if resume_only else "finalize",
                             db, user, container, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
@@ -1513,15 +1568,18 @@ def _phase_finalize_locked(receipt_in_path, inventory_path, inventory_sha_path, 
         except Exception as e:
             return _blocked(
                 receipt, f"refusing recovery resume authority: {e}")
+        execution_authority.activate()
     else:
         try:
             promote, stamp, quarantine, staging, operation_id = \
                 _validated_transition_receipt(
                     receipt_in_path, db, user, container, inventory_path,
                     inventory_sha_path, "finalize")
-            # Fresh finalize consumes the operation's one branch authority
-            # before any catalog call. It never doubles as resume authority.
+            # Full receipt/state/identity authorization is complete while the OS
+            # lock is held. Consume the one operation branch, then publish
+            # execution metadata before any catalog or filesystem mutation.
             _claim_transition(operation_id, "finalize", promote)
+            execution_authority.activate()
         except Exception as e:
             return _blocked(
                 receipt, f"refusing recovery transition authority: {e}")
@@ -1669,41 +1727,34 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
                    user, container, probe_spec):
     """Fresh finalize under the operation's OS-backed execution authority."""
     try:
-        promote, _stamp, _quarantine, _staging, operation_id = \
-            _validated_transition_receipt(
-                receipt_in_path, db, user, container, inventory_path,
-                inventory_sha_path, "finalize")
-    except Exception:
+        promote, operation_id = _execution_receipt_binding(receipt_in_path)
+    except Exception as exc:
+        return _execution_binding_blocked(
+            "finalize", receipt_in_path, inventory_path, db, user, container, exc)
+    with _OperationExecutionAuthority(operation_id, "finalize", promote) as authority:
         return _phase_finalize_locked(
             receipt_in_path, inventory_path, inventory_sha_path, db, user,
-            container, probe_spec, resume_only=False)
-    with _OperationExecutionAuthority(operation_id, "finalize", promote):
-        return _phase_finalize_locked(
-            receipt_in_path, inventory_path, inventory_sha_path, db, user,
-            container, probe_spec, resume_only=False)
+            container, probe_spec, authority, resume_only=False)
 
 
 def phase_resume_finalize(receipt_in_path, inventory_path, inventory_sha_path,
                            db, user, container, probe_spec):
     """Resume a spent finalize claim after a crash under the same executor lock."""
     try:
-        (promote, _stamp, _quarantine, _staging,
-         operation_id, _state) = _validated_resume_finalize_receipt(
-             receipt_in_path, db, user, container, inventory_path,
-             inventory_sha_path)
-    except Exception:
+        promote, operation_id = _execution_receipt_binding(receipt_in_path)
+    except Exception as exc:
+        return _execution_binding_blocked(
+            "resume-finalize", receipt_in_path, inventory_path, db, user,
+            container, exc)
+    with _OperationExecutionAuthority(operation_id, "resume-finalize", promote) as authority:
         return _phase_finalize_locked(
             receipt_in_path, inventory_path, inventory_sha_path, db, user,
-            container, probe_spec, resume_only=True)
-    with _OperationExecutionAuthority(operation_id, "resume-finalize", promote):
-        return _phase_finalize_locked(
-            receipt_in_path, inventory_path, inventory_sha_path, db, user,
-            container, probe_spec, resume_only=True)
+            container, probe_spec, authority, resume_only=True)
 
 
 # ── phase: rollback (explicit) ───────────────────────────────────────────
 def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, db,
-                           user, container, probe_spec):
+                           user, container, probe_spec, execution_authority):
     receipt = _base_receipt("rollback", db, user, container, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
     targets = _governed_identity_problems(db, user, container)
@@ -1713,10 +1764,11 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
         promote, stamp, quarantine, staging, operation_id = _validated_transition_receipt(
             receipt_in_path, db, user, container, inventory_path, inventory_sha_path,
             "rollback")
-        # Consume this operation's ONE-TIME rollback authority before any docker
-        # or catalog call exists to make. OPERATION-WIDE claim: a concurrent
-        # finalize (or another rollback) loses HERE, before any mutation.
+        # Full receipt/state/identity authorization is complete under the OS
+        # lock. Consume the one operation branch, then publish execution
+        # metadata before any docker or catalog call exists to make.
         _claim_transition(operation_id, "rollback", promote)
+        execution_authority.activate()
         floor = _floor_from_record(operation_id)
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
@@ -1752,18 +1804,14 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
 def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
                    user, container, probe_spec):
     try:
-        promote, _stamp, _quarantine, _staging, operation_id = \
-            _validated_transition_receipt(
-                receipt_in_path, db, user, container, inventory_path,
-                inventory_sha_path, "rollback")
-    except Exception:
+        promote, operation_id = _execution_receipt_binding(receipt_in_path)
+    except Exception as exc:
+        return _execution_binding_blocked(
+            "rollback", receipt_in_path, inventory_path, db, user, container, exc)
+    with _OperationExecutionAuthority(operation_id, "rollback", promote) as authority:
         return _phase_rollback_locked(
             receipt_in_path, inventory_path, inventory_sha_path, db, user,
-            container, probe_spec)
-    with _OperationExecutionAuthority(operation_id, "rollback", promote):
-        return _phase_rollback_locked(
-            receipt_in_path, inventory_path, inventory_sha_path, db, user,
-            container, probe_spec)
+            container, probe_spec, authority)
 
 
 # ── phase: pre-intent rollback (finalize-claimed recovery) ─────────────
@@ -1784,13 +1832,15 @@ def phase_preintent_rollback(receipt_in_path, inventory_path, inventory_sha_path
     except Exception as e:
         return _blocked(receipt, f"refusing pre-intent abort authority: {e}")
     try:
-        with _OperationExecutionAuthority(operation_id, "preintent-rollback", promote):
+        with _OperationExecutionAuthority(
+                operation_id, "preintent-rollback", promote) as authority:
             # Re-validate after acquiring the OS lock: no finalize executor or
             # competing recovery process can mutate while this authority is held.
             (promote, stamp, quarantine, staging, operation_id,
              floor) = _validated_preintent_abort_receipt(
                  receipt_in_path, db, user, container, inventory_path,
                  inventory_sha_path)
+            authority.activate()
             receipt.update({
                 "stamp": stamp,
                 "staging_database": staging,
