@@ -1,0 +1,14 @@
+# SENSOR-B4-I09 — configurable storage-pressure policy.
+# Equality belongs to the higher pressure state:
+# NORMAL <70%, WATCH >=70%, CONSTRAINED >=85%, CRITICAL >=95%.
+watch_percent: 70
+constrained_percent: 85
+critical_percent: 95
+
+# Hard local safety floor. A write is safe only when free - projected >= floor.
+absolute_free_floor_bytes: 10737418240
+
+# Facts must reconcile exactly by default; operators may explicitly widen this
+# for a documented filesystem reserved-space policy.
+capacity_reconciliation_tolerance_bytes: 0
+utilization_ratio_tolerance: 0.01
