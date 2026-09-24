@@ -42,7 +42,12 @@ from typing import Any
 import duckdb
 import pyarrow.parquet as pq
 
-from .catalog import ACQUISITION_SCHEMA, BLOB_SCHEMA, read_fragment
+from .catalog import (
+    ACQUISITION_SCHEMA,
+    BLOB_SCHEMA,
+    is_usable_manifest_provenance,
+    read_fragment,
+)
 from .checksums import sha256_file
 from .json_catalog import DurableJsonCatalog, JsonCatalogCorrupt
 from .manifests import MANIFEST_SCHEMA, PartitionCurrentPointer
@@ -343,9 +348,13 @@ def _read_blobs(root: Path) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda row: (row["blob_sha256"], row["storage_object_key"]))
 
 
-def _read_acquisitions(root: Path, blob_ids: set[str]) -> list[dict[str, Any]]:
+def _read_acquisitions(
+    root: Path, blob_ids: set[str]
+) -> tuple[list[dict[str, Any]], dict[str, AcquisitionRecord]]:
+    """Read one durable acquisition truth set for rows and relation checks."""
     directory = root / "catalogs" / "manifests" / "acquisitions"
     rows: list[dict[str, Any]] = []
+    records: dict[str, AcquisitionRecord] = {}
     for path in sorted(directory.glob("*.parquet")) if directory.exists() else []:
         try:
             values = read_fragment(path, ACQUISITION_SCHEMA)
@@ -354,10 +363,15 @@ def _read_acquisitions(root: Path, blob_ids: set[str]) -> list[dict[str, Any]]:
         if len(values) != 1:
             raise DuckDBCatalogCorrupt(f"acquisition manifest {path} must contain exactly one row")
         record = _acquisition_from_row(values[0])
+        if record.acquisition_id in records:
+            raise DuckDBCatalogCorrupt(
+                f"duplicate durable acquisition id {record.acquisition_id}"
+            )
         if record.blob_sha256 is not None and record.blob_sha256 not in blob_ids:
             raise DuckDBCatalogCorrupt(
                 f"acquisition {record.acquisition_id} references unknown blob {record.blob_sha256}"
             )
+        records[record.acquisition_id] = record
         rows.append(
             {
                 "acquisition_id": record.acquisition_id,
@@ -377,7 +391,8 @@ def _read_acquisitions(root: Path, blob_ids: set[str]) -> list[dict[str, Any]]:
                 "schema_state": record.schema_state.value if record.schema_state else None,
             }
         )
-    return sorted(rows, key=lambda row: row["acquisition_id"])
+    ordered = sorted(rows, key=lambda row: row["acquisition_id"])
+    return ordered, records
 
 
 def _read_json_catalog(root: Path, relative: str, logical_field: str) -> list[dict[str, Any]]:
@@ -397,65 +412,179 @@ def _read_json_catalog(root: Path, relative: str, logical_field: str) -> list[di
         raise DuckDBCatalogCorrupt(f"JSON catalog {relative} is corrupt: {exc}") from exc
 
 
-def _read_projections(root: Path) -> list[dict[str, Any]]:
-    from .models import RawProjectionArtifact
+def _read_projections(
+    root: Path,
+    *,
+    blobs: list[dict[str, Any]],
+    acquisitions: dict[str, AcquisitionRecord],
+) -> list[dict[str, Any]]:
+    """Discover projections using the frozen I05 contract at metadata level.
+
+    This reuses the authoritative typed models and ordering/bounds/source-list
+    helpers, but never constructs the physical ``ProjectionLineageRepository``
+    or calls ``LocalBlobStore``; T0A payload verification remains owned by the
+    explicit integrity path.
+    """
+    from .models import ProjectionLineage, RawProjectionArtifact
+    from .projection_lineage import (
+        validate_artifact_lineage_consistency,
+        validate_lineage_completeness,
+    )
     from .projections import ProjectionCatalogRecord
 
     artifacts = _read_json_catalog(root, "catalogs/manifests/projections", "projection_id")
     contexts = _read_json_catalog(root, "catalogs/manifests/projection_context", "projection_id")
     lineages = _read_json_catalog(root, "catalogs/manifests/projection_lineage", "lineage_manifest_id")
-    context_by_id: dict[str, dict[str, Any]] = {}
+    blob_ids = {row["blob_sha256"] for row in blobs}
+
+    artifact_by_id: dict[str, RawProjectionArtifact] = {}
+    for payload in artifacts:
+        if payload.get("record_type") != "projection_artifact":
+            raise DuckDBCatalogCorrupt("projection artifact has wrong record_type")
+        try:
+            artifact = RawProjectionArtifact.model_validate(
+                {key: value for key, value in payload.items() if key != "record_type"}
+            )
+        except Exception as exc:
+            raise DuckDBCatalogCorrupt(f"projection artifact is corrupt: {exc}") from exc
+        if artifact.projection_id in artifact_by_id:
+            raise DuckDBCatalogCorrupt(f"duplicate projection artifact {artifact.projection_id}")
+        artifact_by_id[artifact.projection_id] = artifact
+
+    context_by_id: dict[str, ProjectionCatalogRecord] = {}
     for payload in contexts:
         try:
             record = ProjectionCatalogRecord.from_dict(payload)
         except Exception as exc:
             raise DuckDBCatalogCorrupt(f"projection context is corrupt: {exc}") from exc
-        context_by_id[record.projection_id] = record.to_dict()
-    lineage_by_projection: dict[str, list[dict[str, Any]]] = {}
+        if record.projection_id in context_by_id:
+            raise DuckDBCatalogCorrupt(f"duplicate projection context {record.projection_id}")
+        context_by_id[record.projection_id] = record
+
+    lineage_by_id: dict[str, list[ProjectionLineage]] = {}
+    projection_by_lineage: dict[str, str] = {}
     for manifest in lineages:
-        entries = manifest.get("entries")
-        if not isinstance(entries, list) or not entries:
-            raise DuckDBCatalogCorrupt("projection lineage manifest has no entries")
-        projection_ids = {entry.get("projection_id") for entry in entries if isinstance(entry, dict)}
-        if len(projection_ids) != 1:
-            raise DuckDBCatalogCorrupt("projection lineage manifest has inconsistent projection ids")
-        projection_id = next(iter(projection_ids))
+        if manifest.get("record_type") != "projection_lineage_manifest":
+            raise DuckDBCatalogCorrupt("projection lineage has wrong record_type")
+        manifest_id = manifest.get("lineage_manifest_id")
+        projection_id = manifest.get("projection_id")
+        if not isinstance(manifest_id, str) or not manifest_id:
+            raise DuckDBCatalogCorrupt("projection lineage has empty manifest id")
         if not isinstance(projection_id, str) or not projection_id:
-            raise DuckDBCatalogCorrupt("projection lineage has invalid projection id")
-        if projection_id in lineage_by_projection:
-            raise DuckDBCatalogCorrupt(f"multiple lineage manifests claim {projection_id}")
-        lineage_by_projection[projection_id] = sorted(entries, key=lambda row: row["source_order"])
-    rows: list[dict[str, Any]] = []
-    for payload in sorted(artifacts, key=lambda row: row["projection_id"]):
+            raise DuckDBCatalogCorrupt("projection lineage has empty projection id")
+        raw_entries = manifest.get("entries")
+        if not isinstance(raw_entries, list) or not raw_entries:
+            raise DuckDBCatalogCorrupt("projection lineage manifest has no entries")
         try:
-            artifact = RawProjectionArtifact(**{k: v for k, v in payload.items() if k != "record_type"})
+            entries = [ProjectionLineage.model_validate(entry) for entry in raw_entries]
         except Exception as exc:
-            raise DuckDBCatalogCorrupt(f"projection artifact is corrupt: {exc}") from exc
-        context = context_by_id.get(artifact.projection_id)
+            raise DuckDBCatalogCorrupt(f"projection lineage entry is corrupt: {exc}") from exc
+        if any(
+            entry.lineage_manifest_id != manifest_id
+            or entry.projection_id != projection_id
+            for entry in entries
+        ):
+            raise DuckDBCatalogCorrupt(
+                f"projection lineage {manifest_id} entries disagree with manifest identity; "
+                "lineage without projection artifacts or mismatched manifest identity"
+            )
+        if manifest_id in lineage_by_id:
+            raise DuckDBCatalogCorrupt(f"duplicate lineage manifest {manifest_id}")
+        previous = projection_by_lineage.get(projection_id)
+        if previous is not None:
+            raise DuckDBCatalogCorrupt(
+                f"lineage manifests {previous} and {manifest_id} claim {projection_id}"
+            )
+        lineage_by_id[manifest_id] = entries
+        projection_by_lineage[projection_id] = manifest_id
+
+    rows: list[dict[str, Any]] = []
+    for projection_id, artifact in sorted(artifact_by_id.items()):
+        context = context_by_id.get(projection_id)
         if context is None:
-            raise DuckDBCatalogCorrupt(f"projection {artifact.projection_id} has no context")
-        if context["projection_sha256"] != artifact.projection_sha256 or context["projection_uri"] != artifact.projection_uri:
-            raise DuckDBCatalogCorrupt(f"projection {artifact.projection_id} context diverges")
-        physical = _require_file_under(root, artifact.projection_uri, f"projection {artifact.projection_id}")
+            raise DuckDBCatalogCorrupt(f"projection {projection_id} has no context")
+        if (
+            context.projection_sha256 != artifact.projection_sha256
+            or context.projection_uri != artifact.projection_uri
+        ):
+            raise DuckDBCatalogCorrupt(f"projection {projection_id} context diverges")
+        manifest_id = context.lineage_manifest_id
+        lineage = lineage_by_id.get(manifest_id)
+        if lineage is None:
+            raise DuckDBCatalogCorrupt(
+                f"projection {projection_id} context names missing lineage {manifest_id}"
+            )
+        owner = projection_by_lineage.get(projection_id)
+        if owner != manifest_id:
+            raise DuckDBCatalogCorrupt(
+                f"projection {projection_id} context lineage {manifest_id} != durable owner {owner}"
+            )
+        try:
+            validate_lineage_completeness(
+                lineage,
+                artifact.source_blob_sha256,
+                projection_id,
+            )
+            validate_artifact_lineage_consistency(artifact.source_blob_sha256, lineage)
+        except Exception as exc:
+            raise DuckDBCatalogCorrupt(
+                f"projection {projection_id} lineage shape is inconsistent: {exc}"
+            ) from exc
+
+        for entry in sorted(lineage, key=lambda value: value.source_order):
+            if entry.source_blob_sha256 not in blob_ids:
+                raise DuckDBCatalogCorrupt(
+                    f"lineage source blob {entry.source_blob_sha256} has no durable metadata"
+                )
+            acquisition = acquisitions.get(entry.source_acquisition_id)
+            if acquisition is None:
+                raise DuckDBCatalogCorrupt(
+                    f"lineage acquisition {entry.source_acquisition_id} does not exist"
+                )
+            if acquisition.blob_sha256 != entry.source_blob_sha256:
+                raise DuckDBCatalogCorrupt(
+                    f"lineage acquisition {entry.source_acquisition_id} blob diverges"
+                )
+            if not is_usable_manifest_provenance(acquisition):
+                raise DuckDBCatalogCorrupt(
+                    f"lineage acquisition {entry.source_acquisition_id} is not usable provenance"
+                )
+            for name, expected, actual in (
+                ("provider", context.provider, acquisition.provider_id),
+                ("venue", context.venue, acquisition.venue),
+                ("sensor_family", context.sensor_family, acquisition.sensor_family.value),
+                ("native_instrument", context.native_instrument, acquisition.native_instrument),
+            ):
+                if actual != expected:
+                    raise DuckDBCatalogCorrupt(
+                        f"lineage acquisition {entry.source_acquisition_id} {name} diverges"
+                    )
+            if (
+                context.source_granularity is not None
+                and acquisition.native_granularity is not None
+                and str(acquisition.native_granularity) != context.source_granularity
+            ):
+                raise DuckDBCatalogCorrupt(
+                    f"lineage acquisition {entry.source_acquisition_id} granularity diverges"
+                )
+
+        physical = _require_file_under(root, artifact.projection_uri, f"projection {projection_id}")
         actual_sha = sha256_file(str(physical)).hex_digest
         if actual_sha != artifact.projection_sha256:
-            raise DuckDBCatalogCorrupt(f"projection {artifact.projection_id} physical SHA diverges")
+            raise DuckDBCatalogCorrupt(f"projection {projection_id} physical SHA diverges")
         try:
             parquet_rows = pq.ParquetFile(str(physical)).metadata.num_rows
         except Exception as exc:
-            raise DuckDBCatalogCorrupt(f"projection {artifact.projection_id} Parquet is corrupt: {exc}") from exc
+            raise DuckDBCatalogCorrupt(f"projection {projection_id} Parquet is corrupt: {exc}") from exc
         if parquet_rows != artifact.row_count:
-            raise DuckDBCatalogCorrupt(f"projection {artifact.projection_id} row count diverges")
-        lineage = lineage_by_projection.get(artifact.projection_id)
-        if not lineage:
-            raise DuckDBCatalogCorrupt(f"projection {artifact.projection_id} has no lineage")
+            raise DuckDBCatalogCorrupt(f"projection {projection_id} row count diverges")
         rows.append(
             {
-                "projection_id": artifact.projection_id,
-                "provider": context["provider"],
-                "venue": context["venue"],
-                "sensor_family": context["sensor_family"],
-                "native_instrument": context["native_instrument"],
+                "projection_id": projection_id,
+                "provider": context.provider,
+                "venue": context.venue,
+                "sensor_family": context.sensor_family,
+                "native_instrument": context.native_instrument,
                 "partition_key": artifact.partition_key,
                 "projection_schema_id": artifact.projection_schema_id,
                 "projection_schema_version": artifact.projection_schema_version,
@@ -467,21 +596,18 @@ def _read_projections(root: Path) -> list[dict[str, Any]]:
                 "row_count": artifact.row_count,
                 "stored_bytes": physical.stat().st_size,
                 "state": artifact.state.value,
-                "lineage_manifest_id": lineage[0]["lineage_manifest_id"],
+                "lineage_manifest_id": manifest_id,
                 "source_count": len(lineage),
             }
         )
-    extra_contexts = set(context_by_id) - {row["projection_id"] for row in rows}
+
+    extra_contexts = set(context_by_id) - set(artifact_by_id)
     if extra_contexts:
         raise DuckDBCatalogCorrupt(f"projection contexts without artifacts: {sorted(extra_contexts)}")
-    # I10R1 Defect E: a durable lineage manifest whose projection_id has NO
-    # accepted artifact is an orphan durable relation — inconsistent evidence,
-    # never silently ignored (artifact ids, context ids, and lineage-owned
-    # projection ids must be exactly coherent).
-    orphan_lineage_ids = sorted(set(lineage_by_projection) - {row["projection_id"] for row in rows})
-    if orphan_lineage_ids:
+    orphan_lineages = set(projection_by_lineage) - set(artifact_by_id)
+    if orphan_lineages:
         raise DuckDBCatalogCorrupt(
-            f"projection lineage manifests without projection artifacts: {orphan_lineage_ids}"
+            f"projection lineage manifests without projection artifacts: {sorted(orphan_lineages)}"
         )
     return sorted(rows, key=lambda row: row["projection_id"])
 
@@ -851,20 +977,26 @@ def rebuild_duckdb_catalog(data_root: str | Path, catalog_path: str | Path) -> D
     if output.exists() and not output.is_file():
         raise DuckDBCatalogPublishError(f"catalog output is not a file: {output}")
     blobs = _read_blobs(root)
-    acquisitions = _read_acquisitions(root, {row["blob_sha256"] for row in blobs})
-    projections = _read_projections(root)
+    acquisition_rows, acquisition_records = _read_acquisitions(
+        root, {row["blob_sha256"] for row in blobs}
+    )
+    projections = _read_projections(
+        root,
+        blobs=blobs,
+        acquisitions=acquisition_records,
+    )
     partitions = _read_partitions(root, {row["blob_sha256"] for row in blobs}, {row["projection_id"] for row in projections})
     quarantine = _read_quarantine(root)
     revisions = _read_revisions(
         root,
         {row["blob_sha256"] for row in blobs},
-        {row["acquisition_id"] for row in acquisitions},
+        {row["acquisition_id"] for row in acquisition_rows},
     )
-    gaps = _read_gaps(partitions, acquisitions, quarantine)
+    gaps = _read_gaps(partitions, acquisition_rows, quarantine)
     usage = _storage_usage(blobs, projections, partitions, quarantine)
     datasets = {
         "v_t0_blobs": blobs,
-        "v_t0_acquisitions": acquisitions,
+        "v_t0_acquisitions": acquisition_rows,
         "v_t0_projections": projections,
         "v_t0_partitions": partitions,
         "v_t0_gaps": gaps,
