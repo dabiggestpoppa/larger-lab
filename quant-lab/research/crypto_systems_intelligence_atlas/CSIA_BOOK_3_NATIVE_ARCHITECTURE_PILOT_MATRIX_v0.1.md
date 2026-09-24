@@ -48,7 +48,7 @@ This matrix is a planning coverage test, not an implementation or live-data clai
 14. Native asset relationship: ETH economic asset, WETH, bridged ETH, L2 representations.
 15. Network identity anchor: genesis/network namespace plus chain ID and deployment-specific anchors.
 16. Book 1 nodes: network, execution layer, consensus layer, account, contract, transaction, asset, L2.
-17. Book 1 edges: EXECUTES_WITH, SECURED_BY, SETTLES_TO, USES_DA, MESSAGES_TO, REALIZES.
+17. Book 1 edges: SECURED_BY, SETTLES_TO, MESSAGES_TO, REALIZES. Book 3-local relation candidates: EXECUTES_WITH, USES_DA.
 18. Required extensions: layered component dossier, beacon consensus, blobs, rollup relations.
 19. Book 2 evidence families: network identity, consensus, execution, upgrade, settlement, native asset, interoperability.
 20. Unresolved gaps: finality wording, blob/DA provider boundaries, L2-specific identities.
@@ -71,7 +71,7 @@ This matrix is a planning coverage test, not an implementation or live-data clai
 14. Native asset relationship: ETH/WETH and token representations; native versus bridged status explicit.
 15. Network identity anchor: chain ID plus OP Stack deployment/genesis configuration; not Ethereum L1 solely.
 16. Book 1 nodes: rollup, sequencer, settlement domain, DA domain, account, contract, bridge.
-17. Book 1 edges: EXECUTES_WITH, SETTLES_TO, USES_DA, SECURED_BY, SEQUENCED_BY, BRIDGES_TO.
+17. Book 1 edges: SETTLES_TO, SECURED_BY, BRIDGES_TO. Book 3-local relation candidates: EXECUTES_WITH, USES_DA, SEQUENCED_BY.
 18. Required extensions: modular component dossier and sequencer/security distinction.
 19. Book 2 evidence families: network identity, execution, settlement, DA, security, native asset, interoperability.
 20. Unresolved gaps: operator governance and exact DA/finality claims.
@@ -94,7 +94,7 @@ This matrix is a planning coverage test, not an implementation or live-data clai
 14. Native asset relationship: ETH/WETH and chain-specific token realizations.
 15. Network identity anchor: chain ID and Orbit genesis/deployment configuration, not generic Arbitrum identity.
 16. Book 1 nodes: rollup, batcher, prover/validator, settlement, DA, account, contract.
-17. Book 1 edges: EXECUTES_WITH, SETTLES_TO, USES_DA, SECURED_BY, SEQUENCED_BY, BRIDGES_TO.
+17. Book 1 edges: SETTLES_TO, SECURED_BY, BRIDGES_TO. Book 3-local relation candidates: EXECUTES_WITH, USES_DA, SEQUENCED_BY.
 18. Required extensions: proof-system, batcher, and settlement-specific typed fields.
 19. Book 2 evidence families: network identity, execution, settlement, security, DA, native asset.
 20. Unresolved gaps: proof-system version and governance decomposition.
@@ -209,7 +209,7 @@ This matrix is a planning coverage test, not an implementation or live-data clai
 14. Native asset relationship: TIA native asset and DA-service realization distinct.
 15. Network identity anchor: chain ID/genesis/deployment configuration and namespace.
 16. Book 1 nodes: DA network, namespace, blob/data sample, validator, light node, dependent rollup.
-17. Book 1 edges: USES_DA, SECURED_BY, MESSAGES_TO, SETTLES_TO where applicable.
+17. Book 1 edges: SECURED_BY, MESSAGES_TO, SETTLES_TO where applicable. Book 3-local relation candidate: USES_DA.
 18. Required extensions: DA-specific, namespace, sampling, and non-settlement semantics.
 19. Book 2 evidence families: network identity, consensus, DA model, security, native asset.
 20. Unresolved gaps: exact DA/settlement separation per deployment.

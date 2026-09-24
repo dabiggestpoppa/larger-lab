@@ -20,7 +20,7 @@
 | 1 | Chain renames but genesis unchanged | **HISTORICAL_CONTINUATION** | Same genesis/config and state history support continuation; rename is a label/version claim, not automatically a new object. Final naming authority remains operator-governed. |
 | 2 | Same ticker, unrelated network | **NEW_OBJECT** | Different genesis, namespace, validators, and state history; ticker is never sufficient identity evidence. |
 | 3 | Chain ID changes during migration | **OPERATOR_DECISION: D3-5** | Preserve prior chain ID, new chain ID, and migration edge; final same-object/new-object decision depends on state and settlement continuity. |
-| 4 | Hard fork with shared history | **HISTORICAL_CONTINUATION** | Fork edge, shared genesis/history, and rule divergence must be explicit; fork does not erase ancestry. |
+| 4 | Hard fork with shared history | **BRANCH-SENSITIVE** | Shared history establishes ancestry only. A non-branching upgrade is `SAME_OBJECT` + `HISTORICAL_CONTINUATION`; a persistent divergent branch is `NEW_OBJECT` + `FORKED_FROM`; an unresolved temporary split is `UNKNOWN`. |
 | 5 | Testnet reset with same name | **NEW_OBJECT** unless continuity is proven | New genesis/state and separate deployment identity require a new object; a reused name is only a label. |
 | 6 | Mainnet restarts from new genesis | **NEW_OBJECT + MIGRATION** | Preserve old network as historical/superseded and link restart to migration; operator decision D3-2 applies to restart semantics. |
 | 7 | L1 migrates state to L2 | **MIGRATION / NEW_REALIZATION** | Preserve L1 historical object and L2 identity; state migration does not make L2 the same network. |
@@ -37,8 +37,9 @@
 
 1. A genesis/config identity anchor is necessary but not always sufficient.
 2. A name or ticker alone is never sufficient.
-3. Shared history can support `HISTORICAL_CONTINUATION`; it does not erase a fork or
-   migration edge.
+3. Shared history establishes ancestry but does not by itself establish the same
+   current network identity. Preserve `FORKED_FROM` and pre-fork history for each
+   persistent divergent branch; do not collapse independent canonical branches.
 4. A new chain ID, namespace, genesis, or deployment may indicate a new object but
    requires state and operator evidence.
 5. Settlement migration, security migration, and realization migration are typed
@@ -49,8 +50,9 @@
 ## Gate result
 
 ```text
-NETWORK_IDENTITY_STRESS_MATRIX = COMPLETE_FOR_REVIEW
+NETWORK_IDENTITY_STRESS_MATRIX = RECONCILED_FOR_V0.2
 STRUCTURAL_FAILURE_COUNT = 0
 GOVERNANCE_SENSITIVE_DECISIONS = D3-1, D3-2, D3-5
 BOOK_1_MUTATION = NONE
+SHARED_HISTORY_ONLY_IDENTITY_COLLAPSE = PROHIBITED
 ```

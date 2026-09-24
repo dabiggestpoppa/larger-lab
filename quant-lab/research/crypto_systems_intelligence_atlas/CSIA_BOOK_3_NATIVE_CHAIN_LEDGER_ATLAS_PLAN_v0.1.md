@@ -6,6 +6,14 @@
 **BOOK_1 = FROZEN_ACCEPTED**
 **BOOK_2 = FROZEN_ACCEPTED**
 
+## Authorized reconciliation directive — 2026-09-24
+
+This v0.1 file is preserved and narrowly corrected, not regenerated, for the v0.2
+ratification pass. Shared history is ancestry evidence, not by itself evidence of
+same current network identity. The authorized D3-1 branch-sensitive rule and exact
+Book 1 relationship classification are stated below and are carried forward into
+plan v0.2; the binding decision record is the operator decision log.
+
 ## Purpose
 
 Book 3 defines how CSIA represents the actual native architecture of blockchain and
@@ -201,8 +209,10 @@ block-lattice systems. Linear block height is not fabricated when it is not cano
 ## Bloc 3M — Modular / rollup / appchain systems
 
 Represent decomposition across execution, sequencing, settlement, consensus, data
-availability, and security. Plan relationships `EXECUTES_WITH`, `SETTLES_TO`,
-`USES_DA`, `SECURED_BY`, `SEQUENCED_BY`, `BRIDGES_TO`, and `MESSAGES_TO`.
+availability, and security. Reuse faithful Book 1 `SETTLES_TO`, `SECURED_BY`,
+`BRIDGES_TO`, and `MESSAGES_TO` edges. Plan Book 3-local typed relations
+`EXECUTES_WITH`, `USES_DA`, and `SEQUENCED_BY`; do not alias them to
+`DEPENDS_ON` and do not mutate Book 1.
 
 A rollup may execute locally, settle to Ethereum, use Celestia DA, use a centralized
 sequencer, and bridge through a separate protocol. The representation must not
@@ -225,8 +235,15 @@ devnet, forks, restarts, migrations, renamed networks, new genesis, state migrat
 and consensus forks.
 
 The planning distinction is between `SAME_NETWORK_CONTINUATION` and
-`NEW_NETWORK_IDENTITY`. The final criteria are operator decisions D3-1, D3-2, and
-D3-5; no doctrine is self-ratified here.
+`NEW_NETWORK_IDENTITY`. Shared history establishes ancestry but does not by itself
+establish the same current network identity. A non-branching protocol upgrade with
+one continuing canonical network, state continuity, deployment continuity, and no
+persistent independent branch is `SAME_OBJECT` plus `HISTORICAL_CONTINUATION`.
+Persistent independent consensus/state branches are separate `NEW_OBJECT`s, each
+linked by `FORKED_FROM` to the shared ancestor with pre-fork history preserved. A
+temporary or ambiguous split remains `UNKNOWN` until evidence resolves it. D3-1,
+D3-2, and D3-5 supply the authorized decision basis; no identity is inferred from
+a name or ticker.
 
 ## Bloc 3P — Shared security
 
@@ -246,19 +263,24 @@ is not rewritten.
 
 No Book 3 fact bypasses Book 2. The architecture evidence matrix defines preferred
 evidence for network identity, consensus, execution, upgrades, interoperability, and
-native assets. Book 1 remains frozen; this plan identifies only candidate extensions
-and does not amend Book 1.
+native assets. Accepted Book 1 already supports `RUNS_ON`, `USES_VM`,
+`SETTLES_TO`, `SECURED_BY`, `BRIDGES_TO`, `MESSAGES_TO`, `FORKED_FROM`,
+`MIGRATED_FROM`, `MIGRATED_TO`, and `REALIZES`; Book 3 reuses them only faithfully.
+`EXECUTES_WITH`, `USES_DA`, and `SEQUENCED_BY` are Book 3-local relation-extension
+candidates. Book 1 remains frozen and receives no mutation.
 
-## Governance decisions held for operator review
+## Governance decisions authorized for v0.2
 
-1. Fork identity doctrine.
-2. New-genesis restart identity doctrine.
-3. Modular stack component identity.
-4. Shared-security representation.
-5. Network identity-anchor priority.
-6. Family registry admission and governance.
-7. State-migration continuity.
+1. D3-1 — branch-sensitive fork identity: shared history is ancestry evidence,
+   while current identity requires canonical, state, deployment, and branch-survival
+   analysis.
+2. D3-2 — conservative new-genesis restart default.
+3. D3-3 — typed modular component dossiers.
+4. D3-4 — typed `SECURED_BY` shared-security doctrine.
+5. D3-5 — family-native network identity evidence bundle.
+6. D3-6 — two-tier family registry admission.
+7. D3-7 — typed migration with preserved historical objects.
 
-These are not decided by this plan. Their options, consequences, recommended
-evidence-based defaults, reversibility, and blocking status are recorded in the
-pre-ratification review.
+These outcomes are authorized for Book 3 planning and are recorded canonically in
+`CSIA_OPERATOR_DECISION_LOG.md`; plan v0.2 carries the complete consequences and
+invariants. This reconciliation does not authorize implementation.
