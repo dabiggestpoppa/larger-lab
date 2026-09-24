@@ -390,7 +390,7 @@ def assess_storage_admission(
     quota_state: StorageQuotaState,
     *,
     priority: StoragePriority,
-    quota_config: QuotaConfig | None = None,
+    quota_config: QuotaConfig,
 ) -> QuotaWriteDecision:
     """Purely refuse oversized planned work before execution.
 
