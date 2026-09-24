@@ -128,6 +128,64 @@ LIVE_ACQUISITION_AUTHORITY = FALSE
 BLOCKERS = 0
 ```
 
-The exact next operator action is to review this evidence and
-`CSIA_BOOK_3_IMPLEMENTATION_MATRIX.json`, then explicitly accept or reject the
-proposed Book 3 exit gate. This implementation does not self-accept Book 3.
+## 9. HARDENING R1 — IDENTITY PROVENANCE + DOSSIER REFERENTIAL-INTEGRITY SEAL
+
+Hardening R1 closed the two concrete Book 3 findings identified after the
+initial implementation review. No broad re-audit and no Book 1/Book 2 contract
+change was performed.
+
+### R1 repairs
+
+- `NetworkIdentityEngine` now requires `Book2ArchitectureProvenance` and binds
+  each decision-driving assertion to explicit fact-specific canonical claim
+  refs. Unsupported divergence, unrelated-network, genesis, continuity,
+  migration, temporary-split, and family-native assertions fail closed.
+- Identity support is restricted by fact to accepted structural claim families;
+  narrative, market-data, and other unsuitable claim families cannot support
+  identity truth merely because they are graph-promotable.
+- `Book2ArchitectureProvenance` now receives the governed architecture registry
+  and verifies every populated dossier field against an admitted registry value,
+  the exact namespace mapping, canonical registry source claims, and current or
+  explicitly historical valid-time status.
+- Dossier network identity, genesis/origin, and native asset anchors now have
+  explicit claim-ref fields. The prior semantically incorrect namespace-value
+  versus field-name comparison was removed.
+- Registry `history()` now projects immutable supersession metadata coherently:
+  superseded historical values are visibly `SUPERSEDED`, while the replacement
+  remains `ACTIVE`.
+
+### R1 executable evidence
+
+```text
+R1 focused tests       = 15 passed
+Old Book 3 tests       = 56
+New Book 3 tests       = 71
+Book 1 tests           = 107 passed
+Book 2 tests           = 108 passed
+Complete CSIA          = 286 passed
+Crypto Sensor          = 2339 passed / 4 skipped
+ruff (CSIA scope)      = PASS
+mypy                   = PASS (22 source files)
+Book 1 mutations       = 0
+Book 2 mutations       = 0
+```
+
+R1 matrix:
+`CSIA_BOOK_3_HARDENING_R1_MATRIX.json`
+
+R1 status:
+
+```text
+BOOK_3_HARDENING_R1 = PASS
+BOOK_3_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_3_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_4 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+BLOCKERS = 0
+```
+
+The exact next operator action is to review the R1 matrix and this evidence,
+then explicitly accept or reject the proposed Book 3 exit gate. R1 does not
+self-accept Book 3 or authorize Book 4/live acquisition.

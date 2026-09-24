@@ -513,3 +513,45 @@ Artifacts:
 Exact next operator action: review the Book 3 matrix and evidence, then
 explicitly accept or reject the proposed exit gate. Do not start Book 4 or
 enable live acquisition before a separate authorization.
+
+---
+
+# CHECKPOINT 12 — BOOK 3 HARDENING R1 (2026-09-24)
+
+Checkpoints 1–11 are preserved. R1 is a narrow hardening pass for identity
+provenance and dossier referential integrity; it does not self-accept Book 3.
+
+```text
+BOOK_3_HARDENING_R1 = PASS
+BOOK_3_IMPLEMENTATION = COMPLETE_HARDENED
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+STRUCTURAL_FAILURE_COUNT = 0
+BLOCKING_OPERATOR_DECISION_COUNT = 0
+
+OLD_BOOK3_TESTS = 56
+NEW_BOOK3_TESTS = 71
+R1_FOCUSED_TESTS = 15
+BOOK1_TESTS = 107 PASS
+BOOK2_TESTS = 108 PASS
+TOTAL_CSIA = 286 PASS
+CRYPTO_SENSOR = 2339 PASS / 4 SKIPPED
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (22 source files)
+
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_3_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_4 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Artifacts:
+
+- `CSIA_BOOK_3_HARDENING_R1_MATRIX.json`
+- `CSIA_BOOK_3_IMPLEMENTATION_EVIDENCE_v0.1.md` (HARDENING R1 addendum)
+- this checkpoint
+
+Exact next operator action: review the R1 matrix and evidence, then explicitly
+accept or reject the proposed Book 3 exit gate. Do not start Book 4 or enable
+live acquisition before separate authorization.

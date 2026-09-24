@@ -1,0 +1,67 @@
+{
+  "schema_version": "csia-book3-hardening-r1-matrix-v0.1",
+  "book": 3,
+  "hardening_round": "R1",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "starting_head": "97d83dd89b02599548861c611715fb48a86f6385",
+  "ratified_planning_anchor": "21fdd79763c745034d34946896756efb430dc11a",
+  "accepted_book2_base": "cadc1e7e4378248da0a9aeefbe12909918656433",
+  "self_accepted": false,
+  "gates": {
+    "NETWORK_IDENTITY_BOOK2_PROVENANCE": {
+      "status": "PASS",
+      "invariants": ["engine requires Book2ArchitectureProvenance", "assertion-to-claim binding", "unknown support rejected", "no decision from detached refs"]
+    },
+    "ASSERTION_TO_CLAIM_BINDING": {
+      "status": "PASS",
+      "invariants": ["continuity dimensions individually supported", "divergence supported", "new genesis supported", "migration supported", "unrelated network supported", "family-native continuation supported"]
+    },
+    "IDENTITY_CLAIM_FAMILY_RULES": {
+      "status": "PASS",
+      "invariants": ["identity attributes", "historical genesis", "chain architecture", "deployment activation", "governance execution only for deployment continuity", "narrative and market data rejected"]
+    },
+    "DOSSIER_REGISTRY_REFERENTIAL_INTEGRITY": {
+      "status": "PASS",
+      "invariants": ["registry reference exists", "registry source claims resolve", "unknown explicit sentinel accepted", "superseded current truth rejected", "historical mode requires valid-time compatibility"]
+    },
+    "DOSSIER_NAMESPACE_CORRECTNESS": {
+      "status": "PASS",
+      "invariants": ["all 14 architecture field mappings", "validator participant allows validator or participant namespace", "wrong namespace rejected"]
+    },
+    "ANCHOR_PROVENANCE": {
+      "status": "PASS",
+      "invariants": ["explicit network identity claim refs", "explicit genesis/origin claim refs", "explicit native asset claim refs", "claim-family-specific validation", "incorrect namespace field-name comparison removed"]
+    },
+    "SUPERSESSION_HISTORY": {
+      "status": "PASS",
+      "invariants": ["require(old) exposes SUPERSEDED", "history(old semantic key) exposes old SUPERSEDED and current ACTIVE", "underlying immutable registry value is not rewritten"]
+    },
+    "BOOK1_FREEZE": {
+      "status": "PASS",
+      "mutations": 0
+    },
+    "BOOK2_FREEZE": {
+      "status": "PASS",
+      "mutations": 0
+    }
+  },
+  "tests": {
+    "old_book3_test_count": 56,
+    "new_book3_test_count": 71,
+    "r1_focused_test_count": 15,
+    "book1_test_count": 107,
+    "book2_test_count": 108,
+    "total_csia_count": 286,
+    "crypto_sensor_regression_passed": 2339,
+    "crypto_sensor_regression_skipped": 4,
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "mypy_source_files": 22
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "book3_acceptance": "NOT_SELF_ACCEPTED",
+  "book4": "NOT_STARTED",
+  "live_acquisition_authority": false,
+  "blockers": 0
+}
