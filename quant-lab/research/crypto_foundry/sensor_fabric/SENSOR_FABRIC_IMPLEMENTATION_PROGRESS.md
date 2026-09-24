@@ -1966,3 +1966,65 @@ restored. Unscoped root pytest is not claimed because of the known research
 `G4-08_STORAGE_PRESSURE_GATE = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW`.
 `next_checkpoint_authorized = FALSE`; `recommended_next = OPERATOR REVIEW OF
 SENSOR-B4-I09`. I10 remains unauthorized and research remains frozen.
+
+## SENSOR-B4-I09R1 - EVIDENCE TRUTH + QUOTA ADMISSION + FAIL-CLOSED POLICY MICROSEAL
+
+Mandatory start: `71ccb0c7fbd110edf6d431140009254f90c37722` on
+`agent/crypto-sensor-fabric-build`; remote main remains
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`.
+
+| Commit | Content | Verdict |
+|---|---|---|
+| `683f5d7a` | SENSOR-B4-I09R1A: remove essential bypass; reconcile and rederive untrusted quota state | repair |
+| `fa38e779` | SENSOR-B4-I09R1B: explicit estimate admission; strict retention boolean and schema types | repair |
+| `fe7cd0d3` | SENSOR-B4-I09R1C: adversarial tests and deterministic required-invariant builders | evidence builders/tests |
+| `ed2a7569` | SENSOR-B4-I09R1A-R1: require explicit config and matching floor authority | repair |
+| `ec1eff5f` | SENSOR-B4-I09R1B-R1: require explicit admission config authority | repair |
+| D (this commit) | Publish four R1 matrices, microseal, and operator-hold reconciliation | proposed seal |
+
+The historical I09 quota simulation incorrectly named a row
+`floor_breach_p0_blocked` although it left 8,000 bytes free against a 20-byte
+floor and therefore correctly returned `PROCEED`. Its bytes remain immutable.
+R1 publishes a real exactly-at-floor permitted case and a real one-byte-below
+blocked case. The old test skipped simulation truth; every R1 row now declares
+`required_invariants` and derives `OK` iff all are boolean true. The deliberate
+`counterfactual_one_byte_below_floor_permitted` row is `FAIL`.
+
+Pre-repair, non-P0 `essential=True` converted CRITICAL to `WARN`, and a forged
+NORMAL state at 95% bytes incorrectly returned `PROCEED` for P2. R1 removes the
+caller flag entirely, requires explicit `QuotaConfig`, reconciles byte facts,
+rederives pressure under that config, and rejects stale/forged pressure,
+ratio, capacity, or floor truth. P0 alone continues at CRITICAL while
+floor-safe; P1/P2/P3 block.
+
+R1 adds a pure admission boundary. Over-budget plans block before execution;
+budget-safe plans pass their full estimate through the same quota/floor policy.
+Constrained P2 defers, constrained P3 pauses, critical P1/P2/P3 block, and P0
+cannot bypass the floor. Retention config now requires exact booleans and an
+exact nonempty string schema version; no string or numeric coercion is allowed.
+T0A refusal is measured independently for P0/P1/P2/P3 including P3+T0A.
+`HIGH` remains only a >=24-hour duration label, not a calibrated probability,
+confidence interval, or proof of representative activity.
+
+R1 evidence: simulation truth 9 rows (8 OK, one deliberate FAIL); priority
+authority 14/14 OK; backfill admission 9/9 OK; retention config safety 23/23 OK.
+All six historical I09 evidence hashes remain unchanged. Historical I08
+hash/read-only gates pass.
+
+Final gates: focused I09 + I09R1 126 passed; required I07/I08 regression slice
+241 passed / 1 skipped; storage 1389 passed / 4 skipped; project
+`pytest tests/ -q` 2768 passed / 5 skipped. Ruff, py_compile, and compileall
+passed. Mypy has no I09/I09R1 error and reports only the pre-existing
+`src/crypto_sensor_fabric/probes/planner.py:79 [call-overload]` dependency
+error. Provider, frozen-contract, I10 DuckDB, I11 PostgreSQL, and I12
+RawEvidenceQuery diffs are zero; product/test network calls are zero. Seven
+known CRLF-only evidence files were restored. Unscoped root pytest is not
+claimed because of the known research `sys.exit(0)` import.
+
+`PASS_SENSOR_B4_I09_QUOTA_STORAGE_ESTIMATOR_SEALED = OPERATOR_HOLD`.
+`PASS_SENSOR_B4_I09R1_EVIDENCE_TRUTH_ADMISSION_POLICY_SEALED =
+PENDING_OPERATOR_REVIEW`.
+`G4-08_STORAGE_PRESSURE_GATE = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW`.
+`next_checkpoint_authorized = FALSE`; `recommended_next = OPERATOR REVIEW OF
+COMPLETE I09 -> I09R1 CHAIN`. I10 and I11+ remain unauthorized; research remains
+frozen.

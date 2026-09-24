@@ -1,0 +1,192 @@
+{
+  "checkpoint": "SENSOR-B4-I09R1",
+  "matrix": "BACKFILL_ADMISSION",
+  "policy": "Oversize blocks before execution; budget-safe estimates pass through authoritative quota and floor policy.",
+  "rows": [
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "available_budget_bytes": 100,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 1,
+      "case": "over_budget_blocked",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 101,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": false
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "available_budget_bytes": 2000,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 0,
+      "case": "within_budget_floor_breach_blocked",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 81,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": true
+    },
+    {
+      "actual_blocked_code": null,
+      "actual_disposition": "PROCEED",
+      "available_budget_bytes": 2000,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 0,
+      "case": "within_budget_safe_admitted",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 100,
+      "expected_blocked_code": null,
+      "expected_disposition": "PROCEED",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": true
+    },
+    {
+      "actual_blocked_code": null,
+      "actual_disposition": "DEFER",
+      "available_budget_bytes": 2000,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 0,
+      "case": "constrained_p2_deferred",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 10,
+      "expected_blocked_code": null,
+      "expected_disposition": "DEFER",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": true
+    },
+    {
+      "actual_blocked_code": null,
+      "actual_disposition": "PAUSE",
+      "available_budget_bytes": 2000,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 0,
+      "case": "constrained_p3_paused",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 10,
+      "expected_blocked_code": null,
+      "expected_disposition": "PAUSE",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": true
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "available_budget_bytes": 2000,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 0,
+      "case": "critical_p1_blocked",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 10,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": true
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "available_budget_bytes": 2000,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 0,
+      "case": "critical_p2_blocked",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 10,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": true
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "available_budget_bytes": 2000,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 0,
+      "case": "critical_p3_blocked",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 10,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": true
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "available_budget_bytes": 2000,
+      "blocked_code_matches": true,
+      "budget_excess_bytes": 0,
+      "case": "p0_floor_refused",
+      "disposition_matches": true,
+      "estimate_budget_truth_visible": true,
+      "estimated_total": 81,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "estimate_budget_truth_visible"
+      ],
+      "result": "OK",
+      "within_budget": true
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 9,
+    "rows": 9
+  }
+}

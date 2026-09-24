@@ -1,0 +1,173 @@
+{
+  "checkpoint": "SENSOR-B4-I09R1",
+  "matrix": "SIMULATION_TRUTH",
+  "rows": [
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_blocked_code": null,
+      "actual_disposition": "PROCEED",
+      "blocked_code_matches": true,
+      "case": "exact_floor_permitted",
+      "disposition_matches": true,
+      "expected_blocked_code": null,
+      "expected_disposition": "PROCEED",
+      "floor_relationship": "AT_FLOOR",
+      "floor_relationship_correct": true,
+      "projected_free_bytes": 20,
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "floor_relationship_correct"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "blocked_code_matches": true,
+      "case": "one_byte_below_floor_blocked",
+      "disposition_matches": true,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "floor_relationship": "BELOW_FLOOR",
+      "floor_relationship_correct": true,
+      "projected_free_bytes": 19,
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "floor_relationship_correct"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_blocked_code": null,
+      "actual_disposition": "PROCEED",
+      "blocked_code_matches": true,
+      "case": "normal_safe_p0",
+      "disposition_matches": true,
+      "expected_blocked_code": null,
+      "expected_disposition": "PROCEED",
+      "floor_relationship": "ABOVE_FLOOR",
+      "floor_relationship_correct": true,
+      "projected_free_bytes": 800,
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "floor_relationship_correct"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_blocked_code": null,
+      "actual_disposition": "WARN",
+      "blocked_code_matches": true,
+      "case": "watch_safe_p2",
+      "disposition_matches": true,
+      "expected_blocked_code": null,
+      "expected_disposition": "WARN",
+      "floor_relationship": "ABOVE_FLOOR",
+      "floor_relationship_correct": true,
+      "projected_free_bytes": 200,
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "floor_relationship_correct"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_blocked_code": null,
+      "actual_disposition": "DEFER",
+      "blocked_code_matches": true,
+      "case": "constrained_p2_deferred",
+      "disposition_matches": true,
+      "expected_blocked_code": null,
+      "expected_disposition": "DEFER",
+      "floor_relationship": "ABOVE_FLOOR",
+      "floor_relationship_correct": true,
+      "projected_free_bytes": 50,
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "floor_relationship_correct"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_blocked_code": null,
+      "actual_disposition": "WARN",
+      "blocked_code_matches": true,
+      "case": "critical_p0_warn",
+      "disposition_matches": true,
+      "expected_blocked_code": null,
+      "expected_disposition": "WARN",
+      "floor_relationship": "ABOVE_FLOOR",
+      "floor_relationship_correct": true,
+      "projected_free_bytes": 50,
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "floor_relationship_correct"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "blocked_code_matches": true,
+      "case": "critical_p1_blocked",
+      "disposition_matches": true,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "floor_relationship": "ABOVE_FLOOR",
+      "floor_relationship_correct": true,
+      "projected_free_bytes": 50,
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches",
+        "floor_relationship_correct"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "historical_false_scenario_preserved",
+      "historical_absolute_free_floor_bytes": 20,
+      "historical_blocked_code": null,
+      "historical_bytes_preserved": true,
+      "historical_defect_confirmed": true,
+      "historical_disposition": "PROCEED",
+      "historical_projected_free_bytes": 8000,
+      "required_invariants": [
+        "historical_bytes_preserved",
+        "historical_defect_confirmed"
+      ],
+      "result": "OK"
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "actual_disposition": "PROCEED",
+      "case": "counterfactual_one_byte_below_floor_permitted",
+      "disposition_matches": false,
+      "expected_disposition": "BLOCK",
+      "floor_relationship_correct": false,
+      "projected_free_bytes": 19,
+      "required_invariants": [
+        "disposition_matches",
+        "floor_relationship_correct"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "rule": "Every scenario declares required invariants; no simulation exception remains.",
+  "summary": {
+    "fail": 1,
+    "ok": 8,
+    "rows": 9
+  }
+}

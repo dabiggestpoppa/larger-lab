@@ -1,0 +1,305 @@
+{
+  "checkpoint": "SENSOR-B4-I09R1",
+  "confidence_limitation": "HIGH means >=24h duration coverage only; not a calibrated probability, confidence interval, or proof of representative activity.",
+  "matrix": "RETENTION_CONFIG_SAFETY",
+  "rows": [
+    {
+      "attacked_value": "false",
+      "case": "boolean_type_attack_u2_full_depth_books_enabled_str_false",
+      "detail": "u2_full_depth_books_enabled must be an exact bool",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": "true",
+      "case": "boolean_type_attack_u2_full_depth_books_enabled_str_true",
+      "detail": "u2_full_depth_books_enabled must be an exact bool",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": 0,
+      "case": "boolean_type_attack_u2_full_depth_books_enabled_int_0",
+      "detail": "u2_full_depth_books_enabled must be an exact bool",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": 1,
+      "case": "boolean_type_attack_u2_full_depth_books_enabled_int_1",
+      "detail": "u2_full_depth_books_enabled must be an exact bool",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": null,
+      "case": "boolean_type_attack_u2_full_depth_books_enabled_NoneType_None",
+      "detail": "u2_full_depth_books_enabled must be an exact bool",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": [],
+      "case": "boolean_type_attack_u2_full_depth_books_enabled_list_[]",
+      "detail": "u2_full_depth_books_enabled must be an exact bool",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": {},
+      "case": "boolean_type_attack_u2_full_depth_books_enabled_dict_{}",
+      "detail": "u2_full_depth_books_enabled must be an exact bool",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": "false",
+      "case": "boolean_type_attack_automatic_t0a_destructive_actions_str_false",
+      "detail": "automatic_t0a_destructive_actions must be an exact bool",
+      "field": "automatic_t0a_destructive_actions",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": "true",
+      "case": "boolean_type_attack_automatic_t0a_destructive_actions_str_true",
+      "detail": "automatic_t0a_destructive_actions must be an exact bool",
+      "field": "automatic_t0a_destructive_actions",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": 0,
+      "case": "boolean_type_attack_automatic_t0a_destructive_actions_int_0",
+      "detail": "automatic_t0a_destructive_actions must be an exact bool",
+      "field": "automatic_t0a_destructive_actions",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": 1,
+      "case": "boolean_type_attack_automatic_t0a_destructive_actions_int_1",
+      "detail": "automatic_t0a_destructive_actions must be an exact bool",
+      "field": "automatic_t0a_destructive_actions",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": null,
+      "case": "boolean_type_attack_automatic_t0a_destructive_actions_NoneType_None",
+      "detail": "automatic_t0a_destructive_actions must be an exact bool",
+      "field": "automatic_t0a_destructive_actions",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": [],
+      "case": "boolean_type_attack_automatic_t0a_destructive_actions_list_[]",
+      "detail": "automatic_t0a_destructive_actions must be an exact bool",
+      "field": "automatic_t0a_destructive_actions",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "attacked_value": {},
+      "case": "boolean_type_attack_automatic_t0a_destructive_actions_dict_{}",
+      "detail": "automatic_t0a_destructive_actions must be an exact bool",
+      "field": "automatic_t0a_destructive_actions",
+      "required_invariants": [
+        "type_confusion_refused"
+      ],
+      "result": "OK",
+      "type_confusion_refused": true,
+      "typed_refusal": true
+    },
+    {
+      "case": "valid_u2_false",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "valid_exact_bool_accepted"
+      ],
+      "result": "OK",
+      "valid_exact_bool_accepted": true,
+      "value": false
+    },
+    {
+      "case": "valid_u2_true",
+      "field": "u2_full_depth_books_enabled",
+      "required_invariants": [
+        "valid_exact_bool_accepted"
+      ],
+      "result": "OK",
+      "valid_exact_bool_accepted": true,
+      "value": true
+    },
+    {
+      "case": "valid_automatic_t0a_false",
+      "field": "automatic_t0a_destructive_actions",
+      "required_invariants": [
+        "valid_exact_bool_accepted"
+      ],
+      "result": "OK",
+      "valid_exact_bool_accepted": true,
+      "value": false
+    },
+    {
+      "case": "t0a_refused_p0_all_flags",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "OLD",
+        "LARGE",
+        "DUPLICATE_LOOKING",
+        "REVISION"
+      ],
+      "priority": "P0",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "t0a_refused_p1_all_flags",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "OLD",
+        "LARGE",
+        "DUPLICATE_LOOKING",
+        "REVISION"
+      ],
+      "priority": "P1",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "t0a_refused_p2_all_flags",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "OLD",
+        "LARGE",
+        "DUPLICATE_LOOKING",
+        "REVISION"
+      ],
+      "priority": "P2",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "t0a_refused_p3_all_flags",
+      "destructive_action_refused": true,
+      "evidence_flags": [
+        "OLD",
+        "LARGE",
+        "DUPLICATE_LOOKING",
+        "REVISION"
+      ],
+      "priority": "P3",
+      "required_invariants": [
+        "destructive_action_refused",
+        "t0a_preserved"
+      ],
+      "result": "OK",
+      "t0a_preserved": true
+    },
+    {
+      "case": "p3_t0a_cannot_inherit_eviction",
+      "p3_non_t0a_allowed": true,
+      "p3_non_t0a_evictable": true,
+      "p3_t0a_allowed": false,
+      "p3_t0a_refused": true,
+      "required_invariants": [
+        "p3_t0a_refused",
+        "p3_non_t0a_evictable"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "tiny_24h_sample_high_is_coverage_only",
+      "confidence_band": "HIGH",
+      "high_label_observed": true,
+      "not_calibrated_probability": true,
+      "not_representativeness_proof": true,
+      "required_invariants": [
+        "high_label_observed",
+        "not_calibrated_probability",
+        "not_representativeness_proof"
+      ],
+      "result": "OK",
+      "sample_bytes": 1,
+      "sample_duration_seconds": 86400
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 23,
+    "rows": 23
+  }
+}

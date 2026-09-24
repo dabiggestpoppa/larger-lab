@@ -1,0 +1,218 @@
+{
+  "checkpoint": "SENSOR-B4-I09R1",
+  "matrix": "PRIORITY_AUTHORITY",
+  "policy": "P0 alone continues at CRITICAL; every write revalidates byte facts and config authority.",
+  "rows": [
+    {
+      "attack": "essential=True",
+      "caller_bypass_refused": true,
+      "case": "essential_bypass_removed_p1",
+      "detail": "decide_storage_write() got an unexpected keyword argument 'essential'",
+      "priority": "P1",
+      "required_invariants": [
+        "caller_bypass_refused"
+      ],
+      "result": "OK",
+      "typed_refusal": true
+    },
+    {
+      "attack": "essential=True",
+      "caller_bypass_refused": true,
+      "case": "essential_bypass_removed_p2",
+      "detail": "decide_storage_write() got an unexpected keyword argument 'essential'",
+      "priority": "P2",
+      "required_invariants": [
+        "caller_bypass_refused"
+      ],
+      "result": "OK",
+      "typed_refusal": true
+    },
+    {
+      "attack": "essential=True",
+      "caller_bypass_refused": true,
+      "case": "essential_bypass_removed_p3",
+      "detail": "decide_storage_write() got an unexpected keyword argument 'essential'",
+      "priority": "P3",
+      "required_invariants": [
+        "caller_bypass_refused"
+      ],
+      "result": "OK",
+      "typed_refusal": true
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "capacity_bytes": 1000,
+      "case": "forged_normal_critical_bytes",
+      "detail": "state pressure_state contradicts byte-derived pressure under the applicable quota config",
+      "free_bytes": 50,
+      "required_invariants": [
+        "untrusted_state_refused"
+      ],
+      "result": "OK",
+      "supplied_pressure": "NORMAL",
+      "typed_refusal": true,
+      "untrusted_state_refused": true,
+      "used_bytes": 950,
+      "utilization_ratio": 0.95
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "capacity_bytes": 1000,
+      "case": "stale_watch_critical_bytes",
+      "detail": "state pressure_state contradicts byte-derived pressure under the applicable quota config",
+      "free_bytes": 50,
+      "required_invariants": [
+        "untrusted_state_refused"
+      ],
+      "result": "OK",
+      "supplied_pressure": "WATCH",
+      "typed_refusal": true,
+      "untrusted_state_refused": true,
+      "used_bytes": 950,
+      "utilization_ratio": 0.95
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "capacity_bytes": 1000,
+      "case": "stale_critical_normal_bytes",
+      "detail": "state pressure_state contradicts byte-derived pressure under the applicable quota config",
+      "free_bytes": 900,
+      "required_invariants": [
+        "untrusted_state_refused"
+      ],
+      "result": "OK",
+      "supplied_pressure": "CRITICAL",
+      "typed_refusal": true,
+      "untrusted_state_refused": true,
+      "used_bytes": 100,
+      "utilization_ratio": 0.1
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "capacity_bytes": 1000,
+      "case": "used_free_capacity_contradiction",
+      "detail": "untrusted quota state: used_bytes + free_bytes contradicts capacity_bytes",
+      "free_bytes": 300,
+      "required_invariants": [
+        "untrusted_state_refused"
+      ],
+      "result": "OK",
+      "supplied_pressure": "CRITICAL",
+      "typed_refusal": true,
+      "untrusted_state_refused": true,
+      "used_bytes": 600,
+      "utilization_ratio": 0.6
+    },
+    {
+      "absolute_free_floor_bytes": 20,
+      "capacity_bytes": 1000,
+      "case": "ratio_contradiction",
+      "detail": "untrusted quota state: supplied utilization_ratio contradicts byte-derived utilization",
+      "free_bytes": 50,
+      "required_invariants": [
+        "untrusted_state_refused"
+      ],
+      "result": "OK",
+      "supplied_pressure": "CRITICAL",
+      "typed_refusal": true,
+      "untrusted_state_refused": true,
+      "used_bytes": 950,
+      "utilization_ratio": 0.5
+    },
+    {
+      "absolute_free_floor_bytes": 0,
+      "capacity_bytes": 1000,
+      "case": "floor_config_contradiction",
+      "detail": "state absolute_free_floor_bytes contradicts the applicable quota config",
+      "free_bytes": 50,
+      "required_invariants": [
+        "untrusted_state_refused"
+      ],
+      "result": "OK",
+      "supplied_pressure": "CRITICAL",
+      "typed_refusal": true,
+      "untrusted_state_refused": true,
+      "used_bytes": 950,
+      "utilization_ratio": 0.95
+    },
+    {
+      "actual_blocked_code": null,
+      "actual_disposition": "WARN",
+      "blocked_code_matches": true,
+      "case": "critical_p0_exact_matrix",
+      "disposition_matches": true,
+      "expected_blocked_code": null,
+      "expected_disposition": "WARN",
+      "priority": "P0",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "blocked_code_matches": true,
+      "case": "critical_p1_exact_matrix",
+      "disposition_matches": true,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "priority": "P1",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "blocked_code_matches": true,
+      "case": "critical_p2_exact_matrix",
+      "disposition_matches": true,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "priority": "P2",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "blocked_code_matches": true,
+      "case": "critical_p3_exact_matrix",
+      "disposition_matches": true,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "priority": "P3",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches"
+      ],
+      "result": "OK"
+    },
+    {
+      "actual_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "actual_disposition": "BLOCK",
+      "blocked_code_matches": true,
+      "case": "critical_p0_hard_floor_precedence",
+      "disposition_matches": true,
+      "expected_blocked_code": "STORAGE_CAPACITY_BLOCKED",
+      "expected_disposition": "BLOCK",
+      "required_invariants": [
+        "disposition_matches",
+        "blocked_code_matches"
+      ],
+      "result": "OK"
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 14,
+    "rows": 14
+  }
+}
