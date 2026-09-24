@@ -348,3 +348,41 @@ Artifacts:
 Exact next operator action: review the R2 projection/graph-fact seal and explicitly
 accept or reject the proposed Book 2 exit gate. Do not start Book 3 before that
 decision.
+
+
+# CHECKPOINT 8 — BOOK 2 HARDENING R3 (2026-09-24)
+
+Checkpoints 1–7 are preserved. This narrow checkpoint records the canonical claim
+authority seal only; it does not accept Book 2 or authorize Book 3/live systems.
+
+```text
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_HARDENING_R3 = PASS
+BOOK_2_IMPLEMENTATION = COMPLETE_HARDENED
+BOOK_2_EXIT_GATE = PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_2_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_3 = NOT_STARTED
+LIVE_COLLECTORS = NOT_STARTED
+```
+
+Quality gates:
+
+```text
+CSIA tests             = 199 passed (107 Book 1 + 92 Book 2/hardening/integration)
+R3 focused tests       = 9 passed
+Crypto Sensor          = 2339 passed / 4 skipped
+ruff (CSIA scope)      = PASS
+mypy                   = PASS (16 source files)
+full-repository ruff   = pre-existing legacy findings outside CSIA scope
+```
+
+Artifacts:
+
+- `CSIA_BOOK_2_HARDENING_R3_MATRIX.json`
+- `CSIA_BOOK_2_IMPLEMENTATION_EVIDENCE_v0.1.md` (HARDENING R3 — CANONICAL CLAIM AUTHORITY SEAL)
+- this checkpoint
+
+Exact next operator action: review the R3 canonical claim authority matrix and
+explicitly accept or reject the proposed Book 2 exit gate. Do not start Book 3
+before that decision.

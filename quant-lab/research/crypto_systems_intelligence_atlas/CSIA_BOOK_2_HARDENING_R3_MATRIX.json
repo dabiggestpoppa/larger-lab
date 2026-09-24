@@ -1,0 +1,34 @@
+{
+  "artifact": "CSIA_BOOK_2_HARDENING_R3_MATRIX",
+  "version": "0.1",
+  "date": "2026-09-24",
+  "branch": "agent/crypto-systems-intelligence-atlas-book2-build",
+  "scope": "Narrow canonical ClaimStore authority seal for Book 2 graph promotion; no Book 1 mutation, Book 3, live collectors, network, database, graph DB, Sensor, or Capital Field",
+  "starting_head": "b1aa0f5fc3a497c92ae4e6a04b26f9def3b1e172",
+  "book1_anchor": "7c2419f00b9f5f5f105708b067848909fa4da609",
+  "findings": {
+    "detached_claim_promotion": {"status": "REJECTED", "proof": "GraphFactPromoter requires ClaimService, resolves claim_id through ClaimStore.require, and requires exact equality with the canonical current Claim"},
+    "forged_corroborated": {"status": "REJECTED", "proof": "A detached OBSERVED copy with CORROBORATED state cannot pass canonical equality or the recorded current-version transition check"},
+    "forged_inferred": {"status": "REJECTED", "proof": "A detached INFERRED copy with syntactically valid lineage cannot pass canonical equality; canonical INFERRED requires the authorized inference insertion origin"},
+    "historical_claim_promotion": {"status": "REJECTED", "proof": "Superseded ClaimStore history is queryable but cannot create a new current graph fact; an old CORROBORATED version remains non-promotable after REJECTED"},
+    "canonical_observed": {"status": "PASS", "path": "ClaimService.add_observed -> ClaimStore -> GraphFactPromoter -> TypedEdge"},
+    "canonical_corroborated": {"status": "PASS", "path": "independent evidence -> OBSERVED -> P-4 ClaimStateEngine.transition -> current CORROBORATED -> GraphFactPromoter"},
+    "canonical_inferred": {"status": "PASS", "path": "RawEvidence -> OBSERVED parents -> InferenceEngine.create -> authorized ClaimStore origin -> GraphFactPromoter"},
+    "claimstore_insertion_seal": {"status": "PASS", "initial_states": ["DECLARED", "OBSERVED"], "promoted_states": "rejected by public add/add_initial", "inferred_states": "requires the module-private inference insertion token"},
+    "transition_provenance_seal": {"status": "PASS", "proof": "TransitionEvent stores the exact resulting Claim version and triggering evidence; GraphFactPromoter requires a matching current CORROBORATED event"},
+    "book1_freeze": {"status": "PASS", "temporal_py_diff_from_accepted_anchor": 0, "init_py_diff_from_accepted_anchor": 0, "identity_py_diff_from_accepted_anchor": 0, "ontology_py_diff_from_accepted_anchor": 0, "relationships_py_diff_from_accepted_anchor": 0, "book1_accepted_contract_mutations": 0}
+  },
+  "quality_gates": {
+    "all_csia": "199 passed",
+    "book1_only": "107 passed",
+    "book2_and_hardening": "92 passed",
+    "r3_focused": "9 passed",
+    "sensor_regression": "2339 passed, 4 skipped; full suite passed with no failure",
+    "ruff_csia": "PASS",
+    "mypy": "PASS; 16 source files",
+    "full_repository_ruff": "PRE-EXISTING FAILURE outside CSIA scope; 5832 findings in legacy research/backtest/strategy files"
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "operator_acceptance": "NOT_SELF_ACCEPTED"
+}

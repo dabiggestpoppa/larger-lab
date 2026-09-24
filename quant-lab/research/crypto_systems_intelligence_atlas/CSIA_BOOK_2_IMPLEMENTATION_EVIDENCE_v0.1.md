@@ -212,3 +212,40 @@ Quality evidence after R2:
 The proposed exit gate remains
 `PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`; it is not self-accepted.
 Book 3 and all live/infrastructure scope remain deferred.
+
+
+## HARDENING R3 — CANONICAL CLAIM AUTHORITY SEAL
+
+Book 2 Hardening R3 closes the final graph-boundary authority bypass without mutating
+accepted Book 1. `GraphFactPromoter` now requires a `ClaimService`, resolves the
+canonical current claim by `claim_id`, and requires exact equality with the supplied
+claim before generating a graph binding. Detached caller state is never graph truth.
+
+`ClaimStore.add_initial()` accepts only `DECLARED` and `OBSERVED`. The compatibility
+`add()` entry point delegates to that restricted path. `INFERRED` insertion requires
+the private inference insertion token and records an `INFERENCE` creation origin.
+`TransitionEvent` now records the exact resulting claim version and triggering
+evidence, so a current `CORROBORATED` claim must match its authorized P-4 transition
+rather than merely share a historical state marker. Superseded history remains
+queryable but cannot create a new current graph fact.
+
+R3 evidence:
+
+- `DETACHED_CLAIM_PROMOTION = REJECTED`
+- `HISTORICAL_CLAIM_PROMOTION = REJECTED`
+- `FORGED_CORROBORATED = REJECTED`
+- `FORGED_INFERRED = REJECTED`
+- `CANONICAL_OBSERVED = PASS`
+- `CANONICAL_CORROBORATED = PASS`
+- `CANONICAL_INFERRED = PASS`
+- Book 1 accepted contract mutations: **0**
+- CSIA: **199 passed** (107 Book 1 + 92 Book 2/hardening/integration)
+- R3 focused tests: **9 passed**
+- Crypto Sensor regression: **2339 passed, 4 skipped**; the full suite passed
+- CSIA Ruff: **PASS**; full-repository Ruff remains blocked by pre-existing legacy
+  findings outside CSIA scope
+- Mypy: **PASS**, 16 source files
+
+The proposed exit gate remains
+`PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`. Operator acceptance is still
+required; Book 3 and all live/infrastructure scope remain deferred.
