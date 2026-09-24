@@ -18,6 +18,14 @@ import yaml
 from .._paths import CONFIG_DIR
 from ..contracts.enums import SensorFamily
 from .enums import StoragePriority
+from .models import StorageQuotaState
+from .quota import (
+    STORAGE_CAPACITY_BLOCKED,
+    QuotaConfig,
+    QuotaWriteDecision,
+    WriteDisposition,
+    decide_storage_write,
+)
 
 DEFAULT_RETENTION_CONFIG_PATH = CONFIG_DIR / "retention.yaml"
 _SECONDS_PER_DAY = 86_400
@@ -53,8 +61,11 @@ class RetentionConfig:
     medium_confidence_sample_seconds: int = 3_600
 
     def __post_init__(self) -> None:
-        if not self.schema_version:
-            raise RetentionConfigurationError("schema_version must be nonempty")
+        if not isinstance(self.schema_version, str) or not self.schema_version.strip():
+            raise RetentionConfigurationError("schema_version must be a nonempty string")
+        for name in ("u2_full_depth_books_enabled", "automatic_t0a_destructive_actions"):
+            if type(getattr(self, name)) is not bool:
+                raise RetentionConfigurationError(f"{name} must be an exact bool")
         if self.automatic_t0a_destructive_actions:
             raise RetentionConfigurationError(
                 "automatic T0A destructive actions are forbidden in v1"
@@ -374,6 +385,53 @@ def estimate_storage(
     )
 
 
+def assess_storage_admission(
+    estimate: StorageEstimate,
+    quota_state: StorageQuotaState,
+    *,
+    priority: StoragePriority,
+    quota_config: QuotaConfig | None = None,
+) -> QuotaWriteDecision:
+    """Purely refuse oversized planned work before execution.
+
+    Nominal budget is checked first. A budget-safe estimate then enters the
+    same fail-closed quota/floor policy used for ordinary writes, with its full
+    estimated bytes treated as the projected write.
+    """
+    if not isinstance(estimate, StorageEstimate):
+        raise StorageEstimationError("estimate must be a StorageEstimate")
+    try:
+        priority = StoragePriority(priority)
+    except ValueError as exc:
+        raise StorageEstimationError(f"unknown storage priority: {priority!r}") from exc
+    policy = quota_config
+    if not estimate.within_budget:
+        base = decide_storage_write(
+            quota_state,
+            projected_write_bytes=0,
+            priority=priority,
+            config=policy,
+        )
+        return QuotaWriteDecision(
+            disposition=WriteDisposition.BLOCK,
+            reason=(
+                "planned storage estimate exceeds configured available budget by "
+                f"{estimate.budget_excess_bytes} bytes"
+            ),
+            projected_free_bytes=base.projected_free_bytes,
+            absolute_free_floor_bytes=base.absolute_free_floor_bytes,
+            pressure_state=base.pressure_state,
+            priority=priority,
+            blocked_code=STORAGE_CAPACITY_BLOCKED,
+        )
+    return decide_storage_write(
+        quota_state,
+        projected_write_bytes=estimate.estimated_total,
+        priority=priority,
+        config=policy,
+    )
+
+
 __all__ = [
     "ConfidenceBand",
     "DEFAULT_RETENTION_CONFIG_PATH",
@@ -389,6 +447,7 @@ __all__ = [
     "StorageEstimationError",
     "UniverseTier",
     "assess_destructive_retention",
+    "assess_storage_admission",
     "estimate_storage",
     "load_retention_config",
     "retention_policy",
