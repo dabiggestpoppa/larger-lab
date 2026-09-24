@@ -263,13 +263,21 @@ def _quarantine_terminality_matrix(tmp: Path) -> list[dict[str, Any]]:
         resolution="record only",
         before_state={"relative_path": "locks/missing-action.lock"},
     )
-    op_id = engine._record_intent(planned, "missing-action")
-    engine._record_outcome(
-        op_id,
-        planned,
-        "missing-action",
-        resolution="COMPLETED: terminal names absent action",
+    engine._record_intent(planned, "missing-action")
+    # Preserve the historical corruption scenario by forging the durable
+    # catalog shape that the I08R2R1 production writer now refuses to create.
+    engine.operations.record_phase(
+        recovery_run_id="missing-action",
+        action_kind=planned.action_kind,
+        object_type=planned.object_type,
+        object_id=planned.object_id,
+        problem=planned.problem,
+        resolution=planned.resolution,
+        before_state=planned.before_state,
+        phase=rec.RecoveryOperationJournal.PHASE_COMPLETED,
+        detail="COMPLETED: terminal names absent action",
         final_action_id="f" * 64,
+        final_outcome="{}",
     )
     try:
         _finish_with_empty_scan(root)
@@ -305,7 +313,7 @@ def _quarantine_terminality_matrix(tmp: Path) -> list[dict[str, Any]]:
         resolution="record only",
         before_state={"relative_path": "locks/other-action.lock"},
     )
-    op_id = engine._record_intent(first, "wrong-action")
+    engine._record_intent(first, "wrong-action")
     other_action_id, _ = engine.journal.record(
         recovery_run_id="wrong-action",
         object_type=second.object_type,
@@ -316,12 +324,38 @@ def _quarantine_terminality_matrix(tmp: Path) -> list[dict[str, Any]]:
         after_state={},
         action_kind=second.action_kind,
     )
-    engine._record_outcome(
-        op_id,
-        first,
-        "wrong-action",
-        resolution="COMPLETED: wrong action ownership",
+    other_action = engine.journal.get(other_action_id)
+    assert other_action is not None
+    # Forge the historical wrong-owner terminal directly; current production
+    # refuses it before publication because the action has no exact operation
+    # binding for this operation.
+    engine.operations.record_phase(
+        recovery_run_id="wrong-action",
+        action_kind=first.action_kind,
+        object_type=first.object_type,
+        object_id=first.object_id,
+        problem=first.problem,
+        resolution=first.resolution,
+        before_state=first.before_state,
+        phase=rec.RecoveryOperationJournal.PHASE_COMPLETED,
+        detail="COMPLETED: wrong action ownership",
         final_action_id=other_action_id,
+        final_outcome=rec._canonical(
+            {
+                "recovery_run_id": other_action["recovery_run_id"],
+                "action_kind": other_action["action_kind"],
+                "object_type": other_action["object_type"],
+                "object_id": other_action["object_id"],
+                "problem": other_action["problem"],
+                "resolution": other_action["resolution"],
+                "before_state": rec._parse_state_field(
+                    other_action["before_state"]
+                ),
+                "after_state": rec._parse_state_field(
+                    other_action["after_state"]
+                ),
+            }
+        ),
     )
     try:
         _finish_with_empty_scan(root)
@@ -359,14 +393,37 @@ def _quarantine_terminality_matrix(tmp: Path) -> list[dict[str, Any]]:
         before_state=planned.before_state,
         after_state={},
         action_kind=planned.action_kind,
+        operation_id=op_id,
     )
     engine._record_outcome(
-        op_id, planned, "both-terminal", resolution="COMPLETED: first",
+        op_id, planned, "both-terminal", resolution="completed",
         final_action_id=action_id,
     )
-    engine._record_outcome(
-        op_id, planned, "both-terminal", resolution="UNRESOLVED: second",
+    # Append the contradictory historical row directly; the R2R1 writer now
+    # refuses a terminal whose semantics do not match its exact action.
+    engine.operations.record_phase(
+        recovery_run_id="both-terminal",
+        action_kind=planned.action_kind,
+        object_type=planned.object_type,
+        object_id=planned.object_id,
+        problem=planned.problem,
+        resolution=planned.resolution,
+        before_state=planned.before_state,
+        phase=rec.RecoveryOperationJournal.PHASE_UNRESOLVED,
+        detail="UNRESOLVED: second",
         final_action_id=action_id,
+        final_outcome=rec._canonical(
+            {
+                "recovery_run_id": "both-terminal",
+                "action_kind": planned.action_kind,
+                "object_type": planned.object_type,
+                "object_id": planned.object_id,
+                "problem": planned.problem,
+                "resolution": "completed",
+                "before_state": planned.before_state,
+                "after_state": {},
+            }
+        ),
     )
     try:
         _finish_with_empty_scan(root)

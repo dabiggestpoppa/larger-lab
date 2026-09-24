@@ -51,10 +51,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import threading
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -183,7 +184,12 @@ _ACTION_OPERATE_CLEAR_JOB_LOCK = "OPERATOR_CLEAR_JOB_LOCK"
 #: grandfathered marker "I08R1"; an UNKNOWN marker fails closed.
 _OP_SCHEMA_I08R1 = "I08R1"
 _OP_SCHEMA_I08R2 = "I08R2"
-_OP_SCHEMA_VALUES = (_OP_SCHEMA_I08R1, _OP_SCHEMA_I08R2)
+_OP_SCHEMA_I08R2R1 = "I08R2R1"
+_OP_SCHEMA_VALUES = (
+    _OP_SCHEMA_I08R1,
+    _OP_SCHEMA_I08R2,
+    _OP_SCHEMA_I08R2R1,
+)
 
 #: Full semantic field set of one operation-phase record.  An exact retry
 #: compares EVERY field here except ``registered_at`` (I08R2 §14) — the
@@ -206,6 +212,7 @@ _OPERATION_RECORD_FIELDS = (
     "effect_identity",
     "effect_detail_sha256",
     "final_action_id",
+    "final_outcome",
     "detail",
     "registered_at",
 )
@@ -263,6 +270,7 @@ def validate_operation_record(payload: Any) -> dict[str, Any]:
                 "effect_identity",
                 "effect_detail_sha256",
                 "final_action_id",
+                "final_outcome",
             ):
                 continue
             raise RecoveryOperationCorrupt(
@@ -333,18 +341,41 @@ def validate_operation_record(payload: Any) -> dict[str, Any]:
         raise RecoveryOperationCorrupt(
             "final_action_id must be a string when present (I08R2 §5)"
         )
+    final_outcome = payload.get("final_outcome")
+    if final_outcome is not None and not isinstance(final_outcome, str):
+        raise RecoveryOperationCorrupt(
+            "final_outcome must be canonical JSON text when present "
+            "(I08R2R1)"
+        )
     if phase in (
         RecoveryOperationJournal.PHASE_COMPLETED,
         RecoveryOperationJournal.PHASE_UNRESOLVED,
     ):
-        # A terminal phase must name the exact final RecoveryAction it
-        # was sealed with (I08R2 §5): the terminal record carries enough
-        # durable final-outcome data to reconstruct the action.
+        # A terminal phase names the exact final action and carries its
+        # complete semantic outcome. Replay compares both; a coarse
+        # run/action/object/problem tuple is not sufficient ownership.
         if not final_action_id:
             raise RecoveryOperationCorrupt(
                 f"{phase} terminal row without final_action_id; a terminal "
                 "operation cannot truthfully exist without its final "
                 "RecoveryAction (I08R2 §5/§6)"
+            )
+        if final_outcome is None:
+            raise RecoveryOperationCorrupt(
+                f"{phase} terminal row without exact final_outcome evidence; "
+                "the named action cannot be proven to be this terminal's "
+                "final outcome (I08R2R1)"
+            )
+        try:
+            parsed_final_outcome = json.loads(final_outcome)
+        except json.JSONDecodeError as exc:
+            raise RecoveryOperationCorrupt(
+                "terminal final_outcome is malformed canonical JSON "
+                "(I08R2R1)"
+            ) from exc
+        if not isinstance(parsed_final_outcome, dict):
+            raise RecoveryOperationCorrupt(
+                "terminal final_outcome is not a JSON object (I08R2R1)"
             )
     try:
         registered_at = datetime.fromisoformat(str(payload["registered_at"]))
@@ -354,7 +385,12 @@ def validate_operation_record(payload: Any) -> dict[str, Any]:
         ) from exc
     if registered_at.tzinfo is None:
         raise RecoveryOperationCorrupt(
-            "registered_at must be timezone-aware UTC (I08R2 §13)"
+            "registered_at must be timezone-aware UTC (I08R2R1)"
+        )
+    if registered_at.utcoffset() != timedelta(0):
+        raise RecoveryOperationCorrupt(
+            "registered_at must use canonical zero UTC offset (+00:00); "
+            f"got {registered_at.utcoffset()} (I08R2R1)"
         )
     # The identity is RECOMPUTED from the payload semantics (I08R2 §14:
     # never trusted from the stored fields).
@@ -397,7 +433,12 @@ def _parse_state_field(raw: Any) -> dict[str, Any]:
     if isinstance(raw, dict):
         return dict(raw)
     if isinstance(raw, str) and raw:
-        parsed = json.loads(raw)
+        try:
+            parsed = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise RecoveryOperationCorrupt(
+                "state field is malformed JSON (I08R2R1)"
+            ) from exc
         if not isinstance(parsed, dict):
             raise RecoveryOperationCorrupt(
                 "state field is not a JSON object (I08R2 §13)"
@@ -622,8 +663,8 @@ def action_identity(payload: dict[str, Any]) -> str:
         "object_id": payload["object_id"],
         "problem": payload["problem"],
         "resolution": payload["resolution"],
-        "before_state": payload.get("before_state"),
-        "after_state": payload.get("after_state"),
+        "before_state": _parse_state_field(payload.get("before_state")),
+        "after_state": _parse_state_field(payload.get("after_state")),
     }
     return hashlib.sha256(_canonical(semantic).encode("utf-8")).hexdigest()
 
@@ -662,6 +703,7 @@ class RecoveryJournal:
         after_state: dict[str, Any] | None = None,
         registered_at: datetime | None = None,
         action_kind: str | None = None,
+        operation_id: str | None = None,
     ) -> tuple[str, bool]:
         """Commit one durable recovery record; idempotent on exact retry.
 
@@ -716,6 +758,7 @@ class RecoveryJournal:
             "after_state": _json_state(after_state),
             "evidence_ref": None,
             "action_kind": action_kind,
+            "operation_id": operation_id,
             "registered_at": (
                 coerce_utc(registered_at).isoformat()
                 if registered_at is not None
@@ -744,7 +787,8 @@ class RecoveryJournal:
         existing: dict[str, Any], envelope: dict[str, Any]
     ) -> bool:
         """True iff the durable record and the retry agree on ALL semantic
-        fields (everything except the operational ``registered_at``)."""
+        fields (everything except operational context: ``registered_at`` and
+        the operation binding added by I08R2R1)."""
         semantic_keys = (
             "record_type",
             "recovery_action_id",
@@ -895,6 +939,7 @@ class RecoveryOperationJournal:
         detail: str | None = None,
         effect_identity: str | None = None,
         final_action_id: str | None = None,
+        final_outcome: str | None = None,
         registered_at: datetime | None = None,
     ) -> tuple[str, bool]:
         """Append one phase of a recovery operation (idempotent on exact retry).
@@ -954,7 +999,7 @@ class RecoveryOperationJournal:
             "recovery_operation_id": record_id,
             "operation_id": operation_id,
             "phase": phase,
-            "op_schema": _OP_SCHEMA_I08R2,
+            "op_schema": _OP_SCHEMA_I08R2R1,
             "recovery_run_id": recovery_run_id,
             "action_kind": action_kind,
             "object_type": object_type,
@@ -966,6 +1011,7 @@ class RecoveryOperationJournal:
             "effect_identity": effect_identity,
             "effect_detail_sha256": effect_detail_sha,
             "final_action_id": final_action_id,
+            "final_outcome": final_outcome,
             "detail": detail,
             "registered_at": (
                 coerce_utc(registered_at).isoformat()
@@ -1490,6 +1536,39 @@ class RecoveryEngine:
                     "RecoveryAction belonging to a DIFFERENT operation; "
                     "the journal is corrupt (I08R2 §6)"
                 )
+            if action_identity(payload) != final_action_id:
+                raise RecoveryOperationCorrupt(
+                    "named final RecoveryAction does not match its own "
+                    "semantic identity (I08R2R1)"
+                )
+            if payload.get("operation_id") != operation_id:
+                raise RecoveryOperationCorrupt(
+                    "named final RecoveryAction is not bound to this exact "
+                    "operation_id; coarse tuple ownership is insufficient "
+                    "(I08R2R1)"
+                )
+            expected_outcome = _canonical(
+                {
+                    "recovery_run_id": payload.get("recovery_run_id"),
+                    "action_kind": payload.get("action_kind"),
+                    "object_type": payload.get("object_type"),
+                    "object_id": payload.get("object_id"),
+                    "problem": payload.get("problem"),
+                    "resolution": payload.get("resolution"),
+                    "before_state": _parse_state_field(
+                        payload.get("before_state")
+                    ),
+                    "after_state": _parse_state_field(
+                        payload.get("after_state")
+                    ),
+                }
+            )
+            if row.get("final_outcome") != expected_outcome:
+                raise RecoveryOperationCorrupt(
+                    "terminal final outcome does not exactly match its named "
+                    "RecoveryAction semantics; coarse ownership is "
+                    "insufficient (I08R2R1)"
+                )
 
     def _planned_from_record(self, record: dict[str, Any]) -> RecoveryPlanAction:
         """Rebuild the planned action from a validated record's semantics."""
@@ -1575,7 +1654,13 @@ class RecoveryEngine:
                 "is ambiguous (I08R2 §7/§12)"
             )
         if prior_actions:
-            final_action_id = str(prior_actions[0]["recovery_action_id"])
+            # The durable action's resolution is the outcome that actually
+            # reached the journal before the crash. Replay recognition may
+            # describe the landed effect with fresh wording, but adoption must
+            # not manufacture a second outcome or mutate the first one.
+            prior_action = prior_actions[0]
+            resolution = str(prior_action["resolution"])
+            final_action_id = str(prior_action["recovery_action_id"])
             self._last_action_id = final_action_id
         else:
             action = self._journal_action(
@@ -2949,6 +3034,7 @@ class RecoveryEngine:
             after_state=after_state,
             registered_at=self._clock(),
             action_kind=planned.action_kind,
+            operation_id=self._operation_id(planned, run_id),
         )
         # I08R2 §5: the durable action id is retained so the terminal
         # operation phase can be sealed with the EXACT final RecoveryAction.
@@ -3147,7 +3233,40 @@ class RecoveryEngine:
             else RecoveryOperationJournal.PHASE_COMPLETED
         )
         detail = resolution
+        final_outcome: str | None = None
         if final_action_id:
+            action_payload = self._journal.get(final_action_id)
+            if action_payload is None:
+                raise RecoveryOperationCorrupt(
+                    "cannot seal a terminal operation without its durable "
+                    "final RecoveryAction (I08R2R1)"
+                )
+            if action_payload.get("operation_id") != op_id:
+                raise RecoveryOperationCorrupt(
+                    "final RecoveryAction is not bound to this exact "
+                    "operation_id (I08R2R1)"
+                )
+            if action_payload.get("resolution") != resolution:
+                raise RecoveryOperationCorrupt(
+                    "final RecoveryAction resolution does not exactly match "
+                    "the terminal outcome being sealed (I08R2R1)"
+                )
+            final_outcome = _canonical(
+                {
+                    "recovery_run_id": action_payload.get("recovery_run_id"),
+                    "action_kind": action_payload.get("action_kind"),
+                    "object_type": action_payload.get("object_type"),
+                    "object_id": action_payload.get("object_id"),
+                    "problem": action_payload.get("problem"),
+                    "resolution": action_payload.get("resolution"),
+                    "before_state": _parse_state_field(
+                        action_payload.get("before_state")
+                    ),
+                    "after_state": _parse_state_field(
+                        action_payload.get("after_state")
+                    ),
+                }
+            )
             detail = (
                 f"{resolution} | final RecoveryAction {final_action_id} "
                 "durable before this terminal phase (I08R2 §5)"
@@ -3164,6 +3283,7 @@ class RecoveryEngine:
             phase=phase,
             detail=detail,
             final_action_id=final_action_id,
+            final_outcome=final_outcome,
             registered_at=self._clock(),
         )
 
@@ -4381,17 +4501,39 @@ class RecoveryEngine:
                 f"job {expected_job_id!r} acquired a LIVE in-process owner "
                 "record after the INTENT; refusing the clear (I08R2 §18)"
             )
-        lock_obj = owner_repository._job_locks.get(expected_job_id)
-        if lock_obj is not None and not lock_obj.acquire(blocking=False):
+        # Hold the SAME per-job RLock used by the owner repository across the
+        # final owner-map validation, unlink, and directory fsync. A local
+        # writer cannot establish a new owner in this interval because its
+        # authority acquisition blocks on this RLock (I08R2R1).
+        lock_table = getattr(owner_repository, "_job_locks", None)
+        if not isinstance(lock_table, dict):
+            raise RecoveryConfigurationError(
+                "owner repository exposes no per-job RLock authority; "
+                "refusing the clear (I08R2R1)"
+            )
+        lock_obj = lock_table.setdefault(expected_job_id, threading.RLock())
+        if not lock_obj.acquire(blocking=False):
             raise RecoveryPlanConflict(
                 "the job RLock became held after the INTENT; refusing the "
-                "clear (I08R2 §18)"
+                "clear (I08R2R1)"
             )
-        if lock_obj is not None:
+        try:
+            if expected_job_id in getattr(owner_repository, "_lock_owners", {}):
+                raise RecoveryPlanConflict(
+                    f"job {expected_job_id!r} acquired a LIVE in-process owner "
+                    "record after the INTENT; refusing the clear (I08R2R1)"
+                )
+            if not lock_path.exists():
+                raise RecoveryPlanConflict(
+                    f"lock {lock_id} vanished after the INTENT was recorded; "
+                    "refusing a phantom clear (I08R2R1)"
+                )
+            # Continuous authority: no contender can acquire the RLock
+            # between this final validation and durable unlink+fsync.
+            lock_path.unlink()
+            fsync_directory(lock_path.parent)
+        finally:
             lock_obj.release()
-        # The irreversible unlink happens ONLY now.
-        lock_path.unlink()
-        fsync_directory(lock_path.parent)
         # EFFECT row: the actual durable mutation, fingerprinted.
         op_id = self._operation_id(clear_planned, run_id)
         self._record_effect(

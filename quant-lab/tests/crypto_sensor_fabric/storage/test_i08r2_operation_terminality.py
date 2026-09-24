@@ -217,13 +217,21 @@ def test_terminal_without_named_action_fails_closed(tmp_path: Path) -> None:
         resolution="record only",
         before_state={"relative_path": "locks/lock-corrupt.lock"},
     )
-    op_id = engine._record_intent(planned, "run-corrupt")
-    engine._record_outcome(
-        op_id,
-        planned,
-        "run-corrupt",
-        resolution="COMPLETED: forged terminal without an action",
+    engine._record_intent(planned, "run-corrupt")
+    # Forge the durable terminal shape directly: the production writer now
+    # refuses to create a terminal without its exact durable action.
+    engine.operations.record_phase(
+        recovery_run_id="run-corrupt",
+        action_kind=planned.action_kind,
+        object_type=planned.object_type,
+        object_id=planned.object_id,
+        problem=planned.problem,
+        resolution=planned.resolution,
+        before_state=planned.before_state,
+        phase=rec.RecoveryOperationJournal.PHASE_COMPLETED,
+        detail="COMPLETED: forged terminal without an action",
         final_action_id="f" * 64,
+        final_outcome="{}",
     )
     restarted = Stack(tmp_path).engine("run-restart")
     with pytest.raises(rec.RecoveryOperationCorrupt, match="NOT durable"):
@@ -254,20 +262,40 @@ def test_both_terminal_phases_fail_closed(tmp_path: Path) -> None:
         before_state=planned.before_state,
         after_state={"done": True},
         action_kind=planned.action_kind,
+        operation_id=op_id,
     )
     engine._record_outcome(
         op_id,
         planned,
         "run-both",
-        resolution="COMPLETED: first terminal",
+        resolution="completed",
         final_action_id=action_id,
     )
-    engine._record_outcome(
-        op_id,
-        planned,
-        "run-both",
-        resolution="UNRESOLVED: contradictory terminal",
+    # Append the contradictory second terminal directly to model a durable
+    # catalog written before the R2R1 writer-side ownership guard existed.
+    engine.operations.record_phase(
+        recovery_run_id="run-both",
+        action_kind=planned.action_kind,
+        object_type=planned.object_type,
+        object_id=planned.object_id,
+        problem=planned.problem,
+        resolution=planned.resolution,
+        before_state=planned.before_state,
+        phase=rec.RecoveryOperationJournal.PHASE_UNRESOLVED,
+        detail="UNRESOLVED: contradictory terminal",
         final_action_id=action_id,
+        final_outcome=rec._canonical(
+            {
+                "recovery_run_id": "run-both",
+                "action_kind": planned.action_kind,
+                "object_type": planned.object_type,
+                "object_id": planned.object_id,
+                "problem": planned.problem,
+                "resolution": "completed",
+                "before_state": planned.before_state,
+                "after_state": {"done": True},
+            }
+        ),
     )
     restarted = Stack(tmp_path).engine("run-restart")
     with pytest.raises(rec.RecoveryOperationCorrupt, match="BOTH terminal"):
