@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-FROM docker.io/library/golang:1.22.2-alpine3.19@sha256:d95b4ffda07936e6f302209a7a7912855b8659d2439af3e48939fc7f5c330716 AS build
+FROM docker.io/library/golang:1.22.2-alpine3.19@sha256:cdc86d9f363e8786845bea2040312b4efa321b828acdeb26f393faa864d887b0 AS build
 
 ARG RELEASE_TAG=RELEASE.2024-05-28T17-19-04Z
 ARG SOURCE_COMMIT=f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531
@@ -25,7 +25,7 @@ RUN CGO_ENABLED=0 GOPROXY=https://proxy.golang.org,direct GOSUMDB=sum.golang.org
     -o /out/minio . \
     && /out/minio --version | grep -F "${RELEASE_TAG}"
 
-FROM docker.io/library/alpine:3.20.1@sha256:ac77ebc035f69184acb2660028580c9053f6d0f892de7933e1456d8b5e0ac085
+FROM docker.io/library/alpine:3.20.1@sha256:b89d9c93e9ed3597455c90a0b88a8bbb5cb7188438f70953fede212a0c4394e0
 
 ARG RELEASE_TAG=RELEASE.2024-05-28T17-19-04Z
 ARG SOURCE_COMMIT=f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531
