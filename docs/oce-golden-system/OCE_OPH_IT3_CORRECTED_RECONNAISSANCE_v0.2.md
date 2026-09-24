@@ -69,3 +69,11 @@ Every row applies the same reuse test: *if a current owner already closes the ob
 ### Left-open debt still carried (unchanged from STRESS-G8ARCH7)
 
 `declared()` helper unused; dual module identity patch shape (`CLOSURE.ARCH` vs top-level) remains; harness still duplicates ~50 lines of `PROBE_IDS`/`PRE_PASS_HEADS` indexing; row-table `G8_AUDIT_CLOSURE_MATRIX.md` is 320+ derived lines. These are non-blocking, recorded technical debt.
+
+---
+
+### Witness clarification (v0.2 patch — see decision packet §7 for binding text)
+
+**Block E correction to this matrix's E/F row wording:** A populated `preserved_operations` / `preserved_order` / `preserved_normalization` / `refinement_rule` is a declaration, not proof. The `EXTEND` for `TransferInvariantMap` + `validate_transfer_map()` therefore must add a **witness predicate**: each `preserved_*` declaration requires an independently resolvable witness edge (e.g., overlap-translation tau reconciling `res` lineages + trace digest match). Unresolved witness -> `ANALOGY_ONLY` + `OPEN_BRIDGE=[preserved field]` even when the string is populated; only witness-VERIFIED may gate `DOMAIN_VALIDATION_REQUIRED`. Entry-point test corrected: Map A witness resolves, Map B same strings but empty/non-resolving `evidence_refs`/`source_lineage` -> B stays `ANALOGY_ONLY`.
+
+**Block F correction:** `verify_freeze_chronology: freeze_seq < result_seq` proves chronology, not prospectiveness. `FrozenPredictionCustody` that wraps `verify_freeze_chronology` must independently verify **eligible-data custody** (`ingested_at`/`observed_at` provenance resolves in `EvidenceRegistry` and post-cutoff; pre-cutoff or `TARGET_CONTAMINATED` -> `RETROSPECTIVE`/`DIAGNOSTIC`, not promotion) and bind `kill_band`/`precision_floor` into the frozen canonical content. See decision packet §7.2 for the three-case entry-point test (post-cutoff PASS, pre-cutoff RETROSPECTIVE even though chronology holds, result-before-freeze refusal).

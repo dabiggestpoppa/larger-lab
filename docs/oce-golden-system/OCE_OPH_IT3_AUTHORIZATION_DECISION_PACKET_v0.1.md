@@ -1,11 +1,11 @@
-# OCE × OPH × IT³ — Authorization Decision Packet v0.1
+# OCE × OPH × IT³ — Authorization Decision Packet v0.2 (supersedes v0.1)
 
-**Date:** 2026-09-24
-**Branch:** `agent/oce-institutional-stress-suite-build`
-**Authenticated head at review:** `ef30cb4955c9b7c1e241fe6218c685e94698430a`
-**Evidence lineage:** `ef30cb49` (ingestion docs; not a G8 PASS) ⊳ `31c68da2` (`STRESS-G8ARCH7-R`, published evidence head) ⊳ `2cf1bb4b` (tested G8 code tree `derived_tested_tree()`). G8 `PASS_G8_CROSS_SCENARIO_COHERENCE` and `G9 — NOT AUTHORIZED` remain as recorded at `31c68da2`/`ef30cb49` — this packet does not change them.
-**Task:** corrected reconnaissance (planning-only, no A–H code) and a concrete operator decision packet for any future implementation increment.
-**Constraint from prompt:** commit and push only this corrected matrix + decision packet; no A–H code, no G8 receipt changes, no G9/G10, no merge.
+**Date:** 2026-09-24 · **Branch:** `agent/oce-institutional-stress-suite-build`
+**Authenticated head at review:** `c43c6c265bc47a11018266e8ad1fb18c3825ac0b` (revised pre-implementation baseline below)
+**Prior heads:** `ef30cb4955c9b7c1e241fe6218c685e94698430a` (ingestion docs; not a G8 PASS) ⊳ `31c68da2b53e899cf64fed393be468f758760008` (`STRESS-G8ARCH7-R`, published evidence head) ⊳ `2cf1bb4b6bc39b2a372851a02ec50d96758a8788` (`STRESS-G8ARCH7` tested code tree via `stress-suite/scenarios/g8_tested_tree.py:derived_tested_tree()`, `raw 23f97af88ff31c0e / canonical 6fa5005e1d26dd32`)
+**Scope:** planning-only correction of v0.1. No A–H code, no G8 receipt rewrite, no G9/G10, no merge, external OPH packet stays unratified.
+
+This revision fixes five defects in v0.1: (1) no alias sentence may make a non-grammar stage count as `B<n>-I<m>`; (2) `B1-I0`/`B1-I9` cannot be repurposed; (3) G8 custody must reconcile moving `derived_tested_tree()` with preserving historical G8 claims; (4) baseline counts are observed not fixed acceptance; (5) Block E/F tests must require witness checks, not populated declarations.
 
 ---
 
@@ -19,169 +19,239 @@
 
 > A ratified dossier authorizes only the scope it explicitly defines. Implementation begins with a frozen specification and ends with evidence linked to that version.
 
-In full: Atlas §2.4 sits inside §2 "Deep-Planning Protocol"— the build-authorization rule for dossier-driven work: a dossier ratifies one scope, and only that scope may be built from its frozen specification.
+Atlas §2.4 is the dossier-scope rule: a build is authorized only for the scope a ratified dossier defines, from a frozen spec, with evidence bound to that version.
 
 ### 1.3 Constitution `OCE_GOLDEN_SYSTEM_ARCHITECTURE_CONSTITUTION_v1.1.md:Art XVI` (Constitutional change)
 
 > No implementation may weaken these articles through convenience defaults. An amendment requires proposed language, motivation, affected invariants, risk analysis, migration, tests and evidence, rollback, operator ratification, and a new versioned decision record.
 
-Art XVI does not define `AUTHORIZED_STAGE` grammar; it governs how the constitutional articles themselves are changed.
+Art XVI does not define `AUTHORIZED_STAGE` grammar; it governs how articles change.
 
 ### 1.4 `OCE_STRESS_SUITE_EXECUTION_GATES_v1.0.md:§3–§5`
 
-- Gate progression: G8 exit is `PASS_G8_CROSS_SCENARIO_COHERENCE` or `BLOCKED_G8_ARCHITECTURE_CONTRADICTION`; next eligible gate `G9 — Invariant Extraction` (no invariant accepted because it sounded philosophically attractive before testing).
+- Gate progression: G8 exit `PASS_G8_CROSS_SCENARIO_COHERENCE` or `BLOCKED_G8_ARCHITECTURE_CONTRADICTION`; next eligible gate `G9 — Invariant Extraction` (no invariant accepted because it sounded philosophically attractive before testing).
 - Commit contract (§4): each gate needs granular `STRESS-G{n}` commits; one giant commit is prohibited; evidence artifacts are separate.
 - Stop conditions (§5): the agent **must stop and report** rather than self-repair architecture when expected behavior contradicts A-009/A-010, two scenarios require mutually incompatible rules, a required authority boundary is ambiguous, contracts would make the test dishonest, a domain scenario requires information not supported by authoritative materials, a fix would change the constitutional rule being tested, or live/production/capital access would be required.
 
-### 1.5 `stress-suite/evidence/G8_RESULT.md:72` (applied rule at the current gate)
+### 1.5 `stress-suite/evidence/G8_RESULT.md:72` (applied rule at current gate)
 
-> `PASS_G8_CROSS_SCENARIO_COHERENCE` → next eligible gate: **G9 — NOT AUTHORIZED**; G9 requires a new explicit authorization after operator review of this evidence.
+> `PASS_G8_CROSS_SCENARIO_COHERENCE` -> next eligible gate: **G9 — NOT AUTHORIZED**; G9 requires a new explicit authorization after operator review of this evidence.
 
 ---
 
-## 2. Applicability assessment — two contexts the rules share
+## 2. Applicability assessment
 
-### 2.1 What the controlling grammar covers
+### 2.1 What the grammar covers
 
 The `AUTHORIZED_STAGE=B<n>-I<m>` grammar is defined in `README.md:34` and specialized in `OCE_FULL_PROGRAM_BUILD_ROADMAP_v1.0.md:§4`:
 
 > The dossier for each block specializes these increments. An agent may execute only the exact `AUTHORIZED_STAGE=B{n}-I{m}` supplied by the operator.
 
-Every example in the repo follows `B1-I0`/`B1-I1`/`B1-I2`/`OCE-BOOK-1-…` or `B1-LOCAL-GROUND-CLOSURE`. The stress-suite execution gates §3–§5 layer a **second** authorization surface on top: G8→G9→G10 is a sequential gate chain inside `agent/oce-institutional-stress-suite-build`, and the G8 result packet explicitly gates G9 as `NOT AUTHORIZED`.
+Live examples satisfy it literally (`B1-I0`/`B1-I1`/`B1-I2` and the `OCE-BOOK-1-RATIFICATION-AND-BOOK-2-BUILD` ledger identity used by `infrastructure/.../B1-RATIFICATION-RECORD.md`). The stress-suite gates §3–§5 add a **second** authorization surface on top: G8→G9→G10 is a sequential gate chain on this branch, and `G8_RESULT` explicitly gates G9 as `NOT AUTHORIZED`.
 
-### 2.2 The question: does the `B<n>-I<m>` + ratified-dependency rule also cover a separate, nonauthoritative diagnostic research increment on this branch?
+### 2.2 Does `B<n>-I<m>` + ratified-dependency also cover a nonauthoritative diagnostic research increment on this branch?
 
-**Yes.** Three reasons the answer is *yes* (not inventing a new rule, applying the existing ones):
+**Yes.** Two independent grounds:
 
-1. **Atlas §2.4 universality.** "A ratified dossier authorizes only the scope it explicitly defines" is not scoped to "program builds only" — it governs any implementation that builds from a ratified planning unit. The OPH×IT³ ingestion packet and substrate plan were explicitly marked non-ratifying at ingest time:
+1. **Atlas §2.4 universality.** "A ratified dossier authorizes only the scope it explicitly defines" is not scoped to "program builds only" — it governs any implementation writing code/schemas/tests from a ratified planning unit. The OPH×IT³ packet and substrate plan were explicitly non-ratifying at ingest time:
    - `OCE_OPH_IT3_INGESTION_PACKET_2026-09-23.md:2` — "This transcript preserves its assertions; OCE has not independently verified or ratified them."
    - `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md` — "Status: proposed research handoff; no ratification, gate PASS, or implementation claim."
    - `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md:7` — "This prompt does not ratify architecture or authorize G9/G10" and §First paragraph — "is not itself G9 authorization or an exception to constitutional increment gates."
+   Under Atlas §2.4 those documents have **no build scope** until a ratified dossier says otherwise, and a "nonauthoritative" diagnostic writing files is implementation in that rule's sense (nonauthoritative describes promotion status, not an authorization exemption).
 
-   Under Atlas §2.4, those documents have **no build scope until a ratified dossier says otherwise**, and a nonauthoritative diagnostic that writes code/schemas/tests is "implementation" in that rule's sense, even if its evidence is labeled nonauthoritative.
+2. **Gates §5 stop / Atlas §1.4 dependency rule.** Implementation may not "claim a stable dependency until the upstream exit gate is satisfied" and the agent must stop rather than self-repair architecture when an authority boundary is ambiguous. This branch's upstream is `G8 PASS` at `31c68da2`, but there is **no ratified dossier dependency that places this research increment after G8**. The README rule therefore still requires an exact operator-provided `AUTHORIZED_STAGE` plus its ratified dependency, regardless of whether the work is called program work or bounded diagnostic research.
 
-2. **README §34 + Atlas §1.4 dependency rule.** Implementation may not "claim a stable dependency until the upstream exit gate is satisfied." This branch's upstream is `G8 PASS` at `31c68da2`, but there is **no ratified dossier dependency that places this research increment after G8** — i.e., no `OCE_OPH_IT3_RESEARCH_DOSSIER` ratified with an explicit scope. The README rule therefore still requires an exact operator-provided `AUTHORIZED_STAGE` plus its ratified dependency, regardless of whether the work is called `B<n>-I<m>` program work or "bounded diagnostic research."
+### 2.3 Research is not silently G9
 
-3. **Gates §5 stop conditions.** G5's stop conditions apply to the *implementation agent*, not just to cloud builds: "The implementation agent MUST stop and report rather than self-repair architecture when [authority boundary ambiguous … required information not supported … fix would change the rule being tested]." A diagnostic increment that adds seven claim classes, prediction custody, or confluence harnesses *does* sit on that boundary — it exercises authority, lifecycle, and freeze controls that are under constitutional protection. The gate rule's safe behavior is to stop after a planning-only review and identify the missing authorization — which is what this packet does.
-
-### 2.3 The inverse risk: silently classifying research as G9
-
-Research must **not** be silently classified as G9, and this assessment does not do so. G9 is "Invariant Extraction" (`OCE_STRESS_SUITE_EXECUTION_GATES_v1.0.md:§3 G9`), a gated promotion that treats survived scenarios as provisional doctrine. The OPH research substrate is **not** G9: its success criteria are `EXISTING_CAPABILITY` / `OPERATOR_INDUCED` / `ANALOGY_ONLY` / `DIAGNOSTIC` / `INSUFFICIENT_DATA` — explicitly non-promotional.
-
-The research is therefore a **separate tract**: a diagnostic research increment *on the same branch* (`agent/oce-institutional-stress-suite-build`) but with a distinct provenance, namespace, and promotion bar. It shares the authorization prerequisite (needs a ratified dossier + `AUTHORIZED_STAGE`) without borrowing G9's gate semantics. Calling it "G9" would be claim inflation; keeping it unlabeled and running anyway would be the other error (building without authority). The correct resolution is to **name the dependency it needs and ratify it explicitly**.
+G9 is `Invariant Extraction` (`OCE_STRESS_SUITE_EXECUTION_GATES_v1.0.md:§3`) — promotion of invariants from survived scenarios to provisional doctrine. The OPH substrate is **not** G9: its success criteria are `EXISTING_CAPABILITY` / `OPERATOR_INDUCED` / `ANALOGY_ONLY` / `DIAGNOSTIC` / `INSUFFICIENT_DATA`, explicitly non-promotional. Calling it G9 would be claim inflation; leaving it unlabeled and running anyway would be building without authority. Correct resolution: name the dependency it needs and ratify it explicitly.
 
 ---
 
-## 3. Authorization inventory — what is missing
+## 3. Authorization inventory — what is valid today
 
-| Required authorization artifact | Current state at `ef30cb49` | Verdict |
+| Required  artifact | Current state | Verdict |
 |---|---|---|
-| `AUTHORIZED_STAGE=B<n>-I<m>` exactly provided by operator for **either** G9 **or** the separate diagnostic research increment | No such value is recorded in `infrastructure/*/evidence/*.md` for this branch, nor in `docs/oce-golden-system/*.md` as an operator ratification. `G8_RESULT.md` explicitly states `G9 — NOT AUTHORIZED`. The substrate plan `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md` and handoff `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md` state they are not authorization. | **Missing** — do not invent a label such as `AUTHORIZED_STAGE=OCE-RESEARCH-OPHIT3-DIAGNOSTIC`; that grammar does not exist and would not satisfy `B<n>-I<m>` or the `OCE-BOOK-*` variant actually used in B1 evidence records. |
-| Ratified dossier/dependency authorizing the increment's scope | No ratified research dossier exists. The planning chain at `OCE_FULL_PLANNING_INDEX_v1.0.md` lists `B0` gated complete and `B1` IN PROGRESS; `B2`–`B10` are `LOCKED`. No `B2–B10` dossier and no OPH-research dossier has been ratified. | **Missing** |
-| Evidence/research dispatch that would carry `AUTHORIZED_STAGE` | The existing evidence records `AUTHORIZED_STAGE=OCE-BOOK-1-RATIFICATION-AND-BOOK-2-BUILD` (at `infrastructure/local-ground/evidence/B1-RATIFICATION-RECORD.md`) and `AUTHORIZED_STAGE=B1-I2` (at `cloud-ground/evidence/BUILD_STATUS_LEDGER.md`) authorize Block 1 work — not stress-suite research on `agent/oce-institutional-stress-suite-build`. No stress-suite-equivalent ledger entry authorizes A–H on this branch. | **Missing for this branch** |
-| Deterministic canopy: dependency, contracts, gates before edit | Present: `ef30cb49` head, `derived_tested_tree()`, `verify_citation(..., expected_tested_sha)`, `g8_tested_tree.py`, `g8_closure_evidence.py` single owner, LF enforcement via `.gitattributes` | **Present** — the building blocks are there; the authorization is not. |
+| `AUTHORIZED_STAGE=B<n>-I<m>` for G9 or for a separate diagnostic research increment on this branch | No such value is recorded in `infrastructure/*/evidence/*.md` for this branch, nor in `docs/oce-golden-system/*.md` as an operator ratification. `G8_RESULT.md` explicitly states `G9 — NOT AUTHORIZED`. The substrate plan and handoff state they are not authorization. | **Missing** |
+| Ratified dossier/dependency authorizing the increment's scope | No ratified research dossier exists. `OCE_FULL_PLANNING_INDEX_v1.0.md` lists `B0 GATED_COMPLETE`, `B1 IN PROGRESS; only current ledger authorization`, `B2-B10 LOCKED`. No `B2-B10` dossier and no OPH-research dossier has been ratified. The 225 sections for B2-B10 are `READY_FOR_OPERATOR_REVIEW` planning only. | **Missing** |
+| Ledger dispatch carrying `AUTHORIZED_STAGE` for this branch | `B1-RATIFICATION-RECORD.md` (`OCE-BOOK-1-RATIFICATION-AND-BOOK-2-BUILD`) and `BUILD_STATUS_LEDGER.md` (`B1-I2`, `B1-LOCAL`) authorize Cloud Ground / Block 1 work — not `agent/oce-institutional-stress-suite-build` stress-suite research. No stress-suite-equivalent ledger entry authorizes A–H on this branch. | **Missing for this branch** |
+| Deterministic canopy: dependency, contracts, gates before edit | Present (not made valid by being present): `c43c6c26` head, `derived_tested_tree()` at `engine/g8_test_evidence.py:TESTED_TREE_PATHS = ("stress-suite/engine","stress-suite/scenarios","stress-suite/tests")` + `TESTED_TREE_GIT_ARGS`, `verify_citation(*, repo_root, expected_tested_sha)` keyword-only + `CANONICAL_JUNIT_MINUS_VOLATILE` / `CITATION_RULE`, `g8_tested_tree.py` sole owner via `engine.g8_test_evidence`, `.gitattributes LF` for `stress-suite/evidence/*` | **Present** — canopy is there; authorization is not |
 
-**Conclusion:** Under `README.md:34` + `Atlas §2.4`, **no A–H code/schema/test may be written on this branch** until an operator records an exact `AUTHORIZED_STAGE` value plus a ratified dossier whose scope explicitly includes this research. The planning-only pass in this packet (§4–§6 of the reconnaissance doc) is allowed; the implementation step is blocked pending the decision in §5.
+**Consequence:** Under `README.md:34` + `Atlas §2.4` + Gates §5, **no A–H code/schema/test may be written on this branch** until an operator records a valid `AUTHORIZED_STAGE` plus a ratified dossier whose scope explicitly includes this research. The planning-only pass in this packet (§§5–8 below) is allowed; the implementation step is blocked pending the decision in §9.
+
+### 3.1 Correction to v0.1: alias sentence is revoked
+
+v0.1 §4.2 suggested carrying `This AUTHORIZED_STAGE alias is approved as a B<n>-I<m> authorization` inside the same ratification record to make `OCE-RESEARCH-OPHIT3-AH-DIAGNOSTIC` count. That is **revoked**. An alias sentence is a **change to the stage grammar**, not evidence the existing `B<n>-I<m>` rule was met. A dossier wanting a grammar exception must propose it as (or alongside) a constitutional/Atlas amendment per Art XVI, not smuggle it as a string match. This packet treats `OCE-RESEARCH-*` as **not a valid `B<n>-I<m>` value under current rules**.
+
+### 3.2 Correction to v0.1: `B1-I0` and `B1-I9` are not available
+
+v0.1's Option R2 (`B1-I0` / `B1-I9` repurposed) is **withdrawn**. `OCE_BLOCK_01_CLOUD_GROUND_PLAN` defines `B1-I0` as "Re-price and purchase decision" and `B1-I9` as "Block gate — only B1-I9 + operator may mark Block 1 GATED_COMPLETE"; `BUILD_STATUS_LEDGER.md` shows `B1-I1` ratified/checkpointed and `B1-LOCAL`/`B1-CLOUD-ACTIVATION` lives on `oce-program-build`, not this branch. Reusing those designations for stress-suite research would silently overload a Block 1 stage that already has a meaning and an active ledger, violating Atlas §1.2 dimensional limits and the Planning Index's `Only current ledger authorization`.
+
+No `B<n>-I<m>` in `B1` through `B10` is unallocated for this branch under the current dossiers (see §4).
 
 ---
 
-## 4. The existing stage/dependency that *would* have to be ratified
+## 4. There is no valid unallocated `B<n>-I<m>` stage for this research under current rules
 
-There is no existing `AUTHORIZED_STAGE` for this research to reuse. A concrete choice must be made; this packet recommends one **without inventing grammar**, by mapping to what already exists in `OCE_FULL_PLANNING_INDEX_v1.0.md` and Block 1 precedent.
+**Finding:** Under the ratified and currently planned dossiers, there is **no valid, unallocated `B<n>-I<m>` stage** on which to hang an OPH×IT³ diagnostic research increment on `agent/oce-institutional-stress-suite-build` without first amending or adding a planning unit.
 
-### 4.1 Candidate that respects the repo's actual B<n>-I<m> usage
+Evidence:
 
-Existing B<n>-I<m> values follow two patterns:
-- Short form `B1-I0` / `B1-I1` / `B1-I2` (cloud-ground/build-status ledger).
-- Book form `OCE-BOOK-1-RATIFICATION-AND-BOOK-2-BUILD` / `OCE-BOOK-2-DURABLE-CONTROL-PLANE-CLOSURE` (ratification records).
+- `OCE_FULL_PLANNING_INDEX_v1.0.md` — `B0 GATED_COMPLETE`, `B1 IN PROGRESS`, `B2-B10 LOCKED` with `B2-I0..I9` through `B10-I0..I9` already mapped to their chapters (25 sections each). No empty slot exists in the Block → Chapter → Section grammar that maps to "bounded stress-suite diagnostic research."
+- `OCE_FULL_PROGRAM_BUILD_ROADMAP_v1.0.md §4` — every block `B2-B10` uses ten bounded increments `I0-I9` with fixed functions (`I0` freeze contracts/baseline ... `I8` adversarial/reconciliation ... `I9` gate packet/learning/operator hold). None is defined as a research substrate lane.
+- `OCE_BLOCK_02..B10` dossiers are `READY_FOR_OPERATOR_REVIEW — BUILD LOCKED` (not ratified as build authority); `OCE_BLOCK_01` dossiers do not define a stress-suite increment.
+- `OCE_STRESS_SUITE_EXECUTION_GATES_v1.0.md` §4 commit contract and §5 stop conditions govern an **execution-gate sequence** (`G0..G10` with statuses `PASS_G8_CROSS_SCENARIO_COHERENCE` / `BLOCKED`) on this branch — but that sequence has **no `B<n>-I<m>` binding** in `OCE_MASTER_PROGRAM_ATLAS` for an OPH increment. The G gates authorize a test baseline, not a scope to write new `engine`/`scenarios`/`tests` code.
 
-The `OCE_MASTER_PROGRAM_ATLAS_v1.0.md` bounded grammar is `B{block}.C{chapter}.S{section}` for planning, and `B{n}-I{m}` for execution increments. A "research" lane does not have a ratified block number. The cleanest fit is to **place the research under B1 as a bounded R-stage** (not B2–B10, which are LOCKED and whose planning dossiers would be implied), or to create a dedicated `OCE-BOOK-` ratification record — but both require ratification as "A ratified dossier authorizes only the scope it explicitly defines."
-
-### 4.2 Recommended: ratify a narrow `STRESS-R` research dossier on this branch
-
-Recommended dossier to ratify before any code:
-
-* **Ratified dossier:** `OCE_STRESS_SUITE_RESEARCH_DOSSIER_OPHIT3_DIAGNOSTIC_v1.0` — a single-document scope ratification (an `A`-series amendment or a `STRESS-` dossier) that explicitly authorizes a *nonauthoritative diagnostic research increment* on branch `agent/oce-institutional-stress-suite-build` only.
-* **Scope it explicitly defines (to satisfy Atlas §2.4):** A–H reconnaissance + optional diagnostic implementation **bounded to `stress-suite/`** with no promotion to doctrine, no forward-port, no G9 claim. Must list §5 "bounded research scope" and "exclusions" verbatim, plus acceptance evidence.
-* **`AUTHORIZED_STAGE` value to record (exact):** either
-
-  - **Option R1 (recommended, minimal grammar risk):** `AUTHORIZED_STAGE=OCE-RESEARCH-OPHIT3-AH-DIAGNOSTIC` as an `OCE-BOOK-` form ratification record (parallel to `B1-RATIFICATION-RECORD.md`'s `OCE-BOOK-1-…` form), **or**
-  - **Option R2 (B<n>-I<m> literal):** `AUTHORIZED_STAGE=B1-I9` or `B1-I0` variant only if the operator ratifies that designation as a Block 1 research increment dossier — but B1-I9 is historically "gate packet/learning ledger/operator hold" and would need a fresh dossier that repurposes it for this research, which is higher documentation risk.
-
-  To satisfy `README.md:34` literally (`B<n>-I<m>`), the operator may prefer **R1 with an explicit amendment** stating that `OCE-RESEARCH-*` is an approved `B<n>-I<m>` alias for a diagnostic-only lane on this branch. The dossier must carry that sentence; this packet does not assume it.
-
-> **No value is claimed to be authorized by this packet.** The packet records the decision the operator must make; it does not supply the value.
+**Conclusion:** The honest status is **none exists**. The research cannot be authorized by pointing at an existing unallocated stage. It needs a **new planning unit** (new block or out-of-band dossier) ratified by the operator, or a **standalone research dossier** with an explicit authorization carve-out (see §9).
 
 ---
 
 ## 5. Bounded research scope (what the ratified dossier would allow — and only that)
 
-If the dossier above is ratified and the operator records the exact `AUTHORIZED_STAGE`, the authorized implementing agent may (and only may) do:
+If a dossier per §9 is ratified and the operator records the exact `AUTHORIZED_STAGE` defined there, the authorized implementing agent may — and only may — do:
 
-### In scope
+### In scope (bounded to `stress-suite/` and to docs planning artifacts)
 
-* Read `OCE_OPH_IT3_INGESTION_PACKET_2026-09-23.md` (and DOCX source), `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md`, `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md`, A012 + OPH/Cadence impact review, G8 evidence, and all `stress-suite/engine` + `stress-suite/scenarios` + `stress-suite/tests` at `ef30cb49`.
-* Produce a frozen contract document (`OCE_OPH_IT3_RESEARCH_CONTRACT_v0.x.md`) stating: claim classes (`finite_theorem` … `frozen_prediction`), protected public vs nuisance state projection, valid-schedule bound, dataset selection, null construction, metrics, premise/target hashes, falsification thresholds, code/config/input digests — versioned with pre/post reasons.
-* Implement **only genuinely missing** A–H obligations as **nonauthoritative extensions** under `stress-suite/`:
-  - A: typed `ClaimLedgerView` over existing `EvidenceRegistry`/`KnowledgeRecord` (no second registry).
-  - B: bounded `schedule_enumerator` + `protected_projection` + `confluence_verdict` on top of `DeterministicReplay`.
-  - C: `InvariantQuotientSpec` + `verify_quotient` reusing `PerturbationRecord`/`RelationVerdict`/`CounterexampleRecord`.
-  - D: `ReductionArena` harness that plugs into existing `S01_WEAK`+ streams (no model/data pipeline); emits `INSUFFICIENT_DATA` when no stream qualifies.
-  - E: preservation predicates `preserved_operations / preserved_order / preserved_normalization / refinement_rule` as fields on `TransferInvariantMap` + `validate_transfer_map` preservation result (`ANALOGY_ONLY` vs `STRUCTURALLY_SOUND` with `open_bridge`); **no second registry**.
-  - F: `FrozenPredictionCustody` wrapping existing `verify_freeze_chronology` + `resolve_frozen_target_protocol` with `eligible_data_cutoff` + `kill_band`; diagnostics → `DIAGNOSTIC_RECEIPT` not promotion.
-  - G: `CountermodelGenerator` reusing `CounterexampleRecord` (minimize + null + ablation + compression).
-  - H: `ClosureResidualReport` composing `g8_closure_evidence.require()` + `verify_citation(..., expected_tested_sha=derived_tested_tree())` + replay `deterministic_fp` protected hash — **no second verdict**.
-* Write schemas/tests/receipts/dependency graph/claim-ledger/comparison tables/counterexamples as diagnostic artifacts.
-* Run `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` (plain 1024 expected = 1023 + lag check) **and** artifact-producing `... --junitxml=evidence/G8_TEST_RESULTS.xml` (1023/1/0), publish both counts separately, re-derive `verify_citation` (`repo_root`, `expected_tested_sha` keyword-only) and `canonical_artifact_digest` `JUNIT_XML_MINUS_VOLATILE_ATTRS_V1`, keep `G8_AUDIT_CLOSURE_MATRIX.md` byte-identical unless intentionally rederived.
+* Read `OCE_OPH_IT3_INGESTION_PACKET_2026-09-23.md` (and DOCX source), `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md`, `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md`, A012 + OPH/Cadence impact review, G8 evidence (`G8_RESULT.md`, `G8_EVIDENCE_RECEIPT.json`, `G8_TEST_RESULTS.xml` at `2cf1bb4b`), and all `stress-suite/engine` + `stress-suite/scenarios` + `stress-suite/tests` at the frozen ratified head.
+* Produce a **frozen contract document** (`OCE_OPH_IT3_RESEARCH_CONTRACT_v0.x.md`) at the **ratified dependency head** before any A–H code: claim classes (`finite_theorem` … `frozen_prediction`), `protected public vs nuisance/presentation` state projection, `valid-schedule` bound, dataset/stream selection, null construction, metrics, premise/target hashes, falsification thresholds, code/config/input digests — versioned with pre/post reasons.
+* Implement **only genuinely missing** A–H obligations as **nonauthoritative extensions** under `stress-suite/`, reusing the owners from `OCE_OPH_IT3_CORRECTED_RECONNAISSANCE_v0.2.md`:
+  - **A:** typed `ClaimLedgerView` over existing `EvidenceRegistry`/`KnowledgeRecord` (no second registry); seven-class discrimination is a view, not a new channel.
+  - **B:** bounded `schedule_enumerator` + `protected_projection` + `confluence_verdict` on top of `DeterministicReplay` (no new worker fabric).
+  - **C:** `InvariantQuotientSpec` + `verify_quotient` reusing `PerturbationRecord`/`RelationVerdict`/`CounterexampleRecord` (no parallel G7/G9 gate).
+  - **D:** `ReductionArena` harness that **plugs into existing streams** (`S01_WEAK`+); emits `INSUFFICIENT_DATA` when no stream qualifies (no model/training pipeline, no new dataset).
+  - **E:** preservation predicates `preserved_operations / preserved_order / preserved_normalization / refinement_rule` **on `TransferInvariantMap`** + witness-checked `validate_transfer_map` result (`ANALOGY_ONLY` vs `STRUCTURALLY_SOUND` with typed `OPEN_BRIDGE`); **no second registry** — declaration requires witness (see §7.1).
+  - **F:** `FrozenPredictionCustody` wrapping existing `verify_freeze_chronology` + `resolve_frozen_target_protocol` + `EvalContractSnapshot` deep-freeze with `eligible_data_cutoff` + `kill_band` and **independently verified data provenance**; diagnostics -> `DIAGNOSTIC` not promotion (see §7.2).
+  - **G:** `CountermodelGenerator` reusing `CounterexampleRecord` (minimize + null + ablation + compression).
+  - **H:** `ClosureResidualReport` composing `g8_closure_evidence.require()` + `verify_citation(..., expected_tested_sha=derived_tested_tree())` + replay `deterministic_fp` protected hash — **no second verdict**.
+* Write schemas/tests/receipts plus dependency graph / claim-ledger / comparison tables / minimized counterexamples as **diagnostic artifacts** (see §6 quarantine).
+* Re-derive the tested tree and the full G8 evidence custody after any code change (see §6).
 
 ### Exclusions (hard — the dossier must state them; the agent must not do them)
 
-* No modifications to `C:/Users/wifik/Desktop/larger-lab-model-foundry` (`MF-B0–B4`) or to branch `oce-program-build`.
+* No modifications to `larger-lab-model-foundry` (`MF-B0–B4`) or to branch `oce-program-build`/`oce-full-program-planning-books-2-10`.
 * No forward-port, merge, deployment, cloud mutation, credential rotation, broker/capital contact, or production change.
-* No G9/G10 gate claim, no `G8_RESULT.md`/`G8_EVIDENCE_RECEIPT.json`/historical-receipt rewrite; new diagnostics MUST NOT be named `*RECEIPT*.json` under `stress-suite/evidence/` in a way discoverable by `prior_gate_receipts()` unless that auditor scope change is an explicitly reviewed contract revision — use a distinct namespace `evidence/diagnostic/` or `evidence/RESEARCH_*`.
-* No creation of a second `EvidenceRegistry`, lifecycle, worker fabric, `TransferInvariantMap` authority, freeze mechanism, or gate — extend the owners listed in `OCE_OPH_IT3_CORRECTED_RECONNAISSANCE_v0.2.md`.
-* No invention of `AUTHORIZED_STAGE` value beyond the one ratified; no claim that planning files self-authorize.
+* No G9/G10 gate claim, no historical `G8_EVIDENCE_RECEIPT.json` rewrite, no claim that planning files self-authorize.
+* No new `*RECEIPT*.json` under `stress-suite/evidence/` in a way discoverable by `prior_gate_receipts()` unless that auditor scope change is an explicitly reviewed contract revision — use `evidence/diagnostic/` or `evidence/RESEARCH_*` (see §6).
+* No second `EvidenceRegistry`, lifecycle, worker fabric, `TransferInvariantMap` authority, freeze mechanism, or gate — extend listed owners.
+* No invented `AUTHORIZED_STAGE` value beyond the one the ratified dossier defines.
 
 ---
 
-## 6. Acceptance evidence the dossier must require before close
+## 6. G8 custody reconciliation — moving `derived_tested_tree()` without rewriting G8 history
 
-1. **Head & lineage:** `git ls-remote --heads origin agent/oce-institutional-stress-suite-build` SHA equals local `HEAD`; `git rev-list --left-right --count == 0 0`; published commit SHAs cited alongside starting SHA `661878e7df4c5b8f7bcb2479ceebabd79d8c28b3` and tested tree derived from `g8_tested_tree.py`.
-2. **Suite green without weakening:** plain suite `1024 passed` (1023 + 1 lag check) and artifact-producing `collected 1024 / passed 1023 / skipped 1 / failed 0` both reported with own counts; LF/CRLF parity proved (`.gitattributes` `stress-suite/evidence/* text eol=lf`); `verify_citation(repo_root, expected_tested_sha)` re-derived from `defined rule` only; `artifact_digest` + `canonical_artifact_digest` distinct and re-derived.
-3. **Contract frozen:** `OCE_OPH_IT3_RESEARCH_CONTRACT_v0.x.md` versioned before any A–H code; changes preserve pre-change verdicts where a revision affects a result.
-4. **Namespace hygiene:** no new `evidence/*RECEIPT*.json` at depth discoverable by `prior_gate_receipts()` without reviewed contract change; citation hashes unchanged.
-5. **Boundary untouched proofs:** `git diff --name-only` shows changes only under `stress-suite/` + `docs/oce-golden-system/` planning/diagnostic docs; no `docs/larger-lab-model-foundry/` or `oce-program-build` merge commit.
-6. **`diff --check` clean** and only intended paths changed.
+The proposed scope and the G8 custody rules appear contradictory if read naively: "changes in `stress-suite/engine`, `scenarios`, or `tests` move `derived_tested_tree()`" vs "preserve historical G8 claims". They are reconciled by the actual custody model, which **derives** rather than asserts:
 
----
+1. **The code tree is derived, not declared.** `engine/g8_test_evidence.py:TESTED_TREE_PATHS = ("stress-suite/engine","stress-suite/scenarios","stress-suite/tests")` and `TESTED_TREE_GIT_ARGS = ("log","-1","--format=%H","--",*TESTED_TREE_PATHS)`; the **sole** implementation is `scenarios/g8_tested_tree.py:derived_tested_tree()` (see `tests/test_g8_contradiction.py:1841` ownership check), shelling out to Git. A later commit that touches only docs or `evidence/*` **does not move** the derived tree (archive-friendly property recovered at `2cf1bb4b` — `G8_RESULT.md: "because the rule names the CODE tree, the package regenerates identically from any later commit that touches only docs or evidence"`).
 
-## 7. Exact decision requested — the operator must record one of these
+2. **New code on that tree moves the derived tree — that is correct behavior.** An implementation commit that changes `engine`/`scenarios`/`tests` per §5 **must** create a **new tested tree SHA** (the newest commit touching those paths). The agent must then:
+   - run **both** suite commands from that new tree: plain `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` and artifact-producing `... --junitxml=evidence/G8_TEST_RESULTS.xml`, and publish each command's **measured** counts (`collected/passed/skipped/failed/errors`), not a fixed 1024 expectation;
+   - re-derive `verify_citation(repo_root, expected_tested_sha)` with keyword-only `repo_root`/`expected_tested_sha` per `engine/g8_test_evidence.py:CITATION_RULE` and `JUNIT_XML_MINUS_VOLATILE_ATTRS_V1` canonical digest (volatile attrs stripped; `pytest`/`python_version` retained) and confirm the **new** artifact's `artifact_digest`/`artifact_canonical_digest` + `tested_sha` against the bytes at the cited path (`ARTIFACT_RELATIVE_PATH = stress-suite/evidence/G8_TEST_RESULTS.xml`); the **lag check** `test_the_committed_package_names_the_derived_code_tree` is not weakened — it remains the fail-closed proof that the package lags by exactly one artifact-producing run, now **re-proved on the new tree** (artifact run 1023/1/0, plain run 1024/1024 are not fixed — they are re-measured per tree);
+   - re-run `scenarios/g8_emit_evidence.py` which delegates to `scenarios/g8_closure_evidence.py:require()` (single owner for RED+GREEN+artifact+survival, one derivation per ARCH row, `HARNESSES=(RED,ARCH)`, `TEST_MODULE`, `PROBE_IDS/PRE_PASS_HEADS`, `require/problems/resolve`, refusing bogus green/artifact/empty `green_tests`, `ANNEX` derived not declared); publish any new `G8_AUDIT_CLOSURE_MATRIX` byte hash if rows changed — that matrix is **derived, not declared**, so a changed hash is not a violation, it is the evidence that the delegation was not behavior-preserving and must be audited.
 
-To unblock any A–H code/schema/test on branch `agent/oce-institutional-stress-suite-build`, the operator must **commit one ratification record** (in `infrastructure/local-ground/evidence/` or `docs/oce-golden-system/`) that contains, verbatim:
+3. **Historical G8 claims are preserved, not mutated.** `stress-suite/evidence/G8_RESULT.md` / `G8_EVIDENCE_RECEIPT.json` at `31c68da2`/`2cf1bb4b` remain byte-preserved as the record of the `PASS_G8_CROSS_SCENARIO_COHERENCE` at that tree. The new evidence is **new commits** with a new `tested_sha`; `scenarios/g8_run_audit.py:prior_gate_receipts()` (`sorted(EVIDENCE.glob("*RECEIPT*.json"))` excluding `OWN_GATE_RECEIPT_PREFIX`) will discover the historical receipts by design, and `g8_test_evidence:verify_citation` will still re-derive their citations. The research's **diagnostic** outcomes must not masquerade as a historical gate receipt: either use a distinct namespace (`evidence/diagnostic/` or `evidence/RESEARCH_*`) or, if a new `*RECEIPT*.json` at `evidence/` depth is needed, make its auditor-scope effect an **explicit reviewed contract change** with pre/post reasoning. This preserves `G8 prior_gate_receipts()` intent while letting the custody model move.
 
-> **Ratified dossier:** `<dossier id and version cited in §4.2>` with scope exactly as §5 "In scope" and "Exclusions" (including bounded `stress-suite/` limit, no MF-B0–B4/forward-port, no G9/G10, namespace rule, acceptance evidence §6).
->
-> **Ratified dependency:** `ef30cb49` plus `31c68da2`/`2cf1bb4b` lineage as frozen parent.
->
-> **Authorized stage for this increment:** `AUTHORIZED_STAGE=<the exact string the operator chooses, per §4.2 Option R1 or R2>` — plus the sentence `This AUTHORIZED_STAGE alias is approved as a B<n>-I<m> authorization for diagnostic-only work on this branch` if Option R1 is chosen.
->
-> **Decision:** one of (a) **AUTHORIZE** the bounded research increment described in §5 for implementation by an authorized agent, or (b) **HOLD** — planning-only disposition, no code written on this branch until a future dossier authorizes it.
-
-Until (a) is recorded, every agent (including the author of this packet) must treat this branch as **planning-only**: reconnaissance, contract freeze, and evidence inventory are permitted; code/schema/test writes for A–H are **blocked**.
+4. **No weakening.** The lag check, `require_clean` refusal for dirty trees (`g8_tested_tree.py:require_clean`), `CITATION_RULE` (`cited path must resolve inside declared tree and raw+canonical digests must equal published`), and `prior_gate_receipts()` discovery are not loosened to make new research pass. They are **re-proved** on the new tree with measured, not fixed, counts.
 
 ---
 
-## 8. Guidance on scope interpretation — why research needs authorization and how it remains distinct from G9
+## 7. Witness rules — what counts as proof (corrections to reconnaissance)
 
-* Under `Atlas §2.4` + `README.md:34` + Gates §5, even a diagnostic research increment that writes files is "implementation" and requires the dossier + `AUTHORIZED_STAGE` whose scope it falls in. "Nonauthoritative" describes the **promotion status of its outputs** (they cannot certify doctrine, gates, or adjacent builds), not an exemption from the authorization grammar.
-* G9 remains `Invariant Extraction` — the promotion of invariants from survived scenarios — at `stress-suite/scenarios/g9_*` and its gate evidence. This research must be **cited separately** (e.g., `RESEARCH-OPHIT3-DIAGNOSTIC`) and must not append to `G8_EVIDENCE_RECEIPT.json` or claim `PASS_G9_INVARIANT_EXTRACTION`. Its receipts live under `evidence/diagnostic/` (or equivalent distinct namespace) and link to `derived_tested_tree()` as diagnostic citations, not as a new gate closure.
+### 7.1 Block E — declaration is not preservation
+
+A populated `preserved_operations` (or `preserved_order`/`preserved_normalization`/`refinement_rule`) tuple is a **declaration**, not proof that the operation is preserved. Under `TransferInvariantMap`'s 13-axis completeness (`validate_transfer_map(): missing_axes` per `TRANSFER_MAP_AXES:1406`, `known_broken_assumptions` invalidates `map_sound`), those fields must be added as **preservation declarations**, but the **classification** `ANALOGY_ONLY` vs `STRUCTURALLY_SOUND` and the **promotion eligibility** `OPEN_BRIDGE` must be derived from an **independently checked witness**, not from string occupancy.
+
+For a proposed `TransferInvariantMap` that claims `preserved_operations=("commutator-closure",)` (or any overlap/order/normalization/refinement predicate from packet §5 `RealizationMap = (source_type, target_type, preserved_operations, preserved_order, preserved_normalization, refinement_rule)` and §16 caution `preserved_operations / overlap / causal order / normalizations / refinement`), the extended `validate_transfer_map()` must distinguish three outcomes:
+
+- **STRUCTURALLY_SOUND with preservation VERIFIED** — every `preserved_*` declaration is accompanied by a typed witness edge that resolves (e.g., an overlap translation `τ` that demonstrably maps `res_{PQ}` to `τ res`, or a commutator-closure invariant check against declared operators) and that witness hash reconciles with the map's `mechanism_invariants`/`source_observables` lineage. Only then may a `DomainTransferHypothesis` depending on the map gate a `DOMAIN_VALIDATION_REQUIRED` promotion.
+- **`ANALOGY_ONLY` with `OPEN_BRIDGE` holding the unproven predicate** — any `preserved_*` declaration whose witness edge does not resolve (empty, unregistered, lineage-mismatched, or observing only label/dimension equality without operation/order/refinement proof) forces `ANALOGY_ONLY` classification and the specific obligation stays `OPEN_BRIDGE`. This is the correct handling of refinement-tower closure when the tower is declared but not demonstrated.
+
+**Revised entry-point test for Block E (witness, not string):** Construct two maps equal on the 13 structural axes except both declare `preserved_operations=("commutator-closure",)`. Map A ships an **independently resolvable witness** (e.g., `engine/domain.py -> engine/g5r.py` overlap-translation check where the declared overlap `τ` reconciles the two source `operator` lineages and the trace `commutator(closure)` digest matches pre/post). Map B ships the same string declaration with an **unresolved** witness (empty `evidence_refs`, or a non-resolving `source_lineage` label, or a witness that only names dimensions). `validate_transfer_map` asserts `ANALOGY_ONLY + OPEN_BRIDGE=["preserved_operations"]` for B **even though the string is populated**, and only A may reach preservation-VERIFIED.
+
+This clarifies the reuse verdict: Block E is `EXTEND` because `TransferInvariantMap` exists as a structural owner, but OPH's `preserved_operations / overlap / causal order / normalizations / refinement` obligations are **not** closed by that owner until witness semantics are added — the prior matrix's wording that implied string occupancy alone sufficed is corrected here.
+
+### 7.2 Block F — eligible-data custody is not `freeze_seq < result_seq` alone
+
+`verify_freeze_chronology(protocol, result_seq, registry)` (§1 re-read — `domain.py:717 FrozenExperimentProtocol` + `g5r.py:1481 FreezeChronologyProof / :1510 verify_freeze_chronology` five-rung ladder + `g6_governance.py:180 EvalContractSnapshot` deep-freeze) already proves **chronology** (`freeze_seq < result_seq`) with `FROZEN_BEFORE_RESULT_VERIFIED` only when `recomputed==stored && structured_freeze && refs resolve && chronology_ok`.
+
+That is **necessary but not sufficient** for a *prospective prediction* (packet §2 ledger — `prospectively fixed conditional test` / `frozen prospective branch prediction` — failure rejects the branch, not the framework; and §6 `Test = (hypothesis, baseline, perturbations, frozen_metric, kill_band, data_custody, result)`).
+
+For the new `FrozenPredictionCustody{ prediction_ref, protocol_ref (FreezeChronologyProof status), source_refs, target_binding, hypothesis/mechanism binding, code_hash, metric, kill_band, eligible_data_cutoff, data_custody_hash }` that wraps the existing verifier:
+
+- **`eligible_data_cutoff` custody** is independently checked: the implementing code must prove **data custody**, i.e., that every target-domain sample contributing to the evaluated metric has a **provenance lineage** whose `observed_at` / `ingested_at` **resolves in the `EvidenceRegistry`** and is **not target-informed via cutoff leakage** (target labels observed before the cutoff must imply `TARGET_CONTAMINATED` -> `DIAGNOSTIC`, never `PREDICTION`). The `eligible_data_cutoff` hash is bound at `freeze_seq`; any data whose lineage `observed_at` precedes cut-off on the registry is `OUT_OF_CUSTODY` and the new `verify_prediction_custody()` must return `RETROSPECTIVE` (or equivalent non-promotion) even when `verify_freeze_chronology` is `FROZEN_BEFORE_RESULT_VERIFIED` — chronology without custody is not prospectiveness.
+- **Kill-band / precision-floor** binding: `kill_band` and `precision_floor` are part of the frozen canonical content (included in the `deterministic_hex` / deep-freeze lineage); post-hoc band movement is a `FINGERPRINT_MISMATCH`-class refusal, not a narrative correction.
+- **Post-hoc diagnostics quarantine:** Diagnostics that consumed measured values (observed failures, OOD pathologies, manifold diagnostics per packet §§12-16) are appended as `DIAGNOSTIC` / `BRANCH_REJECTED` receipts in a distinct diagnostic namespace, not as `PREDICTION` promotion or as `PASS_G9` precursors.
+
+**Revised entry-point test for Block F (custody, not chronology alone):** Freeze protocol at `freeze_seq=10` with resolving `freeze_evidence_refs`; register `FrozenPredictionCustody{code_hash="abc", eligible_data_cutoff="2026-09-23T00:00:00Z", kill_band="[-ε,+ε]"}`. (1) Evaluate at `result_seq=20` against registry data with `ingested_at="2026-09-24T..."` -> `FROZEN_BEFORE_DATA_VERIFIED` pass. (2) Re-evaluate against the same frozen prediction but with data `ingested_at="2026-09-22T..."` (pre-cutoff, lineage before custody) -> `RETROSPECTIVE` refusal even though `freeze_seq<result_seq` still holds and the protocol fingerprint matches; (3) attempt with `result_seq=8` (result precedes freeze) -> `RESULT_PRECEDES_FREEZE` refusal regardless of custody. Diagnostics that consumed measured values append as `DIAGNOSTIC`, not promotion, when `source_provenance == TARGET_CONTAMINATED`.
 
 ---
 
-## 9. Related files & retention
+## 8. Baseline counts are observed, not fixed acceptance numbers
 
-- Reconnaissance corrected in `docs/oce-golden-system/OCE_OPH_IT3_CORRECTED_RECONNAISSANCE_v0.2.md` (exact file:line table, `REUSE/EXTEND` decisions, harnesses, entry-point tests).
-- Ingestion packet/plan/handoff remain at `OCE_OPH_IT3_INGESTION_PACKET_2026-09-23.md` + `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md` + `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md` — all explicitly non-ratifying.
-- This decision packet does not modify `stress-suite/evidence/G8_RESULT.md` or `G8_EVIDENCE_RECEIPT.json`.
+### 8.1 What `1024` / `1023+1` actually record
 
-*Retention:* This packet and its reconnaissance companion are durable planning artifacts; if superseded, keep the tombstone and reason. Failed or rejected implementations under any later authorization must remain distinguishable from successful ones (Constitution Art XVII).
+At the pre-implementation baseline (on the derived tested tree `2cf1bb4b`):
+
+- Plain suite `cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q` -> **1024 passed** (1024 collected, 0 failed, 0 error). This is the count that an ordinary run reports **on that tree**, derived from the `pytest` artifact at `G8_TEST_RESULTS.xml`'s `pytest tests` root and from `G8_RESULT.md`'s two-command accounting.
+- Artifact-producing `... --junitxml=evidence/G8_TEST_RESULTS.xml` -> **collected 1024 / passed 1023 / skipped 1 / failed 0 / errors 0** (skipped: `tests/test_g8_contradiction.py::test_the_committed_package_names_the_derived_code_tree` — the lag check that the artifact run must skip; passing on the plain run + skipped on the artifact run is the pre-repair-to-green property proved in the closure matrix — `G8_AUDIT_CLOSURE_MATRIX.md` hash `0b3e262468407d46` byte-identical per `STRESS-G8ARCH7`).
+- Artifact digests `raw 23f97af88ff31c0e` / `canonical 6fa5005e1d26dd32` are the hash-contract for that artifact instance (canonical strips volatile `time`/`timestamp`/`hostname` per `JUNIT_XML_MINUS_VOLATILE_ATTRS_V1`, retains `pytest`/`python_version`).
+
+These counts are **observed evidence at `2cf1bb4b`**, not a fixed authorization gate for future trees.
+
+### 8.2 How an implementation increment measures its own acceptance
+
+After any §5 code change that touches `stress-suite/engine|scenarios|tests`, the derived tree moves and the new tree must re-measure independently:
+
+- Re-run **both** commands from the **new** tree and publish each command's **measured** `collected/passed/skipped/failed/errors` alongside the tree SHA they were measured on. Never carry `1024` or `1023/1/0` forward as fixed expectations — a new test file (+N cases), a removed test, or a new skip reason **must** move the count, and that move is validated by the JUnit counts plus the new `verify_citation` / `read_test_evidence` artifact content hashes, not by matching an old scalar.
+- Re-prove LF/CRLF parity (`.gitattributes` `stress-suite/evidence/* text eol=lf` plus a `--junitxml` run on `core.autocrlf=true` vs `false` if desired) and `verify_citation(repo_root, expected_tested_sha)` re-derivation from definition only (keyword-only `repo_root`/`expected_tested_sha`, `CITATION_RULE`), plus `artifact_digest`/`artifact_canonical_digest` distinctness.
+- The **lag check** `test_the_committed_package_names_the_derived_code_tree` vs its harness `test_the_lag_rule_detects_...` is not weakened to keep counts stable. Its expected skip matrix (plain `PASS`, artifact `SKIP`) is re-proved on the new tree with the new artifact instance. A count shift driven by a real test change is correct; a count shift driven by a weakening of that rule is a stop.
+
+---
+
+## 9. The precise operator decision that would authorize the first bounded increment
+
+### 9.1 Plain finding
+
+Under the **current** rules (`README.md:34`, Atlas §2.4, Gates §3–§5, `OCE_FULL_PLANNING_INDEX_v1.0.md` covering `B1..B10` only), there is **no valid `AUTHORIZED_STAGE=B<n>-I<m>` and no ratified dossier** that authorizes an OPH×IT³ diagnostic research increment on `agent/oce-institutional-stress-suite-build`.
+
+This is not a gap that can be filled by re-labeling an `OCE-RESEARCH-*` string or by repurposing `B1-I0`/`B1-I9`. Those paths would change the stage grammar or overload a Block 1 stage without a ratified scope, which Atlas §2.4 — "authorizes only the scope it explicitly defines" — and the Planning Index's `Only current ledger authorization` expressly forbid.
+
+### 9.2 What granting authorization actually requires (two ratifications, not one string)
+
+Because no stage exists in the current map, actually authorizing the work requires a **grammar/risk decision and then a scope decision**, committed as **separate reviewable records** so that changing grammar does not silently carry research scope:
+
+**Decision A — Grammar amendment (required before any OPH×IT³ `AUTHORIZED_STAGE` is valid).** Ratify a new planning unit or dossier type that explicitly extends the `B<n>-I<m>` namespace to cover this lane. Two reviewable options; the operator chooses one or proposes its own — none is claimed approved:
+
+- **A1) Add a Block 11 dossier for bounded institutional research (`B11`),** with its own dossier lifecycle `MAPPED -> READY_FOR_OPERATOR_REVIEW -> RATIFIED -> BUILDING ...` and bounded `B11-I{m}` increments specialized to nonauthoritative diagnostic work. This keeps `B<n>-I<m>` literal (best alignment with `README.md:34`'s `B<n>-I<m>` token), but duplicates a full block for a narrow tract. Requires Constitution/Atlas-coherent amendment + `OCE_FULL_PLANNING_INDEX` + `OCE_FULL_PROGRAM_BUILD_ROADMAP` version bump and a `B11` `OCE_BLOCK_11_*_PLAN` dossier.
+- **A2) Add an explicit `RESEARCH` dossier class outside `B<n>-I<m>`** (e.g., a single `OCE-OPHIT3-RESEARCH-DOSSIER_v1.0`) with a `RESEARCH-I{m}` lane, and **amend `README.md:34`** (or add a narrow exception beside it) to state that `RESEARCH-I{m}` is an approved alternative to `B<n>-I<m>` for diagnostic-only work on `agent/oce-institutional-stress-suite-build` (and optionally on `oce-program-build`'s research exception). Smallest grammar change, but strongest Atlas amendment burden.
+
+Either amendment must carry per Constitution Art XVI: proposed language, motivation, affected invariants, risk analysis, migration, tests/evidence, rollback, operator ratification and a new versioned decision record. The dossier amendment process is `MAPPED->ARTICULATING->READY_FOR_OPERATOR_REVIEW->RATIFIED->BUILDING` per Atlas §1.3/§2.5; a `LOCKED`/`MAPPED` block cannot become `BUILDING` without ratification.
+
+**Decision B — Scope ratification for increment 1 (only operative after Decision A).** Ratify the bounded research dossier that actually scopes the work per Atlas §2.4 (e.g., `OCE_STRESS_SUITE_RESEARCH_DOSSIER_OPHIT3_DIAGNOSTIC_v1.0` or `B11`'s first dossier — the ID follows whichever Decision A is taken), whose frozen spec contains verbatim:
+
+- scope §5 In scope + hard Exclusions (bounded `stress-suite/` plus docs planning artifacts; no `MF-B0–B4`; no forward-port/merge/deployment/cloud/capital; no G9/G10; diagnostic namespace per §6; no second authority);
+- acceptance evidence §8 (both commands measured e.g., LF/CRLF + `verify_citation` re-derivation, frozen contract versioned before code, `diff --check` clean, only intended paths);
+- G8 custody reconciliation per §6 (new tested tree SHA via `derived_tested_tree()`, new JUnit artifact re-emitted with its own digests, new `verify_citation` proof, new `G8_AUDIT_CLOSURE_MATRIX` derivation if rows moved, historical `31c68da2`/`2cf1bb4b` claims byte-preserved);
+- witness rules per §7 (E: declaration needs witness -> `ANALOGY_ONLY` + `OPEN_BRIDGE` on unresolved witness; F: `eligible_data_cutoff` custody independent of `freeze_seq<result_seq`).
+
+The `AUTHORIZED_STAGE` for increment 1 is then **exactly the value Decision A's amendment defines** — e.g., `B11-I0` plus frozen spec (if A1) or `RESEARCH-I0` (if A2). No dossier may invent its own stage that the grammar amendment did not define.
+
+### 9.3 The one sentence the operator must record to actually authorize
+
+Until **both** ratifications above exist, every agent must treat this branch as **planning-only**. The exact sentence that authorizes the first bounded implementation increment, once Decisions A and B are ratified, is (verbatim, with the dossier ID and stage filled from the ratified records):
+
+> **Operator authorization for increment 1:** `AUTHORIZED_STAGE=<the exact stage value defined by ratified Decision A, e.g., B11-I0 or RESEARCH-I0>` plus ratified dossier `<exact dossier ID/version from Decision B, e.g., OCE_STRESS_SUITE_RESEARCH_DOSSIER_OPHIT3_DIAGNOSTIC_v1.0 or the B11 dossier ID>` at frozen dependency `SHA=<new head, e.g., c43c6c26>` (prior `ef30cb49 ⊳ 31c68da2 ⊳ 2cf1bb4b`) — Decision B's scope §§5-8 frozen as the spec. Branch `agent/oce-institutional-stress-suite-build` may write bounded code/tests per §§5-7; acceptance per §8; hold `BLOCKED` until Planning Index / `BUILD_STATUS_LEDGER` / `BLOCK_PROGRESS` reflect the amendment.
+
+If the operator instead prefers **no build**, no Decision A/B is needed: record **"OPH×IT³ diagnostic research stays planning-only; agent does not write A–H code on this branch."** That is the valid HOLD disposition under Gates §5.
+
+### 9.4 Why this replaces v0.1 §5's decision sentence
+
+v0.1's single-sentence decision bundled grammar change ("alias sentence") with research scope, which Atlas §2.4 forbids — a dossier cannot authorize a scope and simultaneously rewrite the authorization key that would make it valid. The corrected §9.2 separates them so each is reviewable and neither simulates the other.
+
+---
+
+## 10. Related files & retention
+
+- Reconnaissance corrected in `docs/oce-golden-system/OCE_OPH_IT3_CORRECTED_RECONNAISSANCE_v0.2.md` (exact file:line table, `REUSE/EXTEND` decisions, harnesses, entry-point tests). v0.2 is patched only for E/F witness clarifications that mirror §7 — it is otherwise preserved.
+- Ingestion packet/plan/handoff remain at `OCE_OPH_IT3_INGESTION_PACKET_2026-09-23.md` + `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md` + `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md` — all explicitly non-ratifying and their `no-OPH-ontology-as-axiom` boundary holds.
+- This decision packet is **v0.2 superseding v0.1**: the prior §4 alias and §4 R1/R2 options and §7 bundling are revoked and superseded by this document and its Decisions A/B. Do not mix v0.1's revoked options with v0.2.
+
+*Retention:* This packet and its reconnaissance companion are durable planning artifacts; if superseded, keep the tombstone and reason. Failed or rejected implementations under any later authorization must remain distinguishable from successful ones (Constitution Art XVII — `No implementation may weaken these articles through convenience defaults; amendment requires ... operator ratification, and a new versioned decision record`).
