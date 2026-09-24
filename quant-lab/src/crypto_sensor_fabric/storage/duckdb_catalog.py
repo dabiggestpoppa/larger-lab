@@ -711,53 +711,87 @@ def _read_revisions(root: Path, blob_ids: set[str], acquisition_ids: set[str]) -
 
 
 def _read_quarantine(root: Path) -> list[dict[str, Any]]:
-    """Durable recovery actions under the authoritative I08 contract.
+    """Validate complete RecoveryJournal envelopes before narrow projection."""
+    from datetime import datetime
 
-    Every committed action must carry nonempty run/object/problem/resolution
-    semantics and re-derive its logical id (``action_identity``, I08 §7).
-    Malformed durable recovery evidence fails typed — it never becomes a
-    plausible all-NULL discovery row (I10R1 Defect D repair).
-    """
+    from ..contracts.base import coerce_utc
+    from .enums import StorageObjectType
     from .recovery import action_identity
 
+    required_fields = {
+        "record_type",
+        "recovery_action_id",
+        "recovery_run_id",
+        "object_type",
+        "storage_object_type",
+        "object_id",
+        "problem",
+        "resolution",
+        "before_state",
+        "after_state",
+        "evidence_ref",
+        "action_kind",
+        "operation_id",
+        "registered_at",
+    }
     payloads = _read_json_catalog(root, "catalogs/recovery/actions", "recovery_action_id")
     rows = []
     for payload in payloads:
         action_id = payload.get("recovery_action_id")
         if not isinstance(action_id, str) or not action_id:
+            raise DuckDBCatalogShapeCorrupt("recovery action has empty recovery_action_id")
+        if set(payload) != required_fields:
             raise DuckDBCatalogShapeCorrupt(
-                "recovery action fragment is missing a usable recovery_action_id: "
-                f"{payload.get('recovery_action_id')!r}"
+                f"recovery action {action_id} envelope fields differ from the frozen contract"
             )
-        run_id = payload.get("recovery_run_id")
-        if not isinstance(run_id, str) or not run_id:
-            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty recovery_run_id")
-        object_type = payload.get("object_type")
-        if not isinstance(object_type, str) or not object_type:
-            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty object_type")
-        object_id = payload.get("object_id")
-        if not isinstance(object_id, str) or not object_id:
-            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty object_id")
-        problem = payload.get("problem")
-        if not isinstance(problem, str) or not problem:
-            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty problem")
-        resolution = payload.get("resolution")
-        if not isinstance(resolution, str) or not resolution:
-            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty resolution")
-        semantic = {
-            "recovery_run_id": run_id,
-            "object_type": object_type,
-            "object_id": object_id,
-            "problem": problem,
-            "resolution": resolution,
-            "before_state": payload.get("before_state"),
-            "after_state": payload.get("after_state"),
-        }
+        if payload.get("record_type") != "recovery_action":
+            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has wrong record_type")
+        for field_name in ("recovery_run_id", "object_type", "object_id", "problem", "resolution"):
+            value = payload[field_name]
+            if not isinstance(value, str) or not value:
+                raise DuckDBCatalogShapeCorrupt(
+                    f"recovery action {action_id} has invalid {field_name}"
+                )
+        for field_name in ("action_kind", "operation_id"):
+            value = payload[field_name]
+            if value is not None and not isinstance(value, str):
+                raise DuckDBCatalogShapeCorrupt(
+                    f"recovery action {action_id} has non-string {field_name}"
+                )
+        if payload["evidence_ref"] is not None and not isinstance(payload["evidence_ref"], str):
+            raise DuckDBCatalogShapeCorrupt(
+                f"recovery action {action_id} has invalid evidence_ref"
+            )
+        object_type = payload["object_type"]
+        storage_object_type = payload["storage_object_type"]
         try:
-            recomputed = action_identity(semantic)
+            expected_storage_type = StorageObjectType(object_type).value
+        except ValueError:
+            if storage_object_type is not None:
+                raise DuckDBCatalogShapeCorrupt(
+                    f"recovery action {action_id} internal object_type has a storage mapping"
+                )
+        else:
+            if storage_object_type != expected_storage_type:
+                raise DuckDBCatalogShapeCorrupt(
+                    f"recovery action {action_id} storage_object_type contradicts object_type"
+                )
+        registered_at = payload["registered_at"]
+        if not isinstance(registered_at, str):
+            raise DuckDBCatalogShapeCorrupt(
+                f"recovery action {action_id} has invalid registered_at"
+            )
+        try:
+            coerce_utc(datetime.fromisoformat(registered_at))
+        except (TypeError, ValueError) as exc:
+            raise DuckDBCatalogShapeCorrupt(
+                f"recovery action {action_id} registered_at is malformed or naive"
+            ) from exc
+        try:
+            recomputed = action_identity(payload)
         except Exception as exc:
             raise DuckDBCatalogShapeCorrupt(
-                f"recovery action {action_id} does not re-derive its I08 §7 identity: {exc}"
+                f"recovery action {action_id} has malformed state or identity: {exc}"
             ) from exc
         if recomputed != action_id:
             raise DuckDBCatalogShapeCorrupt(
@@ -766,12 +800,12 @@ def _read_quarantine(root: Path) -> list[dict[str, Any]]:
         rows.append(
             {
                 "recovery_action_id": action_id,
-                "recovery_run_id": run_id,
+                "recovery_run_id": payload["recovery_run_id"],
                 "object_type": object_type,
-                "object_id": object_id,
-                "problem": problem,
-                "resolution": resolution,
-                "action_kind": payload.get("action_kind"),
+                "object_id": payload["object_id"],
+                "problem": payload["problem"],
+                "resolution": payload["resolution"],
+                "action_kind": payload["action_kind"],
             }
         )
     return sorted(rows, key=lambda row: row["recovery_action_id"])
