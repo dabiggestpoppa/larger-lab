@@ -700,7 +700,13 @@ def _clear(
     return engine, lock_id, path
 
 
-def build_i08r2_lock_clear_atomicity_matrix(tmp: Path) -> dict[str, Any]:
+def measure_i08r2_lock_clear_atomicity_matrix(tmp: Path) -> dict[str, Any]:
+    """Corrected live measurement of the historical I08R2 lock scenarios.
+
+    This function no longer regenerates the committed R2 matrix. R2R1
+    consumes the corrected measurements under a new evidence identity; the
+    old false-green bytes remain immutable historical evidence.
+    """
     cases: list[dict[str, Any]] = []
 
     # Successful order captured at real method boundaries.
@@ -926,25 +932,55 @@ def build_i08r2_lock_clear_atomicity_matrix(tmp: Path) -> dict[str, Any]:
     except _DeadAfterUnlink:
         died = True
     restarted = Stack(root).engine("lock-run-b")
-    report = restarted.apply_plan(
+    applied = restarted.apply_plan(
         restarted.scan(recovery_run_id="lock-run-b"),
         recovery_run_id="lock-run-b",
     )
+    replay_report = restarted.last_replay_report
     rows = restarted.operations.list_for_object(rec.SEMANTIC_JOB_LOCK, lock_id)
     actions = restarted.journal.list_for_object(rec.SEMANTIC_JOB_LOCK, lock_id)
+    injected_death = died
+    lock_absent = not path.exists()
+    original_run = {row["recovery_run_id"] for row in rows} == {"lock-run-a"}
+    completed = sum(row["phase"] == "COMPLETED" for row in rows) == 1
+    one_action = len(actions) == 1
+    replay_closed = any(
+        row["disposition"] == "CLOSED_EFFECT_PROVEN_LANDED"
+        for row in replay_report
+    )
+    apply_return_is_not_replay_report = applied == [] and bool(replay_report)
     cases.append(
         _case(
             "crash_after_unlink_replays_original",
-            injected_death=died,
-            lock_absent=not path.exists(),
-            original_run={row["recovery_run_id"] for row in rows} == {"lock-run-a"},
-            completed=sum(row["phase"] == "COMPLETED" for row in rows) == 1,
-            one_action=len(actions) == 1,
-            replay_closed=any(
-                row["disposition"] == "CLOSED_EFFECT_PROVEN_LANDED"
-                for row in report
-            ),
-            result=_OK,
+            injected_death=injected_death,
+            lock_absent=lock_absent,
+            original_run=original_run,
+            completed=completed,
+            one_action=one_action,
+            replay_closed=replay_closed,
+            apply_return_is_not_replay_report=apply_return_is_not_replay_report,
+            required_invariants=[
+                "injected_death",
+                "lock_absent",
+                "original_run",
+                "completed",
+                "one_action",
+                "replay_closed",
+                "apply_return_is_not_replay_report",
+            ],
+            result=_OK
+            if all(
+                (
+                    injected_death,
+                    lock_absent,
+                    original_run,
+                    completed,
+                    one_action,
+                    replay_closed,
+                    apply_return_is_not_replay_report,
+                )
+            )
+            else _FAIL,
         )
     )
 
@@ -993,25 +1029,57 @@ def build_i08r2_lock_clear_atomicity_matrix(tmp: Path) -> dict[str, Any]:
         },
     )
     restarted = Stack(root).engine("lock-open-restart")
-    report = restarted.apply_plan(
-        restarted.scan(recovery_run_id="lock-open-restart"),
+    # Isolate restart replay from the still-present lock's legitimate
+    # record-only scan action.  The interrupted explicit-clear operation
+    # itself must acquire no action and remain open.
+    empty = rec.RecoveryScanResult(
         recovery_run_id="lock-open-restart",
+        findings=(),
+        counts_by_problem={},
+        has_blockers=False,
+        planned_actions=(),
     )
+    applied = restarted.apply_plan(empty, recovery_run_id="lock-open-restart")
+    replay_report = restarted.last_replay_report
     rows = restarted.operations.list_for_object(rec.SEMANTIC_JOB_LOCK, lock_id)
+    left_open = not any(
+        row["phase"] in {"COMPLETED", "UNRESOLVED"} for row in rows
+    )
+    no_action = not restarted.journal.list_for_object(
+        rec.SEMANTIC_JOB_LOCK, lock_id
+    )
+    lock_intact = path.exists()
+    report_left_open = any(
+        row["disposition"] == "LEFT_OPEN_NO_PROVEN_EFFECT"
+        for row in replay_report
+    )
+    apply_return_is_not_replay_report = applied == [] and bool(replay_report)
     cases.append(
         _case(
             "present_lock_intent_not_false_completed",
-            left_open=not any(
-                row["phase"] in {"COMPLETED", "UNRESOLVED"} for row in rows
-            ),
-            no_action=not restarted.journal.list_for_object(
-                rec.SEMANTIC_JOB_LOCK, lock_id
-            ),
-            lock_intact=path.exists(),
-            report_left_open=any(
-                row["disposition"] == "LEFT_OPEN_NO_PROVEN_EFFECT" for row in report
-            ),
-            result=_OK,
+            left_open=left_open,
+            no_action=no_action,
+            lock_intact=lock_intact,
+            report_left_open=report_left_open,
+            apply_return_is_not_replay_report=apply_return_is_not_replay_report,
+            required_invariants=[
+                "left_open",
+                "no_action",
+                "lock_intact",
+                "report_left_open",
+                "apply_return_is_not_replay_report",
+            ],
+            result=_OK
+            if all(
+                (
+                    left_open,
+                    no_action,
+                    lock_intact,
+                    report_left_open,
+                    apply_return_is_not_replay_report,
+                )
+            )
+            else _FAIL,
         )
     )
     assert len(cases) == 9
@@ -1027,6 +1095,16 @@ def build_i08r2_lock_clear_atomicity_matrix(tmp: Path) -> dict[str, Any]:
     }
 
 
+def build_i08r2_lock_clear_atomicity_matrix_historical(tmp: Path) -> dict[str, Any]:
+    """Frozen I08R2 false-green evidence; never regenerated after operator review."""
+    del tmp
+    return json.loads(
+        (EVIDENCE_DIR / "BLOC_04_I08R2_LOCK_CLEAR_ATOMICITY_MATRIX.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+
 BUILDERS = [
     (
         build_i08r2_operation_terminality_matrix,
@@ -1037,7 +1115,7 @@ BUILDERS = [
         "BLOC_04_I08R2_OPERATION_RECORD_INTEGRITY_MATRIX.json",
     ),
     (
-        build_i08r2_lock_clear_atomicity_matrix,
+        build_i08r2_lock_clear_atomicity_matrix_historical,
         "BLOC_04_I08R2_LOCK_CLEAR_ATOMICITY_MATRIX.json",
     ),
 ]
