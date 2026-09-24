@@ -145,7 +145,10 @@ def build_priority_pause_matrix() -> dict[str, Any]:
     rows = []
     for name, used, write, priority, expected, blocked in scenarios:
         decision = decide_storage_write(
-            _state(used), projected_write_bytes=write, priority=priority
+            _state(used),
+            projected_write_bytes=write,
+            priority=priority,
+            config=_CONFIG,
         )
         rows.append(
             _case(
@@ -353,7 +356,10 @@ def build_quota_simulation() -> dict[str, Any]:
     for name, used, write, priority in scenarios:
         state = _state(used)
         decision = decide_storage_write(
-            state, projected_write_bytes=write, priority=priority
+            state,
+            projected_write_bytes=write,
+            priority=priority,
+            config=_CONFIG,
         )
         results.append(
             {

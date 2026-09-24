@@ -155,7 +155,10 @@ def test_u0_richness_does_not_bypass_quota_safety() -> None:
     )
     assert state.pressure_state is DiskPressure.CRITICAL
     decision = decide_storage_write(
-        state, projected_write_bytes=0, priority=StoragePriority.P0
+        state,
+        projected_write_bytes=0,
+        priority=StoragePriority.P0,
+        config=QuotaConfig(absolute_free_floor_bytes=50),
     )
     assert decision.disposition is WriteDisposition.BLOCK
 

@@ -229,6 +229,10 @@ def _verified_storage_state(
         or state.absolute_free_floor_bytes < 0
     ):
         raise QuotaWritePolicyError("state absolute_free_floor_bytes must be a nonnegative integer")
+    if state.absolute_free_floor_bytes != config.absolute_free_floor_bytes:
+        raise QuotaWritePolicyError(
+            "state absolute_free_floor_bytes contradicts the applicable quota config"
+        )
     if (
         isinstance(state.utilization_ratio, bool)
         or not isinstance(state.utilization_ratio, (int, float))
@@ -261,7 +265,7 @@ def decide_storage_write(
     *,
     projected_write_bytes: int,
     priority: StoragePriority,
-    config: QuotaConfig | None = None,
+    config: QuotaConfig,
 ) -> QuotaWriteDecision:
     """Return a deterministic write decision without touching storage.
 
@@ -278,8 +282,7 @@ def decide_storage_write(
         priority = StoragePriority(priority)
     except ValueError as exc:
         raise QuotaWritePolicyError(f"unknown storage priority: {priority!r}") from exc
-    policy = config or load_quota_config()
-    verified_state = _verified_storage_state(state, policy)
+    verified_state = _verified_storage_state(state, config)
     floor = verified_state.absolute_free_floor_bytes or 0
     projected_free = verified_state.free_bytes - projected_write_bytes
     is_essential = priority is StoragePriority.P0

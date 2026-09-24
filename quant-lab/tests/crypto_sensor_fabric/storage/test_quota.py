@@ -61,13 +61,20 @@ def test_absolute_floor_equality_is_safe_and_one_byte_below_blocks() -> None:
         ),
         observed_at=OBSERVED_AT,
     )
+    config = QuotaConfig(absolute_free_floor_bytes=400)
     safe = decide_storage_write(
-        state, projected_write_bytes=100, priority=StoragePriority.P1
+        state,
+        projected_write_bytes=100,
+        priority=StoragePriority.P1,
+        config=config,
     )
     assert safe.disposition is WriteDisposition.PROCEED
     assert safe.projected_free_bytes == 400
     blocked = decide_storage_write(
-        state, projected_write_bytes=101, priority=StoragePriority.P0
+        state,
+        projected_write_bytes=101,
+        priority=StoragePriority.P0,
+        config=config,
     )
     assert blocked.disposition is WriteDisposition.BLOCK
     assert blocked.blocked_code == "STORAGE_CAPACITY_BLOCKED"
@@ -86,7 +93,10 @@ def test_normal_percent_can_still_be_blocked_by_absolute_floor() -> None:
     )
     assert state.pressure_state is DiskPressure.NORMAL
     decision = decide_storage_write(
-        state, projected_write_bytes=100, priority=StoragePriority.P0
+        state,
+        projected_write_bytes=100,
+        priority=StoragePriority.P0,
+        config=QuotaConfig(absolute_free_floor_bytes=450),
     )
     assert decision.disposition is WriteDisposition.BLOCK
 
@@ -102,7 +112,10 @@ def test_watch_with_plenty_free_space_warns_but_proceeds() -> None:
         observed_at=OBSERVED_AT,
     )
     decision = decide_storage_write(
-        state, projected_write_bytes=10, priority=StoragePriority.P1
+        state,
+        projected_write_bytes=10,
+        priority=StoragePriority.P1,
+        config=QuotaConfig(absolute_free_floor_bytes=10),
     )
     assert decision.disposition is WriteDisposition.WARN
     assert decision.warning is True
@@ -110,30 +123,50 @@ def test_watch_with_plenty_free_space_warns_but_proceeds() -> None:
 
 def test_critical_blocks_nonessential_but_not_safe_p0() -> None:
     state = _state(950, free=50, config=QuotaConfig(absolute_free_floor_bytes=0))
+    config = QuotaConfig(absolute_free_floor_bytes=0)
     p2 = decide_storage_write(
-        state, projected_write_bytes=1, priority=StoragePriority.P2
+        state,
+        projected_write_bytes=1,
+        priority=StoragePriority.P2,
+        config=config,
     )
     assert p2.disposition is WriteDisposition.BLOCK
     p0 = decide_storage_write(
-        state, projected_write_bytes=1, priority=StoragePriority.P0
+        state,
+        projected_write_bytes=1,
+        priority=StoragePriority.P0,
+        config=config,
     )
     assert p0.disposition is WriteDisposition.WARN
     unsafe_p0 = decide_storage_write(
-        state, projected_write_bytes=51, priority=StoragePriority.P0
+        state,
+        projected_write_bytes=51,
+        priority=StoragePriority.P0,
+        config=config,
     )
     assert unsafe_p0.disposition is WriteDisposition.BLOCK
 
 
 def test_constrained_defers_p2_and_pauses_p3_before_p0() -> None:
     state = _state(850, free=150, config=QuotaConfig(absolute_free_floor_bytes=0))
+    config = QuotaConfig(absolute_free_floor_bytes=0)
     p0 = decide_storage_write(
-        state, projected_write_bytes=10, priority=StoragePriority.P0
+        state,
+        projected_write_bytes=10,
+        priority=StoragePriority.P0,
+        config=config,
     )
     p2 = decide_storage_write(
-        state, projected_write_bytes=10, priority=StoragePriority.P2
+        state,
+        projected_write_bytes=10,
+        priority=StoragePriority.P2,
+        config=config,
     )
     p3 = decide_storage_write(
-        state, projected_write_bytes=10, priority=StoragePriority.P3
+        state,
+        projected_write_bytes=10,
+        priority=StoragePriority.P3,
+        config=config,
     )
     assert p0.disposition is WriteDisposition.PROCEED
     assert p2.disposition is WriteDisposition.DEFER
@@ -143,7 +176,10 @@ def test_constrained_defers_p2_and_pauses_p3_before_p0() -> None:
 def test_zero_free_space_is_critical_and_floor_is_hard() -> None:
     state = _state(1000, free=0)
     decision = decide_storage_write(
-        state, projected_write_bytes=0, priority=StoragePriority.P0
+        state,
+        projected_write_bytes=0,
+        priority=StoragePriority.P0,
+        config=QuotaConfig(),
     )
     assert state.pressure_state is DiskPressure.CRITICAL
     assert decision.disposition is WriteDisposition.BLOCK
@@ -197,10 +233,18 @@ def test_negative_projected_write_and_unknown_priority_fail_typed() -> None:
     state = _state(100)
     with pytest.raises(QuotaWritePolicyError):
         decide_storage_write(
-            state, projected_write_bytes=-1, priority=StoragePriority.P0
+            state,
+            projected_write_bytes=-1,
+            priority=StoragePriority.P0,
+            config=QuotaConfig(),
         )
     with pytest.raises(QuotaWritePolicyError):
-        decide_storage_write(state, projected_write_bytes=1, priority="P9")  # type: ignore[arg-type]
+        decide_storage_write(
+            state,
+            projected_write_bytes=1,
+            priority="P9",  # type: ignore[arg-type]
+            config=QuotaConfig(),
+        )
 
 
 def test_loaded_config_is_operator_configurable() -> None:
