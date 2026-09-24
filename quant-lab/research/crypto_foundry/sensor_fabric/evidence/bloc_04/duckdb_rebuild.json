@@ -1,0 +1,34 @@
+{
+  "api": "crypto_sensor_fabric.storage.duckdb_catalog.rebuild_duckdb_catalog",
+  "catalog_role": "REBUILDABLE_DISCOVERY_NON_AUTHORITATIVE",
+  "checkpoint": "SENSOR-B4-I10",
+  "governance": {
+    "G4-09_CATALOG_REBUILD_GATE": "IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW",
+    "PASS_SENSOR_B4_I10_DUCKDB_DISCOVERY_SEALED": "PENDING_OPERATOR_REVIEW",
+    "next_checkpoint_authorized": false,
+    "recommended_next": "OPERATOR REVIEW OF SENSOR-B4-I10"
+  },
+  "matrices": {
+    "catalog_rebuild_fail_rows": 1,
+    "catalog_rebuild_rows": 5,
+    "corruption_discovery_rows": 6,
+    "evidence_immutability_rows": 2,
+    "portability_rows": 4,
+    "view_equivalence_rows": 8
+  },
+  "performance": {
+    "raw_payload_loaded": false,
+    "synthetic_manifest_rows_scanned": 10001
+  },
+  "schema_version": "1.0",
+  "views": [
+    "v_t0_blobs",
+    "v_t0_acquisitions",
+    "v_t0_projections",
+    "v_t0_partitions",
+    "v_t0_gaps",
+    "v_t0_revisions",
+    "v_t0_quarantine",
+    "v_t0_storage_usage"
+  ]
+}

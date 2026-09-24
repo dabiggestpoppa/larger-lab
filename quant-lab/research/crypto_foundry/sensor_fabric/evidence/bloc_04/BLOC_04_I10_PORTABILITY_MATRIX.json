@@ -1,0 +1,57 @@
+{
+  "checkpoint": "SENSOR-B4-I10",
+  "matrix": "PORTABILITY",
+  "rows": [
+    {
+      "absolute_paths_not_identity": true,
+      "canonical_ids_equal": true,
+      "case": "root_relocation",
+      "object_keys_equal": true,
+      "required_invariants": [
+        "canonical_ids_equal",
+        "object_keys_equal",
+        "absolute_paths_not_identity"
+      ],
+      "result": "OK"
+    },
+    {
+      "both_revisions_visible": true,
+      "case": "revision_multiplicity",
+      "latest_not_selected": true,
+      "required_invariants": [
+        "both_revisions_visible",
+        "latest_not_selected"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "missingness_vocabulary",
+      "failed_explicit": true,
+      "no_zero_fill": true,
+      "quarantined_explicit": true,
+      "required_invariants": [
+        "failed_explicit",
+        "quarantined_explicit",
+        "no_zero_fill"
+      ],
+      "result": "OK"
+    },
+    {
+      "build_succeeded": true,
+      "case": "ten_thousand_manifest_rows",
+      "raw_payload_not_loaded": true,
+      "required_invariants": [
+        "rows_discovered",
+        "raw_payload_not_loaded",
+        "build_succeeded"
+      ],
+      "result": "OK",
+      "rows_discovered": true
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 4,
+    "rows": 4
+  }
+}

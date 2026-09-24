@@ -1,0 +1,123 @@
+{
+  "checkpoint": "SENSOR-B4-I10",
+  "matrix": "VIEW_EQUIVALENCE",
+  "rows": [
+    {
+      "canonical_rows_equal": true,
+      "case": "v_t0_blobs",
+      "explicit_order_equal": true,
+      "required_invariants": [
+        "schema_equal",
+        "row_count_equal",
+        "canonical_rows_equal",
+        "explicit_order_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    },
+    {
+      "canonical_rows_equal": true,
+      "case": "v_t0_acquisitions",
+      "explicit_order_equal": true,
+      "required_invariants": [
+        "schema_equal",
+        "row_count_equal",
+        "canonical_rows_equal",
+        "explicit_order_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    },
+    {
+      "canonical_rows_equal": true,
+      "case": "v_t0_projections",
+      "explicit_order_equal": true,
+      "required_invariants": [
+        "schema_equal",
+        "row_count_equal",
+        "canonical_rows_equal",
+        "explicit_order_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    },
+    {
+      "canonical_rows_equal": true,
+      "case": "v_t0_partitions",
+      "explicit_order_equal": true,
+      "required_invariants": [
+        "schema_equal",
+        "row_count_equal",
+        "canonical_rows_equal",
+        "explicit_order_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    },
+    {
+      "canonical_rows_equal": true,
+      "case": "v_t0_gaps",
+      "explicit_order_equal": true,
+      "required_invariants": [
+        "schema_equal",
+        "row_count_equal",
+        "canonical_rows_equal",
+        "explicit_order_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    },
+    {
+      "canonical_rows_equal": true,
+      "case": "v_t0_revisions",
+      "explicit_order_equal": true,
+      "required_invariants": [
+        "schema_equal",
+        "row_count_equal",
+        "canonical_rows_equal",
+        "explicit_order_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    },
+    {
+      "canonical_rows_equal": true,
+      "case": "v_t0_quarantine",
+      "explicit_order_equal": true,
+      "required_invariants": [
+        "schema_equal",
+        "row_count_equal",
+        "canonical_rows_equal",
+        "explicit_order_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    },
+    {
+      "canonical_rows_equal": true,
+      "case": "v_t0_storage_usage",
+      "explicit_order_equal": true,
+      "required_invariants": [
+        "schema_equal",
+        "row_count_equal",
+        "canonical_rows_equal",
+        "explicit_order_equal"
+      ],
+      "result": "OK",
+      "row_count_equal": true,
+      "schema_equal": true
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 8,
+    "rows": 8
+  }
+}

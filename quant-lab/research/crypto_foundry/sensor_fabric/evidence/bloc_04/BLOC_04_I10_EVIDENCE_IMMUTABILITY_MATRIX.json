@@ -1,0 +1,31 @@
+{
+  "checkpoint": "SENSOR-B4-I10",
+  "matrix": "EVIDENCE_IMMUTABILITY",
+  "rows": [
+    {
+      "before_after_file_set_equal": true,
+      "before_after_hashes_equal": true,
+      "case": "complete_tree_hash_unchanged",
+      "required_invariants": [
+        "before_after_file_set_equal",
+        "before_after_hashes_equal"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "designated_output_only_changes",
+      "durable_tree_unchanged": true,
+      "output_replaced": true,
+      "required_invariants": [
+        "durable_tree_unchanged",
+        "output_replaced"
+      ],
+      "result": "OK"
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 2,
+    "rows": 2
+  }
+}

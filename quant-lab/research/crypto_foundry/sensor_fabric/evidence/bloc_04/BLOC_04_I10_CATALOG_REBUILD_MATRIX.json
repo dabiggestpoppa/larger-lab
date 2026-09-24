@@ -1,0 +1,67 @@
+{
+  "checkpoint": "SENSOR-B4-I10",
+  "matrix": "CATALOG_REBUILD",
+  "rows": [
+    {
+      "all_views_present": true,
+      "build_succeeded": true,
+      "case": "new_catalog_published",
+      "read_only_validation_passed": true,
+      "required_invariants": [
+        "build_succeeded",
+        "all_views_present",
+        "read_only_validation_passed"
+      ],
+      "result": "OK"
+    },
+    {
+      "all_view_rows_equal": true,
+      "case": "destroy_rebuild_equivalent",
+      "catalog_deleted": true,
+      "rebuild_succeeded": true,
+      "required_invariants": [
+        "catalog_deleted",
+        "rebuild_succeeded",
+        "all_view_rows_equal"
+      ],
+      "result": "OK"
+    },
+    {
+      "all_view_rows_equal": true,
+      "case": "rebuild_twice_equivalent",
+      "first_build_succeeded": true,
+      "required_invariants": [
+        "first_build_succeeded",
+        "second_build_succeeded",
+        "all_view_rows_equal"
+      ],
+      "result": "OK",
+      "second_build_succeeded": true
+    },
+    {
+      "case": "failed_rebuild_preserves_existing",
+      "corrupt_manifest_refused": true,
+      "existing_catalog_unchanged": true,
+      "required_invariants": [
+        "corrupt_manifest_refused",
+        "existing_catalog_unchanged"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "counterfactual_failed_rebuild_overwrites",
+      "corrupt_manifest_refused": false,
+      "existing_catalog_unchanged": false,
+      "required_invariants": [
+        "corrupt_manifest_refused",
+        "existing_catalog_unchanged"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 4,
+    "rows": 5
+  }
+}

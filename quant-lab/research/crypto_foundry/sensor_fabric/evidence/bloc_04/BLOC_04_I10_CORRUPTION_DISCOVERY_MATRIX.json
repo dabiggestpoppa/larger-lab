@@ -1,0 +1,71 @@
+{
+  "checkpoint": "SENSOR-B4-I10",
+  "matrix": "CORRUPTION_DISCOVERY",
+  "rows": [
+    {
+      "case": "corrupt_manifest_parquet",
+      "not_silently_absent": true,
+      "required_invariants": [
+        "typed_corruption_raised",
+        "not_silently_absent"
+      ],
+      "result": "OK",
+      "typed_corruption_raised": true
+    },
+    {
+      "case": "corrupt_projection_json",
+      "not_silently_absent": true,
+      "required_invariants": [
+        "typed_corruption_raised",
+        "not_silently_absent"
+      ],
+      "result": "OK",
+      "typed_corruption_raised": true
+    },
+    {
+      "case": "dangling_projection_artifact",
+      "not_silently_absent": true,
+      "required_invariants": [
+        "typed_corruption_raised",
+        "not_silently_absent"
+      ],
+      "result": "OK",
+      "typed_corruption_raised": true
+    },
+    {
+      "case": "missing_blob",
+      "not_silently_absent": true,
+      "required_invariants": [
+        "typed_corruption_raised",
+        "not_silently_absent"
+      ],
+      "result": "OK",
+      "typed_corruption_raised": true
+    },
+    {
+      "case": "dangling_current_pointer",
+      "not_silently_absent": true,
+      "required_invariants": [
+        "typed_corruption_raised",
+        "not_silently_absent"
+      ],
+      "result": "OK",
+      "typed_corruption_raised": true
+    },
+    {
+      "case": "malformed_revision_json",
+      "not_silently_absent": true,
+      "required_invariants": [
+        "typed_corruption_raised",
+        "not_silently_absent"
+      ],
+      "result": "OK",
+      "typed_corruption_raised": true
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "ok": 6,
+    "rows": 6
+  }
+}
