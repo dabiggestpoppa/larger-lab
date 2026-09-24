@@ -13,23 +13,30 @@ import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 
+import duckdb
 import pyarrow as pa
 import pytest
-
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.probes.enums import Granularity
 from crypto_sensor_fabric.storage.blob_store import LocalBlobStore
-from crypto_sensor_fabric.storage.catalog import AcquisitionRepository, BlobMetadataRepository
+from crypto_sensor_fabric.storage.catalog import (
+    AcquisitionRepository,
+    BlobMetadataRepository,
+)
 from crypto_sensor_fabric.storage.duckdb_catalog import (
     VIEW_NAMES,
     DuckDBCatalogCorrupt,
+    DuckDBCatalogError,
     DuckDBCatalogShapeCorrupt,
     DuckDBCatalogVersionError,
     ReadOnlyDuckDBCatalog,
     rebuild_duckdb_catalog,
 )
 from crypto_sensor_fabric.storage.enums import CoverageState, StorageEncoding
-from crypto_sensor_fabric.storage.manifests import PartitionManifest, PartitionManifestRepository
+from crypto_sensor_fabric.storage.manifests import (
+    PartitionManifest,
+    PartitionManifestRepository,
+)
 from crypto_sensor_fabric.storage.models import AcquisitionRecord
 from crypto_sensor_fabric.storage.projection_lineage import ProjectionLineageRepository
 from crypto_sensor_fabric.storage.projection_schema import (
@@ -143,7 +150,9 @@ class Fixture:
             logical_day=15,
             lineage_manifest_id="lineage-1",
         )
-        from crypto_sensor_fabric.storage.projection_resolver import ProjectionLineageResolver
+        from crypto_sensor_fabric.storage.projection_resolver import (
+            ProjectionLineageResolver,
+        )
 
         self.resolver = ProjectionLineageResolver(
             root=root,
@@ -264,7 +273,6 @@ def test_i10r1_all_eight_views_have_exact_contract_schema_empty(
 
 def test_i10r1_nullable_first_row_cannot_change_a_numeric_type() -> None:
     import duckdb
-
     from crypto_sensor_fabric.storage.duckdb_catalog import _create_table
 
     con = duckdb.connect(":memory:")
@@ -305,7 +313,6 @@ def test_i10r1_nullable_first_row_cannot_change_a_numeric_type() -> None:
 
 def test_i10r1_missing_row_key_is_refused_not_null_backfilled() -> None:
     import duckdb
-
     from crypto_sensor_fabric.storage.duckdb_catalog import _create_table
 
     con = duckdb.connect(":memory:")
@@ -317,7 +324,6 @@ def test_i10r1_missing_row_key_is_refused_not_null_backfilled() -> None:
 
 def test_i10r1_extra_row_key_is_refused() -> None:
     import duckdb
-
     from crypto_sensor_fabric.storage.duckdb_catalog import _create_table
 
     con = duckdb.connect(":memory:")
@@ -328,7 +334,6 @@ def test_i10r1_extra_row_key_is_refused() -> None:
 
 def test_i10r1_wrong_scalar_type_is_refused() -> None:
     import duckdb
-
     from crypto_sensor_fabric.storage.duckdb_catalog import _create_table
 
     con = duckdb.connect(":memory:")
@@ -349,7 +354,6 @@ def test_i10r1_wrong_scalar_type_is_refused() -> None:
 
 def test_i10r1_wrong_list_type_is_refused() -> None:
     import duckdb
-
     from crypto_sensor_fabric.storage.duckdb_catalog import _create_table
 
     con = duckdb.connect(":memory:")
@@ -681,7 +685,9 @@ def test_i10r1_frozen_missingness_states_are_preserved_verbatim(
         artifact_repository=fixture.artifacts,
         context_repository=fixture.contexts,
     )
-    from crypto_sensor_fabric.storage.projection_resolver import ProjectionLineageResolver
+    from crypto_sensor_fabric.storage.projection_resolver import (
+        ProjectionLineageResolver,
+    )
 
     fixture.resolver = ProjectionLineageResolver(
         root=evidence_root,
@@ -791,10 +797,16 @@ def test_i10r1_consumer_remains_read_only(
 ) -> None:
     output = _rebuild_partitions_view(evidence_root, tmp_path)
     with ReadOnlyDuckDBCatalog(output) as reader:
-        with pytest.raises(Exception):
+        with pytest.raises(DuckDBCatalogError):
             reader.query_view("v_t0_blobs", "DELETE FROM v_t0_blobs")
-        with pytest.raises(Exception):
+        with pytest.raises(DuckDBCatalogError):
             reader.query_view("v_t0_blobs", "SELECT 1; SELECT 2")
+        with pytest.raises(DuckDBCatalogError):
+            reader.query_view("v_t0_blobs", "UPDATE v_t0_blobs SET blob_sha256 = 'x'")
+        # The connection itself is opened read-only: even a valid SELECT-
+        # shaped statement cannot mutate (defense in depth at the DB layer).
+        with pytest.raises(duckdb.Error):
+            reader._connection.execute("CREATE OR REPLACE TABLE v_t0_blobs AS SELECT 1")
 
 
 # ---------------------------------------------------------------------------

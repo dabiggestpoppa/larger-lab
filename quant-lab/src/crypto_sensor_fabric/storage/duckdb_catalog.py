@@ -42,7 +42,6 @@ from typing import Any
 import duckdb
 import pyarrow.parquet as pq
 
-from .blob_store import LocalBlobStore
 from .catalog import ACQUISITION_SCHEMA, BLOB_SCHEMA, read_fragment
 from .checksums import sha256_file
 from .json_catalog import DurableJsonCatalog, JsonCatalogCorrupt
@@ -683,25 +682,29 @@ def _storage_usage(blobs: list[dict[str, Any]], projections: list[dict[str, Any]
         return value
 
     for row in blobs:
-        key = ("T0A_BLOB", row["integrity_state"], None, None, None, None)
+        key: tuple[Any, ...] = ("T0A_BLOB", row["integrity_state"], None, None, None, None)
         value = _bucket(key)
         value["stored_bytes"] += row["stored_byte_length"]
         value["raw_bytes"] += row["byte_length"]
         value["object_count"] += 1
     for row in projections:
-        key = ("T0B_PROJECTION", row["state"], row["provider"], row["sensor_family"], "P3", None)
-        value = _bucket(key)
+        key_proj: tuple[Any, ...] = (
+            "T0B_PROJECTION", row["state"], row["provider"], row["sensor_family"], "P3", None,
+        )
+        value = _bucket(key_proj)
         value["stored_bytes"] += row["stored_bytes"]
         value["projection_bytes"] += row["stored_bytes"]
         value["object_count"] += 1
     for row in partitions:
-        key = ("PARTITION_MANIFEST", row["integrity_state"], row["provider"], row["sensor_family"], "P0", None)
-        value = _bucket(key)
+        key_part: tuple[Any, ...] = (
+            "PARTITION_MANIFEST", row["integrity_state"], row["provider"], row["sensor_family"], "P0", None,
+        )
+        value = _bucket(key_part)
         value["stored_bytes"] = None
         value["object_count"] += 1
     for row in quarantine:
-        key = ("QUARANTINE", "QUARANTINED_INTEGRITY_FAILURE", None, None, None, None)
-        value = _bucket(key)
+        key_quar: tuple[Any, ...] = ("QUARANTINE", "QUARANTINED_INTEGRITY_FAILURE", None, None, None, None)
+        value = _bucket(key_quar)
         value["stored_bytes"] = None
         value["object_count"] += 1
     return [usage[key] for key in sorted(usage, key=lambda item: tuple("" if v is None else v for v in item))]
@@ -968,7 +971,7 @@ class ReadOnlyDuckDBCatalog:
     def close(self) -> None:
         self._connection.close()
 
-    def __enter__(self) -> ReadOnlyDuckDBCatalog:
+    def __enter__(self) -> ReadOnlyDuckDBCatalog:  # noqa: PYI034 - runtime identity
         return self
 
     def __exit__(self, *_exc: object) -> None:
@@ -992,7 +995,7 @@ class ReadOnlyDuckDBCatalog:
         return [list(row) for row in self._connection.execute(f"SELECT * FROM {view_name} ORDER BY {order}").fetchall()]
 
 
-__all__ = [
+__all__ = [  # noqa: RUF022 - grouped by constants, errors, API surface
     "CATALOG_ROLE",
     "CATALOG_SCHEMA_VERSION",
     "DuckDBCatalogBuild",

@@ -20,20 +20,21 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-import pytest
-
 _HERE = Path(__file__).resolve().parent
 _SRC = _HERE.parents[2] / "src"
 for _path in (str(_SRC), str(_HERE)):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-from _sibling_import import load_sibling  # noqa: E402
-
+import duckdb
+from _sibling_import import load_sibling
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.probes.enums import Granularity
 from crypto_sensor_fabric.storage.blob_store import LocalBlobStore
-from crypto_sensor_fabric.storage.catalog import AcquisitionRepository, BlobMetadataRepository
+from crypto_sensor_fabric.storage.catalog import (
+    AcquisitionRepository,
+    BlobMetadataRepository,
+)
 from crypto_sensor_fabric.storage.duckdb_catalog import (
     VIEW_NAMES,
     DuckDBCatalogCorrupt,
@@ -42,10 +43,11 @@ from crypto_sensor_fabric.storage.duckdb_catalog import (
     ReadOnlyDuckDBCatalog,
     rebuild_duckdb_catalog,
 )
-from crypto_sensor_fabric.storage.enums import CoverageState, StorageEncoding
-from crypto_sensor_fabric.storage.manifests import PartitionManifest, PartitionManifestRepository
-from crypto_sensor_fabric.storage.models import AcquisitionRecord
-from crypto_sensor_fabric.storage.recovery import RecoveryJournal
+from crypto_sensor_fabric.storage.enums import CoverageState
+from crypto_sensor_fabric.storage.manifests import (
+    PartitionManifest,
+    PartitionManifestRepository,
+)
 
 EVIDENCE_DIR = (
     Path(__file__).resolve().parents[3]
@@ -89,8 +91,6 @@ def _matrix(name: str, rows: list[dict[str, Any]], **values: Any) -> dict[str, A
 
 def _schema_row(root: Path, output: Path) -> tuple[dict[str, Any], dict[str, str]]:
     """Measured: actual PRAGMA schema vs VIEW_SCHEMAS + metadata stamp."""
-    import duckdb
-
     from crypto_sensor_fabric.storage.duckdb_catalog import VIEW_SCHEMAS
 
     receipt = rebuild_duckdb_catalog(root, output)
@@ -175,8 +175,6 @@ def _measured_failed_build_preservation(base: Path) -> dict[str, Any]:
 
 def _measured_shape_refusal(base: Path) -> dict[str, Any]:
     """Missing-column refusal is executed against the production builder."""
-    import duckdb
-
     from crypto_sensor_fabric.storage.duckdb_catalog import _create_table
 
     full = {"gap_id": "g1", "scope": "PARTITION", "scope_id": "p1", "missingness": "PARTIAL", "detail": None}
@@ -204,8 +202,6 @@ def _measured_shape_refusal(base: Path) -> dict[str, Any]:
 
 
 def _measured_type_stability(base: Path) -> dict[str, Any]:
-    import duckdb
-
     from crypto_sensor_fabric.storage.duckdb_catalog import _create_table
 
     con = duckdb.connect(":memory:")
@@ -232,7 +228,6 @@ def _measured_type_stability(base: Path) -> dict[str, Any]:
 
 
 def _measured_version_refusal(base: Path) -> dict[str, Any]:
-    import duckdb
 
     output = base / "versioned.duckdb"
     root = _fixture_root(base, "version-evidence")
@@ -519,7 +514,6 @@ def build_i10r1_schema_contract_matrix() -> dict[str, Any]:
         empty_output = base / "empty.duckdb"
         rebuild_duckdb_catalog(empty_root, empty_output)
         import duckdb
-
         from crypto_sensor_fabric.storage.duckdb_catalog import VIEW_SCHEMAS
 
         con = duckdb.connect(str(empty_output), read_only=True)
@@ -624,7 +618,6 @@ def build_i10r1_runtime_evidence_truth_matrix() -> dict[str, Any]:
 
 
 def build_i10r1_storage_usage_dimension_matrix() -> dict[str, Any]:
-    dimensions = _measured_storage_dimensions(Path(".")) if False else None
     import tempfile
 
     with tempfile.TemporaryDirectory() as tmp:
