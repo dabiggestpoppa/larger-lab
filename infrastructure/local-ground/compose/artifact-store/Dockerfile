@@ -29,7 +29,7 @@ FROM docker.io/library/alpine:3.20.1@sha256:ac77ebc035f69184acb2660028580c9053f6
 
 ARG RELEASE_TAG=RELEASE.2024-05-28T17-19-04Z
 ARG SOURCE_COMMIT=f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531
-RUN apk add --no-cache ca-certificates=20241121-r1 curl=8.12.1-r0
+RUN apk add --no-cache ca-certificates=20260413-r0 curl=8.14.1-r2
 COPY --from=build /out/minio /usr/bin/minio
 COPY --from=build /src/minio/dockerscripts/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 COPY --from=build /src/minio/LICENSE /licenses/LICENSE
