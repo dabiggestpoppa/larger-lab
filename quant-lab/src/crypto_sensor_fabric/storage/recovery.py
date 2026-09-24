@@ -1550,18 +1550,47 @@ class RecoveryEngine:
                 registered_at=self._clock(),
             )
         resolution = effect["resolution"]
-        action = self._journal_action(
-            run_id=run_id,
-            planned=planned,
-            resolution=resolution,
-            after_state=effect["after_state"],
-        )
+        # A crash can leave the final RecoveryAction durable while its
+        # terminal phase is absent (I08R2 §7).  ADOPT that exact action
+        # instead of manufacturing a second, differently-worded logical
+        # action from the replay recognition text.  The action journal is
+        # keyed by the original run + operation semantics, so a unique
+        # exact match is mechanical proof of membership in THIS
+        # operation; zero means it was lost and must be materialized;
+        # multiple candidates are ambiguous corruption and fail closed.
+        prior_actions = [
+            payload
+            for payload in self._journal.list_for_object(
+                planned.object_type, planned.object_id
+            )
+            if payload.get("recovery_run_id") == run_id
+            and payload.get("action_kind") == planned.action_kind
+            and payload.get("problem") == planned.problem
+        ]
+        if len(prior_actions) > 1:
+            raise RecoveryOperationCorrupt(
+                f"operation {operation_id[:16]}... has {len(prior_actions)} "
+                "candidate final RecoveryActions; exact terminal ownership "
+                "is ambiguous (I08R2 §7/§12)"
+            )
+        if prior_actions:
+            final_action_id = str(prior_actions[0]["recovery_action_id"])
+            self._last_action_id = final_action_id
+        else:
+            action = self._journal_action(
+                run_id=run_id,
+                planned=planned,
+                resolution=resolution,
+                after_state=effect["after_state"],
+            )
+            final_action_id = self._final_id(action)
+        assert final_action_id is not None
         self._record_outcome(
             operation_id,
             planned,
             run_id,
             resolution=resolution,
-            final_action_id=self._final_id(action),
+            final_action_id=final_action_id,
         )
         return {
             "operation_id": operation_id,
@@ -1571,7 +1600,7 @@ class RecoveryEngine:
             "object_type": planned.object_type,
             "object_id": planned.object_id,
             "effect": effect["detail"],
-            "final_action_id": self._final_id(action),
+            "final_action_id": final_action_id,
             "terminal_phase": RecoveryOperationJournal.PHASE_COMPLETED,
         }
 
@@ -1614,19 +1643,39 @@ class RecoveryEngine:
         if kind == _ACTION_QUARANTINE_JOB:
             return self._recognize_job_divergence_effect(planned)
         if kind == _ACTION_OPERATE_CLEAR_JOB_LOCK:
-            return self._recognize_lock_clear_effect(planned)
+            return self._recognize_lock_clear_effect(record, planned)
         return None
 
     def _recognize_lock_clear_effect(
-        self, planned: RecoveryPlanAction
+        self, record: dict[str, Any], planned: RecoveryPlanAction
     ) -> dict[str, Any] | None:
         """Lock-clear replay (I08R2 §18): the effect is proven ONLY by the
-        lock file's ABSENCE at the INTENT-fingerprinted path — storage
-        truth, never a journaled claim (the I08R1 order journaled
-        ``cleared: true`` BEFORE the unlink, which is exactly the false
-        evidence this replay refuses to trust)."""
-        relative = str((planned.before_state or {}).get("relative_path", ""))
-        if not relative:
+        lock file's ABSENCE at the exact path and job identity in the
+        INTENT fingerprint — storage truth, never a journaled claim (the
+        I08R1 order journaled ``cleared: true`` BEFORE the unlink, which
+        is exactly the false evidence this replay refuses to trust)."""
+        identity = record.get("effect_identity")
+        if not isinstance(identity, str) or not identity:
+            return None
+        try:
+            intent_effect = json.loads(identity)
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(intent_effect, dict):
+            return None
+        plan = intent_effect.get("effect_plan") or {}
+        if plan.get("reconciliation") != "OPERATOR_LOCK_CLEAR":
+            return None
+        relative = plan.get("relative_path")
+        lock_fingerprint = plan.get("lock_fingerprint")
+        expected_job_id = plan.get("expected_job_id")
+        if (
+            not isinstance(relative, str)
+            or not relative
+            or lock_fingerprint != planned.object_id
+            or not isinstance(expected_job_id, str)
+            or not expected_job_id
+        ):
             return None
         lock_path = self._t0_root / relative
         if lock_path.exists():
@@ -1635,8 +1684,8 @@ class RecoveryEngine:
             return None
         fingerprint = {
             "kind": "LOCK_CLEAR",
-            "lock_fingerprint": planned.object_id,
-            "expected_job_id": None,
+            "lock_fingerprint": lock_fingerprint,
+            "expected_job_id": expected_job_id,
             "relative_path": relative,
         }
         return {
