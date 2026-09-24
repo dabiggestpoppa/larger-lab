@@ -5,9 +5,12 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from enum import Enum
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+if TYPE_CHECKING:
+    from .evidence import EvidenceStore
 
 from .identity import ObjectType
 from .temporal import normalize_utc
@@ -190,6 +193,28 @@ class SourceRegistry:
         return {source_id: versions[-1] for source_id, versions in self._versions.items()}
 
 
+class SourceEvidenceCoordinator:
+    """Validates evidence references before applying a source version."""
+
+    def __init__(self, *, source_registry: SourceRegistry, evidence_store: EvidenceStore) -> None:
+        self.source_registry = source_registry
+        self.evidence_store = evidence_store
+
+    def _require_refs(self, refs: tuple[str, ...]) -> None:
+        if not refs:
+            raise ValueError("source updates require evidence references")
+        for ref in refs:
+            self.evidence_store.require(ref)
+
+    def update_locator(self, source_id: str, *, locator: LocatorMetadata, verification_evidence_refs: tuple[str, ...], at: datetime) -> Source:
+        self._require_refs(verification_evidence_refs)
+        return self.source_registry.update_locator(source_id, locator=locator, verification_evidence_refs=verification_evidence_refs, at=at)
+
+    def mark_health(self, source_id: str, health_state: SourceHealth, *, at: datetime, evidence_refs: tuple[str, ...] = ()) -> Source:
+        self._require_refs(evidence_refs)
+        return self.source_registry.mark_health(source_id, health_state, at=at, evidence_refs=evidence_refs)
+
+
 __all__ = [
     "AccessMethod",
     "LocatorMetadata",
@@ -197,5 +222,6 @@ __all__ = [
     "SourceHealth",
     "SourceLifecycle",
     "SourceRegistry",
+    "SourceEvidenceCoordinator",
     "VerificationStatus",
 ]

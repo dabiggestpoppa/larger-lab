@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from datetime import datetime
 from typing import Iterable
 
@@ -113,6 +114,7 @@ class AuthorityPolicy:
     def __init__(self) -> None:
         self._registered: dict[str, SourceClass] = {}
         self._assignments: dict[str, list[AuthorityAssignment]] = {}
+        self._explicit_assignments: set[int] = set()
         self._discrepancies: list[DiscrepancyEvent] = []
         self._decisions: list[AuthorityDecision] = []
 
@@ -165,6 +167,7 @@ class AuthorityPolicy:
             evidence_refs=evidence_refs,
         )
         self._assignments.setdefault(source_id, []).append(assignment)
+        self._explicit_assignments.add(id(assignment))
         return assignment
 
     def _current_assignment(self, source_id: str, family: ClaimFamily, at: datetime) -> AuthorityAssignment | None:
@@ -175,7 +178,12 @@ class AuthorityPolicy:
         ]
         if not candidates:
             return None
-        return sorted(candidates, key=lambda item: item.policy_version)[-1]
+        if len(candidates) > 1 and any(id(item) in self._explicit_assignments for item in candidates):
+            raise ValueError("ambiguous overlapping authority assignments")
+        def version_key(item: AuthorityAssignment) -> tuple[int, str]:
+            match = re.fullmatch(r"v(\d+)", item.policy_version)
+            return (int(match.group(1)) if match else -1, item.policy_version)
+        return sorted(candidates, key=version_key)[-1]
 
     def resolve(self, source_id: str, claim_family: ClaimFamily, at: datetime) -> AuthorityResolution:
         if source_id not in self._registered:

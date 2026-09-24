@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .acquisition import AcquisitionContract, AcquisitionType
 from .claims import Claim, ClaimService, ClaimState
 from .evidence import EvidenceStore, EvidenceTier, RawEvidence
-from .sources import Source, SourceRegistry
+from .sources import Source, SourceEvidenceCoordinator, SourceHealth, SourceRegistry
 from .temporal import normalize_utc
 
 
@@ -51,16 +51,35 @@ class ResearchInterface:
         source_registry: SourceRegistry,
         evidence_store: EvidenceStore,
         claim_service: ClaimService,
+        source_evidence_coordinator: SourceEvidenceCoordinator | None = None,
     ) -> None:
         self.source_registry = source_registry
         self.evidence_store = evidence_store
         self.claim_service = claim_service
+        self.source_evidence_coordinator = source_evidence_coordinator or SourceEvidenceCoordinator(
+            source_registry=source_registry, evidence_store=evidence_store
+        )
         self._corroborations: list[CorroborationMaterial] = []
 
     def discover(self, source: Source) -> Source:
         if source.source_id in self.source_registry:
             raise ValueError("source candidate must not overwrite a registered source")
         return self.source_registry.register(source)
+
+    def update_locator(self, source_id: str, *, locator, verification_evidence_refs: tuple[str, ...], at: datetime):
+        """Apply a source version only after evidence references exist."""
+        return self.source_evidence_coordinator.update_locator(
+            source_id,
+            locator=locator,
+            verification_evidence_refs=verification_evidence_refs,
+            at=at,
+        )
+
+    def mark_health(self, source_id: str, health_state: SourceHealth, *, at: datetime, evidence_refs: tuple[str, ...] = ()):
+        """Apply a health version only after evidence references exist."""
+        return self.source_evidence_coordinator.mark_health(
+            source_id, health_state, at=at, evidence_refs=evidence_refs
+        )
 
     def retrieve(
         self,
@@ -103,7 +122,7 @@ class ResearchInterface:
     def propose(self, claim: Claim) -> Claim:
         if claim.claim_state is not ClaimState.DECLARED:
             raise ValueError("research systems may propose only DECLARED claims")
-        return self.claim_service.add(claim)
+        return self.claim_service.add_declared(claim)
 
     def corroborate(
         self,
