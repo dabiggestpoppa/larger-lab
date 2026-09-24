@@ -36,6 +36,7 @@ class NetworkIdentityEvidence(BaseModel):
     deployment_continuity: bool | None = None
     persistent_divergence: bool | None = None
     temporary_ambiguous_split: bool | None = None
+    unrelated_network_evidence: bool = False
     new_genesis: bool | None = None
     migration_evidence_refs: tuple[str, ...] = ()
     family_native_continuation: bool | None = None
@@ -76,6 +77,17 @@ class NetworkIdentityEngine:
                 evidence,
                 "temporary split is unresolved; shared history does not establish identity",
                 operator_review_required=False,
+            )
+        if evidence.unrelated_network_evidence:
+            if not prior or not candidate:
+                return self._unknown(evidence, "unrelated-network evidence lacks both object identities")
+            return NetworkIdentityDecision(
+                decision_id=f"identity-decision:{evidence.evidence_id}",
+                evidence_id=evidence.evidence_id,
+                prior_object_id=prior,
+                outcome=NetworkIdentityOutcome.NEW_OBJECT,
+                resulting_object_ids=(candidate,),
+                reason="independent network evidence defeats ticker/name-based identity collapse",
             )
         if evidence.persistent_divergence:
             if not prior or not candidate:

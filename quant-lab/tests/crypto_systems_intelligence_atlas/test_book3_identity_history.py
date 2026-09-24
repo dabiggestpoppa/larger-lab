@@ -83,8 +83,9 @@ def test_e_same_ticker_unrelated_networks_remain_distinct() -> None:
         consensus_continuity=False,
         deployment_continuity=False,
         genesis_or_origin_anchor_refs=("genesis:left", "genesis:right"),
+        unrelated_network_evidence=True,
     )
-    assert NetworkIdentityEngine().decide(evidence).outcome is NetworkIdentityOutcome.UNKNOWN
+    assert NetworkIdentityEngine().decide(evidence).outcome is NetworkIdentityOutcome.NEW_OBJECT
     assert evidence.ticker_refs  # retained as evidence, never used as a key
 
 
