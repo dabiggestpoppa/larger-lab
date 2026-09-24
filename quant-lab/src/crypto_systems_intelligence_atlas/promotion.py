@@ -132,6 +132,7 @@ class ClaimStateEngine:
             prior_state=current.claim_state,
             new_state=new_state,
             triggering_evidence_refs=triggering_evidence_refs,
+            resulting_claim=updated,
             transitioned_at=transitioned_at,
             operator_involvement=operator_involvement,
         )

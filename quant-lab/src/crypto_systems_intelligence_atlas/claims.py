@@ -70,8 +70,8 @@ class Book2ClaimBinding(BaseModel):
         )
 
     @classmethod
-    def for_graph(cls, claim: "Claim") -> "Book2ClaimBinding":
-        if not can_promote_to_graph(claim):
+    def for_graph(cls, claim: "Claim", claim_store: "ClaimStore") -> "Book2ClaimBinding":
+        if not can_promote_to_graph(claim, claim_store):
             raise ValueError(f"{claim.claim_state.value} cannot create a current graph fact")
         marker = f"book2-state:{claim.claim_state.value}"
         methodology_marker = f"book2-methodology:{claim.methodology_ref}" if claim.methodology_ref else None
@@ -89,8 +89,13 @@ class Book2ClaimBinding(BaseModel):
         )
 
 
-def can_promote_to_graph(claim: "Claim") -> bool:
-    """Return whether a claim may create a current Book 1 graph fact."""
+def can_promote_to_graph(claim: "Claim", claim_store: "ClaimStore") -> bool:
+    """Return whether the canonical current claim may create a graph fact."""
+    try:
+        if claim_store.require(claim.claim_id) != claim:
+            return False
+    except KeyError:
+        return False
     if claim.claim_state is ClaimState.OBSERVED:
         return True
     if claim.claim_state is ClaimState.CORROBORATED:
@@ -105,19 +110,41 @@ def can_promote_to_graph(claim: "Claim") -> bool:
     return False
 
 
-def promote_claim_to_graph(claim: "Claim") -> Book2ClaimBinding:
-    """Mediated Book 2 graph insertion; returns Book 1 pointer plus marker."""
-    return Book2ClaimBinding.for_graph(claim)
+def promote_claim_to_graph(claim: "Claim", claim_store: "ClaimStore") -> Book2ClaimBinding:
+    """Mediate a graph pointer only after canonical state validation."""
+    if not can_promote_to_graph(claim, claim_store):
+        raise ValueError("claim is not the canonical current claim")
+    return Book2ClaimBinding.for_graph(claim, claim_store)
 
 
 class GraphFactPromoter:
     """Book 2 adapter that mediates insertion into the frozen Book 1 graph API."""
 
-    def __init__(self, graph_validator: object) -> None:
+    def __init__(self, graph_validator: object, claim_service: "ClaimService | None" = None) -> None:
+        if claim_service is None:
+            raise ValueError("GraphFactPromoter requires ClaimService authority")
         self._graph_validator = graph_validator
+        self._claim_service = claim_service
 
     def add(self, *, claim: "Claim", edge: object) -> object:
-        expected = promote_claim_to_graph(claim)
+        canonical = self._claim_service.require(claim.claim_id)
+        if canonical != claim:
+            raise ValueError("claim is not the canonical current claim")
+        if not can_promote_to_graph(canonical, self._claim_service.claim_store):
+            raise ValueError("canonical claim is not graph-promotable")
+        if canonical.claim_state is ClaimState.CORROBORATED:
+            if not any(
+                event.claim_id == canonical.claim_id
+                and event.new_state is ClaimState.CORROBORATED
+                and event.resulting_claim == canonical
+                and event.triggering_evidence_refs
+                for event in self._claim_service.claim_store.transitions
+            ):
+                raise ValueError("CORROBORATED requires a recorded transition")
+        if canonical.claim_state is ClaimState.INFERRED:
+            if self._claim_service.claim_store.creation_origin(canonical.claim_id) != "INFERENCE":
+                raise ValueError("INFERRED requires authorized CREATE_INFERRED provenance")
+        expected = Book2ClaimBinding.for_graph(canonical, self._claim_service.claim_store)
         if getattr(edge, "claim_binding", None) != expected.book1:
             raise ValueError("graph edge must use the mediated Book 2 claim binding")
         return self._graph_validator.add_edge(edge)  # type: ignore[attr-defined]
@@ -218,18 +245,46 @@ class Claim(BaseModel):
         return self
 
 
+_INFERENCE_INSERTION_TOKEN = object()
+
+
 class ClaimStore:
     """Append-only current-plus-history store for claim versions."""
 
     def __init__(self) -> None:
         self._versions: dict[str, list[Claim]] = {}
+        self._creation_origins: dict[str, str] = {}
         self._transitions: list["TransitionEvent"] = []
 
-    def add(self, claim: Claim) -> Claim:
+    def add_initial(self, claim: Claim) -> Claim:
+        if claim.claim_state not in (ClaimState.DECLARED, ClaimState.OBSERVED):
+            raise ValueError("initial insertion accepts only DECLARED or OBSERVED claims")
         if claim.claim_id in self._versions:
             raise ValueError(f"claim {claim.claim_id} already exists")
         self._versions[claim.claim_id] = [claim]
+        self._creation_origins[claim.claim_id] = "ENTRY"
         return claim
+
+    def _add_inferred(self, claim: Claim, token: object) -> Claim:
+        if token is not _INFERENCE_INSERTION_TOKEN:
+            raise ValueError("INFERRED insertion requires the authorized inference path")
+        if claim.claim_state is not ClaimState.INFERRED:
+            raise ValueError("authorized inference insertion requires INFERRED state")
+        if claim.claim_id in self._versions:
+            raise ValueError(f"claim {claim.claim_id} already exists")
+        self._versions[claim.claim_id] = [claim]
+        self._creation_origins[claim.claim_id] = "INFERENCE"
+        return claim
+
+    def add(self, claim: Claim) -> Claim:
+        """Compatibility entry point; promoted states cannot be inserted directly."""
+        return self.add_initial(claim)
+
+    def creation_origin(self, claim_id: str) -> str:
+        try:
+            return self._creation_origins[claim_id]
+        except KeyError as exc:
+            raise KeyError(f"unknown claim {claim_id}") from exc
 
     def require(self, claim_id: str) -> Claim:
         try:
@@ -252,6 +307,8 @@ class ClaimStore:
         return {claim_id: versions[-1] for claim_id, versions in self._versions.items()}
 
     def append_transition(self, claim: Claim, event: "TransitionEvent") -> Claim:
+        if event.resulting_claim != claim:
+            raise ValueError("transition event must identify the appended claim version")
         history = self._versions.get(claim.claim_id)
         if history is None:
             raise KeyError(f"unknown claim {claim.claim_id}")
@@ -274,6 +331,7 @@ class TransitionEvent(BaseModel):
     prior_state: ClaimState
     new_state: ClaimState
     triggering_evidence_refs: tuple[str, ...] = Field(min_length=1)
+    resulting_claim: Claim
     transitioned_at: datetime
     operator_involvement: str | None = None
 
@@ -315,7 +373,7 @@ class ClaimService:
         self._validate_evidence(claim)
         if claim.claim_state in (ClaimState.OBSERVED, ClaimState.CORROBORATED):
             self._require_promotion_authority(claim)
-        return self.claim_store.add(claim)
+        return self.claim_store.add_initial(claim)
 
     def add(self, claim: Claim) -> Claim:
         raise ValueError("raw claim insertion is closed; use add_declared, add_observed, or CREATE_INFERRED")
@@ -451,7 +509,8 @@ class InferenceEngine:
         for parent, snapshot in zip(parents, parent_snapshots, strict=True):
             if parent.model_dump(mode="json") != snapshot:
                 raise AssertionError("CREATE_INFERRED mutated a parent claim")
-        return self.service._add_validated(inferred)
+        self.service._validate_evidence(inferred)
+        return self.service.claim_store._add_inferred(inferred, _INFERENCE_INSERTION_TOKEN)
 
 
 __all__ = [
