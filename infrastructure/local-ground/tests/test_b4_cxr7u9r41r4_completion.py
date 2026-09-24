@@ -406,7 +406,7 @@ def test_artifact_source_authority_is_exact_and_registry_independent():
 
 
 def _sign(key, msg):
-    return hmac.new(key, msg.encode(), hashlib.sha256).hexdigest()
+    return hmac.new(key, msg.encode(), hashlib.sha256).digest()
 
 
 def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
@@ -428,7 +428,7 @@ def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
     kregion = _sign(kdate, date_only)
     kservice = _sign(kregion, "us-east-1")
     ksigning = _sign(kservice, "s3")
-    signature = _sign(ksigning, string_to_sign)
+    signature = _sign(ksigning, string_to_sign).hex()
     auth = (f"AWS4-HMAC-SHA256 Credential={access}/{scope}, "
             "SignedHeaders=host;x-amz-content-sha256;x-amz-date, "
             f"Signature={signature}")
