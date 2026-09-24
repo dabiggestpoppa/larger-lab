@@ -214,19 +214,61 @@ class QuotaWriteDecision:
     blocked_code: str | None = None
 
 
+def _verified_storage_state(
+    state: StorageQuotaState,
+    config: QuotaConfig,
+) -> StorageQuotaState:
+    """Reconcile a supplied snapshot and rederive its pressure from bytes."""
+    for name in ("used_bytes", "capacity_bytes", "free_bytes"):
+        value = getattr(state, name)
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise QuotaWritePolicyError(f"state {name} must be an integer")
+    if state.absolute_free_floor_bytes is not None and (
+        isinstance(state.absolute_free_floor_bytes, bool)
+        or not isinstance(state.absolute_free_floor_bytes, int)
+        or state.absolute_free_floor_bytes < 0
+    ):
+        raise QuotaWritePolicyError("state absolute_free_floor_bytes must be a nonnegative integer")
+    if (
+        isinstance(state.utilization_ratio, bool)
+        or not isinstance(state.utilization_ratio, (int, float))
+        or not math.isfinite(float(state.utilization_ratio))
+    ):
+        raise QuotaWritePolicyError("state utilization_ratio must be finite")
+    try:
+        verified = classify_storage(
+            QuotaFacts(
+                capacity_bytes=state.capacity_bytes,
+                used_bytes=state.used_bytes,
+                free_bytes=state.free_bytes,
+                utilization_ratio=float(state.utilization_ratio),
+                absolute_free_floor_bytes=state.absolute_free_floor_bytes,
+            ),
+            config=config,
+            observed_at=state.observed_at,
+        )
+    except QuotaFactsError as exc:
+        raise QuotaWritePolicyError(f"untrusted quota state: {exc}") from exc
+    if verified.pressure_state is not state.pressure_state:
+        raise QuotaWritePolicyError(
+            "state pressure_state contradicts byte-derived pressure under the applicable quota config"
+        )
+    return verified
+
+
 def decide_storage_write(
     state: StorageQuotaState,
     *,
     projected_write_bytes: int,
     priority: StoragePriority,
-    essential: bool = False,
+    config: QuotaConfig | None = None,
 ) -> QuotaWriteDecision:
     """Return a deterministic write decision without touching storage.
 
-    Equality at the configured absolute floor is safe: a write is allowed iff
-    ``free_bytes - projected_write_bytes >= absolute_free_floor_bytes``.  P0
-    is treated as essential for policy purposes, but no priority can bypass
-    the hard floor.
+    The incoming snapshot is untrusted. Its byte facts are reconciled and its
+    pressure is rederived with the same applicable config before policy runs.
+    Equality at the absolute floor is safe; P0 is the only priority with
+    critical-pressure continuation, and no priority bypasses the hard floor.
     """
     if isinstance(projected_write_bytes, bool) or not isinstance(projected_write_bytes, int):
         raise QuotaWritePolicyError("projected_write_bytes must be an integer")
@@ -236,37 +278,39 @@ def decide_storage_write(
         priority = StoragePriority(priority)
     except ValueError as exc:
         raise QuotaWritePolicyError(f"unknown storage priority: {priority!r}") from exc
-    floor = state.absolute_free_floor_bytes or 0
-    projected_free = state.free_bytes - projected_write_bytes
-    is_essential = essential or priority is StoragePriority.P0
+    policy = config or load_quota_config()
+    verified_state = _verified_storage_state(state, policy)
+    floor = verified_state.absolute_free_floor_bytes or 0
+    projected_free = verified_state.free_bytes - projected_write_bytes
+    is_essential = priority is StoragePriority.P0
     if projected_free < floor:
         return QuotaWriteDecision(
             WriteDisposition.BLOCK,
             "projected write would cross the absolute free-space floor",
             projected_free,
             floor,
-            state.pressure_state,
+            verified_state.pressure_state,
             priority,
             blocked_code=STORAGE_CAPACITY_BLOCKED,
         )
-    if state.pressure_state is DiskPressure.CRITICAL and not is_essential:
+    if verified_state.pressure_state is DiskPressure.CRITICAL and not is_essential:
         return QuotaWriteDecision(
             WriteDisposition.BLOCK,
             "critical pressure pauses every non-essential write before exhaustion",
             projected_free,
             floor,
-            state.pressure_state,
+            verified_state.pressure_state,
             priority,
             blocked_code=STORAGE_CAPACITY_BLOCKED,
         )
-    if state.pressure_state is DiskPressure.CONSTRAINED:
+    if verified_state.pressure_state is DiskPressure.CONSTRAINED:
         if priority is StoragePriority.P2:
             return QuotaWriteDecision(
                 WriteDisposition.DEFER,
                 "constrained pressure defers optional high-volume P2 writes before P0",
                 projected_free,
                 floor,
-                state.pressure_state,
+                verified_state.pressure_state,
                 priority,
             )
         if priority is StoragePriority.P3:
@@ -275,26 +319,26 @@ def decide_storage_write(
                 "constrained pressure pauses rebuildable P3 work first",
                 projected_free,
                 floor,
-                state.pressure_state,
+                verified_state.pressure_state,
                 priority,
             )
-    if state.pressure_state is DiskPressure.WATCH:
+    if verified_state.pressure_state is DiskPressure.WATCH:
         return QuotaWriteDecision(
             WriteDisposition.WARN,
             "watch pressure permits a safe write with projected-growth warning",
             projected_free,
             floor,
-            state.pressure_state,
+            verified_state.pressure_state,
             priority,
             warning=True,
         )
-    if state.pressure_state is DiskPressure.CRITICAL:
+    if verified_state.pressure_state is DiskPressure.CRITICAL:
         return QuotaWriteDecision(
             WriteDisposition.WARN,
             "critical P0 evidence may proceed only while the absolute floor remains intact",
             projected_free,
             floor,
-            state.pressure_state,
+            verified_state.pressure_state,
             priority,
             warning=True,
         )
