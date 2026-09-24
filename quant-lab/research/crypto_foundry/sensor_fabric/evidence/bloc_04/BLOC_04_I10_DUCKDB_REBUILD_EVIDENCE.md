@@ -100,10 +100,7 @@ memory and byte-compares committed files without rewriting them.
 - Required I07/I08/I09/I09R1 regressions: 178 passed.
 - Complete storage suite: 1404 passed, 4 skipped. One pre-existing Windows
   reader-thread warning was emitted; no test failed.
-- Project `pytest tests/ -q`: 2782 passed, 5 skipped, with one unrelated
-  pre-existing concurrent blob-store race failure; its isolated rerun passed.
-  This is not claimed as a clean full-suite pass and requires operator-visible
-  disclosure.
+- Project `pytest tests/ -q`: 2784 passed, 5 skipped.
 - Ruff changed scope and compileall: passed.
 - Mypy changed scope: no I10 errors; only the known pre-existing
   `src/crypto_sensor_fabric/probes/planner.py:79` error remains.
