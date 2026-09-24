@@ -1978,3 +1978,154 @@ The R41 source and proof-repair requirements are implemented and locally
 validated. R41 cannot be marked closed until the authoritative local-ground
 workflow completes with the container stack available, and the external
 Sonar/Kilo dispositions are resolved. No self-ratification is claimed.
+
+---
+
+## R41R2 SUPERSEDING SECTION — DURABLE FORWARD INTENT + EXECUTABLE CRASH COHERENCE (B4-CXR7U9R41R2)
+
+**Status:** `IN_PROGRESS / EXTERNAL-CI-BLOCKED` (append-only supersession; R41 and all earlier sections remain historical truth and are not rewritten).
+
+**Authorized start SHA:** `9758b450033e1c8133e99247c9dbf61973e6eead`.
+**R41R2 implementation head:** `af69345daaf37b52bbf6fa1a4c60b28b9140ed02`.
+**origin/main:** `7c7816f382947bbc8a1f2154435fc436f2428fa8` (untouched).
+**PR #4:** OPEN, unmerged, `mergeable=MERGEABLE`, `mergeStateStatus=UNSTABLE`; merge authorization was not granted or exercised.
+
+### R41R2 append-only implementation chain
+
+```text
+6afb849a  B4-CXR7U9R41R2   close the drop-before-record crash window
+9f47e541  B4-CXR7U9R41R3   execute every finalize crash boundary
+af69345d  B4-CXR7U9R41R3X  make the shell-boundary kill descendant-free
+```
+
+No amend, squash, rebase, reset, force-push, PR merge, or main modification was
+performed.
+
+### Durable forward intent and restart authority
+
+The finalize ladder is now explicit and forward-only:
+
+```text
+FINALIZING -> COMMIT_INTENT_RECORDED -> COMMIT_POINT_REACHED -> FINALIZED
+```
+
+`COMMIT_INTENT_RECORDED` is atomically written, flushed, fsynced, and its
+containing directory fsynced after the last successful canonical verification
+and before quarantine removal. The intent binds the operation ID, promote
+receipt digest, canonical database/user/container identity, quarantine name,
+and timestamp. A crash after the physical drop but before the commit-point
+record therefore restarts from durable intent, not from an indistinguishable
+`FINALIZING` marker.
+
+Fresh finalize still consumes the one operation-wide claim exactly once.
+Recovery uses a separate, explicit `resume-finalize` phase, which is admitted
+only for the same operation ID, exact promote-receipt digest, existing finalize
+claim, canonical DB/user/container identity, selected transition, and valid
+durable intent. Operation ID, receipt digest, finalize claim, canonical
+identity, and missing intent each have executable mismatch refusals. A
+concurrent duplicate fresh finalize cannot become a second winner.
+
+Reconciliation now distinguishes `resume_required` from committed truth by
+observing canonical inventory truth and quarantine presence. A finalize resume
+can finish either side of the drop-before-record boundary without rolling back
+either durable store.
+
+### One engine-owned fail-closed rollback law
+
+`restore.sh` no longer extracts an operation ID or decides whether a record is
+missing. It delegates the exact promote receipt and program-owned transition
+directory to `pg-recovery.py --classify-rollback`. The engine validates the
+promote receipt, operation record, receipt digest, identity, state, and intent.
+Exit 0 permits rollback; exit 3 forbids it after forward intent; exit 4 fails
+closed. Missing, corrupt, unreadable, malformed, digest-mismatched,
+missing-record, and unknown states are never treated as pre-commit. The old
+`FINALIZING + commit_point` exception is rejected as structurally impossible;
+it is not used as authority.
+
+### Executable eight-boundary proof and negative controls
+
+`test_b4_cxr7u9r41r2_crash_coherence.py` is included in the existing single
+authoritative local-ground pytest invocation. It uses the existing test-only
+child-process bridge; there is no production environment variable or CLI crash
+switch. The bridge stalls immediately after a real engine action and the parent
+kills the actual CLI/shell process. The eight exact positive node IDs are:
+
+```text
+test_crash_01_after_finalize_claim_before_verification
+test_crash_02_after_verification_before_intent
+test_crash_03_after_commit_intent_before_drop
+test_crash_04_after_drop_before_commit_point_record
+test_crash_05_after_commit_point_before_removal_check
+test_crash_06_after_removal_verification_before_finalized
+test_crash_07_after_finalized_before_receipt_commit
+test_crash_08_after_finalize_receipt_before_shell_commit_flag
+```
+
+Authoritative selection collection at the implementation head: **335 tests
+collected**, exactly **8** matching crash-boundary node IDs, and **0 duplicate
+crash-boundary node IDs**. The module has 16 tests total: eight positive crash
+boundaries, five binding-mismatch refusals, and three executable negative
+controls. The controls execute weakened engine copies to demonstrate the old
+drop-before-record ordering, the impossible-marker classifier exception, and
+the permissive missing-record classifier; they are not source-string-only
+assertions.
+
+### R41R2 local proof truth
+
+```text
+focused R39/R40/R41 selection: 58 passed, 2 skipped
+final crash-coherence module:   16 passed
+R41R2 focused shell/proofs:      48 passed
+Ruff:                            clean on all changed Python files
+bash -n:                         clean for restore.sh and run-validation.sh
+git diff --check:                clean
+```
+
+The two focused skips are truthful container-gated tests in the local Windows
+environment. No test was deleted, skipped by the new proof module, or hidden
+from the runner.
+
+### R41R2 exact implementation-head CI truth
+
+```text
+36034493154  b2-control-plane-validation  success
+36034493249  b3-worker-fabric-validation  success
+36034493173  b4-config-spine-validation  success
+36034499330  B1-I1R Validation            success
+36034493288  b1-local-ground-validation  failure (attempt 1 and sanctioned failed-job rerun attempt 2)
+```
+
+Both b1-local-ground attempts failed during existing compose image retrieval:
+
+```text
+artifact-store Error unauthorized: access to the requested resource is not authorized
+Error response from daemon: unauthorized: access to the requested resource is not authorized
+3 failed, 304 passed, 28 errors
+```
+
+All R41R2 crash proofs passed on the Linux CI head. The 3 failures and 28
+errors are the existing bootstrap/operator/container-backed cases whose shared
+`local up` could not authenticate to the pinned compose image source. The
+attempt-2 run reproduced the same registry authorization failure. No workflow,
+test selection, container image, registry, or recovery behavior was weakened to
+hide it.
+
+### R41R2 external-check and scope truth
+
+- SonarCloud Code Analysis: **failure**, unchanged and unsuppressed; no
+  exclusions, NOSONAR markers, threshold edits, or severity changes.
+- Kilo Code Review: **queued** in the live PR view; it is not called green.
+- PR #4 remains OPEN, unmerged, MERGEABLE, and UNSTABLE.
+- `main` remains `7c7816f3`; it was not modified or pushed.
+- Cloud mutations = 0; broker mutations = 0; capital mutations = 0;
+  execution-authority mutations = 0; recurring cost = $0.
+- Book 5 and Atlas Program Block 4 were not begun.
+
+### R41R2 exit-gate status
+
+The R41R2 source, fail-closed rollback law, explicit resume authority, and
+eight-boundary executable proofs are implemented and validated. The gate is not
+self-ratified closed: the authoritative local-ground workflow remains blocked
+by Docker registry authorization, and SonarCloud remains failed. The evidence
+head is this evidence-only commit; the implementation head remains
+`af69345d`.

@@ -262,3 +262,30 @@ sequence; see `B4-EVIDENCE-RECORD.md`.*
 - **R41 status:** `IN_PROGRESS / EXTERNAL-CI-BLOCKED`. No cloud, broker,
   capital, or execution authority was introduced; recurring cost is $0. Book 5
   and Atlas Program Block 4 remain untouched.
+
+### R41R2 crash-coherence repair (append-only)
+
+| Repair | Commit | Scope | Evidence |
+|---|---|---|---|
+| B4-CXR7U9R41R2 | `6afb849a` | fsynced forward-commit intent before quarantine drop; explicit ladder; receipt/record/claim/identity/intent-bound `resume-finalize`; engine-owned fail-closed rollback law | focused engine + shell proofs |
+| B4-CXR7U9R41R3 | `9f47e541` | eight real-process crash/restart cases, five resume-binding refusals, three executable negative controls; wired into the existing single pytest invocation | 16-test crash-coherence module; 335 collected; 8 exact crash IDs; 0 duplicate crash IDs |
+| B4-CXR7U9R41R3X | `af69345d` | Linux CI repair: exec the sleeping crash-boundary process so kill does not wait on a descendant-held pipe | exact-head rerun; all R41R2 proofs passed |
+
+**Implementation head:** `af69345daaf37b52bbf6fa1a4c60b28b9140ed02`.
+
+**Exact-head validation runs:**
+
+- `36034493154` b2-control-plane-validation — success
+- `36034493249` b3-worker-fabric-validation — success
+- `36034493173` b4-config-spine-validation — success
+- `36034499330` B1-I1R Validation — success
+- `36034493288` b1-local-ground-validation — failure on attempt 1 and
+  sanctioned failed-job rerun attempt 2; both report Docker registry
+  `unauthorized` for the existing `artifact-store` image, with
+  `3 failed, 304 passed, 28 errors`. The R41R2 module itself passed.
+
+**Exit-gate truth:** implementation and executable proofs are complete, but
+status remains `IN_PROGRESS / EXTERNAL-CI-BLOCKED`. SonarCloud is failure and
+unsuppressed; Kilo is queued; PR #4 is OPEN, unmerged, MERGEABLE, and UNSTABLE.
+No cloud, broker, capital, or execution-authority mutation occurred; recurring
+cost is $0. Book 5 and Atlas Program Block 4 remain untouched.
