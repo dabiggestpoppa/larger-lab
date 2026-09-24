@@ -381,8 +381,8 @@ def test_crash_01_after_finalize_claim_before_verification(tmp_path):
     _crash_finalize(h, "after_claim_before_verification", h.root / "crash.json")
     assert _record(h)["state"] == "FINALIZING"
     decision = _reconcile(h, "reconcile-01.json")
-    assert decision["verdict"] == "rolled_back_available", decision
-    assert _classify(h) == 0
+    assert decision["verdict"] == "preintent_abort_required", decision
+    assert _classify(h) == 5
 
 
 def test_crash_02_after_verification_before_intent(tmp_path):
@@ -390,8 +390,8 @@ def test_crash_02_after_verification_before_intent(tmp_path):
     _crash_finalize(h, "after_verification_before_intent", h.root / "crash.json")
     assert _record(h)["state"] == "FINALIZING"
     decision = _reconcile(h, "reconcile-02.json")
-    assert decision["verdict"] == "rolled_back_available", decision
-    assert _classify(h) == 0
+    assert decision["verdict"] == "preintent_abort_required", decision
+    assert _classify(h) == 5
 
 
 def test_crash_03_after_commit_intent_before_drop(tmp_path):
@@ -564,7 +564,7 @@ def test_control_impossible_marker_classifier_reopens_old_window(tmp_path):
     }), encoding="utf-8")
 
     def old_marker(source):
-        old = '''        if record.get("commit_intent") is not None or record.get("commit_point") is not None:\n            return 4\n        return 0\n'''
+        old = '''        if record.get("commit_intent") is not None or record.get("commit_point") is not None:\n            return 4\n        if record.get("selected_transition") == "finalize":\n            return 5\n        return 4\n'''
         new = '''        marker = record.get("commit_point")\n        return 3 if isinstance(marker, dict) and marker.get("marker") else 0\n'''
         assert old in source
         return source.replace(old, new)

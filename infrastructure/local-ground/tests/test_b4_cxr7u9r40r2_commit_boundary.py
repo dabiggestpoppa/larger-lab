@@ -98,6 +98,8 @@ def shell_law(tmp_path):
                     "source_archive_sha256", "inventory_sha256")},
                 "receipt_sha256": pgrec._receipt_digest(authority),
             }
+            if record_state == pgrec.TRANSITION_STATE_FINALIZING:
+                record["selected_transition"] = "finalize"
             if record_state in (pgrec.TRANSITION_STATE_COMMIT_INTENT,
                                 pgrec.TRANSITION_STATE_COMMIT_POINT,
                                 "FINALIZED"):

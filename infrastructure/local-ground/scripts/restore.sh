@@ -329,20 +329,30 @@ pg_rollback_from_quarantine() { # explicit rollback of the held quarantine
   python3 "$BIN/pg-recovery.py" --phase rollback --receipt-in "$PROMOTE_RECEIPT" \
     "${PG_COMMON[@]}" --receipt-out "$ROLLBACK_RECEIPT"
 }
+pg_abort_finalize_preintent() { # recover the already-selected finalize branch
+  [ -n "$PROMOTE_RECEIPT" ] || return 1
+  python3 "$BIN/pg-recovery.py" --phase preintent-rollback \
+    --receipt-in "$PROMOTE_RECEIPT" "${PG_COMMON[@]}" \
+    --receipt-out "$ROLLBACK_RECEIPT"
+}
 write_transaction_rollback_receipt() { # truthful account of what was restored
-  python3 - "$TRANSACTION_RECEIPT" "$1" "$ARTIFACT_BEFORE_SHA" "$2" "$3" \
+  python3 - "$TRANSACTION_RECEIPT" "$1" "$ARTIFACT_BEFORE_SHA" "$2" "$3" "$4" \
            "$(date -u +"$TS_FMT")" <<'PY'
 import json, sys
-p, reason, before, after, pg_ok, ts = sys.argv[1:7]
+p, reason, before, after, pg_ok, converged, ts = sys.argv[1:8]
 json.dump({"format": "oce-restore-transaction-rollback-receipt-v1",
            "reason": reason,
            "committed": False,
+           "converged_old_old": converged == "true",
            "artifact_switched": bool(before),
            "artifact_sha256_before": before or None,
            "artifact_sha256_after": after or None,
-           "artifact_restored": bool(before) and after == before,
+           "artifact_restored": (not before) or after == before,
            "postgres_rolled_back": pg_ok == "true",
            "redis_untouched": True,
+           "operator_reconciliation_command":
+             "pg-recovery.py --phase reconcile --receipt-in <promote-receipt> "
+             "--inventory <inventory.json> --inventory-sha <inventory.sha256>",
            "timestamp": ts},
           open(p, "w", encoding="utf-8"), indent=2)
 PY
@@ -356,8 +366,10 @@ PY
 # The interpreter used for durable-state reads is the SAME python restore.sh
 # otherwise uses: OCE_PYTHON may pin it (tests), python3 is the default.
 OCE_PYTHON="${OCE_PYTHON:-python3}"
+DURABLE_ROLLBACK_CLASS=4
 durable_precommit() {
   if [[ ! -f "$PROMOTE_RECEIPT" ]]; then
+    DURABLE_ROLLBACK_CLASS=0
     return 0   # no operation ever started: there is nothing to roll back
   fi
   # ONE authority for the commit law: the engine binds the exact promote
@@ -367,8 +379,13 @@ durable_precommit() {
     --classify-rollback "$PROMOTE_RECEIPT" \
     --transition-dir "$VAR_DIR/recovery/transitions" 2>/dev/null
   local cls=$?
+  DURABLE_ROLLBACK_CLASS="$cls"
   if [[ "$cls" -eq 0 ]]; then
-    return 0                        # pre-commit: both stores restorable
+    return 0                        # fresh rollback authority exists
+  elif [[ "$cls" -eq 5 ]]; then
+    echo "PRE-INTENT ABORT: finalize claim is spent before forward intent; " \
+         "the governed preintent-rollback phase will restore PostgreSQL first" >&2
+    return 0
   elif [[ "$cls" -eq 3 ]]; then
     echo "BLOCKED: PostgreSQL passed its irreversible commit point (durable " \
          "transition state); artifact-only rollback is forbidden — both stores " \
@@ -392,34 +409,60 @@ rollback_precommit() { # single owner of every pre-commit rollback
   fi
   [[ "$ARTIFACT_SWITCHED" == "true" || "$PG_PROMOTED" == "true" ]] || return 0
   local art_after=""
-  if [[ "$ARTIFACT_SWITCHED" == "true" && "$ARTIFACT_LIVE_SNAPSHOT" == "true" ]]; then
-    echo "rollback: restoring the original artifact volume from its snapshot..." >&2
-    # stopped-state restore + identity (see artifact_volume_sha_stopped)
-    artifact_stop
-    if artifact_restore_from "$LIVE_SNAPSHOT_DIR"; then
-      ARTIFACT_SWITCHED=false
+  local pg_ok=false
+  # If PostgreSQL was never promoted, its original canonical is already the
+  # rollback floor and requires no mutation. Only a promoted, unfinalized
+  # canonical needs the engine-owned rollback/abort phase.
+  if [[ "$PG_PROMOTED" != "true" ]]; then
+    pg_ok=true
+  fi
+  # PostgreSQL convergence is authoritative and happens FIRST. Never restore
+  # artifacts while the engine still owns a promoted canonical that cannot be
+  # rolled back through an authorized operation.
+  if [[ "$PG_PROMOTED" == "true" && "$PG_FINALIZED" != "true" ]]; then
+    echo "rollback: restoring the original PostgreSQL database first..." >&2
+    if [[ "$DURABLE_ROLLBACK_CLASS" -eq 5 ]]; then
+      pg_abort_finalize_preintent && pg_ok=true
     else
-      echo "WARNING: artifact rollback FAILED; the volume is not the original" >&2
+      pg_rollback_from_quarantine && pg_ok=true
+    fi
+  fi
+  if [[ "$pg_ok" != "true" ]]; then
+    write_transaction_rollback_receipt "$reason" "" false false
+    if [[ -n "$EV_DIR" ]]; then
+      cp "$TRANSACTION_RECEIPT" "$EV_DIR/transaction-rollback-receipt.json" 2>/dev/null || true
+    fi
+    echo "BLOCKED: PostgreSQL rollback did not verify; artifact state was left untouched" >&2
+    echo "RECONCILE: run pg-recovery.py --phase reconcile with the exact promote receipt" >&2
+    return 1
+  fi
+  if [[ "$ARTIFACT_SWITCHED" == "true" && "$ARTIFACT_LIVE_SNAPSHOT" == "true" ]]; then
+    echo "rollback: PostgreSQL verified old; restoring original artifact identity..." >&2
+    artifact_stop
+    if ! artifact_restore_from "$LIVE_SNAPSHOT_DIR"; then
+      artifact_start
+      write_transaction_rollback_receipt "$reason" "" true false
+      echo "BLOCKED: artifact restore command failed after verified PostgreSQL rollback" >&2
+      return 1
     fi
     art_after="$(artifact_volume_sha)"
     artifact_start
+    if [[ "$art_after" != "$ARTIFACT_BEFORE_SHA" ]]; then
+      write_transaction_rollback_receipt "$reason" "$art_after" true false
+      echo "BLOCKED: artifact identity mismatch after verified PostgreSQL rollback" >&2
+      return 1
+    fi
+    ARTIFACT_SWITCHED=false
   fi
-  local pg_ok=false
-  if [[ "$PG_PROMOTED" == "true" && "$PG_FINALIZED" != "true" ]]; then
-    echo "rollback: restoring the original PostgreSQL database from quarantine..." >&2
-    pg_rollback_from_quarantine && pg_ok=true
+  local converged=true
+  if [[ "$ARTIFACT_LIVE_SNAPSHOT" == "true" && "$art_after" != "$ARTIFACT_BEFORE_SHA" ]]; then
+    converged=false
   fi
-  # R40-R2: a post-commit receipt write failure (finalize exited nonzero but
-  # durably committed) must NOT reach this function at all — durable_precommit
-  # already refused. Belt and braces: if PG_FINALIZED is set, never restore.
-  [[ "$PG_FINALIZED" == "true" ]] && pg_ok=true
-  write_transaction_rollback_receipt "$reason" "$art_after" "$pg_ok"
+  write_transaction_rollback_receipt "$reason" "$art_after" "$pg_ok" "$converged"
   if [[ -n "$EV_DIR" ]]; then
     cp "$TRANSACTION_RECEIPT" "$EV_DIR/transaction-rollback-receipt.json" 2>/dev/null || true
   fi
-  if [[ "$ARTIFACT_LIVE_SNAPSHOT" == "true" && "$art_after" != "$ARTIFACT_BEFORE_SHA" ]]; then
-    echo "BLOCKED: pre-commit rollback could not restore the artifact volume" >&2
-  fi
+  [[ "$converged" == "true" ]]
 }
 trap 'rc=$?; if [ "$rc" -ne 0 ]; then rollback_precommit "${FAIL_NOTE:-restore exited $rc} before transaction commitment"; fi; register_op "$rc"; exit "$rc"' EXIT
 FAIL_NOTE=""  # each BLOCKED exit names its own failure site

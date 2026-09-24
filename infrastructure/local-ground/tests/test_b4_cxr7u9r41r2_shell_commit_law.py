@@ -87,8 +87,9 @@ def test_impossible_finalizing_commit_marker_fails_closed(tmp_path):
     assert rc == 4, rc
 
 
-def test_finalizing_without_marker_is_precommit(tmp_path):
-    assert _classify({"state": "FINALIZING"}, tmp_path) == 0
+def test_finalizing_without_intent_requires_preintent_abort(tmp_path):
+    assert _classify({"state": "FINALIZING",
+                      "selected_transition": "finalize"}, tmp_path) == 5
 
 
 def test_unknowable_record_fails_closed(tmp_path):

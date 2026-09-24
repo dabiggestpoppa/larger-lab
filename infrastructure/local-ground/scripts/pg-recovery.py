@@ -809,6 +809,106 @@ def _load_claim(operation_id):
         return None
 
 
+class _ExecutionAuthorityConflict(RuntimeError):
+    """A process already owns the operation's mutation interval."""
+
+
+class _OperationExecutionAuthority:
+    """One OS advisory lock per operation for the complete mutation interval.
+
+    The lock file is persistent evidence, not the authority. The operating
+    system owns the exclusive byte-range lock and releases it on process death,
+    so a killed executor cannot leave a permanent lease. Once locked, metadata
+    is rewritten with the exact operation, selected transition, receipt digest,
+    process id, and random token. A contender never trusts stale metadata when
+    the OS says the lock is held.
+    """
+    def __init__(self, operation_id, transition, promote):
+        self.operation_id = operation_id
+        self.transition = transition
+        self.promote = promote
+        self.fd = None
+        self.path = os.path.join(_transitions_dir(), f"{operation_id}.execution.lock")
+
+    def acquire(self):
+        os.makedirs(_transitions_dir(), mode=0o700, exist_ok=True)
+        fd = os.open(self.path, os.O_CREAT | os.O_RDWR, 0o600)
+        try:
+            if os.fstat(fd).st_size == 0:
+                os.write(fd, b"\0")
+            os.lseek(fd, 0, os.SEEK_SET)
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as e:
+            owner = "unknown"
+            try:
+                os.lseek(fd, 0, os.SEEK_SET)
+                raw = os.read(fd, 4096).decode("utf-8", errors="replace")
+                parsed = json.loads(raw)
+                owner = parsed.get("transition", "unknown")
+            except (OSError, ValueError):
+                pass
+            os.close(fd)
+            raise _ExecutionAuthorityConflict(
+                f"operation {self.operation_id} already has execution authority "
+                f"for {owner!r}; {self.transition!r} refused") from e
+        self.fd = fd
+        metadata = {
+            "format": "oce-operation-execution-authority-v1",
+            "operation_id": self.operation_id,
+            "transition": self.transition,
+            "receipt_sha256": _receipt_digest(self.promote),
+            "pid": os.getpid(),
+            "token": os.urandom(16).hex(),
+            "acquired_at": now_iso(),
+        }
+        payload = json.dumps(metadata, sort_keys=True, separators=(",", ":")) + "\n"
+        os.lseek(self.fd, 0, os.SEEK_SET)
+        os.ftruncate(self.fd, 0)
+        os.write(self.fd, payload.encode("utf-8"))
+        os.fsync(self.fd)
+        _fsync_dir(_transitions_dir())
+        return self
+
+    def __enter__(self):
+        return self.acquire()
+
+    def __exit__(self, exc_type, exc, tb):
+        if self.fd is None:
+            return False
+        try:
+            os.lseek(self.fd, 0, os.SEEK_SET)
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(self.fd, msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(self.fd, fcntl.LOCK_UN)
+        finally:
+            os.close(self.fd)
+            self.fd = None
+        return False
+
+
+def _execution_receipt_binding(receipt_path):
+    """Minimal identity used only to name/bind the execution lock.
+
+    Full receipt/state authority is still enforced by the phase body after the
+    lock is acquired and before any catalog or filesystem mutation.
+    """
+    promote = _load_receipt(receipt_path)
+    if not isinstance(promote, dict):
+        raise RuntimeError("promote receipt is not a JSON object")
+    operation_id = promote.get("operation_id")
+    if not isinstance(operation_id, str) or not OPERATION_ID_RE.match(operation_id):
+        raise RuntimeError("promote receipt operation id is missing or malformed")
+    return promote, operation_id
+
+
 def _bound_operation(promote, transition_dir=None):
     """Bind a promote receipt to its ONE durable operation record: the record
     must exist, its format must be known, its content digest must match this
@@ -987,6 +1087,33 @@ def _validated_resume_finalize_receipt(path, db, user, container, inventory_path
                 or not isinstance(commit_point.get("at"), str):
             raise RuntimeError("durable commit-point evidence is missing or malformed")
     return promote, stamp, quarantine, staging, operation_id, state
+
+
+def _validated_preintent_abort_receipt(path, db, user, container,
+                                       inventory_path, inventory_sha_path):
+    """Admit recovery of the already-selected finalize branch before intent."""
+    promote, stamp, quarantine, staging, operation_id = _validated_promote_receipt(
+        path, db, user, container, inventory_path, inventory_sha_path)
+    _operation_id, record = _bound_operation(promote)
+    if record.get("state") != TRANSITION_STATE_FINALIZING:
+        raise RuntimeError(
+            f"pre-intent abort requires FINALIZING, got {record.get('state')!r}")
+    if record.get("commit_intent") is not None \
+            or record.get("commit_point") is not None:
+        raise RuntimeError("pre-intent abort is forbidden after forward intent")
+    if record.get("selected_transition") != "finalize":
+        raise RuntimeError("pre-intent abort requires the selected finalize branch")
+    claim = _load_claim(operation_id)
+    if not isinstance(claim, dict) or claim.get("format") != _CLAIM_FORMAT \
+            or claim.get("operation_id") != operation_id \
+            or claim.get("transition") != "finalize" \
+            or claim.get("receipt_sha256") != _receipt_digest(promote):
+        raise RuntimeError("pre-intent abort finalize claim is missing, corrupt, or mismatched")
+    floor = _floor_from_record(operation_id)
+    if not isinstance(floor, dict) or not floor.get("tables") \
+            or not isinstance(floor.get("rows"), dict):
+        raise RuntimeError("pre-intent abort rollback floor is missing or malformed")
+    return promote, stamp, quarantine, staging, operation_id, floor
 
 
 def _floor_from_record(operation_id):
@@ -1365,8 +1492,8 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
 
 
 # ── phase: finalize ──────────────────────────────────────────────────────
-def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
-                   user, container, probe_spec, resume_only=False):
+def _phase_finalize_locked(receipt_in_path, inventory_path, inventory_sha_path, db,
+                           user, container, probe_spec, resume_only=False):
     receipt = _base_receipt("resume-finalize" if resume_only else "finalize",
                             db, user, container, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
@@ -1538,21 +1665,45 @@ def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
         return receipt
 
 
+def phase_finalize(receipt_in_path, inventory_path, inventory_sha_path, db,
+                   user, container, probe_spec):
+    """Fresh finalize under the operation's OS-backed execution authority."""
+    try:
+        promote, _stamp, _quarantine, _staging, operation_id = \
+            _validated_transition_receipt(
+                receipt_in_path, db, user, container, inventory_path,
+                inventory_sha_path, "finalize")
+    except Exception:
+        return _phase_finalize_locked(
+            receipt_in_path, inventory_path, inventory_sha_path, db, user,
+            container, probe_spec, resume_only=False)
+    with _OperationExecutionAuthority(operation_id, "finalize", promote):
+        return _phase_finalize_locked(
+            receipt_in_path, inventory_path, inventory_sha_path, db, user,
+            container, probe_spec, resume_only=False)
+
+
 def phase_resume_finalize(receipt_in_path, inventory_path, inventory_sha_path,
                            db, user, container, probe_spec):
-    """Explicitly resume a spent finalize claim after a crash.
-
-    This remains separate from fresh finalize so a concurrent duplicate
-    finalize still loses exactly once; restart authority is deliberate and
-    bound to the existing claim plus durable intent.
-    """
-    return phase_finalize(receipt_in_path, inventory_path, inventory_sha_path,
-                          db, user, container, probe_spec, resume_only=True)
+    """Resume a spent finalize claim after a crash under the same executor lock."""
+    try:
+        (promote, _stamp, _quarantine, _staging,
+         operation_id, _state) = _validated_resume_finalize_receipt(
+             receipt_in_path, db, user, container, inventory_path,
+             inventory_sha_path)
+    except Exception:
+        return _phase_finalize_locked(
+            receipt_in_path, inventory_path, inventory_sha_path, db, user,
+            container, probe_spec, resume_only=True)
+    with _OperationExecutionAuthority(operation_id, "resume-finalize", promote):
+        return _phase_finalize_locked(
+            receipt_in_path, inventory_path, inventory_sha_path, db, user,
+            container, probe_spec, resume_only=True)
 
 
 # ── phase: rollback (explicit) ───────────────────────────────────────────
-def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
-                   user, container, probe_spec):
+def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, db,
+                           user, container, probe_spec):
     receipt = _base_receipt("rollback", db, user, container, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
     targets = _governed_identity_problems(db, user, container)
@@ -1595,6 +1746,107 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 1
         _record_transition(operation_id, "FAILED", promote, extra={"error": str(e)})
+        return receipt
+
+
+def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
+                   user, container, probe_spec):
+    try:
+        promote, _stamp, _quarantine, _staging, operation_id = \
+            _validated_transition_receipt(
+                receipt_in_path, db, user, container, inventory_path,
+                inventory_sha_path, "rollback")
+    except Exception:
+        return _phase_rollback_locked(
+            receipt_in_path, inventory_path, inventory_sha_path, db, user,
+            container, probe_spec)
+    with _OperationExecutionAuthority(operation_id, "rollback", promote):
+        return _phase_rollback_locked(
+            receipt_in_path, inventory_path, inventory_sha_path, db, user,
+            container, probe_spec)
+
+
+# ── phase: pre-intent rollback (finalize-claimed recovery) ─────────────
+def phase_preintent_rollback(receipt_in_path, inventory_path, inventory_sha_path,
+                             db, user, container, probe_spec):
+    """Recover the selected finalize branch after death before forward intent."""
+    receipt = _base_receipt("preintent-rollback", db, user, container,
+                            inventory_path)
+    receipt["promote_receipt"] = receipt_in_path
+    targets = _governed_identity_problems(db, user, container)
+    if targets:
+        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+    try:
+        (promote, _stamp, _quarantine, _staging,
+         operation_id, _floor) = _validated_preintent_abort_receipt(
+             receipt_in_path, db, user, container, inventory_path,
+             inventory_sha_path)
+    except Exception as e:
+        return _blocked(receipt, f"refusing pre-intent abort authority: {e}")
+    try:
+        with _OperationExecutionAuthority(operation_id, "preintent-rollback", promote):
+            # Re-validate after acquiring the OS lock: no finalize executor or
+            # competing recovery process can mutate while this authority is held.
+            (promote, stamp, quarantine, staging, operation_id,
+             floor) = _validated_preintent_abort_receipt(
+                 receipt_in_path, db, user, container, inventory_path,
+                 inventory_sha_path)
+            receipt.update({
+                "stamp": stamp,
+                "staging_database": staging,
+                "quarantine_database": quarantine,
+                "source_archive_sha256": promote.get("source_archive_sha256"),
+                "promoted": True,
+                "rollback_required": True,
+                "rollback_attempted": True,
+            })
+            inventory = _load_protected_inventory(inventory_path,
+                                                   inventory_sha_path)
+            probe = parse_probe_spec(probe_spec)
+            if not db_exists(container, user, quarantine):
+                raise RuntimeError("pre-intent abort quarantine is missing")
+            ok, problems, rows, fps = _verify_db(
+                container, db, user, inventory, probe)
+            receipt["canonical_verification"] = {
+                "result": "ok" if ok else "failed", "tables": rows,
+            }
+            if fps is not None:
+                receipt["canonical_verification"]["fingerprints"] = fps
+            if not ok:
+                raise RuntimeError("pre-intent canonical verification failed: "
+                                   + "; ".join(problems))
+            ok_rb, rb_problems, rb_detail = rollback_recovery(
+                container, user, db, quarantine, inventory, probe, floor=floor)
+            receipt.update(rb_detail)
+            receipt["rollback_succeeded"] = ok_rb
+            receipt["rollback_failed"] = not ok_rb
+            if not ok_rb:
+                receipt["rollback_error"] = "; ".join(rb_problems)
+                raise RuntimeError(receipt["rollback_error"])
+            _record_transition(
+                operation_id, "ROLLED_BACK", promote,
+                extra={"preintent_abort": {
+                    "marker": "finalize_aborted_before_intent",
+                    "operation_id": operation_id,
+                    "receipt_sha256": _receipt_digest(promote),
+                    "at": now_iso(),
+                }})
+            receipt["finished_at"] = now_iso()
+            receipt["exit_status"] = 0
+            return receipt
+    except _ExecutionAuthorityConflict:
+        # Execution-authority contention is not an operation receipt. Writing
+        # one would make the loser mutate evidence despite being refused.
+        raise
+    except Exception as e:
+        if not receipt.get("error"):
+            receipt["error"] = str(e)
+        receipt.setdefault("rollback_attempted", True)
+        receipt.setdefault("rollback_succeeded", False)
+        receipt.setdefault("rollback_failed", True)
+        receipt.setdefault("original_canonical_restored", False)
+        receipt["finished_at"] = now_iso()
+        receipt["exit_status"] = 1
         return receipt
 
 
@@ -1681,16 +1933,15 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
             verdict = "committed"
         else:
             verdict = "unreconciled"
-    elif state in (TRANSITION_STATE_FINALIZING, TRANSITION_STATE_ROLLING_BACK):
-        # Claim taken, commit point not reached. Quarantine presence decides:
-        # it is the physical rollback source.
-        if observation["quarantine_present"] is False \
+    elif state == TRANSITION_STATE_FINALIZING:
+        if observation["quarantine_present"] is True \
                 and observation["canonical_matches_inventory"] is True:
-            # Durable record says the commit point was NOT reached, yet the
-            # quarantine is gone: the two authorities disagree — fail closed.
+            verdict = "preintent_abort_required"
+        else:
             verdict = "unreconciled"
-        elif observation["quarantine_present"] is True:
-            verdict = "rolled_back_available"   # original still restorable
+    elif state == TRANSITION_STATE_ROLLING_BACK:
+        if observation["quarantine_present"] is True:
+            verdict = "rolled_back_available"
         else:
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_PROMOTED:
@@ -1702,9 +1953,9 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     receipt["verdict"] = verdict
     receipt["committed"] = verdict == "committed"
     receipt["finished_at"] = now_iso()
-    receipt["exit_status"] = 0 if verdict in ("committed", "rolled_back",
-                                              "rolled_back_available",
-                                              "resume_required") else 1
+    receipt["exit_status"] = 0 if verdict in (
+        "committed", "rolled_back", "rolled_back_available",
+        "preintent_abort_required", "resume_required") else 1
     return receipt
 
 
@@ -1725,7 +1976,9 @@ def _classify_record_for_shell(record, promote=None):
         # (the old drop-before-record window). Never treat it as authority.
         if record.get("commit_intent") is not None or record.get("commit_point") is not None:
             return 4
-        return 0
+        if record.get("selected_transition") == "finalize":
+            return 5
+        return 4
     if state in ("CREATED", "STAGED", TRANSITION_STATE_PROMOTED,
                  TRANSITION_STATE_ROLLING_BACK, "ROLLED_BACK", "FAILED"):
         if state == TRANSITION_STATE_ROLLING_BACK \
@@ -1806,9 +2059,9 @@ def _parse_cli(argv):
 
 def _validate_cli(phase, kw):
     """Fail closed on incomplete recovery invocations (usage errors, exit 2)."""
-    if phase not in ("promote", "finalize", "resume-finalize", "rollback",
-                     "reconcile"):
-        print("USAGE_ERROR: --phase <promote|finalize|resume-finalize|rollback|reconcile> required",
+    if phase not in ("promote", "finalize", "resume-finalize",
+                     "preintent-rollback", "rollback", "reconcile"):
+        print("USAGE_ERROR: --phase <promote|finalize|resume-finalize|preintent-rollback|rollback|reconcile> required",
               file=sys.stderr)
         sys.exit(2)
     if not kw.get("inventory") or not kw.get("inventory_sha"):
@@ -1817,8 +2070,8 @@ def _validate_cli(phase, kw):
     if phase == "promote" and not kw.get("archive"):
         print("USAGE_ERROR: --phase promote requires --archive", file=sys.stderr)
         sys.exit(2)
-    if phase in ("finalize", "resume-finalize", "rollback", "reconcile") \
-            and not kw.get("receipt_in"):
+    if phase in ("finalize", "resume-finalize", "preintent-rollback",
+                 "rollback", "reconcile") and not kw.get("receipt_in"):
         print(f"USAGE_ERROR: --phase {phase} requires --receipt-in", file=sys.stderr)
         sys.exit(2)
     targets = _governed_identity_problems(kw.get("db", DB), kw.get("user", USER),
@@ -1861,22 +2114,34 @@ def main():
             sys.exit(2)
     # the destructive destination is the governed identity, full stop
     db, user, container = DB, USER, CONTAINER
-    if phase == "promote":
-        receipt = phase_promote(kw["archive"], kw["inventory"], kw["inventory_sha"],
-                                db, user, container, probe)
-    elif phase == "finalize":
-        receipt = phase_finalize(kw["receipt_in"], kw["inventory"], kw["inventory_sha"],
-                                 db, user, container, probe)
-    elif phase == "resume-finalize":
-        receipt = phase_resume_finalize(kw["receipt_in"], kw["inventory"],
-                                        kw["inventory_sha"], db, user, container,
-                                        probe)
-    elif phase == "reconcile":
-        receipt = phase_reconcile(kw["receipt_in"], kw["inventory"], kw["inventory_sha"],
-                                  db, user, container, probe)
-    else:
-        receipt = phase_rollback(kw["receipt_in"], kw["inventory"], kw["inventory_sha"],
-                                 db, user, container, probe)
+    try:
+        if phase == "promote":
+            receipt = phase_promote(kw["archive"], kw["inventory"],
+                                    kw["inventory_sha"], db, user, container, probe)
+        elif phase == "finalize":
+            receipt = phase_finalize(kw["receipt_in"], kw["inventory"],
+                                     kw["inventory_sha"], db, user, container, probe)
+        elif phase == "resume-finalize":
+            receipt = phase_resume_finalize(
+                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
+                container, probe)
+        elif phase == "preintent-rollback":
+            receipt = phase_preintent_rollback(
+                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
+                container, probe)
+        elif phase == "reconcile":
+            receipt = phase_reconcile(
+                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
+                container, probe)
+        else:
+            receipt = phase_rollback(
+                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
+                container, probe)
+    except _ExecutionAuthorityConflict as e:
+        # A refused contender must not write a phase receipt: it owns no
+        # operation mutation interval and therefore owns no new evidence.
+        print("BLOCKED:", e, file=sys.stderr)
+        sys.exit(1)
     if out:
         try:
             _commit_receipt(out, receipt)
