@@ -428,17 +428,73 @@ def _s3_request(method, bucket, key, body=b"", access="oce-local-access",
                                        diagnostics)
 
 
+def _artifact_image_identity(image):
+    inspected = subprocess.run(["docker", "image", "inspect", image],
+                               capture_output=True, text=True, timeout=30)
+    assert inspected.returncode == 0, inspected.stderr
+    metadata = json.loads(inspected.stdout)[0]
+    labels = metadata["Config"]["Labels"]
+    version = oc.dexec(oc.ARTIFACT, ["minio", "--version"]).stdout
+    return {
+        "image_id": metadata["Id"],
+        "revision": labels["org.opencontainers.image.revision"],
+        "release": "RELEASE.2024-05-28T17-19-04Z"
+        if "RELEASE.2024-05-28T17-19-04Z" in version else version,
+    }
+
+
+def _artifact_runtime_identity():
+    inspected = subprocess.run(["docker", "inspect", oc.ARTIFACT],
+                               capture_output=True, text=True, timeout=30)
+    assert inspected.returncode == 0, inspected.stderr
+    container = json.loads(inspected.stdout)[0]
+    mounts = [mount for mount in container["Mounts"]
+              if mount.get("Destination") == "/data"]
+    assert len(mounts) == 1, container["Mounts"]
+    mount = mounts[0]
+    assert mount.get("Type") == "volume", mount
+    return {"container_image": container["Image"],
+            "volume_name": mount["Name"],
+            "volume_source": mount["Source"]}
+
+
+def _assert_s3_restart_durability(expected_body, observed_status, observed_body,
+                                  before_runtime, after_runtime,
+                                  before_image, after_image):
+    assert observed_status == b"200", observed_status
+    assert observed_body == expected_body, (observed_body, expected_body)
+    assert after_runtime == before_runtime, (before_runtime, after_runtime)
+    assert after_image == before_image, (before_image, after_image)
+
+
+@pytest.mark.parametrize("failure", [
+    "object_disappears", "wrong_body", "different_volume", "different_image",
+])
+def test_s3_restart_durability_negative_controls_fail(failure):
+    good_runtime = {"container_image": "sha256:image", "volume_name": "data",
+                    "volume_source": "/var/lib/docker/volumes/data/_data"}
+    good_image = {"image_id": "sha256:image", "revision": "f79a4ef4",
+                  "release": "RELEASE.2024-05-28T17-19-04Z"}
+    status, body, after_runtime, after_image = b"200", b"payload", good_runtime, good_image
+    if failure == "object_disappears":
+        body = b""
+    elif failure == "wrong_body":
+        body = b"wrong"
+    elif failure == "different_volume":
+        after_runtime = {**good_runtime, "volume_name": "other"}
+    else:
+        after_image = {**good_image, "image_id": "sha256:other"}
+    with pytest.raises(AssertionError):
+        _assert_s3_restart_durability(b"payload", status, body, good_runtime,
+                                      after_runtime, good_image, after_image)
+
+
 def test_official_source_image_health_s3_and_persistence(oce_stack, tmp_path):
     oc.assert_stack_converged(timeout_s=600, stable=3)
     image = "oce-local/artifact-store:RELEASE.2024-05-28T17-19-04Z-f79a4ef4d0dc"
-    inspect = subprocess.run(["docker", "image", "inspect", image], capture_output=True,
-                             text=True, timeout=30)
-    assert inspect.returncode == 0, inspect.stderr
-    metadata = json.loads(inspect.stdout)[0]
-    labels = metadata["Config"]["Labels"]
-    assert labels["org.opencontainers.image.revision"] == "f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531"
-    version = oc.dexec(oc.ARTIFACT, ["minio", "--version"]).stdout
-    assert "RELEASE.2024-05-28T17-19-04Z" in version
+    before_image = _artifact_image_identity(image)
+    assert before_image["revision"] == "f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531"
+    before_runtime = _artifact_runtime_identity()
     # S3 API write/read against the running OCE-owned image.
     body = b"r41r4-official-source"
     bucket = _s3_request("PUT", "r41r4-proof", "", b"")
@@ -454,6 +510,14 @@ def test_official_source_image_health_s3_and_persistence(oce_stack, tmp_path):
                    timeout=30)
     subprocess.run(["docker", "restart", oc.ARTIFACT], check=True, timeout=120)
     oc.assert_stack_converged(timeout_s=180, stable=2)
+    after_image = _artifact_image_identity(image)
+    after_runtime = _artifact_runtime_identity()
+    post_restart = _s3_request("GET", "r41r4-proof", "payload")
+    assert post_restart.stdout.endswith(b"\n200"), post_restart.stdout
+    post_restart_body = post_restart.stdout.rsplit(b"\n", 1)[0]
+    _assert_s3_restart_durability(body, post_restart.stdout.rsplit(b"\n", 1)[1],
+                                  post_restart_body, before_runtime, after_runtime,
+                                  before_image, after_image)
     got = subprocess.run(["docker", "exec", oc.ARTIFACT, "cat", "/data/restart-marker"],
                          capture_output=True, text=True, timeout=30)
     assert got.stdout.strip() == "survives"
