@@ -4419,9 +4419,11 @@ class RecoveryEngine:
         ``_lock_owners`` truth, and the job's local RLock can be probed
         safely.  The RLock probe alone is NOT sufficient (the owning
         thread can always re-acquire an RLock) — the owner-map check is
-        load-bearing.  The RecoveryAction is journaled BEFORE removal
-        (evidence precedes mutation); any refusal leaves the lock exactly
-        as it was.  Never invoked by apply_plan.
+        load-bearing.  INTENT is journaled before removal; after continuous
+        final ownership authority covers unlink and parent-directory fsync,
+        the RecoveryAction is journaled before terminal COMPLETED.  Any
+        refusal leaves the lock exactly as it was.  Never invoked by
+        apply_plan.
         """
         if owner_repository is None:
             raise RecoveryConfigurationError(
