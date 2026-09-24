@@ -1,10 +1,33 @@
-"""SENSOR-B4-I10 — rebuildable DuckDB discovery catalog.
+"""SENSOR-B4-I10/I10R1 — rebuildable DuckDB discovery catalog.
 
 DuckDB is a rebuildable analytical index over durable Bloc-4 evidence. This
 module never owns evidence, manifests, pointers, revisions, recovery state, or
 resume authority. Rebuild reads validated durable fragments, writes a new
 DuckDB file beside the requested output, validates it, and only then replaces
 the rebuildable output.
+
+I10R1 microseal invariants (operator review SENSOR-B4-I10R1):
+
+- ONE ordered schema contract (``VIEW_SCHEMAS``) drives table DDL, insert
+  column order, and pre-publication validation for every view — empty,
+  single-row, many-row, and nullable-first-row datasets all get the exact
+  same physical schema. SQL types are never inferred from runtime values.
+- Every discovery row must match the contract key set EXACTLY. Missing keys
+  never silently become NULL (no ``row.get``); extra keys are refused;
+  malformed shape raises typed ``DuckDBCatalogShapeCorrupt``.
+- The candidate catalog is built inside one explicit transaction and fully
+  validated (metadata row, all eight views, exact column names/order/SQL
+  types, row counts) before ``os.replace`` publishes it.
+- ``ReadOnlyDuckDBCatalog`` refuses any catalog whose stored schema version
+  or data-root role does not match this build (stale/future/mismatched).
+- Rebuild is a metadata/discovery pass, NOT an integrity rescan: T0A
+  payloads are never read, hashed, or decompressed. Physical facts are
+  validated at metadata level (safe key, exists, regular file, stored size).
+  Full H1 verification remains owned by the integrity/recovery machinery.
+- Storage usage aggregates over EVERY output dimension (evidence class,
+  integrity/state, provider, sensor family, storage priority, universe
+  tier); identities a durable record does not own stay NULL rather than
+  being falsely attributed.
 """
 
 from __future__ import annotations
@@ -38,6 +61,149 @@ VIEW_NAMES = (
     "v_t0_storage_usage",
 )
 CATALOG_SCHEMA_VERSION = "1.0"
+CATALOG_ROLE = "rebuildable_discovery_non_authoritative"
+
+# ---------------------------------------------------------------------------
+# ONE ordered view-schema authority (I10R1 §3)
+# ---------------------------------------------------------------------------
+
+VIEW_SCHEMAS: dict[str, tuple[tuple[str, str], ...]] = {
+    "v_t0_blobs": (
+        ("blob_sha256", "VARCHAR"),
+        ("byte_length", "BIGINT"),
+        ("stored_byte_length", "BIGINT"),
+        ("storage_object_key", "VARCHAR"),
+        ("backend_id", "VARCHAR"),
+        ("resolved_local_path", "VARCHAR"),
+        ("source_media_type", "VARCHAR"),
+        ("storage_encoding", "VARCHAR"),
+        ("integrity_state", "VARCHAR"),
+        ("created_at", "VARCHAR"),
+    ),
+    "v_t0_acquisitions": (
+        ("acquisition_id", "VARCHAR"),
+        ("provider_id", "VARCHAR"),
+        ("venue", "VARCHAR"),
+        ("sensor_family", "VARCHAR"),
+        ("request_fingerprint", "VARCHAR"),
+        ("native_instrument", "VARCHAR"),
+        ("requested_start", "VARCHAR"),
+        ("requested_end", "VARCHAR"),
+        ("actual_start", "VARCHAR"),
+        ("actual_end", "VARCHAR"),
+        ("response_observed_at", "VARCHAR"),
+        ("ingested_at", "VARCHAR"),
+        ("blob_sha256", "VARCHAR"),
+        ("failure_ref", "VARCHAR"),
+        ("schema_state", "VARCHAR"),
+    ),
+    "v_t0_projections": (
+        ("projection_id", "VARCHAR"),
+        ("provider", "VARCHAR"),
+        ("venue", "VARCHAR"),
+        ("sensor_family", "VARCHAR"),
+        ("native_instrument", "VARCHAR"),
+        ("partition_key", "VARCHAR"),
+        ("projection_schema_id", "VARCHAR"),
+        ("projection_schema_version", "VARCHAR"),
+        ("parser_version", "VARCHAR"),
+        ("projection_object_key", "VARCHAR"),
+        ("backend_id", "VARCHAR"),
+        ("resolved_local_path", "VARCHAR"),
+        ("projection_sha256", "VARCHAR"),
+        ("row_count", "BIGINT"),
+        ("stored_bytes", "BIGINT"),
+        ("state", "VARCHAR"),
+        ("lineage_manifest_id", "VARCHAR"),
+        ("source_count", "BIGINT"),
+    ),
+    "v_t0_partitions": (
+        ("partition_manifest_id", "VARCHAR"),
+        ("partition_key", "VARCHAR"),
+        ("manifest_version", "BIGINT"),
+        ("is_current", "BOOLEAN"),
+        ("provider", "VARCHAR"),
+        ("venue", "VARCHAR"),
+        ("sensor_family", "VARCHAR"),
+        ("native_instrument", "VARCHAR"),
+        ("blob_refs", "VARCHAR[]"),
+        ("projection_refs", "VARCHAR[]"),
+        ("coverage_state", "VARCHAR"),
+        ("integrity_state", "VARCHAR"),
+        ("gap_count", "BIGINT"),
+        ("revision_count", "BIGINT"),
+        ("supersedes_manifest_id", "VARCHAR"),
+    ),
+    "v_t0_gaps": (
+        ("gap_id", "VARCHAR"),
+        ("scope", "VARCHAR"),
+        ("scope_id", "VARCHAR"),
+        ("missingness", "VARCHAR"),
+        ("detail", "VARCHAR"),
+    ),
+    "v_t0_revisions": (
+        ("source_revision_key", "VARCHAR"),
+        ("revision_number", "BIGINT"),
+        ("segment_id", "VARCHAR"),
+        ("blob_sha256", "VARCHAR"),
+        ("first_acquisition_id", "VARCHAR"),
+        ("first_seen_at", "VARCHAR"),
+        ("revision_state", "VARCHAR"),
+        ("revision_reason", "VARCHAR"),
+    ),
+    "v_t0_quarantine": (
+        ("recovery_action_id", "VARCHAR"),
+        ("recovery_run_id", "VARCHAR"),
+        ("object_type", "VARCHAR"),
+        ("object_id", "VARCHAR"),
+        ("problem", "VARCHAR"),
+        ("resolution", "VARCHAR"),
+        ("action_kind", "VARCHAR"),
+    ),
+    "v_t0_storage_usage": (
+        ("evidence_class", "VARCHAR"),
+        ("integrity_state", "VARCHAR"),
+        ("provider", "VARCHAR"),
+        ("sensor_family", "VARCHAR"),
+        ("storage_priority", "VARCHAR"),
+        ("universe_tier", "VARCHAR"),
+        ("stored_bytes", "BIGINT"),
+        ("raw_bytes", "BIGINT"),
+        ("projection_bytes", "BIGINT"),
+        ("object_count", "BIGINT"),
+    ),
+}
+
+# Columns whose SQL type is numeric/boolean/list — never VARCHAR-able.
+_NON_VARCHAR_COLUMNS = frozenset({"BIGINT", "BOOLEAN", "VARCHAR[]"})
+
+# Columns where an intentionally-None value is part of frozen discovery
+# semantics (I10R1 §4).  A None in any OTHER column is a shape violation.
+VIEW_NULLABLE_COLUMNS: dict[str, frozenset[str]] = {
+    "v_t0_blobs": frozenset(),
+    "v_t0_acquisitions": frozenset(
+        {"actual_start", "actual_end", "blob_sha256", "failure_ref", "schema_state"}
+    ),
+    "v_t0_projections": frozenset(),
+    "v_t0_partitions": frozenset({"supersedes_manifest_id", "gap_count"}),
+    "v_t0_gaps": frozenset({"detail"}),
+    "v_t0_revisions": frozenset({"revision_reason"}),
+    # action_kind is an optional envelope field (RecoveryJournal.record: str | None).
+    "v_t0_quarantine": frozenset({"action_kind"}),
+    "v_t0_storage_usage": frozenset(
+        {"provider", "sensor_family", "storage_priority", "universe_tier", "stored_bytes"}
+    ),
+}
+
+def _quote_ident(identifier: str) -> str:
+    """Quote one SQL identifier; internal quotes are doubled."""
+    return '"' + identifier.replace('"', '""') + '"'
+
+
+_VIEW_COLUMNS: dict[str, str] = {
+    name: ", ".join(f"{_quote_ident(column)} {sql_type}" for column, sql_type in schema)
+    for name, schema in VIEW_SCHEMAS.items()
+}
 
 
 class DuckDBCatalogError(RuntimeError):
@@ -48,8 +214,16 @@ class DuckDBCatalogCorrupt(DuckDBCatalogError):
     """Durable evidence is corrupt, dangling, or internally inconsistent."""
 
 
+class DuckDBCatalogShapeCorrupt(DuckDBCatalogCorrupt):
+    """A durable discovery row does not match the frozen view schema shape."""
+
+
 class DuckDBCatalogPublishError(DuckDBCatalogError):
     """A validated rebuild could not be durably published."""
+
+
+class DuckDBCatalogVersionError(DuckDBCatalogError):
+    """A catalog file does not carry the expected schema version and role."""
 
 
 @dataclass(frozen=True)
@@ -132,7 +306,14 @@ def _require_file_under(root: Path, object_key: str, label: str) -> Path:
 
 
 def _read_blobs(root: Path) -> list[dict[str, Any]]:
-    directory = root / "catalogs" / "manifests" / "blobs"
+    """Metadata-level T0A discovery (I10R1 Defect C repair).
+
+    Reads ONLY durable manifest metadata and file stat facts.  The payload is
+    never opened, hashed, or decompressed: full H1 content verification stays
+    owned by the integrity/recovery machinery, and its durable
+    ``integrity_state`` is used as-is here.  Missing physical blobs and
+    stored-size divergence still fail typed.
+    """    directory = root / "catalogs" / "manifests" / "blobs"
     rows: list[dict[str, Any]] = []
     for path in sorted(directory.glob("*.parquet")) if directory.exists() else []:
         try:
@@ -447,63 +628,122 @@ def _storage_usage(blobs: list[dict[str, Any]], projections: list[dict[str, Any]
     return [usage[key] for key in sorted(usage, key=lambda item: tuple("" if v is None else v for v in item))]
 
 
-_VIEW_DDL: dict[str, str] = {
-    "v_t0_blobs": "CREATE VIEW v_t0_blobs AS SELECT * FROM t0_blobs",
-    "v_t0_acquisitions": "CREATE VIEW v_t0_acquisitions AS SELECT * FROM t0_acquisitions",
-    "v_t0_projections": "CREATE VIEW v_t0_projections AS SELECT * FROM t0_projections",
-    "v_t0_partitions": "CREATE VIEW v_t0_partitions AS SELECT * FROM t0_partitions",
-    "v_t0_gaps": "CREATE VIEW v_t0_gaps AS SELECT * FROM t0_gaps",
-    "v_t0_revisions": "CREATE VIEW v_t0_revisions AS SELECT * FROM t0_revisions",
-    "v_t0_quarantine": "CREATE VIEW v_t0_quarantine AS SELECT * FROM t0_quarantine",
-    "v_t0_storage_usage": "CREATE VIEW v_t0_storage_usage AS SELECT * FROM t0_storage_usage",
-}
+def _require_contract_row(name: str, row: dict[str, Any], source: str) -> None:
+    """Strict row shape against the ONE schema contract (I10R1 §4).
+
+    The row must carry EXACTLY the contract keys.  Missing fields are refused
+    (they never silently become NULL); extra fields are refused; an
+    intentionally-None value is accepted only in columns nullable by frozen
+    discovery semantics.  Wrong scalar/list typing is refused where DuckDB
+    would otherwise coerce it into plausible data.
+    """
+    schema = VIEW_SCHEMAS.get(name)
+    if schema is None:
+        raise DuckDBCatalogShapeCorrupt(f"{source}: unknown discovery view {name!r}")
+    expected = {column for column, _ in schema}
+    actual = set(row)
+    missing = sorted(expected - actual)
+    extra = sorted(actual - expected)
+    if missing or extra:
+        raise DuckDBCatalogShapeCorrupt(
+            f"{source}: row shape does not match {name} contract "
+            f"(missing={missing}, unexpected={extra})"
+        )
+    nullable = VIEW_NULLABLE_COLUMNS[name]
+    for column, sql_type in schema:
+        value = row[column]
+        if value is None:
+            if column not in nullable:
+                raise DuckDBCatalogShapeCorrupt(
+                    f"{source}: {name}.{column} is None but not nullable by discovery semantics"
+                )
+            continue
+        if sql_type in _NON_VARCHAR_COLUMNS:
+            if sql_type == "BOOLEAN":
+                if not isinstance(value, bool):
+                    raise DuckDBCatalogShapeCorrupt(
+                        f"{source}: {name}.{column} must be BOOLEAN, got {type(value).__name__}"
+                    )
+            elif sql_type == "BIGINT":
+                if isinstance(value, bool) or not isinstance(value, int):
+                    raise DuckDBCatalogShapeCorrupt(
+                        f"{source}: {name}.{column} must be BIGINT, got {type(value).__name__}"
+                    )
+            else:  # VARCHAR[]
+                if not isinstance(value, list) or not all(
+                    item is None or isinstance(item, str) for item in value
+                ):
+                    raise DuckDBCatalogShapeCorrupt(
+                        f"{source}: {name}.{column} must be a VARCHAR[] list"
+                    )
+        elif not isinstance(value, str):
+            raise DuckDBCatalogShapeCorrupt(
+                f"{source}: {name}.{column} must be VARCHAR, got {type(value).__name__}"
+            )
 
 
 def _create_table(con: duckdb.DuckDBPyConnection, name: str, rows: list[dict[str, Any]]) -> None:
-    if not rows:
-        columns = {
-            "v_t0_blobs": "blob_sha256 VARCHAR, byte_length BIGINT, stored_byte_length BIGINT, storage_object_key VARCHAR, backend_id VARCHAR, resolved_local_path VARCHAR, source_media_type VARCHAR, storage_encoding VARCHAR, integrity_state VARCHAR, created_at VARCHAR",
-            "v_t0_acquisitions": "acquisition_id VARCHAR, provider_id VARCHAR, venue VARCHAR, sensor_family VARCHAR, request_fingerprint VARCHAR, native_instrument VARCHAR, requested_start VARCHAR, requested_end VARCHAR, actual_start VARCHAR, actual_end VARCHAR, response_observed_at VARCHAR, ingested_at VARCHAR, blob_sha256 VARCHAR, failure_ref VARCHAR, schema_state VARCHAR",
-            "v_t0_projections": "projection_id VARCHAR, provider VARCHAR, venue VARCHAR, sensor_family VARCHAR, native_instrument VARCHAR, partition_key VARCHAR, projection_schema_id VARCHAR, projection_schema_version VARCHAR, parser_version VARCHAR, projection_object_key VARCHAR, backend_id VARCHAR, resolved_local_path VARCHAR, projection_sha256 VARCHAR, row_count BIGINT, stored_bytes BIGINT, state VARCHAR, lineage_manifest_id VARCHAR, source_count BIGINT",
-            "v_t0_partitions": "partition_manifest_id VARCHAR, partition_key VARCHAR, manifest_version BIGINT, is_current BOOLEAN, provider VARCHAR, venue VARCHAR, sensor_family VARCHAR, native_instrument VARCHAR, blob_refs VARCHAR[], projection_refs VARCHAR[], coverage_state VARCHAR, integrity_state VARCHAR, gap_count BIGINT, revision_count BIGINT, supersedes_manifest_id VARCHAR",
-            "v_t0_gaps": "gap_id VARCHAR, scope VARCHAR, scope_id VARCHAR, missingness VARCHAR, detail VARCHAR",
-            "v_t0_revisions": "source_revision_key VARCHAR, revision_number BIGINT, segment_id VARCHAR, blob_sha256 VARCHAR, first_acquisition_id VARCHAR, first_seen_at VARCHAR, revision_state VARCHAR, revision_reason VARCHAR",
-            "v_t0_quarantine": "recovery_action_id VARCHAR, recovery_run_id VARCHAR, object_type VARCHAR, object_id VARCHAR, problem VARCHAR, resolution VARCHAR, action_kind VARCHAR",
-            "v_t0_storage_usage": "evidence_class VARCHAR, integrity_state VARCHAR, provider VARCHAR, sensor_family VARCHAR, storage_priority VARCHAR, universe_tier VARCHAR, stored_bytes BIGINT, raw_bytes BIGINT, projection_bytes BIGINT, object_count BIGINT",
-        }
-        con.execute(f"CREATE TABLE t0_{name.removeprefix('v_t0_')} ({columns[name]})")
-    else:
-        first = rows[0]
-        declarations = []
-        for column, value in first.items():
-            if isinstance(value, bool):
-                kind = "BOOLEAN"
-            elif isinstance(value, int):
-                kind = "BIGINT"
-            elif isinstance(value, list):
-                kind = "VARCHAR[]"
-            else:
-                kind = "VARCHAR"
-            declarations.append(f"{column} {kind}")
-        table_name = f"t0_{name.removeprefix('v_t0_')}"
-        con.execute(f"CREATE TABLE {table_name} ({', '.join(declarations)})")
-        keys = list(first)
-        placeholders = ", ".join("?" for _ in keys)
-        con.executemany(f"INSERT INTO {table_name} VALUES ({placeholders})", [[row.get(key) for key in keys] for row in rows])
-    con.execute(_VIEW_DDL[name])
+    """Create one backing table and its view from the ONE schema contract.
+
+    The table DDL is identical whether the dataset is empty, single-row, or
+    many-row; the insert column order is the contract order; identifiers are
+    quoted; the view is a plain projection over the backing table.  The
+    caller owns the surrounding transaction.
+    """
+    schema = VIEW_SCHEMAS[name]
+    table_name = f"t0_{name.removeprefix('v_t0_')}"
+    con.execute(
+        f"CREATE TABLE {_quote_ident(table_name)} ({_VIEW_COLUMNS[name]})"
+    )
+    if rows:
+        for row in rows:
+            _require_contract_row(name, row, f"table {table_name}")
+        columns = ", ".join(_quote_ident(column) for column, _ in schema)
+        placeholders = ", ".join("?" for _ in schema)
+        values = [[row[column] for column, _ in schema] for row in rows]
+        con.executemany(
+            f"INSERT INTO {_quote_ident(table_name)} ({columns}) VALUES ({placeholders})",
+            values,
+        )
+    con.execute(f"CREATE VIEW {_quote_ident(name)} AS SELECT * FROM {_quote_ident(table_name)}")
 
 
 def _validate_database(path: Path, expected_counts: dict[str, int]) -> None:
+    """Prove the FULL frozen contract before publication (I10R1 §6)."""
     try:
         con = duckdb.connect(str(path), read_only=True)
     except Exception as exc:
         raise DuckDBCatalogPublishError(f"rebuilt catalog cannot open read-only: {exc}") from exc
     try:
-        existing = {row[0] for row in con.execute("SELECT view_name FROM duckdb_views() WHERE schema_name='main'").fetchall()}
+        metadata = con.execute(
+            "SELECT schema_version, data_root_role FROM catalog_metadata"
+        ).fetchall()
+        if len(metadata) != 1:
+            raise DuckDBCatalogPublishError(
+                f"rebuilt catalog metadata must have exactly one row, got {len(metadata)}"
+            )
+        if metadata[0][0] != CATALOG_SCHEMA_VERSION:
+            raise DuckDBCatalogPublishError(
+                f"rebuilt catalog schema_version {metadata[0][0]!r} != {CATALOG_SCHEMA_VERSION!r}"
+            )
+        if metadata[0][1] != CATALOG_ROLE:
+            raise DuckDBCatalogPublishError(
+                f"rebuilt catalog role {metadata[0][1]!r} != {CATALOG_ROLE!r}"
+            )
+        existing = {
+            row[0] for row in con.execute("SELECT view_name FROM duckdb_views() WHERE schema_name='main'").fetchall()
+        }
         missing = set(VIEW_NAMES) - existing
         if missing:
             raise DuckDBCatalogPublishError(f"rebuilt catalog missing views: {sorted(missing)}")
         for view in VIEW_NAMES:
+            info = con.execute(f"PRAGMA table_info('{view}')").fetchall()
+            actual_columns = tuple((row[1], row[2]) for row in info)
+            if actual_columns != VIEW_SCHEMAS[view]:
+                raise DuckDBCatalogPublishError(
+                    f"{view} schema {actual_columns!r} does not match the frozen contract "
+                    f"{VIEW_SCHEMAS[view]!r}"
+                )
             count_row = con.execute(f"SELECT count(*) FROM {view}").fetchone()
             if count_row is None:
                 raise DuckDBCatalogPublishError(f"view count query returned no row: {view}")
@@ -515,7 +755,13 @@ def _validate_database(path: Path, expected_counts: dict[str, int]) -> None:
 
 
 def rebuild_duckdb_catalog(data_root: str | Path, catalog_path: str | Path) -> DuckDBCatalogBuild:
-    """Build and atomically publish a new discovery catalog from durable evidence."""
+    """Build and atomically publish a new discovery catalog from durable evidence.
+
+    The candidate is built inside one explicit transaction (metadata, tables,
+    rows, views) so the temporary file itself always has one coherent build;
+    on any failure the candidate is rolled back, closed, deleted, and the
+    previously published catalog is left byte-identical.
+    """
     root = Path(data_root)
     if not root.is_dir():
         raise DuckDBCatalogCorrupt(f"data root is not a directory: {root}")
@@ -556,10 +802,22 @@ def rebuild_duckdb_catalog(data_root: str | Path, catalog_path: str | Path) -> D
             con.execute("SET threads TO 2")
             con.execute("SET preserve_insertion_order = true")
             con.execute("SET enable_external_access = false")
-            con.execute("CREATE TABLE catalog_metadata(schema_version VARCHAR, data_root_role VARCHAR)")
-            con.execute("INSERT INTO catalog_metadata VALUES (?, ?)", [CATALOG_SCHEMA_VERSION, "rebuildable_discovery_non_authoritative"])
-            for name in VIEW_NAMES:
-                _create_table(con, name, datasets[name])
+            con.execute("BEGIN TRANSACTION")
+            try:
+                con.execute(
+                    f"CREATE TABLE {_quote_ident('catalog_metadata')}"
+                    " (schema_version VARCHAR, data_root_role VARCHAR)"
+                )
+                con.execute(
+                    "INSERT INTO catalog_metadata VALUES (?, ?)",
+                    [CATALOG_SCHEMA_VERSION, CATALOG_ROLE],
+                )
+                for name in VIEW_NAMES:
+                    _create_table(con, name, datasets[name])
+            except Exception:
+                con.execute("ROLLBACK")
+                raise
+            con.execute("COMMIT")
         finally:
             con.close()
         _validate_database(temporary, counts)
@@ -588,6 +846,32 @@ def rebuild_duckdb_catalog(data_root: str | Path, catalog_path: str | Path) -> D
     return DuckDBCatalogBuild(output, root, counts, durable_files)
 
 
+def _validate_catalog_identity(con: duckdb.DuckDBPyConnection, path: Path) -> None:
+    """Refuse stale/mismatched catalogs at open time (I10R1 §7)."""
+    try:
+        metadata = con.execute(
+            "SELECT schema_version, data_root_role FROM catalog_metadata"
+        ).fetchall()
+    except duckdb.Error as exc:
+        raise DuckDBCatalogVersionError(
+            f"discovery catalog {path} has no readable catalog_metadata: {exc}"
+        ) from exc
+    if len(metadata) != 1:
+        raise DuckDBCatalogVersionError(
+            f"discovery catalog {path} must carry exactly one metadata row, got {len(metadata)}"
+        )
+    schema_version, role = metadata[0]
+    if schema_version != CATALOG_SCHEMA_VERSION:
+        raise DuckDBCatalogVersionError(
+            f"discovery catalog {path} schema_version {schema_version!r} != "
+            f"expected {CATALOG_SCHEMA_VERSION!r} (no silent migration)"
+        )
+    if role != CATALOG_ROLE:
+        raise DuckDBCatalogVersionError(
+            f"discovery catalog {path} data_root_role {role!r} != expected {CATALOG_ROLE!r}"
+        )
+
+
 class ReadOnlyDuckDBCatalog:
     """Normal consumer query boundary; no mutable connection is exposed."""
 
@@ -596,6 +880,11 @@ class ReadOnlyDuckDBCatalog:
         if not self.catalog_path.is_file():
             raise DuckDBCatalogCorrupt(f"discovery catalog is missing: {self.catalog_path}")
         self._connection = duckdb.connect(str(self.catalog_path), read_only=True)
+        try:
+            _validate_catalog_identity(self._connection, self.catalog_path)
+        except Exception:
+            self._connection.close()
+            raise
 
     def close(self) -> None:
         self._connection.close()
@@ -625,12 +914,17 @@ class ReadOnlyDuckDBCatalog:
 
 
 __all__ = [
+    "CATALOG_ROLE",
     "CATALOG_SCHEMA_VERSION",
     "DuckDBCatalogBuild",
     "DuckDBCatalogCorrupt",
     "DuckDBCatalogError",
     "DuckDBCatalogPublishError",
+    "DuckDBCatalogShapeCorrupt",
+    "DuckDBCatalogVersionError",
     "ReadOnlyDuckDBCatalog",
     "VIEW_NAMES",
+    "VIEW_NULLABLE_COLUMNS",
+    "VIEW_SCHEMAS",
     "rebuild_duckdb_catalog",
 ]
