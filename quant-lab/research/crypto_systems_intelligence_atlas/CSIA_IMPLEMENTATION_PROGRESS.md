@@ -311,3 +311,40 @@ Artifacts:
 
 Exact next operator action: review the hardening matrix and explicitly accept or
 reject the proposed Book 2 exit gate. Do not start Book 3 before that decision.
+
+
+# CHECKPOINT 7 — BOOK 2 HARDENING R2 (2026-09-24)
+
+Checkpoints 1–6 are preserved. This narrow checkpoint records the projection and
+graph-fact seal only; it does not accept Book 2 or authorize Book 3/live systems.
+
+```text
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_HARDENING_R2 = PASS
+BOOK_2_IMPLEMENTATION = COMPLETE_HARDENED
+BOOK_2_EXIT_GATE = PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_2_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_3 = NOT_STARTED
+LIVE_COLLECTORS = NOT_STARTED
+```
+
+Quality gates:
+
+```text
+CSIA tests             = 190 passed (107 Book 1 + 83 Book 2/hardening/integration)
+R2 focused tests       = 14 passed
+Crypto Sensor          = 2338 passed / 4 skipped / 1 unrelated flaky failure
+ruff                   = PASS
+mypy                   = PASS (16 source files)
+```
+
+Artifacts:
+
+- `CSIA_BOOK_2_HARDENING_R2_MATRIX.json`
+- `CSIA_BOOK_2_IMPLEMENTATION_EVIDENCE_v0.1.md` (HARDENING R2 — PROJECTION / GRAPH-FACT SEAL)
+- this checkpoint
+
+Exact next operator action: review the R2 projection/graph-fact seal and explicitly
+accept or reject the proposed Book 2 exit gate. Do not start Book 3 before that
+decision.

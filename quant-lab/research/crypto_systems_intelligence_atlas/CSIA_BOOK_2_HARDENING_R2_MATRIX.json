@@ -1,0 +1,29 @@
+{
+  "artifact": "CSIA_BOOK_2_HARDENING_R2_MATRIX",
+  "version": "0.1",
+  "date": "2026-09-24",
+  "branch": "agent/crypto-systems-intelligence-atlas-book2-build",
+  "scope": "Narrow Book 2 projection and graph-fact boundary seal; no Book 1 mutation, Book 3, live collectors, network, database, graph DB, Sensor, or Capital Field",
+  "starting_head": "67dbb162eb94194e24b0a2bef8a39d53d6bf8c31",
+  "book1_anchor": "7c2419f00b9f5f5f105708b067848909fa4da609",
+  "findings": {
+    "projection_bug": {"status": "REPRODUCED_AND_CLOSED", "previous_behavior": "Book2ClaimBinding.from_claim mapped every state to RecordLifecycle.OBSERVED", "policy": "Faithful direct mappings: DECLARED, OBSERVED, CONTESTED, REJECTED. Non-equivalent states require Book2ClaimBinding.for_graph and GraphFactPromoter.", "marker": "Graph-bound transformations retain book2-state, optional methodology/parent markers, and raw evidence lineage."},
+    "promotability_gate": {"status": "CLOSED", "promotable": ["OBSERVED", "CORROBORATED", "INFERRED"], "non_promotable": ["DECLARED", "CONTESTED", "UNRESOLVED", "STALE", "REJECTED", "SUPERSEDED"], "inferred_requirements": ["parent claims", "methodology", "valid-time derivation", "terminating raw evidence lineage"]},
+    "inferred_graph_integration": {"status": "PASS", "path": "RawEvidence -> parent OBSERVED claims -> CREATE_INFERRED -> GraphFactPromoter -> TypedEdge -> GraphValidator", "reconstruction": ["Book 1 claim id", "Book2ClaimState.INFERRED marker", "methodology", "parent claims", "raw evidence lineage", "content hashes", "snapshot refs"]},
+    "corroborated_graph_integration": {"status": "PASS", "path": "Independent evidence -> OBSERVED -> P-4 transition -> CORROBORATED -> GraphFactPromoter -> TypedEdge", "reconstruction": ["Book 1 claim id", "book2-state:CORROBORATED marker", "source/evidence lineage"]},
+    "negative_graph_boundary": {"status": "PASS", "rejected_states": ["DECLARED", "CONTESTED", "UNRESOLVED", "STALE", "REJECTED", "SUPERSEDED"], "inferred_without_lineage": "REJECTED"},
+    "book1_freeze": {"status": "PASS", "temporal_py_diff_from_accepted_anchor": 0, "init_py_diff_from_accepted_anchor": 0, "book1_accepted_contract_mutations": 0}
+  },
+  "quality_gates": {
+    "all_csia": "190 passed",
+    "book1_only": "107 passed",
+    "book2_and_hardening": "83 passed",
+    "r2_focused": "14 passed",
+    "sensor_regression": "2338 passed, 4 skipped, 1 initial unrelated concurrent identical-writers failure; targeted retry passed",
+    "ruff": "PASS",
+    "mypy": "PASS; 16 source files"
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "operator_acceptance": "NOT_SELF_ACCEPTED"
+}

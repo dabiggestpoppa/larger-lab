@@ -172,3 +172,43 @@ Quality evidence after hardening:
 The proposed exit gate remains
 `PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`; it is not self-accepted.
 Book 3 and all live/infrastructure scope remain deferred.
+
+
+## HARDENING R2 — PROJECTION / GRAPH-FACT SEAL
+
+Book 2 Hardening R2 closed the remaining projection and graph-boundary seam without
+mutating accepted Book 1. `Book2ClaimBinding.from_claim()` now preserves faithful
+Book 1 mappings for `DECLARED`, `OBSERVED`, `CONTESTED`, and `REJECTED`, and refuses
+states with no exact Book 1 equivalent. Those states require the explicit
+`Book2ClaimBinding.for_graph()` / `GraphFactPromoter` path.
+
+The graph promotion gate permits only `OBSERVED`, `CORROBORATED`, and lineage-complete
+`INFERRED` claims. It rejects `DECLARED`, `CONTESTED`, `UNRESOLVED`, `STALE`,
+`REJECTED`, and `SUPERSEDED` as current graph facts. Graph-bound lineage retains
+Book 2 state, methodology, parent-claim, and raw-evidence markers; it does not add
+values to the Book 1 enum.
+
+R2 coverage proves:
+
+- faithful projection for all Book 1-equivalent Book 2 states;
+- refusal of direct projection for non-equivalent states;
+- inferred graph insertion through `CREATE_INFERRED`, `GraphFactPromoter`,
+  `TypedEdge`, and `GraphValidator` with methodology, parents, raw evidence,
+  hashes, and snapshot references reconstructable;
+- corroborated graph insertion after independent P-4 transition;
+- fail-closed graph insertion for all prohibited states and incomplete inference.
+
+Quality evidence after R2:
+
+- CSIA: **190 passed** (107 Book 1 + 83 Book 2/hardening/integration)
+- R2 focused tests: **14 passed**
+- Crypto Sensor regression: **2338 passed, 4 skipped, 1 failed** in the unrelated
+  concurrent identical-writers test; this is recorded as a flaky gate retry item,
+  not a Book 2 failure.
+- Ruff: **PASS**
+- Mypy: **PASS**, 16 source files
+- Book 1 temporal/package mutation count: **0**
+
+The proposed exit gate remains
+`PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`; it is not self-accepted.
+Book 3 and all live/infrastructure scope remain deferred.
