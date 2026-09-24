@@ -187,6 +187,151 @@ DECISION LOG ENTRY {
 
 ---
 
+# BOOK 2 DECISIONS (D2-1–D2-6)
+
+**Decision session:** 2026-09-24
+
+**Binding artifact:** `CSIA_BOOK_2_SOURCE_EVIDENCE_ACQUISITION_PLAN_v0.2.md`
+
+**Binding commit SHA:** `40d391446088280ca5e6bf49dcdbe36428499c98`
+
+## D2-1 — SOURCE CLASSES + AGGREGATOR EXCLUSION
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D2-1
+  operator_selection:     ACCEPT
+  affected_bloc:          BOOK 2 Bloc 2A
+  affected_invariants:    S-3 object_scope; S-4 aggregator exclusion
+  rationale:              Fourteen distinct witness classes prevent false
+                          equivalence; aggregators may support identity or
+                          context but cannot establish structural truth alone.
+  consequence:            The 14-class registry and S-4 are ratified; the
+                          authority matrix A-2 is binding for promotion.
+  reversibility:          Reversible only by a later recorded operator
+                          decision with evidence and migration impact stated.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     40d391446088280ca5e6bf49dcdbe36428499c98
+}
+```
+
+## D2-2 — CLAIM PROMOTION DOCTRINE
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D2-2
+  operator_selection:     ACCEPT_WITH_INFERRED_REPAIR
+  affected_bloc:          BOOK 2 Blocs 2D and 2E
+  affected_invariants:    C-1..C-8; P-1..P-6; I-1..I-10
+  rationale:              P-1/P-3 prevent narrative laundering, while the
+                          v0.2 CREATE_INFERRED action makes derivation a
+                          new lineage-explicit claim rather than an
+                          unreachable or mutating state.
+  consequence:            P-1 and P-3 are accepted; transition doctrine is
+                          accepted only with I-1..I-10, own claim identity,
+                          terminating raw-evidence lineage, and the permanent
+                          prohibition on INFERRED→OBSERVED re-labeling.
+  reversibility:          Reversible only by a later recorded operator
+                          decision; any relaxation requires a new review.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     40d391446088280ca5e6bf49dcdbe36428499c98
+}
+```
+
+## D2-3 — CONTRADICTION DOCTRINE
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D2-3
+  operator_selection:     ACCEPT
+  affected_bloc:          BOOK 2 Bloc 2F
+  affected_invariants:    F-2 time-split; F-5 never-average
+  rationale:              Distinct valid-time windows can explain apparently
+                          conflicting claims; averaging invents unsupported
+                          facts and is prohibited.
+  consequence:            F-2 is the primary resolution where both claims can
+                          be true at different valid times; F-5 is absolute.
+  reversibility:          Reversible only by a later recorded operator
+                          decision after contradiction-path review.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     40d391446088280ca5e6bf49dcdbe36428499c98
+}
+```
+
+## D2-4 — STALENESS DOCTRINE
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D2-4
+  operator_selection:     ACCEPT
+  affected_bloc:          BOOK 2 Bloc 2G
+  affected_invariants:    G-1..G-3 and four-kind staleness split
+  rationale:              Source availability, evidence usability, claim
+                          freshness, and relationship freshness are distinct;
+                          one global period would erase their semantics.
+  consequence:            SOURCE_STALE, EVIDENCE_STALE, CLAIM_STALE, and
+                          RELATIONSHIP_STALE are binding. The 2G table is
+                          default, versioned policy—not immutable constants
+                          and not a universal stale window.
+  reversibility:          Individual defaults are version-tunable; the
+                          four-kind structural split changes only by recorded
+                          operator decision.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     40d391446088280ca5e6bf49dcdbe36428499c98
+}
+```
+
+## D2-5 — DOC-vs-CHAIN TRUST DOWNGRADE
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D2-5
+  operator_selection:     CLAIM_FAMILY_SCOPED_TRUST_DOWNGRADE
+  affected_bloc:          BOOK 2 Blocs 2A, 2E, 2F; Source Authority Matrix
+  affected_invariants:    A-1..A-5; P-2/P-5/P-6; F-1/F-6
+  rationale:              Reliability is proposition-specific. Activation
+                          timing evidence must not erase a source's distinct
+                          authority for specification, governance intent, or
+                          historical documentation.
+  consequence:            Authority is keyed by SOURCE × CLAIM_FAMILY ×
+                          VALID_TIME. Both conflicting lines are preserved;
+                          discrepancies become meta-claims and tracked history.
+                          One discrepancy never globally demotes a source.
+                          Repeated demonstrated family-specific failure may
+                          produce an evidence-backed, temporally versioned,
+                          reversible downgrade; persistent tier changes require
+                          operator review. No opaque global trust score exists.
+  reversibility:          Reversible by a later evidence-backed, versioned
+                          decision for the same source/family/time scope.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     40d391446088280ca5e6bf49dcdbe36428499c98
+}
+```
+
+## D2-6 — ANNOUNCED / DEPLOYED / USED
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D2-6
+  operator_selection:     DEFER_USAGE_HEALTH_PARAMETERS
+  affected_bloc:          BOOK 2 Blocs 2A, 2E, 2H; Source Authority Matrix
+  affected_invariants:    P-1..P-3; ANNOUNCED/DEPLOYED/USED separation
+  rationale:              The three propositions require different evidence,
+                          but concrete usage/health thresholds cannot be
+                          responsibly frozen without empirical research.
+  consequence:            ANNOUNCED ≠ DEPLOYED ≠ USED is ratified. Usage and
+                          health parameters are deferred to a later explicitly
+                          authorized empirical implementation-planning phase.
+  reversibility:          The three-way distinction is structural and changes
+                          only by recorded operator decision; the deferred
+                          parameters remain open until that decision.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     40d391446088280ca5e6bf49dcdbe36428499c98
+}
+```
+
+---
+
 # DEFERRED DECISIONS (OPEN — NOT DECIDED THIS SESSION)
 
 ```text
