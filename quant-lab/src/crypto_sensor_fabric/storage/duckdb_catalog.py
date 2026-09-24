@@ -475,6 +475,15 @@ def _read_projections(root: Path) -> list[dict[str, Any]]:
     extra_contexts = set(context_by_id) - {row["projection_id"] for row in rows}
     if extra_contexts:
         raise DuckDBCatalogCorrupt(f"projection contexts without artifacts: {sorted(extra_contexts)}")
+    # I10R1 Defect E: a durable lineage manifest whose projection_id has NO
+    # accepted artifact is an orphan durable relation — inconsistent evidence,
+    # never silently ignored (artifact ids, context ids, and lineage-owned
+    # projection ids must be exactly coherent).
+    orphan_lineage_ids = sorted(set(lineage_by_projection) - {row["projection_id"] for row in rows})
+    if orphan_lineage_ids:
+        raise DuckDBCatalogCorrupt(
+            f"projection lineage manifests without projection artifacts: {orphan_lineage_ids}"
+        )
     return sorted(rows, key=lambda row: row["projection_id"])
 
 
@@ -577,21 +586,70 @@ def _read_revisions(root: Path, blob_ids: set[str], acquisition_ids: set[str]) -
 
 
 def _read_quarantine(root: Path) -> list[dict[str, Any]]:
+    """Durable recovery actions under the authoritative I08 contract.
+
+    Every committed action must carry nonempty run/object/problem/resolution
+    semantics and re-derive its logical id (``action_identity``, I08 §7).
+    Malformed durable recovery evidence fails typed — it never becomes a
+    plausible all-NULL discovery row (I10R1 Defect D repair).
+    """
+    from .recovery import action_identity
+
     payloads = _read_json_catalog(root, "catalogs/recovery/actions", "recovery_action_id")
     rows = []
     for payload in payloads:
+        action_id = payload.get("recovery_action_id")
+        if not isinstance(action_id, str) or not action_id:
+            raise DuckDBCatalogShapeCorrupt(
+                "recovery action fragment is missing a usable recovery_action_id: "
+                f"{payload.get('recovery_action_id')!r}"
+            )
+        run_id = payload.get("recovery_run_id")
+        if not isinstance(run_id, str) or not run_id:
+            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty recovery_run_id")
+        object_type = payload.get("object_type")
+        if not isinstance(object_type, str) or not object_type:
+            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty object_type")
+        object_id = payload.get("object_id")
+        if not isinstance(object_id, str) or not object_id:
+            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty object_id")
+        problem = payload.get("problem")
+        if not isinstance(problem, str) or not problem:
+            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty problem")
+        resolution = payload.get("resolution")
+        if not isinstance(resolution, str) or not resolution:
+            raise DuckDBCatalogShapeCorrupt(f"recovery action {action_id} has empty resolution")
+        semantic = {
+            "recovery_run_id": run_id,
+            "object_type": object_type,
+            "object_id": object_id,
+            "problem": problem,
+            "resolution": resolution,
+            "before_state": payload.get("before_state"),
+            "after_state": payload.get("after_state"),
+        }
+        try:
+            recomputed = action_identity(semantic)
+        except Exception as exc:
+            raise DuckDBCatalogShapeCorrupt(
+                f"recovery action {action_id} does not re-derive its I08 §7 identity: {exc}"
+            ) from exc
+        if recomputed != action_id:
+            raise DuckDBCatalogShapeCorrupt(
+                f"recovery action {action_id} identity diverges from its semantics"
+            )
         rows.append(
             {
-                "recovery_action_id": payload.get("recovery_action_id"),
-                "recovery_run_id": payload.get("recovery_run_id"),
-                "object_type": payload.get("object_type"),
-                "object_id": payload.get("object_id"),
-                "problem": payload.get("problem"),
-                "resolution": payload.get("resolution"),
+                "recovery_action_id": action_id,
+                "recovery_run_id": run_id,
+                "object_type": object_type,
+                "object_id": object_id,
+                "problem": problem,
+                "resolution": resolution,
                 "action_kind": payload.get("action_kind"),
             }
         )
-    return sorted(rows, key=lambda row: str(row["recovery_action_id"]))
+    return sorted(rows, key=lambda row: row["recovery_action_id"])
 
 
 def _storage_usage(blobs: list[dict[str, Any]], projections: list[dict[str, Any]], partitions: list[dict[str, Any]], quarantine: list[dict[str, Any]]) -> list[dict[str, Any]]:
