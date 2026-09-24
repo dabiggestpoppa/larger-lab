@@ -313,7 +313,8 @@ def _read_blobs(root: Path) -> list[dict[str, Any]]:
     owned by the integrity/recovery machinery, and its durable
     ``integrity_state`` is used as-is here.  Missing physical blobs and
     stored-size divergence still fail typed.
-    """    directory = root / "catalogs" / "manifests" / "blobs"
+    """
+    directory = root / "catalogs" / "manifests" / "blobs"
     rows: list[dict[str, Any]] = []
     for path in sorted(directory.glob("*.parquet")) if directory.exists() else []:
         try:
@@ -326,16 +327,6 @@ def _read_blobs(root: Path) -> list[dict[str, Any]]:
         physical = _require_file_under(root, blob.storage_uri, f"blob {blob.blob_sha256}")
         if physical.stat().st_size != blob.stored_byte_length:
             raise DuckDBCatalogCorrupt(f"blob {blob.blob_sha256} stored byte length diverges")
-        try:
-            LocalBlobStore(root).verify_blob(
-                blob.blob_sha256,
-                blob.storage_encoding,
-                expected_byte_length=blob.byte_length,
-            )
-        except Exception as exc:
-            raise DuckDBCatalogCorrupt(
-                f"blob {blob.blob_sha256} physical content diverges: {exc}"
-            ) from exc
         rows.append(
             {
                 "blob_sha256": blob.blob_sha256,
@@ -604,26 +595,56 @@ def _read_quarantine(root: Path) -> list[dict[str, Any]]:
 
 
 def _storage_usage(blobs: list[dict[str, Any]], projections: list[dict[str, Any]], partitions: list[dict[str, Any]], quarantine: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    usage: dict[tuple[str, str | None], dict[str, Any]] = {}
+    """Storage usage aggregated over EVERY output dimension (I10R1 Defect B).
+
+    Each aggregate row is keyed by the full dimension tuple present in the
+    output columns, so two providers or sensors sharing a state stay
+    separate instead of collapsing into whichever row initialized the
+    bucket.  Identities the durable record does not own stay NULL — never
+    falsely attributed (T0A blob-level rows carry no provider/sensor
+    identity).
+    """
+    usage: dict[tuple[Any, ...], dict[str, Any]] = {}
+
+    def _bucket(key: tuple[Any, ...]) -> dict[str, Any]:
+        value = usage.get(key)
+        if value is None:
+            value = {
+                "evidence_class": key[0],
+                "integrity_state": key[1],
+                "provider": key[2],
+                "sensor_family": key[3],
+                "storage_priority": key[4],
+                "universe_tier": key[5],
+                "stored_bytes": 0,
+                "raw_bytes": 0,
+                "projection_bytes": 0,
+                "object_count": 0,
+            }
+            usage[key] = value
+        return value
+
     for row in blobs:
-        key = ("T0A_BLOB", row["integrity_state"])
-        value = usage.setdefault(key, {"evidence_class": key[0], "integrity_state": key[1], "provider": None, "sensor_family": None, "storage_priority": None, "universe_tier": None, "stored_bytes": 0, "raw_bytes": 0, "projection_bytes": 0, "object_count": 0})
+        key = ("T0A_BLOB", row["integrity_state"], None, None, None, None)
+        value = _bucket(key)
         value["stored_bytes"] += row["stored_byte_length"]
         value["raw_bytes"] += row["byte_length"]
         value["object_count"] += 1
     for row in projections:
-        key = ("T0B_PROJECTION", row["state"])
-        value = usage.setdefault(key, {"evidence_class": key[0], "integrity_state": key[1], "provider": row["provider"], "sensor_family": row["sensor_family"], "storage_priority": "P3", "universe_tier": None, "stored_bytes": 0, "raw_bytes": 0, "projection_bytes": 0, "object_count": 0})
+        key = ("T0B_PROJECTION", row["state"], row["provider"], row["sensor_family"], "P3", None)
+        value = _bucket(key)
         value["stored_bytes"] += row["stored_bytes"]
         value["projection_bytes"] += row["stored_bytes"]
         value["object_count"] += 1
     for row in partitions:
-        key = ("PARTITION_MANIFEST", row["integrity_state"])
-        value = usage.setdefault(key, {"evidence_class": key[0], "integrity_state": key[1], "provider": row["provider"], "sensor_family": row["sensor_family"], "storage_priority": "P0", "universe_tier": None, "stored_bytes": None, "raw_bytes": 0, "projection_bytes": 0, "object_count": 0})
+        key = ("PARTITION_MANIFEST", row["integrity_state"], row["provider"], row["sensor_family"], "P0", None)
+        value = _bucket(key)
+        value["stored_bytes"] = None
         value["object_count"] += 1
     for row in quarantine:
-        key = ("QUARANTINE", None)
-        value = usage.setdefault(key, {"evidence_class": key[0], "integrity_state": "QUARANTINED_INTEGRITY_FAILURE", "provider": None, "sensor_family": None, "storage_priority": None, "universe_tier": None, "stored_bytes": None, "raw_bytes": 0, "projection_bytes": 0, "object_count": 0})
+        key = ("QUARANTINE", "QUARANTINED_INTEGRITY_FAILURE", None, None, None, None)
+        value = _bucket(key)
+        value["stored_bytes"] = None
         value["object_count"] += 1
     return [usage[key] for key in sorted(usage, key=lambda item: tuple("" if v is None else v for v in item))]
 
