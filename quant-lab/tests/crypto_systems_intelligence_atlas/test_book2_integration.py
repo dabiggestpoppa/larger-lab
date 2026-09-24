@@ -8,7 +8,7 @@ import pytest
 
 from crypto_systems_intelligence_atlas.authority import AuthorityPolicy
 from crypto_systems_intelligence_atlas.claims import (
-    Book2ClaimBinding,
+    promote_claim_to_graph,
     Claim,
     ClaimService,
     ClaimState,
@@ -198,11 +198,11 @@ def test_inferred_claim_binding_preserves_methodology_parent_and_raw_lineage() -
         object_refs=(protocol.object_id, oracle.object_id),
         relationship_refs=(EdgeType.DEPENDS_ON.value,),
     )
-    binding = Book2ClaimBinding.from_claim(inferred)
+    binding = promote_claim_to_graph(inferred)
     assert binding.book2_claim_state is ClaimState.INFERRED
     assert inferred.parent_claim_refs == (p1.claim_id, p2.claim_id)
     assert set(service.lineage_evidence(inferred)) == {p1_ref, p2_ref}
-    assert binding.book1.transformation_lineage[-1] == "oracle-risk"
+    assert "book2-methodology:oracle-risk" in binding.book1.transformation_lineage
     assert (evidence.require(p1_ref).content_hash, evidence.require(p2_ref).content_hash) == (
         evidence.require(p1_ref).content_hash,
         evidence.require(p2_ref).content_hash,

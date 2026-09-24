@@ -39,7 +39,7 @@ ClaimState = Book2ClaimState
 
 
 class Book2ClaimBinding(BaseModel):
-    """Book 2 claim projection; Book 1 receives only its compatible pointer."""
+    """Book 2 provenance adapter with an explicit, non-erasing state marker."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -48,19 +48,79 @@ class Book2ClaimBinding(BaseModel):
 
     @classmethod
     def from_claim(cls, claim: "Claim") -> "Book2ClaimBinding":
+        faithful = {
+            ClaimState.DECLARED: RecordLifecycle.DECLARED,
+            ClaimState.OBSERVED: RecordLifecycle.OBSERVED,
+            ClaimState.CONTESTED: RecordLifecycle.CONTESTED,
+            ClaimState.REJECTED: RecordLifecycle.REJECTED,
+        }
+        if claim.claim_state not in faithful:
+            raise ValueError("state has no faithful Book 1 projection; use the graph promotion adapter")
         source_id = claim.source_refs[0]
         evidence_ref = claim.evidence_refs[0]
-        lineage = (*claim.lineage_evidence_refs, claim.methodology_ref) if claim.methodology_ref else claim.lineage_evidence_refs
         return cls(
             book1=ClaimBinding(
                 claim_id=claim.claim_id,
                 source_id=source_id,
                 source_locator=evidence_ref,
+                transformation_lineage=claim.lineage_evidence_refs,
+                claim_state=faithful[claim.claim_state],
+            ),
+            book2_claim_state=claim.claim_state,
+        )
+
+    @classmethod
+    def for_graph(cls, claim: "Claim") -> "Book2ClaimBinding":
+        if not can_promote_to_graph(claim):
+            raise ValueError(f"{claim.claim_state.value} cannot create a current graph fact")
+        marker = f"book2-state:{claim.claim_state.value}"
+        methodology_marker = f"book2-methodology:{claim.methodology_ref}" if claim.methodology_ref else None
+        parent_marker = f"book2-parents:{','.join(claim.parent_claim_refs)}" if claim.parent_claim_refs else None
+        lineage = tuple(item for item in (marker, methodology_marker, parent_marker, *claim.lineage_evidence_refs) if item)
+        return cls(
+            book1=ClaimBinding(
+                claim_id=claim.claim_id,
+                source_id=claim.source_refs[0],
+                source_locator=claim.evidence_refs[0],
                 transformation_lineage=lineage,
                 claim_state=RecordLifecycle.OBSERVED,
             ),
             book2_claim_state=claim.claim_state,
         )
+
+
+def can_promote_to_graph(claim: "Claim") -> bool:
+    """Return whether a claim may create a current Book 1 graph fact."""
+    if claim.claim_state is ClaimState.OBSERVED:
+        return True
+    if claim.claim_state is ClaimState.CORROBORATED:
+        return bool(claim.evidence_refs)
+    if claim.claim_state is ClaimState.INFERRED:
+        return bool(
+            claim.parent_claim_refs
+            and claim.methodology_ref
+            and claim.lineage_evidence_refs
+            and claim.valid_time_derivation
+        )
+    return False
+
+
+def promote_claim_to_graph(claim: "Claim") -> Book2ClaimBinding:
+    """Mediated Book 2 graph insertion; returns Book 1 pointer plus marker."""
+    return Book2ClaimBinding.for_graph(claim)
+
+
+class GraphFactPromoter:
+    """Book 2 adapter that mediates insertion into the frozen Book 1 graph API."""
+
+    def __init__(self, graph_validator: object) -> None:
+        self._graph_validator = graph_validator
+
+    def add(self, *, claim: "Claim", edge: object) -> object:
+        expected = promote_claim_to_graph(claim)
+        if getattr(edge, "claim_binding", None) != expected.book1:
+            raise ValueError("graph edge must use the mediated Book 2 claim binding")
+        return self._graph_validator.add_edge(edge)  # type: ignore[attr-defined]
 
 
 class MethodologyParameter(BaseModel):
@@ -396,6 +456,9 @@ class InferenceEngine:
 
 __all__ = [
     "Book2ClaimBinding",
+    "GraphFactPromoter",
+    "can_promote_to_graph",
+    "promote_claim_to_graph",
     "Book2ClaimState",
     "Claim",
     "ClaimService",
