@@ -43,7 +43,7 @@ Every non-counterfactual evidence predicate is mechanically observed from execut
 
 - `BLOC_04_I10R2_LINEAGE_BINDING_MATRIX.json` — 10 rows.
 - `BLOC_04_I10R2_RECOVERY_ENVELOPE_MATRIX.json` — 10 rows.
-- `BLOC_04_I10R2_MEASUREMENT_PARITY_MATRIX.json` — 9 rows.
+- `BLOC_04_I10R2_MEASUREMENT_PARITY_MATRIX.json` — 8 rows.
 - `BLOC_04_I10R2_RELATION_GOVERNANCE_MICROSEAL.json` — governance summary.
 
 Historical I10 and I10R1 evidence hashes remain byte-for-byte unchanged.

@@ -17,7 +17,7 @@
   "lineage_law": "metadata-only frozen I05 model, manifest/context/artifact binding, ordered source parity, durable blob/acquisition linkage, usable provenance, and metadata identity/granularity agreement",
   "matrices": {
     "lineage_binding_rows": 10,
-    "measurement_parity_rows": 9,
+    "measurement_parity_rows": 8,
     "recovery_envelope_rows": 10
   },
   "measured_evidence": "Every non-counterfactual evidence predicate is mechanically observed from executed production behavior; deliberate counterfactual predicates are explicitly synthetic and must evaluate FAIL.",

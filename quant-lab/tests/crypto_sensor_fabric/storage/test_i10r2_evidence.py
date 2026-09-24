@@ -432,7 +432,7 @@ def build_i10r2_summary() -> dict[str, Any]:
         "matrices": {
             "lineage_binding_rows": 10,
             "recovery_envelope_rows": 10,
-            "measurement_parity_rows": 9,
+            "measurement_parity_rows": 8,
         },
         "measured_evidence": (
             "Every non-counterfactual evidence predicate is mechanically observed from "
