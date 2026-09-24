@@ -1,0 +1,37 @@
+{
+  "artifact": "CSIA_BOOK_2_HARDENING_R1_MATRIX",
+  "version": "0.1",
+  "date": "2026-09-24",
+  "branch": "agent/crypto-systems-intelligence-atlas-book2-build",
+  "scope": "Book 2 source/evidence/acquisition kernel hardening only; no live collectors, network, persistence, database, graph DB, Book 3, Sensor, Capital Field, or trading logic",
+  "contract_audit": {
+    "accepted_book1_anchor": "7c2419f00b9f5f5f105708b067848909fa4da609",
+    "ratified_planning_anchor": "637e0908376004895476e65592d5f9cda0d3e85d",
+    "book1_source_files_changed_by_book2_before_hardening": ["quant-lab/src/crypto_systems_intelligence_atlas/temporal.py", "quant-lab/src/crypto_systems_intelligence_atlas/__init__.py"],
+    "required_book2_changes": ["Book 2 consumes Book 1 provenance, identity, supersession, and temporal primitives", "Book 2 state is represented by a separate Book2ClaimState", "Book2ClaimBinding projects a Book 1 ClaimBinding pointer while retaining Book 2 state separately"],
+    "book1_recordlifecycle_extension_permitted": false,
+    "book1_amendment_required": false,
+    "disposition": "BOOK_1_REMAINS_FROZEN"
+  },
+  "findings": {
+    "A": {"status": "CLOSED", "result": "Book 1 RecordLifecycle and package root restored; Book2ClaimState has exactly nine ratified states."},
+    "B": {"status": "CLOSED", "result": "CHAIN_SPECIFIC returns REQUIRES_CHAIN_CONTEXT without an invented duration and resolves only with matching deterministic chain context."},
+    "C": {"status": "CLOSED", "result": "Book 2 Claim rejects Book 1 VERIFIED; no VERIFIED member exists in Book2ClaimState."},
+    "D": {"status": "CLOSED", "result": "Raw add is closed; DECLARED and OBSERVED use explicit entry APIs; INFERRED uses CREATE_INFERRED; promotion states require transition machinery."},
+    "P4": {"status": "CLOSED", "result": "CORROBORATED requires a corroborating claim, distinct source, distinct owner, distinct mechanism/provider, and rejects narrative copies."},
+    "authority": {"status": "CLOSED", "result": "Numeric vN ordering is used; explicitly assigned overlapping candidates are rejected as ambiguous."},
+    "source_evidence": {"status": "CLOSED", "result": "SourceEvidenceCoordinator validates evidence references before source locator/health versions; ResearchInterface routes through it."}
+  },
+  "quality_gates": {
+    "focused_hardening": {"command": "python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/test_book2_hardening_r1.py -q", "result": "15 passed"},
+    "book1_only": {"command": "python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/ -q [Book 2 tests ignored]", "result": "107 passed"},
+    "book2_and_integration": {"command": "python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/test_book2_core.py test_book2_stress.py test_book2_adversarial.py test_book2_integration.py test_book2_hardening_r1.py -q", "result": "69 passed"},
+    "all_csia": {"command": "python -m pytest quant-lab/tests/crypto_systems_intelligence_atlas/ -q", "result": "176 passed"},
+    "sensor_regression": {"command": "python -m pytest quant-lab/tests/crypto_sensor_fabric/ -q", "result": "2339 passed, 4 skipped"},
+    "ruff": {"command": "python -m ruff check quant-lab/src/crypto_systems_intelligence_atlas/ quant-lab/tests/crypto_systems_intelligence_atlas/", "result": "PASS"},
+    "mypy": {"command": "python -m mypy quant-lab/src/crypto_systems_intelligence_atlas/ --ignore-missing-imports", "result": "PASS; 16 source files"}
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "operator_acceptance": "NOT_SELF_ACCEPTED"
+}

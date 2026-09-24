@@ -274,3 +274,40 @@ Deferred: live collectors/network/RPC/scraping, databases/graph databases,
 schedulers/persistence, credentials, live Research Mesh/QCAE/OCE integration,
 Book 3, Sensor/Capital Field mutation, trading logic, and productiondeployment. The proposed operator exit gate is
 `PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`.
+
+
+# CHECKPOINT 6 — BOOK 2 HARDENING R1 (2026-09-24)
+
+Checkpoints 1–5 are preserved. This checkpoint records hardening only; it does
+not accept the Book 2 exit gate and does not authorize Book 3 or live systems.
+
+```text
+BOOK_1_CONTRACT_MUTATIONS = 0
+BOOK_2_HARDENING_R1 = COMPLETE
+BOOK_2_IMPLEMENTATION = COMPLETE_HARDENED
+BOOK_2_EXIT_GATE = PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_2_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_3 = NOT_STARTED
+LIVE_COLLECTORS = NOT_STARTED
+```
+
+Quality gates:
+
+```text
+CSIA tests             = 176 passed (107 Book 1 + 69 Book 2/hardening/integration)
+Crypto Sensor          = 2339 passed / 4 skipped
+ruff                   = PASS
+mypy                   = PASS (16 source files)
+BOOK_1_ONLY            = 107 passed
+FOCUSED_HARDENING       = 15 passed
+```
+
+Artifacts:
+
+- `CSIA_BOOK_2_HARDENING_R1_MATRIX.json`
+- `CSIA_BOOK_2_IMPLEMENTATION_EVIDENCE_v0.1.md` (HARDENING R1 ADDENDUM)
+- this checkpoint
+
+Exact next operator action: review the hardening matrix and explicitly accept or
+reject the proposed Book 2 exit gate. Do not start Book 3 before that decision.

@@ -139,3 +139,36 @@ BOOK_2_ACCEPTANCE      = NOT SELF-ACCEPTED
 The proposed exit gate is
 `PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`. Operator acceptance is
 required before Book 2 implementation is considered accepted.
+
+
+## HARDENING R1 ADDENDUM
+
+Book 2 Hardening R1 closed the operator-identified correctness seams without amending
+Book 1. The accepted Book 1 temporal kernel and package root remain frozen; Book 2
+now uses `Book2ClaimState` with exactly the ratified nine states and projects through
+`Book2ClaimBinding` to the Book 1-compatible `ClaimBinding` pointer.
+
+Focused hardening evidence:
+
+- `CHAIN_SPECIFIC` returns `REQUIRES_CHAIN_CONTEXT` and never fabricates seconds;
+  matching deterministic chain context resolves freshness.
+- `VERIFIED` is unavailable to Book 2 claims.
+- raw claim insertion is closed; declared/observed entry paths and `CREATE_INFERRED`
+  are explicit; promoted states require transition machinery.
+- P-4 corroboration requires distinct source, owner, and mechanism/provider, and
+  rejects same-source evidence and narrative copies.
+- authority selection uses numeric `vN` chronology and rejects explicit overlapping
+  assignments as ambiguous.
+- `SourceEvidenceCoordinator` validates evidence IDs before source locator/health
+  versions; the constrained research interface routes source updates through it.
+
+Quality evidence after hardening:
+
+- CSIA: **176 passed** (107 Book 1 + 69 Book 2/hardening/integration)
+- Crypto Sensor regression: **2339 passed, 4 skipped**
+- Ruff: **PASS**
+- Mypy: **PASS**, 16 source files
+
+The proposed exit gate remains
+`PASS_CSIA_BOOK2_SOURCE_EVIDENCE_ACQUISITION_KERNEL`; it is not self-accepted.
+Book 3 and all live/infrastructure scope remain deferred.
