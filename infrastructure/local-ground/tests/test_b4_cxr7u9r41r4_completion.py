@@ -316,7 +316,9 @@ artifact_restore_from() {{ rm -rf "$ARTIFACT_ROOT"; mkdir -p "$ARTIFACT_ROOT"; c
 {_shell_functions()}
 rollback_precommit "r41r4 production route"
 '''
-    result = subprocess.run([BASH, "-c", script], capture_output=True, text=True,
+    script_path = tmp_path / "rollback-route.sh"
+    script_path.write_text(script, encoding="utf-8")
+    result = subprocess.run([BASH, str(script_path)], capture_output=True, text=True,
                             env=h.env, timeout=120)
     assert result.returncode == 0, result.stdout + result.stderr
     assert (artifact / "truth.txt").read_text(encoding="utf-8") == "old"
