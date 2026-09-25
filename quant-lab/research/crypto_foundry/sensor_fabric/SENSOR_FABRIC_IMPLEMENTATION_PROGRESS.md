@@ -11,10 +11,10 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I11: offline implementation and metadata-only firewall complete; real PostgreSQL runtime unavailable; G4-10 remains pending runtime validation; I12+ unauthorized; research frozen |
+| Current checkpoint | SENSOR-B4-I11R1: real PostgreSQL 16.15 runtime executed; all six operator-reported I11 defects (A-F) reproduced then repaired; exact schema validation, populated reconstruction, drop/reinstall parity, rollback, concurrency, and the I07/I08/I09 authority firewalls all measured OK. G4-10 is NOT awarded: two pre-existing governance-ledger test failures (introduced by the I11 commit, not by I11R1) keep the regression suite non-green. I12+ unauthorized; research frozen |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | I11 implementation is not self-ratified. PASS_SENSOR_B4_I11_POSTGRES_OPERATIONAL_METADATA_SEALED=BLOCKED_RUNTIME_VALIDATION; G4-10_OPERATIONAL_METADATA_GATE=PENDING_REAL_POSTGRES_RUNTIME; next_checkpoint_authorized=FALSE; recommended next is real local PostgreSQL runtime validation and operator review. I12+ unauthorized; research frozen. |
+| Operator review state | I11R1 is not self-ratified. PASS_SENSOR_B4_I11R1_RUNTIME_CORRECTNESS_SEALED=PENDING_OPERATOR_REVIEW; PASS_SENSOR_B4_I11_POSTGRES_OPERATIONAL_METADATA_SEALED=BLOCKED_RUNTIME_VALIDATION (unchanged - runtime truth is now measured, but the gate is not awarded); G4-10_OPERATIONAL_METADATA_GATE=NOT_PASSED_REGRESSION_BLOCKED; next_checkpoint_authorized=FALSE; recommended next is operator review of the complete I11 -> I11R1 chain and a decision on the two pre-existing governance-ledger test failures. I12+ unauthorized; research frozen. |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
@@ -25,7 +25,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE - I11 implementation is blocked pending real PostgreSQL runtime validation and operator review; I12+ remain unauthorized; research remains frozen. |
+| next_checkpoint_authorized | FALSE - I11R1 runtime correctness is implemented and measured but G4-10 is not awarded; operator review of the complete I11 -> I11R1 chain is required and the two pre-existing governance-ledger failures need an operator decision. I12+ remain unauthorized; research remains frozen. |
 
 ## Append-only SENSOR-B4-I10R1 / I10R2 checkpoint history
 
@@ -2111,3 +2111,117 @@ Evidence artifacts are under `evidence/bloc_04/`:
 `BLOC_04_I11_TRANSACTION_ATOMICITY_MATRIX.json`,
 `BLOC_04_I11_RUNTIME_INTEGRATION_MATRIX.json`, and
 `BLOC_04_I11_POSTGRES_OPERATIONAL_METADATA_EVIDENCE.md`.
+
+## SENSOR-B4-I11R1 - POSTGRES RUNTIME TRUTH + SCHEMA / OPERATIONAL API CORRECTNESS MICROSEAL
+
+Six operator-reported I11 defects were reproduced against a real PostgreSQL
+16.15 runtime before any repair, then fixed:
+
+- **A** the forbidden-column vocabulary contained `token`, so every acquisition
+  row self-refused because the contract also declared `resume_token_before` /
+  `resume_token_after`. Both columns are removed from the PostgreSQL
+  acquisitions DDL and row contract. PostgreSQL is not the I07 resume
+  authority; the frozen `AcquisitionRecord` is unchanged.
+- **B** `canonical_rows` built its `ORDER BY` by character-joining an already
+  rendered SQL string. Replaced with an explicit per-table `CANONICAL_ORDER`
+  sort-key map.
+- **C** the generic operational writer used `ON CONFLICT (singleton)` for every
+  operational table, which cannot work for `integrity_checks` (primary key
+  `check_id`, no singleton column). Replaced with `record_integrity_check`
+  (idempotent by `check_id`, divergent same-id raises `PostgresConflict`),
+  `set_quota_state`, and `set_backup_state`.
+- **D** acquisition DDL mapped almost every non-time field to `text`.
+  `TABLE_SCHEMAS` is now the single authority for DDL, insert order, nullability,
+  primary keys, foreign keys, introspection and tests. `provider_checksum_verified`
+  is `boolean`; temporal fields are `timestamptz`.
+- **E** `install_schema` used `CREATE ... IF NOT EXISTS` without proving the
+  installed structure. `validate_installed_schema()` now proves the exact table
+  set, column order/types/nullability, PK shape, the single
+  `storage_job_transitions.job_id -> storage_jobs.job_id` foreign key, and
+  exactly one `schema_metadata` row with the exact version/role. It fails
+  closed; there is no auto-migration and no DROP of unexpected user state.
+- **F** one substring tuple conflated column vocabulary with value detection.
+  Split into `_FORBIDDEN_COLUMN_TERMS` (payload/body/content/raw/trade_row/
+  book_level/market_row/event_array/bytea), `_SECRET_COLUMN_TERMS`
+  (password/cookie/authorization/api_key/apikey/secret), and `_SECRET_VALUE_RE`.
+
+Reconstruction completeness is an explicit caller contract: `MetadataInventory`
+requires `complete=True` and the complete id/key set. Readiness import reuses
+the accepted `providers.readiness.load_human_readiness_matrix` loader and
+provider registry import reuses the accepted `registry.provider_registry`
+loader, so there is no duplicate parser ontology. No accepted I04/I05/I06/I07/
+I08/I09/I10 module was modified.
+
+### Measured against real PostgreSQL 16.15
+
+- focused I11 + I11R1 tests: **38 passed** (real DSN, loopback `127.0.0.1:55432`)
+- storage suite: **1502 passed, 4 skipped, 2 failed**
+- project suite outside storage: **1379 passed, 1 skipped, 0 failed**
+- exact schema: 13 tables (`schema_metadata` + 12 frozen I11 tables), 12
+  canonical sort-key entries; 8 parametrized schema attacks refused
+- populated reconstruction: 18 rows across 9 reconstructible tables
+  (2 provider_registry, 2 adapter_readiness, 2 blobs_current_metadata,
+  2 acquisitions, 2 storage_jobs, 3 storage_job_transitions,
+  2 partition_manifest_current, 2 source_revisions, 1 recovery_runs)
+- drop/reinstall/rebuild parity exact; repeated refresh idempotent
+- zero `LocalBlobStore.verify_blob` / `open_blob` / `_decode_stats` calls
+- failed refresh rolls back; concurrent refresh serialized on a
+  transaction-scoped advisory lock with no committed hybrid snapshot
+- I07, I08 and I09 tamper firewalls hold; operational-only state preserved
+- Ruff: at the accepted baseline (only the pre-existing I08 `F401`/`F811`)
+- mypy: **15 pre-existing errors only**, unchanged
+
+### Section 23 CRLF diagnostic (verified, not assumed)
+
+The prior 59-failure attribution was proven rather than accepted. The
+machine-wide `core.autocrlf=true` comes from `C:/Program Files/Git/etc/gitconfig`,
+not from this repository, and it rewrote **3236** committed LF blobs to CRLF in
+the worktree at checkout. Evidence builders emit LF, so byte comparison against
+CRLF worktree files failed. This worktree is now `core.autocrlf=false`
+(worktree-scoped) and all 3236 files are byte-identical to their committed
+blobs; **no committed byte was rewritten** and `git diff --cached` stayed empty.
+
+A separate pre-existing mutation remains: `test_catalog_evidence.py` and
+`test_i04r1_evidence.py` write seven `BLOC_04_I0*` evidence files with
+`Path.write_text`, which translates LF to CRLF on Windows, so those files are
+re-CRLF'd on every test run. Their content is unchanged modulo line endings and
+no test asserts on their bytes. Fixing an accepted I04 test is outside the
+I11R1 scope.
+
+### The two remaining failures are NOT I11R1 regressions
+
+`test_i10r2_evidence.py::test_i10r2_evidence_is_measured_and_committed` and
+`test_job_state_r1i.py::test_ledger_operator_state_is_truthful` both assert
+against the top-level `## Current state` ledger table. The I11 commit
+`09fc62f6` rewrote that table and dropped the anchor text they require. Both
+test files and the ledger are byte-identical to `09fc62f6`, so I11R1 did not
+cause this. At `7f4e753b` the Current state row carried explicitly labelled
+*historical, superseded* proposal snapshots next to the live verdict, which is
+what satisfied both tests. Restoring that text, or relaxing the two accepted
+frozen tests, is an operator decision and was not taken unilaterally.
+
+Because the full regression suite is not green, the G4-10 success law is NOT
+satisfied and the gate is not claimed.
+
+- `PASS_SENSOR_B4_I11R1_RUNTIME_CORRECTNESS_SEALED=PENDING_OPERATOR_REVIEW`
+- `G4-10_OPERATIONAL_METADATA_GATE=NOT_PASSED_REGRESSION_BLOCKED`
+- `PASS_SENSOR_B4_I11_POSTGRES_OPERATIONAL_METADATA_SEALED=BLOCKED_RUNTIME_VALIDATION` (unchanged)
+- `next_checkpoint_authorized=FALSE`
+- `recommended_next=OPERATOR REVIEW OF COMPLETE I11 -> I11R1 CHAIN AND A DECISION ON THE TWO PRE-EXISTING GOVERNANCE-LEDGER TEST FAILURES`
+- I12+ remain unauthorized; research remains frozen. No self-ratification.
+
+Runtime truth: PostgreSQL 16.15 on loopback `127.0.0.1:55432`;
+`postgres_runtime_provision_network=YES` (official package acquisition only);
+`dependency_resolution_network=NO`; provider/product network `ZERO`;
+cloud databases and provider APIs were not contacted. No credentials were
+persisted into Git; the disposable cluster was destroyed.
+
+New R1 evidence under `evidence/bloc_04/`: `BLOC_04_I11R1_SCHEMA_RUNTIME_MATRIX.json`
+(5 rows), `BLOC_04_I11R1_POPULATED_RECONSTRUCTION_MATRIX.json` (5),
+`BLOC_04_I11R1_AUTHORITY_FIREWALL_MATRIX.json` (3),
+`BLOC_04_I11R1_TRANSACTION_CONCURRENCY_MATRIX.json` (3),
+`BLOC_04_I11R1_OPERATIONAL_STATE_MATRIX.json` (5),
+`BLOC_04_I11R1_EVIDENCE_TRUTH_MATRIX.json` (3), and
+`BLOC_04_I11R1_POSTGRES_RUNTIME_MICROSEAL.md`. Every non-counterfactual row is
+measured `OK`; every `counterfactual_*` row is synthetic `FAIL`. The six
+original I11 blocked-runtime artifacts are byte-unchanged.

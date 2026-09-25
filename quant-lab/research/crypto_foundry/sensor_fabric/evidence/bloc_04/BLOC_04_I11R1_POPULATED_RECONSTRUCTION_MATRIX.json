@@ -1,0 +1,44 @@
+{
+  "rows": [
+    {
+      "case": "populated_reconstruction",
+      "counts": true,
+      "required_invariants": [
+        "counts"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "drop_reinstall_parity",
+      "parity": true,
+      "required_invariants": [
+        "parity"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "repeat_idempotence",
+      "repeated": true,
+      "required_invariants": [
+        "repeated"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "t0_evidence_unchanged",
+      "required_invariants": [
+        "unchanged"
+      ],
+      "result": "OK",
+      "unchanged": true
+    },
+    {
+      "case": "counterfactual_postgres_loss_erases_evidence",
+      "evidence_unchanged": false,
+      "required_invariants": [
+        "evidence_unchanged"
+      ],
+      "result": "FAIL"
+    }
+  ]
+}

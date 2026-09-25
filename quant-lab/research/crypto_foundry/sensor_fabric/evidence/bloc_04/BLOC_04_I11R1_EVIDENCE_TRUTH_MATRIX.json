@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "case": "real_postgres_executed",
+      "required_invariants": [
+        "runtime"
+      ],
+      "result": "OK",
+      "runtime": true
+    },
+    {
+      "case": "required_invariant_law",
+      "measured": true,
+      "required_invariants": [
+        "measured"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "counterfactual_offline_equals_integration",
+      "offline_is_runtime": false,
+      "required_invariants": [
+        "offline_is_runtime"
+      ],
+      "result": "FAIL"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "rows": [
+    {
+      "case": "real_exact_schema",
+      "exact": true,
+      "required_invariants": [
+        "exact"
+      ],
+      "result": "OK"
+    },
+    {
+      "bytea": true,
+      "case": "raw_secret_firewall",
+      "generic": true,
+      "raw": true,
+      "required_invariants": [
+        "raw",
+        "generic",
+        "secret",
+        "bytea"
+      ],
+      "result": "OK",
+      "secret": true
+    },
+    {
+      "absent": true,
+      "case": "resume_tokens_absent",
+      "required_invariants": [
+        "absent"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "schema_attack_extra_table_refused",
+      "refused": true,
+      "required_invariants": [
+        "refused"
+      ],
+      "result": "OK"
+    },
+    {
+      "attack_refused": false,
+      "case": "counterfactual_extra_table_accepted",
+      "required_invariants": [
+        "attack_refused"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "runtime": "PostgreSQL 16.15"
+}

@@ -1,0 +1,44 @@
+{
+  "rows": [
+    {
+      "case": "integrity_append_idempotent",
+      "duplicate": true,
+      "required_invariants": [
+        "duplicate"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "integrity_divergence_refused",
+      "divergence": true,
+      "required_invariants": [
+        "divergence"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "quota_singleton_upsert",
+      "quota": true,
+      "required_invariants": [
+        "quota"
+      ],
+      "result": "OK"
+    },
+    {
+      "backup": true,
+      "case": "backup_singleton_upsert",
+      "required_invariants": [
+        "backup"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "counterfactual_integrity_overwrite",
+      "overwrite": false,
+      "required_invariants": [
+        "overwrite"
+      ],
+      "result": "FAIL"
+    }
+  ]
+}

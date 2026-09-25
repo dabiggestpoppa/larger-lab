@@ -1,0 +1,32 @@
+{
+  "rows": [
+    {
+      "case": "postgres_non_authoritative",
+      "mirror_only": true,
+      "required_invariants": [
+        "mirror_only"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "authority_tamper_firewalls",
+      "i07_unchanged": true,
+      "i08_unchanged": true,
+      "i09_unchanged": true,
+      "required_invariants": [
+        "i07_unchanged",
+        "i08_unchanged",
+        "i09_unchanged"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "counterfactual_postgres_supersedes_i07",
+      "postgres_is_resume_authority": false,
+      "required_invariants": [
+        "postgres_is_resume_authority"
+      ],
+      "result": "FAIL"
+    }
+  ]
+}

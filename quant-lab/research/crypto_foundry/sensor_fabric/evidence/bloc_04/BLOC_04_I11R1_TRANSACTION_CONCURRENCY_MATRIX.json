@@ -1,0 +1,32 @@
+{
+  "rows": [
+    {
+      "case": "failed_refresh_rollback",
+      "required_invariants": [
+        "rollback"
+      ],
+      "result": "OK",
+      "rollback": true
+    },
+    {
+      "backup": true,
+      "case": "operational_state_preserved",
+      "integrity": true,
+      "quota": true,
+      "required_invariants": [
+        "integrity",
+        "quota",
+        "backup"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "counterfactual_hybrid_commit",
+      "no_hybrid_snapshot": false,
+      "required_invariants": [
+        "no_hybrid_snapshot"
+      ],
+      "result": "FAIL"
+    }
+  ]
+}
