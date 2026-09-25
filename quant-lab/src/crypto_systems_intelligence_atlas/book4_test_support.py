@@ -69,6 +69,30 @@ def fact_snapshot_ref(claim_id: str) -> str:
 FACT_SNAPSHOT_REFS = tuple(
     fact_snapshot_ref(ref) for ref in FACT_CLAIM_REFS.values()
 )
+MECHANISM_KEYS = (
+    "a",
+    "b",
+    "oracle-domain",
+    "deployment-a",
+    "deployment-b",
+    "backend-a",
+    "backend-b",
+    "set-a",
+    "cloud-a",
+    "sequencer-op",
+    "da-layer",
+    "validator-set",
+    "multisig",
+    "custodian",
+    "relayer",
+    "indexer",
+    "upstream-api",
+    "fallback-upstream",
+)
+MECHANISM_CLAIM_REFS = {
+    key: f"book4-mechanism-{key}" for key in MECHANISM_KEYS
+}
+INDEPENDENCE_CLAIM_REF = "book4-independence-review"
 
 
 def source_fixture() -> Source:
@@ -157,6 +181,41 @@ def kernel() -> tuple[ClaimStore, EvidenceStore, Book4Provenance]:
                 qualifier=fact.value,
             )
         )
+    for key, claim_id in MECHANISM_CLAIM_REFS.items():
+        mechanism_evidence = evidence.capture(
+            source_id="csia:source:book4-offline",
+            retrieved_at=NOW,
+            content=f"book4 mechanism evidence {key}".encode(),
+            content_locator=f"fixture://book4/mechanism/{key}",
+            raw_snapshot_ref=f"snapshot://book4/mechanism/{key}",
+            extractor_version="test",
+            parser_version="test",
+            evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
+        ).evidence_id
+        claims.add_initial(
+            make_claim(
+                claim_id,
+                evidence_ref=mechanism_evidence,
+                qualifier="FAILURE_MECHANISM",
+            )
+        )
+    independence_evidence = evidence.capture(
+        source_id="csia:source:book4-offline",
+        retrieved_at=NOW,
+        content=b"book4 independence evidence",
+        content_locator="fixture://book4/independence",
+        raw_snapshot_ref="snapshot://book4/independence",
+        extractor_version="test",
+        parser_version="test",
+        evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
+    ).evidence_id
+    claims.add_initial(
+        make_claim(
+            INDEPENDENCE_CLAIM_REF,
+            evidence_ref=independence_evidence,
+            qualifier="POSITIVE_INDEPENDENCE",
+        )
+    )
     return claims, evidence, Book4Provenance(claims, evidence)
 
 
@@ -271,6 +330,7 @@ def failure_domain(
     evidence_ref: str = "mechanism-a",
     system: str | None = None,
 ) -> FailureDomain:
+    key = evidence_ref.removeprefix("mechanism-")
     return FailureDomain(
         domain_id=domain_id,
         domain_type=FailureDomainType.PROVIDER,
@@ -280,7 +340,8 @@ def failure_domain(
         protocol_refs=(),
         affected_system_refs=(system or f"fixture:{domain_id}:system",),
         mechanism=mechanism,
-        mechanism_evidence_refs=(evidence_ref,),
+        mechanism_claim_refs=(MECHANISM_CLAIM_REFS[key],),
+        mechanism_evidence_refs=(f"snapshot://book4/mechanism/{key}",),
         correlation_scope="fixture deployment",
         valid_time=NOW,
         book2_claim_refs=(CLAIM_REF,),

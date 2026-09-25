@@ -9,6 +9,9 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .dependency_provenance import Book4Provenance
 from .temporal import Timestamp, UnknownBound
 
+FAILURE_MECHANISM_QUALIFIER = "FAILURE_MECHANISM"
+POSITIVE_INDEPENDENCE_QUALIFIER = "POSITIVE_INDEPENDENCE"
+
 
 class FailureDomainType(str, Enum):
     PROVIDER = "PROVIDER"
@@ -45,7 +48,8 @@ class FailureDomain(BaseModel):
     protocol_refs: tuple[str, ...] = ()
     affected_system_refs: tuple[str, ...] = Field(min_length=1)
     mechanism: str = Field(min_length=1)
-    mechanism_evidence_refs: tuple[str, ...] = Field(min_length=1)
+    mechanism_claim_refs: tuple[str, ...] = Field(min_length=1)
+    mechanism_evidence_refs: tuple[str, ...] = ()
     correlation_scope: str = Field(min_length=1)
     valid_time: Timestamp | UnknownBound
     book2_claim_refs: tuple[str, ...] = Field(min_length=1)
@@ -70,7 +74,7 @@ class FailureDomainAssessment(BaseModel):
     subject_ref: str
     object_ref: str
     classification: FailureDomainClassification
-    positive_independence_evidence_refs: tuple[str, ...]
+    positive_independence_claim_refs: tuple[str, ...]
     reason: str
 
 
@@ -83,6 +87,10 @@ class FailureDomainBook:
         if domain.domain_id in self._domains:
             raise ValueError("failure domain IDs are immutable and unique")
         self.provenance.validate_refs(domain.book2_claim_refs)
+        for claim_ref in domain.mechanism_claim_refs:
+            self.provenance.resolve_qualifier_claim(
+                claim_ref, qualifier=FAILURE_MECHANISM_QUALIFIER
+            )
         self._domains[domain.domain_id] = domain
         return domain
 
@@ -94,41 +102,63 @@ class FailureDomainBook:
         left: FailureDomain,
         right: FailureDomain,
         *,
-        positive_independence_evidence_refs: tuple[str, ...] = (),
+        positive_independence_claim_refs: tuple[str, ...] = (),
     ) -> FailureDomainAssessment:
+        subject = left.affected_system_refs[0]
+        obj = right.affected_system_refs[0]
         if left.domain_id == right.domain_id:
             return FailureDomainAssessment(
-                subject_ref=left.affected_system_refs[0],
-                object_ref=right.affected_system_refs[0],
+                subject_ref=subject,
+                object_ref=obj,
                 classification=FailureDomainClassification.SHARED_FAILURE_DOMAIN,
-                positive_independence_evidence_refs=(),
+                positive_independence_claim_refs=(),
                 reason="same mechanism-backed failure-domain identity",
             )
-        shared_mechanism_evidence = set(left.mechanism_evidence_refs) & set(
-            right.mechanism_evidence_refs
+        shared_mechanism_claims = set(left.mechanism_claim_refs) & set(
+            right.mechanism_claim_refs
         )
-        if shared_mechanism_evidence:
+        if shared_mechanism_claims:
             return FailureDomainAssessment(
-                subject_ref=left.affected_system_refs[0],
-                object_ref=right.affected_system_refs[0],
+                subject_ref=subject,
+                object_ref=obj,
                 classification=FailureDomainClassification.SHARED_FAILURE_DOMAIN,
-                positive_independence_evidence_refs=(),
-                reason="positive mechanism evidence identifies a shared failure mode",
+                positive_independence_claim_refs=(),
+                reason="canonical mechanism support identifies a shared failure mode",
             )
-        if positive_independence_evidence_refs:
-            return FailureDomainAssessment(
-                subject_ref=left.affected_system_refs[0],
-                object_ref=right.affected_system_refs[0],
-                classification=FailureDomainClassification.INDEPENDENT,
-                positive_independence_evidence_refs=positive_independence_evidence_refs,
-                reason="positive independence evidence supplied",
-            )
+        independence_refs: tuple[str, ...] = ()
+        independence_reason = ""
+        if positive_independence_claim_refs:
+            for claim_ref in positive_independence_claim_refs:
+                try:
+                    self.provenance.resolve_qualifier_claim(
+                        claim_ref, qualifier=POSITIVE_INDEPENDENCE_QUALIFIER
+                    )
+                except ValueError as exc:
+                    independence_reason = f"independence support rejected: {exc}"
+                    break
+                independence_refs = independence_refs + (claim_ref,)
+            if not independence_reason:
+                return FailureDomainAssessment(
+                    subject_ref=subject,
+                    object_ref=obj,
+                    classification=FailureDomainClassification.INDEPENDENT,
+                    positive_independence_claim_refs=independence_refs,
+                    reason="canonical positive independence support supplied",
+                )
         identity_overlap = bool(
             (set(left.provider_refs) & set(right.provider_refs))
             or (set(left.operator_refs) & set(right.operator_refs))
             or (set(left.owner_refs) & set(right.owner_refs))
             or (set(left.protocol_refs) & set(right.protocol_refs))
         )
+        if independence_reason:
+            return FailureDomainAssessment(
+                subject_ref=subject,
+                object_ref=obj,
+                classification=FailureDomainClassification.UNKNOWN,
+                positive_independence_claim_refs=(),
+                reason=independence_reason,
+            )
         classification = (
             FailureDomainClassification.PARTIAL_SHARED_DOMAIN
             if identity_overlap
@@ -140,18 +170,20 @@ class FailureDomainBook:
             else "absence of common evidence does not prove independence"
         )
         return FailureDomainAssessment(
-            subject_ref=left.affected_system_refs[0],
-            object_ref=right.affected_system_refs[0],
+            subject_ref=subject,
+            object_ref=obj,
             classification=classification,
-            positive_independence_evidence_refs=(),
+            positive_independence_claim_refs=(),
             reason=reason,
         )
 
 
 __all__ = [
+    "FAILURE_MECHANISM_QUALIFIER",
     "FailureDomain",
     "FailureDomainAssessment",
     "FailureDomainBook",
     "FailureDomainClassification",
     "FailureDomainType",
+    "POSITIVE_INDEPENDENCE_QUALIFIER",
 ]

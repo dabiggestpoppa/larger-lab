@@ -30,7 +30,7 @@ from crypto_systems_intelligence_atlas.redundancy import RedundancyBook, Redunda
         ("shared indexer", {"provider": "app-a", "evidence_ref": "indexer"}, {"provider": "app-b", "evidence_ref": "indexer"}, (), FailureDomainClassification.SHARED_FAILURE_DOMAIN),
         ("common upstream API", {"provider": "service-a", "evidence_ref": "upstream-api"}, {"provider": "service-b", "evidence_ref": "upstream-api"}, (), FailureDomainClassification.SHARED_FAILURE_DOMAIN),
         ("fallbacks sharing upstream", {"provider": "fallback-a", "evidence_ref": "fallback-upstream"}, {"provider": "fallback-b", "evidence_ref": "fallback-upstream"}, (), FailureDomainClassification.SHARED_FAILURE_DOMAIN),
-        ("positive independent backends", {"provider": "a", "evidence_ref": "a"}, {"provider": "b", "evidence_ref": "b"}, ("independence-review",), FailureDomainClassification.INDEPENDENT),
+        ("positive independent backends", {"provider": "a", "evidence_ref": "a"}, {"provider": "b", "evidence_ref": "b"}, ("book4-independence-review",), FailureDomainClassification.INDEPENDENT),
         ("no inference from different brands", {"provider": "a", "evidence_ref": "a"}, {"provider": "b", "evidence_ref": "b"}, (), FailureDomainClassification.UNKNOWN),
     ],
 )
@@ -45,7 +45,7 @@ def test_failure_domain_scenarios(
     book = FailureDomainBook(provenance)
     left = book.add(failure_domain(f"{case}:left", **left_kwargs))
     right = book.add(failure_domain(f"{case}:right", **right_kwargs))
-    assert book.classify(left, right, positive_independence_evidence_refs=positive).classification is expected
+    assert book.classify(left, right, positive_independence_claim_refs=positive).classification is expected
 
 
 def test_two_providers_without_shared_evidence_remain_unknown() -> None:

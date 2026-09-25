@@ -175,6 +175,26 @@ def contested_kernel() -> tuple[ClaimService, str]:
     ).evidence_id
     claim = make_claim(INDEPENDENCE_CONTESTED_CLAIM, "POSITIVE_INDEPENDENCE")
     service.add_observed(claim.model_copy(update={"evidence_refs": (evidence_id,)}))
+    for claim_id, qualifier in (
+        (GENERIC_CLAIM, None),
+        (MECHANISM_SHARED_CLAIM, "FAILURE_MECHANISM"),
+        (MECHANISM_LEFT_CLAIM, "FAILURE_MECHANISM"),
+    ):
+        mechanism_evidence = service.evidence_store.capture(
+            source_id=SOURCE_ID,
+            retrieved_at=NOW,
+            content=f"book4 r1 mechanism evidence {claim_id}".encode(),
+            content_locator=f"fixture://book4-r1/{claim_id}",
+            raw_snapshot_ref=snapshot_ref(claim_id),
+            extractor_version="test",
+            parser_version="test",
+            evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
+        ).evidence_id
+        service.add_observed(
+            make_claim(claim_id, qualifier).model_copy(
+                update={"evidence_refs": (mechanism_evidence,)}
+            )
+        )
     return service, evidence_id
 
 
