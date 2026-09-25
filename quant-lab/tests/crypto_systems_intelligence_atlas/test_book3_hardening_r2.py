@@ -39,6 +39,7 @@ from crypto_systems_intelligence_atlas.types import ClaimFamily
 NOW = datetime(2026, 9, 24, 12, tzinfo=UTC)
 LATER = NOW + timedelta(days=1)
 AFTER_LATER = LATER + timedelta(days=1)
+BETWEEN = NOW + timedelta(hours=12)
 
 
 def make_kernel() -> tuple[ClaimStore, EvidenceStore, Book2ArchitectureProvenance]:
@@ -304,6 +305,9 @@ def test_supersession_closes_projected_validity_without_mutating_old_record() ->
     ]
     assert validator.validate_dossier(
         make_dossier(old_record.registry_id), historical=True
+    )
+    assert validator.validate_dossier(
+        make_dossier(old_record.registry_id, valid_time=BETWEEN), historical=True
     )
     with pytest.raises(ArchitectureProvenanceError, match="does not hold"):
         validator.validate_dossier(
