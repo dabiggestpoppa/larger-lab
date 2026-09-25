@@ -1,0 +1,125 @@
+{
+  "fixture": "corpus_items",
+  "noncanonical": true,
+  "canonical_oce_target": "OCE artifact/provenance envelope for datasets",
+  "replacement_condition": "replace when the Foundry consumes canonical dataset lineage envelopes",
+  "notes": "Small deterministic text items. Timestamps exist so point-in-time leakage is testable without external data.",
+  "items": [
+    {
+      "item_id": "ALPHA-0001",
+      "source_id": "SRC_NEWS_ALPHA",
+      "payload_class": "text",
+      "event_time_utc": "2026-01-01T08:00:00Z",
+      "known_at_utc": "2026-01-02T00:00:00Z",
+      "text": "the exchange reported a settlement delay affecting scheduled deliveries during the morning session"
+    },
+    {
+      "item_id": "ALPHA-0002",
+      "source_id": "SRC_NEWS_ALPHA",
+      "payload_class": "text",
+      "event_time_utc": "2026-01-01T12:00:00Z",
+      "known_at_utc": "2026-01-02T00:00:00Z",
+      "text": "regulators published a consultation on collateral reporting obligations for clearing members"
+    },
+    {
+      "item_id": "ALPHA-0001-DUP",
+      "source_id": "SRC_NEWS_ALPHA",
+      "payload_class": "text",
+      "event_time_utc": "2026-01-01T08:00:00Z",
+      "known_at_utc": "2026-01-02T00:00:00Z",
+      "text": "The exchange reported a settlement delay affecting scheduled deliveries during the morning session"
+    },
+    {
+      "item_id": "ALPHA-0002-NEAR",
+      "source_id": "SRC_NEWS_ALPHA",
+      "payload_class": "text",
+      "event_time_utc": "2026-01-01T12:00:00Z",
+      "known_at_utc": "2026-01-02T00:00:00Z",
+      "text": "regulators published a consultation on collateral reporting obligations for clearing members today"
+    },
+    {
+      "item_id": "MIRROR-0001",
+      "source_id": "SRC_NEWS_ALPHA_MIRROR",
+      "payload_class": "text",
+      "event_time_utc": "2026-01-01T08:00:00Z",
+      "known_at_utc": "2026-01-02T01:00:00Z",
+      "text": "the exchange reported a settlement delay affecting scheduled deliveries during the morning session"
+    },
+    {
+      "item_id": "TRACE-0001",
+      "source_id": "SRC_AGENT_TRACE",
+      "payload_class": "text",
+      "event_time_utc": "2026-01-02T02:10:00Z",
+      "known_at_utc": "2026-01-02T03:00:00Z",
+      "text": "assistant summarised the settlement delay article and proposed three follow-up questions for the operator"
+    },
+    {
+      "item_id": "MARKET-0001",
+      "source_id": "SRC_MARKET_TICKS_PIT",
+      "payload_class": "timeseries",
+      "event_time_utc": "2026-01-01T09:30:00Z",
+      "known_at_utc": "2026-01-01T09:31:00Z",
+      "text": "tick open 41250 high 41310 low 41190 close 41280 volume 1840",
+      "fields": {"symbol": "FIXTURE_IDX", "interval": "1m"}
+    },
+    {
+      "item_id": "MARKET-0002",
+      "source_id": "SRC_MARKET_TICKS_PIT",
+      "payload_class": "timeseries",
+      "event_time_utc": "2026-01-01T09:31:00Z",
+      "known_at_utc": "2026-01-01T09:32:00Z",
+      "text": "tick open 41280 high 41305 low 41240 close 41250 volume 1510",
+      "fields": {"symbol": "FIXTURE_IDX", "interval": "1m"}
+    },
+    {
+      "item_id": "MARKET-LEAK-0003",
+      "source_id": "SRC_MARKET_TICKS_PIT",
+      "payload_class": "timeseries",
+      "event_time_utc": "2026-01-01T09:32:00Z",
+      "known_at_utc": "2026-01-03T09:32:00Z",
+      "text": "tick open 41250 high 41400 low 41200 close 41390 volume 2210 revised after settlement",
+      "fields": {"symbol": "FIXTURE_IDX", "interval": "1m"}
+    },
+    {
+      "item_id": "MARKET-IMPLAUSIBLE-0004",
+      "source_id": "SRC_MARKET_TICKS_PIT",
+      "payload_class": "timeseries",
+      "event_time_utc": "2026-01-01T09:33:00Z",
+      "known_at_utc": "2026-01-01T09:30:00Z",
+      "text": "tick open 41390 high 41395 low 41380 close 41385 volume 640",
+      "fields": {"symbol": "FIXTURE_IDX", "interval": "1m"}
+    },
+    {
+      "item_id": "CRAWL-0001",
+      "source_id": "SRC_RIGHTS_UNKNOWN",
+      "payload_class": "text",
+      "event_time_utc": "2025-12-15T00:00:00Z",
+      "known_at_utc": "2026-01-02T04:00:00Z",
+      "text": "undated page sample captured by an unreviewed crawl with no recorded licence"
+    },
+    {
+      "item_id": "VENDOR-0001",
+      "source_id": "SRC_VENDOR_TERMS",
+      "payload_class": "text",
+      "event_time_utc": "2025-12-01T00:00:00Z",
+      "known_at_utc": "2026-01-02T05:00:00Z",
+      "text": "vendor research note describing dataset composition and evaluation methodology"
+    },
+    {
+      "item_id": "WITHHELD-0001",
+      "source_id": "SRC_CEREBUS_RULES",
+      "payload_class": "cerebus_rule_table",
+      "event_time_utc": "2025-11-01T00:00:00Z",
+      "known_at_utc": "2026-01-02T07:00:00Z",
+      "text": "session_open displacement band 0.7425 with volatility scaling 13.5 applied per regime table"
+    },
+    {
+      "item_id": "INCIDENT-0001",
+      "source_id": "SRC_SECRET_INCIDENT",
+      "payload_class": "incident_note",
+      "event_time_utc": "2026-01-01T12:00:00Z",
+      "known_at_utc": "2026-01-02T08:00:00Z",
+      "text": "rotated the deployment token after surfacing; old value api_key = AKIAIOSFODNN7EXAMPLE was revoked"
+    }
+  ]
+}

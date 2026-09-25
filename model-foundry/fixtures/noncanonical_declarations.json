@@ -1,0 +1,102 @@
+{
+  "boundary_fingerprint": "sha256:98cb4c61a3eb5856944f54f4495686701263bbc46c8e70928f22e3e41eb7627d",
+  "declared_only_services": [
+    "identity",
+    "authority",
+    "artifacts"
+  ],
+  "fixtures": [
+    {
+      "canonical_oce_target": "OCE artifact registry + artifact-manifest envelope",
+      "fixture": "FoundryLocalArtifactStore",
+      "module": "declaration-only",
+      "noncanonical": true,
+      "present_scope": "declaration only",
+      "replacement_condition": "replace when OCE artifact service is exposed on the convergence branch",
+      "retirement_evidence": "artifact digests resolve through OCE artifact registry"
+    },
+    {
+      "canonical_oce_target": "OCE AuthorityState / capability grants (A-009/A-010 lineage)",
+      "fixture": "FoundryLocalAuthorityProjection",
+      "module": "declaration-only",
+      "noncanonical": true,
+      "present_scope": "declaration only",
+      "replacement_condition": "replace when canonical OCE authority projection is available",
+      "retirement_evidence": "no Foundry-local grant may authorize an action once OCE projection is bound"
+    },
+    {
+      "canonical_oce_target": "OCE resource budget service",
+      "fixture": "FoundryLocalBudgetLedger",
+      "module": "foundry.resources.BUDGET_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "explicit operator budget arithmetic only; no spend path",
+      "replacement_condition": "replace when OCE budget authority is consumable",
+      "retirement_evidence": "budget holds are issued by canonical budget service"
+    },
+    {
+      "canonical_oce_target": "OCE recovery/resume service",
+      "fixture": "FoundryLocalCheckpointRecovery",
+      "module": "foundry.resources.RECOVERY_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "portable checkpoint manifests + simulated resume only",
+      "replacement_condition": "replace when generic recovery exists",
+      "retirement_evidence": "provider-loss recovery runs through canonical recovery service"
+    },
+    {
+      "canonical_oce_target": "OCE B6 Evaluation Service / CEREBUS-governed evaluator freeze (G6 lineage)",
+      "fixture": "FoundryLocalEvaluationFreeze",
+      "module": "foundry.evaluation.EVAL_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "protocol freeze + sealed access boundary only",
+      "replacement_condition": "replace when OCE owns evaluator freeze/ratification authority",
+      "retirement_evidence": "protocol freeze receipts are issued by the canonical evaluator service"
+    },
+    {
+      "canonical_oce_target": "OCE EvidenceGraph / evidence registry",
+      "fixture": "FoundryLocalEvidenceLedger",
+      "module": "foundry.data.DATA_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "MF-B2/B3 provenance links only; no generic evidence graph",
+      "replacement_condition": "replace when convergence branch exposes canonical evidence graph",
+      "retirement_evidence": "evidence refs carry canonical OCE envelope ids"
+    },
+    {
+      "canonical_oce_target": "OCE identity / actor registry",
+      "fixture": "FoundryLocalIdentity",
+      "module": "declaration-only",
+      "noncanonical": true,
+      "present_scope": "declaration only",
+      "replacement_condition": "replace when convergence branch exposes canonical identity service",
+      "retirement_evidence": "Foundry actor references resolve through OCE identity adapter"
+    },
+    {
+      "canonical_oce_target": "OCE NegativeKnowledge with governed reopen semantics (A-004/A-009 lineage)",
+      "fixture": "FoundryLocalNegativeKnowledge",
+      "module": "foundry.evaluation.NEGATIVE_KNOWLEDGE_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "negative results + reopen records only",
+      "replacement_condition": "replace when canonical NegativeKnowledge service is consumable",
+      "retirement_evidence": "reopen conditions evaluated by canonical lifecycle, not locally"
+    },
+    {
+      "canonical_oce_target": "OCE B10 Resource Intelligence (COMPUTE.GPU.RENT)",
+      "fixture": "FoundryLocalOfferNormalizer",
+      "module": "foundry.providers.PROVIDER_OFFER_DOUBLE,foundry.resources.RESOURCE_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "read-only offer normalization + placement; no provider API calls",
+      "replacement_condition": "replace when B10 exposes provider-neutral offer/routing",
+      "retirement_evidence": "Foundry submits ComputeRequest to B10 and consumes routing receipts"
+    },
+    {
+      "canonical_oce_target": "OCE WorkGraph / governed workflow",
+      "fixture": "FoundryLocalRunLifecycle",
+      "module": "foundry.refinery.REFINERY_DOUBLE",
+      "noncanonical": true,
+      "present_scope": "dataset/experiment run records only; no scheduler",
+      "replacement_condition": "replace when generic workflow service exists",
+      "retirement_evidence": "experiment runs admitted through canonical workflow nodes"
+    }
+  ],
+  "marker": "NONCANONICAL_OCE_TEST_DOUBLES",
+  "second_oce_risk": "none declared; every local stand-in has a retirement path"
+}

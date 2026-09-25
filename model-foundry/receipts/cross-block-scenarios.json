@@ -1,0 +1,377 @@
+{
+  "report_fingerprint": "sha256:f85bee7526c074a13fb7867b631eb0860a25144059ff9e494352d1f88ab79d04",
+  "scenarios": [
+    {
+      "held": true,
+      "intent": "the substrate may not become a second OCE and may not own truth or authority",
+      "observed": {
+        "attacks_allowed": [],
+        "attacks_held": 20,
+        "attacks_total": 20,
+        "boundary_fixtures": 10,
+        "constitution_fingerprint": "sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420",
+        "doctrine_count": 12,
+        "ownership_conflicts": [],
+        "undeclared_generic_services": []
+      },
+      "refusals": [],
+      "scenario_id": "F0",
+      "status": "HELD",
+      "title": "constitution + one-OCE boundary"
+    },
+    {
+      "held": true,
+      "intent": "provider identity must not change scientific semantics, and hourly price is not cost-to-close",
+      "observed": {
+        "cheapest_hourly_eligible": "octa_fixture:octa-gpu-4471",
+        "cheapest_hourly_usd": 0.25,
+        "cost_to_close_stable_under_provider_rename": true,
+        "hourly_trap_detected": true,
+        "rejected_reasons": {
+          "local_cpu:local-workstation-0": "INSUFFICIENT_VRAM",
+          "runpod_fixture:runpod-secure-2200-stale": "OFFER_OBSERVATION_STALE"
+        },
+        "request_has_no_provider_field": true,
+        "selected_cost_to_close_usd": 3.873333,
+        "selected_offer_id": "runpod_fixture:runpod-secure-8891"
+      },
+      "refusals": [],
+      "scenario_id": "F1",
+      "status": "HELD",
+      "title": "provider-neutral placement"
+    },
+    {
+      "held": true,
+      "intent": "negative findings are first-class, reopening requires new evidence, and impossible reopen conditions stay visible as dogma risk",
+      "observed": {
+        "dogma_risk_of_unreachable_condition": "CRITICAL_UNREACHABLE",
+        "refusal_codes": [
+          "REOPEN_REQUIRES_NEW_EVIDENCE",
+          "NEGATIVE_RESULT_IMMUTABLE"
+        ],
+        "reopen_preserves_prior_conclusion": "INCONCLUSIVE",
+        "reopen_requires_new_evidence_record": true
+      },
+      "refusals": [
+        {
+          "code": "REOPEN_REQUIRES_NEW_EVIDENCE",
+          "detail": "REOPEN_REQUIRES_NEW_EVIDENCE: NEG-CROSS-1 may not be reopened without new evidence",
+          "refused_by": "PolicyBlocked"
+        },
+        {
+          "code": "NEGATIVE_RESULT_IMMUTABLE",
+          "detail": "NEGATIVE_RESULT_IMMUTABLE: NEG-CROSS-1: negative results are appended, never overwritten",
+          "refused_by": "PolicyBlocked"
+        }
+      ],
+      "scenario_id": "F10",
+      "status": "HELD",
+      "title": "negative results and reopen"
+    },
+    {
+      "held": true,
+      "intent": "no paid path exists, an accepted provider is not an authorization, checkpoints survive framework loss, secrets are detected",
+      "observed": {
+        "budget_consumed_usd": 3.1515,
+        "checkpoint_fingerprint": "sha256:dba36a9e5e7ae37f480a5c13c9aa5522c78c7218d3119818a0a253aab55d4cca",
+        "cost_to_close_with_checkpoint": 3.151515,
+        "framework_locked_checkpoint_refused": "CHECKPOINT_FORMAT_NOT_PORTABLE",
+        "paid_compute_consumed": false,
+        "provider_identity_in_scientific_result": false,
+        "refusal_codes": [
+          "LIVE_LAUNCH_NOT_AUTHORIZED",
+          "OPERATOR_HOLD",
+          "GRANT_ISSUER_NOT_OPERATOR",
+          "BUDGET_EXCEEDED"
+        ],
+        "secret_hits": [
+          "aws_access_key",
+          "api_key_assignment"
+        ],
+        "secret_scan_passed": false,
+        "simulated_mode": "SIMULATE"
+      },
+      "refusals": [
+        {
+          "code": "LIVE_LAUNCH_NOT_AUTHORIZED",
+          "detail": "LIVE_LAUNCH_NOT_AUTHORIZED: real provider launch is outside MF-B0..B4 scope; a live path requires explicit operator authorization and a costed MF-B5 gate",
+          "refused_by": "PolicyBlocked"
+        },
+        {
+          "code": "OPERATOR_HOLD",
+          "detail": "OPERATOR_HOLD: no operator grant for paid compute on REQ-CROSS-BLOCK; Foundry may not authorize its own spending",
+          "refused_by": "Unauthorized"
+        },
+        {
+          "code": "GRANT_ISSUER_NOT_OPERATOR",
+          "detail": "GRANT_ISSUER_NOT_OPERATOR: grant GRANT-CROSS-1 was issued by 'BUILDER_AGENT', not the operator actor",
+          "refused_by": "Unauthorized"
+        },
+        {
+          "code": "BUDGET_EXCEEDED",
+          "detail": "BUDGET_EXCEEDED: cost-to-close 3.15 USD would exceed authorized 1.00 USD (spent 0.00)",
+          "refused_by": "Unauthorized"
+        }
+      ],
+      "scenario_id": "F11",
+      "status": "HELD",
+      "title": "provider loss, portability, and secret discipline"
+    },
+    {
+      "held": true,
+      "intent": "ACCESS != RIGHTS: unknown rights fail away from training, and permissions are not roles",
+      "observed": {
+        "eligible_for_training": [
+          "SRC_AGENT_TRACE",
+          "SRC_NEWS_ALPHA",
+          "SRC_NEWS_ALPHA_MIRROR"
+        ],
+        "negative_control_can_train": true,
+        "refusal_codes": [
+          "RIGHTS_BLOCKED",
+          "ROLE_TRANSITION_NOOP",
+          "SECRET_BEARING_SOURCE_TRAIN_ROLE_REFUSED"
+        ],
+        "rights_blocked": {
+          "SRC_PROHIBITED": "EXCLUDED_BY_POLICY",
+          "SRC_RIGHTS_UNKNOWN": "RIGHTS_UNKNOWN",
+          "SRC_VENDOR_TERMS": "RIGHTS_RESTRICTED"
+        },
+        "rights_permissive_but_role_forbidden": {
+          "SRC_BENCH_CORE": "HIDDEN_EVAL",
+          "SRC_CEREBUS_RULES": "RETRIEVAL_ONLY",
+          "SRC_MARKET_TICKS_PIT": "DEV",
+          "SRC_SECRET_INCIDENT": "RETRIEVAL_ONLY"
+        },
+        "unknown_rights_permits_training": false,
+        "unknown_rights_state": "RIGHTS_UNKNOWN"
+      },
+      "refusals": [
+        {
+          "code": "RIGHTS_BLOCKED",
+          "detail": "RIGHTS_BLOCKED: role TRAIN_CPT requires recorded rights evidence permitting training; 'rights://unresolved/web-crawl-sample-a' resolves to RIGHTS_UNKNOWN",
+          "refused_by": "PolicyBlocked"
+        },
+        {
+          "code": "ROLE_TRANSITION_NOOP",
+          "detail": "ROLE_TRANSITION_NOOP: a role transition must change the role; no-op transitions pollute provenance",
+          "refused_by": "PolicyBlocked"
+        },
+        {
+          "code": "SECRET_BEARING_SOURCE_TRAIN_ROLE_REFUSED",
+          "detail": "SECRET_BEARING_SOURCE_TRAIN_ROLE_REFUSED: SRC_SECRET_TRAIN: secret-bearing material cannot hold a training role",
+          "refused_by": "PolicyBlocked"
+        }
+      ],
+      "scenario_id": "F2",
+      "status": "HELD",
+      "title": "data rights, roles, and permissions"
+    },
+    {
+      "held": true,
+      "intent": "governed sources produce a deterministic manifest, and aliases are not diversity",
+      "observed": {
+        "exact_duplicates_collapsed": 1,
+        "excluded_sources": [
+          "SRC_RIGHTS_UNKNOWN"
+        ],
+        "item_count": 3,
+        "item_level_random_split_used": false,
+        "lineage_fingerprint": "sha256:e06c2ccd61f3f88fecfb10505b7708f30f0671ae2fdf26a36006e2f251a9b1bb",
+        "lineage_reproducible": true,
+        "mirror_collapsed": true,
+        "mirror_lineages": 1,
+        "near_duplicates_collapsed": 2,
+        "split_strategy": "BY_SOURCE",
+        "unknown_rights_excluded": true
+      },
+      "refusals": [],
+      "scenario_id": "F3",
+      "status": "HELD",
+      "title": "governed corpus construction"
+    },
+    {
+      "held": true,
+      "intent": "future information at the decision instant is detected and blocks a training dataset",
+      "observed": {
+        "clean_subset_passes": true,
+        "dataset_refused": true,
+        "failure": "PIT_INVALID",
+        "violation_reasons": [
+          "FUTURE_INFORMATION_AT_DECISION_INSTANT",
+          "KNOWLEDGE_PRECEDES_EVENT"
+        ],
+        "violations": 2
+      },
+      "refusals": [],
+      "scenario_id": "F4",
+      "status": "HELD",
+      "title": "point-in-time leakage"
+    },
+    {
+      "held": true,
+      "intent": "a train source contaminated against an eval set degrades the claim and blocks the strongest labels",
+      "observed": {
+        "adjacent_source_grade_not_inherited": "C0_NO_OBSERVED_OVERLAP",
+        "claim_blocking_edges": 1,
+        "combined_grade": "C3_PARAPHRASE_OR_SOLUTION_OVERLAP",
+        "unobserved_is_not_clean": true,
+        "worst_grade_for_bench_core": "C3_PARAPHRASE_OR_SOLUTION_OVERLAP"
+      },
+      "refusals": [],
+      "scenario_id": "F5",
+      "status": "HELD",
+      "title": "contamination gating"
+    },
+    {
+      "held": true,
+      "intent": "CEREBUS-family material is operationally withheld from every model-facing path",
+      "observed": {
+        "blocked_sources": [
+          "SRC_CEREBUS_RULES"
+        ],
+        "dataset_refused": true,
+        "doctrine_bearing_sources": [
+          "SRC_CEREBUS_RULES"
+        ],
+        "failure": "CONTAMINATION_BLOCKED",
+        "refusal_codes": [
+          "CEREBUS_FAMILY_WITHHELD",
+          "CEREBUS_FAMILY_WITHHELD"
+        ],
+        "reopen_condition": "reopen when a rights disposition, provenance record, or decontaminated source set is registered and re-audited under the same recipe"
+      },
+      "refusals": [
+        {
+          "code": "CEREBUS_FAMILY_WITHHELD",
+          "detail": "CEREBUS_FAMILY_WITHHELD: SRC_CEREBUS_RULES carries withheld doctrine and cannot enter model-facing paths",
+          "refused_by": "PolicyBlocked"
+        },
+        {
+          "code": "CEREBUS_FAMILY_WITHHELD",
+          "detail": "CEREBUS_FAMILY_WITHHELD: SRC_CEREBUS_RULES carries withheld doctrine and cannot enter model-facing paths",
+          "refused_by": "PolicyBlocked"
+        }
+      ],
+      "scenario_id": "F6",
+      "status": "HELD",
+      "title": "withheld doctrine boundary"
+    },
+    {
+      "held": true,
+      "intent": "criteria are frozen before outcomes, builders cannot author the freeze that judges them, freeze is immutable",
+      "observed": {
+        "frozen_at_utc_present": true,
+        "protocol_fingerprint": "sha256:824fb9ae6c63b3bb7ec5c4103bfd4a2be585ce7f441ae3b0275906d3c1e7ee35",
+        "refusal_codes": [
+          "FREEZE_AFTER_OUTCOMES_REFUSED",
+          "SEALED_FREEZE_BUILDER_REFUSED",
+          "PROTOCOL_MUTATION_REFUSED"
+        ],
+        "tier": "PROMOTION"
+      },
+      "refusals": [
+        {
+          "code": "FREEZE_AFTER_OUTCOMES_REFUSED",
+          "detail": "FREEZE_AFTER_OUTCOMES_REFUSED: criteria must be frozen before candidate outcomes are observed",
+          "refused_by": "PolicyBlocked"
+        },
+        {
+          "code": "SEALED_FREEZE_BUILDER_REFUSED",
+          "detail": "SEALED_FREEZE_BUILDER_REFUSED: a builder cannot author the sealed freeze that will judge it",
+          "refused_by": "Unauthorized"
+        },
+        {
+          "code": "PROTOCOL_MUTATION_REFUSED",
+          "detail": "PROTOCOL_MUTATION_REFUSED: a frozen protocol cannot be edited; register a new version through the tier contract",
+          "refused_by": "Unauthorized"
+        }
+      ],
+      "scenario_id": "F7",
+      "status": "HELD",
+      "title": "evaluation freeze"
+    },
+    {
+      "held": true,
+      "intent": "sealed answers are unreachable from the builder surface, every attempt is recorded, access requires operator authority",
+      "observed": {
+        "authorised_read_items": 2,
+        "builder_view_exposes_contents": false,
+        "exposure_budget_ok": true,
+        "exposures_recorded": [
+          "ACCESSED_SEALED_PAYLOAD"
+        ],
+        "refusal_codes": [
+          "SEALED_ACCESS_BUILDER_REFUSED",
+          "SEALED_ACCESS_BUILDER_REFUSED",
+          "SEALED_ACCESS_TOKEN_REQUIRED",
+          "SEALED_REGISTRATION_ROLE_REFUSED"
+        ],
+        "refusals_recorded": 3
+      },
+      "refusals": [
+        {
+          "code": "SEALED_ACCESS_BUILDER_REFUSED",
+          "detail": "SEALED_ACCESS_BUILDER_REFUSED: sealed confirmation material is never available through the builder surface",
+          "refused_by": "Unauthorized"
+        },
+        {
+          "code": "SEALED_ACCESS_BUILDER_REFUSED",
+          "detail": "SEALED_ACCESS_BUILDER_REFUSED: sealed confirmation material is never available through the builder surface",
+          "refused_by": "Unauthorized"
+        },
+        {
+          "code": "SEALED_ACCESS_TOKEN_REQUIRED",
+          "detail": "SEALED_ACCESS_TOKEN_REQUIRED: sealed access requires an operator-issued token for this payload",
+          "refused_by": "Unauthorized"
+        },
+        {
+          "code": "SEALED_REGISTRATION_ROLE_REFUSED",
+          "detail": "SEALED_REGISTRATION_ROLE_REFUSED: 'BUILDER_AGENT' may not register sealed material",
+          "refused_by": "Unauthorized"
+        }
+      ],
+      "scenario_id": "F8",
+      "status": "HELD",
+      "title": "sealed evaluation boundary"
+    },
+    {
+      "held": true,
+      "intent": "a system result cannot be credited as an artifact result, and capability evidence promotes only through OCE review",
+      "observed": {
+        "attribution_study_permits_narrower_credit": true,
+        "framework_dependence": "CROSS_FRAMEWORK_AGREED",
+        "master_score": null,
+        "refusal_codes": [
+          "SUBJECT_CREDIT_COLLAPSE_REFUSED",
+          "CAPABILITY_SELF_PROMOTION_REFUSED"
+        ],
+        "subject_kind": "COGNITIVE_SYSTEM",
+        "terminal_conclusion": "PASS",
+        "vector_dimensions": [
+          "accuracy"
+        ],
+        "writes_global_capability_status": false
+      },
+      "refusals": [
+        {
+          "code": "SUBJECT_CREDIT_COLLAPSE_REFUSED",
+          "detail": "SUBJECT_CREDIT_COLLAPSE_REFUSED: COGNITIVE_SYSTEM result cannot be credited as COGNITIVE_ARTIFACT",
+          "refused_by": "PolicyBlocked"
+        },
+        {
+          "code": "CAPABILITY_SELF_PROMOTION_REFUSED",
+          "detail": "CAPABILITY_SELF_PROMOTION_REFUSED: Foundry capability evidence cannot become institutional capability truth without OCE review",
+          "refused_by": "Unauthorized"
+        }
+      ],
+      "scenario_id": "F9",
+      "status": "HELD",
+      "title": "artifact / runtime / system separation"
+    }
+  ],
+  "scenarios_failed": [],
+  "scenarios_held": 12,
+  "scenarios_total": 12,
+  "verdict": "PASS"
+}
