@@ -1,0 +1,99 @@
+{
+  "schema": "csia-book-4-hardening-r1-matrix-v0.1",
+  "generated_at": "2026-09-25T12:00:00Z",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "scope": "FACT_SPECIFIC_PROVENANCE + CROSS_RECORD_INTEGRITY + BOOK5_BOUNDARY_SEAL",
+  "governance": {
+    "ratified_planning_anchor": "04820379bd0f63a605d83b1c710a246b103a5ef1",
+    "book_4_decision_binding_commit": "8b6106055686721b1b490adc792b0d6c03696e15",
+    "accepted_book_3_base": "d33afd5ec87208d96d256ec919fbf55956bf2791",
+    "book_4_implementation_start_head": "655bd0cecfe63ea3192408b7ec4c54f027038933",
+    "book_4_acceptance": "NOT_SELF_ACCEPTED",
+    "book_5": "NOT_STARTED",
+    "live_acquisition_authority": false
+  },
+  "gates": {
+    "HARD_RUNTIME_FACT_PROVENANCE": "PASS",
+    "FALLBACK_FACT_PROVENANCE": "PASS",
+    "FAILURE_MECHANISM_PROVENANCE": "PASS",
+    "POSITIVE_INDEPENDENCE_PROVENANCE": "PASS",
+    "REDUNDANCY_FAILURE_DOMAIN_REFERENTIAL_INTEGRITY": "PASS",
+    "SNAPSHOT_LINEAGE_INTEGRITY": "PASS",
+    "BOOK4_BOOK5_STRUCTURAL_BOUNDARY": "PASS",
+    "DEPENDENCY_RELATION_ALLOWLIST": "PASS",
+    "SENSOR_BASELINE_EQUIVALENCE": "PASS",
+    "BOOK1_FREEZE": "PASS",
+    "BOOK2_FREEZE": "PASS",
+    "BOOK3_FREEZE": "PASS"
+  },
+  "findings": {
+    "A_hard_runtime_fact_binding": {
+      "status": "SEALED",
+      "mechanism": "HardRuntimeFactBinding requires canonical Book 2 claims whose proposition qualifier equals the D4-6 fact class; a generic claim cannot support a specific fact",
+      "facts": [
+        "IDENTITY",
+        "DEPLOYED_CONFIGURATION",
+        "RUNTIME_NECESSITY",
+        "FAILURE_CONSEQUENCE",
+        "NO_ACTIVE_EQUIVALENT_FALLBACK",
+        "VALID_TIME"
+      ]
+    },
+    "B_failure_domain_mechanism": {
+      "status": "SEALED",
+      "mechanism": "mechanism_claim_refs must resolve as canonical FAILURE_MECHANISM claims; raw evidence refs are lineage only",
+      "independence": "positive_independence_claim_refs must resolve as canonical POSITIVE_INDEPENDENCE claims"
+    },
+    "C_redundancy_referential_integrity": {
+      "status": "SEALED",
+      "mechanism": "RedundancyBook requires a FailureDomainBook and resolves every failure_domain_ref; independence assertions resolve through Book 2 provenance"
+    },
+    "D_snapshot_lineage": {
+      "status": "SEALED",
+      "mechanism": "Book4Provenance.validate_snapshot_lineage requires each source_snapshot_ref to originate from the resolved Book 2 claim evidence raw_snapshot_ref; no second snapshot registry",
+      "known_limitation": "Book 2 exposes snapshot identity only through RawEvidence.raw_snapshot_ref, so lineage equality is the narrowest available check"
+    },
+    "E_book5_boundary": {
+      "status": "SEALED",
+      "mechanism": "book4_boundary.Book4RelationSupportPolicy is the structural authority; keyword screening is defense in depth",
+      "allowlist_size": 18,
+      "explicitly_rejected": [
+        "COLLATERAL_IN",
+        "LIQUIDITY_ON",
+        "STAKED_IN",
+        "RESTAKED_IN",
+        "REDEEMS_FOR",
+        "ISSUED_ON",
+        "NATIVE_TO",
+        "WRAPS"
+      ]
+    }
+  },
+  "tests": {
+    "book_1": 107,
+    "book_2": 108,
+    "book_3": 83,
+    "book_4_previous": 101,
+    "book_4_r1_focused": 36,
+    "book_4_total": 137,
+    "total_csia": 435
+  },
+  "quality": {
+    "csia_ruff": "PASS",
+    "csia_mypy": "PASS",
+    "csia_mypy_files": 36,
+    "crypto_sensor": {
+      "passed": 2325,
+      "failed": 14,
+      "skipped": 4
+    },
+    "pre_existing_baseline_failures": 14,
+    "book4_introduced_sensor_failures": 0
+  },
+  "freeze": {
+    "book_1_accepted_contract_mutations": 0,
+    "book_2_accepted_contract_mutations": 0,
+    "book_3_accepted_contract_mutations": 0,
+    "crypto_sensor_mutations": 0
+  }
+}

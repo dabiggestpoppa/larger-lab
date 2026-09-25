@@ -678,6 +678,73 @@ Exact next operator action: review the Book 4 implementation matrix and evidence
 then explicitly accept or reject the proposed exit gate. Do not self-accept Book
 4, start Book 5, or enable live acquisition.
 
+---
+
+# CHECKPOINT 16 — BOOK 4 HARDENING R1 (2026-09-25)
+
+Hardening R1 seals fact-specific provenance, cross-record integrity, and the
+Book 4/Book 5 structural boundary without mutating accepted Books 1–3 or the
+Crypto Sensor.
+
+```text
+BOOK_4_HARDENING_R1 = PASS
+BOOK_4_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_4_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_5 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+
+HARD_RUNTIME_FACT_PROVENANCE = PASS
+FALLBACK_FACT_PROVENANCE = PASS
+FAILURE_MECHANISM_PROVENANCE = PASS
+POSITIVE_INDEPENDENCE_PROVENANCE = PASS
+REDUNDANCY_FAILURE_DOMAIN_REFERENTIAL_INTEGRITY = PASS
+SNAPSHOT_LINEAGE_INTEGRITY = PASS
+BOOK4_BOOK5_STRUCTURAL_BOUNDARY = PASS
+DEPENDENCY_RELATION_ALLOWLIST = PASS
+SENSOR_BASELINE_EQUIVALENCE = PASS
+BOOK1_FREEZE = PASS
+BOOK2_FREEZE = PASS
+BOOK3_FREEZE = PASS
+
+BOOK_1_TESTS = 107 PASS
+BOOK_2_TESTS = 108 PASS
+BOOK_3_TESTS = 83 PASS
+BOOK_4_PRIOR_TESTS = 101 PASS
+BOOK_4_R1_FOCUSED_TESTS = 36 PASS
+BOOK_4_TOTAL = 137 PASS
+TOTAL_CSIA = 435 PASS
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (36 source files)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+PRE_EXISTING_BASELINE_FAILURES = 14
+BOOK4_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```
+
+R1 anchors:
+
+- Ratified Book 4 planning + errata anchor: `04820379bd0f63a605d83b1c710a246b103a5ef1`
+- Book 4 D4 binding commit: `8b6106055686721b1b490adc792b0d6c03696e15`
+- Accepted Book 3 base: `d33afd5ec87208d96d256ec919fbf55956bf2791`
+- R1 start HEAD: `655bd0cecfe63ea3192408b7ec4c54f027038933`
+
+Artifacts:
+
+- `CSIA_BOOK_4_HARDENING_R1_MATRIX.json`
+- `CSIA_BOOK_4_HARDENING_R1_SENSOR_EQUIVALENCE.md`
+- `CSIA_BOOK_4_IMPLEMENTATION_EVIDENCE_v0.1.md` (Hardening R1 section)
+- this checkpoint
+
+Exact next operator action: review the R1 matrix, R1 Sensor equivalence record,
+and the R1 evidence section, then explicitly accept or reject the proposed Book
+4 exit gate. Do not self-accept Book 4, start Book 5, or enable live
+acquisition.
+
 Future Book 3 changes require a concrete downstream integration defect, an
 explicit operator amendment, or a newly discovered correctness failure. No
 further generic Book 3 hardening is authorized.
