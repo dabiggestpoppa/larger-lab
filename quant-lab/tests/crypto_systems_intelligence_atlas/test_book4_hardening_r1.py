@@ -24,7 +24,8 @@ from crypto_systems_intelligence_atlas.book4_r1_support import (
     redundancy_r1,
     snapshot_ref,
 )
-from crypto_systems_intelligence_atlas.claims import ClaimState, ClaimStateEngine
+from crypto_systems_intelligence_atlas.claims import ClaimState
+from crypto_systems_intelligence_atlas.promotion import ClaimStateEngine
 from crypto_systems_intelligence_atlas.dependency import (
     BOOK4_DEPENDENCY_RELATION_ALLOWLIST,
     BOOK5_ECONOMIC_RELATIONS,
@@ -155,12 +156,7 @@ def test_a6_non_promotable_fact_claims_cannot_support_hard_runtime(
 ) -> None:
     provenance = _provenance_with_claim_in_state(target)
     bindings = tuple(
-        HardRuntimeFactBinding(
-            fact=HardRuntimeFact.DEPLOYED_CONFIGURATION,
-            claim_refs=(INDEPENDENCE_CONTESTED_CLAIM,),
-        )
-        if binding.fact is HardRuntimeFact.DEPLOYED_CONFIGURATION
-        else binding
+        HardRuntimeFactBinding(fact=binding.fact, claim_refs=(INDEPENDENCE_CONTESTED_CLAIM,))
         for binding in fact_bindings()
     )
     result = HardRuntimeGate(provenance).classify(hard_evidence_r1(bindings=bindings))

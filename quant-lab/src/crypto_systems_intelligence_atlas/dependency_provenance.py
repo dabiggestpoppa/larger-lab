@@ -44,6 +44,42 @@ class Book4Provenance:
                 ) from exc
         return canonical
 
+    def resolve_qualifier_claim(self, claim_ref: str, *, qualifier: str) -> Claim:
+        """Resolve a canonical claim that specifically asserts ``qualifier``.
+
+        A generic canonical claim is never accepted as support for a specific
+        Book 4 fact; the claim proposition must carry the fact qualifier.
+        """
+
+        claim = self.resolve_claim(claim_ref)
+        if claim.proposition.qualifier != qualifier:
+            raise Book4ProvenanceError(
+                f"claim {claim_ref} does not assert required fact qualifier {qualifier}"
+            )
+        return claim
+
+    def validate_snapshot_lineage(
+        self,
+        claim_refs: tuple[str, ...],
+        source_snapshot_refs: tuple[str, ...],
+    ) -> None:
+        """Seal snapshot lineage against accepted Book 2 evidence metadata."""
+
+        if not source_snapshot_refs:
+            raise Book4ProvenanceError(
+                "canonical Book 4 records require source_snapshot_refs lineage"
+            )
+        for claim_ref in claim_refs:
+            claim = self.resolve_claim(claim_ref)
+            for evidence_ref in claim.evidence_refs:
+                raw = self.evidence_store.require(evidence_ref)
+                if raw.raw_snapshot_ref not in source_snapshot_refs:
+                    raise Book4ProvenanceError(
+                        f"snapshot lineage mismatch: claim {claim_ref} evidence "
+                        f"{evidence_ref} originates from snapshot "
+                        f"{raw.raw_snapshot_ref}"
+                    )
+
     def validate_refs(
         self,
         claim_refs: tuple[str, ...],

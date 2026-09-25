@@ -20,6 +20,8 @@ from crypto_systems_intelligence_atlas.dependency import (
     DependencyStrengthState,
     FallbackState,
     HardRuntimeEvidence,
+    HardRuntimeFact,
+    HardRuntimeFactBinding,
     RuntimeScope,
 )
 from crypto_systems_intelligence_atlas.dependency_paths import DependencyPath, PathRelation
@@ -50,6 +52,23 @@ from crypto_systems_intelligence_atlas.types import AuthoritySeed, AuthorityTier
 
 NOW = datetime(2026, 9, 25, 12, tzinfo=UTC)
 CLAIM_REF = "book4-claim-current"
+FACT_CLAIM_REFS = {
+    HardRuntimeFact.IDENTITY: "book4-fact-identity",
+    HardRuntimeFact.DEPLOYED_CONFIGURATION: "book4-fact-deployment",
+    HardRuntimeFact.RUNTIME_NECESSITY: "book4-fact-necessity",
+    HardRuntimeFact.FAILURE_CONSEQUENCE: "book4-fact-failure",
+    HardRuntimeFact.NO_ACTIVE_EQUIVALENT_FALLBACK: "book4-fact-no-fallback",
+    HardRuntimeFact.VALID_TIME: "book4-fact-valid-time",
+}
+
+
+def fact_snapshot_ref(claim_id: str) -> str:
+    return f"snapshot://book4/{claim_id}"
+
+
+FACT_SNAPSHOT_REFS = tuple(
+    fact_snapshot_ref(ref) for ref in FACT_CLAIM_REFS.values()
+)
 
 
 def source_fixture() -> Source:
@@ -77,7 +96,11 @@ def source_fixture() -> Source:
     )
 
 
-def make_claim(claim_id: str = CLAIM_REF, evidence_ref: str = "book4-evidence") -> Claim:
+def make_claim(
+    claim_id: str = CLAIM_REF,
+    evidence_ref: str = "book4-evidence",
+    qualifier: str | None = None,
+) -> Claim:
     return Claim(
         claim_id=claim_id,
         evidence_refs=(evidence_ref,),
@@ -86,6 +109,7 @@ def make_claim(claim_id: str = CLAIM_REF, evidence_ref: str = "book4-evidence") 
             subject_refs=("fixture:system",),
             predicate="has_infrastructure_role",
             object_ref=claim_id,
+            qualifier=qualifier,
         ),
         claim_family=ClaimFamily.CHAIN_ARCHITECTURE,
         claim_state=ClaimState.OBSERVED,
@@ -115,6 +139,24 @@ def kernel() -> tuple[ClaimStore, EvidenceStore, Book4Provenance]:
     ).evidence_id
     claims = ClaimStore()
     claims.add_initial(make_claim(evidence_ref=evidence_ref))
+    for fact, claim_id in FACT_CLAIM_REFS.items():
+        fact_evidence = evidence.capture(
+            source_id="csia:source:book4-offline",
+            retrieved_at=NOW,
+            content=f"book4 fact evidence {claim_id}".encode(),
+            content_locator=f"fixture://book4/{claim_id}",
+            raw_snapshot_ref=fact_snapshot_ref(claim_id),
+            extractor_version="test",
+            parser_version="test",
+            evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
+        ).evidence_id
+        claims.add_initial(
+            make_claim(
+                claim_id,
+                evidence_ref=fact_evidence,
+                qualifier=fact.value,
+            )
+        )
     return claims, evidence, Book4Provenance(claims, evidence)
 
 
@@ -194,6 +236,11 @@ def path(path_id: str = "path-abc") -> DependencyPath:
 
 
 def hard_evidence(**updates: object) -> HardRuntimeEvidence:
+    bindings = tuple(
+        HardRuntimeFactBinding(fact=fact, claim_refs=(claim_ref,))
+        for fact, claim_ref in FACT_CLAIM_REFS.items()
+    )
+    claim_refs = (CLAIM_REF, *(ref for ref in FACT_CLAIM_REFS.values()))
     values: dict[str, object] = {
         "consumer_ref": "fixture:liquidation-contract",
         "provider_ref": "fixture:rpc-primary",
@@ -204,8 +251,12 @@ def hard_evidence(**updates: object) -> HardRuntimeEvidence:
         "removal_makes_function_unavailable": True,
         "fallback_state": FallbackState.NONE,
         "valid_time": NOW,
-        "book2_claim_refs": (CLAIM_REF,),
-        "source_snapshot_refs": ("snapshot://book4/evidence",),
+        "book2_claim_refs": claim_refs,
+        "source_snapshot_refs": (
+            "snapshot://book4/evidence",
+            *FACT_SNAPSHOT_REFS,
+        ),
+        "fact_bindings": bindings,
     }
     values.update(updates)
     return HardRuntimeEvidence.model_validate(values)

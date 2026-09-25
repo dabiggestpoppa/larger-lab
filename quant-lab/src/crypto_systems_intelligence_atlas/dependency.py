@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import Final
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -10,6 +11,59 @@ from .architecture_relations import ArchitectureRelationType
 from .dependency_provenance import Book4Provenance
 from .relationships import EdgeType
 from .temporal import Timestamp, UnknownBound
+
+BOOK4_DEPENDENCY_RELATION_ALLOWLIST: Final[frozenset[EdgeType | ArchitectureRelationType]] = frozenset(
+    {
+        EdgeType.DEPENDS_ON,
+        EdgeType.INTEGRATES_WITH,
+        EdgeType.BUILT_WITH,
+        EdgeType.RUNS_ON,
+        EdgeType.HOSTS,
+        EdgeType.ORACLE_FOR,
+        EdgeType.DATA_FROM,
+        EdgeType.BRIDGES_TO,
+        EdgeType.MESSAGES_TO,
+        EdgeType.ROUTED_THROUGH,
+        EdgeType.OPERATED_BY,
+        EdgeType.OWNED_BY,
+        EdgeType.SECURED_BY,
+        EdgeType.VALIDATED_BY,
+        EdgeType.SETTLES_TO,
+        EdgeType.PRICES,
+        ArchitectureRelationType.EXECUTES_WITH,
+        ArchitectureRelationType.USES_DA,
+        ArchitectureRelationType.SEQUENCED_BY,
+    }
+)
+"""Technical dependency relations faithful to the Book 4 scope."""
+
+BOOK5_ECONOMIC_RELATIONS: Final[frozenset[EdgeType]] = frozenset(
+    {
+        EdgeType.COLLATERAL_IN,
+        EdgeType.LIQUIDITY_ON,
+        EdgeType.STAKED_IN,
+        EdgeType.RESTAKED_IN,
+        EdgeType.REDEEMS_FOR,
+        EdgeType.ISSUED_ON,
+        EdgeType.NATIVE_TO,
+        EdgeType.WRAPS,
+    }
+)
+"""Book 1 economic relations that may never authorize a Book 4 dependency record."""
+
+
+class HardRuntimeFact(str, Enum):
+    """Fact-specific Book 4 support classes for the D4-6 contract."""
+
+    IDENTITY = "IDENTITY"
+    DEPLOYED_CONFIGURATION = "DEPLOYED_CONFIGURATION"
+    RUNTIME_NECESSITY = "RUNTIME_NECESSITY"
+    FAILURE_CONSEQUENCE = "FAILURE_CONSEQUENCE"
+    NO_ACTIVE_EQUIVALENT_FALLBACK = "NO_ACTIVE_EQUIVALENT_FALLBACK"
+    VALID_TIME = "VALID_TIME"
+
+
+REQUIRED_HARD_RUNTIME_FACTS: Final[frozenset[HardRuntimeFact]] = frozenset(HardRuntimeFact)
 
 
 class DependencyClass(str, Enum):
@@ -85,12 +139,30 @@ class DependencyRecord(BaseModel):
         if self.relation_basis is EdgeType.INTEGRATES_WITH:
             if self.strength_descriptor.state is DependencyStrengthState.REQUIRED:
                 raise ValueError("INTEGRATES_WITH does not establish REQUIRED dependency")
+        if self.relation_basis not in BOOK4_DEPENDENCY_RELATION_ALLOWLIST:
+            if self.relation_basis in BOOK5_ECONOMIC_RELATIONS:
+                raise ValueError(
+                    "Book 5 economic relations may not authorize a Book 4 dependency record"
+                )
+            raise ValueError(
+                f"relation {self.relation_basis.value} is outside the Book 4 "
+                "technical dependency allowlist"
+            )
         if self.relation_basis is EdgeType.DEPENDS_ON:
             if self.runtime_scope is RuntimeScope.HARD_RUNTIME:
                 raise ValueError(
                     "DEPENDS_ON alone cannot establish HARD_RUNTIME; use HardRuntimeGate"
                 )
         return self
+
+
+class HardRuntimeFactBinding(BaseModel):
+    """Canonical Book 2 claims that support exactly one D4-6 fact."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    fact: HardRuntimeFact
+    claim_refs: tuple[str, ...] = Field(min_length=1)
 
 
 class HardRuntimeEvidence(BaseModel):
@@ -109,11 +181,15 @@ class HardRuntimeEvidence(BaseModel):
     source_snapshot_refs: tuple[str, ...] = Field(min_length=1)
     runtime_scope_hint: RuntimeScope = RuntimeScope.UNKNOWN
     escape_hatch_evidenced: bool = False
+    fact_bindings: tuple[HardRuntimeFactBinding, ...] = ()
 
     @model_validator(mode="after")
     def _identity(self) -> "HardRuntimeEvidence":
         if self.consumer_ref == self.provider_ref:
             raise ValueError("consumer and provider identities must differ")
+        declared = {binding.fact for binding in self.fact_bindings}
+        if len(declared) != len(self.fact_bindings):
+            raise ValueError("each HARD_RUNTIME fact may be bound only once")
         return self
 
 
@@ -134,8 +210,25 @@ class HardRuntimeGate:
         self.provenance = provenance
 
     def classify(self, evidence: HardRuntimeEvidence) -> RuntimeAssessment:
-        self.provenance.validate_refs(evidence.book2_claim_refs)
         reasons: list[str] = []
+        try:
+            self.provenance.validate_snapshot_lineage(
+                evidence.book2_claim_refs, evidence.source_snapshot_refs
+            )
+        except ValueError as exc:
+            reasons.append(f"snapshot lineage unsupported: {exc}")
+        bound_facts: set[HardRuntimeFact] = set()
+        for binding in evidence.fact_bindings:
+            bound_facts.add(binding.fact)
+            for claim_ref in binding.claim_refs:
+                try:
+                    self.provenance.resolve_qualifier_claim(
+                        claim_ref, qualifier=binding.fact.value
+                    )
+                except ValueError as exc:
+                    reasons.append(f"fact {binding.fact.value} unsupported: {exc}")
+        for missing in sorted(REQUIRED_HARD_RUNTIME_FACTS - bound_facts, key=lambda f: f.value):
+            reasons.append(f"missing fact-specific support for {missing.value}")
         if evidence.escape_hatch_evidenced:
             reasons.append("escape hatch changes the scoped liveness consequence")
         if evidence.runtime_scope_hint in {
@@ -159,8 +252,11 @@ class HardRuntimeGate:
             reasons.append("fallback state is UNKNOWN; promotion is blocked")
         if isinstance(evidence.valid_time, UnknownBound):
             reasons.append("valid time is not established")
-        if not evidence.source_snapshot_refs:
-            reasons.append("source snapshot evidence is missing")
+        if evidence.fallback_state is FallbackState.NONE and not any(
+            binding.fact is HardRuntimeFact.NO_ACTIVE_EQUIVALENT_FALLBACK
+            for binding in evidence.fact_bindings
+        ):
+            reasons.append("absence of an active fallback is asserted without canonical proof")
         scope = (
             evidence.runtime_scope_hint
             if evidence.runtime_scope_hint
@@ -204,6 +300,8 @@ class DependencyBook:
 
 
 __all__ = [
+    "BOOK4_DEPENDENCY_RELATION_ALLOWLIST",
+    "BOOK5_ECONOMIC_RELATIONS",
     "DependencyBook",
     "DependencyClass",
     "DependencyRecord",
@@ -211,7 +309,10 @@ __all__ = [
     "DependencyStrengthState",
     "FallbackState",
     "HardRuntimeEvidence",
+    "HardRuntimeFact",
+    "HardRuntimeFactBinding",
     "HardRuntimeGate",
+    "REQUIRED_HARD_RUNTIME_FACTS",
     "RuntimeAssessment",
     "RuntimeScope",
 ]
