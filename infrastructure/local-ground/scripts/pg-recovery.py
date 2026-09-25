@@ -64,6 +64,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -765,11 +766,11 @@ def _publish_no_replace(source_path, destination_path) -> None:
 
     The predecessor created the canonical claim name with O_CREAT|O_EXCL and
     only then wrote the payload, so any death in that window left a durably
-    VISIBLE EMPTY claim: the one-time authority was spent and unreadable, and
-    the operation was stranded with no governed continuation. Here the payload
-    is written and fsynced to a private temporary first; publication then
-    exposes the already-durable inode under the canonical name, so the
-    canonical claim is never observable empty, partial, or malformed.
+    VISIBLE EMPTY claim: the authority was spent and unreadable, and the
+    operation was stranded with no governed continuation. Here the payload is
+    written and fsynced to a private temporary first; publication then exposes
+    the already-durable inode under the canonical name, so the canonical claim
+    is never observable empty, partial, or malformed.
 
     os.link() is the POSIX primitive: it fails atomically with EEXIST when the
     destination name is taken, and it can never overwrite a winner. On Windows
@@ -897,11 +898,11 @@ def _claim_state(operation_id, transition_dir=None):
 
     B4-CXR7U9R44R1. A COMPLETE claim is one this engine published atomically.
     MALFORMED means a canonical claim NAME exists that is not a complete
-    engine-published claim - a foreign write, a truncated file, or a pre-R44
-    zero-byte poison claim. The engine can no longer generate that state, but
-    it must be named and failed closed rather than reported as "fresh
-    authority": the selector name being present means the one-time authority
-    is SPENT even when its content cannot be read.
+    engine-published claim - a foreign write, a truncated file, or a
+    pre-R44 zero-byte poison claim. The engine can no longer generate that
+    state, but it must be named and failed closed rather than reported as
+    "fresh authority": the selector name being present means the one-time
+    authority is SPENT even when its content cannot be read.
     """
     directory = transition_dir or _transitions_dir()
     path = os.path.join(directory, f"{operation_id}.claim")
@@ -917,7 +918,108 @@ def _claim_state(operation_id, transition_dir=None):
 
 
 class _ExecutionAuthorityConflict(RuntimeError):
-    """A process already owns the operation's mutation interval."""
+    """A process does not own the operation's mutation interval."""
+
+
+def _coordinate_path(operation_id) -> str:
+    return os.path.join(_transitions_dir(), f"{operation_id}.execution.lock")
+
+
+def _validate_lock_coordinate(path, operation_id):
+    """A coordinate is a real, private file inside the governed transition
+    directory: never a symlink, never a directory, never a redirection target,
+    never readable by group or other (B4-CXR7U9R44R2). Refusal is
+    deterministic and happens before the coordinate can be used."""
+    info = os.lstat(path)
+    if not stat.S_ISREG(info.st_mode):
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} execution coordinate is not a regular "
+            "file; refusing a malformed coordinate")
+    governed = os.path.realpath(_transitions_dir())
+    if os.path.dirname(os.path.realpath(path)) != governed:
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} execution coordinate is not in its "
+            "governed transition directory; refusing a redirected coordinate")
+    if os.name != "nt":
+        mode = stat.S_IMODE(info.st_mode)
+        if mode & 0o077:
+            raise _ExecutionAuthorityConflict(
+                f"operation {operation_id} execution coordinate is not private "
+                f"(mode {mode:04o}); refusing a widened coordinate")
+    return info
+
+
+def _require_governed_operation(operation_id, promote):
+    """An execution authority may only be entered for a GOVERNED operation.
+
+    B4-CXR7U9R44R2. The coordinate is durable for the whole operation
+    lifecycle, so provisioning one for an input that merely LOOKS like a
+    recovery receipt would let an arbitrary 32-hex operation id grow the
+    governed transition directory without ever registering an operation. The
+    durable record must already exist AND be bound to THIS receipt before any
+    coordinate is opened or created, so a malformed, substituted, replayed or
+    unregistered input leaves the transition tree byte-identical.
+    """
+    directory = _transitions_dir()
+    if not os.path.isdir(directory):
+        raise _ExecutionAuthorityConflict(
+            f"no governed recovery transition directory; refusing to enter "
+            f"execution authority for operation {operation_id}")
+    try:
+        record = _load_transition_record(operation_id, transition_dir=directory)
+    except (OSError, ValueError, RuntimeError, TypeError) as e:
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} is not a governed recovery operation; "
+            f"refusing to enter execution authority: {e}") from e
+    if not isinstance(record, dict) or record.get("format") != TRANSITION_FORMAT:
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} durable record has an unknown format; "
+            "refusing to enter execution authority")
+    if not isinstance(promote, dict) \
+            or record.get("receipt_sha256") != _receipt_digest(promote):
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} receipt does not match its durable "
+            "operation record (substituted or altered receipt); refusing to "
+            "enter execution authority")
+    return record
+
+
+def _provision_lock_coordinate(operation_id, promote=None, require_binding=True):
+    """Provision the stable execution coordinate ONCE, as governed operation
+    authority (B4-CXR7U9R44R2).
+
+    Called at the end of a successful promotion, where the durable operation
+    record already exists and this process owns the freshly minted operation id
+    (no receipt binding is possible yet: the promote receipt is still being
+    built). It is also the attributable, idempotent compatibility backfill for
+    an operation that predates the coordinate - but only after
+    receipt-to-record binding has been proven, never for an arbitrary
+    unregistered operation id.
+
+    The coordinate is created, initialized and released while this process
+    holds its OS lock, so R43's stable-inode property is preserved exactly: no
+    process ever writes, truncates, restores, replaces or unlinks a
+    coordinate after releasing its OS lock.
+    """
+    path = _coordinate_path(operation_id)
+    if os.path.lexists(path):
+        _validate_lock_coordinate(path, operation_id)
+        return False
+    if not os.path.isdir(_transitions_dir()):
+        raise _ExecutionAuthorityConflict(
+            f"refusing to provision an execution coordinate for operation "
+            f"{operation_id} outside the governed transition directory")
+    if require_binding:
+        _require_governed_operation(operation_id, promote)
+    authority = _OperationExecutionAuthority(operation_id, "provision", promote)
+    authority.acquire(governed_operation_checked=True)
+    try:
+        authority._release_lock()
+    finally:
+        if authority.fd is not None:
+            os.close(authority.fd)
+            authority.fd = None
+    return True
 
 
 class _OperationExecutionAuthority:
@@ -929,21 +1031,33 @@ class _OperationExecutionAuthority:
     file; it is evidence only and can never authorize a transition. All
     metadata cleanup happens while the coordinate lock is still held, and
     unlocking/closing the descriptor is the final action.
+
+    B4-CXR7U9R44R2 hardens the entry: a coordinate is only provisioned for a
+    governed, receipt-bound operation, never as a side effect of a denial.
     """
     def __init__(self, operation_id, transition, promote):
         self.operation_id = operation_id
         self.transition = transition
         self.promote = promote
         self.fd = None
-        self.path = os.path.join(_transitions_dir(), f"{operation_id}.execution.lock")
+        self.path = _coordinate_path(operation_id)
         self.metadata_path = os.path.join(_transitions_dir(),
                                           f"{operation_id}.execution.json")
         self.metadata_tmp = None
         self.activated = False
         self.metadata_committed = False
+        self.record = None
 
-    def acquire(self):
-        os.makedirs(_transitions_dir(), mode=0o700, exist_ok=True)
+    def acquire(self, governed_operation_checked=False):
+        # DENIAL MUST NOT PROVISION (B4-CXR7U9R44R2): prove a governed,
+        # receipt-bound operation BEFORE a coordinate is opened or created.
+        if not governed_operation_checked:
+            self.record = _require_governed_operation(
+                self.operation_id, self.promote)
+        self._open_and_lock_coordinate()
+        return self
+
+    def _open_and_lock_coordinate(self):
         created = False
         try:
             fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
@@ -971,13 +1085,32 @@ class _OperationExecutionAuthority:
                 # OS lock. The coordinate is never truncated or rewritten.
                 os.write(fd, b"\0")
                 os.fsync(fd)
+            _validate_lock_coordinate(self.path, self.operation_id)
+            if not os.path.samestat(os.fstat(fd), os.lstat(self.path)):
+                raise _ExecutionAuthorityConflict(
+                    f"operation {self.operation_id} execution coordinate path "
+                    "is redirected; refusing a replaced coordinate")
+        except _ExecutionAuthorityConflict:
+            os.close(fd)
+            raise
         except OSError as e:
             os.close(fd)
             raise _ExecutionAuthorityConflict(
                 f"operation {self.operation_id} already has execution authority; "
-                f"{self.transition!r} refused") from e
+                f"{self.transition!r} refused: {e}") from e
         self.fd = fd
         return self
+
+    def _release_lock(self):
+        if self.fd is None:
+            return
+        os.lseek(self.fd, 0, os.SEEK_SET)
+        if os.name == "nt":
+            import msvcrt
+            msvcrt.locking(self.fd, msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(self.fd, fcntl.LOCK_UN)
 
     def activate(self):
         """Publish non-authoritative metadata while the coordinate is locked."""
@@ -1675,8 +1808,17 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
         # floor is durably part of the record: the later finalize/rollback
         # processes verify the restored original against THIS, in their own
         # process, without trusting the backup to describe the original.
+        # GOVERNED COORDINATE PROVISIONING (B4-CXR7U9R44R2): the stable
+        # execution coordinate is created here, as part of successful
+        # operation initialization, so every later finalize/rollback/resume
+        # process opens ONE already-governed coordinate instead of creating one
+        # on entry. It is provisioned BEFORE the PROMOTED write so a
+        # provisioning failure leaves the record in STAGED, where the ladder
+        # still permits the quarantine rollback that follows.
+        _provision_lock_coordinate(operation_id, receipt, require_binding=False)
         _record_transition(operation_id, TRANSITION_STATE_PROMOTED, receipt,
-                           extra={"rollback_floor": floor})
+                           extra={"rollback_floor": floor,
+                                  "execution_coordinate": "provisioned"})
         return receipt
     except Exception as e:
         receipt["error"] = str(e)

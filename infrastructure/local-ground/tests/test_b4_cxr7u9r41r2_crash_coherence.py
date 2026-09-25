@@ -500,7 +500,11 @@ def test_resume_authority_rejects_mismatched_binding(tmp_path, binding):
         write_root=str(h.root), bridge=str(h.bridge),
         env_extra=_env(h.tmp), timeout=60)
     assert result.returncode == 1
-    assert "refusing recovery resume authority" in result.stderr
+    # B4-CXR7U9R44R2: a receipt that no longer binds its durable operation is
+    # refused before any coordinate can be provisioned, so the named reason is
+    # the governed-operation refusal rather than the in-lock resume validation.
+    assert "refusing recovery resume authority" in result.stderr \
+        or "refusing to enter execution authority" in result.stderr
     assert promote["quarantine_database"] in _dbs(h)
     durable = json.loads(record_path.read_text(encoding="utf-8"))
     if binding in ("canonical_database_identity", "durable_intent"):

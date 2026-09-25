@@ -49,7 +49,17 @@ def _record(operation_id):
 
 def _transition(bridge, phase, path, inv, sha):
     fn = pgrec.phase_finalize if phase == "finalize" else pgrec.phase_rollback
-    return fn(str(path), str(inv), str(sha), pgrec.DB, pgrec.USER, pgrec.CONTAINER, None)
+    try:
+        return fn(str(path), str(inv), str(sha), pgrec.DB, pgrec.USER,
+                  pgrec.CONTAINER, None)
+    except pgrec._ExecutionAuthorityConflict as exc:
+        # B4-CXR7U9R44R2: a receipt that is not bound to a governed durable
+        # operation is now refused BEFORE a lock coordinate can be
+        # provisioned, so the refusal raises instead of returning a phase
+        # receipt. It is strictly stronger than before: no coordinate, no
+        # metadata, no claim, and no receipt of its own.
+        return {"exit_status": 1, "error": str(exc), "operation_phase": phase,
+                "refused_before_authority": True}
 
 
 def _inputs(tmp_path, monkeypatch):
@@ -81,10 +91,20 @@ def _promoted(bridge, tmp_path, monkeypatch, name="promote.json"):
 
 def _assert_refused_without_mutation(bridge, out, needle):
     assert out["exit_status"] == 1, out
-    assert "refusing recovery transition authority" in out["error"], out
+    assert "refusing recovery transition authority" in out["error"] \
+        or "refusing to enter execution authority" in out["error"], out
     assert needle in out["error"], out["error"]
     assert bridge.docker == [], bridge.docker
     assert bridge.dropped == [] and bridge.renamed == [] and bridge.staged == []
+
+
+def _identity_refusal(path, inv, sha, needle):
+    """The receipt's own identity rules are unchanged: prove the specific
+    reason is still named even though R44 refuses earlier and more cheaply."""
+    with pytest.raises(RuntimeError) as refused:
+        pgrec._validated_promote_receipt(str(path), pgrec.DB, pgrec.USER,
+                                         pgrec.CONTAINER, str(inv), str(sha))
+    assert needle in str(refused.value), str(refused.value)
 
 
 # --------------------------------------------------------------------- #
@@ -232,15 +252,19 @@ def test_unknown_identity_is_not_transition_authority(
     forged = _mutated(receipt, lambda r: r.__setitem__(label, value), path)
     bridge.reset()
     out = _transition(bridge, "finalize", forged, inv, sha)
-    _assert_refused_without_mutation(bridge, out, needle)
+    _assert_refused_without_mutation(
+        bridge, out, "does not match its durable operation record")
+    _identity_refusal(forged, inv, sha, needle)
 
 
 def test_a_receipt_from_another_run_is_denied(bridge, tmp_path, monkeypatch):
     receipt, path, inv, sha = _promoted(bridge, tmp_path, monkeypatch)
     forged = _mutated(receipt, lambda r: r.__setitem__("run_id", "ffffffffffffffff"), path)
     bridge.reset()
-    _assert_refused_without_mutation(bridge, _transition(bridge, "finalize", forged, inv, sha),
-                                     "different recovery run")
+    _assert_refused_without_mutation(
+        bridge, _transition(bridge, "finalize", forged, inv, sha),
+        "does not match its durable operation record")
+    _identity_refusal(forged, inv, sha, "different recovery run")
 
 
 def test_a_preflight_refusal_opens_no_operation_state_at_all(
@@ -260,8 +284,9 @@ def test_a_preflight_refusal_opens_no_operation_state_at_all(
     path.write_text(json.dumps(out), encoding="utf-8")
     bridge.reset()
     # it is refused as a failed promotion, and nothing durable is touched
-    _assert_refused_without_mutation(bridge, _transition(bridge, "finalize", path, inv, sha),
-                                     "failed promote")
+    _assert_refused_without_mutation(
+        bridge, _transition(bridge, "finalize", path, inv, sha),
+        "no governed recovery transition directory")
     assert not list((governed / "transitions").glob("*.json"))
     assert not list((governed / "transitions").glob("*.claim"))
 

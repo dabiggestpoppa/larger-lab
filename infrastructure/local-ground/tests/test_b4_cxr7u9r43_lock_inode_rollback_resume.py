@@ -547,10 +547,19 @@ def _post_unlock_unlink_engine(tmp_path):
 def _coordinate_replacement_engine(tmp_path):
     def transform(source):
         source = source.replace("import tempfile\n", "import tempfile\nimport time\n")
+        # B4-CXR7U9R44R2: the coordinate is now validated before use, so the
+        # weakened engine redirects the whole coordinate PATH to a replacement
+        # inode - exactly the pre-R44 defect, where the stable name and the
+        # locked inode can diverge.
         return source.replace(
             "        except FileExistsError:\n            fd = os.open(self.path, os.O_RDWR, 0o600)",
             "        except FileExistsError:\n"
-            "            fd = os.open(self.path + '.replacement', os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)",
+            "            self.path = self.path + '.replacement'\n"
+            "            try:\n"
+            "                fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)\n"
+            "                created = True\n"
+            "            except FileExistsError:\n"
+            "                fd = os.open(self.path, os.O_RDWR, 0o600)",
         )
     return _weakened_engine(tmp_path, transform)
 
@@ -617,6 +626,18 @@ def test_weakened_coordinate_replacement_lets_contender_lock_a_new_inode(tmp_pat
         replacement = Path(str(coordinate) + ".replacement")
         assert replacement.is_file()
         assert replacement.stat().st_ino != original_inode
+        # B4-CXR7U9R44R2: the weakened winner now holds a lock on the
+        # REPLACEMENT inode while the stable coordinate name is still free, so
+        # a real, unweakened contender enters the same mutation interval
+        # concurrently. That is the two-executors defect itself.
+        h.bridge_dir.joinpath("crash.json").write_text(
+            json.dumps({"boundary": "after_execution_metadata"}), encoding="utf-8")
+        contender = _spawn(h, _rollback_argv(h, h.root / "second-executor.json"))
+        processes.append(contender)
+        if contender.poll() is not None:
+            contender_out, contender_err = contender.communicate()
+            pytest.fail(f"second executor was refused: {contender_out!r} {contender_err!r}")
+        _wait_for_path(h.signal)
     finally:
         _terminate(processes)
 
