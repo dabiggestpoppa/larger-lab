@@ -8,48 +8,14 @@ from typing import Final
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .architecture_relations import ArchitectureRelationType
+from .book4_boundary import (
+    BOOK4_DEPENDENCY_RELATION_ALLOWLIST,
+    BOOK5_ECONOMIC_RELATIONS,
+    Book4RelationSupportPolicy,
+)
 from .dependency_provenance import Book4Provenance
 from .relationships import EdgeType
 from .temporal import Timestamp, UnknownBound
-
-BOOK4_DEPENDENCY_RELATION_ALLOWLIST: Final[frozenset[EdgeType | ArchitectureRelationType]] = frozenset(
-    {
-        EdgeType.DEPENDS_ON,
-        EdgeType.INTEGRATES_WITH,
-        EdgeType.BUILT_WITH,
-        EdgeType.RUNS_ON,
-        EdgeType.HOSTS,
-        EdgeType.ORACLE_FOR,
-        EdgeType.DATA_FROM,
-        EdgeType.BRIDGES_TO,
-        EdgeType.MESSAGES_TO,
-        EdgeType.ROUTED_THROUGH,
-        EdgeType.OPERATED_BY,
-        EdgeType.OWNED_BY,
-        EdgeType.SECURED_BY,
-        EdgeType.VALIDATED_BY,
-        EdgeType.SETTLES_TO,
-        EdgeType.PRICES,
-        ArchitectureRelationType.EXECUTES_WITH,
-        ArchitectureRelationType.USES_DA,
-        ArchitectureRelationType.SEQUENCED_BY,
-    }
-)
-"""Technical dependency relations faithful to the Book 4 scope."""
-
-BOOK5_ECONOMIC_RELATIONS: Final[frozenset[EdgeType]] = frozenset(
-    {
-        EdgeType.COLLATERAL_IN,
-        EdgeType.LIQUIDITY_ON,
-        EdgeType.STAKED_IN,
-        EdgeType.RESTAKED_IN,
-        EdgeType.REDEEMS_FOR,
-        EdgeType.ISSUED_ON,
-        EdgeType.NATIVE_TO,
-        EdgeType.WRAPS,
-    }
-)
-"""Book 1 economic relations that may never authorize a Book 4 dependency record."""
 
 
 class HardRuntimeFact(str, Enum):
@@ -140,14 +106,7 @@ class DependencyRecord(BaseModel):
             if self.strength_descriptor.state is DependencyStrengthState.REQUIRED:
                 raise ValueError("INTEGRATES_WITH does not establish REQUIRED dependency")
         if self.relation_basis not in BOOK4_DEPENDENCY_RELATION_ALLOWLIST:
-            if self.relation_basis in BOOK5_ECONOMIC_RELATIONS:
-                raise ValueError(
-                    "Book 5 economic relations may not authorize a Book 4 dependency record"
-                )
-            raise ValueError(
-                f"relation {self.relation_basis.value} is outside the Book 4 "
-                "technical dependency allowlist"
-            )
+            Book4RelationSupportPolicy.require_supported(self.relation_basis)
         if self.relation_basis is EdgeType.DEPENDS_ON:
             if self.runtime_scope is RuntimeScope.HARD_RUNTIME:
                 raise ValueError(

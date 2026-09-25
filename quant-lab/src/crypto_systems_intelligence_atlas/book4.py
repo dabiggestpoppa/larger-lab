@@ -1,5 +1,12 @@
 """Public Book 4 offline kernel facade; no persistence, acquisition, or Book 5."""
 
+from .book4_boundary import (
+    BOOK4_DEPENDENCY_RELATION_ALLOWLIST,
+    BOOK4ScopeError,
+    BOOK5_ECONOMIC_RELATIONS,
+    Book4RelationSupportPolicy,
+    assert_book4_technical_scope,
+)
 from .dependency import (
     DependencyBook,
     DependencyClass,
@@ -50,8 +57,11 @@ from .substitutability import (
 
 __all__ = [
     "ActivationMode",
+    "BOOK4_DEPENDENCY_RELATION_ALLOWLIST",
     "BOOK4ScopeError",
+    "BOOK5_ECONOMIC_RELATIONS",
     "Book4Provenance",
+    "Book4RelationSupportPolicy",
     "Book4ProvenanceError",
     "Book4RelationProjector",
     "ChangeClass",
@@ -93,26 +103,3 @@ __all__ = [
     "SubstitutabilityDirection",
     "assert_book4_technical_scope",
 ]
-
-
-class BOOK4ScopeError(ValueError):
-    """Book 5 capital-field content attempted to cross the Book 4 boundary."""
-
-
-def assert_book4_technical_scope(value: str) -> None:
-    forbidden = (
-        "total value locked",
-        "capital routing",
-        "liquidity depth",
-        "collateral value",
-        "stablecoin supply",
-        "credit risk",
-        "yield",
-        "staking economics",
-        "derivative position",
-        "value locked",
-        "capital concentration",
-    )
-    normalized = value.lower()
-    if any(term in normalized for term in forbidden):
-        raise BOOK4ScopeError(f"Book 5 capital-field claim rejected from Book 4: {value}")
