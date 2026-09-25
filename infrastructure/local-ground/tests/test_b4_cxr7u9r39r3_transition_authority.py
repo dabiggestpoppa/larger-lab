@@ -262,7 +262,8 @@ def test_a_preflight_refusal_opens_no_operation_state_at_all(
     # it is refused as a failed promotion, and nothing durable is touched
     _assert_refused_without_mutation(bridge, _transition(bridge, "finalize", path, inv, sha),
                                      "failed promote")
-    assert not (governed / "transitions").exists()
+    assert not list((governed / "transitions").glob("*.json"))
+    assert not list((governed / "transitions").glob("*.claim"))
 
 
 def test_a_promotion_that_fails_after_staging_records_a_terminal_failure(

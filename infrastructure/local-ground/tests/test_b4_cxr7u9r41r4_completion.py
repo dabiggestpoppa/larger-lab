@@ -284,6 +284,8 @@ def test_production_shell_preintent_route_converges_old_old(boundary, tmp_path):
     before = _tree_sha(snapshot)
     after = _tree_sha(artifact)
     assert before != after
+    tree_sha_script = tmp_path / "tree-sha.py"
+    tree_sha_script.write_text(_tree_sha_py(), encoding="utf-8")
     script = f'''set -uo pipefail
 OCE_PYTHON={shlex_quote(sys.executable)}
 BIN={shlex_quote(str(bindir))}
@@ -309,7 +311,7 @@ FAIL_NOTE=""
 LIVE_SNAPSHOT_DIR={shlex_quote(str(snapshot))}
 artifact_stop() {{ return 0; }}
 artifact_start() {{ return 0; }}
-artifact_volume_sha() {{ "$OCE_PYTHON" -c '{_tree_sha_py()}' "$ARTIFACT_ROOT"; }}
+artifact_volume_sha() {{ "$OCE_PYTHON" {shlex_quote(str(tree_sha_script))} "$ARTIFACT_ROOT"; }}
 artifact_restore_from() {{ rm -rf "$ARTIFACT_ROOT"; mkdir -p "$ARTIFACT_ROOT"; cp -a "$1"/. "$ARTIFACT_ROOT"/; }}
 {_shell_functions()}
 rollback_precommit "r41r4 production route"
