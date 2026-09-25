@@ -814,15 +814,14 @@ class _ExecutionAuthorityConflict(RuntimeError):
 
 
 class _OperationExecutionAuthority:
-    """One OS advisory lock per operation for the complete mutation interval.
+    """Stable per-operation OS lock coordinate plus non-authoritative metadata.
 
-    The lock file is persistent evidence, not the authority. The operating
-    system owns the exclusive byte-range lock and releases it on process death,
-    so a killed executor cannot leave a permanent lease. Lock acquisition is
-    silent; after complete authorization, metadata is published with the exact
-    operation, selected transition, receipt digest, process id, and random
-    token. A denied contender restores the prior payload, and a contender never
-    trusts stale metadata when the OS says the lock is held.
+    The coordinate pathname and inode are created once and never replaced,
+    truncated, restored, or unlinked. Only the operating-system lock is
+    authority. Execution metadata lives in a separate atomically replaced JSON
+    file; it is evidence only and can never authorize a transition. All
+    metadata cleanup happens while the coordinate lock is still held, and
+    unlocking/closing the descriptor is the final action.
     """
     def __init__(self, operation_id, transition, promote):
         self.operation_id = operation_id
@@ -830,21 +829,29 @@ class _OperationExecutionAuthority:
         self.promote = promote
         self.fd = None
         self.path = os.path.join(_transitions_dir(), f"{operation_id}.execution.lock")
-        self.original_payload = None
+        self.metadata_path = os.path.join(_transitions_dir(),
+                                          f"{operation_id}.execution.json")
+        self.metadata_tmp = None
         self.activated = False
-        self.created_transitions_dir = False
+        self.metadata_committed = False
 
     def acquire(self):
-        self.created_transitions_dir = not os.path.isdir(_transitions_dir())
         os.makedirs(_transitions_dir(), mode=0o700, exist_ok=True)
-        fd = os.open(self.path, os.O_CREAT | os.O_RDWR, 0o600)
+        created = False
         try:
-            size = os.fstat(fd).st_size
-            if size == 0:
-                os.write(fd, b"\0")
-                size = 1
-            os.lseek(fd, 0, os.SEEK_SET)
-            self.original_payload = os.read(fd, size)
+            fd = os.open(self.path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
+            created = True
+        except FileExistsError:
+            fd = os.open(self.path, os.O_RDWR, 0o600)
+        try:
+            if created:
+                # Creation publishes the stable pathname but does not mutate
+                # its contents. Reopen and lock it before the one-time
+                # initialization below, so even the creating process never
+                # writes a contender-owned coordinate.
+                os.close(fd)
+                _fsync_dir(_transitions_dir())
+                fd = os.open(self.path, os.O_RDWR, 0o600)
             os.lseek(fd, 0, os.SEEK_SET)
             if os.name == "nt":
                 import msvcrt
@@ -852,34 +859,25 @@ class _OperationExecutionAuthority:
             else:
                 import fcntl
                 fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            if os.fstat(fd).st_size < 1:
+                # Stable sentinel initialization is itself protected by the
+                # OS lock. The coordinate is never truncated or rewritten.
+                os.write(fd, b"\0")
+                os.fsync(fd)
         except OSError as e:
-            owner = "unknown"
-            try:
-                os.lseek(fd, 0, os.SEEK_SET)
-                raw = os.read(fd, 4096).decode("utf-8", errors="replace")
-                parsed = json.loads(raw)
-                owner = parsed.get("transition", "unknown")
-            except (OSError, ValueError):
-                pass
             os.close(fd)
             raise _ExecutionAuthorityConflict(
-                f"operation {self.operation_id} already has execution authority "
-                f"for {owner!r}; {self.transition!r} refused") from e
+                f"operation {self.operation_id} already has execution authority; "
+                f"{self.transition!r} refused") from e
         self.fd = fd
         return self
 
     def activate(self):
-        """Publish metadata only after complete authorization under the lock.
-
-        Binding and the OS lock are intentionally silent. A denial restores the
-        exact prior lock payload (or removes the lock file), so malformed,
-        substituted, replayed, and state-ineligible receipts have no durable
-        execution-authority side effect.
-        """
+        """Publish non-authoritative metadata while the coordinate is locked."""
         if self.fd is None:
             raise RuntimeError("execution authority is not locked")
         metadata = {
-            "format": "oce-operation-execution-authority-v1",
+            "format": "oce-operation-execution-authority-v2",
             "operation_id": self.operation_id,
             "transition": self.transition,
             "receipt_sha256": _receipt_digest(self.promote),
@@ -888,12 +886,44 @@ class _OperationExecutionAuthority:
             "acquired_at": now_iso(),
         }
         payload = json.dumps(metadata, sort_keys=True, separators=(",", ":")) + "\n"
-        os.lseek(self.fd, 0, os.SEEK_SET)
-        os.ftruncate(self.fd, 0)
-        os.write(self.fd, payload.encode("utf-8"))
-        os.fsync(self.fd)
+        tmp_fd, self.metadata_tmp = tempfile.mkstemp(
+            prefix=f".{self.operation_id}.execution.", suffix=".tmp",
+            dir=_transitions_dir())
+        try:
+            os.write(tmp_fd, payload.encode("utf-8"))
+            os.fsync(tmp_fd)
+            os.close(tmp_fd)
+            tmp_fd = None
+            os.replace(self.metadata_tmp, self.metadata_path)
+            self.metadata_tmp = None
+            _fsync_dir(_transitions_dir())
+            self.activated = True
+        except Exception:
+            if tmp_fd is not None:
+                os.close(tmp_fd)
+            if self.metadata_tmp is not None:
+                try:
+                    os.unlink(self.metadata_tmp)
+                except FileNotFoundError:
+                    pass
+                self.metadata_tmp = None
+            raise
+
+    def commit(self):
+        """Mark metadata as belonging to a consumed, resumable branch."""
+        self.metadata_committed = True
+
+    def clear_metadata(self):
+        """Remove only this attempt's metadata, never the stable coordinate."""
+        for path in (self.metadata_tmp, self.metadata_path):
+            if path is None:
+                continue
+            try:
+                os.unlink(path)
+            except FileNotFoundError:
+                pass
+        self.metadata_tmp = None
         _fsync_dir(_transitions_dir())
-        self.activated = True
 
     def __enter__(self):
         return self.acquire()
@@ -901,37 +931,19 @@ class _OperationExecutionAuthority:
     def __exit__(self, exc_type, exc, tb):
         if self.fd is None:
             return False
-        fd = self.fd
         try:
-            os.lseek(fd, 0, os.SEEK_SET)
+            if self.activated and not self.metadata_committed:
+                self.clear_metadata()
+            os.lseek(self.fd, 0, os.SEEK_SET)
             if os.name == "nt":
                 import msvcrt
-                msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+                msvcrt.locking(self.fd, msvcrt.LK_UNLCK, 1)
             else:
                 import fcntl
-                fcntl.flock(fd, fcntl.LOCK_UN)
+                fcntl.flock(self.fd, fcntl.LOCK_UN)
         finally:
-            os.close(fd)
+            os.close(self.fd)
             self.fd = None
-        if not self.activated:
-            try:
-                if self.original_payload in (None, b"\0"):
-                    os.unlink(self.path)
-                else:
-                    restore = os.open(self.path, os.O_WRONLY | os.O_TRUNC, 0o600)
-                    try:
-                        os.write(restore, self.original_payload)
-                        os.fsync(restore)
-                    finally:
-                        os.close(restore)
-                _fsync_dir(_transitions_dir())
-                if self.created_transitions_dir:
-                    try:
-                        os.rmdir(_transitions_dir())
-                    except OSError:
-                        pass
-            except FileNotFoundError:
-                pass
         return False
 
 
@@ -1569,17 +1581,19 @@ def _phase_finalize_locked(receipt_in_path, inventory_path, inventory_sha_path, 
             return _blocked(
                 receipt, f"refusing recovery resume authority: {e}")
         execution_authority.activate()
+        execution_authority.commit()
     else:
         try:
             promote, stamp, quarantine, staging, operation_id = \
                 _validated_transition_receipt(
                     receipt_in_path, db, user, container, inventory_path,
                     inventory_sha_path, "finalize")
-            # Full receipt/state/identity authorization is complete while the OS
-            # lock is held. Consume the one operation branch, then publish
-            # execution metadata before any catalog or filesystem mutation.
-            _claim_transition(operation_id, "finalize", promote)
+            # Full authorization is complete while the stable coordinate is
+            # locked. Publish evidence, consume the branch, then retain the
+            # metadata for governed resume if the process dies.
             execution_authority.activate()
+            _claim_transition(operation_id, "finalize", promote)
+            execution_authority.commit()
         except Exception as e:
             return _blocked(
                 receipt, f"refusing recovery transition authority: {e}")
@@ -1764,11 +1778,12 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
         promote, stamp, quarantine, staging, operation_id = _validated_transition_receipt(
             receipt_in_path, db, user, container, inventory_path, inventory_sha_path,
             "rollback")
-        # Full receipt/state/identity authorization is complete under the OS
-        # lock. Consume the one operation branch, then publish execution
-        # metadata before any docker or catalog call exists to make.
-        _claim_transition(operation_id, "rollback", promote)
+        # Full authorization is complete under the stable coordinate lock.
+        # Publish evidence, consume the branch, then retain metadata for the
+        # explicit rollback-resume path if this process dies.
         execution_authority.activate()
+        _claim_transition(operation_id, "rollback", promote)
+        execution_authority.commit()
         floor = _floor_from_record(operation_id)
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
@@ -1841,6 +1856,7 @@ def phase_preintent_rollback(receipt_in_path, inventory_path, inventory_sha_path
                  receipt_in_path, db, user, container, inventory_path,
                  inventory_sha_path)
             authority.activate()
+            authority.commit()
             receipt.update({
                 "stamp": stamp,
                 "staging_database": staging,

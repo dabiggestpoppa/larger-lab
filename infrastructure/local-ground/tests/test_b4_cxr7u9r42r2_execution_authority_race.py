@@ -212,7 +212,9 @@ def _snapshot(harness, artifact):
     return {
         "transition": _bytes(transitions / f"{opid}.json"),
         "claim": _bytes(transitions / f"{opid}.claim"),
-        "execution_metadata": _bytes(transitions / f"{opid}.execution.lock"),
+        # R43 creates this stable, evidence-free coordinate before full
+        # authorization. Its lifecycle/inode safety is proven separately.
+        "execution_metadata": _bytes(transitions / f"{opid}.execution.json"),
         "receipts": {p.name: _bytes(p) for p in sorted(harness.root.glob("*.json"))},
         "postgres_catalog": _bytes(harness.bridge_dir / "dbs.json"),
         "artifact": {p.name: _bytes(p) for p in sorted(artifact.iterdir())},
@@ -367,9 +369,15 @@ def phase_resume_finalize(receipt_in_path, inventory_path, inventory_sha_path,
     source = source.replace("\n            execution_authority.activate()\n",
                             "\n            if execution_authority is not None:\n"
                             "                execution_authority.activate()\n")
+    source = source.replace("\n            execution_authority.commit()\n",
+                            "\n            if execution_authority is not None:\n"
+                            "                execution_authority.commit()\n")
     source = source.replace("\n        execution_authority.activate()\n",
                             "\n        if execution_authority is not None:\n"
                             "            execution_authority.activate()\n")
+    source = source.replace("\n        execution_authority.commit()\n",
+                            "\n        if execution_authority is not None:\n"
+                            "            execution_authority.commit()\n")
     weak = tmp_path / "weakened-pg-recovery.py"
     weak.write_text(source, encoding="utf-8")
     return weak
