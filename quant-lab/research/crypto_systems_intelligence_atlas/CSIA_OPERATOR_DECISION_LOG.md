@@ -516,6 +516,200 @@ DECISION LOG ENTRY {
 }
 ```
 
+# BOOK 4 DECISIONS (D4-1–D4-8)
+
+**Decision session:** 2026-09-24
+
+**Operator authorization:** explicit narrow Book 4 v0.2 reconciliation and
+ratification decisions D4-1 through D4-8.
+
+**Binding planning artifact:** `CSIA_BOOK_4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_ATLAS_PLAN_v0.2.md`
+
+## D4-1 — TYPED DEPENDENCY-STRENGTH DESCRIPTOR
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D4-1
+  decision:               ACCEPT TYPED EVIDENCE-BACKED DESCRIPTOR OBJECT
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 4 Blocs 4A, 4B, 4C
+  invariant:              Dependency strength is a typed, evidence-backed,
+                          function- and scope-specific description, not a score.
+  consequence:            Use state REQUIRED, PRIMARY, FALLBACK, OPTIONAL,
+                          LEGACY, DEPRECATED, or UNKNOWN with function, scope,
+                          mechanism, valid_time, and book2_claim_refs.
+  reversibility:          Reversible only by later recorded operator decision;
+                          existing evidence and temporal history remain intact.
+  evidence_basis:         Book 4 v0.2 plan; dependency evidence matrix;
+                          Book 2 claim provenance and valid-time rules.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D4-2 — FIRST-CLASS FAILURE DOMAINS
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D4-2
+  decision:               ACCEPT FIRST-CLASS FAILURE DOMAIN RECORDS
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 4 Blocs 4A, 4D, 4E
+  invariant:              A failure domain is mechanism-based and distinct from
+                          provider, operator, owner, and protocol identity.
+  consequence:            Store FailureDomain records with evidence-backed
+                          membership; use an optional Book 1 hyperedge only when
+                          a simple record plus links would lose participant roles
+                          or mechanisms.
+  reversibility:          Reversible only by later recorded operator decision;
+                          identity and evidence history remain preserved.
+  evidence_basis:         Book 4 failure-domain stress matrix; Book 1
+                          relationship and hyperedge foundations.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D4-3 — DERIVED TRANSITIVE DEPENDENCIES
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D4-3
+  decision:               ACCEPT ORDERED DEPENDENCY PATHS
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 4 Blocs 4A, 4B
+  invariant:              Transitive dependency is a path property, not a
+                          flattened canonical edge.
+  consequence:            Store ordered_nodes, ordered_relations, path_length,
+                          valid_time, and book2_claim_refs in DependencyPath.
+                          Any cache or materialization is a derived view.
+  reversibility:          Reversible only by later recorded operator decision;
+                          path and source lineage remain auditable.
+  evidence_basis:         Book 4 v0.2 plan; Book 1 relation semantics; Book 2
+                          provenance and temporal controls.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D4-4 — EVIDENCE-BACKED SUBSTITUTABILITY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D4-4
+  decision:               ACCEPT CONTEXTUAL SUBSTITUTABILITY ASSESSMENTS
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 4 Blocs 4C, 4D
+  invariant:              Substitutability is directional, function-specific,
+                          context-specific, and time-valid; A->B never implies
+                          B->A.
+  consequence:            Store evidence-backed SubstitutabilityAssessment
+                          records. Do not compute or store a universal REPLACES
+                          relationship.
+  reversibility:          Reversible only by later recorded operator decision;
+                          prior assessments and valid-time history remain.
+  evidence_basis:         Book 4 substitutability stress matrix; Book 2 claim
+                          provenance, scope, and temporal rules.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D4-5 — LOCAL BOOK 4 TYPED LAYER
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D4-5
+  decision:               ACCEPT BOOK 4-LOCAL TYPED RELATIONSHIP LAYER
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 4 Blocs 4A, 4B, 4C, 4D
+  invariant:              Book 4 dependency semantics do not silently amend or
+                          duplicate accepted Books 1–3 contracts.
+  consequence:            Reuse faithful Book 1 and Book 3 relations while
+                          keeping dependency, failure-domain, redundancy,
+                          substitutability, and route/service context in typed
+                          Book 4 records. Amend Books 1–3 only after a demonstrated
+                          cross-book contract need and operator decision.
+  reversibility:          Book-local representation may evolve by recorded
+                          decision without rewriting accepted foundations.
+  evidence_basis:         Book 4 v0.2 plan; accepted Books 1–3 planning records;
+                          cross-book boundary review.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D4-6 — CONSERVATIVE HARD_RUNTIME CONTRACT
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D4-6
+  decision:               ACCEPT EIGHT-PART MINIMUM HARD_RUNTIME EVIDENCE RULE
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 4 Blocs 4B, 4C, 4E
+  invariant:              HARD_RUNTIME requires evidence for all eight contract
+                          facts and remains scoped to an explicit function.
+  consequence:              Require consumer/function, provider/service, deployed
+                          configuration, runtime necessity, real failure or
+                          unavailability, no active equivalent fallback, valid
+                          time, and canonical Book 2 provenance. Unknown fallback
+                          behavior prevents promotion.
+  reversibility:          A later evidence-backed decision may narrow or expand
+                          a scoped assessment; it cannot erase prior evidence.
+  evidence_basis:         Book 4 HARD_RUNTIME stress matrix; v0.2 plan; Book 2
+                          deployed-state and provenance requirements.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D4-7 — CORRELATED REDUNDANCY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D4-7
+  decision:               ACCEPT FAILURE-DOMAIN-REFERENCED REDUNDANCY
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 4 Blocs 4D, 4E
+  invariant:              Redundancy is a scoped assessment of function
+                          preservation and cannot be inferred from branding.
+  consequence:            Store RedundancyAssessment with providers, activation
+                          mode, function, shared upstreams, failure_domain_refs,
+                          independence dimensions, valid time, and Book 2 refs.
+                          INDEPENDENT_REDUNDANCY requires positive evidence.
+  reversibility:          Reversible only by later recorded operator decision;
+                          assessment history and evidence remain preserved.
+  evidence_basis:         Book 4 failure-domain and infrastructure-pilot
+                          matrices; Book 2 evidence and temporal controls.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
+## D4-8 — DISTINCT IDENTITIES
+
+```text
+DECISION LOG ENTRY {
+  decision_id:            D4-8
+  decision:               ACCEPT SEPARATE PROVIDER, OPERATOR, OWNER, PROTOCOL,
+                          AND FAILURE-DOMAIN IDENTITIES
+  operator_status:        RATIFIED / CLOSED
+  affected_blocs:         BOOK 4 Blocs 4A, 4D
+  invariant:              Provider, operator, owner, protocol, and failure-domain
+                          identities are not interchangeable.
+  consequence:            Use faithful OPERATED_BY and OWNED_BY relationships;
+                          infer failure-domain membership only from mechanism-
+                          based evidence. One operator may span one domain,
+                          several domains, partial correlation, or UNKNOWN.
+  reversibility:          Reversible only by later recorded operator decision;
+                          identity distinctions and source lineage remain intact.
+  evidence_basis:         Book 4 v0.2 plan; failure-domain stress matrix;
+                          accepted Book 1 relationship semantics.
+  effective_timestamp:    2026-09-24
+  binding_commit_sha:     (assigned at this decision commit)
+}
+```
+
 ---
 
 # DEFERRED DECISIONS (OPEN — NOT DECIDED THIS SESSION)
