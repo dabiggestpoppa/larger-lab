@@ -152,8 +152,8 @@ hosted-service scope must be recorded independently of role lifecycle state.
 9. `role_state=UNKNOWN` means the role lifecycle property is unknown; it does not
    change any Book 2 claim state.
 10. A role assignment with no Book 2 claim refs is not canonical.
-11. An `UNKNOWN` Book 2 claim or domain classification cannot be strengthened by
-    a role label.
+11. A Book 4 domain value of `UNKNOWN` cannot be strengthened by a role label.
+    Book 2 claims retain their accepted ClaimState independently.
 12. Role assignment is not dependency classification; a Book 4 DependencyRecord
     separately states function, scope, strength, and runtime consequence.
 

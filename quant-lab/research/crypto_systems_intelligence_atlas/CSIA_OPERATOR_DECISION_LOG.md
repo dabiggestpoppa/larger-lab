@@ -543,7 +543,7 @@ DECISION LOG ENTRY {
   evidence_basis:         Book 4 v0.2 plan; dependency evidence matrix;
                           Book 2 claim provenance and valid-time rules.
   effective_timestamp:    2026-09-24
-  binding_commit_sha:     (assigned at this decision commit)
+  binding_commit_sha:     8b6106055686721b1b490adc792b0d6c03696e15
 }
 ```
 
@@ -566,7 +566,7 @@ DECISION LOG ENTRY {
   evidence_basis:         Book 4 failure-domain stress matrix; Book 1
                           relationship and hyperedge foundations.
   effective_timestamp:    2026-09-24
-  binding_commit_sha:     (assigned at this decision commit)
+  binding_commit_sha:     8b6106055686721b1b490adc792b0d6c03696e15
 }
 ```
 
@@ -588,7 +588,7 @@ DECISION LOG ENTRY {
   evidence_basis:         Book 4 v0.2 plan; Book 1 relation semantics; Book 2
                           provenance and temporal controls.
   effective_timestamp:    2026-09-24
-  binding_commit_sha:     (assigned at this decision commit)
+  binding_commit_sha:     8b6106055686721b1b490adc792b0d6c03696e15
 }
 ```
 
@@ -611,7 +611,7 @@ DECISION LOG ENTRY {
   evidence_basis:         Book 4 substitutability stress matrix; Book 2 claim
                           provenance, scope, and temporal rules.
   effective_timestamp:    2026-09-24
-  binding_commit_sha:     (assigned at this decision commit)
+  binding_commit_sha:     8b6106055686721b1b490adc792b0d6c03696e15
 }
 ```
 
@@ -635,7 +635,7 @@ DECISION LOG ENTRY {
   evidence_basis:         Book 4 v0.2 plan; accepted Books 1–3 planning records;
                           cross-book boundary review.
   effective_timestamp:    2026-09-24
-  binding_commit_sha:     (assigned at this decision commit)
+  binding_commit_sha:     8b6106055686721b1b490adc792b0d6c03696e15
 }
 ```
 
@@ -659,7 +659,7 @@ DECISION LOG ENTRY {
   evidence_basis:         Book 4 HARD_RUNTIME stress matrix; v0.2 plan; Book 2
                           deployed-state and provenance requirements.
   effective_timestamp:    2026-09-24
-  binding_commit_sha:     (assigned at this decision commit)
+  binding_commit_sha:     8b6106055686721b1b490adc792b0d6c03696e15
 }
 ```
 
@@ -682,7 +682,7 @@ DECISION LOG ENTRY {
   evidence_basis:         Book 4 failure-domain and infrastructure-pilot
                           matrices; Book 2 evidence and temporal controls.
   effective_timestamp:    2026-09-24
-  binding_commit_sha:     (assigned at this decision commit)
+  binding_commit_sha:     8b6106055686721b1b490adc792b0d6c03696e15
 }
 ```
 
@@ -706,7 +706,7 @@ DECISION LOG ENTRY {
   evidence_basis:         Book 4 v0.2 plan; failure-domain stress matrix;
                           accepted Book 1 relationship semantics.
   effective_timestamp:    2026-09-24
-  binding_commit_sha:     (assigned at this decision commit)
+  binding_commit_sha:     8b6106055686721b1b490adc792b0d6c03696e15
 }
 ```
 

@@ -716,3 +716,31 @@ No Book 4 implementation, live data, RPC, collector, database, graph database,
 Book 1–3 mutation, Sensor mutation, or Book 5 work is authorized. The next
 operator action is a separate explicit authorization for offline Book 4
 implementation planning/authorization.
+
+---
+
+# PLANNING LEDGER — BOOK 4 RATIFICATION ERRATA v0.1 (2026-09-25)
+
+This narrow errata corrects one invalid Book 2 `UNKNOWN` claim-state reference in
+the Book 4 role model and completes the binding SHA metadata for D4-1 through
+D4-8. It does not reopen Book 4 ratification or change any D4 semantics.
+
+```text
+BOOK_4_RATIFICATION_ERRATA = v0.1 APPLIED
+BOOK_4_RATIFICATION = PRESERVED
+BOOK_4 = RATIFIED
+BOOK_4_PLAN = v0.2
+SEMANTIC_DECISION_CHANGES = 0
+D4_DECISION_CHANGES = 0
+BOOK_1_AMENDMENTS = 0
+BOOK_2_AMENDMENTS = 0
+BOOK_3_AMENDMENTS = 0
+BOOK_4_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+BOOK_5 = NOT_STARTED
+NEXT = BOOK 4 OFFLINE IMPLEMENTATION AUTHORIZATION
+```
+
+Errata artifact:
+
+- `CSIA_BOOK_4_RATIFICATION_ERRATA_v0.1.md`
