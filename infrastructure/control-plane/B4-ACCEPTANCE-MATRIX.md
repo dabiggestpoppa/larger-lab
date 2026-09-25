@@ -321,3 +321,38 @@ SonarCloud is failure/unsuppressed; Kilo was in progress and is not called green
 PR #4 is OPEN, unmerged, and UNSTABLE. `main` remains `7c7816f3`. Cloud, broker,
 capital, and execution-authority mutations are 0; recurring cost is $0; Book 5
 and Atlas Program Block 4 remain untouched.
+
+### B4-CXR7U9R42 superseding repair (append-only)
+
+`R41R4: SUPERSEDED BY B4-CXR7U9R42 POST-REVIEW REPAIR`. The prior exact-head
+R41R4 green workflows remain real and valid for the tests they executed; the
+coverage boundary was incomplete, not fabricated.
+
+| Repair | Commit | Acceptance proof | Exact-head evidence |
+|---|---|---|---|
+| B4-CXR7U9R42R1 | `78b68ae6` | no finalize/resume/rollback mutation-capable body is reachable from an unlocked exception path; full authorization and branch consumption occur inside OS execution authority; denied binding restores zero durable metadata | focused R39/R40/R41 recovery suites pass |
+| B4-CXR7U9R42R2 | `d86b3e82` | deterministic real-process invalid-to-valid proof; fresh/resume/ordinary/pre-intent contention; malformed/digest/unregistered receipt zero-effect snapshots; executable weakened-engine control observes unlocked mutation | 8/8 R42 node IDs selected in authoritative runner |
+| B4-CXR7U9R42R3 | `4720a27e` | authenticated exact-byte S3 GET after service restart plus unchanged image release/revision/ID and `/data` volume identity; disappearance/body/volume/image negative controls | container-backed source-built MinIO proof passes |
+| B4-CXR7U9R42X1 | `698462ac` | malformed receipt is truthfully classified at minimal execution binding while preserving the historical no-call/no-mutation assertion | exact implementation head green |
+
+**Implementation head:** `698462ac6588cdbfb11f0e9c67b03b6e67db01f3`.
+**Implementation tree:** `07073a8f28b34dd6a2618d4d93c436266349a762`.
+**Exact-head workflows:** b1 `36075925792`, b2 `36075925798`, b3 `36075925728`,
+b4 `36075925780`, and B1-I1R `36075929965` — all success.
+
+**Artifact truth:** `b1-local-ground-evidence-9bb6ee8e858e`, OCE_RUN_ID
+`9bb6ee8e858e`, reports 360/360 executed and passed, zero failures/errors/skips,
+27/27 container-backed tests, all eight R42 race IDs, the executable negative
+control, authenticated post-restart S3 GET, independent gate 75 PASS / 0 FAIL,
+37 manifest entries with hashes/sizes reverified, source clean before/after,
+verified cleanup, and read-only final-package verifier PASS.
+
+**Superseded boundaries closed:** unlocked invalid-to-valid recovery re-entry
+and the absence of a post-restart authenticated S3 object retrieval proof.
+Prior R41/R41R2/R41R4 sections remain preserved verbatim above.
+
+**Current authorization boundary:** SonarCloud remains failure/unsuppressed;
+Kilo is recorded by fresh external result after the evidence head. PR #4 stays
+OPEN, unmerged, MERGEABLE, and UNSTABLE. `main` remains `7c7816f3`. No cloud,
+broker, capital, or execution-authority mutation occurred; recurring cost is $0.
+Book 5 and Atlas Program Block 4 remain untouched.

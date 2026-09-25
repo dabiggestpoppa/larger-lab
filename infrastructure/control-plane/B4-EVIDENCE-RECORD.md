@@ -2285,3 +2285,113 @@ restart proof, single-runner wiring, and exact-head CI requirements are complete
 The result is `READY_FOR_OPERATOR_REVIEW`; Book 4 closure is not self-ratified,
 PR #4 is not merged, and the external Sonar/Kilo dispositions remain operator
 review facts.
+
+---
+
+## B4-CXR7U9R42 — superseding execution-authority and restart-durability repair
+
+**Gate:** `B4-CXR7U9R42`
+**Authorized start:** `1ec2af1764de865b55ecb5509b7e1443b7a0103b`
+**R42 implementation head:** `698462ac6588cdbfb11f0e9c67b03b6e67db01f3`
+**Implementation tree:** `07073a8f28b34dd6a2618d4d93c436266349a762`
+**`origin/main`:** `7c7816f382947bbc8a1f2154435fc436f2428fa8` (untouched)
+
+### Supersession, without rewriting R41 truth
+
+`R41R4: SUPERSEDED BY B4-CXR7U9R42 POST-REVIEW REPAIR`.
+
+The exact-head R41R4 workflows were real, successful, and valid for the tests
+they executed. Nothing in this section calls those green workflows fake. The
+post-review boundary was incomplete in two exact ways:
+
+1. `phase_finalize()`, `phase_resume_finalize()`, and `phase_rollback()` could
+   enter mutation-capable locked bodies from unlocked exception paths. Prior
+   valid-contender concurrency proofs did not cover an invalid contender whose
+   preliminary validation failed, whose target became valid, and whose second
+   validation could then succeed.
+2. The restart proof performed authenticated S3 PUT and exact-body GET before
+   restart, then proved `/data` persistence with a direct marker. It did not GET
+   the same object through authenticated S3 after restart.
+
+R42 closes those proof boundaries without altering or deleting any historical
+R41/R41R2/R41R4 section.
+
+### Implementation and executable proof chain
+
+| Repair | Commit | Exact result |
+|---|---|---|
+| B4-CXR7U9R42R1 | `78b68ae6` | receipt operation ID is minimal lock binding only; full receipt/state/claim/identity authorization and branch consumption occur under the operation OS lock; silent binding restores prior lock metadata on every denial |
+| B4-CXR7U9R42R2 | `d86b3e82` | real-process deterministic barriers, real OS advisory locking, full side-effect snapshots, all recovery wrappers, malformed/substituted/unregistered receipts, and executable weakened-engine negative control |
+| B4-CXR7U9R42R3 | `4720a27e` | authenticated same-bucket/same-key exact-byte GET after governed restart; image ID/revision/release and `/data` volume identity reverified; four negative controls |
+| B4-CXR7U9R42X1 | `698462ac` | narrow CI-exposed assertion repair: malformed JSON is now truthfully named as an execution-binding refusal while preserving the historical zero-mutation proof |
+
+The real-process R42 registry contains exactly these eight selected node IDs:
+
+1. `test_b4_cxr7u9r42r2_execution_authority_race.py::test_resume_finalize_invalid_to_valid_race_is_denied_with_zero_effects`
+2. `test_b4_cxr7u9r42r2_execution_authority_race.py::test_all_recovery_wrappers_have_zero_effects_under_active_lock_contention[finalize]`
+3. `test_b4_cxr7u9r42r2_execution_authority_race.py::test_all_recovery_wrappers_have_zero_effects_under_active_lock_contention[rollback]`
+4. `test_b4_cxr7u9r42r2_execution_authority_race.py::test_all_recovery_wrappers_have_zero_effects_under_active_lock_contention[preintent-rollback]`
+5. `test_b4_cxr7u9r42r2_execution_authority_race.py::test_invalid_receipts_have_zero_authority_side_effects[malformed]`
+6. `test_b4_cxr7u9r42r2_execution_authority_race.py::test_invalid_receipts_have_zero_authority_side_effects[digest-substitution]`
+7. `test_b4_cxr7u9r42r2_execution_authority_race.py::test_invalid_receipts_have_zero_authority_side_effects[unregistered]`
+8. `test_b4_cxr7u9r42r2_execution_authority_race.py::test_negative_control_unlocked_fallback_enters_mutation_interval`
+
+The contender snapshots cover the transition record, operation claim,
+execution-authority metadata, emitted receipts, PostgreSQL bridge/catalog
+state, artifact state, and observable mutation-call log. Every denied contender
+has zero side-effect deltas. The weakened control uses an executable engine copy
+restoring the old unlocked fallback and observes that executor enter the
+mutation interval while another process still owns the OS lock.
+
+### Local validation truth
+
+Focused R39/R40/R41/R42 recovery and transaction selection: `114 passed, 11
+skipped`, zero failures/errors. Complete local runner collection: `360
+collected / 360 executed / 323 passed / 0 failed / 0 errors / 37 skipped`; all
+eight R42 race nodes passed. The 37 local skips are truthful unavailable-runtime
+or platform-capability skips, so the local result remains
+`LOCAL_STATIC_READY_CI_REQUIRED`; it is not represented as authoritative Linux
+closure. Ruff, `bash -n`, and `git diff --check` passed for the changed surface.
+
+### Exact implementation-head CI and evidence
+
+All five workflows succeeded on exact implementation SHA
+`698462ac6588cdbfb11f0e9c67b03b6e67db01f3`:
+
+- `36075925792` — `b1-local-ground-validation` — success
+- `36075925798` — `b2-control-plane-validation` — success
+- `36075925728` — `b3-worker-fabric-validation` — success
+- `36075925780` — `b4-config-spine-validation` — success
+- `36075929965` — `B1-I1R Validation` — success
+
+B1 artifact `b1-local-ground-evidence-9bb6ee8e858e` was downloaded and
+verified:
+
+```text
+tested commit:       698462ac6588cdbfb11f0e9c67b03b6e67db01f3
+tested tree:         07073a8f28b34dd6a2618d4d93c436266349a762
+OCE_RUN_ID:          9bb6ee8e858e
+test totals:         360 collected / 360 executed / 360 passed
+failures/errors:     0 / 0
+skips:               0
+container-backed:    27 collected / 27 executed / 27 passed
+independent gate:    75 PASS / 0 FAIL
+manifest:            37 artifacts; hashes and sizes re-verified
+R42 race registry:   8/8 selected and passed
+negative control:    passed by observing unlocked mutation
+S3 restart proof:    passed, including authenticated post-restart exact GET
+source cleanliness:  clean before and after
+cleanup:             disposable containers, networks, and volumes removed
+final package:       read-only verifier PASS
+final status:        LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW
+```
+
+### External and authorization truth
+
+SonarCloud remains failed and unsuppressed; the disclosed Security D /
+Reliability C new-code ratings are not relabelled green. Kilo is read fresh
+after the evidence commit and is recorded by its actual result. PR #4 remains
+OPEN, unmerged, MERGEABLE, and UNSTABLE; no merge authorization was granted or
+exercised. `main` is untouched. Cloud, broker, capital, and execution-authority
+mutations are 0; recurring cost is $0. Book 5 and Atlas Program Block 4 remain
+untouched.
