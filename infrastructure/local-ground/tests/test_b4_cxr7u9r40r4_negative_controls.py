@@ -106,17 +106,24 @@ def test_control_finalize_and_rollback_with_different_claim_filenames_race(
 def test_control_state_check_before_nonatomic_claim_loses_the_race(
         bridge, tmp_path, monkeypatch):
     """With the claim reduced to non-atomic write-then-check, two threads can
-    both observe PROMOTED and both proceed — the R40-01 race test catches it."""
+    both observe PROMOTED and both proceed — the R40-01 race test catches it.
+
+    B4-CXR7U9R44R1: the weakened control now targets the R44 publication
+    primitive. Replacing the atomic NO-REPLACE publication with the pre-R44
+    exists-check/barrier/plain-write sequence reproduces exactly the
+    double-win that atomic publication exists to prevent.
+    """
     receipt, _path, _inv, _sha = _promoted(bridge, tmp_path, monkeypatch)
 
     def weaken(source):
-        old = 'fd = os.open(claim_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)'
-        new = ('if os.path.exists(claim_path):\n'
-               '            raise RuntimeError("claimed")\n'
-               '        _neg_control_barrier.wait()\n'
-               '        fd = os.open(claim_path, '
-               'os.O_CREAT | os.O_WRONLY, 0o600)')
-        assert old in source
+        old = "    try:\n        _publish_no_replace(tmp, claim_path)"
+        new = ("    if os.path.exists(claim_path):\n"
+               "        raise RuntimeError('claimed')\n"
+               "    _neg_control_barrier.wait()\n"
+               "    try:\n"
+               "        with open(claim_path, 'wb') as stream:\n"
+               "            stream.write(payload)")
+        assert old in source, "atomic claim publication not found"
         return source.replace(old, new)
 
     weakened = _load_weakened(tmp_path, _weaken_source(weaken))

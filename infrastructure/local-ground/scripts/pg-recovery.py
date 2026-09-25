@@ -737,59 +737,131 @@ def _record_transition(operation_id, state, receipt, extra=None) -> None:
     _write_transition_record(operation_id, record)
 
 
+def _claim_temp_prefix(operation_id) -> str:
+    """Private, never-canonical name prefix for an unpublished claim."""
+    return f".{operation_id}.claim."
+
+
+def _discard_abandoned_claim_temporaries(operation_id, directory) -> None:
+    """Remove claim temporaries abandoned by a crash BEFORE publication.
+
+    Only this operation's private dot-prefixed temporaries are considered, and
+    only while the operation's stable OS lock is held, so a live publisher can
+    never lose a file it is still writing. The canonical claim name is never a
+    candidate.
+    """
+    prefix = _claim_temp_prefix(operation_id)
+    for name in os.listdir(directory):
+        if name.startswith(prefix) and name.endswith(".tmp"):
+            try:
+                os.unlink(os.path.join(directory, name))
+            except OSError:
+                pass
+
+
+def _publish_no_replace(source_path, destination_path) -> None:
+    """Publish a FULLY DURABLE file at a name that may already exist, atomically
+    and WITHOUT EVER REPLACING AN EXISTING WINNER (B4-CXR7U9R44R1).
+
+    The predecessor created the canonical claim name with O_CREAT|O_EXCL and
+    only then wrote the payload, so any death in that window left a durably
+    VISIBLE EMPTY claim: the one-time authority was spent and unreadable, and
+    the operation was stranded with no governed continuation. Here the payload
+    is written and fsynced to a private temporary first; publication then
+    exposes the already-durable inode under the canonical name, so the
+    canonical claim is never observable empty, partial, or malformed.
+
+    os.link() is the POSIX primitive: it fails atomically with EEXIST when the
+    destination name is taken, and it can never overwrite a winner. On Windows
+    os.rename() has the same no-replace failure semantics (it raises
+    FileExistsError rather than replacing), so it is used there instead.
+    """
+    if os.name == "nt":
+        os.rename(source_path, destination_path)
+        return
+    os.link(source_path, destination_path)
+
+
 def _claim_transition(operation_id, transition, promote=None) -> dict:
     """Consume this operation's ONE-TIME transition authority BEFORE any docker
-    or catalog call — OPERATION-WIDE, not per-transition (B4-CXR7U9R40-R1).
+    or catalog call — OPERATION-WIDE, not per-transition (B4-CXR7U9R40-R1),
+    and CRASH-ATOMIC (B4-CXR7U9R44R1).
 
-    The claim is one file per OPERATION, exclusively created: finalize and
-    rollback contend on the SAME name, so exactly one branch can ever win.
-    The winning branch and its binding are recorded IN the claim file, so the
-    selection is durably attributable after a crash. A loser fails here, before
-    any docker, catalog or receipt mutation exists to make.
+    The claim is one file per OPERATION and exactly one publication can ever
+    win it: the complete payload is written and fsynced to a private temporary
+    in the same directory, then published under the canonical name with an
+    atomic NO-REPLACE primitive while the operation's stable OS lock is held.
+
+      * death BEFORE publication  -> no canonical claim exists at all, so fresh
+        authority for this operation is untouched and still available;
+      * death AFTER publication   -> the canonical claim is complete, bound and
+        attributable, so exactly the selected branch is resumable.
+
+    There is no boundary in between that can expose an empty or partial claim,
+    because the canonical name is only ever bound to a fully durable inode.
     """
     if transition not in TRANSITIONS_ALLOWED_FROM_PROMOTED:
         raise RuntimeError(f"unknown transition {transition!r}")
     directory = _transitions_dir()
-    os.makedirs(directory, mode=0o700, exist_ok=True)
+    if not os.path.isdir(directory):
+        raise RuntimeError(f"recovery operation {operation_id} has no governed "
+                           "transition directory; refusing to take a claim")
     claim_path = os.path.join(directory, f"{operation_id}.claim")
+    _discard_abandoned_claim_temporaries(operation_id, directory)
     claim = {"format": _CLAIM_FORMAT,
              "operation_id": operation_id,
              "transition": transition,
              "claimed_at": now_iso()}
     if promote is not None:
         claim["receipt_sha256"] = _receipt_digest(promote)
-    payload = json.dumps(claim, sort_keys=True, indent=2) + "\n"
+    payload = (json.dumps(claim, sort_keys=True, indent=2) + "\n").encode("utf-8")
+    fd, tmp = tempfile.mkstemp(prefix=_claim_temp_prefix(operation_id),
+                               suffix=".tmp", dir=directory)
     try:
-        fd = os.open(claim_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(tmp, 0o600)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+    try:
+        _publish_no_replace(tmp, claim_path)
     except FileExistsError:
-        # The claim file exists but the winner may not have finished writing
-        # it yet (O_EXCL create precedes the payload write). Spin briefly so
-        # the refusal can NAME the winning transition truthfully; if it is
-        # still unreadable, fail closed with 'unknown' — the authority is
-        # spent either way.
-        import time
-        winner = None
-        for _ in range(50):
-            winner = _load_claim(operation_id)
-            if winner:
-                break
-            time.sleep(0.01)
+        # Exactly one branch won. The canonical claim is always complete when
+        # it is visible, so the winning transition can be named truthfully.
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        winner = _load_claim(operation_id)
         chosen = winner.get("transition") if winner else "unknown"
         raise RuntimeError(
             f"recovery operation {operation_id} was already claimed for a "
             f"different or earlier transition ({chosen!r}); the "
             f"{transition!r} authority is spent")
-    try:
-        os.write(fd, payload.encode("utf-8"))
-        os.fsync(fd)
-    finally:
-        os.close(fd)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
     _fsync_dir(directory)
-    # The record is moved to the IN-FLIGHT state only after the claim file won:
-    # state validation happened in _validated_transition_receipt, the claim is
-    # the atomic selection, and this write is forward-only (enforced in
-    # _record_transition), so a crash here leaves PROMOTED + a claim file — an
-    # attributable, spent authority — never a re-opened PROMOTED.
+    if os.path.lexists(tmp):
+        # POSIX: the publication left the private temporary as a second name
+        # for the same durable inode. Retire it; the canonical claim remains.
+        os.unlink(tmp)
+        _fsync_dir(directory)
+    # The record is moved to the IN-FLIGHT state only after the claim was
+    # durably published: state validation happened in
+    # _validated_transition_receipt, the claim is the atomic selection, and
+    # this write is forward-only (enforced in _record_transition), so a crash
+    # here leaves PROMOTED + a COMPLETE claim file — an attributable, spent
+    # authority with a governed resume — never a re-opened PROMOTED.
     _record_transition(operation_id,
                        TRANSITION_STATE_FINALIZING if transition == "finalize"
                        else TRANSITION_STATE_ROLLING_BACK,
@@ -818,6 +890,30 @@ def _valid_transition_claim(operation_id, transition, promote,
         and claim.get("operation_id") == operation_id \
         and claim.get("transition") == transition \
         and claim.get("receipt_sha256") == _receipt_digest(promote)
+
+
+def _claim_state(operation_id, transition_dir=None):
+    """Is the durable branch selector ABSENT, COMPLETE, or MALFORMED?
+
+    B4-CXR7U9R44R1. A COMPLETE claim is one this engine published atomically.
+    MALFORMED means a canonical claim NAME exists that is not a complete
+    engine-published claim - a foreign write, a truncated file, or a pre-R44
+    zero-byte poison claim. The engine can no longer generate that state, but
+    it must be named and failed closed rather than reported as "fresh
+    authority": the selector name being present means the one-time authority
+    is SPENT even when its content cannot be read.
+    """
+    directory = transition_dir or _transitions_dir()
+    path = os.path.join(directory, f"{operation_id}.claim")
+    if not os.path.isfile(path):
+        return "absent"
+    claim = _load_claim(operation_id, transition_dir=directory)
+    if isinstance(claim, dict) \
+            and claim.get("format") == _CLAIM_FORMAT \
+            and claim.get("operation_id") == operation_id \
+            and claim.get("transition") in TRANSITIONS_ALLOWED_FROM_PROMOTED:
+        return "complete"
+    return "malformed"
 
 
 class _ExecutionAuthorityConflict(RuntimeError):
@@ -2135,6 +2231,22 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     receipt["operation_id"] = operation_id
     state = record.get("state")
     receipt["durable_state"] = state
+    # ONE BRANCH-SELECTION LAW (B4-CXR7U9R44R1): the durable selector name
+    # decides whether the one-time authority is spent. A canonical claim that
+    # is not a COMPLETE engine-published claim is never reported as fresh
+    # authority and never repaired by guessing or by manual deletion - it is a
+    # deterministic fail-closed verdict.
+    claim_state = _claim_state(operation_id)
+    receipt["claim_state"] = claim_state
+    if claim_state == "malformed":
+        receipt["verdict"] = "unreconciled"
+        receipt["error"] = (
+            "durable transition claim exists but is not a complete, "
+            "engine-published claim; the one-time branch authority is spent and "
+            "fail-closed pending operator review")
+        receipt["finished_at"] = now_iso()
+        receipt["exit_status"] = 1
+        return receipt
     try:
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
         probe = parse_probe_spec(probe_spec)
@@ -2254,6 +2366,12 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         return 4
     state = record.get("state")
     operation_id = record.get("operation_id")
+    # A canonical claim name that is not a complete engine-published claim
+    # means the one-time authority is spent but unreadable: fail closed
+    # (code 4) instead of reopening fresh authority (B4-CXR7U9R44R1).
+    if isinstance(operation_id, str) and OPERATION_ID_RE.match(operation_id) \
+            and _claim_state(operation_id, transition_dir) == "malformed":
+        return 4
     if state == TRANSITION_STATE_FINALIZING:
         if record.get("commit_intent") is not None or record.get("commit_point") is not None:
             return 4
@@ -2316,7 +2434,7 @@ def _classify_state_for_shell(path):
             record = json.load(f)
     except (OSError, ValueError):
         return 4
-    return _classify_record_for_shell(record)
+    return _classify_record_for_shell(record, transition_dir=os.path.dirname(path))
 
 
 def _classify_rollback_for_shell(receipt_path, transition_dir=None):
