@@ -1,8 +1,8 @@
 # CSIA — Book 4 Pre-Ratification Review v0.2
 
-**Review date:** 2026-09-24  
-**Scope:** narrow Book 4 v0.2 epistemic reconciliation and operator ratification  
-**Planning branch:** `agent/crypto-systems-intelligence-atlas-plan`  
+**Review date:** 2026-09-24
+**Scope:** narrow Book 4 v0.2 epistemic reconciliation and operator ratification
+**Planning branch:** `agent/crypto-systems-intelligence-atlas-plan`
 **Review status:** PASS
 
 ## 1. Decision boundary
