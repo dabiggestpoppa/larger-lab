@@ -199,7 +199,7 @@ def test_resume_and_abort_race_has_one_executor(tmp_path):
         _abort_argv(h, h.root / "abort.json"), write_root=str(h.root),
         bridge=str(h.bridge), env_extra=_env(tmp_path), timeout=60)
     assert denied.returncode == 1
-    assert "requires FINALIZING" in denied.stderr
+    assert "requires PROMOTED/FINALIZING" in denied.stderr
     refused = json.loads((h.root / "abort.json").read_text(encoding="utf-8"))
     assert refused["exit_status"] == 1
     assert "rollback_attempted" not in refused

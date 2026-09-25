@@ -1141,8 +1141,14 @@ def _validated_resume_finalize_receipt(path, db, user, container, inventory_path
         path, db, user, container, inventory_path, inventory_sha_path)
     _operation_id, record = _bound_operation(promote)
     state = record.get("state")
-    if state not in (TRANSITION_STATE_COMMIT_INTENT,
-                     TRANSITION_STATE_COMMIT_POINT, "FINALIZED"):
+    if state == TRANSITION_STATE_PROMOTED:
+        if record.get("selected_transition") not in (None, "finalize") \
+                or record.get("commit_intent") is not None \
+                or record.get("commit_point") is not None:
+            raise RuntimeError("claim-before-state finalize conflicts with forward authority")
+    elif state not in (TRANSITION_STATE_FINALIZING,
+                       TRANSITION_STATE_COMMIT_INTENT,
+                       TRANSITION_STATE_COMMIT_POINT, "FINALIZED"):
         raise RuntimeError(
             f"recovery operation {operation_id} is {state!r}: it has no durable "
             "finalize intent to resume")
@@ -1153,7 +1159,9 @@ def _validated_resume_finalize_receipt(path, db, user, container, inventory_path
             or claim.get("receipt_sha256") != _receipt_digest(promote):
         raise RuntimeError("existing finalize claim is missing, corrupt, or bound "
                            "to different authority")
-    if record.get("selected_transition") != "finalize" \
+    if state == TRANSITION_STATE_PROMOTED:
+        pass
+    elif record.get("selected_transition") != "finalize" \
             or not _valid_commit_intent(record, promote):
         raise RuntimeError("durable finalize intent is missing, malformed, or bound "
                            "to different authority")
@@ -1208,13 +1216,14 @@ def _validated_preintent_abort_receipt(path, db, user, container,
     promote, stamp, quarantine, staging, operation_id = _validated_promote_receipt(
         path, db, user, container, inventory_path, inventory_sha_path)
     _operation_id, record = _bound_operation(promote)
-    if record.get("state") != TRANSITION_STATE_FINALIZING:
+    if record.get("state") not in (TRANSITION_STATE_PROMOTED,
+                                   TRANSITION_STATE_FINALIZING):
         raise RuntimeError(
-            f"pre-intent abort requires FINALIZING, got {record.get('state')!r}")
+            f"pre-intent abort requires PROMOTED/FINALIZING, got {record.get('state')!r}")
     if record.get("commit_intent") is not None \
             or record.get("commit_point") is not None:
         raise RuntimeError("pre-intent abort is forbidden after forward intent")
-    if record.get("selected_transition") != "finalize":
+    if record.get("selected_transition") not in (None, "finalize"):
         raise RuntimeError("pre-intent abort requires the selected finalize branch")
     claim = _load_claim(operation_id)
     if not isinstance(claim, dict) or claim.get("format") != _CLAIM_FORMAT \
@@ -1628,6 +1637,11 @@ def _phase_finalize_locked(receipt_in_path, inventory_path, inventory_sha_path, 
             return _blocked(
                 receipt, f"refusing recovery resume authority: {e}")
         execution_authority.activate()
+        if durable_state == TRANSITION_STATE_PROMOTED:
+            _record_transition(
+                operation_id, TRANSITION_STATE_FINALIZING, promote,
+                extra={"selected_transition": "finalize"})
+            durable_state = TRANSITION_STATE_FINALIZING
         execution_authority.commit()
     else:
         try:
@@ -2011,6 +2025,10 @@ def phase_preintent_rollback(receipt_in_path, inventory_path, inventory_sha_path
                  receipt_in_path, db, user, container, inventory_path,
                  inventory_sha_path)
             authority.activate()
+            if _load_transition_record(operation_id).get("state") == TRANSITION_STATE_PROMOTED:
+                _record_transition(
+                    operation_id, TRANSITION_STATE_FINALIZING, promote,
+                    extra={"selected_transition": "finalize"})
             authority.commit()
             receipt.update({
                 "stamp": stamp,
@@ -2192,7 +2210,12 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
         else:
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_PROMOTED:
-        verdict = "fresh_rollback_available"
+        if _valid_transition_claim(operation_id, "finalize", promote):
+            verdict = "preintent_abort_required"
+        elif _valid_transition_claim(operation_id, "rollback", promote):
+            verdict = "resume_rollback_required"
+        else:
+            verdict = "fresh_rollback_available"
     elif state == "ROLLED_BACK":
         valid_claim = record.get("selected_transition") == "rollback" \
             and _valid_transition_claim(operation_id, "rollback", promote)
