@@ -103,6 +103,9 @@ class ProtocolRoleBook:
         if assignment.role_assignment_id in self._assignments:
             raise ValueError("role assignment IDs are immutable and unique")
         self.provenance.validate_refs(assignment.book2_claim_refs)
+        self.provenance.validate_snapshot_lineage(
+            assignment.book2_claim_refs, assignment.source_snapshot_refs
+        )
         self._assignments[assignment.role_assignment_id] = assignment
         return assignment
 

@@ -83,6 +83,9 @@ class DependencyPathBook:
         if path.path_id in self._paths:
             raise ValueError("path IDs are immutable and unique")
         self.provenance.validate_refs(path.book2_claim_refs)
+        self.provenance.validate_snapshot_lineage(
+            path.book2_claim_refs, path.source_snapshot_refs
+        )
         self._paths[path.path_id] = path
         return path
 

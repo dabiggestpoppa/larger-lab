@@ -289,6 +289,9 @@ class DependencyBook:
             raise ValueError("dependency IDs are immutable and unique")
         self.provenance.validate_refs(record.book2_claim_refs)
         self.provenance.validate_refs(record.strength_descriptor.book2_claim_refs)
+        self.provenance.validate_snapshot_lineage(
+            record.book2_claim_refs, record.source_snapshot_refs
+        )
         self._records[record.dependency_id] = record
         return record
 
