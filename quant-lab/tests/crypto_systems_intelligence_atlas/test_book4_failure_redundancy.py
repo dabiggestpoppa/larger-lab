@@ -57,8 +57,10 @@ def test_two_providers_without_shared_evidence_remain_unknown() -> None:
 
 
 def test_redundancy_book_validates_canonical_claims() -> None:
+    from crypto_systems_intelligence_atlas.failure_domains import FailureDomainBook
+
     _, _, provenance = kernel()
-    book = RedundancyBook(provenance)
+    book = RedundancyBook(provenance, FailureDomainBook(provenance))
     assert book.add(redundancy("red-1")) is not None
     with pytest.raises(ValueError, match="unique"):
         book.add(redundancy("red-1"))

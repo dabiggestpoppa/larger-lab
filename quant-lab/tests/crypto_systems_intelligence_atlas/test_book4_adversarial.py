@@ -82,7 +82,7 @@ def test_08_multiple_providers_do_not_imply_independent_redundancy() -> None:
     item = redundancy("multi-provider")
     assert len(item.provider_refs) == 2
     assert item.state.value == "UNKNOWN"
-    assert not item.positive_independence_evidence_refs
+    assert not item.positive_independence_claim_refs
 
 
 def test_09_same_provider_does_not_automatically_imply_one_failure_domain() -> None:

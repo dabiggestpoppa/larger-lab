@@ -365,7 +365,9 @@ def redundancy(
         shared_upstreams=shared_upstreams,
         failure_domain_refs=failure_domain_refs,
         independence_dimensions=("operator", "backend"),
-        positive_independence_evidence_refs=positive,
+        positive_independence_claim_refs=(
+            (INDEPENDENCE_CLAIM_REF,) if positive else ()
+        ),
         state=state,
         valid_time=NOW,
         book2_claim_refs=(CLAIM_REF,),
