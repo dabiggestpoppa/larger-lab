@@ -921,6 +921,19 @@ class _ExecutionAuthorityConflict(RuntimeError):
     """A process does not own the operation's mutation interval."""
 
 
+# ONE BRANCH-SELECTION LAW (B4-CXR7U9R44): every transition that may publish
+# execution evidence names the BRANCH it belongs to. "preintent-rollback" and
+# "resume-finalize" complete a durably selected FINALIZE branch; the resume
+# phases complete the branch their own durable selector names.
+_ATTEMPT_BRANCH = {
+    "finalize": "finalize",
+    "resume-finalize": "finalize",
+    "preintent-rollback": "finalize",
+    "rollback": "rollback",
+    "resume-rollback": "rollback",
+}
+
+
 def _coordinate_path(operation_id) -> str:
     return os.path.join(_transitions_dir(), f"{operation_id}.execution.lock")
 
@@ -1032,8 +1045,10 @@ class _OperationExecutionAuthority:
     metadata cleanup happens while the coordinate lock is still held, and
     unlocking/closing the descriptor is the final action.
 
-    B4-CXR7U9R44R2 hardens the entry: a coordinate is only provisioned for a
-    governed, receipt-bound operation, never as a side effect of a denial.
+    B4-CXR7U9R44R2/R3 harden the entry and the evidence: a coordinate is only
+    provisioned for a governed, receipt-bound operation (never for a denial),
+    and metadata is attempt-owned - a refused attempt can never erase an
+    earlier committed owner's evidence.
     """
     def __init__(self, operation_id, transition, promote):
         self.operation_id = operation_id
@@ -1046,7 +1061,9 @@ class _OperationExecutionAuthority:
         self.metadata_tmp = None
         self.activated = False
         self.metadata_committed = False
+        self.attempt_token = None
         self.record = None
+        self._prior_metadata = None
 
     def acquire(self, governed_operation_checked=False):
         # DENIAL MUST NOT PROVISION (B4-CXR7U9R44R2): prove a governed,
@@ -1112,17 +1129,72 @@ class _OperationExecutionAuthority:
             import fcntl
             fcntl.flock(self.fd, fcntl.LOCK_UN)
 
+    def _read_prior_metadata(self):
+        try:
+            with open(self.metadata_path, encoding="utf-8") as f:
+                value = json.load(f)
+        except (OSError, ValueError):
+            return None
+        return value if isinstance(value, dict) else None
+
     def activate(self):
-        """Publish non-authoritative metadata while the coordinate is locked."""
+        """Publish non-authoritative, ATTEMPT-OWNED evidence while the stable
+        coordinate is locked (B4-CXR7U9R44R3).
+
+        The durable branch selector is read HERE, under the stable OS lock, so
+        an attempt that has already lost the branch refuses BEFORE it can
+        replace an earlier committed owner's evidence. Metadata remains
+        evidence only: it never grants or consumes transition authority.
+        """
         if self.fd is None:
             raise RuntimeError("execution authority is not locked")
+        branch = _ATTEMPT_BRANCH.get(self.transition)
+        if branch is None:
+            raise RuntimeError(
+                f"unknown execution transition {self.transition!r}")
+        record = self.record if isinstance(self.record, dict) else {}
+        selector = _load_claim(self.operation_id)
+        selected = record.get("selected_transition")
+        state = record.get("state")
+        if selector is not None and selector.get("transition") != branch:
+            raise _ExecutionAuthorityConflict(
+                f"operation {self.operation_id} is already claimed for "
+                f"{selector.get('transition')!r}; a {self.transition!r} attempt "
+                "may not publish execution evidence over the selected branch")
+        if selected is not None and selected != branch:
+            raise _ExecutionAuthorityConflict(
+                f"operation {self.operation_id} has durably selected "
+                f"{selected!r}; a {self.transition!r} attempt may not publish "
+                "execution evidence over it")
+        if selector is None and selected is None \
+                and state not in (None, TRANSITION_STATE_PROMOTED):
+            raise _ExecutionAuthorityConflict(
+                f"operation {self.operation_id} is in durable state {state!r} "
+                f"with no durable branch selector; a {self.transition!r} attempt "
+                "may not publish execution evidence")
+        self._prior_metadata = self._read_prior_metadata()
+        if self._prior_metadata is not None:
+            prior_branch = self._prior_metadata.get("branch")
+            if prior_branch is not None and prior_branch != branch:
+                raise _ExecutionAuthorityConflict(
+                    f"operation {self.operation_id} already holds committed "
+                    f"{prior_branch!r} execution evidence; a {self.transition!r} "
+                    "attempt may not overwrite it")
+        self.attempt_token = os.urandom(16).hex()
         metadata = {
-            "format": "oce-operation-execution-authority-v2",
+            "format": "oce-operation-execution-authority-v3",
             "operation_id": self.operation_id,
             "transition": self.transition,
+            "branch": branch,
             "receipt_sha256": _receipt_digest(self.promote),
+            "durable_selected_transition": selected or (
+                selector or {}).get("transition"),
+            "durable_state": state,
             "pid": os.getpid(),
-            "token": os.urandom(16).hex(),
+            "token": self.attempt_token,
+            "attempt_token": self.attempt_token,
+            "predecessor_token": (self._prior_metadata or {}).get("attempt_token")
+                                 or (self._prior_metadata or {}).get("token"),
             "acquired_at": now_iso(),
         }
         payload = json.dumps(metadata, sort_keys=True, separators=(",", ":")) + "\n"
@@ -1130,17 +1202,16 @@ class _OperationExecutionAuthority:
             prefix=f".{self.operation_id}.execution.", suffix=".tmp",
             dir=_transitions_dir())
         try:
-            os.write(tmp_fd, payload.encode("utf-8"))
-            os.fsync(tmp_fd)
-            os.close(tmp_fd)
-            tmp_fd = None
+            with os.fdopen(tmp_fd, "wb") as stream:
+                stream.write(payload.encode("utf-8"))
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.chmod(self.metadata_tmp, 0o600)
             os.replace(self.metadata_tmp, self.metadata_path)
             self.metadata_tmp = None
             _fsync_dir(_transitions_dir())
             self.activated = True
         except Exception:
-            if tmp_fd is not None:
-                os.close(tmp_fd)
             if self.metadata_tmp is not None:
                 try:
                     os.unlink(self.metadata_tmp)
@@ -1153,16 +1224,52 @@ class _OperationExecutionAuthority:
         """Mark metadata as belonging to a consumed, resumable branch."""
         self.metadata_committed = True
 
-    def clear_metadata(self):
-        """Remove only this attempt's metadata, never the stable coordinate."""
-        for path in (self.metadata_tmp, self.metadata_path):
-            if path is None:
-                continue
+    def _restore_prior_metadata(self, payload):
+        """Put a replaced committed owner's evidence back byte-for-byte."""
+        tmp_fd, tmp = tempfile.mkstemp(
+            prefix=f".{self.operation_id}.execution.", suffix=".restore",
+            dir=_transitions_dir())
+        try:
+            with os.fdopen(tmp_fd, "wb") as stream:
+                stream.write(payload)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.chmod(tmp, 0o600)
+            os.replace(tmp, self.metadata_path)
+        except BaseException:
             try:
-                os.unlink(path)
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
+
+    def clear_metadata(self):
+        """Delete ONLY this uncommitted attempt's evidence (B4-CXR7U9R44R3).
+
+        Compare-and-delete: the canonical path is removed only while it still
+        carries THIS attempt's token. A prior committed owner is never deleted
+        - if this attempt replaced it, it is restored byte-for-byte instead.
+        The stable coordinate is never touched.
+        """
+        if self.metadata_tmp is not None:
+            try:
+                os.unlink(self.metadata_tmp)
             except FileNotFoundError:
                 pass
-        self.metadata_tmp = None
+            self.metadata_tmp = None
+        current = self._read_prior_metadata()
+        if current is not None and current.get("token") == self.attempt_token:
+            prior_bytes = None
+            if self._prior_metadata is not None:
+                prior_bytes = (json.dumps(self._prior_metadata, sort_keys=True,
+                                          separators=(",", ":")) + "\n").encode("utf-8")
+            if prior_bytes is None:
+                try:
+                    os.unlink(self.metadata_path)
+                except FileNotFoundError:
+                    pass
+            else:
+                self._restore_prior_metadata(prior_bytes)
         _fsync_dir(_transitions_dir())
 
     def __enter__(self):
