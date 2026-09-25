@@ -147,6 +147,7 @@ class ArchitectureRegistryBook:
         self._values: dict[str, RegistryValue] = {}
         self._semantic_index: dict[tuple[str, str], str] = {}
         self._superseded_by: dict[str, str] = {}
+        self._supersession_boundaries: dict[str, Timestamp | UnknownBound] = {}
         for family in RATIFIED_ARCHITECTURE_FAMILIES:
             self.admit_namespace(
                 RegistryNamespace(
@@ -229,6 +230,15 @@ class ArchitectureRegistryBook:
                 registry_id=value.registry_id,
                 reason="supersedes target is unknown",
             )
+        if value.supersedes and not _moves_forward(
+            self._values[value.supersedes].valid_from,
+            value.valid_from,
+        ):
+            return AdmissionResult(
+                outcome=AdmissionOutcome.REJECTED,
+                registry_id=value.registry_id,
+                reason="replacement valid_from must move temporal state forward",
+            )
         try:
             self._validate_claims(value, claim_store)
         except ValueError as exc:
@@ -269,10 +279,13 @@ class ArchitectureRegistryBook:
                 raise ValueError("only an active value can be superseded")
             if old.namespace != value.namespace or old.semantic_key.casefold() != value.semantic_key.casefold():
                 raise ValueError("supersession must preserve namespace and semantic key")
+            if not _moves_forward(old.valid_from, value.valid_from):
+                raise ValueError("replacement valid_from must move temporal state forward")
             old_id = old.registry_id
         self._values[value.registry_id] = value
         if old_id is not None:
             self._superseded_by[old_id] = value.registry_id
+            self._supersession_boundaries[old_id] = value.valid_from
         self._semantic_index[(value.namespace, value.semantic_key.casefold())] = value.registry_id
         return value
 
@@ -312,11 +325,16 @@ class ArchitectureRegistryBook:
             value = self._values[registry_id]
         except KeyError as exc:
             raise KeyError(f"unknown registry value {registry_id}") from exc
-        replacement = self._superseded_by.get(registry_id)
-        if replacement is None:
+        replacement_id = self._superseded_by.get(registry_id)
+        boundary = self._supersession_boundaries.get(registry_id)
+        if replacement_id is None or boundary is None:
             return value
         return value.model_copy(
-            update={"status": RegistryStatus.SUPERSEDED, "superseded_by": replacement}
+            update={
+                "status": RegistryStatus.SUPERSEDED,
+                "superseded_by": replacement_id,
+                "valid_to": _effective_valid_to(value, boundary),
+            }
         )
 
     def current(self, namespace: str, semantic_key: str) -> RegistryValue | None:
@@ -342,6 +360,25 @@ def _history_sort_key(value: RegistryValue) -> tuple[int, datetime]:
         assert isinstance(value.valid_from, UnknownBound)
         start = value.valid_from.earliest_bound or datetime.min.replace(tzinfo=UTC)
     return (1 if isinstance(value.valid_from, UnknownBound) else 0, start)
+
+
+def _moves_forward(old_start: Timestamp | UnknownBound, new_start: Timestamp | UnknownBound) -> bool:
+    old_known = _known_start(old_start)
+    new_known = _known_start(new_start)
+    return old_known is None or new_known is None or new_known > old_known
+
+
+def _effective_valid_to(
+    value: RegistryValue,
+    supersession_boundary: Timestamp | UnknownBound,
+) -> Timestamp | UnknownBound:
+    if isinstance(supersession_boundary, UnknownBound):
+        return supersession_boundary
+    if isinstance(value.valid_to, UnknownBound):
+        return value.valid_to
+    if value.valid_to is None:
+        return supersession_boundary
+    return min(value.valid_to, supersession_boundary)
 
 
 def _known_start(value: Timestamp | UnknownBound) -> datetime | None:
