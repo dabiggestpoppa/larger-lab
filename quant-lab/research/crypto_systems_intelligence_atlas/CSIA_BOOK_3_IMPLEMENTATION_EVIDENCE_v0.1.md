@@ -189,3 +189,68 @@ BLOCKERS = 0
 The exact next operator action is to review the R1 matrix and this evidence,
 then explicitly accept or reject the proposed Book 3 exit gate. R1 does not
 self-accept Book 3 or authorize Book 4/live acquisition.
+
+
+## 10. HARDENING R2 — NEGATIVE IDENTITY EVIDENCE + TEMPORAL SUPERSESSION SEAL
+
+R2 independently reproduced and closed the two narrow findings identified after
+R1. It does not self-accept Book 3 or authorize Book 4/live acquisition.
+
+### R2 repairs
+
+- `NetworkIdentityEvidence` now carries explicit `non_divergence_claim_refs`
+  and `split_resolved_claim_refs` fact bindings. When the four positive
+  continuity dimensions are asserted, `persistent_divergence=False` and
+  `temporary_ambiguous_split=False` each require canonical, current Book 2
+  structural claim support. `None` remains UNKNOWN, and negative support is not
+  demanded for irrelevant fork/genesis/unrelated-network paths.
+- A divergence-supporting claim cannot also support non-divergence.
+  CONTESTED, REJECTED, STALE, SUPERSEDED, and UNRESOLVED claims fail the
+  existing current graph-promotable gate and cannot establish absence.
+- Boolean audit: positive decision facts require canonical support when `True`;
+  the two negative facts require canonical support when `False` and continuity
+  is asserted; `None` remains UNKNOWN. Procedural/disqualifier flags never
+  independently satisfy SAME_OBJECT and do not create fabricated absence claims.
+- Registry supersession metadata stores the replacement identity and effective
+  boundary without mutating the immutable old `RegistryValue`. `require()` and
+  `history()` project the old value as SUPERSEDED with effective validity
+  `[T1,T2)`, while the replacement remains ACTIVE.
+- Known replacements must move temporal state forward. An UnknownBound
+  replacement boundary remains uncertain and therefore fails closed across the
+  uncertain historical interval rather than remaining open-ended.
+
+### R2 executable evidence
+
+```text
+R2 focused tests       = 12 passed
+Old Book 3 tests       = 71
+New Book 3 tests       = 83
+Book 1 tests           = 107 passed
+Book 2 tests           = 108 passed
+Complete CSIA          = 298 passed
+Crypto Sensor          = 2339 passed / 4 skipped
+ruff (CSIA scope)      = PASS
+mypy                   = PASS (22 source files)
+Book 1 mutations       = 0
+Book 2 mutations       = 0
+```
+
+R2 matrix:
+`CSIA_BOOK_3_HARDENING_R2_MATRIX.json`
+
+R2 status:
+
+```text
+BOOK_3_HARDENING_R2 = PASS
+BOOK_3_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_3_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_4 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+BLOCKERS = 0
+```
+
+The exact next operator action is to review the independently verified R2
+branch and explicitly accept or reject the proposed Book 3 exit gate. Do not
+start Book 4 or enable live acquisition before separate authorization.

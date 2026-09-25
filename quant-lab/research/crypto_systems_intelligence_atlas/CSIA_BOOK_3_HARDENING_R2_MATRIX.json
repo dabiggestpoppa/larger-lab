@@ -1,0 +1,104 @@
+{
+  "schema_version": "csia-book3-hardening-r2-matrix-v0.1",
+  "book": 3,
+  "hardening_round": "R2",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "starting_head": "eb4c010d13d11a20cdf7bf45563ac2a5c6e9d5b0",
+  "ratified_planning_anchor": "21fdd79763c745034d34946896756efb430dc11a",
+  "accepted_book2_base": "cadc1e7e4378248da0a9aeefbe12909918656433",
+  "self_accepted": false,
+  "gates": {
+    "NEGATIVE_IDENTITY_ASSERTION_PROVENANCE": {
+      "status": "PASS",
+      "invariants": [
+        "persistent_divergence=False requires non_divergence_claim_refs",
+        "temporary_ambiguous_split=False requires split_resolved_claim_refs",
+        "false-form checks activate only when continuity is asserted",
+        "None remains UNKNOWN"
+      ]
+    },
+    "SAME_OBJECT_SIX_DIMENSION_EVIDENCE": {
+      "status": "PASS",
+      "invariants": [
+        "canonical network continuation",
+        "state-history continuity",
+        "consensus continuity",
+        "deployment continuity",
+        "no persistent divergence",
+        "no unresolved temporary split"
+      ]
+    },
+    "NO_ABSENCE_AS_EVIDENCE": {
+      "status": "PASS",
+      "invariants": [
+        "missing negative-support refs cannot satisfy continuity",
+        "a claim cannot support both divergence and non-divergence",
+        "CONTESTED REJECTED STALE SUPERSEDED UNRESOLVED claims are non-current"
+      ]
+    },
+    "SUPERSESSION_EFFECTIVE_VALIDITY": {
+      "status": "PASS",
+      "invariants": [
+        "immutable RegistryValue records preserved",
+        "store-level replacement boundary metadata",
+        "effective valid_to projected by require and history",
+        "known replacement must move forward"
+      ]
+    },
+    "HISTORICAL_ASOF_BOUNDARY": {
+      "status": "PASS",
+      "invariants": [
+        "[T1,T2) old validity",
+        "T2 and later reject old historical value",
+        "before and strict interior accept old historical value",
+        "current old rejects and current replacement accepts"
+      ]
+    },
+    "UNKNOWNBOUND_SUPERSESSION_FAIL_CLOSED": {
+      "status": "PASS",
+      "invariants": [
+        "uncertain replacement boundary remains UnknownBound",
+        "uncertain historical interval returns no positive hold",
+        "no fabricated open-ended validity"
+      ]
+    },
+    "REGISTRY_HISTORY_COHERENCE": {
+      "status": "PASS",
+      "invariants": [
+        "history exposes old SUPERSEDED",
+        "history exposes replacement ACTIVE",
+        "projected validity agrees with history"
+      ]
+    },
+    "BOOK1_FREEZE": {
+      "status": "PASS",
+      "mutations": 0
+    },
+    "BOOK2_FREEZE": {
+      "status": "PASS",
+      "mutations": 0
+    }
+  },
+  "tests": {
+    "baseline_book1_test_count": 107,
+    "baseline_book2_test_count": 108,
+    "baseline_book3_test_count": 71,
+    "baseline_total_csia_count": 286,
+    "old_book3_test_count": 71,
+    "new_book3_test_count": 83,
+    "r2_focused_test_count": 12,
+    "book1_test_count": 107,
+    "book2_test_count": 108,
+    "total_csia_count": 298,
+    "crypto_sensor_regression_passed": 2339,
+    "crypto_sensor_regression_skipped": 4,
+    "ruff": "PASS",
+    "mypy": "PASS",
+    "mypy_source_files": 22
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL",
+  "book3_acceptance": "NOT_SELF_ACCEPTED",
+  "book4": "NOT_STARTED",
+  "live_acquisition_authority": false,
+  "blockers": 0
+}

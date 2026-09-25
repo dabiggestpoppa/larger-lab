@@ -555,3 +555,48 @@ Artifacts:
 Exact next operator action: review the R1 matrix and evidence, then explicitly
 accept or reject the proposed Book 3 exit gate. Do not start Book 4 or enable
 live acquisition before separate authorization.
+
+
+---
+
+# CHECKPOINT 13 — BOOK 3 HARDENING R2 (2026-09-24)
+
+Checkpoints 1–12 are preserved. R2 independently closes negative identity
+provenance and temporal registry supersession without mutating accepted Book 1
+or Book 2 contracts.
+
+```text
+BOOK_3_HARDENING_R2 = PASS
+BOOK_3_IMPLEMENTATION = COMPLETE_HARDENED
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+STRUCTURAL_FAILURE_COUNT = 0
+BLOCKING_OPERATOR_DECISION_COUNT = 0
+
+OLD_BOOK3_TESTS = 71
+NEW_BOOK3_TESTS = 83
+R2_FOCUSED_TESTS = 12
+BOOK1_TESTS = 107 PASS
+BOOK2_TESTS = 108 PASS
+TOTAL_CSIA = 298 PASS
+CRYPTO_SENSOR = 2339 PASS / 4 SKIPPED
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (22 source files)
+
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_3_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_4 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Artifacts:
+
+- `CSIA_BOOK_3_HARDENING_R2_MATRIX.json`
+- `CSIA_BOOK_3_IMPLEMENTATION_EVIDENCE_v0.1.md` (HARDENING R2 addendum)
+- this checkpoint
+
+Exact next operator action: review the independent R2 branch and explicitly
+accept or reject the proposed Book 3 exit gate. Do not merge R2 into the
+original Book 3 branch, start Book 4, or enable live acquisition without
+separate authorization.
