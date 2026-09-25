@@ -151,6 +151,8 @@ def test_canonical_continuation_support_produces_same_object() -> None:
         state_continuity_claim_refs=("claim:architecture",),
         consensus_continuity_claim_refs=("claim:architecture",),
         deployment_continuity_claim_refs=("claim:deployment",),
+        non_divergence_claim_refs=("claim:identity",),
+        split_resolved_claim_refs=("claim:identity",),
     )
     assert NetworkIdentityEngine(provenance).decide(evidence).outcome is NetworkIdentityOutcome.SAME_OBJECT
 

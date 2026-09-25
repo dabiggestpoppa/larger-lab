@@ -40,6 +40,8 @@ def bundle(**updates) -> NetworkIdentityEvidence:
         "state_continuity_claim_refs": ("claim-history",),
         "consensus_continuity_claim_refs": ("claim-history",),
         "deployment_continuity_claim_refs": ("claim-history",),
+        "non_divergence_claim_refs": ("claim-history",),
+        "split_resolved_claim_refs": ("claim-history",),
     }
     data.update(updates)
     return NetworkIdentityEvidence.model_validate(data)
@@ -68,6 +70,7 @@ def test_b_persistent_divergence_is_fork_with_separate_new_objects() -> None:
             persistent_divergence=True,
             shared_ancestry_claim_refs=("claim-history",),
             divergence_claim_refs=("claim-history",),
+            non_divergence_claim_refs=(),
             unrelated_network_claim_refs=("claim-history",),
         )
     )

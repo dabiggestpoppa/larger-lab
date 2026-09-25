@@ -26,6 +26,8 @@ CONTINUITY_CLAIM_FAMILIES: dict[str, tuple[ClaimFamily, ...]] = {
     ),
     "migration": IDENTITY_CLAIM_FAMILIES,
     "temporary split": IDENTITY_CLAIM_FAMILIES,
+    "non-divergence": IDENTITY_CLAIM_FAMILIES,
+    "split resolution": IDENTITY_CLAIM_FAMILIES,
     "family-native continuation": IDENTITY_CLAIM_FAMILIES,
 }
 
@@ -71,10 +73,12 @@ class NetworkIdentityEvidence(BaseModel):
     deployment_continuity_claim_refs: tuple[str, ...] = ()
     shared_ancestry_claim_refs: tuple[str, ...] = ()
     divergence_claim_refs: tuple[str, ...] = ()
+    non_divergence_claim_refs: tuple[str, ...] = ()
     unrelated_network_claim_refs: tuple[str, ...] = ()
     genesis_claim_refs: tuple[str, ...] = ()
     migration_claim_refs: tuple[str, ...] = ()
     temporary_split_claim_refs: tuple[str, ...] = ()
+    split_resolved_claim_refs: tuple[str, ...] = ()
     family_native_continuation_claim_refs: tuple[str, ...] = ()
 
     @model_validator(mode="after")
@@ -185,6 +189,19 @@ class NetworkIdentityEngine:
         return self._unknown(evidence, "insufficient canonical continuity evidence")
 
     def _validate_assertions(self, evidence: NetworkIdentityEvidence) -> None:
+        if set(evidence.divergence_claim_refs) & set(evidence.non_divergence_claim_refs):
+            raise ArchitectureProvenanceError(
+                "a divergence claim cannot support both divergence and non-divergence"
+            )
+        continuity_asserted = all(
+            assertion is True
+            for assertion in (
+                evidence.canonical_network_continues,
+                evidence.state_history_continuity,
+                evidence.consensus_continuity,
+                evidence.deployment_continuity,
+            )
+        )
         checks = (
             (evidence.persistent_divergence is True, evidence.divergence_claim_refs, "divergence"),
             (evidence.unrelated_network_evidence, evidence.unrelated_network_claim_refs, "unrelated-network"),
@@ -199,6 +216,16 @@ class NetworkIdentityEngine:
             (evidence.deployment_continuity is True, evidence.deployment_continuity_claim_refs, "deployment continuation"),
             (bool(evidence.migration_evidence_refs) or bool(evidence.migration_claim_refs), evidence.migration_claim_refs, "migration"),
             (evidence.temporary_ambiguous_split is True, evidence.temporary_split_claim_refs, "temporary split"),
+            (
+                continuity_asserted and evidence.persistent_divergence is False,
+                evidence.non_divergence_claim_refs,
+                "non-divergence",
+            ),
+            (
+                continuity_asserted and evidence.temporary_ambiguous_split is False,
+                evidence.split_resolved_claim_refs,
+                "split resolution",
+            ),
             (
                 evidence.family_native_continuation is True,
                 evidence.family_native_continuation_claim_refs,

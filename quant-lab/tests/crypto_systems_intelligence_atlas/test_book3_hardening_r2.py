@@ -117,7 +117,9 @@ def test_unsigned_non_divergence_cannot_produce_same_object() -> None:
 def test_unsigned_resolved_split_cannot_produce_same_object() -> None:
     _, _, provenance = make_kernel()
     with pytest.raises(ArchitectureProvenanceError, match="split resolution"):
-        NetworkIdentityEngine(provenance).decide(identity_bundle())
+        NetworkIdentityEngine(provenance).decide(
+            identity_bundle(non_divergence_claim_refs=("claim:identity",))
+        )
 
 
 def test_six_canonically_supported_dimensions_produce_same_object() -> None:
@@ -139,6 +141,7 @@ def test_divergence_claim_cannot_be_reused_as_non_divergence_evidence() -> None:
             identity_bundle(
                 divergence_claim_refs=("claim:identity",),
                 non_divergence_claim_refs=("claim:identity",),
+                split_resolved_claim_refs=("claim:identity",),
             )
         )
 
