@@ -100,6 +100,15 @@ def shell_law(tmp_path):
             }
             if record_state == pgrec.TRANSITION_STATE_FINALIZING:
                 record["selected_transition"] = "finalize"
+            if record_state == pgrec.TRANSITION_STATE_ROLLING_BACK:
+                record["selected_transition"] = "rollback"
+                (transitions / f"{opid}.claim").write_text(json.dumps({
+                    "format": pgrec._CLAIM_FORMAT,
+                    "operation_id": opid,
+                    "transition": "rollback",
+                    "receipt_sha256": record["receipt_sha256"],
+                    "claimed_at": "2026-09-24T00:00:00Z",
+                }), encoding="utf-8")
             if record_state in (pgrec.TRANSITION_STATE_COMMIT_INTENT,
                                 pgrec.TRANSITION_STATE_COMMIT_POINT,
                                 "FINALIZED"):
@@ -305,15 +314,14 @@ def test_reconcile_reads_the_durable_commit_point(
         == pgrec.TRANSITION_STATE_COMMIT_POINT
 
 
-def test_reconcile_disagreement_fails_closed(bridge, tmp_path, monkeypatch):
-    """Durable record says commit point NOT reached but the quarantine is
-    gone: the two authorities disagree — unreconciled, nonzero, no guessing."""
+def test_reconcile_rollback_after_rename_requires_explicit_resume(bridge, tmp_path, monkeypatch):
+    """A rolled-back catalog with a valid rollback claim is resumable, not fresh."""
     receipt, path, inv, sha = _promoted(bridge, tmp_path, monkeypatch)
     pgrec._claim_transition(receipt["operation_id"], "rollback", receipt)
     out = _reconcile(bridge, tmp_path, monkeypatch, receipt, path, inv, sha,
                      quarantine_present=False, canonical_ok=True)
-    assert out["exit_status"] == 1, out
-    assert out["verdict"] == "unreconciled", out
+    assert out["exit_status"] == 0, out
+    assert out["verdict"] == "resume_rollback_required", out
 
 
 def test_reconcile_with_quarantine_intact_reports_rollback_available(
@@ -322,7 +330,7 @@ def test_reconcile_with_quarantine_intact_reports_rollback_available(
     out = _reconcile(bridge, tmp_path, monkeypatch, receipt, path, inv, sha,
                      quarantine_present=True, canonical_ok=False)
     assert out["exit_status"] == 0, out
-    assert out["verdict"] == "rolled_back_available", out
+    assert out["verdict"] == "fresh_rollback_available", out
 
 
 def test_reconcile_consumes_no_authority(bridge, tmp_path, monkeypatch):
@@ -332,7 +340,7 @@ def test_reconcile_consumes_no_authority(bridge, tmp_path, monkeypatch):
     opid = receipt["operation_id"]
     out = _reconcile(bridge, tmp_path, monkeypatch, receipt, path, inv, sha,
                      quarantine_present=True, canonical_ok=False)
-    assert out["verdict"] == "rolled_back_available"
+    assert out["verdict"] == "fresh_rollback_available"
     assert pgrec._load_transition_record(opid)["state"] \
         == pgrec.TRANSITION_STATE_PROMOTED
     assert pgrec._load_claim(opid) is None

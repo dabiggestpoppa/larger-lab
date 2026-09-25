@@ -797,9 +797,10 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
     return claim
 
 
-def _load_claim(operation_id):
+def _load_claim(operation_id, transition_dir=None):
     """The durable operation-wide claim, or None if none was ever taken."""
-    path = os.path.join(_transitions_dir(), f"{operation_id}.claim")
+    directory = transition_dir or _transitions_dir()
+    path = os.path.join(directory, f"{operation_id}.claim")
     if not os.path.isfile(path):
         return None
     try:
@@ -807,6 +808,16 @@ def _load_claim(operation_id):
             return json.load(f)
     except (OSError, ValueError):
         return None
+
+
+def _valid_transition_claim(operation_id, transition, promote,
+                            transition_dir=None):
+    claim = _load_claim(operation_id, transition_dir=transition_dir)
+    return isinstance(claim, dict) \
+        and claim.get("format") == _CLAIM_FORMAT \
+        and claim.get("operation_id") == operation_id \
+        and claim.get("transition") == transition \
+        and claim.get("receipt_sha256") == _receipt_digest(promote)
 
 
 class _ExecutionAuthorityConflict(RuntimeError):
@@ -1153,6 +1164,42 @@ def _validated_resume_finalize_receipt(path, db, user, container, inventory_path
                 or not isinstance(commit_point.get("at"), str):
             raise RuntimeError("durable commit-point evidence is missing or malformed")
     return promote, stamp, quarantine, staging, operation_id, state
+
+
+def _validated_resume_rollback_receipt(path, db, user, container,
+                                        inventory_path, inventory_sha_path):
+    """Validate continuation of the one rollback branch already selected.
+
+    A claim may become durable just before the in-flight state update. Both that
+    PROMOTED+rollback-claim window and ROLLING_BACK therefore admit only the
+    exact rollback continuation. ROLLED_BACK is admitted solely to prove an
+    already-complete catalog against the original floor; it cannot mutate.
+    """
+    promote, stamp, quarantine, staging, operation_id = _validated_promote_receipt(
+        path, db, user, container, inventory_path, inventory_sha_path)
+    _operation_id, record = _bound_operation(promote)
+    state = record.get("state")
+    if state not in (TRANSITION_STATE_PROMOTED,
+                     TRANSITION_STATE_ROLLING_BACK, "ROLLED_BACK"):
+        raise RuntimeError(
+            f"recovery operation {operation_id} is {state!r}: it has no durable "
+            "rollback branch to resume")
+    if not _valid_transition_claim(operation_id, "rollback", promote):
+        raise RuntimeError("durable rollback claim is missing, corrupt, or bound "
+                           "to different authority")
+    if state == TRANSITION_STATE_PROMOTED:
+        if record.get("selected_transition") not in (None, "rollback"):
+            raise RuntimeError("claim-before-state rollback has a conflicting selection")
+    elif record.get("selected_transition") != "rollback":
+        raise RuntimeError("rollback resume requires the selected rollback branch")
+    if record.get("commit_intent") is not None \
+            or record.get("commit_point") is not None:
+        raise RuntimeError("rollback resume is forbidden after forward commit intent")
+    floor = _floor_from_record(operation_id)
+    if not isinstance(floor, dict) or not floor.get("tables") \
+            or not isinstance(floor.get("rows"), dict):
+        raise RuntimeError("rollback resume floor is missing or malformed")
+    return promote, stamp, quarantine, staging, operation_id, floor, state
 
 
 def _validated_preintent_abort_receipt(path, db, user, container,
@@ -1766,53 +1813,145 @@ def phase_resume_finalize(receipt_in_path, inventory_path, inventory_sha_path,
             container, probe_spec, authority, resume_only=True)
 
 
-# ── phase: rollback (explicit) ───────────────────────────────────────────
+# ── phase: rollback (explicit fresh selection or governed resume) ────────
+def _rollback_catalog_state(container, user, db, quarantine, staging):
+    """Classify only the catalog states defined by the rollback crash law."""
+    if staging is None:
+        return "unreconciled"
+    names = _catalog_names(container, user)
+    if staging in names:
+        return "unreconciled"
+    canonical = db in names
+    original = quarantine in names
+    if canonical and original:
+        return "before_mutation"
+    if original and not canonical:
+        return "canonical_removed"
+    if canonical and not original:
+        return "quarantine_renamed"
+    return "unreconciled"
+
+
 def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, db,
-                           user, container, probe_spec, execution_authority):
-    receipt = _base_receipt("rollback", db, user, container, inventory_path)
+                           user, container, probe_spec, execution_authority,
+                           resume_only=False):
+    receipt = _base_receipt("resume-rollback" if resume_only else "rollback",
+                            db, user, container, inventory_path)
     receipt["promote_receipt"] = receipt_in_path
     targets = _governed_identity_problems(db, user, container)
     if targets:
         return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+    durable_state = None
+    floor = None
     try:
-        promote, stamp, quarantine, staging, operation_id = _validated_transition_receipt(
-            receipt_in_path, db, user, container, inventory_path, inventory_sha_path,
-            "rollback")
-        # Full authorization is complete under the stable coordinate lock.
-        # Publish evidence, consume the branch, then retain metadata for the
-        # explicit rollback-resume path if this process dies.
-        execution_authority.activate()
-        _claim_transition(operation_id, "rollback", promote)
-        execution_authority.commit()
-        floor = _floor_from_record(operation_id)
+        if resume_only:
+            (promote, stamp, quarantine, staging, operation_id,
+             floor, durable_state) = _validated_resume_rollback_receipt(
+                 receipt_in_path, db, user, container, inventory_path,
+                 inventory_sha_path)
+        else:
+            promote, stamp, quarantine, staging, operation_id = \
+                _validated_transition_receipt(
+                    receipt_in_path, db, user, container, inventory_path,
+                    inventory_sha_path, "rollback")
+            floor = _floor_from_record(operation_id)
+            if not isinstance(floor, dict) or not floor.get("tables") \
+                    or not isinstance(floor.get("rows"), dict):
+                raise RuntimeError("rollback floor is missing or malformed")
+            # Non-authoritative evidence is durable before the one-time branch
+            # claim. A failure here is cleaned while the coordinate remains held.
+            execution_authority.activate()
+            _claim_transition(operation_id, "rollback", promote)
+            execution_authority.commit()
+            durable_state = TRANSITION_STATE_ROLLING_BACK
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
-    receipt["stamp"] = stamp
-    receipt["quarantine_database"] = quarantine
-    receipt["rollback_required"] = True
+
+    if resume_only:
+        execution_authority.activate()
+        execution_authority.commit()
+    receipt.update({
+        "operation_id": operation_id,
+        "stamp": stamp,
+        "staging_database": staging,
+        "quarantine_database": quarantine,
+        "resumed": resume_only,
+        "durable_state_at_admission": durable_state,
+        "rollback_required": True,
+    })
     inventory = None
     probe = {}
     try:
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
         probe = parse_probe_spec(probe_spec)
-        ok, problems, detail = rollback_recovery(container, user, db, quarantine,
-                                                 inventory, probe, floor=floor)
+
+        # A claim can die before its state update. Complete that state advance
+        # under the same lock before any catalog mutation.
+        if resume_only and durable_state == TRANSITION_STATE_PROMOTED:
+            _record_transition(
+                operation_id, TRANSITION_STATE_ROLLING_BACK, promote,
+                extra={"selected_transition": "rollback"})
+            durable_state = TRANSITION_STATE_ROLLING_BACK
+
+        catalog_state = _rollback_catalog_state(
+            container, user, db, quarantine, staging)
+        receipt["catalog_state_at_admission"] = catalog_state
+        if catalog_state == "unreconciled":
+            receipt["verdict"] = "unreconciled"
+            raise RuntimeError("rollback catalog state is unreconciled")
+
+        if durable_state == "ROLLED_BACK":
+            if catalog_state != "quarantine_renamed":
+                raise RuntimeError("ROLLED_BACK catalog does not contain only old canonical")
+            ok, problems, detail = _verify_against_floor(container, db, user, floor)
+        elif catalog_state == "before_mutation":
+            ok, problems, _rows, _fps = _verify_db(
+                container, db, user, inventory, probe)
+            if not ok:
+                raise RuntimeError("promoted canonical verification failed: "
+                                   + "; ".join(problems))
+            ok, problems, detail = rollback_recovery(
+                container, user, db, quarantine, inventory, probe, floor=floor)
+        elif catalog_state == "canonical_removed":
+            # The promoted canonical is already absent; rollback_recovery will
+            # only rename the still-present original and then verify it.
+            ok, problems, detail = rollback_recovery(
+                container, user, db, quarantine, inventory, probe, floor=floor)
+        elif catalog_state == "quarantine_renamed":
+            # The old canonical is in place. Verify the durable pre-promotion
+            # floor directly; no catalog mutation is guessed or repeated.
+            ok, problems, detail = _verify_against_floor(
+                container, db, user, floor)
+        else:
+            raise RuntimeError("rollback catalog state is unreconciled")
+
+        detail.setdefault("rollback_succeeded", ok)
+        detail.setdefault("rollback_failed", not ok)
+        detail.setdefault("original_canonical_restored", ok)
+        detail.setdefault("rollback_attempted", True)
         receipt.update(detail)
+        receipt["verdict"] = "rolled_back" if ok else "unreconciled"
         if not ok:
             receipt["rollback_error"] = "; ".join(problems)
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 0 if ok else 1
-        _record_transition(operation_id, "ROLLED_BACK" if ok else "FAILED", promote)
+        if ok:
+            _record_transition(operation_id, "ROLLED_BACK", promote)
         return receipt
     except Exception as e:
-        receipt["rollback_attempted"] = True
+        receipt["verdict"] = "unreconciled"
+        receipt["rollback_attempted"] = catalog_state in (
+            "before_mutation", "canonical_removed", "quarantine_renamed") \
+            if "catalog_state" in locals() else False
         receipt["rollback_succeeded"] = False
         receipt["rollback_failed"] = True
         receipt["original_canonical_restored"] = False
         receipt["rollback_error"] = str(e)
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 1
-        _record_transition(operation_id, "FAILED", promote, extra={"error": str(e)})
+        # Never strand ROLLING_BACK behind FAILED: the catalog state remains a
+        # governed, explicitly resumable branch and artifact restore stays gated
+        # on PostgreSQL verification.
         return receipt
 
 
@@ -1826,7 +1965,23 @@ def phase_rollback(receipt_in_path, inventory_path, inventory_sha_path, db,
     with _OperationExecutionAuthority(operation_id, "rollback", promote) as authority:
         return _phase_rollback_locked(
             receipt_in_path, inventory_path, inventory_sha_path, db, user,
-            container, probe_spec, authority)
+            container, probe_spec, authority, resume_only=False)
+
+
+def phase_resume_rollback(receipt_in_path, inventory_path, inventory_sha_path,
+                          db, user, container, probe_spec):
+    """Complete only the rollback claim already durably selected."""
+    try:
+        promote, operation_id = _execution_receipt_binding(receipt_in_path)
+    except Exception as exc:
+        return _execution_binding_blocked(
+            "resume-rollback", receipt_in_path, inventory_path, db, user,
+            container, exc)
+    with _OperationExecutionAuthority(
+            operation_id, "resume-rollback", promote) as authority:
+        return _phase_rollback_locked(
+            receipt_in_path, inventory_path, inventory_sha_path, db, user,
+            container, probe_spec, authority, resume_only=True)
 
 
 # ── phase: pre-intent rollback (finalize-claimed recovery) ─────────────
@@ -1926,6 +2081,14 @@ def _canonical_matches_inventory(container, db, user, inventory, probe):
     return ok
 
 
+def _canonical_matches_floor(container, db, user, floor):
+    if not isinstance(floor, dict) or not floor.get("tables") \
+            or not isinstance(floor.get("rows"), dict):
+        return False
+    ok, _problems, _detail = _verify_against_floor(container, db, user, floor)
+    return ok
+
+
 def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
                     user, container, probe_spec):
     """B4-CXR7U9R40-R2: resolve an AMBIGUOUS restart without guessing.
@@ -1966,12 +2129,18 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     # 1. Durable state and 2. catalog observation, fail-closed.
     observation = {"durable_state": state,
                    "quarantine_present": None,
-                   "canonical_matches_inventory": None}
+                   "staging_present": None,
+                   "canonical_matches_inventory": None,
+                   "canonical_matches_floor": None}
     try:
         observation["quarantine_present"] = \
             _quarantine_present(container, user, quarantine)
+        observation["staging_present"] = db_exists(
+            container, user, record.get("staging_database"))
         observation["canonical_matches_inventory"] = \
             _canonical_matches_inventory(container, db, user, inventory, probe)
+        observation["canonical_matches_floor"] = _canonical_matches_floor(
+            container, db, user, _floor_from_record(operation_id))
     except Exception as e:
         receipt["error"] = f"reconcile could not observe durable truth: {e}"
         receipt["observation"] = observation
@@ -2006,51 +2175,99 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
         else:
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_ROLLING_BACK:
-        if observation["quarantine_present"] is True:
-            verdict = "rolled_back_available"
+        valid_claim = record.get("selected_transition") == "rollback" \
+            and _valid_transition_claim(operation_id, "rollback", promote) \
+            and record.get("commit_intent") is None \
+            and record.get("commit_point") is None
+        catalog_state = _rollback_catalog_state(
+            container, user, db, quarantine, record.get("staging_database"))
+        observation["rollback_catalog_state"] = catalog_state
+        accepted = {
+            "before_mutation": observation["canonical_matches_inventory"] is True,
+            "canonical_removed": True,
+            "quarantine_renamed": observation["canonical_matches_floor"] is True,
+        }
+        if valid_claim and accepted.get(catalog_state) is True:
+            verdict = "resume_rollback_required"
         else:
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_PROMOTED:
-        verdict = "rolled_back_available"
-    elif state in ("ROLLED_BACK", "FAILED"):
-        verdict = "rolled_back" if state == "ROLLED_BACK" else "unreconciled"
+        verdict = "fresh_rollback_available"
+    elif state == "ROLLED_BACK":
+        valid_claim = record.get("selected_transition") == "rollback" \
+            and _valid_transition_claim(operation_id, "rollback", promote)
+        catalog_state = _rollback_catalog_state(
+            container, user, db, quarantine, record.get("staging_database"))
+        observation["rollback_catalog_state"] = catalog_state
+        if valid_claim and catalog_state == "quarantine_renamed" \
+                and observation["canonical_matches_floor"] is True:
+            verdict = "rolled_back"
+        else:
+            verdict = "unreconciled"
+    elif state == "FAILED":
+        verdict = "unreconciled"
     else:
         verdict = "unreconciled"
     receipt["verdict"] = verdict
     receipt["committed"] = verdict == "committed"
     receipt["finished_at"] = now_iso()
     receipt["exit_status"] = 0 if verdict in (
-        "committed", "rolled_back", "rolled_back_available",
-        "preintent_abort_required", "resume_required") else 1
+        "committed", "rolled_back", "fresh_rollback_available",
+        "resume_rollback_required", "preintent_abort_required",
+        "resume_required") else 1
     return receipt
 
 
-def _classify_record_for_shell(record, promote=None):
+def _classify_record_for_shell(record, promote=None, transition_dir=None):
     """The single rollback-legality law for both engine callers and the shell.
 
-    Codes are deliberately small and stable: 0 means rollback is legal, 3 means
-    the durable forward decision forbids it, and 4 means unknown/malformed and
-    therefore fails closed. When a promote receipt is supplied, the operation
-    record is also bound to that exact receipt and the intent is checked; the
-    shell uses that form and never derives trust from a state label alone.
+    Code 0 is fresh rollback authority, code 5 is pre-intent finalize abort,
+    code 6 is explicit rollback resume, code 3 forbids rollback after forward
+    intent, and code 4 is malformed/unknown. When a promote receipt is supplied,
+    the exact claim and operation binding are checked; a state label alone can
+    never turn a spent branch into fresh authority.
     """
     if not isinstance(record, dict) or record.get("format") not in (None, TRANSITION_FORMAT):
         return 4
     state = record.get("state")
+    operation_id = record.get("operation_id")
     if state == TRANSITION_STATE_FINALIZING:
-        # A commit marker in FINALIZING is impossible under the explicit ladder
-        # (the old drop-before-record window). Never treat it as authority.
         if record.get("commit_intent") is not None or record.get("commit_point") is not None:
             return 4
         if record.get("selected_transition") == "finalize":
             return 5
         return 4
-    if state in ("CREATED", "STAGED", TRANSITION_STATE_PROMOTED,
-                 TRANSITION_STATE_ROLLING_BACK, "ROLLED_BACK", "FAILED"):
-        if state == TRANSITION_STATE_ROLLING_BACK \
-                and record.get("selected_transition") not in (None, "rollback"):
-            return 4
+    if state in ("CREATED", "STAGED"):
         return 0
+    if state == TRANSITION_STATE_PROMOTED:
+        if promote is not None and isinstance(operation_id, str):
+            if _valid_transition_claim(operation_id, "rollback", promote,
+                                       transition_dir=transition_dir):
+                return 6
+            if _valid_transition_claim(operation_id, "finalize", promote,
+                                       transition_dir=transition_dir):
+                return 5
+        return 0
+    if state == TRANSITION_STATE_ROLLING_BACK:
+        if record.get("selected_transition") not in (None, "rollback"):
+            return 4
+        if record.get("commit_intent") is not None or record.get("commit_point") is not None:
+            return 4
+        if promote is None:
+            return 6 if record.get("selected_transition") == "rollback" else 0
+        if not isinstance(operation_id, str) \
+                or not _valid_transition_claim(operation_id, "rollback", promote,
+                                               transition_dir=transition_dir):
+            return 4
+        return 6
+    if state == "ROLLED_BACK":
+        if promote is not None and isinstance(operation_id, str) \
+                and _valid_transition_claim(operation_id, "rollback", promote,
+                                            transition_dir=transition_dir):
+            return 6
+        return 0
+    if state == "FAILED":
+        return 4 if promote is not None else 0
     if state == TRANSITION_STATE_COMMIT_INTENT:
         intent = record.get("commit_intent")
         if not isinstance(intent, dict) or intent.get("marker") != "forward_commit":
@@ -2091,7 +2308,8 @@ def _classify_rollback_for_shell(receipt_path, transition_dir=None):
             return 4
         _operation_id, record = _bound_operation(
             promote, transition_dir=transition_dir)
-        return _classify_record_for_shell(record, promote)
+        return _classify_record_for_shell(
+            record, promote, transition_dir=transition_dir)
     except (OSError, ValueError, RuntimeError, TypeError):
         return 4
 
@@ -2126,8 +2344,9 @@ def _parse_cli(argv):
 def _validate_cli(phase, kw):
     """Fail closed on incomplete recovery invocations (usage errors, exit 2)."""
     if phase not in ("promote", "finalize", "resume-finalize",
-                     "preintent-rollback", "rollback", "reconcile"):
-        print("USAGE_ERROR: --phase <promote|finalize|resume-finalize|preintent-rollback|rollback|reconcile> required",
+                     "preintent-rollback", "rollback", "resume-rollback",
+                     "reconcile"):
+        print("USAGE_ERROR: --phase <promote|finalize|resume-finalize|preintent-rollback|rollback|resume-rollback|reconcile> required",
               file=sys.stderr)
         sys.exit(2)
     if not kw.get("inventory") or not kw.get("inventory_sha"):
@@ -2137,7 +2356,7 @@ def _validate_cli(phase, kw):
         print("USAGE_ERROR: --phase promote requires --archive", file=sys.stderr)
         sys.exit(2)
     if phase in ("finalize", "resume-finalize", "preintent-rollback",
-                 "rollback", "reconcile") and not kw.get("receipt_in"):
+                 "rollback", "resume-rollback", "reconcile") and not kw.get("receipt_in"):
         print(f"USAGE_ERROR: --phase {phase} requires --receipt-in", file=sys.stderr)
         sys.exit(2)
     targets = _governed_identity_problems(kw.get("db", DB), kw.get("user", USER),
@@ -2193,6 +2412,10 @@ def main():
                 container, probe)
         elif phase == "preintent-rollback":
             receipt = phase_preintent_rollback(
+                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
+                container, probe)
+        elif phase == "resume-rollback":
+            receipt = phase_resume_rollback(
                 kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
                 container, probe)
         elif phase == "reconcile":

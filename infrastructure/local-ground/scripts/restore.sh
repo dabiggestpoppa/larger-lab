@@ -335,6 +335,12 @@ pg_abort_finalize_preintent() { # recover the already-selected finalize branch
     --receipt-in "$PROMOTE_RECEIPT" "${PG_COMMON[@]}" \
     --receipt-out "$ROLLBACK_RECEIPT"
 }
+pg_resume_rollback_from_quarantine() { # continue the selected rollback branch
+  [ -n "$PROMOTE_RECEIPT" ] || return 1
+  python3 "$BIN/pg-recovery.py" --phase resume-rollback \
+    --receipt-in "$PROMOTE_RECEIPT" "${PG_COMMON[@]}" \
+    --receipt-out "$ROLLBACK_RECEIPT"
+}
 write_transaction_rollback_receipt() { # truthful account of what was restored
   python3 - "$TRANSACTION_RECEIPT" "$1" "$ARTIFACT_BEFORE_SHA" "$2" "$3" "$4" \
            "$(date -u +"$TS_FMT")" <<'PY'
@@ -386,6 +392,10 @@ durable_precommit() {
     echo "PRE-INTENT ABORT: finalize claim is spent before forward intent; " \
          "the governed preintent-rollback phase will restore PostgreSQL first" >&2
     return 0
+  elif [[ "$cls" -eq 6 ]]; then
+    echo "ROLLBACK RESUME: rollback claim is spent; " \
+         "the governed resume-rollback phase will restore PostgreSQL first" >&2
+    return 0
   elif [[ "$cls" -eq 3 ]]; then
     echo "BLOCKED: PostgreSQL passed its irreversible commit point (durable " \
          "transition state); artifact-only rollback is forbidden — both stores " \
@@ -423,6 +433,8 @@ rollback_precommit() { # single owner of every pre-commit rollback
     echo "rollback: restoring the original PostgreSQL database first..." >&2
     if [[ "$DURABLE_ROLLBACK_CLASS" -eq 5 ]]; then
       pg_abort_finalize_preintent && pg_ok=true
+    elif [[ "$DURABLE_ROLLBACK_CLASS" -eq 6 ]]; then
+      pg_resume_rollback_from_quarantine && pg_ok=true
     else
       pg_rollback_from_quarantine && pg_ok=true
     fi
