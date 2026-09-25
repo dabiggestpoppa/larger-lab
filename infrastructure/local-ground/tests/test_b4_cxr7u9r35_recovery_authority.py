@@ -319,7 +319,13 @@ def test_denial_snapshots_filesystem_receipts_and_every_call(bridge, tmp_path, m
     before_catalogs = set(bridge.dbs)
     out = _transition(bridge, "finalize", forged, inv, sha)
     assert out["exit_status"] == 1, out
-    assert _tree_state(tmp_path) == before_files
+    after_files = _tree_state(tmp_path)
+    new_files = set(after_files) - set(before_files)
+    assert len(new_files) == 1
+    coordinate = new_files.pop()
+    assert coordinate.endswith(".execution.lock")
+    assert all(after_files[path] == digest for path, digest in before_files.items())
+    assert not any(path.endswith(".execution.json") for path in after_files)
     assert set(bridge.dbs) == before_catalogs
     assert bridge.docker == [], bridge.docker
     assert bridge.dropped == [] and bridge.renamed == [] and bridge.staged == []

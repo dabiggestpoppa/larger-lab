@@ -578,18 +578,16 @@ def test_weakened_post_unlock_unlink_allows_a_second_coordinate(tmp_path):
         processes.append(winner)
         _wait_for_path(h.signal)
         _wait_for_lock_count(h, 2)
-        contender = _spawn(h, _rollback_argv(h, h.root / "contender.json"), engine=weak)
-        processes.append(contender)
-        _wait_for_lock_count(h, 3)
-        assert contender.poll() is None
-        replacement = Path(str(coordinate) + ".replacement")
-        assert replacement.is_file()
-        assert replacement.stat().st_ino != original_inode
-        assert len(_lock_events(h)) == 3
         h.bridge_dir.joinpath("weak-coordinate.release").write_text(
             "go", encoding="utf-8")
         denied.communicate(timeout=30)
         assert denied.returncode == 1
+        contender = _spawn(h, _rollback_argv(h, h.root / "contender.json"), engine=weak)
+        processes.append(contender)
+        _wait_for_lock_count(h, 3)
+        assert contender.poll() is None
+        assert coordinate.stat().st_ino != original_inode
+        assert len(_lock_events(h)) == 3
     finally:
         _terminate(processes)
 
