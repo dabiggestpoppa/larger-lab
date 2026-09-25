@@ -432,14 +432,18 @@ def _artifact_image_identity(image):
     inspected = subprocess.run(["docker", "image", "inspect", image],
                                capture_output=True, text=True, timeout=30)
     assert inspected.returncode == 0, inspected.stderr
-    metadata = json.loads(inspected.stdout)[0]
+    tagged = json.loads(inspected.stdout)[0]
+    image_id = tagged["Id"]
+    exact = subprocess.run(["docker", "image", "inspect", image_id],
+                           capture_output=True, text=True, timeout=30)
+    assert exact.returncode == 0, exact.stderr
+    metadata = json.loads(exact.stdout)[0]
+    assert metadata["Id"] == image_id
     labels = metadata["Config"]["Labels"]
-    version = oc.dexec(oc.ARTIFACT, ["minio", "--version"]).stdout
     return {
-        "image_id": metadata["Id"],
+        "image_id": image_id,
         "revision": labels["org.opencontainers.image.revision"],
-        "release": "RELEASE.2024-05-28T17-19-04Z"
-        if "RELEASE.2024-05-28T17-19-04Z" in version else version,
+        "release": labels["org.opencontainers.image.version"],
     }
 
 
@@ -463,6 +467,8 @@ def _assert_s3_restart_durability(expected_body, observed_status, observed_body,
                                   before_image, after_image):
     assert observed_status == b"200", observed_status
     assert observed_body == expected_body, (observed_body, expected_body)
+    assert before_runtime["container_image"] == before_image["image_id"]
+    assert after_runtime["container_image"] == after_image["image_id"]
     assert after_runtime == before_runtime, (before_runtime, after_runtime)
     assert after_image == before_image, (before_image, after_image)
 
@@ -494,7 +500,9 @@ def test_official_source_image_health_s3_and_persistence(oce_stack, tmp_path):
     image = "oce-local/artifact-store:RELEASE.2024-05-28T17-19-04Z-f79a4ef4d0dc"
     before_image = _artifact_image_identity(image)
     assert before_image["revision"] == "f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531"
+    assert before_image["release"] == "RELEASE.2024-05-28T17-19-04Z"
     before_runtime = _artifact_runtime_identity()
+    assert before_runtime["container_image"] == before_image["image_id"]
     # S3 API write/read against the running OCE-owned image.
     body = b"r41r4-official-source"
     bucket = _s3_request("PUT", "r41r4-proof", "", b"")
@@ -512,6 +520,9 @@ def test_official_source_image_health_s3_and_persistence(oce_stack, tmp_path):
     oc.assert_stack_converged(timeout_s=180, stable=2)
     after_image = _artifact_image_identity(image)
     after_runtime = _artifact_runtime_identity()
+    assert after_runtime["container_image"] == after_image["image_id"]
+    assert after_image["revision"] == before_image["revision"]
+    assert after_image["release"] == before_image["release"]
     post_restart = _s3_request("GET", "r41r4-proof", "payload")
     assert post_restart.stdout.endswith(b"\n200"), post_restart.stdout
     post_restart_body = post_restart.stdout.rsplit(b"\n", 1)[0]
