@@ -608,3 +608,51 @@ Accepted Book 3 exit gate:
 Book 4 remains NOT_STARTED. The next operator action is to authorize a separate
 Book 4 planning session; no Book 4 planning content or implementation is created
 by this bridge.
+
+---
+
+# PLANNING CHECKPOINT — BOOK 4 PROTOCOL, INFRASTRUCTURE, AND DEPENDENCY ATLAS (2026-09-24)
+
+This checkpoint records completion of the Book 4 planning packet only. It does not
+implement Book 4, acquire live data, start Book 5, or mutate Books 1–3 or Sensor.
+
+```text
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_4 = NOT_STARTED
+BOOK_4_PLAN_VERSION = v0.1
+BOOK_4_PLANNING = COMPLETE
+BOOK_4_READY_FOR_OPERATOR_REVIEW = TRUE
+BOOK_4_OPERATOR_RATIFIED = FALSE
+BOOK_4_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+BOOK_5 = NOT_STARTED
+```
+
+Book 4 planning artifacts:
+
+- `CSIA_BOOK_4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_ATLAS_PLAN_v0.1.md`
+- `CSIA_BOOK_4_RELATIONSHIP_SUPPORT_MATRIX_v0.1.md`
+- `CSIA_BOOK_4_PROTOCOL_ROLE_MODEL_v0.1.md`
+- `CSIA_BOOK_4_INFRASTRUCTURE_PILOT_MATRIX_v0.1.md`
+- `CSIA_BOOK_4_DEPENDENCY_ADVERSARIAL_REVIEW_v0.1.md`
+- `CSIA_BOOK_4_FAILURE_DOMAIN_STRESS_MATRIX_v0.1.md`
+- `CSIA_BOOK_4_SUBSTITUTABILITY_STRESS_MATRIX_v0.1.md`
+- `CSIA_BOOK_4_DEPENDENCY_EVIDENCE_MATRIX_v0.1.md`
+- `CSIA_BOOK_4_PRE_RATIFICATION_REVIEW_v0.1.md`
+
+Pre-ratification result:
+
+- Structural failures: 0
+- Required planning extensions: typed dependency records, dependency paths,
+  mechanism-based failure domains, redundancy assessments, substitutability
+  assessments, and oracle/bridge/DA service context where pairwise edges lose
+  causal structure
+- Current deployment and evidence gaps: intentionally unresolved because live
+  acquisition is unauthorized
+- Operator decisions still open: D4-1 through D4-8
+- Book 1, Book 2, Book 3, and Sensor mutation: none
+
+The next operator action is explicit review and decision on D4-1 through D4-8.
+Implementation authorization must be a separate decision.
