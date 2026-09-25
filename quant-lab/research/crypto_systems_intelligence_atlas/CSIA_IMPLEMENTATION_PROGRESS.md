@@ -628,6 +628,56 @@ LIVE_ACQUISITION_AUTHORITY = FALSE
 Acceptance record:
 `CSIA_BOOK_3_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md`
 
+---
+
+# CHECKPOINT 15 — BOOK 4 OFFLINE IMPLEMENTATION (2026-09-25)
+
+Book 4 implementation is complete within the operator-authorized deterministic
+offline protocol / infrastructure / dependency kernel scope. Books 1–3 remain
+frozen and no live acquisition, Crypto Sensor mutation, or Book 5 work was
+performed.
+
+```text
+BOOK_4_IMPLEMENTATION = COMPLETE
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL
+STATUS = READY_FOR_OPERATOR_REVIEW
+BOOK_4_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_5 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+
+BOOK_1_TESTS = 107 PASS
+BOOK_2_TESTS = 108 PASS
+BOOK_3_TESTS = 83 PASS
+BOOK_4_TESTS = 101 PASS
+TOTAL_CSIA = 399 PASS
+BOOK_4_ADVERSARIAL_CASES = 17
+HARD_RUNTIME_CASES = 10
+FAILURE_DOMAIN_SCENARIOS = 16
+SUBSTITUTABILITY_DIRECTIONAL_CASES = 11
+OFFLINE_PILOT_FIXTURES = 18
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_FINAL = 2325 PASS / 14 FAIL / 4 SKIPPED
+```
+
+The final Crypto Sensor result is recorded under the operator-authorized
+baseline deviation: 14 pre-existing CRLF/LF evidence-byte comparison failures;
+the prior Windows concurrency failure did not reproduce. No Sensor artifact or
+source was changed.
+
+Artifacts:
+
+- `CSIA_BOOK_4_IMPLEMENTATION_MATRIX.json`
+- `CSIA_BOOK_4_IMPLEMENTATION_EVIDENCE_v0.1.md`
+- this checkpoint
+
+Exact next operator action: review the Book 4 implementation matrix and evidence,
+then explicitly accept or reject the proposed exit gate. Do not self-accept Book
+4, start Book 5, or enable live acquisition.
+
 Future Book 3 changes require a concrete downstream integration defect, an
 explicit operator amendment, or a newly discovered correctness failure. No
 further generic Book 3 hardening is authorized.

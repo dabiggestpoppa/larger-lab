@@ -1,0 +1,81 @@
+{
+  "schema": "csia-book-4-implementation-matrix-v0.1",
+  "generated_at": "2026-09-25T12:00:00Z",
+  "status": "READY_FOR_OPERATOR_REVIEW",
+  "governance": {
+    "book_4": "RATIFIED",
+    "book_4_plan": "v0.2",
+    "book_4_ratification_errata": "v0.1 APPLIED",
+    "ratified_planning_anchor": "04820379bd0f63a605d83b1c710a246b103a5ef1",
+    "book_4_decision_binding_commit": "8b6106055686721b1b490adc792b0d6c03696e15",
+    "accepted_book_3_base": "d33afd5ec87208d96d256ec919fbf55956bf2791",
+    "book_4_implementation_authority": "DETERMINISTIC_OFFLINE_ONLY",
+    "live_acquisition_authority": false,
+    "book_5": "NOT_STARTED"
+  },
+  "implementation": {
+    "book_4_implementation": "COMPLETE",
+    "proposed_exit_gate": "PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL",
+    "book_4_acceptance": "NOT_SELF_ACCEPTED",
+    "book_2_claim_machine_reused": true,
+    "second_claim_state_machine": false,
+    "numeric_dependency_score": false,
+    "universal_replaces_relation": false,
+    "flattened_transitive_dependency": false,
+    "accepted_hyperedge_primitive_reused": true,
+    "new_hypergraph_primitive": false
+  },
+  "modules": [
+    "book4.py",
+    "book4_test_support.py",
+    "dependency.py",
+    "dependency_paths.py",
+    "dependency_provenance.py",
+    "dependency_relations.py",
+    "failure_domains.py",
+    "infrastructure_context.py",
+    "offline_pilots.py",
+    "protocol_roles.py",
+    "redundancy.py",
+    "substitutability.py"
+  ],
+  "tests": {
+    "book_1": 107,
+    "book_2": 108,
+    "book_3": 83,
+    "book_4": 101,
+    "total_csia": 399,
+    "adversarial_required_cases": 17,
+    "hard_runtime_cases": 10,
+    "failure_domain_scenarios": 16,
+    "redundancy_scenarios": 5,
+    "substitutability_directional_cases": 11,
+    "offline_pilot_fixtures": 18
+  },
+  "quality": {
+    "csia_ruff": "PASS",
+    "csia_mypy": "PASS",
+    "crypto_sensor_final": {
+      "passed": 2325,
+      "failed": 14,
+      "skipped": 4
+    },
+    "crypto_sensor_baseline": {
+      "passed": 2324,
+      "failed": 15,
+      "skipped": 4
+    },
+    "scoped_baseline_deviation": {
+      "operator_authorized": true,
+      "scope": "PRE_EXISTING_CRYPTO_SENSOR_WINDOWS_FAILURES_ONLY",
+      "line_ending_failures": 14,
+      "concurrency_failures_in_final_run": 0,
+      "book_4_related_failures": 0
+    }
+  },
+  "freeze": {
+    "book_1_accepted_contract_mutations": 0,
+    "book_2_accepted_contract_mutations": 0,
+    "book_3_accepted_contract_mutations": 0
+  }
+}
