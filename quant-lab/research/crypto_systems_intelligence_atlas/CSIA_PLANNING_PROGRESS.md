@@ -582,3 +582,29 @@ Ratification artifacts:
 No Book 3 implementation, live data, RPC, collector, database, graph database,
 Book 1 mutation, or Book 2 mutation is authorized. The next action requires a
 separate explicit operator authorization.
+
+
+---
+
+# PLANNING GOVERNANCE BRIDGE — BOOK 3 ACCEPTED (2026-09-24)
+
+The canonical Book 3 implementation has been accepted and frozen. This bridge
+records authority only; it does not plan or implement Book 4.
+
+```text
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_3_ACCEPTED_IMPLEMENTATION_ANCHOR = 30fd74d45df79b40291b5d5094b80dc65f70a725
+BOOK_3_ACCEPTANCE_RECORD_COMMIT = d33afd5ec87208d96d256ec919fbf55956bf2791
+BOOK_4_PLANNING_AUTHORITY = TRUE
+BOOK_4_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Accepted Book 3 exit gate:
+`PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL`
+
+Book 4 remains NOT_STARTED. The next operator action is to authorize a separate
+Book 4 planning session; no Book 4 planning content or implementation is created
+by this bridge.
