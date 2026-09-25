@@ -600,3 +600,34 @@ Exact next operator action: review the independent R2 branch and explicitly
 accept or reject the proposed Book 3 exit gate. Do not merge R2 into the
 original Book 3 branch, start Book 4, or enable live acquisition without
 separate authorization.
+
+
+---
+
+# CHECKPOINT 14 — BOOK 3 IMPLEMENTATION ACCEPTED (2026-09-24)
+
+The operator accepts the independently verified R2 implementation and freezes
+Book 3 under the ratified exit gate.
+
+```text
+BOOK_3_IMPLEMENTATION = ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_3_ACCEPTED_IMPLEMENTATION_ANCHOR = 30fd74d45df79b40291b5d5094b80dc65f70a725
+BOOK_3_EXIT_GATE = PASS_CSIA_BOOK3_NATIVE_CHAIN_LEDGER_ATLAS_KERNEL
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+BLOCKERS = 0
+BOOK_4 = NOT_STARTED
+BOOK_4_PLANNING_AUTHORITY = TRUE
+BOOK_4_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Acceptance record:
+`CSIA_BOOK_3_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md`
+
+Future Book 3 changes require a concrete downstream integration defect, an
+explicit operator amendment, or a newly discovered correctness failure. No
+further generic Book 3 hardening is authorized.
