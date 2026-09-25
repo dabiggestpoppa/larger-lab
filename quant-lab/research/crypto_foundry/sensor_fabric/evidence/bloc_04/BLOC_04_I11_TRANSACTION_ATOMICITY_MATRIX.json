@@ -1,0 +1,71 @@
+{
+  "checkpoint": "SENSOR-B4-I11",
+  "artifact": "BLOC_04_I11_TRANSACTION_ATOMICITY_MATRIX",
+  "runtime_validation": "BLOCKED_ENVIRONMENT",
+  "rows": [
+    {
+      "case": "offline_transaction_design",
+      "required_invariants": [
+        "validate_before_begin",
+        "explicit_begin_commit_rollback",
+        "fixed_advisory_lock_boundary",
+        "operational_tables_not_truncated"
+      ],
+      "validate_before_begin": true,
+      "explicit_begin_commit_rollback": true,
+      "fixed_advisory_lock_boundary": true,
+      "operational_tables_not_truncated": true,
+      "result": "OK"
+    },
+    {
+      "case": "real_failed_refresh_rollback",
+      "required_invariants": [
+        "runtime_available",
+        "prior_snapshot_preserved",
+        "rollback_observed"
+      ],
+      "runtime_available": false,
+      "prior_snapshot_preserved": false,
+      "rollback_observed": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "real_concurrent_refresh_serialization",
+      "required_invariants": [
+        "runtime_available",
+        "no_hybrid_snapshot",
+        "advisory_lock_observed"
+      ],
+      "runtime_available": false,
+      "no_hybrid_snapshot": false,
+      "advisory_lock_observed": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "real_operational_state_preservation",
+      "required_invariants": [
+        "runtime_available",
+        "quota_state_preserved",
+        "backup_state_preserved",
+        "integrity_checks_preserved"
+      ],
+      "runtime_available": false,
+      "quota_state_preserved": false,
+      "backup_state_preserved": false,
+      "integrity_checks_preserved": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "counterfactual_interleaved_refresh_commits",
+      "required_invariants": [
+        "no_hybrid_snapshot"
+      ],
+      "no_hybrid_snapshot": false,
+      "result": "FAIL"
+    }
+  ],
+  "row_count": 5,
+  "deliberate_failures": [
+    "counterfactual_interleaved_refresh_commits"
+  ]
+}

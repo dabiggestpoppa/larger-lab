@@ -1,0 +1,55 @@
+{
+  "checkpoint": "SENSOR-B4-I11",
+  "artifact": "BLOC_04_I11_RECONSTRUCTION_MATRIX",
+  "runtime_validation": "BLOCKED_ENVIRONMENT",
+  "rows": [
+    {
+      "case": "offline_public_source_boundary",
+      "required_invariants": [
+        "public_repository_boundary",
+        "closed_snapshot_validation",
+        "zero_t0a_payload_reads_in_importer"
+      ],
+      "public_repository_boundary": true,
+      "closed_snapshot_validation": true,
+      "zero_t0a_payload_reads_in_importer": true,
+      "result": "OK"
+    },
+    {
+      "case": "real_initial_reconstruction",
+      "required_invariants": [
+        "runtime_available",
+        "initial_import_completed"
+      ],
+      "runtime_available": false,
+      "initial_import_completed": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "real_drop_schema_rebuild_parity",
+      "required_invariants": [
+        "schema_dropped",
+        "durable_evidence_unchanged",
+        "schema_reinstalled",
+        "exact_row_parity"
+      ],
+      "schema_dropped": false,
+      "durable_evidence_unchanged": false,
+      "schema_reinstalled": false,
+      "exact_row_parity": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "counterfactual_postgres_loss_erases_t0a",
+      "required_invariants": [
+        "postgres_loss_not_raw_evidence_loss"
+      ],
+      "postgres_loss_not_raw_evidence_loss": false,
+      "result": "FAIL"
+    }
+  ],
+  "row_count": 4,
+  "deliberate_failures": [
+    "counterfactual_postgres_loss_erases_t0a"
+  ]
+}

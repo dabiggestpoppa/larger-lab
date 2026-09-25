@@ -47,6 +47,7 @@ dependencies = [
     # Hyperliquid DEX
     "hyperliquid-python-sdk>=0.24.0",
     "zstandard>=0.23.0",
+    "psycopg[binary]>=3.2,<4",
 ]
 
 [dependency-groups]

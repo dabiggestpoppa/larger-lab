@@ -1,0 +1,67 @@
+{
+  "checkpoint": "SENSOR-B4-I11",
+  "artifact": "BLOC_04_I11_AUTHORITY_FIREWALL_MATRIX",
+  "runtime_validation": "BLOCKED_ENVIRONMENT",
+  "rows": [
+    {
+      "case": "offline_authority_classification",
+      "required_invariants": [
+        "postgres_is_non_authoritative",
+        "raw_evidence_authority_unchanged",
+        "accepted_repositories_are_only_sources"
+      ],
+      "postgres_is_non_authoritative": true,
+      "raw_evidence_authority_unchanged": true,
+      "accepted_repositories_are_only_sources": true,
+      "result": "OK"
+    },
+    {
+      "case": "real_i07_tamper_firewall",
+      "required_invariants": [
+        "runtime_available",
+        "i07_state_unchanged",
+        "postgres_refresh_corrects_forgery"
+      ],
+      "runtime_available": false,
+      "i07_state_unchanged": false,
+      "postgres_refresh_corrects_forgery": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "real_i08_tamper_firewall",
+      "required_invariants": [
+        "runtime_available",
+        "recovery_journal_unchanged",
+        "postgres_refresh_corrects_summary"
+      ],
+      "runtime_available": false,
+      "recovery_journal_unchanged": false,
+      "postgres_refresh_corrects_summary": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "real_i09_tamper_firewall",
+      "required_invariants": [
+        "runtime_available",
+        "quota_policy_unchanged",
+        "postgres_refresh_cannot_change_policy"
+      ],
+      "runtime_available": false,
+      "quota_policy_unchanged": false,
+      "postgres_refresh_cannot_change_policy": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "counterfactual_postgres_supersedes_i07",
+      "required_invariants": [
+        "postgres_not_resume_authority"
+      ],
+      "postgres_not_resume_authority": false,
+      "result": "FAIL"
+    }
+  ],
+  "row_count": 5,
+  "deliberate_failures": [
+    "counterfactual_postgres_supersedes_i07"
+  ]
+}

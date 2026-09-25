@@ -1,0 +1,59 @@
+{
+  "checkpoint": "SENSOR-B4-I11",
+  "artifact": "BLOC_04_I11_RUNTIME_INTEGRATION_MATRIX",
+  "runtime_validation": "BLOCKED_ENVIRONMENT",
+  "driver": "psycopg 3.3.6 resolved; no connection executed",
+  "postgresql_version": null,
+  "dsn_supplied": false,
+  "runtime_available": false,
+  "rows": [
+    {
+      "case": "offline_driver_dependency",
+      "required_invariants": [
+        "driver_dependency_declared",
+        "driver_import_is_lazy"
+      ],
+      "driver_dependency_declared": true,
+      "driver_import_is_lazy": true,
+      "result": "OK"
+    },
+    {
+      "case": "real_postgres_connection",
+      "required_invariants": [
+        "runtime_available",
+        "real_connection_observed",
+        "server_version_observed"
+      ],
+      "runtime_available": false,
+      "real_connection_observed": false,
+      "server_version_observed": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "real_schema_and_transaction_execution",
+      "required_invariants": [
+        "schema_created",
+        "rollback_executed",
+        "reconstruction_executed",
+        "introspection_executed"
+      ],
+      "schema_created": false,
+      "rollback_executed": false,
+      "reconstruction_executed": false,
+      "introspection_executed": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "counterfactual_offline_sql_counts_as_integration",
+      "required_invariants": [
+        "real_postgres_required_for_gate"
+      ],
+      "real_postgres_required_for_gate": false,
+      "result": "FAIL"
+    }
+  ],
+  "row_count": 4,
+  "deliberate_failures": [
+    "counterfactual_offline_sql_counts_as_integration"
+  ]
+}

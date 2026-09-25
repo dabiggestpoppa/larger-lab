@@ -1,0 +1,57 @@
+{
+  "checkpoint": "SENSOR-B4-I11",
+  "artifact": "BLOC_04_I11_POSTGRES_SCHEMA_MATRIX",
+  "runtime_validation": "BLOCKED_ENVIRONMENT",
+  "rows": [
+    {
+      "case": "offline_fixed_schema_contract",
+      "required_invariants": [
+        "fixed_namespace",
+        "closed_table_allowlist",
+        "no_bytea_contract",
+        "no_generic_raw_column"
+      ],
+      "fixed_namespace": true,
+      "closed_table_allowlist": true,
+      "no_bytea_contract": true,
+      "no_generic_raw_column": true,
+      "result": "OK"
+    },
+    {
+      "case": "offline_raw_and_secret_refusal",
+      "required_invariants": [
+        "raw_bytes_refused",
+        "secret_shaped_values_not_persisted",
+        "dsn_redacted"
+      ],
+      "raw_bytes_refused": true,
+      "secret_shaped_values_not_persisted": true,
+      "dsn_redacted": true,
+      "result": "OK"
+    },
+    {
+      "case": "real_postgres_schema_install",
+      "required_invariants": [
+        "runtime_available",
+        "schema_installed",
+        "introspection_exact"
+      ],
+      "runtime_available": false,
+      "schema_installed": false,
+      "introspection_exact": false,
+      "result": "FAIL"
+    },
+    {
+      "case": "counterfactual_raw_payload_table_present",
+      "required_invariants": [
+        "raw_table_absent"
+      ],
+      "raw_table_absent": false,
+      "result": "FAIL"
+    }
+  ],
+  "row_count": 4,
+  "deliberate_failures": [
+    "counterfactual_raw_payload_table_present"
+  ]
+}
