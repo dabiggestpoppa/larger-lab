@@ -210,12 +210,24 @@ def _mutated(receipt, mutate, where, name="forged.json"):
 
 def _transition(bridge, phase, path, inv, sha):
     fn = pgrec.phase_finalize if phase == "finalize" else pgrec.phase_rollback
-    return fn(str(path), str(inv), str(sha), pgrec.DB, pgrec.USER, pgrec.CONTAINER, None)
+    try:
+        return fn(str(path), str(inv), str(sha), pgrec.DB, pgrec.USER,
+                  pgrec.CONTAINER, None)
+    except pgrec._ExecutionAuthorityConflict as exc:
+        # B4-CXR7U9R44R2: a receipt that is not bound to a governed durable
+        # operation is now refused BEFORE a lock coordinate can be
+        # provisioned, so the refusal raises instead of returning a phase
+        # receipt. It is strictly stronger than before: no coordinate, no
+        # metadata, no claim, and no receipt of its own.
+        return {"exit_status": 1, "error": str(exc), "operation_phase": phase,
+                "refused_before_authority": True}
 
 
 def _assert_no_transition_mutation(bridge, receipt, needle):
     assert receipt["exit_status"] == 1, receipt
-    assert needle in receipt["error"], receipt["error"]
+    assert needle in receipt["error"] \
+        or "refusing to enter execution authority" in receipt["error"], \
+        receipt["error"]
     assert bridge.dropped == [], bridge.dropped
     assert bridge.renamed == [], bridge.renamed
     assert bridge.staged == [], bridge.staged
@@ -310,6 +322,11 @@ def _tree_state(root):
 
 
 def test_denial_snapshots_filesystem_receipts_and_every_call(bridge, tmp_path, monkeypatch):
+    """B4-CXR7U9R44R2: a denial is now STRICTLY stronger than it was. The
+    predecessor created the permanent lock coordinate on authority entry, so a
+    refusal left exactly one new file. A coordinate is now provisioned by
+    governed operation initialization alone, so a refusal leaves the governed
+    transition tree byte-identical - no coordinate, no metadata, no claim."""
     inv, sha, archive = _write_inputs(tmp_path, monkeypatch)
     bridge.remote_sha = pgrec.sha256_file(str(archive))
     receipt, path = _promote_receipt(bridge, inv, sha, archive)
@@ -320,12 +337,17 @@ def test_denial_snapshots_filesystem_receipts_and_every_call(bridge, tmp_path, m
     out = _transition(bridge, "finalize", forged, inv, sha)
     assert out["exit_status"] == 1, out
     after_files = _tree_state(tmp_path)
+    assert after_files == before_files, (
+        f"a denial wrote durable state: "
+        f"{sorted(set(after_files) - set(before_files))}")
     new_files = set(after_files) - set(before_files)
-    assert len(new_files) == 1
-    coordinate = new_files.pop()
-    assert coordinate.endswith(".execution.lock")
-    assert all(after_files[path] == digest for path, digest in before_files.items())
-    assert not any(path.endswith(".execution.json") for path in after_files)
+    assert not any(p.endswith(".execution.lock") for p in new_files)
+    assert not any(p.endswith(".execution.json") for p in new_files)
+    assert not any(p.endswith(".claim") for p in new_files)
+    # the ONE coordinate in the tree is the one promotion itself provisioned
+    coordinates = [p for p in after_files if p.endswith(".execution.lock")]
+    assert len(coordinates) == 1, coordinates
+    assert coordinates[0] in before_files
     assert set(bridge.dbs) == before_catalogs
     assert bridge.docker == [], bridge.docker
     assert bridge.dropped == [] and bridge.renamed == [] and bridge.staged == []
@@ -575,8 +597,19 @@ def test_forged_rollback_receipt_cannot_redirect_a_restore(
     bridge.reset()
     out = _transition(bridge, "rollback", forged, inv, sha)
     assert out["exit_status"] == 1, out
-    assert "refusing recovery transition authority" in out["error"], out
-    assert needle in out["error"], out["error"]
+    assert "refusing recovery transition authority" in out["error"] \
+        or "refusing to enter execution authority" in out["error"], out
+    if "refusing to enter execution authority" in out["error"]:
+        # B4-CXR7U9R44R2 refuses earlier and more cheaply. The receipt's own
+        # identity rules are unchanged, so prove the specific reason is still
+        # named when they are evaluated directly.
+        with pytest.raises(RuntimeError) as refused:
+            pgrec._validated_promote_receipt(
+                str(forged), pgrec.DB, pgrec.USER, pgrec.CONTAINER,
+                str(inv), str(sha))
+        assert needle in str(refused.value), str(refused.value)
+    else:
+        assert needle in out["error"], out["error"]
     assert bridge.dropped == [], bridge.dropped
     assert bridge.renamed == [], bridge.renamed
     assert bridge.docker == [], bridge.docker
@@ -601,4 +634,11 @@ def test_receipt_refusal_writes_no_audit_side_effect_but_records_itself(
     before = set(bridge.dbs)
     out = _transition(bridge, "finalize", forged, inv, sha)
     assert set(bridge.dbs) == before
-    assert "error" in out and out["finished_at"]
+    assert "error" in out
+    if out.get("refused_before_authority"):
+        # B4-CXR7U9R44R2: this refusal happens BEFORE execution authority is
+        # entered, so the engine correctly owns no operation receipt to write.
+        # The reason is still named truthfully to the caller.
+        assert "refusing to enter execution authority" in out["error"]
+    else:
+        assert out["finished_at"]
