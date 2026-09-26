@@ -278,3 +278,24 @@ BOOK_4_ACCEPTANCE = NOT_SELF_ACCEPTED
 BOOK_5 = NOT_STARTED
 LIVE_ACQUISITION_AUTHORITY = FALSE
 ```
+
+## Hardening R2 — adversarial audit addendum
+
+An adversarial pass ran 16 executable bypass probes against the R2 seals
+(`CSIA_BOOK_4_HARDENING_R2_ADVERSARIAL_AUDIT.md`). Five bypasses landed: the
+context-binding, redundancy-coverage, and pair-scope checks lived only in
+pydantic model validators, which `model_copy(update=...)` skips entirely, and
+third/failure-domain providers could ride on partial pair evidence. Four
+concrete correctness defects were confirmed and fixed at the decision points:
+the gates and book admission methods now re-derive every seal from the
+record's current state (raw untyped bindings fail closed, never crash).
+
+```text
+AUDIT_PROBES = 16
+BYPASSES_CONFIRMED_BEFORE_FIX = 5
+DEFECTS_FIXED = 4
+CSIA_TESTS = 486 PASS
+BOOK4_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_1/2/3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```

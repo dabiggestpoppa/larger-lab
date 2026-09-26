@@ -845,3 +845,42 @@ concrete new correctness failure is demonstrated.
 Future Book 4 changes require a concrete demonstrated correctness defect, an
 explicit operator amendment, or a newly discovered integration failure. No
 further generic hardening rounds are authorized.
+
+## CHECKPOINT 17 ADDENDUM — R2 ADVERSARIAL AUDIT (2026-09-26)
+
+16 executable bypass probes were run against the R2 seals before any fix
+(`CSIA_BOOK_4_HARDENING_R2_ADVERSARIAL_AUDIT.md`). Five bypasses landed and
+four concrete correctness defects were confirmed and fixed in the same pass:
+
+- context-binding seal bypassed post-construction via `model_copy` (consumer,
+  function, scope drift; plain-binding swap; raw dict binding) — the gate now
+  re-verifies binding type and context equality at classify time;
+- redundancy binding coverage bypassed by stripping bindings via `model_copy`
+  — `add` re-derives exact coverage from record state;
+- a third provider could ride on two-provider independence evidence — `add`
+  now requires a binding for every consecutive provider pair when independence
+  is asserted;
+- failure-domain `classify` checked only `affected_system_refs[0]` — it now
+  requires bindings covering exactly the Cartesian product of affected
+  systems.
+
+Provenance-set closure and exact snapshot lineage held against every attack
+(they were already computed at the decision points from live store state).
+
+```text
+AUDIT_PROBES = 16
+BYPASSES_CONFIRMED_BEFORE_FIX = 5
+DEFECTS_FIXED = 4
+PROBES_GREEN_AFTER_FIX = 16
+CSIA_TESTS = 486 PASS
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (37 source files)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+SENSOR_FAILURE_SET = byte-identical to the R2 equivalence record
+BOOK_1/2/3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```
+
+Audit artifact: `CSIA_BOOK_4_HARDENING_R2_ADVERSARIAL_AUDIT.md`.
+Book 4 remains NOT_SELF_ACCEPTED; no Book 5; no live acquisition; no R3
+(these fixes close the demonstrated defects found by the audit itself).

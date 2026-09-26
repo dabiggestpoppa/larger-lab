@@ -113,5 +113,18 @@
   "commits": {
     "r2_seal": "e5884686",
     "r2_test_suite": "8a336fb0"
+  },
+  "adversarial_audit": {
+    "record": "CSIA_BOOK_4_HARDENING_R2_ADVERSARIAL_AUDIT.md",
+    "probes_run": 16,
+    "bypasses_confirmed_before_fix": 5,
+    "concrete_correctness_defects": 4,
+    "defects_fixed_in_pass": 4,
+    "post_fix": {
+      "csia_tests": 486,
+      "sensor_failure_set_identical": true,
+      "decision_point_reverification": true,
+      "note": "pydantic model_copy skips model validators; the context-binding, redundancy-coverage, and pair-scope checks are re-derived at the classification/admission decision points"
+    }
   }
 }
