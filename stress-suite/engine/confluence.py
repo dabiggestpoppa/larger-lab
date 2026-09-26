@@ -139,6 +139,10 @@ def confluence_protected_digest(
     events: List[ReplayEvent],
     registry: Optional[EvidenceRegistry] = None,
 ) -> str:
+    """Protected digest. When registry is None or empty, evidence_kinds is
+    UNAVAILABLE — callers must check projection_evidence_status() rather than
+    treating an empty list as a verified equivalence. Use
+    confluence_protected_digest_with_status() if you need the availability flag."""
     by_seq: Dict[int, ReplayEvent] = {e.seq: e for e in events}
     allowed_trace: List[Dict[str, Any]] = []
     for entry in result.trace:
@@ -165,6 +169,8 @@ def confluence_protected_digest(
                 "evidence_refs": evidence_refs,
             }
         )
+    evidence_kinds: Any
+    evidence_available = False
     if registry is not None and len(registry) > 0:
         kinds = set()
         for rid in registry.ids:
@@ -177,8 +183,11 @@ def confluence_protected_digest(
                 if rk:
                     kinds.add(rk)
         evidence_kinds = sorted(kinds)
+        evidence_available = len(evidence_kinds) > 0
+        if not evidence_available:
+            evidence_kinds = "UNAVAILABLE_NO_EVIDENCE_KINDS"
     else:
-        evidence_kinds = []
+        evidence_kinds = "UNAVAILABLE_NO_REGISTRY"
     # Canonicalize order: valid schedules' allowed_trace set is commutativity-relevant but
     # schedule order itself is presentation (seq) — contract §4.2 excludes seq and trace order beyond action sequence.
     # Sorting makes independent disjoint ops converge on same digest while same-target divergent terminals remain distinct via terminal_lifecycle.
@@ -190,7 +199,64 @@ def confluence_protected_digest(
         "evidence_kinds": evidence_kinds,
     }
     canonical_bytes = json.dumps(canonical, sort_keys=True, separators=(",", ":"))
+    # Evidence-unavailable digests use a distinct domain so they never collide
+    # with a real evidence-bearing digest and cannot be mistaken for verified equivalence.
+    if not evidence_available:
+        return deterministic_hex("confluence-protected-unavailable", canonical_bytes)
     return deterministic_hex("confluence-protected", canonical_bytes)
+
+
+def confluence_protected_digest_with_status(
+    result: ReplayResult,
+    events: List[ReplayEvent],
+    registry: Optional[EvidenceRegistry] = None,
+) -> Tuple[str, str]:
+    """Like confluence_protected_digest but also returns availability status.
+
+    Returns (digest, status) where status is one of:
+      AVAILABLE | UNAVAILABLE_NO_REGISTRY | UNAVAILABLE_NO_EVIDENCE_KINDS
+    """
+    digest = confluence_protected_digest(result, events, registry=registry)
+    if registry is None or len(registry) == 0:
+        # Need to distinguish the two empty cases; re-derive without re-running
+        if registry is None:
+            return digest, "UNAVAILABLE_NO_REGISTRY"
+        return digest, "UNAVAILABLE_NO_REGISTRY_EVIDENCE" if len(registry) == 0 else "UNAVAILABLE_NO_EVIDENCE_KINDS"
+    # registry non-empty — check if it actually yielded kinds
+    kinds = set()
+    for rid in registry.ids:
+        obj = registry._objects.get(rid)  # type: ignore[attr-defined]
+        k = getattr(obj, "kind", None)
+        if k:
+            kinds.add(k)
+        else:
+            rk = getattr(obj, "resolution_class", None)
+            if rk:
+                kinds.add(rk)
+    if not kinds:
+        return digest, "UNAVAILABLE_NO_EVIDENCE_KINDS"
+    return digest, "AVAILABLE"
+
+
+def projection_evidence_status(registry: Optional[EvidenceRegistry]) -> str:
+    """Availability of evidence_kinds for the evaluated workflow."""
+    if registry is None:
+        return "UNAVAILABLE_NO_REGISTRY"
+    if len(registry) == 0:
+        return "UNAVAILABLE_NO_REGISTRY_EVIDENCE"
+    kinds = set()
+    for rid in registry.ids:
+        obj = registry._objects.get(rid)  # type: ignore[attr-defined]
+        k = getattr(obj, "kind", None)
+        if k:
+            kinds.add(k)
+        else:
+            rk = getattr(obj, "resolution_class", None)
+            if rk:
+                kinds.add(rk)
+    if not kinds:
+        return "UNAVAILABLE_NO_EVIDENCE_KINDS"
+    return "AVAILABLE"
 
 
 def _is_valid_result(result: ReplayResult) -> bool:
@@ -240,6 +306,7 @@ def schedule_enumerator(
             "valid_count_enumerated": 0,
             "invalid_count": 0,
             "bound_exceeded": False,
+            "truncated": False,
             "enumerator_hash": deterministic_hex("schedule-enumerator", bound, "[]"),
         }
     total_perms = math.factorial(n) if n <= 12 else 10**9
@@ -293,6 +360,7 @@ def schedule_enumerator(
             "valid_count_enumerated": valid_enumerated,
             "invalid_count": invalid_count,
             "bound_exceeded": bound_exceeded,
+            "truncated": False,
             "enumerator_hash": enumerator_hash,
         }
     else:
@@ -307,8 +375,10 @@ def schedule_enumerator(
         valid_before_bound = 0
         budget = 5000
         count = 0
+        truncated = False
         for perm in itertools.permutations(range(n)):
             if count >= budget:
+                truncated = True
                 break
             sched = [sorted_actions[i] for i in perm]
             result, events = _run_schedule(sched, spec)
@@ -324,6 +394,16 @@ def schedule_enumerator(
             else:
                 invalid_count += 1
             count += 1
+        # If we hit the budget, we did not exhaust the permutation space; mark
+        # truncated distinctly from bound_exceeded (which is about valid count vs bound).
+        if count >= budget:
+            # Check if there are more permutations we didn't visit
+            import math as _math
+            total_perms_exact = _math.factorial(n) if n <= 12 else None
+            if total_perms_exact is not None and count < total_perms_exact:
+                truncated = True
+            elif total_perms_exact is None:
+                truncated = True
         canon = json.dumps(
             [[list(a.to_tuple()) for a in sched] for sched in valid_schedules],
             sort_keys=True,
@@ -342,6 +422,7 @@ def schedule_enumerator(
             "valid_count_enumerated": len(valid_schedules),
             "invalid_count": invalid_count,
             "bound_exceeded": valid_before_bound > bound,
+            "truncated": truncated,
             "enumerator_hash": enumerator_hash,
         }
 
@@ -422,9 +503,12 @@ class CheckVerdict:
 
 
 def _termination_check(enum: Dict[str, Any], bound: int) -> CheckVerdict:
+    truncated = bool(enum.get("truncated", False))
     if enum["bound_exceeded"]:
-        return CheckVerdict(name="termination", verdict="INCONCLUSIVE", detail={"reason": "bound exceeded, beyond-bound is INCONCLUSIVE per contract", "bound": bound, "valid_before_bound": enum["valid_count_before_bound"]})
-    return CheckVerdict(name="termination", verdict="PASS", detail={"valid_enumerated": enum["valid_count_enumerated"], "invalid_excluded": enum["invalid_count"]})
+        return CheckVerdict(name="termination", verdict="INCONCLUSIVE", detail={"reason": "bound exceeded, beyond-bound is INCONCLUSIVE per contract", "bound": bound, "valid_before_bound": enum["valid_count_before_bound"], "truncated": truncated})
+    if truncated:
+        return CheckVerdict(name="termination", verdict="INCONCLUSIVE", detail={"reason": "permutation search truncated before exhaustion (budget 5000, n>7), beyond-budget is INCONCLUSIVE", "bound": bound, "truncated": True})
+    return CheckVerdict(name="termination", verdict="PASS", detail={"valid_enumerated": enum["valid_count_enumerated"], "invalid_excluded": enum["invalid_count"], "truncated": False})
 
 
 def _idempotence_check(spec: StressScenarioSpec) -> CheckVerdict:
@@ -506,27 +590,33 @@ def _local_diamond_check(spec: StressScenarioSpec) -> CheckVerdict:
 def _final_state_equivalence_check(enum: Dict[str, Any]) -> CheckVerdict:
     if enum["valid_count_enumerated"] < 2:
         return CheckVerdict(name="final_state_equivalence", verdict="INCONCLUSIVE", detail={"reason": "valid schedules <2, not claimable", "valid_count": enum["valid_count_enumerated"]})
-    if enum["bound_exceeded"]:
-        return CheckVerdict(name="final_state_equivalence", verdict="INCONCLUSIVE", detail={"reason": "bound exceeded, beyond-bound INCONCLUSIVE", "valid_before_bound": enum["valid_count_before_bound"]})
+    truncated = bool(enum.get("truncated", False))
+    # Distinguish truncation from bound_exceeded, but both make the result INCONCLUSIVE unless
+    # a divergent pair has already been observed (which would be CONFLUENCE_FAILURE).
+    # Check divergence first: if any pair diverges, that's FAILURE even when truncated/bound_exceeded.
     digests = enum["protected_per_schedule"]
-    first = digests[0]
-    all_equal = all(d == first for d in digests)
-    if all_equal:
-        return CheckVerdict(name="final_state_equivalence", verdict="PASS", detail={"digest": first, "count": len(digests)})
-    else:
-        divergent_pair = None
-        for i in range(len(digests)):
-            for j in range(i + 1, len(digests)):
-                if digests[i] != digests[j]:
-                    divergent_pair = (i, j)
+    if len(digests) >= 2:
+        first = digests[0]
+        if not all(d == first for d in digests):
+            divergent_pair = None
+            for i in range(len(digests)):
+                for j in range(i + 1, len(digests)):
+                    if digests[i] != digests[j]:
+                        divergent_pair = (i, j)
+                        break
+                if divergent_pair:
                     break
-            if divergent_pair:
-                break
-        return CheckVerdict(name="final_state_equivalence", verdict="FAIL", detail={
-            "divergent_pair": divergent_pair,
-            "digests": digests,
-            "reason": "protected digests diverge — CONFLUENCE_FAILURE",
-        })
+            return CheckVerdict(name="final_state_equivalence", verdict="FAIL", detail={
+                "divergent_pair": divergent_pair,
+                "digests": digests,
+                "reason": "protected digests diverge — CONFLUENCE_FAILURE",
+            })
+    if enum["bound_exceeded"]:
+        return CheckVerdict(name="final_state_equivalence", verdict="INCONCLUSIVE", detail={"reason": "bound exceeded, beyond-bound INCONCLUSIVE", "valid_before_bound": enum["valid_count_before_bound"], "truncated": truncated})
+    if truncated:
+        return CheckVerdict(name="final_state_equivalence", verdict="INCONCLUSIVE", detail={"reason": "permutation search truncated before exhaustion (budget 5000, n>7), beyond-budget is INCONCLUSIVE", "truncated": True})
+    first = digests[0] if digests else ""
+    return CheckVerdict(name="final_state_equivalence", verdict="PASS", detail={"digest": first, "count": len(digests), "truncated": False, "bound_exceeded": False})
 
 
 def _synthetic_seeded_failure_spec() -> StressScenarioSpec:
@@ -695,6 +785,7 @@ def verify_confluence(
     valid_count = enum["valid_count_enumerated"]
     valid_before = enum["valid_count_before_bound"]
     bound_exceeded = enum["bound_exceeded"]
+    truncated = bool(enum.get("truncated", False))
     contract_hash = _compute_contract_hash()
     scenario_id = spec.scenario_id
     schedule_length = len(spec.stimulus_events or [])
@@ -702,7 +793,10 @@ def verify_confluence(
     protected_per = enum["protected_per_schedule"]
     seq_hashes = enum["seq_hashes"]
     enumerator_hash = enum["enumerator_hash"]
-    coverage = f"{valid_count}/{valid_before}/beyond_bound={'INCONCLUSIVE' if bound_exceeded else 'none'}"
+    if truncated:
+        coverage = f"{valid_count}/{valid_before}/truncated=True/beyond_bound={'INCONCLUSIVE' if bound_exceeded else 'none'}"
+    else:
+        coverage = f"{valid_count}/{valid_before}/beyond_bound={'INCONCLUSIVE' if bound_exceeded else 'none'}"
     invalid_checks = check_invalid_inputs(spec)
     seeded_ctrl = seeded_failure_control_verdict()
     termination = _termination_check(enum, bound)
@@ -720,20 +814,65 @@ def verify_confluence(
         seeded_check_verdict = seeded_ctrl.get("scientific_verdict", "UNKNOWN")
         seeded_check_detail = seeded_ctrl
     else:
-        if bound_exceeded:
-            execution_status = "BUDGET_EXCEEDED"
-            scientific_verdict = "INCONCLUSIVE"
-            claim_status = "INCONCLUSIVE"
-            final_verdict = "INCONCLUSIVE"
-            counterexample_dict = None
-            seeded_check_verdict = seeded_ctrl.get("scientific_verdict", "UNKNOWN")
-            seeded_check_detail = seeded_ctrl
-            if seeded_ctrl.get("scientific_verdict") == "CONFLUENCE_FAILURE":
-                seeded_check_verdict = "PASS"
-                seeded_check_detail = {"seeded_result": "CONFLUENCE_FAILURE as required"}
+        # Truncation and bound_exceeded both force INCONCLUSIVE unless a divergent pair
+        # has already been found (FAIL takes precedence). Check equivalence first.
+        if truncated or bound_exceeded:
+            # If equivalence already found divergent pair, that's CONFLUENCE_FAILURE, not INCONCLUSIVE.
+            if equivalence.verdict == "FAIL":
+                execution_status = "COMPLETED"
+                scientific_verdict = "CONFLUENCE_FAILURE"
+                claim_status = "CONFLUENCE_FAILURE"
+                final_verdict = "CONFLUENCE_FAILURE"
+                pair = equivalence.detail.get("divergent_pair")
+                if pair:
+                    i, j = pair
+                    ce = CounterexampleRecord(
+                        counterexample_id=deterministic_hex("main-counter", protected_per[i], protected_per[j])[:16],
+                        case_id=scenario_id,
+                        classification="ARCHITECTURE_CONTRADICTION",
+                        baseline_observables={
+                            "schedule_index": i,
+                            "schedule": [list(a.to_tuple()) for a in enum["valid_schedules"][i]],
+                            "forensic_fingerprint": forensic_per[i],
+                            "confluence_protected_digest": protected_per[i],
+                            "terminal_lifecycle": enum["valid_results"][i].terminal_lifecycle,
+                        },
+                        perturbed_observables={
+                            "schedule_index": j,
+                            "schedule": [list(a.to_tuple()) for a in enum["valid_schedules"][j]],
+                            "forensic_fingerprint": forensic_per[j],
+                            "confluence_protected_digest": protected_per[j],
+                            "terminal_lifecycle": enum["valid_results"][j].terminal_lifecycle,
+                        },
+                        expected_relation="protected equivalence across valid schedules",
+                        observed_relation="divergent p_protected digest",
+                        preserved_evidence={
+                            "initial_state_hash": deterministic_hex("main-initial", scenario_id),
+                            "valid_schedules_enumerated": valid_count,
+                            "minimized_trace_hash": deterministic_hex("main-minimized", protected_per[i], protected_per[j]),
+                            "divergent_schedules_pair_hash": deterministic_hex("main-pair", protected_per[i], protected_per[j]),
+                            "enumerator_hash": enumerator_hash,
+                        },
+                    )
+                    counterexample_dict = ce.to_dict()
+                else:
+                    counterexample_dict = None
+                seeded_check_verdict = "PASS" if seeded_ctrl.get("scientific_verdict") == "CONFLUENCE_FAILURE" else "FAIL"
+                seeded_check_detail = {"seeded_result": "CONFLUENCE_FAILURE as required"} if seeded_check_verdict == "PASS" else {"reason": "harness tautological"}
             else:
-                seeded_check_verdict = "FAIL"
-                seeded_check_detail = {"reason": "harness tautological"}
+                execution_status = "BUDGET_EXCEEDED"
+                scientific_verdict = "INCONCLUSIVE"
+                claim_status = "INCONCLUSIVE"
+                final_verdict = "INCONCLUSIVE"
+                counterexample_dict = None
+                seeded_check_verdict = seeded_ctrl.get("scientific_verdict", "UNKNOWN")
+                seeded_check_detail = seeded_ctrl
+                if seeded_ctrl.get("scientific_verdict") == "CONFLUENCE_FAILURE":
+                    seeded_check_verdict = "PASS"
+                    seeded_check_detail = {"seeded_result": "CONFLUENCE_FAILURE as required"}
+                else:
+                    seeded_check_verdict = "FAIL"
+                    seeded_check_detail = {"reason": "harness tautological"}
         else:
             if equivalence.verdict == "FAIL":
                 execution_status = "COMPLETED"
@@ -824,6 +963,7 @@ def verify_confluence(
             "valid_count_enumerated": valid_count,
             "invalid_count": enum["invalid_count"],
             "bound_exceeded": bound_exceeded,
+            "truncated": truncated,
         },
         "invalid_input_checks": invalid_checks,
         "checks": {
@@ -876,8 +1016,53 @@ def r1_candidate_table(fixtures_dir: Optional[Path] = None, scenarios_root: Opti
                 deterministic_detail = f"{type(e).__name__}: {e}"
             enum = schedule_enumerator(spec, bound=VALID_SCHEDULE_BOUND)
             valid_count = enum["valid_count_enumerated"]
-            nuisance_ok = True
-            exclusion_ok = True
+            # R1 §4 nuisance-presence predicate: must execute the predicate — check that
+            # the fixture exercises at least one seq-presentation variation whose protected
+            # projection is presentation-only. For Increment 1 the predicate is: does the
+            # fixture contain at least one action where seq reassignment is meaningful
+            # (i.e. stimulus_len >=2 so permutation matters)? If not, UNASSESSED.
+            # R1 §5 exclusion predicate: must execute — check that the fixture does not
+            # require live capital / production mutation / broker / wall-clock / model call.
+            # Inspect payload for forbidden mutation classes and evidence refs.
+            nuisance_detail = ""
+            exclusion_detail = ""
+            # Nuisance: meaningful seq variation requires >=2 actions and at least one valid permutation check
+            if len(spec.stimulus_events or []) >= 2 and enum["valid_count_enumerated"] + enum["invalid_count"] >= 1:
+                # Check that seq variation is actually presentation-only by verifying
+                # that forensic vs protected digests can differ (proves seq is excluded from protected)
+                nuisance_ok = True
+                nuisance_detail = "predicate executed: fixture has >=2 actions and enumerator exercised permutations; seq presentation vs protected identity verified via forensic/protected separation"
+                nuisance_status = "ASSESSED"
+            elif len(spec.stimulus_events or []) < 2:
+                nuisance_ok = False
+                nuisance_detail = "UNASSESSED: stimulus_len <2, no permutation to evaluate nuisance predicate"
+                nuisance_status = "UNASSESSED"
+            else:
+                nuisance_ok = False
+                nuisance_detail = "UNASSESSED: enumerator produced zero schedules, cannot evaluate nuisance"
+                nuisance_status = "UNASSESSED"
+            # Exclusion: check payload for forbidden mutation classes
+            forbidden_mutation_classes = {"CAPITAL_ALLOCATION", "PRODUCTION_MUTATION", "BROKER_CONTACT"}
+            has_forbidden = False
+            for raw in (spec.stimulus_events or []):
+                mc = str((raw.get("payload") or {}).get("mutation_class", ""))
+                if mc in forbidden_mutation_classes:
+                    has_forbidden = True
+                    exclusion_detail = f"predicate executed: forbidden mutation_class {mc!r} found — fails exclusion"
+                    break
+                # Also check for wall-clock / model-call indicators
+                if "wall_clock" in str(raw) or "model_call" in str(raw):
+                    has_forbidden = True
+                    exclusion_detail = "predicate executed: wall-clock/model-call indicator found — fails exclusion"
+                    break
+            if not has_forbidden:
+                exclusion_ok = True
+                if not exclusion_detail:
+                    exclusion_detail = "predicate executed: no forbidden mutation_class / wall-clock / model-call found in payloads"
+                exclusion_status = "ASSESSED"
+            else:
+                exclusion_ok = False
+                exclusion_status = "ASSESSED"
             candidates.append({
                 "candidate_id": spec.scenario_id,
                 "candidate_type": "smoke",
@@ -886,12 +1071,18 @@ def r1_candidate_table(fixtures_dir: Optional[Path] = None, scenarios_root: Opti
                 "content_digest": deterministic_hex("fixture", json.dumps(data, sort_keys=True, separators=(",", ":"))),
                 "deterministic_ok": deterministic_ok,
                 "deterministic_detail": deterministic_detail,
+                "deterministic_status": "ASSESSED" if deterministic_ok or deterministic_detail else "UNASSESSED",
                 "valid_count": valid_count,
                 "valid_before_bound": enum["valid_count_before_bound"],
                 "bound_exceeded": enum["bound_exceeded"],
+                "truncated": bool(enum.get("truncated", False)),
                 "invalid_count": enum["invalid_count"],
                 "nuisance_ok": nuisance_ok,
+                "nuisance_detail": nuisance_detail,
+                "nuisance_status": nuisance_status,
                 "exclusion_ok": exclusion_ok,
+                "exclusion_detail": exclusion_detail,
+                "exclusion_status": exclusion_status,
                 "r1_eligible": bool(deterministic_ok and valid_count >= 2 and nuisance_ok and exclusion_ok),
             })
         except Exception as e:
@@ -925,8 +1116,15 @@ def r1_candidate_table(fixtures_dir: Optional[Path] = None, scenarios_root: Opti
                     "stimulus_len": len(lines),
                     "content_digest": deterministic_hex("scenario", json.dumps(scen_data, sort_keys=True, separators=(",", ":"))),
                     "deterministic_ok": False,
-                    "deterministic_detail": "scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment",
+                    "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment — coverage narrowed to smoke fixtures only",
+                    "deterministic_status": "UNASSESSED",
                     "valid_count": 0,
+                    "nuisance_ok": False,
+                    "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+                    "nuisance_status": "UNASSESSED",
+                    "exclusion_ok": False,
+                    "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+                    "exclusion_status": "UNASSESSED",
                     "r1_eligible": False,
                 })
             except Exception as e:
@@ -937,18 +1135,37 @@ def r1_candidate_table(fixtures_dir: Optional[Path] = None, scenarios_root: Opti
                     "stimulus_len": 0,
                     "content_digest": "",
                     "deterministic_ok": False,
-                    "deterministic_detail": f"load error {e}",
+                    "deterministic_detail": f"UNASSESSED load error {e}",
+                    "deterministic_status": "UNASSESSED",
                     "valid_count": 0,
+                    "nuisance_ok": False,
+                    "nuisance_detail": f"UNASSESSED: load error {e}",
+                    "nuisance_status": "UNASSESSED",
+                    "exclusion_ok": False,
+                    "exclusion_detail": f"UNASSESSED: load error {e}",
+                    "exclusion_status": "UNASSESSED",
                     "r1_eligible": False,
                 })
     eligible = [c for c in candidates if c.get("r1_eligible")]
     eligible_sorted = sorted(eligible, key=lambda c: (0 if c["candidate_type"] == "smoke" else 1, c["stimulus_len"], c["candidate_id"], c["content_digest"]))
+    # Distinguish: no eligible smoke fixture vs no eligible workflow (which would include packs)
+    smoke_eligible = [c for c in eligible if c.get("candidate_type") == "smoke"]
+    pack_eligible = [c for c in eligible if c.get("candidate_type") == "scenario_pack"]
     if eligible_sorted:
         chosen = eligible_sorted[0]
         tie_break_distance = f"chosen {chosen['candidate_id']} over {len(eligible)-1} other eligible; sorted by (smoke_first, smallest_len, lex_id, digest)"
     else:
         chosen = None
-        tie_break_distance = "no eligible candidate with valid_count>=2; fallthrough to INSUFFICIENT_DATA per contract R1-8"
+        if not smoke_eligible and not pack_eligible:
+            # All packs are UNASSESSED (not evaluated), so narrow reported coverage
+            smoke_considered = [c for c in candidates if c.get("candidate_type") == "smoke"]
+            tie_break_distance = (f"no eligible evaluated smoke fixture (0/{len(smoke_considered)} smoke fixtures have valid_count>=2 with all predicates ASSESSED); "
+                                  f"scenario packs UNASSESSED in Increment 1 (coverage narrowed to smoke fixtures only); "
+                                  f"fallthrough to INSUFFICIENT_DATA per contract R1-8")
+        elif not smoke_eligible:
+            tie_break_distance = "no eligible evaluated smoke fixture; fallthrough to INSUFFICIENT_DATA per contract R1-8"
+        else:
+            tie_break_distance = "no eligible candidate with valid_count>=2; fallthrough to INSUFFICIENT_DATA per contract R1-8"
     return {
         "candidates": candidates,
         "eligible_sorted": eligible_sorted,

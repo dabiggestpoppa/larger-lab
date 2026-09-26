@@ -398,3 +398,138 @@ class TestChecksOnValidSpec:
             spec = _load_smoke(name)
             v = verify_confluence(spec)
             assert v["termination_verdict"] in ("PASS", "INCONCLUSIVE")
+
+
+# ---------------------------------------------------------------------------
+# Enumeration: truncated vs bound_exceeded, and >7 regression
+# ---------------------------------------------------------------------------
+
+class TestEnumerationTruncation:
+    def test_truncated_distinct_from_bound_exceeded(self):
+        # n<=7 path never truncates; n>7 with budget hit sets truncated=True
+        spec_small = _diamond_spec()
+        e_small = schedule_enumerator(spec_small, bound=24)
+        assert e_small["truncated"] is False
+        assert "truncated" in e_small
+        # bound_exceeded is separate: need many valid schedules > bound
+        assert e_small["bound_exceeded"] is False
+
+    def test_truncated_search_cannot_verify_without_divergence(self):
+        # Build a spec with 8 independent disjoint actions — n=8 >7, so truncated path.
+        # All actions are OBSERVED->CANDIDATE on distinct targets, so every permutation is valid.
+        # 8! = 40320, budget 5000 < 40320, so truncated=True.
+        # No divergence (all disjoint, sorted trace converges), but truncated forces INCONCLUSIVE not VERIFIED.
+        spec = StressScenarioSpec(
+            scenario_id="truncated_8_test",
+            scenario_version="1.0.0",
+            initial_authority_state={"PO": "PO"},
+            initial_knowledge=[
+                {"record_id": f"@K{i}", "state": "OBSERVED", "claim": f"k{i}", "provenance_source_kind": "FIXTURE", "provenance_source_label": "x"}
+                for i in range(8)
+            ],
+            stimulus_events=[
+                {"seq": i+1, "machine": "lifecycle", "actor": "PO", "target": f"@K{i}", "payload": {"to_state": "CANDIDATE", "authority_level": "PO", "authority_basis": "x", "reason": "x"}}
+                for i in range(8)
+            ],
+        )
+        enum = schedule_enumerator(spec, bound=24)
+        assert enum["truncated"] is True, "8! permutations must hit budget truncation"
+        verdict = verify_confluence(spec, bound=24)
+        # Truncated with no divergence must be INCONCLUSIVE, not VERIFIED
+        assert verdict["scientific_verdict"] == "INCONCLUSIVE", f"truncated with no divergence must be INCONCLUSIVE, got {verdict['scientific_verdict']}"
+        assert verdict["scientific_verdict"] != "CONFLUENCE_VERIFIED"
+        assert verdict["enumerator_snapshot"]["truncated"] is True
+
+    def test_truncated_with_divergence_still_reports_failure(self):
+        # For n>7, truncated enumeration still reports CONFLUENCE_FAILURE if a divergent
+        # pair is observed within the budget. Use n=8 with two @K divergent actions
+        # that interleave early in lex order so divergence appears in first 5000.
+        # The 8-action divergent case with 6 disjoint dilutes divergence; instead use
+        # a tighter case: 8 actions where divergence is forced regardless of interleaving.
+        # Simpler: directly test the enumerator divergence logic with a truncated-but-divergent
+        # synthetic enum dict, bypassing the dilution problem.
+        from engine.confluence import _final_state_equivalence_check
+        # Simulate truncated enum where digests already diverge within budget
+        fake_enum = {
+            "valid_count_enumerated": 2,
+            "valid_count_before_bound": 10,
+            "bound_exceeded": False,
+            "truncated": True,
+            "protected_per_schedule": ["aaa", "bbb"],
+        }
+        check = _final_state_equivalence_check(fake_enum)
+        assert check.verdict == "FAIL", "divergent pair must be FAIL even when truncated"
+        # And verify_confluence with bound_exceeded+truncated+divergent still yields FAILURE
+        # via the synthetic seeded control path: seeded spec has n=2 (not truncated) so not affected,
+        # but direct check above proves truncated does not mask divergence.
+
+
+# ---------------------------------------------------------------------------
+# R1: predicates executed or UNASSESSED, not default True
+# ---------------------------------------------------------------------------
+
+class TestR1Predicates:
+    def test_r1_smoke_predicates_are_assessed_not_default_true(self):
+        table = r1_candidate_table()
+        for c in table["candidates"]:
+            if c["candidate_type"] == "smoke":
+                assert "nuisance_status" in c, "smoke candidate must have nuisance_status"
+                assert "exclusion_status" in c, "smoke candidate must have exclusion_status"
+                assert c["nuisance_status"] in ("ASSESSED", "UNASSESSED")
+                assert c["exclusion_status"] in ("ASSESSED", "UNASSESSED")
+                # Not bare True by default; must have detail
+                assert "nuisance_detail" in c
+                assert "exclusion_detail" in c
+                assert c["nuisance_detail"], "nuisance_detail must be non-empty"
+                assert c["exclusion_detail"], "exclusion_detail must be non-empty"
+
+    def test_r1_scenario_packs_are_unassessed_and_coverage_narrowed(self):
+        table = r1_candidate_table()
+        packs = [c for c in table["candidates"] if c["candidate_type"] == "scenario_pack"]
+        if packs:
+            for c in packs:
+                assert c["deterministic_status"] == "UNASSESSED"
+                assert c["nuisance_status"] == "UNASSESSED"
+                assert c["exclusion_status"] == "UNASSESSED"
+            # Coverage must mention narrowed scope when no smoke eligible
+            assert "smoke fixture" in table["tie_break_distance"] or "UNASSESSED" in table["tie_break_distance"] or "narrowed" in table["tie_break_distance"]
+
+    def test_r1_distinguishes_no_eligible_smoke_vs_no_eligible_workflow(self):
+        table = r1_candidate_table()
+        # Must distinguish the two cases in tie_break_distance
+        assert "smoke" in table["tie_break_distance"].lower() or "eligible" in table["tie_break_distance"].lower()
+
+
+# ---------------------------------------------------------------------------
+# Projection evidence: EvidenceRegistry read vs unavailable
+# ---------------------------------------------------------------------------
+
+class TestProjectionEvidence:
+    def test_confluence_protected_digest_unavailable_without_registry(self):
+        from engine.confluence import confluence_protected_digest, projection_evidence_status
+        spec = _diamond_spec()
+        enum = schedule_enumerator(spec)
+        result = enum["valid_results"][0]
+        events = enum["valid_events"][0]
+        digest_no_reg = confluence_protected_digest(result, events, registry=None)
+        digest_empty = confluence_protected_digest(result, events, registry=__import__('engine.registry', fromlist=['EvidenceRegistry']).EvidenceRegistry())
+        # Both unavailable digests use unavailable domain; they must not equal a real AVAILABLE digest
+        from engine.registry import EvidenceRegistry
+        from engine.evidence import EvidenceRecord
+        reg = EvidenceRegistry([EvidenceRecord(record_id="@E1", kind="OBSERVATION", claim="c", source_lineage="L1", resolution_class="R1", allocator="A1", retrieval_lineage="RL1", seq=1)])
+        digest_available = confluence_protected_digest(result, events, registry=reg)
+        assert digest_no_reg != digest_available, "unavailable digest must not collide with available one"
+        assert digest_empty != digest_available
+        assert projection_evidence_status(None) == "UNAVAILABLE_NO_REGISTRY"
+        assert projection_evidence_status(EvidenceRegistry()) in ("UNAVAILABLE_NO_REGISTRY_EVIDENCE", "UNAVAILABLE_NO_REGISTRY")
+        assert projection_evidence_status(reg) == "AVAILABLE"
+
+    def test_empty_derived_list_not_presented_as_verified(self):
+        from engine.confluence import confluence_protected_digest_with_status
+        spec = _diamond_spec()
+        enum = schedule_enumerator(spec)
+        result = enum["valid_results"][0]
+        events = enum["valid_events"][0]
+        _, status = confluence_protected_digest_with_status(result, events, registry=None)
+        assert status.startswith("UNAVAILABLE")
+        assert status != "AVAILABLE"
