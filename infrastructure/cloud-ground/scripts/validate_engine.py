@@ -45,6 +45,7 @@ REPO_ROOT = BASE_DIR.parent.parent  # infrastructure/cloud-ground -> repo root
 EVIDENCE_DIR = BASE_DIR / "evidence"
 CONTRACTS_DIR = BASE_DIR / "contracts"
 COMPOSE_DIR = BASE_DIR / "compose"
+WORKER_NO_DB_NAME = "Workers denied direct DB access"
 POLICY_DIR = BASE_DIR / "policy"
 ANSIBLE_DIR = BASE_DIR / "ansible"
 IDENTITY_DATA = CONTRACTS_DIR / "checkpoint-identity-data.json"
@@ -381,8 +382,8 @@ class Validator:
                 capture_output=True, text=True, timeout=10,
             )
             dirty_lines = [
-                l for l in r.stdout.strip().splitlines()
-                if l.strip()
+                line for line in r.stdout.strip().splitlines()
+                if line.strip()
             ]
             if dirty_lines:
                 errors.append(
@@ -901,7 +902,7 @@ class Validator:
     def check_worker_no_db_access(self):
         policy = POLICY_DIR / "network-access.yml"
         if not policy.exists():
-            self.add("WORKER-NO-DB", "Workers denied direct DB access", True, "FAIL",
+            self.add("WORKER-NO-DB", WORKER_NO_DB_NAME, True, "FAIL",
                       "network-access.yml not found", "")
             return
         try:
@@ -909,11 +910,11 @@ class Validator:
             with open(policy, "r", encoding="utf-8") as f:
                 data = yaml.safe_load(f)
         except ImportError:
-            self.add("WORKER-NO-DB", "Workers denied direct DB access", True, "BLOCKED",
+            self.add("WORKER-NO-DB", WORKER_NO_DB_NAME, True, "BLOCKED",
                       "pyyaml not installed", "")
             return
         except Exception as e:
-            self.add("WORKER-NO-DB", "Workers denied direct DB access", True, "FAIL",
+            self.add("WORKER-NO-DB", WORKER_NO_DB_NAME, True, "FAIL",
                       f"Parse error: {e}", "")
             return
         rules = data.get("rules", []) if data else []
@@ -930,10 +931,10 @@ class Validator:
                 missing.append(f"{worker}->{service}")
         total = len(required)
         if found >= total:
-            self.add("WORKER-NO-DB", "Workers denied direct DB access", True, "PASS",
+            self.add("WORKER-NO-DB", WORKER_NO_DB_NAME, True, "PASS",
                       f"{found}/{total} rules", "All denied")
         else:
-            self.add("WORKER-NO-DB", "Workers denied direct DB access", True, "FAIL",
+            self.add("WORKER-NO-DB", WORKER_NO_DB_NAME, True, "FAIL",
                       f"{found}/{total} rules", f"Missing: {', '.join(missing)}")
 
     def check_security_opts(self):

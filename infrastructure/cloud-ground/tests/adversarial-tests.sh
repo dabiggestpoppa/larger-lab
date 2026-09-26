@@ -15,6 +15,7 @@
 #
 set -uo pipefail
 
+readonly CHECK_SOURCE_IDENTITY="SOURCE-IDENTITY"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENGINE="$BASE_DIR/scripts/validate_engine.py"
@@ -258,15 +259,15 @@ ANSIBLE_CFG="$BASE_DIR/ansible/ansible.cfg"
 # === NEGATIVE TESTS: Mutation lifecycle tests ===
 
 echo "--- Block A: Source Identity Mutations ---"
-run_one "ID-01" "Wrong repo owner" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['owner']='wrong';json.dump(d,open(p,'w'),indent=2)"
-run_one "ID-02" "Wrong repo name" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['name']='other';json.dump(d,open(p,'w'),indent=2)"
+run_one "ID-01" "Wrong repo owner" "$IDENTITY" "$CHECK_SOURCE_IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['owner']='wrong';json.dump(d,open(p,'w'),indent=2)"
+run_one "ID-02" "Wrong repo name" "$IDENTITY" "$CHECK_SOURCE_IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['name']='other';json.dump(d,open(p,'w'),indent=2)"
 # B4-CXR7U9R8: since run_check() pins --target-branch to the OBSERVED
 # branch, ID-03 becomes a CLI meta test: a WRONG --target-branch value
 # must be rejected by SOURCE-IDENTITY (mismatch with the observed HEAD
 # branch), exit nonzero.
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] ID-03: Wrong --target-branch rejected"
-rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" --target-branch "${CB}-definitely-wrong" >/dev/null 2>&1 || rc=$?
+rc=0; python3 "$ENGINE_WIN" --only "$CHECK_SOURCE_IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" --target-branch "${CB}-definitely-wrong" >/dev/null 2>&1 || rc=$?
 if [[ "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "ID-03" "PASS" "Wrong --target-branch rejected"         "cli-input" "--target-branch=definitely-wrong-branch does not match observed branch"         "FAIL" "FAIL" "$rc" "Validator correctly rejected wrong target branch"
@@ -274,12 +275,12 @@ else
     echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
     write_meta_result "ID-03" "FAIL" "Wrong --target-branch rejected"         "cli-input" "--target-branch=definitely-wrong-branch does not match observed branch"         "FAIL" "PASS" "0" "Validator accepted wrong target branch"
 fi
-run_one "ID-04" "Wrong base SHA" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['authoritative_base_sha']='0'*40;json.dump(d,open(p,'w'),indent=2)"
-run_one "ID-05" "Wrong project root" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['expected_project_root']='wrong';json.dump(d,open(p,'w'),indent=2)"
-run_one "ID-06" "Wrong origins" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['accepted_origins']=['https://evil.com/r.git'];json.dump(d,open(p,'w'),indent=2)"
-run_one "ID-07" "Wrong expected commit" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['expected_implementation_commit_source']='f41e9c09';json.dump(d,open(p,'w'),indent=2)"
-run_one "ID-08" "Wrong full_name" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['full_name']='wrong/repo';json.dump(d,open(p,'w'),indent=2)"
-run_one "ID-09" "Wrong tree SHA" "$IDENTITY" "SOURCE-IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['expected_tree_sha']='0'*40;json.dump(d,open(p,'w'),indent=2)"
+run_one "ID-04" "Wrong base SHA" "$IDENTITY" "$CHECK_SOURCE_IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['authoritative_base_sha']='0'*40;json.dump(d,open(p,'w'),indent=2)"
+run_one "ID-05" "Wrong project root" "$IDENTITY" "$CHECK_SOURCE_IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['expected_project_root']='wrong';json.dump(d,open(p,'w'),indent=2)"
+run_one "ID-06" "Wrong origins" "$IDENTITY" "$CHECK_SOURCE_IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['accepted_origins']=['https://evil.com/r.git'];json.dump(d,open(p,'w'),indent=2)"
+run_one "ID-07" "Wrong expected commit" "$IDENTITY" "$CHECK_SOURCE_IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['expected_implementation_commit_source']='f41e9c09';json.dump(d,open(p,'w'),indent=2)"
+run_one "ID-08" "Wrong full_name" "$IDENTITY" "$CHECK_SOURCE_IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['full_name']='wrong/repo';json.dump(d,open(p,'w'),indent=2)"
+run_one "ID-09" "Wrong tree SHA" "$IDENTITY" "$CHECK_SOURCE_IDENTITY" "import json,sys;p=sys.argv[1];d=json.load(open(p));d['expected_tree_sha']='0'*40;json.dump(d,open(p,'w'),indent=2)"
 echo ""
 
 echo "--- Block B: Compose / Image Mutations ---"
@@ -325,21 +326,21 @@ echo "--- Block E: Evidence Mutation ---"
 TOTAL_COUNT=$((TOTAL_COUNT + 1))
 echo "  [$TOTAL_COUNT] EV-01: Wrong repository rejected"
 mkdir -p "$BACKUP_DIR"
-run_check "SOURCE-IDENTITY"; be=$_RUN_CHECK_EXIT; br=$(get_result "SOURCE-IDENTITY")
+run_check "$CHECK_SOURCE_IDENTITY"; be=$_RUN_CHECK_EXIT; br=$(get_result "$CHECK_SOURCE_IDENTITY")
 cp "$IDENTITY" "$BACKUP_DIR/pre-EV-01.json"
 orig_h=$(sha256sum "$IDENTITY" | cut -d' ' -f1)
 python3 -c "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['owner']='bad';json.dump(d,open(p,'w'),indent=2)" "$(win_path "$IDENTITY")"
-run_check "SOURCE-IDENTITY"; me=$_RUN_CHECK_EXIT; mr=$(get_result "SOURCE-IDENTITY")
+run_check "$CHECK_SOURCE_IDENTITY"; me=$_RUN_CHECK_EXIT; mr=$(get_result "$CHECK_SOURCE_IDENTITY")
 cp "$BACKUP_DIR/pre-EV-01.json" "$IDENTITY"
 rest_h=$(sha256sum "$IDENTITY" | cut -d' ' -f1)
-run_check "SOURCE-IDENTITY"; pe=$_RUN_CHECK_EXIT; pr=$(get_result "SOURCE-IDENTITY")
+run_check "$CHECK_SOURCE_IDENTITY"; pe=$_RUN_CHECK_EXIT; pr=$(get_result "$CHECK_SOURCE_IDENTITY")
 if [[ "$br" == "PASS" && "$be" -eq 0 && "$mr" == "FAIL" && "$me" -ne 0 && "$pr" == "PASS" && "$pe" -eq 0 && "$orig_h" == "$rest_h" ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
-    write_result "EV-01" "PASS" "Wrong repository rejected" "SOURCE-IDENTITY" "FAIL" \
+    write_result "EV-01" "PASS" "Wrong repository rejected" "$CHECK_SOURCE_IDENTITY" "FAIL" \
         "PASS" "0" "FAIL" "$me" "PASS" "0" "$orig_h" "$rest_h" "Correctly rejected"
 else
     echo "$FAIL_LABEL"; FAIL_COUNT=$((FAIL_COUNT + 1))
-    write_result "EV-01" "FAIL" "Wrong repository rejected" "SOURCE-IDENTITY" "$mr" \
+    write_result "EV-01" "FAIL" "Wrong repository rejected" "$CHECK_SOURCE_IDENTITY" "$mr" \
         "$br" "$be" "$mr" "$me" "$pr" "$pe" "$orig_h" "$rest_h" "Not rejected"
 fi
 
@@ -556,9 +557,9 @@ echo "  [$TOTAL_COUNT] CLI-05: FAIL paired with nonzero exit"
 mkdir -p "$BACKUP_DIR"
 cp "$IDENTITY" "$BACKUP_DIR/pre-CLI-05.json"
 python3 -c "import json,sys;p=sys.argv[1];d=json.load(open(p));d['repository']['owner']='bad';json.dump(d,open(p,'w'),indent=2)" "$(win_path "$IDENTITY")"
-rc=0; python3 "$ENGINE_WIN" --only "SOURCE-IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" >/dev/null 2>&1 || rc=$?
+rc=0; python3 "$ENGINE_WIN" --only "$CHECK_SOURCE_IDENTITY" --evidence-dir "$SCRATCH_DIR_WIN" >/dev/null 2>&1 || rc=$?
 cp "$BACKUP_DIR/pre-CLI-05.json" "$IDENTITY"
-res=$(get_result "SOURCE-IDENTITY")
+res=$(get_result "$CHECK_SOURCE_IDENTITY")
 if [[ "$res" == "FAIL" && "$rc" -ne 0 ]]; then
     echo "    PASS"; PASS_COUNT=$((PASS_COUNT + 1))
     write_meta_result "CLI-05" "PASS" "FAIL+nonzero exit paired" \

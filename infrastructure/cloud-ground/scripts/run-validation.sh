@@ -162,11 +162,11 @@ write_worktree_cleanup_evidence() {
     # R3H: truthfully record removal and prune results. Called immediately
     # after successful removal (so the final gate sees it before it runs)
     # and again from the exit trap for abnormal-failure cleanup.
-    export _WT_REMOVED=$WORKTREE_REMOVED _WT_PRUNED=$WORKTREE_PRUNED
-    printf '{"removed": %s, "pruned": %s}\n' \
-        "$( [[ "$WORKTREE_REMOVED" = true ]] && echo true || echo false)" \
-        "$( [[ "$WORKTREE_PRUNED" = true ]] && echo true || echo false)" \
-        > "$FINAL_EVIDENCE/worktree-cleanup.json" 2>/dev/null || true
+    local removed=false pruned=false
+    [[ "$WORKTREE_REMOVED" = true ]] && removed=true
+    [[ "$WORKTREE_PRUNED" = true ]] && pruned=true
+    printf '{"removed": %s, "pruned": %s}
+' "$removed" "$pruned" \n        > "$FINAL_EVIDENCE/worktree-cleanup.json" 2>/dev/null || true
 }
 
 cleanup() {

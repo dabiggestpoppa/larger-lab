@@ -60,7 +60,7 @@ have_docker() {
 }
 
 # ── var/ working set (deterministic by relpath) ────────────────────────────
-if [ -d "$VAR_DIR" ]; then
+if [[ -d "$VAR_DIR" ]]; then
   (cd "$VAR_DIR" && find . -type f -not -path "./backups/*" -not -name "*.tmp" | sort) | while read -r rel; do
     rel="${rel#./}"
     dest="$CONTENT/$rel"

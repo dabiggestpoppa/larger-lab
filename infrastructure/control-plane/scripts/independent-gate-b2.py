@@ -110,10 +110,20 @@ def parse_junit(path: Path) -> dict:
 
 
 def _parse_json(evidence: Path, name: str, checks: list, tag: str) -> dict | None:
-    # B4-CXR7U9R14: *name* only ever comes from module constants
-    # (LATE_ARTIFACTS / stage-artifact inventory), never from user input;
-    # the read sink receives the realpath of the constant-named member.
+    # B4-CXR7U9R14 + B4-CXR7U9R45R4 (Sonar S2076, AaB79zkDUzuNt_): the
+    # constant-provenance argument is now ENFORCED here at the sink itself.
+    # A path-separator payload in *name* (or any name that escapes the
+    # evidence directory) is refused instead of being read; the sink no
+    # longer trusts its callers' discipline.
+    if Path(name).name != str(name):
+        checks.append({"id": tag, "name": f"{name} exists", "ok": False,
+                       "detail": "refused: name is not a plain evidence member"})
+        return None
     path = Path(os.path.realpath(str(evidence / name)))
+    if path.parent != os.path.realpath(evidence):
+        checks.append({"id": tag, "name": f"{name} exists", "ok": False,
+                       "detail": "refused: resolved path escapes the evidence directory"})
+        return None
     if not path.exists():
         checks.append({"id": tag, "name": f"{name} exists", "ok": False,
                        "detail": "missing"})

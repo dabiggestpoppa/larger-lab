@@ -189,7 +189,6 @@ def test_writer_retreats_and_publishes_after_released_window_removal(
     governed = _transitions_dir()
     claim_path = governed / f"{receipt['operation_id']}.claim"
 
-    original = pgrec._publish_no_replace
 
     class _InterferingOnce:
         """A discarder that deletes the writer's temporary in the released
@@ -204,13 +203,11 @@ def test_writer_retreats_and_publishes_after_released_window_removal(
                 except OSError:
                     pass
                 raise FileNotFoundError(2, "removed mid-window", source)
-            return original(source, destination)
+            return _real_publish(source, destination)
 
-    pgrec._publish_no_replace = _InterferingOnce()
-    try:
-        pgrec._claim_transition(receipt["operation_id"], "finalize", receipt)
-    finally:
-        pgrec._publish_no_replace = original
+    _real_publish = pgrec._publish_no_replace
+    monkeypatch.setattr(pgrec, "_publish_no_replace", _InterferingOnce())
+    pgrec._claim_transition(receipt["operation_id"], "finalize", receipt)
     claim = json.loads(claim_path.read_text(encoding="utf-8"))
     assert claim["transition"] == "finalize"
     assert claim["operation_id"] == receipt["operation_id"]

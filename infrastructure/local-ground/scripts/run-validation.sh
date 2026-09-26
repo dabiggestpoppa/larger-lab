@@ -112,7 +112,10 @@ fail() { # phase rc
   exit "$rc"
 }
 
-have_docker() { command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; }
+have_docker() {
+  command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1
+  return $?
+}
 
 # Capture bounded machine-readable diagnostics into the POST-CLEANUP namespace
 # only. These run after resources may already be gone, so they prove what was
@@ -168,7 +171,7 @@ PY
 
 cleanup_trap() {
   local rc=$?
-  if [ "$rc" -eq 0 ] && [ -z "$FAILED_PHASE" ]; then
+  if [[ "$rc" -eq 0 && -z "$FAILED_PHASE" ]]; then
     # Success: the final manifest and read-only verifier already ran against
     # the exact package. NEVER touch the evidence directory here.
     exit 0
@@ -259,7 +262,7 @@ record "acceptance + contract tests executed"
 bash "$ADV_SH" > /dev/null 2>&1
 ADV_RC=$?
 tail -12 "$EVIDENCE/adversarial-output.txt"
-if [ "$ADV_RC" -ne 0 ]; then fail adversarial "$ADV_RC"; fi
+if [[ "$ADV_RC" -ne 0 ]]; then fail adversarial "$ADV_RC"; fi
 record "adversarial suite passed"
 
 # â”€â”€ cloud boundary (deterministic plan; apply denied; zero mutation) â”€â”€â”€â”€â”€â”€â”€

@@ -234,7 +234,7 @@ register_op() { # EXIT trap: index this restore operation immutably (idempotent)
   local rc="$1"
   [[ "$MODE" == "full-replace" ]] || return 0
   local final="success" rollback="none"
-  [ "$rc" -eq 0 ] || final="blocked"
+  [[ "$rc" -eq 0 ]] || final="blocked"
   if [[ -f "$RECEIPT_DIR/rollback-receipt.json" ]]; then
     rollback="$(python3 -c "import json;d=json.load(open(r'$RECEIPT_DIR/rollback-receipt.json',encoding='utf-8'));print('ok' if d.get('rollback_succeeded') is True else 'failed')" 2>/dev/null || echo failed)"
   fi
@@ -342,8 +342,8 @@ pg_resume_rollback_from_quarantine() { # continue the selected rollback branch
     --receipt-out "$ROLLBACK_RECEIPT"
 }
 write_transaction_rollback_receipt() { # truthful account of what was restored
-  python3 - "$TRANSACTION_RECEIPT" "$1" "$ARTIFACT_BEFORE_SHA" "$2" "$3" "$4" \
-           "$(date -u +"$TS_FMT")" <<'PY'
+  local reason="$1" pg_ok="$2" converged="$3" _unused="$4"
+  python3 - "$TRANSACTION_RECEIPT" "$reason" "$ARTIFACT_BEFORE_SHA" "$pg_ok" "$converged" "$_unused" \n           "$(date -u +"$TS_FMT")" <<'PY'
 import json, sys
 p, reason, before, after, pg_ok, converged, ts = sys.argv[1:8]
 json.dump({"format": "oce-restore-transaction-rollback-receipt-v1",
@@ -362,6 +362,8 @@ json.dump({"format": "oce-restore-transaction-rollback-receipt-v1",
            "timestamp": ts},
           open(p, "w", encoding="utf-8"), indent=2)
 PY
+  return 0
+  return 0
 }
 # DURABLE COMMIT STATE (R40-R2): the shell's volatile flags (PG_FINALIZED,
 # COMMITTED) can die with the process; the engine's transition record cannot.

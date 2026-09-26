@@ -25,7 +25,7 @@ RUN CGO_ENABLED=0 GOPROXY=https://proxy.golang.org,direct GOSUMDB=sum.golang.org
     -o /out/minio . \
     && /out/minio --version | grep -F "${RELEASE_TAG}"
 
-FROM docker.io/library/alpine:3.20.1@sha256:b89d9c93e9ed3597455c90a0b88a8bbb5cb7188438f70953fede212a0c4394e0
+FROM docker.io/library/alpine@sha256:b89d9c93e9ed3597455c90a0b88a8bbb5cb7188438f70953fede212a0c4394e0
 
 ARG RELEASE_TAG=RELEASE.2024-05-28T17-19-04Z
 ARG SOURCE_COMMIT=f79a4ef4d0dc3e6562cad0d1d1db674bc8c75531

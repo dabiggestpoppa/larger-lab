@@ -87,7 +87,8 @@ def test_preintent_abort_admitted_and_converges_state(
     assert out["original_canonical_restored"] is True
     durable = pgrec._load_transition_record(receipt["operation_id"])
     assert durable["state"] == "ROLLED_BACK"
-    assert "commit_intent" not in durable and "commit_point" not in durable
+    assert "commit_intent" not in durable
+    assert "commit_point" not in durable
 
 
 @pytest.mark.parametrize("state", ["COMMIT_INTENT_RECORDED", "COMMIT_POINT_REACHED"])

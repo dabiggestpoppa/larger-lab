@@ -166,7 +166,7 @@ class SessionHost:
     def revoke(self, worker_id: str) -> list:
         """Revoke all sessions for a worker. Returns revoked session IDs."""
         revoked = []
-        for sid in list(self._sessions):
+        for sid in self._sessions:
             if self._sessions[sid].worker_id == worker_id:
                 self._sessions[sid].revoked_at = utcnow_iso()
                 self._sessions[sid].generation += 1

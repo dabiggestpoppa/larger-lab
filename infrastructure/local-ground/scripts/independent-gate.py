@@ -47,6 +47,8 @@ EVIDENCE_MANIFEST_NAME = "evidence-manifest.json"
 CLOUD_PLAN_DETERMINISTIC = "cloud-plan-deterministic.json"
 # B4-CXR7U9R15: single definitions of the repeated evidence names
 ADVERSARIAL_RESULTS_NAME = "adversarial-results.json"
+CLEANUP_EVIDENCE_NAME = "cleanup.json"
+LOCAL_AFTER_DENIED_NAME = "local-after-denied.json"
 RECOVERY_RECEIPT_NAME = "postgres-recovery-receipt.json"
 
 REQUIRED = [
@@ -54,7 +56,7 @@ REQUIRED = [
     TEST_SUMMARY_NAME, "test-mode.txt", ADVERSARIAL_RESULTS_NAME,
     "adversarial-output.txt", "cloud-plan.txt", "cloud-apply-denial.txt",
     "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
-    "local-after-denied.json", "source-clean.json", "cleanup.json",
+    LOCAL_AFTER_DENIED_NAME, "source-clean.json", CLEANUP_EVIDENCE_NAME,
     "stage-log.txt", STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME,
 ]
 
@@ -216,7 +218,7 @@ def main():
     # 2. Required JSON parses
     json_files = ["identity.json", TEST_SUMMARY_NAME, ADVERSARIAL_RESULTS_NAME,
                   "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
-                  "local-after-denied.json", "source-clean.json", "cleanup.json",
+                  LOCAL_AFTER_DENIED_NAME, "source-clean.json", CLEANUP_EVIDENCE_NAME,
                   STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME]
     parse_ok = True
     for jf in json_files:
@@ -411,7 +413,7 @@ def main():
 
     # 29. Local mode works after denied cloud action
     try:
-        lad = ev.json("local-after-denied.json")
+        lad = ev.json(LOCAL_AFTER_DENIED_NAME)
         local_ok = lad.get("exit_code") == 0
     except Exception:
         local_ok = False
@@ -420,7 +422,7 @@ def main():
 
     # 30. Cleanup succeeds
     try:
-        cl = ev.json("cleanup.json")
+        cl = ev.json(CLEANUP_EVIDENCE_NAME)
         cleanup_ok = cl.get("cleanup") == "ok" or (cl.get("removed") is True and cl.get("pruned") is True)
     except Exception:
         cleanup_ok = False
