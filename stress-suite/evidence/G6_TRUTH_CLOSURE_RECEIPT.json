@@ -1,0 +1,91 @@
+{
+  "closure_id": "G6-TRUTH-CLOSURE-2026-03",
+  "exit": "PASS_G6_TRUTH_CLOSURE",
+  "g7_authorization": "AUTHORIZE_G7_SENSITIVITY_METAMORPHIC",
+  "start_sha": "c3a6d4739bfd501d8e33d54cf407c8537bf56286",
+  "tested_sha": "92da5c7ba625d0813be6aaefdf321b8118140bfe",
+  "archive_commit": "STRESS-G6TCR",
+  "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
+  "collected": 899,
+  "passed": 899,
+  "failed": 0,
+  "test_delta_from_g6_archive_head": {
+    "from": 874,
+    "to": 899,
+    "delta": 25,
+    "test_g6_governance_py": {"from": 45, "to": 69, "delta": 24},
+    "test_g6_scenarios_py": {"from": 13, "to": 14, "delta": 1}
+  },
+  "test_lineage_measured": [
+    {"sha": "16b53049", "stage": "G6X head / G5RER closure tested SHA", "test_g6_governance": 22, "test_g6_scenarios": 0, "suite_total": 838},
+    {"sha": "90f8b653", "stage": "STRESS-G6ER2: 22 first-draft superseded by 45 rewritten", "test_g6_governance": 45, "test_g6_scenarios": 0, "suite_total": 861},
+    {"sha": "214f3460", "stage": "STRESS-G6ER1: +13 scenario tests", "test_g6_governance": 45, "test_g6_scenarios": 13, "suite_total": 874},
+    {"sha": "c3a6d473", "stage": "handoff archive head", "test_g6_governance": 45, "test_g6_scenarios": 13, "suite_total": 874},
+    {"sha": "92da5c7b", "stage": "this closure (STRESS-G6TC1)", "test_g6_governance": 69, "test_g6_scenarios": 14, "suite_total": 899}
+  ],
+  "arithmetic_confirmed": "838 - 22 + 45 + 13 = 874 (measured, not merely balanced); 874 - 45 - 13 + 69 + 14 = 899 (measured)",
+  "prose_correction": "G6_RESULT.md phrase '22 rewritten G6 engine regressions' is superseded: the rewritten file contains 45 engine regressions. G6_EVIDENCE_RECEIPT.json superseded_tests text is correct. Historical receipt files left unrewritten; correction recorded here.",
+  "findings": {
+    "TC01_five_missing_audits": "CONFIRMED -> created G6_EVALUATION_FREEZE_AUDIT.md, G6_AUTHORITY_SEPARATION_AUDIT.md, G6_OPERATOR_BOUNDARY_AUDIT.md, G6_UNKNOWN_GOVERNANCE_AUDIT.md, G6_ALLOCATOR_PROVENANCE_AUDIT.md",
+    "TC02_test_accounting": "CONFIRMED minor contradiction -> measured lineage; prose corrected in addendum",
+    "TC03_deep_freeze_backing_store": "CONFIRMED GAP (snap.criteria._data['threshold']=0.99 mutated the contract) -> repaired with MappingProxyType over unreachable rebuilt dict; sets rejected; honest scoped claim",
+    "TC04_role_string_not_authority": "CONFIRMED -> authority derived from canonical AuthorityState; claimed_level recorded with no vote; adversarial cases covered",
+    "TC05_governed_mandate": "CONFIRMED -> verify_operator_mandate composes with canonical grants (issuer authority, resolution, pre-existence, grantee, provenance, envelope, scope)",
+    "TC06_governed_permission": "CONFIRMED -> ConstitutionPermissionRecord verified against governed ConstitutionalRuleRegistry; unknown rules fail closed",
+    "TC07_relevant_evidence": "CONFIRMED -> with_grade requires RESOLVES AND RELEVANT-to-subject; UNKNOWN relevance fails closed",
+    "TC08_classification_linkage": "CONFIRMED -> deterministic binding/scope linkage; unrelated registered evidence cannot route a channel",
+    "TC09_authority_mutation_accounting": "CONFIRMED -> external=0, production=0, scenario_internal_authority_events measured per scenario"
+  },
+  "repairs": [
+    "engine/g6_governance.py: _FrozenMapping MappingProxyType backing; sets rejected; with_grade relevance; ConstitutionRule/Registry; ConstitutionPermissionRecord.claim/.verify; verify_operator_mandate; apply_operator_directive actor+AuthorityState; GovernanceEvent/ClassificationEvidence binding+scope; classify linkage",
+    "engine/authority.py: CapabilityGrant.issued_seq; AuthorityRegistry.resolve(active); AuthorityState.authority_event_summary()",
+    "engine/evidence.py: EvidenceRecord.subject",
+    "engine/registry.py: EvidenceRegistry.relevance() (True/False/None UNKNOWN)",
+    "engine/g6_scenario_runner.py: governed_grant_issue stimulus; define_permission verification; operator_directive actor identity; evidence_grade_change subject; classify binding; authority_accounting receipt",
+    "stress-suite/fixtures/g6_constitutional_rules.json: governed rule fixture (A-009 RESEARCH/EXPERIMENT; A-010 POLICY)",
+    "schemas/evidence-record.schema.json: subject property",
+    "scenarios/s22_operator_truth_boundary/* and s24_unknown_governance_event/*: hardened contracts (actor directives, governed grant, imposter case, binding keys)",
+    "tests/test_g6_governance.py (45->69), tests/test_g6_scenarios.py (13->14): truth-closure regressions incl. TC03 backing-store attack, TC04 adversarial, TC05/06 verification matrix, TC07/08 relevance/linkage, TC09 accounting"
+  ],
+  "scenario_receipt_regeneration": {
+    "command": "python scenarios/g6_run_scenarios.py",
+    "status": "regenerated at tested SHA",
+    "digests": {
+      "S20": "e20a3620cf0d45fcffe70f56bd5c8cfe665fd49530843f7a9b2fefbe96ad9e47",
+      "S21": "6aa6a6159fb7a1a8ca4022e759ec7418fc54aa584e26a166596d37f992e30bd0",
+      "S22": "200bfbb07140b465675033974339fd8212d2753cf00b50fcfb98b338a2d7854f",
+      "S23": "7e97162ab195c19f5de71d6fbc3c791e6dba19417204934b5a48de4b7ad7c3d0",
+      "S24": "dde53a44f7457a39946f994cfd28479520187cbdf435798252b42ca07e266aa6"
+    }
+  },
+  "authority_accounting": {
+    "external_authority_mutations": 0,
+    "production_authority_mutations": 0,
+    "scenario_internal_authority_events": {
+      "S20": {"proposals": 1, "ratifications": 0, "registry_issues": 0, "registry_revokes": 0, "total": 1},
+      "S21": {"proposals": 3, "ratifications": 0, "registry_issues": 0, "registry_revokes": 0, "total": 3},
+      "S22": {"proposals": 1, "ratifications": 1, "registry_issues": 1, "registry_revokes": 0, "total": 3},
+      "S23": {"proposals": 0, "ratifications": 0, "registry_issues": 0, "registry_revokes": 0, "total": 0},
+      "S24": {"proposals": 0, "ratifications": 0, "registry_issues": 0, "registry_revokes": 0, "total": 0}
+    },
+    "model_calls": 0,
+    "cloud_mutations": 0,
+    "production_mutations": 0,
+    "capital_mutations": 0
+  },
+  "carried_items": {
+    "CON-02": "allocator provenance observable (AllocatorProvenanceLedger + concentration detection); no constitutional rule applied; A-009/A-010 unchanged; carried to G7 CON-02 sensitivity",
+    "CON-03": "threshold transparency/gameability NOT solved by future-candidate machinery; carried to G7 CON-03 Goodhart audit",
+    "AMB-08": "operator-unavailable reversible scope: hold is a hold, not a resolution; exact-envelope semantics only",
+    "AMB-G5R-01": "no canonical PDF identity; preserved",
+    "AMB-G5R-02": "claim linkage is mechanism-mediated; preserved"
+  },
+  "remaining_ambiguities": [
+    "who may constitutionally ratify future evaluation contracts beyond 'an OPERATOR per canonical authority rules' is doctrine-space, not engine-space (recorded in G6_EVALUATION_FREEZE_AUDIT.md)",
+    "event binding/scope keys in S24 classification are a deterministic fixture contract; what a novel event 'is' remains doctrinally open by design"
+  ],
+  "new_contradictions": [],
+  "external_verification": "NOT claimed — this receipt is self-generated; independent external review of this closure package remains the recommended next step",
+  "g6_still_passes_honestly": true,
+  "recommended_next_gate": "G7_SENSITIVITY_METAMORPHIC (authorized by this closure)"
+}

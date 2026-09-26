@@ -1,0 +1,4515 @@
+{
+  "checks": {
+    "diamond": {
+      "final_state_equivalence": {
+        "detail": {
+          "count": 2,
+          "digest": "5a69ec57ce6d9a51"
+        },
+        "verdict": "PASS"
+      },
+      "idempotence": {
+        "detail": {
+          "first_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "lifecycle_step",
+              "from": "OBSERVED",
+              "kind": "OK",
+              "machine": "lifecycle",
+              "rationale": "x",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "CANDIDATE"
+            }
+          ],
+          "second_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "lifecycle_step",
+              "from": "OBSERVED",
+              "kind": "OK",
+              "machine": "lifecycle",
+              "rationale": "x",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "CANDIDATE"
+            },
+            {
+              "allowed": false,
+              "applied": false,
+              "event_type": "lifecycle_step",
+              "from": "CANDIDATE",
+              "kind": "TOPOLOGY_DENIED",
+              "machine": "lifecycle",
+              "rationale": "CANDIDATE -> CANDIDATE absent from lifecycle edge table",
+              "rule_ids": [],
+              "seq": 2,
+              "to": "CANDIDATE"
+            }
+          ],
+          "terminal_lifecycle_first": {
+            "@A": "CANDIDATE",
+            "@B": "OBSERVED"
+          },
+          "terminal_lifecycle_second": {
+            "@A": "CANDIDATE",
+            "@B": "OBSERVED"
+          }
+        },
+        "verdict": "PASS"
+      },
+      "local_diamond": {
+        "detail": {
+          "forensic_ab": "57da5033b4607ed8e6d5fa1460079ca5",
+          "forensic_ba": "57da5033b4607ed8e6d5fa1460079ca5",
+          "p_ab": "5a69ec57ce6d9a51",
+          "p_ba": "5a69ec57ce6d9a51"
+        },
+        "verdict": "PASS"
+      },
+      "seeded_negative_control": {
+        "detail": {
+          "counterexample_id": "567ffabfc6b9c621",
+          "seeded_result": "CONFLUENCE_FAILURE as required"
+        },
+        "verdict": "PASS"
+      },
+      "termination": {
+        "detail": {
+          "invalid_excluded": 0,
+          "valid_enumerated": 2
+        },
+        "verdict": "PASS"
+      }
+    },
+    "primary": {
+      "final_state_equivalence": {
+        "detail": {
+          "reason": "INSUFFICIENT_DATA",
+          "valid_count": 1
+        },
+        "verdict": "INCONCLUSIVE"
+      },
+      "idempotence": {
+        "detail": {
+          "first_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "phase_step",
+              "from": "STABLE",
+              "kind": "OK",
+              "machine": "phase",
+              "rationale": "single material contradiction observed",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "WATCH"
+            }
+          ],
+          "second_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "phase_step",
+              "from": "STABLE",
+              "kind": "OK",
+              "machine": "phase",
+              "rationale": "single material contradiction observed",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "WATCH"
+            },
+            {
+              "allowed": false,
+              "applied": false,
+              "event_type": "phase_step",
+              "from": "WATCH",
+              "kind": "TOPOLOGY_DENIED",
+              "machine": "phase",
+              "rationale": "edge absent from phase graph",
+              "rule_ids": [],
+              "seq": 2,
+              "to": "WATCH"
+            }
+          ],
+          "terminal_lifecycle_first": {},
+          "terminal_lifecycle_second": {}
+        },
+        "verdict": "PASS"
+      },
+      "local_diamond": {
+        "detail": {
+          "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+        },
+        "verdict": "INCONCLUSIVE"
+      },
+      "seeded_negative_control": {
+        "detail": {
+          "claim_status": "CONFLUENCE_FAILURE",
+          "counterexample": {
+            "baseline_observables": {
+              "confluence_protected_digest": "1085ec412955ab10",
+              "events": [
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded CHALLENGED",
+                    "to_state": "CHALLENGED"
+                  },
+                  "seq": 1,
+                  "target": "@K"
+                },
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded TESTED",
+                    "to_state": "TESTED"
+                  },
+                  "seq": 2,
+                  "target": "@K"
+                }
+              ],
+              "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 0,
+              "terminal_lifecycle": {
+                "@K": "TESTED"
+              },
+              "terminal_phase": "STABLE"
+            },
+            "case_id": "seeded_failure_control",
+            "classification": "ARCHITECTURE_CONTRADICTION",
+            "counterexample_id": "567ffabfc6b9c621",
+            "expected_relation": "protected equivalence across valid schedules",
+            "observed_relation": "divergent p_protected digest",
+            "perturbed_observables": {
+              "confluence_protected_digest": "58f6644695f0d51b",
+              "events": [
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded TESTED",
+                    "to_state": "TESTED"
+                  },
+                  "seq": 1,
+                  "target": "@K"
+                },
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded CHALLENGED",
+                    "to_state": "CHALLENGED"
+                  },
+                  "seq": 2,
+                  "target": "@K"
+                }
+              ],
+              "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 1,
+              "terminal_lifecycle": {
+                "@K": "CHALLENGED"
+              },
+              "terminal_phase": "STABLE"
+            },
+            "preserved_evidence": {
+              "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+              "enumerator_hash": "0c49cdfd573af081",
+              "initial_state_hash": "3dc9c326ab8902b0",
+              "minimized_trace_hash": "7282779e0c594689",
+              "schedule_seq_hashes": [
+                "281c98932b632887",
+                "856b867ba215c918"
+              ],
+              "valid_schedules_enumerated": 2
+            }
+          },
+          "enum": {
+            "bound_exceeded": false,
+            "enumerator_hash": "0c49cdfd573af081",
+            "forensic_per_schedule": [
+              "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "dd90d5713917758f8264506e8a68e8d5"
+            ],
+            "invalid_count": 0,
+            "protected_per_schedule": [
+              "1085ec412955ab10",
+              "58f6644695f0d51b"
+            ],
+            "seq_hashes": [
+              "281c98932b632887",
+              "856b867ba215c918"
+            ],
+            "total_permutations": 2,
+            "valid_count_before_bound": 2,
+            "valid_count_enumerated": 2,
+            "valid_events": [
+              [
+                "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')",
+                "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')"
+              ],
+              [
+                "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')",
+                "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')"
+              ]
+            ],
+            "valid_results": [
+              {
+                "fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+                "terminal_lifecycle": {
+                  "@K": "TESTED"
+                },
+                "terminal_phase": "STABLE",
+                "trace": [
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "CANDIDATE",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded CHALLENGED",
+                    "rule_ids": [],
+                    "seq": 1,
+                    "to": "CHALLENGED"
+                  },
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "CHALLENGED",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded TESTED",
+                    "rule_ids": [],
+                    "seq": 2,
+                    "to": "TESTED"
+                  }
+                ]
+              },
+              {
+                "fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+                "terminal_lifecycle": {
+                  "@K": "CHALLENGED"
+                },
+                "terminal_phase": "STABLE",
+                "trace": [
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "CANDIDATE",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded TESTED",
+                    "rule_ids": [],
+                    "seq": 1,
+                    "to": "TESTED"
+                  },
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "TESTED",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded CHALLENGED",
+                    "rule_ids": [],
+                    "seq": 2,
+                    "to": "CHALLENGED"
+                  }
+                ]
+              }
+            ],
+            "valid_schedules": [
+              [
+                "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')",
+                "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')"
+              ],
+              [
+                "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')",
+                "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')"
+              ]
+            ]
+          },
+          "execution_status": "COMPLETED",
+          "forensic": [
+            "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "dd90d5713917758f8264506e8a68e8d5"
+          ],
+          "protected": [
+            "1085ec412955ab10",
+            "58f6644695f0d51b"
+          ],
+          "reason": "seeded control correctly yields CONFLUENCE_FAILURE with minimized counterexample",
+          "scientific_verdict": "CONFLUENCE_FAILURE"
+        },
+        "verdict": "CONFLUENCE_FAILURE"
+      },
+      "termination": {
+        "detail": {
+          "reason": "valid schedules <2, no confluence claim",
+          "valid_count": 1
+        },
+        "verdict": "INCONCLUSIVE"
+      }
+    },
+    "seeded": {
+      "final_state_equivalence": {
+        "detail": {
+          "digests": [
+            "1085ec412955ab10",
+            "58f6644695f0d51b"
+          ],
+          "divergent_pair": [
+            0,
+            1
+          ],
+          "reason": "protected digests diverge \u2014 CONFLUENCE_FAILURE"
+        },
+        "verdict": "FAIL"
+      },
+      "idempotence": {
+        "detail": {
+          "first_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "lifecycle_step",
+              "from": "CANDIDATE",
+              "kind": "OK",
+              "machine": "lifecycle",
+              "rationale": "seeded CHALLENGED",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "CHALLENGED"
+            }
+          ],
+          "second_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "lifecycle_step",
+              "from": "CANDIDATE",
+              "kind": "OK",
+              "machine": "lifecycle",
+              "rationale": "seeded CHALLENGED",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "CHALLENGED"
+            },
+            {
+              "allowed": false,
+              "applied": false,
+              "event_type": "lifecycle_step",
+              "from": "CHALLENGED",
+              "kind": "TOPOLOGY_DENIED",
+              "machine": "lifecycle",
+              "rationale": "CHALLENGED -> CHALLENGED absent from lifecycle edge table",
+              "rule_ids": [],
+              "seq": 2,
+              "to": "CHALLENGED"
+            }
+          ],
+          "terminal_lifecycle_first": {
+            "@K": "CHALLENGED"
+          },
+          "terminal_lifecycle_second": {
+            "@K": "CHALLENGED"
+          }
+        },
+        "verdict": "PASS"
+      },
+      "local_diamond": {
+        "detail": {
+          "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+        },
+        "verdict": "INCONCLUSIVE"
+      },
+      "seeded_negative_control": {
+        "detail": {
+          "counterexample_id": "567ffabfc6b9c621",
+          "seeded_result": "CONFLUENCE_FAILURE as required"
+        },
+        "verdict": "PASS"
+      },
+      "termination": {
+        "detail": {
+          "invalid_excluded": 0,
+          "valid_enumerated": 2
+        },
+        "verdict": "PASS"
+      }
+    }
+  },
+  "confluence_summary": {
+    "diamond_execution_status": "COMPLETED",
+    "diamond_scientific_verdict": "CONFLUENCE_VERIFIED",
+    "diamond_valid": 2,
+    "overall_harness_verdict": "HONEST -- primary INSUFFICIENT_DATA, positive VERIFIED, negative FAILURE correctly reported; neither collapsed to VERIFIED",
+    "primary_claim_status": "INSUFFICIENT_DATA",
+    "primary_confluence_verdict": "INSUFFICIENT_DATA",
+    "primary_coverage": "1/1/beyond_bound=none",
+    "primary_coverage_gap": "All existing smokes valid_count <2 (knowledge_reactivation 0, legal 1, illegal 0) -> INSUFFICIENT_DATA per R1-8. No confluence claim on existing workflow. Synthetic diamond (2 valid VERIFIED) and seeded failure (2 valid FAILURE) demonstrate harness correctness.",
+    "primary_execution_status": "INSUFFICIENT_DATA",
+    "primary_scientific_verdict": "NOT_CLAIMED",
+    "primary_valid_enumerated": 1,
+    "seeded_execution_status": "COMPLETED",
+    "seeded_scientific_verdict": "CONFLUENCE_FAILURE",
+    "seeded_valid": 2
+  },
+  "contract": {
+    "branch": "agent/oce-institutional-stress-suite-build",
+    "contract_hash": "93f09b5a88b2b4d9",
+    "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+    "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+    "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+    "harness_version": "0.1.0",
+    "operator_authorization_tied_to": "dossier bfb8ca48 + frozen dependency 92a99d54 Path M Increment 1 diagnostic, G9 NOT AUTHORIZED",
+    "valid_schedule_bound": 24,
+    "superseding": {
+      "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2",
+      "contract_deterministic_hash": "b70a03f39e2ad818",
+      "contract_raw_sha16": "b2233bc3e33aeb52",
+      "contract_bytes": 43572,
+      "contract_path": "docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2.md",
+      "note": "v0.2 supersedes v0.1 (e2b06cdf, det 93f09b5a88b2b4d9, raw d99b86c22101fbd4). v0.1 remains byte-identical at this head for live engine binding; v0.2 is the controlling specification for reviewers at this archive. Engine CONTRACT_ID/CONTRACT_REL will be updated to v0.2 at the next engine mutation (derived tree will move then)."
+    }
+  },
+  "dependency_digest": {
+    "contract_hash": "93f09b5a88b2b4d9",
+    "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+    "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+    "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+    "g8_test_evidence_module": "engine/g8_test_evidence.py",
+    "g8_tested_tree_owner": "scenarios/g8_tested_tree.derived_tested_tree",
+    "harness_version": "0.1.0",
+    "smoke_fixture_digests": {
+      "illegal_transition_smoke.json": "6aa294a420063b32",
+      "knowledge_reactivation_smoke.json": "8a2779314c74c543",
+      "legal_transition_smoke.json": "0d842ea31deac5d8"
+    },
+    "spec_digest": "c26b75b74fa4a8ba",
+    "tested_sha": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d",
+    "tested_tree_paths": [
+      "stress-suite/engine",
+      "stress-suite/scenarios",
+      "stress-suite/tests"
+    ]
+  },
+  "g8_custody": {
+    "current_regeneration_if_tree_moved": "via existing derived_tested_tree / verify_citation (keyword-only, CITATION_RULE, ARTIFACT_RELATIVE_PATH, JUNIT_XML_MINUS_VOLATILE_ATTRS_V1) / lag-check / emit machinery \u2014 historical intact, current artifact re-measured on same tested tree",
+    "derived_tested_tree_mechanism": "scenarios/g8_tested_tree.derived_tested_tree() sole owner via engine/g8_test_evidence.TESTED_TREE_PATHS/GIT_ARGS",
+    "historical_receipts_intact": "stress-suite/evidence/G8_RESULT.md + G8_EVIDENCE_RECEIPT.json + G8_TEST_RESULTS.xml byte-preserved via Git history at 31c68da2-2cf1bb4b961 (tested_sha 2cf1bb4b961, raw 23f97af88ff31c0e) and re-derived at 19b6077f456b (raw 9267e8b103e04279, canonical 9c5456ec3e21039f); contract v0.1 at e2b06cdf superseded by v0.2 at this head (det b70a03f39e2ad818, raw b2233bc3e33aeb52)",
+    "tested_sha_at_receipt": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d"
+  },
+  "generated_at": "2026-09-26T18:57:49.844166+00:00",
+  "measurement": {
+    "artifact_bytes": 136237,
+    "artifact_canonical_digest": "9c5456ec3e21039f2b848b9b94e0265f4533d5bf045022fdf740bfafc983d51f",
+    "artifact_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q --junitxml=evidence/G8_TEST_RESULTS.xml",
+    "artifact_counts": {
+      "artifact_bytes": 134987,
+      "artifact_canonical_digest": "9c5456ec3e21039f2b848b9b94e0265f4533d5bf045022fdf740bfafc983d51f",
+      "artifact_digest": "9267e8b103e042793ec5c65ce943a7167e186e78c2e401a6956a116be1f84513",
+      "artifact_path": "stress-suite/evidence/G8_TEST_RESULTS.xml",
+      "check_baseline_verified": true,
+      "collected": 1058,
+      "command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q --junitxml=evidence/G8_TEST_RESULTS.xml",
+      "errors": 0,
+      "failed": 0,
+      "honest_baseline": true,
+      "passed": 1057,
+      "pytest_version": "",
+      "python_version": "",
+      "skipped": 1,
+      "skipped_cases": [
+        {
+          "reason": "artifact-producing run: the archive for this tree cannot exist yet, so a lag is expected here and is checked by every ordinary run (and by test_the_lag_rule_detects_a_lagging_tree_...)",
+          "test": "stress-suite.tests.test_g8_contradiction::test_the_committed_package_names_the_derived_code_tree"
+        }
+      ],
+      "suite_identity": "pytest",
+      "tested_sha": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d",
+      "verify_citation_new": true
+    },
+    "artifact_digest": "9267e8b103e042793ec5c65ce943a7167e186e78c2e401a6956a116be1f84513",
+    "coverage_gap": "All existing smokes valid_count <2 (knowledge_reactivation 0, legal 1, illegal 0) -> INSUFFICIENT_DATA per R1-8. No confluence claim on existing workflow. Synthetic diamond (2 valid VERIFIED) and seeded failure (2 valid FAILURE) demonstrate harness correctness.",
+    "hashes": {
+      "artifact_canonical_sha256": "9c5456ec3e21039f2b848b9b94e0265f4533d5bf045022fdf740bfafc983d51f",
+      "artifact_raw_sha256": "9267e8b103e042793ec5c65ce943a7167e186e78c2e401a6956a116be1f84513",
+      "contract_hash": "93f09b5a88b2b4d9",
+      "receipt_sha256_TO_BE_COMPUTED_AFTER_WRITE": "recomputed after commit"
+    },
+    "plain_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
+    "plain_counts": {
+      "collected": 1050,
+      "command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
+      "errors": 0,
+      "exit": 0,
+      "failed": 0,
+      "notes": "plain run executes lag check, artifact run skips 1 case; hence 1050 vs 1049+1",
+      "passed": 1050,
+      "skipped": 0
+    },
+    "tested_sha_measured": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788",
+    "verdict": {
+      "overall_harness": "HONEST -- primary INSUFFICIENT_DATA, positive VERIFIED, negative FAILURE correctly reported; neither collapsed to VERIFIED",
+      "primary": "INSUFFICIENT_DATA",
+      "primary_execution": "INSUFFICIENT_DATA",
+      "primary_scientific": "NOT_CLAIMED"
+    },
+    "artifact_raw_sha256": "9267e8b103e042793ec5c65ce943a7167e186e78c2e401a6956a116be1f84513",
+    "artifact_canonical_sha256": "9c5456ec3e21039f2b848b9b94e0265f4533d5bf045022fdf740bfafc983d51f"
+  },
+  "primary_workflow": {
+    "claim_ledger_view": {
+      "claim_class": "confluence_check",
+      "code_hash": "30548d5fad38a621",
+      "evidence_refs": [],
+      "execution_status": "INSUFFICIENT_DATA",
+      "falsifier": "any two valid schedules with divergent confluence_protected_digest",
+      "input_hash": "db5eb267a732708b",
+      "premise_refs": [
+        "legal_transition_smoke"
+      ],
+      "protected_fields": [
+        "terminal_phase",
+        "terminal_lifecycle",
+        "allowed_trace",
+        "evidence_kinds"
+      ],
+      "receipt": {
+        "bound": 24,
+        "bound_exceeded_is_INCONCLUSIVE": false,
+        "checks": {
+          "final_state_equivalence": {
+            "detail": {
+              "reason": "INSUFFICIENT_DATA",
+              "valid_count": 1
+            },
+            "verdict": "INCONCLUSIVE"
+          },
+          "idempotence": {
+            "detail": {
+              "first_trace": [
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "phase_step",
+                  "from": "STABLE",
+                  "kind": "OK",
+                  "machine": "phase",
+                  "rationale": "single material contradiction observed",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "WATCH"
+                }
+              ],
+              "second_trace": [
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "phase_step",
+                  "from": "STABLE",
+                  "kind": "OK",
+                  "machine": "phase",
+                  "rationale": "single material contradiction observed",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "WATCH"
+                },
+                {
+                  "allowed": false,
+                  "applied": false,
+                  "event_type": "phase_step",
+                  "from": "WATCH",
+                  "kind": "TOPOLOGY_DENIED",
+                  "machine": "phase",
+                  "rationale": "edge absent from phase graph",
+                  "rule_ids": [],
+                  "seq": 2,
+                  "to": "WATCH"
+                }
+              ],
+              "terminal_lifecycle_first": {},
+              "terminal_lifecycle_second": {}
+            },
+            "verdict": "PASS"
+          },
+          "local_diamond": {
+            "detail": {
+              "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+            },
+            "verdict": "INCONCLUSIVE"
+          },
+          "seeded_negative_control": {
+            "detail": {
+              "claim_status": "CONFLUENCE_FAILURE",
+              "counterexample": {
+                "baseline_observables": {
+                  "confluence_protected_digest": "1085ec412955ab10",
+                  "events": [
+                    {
+                      "payload": {
+                        "authority_basis": "seeded",
+                        "authority_level": "PO",
+                        "reason": "seeded CHALLENGED",
+                        "to_state": "CHALLENGED"
+                      },
+                      "seq": 1,
+                      "target": "@K"
+                    },
+                    {
+                      "payload": {
+                        "authority_basis": "seeded",
+                        "authority_level": "PO",
+                        "reason": "seeded TESTED",
+                        "to_state": "TESTED"
+                      },
+                      "seq": 2,
+                      "target": "@K"
+                    }
+                  ],
+                  "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+                  "schedule": [
+                    [
+                      "lifecycle",
+                      "PO",
+                      "@K",
+                      "lifecycle_step",
+                      "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                      ""
+                    ],
+                    [
+                      "lifecycle",
+                      "PO",
+                      "@K",
+                      "lifecycle_step",
+                      "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                      ""
+                    ]
+                  ],
+                  "schedule_index": 0,
+                  "terminal_lifecycle": {
+                    "@K": "TESTED"
+                  },
+                  "terminal_phase": "STABLE"
+                },
+                "case_id": "seeded_failure_control",
+                "classification": "ARCHITECTURE_CONTRADICTION",
+                "counterexample_id": "567ffabfc6b9c621",
+                "expected_relation": "protected equivalence across valid schedules",
+                "observed_relation": "divergent p_protected digest",
+                "perturbed_observables": {
+                  "confluence_protected_digest": "58f6644695f0d51b",
+                  "events": [
+                    {
+                      "payload": {
+                        "authority_basis": "seeded",
+                        "authority_level": "PO",
+                        "reason": "seeded TESTED",
+                        "to_state": "TESTED"
+                      },
+                      "seq": 1,
+                      "target": "@K"
+                    },
+                    {
+                      "payload": {
+                        "authority_basis": "seeded",
+                        "authority_level": "PO",
+                        "reason": "seeded CHALLENGED",
+                        "to_state": "CHALLENGED"
+                      },
+                      "seq": 2,
+                      "target": "@K"
+                    }
+                  ],
+                  "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+                  "schedule": [
+                    [
+                      "lifecycle",
+                      "PO",
+                      "@K",
+                      "lifecycle_step",
+                      "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                      ""
+                    ],
+                    [
+                      "lifecycle",
+                      "PO",
+                      "@K",
+                      "lifecycle_step",
+                      "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                      ""
+                    ]
+                  ],
+                  "schedule_index": 1,
+                  "terminal_lifecycle": {
+                    "@K": "CHALLENGED"
+                  },
+                  "terminal_phase": "STABLE"
+                },
+                "preserved_evidence": {
+                  "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+                  "enumerator_hash": "0c49cdfd573af081",
+                  "initial_state_hash": "3dc9c326ab8902b0",
+                  "minimized_trace_hash": "7282779e0c594689",
+                  "schedule_seq_hashes": [
+                    "281c98932b632887",
+                    "856b867ba215c918"
+                  ],
+                  "valid_schedules_enumerated": 2
+                }
+              },
+              "enum": {
+                "bound_exceeded": false,
+                "enumerator_hash": "0c49cdfd573af081",
+                "forensic_per_schedule": [
+                  "e3f113be79ad4c5723e9c7c3ec492d9d",
+                  "dd90d5713917758f8264506e8a68e8d5"
+                ],
+                "invalid_count": 0,
+                "protected_per_schedule": [
+                  "1085ec412955ab10",
+                  "58f6644695f0d51b"
+                ],
+                "seq_hashes": [
+                  "281c98932b632887",
+                  "856b867ba215c918"
+                ],
+                "total_permutations": 2,
+                "valid_count_before_bound": 2,
+                "valid_count_enumerated": 2,
+                "valid_events": [
+                  [
+                    "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')",
+                    "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')"
+                  ],
+                  [
+                    "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')",
+                    "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')"
+                  ]
+                ],
+                "valid_results": [
+                  {
+                    "fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+                    "terminal_lifecycle": {
+                      "@K": "TESTED"
+                    },
+                    "terminal_phase": "STABLE",
+                    "trace": [
+                      {
+                        "allowed": true,
+                        "applied": true,
+                        "event_type": "lifecycle_step",
+                        "from": "CANDIDATE",
+                        "kind": "OK",
+                        "machine": "lifecycle",
+                        "rationale": "seeded CHALLENGED",
+                        "rule_ids": [],
+                        "seq": 1,
+                        "to": "CHALLENGED"
+                      },
+                      {
+                        "allowed": true,
+                        "applied": true,
+                        "event_type": "lifecycle_step",
+                        "from": "CHALLENGED",
+                        "kind": "OK",
+                        "machine": "lifecycle",
+                        "rationale": "seeded TESTED",
+                        "rule_ids": [],
+                        "seq": 2,
+                        "to": "TESTED"
+                      }
+                    ]
+                  },
+                  {
+                    "fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+                    "terminal_lifecycle": {
+                      "@K": "CHALLENGED"
+                    },
+                    "terminal_phase": "STABLE",
+                    "trace": [
+                      {
+                        "allowed": true,
+                        "applied": true,
+                        "event_type": "lifecycle_step",
+                        "from": "CANDIDATE",
+                        "kind": "OK",
+                        "machine": "lifecycle",
+                        "rationale": "seeded TESTED",
+                        "rule_ids": [],
+                        "seq": 1,
+                        "to": "TESTED"
+                      },
+                      {
+                        "allowed": true,
+                        "applied": true,
+                        "event_type": "lifecycle_step",
+                        "from": "TESTED",
+                        "kind": "OK",
+                        "machine": "lifecycle",
+                        "rationale": "seeded CHALLENGED",
+                        "rule_ids": [],
+                        "seq": 2,
+                        "to": "CHALLENGED"
+                      }
+                    ]
+                  }
+                ],
+                "valid_schedules": [
+                  [
+                    "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')",
+                    "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')"
+                  ],
+                  [
+                    "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')",
+                    "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')"
+                  ]
+                ]
+              },
+              "execution_status": "COMPLETED",
+              "forensic": [
+                "e3f113be79ad4c5723e9c7c3ec492d9d",
+                "dd90d5713917758f8264506e8a68e8d5"
+              ],
+              "protected": [
+                "1085ec412955ab10",
+                "58f6644695f0d51b"
+              ],
+              "reason": "seeded control correctly yields CONFLUENCE_FAILURE with minimized counterexample",
+              "scientific_verdict": "CONFLUENCE_FAILURE"
+            },
+            "verdict": "CONFLUENCE_FAILURE"
+          },
+          "termination": {
+            "detail": {
+              "reason": "valid schedules <2, no confluence claim",
+              "valid_count": 1
+            },
+            "verdict": "INCONCLUSIVE"
+          }
+        },
+        "claim_cap": "DIAGNOSTIC",
+        "claim_status": "INSUFFICIENT_DATA",
+        "confluence_protected_digest_per_schedule": [
+          "1aa73ba4e75df593"
+        ],
+        "confluence_verdict": "INSUFFICIENT_DATA",
+        "contract_hash": "93f09b5a88b2b4d9",
+        "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+        "counterexample": null,
+        "coverage": "1/1/beyond_bound=none",
+        "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+        "dossier_short": "bfb8ca48",
+        "enumerator_hash": "91d69cc0a19a65dc",
+        "enumerator_snapshot": {
+          "bound_exceeded": false,
+          "invalid_count": 23,
+          "total_permutations": 24,
+          "valid_count_before_bound": 1,
+          "valid_count_enumerated": 1
+        },
+        "execution_status": "INSUFFICIENT_DATA",
+        "final_state_equivalence_detail": {
+          "reason": "INSUFFICIENT_DATA",
+          "valid_count": 1
+        },
+        "final_state_equivalence_verdict": "INCONCLUSIVE",
+        "forensic_fingerprint_per_schedule": [
+          "2a003027b2061087a4e831099dc3e1fd"
+        ],
+        "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+        "idempotence_detail": {
+          "first_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "phase_step",
+              "from": "STABLE",
+              "kind": "OK",
+              "machine": "phase",
+              "rationale": "single material contradiction observed",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "WATCH"
+            }
+          ],
+          "second_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "phase_step",
+              "from": "STABLE",
+              "kind": "OK",
+              "machine": "phase",
+              "rationale": "single material contradiction observed",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "WATCH"
+            },
+            {
+              "allowed": false,
+              "applied": false,
+              "event_type": "phase_step",
+              "from": "WATCH",
+              "kind": "TOPOLOGY_DENIED",
+              "machine": "phase",
+              "rationale": "edge absent from phase graph",
+              "rule_ids": [],
+              "seq": 2,
+              "to": "WATCH"
+            }
+          ],
+          "terminal_lifecycle_first": {},
+          "terminal_lifecycle_second": {}
+        },
+        "idempotence_verdict": "PASS",
+        "invalid_input_checks": {
+          "assigned_seq_topology_denied_excluded": true,
+          "enumerator_snapshot": {
+            "bound_exceeded": false,
+            "invalid_count": 23,
+            "valid_enumerated": 1
+          },
+          "fixed_seq_detail": "out-of-order seq 1 after 2",
+          "fixed_seq_replay_input_error": true,
+          "topology_detail": {
+            "invalid_count": 23,
+            "note": "invalid schedules with TOPOLOGY_DENIED present and excluded from valid set",
+            "valid_enumerated": 1
+          }
+        },
+        "local_diamond_detail": {
+          "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+        },
+        "local_diamond_verdict": "INCONCLUSIVE",
+        "scenario_or_fixture_id": "legal_transition_smoke",
+        "schedule_length": 4,
+        "schedule_seq_hashes": [
+          "a8945901d62b787e"
+        ],
+        "scientific_verdict": "NOT_CLAIMED",
+        "seeded_counterexample": {
+          "baseline_observables": {
+            "confluence_protected_digest": "1085ec412955ab10",
+            "events": [
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded CHALLENGED",
+                  "to_state": "CHALLENGED"
+                },
+                "seq": 1,
+                "target": "@K"
+              },
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded TESTED",
+                  "to_state": "TESTED"
+                },
+                "seq": 2,
+                "target": "@K"
+              }
+            ],
+            "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 0,
+            "terminal_lifecycle": {
+              "@K": "TESTED"
+            },
+            "terminal_phase": "STABLE"
+          },
+          "case_id": "seeded_failure_control",
+          "classification": "ARCHITECTURE_CONTRADICTION",
+          "counterexample_id": "567ffabfc6b9c621",
+          "expected_relation": "protected equivalence across valid schedules",
+          "observed_relation": "divergent p_protected digest",
+          "perturbed_observables": {
+            "confluence_protected_digest": "58f6644695f0d51b",
+            "events": [
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded TESTED",
+                  "to_state": "TESTED"
+                },
+                "seq": 1,
+                "target": "@K"
+              },
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded CHALLENGED",
+                  "to_state": "CHALLENGED"
+                },
+                "seq": 2,
+                "target": "@K"
+              }
+            ],
+            "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 1,
+            "terminal_lifecycle": {
+              "@K": "CHALLENGED"
+            },
+            "terminal_phase": "STABLE"
+          },
+          "preserved_evidence": {
+            "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+            "enumerator_hash": "0c49cdfd573af081",
+            "initial_state_hash": "3dc9c326ab8902b0",
+            "minimized_trace_hash": "7282779e0c594689",
+            "schedule_seq_hashes": [
+              "281c98932b632887",
+              "856b867ba215c918"
+            ],
+            "valid_schedules_enumerated": 2
+          }
+        },
+        "seeded_negative_control_detail": {
+          "claim_status": "CONFLUENCE_FAILURE",
+          "counterexample": {
+            "baseline_observables": {
+              "confluence_protected_digest": "1085ec412955ab10",
+              "events": [
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded CHALLENGED",
+                    "to_state": "CHALLENGED"
+                  },
+                  "seq": 1,
+                  "target": "@K"
+                },
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded TESTED",
+                    "to_state": "TESTED"
+                  },
+                  "seq": 2,
+                  "target": "@K"
+                }
+              ],
+              "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 0,
+              "terminal_lifecycle": {
+                "@K": "TESTED"
+              },
+              "terminal_phase": "STABLE"
+            },
+            "case_id": "seeded_failure_control",
+            "classification": "ARCHITECTURE_CONTRADICTION",
+            "counterexample_id": "567ffabfc6b9c621",
+            "expected_relation": "protected equivalence across valid schedules",
+            "observed_relation": "divergent p_protected digest",
+            "perturbed_observables": {
+              "confluence_protected_digest": "58f6644695f0d51b",
+              "events": [
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded TESTED",
+                    "to_state": "TESTED"
+                  },
+                  "seq": 1,
+                  "target": "@K"
+                },
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded CHALLENGED",
+                    "to_state": "CHALLENGED"
+                  },
+                  "seq": 2,
+                  "target": "@K"
+                }
+              ],
+              "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 1,
+              "terminal_lifecycle": {
+                "@K": "CHALLENGED"
+              },
+              "terminal_phase": "STABLE"
+            },
+            "preserved_evidence": {
+              "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+              "enumerator_hash": "0c49cdfd573af081",
+              "initial_state_hash": "3dc9c326ab8902b0",
+              "minimized_trace_hash": "7282779e0c594689",
+              "schedule_seq_hashes": [
+                "281c98932b632887",
+                "856b867ba215c918"
+              ],
+              "valid_schedules_enumerated": 2
+            }
+          },
+          "enum": {
+            "bound_exceeded": false,
+            "enumerator_hash": "0c49cdfd573af081",
+            "forensic_per_schedule": [
+              "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "dd90d5713917758f8264506e8a68e8d5"
+            ],
+            "invalid_count": 0,
+            "protected_per_schedule": [
+              "1085ec412955ab10",
+              "58f6644695f0d51b"
+            ],
+            "seq_hashes": [
+              "281c98932b632887",
+              "856b867ba215c918"
+            ],
+            "total_permutations": 2,
+            "valid_count_before_bound": 2,
+            "valid_count_enumerated": 2,
+            "valid_events": [
+              [
+                "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')",
+                "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')"
+              ],
+              [
+                "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')",
+                "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')"
+              ]
+            ],
+            "valid_results": [
+              {
+                "fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+                "terminal_lifecycle": {
+                  "@K": "TESTED"
+                },
+                "terminal_phase": "STABLE",
+                "trace": [
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "CANDIDATE",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded CHALLENGED",
+                    "rule_ids": [],
+                    "seq": 1,
+                    "to": "CHALLENGED"
+                  },
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "CHALLENGED",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded TESTED",
+                    "rule_ids": [],
+                    "seq": 2,
+                    "to": "TESTED"
+                  }
+                ]
+              },
+              {
+                "fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+                "terminal_lifecycle": {
+                  "@K": "CHALLENGED"
+                },
+                "terminal_phase": "STABLE",
+                "trace": [
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "CANDIDATE",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded TESTED",
+                    "rule_ids": [],
+                    "seq": 1,
+                    "to": "TESTED"
+                  },
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "TESTED",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded CHALLENGED",
+                    "rule_ids": [],
+                    "seq": 2,
+                    "to": "CHALLENGED"
+                  }
+                ]
+              }
+            ],
+            "valid_schedules": [
+              [
+                "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')",
+                "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')"
+              ],
+              [
+                "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')",
+                "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')"
+              ]
+            ]
+          },
+          "execution_status": "COMPLETED",
+          "forensic": [
+            "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "dd90d5713917758f8264506e8a68e8d5"
+          ],
+          "protected": [
+            "1085ec412955ab10",
+            "58f6644695f0d51b"
+          ],
+          "reason": "seeded control correctly yields CONFLUENCE_FAILURE with minimized counterexample",
+          "scientific_verdict": "CONFLUENCE_FAILURE"
+        },
+        "seeded_negative_control_verdict": "CONFLUENCE_FAILURE",
+        "termination_detail": {
+          "reason": "valid schedules <2, no confluence claim",
+          "valid_count": 1
+        },
+        "termination_verdict": "INCONCLUSIVE",
+        "valid_schedules_enumerated": 1,
+        "valid_schedules_total_up_to_bound": 1
+      },
+      "record_id": "a8bec4c830ec1add",
+      "scientific_verdict": "NOT_CLAIMED"
+    },
+    "dependency_digest": {
+      "contract_hash": "93f09b5a88b2b4d9",
+      "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+      "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+      "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+      "g8_test_evidence_module": "engine/g8_test_evidence.py",
+      "g8_tested_tree_owner": "scenarios/g8_tested_tree.derived_tested_tree",
+      "harness_version": "0.1.0",
+      "smoke_fixture_digests": {
+        "illegal_transition_smoke.json": "6aa294a420063b32",
+        "knowledge_reactivation_smoke.json": "8a2779314c74c543",
+        "legal_transition_smoke.json": "0d842ea31deac5d8"
+      },
+      "spec_digest": "c26b75b74fa4a8ba",
+      "tested_sha": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788",
+      "tested_tree_paths": [
+        "stress-suite/engine",
+        "stress-suite/scenarios",
+        "stress-suite/tests"
+      ]
+    },
+    "fixture_digest": "0d842ea31deac5d8",
+    "fixture_path": "stress-suite/fixtures/smoke/legal_transition_smoke.json",
+    "note": "R1 yields 0 eligible (all smokes valid_count <2). Primary workflow largest smoke shown as INSUFFICIENT_DATA honest. No synthetic substitution for R1.",
+    "spec_digest": "c26b75b74fa4a8ba",
+    "spec_id": "legal_transition_smoke",
+    "verdict": {
+      "bound": 24,
+      "bound_exceeded_is_INCONCLUSIVE": false,
+      "checks": {
+        "final_state_equivalence": {
+          "detail": {
+            "reason": "INSUFFICIENT_DATA",
+            "valid_count": 1
+          },
+          "verdict": "INCONCLUSIVE"
+        },
+        "idempotence": {
+          "detail": {
+            "first_trace": [
+              {
+                "allowed": true,
+                "applied": true,
+                "event_type": "phase_step",
+                "from": "STABLE",
+                "kind": "OK",
+                "machine": "phase",
+                "rationale": "single material contradiction observed",
+                "rule_ids": [],
+                "seq": 1,
+                "to": "WATCH"
+              }
+            ],
+            "second_trace": [
+              {
+                "allowed": true,
+                "applied": true,
+                "event_type": "phase_step",
+                "from": "STABLE",
+                "kind": "OK",
+                "machine": "phase",
+                "rationale": "single material contradiction observed",
+                "rule_ids": [],
+                "seq": 1,
+                "to": "WATCH"
+              },
+              {
+                "allowed": false,
+                "applied": false,
+                "event_type": "phase_step",
+                "from": "WATCH",
+                "kind": "TOPOLOGY_DENIED",
+                "machine": "phase",
+                "rationale": "edge absent from phase graph",
+                "rule_ids": [],
+                "seq": 2,
+                "to": "WATCH"
+              }
+            ],
+            "terminal_lifecycle_first": {},
+            "terminal_lifecycle_second": {}
+          },
+          "verdict": "PASS"
+        },
+        "local_diamond": {
+          "detail": {
+            "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+          },
+          "verdict": "INCONCLUSIVE"
+        },
+        "seeded_negative_control": {
+          "detail": {
+            "claim_status": "CONFLUENCE_FAILURE",
+            "counterexample": {
+              "baseline_observables": {
+                "confluence_protected_digest": "1085ec412955ab10",
+                "events": [
+                  {
+                    "payload": {
+                      "authority_basis": "seeded",
+                      "authority_level": "PO",
+                      "reason": "seeded CHALLENGED",
+                      "to_state": "CHALLENGED"
+                    },
+                    "seq": 1,
+                    "target": "@K"
+                  },
+                  {
+                    "payload": {
+                      "authority_basis": "seeded",
+                      "authority_level": "PO",
+                      "reason": "seeded TESTED",
+                      "to_state": "TESTED"
+                    },
+                    "seq": 2,
+                    "target": "@K"
+                  }
+                ],
+                "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+                "schedule": [
+                  [
+                    "lifecycle",
+                    "PO",
+                    "@K",
+                    "lifecycle_step",
+                    "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                    ""
+                  ],
+                  [
+                    "lifecycle",
+                    "PO",
+                    "@K",
+                    "lifecycle_step",
+                    "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                    ""
+                  ]
+                ],
+                "schedule_index": 0,
+                "terminal_lifecycle": {
+                  "@K": "TESTED"
+                },
+                "terminal_phase": "STABLE"
+              },
+              "case_id": "seeded_failure_control",
+              "classification": "ARCHITECTURE_CONTRADICTION",
+              "counterexample_id": "567ffabfc6b9c621",
+              "expected_relation": "protected equivalence across valid schedules",
+              "observed_relation": "divergent p_protected digest",
+              "perturbed_observables": {
+                "confluence_protected_digest": "58f6644695f0d51b",
+                "events": [
+                  {
+                    "payload": {
+                      "authority_basis": "seeded",
+                      "authority_level": "PO",
+                      "reason": "seeded TESTED",
+                      "to_state": "TESTED"
+                    },
+                    "seq": 1,
+                    "target": "@K"
+                  },
+                  {
+                    "payload": {
+                      "authority_basis": "seeded",
+                      "authority_level": "PO",
+                      "reason": "seeded CHALLENGED",
+                      "to_state": "CHALLENGED"
+                    },
+                    "seq": 2,
+                    "target": "@K"
+                  }
+                ],
+                "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+                "schedule": [
+                  [
+                    "lifecycle",
+                    "PO",
+                    "@K",
+                    "lifecycle_step",
+                    "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                    ""
+                  ],
+                  [
+                    "lifecycle",
+                    "PO",
+                    "@K",
+                    "lifecycle_step",
+                    "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                    ""
+                  ]
+                ],
+                "schedule_index": 1,
+                "terminal_lifecycle": {
+                  "@K": "CHALLENGED"
+                },
+                "terminal_phase": "STABLE"
+              },
+              "preserved_evidence": {
+                "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+                "enumerator_hash": "0c49cdfd573af081",
+                "initial_state_hash": "3dc9c326ab8902b0",
+                "minimized_trace_hash": "7282779e0c594689",
+                "schedule_seq_hashes": [
+                  "281c98932b632887",
+                  "856b867ba215c918"
+                ],
+                "valid_schedules_enumerated": 2
+              }
+            },
+            "enum": {
+              "bound_exceeded": false,
+              "enumerator_hash": "0c49cdfd573af081",
+              "forensic_per_schedule": [
+                "e3f113be79ad4c5723e9c7c3ec492d9d",
+                "dd90d5713917758f8264506e8a68e8d5"
+              ],
+              "invalid_count": 0,
+              "protected_per_schedule": [
+                "1085ec412955ab10",
+                "58f6644695f0d51b"
+              ],
+              "seq_hashes": [
+                "281c98932b632887",
+                "856b867ba215c918"
+              ],
+              "total_permutations": 2,
+              "valid_count_before_bound": 2,
+              "valid_count_enumerated": 2,
+              "valid_events": [
+                [
+                  "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')",
+                  "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')"
+                ],
+                [
+                  "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')",
+                  "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')"
+                ]
+              ],
+              "valid_results": [
+                {
+                  "fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+                  "terminal_lifecycle": {
+                    "@K": "TESTED"
+                  },
+                  "terminal_phase": "STABLE",
+                  "trace": [
+                    {
+                      "allowed": true,
+                      "applied": true,
+                      "event_type": "lifecycle_step",
+                      "from": "CANDIDATE",
+                      "kind": "OK",
+                      "machine": "lifecycle",
+                      "rationale": "seeded CHALLENGED",
+                      "rule_ids": [],
+                      "seq": 1,
+                      "to": "CHALLENGED"
+                    },
+                    {
+                      "allowed": true,
+                      "applied": true,
+                      "event_type": "lifecycle_step",
+                      "from": "CHALLENGED",
+                      "kind": "OK",
+                      "machine": "lifecycle",
+                      "rationale": "seeded TESTED",
+                      "rule_ids": [],
+                      "seq": 2,
+                      "to": "TESTED"
+                    }
+                  ]
+                },
+                {
+                  "fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+                  "terminal_lifecycle": {
+                    "@K": "CHALLENGED"
+                  },
+                  "terminal_phase": "STABLE",
+                  "trace": [
+                    {
+                      "allowed": true,
+                      "applied": true,
+                      "event_type": "lifecycle_step",
+                      "from": "CANDIDATE",
+                      "kind": "OK",
+                      "machine": "lifecycle",
+                      "rationale": "seeded TESTED",
+                      "rule_ids": [],
+                      "seq": 1,
+                      "to": "TESTED"
+                    },
+                    {
+                      "allowed": true,
+                      "applied": true,
+                      "event_type": "lifecycle_step",
+                      "from": "TESTED",
+                      "kind": "OK",
+                      "machine": "lifecycle",
+                      "rationale": "seeded CHALLENGED",
+                      "rule_ids": [],
+                      "seq": 2,
+                      "to": "CHALLENGED"
+                    }
+                  ]
+                }
+              ],
+              "valid_schedules": [
+                [
+                  "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')",
+                  "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')"
+                ],
+                [
+                  "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')",
+                  "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')"
+                ]
+              ]
+            },
+            "execution_status": "COMPLETED",
+            "forensic": [
+              "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "dd90d5713917758f8264506e8a68e8d5"
+            ],
+            "protected": [
+              "1085ec412955ab10",
+              "58f6644695f0d51b"
+            ],
+            "reason": "seeded control correctly yields CONFLUENCE_FAILURE with minimized counterexample",
+            "scientific_verdict": "CONFLUENCE_FAILURE"
+          },
+          "verdict": "CONFLUENCE_FAILURE"
+        },
+        "termination": {
+          "detail": {
+            "reason": "valid schedules <2, no confluence claim",
+            "valid_count": 1
+          },
+          "verdict": "INCONCLUSIVE"
+        }
+      },
+      "claim_cap": "DIAGNOSTIC",
+      "claim_status": "INSUFFICIENT_DATA",
+      "confluence_protected_digest_per_schedule": [
+        "1aa73ba4e75df593"
+      ],
+      "confluence_verdict": "INSUFFICIENT_DATA",
+      "contract_hash": "93f09b5a88b2b4d9",
+      "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+      "counterexample": null,
+      "coverage": "1/1/beyond_bound=none",
+      "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+      "dossier_short": "bfb8ca48",
+      "enumerator_hash": "91d69cc0a19a65dc",
+      "enumerator_snapshot": {
+        "bound_exceeded": false,
+        "invalid_count": 23,
+        "total_permutations": 24,
+        "valid_count_before_bound": 1,
+        "valid_count_enumerated": 1
+      },
+      "execution_status": "INSUFFICIENT_DATA",
+      "final_state_equivalence_detail": {
+        "reason": "INSUFFICIENT_DATA",
+        "valid_count": 1
+      },
+      "final_state_equivalence_verdict": "INCONCLUSIVE",
+      "forensic_fingerprint_per_schedule": [
+        "2a003027b2061087a4e831099dc3e1fd"
+      ],
+      "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+      "idempotence_detail": {
+        "first_trace": [
+          {
+            "allowed": true,
+            "applied": true,
+            "event_type": "phase_step",
+            "from": "STABLE",
+            "kind": "OK",
+            "machine": "phase",
+            "rationale": "single material contradiction observed",
+            "rule_ids": [],
+            "seq": 1,
+            "to": "WATCH"
+          }
+        ],
+        "second_trace": [
+          {
+            "allowed": true,
+            "applied": true,
+            "event_type": "phase_step",
+            "from": "STABLE",
+            "kind": "OK",
+            "machine": "phase",
+            "rationale": "single material contradiction observed",
+            "rule_ids": [],
+            "seq": 1,
+            "to": "WATCH"
+          },
+          {
+            "allowed": false,
+            "applied": false,
+            "event_type": "phase_step",
+            "from": "WATCH",
+            "kind": "TOPOLOGY_DENIED",
+            "machine": "phase",
+            "rationale": "edge absent from phase graph",
+            "rule_ids": [],
+            "seq": 2,
+            "to": "WATCH"
+          }
+        ],
+        "terminal_lifecycle_first": {},
+        "terminal_lifecycle_second": {}
+      },
+      "idempotence_verdict": "PASS",
+      "invalid_input_checks": {
+        "assigned_seq_topology_denied_excluded": true,
+        "enumerator_snapshot": {
+          "bound_exceeded": false,
+          "invalid_count": 23,
+          "valid_enumerated": 1
+        },
+        "fixed_seq_detail": "out-of-order seq 1 after 2",
+        "fixed_seq_replay_input_error": true,
+        "topology_detail": {
+          "invalid_count": 23,
+          "note": "invalid schedules with TOPOLOGY_DENIED present and excluded from valid set",
+          "valid_enumerated": 1
+        }
+      },
+      "local_diamond_detail": {
+        "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+      },
+      "local_diamond_verdict": "INCONCLUSIVE",
+      "scenario_or_fixture_id": "legal_transition_smoke",
+      "schedule_length": 4,
+      "schedule_seq_hashes": [
+        "a8945901d62b787e"
+      ],
+      "scientific_verdict": "NOT_CLAIMED",
+      "seeded_counterexample": {
+        "baseline_observables": {
+          "confluence_protected_digest": "1085ec412955ab10",
+          "events": [
+            {
+              "payload": {
+                "authority_basis": "seeded",
+                "authority_level": "PO",
+                "reason": "seeded CHALLENGED",
+                "to_state": "CHALLENGED"
+              },
+              "seq": 1,
+              "target": "@K"
+            },
+            {
+              "payload": {
+                "authority_basis": "seeded",
+                "authority_level": "PO",
+                "reason": "seeded TESTED",
+                "to_state": "TESTED"
+              },
+              "seq": 2,
+              "target": "@K"
+            }
+          ],
+          "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+          "schedule": [
+            [
+              "lifecycle",
+              "PO",
+              "@K",
+              "lifecycle_step",
+              "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+              ""
+            ],
+            [
+              "lifecycle",
+              "PO",
+              "@K",
+              "lifecycle_step",
+              "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+              ""
+            ]
+          ],
+          "schedule_index": 0,
+          "terminal_lifecycle": {
+            "@K": "TESTED"
+          },
+          "terminal_phase": "STABLE"
+        },
+        "case_id": "seeded_failure_control",
+        "classification": "ARCHITECTURE_CONTRADICTION",
+        "counterexample_id": "567ffabfc6b9c621",
+        "expected_relation": "protected equivalence across valid schedules",
+        "observed_relation": "divergent p_protected digest",
+        "perturbed_observables": {
+          "confluence_protected_digest": "58f6644695f0d51b",
+          "events": [
+            {
+              "payload": {
+                "authority_basis": "seeded",
+                "authority_level": "PO",
+                "reason": "seeded TESTED",
+                "to_state": "TESTED"
+              },
+              "seq": 1,
+              "target": "@K"
+            },
+            {
+              "payload": {
+                "authority_basis": "seeded",
+                "authority_level": "PO",
+                "reason": "seeded CHALLENGED",
+                "to_state": "CHALLENGED"
+              },
+              "seq": 2,
+              "target": "@K"
+            }
+          ],
+          "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+          "schedule": [
+            [
+              "lifecycle",
+              "PO",
+              "@K",
+              "lifecycle_step",
+              "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+              ""
+            ],
+            [
+              "lifecycle",
+              "PO",
+              "@K",
+              "lifecycle_step",
+              "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+              ""
+            ]
+          ],
+          "schedule_index": 1,
+          "terminal_lifecycle": {
+            "@K": "CHALLENGED"
+          },
+          "terminal_phase": "STABLE"
+        },
+        "preserved_evidence": {
+          "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+          "enumerator_hash": "0c49cdfd573af081",
+          "initial_state_hash": "3dc9c326ab8902b0",
+          "minimized_trace_hash": "7282779e0c594689",
+          "schedule_seq_hashes": [
+            "281c98932b632887",
+            "856b867ba215c918"
+          ],
+          "valid_schedules_enumerated": 2
+        }
+      },
+      "seeded_negative_control_detail": {
+        "claim_status": "CONFLUENCE_FAILURE",
+        "counterexample": {
+          "baseline_observables": {
+            "confluence_protected_digest": "1085ec412955ab10",
+            "events": [
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded CHALLENGED",
+                  "to_state": "CHALLENGED"
+                },
+                "seq": 1,
+                "target": "@K"
+              },
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded TESTED",
+                  "to_state": "TESTED"
+                },
+                "seq": 2,
+                "target": "@K"
+              }
+            ],
+            "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 0,
+            "terminal_lifecycle": {
+              "@K": "TESTED"
+            },
+            "terminal_phase": "STABLE"
+          },
+          "case_id": "seeded_failure_control",
+          "classification": "ARCHITECTURE_CONTRADICTION",
+          "counterexample_id": "567ffabfc6b9c621",
+          "expected_relation": "protected equivalence across valid schedules",
+          "observed_relation": "divergent p_protected digest",
+          "perturbed_observables": {
+            "confluence_protected_digest": "58f6644695f0d51b",
+            "events": [
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded TESTED",
+                  "to_state": "TESTED"
+                },
+                "seq": 1,
+                "target": "@K"
+              },
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded CHALLENGED",
+                  "to_state": "CHALLENGED"
+                },
+                "seq": 2,
+                "target": "@K"
+              }
+            ],
+            "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 1,
+            "terminal_lifecycle": {
+              "@K": "CHALLENGED"
+            },
+            "terminal_phase": "STABLE"
+          },
+          "preserved_evidence": {
+            "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+            "enumerator_hash": "0c49cdfd573af081",
+            "initial_state_hash": "3dc9c326ab8902b0",
+            "minimized_trace_hash": "7282779e0c594689",
+            "schedule_seq_hashes": [
+              "281c98932b632887",
+              "856b867ba215c918"
+            ],
+            "valid_schedules_enumerated": 2
+          }
+        },
+        "enum": {
+          "bound_exceeded": false,
+          "enumerator_hash": "0c49cdfd573af081",
+          "forensic_per_schedule": [
+            "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "dd90d5713917758f8264506e8a68e8d5"
+          ],
+          "invalid_count": 0,
+          "protected_per_schedule": [
+            "1085ec412955ab10",
+            "58f6644695f0d51b"
+          ],
+          "seq_hashes": [
+            "281c98932b632887",
+            "856b867ba215c918"
+          ],
+          "total_permutations": 2,
+          "valid_count_before_bound": 2,
+          "valid_count_enumerated": 2,
+          "valid_events": [
+            [
+              "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')",
+              "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')"
+            ],
+            [
+              "ReplayEvent(seq=1, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded TESTED', 'to_state': 'TESTED'}, contract_version='')",
+              "ReplayEvent(seq=2, event_type='lifecycle_step', machine='lifecycle', actor='PO', target='@K', payload={'authority_basis': 'seeded', 'authority_level': 'PO', 'reason': 'seeded CHALLENGED', 'to_state': 'CHALLENGED'}, contract_version='')"
+            ]
+          ],
+          "valid_results": [
+            {
+              "fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "terminal_lifecycle": {
+                "@K": "TESTED"
+              },
+              "terminal_phase": "STABLE",
+              "trace": [
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "CANDIDATE",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "seeded CHALLENGED",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "CHALLENGED"
+                },
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "CHALLENGED",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "seeded TESTED",
+                  "rule_ids": [],
+                  "seq": 2,
+                  "to": "TESTED"
+                }
+              ]
+            },
+            {
+              "fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+              "terminal_lifecycle": {
+                "@K": "CHALLENGED"
+              },
+              "terminal_phase": "STABLE",
+              "trace": [
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "CANDIDATE",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "seeded TESTED",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "TESTED"
+                },
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "TESTED",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "seeded CHALLENGED",
+                  "rule_ids": [],
+                  "seq": 2,
+                  "to": "CHALLENGED"
+                }
+              ]
+            }
+          ],
+          "valid_schedules": [
+            [
+              "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')",
+              "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')"
+            ],
+            [
+              "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}', contract_version='')",
+              "ActionIdentity(machine='lifecycle', actor='PO', target='@K', event_type='lifecycle_step', payload_canonical='{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}', contract_version='')"
+            ]
+          ]
+        },
+        "execution_status": "COMPLETED",
+        "forensic": [
+          "e3f113be79ad4c5723e9c7c3ec492d9d",
+          "dd90d5713917758f8264506e8a68e8d5"
+        ],
+        "protected": [
+          "1085ec412955ab10",
+          "58f6644695f0d51b"
+        ],
+        "reason": "seeded control correctly yields CONFLUENCE_FAILURE with minimized counterexample",
+        "scientific_verdict": "CONFLUENCE_FAILURE"
+      },
+      "seeded_negative_control_verdict": "CONFLUENCE_FAILURE",
+      "termination_detail": {
+        "reason": "valid schedules <2, no confluence claim",
+        "valid_count": 1
+      },
+      "termination_verdict": "INCONCLUSIVE",
+      "valid_schedules_enumerated": 1,
+      "valid_schedules_total_up_to_bound": 1
+    }
+  },
+  "r1_selection": {
+    "candidates": [
+      {
+        "candidate_id": "illegal_transition_smoke",
+        "candidate_type": "smoke",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\fixtures\\smoke\\illegal_transition_smoke.json",
+        "stimulus_len": 3,
+        "content_digest": "7d22ff890061c6d8",
+        "deterministic_ok": true,
+        "deterministic_detail": "",
+        "deterministic_status": "ASSESSED",
+        "valid_count": 0,
+        "valid_before_bound": 0,
+        "bound_exceeded": false,
+        "truncated": false,
+        "invalid_count": 6,
+        "nuisance_ok": true,
+        "nuisance_detail": "predicate executed: fixture has >=2 actions and enumerator exercised permutations; seq presentation vs protected identity verified via forensic/protected separation",
+        "nuisance_status": "ASSESSED",
+        "exclusion_ok": true,
+        "exclusion_detail": "predicate executed: no forbidden mutation_class / wall-clock / model-call found in payloads",
+        "exclusion_status": "ASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "knowledge_reactivation_smoke",
+        "candidate_type": "smoke",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\fixtures\\smoke\\knowledge_reactivation_smoke.json",
+        "stimulus_len": 3,
+        "content_digest": "82317e96424118be",
+        "deterministic_ok": true,
+        "deterministic_detail": "",
+        "deterministic_status": "ASSESSED",
+        "valid_count": 0,
+        "valid_before_bound": 0,
+        "bound_exceeded": false,
+        "truncated": false,
+        "invalid_count": 6,
+        "nuisance_ok": true,
+        "nuisance_detail": "predicate executed: fixture has >=2 actions and enumerator exercised permutations; seq presentation vs protected identity verified via forensic/protected separation",
+        "nuisance_status": "ASSESSED",
+        "exclusion_ok": true,
+        "exclusion_detail": "predicate executed: no forbidden mutation_class / wall-clock / model-call found in payloads",
+        "exclusion_status": "ASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "legal_transition_smoke",
+        "candidate_type": "smoke",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\fixtures\\smoke\\legal_transition_smoke.json",
+        "stimulus_len": 4,
+        "content_digest": "6eb934cb84238b4c",
+        "deterministic_ok": true,
+        "deterministic_detail": "",
+        "deterministic_status": "ASSESSED",
+        "valid_count": 1,
+        "valid_before_bound": 1,
+        "bound_exceeded": false,
+        "truncated": false,
+        "invalid_count": 23,
+        "nuisance_ok": true,
+        "nuisance_detail": "predicate executed: fixture has >=2 actions and enumerator exercised permutations; seq presentation vs protected identity verified via forensic/protected separation",
+        "nuisance_status": "ASSESSED",
+        "exclusion_ok": true,
+        "exclusion_detail": "predicate executed: no forbidden mutation_class / wall-clock / model-call found in payloads",
+        "exclusion_status": "ASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S01",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s01_old_theory_dies_slowly",
+        "stimulus_len": 10,
+        "content_digest": "57f85f13d78be1f5",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S01_WEAK",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s01_variant_weak_contradiction",
+        "stimulus_len": 5,
+        "content_digest": "84088dba78528c12",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S02",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s02_false_revolution",
+        "stimulus_len": 6,
+        "content_digest": "c150d5a5afd8af91",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S03",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s03_patch_maze",
+        "stimulus_len": 11,
+        "content_digest": "1656324937b45784",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S04",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s04_leaf_failure",
+        "stimulus_len": 5,
+        "content_digest": "642ec2d34a09bbc3",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S05",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s05_two_non_dominated_models",
+        "stimulus_len": 7,
+        "content_digest": "3d10429f09a3d19a",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S20",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s20_governor_self_change",
+        "stimulus_len": 10,
+        "content_digest": "1214f32532d17806",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S21",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s21_capability_not_authority",
+        "stimulus_len": 5,
+        "content_digest": "de193d0785179f07",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S22",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s22_operator_truth_boundary",
+        "stimulus_len": 10,
+        "content_digest": "0e3474ef05cca826",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S23",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s23_operator_unavailable",
+        "stimulus_len": 12,
+        "content_digest": "3a3b76f4818d2dfe",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S24",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s24_unknown_governance_event",
+        "stimulus_len": 4,
+        "content_digest": "09327e5c93f5220e",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      }
+    ],
+    "eligible_sorted": [],
+    "chosen": null,
+    "tie_break_distance": "no eligible evaluated smoke fixture (0/3 smoke fixtures have valid_count>=2 with all predicates ASSESSED); scenario packs UNASSESSED in Increment 1 (coverage narrowed to smoke fixtures only); fallthrough to INSUFFICIENT_DATA per contract R1-8",
+    "candidates_considered": 14,
+    "eligible_count": 0
+  },
+  "receipt_id": "OPHIT3_CONFLUENCE_DIAGNOSTIC_v0.1",
+  "schema_version": "0.1.0",
+  "smoke_table_all": {
+    "candidates": [
+      {
+        "candidate_id": "illegal_transition_smoke",
+        "candidate_type": "smoke",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\fixtures\\smoke\\illegal_transition_smoke.json",
+        "stimulus_len": 3,
+        "content_digest": "7d22ff890061c6d8",
+        "deterministic_ok": true,
+        "deterministic_detail": "",
+        "deterministic_status": "ASSESSED",
+        "valid_count": 0,
+        "valid_before_bound": 0,
+        "bound_exceeded": false,
+        "truncated": false,
+        "invalid_count": 6,
+        "nuisance_ok": true,
+        "nuisance_detail": "predicate executed: fixture has >=2 actions and enumerator exercised permutations; seq presentation vs protected identity verified via forensic/protected separation",
+        "nuisance_status": "ASSESSED",
+        "exclusion_ok": true,
+        "exclusion_detail": "predicate executed: no forbidden mutation_class / wall-clock / model-call found in payloads",
+        "exclusion_status": "ASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "knowledge_reactivation_smoke",
+        "candidate_type": "smoke",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\fixtures\\smoke\\knowledge_reactivation_smoke.json",
+        "stimulus_len": 3,
+        "content_digest": "82317e96424118be",
+        "deterministic_ok": true,
+        "deterministic_detail": "",
+        "deterministic_status": "ASSESSED",
+        "valid_count": 0,
+        "valid_before_bound": 0,
+        "bound_exceeded": false,
+        "truncated": false,
+        "invalid_count": 6,
+        "nuisance_ok": true,
+        "nuisance_detail": "predicate executed: fixture has >=2 actions and enumerator exercised permutations; seq presentation vs protected identity verified via forensic/protected separation",
+        "nuisance_status": "ASSESSED",
+        "exclusion_ok": true,
+        "exclusion_detail": "predicate executed: no forbidden mutation_class / wall-clock / model-call found in payloads",
+        "exclusion_status": "ASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "legal_transition_smoke",
+        "candidate_type": "smoke",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\fixtures\\smoke\\legal_transition_smoke.json",
+        "stimulus_len": 4,
+        "content_digest": "6eb934cb84238b4c",
+        "deterministic_ok": true,
+        "deterministic_detail": "",
+        "deterministic_status": "ASSESSED",
+        "valid_count": 1,
+        "valid_before_bound": 1,
+        "bound_exceeded": false,
+        "truncated": false,
+        "invalid_count": 23,
+        "nuisance_ok": true,
+        "nuisance_detail": "predicate executed: fixture has >=2 actions and enumerator exercised permutations; seq presentation vs protected identity verified via forensic/protected separation",
+        "nuisance_status": "ASSESSED",
+        "exclusion_ok": true,
+        "exclusion_detail": "predicate executed: no forbidden mutation_class / wall-clock / model-call found in payloads",
+        "exclusion_status": "ASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S01",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s01_old_theory_dies_slowly",
+        "stimulus_len": 10,
+        "content_digest": "57f85f13d78be1f5",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S01_WEAK",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s01_variant_weak_contradiction",
+        "stimulus_len": 5,
+        "content_digest": "84088dba78528c12",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S02",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s02_false_revolution",
+        "stimulus_len": 6,
+        "content_digest": "c150d5a5afd8af91",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S03",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s03_patch_maze",
+        "stimulus_len": 11,
+        "content_digest": "1656324937b45784",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S04",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s04_leaf_failure",
+        "stimulus_len": 5,
+        "content_digest": "642ec2d34a09bbc3",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S05",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s05_two_non_dominated_models",
+        "stimulus_len": 7,
+        "content_digest": "3d10429f09a3d19a",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S20",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s20_governor_self_change",
+        "stimulus_len": 10,
+        "content_digest": "1214f32532d17806",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S21",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s21_capability_not_authority",
+        "stimulus_len": 5,
+        "content_digest": "de193d0785179f07",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S22",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s22_operator_truth_boundary",
+        "stimulus_len": 10,
+        "content_digest": "0e3474ef05cca826",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S23",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s23_operator_unavailable",
+        "stimulus_len": 12,
+        "content_digest": "3a3b76f4818d2dfe",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      },
+      {
+        "candidate_id": "S24",
+        "candidate_type": "scenario_pack",
+        "candidate_path": "C:\\Users\\wifik\\Desktop\\larger-lab-stress-suite\\stress-suite\\scenarios\\s24_unknown_governance_event",
+        "stimulus_len": 4,
+        "content_digest": "09327e5c93f5220e",
+        "deterministic_ok": false,
+        "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment \u2014 coverage narrowed to smoke fixtures only",
+        "deterministic_status": "UNASSESSED",
+        "valid_count": 0,
+        "nuisance_ok": false,
+        "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
+        "nuisance_status": "UNASSESSED",
+        "exclusion_ok": false,
+        "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
+        "exclusion_status": "UNASSESSED",
+        "r1_eligible": false
+      }
+    ],
+    "eligible_sorted": [],
+    "chosen": null,
+    "tie_break_distance": "no eligible evaluated smoke fixture (0/3 smoke fixtures have valid_count>=2 with all predicates ASSESSED); scenario packs UNASSESSED in Increment 1 (coverage narrowed to smoke fixtures only); fallthrough to INSUFFICIENT_DATA per contract R1-8",
+    "candidates_considered": 14,
+    "eligible_count": 0
+  },
+  "synthetic_controls": {
+    "diamond": {
+      "claim_ledger_view": {
+        "claim_class": "confluence_check",
+        "code_hash": "059697b43ebebf5f",
+        "evidence_refs": [],
+        "execution_status": "COMPLETED",
+        "falsifier": "any two valid schedules with divergent confluence_protected_digest",
+        "input_hash": "ea1ff6787fc93595",
+        "premise_refs": [
+          "synthetic_diamond_diagnostic"
+        ],
+        "protected_fields": [
+          "terminal_phase",
+          "terminal_lifecycle",
+          "allowed_trace",
+          "evidence_kinds"
+        ],
+        "receipt": {
+          "bound": 24,
+          "bound_exceeded_is_INCONCLUSIVE": false,
+          "checks": {
+            "final_state_equivalence": {
+              "detail": {
+                "count": 2,
+                "digest": "5a69ec57ce6d9a51"
+              },
+              "verdict": "PASS"
+            },
+            "idempotence": {
+              "detail": {
+                "first_trace": [
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "OBSERVED",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "x",
+                    "rule_ids": [],
+                    "seq": 1,
+                    "to": "CANDIDATE"
+                  }
+                ],
+                "second_trace": [
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "OBSERVED",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "x",
+                    "rule_ids": [],
+                    "seq": 1,
+                    "to": "CANDIDATE"
+                  },
+                  {
+                    "allowed": false,
+                    "applied": false,
+                    "event_type": "lifecycle_step",
+                    "from": "CANDIDATE",
+                    "kind": "TOPOLOGY_DENIED",
+                    "machine": "lifecycle",
+                    "rationale": "CANDIDATE -> CANDIDATE absent from lifecycle edge table",
+                    "rule_ids": [],
+                    "seq": 2,
+                    "to": "CANDIDATE"
+                  }
+                ],
+                "terminal_lifecycle_first": {
+                  "@A": "CANDIDATE",
+                  "@B": "OBSERVED"
+                },
+                "terminal_lifecycle_second": {
+                  "@A": "CANDIDATE",
+                  "@B": "OBSERVED"
+                }
+              },
+              "verdict": "PASS"
+            },
+            "local_diamond": {
+              "detail": {
+                "forensic_ab": "57da5033b4607ed8e6d5fa1460079ca5",
+                "forensic_ba": "57da5033b4607ed8e6d5fa1460079ca5",
+                "p_ab": "5a69ec57ce6d9a51",
+                "p_ba": "5a69ec57ce6d9a51"
+              },
+              "verdict": "PASS"
+            },
+            "seeded_negative_control": {
+              "detail": {
+                "counterexample_id": "567ffabfc6b9c621",
+                "seeded_result": "CONFLUENCE_FAILURE as required"
+              },
+              "verdict": "PASS"
+            },
+            "termination": {
+              "detail": {
+                "invalid_excluded": 0,
+                "valid_enumerated": 2
+              },
+              "verdict": "PASS"
+            }
+          },
+          "claim_cap": "DIAGNOSTIC",
+          "claim_status": "VERIFIED",
+          "confluence_protected_digest_per_schedule": [
+            "5a69ec57ce6d9a51",
+            "5a69ec57ce6d9a51"
+          ],
+          "confluence_verdict": "CONFLUENCE_VERIFIED",
+          "contract_hash": "93f09b5a88b2b4d9",
+          "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+          "counterexample": null,
+          "coverage": "2/2/beyond_bound=none",
+          "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+          "dossier_short": "bfb8ca48",
+          "enumerator_hash": "511477b7f935c9cd",
+          "enumerator_snapshot": {
+            "bound_exceeded": false,
+            "invalid_count": 0,
+            "total_permutations": 2,
+            "valid_count_before_bound": 2,
+            "valid_count_enumerated": 2
+          },
+          "execution_status": "COMPLETED",
+          "final_state_equivalence_detail": {
+            "count": 2,
+            "digest": "5a69ec57ce6d9a51"
+          },
+          "final_state_equivalence_verdict": "PASS",
+          "forensic_fingerprint_per_schedule": [
+            "57da5033b4607ed8e6d5fa1460079ca5",
+            "57da5033b4607ed8e6d5fa1460079ca5"
+          ],
+          "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+          "idempotence_detail": {
+            "first_trace": [
+              {
+                "allowed": true,
+                "applied": true,
+                "event_type": "lifecycle_step",
+                "from": "OBSERVED",
+                "kind": "OK",
+                "machine": "lifecycle",
+                "rationale": "x",
+                "rule_ids": [],
+                "seq": 1,
+                "to": "CANDIDATE"
+              }
+            ],
+            "second_trace": [
+              {
+                "allowed": true,
+                "applied": true,
+                "event_type": "lifecycle_step",
+                "from": "OBSERVED",
+                "kind": "OK",
+                "machine": "lifecycle",
+                "rationale": "x",
+                "rule_ids": [],
+                "seq": 1,
+                "to": "CANDIDATE"
+              },
+              {
+                "allowed": false,
+                "applied": false,
+                "event_type": "lifecycle_step",
+                "from": "CANDIDATE",
+                "kind": "TOPOLOGY_DENIED",
+                "machine": "lifecycle",
+                "rationale": "CANDIDATE -> CANDIDATE absent from lifecycle edge table",
+                "rule_ids": [],
+                "seq": 2,
+                "to": "CANDIDATE"
+              }
+            ],
+            "terminal_lifecycle_first": {
+              "@A": "CANDIDATE",
+              "@B": "OBSERVED"
+            },
+            "terminal_lifecycle_second": {
+              "@A": "CANDIDATE",
+              "@B": "OBSERVED"
+            }
+          },
+          "idempotence_verdict": "PASS",
+          "invalid_input_checks": {
+            "assigned_seq_topology_denied_excluded": true,
+            "enumerator_snapshot": {
+              "bound_exceeded": false,
+              "invalid_count": 0,
+              "valid_enumerated": 2
+            },
+            "fixed_seq_detail": "out-of-order seq 1 after 2",
+            "fixed_seq_replay_input_error": true,
+            "topology_detail": {
+              "denied": true,
+              "note": "synthetic OBSERVED->TESTED before CANDIDATE yields TOPOLOGY_DENIED, excluded",
+              "synthetic_probe_lifecycle": {
+                "@K": "CANDIDATE"
+              },
+              "synthetic_probe_result_trace": [
+                {
+                  "allowed": false,
+                  "applied": false,
+                  "event_type": "lifecycle_step",
+                  "from": "OBSERVED",
+                  "kind": "TOPOLOGY_DENIED",
+                  "machine": "lifecycle",
+                  "rationale": "OBSERVED -> TESTED absent from lifecycle edge table",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "TESTED"
+                },
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "OBSERVED",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "x",
+                  "rule_ids": [],
+                  "seq": 2,
+                  "to": "CANDIDATE"
+                }
+              ]
+            }
+          },
+          "local_diamond_detail": {
+            "forensic_ab": "57da5033b4607ed8e6d5fa1460079ca5",
+            "forensic_ba": "57da5033b4607ed8e6d5fa1460079ca5",
+            "p_ab": "5a69ec57ce6d9a51",
+            "p_ba": "5a69ec57ce6d9a51"
+          },
+          "local_diamond_verdict": "PASS",
+          "scenario_or_fixture_id": "synthetic_diamond_diagnostic",
+          "schedule_length": 2,
+          "schedule_seq_hashes": [
+            "6768c643acd4f227",
+            "abb9e4e3377df9e9"
+          ],
+          "scientific_verdict": "CONFLUENCE_VERIFIED",
+          "seeded_counterexample": {
+            "baseline_observables": {
+              "confluence_protected_digest": "1085ec412955ab10",
+              "events": [
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded CHALLENGED",
+                    "to_state": "CHALLENGED"
+                  },
+                  "seq": 1,
+                  "target": "@K"
+                },
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded TESTED",
+                    "to_state": "TESTED"
+                  },
+                  "seq": 2,
+                  "target": "@K"
+                }
+              ],
+              "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 0,
+              "terminal_lifecycle": {
+                "@K": "TESTED"
+              },
+              "terminal_phase": "STABLE"
+            },
+            "case_id": "seeded_failure_control",
+            "classification": "ARCHITECTURE_CONTRADICTION",
+            "counterexample_id": "567ffabfc6b9c621",
+            "expected_relation": "protected equivalence across valid schedules",
+            "observed_relation": "divergent p_protected digest",
+            "perturbed_observables": {
+              "confluence_protected_digest": "58f6644695f0d51b",
+              "events": [
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded TESTED",
+                    "to_state": "TESTED"
+                  },
+                  "seq": 1,
+                  "target": "@K"
+                },
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded CHALLENGED",
+                    "to_state": "CHALLENGED"
+                  },
+                  "seq": 2,
+                  "target": "@K"
+                }
+              ],
+              "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 1,
+              "terminal_lifecycle": {
+                "@K": "CHALLENGED"
+              },
+              "terminal_phase": "STABLE"
+            },
+            "preserved_evidence": {
+              "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+              "enumerator_hash": "0c49cdfd573af081",
+              "initial_state_hash": "3dc9c326ab8902b0",
+              "minimized_trace_hash": "7282779e0c594689",
+              "schedule_seq_hashes": [
+                "281c98932b632887",
+                "856b867ba215c918"
+              ],
+              "valid_schedules_enumerated": 2
+            }
+          },
+          "seeded_negative_control_detail": {
+            "counterexample_id": "567ffabfc6b9c621",
+            "seeded_result": "CONFLUENCE_FAILURE as required"
+          },
+          "seeded_negative_control_verdict": "PASS",
+          "termination_detail": {
+            "invalid_excluded": 0,
+            "valid_enumerated": 2
+          },
+          "termination_verdict": "PASS",
+          "valid_schedules_enumerated": 2,
+          "valid_schedules_total_up_to_bound": 2
+        },
+        "record_id": "db0ab8298acdf36f",
+        "scientific_verdict": "CONFLUENCE_VERIFIED"
+      },
+      "purpose": "positive control: disjoint @A/@B both orders valid must CONFLUENCE_VERIFIED",
+      "spec_digest": "771254860491c68c",
+      "spec_id": "synthetic_diamond_diagnostic",
+      "verdict": {
+        "bound": 24,
+        "bound_exceeded_is_INCONCLUSIVE": false,
+        "checks": {
+          "final_state_equivalence": {
+            "detail": {
+              "count": 2,
+              "digest": "5a69ec57ce6d9a51"
+            },
+            "verdict": "PASS"
+          },
+          "idempotence": {
+            "detail": {
+              "first_trace": [
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "OBSERVED",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "x",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "CANDIDATE"
+                }
+              ],
+              "second_trace": [
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "OBSERVED",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "x",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "CANDIDATE"
+                },
+                {
+                  "allowed": false,
+                  "applied": false,
+                  "event_type": "lifecycle_step",
+                  "from": "CANDIDATE",
+                  "kind": "TOPOLOGY_DENIED",
+                  "machine": "lifecycle",
+                  "rationale": "CANDIDATE -> CANDIDATE absent from lifecycle edge table",
+                  "rule_ids": [],
+                  "seq": 2,
+                  "to": "CANDIDATE"
+                }
+              ],
+              "terminal_lifecycle_first": {
+                "@A": "CANDIDATE",
+                "@B": "OBSERVED"
+              },
+              "terminal_lifecycle_second": {
+                "@A": "CANDIDATE",
+                "@B": "OBSERVED"
+              }
+            },
+            "verdict": "PASS"
+          },
+          "local_diamond": {
+            "detail": {
+              "forensic_ab": "57da5033b4607ed8e6d5fa1460079ca5",
+              "forensic_ba": "57da5033b4607ed8e6d5fa1460079ca5",
+              "p_ab": "5a69ec57ce6d9a51",
+              "p_ba": "5a69ec57ce6d9a51"
+            },
+            "verdict": "PASS"
+          },
+          "seeded_negative_control": {
+            "detail": {
+              "counterexample_id": "567ffabfc6b9c621",
+              "seeded_result": "CONFLUENCE_FAILURE as required"
+            },
+            "verdict": "PASS"
+          },
+          "termination": {
+            "detail": {
+              "invalid_excluded": 0,
+              "valid_enumerated": 2
+            },
+            "verdict": "PASS"
+          }
+        },
+        "claim_cap": "DIAGNOSTIC",
+        "claim_status": "VERIFIED",
+        "confluence_protected_digest_per_schedule": [
+          "5a69ec57ce6d9a51",
+          "5a69ec57ce6d9a51"
+        ],
+        "confluence_verdict": "CONFLUENCE_VERIFIED",
+        "contract_hash": "93f09b5a88b2b4d9",
+        "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+        "counterexample": null,
+        "coverage": "2/2/beyond_bound=none",
+        "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+        "dossier_short": "bfb8ca48",
+        "enumerator_hash": "511477b7f935c9cd",
+        "enumerator_snapshot": {
+          "bound_exceeded": false,
+          "invalid_count": 0,
+          "total_permutations": 2,
+          "valid_count_before_bound": 2,
+          "valid_count_enumerated": 2
+        },
+        "execution_status": "COMPLETED",
+        "final_state_equivalence_detail": {
+          "count": 2,
+          "digest": "5a69ec57ce6d9a51"
+        },
+        "final_state_equivalence_verdict": "PASS",
+        "forensic_fingerprint_per_schedule": [
+          "57da5033b4607ed8e6d5fa1460079ca5",
+          "57da5033b4607ed8e6d5fa1460079ca5"
+        ],
+        "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+        "idempotence_detail": {
+          "first_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "lifecycle_step",
+              "from": "OBSERVED",
+              "kind": "OK",
+              "machine": "lifecycle",
+              "rationale": "x",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "CANDIDATE"
+            }
+          ],
+          "second_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "lifecycle_step",
+              "from": "OBSERVED",
+              "kind": "OK",
+              "machine": "lifecycle",
+              "rationale": "x",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "CANDIDATE"
+            },
+            {
+              "allowed": false,
+              "applied": false,
+              "event_type": "lifecycle_step",
+              "from": "CANDIDATE",
+              "kind": "TOPOLOGY_DENIED",
+              "machine": "lifecycle",
+              "rationale": "CANDIDATE -> CANDIDATE absent from lifecycle edge table",
+              "rule_ids": [],
+              "seq": 2,
+              "to": "CANDIDATE"
+            }
+          ],
+          "terminal_lifecycle_first": {
+            "@A": "CANDIDATE",
+            "@B": "OBSERVED"
+          },
+          "terminal_lifecycle_second": {
+            "@A": "CANDIDATE",
+            "@B": "OBSERVED"
+          }
+        },
+        "idempotence_verdict": "PASS",
+        "invalid_input_checks": {
+          "assigned_seq_topology_denied_excluded": true,
+          "enumerator_snapshot": {
+            "bound_exceeded": false,
+            "invalid_count": 0,
+            "valid_enumerated": 2
+          },
+          "fixed_seq_detail": "out-of-order seq 1 after 2",
+          "fixed_seq_replay_input_error": true,
+          "topology_detail": {
+            "denied": true,
+            "note": "synthetic OBSERVED->TESTED before CANDIDATE yields TOPOLOGY_DENIED, excluded",
+            "synthetic_probe_lifecycle": {
+              "@K": "CANDIDATE"
+            },
+            "synthetic_probe_result_trace": [
+              {
+                "allowed": false,
+                "applied": false,
+                "event_type": "lifecycle_step",
+                "from": "OBSERVED",
+                "kind": "TOPOLOGY_DENIED",
+                "machine": "lifecycle",
+                "rationale": "OBSERVED -> TESTED absent from lifecycle edge table",
+                "rule_ids": [],
+                "seq": 1,
+                "to": "TESTED"
+              },
+              {
+                "allowed": true,
+                "applied": true,
+                "event_type": "lifecycle_step",
+                "from": "OBSERVED",
+                "kind": "OK",
+                "machine": "lifecycle",
+                "rationale": "x",
+                "rule_ids": [],
+                "seq": 2,
+                "to": "CANDIDATE"
+              }
+            ]
+          }
+        },
+        "local_diamond_detail": {
+          "forensic_ab": "57da5033b4607ed8e6d5fa1460079ca5",
+          "forensic_ba": "57da5033b4607ed8e6d5fa1460079ca5",
+          "p_ab": "5a69ec57ce6d9a51",
+          "p_ba": "5a69ec57ce6d9a51"
+        },
+        "local_diamond_verdict": "PASS",
+        "scenario_or_fixture_id": "synthetic_diamond_diagnostic",
+        "schedule_length": 2,
+        "schedule_seq_hashes": [
+          "6768c643acd4f227",
+          "abb9e4e3377df9e9"
+        ],
+        "scientific_verdict": "CONFLUENCE_VERIFIED",
+        "seeded_counterexample": {
+          "baseline_observables": {
+            "confluence_protected_digest": "1085ec412955ab10",
+            "events": [
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded CHALLENGED",
+                  "to_state": "CHALLENGED"
+                },
+                "seq": 1,
+                "target": "@K"
+              },
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded TESTED",
+                  "to_state": "TESTED"
+                },
+                "seq": 2,
+                "target": "@K"
+              }
+            ],
+            "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 0,
+            "terminal_lifecycle": {
+              "@K": "TESTED"
+            },
+            "terminal_phase": "STABLE"
+          },
+          "case_id": "seeded_failure_control",
+          "classification": "ARCHITECTURE_CONTRADICTION",
+          "counterexample_id": "567ffabfc6b9c621",
+          "expected_relation": "protected equivalence across valid schedules",
+          "observed_relation": "divergent p_protected digest",
+          "perturbed_observables": {
+            "confluence_protected_digest": "58f6644695f0d51b",
+            "events": [
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded TESTED",
+                  "to_state": "TESTED"
+                },
+                "seq": 1,
+                "target": "@K"
+              },
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded CHALLENGED",
+                  "to_state": "CHALLENGED"
+                },
+                "seq": 2,
+                "target": "@K"
+              }
+            ],
+            "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 1,
+            "terminal_lifecycle": {
+              "@K": "CHALLENGED"
+            },
+            "terminal_phase": "STABLE"
+          },
+          "preserved_evidence": {
+            "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+            "enumerator_hash": "0c49cdfd573af081",
+            "initial_state_hash": "3dc9c326ab8902b0",
+            "minimized_trace_hash": "7282779e0c594689",
+            "schedule_seq_hashes": [
+              "281c98932b632887",
+              "856b867ba215c918"
+            ],
+            "valid_schedules_enumerated": 2
+          }
+        },
+        "seeded_negative_control_detail": {
+          "counterexample_id": "567ffabfc6b9c621",
+          "seeded_result": "CONFLUENCE_FAILURE as required"
+        },
+        "seeded_negative_control_verdict": "PASS",
+        "termination_detail": {
+          "invalid_excluded": 0,
+          "valid_enumerated": 2
+        },
+        "termination_verdict": "PASS",
+        "valid_schedules_enumerated": 2,
+        "valid_schedules_total_up_to_bound": 2
+      }
+    },
+    "seeded_failure": {
+      "claim_ledger_view": {
+        "claim_class": "confluence_check",
+        "code_hash": "5b954a1b2287951f",
+        "evidence_refs": [],
+        "execution_status": "COMPLETED",
+        "falsifier": "any two valid schedules with divergent confluence_protected_digest",
+        "input_hash": "5cc56637e017fe33",
+        "premise_refs": [
+          "seeded_failure_control"
+        ],
+        "protected_fields": [
+          "terminal_phase",
+          "terminal_lifecycle",
+          "allowed_trace",
+          "evidence_kinds"
+        ],
+        "receipt": {
+          "bound": 24,
+          "bound_exceeded_is_INCONCLUSIVE": false,
+          "checks": {
+            "final_state_equivalence": {
+              "detail": {
+                "digests": [
+                  "1085ec412955ab10",
+                  "58f6644695f0d51b"
+                ],
+                "divergent_pair": [
+                  0,
+                  1
+                ],
+                "reason": "protected digests diverge \u2014 CONFLUENCE_FAILURE"
+              },
+              "verdict": "FAIL"
+            },
+            "idempotence": {
+              "detail": {
+                "first_trace": [
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "CANDIDATE",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded CHALLENGED",
+                    "rule_ids": [],
+                    "seq": 1,
+                    "to": "CHALLENGED"
+                  }
+                ],
+                "second_trace": [
+                  {
+                    "allowed": true,
+                    "applied": true,
+                    "event_type": "lifecycle_step",
+                    "from": "CANDIDATE",
+                    "kind": "OK",
+                    "machine": "lifecycle",
+                    "rationale": "seeded CHALLENGED",
+                    "rule_ids": [],
+                    "seq": 1,
+                    "to": "CHALLENGED"
+                  },
+                  {
+                    "allowed": false,
+                    "applied": false,
+                    "event_type": "lifecycle_step",
+                    "from": "CHALLENGED",
+                    "kind": "TOPOLOGY_DENIED",
+                    "machine": "lifecycle",
+                    "rationale": "CHALLENGED -> CHALLENGED absent from lifecycle edge table",
+                    "rule_ids": [],
+                    "seq": 2,
+                    "to": "CHALLENGED"
+                  }
+                ],
+                "terminal_lifecycle_first": {
+                  "@K": "CHALLENGED"
+                },
+                "terminal_lifecycle_second": {
+                  "@K": "CHALLENGED"
+                }
+              },
+              "verdict": "PASS"
+            },
+            "local_diamond": {
+              "detail": {
+                "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+              },
+              "verdict": "INCONCLUSIVE"
+            },
+            "seeded_negative_control": {
+              "detail": {
+                "counterexample_id": "567ffabfc6b9c621",
+                "seeded_result": "CONFLUENCE_FAILURE as required"
+              },
+              "verdict": "PASS"
+            },
+            "termination": {
+              "detail": {
+                "invalid_excluded": 0,
+                "valid_enumerated": 2
+              },
+              "verdict": "PASS"
+            }
+          },
+          "claim_cap": "DIAGNOSTIC",
+          "claim_status": "CONFLUENCE_FAILURE",
+          "confluence_protected_digest_per_schedule": [
+            "1085ec412955ab10",
+            "58f6644695f0d51b"
+          ],
+          "confluence_verdict": "CONFLUENCE_FAILURE",
+          "contract_hash": "93f09b5a88b2b4d9",
+          "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+          "counterexample": {
+            "baseline_observables": {
+              "confluence_protected_digest": "1085ec412955ab10",
+              "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 0,
+              "terminal_lifecycle": {
+                "@K": "TESTED"
+              }
+            },
+            "case_id": "seeded_failure_control",
+            "classification": "ARCHITECTURE_CONTRADICTION",
+            "counterexample_id": "283276e9351e72cb",
+            "expected_relation": "protected equivalence across valid schedules",
+            "observed_relation": "divergent p_protected digest",
+            "perturbed_observables": {
+              "confluence_protected_digest": "58f6644695f0d51b",
+              "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 1,
+              "terminal_lifecycle": {
+                "@K": "CHALLENGED"
+              }
+            },
+            "preserved_evidence": {
+              "divergent_schedules_pair_hash": "8de4e0f8ce403cde",
+              "enumerator_hash": "0c49cdfd573af081",
+              "initial_state_hash": "4db7e3fb5e0722b7",
+              "minimized_trace_hash": "cabe7edf966b6346",
+              "valid_schedules_enumerated": 2
+            }
+          },
+          "counterexample_record": {
+            "baseline_observables": {
+              "confluence_protected_digest": "1085ec412955ab10",
+              "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 0,
+              "terminal_lifecycle": {
+                "@K": "TESTED"
+              }
+            },
+            "case_id": "seeded_failure_control",
+            "classification": "ARCHITECTURE_CONTRADICTION",
+            "counterexample_id": "283276e9351e72cb",
+            "expected_relation": "protected equivalence across valid schedules",
+            "observed_relation": "divergent p_protected digest",
+            "perturbed_observables": {
+              "confluence_protected_digest": "58f6644695f0d51b",
+              "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 1,
+              "terminal_lifecycle": {
+                "@K": "CHALLENGED"
+              }
+            },
+            "preserved_evidence": {
+              "divergent_schedules_pair_hash": "8de4e0f8ce403cde",
+              "enumerator_hash": "0c49cdfd573af081",
+              "initial_state_hash": "4db7e3fb5e0722b7",
+              "minimized_trace_hash": "cabe7edf966b6346",
+              "valid_schedules_enumerated": 2
+            }
+          },
+          "coverage": "2/2/beyond_bound=none",
+          "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+          "dossier_short": "bfb8ca48",
+          "enumerator_hash": "0c49cdfd573af081",
+          "enumerator_snapshot": {
+            "bound_exceeded": false,
+            "invalid_count": 0,
+            "total_permutations": 2,
+            "valid_count_before_bound": 2,
+            "valid_count_enumerated": 2
+          },
+          "execution_status": "COMPLETED",
+          "final_state_equivalence_detail": {
+            "digests": [
+              "1085ec412955ab10",
+              "58f6644695f0d51b"
+            ],
+            "divergent_pair": [
+              0,
+              1
+            ],
+            "reason": "protected digests diverge \u2014 CONFLUENCE_FAILURE"
+          },
+          "final_state_equivalence_verdict": "FAIL",
+          "forensic_fingerprint_per_schedule": [
+            "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "dd90d5713917758f8264506e8a68e8d5"
+          ],
+          "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+          "idempotence_detail": {
+            "first_trace": [
+              {
+                "allowed": true,
+                "applied": true,
+                "event_type": "lifecycle_step",
+                "from": "CANDIDATE",
+                "kind": "OK",
+                "machine": "lifecycle",
+                "rationale": "seeded CHALLENGED",
+                "rule_ids": [],
+                "seq": 1,
+                "to": "CHALLENGED"
+              }
+            ],
+            "second_trace": [
+              {
+                "allowed": true,
+                "applied": true,
+                "event_type": "lifecycle_step",
+                "from": "CANDIDATE",
+                "kind": "OK",
+                "machine": "lifecycle",
+                "rationale": "seeded CHALLENGED",
+                "rule_ids": [],
+                "seq": 1,
+                "to": "CHALLENGED"
+              },
+              {
+                "allowed": false,
+                "applied": false,
+                "event_type": "lifecycle_step",
+                "from": "CHALLENGED",
+                "kind": "TOPOLOGY_DENIED",
+                "machine": "lifecycle",
+                "rationale": "CHALLENGED -> CHALLENGED absent from lifecycle edge table",
+                "rule_ids": [],
+                "seq": 2,
+                "to": "CHALLENGED"
+              }
+            ],
+            "terminal_lifecycle_first": {
+              "@K": "CHALLENGED"
+            },
+            "terminal_lifecycle_second": {
+              "@K": "CHALLENGED"
+            }
+          },
+          "idempotence_verdict": "PASS",
+          "invalid_input_checks": {
+            "assigned_seq_topology_denied_excluded": true,
+            "enumerator_snapshot": {
+              "bound_exceeded": false,
+              "invalid_count": 0,
+              "valid_enumerated": 2
+            },
+            "fixed_seq_detail": "out-of-order seq 1 after 2",
+            "fixed_seq_replay_input_error": true,
+            "topology_detail": {
+              "denied": true,
+              "note": "synthetic OBSERVED->TESTED before CANDIDATE yields TOPOLOGY_DENIED, excluded",
+              "synthetic_probe_lifecycle": {
+                "@K": "CANDIDATE"
+              },
+              "synthetic_probe_result_trace": [
+                {
+                  "allowed": false,
+                  "applied": false,
+                  "event_type": "lifecycle_step",
+                  "from": "OBSERVED",
+                  "kind": "TOPOLOGY_DENIED",
+                  "machine": "lifecycle",
+                  "rationale": "OBSERVED -> TESTED absent from lifecycle edge table",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "TESTED"
+                },
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "OBSERVED",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "x",
+                  "rule_ids": [],
+                  "seq": 2,
+                  "to": "CANDIDATE"
+                }
+              ]
+            }
+          },
+          "local_diamond_detail": {
+            "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+          },
+          "local_diamond_verdict": "INCONCLUSIVE",
+          "scenario_or_fixture_id": "seeded_failure_control",
+          "schedule_length": 2,
+          "schedule_seq_hashes": [
+            "281c98932b632887",
+            "856b867ba215c918"
+          ],
+          "scientific_verdict": "CONFLUENCE_FAILURE",
+          "seeded_counterexample": {
+            "baseline_observables": {
+              "confluence_protected_digest": "1085ec412955ab10",
+              "events": [
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded CHALLENGED",
+                    "to_state": "CHALLENGED"
+                  },
+                  "seq": 1,
+                  "target": "@K"
+                },
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded TESTED",
+                    "to_state": "TESTED"
+                  },
+                  "seq": 2,
+                  "target": "@K"
+                }
+              ],
+              "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 0,
+              "terminal_lifecycle": {
+                "@K": "TESTED"
+              },
+              "terminal_phase": "STABLE"
+            },
+            "case_id": "seeded_failure_control",
+            "classification": "ARCHITECTURE_CONTRADICTION",
+            "counterexample_id": "567ffabfc6b9c621",
+            "expected_relation": "protected equivalence across valid schedules",
+            "observed_relation": "divergent p_protected digest",
+            "perturbed_observables": {
+              "confluence_protected_digest": "58f6644695f0d51b",
+              "events": [
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded TESTED",
+                    "to_state": "TESTED"
+                  },
+                  "seq": 1,
+                  "target": "@K"
+                },
+                {
+                  "payload": {
+                    "authority_basis": "seeded",
+                    "authority_level": "PO",
+                    "reason": "seeded CHALLENGED",
+                    "to_state": "CHALLENGED"
+                  },
+                  "seq": 2,
+                  "target": "@K"
+                }
+              ],
+              "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+              "schedule": [
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                  ""
+                ],
+                [
+                  "lifecycle",
+                  "PO",
+                  "@K",
+                  "lifecycle_step",
+                  "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                  ""
+                ]
+              ],
+              "schedule_index": 1,
+              "terminal_lifecycle": {
+                "@K": "CHALLENGED"
+              },
+              "terminal_phase": "STABLE"
+            },
+            "preserved_evidence": {
+              "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+              "enumerator_hash": "0c49cdfd573af081",
+              "initial_state_hash": "3dc9c326ab8902b0",
+              "minimized_trace_hash": "7282779e0c594689",
+              "schedule_seq_hashes": [
+                "281c98932b632887",
+                "856b867ba215c918"
+              ],
+              "valid_schedules_enumerated": 2
+            }
+          },
+          "seeded_negative_control_detail": {
+            "counterexample_id": "567ffabfc6b9c621",
+            "seeded_result": "CONFLUENCE_FAILURE as required"
+          },
+          "seeded_negative_control_verdict": "PASS",
+          "termination_detail": {
+            "invalid_excluded": 0,
+            "valid_enumerated": 2
+          },
+          "termination_verdict": "PASS",
+          "valid_schedules_enumerated": 2,
+          "valid_schedules_total_up_to_bound": 2
+        },
+        "record_id": "18935f55b4724a35",
+        "scientific_verdict": "CONFLUENCE_FAILURE"
+      },
+      "purpose": "negative control: same @K CANDIDATE->CHALLENGED vs TESTED both valid but divergent terminals must CONFLUENCE_FAILURE",
+      "spec_digest": "ce7de9dbdb9ba222",
+      "spec_id": "seeded_failure_control",
+      "verdict": {
+        "bound": 24,
+        "bound_exceeded_is_INCONCLUSIVE": false,
+        "checks": {
+          "final_state_equivalence": {
+            "detail": {
+              "digests": [
+                "1085ec412955ab10",
+                "58f6644695f0d51b"
+              ],
+              "divergent_pair": [
+                0,
+                1
+              ],
+              "reason": "protected digests diverge \u2014 CONFLUENCE_FAILURE"
+            },
+            "verdict": "FAIL"
+          },
+          "idempotence": {
+            "detail": {
+              "first_trace": [
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "CANDIDATE",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "seeded CHALLENGED",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "CHALLENGED"
+                }
+              ],
+              "second_trace": [
+                {
+                  "allowed": true,
+                  "applied": true,
+                  "event_type": "lifecycle_step",
+                  "from": "CANDIDATE",
+                  "kind": "OK",
+                  "machine": "lifecycle",
+                  "rationale": "seeded CHALLENGED",
+                  "rule_ids": [],
+                  "seq": 1,
+                  "to": "CHALLENGED"
+                },
+                {
+                  "allowed": false,
+                  "applied": false,
+                  "event_type": "lifecycle_step",
+                  "from": "CHALLENGED",
+                  "kind": "TOPOLOGY_DENIED",
+                  "machine": "lifecycle",
+                  "rationale": "CHALLENGED -> CHALLENGED absent from lifecycle edge table",
+                  "rule_ids": [],
+                  "seq": 2,
+                  "to": "CHALLENGED"
+                }
+              ],
+              "terminal_lifecycle_first": {
+                "@K": "CHALLENGED"
+              },
+              "terminal_lifecycle_second": {
+                "@K": "CHALLENGED"
+              }
+            },
+            "verdict": "PASS"
+          },
+          "local_diamond": {
+            "detail": {
+              "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+            },
+            "verdict": "INCONCLUSIVE"
+          },
+          "seeded_negative_control": {
+            "detail": {
+              "counterexample_id": "567ffabfc6b9c621",
+              "seeded_result": "CONFLUENCE_FAILURE as required"
+            },
+            "verdict": "PASS"
+          },
+          "termination": {
+            "detail": {
+              "invalid_excluded": 0,
+              "valid_enumerated": 2
+            },
+            "verdict": "PASS"
+          }
+        },
+        "claim_cap": "DIAGNOSTIC",
+        "claim_status": "CONFLUENCE_FAILURE",
+        "confluence_protected_digest_per_schedule": [
+          "1085ec412955ab10",
+          "58f6644695f0d51b"
+        ],
+        "confluence_verdict": "CONFLUENCE_FAILURE",
+        "contract_hash": "93f09b5a88b2b4d9",
+        "contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+        "counterexample": {
+          "baseline_observables": {
+            "confluence_protected_digest": "1085ec412955ab10",
+            "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 0,
+            "terminal_lifecycle": {
+              "@K": "TESTED"
+            }
+          },
+          "case_id": "seeded_failure_control",
+          "classification": "ARCHITECTURE_CONTRADICTION",
+          "counterexample_id": "283276e9351e72cb",
+          "expected_relation": "protected equivalence across valid schedules",
+          "observed_relation": "divergent p_protected digest",
+          "perturbed_observables": {
+            "confluence_protected_digest": "58f6644695f0d51b",
+            "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 1,
+            "terminal_lifecycle": {
+              "@K": "CHALLENGED"
+            }
+          },
+          "preserved_evidence": {
+            "divergent_schedules_pair_hash": "8de4e0f8ce403cde",
+            "enumerator_hash": "0c49cdfd573af081",
+            "initial_state_hash": "4db7e3fb5e0722b7",
+            "minimized_trace_hash": "cabe7edf966b6346",
+            "valid_schedules_enumerated": 2
+          }
+        },
+        "counterexample_record": {
+          "baseline_observables": {
+            "confluence_protected_digest": "1085ec412955ab10",
+            "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 0,
+            "terminal_lifecycle": {
+              "@K": "TESTED"
+            }
+          },
+          "case_id": "seeded_failure_control",
+          "classification": "ARCHITECTURE_CONTRADICTION",
+          "counterexample_id": "283276e9351e72cb",
+          "expected_relation": "protected equivalence across valid schedules",
+          "observed_relation": "divergent p_protected digest",
+          "perturbed_observables": {
+            "confluence_protected_digest": "58f6644695f0d51b",
+            "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 1,
+            "terminal_lifecycle": {
+              "@K": "CHALLENGED"
+            }
+          },
+          "preserved_evidence": {
+            "divergent_schedules_pair_hash": "8de4e0f8ce403cde",
+            "enumerator_hash": "0c49cdfd573af081",
+            "initial_state_hash": "4db7e3fb5e0722b7",
+            "minimized_trace_hash": "cabe7edf966b6346",
+            "valid_schedules_enumerated": 2
+          }
+        },
+        "coverage": "2/2/beyond_bound=none",
+        "dossier_id": "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b",
+        "dossier_short": "bfb8ca48",
+        "enumerator_hash": "0c49cdfd573af081",
+        "enumerator_snapshot": {
+          "bound_exceeded": false,
+          "invalid_count": 0,
+          "total_permutations": 2,
+          "valid_count_before_bound": 2,
+          "valid_count_enumerated": 2
+        },
+        "execution_status": "COMPLETED",
+        "final_state_equivalence_detail": {
+          "digests": [
+            "1085ec412955ab10",
+            "58f6644695f0d51b"
+          ],
+          "divergent_pair": [
+            0,
+            1
+          ],
+          "reason": "protected digests diverge \u2014 CONFLUENCE_FAILURE"
+        },
+        "final_state_equivalence_verdict": "FAIL",
+        "forensic_fingerprint_per_schedule": [
+          "e3f113be79ad4c5723e9c7c3ec492d9d",
+          "dd90d5713917758f8264506e8a68e8d5"
+        ],
+        "frozen_dependency": "92a99d5448e417473a5d00c24a3fe75cabca30a7",
+        "idempotence_detail": {
+          "first_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "lifecycle_step",
+              "from": "CANDIDATE",
+              "kind": "OK",
+              "machine": "lifecycle",
+              "rationale": "seeded CHALLENGED",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "CHALLENGED"
+            }
+          ],
+          "second_trace": [
+            {
+              "allowed": true,
+              "applied": true,
+              "event_type": "lifecycle_step",
+              "from": "CANDIDATE",
+              "kind": "OK",
+              "machine": "lifecycle",
+              "rationale": "seeded CHALLENGED",
+              "rule_ids": [],
+              "seq": 1,
+              "to": "CHALLENGED"
+            },
+            {
+              "allowed": false,
+              "applied": false,
+              "event_type": "lifecycle_step",
+              "from": "CHALLENGED",
+              "kind": "TOPOLOGY_DENIED",
+              "machine": "lifecycle",
+              "rationale": "CHALLENGED -> CHALLENGED absent from lifecycle edge table",
+              "rule_ids": [],
+              "seq": 2,
+              "to": "CHALLENGED"
+            }
+          ],
+          "terminal_lifecycle_first": {
+            "@K": "CHALLENGED"
+          },
+          "terminal_lifecycle_second": {
+            "@K": "CHALLENGED"
+          }
+        },
+        "idempotence_verdict": "PASS",
+        "invalid_input_checks": {
+          "assigned_seq_topology_denied_excluded": true,
+          "enumerator_snapshot": {
+            "bound_exceeded": false,
+            "invalid_count": 0,
+            "valid_enumerated": 2
+          },
+          "fixed_seq_detail": "out-of-order seq 1 after 2",
+          "fixed_seq_replay_input_error": true,
+          "topology_detail": {
+            "denied": true,
+            "note": "synthetic OBSERVED->TESTED before CANDIDATE yields TOPOLOGY_DENIED, excluded",
+            "synthetic_probe_lifecycle": {
+              "@K": "CANDIDATE"
+            },
+            "synthetic_probe_result_trace": [
+              {
+                "allowed": false,
+                "applied": false,
+                "event_type": "lifecycle_step",
+                "from": "OBSERVED",
+                "kind": "TOPOLOGY_DENIED",
+                "machine": "lifecycle",
+                "rationale": "OBSERVED -> TESTED absent from lifecycle edge table",
+                "rule_ids": [],
+                "seq": 1,
+                "to": "TESTED"
+              },
+              {
+                "allowed": true,
+                "applied": true,
+                "event_type": "lifecycle_step",
+                "from": "OBSERVED",
+                "kind": "OK",
+                "machine": "lifecycle",
+                "rationale": "x",
+                "rule_ids": [],
+                "seq": 2,
+                "to": "CANDIDATE"
+              }
+            ]
+          }
+        },
+        "local_diamond_detail": {
+          "reason": "no independent pair: actions share single target, declared INCONCLUSIVE not PASS/FAIL"
+        },
+        "local_diamond_verdict": "INCONCLUSIVE",
+        "scenario_or_fixture_id": "seeded_failure_control",
+        "schedule_length": 2,
+        "schedule_seq_hashes": [
+          "281c98932b632887",
+          "856b867ba215c918"
+        ],
+        "scientific_verdict": "CONFLUENCE_FAILURE",
+        "seeded_counterexample": {
+          "baseline_observables": {
+            "confluence_protected_digest": "1085ec412955ab10",
+            "events": [
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded CHALLENGED",
+                  "to_state": "CHALLENGED"
+                },
+                "seq": 1,
+                "target": "@K"
+              },
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded TESTED",
+                  "to_state": "TESTED"
+                },
+                "seq": 2,
+                "target": "@K"
+              }
+            ],
+            "forensic_fingerprint": "e3f113be79ad4c5723e9c7c3ec492d9d",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 0,
+            "terminal_lifecycle": {
+              "@K": "TESTED"
+            },
+            "terminal_phase": "STABLE"
+          },
+          "case_id": "seeded_failure_control",
+          "classification": "ARCHITECTURE_CONTRADICTION",
+          "counterexample_id": "567ffabfc6b9c621",
+          "expected_relation": "protected equivalence across valid schedules",
+          "observed_relation": "divergent p_protected digest",
+          "perturbed_observables": {
+            "confluence_protected_digest": "58f6644695f0d51b",
+            "events": [
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded TESTED",
+                  "to_state": "TESTED"
+                },
+                "seq": 1,
+                "target": "@K"
+              },
+              {
+                "payload": {
+                  "authority_basis": "seeded",
+                  "authority_level": "PO",
+                  "reason": "seeded CHALLENGED",
+                  "to_state": "CHALLENGED"
+                },
+                "seq": 2,
+                "target": "@K"
+              }
+            ],
+            "forensic_fingerprint": "dd90d5713917758f8264506e8a68e8d5",
+            "schedule": [
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded TESTED\",\"to_state\":\"TESTED\"}",
+                ""
+              ],
+              [
+                "lifecycle",
+                "PO",
+                "@K",
+                "lifecycle_step",
+                "{\"authority_basis\":\"seeded\",\"authority_level\":\"PO\",\"reason\":\"seeded CHALLENGED\",\"to_state\":\"CHALLENGED\"}",
+                ""
+              ]
+            ],
+            "schedule_index": 1,
+            "terminal_lifecycle": {
+              "@K": "CHALLENGED"
+            },
+            "terminal_phase": "STABLE"
+          },
+          "preserved_evidence": {
+            "divergent_schedules_pair_hash": "b438bcb3b730ed55",
+            "enumerator_hash": "0c49cdfd573af081",
+            "initial_state_hash": "3dc9c326ab8902b0",
+            "minimized_trace_hash": "7282779e0c594689",
+            "schedule_seq_hashes": [
+              "281c98932b632887",
+              "856b867ba215c918"
+            ],
+            "valid_schedules_enumerated": 2
+          }
+        },
+        "seeded_negative_control_detail": {
+          "counterexample_id": "567ffabfc6b9c621",
+          "seeded_result": "CONFLUENCE_FAILURE as required"
+        },
+        "seeded_negative_control_verdict": "PASS",
+        "termination_detail": {
+          "invalid_excluded": 0,
+          "valid_enumerated": 2
+        },
+        "termination_verdict": "PASS",
+        "valid_schedules_enumerated": 2,
+        "valid_schedules_total_up_to_bound": 2
+      }
+    }
+  },
+  "supersedes": {
+    "prior_receipt": "OPHIT3_CONFLUENCE_RECEIPT_v0.1.json at e2b06cdf/57b3b09b (contract v0.1 det 93f09b5a88b2b4d9, tested_sha 2cf1bb4b961, artifact 8ceade/275a691, 1050 collected)",
+    "reason": "evidence-only reconciliation + code repair at 19b6077f (R1 predicates assessed/unassessed, enumeration truncated vs bound, projection unavailable) bound to contract v0.2 (det b70a03f39e2ad818); historical package intact, diagnostic rebinding"
+  },
+  "binding": {
+    "live_engine_contract_hash": "93f09b5a88b2b4d9",
+    "live_engine_contract_id": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1",
+    "live_engine_note": "engine/confluence.py _CONTRACT_REL still points to v0.1.md at this tree (code not mutated in this evidence-only phase); _compute_contract_hash() returns 93f09b5a88b2b4d9 live. This will be updated to v0.2 at next code touch.",
+    "controlling_specification": "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2 at docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2.md",
+    "controlling_spec_deterministic_hash": "b70a03f39e2ad818",
+    "controlling_spec_raw_sha16": "b2233bc3e33aeb52",
+    "historical_contract_v01_deterministic_hash": "93f09b5a88b2b4d9",
+    "note": "Inner check verdicts (checks.*, primary_workflow.verdict, synthetic_controls) embed the contract_hash active at measurement. Top-level contract/dependency_digest are the live binding; controlling_specification is the versioned amendment reviewers must read; both are reconciled at next engine mutation."
+  }
+}

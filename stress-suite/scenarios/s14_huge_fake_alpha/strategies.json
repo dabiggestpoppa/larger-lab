@@ -1,0 +1,59 @@
+[
+  {
+    "candidate_id": "CAND_FAKE_ALPHA",
+    "family": "MOMENTUM_ORPHAN",
+    "specification_ref": "SPEC:001",
+    "performance": {
+      "sharpe": 6.8,
+      "cumulative_return": 58.0,
+      "max_drawdown": 0.015,
+      "win_rate": 0.9,
+      "sample_years": 2.0
+    },
+    "features": [
+      {
+        "feature_id": "FEAT_MOM",
+        "observation_time": 100,
+        "availability_time": 100,
+        "decision_time": 200,
+        "pct": 60
+      },
+      {
+        "feature_id": "FEAT_FUTURE_PRICE",
+        "observation_time": 300,
+        "availability_time": 380,
+        "decision_time": 320,
+        "pct": 40
+      }
+    ],
+    "fills": [
+      {
+        "fill_id": "FILL_1",
+        "signal_time": 500,
+        "fill_time": 480,
+        "spread_state": "NORMAL",
+        "depth_available": 100,
+        "size": 50,
+        "slippage_bps": 0.0,
+        "low_liquidity": false
+      },
+      {
+        "fill_id": "FILL_2",
+        "signal_time": 600,
+        "fill_time": 601,
+        "spread_state": "WIDE",
+        "depth_available": 5,
+        "size": 200,
+        "slippage_bps": 0.0,
+        "low_liquidity": true
+      }
+    ],
+    "data_lineage": "synthetic:binance-style-5m fixture (no real broker data)",
+    "dataset_ref": "DS_S14_FIXTURE",
+    "parameter_count": 3,
+    "sample_count": 1200,
+    "holdout_ref": "HOLDOUT_S14",
+    "walk_forward_ref": "WF_S14",
+    "cost_model_ref": "COST_S14"
+  }
+]

@@ -1,0 +1,31 @@
+cloud-plan: PLAN (deterministic, NON-mutating, no provider contact)
+# OCE Cloud Deployment Plan (A-003) — falls closed
+
+mode: --mode (read-only; zero provider contact; zero external mutation)
+runtime_target: cloud-plan
+cloud_activation_state: DEFERRED_BY_OPERATOR
+
+## Contract summary
+- local_ground_state:     BUILDING
+- cloud_plan_state:       VALIDATED_NO_APPLY
+- cloud_activation_state: DEFERRED_BY_OPERATOR
+- cloud_deployment_state: NOT_DEPLOYED
+- cloud_cost_state:       ZERO
+- operator_hold_reason:   CLOUD_PURCHASE_DEFERRED
+
+## Future activation profile (deferred; never auto-applied)
+- approved future target provider: netcup
+- approved future target product:  RS 4000 G12
+- provider values are adapter-only: True
+
+## Apply prerequisites (missing any one => DENIED)
+ - AUTHORIZED_STAGE
+ - CLOUD_AUTHORIZATION_ENVELOPE
+ - CLOUD_PROVIDER + CLOUD_PROVIDER_IDENTITY
+ - CLOUD_COST_APPROVED_USD
+ - PUBLIC_EXPOSURE_APPROVED
+
+## This plan performed NO mutations
+ - provider contacts: 0
+ - resources changed: 0
+ - cost incurred: ZERO

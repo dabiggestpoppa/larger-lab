@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/stress-suite/knowledge-record.json",
+  "title": "OCE Stress Suite KnowledgeRecord (M4)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_id", "schema_version", "claim", "state"],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string"},
+    "claim": {"type": "string"},
+    "provenance": {"type": ["object", "null"]},
+    "creation_source": {"type": "string"},
+    "state": {"enum": ["OBSERVED","CANDIDATE","TESTED","PROMOTED","ACTIVE","CHALLENGED","REVALIDATED","DEMOTED","DORMANT","REACTIVATED","SUPERSEDED"]},
+    "lifecycle_status": {"type": "string"},
+    "supersession_lineage": {"type": "array", "items": {"type": "string"}},
+    "transitions": {"type": "array", "items": {"type": "object"}}
+  }
+}

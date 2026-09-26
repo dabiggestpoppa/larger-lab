@@ -1,0 +1,9 @@
+{
+  "seq": 1,
+  "window": "W1",
+  "authority_seed": {
+    "GOVERNOR": "GOVERNOR",
+    "OPERATOR_1": "OPERATOR"
+  },
+  "note": "current evaluation window; contract frozen below by stimulus"
+}

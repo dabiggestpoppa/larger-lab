@@ -1,0 +1,14 @@
+{
+  "phases": [
+    {"phase": "CONTRACT_FROZEN"},
+    {"phase": "MUTATION_REFUSED"},
+    {"phase": "NESTED_MUTATION_IMPOSSIBLE"},
+    {"phase": "NESTED_MUTATION_IMPOSSIBLE"},
+    {"phase": "WINDOW_EVALUATION"},
+    {"phase": "STALE_FINGERPRINT_REFUSED"},
+    {"phase": "RETROACTIVE_CHANGE_REFUSED"},
+    {"phase": "FUTURE_VERSION_CANDIDATE"},
+    {"phase": "ACTIVATION_REFUSED"},
+    {"phase": "WINDOW_EVALUATION"}
+  ]
+}

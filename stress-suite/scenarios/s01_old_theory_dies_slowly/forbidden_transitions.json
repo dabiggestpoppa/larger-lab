@@ -1,0 +1,9 @@
+{
+  "forbidden": [
+    {"from": "STABLE", "to": "NEW_STABLE", "rule": "must pass review/evidence path before a new stable epoch"},
+    {"from": "WATCH", "to": "ARCHITECTURE_MUTATION", "rule": "watch cannot mutate architecture"},
+    {"from": "TRANSFORMATION_WINDOW", "to": "CAPITAL", "rule": "window grants no capital authority"},
+    {"from": "DORMANT", "to": "ACTIVE", "rule": "reactivation requires review"},
+    {"from": "RECONSOLIDATION", "to": "TRANSFORMATION_WINDOW", "rule": "no loop back into the window without new evidence"}
+  ]
+}

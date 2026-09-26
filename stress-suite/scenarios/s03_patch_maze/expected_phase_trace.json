@@ -1,0 +1,6 @@
+{
+  "expected_phase_path": ["STABLE", "WATCH", "ESCALATION_REVIEW", "HOMEOSTATIC_REPAIR", "STABLE", "WATCH", "ESCALATION_REVIEW", "HOMEOSTATIC_REPAIR", "STABLE", "WATCH", "ESCALATION_REVIEW", "TRANSFORMATION_CANDIDATE"],
+  "expected_terminal_knowledge": {},
+  "terminal_states": ["TRANSFORMATION_CANDIDATE"],
+  "contrast_claim": "S03 (repeated shared signature) escalates scope; S04 (single leaf fault) stays local. Raw patch count never triggers escalation; unrelated signatures never aggregate."
+}

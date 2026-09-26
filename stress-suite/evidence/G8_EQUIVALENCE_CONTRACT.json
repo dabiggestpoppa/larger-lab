@@ -1,0 +1,1643 @@
+{
+  "contract_id": "G8-EQUIVALENCE-CONTRACT-001",
+  "version": "1.2.0",
+  "gate": "G8_CROSS_SCENARIO_CONTRADICTION_AUDIT",
+  "status": "CONTRACT_OF_RECORD_FOR_THE_REPAIRED_G8 (see contract_chronology)",
+  "non_exercising_tokens": [
+    "UNKNOWN",
+    "NOT_EXERCISED",
+    "NOT_APPLICABLE"
+  ],
+  "pre_repair_red_register": {
+    "note": "STRESS-G8R0. The exact adverse surface or identifier that was RED against the pre-repair head, recorded here so each regression reads its input from declared state instead of restating it. The raw command/output transcript that proved each one red is committed at stress-suite/evidence/G8_PRE_REPAIR_RED_TRANSCRIPT.md and is regenerable by scenarios/g8_pre_repair_red_transcript.py against the pre-repair commit below.",
+    "pre_repair_head": "6c015f86408a56721f8999e4aa39b218fab0fd4d",
+    "red_transcript": "stress-suite/evidence/G8_PRE_REPAIR_RED_TRANSCRIPT.md",
+    "red_transcript_regenerator": "stress-suite/scenarios/g8_pre_repair_red_transcript.py",
+    "red_before_repair": {
+      "R-G8-01_mandated_coverage": "mandated_pair_coverage claimed 20/20 observed with 5 NOT_COMPARABLE comparison results, and decide_gate returned PASS_G8_CROSS_SCENARIO_COHERENCE with those pairs counted as covered",
+      "R-G8-02_p5_adverse_surface": {
+        "profit": 10,
+        "items": [
+          {
+            "disposition": "VALIDATED"
+          }
+        ]
+      },
+      "R-G8-02_observed": "p5 returned True through the `... or True` tautology",
+      "R-G8-02_post_repair_expected": "UNKNOWN_NOT_FAVORABLE — the surface cannot demonstrate that profit left the validation state intact, so it must not read as HOLDS; it is not VIOLATED either, because it cites no concrete candidate reference",
+      "R-G8-02_p5_identified_surface": {
+        "profit": 10,
+        "items": [
+          {
+            "candidate_id": "CAND_FORGED",
+            "disposition": "VALIDATED"
+          }
+        ]
+      },
+      "R-G8-02_p5_identified_expected": "VIOLATED — a validated profit-bearing claim that exposes no gate surface at all",
+      "R-G8-03_provenance_adverse_surface": {
+        "evidence_provenance": "UNKNOWN",
+        "evidence_lineage": "UNKNOWN"
+      },
+      "R-G8-03_observed": "the provenance check returned True from key-name presence alone",
+      "R-G8-04_scenario_identifier": "S13",
+      "R-G8-04_observed": "the runtime-neutrality check returned True both for S13 and for S99_NO_SUCH_SCENARIO",
+      "R-G8-05_observed": "P1 held on refusal presence alone, P8 returned a literal True, P9 recognised the AVAILABLE/UNAVAILABLE token without a paired comparison",
+      "R-G8-06_observed": "P6 derived from the count conditions instead of the resulting disposition",
+      "R-G8-07_scalar_self_report": [1, 973, 9999],
+      "R-G8-07_observed": "emit(measured_full: int) built collected=passed=the scalar with failed=0 and consumed no artifact",
+      "R-G8-08_observed": "the LF blob (354913 bytes, af5941c3...) and the CRLF working tree (366841 bytes, 72ba79d7...) both bound the same S16 source to different digests, and the fixture, live comparison and receipt all used the raw working-tree digest",
+      "R-G8-08_raw_digests": {
+        "lf_bytes": 354913,
+        "lf_sha256": "af5941c35232a36f3b35c47b815d53377bd067a1fed7b1008a1ac5cace3ed4eb",
+        "crlf_bytes": 366841,
+        "crlf_sha256": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233"
+      },
+      "R-G8-09_chronology": {
+        "commits_touching_this_contract": ["f5482e3e"],
+        "v1_0_0_bytes": "NOT RECOVERABLE from any object",
+        "retracted_claim": "that the v1.0.0 text was 'preserved verbatim' and 'frozen before any comparison ran'",
+        "disposition": "RETRACTED_AS_UNSUPPORTED; replaced by the explicit PRE-RUN FROZEN / POST-FINDING AMENDMENT / RETROSPECTIVE RECONSTRUCTION record in contract_chronology"
+      }
+    }
+  },
+  "closure_required_properties": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6",
+    "P7",
+    "P8",
+    "P9",
+    "P10",
+    "P11",
+    "P12"
+  ],
+  "closure_required_properties_note": "A property listed here is MANDATORY for the G8 closure verdict. It may only contribute HOLDS when its observation carries the derivation evidence its declared derivation_kind requires. Declaring no violation is NOT proving the property: a closure-required property that is never exercised with a real derivation blocks the gate as BLOCKED_G8_MISSING_EVIDENCE rather than passing by absence of a violation.",
+  "contract_chronology": {
+    "classification": "RETROSPECTIVE_RECONSTRUCTION",
+    "classification_note": "STRESS-G8R4 (R-G8-09). The overall classification is the WEAKEST stage recorded below, not the most convenient one. The first G8 run's contract text is NOT recoverable as a pre-run artifact, and that fact makes the whole chronology record weaker than the repaired R3 policy taken alone. The R3 policy of record IS a genuine pre-run frozen artifact relative to the R3 evidence commit, and it is named as such below — that is what the gate's blocking status is derived from.",
+    "git_evidence": "`git log --all -- stress-suite/evidence/G8_EQUIVALENCE_CONTRACT.json` returns exactly one commit, f5482e3e (STRESS-G8P0), and that commit's blob already carries version 1.1.0 WITH the R1/R2 revisions. Git therefore does NOT establish that the v1.0.0 verdict rules were frozen before the first comparison ran. The earlier wording 'preserved verbatim' / 'frozen before any comparison ran' was NOT supportable and has been removed rather than softened.",
+    "gate_blocking_policy_source": "G8-EQUIVALENCE-CONTRACT v1.2.0 (revision R3) — committed by STRESS-G8R1, i.e. a PRE-RUN FROZEN ARTIFACT relative to the STRESS-G8RR evidence commit that archives the repaired result. The gate's blocking status is therefore derived from a policy that predates the repaired run, NOT from any rule authored after seeing the repaired outcome.",
+    "artifacts": [
+      {
+        "artifact_id": "G8-EQUIVALENCE-CONTRACT v1.0.0 (superseded)",
+        "stage": "RETROSPECTIVE_RECONSTRUCTION",
+        "introducing_commit_ref": null,
+        "claims_pre_run_freeze": false,
+        "reconstruction_basis": "the pre-revision audit state preserved in G8_COUNTEREXAMPLE_REGISTER.json as PRE_REVISION_STATE, plus the R1/R2 revision entries below; the original bytes are in no object reachable from this repository",
+        "note": "the earlier claim that these bytes were 'preserved verbatim' and 'frozen before any comparison ran' is retracted here as unsupported"
+      },
+      {
+        "artifact_id": "G8-EQUIVALENCE-CONTRACT v1.1.0 @ f5482e3e (STRESS-G8P0)",
+        "stage": "POST_FINDING_AMENDMENT",
+        "introducing_commit_ref": "f5482e3e (STRESS-G8P0)",
+        "claims_pre_run_freeze": false,
+        "amendment_revision_refs": ["R1", "R2"],
+        "note": "carries revisions motivated by the first run's own findings, so it is a post-finding amendment and not evidence of a pre-run freeze"
+      },
+      {
+        "artifact_id": "G8-EQUIVALENCE-CONTRACT v1.2.0 (revision R3)",
+        "stage": "PRE_RUN_FROZEN_ARTIFACT",
+        "introducing_commit_ref": "STRESS-G8R1 (the repaired audit-contract commit)",
+        "claims_pre_run_freeze": true,
+        "pre_run_baseline_ref": "STRESS-G8RR (the evidence commit that archives the repaired G8 result)",
+        "note": "the only artifact relative to which a freeze is actually provable"
+      }
+    ],
+    "forward_rule": "future gates must commit the pre-run contract BEFORE executing the audit; this gate records the chronology defect instead of rewriting it away"
+  },
+  "revisions": [
+    {
+      "revision": "R3",
+      "authored_at": "STRESS-G8R1..STRESS-G8R4",
+      "motivated_by": "adversarial repair review of the first G8 PASS (findings R-G8-01 through R-G8-09). The first pass overclaimed: five mandatory cross-machine relationships were counted as covered while returning NOT_COMPARABLE, several guarded properties returned HOLDS from a key-name search, a substring search, a scenario identifier, an unconditional literal or a `... or True` tautology, test counts were self-reported scalars, the CEREBUS source binding differed between LF and CRLF checkouts, and the freeze chronology was asserted rather than provable.",
+      "changes": [
+        "mandatory coverage now counts only SUBSTANTIVE verdicts (CONSISTENT / MATERIAL_DISCRIMINATOR); NOT_COMPARABLE, missing and never-adjudicated relationships are UNCOVERED and block the gate (R-G8-01)",
+        "added the cross-machine CONCEPTUAL projection family (F2, state machine M-CONCEPT) with per-machine adapters projecting observable traces into a shared, genuinely shared conceptual vocabulary; the previous machine-local F2 is retained as diagnostic family F9 and no longer carries mandated pairs (R-G8-01)",
+        "every guarded-property observation must now carry value + derivation_kind + evidence_refs + before_state + after_state + decision_surface + reason; a HOLDS record lacking that shape is a hard failure (R-G8-02..R-G8-06)",
+        "P5 no longer ends in a tautology: a validated profit-bearing claim with a materially failed or absent gate surface is a VIOLATION (R-G8-02)",
+        "P7 requires a CONCRETE retained provenance reference, not a key name or the literal 'UNKNOWN' (R-G8-03)",
+        "P11 requires a real paired baseline/runtime-replacement execution with two fingerprints (R-G8-04)",
+        "P1/P8/P9 compare canonical before/after state instead of accepting a refusal, a literal True or a recognised token (R-G8-05)",
+        "P6 inspects the ACTUAL resulting disposition, so a count-driven transformation is a VIOLATION (R-G8-06)",
+        "the test baseline is a provenance-bearing JUnit artifact (command, digest, suite identity, tested tree, exit status), not a self-reported scalar (R-G8-07)",
+        "the source binding hashes a declared canonical representation and additionally records the raw working-tree digest, so the binding no longer depends on core.autocrlf (R-G8-08)",
+        "the freeze chronology is corrected to POST-FINDING AMENDMENT with an explicit PRE-RUN / POST-FINDING / RETROSPECTIVE classification (R-G8-09)"
+      ],
+      "not_a_goalpost_move_because": "every change makes the audit STRICTER. No verdict rule, token vocabulary, order invariant, permissiveness rank or scenario expectation was relaxed; the only coverage number that moves is mandatory adjudication, which moves from 20/20 claimed to the honestly adjudicated count. The pre-revision NOT_COMPARABLE outcomes and the pre-revision audit state are preserved in G8_COUNTEREXAMPLE_REGISTER.json."
+    },
+    {
+      "revision": "R1",
+      "authored_at": "STRESS-G8C1",
+      "motivated_by": "recorded G8 gap entries (NOT observed institutional behaviour): F4 G4:S10 vs G4:S11 and F5 G5:S14 vs G5:S16 both produced UNDISCRIMINATED DIVERGENCE because a declared outcome-relevant field was DERIVED AS A CONSTANT (or not derived at all) even though the run surface exposes it. A gap created by the audit's own derivation is an audit defect, not an institutional contradiction, and widening the derivation is recorded here rather than being hidden.",
+      "changes": [
+        "added equivalence field 'reopen_target_class' (F4): the kind of reopen target a memory record carries, which the architecture names as outcome-relevant (Book §17 blocker resolution; G4 policy mem.reopen.*)",
+        "added discriminator D-REOPEN-TARGET (JUSTIFIES_DIVERGENCE) for that field",
+        "declared a DERIVATION-COMPLETENESS requirement: every field listed in a family's verified_fields must be derived from the run surface, not fixed to a constant; a constant derivation is a defect to be recorded",
+        "fixed F5 claim_scope_class derivation to read the pack's declared claim_type instead of a constant"
+      ],
+      "not_a_goalpost_move_because": "the additions are declared BEFORE the post-revision run, name the exact pre-revision gap entries they answer, and the pre-revision counterexamples are preserved verbatim in G8_COUNTEREXAMPLE_REGISTER.json; no verdict rule, vocabulary, order invariant or permissiveness rank was relaxed, and no scenario expectation changed"
+    },
+    {
+      "revision": "R2",
+      "authored_at": "STRESS-G8C1",
+      "motivated_by": "recorded gate-claim findings: a mechanical rule inferred a 'declared tested surface' from a receipt key that declares a TERMINAL-HEAD-of-record semantic, which produced a false claim defect; and a gate finding was recorded where a LATER closure artifact already corrected the same claim under the G6-TC12 'do not rewrite the historical receipt' instruction.",
+      "changes": [
+        "split the tested-surface key vocabulary from the terminal-head-of-record key vocabulary; the self-certification rule now applies only to a DECLARED tested surface",
+        "added an explicit supersession resolution: a finding whose claim is corrected by a later-archived artifact (declared correction keys naming the historical receipt) is recorded as SUPERSEDED_BY_LATER_ARTIFACT, still visible, not silently dropped",
+        "added prefix resolution for an unresolvable full-length SHA so an abbreviated referent named by the same receipt can be resolved and cross-checked against the receipt's own declared commit subject",
+        "added blocks_gate_policy: which findings block the gate, declared rather than implied"
+      ]
+    }
+  ],
+  "authored_by": "stress-suite implementation agent",
+  "governing_documents": [
+    "OCE_INSTITUTIONAL_STRESS_SUITE_BOOK_v1.0.md",
+    "OCE_STRESS_SUITE_SCENARIO_CATALOG_v1.0.md",
+    "OCE_STRESS_SUITE_EXECUTION_GATES_v1.0.md",
+    "LARGER_LAB_INSTITUTIONAL_ARCHITECTURE_v1.1.md",
+    "OCE_ARCHITECTURE_AMENDMENT_A004..A010",
+    "stress-suite/planning/G0_ARCHITECTURE_INGESTION.md",
+    "stress-suite/planning/G0_ADVERSARIAL_REVIEW.md"
+  ],
+  "freeze_note": "CHRONOLOGY (corrected in revision R3, finding R-G8-09): this artifact is a POST-FINDING AMENDMENT, not a pre-run frozen artifact, and the claim below is now scoped to what is PROVABLE. The Git history of this file contains exactly one commit (STRESS-G8P0, f5482e3e), and that blob already carries version 1.1.0 together with the R1/R2 revisions that were motivated by the first run's own findings, so Git cannot show that these verdict rules predate the first comparison; the v1.0.0 bytes are not recoverable from any object in this repository and are recorded as a RETROSPECTIVE_RECONSTRUCTION. Relative to the REPAIRED R3 audit this contract's commit does precede the evidence commit that archives the R3 result, so for R3 it is a genuine PRE-RUN FROZEN ARTIFACT. It declares the equivalence vector, the normalization rules, the comparison families, the discriminator rules, the outcome-class vocabulary and the classification vocabulary. No verdict rule below depends on which scenario produced a token; verdict logic is a pure function of the declared fields. The later planning package (A-012 / MF-A002 / OPH / Cadence / continuation extension) is deliberately NOT an input to this contract and cannot define an expected G8 outcome.",
+  "state_machines": [
+    "M5_PHASE",
+    "M4_KNOWLEDGE",
+    "M1_CAPABILITY",
+    "AUTHORITY",
+    "EVIDENCE",
+    "M-CONCEPT"
+  ],
+  "equivalence_fields": [
+    {
+      "field": "object_class",
+      "kind": "IDENTITY",
+      "order": "UNORDERED",
+      "tokens": [
+        "INSTITUTIONAL_PHASE",
+        "KNOWLEDGE_OBJECT",
+        "CAPABILITY",
+        "AUTHORITY_ACTION",
+        "EVIDENCE_CLAIM",
+        "DOMAIN_CLAIM",
+        "EPOCH",
+        "UNKNOWN"
+      ],
+      "note": "what kind of thing the outcome is about"
+    },
+    {
+      "field": "state_machine",
+      "kind": "IDENTITY",
+      "order": "UNORDERED",
+      "tokens": [
+        "M5_PHASE",
+        "M4_KNOWLEDGE",
+        "M1_CAPABILITY",
+        "AUTHORITY",
+        "EVIDENCE",
+        "M-CONCEPT",
+        "UNKNOWN"
+      ],
+      "note": "which machine asserted the outcome; comparisons never cross machines"
+    },
+    {
+      "field": "domain",
+      "kind": "IDENTITY",
+      "order": "UNORDERED",
+      "tokens": [
+        "GENERIC",
+        "CRYPTO",
+        "QUANT",
+        "FX",
+        "CEREBUS",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "claim_scope_class",
+      "kind": "IDENTITY",
+      "order": "UNORDERED",
+      "tokens": [
+        "SINGLE_CLAIM",
+        "BOUNDED_SCOPE",
+        "INSTITUTIONAL_SCOPE",
+        "ARCHITECTURE_SCOPE",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "evidence_quality",
+      "kind": "OUTCOME_RELEVANT",
+      "order": [
+        "WEAK",
+        "MIXED",
+        "STRONG"
+      ],
+      "tokens": [
+        "WEAK",
+        "MIXED",
+        "STRONG",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "evidence_provenance",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "GOVERNED_REGISTRY",
+        "AUTHORITATIVE_SYNTHETIC_FIXTURE",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "evidence_subject_binding",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "BOUND",
+        "UNBOUND",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "evidence_scope_binding",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "BOUND",
+        "UNBOUND",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "evidence_lineage",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "SINGLE",
+        "MULTIPLE",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "independence",
+      "kind": "OUTCOME_RELEVANT",
+      "order": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "tokens": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "persistence",
+      "kind": "OUTCOME_RELEVANT",
+      "order": [
+        "ONE_SHOT",
+        "REPEATED",
+        "CHRONIC"
+      ],
+      "tokens": [
+        "ONE_SHOT",
+        "REPEATED",
+        "CHRONIC",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "dependency_centrality",
+      "kind": "OUTCOME_RELEVANT",
+      "order": [
+        "LEAF",
+        "MID",
+        "CORE"
+      ],
+      "tokens": [
+        "LEAF",
+        "MID",
+        "CORE",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "reversibility",
+      "kind": "OUTCOME_RELEVANT",
+      "order": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
+      "tokens": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "consequence_class",
+      "kind": "OUTCOME_RELEVANT",
+      "order": [
+        "READ_ONLY",
+        "REVERSIBLE",
+        "HOMEOSTATIC_REPAIR",
+        "IRREVERSIBLE"
+      ],
+      "tokens": [
+        "READ_ONLY",
+        "REVERSIBLE",
+        "HOMEOSTATIC_REPAIR",
+        "IRREVERSIBLE",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "environment_shift",
+      "kind": "OUTCOME_RELEVANT",
+      "order": [
+        "NONE",
+        "PLAUSIBLE",
+        "CONFIRMED"
+      ],
+      "tokens": [
+        "NONE",
+        "PLAUSIBLE",
+        "CONFIRMED",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "authority_pre_state",
+      "kind": "OUTCOME_RELEVANT",
+      "order": [
+        "NONE",
+        "OBSERVER",
+        "WORKER",
+        "PO",
+        "GOVERNOR",
+        "OPERATOR"
+      ],
+      "tokens": [
+        "NONE",
+        "OBSERVER",
+        "WORKER",
+        "PO",
+        "GOVERNOR",
+        "OPERATOR",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "grant_mandate_state",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "NONE",
+        "ACTIVE",
+        "EXPIRED",
+        "REVOKED",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "operator_availability",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "AVAILABLE",
+        "UNAVAILABLE",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "evaluation_contract_state",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "FROZEN",
+        "UNFROZEN",
+        "ABSENT",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "runtime_relevance",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "RUNTIME_NEUTRAL",
+        "RUNTIME_BOUND",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "data_quality_state",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "CLEAN",
+        "CONTAMINATED",
+        "INSUFFICIENT",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "effect_verification",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "VERIFIED",
+        "UNVERIFIED",
+        "UNKNOWN"
+      ]
+    },
+    {
+      "field": "reopen_target_class",
+      "kind": "OUTCOME_RELEVANT",
+      "order": "UNORDERED",
+      "tokens": [
+        "NONE",
+        "DORMANT_RECORD",
+        "REJECTED_CLAIM_BLOCKED",
+        "REJECTED_CLAIM_UNBLOCKED",
+        "UNKNOWN"
+      ],
+      "note": "added by revision R1: what a reopen condition is attached to — a dormant positive record, or a rejected claim whose blocker must be resolved. Book §17 names blocker resolution as an outcome-relevant G4 dimension; the G4 policy's mem.reopen.* rules bind to it."
+    },
+    {
+      "field": "conceptual_unresolved_representable",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "COLLAPSED",
+        "NOT_EXERCISED",
+        "UNKNOWN"
+      ],
+      "note": "projection of a machine-local trace onto the shared concept 'an unresolved or ambiguous fact remains representable'. NOT_EXERCISED means this run surface did not exercise the concept; it never means the concept holds."
+    },
+    {
+      "field": "conceptual_plural_not_collapsed",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "COLLAPSED",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ],
+      "note": "projection onto 'a non-dominated plurality is not collapsed into a single winner'"
+    },
+    {
+      "field": "conceptual_authority_not_empirical",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "VIOLATED",
+        "NOT_EXERCISED",
+        "UNKNOWN"
+      ],
+      "note": "projection onto 'an authority action does not change the empirical evidence state'"
+    },
+    {
+      "field": "conceptual_provenance_attached",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "ABSENT",
+        "NOT_EXERCISED",
+        "UNKNOWN"
+      ],
+      "note": "projection onto 'the observation retains a concrete reference to its origin'"
+    },
+    {
+      "field": "conceptual_preference_not_empirical",
+      "kind": "CONCEPTUAL",
+      "order": "UNORDERED",
+      "tokens": [
+        "PRESERVED",
+        "VIOLATED",
+        "NOT_EXERCISED",
+        "UNKNOWN"
+      ],
+      "note": "projection onto 'operator preference cannot rewrite the empirical evidence state'"
+    }
+  ],
+  "normalization_rules": [
+    {
+      "rule_id": "N1",
+      "rule": "IDENTITY_FIELDS_EXACT",
+      "detail": "field kind IDENTITY must match exactly; no similarity, prose or label inference"
+    },
+    {
+      "rule_id": "N2",
+      "rule": "UNKNOWN_NEVER_FAVORABLE",
+      "detail": "UNKNOWN is a distinct token; it is never normalized to a favorable value and never collapses into another token"
+    },
+    {
+      "rule_id": "N3",
+      "rule": "NO_PROSE_OR_LABEL_EQUIVALENCE",
+      "detail": "equivalence is never inferred from similar prose, matching scenario labels, agent counts, confidence, profit, phase names or shared vocabulary"
+    },
+    {
+      "rule_id": "N4",
+      "rule": "NO_SCALAR_SUMMARY_EQUIVALENCE",
+      "detail": "equivalence is never derived from one scalar summary of a vector or of the outcome"
+    },
+    {
+      "rule_id": "N5",
+      "rule": "UNORDERED_FIELDS_ARE_SET_EQUALITY",
+      "detail": "for UNORDERED fields only token equality is meaningful; no ordering may be presumed"
+    },
+    {
+      "rule_id": "N6",
+      "rule": "ORDERED_FIELDS_USE_DECLARED_ORDER_ONLY",
+      "detail": "strictness comparisons use only the declared `order` list for that field; no other ranking may be assumed"
+    },
+    {
+      "rule_id": "N7",
+      "rule": "UNMAPPED_TOKEN_FAILS_CLOSED",
+      "detail": "an outcome token absent from outcome_class_map is an INSUFFICIENT_EVIDENCE gap and is never assigned a nearest class"
+    },
+    {
+      "rule_id": "N8",
+      "rule": "NO_CROSS_MACHINE_COMPARISON",
+      "detail": "observations whose state_machine differs are NOT_COMPARABLE; terminal strings from different machines are never treated as equivalent vocabulary"
+    }
+  ],
+  "outcome_classes_note": "revision R1 removed a duplicated DOMAIN_VALIDATION_REFUSED entry and validate_contract now fails closed on duplicates in this list. Revision R3 added exactly four classes, all of them for the cross-machine CONCEPTUAL family (state machine M-CONCEPT): CONCEPTUAL_COHERENCE_RETAINED, CONCEPTUAL_PARTIAL_COVERAGE, CONCEPTUAL_INVARIANT_VIOLATED, CONCEPTUAL_UNDER_EXERCISED. No pre-existing class was removed or redefined.",
+  "outcome_classes": [
+    "STABLE_PRESERVED",
+    "WATCH_OBSERVED",
+    "REPAIR_LOCAL",
+    "PLURAL_RETAINED",
+    "TRANSFORMATION_ADMITTED",
+    "NEW_STABLE_ESTABLISHED",
+    "NO_CHANGE_PRESERVED",
+    "UNRESOLVED_HELD",
+    "OPERATOR_HOLD",
+    "DATA_BLOCKED",
+    "AUTHORITY_REFUSED",
+    "CORRELATED_SUPPORT_ONLY",
+    "INDEPENDENT_SUPPORT",
+    "INDEPENDENT_REVIEW_REQUIRED",
+    "NEGATIVE_KNOWLEDGE_RETAINED",
+    "REOPEN_ADMITTED",
+    "BOUNDED_CONTEXT_RETAINED",
+    "EPOCH_RECONSTRUCTED",
+    "DOMAIN_VALIDATION_REFUSED",
+    "DOMAIN_TRANSFER_REFUSED",
+    "DOMAIN_ONTOLOGY_CANDIDATE",
+    "DOMAIN_CONTRADICTION_OPEN",
+    "DOMAIN_SOURCE_LAYER_CHALLENGE",
+    "DOMAIN_DATA_BLOCKED",
+    "AUTHORITY_HELD_FUTURE_ISOLATED",
+    "CAPABILITY_ONLY_UPDATED",
+    "ACTION_AUTHORIZED_BY_OPERATOR",
+    "CONCEPTUAL_COHERENCE_RETAINED",
+    "CONCEPTUAL_PARTIAL_COVERAGE",
+    "CONCEPTUAL_INVARIANT_VIOLATED",
+    "CONCEPTUAL_UNDER_EXERCISED"
+  ],
+  "outcome_token_map": [
+    {
+      "token": "STABLE",
+      "outcome_class": "STABLE_PRESERVED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "WATCH",
+      "outcome_class": "WATCH_OBSERVED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "HOMEOSTATIC_REPAIR",
+      "outcome_class": "REPAIR_LOCAL",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "PLURAL_MODEL_STATE",
+      "outcome_class": "PLURAL_RETAINED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "TRANSFORMATION_CANDIDATE",
+      "outcome_class": "TRANSFORMATION_ADMITTED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "TRANSFORMATION_WINDOW",
+      "outcome_class": "TRANSFORMATION_ADMITTED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "NEW_STABLE",
+      "outcome_class": "NEW_STABLE_ESTABLISHED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "NO_CHANGE",
+      "outcome_class": "NO_CHANGE_PRESERVED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "UNRESOLVED",
+      "outcome_class": "UNRESOLVED_HELD",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "OPERATOR_HOLD",
+      "outcome_class": "OPERATOR_HOLD",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "DATA_BLOCKED",
+      "outcome_class": "DATA_BLOCKED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "AUTHORITY_BLOCKED",
+      "outcome_class": "AUTHORITY_REFUSED",
+      "machine": "M5_PHASE"
+    },
+    {
+      "token": "SUPPORTED_BUT_CORRELATED",
+      "outcome_class": "CORRELATED_SUPPORT_ONLY",
+      "machine": "EVIDENCE"
+    },
+    {
+      "token": "INDEPENDENTLY_SUPPORTED",
+      "outcome_class": "INDEPENDENT_SUPPORT",
+      "machine": "EVIDENCE"
+    },
+    {
+      "token": "REQUIRES_INDEPENDENT_REVIEW",
+      "outcome_class": "INDEPENDENT_REVIEW_REQUIRED",
+      "machine": "EVIDENCE"
+    },
+    {
+      "token": "REOPEN_CANDIDATE",
+      "outcome_class": "REOPEN_ADMITTED",
+      "machine": "M4_KNOWLEDGE"
+    },
+    {
+      "token": "NO_REOPEN",
+      "outcome_class": "NEGATIVE_KNOWLEDGE_RETAINED",
+      "machine": "M4_KNOWLEDGE"
+    },
+    {
+      "token": "CONTINUE_SUPPRESSION",
+      "outcome_class": "NEGATIVE_KNOWLEDGE_RETAINED",
+      "machine": "M4_KNOWLEDGE"
+    },
+    {
+      "token": "BOUNDED_CONTEXT",
+      "outcome_class": "BOUNDED_CONTEXT_RETAINED",
+      "machine": "M4_KNOWLEDGE"
+    },
+    {
+      "token": "RECONSTRUCTED",
+      "outcome_class": "EPOCH_RECONSTRUCTED",
+      "machine": "M4_KNOWLEDGE"
+    },
+    {
+      "token": "STOP_SUPPRESSION",
+      "outcome_class": "NEGATIVE_KNOWLEDGE_RETAINED",
+      "machine": "M4_KNOWLEDGE"
+    },
+    {
+      "token": "REJECTED_NEGATIVE_KNOWLEDGE",
+      "outcome_class": "DOMAIN_VALIDATION_REFUSED",
+      "machine": "DOMAIN_MACHINE"
+    },
+    {
+      "token": "ONTOLOGY_EXPLORATION_CANDIDATE",
+      "outcome_class": "DOMAIN_ONTOLOGY_CANDIDATE",
+      "machine": "DOMAIN_MACHINE"
+    },
+    {
+      "token": "CONTRADICTION_OPEN",
+      "outcome_class": "DOMAIN_CONTRADICTION_OPEN",
+      "machine": "DOMAIN_MACHINE"
+    },
+    {
+      "token": "NORMALIZATION_MISMATCH",
+      "outcome_class": "DOMAIN_SOURCE_LAYER_CHALLENGE",
+      "machine": "DOMAIN_MACHINE"
+    },
+    {
+      "token": "DATA_BLOCKED",
+      "outcome_class": "DOMAIN_DATA_BLOCKED",
+      "machine": "DOMAIN_MACHINE"
+    },
+    {
+      "token": "WINDOW_EVALUATION",
+      "outcome_class": "AUTHORITY_HELD_FUTURE_ISOLATED",
+      "machine": "AUTHORITY"
+    },
+    {
+      "token": "CAPABILITY_UPDATED",
+      "outcome_class": "CAPABILITY_ONLY_UPDATED",
+      "machine": "AUTHORITY"
+    },
+    {
+      "token": "DIRECTIVE_AUTHORIZED",
+      "outcome_class": "ACTION_AUTHORIZED_BY_OPERATOR",
+      "machine": "AUTHORITY"
+    },
+    {
+      "token": "OPERATOR_HOLD",
+      "outcome_class": "OPERATOR_HOLD",
+      "machine": "AUTHORITY"
+    },
+    {
+      "token": "UNRESOLVED_GOVERNANCE_EVENT",
+      "outcome_class": "UNRESOLVED_HELD",
+      "machine": "AUTHORITY"
+    },
+    {
+      "token": "CONCEPTUAL_COHERENT",
+      "outcome_class": "CONCEPTUAL_COHERENCE_RETAINED",
+      "machine": "M-CONCEPT"
+    },
+    {
+      "token": "CONCEPTUAL_PARTIAL_COVERAGE",
+      "outcome_class": "CONCEPTUAL_PARTIAL_COVERAGE",
+      "machine": "M-CONCEPT"
+    },
+    {
+      "token": "CONCEPTUAL_VIOLATION",
+      "outcome_class": "CONCEPTUAL_INVARIANT_VIOLATED",
+      "machine": "M-CONCEPT"
+    },
+    {
+      "token": "CONCEPTUAL_UNDER_EXERCISED",
+      "outcome_class": "CONCEPTUAL_UNDER_EXERCISED",
+      "machine": "M-CONCEPT"
+    }
+  ],
+  "outcome_token_map_note": "Token vocabulary authored AFTER enumerating the family runners' observable outcome tokens, so that no run token silently falls outside the map. Rule N7 still fails closed for any token not listed here. WHICH scenario produces WHICH token is not an input to any verdict rule; only the token->class map is an input.",
+  "guarded_properties": [
+    {
+      "property_id": "P1",
+      "name": "no_authority_escalation",
+      "statement": "no run result may show an actor's authority increasing through capability, evidence strength, profit, consensus, novelty or operator preference",
+      "governing_contract": "Constitution Art. X; A-010 §9.9, §10; Book §1 rules 7/12; S20/S21/S22"
+    },
+    {
+      "property_id": "P2",
+      "name": "evidence_status_not_fabricated_by_authority",
+      "statement": "an authority action never changes an empirical evidence grade or status",
+      "governing_contract": "Constitution Art. I/§9; A-010 §10; S22"
+    },
+    {
+      "property_id": "P3",
+      "name": "no_forced_classification",
+      "statement": "an unclassifiable or unresolved fact remains representable without being forced into a known channel or category",
+      "governing_contract": "A-010 §20/§21; A010-RT T24; S24"
+    },
+    {
+      "property_id": "P4",
+      "name": "no_plural_collapse",
+      "statement": "a non-dominated plural state is not collapsed into a single winner",
+      "governing_contract": "A-010 §16; Book §11; S05"
+    },
+    {
+      "property_id": "P5",
+      "name": "profit_or_novelty_never_reduces_validation",
+      "statement": "profit, novelty or candidate volume never weakens a validation requirement",
+      "governing_contract": "A-008 §5/§11; A-010 §4.1/§4.7/§18; S14/S15/T2/T21"
+    },
+    {
+      "property_id": "P6",
+      "name": "count_never_creates_transformation",
+      "statement": "raw counts (anomalies, agents, reviewers, novelty) never by themselves produce transformation candidacy",
+      "governing_contract": "A-010 §4.3/§4.4; A010-RT T3/T4; S02/S06/S09"
+    },
+    {
+      "property_id": "P7",
+      "name": "provenance_preserved",
+      "statement": "no outcome deletes or detaches provenance, lineage or archival retention",
+      "governing_contract": "A-009 §9/§11; Book §1 rule 8; S10/S12"
+    },
+    {
+      "property_id": "P8",
+      "name": "capability_not_authority",
+      "statement": "a capability or confidence change does not change the authority map",
+      "governing_contract": "Constitution Art. X; A-007 §2.3; S21"
+    },
+    {
+      "property_id": "P9",
+      "name": "operator_availability_not_empirical",
+      "statement": "operator availability changes what may execute, never the empirical evidence state",
+      "governing_contract": "A-010 §8/§14; Book §29; S23; G7-OA-01"
+    },
+    {
+      "property_id": "P10",
+      "name": "unobserved_not_clean",
+      "statement": "absent observation never reads as a clean/verified result",
+      "governing_contract": "A-009 §10; Book §24; S18; G7 F5"
+    },
+    {
+      "property_id": "P11",
+      "name": "runtime_identity_not_semantic",
+      "statement": "runtime/agent identity changes do not change substantive constitutional behavior",
+      "governing_contract": "A-007 §1-§4; A-010 §14; S13; G7 M1/M2/M8/M9/M17"
+    },
+    {
+      "property_id": "P12",
+      "name": "no_permanent_incumbent_immunity",
+      "statement": "dependency centrality raises review rigor and never grants permanent immunity to a strong persistent independent contradiction",
+      "governing_contract": "A-010 §4.5; A010-RT T1; S01; G7-CE-02"
+    }
+  ],
+  "comparison_families": [
+    {
+      "family_id": "F1",
+      "family_class": "PHASE_STRUCTURE",
+      "state_machine": "M5_PHASE",
+      "object_class": "INSTITUTIONAL_PHASE",
+      "question": "does equivalent phase evidence produce consistent escalation / repair / transformation routing?",
+      "members": [
+        "G2:S01",
+        "G2:S01_WEAK",
+        "G2:S02",
+        "G2:S03",
+        "G2:S04",
+        "G2:S05"
+      ],
+      "declared_pairs": [
+        [
+          "G2:S01",
+          "G2:S02"
+        ],
+        [
+          "G2:S03",
+          "G2:S04"
+        ],
+        [
+          "G2:S01",
+          "G2:S01_WEAK"
+        ],
+        [
+          "G2:S02",
+          "G2:S04"
+        ]
+      ],
+      "default_classification": "ARCHITECTURE_CONTRADICTION",
+      "verified_fields": [
+        "evidence_quality",
+        "dependency_centrality",
+        "persistence",
+        "evidence_lineage",
+        "evidence_provenance",
+        "evaluation_contract_state",
+        "authority_pre_state",
+        "runtime_relevance",
+        "claim_scope_class",
+        "object_class",
+        "state_machine",
+        "domain"
+      ],
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
+      "equivalence_basis": "PARTIAL",
+      "equivalence_basis_note": "PARTIAL: an identically satisfied vector is NECESSARY but not sufficient to establish equivalence, because scenario stimulus content beyond the declared fields is not captured. An identical-vector divergence is therefore recorded as an UNDISCRIMINATED DIVERGENCE (INSUFFICIENT_EVIDENCE), never promoted to an architectural claim. Architectural claims are reserved for order-invariant violations on verified fields, must-not-diverge-empirical violations, and guarded-property violations."
+    },
+    {
+      "family_id": "F2",
+      "family_class": "PLURALITY_AND_AUTHORITY_CONCEPTUAL",
+      "state_machine": "M-CONCEPT",
+      "object_class": "INSTITUTIONAL_CONCEPT",
+      "adjudication_requires": [
+        "conceptual_unresolved_representable",
+        "conceptual_plural_not_collapsed",
+        "conceptual_authority_not_empirical",
+        "conceptual_provenance_attached",
+        "conceptual_preference_not_empirical"
+      ],
+      "adjudication_requires_note": "revision R3 (finding R-G8-01): a mandatory relationship is substantively adjudicated only when at least one side exercises at least one of these fields. If every one of them is non-exercising on BOTH sides the comparison is an INSUFFICIENT_EVIDENCE gap that BLOCKS, instead of an equivalence verdict.",
+      "projection_note": "revision R3 (finding R-G8-01): these members are CROSS-MACHINE CONCEPTUAL PROJECTIONS of machine-local traces, not machine-local observations. A machine-local terminal string is never compared against another machine's terminal vocabulary (rule N8); each participating machine projects its observable trace into this shared conceptual vocabulary through a declared adapter in scenarios/g8_concept_projection.py, and the adapters are tested independently and never read expected outcomes. The former machine-local F2 is retained as diagnostic family F9.",
+      "question": "is a non-dominated or unresolved fact ever collapsed, forced into a category, or rewritten by authority preference?",
+      "members": [
+        "F2::CONCEPT::G2:S05",
+        "F2::CONCEPT::G5:S16",
+        "F2::CONCEPT::G6:S22",
+        "F2::CONCEPT::G6:S24"
+      ],
+      "declared_pairs": [
+        [
+          "F2::CONCEPT::G2:S05",
+          "F2::CONCEPT::G5:S16"
+        ],
+        [
+          "F2::CONCEPT::G5:S16",
+          "F2::CONCEPT::G6:S22"
+        ],
+        [
+          "F2::CONCEPT::G6:S22",
+          "F2::CONCEPT::G6:S24"
+        ]
+      ],
+      "guarded_properties": [
+        "P2",
+        "P3",
+        "P4",
+        "P7"
+      ],
+      "default_classification": "ARCHITECTURE_CONTRADICTION",
+      "verified_fields": [
+        "conceptual_unresolved_representable",
+        "conceptual_plural_not_collapsed",
+        "conceptual_authority_not_empirical",
+        "conceptual_provenance_attached",
+        "conceptual_preference_not_empirical"
+      ],
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
+      "equivalence_basis": "PARTIAL",
+      "equivalence_basis_note": "PARTIAL: an identically satisfied vector is NECESSARY but not sufficient to establish equivalence, because scenario stimulus content beyond the declared fields is not captured. An identical-vector divergence is therefore recorded as an UNDISCRIMINATED DIVERGENCE (INSUFFICIENT_EVIDENCE), never promoted to an architectural claim. Architectural claims are reserved for order-invariant violations on verified fields, must-not-diverge-empirical violations, and guarded-property violations."
+    },
+    {
+      "family_id": "F3",
+      "family_class": "INDEPENDENCE_AND_ECOLOGY",
+      "state_machine": "EVIDENCE",
+      "object_class": "EVIDENCE_CLAIM",
+      "question": "does duplicated correlated evidence ever manufacture independence, and does genuine independence ever reduce support?",
+      "members": [
+        "G3:S06",
+        "G3:S07",
+        "G3:S08",
+        "G3:S09"
+      ],
+      "declared_pairs": [
+        [
+          "G3:S06",
+          "G3:S07"
+        ],
+        [
+          "G3:S08",
+          "G3:S09"
+        ],
+        [
+          "G3:S06",
+          "G3:S09"
+        ]
+      ],
+      "guarded_properties": [
+        "P6",
+        "P12"
+      ],
+      "default_classification": "ARCHITECTURE_CONTRADICTION",
+      "verified_fields": [
+        "evidence_lineage",
+        "independence",
+        "evidence_quality",
+        "consequence_class",
+        "claim_scope_class",
+        "evidence_provenance",
+        "evidence_subject_binding",
+        "evidence_scope_binding",
+        "authority_pre_state",
+        "runtime_relevance"
+      ],
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
+      "equivalence_basis": "PARTIAL",
+      "equivalence_basis_note": "PARTIAL: an identically satisfied vector is NECESSARY but not sufficient to establish equivalence, because scenario stimulus content beyond the declared fields is not captured. An identical-vector divergence is therefore recorded as an UNDISCRIMINATED DIVERGENCE (INSUFFICIENT_EVIDENCE), never promoted to an architectural claim. Architectural claims are reserved for order-invariant violations on verified fields, must-not-diverge-empirical violations, and guarded-property violations."
+    },
+    {
+      "family_id": "F4",
+      "family_class": "MEMORY_AND_RECONSTRUCTION",
+      "state_machine": "M4_KNOWLEDGE",
+      "object_class": "KNOWLEDGE_OBJECT",
+      "question": "do equivalent memory facts produce consistent retention / reopen / reconstruction treatment?",
+      "members": [
+        "G4:S10",
+        "G4:S11",
+        "G4:S12",
+        "G4:S13"
+      ],
+      "declared_pairs": [
+        [
+          "G4:S10",
+          "G4:S11"
+        ],
+        [
+          "G4:S12",
+          "G4:S13"
+        ]
+      ],
+      "guarded_properties": [
+        "P7",
+        "P11"
+      ],
+      "default_classification": "ARCHITECTURE_CONTRADICTION",
+      "verified_fields": [
+        "evidence_lineage",
+        "evidence_quality",
+        "persistence",
+        "reopen_target_class",
+        "evidence_provenance",
+        "evidence_subject_binding",
+        "evidence_scope_binding",
+        "authority_pre_state",
+        "runtime_relevance",
+        "data_quality_state",
+        "effect_verification",
+        "grant_mandate_state",
+        "claim_scope_class"
+      ],
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
+      "equivalence_basis": "PARTIAL",
+      "equivalence_basis_note": "PARTIAL: an identically satisfied vector is NECESSARY but not sufficient to establish equivalence, because scenario stimulus content beyond the declared fields is not captured. An identical-vector divergence is therefore recorded as an UNDISCRIMINATED DIVERGENCE (INSUFFICIENT_EVIDENCE), never promoted to an architectural claim. Architectural claims are reserved for order-invariant violations on verified fields, must-not-diverge-empirical violations, and guarded-property violations."
+    },
+    {
+      "family_id": "F5",
+      "family_class": "DOMAIN_EPISTEMICS",
+      "state_machine": "DOMAIN_MACHINE",
+      "object_class": "DOMAIN_CLAIM",
+      "question": "are materially different domain epistemics ever treated as interchangeable, and is equivalent evidence treated consistently?",
+      "members": [
+        "G5:S14",
+        "G5:S15",
+        "G5:S16",
+        "G5:S17",
+        "G5:S18",
+        "G5:S19"
+      ],
+      "declared_pairs": [
+        [
+          "G5:S14",
+          "G5:S15"
+        ],
+        [
+          "G5:S17",
+          "G5:S18"
+        ],
+        [
+          "G5:S18",
+          "G5:S19"
+        ],
+        [
+          "G5:S15",
+          "G5:S19"
+        ]
+      ],
+      "guarded_properties": [
+        "P5",
+        "P10"
+      ],
+      "default_classification": "ARCHITECTURE_CONTRADICTION",
+      "verified_fields": [
+        "domain",
+        "data_quality_state",
+        "environment_shift",
+        "evidence_lineage",
+        "evidence_provenance",
+        "evidence_subject_binding",
+        "evidence_scope_binding",
+        "effect_verification",
+        "runtime_relevance",
+        "claim_scope_class",
+        "authority_pre_state"
+      ],
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
+      "equivalence_basis": "PARTIAL",
+      "equivalence_basis_note": "PARTIAL: an identically satisfied vector is NECESSARY but not sufficient to establish equivalence, because scenario stimulus content beyond the declared fields is not captured. An identical-vector divergence is therefore recorded as an UNDISCRIMINATED DIVERGENCE (INSUFFICIENT_EVIDENCE), never promoted to an architectural claim. Architectural claims are reserved for order-invariant violations on verified fields, must-not-diverge-empirical violations, and guarded-property violations."
+    },
+    {
+      "family_id": "F6",
+      "family_class": "AUTHORITY_AND_GOVERNANCE",
+      "state_machine": "AUTHORITY",
+      "object_class": "AUTHORITY_ACTION",
+      "question": "does authority ever move because of capability, confidence, profit, consensus, preference, reversibility or operator availability?",
+      "members": [
+        "G6:S20",
+        "G6:S21",
+        "G6:S22",
+        "G6:S23",
+        "G6:S24"
+      ],
+      "declared_pairs": [
+        [
+          "G6:S20",
+          "G6:S21"
+        ],
+        [
+          "G6:S21",
+          "G6:S22"
+        ],
+        [
+          "G6:S22",
+          "G6:S23"
+        ],
+        [
+          "G6:S23",
+          "G6:S24"
+        ]
+      ],
+      "guarded_properties": [
+        "P1",
+        "P2",
+        "P8",
+        "P9"
+      ],
+      "default_classification": "ARCHITECTURE_CONTRADICTION",
+      "verified_fields": [
+        "authority_pre_state",
+        "grant_mandate_state",
+        "operator_availability",
+        "reversibility",
+        "consequence_class",
+        "environment_shift",
+        "evidence_provenance",
+        "evidence_subject_binding",
+        "evidence_scope_binding",
+        "evidence_lineage",
+        "claim_scope_class",
+        "runtime_relevance"
+      ],
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
+      "equivalence_basis": "PARTIAL",
+      "equivalence_basis_note": "PARTIAL: an identically satisfied vector is NECESSARY but not sufficient to establish equivalence, because scenario stimulus content beyond the declared fields is not captured. An identical-vector divergence is therefore recorded as an UNDISCRIMINATED DIVERGENCE (INSUFFICIENT_EVIDENCE), never promoted to an architectural claim. Architectural claims are reserved for order-invariant violations on verified fields, must-not-diverge-empirical violations, and guarded-property violations."
+    },
+    {
+      "family_id": "F7",
+      "family_class": "CROSS_GATE_CLAIMS",
+      "state_machine": "META",
+      "object_class": "EVIDENCE_CLAIM",
+      "question": "does any completed gate claim exceed the surface and evidence it names?",
+      "members": [
+        "GATE:G1",
+        "GATE:G1R",
+        "GATE:G2",
+        "GATE:G2R",
+        "GATE:G3",
+        "GATE:G3R",
+        "GATE:G3R2",
+        "GATE:G4",
+        "GATE:G4R",
+        "GATE:G5",
+        "GATE:G5R",
+        "GATE:G5RER",
+        "GATE:G6",
+        "GATE:G6TCR",
+        "GATE:G7"
+      ],
+      "declared_pairs": [],
+      "guarded_properties": [],
+      "default_classification": "RECEIPT_OR_CLAIM_DEFECT",
+      "verified_fields": [],
+      "blocks_gate_policy_ref": "blocks_gate_policy",
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family. A differing field outside this set is a coarse proxy — it can neither justify an outcome nor be turned into an architectural claim, and such a comparison is recorded as INSUFFICIENT_EVIDENCE.",
+      "equivalence_basis": "NOT_APPLICABLE",
+      "equivalence_basis_note": "F7 compares a receipt against the claims it makes, not two observations against each other, so no equivalence vector applies. Findings are produced by the gate-claim audit and classified one at a time."
+    },
+    {
+      "family_id": "F8",
+      "family_class": "G7_RELATIONAL_SURFACES",
+      "state_machine": "AUTHORITY",
+      "object_class": "AUTHORITY_ACTION",
+      "question": "does an operator-availability perturbation change what may execute without changing the empirical evidence state?",
+      "members": [
+        "G7:OA_AVAILABLE",
+        "G7:OA_UNAVAILABLE"
+      ],
+      "declared_pairs": [
+        [
+          "G7:OA_AVAILABLE",
+          "G7:OA_UNAVAILABLE"
+        ]
+      ],
+      "guarded_properties": [
+        "P2",
+        "P9"
+      ],
+      "default_classification": "ARCHITECTURE_CONTRADICTION",
+      "verified_fields": [
+        "operator_availability",
+        "authority_pre_state",
+        "grant_mandate_state",
+        "evidence_provenance",
+        "reversibility",
+        "consequence_class"
+      ],
+      "verified_fields_note": "declared DERIVATION COMPLETENESS: only these fields may carry an equivalence verdict for this family.",
+      "equivalence_basis": "PARTIAL",
+      "equivalence_basis_note": "PARTIAL: these two members are the SAME governed institutional inputs under one availability perturbation, so an identical vector would establish nothing; the pair exists to exercise P9 and P2. Added by revision R3 (finding R-G8-05) because P9 requires a real paired baseline/perturbation execution with a non-empty empirical state on both sides, which the G6 scenario surfaces do not expose."
+    },
+    {
+      "family_id": "F9",
+      "diagnostic": true,
+      "family_class": "MACHINE_LOCAL_TERMINAL_VOCABULARY",
+      "state_machine": "MULTI",
+      "object_class": "KNOWLEDGE_OBJECT",
+      "question": "DIAGNOSTIC ONLY (revision R3): do the participating machines' machine-local terminal tokens ever look interchangeable? They do not, and this family records that fact instead of silently counting it as coverage. No pair is mandated here; the mandated cross-machine relationship is adjudicated in F2 through the conceptual projection.",
+      "members": [
+        "F9::LOCAL::G2:S05",
+        "F9::LOCAL::G5:S16",
+        "F9::LOCAL::G6:S22",
+        "F9::LOCAL::G6:S24"
+      ],
+      "declared_pairs": [],
+      "guarded_properties": [],
+      "default_classification": "NOT_EQUIVALENT",
+      "verified_fields": [],
+      "verified_fields_note": "no field carries an equivalence verdict in a diagnostic vocabulary family.",
+      "equivalence_basis": "NOT_APPLICABLE",
+      "equivalence_basis_note": "machine-local terminal vocabularies are not interchangeable (rule N8), so no equivalence basis exists. Every such comparison is NOT_COMPARABLE and NOT_EQUIVALENT; it is reported and never counted as mandated coverage."
+    }
+  ],
+  "discriminator_rules": [
+    {
+      "discriminator_id": "D-QUALITY",
+      "field": "evidence_quality",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §4.1/§4.3/§4.4",
+      "note": "evidence quality is an outcome-relevant fact; its ORDER invariant A-EVIDENCE-QUALITY still applies on top"
+    },
+    {
+      "discriminator_id": "D-INDEPENDENCE",
+      "field": "independence",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §4.3/§11; S06/S07",
+      "note": "independence is an outcome-relevant fact; order invariant A-INDEPENDENCE still applies on top"
+    },
+    {
+      "discriminator_id": "D-PERSISTENCE",
+      "field": "persistence",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §4.2/§4.4",
+      "note": "persistence is an outcome-relevant fact; order invariant A-PERSISTENCE still applies on top"
+    },
+    {
+      "discriminator_id": "D-LINEAGE",
+      "field": "evidence_lineage",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "G2R §5; A-010 §11",
+      "note": "one lineage vs multiple distinct lineages is an outcome-relevant fact"
+    },
+    {
+      "discriminator_id": "D-SUBJECT-BINDING",
+      "field": "evidence_subject_binding",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "G6-TC07; G6-TC08",
+      "note": "evidence bound to the subject vs unbound/unknown changes admissibility"
+    },
+    {
+      "discriminator_id": "D-SCOPE-BINDING",
+      "field": "evidence_scope_binding",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "G6-TC08; A-010 §19",
+      "note": "evidence bound to the relevant scope vs unbound changes admissibility"
+    },
+    {
+      "discriminator_id": "D-AUTHORITY-PRESTATE",
+      "field": "authority_pre_state",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "Constitution Art. X; A-010 §10",
+      "note": "the authority pre-state legitimately changes what may proceed"
+    },
+    {
+      "discriminator_id": "D-OPERATOR-AVAILABILITY-ACTION",
+      "field": "operator_availability",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §8/§14; S23",
+      "note": "availability legitimately changes ACTION authority; rule A-OPERATOR-AVAILABILITY still forbids it reaching an empirical outcome class"
+    },
+    {
+      "discriminator_id": "D-CONSEQUENCE",
+      "field": "consequence_class",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §7/§8; Book rule 13",
+      "note": "the consequence/reversibility class legitimately changes what may proceed"
+    },
+    {
+      "discriminator_id": "D-EFFECT-VERIFICATION",
+      "field": "effect_verification",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-009 §10; G4R-15 qualified reconstruction",
+      "note": "verified effect vs unverified effect legitimately changes what may be claimed"
+    },
+    {
+      "discriminator_id": "D-RUNTIME-RELEVANCE",
+      "field": "runtime_relevance",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-007 §1-§4; A-010 §14",
+      "note": "whether a scenario is runtime-bound at all legitimately changes the treatment; property P11 still requires identity renames to be inert"
+    },
+    {
+      "discriminator_id": "D-ENV-SHIFT",
+      "field": "environment_shift",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §19; Book S24; G7-ES-01",
+      "note": "a confirmed environment shift legitimately changes applicability and interpretation"
+    },
+    {
+      "discriminator_id": "D-DOMAIN",
+      "field": "domain",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-008 §8; A-009 §18/§19.4; Book IV",
+      "note": "different domains legitimately have different epistemic treatment; domain difference never licenses metaphor transfer"
+    },
+    {
+      "discriminator_id": "D-CONTRACT-STATE",
+      "field": "evaluation_contract_state",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §6/§9.9; S20",
+      "note": "a frozen vs absent evaluation contract legitimately changes admissibility"
+    },
+    {
+      "discriminator_id": "D-GRANT-STATE",
+      "field": "grant_mandate_state",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §8/§14; S23",
+      "note": "an ACTIVE pre-existing grant vs NONE legitimately changes what may execute"
+    },
+    {
+      "discriminator_id": "D-SCOPE",
+      "field": "claim_scope_class",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §7 (scope ladder); S03/S04",
+      "note": "narrowest-plausible-level scope legitimately changes escalation"
+    },
+    {
+      "discriminator_id": "D-PROVENANCE-NEUTRAL",
+      "field": "evidence_provenance",
+      "kind": "NEUTRAL",
+      "governing_contract": "G3R2-02; AMB-09/AMB-10",
+      "note": "governed-registry vs explicitly-authoritative-synthetic fixture provenance is a declared fixture contract; it may not be used to justify a different outcome by itself"
+    },
+    {
+      "discriminator_id": "D-DATA-QUALITY",
+      "field": "data_quality_state",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §4.4; S14/S18",
+      "note": "contaminated vs clean vs insufficient data legitimately changes admissibility"
+    },
+    {
+      "discriminator_id": "A-REVERSIBILITY",
+      "field": "reversibility",
+      "kind": "MUST_NOT_VIOLATE_ORDER",
+      "direction": "NON_DECREASING",
+      "governing_contract": "A-010 §4.6/§8; Book rule 13; G7-RV-01/02",
+      "note": "as reversibility rises, outcome permissiveness must not fall: lower reversibility is never easier"
+    },
+    {
+      "discriminator_id": "A-EVIDENCE-QUALITY",
+      "field": "evidence_quality",
+      "kind": "MUST_NOT_VIOLATE_ORDER",
+      "direction": "NON_DECREASING",
+      "governing_contract": "A-010 §4.1/§4.3/§4.4; G7-EQ-01",
+      "note": "as evidence quality rises, outcome permissiveness must not fall: stronger evidence never weakens support"
+    },
+    {
+      "discriminator_id": "A-INDEPENDENCE",
+      "field": "independence",
+      "kind": "MUST_NOT_VIOLATE_ORDER",
+      "direction": "NON_DECREASING",
+      "governing_contract": "A-010 §4.3/§11; S06/S07; G7-IN-01",
+      "note": "as independence rises, outcome permissiveness must not fall"
+    },
+    {
+      "discriminator_id": "A-PERSISTENCE",
+      "field": "persistence",
+      "kind": "MUST_NOT_VIOLATE_ORDER",
+      "direction": "NON_DECREASING",
+      "governing_contract": "A-010 §4.2/§4.4; G7-PE-01",
+      "note": "as persistence rises, outcome permissiveness must not fall (repeated credible contradiction may increase review pressure)"
+    },
+    {
+      "discriminator_id": "A-CENTRALITY",
+      "field": "dependency_centrality",
+      "kind": "MUST_NOT_VIOLATE_ORDER",
+      "direction": "NON_INCREASING",
+      "governing_contract": "A-010 §4.5; A010-RT T1; G7-CE-01",
+      "note": "as centrality rises, outcome permissiveness must not rise: centrality raises rigor, it never grants immunity"
+    },
+    {
+      "discriminator_id": "A-OPERATOR-AVAILABILITY",
+      "field": "operator_availability",
+      "kind": "MUST_NOT_DIVERGE_EMPIRICAL",
+      "governing_contract": "A-010 §8/§14; S23; G7-OA-01",
+      "note": "operator availability may change what executes, but two empirical outcome classes may never differ solely because availability changed"
+    },
+    {
+      "discriminator_id": "D-REOPEN-TARGET",
+      "field": "reopen_target_class",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-009 §9/§11; G4 policy mem.reopen.*; Book §17 blocker resolution",
+      "note": "added by revision R1: a dormant positive record whose field predicate fires and a rejected claim whose blocker is still unresolved are materially different memory situations and may legitimately route differently"
+    },
+    {
+      "discriminator_id": "D-CONCEPT-UNRESOLVED",
+      "field": "conceptual_unresolved_representable",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §20/§21; S24; S05",
+      "note": "added by revision R3 for the cross-machine conceptual family: whether a run surface exercises 'an unresolved fact remains representable' is a materially different fact, so a difference in it may justify a different conceptual class. NOT_EXERCISED is recorded and is never favourable."
+    },
+    {
+      "discriminator_id": "D-CONCEPT-PLURAL",
+      "field": "conceptual_plural_not_collapsed",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §16; Book §11; S05",
+      "note": "added by revision R3 for the cross-machine conceptual family"
+    },
+    {
+      "discriminator_id": "D-CONCEPT-AUTHORITY",
+      "field": "conceptual_authority_not_empirical",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §10; Art. I/§9; S22",
+      "note": "added by revision R3 for the cross-machine conceptual family"
+    },
+    {
+      "discriminator_id": "D-CONCEPT-PROVENANCE",
+      "field": "conceptual_provenance_attached",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-009 §9/§11; Book §1 rule 8",
+      "note": "added by revision R3 for the cross-machine conceptual family"
+    },
+    {
+      "discriminator_id": "D-CONCEPT-PREFERENCE",
+      "field": "conceptual_preference_not_empirical",
+      "kind": "JUSTIFIES_DIVERGENCE",
+      "governing_contract": "A-010 §14; Art. X; S22/S24",
+      "note": "added by revision R3 for the cross-machine conceptual family: an operator-preference surface and a non-preference surface are materially different, so a difference in whether preference was exercised may justify a different conceptual class"
+    }
+  ],
+  "outcome_permissiveness": {
+    "note": "declared permissiveness rank used only by MUST_NOT_VIOLATE_ORDER checks; higher rank = more permissive outcome",
+    "rank": {
+      "AUTHORITY_REFUSED": 0,
+      "OPERATOR_HOLD": 0,
+      "DATA_BLOCKED": 0,
+      "UNRESOLVED_HELD": 0,
+      "DOMAIN_VALIDATION_REFUSED": 0,
+      "DOMAIN_TRANSFER_REFUSED": 0,
+      "DOMAIN_DATA_BLOCKED": 0,
+      "NEGATIVE_KNOWLEDGE_RETAINED": 0,
+      "NO_CHANGE_PRESERVED": 0,
+      "CORRELATED_SUPPORT_ONLY": 1,
+      "INDEPENDENT_REVIEW_REQUIRED": 1,
+      "WATCH_OBSERVED": 1,
+      "DOMAIN_CONTRADICTION_OPEN": 1,
+      "DOMAIN_SOURCE_LAYER_CHALLENGE": 1,
+      "DOMAIN_ONTOLOGY_CANDIDATE": 1,
+      "CAPABILITY_ONLY_UPDATED": 1,
+      "AUTHORITY_HELD_FUTURE_ISOLATED": 1,
+      "REPAIR_LOCAL": 2,
+      "PLURAL_RETAINED": 2,
+      "REOPEN_ADMITTED": 2,
+      "BOUNDED_CONTEXT_RETAINED": 2,
+      "STABLE_PRESERVED": 2,
+      "ACTION_AUTHORIZED_BY_OPERATOR": 2,
+      "INDEPENDENT_SUPPORT": 3,
+      "EPOCH_RECONSTRUCTED": 3,
+      "TRANSFORMATION_ADMITTED": 3,
+      "NEW_STABLE_ESTABLISHED": 4,
+      "CONCEPTUAL_INVARIANT_VIOLATED": 0,
+      "CONCEPTUAL_UNDER_EXERCISED": 1,
+      "CONCEPTUAL_PARTIAL_COVERAGE": 2,
+      "CONCEPTUAL_COHERENCE_RETAINED": 2
+    }
+  },
+  "classification_vocabulary": [
+    "NOT_EQUIVALENT",
+    "IMPLEMENTATION_DEFECT",
+    "FIXTURE_DEFECT",
+    "RECEIPT_OR_CLAIM_DEFECT",
+    "ARCHITECTURE_CONTRADICTION",
+    "AUTHORITY_AMBIGUITY",
+    "INSUFFICIENT_EVIDENCE",
+    "FUTURE_PLANNING_IMPACT"
+  ],
+  "severity_levels": [
+    "INFO",
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "BLOCKING"
+  ],
+  "adversarial_controls": [
+    {
+      "control_id": "C01",
+      "name": "identical_facts_different_outcomes_create_contradiction",
+      "expectation": "two observations with identical equivalence vectors and different outcome classes produce a contradiction record"
+    },
+    {
+      "control_id": "C02",
+      "name": "material_discriminator_prevents_false_contradiction",
+      "expectation": "a declared JUSTIFIES_DIVERGENCE discriminator covering the differing field yields MATERIAL_DISCRIMINATOR, never a contradiction"
+    },
+    {
+      "control_id": "C03",
+      "name": "omitted_discriminator_cannot_create_equivalence",
+      "expectation": "a differing field with no discriminator rule at all yields an UNDECLARED_DISCRIMINATOR contradiction candidate"
+    },
+    {
+      "control_id": "C04",
+      "name": "unknown_provenance_never_normalized_into_independence",
+      "expectation": "UNKNOWN independence never counts as favorable and is never collapsed into LOW or HIGH by any rule"
+    },
+    {
+      "control_id": "C05",
+      "name": "state_machine_vocabulary_not_interchangeable",
+      "expectation": "identical outcome token strings on different state machines are NOT_COMPARABLE, never equivalent"
+    },
+    {
+      "control_id": "C06",
+      "name": "reordered_maps_produce_identical_fingerprints",
+      "expectation": "reordering unordered fields/records leaves the equivalence digest and the report bytes unchanged"
+    },
+    {
+      "control_id": "C07",
+      "name": "renamed_agents_do_not_change_equivalence",
+      "expectation": "renaming scenario/agent identifiers leaves the observation vector and verdicts unchanged"
+    },
+    {
+      "control_id": "C08",
+      "name": "duplicated_evidence_aliases_are_one_epistemic_path",
+      "expectation": "aliasing one canonical evidence object under several refs does not increase distinct lineage/independence"
+    },
+    {
+      "control_id": "C09",
+      "name": "operator_labels_without_authority_do_not_change_classification",
+      "expectation": "a claimed OPERATOR label with no canonical authority never changes an authority outcome class"
+    },
+    {
+      "control_id": "C10",
+      "name": "profit_and_capability_do_not_change_evidence_or_authority",
+      "expectation": "profit/capability observables never appear as outcome-relevant vector fields and never alter a verdict"
+    },
+    {
+      "control_id": "C11",
+      "name": "sealed_expected_truth_never_consumed",
+      "expectation": "the audit input set contains zero sealed fields and every evaluator is passed a decision-grade projection"
+    },
+    {
+      "control_id": "C12",
+      "name": "proposed_a012_language_cannot_overwrite_existing_expectations",
+      "expectation": "no verdict, expectation or classification is derived from the A-012 / MF-A002 / OPH / Cadence package; interactions are recorded only as FUTURE_PLANNING_IMPACT"
+    },
+    {
+      "control_id": "C13",
+      "name": "contradiction_register_cannot_report_empty_when_a_seeded_control_exists",
+      "expectation": "a seeded, intentionally inconsistent synthetic control is detected and appears in the register; an empty register with a seeded control is a hard failure"
+    },
+    {
+      "control_id": "C14",
+      "name": "report_generation_is_deterministic_and_byte_reproducible",
+      "expectation": "two consecutive package builds produce byte-identical evidence files"
+    },
+    {
+      "control_id": "C15",
+      "name": "receipt_cannot_certify_itself",
+      "expectation": "the receipt builder refuses to reference its own containing commit or its own file digest as tested evidence"
+    }
+  ],
+  "blocks_gate_policy": {
+    "note": "declared in revision R2 so the gate decision is a function of this contract, not of an ad-hoc judgement. A finding blocks the gate when it makes the claimed result unverifiable AS DECLARED. A finding does not block when the referent is unambiguously locatable from another declaration in the same receipt and the substantive result is independently reproducible; it is still recorded and still requires operator authority before ratification.",
+    "blocking_classifications": [
+      "ARCHITECTURE_CONTRADICTION",
+      "AUTHORITY_AMBIGUITY",
+      "FIXTURE_DEFECT",
+      "IMPLEMENTATION_DEFECT"
+    ],
+    "blocking_when_unresolvable": [
+      "RECEIPT_OR_CLAIM_DEFECT",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "resolvable_narrowly": {
+      "RECEIPT_OR_CLAIM_DEFECT": "blocks unless the declared identifier resolves through an abbreviation the same receipt declares AND the resolved object's own subject matches the receipt's declared subject verbatim; then severity is capped at MEDIUM, blocks_gate=false, and the entry stays in the register with the resolution recorded",
+      "INSUFFICIENT_EVIDENCE": "a comparison gap where the declared vector cannot establish equivalence blocks when severity is HIGH; a LOW-severity gap (differences that are only coarse proxies for the family) is recorded without blocking"
+    },
+    "never_blocking_classifications": [
+      "NOT_EQUIVALENT",
+      "FUTURE_PLANNING_IMPACT",
+      "SUPERSEDED_BY_LATER_ARTIFACT"
+    ]
+  },
+  "verdict_classes": [
+    "CONSISTENT",
+    "MATERIAL_DISCRIMINATOR",
+    "NOT_COMPARABLE",
+    "CONTRADICTION"
+  ],
+  "not_claimed": [
+    "G8 does not claim independent external verification; the package is self-generated.",
+    "G8 does not resolve CON-02, CON-03 or AMB-08 and does not invent a constitutional threshold.",
+    "G8 does not claim the harness can prove arbitrary Python introspection impossible.",
+    "G8 does not treat matching prose, labels, counts, confidence or profit as equivalence.",
+    "G8 does not amend A-004..A-010."
+  ]
+}

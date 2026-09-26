@@ -1,0 +1,6 @@
+{
+  "records": {
+    "@M_A": {"state": "ACTIVE", "provenance": "S01-seed", "claim": "periodic credit/quality mechanism; CORE dependency"},
+    "@M_B": {"state": "OBSERVED", "provenance": "S01-seed", "claim": "candidate replacement mechanism"}
+  }
+}

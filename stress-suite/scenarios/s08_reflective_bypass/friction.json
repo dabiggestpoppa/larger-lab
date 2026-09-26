@@ -1,0 +1,31 @@
+{
+  "contract": {
+    "contract_id": "G3-S08-FRICTION",
+    "version_tag": "V1",
+    "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+    "consequence_classes": {
+      "HIGH": {
+        "trigger_on": ["premature_convergence"],
+        "max_prior_exposure_ratio": 0.0,
+        "budget": 1,
+        "cost_per_reconstruction": 5,
+        "methods": ["fresh_context_reconstruction"]
+      }
+    }
+  },
+  "reviewers": [
+    {"reviewer_id": "R_BLIND_S08", "role": "reviewer", "model_family": "FAM_H", "provider": "PROV_H2",
+     "runtime_lineage": "RT_H2", "sources": ["S_H2", "S_H3"], "retrieval_bundle": "BUNDLE_H2",
+     "prompt_context": "CTX_H2", "prior_conclusion_exposure": "FALSE", "implementation_path": "IMP_H2",
+     "experiment_design_origin": "DESIGN_H2", "allocator": "GOVERNOR",
+     "visible_information": "BLIND", "fresh_context": true,
+     "conclusion": "", "confidence": "UNKNOWN", "evidence_refs": [], "cost_units": 5,
+     "latency_units": 2, "capability_tier": "ADEQUATE"}
+  ],
+  "conclusions_by_exposure": {
+    "R_BLIND_S08": {
+      "BLIND": "ALT_B",
+      "PRIOR_CONCLUSION_VISIBLE": "ELEGANT_A"
+    }
+  }
+}

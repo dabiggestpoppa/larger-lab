@@ -52,6 +52,29 @@ Every failed attempt remains truthful evidence. Agents do not merge, deploy, pur
 
 Planning, development, debugging, ordinary execution and validation run locally. Cloud is a later surface for deployment, durability, remote availability, observability, backups and heavy compute. Telegram is an interface, not canonical state. Core OCE/PO operation must not depend on Telegram or cloud availability.
 
+## Institutional extensions
+
+The institutional-architecture planning branch also contains proposed extensions for controlled learning, transformation, and external economic interaction. They do not authorize implementation merely by existing.
+
+Current Opportunity Exchange package:
+
+1. `OCE_ARCHITECTURE_AMENDMENT_A011_EXTERNAL_ECONOMIC_ENVIRONMENT_AND_OPPORTUNITY_EXCHANGE_v1.0.md` — governing architecture.
+2. `OCE_AGENT_ECONOMY_SOURCE_REGISTRY_v0.1.json` — original machine-readable source registry.
+3. `OCE_AGENT_ECONOMY_MARKET_MAP_v0.1.md` — initial agent-native market research.
+4. `OCE_OPPORTUNITY_EXCHANGE_BUILD_PLAN_v0.1.md` — phased source-neutral build plan from read-only observation through bounded autonomy.
+5. `OCE_AGENT_ECONOMY_MARKET_MAP_SUPPLEMENT_01_UPWORK_FIVERR_v0.1.md` — current Upwork/Fiverr human-freelance research and initial operating model.
+6. `OCE_AGENT_ECONOMY_SOURCE_REGISTRY_SUPPLEMENT_01_UPWORK_FIVERR_v0.1.json` — machine-readable Upwork/Fiverr source metadata.
+
+### Opportunity-source doctrine
+
+Opportunity Exchange follows:
+
+> **OBSERVE BROADLY → QUALIFY EMPIRICALLY → EXECUTE SELECTIVELY → LEARN FROM RESULTS → REVISIT DORMANT SOURCES**
+
+No venue is permanently discarded merely because desk research suggests poor current economics, high competition, low liquidity, or manual checkpoints. Observation authority, transaction authority, source priority, and source existence are separate concepts. Negative results remain durable knowledge with explicit re-entry conditions.
+
+Upwork and Fiverr are first-class source candidates alongside agent-native venues. Their integration mode differs according to current platform rules: official machine interfaces are preferred when supported; human-first/operator-mediated workflows remain valid institutional surfaces when autonomous interaction is not permitted.
+
 ## Current checkpoint
 
 - Canonical integration branch: `oce`
@@ -59,3 +82,28 @@ Planning, development, debugging, ordinary execution and validation run locally.
 - Block 1 remains the active implementation block.
 - Blocks 2–10 are planned but build-locked.
 - Main is not changed by this planning package.
+
+## Model-sparse and cognitive-continuation planning package
+
+The institutional branch also carries a non-ratified research-to-architecture package for model-sparse cognition, continuation, and cognitive-primitives research:
+
+1. `../oce-autonomy/OPH_CADENCE_SOPHONTIC_INSTITUTIONAL_SYNTHESIS_v0.1.md` — source synthesis and hierarchy.
+2. `OCE_OPH_CADENCE_SOPHONTIC_ARCHITECTURE_IMPACT_REVIEW_v0.1.md` — contradiction and ownership review.
+3. `OCE_OPH_CADENCE_SOPHONTIC_EXISTING_AMENDMENT_PATCHSET_v0.1.md` — narrow proposed deltas to A-004, A-005, A-007, A-009, and A-010.
+4. `OCE_ARCHITECTURE_AMENDMENT_A012_MODEL_SPARSE_INSTITUTIONAL_INTELLIGENCE_v0.1.md` — cross-OCE dependency and routing doctrine proposal.
+5. `LARGER_LAB_MODEL_FOUNDRY_ARCHITECTURE_AMENDMENT_MF_A002_COGNITIVE_PRIMITIVES_v0.1.md` — proposed System-One/cognitive-primitives Foundry lane.
+6. `../oce-autonomy/OCE_CONTINUATION_AND_PRIVATE_IMAGINATION_TEST_EXTENSION_v0.1.md` — future autonomy falsification extension.
+
+These documents do not alter the current MF-B0 through MF-B4 build, completed stress-suite receipts, or the current G8 → G9 → G10 sequence. They authorize no implementation, training, runtime migration, or production change.
+
+### OPH × IT³ research handoff
+
+- `OCE_OPH_IT3_INGESTION_PACKET_2026-09-23.md` — full text and table transcription of the user-supplied external research packet; the original DOCX is retained under `research-sources/` for exact source custody. Its claims are source statements, not OCE-verified results.
+- `OCE_OPH_IT3_RESEARCH_SUBSTRATE_PLAN_v0.1.md` maps the external research packet's Section 13 A–H obligations to existing stress-suite owners, experiments, custody rules, and nonauthoritative claim limits.
+- `OCE_OPH_IT3_AGENT_HANDOFF_v0.1.md` is a copy-ready instruction for a separately authorized implementing agent.
+- `OCE_OPH_IT3_CORRECTED_RECONNAISSANCE_v0.2.md` (2026-09-24, patched by `OCE_OPH_IT3_AUTHORIZATION_DECISION_PACKET_v0.1.md` v0.3 §7) — exact file:line reuse/extend inventory; Block F witness correction and Block E declaration-vs-preservation patch.
+- `OCE_OPH_IT3_AUTHORIZATION_DECISION_PACKET_v0.1.md` **v0.3 supersedes v0.2 (2026-09-24, authenticated head `121bacd5` ⊳ `c43c6c26` ⊳ `ef30cb49` ⊳ `31c68da2` ⊳ `2cf1bb4b`)** — planning-only correction: Block F `observed_at`/`ingested_at` not existing capability (fail-closed `CUSTODY_UNVERIFIED`/`DIAGNOSTIC`), plus explicit-vs-inferred-vs-unresolved analysis of `README.md:34` and minimum-change Path M vs grammar-amending Path G.
+- `OCE_STRESS_SUITE_RESEARCH_DOSSIER_OPHIT3_DIAGNOSTIC_v0.1.md` **PROPOSED — FOR OPERATOR REVIEW (2026-09-24, frozen dependency `92a99d5448e417473a5d00c24a3fe75cabca30a7` lineage `92a99d54 ⊳ 121bacd5 ⊳ c43c6c26 ⊳ ef30cb49 ⊳ 31c68da2 ⊳ 2cf1bb4b961`)** — narrow Path M proposal: frozen research contract + ONE bounded confluence experiment reusing `DeterministicReplay` + `EvidenceRegistry`/`CounterexampleRecord`, minimum Block A `ClaimLedgerView` only; four-reducer arena and remaining A–H deferred. Diagnostic, `evidence/diagnostic/` only, G9 NOT AUTHORIZED. No code authorized — separate ratification + explicit branch authorization required (see dossier §10 and Appendix A).
+- `OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md` **FROZEN — REVIEWABLE (2026-09-24, dossier `bfb8ca48`, frozen dependency `92a99d54`)** — corrected contract per operator instruction: stable action identity + per-schedule seq assignment (defect 1), forensic fingerprint retained separately from `confluence_protected_digest` (defect 2), two valid divergent schedules for seeded failure control + `ReplayInputError`/`TOPOLOGY_DENIED` invalid-input separation (defect 3), `execution_status` distinct from `scientific_verdict`/`claim_status` with `INSUFFICIENT_DATA`/`INCONCLUSIVE` honesty (defect 4), G8 historical intact / current regeneration via existing `derived_tested_tree`/`verify_citation`/`emit` machinery (defect 5). Operator branch authorization recorded in §10 — Increment 1 diagnostic, G9 NOT AUTHORIZED.
+
+These are planning artifacts. No OPH × IT³ research substrate is implemented or ratified by this addition beyond the explicit Path M Increment 1 contract above, which now carries operator branch authorization for that bounded scope. The dossier remains a proposed interpretation until the operator records `AUTHORIZED_STAGE` outside this branch or extends the stress-suite gate contract — `README.md:34` quoted; no exact clause forbids Path M for this diagnostic increment (prior `STRESS-G*` lineage produced `PASS_G8` at `2cf1bb4b` without `B<n>-I<m>`).

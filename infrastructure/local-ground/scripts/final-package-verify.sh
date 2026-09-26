@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# final-package-verify.sh — READ-ONLY verification of the exact final evidence
+# final-package-verify.sh â€” READ-ONLY verification of the exact final evidence
 # package. It MUST NOT write, move, or modify any evidence file. It re-checks
 # the final manifest (hashes/sizes), final status, independent-gate result,
 # RUN_ID, identities, totals, cleanup, and cloud fields, printing the result
@@ -12,10 +12,11 @@ set -uo pipefail
 EVIDENCE="${1:?evidence dir}"
 COMMIT="${2:?commit}"
 TREE="${3:?tree}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-python3 - "$EVIDENCE" "$COMMIT" "$TREE" <<'PY'
-import hashlib, json, os, sys
-ev, commit, tree = sys.argv[1], sys.argv[2], sys.argv[3]
+python3 - "$EVIDENCE" "$COMMIT" "$TREE" "$SCRIPT_DIR" <<'PY'
+import hashlib, json, os, subprocess, sys
+ev, commit, tree, script_dir = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 errs = []
 def sha(p):
     h = hashlib.sha256()
@@ -72,9 +73,29 @@ if mode == "AUTHORITATIVE_CI":
     if not (cc.get("cleanup") == "ok" and cc.get("containers_removed") is True
             and cc.get("networks_removed") is True and cc.get("volumes_removed") is True):
         errs.append("container cleanup not verified in CI mode")
+    # Recovery evidence: verified postgres promotion must have run and succeeded
+    try:
+        rr = json.load(open(os.path.join(ev, "postgres-recovery-receipt.json"), encoding="utf-8"))
+    except Exception:
+        rr = {}
+        errs.append("missing postgres-recovery-receipt.json in CI mode")
+    if rr and (rr.get("exit_status") != 0 or rr.get("promoted") is not True
+               or rr.get("redis_restored") is not False or not rr.get("source_archive_sha256")):
+        errs.append("postgres recovery receipt does not show verified promotion")
 cleanup = json.load(open(os.path.join(ev, "cleanup.json"), encoding="utf-8"))
 if not (cleanup.get("cleanup") == "ok" or (cleanup.get("removed") is True and cleanup.get("pruned") is True)):
     errs.append("cleanup not confirmed")
+# R8/R9: the immutable operation index is the authoritative recovery record.
+ops_root = os.path.join(ev, "operations")
+if not os.path.isfile(os.path.join(ops_root, "index.json")):
+    errs.append("missing operations/index.json (immutable operation index)")
+else:
+    r = subprocess.run([sys.executable,
+                        os.path.join(script_dir, "recovery-ops.py"),
+                        "verify", "--ops-root", ops_root],
+                       capture_output=True, text=True, timeout=60)
+    if r.returncode != 0:
+        errs.append("operation index verification failed: " + (r.stdout + r.stderr).strip())
 
 print("FINAL PACKAGE VERIFIER (read-only): " + ("PASS" if not errs else "FAIL"))
 for e in errs:

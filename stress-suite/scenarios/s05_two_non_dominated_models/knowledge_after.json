@@ -1,0 +1,7 @@
+{
+  "records": {
+    "@M_A": {"state": "ACTIVE", "provenance_retained": true, "note": "still active: explains condition-space A"},
+    "@M_B": {"state": "ACTIVE", "provenance_retained": true, "note": "active alongside M_A: explains condition-space B"},
+    "@M_AVG": {"absent": true, "note": "no synthetic compromise was created"}
+  }
+}

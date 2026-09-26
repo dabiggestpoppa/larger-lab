@@ -1,0 +1,190 @@
+{
+  "access_accounting": {
+    "authority_changes": "NONE",
+    "capital_mutations": 0,
+    "cerebus_mutated": false,
+    "cloud_mutations": 0,
+    "cost_usd": 0,
+    "expected_outcome_access_count": 0,
+    "hidden_ground_truth_access_count": 0,
+    "model_calls": 0,
+    "production_mutations": 0
+  },
+  "addendum_arithmetic_corrections": {
+    "actual_new_tests_since_base": 72,
+    "addendum_enumerated_4_plus_2_plus_2_plus_3_equals_11_but_claimed_9": "resolved: 11 ER regression tests were added by STRESS-G5RER (7efa6bb6) after base; the 9 in the receipt is inconsistent",
+    "addendum_full_suite_764_of_777_at_base": "wrong on both counts: base collects 766, not 777; and the 13 'failures' do not exist on the authoritative surface",
+    "regression_tests_added_9_claimed": "superseded"
+  },
+  "authoritative_collected": 838,
+  "authoritative_failed": 0,
+  "authoritative_passed": 838,
+  "authoritative_test_command": "cd stress-suite && python -m pytest tests -q",
+  "base_sha": "b8a152e88432198490cb170b52a2c803e9ad9e1b",
+  "cerebus_source": {
+    "content_digest": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+    "content_length_bytes": 366841,
+    "hash_algorithm": "SHA-256",
+    "source_path": "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt"
+  },
+  "closure_id": "G5RER-TRUTH-CLOSURE-2026-02",
+  "exit": "PASS_G5RER_TRUTH_CLOSURE",
+  "g6_authorization": "AUTHORIZE_G6_CONSTITUTIONAL_ATTACK (executed S20-S24; G7 NOT begun)",
+  "g6_forbidden_transitions": {
+    "capability_to_authority": "REFUSED",
+    "current_window_criteria_change": "REFUSED",
+    "near_match_or_expired_grant_to_execution": "REFUSED",
+    "novel_event_to_nearest_channel": "REFUSED",
+    "operator_desire_to_evidence_grade": "REFUSED"
+  },
+  "g7_recommended_authorization_state": "NOT_AUTHORIZED \u2014 G7 must not begin. G6 S20-S24 executed with 838/838 green; G7 should only be authorized after an external review of this truth-closure package (mirroring how G5R's closure was itself externally reviewed).",
+  "gate": "G5R EXTERNAL-REVIEW TRUTH CLOSURE -> CONDITIONAL G6",
+  "generated_by_script": "stress-suite/scenarios/g5rer_run_closure.py",
+  "measured_suite": {
+    "collected": 838,
+    "failed": 0,
+    "passed": 838,
+    "returncode": 0,
+    "summary_line": "838 passed in 3.86s"
+  },
+  "new_test_ids": {
+    "stress-suite/tests/test_g5rer.py": [
+      "test_valid_frozen_protocol_proves_freeze_before_result",
+      "test_forged_stored_fingerprint_fails_closed",
+      "test_stale_fingerprint_after_field_mutation_fails_closed",
+      "test_missing_freeze_record_text_alone_never_proves",
+      "test_result_preceding_freeze_fails_chronology",
+      "test_freeze_evidence_refs_unresolved_or_unverified_fail_closed",
+      "test_wrong_mechanism_binding_never_sets_claim_hypothesis_ok",
+      "test_correct_mechanism_binding_sets_claim_hypothesis_ok",
+      "test_wrong_target_domain_protocol_rejected",
+      "test_source_fragment_atom_verified_occurrence_and_digests",
+      "test_source_fragment_atom_fail_closed_when_absent_from_source",
+      "test_normalized_doctrine_claim_is_never_exact",
+      "test_run_s16_target_atom_is_verbatim_and_normalized_claim_is_separate",
+      "test_run_s16_applicability_conditions_labeled_when_not_verbatim",
+      "test_no_json_fallback_creates_exact_atom",
+      "test_clean_quality_never_implies_full_protocol_verified",
+      "test_dimension_classification_never_silent_pass",
+      "test_derive_fidelity_vocabulary_boundaries",
+      "test_material_unverified_dimension_never_full",
+      "test_compare_contract_blocks_metric_mismatch",
+      "test_compare_contract_blocks_units_incompatible",
+      "test_compare_contract_blocks_invalid_intervals",
+      "test_compare_contract_blocks_estimate_outside_uncertainty",
+      "test_compare_contract_blocks_missing_sample",
+      "test_compare_contract_ready_then_guarded_compare_runs",
+      "test_exact_band_equality_is_explicitly_inconclusive",
+      "test_boundary_touch_inconclusive_strict_separation_contradicts",
+      "test_semantic_label_unresolved_when_zero_refs_or_unknown",
+      "test_source_only_is_never_globally_confirmed_independence",
+      "test_source_and_method_diverse_label",
+      "test_correlated_when_methods_share_lineage_or_single_source",
+      "test_unknown_lineage_never_favorable",
+      "test_cluster_dedupes_canonical_underlying_identity_not_ref_string",
+      "test_cluster_distinct_records_still_count_separately",
+      "test_run_s15_pattern_carries_semantic_label_observability",
+      "test_diagnosis_contract_semantics_not_empirical_by_default",
+      "test_empirically_verified_steps_upgrade_only_those_steps",
+      "test_all_steps_verified_upgrades_semantics_grade",
+      "test_terminal_values_unchanged_while_grades_added"
+    ],
+    "stress-suite/tests/test_g6_governance.py": [
+      "test_s20_same_object_mutation_is_refused",
+      "test_s20_future_version_is_legal_and_current_window_unchanged",
+      "test_s20_current_window_replay_uses_original_contract",
+      "test_s20_stale_fingerprint_proposal_refused",
+      "test_s20_no_retroactive_success_criteria",
+      "test_s21_reliability_improvement_never_grants_authority",
+      "test_s21_capability_change_does_not_mutate_authority_entry",
+      "test_s21_authority_grant_requires_governed_grantor",
+      "test_s22_operator_desire_never_changes_empirical_grade",
+      "test_s22_operator_prefers_incumbent_but_evidence_contradicts",
+      "test_s22_worker_is_not_operator_authority",
+      "test_s22_evidence_grade_changes_only_with_evidence",
+      "test_s23_exact_covered_reversible_action_may_continue",
+      "test_s23_near_match_grant_does_not_count",
+      "test_s23_expired_grant_does_not_count",
+      "test_s23_revoked_grant_does_not_count",
+      "test_s23_high_surface_irreversible_or_constitutional_is_hold",
+      "test_s23_wrong_grantee_or_missing_grant_is_hold",
+      "test_s24_novel_event_stays_unresolved_and_preserved",
+      "test_s24_matching_channel_routes_event",
+      "test_s24_ambiguous_match_is_not_forced",
+      "test_s24_no_nearest_category_coercion_no_ontology_change"
+    ]
+  },
+  "preserved_not_deleted": [
+    "G5R_EXTERNAL_REVIEW_ADDENDUM.md",
+    "G5R_EXTERNAL_REVIEW_RECEIPT.json"
+  ],
+  "receipt_generation_command": "python stress-suite/scenarios/g5rer_run_closure.py",
+  "s20_s24_outcomes": {
+    "S20_governor_self_change": "PASS (same-object mutation refused; future version only; replay uses original frozen criteria; no retroactive success criteria; CON-03 carried)",
+    "S21_capability_not_authority": "PASS (capability may emit AUTHORITY_REVIEW_REQUEST; never AUTHORITY_GRANTED; grants require an existing governed grantor + evidence)",
+    "S22_operator_authority_not_truth": "PASS (operator may authorize constitution-permitted action; empirical evidence grades change only with evidence)",
+    "S23_operator_unavailable": "PASS (exact covered reversible sandbox grant continues; near-match/expired/revoked/high-surface/irreversible/constitutional/capital -> OPERATOR_HOLD; AMB-08 carried)",
+    "S24_unknown_governance_event": "PASS (novel/ambiguous events stay UNRESOLVED_GOVERNANCE_EVENT with full preservation; no nearest-category coercion; no self-ratified ontology change)"
+  },
+  "session_commits_since_audit_start": [
+    "16b53049 STRESS-G6X: adversarial G6 regressions (S20-S24 forbidden transitions)",
+    "57aef6e1 STRESS-S20-S24: implement G6 constitutional-attack governance engine",
+    "dbea8476 STRESS-G5RERTX: adversarial truth-closure regressions (TC-01..TC-06)",
+    "e38e820c STRESS-G5RERT2-6: truth-closure hardening TC-01..TC-06 (engine + fixtures)",
+    "f622089d STRESS-G5RERT1: reconcile full-suite test lineage (599/599 vs 766/766 vs 764/777)"
+  ],
+  "session_start_sha": "7ba17112e7521be700255188d36d15f63a951b3e",
+  "sha_semantics": "tested_sha is the last code/test commit before the archive commit that carries this receipt (STRESS-G5RERTR); the receipt is created in that later archive commit, so it never hashes itself.",
+  "superseding_artifacts": [
+    "stress-suite/evidence/G5RER_TEST_LINEAGE_AUDIT.md",
+    "stress-suite/evidence/G5RER_TRUTH_CLOSURE_RESULT.md",
+    "stress-suite/evidence/G5RER_TRUTH_CLOSURE_RECEIPT.json"
+  ],
+  "test_accounting": {
+    "archive_head_G4R_463495c3": {
+      "collected": 599,
+      "failed": 0,
+      "passed": 599,
+      "surface": "cd stress-suite && python -m pytest tests -q"
+    },
+    "archive_head_G5R_b8a152e8_base": {
+      "collected": 766,
+      "failed": 0,
+      "passed": 766,
+      "surface": "cd stress-suite && python -m pytest tests -q"
+    },
+    "archive_head_G5_56c0605d": {
+      "collected": 684,
+      "failed": 0,
+      "passed": 684,
+      "surface": "cd stress-suite && python -m pytest tests -q"
+    },
+    "audit_start_head_7ba17112": {
+      "collected": 777,
+      "failed": 0,
+      "passed": 777,
+      "surface": "cd stress-suite && python -m pytest tests -q"
+    },
+    "new_tests_in_this_session": 61,
+    "new_tests_since_base_b8a152e8": 72,
+    "superseded_label": "the 13 'pre-existing G4R failures' of the ER addendum are not failing tests on the authoritative surface; they are a sys.path shadowing artifact of `python -m pytest` from the repo root (see G5RER_TEST_LINEAGE_AUDIT.md).",
+    "this_head": {
+      "collected": 838,
+      "failed": 0,
+      "passed": 838,
+      "surface": "cd stress-suite && python -m pytest tests -q"
+    }
+  },
+  "test_lineage_terminal_state": "A) FULL SUITE GREEN",
+  "tested_sha": "16b53049ff7bd431b2c217791fea7da509d05477",
+  "unresolved_ambiguities": [
+    "AMB-G5R-01: canonical CEREBUS v4 PDF is not in the repository; source binding is to the repo text extract (SHA-256 72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233, 366841 bytes) \u2014 re-audit if a canonical PDF later differs.",
+    "AMB-G5R-02 (reduced): frozen protocol mechanism binding is now a tested field-level comparison; claim-level linkage remains mechanism-mediated (the protocol carries no direct claim_ref) \u2014 documented, not hidden.",
+    "ER-06 depth: the kernel has no live adapter engine; TC-06 grades make contract-declared vs empirically-verified explicit rather than closing the gap.",
+    "G3-composition: G5 independence assesses source + (optional) method/runtime; model_family, provider, retrieval, design and allocator overlap remain out of G5 scope and are labeled FULL_INDEPENDENCE_NOT_ASSESSED where only source diversity is known.",
+    "CON-02: allocator provenance observability is carried into G6 without constitutionalizing a solution (A-009/A-010 unchanged).",
+    "CON-03: threshold transparency/gameability is NOT declared constitutionally solved by S20.",
+    "AMB-08: an OPERATOR_HOLD is a hold, not a resolution \u2014 carried."
+  ],
+  "unresolved_contradictions": []
+}

@@ -1,0 +1,243 @@
+{
+  "blocks_gate_policy": {
+    "blocking_classifications": [
+      "ARCHITECTURE_CONTRADICTION",
+      "AUTHORITY_AMBIGUITY",
+      "FIXTURE_DEFECT",
+      "IMPLEMENTATION_DEFECT"
+    ],
+    "blocking_when_unresolvable": [
+      "RECEIPT_OR_CLAIM_DEFECT",
+      "INSUFFICIENT_EVIDENCE"
+    ],
+    "never_blocking_classifications": [
+      "NOT_EQUIVALENT",
+      "FUTURE_PLANNING_IMPACT",
+      "SUPERSEDED_BY_LATER_ARTIFACT"
+    ],
+    "note": "declared in revision R2 so the gate decision is a function of this contract, not of an ad-hoc judgement. A finding blocks the gate when it makes the claimed result unverifiable AS DECLARED. A finding does not block when the referent is unambiguously locatable from another declaration in the same receipt and the substantive result is independently reproducible; it is still recorded and still requires operator authority before ratification.",
+    "resolvable_narrowly": {
+      "INSUFFICIENT_EVIDENCE": "a comparison gap where the declared vector cannot establish equivalence blocks when severity is HIGH; a LOW-severity gap (differences that are only coarse proxies for the family) is recorded without blocking",
+      "RECEIPT_OR_CLAIM_DEFECT": "blocks unless the declared identifier resolves through an abbreviation the same receipt declares AND the resolved object's own subject matches the receipt's declared subject verbatim; then severity is capped at MEDIUM, blocks_gate=false, and the entry stays in the register with the resolution recorded"
+    }
+  },
+  "classification_vocabulary": [
+    "NOT_EQUIVALENT",
+    "IMPLEMENTATION_DEFECT",
+    "FIXTURE_DEFECT",
+    "RECEIPT_OR_CLAIM_DEFECT",
+    "ARCHITECTURE_CONTRADICTION",
+    "AUTHORITY_AMBIGUITY",
+    "INSUFFICIENT_EVIDENCE",
+    "FUTURE_PLANNING_IMPACT"
+  ],
+  "counts": {
+    "comparison_contradictions": 0,
+    "gate_findings_blocking": 0,
+    "gate_findings_recorded_not_blocking": 1,
+    "gate_findings_total": 65,
+    "guarded_property_violations": 0
+  },
+  "counts_by_classification": {
+    "NOT_EQUIVALENT": 6,
+    "RECEIPT_OR_CLAIM_DEFECT": 1,
+    "SUPERSEDED_BY_LATER_ARTIFACT": 1
+  },
+  "entries": [
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "2cdd903dac199159ca9e",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G2:S05",
+      "preserved_evidence": {
+        "left_outcome_class": "STABLE_PRESERVED",
+        "right_outcome_class": "DOMAIN_CONTRADICTION_OPEN"
+      },
+      "reason": "different state machines (M5_PHASE vs DOMAIN_MACHINE): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G5:S16",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "fe5d7e429847df5f04d0",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G2:S05",
+      "preserved_evidence": {
+        "left_outcome_class": "STABLE_PRESERVED",
+        "right_outcome_class": "ACTION_AUTHORIZED_BY_OPERATOR"
+      },
+      "reason": "different state machines (M5_PHASE vs AUTHORITY): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S22",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "ded8ac599e30eb82859f",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G2:S05",
+      "preserved_evidence": {
+        "left_outcome_class": "STABLE_PRESERVED",
+        "right_outcome_class": "UNRESOLVED_HELD"
+      },
+      "reason": "different state machines (M5_PHASE vs AUTHORITY): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S24",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "23a01a5b86091e2c966b",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G5:S16",
+      "preserved_evidence": {
+        "left_outcome_class": "DOMAIN_CONTRADICTION_OPEN",
+        "right_outcome_class": "ACTION_AUTHORIZED_BY_OPERATOR"
+      },
+      "reason": "different state machines (DOMAIN_MACHINE vs AUTHORITY): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S22",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "eaf4272416698d3e30fe",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G5:S16",
+      "preserved_evidence": {
+        "left_outcome_class": "DOMAIN_CONTRADICTION_OPEN",
+        "right_outcome_class": "UNRESOLVED_HELD"
+      },
+      "reason": "different state machines (DOMAIN_MACHINE vs AUTHORITY): terminal vocabulary is not interchangeable (contract rule N8)",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S24",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "NOT_EQUIVALENT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "1cc7b1cf83e87259aa17",
+      "family_id": "F9",
+      "governing_contract_refs": [
+        "rule N8"
+      ],
+      "kind": "DIAGNOSTIC_NON_COMPARABILITY",
+      "left": "F9::LOCAL::G6:S22",
+      "preserved_evidence": {
+        "left_outcome_class": "ACTION_AUTHORIZED_BY_OPERATOR",
+        "right_outcome_class": "UNRESOLVED_HELD"
+      },
+      "reason": "diagnostic family: no equivalence verdict is claimed. The machine-local tokens ('DIRECTIVE_AUTHORIZED' vs 'UNRESOLVED_GOVERNANCE_EVENT') come from different vocabularies and are not interchangeable (rule N8); the mandated relationship is adjudicated in F2 through the conceptual projection.",
+      "required_next_authority": "none (diagnostic family claims no verdict)",
+      "right": "F9::LOCAL::G6:S24",
+      "severity": "INFO",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "RECEIPT_OR_CLAIM_DEFECT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "e936c1f1a95bc255f02f",
+      "family_id": "F7",
+      "governing_contract_refs": [
+        "G8 \u00a77 cross-gate claims"
+      ],
+      "kind": "GATE_CLAIM_FINDING",
+      "left": "stress-suite/evidence/G4_EVIDENCE_RECEIPT.json",
+      "preserved_evidence": {
+        "candidate_count": 1,
+        "declaration": "artifacts_head_sha",
+        "declared_sha": "490e078d1e2e6f1c31e88944de9cf2dcd99a4609",
+        "declared_subject": "STRESS-G4X: adversarial cross-scenario and metamorphic regression suite (66 tests)",
+        "declared_subject_matches": true,
+        "prefix": "490e078d",
+        "resolved_candidate": "490e078d2b5c4360ca71f062e3736b7555c9f627",
+        "resolved_subject": "STRESS-G4X: adversarial cross-scenario and metamorphic regression suite (66 tests)"
+      },
+      "reason": "the receipt declares the full-length identifier 490e078d1e2e6f1c31e88944de9cf2dcd99a4609, which is not an object in this repository. Its own abbreviation 490e078d resolves to exactly one commit, 490e078d2b5c4360ca71f062e3736b7555c9f627, whose recorded subject is 'STRESS-G4X: adversarial cross-scenario and metamorphic regression suite (66 tests)' and matches the receipt's declared subject verbatim, so the substantive result is locatable and reproducible. The declared identifier is a transcription defect in a historical receipt; G8 records it and does not rewrite the receipt \u00a711.",
+      "required_next_authority": "operator/architecture review",
+      "right": "",
+      "severity": "MEDIUM",
+      "superseded_by": "",
+      "supersession_detail": "",
+      "undeclared_fields": []
+    },
+    {
+      "blocks_gate": false,
+      "changes_historical_meaning": false,
+      "classification": "SUPERSEDED_BY_LATER_ARTIFACT",
+      "differing_fields": [],
+      "discriminator_ids": [],
+      "entry_id": "4f8dfba3523b46a4c211",
+      "family_id": "F7",
+      "governing_contract_refs": [
+        "G6-TC09 authority-mutation accounting"
+      ],
+      "kind": "GATE_CLAIM_FINDING_SUPERSEDED",
+      "left": "stress-suite/evidence/G6_EVIDENCE_RECEIPT.json",
+      "preserved_evidence": {},
+      "reason": "receipt collapsed simulated scenario-internal authority transitions into 'NONE' | superseded by G6_TRUTH_CLOSURE_RECEIPT.json which declares: CONFIRMED -> external=0, production=0, scenario_internal_authority_events measured per scenario",
+      "required_next_authority": "none \u2014 corrected by a later recorded artifact",
+      "right": "",
+      "severity": "MEDIUM",
+      "superseded_by": "G6_TRUTH_CLOSURE_RECEIPT.json",
+      "supersession_detail": "CONFIRMED -> external=0, production=0, scenario_internal_authority_events measured per scenario",
+      "undeclared_fields": []
+    }
+  ],
+  "gate_exit": "PASS_G8_CROSS_SCENARIO_COHERENCE",
+  "note": "an entry with classification NOT_EQUIVALENT or FUTURE_PLANNING_IMPACT is not an institutional contradiction; every other class requires authority review before ratification",
+  "open_entries": 8,
+  "register_id": "G8-CONTRADICTION-REGISTER-001"
+}

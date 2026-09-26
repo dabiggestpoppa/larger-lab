@@ -1,0 +1,9 @@
+{
+  "epoch_id": "E-S02-0",
+  "predecessor": "E-PRIOR-RATIFIED",
+  "governing_architecture_versions": {"constitution": "1.1", "a009": "v1.0", "a010": "v1.0"},
+  "evaluation_contract": "S02-EVAL-V1",
+  "authority_state": {"PO": "PO", "GOVERNOR": "GOVERNOR"},
+  "active_knowledge": ["@K_REV"],
+  "dependency_summary": {"incumbent": "HEALTHY at t0"}
+}
