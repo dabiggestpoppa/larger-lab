@@ -183,8 +183,8 @@ def install(mod):
 '''
 
 _R44_POISON_TRANSFORM = (
-    "        _publish_no_replace(tmp, claim_path)",
-    "        _pre_r44_publish_claim(claim_path, payload)",
+    "            _publish_no_replace(tmp, claim_path)",
+    "            _pre_r44_publish_claim(claim_path, payload)",
 )
 
 _R44_POISON_HELPER = '''

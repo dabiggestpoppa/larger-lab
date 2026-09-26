@@ -117,6 +117,32 @@ _TRANSITION_LADDER = {
     "FAILED": set(),
 }
 _CLAIM_FORMAT = "oce-transition-claim-v1"
+_CLAIM_TEMP_LIVENESS_ATTEMPTS = 4
+
+
+# The R44X2 claim temporary lifecycle
+# -----------------------------------
+# A crashed publisher leaves its private temporary behind (R44R1 law); the
+# next attempt discards it. But a discarder that deleted ANY matching name
+# would also delete a LIVE attempt's in-flight temporary — the defect
+# B4-CXR7U9R44X2 closes.
+#
+# Liveness is proven with an OS lock on the temporary itself, never with
+# names or timestamps:
+#
+#   writer:   mkstemp(temp) -> open second descriptor -> flock it EX | NB
+#             -> st_nlink >= 1 (else retreat to a fresh temporary)
+#             -> write+fsync payload -> no-replace publish -> release
+#   discarder: open candidate -> try flock EX | NB: HELD -> live, skip;
+#             FREE -> dead (or pre-lock window) -> close probe -> unlink
+#
+# The writer holds the lock from before the first payload byte until the
+# temporary is published or abandoned, so a discarder can only ever delete
+# a temporary whose writer is dead — or one still inside the mkstemp-to-lock
+# window, where nothing has been written and the writer retreats
+# (st_nlink < 1) to a brand-new temporary. On Windows, default share
+# semantics refuse unlinking any open file, so the live temporary is
+# doubly protected there.
 
 PHASES_PROMOTE = [
     "inventory_validated",
@@ -743,21 +769,126 @@ def _claim_temp_prefix(operation_id) -> str:
     return f".{operation_id}.claim."
 
 
-def _discard_abandoned_claim_temporaries(operation_id, directory) -> None:
-    """Remove claim temporaries abandoned by a crash BEFORE publication.
+def _open_claim_temporary(operation_id, directory):
+    """Create ONE claim temporary whose exclusive OS lock is held from before
+    the first payload byte until publication or abandonment (B4-CXR7U9R44X2).
 
-    Only this operation's private dot-prefixed temporaries are considered, and
-    only while the operation's stable OS lock is held, so a live publisher can
-    never lose a file it is still writing. The canonical claim name is never a
-    candidate.
+    A crashed attempt leaves its private temporary behind for the next
+    attempt to discard, so liveness must be provable WITHOUT trusting names
+    or timestamps: the writer locks the temporary ITSELF — through a second
+    descriptor, so the bridge-visible write descriptor stays untouched — and
+    holds that lock for the temporary's whole life. The discarder therefore
+    removes an abandoned temporary only when it can take its lock; a live
+    writer's lock is held, so its temporary is untouchable.
+
+    Creation is wrapped in a bounded retreat loop for the one window the
+    lock cannot cover — between mkstemp and the lock — where a concurrent
+    discarder may unlink this fresh file: the writer detects that
+    (st_nlink < 1 after the lock is acquired) and retreats to a brand-new
+    temporary instead of ever writing into a file someone else is removing.
+    So a discarder never sees a lock it can take on a live committed writer,
+    and a writer never writes into a deleted temporary: the defect where a
+    racing discard deleted a live publisher's in-flight claim (the
+    B4-CXR7U9R44X2 CI failure) is closed on both sides.
+
+    Returns (fd, temporary_path, lockfd): fd is the write descriptor (and
+    the one the test bridge observes); lockfd stays open and locked, and
+    the CALLER must close it exactly when the temporary is published or
+    abandoned.
+    """
+    for _attempt in range(_CLAIM_TEMP_LIVENESS_ATTEMPTS):
+        fd, tmp = tempfile.mkstemp(prefix=_claim_temp_prefix(operation_id),
+                                   suffix=".tmp", dir=directory)
+        try:
+            lockfd = os.open(tmp, os.O_RDWR)
+        except OSError:
+            # The fresh temporary vanished before it could be reopened: a
+            # concurrent discarder won the creation window. Nothing was
+            # written to it. Retreat to a brand-new temporary.
+            os.close(fd)
+            continue
+        try:
+            os.lseek(lockfd, 0, os.SEEK_SET)
+            if os.name == "nt":
+                import msvcrt
+                msvcrt.locking(lockfd, msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(lockfd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            # A discarder holds the probe lock on this fresh name: it is
+            # mid-decision on a file this attempt has not committed to.
+            # Retreat to a brand-new temporary.
+            os.close(lockfd)
+            os.close(fd)
+            continue
+        if os.fstat(lockfd).st_nlink < 1:
+            # The creation-window loss: the file was unlinked between
+            # mkstemp and the lock above. Nothing was written. Retreat.
+            os.close(lockfd)
+            os.close(fd)
+            continue
+        return fd, tmp, lockfd
+    raise RuntimeError(
+        "could not create a locked claim temporary after "
+        f"{_CLAIM_TEMP_LIVENESS_ATTEMPTS} attempts")
+
+
+def _discard_abandoned_claim_temporaries(operation_id, directory) -> None:
+    """Remove claim temporaries abandoned by a crash BEFORE publication
+    (B4-CXR7U9R44R1), NEVER one that a live attempt is still writing
+    (B4-CXR7U9R44X2).
+
+    Only this operation's private dot-prefixed temporaries are candidates,
+    and the canonical claim name is never one. Liveness is proven with the
+    OS lock the writer holds on the temporary itself (_open_claim_temporary):
+    a temporary is removed only when its lock can be taken here. A held lock
+    means a live writer — the candidate is skipped, never touched. A free
+    lock means the writer is dead, or still inside its creation window where
+    it has written nothing and will retreat to a fresh temporary on its own.
+    An undecidable probe (the file vanished mid-probe) touches nothing.
+    On Windows an unlink of a file opened by a live writer fails on default
+    share semantics regardless, so the live temporary is doubly protected.
     """
     prefix = _claim_temp_prefix(operation_id)
-    for name in os.listdir(directory):
-        if name.startswith(prefix) and name.endswith(".tmp"):
+    try:
+        names = os.listdir(directory)
+    except OSError:
+        return
+    for name in names:
+        if not (name.startswith(prefix) and name.endswith(".tmp")):
+            continue
+        path = os.path.join(directory, name)
+        try:
+            probe = os.open(path, os.O_RDWR)
+        except OSError:
+            # Already gone, or undecidable: touch nothing.
+            continue
+        held = False
+        try:
             try:
-                os.unlink(os.path.join(directory, name))
+                os.lseek(probe, 0, os.SEEK_SET)
+                if os.name == "nt":
+                    import msvcrt
+                    msvcrt.locking(probe, msvcrt.LK_NBLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(probe, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except OSError:
-                pass
+                # The lock is HELD: a live writer owns this temporary.
+                held = True
+        finally:
+            os.close(probe)
+        if held:
+            continue
+        # The lock was FREE: the writer is dead, or still inside its creation
+        # window (nothing written; that writer will retreat on its own).
+        # Release the probe BEFORE unlinking — Windows cannot unlink an open
+        # file — then remove the abandoned temporary.
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
 
 
 def _publish_no_replace(source_path, destination_path) -> None:
@@ -816,46 +947,93 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
     if promote is not None:
         claim["receipt_sha256"] = _receipt_digest(promote)
     payload = (json.dumps(claim, sort_keys=True, indent=2) + "\n").encode("utf-8")
-    fd, tmp = tempfile.mkstemp(prefix=_claim_temp_prefix(operation_id),
-                               suffix=".tmp", dir=directory)
-    try:
-        with os.fdopen(fd, "wb") as stream:
-            stream.write(payload)
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.chmod(tmp, 0o600)
-    except BaseException:
+    # The publication is wrapped in a bounded retreat loop (B4-CXR7U9R44X2):
+    # the liveness lock must be RELEASED before a Windows rename (the open
+    # descriptor would make the rename refuse), and after that release a
+    # concurrent discarder could remove the not-yet-published temporary.
+    # Nothing canonical exists in that case, so this attempt rebuilds a fresh
+    # temporary and retries instead of failing: interference can delay the
+    # claim but can never strand or corrupt the operation's authority.
+    for _publish_attempt in range(_CLAIM_TEMP_LIVENESS_ATTEMPTS):
+        fd, tmp, lockfd = _open_claim_temporary(operation_id, directory)
+        if os.name == "nt":
+            # Windows cannot rename a file with an open descriptor; from here
+            # the temporary is protected by default share semantics instead
+            # (a unlink of the open file fails for the discarder).
+            os.close(lockfd)
+            lockfd = None
         try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise
-    try:
-        _publish_no_replace(tmp, claim_path)
-    except FileExistsError:
-        # Exactly one branch won. The canonical claim is always complete when
-        # it is visible, so the winning transition can be named truthfully.
+            with os.fdopen(fd, "wb") as stream:
+                stream.write(payload)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.chmod(tmp, 0o600)
+        except BaseException:
+            if lockfd is not None:
+                os.close(lockfd)
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
         try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        winner = _load_claim(operation_id)
-        chosen = winner.get("transition") if winner else "unknown"
+            _publish_no_replace(tmp, claim_path)
+        except FileExistsError:
+            # Exactly one branch won. The canonical claim is always complete
+            # when it is visible, so the winning transition can be named
+            # truthfully.
+            if lockfd is not None:
+                os.close(lockfd)
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            winner = _load_claim(operation_id)
+            chosen = winner.get("transition") if winner else "unknown"
+            raise RuntimeError(
+                f"recovery operation {operation_id} was already claimed for "
+                "a different or earlier transition "
+                f"({chosen!r}); the {transition!r} authority is spent")
+        except FileNotFoundError:
+            # The temporary vanished before publication: a discarder removed
+            # it in the released window (nothing canonical was created). The
+            # payload is gone with it; retreat and rebuild from scratch. If
+            # the error came from elsewhere and this attempt still owns the
+            # private name, retire it best-effort so no garbage survives.
+            if lockfd is not None:
+                os.close(lockfd)
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            continue
+        except BaseException:
+            if lockfd is not None:
+                os.close(lockfd)
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
+        if lockfd is not None:
+            # POSIX: the canonical name is now bound to the durable inode.
+            # Release the liveness lock; the private name is retired below.
+            os.close(lockfd)
+        break
+    else:
         raise RuntimeError(
-            f"recovery operation {operation_id} was already claimed for a "
-            f"different or earlier transition ({chosen!r}); the "
-            f"{transition!r} authority is spent")
-    except BaseException:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
-        raise
+            "could not publish the transition claim temporary after "
+            f"{_CLAIM_TEMP_LIVENESS_ATTEMPTS} attempts")
     _fsync_dir(directory)
     if os.path.lexists(tmp):
         # POSIX: the publication left the private temporary as a second name
         # for the same durable inode. Retire it; the canonical claim remains.
-        os.unlink(tmp)
+        try:
+            os.unlink(tmp)
+        except FileNotFoundError:
+            # A later attempt's discarder retired the leftover name first;
+            # the canonical claim is a second independent name and unaffected.
+            pass
         _fsync_dir(directory)
     # The record is moved to the IN-FLIGHT state only after the claim was
     # durably published: state validation happened in

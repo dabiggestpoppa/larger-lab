@@ -116,13 +116,13 @@ def test_control_state_check_before_nonatomic_claim_loses_the_race(
     receipt, _path, _inv, _sha = _promoted(bridge, tmp_path, monkeypatch)
 
     def weaken(source):
-        old = "    try:\n        _publish_no_replace(tmp, claim_path)"
-        new = ("    if os.path.exists(claim_path):\n"
-               "        raise RuntimeError('claimed')\n"
-               "    _neg_control_barrier.wait()\n"
-               "    try:\n"
-               "        with open(claim_path, 'wb') as stream:\n"
-               "            stream.write(payload)")
+        old = "        try:\n            _publish_no_replace(tmp, claim_path)"
+        new = ("        if os.path.exists(claim_path):\n"
+               "            raise RuntimeError('claimed')\n"
+               "        _neg_control_barrier.wait()\n"
+               "        try:\n"
+               "            with open(claim_path, 'wb') as stream:\n"
+               "                stream.write(payload)")
         assert old in source, "atomic claim publication not found"
         return source.replace(old, new)
 
