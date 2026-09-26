@@ -151,6 +151,14 @@ class RedundancyBook:
         # model validator, so both coverages are re-derived here from the
         # record's CURRENT state.
         #
+        # Typed-binding gate first: raw or untyped bindings (smuggled past the
+        # constructor via model_copy) must fail closed, never crash.
+        for binding in assessment.independence_bindings:
+            if not isinstance(binding, IndependenceClaimBinding):
+                raise Book4ProvenanceError(
+                    "independence bindings must be typed IndependenceClaimBinding "
+                    "records; untyped binding payloads are rejected"
+                )
         # CLAIM COVERAGE: binding claim refs must exactly cover the declared
         # positive_independence_claim_refs (unchanged R2 doctrine).
         bound_refs = {
