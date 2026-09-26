@@ -1163,6 +1163,36 @@ def _receiptless_selector_agrees(operation_id, transition,
     return isinstance(claim, dict) and claim.get("transition") == transition
 
 
+def _selector_agrees_with_finalizing(operation_id, promote,
+                                     transition_dir=None):
+    """ONE state/selector agreement law for FINALIZING (B4-CXR7U9R45R3).
+
+    Shared verbatim by the shell classifier and phase_reconcile, so the two
+    surfaces can never disagree about a FINALIZING record whose canonical
+    claim is missing, wrong-branched or bound to foreign authority:
+
+      * no canonical claim  -> the selector was lost before the state advance;
+        the governed preintent abort stands (the record itself re-proves its
+        binding on the resume path);
+      * a claim that exists -> it must bind THIS finalize branch exactly
+        (receipt-bound when a promote receipt is available, complete and
+        finalize-naming when none is); anything else is disagreement and
+        fails closed.
+    """
+    if not isinstance(operation_id, str)             or not OPERATION_ID_RE.match(operation_id):
+        return True
+    try:
+        if _claim_state(operation_id, transition_dir) == "absent":
+            return True
+        if promote is not None:
+            return _valid_transition_claim(operation_id, "finalize", promote,
+                                           transition_dir=transition_dir)
+        return _receiptless_selector_agrees(operation_id, "finalize",
+                                            transition_dir)
+    except _ExecutionAuthorityConflict:
+        return False
+
+
 def _claim_state(operation_id, transition_dir=None,
                  expected_receipt_sha256=None):
     """The SEMANTIC state of the durable branch selector (B4-CXR7U9R45R1).
@@ -2863,7 +2893,13 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
         else:
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_FINALIZING:
-        if observation["quarantine_present"] is True \
+        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R3): the same
+        # state/selector agreement the shell classifier enforces. A FINALIZING
+        # record whose claim is wrong-branched or foreign-bound is
+        # unreconciled, never a governed abort.
+        if not _selector_agrees_with_finalizing(operation_id, promote):
+            verdict = "unreconciled"
+        elif observation["quarantine_present"] is True \
                 and observation["canonical_matches_inventory"] is True:
             verdict = "preintent_abort_required"
         else:
@@ -2958,19 +2994,9 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # the state and the selector DISAGREE: fail closed, never re-describe
         # the spent selector as governed abort authority. A crash that lost
         # the claim BEFORE the state advance keeps its governed abort (5).
-        if isinstance(operation_id, str) and OPERATION_ID_RE.match(operation_id) \
-                and _claim_state(operation_id, transition_dir) != "absent":
-            if promote is not None:
-                if not _valid_transition_claim(operation_id, "finalize",
-                                               promote,
-                                               transition_dir=transition_dir):
-                    return 4
-            elif not _receiptless_selector_agrees(
-                    operation_id, "finalize", transition_dir):
-                # No receipt to bind: the selector must at least be a complete
-                # engine-published claim naming THIS branch, or the durable
-                # state and the selector disagree — fail closed.
-                return 4
+        if not _selector_agrees_with_finalizing(operation_id, promote,
+                                                transition_dir):
+            return 4
         if record.get("selected_transition") == "finalize":
             return 5
         return 4
