@@ -21,13 +21,17 @@ from crypto_systems_intelligence_atlas.dependency import (
     FallbackState,
     HardRuntimeEvidence,
     HardRuntimeFact,
-    HardRuntimeFactBinding,
+    HardRuntimeFactContextBinding,
     RuntimeScope,
 )
 from crypto_systems_intelligence_atlas.dependency_paths import DependencyPath, PathRelation
 from crypto_systems_intelligence_atlas.dependency_provenance import Book4Provenance
 from crypto_systems_intelligence_atlas.evidence import EvidenceStore, EvidenceTier
-from crypto_systems_intelligence_atlas.failure_domains import FailureDomain, FailureDomainType
+from crypto_systems_intelligence_atlas.failure_domains import (
+    FailureDomain,
+    FailureDomainType,
+    IndependenceClaimBinding,
+)
 from crypto_systems_intelligence_atlas.infrastructure_context import InfrastructureContext
 from crypto_systems_intelligence_atlas.protocol_roles import ProtocolRole, RoleAssignment, RoleState
 from crypto_systems_intelligence_atlas.redundancy import (
@@ -52,6 +56,8 @@ from crypto_systems_intelligence_atlas.types import AuthoritySeed, AuthorityTier
 
 NOW = datetime(2026, 9, 25, 12, tzinfo=UTC)
 CLAIM_REF = "book4-claim-current"
+EVIDENCE_CONSUMER = "fixture:liquidation-contract"
+EVIDENCE_PROVIDER = "fixture:rpc-primary"
 FACT_CLAIM_REFS = {
     HardRuntimeFact.IDENTITY: "book4-fact-identity",
     HardRuntimeFact.DEPLOYED_CONFIGURATION: "book4-fact-deployment",
@@ -125,14 +131,23 @@ def make_claim(
     evidence_ref: str = "book4-evidence",
     qualifier: str | None = None,
 ) -> Claim:
+    # Fact-class claims encode the assessment context in their proposition:
+    # subject = consumer, object = provider (Book 2 has no function/scope
+    # dimension; those live only in the typed Book 4 context binding).
+    if qualifier in {fact.value for fact in HardRuntimeFact}:
+        subject_refs: tuple[str, ...] = (EVIDENCE_CONSUMER,)
+        object_ref = EVIDENCE_PROVIDER
+    else:
+        subject_refs = ("fixture:system",)
+        object_ref = claim_id
     return Claim(
         claim_id=claim_id,
         evidence_refs=(evidence_ref,),
         source_refs=("csia:source:book4-offline",),
         proposition=Proposition(
-            subject_refs=("fixture:system",),
+            subject_refs=subject_refs,
             predicate="has_infrastructure_role",
-            object_ref=claim_id,
+            object_ref=object_ref,
             qualifier=qualifier,
         ),
         claim_family=ClaimFamily.CHAIN_ARCHITECTURE,
@@ -240,6 +255,57 @@ def service_kernel() -> ClaimService:
     return service
 
 
+def add_pair_independence_claim(
+    claims: ClaimStore,
+    evidence: EvidenceStore,
+    *,
+    left_system: str,
+    right_system: str,
+    claim_id: str | None = None,
+    source_id: str = "csia:source:book4-offline",
+) -> str:
+    """Mint a canonical POSITIVE_INDEPENDENCE claim bound to one exact pair.
+
+    The proposition encodes subject = left system and object = right system,
+    so the claim can only support independence for that exact comparison.
+    """
+
+    resolved_id = claim_id or f"book4-independence-{left_system}-{right_system}"
+    evidence_id = evidence.capture(
+        source_id=source_id,
+        retrieved_at=NOW,
+        content=f"book4 pair independence evidence {resolved_id}".encode(),
+        content_locator=f"fixture://book4/independence/{resolved_id}",
+        raw_snapshot_ref=f"snapshot://book4/independence/{resolved_id}",
+        extractor_version="test",
+        parser_version="test",
+        evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
+    ).evidence_id
+    claims.add_initial(
+        Claim(
+            claim_id=resolved_id,
+            evidence_refs=(evidence_id,),
+            source_refs=(source_id,),
+            proposition=Proposition(
+                subject_refs=(left_system,),
+                predicate="independent_failure_domain",
+                object_ref=right_system,
+                qualifier="POSITIVE_INDEPENDENCE",
+            ),
+            claim_family=ClaimFamily.CHAIN_ARCHITECTURE,
+            claim_state=ClaimState.OBSERVED,
+            valid_time_hypothesis=NOW,
+            observed_time=NOW,
+            methodology=Methodology(
+                methodology_ref="offline-book4-fixture",
+                version="1",
+                description="deterministic offline Book 4 pair independence input",
+            ),
+        )
+    )
+    return resolved_id
+
+
 def descriptor(
     *, state: DependencyStrengthState = DependencyStrengthState.PRIMARY
 ) -> DependencyStrengthDescriptor:
@@ -295,8 +361,17 @@ def path(path_id: str = "path-abc") -> DependencyPath:
 
 
 def hard_evidence(**updates: object) -> HardRuntimeEvidence:
+    function = str(updates.get("function", "submit liquidation transaction"))
+    scope = str(updates.get("scope", "production liquidation"))
     bindings = tuple(
-        HardRuntimeFactBinding(fact=fact, claim_refs=(claim_ref,))
+        HardRuntimeFactContextBinding(
+            fact=fact,
+            claim_refs=(claim_ref,),
+            consumer_ref=EVIDENCE_CONSUMER,
+            provider_ref=EVIDENCE_PROVIDER,
+            function=function,
+            scope=scope,
+        )
         for fact, claim_ref in FACT_CLAIM_REFS.items()
     )
     claim_refs = (CLAIM_REF, *(ref for ref in FACT_CLAIM_REFS.values()))
@@ -344,7 +419,7 @@ def failure_domain(
         mechanism_evidence_refs=(f"snapshot://book4/mechanism/{key}",),
         correlation_scope="fixture deployment",
         valid_time=NOW,
-        book2_claim_refs=(CLAIM_REF,),
+        book2_claim_refs=(CLAIM_REF, MECHANISM_CLAIM_REFS[key]),
     )
 
 
@@ -356,6 +431,19 @@ def redundancy(
     failure_domain_refs: tuple[str, ...] = (),
     positive: tuple[str, ...] = (),
 ) -> RedundancyAssessment:
+    bindings: tuple[IndependenceClaimBinding, ...] = ()
+    if positive:
+        bindings = tuple(
+            IndependenceClaimBinding(
+                claim_ref=claim_ref,
+                left_domain_ref="fixture:provider-a",
+                right_domain_ref="fixture:provider-b",
+                left_system_ref="fixture:liquidation-contract",
+                right_system_ref="fixture:liquidation-contract",
+                correlation_scope="liquidation execution",
+            )
+            for claim_ref in positive
+        )
     return RedundancyAssessment(
         redundancy_id=assessment_id,
         subject_ref="fixture:liquidation-contract",
@@ -365,12 +453,11 @@ def redundancy(
         shared_upstreams=shared_upstreams,
         failure_domain_refs=failure_domain_refs,
         independence_dimensions=("operator", "backend"),
-        positive_independence_claim_refs=(
-            (INDEPENDENCE_CLAIM_REF,) if positive else ()
-        ),
+        positive_independence_claim_refs=positive,
+        independence_bindings=bindings,
         state=state,
         valid_time=NOW,
-        book2_claim_refs=(CLAIM_REF,),
+        book2_claim_refs=(CLAIM_REF, *positive),
     )
 
 

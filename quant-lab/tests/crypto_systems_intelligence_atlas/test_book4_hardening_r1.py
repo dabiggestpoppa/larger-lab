@@ -15,7 +15,6 @@ from crypto_systems_intelligence_atlas.book4_r1_support import (
     MECHANISM_RIGHT_CLAIM,
     MECHANISM_SHARED_CLAIM,
     NOW,
-    all_snapshot_refs,
     contested_kernel,
     fact_bindings,
     failure_domain_r1,
@@ -24,6 +23,10 @@ from crypto_systems_intelligence_atlas.book4_r1_support import (
     redundancy_r1,
     snapshot_ref,
 )
+from crypto_systems_intelligence_atlas.book4_test_support import (
+    add_pair_independence_claim,
+)
+from crypto_systems_intelligence_atlas.book4_r1_support import SOURCE_ID
 from crypto_systems_intelligence_atlas.claims import ClaimState
 from crypto_systems_intelligence_atlas.promotion import ClaimStateEngine
 from crypto_systems_intelligence_atlas.dependency import (
@@ -36,7 +39,7 @@ from crypto_systems_intelligence_atlas.dependency import (
     DependencyStrengthState,
     FallbackState,
     HardRuntimeFact,
-    HardRuntimeFactBinding,
+    HardRuntimeFactContextBinding,
     HardRuntimeGate,
     RuntimeScope,
 )
@@ -47,6 +50,7 @@ from crypto_systems_intelligence_atlas.dependency_provenance import (
 from crypto_systems_intelligence_atlas.failure_domains import (
     FailureDomainBook,
     FailureDomainClassification,
+    IndependenceClaimBinding,
 )
 from crypto_systems_intelligence_atlas.relationships import EdgeType
 from crypto_systems_intelligence_atlas.redundancy import RedundancyBook, RedundancyState
@@ -156,7 +160,14 @@ def test_a6_non_promotable_fact_claims_cannot_support_hard_runtime(
 ) -> None:
     provenance = _provenance_with_claim_in_state(target)
     bindings = tuple(
-        HardRuntimeFactBinding(fact=binding.fact, claim_refs=(INDEPENDENCE_CONTESTED_CLAIM,))
+        HardRuntimeFactContextBinding(
+            fact=binding.fact,
+            claim_refs=(INDEPENDENCE_CONTESTED_CLAIM,),
+            consumer_ref=binding.consumer_ref,
+            provider_ref=binding.provider_ref,
+            function=binding.function,
+            scope=binding.scope,
+        )
         for binding in fact_bindings()
     )
     result = HardRuntimeGate(provenance).classify(hard_evidence_r1(bindings=bindings))
@@ -165,9 +176,13 @@ def test_a6_non_promotable_fact_claims_cannot_support_hard_runtime(
 
 def test_a7_fallback_proof_claim_cannot_prove_no_active_fallback() -> None:
     bindings = tuple(
-        HardRuntimeFactBinding(
-            fact=HardRuntimeFact.NO_ACTIVE_EQUIVALENT_FALLBACK,
+        HardRuntimeFactContextBinding(
+            fact=binding.fact,
             claim_refs=(ACTIVE_FALLBACK_CLAIM,),
+            consumer_ref=binding.consumer_ref,
+            provider_ref=binding.provider_ref,
+            function=binding.function,
+            scope=binding.scope,
         )
         if binding.fact is HardRuntimeFact.NO_ACTIVE_EQUIVALENT_FALLBACK
         else binding
@@ -223,16 +238,49 @@ def test_b5_noncanonical_independence_claim_cannot_establish_independence() -> N
     book = FailureDomainBook(provenance)
     left = book.add(failure_domain_r1("b5-left", mechanism_claim_refs=(MECHANISM_LEFT_CLAIM,)))
     right = book.add(failure_domain_r1("b5-right", mechanism_claim_refs=(MECHANISM_RIGHT_CLAIM,)))
-    result = book.classify(left, right, positive_independence_claim_refs=("arbitrary-string",))
+    binding = IndependenceClaimBinding(
+        claim_ref="arbitrary-string",
+        left_domain_ref=left.domain_id,
+        right_domain_ref=right.domain_id,
+        left_system_ref=left.affected_system_refs[0],
+        right_system_ref=right.affected_system_refs[0],
+        correlation_scope=left.correlation_scope,
+    )
+    result = book.classify(
+        left,
+        right,
+        positive_independence_claim_refs=("arbitrary-string",),
+        independence_bindings=(binding,),
+    )
     assert result.classification is not FailureDomainClassification.INDEPENDENT
 
 
 def test_b6_canonical_independence_claim_establishes_independence() -> None:
-    _, _, provenance = kernel()
+    claims, evidence, provenance = kernel()
     book = FailureDomainBook(provenance)
     left = book.add(failure_domain_r1("b6-left", mechanism_claim_refs=(MECHANISM_LEFT_CLAIM,)))
     right = book.add(failure_domain_r1("b6-right", mechanism_claim_refs=(MECHANISM_RIGHT_CLAIM,)))
-    result = book.classify(left, right, positive_independence_claim_refs=(INDEPENDENCE_CLAIM,))
+    claim_ref = add_pair_independence_claim(
+        claims,
+        evidence,
+        left_system=left.affected_system_refs[0],
+        right_system=right.affected_system_refs[0],
+        source_id=SOURCE_ID,
+    )
+    binding = IndependenceClaimBinding(
+        claim_ref=claim_ref,
+        left_domain_ref=left.domain_id,
+        right_domain_ref=right.domain_id,
+        left_system_ref=left.affected_system_refs[0],
+        right_system_ref=right.affected_system_refs[0],
+        correlation_scope=left.correlation_scope,
+    )
+    result = book.classify(
+        left,
+        right,
+        positive_independence_claim_refs=(claim_ref,),
+        independence_bindings=(binding,),
+    )
     assert result.classification is FailureDomainClassification.INDEPENDENT
 
 
@@ -241,8 +289,19 @@ def test_b7_contested_independence_claim_is_not_independence() -> None:
     book = FailureDomainBook(provenance)
     left = book.add(failure_domain_r1("b7-left", mechanism_claim_refs=(MECHANISM_SHARED_CLAIM,)))
     right = book.add(failure_domain_r1("b7-right", mechanism_claim_refs=(MECHANISM_LEFT_CLAIM,)))
+    binding = IndependenceClaimBinding(
+        claim_ref=INDEPENDENCE_CONTESTED_CLAIM,
+        left_domain_ref=left.domain_id,
+        right_domain_ref=right.domain_id,
+        left_system_ref=left.affected_system_refs[0],
+        right_system_ref=right.affected_system_refs[0],
+        correlation_scope=left.correlation_scope,
+    )
     result = book.classify(
-        left, right, positive_independence_claim_refs=(INDEPENDENCE_CONTESTED_CLAIM,)
+        left,
+        right,
+        positive_independence_claim_refs=(INDEPENDENCE_CONTESTED_CLAIM,),
+        independence_bindings=(binding,),
     )
     assert result.classification is not FailureDomainClassification.INDEPENDENT
 
@@ -402,7 +461,9 @@ def test_d3_snapshot_from_supporting_claim_is_accepted() -> None:
 )
 def test_e1_e4_book5_economic_relations_are_rejected(relation: EdgeType) -> None:
     payload = _dependency_payload(
-        all_snapshot_refs(), relation=relation, dependency_id=f"r1-{relation.value.lower()}"
+        (snapshot_ref(DEPLOYMENT_CLAIM),),
+        relation=relation,
+        dependency_id=f"r1-{relation.value.lower()}",
     )
     with pytest.raises(ValidationError, match="Book 4"):
         DependencyRecord.model_validate(payload)
@@ -410,7 +471,7 @@ def test_e1_e4_book5_economic_relations_are_rejected(relation: EdgeType) -> None
 
 def test_e5_capital_flow_semantics_fail_structurally_without_forbidden_phrases() -> None:
     payload = _dependency_payload(
-        all_snapshot_refs(),
+        (snapshot_ref(DEPLOYMENT_CLAIM),),
         relation=EdgeType.COLLATERAL_IN,
         dependency_id="r1-capital-flow",
         function="post units for execution",
@@ -427,7 +488,9 @@ def test_e5_capital_flow_semantics_fail_structurally_without_forbidden_phrases()
 def test_e6_e8_technical_relations_remain_supported(relation: EdgeType) -> None:
     assert relation in BOOK4_DEPENDENCY_RELATION_ALLOWLIST
     payload = _dependency_payload(
-        all_snapshot_refs(), relation=relation, dependency_id=f"r1-{relation.value.lower()}"
+        (snapshot_ref(DEPLOYMENT_CLAIM),),
+        relation=relation,
+        dependency_id=f"r1-{relation.value.lower()}",
     )
     assert DependencyRecord.model_validate(payload) is not None
 

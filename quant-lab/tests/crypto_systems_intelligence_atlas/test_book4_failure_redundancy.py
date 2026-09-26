@@ -5,10 +5,16 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from crypto_systems_intelligence_atlas.book4_test_support import failure_domain, kernel, redundancy
+from crypto_systems_intelligence_atlas.book4_test_support import (
+    add_pair_independence_claim,
+    failure_domain,
+    kernel,
+    redundancy,
+)
 from crypto_systems_intelligence_atlas.failure_domains import (
     FailureDomainBook,
     FailureDomainClassification,
+    IndependenceClaimBinding,
 )
 from crypto_systems_intelligence_atlas.redundancy import RedundancyBook, RedundancyState
 
@@ -41,11 +47,40 @@ def test_failure_domain_scenarios(
     positive: tuple[str, ...],
     expected: FailureDomainClassification,
 ) -> None:
-    _, _, provenance = kernel()
+    claims, evidence, provenance = kernel()
     book = FailureDomainBook(provenance)
     left = book.add(failure_domain(f"{case}:left", **left_kwargs))
     right = book.add(failure_domain(f"{case}:right", **right_kwargs))
-    assert book.classify(left, right, positive_independence_claim_refs=positive).classification is expected
+    if positive:
+        positive = (
+            add_pair_independence_claim(
+                claims,
+                evidence,
+                left_system=left.affected_system_refs[0],
+                right_system=right.affected_system_refs[0],
+            ),
+        )
+    bindings: tuple[IndependenceClaimBinding, ...] = ()
+    if positive:
+        bindings = (
+            IndependenceClaimBinding(
+                claim_ref=positive[0],
+                left_domain_ref=left.domain_id,
+                right_domain_ref=right.domain_id,
+                left_system_ref=left.affected_system_refs[0],
+                right_system_ref=right.affected_system_refs[0],
+                correlation_scope=left.correlation_scope,
+            ),
+        )
+    assert (
+        book.classify(
+            left,
+            right,
+            positive_independence_claim_refs=positive,
+            independence_bindings=bindings,
+        ).classification
+        is expected
+    )
 
 
 def test_two_providers_without_shared_evidence_remain_unknown() -> None:

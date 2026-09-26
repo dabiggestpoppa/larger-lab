@@ -124,6 +124,20 @@ class HardRuntimeFactBinding(BaseModel):
     claim_refs: tuple[str, ...] = Field(min_length=1)
 
 
+class HardRuntimeFactContextBinding(HardRuntimeFactBinding):
+    """Fact binding sealed to the exact consumer/provider/function/scope.
+
+    The canonical Book 2 claim remains the only authority; this binding
+    records which exact assessment context the claim is being interpreted
+    for so a claim about one system can never support another.
+    """
+
+    consumer_ref: str = Field(min_length=1)
+    provider_ref: str = Field(min_length=1)
+    function: str = Field(min_length=1)
+    scope: str = Field(min_length=1)
+
+
 class HardRuntimeEvidence(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -138,9 +152,9 @@ class HardRuntimeEvidence(BaseModel):
     valid_time: Timestamp | UnknownBound
     book2_claim_refs: tuple[str, ...] = Field(min_length=1)
     source_snapshot_refs: tuple[str, ...] = Field(min_length=1)
+    fact_bindings: tuple[HardRuntimeFactBinding, ...] = ()
     runtime_scope_hint: RuntimeScope = RuntimeScope.UNKNOWN
     escape_hatch_evidenced: bool = False
-    fact_bindings: tuple[HardRuntimeFactBinding, ...] = ()
 
     @model_validator(mode="after")
     def _identity(self) -> "HardRuntimeEvidence":
@@ -149,6 +163,27 @@ class HardRuntimeEvidence(BaseModel):
         declared = {binding.fact for binding in self.fact_bindings}
         if len(declared) != len(self.fact_bindings):
             raise ValueError("each HARD_RUNTIME fact may be bound only once")
+        if self.fact_bindings and not all(
+            isinstance(binding, HardRuntimeFactContextBinding)
+            for binding in self.fact_bindings
+        ):
+            raise ValueError(
+                "HARD_RUNTIME fact bindings must be context-bound "
+                "(consumer, provider, function, scope)"
+            )
+        for binding in self.fact_bindings:
+            if not isinstance(binding, HardRuntimeFactContextBinding):
+                continue
+            if (
+                binding.consumer_ref != self.consumer_ref
+                or binding.provider_ref != self.provider_ref
+                or binding.function != self.function
+                or binding.scope != self.scope
+            ):
+                raise ValueError(
+                    "HARD_RUNTIME fact binding context must equal the assessed "
+                    "consumer, provider, function, and scope"
+                )
         return self
 
 
@@ -177,15 +212,42 @@ class HardRuntimeGate:
         except ValueError as exc:
             reasons.append(f"snapshot lineage unsupported: {exc}")
         bound_facts: set[HardRuntimeFact] = set()
+        binding_claim_refs: set[str] = set()
         for binding in evidence.fact_bindings:
             bound_facts.add(binding.fact)
             for claim_ref in binding.claim_refs:
+                binding_claim_refs.add(claim_ref)
                 try:
-                    self.provenance.resolve_qualifier_claim(
+                    claim = self.provenance.resolve_qualifier_claim(
                         claim_ref, qualifier=binding.fact.value
                     )
                 except ValueError as exc:
                     reasons.append(f"fact {binding.fact.value} unsupported: {exc}")
+                    continue
+                if isinstance(binding, HardRuntimeFactContextBinding):
+                    proposition = claim.proposition
+                    if (
+                        proposition.subject_refs
+                        and binding.consumer_ref not in proposition.subject_refs
+                    ):
+                        reasons.append(
+                            f"fact {binding.fact.value} claim {claim_ref} does not "
+                            "bind the assessed consumer"
+                        )
+                    if (
+                        proposition.object_ref
+                        and proposition.object_ref != binding.provider_ref
+                    ):
+                        reasons.append(
+                            f"fact {binding.fact.value} claim {claim_ref} does not "
+                            "bind the assessed provider"
+                        )
+        outside = sorted(binding_claim_refs - set(evidence.book2_claim_refs))
+        if outside:
+            reasons.append(
+                "decision-driving fact claims outside the declared book2_claim_refs "
+                f"provenance set: {outside}"
+            )
         for missing in sorted(REQUIRED_HARD_RUNTIME_FACTS - bound_facts, key=lambda f: f.value):
             reasons.append(f"missing fact-specific support for {missing.value}")
         if evidence.escape_hatch_evidenced:
@@ -273,6 +335,7 @@ __all__ = [
     "HardRuntimeEvidence",
     "HardRuntimeFact",
     "HardRuntimeFactBinding",
+    "HardRuntimeFactContextBinding",
     "HardRuntimeGate",
     "REQUIRED_HARD_RUNTIME_FACTS",
     "RuntimeAssessment",

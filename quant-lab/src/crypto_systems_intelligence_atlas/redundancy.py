@@ -10,6 +10,7 @@ from .dependency_provenance import Book4Provenance, Book4ProvenanceError
 from .failure_domains import (
     POSITIVE_INDEPENDENCE_QUALIFIER,
     FailureDomainBook,
+    IndependenceClaimBinding,
 )
 from .temporal import Timestamp, UnknownBound
 
@@ -39,6 +40,7 @@ class RedundancyAssessment(BaseModel):
     failure_domain_refs: tuple[str, ...] = ()
     independence_dimensions: tuple[str, ...] = ()
     positive_independence_claim_refs: tuple[str, ...] = ()
+    independence_bindings: tuple[IndependenceClaimBinding, ...] = ()
     state: RedundancyState
     valid_time: Timestamp | UnknownBound
     book2_claim_refs: tuple[str, ...] = Field(min_length=1)
@@ -55,7 +57,29 @@ class RedundancyAssessment(BaseModel):
         if self.state is RedundancyState.CORRELATED_REDUNDANCY:
             if not (self.shared_upstreams or self.failure_domain_refs):
                 raise ValueError("CORRELATED_REDUNDANCY requires a named correlation")
+        if self.independence_bindings:
+            bound = {binding.claim_ref for binding in self.independence_bindings}
+            if bound != set(self.positive_independence_claim_refs):
+                raise ValueError(
+                    "independence bindings must cover exactly the declared "
+                    "positive_independence_claim_refs"
+                )
+        if self.positive_independence_claim_refs and not self.independence_bindings:
+            raise ValueError(
+                "redundancy independence claims require explicit provider/function/scope "
+                "IndependenceClaimBinding support"
+            )
         return self
+
+    def _binding_matches(self, binding: IndependenceClaimBinding) -> bool:
+        left_provider, right_provider = self.provider_refs[0], self.provider_refs[1]
+        return (
+            binding.left_system_ref == self.subject_ref
+            and binding.right_system_ref == self.subject_ref
+            and binding.left_domain_ref == left_provider
+            and binding.right_domain_ref == right_provider
+            and binding.correlation_scope == self.function
+        )
 
 
 class RedundancyBook:
@@ -86,6 +110,18 @@ class RedundancyBook:
             self.provenance.resolve_qualifier_claim(
                 claim_ref, qualifier=POSITIVE_INDEPENDENCE_QUALIFIER
             )
+        self.provenance.require_claim_set_closure(
+            assessment.positive_independence_claim_refs,
+            assessment.book2_claim_refs,
+            nested_role="positive independence",
+            record_kind="redundancy assessment",
+        )
+        for binding in assessment.independence_bindings:
+            if not assessment._binding_matches(binding):
+                raise Book4ProvenanceError(
+                    f"independence binding {binding.claim_ref} is not scoped to the "
+                    "assessed subject, provider pair, and function"
+                )
         self._records[assessment.redundancy_id] = assessment
         return assessment
 

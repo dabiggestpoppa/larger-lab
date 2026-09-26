@@ -58,27 +58,78 @@ class Book4Provenance:
             )
         return claim
 
+    def require_claim_set_closure(
+        self,
+        nested_claim_refs: tuple[str, ...],
+        book2_claim_refs: tuple[str, ...],
+        *,
+        nested_role: str,
+        record_kind: str,
+    ) -> None:
+        """Require every nested decision-driving claim to be declared provenance.
+
+        The record-level ``book2_claim_refs`` set is the record's declared
+        authority set; a nested decision-driving claim outside it means the
+        assessment's actual authority set differs from its declared provenance.
+        Referenced objects (for example a FailureDomain named by a redundancy
+        record) keep their own canonical provenance and are not part of this
+        closure.
+        """
+
+        declared = set(book2_claim_refs)
+        for claim_ref in nested_claim_refs:
+            if claim_ref not in declared:
+                raise Book4ProvenanceError(
+                    f"{record_kind} {nested_role} claim {claim_ref} is outside the "
+                    f"record-level book2_claim_refs provenance set"
+                )
+
+    def _normalized_snapshot_set(self, source_snapshot_refs: tuple[str, ...]) -> set[str]:
+        return set(source_snapshot_refs)
+
+    def _required_snapshot_refs(
+        self,
+        claim_refs: tuple[str, ...],
+    ) -> set[str]:
+        required: set[str] = set()
+        for claim_ref in claim_refs:
+            claim = self.resolve_claim(claim_ref)
+            for evidence_ref in claim.evidence_refs:
+                raw = self.evidence_store.require(evidence_ref)
+                required.add(raw.raw_snapshot_ref)
+        return required
+
     def validate_snapshot_lineage(
         self,
         claim_refs: tuple[str, ...],
         source_snapshot_refs: tuple[str, ...],
     ) -> None:
-        """Seal snapshot lineage against accepted Book 2 evidence metadata."""
+        """Require exact snapshot lineage: all and only reachable snapshots.
+
+        Canonical provenance is exact.  ``source_snapshot_refs`` must equal
+        (as a set) the ``raw_snapshot_ref`` values reachable from the canonical
+        Book 2 claims the record declares: every reachable snapshot must be
+        declared, and no unrelated extra snapshot may appear.  Shared snapshots
+        across claims deduplicate naturally through set equality, and no second
+        snapshot registry is introduced.
+        """
 
         if not source_snapshot_refs:
             raise Book4ProvenanceError(
                 "canonical Book 4 records require source_snapshot_refs lineage"
             )
-        for claim_ref in claim_refs:
-            claim = self.resolve_claim(claim_ref)
-            for evidence_ref in claim.evidence_refs:
-                raw = self.evidence_store.require(evidence_ref)
-                if raw.raw_snapshot_ref not in source_snapshot_refs:
-                    raise Book4ProvenanceError(
-                        f"snapshot lineage mismatch: claim {claim_ref} evidence "
-                        f"{evidence_ref} originates from snapshot "
-                        f"{raw.raw_snapshot_ref}"
-                    )
+        required = self._required_snapshot_refs(claim_refs)
+        supplied = self._normalized_snapshot_set(source_snapshot_refs)
+        missing = sorted(required - supplied)
+        extra = sorted(supplied - required)
+        if missing:
+            raise Book4ProvenanceError(
+                f"snapshot lineage mismatch: missing required snapshots {missing}"
+            )
+        if extra:
+            raise Book4ProvenanceError(
+                f"snapshot lineage mismatch: unrelated extra snapshots {extra}"
+            )
 
     def validate_refs(
         self,

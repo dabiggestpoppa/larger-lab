@@ -17,11 +17,15 @@ from crypto_systems_intelligence_atlas.dependency import (
     FallbackState,
     HardRuntimeEvidence,
     HardRuntimeFact,
-    HardRuntimeFactBinding,
+    HardRuntimeFactContextBinding,
 )
 from crypto_systems_intelligence_atlas.dependency_provenance import Book4Provenance
 from crypto_systems_intelligence_atlas.evidence import EvidenceStore, EvidenceTier
-from crypto_systems_intelligence_atlas.failure_domains import FailureDomain, FailureDomainType
+from crypto_systems_intelligence_atlas.failure_domains import (
+    FailureDomain,
+    FailureDomainType,
+    IndependenceClaimBinding,
+)
 from crypto_systems_intelligence_atlas.redundancy import (
     ActivationMode,
     RedundancyAssessment,
@@ -38,6 +42,11 @@ from crypto_systems_intelligence_atlas.types import AuthoritySeed, AuthorityTier
 
 NOW = datetime(2026, 9, 25, 12, tzinfo=UTC)
 SOURCE_ID = "csia:source:book4-r1"
+
+R1_CONSUMER = "fixture:r1-consumer"
+R1_PROVIDER = "fixture:r1-provider"
+R1_FUNCTION = "submit liquidation transaction"
+R1_SCOPE = "production liquidation"
 
 GENERIC_CLAIM = "r1-generic-claim"
 IDENTITY_CLAIM = "r1-fact-identity"
@@ -92,15 +101,29 @@ def snapshot_ref(claim_id: str) -> str:
     return f"snapshot://book4-r1/{claim_id}"
 
 
+_CONTEXT_QUALIFIERS = frozenset(
+    {fact.value for fact in HardRuntimeFact} | {"ACTIVE_EQUIVALENT_FALLBACK"}
+)
+
+
 def make_claim(claim_id: str, qualifier: str | None) -> Claim:
+    # Fact-class claims encode the assessment context in their proposition:
+    # subject = consumer, object = provider (Book 2 has no function/scope
+    # dimension; those live only in the typed Book 4 context binding).
+    if qualifier in _CONTEXT_QUALIFIERS:
+        subject_refs: tuple[str, ...] = (R1_CONSUMER,)
+        object_ref = R1_PROVIDER
+    else:
+        subject_refs = ("fixture:r1-system",)
+        object_ref = "fixture:r1-object"
     return Claim(
         claim_id=claim_id,
         evidence_refs=(f"evidence-{claim_id}",),
         source_refs=(SOURCE_ID,),
         proposition=Proposition(
-            subject_refs=("fixture:r1-system",),
+            subject_refs=subject_refs,
             predicate="supports_book4_fact",
-            object_ref="fixture:r1-object",
+            object_ref=object_ref,
             qualifier=qualifier,
         ),
         claim_family=ClaimFamily.CHAIN_ARCHITECTURE,
@@ -198,9 +221,18 @@ def contested_kernel() -> tuple[ClaimService, str]:
     return service, evidence_id
 
 
-def fact_bindings(omit: frozenset[HardRuntimeFact] = frozenset()) -> tuple[HardRuntimeFactBinding, ...]:
+def fact_bindings(
+    omit: frozenset[HardRuntimeFact] = frozenset(),
+) -> tuple[HardRuntimeFactContextBinding, ...]:
     return tuple(
-        HardRuntimeFactBinding(fact=fact, claim_refs=(claim_ref,))
+        HardRuntimeFactContextBinding(
+            fact=fact,
+            claim_refs=(claim_ref,),
+            consumer_ref=R1_CONSUMER,
+            provider_ref=R1_PROVIDER,
+            function=R1_FUNCTION,
+            scope=R1_SCOPE,
+        )
         for fact, claim_ref in ALL_FACT_CLAIMS.items()
         if fact not in omit
     )
@@ -212,7 +244,7 @@ def all_snapshot_refs() -> tuple[str, ...]:
 
 def hard_evidence_r1(
     *,
-    bindings: tuple[HardRuntimeFactBinding, ...] | None = None,
+    bindings: tuple[HardRuntimeFactContextBinding, ...] | None = None,
     book2_claim_refs: tuple[str, ...] | None = None,
     source_snapshot_refs: tuple[str, ...] | None = None,
     fallback_state: FallbackState = FallbackState.NONE,
@@ -227,10 +259,10 @@ def hard_evidence_r1(
         else book2_claim_refs
     )
     return HardRuntimeEvidence(
-        consumer_ref="fixture:r1-consumer",
-        provider_ref="fixture:r1-provider",
-        function="submit liquidation transaction",
-        scope="production liquidation",
+        consumer_ref=R1_CONSUMER,
+        provider_ref=R1_PROVIDER,
+        function=R1_FUNCTION,
+        scope=R1_SCOPE,
         deployed_configuration_evidenced=deployed_configuration_evidenced,
         runtime_necessity_evidenced=runtime_necessity_evidenced,
         removal_makes_function_unavailable=removal_makes_function_unavailable,
@@ -238,7 +270,9 @@ def hard_evidence_r1(
         valid_time=NOW,
         book2_claim_refs=claim_refs,
         source_snapshot_refs=(
-            all_snapshot_refs() if source_snapshot_refs is None else source_snapshot_refs
+            tuple(sorted(snapshot_ref(ref) for ref in claim_refs))
+            if source_snapshot_refs is None
+            else source_snapshot_refs
         ),
         fact_bindings=resolved,
     )
@@ -267,7 +301,7 @@ def failure_domain_r1(
         mechanism_evidence_refs=mechanism_evidence_refs,
         correlation_scope="fixture deployment",
         valid_time=NOW,
-        book2_claim_refs=(GENERIC_CLAIM,),
+        book2_claim_refs=(GENERIC_CLAIM, *mechanism_claim_refs),
     )
 
 
@@ -279,9 +313,20 @@ def redundancy_r1(
     positive_independence_claim_refs: tuple[str, ...] = (),
     shared_upstreams: tuple[str, ...] = (),
 ) -> RedundancyAssessment:
+    bindings = tuple(
+        IndependenceClaimBinding(
+            claim_ref=claim_ref,
+            left_domain_ref="fixture:r1-provider-a",
+            right_domain_ref="fixture:r1-provider-b",
+            left_system_ref=R1_CONSUMER,
+            right_system_ref=R1_CONSUMER,
+            correlation_scope="liquidation execution",
+        )
+        for claim_ref in positive_independence_claim_refs
+    )
     return RedundancyAssessment(
         redundancy_id=assessment_id,
-        subject_ref="fixture:r1-consumer",
+        subject_ref=R1_CONSUMER,
         function="liquidation execution",
         provider_refs=("fixture:r1-provider-a", "fixture:r1-provider-b"),
         activation_mode=ActivationMode.DEPLOYED,
@@ -289,9 +334,10 @@ def redundancy_r1(
         failure_domain_refs=failure_domain_refs,
         independence_dimensions=("operator", "backend"),
         positive_independence_claim_refs=positive_independence_claim_refs,
+        independence_bindings=bindings,
         state=state,
         valid_time=NOW,
-        book2_claim_refs=(GENERIC_CLAIM,),
+        book2_claim_refs=(GENERIC_CLAIM, *positive_independence_claim_refs),
     )
 
 
@@ -310,6 +356,10 @@ __all__ = [
     "NECESSITY_CLAIM",
     "NO_FALLBACK_CLAIM",
     "NOW",
+    "R1_CONSUMER",
+    "R1_FUNCTION",
+    "R1_PROVIDER",
+    "R1_SCOPE",
     "VALID_TIME_CLAIM",
     "all_snapshot_refs",
     "contested_kernel",

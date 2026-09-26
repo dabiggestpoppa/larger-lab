@@ -15,6 +15,7 @@ from .dependency import (
     DependencyStrengthState,
     FallbackState,
     HardRuntimeEvidence,
+    HardRuntimeFactContextBinding,
     HardRuntimeGate,
     RuntimeAssessment,
     RuntimeScope,
@@ -38,6 +39,7 @@ from .failure_domains import (
     FailureDomainBook,
     FailureDomainClassification,
     FailureDomainType,
+    IndependenceClaimBinding,
 )
 from .infrastructure_context import InfrastructureContext, InfrastructureContextBook
 from .offline_pilots import OFFLINE_PILOTS, OfflinePilotFixture
@@ -81,7 +83,9 @@ __all__ = [
     "FailureDomainClassification",
     "FailureDomainType",
     "HardRuntimeEvidence",
+    "HardRuntimeFactContextBinding",
     "HardRuntimeGate",
+    "IndependenceClaimBinding",
     "InfrastructureContext",
     "InfrastructureContextBook",
     "OFFLINE_PILOTS",
