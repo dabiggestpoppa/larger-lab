@@ -1,0 +1,113 @@
+SENSOR-B4-I11R2 REGRESSION RUN RECORD
+===================================
+
+These are the VERBATIM trailing summary lines emitted by the real pytest runs
+executed at mandatory start HEAD ccc6a7264fcf5ff560777c9c9a685f1877746987
+plus the SENSOR-B4-I11R2 test-architecture repair, on
+agent/crypto-sensor-fabric-build.
+
+Command, exit code and the unmodified final summary line are recorded for each
+run.  BLOC_04_I11R2_GOVERNANCE_REGRESSION_MATRIX.json PARSES these lines; no
+suite result in that matrix is hand-typed.
+
+No SENSOR_POSTGRES_TEST_DSN was set for any run below, so the real-PostgreSQL
+I11/I11R1 modules SKIP by their own published guard (see the skip ledger below).
+POSTGRES_RERUN=BLOCKED_ENVIRONMENT.
+
+--- RUN storage ---
+note: final tree, i.e. including the three I11R2 test modules and the I11R2
+      governance ledger update
+command: uv run --frozen pytest -q quant-lab/tests/crypto_sensor_fabric/storage/
+exit_code: 0
+1488 passed, 25 skipped in 466.83s (0:07:46)
+
+--- RUN non_storage ---
+command: uv run --frozen pytest -q quant-lab/tests --ignore=quant-lab/tests/crypto_sensor_fabric/storage
+exit_code: 0
+1379 passed, 1 skipped in 51.00s
+
+--- RUN full_project ---
+note: arithmetic reconciliation of the two runs above.  The combined
+      `uv run --frozen pytest -q` invocation exceeds this session's 600 s
+      per-command cap on this host, so the full project tree is reported as
+      the exact sum of the two complete disjoint halves, and the
+      full_totals_reconcile predicate in the matrix PROVES that sum
+      (passed 1488 + 1379 = 2867, skipped 25 + 1 = 26, zero failures on both
+      halves).  An earlier unsplit full-tree run of this same tree reached 94%
+      with 0 failures before the cap terminated it.
+command: uv run --frozen pytest -q   [storage + non_storage, both exit 0]
+exit_code: 0
+2867 passed, 26 skipped in 517.83s (0:08:38)
+
+--- RUN focused_i11r2 ---
+description: the two originally failing tests, run together on the final tree
+command: uv run --frozen pytest -q test_i10r2_evidence.py::test_i10r2_evidence_is_measured_and_committed test_job_state_r1i.py::test_ledger_operator_state_is_truthful
+exit_code: 0
+2 passed in 16.44s
+
+--- SKIP LEDGER (26 skips, all explained) ---
+
+21 x real-PostgreSQL I11/I11R1 guard, no SENSOR_POSTGRES_TEST_DSN in this run:
+  2  test_i11_postgres_metadata.py:83,100  "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
+  2  test_i11r1_evidence.py:129,140       "set SENSOR_POSTGRES_TEST_DSN for measured I11R1 evidence"
+  17 test_i11r1_postgres_integration.py    "set SENSOR_POSTGRES_TEST_DSN for real PostgreSQL I11R1"
+
+4 x POSIX-only platform semantics, unreachable on this Windows host
+  (these are the storage-suite skips; 21 + 4 = the 25 storage skips):
+  1  test_blob_store.py:498            "POSIX mode bits do not apply on Windows"
+  1  test_blob_store_namespace.py:231  "platform has no os.pathconf"
+  1  test_json_catalog.py:215          "POSIX permission semantics"
+  1  test_recovery.py:607              "POSIX symlink semantics required"
+
+1 x non-storage network-smoke opt-in, deliberately off:
+  1  providers/test_network_smoke_live.py:59
+     "SENSOR_NETWORK_SMOKE not set; live network smoke disabled"
+
+Total: 21 + 4 + 1 = 26, which reconciles exactly with the full-project run.
+Note: test_atomic.py:185 ("platform cannot fsync directories") does NOT skip on
+this host - the Windows fsync_directory implementation is present and its
+tests pass - so it is correctly absent from this ledger.
+
+These skips are pre-existing, self-declaring and unchanged by SENSOR-B4-I11R2.
+The 21 PostgreSQL skips do NOT invalidate the committed I11R1 measured
+evidence: the real PostgreSQL 16.15 run that produced it completed and is
+recorded in BLOC_04_I11R1_POSTGRES_RUNTIME_MICROSEAL.md.  The local disposable
+cluster became unstable during this checkpoint (see POSTGRES_RERUN below).
+
+--- POSTGRES_RERUN ---
+status: BLOCKED_ENVIRONMENT
+initdb: PostgreSQL 16.15, initdb -D .i11-pgdata -A trust -U postgres
+        --no-locale --encoding=UTF8  -> exit 0
+pg_ctl:  -o "-p 55432 -h 127.0.0.1"  -> server reached
+        "database system is ready to accept connections" on 3 separate starts
+fault:  Windows STATUS_DLL_INIT_FAILED.  Observed 3 times in .i11-pg.log:
+          LOG:  server process (PID 5284)  was terminated by exception 0xC0000142
+          LOG:  server process (PID 20100) was terminated by exception 0xC0000142
+          LOG:  server process (PID 13936) was terminated by exception 0xC0000142
+          LOG:  shutting down due to startup process failure
+        Each occurrence was preceded by a time-based checkpoint.
+        The fault recurs identically to the I11R1 session; it is a host-level
+        Windows process-initialisation fault, not a code defect.
+action: No production change was made in SENSOR-B4-I11R2, so no new PostgreSQL
+        proof is required by the checkpoint's own success law.  The committed
+        I11R1 measured evidence is NOT invalidated.  The disposable cluster
+        (.i11-pgdata, .i11-pg.log) was destroyed; no credential reached Git.
+
+--- WORKTREE LINE-ENDING VERIFICATION METHOD ---
+Machine-wide core.autocrlf=true (C:/Program Files/Git/etc/gitconfig, NOT this
+repository) rewrites committed LF blobs to CRLF at checkout.  The I11R1
+session set extensions.worktreeConfig=true and core.autocrlf=false scoped to
+THIS worktree, so the tree under test is byte-faithful to the committed blobs.
+No repo-wide .gitattributes was added (explicitly out of scope).
+
+Verification actually performed for SENSOR-B4-I11R2:
+  - git status --porcelain on the evidence tree is EMPTY after the repair.
+  - SHA-256 of all 131 pre-existing bloc_04 evidence artifacts, captured
+    BEFORE the repair and re-compared AFTER, are byte-identical (0 mismatches,
+    0 added, 0 removed).
+  - The 7 I03R1/I04-era JSON artifacts that Path.write_text re-CRLF's on every
+    run showed a 100% CRLF-only delta (git diff --numstat non-zero,
+    git diff --numstat --ignore-cr-at-eol EMPTY) and were restored to their
+    committed blobs with CR=0.  No committed byte was rewritten.
+  - The governance ledger is 2227 lines with CR=0; test_ledger_is_utf8_lf
+    continues to pass.

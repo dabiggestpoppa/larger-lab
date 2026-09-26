@@ -1,0 +1,207 @@
+{
+  "checkpoint": "SENSOR-B4-I11R2",
+  "evidence_truth": "Every non-counterfactual evidence predicate is mechanically observed from the real repository, the real committed immutable artifacts and the verbatim committed pytest run record; the single deliberate counterfactual predicate is explicitly synthetic and must evaluate FAIL.",
+  "historical_sources": {
+    "i07r1i_proposal_truth": "BLOC_04_I07R1I_LEDGER_STRUCTURE_MATRIX.json",
+    "i07r1i_ratification_truth": "SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md :: ## SENSOR-B4-I07R1I-RATIFY \u2014 operator accepts the complete I07 chain, authorizes I08",
+    "i10r2_governance_truth": "BLOC_04_I10R2_RELATION_GOVERNANCE_MICROSEAL.md :: ## Governance"
+  },
+  "matrix": "I11R2_GOVERNANCE_REGRESSION",
+  "measured_runs": {
+    "focused_i11r2": {
+      "exit_code": 0,
+      "summary_line": "2 passed in 16.44s"
+    },
+    "full_project": {
+      "exit_code": 0,
+      "summary_line": "2867 passed, 26 skipped in 517.83s (0:08:38)"
+    },
+    "non_storage": {
+      "exit_code": 0,
+      "summary_line": "1379 passed, 1 skipped in 51.00s"
+    },
+    "storage": {
+      "exit_code": 0,
+      "summary_line": "1488 passed, 25 skipped in 466.83s (0:07:46)"
+    }
+  },
+  "postgres_rerun": "BLOCKED_ENVIRONMENT",
+  "production_changed_files": [],
+  "rows": [
+    {
+      "case": "i07r1i_historical_section_bound",
+      "i07r1i_bound_verdict_true": true,
+      "i07r1i_durable_resume_pending_acceptance": true,
+      "i07r1i_hold_case_exact": true,
+      "i07r1i_hold_keys_exact": true,
+      "i07r1i_hold_proposal_pending": true,
+      "i07r1i_matrix_checkpoint_exact": true,
+      "i07r1i_matrix_file_present": true,
+      "i07r1i_next_checkpoint_not_authorized": true,
+      "i07r1i_recovery_scanner_false": true,
+      "required_invariants": [
+        "i07r1i_matrix_file_present",
+        "i07r1i_matrix_checkpoint_exact",
+        "i07r1i_hold_case_exact",
+        "i07r1i_hold_keys_exact",
+        "i07r1i_hold_proposal_pending",
+        "i07r1i_durable_resume_pending_acceptance",
+        "i07r1i_recovery_scanner_false",
+        "i07r1i_next_checkpoint_not_authorized",
+        "i07r1i_bound_verdict_true"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "i07r1i_live_current_state_dependency_removed",
+      "i07r1i_binding_never_reads_the_ledger": true,
+      "i07r1i_binding_reads_its_immutable_source": true,
+      "i07r1i_bound_verdict_true": true,
+      "old_i07r1i_binding_flips_with_dashboard": true,
+      "old_i07r1i_binding_red_against_present_dashboard": true,
+      "required_invariants": [
+        "i07r1i_bound_verdict_true",
+        "i07r1i_binding_never_reads_the_ledger",
+        "i07r1i_binding_reads_its_immutable_source",
+        "old_i07r1i_binding_flips_with_dashboard",
+        "old_i07r1i_binding_red_against_present_dashboard"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "i10r2_historical_section_bound",
+      "i10r2_bound_verdict_true": true,
+      "i10r2_governance_section_exactly_one": true,
+      "i10r2_microseal_present": true,
+      "i10r2_never_self_ratified": true,
+      "i10r2_proposed_verdicts_exact": true,
+      "required_invariants": [
+        "i10r2_microseal_present",
+        "i10r2_governance_section_exactly_one",
+        "i10r2_proposed_verdicts_exact",
+        "i10r2_never_self_ratified",
+        "i10r2_bound_verdict_true"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "i10r2_live_current_state_dependency_removed",
+      "i10r2_binding_never_reads_the_ledger": true,
+      "i10r2_binding_reads_its_immutable_source": true,
+      "i10r2_bound_verdict_true": true,
+      "old_i10r2_binding_flips_with_dashboard": true,
+      "old_i10r2_binding_red_against_present_dashboard": true,
+      "required_invariants": [
+        "i10r2_bound_verdict_true",
+        "i10r2_binding_never_reads_the_ledger",
+        "i10r2_binding_reads_its_immutable_source",
+        "old_i10r2_binding_flips_with_dashboard",
+        "old_i10r2_binding_red_against_present_dashboard"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "current_state_still_truthful",
+      "current_checkpoint_row_exactly_one": true,
+      "current_state_g4_10_not_operator_accepted": true,
+      "current_state_i12_unauthorized": true,
+      "current_state_names_i11_chain": true,
+      "current_state_next_checkpoint_false": true,
+      "current_state_not_pinned_to_superseded_checkpoint": true,
+      "current_state_research_frozen": true,
+      "current_state_rows_two_columns": true,
+      "i07r1i_ratification_still_recorded": true,
+      "required_invariants": [
+        "current_state_rows_two_columns",
+        "current_checkpoint_row_exactly_one",
+        "current_state_names_i11_chain",
+        "current_state_g4_10_not_operator_accepted",
+        "current_state_next_checkpoint_false",
+        "current_state_i12_unauthorized",
+        "current_state_research_frozen",
+        "current_state_not_pinned_to_superseded_checkpoint",
+        "i07r1i_ratification_still_recorded"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "historical_evidence_unchanged",
+      "historical_evidence_all_present": true,
+      "historical_evidence_count_is_131": true,
+      "historical_evidence_crlf_churn_is_allowlisted": true,
+      "historical_evidence_zero_byte_mismatch": true,
+      "ledger_is_lf_only": true,
+      "required_invariants": [
+        "historical_evidence_count_is_131",
+        "historical_evidence_all_present",
+        "historical_evidence_zero_byte_mismatch",
+        "historical_evidence_crlf_churn_is_allowlisted",
+        "ledger_is_lf_only"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "production_diff_zero",
+      "no_production_files_changed_vs_head": true,
+      "no_production_files_changed_vs_i11r1_head": true,
+      "no_untracked_production_files": true,
+      "postgres_metadata_untouched": true,
+      "required_invariants": [
+        "no_production_files_changed_vs_head",
+        "no_production_files_changed_vs_i11r1_head",
+        "no_untracked_production_files",
+        "postgres_metadata_untouched"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "storage_regression_green",
+      "required_invariants": [
+        "storage_run_exit_zero",
+        "storage_zero_failures",
+        "storage_failures_absent",
+        "storage_passed_measured",
+        "storage_skips_reconcile"
+      ],
+      "result": "OK",
+      "storage_failures_absent": true,
+      "storage_passed_measured": true,
+      "storage_run_exit_zero": true,
+      "storage_skips_reconcile": true,
+      "storage_zero_failures": true
+    },
+    {
+      "case": "project_regression_green",
+      "focused_i11r2_run_exit_zero": true,
+      "focused_i11r2_zero_failures": true,
+      "full_run_exit_zero": true,
+      "full_totals_reconcile": true,
+      "full_zero_failures": true,
+      "non_storage_run_exit_zero": true,
+      "non_storage_zero_failures": true,
+      "required_invariants": [
+        "full_run_exit_zero",
+        "full_zero_failures",
+        "non_storage_run_exit_zero",
+        "non_storage_zero_failures",
+        "focused_i11r2_run_exit_zero",
+        "focused_i11r2_zero_failures",
+        "full_totals_reconcile"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "counterfactual_historical_test_reads_live_dashboard",
+      "historical_test_reads_live_dashboard": false,
+      "required_invariants": [
+        "historical_test_reads_live_dashboard"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "summary": {
+    "fail": 1,
+    "ok": 9,
+    "rows": 10
+  }
+}
