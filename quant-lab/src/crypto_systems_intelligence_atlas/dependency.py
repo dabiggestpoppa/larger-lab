@@ -211,9 +211,42 @@ class HardRuntimeGate:
             )
         except ValueError as exc:
             reasons.append(f"snapshot lineage unsupported: {exc}")
+        # Decision-point re-verification.  Pydantic model_copy skips every
+        # model validator, so constructor-time context checks cannot be
+        # trusted here: re-derive them from the current record state.  Raw
+        # (unvalidated) binding objects must fail closed, never crash.
+        if evidence.fact_bindings and not all(
+            isinstance(binding, HardRuntimeFactContextBinding)
+            for binding in evidence.fact_bindings
+        ):
+            reasons.append(
+                "HARD_RUNTIME fact bindings must be context-bound "
+                "(consumer, provider, function, scope)"
+            )
+        typed_bindings = tuple(
+            binding
+            for binding in evidence.fact_bindings
+            if isinstance(binding, HardRuntimeFactContextBinding)
+        )
+        declared_facts = {binding.fact for binding in typed_bindings}
+        if len(declared_facts) != len(typed_bindings):
+            reasons.append("each HARD_RUNTIME fact may be bound only once")
+        for binding in evidence.fact_bindings:
+            if not isinstance(binding, HardRuntimeFactContextBinding):
+                continue
+            if (
+                binding.consumer_ref != evidence.consumer_ref
+                or binding.provider_ref != evidence.provider_ref
+                or binding.function != evidence.function
+                or binding.scope != evidence.scope
+            ):
+                reasons.append(
+                    "HARD_RUNTIME fact binding context must equal the assessed "
+                    "consumer, provider, function, and scope"
+                )
         bound_facts: set[HardRuntimeFact] = set()
         binding_claim_refs: set[str] = set()
-        for binding in evidence.fact_bindings:
+        for binding in typed_bindings:
             bound_facts.add(binding.fact)
             for claim_ref in binding.claim_refs:
                 binding_claim_refs.add(claim_ref)
@@ -224,24 +257,23 @@ class HardRuntimeGate:
                 except ValueError as exc:
                     reasons.append(f"fact {binding.fact.value} unsupported: {exc}")
                     continue
-                if isinstance(binding, HardRuntimeFactContextBinding):
-                    proposition = claim.proposition
-                    if (
-                        proposition.subject_refs
-                        and binding.consumer_ref not in proposition.subject_refs
-                    ):
-                        reasons.append(
-                            f"fact {binding.fact.value} claim {claim_ref} does not "
-                            "bind the assessed consumer"
-                        )
-                    if (
-                        proposition.object_ref
-                        and proposition.object_ref != binding.provider_ref
-                    ):
-                        reasons.append(
-                            f"fact {binding.fact.value} claim {claim_ref} does not "
-                            "bind the assessed provider"
-                        )
+                proposition = claim.proposition
+                if (
+                    proposition.subject_refs
+                    and binding.consumer_ref not in proposition.subject_refs
+                ):
+                    reasons.append(
+                        f"fact {binding.fact.value} claim {claim_ref} does not "
+                        "bind the assessed consumer"
+                    )
+                if (
+                    proposition.object_ref
+                    and proposition.object_ref != binding.provider_ref
+                ):
+                    reasons.append(
+                        f"fact {binding.fact.value} claim {claim_ref} does not "
+                        "bind the assessed provider"
+                    )
         outside = sorted(binding_claim_refs - set(evidence.book2_claim_refs))
         if outside:
             reasons.append(
@@ -275,7 +307,7 @@ class HardRuntimeGate:
             reasons.append("valid time is not established")
         if evidence.fallback_state is FallbackState.NONE and not any(
             binding.fact is HardRuntimeFact.NO_ACTIVE_EQUIVALENT_FALLBACK
-            for binding in evidence.fact_bindings
+            for binding in typed_bindings
         ):
             reasons.append("absence of an active fallback is asserted without canonical proof")
         scope = (

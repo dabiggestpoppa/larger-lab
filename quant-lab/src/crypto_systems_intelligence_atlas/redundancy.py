@@ -116,12 +116,40 @@ class RedundancyBook:
             nested_role="positive independence",
             record_kind="redundancy assessment",
         )
+        # Decision-point re-verification.  Pydantic model_copy skips every
+        # model validator, so the constructor-time exact-coverage rule is
+        # re-derived here from the record's current state.
+        bound_refs = {
+            binding.claim_ref for binding in assessment.independence_bindings
+        }
+        if assessment.positive_independence_claim_refs and bound_refs != set(
+            assessment.positive_independence_claim_refs
+        ):
+            raise Book4ProvenanceError(
+                "independence bindings must cover exactly the declared "
+                "positive_independence_claim_refs"
+            )
+        covered_pairs: set[tuple[str, str]] = set()
         for binding in assessment.independence_bindings:
             if not assessment._binding_matches(binding):
                 raise Book4ProvenanceError(
                     f"independence binding {binding.claim_ref} is not scoped to the "
                     "assessed subject, provider pair, and function"
                 )
+            covered_pairs.add((binding.left_domain_ref, binding.right_domain_ref))
+        if bound_refs:
+            # Independence was asserted: every consecutive provider pair must
+            # carry its own pair-scoped binding, or the third provider rides
+            # on evidence for the first two.
+            for index in range(len(assessment.provider_refs) - 1):
+                pair = (
+                    assessment.provider_refs[index],
+                    assessment.provider_refs[index + 1],
+                )
+                if pair not in covered_pairs:
+                    raise Book4ProvenanceError(
+                        f"provider pair {pair} has no pair-scoped independence binding"
+                    )
         self._records[assessment.redundancy_id] = assessment
         return assessment
 

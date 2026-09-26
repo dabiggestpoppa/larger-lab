@@ -164,8 +164,16 @@ class FailureDomainBook:
                     "positive_independence_claim_refs"
                 )
             else:
-                left_system = left.affected_system_refs[0]
-                right_system = right.affected_system_refs[0]
+                # Every left x right system combination must be covered by a
+                # binding whose canonical claim proposition binds exactly that
+                # system pair; a multi-system domain cannot ride on evidence
+                # for one combination alone.
+                required_pairs = {
+                    (left_system, right_system)
+                    for left_system in left.affected_system_refs
+                    for right_system in right.affected_system_refs
+                }
+                bound_pairs: set[tuple[str, str]] = set()
                 for binding in independence_bindings:
                     try:
                         claim = self.provenance.resolve_qualifier_claim(
@@ -178,10 +186,10 @@ class FailureDomainBook:
                     proposition = claim.proposition
                     if (
                         proposition.subject_refs
-                        and left_system not in proposition.subject_refs
+                        and binding.left_system_ref not in proposition.subject_refs
                     ) or (
                         proposition.object_ref
-                        and proposition.object_ref != right_system
+                        and proposition.object_ref != binding.right_system_ref
                     ):
                         independence_reason = (
                             f"independence claim {binding.claim_ref} does not bind "
@@ -191,8 +199,8 @@ class FailureDomainBook:
                     if (
                         binding.left_domain_ref != left.domain_id
                         or binding.right_domain_ref != right.domain_id
-                        or binding.left_system_ref != left_system
-                        or binding.right_system_ref != right_system
+                        or binding.left_system_ref not in left.affected_system_refs
+                        or binding.right_system_ref not in right.affected_system_refs
                         or binding.correlation_scope != left.correlation_scope
                         or binding.correlation_scope != right.correlation_scope
                     ):
@@ -201,6 +209,14 @@ class FailureDomainBook:
                             "left/right failure domains"
                         )
                         break
+                    bound_pairs.add(
+                        (binding.left_system_ref, binding.right_system_ref)
+                    )
+                if not independence_reason and bound_pairs != required_pairs:
+                    independence_reason = (
+                        "independence bindings must cover exactly the assessed "
+                        "left/right affected-system combinations"
+                    )
                 if not independence_reason:
                     independence_refs = tuple(
                         dict.fromkeys(
