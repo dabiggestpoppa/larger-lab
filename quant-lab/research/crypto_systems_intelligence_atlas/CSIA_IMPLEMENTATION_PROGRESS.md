@@ -884,3 +884,46 @@ CRYPTO_SENSOR_MUTATIONS = 0
 Audit artifact: `CSIA_BOOK_4_HARDENING_R2_ADVERSARIAL_AUDIT.md`.
 Book 4 remains NOT_SELF_ACCEPTED; no Book 5; no live acquisition; no R3
 (these fixes close the demonstrated defects found by the audit itself).
+
+## CHECKPOINT 18 — BOOK 4 HARDENING R3
+
+R3 was triggered by a concrete external-review correctness defect. It is not a
+generic hardening round. External review proved the R2 audit's
+consecutive-pair remedy incomplete (PAIRWISE_TRANSITIVITY_FALSE) and the
+first-pair binding matcher unrepresentative (FIRST_PAIR_BINDING_ASSUMPTION).
+
+The R3 seal replaces the invariant with COMPLETE_UNORDERED_PAIR_COVERAGE:
+exact set equality between bound and required unordered provider pairs
+(N*(N-1)/2), re-derived at the RedundancyBook.add decision point from the
+record's current state, with order-invariant pair normalization. No
+transitivity, no consecutive-pair shortcut, no external providers, no
+self-pairs, no duplicate substitution. The R2 audit record remains preserved
+historical evidence.
+
+```text
+R3_TRIGGER = EXTERNAL_REVIEW_DEMONSTRATED_CORRECTNESS_DEFECT
+R3_PROBES = 21 (17 pair-coverage + 4 decision-point)
+DEFECTS_FIXED = 3 (2 demonstrated + 1 untyped-binding crash found probing)
+CSIA_TESTS = 507 PASS (pre-R3 486 preserved unchanged)
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (37 source files)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+SENSOR_FAILURE_SET = byte-identical to the R2 equivalence record
+BOOK4_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_1/2/3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```
+
+```text
+BOOK_4_HARDENING_R3 = PASS
+BOOK_4_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_4_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_5 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+No R4 merely for generic hardening. The exact next action is BOOK 4 OPERATOR
+ACCEPTANCE unless another concrete externally demonstrated correctness defect
+exists.

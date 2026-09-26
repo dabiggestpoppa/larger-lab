@@ -1,0 +1,112 @@
+{
+  "schema": "csia-book-4-hardening-r3-matrix-v0.1",
+  "generated_at": "2026-09-26T00:00:00Z",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "scope": "MULTI_PROVIDER_INDEPENDENCE_COMPLETENESS",
+  "trigger": "EXTERNAL_REVIEW_DEMONSTRATED_CORRECTNESS_DEFECT",
+  "governance": {
+    "ratified_planning_anchor": "04820379bd0f63a605d83b1c710a246b103a5ef1",
+    "book_4_decision_binding_commit": "8b6106055686721b1b490adc792b0d6c03696e15",
+    "accepted_book_3_base": "d33afd5ec87208d96d256ec919fbf55956bf2791",
+    "book_4_hardening_r1_head": "e71a99a2c4bea22f870f3e1de70688bc83b1dede",
+    "book_4_hardening_r2_seal": "4db44c52b527a880ed5d991cf99f56ae1a85e082",
+    "book_4_r2_adversarial_fixes": "8c3fa9e409ee2bb07fa2afb0cbef911f52cba8c3",
+    "book_4_r2_audit_record": "199cad59603c079a1a5b1ed6c8630e0268b32ea3",
+    "book_4_hardening_r3_start_head": "199cad59603c079a1a5b1ed6c8630e0268b32ea3",
+    "book_4_acceptance": "NOT_SELF_ACCEPTED",
+    "book_5": "NOT_STARTED",
+    "live_acquisition_authority": false
+  },
+  "demonstrated_defects": {
+    "PAIRWISE_TRANSITIVITY_FALSE": {
+      "status": "CONFIRMED_AND_SEALED",
+      "defect": "RedundancyBook.add required only consecutive provider pairs (A-B, B-C for providers A/B/C), so an unverified A-C pair could ride to INDEPENDENT_REDUNDANCY; independence is not transitive",
+      "remedy": "complete unordered pair coverage with exact set equality at the decision point"
+    },
+    "FIRST_PAIR_BINDING_ASSUMPTION": {
+      "status": "CONFIRMED_AND_SEALED",
+      "defect": "RedundancyAssessment._binding_matches bound every binding against provider_refs[0]/[1] only, so a legitimate B-C binding in a 3-provider assessment could not be represented",
+      "remedy": "matcher proves in-set distinct provider pair, subject, and function; no first-pair assumption"
+    },
+    "UNTYPED_BINDING_CRASH": {
+      "status": "FOUND_AND_SEALED_DURING_R3",
+      "defect": "raw dict bindings injected via model_copy crashed RedundancyBook.add with AttributeError (R2 fail-closed fix had covered only the HARD_RUNTIME gate)",
+      "remedy": "typed-binding gate refuses untyped payloads closed at the decision point"
+    }
+  },
+  "invariant": {
+    "required_pairs": "all unordered 2-combinations of provider_refs (N*(N-1)/2)",
+    "gate": "bound_pairs == required_pairs (exact set equality), re-derived at RedundancyBook.add from the record's current state",
+    "pair_normalization": "normalized_provider_pair: (A, B) and (B, A) are one pair; provider ordering cannot change independence truth",
+    "transitivity": "NOT_INFERRED — A⊥B and B⊥C does not imply A⊥C",
+    "claim_vs_pair_coverage": "claim coverage (bindings exactly cover positive_independence_claim_refs) and provider-pair coverage are separate gates; both must pass; duplicates never substitute for a missing pair",
+    "doctrine_preserved": "UNKNOWN/CORRELATED records with declared positive refs are never silently upgraded"
+  },
+  "gates": {
+    "MULTI_PROVIDER_COMPLETE_PAIR_COVERAGE": "PASS",
+    "PROVIDER_ORDER_INVARIANCE": "PASS",
+    "NO_INDEPENDENCE_TRANSITIVITY": "PASS",
+    "NO_EXTERNAL_PROVIDER_BINDING": "PASS",
+    "NO_SELF_PAIR_BINDING": "PASS",
+    "REDUNDANCY_DECISION_POINT_REVALIDATION": "PASS",
+    "MODEL_COPY_PAIR_COVERAGE_SEAL": "PASS",
+    "R2_GATES_PRESERVED": "PASS",
+    "SENSOR_BASELINE_EQUIVALENCE": "PASS",
+    "BOOK1_FREEZE": "PASS",
+    "BOOK2_FREEZE": "PASS",
+    "BOOK3_FREEZE": "PASS"
+  },
+  "probes": {
+    "pair_completeness_suite": {
+      "file": "quant-lab/tests/crypto_systems_intelligence_atlas/test_book4_r3_pair_coverage.py",
+      "count": 17,
+      "shown_failing_before_seal": true,
+      "cases": {
+        "R3_A1_missing_non_adjacent_pair": "REJECT",
+        "R3_A2_three_provider_complete": "PASS",
+        "R3_A3_provider_order_invariance": "PASS",
+        "R3_A4_duplicate_pair_cannot_substitute": "REJECT",
+        "R3_A5_external_provider": "REJECT",
+        "R3_A6_self_pair": "REJECT",
+        "R3_A7_two_provider_preserved": "PASS",
+        "R3_A8_four_provider_any_missing_pair": "REJECT (x6 parametrized)",
+        "R3_A9_four_provider_complete": "PASS",
+        "no_transitivity": "REJECT without A-C",
+        "unknown_doctrine_preserved": "PASS",
+        "correlated_doctrine_preserved": "PASS"
+      }
+    },
+    "decision_point_suite": {
+      "file": "quant-lab/tests/crypto_systems_intelligence_atlas/test_book4_r3_model_copy_adversarial.py",
+      "count": 4,
+      "cases": {
+        "R3_B1_model_copy_stripped_pairs": "REJECT",
+        "R3_B2_model_copy_provider_expansion": "REJECT",
+        "R3_B3_model_copy_reorder_complete_coverage": "PASS",
+        "R3_B4_raw_dict_binding": "FAIL_CLOSED (no crash)"
+      }
+    }
+  },
+  "verification": {
+    "pre_r3_csia_baseline": "486 PASS on 199cad59",
+    "post_r3_csia_total": 507,
+    "pre_r3_book4_tests_preserved": "all 137 R1-era + 35 R2 + 16 R2-audit tests green unchanged",
+    "ruff": "PASS",
+    "mypy": "PASS (37 source files)",
+    "sensor": {
+      "passed": 2325,
+      "failed": 14,
+      "skipped": 4,
+      "failure_ids_match_baseline_record": true,
+      "book4_introduced_sensor_failures": 0
+    },
+    "freeze": {
+      "BOOK_1_ACCEPTED_CONTRACT_MUTATIONS": 0,
+      "BOOK_2_ACCEPTED_CONTRACT_MUTATIONS": 0,
+      "BOOK_3_ACCEPTED_CONTRACT_MUTATIONS": 0,
+      "CRYPTO_SENSOR_MUTATIONS": 0
+    }
+  },
+  "record": "CSIA_BOOK_4_HARDENING_R3_MULTI_PROVIDER_INDEPENDENCE.md",
+  "historical_note": "The R2 adversarial audit record is preserved unmodified as historical evidence. Its consecutive-pair remedy language is superseded by this R3 invariant (COMPLETE_UNORDERED_PAIR_COVERAGE)."
+}

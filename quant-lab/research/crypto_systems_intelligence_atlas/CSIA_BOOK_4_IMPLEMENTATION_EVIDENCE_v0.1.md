@@ -299,3 +299,50 @@ BOOK4_INTRODUCED_SENSOR_FAILURES = 0
 BOOK_1/2/3_ACCEPTED_CONTRACT_MUTATIONS = 0
 CRYPTO_SENSOR_MUTATIONS = 0
 ```
+
+## Hardening R3 — MULTI-PROVIDER INDEPENDENCE COMPLETENESS
+
+R3 was triggered by a concrete external-review correctness defect. It is not a
+generic hardening round. External review demonstrated two coupled defects in
+the redundancy independence seam:
+
+1. **PAIRWISE_TRANSITIVITY_FALSE** — the R2 audit's consecutive-pair remedy
+   required only A-B and B-C for providers (A, B, C), letting an unverified
+   A-C pair ride to INDEPENDENT_REDUNDANCY. Independence is not transitive.
+2. **FIRST_PAIR_BINDING_ASSUMPTION** — `_binding_matches` bound every binding
+   against `provider_refs[0]`/`[1]` only, so a legitimate B-C binding could
+   not be represented in a 3-provider assessment.
+
+The R2 audit record is preserved unmodified as historical evidence; its
+consecutive-pair language is superseded. The implementation invariant is now
+**COMPLETE_UNORDERED_PAIR_COVERAGE**: `bound_pairs == required_pairs` (exact
+set equality over all N*(N-1)/2 unordered pairs), re-derived at the
+`RedundancyBook.add` decision point from the record's current state, with
+deterministic pair normalization so provider ordering cannot change
+independence truth. Claim coverage and provider-pair coverage remain separate
+gates; duplicates never substitute for a missing pair; transitivity is never
+inferred; UNKNOWN/CORRELATED doctrine is unchanged. Probing additionally found
+and sealed an untyped-binding crash (raw dict bindings via `model_copy`
+previously raised AttributeError instead of failing closed).
+
+```text
+DEMONSTRATED_DEFECTS = PAIRWISE_TRANSITIVITY_FALSE + FIRST_PAIR_BINDING_ASSUMPTION
+REQUIRED_PAIR_FORMULA = N*(N-1)/2 unordered provider pairs, exact set equality
+PAIR_NORMALIZATION = normalized_provider_pair (order-invariant)
+R3_PAIR_PROBES = 17 (all shown failing before the seal)
+R3_DECISION_POINT_PROBES = 4 (model_copy bypass attempts)
+DEFECTS_FIXED = 3 (2 demonstrated + 1 found during R3 probing)
+CSIA_PRE_R3 = 486 PASS
+CSIA_POST_R3 = 507 PASS
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (37 source files)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+SENSOR_FAILURE_SET = byte-identical to the R2 equivalence record
+BOOK4_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_1/2/3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```
+
+R3 artifacts: `CSIA_BOOK_4_HARDENING_R3_MULTI_PROVIDER_INDEPENDENCE.md`,
+`CSIA_BOOK_4_HARDENING_R3_MATRIX.json`,
+`test_book4_r3_pair_coverage.py`, `test_book4_r3_model_copy_adversarial.py`.

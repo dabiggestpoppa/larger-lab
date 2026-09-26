@@ -18,7 +18,6 @@ transitivity: A⊥B and B⊥C does NOT imply A⊥C.
 from __future__ import annotations
 
 import pytest
-from pydantic import ValidationError
 
 from crypto_systems_intelligence_atlas.book4_test_support import (
     add_pair_independence_claim,
@@ -87,7 +86,9 @@ def _provider_assessment(
     if pair_coverage is None:
         pair_coverage = tuple(complete)
     if claims is not None and evidence is not None and bindings is None:
-        claim_ids = tuple(_pair_claim(claims, evidence, l, r) for l, r in pair_coverage)
+        claim_ids = tuple(
+            _pair_claim(claims, evidence, left, right) for left, right in pair_coverage
+        )
         bindings = tuple(
             _binding(claim_id, left, right)
             for claim_id, (left, right) in zip(claim_ids, pair_coverage)
@@ -194,7 +195,7 @@ def test_r3_a5_external_provider_binding_is_rejected() -> None:
         (providers[0], providers[2]),
         (providers[1], providers[2]),
     ]
-    claim_ids = tuple(_pair_claim(claims, evidence, l, r) for l, r in in_set)
+    claim_ids = tuple(_pair_claim(claims, evidence, left, right) for left, right in in_set)
     bindings = tuple(
         _binding(claim_id, left, right) for claim_id, (left, right) in zip(claim_ids, in_set)
     )
@@ -217,7 +218,7 @@ def test_r3_a6_self_pair_binding_is_rejected() -> None:
         (providers[0], providers[2]),
         (providers[1], providers[2]),
     ]
-    claim_ids = tuple(_pair_claim(claims, evidence, l, r) for l, r in complete)
+    claim_ids = tuple(_pair_claim(claims, evidence, left, right) for left, right in complete)
     bindings = tuple(
         _binding(claim_id, left, right) for claim_id, (left, right) in zip(claim_ids, complete)
     )
@@ -260,7 +261,7 @@ def test_r3_a8_four_providers_with_any_missing_pair_is_rejected(missing: int) ->
         for j in range(i + 1, len(providers))
     ]
     kept = [pair for index, pair in enumerate(complete) if index != missing]
-    claim_ids = tuple(_pair_claim(claims, evidence, l, r) for l, r in kept)
+    claim_ids = tuple(_pair_claim(claims, evidence, left, right) for left, right in kept)
     bindings = tuple(
         _binding(claim_id, left, right) for claim_id, (left, right) in zip(claim_ids, kept)
     )

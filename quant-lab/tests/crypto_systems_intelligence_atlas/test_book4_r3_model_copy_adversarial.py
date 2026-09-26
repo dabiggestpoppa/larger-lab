@@ -65,7 +65,7 @@ def _complete_record(
         for i in range(len(providers))
         for j in range(i + 1, len(providers))
     ]
-    claim_ids = tuple(_pair_claim(claims, evidence, l, r) for l, r in pairs)
+    claim_ids = tuple(_pair_claim(claims, evidence, left, right) for left, right in pairs)
     bindings = tuple(
         _binding(claim_id, left, right)
         for claim_id, (left, right) in zip(claim_ids, pairs)
@@ -114,7 +114,7 @@ def test_r3_b2_model_copy_provider_expansion_without_bindings_is_refused() -> No
     """Expand (A, B) to (A, B, C) via model_copy; the new pairs are unbound."""
     book, claims, evidence = _fixture()
     pairs = [(PROVIDERS[0], PROVIDERS[1])]
-    claim_ids = tuple(_pair_claim(claims, evidence, l, r) for l, r in pairs)
+    claim_ids = tuple(_pair_claim(claims, evidence, left, right) for left, right in pairs)
     bindings = tuple(
         _binding(claim_id, left, right) for claim_id, (left, right) in zip(claim_ids, pairs)
     )
