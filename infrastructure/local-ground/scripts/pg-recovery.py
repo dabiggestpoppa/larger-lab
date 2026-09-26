@@ -1063,36 +1063,81 @@ def _load_claim(operation_id, transition_dir=None):
 
 def _valid_transition_claim(operation_id, transition, promote,
                             transition_dir=None):
+    """EXACT binding of the canonical selector to this transition and THIS
+    promote receipt (B4-CXR7U9R45R1). One semantic law, shared by the shell
+    classifier, reconciliation and every resume path: the claim must pass its
+    coordinate admission and be exactly bound, and the claimed transition
+    must equal the one requested."""
+    if promote is None:
+        return False
+    expected = _receipt_digest(promote)
+    try:
+        state = _claim_state(operation_id, transition_dir,
+                             expected_receipt_sha256=expected)
+    except _ExecutionAuthorityConflict:
+        return False
+    if state != "bound_complete":
+        return False
     claim = _load_claim(operation_id, transition_dir=transition_dir)
-    return isinstance(claim, dict) \
-        and claim.get("format") == _CLAIM_FORMAT \
-        and claim.get("operation_id") == operation_id \
-        and claim.get("transition") == transition \
-        and claim.get("receipt_sha256") == _receipt_digest(promote)
+    return isinstance(claim, dict) and claim.get("transition") == transition
 
 
-def _claim_state(operation_id, transition_dir=None):
-    """Is the durable branch selector ABSENT, COMPLETE, or MALFORMED?
+def _claim_state(operation_id, transition_dir=None,
+                 expected_receipt_sha256=None):
+    """The SEMANTIC state of the durable branch selector (B4-CXR7U9R45R1).
 
-    B4-CXR7U9R44R1. A COMPLETE claim is one this engine published atomically.
-    MALFORMED means a canonical claim NAME exists that is not a complete
-    engine-published claim - a foreign write, a truncated file, or a
-    pre-R44 zero-byte poison claim. The engine can no longer generate that
-    state, but it must be named and failed closed rather than reported as
-    "fresh authority": the selector name being present means the one-time
-    authority is SPENT even when its content cannot be read.
+    ONE classification law for the shell classifier, reconciliation and every
+    resume path. FRESH AUTHORITY EXISTS ONLY WHEN THE CANONICAL CLAIM PATHNAME
+    IS ABSENT. A canonical claim that exists is one of:
+
+      * bound_complete         -- format, operation id, permitted transition
+                                  and receipt digest all match (the digest must
+                                  equal expected_receipt_sha256 when one is
+                                  supplied; a structurally valid digest with no
+                                  expectation to compare against is reported as
+                                  unbound_or_mismatched rather than silently
+                                  trusted);
+      * unbound_or_mismatched  -- a well-shaped claim whose receipt digest is
+                                  missing, malformed, or bound to different
+                                  authority: the selector coordinate is SPENT,
+                                  never fresh;
+      * malformed              -- a canonical claim NAME exists that is not an
+                                  engine-published claim at all (foreign write,
+                                  truncated file, pre-R44 zero-byte poison
+                                  claim), or a claim that fails its coordinate
+                                  admission (symlink, non-regular object,
+                                  redirected or widened file: B4-CXR7U9R45R2).
+
+    The selector name being present means the one-time authority was selected
+    or corrupted; no content-based reading can make it fresh again, and the
+    engine never deletes or rewrites it automatically.
     """
     directory = transition_dir or _transitions_dir()
     path = os.path.join(directory, f"{operation_id}.claim")
-    if not os.path.isfile(path):
+    if not os.path.lexists(path):
         return "absent"
-    claim = _load_claim(operation_id, transition_dir=directory)
-    if isinstance(claim, dict) \
-            and claim.get("format") == _CLAIM_FORMAT \
-            and claim.get("operation_id") == operation_id \
-            and claim.get("transition") in TRANSITIONS_ALLOWED_FROM_PROMOTED:
-        return "complete"
-    return "malformed"
+    try:
+        claim = _load_claim(operation_id, transition_dir=directory)
+    except _ExecutionAuthorityConflict:
+        # Coordinate admission failed: symlink, non-regular object, redirect
+        # or widened permissions. Fail closed, never describe it as fresh.
+        return "malformed"
+    if not isinstance(claim, dict):
+        return "malformed"
+    if claim.get("format") != _CLAIM_FORMAT \
+            or claim.get("operation_id") != operation_id \
+            or claim.get("transition") not in TRANSITIONS_ALLOWED_FROM_PROMOTED:
+        return "malformed"
+    digest = claim.get("receipt_sha256")
+    if not isinstance(digest, str) or len(digest) != 64 \
+            or any(c not in "0123456789abcdef" for c in digest):
+        return "unbound_or_mismatched"
+    if expected_receipt_sha256 is not None \
+            and digest != expected_receipt_sha256:
+        return "unbound_or_mismatched"
+    if expected_receipt_sha256 is None:
+        return "unbound_or_mismatched"
+    return "bound_complete"
 
 
 class _ExecutionAuthorityConflict(RuntimeError):
@@ -2656,14 +2701,16 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     except Exception as e:
         return _blocked(receipt, f"refusing reconcile authority: {e}")
     receipt["operation_id"] = operation_id
+    expected_digest = _receipt_digest(promote)
     state = record.get("state")
     receipt["durable_state"] = state
-    # ONE BRANCH-SELECTION LAW (B4-CXR7U9R44R1): the durable selector name
-    # decides whether the one-time authority is spent. A canonical claim that
-    # is not a COMPLETE engine-published claim is never reported as fresh
-    # authority and never repaired by guessing or by manual deletion - it is a
-    # deterministic fail-closed verdict.
-    claim_state = _claim_state(operation_id)
+    # ONE BRANCH-SELECTION LAW (B4-CXR7U9R44R1, bound in B4-CXR7U9R45R1): the
+    # durable selector name decides whether the one-time authority is spent,
+    # and a claim bound to different authority is NEVER reported as fresh.
+    # Any canonical claim that is not exactly bound to THIS promote receipt is
+    # a deterministic fail-closed verdict, never repaired by guessing.
+    claim_state = _claim_state(operation_id,
+                               expected_receipt_sha256=expected_digest)
     receipt["claim_state"] = claim_state
     if claim_state == "malformed":
         receipt["verdict"] = "unreconciled"
@@ -2671,6 +2718,15 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
             "durable transition claim exists but is not a complete, "
             "engine-published claim; the one-time branch authority is spent and "
             "fail-closed pending operator review")
+        receipt["finished_at"] = now_iso()
+        receipt["exit_status"] = 1
+        return receipt
+    if claim_state == "unbound_or_mismatched":
+        receipt["verdict"] = "unreconciled"
+        receipt["error"] = (
+            "durable transition claim exists and is bound to different or "
+            "unreadable authority; the one-time branch authority is spent and "
+            "can never be reported as fresh (B4-CXR7U9R45R1)")
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 1
         return receipt
@@ -2793,12 +2849,25 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         return 4
     state = record.get("state")
     operation_id = record.get("operation_id")
-    # A canonical claim name that is not a complete engine-published claim
-    # means the one-time authority is spent but unreadable: fail closed
-    # (code 4) instead of reopening fresh authority (B4-CXR7U9R44R1).
-    if isinstance(operation_id, str) and OPERATION_ID_RE.match(operation_id) \
-            and _claim_state(operation_id, transition_dir) == "malformed":
-        return 4
+    # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R1). A canonical claim that
+    # exists but is not EXACTLY bound to the supplied promote receipt means the
+    # one-time authority is spent (selected or corrupted): fail closed (code 4)
+    # instead of reopening fresh authority (B4-CXR7U9R44R1; binding law added
+    # by B4-CXR7U9R45R1). A malformed claim, including one that fails its
+    # coordinate admission (symlink, non-regular, redirected or widened file),
+    # fails closed even without a receipt to compare against.
+    if isinstance(operation_id, str) and OPERATION_ID_RE.match(operation_id):
+        expected = _receipt_digest(promote) if promote is not None else None
+        try:
+            selector_state = _claim_state(
+                operation_id, transition_dir,
+                expected_receipt_sha256=expected)
+        except _ExecutionAuthorityConflict:
+            return 4
+        if selector_state == "malformed":
+            return 4
+        if promote is not None and selector_state == "unbound_or_mismatched":
+            return 4
     if state == TRANSITION_STATE_FINALIZING:
         if record.get("commit_intent") is not None or record.get("commit_point") is not None:
             return 4
@@ -2815,6 +2884,20 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
             if _valid_transition_claim(operation_id, "finalize", promote,
                                        transition_dir=transition_dir):
                 return 5
+            # Defense in depth (and TOCTOU guard): if any canonical claim
+            # somehow survived both exact-binding checks above without being
+            # consumable, it is still never fresh.
+            if _claim_state(operation_id, transition_dir,
+                            expected_receipt_sha256=_receipt_digest(promote)) \
+                    != "absent":
+                return 4
+        elif isinstance(operation_id, str) \
+                and OPERATION_ID_RE.match(operation_id) \
+                and _claim_state(operation_id, transition_dir) != "absent":
+            # PROMOTED with an existing canonical claim and NO receipt to bind:
+            # the selector name exists, so the one-time authority is spent —
+            # never fresh (B4-CXR7U9R45R1).
+            return 4
         return 0
     if state == TRANSITION_STATE_ROLLING_BACK:
         if record.get("selected_transition") not in (None, "rollback"):
