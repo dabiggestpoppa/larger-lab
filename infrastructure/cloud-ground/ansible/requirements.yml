@@ -1,0 +1,19 @@
+# OCE Cloud Ground — Ansible Collection Dependencies
+# B1-I1R — RANGE-CONSTRAINED collection requirements
+#
+# Install: ansible-galaxy collection install -r requirements.yml
+#
+# TRUTH ABOUT PINNING (B4-CXR7U9R25): these are version RANGES, not exact
+# pins, and there are no artifact hashes.  `ansible-galaxy collection
+# install` resolves each range to the newest matching release at install
+# time, so the collection class is the one CI input that R22 did not
+# hash-lock.  R22 closed the Python/Ansible pip toolchain class only.
+# Do not describe these as pinned; the ranges below bound them, nothing more.
+
+collections:
+  - name: community.general
+    version: ">=8.0.0,<10.0.0"
+  - name: community.docker
+    version: ">=3.0.0,<5.0.0"
+  - name: ansible.posix
+    version: ">=1.0.0,<2.0.0"

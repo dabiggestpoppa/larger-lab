@@ -1,0 +1,20 @@
+# OCE Backup Environment Configuration
+# B1-I1 — Template (REPLACE all placeholder values)
+# WARNING: Do not commit real credentials
+
+# Object storage target (R2 or B2)
+OCE_BACKUP_TARGET="{{ OCE_BACKUP_TARGET | default('s3:s3.amazonaws.com/BUCKET_NAME') }}"
+OCE_BACKUP_PASSWORD="{{ OCE_BACKUP_PASSWORD | default('PLACEHOLDER_BACKUP_PASSWORD') }}"
+
+# R2/B2 credentials (REPLACE)
+AWS_ACCESS_KEY_ID="{{ OCE_BACKUP_ACCESS_KEY | default('PLACEHOLDER_ACCESS_KEY') }}"
+AWS_SECRET_ACCESS_KEY="{{ OCE_BACKUP_SECRET_KEY | default('PLACEHOLDER_SECRET_KEY') }}"
+
+# Backup schedule
+OCE_BACKUP_FULL_SCHEDULE="weekly"
+OCE_BACKUP_INCREMENTAL_SCHEDULE="daily"
+OCE_BACKUP_RETENTION_DAYS="30"
+
+# PostgreSQL backup
+OCE_PGBACKREST_STANZA="main"
+OCE_PGBACKREST_REPO_PATH="/opt/oce/backups/db"

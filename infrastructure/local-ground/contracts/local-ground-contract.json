@@ -1,0 +1,52 @@
+{
+  "contract_id": "OCE-LOCALGROUND-CONTRACT-20260829",
+  "stage": "B1-LOCAL-GROUND-CLOSURE",
+  "decision": "LOCAL_FIRST_CLOUD_ACTIVATION_DEFERRED",
+  "amendment": "OCE-AMEND-A003",
+  "repository": {
+    "full_name": "dabiggestpoppa/larger-lab"
+  },
+  "default_runtime_target": "local",
+  "runtime_profiles": [
+    "local",
+    "local-test",
+    "local-recovery",
+    "cloud-plan",
+    "cloud"
+  ],
+  "local_data_contract": {
+    "postgresql_is_authoritative_truth": true,
+    "redis_is_transient_only": true,
+    "artifact_storage_is_replaceable": true,
+    "artifact_storage_adapter_version": "v1"
+  },
+  "provider_policy": {
+    "provider_values_in_deployment_adapters_only": true,
+    "no_provider_hardcoded_in_domain_logic": true,
+    "approved_future_target_provider": "netcup",
+    "approved_future_target_product": "RS 4000 G12"
+  },
+  "cloud_activation": {
+    "state": "DEFERRED_BY_OPERATOR",
+    "zero_cost": true,
+    "zero_mutations": true,
+    "purchase_decision": "RESEARCHED_DEFERRED",
+    "no_false_dry_run_equivalence": true
+  },
+  "ledger_model": {
+    "local_ground_state": "RATIFIED",
+    "cloud_plan_state": "VALIDATED_NO_APPLY",
+    "cloud_activation_state": "DEFERRED_BY_OPERATOR",
+    "cloud_deployment_state": "NOT_DEPLOYED",
+    "cloud_cost_state": "ZERO",
+    "next_local_book": "B2",
+    "operator_hold_reason": "NONE"
+  },
+  "local_acceptance_tests": {
+    "count": 30,
+    "reference": "tests/test_local_ground.py"
+  },
+  "posture": {
+    "statement": "Local is the default and authoritative runtime. Cloud is a replaceable, deferred deployment target with mandatory validate/plan/apply separation. No cloud account, provision, deploy, purchase, public exposure, or cost while cloud_activation_state is DEFERRED_BY_OPERATOR."
+  }
+}

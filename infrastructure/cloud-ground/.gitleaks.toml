@@ -1,0 +1,21 @@
+# Gitleaks configuration for OCE Cloud Ground
+# B1-I1R3H — the generic-api-key rule flags the public git SHAs stored in the
+# checkpoint identity contract (authoritative_base_sha, expected_tree_sha,
+# expected_implementation_commit_source). Those are public repository
+# identities, not credentials, so allowlist them explicitly.
+title = "OCE Cloud Ground gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "OCE public identity data: git SHAs and commit references are not secrets"
+# Paths are matched relative to the scan root (--source infrastructure/cloud-ground).
+paths = [
+  '''contracts/checkpoint-identity-data\.json''',
+]
+# Regexes are matched against the detected secret value: the allowlisted
+# identity fields are 40-hex git SHAs (public repository identities).
+regexes = [
+  '''^[0-9a-f]{40}$''',
+]

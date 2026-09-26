@@ -1,0 +1,103 @@
+# OCE Cloud Ground — Retention Classes Policy
+# B1-I1 — Static data
+# Document: B1-ARCH-DATA-001
+# Ratified: Block 1 Cloud Ground Plan 1.0
+
+# Disposition classes
+classes:
+  critical:
+    description: "Constitutional records, capital decisions, audit trails"
+    retention: indefinite
+    review_cycle: annual
+    backup: required
+    encryption: required
+    examples:
+      - Constitutional decisions
+      - Capital authority grants
+      - Block gate reports
+      - Incident records
+      - Restoration evidence
+
+  operational:
+    description: "Job state, service logs, operational decisions"
+    retention_days: 365
+    review_cycle: quarterly
+    backup: recommended
+    encryption: recommended
+    examples:
+      - Job state transitions
+      - Service health logs
+      - Operator decisions
+      - Deployment records
+
+  artifact:
+    description: "Build outputs, reports, models, datasets"
+    retention_days: 90
+    review_cycle: monthly
+    backup: optional
+    encryption: optional
+    examples:
+      - Backtest results
+      - Generated reports
+      - Build artifacts
+      - Model checkpoints
+
+  transient:
+    description: "Debug logs, temporary staging, ephemeral state"
+    retention_days: 7
+    review_cycle: none
+    backup: no
+    encryption: no
+    examples:
+      - Debug output
+      - Temporary files
+      - Staging artifacts
+
+  hazardous:
+    description: "Secrets, credentials, sensitive data"
+    retention: immediate_redact_or_delete
+    review_cycle: on_detection
+    backup: no
+    encryption: always
+    examples:
+      - API keys
+      - Passwords
+      - Private keys
+      - Broker credentials
+    disposition: "Redact, delete with tombstone, rotate credential"
+
+# Storage tiers
+tiers:
+  hot_operational:
+    description: "Recent state and active incidents"
+    retention_days: 30
+    location: local-ssd
+
+  warm_learning:
+    description: "Normalized observations and lesson candidates"
+    retention_days: 180
+    location: local-ssd-or-object
+
+  cold_audit:
+    description: "Immutable evidence and historical gate records"
+    retention_days: 365
+    location: object-storage
+
+  quarantine:
+    description: "Restricted hazardous or disputed material"
+    retention_days: 90
+    location: isolated-storage
+    access: operator-only
+
+  tombstone_index:
+    description: "Proof of disposition for deleted content"
+    retention: indefinite
+    location: postgresql
+
+# Secrets handling
+secrets:
+  never_in_source: true
+  never_in_logs: true
+  never_in_artifacts: true
+  never_in_backup_raw: true
+  suspected_exposure: "rotate, redact, incident-record, tombstone"

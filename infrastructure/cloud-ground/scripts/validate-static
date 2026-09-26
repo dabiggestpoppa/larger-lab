@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# OCE Cloud Ground -- Static Validation Wrapper
+# B1-I1R -- Calls the Python validation engine
+# Version: 2.0.0
+#
+# Usage: ./scripts/validate-static
+# Exit code: nonzero when gate != READY_FOR_OPERATOR_REVIEW
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENGINE="$SCRIPT_DIR/validate_engine.py"
+
+if [ ! -f "$ENGINE" ]; then
+    echo "ERROR: validate_engine.py not found at $ENGINE" >&2
+    exit 1
+fi
+
+python3 "$ENGINE" "$@"
+exit $?

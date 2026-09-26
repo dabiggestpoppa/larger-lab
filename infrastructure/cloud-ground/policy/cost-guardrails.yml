@@ -1,0 +1,95 @@
+# OCE Cloud Ground — Cost Guardrails Policy
+# B1-I1 — Static data
+# Document: B1-C1.S5 Cost Guardrails
+# Ratified: Block 1 Cloud Ground Plan 1.0
+
+# Monthly budget thresholds (USD equivalent)
+thresholds:
+  fixed_baseline_warning: 60
+  burst_default_allowance: 25
+  burst_hard_stop: 50
+  total_approval_gate: 100
+
+# Provider pricing (as of 2026-08-17 — revalidate at purchase)
+providers:
+  netcup:
+    plan: rs-4000-g12
+    monthly_eur: 39.92
+    monthly_usd_approx: 43.00
+    includes_vat: true
+    status: preferred
+
+  ovh:
+    plan: vps-4
+    monthly_usd: 23.37
+    status: fallback
+
+  octaspace:
+    gpu_prices:
+      h100_80gb: 0.12
+      rtx_4080: 0.15
+      rtx_4090: 0.26
+      rtx_a6000: 0.20
+    status: experimental
+
+  runpod:
+    gpu_prices:
+      rtx_a5000_community: 0.27
+      rtx_4090_community: 0.74
+      a100_pcie_80gb: 1.39
+      h100_pcie: 2.89
+    status: fallback
+
+  cloudflare_r2:
+    storage_per_gb: 0.015
+    free_tier_gb: 10
+    egress: free
+    status: artifact-storage
+
+  backblaze_b2:
+    storage_per_tb: 6.95
+    status: backup-evaluation
+
+  tailscale:
+    personal_plan: 0
+    status: private-network
+
+# Cost tracking rules
+tracking:
+  currency: USD
+  conversion_date: "on-record"
+  tax_included: true
+  ledger_file: "cost-ledger.schema.json"
+  reconciliation_frequency: weekly
+
+# Alert rules
+alerts:
+  approaching_warning:
+    threshold_percent: 80
+    severity: warning
+    action: "Notify operator"
+
+  approaching_stop:
+    threshold_percent: 95
+    severity: critical
+    action: "Pause burst dispatch"
+
+  exceeded_gate:
+    threshold_percent: 100
+    severity: emergency
+    action: "Stop all non-essential work, operator approval required"
+
+# B1-I1 cost impact
+b1_i1:
+  new_recurring_usd: 0
+  new_burst_usd: 0
+  cloud_mutations: 0
+  public_exposure: false
+
+# Enforcement state
+enforcement:
+  policy_file: this
+  consumer: "Future cost tracking ledger and burst dispatcher"
+  verified: false
+  verification_date: null
+  notes: "B1-I1 defines thresholds. Enforcement requires the cost tracking component."

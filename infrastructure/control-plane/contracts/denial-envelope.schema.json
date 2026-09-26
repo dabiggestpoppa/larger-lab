@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/control-plane/denial-envelope.json",
+  "title": "OCE Denial Envelope",
+  "description": "Safe reason codes and remediation without leaking secrets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["denial_id", "reason_code", "actor_id", "requested_action", "requested_target", "policy_version", "denied_at"],
+  "properties": {
+    "denial_id": { "type": "string", "pattern": "^[a-f0-9]{16,64}$" },
+    "reason_code": { "enum": ["missing_identity", "missing_authority", "incomplete_approval", "unsupported_schema_version", "missing_idempotency", "unavailable_authoritative_state", "inconsistent_migration", "payload_hash_mismatch", "stale_lease", "redis_pg_conflict", "evidence_unreconcilable", "dirty_source", "missing_validation", "missing_cloud_approval", "risk_class_exceeded", "expired_grant", "revoked_grant", "replayed_grant", "wrong_target", "self_approval_blocked"] },
+    "actor_id": { "type": "string" },
+    "requested_action": { "type": "string" },
+    "requested_target": { "type": "string" },
+    "policy_version": { "type": "string", "minLength": 1 },
+    "remediation": { "type": "string" },
+    "denied_at": { "type": "string", "format": "date-time" },
+    "schema_version": { "type": "string", "const": "1.0.0" }
+  }
+}

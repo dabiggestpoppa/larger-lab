@@ -1,0 +1,71 @@
+# OCE Local Ground — B1-LOCAL Policy (A-003)
+# Machine-readable expectation set for the local-first OCE runtime.
+# Local is default and authoritative; cloud is deferred and non-mutating.
+
+local_ground:
+  default_runtime_target: local
+  enabled_profiles: [local, local-test, local-recovery, cloud-plan, cloud]
+  local_front_first: true
+  cloud_activation_state: DEFERRED_BY_OPERATOR
+
+runtime:
+  local:
+    default: true
+    mutates_external: false
+    requires_authorization: false
+    contact_provider: false
+    cost: ZERO
+  local-test:
+    default: false
+    mutates_external: false
+    requires_authorization: false
+    contact_provider: false
+    cost: ZERO
+  local-recovery:
+    default: false
+    mutates_external: false
+    requires_authorization: false
+    contact_provider: false
+    cost: ZERO
+  cloud-plan:
+    default: false
+    mutates_external: false
+    requires_authorization: false
+    contact_provider: false
+    cost: ZERO
+  cloud:
+    default: false
+    mutates_external: true
+    requires_authorization: true
+    contact_provider: true
+    cost: ZERO
+
+local_data:
+  postgresql_authoritative_truth: true
+  redis_transient_only: true
+  artifact_fs_migration_target: s3-any-provider
+  artifact_storage_adapter_version: v1
+
+secrets:
+  committed_credentials: forbidden
+  env_file: .env.example
+  missing_secret_behavior: FAIL_CLOSED
+  diagnostics_redacted: true
+  scan: gitleaks
+
+cloud_activation:
+  state: DEFERRED_BY_OPERATOR
+  zero_cost: true
+  zero_mutations: true
+  apply_requires: [authorization_envelope, provider_identity, cost_approval, public_exposure_approval]
+  no_auto_fallback_purchase: true
+
+acceptance:
+  local_tests_count: 30
+  reference: tests/test_local_ground.py
+  independent_gate: scripts/final-gate-local.sh
+
+enforcement:
+  consumer: "B1-LOCAL regressions, CI workflow, and remote-independent gate"
+  verified: false
+  verification_date: null
