@@ -356,3 +356,64 @@ Kilo is recorded by fresh external result after the evidence head. PR #4 stays
 OPEN, unmerged, MERGEABLE, and UNSTABLE. `main` remains `7c7816f3`. No cloud,
 broker, capital, or execution-authority mutation occurred; recurring cost is $0.
 Book 5 and Atlas Program Block 4 remain untouched.
+
+### B4-CXR7U9R44 superseding repair (append-only)
+
+`R43: SUPERSEDED BY B4-CXR7U9R44 POST-REVIEW REPAIR` (and R42 likewise). The
+prior exact-head R42/R43 green workflows remain real and valid for the tests
+they executed; the coverage boundary was incomplete, not fabricated.
+Correction of the prior boundary statement: **R43 CLOSED THE KNOWN LOCK-ABA
+AND ROLLBACK-RESUME DEFECTS, BUT DID NOT TEST CRASHES INSIDE CLAIM
+PUBLICATION OR DENIAL-SIDE-EFFECT-FREE COORDINATE PROVISIONING.**
+
+Three post-R43 review findings closed by this repair: (1) the canonical
+branch selector became VISIBLE before its payload was durable, so death in
+that window left a zero-byte claim that spent the one-time authority and
+stranded PROMOTED; (2) entering execution authority created the permanent
+lock coordinate BEFORE authorization, so a denial — including an arbitrary
+unregistered operation id — left durable growth; (3) a denied fresh retry
+could ERASE an earlier committed owner's execution metadata.
+
+| Repair | Commit | Acceptance proof | Exact-head evidence |
+|---|---|---|---|
+| B4-CXR7U9R44R1 | `74321f5c` | crash-atomic claim publication: durable temporary + atomic NO-REPLACE publication; malformed selector fails closed in reconcile and classifier; negative control retargeted to the pre-R44 primitive | R44 boundary sweep passes on Linux CI |
+| B4-CXR7U9R44R2 | `ff6912d4` | lock coordinates provisioned ONLY through governed authority: governed-operation proof (record+format+digest) precedes any coordinate open/create; promotion provisions exactly one; every denial provisions nothing | R44 provisioning + hostile-id growth proofs pass |
+| B4-CXR7U9R44R3 | `0aefe40e` | attempt-owned execution metadata v3: selector read under the OS lock; cross-branch and prior-committed-evidence overwrite refused; compare-and-delete with byte-for-byte restore | R44 metadata preservation proofs pass |
+| B4-CXR7U9R44R4 | `d3d5ba37` | real-process proofs of all seven publication crash boundaries; executable poison control reproduces the zero-byte claim at runtime | R44 proof module green |
+| B4-CXR7U9R44R5 | `a8c6e0b1` | R44 proof module selected in the authoritative runner with unique node IDs | runner selection proof passes |
+| B4-CXR7U9R44X1 | `bccc9cc5` | R35 aligned: pre-authority conflict reported as truthful refusal; denial proves byte-identical tree plus exactly the promotion-provisioned coordinate | R35 suite 39 passed / 1 skipped |
+| B4-CXR7U9R44X2 | `30370dc5` | liveness-safe discard: OS-lock-proven death (never names/timestamps); live writer's temporary untouchable; bounded retreat from creation and Windows release windows; new real-process proof module selected in the runner | R44X2 module 5/5 on Linux CI; R40R1 race repaired |
+
+Mid-gate truth record: exact-head CI on `bccc9cc5` FAILED (b1 run
+`36243225760`, the two-thread claim race produced no winner). Root cause was
+a REAL DEFECT introduced by R44R1 — the discard step deleted a LIVE
+publisher's in-flight temporary — repaired in R44X2 and recorded as
+observed; not dismissed as a flake.
+
+**Implementation head:** `30370dc5116789414eeede41fff7acef90bdff25`.
+**Implementation tree:** `43d2c78a5ca0b90b3749779f62fd1fe08f2c1633`.
+**Exact-head workflows:** b1 `36248776201`, b2 `36248776161`,
+b3 `36248776197`, b4 `36248776169`, and B1-I1R `36248779729` — all success.
+
+**Artifact truth:** `b1-local-ground-evidence-b16c3e20112f`, OCE_RUN_ID
+`b16c3e20112f`, reports 417/417 executed and passed on Linux, zero
+failures/errors/skips (both platform-gated R44 proofs RAN), 62
+container-backed tests passed, all R44 and R44X2 proofs, independent gate
+75 PASS / 0 FAIL (AUTHORITATIVE_CI), adversarial 8 PASS / 0 FAIL, 37
+manifest entries with sha256 reverified (0 mismatches), source clean
+before/after, main `7c7816f3` untouched, cloud_mutations 0,
+cloud_cost_state ZERO, cloud_activation_state DEFERRED_BY_OPERATOR.
+
+**Superseded boundaries closed:** crash windows inside claim publication;
+denial-side persistent coordinate growth; committed metadata loss on denied
+retry; and (found by CI mid-gate, fixed in R44X2) discard interference with
+a live publisher's in-flight temporary. Prior sections remain preserved
+verbatim above.
+
+**Current authorization boundary:** SonarCloud is FAILURE/unsuppressed on
+this head; Kilo has NO CONCLUSION (pending) and is not called green. PR #4
+stays OPEN, unmerged, MERGEABLE, and UNSTABLE. `main` remains `7c7816f3`.
+No cloud, broker, capital, or execution-authority mutation occurred;
+recurring cost is $0. Book 5 and Atlas Program Block 4 remain untouched.
+
+**Exit-gate truth:** `READY_FOR_OPERATOR_REVIEW`.

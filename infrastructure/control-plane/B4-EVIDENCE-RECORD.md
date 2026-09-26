@@ -2395,3 +2395,125 @@ OPEN, unmerged, MERGEABLE, and UNSTABLE; no merge authorization was granted or
 exercised. `main` is untouched. Cloud, broker, capital, and execution-authority
 mutations are 0; recurring cost is $0. Book 5 and Atlas Program Block 4 remain
 untouched.
+
+## B4-CXR7U9R44 — SUPERSEDING SECTION — CRASH-ATOMIC CLAIM PUBLICATION, GOVERNED COORDINATE PROVISIONING, ATTEMPT-OWNED EVIDENCE (2026-09-26)
+
+Operator-directed continuation of gate `B4-CXR7U9R44` from start SHA
+`99758d33ad320b44cc010a4af719c7b14c5a67a6` on branch `oce-program-build`.
+Append-only: every earlier section above is preserved verbatim.
+
+`R42: SUPERSEDED BY B4-CXR7U9R44 POST-REVIEW REPAIR`.
+`R43: SUPERSEDED BY B4-CXR7U9R44 POST-REVIEW REPAIR`.
+The prior exact-head R42/R43 green workflows remain real and valid for the
+tests they executed; the coverage boundary was incomplete, not fabricated.
+The correction is: **R43 CLOSED THE KNOWN LOCK-ABA AND ROLLBACK-RESUME
+DEFECTS, BUT DID NOT TEST CRASHES INSIDE CLAIM PUBLICATION OR
+DENIAL-SIDE-EFFECT-FREE COORDINATE PROVISIONING.**
+
+### The three post-R43 review findings
+
+1. **Claim visibility before payload durability.** The branch selector was
+   published by `O_CREAT|O_EXCL` create and written afterwards, so any death
+   in that window left a durably visible ZERO-BYTE claim: the one-time
+   authority was spent, unreadable, and the operation was stranded in
+   PROMOTED with no governed continuation (fresh authority refused, resume
+   refused, classifier verdict 4).
+2. **Denial created persistent lock coordinates.** Entering execution
+   authority created the permanent coordinate file BEFORE authorization, so
+   a denial — including one carrying an arbitrary 32-hex operation id that
+   was never registered — left a durable one-byte file and grew the governed
+   transition directory.
+3. **Committed metadata loss on a denied fresh retry.** A denied fresh retry
+   could erase an earlier committed owner's execution metadata (compare-
+   absent-delete), destroying attempt-owned evidence that resume depends on.
+
+### The repairs (append-only commit ladder)
+
+| Repair | Commit | Law enforced |
+|---|---|---|
+| R44R1 | `74321f5c` | crash-atomic claim publication: payload written+fsynced to a private same-directory temporary, published with an atomic NO-REPLACE primitive (`os.link` POSIX / no-replace `os.rename` Windows), directory fsynced, temporary retired; malformed canonical claims fail closed in reconcile and classifier |
+| R44R2 | `ff6912d4` | lock coordinates exist ONLY through governed authority: `_require_governed_operation` proves record existence+format+receipt digest BEFORE any coordinate open/create; promotion provisions exactly one coordinate (`execution_coordinate: "provisioned"`); denial provisions nothing |
+| R44R3 | `0aefe40e` | attempt-owned execution metadata (format v3): `activate()` reads the durable selector under the OS lock, refuses cross-branch and prior-committed-evidence overwrite; `clear_metadata()` is compare-and-delete with byte-for-byte restore |
+| R44R4 | `d3d5ba37` | real-process adversarial proofs: all seven publication crash boundaries, poison control (executable pre-R44 engine copy reproduces the zero-byte claim at runtime), denial provisioning, metadata preservation, malformed-selector fail-closed |
+| R44R5 | `a8c6e0b1` | R44 proof module selected in the authoritative runner |
+| R44X1 | `bccc9cc5` | R35 suite alignment: `_transition` reports `_ExecutionAuthorityConflict` raised BEFORE authority entry as a truthful refusal receipt; R35 denial assertions prove a byte-identical tree with exactly the promotion-provisioned coordinate |
+| R44X2 | `30370dc5` | liveness-safe discard: see below |
+
+### Mid-gate defect found by authoritative CI and repaired (truth record)
+
+Exact-head CI on `bccc9cc5` FAILED in `b1-local-ground-validation`
+(run `36243225760`): the R40R1 two-thread claim race produced NO winner —
+winner died with `FileNotFoundError` on its temporary, loser with
+`IndexError`. Diagnosis against the traceback proved a REAL DEFECT
+INTRODUCED BY R44R1, not a flake: the discard step (which cannot exist
+before R44R1 introduces private temporaries) deleted ANY matching
+`.claim.*.tmp` name, including a LIVE publisher's in-flight temporary.
+It was repaired in R44X2 by proving death with an OS lock the writer holds
+on the temporary itself — never names or timestamps — with bounded retreat
+loops for the creation window (`st_nlink < 1` after locking) and the
+Windows-required release-before-rename window (rebuild + retry). New proof
+module `test_b4_cxr7u9r44x2_claim_temporary_liveness.py` drives the
+interference with real primitives and real processes. The failure and fix
+are recorded as observed; nothing was dismissed as timing.
+
+### Local validation truth
+
+Focused claim-related selection plus the new R44X2 module: `131 passed,
+3 skipped`. Full runner selection split across batches on Windows:
+`233 passed, 15 skipped` + `74 passed, 2 skipped` + `44 passed, 17 skipped,
+1 failed` — the single failure is the PRE-EXISTING local-only backup
+timeout artifact (`test_backup_hardening.py::test_incomplete_full_backup_rejected`
+against the gitignored local `var/` scratch; it passes in authoritative CI
+and at the base-commit tree). Ruff clean under the project config for every
+touched file.
+
+### Exact implementation-head CI and evidence
+
+All five workflows succeeded on exact implementation SHA
+`30370dc5116789414eeede41fff7acef90bdff25`:
+
+- `36248776201` — `b1-local-ground-validation` — success
+- `36248776161` — `b2-control-plane-validation` — success
+- `36248776197` — `b3-worker-fabric-validation` — success
+- `36248776169` — `b4-config-spine-validation` — success
+- `36248779729` — `B1-I1R Validation` — success
+
+B1 artifact `b1-local-ground-evidence-b16c3e20112f` was downloaded and
+verified:
+
+```text
+tested commit:       30370dc5116789414eeede41fff7acef90bdff25
+tested tree:         43d2c78a5ca0b90b3749779f62fd1fe08f2c1633
+OCE_RUN_ID:          b16c3e20112f
+test totals:         417 collected / 417 executed / 417 passed
+failures/errors:     0 / 0
+skips:               0  (both platform-gated R44 proofs RAN on Linux)
+container-backed:    62 passed (lifecycle 16, backup hardening 42,
+                     operation-wide claim 4)
+R44 proofs:          32/32 passed (boundary sweep, poison control,
+                     provisioning, metadata, runner wiring)
+R44X2 proofs:        5/5 passed (live-writer survival, probe-lock
+                     respect, released-window retreat, race winner,
+                     retry budget)
+independent gate:    75 PASS / 0 FAIL (AUTHORITATIVE_CI)
+adversarial:         8 PASS / 0 FAIL
+manifest:            37 artifacts; sha256 re-verified, 0 mismatches
+source cleanliness:  clean before and after (dirty 0 / 0)
+identity:            attached checkout, trusted ref oce-program-build,
+                     main_sha 7c7816f382947bbc8a1f2154435fc436f2428fa8
+accounting:          cloud_mutations 0, cloud_cost_state ZERO,
+                     cloud_activation_state DEFERRED_BY_OPERATOR
+```
+
+### External and authorization truth
+
+SonarCloud Code Analysis on this head is FAILURE and unsuppressed; the
+disclosed new-code ratings are not relabelled green. Kilo Code Review on
+this head has NO CONCLUSION (pending) and is not called green. PR #4
+remains OPEN, unmerged, MERGEABLE, and UNSTABLE; no merge authorization
+was granted or exercised. `main` is untouched at `7c7816f3`. Cloud,
+broker, capital, and execution-authority mutations are 0; recurring cost
+is $0. Book 5 and Atlas Program Block 4 remain untouched.
+
+**Status: IMPLEMENTATION CONVERGED — CLOSURE BLOCKED** (external blockers:
+SonarCloud failure and Kilo review without conclusion; no self-ratification).
