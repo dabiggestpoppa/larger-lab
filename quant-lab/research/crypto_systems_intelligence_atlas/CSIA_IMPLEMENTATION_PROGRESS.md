@@ -748,3 +748,100 @@ acquisition.
 Future Book 3 changes require a concrete downstream integration defect, an
 explicit operator amendment, or a newly discovered correctness failure. No
 further generic Book 3 hardening is authorized.
+
+# CHECKPOINT 17 — BOOK 4 HARDENING R2 (2026-09-26)
+
+Scope: ONE final narrow hardening pass — contextual claim binding +
+provenance-set closure. No generic hardening, no redesign, no Book 5, no live
+acquisition, no self-acceptance.
+
+Baseline: Book 4 Hardening R1 = PASS at HEAD
+`e71a99a2c4bea22f870f3e1de70688bc83b1dede` (clean worktree, origin synced).
+
+## Findings sealed
+
+- Finding A — HARD_RUNTIME provenance-set coherence: decision-driving
+  fact-binding claims must be contained in
+  `HardRuntimeEvidence.book2_claim_refs` (A1-A4).
+- Finding B — fact qualifier != fact context: `HardRuntimeFactContextBinding`
+  binds every fact claim to the exact consumer/provider/function/scope;
+  canonical claim propositions must bind the assessed consumer and provider
+  (B1-B7).
+- Finding C — failure-domain pair scope: independence requires
+  `IndependenceClaimBinding` records scoped to the exact assessed left/right
+  pair, with propositions binding both systems (C1-C6).
+- Finding D — redundancy provider/function scope: redundancy independence
+  bindings must name the assessed subject, provider pair, and function (D1-D5).
+- Finding E — nested claim-set coherence: fact/mechanism/independence claims
+  must sit inside their own record's declared `book2_claim_refs`; referenced
+  FailureDomain objects keep separate canonical provenance (E1-E5).
+- Finding F — exact snapshot lineage: `source_snapshot_refs` must equal the
+  reachable `raw_snapshot_ref` set (missing and extra snapshots rejected,
+  shared snapshots deduplicated) across DependencyRecord, DependencyPath,
+  RoleAssignment, and HardRuntimeEvidence (F1-F6).
+
+## Required gates
+
+```text
+HARD_RUNTIME_PROVENANCE_SET_COHERENCE = PASS
+HARD_RUNTIME_CONTEXT_BINDING = PASS
+FAILURE_DOMAIN_PAIR_SCOPE_BINDING = PASS
+REDUNDANCY_CONTEXT_BINDING = PASS
+MECHANISM_CLAIM_SET_COHERENCE = PASS
+INDEPENDENCE_CLAIM_SET_COHERENCE = PASS
+SNAPSHOT_EXACT_LINEAGE = PASS
+R1_GATES_PRESERVED = PASS
+SENSOR_BASELINE_EQUIVALENCE = PASS
+BOOK1_FREEZE = PASS
+BOOK2_FREEZE = PASS
+BOOK3_FREEZE = PASS
+```
+
+## Test and quality counts
+
+```text
+BOOK_1_TESTS = 107 PASS
+BOOK_2_TESTS = 108 PASS
+BOOK_3_TESTS = 83 PASS
+BOOK_4_PRIOR_TESTS = 137 PASS
+BOOK_4_R2_FOCUSED_TESTS = 35 PASS
+BOOK_4_TOTAL = 172 PASS
+TOTAL_CSIA = 470 PASS
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (37 source files)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+PRE_EXISTING_BASELINE_FAILURES = 14
+BOOK4_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```
+
+The post-R2 Sensor failing-test set is byte-identical to the 14 failures
+recorded in `CSIA_BOOK_4_HARDENING_R1_SENSOR_EQUIVALENCE.md`.
+
+R2 anchors:
+
+- Ratified Book 4 planning + errata anchor: `04820379bd0f63a605d83b1c710a246b103a5ef1`
+- Book 4 D4 binding commit: `8b6106055686721b1b490adc792b0d6c03696e15`
+- Accepted Book 3 base: `d33afd5ec87208d96d256ec919fbf55956bf2791`
+- R2 start HEAD: `e71a99a2c4bea22f870f3e1de70688bc83b1dede`
+- R2 seal commit: `e5884686`
+- R2 test-suite commit: `8a336fb0`
+
+Artifacts:
+
+- `CSIA_BOOK_4_HARDENING_R2_MATRIX.json`
+- `CSIA_BOOK_4_IMPLEMENTATION_EVIDENCE_v0.1.md` (Hardening R2 section)
+- this checkpoint
+
+Exact next operator action: review the R2 matrix and the R2 evidence section,
+then explicitly accept or reject the proposed Book 4 exit gate
+(`PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL`). Do not
+self-accept Book 4, start Book 5, or enable live acquisition. No R3 unless a
+concrete new correctness failure is demonstrated.
+
+Future Book 4 changes require a concrete demonstrated correctness defect, an
+explicit operator amendment, or a newly discovered integration failure. No
+further generic hardening rounds are authorized.

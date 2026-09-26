@@ -1,0 +1,117 @@
+{
+  "schema": "csia-book-4-hardening-r2-matrix-v0.1",
+  "generated_at": "2026-09-26T00:00:00Z",
+  "status": "READY_FOR_OPERATOR_ACCEPTANCE",
+  "scope": "CONTEXTUAL_CLAIM_BINDING + PROVENANCE_SET_CLOSURE",
+  "governance": {
+    "ratified_planning_anchor": "04820379bd0f63a605d83b1c710a246b103a5ef1",
+    "book_4_decision_binding_commit": "8b6106055686721b1b490adc792b0d6c03696e15",
+    "accepted_book_3_base": "d33afd5ec87208d96d256ec919fbf55956bf2791",
+    "book_4_hardening_r1_head": "e71a99a2c4bea22f870f3e1de70688bc83b1dede",
+    "book_4_acceptance": "NOT_SELF_ACCEPTED",
+    "book_5": "NOT_STARTED",
+    "live_acquisition_authority": false
+  },
+  "gates": {
+    "HARD_RUNTIME_PROVENANCE_SET_COHERENCE": "PASS",
+    "HARD_RUNTIME_CONTEXT_BINDING": "PASS",
+    "FAILURE_DOMAIN_PAIR_SCOPE_BINDING": "PASS",
+    "REDUNDANCY_CONTEXT_BINDING": "PASS",
+    "MECHANISM_CLAIM_SET_COHERENCE": "PASS",
+    "INDEPENDENCE_CLAIM_SET_COHERENCE": "PASS",
+    "SNAPSHOT_EXACT_LINEAGE": "PASS",
+    "R1_GATES_PRESERVED": "PASS",
+    "SENSOR_BASELINE_EQUIVALENCE": "PASS",
+    "BOOK1_FREEZE": "PASS",
+    "BOOK2_FREEZE": "PASS",
+    "BOOK3_FREEZE": "PASS"
+  },
+  "findings": {
+    "A_hard_runtime_provenance_set_coherence": {
+      "status": "SEALED",
+      "mechanism": "HardRuntimeGate requires every decision-driving fact-binding claim to be contained in HardRuntimeEvidence.book2_claim_refs; the assessment's actual authority set can no longer differ from its declared provenance set"
+    },
+    "B_hard_runtime_context_binding": {
+      "status": "SEALED",
+      "mechanism": "HardRuntimeFactContextBinding binds each fact claim to the exact consumer, provider, function, and scope; binding context must equal the record context, and the canonical claim proposition must bind the assessed consumer (subject_refs) and provider (object_ref). Function and scope have no Book 2 Proposition dimension and are validated only as typed Book 4 binding dimensions, which is documented rather than treated as proven.",
+      "proposition_fields_used": [
+        "Proposition.subject_refs = (consumer,)",
+        "Proposition.object_ref = provider",
+        "Proposition.qualifier = fact class (R1)"
+      ]
+    },
+    "C_failure_domain_pair_scope": {
+      "status": "SEALED",
+      "mechanism": "FailureDomainBook.classify requires IndependenceClaimBinding records whose domain, system, and correlation-scope dimensions equal the assessed left/right pair, and whose canonical POSITIVE_INDEPENDENCE claim proposition binds the left/right systems; an independence claim for X/Y can never classify A/B. Shared-mechanism classification still dominates.",
+      "binding_required": true
+    },
+    "D_redundancy_context_binding": {
+      "status": "SEALED",
+      "mechanism": "RedundancyAssessment requires IndependenceClaimBinding coverage exactly equal to positive_independence_claim_refs; RedundancyBook validates that each binding names the assessed subject, provider pair, and function, so a claim for providers X/Y or another function can never support INDEPENDENT_REDUNDANCY",
+      "binding_required": true
+    },
+    "E_nested_claim_set_coherence": {
+      "status": "SEALED",
+      "mechanism": "require_claim_set_closure enforces nested decision-driving claims to be a subset of the record-level book2_claim_refs for HardRuntimeEvidence fact bindings, FailureDomain.mechanism_claim_refs, and RedundancyAssessment.positive_independence_claim_refs; referenced FailureDomain objects keep their own canonical provenance and are deliberately excluded from the redundancy closure",
+      "direct_assessment_evidence": "nested claims must sit inside the owning record's declared provenance",
+      "referenced_object_evidence": "FailureDomain objects referenced by redundancy records keep their own canonical provenance"
+    },
+    "F_snapshot_exact_lineage": {
+      "status": "SEALED",
+      "mechanism": "Book4Provenance.validate_snapshot_lineage now requires set equality between source_snapshot_refs and the raw_snapshot_ref values reachable from the record's canonical Book 2 claims: missing snapshots and unrelated extra snapshots are both rejected; deduplication follows from set equality; no second snapshot registry exists",
+      "applies_to": [
+        "DependencyRecord",
+        "DependencyPath",
+        "RoleAssignment",
+        "HardRuntimeEvidence"
+      ],
+      "known_limitation": "Book 2 exposes snapshot identity only through RawEvidence.raw_snapshot_ref, so exact reachable-set equality remains the narrowest valid check without mutating accepted Books 1-3"
+    }
+  },
+  "r1_preservation": {
+    "hard_runtime_fact_qualifier_binding": "PRESERVED",
+    "fallback_specific_proof": "PRESERVED",
+    "failure_mechanism_provenance": "PRESERVED",
+    "positive_independence_provenance": "PRESERVED",
+    "failure_domain_referential_integrity": "PRESERVED",
+    "redundancy_domain_resolution": "PRESERVED",
+    "book4_book5_structural_boundary": "PRESERVED",
+    "dependency_relation_allowlist_size": 18,
+    "ordered_dependency_path": "PRESERVED",
+    "directional_substitutability": "PRESERVED",
+    "book1_hyperedge_reuse": "PRESERVED",
+    "book3_relation_reuse": "PRESERVED"
+  },
+  "tests": {
+    "book_1": 107,
+    "book_2": 108,
+    "book_3": 83,
+    "book_4_previous": 137,
+    "book_4_r2_focused": 35,
+    "book_4_total": 172,
+    "total_csia": 470
+  },
+  "quality": {
+    "csia_ruff": "PASS",
+    "csia_mypy": "PASS",
+    "csia_mypy_files": 37,
+    "crypto_sensor": {
+      "passed": 2325,
+      "failed": 14,
+      "skipped": 4
+    },
+    "pre_existing_baseline_failures": 14,
+    "book4_introduced_sensor_failures": 0,
+    "sensor_failure_set_identical_to_r1_equivalence_record": true
+  },
+  "freeze": {
+    "book_1_accepted_contract_mutations": 0,
+    "book_2_accepted_contract_mutations": 0,
+    "book_3_accepted_contract_mutations": 0,
+    "crypto_sensor_mutations": 0
+  },
+  "commits": {
+    "r2_seal": "e5884686",
+    "r2_test_suite": "8a336fb0"
+  }
+}

@@ -167,3 +167,114 @@ BOOK_4_ACCEPTANCE = NOT_SELF_ACCEPTED
 BOOK_5 = NOT_STARTED
 LIVE_ACQUISITION_AUTHORITY = FALSE
 ```
+
+---
+
+# HARDENING R2 — CONTEXTUAL CLAIM BINDING + PROVENANCE-SET CLOSURE
+
+- **Date:** 2026-09-26
+- **Scope:** narrow R2 pass over the hardened Book 4 kernel; no Book 5, no live acquisition
+- **Baseline HEAD:** `e71a99a2c4bea22f870f3e1de70688bc83b1dede` (Book 4 Hardening R1 = PASS)
+
+## Finding A — HARD_RUNTIME provenance-set coherence (SEALED)
+
+`HardRuntimeGate` now rejects any evidence whose decision-driving fact-binding
+claims are not contained in `HardRuntimeEvidence.book2_claim_refs`. The
+assessment's actual authority set can no longer differ from its declared
+provenance set. Omitting a canonical RUNTIME_NECESSITY (or any required fact)
+claim from the record-level provenance set is NOT HARD_RUNTIME.
+
+## Finding B — fact qualifier + fact context (SEALED)
+
+`HardRuntimeFactContextBinding` extends the R1 fact binding with the exact
+`consumer_ref`, `provider_ref`, `function`, and `scope`. The record validator
+requires binding context to equal the assessed context, and the gate requires
+the canonical claim proposition to bind the assessed consumer
+(`Proposition.subject_refs`) and provider (`Proposition.object_ref`). A
+canonical RUNTIME_NECESSITY claim about system X can no longer be reused for
+system Y. Function and scope have no Book 2 Proposition dimension; they are
+validated as typed Book 4 binding dimensions only, and this limitation is
+documented instead of being treated as proposition-proven.
+
+## Finding C — failure-domain pair scope (SEALED)
+
+`FailureDomainBook.classify` no longer accepts qualifier-only independence.
+Every declared `positive_independence_claim_refs` entry must be covered exactly
+by `IndependenceClaimBinding` records whose domain, system, and
+correlation-scope dimensions equal the assessed left/right pair, and whose
+canonical claim proposition binds the left/right systems. An independence claim
+for X/Y cannot classify A/B. Shared canonical failure mechanisms still dominate
+independence.
+
+## Finding D — redundancy context binding (SEALED)
+
+`RedundancyAssessment` requires `independence_bindings` covering exactly its
+declared independence claims, and `RedundancyBook.add` rejects any binding that
+does not name the assessed subject, provider pair, and function. A canonical
+independence claim for providers X/Y, another function, or another subject can
+no longer support INDEPENDENT_REDUNDANCY.
+
+## Finding E — nested claim-set coherence (SEALED)
+
+`Book4Provenance.require_claim_set_closure` enforces:
+
+- `HardRuntimeEvidence.fact_bindings[*].claim_refs ⊆ HardRuntimeEvidence.book2_claim_refs`
+- `FailureDomain.mechanism_claim_refs ⊆ FailureDomain.book2_claim_refs`
+- `RedundancyAssessment.positive_independence_claim_refs ⊆ RedundancyAssessment.book2_claim_refs`
+
+Direct assessment evidence is distinguished from referenced object evidence:
+a FailureDomain referenced by a redundancy record keeps its own canonical
+provenance and is deliberately not forced into the redundancy record.
+
+## Finding F — exact snapshot lineage (SEALED)
+
+`validate_snapshot_lineage` now requires set equality between
+`source_snapshot_refs` and the `raw_snapshot_ref` values reachable from the
+record's canonical Book 2 claims. Missing required snapshots and unrelated
+extra snapshots are both rejected; claims sharing one raw snapshot deduplicate
+naturally; ordering is normalized through set semantics. The check applies to
+DependencyRecord, DependencyPath, RoleAssignment, and HardRuntimeEvidence
+through the shared provenance adapter. No second snapshot registry exists.
+
+## R1 preservation
+
+All R1 gates re-verified green: fact-qualifier binding, fallback-specific
+proof, mechanism and independence provenance, failure-domain referential
+integrity, redundancy domain resolution, the structural Book 4/Book 5 boundary,
+the 18-relation technical allowlist, ordered DependencyPath, directional
+SubstitutabilityAssessment, Book 1 hyperedge reuse, and Book 3 relation reuse.
+
+## Verification
+
+```text
+BOOK_1_TESTS = 107 PASS
+BOOK_2_TESTS = 108 PASS
+BOOK_3_TESTS = 83 PASS
+BOOK_4_PRIOR_TESTS = 137 PASS
+BOOK_4_R2_FOCUSED_TESTS = 35 PASS
+BOOK_4_TOTAL = 172 PASS
+TOTAL_CSIA = 470 PASS
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (37 source files)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+PRE_EXISTING_BASELINE_FAILURES = 14
+BOOK4_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```
+
+Artifacts:
+
+- `CSIA_BOOK_4_HARDENING_R2_MATRIX.json`
+
+```text
+BOOK_4_HARDENING_R2 = PASS
+BOOK_4_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_4_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_5 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
