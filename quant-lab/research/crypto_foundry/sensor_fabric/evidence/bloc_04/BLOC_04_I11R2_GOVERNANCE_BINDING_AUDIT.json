@@ -1,0 +1,141 @@
+{
+  "allowlist": {
+    "_sibling_import.py": "Owns extract_checkpoint_section; names the heading only in the helper's contract docstring. Reads no document.",
+    "test_i07r1i_evidence.py": "Carries a FROZEN literal projection of the I07R1I Current-state section and reads NO live ledger. Mentions the heading and the row label only in provenance comments and in the frozen literal.",
+    "test_i10r2_evidence.py": "Reads NO ledger. Mentions the heading only to assert the I10R2 microseal Governance section is not a dashboard row.",
+    "test_i11r2_evidence.py": "Reads the ledger for present-checkpoint law and the exact append-only I07R1I-RATIFY section, and deliberately re-implements the PRE-I11R2 dashboard-reading binding as the synthetic counterfactual.",
+    "test_job_state_r1i.py": "Reads the ledger for three legitimate purposes only: the two-column Current-state STRUCTURAL law, the dashboard's PRESENT-checkpoint law (test_current_state_is_a_dashboard_not_a_historical_checkpoint), and the exact append-only I07R1I-RATIFY section. Its historical I07R1I proposal truth binds to the committed measured matrix instead."
+  },
+  "checkpoint": "SENSOR-B4-I11R2",
+  "evidence_truth": "Predicates are mechanically evaluated over every tracked .py file in the repository; the frozen I07R1I provenance pin is recomputed from the real Git object rather than trusted. The single counterfactual row is explicitly synthetic and must evaluate FAIL.",
+  "frozen_projection_provenance": {
+    "pinned_section_sha256": "412da2f97b5d9627101e35ad6ebd68be6bd4aa1e8b643cc4400858feb26cb824",
+    "recomputed_from_git": "412da2f97b5d9627101e35ad6ebd68be6bd4aa1e8b643cc4400858feb26cb824",
+    "source_commit": "fd961604"
+  },
+  "ledger_readers_allowed": [
+    "test_i11r2_evidence.py",
+    "test_job_state_r1i.py"
+  ],
+  "matrix": "I11R2_GOVERNANCE_BINDING_AUDIT",
+  "measured_hits": {
+    "current_checkpoint_row": {
+      "test_i07r1i_evidence.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i07r1i_evidence.py"
+      ],
+      "test_i10r2_evidence.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i10r2_evidence.py"
+      ],
+      "test_i11r2_evidence.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_evidence.py"
+      ],
+      "test_job_state_r1i.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_job_state_r1i.py"
+      ]
+    },
+    "dashboard_heading_literal": {
+      "_sibling_import.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/_sibling_import.py"
+      ],
+      "test_i07r1i_evidence.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i07r1i_evidence.py"
+      ],
+      "test_i10r2_evidence.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i10r2_evidence.py"
+      ],
+      "test_i11r2_evidence.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_evidence.py"
+      ],
+      "test_job_state_r1i.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_job_state_r1i.py"
+      ]
+    },
+    "governance_ledger_filename": {
+      "test_i11r2_evidence.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_evidence.py"
+      ],
+      "test_job_state_r1i.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_job_state_r1i.py"
+      ]
+    }
+  },
+  "predicates": {
+    "current_checkpoint_row": "Current checkpoint",
+    "dashboard_heading_literal": "## Current state",
+    "governance_ledger_filename": "SENSOR_FABRIC_IMPLEMENTATION_PROGRESS"
+  },
+  "python_files_scanned": 965,
+  "rows": [
+    {
+      "case": "no_unexpected_dashboard_dependency",
+      "every_allowlisted_module_is_accounted_for": true,
+      "every_predicate_hit_is_allowlisted": true,
+      "every_predicate_was_actually_exercised": true,
+      "no_stale_allowlist_entry": true,
+      "required_invariants": [
+        "every_predicate_hit_is_allowlisted",
+        "no_stale_allowlist_entry",
+        "every_allowlisted_module_is_accounted_for",
+        "every_predicate_was_actually_exercised"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "only_current_state_law_reads_the_ledger",
+      "ledger_filename_referenced_only_by_approved_readers": true,
+      "ledger_readers_exactly_the_approved_set": true,
+      "required_invariants": [
+        "ledger_filename_referenced_only_by_approved_readers",
+        "ledger_readers_exactly_the_approved_set"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "frozen_i07r1i_projection_provenance_is_verified",
+      "pinned_commit_resolves": true,
+      "pinned_digest_is_well_formed": true,
+      "pinned_digest_matches_the_real_git_blob": true,
+      "required_invariants": [
+        "pinned_commit_resolves",
+        "pinned_digest_is_well_formed",
+        "pinned_digest_matches_the_real_git_blob"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "frozen_i07r1i_projection_agrees_with_measured_evidence",
+      "frozen_projection_durable_resume_pending": true,
+      "frozen_projection_hold_keys_exact": true,
+      "frozen_projection_holds_all_five_keys": true,
+      "frozen_projection_names_i07r1i": true,
+      "frozen_projection_next_checkpoint_false": true,
+      "frozen_projection_recovery_scanner_false": true,
+      "measured_matrix_agrees_on_every_shared_claim": true,
+      "required_invariants": [
+        "frozen_projection_names_i07r1i",
+        "frozen_projection_holds_all_five_keys",
+        "frozen_projection_hold_keys_exact",
+        "frozen_projection_durable_resume_pending",
+        "frozen_projection_recovery_scanner_false",
+        "frozen_projection_next_checkpoint_false",
+        "measured_matrix_agrees_on_every_shared_claim"
+      ],
+      "result": "OK"
+    },
+    {
+      "case": "counterfactual_new_historical_test_reads_the_dashboard",
+      "hypothetical_historical_reader_is_tolerated": false,
+      "required_invariants": [
+        "hypothetical_historical_reader_is_tolerated"
+      ],
+      "result": "FAIL"
+    }
+  ],
+  "stale_allowlist_entries": [],
+  "summary": {
+    "fail": 1,
+    "ok": 4,
+    "rows": 5
+  },
+  "unexpected_hits": {}
+}

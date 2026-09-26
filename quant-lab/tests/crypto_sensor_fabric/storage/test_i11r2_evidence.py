@@ -18,6 +18,8 @@ dashboard, and MUST evaluate FAIL.  It is the exact shape that broke.
 
 from __future__ import annotations
 
+# ruff: noqa: E402
+
 import hashlib
 import json
 import os

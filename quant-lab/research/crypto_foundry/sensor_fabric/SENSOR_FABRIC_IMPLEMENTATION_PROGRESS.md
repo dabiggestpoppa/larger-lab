@@ -2319,3 +2319,84 @@ verbatim run record, never hand-declared.
 - `next_checkpoint_authorized=FALSE`
 - `recommended_next=OPERATOR REVIEW OF COMPLETE I11 -> I11R1 -> I11R2 CHAIN`
 - I12+ remain unauthorized; research remains frozen.  No self-ratification.
+## SENSOR-B4-I11R2C - REPO-WIDE GOVERNANCE BINDING AUDIT, ENFORCED AS LAW
+
+Follow-up hardening of `SENSOR-B4-I11R2`, at the operator's request, after
+`5766ab06dff17d89861aaf80708f8d4907f0f703`.  I12+ remain unauthorized; research
+remains frozen.  This checkpoint changes **no production source**, **no
+historical evidence artifact**, and **no governance verdict**: G4-10 stays
+`IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW`, nothing is self-ratified, and
+the `I11 -> I11R1 -> I11R2 CHAIN` operator review is still the next step.
+
+### The sweep
+
+Every tracked Python file in the repository was scanned - **965** files - for
+the three text shapes that can express a dependency on a mutable governance
+dashboard, and for the other candidate dashboards in the tree
+(`quant-lab/STATUS.md`, `quant-lab/research/crypto_foundry/CURRENT_RESEARCH_STATE.md`,
+`CRYPTO_MASTER_PLAN.md`) and for the other mutable ledger sections
+(`## Next checkpoint`, `## Commit log`, `## Test counts`,
+`## Prior next-checkpoint history`, `## Unresolved contradictions`).
+
+**No further historical test reads a mutable dashboard.**  Only two modules open
+the governance ledger at all, and both do so legitimately:
+`test_job_state_r1i.py` for the two-column Current-state structural law, the
+dashboard's own present-checkpoint law, and the exact append-only
+`SENSOR-B4-I07R1I-RATIFY` section; and `test_i11r2_evidence.py` for the same
+purposes plus the deliberately re-implemented pre-I11R2 counterfactual.  No test
+in any other subsystem reads a progress or status document.  Nothing needed
+repointing.
+
+### Finding 1 - `test_i07r1i_evidence.py` was already correct, for a reason worth keeping
+
+That module had solved the same problem earlier and well: it carries a FROZEN
+literal projection of the I07R1I `## Current state` section and reads no live
+ledger, with an explicit comment that the dashboard "is chronological and must
+advance at later checkpoints".  Its comment states the source commit
+`fd961604` and a section digest.  That is now the accepted precedent shape.
+
+### Finding 2 - a provenance pin that nothing checked
+
+`_FROZEN_I07R1I_SECTION_SHA256` and `_FROZEN_I07R1I_SOURCE_COMMIT` were
+**defined and never used by any code**.  A pin nothing verifies is decoration:
+it documented provenance it did not enforce.  The pin was checked and is
+**correct** - the `## Current state` section at commit `fd961604`, CRLF
+normalised to LF with a trailing newline, hashes to exactly
+`412da2f97b5d9627101e35ad6ebd68be6bd4aa1e8b643cc4400858feb26cb824`.  It is now
+enforced: the digest is recomputed from the real Git object on every run, and
+the frozen projection is cross-checked against the committed measured
+`BLOC_04_I07R1I_LEDGER_STRUCTURE_MATRIX.json` so the two independent historical
+sources for the same I07R1I truth cannot silently diverge.
+
+### The sweep is now enforced, not merely performed
+
+A one-time audit decays: the next checkpoint that helpfully re-reads the
+dashboard would reintroduce the identical bug and the suite would stay green
+right up until the operator legitimately ratified something.  So the audit
+became a machine-enforced law in
+`tests/crypto_sensor_fabric/storage/test_i11r2_binding_audit.py`.  It scans all
+965 tracked Python files for the three predicates and requires the hit set to
+equal an explicit, reasoned allowlist; a new module that touches the dashboard
+fails loudly with its name and the predicate it tripped.  Adding an allowlist
+entry is therefore a governance decision, not a convenience.
+
+New append-only evidence:
+`BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json` - 5 rows, 4 measured `OK` and 1
+synthetic `FAIL`.  The counterfactual row asserts that a hypothetical new
+historical test reading the dashboard would be **tolerated**, and must evaluate
+FAIL.
+
+### Measured state of the post-I11R2C tree
+
+Production diff **zero**; historical evidence diff **zero**; the 131 pre-existing
+`bloc_04` artifacts remain byte-identical.  Ruff storage-tree baseline unchanged
+at exactly the two known `test_i08_evidence.py` findings; mypy repository
+baseline unchanged at exactly 15 errors in 9 files, with no new finding in
+changed scope.  Regression green: storage **1491** passed / 25 skipped /
+0 failed (the I11R2A/B 1488 plus the 3 new audit tests), non-storage
+**1379** passed / 1 skipped / 0 failed, full project **2870** passed /
+26 skipped / 0 failed.  The `SENSOR-B4-I11R2_REGRESSION_RUN_RECORD.txt` and
+`BLOC_04_I11R2_GOVERNANCE_REGRESSION_MATRIX.json` published at I11R2B are
+deliberately **not** regenerated: they record the tree I11R2A/B was published
+against, and rewriting a published evidence artifact would itself be the
+append-only violation this checkpoint exists to prevent.
