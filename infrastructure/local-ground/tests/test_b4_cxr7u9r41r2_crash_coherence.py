@@ -568,7 +568,7 @@ def test_control_impossible_marker_classifier_reopens_old_window(tmp_path):
     }), encoding="utf-8")
 
     def old_marker(source):
-        old = '''        if record.get("commit_intent") is not None or record.get("commit_point") is not None:\n            return 4\n        if record.get("selected_transition") == "finalize":\n            return 5\n        return 4\n'''
+        old = '''        if record.get("commit_intent") is not None or record.get("commit_point") is not None:\n            return 4\n'''
         new = '''        marker = record.get("commit_point")\n        return 3 if isinstance(marker, dict) and marker.get("marker") else 0\n'''
         assert old in source
         return source.replace(old, new)

@@ -19,6 +19,7 @@ the container-backed fault injections at every boundary live in
 test_b4_cxr7u9r40r2_commit_boundary_container.py.
 """
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -102,13 +103,18 @@ def shell_law(tmp_path):
                 record["selected_transition"] = "finalize"
             if record_state == pgrec.TRANSITION_STATE_ROLLING_BACK:
                 record["selected_transition"] = "rollback"
-                (transitions / f"{opid}.claim").write_text(json.dumps({
+                claim_path = transitions / f"{opid}.claim"
+                claim_path.write_text(json.dumps({
                     "format": pgrec._CLAIM_FORMAT,
                     "operation_id": opid,
                     "transition": "rollback",
                     "receipt_sha256": record["receipt_sha256"],
                     "claimed_at": "2026-09-24T00:00:00Z",
                 }), encoding="utf-8")
+                # The engine publishes claims 0600 (B4-CXR7U9R45R2 admission
+                # refuses widened claims on POSIX); mirror that here so the
+                # hand-written fixture is admissible on Linux CI too.
+                os.chmod(claim_path, 0o600)
             if record_state in (pgrec.TRANSITION_STATE_COMMIT_INTENT,
                                 pgrec.TRANSITION_STATE_COMMIT_POINT,
                                 "FINALIZED"):

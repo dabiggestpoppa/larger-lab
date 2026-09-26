@@ -264,12 +264,17 @@ def test_claim_before_finalize_state_keeps_governed_abort_authority(tmp_path):
     record.pop("selected_transition", None)
     record_path.write_text(json.dumps(record), encoding="utf-8")
     canonical = json.dumps(promote, sort_keys=True, separators=(",", ":"))
-    (h.transitions / f"{opid}.claim").write_text(json.dumps({
+    claim_path = h.transitions / f"{opid}.claim"
+    claim_path.write_text(json.dumps({
         "format": "oce-transition-claim-v1", "operation_id": opid,
         "transition": "finalize",
         "receipt_sha256": hashlib.sha256(canonical.encode()).hexdigest(),
         "claimed_at": "2026-09-24T00:00:00Z",
     }), encoding="utf-8")
+    # The engine publishes claims 0600 (B4-CXR7U9R45R2 admission refuses
+    # widened claims on POSIX); mirror that here so the hand-written fixture
+    # is admissible on Linux CI too.
+    os.chmod(claim_path, 0o600)
     result = _run(h, [
         "--phase", "preintent-rollback", "--receipt-in", str(h.promote),
         "--inventory", str(h.inventory), "--inventory-sha", str(h.inventory_sha),

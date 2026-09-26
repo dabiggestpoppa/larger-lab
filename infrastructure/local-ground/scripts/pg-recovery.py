@@ -1048,12 +1048,72 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
     return claim
 
 
+def _validate_claim_coordinate(path, operation_id, directory):
+    """Canonical claim path/type admission (B4-CXR7U9R45R2).
+
+    The canonical claim coordinate must satisfy the same class of admission as
+    the governed lock coordinate before its content may be read as a selector:
+
+      * the pathname is the engine-derived canonical claim name for THIS
+        operation id (never a CLI-supplied root — callers derive it here);
+      * containment: the real parent directory IS the governed transitions
+        directory, so a prefix-sibling directory or a redirected parent
+        cannot smuggle a claim past the law;
+      * type: lstat identifies a REGULAR file — symlinks are refused even
+        when their target is inside the approved root, and directories,
+        devices and FIFOs are refused;
+      * privacy: on POSIX the mode must not be readable/writable by group or
+        other (the engine publishes claims 0600);
+      * stability: a second lstat must observe the same inode, size and
+        mtime, so a replacement during validation is noticed.
+
+    Every refusal raises _ExecutionAuthorityConflict: the claim is failed
+    closed by the classification law, never followed, never repaired, and
+    never deleted.
+    """
+    governed = os.path.realpath(directory)
+    if os.path.dirname(os.path.realpath(path)) != governed:
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} canonical claim is not contained in "
+            "its governed transition directory; refusing a redirected claim "
+            "coordinate")
+    info = os.lstat(path)
+    if stat.S_ISLNK(info.st_mode):
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} canonical claim is a symlink; refusing "
+            "to follow a redirected selector")
+    if not stat.S_ISREG(info.st_mode):
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} canonical claim is not a regular "
+            "file; refusing a malformed selector coordinate")
+    if os.name != "nt":
+        mode = stat.S_IMODE(info.st_mode)
+        if mode & 0o077:
+            raise _ExecutionAuthorityConflict(
+                f"operation {operation_id} canonical claim is not private "
+                f"(mode {mode:04o}); refusing a widened selector")
+    recheck = os.lstat(path)
+    if (info.st_ino, info.st_dev, info.st_size, info.st_mtime_ns) \
+            != (recheck.st_ino, recheck.st_dev, recheck.st_size,
+                recheck.st_mtime_ns):
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} canonical claim changed while it was "
+            "being validated; refusing a replaced selector coordinate")
+    return recheck
+
+
 def _load_claim(operation_id, transition_dir=None):
-    """The durable operation-wide claim, or None if none was ever taken."""
+    """The durable operation-wide claim, or None if none was ever taken.
+
+    Every read passes canonical-claim admission (B4-CXR7U9R45R2): a symlink,
+    non-regular object, redirected or widened claim raises
+    _ExecutionAuthorityConflict instead of returning content.
+    """
     directory = transition_dir or _transitions_dir()
     path = os.path.join(directory, f"{operation_id}.claim")
-    if not os.path.isfile(path):
+    if not os.path.lexists(path):
         return None
+    _validate_claim_coordinate(path, operation_id, directory)
     try:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
@@ -1079,6 +1139,27 @@ def _valid_transition_claim(operation_id, transition, promote,
     if state != "bound_complete":
         return False
     claim = _load_claim(operation_id, transition_dir=transition_dir)
+    return isinstance(claim, dict) and claim.get("transition") == transition
+
+
+def _receiptless_selector_agrees(operation_id, transition,
+                                 transition_dir=None):
+    """Receiptless agreement check (B4-CXR7U9R45R3). When no promote receipt
+    is available to bind an expectation, a canonical claim that exists may
+    still support its durable state ONLY if it is a complete engine-published
+    claim naming exactly that transition. Anything else — unbound, mismatched,
+    malformed or naming the other branch — is a state/selector disagreement
+    and fails closed."""
+    try:
+        state = _claim_state(operation_id, transition_dir)
+    except _ExecutionAuthorityConflict:
+        return False
+    if state != "unbound_or_mismatched":
+        return False
+    try:
+        claim = _load_claim(operation_id, transition_dir=transition_dir)
+    except _ExecutionAuthorityConflict:
+        return False
     return isinstance(claim, dict) and claim.get("transition") == transition
 
 
@@ -2871,6 +2952,25 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
     if state == TRANSITION_STATE_FINALIZING:
         if record.get("commit_intent") is not None or record.get("commit_point") is not None:
             return 4
+        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R3): a FINALIZING
+        # record names a durably selected finalize branch. A canonical claim
+        # that exists but is not EXACTLY bound to that finalize branch means
+        # the state and the selector DISAGREE: fail closed, never re-describe
+        # the spent selector as governed abort authority. A crash that lost
+        # the claim BEFORE the state advance keeps its governed abort (5).
+        if isinstance(operation_id, str) and OPERATION_ID_RE.match(operation_id) \
+                and _claim_state(operation_id, transition_dir) != "absent":
+            if promote is not None:
+                if not _valid_transition_claim(operation_id, "finalize",
+                                               promote,
+                                               transition_dir=transition_dir):
+                    return 4
+            elif not _receiptless_selector_agrees(
+                    operation_id, "finalize", transition_dir):
+                # No receipt to bind: the selector must at least be a complete
+                # engine-published claim naming THIS branch, or the durable
+                # state and the selector disagree — fail closed.
+                return 4
         if record.get("selected_transition") == "finalize":
             return 5
         return 4
