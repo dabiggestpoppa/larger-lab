@@ -395,7 +395,7 @@ def test_d1_independence_claim_for_other_providers_rejected() -> None:
     other_binding = redundancy_independence_binding(
         claim, providers=provider_refs_for("X/Y")
     )
-    with pytest.raises(Book4ProvenanceError, match="not scoped"):
+    with pytest.raises(Book4ProvenanceError, match="outside the assessed provider set"):
         book.add(
             r2_redundancy(
                 "d1",

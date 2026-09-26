@@ -322,7 +322,9 @@ def test_a14_binding_for_wrong_pair_added_via_model_copy_is_refused() -> None:
             )
         }
     )
-    with pytest.raises(Book4ProvenanceError, match="not scoped"):
+    with pytest.raises(
+        Book4ProvenanceError, match="outside the assessed provider set"
+    ):
         book.add(hostile)
 
 
