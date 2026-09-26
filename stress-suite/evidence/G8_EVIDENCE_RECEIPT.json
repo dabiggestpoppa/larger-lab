@@ -6,22 +6,22 @@
     "findings": "R-G8-01..R-G8-09",
     "pre_repair_head": "6c015f86408a56721f8999e4aa39b218fab0fd4d",
     "red_evidence": "stress-suite/evidence/G8_PRE_REPAIR_RED_TRANSCRIPT.md (regenerable: scenarios/g8_pre_repair_red_transcript.py)",
-    "repaired_head": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788",
+    "repaired_head": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d",
     "verdict_scope": "the first G8 PASS was PROVISIONAL: it reported 20/20 mandated coverage while mandated pairs returned NOT_COMPARABLE, and several guarded properties passed on non-derivations. The repair makes the audit stricter; no scenario expectation and no A-004..A-012 text was changed."
   },
   "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
   "baseline_check": {
-    "artifact_bound_tested_sha": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788",
-    "artifact_canonical_digest": "6fa5005e1d26dd326e58ab5d6a67d60ee8637f7697a07f858a94115fb07532e1",
-    "artifact_digest": "23f97af88ff31c0ed1372d8bd0e594fb379195d7737b79dbe4b14c0a1fc8a7f2",
+    "artifact_bound_tested_sha": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d",
+    "artifact_canonical_digest": "9c5456ec3e21039f2b848b9b94e0265f4533d5bf045022fdf740bfafc983d51f",
+    "artifact_digest": "9267e8b103e042793ec5c65ce943a7167e186e78c2e401a6956a116be1f84513",
     "artifact_in_tree": true,
     "artifact_path": "stress-suite/evidence/G8_TEST_RESULTS.xml",
     "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
-    "collected_full": 1024,
-    "declared_tested_sha": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788",
+    "collected_full": 1058,
+    "declared_tested_sha": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d",
     "problems": [],
     "suite_identity": "pytest",
-    "tested_sha": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788",
+    "tested_sha": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d",
     "verified": true
   },
   "capital_mutations": 0,
@@ -34,12 +34,12 @@
     "ER02": "OPEN_DOCTRINE_SPACE"
   },
   "citation_check": {
-    "artifact_canonical_digest": "6fa5005e1d26dd326e58ab5d6a67d60ee8637f7697a07f858a94115fb07532e1",
-    "artifact_digest": "23f97af88ff31c0ed1372d8bd0e594fb379195d7737b79dbe4b14c0a1fc8a7f2",
+    "artifact_canonical_digest": "9c5456ec3e21039f2b848b9b94e0265f4533d5bf045022fdf740bfafc983d51f",
+    "artifact_digest": "9267e8b103e042793ec5c65ce943a7167e186e78c2e401a6956a116be1f84513",
     "artifact_path": "stress-suite/evidence/G8_TEST_RESULTS.xml",
     "citation_rule": "the cited path must resolve inside the declared tree and its on-disk raw and canonical digests must equal the published ones, and it must record the tree the caller declares",
     "problems": [],
-    "recorded_tested_sha": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788",
+    "recorded_tested_sha": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d",
     "verified": true
   },
   "claim_defects_recorded": [
@@ -54,7 +54,7 @@
   ],
   "cloud_mutations": 0,
   "coherent_equivalence_classes": 32,
-  "collected": 1024,
+  "collected": 1058,
   "comparisons_completed": 65,
   "contradictions_by_classification": {
     "NOT_EQUIVALENT": 6,
@@ -221,10 +221,10 @@
     "the receipt declares the full-length identifier 490e078d1e2e6f1c31e88944de9cf2dcd99a4609, which is not an object in this repository. Its own abbreviation 490e078d resolves to exactly one commit, 490e078d2b5c4360ca71f062e3736b7555c9f627, whose recorded subject is 'STRESS-G4X: adversarial cross-scenario and metamorphic regression suite (66 tests)' and matches the receipt's declared subject verbatim, so the substantive result is locatable and reproducible. The declared identifier is a transcription defect in a historical receipt; G8 records it and does not rewrite the receipt \u00a711.",
     "receipt collapsed simulated scenario-internal authority transitions into 'NONE' | superseded by G6_TRUTH_CLOSURE_RECEIPT.json which declares: CONFIRMED -> external=0, production=0, scenario_internal_authority_events measured per scenario"
   ],
-  "new_g8_test_count": 86,
-  "new_test_count_lineage": "1024 measured - 938 inherited = 86 tests added since the inherited baseline. This is NOT all G8 tests: the repair also added one G5R regression for the canonical source binding (R-G8-08), and 61 of the delta are tests/test_g8_contradiction.py. The count is derived from the measured artifact, never asserted.",
+  "new_g8_test_count": 120,
+  "new_test_count_lineage": "1058 measured - 938 inherited = 120 tests added since the inherited baseline. This is NOT all G8 tests: the repair also added one G5R regression for the canonical source binding (R-G8-08), and 61 of the delta are tests/test_g8_contradiction.py. The count is derived from the measured artifact, never asserted.",
   "observations": 35,
-  "passed": 1023,
+  "passed": 1057,
   "production_mutations": 0,
   "receipt_id": "G8-EVIDENCE-RECEIPT-001",
   "recommended_next_gate": "G9 \u2014 NOT AUTHORIZED",
@@ -367,20 +367,20 @@
     }
   ],
   "test_evidence_artifact": {
-    "artifact_bytes": 131099,
-    "artifact_canonical_digest": "6fa5005e1d26dd326e58ab5d6a67d60ee8637f7697a07f858a94115fb07532e1",
+    "artifact_bytes": 136237,
+    "artifact_canonical_digest": "9c5456ec3e21039f2b848b9b94e0265f4533d5bf045022fdf740bfafc983d51f",
     "artifact_canonicalization_rule": "JUNIT_XML_MINUS_VOLATILE_ATTRS_V1",
     "artifact_canonicalization_rule_fingerprint": "0aa12afabf2ecfedbc401ff14de4eae6e551a7bc28c4cb997ee92edd3049f670",
-    "artifact_digest": "23f97af88ff31c0ed1372d8bd0e594fb379195d7737b79dbe4b14c0a1fc8a7f2",
+    "artifact_digest": "9267e8b103e042793ec5c65ce943a7167e186e78c2e401a6956a116be1f84513",
     "artifact_digest_semantics": "artifact_digest is the RAW sha256 of the artifact as produced, so it changes with run timings; artifact_canonical_digest applies the declared rule above and is re-derivable by re-running.",
     "artifact_path": "stress-suite/evidence/G8_TEST_RESULTS.xml",
     "artifact_path_scope": "REPO_RELATIVE",
     "authoritative_test_command": "cd stress-suite && PYTHONIOENCODING=utf-8 python -m pytest tests -q",
-    "collected": 1024,
+    "collected": 1058,
     "errors": 0,
     "failed": 0,
     "honest_baseline": true,
-    "passed": 1023,
+    "passed": 1057,
     "pytest_version": "",
     "python_version": "3.11.9",
     "skipped": 1,
@@ -391,9 +391,9 @@
       }
     ],
     "suite_identity": "pytest",
-    "tested_sha": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788"
+    "tested_sha": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d"
   },
-  "tested_sha": "2cf1bb4b6bc39b2a372851a02ec50d96758a8788",
+  "tested_sha": "19b6077f456b1df2a751d38385ae4d6ca3a7a54d",
   "uncovered_mandated_pairs": [],
   "verdict": "PASS_G8_CROSS_SCENARIO_COHERENCE",
   "verdicts_by_verdict": {
