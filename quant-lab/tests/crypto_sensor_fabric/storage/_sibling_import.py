@@ -33,3 +33,48 @@ def load_sibling(module_name: str, file_stem: str):
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def extract_checkpoint_section(text: str, heading_exact: str) -> str:
+    """Return the body of the one section whose heading is exactly ``heading_exact``.
+
+    Governance model (SENSOR-B4-I11R2).  The top-level ``## Current state``
+    table is a MUTABLE dashboard that must advance with every checkpoint, so a
+    historical checkpoint test may never read it: doing so makes the test fail
+    the moment the checkpoint it describes is legitimately superseded.  A
+    historical checkpoint test instead binds to one exact immutable source --
+    an append-only checkpoint-history section, or a committed measured evidence
+    artifact.  This helper is what makes that binding explicit and narrow:
+
+    * the heading must match EXACTLY -- no prefix, no substring, no glob, and
+      not even trailing whitespace, because "close enough" is exactly how a
+      historical test ends up bound to the wrong section;
+    * it must occur EXACTLY once -- missing and ambiguous both fail;
+    * the section is bounded by the next heading of the same or higher rank.
+
+    It is deliberately not a general Markdown parser, and it never falls back
+    to searching the whole document for a string.
+    """
+    wanted = heading_exact
+    rank = len(wanted) - len(wanted.lstrip("#"))
+    if rank < 1 or not wanted.lstrip("#").startswith(" "):
+        raise ValueError(f"not a Markdown heading: {heading_exact!r}")
+    lines = text.split("\n")
+    starts = [
+        index for index, line in enumerate(lines) if line.rstrip() == wanted
+    ]
+    if len(starts) != 1:
+        raise AssertionError(
+            f"expected exactly one {wanted!r} section, found {len(starts)}"
+        )
+    begin = starts[0] + 1
+    for index in range(begin, len(lines)):
+        line = lines[index]
+        if not line.startswith("#"):
+            continue
+        body = line.lstrip("#")
+        if not body.startswith(" "):
+            continue  # not a heading, e.g. a '#' inside a fenced block
+        if len(line) - len(body) <= rank:
+            return "\n".join(lines[begin:index])
+    return "\n".join(lines[begin:])

@@ -19,7 +19,7 @@ for _path in (str(_SRC), str(_HERE)):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-from _sibling_import import load_sibling
+from _sibling_import import extract_checkpoint_section, load_sibling
 from crypto_sensor_fabric.storage.blob_store import LocalBlobStore
 from crypto_sensor_fabric.storage.duckdb_catalog import (
     CATALOG_ROLE,
@@ -40,12 +40,33 @@ EVIDENCE_DIR = (
     / "evidence"
     / "bloc_04"
 )
-LEDGER = (
-    Path(__file__).resolve().parents[3]
-    / "research"
-    / "crypto_foundry"
-    / "sensor_fabric"
-    / "SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md"
+#: SENSOR-B4-I11R2 -- the ONE exact immutable authority for I10R2 governance.
+#: The top-level ``## Current state`` ledger table is a mutable dashboard that
+#: must advance as checkpoints are ratified and superseded, so it is NOT a
+#: valid source for historical checkpoint truth.  I10R2's own committed
+#: microseal is append-only and immutable, and it records the checkpoint's
+#: governance verdict exactly as it stood at I10R2.
+I10R2_MICROSEAL = EVIDENCE_DIR / "BLOC_04_I10R2_RELATION_GOVERNANCE_MICROSEAL.md"
+I10R2_GOVERNANCE_HEADING = "## Governance"
+
+#: Verdicts I10R2 proposed, read from the exact immutable microseal section.
+I10R2_HISTORICAL_GOVERNANCE = (
+    "PASS_SENSOR_B4_I10_DUCKDB_DISCOVERY_SEALED = OPERATOR_HOLD",
+    "PASS_SENSOR_B4_I10R1_SCHEMA_EVIDENCE_DISCOVERY_SEALED = OPERATOR_HOLD",
+    "PASS_SENSOR_B4_I10R2_RELATION_GOVERNANCE_PARITY_SEALED = PENDING_OPERATOR_REVIEW",
+    "G4-09_CATALOG_REBUILD_GATE = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW",
+    "next_checkpoint_authorized = FALSE",
+    "recommended_next = OPERATOR REVIEW OF COMPLETE I10 -> I10R1 -> I10R2 CHAIN",
+    "I11 = UNAUTHORIZED",
+    "research = FROZEN",
+)
+
+#: I10R2 never self-ratified.  The later I10R2-RATIFY verdict belongs to a
+#: DIFFERENT checkpoint and must never leak backwards into I10R2's own record.
+I10R2_FORBIDDEN_IN_MICROSEAL = (
+    "PASS_SENSOR_B4_I10R2_RELATION_GOVERNANCE_PARITY_SEALED = OPERATOR_ACCEPTED",
+    "G4-09_CATALOG_REBUILD_GATE = OPERATOR_ACCEPTED",
+    "next_checkpoint_authorized = TRUE",
 )
 
 HISTORICAL_I10 = {
@@ -313,24 +334,45 @@ def _historical_hashes_unchanged(names: dict[str, str]) -> bool:
     )
 
 
-def _ledger_current_state_parity() -> bool:
-    text = LEDGER.read_text(encoding="utf-8")
-    current = text.split("## Current state", 1)[1].split(
-        "## Append-only SENSOR-B4-I10R1 / I10R2 checkpoint history", 1
-    )[0]
-    required = (
-        "Current checkpoint | SENSOR-B4-I10R2",
-        "PASS_SENSOR_B4_I10_DUCKDB_DISCOVERY_SEALED=OPERATOR_HOLD",
-        "PASS_SENSOR_B4_I10R1_SCHEMA_EVIDENCE_DISCOVERY_SEALED=OPERATOR_HOLD",
-        "PASS_SENSOR_B4_I10R2_RELATION_GOVERNANCE_PARITY_SEALED=PENDING_OPERATOR_REVIEW",
-        "G4-09_CATALOG_REBUILD_GATE=IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW",
-        "next_checkpoint_authorized=FALSE",
-        "recommended_next=OPERATOR REVIEW OF COMPLETE I10 -> I10R1 -> I10R2 CHAIN",
-        "I11+ unauthorized; research frozen",
+def _i10r2_historical_governance_parity() -> bool:
+    """I10R2 governance truth, read from the exact immutable I10R2 microseal.
+
+    SENSOR-B4-I11R2.  This used to read the mutable top-level ``## Current
+    state`` ledger table, which made an immutable historical claim depend on a
+    dashboard that is SUPPOSED to advance: it went red the moment I10R2 was
+    legitimately ratified and I11 began, with no regression in anything I10R2
+    actually did.  Historical checkpoint truth now comes from I10R2's own
+    append-only, committed microseal -- one exact section, no live-dashboard
+    dependency, no whole-file string search.
+    """
+    governance = extract_checkpoint_section(
+        I10R2_MICROSEAL.read_text(encoding="utf-8"), I10R2_GOVERNANCE_HEADING
     )
-    return all(item in current for item in required) and (
-        "recommended_next=OPERATOR REVIEW OF SENSOR-B4-I10;" not in current
+    return all(item in governance for item in I10R2_HISTORICAL_GOVERNANCE) and not any(
+        item in governance for item in I10R2_FORBIDDEN_IN_MICROSEAL
     )
+
+
+def test_i10r2_governance_source_is_immutable_not_the_live_dashboard() -> None:
+    """SENSOR-B4-I11R2 §4/§5: one exact immutable I10R2 source, no dashboard.
+
+    Counterfactually this is the exact shape that failed: rewriting the LIVE
+    ``## Current state`` table (as the ratified-and-superseded I11 commit
+    legitimately did) must no longer change any I10R2 historical verdict.
+    """
+    text = I10R2_MICROSEAL.read_text(encoding="utf-8")
+    assert I10R2_MICROSEAL.name not in text  # the microseal never cites the ledger
+    # The helper is a strict single-section extractor, not a document search.
+    body = extract_checkpoint_section(text, I10R2_GOVERNANCE_HEADING)
+    assert "PASS_SENSOR_B4_I10R2_RELATION_GOVERNANCE_PARITY_SEALED" in body
+    assert "Current checkpoint" not in body  # never a dashboard row
+    # A heading that is absent must fail closed, not silently return the file.
+    for missing in ("## Governance ", "## governance", "# Governance"):
+        try:
+            extract_checkpoint_section(text, missing)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError(f"extract_checkpoint_section accepted {missing!r}")
 
 
 def _measured_parity(base: Path) -> tuple[dict[str, Any], dict[str, int]]:
@@ -390,7 +432,7 @@ def _measured_parity(base: Path) -> tuple[dict[str, Any], dict[str, int]]:
             "historical_i10r1_unchanged": _historical_hashes_unchanged(
                 HISTORICAL_I10R1
             ),
-            "implementation_ledger_current_state_parity": _ledger_current_state_parity(),
+            "implementation_ledger_current_state_parity": _i10r2_historical_governance_parity(),
         },
         actual_counts,
     )

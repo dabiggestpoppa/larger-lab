@@ -26,6 +26,7 @@ Read-only against the committed evidence tree; real durable stack only.
 
 from __future__ import annotations
 
+import json
 import sys
 import threading
 from pathlib import Path
@@ -44,7 +45,7 @@ from crypto_sensor_fabric.storage.jobs import (
 )
 from crypto_sensor_fabric.storage.json_catalog import JsonCatalogCorrupt
 
-from _sibling_import import load_sibling
+from _sibling_import import extract_checkpoint_section, load_sibling
 
 _base = load_sibling("_i07r1_base_mod", "test_job_state_r1")
 _r1h = load_sibling("_i07r1h_mod", "test_job_state_r1h")
@@ -524,6 +525,38 @@ LEDGER = (
     / "SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md"
 )
 
+#: SENSOR-B4-I11R2 -- the ONE exact immutable authority for the I07R1I
+#: *proposal* governance state.  ``## Current state`` is a mutable dashboard
+#: and MUST advance; binding an immutable historical claim to it means the
+#: claim breaks the moment the operator legitimately accepts or supersedes the
+#: checkpoint.  I07R1I's own committed, measured, append-only ledger-structure
+#: matrix records the proposal state permanently.
+I07R1I_MATRIX = (
+    Path(__file__).resolve().parents[3]
+    / "research"
+    / "crypto_foundry"
+    / "sensor_fabric"
+    / "evidence"
+    / "bloc_04"
+    / "BLOC_04_I07R1I_LEDGER_STRUCTURE_MATRIX.json"
+)
+
+#: The superseding verdict, bound to its own exact append-only section.  The
+#: em dash is written as a code point so this heading stays byte-exact.
+I07R1I_RATIFY_HEADING = (
+    "## SENSOR-B4-I07R1I-RATIFY " + chr(0x2014) + " operator accepts the "
+    "complete I07 chain, authorizes I08"
+)
+
+
+def _i07r1i_historical_case(case: str) -> dict[str, Any]:
+    """One case of the committed I07R1I matrix, by exact name."""
+    matrix = json.loads(I07R1I_MATRIX.read_text(encoding="utf-8"))
+    assert matrix["checkpoint"] == "SENSOR-B4-I07R1I", matrix["checkpoint"]
+    matches = [row for row in matrix["cases"] if row["case"] == case]
+    assert len(matches) == 1, (case, matches)
+    return matches[0]
+
 
 def _current_state_rows() -> list[list[str]]:
     """Logical cells of every ordinary row in the top-level Current state table.
@@ -574,16 +607,80 @@ def test_current_checkpoint_row_appears_exactly_once() -> None:
 
 
 def test_ledger_operator_state_is_truthful() -> None:
-    """§24: upstream approvals stay held and I08 stays unauthorized."""
-    table = "\n".join(
-        "|".join(row) for row in _current_state_rows()
-    ).replace(" = ", "=")
+    """SENSOR-B4-I11R2: the recorded I07R1I proposal truth, from the exact
+    immutable I07R1I evidence rather than the live ``## Current state``
+    dashboard.
+
+    This test used to require the LIVE top-level ``## Current state`` table
+    to still read ``SENSOR-B4-I07R1I`` with all five upstream approvals
+    ``OPERATOR_HOLD``.  That is a statement about the I07R1I *proposal*, and
+    the operator subsequently accepted the complete chain in
+    ``SENSOR-B4-I07R1I-RATIFY`` -- so the dashboard was SUPPOSED to advance,
+    and the test broke with no regression in anything I07R1I ever did.  The
+    proposal truth is immutable and remains fully provable; it now comes from
+    the committed measured I07R1I ledger-structure matrix.  The superseding
+    ratification is pinned by :func:`test_i07r1i_ratification_is_recorded`.
+    """
+    hold = _i07r1i_historical_case("i07_hold_chain_truthful")
+    assert hold["result"] == "PASS"
+    assert hold["proposal_pending"] is True
+    assert tuple(hold["hold_keys"]) == _HOLD_KEYS
+
+    resume = _i07r1i_historical_case("durable_resume_pending_acceptance")
+    assert resume["result"] == "PASS"
+    assert resume["durable_resume_implemented"] == "PENDING_OPERATOR_ACCEPTANCE"
+    assert resume["recovery_scanner_implemented"] is False
+
+    following = _i07r1i_historical_case("next_checkpoint_not_authorized")
+    assert following["result"] == "PASS"
+    assert following["next_checkpoint_authorized"] is False
+
+
+def test_i07r1i_ratification_is_recorded() -> None:
+    """SENSOR-B4-I11R2: the superseding operator verdict is still pinned.
+
+    Decoupling the stale proposal test must NOT delete the accountability
+    that replaced it: the ledger's exact I07R1I-RATIFY section must still show
+    the chain accepted, durable resume TRUE, and I08 -- and only I08 --
+    authorized.
+    """
+    section = extract_checkpoint_section(
+        LEDGER.read_text(encoding="utf-8"), I07R1I_RATIFY_HEADING
+    )
+    assert "OPERATOR_ACCEPTED" in section
     for key in _HOLD_KEYS:
-        assert f"{key}=OPERATOR_HOLD" in table, key
-    assert "DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE" in table
-    assert "RECOVERY_SCANNER_IMPLEMENTED=FALSE" in table
+        assert key in section, key
+    assert "DURABLE_RESUME_IMPLEMENTED = TRUE" in section
+    assert "RECOVERY_SCANNER_IMPLEMENTED = FALSE" in section
+    assert "next_checkpoint_authorized = TRUE" in section
+    assert "SENSOR-B4-I08 RECOVERY / QUARANTINE ONLY" in section
+    assert "I09+ NOT" in section
+    # A ratification is governance-only: it changed no source, test or evidence.
+    assert "no test delta" in section
+
+
+def test_current_state_is_a_dashboard_not_a_historical_checkpoint() -> None:
+    """SENSOR-B4-I11R2: the dashboard states only the PRESENT checkpoint.
+
+    The live table is a two-column Field|Value dashboard for the checkpoint
+    actually implemented.  It must never be re-pinned to a superseded
+    checkpoint's proposal state, and it must never re-assert a hold the
+    operator has since accepted.
+    """
+    rows = _current_state_rows()
+    table = "\n".join("|".join(row) for row in rows).replace(" = ", "=")
+    checkpoint_rows = [row for row in rows if row[0] == "Current checkpoint"]
+    assert len(checkpoint_rows) == 1
+    current = checkpoint_rows[0][1]
+
+    # Present-checkpoint truth only.
+    assert "SENSOR-B4-I11" in current
+    assert "research frozen" in current
+    assert "I12" in current
     assert "next_checkpoint_authorized=FALSE" in table
-    assert "SENSOR-B4-I07R1I" in table
+    # Never a superseded checkpoint's proposal state.
+    assert "SENSOR-B4-I07R1I" not in current
+    assert "DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE" not in table
 
 
 def test_ledger_is_utf8_lf() -> None:
