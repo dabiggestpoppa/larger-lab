@@ -3,6 +3,7 @@
     "_sibling_import.py": "Owns extract_checkpoint_section; names the heading only in the helper's contract docstring. Reads no document.",
     "test_i07r1i_evidence.py": "Carries a FROZEN literal projection of the I07R1I Current-state section and reads NO live ledger. Mentions the heading and the row label only in provenance comments and in the frozen literal.",
     "test_i10r2_evidence.py": "Reads NO ledger. Mentions the heading only to assert the I10R2 microseal Governance section is not a dashboard row.",
+    "test_i11r2_binding_audit.py": "THIS AUDITOR. Trips all three predicates because it DEFINES them, so the literals, the heading and the ledger path necessarily appear in it. Reads the ledger only to recompute the frozen I07R1I provenance pin from a pinned Git object, and asserts no historical checkpoint truth from the dashboard -- which is the defect being policed. Listed here so the audit covers its own scope instead of excluding itself.",
     "test_i11r2_evidence.py": "Reads the ledger for present-checkpoint law and the exact append-only I07R1I-RATIFY section, and deliberately re-implements the PRE-I11R2 dashboard-reading binding as the synthetic counterfactual.",
     "test_job_state_r1i.py": "Reads the ledger for three legitimate purposes only: the two-column Current-state STRUCTURAL law, the dashboard's PRESENT-checkpoint law (test_current_state_is_a_dashboard_not_a_historical_checkpoint), and the exact append-only I07R1I-RATIFY section. Its historical I07R1I proposal truth binds to the committed measured matrix instead."
   },
@@ -14,6 +15,7 @@
     "source_commit": "fd961604"
   },
   "ledger_readers_allowed": [
+    "test_i11r2_binding_audit.py",
     "test_i11r2_evidence.py",
     "test_job_state_r1i.py"
   ],
@@ -25,6 +27,9 @@
       ],
       "test_i10r2_evidence.py": [
         "quant-lab/tests/crypto_sensor_fabric/storage/test_i10r2_evidence.py"
+      ],
+      "test_i11r2_binding_audit.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_binding_audit.py"
       ],
       "test_i11r2_evidence.py": [
         "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_evidence.py"
@@ -43,6 +48,9 @@
       "test_i10r2_evidence.py": [
         "quant-lab/tests/crypto_sensor_fabric/storage/test_i10r2_evidence.py"
       ],
+      "test_i11r2_binding_audit.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_binding_audit.py"
+      ],
       "test_i11r2_evidence.py": [
         "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_evidence.py"
       ],
@@ -51,6 +59,9 @@
       ]
     },
     "governance_ledger_filename": {
+      "test_i11r2_binding_audit.py": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_binding_audit.py"
+      ],
       "test_i11r2_evidence.py": [
         "quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_evidence.py"
       ],
@@ -64,7 +75,7 @@
     "dashboard_heading_literal": "## Current state",
     "governance_ledger_filename": "SENSOR_FABRIC_IMPLEMENTATION_PROGRESS"
   },
-  "python_files_scanned": 965,
+  "python_files_scanned": 966,
   "rows": [
     {
       "case": "no_unexpected_dashboard_dependency",

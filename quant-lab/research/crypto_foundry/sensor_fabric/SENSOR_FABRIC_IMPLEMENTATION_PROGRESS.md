@@ -2533,3 +2533,100 @@ and its governance/regression closure **only**.  It is not acceptance of
 I12 or any later Bloc-4 work.  Research remains frozen.  I12 is
 authorized but **not started**; it must not begin in the ratification
 run.
+
+## SENSOR-B4-I11R2C-R1 — the governance binding audit now audits itself
+
+Correction of the first defect named at I11R2-RATIFY.  Append-only: this
+section is new; no prior checkpoint-history section was rewritten.  The
+paragraph above that says the audit artifact "was deliberately NOT
+rewritten" is left exactly as ratified -- the correction below supersedes
+it, and rewriting it would be the append-only violation this checkpoint
+exists to prevent.
+
+Corrected head: `adf1dd1f18431caf0a91940a0d952425f73ec345` on branch
+`agent/crypto-sensor-fabric-build`.
+
+### The defect, restated
+
+`test_i11r2_binding_audit.py` scans `git ls-files '*.py'`.  When it was
+first published the auditor was still untracked, so it measured 965
+files and never saw its own source.  The committed artifact claimed
+`python_files_scanned: 965`, `unexpected_hits: {}` and
+`ledger_readers_allowed: [test_i11r2_evidence.py,
+test_job_state_r1i.py]`.  Those values were accurate for the tree that
+was scanned and **incomplete as a claim**: the repository holds 966
+tracked Python files, the auditor necessarily trips all three
+predicates because it *defines* them, and the true number of modules
+that open the governance ledger is three, not two.
+
+### Why RATIFY's fix was the wrong trade
+
+Ratification resolved the mismatch by declaring a self-exclusion
+(`SELF_EXCLUDED = frozenset({"test_i11r2_binding_audit.py"})`) plus a
+`_scanned_paths()` filter, which preserved the frozen artifact
+byte-for-byte.  That was rejected by the operator: **correctness over
+frozen bytes**.  An auditor that quietly omits its own scope cannot be
+trusted to police that scope, and freezing a number that is known to be
+short makes the artifact a record of a convenient scope rather than of
+the code that exists.
+
+### What changed
+
+The exclusion mechanism is **gone**.  There is nothing to exclude.
+
+- `_scanned_paths()` returns every tracked `.py` file with no filter;
+  `_scan()` no longer skips the auditor.
+- `ALLOWLIST` gained a `test_i11r2_binding_audit.py` entry stating that
+  it trips all three predicates because it defines them, and that it
+  reads the ledger only to recompute the frozen I07R1I provenance pin
+  from a pinned Git object -- asserting no historical checkpoint truth
+  from the dashboard, which is the defect being policed.  Six entries.
+- `LEDGER_READERS` expanded from two members to three.
+- `test_audit_excludes_only_itself` was **replaced** by
+  `test_audit_scans_itself_and_is_accounted_for`, which asserts the
+  auditor is present in `_scanned_paths()`, in `ALLOWLIST` and in
+  `LEDGER_READERS`; that it really does trip all three `PREDICATES`;
+  and that the built payload's `python_files_scanned` equals
+  `len(_scanned_paths())` with the auditor named in
+  `measured_hits["governance_ledger_filename"]` and in
+  `ledger_readers_allowed`, and `unexpected_hits == {}`.
+- `BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json` was **republished** to
+  match: 12 insertions, 1 deletion.  `python_files_scanned` 965 -> 966;
+  three `measured_hits` buckets gain the auditor; `ledger_readers_allowed`
+  and `allowlist` gain their entries.  The artifact is byte-stable: a
+  rerun without the `UPDATE_I11R2_EVIDENCE=1` override regenerates it
+  identically and passes.
+
+### Unchanged by this correction
+
+- Production diff **ZERO** against `adf1dd1f`; no `quant-lab/src`
+  change, no untracked source, no dependency, provider, DuckDB or frozen
+  plan change.
+- The other 130 historical evidence artifacts are byte-identical.  The
+  131-entry `HISTORICAL_EVIDENCE` hash sweep still reports
+  `mismatched: []`, `missing: []`, `crlf_only: []`.
+- No governance verdict moved.  `## Current state` is untouched, so
+  the frozen I11R2B dashboard digest `3a69ecf0...` at commit
+  `5766ab06` is unaffected.  The four OK rows and the one synthetic
+  counterfactual FAIL row are unchanged.
+- The `## Current state` dashboard is not edited by this section; the
+  ratification governance stands verbatim.
+
+### Authorization boundary
+
+```
+PASS_SENSOR_B4_I11_POSTGRES_OPERATIONAL_METADATA_SEALED = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I11R1_RUNTIME_CORRECTNESS_SEALED          = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I11R2_GOVERNANCE_REGRESSION_SEALED        = OPERATOR_ACCEPTED
+G4-10_OPERATIONAL_METADATA_GATE                          = IMPLEMENTATION_PASS
+next_checkpoint_authorized                               = TRUE
+next_checkpoint                                          = SENSOR-B4-I12 RAW EVIDENCE QUERY / REPLAY API
+authorized_scope                                         = I12 ONLY
+I13+                                                      = UNAUTHORIZED
+research                                                  = FROZEN
+recommended_next                                         = SENSOR-B4-I12 IMPLEMENTATION
+```
+
+This correction changes the completeness of one evidence claim.  It is
+not a new seal, not a new phase, and not a change of authorization.  I12
+remains authorized but **not started**.

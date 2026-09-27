@@ -21,6 +21,25 @@ resolved against the real Git object and the frozen projection is cross-checked
 against the committed measured matrix, so the two historical sources for the
 same I07R1I truth cannot silently diverge.
 
+SENSOR-B4-I11R2C-R1 -- the auditor audits ITSELF.
+
+When this module was first published it was still UNTRACKED, so ``git
+ls-files '*.py'`` could not see it and it never scanned itself.  Its first
+committed artifact therefore claimed ``python_files_scanned: 965`` and
+``unexpected_hits: {}``, which were accurate for the tree it scanned but
+INCOMPLETE as a claim: the repository holds more tracked Python files, and the
+true number of modules that open the governance ledger is three, not the two
+that artifact named.
+
+RATIFY first papered over this with a declared self-EXCLUSION, which kept the
+frozen artifact byte-identical but left the law permanently one module short of
+its own scope.  That was the wrong trade.  This module is now an ordinary,
+accounted-for member of the audit: it is allowlisted WITH its reason, it is
+counted in the scan, and it is named in ``LEDGER_READERS`` because it does read
+the ledger.  The artifact was republished to match.  The exclusion mechanism is
+gone -- there is nothing to exclude, and ``test_audit_scans_itself_and_is
+_accounted_for`` fails if this module ever falls out of its own audit.
+
 Read-only against the committed evidence tree.  Publication of the audit artifact
 requires the explicit ``UPDATE_I11R2_EVIDENCE=1`` override.
 """
@@ -94,35 +113,30 @@ ALLOWLIST: dict[str, str] = {
         "the exact append-only I07R1I-RATIFY section. Its historical I07R1I "
         "proposal truth binds to the committed measured matrix instead."
     ),
+    "test_i11r2_binding_audit.py": (
+        "THIS AUDITOR. Trips all three predicates because it DEFINES them, so "
+        "the literals, the heading and the ledger path necessarily appear in "
+        "it. Reads the ledger only to recompute the frozen I07R1I provenance "
+        "pin from a pinned Git object, and asserts no historical checkpoint "
+        "truth from the dashboard -- which is the defect being policed. Listed "
+        "here so the audit covers its own scope instead of excluding itself."
+    ),
 }
 
 #: The only modules permitted to actually READ the governance ledger file, with
 #: the exact reasons above.  A narrower law than ALLOWLIST on purpose: naming
 #: the heading in a comment is harmless; opening the dashboard is not.
-LEDGER_READERS = frozenset({"test_i11r2_evidence.py", "test_job_state_r1i.py"})
+#:
+#: The auditor is here because it genuinely does read the ledger, via
+#: ``git show <commit>:<path>`` when recomputing the frozen I07R1I pin.  SENSOR-
+#: B4-I11R2C-R1 added it: the previous artifact named only two readers, which
+#: understated the real number.
+LEDGER_READERS = frozenset({
+    "test_i11r2_binding_audit.py",
+    "test_i11r2_evidence.py",
+    "test_job_state_r1i.py",
+})
 
-#: SENSOR-B4-I11R2-RATIFY: this auditor, excluded from its own scan BY PATH and
-#: declared here in the open.
-#:
-#: When the audit was first published it was still UNTRACKED, so ``git
-#: ls-files '*.py'`` could not see it and it never scanned itself.  The
-#: committed artifact is frozen evidence and is deliberately NOT rewritten, so
-#: the live scan must reproduce the conditions the artifact was measured under:
-#: every tracked ``.py`` file EXCEPT this one.
-#:
-#: The exclusion is legitimate and narrow.  This module trips all three
-#: predicates for the most defensible reason possible -- it is the code that
-#: DEFINES the predicates, so the literals, the heading and the ledger path
-#: must appear in it -- and it opens the ledger solely to verify the frozen
-#: I07R1I provenance pin against the real Git object.  It asserts no historical
-#: checkpoint truth from the dashboard, which is the actual defect being policed.
-#:
-#: The cost is recorded, not hidden: the artifact's completeness claim was
-#: understated by exactly this module, and the true number of modules that open
-#: the governance ledger is three, not the two the artifact names.  That
-#: correction is stated in the I11R2-RATIFICATION record.  ``test_audit_excludes
-#: _only_itself`` keeps this exclusion from ever growing silently.
-SELF_EXCLUDED = frozenset({"test_i11r2_binding_audit.py"})
 
 
 def _git(*args: str) -> str:
@@ -139,12 +153,8 @@ def _git(*args: str) -> str:
 
 
 def _scanned_paths() -> list[str]:
-    """Tracked ``.py`` files this audit actually scanned (self excluded)."""
-    return [
-        line.strip()
-        for line in _git("ls-files", "*.py").splitlines()
-        if line.strip() and Path(line.strip()).name not in SELF_EXCLUDED
-    ]
+    """Every tracked ``.py`` file this audit scans -- including this one."""
+    return [line.strip() for line in _git("ls-files", "*.py").splitlines() if line.strip()]
 
 
 def _scan() -> dict[str, dict[str, list[str]]]:
@@ -154,7 +164,7 @@ def _scan() -> dict[str, dict[str, list[str]]]:
     }
     for path in _git("ls-files", "*.py").splitlines():
         path = path.strip()
-        if not path or Path(path).name in SELF_EXCLUDED:
+        if not path:
             continue
         source = (_REPO_ROOT / path).read_text(encoding="utf-8", errors="replace")
         for name, needle in PREDICATES.items():
@@ -441,34 +451,32 @@ def test_frozen_i07r1i_pin_is_enforced_not_decorative() -> None:
         "pinned provenance commit"
     )
 
-def test_audit_excludes_only_itself() -> None:
-    """SENSOR-B4-I11R2-RATIFY: the self-exclusion is exactly one file, and it
-    is the auditor.
+def test_audit_scans_itself_and_is_accounted_for() -> None:
+    """SENSOR-B4-I11R2C-R1: the auditor is inside its own audit.
 
-    The auditor trips all three predicates because it *defines* them, and when
-    it first ran it was still untracked, so its own committed artifact could not
-    see it.  The artifact is frozen evidence and is not rewritten; instead the
-    exclusion is declared in ``SELF_EXCLUDED`` and pinned here so it can never
-    quietly grow to cover a real offender.
+    This module was invisible to the first published audit because it was
+    untracked when that audit ran.  RATIFY hid the same gap behind a declared
+    self-exclusion; both were wrong, because an auditor that quietly omits its
+    own scope cannot be trusted to police that scope.  The auditor is now an
+    ordinary allowlisted member, and this test fails if it ever falls out again.
     """
-    assert SELF_EXCLUDED == frozenset({"test_i11r2_binding_audit.py"})
+    name = "test_i11r2_binding_audit.py"
 
-    scanned = _scanned_paths()
-    assert scanned, "the audit scanned nothing"
-    # The auditor exists and is tracked, yet is not in its own scan.
-    tracked = _git("ls-files", "*.py").splitlines()
-    assert any(
-        line.strip().endswith("test_i11r2_binding_audit.py") for line in tracked
-    ), "the auditor is not tracked, so the self-exclusion is moot"
-    assert all(
-        Path(path).name not in SELF_EXCLUDED for path in scanned
-    ), "a self-excluded file leaked into the scan"
+    scanned_names = {Path(path).name for path in _scanned_paths()}
+    assert name in scanned_names, "the auditor is not scanning itself"
+    assert name in ALLOWLIST, "the auditor is not accounted for in the allowlist"
+    assert name in LEDGER_READERS, "the auditor reads the ledger but is not named"
 
-    # No OTHER module is excluded: the only way to lose a file from the scan is
-    # SELF_EXCLUDED, so the excluded set is exactly the tracked set minus the
-    # scanned set.
-    tracked_names = {Path(line.strip()).name for line in tracked if line.strip()}
-    assert tracked_names - {Path(path).name for path in scanned} == SELF_EXCLUDED
+    # It really does trip all three predicates -- that is why it needs an entry.
+    hits = _scan()
+    for predicate in PREDICATES:
+        assert name in hits[predicate], (predicate, sorted(hits[predicate]))
 
+    # And the published artifact must state the same number of files.
+    payload = build_governance_binding_audit()
+    assert payload["python_files_scanned"] == len(_scanned_paths())
+    assert name in payload["measured_hits"]["governance_ledger_filename"]
+    assert name in payload["ledger_readers_allowed"]
+    assert payload["unexpected_hits"] == {}, payload["unexpected_hits"]
 
 
