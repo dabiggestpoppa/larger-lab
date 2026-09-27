@@ -374,9 +374,15 @@ echo ""
 echo "[STEP g] Create disposable adversarial worktree..."
 ADV_PARENT="$(mktemp -d "${TMPDIR:-/tmp}/oce-adversarial-parent-XXXXXX")"
 ADV_WORKTREE="$ADV_PARENT/wt"
-if ! git -C "$PROJ_ROOT" worktree add --detach "$ADV_WORKTREE" HEAD >/dev/null 2>&1; then
+# B4-CXR7U9R45X2: capture the real git error. Runs 36324309594 (attempts 1
+# and 2) failed here with the cause invisible because stderr was discarded;
+# the identical command against the identical merge-preview commit succeeds
+# locally. Diagnostics only: the success path is byte-for-byte unchanged.
+if ! git -C "$PROJ_ROOT" worktree add --detach "$ADV_WORKTREE" HEAD \
+    >/dev/null 2>"$ADV_PARENT/wt-add.err"; then
     FAILED_PHASE="worktree-create"
     echo "FATAL: Could not create real isolated Git worktree at $ADV_WORKTREE." >&2
+    sed -n '1,40p' "$ADV_PARENT/wt-add.err" >&2 2>/dev/null || true
     exit 1
 fi
 WORKTREE_REGISTERED=true
