@@ -1,0 +1,72 @@
+{
+  "scenario_id": "illegal_transition_smoke",
+  "scenario_version": "1.0.0",
+  "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
+  "institutional_scope": "generic forbidden-transition smoke (no S01-S24 logic)",
+  "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "PO": "PO",
+    "WORKER": "WORKER",
+    "GOVERNOR": "GOVERNOR"
+  },
+  "initial_knowledge": [
+    {
+      "record_id": "@K_DORM",
+      "state": "DORMANT",
+      "claim": "a periodic credit/quality relationship that was demoted",
+      "provenance_source_kind": "FIXTURE",
+      "provenance_source_label": "smoke-dormant"
+    }
+  ],
+  "stimulus_events": [
+    {
+      "seq": 1,
+      "machine": "phase",
+      "actor": "GOVERNOR",
+      "target": "@INST",
+      "payload": {
+        "to_state": "NEW_STABLE",
+        "evidence_vector": {
+          "reliability_degradation": "LOW"
+        },
+        "authority_level": "PO",
+        "mutation_class": "READ_ONLY",
+        "reason": "attempt to skip to a new stable epoch without review"
+      }
+    },
+    {
+      "seq": 2,
+      "machine": "phase",
+      "actor": "GOVERNOR",
+      "target": "@INST",
+      "payload": {
+        "to_state": "TRANSFORMATION_WINDOW",
+        "evidence_vector": {
+          "independent_contradiction": "HIGH"
+        },
+        "authority_level": "WORKER",
+        "mutation_class": "CAPITAL_MUTATION",
+        "reason": "worker attempts capital authority from transformation posture"
+      }
+    },
+    {
+      "seq": 3,
+      "machine": "lifecycle",
+      "actor": "PO",
+      "target": "@K_DORM",
+      "payload": {
+        "to_state": "ACTIVE",
+        "authority_level": "PO",
+        "authority_basis": "none",
+        "reason": "attempt to promote dormant knowledge without reactivation review"
+      }
+    }
+  ],
+  "expected_phase_path": [
+    "STABLE"
+  ],
+  "terminal_states": [
+    "STABLE"
+  ],
+  "hidden_ground_truth": null
+}

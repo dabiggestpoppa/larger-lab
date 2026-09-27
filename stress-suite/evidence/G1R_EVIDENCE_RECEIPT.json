@@ -1,0 +1,90 @@
+{
+  "gate_id": "G1R",
+  "gate_name": "HARNESS_HARDENING_ADVERSARIAL_REPAIR",
+  "status": "PASS_G1R_HARNESS_HARDENING",
+  "branch": "agent/oce-institutional-stress-suite-build",
+  "starting_sha": "39b5102be24f82cf06cd2f07bc912ac7d85f7d20",
+  "ending_sha": "84b04e6eb0f0f9178520436481f80594b0d8e121",
+  "repair_commits": [
+    "0af6a650 STRESS-G1R1: machine truth - decision serialization, explicit admissibility, decision/applied reconciliation",
+    "142b4b9b STRESS-G1R2: true deep freeze and version isolation for evaluation contracts",
+    "4f0bf9c2 STRESS-G1R3: governed transition executor and exact contract-version binding in replay",
+    "5b507e1d STRESS-G1R4: authority initialization boundary and behavioral firewall tests",
+    "84b04e6e STRESS-G1R5: adversarial serialization/replay integrity sweep",
+    "STRESS-G1RR: archive G1R hardening evidence receipt (terminal commit of this gate)"
+  ],
+  "defects": {
+    "G1R-01": "CLOSED - PhaseDecisionRecord is a real dataclass with deterministic to_dict; evidence_vector survives exactly; round-trip regression added (test_phase_decision_to_dict_roundtrip)",
+    "G1R-02": "CLOSED - PhaseEvaluationContract deep-frozen once frozen: nested channel_rules/hysteresis_rules/admissible_phase_transitions sealed, direct nested mutation detected, next_version() deep-copies (no shared aliases), predecessor fingerprint byte-stable",
+    "G1R-03": "CLOSED - replay routes all lifecycle events through the active LifecycleEdgeTable; supplied custom table changes result vs default; same custom table replays to identical fingerprint",
+    "G1R-04": "CLOSED - ReplayEvent.contract_version enforced; mismatch fails closed and is recorded as kind=CONTRACT_VERSION_MISMATCH without application; matching version accepted; blank version documented as 'use active contract' (smoke-fixture policy)",
+    "G1R-05": "CLOSED - lifecycle transitions carry explicit allowed/applied/violation fields; legality never inferred from post-state equality; attempted transitions preserved with reason on rejection",
+    "G1R-06": "CLOSED - PhaseStateMachine evaluate/record/apply split; decision.allowed always matches applied truth; CAPITAL_MUTATION denied across every legal phase edge with state unchanged; invalid authority raises before ledger mutation",
+    "G1R-07": "CLOSED - GovernedTransitionExecutor composes topology + contract version/freeze + forbidden policy + authority firewall + provenance before application; replay uses it; rule_id recorded on rejection; bypass attempts blocked",
+    "G1R-08": "CLOSED - placeholder intent checks replaced with behavioral state-invariance tests (operator preference, research promotion, capability improvement, profit raise: no evidence/authority mutation)",
+    "G1R-09": "CLOSED - AuthorityState distinguishes seed_level (pre freeze_initialization) from governed change; worker cannot escalate via ordinary API after freeze; governed ratification is the only legal mutation path",
+    "G1R-10": "CLOSED - adversarial serialization/replay sweep over all replay/evidence objects: plain JSON serializable, deterministic across independent builds, provenance retained, contract version retained, no live timestamps"
+  },
+  "old_tests_preserved": 77,
+  "new_regression_tests": 37,
+  "pass_count": 114,
+  "fail_count": 0,
+  "total_tests": 114,
+  "test_counts_by_defect": {
+    "G1R-01_phase_decision_serialization": 1,
+    "G1R-02_deep_freeze_version_isolation": 6,
+    "G1R-03_replay_lifecycle_contract_binding": 3,
+    "G1R-04_contract_version_enforcement": 4,
+    "G1R-05_explicit_transition_admissibility": 4,
+    "G1R-06_decision_applied_truth_capital_disabled": 2,
+    "G1R-07_governed_executor_bypass": 5,
+    "G1R-08_behavioral_authority_firewall": 4,
+    "G1R-09_authority_init_vs_mutation": 3,
+    "G1R-10_serialization_replay_sweep": 5
+  },
+  "contract_version_tests": 4,
+  "deep_freeze_tests": 6,
+  "illegal_same_state_tests": 4,
+  "governed_executor_tests": 5,
+  "authority_bypass_tests": 7,
+  "serialization_tests": 6,
+  "replay_tests": 3,
+  "open_contradictions": [
+    "CON-02 - A-009 PO posture vs A-010 Governor decision (carried, not resolved)",
+    "CON-03 - A-010 preregistration vs threshold opacity / Goodhart (carried, not resolved)"
+  ],
+  "open_ambiguities": [
+    "AMB-03 - authoritative independence aggregation (representation surface built; no scalar declared)",
+    "AMB-08 - reversible low-scope transformation boundary",
+    "AMB-11 - automated causal-signature discovery (patch pressure grouping only by explicit supplied signature)"
+  ],
+  "known_gaps": [
+    "G1R hardening covers harness machinery only; S01-S24 scenario fixtures not yet implemented (G2+ program)",
+    "M4/M5 separation, AMB-01, and lifecycle edge table remain PROVISIONAL_TEST_CONTRACT, not constitutional truth",
+    "CON-04..CON-09 unchanged from G0 (documented revision obligations / spec-level), not re-audited in G1R"
+  ],
+  "artifacts": [
+    "stress-suite/engine/base.py",
+    "stress-suite/engine/phase.py",
+    "stress-suite/engine/lifecycle.py",
+    "stress-suite/engine/evalcontract.py",
+    "stress-suite/engine/authority.py",
+    "stress-suite/engine/governed.py",
+    "stress-suite/engine/replay.py",
+    "stress-suite/engine/__init__.py",
+    "stress-suite/tests/test_schema_roundtrip.py",
+    "stress-suite/tests/test_g1r_hardening.py",
+    "stress-suite/tests/test_g1r_evalcontract.py",
+    "stress-suite/tests/test_g1r_replay_contract.py",
+    "stress-suite/tests/test_g1r_serialization_sweep.py",
+    "stress-suite/evidence/G1R_EVIDENCE_RECEIPT.json",
+    "stress-suite/evidence/G1R_RESULT.md"
+  ],
+  "cost": 0,
+  "cloud_mutations": 0,
+  "production_mutations": 0,
+  "capital_mutations": 0,
+  "authority_changes": "NONE",
+  "next_gate": "G2",
+  "ending_sha_note": "terminal code head; STRESS-G1RR receipt commit is the terminal commit of this gate (see git log)"
+}

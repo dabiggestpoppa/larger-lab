@@ -1,0 +1,13 @@
+[
+  {
+    "evidence_id": "EV_S18_SENSOR",
+    "subject_ref": "MECH_LIQUIDATION_FLOW_1",
+    "scope": "MECH_LIQUIDATION_FLOW_1",
+    "domain": "CRYPTO",
+    "condition_ref": "RC_S18_SENSOR_AVAILABLE",
+    "epoch": "E18",
+    "provenance": "AUTHORITATIVE_SYNTHETIC_FIXTURE (Sensor Fabric capability probe)",
+    "admissible_use": ["FIELD_PREDICATE"],
+    "version_tag": "1.0.0"
+  }
+]

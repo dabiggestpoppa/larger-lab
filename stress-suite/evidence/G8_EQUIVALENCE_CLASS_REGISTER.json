@@ -1,0 +1,478 @@
+{
+  "classes": [
+    {
+      "class_id": "999802b351d7ab953d94",
+      "coherent": true,
+      "family_id": "F1",
+      "members": [
+        "G2:S05"
+      ],
+      "object_class": "INSTITUTIONAL_PHASE",
+      "outcome_classes": [
+        "STABLE_PRESERVED"
+      ],
+      "state_machine": "M5_PHASE",
+      "vector_digest": "0658e64eaf4a1ca2aa89bd9d"
+    },
+    {
+      "class_id": "0c338c0d760ec879e98c",
+      "coherent": true,
+      "family_id": "F1",
+      "members": [
+        "G2:S03"
+      ],
+      "object_class": "INSTITUTIONAL_PHASE",
+      "outcome_classes": [
+        "TRANSFORMATION_ADMITTED"
+      ],
+      "state_machine": "M5_PHASE",
+      "vector_digest": "1f99088cc7732e1ffab03e0d"
+    },
+    {
+      "class_id": "10b61d039142ac83e109",
+      "coherent": true,
+      "family_id": "F1",
+      "members": [
+        "G2:S01_WEAK"
+      ],
+      "object_class": "INSTITUTIONAL_PHASE",
+      "outcome_classes": [
+        "STABLE_PRESERVED"
+      ],
+      "state_machine": "M5_PHASE",
+      "vector_digest": "55c3d2f5762578cefd90f994"
+    },
+    {
+      "class_id": "ddbde5cfe0c8ca2267d6",
+      "coherent": true,
+      "family_id": "F1",
+      "members": [
+        "G2:S04"
+      ],
+      "object_class": "INSTITUTIONAL_PHASE",
+      "outcome_classes": [
+        "STABLE_PRESERVED"
+      ],
+      "state_machine": "M5_PHASE",
+      "vector_digest": "b947f378927d9b4f3fbd577b"
+    },
+    {
+      "class_id": "d2455e3aedfb1f836889",
+      "coherent": true,
+      "family_id": "F1",
+      "members": [
+        "G2:S01"
+      ],
+      "object_class": "INSTITUTIONAL_PHASE",
+      "outcome_classes": [
+        "NEW_STABLE_ESTABLISHED"
+      ],
+      "state_machine": "M5_PHASE",
+      "vector_digest": "bec25ac2af300e1e2be8f533"
+    },
+    {
+      "class_id": "e627a22e91fd354aabe8",
+      "coherent": true,
+      "family_id": "F1",
+      "members": [
+        "G2:S02"
+      ],
+      "object_class": "INSTITUTIONAL_PHASE",
+      "outcome_classes": [
+        "STABLE_PRESERVED"
+      ],
+      "state_machine": "M5_PHASE",
+      "vector_digest": "f68ba8d082777ee61f6496cf"
+    },
+    {
+      "class_id": "a6f3378f353c4c9cecb6",
+      "coherent": true,
+      "family_id": "F2",
+      "members": [
+        "F2::CONCEPT::G6:S24"
+      ],
+      "object_class": "INSTITUTIONAL_CONCEPT",
+      "outcome_classes": [
+        "CONCEPTUAL_PARTIAL_COVERAGE"
+      ],
+      "state_machine": "M-CONCEPT",
+      "vector_digest": "22b473521c9fb4bb5beb3367"
+    },
+    {
+      "class_id": "a8a36a3aff6e2ad152b6",
+      "coherent": true,
+      "family_id": "F2",
+      "members": [
+        "F2::CONCEPT::G6:S22"
+      ],
+      "object_class": "INSTITUTIONAL_CONCEPT",
+      "outcome_classes": [
+        "CONCEPTUAL_PARTIAL_COVERAGE"
+      ],
+      "state_machine": "M-CONCEPT",
+      "vector_digest": "ac099810eb896e173be7c32b"
+    },
+    {
+      "class_id": "08401c709d5c2cb34cfa",
+      "coherent": true,
+      "family_id": "F2",
+      "members": [
+        "F2::CONCEPT::G5:S16"
+      ],
+      "object_class": "INSTITUTIONAL_CONCEPT",
+      "outcome_classes": [
+        "CONCEPTUAL_PARTIAL_COVERAGE"
+      ],
+      "state_machine": "M-CONCEPT",
+      "vector_digest": "b118aefdb6b2359449fb9e7b"
+    },
+    {
+      "class_id": "d15a3881d8f5f9ca560b",
+      "coherent": true,
+      "family_id": "F2",
+      "members": [
+        "F2::CONCEPT::G2:S05"
+      ],
+      "object_class": "INSTITUTIONAL_CONCEPT",
+      "outcome_classes": [
+        "CONCEPTUAL_PARTIAL_COVERAGE"
+      ],
+      "state_machine": "M-CONCEPT",
+      "vector_digest": "c15020fa8e9dbf11e3cc3023"
+    },
+    {
+      "class_id": "714c790f54e35d23995d",
+      "coherent": true,
+      "family_id": "F3",
+      "members": [
+        "G3:S09"
+      ],
+      "object_class": "EVIDENCE_CLAIM",
+      "outcome_classes": [
+        "INDEPENDENT_SUPPORT"
+      ],
+      "state_machine": "EVIDENCE",
+      "vector_digest": "06402d18b26e0428e24e2a3c"
+    },
+    {
+      "class_id": "fe4ca141f007ab446f45",
+      "coherent": true,
+      "family_id": "F3",
+      "members": [
+        "G3:S07"
+      ],
+      "object_class": "EVIDENCE_CLAIM",
+      "outcome_classes": [
+        "INDEPENDENT_REVIEW_REQUIRED"
+      ],
+      "state_machine": "EVIDENCE",
+      "vector_digest": "81b50f4714f54bd66026403f"
+    },
+    {
+      "class_id": "f6831da31000c1539288",
+      "coherent": true,
+      "family_id": "F3",
+      "members": [
+        "G3:S06",
+        "G3:S08"
+      ],
+      "object_class": "EVIDENCE_CLAIM",
+      "outcome_classes": [
+        "CORRELATED_SUPPORT_ONLY"
+      ],
+      "state_machine": "EVIDENCE",
+      "vector_digest": "a057d550097a7218ed676e89"
+    },
+    {
+      "class_id": "c8baa987389c5f49c877",
+      "coherent": true,
+      "family_id": "F4",
+      "members": [
+        "G4:S12"
+      ],
+      "object_class": "KNOWLEDGE_OBJECT",
+      "outcome_classes": [
+        "BOUNDED_CONTEXT_RETAINED"
+      ],
+      "state_machine": "M4_KNOWLEDGE",
+      "vector_digest": "2f7e2175052abcddfa15ada8"
+    },
+    {
+      "class_id": "058db3d76872fe2a8072",
+      "coherent": true,
+      "family_id": "F4",
+      "members": [
+        "G4:S10"
+      ],
+      "object_class": "KNOWLEDGE_OBJECT",
+      "outcome_classes": [
+        "REOPEN_ADMITTED"
+      ],
+      "state_machine": "M4_KNOWLEDGE",
+      "vector_digest": "316781b12e5db298f5134d88"
+    },
+    {
+      "class_id": "4d455497401ef647619a",
+      "coherent": true,
+      "family_id": "F4",
+      "members": [
+        "G4:S13"
+      ],
+      "object_class": "KNOWLEDGE_OBJECT",
+      "outcome_classes": [
+        "EPOCH_RECONSTRUCTED"
+      ],
+      "state_machine": "M4_KNOWLEDGE",
+      "vector_digest": "cb61a498050f6c8f3f443cc9"
+    },
+    {
+      "class_id": "ec7ba34b8893ec47b72d",
+      "coherent": true,
+      "family_id": "F4",
+      "members": [
+        "G4:S11"
+      ],
+      "object_class": "KNOWLEDGE_OBJECT",
+      "outcome_classes": [
+        "NEGATIVE_KNOWLEDGE_RETAINED"
+      ],
+      "state_machine": "M4_KNOWLEDGE",
+      "vector_digest": "fbe36dedbb8b9eb109b5c65f"
+    },
+    {
+      "class_id": "eb7f14092064518f2745",
+      "coherent": true,
+      "family_id": "F5",
+      "members": [
+        "G5:S16"
+      ],
+      "object_class": "DOMAIN_CLAIM",
+      "outcome_classes": [
+        "DOMAIN_CONTRADICTION_OPEN"
+      ],
+      "state_machine": "DOMAIN_MACHINE",
+      "vector_digest": "2a133ecb2766d38efc1b39a2"
+    },
+    {
+      "class_id": "160d98e76889c07a3c52",
+      "coherent": true,
+      "family_id": "F5",
+      "members": [
+        "G5:S18"
+      ],
+      "object_class": "DOMAIN_CLAIM",
+      "outcome_classes": [
+        "DOMAIN_DATA_BLOCKED"
+      ],
+      "state_machine": "DOMAIN_MACHINE",
+      "vector_digest": "36da525a637dc362a2c28c7e"
+    },
+    {
+      "class_id": "c9c3cf3a4bd2f04f0696",
+      "coherent": true,
+      "family_id": "F5",
+      "members": [
+        "G5:S17"
+      ],
+      "object_class": "DOMAIN_CLAIM",
+      "outcome_classes": [
+        "DOMAIN_SOURCE_LAYER_CHALLENGE"
+      ],
+      "state_machine": "DOMAIN_MACHINE",
+      "vector_digest": "5aa0a5214e14a02aee32d29e"
+    },
+    {
+      "class_id": "2a0422e68b4496b5d43c",
+      "coherent": true,
+      "family_id": "F5",
+      "members": [
+        "G5:S19"
+      ],
+      "object_class": "DOMAIN_CLAIM",
+      "outcome_classes": [
+        "DOMAIN_DATA_BLOCKED"
+      ],
+      "state_machine": "DOMAIN_MACHINE",
+      "vector_digest": "ada6e73f79d877ab2804341e"
+    },
+    {
+      "class_id": "0d0fa4a855b5d0ebf574",
+      "coherent": true,
+      "family_id": "F5",
+      "members": [
+        "G5:S14"
+      ],
+      "object_class": "DOMAIN_CLAIM",
+      "outcome_classes": [
+        "DOMAIN_VALIDATION_REFUSED"
+      ],
+      "state_machine": "DOMAIN_MACHINE",
+      "vector_digest": "e72fa511a4861da4be6244f9"
+    },
+    {
+      "class_id": "27c53e21aa122c5d1f18",
+      "coherent": true,
+      "family_id": "F5",
+      "members": [
+        "G5:S15"
+      ],
+      "object_class": "DOMAIN_CLAIM",
+      "outcome_classes": [
+        "DOMAIN_ONTOLOGY_CANDIDATE"
+      ],
+      "state_machine": "DOMAIN_MACHINE",
+      "vector_digest": "fba7d02f1e5488709b4b531d"
+    },
+    {
+      "class_id": "ab17407f17568a12f2e5",
+      "coherent": true,
+      "family_id": "F6",
+      "members": [
+        "G6:S22"
+      ],
+      "object_class": "AUTHORITY_ACTION",
+      "outcome_classes": [
+        "ACTION_AUTHORIZED_BY_OPERATOR"
+      ],
+      "state_machine": "AUTHORITY",
+      "vector_digest": "11d73d35ae8e90edac5cb211"
+    },
+    {
+      "class_id": "5cfc7e445a099c0c6eac",
+      "coherent": true,
+      "family_id": "F6",
+      "members": [
+        "G6:S21"
+      ],
+      "object_class": "AUTHORITY_ACTION",
+      "outcome_classes": [
+        "CAPABILITY_ONLY_UPDATED"
+      ],
+      "state_machine": "AUTHORITY",
+      "vector_digest": "484e8325c4a24b501152cbaf"
+    },
+    {
+      "class_id": "4fc4251f06887ceb4f80",
+      "coherent": true,
+      "family_id": "F6",
+      "members": [
+        "G6:S24"
+      ],
+      "object_class": "AUTHORITY_ACTION",
+      "outcome_classes": [
+        "UNRESOLVED_HELD"
+      ],
+      "state_machine": "AUTHORITY",
+      "vector_digest": "91d2fb98e20ef503e8c5fde2"
+    },
+    {
+      "class_id": "4eed206bb3ce689c4229",
+      "coherent": true,
+      "family_id": "F6",
+      "members": [
+        "G6:S20"
+      ],
+      "object_class": "AUTHORITY_ACTION",
+      "outcome_classes": [
+        "AUTHORITY_HELD_FUTURE_ISOLATED"
+      ],
+      "state_machine": "AUTHORITY",
+      "vector_digest": "956ab23e7db392ede6d3af3c"
+    },
+    {
+      "class_id": "3ac716533aff5e80a943",
+      "coherent": true,
+      "family_id": "F6",
+      "members": [
+        "G6:S23"
+      ],
+      "object_class": "AUTHORITY_ACTION",
+      "outcome_classes": [
+        "OPERATOR_HOLD"
+      ],
+      "state_machine": "AUTHORITY",
+      "vector_digest": "d13464c72cbeeb0ce7ec22d7"
+    },
+    {
+      "class_id": "a712fc1b8134f1267897",
+      "coherent": true,
+      "family_id": "F8",
+      "members": [
+        "G7:OA_AVAILABLE"
+      ],
+      "object_class": "AUTHORITY_ACTION",
+      "outcome_classes": [
+        "ACTION_AUTHORIZED_BY_OPERATOR"
+      ],
+      "state_machine": "AUTHORITY",
+      "vector_digest": "84d4cef2c9f4ccae99ede7f2"
+    },
+    {
+      "class_id": "9455ffcc0f613835c980",
+      "coherent": true,
+      "family_id": "F8",
+      "members": [
+        "G7:OA_UNAVAILABLE"
+      ],
+      "object_class": "AUTHORITY_ACTION",
+      "outcome_classes": [
+        "OPERATOR_HOLD"
+      ],
+      "state_machine": "AUTHORITY",
+      "vector_digest": "8f84f32b6c91d9967a52cff0"
+    },
+    {
+      "class_id": "4ce81bfa02b8c6b992d9",
+      "coherent": false,
+      "family_id": "F9",
+      "members": [
+        "F9::LOCAL::G6:S22",
+        "F9::LOCAL::G6:S24"
+      ],
+      "object_class": "AUTHORITY_ACTION",
+      "outcome_classes": [
+        "ACTION_AUTHORIZED_BY_OPERATOR",
+        "UNRESOLVED_HELD"
+      ],
+      "state_machine": "AUTHORITY",
+      "vector_digest": "fad8bcb10a8c27f60700480e"
+    },
+    {
+      "class_id": "9c2dcf5f57c294b86909",
+      "coherent": true,
+      "family_id": "F9",
+      "members": [
+        "F9::LOCAL::G5:S16"
+      ],
+      "object_class": "DOMAIN_CLAIM",
+      "outcome_classes": [
+        "DOMAIN_CONTRADICTION_OPEN"
+      ],
+      "state_machine": "DOMAIN_MACHINE",
+      "vector_digest": "7ae4cfcfe21d1483b8e80d68"
+    },
+    {
+      "class_id": "0b9e37ede8bef0ed8def",
+      "coherent": true,
+      "family_id": "F9",
+      "members": [
+        "F9::LOCAL::G2:S05"
+      ],
+      "object_class": "INSTITUTIONAL_PHASE",
+      "outcome_classes": [
+        "STABLE_PRESERVED"
+      ],
+      "state_machine": "M5_PHASE",
+      "vector_digest": "580115500f3fb4687ffa9070"
+    }
+  ],
+  "coherent_classes": 32,
+  "contract_digest": "525b18bcea68d23584097c8b740d2d23",
+  "contract_id": "G8-EQUIVALENCE-CONTRACT-001",
+  "contract_version": "1.2.0",
+  "equivalence_classes_total": 33,
+  "incoherent_classes": 1,
+  "note": "a class groups observations whose DECLARED equivalence vector is identically satisfied inside one family and one state machine. An incoherent class (more than one outcome class) must have a matching register entry; the G8 controls prove none can be dropped.",
+  "observations_total": 35,
+  "register_id": "G8-EQUIVALENCE-CLASS-REGISTER-001"
+}

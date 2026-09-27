@@ -1,0 +1,143 @@
+{
+  "gate_id": "G2",
+  "status": "PASS_G2_CORE_PHASE_CONTROL",
+  "g2_p0": "PASS",
+  "starting_sha": "8437a58e90bbc9ab39b843caf9ed7438fc62a65a",
+  "ending_sha": "2f7bf2b6c41c3663e2f03a57ca55b7ab0b813edd",
+  "scenario_ids": [
+    "S01",
+    "S01_WEAK",
+    "S02",
+    "S03",
+    "S04",
+    "S05"
+  ],
+  "tests_run": 225,
+  "pass_count": 225,
+  "fail_count": 0,
+  "tests_by_family": {
+    "g1_g1r_preserved": 114,
+    "g2_p0_identity_binding": 17,
+    "g2_a_adjudicator": 12,
+    "g2_a_scenario_runner": 11,
+    "g2_scenarios": 43,
+    "g2x_audit": 28
+  },
+  "scenario_results": {
+    "S01": {
+      "status": "follows expected trace from evidence",
+      "terminal_phase": "NEW_STABLE",
+      "trace_length": 9,
+      "fingerprint": "cdc524274120e82ba33943766fd3d42c",
+      "knowledge_after": {
+        "@M_A": "SUPERSEDED",
+        "@M_B": "ACTIVE"
+      },
+      "forbidden_attempts": 0
+    },
+    "S01_WEAK": {
+      "status": "sensitivity: weak contradiction + CORE centrality -> no transformation",
+      "terminal_phase": "STABLE",
+      "trace_length": 5,
+      "fingerprint": "3afffb0361cdcaa9f95ff117097a64ab",
+      "knowledge_after": {
+        "@M_A": "ACTIVE"
+      },
+      "forbidden_attempts": 0
+    },
+    "S02": {
+      "status": "false revolution collapses under data-quality inspection",
+      "terminal_phase": "STABLE",
+      "trace_length": 5,
+      "fingerprint": "d3aa6a8ce65f385f73633fbf51313cf5",
+      "knowledge_after": {
+        "@K_REV": "DEMOTED"
+      },
+      "forbidden_attempts": 0
+    },
+    "S03": {
+      "status": "repeated shared causal signature escalates scope to candidate",
+      "terminal_phase": "TRANSFORMATION_CANDIDATE",
+      "trace_length": 12,
+      "fingerprint": "9c7f3f2906e26e41935735d1fabc882b",
+      "knowledge_after": {},
+      "forbidden_attempts": 0
+    },
+    "S04": {
+      "status": "single leaf failure stays local",
+      "terminal_phase": "STABLE",
+      "trace_length": 5,
+      "fingerprint": "21fe11f209865575d00267458e179220",
+      "knowledge_after": {},
+      "forbidden_attempts": 0
+    },
+    "S05": {
+      "status": "two non-dominated models preserved; plural knowledge with stable phase",
+      "terminal_phase": "STABLE",
+      "trace_length": 8,
+      "fingerprint": "9e5b22de4d53d24e564c5b8c28d3e792",
+      "knowledge_after": {
+        "@M_A": "ACTIVE",
+        "@M_B": "ACTIVE"
+      },
+      "forbidden_attempts": 0
+    }
+  },
+  "phase_transition_coverage": {
+    "applied_transitions_across_scenario_runs": 38,
+    "holds_recorded": 6,
+    "phase_paths_exercised": [
+      "STABLE->WATCH",
+      "WATCH->STABLE",
+      "WATCH->ESCALATION_REVIEW",
+      "ESCALATION_REVIEW->HOMEOSTATIC_REPAIR",
+      "ESCALATION_REVIEW->TRANSFORMATION_CANDIDATE",
+      "ESCALATION_REVIEW->NO_CHANGE",
+      "NO_CHANGE->STABLE",
+      "TRANSFORMATION_CANDIDATE->TRANSFORMATION_WINDOW",
+      "TRANSFORMATION_WINDOW->RECONSOLIDATION",
+      "RECONSOLIDATION->NEW_STABLE",
+      "RECONSOLIDATION->PLURAL_MODEL_STATE",
+      "HOMEOSTATIC_REPAIR->STABLE",
+      "PLURAL_MODEL_STATE->STABLE"
+    ]
+  },
+  "forbidden_transition_coverage": {
+    "forbidden_attempts_in_scenario_runs": 0,
+    "machine_level_forbidden_tests": 20,
+    "documented_forbidden_edges": "forbidden_transitions.json per scenario"
+  },
+  "sealed_expectations": {
+    "expected_trace_accessed_during_run": false,
+    "hidden_ground_truth_accessed": false,
+    "metamorphic_tests": "flipping expected trace or hidden ground truth changes nothing in any run"
+  },
+  "authority_binding": {
+    "p0_a_actor_binding": "declared level must match AuthorityState; unknown actors fail closed",
+    "p0_b_ratifier_binding": "ratifier == event.actor enforced",
+    "p0_c_enum_validation": "seed_level rejects unknown authority levels",
+    "p0_d_risk_class_fail_closed": "canonical capability-grant vocabulary enforced"
+  },
+  "new_contradictions": [],
+  "notes_on_new_tensions": [
+    "AMB-13 (new observation): M5 outcome semantics (NEW_STABLE vs PLURAL_MODEL_STATE vs ROLLBACK) are expressible only with history-shaped gates (prior); the A-010 channel vocabulary has no dedicated 'replacement validated' channel. Represented via prior-history gate; flagged, not resolved."
+  ],
+  "carried_contradictions": [
+    "CON-02",
+    "CON-03"
+  ],
+  "carried_ambiguities": [
+    "AMB-03",
+    "AMB-08",
+    "AMB-11",
+    "AMB-13"
+  ],
+  "cost": "$0",
+  "cloud_mutations": 0,
+  "production_mutations": 0,
+  "capital_mutations": 0,
+  "authority_changes": "NONE",
+  "architecture_amendments": "NONE (A-004..A-010 untouched)",
+  "next_gate": "AUTHORIZE_G3",
+  "receipt_terminal_commit": "SEE_COMMIT_AFTER_EVIDENCE_PACKAGE"
+}

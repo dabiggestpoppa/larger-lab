@@ -1,0 +1,9 @@
+{
+  "records": [
+    {"record_id": "E_NOVEL", "kind": "INDEPENDENT_CONFIRMATION", "claim": "paper+dataset contradiction, initially strong", "lineage": "PAPER_LINEAGE"},
+    {"record_id": "E_LEAK", "kind": "OBSERVATION", "claim": "timestamp leakage detected in revolutionary dataset (NOT erased)", "lineage": "DATA_QUALITY"},
+    {"record_id": "E_SURV", "kind": "OBSERVATION", "claim": "survivorship bias detected (NOT erased)", "lineage": "DATA_QUALITY"},
+    {"record_id": "E_REAN", "kind": "DETERMINISTIC", "claim": "corrected re-analysis: no sustained contradiction after defect removal", "lineage": "RESEARCH_VALIDATION"},
+    {"record_id": "E_DEMOTE", "kind": "DETERMINISTIC", "claim": "revolutionary claim recorded as negative knowledge with reopen conditions", "lineage": "CONTROL_PLANE"}
+  ]
+}

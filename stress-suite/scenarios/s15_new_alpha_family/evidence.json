@@ -1,0 +1,26 @@
+[
+  {
+    "record_id": "IND_1",
+    "kind": "INDEPENDENT_CONFIRMATION",
+    "claim": "sign-asymmetric post-news overhang decay observed by estimator lineage L1",
+    "lineage": "L1_ESTIMATOR_1",
+    "source_label": "independent lineage 1",
+    "seq": 0
+  },
+  {
+    "record_id": "IND_2",
+    "kind": "INDEPENDENT_CONFIRMATION",
+    "claim": "sign-asymmetric post-news overhang decay observed by estimator lineage L2",
+    "lineage": "L2_ESTIMATOR_2",
+    "source_label": "independent lineage 2",
+    "seq": 1
+  },
+  {
+    "record_id": "IND_3",
+    "kind": "INDEPENDENT_CONFIRMATION",
+    "claim": "sign-asymmetric post-news overhang decay observed by estimator lineage L3",
+    "lineage": "L3_ESTIMATOR_3",
+    "source_label": "independent lineage 3",
+    "seq": 2
+  }
+]

@@ -1,0 +1,25 @@
+[
+  {
+    "hypothesis_id": "TRANSFER_CAPACITY_1",
+    "source_concept": "ARBITRAGE_CAPITAL_BANDWIDTH",
+    "source_domain": "CRYPTO",
+    "target_domain": "FX",
+    "source_evidence_refs": ["FAM_A_EXTREME_NEGATIVE_BASIS_DISLOCATION"],
+    "transfer_map": {
+      "source_domain": "CRYPTO",
+      "target_domain": "FX",
+      "source_definition": "speed/extent of spot-perp basis convergence bounded by available arbitrage capital bandwidth (crypto foundry FAM_A mechanism)",
+      "target_candidate_definition": "speed/extent of forward-vs-cash convergence bounded by capital that can arbitrage FX forward dislocations",
+      "source_observables": ["spot_perp_basis", "funding_rate", "perp_open_interest"],
+      "target_observables": ["forward_basis", "swaps_points", "cash_forward_spread"],
+      "units_scales": ["crypto: bps of notional", "fx: bps annualized vs spot"],
+      "state_semantics": ["dislocation states B0-B4 mapping to FX dislocation bands", "funding analog: forward term premium"],
+      "market_structure_assumptions": ["24x7 continuous crypto venue", "fx venue sessions/holidays bound arbitrage window"],
+      "mechanism_invariants": ["convergence speed rises with arbitrage capital availability", "dislocation persistence falls monotonically as bandwidth expands"],
+      "known_broken_assumptions": [],
+      "required_sensors": ["FX_FORWARD_DETAIL", "FX_SWAP_POINTS_HISTORY"],
+      "falsifiers": ["convergence speed independent of measured bandwidth in target domain", "fx cash-forward convergence not bounded by capital availability"]
+    },
+    "frozen_target_protocol_ref": "PROTO_TC1_FX"
+  }
+]

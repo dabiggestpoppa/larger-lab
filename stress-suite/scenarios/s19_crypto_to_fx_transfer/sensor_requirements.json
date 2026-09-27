@@ -1,0 +1,26 @@
+[
+  {
+    "requirement_id": "REQ_TC1_FX_FORWARD",
+    "claim_ref": "TRANSFER_CAPACITY_1",
+    "required_observable": "FX_FORWARD_DETAIL",
+    "resolution": "1d",
+    "history_depth": "36m",
+    "instrument_coverage": ["EURUSD", "GBPUSD"],
+    "time_semantics": "WINDOW_START",
+    "quality_minimum": "VERIFIED",
+    "why_required": "target-domain forward basis history is the test surface for the transfer",
+    "alternative_insufficient": "crypto spot-perp basis is not FX forward data"
+  },
+  {
+    "requirement_id": "REQ_TC1_FX_SWAP",
+    "claim_ref": "TRANSFER_CAPACITY_1",
+    "required_observable": "FX_SWAP_POINTS_HISTORY",
+    "resolution": "1d",
+    "history_depth": "36m",
+    "instrument_coverage": ["EURUSD", "GBPUSD"],
+    "time_semantics": "WINDOW_START",
+    "quality_minimum": "VERIFIED",
+    "why_required": "swaps/forward points history is the target-domain observable analogue",
+    "alternative_insufficient": "crypto funding rate is not swap points"
+  }
+]

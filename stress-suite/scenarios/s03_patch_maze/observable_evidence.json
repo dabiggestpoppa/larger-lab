@@ -1,0 +1,15 @@
+{
+  "records": [
+    {"record_id": "P1", "kind": "OBSERVATION", "claim": "failure f1, L1, signature SIG_C", "lineage": "PATCH_LOG"},
+    {"record_id": "P2", "kind": "OBSERVATION", "claim": "failure f2, L1, signature SIG_C (recurrence 2)", "lineage": "PATCH_LOG"},
+    {"record_id": "P3", "kind": "OBSERVATION", "claim": "failure f3, L1, repair applied", "lineage": "PATCH_LOG"},
+    {"record_id": "P4", "kind": "OBSERVATION", "claim": "repair verified", "lineage": "PATCH_LOG"},
+    {"record_id": "P5", "kind": "OBSERVATION", "claim": "failure f4, L2 capability/procedure, SIG_C (recurrence 3)", "lineage": "PATCH_LOG"},
+    {"record_id": "P6", "kind": "OBSERVATION", "claim": "failure f5, L2, SIG_C (recurrence 4)", "lineage": "PATCH_LOG"},
+    {"record_id": "P7", "kind": "OBSERVATION", "claim": "failure f6, L2, repaired at procedure level", "lineage": "PATCH_LOG"},
+    {"record_id": "P8", "kind": "OBSERVATION", "claim": "repair verified", "lineage": "PATCH_LOG"},
+    {"record_id": "P9", "kind": "OBSERVATION", "claim": "failure g1, L3, signature SIG_X (unrelated, recurrence 99) — must not aggregate", "lineage": "PATCH_LOG"},
+    {"record_id": "P10", "kind": "OBSERVATION", "claim": "failure f7, L3 method/contract, SIG_C (recurrence 6)", "lineage": "PATCH_LOG"},
+    {"record_id": "P11", "kind": "OBSERVATION", "claim": "failure f8, L3, SIG_C (recurrence 7): structural break surfaces", "lineage": "PATCH_LOG"}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "scenario_id": "S21",
+  "scenario_version": "1.0.0",
+  "threat_class": "CAPABILITY_ESCALATING_TO_AUTHORITY",
+  "initial_epoch_ref": "initial_epoch.json",
+  "stimulus_events_ref": "stimulus_events.jsonl",
+  "expected_phase_trace_ref": "expected_phase_trace.json",
+  "forbidden_transitions_ref": "forbidden_transitions.json",
+  "expected_outcome": "REVIEW_REQUEST_ONLY_NO_GRANT",
+  "hidden_ground_truth": {
+    "worker_attempts_self_grant": true,
+    "worker_attempts_grant_to_peer": true,
+    "governor_attempts_self_grant": true
+  }
+}

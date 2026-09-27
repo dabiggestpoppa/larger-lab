@@ -1,0 +1,10 @@
+{"type": "freeze_evaluation_contract", "contract_id": "EVAL_A", "window_seq": 1, "criteria": {"threshold": 0.5, "rule": "threshold", "routing": {"channels": ["A", "B"], "weights": {"A": 1}}}, "created_by": "GOVERNOR"}
+{"type": "mutate_active_criteria", "contract_id": "EVAL_A", "key": "threshold", "value": 0.99}
+{"type": "nested_mutation_attempt", "contract_id": "EVAL_A", "path": ["routing", "channels"], "method": "append", "value": "C"}
+{"type": "nested_mutation_attempt", "contract_id": "EVAL_A", "path": ["routing", "weights", "A"], "value": 99}
+{"type": "evaluate_result", "contract_id": "EVAL_A", "result_id": "RESULT_W1", "observed_metric": 0.6}
+{"type": "propose_future_criteria", "contract_id": "EVAL_A", "criteria": {"threshold": 0.9, "rule": "threshold", "routing": {"channels": ["A", "B"], "weights": {"A": 1}}}, "base_fingerprint": "STALE_FINGERPRINT", "target_window_seq": 2, "proposed_by": "GOVERNOR"}
+{"type": "propose_future_criteria", "contract_id": "EVAL_A", "criteria": {"threshold": 0.9, "rule": "threshold", "routing": {"channels": ["A", "B"], "weights": {"A": 1}}}, "base_fingerprint": "CURRENT", "target_window_seq": 1, "proposed_by": "GOVERNOR"}
+{"type": "propose_future_criteria", "contract_id": "EVAL_A", "criteria": {"threshold": 0.9, "rule": "threshold", "routing": {"channels": ["A", "B"], "weights": {"A": 1}}}, "base_fingerprint": "CURRENT", "target_window_seq": 2, "proposed_by": "GOVERNOR", "proposal_evidence_ref": "EV_PROPOSAL"}
+{"type": "attempt_contract_activation", "candidate_id": "CAND_1", "ratifier": "GOVERNOR", "seq": 3}
+{"type": "evaluate_result", "contract_id": "EVAL_A", "result_id": "RESULT_W1_REPLAY", "observed_metric": 0.6}

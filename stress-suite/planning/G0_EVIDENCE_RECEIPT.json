@@ -1,0 +1,78 @@
+{
+  "receipt_schema_version": "1.0",
+  "gate_id": "G0",
+  "milestone_id": "STRESS-G0",
+  "status": "PASS_G0_PLANNING_INGESTION",
+  "program": "OCE_INSTITUTIONAL_STRESS_SUITE",
+  "branch": "agent/oce-institutional-stress-suite-build",
+  "base_branch": "agent/oce-agent-ergonomics-amendment",
+  "starting_sha": "7105347f6e8e4807cca2d8d450baa149b5fa0aeb",
+  "ending_sha": "ce3048b3",
+  "ending_sha_note": "ending_sha is the SHA of the last content commit; the receipt commit is the terminal commit of the gate. Full SHAs are available in git log.",
+  "commits": [
+    {
+      "sha": "cc039578",
+      "message": "STRESS-G0: archive architecture ingestion and dependency map",
+      "artifact": "stress-suite/planning/G0_ARCHITECTURE_INGESTION.md"
+    },
+    {
+      "sha": "ce3048b3",
+      "message": "STRESS-G0: adversarial review and stop-condition findings",
+      "artifact": "stress-suite/planning/G0_ADVERSARIAL_REVIEW.md"
+    }
+  ],
+  "scenario_ids": [],
+  "tests_run": 0,
+  "pass_count": 0,
+  "fail_count": 0,
+  "known_gaps": [
+    "AMB-09: CEREBUS manual has no canonical machine-readable representation on this branch",
+    "AMB-10: Crypto doctrine (MECH21/LF14, provider semantics) lives on sibling branches; read-only extraction decision pending operator confirmation",
+    "AMB-02: amendment versions under test (v1.0 texts vs Post-Michels revisions) assumed v1.0 unless operator overrides"
+  ],
+  "contradictions": {
+    "count": 9,
+    "ids": [
+      "CON-01 A-002 vs A-007 runtime replacement",
+      "CON-02 A-009 PO posture vs A-010 Governor decision (OPEN)",
+      "CON-03 A-010 preregistration vs adversarial T5 threshold opacity (OPEN)",
+      "CON-04 A-004 accretion lacks dormancy/demotion",
+      "CON-05 A-005 static canonical truth",
+      "CON-06 A-006 gap-only discovery",
+      "CON-07 A-007 routing lacks independence criteria",
+      "CON-08 A-008 genome ontology prison",
+      "CON-09 book phase graph mixes machines (spec-level)"
+    ],
+    "note": "CON-02 and CON-03 are open design tensions; CON-04..08 are documented revision obligations with resolution direction recorded in the Post-Michels matrix; no contradiction with ratified constitutional authority."
+  },
+  "ambiguities": {
+    "count": 12,
+    "ids": [
+      "AMB-01 phase machine vs knowledge lifecycle mapping",
+      "AMB-02 amendment version under test",
+      "AMB-03 independence aggregation function",
+      "AMB-04 S14/S15 data-quality-vs-anomaly discriminator",
+      "AMB-05 threshold preregistration mechanics",
+      "AMB-06 knowledge lifecycle transition edges",
+      "AMB-07 truth-label vs lifecycle vocabularies",
+      "AMB-08 reversible low-scope transformation boundary",
+      "AMB-09 CEREBUS doctrine representation",
+      "AMB-10 crypto doctrine availability",
+      "AMB-11 causal-signature clustering definition",
+      "AMB-12 epoch reconstruction checklist"
+    ]
+  },
+  "phase_transition_coverage": "n/a (G0 planning only; M5 Governor graph recorded)",
+  "forbidden_transition_coverage": "n/a (negative tests are G1 work; illegal classes recorded)",
+  "artifacts": [
+    "stress-suite/planning/G0_ARCHITECTURE_INGESTION.md",
+    "stress-suite/planning/G0_ADVERSARIAL_REVIEW.md",
+    "stress-suite/planning/G0_EVIDENCE_RECEIPT.json"
+  ],
+  "cost": 0.0,
+  "cloud_mutations": 0,
+  "production_mutations": 0,
+  "capital_mutations": 0,
+  "authority_changes": "NONE",
+  "next_gate": "G1"
+}

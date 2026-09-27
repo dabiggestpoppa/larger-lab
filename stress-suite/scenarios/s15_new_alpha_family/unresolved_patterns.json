@@ -1,0 +1,17 @@
+[
+  {
+    "pattern_id": "UP_ORPHAN_1",
+    "domain": "FX",
+    "observations": ["OBS_A", "OBS_B", "OBS_C"],
+    "conditions": ["session:asia", "regime:low-vol"],
+    "data_quality_passed": true,
+    "known_family_fit_attempts": ["TREND", "MEAN_REVERSION", "CARRY", "MICROSTRUCTURE"],
+    "residual_behavior": "post-news overhang decay with sign asymmetry",
+    "independence_evidence_refs": ["IND_1", "IND_2", "IND_3"],
+    "falsifiers": ["vanishing under OOS holdout", "explained by known family on cleaner data"],
+    "what_remains_unexplained": "persistent sign-asymmetric decay after controlling known families",
+    "family_label": "UNKNOWN_FAMILY",
+    "required_sensor": "",
+    "evidence_lineages": 3
+  }
+]

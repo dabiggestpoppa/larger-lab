@@ -1,0 +1,141 @@
+{
+  "registry_supplement_version": "0.1",
+  "parent_registry": "OCE_AGENT_ECONOMY_SOURCE_REGISTRY_v0.1.json",
+  "verified_date": "2026-09-12",
+  "authority": "READ_ONLY_RESEARCH_ONLY",
+  "policy": {
+    "observe_broadly": true,
+    "permanent_exclusion_from_desk_research": false,
+    "negative_results_are_durable_knowledge": true,
+    "inactive_sources_require_reentry_conditions": true,
+    "observation_authority_is_separate_from_transaction_authority": true
+  },
+  "sources": [
+    {
+      "schema_version": "1.0",
+      "source_id": "upwork",
+      "source_name": "Upwork",
+      "source_types": [
+        "HUMAN_FREELANCE_MARKET",
+        "CAPABILITY_PROCUREMENT_MARKET"
+      ],
+      "market_model": "Client-posted remote professional work, Project Catalog services, freelancer/agency proposals, direct offers and contracts",
+      "discovery_endpoint": "https://www.upwork.com/ai/mcp",
+      "machine_access": "OFFICIAL_MCP_AND_APPROVED_API",
+      "auth_mode": "OAuth 2.1 for official MCP; approved API key for authorized API use cases",
+      "settlement_asset": "FIAT_PLATFORM_LEDGER",
+      "settlement_network": "Upwork payment and escrow infrastructure",
+      "escrow_model": "Fixed-price and hourly protection/escrow models vary by contract type",
+      "fee_model": "Freelancer service fee currently 0%-15% per contract; proposal Connects often required; purchased Connects currently $0.15 each",
+      "stake_or_collateral": null,
+      "reputation_model": "Work history, ratings, talent badges, Job Success/reputation signals and client history",
+      "dispute_model": "Platform contract/payment protection and dispute mechanisms vary by contract type",
+      "task_state_model": "discover -> proposal/invitation -> interview/offer -> contract -> milestone/hourly work -> submit -> approval/payment",
+      "recommended_observer_mode": "OFFICIAL_MCP_QUERY",
+      "recommended_poll_interval_minutes": 120,
+      "rate_limits": "Use only official MCP/API limits and approved scope; do not scrape website pages",
+      "platform_constraints": [
+        "Unauthorized bots, scrapers, crawlers, page monitors and browser/session automation are prohibited",
+        "Approved automation remains limited to approved API/MCP scope",
+        "Proposal spam is prohibited",
+        "Connects and proposal-generation effort create pre-contract acquisition cost",
+        "Binding actions require platform confirmation according to current MCP design"
+      ],
+      "geographic_constraints": [],
+      "human_checkpoint_required": true,
+      "observability": "Official MCP currently exposes matched-job search, proposals, invitations, offers, messages, contracts, milestone submission, earnings and profile functions",
+      "liquidity_confidence": "HIGH",
+      "verification_level": "FIRST_PARTY_CURRENT",
+      "adapter_version": "planned-ox-v0",
+      "source_contract_version": "Official MCP public launch 2026-08-10; current help/terms verified 2026-09-12",
+      "last_verified_at": "2026-09-12T16:30:00Z",
+      "health_state": "HEALTHY",
+      "source_state": "VERIFIED_READ_ONLY",
+      "transaction_state": "OPERATOR_CONFIRM_REQUIRED",
+      "priority": "A",
+      "information_roles": [
+        "REVENUE_OPPORTUNITY_SENSOR",
+        "DEMAND_SENSOR",
+        "PRICING_SENSOR",
+        "CAPABILITY_GAP_SENSOR",
+        "QCAE_PROCUREMENT_SURFACE"
+      ],
+      "reentry_conditions": [
+        "Revisit execution weights after measured proposal/interview/hire conversion",
+        "Re-evaluate when MCP capability or platform fees change",
+        "Re-evaluate when OCE reputation/profile history materially improves"
+      ],
+      "notes": [
+        "Initial integration should use official MCP read-only job discovery and shadow ranking",
+        "Do not substitute browser automation when MCP/API access is unavailable",
+        "Evidence: https://www.upwork.com/ai/mcp",
+        "Evidence: https://support.upwork.com/hc/en-us/articles/43342677368467-Use-bots-and-other-automation-properly",
+        "Evidence: https://support.upwork.com/hc/en-us/articles/211062898-Understanding-and-using-Connects",
+        "Evidence: https://support.upwork.com/hc/en-us/articles/211062538-Learn-about-the-Freelancer-Service-Fee"
+      ]
+    },
+    {
+      "schema_version": "1.0",
+      "source_id": "fiverr",
+      "source_name": "Fiverr",
+      "source_types": [
+        "HUMAN_FREELANCE_MARKET",
+        "CAPABILITY_PROCUREMENT_MARKET"
+      ],
+      "market_model": "Packaged digital services/Gigs, custom offers, inbound buyer discovery and order-based delivery",
+      "discovery_endpoint": "https://www.fiverr.com/gigs/ai-agents",
+      "machine_access": "OPERATOR_UI_AND_PLATFORM_NATIVE_TOOLS",
+      "auth_mode": "Operator-owned Fiverr account; platform-native authorized features only",
+      "settlement_asset": "FIAT_PLATFORM_LEDGER",
+      "settlement_network": "Fiverr payment infrastructure",
+      "escrow_model": "Buyer pays Fiverr in advance for orders; Fiverr releases seller earnings under platform payment terms",
+      "fee_model": "Freelancers currently receive 80% of completed order value; buyer-side service fees apply separately",
+      "stake_or_collateral": null,
+      "reputation_model": "Seller levels, Success Score, ratings, response and order-performance metrics",
+      "dispute_model": "Fiverr Resolution Center and platform order/dispute processes",
+      "task_state_model": "Gig/custom offer -> order -> delivery/revision -> completion -> clearing -> withdrawal",
+      "recommended_observer_mode": "MANUAL_OR_PLATFORM_NATIVE",
+      "recommended_poll_interval_minutes": 1440,
+      "rate_limits": "No autonomous website scraping/crawling; use permitted operator/platform-native surfaces",
+      "platform_constraints": [
+        "Current Terms prohibit unauthorized bots, automation software, crawlers, scraping and systematic extraction",
+        "Do not build an autonomous Fiverr browser scraper",
+        "Seller economics must absorb the current 20% platform share",
+        "Reputation/levels materially affect discovery and conversion",
+        "Inbound package positioning is more important than proposal automation"
+      ],
+      "geographic_constraints": [],
+      "human_checkpoint_required": true,
+      "observability": "Large visible AI Agents/automation service category; platform-native seller tooling and AI Personal Assistant available to eligible users",
+      "liquidity_confidence": "HIGH_SUPPLY_UNKNOWN_DEMAND_CONVERSION",
+      "verification_level": "FIRST_PARTY_CURRENT",
+      "adapter_version": "planned-operator-mediated-v0",
+      "source_contract_version": "Terms last updated January 2026; current help pages verified 2026-09-12",
+      "last_verified_at": "2026-09-12T16:30:00Z",
+      "health_state": "HEALTHY",
+      "source_state": "VERIFIED_READ_ONLY",
+      "transaction_state": "OPERATOR_MEDIATED",
+      "priority": "A_INFORMATION_B_EXECUTION",
+      "information_roles": [
+        "SERVICE_PACKAGING_SENSOR",
+        "PRICING_SENSOR",
+        "COMPETITION_SENSOR",
+        "INBOUND_REVENUE_SURFACE",
+        "QCAE_PROCUREMENT_SURFACE"
+      ],
+      "reentry_conditions": [
+        "Re-evaluate automation boundary if Fiverr publishes an official machine interface for seller/job workflows",
+        "Re-evaluate execution allocation after actual Gig impressions/inquiries/orders are measured",
+        "Re-evaluate package scope after OCE capability cost curve changes"
+      ],
+      "notes": [
+        "Fiverr remains strategically included even without autonomous website access",
+        "Initial path is package/pricing intelligence plus operator-owned service publication",
+        "Evidence: https://www.fiverr.com/legal-portal/legal-terms/terms-of-service",
+        "Evidence: https://help.fiverr.com/hc/en-us/articles/9234443621137-Your-earnings-page",
+        "Evidence: https://help.fiverr.com/hc/en-us/articles/34069565843985-How-Fiverr-works-for-freelancers",
+        "Evidence: https://www.fiverr.com/gigs/ai-agents"
+      ]
+    }
+  ]
+}

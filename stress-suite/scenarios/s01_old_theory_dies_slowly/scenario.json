@@ -1,0 +1,30 @@
+{
+  "scenario_id": "S01",
+  "scenario_version": "1.0.0",
+  "policy_ref": "G2_CORE_PHASE_POLICY",
+  "threat_class": "DETERMINISTIC_CONSTITUTIONAL",
+  "institutional_scope": "core phase control: conservative lock-in / slow structural decay",
+  "initial_phase": "STABLE",
+  "initial_authority_state": {
+    "PO": "PO",
+    "WORKER_1": "WORKER"
+  },
+  "initial_knowledge": [
+    {
+      "record_id": "@M_A",
+      "state": "ACTIVE",
+      "claim": "M_A: periodic credit/quality mechanism validated in prior epoch; high historical confidence; CORE dependency",
+      "provenance_source_kind": "FIXTURE",
+      "provenance_source_label": "S01-seed",
+      "producing_actor": "PO"
+    },
+    {
+      "record_id": "@M_B",
+      "state": "OBSERVED",
+      "claim": "M_B: candidate replacement mechanism proposed by research",
+      "provenance_source_kind": "FIXTURE",
+      "provenance_source_label": "S01-seed",
+      "producing_actor": "RESEARCH"
+    }
+  ]
+}

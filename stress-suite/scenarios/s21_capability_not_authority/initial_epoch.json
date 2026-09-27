@@ -1,0 +1,9 @@
+{
+  "seq": 1,
+  "authority_seed": {
+    "W1": "WORKER",
+    "W2": "WORKER",
+    "GOV": "GOVERNOR"
+  },
+  "note": "capability improvement observed on W1; no operator present in seed beyond canon"
+}

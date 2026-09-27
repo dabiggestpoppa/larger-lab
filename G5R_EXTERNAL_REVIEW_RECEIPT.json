@@ -1,0 +1,31 @@
+{
+  "closure_id": "G5R-ER-2026-02",
+  "status": "closed",
+  "er_findings_addressed": [
+    "ER-01",
+    "ER-02",
+    "ER-03",
+    "ER-04",
+    "ER-05",
+    "ER-06",
+    "ER-07"
+  ],
+  "files_changed": [
+    "stress-suite/engine/domain.py",
+    "stress-suite/engine/g5_runner.py",
+    "stress-suite/engine/g5r.py",
+    "stress-suite/tests/test_g5r.py",
+    "scenarios/g5r_run_evidence.py",
+    "scenarios/s19_crypto_to_fx_transfer/experiment_protocols.json"
+  ],
+  "regression_tests_added": 9,
+  "bounded_suite_passes": 154,
+  "bounded_suite_total": 154,
+  "g5_suite_passes": 178,
+  "g5_suite_total": 178,
+  "full_suite_passes": 764,
+  "full_suite_failures": 13,
+  "full_suite_failures_pre_existing": true,
+  "base_commit": "b8a152e88432198490cb170b52a2c803e9ad9e1b",
+  "archive_commit_placeholder": ""
+}

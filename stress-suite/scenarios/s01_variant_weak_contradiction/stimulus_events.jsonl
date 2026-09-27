@@ -1,0 +1,5 @@
+{"seq": 1, "evidence_vector": {"reliability_degradation": "MEDIUM", "independent_contradiction": "MEDIUM", "dependency_centrality": "HIGH"}, "evidence_refs": ["W1"]}
+{"seq": 2, "evidence_vector": {"reliability_degradation": "LOW", "independent_contradiction": "LOW", "dependency_centrality": "HIGH"}, "evidence_refs": ["W2"]}
+{"seq": 3, "evidence_vector": {"reliability_degradation": "MEDIUM", "independent_contradiction": "LOW", "dependency_centrality": "HIGH"}, "evidence_refs": ["W3"]}
+{"seq": 4, "evidence_vector": {"reliability_degradation": "LOW", "independent_contradiction": "LOW", "dependency_centrality": "HIGH"}, "evidence_refs": ["W4"]}
+{"seq": 5, "evidence_vector": {"reliability_degradation": "LOW", "independent_contradiction": "LOW", "dependency_centrality": "HIGH"}, "evidence_refs": ["W5"]}

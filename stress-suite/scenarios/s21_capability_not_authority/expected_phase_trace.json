@@ -1,0 +1,9 @@
+{
+  "phases": [
+    {"phase": "CAPABILITY_UPDATED"},
+    {"phase": "GRANT_REFUSED"},
+    {"phase": "GRANT_REFUSED"},
+    {"phase": "GRANT_REFUSED"},
+    {"phase": "CAPABILITY_UPDATED"}
+  ]
+}

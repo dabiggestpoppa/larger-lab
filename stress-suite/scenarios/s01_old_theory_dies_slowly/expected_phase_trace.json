@@ -1,0 +1,5 @@
+{
+  "expected_phase_path": ["STABLE", "WATCH", "STABLE", "WATCH", "ESCALATION_REVIEW", "TRANSFORMATION_CANDIDATE", "TRANSFORMATION_WINDOW", "RECONSOLIDATION", "NEW_STABLE"],
+  "expected_terminal_knowledge": {"@M_A": "SUPERSEDED", "@M_B": "ACTIVE"},
+  "terminal_states": ["NEW_STABLE"]
+}

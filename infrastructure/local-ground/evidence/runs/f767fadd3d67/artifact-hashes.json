@@ -1,0 +1,384 @@
+{
+  "format": "oce-b1-local-ground-artifact-hashes-v1",
+  "oce_run_id": "f767fadd3d67",
+  "base": "expanded",
+  "file_count": 75,
+  "artifacts": [
+    {
+      "path": "acceptance-output.txt",
+      "sha256": "7770cb1f97adf60bdf9ad4e1115bdf70b7add0185d6c4ff826f483e427c94dd8",
+      "size": 17819
+    },
+    {
+      "path": "adversarial-output.txt",
+      "sha256": "e91c9aac55f4f37469577cdb0959570e1f7a2d2c0a2e0d5f4e6a44778971a04d",
+      "size": 2177
+    },
+    {
+      "path": "adversarial-results.json",
+      "sha256": "cb0472ffb866ab65e1f82855859394c5c89c7b84e8ccb97561fd464b0ee328c4",
+      "size": 965
+    },
+    {
+      "path": "artifact-recovery-receipt.json",
+      "sha256": "252f29f1275db3ca5080fdfbb466e251f440f394f7ddb8edff8d304bf090fdf1",
+      "size": 275
+    },
+    {
+      "path": "cleanup.json",
+      "sha256": "382da6348eb9f820e60fe1531a212d64899913d7ccb88722427912a93490ef1a",
+      "size": 46
+    },
+    {
+      "path": "cloud-apply-denial.json",
+      "sha256": "44e950211b9d5cdd61ca7534aed8f5cd1874603fc4f186646f9dc61956449034",
+      "size": 48
+    },
+    {
+      "path": "cloud-apply-denial.txt",
+      "sha256": "b1c480359d4d38fb949db72fa7ede2006730a19292d57617345e3ffb483c71ec",
+      "size": 89
+    },
+    {
+      "path": "cloud-plan-2.txt",
+      "sha256": "e1fea33c148063cdb6f82e396bed8e446ba06b21a1fef5a0a90dd4c0990e3892",
+      "size": 1036
+    },
+    {
+      "path": "cloud-plan-deterministic.json",
+      "sha256": "5e77f59dff7a37d25dd89ead1d82e9f4597fb539cb612f639abc97626cd8cd00",
+      "size": 27
+    },
+    {
+      "path": "cloud-plan.txt",
+      "sha256": "e1fea33c148063cdb6f82e396bed8e446ba06b21a1fef5a0a90dd4c0990e3892",
+      "size": 1036
+    },
+    {
+      "path": "container-cleanup.json",
+      "sha256": "65a04ed483c1eee3a7043054f2fcba676bf9bda73dfa3a6624ea307d444f4cec",
+      "size": 136
+    },
+    {
+      "path": "environment-fingerprint.json",
+      "sha256": "b8faf5daabcf760483f225d663d1b2232cf0decf5b3a16c22958e8b575a78a2f",
+      "size": 493
+    },
+    {
+      "path": "evidence-dir.path",
+      "sha256": "d200237592a7f323638bb60f3396645982b208c3cef732ba7cb129d2ea4aa3d0",
+      "size": 62
+    },
+    {
+      "path": "evidence-manifest.json",
+      "sha256": "bfedbb0cdb83da6625cb5888af15c33d30e01aa9c7e9719a3eec666cb7056b2b",
+      "size": 6329
+    },
+    {
+      "path": "identity.json",
+      "sha256": "5aa75829c20ae5e71215ef87e316ddce4370877bf397a0037d9e83d864a4476c",
+      "size": 643
+    },
+    {
+      "path": "independent-gate.json",
+      "sha256": "fafdcb73828842a74003d823b63b01704acf40322e8ecb5812f09c9bf3543bf1",
+      "size": 14479
+    },
+    {
+      "path": "junit.xml",
+      "sha256": "4940df3ff79fd89da8fb6e4ce9e814c148bb8c6086e6ee016716a585009979a4",
+      "size": 21471
+    },
+    {
+      "path": "local-after-denied.json",
+      "sha256": "8f0c1c520d4343f54805dcdaa74287fb690f4d610186020a9343b1407654bdbd",
+      "size": 20
+    },
+    {
+      "path": "local-after-denied.txt",
+      "sha256": "be858f356e7f392efbc83c678f2cd3590aebfb481cdc8daa7c904f24ef100510",
+      "size": 358
+    },
+    {
+      "path": "log-driver-config.json",
+      "sha256": "fcd205dad742cc3045a3c79ce9b1373831c60d21022364ee772ef5f4af122a4c",
+      "size": 87
+    },
+    {
+      "path": "postgres-recovery-receipt-1788093157314815560.json",
+      "sha256": "fcf4653d90ded27f1adca4eb0115102dd3fe33e439020245cb1cd30b06ab8a4b",
+      "size": 1669
+    },
+    {
+      "path": "postgres-recovery-receipt-1788093173912202907.json",
+      "sha256": "b70295f945970a80ba98557ad5dab03fc11650828bbf96e1c715eb58b1d0d5f3",
+      "size": 1768
+    },
+    {
+      "path": "postgres-recovery-receipt-1788093204231123866.json",
+      "sha256": "b3c4aa18618c94cf487db3ce44fc614b1ae0e657a08ffd5adbecaf5de16af9be",
+      "size": 1768
+    },
+    {
+      "path": "postgres-recovery-receipt.json",
+      "sha256": "b3c4aa18618c94cf487db3ce44fc614b1ae0e657a08ffd5adbecaf5de16af9be",
+      "size": 1768
+    },
+    {
+      "path": "promote-receipt-1788093154347807867.json",
+      "sha256": "ffcf415232fceed2838bf524f5d42b5699b52d22cc1bd493e36ba2542abd3c32",
+      "size": 1870
+    },
+    {
+      "path": "promote-receipt-1788093170581187949.json",
+      "sha256": "6c5191b993083591c4ed49ba04c60c56df849497593a7834c19861e2fc02894a",
+      "size": 2068
+    },
+    {
+      "path": "promote-receipt-1788093200899156033.json",
+      "sha256": "95561c345d3c37164afe5caad5edfc1b9f95e1a21079ee8fac98ed7d59fca0d3",
+      "size": 2068
+    },
+    {
+      "path": "promote-receipt.json",
+      "sha256": "95561c345d3c37164afe5caad5edfc1b9f95e1a21079ee8fac98ed7d59fca0d3",
+      "size": 2068
+    },
+    {
+      "path": "redis-invalidation-receipt.json",
+      "sha256": "a4f7f455a0bfbab0c2d60a8ef3d590470a1a8e8ea4dc574715b8d3bdc3cd1f55",
+      "size": 433
+    },
+    {
+      "path": "restore-receipt.json",
+      "sha256": "b70295f945970a80ba98557ad5dab03fc11650828bbf96e1c715eb58b1d0d5f3",
+      "size": 1768
+    },
+    {
+      "path": "rollback-failure-receipt.json",
+      "sha256": "f5ee7979cadb606f5c6d6fd7645734b1dd32f53c1b22c1facbbe489dd017c874",
+      "size": 1762
+    },
+    {
+      "path": "rollback-receipt-af5e367a1e25.json",
+      "sha256": "1428cb13a458c358fe936602b9f431544965365364ca6d406501a3796d0d3409",
+      "size": 2069
+    },
+    {
+      "path": "rollback-receipt.json",
+      "sha256": "1428cb13a458c358fe936602b9f431544965365364ca6d406501a3796d0d3409",
+      "size": 2069
+    },
+    {
+      "path": "source-clean.json",
+      "sha256": "57e2734dfe0753e080ee37be3433187ae85c44d86bac544d5ae1c92ce155d3e7",
+      "size": 70
+    },
+    {
+      "path": "stage-log.txt",
+      "sha256": "1f59a623d188c9c5873c3452025f510ef9f5525140bd21ec06cef0889d56a89b",
+      "size": 401
+    },
+    {
+      "path": "stage-status.json",
+      "sha256": "3f7f306889993525ff2763c62da571015bc66a583c53ef5fdd1f278e0a138693",
+      "size": 467
+    },
+    {
+      "path": "test-mode.txt",
+      "sha256": "f92e9b2fbccb78c0df3470eba945b46353e978d2a7cdc27fedc53a20d918df85",
+      "size": 17
+    },
+    {
+      "path": "test-summary.json",
+      "sha256": "42c97495c2ab73e4190b01478f1e835dcebc8830e5d3e82dd1713d7d6145dd9b",
+      "size": 42199
+    },
+    {
+      "path": "operations/index.json",
+      "sha256": "5a3d5b58838737b4b1d6e5d47a60468dd5ff2ba497a34ba0bd4dfd36813ac29d",
+      "size": 23284
+    },
+    {
+      "path": "operations/latest.json",
+      "sha256": "2649b8f6d0ace4efc6e9de991ae79c09f2a8eb99723a9d67cfe479539f86f7bd",
+      "size": 1010
+    },
+    {
+      "path": "operations/operations/1c8fec21ebd6497ea97433f8a1bf6d68/artifact-recovery-receipt.json",
+      "sha256": "7fdeb4aa0af4c01b82672b86f424be3ffdc9e13488664d6d59825c93b9f122e5",
+      "size": 275
+    },
+    {
+      "path": "operations/operations/1c8fec21ebd6497ea97433f8a1bf6d68/postgres-recovery-receipt.json",
+      "sha256": "b70295f945970a80ba98557ad5dab03fc11650828bbf96e1c715eb58b1d0d5f3",
+      "size": 1768
+    },
+    {
+      "path": "operations/operations/1c8fec21ebd6497ea97433f8a1bf6d68/promote-receipt.json",
+      "sha256": "6c5191b993083591c4ed49ba04c60c56df849497593a7834c19861e2fc02894a",
+      "size": 2068
+    },
+    {
+      "path": "operations/operations/1c8fec21ebd6497ea97433f8a1bf6d68/redis-invalidation-receipt.json",
+      "sha256": "f27d18eeb558c4af594ee0f24f5fbac823e1500b47e28abf7ae46094a1b9aea9",
+      "size": 380
+    },
+    {
+      "path": "operations/operations/1c8fec21ebd6497ea97433f8a1bf6d68/restore-receipt.json",
+      "sha256": "b70295f945970a80ba98557ad5dab03fc11650828bbf96e1c715eb58b1d0d5f3",
+      "size": 1768
+    },
+    {
+      "path": "operations/operations/25e65042d9f642d3aa73b7afe52ccb5b/backup-info.json",
+      "sha256": "4f33c3e2f54e09dd7b82b3ed52fb3e0804198a5b0945f17b026f1cc13c950264",
+      "size": 503
+    },
+    {
+      "path": "operations/operations/3971d5ddbc044e95a84468b48a7d77c5/backup-info.json",
+      "sha256": "8a573999b22064d569f0fc828c897ad33f980b3eb1639edf47945fc3022c25e2",
+      "size": 503
+    },
+    {
+      "path": "operations/operations/5c67265ea5de4b83a416bb90717b39d7/backup-info.json",
+      "sha256": "86f709b6fae93d2d6e35321f16c856476efd78a77a227e1dd2d6e5253b34b780",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/66643c85384a4d50a0d7a39439f7a9e8/backup-info.json",
+      "sha256": "1877abf0ca0b9ad697ab6dd683c9a767b013a055c2b20c5e896b32fc03f7358c",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/689f5d7b184547c9be2a684c37f98449/backup-info.json",
+      "sha256": "81fb763e418c2e1b6369a3188b379cf7b964972940fc85ccd4e747b1f9588401",
+      "size": 503
+    },
+    {
+      "path": "operations/operations/69089a40645f409889195b110ca43d04/backup-info.json",
+      "sha256": "b1e342bda268629a1da0e9a81bc24e25af1f040f96494b675289e9b1444d1331",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/6d492a0f77cb4cd6b7f1f9f6402e8534/backup-info.json",
+      "sha256": "9311cc3ebb45b2b0e72d8ef4578d083c720ec4c57de0b949ed5633bbf7c64ff6",
+      "size": 503
+    },
+    {
+      "path": "operations/operations/7572138339cf4e3591d7f04902963145/artifact-recovery-receipt.json",
+      "sha256": "252f29f1275db3ca5080fdfbb466e251f440f394f7ddb8edff8d304bf090fdf1",
+      "size": 275
+    },
+    {
+      "path": "operations/operations/7572138339cf4e3591d7f04902963145/postgres-recovery-receipt.json",
+      "sha256": "b3c4aa18618c94cf487db3ce44fc614b1ae0e657a08ffd5adbecaf5de16af9be",
+      "size": 1768
+    },
+    {
+      "path": "operations/operations/7572138339cf4e3591d7f04902963145/promote-receipt.json",
+      "sha256": "95561c345d3c37164afe5caad5edfc1b9f95e1a21079ee8fac98ed7d59fca0d3",
+      "size": 2068
+    },
+    {
+      "path": "operations/operations/7572138339cf4e3591d7f04902963145/redis-invalidation-receipt.json",
+      "sha256": "a4f7f455a0bfbab0c2d60a8ef3d590470a1a8e8ea4dc574715b8d3bdc3cd1f55",
+      "size": 433
+    },
+    {
+      "path": "operations/operations/7572138339cf4e3591d7f04902963145/restore-receipt.json",
+      "sha256": "b70295f945970a80ba98557ad5dab03fc11650828bbf96e1c715eb58b1d0d5f3",
+      "size": 1768
+    },
+    {
+      "path": "operations/operations/77afcbf1cd694809b6b51bc60aee6271/backup-info.json",
+      "sha256": "2a384edd69a6aa4e683d8a3c65f7a54cae0f6a2c765310de3d86496a74468899",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/7dc405464400489f890e2cdc97d016df/backup-info.json",
+      "sha256": "560d0ebf8ee9a746feaf0bbc65cfc23c10ca3140eb4ba9a6572c11e9484eb3ca",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/88052dfc5d1d4aa1b2ad4bf3cf323363/backup-info.json",
+      "sha256": "42c62101c717bb7a71f90eb41fe65af813ff1cc2d79b1a6b11607170fbca3ae2",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/9480b08a4a7e44bdb2522735b558f8f8/backup-info.json",
+      "sha256": "2c273f441f4e73cee10fcf32e10490dec3b9625814c893e3bbb327f17b17fe64",
+      "size": 503
+    },
+    {
+      "path": "operations/operations/94e3f863683a4c179fae6132417fd317/backup-info.json",
+      "sha256": "091577a4d9c200e5ff3762e75697d1e3c1e6b03e5b31ffca1d6872b4b6ea4ce7",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/966afeedf10e42d8a1122cde587b9ac8/backup-info.json",
+      "sha256": "51d4951e58d32a6b5773b50cde1a4b5d1f78d5637b8cae2ab30cada47685bda7",
+      "size": 503
+    },
+    {
+      "path": "operations/operations/992ceef3382c4208acbb9daa0f37dc6a/backup-info.json",
+      "sha256": "ee7e72f19787080fae356deb31996305c42254ac81f264b5350f14b6b84a0848",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/a71825558e1c42cca7d6c909d16151b0/backup-info.json",
+      "sha256": "100aca6daa7cdce997de89ff225d62fa576c1ca969ee0612328922c3872e0071",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/af5e367a1e25/postgres-recovery-receipt.json",
+      "sha256": "1428cb13a458c358fe936602b9f431544965365364ca6d406501a3796d0d3409",
+      "size": 2069
+    },
+    {
+      "path": "operations/operations/b0bdef6e591c4dd8806d7d70f9e76916/backup-info.json",
+      "sha256": "a2acd8251c8043fc5ce5d2a4f6198b72983b5832d88626968a87000b9d6e323a",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/c0a0967a8fe54569943a1a1a082f318b/backup-info.json",
+      "sha256": "a8183171ba55cc955b5ca089fa0f569cba05f43b7c6f51de80c73abd1963afa8",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/cc0585e5e20b/postgres-recovery-receipt.json",
+      "sha256": "f5ee7979cadb606f5c6d6fd7645734b1dd32f53c1b22c1facbbe489dd017c874",
+      "size": 1762
+    },
+    {
+      "path": "operations/operations/e67397f4bad1400bb8fd015d834c6e3c/backup-info.json",
+      "sha256": "6bc2eaf7e03e63c42378565365c8fc513b27f30118b3d151079476b3eca8511b",
+      "size": 466
+    },
+    {
+      "path": "operations/operations/e96f3eb844174d5eb01f2b7d36a89166/artifact-recovery-receipt.json",
+      "sha256": "4bc82ecfd87c363ab21b5897b782644f366fbd3f42e0e0f374d02fe4e69f5afa",
+      "size": 275
+    },
+    {
+      "path": "operations/operations/e96f3eb844174d5eb01f2b7d36a89166/postgres-recovery-receipt.json",
+      "sha256": "fcf4653d90ded27f1adca4eb0115102dd3fe33e439020245cb1cd30b06ab8a4b",
+      "size": 1669
+    },
+    {
+      "path": "operations/operations/e96f3eb844174d5eb01f2b7d36a89166/promote-receipt.json",
+      "sha256": "ffcf415232fceed2838bf524f5d42b5699b52d22cc1bd493e36ba2542abd3c32",
+      "size": 1870
+    },
+    {
+      "path": "operations/operations/e96f3eb844174d5eb01f2b7d36a89166/redis-invalidation-receipt.json",
+      "sha256": "fa02c88563163263c7aee3cc8e35b6f87e3d4bd5ee30df19032534b799f4ad16",
+      "size": 380
+    },
+    {
+      "path": "operations/operations/e96f3eb844174d5eb01f2b7d36a89166/restore-receipt.json",
+      "sha256": "fcf4653d90ded27f1adca4eb0115102dd3fe33e439020245cb1cd30b06ab8a4b",
+      "size": 1669
+    }
+  ],
+  "generated_at": "2026-08-30T13:05:00Z"
+}

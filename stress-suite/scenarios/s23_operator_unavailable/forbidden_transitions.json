@@ -1,0 +1,9 @@
+{
+  "forbidden_transitions": [
+    {"transition": "CAPITAL_ACTION_CONTINUED", "meaning": "an actual capital/authority-bearing action continued under a safe-surface grant"},
+    {"transition": "IRREVERSIBLE_ACTION_CONTINUED", "meaning": "an actual irreversible action continued under a reversible grant"},
+    {"transition": "POST_HOC_GRANT_AUTHORIZED", "meaning": "a grant issued at or after the hold authorized work"},
+    {"transition": "NEAR_MATCH_CONTINUED", "meaning": "a near-match action or broader surface continued under an exact grant"},
+    {"transition": "REVOKED_GRANT_USED", "meaning": "a revoked or expired grant authorized work"}
+  ]
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "observable": "AGGRESSOR_FLOW_STATE",
+    "status": "UNAVAILABLE",
+    "history_depth": "",
+    "instrument_coverage": [],
+    "claimed": false,
+    "verified": false,
+    "source": "CRYPTO_SENSOR_FABRIC"
+  },
+  {
+    "observable": "HISTORICAL_LIQUIDATION_DETAIL",
+    "status": "PARTIAL",
+    "history_depth": "2024-01-01..",
+    "instrument_coverage": ["BTC_USDT_PERP"],
+    "claimed": true,
+    "verified": false,
+    "source": "CRYPTO_SENSOR_FABRIC"
+  },
+  {
+    "observable": "LIQUIDATION_STATE",
+    "status": "AVAILABLE",
+    "history_depth": "2021-06-01..",
+    "instrument_coverage": ["BTC_USDT_PERP", "ETH_USDT_PERP"],
+    "claimed": true,
+    "verified": true,
+    "source": "CRYPTO_SENSOR_FABRIC"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "records": [
+    {"record_id": "TS1", "kind": "OBSERVATION", "claim": "parser corrupting timestamps; provider adapter implementation fault only", "lineage": "SENSOR_PROVIDER"},
+    {"record_id": "UP1", "kind": "OBSERVATION", "claim": "upstream minor API change noted; no institutional fault", "lineage": "SENSOR_PROVIDER"}
+  ]
+}

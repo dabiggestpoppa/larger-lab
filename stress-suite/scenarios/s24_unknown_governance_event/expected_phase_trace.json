@@ -1,0 +1,8 @@
+{
+  "phases": [
+    {"phase": "UNRESOLVED_GOVERNANCE_EVENT"},
+    {"phase": "SENSOR"},
+    {"phase": "UNRESOLVED_GOVERNANCE_EVENT"},
+    {"phase": "UNRESOLVED_GOVERNANCE_EVENT"}
+  ]
+}

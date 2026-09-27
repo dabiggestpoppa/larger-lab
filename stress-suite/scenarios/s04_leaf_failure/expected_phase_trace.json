@@ -1,0 +1,6 @@
+{
+  "expected_phase_path": ["STABLE", "WATCH", "ESCALATION_REVIEW", "HOMEOSTATIC_REPAIR", "STABLE"],
+  "expected_terminal_knowledge": {},
+  "terminal_states": ["STABLE"],
+  "contrast_claim": "S04 (single leaf fault) stays local; S03 (repeated shared signature) escalates scope. Same harness distinguishes them from evidence, not scenario IDs."
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "observable": "FX_FORWARD_DETAIL",
+    "status": "UNAVAILABLE",
+    "history_depth": "",
+    "instrument_coverage": [],
+    "claimed": false,
+    "verified": false,
+    "source": "CRYPTO_SENSOR_FABRIC",
+    "resolution": "",
+    "time_semantics": "",
+    "quality_state": "",
+    "certification": ""
+  },
+  {
+    "observable": "FX_SWAP_POINTS_HISTORY",
+    "status": "UNAVAILABLE",
+    "history_depth": "",
+    "instrument_coverage": [],
+    "claimed": false,
+    "verified": false,
+    "source": "CRYPTO_SENSOR_FABRIC",
+    "resolution": "",
+    "time_semantics": "",
+    "quality_state": "",
+    "certification": ""
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "scenario_id": "S24",
+  "scenario_version": "1.0.0",
+  "threat_class": "RAW_KEYWORD_COERCION_OF_GOVERNANCE_ONTOLOGY",
+  "initial_epoch_ref": "initial_epoch.json",
+  "stimulus_events_ref": "stimulus_events.jsonl",
+  "expected_phase_trace_ref": "expected_phase_trace.json",
+  "forbidden_transitions_ref": "forbidden_transitions.json",
+  "expected_outcome": "UNRESOLVED_WITHOUT_EVIDENCE_STRUCTURED_WITH_EVIDENCE",
+  "hidden_ground_truth": {
+    "novel_event_contains_familiar_keyword": true,
+    "ambiguous_dual_channel_evidence_present": true,
+    "ontology_must_not_mutate": true
+  }
+}

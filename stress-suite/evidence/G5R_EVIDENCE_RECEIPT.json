@@ -1,0 +1,88 @@
+{
+  "gate": "G5R",
+  "status": "PASS_G5R_DOMAIN_EVIDENCE_INTEGRITY",
+  "starting_sha": "56c0605d5924b703603612327c89dfa15367914e",
+  "artifacts_head_sha": "181b2589",
+  "receipt_content_parent_sha": "181b2589",
+  "externally_verified_branch_head": null,
+  "sha_semantics": "non-self-referential: artifacts_head_sha is the last code/artifact commit (STRESS-G5RX); receipt_content_parent_sha is that same artifact commit which this receipt DOCUMENTS (the receipt itself is created in the later STRESS-G5RR archive commit, so it never hashes itself); externally_verified_branch_head is filled only after an external push verification and is NOT claimed by this receipt",
+  "commit_delta_verified": {"from": "463495c3", "to": "56c0605d", "commits": 10, "behind": 0},
+  "commits": [
+    {"sha": "2a7afd11", "subject": "STRESS-G5R1: replace integer independence with governed evidence paths", "items": "G5R-01 G5R-02 G5R-03 (+G5R-24 test-vocabulary fix)"},
+    {"sha": "55097277", "subject": "STRESS-G5R3: harden CEREBUS source binding / exact claim atoms", "items": "G5R-04 G5R-05 G5R-06 G5R-07 G5R-08 G5R-09 (scenario side)"},
+    {"sha": "d19eda9c", "subject": "STRESS-G5R6: govern provider semantic/adapter/time/normalization diagnosis", "items": "G5R-10 G5R-11 G5R-12 G5R-13 G5R-14 G5R-15 (scenario side)"},
+    {"sha": "e74a62c2", "subject": "STRESS-G5R8: harden transfer-map / target-protocol / target-data validation", "items": "G5R-20 G5R-21 G5R-22 G5R-23 (scenario side)"},
+    {"sha": "08f7e5c0", "subject": "STRESS-G5R7: implement full-vector sensor adequacy + capability-change evidence", "items": "G5R-16 G5R-17 G5R-18 (policy rules)"},
+    {"sha": "181b2589", "subject": "STRESS-G5RX: regenerate G5 per-scenario receipts under G5R fixtures", "items": "adversarial cases A-J + receipt regeneration; G5RR archive commit follows"}
+  ],
+  "tests": {
+    "pass": 766,
+    "total": 766,
+    "pre_g5r": 684,
+    "g5r_new": 82,
+    "total_final": 766
+  },
+  "test_accounting_note": "pre-G5R accepted baseline = 684 (G5 total, verified at 56c0605d). G5R added 82 regressions (tests/test_g5r.py: 81 core G5R-01..25 + adversarial A-J + 1 corrected runner-level assertion inside test_missing_metric_semantics_fails_closed, documented in the test docstring). 0 legacy tests deleted; 5 G5 assertions were UPGRADED to remove fixture-declared truth authority, each with the old assertion, why it was invalid, and the replacement recorded in the test docstring (test_control_c_moderate_clean_progresses_farther, test_control_b_single_lineage_remains_unresolved, test_operator_preference_cannot_fabricate_contradiction, test_target_data_frozen_protocol_routes_domain_validation_required, test_without_frozen_protocol_transfer_stays_hypothesis). 684 + 82 = 766.",
+  "scenarios": {
+    "S14": {"outcome": "REJECTED_NEGATIVE_KNOWLEDGE", "behavior_fingerprint": "b259b6e1faf914ba597c48b5ce97734b", "pass": true, "promotion_vocabulary": "VALIDATION_PASS != PROMOTION_CANDIDATE != execution authority (NONE); gate materiality from B7GateContract v1.0 sourced to OCE-B7-PLAN-001"},
+    "S15": {"outcome": "ONTOLOGY_EXPLORATION_CANDIDATE", "behavior_fingerprint": "0cbf99b5f678b2e687b4b5d1e1ff9c4f", "pass": true, "independence": "derived from 3 registered evidence refs on 3 distinct lineages; cluster observations = unique verified paths; mechanism ADMITTED only via governed disposition"},
+    "S16": {"outcome": "CONTRADICTION_OPEN", "behavior_fingerprint": "ca9d22034e6785228a5bc1a444648210", "pass": true, "manual_version": "CEREBUS_v4_Manual_EXTRACTED.txt", "claim_id": "CEREBUS_V4_P90_TARGET_METRICS", "source_binding": "SHA-256 recomputed from file, 64 hex, matches stored digest", "contradiction": "derived from measured interval [0.68, 0.76] vs doctrine band [0.85, 0.90]", "manual_preserved": true, "ratification": "OPERATOR-only via AuthorityState; proposal exists; manual unamended"},
+    "S17": {"outcome": "NORMALIZATION_MISMATCH", "behavior_fingerprint": "3c69e2e6a4b30d8d4c86ad72f2dfcb9c", "pass": true, "semantics_key": "(provider, metric)", "adapter": "version equality enforced (compatible list honored)", "normalization": "missing value stays MISSING, never 0.0", "genuine_disagreement_preserved": true, "averaged": false},
+    "S18": {"outcome": "DATA_BLOCKED", "behavior_fingerprint": "032f220f64510c3bafdeae2d9c9cbec1", "pass": true, "adequacy": "full requirement vector + provenance; AVAILABLE+unverified stays DATA_BLOCKED (governed policy rule); boolean override non-authoritative; capability change = evidenced record", "search_demand": true},
+    "S19": {"outcome": "DATA_BLOCKED", "behavior_fingerprint": "eaf2222c3e8e27c66b6a1ab593c6065a", "pass": true, "transfer_map": "all 13 invariant axes validated; blank mandatory axis != STRUCTURALLY_SOUND", "target_protocol": "must resolve to registered frozen protocol with matching target_domain (PROTO_TC1_FX_VALIDATION)", "target_data": "governed sensor adequacy, boolean override non-authoritative", "source_evidence": "resolves to CRYPTO_FOUNDRY_FAM_A; crypto evidence never counts as FX validation"}
+  },
+  "shared_policy": {
+    "policy_id": "G5_DOMAIN_EPISTEMIC_POLICY",
+    "version_tag": "V1",
+    "status": "PROVISIONAL_SCENARIO_TEST_POLICY",
+    "governs_execution": true,
+    "policy_fingerprint_after_g5r": "0d1ec2bf35e9ef824230aab1",
+    "added_rules": ["g5.availability.blocked_insufficient_vector", "g5.availability.blocked_unverified_sensor"],
+    "scenario_id_predicates": "none (static guard: decision fields contain no S14-S19 ids, no strategy/provider/concept literals)",
+    "single_policy_all_scenarios": true
+  },
+  "adversarial_cases": {
+    "A_integer_independence_spoof": "BLOCKED — evidence_lineages=99 with 0 registered refs stays UNRESOLVED (raw_integer_cannot_mint_independence)",
+    "B_fake_clean_reproduction": "BLOCKED — structured session mismatch is REPRODUCTION_REJECTED even with known_deviations=[] (wrong_session_detected_without_declared_deviation)",
+    "C_string_contradiction_spoof": "BLOCKED — result string cannot override the measured interval; in-band measured result yields ZERO contradictions (fixture_string_contradicts_cannot_override_measured_result)",
+    "D_ratified_boolean_spoof": "BLOCKED — amendment ratified=true with no governed record leaves the manual unamended (fixture_ratified_true_without_authority_rejected)",
+    "E_adapter_version_spoof": "BLOCKED — adapter v2 vs contract v1 -> ADAPTER_MISMATCH before normalization (wrong_observation_adapter_version_detected)",
+    "F_missing_normalization": "BLOCKED — absent normalized_value stays MISSING/NORMALIZATION_MISSING (DATA_INSUFFICIENT), never a real zero (missing_normalized_value_not_zero)",
+    "G_false_sensor_available": "BLOCKED — AVAILABLE+verified=false is not adequate; governed rule keeps DATA_BLOCKED (available_but_unverified_not_adequate)",
+    "H_wrong_sensor_resolution": "BLOCKED — AVAILABLE+VERIFIED at 5m vs 1m requirement is not adequate -> DATA_BLOCKED (available_wrong_resolution_not_adequate)",
+    "I_bool_protocol_spoof": "BLOCKED — protocol_frozen=true without a resolvable registered protocol ref stays TRANSFER_HYPOTHESIS_ONLY (protocol_frozen_boolean_without_protocol_ref_rejected)",
+    "J_incomplete_transfer_map": "BLOCKED — missing units/state-semantics/falsifiers axes -> map not structurally sound -> ANALOGY_ONLY (missing_units_scale_not_sound et al.)"
+  },
+  "b7_gate_contract": {
+    "contract_id": "B7_GATE_CONTRACT",
+    "version": "1.0",
+    "source_doc_ref": "docs/oce-golden-system/OCE_BLOCK_07_QUANT_FOUNDATION_PLAN_v1.0.md (OCE-B7-PLAN-001)",
+    "blocking": ["PIT_INTEGRITY (B7.C1.S5)", "EXECUTION_REALISM (B7.C2.S4)", "OOS_WALK_FORWARD (B7.C3.S2/S3/S5)"],
+    "advisory": ["COST_SENSITIVITY (B7.C3.S4)", "FAMILY_MULTIPLICITY (B7.C3.S5)"],
+    "conditional": ["MECHANISM_PLAUSIBILITY (B7.C2.S1)"],
+    "not_executed_surfaced": ["REPRODUCIBILITY (B7.C2.S5)", "SENSITIVITY_STRESS (B7.C3.S4)"]
+  },
+  "cerebus_source": {
+    "source_path": "quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt",
+    "hash_algorithm": "SHA-256",
+    "content_digest": "72ba79d7064404b463dfcf7d937a3a4c03565f6bad12f0ffa4fb8f6d5f011233",
+    "content_length_bytes": 366841,
+    "canonical_pdf_available": false,
+    "modified": false
+  },
+  "mutations": {
+    "cloud": 0,
+    "production": 0,
+    "capital": 0,
+    "authority": "NONE",
+    "model_calls": 0,
+    "cost_usd": 0
+  },
+  "carried": ["CON-02", "CON-03", "AMB-03", "AMB-08", "AMB-11", "AMB-12 (EMPIRICALLY_TESTED_PROVISIONAL_CONTRACT)", "AMB-13", "operator-permanence revocation ambiguity"],
+  "new_contradictions": [],
+  "new_ambiguities": [
+    "AMB-G5R-01 (documented, non-blocking): canonical CEREBUS v4 PDF is not present in the repository; source binding is to the repo text extract (quant-lab/reports/CEREBUS_v4_Manual_EXTRACTED.txt, SHA-256 72ba79d7...11233, 366841 bytes). Claim-atom fragments verified against THIS extract; if the canonical PDF later differs materially, S16 must be re-blocked and re-audited.",
+    "AMB-G5R-02 (documented, non-blocking): G5R-21 verifies protocol ref resolution, target-domain match and fingerprint validity; claim/hypothesis linkage is carried by claim_ref fields and asserted in tests but is not yet a hard governed field-level comparison inside resolve_frozen_target_protocol."
+  ],
+  "recommended_next_action": "AUTHORIZE_G6"
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "evidence_id": "EV_NEW_SENSOR_CAPABILITY",
+    "subject_ref": "NK_FAMILY_X",
+    "scope": "family_X_european",
+    "domain": "FX",
+    "claim_ref": "NK_FAMILY_X",
+    "condition_ref": "RC_NK_BLOCKER",
+    "epoch": "E11",
+    "provenance": "synthetic fixture sensor capability certification (AUTHORITATIVE_SYNTHETIC_FIXTURE)",
+    "admissible_use": ["BLOCKER_RESOLVED"],
+    "version_tag": "1.0.0"
+  },
+  {
+    "evidence_id": "EV_REJECT_1",
+    "subject_ref": "NK_FAMILY_X",
+    "scope": "family_X_european",
+    "domain": "FX",
+    "claim_ref": "NK_FAMILY_X",
+    "epoch": "E_REJECT",
+    "provenance": "historical rejection evidence",
+    "admissible_use": ["FIELD_PREDICATE"],
+    "version_tag": "1.0.0"
+  },
+  {
+    "evidence_id": "EV_REJECT_2",
+    "subject_ref": "NK_FAMILY_X",
+    "scope": "family_X_european",
+    "domain": "FX",
+    "claim_ref": "NK_FAMILY_X",
+    "epoch": "E_REJECT",
+    "provenance": "historical rejection evidence",
+    "admissible_use": ["FIELD_PREDICATE"],
+    "version_tag": "1.0.0"
+  }
+]
