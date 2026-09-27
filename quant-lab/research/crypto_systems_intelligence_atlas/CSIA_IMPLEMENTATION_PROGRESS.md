@@ -963,3 +963,35 @@ BOOK_4_ACCEPTANCE = NOT_SELF_ACCEPTED
 BOOK_5 = NOT_STARTED
 LIVE_ACQUISITION_AUTHORITY = FALSE
 ```
+
+## CHECKPOINT 20 — BOOK 4 IMPLEMENTATION ACCEPTED
+
+Note on numbering: the acceptance directive specified "CHECKPOINT 19"; that
+number was already consumed by the post-R3 fail-closed audit (commit
+1650ba7c), so acceptance is recorded as CHECKPOINT 20 to keep ledger
+numbering unambiguous.
+
+All acceptance gates passed: strict ancestry from the accepted Book 3 base
+through R1, R2, the R2 adversarial audit, R3, and the operator-directed
+fail-closed audit; zero Book 1/2/3/Sensor mutations; canonical test-selector
+partition reproduced exactly (Book 1 = 107, Book 2 = 108, Book 3 = 83 — the
+R3 narrative's 84/107 figures were reporting-only misattribution from a
+`-k bookN` string-match command, no reclassification occurred); Book 4 =
+230, total CSIA = 528 PASS; Sensor 2325/14/4 with a byte-identical failure
+set; Ruff PASS; mypy PASS (37 source files). All ratified Book 4 invariants
+reviewed and green.
+
+```text
+BOOK_4 = FROZEN_ACCEPTED
+BOOK_4_IMPLEMENTATION_ACCEPTED = TRUE
+BOOK_4_ACCEPTED_IMPLEMENTATION_ANCHOR = 1650ba7ce30633e2e4ddf141e439a13ed948c51b
+BOOK_4_EXIT_GATE = PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL
+BOOK_4_HARDENING_R1 = ACCEPTED_LINEAGE
+BOOK_4_HARDENING_R2 = ACCEPTED_LINEAGE
+BOOK_4_R2_ADVERSARIAL_AUDIT = ACCEPTED_LINEAGE
+BOOK_4_HARDENING_R3 = ACCEPTED_LINEAGE
+BOOK_4_FAIL_CLOSED_AUDIT = ACCEPTED_LINEAGE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+BOOK_5_PLANNING_AUTHORITY = TRUE
+BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
+```
