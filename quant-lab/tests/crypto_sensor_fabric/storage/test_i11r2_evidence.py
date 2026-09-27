@@ -38,6 +38,7 @@ for _path in (str(_SRC), str(_HERE)):
 from _sibling_import import extract_checkpoint_section
 
 _QUANT_LAB = _HERE.parents[2]  # quant-lab/
+_REPO_ROOT = _QUANT_LAB.parent
 EVIDENCE_DIR = (
     _QUANT_LAB / "research" / "crypto_foundry" / "sensor_fabric" / "evidence" / "bloc_04"
 )
@@ -68,6 +69,30 @@ I07R1I_HOLD_KEYS = (
 I07R1I_RATIFY_HEADING = (
     "## SENSOR-B4-I07R1I-RATIFY " + chr(0x2014) + " operator accepts the "
     "complete I07 chain, authorizes I08"
+)
+
+# ---------------------------------------------------------------------------
+# SENSOR-B4-I11R2-RATIFY: the I11R2B dashboard, frozen.
+#
+# The I11R2 regression matrix measures what the dashboard said AT I11R2B.  The
+# dashboard is a mutable dashboard and legitimately advanced at I11R2-RATIFY, so
+# a HISTORICAL checkpoint's measured evidence must not keep reading it -- that is
+# precisely the disease I11R2 repaired, re-entering from the other direction.
+# This is the same remedy `test_i07r1i_evidence.py` already uses for I07R1I: a
+# frozen projection of the dashboard AS IT WAS, resolved from the real Git
+# object and digest-pinned so it cannot drift.
+# ---------------------------------------------------------------------------
+
+LEDGER_RELPATH = (
+    "quant-lab/research/crypto_foundry/sensor_fabric/"
+    "SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md"
+)
+#: The commit at which I11R2B published its evidence and governance.
+I11R2B_DASHBOARD_COMMIT = "5766ab06"
+#: SHA-256 of that commit's ``## Current state`` block, CRLF-normalised to LF
+#: with a single trailing newline.  Verified on every run, never trusted.
+I11R2B_DASHBOARD_SHA256 = (
+    "3a69ecf01a6461a58bd85a0aa3c565093da624a44a0af0e0b86673660e045f5d"
 )
 
 
@@ -122,6 +147,35 @@ def _dashboard_rows(text: str) -> list[list[str]]:
             continue
         rows.append(cells)
     return rows
+
+
+def _frozen_i11r2b_dashboard() -> tuple[list[list[str]], str]:
+    """The I11R2B ``## Current state`` dashboard exactly as it was committed.
+
+    Returns its logical rows and the normalised governance blob, both resolved
+    from the real Git object at :data:`I11R2B_DASHBOARD_COMMIT` and verified
+    against :data:`I11R2B_DASHBOARD_SHA256`.  Nothing here touches the live
+    dashboard, so the I11R2 measured evidence stays true no matter how far the
+    operator's governance later advances.
+    """
+    text = _git("show", I11R2B_DASHBOARD_COMMIT + ":" + LEDGER_RELPATH)
+    text = text.replace(chr(13) + chr(10), chr(10))
+    lines = text.split(chr(10))
+    start = lines.index("## Current state")
+    block: list[str] = []
+    for line in lines[start:]:
+        if not line.startswith("|"):
+            if block:
+                break
+            continue
+        block.append(line)
+    digest = hashlib.sha256((chr(10).join(block) + chr(10)).encode("utf-8"))
+    assert digest.hexdigest() == I11R2B_DASHBOARD_SHA256, (
+        "frozen I11R2B dashboard digest mismatch: " + digest.hexdigest()
+    )
+    rows = _dashboard_rows(text)
+    blob = chr(10).join("|".join(row) for row in rows).replace(" = ", "=")
+    return rows, blob
 
 
 def _old_i07r1i_binding(text: str) -> bool:
@@ -306,7 +360,11 @@ def _git(*args: str) -> str:
         ["git", *args],
         cwd=_QUANT_LAB,
         capture_output=True,
-        text=True,
+        # Explicit UTF-8: ``text=True`` alone decodes with the Windows locale
+        # (cp1252).  ``git show`` of the governance ledger contains em-dashes and
+        # would otherwise be mis-decoded before the frozen digest is computed.
+        encoding="utf-8",
+        errors="replace",
         check=False,
     )
     return result.stdout
@@ -529,9 +587,14 @@ def build_i11r2_governance_regression_matrix() -> dict[str, Any]:
     mismatched = evidence["mismatched"]
     missing = evidence["missing"]
     crlf_only = evidence["crlf_only"]
-    rows = _dashboard_rows(ledger_text)
-    checkpoint_rows = [row for row in rows if row[0] == "Current checkpoint"]
-    governance_blob = chr(10).join("|".join(row) for row in rows).replace(" = ", "=")
+    # SENSOR-B4-I11R2-RATIFY: the live dashboard has legitimately advanced past
+    # I11R2, so the I11R2 measurement below is taken against the FROZEN I11R2B
+    # dashboard instead.  The deliberately pre-I11R2 counterfactuals keep
+    # reading the live text, which is the point: they must still FAIL.
+    frozen_rows, frozen_blob = _frozen_i11r2b_dashboard()
+    frozen_checkpoint_rows = [
+        row for row in frozen_rows if row[0] == "Current checkpoint"
+    ]
     ratify = extract_checkpoint_section(ledger_text, I07R1I_RATIFY_HEADING)
 
     storage = runs["storage"]["counts"]
@@ -716,34 +779,34 @@ def build_i11r2_governance_regression_matrix() -> dict[str, Any]:
                 "current_state_not_pinned_to_superseded_checkpoint",
                 "i07r1i_ratification_still_recorded",
             ],
-            current_state_rows_two_columns=all(len(row) == 2 for row in rows) and bool(rows),
-            current_checkpoint_row_exactly_one=len(checkpoint_rows) == 1,
+            current_state_rows_two_columns=all(len(row) == 2 for row in frozen_rows) and bool(frozen_rows),
+            current_checkpoint_row_exactly_one=len(frozen_checkpoint_rows) == 1,
             current_state_names_i11_chain=(
-                len(checkpoint_rows) == 1 and "SENSOR-B4-I11" in checkpoint_rows[0][1]
+                len(frozen_checkpoint_rows) == 1 and "SENSOR-B4-I11" in frozen_checkpoint_rows[0][1]
             ),
             current_state_g4_10_not_operator_accepted=(
                 "G4-10_OPERATIONAL_METADATA_GATE=IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW"
-                in governance_blob
-                and "G4-10_OPERATIONAL_METADATA_GATE=OPERATOR_HOLD" not in governance_blob
-                and "G4-10_OPERATIONAL_METADATA_GATE=PASS" not in governance_blob
+                in frozen_blob
+                and "G4-10_OPERATIONAL_METADATA_GATE=OPERATOR_HOLD" not in frozen_blob
+                and "G4-10_OPERATIONAL_METADATA_GATE=PASS" not in frozen_blob
             ),
             current_state_next_checkpoint_false=(
-                "next_checkpoint_authorized=FALSE" in governance_blob
+                "next_checkpoint_authorized=FALSE" in frozen_blob
             ),
             current_state_i12_unauthorized=(
-                "I12+ unauthorized" in governance_blob
-                or "I12+ remain unauthorized" in governance_blob
+                "I12+ unauthorized" in frozen_blob
+                or "I12+ remain unauthorized" in frozen_blob
             ),
             current_state_research_frozen=(
-                "research frozen" in governance_blob
-                or "research remains frozen" in governance_blob
+                "research frozen" in frozen_blob
+                or "research remains frozen" in frozen_blob
             ),
             current_state_not_pinned_to_superseded_checkpoint=(
-                len(checkpoint_rows) == 1
-                and "SENSOR-B4-I07R1I" not in checkpoint_rows[0][1]
-                and "SENSOR-B4-I10R2" not in checkpoint_rows[0][1]
+                len(frozen_checkpoint_rows) == 1
+                and "SENSOR-B4-I07R1I" not in frozen_checkpoint_rows[0][1]
+                and "SENSOR-B4-I10R2" not in frozen_checkpoint_rows[0][1]
                 and "DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE"
-                not in governance_blob
+                not in frozen_blob
             ),
             i07r1i_ratification_still_recorded=(
                 "OPERATOR_ACCEPTED" in ratify
@@ -941,3 +1004,228 @@ def test_i11r2_does_not_rewrite_historical_evidence() -> None:
     # The documented I04 Path.write_text line-ending churn is recorded, and is
     # only ever tolerated for the exact, closed set of artifacts named above.
     assert set(evidence["crlf_only"]) <= I04_CRLF_CHURN_ALLOWLIST, evidence["crlf_only"]
+
+
+# ===========================================================================
+# SENSOR-B4-I11R2-RATIFY -- the operator acceptance, pinned as law.
+#
+# These live in THIS module rather than a new `test_i11r2_ratify_evidence.py`
+# on purpose.  A new tracked .py file would raise the repository's tracked
+# Python count and would itself trip the I11R2C binding audit's three
+# predicates, mutating that frozen artifact.  This module is already an
+# allowlisted, already-a-ledger-reader module, so extending it keeps the
+# audit's committed measurement intact.
+# ===========================================================================
+
+RATIFICATION_ARTIFACT = EVIDENCE_DIR / "BLOC_04_I11_CHAIN_OPERATOR_RATIFICATION.md"
+RATIFIED_HEAD = "fa6df668ca3351eb910b0450d1151c67482b2b24"
+RATIFIED_CHAIN = (
+    ("09fc62f6", "SENSOR-B4-I11:"),
+    ("81dd7828", "SENSOR-B4-I11R1A:"),
+    ("05369fee", "SENSOR-B4-I11R1B:"),
+    ("8311e61b", "SENSOR-B4-I11R1C:"),
+    ("ccc6a726", "SENSOR-B4-I11R1D:"),
+    ("b5d45007", "SENSOR-B4-I11R2A:"),
+    ("5766ab06", "SENSOR-B4-I11R2B:"),
+    ("fa6df668", "SENSOR-B4-I11R2C:"),
+)
+
+#: What the ratified live dashboard must now say.
+RATIFIED_GOVERNANCE = (
+    "PASS_SENSOR_B4_I11_POSTGRES_OPERATIONAL_METADATA_SEALED=OPERATOR_ACCEPTED",
+    "PASS_SENSOR_B4_I11R1_RUNTIME_CORRECTNESS_SEALED=OPERATOR_ACCEPTED",
+    "PASS_SENSOR_B4_I11R2_GOVERNANCE_REGRESSION_SEALED=OPERATOR_ACCEPTED",
+    "G4-10_OPERATIONAL_METADATA_GATE=IMPLEMENTATION_PASS",
+    "next_checkpoint_authorized=TRUE",
+    "next_checkpoint=SENSOR-B4-I12",
+    "authorized_scope=I12 ONLY",
+    "I13+ unauthorized",
+    "research frozen",
+)
+
+#: What the ratified live dashboard must NOT still claim.  These are the
+#: pre-ratification values; their presence would mean the ratification was
+#: recorded in a new section but never applied to the live dashboard.
+SUPERSEDED_GOVERNANCE = (
+    "G4-10_OPERATIONAL_METADATA_GATE=IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW",
+    "PASS_SENSOR_B4_I11R2_GOVERNANCE_REGRESSION_SEALED=PENDING_OPERATOR_REVIEW",
+    "next_checkpoint_authorized=FALSE",
+)
+
+
+#: Any claim of scope beyond I12.  The ratified boundary is I12 ONLY, so these
+#: must never appear.  Note ``I13+ unauthorized`` is REQUIRED and is therefore
+#: deliberately not in this list -- the two differ by two characters, and the
+#: counterfactual below exists to prove the distinction is actually enforced.
+BEYOND_AUTHORIZED_SCOPE = (
+    "authorized_scope=I13",
+    "I13 authorized",
+    "I13+ authorized",
+    "authorized_scope=I12 AND I13",
+    "authorized_scope=ALL",
+)
+
+
+def _ratification_is_sound(rows: list[list[str]]) -> bool:
+    """Does this dashboard state a coherent ratified I11 chain, I12 only?
+
+    Checkpoint-agnostic: it asks the dashboard to agree with itself, so it stays
+    true at the ratification and at any later authorized checkpoint.
+    """
+    blob = chr(10).join("|".join(row) for row in rows).replace(" = ", "=")
+    if any(item in blob for item in SUPERSEDED_GOVERNANCE):
+        return False
+    if any(item in blob for item in BEYOND_AUTHORIZED_SCOPE):
+        return False
+    # The scope must be stated EXACTLY, not merely present: a dashboard that
+    # says "I12 ONLY" and also "I13" is not a coherent boundary statement.
+    scopes = re.findall(r"authorized_scope=([A-Z0-9 +]*)", blob)
+    if not scopes or any(scope != "I12 ONLY" for scope in scopes):
+        return False
+    return all(item in blob for item in RATIFIED_GOVERNANCE)
+
+
+def test_ratification_artifact_is_committed_and_lf() -> None:
+    """The ratification record exists, is UTF-8, and stays normal LF."""
+    assert RATIFICATION_ARTIFACT.is_file(), RATIFICATION_ARTIFACT
+    raw = RATIFICATION_ARTIFACT.read_bytes()
+    raw.decode("utf-8")
+    assert b"\r\n" not in raw, "ratification record must be LF"
+    text = raw.decode("utf-8")
+    for required in (
+        RATIFIED_HEAD,
+        "external_ci = NONE_OBSERVED",
+        "authorized_scope                                         = I12 ONLY",
+        "I13+                                                      = UNAUTHORIZED",
+        "Production diff across the I11R2 chain",
+        "| I12 | not started |",
+    ):
+        assert required in text, required
+
+
+def test_ratified_chain_is_append_only_and_linear() -> None:
+    """Every ratified commit resolves, is named, and has exactly one parent."""
+    previous = ""
+    for short, prefix in RATIFIED_CHAIN:
+        resolved = _git("rev-parse", "--verify", "--quiet", short + "^{commit}").strip()
+        assert resolved, "unresolvable ratified commit: " + short
+        subject = _git("log", "-1", "--format=%s", short).strip()
+        assert subject.startswith(prefix), (short, subject)
+        parents = _git("log", "-1", "--format=%P", short).split()
+        assert len(parents) == 1, (short, "not a single-parent commit")
+        if previous:
+            assert parents[0].startswith(previous), (
+                short,
+                "parent is not the previous ratified commit",
+            )
+        previous = resolved[:8]
+
+    # No merge anywhere in the ratified range: nothing was folded together.
+    merges = [
+        line
+        for line in _git(
+            "rev-list", "--merges", "09fc62f6^.." + RATIFIED_HEAD
+        ).splitlines()
+        if line.strip()
+    ]
+    assert not merges, merges
+
+
+def test_ratified_head_is_in_this_history() -> None:
+    """The ratified head is an ancestor of the current commit."""
+    assert RATIFIED_HEAD in _git("rev-list", "HEAD").split()
+
+
+def test_ratified_governance_is_live_and_truthful() -> None:
+    """The live dashboard states the ratification, and nothing superseded."""
+    rows = _dashboard_rows(LEDGER.read_text(encoding="utf-8"))
+    assert _ratification_is_sound(rows)
+    blob = chr(10).join("|".join(row) for row in rows).replace(" = ", "=")
+    assert "SENSOR-B4-I11R2-RATIFY" in blob
+    assert "research frozen" in blob
+
+
+def test_counterfactual_i13_authorization_is_refused() -> None:
+    """A dashboard claiming I13 is NOT accepted as a coherent ratification.
+
+    The synthetic doctored row is the counterfactual: it must make the
+    ratification law FAIL.  If this ever passes silently, the law has stopped
+    constraining the authorization boundary.
+    """
+    rows = _dashboard_rows(LEDGER.read_text(encoding="utf-8"))
+    assert _ratification_is_sound(rows), "the real dashboard must be sound first"
+    doctored = rows + [
+        [
+            "next_checkpoint_authorized",
+            "TRUE; next_checkpoint=SENSOR-B4-I13; authorized_scope=I13 ONLY; "
+            "I13+ authorized",
+        ]
+    ]
+    assert not _ratification_is_sound(doctored)
+
+
+def test_ratification_changed_no_production_source() -> None:
+    """Governance only: production source is untouched, uncommitted or not."""
+    assert not _production_untouched(), _production_untouched()
+    assert not [
+        line
+        for line in _git(
+            "diff", "--name-only", RATIFIED_HEAD, "HEAD", "--", "quant-lab/src"
+        ).splitlines()
+        if line.strip()
+    ]
+
+
+def test_ratification_changed_no_historical_evidence() -> None:
+    """No pre-existing evidence artifact is added, removed or rewritten."""
+    evidence = _evidence_hashes_unchanged()
+    assert not evidence["mismatched"], evidence["mismatched"]
+    assert not evidence["missing"], evidence["missing"]
+    assert set(evidence["crlf_only"]) <= I04_CRLF_CHURN_ALLOWLIST, evidence["crlf_only"]
+
+    # The 131-entry baseline predates the I11R2 artifacts, so "added vs
+    # baseline" would flag those too.  Prove it against the ratified head
+    # instead: the ONLY evidence-path change since then is this record.
+    changed = [
+        line
+        for line in _git(
+            "diff",
+            "--name-status",
+            RATIFIED_HEAD,
+            "HEAD",
+            "--",
+            str(EVIDENCE_DIR.relative_to(_REPO_ROOT)),
+        ).splitlines()
+        + _git(
+            "status",
+            "--porcelain",
+            "--",
+            str(EVIDENCE_DIR.relative_to(_REPO_ROOT)),
+        ).splitlines()
+        if line.strip()
+    ]
+    touched = {line.split()[-1].split("/")[-1] for line in changed}
+    assert touched <= {RATIFICATION_ARTIFACT.name}, touched
+
+
+def test_g4_10_contract_holds_in_committed_code() -> None:
+    """The accepted contract is enforced in source, not only in prose."""
+    source = (
+        _HERE.parents[2]
+        / "src"
+        / "crypto_sensor_fabric"
+        / "storage"
+        / "postgres_metadata.py"
+    ).read_text(encoding="utf-8")
+    assert 'SCHEMA_NAME = "crypto_sensor_fabric_ops"' in source
+    assert 'REPOSITORY_ROLE = "operational_metadata_non_raw"' in source
+    for forbidden in ("payload", "body", "content", "raw", "book_level", "bytea"):
+        assert '"' + forbidden + '"' in source, forbidden
+    assert "forbidden raw-storage column" in source
+    assert "raw or structured content refused" in source
+    assert "secret-shaped value refused" in source
+
+    # Resume tokens are absent from the PostgreSQL acquisition contract.
+    acquisitions = source.split("acquisitions", 1)[-1]
+    assert "resume_token" not in acquisitions.lower()
+

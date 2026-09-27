@@ -672,12 +672,27 @@ def test_current_state_is_a_dashboard_not_a_historical_checkpoint() -> None:
     checkpoint_rows = [row for row in rows if row[0] == "Current checkpoint"]
     assert len(checkpoint_rows) == 1
     current = checkpoint_rows[0][1]
+    authorization_rows = [
+        row for row in rows if row[0] == "next_checkpoint_authorized"
+    ]
+    assert len(authorization_rows) == 1, authorization_rows
 
     # Present-checkpoint truth only.
     assert "SENSOR-B4-I11" in current
     assert "research frozen" in current
     assert "I12" in current
-    assert "next_checkpoint_authorized=FALSE" in table
+
+    # SENSOR-B4-I11R2-RATIFY: INTERNAL CONSISTENCY, not a hard-coded value.
+    # This law used to demand ``next_checkpoint_authorized=FALSE``, which was
+    # true only while the I11 chain awaited review.  The operator then accepted
+    # the chain and authorized I12, and a hard-coded FALSE would have become the
+    # SAME stale-dashboard disease I11R2 just repaired, pointing the other way:
+    # a test that refuses to let the operator's own decision become visible.
+    # What must always hold is that the dashboard agrees with ITSELF.
+    authorized = "next_checkpoint_authorized=TRUE" in table
+    assert ("next_checkpoint=" in table) == authorized
+    assert ("authorized_scope=" in table) == authorized
+
     # Never a superseded checkpoint's proposal state.
     assert "SENSOR-B4-I07R1I" not in current
     assert "DURABLE_RESUME_IMPLEMENTED=PENDING_OPERATOR_ACCEPTANCE" not in table

@@ -11,10 +11,10 @@ that is updated at every staged checkpoint.
 | Field | Value |
 |---|---|
 | Current Bloc | 4 — IMMUTABLE T0 RAW EVIDENCE LAKE |
-| Current checkpoint | SENSOR-B4-I11R2: historical governance-test decoupling + green regression closure. The two remaining failures were TEST-ARCHITECTURE failures, not PostgreSQL implementation failures: two accepted historical checkpoint tests read the MUTABLE top-level `## Current state` dashboard instead of immutable checkpoint history, so they broke the moment I07R1I and I10R2 were legitimately ratified. I07R1I proposal truth now binds to its committed measured `BLOC_04_I07R1I_LEDGER_STRUCTURE_MATRIX.json`; I10R2 governance truth binds to its committed microseal's exact `## Governance` section; a strict `extract_checkpoint_section` helper enforces exact-heading, single-section, peer-bounded extraction. The superseding I07R1I-RATIFY verdict is pinned by its own exact section, and the live dashboard is now proven present-checkpoint-only. Production diff is ZERO, all 131 historical evidence artifacts are byte-identical, and the full regression is GREEN: storage 1488 passed / 25 skipped / 0 failed, non-storage 1379 passed / 1 skipped / 0 failed, full project 2867 passed / 26 skipped / 0 failed. G4-10 is NOT self-ratified. I12+ unauthorized; research frozen |
+| Current checkpoint | SENSOR-B4-I11R2-RATIFY: operator acceptance of the complete PostgreSQL operational metadata chain. The operator reviewed and ACCEPTED I11 -> I11R1 -> I11R2A -> I11R2B -> I11R2C at ratified head fa6df668ca3351eb910b0450d1151c67482b2b24, having confirmed: the commit chain is append-only and linear with zero merge commits and no rebase, reset, amend, squash or force push; the G4-10 contract holds in committed code (schema crypto_sensor_fabric_ops, repository role operational_metadata_non_raw, forbidden raw and secret columns and secret-shaped values refused, resume tokens absent, PostgreSQL authoritative for no prior subsystem); the real PostgreSQL 16.15 evidence records the 18-row 9-table populated reconstruction, exact schema, drop/reinstall/rebuild parity, idempotence, failed-refresh rollback, concurrent-refresh serialisation, the I07/I08/I09 tamper firewalls, preserved operational state and unchanged T0 evidence; both historical governance tests are bound to immutable evidence rather than the mutable dashboard; and production diff is ZERO with historical evidence diff ZERO. This checkpoint is GOVERNANCE ONLY: no production source, no historical evidence artifact, no provider code, no DuckDB I10 code, no frozen Bloc-4 plan and no main branch change. external_ci = NONE_OBSERVED. next_checkpoint_authorized=TRUE for SENSOR-B4-I12 RAW EVIDENCE QUERY / REPLAY API, authorized_scope = I12 ONLY; I13+ unauthorized; research frozen. I12 is AUTHORIZED but NOT STARTED. |
 | Bloc 2 verdict | PASS_BLOC_02_WITH_SENSOR_GAPS (co-earned PASS_BLOC_02_FREE_ONLY_REDUNDANCY) — IMPLEMENTATION COMPLETE, OPERATOR RATIFIED (SENSOR-B2-RATIFY) |
 | Bloc 1 verdict | PASS_BLOC_01_CONTRACTS_FROZEN — operator_ratified = TRUE (see evidence/bloc_01/BLOC_01_DECISION.md) |
-| Operator review state | I11R2 is not self-ratified. The I11R2 success law is satisfied (both stale governance tests repaired, no production change, no historical evidence change, I11R1 measured evidence unchanged, full storage and full project suites at zero failures, no new Ruff or mypy regressions), so the G4-10 blocker recorded at I11R1 is cleared. Governance: PASS_SENSOR_B4_I11_POSTGRES_OPERATIONAL_METADATA_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I11R1_RUNTIME_CORRECTNESS_SEALED=OPERATOR_HOLD; PASS_SENSOR_B4_I11R2_GOVERNANCE_REGRESSION_SEALED=PENDING_OPERATOR_REVIEW; G4-10_OPERATIONAL_METADATA_GATE=IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW; next_checkpoint_authorized=FALSE; recommended_next=OPERATOR REVIEW OF COMPLETE I11 -> I11R1 -> I11R2 CHAIN. I12+ unauthorized; research frozen. |
+| Operator review state | I11 chain OPERATOR_ACCEPTED by the operator at ratified head fa6df668ca3351eb910b0450d1151c67482b2b24. PASS_SENSOR_B4_I11_POSTGRES_OPERATIONAL_METADATA_SEALED=OPERATOR_ACCEPTED; PASS_SENSOR_B4_I11R1_RUNTIME_CORRECTNESS_SEALED=OPERATOR_ACCEPTED; PASS_SENSOR_B4_I11R2_GOVERNANCE_REGRESSION_SEALED=OPERATOR_ACCEPTED; G4-10_OPERATIONAL_METADATA_GATE=IMPLEMENTATION_PASS; next_checkpoint_authorized=TRUE; next_checkpoint=SENSOR-B4-I12 RAW EVIDENCE QUERY / REPLAY API; authorized_scope=I12 ONLY; I13+ unauthorized; research frozen. recommended_next=SENSOR-B4-I12 IMPLEMENTATION. This ratification is operator authority, not self-ratification: no checkpoint in the I11 chain ever ratified itself. The ratification record is the append-only BLOC_04_I11_CHAIN_OPERATOR_RATIFICATION.md. |
 | human_review_required | TRUE |
 | Bloc 2 implementation_authorized | TRUE (COMPLETE — ratified) |
 | Bloc 3 implementation_authorized | TRUE — common foundation complete/hardened/behaviorally closed (SENSOR-B3-I01..I04 + I04R1 + I04R2); provider_adapter_implementation_authorized = NONE beyond I08 (Kraken + Gate + OKX + Deribit implemented offline; next step requires operator authorization) |
@@ -25,7 +25,7 @@ that is updated at every staged checkpoint.
 | Base planning commit | `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | Planning head (frozen) | `agent/crypto-sensor-fabric-plan` @ `4bb677f9e0266f4dc48405181696019f359ae49f` |
 | next_provider_authorized | FALSE (all four I14 production providers implemented offline; no further provider without operator authorization) |
-| next_checkpoint_authorized | FALSE - the I11 -> I11R1 -> I11R2 chain is implemented, measured and regression-green, and G4-10 is IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW; operator review of the complete chain is required before any next checkpoint is authorized. I12+ remain unauthorized; research remains frozen. |
+| next_checkpoint_authorized | TRUE - the operator accepted the complete I11 -> I11R1 -> I11R2 chain at ratified head fa6df668ca3351eb910b0450d1151c67482b2b24 and G4-10 is IMPLEMENTATION_PASS. next_checkpoint=SENSOR-B4-I12 RAW EVIDENCE QUERY / REPLAY API; authorized_scope=I12 ONLY; I13+ unauthorized; research remains frozen. I12 is AUTHORIZED but NOT STARTED as of this commit. |
 
 ## Append-only SENSOR-B4-I10R1 / I10R2 checkpoint history
 
@@ -2400,3 +2400,136 @@ changed scope.  Regression green: storage **1491** passed / 25 skipped /
 deliberately **not** regenerated: they record the tree I11R2A/B was published
 against, and rewriting a published evidence artifact would itself be the
 append-only violation this checkpoint exists to prevent.
+
+## SENSOR-B4-I11R2-RATIFY — operator accepts the complete I11 chain, authorizes I12
+
+Ratified head: `fa6df668ca3351eb910b0450d1151c67482b2b24` on branch
+`agent/crypto-sensor-fabric-build`.  Append-only: this section is new;
+no prior checkpoint-history section was rewritten, and no historical
+evidence artifact was regenerated.
+
+### The chain accepted
+
+`09fc62f6` I11 -> `81dd7828` I11R1A -> `05369fee` I11R1B -> `8311e61b`
+I11R1C -> `ccc6a726` I11R1D -> `b5d45007` I11R2A -> `5766ab06` I11R2B
+-> `fa6df668` I11R2C.  Verified linear: every commit has exactly one
+parent, the range contains zero merge commits, and no rebase, reset,
+amend, squash or force push occurred at any point.
+
+### What was verified before acceptance
+
+- **G4-10 contract**, from committed code: PostgreSQL is operational
+  metadata and state only; schema `crypto_sensor_fabric_ops`;
+  repository role `operational_metadata_non_raw`; no raw payload, no
+  BYTEA market store, no full trade rows, no book-level bulk payloads,
+  no generic raw body/content/data escape hatch, no resume-token
+  persistence in PostgreSQL acquisitions.  PostgreSQL is not authority
+  for raw T0 evidence, I07 job resume/checkpoint, I08 recovery journal
+  or I09 quota policy.
+- **Real PostgreSQL 16.15 execution**, not static SQL inference: the
+  18-row / 9-table populated reconstruction, exact schema validation,
+  drop/reinstall/rebuild parity, idempotence, zero T0A verify/open/
+  decode calls, failed-refresh rollback, concurrent-refresh
+  serialisation, the I07/I08/I09 tamper firewalls, preserved
+  operational state, unchanged T0 evidence, and refused schema attacks
+  are all committed measured evidence.
+- **Governance repair**: I07R1I proposal truth binds to its committed
+  measured `BLOC_04_I07R1I_LEDGER_STRUCTURE_MATRIX.json`; I10R2
+  governance truth binds to its committed microseal's exact
+  `## Governance` section.  The live dashboard is proven
+  present-checkpoint-only.  I11R2C changed no governance verdict --
+  its dashboard was byte-identical to I11R2B's.
+- **Regression closure**, as recorded append-only at I11R2C: storage
+  1491 passed / 25 skipped / 0 failed, non-storage 1379 / 1 / 0, full
+  project 2870 / 26 / 0.  The I11R2A/B run record and matrix were
+  deliberately not regenerated.
+- **Immutability**: production diff ZERO across the I11R2 chain, 131
+  pre-existing evidence artifacts byte-identical, I11/I11R1 artifacts
+  unchanged, providers unchanged, DuckDB I10 unchanged, frozen Bloc-4
+  plan unchanged, `main` unchanged.
+
+### Two defects found and fixed at ratification
+
+**The I11R2C audit could not scan itself.**  It scans
+`git ls-files '*.py'`, but when it first ran the auditor was still
+untracked, so it measured 965 files and never saw its own source --
+which necessarily contains all three predicate literals because it
+defines them.  The committed artifact's `python_files_scanned: 965` and
+`unexpected_hits: {}` were accurate for the tree scanned but
+**incomplete as a claim**: the repository now holds 966 tracked Python
+files, and the true number of modules that open the governance ledger
+is three, not the two the artifact names.  The artifact is frozen
+evidence and was deliberately NOT rewritten.  Instead the self-exclusion
+is explicit and commented in the auditor, and a new test
+`test_audit_excludes_only_itself` prevents it from ever growing
+silently.
+
+**Git output was decoded with the Windows locale.**  Both evidence
+modules called `subprocess.run(..., text=True)` with no explicit
+encoding, which decodes as cp1252 on this host and silently
+mis-decoded the ledger's em-dashes before the frozen-projection digest
+was computed.  Both now decode UTF-8 explicitly, and the frozen I11R2B
+dashboard digest is recomputed from the real Git object on every run.
+
+### Dashboard dependency, closed in both directions
+
+Ratification legitimately advances the dashboard, which exposed a
+mirror image of the I11R2 defect.  The I11R2 measured matrix asserted
+`next_checkpoint_authorized=FALSE` against the *live* dashboard, so a
+historical checkpoint's own evidence would have broken the moment the
+operator ratified.  Its `current_state_still_truthful` row is now
+measured against the **frozen I11R2B dashboard**, resolved from the Git
+object at `5766ab06` and digest-pinned, so the committed matrix
+regenerates byte-for-byte at any later governance state.  The
+present-checkpoint law in `test_job_state_r1i.py` stays a live test but
+now asserts **internal consistency** -- the authorization field must
+agree with the checkpoint the dashboard claims -- instead of a
+hard-coded pre-ratification `FALSE`.
+
+### External CI truth
+
+`external_ci = NONE_OBSERVED`.  No external check-runs were observed on
+the ratified head and no external CI is claimed.  Local verification is
+the accepted evidence source.
+
+### Non-blocking future hardening notes
+
+Recorded, not blocking, and deliberately not actioned -- no I11R3 was
+created for any of them:
+
+- **A.** The audit keys scan hits by **basename**; two same-named
+  modules in different directories would collide.  Repo-relative path
+  identity would remove that.
+- **B.** The audit detects explicit **literal** dependency shapes.  It
+  is not a formal static-analysis proof and cannot see a dynamically
+  constructed path or read.
+- **C.** Accepted I04 tests write seven `BLOC_04_I0*` artifacts with
+  `Path.write_text` and can still produce Windows CRLF churn in a
+  non-byte-faithful worktree.
+- **D.** Machine-wide `core.autocrlf=true` remains an environment
+  hygiene issue, distinct from this repository's configuration.
+- **E.** The disposable local PostgreSQL runtime later exhibited
+  Windows `0xC0000142` faults after the completed measured run.  The
+  I11R1 evidence already records the completed real-PG execution and is
+  not invalidated by this.
+
+### Authorization boundary
+
+```
+PASS_SENSOR_B4_I11_POSTGRES_OPERATIONAL_METADATA_SEALED = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I11R1_RUNTIME_CORRECTNESS_SEALED          = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I11R2_GOVERNANCE_REGRESSION_SEALED        = OPERATOR_ACCEPTED
+G4-10_OPERATIONAL_METADATA_GATE                          = IMPLEMENTATION_PASS
+next_checkpoint_authorized                               = TRUE
+next_checkpoint                                          = SENSOR-B4-I12 RAW EVIDENCE QUERY / REPLAY API
+authorized_scope                                         = I12 ONLY
+I13+                                                      = UNAUTHORIZED
+research                                                  = FROZEN
+recommended_next                                         = SENSOR-B4-I12 IMPLEMENTATION
+```
+
+This ratification accepts the PostgreSQL operational metadata repository
+and its governance/regression closure **only**.  It is not acceptance of
+I12 or any later Bloc-4 work.  Research remains frozen.  I12 is
+authorized but **not started**; it must not begin in the ratification
+run.

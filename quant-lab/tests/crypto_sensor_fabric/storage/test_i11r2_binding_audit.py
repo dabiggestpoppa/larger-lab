@@ -101,15 +101,50 @@ ALLOWLIST: dict[str, str] = {
 #: the heading in a comment is harmless; opening the dashboard is not.
 LEDGER_READERS = frozenset({"test_i11r2_evidence.py", "test_job_state_r1i.py"})
 
+#: SENSOR-B4-I11R2-RATIFY: this auditor, excluded from its own scan BY PATH and
+#: declared here in the open.
+#:
+#: When the audit was first published it was still UNTRACKED, so ``git
+#: ls-files '*.py'`` could not see it and it never scanned itself.  The
+#: committed artifact is frozen evidence and is deliberately NOT rewritten, so
+#: the live scan must reproduce the conditions the artifact was measured under:
+#: every tracked ``.py`` file EXCEPT this one.
+#:
+#: The exclusion is legitimate and narrow.  This module trips all three
+#: predicates for the most defensible reason possible -- it is the code that
+#: DEFINES the predicates, so the literals, the heading and the ledger path
+#: must appear in it -- and it opens the ledger solely to verify the frozen
+#: I07R1I provenance pin against the real Git object.  It asserts no historical
+#: checkpoint truth from the dashboard, which is the actual defect being policed.
+#:
+#: The cost is recorded, not hidden: the artifact's completeness claim was
+#: understated by exactly this module, and the true number of modules that open
+#: the governance ledger is three, not the two the artifact names.  That
+#: correction is stated in the I11R2-RATIFICATION record.  ``test_audit_excludes
+#: _only_itself`` keeps this exclusion from ever growing silently.
+SELF_EXCLUDED = frozenset({"test_i11r2_binding_audit.py"})
+
 
 def _git(*args: str) -> str:
     result = subprocess.run(
         ["git", "-C", str(_REPO_ROOT), *args],
         capture_output=True,
-        text=True,
+        # Explicit UTF-8: ``text=True`` alone decodes with the Windows locale
+        # (cp1252), which silently mis-decodes any non-ASCII path or content.
+        encoding="utf-8",
+        errors="replace",
         check=False,
     )
     return result.stdout
+
+
+def _scanned_paths() -> list[str]:
+    """Tracked ``.py`` files this audit actually scanned (self excluded)."""
+    return [
+        line.strip()
+        for line in _git("ls-files", "*.py").splitlines()
+        if line.strip() and Path(line.strip()).name not in SELF_EXCLUDED
+    ]
 
 
 def _scan() -> dict[str, dict[str, list[str]]]:
@@ -119,7 +154,7 @@ def _scan() -> dict[str, dict[str, list[str]]]:
     }
     for path in _git("ls-files", "*.py").splitlines():
         path = path.strip()
-        if not path:
+        if not path or Path(path).name in SELF_EXCLUDED:
             continue
         source = (_REPO_ROOT / path).read_text(encoding="utf-8", errors="replace")
         for name, needle in PREDICATES.items():
@@ -173,7 +208,7 @@ def _case(name: str, required: list[str], **values: Any) -> dict[str, Any]:
 
 def build_governance_binding_audit() -> dict[str, Any]:
     hits = _scan()
-    scanned = len(_git("ls-files", "*.py").splitlines())
+    scanned = len(_scanned_paths())
     rows_literal, source_commit, pinned_digest = _frozen_projection()
     matrix = json.loads(I07R1I_MATRIX.read_text(encoding="utf-8"))
     cases = {row["case"]: row for row in matrix["cases"]}
@@ -405,3 +440,35 @@ def test_frozen_i07r1i_pin_is_enforced_not_decorative() -> None:
         "the frozen I07R1I Current-state projection no longer matches its "
         "pinned provenance commit"
     )
+
+def test_audit_excludes_only_itself() -> None:
+    """SENSOR-B4-I11R2-RATIFY: the self-exclusion is exactly one file, and it
+    is the auditor.
+
+    The auditor trips all three predicates because it *defines* them, and when
+    it first ran it was still untracked, so its own committed artifact could not
+    see it.  The artifact is frozen evidence and is not rewritten; instead the
+    exclusion is declared in ``SELF_EXCLUDED`` and pinned here so it can never
+    quietly grow to cover a real offender.
+    """
+    assert SELF_EXCLUDED == frozenset({"test_i11r2_binding_audit.py"})
+
+    scanned = _scanned_paths()
+    assert scanned, "the audit scanned nothing"
+    # The auditor exists and is tracked, yet is not in its own scan.
+    tracked = _git("ls-files", "*.py").splitlines()
+    assert any(
+        line.strip().endswith("test_i11r2_binding_audit.py") for line in tracked
+    ), "the auditor is not tracked, so the self-exclusion is moot"
+    assert all(
+        Path(path).name not in SELF_EXCLUDED for path in scanned
+    ), "a self-excluded file leaked into the scan"
+
+    # No OTHER module is excluded: the only way to lose a file from the scan is
+    # SELF_EXCLUDED, so the excluded set is exactly the tracked set minus the
+    # scanned set.
+    tracked_names = {Path(line.strip()).name for line in tracked if line.strip()}
+    assert tracked_names - {Path(path).name for path in scanned} == SELF_EXCLUDED
+
+
+
