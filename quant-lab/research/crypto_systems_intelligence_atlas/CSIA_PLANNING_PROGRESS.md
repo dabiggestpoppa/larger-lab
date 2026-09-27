@@ -744,3 +744,33 @@ NEXT = BOOK 4 OFFLINE IMPLEMENTATION AUTHORIZATION
 Errata artifact:
 
 - `CSIA_BOOK_4_RATIFICATION_ERRATA_v0.1.md`
+
+# GOVERNANCE BRIDGE — BOOK 4 IMPLEMENTATION ACCEPTED (2026-09-26)
+
+Book 4 implementation completed its full hardening lineage (R1, R2, R2
+adversarial audit, R3 multi-provider independence completeness, and the
+operator-directed fail-closed decision-point audit) and passed operator
+acceptance review on the implementation branch
+`agent/crypto-systems-intelligence-atlas-book4-build`. This bridge records
+the governance transition only; no implementation code is merged into the
+planning branch.
+
+```text
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_4 = FROZEN_ACCEPTED
+BOOK_4_ACCEPTED_IMPLEMENTATION_ANCHOR = 1650ba7ce30633e2e4ddf141e439a13ed948c51b
+BOOK_4_ACCEPTANCE_COMMIT = a2526e8220513b34967ab11f227ddbddc14e7e4a
+BOOK_4_EXIT_GATE = PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL
+TOTAL_CSIA_AT_ACCEPTANCE = 528 PASS
+CRYPTO_SENSOR_AT_ACCEPTANCE = 2325 PASS / 14 FAIL / 4 SKIPPED (canonical baseline)
+BOOK_5_PLANNING_AUTHORITY = TRUE
+BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+NEXT = BOOK 5 PLANNING SESSION
+```
+
+Acceptance record:
+`CSIA_BOOK_4_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md` (on the
+implementation branch at the acceptance commit).
