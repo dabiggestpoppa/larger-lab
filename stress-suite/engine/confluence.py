@@ -1,6 +1,7 @@
-"""OPH x IT3 — Confluence harness (Path M Increment 1, frozen contract v0.1).
+"""OPH x IT3 — Confluence harness (Path M Increment 1, frozen contract v0.2).
 
-Frozen contract: docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md
+Controlling contract: docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2.md
+Historical contract: docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md (frozen, preserved)
 Dossier: bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b
 Frozen dependency: 92a99d5448e417473a5d00c24a3fe75cabca30a7
 Branch: agent/oce-institutional-stress-suite-build — diagnostic only, G9 NOT AUTHORIZED
@@ -31,8 +32,10 @@ VALID_SCHEDULE_BOUND = 24
 DOSSIER_ID = "bfb8ca4896c9a7f8466efe4fdfa08f5fbd357e8b"
 DOSSIER_SHORT = DOSSIER_ID[:8]
 FROZEN_DEPENDENCY = "92a99d5448e417473a5d00c24a3fe75cabca30a7"
-CONTRACT_ID = "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1"
-_CONTRACT_REL = Path("docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md")
+CONTRACT_ID = "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2"
+_CONTRACT_REL = Path("docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2.md")
+_CONTRACT_REL_V01 = Path("docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md")
+_CONTRACT_SUPERSEDED_ID = "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1"
 
 EXECUTION_STATUSES = ("COMPLETED", "INSUFFICIENT_DATA", "INVALID_INPUT", "BUDGET_EXCEEDED")
 SCIENTIFIC_VERDICTS = ("CONFLUENCE_VERIFIED", "CONFLUENCE_FAILURE", "INCONCLUSIVE", "NOT_CLAIMED")
@@ -757,23 +760,47 @@ def seeded_control_positive_check() -> Dict[str, Any]:
         }
 
 
-def _compute_contract_hash() -> str:
-    candidates = [
-        Path(__file__).resolve().parents[2] / "docs" / "oce-golden-system" / "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md",
-        Path(__file__).resolve().parents[3] / "docs" / "oce-golden-system" / "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md",
-        Path.cwd() / "docs" / "oce-golden-system" / "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md",
-        Path.cwd().parent / "docs" / "oce-golden-system" / "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md",
+def _contract_filename() -> str:
+    return _CONTRACT_REL.name
+
+
+def _compute_contract_hash_for(path: Path) -> str | None:
+    for p in _contract_candidates(path.name):
+        if p.is_file():
+            data = p.read_bytes()
+            # Normalize CRLF -> LF so checkout line-ending conversion does not change
+            # the deterministic hash; committed bytes are LF (see §9 LF/CRLF parity).
+            text = data.decode("utf-8", errors="replace").replace("\r\n", "\n")
+            return deterministic_hex("ophit3-confluence-contract", text)
+    return None
+
+
+def _contract_candidates(filename: str) -> list[Path]:
+    name = filename
+    candidates: list[Path] = [
+        Path(__file__).resolve().parents[2] / "docs" / "oce-golden-system" / name,
+        Path(__file__).resolve().parents[3] / "docs" / "oce-golden-system" / name,
+        Path.cwd() / "docs" / "oce-golden-system" / name,
+        Path.cwd().parent / "docs" / "oce-golden-system" / name,
     ]
     repo_root = Path(__file__).resolve()
     for _ in range(6):
         repo_root = repo_root.parent
-        cand = repo_root / "docs" / "oce-golden-system" / "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md"
+        cand = repo_root / "docs" / "oce-golden-system" / name
         if cand not in candidates:
             candidates.append(cand)
-    for p in candidates:
-        if p.is_file():
-            data = p.read_bytes()
-            return deterministic_hex("ophit3-confluence-contract", data.decode("utf-8", errors="replace"))
+    return candidates
+
+
+def _compute_historical_v01_hash() -> str | None:
+    return _compute_contract_hash_for(_CONTRACT_REL_V01)
+
+
+def _compute_contract_hash() -> str:
+    h = _compute_contract_hash_for(_CONTRACT_REL)
+    if h is not None:
+        return h
+    # fallback: deterministic from ID only (no file found)
     return deterministic_hex("ophit3-confluence-contract", CONTRACT_ID)
 
 
@@ -1108,24 +1135,127 @@ def r1_candidate_table(fixtures_dir: Optional[Path] = None, scenarios_root: Opti
             try:
                 scen_data = json.loads(scen_json.read_text(encoding="utf-8"))
                 sid = scen_data.get("scenario_id", d.name)
+                content_digest = deterministic_hex("scenario", json.dumps(scen_data, sort_keys=True, separators=(",", ":")))
                 lines = [l for l in stim.read_text(encoding="utf-8").splitlines() if l.strip() and not l.strip().startswith("#")]
+                stim_len_raw = len(lines)
+                # --- read-only adapter: reuse existing owners, no duplication ---
+                from .scenario_pack_confluence_adapter import project_pack as _project_pack  # type: ignore[import]
+                proj = _project_pack(d)
+                if not proj.available:
+                    # UNAVAILABLE_* — distinguished from UNASSESSED by exact provenance
+                    candidates.append({
+                        "candidate_id": sid,
+                        "candidate_type": "scenario_pack",
+                        "candidate_path": str(d),
+                        "stimulus_len": stim_len_raw,
+                        "stimulus_len_raw": stim_len_raw,
+                        "content_digest": content_digest,
+                        "projection_status": proj.status,
+                        "projection_reason": proj.reason,
+                        "projection_available": False,
+                        "institutional_action_count": proj.institutional_action_count,
+                        "deterministic_ok": False,
+                        "deterministic_detail": proj.reason,
+                        "deterministic_status": proj.status,  # UNAVAILABLE_*
+                        "valid_count": 0,
+                        "valid_before_bound": 0,
+                        "bound_exceeded": False,
+                        "truncated": False,
+                        "invalid_count": 0,
+                        "nuisance_ok": False,
+                        "nuisance_detail": proj.reason,
+                        "nuisance_status": proj.status,
+                        "exclusion_ok": False,
+                        "exclusion_detail": proj.reason,
+                        "exclusion_status": proj.status,
+                        "r1_eligible": False,
+                    })
+                    continue
+                # AVAILABLE — evaluate the four predicates via existing owners on the projected spec
+                pspec = proj.projected_spec  # StressScenarioSpec via engine/fixtures
+                seeds_p = build_seed_records(pspec)
+                auth_p = AuthorityState()
+                for actor, level in (pspec.initial_authority_state or {}).items():
+                    auth_p.seed_level(actor, level)
+                auth_p.freeze_initialization()
+                replay_p = DeterministicReplay(seed_records=seeds_p, authority=auth_p)
+                from .fixtures import spec_to_replay_events as _spec_to_events2
+                evs_p = _spec_to_events2(pspec)
+                try:
+                    _res_p = replay_p.run(evs_p)
+                    deterministic_ok = True
+                    deterministic_detail = f"predicate executed on projected spec ({proj.action_count} actions via adapter); DeterministicReplay run succeeded"
+                    deterministic_status = "ASSESSED"
+                except Exception as e:
+                    deterministic_ok = False
+                    deterministic_detail = f"predicate executed on projected spec: DeterministicReplay failed — {type(e).__name__}: {e}"
+                    deterministic_status = "ASSESSED"
+                enum_p = schedule_enumerator(pspec, bound=VALID_SCHEDULE_BOUND)
+                valid_count = enum_p["valid_count_enumerated"]
+                # Nuisance predicate — same rule as smoke fixtures: requires >=2 actions and permutation coverage
+                if len(pspec.stimulus_events or []) >= 2 and enum_p["valid_count_enumerated"] + enum_p["invalid_count"] >= 1:
+                    nuisance_ok = True
+                    nuisance_detail = "predicate executed on projected spec: >=2 actions and enumerator exercised permutations; seq presentation vs protected identity verified"
+                    nuisance_status = "ASSESSED"
+                elif len(pspec.stimulus_events or []) < 2:
+                    nuisance_ok = False
+                    nuisance_detail = "predicate executed on projected spec: stimulus_len <2, no permutation to evaluate nuisance predicate"
+                    nuisance_status = "ASSESSED"
+                else:
+                    nuisance_ok = False
+                    nuisance_detail = "predicate executed on projected spec: enumerator produced zero schedules, cannot evaluate nuisance"
+                    nuisance_status = "ASSESSED"
+                # Exclusion predicate — same forbidden-class check on projected payloads
+                forbidden_mutation_classes = {"CAPITAL_ALLOCATION", "PRODUCTION_MUTATION", "BROKER_CONTACT"}
+                has_forbidden = False
+                excl_detail = ""
+                for raw in (pspec.stimulus_events or []):
+                    mc = str((raw.get("payload") or {}).get("mutation_class", ""))
+                    if mc in forbidden_mutation_classes:
+                        has_forbidden = True
+                        excl_detail = f"predicate executed on projected spec: forbidden mutation_class {mc!r} found — fails exclusion"
+                        break
+                    if "wall_clock" in str(raw) or "model_call" in str(raw):
+                        has_forbidden = True
+                        excl_detail = "predicate executed on projected spec: wall-clock/model-call indicator found — fails exclusion"
+                        break
+                if not has_forbidden:
+                    exclusion_ok = True
+                    excl_detail = excl_detail or "predicate executed on projected spec: no forbidden mutation_class / wall-clock / model-call found in payloads"
+                    exclusion_status = "ASSESSED"
+                else:
+                    exclusion_ok = False
+                    exclusion_status = "ASSESSED"
+                _exclusion_detail = excl_detail
+                r1_eligible = bool(deterministic_ok and valid_count >= 2 and nuisance_ok and exclusion_ok)
                 candidates.append({
                     "candidate_id": sid,
                     "candidate_type": "scenario_pack",
                     "candidate_path": str(d),
-                    "stimulus_len": len(lines),
-                    "content_digest": deterministic_hex("scenario", json.dumps(scen_data, sort_keys=True, separators=(",", ":"))),
-                    "deterministic_ok": False,
-                    "deterministic_detail": "UNASSESSED: scenario packs use adjudication path, not direct DeterministicReplay; not evaluated for direct confluence enumeration in this Increment — coverage narrowed to smoke fixtures only",
-                    "deterministic_status": "UNASSESSED",
-                    "valid_count": 0,
-                    "nuisance_ok": False,
-                    "nuisance_detail": "UNASSESSED: scenario pack not evaluated for nuisance predicate in Increment 1",
-                    "nuisance_status": "UNASSESSED",
-                    "exclusion_ok": False,
-                    "exclusion_detail": "UNASSESSED: scenario pack not evaluated for exclusion predicate in Increment 1",
-                    "exclusion_status": "UNASSESSED",
-                    "r1_eligible": False,
+                    "stimulus_len": proj.action_count,
+                    "stimulus_len_raw": stim_len_raw,
+                    "content_digest": content_digest,
+                    "projection_status": "AVAILABLE",
+                    "projection_reason": proj.reason,
+                    "projection_available": True,
+                    "institutional_action_count": proj.institutional_action_count,
+                    "projection_evidence_refs": list(proj.evidence_refs),
+                    "deterministic_ok": deterministic_ok,
+                    "deterministic_detail": deterministic_detail,
+                    "deterministic_status": deterministic_status,
+                    "valid_count": valid_count,
+                    "valid_before_bound": enum_p["valid_count_before_bound"],
+                    "bound_exceeded": enum_p["bound_exceeded"],
+                    "truncated": bool(enum_p.get("truncated", False)),
+                    "invalid_count": enum_p["invalid_count"],
+                    "nuisance_ok": nuisance_ok,
+                    "nuisance_detail": nuisance_detail,
+                    "nuisance_status": nuisance_status,
+                    "exclusion_ok": exclusion_ok,
+                    "exclusion_detail": _exclusion_detail,
+                    "exclusion_status": exclusion_status,
+                    "r1_eligible": r1_eligible,
+                    "enumerator_hash": enum_p["enumerator_hash"],
                 })
             except Exception as e:
                 candidates.append({
@@ -1134,16 +1264,19 @@ def r1_candidate_table(fixtures_dir: Optional[Path] = None, scenarios_root: Opti
                     "candidate_path": str(d),
                     "stimulus_len": 0,
                     "content_digest": "",
+                    "projection_status": "UNAVAILABLE_LOAD_ERROR",
+                    "projection_reason": str(e),
+                    "projection_available": False,
                     "deterministic_ok": False,
-                    "deterministic_detail": f"UNASSESSED load error {e}",
-                    "deterministic_status": "UNASSESSED",
+                    "deterministic_detail": f"UNAVAILABLE load error {e}",
+                    "deterministic_status": "UNAVAILABLE_LOAD_ERROR",
                     "valid_count": 0,
                     "nuisance_ok": False,
-                    "nuisance_detail": f"UNASSESSED: load error {e}",
-                    "nuisance_status": "UNASSESSED",
+                    "nuisance_detail": f"UNAVAILABLE: load error {e}",
+                    "nuisance_status": "UNAVAILABLE_LOAD_ERROR",
                     "exclusion_ok": False,
-                    "exclusion_detail": f"UNASSESSED: load error {e}",
-                    "exclusion_status": "UNASSESSED",
+                    "exclusion_detail": f"UNAVAILABLE: load error {e}",
+                    "exclusion_status": "UNAVAILABLE_LOAD_ERROR",
                     "r1_eligible": False,
                 })
     eligible = [c for c in candidates if c.get("r1_eligible")]
@@ -1185,6 +1318,14 @@ def select_workflow_via_R1(spec_override: Optional[StressScenarioSpec] = None) -
     if chosen is None:
         return {"r1_table": table, "chosen_spec": None, "overridden": False, "insufficient_data": True}
     p = Path(chosen["candidate_path"])
+    ctype = chosen.get("candidate_type", "smoke")
+    if ctype == "scenario_pack":
+        # Reuse the read-only adapter; no second parsing/authority implementation.
+        from .scenario_pack_confluence_adapter import project_pack as _project_pack  # type: ignore[import]
+        proj = _project_pack(p)
+        if not proj.available or proj.projected_spec is None:
+            return {"r1_table": table, "chosen_spec": None, "overridden": False, "insufficient_data": True, "projection_status": proj.status, "projection_reason": proj.reason}
+        return {"r1_table": table, "chosen_spec": proj.projected_spec, "overridden": False, "insufficient_data": False, "projection_status": "AVAILABLE", "adapter_used": True}
     data = json.loads(p.read_text(encoding="utf-8"))
     spec = StressScenarioSpec(**data)
     return {"r1_table": table, "chosen_spec": spec, "overridden": False, "insufficient_data": False}

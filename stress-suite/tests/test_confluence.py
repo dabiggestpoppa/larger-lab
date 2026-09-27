@@ -1,4 +1,8 @@
-"""Confluence harness tests — Path M Increment 1 (frozen contract v0.1).
+"""Confluence harness tests — Path M Increment 1 (frozen contract v0.2).
+
+v0.2 is the controlling specification; v0.1 is byte-preserved in history.
+The engine now binds to v0.2 (CONTRACT_ID/_CONTRACT_REL) and projects
+scenario packs via the read-only adapter when institutional_action is present.
 
 Tests exercise the real entry points: DeterministicReplay, GovernedTransitionExecutor,
 EvidenceRegistry, CounterexampleRecord. No synthetic null schedule substituted.
@@ -36,7 +40,10 @@ from engine.confluence import (
     _synthetic_seeded_failure_spec,
     dependency_digest,
     _compute_contract_hash,
+    _compute_historical_v01_hash,
     CONTRACT_ID,
+    _CONTRACT_REL,
+    _CONTRACT_REL_V01,
     DOSSIER_ID,
     FROZEN_DEPENDENCY,
 )
@@ -71,18 +78,15 @@ def _diamond_spec() -> StressScenarioSpec:
 
 
 # ---------------------------------------------------------------------------
-# Positive: R1 honest INSUFFICIENT_DATA (no invented schedule)
+# R1 selection — smoke fixtures alone are INSUFFICIENT_DATA; scenario packs
+# are now assessed via the read-only adapter and can supply the eligible
+# workflow (S01). Tests that assert eligible==0 are therefore retired from
+# the smoke-only path and reformulated to describe the adapter-aware table.
 # ---------------------------------------------------------------------------
 
-class TestR1HonestInsufficientData:
-    def test_r1_table_reports_insufficient_data_honestly(self):
-        table = r1_candidate_table()
-        # On this tree, no smoke yields >=2 valid, so eligible==0 is expected honest result
-        assert table["eligible_count"] == 0
-        assert table["chosen"] is None
-        assert "INSUFFICIENT_DATA" in table["tie_break_distance"]
-
-    def test_verify_confluence_on_existing_smoke_is_insufficient_data_not_verified(self):
+class TestR1WithScenarioPackAdapter:
+    def test_smoke_fixtures_alone_are_insufficient_for_confluence(self):
+        # Every smoke fixture has <2 valid schedules — honest gap, not a claim.
         for name in ["knowledge_reactivation_smoke", "legal_transition_smoke", "illegal_transition_smoke"]:
             spec = _load_smoke(name)
             verdict = verify_confluence(spec)
@@ -90,19 +94,42 @@ class TestR1HonestInsufficientData:
             assert verdict["scientific_verdict"] == "NOT_CLAIMED"
             assert verdict["claim_status"] == "INSUFFICIENT_DATA"
             assert verdict["confluence_verdict"] == "INSUFFICIENT_DATA"
-            # Neither becomes VERIFIED
             assert verdict["scientific_verdict"] != "CONFLUENCE_VERIFIED"
             assert verdict["claim_status"] != "VERIFIED"
-            # coverage gap disclosed
             assert verdict["enumerator_snapshot"]["valid_count_enumerated"] < 2
-            # Not self-certifying INSUFFICIENT_DATA
             assert verdict["contract_hash"] == _compute_contract_hash()
 
-    def test_select_workflow_via_R1_insufficient_data_does_not_fabricate(self):
+    def test_adapter_makes_s01_eligible_and_r1_selects_it(self):
+        table = r1_candidate_table()
+        s01 = [c for c in table["candidates"] if c["candidate_id"] == "S01"]
+        assert len(s01) == 1
+        assert s01[0]["r1_eligible"] is True
+        assert s01[0]["projection_status"] == "AVAILABLE"
+        assert s01[0]["deterministic_status"] == "ASSESSED"
+        assert s01[0]["nuisance_status"] == "ASSESSED"
+        assert s01[0]["exclusion_status"] == "ASSESSED"
+        assert s01[0]["valid_count"] >= 2
+        assert table["chosen"] is not None
+        assert table["chosen"]["candidate_id"] == "S01"
+        assert table["eligible_count"] >= 1
+
+    def test_select_workflow_via_R1_returns_projected_spec_for_scenario_pack(self):
         sel = select_workflow_via_R1()
-        assert sel["insufficient_data"] is True
-        assert sel["chosen_spec"] is None
-        assert "r1_table" in sel
+        assert sel["insufficient_data"] is False
+        assert sel["chosen_spec"] is not None
+        assert sel["chosen_spec"].scenario_id == "S01"
+        # projected spec is the adapter output, not a raw scenario.json read
+        assert len(sel["chosen_spec"].stimulus_events) == 5
+        assert sel["r1_table"]["chosen"]["projection_status"] == "AVAILABLE"
+
+    def test_confluence_over_selected_scenario_pack_is_claimed(self):
+        sel = select_workflow_via_R1()
+        v = verify_confluence(sel["chosen_spec"])
+        # S01 projections converge → honest VERIFIED
+        assert v["execution_status"] == "COMPLETED"
+        assert v["scientific_verdict"] in ("CONFLUENCE_VERIFIED", "CONFLUENCE_FAILURE")
+        assert v["contract_hash"] == _compute_contract_hash()
+        assert v["claim_status"] != "INSUFFICIENT_DATA"
 
 
 # ---------------------------------------------------------------------------
@@ -320,10 +347,7 @@ class TestStatusVocabulary:
         assert v["scientific_verdict"] != "CONFLUENCE_VERIFIED"
 
     def test_r1_no_valid_pair_gives_insufficient_data_not_verified(self):
-        # Already tested but explicit: R1 with 0 eligible yields INSUFFICIENT_DATA
-        sel = select_workflow_via_R1()
-        assert sel["insufficient_data"]
-        # Running verify on such should be INSUFFICIENT_DATA
+        # A smoke fixture with <2 valid has no confluence claim on its own.
         spec = _load_smoke("legal_transition_smoke")  # only 1 valid
         v = verify_confluence(spec)
         assert v["valid_schedules_enumerated"] < 2
@@ -368,8 +392,35 @@ class TestContractBinding:
     def test_contract_hash_is_bindable(self):
         h = _compute_contract_hash()
         assert len(h) == 16  # deterministic_hex length 16
-        # Second call same
         assert h == _compute_contract_hash()
+
+    def test_active_contract_is_v0_2_with_stable_det_hash(self):
+        assert CONTRACT_ID == "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2"
+        assert _CONTRACT_REL.name == "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.2.md"
+        assert _CONTRACT_REL_V01.name == "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md"
+        # Committed LF bytes: det hash is b70a..., working CRLF normalizes to same.
+        assert _compute_contract_hash() == "b70a03f39e2ad818"
+        assert _compute_historical_v01_hash() == "93f09b5a88b2b4d9"
+        # Evidence after this touch must not falsely cite v0.1 as controlling.
+        spec = _diamond_spec()
+        v = verify_confluence(spec)
+        assert v["contract_hash"] == "b70a03f39e2ad818"
+        assert v["contract_id"] == CONTRACT_ID
+        assert v["contract_hash"] != "93f09b5a88b2b4d9"
+
+    def test_v0_1_bytes_remain_byte_stable_and_not_silently_edited(self):
+        import hashlib
+        repo_root = Path(__file__).resolve().parents[2]
+        committed = repo_root / "docs" / "oce-golden-system" / "OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md"
+        # Working bytes must match the committed bytes (no silent edit); on Windows
+        # checkout both are LF due to historical CRLF-false, verified via sha.
+        work_bytes = committed.read_bytes()
+        assert hashlib.sha256(work_bytes).hexdigest()[:16] == "d99b86c22101fbd4"
+        assert _compute_historical_v01_hash() == "93f09b5a88b2b4d9"
+        # Generate via git show and compare — must be identical.
+        import subprocess
+        r = subprocess.run(["git", "show", "HEAD:docs/oce-golden-system/OCE_OPH_IT3_RESEARCH_CONTRACT_CONFLUENCE_v0.1.md"], capture_output=True, cwd=str(repo_root))
+        assert hashlib.sha256(r.stdout).hexdigest()[:16] == "d99b86c22101fbd4"
 
     def test_dependency_digest_has_required_fields(self):
         spec = _diamond_spec()
@@ -377,6 +428,7 @@ class TestContractBinding:
         assert "tested_sha" in dd
         assert "harness_version" in dd
         assert "contract_hash" in dd
+        assert dd["contract_hash"] == "b70a03f39e2ad818"
         assert "smoke_fixture_digests" in dd
         assert dd["contract_id"] == CONTRACT_ID
         assert dd["dossier_id"] == DOSSIER_ID
@@ -477,27 +529,40 @@ class TestR1Predicates:
                 assert "exclusion_status" in c, "smoke candidate must have exclusion_status"
                 assert c["nuisance_status"] in ("ASSESSED", "UNASSESSED")
                 assert c["exclusion_status"] in ("ASSESSED", "UNASSESSED")
-                # Not bare True by default; must have detail
                 assert "nuisance_detail" in c
                 assert "exclusion_detail" in c
                 assert c["nuisance_detail"], "nuisance_detail must be non-empty"
                 assert c["exclusion_detail"], "exclusion_detail must be non-empty"
 
-    def test_r1_scenario_packs_are_unassessed_and_coverage_narrowed(self):
+    def test_r1_scenario_pack_predicates_are_assessed_or_unavailable_with_reason(self):
         table = r1_candidate_table()
         packs = [c for c in table["candidates"] if c["candidate_type"] == "scenario_pack"]
-        if packs:
-            for c in packs:
-                assert c["deterministic_status"] == "UNASSESSED"
-                assert c["nuisance_status"] == "UNASSESSED"
-                assert c["exclusion_status"] == "UNASSESSED"
-            # Coverage must mention narrowed scope when no smoke eligible
-            assert "smoke fixture" in table["tie_break_distance"] or "UNASSESSED" in table["tie_break_distance"] or "narrowed" in table["tie_break_distance"]
+        assert packs, "R1 must still consider scenario packs"
+        for c in packs:
+            # Every pack now carries an explicit projection status; when
+            # UNAVAILABLE_* the predicates carry that exact provenance, never
+            # a silent UNASSESSED without reason.
+            assert "projection_status" in c, f"{c['candidate_id']} must have projection_status"
+            assert c["projection_status"].startswith(("AVAILABLE", "UNAVAILABLE"))
+            assert "projection_reason" in c and c["projection_reason"], "UNAVAILABLE must carry exact reason"
+            # Deterministic/nuisance/exclusion must each be either ASSESSED (evaluated)
+            # or UNAVAILABLE_* with the same provenance — never a silent gap.
+            for pred in ("deterministic_status", "nuisance_status", "exclusion_status"):
+                assert c[pred].startswith(("ASSESSED", "UNAVAILABLE")), f"{c['candidate_id']}:{pred} must be ASSESSED or UNAVAILABLE, not UNASSESSED without provenance"
+                assert c[pred.replace("status", "detail")], f"{c['candidate_id']}:{pred} detail must be non-empty"
+        # Coverage distinguishes evaluated packs from UNAVAILABLE ones
+        assert "S01" in table["tie_break_distance"] or "chosen" in table["tie_break_distance"]
 
-    def test_r1_distinguishes_no_eligible_smoke_vs_no_eligible_workflow(self):
+    def test_r1_adapter_unused_fields_are_never_invented(self):
+        # Regression: the adapter must not discard consequential fields or invent
+        # actions — UNAVAILABLE_* packs do not acquire invented stimulus_events.
         table = r1_candidate_table()
-        # Must distinguish the two cases in tie_break_distance
-        assert "smoke" in table["tie_break_distance"].lower() or "eligible" in table["tie_break_distance"].lower()
+        unavailable = [c for c in table["candidates"] if c["candidate_type"] == "scenario_pack" and c.get("projection_status", "").startswith("UNAVAILABLE")]
+        assert unavailable, "some packs must be UNAVAILABLE (adjudication-only / no institutional_action)"
+        for c in unavailable:
+            assert c["r1_eligible"] is False
+            assert c["valid_count"] == 0
+            assert "institutional_action" in c["projection_reason"] or "no institutional_action" in c["projection_reason"].lower() or "evidence_vector" in c["projection_reason"].lower() or "no confluence" in c["projection_reason"].lower()
 
 
 # ---------------------------------------------------------------------------
@@ -533,3 +598,280 @@ class TestProjectionEvidence:
         _, status = confluence_protected_digest_with_status(result, events, registry=None)
         assert status.startswith("UNAVAILABLE")
         assert status != "AVAILABLE"
+
+
+# ---------------------------------------------------------------------------
+# Projection safety — must fail closed, never invent/discard/reduce/substitute
+# ---------------------------------------------------------------------------
+
+class TestProjectionSafety:
+    def test_unsupported_adjudication_only_operation_fails_closed(self):
+        # S03 / S04 style: stimulus is evidence_vector without institutional_action.
+        # Adapter must return UNAVAILABLE_ADJUDICATION_ONLY, not synthesize actions.
+        from engine.scenario_pack_confluence_adapter import project_pack
+        p = project_pack(Path(__file__).resolve().parents[1] / "scenarios" / "s03_patch_maze")
+        assert p.status == "UNAVAILABLE_ADJUDICATION_ONLY"
+        assert not p.available
+        assert "institutional_action" in p.reason or "evidence_vector" in p.reason
+        # Must not have invented stimulus_events
+        assert p.projected_spec is None
+        assert p.action_count == 0
+
+    def test_consequential_field_with_no_confluence_representation(self):
+        # S01 style payload with a missing required field would lose a consequential
+        # field; adapter must refuse rather than silently default it. Build a
+        # synthetic pack on disk that omits a required field and verify fail-closed.
+        import tempfile, json as _json
+        from engine.scenario_pack_confluence_adapter import project_pack
+        from engine.base import deterministic_hex as _hex
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            (td / "scenario.json").write_text(_json.dumps({
+                "scenario_id": "SYNTH_PROJ_MISSING_FIELD",
+                "scenario_version": "1.0.0",
+                "initial_authority_state": {"PO": "PO"},
+                "initial_knowledge": [{"record_id": "@K", "state": "OBSERVED", "claim": "x", "provenance_source_kind": "FIXTURE", "provenance_source_label": "x"}],
+            }), encoding="utf-8")
+            # Missing 'reason' — a consequential field with no confluence representation.
+            (td / "stimulus_events.jsonl").write_text(_json.dumps({
+                "seq": 10, "evidence_vector": {},
+                "institutional_action": [{"machine": "lifecycle", "actor": "PO", "target": "@K", "payload": {"to_state": "CANDIDATE", "authority_level": "PO", "authority_basis": "x"}, "fixture_side_effect": True}]
+            }) + "\n" + _json.dumps({
+                "seq": 11, "institutional_action": [{"machine": "lifecycle", "actor": "PO", "target": "@K", "payload": {"to_state": "TESTED", "authority_level": "PO", "authority_basis": "x", "reason": "x", "evidence_refs": []}, "fixture_side_effect": True}]
+            }) + "\n", encoding="utf-8")
+            # Create marker files so candidate detection matches real FS layout
+            (td / "run_receipt.json").write_text("{}", encoding="utf-8")
+            p = project_pack(td)
+            assert p.status == "UNAVAILABLE_MISSING_PAYLOAD_FIELD"
+            assert "reason" in p.reason.lower() or "missing" in p.reason.lower()
+            assert not p.available
+
+    def test_authority_semantic_that_cannot_be_preserved(self):
+        # institutional_action without target (evidence identity) or with
+        # empty authority_level cannot be preserved; adapter must refuse.
+        import tempfile, json as _json
+        from engine.scenario_pack_confluence_adapter import project_pack
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            (td / "scenario.json").write_text(_json.dumps({
+                "scenario_id": "SYNTH_PROJ_NO_TARGET",
+                "scenario_version": "1.0.0",
+                "initial_authority_state": {"PO": "PO"},
+                "initial_knowledge": [{"record_id": "@K", "state": "OBSERVED", "claim": "x", "provenance_source_kind": "FIXTURE", "provenance_source_label": "x"}],
+            }), encoding="utf-8")
+            (td / "stimulus_events.jsonl").write_text(_json.dumps({
+                "seq": 10, "institutional_action": [{"machine": "lifecycle", "actor": "PO", "payload": {"to_state": "CANDIDATE", "authority_level": "PO", "authority_basis": "x", "reason": "x"}}]
+            }) + "\n", encoding="utf-8")
+            (td / "run_receipt.json").write_text("{}", encoding="utf-8")
+            p = project_pack(td)
+            assert p.status in ("UNAVAILABLE_EVIDENCE_IDENTITY_LOSS", "UNAVAILABLE_MISSING_PAYLOAD_FIELD")
+            assert not p.available
+            assert p.projected_spec is None
+
+    def test_evidence_identity_that_would_be_lost_under_projection(self):
+        # S20/S22/S23: operator/governor actions have no institutional_action.
+        # Under projection this would lose evidence identity (no record_id).
+        from engine.scenario_pack_confluence_adapter import project_pack
+        p = project_pack(Path(__file__).resolve().parents[1] / "scenarios" / "s20_governor_self_change")
+        assert p.status == "UNAVAILABLE_ADJUDICATION_ONLY"
+        assert not p.available
+        assert "institutional_action" in p.reason or "evidence_vector" in p.reason.lower() or "adjudication" in p.reason.lower()
+
+    def test_projection_unavailable_never_becomes_synthetic_substitute(self):
+        # R1 must never substitute a synthetic schedule for an UNAVAILABLE pack.
+        table = r1_candidate_table()
+        for c in table["candidates"]:
+            if c.get("projection_status", "").startswith("UNAVAILABLE"):
+                assert c["r1_eligible"] is False
+                assert c["valid_count"] == 0
+                # Coverage does not hide unavailable as assessed-eligible
+                assert c["deterministic_status"].startswith("UNAVAILABLE")
+
+
+# ---------------------------------------------------------------------------
+# Enumeration / bound semantics — §3.2 (v0.2: truncated vs bound_exceeded)
+# ---------------------------------------------------------------------------
+
+class TestEnumerationBoundSemantics:
+    def test_complete_enumeration_within_bound_is_passable(self):
+        # S01 after projection: 5 actions, n=5<=7, no truncation, valid_count 5<=24
+        sel = select_workflow_via_R1()
+        spec = sel["chosen_spec"]
+        enum = schedule_enumerator(spec, bound=VALID_SCHEDULE_BOUND)
+        assert enum["truncated"] is False
+        assert enum["bound_exceeded"] is False
+        assert enum["valid_count_enumerated"] == enum["valid_count_before_bound"]
+        v = verify_confluence(spec, bound=VALID_SCHEDULE_BOUND)
+        assert v["enumerator_snapshot"]["truncated"] is False
+        assert v["enumerator_snapshot"]["bound_exceeded"] is False
+        assert v["termination_verdict"] == "PASS"
+
+    def test_bound_exceeded_is_distinguishable_from_truncated(self):
+        # bound_exceeded: many valid > bound, within n<=7 path (no budget).
+        # Truncated: n>7 budget hit. They are reported separately.
+        from engine.confluence import _final_state_equivalence_check, _termination_check
+        # Bound exceeded synthetic
+        be = {"valid_count_enumerated": 24, "valid_count_before_bound": 30, "bound_exceeded": True, "truncated": False, "protected_per_schedule": ["x"]*24}
+        assert _termination_check(be, 24).verdict == "INCONCLUSIVE"
+        assert _final_state_equivalence_check(be).verdict == "INCONCLUSIVE"
+        # Truncated synthetic
+        tr = {"valid_count_enumerated": 1, "valid_count_before_bound": 1, "bound_exceeded": False, "truncated": True, "protected_per_schedule": ["x"]}
+        assert _termination_check(tr, 24).verdict == "INCONCLUSIVE"
+        assert _final_state_equivalence_check(tr).verdict in ("INCONCLUSIVE", "FAIL")
+        # Must be distinguishable: detail carries the separate flag
+        assert "bound exceeded" in _termination_check(be, 24).detail["reason"].lower()
+        assert "truncated" in _termination_check(tr, 24).detail["reason"].lower()
+
+    def test_inability_to_establish_complete_coverage_cannot_be_verified(self):
+        # Truncated with no divergence must be INCONCLUSIVE, never VERIFIED.
+        spec = StressScenarioSpec(
+            scenario_id="truncated_incomplete",
+            scenario_version="1.0.0",
+            initial_authority_state={"PO": "PO"},
+            initial_knowledge=[{"record_id": f"@K{i}", "state": "OBSERVED", "claim": f"k{i}", "provenance_source_kind": "FIXTURE", "provenance_source_label": "x"} for i in range(8)],
+            stimulus_events=[{"seq": i+1, "machine": "lifecycle", "actor": "PO", "target": f"@K{i}", "payload": {"to_state": "CANDIDATE", "authority_level": "PO", "authority_basis": "x", "reason": "x"}} for i in range(8)],
+        )
+        v = verify_confluence(spec, bound=24)
+        assert v["enumerator_snapshot"]["truncated"] is True
+        assert v["scientific_verdict"] == "INCONCLUSIVE"
+        assert v["scientific_verdict"] != "CONFLUENCE_VERIFIED"
+        assert v["claim_status"] != "VERIFIED"
+
+    def test_zero_valid_schedules_cannot_become_verification(self):
+        spec = StressScenarioSpec(
+            scenario_id="zero_valid",
+            scenario_version="1.0.0",
+            initial_authority_state={"PO": "PO"},
+            initial_knowledge=[{"record_id": "@K", "state": "OBSERVED", "claim": "x", "provenance_source_kind": "FIXTURE", "provenance_source_label": "x"}],
+            stimulus_events=[{"seq": 1, "machine": "lifecycle", "actor": "PO", "target": "@K", "payload": {"to_state": "TESTED", "authority_level": "PO", "authority_basis": "x", "reason": "x"}}],
+        )
+        enum = schedule_enumerator(spec)
+        assert enum["valid_count_enumerated"] == 0
+        v = verify_confluence(spec)
+        assert v["execution_status"] == "INSUFFICIENT_DATA"
+        assert v["scientific_verdict"] == "NOT_CLAIMED"
+        assert v["scientific_verdict"] != "CONFLUENCE_VERIFIED"
+
+    def test_one_valid_schedule_cannot_establish_confluence(self):
+        spec = _load_smoke("legal_transition_smoke")
+        enum = schedule_enumerator(spec)
+        assert enum["valid_count_enumerated"] == 1
+        v = verify_confluence(spec)
+        assert v["execution_status"] == "INSUFFICIENT_DATA"
+        assert v["scientific_verdict"] == "NOT_CLAIMED"
+        assert v["checks"]["final_state_equivalence"]["verdict"] == "INCONCLUSIVE"
+
+    def test_only_comparable_valid_schedule_family_reaches_confluence_verdict(self):
+        # Synthetically divergent family (seeded failure) reaches FAILURE, not INCONCLUSIVE.
+        # Synthetic invalid/no-valid never reaches VERIFIED.
+        s_valid_pair = _synthetic_seeded_failure_spec()
+        v_fail = verify_confluence(s_valid_pair)
+        assert v_fail["scientific_verdict"] == "CONFLUENCE_FAILURE"
+        s_no_valid = _load_smoke("illegal_transition_smoke")
+        v_none = verify_confluence(s_no_valid)
+        assert v_none["scientific_verdict"] == "NOT_CLAIMED"
+        assert v_none["scientific_verdict"] != "CONFLUENCE_VERIFIED"
+
+    def test_no_increase_of_bound_to_force_eligibility(self):
+        # Contract bound is frozen at 24; adapter/R1 must not inflate it to
+        # manufacture eligibility. Verify the bound is still 24 everywhere.
+        assert VALID_SCHEDULE_BOUND == 24
+        table = r1_candidate_table()
+        for c in table["candidates"]:
+            if c.get("valid_before_bound", 0) > 24:
+                assert c["bound_exceeded"] is True
+        # Raw valid count for S01 before bound is 5, which is <=24 so it wins
+        # honestly; it would not have won if bound were inflated.
+        s01 = [c for c in table["candidates"] if c["candidate_id"] == "S01"][0]
+        assert s01["valid_before_bound"] == 5
+
+
+# ---------------------------------------------------------------------------
+# R1 re-run + tie-break + bounded confluence experiment
+# ---------------------------------------------------------------------------
+
+class TestR1ReRunAndConfluenceExperiment:
+    def test_R1_reports_all_candidates_with_every_predicate_and_selection_reason(self):
+        table = r1_candidate_table()
+        assert table["candidates_considered"] == 14
+        for c in table["candidates"]:
+            for k in ("deterministic_status", "nuisance_status", "exclusion_status"):
+                assert k in c, f"{c['candidate_id']} missing {k}"
+            for k in ("valid_count", "invalid_count", "bound_exceeded", "truncated"):
+                assert k in c, f"{c['candidate_id']} missing {k}"
+            if c["candidate_type"] == "scenario_pack":
+                assert "projection_status" in c, f"{c['candidate_id']} missing projection_status"
+        assert table["chosen"] is not None
+        assert "chosen" in table["tie_break_distance"]
+        assert table["chosen"]["projection_status"] == "AVAILABLE"
+
+    def test_scenario_pack_assessment_counts_are_honest(self):
+        table = r1_candidate_table()
+        packs = [c for c in table["candidates"] if c["candidate_type"] == "scenario_pack"]
+        assessed_true = sum(1 for c in packs if c.get("r1_eligible") is True)
+        assessed_false = sum(1 for c in packs if c.get("projection_status") == "AVAILABLE" and not c.get("r1_eligible"))
+        unavailable = sum(1 for c in packs if c.get("projection_status", "").startswith("UNAVAILABLE"))
+        # With the adapter: S01 eligible true, S02/S05 AVAILABLE but only 1 valid so false, rest UNAVAILABLE
+        assert assessed_true == 1
+        assert unavailable >= 6
+        assert packs and assessed_false >= 1
+
+    def test_confluence_experiment_runs_only_on_eligible_real_workflow(self):
+        sel = select_workflow_via_R1()
+        assert not sel["insufficient_data"]
+        spec = sel["chosen_spec"]
+        v = verify_confluence(spec)
+        # Not synthetic
+        assert spec.scenario_id not in ("synthetic_diamond", "seeded_failure_control")
+        # Bounded experiment already authorized reports separately
+        assert "execution_status" in v and "scientific_verdict" in v and "claim_status" in v
+        assert "bound_exceeded" in v["enumerator_snapshot"] and "truncated" in v["enumerator_snapshot"]
+        assert "confluence_protected_digest_per_schedule" in v
+        assert "forensic_fingerprint_per_schedule" in v
+        # S01 converges → VERIFIED
+        assert v["execution_status"] == "COMPLETED"
+        assert v["scientific_verdict"] == "CONFLUENCE_VERIFIED"
+        assert v["claim_status"] == "VERIFIED"
+        assert v["valid_schedules_enumerated"] == 5
+
+
+# ---------------------------------------------------------------------------
+# Synthetic control regression — not scientific evidence
+# ---------------------------------------------------------------------------
+
+class TestSyntheticControlRegression:
+    def test_positive_diamond_still_verified(self):
+        from engine.confluence import seeded_control_positive_check
+        pos = seeded_control_positive_check()
+        assert pos["execution_status"] == "COMPLETED"
+        assert pos["scientific_verdict"] == "CONFLUENCE_VERIFIED"
+
+    def test_seeded_failure_still_reports_failure(self):
+        from engine.confluence import seeded_failure_control_verdict
+        neg = seeded_failure_control_verdict()
+        assert neg["scientific_verdict"] == "CONFLUENCE_FAILURE"
+        assert neg["counterexample"] is not None
+        assert "minimized_trace_hash" in neg["counterexample"].preserved_evidence
+
+    def test_invalid_order_controls_remain_invalid(self):
+        probe = StressScenarioSpec(
+            scenario_id="invalid_probe_synth",
+            scenario_version="1.0.0",
+            initial_authority_state={"PO": "PO"},
+            initial_knowledge=[{"record_id": "@K", "state": "OBSERVED", "claim": "probe", "provenance_source_kind": "FIXTURE", "provenance_source_label": "x"}],
+            stimulus_events=[
+                {"seq": 1, "machine": "lifecycle", "actor": "PO", "target": "@K", "payload": {"to_state": "TESTED", "authority_level": "PO", "authority_basis": "x", "reason": "x"}},
+                {"seq": 2, "machine": "lifecycle", "actor": "PO", "target": "@K", "payload": {"to_state": "CANDIDATE", "authority_level": "PO", "authority_basis": "x", "reason": "x"}},
+            ],
+        )
+        from engine.confluence import _run_schedule, spec_to_action_identities
+        result, _ = _run_schedule(spec_to_action_identities(probe), probe)
+        assert not result.trace[0]["allowed"], "first transition must be denied (topology)"
+        v = verify_confluence(probe)
+        assert v["invalid_input_checks"]["assigned_seq_topology_denied_excluded"] is True
+
+    def test_synthetics_are_not_counted_as_R1_candidates(self):
+        table = r1_candidate_table()
+        ids = {c["candidate_id"] for c in table["candidates"]}
+        assert "synthetic_diamond" not in ids
+        assert "seeded_failure_control" not in ids
