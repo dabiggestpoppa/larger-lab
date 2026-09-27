@@ -101,6 +101,11 @@ class FailureDomainBook:
         self._domains: dict[str, FailureDomain] = {}
 
     def add(self, domain: FailureDomain) -> FailureDomain:
+        if not isinstance(domain, FailureDomain):
+            raise Book4ProvenanceError(
+                "failure-domain admission requires a typed FailureDomain record; "
+                "untyped payloads are rejected"
+            )
         if domain.domain_id in self._domains:
             raise ValueError("failure domain IDs are immutable and unique")
         self.provenance.validate_refs(domain.book2_claim_refs)
@@ -128,6 +133,26 @@ class FailureDomainBook:
         positive_independence_claim_refs: tuple[str, ...] = (),
         independence_bindings: tuple[IndependenceClaimBinding, ...] = (),
     ) -> FailureDomainAssessment:
+        # Decision-point re-verification: model_copy bypasses every model
+        # validator, so record and binding payloads must be type-checked here
+        # and untyped payloads refused closed, never crashed on.
+        if not isinstance(left, FailureDomain) or not isinstance(right, FailureDomain):
+            raise Book4ProvenanceError(
+                "failure-domain classification requires typed FailureDomain records"
+            )
+        if not all(
+            isinstance(binding, IndependenceClaimBinding)
+            for binding in independence_bindings
+        ):
+            raise Book4ProvenanceError(
+                "independence bindings must be typed IndependenceClaimBinding "
+                "records; untyped binding payloads are rejected"
+            )
+        if not left.affected_system_refs or not right.affected_system_refs:
+            raise Book4ProvenanceError(
+                "failure-domain classification requires non-empty affected "
+                "system references on both domains"
+            )
         subject = left.affected_system_refs[0]
         obj = right.affected_system_refs[0]
         if left.domain_id == right.domain_id:

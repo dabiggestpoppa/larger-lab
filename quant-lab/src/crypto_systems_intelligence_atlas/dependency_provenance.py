@@ -2,8 +2,28 @@
 
 from __future__ import annotations
 
+from typing import Hashable
+
 from .claims import Claim, ClaimState, ClaimStore, can_promote_to_graph
 from .evidence import EvidenceStore
+
+
+def require_str_hashable(value: object, *, role: str) -> str:
+    """Fail closed on payload drift before it can crash a validation path.
+
+    Pydantic ``model_copy(update=...)`` skips every validator, so Book 4
+    decision points can receive payloads of arbitrary type (raw dicts,
+    untyped binding objects, tuples of non-strings).  Refusing such payloads
+    with ``Book4ProvenanceError`` keeps every admission and classification
+    path fail-closed; ``Hashable`` also guards the set/dict operations the
+    validation logic relies on.
+    """
+
+    if not isinstance(value, str) or not isinstance(value, Hashable):
+        raise Book4ProvenanceError(
+            f"{role} must be canonical string references; refusing untyped payload"
+        )
+    return value
 
 
 class Book4ProvenanceError(ValueError):
@@ -24,6 +44,7 @@ class Book4Provenance:
         expected_claim: Claim | None = None,
         require_current: bool = True,
     ) -> Claim:
+        require_str_hashable(claim_ref, role="claim_ref")
         try:
             canonical = self.claim_store.require(claim_ref)
         except KeyError as exc:
@@ -118,6 +139,13 @@ class Book4Provenance:
             raise Book4ProvenanceError(
                 "canonical Book 4 records require source_snapshot_refs lineage"
             )
+        claim_refs = tuple(
+            require_str_hashable(ref, role="book2_claim_refs item") for ref in claim_refs
+        )
+        source_snapshot_refs = tuple(
+            require_str_hashable(ref, role="source_snapshot_refs item")
+            for ref in source_snapshot_refs
+        )
         required = self._required_snapshot_refs(claim_refs)
         supplied = self._normalized_snapshot_set(source_snapshot_refs)
         missing = sorted(required - supplied)
@@ -140,6 +168,9 @@ class Book4Provenance:
     ) -> tuple[Claim, ...]:
         if not claim_refs:
             raise Book4ProvenanceError("canonical Book 4 records require book2_claim_refs")
+        claim_refs = tuple(
+            require_str_hashable(ref, role="book2_claim_refs item") for ref in claim_refs
+        )
         supplied_claims = supplied_claims or {}
         return tuple(
             self.resolve_claim(
@@ -151,4 +182,9 @@ class Book4Provenance:
         )
 
 
-__all__ = ["Book4Provenance", "Book4ProvenanceError", "ClaimState"]
+__all__ = [
+    "Book4Provenance",
+    "Book4ProvenanceError",
+    "ClaimState",
+    "require_str_hashable",
+]

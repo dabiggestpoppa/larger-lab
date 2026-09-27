@@ -6,7 +6,7 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .dependency_provenance import Book4Provenance
+from .dependency_provenance import Book4Provenance, Book4ProvenanceError
 from .temporal import Timestamp, UnknownBound, normalize_utc
 
 
@@ -100,6 +100,11 @@ class ProtocolRoleBook:
         self._assignments: dict[str, RoleAssignment] = {}
 
     def add(self, assignment: RoleAssignment) -> RoleAssignment:
+        if not isinstance(assignment, RoleAssignment):
+            raise Book4ProvenanceError(
+                "role admission requires a typed RoleAssignment; untyped payloads "
+                "are rejected"
+            )
         if assignment.role_assignment_id in self._assignments:
             raise ValueError("role assignment IDs are immutable and unique")
         self.provenance.validate_refs(assignment.book2_claim_refs)

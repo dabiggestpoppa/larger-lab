@@ -13,7 +13,7 @@ from .book4_boundary import (
     BOOK5_ECONOMIC_RELATIONS,
     Book4RelationSupportPolicy,
 )
-from .dependency_provenance import Book4Provenance
+from .dependency_provenance import Book4Provenance, Book4ProvenanceError
 from .relationships import EdgeType
 from .temporal import Timestamp, UnknownBound
 
@@ -204,6 +204,10 @@ class HardRuntimeGate:
         self.provenance = provenance
 
     def classify(self, evidence: HardRuntimeEvidence) -> RuntimeAssessment:
+        if not isinstance(evidence, HardRuntimeEvidence):
+            raise Book4ProvenanceError(
+                "HARD_RUNTIME classification requires a typed HardRuntimeEvidence record"
+            )
         reasons: list[str] = []
         try:
             self.provenance.validate_snapshot_lineage(
@@ -228,8 +232,19 @@ class HardRuntimeGate:
             for binding in evidence.fact_bindings
             if isinstance(binding, HardRuntimeFactContextBinding)
         )
-        declared_facts = {binding.fact for binding in typed_bindings}
-        if len(declared_facts) != len(typed_bindings):
+        # model_copy can drift a binding's fact outside the canonical enum;
+        # refuse rather than crash on set insertion or .value reads.
+        valid_bindings = tuple(
+            binding
+            for binding in typed_bindings
+            if isinstance(binding.fact, HardRuntimeFact)
+        )
+        if len(valid_bindings) != len(typed_bindings):
+            reasons.append(
+                "HARD_RUNTIME fact bindings must declare a canonical HardRuntimeFact"
+            )
+        declared_facts = {binding.fact for binding in valid_bindings}
+        if len(declared_facts) != len(valid_bindings):
             reasons.append("each HARD_RUNTIME fact may be bound only once")
         for binding in evidence.fact_bindings:
             if not isinstance(binding, HardRuntimeFactContextBinding):
@@ -246,7 +261,7 @@ class HardRuntimeGate:
                 )
         bound_facts: set[HardRuntimeFact] = set()
         binding_claim_refs: set[str] = set()
-        for binding in typed_bindings:
+        for binding in valid_bindings:
             bound_facts.add(binding.fact)
             for claim_ref in binding.claim_refs:
                 binding_claim_refs.add(claim_ref)
@@ -307,7 +322,7 @@ class HardRuntimeGate:
             reasons.append("valid time is not established")
         if evidence.fallback_state is FallbackState.NONE and not any(
             binding.fact is HardRuntimeFact.NO_ACTIVE_EQUIVALENT_FALLBACK
-            for binding in typed_bindings
+            for binding in valid_bindings
         ):
             reasons.append("absence of an active fallback is asserted without canonical proof")
         scope = (
@@ -338,6 +353,11 @@ class DependencyBook:
         self._records: dict[str, DependencyRecord] = {}
 
     def add(self, record: DependencyRecord) -> DependencyRecord:
+        if not isinstance(record, DependencyRecord):
+            raise Book4ProvenanceError(
+                "dependency admission requires a typed DependencyRecord; untyped "
+                "payloads are rejected"
+            )
         if record.dependency_id in self._records:
             raise ValueError("dependency IDs are immutable and unique")
         self.provenance.validate_refs(record.book2_claim_refs)

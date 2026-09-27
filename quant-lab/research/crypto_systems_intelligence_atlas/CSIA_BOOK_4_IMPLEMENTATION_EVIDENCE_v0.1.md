@@ -346,3 +346,33 @@ CRYPTO_SENSOR_MUTATIONS = 0
 R3 artifacts: `CSIA_BOOK_4_HARDENING_R3_MULTI_PROVIDER_INDEPENDENCE.md`,
 `CSIA_BOOK_4_HARDENING_R3_MATRIX.json`,
 `test_book4_r3_pair_coverage.py`, `test_book4_r3_model_copy_adversarial.py`.
+
+## Fail-Closed Audit — Admission & Classification Decision Points
+
+Operator-directed sweep of every Book 4 decision point for the fail-closed
+gap pattern R3 found in the redundancy seam (`test_book4_fail_closed_audit.py`,
+21 probes). Three crash classes were confirmed and sealed at the decision
+points: raw-dict record/binding injection (five admission methods and the
+failure-domain classify path previously crashed with AttributeError), a
+stripped `affected_system_refs` tuple crashing failure-domain classification
+with IndexError, and non-string/unhashable claim or snapshot refs reaching
+the provenance chokepoints. A fact-enum drift crash in the HARD_RUNTIME gate
+was also closed. All untyped or drifted payloads are now refused with
+`Book4ProvenanceError`; no decision point can be made to crash by payload
+drift.
+
+```text
+DECISION_POINTS_SWEPT = 13
+CRASH_CLASSES_CONFIRMED = 3 (+1 enum-drift crash)
+PROBES = 21 (all fail-closed after fix)
+CSIA_TESTS = 528 PASS (507 preserved unchanged)
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (37 source files)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+SENSOR_FAILURE_SET = byte-identical to the R3 equivalence record
+BOOK4_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_1/2/3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```
+
+Audit artifact: `CSIA_BOOK_4_FAIL_CLOSED_AUDIT.md`.

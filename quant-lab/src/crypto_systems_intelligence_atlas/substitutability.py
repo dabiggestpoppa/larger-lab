@@ -6,7 +6,7 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .dependency_provenance import Book4Provenance
+from .dependency_provenance import Book4Provenance, Book4ProvenanceError
 from .temporal import Timestamp, UnknownBound
 
 
@@ -58,6 +58,11 @@ class SubstitutabilityBook:
         self._records: dict[str, SubstitutabilityAssessment] = {}
 
     def add(self, assessment: SubstitutabilityAssessment) -> SubstitutabilityAssessment:
+        if not isinstance(assessment, SubstitutabilityAssessment):
+            raise Book4ProvenanceError(
+                "substitutability admission requires a typed SubstitutabilityAssessment; "
+                "untyped payloads are rejected"
+            )
         if assessment.assessment_id in self._records:
             raise ValueError("substitutability IDs are immutable and unique")
         self.provenance.validate_refs(assessment.book2_claim_refs)

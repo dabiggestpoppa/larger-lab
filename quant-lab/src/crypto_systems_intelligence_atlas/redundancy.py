@@ -132,6 +132,11 @@ class RedundancyBook:
             ) from exc
 
     def add(self, assessment: RedundancyAssessment) -> RedundancyAssessment:
+        if not isinstance(assessment, RedundancyAssessment):
+            raise Book4ProvenanceError(
+                "redundancy admission requires a typed RedundancyAssessment; "
+                "untyped payloads are rejected"
+            )
         if assessment.redundancy_id in self._records:
             raise ValueError("redundancy IDs are immutable and unique")
         self.provenance.validate_refs(assessment.book2_claim_refs)

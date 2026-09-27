@@ -5,7 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .architecture_relations import ArchitectureRelationType
-from .dependency_provenance import Book4Provenance
+from .dependency_provenance import Book4Provenance, Book4ProvenanceError
 from .relationships import EdgeType
 from .temporal import Timestamp, UnknownBound
 
@@ -80,6 +80,11 @@ class DependencyPathBook:
         self._paths: dict[str, DependencyPath] = {}
 
     def add(self, path: DependencyPath) -> DependencyPath:
+        if not isinstance(path, DependencyPath):
+            raise Book4ProvenanceError(
+                "path admission requires a typed DependencyPath; untyped payloads "
+                "are rejected"
+            )
         if path.path_id in self._paths:
             raise ValueError("path IDs are immutable and unique")
         self.provenance.validate_refs(path.book2_claim_refs)

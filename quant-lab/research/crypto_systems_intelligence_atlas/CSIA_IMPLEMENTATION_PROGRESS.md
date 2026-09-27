@@ -927,3 +927,39 @@ LIVE_ACQUISITION_AUTHORITY = FALSE
 No R4 merely for generic hardening. The exact next action is BOOK 4 OPERATOR
 ACCEPTANCE unless another concrete externally demonstrated correctness defect
 exists.
+
+## CHECKPOINT 19 — BOOK 4 FAIL-CLOSED AUDIT
+
+Operator-directed audit of every Book 4 admission and classification decision
+point for the fail-closed gap pattern demonstrated in R3. 21 executable
+probes attacked all seven Book admission methods, both classify paths, and
+the provenance chokepoints with raw dicts, model_copy-stripped tuples,
+untyped bindings, non-string/unhashable refs, and enum-drifted facts. Three
+crash classes were confirmed (raw-payload AttributeError, stripped-tuple
+IndexError, chokepoint TypeError) and sealed with typed-record guards,
+structural guards, and a shared `require_str_hashable` entry gate. Every
+untyped payload is now refused closed.
+
+```text
+AUDIT_TRIGGER = OPERATOR_DIRECTED (post-R3)
+DECISION_POINTS_SWEPT = 13
+CRASH_CLASSES_CONFIRMED_AND_SEALED = 4
+PROBES = 21
+CSIA_TESTS = 528 PASS (pre-audit 507 preserved unchanged)
+CSIA_RUFF = PASS
+CSIA_MYPY = PASS (37 source files)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+SENSOR_FAILURE_SET = byte-identical to the R3 equivalence record
+BOOK4_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_1/2/3_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+```
+
+```text
+BOOK_4_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK4_PROTOCOL_INFRASTRUCTURE_DEPENDENCY_KERNEL
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_4_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_5 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
