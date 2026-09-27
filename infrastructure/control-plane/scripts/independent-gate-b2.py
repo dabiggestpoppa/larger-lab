@@ -120,7 +120,7 @@ def _parse_json(evidence: Path, name: str, checks: list, tag: str) -> dict | Non
                        "detail": "refused: name is not a plain evidence member"})
         return None
     path = Path(os.path.realpath(str(evidence / name)))
-    if path.parent != os.path.realpath(evidence):
+    if str(path.parent) != os.path.realpath(evidence):
         checks.append({"id": tag, "name": f"{name} exists", "ok": False,
                        "detail": "refused: resolved path escapes the evidence directory"})
         return None

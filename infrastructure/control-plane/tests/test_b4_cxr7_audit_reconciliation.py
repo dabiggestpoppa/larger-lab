@@ -36,7 +36,6 @@ public one all fail the proof.
 import sys
 from pathlib import Path
 
-import psycopg2
 import pytest
 
 BASE = Path(__file__).resolve().parent.parent
@@ -259,7 +258,10 @@ def test_u5_same_audit_id_different_request_id(pg):
     rid1 = "u5-same-aid-r1"
     rid2 = "u5-same-aid-r2"
     sink.append(_sink_record(aid, rid1, new=9104))
-    with pytest.raises(psycopg2.IntegrityError):
+    # B4-CXR7U9R45X1: the sink's Python-side reconciliation guard refuses the
+    # divergent reuse BEFORE any INSERT reaches PostgreSQL, so the raised
+    # type is PermissionError (B4-CXR6R3), not a unique-violation IntegrityError.
+    with pytest.raises(PermissionError):
         sink.append(_sink_record(aid, rid2, new=9999))
     with pg.cursor() as cur:
         cur.execute("SELECT request_id, new FROM config_override_audit "
@@ -312,7 +314,7 @@ def test_u5_divergent_reuse_refused_no_applicable_value(pg, field, bad):
     sink.append(_sink_record(rid, rid, new=9104))
     record = _sink_record(rid, rid, new=9104)
     record[field] = bad
-    with pytest.raises(psycopg2.IntegrityError):
+    with pytest.raises(PermissionError):  # Python-side divergent-reuse guard
         sink.append(record)
     with pg.cursor() as cur:
         cur.execute("SELECT actor, setting, requested_change, reason, new, "
@@ -495,7 +497,10 @@ def test_u8_same_audit_id_different_request_id_divergent_refused(pg):
         cur.execute("SELECT actor, setting, new, reason FROM "
                     "config_override_audit WHERE audit_id=%s", (aid,))
         before = cur.fetchone()
-    with pytest.raises(psycopg2.IntegrityError):
+    # divergent reuse is refused by the Python-side guard (PermissionError),
+    # but the pending transaction from the SELECT above trips the
+    # dedicated-connection guard FIRST (RuntimeError, B4-CXR5R5)
+    with pytest.raises(RuntimeError):
         sink.append(_sink_record(aid, "u8-div-r2", new=9105))
     with pg.cursor() as cur:
         cur.execute("SELECT actor, setting, new, reason FROM "
@@ -524,7 +529,7 @@ def test_u8_transaction_usable_after_reconcile_and_refusal(pg):
         # divergent refusal on a SECOND audit_id
         aid2 = "u8-txn-usable-0002"
         sink.append(_sink_record(aid2, "u8-txn-usable-r1", new=9104))
-        with pytest.raises(psycopg2.IntegrityError):
+        with pytest.raises(PermissionError):  # Python-side divergent-reuse guard
             sink.append(_sink_record(aid2, "u8-txn-usable-r2", new=9999))
         # the SAME connection must still accept and commit a NEW record
         rid3 = "u8-txn-usable-0003"
@@ -556,7 +561,7 @@ def test_u8_semantic_field_divergence_refused(pg):
         record = _sink_record(rid, rid, new=9104)
         record[field] = bad
         record["request_id"] = r2  # avoid reusing the consumed key shape
-        with pytest.raises(psycopg2.IntegrityError):
+        with pytest.raises(PermissionError):  # Python-side divergent-reuse guard
             sink.append(record)
     with pg.cursor() as cur:
         cur.execute("SELECT count(*) FROM config_override_audit "

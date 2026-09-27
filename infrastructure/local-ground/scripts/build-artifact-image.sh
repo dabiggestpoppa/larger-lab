@@ -37,6 +37,7 @@ PY
 lock_value() {
   local key="$1"
   python3 - "$LOCK" "$key" <<'PY'
+import json, sys
 lock = json.load(open(sys.argv[1], encoding="utf-8"))
 value = lock[sys.argv[2]]
 if not isinstance(value, str):

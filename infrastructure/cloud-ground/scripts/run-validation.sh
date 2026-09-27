@@ -165,8 +165,9 @@ write_worktree_cleanup_evidence() {
     local removed=false pruned=false
     [[ "$WORKTREE_REMOVED" = true ]] && removed=true
     [[ "$WORKTREE_PRUNED" = true ]] && pruned=true
-    printf '{"removed": %s, "pruned": %s}
-' "$removed" "$pruned" \n        > "$FINAL_EVIDENCE/worktree-cleanup.json" 2>/dev/null || true
+    printf '{"removed": %s, "pruned": %s}\n' \
+        "$removed" "$pruned" \
+        > "$FINAL_EVIDENCE/worktree-cleanup.json" 2>/dev/null || true
 }
 
 cleanup() {
