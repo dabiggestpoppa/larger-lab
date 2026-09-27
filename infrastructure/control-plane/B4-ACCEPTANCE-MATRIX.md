@@ -417,3 +417,46 @@ No cloud, broker, capital, or execution-authority mutation occurred;
 recurring cost is $0. Book 5 and Atlas Program Block 4 remain untouched.
 
 **Exit-gate truth:** `READY_FOR_OPERATOR_REVIEW`.
+
+---
+
+## B4-CXR7U9R45 — SUPERSEDING SECTION (selector binding and final quality-gate truth)
+
+**Gate missions:**
+1. One selector classification law: `_selector_agrees_with_finalizing` is the single predicate consumed by the shell FINALIZING branch and phase_reconcile (R45R3: 15-row matrix driving a real CLI child and real reconciliation, cross-surface agreement map, zero-mutation census per row).
+2. Receipt binding: classification keys on the exact promote receipt digest via the four-state `_claim_state` law; a digest without expectation is `unbound_or_mismatched` (R45R1).
+3. Claim path/type admission: realpath containment in the governed transitions directory, symlink refusal, regular-file-only, POSIX group/other-bit refusal, double-lstat TOCTOU (R45R2; refusal tests executable on Linux).
+4. Denied classification has zero durable side effects.
+5. The mandatory runner selects every R45 proof module; collected node ids are unique; every skip is a declared platform gate (R45R5 proofs).
+6. All mandatory proofs executed in authoritative CI with zero skips: b1 467/467, b2 905/905 (read from its `independent-gate.json`; b3/b4 run the same control-plane suite and their gates PASS), I1R 67/67 + 35/35 + 31/31 plus the adversarial battery green (run IDs below).
+7. Sonar findings repaired or individually proven and truthfully blocked on operator disposition — no suppression, exclusion, or severity change (R45R4 inventory in its commit; R45X1 repairs R45R4's own CI-demonstrated defects).
+8. Kilo's completed workspace-setup failure is recorded truthfully; Kilo remains FAILURE on the final head.
+9. Evidence record and acceptance matrix agree on closure status (both BLOCKED, below).
+
+**Implementation head:** `1a66231234363587cc3d6471bce0c6cbc5718bb8`.
+**Exact-head workflows:** b1 `36326811618`, b2 `36326811625`,
+b3 `36326811620`, b4 `36326811621`, and B1-I1R `36326813971` — all success.
+
+**Repair chain:** R45X1 (four R45R4 defects: artifact-image heredoc import,
+worktree-cleanup printf corruption, `_parse_json` Path/str comparison,
+audit exception pins), R45X2 (worktree-create stderr diagnostics),
+R45X3 (LFS-smudge skip; GitHub LFS budget exhaustion captured verbatim in
+run 36326018898 and preserved — account-level, operator-side).
+
+**Artifact truth:** b1 evidence `b1-local-ground-evidence-2e756cada5d9`,
+OCE_RUN_ID `2e756cada5d9`: 467/467 passed on Linux, zero
+failures/errors/skips, independent gate PASS, 37 manifest artifacts with
+sha256 recorded, source clean before and after, main `7c7816f3` untouched,
+cloud_mutations 0, cloud_cost_state ZERO, cloud_activation_state
+DEFERRED_BY_OPERATOR. Failed intermediate heads (`dfbfa699` 5/5 failed;
+`c2829789` and `2d4e1ff3` I1R worktree failures) are recorded in the
+evidence record, not erased. Prior sections remain preserved verbatim
+above.
+
+**Current authorization boundary:** SonarCloud FAILURE (D Security /
+C Reliability on New Code) unsuppressed on this head; Kilo FAILURE; PR #4
+OPEN, MERGEABLE, UNSTABLE, unmerged; `main` at `7c7816f3`; no cloud,
+broker, capital, or execution-authority mutation; recurring cost is $0;
+Book 5 and Atlas Program Block 4 untouched.
+
+**Exit-gate truth:** `BLOCKED_B4_CXR7U9R45: SonarCloud quality gate FAILURE (D Security / C Reliability on New Code) and Kilo Code Review FAILURE on head 1a662312 — operator-side adjudication required`.

@@ -2517,3 +2517,97 @@ is $0. Book 5 and Atlas Program Block 4 remain untouched.
 
 **Status: IMPLEMENTATION CONVERGED — CLOSURE BLOCKED** (external blockers:
 SonarCloud failure and Kilo review without conclusion; no self-ratification).
+
+---
+
+## B4-CXR7U9R45 — Selector binding and final quality-gate truth (superseding)
+
+Authorized start `ade83be89c331e5db11bb7ae63a1dfe5dcd00a9d`; append-only
+ladder on `oce-program-build`, all pushed, PR #4 never merged:
+
+| Commit | Round | Content |
+|---|---|---|
+| `d9f34526` | R45R1 | selector classification bound to the exact promote receipt (four-state `_claim_state` law) |
+| `642fb1e4` | R45R2 | canonical claim path/type admission: realpath containment, symlink refusal, regular-file-only, POSIX 0o077 refusal, double-lstat TOCTOU |
+| `e6e932ec` | R45R3 | one selector law shared by shell FINALIZING and phase_reconcile (`_selector_agrees_with_finalizing`), matrix-proven |
+| `d472392e` | R45R4 | 30 SonarCloud findings adjudicated and repaired/dispositioned (full inventory in that commit message) |
+| `dfbfa699` | R45R5 | runner-selection proof module wired into the authoritative runner (selection, unique node ids, declared platform gates, expanded-variable guard) |
+| `c2829789` | R45X1 | four R45R4 defects CI demonstrated, repaired at the sink |
+| `2d4e1ff3` | R45X2 | git-stderr diagnostics for the adversarial worktree-create step |
+| `1a6623123` | R45X3 | LFS-smudge skip for the disposable adversarial worktree |
+
+### Narrow-repair truth (R45X1 — each CI-demonstrated, none suppressed)
+
+1. `build-artifact-image.sh`: R45R4 dropped `import json, sys` from
+   `lock_value()`'s heredoc, aborting every artifact image build under
+   `set -euo pipefail` (b1 run 36321844387: 32 failures/errors). Import
+   restored; heredoc re-executed against the real `source-lock.json`.
+2. cloud-ground `run-validation.sh`: R45R4 corrupted the
+   `worktree-cleanup.json` printf (literal newline inside the format plus a
+   stray `n` third argument), so the final gate rejected the evidence as
+   UNPARSEABLE (B1-I1R run 36272684656). Format restored; output
+   re-verified parseable.
+3. `independent-gate-b2.py` `_parse_json`: containment compared a `Path`
+   against a `str` — always unequal in Python — refusing every legitimate
+   evidence file ("resolved path escapes the evidence directory"; 7
+   gate-regression failures on runs 36321844303/15/29). Repaired with an
+   explicit `str()` comparison; 16/16 gate regressions pass.
+4. `test_b4_cxr7_audit_reconciliation.py`: R45R4 pinned
+   `psycopg2.IntegrityError` where the sink's Python-side guards actually
+   raise `PermissionError` (divergent reuse, B4-CXR6R3) and `RuntimeError`
+   (pending transaction, B4-CXR5R5) before any INSERT reaches PostgreSQL.
+   Pins corrected to the guards' real types. The module is container-gated
+   locally and executes in CI — which is where the defect surfaced.
+
+### CI truth on the final R45X3 head `1a66231234363587cc3d6471bce0c6cbc5718bb8`
+
+All five authoritative workflows SUCCESS at exact head:
+b1 `36326811618`, b2 `36326811625`, b3 `36326811620`, b4 `36326811621`,
+B1-I1R `36326813971`.
+
+- b1 evidence `b1-local-ground-evidence-2e756cada5d9` (OCE_RUN_ID
+  `2e756cada5d9`): 467/467 executed and passed, 0 failed, 0 errors,
+  0 skipped — every R45 platform-gated proof RAN on Linux; independent
+  gate PASS; manifest 37 artifacts with sha256 recorded; identity
+  attached; source clean before and after; cleanup verified;
+  cloud_mutations 0, cloud_cost_state ZERO.
+- b2/b3/b4 independent gates: 905/905 executed and passed, 0 skipped
+  (counts read from b2's `independent-gate.json`; b3/b4 run the same
+  control-plane suite and their gates PASS) — the ten
+  audit-reconciliation container tests execute green after the R45X1
+  pin correction.
+- B1-I1R: 67/67 registered regressions, 35/35 validation checks, 31/31
+  initial phase, adversarial battery green inside the disposable detached
+  worktree, worktree removed and pruned with parseable cleanup evidence.
+
+### Failed intermediate heads (recorded, not erased)
+
+`dfbfa699` (R45R5): 5/5 workflows failed — the R45R4 defects repaired in
+R45X1 above. `c2829789` (R45X1): b1–b4 success; B1-I1R failed at
+worktree-create. `2d4e1ff3` (R45X2 diagnostics) captured the cause — git
+worktree add smudge of an LFS-tracked `*.parquet` failed with "This
+repository exceeded its LFS budget. The account responsible for the
+budget should increase it to restore access." (run 36326018898). R45X3
+skips the LFS smudge for the disposable worktree only: the adversarial
+suite proves identity, clean source, fixtures and gate rejection from git
+metadata and source text, and the worktree's pointer files are exactly
+what the authoritative CI checkout itself contains, so no proof is
+skipped. The LFS budget itself remains an account-level external
+condition the operator must lift; the captured error stays in the run
+log and in this record.
+
+### External and authorization truth
+
+SonarCloud Code Analysis on this head is FAILURE — D Security / C
+Reliability on New Code — unsuppressed; the four cognitive-complexity
+findings and the documented false positives await operator-side platform
+adjudication. Kilo Code Review on this head is FAILURE (its earlier
+COMPLETED / FAILURE workspace-setup result, check run 108425602635,
+remains recorded truthfully). PR #4 remains OPEN, MERGEABLE, UNSTABLE,
+and unmerged, head `1a6623123`. `main` is untouched at `7c7816f3`. Cloud,
+broker, capital, and execution-authority mutations are 0; recurring cost
+is $0. Book 5 and Atlas Program Block 4 remain untouched.
+
+**Status: IMPLEMENTATION CONVERGED — CLOSURE BLOCKED** (external blockers:
+SonarCloud quality-gate FAILURE and Kilo FAILURE on this head; no
+self-ratification).
