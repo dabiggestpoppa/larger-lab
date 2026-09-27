@@ -378,7 +378,17 @@ ADV_WORKTREE="$ADV_PARENT/wt"
 # and 2) failed here with the cause invisible because stderr was discarded;
 # the identical command against the identical merge-preview commit succeeds
 # locally. Diagnostics only: the success path is byte-for-byte unchanged.
-if ! git -C "$PROJ_ROOT" worktree add --detach "$ADV_WORKTREE" HEAD \
+#
+# B4-CXR7U9R45X3: run 36326018898 captured the cause — GitHub LFS budget
+# exhaustion ("This repository exceeded its LFS budget") during the smudge
+# of an LFS-tracked *.parquet. The adversarial suite requires no LFS
+# payload: it proves identity, clean source, fixtures and gate rejection
+# from git metadata and source text only, and the disposable worktree's
+# pointer files are exactly what the authoritative CI checkout itself
+# contains (the workflow never pulls LFS). Skipping the smudge therefore
+# skips no proof; it only avoids downloading large binary payloads the
+# budget no longer permits.
+if ! GIT_LFS_SKIP_SMUDGE=1 git -C "$PROJ_ROOT" worktree add --detach "$ADV_WORKTREE" HEAD \
     >/dev/null 2>"$ADV_PARENT/wt-add.err"; then
     FAILED_PHASE="worktree-create"
     echo "FATAL: Could not create real isolated Git worktree at $ADV_WORKTREE." >&2
