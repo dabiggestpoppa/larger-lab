@@ -1,0 +1,55 @@
+{
+  "checkpoint": "SENSOR-B4-I12",
+  "matrix": "I12_READ_ONLY_IMMUTABILITY_MATRIX",
+  "evidence_truth": "Full hash sweep of the durable tree before/after queries, artifact reads, replays and expected typed failures; exact equality required.",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "success_path_byte_identical",
+      "required_invariants": [
+        "all_files_same_hash",
+        "no_new_files",
+        "no_deleted_files"
+      ],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "expected_failures_observed",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "failure_path_byte_identical",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "no_mutation_api_on_surface",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "counterfactual_query_writes_to_catalog",
+      "synthetic_counterfactual": true,
+      "required_invariants": [
+        "counterfactual_must_fail"
+      ],
+      "every_invariant_literal_true": false,
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for READ_ONLY_IMMUTABILITY: deliberately invalid execution path that must evaluate FAIL; not a real measured row."
+    }
+  ],
+  "summary": {
+    "rows": 5,
+    "ok": 4,
+    "fail": 1
+  }
+}

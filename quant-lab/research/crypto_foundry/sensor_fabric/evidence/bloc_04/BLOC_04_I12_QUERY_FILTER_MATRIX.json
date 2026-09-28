@@ -1,0 +1,173 @@
+{
+  "checkpoint": "SENSOR-B4-I12",
+  "matrix": "I12_QUERY_FILTER_MATRIX",
+  "evidence_truth": "Every RawEvidenceQuery filter is mechanically evaluated against a real accepted-stack lake; zero-hit filters raise typed NoMatchingEvidence; results carry evidence-backed bounds, never the requested window.",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "unfiltered_returns_whole_inventory",
+      "required_invariants": [
+        "complete_inventory_enumeration",
+        "every_filter_field_evaluated"
+      ],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "provider_filter",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "provider_filter_gate",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "venue_filter",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "sensor_family_filter",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "instrument_filter",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "granularity_filter",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "granularity_zero_hit_is_typed",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "range_exact_bounds",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "range_inside_overlap",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "range_outside_left_of_all_day",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "range_outside_right_all_day_only",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "range_point_interval_inside_all_day",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "range_point_interval_outside_narrow",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "result_carries_evidence_bounds_not_request",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "acquired_before_independent",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "observed_before_independent",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "acquired_cutoff_excludes_late_ingest",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "include_modes_both_false_is_typed_failure",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "coverage_state_filter",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "limit_after_full_reduction",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "counterfactual_filter_ignores_requested_bounds_as_actual",
+      "synthetic_counterfactual": true,
+      "required_invariants": [
+        "counterfactual_must_fail"
+      ],
+      "every_invariant_literal_true": false,
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for QUERY_FILTER: deliberately invalid execution path that must evaluate FAIL; not a real measured row."
+    }
+  ],
+  "summary": {
+    "rows": 22,
+    "ok": 21,
+    "fail": 1
+  }
+}

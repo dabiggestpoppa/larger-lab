@@ -1,0 +1,75 @@
+{
+  "checkpoint": "SENSOR-B4-I12",
+  "matrix": "I12_REPLAY_ORDER_MATRIX",
+  "evidence_truth": "Three explicit order modes only; unavailable evidence is a typed refusal; ordering keys are durable acquisition facts with a documented tie-break.",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "acquisition_order_deterministic",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "acquisition_order_repeatable",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "acquisition_order_fresh_service_identical",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "provider_event_time_absent_refused",
+      "required_invariants": [
+        "no_ingestion_substitution",
+        "no_observed_substitution"
+      ],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "unknown_order_mode_typed",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "provider_event_time_present_orders",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "source_order_absent_refused",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "counterfactual_sort_everything_by_timestamp",
+      "synthetic_counterfactual": true,
+      "required_invariants": [
+        "counterfactual_must_fail"
+      ],
+      "every_invariant_literal_true": false,
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for REPLAY_ORDER: deliberately invalid execution path that must evaluate FAIL; not a real measured row."
+    }
+  ],
+  "summary": {
+    "rows": 8,
+    "ok": 7,
+    "fail": 1
+  }
+}

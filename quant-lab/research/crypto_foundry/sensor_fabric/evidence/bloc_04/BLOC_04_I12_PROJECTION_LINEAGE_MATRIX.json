@@ -1,0 +1,66 @@
+{
+  "checkpoint": "SENSOR-B4-I12",
+  "matrix": "I12_PROJECTION_LINEAGE_MATRIX",
+  "evidence_truth": "Derived from the I12 acceptance suite's projection/lineage test classes run against the real accepted I05 stack.",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "pytest_stdout_tail": [
+    "6 passed in 2.14s"
+  ],
+  "rows": [
+    {
+      "case": "projection_metadata_schema_and_parser_exposed",
+      "required_invariants": [
+        "projection_schema_id",
+        "projection_schema_version",
+        "parser_version",
+        "source_lineage"
+      ],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "lineage_resolution_through_accepted_contracts",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "incomplete_lineage_typed_failure",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "unsupported_schema_typed_failure",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "metadata_query_never_opens_payload",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "counterfactual_t0b_without_lineage_returned_usable",
+      "synthetic_counterfactual": true,
+      "required_invariants": [
+        "counterfactual_must_fail"
+      ],
+      "every_invariant_literal_true": false,
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for PROJECTION_LINEAGE: deliberately invalid execution path that must evaluate FAIL; not a real measured row."
+    }
+  ],
+  "summary": {
+    "rows": 6,
+    "ok": 5,
+    "fail": 1
+  }
+}

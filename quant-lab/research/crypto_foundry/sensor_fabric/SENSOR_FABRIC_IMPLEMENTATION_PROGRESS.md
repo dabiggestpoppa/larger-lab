@@ -2630,3 +2630,97 @@ recommended_next                                         = SENSOR-B4-I12 IMPLEME
 This correction changes the completeness of one evidence claim.  It is
 not a new seal, not a new phase, and not a change of authorization.  I12
 remains authorized but **not started**.
+
+## SENSOR-B4-I12 — raw evidence query / replay API implemented (PENDING_OPERATOR_REVIEW)
+
+Append-only: this section is new; no prior checkpoint-history section was
+rewritten.  Start-gate note: the mandated start SHA was
+`adf1dd1f18431caf0a91940a0d952425f73ec345`, but the I11R2C-R1 self-scan
+correction `bde337176b4af7bafa96ef0743ec07cdabf5dbe6` (operator-directed in
+the previous checkpoint run) was already the branch head.  The operator
+approved starting I12 from `bde33717` with the deviation recorded here; that
+commit's parent IS the mandated `adf1dd1f` and it changed no governance
+verdict and no historical evidence.  Remote main `7c7816f3` untouched.
+
+### §5 COMPLETE INVENTORY gate — MISSING_PUBLIC_INVENTORY_INTERFACE, resolved by operator review
+
+Every accepted I04/I06 read was keyed by an ALREADY-KNOWN identity
+(partition_key, blob hash, acquisition id, source_revision_key); a
+non-globbing consumer could not discover what the lake holds, and the only
+complete-inventory routes were filesystem globbing or DuckDB-as-truth — both
+forbidden for I12.  Implementation STOPPED at the gate per §5/§41 and the
+finding was reported with the smallest additive API.  The operator approved
+exactly four read-only enumeration methods (I12A):
+
+- `PartitionManifestRepository.list_all_current_manifests()` — validates every
+  pointer through the exact logical partition_key path (I04R1 §38/§40); the
+  physical locator filename is never trusted.
+- `BlobMetadataRepository.list_all_blob_metadata()`
+- `AcquisitionRepository.list_all_acquisitions()`
+- `SourceRevisionRegistry.list_source_revision_keys()`
+
+No accepted behavior changed; no historical evidence rewritten.
+
+### What was built
+
+- `storage/query.py` — `RawEvidenceQueryService`: complete-inventory snapshot
+  (sorted by natural identity; determinism by construction, §27); every §6
+  filter applied; evidence-backed range intersection (§7, requested bounds
+  never become actual bounds); independent acquired/observed predicates
+  (§8, F20); explicit integrity admissibility lattice (§14 — failure states
+  never promoted, visible as themselves only at the UNVERIFIED floor);
+  explicit coverage states (§15); typed failure vocabulary (§16) with
+  `NoMatchingEvidence` as a typed condition rather than an empty list.
+- `storage/replay.py` — `RawArtifactReader` (exact bytes, bounded
+  deterministic streaming, verify, metadata; compression stays inside the
+  accepted blob store), `RawProjectionReader` (schema gate, parser version,
+  full lineage chain; `LINEAGE_INCOMPLETE` on any missing relationship;
+  metadata queries never open T0A bytes), `RevisionResolver` (frozen I06
+  policies; typed ambiguity; canonical only from explicit declaration
+  evidence), `RawReplayCursor` (ACQUISITION_ORDER deterministic with
+  documented tie-break; PROVIDER_EVENT_TIME only with actual event-time
+  evidence — never substituted; SOURCE_ORDER only from explicit preserved
+  sequence evidence, else typed refusal), `Bloc5Handoff` (complete
+  `RawNormalizationBatch`, no Bloc-5 semantics).
+- `RawEvidenceQuery.exact_revision_number: int | None` (§11) — the typed
+  EXACT_REVISION selector: required >= 1 under EXACT_REVISION, forbidden
+  otherwise.  Backwards-compatible; no string hacks.
+- Read-only by construction (§29): the surface has no
+  delete/overwrite/repair/quarantine/manifest-mutation/revision-declaration/
+  resume-advancement/recovery names (machine-checked).
+
+### Measured evidence (append-only, mechanically derived)
+
+Seven matrices + narrative under `evidence/bloc_04/`:
+`BLOC_04_I12_QUERY_FILTER_MATRIX.json` (22 rows, 21 OK, 1 synthetic
+counterfactual FAIL), `BLOC_04_I12_REVISION_POLICY_MATRIX.json` (13/12/1),
+`BLOC_04_I12_ARTIFACT_READER_MATRIX.json` (10/9/1),
+`BLOC_04_I12_PROJECTION_LINEAGE_MATRIX.json` (6/5/1),
+`BLOC_04_I12_REPLAY_ORDER_MATRIX.json` (8/7/1),
+`BLOC_04_I12_READ_ONLY_IMMUTABILITY_MATRIX.json` (5/4/1),
+`BLOC_04_I12_BLOC5_HANDOFF_MATRIX.json` (10/9/1),
+`BLOC_04_I12_RAW_QUERY_REPLAY_EVIDENCE.md`.  Every row's invariants are
+literal-true or the row FAILs; each matrix carries exactly one synthetic
+counterfactual FAIL.  Artifacts regenerate byte-identically without any
+override; `UPDATE_I12_EVIDENCE=1` is required only for publication; normal
+pytest is read-only against committed evidence.
+
+Immutability proof (§30): full hash sweep of the durable tree identical
+before/after queries, artifact reads, replays, batch conversion, AND
+expected typed failures.  Firewalls (§31-§33): no Postgres, no DuckDB, no
+network in I12 (AST-verified); path-shaped selector values are inert.
+
+### Authorization boundary
+
+```
+PASS_SENSOR_B4_I12_RAW_QUERY_REPLAY_SEALED = PENDING_OPERATOR_REVIEW
+G4-10_OPERATIONAL_METADATA_GATE            = IMPLEMENTATION_PASS (unchanged)
+next_checkpoint_authorized                 = FALSE
+recommended_next                           = OPERATOR REVIEW OF SENSOR-B4-I12
+I13                                        = UNAUTHORIZED
+I13+                                        = UNAUTHORIZED
+research                                    = FROZEN
+```
+
+I12 does NOT self-ratify and does NOT earn G4-11 (G4-11 is I13
+export/restore).  I12 is NOT started on any later checkpoint.

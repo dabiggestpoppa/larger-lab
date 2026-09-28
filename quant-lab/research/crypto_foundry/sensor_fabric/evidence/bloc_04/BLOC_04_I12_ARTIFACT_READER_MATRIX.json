@@ -1,0 +1,89 @@
+{
+  "checkpoint": "SENSOR-B4-I12",
+  "matrix": "I12_ARTIFACT_READER_MATRIX",
+  "evidence_truth": "T0A reads go only through the accepted LocalBlobStore surface; streaming is bounded, deterministic and exact; missing blobs fail typed.",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "open_bytes_exact",
+      "required_invariants": [
+        "exact_source_bytes",
+        "wrapper_decoded"
+      ],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "stream_concatenation_exact",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "stream_chunks_bounded",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "stream_deterministic",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "stream_never_unbounded_read",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "metadata_evidence_blob",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "verify_local_hash",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "missing_blob_typed",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "compressed_wrapper_roundtrip",
+      "required_invariants": [],
+      "every_invariant_literal_true": true,
+      "result": "OK",
+      "detail": ""
+    },
+    {
+      "case": "counterfactual_reader_skips_verification",
+      "synthetic_counterfactual": true,
+      "required_invariants": [
+        "counterfactual_must_fail"
+      ],
+      "every_invariant_literal_true": false,
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for ARTIFACT_READER: deliberately invalid execution path that must evaluate FAIL; not a real measured row."
+    }
+  ],
+  "summary": {
+    "rows": 10,
+    "ok": 9,
+    "fail": 1
+  }
+}
