@@ -774,3 +774,65 @@ NEXT = BOOK 5 PLANNING SESSION
 Acceptance record:
 `CSIA_BOOK_4_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md` (on the
 implementation branch at the acceptance commit).
+
+---
+
+# PLANNING LEDGER — D7 CAPITAL FIELD RECONCILIATION READY FOR OPERATOR REVIEW (2026-09-28)
+
+The D7 reconnaissance session completed the Capital Field reconciliation
+analysis and the Book 5 pre-planning boundary review. Per Constitution v0.2
+§4.3, Book 5 planning may not begin until the operator records decision D7.
+This session created analysis artifacts only: no Book 5 plan, no ratification,
+no implementation, no live acquisition, no silent D7 selection.
+
+```text
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_4 = FROZEN_ACCEPTED
+BOOK_4_ACCEPTED_IMPLEMENTATION_ANCHOR = 1650ba7ce30633e2e4ddf141e439a13ed948c51b
+
+BOOK_5_PLANNING_AUTHORITY = TRUE
+BOOK_5_PLAN = NOT_STARTED_PENDING_D7
+BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+
+D7 = OPEN
+CAPITAL_FIELD_RECONCILIATION = READY_FOR_OPERATOR_REVIEW
+D8 = OPEN (gate: before Book 8 planning; out of D7 scope)
+
+STRUCTURAL_FAILURE_COUNT = 0
+OPEN_OPERATOR_DECISION_COUNT = 1 (D7)
+BOOK_1_AMENDMENT_CANDIDATE_COUNT = 4 (recorded, not applied)
+BOOK_2_AMENDMENT_CANDIDATE_COUNT = 0
+BOOK_3_AMENDMENT_CANDIDATE_COUNT = 0
+BOOK_4_AMENDMENT_CANDIDATE_COUNT = 0
+BOOK_4_AMENDMENT_REQUIRED = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED = FALSE
+
+PRE_DECISION_ADVERSARIAL_REVIEW = 15/15 PASS
+
+NEXT = OPERATOR DECISION D7 — CAPITAL FIELD RECONCILIATION
+       (via CSIA_BOOK_5_CAPITAL_FIELD_OPERATOR_DECISION_PACKET_v0.1.md;
+       operator supplies D7-SELECT-OPTION, D7-ARTIFACT-DISPOSITION,
+       D7-5G-NAMING, D7-EXIT-SEMANTICS)
+THEN = Book 5 planning session (only after D7 is recorded)
+```
+
+D7 artifacts created (planning-only, non-canonical until D7 is recorded):
+
+- `CSIA_BOOK_5_CAPITAL_FIELD_RECONCILIATION_v0.1.md`
+- `CSIA_BOOK_5_ECONOMIC_PRIMITIVE_CANDIDATE_MATRIX_v0.1.md`
+- `CSIA_BOOK_5_DOUBLE_COUNTING_STRESS_MATRIX_v0.1.md`
+- `CSIA_BOOK_5_BOUNDARY_REVIEW_v0.1.md`
+- `CSIA_BOOK_5_CAPITAL_FIELD_OPERATOR_DECISION_PACKET_v0.1.md`
+- `CSIA_BOOK_5_PRE_DECISION_REVIEW_v0.1.md`
+
+Session integrity: no D7 option was selected or recommended; the packet
+requires explicit operator selections. No Book 5 plan artifact exists
+(`CSIA_BOOK_5_*PLAN*` absent). No mutation of Books 1–4, the Constitution,
+the roadmap, or the Operator Decision Log occurred. Historical Capital Field
+meanings were inventoried from attested sources only (IACER §C2/§R3,
+Constitution v0.1 §4.3, Constitution v0.2 §4.3, roadmap Bloc 5G, frozen
+`book4_boundary.py`, Book 1 review Q15, program ledger guard language);
+no missing doctrine was inferred.
