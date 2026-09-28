@@ -743,6 +743,53 @@ class PartitionManifestRepository:
         orphans.sort(key=lambda m: (m.manifest_version, m.partition_manifest_id))
         return orphans
 
+    def list_all_current_manifests(self) -> list[PartitionManifest]:
+        """Every validated current manifest, across ALL partitions (I12A).
+
+        SENSOR-B4-I12A additive PUBLIC enumeration (operator-reviewed §5
+        gate): the accepted per-key reads (``read_current_pointer``/
+        ``get_current_manifest``/``list_manifest_versions``) all require an
+        ALREADY-KNOWN ``partition_key``, so a non-globbing consumer could
+        not discover which partitions exist.  This read walks the current
+        pointer directory, resolves each pointer through the SAME validated
+        path as ``get_current_manifest`` (logical ``partition_key`` is
+        authoritative, never the physical locator — I04R1 §38/§40), and
+        returns one manifest per partition with a live pointer, sorted by
+        ``(partition_key, manifest_version)``.
+
+        Read-only; corruption fails closed through the existing typed
+        errors; superseded versions stay reachable via
+        ``list_manifest_versions``.  A pointer whose manifest fragment is
+        missing/dangling raises ``CurrentPointerDangling`` — inventory is
+        never silently partial.
+        """
+        pointer_dir = self._pointer_dir()
+        manifests: list[PartitionManifest] = []
+        if not pointer_dir.exists():
+            return []
+        for path in sorted(pointer_dir.glob("*.json")):
+            # The pointer filename is the PHYSICAL locator hash; the pointer
+            # file's OWN partition_key is the logical authority (I04R1
+            # §38/§40).  Parse the file, then validate it against the exact
+            # logical key it declares through the same read path as
+            # ``read_current_pointer`` — never trusting the stem.
+            try:
+                text = path.read_text(encoding="utf-8")
+            except OSError as exc:
+                raise CurrentPointerCorrupt(
+                    f"current pointer {path!s} unreadable: {exc}"
+                ) from exc
+            pointer = PartitionCurrentPointer.from_canonical_json(text)
+            validated = self.read_current_pointer(pointer.partition_key)
+            if validated is None:  # pragma: no cover - file just read
+                continue
+            manifests.append(self._load_manifest_fragment(validated))
+        manifests.sort(
+            key=lambda m: (m.partition_key, m.manifest_version,
+                           m.partition_manifest_id)
+        )
+        return manifests
+
     # -- referential integrity (I04 §45/§46/§47/§68) --------------------------
 
     def _verify_blob_ref(self, blob_sha256: str) -> None:

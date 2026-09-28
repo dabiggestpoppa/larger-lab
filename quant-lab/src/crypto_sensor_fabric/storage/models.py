@@ -650,6 +650,7 @@ class RawEvidenceQuery(StorageModelBase):
     include_t0b: bool = False
     projection_schema_ids: list[str] = Field(default_factory=list)
     limit: int | None = None
+    exact_revision_number: int | None = None  # SENSOR-B4-I12A (I12 §11)
 
     @model_validator(mode="after")
     def _normalize_timestamps(self) -> RawEvidenceQuery:
@@ -669,6 +670,32 @@ class RawEvidenceQuery(StorageModelBase):
     def _validate_limit(self) -> RawEvidenceQuery:
         if self.limit is not None:
             _validate_nonnegative_int(self.limit, "limit")
+        return self
+
+    @model_validator(mode="after")
+    def _validate_exact_revision_number(self) -> RawEvidenceQuery:
+        # SENSOR-B4-I12A (I12 §11): typed revision-number selector —
+        # EXACT_REVISION requires an explicit number >= 1; a non-EXACT
+        # policy must not carry one (no string hacks, no stale selectors).
+        if self.revision_policy is RevisionPolicy.EXACT_REVISION:
+            if self.exact_revision_number is None:
+                raise ValueError(
+                    "revision_policy=EXACT_REVISION requires "
+                    "exact_revision_number >= 1"
+                )
+            if (
+                not isinstance(self.exact_revision_number, int)
+                or isinstance(self.exact_revision_number, bool)
+                or self.exact_revision_number < 1
+            ):
+                raise ValueError(
+                    "exact_revision_number must be an int >= 1"
+                )
+        elif self.exact_revision_number is not None:
+            raise ValueError(
+                "exact_revision_number is only valid with "
+                "revision_policy=EXACT_REVISION"
+            )
         return self
 
 

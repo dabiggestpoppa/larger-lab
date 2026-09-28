@@ -664,6 +664,37 @@ class BlobMetadataRepository:
             receipt = _receipt_for_existing("blobs", key.fragment_name, final, 1)
         return blob, receipt
 
+    def list_all_blob_metadata(self) -> list[EvidenceBlob]:
+        """Every committed EvidenceBlob metadata row (I12A).
+
+        SENSOR-B4-I12A additive PUBLIC enumeration (operator-reviewed §5
+        gate): the accepted reads (``get_blob_metadata``/
+        ``get_blob_metadata_exact``) all require an ALREADY-KNOWN content
+        hash, so a non-globbing consumer could not discover which blobs
+        hold durable metadata.  This read scans the immutable blob family
+        fragments through the SAME ``read_fragment`` path as every other
+        repository read and returns one row per physical
+        ``BlobStorageKey`` (content hash + storage encoding), sorted by
+        ``(blob_sha256, storage_encoding)``.
+
+        Read-only; corrupt fragments raise ``CatalogIntegrityError`` —
+        inventory is never silently partial.
+        """
+        blobs: list[EvidenceBlob] = []
+        family = self._family_dir()
+        if not family.exists():
+            return []
+        for path in sorted(family.glob("*.parquet")):
+            rows = read_fragment(path, BLOB_SCHEMA)
+            if len(rows) != 1:
+                raise CatalogIntegrityError(
+                    f"blob metadata fragment {path!s} holds "
+                    f"{len(rows)} rows, expected exactly 1"
+                )
+            blobs.append(_blob_from_row(rows[0]))
+        blobs.sort(key=lambda b: (b.blob_sha256, b.storage_encoding.value))
+        return blobs
+
     def get_blob_metadata(self, blob_sha256: str) -> list[EvidenceBlob]:
         """All durable metadata rows for one CONTENT hash (all encodings)."""
         validate_sha256_hex(blob_sha256)
@@ -1404,6 +1435,34 @@ class AcquisitionRepository:
                 f"acquisition fragment {path!s} holds {len(rows)} rows"
             )
         return _acquisition_from_row(rows[0])
+
+    def list_all_acquisitions(self) -> list[AcquisitionRecord]:
+        """Every durable AcquisitionRecord, across ALL blobs (I12A).
+
+        SENSOR-B4-I12A additive PUBLIC enumeration (operator-reviewed §5
+        gate): ``list_acquisitions_for_blob`` already documents that its
+        blob-keyed scan is the correctness-first local v1 route; the same
+        fragment walk WITHOUT the hash predicate is the only non-globbing,
+        authority-side complete acquisition inventory.  Failed acquisitions
+        stay included exactly as in the forensic reads (I04R2 §11) — I12
+        filters eligibility itself and never redefines it.  Sorted by
+        ``acquisition_id``.
+
+        Read-only; corrupt fragments raise ``CatalogIntegrityError``.
+        """
+        records: list[AcquisitionRecord] = []
+        family = self._family_dir()
+        if not family.exists():
+            return []
+        for path in sorted(family.glob("*.parquet")):
+            rows = read_fragment(path, ACQUISITION_SCHEMA)
+            if len(rows) != 1:
+                raise CatalogIntegrityError(
+                    f"acquisition fragment {path!s} holds {len(rows)} rows"
+                )
+            records.append(_acquisition_from_row(rows[0]))
+        records.sort(key=lambda r: r.acquisition_id)
+        return records
 
 
 # ---------------------------------------------------------------------------

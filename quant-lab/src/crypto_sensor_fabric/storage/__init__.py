@@ -195,6 +195,35 @@ from .projection_schema import (
     compute_schema_key,
 )
 
+# SENSOR-B4-I12A — raw-evidence query/replay boundary (F19).  Read-only
+# services and typed failures; mutation remains in the writer checkpoints.
+from .query import (
+    BlobMissing as QueryBlobMissing,
+    CatalogStale,
+    IntegrityBelowThreshold,
+    LineageIncomplete,
+    NoMatchingEvidence,
+    ProjectionSchemaUnsupported,
+    QueryOutcome,
+    QueryValidationError,
+    RawEvidenceQueryService,
+    RawInventorySnapshot,
+    RawQueryError,
+    ReplayOrderUnavailable,
+    RevisionAmbiguity,
+    StorageBackendUnavailable,
+)
+from .replay import (
+    ACQUISITION_ORDER,
+    PROVIDER_EVENT_TIME,
+    SOURCE_ORDER,
+    Bloc5Handoff,
+    RawArtifactReader,
+    RawProjectionReader,
+    RawReplayCursor,
+    RevisionResolver,
+)
+
 __all__ = [
     # catalog schemas
     "ACQUISITION_SCHEMA",
@@ -350,4 +379,27 @@ __all__ = [
     "redact_dsn",
     "reconstruct_snapshot",
     "validate_row",
+    # SENSOR-B4-I12A query/replay boundary
+    "ACQUISITION_ORDER",
+    "PROVIDER_EVENT_TIME",
+    "SOURCE_ORDER",
+    "Bloc5Handoff",
+    "CatalogStale",
+    "IntegrityBelowThreshold",
+    "LineageIncomplete",
+    "NoMatchingEvidence",
+    "ProjectionSchemaUnsupported",
+    "QueryBlobMissing",
+    "QueryOutcome",
+    "QueryValidationError",
+    "RawArtifactReader",
+    "RawEvidenceQueryService",
+    "RawInventorySnapshot",
+    "RawProjectionReader",
+    "RawQueryError",
+    "RawReplayCursor",
+    "ReplayOrderUnavailable",
+    "RevisionAmbiguity",
+    "RevisionResolver",
+    "StorageBackendUnavailable",
 ]

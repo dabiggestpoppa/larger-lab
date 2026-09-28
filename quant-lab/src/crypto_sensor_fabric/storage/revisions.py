@@ -1991,6 +1991,17 @@ class SourceRevisionRegistry:
             return seg.source_revision_key, seg.revision_number
         return binding[0], binding[1]
 
+    def list_source_revision_keys(self) -> list[str]:
+        """Every registered source_revision_key (I12A).
+
+        SENSOR-B4-I12A additive PUBLIC enumeration (operator-reviewed §5
+        gate): ``list_revisions``/``list_observations``/``resolve`` all
+        require an ALREADY-KNOWN ``source_revision_key``, and a consumer
+        must never re-derive keys by re-hashing identity descriptors.
+        Returns the registry's own segment keys, sorted.
+        """
+        return sorted(self._segments_by_key.keys())
+
     # -- resolution (§54-§61) -------------------------------------------------
 
     def resolve(
