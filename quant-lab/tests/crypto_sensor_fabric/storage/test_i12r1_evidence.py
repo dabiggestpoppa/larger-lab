@@ -654,13 +654,15 @@ def build_representation_selection_matrix() -> dict[str, object]:
             projection_schema_ids=["other.schema"],
         ))
         rows.append(mrow(
-            "schema_mismatch_with_T0A_fallback_documented",
+            "schema_mismatch_with_both_requested_fails_typed",
             "PRODUCTION_BEHAVIOR",
-            r["exception"] is None and bool(r["blob_refs"])
-            and r["projection_refs"] == [],
-            "FROZEN documented behavior (I12R1 §10 option A): the valid T0A "
-            "selection is returned and the non-matching T0B projection is "
-            "left out of projection_refs (visible absence, not substitution)",
+            r["exception"] == "ProjectionSchemaUnsupported",
+            "SUPERSEDED I12R2 (operator review §12): include_t0b=True is an "
+            "explicit caller REQUIREMENT — both-representations queries "
+            "refuse typed (ProjectionSchemaUnsupported) when no eligible T0B "
+            "projection matches; the I12R1 option-A T0A fallback recorded "
+            "here before operator review is superseded by the I12R2 "
+            "representation-satisfaction law",
             **r,
         ))
         # Lineage-before-publication: broken chain never publishes, even at
@@ -751,11 +753,7 @@ def build_replay_dispatch_matrix() -> dict[str, object]:
             shas[1], "acq-a", ingested_at=FIXED + timedelta(hours=1)
         )
         lake.commit_manifest("pm-1", blob_refs=shas)
-        svc = RawEvidenceQueryService(
-            manifest_repository=lake.manifest_repo,
-            acquisition_repository=lake.acq_repo,
-            blob_metadata_repository=lake.blob_repo,
-        )
+        svc = wired_service(lake)
         cursor = RawReplayCursor(service=svc)
         result = svc.execute(RawEvidenceQuery()).results[0]
 
