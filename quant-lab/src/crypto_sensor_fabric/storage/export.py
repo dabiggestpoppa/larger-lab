@@ -226,14 +226,84 @@ class PackManifestPayload(BaseModel):
     checksum_domains: dict[str, str]
 
 
-def read_pack_manifest(pack_root: Path) -> PackManifestPayload:
+# ---------------------------------------------------------------------------
+# Digest domains (I13R1 §10) — exact, documented, NON-CIRCULAR
+# ---------------------------------------------------------------------------
+
+_DIGEST_NEUTRAL = ""  # neutral value for excluded self-digest fields
+
+
+def _manifest_body_bytes(manifest: PackManifestPayload) -> bytes:
+    """Canonical manifest body: the full payload with BOTH self-digest
+    fields neutralized (excluded from their own hash — no circularity)."""
+    body = manifest.model_copy(
+        update={
+            "manifest_sha256": _DIGEST_NEUTRAL,
+            "pack_root_sha256": _DIGEST_NEUTRAL,
+        }
+    )
+    return canonical_json_bytes(body)
+
+
+def _inventory_tuples_bytes(manifest: PackManifestPayload) -> bytes:
+    """Canonical ordered object-inventory tuples (role, object_id,
+    pack_path, sha256, byte_size, checksum_domain, provenance_ref)."""
+    lines = []
+    for rec in sorted(
+        manifest.object_inventory,
+        key=lambda r: (r.role.value, r.pack_path),
+    ):
+        lines.append(
+            json.dumps(
+                [
+                    rec.role.value,
+                    rec.object_id,
+                    rec.pack_path,
+                    rec.sha256,
+                    rec.byte_size,
+                    rec.checksum_domain.value,
+                    rec.provenance_ref,
+                ],
+                separators=(",", ":"),
+            )
+        )
+    return "\n".join(lines).encode("utf-8")
+
+
+def _compute_manifest_digests(
+    manifest: PackManifestPayload,
+) -> tuple[str, str]:
+    """Return (MANIFEST_BODY_SHA256, PACK_ROOT_SHA256).
+
+    MANIFEST_BODY_SHA256 = SHA256(canonical manifest body with both
+    self-digest fields neutralized).
+
+    PACK_ROOT_SHA256 = SHA256(canonical structure containing the
+    manifest body digest + the sorted object-inventory tuples).
+    """
+    manifest_body_sha = hashlib.sha256(
+        _manifest_body_bytes(manifest)
+    ).hexdigest()
+    pack_root = hashlib.sha256(
+        manifest_body_sha.encode("utf-8")
+        + b"\n"
+        + _inventory_tuples_bytes(manifest)
+    ).hexdigest()
+    return manifest_body_sha, pack_root
+
+
+def read_pack_manifest(
+    pack_root: Path,
+    *,
+    max_manifest_bytes: int = DEFAULT_MAX_MANIFEST_BYTES,
+) -> PackManifestPayload:
     """Load + schema-check the pack manifest (fail-closed)."""
     path = pack_root / PACK_MANIFEST_NAME
     try:
         raw = path.read_bytes()
     except OSError as exc:
         raise PackManifestCorrupt(f"pack manifest unreadable: {exc}") from exc
-    if len(raw) > DEFAULT_MAX_MANIFEST_BYTES:
+    if len(raw) > max_manifest_bytes:
         raise PackResourceLimitExceeded("pack manifest exceeds ceiling")
     try:
         payload = json.loads(raw.decode("utf-8"))
@@ -251,9 +321,21 @@ def read_pack_manifest(pack_root: Path) -> PackManifestPayload:
 
 def write_pack_manifest(pack_root: Path, manifest: PackManifestPayload) -> str:
     """Write the manifest canonically; return its exact-bytes digest."""
-    payload_bytes = canonical_json_bytes(manifest)
-    (pack_root / PACK_MANIFEST_NAME).write_bytes(payload_bytes)
-    return hashlib.sha256(payload_bytes).hexdigest()
+    manifest_bytes = canonical_json_bytes(manifest)
+    (pack_root / PACK_MANIFEST_NAME).write_bytes(manifest_bytes)
+    return hashlib.sha256(manifest_bytes).hexdigest()
+
+
+def _read_pack_metadata_bytes(path: Path) -> bytes:
+    """SMALL_BOUNDED_METADATA read (I13R1 §15): pack JSON catalog records
+    are bounded by the manifest-byte ceiling; physical blob/projection
+    payloads NEVER use this helper (they stream)."""
+    data = path.read_bytes()
+    if len(data) > DEFAULT_MAX_MANIFEST_BYTES:
+        raise PackResourceLimitExceeded(
+            f"pack metadata record exceeds ceiling: {path.name!r}"
+        )
+    return data
 
 
 def _file_digest(path: Path) -> tuple[str, int]:
@@ -312,6 +394,7 @@ class ExportLimits:
     max_objects: int = DEFAULT_MAX_OBJECTS
     max_total_bytes: int = DEFAULT_MAX_TOTAL_BYTES
     max_object_bytes: int = DEFAULT_MAX_OBJECT_BYTES
+    max_manifest_bytes: int = DEFAULT_MAX_MANIFEST_BYTES
 
 
 @dataclass
@@ -425,11 +508,26 @@ class EvidencePackExporter:
         results: list[RawEvidenceResult],
         destination: Path,
     ) -> ExportReceipt:
+        # I13R1 §7 atomic publication law: the final destination MUST NOT
+        # EXIST before publication.  The pack is built COMPLETE in a
+        # sibling staging directory and published with ONE directory-level
+        # atomic rename — no child-by-child finalization, so a crash can
+        # never expose a partially finalized pack.
         self._validate_destination(destination)
-        destination.mkdir(parents=True, exist_ok=True)
-        staging = destination / STAGING_DIR_NAME
+        if destination.exists():
+            raise ExportPackExists(
+                f"destination {destination} already exists (atomic "
+                "publication law: the final pack root must not pre-exist)"
+            )
+        parent = destination.parent
+        parent.mkdir(parents=True, exist_ok=True)
+        staging = parent / f".{destination.name}.staging-export"
         if staging.exists():
-            shutil.rmtree(staging)
+            raise ExportPackExists(
+                f"stale export staging {staging} present; remove it "
+                "explicitly (deterministic policy: never silently adopt "
+                "partial staging)"
+            )
         staging.mkdir()
         try:
             inventory: list[ExportObjectRecord] = []
@@ -571,16 +669,43 @@ class EvidencePackExporter:
                     payload=canonical_json_bytes(artifact),
                     provenance_ref=artifact.projection_sha256,
                 )
-                # T0B payload bytes (PACK_FILE domain; digest must equal the
-                # artifact's projection_sha256 — same bytes, different role).
-                payload_bytes = self._read_projection_payload(artifact)
-                self._add_object(
-                    inventory,
-                    staging,
-                    role=PackObjectRole.PROJECTION_PAYLOAD,
-                    object_id=f"payload:{projection_id}",
-                    payload=payload_bytes,
-                    provenance_ref=artifact.projection_sha256,
+                # T0B payload bytes (PACK_FILE domain) — STREAMED through
+                # the public physically-verified reader (I13R1 §4/§14:
+                # bounded memory, corruption refuses typed before open).
+                payload_component = _safe_object_component(
+                    f"payload:{projection_id}",
+                    PackObjectRole.PROJECTION_PAYLOAD,
+                )
+                payload_path = (
+                    f"{ROLE_DIRS[PackObjectRole.PROJECTION_PAYLOAD]}/"
+                    f"{payload_component}"
+                )
+                payload_target = assert_pack_path_safe(staging, payload_path)
+                if payload_target.exists():
+                    raise ExportSourceInvalid(
+                        f"duplicate projection payload identity {projection_id}"
+                    )
+                with self._artifacts.open_payload(projection_id) as handle:
+                    payload_sha, payload_size = _copy_into(
+                        handle,
+                        payload_target,
+                        chunk_size=self._chunk_size,
+                    )
+                if payload_sha != artifact.projection_sha256:
+                    raise PackChecksumMismatch(
+                        f"projection payload digest != projection_sha256 "
+                        f"for {projection_id}"
+                    )
+                inventory.append(
+                    ExportObjectRecord(
+                        role=PackObjectRole.PROJECTION_PAYLOAD,
+                        object_id=f"payload:{projection_id}",
+                        pack_path=payload_path,
+                        sha256=payload_sha,
+                        byte_size=payload_size,
+                        checksum_domain=PackChecksumDomain.PACK_FILE,
+                        provenance_ref=artifact.projection_sha256,
+                    )
                 )
                 if self._contexts is not None:
                     context = self._contexts.get(projection_id)
@@ -627,9 +752,14 @@ class EvidencePackExporter:
                             provenance_ref=definition.schema_identity,
                         )
 
-            # --- revision evidence for exported acquisitions (§7) --------------
+            # --- revision evidence under the EXPLICIT closure law -------------
+            # (I13R1 §3: only the revisions the query semantics require —
+            # never every revision of a touched source key)
             if self._revisions is not None:
-                self._export_revisions(inventory, staging, acq_ids)
+                self._export_revisions(
+                    inventory, staging, acq_ids, query.revision_policy,
+                    query.exact_revision_number,
+                )
 
             # --- query specification (§7) ----------------------------------------
             query_path = assert_pack_path_safe(staging, QUERY_SPEC_NAME)
@@ -665,12 +795,10 @@ class EvidencePackExporter:
                 blob_count=len(blob_shas),
                 projection_count=len(projection_ids),
                 total_bytes=total_bytes,
-                manifest_sha256=hashlib.sha256(
-                    canonical_json_bytes(inventory[0]) if inventory else b"0"
-                ).hexdigest(),
+                manifest_sha256="",
                 objects=sorted({rec.object_id for rec in inventory}),
                 object_inventory=inventory,
-                pack_root_sha256=None,
+                pack_root_sha256="",
                 layout={role.value: d for role, d in ROLE_DIRS.items()},
                 checksum_domains={
                     "SOURCE_BYTES": (
@@ -680,20 +808,26 @@ class EvidencePackExporter:
                     "PACK_FILE": "sha256 of the pack file's own bytes",
                 },
             )
-            # Self-verify BEFORE finalization (§43): the same independent
-            # verifier a later consumer would run.
+            # I13R1 §10: seal BOTH digest domains, persist them, THEN
+            # self-verify BEFORE publication (§43).
+            manifest_sha, pack_root_sha = _compute_manifest_digests(payload)
+            payload = payload.model_copy(
+                update={
+                    "manifest_sha256": manifest_sha,
+                    "pack_root_sha256": pack_root_sha,
+                }
+            )
             write_pack_manifest(staging, payload)
             EvidencePackVerifier(
                 limits=VerifyLimits(
                     max_objects=self._limits.max_objects,
                     max_total_bytes=self._limits.max_total_bytes,
                     max_object_bytes=self._limits.max_object_bytes,
+                    max_manifest_bytes=self._limits.max_manifest_bytes,
                 )
             ).verify_pack(staging)
-            pack_root_sha = _file_digest(
-                staging / PACK_MANIFEST_NAME
-            )[0]
-            self._finalize(staging, destination)
+            # ONE atomic directory rename publishes the verified pack.
+            staging.rename(destination)
 
             receipt_manifest = ExportManifest(
                 export_id=export_id,
@@ -703,7 +837,7 @@ class EvidencePackExporter:
                 blob_count=len(blob_shas),
                 projection_count=len(projection_ids),
                 total_bytes=total_bytes,
-                manifest_sha256=pack_root_sha,
+                manifest_sha256=manifest_sha,
                 objects=sorted({rec.object_id for rec in inventory}),
                 verification_state=IntegrityState.LOCAL_HASH_VERIFIED,
                 pack_schema_version=PACK_SCHEMA_VERSION,
@@ -740,18 +874,59 @@ class EvidencePackExporter:
         inventory: list[ExportObjectRecord],
         staging: Path,
         acq_ids: set[str],
+        policy: Any,
+        exact_revision_number: int | None,
     ) -> None:
+        """I13R1 §3 EXPLICIT revision closure law — export only the durable
+        revision evidence the query semantics require, never every
+        revision of a touched source key:
+
+        - ALL -> full chain of the selected keys;
+        - FIRST_SEEN -> revision 1 closure only;
+        - LATEST_SEEN -> chain 1..latest (resolution needs the full
+          observed chain to reproduce the latest selection);
+        - EXACT_REVISION=N -> prefix 1..N (numbering/replay derives from
+          the segment chain, so the prefix is required; no future
+          revisions beyond N);
+        - PROVIDER_DECLARED_CANONICAL -> selected revision + its required
+          declaration evidence + prerequisite chain 1..selected;
+        - ERROR_ON_AMBIGUITY (single-revision key) -> that one revision.
+        """
         registry = self._revisions
+        policy_name = (
+            policy.value if hasattr(policy, "value") else str(policy)
+        )
         for key in registry.list_source_revision_keys():
-            # The durable SEGMENT records carry first_acquisition_id (the
-            # materialized SourceRevision views do not); read-only
-            # introspection of registry truth (§42).
-            segments = list(
-                getattr(registry, "_segments_by_key", {}).get(key, [])
-            )
-            if not any(s.first_acquisition_id in acq_ids for s in segments):
+            segments = registry.list_segment_records(key)
+            touched = [
+                s for s in segments if s.first_acquisition_id in acq_ids
+            ]
+            if not touched:
                 continue
+            max_revision = max(s.revision_number for s in segments)
+            if policy_name == "ALL":
+                keep = max_revision
+            elif policy_name == "FIRST_SEEN":
+                keep = 1
+            elif policy_name == "LATEST_SEEN":
+                keep = max_revision
+            elif policy_name == "EXACT_REVISION":
+                keep = exact_revision_number or 1
+            elif policy_name == "PROVIDER_DECLARED_CANONICAL":
+                keep = max(
+                    s.revision_number for s in touched
+                )
+            else:  # ERROR_ON_AMBIGUITY: single-revision key reached here
+                if len(segments) > 1:
+                    # Ambiguity for the touched key: the SERVICE already
+                    # resolved/raised; reaching export means the selection
+                    # was unambiguous, so keep only touched revisions.
+                    keep = max(s.revision_number for s in touched)
+                else:
+                    keep = 1
             for segment in segments:
+                if segment.revision_number > keep:
+                    continue  # closure law: no future/unrelated revisions
                 self._add_object(
                     inventory,
                     staging,
@@ -761,24 +936,25 @@ class EvidencePackExporter:
                     provenance_ref=key,
                 )
             for observation in registry.list_observations(key):
-                if (
-                    observation.acquisition_id in acq_ids
-                    or observation.observation_id.startswith("birth:")
+                bound = observation.acquisition_id in acq_ids
+                synthetic_birth = observation.observation_id.startswith(
+                    "birth:"
+                )
+                if not (bound or synthetic_birth):
+                    continue
+                self._add_object(
+                    inventory,
+                    staging,
+                    role=PackObjectRole.REVISION_OBSERVATIONS,
+                    object_id=observation.observation_id,
+                    payload=canonical_json_bytes(observation),
+                    provenance_ref=key,
+                )
+            for declaration in registry.list_declarations(key):
+                if declaration.revision_number is not None and (
+                    declaration.revision_number > keep
                 ):
-                    self._add_object(
-                        inventory,
-                        staging,
-                        role=PackObjectRole.REVISION_OBSERVATIONS,
-                        object_id=observation.observation_id,
-                        payload=canonical_json_bytes(observation),
-                        provenance_ref=key,
-                    )
-            # Declarations are explicit provider evidence bound to the key;
-            # read-only introspection of durable registry truth (§42).
-            declarations = getattr(registry, "_declarations_by_key", {}).get(
-                key, []
-            )
-            for declaration in declarations:
+                    continue  # closure law
                 self._add_object(
                     inventory,
                     staging,
@@ -787,35 +963,6 @@ class EvidencePackExporter:
                     payload=canonical_json_bytes(declaration),
                     provenance_ref=key,
                 )
-
-    def _read_projection_payload(self, artifact: Any) -> bytes:
-        """Read the provider-native projection file via its accepted
-        read-only URI (validated safe-under-root by the artifact commit).
-        Verify against projection_sha256 (the artifact's own digest law)."""
-        from .paths import resolve_under_root
-
-        root = Path(self._artifacts._projection_root)
-        path = resolve_under_root(root, artifact.projection_uri)
-        if not path.is_file():
-            raise ExportSourceInvalid(
-                f"projection payload missing for {artifact.projection_id}"
-            )
-        data = path.read_bytes()
-        if hashlib.sha256(data).hexdigest() != artifact.projection_sha256:
-            raise PackChecksumMismatch(
-                f"projection payload digest != projection_sha256 for "
-                f"{artifact.projection_id}"
-            )
-        return data
-
-    def _finalize(self, staging: Path, destination: Path) -> None:
-        """Promote the verified staging tree into the final pack root."""
-        for child in list(staging.iterdir()):
-            target = destination / child.name
-            if target.exists():
-                raise ExportPackExists(f"pack object already exists: {target}")
-            shutil.move(str(child), str(target))
-        staging.rmdir()
 
     def _add_object(
         self,
@@ -868,6 +1015,7 @@ class VerifyLimits:
     max_objects: int = DEFAULT_MAX_OBJECTS
     max_total_bytes: int = DEFAULT_MAX_TOTAL_BYTES
     max_object_bytes: int = DEFAULT_MAX_OBJECT_BYTES
+    max_manifest_bytes: int = DEFAULT_MAX_MANIFEST_BYTES
 
 
 @dataclass
@@ -882,8 +1030,10 @@ class EvidencePackVerifier:
     """Full-inventory pack verifier; independent of the source lake (§20).
 
     Validates manifest schema/version, duplicate identities/paths, path
-    containment + symlinks, per-file size AND checksum, and the exact
-    inventory policy (§21: unlisted files refuse; no best-effort recovery).
+    containment + symlinks, per-file size AND checksum, the exact
+    inventory policy (§21: unlisted files refuse; no best-effort
+    recovery), and INDEPENDENTLY RECOMPUTES both persisted pack digests
+    (I13R1 §11).
     """
 
     def __init__(
@@ -895,7 +1045,9 @@ class EvidencePackVerifier:
 
     def verify_pack(self, pack_root: Path) -> PackVerificationReport:
         pack_root = Path(pack_root)
-        manifest = read_pack_manifest(pack_root)
+        manifest = read_pack_manifest(
+            pack_root, max_manifest_bytes=self._limits.max_manifest_bytes
+        )
         if manifest.pack_schema_version != PACK_SCHEMA_VERSION:
             raise PackUnsupportedVersion(
                 f"pack schema {manifest.pack_schema_version!r} not supported"
@@ -950,6 +1102,21 @@ class EvidencePackVerifier:
                 raise PackInventoryMismatch(
                     f"unexpected unlisted pack object: {relative!r}"
                 )
+        # I13R1 §11: independently recompute BOTH persisted digests.
+        _expected_manifest_sha, expected_pack_root = (
+            _compute_manifest_digests(manifest)
+        )
+        if manifest.manifest_sha256 != _expected_manifest_sha:
+            raise PackChecksumMismatch(
+                "manifest_sha256 does not match its documented digest domain"
+            )
+        if (
+            manifest.pack_root_sha256 is None
+            or manifest.pack_root_sha256 != expected_pack_root
+        ):
+            raise PackChecksumMismatch(
+                "pack_root_sha256 does not match its documented digest domain"
+            )
         return PackVerificationReport(
             pack_root=pack_root,
             object_count=len(inventory),
@@ -1092,9 +1259,12 @@ class EvidencePackRestorer:
             key = blob_object_key(rec.object_id, encoding)
             target = t0a / key
             target.parent.mkdir(parents=True, exist_ok=True)
-            file_sha, size = _copy_into(
-                source.read_bytes(), target, chunk_size=DEFAULT_COPY_CHUNK
-            )
+            # I13R1 §13: STREAMING file-to-file copy — no whole-payload
+            # bytes object ever materializes in memory.
+            with open(source, "rb") as src_handle:
+                file_sha, size = _copy_into(
+                    src_handle, target, chunk_size=DEFAULT_COPY_CHUNK
+                )
             if file_sha != rec.object_id or size != rec.byte_size:
                 raise RestoreIntegrityFailure(
                     f"restored blob {rec.object_id} failed canonical "
@@ -1108,7 +1278,7 @@ class EvidencePackRestorer:
         for rec in manifest.object_inventory:
             if rec.role is PackObjectRole.BLOB_METADATA and rec.provenance_ref == blob_sha:
                 row = EvidenceBlob.model_validate_json(
-                    (pack_root / rec.pack_path).read_bytes()
+                    _read_pack_metadata_bytes(pack_root / rec.pack_path)
                 )
                 if row.blob_sha256 == blob_sha:
                     return row.storage_encoding
@@ -1180,21 +1350,21 @@ class EvidencePackRestorer:
         # 1. blob metadata rows.
         for rec in by_role.get(PackObjectRole.BLOB_METADATA, []):
             row = EvidenceBlob.model_validate_json(
-                (pack_root / rec.pack_path).read_bytes()
+                _read_pack_metadata_bytes(pack_root / rec.pack_path)
             )
             blob_repo.append_metadata(row)
 
         # 2. acquisitions (accepted gates re-run).
         for rec in by_role.get(PackObjectRole.ACQUISITION, []):
             record = AcquisitionRecord.model_validate_json(
-                (pack_root / rec.pack_path).read_bytes()
+                _read_pack_metadata_bytes(pack_root / rec.pack_path)
             )
             acq_repo.append_acquisition(record)
 
         # 3. partition manifests + current pointers (accepted CAS law).
         for rec in by_role.get(PackObjectRole.MANIFEST, []):
             pm = PartitionManifest.model_validate_json(
-                (pack_root / rec.pack_path).read_bytes()
+                _read_pack_metadata_bytes(pack_root / rec.pack_path)
             )
             pointer_rec = next(
                 (
@@ -1254,18 +1424,21 @@ class EvidencePackRestorer:
                 if a.object_id == projection_id
             )
             meta = RawProjectionArtifact.model_validate_json(
-                (pack_root / artifact.pack_path).read_bytes()
+                _read_pack_metadata_bytes(pack_root / artifact.pack_path)
             )
-            payload_bytes = (pack_root / rec.pack_path).read_bytes()
             # §25: destination locator DERIVED from validated identity —
             # the artifact's own projection_uri, resolved under t0b.
+            # I13R1 §14: STREAMING pack-file-to-restored-file copy.
             from .paths import resolve_under_root
 
             target = resolve_under_root(t0b, meta.projection_uri)
             target.parent.mkdir(parents=True, exist_ok=True)
-            digest, size = _copy_into(
-                payload_bytes, target, chunk_size=DEFAULT_COPY_CHUNK
-            )
+            with open(
+                assert_pack_path_safe(pack_root, rec.pack_path), "rb"
+            ) as src_handle:
+                digest, size = _copy_into(
+                    src_handle, target, chunk_size=DEFAULT_COPY_CHUNK
+                )
             if digest != meta.projection_sha256:
                 raise RestoreIntegrityFailure(
                     f"projection payload digest mismatch for {projection_id}"
@@ -1281,7 +1454,7 @@ class EvidencePackRestorer:
             contexts.commit(context)
         for rec in by_role.get(PackObjectRole.PROJECTION, []):
             artifact_model = RawProjectionArtifact.model_validate_json(
-                (pack_root / rec.pack_path).read_bytes()
+                _read_pack_metadata_bytes(pack_root / rec.pack_path)
             )
             artifacts.commit(artifact_model)
         for rec in by_role.get(PackObjectRole.PROJECTION_LINEAGE, []):
@@ -1305,7 +1478,7 @@ class EvidencePackRestorer:
         )
         for rec in by_role.get(PackObjectRole.ACQUISITION, []):
             record = AcquisitionRecord.model_validate_json(
-                (pack_root / rec.pack_path).read_bytes()
+                _read_pack_metadata_bytes(pack_root / rec.pack_path)
             )
             registry.register_acquisition(record.acquisition_id)
         for rec in by_role.get(PackObjectRole.REVISION_DECLARATIONS, []):
@@ -1377,7 +1550,7 @@ class EvidencePackRestorer:
             if rec.role is not PackObjectRole.BLOB_METADATA:
                 continue
             row = EvidenceBlob.model_validate_json(
-                (pack_root / rec.pack_path).read_bytes()
+                _read_pack_metadata_bytes(pack_root / rec.pack_path)
             )
             check = store.verify_blob(
                 row.blob_sha256, row.storage_encoding
@@ -1417,7 +1590,7 @@ class EvidencePackRestorer:
         for rec in manifest.object_inventory:
             if rec.role is PackObjectRole.MANIFEST:
                 pm = PartitionManifest.model_validate_json(
-                    (pack_root / rec.pack_path).read_bytes()
+                    _read_pack_metadata_bytes(pack_root / rec.pack_path)
                 )
                 manifest_repo.get_manifest(pm.partition_manifest_id)
 

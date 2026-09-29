@@ -36,10 +36,11 @@ from __future__ import annotations
 
 import json
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, BinaryIO
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -1053,6 +1054,30 @@ class ProjectionArtifactRepository:
                 f"{projection_id!r}"
             )
         return artifact
+
+    @contextmanager
+    def open_payload(self, projection_id: str) -> Iterator[BinaryIO]:
+        """SENSOR-B4-I13R1 (§4): PUBLIC physically-verified streaming read
+        of the provider-native T0B payload bytes.
+
+        Resolves the canonical path INTERNALLY (no internal-root exposure),
+        re-runs the accepted physical verification (digest + row count +
+        registered schema) BEFORE the stream opens, and yields a chunked
+        binary stream — bounded-memory consumers never need the whole
+        payload.  Corruption refuses typed (``ProjectionCorruption``).
+        """
+        artifact = self._cache.get(projection_id)
+        if artifact is None:
+            raise ProjectionCorruption(
+                f"projection_id={projection_id!r} has no committed "
+                "RawProjectionArtifact to stream"
+            )
+        self._verify_physical_projection(artifact)
+        path = resolve_under_root(
+            self._projection_root, artifact.projection_uri
+        )
+        with open(path, "rb") as handle:
+            yield handle
 
     def has(self, projection_id: str) -> bool:
         return projection_id in self._cache

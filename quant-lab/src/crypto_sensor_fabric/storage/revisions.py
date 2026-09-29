@@ -2002,6 +2002,36 @@ class SourceRevisionRegistry:
         """
         return sorted(self._segments_by_key.keys())
 
+    def list_segment_records(
+        self, source_revision_key: str
+    ) -> list[RevisionSegmentRecord]:
+        """SENSOR-B4-I13R1 (§2, operator-authorized additive PUBLIC read):
+        the durable segment-birth records for one source key, ordered by
+        ``revision_number``.  Read-only view of the SAME validated durable
+        truth already used internally; corruption stays fail-closed (the
+        catalog loader refuses corrupt fragments at construction)."""
+        return sorted(
+            self._segments_by_key.get(source_revision_key, []),
+            key=lambda s: s.revision_number,
+        )
+
+    def list_declarations(
+        self, source_revision_key: str
+    ) -> list[RevisionDeclarationRecord]:
+        """SENSOR-B4-I13R1 (§2, operator-authorized additive PUBLIC read):
+        the durable provider declaration records for one source key,
+        deterministically ordered by ``(declaration_kind, declared_at,
+        declaration_id)``.  Read-only view of the SAME validated durable
+        truth already used internally; corruption stays fail-closed."""
+        return sorted(
+            self._declarations_by_key.get(source_revision_key, []),
+            key=lambda d: (
+                d.declaration_kind,
+                d.declared_at,
+                d.declaration_id,
+            ),
+        )
+
     # -- resolution (§54-§61) -------------------------------------------------
 
     def resolve(
