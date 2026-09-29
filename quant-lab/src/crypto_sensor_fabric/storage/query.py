@@ -48,6 +48,30 @@ used as provider event time (F20).
 Integrity (I12 §14): admissibility is an explicit lattice over the frozen
 ``IntegrityState`` vocabulary — never a numeric or lexical sort.  Failure
 states are never admissible at any threshold.
+
+SENSOR-B4-I12R1 — end-to-end query semantics (operator review §1-§11):
+
+- Revision resolution is part of the PUBLIC query reduction.  ``execute``
+  derives each candidate acquisition's source_revision_key through the
+  accepted I06 identity law and delegates selection to the accepted
+  ``SourceRevisionRegistry.resolve`` — never a duplicated policy.  The
+  service accepts ``revision_registry`` + ``revision_identity_factory``;
+  when they are absent, a query carrying a non-default revision policy is
+  a typed validation failure, never a silently-ignored filter.
+- Include modes are real representation selection: ``blob_refs`` is the
+  selected/available T0A representation, ``projection_refs`` the selected
+  T0B representation, ``lineage_refs`` the durable T0A sources required by
+  the selected T0B.  Nothing is populated blindly from the manifest.
+- ``projection_schema_ids`` is evaluated from durable projection METADATA
+  only (no T0A payload bytes are opened during query).
+- T0B lineage is validated BEFORE result publication and therefore before
+  any limit: a returned projection_ref has already passed the
+  projection→schema→lineage→acquisition→blob chain.
+- Pipeline order (§10): enumeration → metadata filters → time filters →
+  revision resolution → integrity admissibility → T0A/T0B eligibility →
+  projection schema filtering → lineage validation → deterministic
+  ordering → limit LAST.  ``limit`` can never suppress a revision
+  ambiguity raised during reduction.
 """
 
 from __future__ import annotations
@@ -57,7 +81,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
-from .enums import IntegrityState
+from .enums import IntegrityState, RevisionPolicy, RevisionState
 from .models import (
     AcquisitionRecord,
     PartitionManifest,
@@ -118,6 +142,19 @@ class ReplayOrderUnavailable(RawQueryError):
 
 class QueryValidationError(RawQueryError):
     """The query itself is structurally invalid at execution time (§6)."""
+
+
+class RevisionPolicyInvalid(QueryValidationError):
+    """The revision selector itself is unusable (I12R1 §18):
+    EXACT_REVISION without a number, a number without EXACT_REVISION, or a
+    registry configuration refusal — never collapsed into a generic
+    backend failure."""
+
+
+class RevisionCanonicalUnavailable(RawQueryError):
+    """PROVIDER_DECLARED_CANONICAL found no explicit provider declaration
+    evidence (I12R1 §18/§4): typed unavailability — the absent claim is
+    never silently replaced by a temporal pick."""
 
 
 #: Frozen integrity ADMISSIBILITY lattice (I12 §14).  NOT a goodness score:
@@ -240,11 +277,121 @@ class RawEvidenceQueryService:
         manifest_repository: Any,
         acquisition_repository: Any,
         blob_metadata_repository: Any,
+        revision_registry: Any = None,
+        revision_identity_factory: Any = None,
+        projection_artifact_repository: Any = None,
+        projection_lineage_repository: Any = None,
     ) -> None:
         self._manifests_repo = manifest_repository
         self._acquisitions_repo = acquisition_repository
         self._blobs_repo = blob_metadata_repository
+        # I12R1: revision authority stays the accepted I06 registry; the
+        # service only wires it into the public query reduction (§3).
+        self._revision_registry = revision_registry
+        self._identity_factory = revision_identity_factory
+        # I12R1: read-only T0B metadata dependencies (metadata ONLY — no
+        # projection payload bytes are ever opened by a query, §9).
+        self._artifacts_repo = projection_artifact_repository
+        self._lineage_repo = projection_lineage_repository
         self._snapshot = self._build_snapshot()
+
+    # -- revision resolution through the accepted I06 law (I12R1 §2-§4) ------
+
+    def _revision_selected(
+        self, acquisition: AcquisitionRecord, query: RawEvidenceQuery
+    ) -> bool:
+        """True when the acquisition's revision is SELECTED by the query
+        policy under the accepted I06 registry resolution (§3).
+
+        Delegates every decision to ``SourceRevisionRegistry.resolve`` —
+        the I12 boundary only maps registry failures into the I12 typed
+        vocabulary, preserving ``__cause__`` (§18):
+
+        - ``RevisionAmbiguityError``  -> ``RevisionAmbiguity``
+        - ``RevisionNotFound``        -> ``NoMatchingEvidence``
+        - ``RevisionResolutionUnavailable`` -> ``RevisionCanonicalUnavailable``
+        - ``RevisionConfigurationError``/catalog corruption
+                                      -> ``RevisionPolicyInvalid``
+
+        Epistemic ambiguity is NEVER mapped to ``StorageBackendUnavailable``.
+        """
+        from .revisions import (  # local: authority module, no cycles
+            RevisionAmbiguityError,
+            RevisionConfigurationError,
+            RevisionNotFound,
+            RevisionResolutionUnavailable,
+            RevisionSourceIdentityV1,
+            RevisionTemporalAmbiguity,
+            SourceRevisionCatalogCorrupt,
+        )
+
+        registry = self._revision_registry
+        factory = self._identity_factory or RevisionSourceIdentityV1
+        try:
+            key = factory.from_acquisition(acquisition).source_revision_key()
+            resolution = registry.resolve(
+                key,
+                query.revision_policy,
+                revision_number=query.exact_revision_number,
+            )
+        except (RevisionAmbiguityError, RevisionTemporalAmbiguity) as exc:
+            # Both are epistemic ambiguity (§40 temporal ambiguity included):
+            # never mapped to StorageBackendUnavailable (I12R1 §18).
+            raise RevisionAmbiguity(str(exc)) from exc
+        except RevisionNotFound as exc:
+            raise NoMatchingEvidence(str(exc)) from exc
+        except RevisionResolutionUnavailable as exc:
+            raise RevisionCanonicalUnavailable(str(exc)) from exc
+        except (RevisionConfigurationError, SourceRevisionCatalogCorrupt) as exc:
+            raise RevisionPolicyInvalid(str(exc)) from exc
+        # The acquisition's durable binding: revision_number derived from the
+        # registry's own reverse lookup (durable truth, never a count hint).
+        binding = registry.revision_for_acquisition(acquisition.acquisition_id)
+        if binding is None:
+            raise NoMatchingEvidence(
+                f"acquisition {acquisition.acquisition_id} has no durable "
+                "revision binding in the accepted registry"
+            )
+        _key, revision_number = binding
+        return revision_number in set(resolution.selected_revision_numbers)
+
+    def _resolve_revision_state(
+        self, manifest: PartitionManifest, acquisitions: list[AcquisitionRecord]
+    ) -> RevisionState:
+        """Durable I06 revision state for the selected acquisitions (§19).
+
+        Reads the registry's own segment classification for the selected
+        revisions — the manifest's ``revision_count`` hint is NEVER the
+        authority.  Falls back to UNKNOWN_REVISION only when no revision
+        dependency is wired (a caller that never queries revision semantics
+        keeps the I12 legacy default explicitly, documented)."""
+        from .revisions import RevisionSourceIdentityV1  # noqa: F401
+
+        registry = self._revision_registry
+        if registry is None or not acquisitions:
+            return RevisionState.UNKNOWN_REVISION
+        states: list[RevisionState] = []
+        for acquisition in sorted(acquisitions, key=lambda a: a.acquisition_id):
+            binding = registry.revision_for_acquisition(acquisition.acquisition_id)
+            if binding is None:
+                continue
+            key, number = binding
+            revision = registry.get_revision(key, number)
+            if revision is not None:
+                states.append(revision.revision_state)
+        if not states:
+            return RevisionState.UNKNOWN_REVISION
+        # Deterministic fold: the strongest CLAIM wins; SOURCE_MUTATION
+        # dominates STABLE because it must stay visible.
+        if any(s is RevisionState.SOURCE_MUTATION for s in states):
+            return RevisionState.SOURCE_MUTATION
+        if any(s is RevisionState.PROVIDER_DECLARED_REVISION for s in states):
+            return RevisionState.PROVIDER_DECLARED_REVISION
+        if all(s is RevisionState.IDENTICAL_REFETCH for s in states):
+            return RevisionState.IDENTICAL_REFETCH
+        if all(s is RevisionState.STABLE for s in states):
+            return RevisionState.STABLE
+        return RevisionState.SOURCE_MUTATION
 
     # -- inventory (§5 gate) --------------------------------------------------
 
@@ -278,7 +425,22 @@ class RawEvidenceQueryService:
     # -- reduction ------------------------------------------------------------
 
     def execute(self, query: RawEvidenceQuery) -> QueryOutcome:
-        """Reduce ``query`` over the complete inventory (§6-§15)."""
+        """Reduce ``query`` over the complete inventory (I12 §6-§15, I12R1 §10).
+
+        Pipeline order is pinned (I12R1 §10):
+
+        1. authoritative inventory enumeration (frozen snapshot)
+        2. metadata filters
+        3. time filters
+        4. revision resolution (accepted I06 law)          <- I12R1
+        5. integrity admissibility
+        6. coverage semantics (via metadata filters)
+        7. T0A/T0B eligibility (representation selection)  <- I12R1
+        8. projection schema filtering                     <- I12R1
+        9. lineage validation BEFORE publication           <- I12R1
+        10. canonical deterministic ordering
+        11. limit LAST
+        """
         if not query.include_t0a and not query.include_t0b:
             # §21: T0A=False/T0B=False is a validation failure, typed here at
             # execution because the model must stay accepted-contract-faithful.
@@ -286,7 +448,26 @@ class RawEvidenceQueryService:
                 "include_t0a=False and include_t0b=False selects nothing; "
                 "at least one include mode must be True"
             )
+        # I12R1 §2: revision policy is REAL.  When the caller wants revision
+        # semantics beyond the research-safe default they must wire the
+        # accepted authority; a missing dependency is a typed refusal, never
+        # a silently-ignored filter.
+        if (
+            self._revision_registry is None
+            and (
+                query.revision_policy is not RevisionPolicy.ERROR_ON_AMBIGUITY
+                or query.exact_revision_number is not None
+            )
+        ):
+            raise QueryValidationError(
+                "the query carries an explicit revision policy but the "
+                "service was constructed without revision_registry — the "
+                "accepted I06 SourceRevisionRegistry is the only revision "
+                "authority (I12R1 §3); re-query with the default policy or "
+                "wire the registry"
+            )
 
+        # 1+2. inventory + metadata filters
         candidates = [
             manifest
             for manifest in self._snapshot.manifests
@@ -300,6 +481,7 @@ class RawEvidenceQueryService:
         results: list[RawEvidenceResult] = []
         for manifest in candidates:
             blob_records = self._snapshot.acquisitions_by_blob
+            selected_records: list[AcquisitionRecord] = []
             acquisition_ids: list[str] = []
             blob_refs: list[str] = []
             ingested_max: datetime | None = None
@@ -324,36 +506,76 @@ class RawEvidenceQueryService:
                         f"manifest {manifest.partition_manifest_id} references "
                         f"blob {blob_sha} with no durable acquisition record"
                     )
+                # 4. REVISION RESOLUTION (I12R1 §2-§4): every candidate
+                # acquisition passes through the accepted I06 registry under
+                # the query's policy.  Ambiguity raises here — BEFORE any
+                # result is built, before ordering, before limit.  With no
+                # registry wired and the default policy, resolution is a
+                # pass-through (the explicit-policy case is refused above).
+                if self._revision_registry is not None:
+                    kept: list[AcquisitionRecord] = []
+                    for r in usable:
+                        try:
+                            if self._revision_selected(r, query):
+                                kept.append(r)
+                        except NoMatchingEvidence:
+                            # This acquisition's revision is NOT selected by
+                            # the policy (e.g. EXACT_REVISION names another
+                            # revision, or the policy selected a different
+                            # revision for this source key).  The acquisition
+                            # is deselected — NOT a manifest-level failure;
+                            # other blobs/manifests may still match.
+                            pass
+                    usable = kept
+                if not usable:
+                    # Every acquisition of this blob was deselected by the
+                    # revision policy: this blob has no selected
+                    # representation — skip the blob, keep the manifest.
+                    continue
                 blob_refs.append(blob_sha)
                 acquisition_ids.extend(r.acquisition_id for r in usable)
+                selected_records.extend(usable)
                 for r in usable:
                     if ingested_max is None or r.ingested_at > ingested_max:
                         ingested_max = r.ingested_at
                     if observed_max is None or r.response_observed_at > observed_max:
                         observed_max = r.response_observed_at
-            else:
-                integrity = self._combined_integrity(
-                    manifest, blob_refs, query.integrity_minimum
-                )
-                if integrity is None:
-                    continue  # below threshold (§14) — candidate dropped
-                results.append(
-                    self._build_result(
-                        manifest,
-                        acquisition_ids=acquisition_ids,
-                        blob_refs=blob_refs,
-                        integrity=integrity,
-                    )
-                )
+
+            # Assemble the result ONLY when at least one blob has a selected
+            # representation — a manifest whose every blob was deselected by
+            # the revision policy contributes nothing (not an empty-shell
+            # result) and falls through to the typed no-match below.
+            if not blob_refs:
+                continue
+
+            # 5. integrity admissibility
+            integrity = self._combined_integrity(
+                manifest, blob_refs, query.integrity_minimum
+            )
+            if integrity is None:
+                continue  # below threshold (§14) — candidate dropped
+            # 7-9. representation selection + lineage BEFORE publication
+            result = self._build_result(
+                manifest,
+                acquisitions=selected_records,
+                blob_refs=blob_refs,
+                integrity=integrity,
+                query=query,
+            )
+            if result is None:
+                continue
+            results.append(result)
 
         if not results:
-            # Candidates existed but every one was filtered by time cuts or
-            # integrity — still a typed no-match, never an empty list.
+            # Candidates existed but every one was filtered by time cuts,
+            # revision selection, representation eligibility or integrity —
+            # still a typed no-match, never an empty list.
             raise NoMatchingEvidence(
-                "candidate manifests exist but none satisfy the time/integrity "
-                "constraints"
+                "candidate manifests exist but none satisfy the time/revision/"
+                "representation/integrity constraints"
             )
 
+        # 10. canonical deterministic ordering
         results.sort(
             key=lambda r: (
                 r.provider,
@@ -365,12 +587,7 @@ class RawEvidenceQueryService:
             )
         )
 
-        # §28: limit applies AFTER discovery, filtering, revision resolution,
-        # integrity validation and deterministic ordering.  Revision
-        # resolution happens in the replay/cursor layer where per-blob
-        # identity is materialized; the ERROR_ON_AMBIGUITY proof lives there
-        # and is not suppressed here because ambiguity raises before a
-        # result is ever appended.
+        # 11. limit LAST — it can never suppress a refusal raised above.
         if query.limit is not None:
             results = results[: query.limit]
 
@@ -488,20 +705,155 @@ class RawEvidenceQueryService:
             return None
         return combined
 
-    # -- result assembly (§13) ----------------------------------------------------
+    # -- result assembly (§13 + I12R1 §8/§10/§11) --------------------------------
+
+    def _projection_metadata(
+        self, projection_id: str, query: RawEvidenceQuery
+    ) -> dict[str, Any] | None:
+        """Durable T0B metadata for one manifest projection ref (metadata ONLY).
+
+        Returns None when the projection does not satisfy the query's T0B
+        eligibility (missing artifact/schema/lineage or filtered schema id).
+        Never opens projection payload bytes or T0A payload bytes (§9).
+        Raises ``LineageIncomplete`` when lineage is BROKEN (not merely
+        absent-by-filter) so a broken chain never publishes (§11).
+        """
+        artifacts = self._artifacts_repo
+        lineage = self._lineage_repo
+        if artifacts is None or lineage is None:
+            raise ProjectionSchemaUnsupported(
+                "the query requested T0B representation but the service was "
+                "constructed without the projection metadata repositories "
+                "(projection_artifact_repository / projection_lineage_repository)"
+            )
+        try:
+            artifact = artifacts.get(projection_id)
+        except Exception as exc:  # noqa: BLE001 - typed re-wrap
+            # The artifact repository signals missing projections by raising
+            # (e.g. ProjectionChainBroken); a missing projection is a broken
+            # lineage chain before publication (§11), not a backend error.
+            raise LineageIncomplete(
+                f"manifest references projection {projection_id} which has "
+                f"no committed artifact: {exc}"
+            ) from exc
+        if artifact is None:
+            raise LineageIncomplete(
+                f"manifest references projection {projection_id} which has "
+                "no committed artifact — lineage broken before publication"
+            )
+        if (
+            query.projection_schema_ids
+            and artifact.projection_schema_id not in query.projection_schema_ids
+        ):
+            return None  # filtered by schema id (not broken — just not selected)
+        try:
+            entries = lineage.get_by_projection(projection_id)
+        except Exception as exc:  # noqa: BLE001 - typed re-wrap
+            # A corrupt lineage fragment is a broken chain, not a backend
+            # outage — typed refusal BEFORE publication (I12R1 §11/§18).
+            raise LineageIncomplete(
+                f"projection {projection_id} lineage is not readable: {exc}"
+            ) from exc
+        if not entries:
+            raise LineageIncomplete(
+                f"projection {projection_id} has zero lineage entries — "
+                "lineage broken before publication"
+            )
+        # Every lineage entry must bind to durable, acquisition-backed T0A
+        # (§11): the query contract claims lineage validation before limit.
+        for entry in sorted(entries, key=lambda e: e.source_order):
+            try:
+                acquisition = self._acquisitions_repo.get_acquisition(
+                    entry.source_acquisition_id
+                )
+            except Exception as exc:  # noqa: BLE001 - typed re-wrap
+                raise LineageIncomplete(
+                    f"lineage acquisition {entry.source_acquisition_id} for "
+                    f"projection {projection_id} is not durable: {exc}"
+                ) from exc
+            if acquisition.blob_sha256 != entry.source_blob_sha256:
+                raise LineageIncomplete(
+                    f"lineage acquisition {entry.source_acquisition_id} binds "
+                    f"blob {acquisition.blob_sha256}, but the lineage entry "
+                    f"claims {entry.source_blob_sha256}"
+                )
+            try:
+                metas = self._blobs_repo.get_blob_metadata(entry.source_blob_sha256)
+            except Exception as exc:  # noqa: BLE001 - typed re-wrap
+                raise LineageIncomplete(
+                    f"lineage blob {entry.source_blob_sha256} for projection "
+                    f"{projection_id} has no committed metadata: {exc}"
+                ) from exc
+            if not metas:
+                raise LineageIncomplete(
+                    f"lineage blob {entry.source_blob_sha256} for projection "
+                    f"{projection_id} has no committed metadata"
+                )
+        return {
+            "projection_id": artifact.projection_id,
+            "projection_schema_id": artifact.projection_schema_id,
+            "projection_schema_version": artifact.projection_schema_version,
+            "source_blobs": sorted(
+                {e.source_blob_sha256 for e in entries}
+            ),
+        }
 
     def _build_result(
         self,
         manifest: PartitionManifest,
         *,
-        acquisition_ids: list[str],
+        acquisitions: list[AcquisitionRecord],
         blob_refs: list[str],
         integrity: IntegrityState,
-    ) -> RawEvidenceResult:
-        from .models import RawEvidenceResult as _RER  # local import: models imports enums only
+        query: RawEvidenceQuery,
+    ) -> RawEvidenceResult | None:
+        """Assemble the result with representation selection (I12R1 §8).
 
-        lineage_refs = sorted(manifest.projection_refs)
-        return _RER(
+        - ``blob_refs``      = selected/available T0A representation under
+          the query's include flags;
+        - ``projection_refs``= selected T0B representation (schema-filtered,
+          lineage-validated BEFORE publication);
+        - ``lineage_refs``   = the durable T0A sources REQUIRED by the
+          selected T0B (provenance, not selection — a T0B-only query
+          references T0A without pretending the caller selected T0A output).
+
+        Returns None when the manifest carries no selected representation
+        (e.g. T0B-only with no matching schema) — the caller drops the
+        candidate or raises a typed representation failure, per §10.
+        """
+        selected_blobs = sorted(blob_refs) if query.include_t0a else []
+        lineage_refs: list[str] = []
+        projection_refs: list[str] = []
+        if query.include_t0b:
+            for projection_id in sorted(manifest.projection_refs):
+                meta = self._projection_metadata(projection_id, query)
+                if meta is None:
+                    continue  # schema-filtered
+                projection_refs.append(meta["projection_id"])
+                lineage_refs.extend(meta["source_blobs"])
+            if not projection_refs and not query.include_t0a:
+                # §10: T0B-only, manifest has projections but none match the
+                # requested schema ids (or none exist) — typed representation
+                # failure; a non-matching projection is never substituted.
+                raise ProjectionSchemaUnsupported(
+                    f"manifest {manifest.partition_manifest_id} carries no T0B "
+                    f"projection matching projection_schema_ids "
+                    f"{sorted(query.projection_schema_ids)} and include_t0a is "
+                    "False — no silent substitution"
+                )
+        elif manifest.projection_refs and self._artifacts_repo is not None:
+            # T0A-only query: T0B stays UNSELECTED (not claimed in
+            # projection_refs); if the T0B chain is broken we still refuse to
+            # publish a manifest whose declared lineage is corrupt — the
+            # failure is the manifest's, not the representation's (§11).
+            for projection_id in sorted(manifest.projection_refs):
+                self._projection_metadata(projection_id, query)
+        else:
+            # T0A-only, no T0B metadata wired, or manifest without
+            # projections: manifest-level projection refs stay unselected.
+            pass
+        lineage_refs = sorted(set(lineage_refs))
+        return RawEvidenceResult(
             provider=manifest.provider,
             venue=manifest.venue,
             sensor_family=manifest.sensor_family,
@@ -512,17 +864,18 @@ class RawEvidenceQueryService:
             logical_time_end=manifest.logical_date_end,
             coverage_state=manifest.coverage_state,
             integrity_state=integrity,
-            acquisition_ids=sorted(acquisition_ids),
-            blob_refs=sorted(blob_refs),
-            projection_refs=lineage_refs,
-            revision_state=self._revision_state_hint(manifest),
+            acquisition_ids=sorted(a.acquisition_id for a in acquisitions),
+            blob_refs=selected_blobs,
+            projection_refs=sorted(projection_refs),
+            revision_state=self._resolve_revision_state(manifest, acquisitions),
             quality_flags=[],
             lineage_refs=lineage_refs,
         )
 
     def _revision_state_hint(self, manifest: PartitionManifest) -> Any:
-        from .enums import RevisionState
-
+        """Deprecated I12 count hint — retained ONLY for the historical I12
+        evidence byte-stability; I12R1 resolution uses
+        ``_resolve_revision_state`` (durable I06 truth, §19)."""
         if manifest.revision_count > 1:
             return RevisionState.SOURCE_MUTATION
         return RevisionState.UNKNOWN_REVISION
@@ -542,5 +895,7 @@ __all__ = [
     "RawQueryError",
     "ReplayOrderUnavailable",
     "RevisionAmbiguity",
+    "RevisionCanonicalUnavailable",
+    "RevisionPolicyInvalid",
     "StorageBackendUnavailable",
 ]
