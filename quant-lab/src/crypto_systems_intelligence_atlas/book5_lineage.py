@@ -254,6 +254,44 @@ class CapitalPrincipalLineageGraph:
                         f"exceeds its Book 2 evidence"
                     )
 
+    def components_for(
+        self, record_id: str, *, provenance=None
+    ) -> PrincipalComponentSet:
+        """The record's principal components as a unit-aware vector (ALG-18).
+
+        R1-D3 seal: a contribution edge lacking an evidenced quantity is NOT a
+        zero. Missing quantity is carried as ``quantity=None`` — an explicit
+        unknown — and remains distinguishable from an explicitly evidenced
+        ``"0"`` (UNKNOWN != ZERO; no quantity may be fabricated).
+
+        R1 Phase 10: when a ``provenance`` is supplied, every materialized
+        component revalidates against live Book 2 state (canonical type,
+        attribution basis, context) — ``model_copy`` mutations cannot flow
+        through lineage into conclusions.
+        """
+
+        components: list[PrincipalComponent] = []
+        for edge in self._edges:
+            if edge.target_record_id != record_id:
+                continue
+            node = self._nodes[edge.source_lineage_id]
+            component = PrincipalComponent(
+                asset_ref=node.asset_ref,
+                realization_ref=node.realization_ref,
+                quantity=edge.quantity,  # None = missing, NEVER fabricated "0"
+                unit=edge.unit or node.unit,
+                attribution_state=edge.attribution_state,
+                book2_claim_refs=edge.book2_claim_refs,
+                valid_time=edge.valid_time,
+                share_fraction=edge.share_fraction,
+            )
+            if provenance is not None:
+                provenance.validate_principal_component(component)
+            components.append(component)
+        if not components:
+            raise LineageError(f"record {record_id} has no principal components")
+        return PrincipalComponentSet(components=tuple(components))
+
     def collapse_same_unit(
         self,
         record_id: str,
@@ -297,41 +335,16 @@ class CapitalPrincipalLineageGraph:
                     f"attributable edge {edge.source_lineage_id}->{record_id} "
                     "carries no quantity; refusing to fabricate one"
                 )
+            if (edge.quantity is None) != (edge.unit is None):
+                raise LineageError(
+                    f"attributable edge {edge.source_lineage_id}->{record_id} "
+                    "carries quantity/unit inconsistently; refusing"
+                )
             total += require_decimal(edge.quantity, role="edge quantity")
             matched += 1
         if matched == 0:
             raise LineageError(f"no attributable contributions for {record_id} in {unit}")
         return str(total)
-
-    def components_for(self, record_id: str) -> PrincipalComponentSet:
-        """The record's principal components as a unit-aware vector (ALG-18).
-
-        R1-D3 seal: a contribution edge lacking an evidenced quantity is NOT a
-        zero. Missing quantity is carried as ``quantity=None`` — an explicit
-        unknown — and remains distinguishable from an explicitly evidenced
-        ``"0"`` (UNKNOWN != ZERO; no quantity may be fabricated).
-        """
-
-        components: list[PrincipalComponent] = []
-        for edge in self._edges:
-            if edge.target_record_id != record_id:
-                continue
-            node = self._nodes[edge.source_lineage_id]
-            components.append(
-                PrincipalComponent(
-                    asset_ref=node.asset_ref,
-                    realization_ref=node.realization_ref,
-                    quantity=edge.quantity,  # None = missing, NEVER fabricated "0"
-                    unit=edge.unit or node.unit,
-                    attribution_state=edge.attribution_state,
-                    book2_claim_refs=edge.book2_claim_refs,
-                    valid_time=edge.valid_time,
-                    share_fraction=edge.share_fraction,
-                )
-            )
-        if not components:
-            raise LineageError(f"record {record_id} has no principal components")
-        return PrincipalComponentSet(components=tuple(components))
 
 
 #: Explicit valuation-request state (plan v0.3 §6 state law). Distinct from

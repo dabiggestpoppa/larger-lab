@@ -405,6 +405,11 @@ class CapitalFieldSynthesis:
         """
 
         components = graph.components_for(target_record_id)
+        if self.provenance is not None:
+            # R1-D5 closure: a derived view may not launder mutated records —
+            # every rendered component revalidates against live Book 2 state.
+            for component in components.components:
+                self.provenance.validate_principal_component(component)
         self.ledger.record_composition()
         return CapitalPrincipalLineageView(
             view_id=view_id,
@@ -448,13 +453,19 @@ class CapitalFieldSynthesis:
         unit: str,
     ) -> tuple[Literal["SAME_UNIT_COLLAPSE", "HETEROGENEOUS_VECTOR"], str | None, PrincipalComponentSet | None]:
         """T-14/A: same-unit collapse where permitted; T-9/B: heterogeneous
-        sets return the component vector (never a scalar)."""
+        sets return the component vector (never a scalar).
+
+        R1: when this synthesis carries a provenance, it is forwarded to the
+        collapse boundary so attribution bases are verified against live Book
+        2 state before any economic total is produced."""
 
         components = graph.components_for(record_id)
         units = components.units()
         if len(units) > 1:
             return ("HETEROGENEOUS_VECTOR", None, components)
-        total = graph.collapse_same_unit(record_id, unit=unit)
+        total = graph.collapse_same_unit(
+            record_id, unit=unit, provenance=self.provenance
+        )
         return ("SAME_UNIT_COLLAPSE", total, None)
 
     def valuation_request(self) -> str:

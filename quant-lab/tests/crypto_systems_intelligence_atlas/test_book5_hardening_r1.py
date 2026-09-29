@@ -618,5 +618,41 @@ def test_collapse_with_canonical_basis_passes() -> None:
     assert g.collapse_same_unit("rec:x", unit="ETH", provenance=provenance) == "3"
 
 
+def test_collapse_refuses_quantity_unit_pairing_tamper() -> None:
+    """Phase 10: a stripped unit on an attributable edge (quantity kept) is
+    caught at the collapse boundary — the node's unit may not silently
+    legitimize a tampered pairing."""
+
+    edge = contribution("l:eth", "rec:x", quantity="3", unit="ETH").model_copy(
+        update={"unit": None}
+    )
+    g = CapitalPrincipalLineageGraph()
+    g.add_node(lineage_node("l:eth"))
+    g.add_edge(edge)
+    with pytest.raises(Exception):
+        g.collapse_same_unit("rec:x", unit="ETH")
+
+
+def test_components_for_validates_live_state_with_provenance() -> None:
+    """Phase 10: components_for() with a provenance revalidates every
+    materialized component — a model_copy unit tamper cannot flow through
+    lineage into a component vector."""
+
+    provenance = _live_provenance()
+    from crypto_systems_intelligence_atlas.book5_provenance import ClaimContextBinding
+
+    provenance.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-eth", asset_ref="csia:token:eth", unit="ETH")
+    )
+    edge = contribution("l:eth", "rec:x", quantity="3", unit="ETH").model_copy(
+        update={"unit": "USDC"}
+    )
+    g = CapitalPrincipalLineageGraph()
+    g.add_node(lineage_node("l:eth"))
+    g.add_edge(edge)
+    with pytest.raises(Exception):
+        g.components_for("rec:x", provenance=provenance)
+
+
 def test_valuation_state_unchanged() -> None:
     assert VALUATION_NOT_AUTHORIZED == "NOT_AUTHORIZED"
