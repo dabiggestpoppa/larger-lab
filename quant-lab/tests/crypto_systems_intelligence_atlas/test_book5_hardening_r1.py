@@ -30,7 +30,10 @@ from crypto_systems_intelligence_atlas.book5_lineage import (
     LineageError,
     VALUATION_NOT_AUTHORIZED,
 )
-from crypto_systems_intelligence_atlas.book5_provenance import Book5ProvenanceError
+from crypto_systems_intelligence_atlas.book5_provenance import (
+    Book5ProvenanceError,
+    ClaimContextBinding,
+)
 from crypto_systems_intelligence_atlas.book5_records import (
     CapitalFlow,
     CapitalPosition,
@@ -165,6 +168,9 @@ def test_a5_exact_with_canonical_exact_basis_passes() -> None:
     claims.add_initial(
         make_claim("book5-claim-eth-exact", evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
     )
+    provenance.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-eth-exact", asset_ref="csia:token:eth", unit="ETH")
+    )
     exact = component(
         quantity="3", attribution=AttributionState.EXACT, claim_ref="book5-claim-eth-exact"
     )
@@ -181,6 +187,9 @@ def test_a6_proportional_with_canonical_proportional_basis_passes() -> None:
         make_claim(
             "book5-claim-eth-prop", evidence_ref=evidence_ref, qualifier="PRINCIPAL_PROPORTIONAL_FACT"
         )
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-eth-prop", asset_ref="csia:token:eth", unit="ETH")
     )
     proportional = component(
         quantity="3",
@@ -254,6 +263,14 @@ def test_b4_coherent_context_with_canonical_claim_passes() -> None:
     evidence_ref = make_evidence(ev, "exact-basis")
     claims.add_initial(
         make_claim("book5-claim-eth-exact", evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(
+            claim_id="book5-claim-eth-exact",
+            asset_ref="csia:token:eth",
+            unit="ETH",
+            realization_ref="realization:chain-1",
+        )
     )
     coherent = component(
         quantity="3",
@@ -379,6 +396,9 @@ def test_d5_observed_zero_distinct_from_no_observation() -> None:
     evidence_ref = make_evidence(ev, "exact-basis")
     claims.add_initial(
         make_claim("book5-claim-eth-exact", evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-eth-exact", asset_ref="csia:token:eth", unit="ETH")
     )
     synthesis = CapitalFieldSynthesis(provenance, SynthesisWriteLedger())
     zero_position = make_position(
@@ -566,6 +586,9 @@ def test_f5_coherent_canonical_inputs_pass() -> None:
     claims.add_initial(
         make_claim("book5-claim-eth-exact", evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
     )
+    provenance.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-eth-exact", asset_ref="csia:token:eth", unit="ETH")
+    )
     synthesis = CapitalFieldSynthesis(provenance, SynthesisWriteLedger())
     position = make_position(
         components=component_set(
@@ -601,6 +624,9 @@ def test_collapse_with_canonical_basis_passes() -> None:
     evidence_ref = make_evidence(ev, "exact-basis")
     claims.add_initial(
         make_claim("book5-claim-eth-exact", evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-eth-exact", asset_ref="csia:token:eth", unit="ETH")
     )
     g = CapitalPrincipalLineageGraph()
     g.add_node(lineage_node("l:eth"))

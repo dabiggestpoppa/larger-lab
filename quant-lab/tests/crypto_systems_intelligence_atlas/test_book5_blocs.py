@@ -146,7 +146,16 @@ def make_position(
 
 def test_5a_canonical_plus_wrapped_supply_never_double_counts() -> None:
     _, _, prov = kernel()
-    fxd = _bound_exact(prov, "fxd-exact", asset_ref="csia:stablecoin:fxd", unit="FXD")
+    canonical_ref = _bound_exact(
+        prov, "fxd-exact", asset_ref="csia:stablecoin:fxd", unit="FXD"
+    )
+    wrapped_ref = _bound_exact(
+        prov,
+        "fxd-wrapped-exact",
+        asset_ref="csia:stablecoin:fxd",
+        unit="FXD",
+        realization_ref="realization:chain-b:0xwrapped",
+    )
     canonical = PrincipalComponentSet(
         components=(
             PrincipalComponent(
@@ -154,7 +163,7 @@ def test_5a_canonical_plus_wrapped_supply_never_double_counts() -> None:
                 quantity="1000",
                 unit="FXD",
                 attribution_state=AttributionState.EXACT,
-                book2_claim_refs=(fxd,),
+                book2_claim_refs=(canonical_ref,),
                 valid_time=T0,
             ),
         )
@@ -167,7 +176,7 @@ def test_5a_canonical_plus_wrapped_supply_never_double_counts() -> None:
                 quantity="1000",
                 unit="FXD",
                 attribution_state=AttributionState.EXACT,
-                book2_claim_refs=(fxd,),
+                book2_claim_refs=("book5-claim-fxd-wrapped-exact",),
                 valid_time=T0,
             ),
         )
@@ -187,6 +196,27 @@ def test_5a_canonical_plus_wrapped_supply_never_double_counts() -> None:
 def test_5a_six_way_supply_separation_representable() -> None:
     _, _, prov = kernel()
     fxd = _bound_exact(prov, "fxd-six-exact", asset_ref="csia:stablecoin:fxd", unit="FXD")
+    chain_local_ref = _bound_exact(
+        prov,
+        "fxd-six-chain-local",
+        asset_ref="csia:stablecoin:fxd",
+        unit="FXD",
+        realization_ref="realization:chain-2",
+    )
+    bridged_ref = _bound_exact(
+        prov,
+        "fxd-six-bridged",
+        asset_ref="csia:stablecoin:fxd",
+        unit="FXD",
+        realization_ref="realization:chain-2:wrapped",
+    )
+    escrow_ref = _bound_exact(
+        prov,
+        "fxd-six-escrow",
+        asset_ref="csia:stablecoin:fxd",
+        unit="FXD",
+        realization_ref="escrow:bridge-1",
+    )
     total_issuance = PrincipalComponent(
         asset_ref="csia:stablecoin:fxd", quantity="10000", unit="FXD",
         attribution_state=AttributionState.EXACT, book2_claim_refs=(fxd,),
@@ -197,24 +227,24 @@ def test_5a_six_way_supply_separation_representable() -> None:
     )
     chain_local = PrincipalComponent(
         asset_ref="csia:stablecoin:fxd", realization_ref="realization:chain-2", quantity="3000",
-        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(fxd,),
+        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(chain_local_ref,),
         valid_time=T0,
     )
     bridged = PrincipalComponent(
         asset_ref="csia:stablecoin:fxd", realization_ref="realization:chain-2:wrapped", quantity="3000",
-        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(fxd,),
+        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(bridged_ref,),
         valid_time=T0,
     )
     escrow = PrincipalComponent(
         asset_ref="csia:stablecoin:fxd", realization_ref="escrow:bridge-1", quantity="3000",
-        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(fxd,),
+        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(escrow_ref,),
         valid_time=T0,
     )
     redemption_liability = ReserveLiability(
         liability_id="liability:fxd-redemption", issuer_ref="csia:entity:issuer",
         claim_token_ref="csia:stablecoin:fxd",
         backing=component_set(escrow),
-        book2_claim_refs=(fxd,), valid_time=T0,
+        book2_claim_refs=(escrow_ref,), valid_time=T0,
     )
     assert total_issuance.quantity == "10000"
     assert canonical_circulating.quantity == "4000"

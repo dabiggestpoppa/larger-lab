@@ -159,6 +159,9 @@ def test_attribution_arithmetic_law() -> None:
     # participant carries a proper R2 basis + binding so the COMMINGLED
     # arithmetic refusal is what fires, not a basis rejection)
     provenance, exact_ref = _exact_bound_kernel("law-exact")
+    provenance.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-pool", asset_ref="csia:token:eth", unit="ETH")
+    )
     s = component_set(
         component(quantity="1", attribution=AttributionState.EXACT, claim_ref=exact_ref),
         component(quantity="2", attribution=AttributionState.COMMINGLED, claim_ref="book5-claim-pool"),

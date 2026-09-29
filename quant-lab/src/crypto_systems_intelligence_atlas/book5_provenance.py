@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from .claims import Claim, ClaimStore, can_promote_to_graph
 from .dependency_provenance import require_str_hashable
@@ -33,13 +33,24 @@ ATTRIBUTION_BASIS_QUALIFIERS: Final[dict[str, str]] = {
 
 
 class ClaimContextBinding(BaseModel):
-    """Typed Book 5-local binding of a claim to asset/realization/unit context.
+    """Typed, evidence-bound Book 5-local binding of a claim to context.
 
-    Book 2 propositions do not encode asset/realization/unit dimensions
-    directly. This binding maps a canonical claim to the context dimensions it
-    supports so decision-time validation can detect post-construction unit or
-    asset mutation (R1-D2). An absent binding means the dimension is NOT
-    verifiable from Book 2 — it is never claimed to be.
+    Book 2 propositions do not natively encode asset/realization/unit
+    dimensions. This binding maps a canonical claim to the context dimensions
+    it supports so decision-time validation can detect post-construction unit
+    or asset mutation (R1-D2) — and, after R2, can no longer skip unbound
+    dimensions (R2-D2).
+
+    Epistemic honesty (plan v0.3 "Book 2 dependence"; Phase 5 of R2): the
+    ``basis_claim_refs`` are canonical Book 2 claims resolved through the
+    accepted claim/evidence engines; the asset/realization/unit FIELDS are a
+    Book 5-local typed contextual INTERPRETATION. Book 2 proves that the
+    referenced claims are canonical, current, and evidenced — it does not
+    natively prove the context fields themselves, because its Proposition
+    schema cannot represent them. An absent binding therefore means the
+    dimension is NOT verifiable, never that it is verified:
+
+        NO CONTEXT BINDING != CONTEXT VERIFIED
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -48,6 +59,20 @@ class ClaimContextBinding(BaseModel):
     asset_ref: str | None = None
     realization_ref: str | None = None
     unit: str | None = None
+    basis_claim_refs: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def _at_least_one_dimension(self) -> "ClaimContextBinding":
+        if (
+            self.asset_ref is None
+            and self.realization_ref is None
+            and self.unit is None
+        ):
+            raise ValueError(
+                "context binding must establish at least one of asset_ref, "
+                "realization_ref, or unit (a vacuous binding grounds nothing)"
+            )
+        return self
 
 
 class Book5Provenance:
@@ -109,14 +134,24 @@ class Book5Provenance:
         return claim
 
     def bind_claim_context(self, binding: ClaimContextBinding) -> None:
-        """Register the context dimensions a canonical claim supports.
+        """Register the evidence-bound context a canonical claim supports.
 
-        The claim must already be canonical (this refuses bindings for
-        unknown/forged claim ids). Rebinding is refused: bindings are
+        R2 Phase 5 contract: the binding must be a typed ClaimContextBinding
+        (raw dicts are refused); its subject claim must resolve as canonical
+        and current; every ``basis_claim_refs`` entry must resolve through
+        Book 2 as a current, evidenced canonical claim. Rebinding (duplicate
+        or conflicting binding identity) is refused: bindings are
         registration-time facts, not mutable state.
         """
 
+        if not isinstance(binding, ClaimContextBinding):
+            raise Book5ProvenanceError(
+                f"context binding must be a typed ClaimContextBinding, got "
+                f"{type(binding).__name__}; raw binding payloads are refused"
+            )
         self.resolve_claim(binding.claim_id)
+        for basis_ref in binding.basis_claim_refs:
+            self.resolve_claim(basis_ref)
         if binding.claim_id in self._context_bindings:
             raise Book5ProvenanceError(
                 f"claim {binding.claim_id} already has a context binding"
@@ -127,11 +162,19 @@ class Book5Provenance:
         """Decision-time live-state validation of a principal component.
 
         Required at every boundary that turns components into economic
-        conclusions (R1-D1/R1-D2). Validates the LIVE object, never a
-        remembered construction: canonical type, canonical attribution state,
-        resolvable current claim refs, attribution basis not exceeding its
-        Book 2 claims, decimal quantity, non-empty unit, timezone-aware valid
-        time, and context-binding agreement for every bound dimension.
+        conclusions (R1-D1/R1-D2; R2-D2 closure). Validates the LIVE object,
+        never a remembered construction: canonical type, canonical
+        attribution state, resolvable current claim refs, attribution basis
+        not exceeding its Book 2 claims, decimal quantity, non-empty unit,
+        timezone-aware valid time, and — for quantitative authority — an
+        explicit evidence-bound ClaimContextBinding establishing the
+        component's asset and unit context (plus realization context when a
+        realization_ref is present).
+
+        R2-D2 closure: an absent binding is NEVER silently skipped. "No
+        context binding" means "context not verified" and fails closed at a
+        quantitative authority boundary (NO CONTEXT BINDING != CONTEXT
+        VERIFIED).
         """
 
         from .book5_core import AttributionState, PrincipalComponent
@@ -179,10 +222,30 @@ class Book5Provenance:
             raise Book5ProvenanceError(
                 "component valid_time must be timezone-aware"
             )
+        # R2-D2 context closure: every claim ref of a quantitative component
+        # must be context-bound; the binding must agree with the component's
+        # live asset/unit (and realization) context. No dimension passes by
+        # falling through a missing binding.
+        if len(component.book2_claim_refs) == 0:
+            raise Book5ProvenanceError(
+                "quantitative component carries no Book 2 claim refs; context "
+                "cannot be established"
+            )
+        unbound = [
+            ref
+            for ref in component.book2_claim_refs
+            if ref not in self._context_bindings
+        ]
+        if unbound:
+            raise Book5ProvenanceError(
+                "context not verified for quantitative component: claim(s) "
+                f"{', '.join(sorted(unbound))} carry no ClaimContextBinding; "
+                "NO CONTEXT BINDING != CONTEXT VERIFIED — bind the claim's "
+                "asset/unit/realization context explicitly before relying on "
+                "it for a quantitative conclusion"
+            )
         for ref in component.book2_claim_refs:
-            binding = self._context_bindings.get(ref)
-            if binding is None:
-                continue  # dimension not verifiable from Book 2: never claimed
+            binding = self._context_bindings[ref]
             if binding.asset_ref is not None and binding.asset_ref != component.asset_ref:
                 raise Book5ProvenanceError(
                     f"component asset_ref {component.asset_ref!r} contradicts "
@@ -201,6 +264,41 @@ class Book5Provenance:
                     f"component realization_ref {component.realization_ref!r} "
                     f"contradicts the context bound to claim {ref} "
                     f"({binding.realization_ref!r})"
+                )
+        # the binding set must ESTABLISH the component's identity dimensions,
+        # not merely fail to contradict them
+        established_asset = any(
+            self._context_bindings[ref].asset_ref is not None
+            for ref in component.book2_claim_refs
+        )
+        established_unit = any(
+            self._context_bindings[ref].unit is not None
+            for ref in component.book2_claim_refs
+        )
+        if not established_asset or not established_unit:
+            missing = [
+                dimension
+                for dimension, established in (
+                    ("asset_ref", established_asset),
+                    ("unit", established_unit),
+                )
+                if not established
+            ]
+            raise Book5ProvenanceError(
+                "context not verified for quantitative component: no binding "
+                f"establishes {', '.join(missing)}; an unverifiable dimension "
+                "is never a verified one"
+            )
+        if component.realization_ref is not None:
+            established_realization = any(
+                self._context_bindings[ref].realization_ref is not None
+                for ref in component.book2_claim_refs
+            )
+            if not established_realization:
+                raise Book5ProvenanceError(
+                    "context not verified for quantitative component: "
+                    "realization_ref is present but no binding establishes "
+                    "the realization context"
                 )
 
     def resolve_claim_refs(

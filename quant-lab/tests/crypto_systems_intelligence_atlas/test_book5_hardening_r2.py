@@ -391,6 +391,67 @@ def test_c8_binding_disagreeing_realization_rejected() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Phase 5 — evidence-bound binding registration contract
+# ---------------------------------------------------------------------------
+
+
+def test_binding_duplicate_identity_refused() -> None:
+    """A claim may carry exactly one context binding; rebinding is refused
+    (bindings are registration-time facts, not mutable state)."""
+
+    claims, evidence, provenance = kernel()
+    claim_id = register_exact_claim(claims, evidence, "dup-exact")
+    binding = ClaimContextBinding(claim_id=claim_id, asset_ref="csia:token:eth", unit="ETH")
+    provenance.bind_claim_context(binding)
+    with pytest.raises(Book5ProvenanceError):
+        provenance.bind_claim_context(
+            ClaimContextBinding(claim_id=claim_id, asset_ref="csia:token:wbtc", unit="BTC")
+        )
+
+
+def test_binding_raw_dict_refused() -> None:
+    """Raw dict binding input is refused — only typed bindings register."""
+
+    _, _, provenance = kernel()
+    with pytest.raises(Book5ProvenanceError):
+        provenance.bind_claim_context(  # type: ignore[arg-type]
+            {"claim_id": "book5-claim-eth", "asset_ref": "csia:token:eth", "unit": "ETH"}
+        )
+
+
+def test_binding_basis_claims_resolve_through_book2() -> None:
+    """Every basis_claim_refs entry must resolve as a current, evidenced
+    canonical Book 2 claim; a detached basis refuses registration."""
+
+    claims, evidence, provenance = kernel()
+    claim_id = register_exact_claim(claims, evidence, "basis-exact")
+    provenance.bind_claim_context(
+        ClaimContextBinding(
+            claim_id=claim_id,
+            asset_ref="csia:token:eth",
+            unit="ETH",
+            basis_claim_refs=(claim_id,),
+        )
+    )
+    with pytest.raises(Book5ProvenanceError):
+        provenance.bind_claim_context(
+            ClaimContextBinding(
+                claim_id="book5-claim-base",
+                asset_ref="csia:token:usdc",
+                unit="USDC",
+                basis_claim_refs=("book5-never-captured",),
+            )
+        )
+
+
+def test_binding_vacuous_refused() -> None:
+    """A binding establishing NO dimension grounds nothing and is refused."""
+
+    with pytest.raises(ValueError):
+        ClaimContextBinding(claim_id="book5-claim-base")
+
+
+# ---------------------------------------------------------------------------
 # helpers — synthesis construction is abstracted so the R2 seal (provenance
 # required, no default None) has exactly one blast radius in this file
 # ---------------------------------------------------------------------------
