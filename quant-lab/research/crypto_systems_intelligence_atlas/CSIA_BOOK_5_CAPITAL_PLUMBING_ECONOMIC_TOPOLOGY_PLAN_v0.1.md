@@ -644,3 +644,215 @@ back another market's debt in the model); multi-collateral netting (ALG-6).
 available/posted/eligibility/liability/socialization split demonstrated;
 supplied+borrowed summation case fails closed; borrowed-redeposit lineage
 de-duplicates.
+
+---
+
+# 19. BLOC 5D — STAKING / RESTAKING / YIELD (Phase 15 contract)
+
+**Mission:** model bonded and yield-bearing capital with unbroken principal
+lineage across staking, liquid staking, restaking, and vault layers.
+
+**Scope:** native stake; delegated stake; validator/operator identities; LSTs;
+restaking; AVS/security targets; vault/yield positions; reward accrual;
+yield realization; slashing liability.
+
+**Non-goals:** yield comparison/ranking (Book 6), validator recommendation,
+APY projection.
+
+**Canonical records:** validator/staking-pool/restaking-strategy
+`EconomicSite`s; `StakePosition` (native/delegated);
+`RestakePosition` (base_claim_ref + AVS set); LST as
+`ClaimTokenRepresentation` + issuer `ReserveLiability`;
+`STAKE`/`UNSTAKE`/`RESTAKE`/`UNRESTAKE` flows; `YIELD_CREDIT` flows (realized);
+reward-accrual claim records; slashing-liability records; `YieldPosition`
+claim states.
+
+**Derived records:** yield-rate views are Book 6 (`MEASUREMENT_METRIC`);
+topology of the restaking collateral graph is `TOPOLOGY_DERIVATION`.
+
+**Principal-lineage requirements (no multi-layer TVL multiplication):**
+
+```text
+ETH (principal)
+  → StakePosition (bonded, validator-held)          [lineage branch 1]
+  → LST claim (ReserveLiability on issuer)          [lineage branch 2]
+      → RestakePosition (receipt over LST claim)    [lineage branch 3]
+```
+
+Every branch references the same `principal_lineage_id`; consumer-side collapse
+to principal is an explicit methodology-carrying derivation (5G territory),
+never implicit. Delegation chains preserve the §7 split: delegated *control*
+(operator) vs owned *claim* (delegator) — control never implies ownership
+(P17). Slashing liability is a typed record on the operator/AVS side; it does
+not reduce recorded principal until an observed slash event occurs, and then
+it is a flow/loss event, not a silent stock rewrite (ALG-2).
+
+**Book 2 evidence:** stake/delegation E0 (consensus/contract state); LST
+supply E0/E1; reward credits E0 events; AVS sets E0/E1.
+**Stress cases:** D7 1.3 (ETH→stETH), 1.4 (stETH→restake — the canonical
+three-representation one-principal case); reward accrual vs realized split;
+slashing with partial loss propagation across branches; operator change
+(delegation migration without ownership change); unstaking queues (in-flight
+principal state).
+**Principles enforced:** B5-P9, P10, P14, P15, P16, P17, P19–P23.
+**Exit gate:** `PASS_CSIA_B5D_YIELD_TOPOLOGY` — evidence: three-layer lineage
+(ETH→LST→restake) demonstrates one-principal accounting; LST+restake TVL
+multiplication case fails closed; slashing event propagates without stock
+rewrite.
+
+---
+
+# 20. BLOC 5E — DERIVATIVES / LEVERAGE (Phase 16 contract)
+
+**Mission:** model margin and exposure truth while keeping capital stock and
+market exposure in strictly separated record domains.
+
+**Scope:** margin; collateral; notional; open interest; realized PnL; unrealized
+PnL; funding; liquidation; insurance funds; counterparty vaults. Perp venues,
+options venues where systemic, cross-chain derivative liquidity.
+
+**Non-goals:** trading strategy, funding-rate prediction, liquidation-hunting,
+venue ranking.
+
+**Canonical records:** perp market `EconomicSite`s; `CollateralPosition`/
+`SettlementBalance` (margin, encumbrance state PLEDGED); `DerivativeExposure`
+records (notional, direction, instrument ref — exposure domain);
+open-interest observations; `LIQUIDATION` flows; realized-PnL settlement flows;
+unrealized-PnL derived states (price-coupled, observation-time bound); funding
+payment flows (`FEE` type); insurance-fund records (liability-backed stock,
+socialized ownership semantics); counterparty vault claims.
+
+**Derived records:** leverage ratios, exposure aggregates — `TOPOLOGY_DERIVATION`
+at most; any normalized/competivative measure is Book 6.
+
+**Mandatory distinction:** capital stock vs market exposure. Notional and OI
+are **exposure-domain quantities** and never enter principal sums (P12, P13,
+ALG-5, ALG-9). Unrealized PnL is a derived, price-coupled observation with its
+own observation time; it never mutates the collateral stock retroactively
+(ALG-2) — realized PnL is the flow that does.
+
+**Book 2 evidence:** on-chain perp collateral/positions E0; CEX-side OI/margin
+frequently aggregate-only E1/E2 → UNKNOWN-preserving records; funding events
+E0/E1.
+**Stress cases:** D7 1.8 (collateral vs notional); both-sides-counted case
+(trader margin + counterparty pool backing the same positions); leveraged-LP
+loops (LP → collateral → borrow → LP, cycle detection); liquidation chains;
+negative/zero collateral states; insurance-fund insolvency states; funding as
+transfer (who pays whom is a liability transfer, not value destruction).
+**Principles enforced:** B5-P12, P13, P16, P17, P19–P23, P28.
+**Exit gate:** `PASS_CSIA_B5E_DERIVATIVE_TOPOLOGY` — evidence: stock/exposure
+domain separation demonstrated; notional-into-principal sum case fails closed;
+unrealized-PnL observation-time coupling enforced.
+
+---
+
+# 21. BLOC 5F — RWA / PAYMENTS (Phase 17 contract)
+
+**Mission:** model tokenized off-chain claims and payment rails without ever
+asserting on-chain supply equals off-chain value without evidence.
+
+**Scope:** issuers; SPVs; custodians; off-chain underlying claims; on-chain
+tokens; redemption; settlement assets; payment flows; institutional routes.
+
+**Non-goals:** asset-management advice, issuer credit assessment, KYC/AML
+surfaces, merchant analytics.
+
+**Canonical records:** issuer/SPV as ENTITY-referenced sites (RWA_ISSUANCE_VEHICLE,
+PAYMENT_ENDPOINT); `RedemptionClaim` records (token holder ↔ SPV);
+`ClaimTokenRepresentation` links (token → underlying claim); custodian
+`custody_ref` (control, often UNKNOWN); off-chain underlying observation
+records (evidence-tiered; equivalence UNKNOWN without backing evidence);
+`REDEEM`/`SETTLEMENT`/`PAYMENT`/`OFF_RAMP` flows; settlement-asset balance
+stocks; institutional-route capability references.
+
+**Derived records:** chain-distribution and redemption-path coverage views
+(`TOPOLOGY_DERIVATION`).
+
+**Structural rules:**
+
+```text
+on-chain token supply != off-chain asset value
+  (equivalence requires observed redemption/backing evidence;
+   absent evidence the equivalence is UNKNOWN — never assumed)
+
+payment flows are ordinary CapitalFlow events (P19);
+institutional routes are capabilities (P3/P4) until an observed flow
+  references them.
+```
+
+**Book 2 evidence:** token supply E0; redemption events E0/E1; SPV/underlying
+attestations E1/E2 (tier-recognized, never silently promoted); payment flows
+E0/E1 as available.
+**Stress cases:** D7 1.9 (token vs underlying); disputed backing (CONTESTED
+claim states); redemption-window gaps (token redeemable in principle but
+unobserved); custodian change events; payment rail via modeled vs unmodeled
+chains (exit-boundary interaction §7); multi-jurisdiction SPV structures.
+**Principles enforced:** B5-P1, P2, P3, P4, P14, P15, P16, P17, P19–P22.
+**Exit gate:** `PASS_CSIA_B5F_RWA_PAYMENT_TOPOLOGY` — evidence: token/underlying
+equivalence stays UNKNOWN without backing evidence; redemption-claim chain
+demonstrated; payment vs institutional-route separation enforced.
+
+---
+
+# 22. BLOC 5G — CAPITAL FIELD SYNTHESIS (Phase 18 contract; D7 Option B binding)
+
+**Mission:** compose canonical 5A–5F records into derived capital topology —
+issuance → routing → liquidity → credit → leverage → staking/yield → exit —
+under the D7 binding invariants. 5G is **derived only**.
+
+**Scope:** derived capital routes/topology; principal-lineage views;
+historical topology replay; descriptive economic-topology output.
+
+**Non-goals (structural, D7):** creating capital facts; a second evidence
+system; overwriting 5A–5F records; hiding methodology or lineage; zero-filling
+missing data; naive claim/representation summation; trading-signal semantics.
+
+**Candidate output shapes (representation = D5CAP-3):**
+
+```text
+CapitalFieldSnapshot      versioned composition of topology at valid time T
+CapitalFieldPath          typed issuance→…→exit path over canonical records
+CapitalPrincipalLineage   lineage view (views over §5 records)
+CapitalTopologyView       projected topology surface
+```
+
+**Required on every 5G output:**
+
+```text
+input_record_refs       pointers to every consumed canonical record
+methodology/version     composition methodology ID + version
+valid_time              topology valid time (replayable, P24)
+observation_time        composition observation time
+principal-collapse      explicit methodology ID when representations are
+                        collapsed to principal (never implicit)
+liability_treatment     how liabilities enter the composition (records, not
+                        negative capital, never dropped)
+exposure_treatment      exposure quantities excluded from principal domains
+unknown_propagation     missing input → dependent output UNKNOWN/INCOMPLETE
+book2_lineage           via constituent records' claim refs (no new channel)
+```
+
+**5G cannot invent an observation.** Where no canonical record exists for a
+path element, the path records an explicit gap (INCOMPLETE), never a
+substituted or interpolated fact. The canonical sequence (issuance → … → exit)
+orders the *composition*; it does not imply temporal causality between
+constituent records (§25 causality doctrine).
+
+**Exit semantics:** bound by D7 — `OUTSIDE_MODELED_SYSTEM` transitions are
+descriptive topology states; TRUE ECONOMIC EXIT vs OBSERVABILITY EXIT is
+preserved mechanically (§7); "exit" is never a trade/sell/timing signal
+(P17-of-D7, P28).
+
+**Canonical write count:** 0 by construction — proven in
+`CSIA_BOOK_5_CAPITAL_FIELD_SYNTHESIS_MATRIX_v0.1.md`.
+
+**Book 2 evidence:** 5G creates none; it inherits constituent lineage (P1,
+B5-P25).
+**Stress cases:** covered by the synthesis matrix and the capital topology
+stress matrix (recursion, hidden authority, missing-input fabrication, naive
+aggregation attacks).
+**Principles enforced:** all of B5-P21..P25, P2, P22, P23, P24, P28.
+**Exit gate:** `PASS_CSIA_B5_CAPITAL_FIELD_V1` — evidence: zero canonical
+writes proven; every output traces to input refs + methodology; missing-input
+case yields INCOMPLETE, never fabrication; replay at two historical valid times
+reproduces consistent topology.
