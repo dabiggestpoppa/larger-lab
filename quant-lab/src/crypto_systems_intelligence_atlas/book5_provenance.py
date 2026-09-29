@@ -8,6 +8,7 @@ Constitution v0.2 §6/§13; ratified Book 5 plan v0.3 "Book 2 dependence").
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Final
 
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -75,6 +76,87 @@ class ClaimContextBinding(BaseModel):
         return self
 
 
+class QuantitativeRecordKind(str, Enum):
+    """Ratified record kinds that carry non-component quantitative context.
+
+    Narrow family (R3 Phase 5): only the record classes whose 5G validators
+    produce authority WITHOUT a principal-component vector need their own
+    context kind. PrincipalComponent keeps its R2 ClaimContextBinding
+    semantics — this family deliberately does not overload them.
+    """
+
+    FLOW = "FLOW"
+    LIABILITY = "LIABILITY"
+    OBSERVED_FACT = "OBSERVED_FACT"
+
+
+#: Decision-time required dimensions per record kind (R3 Phase 6, mechanical:
+#: only dimensions present in the ratified record contracts are bound — no
+#: field is invented to satisfy validation). Each entry names the dimensions
+#: the binding SET must ESTABLISH for the record's context to be verified;
+#: realization context is additionally required whenever the live record
+#: carries a realization_ref.
+REQUIRED_CONTEXT_DIMENSIONS: Final[dict[str, tuple[str, ...]]] = {
+    QuantitativeRecordKind.FLOW.value: ("asset_ref", "unit"),
+    QuantitativeRecordKind.LIABILITY.value: ("asset_ref", "unit"),
+    QuantitativeRecordKind.OBSERVED_FACT.value: ("subject_ref", "numeraire"),
+}
+
+
+class QuantitativeRecordContextBinding(BaseModel):
+    """Typed, evidence-bound Book 5-local context for a non-component
+    quantitative record's claim (R3 Phase 5).
+
+    Book 2 propositions do not natively encode asset/unit/site/subject/
+    numeraire dimensions. This binding maps a canonical claim to the
+    quantitative context dimensions it supports for ONE record kind, so
+    decision-time validation can detect post-construction unit/asset/site/
+    numeraire/subject mutation (R3-D4).
+
+    Epistemic honesty (unchanged from the R2 binding contract): the
+    ``basis_claim_refs`` are canonical Book 2 claims resolved through the
+    accepted claim/evidence engines; every context FIELD is a BOOK 5-LOCAL
+    TYPED INTERPRETATION. Book 2 proves the referenced claims are canonical,
+    current, and evidenced — it does not natively prove the context fields,
+    because its Proposition schema cannot represent them. An absent binding
+    therefore means the dimension is NOT verifiable, never that it is
+    verified:
+
+        NO BINDING != CONTEXT VERIFIED
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    claim_id: str
+    record_kind: QuantitativeRecordKind
+    asset_ref: str | None = None
+    realization_ref: str | None = None
+    unit: str | None = None
+    site_ref: str | None = None
+    subject_ref: str | None = None
+    reporter_ref: str | None = None
+    numeraire: str | None = None
+    basis_claim_refs: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def _at_least_one_dimension(self) -> "QuantitativeRecordContextBinding":
+        dimensions = (
+            self.asset_ref,
+            self.realization_ref,
+            self.unit,
+            self.site_ref,
+            self.subject_ref,
+            self.reporter_ref,
+            self.numeraire,
+        )
+        if all(dimension is None for dimension in dimensions):
+            raise ValueError(
+                "quantitative record context binding must establish at least "
+                "one context dimension (a vacuous binding grounds nothing)"
+            )
+        return self
+
+
 class Book5Provenance:
     """Fail-closed resolver; Book 5 owns no epistemic state machine.
 
@@ -89,6 +171,7 @@ class Book5Provenance:
         self.claim_store = claim_store
         self.evidence_store = evidence_store
         self._context_bindings: dict[str, ClaimContextBinding] = {}
+        self._quantitative_bindings: dict[str, QuantitativeRecordContextBinding] = {}
 
     def resolve_claim(
         self,
@@ -157,6 +240,150 @@ class Book5Provenance:
                 f"claim {binding.claim_id} already has a context binding"
             )
         self._context_bindings[binding.claim_id] = binding
+
+    def bind_quantitative_record_context(
+        self, binding: QuantitativeRecordContextBinding
+    ) -> None:
+        """Register the evidence-bound quantitative context a canonical claim
+        supports for ONE non-component record kind (R3 Phase 5).
+
+        Same registration contract as :meth:`bind_claim_context`: the binding
+        must be typed (raw dicts are refused); the subject claim and every
+        ``basis_claim_refs`` entry must resolve as canonical and current
+        through Book 2. Rebinding is refused: bindings are registration-time
+        facts, not mutable state.
+        """
+
+        if not isinstance(binding, QuantitativeRecordContextBinding):
+            raise Book5ProvenanceError(
+                "quantitative record context binding must be a typed "
+                "QuantitativeRecordContextBinding, got "
+                f"{type(binding).__name__}; raw binding payloads are refused"
+            )
+        self.resolve_claim(binding.claim_id)
+        for basis_ref in binding.basis_claim_refs:
+            self.resolve_claim(basis_ref)
+        if binding.claim_id in self._quantitative_bindings:
+            raise Book5ProvenanceError(
+                f"claim {binding.claim_id} already has a quantitative record "
+                "context binding"
+            )
+        self._quantitative_bindings[binding.claim_id] = binding
+
+    def validate_quantitative_record(self, record: object) -> str:
+        """Decision-time live-state validation of a non-component
+        quantitative record (R3 Phase 5/6).
+
+        Required at every 5G boundary that turns CapitalFlow, DebtLiability,
+        or ObservedCommonValueFact records into authority-bearing input:
+        canonical type, resolvable current claim refs, and an explicit
+        evidence-bound QuantitativeRecordContextBinding whose dimensions
+        AGREE with the live record and whose binding SET ESTABLISHES every
+        required dimension for the record kind (plus realization context
+        whenever the live record carries a realization_ref).
+
+        NO BINDING != CONTEXT VERIFIED: an unbound claim never passes by
+        falling through a missing binding.
+
+        Returns the canonical record kind string for the caller.
+        """
+
+        from .book5_lineage import DebtLiability as _DebtLiability
+        from .book5_records import (
+            CapitalFlow as _CapitalFlow,
+            ObservedCommonValueFact as _ObservedCommonValueFact,
+        )
+
+        if isinstance(record, _CapitalFlow):
+            kind = QuantitativeRecordKind.FLOW
+        elif isinstance(record, _DebtLiability):
+            kind = QuantitativeRecordKind.LIABILITY
+        elif isinstance(record, _ObservedCommonValueFact):
+            kind = QuantitativeRecordKind.OBSERVED_FACT
+        else:
+            raise Book5ProvenanceError(
+                "quantitative context validation requires a typed CapitalFlow, "
+                f"DebtLiability, or ObservedCommonValueFact, got "
+                f"{type(record).__name__}"
+            )
+        required = REQUIRED_CONTEXT_DIMENSIONS[kind.value]
+        claim_refs = record.book2_claim_refs  # canonical tuple on all three
+        if len(claim_refs) == 0:
+            raise Book5ProvenanceError(
+                f"quantitative {kind.value} record carries no Book 2 claim "
+                "refs; context cannot be established"
+            )
+        self.resolve_claim_refs(claim_refs)
+        unbound = [ref for ref in claim_refs if ref not in self._quantitative_bindings]
+        if unbound:
+            raise Book5ProvenanceError(
+                f"context not verified for quantitative {kind.value} record: "
+                f"claim(s) {', '.join(sorted(unbound))} carry no "
+                "QuantitativeRecordContextBinding; NO BINDING != CONTEXT "
+                "VERIFIED — bind the claim's quantitative context explicitly "
+                "before relying on it for an authority-bearing conclusion"
+            )
+        # (a) the binding SET must ESTABLISH every required dimension
+        established = {
+            dimension: any(
+                getattr(self._quantitative_bindings[ref], dimension) is not None
+                for ref in claim_refs
+            )
+            for dimension in required
+        }
+        missing = [d for d, ok in established.items() if not ok]
+        if missing:
+            raise Book5ProvenanceError(
+                f"context not verified for quantitative {kind.value} record: "
+                f"no binding establishes {', '.join(missing)}; an unverifiable "
+                "dimension is never a verified one"
+            )
+        # (b) every bound dimension must AGREE with the live record state
+        for ref in claim_refs:
+            binding = self._quantitative_bindings[ref]
+            if binding.record_kind is not kind:
+                raise Book5ProvenanceError(
+                    f"claim {ref} is bound for record kind "
+                    f"{binding.record_kind.value} but is used by a "
+                    f"{kind.value} record; context binding does not transfer "
+                    "across record kinds"
+                )
+            for dimension in (
+                "asset_ref",
+                "realization_ref",
+                "unit",
+                "site_ref",
+                "subject_ref",
+                "reporter_ref",
+                "numeraire",
+            ):
+                bound_value = getattr(binding, dimension)
+                if bound_value is not None:
+                    if (
+                        dimension == "site_ref"
+                        and isinstance(record, _DebtLiability)
+                    ):
+                        record_value: str | None = record.market_site_id
+                    else:
+                        record_value = getattr(record, dimension)
+                    if record_value != bound_value:
+                        raise Book5ProvenanceError(
+                            f"{kind.value} record {dimension} {record_value!r} "
+                            f"contradicts the context bound to claim {ref} "
+                            f"({bound_value!r})"
+                        )
+        if getattr(record, "realization_ref", None) is not None:
+            established_realization = any(
+                self._quantitative_bindings[ref].realization_ref is not None
+                for ref in claim_refs
+            )
+            if not established_realization:
+                raise Book5ProvenanceError(
+                    "context not verified for quantitative record: "
+                    "realization_ref is present but no binding establishes "
+                    "the realization context"
+                )
+        return kind.value
 
     def validate_principal_component(self, component: object) -> None:
         """Decision-time live-state validation of a principal component.
@@ -339,6 +566,9 @@ __all__ = [
     "Book5Provenance",
     "Book5ProvenanceError",
     "ClaimContextBinding",
+    "QuantitativeRecordContextBinding",
+    "QuantitativeRecordKind",
+    "REQUIRED_CONTEXT_DIMENSIONS",
     "ref_text",
     "require_str_hashable",
 ]

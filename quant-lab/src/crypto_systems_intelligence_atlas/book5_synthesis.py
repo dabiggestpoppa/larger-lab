@@ -236,6 +236,10 @@ class CapitalFieldSynthesis:
         flow = cast(_Flow, flow)
         self._typed(flow, _Flow, role="flow")
         self.provenance.resolve_claim_refs(flow.book2_claim_refs)
+        # R3-D4 context seal: the claim set must be bound to this flow's
+        # live quantitative context (asset/unit/realization) — claim
+        # existence alone never verifies the record's identity.
+        self.provenance.validate_quantitative_record(flow)
 
     def _validate_liability(self, liability: object) -> None:
         from .book5_lineage import DebtLiability as _Liability
@@ -243,6 +247,8 @@ class CapitalFieldSynthesis:
         liability = cast(_Liability, liability)
         self._typed(liability, _Liability, role="liability")
         self.provenance.resolve_claim_refs(liability.book2_claim_refs)
+        # R3-D4 context seal (asset/unit/market-site context).
+        self.provenance.validate_quantitative_record(liability)
 
     def _validate_observed_value_fact(self, fact: object) -> None:
         from .book5_records import ObservedCommonValueFact as _Fact
@@ -250,6 +256,8 @@ class CapitalFieldSynthesis:
         fact = cast(_Fact, fact)
         self._typed(fact, _Fact, role="observed value fact")
         self.provenance.resolve_claim_refs(fact.book2_claim_refs)
+        # R3-D4 context seal (subject/numeraire/reporter context).
+        self.provenance.validate_quantitative_record(fact)
 
     def _snapshot(
         self,
@@ -308,7 +316,12 @@ class CapitalFieldSynthesis:
         constructed without its authority resolver.
         """
 
-        if not positions and not flows and not liabilities:
+        if (
+            not positions
+            and not flows
+            and not liabilities
+            and not observed_value_facts
+        ):
             raise Book5ProvenanceError(
                 "5G composition requires at least one canonical input record"
             )
@@ -325,7 +338,7 @@ class CapitalFieldSynthesis:
         input_seed: list[str] = [
             *(p.position_id for p in positions),
             *(f.flow_id for f in flows),
-            *(liab.liability_id for liab in liabilities),
+            *(liab.liability_id for liab in liabilities if not isinstance(liab, ObservedCommonValueFact)),
             *(o.fact_id for o in observed_value_facts),
         ]
         if not input_seed:
@@ -364,7 +377,11 @@ class CapitalFieldSynthesis:
         input_refs = tuple(
             [p.position_id for p in positions]
             + [f.flow_id for f in flows]
-            + [liab.liability_id for liab in liabilities]
+            + [
+                liab.liability_id
+                for liab in liabilities
+                if not isinstance(liab, ObservedCommonValueFact)
+            ]
             + [o.fact_id for o in observed_value_facts]
         )
         if components:
@@ -391,7 +408,11 @@ class CapitalFieldSynthesis:
             valid_time=valid_time,
             observed_at=observed_at,
             gaps=tuple(gaps),
-            liability_refs=tuple(liab.liability_id for liab in liabilities),
+            liability_refs=tuple(
+                liab.liability_id
+                for liab in liabilities
+                if not isinstance(liab, ObservedCommonValueFact)
+            ),
             observed_value_fact_refs=tuple(o.fact_id for o in observed_value_facts),
         )
 

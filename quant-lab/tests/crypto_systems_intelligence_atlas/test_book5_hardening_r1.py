@@ -58,6 +58,42 @@ from crypto_systems_intelligence_atlas.book5_synthesis import (
 
 UTC = UTC
 T0 = NOW
+
+
+@pytest.fixture(autouse=True)
+def _bind_kernel_flow_context(monkeypatch):
+    """R3 context seal adaptation for the R1 corpus.
+
+    R1's flow-only defect demonstrations (D1–D6) cite ``book5-claim-eth``
+    through ``make_flow()``. After the R3 non-component context seal, a flow
+    claim with NO QuantitativeRecordContextBinding is refused at 5G
+    composition (NO BINDING != CONTEXT VERIFIED) — which is not the defect
+    class R1 documents (fabricated principals, placeholder tokens, stripped
+    claim refs). Binding the flow context (asset ETH / unit ETH) for the
+    fixture claim on every fresh kernel keeps these rows pointed at exactly
+    their original defects.
+    """
+
+    from crypto_systems_intelligence_atlas.book5_provenance import (
+        QuantitativeRecordContextBinding,
+        QuantitativeRecordKind,
+    )
+
+    original_kernel = kernel
+
+    def kernel_with_flow_context():
+        claims, evidence, provenance = original_kernel()
+        provenance.bind_quantitative_record_context(
+            QuantitativeRecordContextBinding(
+                claim_id="book5-claim-eth",
+                record_kind=QuantitativeRecordKind.FLOW,
+                asset_ref="csia:token:eth",
+                unit="ETH",
+            )
+        )
+        return claims, evidence, provenance
+
+    monkeypatch.setitem(globals(), "kernel", kernel_with_flow_context)
 T1 = LATER
 
 
