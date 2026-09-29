@@ -815,3 +815,119 @@ DECISION LOG ENTRY {
   binding_commit_sha:             (assigned at commit — see D7 closure record)
 }
 ```
+
+---
+
+# BOOK 5 DECISIONS (D5CAP-1..D5CAP-3) — DECISION SESSION 2026-09-29 (RECONCILIATION)
+
+**Decision session:** 2026-09-29 (second session, same day). The operator
+supplied provisional selections explicitly via the external-review directive,
+subject to the single-root principal-lineage repair being written precisely:
+`D5CAP-1 = B`, `D5CAP-2 = A WITH REQUIRED MULTI-ROOT/CONTRIBUTION REPAIR`,
+`D5CAP-3 = A`. Per the directive, D5CAP-2 is recorded **not** as the original
+unmodified Option A but as **OPTION A-REVISED** after the repair was written
+(`CSIA_BOOK_5_PRINCIPAL_LINEAGE_RECONCILIATION_v0.1.md`). The original option
+packet `CSIA_BOOK_5_OPERATOR_DECISIONS_D5CAP_v0.1.md` is preserved unmodified.
+No decision was inferred from silence; the repair was operator-directed, not
+agent-invented.
+
+## D5CAP-1 — SEPARATE TYPED LIABILITY OBJECTS
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D5CAP-1
+  decision:                     LIABILITY REPRESENTATION = SEPARATE TYPED
+                                ECONOMIC OBJECTS
+  operator_selection:           OPTION B
+  source_packet:                CSIA_BOOK_5_OPERATOR_DECISIONS_D5CAP_v0.1.md
+  affected_bloc:                5C (credit), 5D (staking/yield), 5F (RWA);
+                                cross-bloc liability records
+  immediate_consequence:        DebtLiability / ReserveLiability /
+                                RedemptionClaim are the canonical obligation
+                                records. SINGLE-SOURCE-OF-TRUTH RULE (binding):
+                                the canonical obligation quantity/state lives in
+                                exactly one record — the liability/claim object.
+                                DebtPosition (and any position) references its
+                                liability object and carries actor/site/context;
+                                it must NOT independently restate a conflicting
+                                canonical obligation quantity. Mechanical
+                                consistency rule: any restated quantity must be
+                                a typed reference-projection of the canonical
+                                liability value at a stated observation time;
+                                divergence between a projection and its canonical
+                                source is a contract violation (fail closed).
+  reversibility:                Medium — mechanical migration to the subtype
+                                design is possible; requires a later recorded
+                                decision.
+  effective_timestamp:          2026-09-29
+  binding_commit_sha:           (assigned at commit)
+}
+```
+
+## D5CAP-2 — TYPED MANY-TO-MANY PRINCIPAL-LINEAGE GRAPH (OPTION A-REVISED)
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D5CAP-2
+  decision:                     PRINCIPAL-LINEAGE REPRESENTATION = TYPED GRAPH
+                                RECORDS WITH MULTI-ROOT/CONTRIBUTION SEMANTICS
+  operator_selection:           OPTION A-REVISED (original Option A repaired;
+                                single-root doctrine REJECTED)
+  source_packet:                CSIA_BOOK_5_OPERATOR_DECISIONS_D5CAP_v0.1.md;
+                                repair artifact
+                                CSIA_BOOK_5_PRINCIPAL_LINEAGE_RECONCILIATION_v0.1.md
+  affected_bloc:                cross-bloc (all 5A–5G)
+  immediate_consequence:        CapitalPrincipalLineage is a typed graph of
+                                lineage nodes + contribution edges supporting
+                                ONE-TO-ONE, ONE-TO-MANY, MANY-TO-ONE, and
+                                MANY-TO-MANY principal relationships with
+                                explicit attribution states (EXACT / PROPORTIONAL /
+                                COMMINGLED / DERIVED_ALLOCATION / UNRESOLVED /
+                                UNKNOWN — candidate vocabulary). The v0.1 rule
+                                "every lineage node traces to exactly one
+                                economic principal at its root" is VOID.
+                                Binding properties: queryable; replayable;
+                                cycle-detectable structurally; many-to-many;
+                                methodology-aware; UNKNOWN-preserving.
+                                UNKNOWN is never upgraded to EXACT; no consumer
+                                may infer unit-level ancestry from COMMINGLED
+                                edges; multi-asset claims carry
+                                principal_component_refs contribution sets, not
+                                a single lineage id (single-root ids remain legal
+                                only for genuinely EXACT single-principal chains).
+  reversibility:                Hard after adoption (lineage underlies all
+                                principal-domain computation); any successor
+                                design requires a recorded decision + migration
+                                plan.
+  effective_timestamp:          2026-09-29
+  binding_commit_sha:           (assigned at commit)
+}
+```
+
+## D5CAP-3 — VERSIONED CAPITAL FIELD SNAPSHOTS + TOPOLOGY VIEWS
+
+```text
+DECISION_LOG_ENTRY {
+  decision_id:                  D5CAP-3
+  decision:                     5G OUTPUT SHAPE = VERSIONED SNAPSHOTS + VIEWS
+  operator_selection:           OPTION A
+  source_packet:                CSIA_BOOK_5_OPERATOR_DECISIONS_D5CAP_v0.1.md
+  affected_bloc:                5G
+  immediate_consequence:        5G publishes immutable, versioned
+                                CapitalFieldSnapshot compositions at explicit
+                                valid times, plus derived projections
+                                (CapitalFieldPath, CapitalPrincipalLineageView,
+                                CapitalTopologyView). NAMING SEAL (binding):
+                                because D5CAP-2 owns the canonical record family
+                                name CapitalPrincipalLineage, 5G's derived
+                                lineage projection is named
+                                CapitalPrincipalLineageView — no canonical/
+                                derived object may share a name, and no 5G output
+                                may imply greater lineage precision than its
+                                source records contain.
+  reversibility:                High (output-shape change is a 5G-local
+                                contract revision).
+  effective_timestamp:          2026-09-29
+  binding_commit_sha:           (assigned at commit)
+}
+```
