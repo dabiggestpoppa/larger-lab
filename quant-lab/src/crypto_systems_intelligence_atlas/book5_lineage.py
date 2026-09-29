@@ -96,6 +96,24 @@ def require_decimal(value: str, *, role: str) -> Decimal:
         raise LineageError(f"{role} {value!r} is not a decimal") from exc
 
 
+class AttributionBasisError(LineageError):
+    """An attribution state claims more precision than its Book 2 basis.
+
+    Ratified doctrine (Phase 4): no attribution state may increase epistemic
+    precision beyond its Book 2 basis. EXACT contributions require claims
+    asserting PRINCIPAL_EXACT_FACT; PROPORTIONAL contributions require
+    PRINCIPAL_PROPORTIONAL_FACT. A state flipped post-construction (e.g., via
+    ``model_copy``) fails closed at the collapse boundary when a provenance
+    is supplied.
+    """
+
+
+ATTRIBUTION_BASIS_QUALIFIERS: Final[dict[str, str]] = {
+    AttributionState.EXACT.value: "PRINCIPAL_EXACT_FACT",
+    AttributionState.PROPORTIONAL.value: "PRINCIPAL_PROPORTIONAL_FACT",
+}
+
+
 class CapitalPrincipalLineageGraph:
     """Executable many-to-many lineage graph enforcing CON-1..CON-10.
 
@@ -185,12 +203,50 @@ class CapitalPrincipalLineageGraph:
 
     # -- aggregation -------------------------------------------------------
 
+    def verify_edge_basis(self, provenance) -> None:
+        """Verify every attributable edge's attribution basis in Book 2.
+
+        Required at authority boundaries when a provenance is available:
+        an EXACT/PROPORTIONAL edge whose underlying claims do not assert the
+        matching basis qualifier is refused (detects post-construction state
+        upgrades that bypassed validators).
+        """
+
+        for edge in self._edges:
+            state_value = (
+                edge.attribution_state.value
+                if isinstance(edge.attribution_state, AttributionState)
+                else str(edge.attribution_state)
+            )
+            # a post-construction tamper may leave a raw string in place of
+            # the enum; both spellings are checked (fail-closed, never trusted)
+            if state_value not in {s.value for s in AttributionState}:
+                raise AttributionBasisError(
+                    f"edge {edge.source_lineage_id}->{edge.target_record_id} "
+                    f"carries non-canonical attribution state {state_value!r}"
+                )
+            if state_value not in ATTRIBUTION_BASIS_QUALIFIERS:
+                continue
+            required = ATTRIBUTION_BASIS_QUALIFIERS[state_value]
+            for ref in edge.book2_claim_refs:
+                claim = provenance.resolve_claim(ref)
+                if claim.proposition.qualifier not in (
+                    required,
+                    "ECONOMIC_FACT",
+                ):
+                    raise AttributionBasisError(
+                        f"edge {edge.source_lineage_id}->{edge.target_record_id} "
+                        f"claims {edge.attribution_state.value} but claim {ref} "
+                        f"asserts qualifier {claim.proposition.qualifier}"
+                    )
+
     def collapse_same_unit(
         self,
         record_id: str,
         *,
         unit: str,
         realization_ref: str | None = None,
+        provenance=None,
     ) -> str:
         """Collapse one record's principal components to a SAME-UNIT total.
 
@@ -206,6 +262,8 @@ class CapitalPrincipalLineageGraph:
                 "refusing collapse over cyclic lineage; de-duplicate or report "
                 "UNKNOWN (CON-9)"
             )
+        if provenance is not None:
+            self.verify_edge_basis(provenance)
         total = Decimal(0)
         matched = 0
         for edge in self._edges:
