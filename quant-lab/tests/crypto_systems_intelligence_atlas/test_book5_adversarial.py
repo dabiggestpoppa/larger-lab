@@ -276,6 +276,23 @@ def test_same_realization_usdc_may_sum() -> None:
 
 def test_observed_40b_fact_is_not_a_conversion_authority() -> None:
     _, _, prov = kernel()
+    # R3 Phase 11: display runs LIVE validation, so the fact's claim carries
+    # its quantitative context binding (subject/numeraire) — the assertions
+    # under test (no conversion authority, valuation NOT_AUTHORIZED) are
+    # unchanged.
+    from crypto_systems_intelligence_atlas.book5_provenance import (
+        QuantitativeRecordContextBinding,
+        QuantitativeRecordKind,
+    )
+
+    prov.bind_quantitative_record_context(
+        QuantitativeRecordContextBinding(
+            claim_id="book5-claim-base",
+            record_kind=QuantitativeRecordKind.OBSERVED_FACT,
+            subject_ref="csia:stablecoin:fxd",
+            numeraire="USD",
+        )
+    )
     synthesis = CapitalFieldSynthesis(prov, SynthesisWriteLedger())
     fact = ObservedCommonValueFact(
         fact_id="fact:reserves", reported_value="40000000000", numeraire="USD",

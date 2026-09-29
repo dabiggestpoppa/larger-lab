@@ -625,6 +625,22 @@ def test_5g_canonical_write_count_zero_by_construction() -> None:
 
 def test_5g_observed_value_fact_display_never_conversion() -> None:
     _, _, prov = kernel()
+    # R3 Phase 11: display runs LIVE validation, so the fact's claim carries
+    # its quantitative context binding (subject/numeraire) — the assertion
+    # under test (display never conversion) is unchanged.
+    from crypto_systems_intelligence_atlas.book5_provenance import (
+        QuantitativeRecordContextBinding,
+        QuantitativeRecordKind,
+    )
+
+    prov.bind_quantitative_record_context(
+        QuantitativeRecordContextBinding(
+            claim_id="book5-claim-base",
+            record_kind=QuantitativeRecordKind.OBSERVED_FACT,
+            subject_ref="csia:stablecoin:fxd",
+            numeraire="USD",
+        )
+    )
     synthesis = CapitalFieldSynthesis(prov)
     fact = ObservedCommonValueFact(
         fact_id="fact:reserves", reported_value="40000000000", numeraire="USD",

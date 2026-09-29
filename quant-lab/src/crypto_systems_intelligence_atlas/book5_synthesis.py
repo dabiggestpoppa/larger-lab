@@ -635,8 +635,23 @@ class CapitalFieldSynthesis:
     ) -> dict[str, str]:
         """T-13: an observed scalar is displayable as an observed fact with
         provenance — never as a Book 5/5G valuation output and never as a
-        conversion authority for component vectors."""
+        conversion authority for component vectors.
 
+        R3-D3 seal (Phase 11): display is an authority-producing surface, so
+        the LIVE fact is validated before any payload is rendered — typed
+        guard (raw dicts fail closed), Book 2 claim resolution (stripped or
+        detached refs fail), and the quantitative context seal (asset —
+        here: subject/numeraire/reporter — context verified against the
+        binding; ``model_copy`` tampering cannot display). The payload is
+        DISPLAY ONLY: no conversion, no valuation derivation, and the kind
+        stays OBSERVED_COMMON_VALUE_FACT, never CSIA_DERIVED_COMMON_VALUE.
+        """
+
+        from .book5_records import ObservedCommonValueFact as _Fact
+
+        self._typed(fact, _Fact, role="observed value fact")
+        self.provenance.resolve_claim_refs(fact.book2_claim_refs)
+        self.provenance.validate_quantitative_record(fact)
         return {
             "display": "OBSERVED_COMMON_VALUE_FACT",
             "fact_id": fact.fact_id,
