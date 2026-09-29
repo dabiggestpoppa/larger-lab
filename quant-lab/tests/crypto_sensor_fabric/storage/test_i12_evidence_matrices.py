@@ -53,6 +53,7 @@ from crypto_sensor_fabric.storage.replay import (  # noqa: E402
 )
 from crypto_sensor_fabric.storage.revisions import (  # noqa: E402
     RevisionAmbiguityError,
+    RevisionSourceIdentityV1,
     SourceRevisionRegistry,
 )
 from crypto_sensor_fabric.providers.base.enums import Granularity  # noqa: E402
@@ -182,10 +183,14 @@ class Lake:
         return result.manifest
 
     def service(self) -> RawEvidenceQueryService:
+        # I12R2 §4 canonical construction: the accepted I06 authority is
+        # required for every executing service.
         return RawEvidenceQueryService(
             manifest_repository=self.manifest_repo,
             acquisition_repository=self.acq_repo,
             blob_metadata_repository=self.blob_repo,
+            revision_registry=self.registry,
+            revision_identity_factory=RevisionSourceIdentityV1,
         )
 
 

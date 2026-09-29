@@ -80,6 +80,7 @@ from crypto_sensor_fabric.storage.replay import (
 )
 from crypto_sensor_fabric.storage.revisions import (
     RevisionAmbiguityError,
+    RevisionSourceIdentityV1,
     SourceRevisionRegistry,
 )
 
@@ -328,10 +329,17 @@ class Lake:
         return result.manifest
 
     def service(self) -> RawEvidenceQueryService:
+        # I12R2 §4 canonical construction: every executing service wires the
+        # accepted I06 revision authority (the default policy is a resolution
+        # policy and is refused without it).
         return RawEvidenceQueryService(
             manifest_repository=self.manifest_repo,
             acquisition_repository=self.acq_repo,
             blob_metadata_repository=self.blob_repo,
+            revision_registry=self.registry,
+            revision_identity_factory=RevisionSourceIdentityV1,
+            projection_artifact_repository=self.artifacts,
+            projection_lineage_repository=self.lineage,
         )
 
 
@@ -1005,6 +1013,8 @@ class TestReplayCursor:
             manifest_repository=lake.manifest_repo,
             acquisition_repository=lake.acq_repo,
             blob_metadata_repository=lake.blob_repo,
+            revision_registry=lake.registry,
+            revision_identity_factory=RevisionSourceIdentityV1,
         )
         cursor2 = RawReplayCursor(service=svc)
         result2 = [r for r in svc.execute(RawEvidenceQuery()).results if r is not None][-1]

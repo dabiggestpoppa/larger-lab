@@ -72,6 +72,28 @@ SENSOR-B4-I12R1 — end-to-end query semantics (operator review §1-§11):
   projection schema filtering → lineage validation → deterministic
   ordering → limit LAST.  ``limit`` can never suppress a revision
   ambiguity raised during reduction.
+
+SENSOR-B4-I12R2 — fail-safe default revision authority + explicit
+representation satisfaction (operator review §2-§11):
+
+- Blocker A repair: the default policy is NOT a bypass.  ``execute``
+  refuses EVERY revision policy — including the default
+  ERROR_ON_AMBIGUITY — with a typed ``RevisionAuthorityUnavailable``
+  when the service was constructed without the accepted I06
+  ``SourceRevisionRegistry``.  There is no compatibility switch; a
+  caller that wants raw evidence must wire the revision authority.
+- Blocker B repair (representation-satisfaction law, §9-§11):
+  ``include_t0b=True`` is a REQUIREMENT, not a preference.  Every
+  published result must carry at least one eligible selected T0B
+  projection; when none exists (no projections, schema filter excluding
+  them all, missing metadata, broken lineage) the query fails typed
+  (``ProjectionSchemaUnsupported``) — a valid T0A selection NEVER
+  silently satisfies an explicitly requested T0B representation.  The
+  I12R1 option-A T0A fallback is superseded.
+- ``include_t0a=True`` remains a requirement on ``blob_refs``: a
+  published result carries nonempty ``blob_refs``.  T0A-only selection
+  is deterministic whether the optional T0B metadata repositories are
+  wired or not.
 """
 
 from __future__ import annotations
@@ -81,7 +103,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
-from .enums import IntegrityState, RevisionPolicy, RevisionState
+from .enums import IntegrityState, RevisionState
 from .models import (
     AcquisitionRecord,
     PartitionManifest,
@@ -142,6 +164,20 @@ class ReplayOrderUnavailable(RawQueryError):
 
 class QueryValidationError(RawQueryError):
     """The query itself is structurally invalid at execution time (§6)."""
+
+
+class RevisionAuthorityUnavailable(QueryValidationError):
+    """The query cannot be executed because the service was constructed
+    without the accepted revision authority (I12R2 §3/§7).
+
+    EVERY revision policy — including the default ERROR_ON_AMBIGUITY —
+    is a revision-RESOLUTION policy and therefore cannot be honored
+    without the accepted I06 ``SourceRevisionRegistry``.  This is a
+    service configuration/authority failure, NOT evidence content: it is
+    never mapped to StorageBackendUnavailable, NoMatchingEvidence or
+    RevisionAmbiguity, and there is no compatibility switch that restores
+    the unsafe pass-through.
+    """
 
 
 class RevisionPolicyInvalid(QueryValidationError):
@@ -249,9 +285,11 @@ class RawInventorySnapshot(BaseModel):
 class QueryOutcome(BaseModel):
     """Typed query outcome: results plus the no-match condition (§16).
 
-    ``NoMatchingEvidence`` is a CONDITION of a successful reduction, not an
-    exception, so a caller can distinguish it from every failure mode while
-    the failure modes themselves stay exceptions.
+    ``no_matching_evidence`` is True ONLY on success-with-no-results.
+    When the complete inventory contains nothing satisfying the query,
+    ``execute()`` raises the typed ``NoMatchingEvidence`` EXCEPTION — the
+    I12 doc's earlier description of it as a returned "condition" was
+    stale (corrected I12R2 §15 to match public behavior).
     """
 
     model_config = ConfigDict(frozen=True)
@@ -440,6 +478,13 @@ class RawEvidenceQueryService:
         9. lineage validation BEFORE publication           <- I12R1
         10. canonical deterministic ordering
         11. limit LAST
+
+        I12R2 §3: revision authority is REQUIRED for every execution.
+        Every revision policy — including the default ERROR_ON_AMBIGUITY
+        — is a revision-resolution policy and cannot be honored without
+        the accepted I06 ``SourceRevisionRegistry``; an unwired service is
+        a typed ``RevisionAuthorityUnavailable`` for EVERY policy (no
+        default pass-through, no compatibility switch).
         """
         if not query.include_t0a and not query.include_t0b:
             # §21: T0A=False/T0B=False is a validation failure, typed here at
@@ -448,25 +493,19 @@ class RawEvidenceQueryService:
                 "include_t0a=False and include_t0b=False selects nothing; "
                 "at least one include mode must be True"
             )
-        # I12R1 §2: revision policy is REAL.  When the caller wants revision
-        # semantics beyond the research-safe default they must wire the
-        # accepted authority; a missing dependency is a typed refusal, never
-        # a silently-ignored filter.
-        if (
-            self._revision_registry is None
-            and (
-                query.revision_policy is not RevisionPolicy.ERROR_ON_AMBIGUITY
-                or query.exact_revision_number is not None
-            )
-        ):
-            raise QueryValidationError(
-                "the query carries an explicit revision policy but the "
-                "service was constructed without revision_registry — the "
+        # I12R2 §3: EVERY revision policy is a revision-resolution policy —
+        # including the default ERROR_ON_AMBIGUITY — so raw evidence is
+        # NEVER returned without the accepted I06 authority.  The I12R1
+        # default-policy pass-through (BLOCKER A, reproduced failure-first)
+        # is closed here with no compatibility switch.
+        if self._revision_registry is None:
+            raise RevisionAuthorityUnavailable(
+                "the service was constructed without revision_registry — the "
                 "accepted I06 SourceRevisionRegistry is the only revision "
-                "authority (I12R1 §3); re-query with the default policy or "
-                "wire the registry"
+                "authority and EVERY revision policy (including the default "
+                "ERROR_ON_AMBIGUITY) requires it to be honored (I12R2 §3); "
+                "wire revision_registry to execute raw-evidence queries"
             )
-
         # 1+2. inventory + metadata filters
         candidates = [
             manifest
@@ -509,9 +548,9 @@ class RawEvidenceQueryService:
                 # 4. REVISION RESOLUTION (I12R1 §2-§4): every candidate
                 # acquisition passes through the accepted I06 registry under
                 # the query's policy.  Ambiguity raises here — BEFORE any
-                # result is built, before ordering, before limit.  With no
-                # registry wired and the default policy, resolution is a
-                # pass-through (the explicit-policy case is refused above).
+                # result is built, before ordering, before limit.  The
+                # registry is always wired here (I12R2 §3 refuses unwired
+                # services at the top of execute()).
                 if self._revision_registry is not None:
                     kept: list[AcquisitionRecord] = []
                     for r in usable:
@@ -818,8 +857,21 @@ class RawEvidenceQueryService:
           references T0A without pretending the caller selected T0A output).
 
         Returns None when the manifest carries no selected representation
-        (e.g. T0B-only with no matching schema) — the caller drops the
-        candidate or raises a typed representation failure, per §10.
+        (the caller drops the candidate or raises a typed representation
+        failure, per §10).
+
+        I12R2 §9-§11 representation-satisfaction law: the include flags are
+        REQUIREMENTS, not preferences.
+
+        - include_t0b=True  -> every published result carries at least one
+          eligible selected T0B projection; when none exists (no
+          projections, schema filter excluding them all, missing metadata,
+          broken lineage) the query fails typed
+          (``ProjectionSchemaUnsupported``).  A valid T0A selection NEVER
+          silently satisfies an explicitly requested T0B representation
+          (the I12R1 option-A fallback is superseded).
+        - include_t0a=True  -> the published result carries nonempty
+          ``blob_refs`` (structurally asserted at the publication boundary).
         """
         selected_blobs = sorted(blob_refs) if query.include_t0a else []
         lineage_refs: list[str] = []
@@ -831,15 +883,21 @@ class RawEvidenceQueryService:
                     continue  # schema-filtered
                 projection_refs.append(meta["projection_id"])
                 lineage_refs.extend(meta["source_blobs"])
-            if not projection_refs and not query.include_t0a:
-                # §10: T0B-only, manifest has projections but none match the
-                # requested schema ids (or none exist) — typed representation
-                # failure; a non-matching projection is never substituted.
+            if not projection_refs:
+                # I12R2 §9-§11: include_t0b=True is an explicit caller
+                # REQUIREMENT.  No eligible T0B projection exists — fail
+                # closed for BOTH T0B-only and both-representations queries
+                # (BLOCKER B, reproduced failure-first: the I12R1 behavior
+                # of returning the valid T0A selection with empty
+                # projection_refs silently dropped the requested T0B).
                 raise ProjectionSchemaUnsupported(
-                    f"manifest {manifest.partition_manifest_id} carries no T0B "
-                    f"projection matching projection_schema_ids "
-                    f"{sorted(query.projection_schema_ids)} and include_t0a is "
-                    "False — no silent substitution"
+                    f"manifest {manifest.partition_manifest_id} satisfies no "
+                    "eligible T0B projection while include_t0b=True — no "
+                    "projections match projection_schema_ids "
+                    f"{sorted(query.projection_schema_ids)} (or none exist / "
+                    "their metadata is not eligible); T0A availability never "
+                    "satisfies an explicitly requested T0B representation "
+                    "(I12R2 §9)"
                 )
         elif manifest.projection_refs and self._artifacts_repo is not None:
             # T0A-only query: T0B stays UNSELECTED (not claimed in
@@ -853,6 +911,18 @@ class RawEvidenceQueryService:
             # projections: manifest-level projection refs stay unselected.
             pass
         lineage_refs = sorted(set(lineage_refs))
+        # I12R2 §13 publication-boundary invariant: the include flags are
+        # requirements on the RETURNED representation.
+        if query.include_t0a and not selected_blobs:
+            raise QueryValidationError(
+                "include_t0a=True requires a nonempty selected T0A "
+                "representation in every published result"
+            )
+        if query.include_t0b and not projection_refs:
+            raise QueryValidationError(
+                "include_t0b=True requires a nonempty selected T0B "
+                "representation in every published result"
+            )
         return RawEvidenceResult(
             provider=manifest.provider,
             venue=manifest.venue,
@@ -895,6 +965,7 @@ __all__ = [
     "RawQueryError",
     "ReplayOrderUnavailable",
     "RevisionAmbiguity",
+    "RevisionAuthorityUnavailable",
     "RevisionCanonicalUnavailable",
     "RevisionPolicyInvalid",
     "StorageBackendUnavailable",

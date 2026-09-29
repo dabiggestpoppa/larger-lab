@@ -389,23 +389,23 @@ class TestRepresentationSelection:
                 )
             )
 
-    def test_projection_schema_mismatch_t0a_fallback_documented(
+    def test_projection_schema_mismatch_with_both_requested_fails_typed(
         self, tmp_path: Path
     ) -> None:
-        """§10 exact fallback: include_t0a=True + no matching projection
-        returns the VALID T0A selection; the non-matching projection is
-        NOT silently substituted into projection_refs."""
+        """SUPERSEDED I12R2 §12 (operator review): include_t0b=True is an
+        explicit caller REQUIREMENT — a query requesting BOTH representations
+        must refuse typed when no eligible T0B projection matches; the valid
+        T0A selection NEVER silently satisfies the requested T0B (the I12R1
+        option-A fallback encoded here before operator review was wrong)."""
         lake = self._lake(tmp_path)
-        result = wired_service(lake).execute(
-            RawEvidenceQuery(
-                include_t0a=True,
-                include_t0b=True,
-                projection_schema_ids=["other.schema"],
+        with pytest.raises(ProjectionSchemaUnsupported):
+            wired_service(lake).execute(
+                RawEvidenceQuery(
+                    include_t0a=True,
+                    include_t0b=True,
+                    projection_schema_ids=["other.schema"],
+                )
             )
-        ).results[0]
-        sha = lake.acq_repo.get_acquisition("acq-1").blob_sha256
-        assert result.blob_refs == [sha]
-        assert result.projection_refs == []
 
     def test_lineage_validated_before_publication(self, tmp_path: Path) -> None:
         """§11: a query that returns a projection_ref must have validated
@@ -539,6 +539,8 @@ class TestReplayDispatch:
             manifest_repository=lake.manifest_repo,
             acquisition_repository=lake.acq_repo,
             blob_metadata_repository=lake.blob_repo,
+            revision_registry=lake.registry,
+            revision_identity_factory=RevisionSourceIdentityV1,
         )
         cursor = RawReplayCursor(service=svc)
         result = svc.execute(RawEvidenceQuery()).results[0]
