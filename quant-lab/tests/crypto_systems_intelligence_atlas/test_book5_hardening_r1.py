@@ -381,11 +381,16 @@ def test_d4_no_fabricated_claim_refs() -> None:
 def test_d5_observed_zero_distinct_from_no_observation() -> None:
     """D5: observed economic zero vs no principal observation."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    claims, ev, provenance = kernel()
+    evidence_ref = make_evidence(ev, "exact-basis")
+    claims.add_initial(
+        make_claim("book5-claim-eth-exact", evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
+    )
+    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=provenance)
     zero_position = make_position(
         "pos:zero",
         components=component_set(
-            component(quantity="0", claim_ref="book5-claim-eth")
+            component(quantity="0", claim_ref="book5-claim-eth-exact")
         ),
     )
     zero_snapshot = synthesis.compose_snapshot(

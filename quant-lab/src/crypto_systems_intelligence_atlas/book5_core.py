@@ -200,7 +200,7 @@ class PrincipalComponent(BaseModel):
 
     asset_ref: str = Field(min_length=1)
     realization_ref: str | None = None
-    quantity: str  # decimal string; exact, no float drift
+    quantity: str | None  # decimal string; None = MISSING (never fabricated as "0")
     unit: str = Field(min_length=1)
     attribution_state: AttributionState
     book2_claim_refs: tuple[str, ...]
@@ -211,6 +211,15 @@ class PrincipalComponent(BaseModel):
     def _state_laws(self) -> PrincipalComponent:
         if len(self.book2_claim_refs) == 0:
             raise ValueError("principal component requires Book 2 claim refs")
+        if self.quantity is not None:
+            from decimal import Decimal, InvalidOperation
+
+            try:
+                Decimal(self.quantity)
+            except InvalidOperation as exc:
+                raise ValueError(
+                    f"component quantity {self.quantity!r} is not a decimal"
+                ) from exc
         if self.attribution_state is AttributionState.DERIVED_ALLOCATION:
             if self.share_fraction is None:
                 raise ValueError(
