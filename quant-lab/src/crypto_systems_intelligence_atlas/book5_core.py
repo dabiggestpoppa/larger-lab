@@ -19,7 +19,11 @@ from typing import Final
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .book5_provenance import Book5ProvenanceError, require_str_hashable
+from .book5_provenance import (
+    ATTRIBUTION_BASIS_QUALIFIERS,
+    Book5ProvenanceError,
+    require_str_hashable,
+)
 from .temporal import Timestamp, UnknownBound
 
 
@@ -44,6 +48,33 @@ ARITHMETIC_STATES: Final[frozenset[AttributionState]] = frozenset(
 
 class AttributionStateError(ValueError):
     """An attribution state was used beyond its epistemic basis."""
+
+
+class AttributionBasisError(Book5ProvenanceError):
+    """A component's attribution state exceeds its live Book 2 basis.
+
+    R1-D1 seal: attribution precision is re-verified against the LIVE record
+    state at every decision boundary. A state upgraded post-construction
+    (e.g. via ``model_copy``) whose underlying claims do not assert the
+    matching basis qualifier fails closed — constructor validators alone are
+    not authority (plan v0.3 Phase 4; CON-2/CON-10; ALG-11).
+    """
+
+
+def require_canonical_state(component: "PrincipalComponent") -> AttributionState:
+    """Fail closed when a component's live state is not the canonical enum.
+
+    ``model_copy(update=...)`` can leave a raw string in ``attribution_state``
+    that bypassed validators. The state is normalized ONLY by canonical
+    construction — never silently trusted at a decision point.
+    """
+
+    if not isinstance(component.attribution_state, AttributionState):
+        raise AttributionBasisError(
+            f"component carries non-canonical attribution state "
+            f"{component.attribution_state!r}; refuse raw attribution payload"
+        )
+    return component.attribution_state
 
 
 def require_attributed(state: AttributionState, *, operation: str) -> None:
@@ -229,12 +260,25 @@ class PrincipalComponentSet(BaseModel):
     def is_heterogeneous(self) -> bool:
         return len(self.units()) > 1
 
-    def aggregate_same_unit(self, unit: str, *, realization_ref: str | None = None) -> str:
+    def aggregate_same_unit(
+        self,
+        unit: str,
+        *,
+        realization_ref: str | None = None,
+        provenance: object = None,
+    ) -> str:
         """Sum quantities of ONE unit under attribution laws (ALG-12).
 
         Components participate only when their attribution state supports
         arithmetic (EXACT/PROPORTIONAL). Cross-unit aggregation does not exist
         on this type; heterogeneous sets are returned as-is by design.
+
+        R1 live-state seal: when a ``provenance`` is supplied, every
+        participating component is re-validated against its LIVE Book 2 basis
+        at this decision point — a ``model_copy`` attribution/unit/asset
+        mutation cannot convert into an economic conclusion. Without a
+        provenance, non-canonical (raw-injected) attribution states still fail
+        closed and the attribution arithmetic law still applies.
         """
 
         from decimal import Decimal, InvalidOperation
@@ -246,6 +290,10 @@ class PrincipalComponentSet(BaseModel):
             expected = realization_ref or unit
             if key != expected and component.unit != unit:
                 continue
+            if provenance is not None:
+                provenance.validate_principal_component(component)
+            else:
+                require_canonical_state(component)
             require_attributed(
                 component.attribution_state,
                 operation=f"same-unit aggregation of {unit}",
@@ -266,6 +314,7 @@ __all__ = [
     "ARITHMETIC_STATES",
     "AttributionState",
     "AttributionStateError",
+    "AttributionBasisError",
     "EconomicLocation",
     "EconomicSite",
     "LOCATION_UNKNOWN",
@@ -274,5 +323,6 @@ __all__ = [
     "PrincipalComponentSet",
     "SiteType",
     "require_attributed",
+    "require_canonical_state",
     "require_site_ref",
 ]

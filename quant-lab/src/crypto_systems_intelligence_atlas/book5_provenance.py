@@ -8,6 +8,9 @@ Constitution v0.2 §6/§13; ratified Book 5 plan v0.3 "Book 2 dependence").
 
 from __future__ import annotations
 
+from typing import Final
+
+from pydantic import BaseModel, ConfigDict
 
 from .claims import Claim, ClaimStore, can_promote_to_graph
 from .dependency_provenance import require_str_hashable
@@ -16,6 +19,35 @@ from .evidence import EvidenceStore
 
 class Book5ProvenanceError(ValueError):
     """A Book 5 record cannot be canonical under accepted Book 2 truth."""
+
+
+#: Attribution states that assert quantitative precision require their Book 2
+#: claims to carry the matching basis qualifier (plan v0.3 Phase 4: no
+#: attribution state may increase epistemic precision beyond its Book 2
+#: basis; CON-2/CON-10; ALG-11). Verified at DECISION TIME against live record
+#: state — construction-time validation alone is not authority.
+ATTRIBUTION_BASIS_QUALIFIERS: Final[dict[str, str]] = {
+    "EXACT": "PRINCIPAL_EXACT_FACT",
+    "PROPORTIONAL": "PRINCIPAL_PROPORTIONAL_FACT",
+}
+
+
+class ClaimContextBinding(BaseModel):
+    """Typed Book 5-local binding of a claim to asset/realization/unit context.
+
+    Book 2 propositions do not encode asset/realization/unit dimensions
+    directly. This binding maps a canonical claim to the context dimensions it
+    supports so decision-time validation can detect post-construction unit or
+    asset mutation (R1-D2). An absent binding means the dimension is NOT
+    verifiable from Book 2 — it is never claimed to be.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    claim_id: str
+    asset_ref: str | None = None
+    realization_ref: str | None = None
+    unit: str | None = None
 
 
 class Book5Provenance:
@@ -31,6 +63,7 @@ class Book5Provenance:
     def __init__(self, claim_store: ClaimStore, evidence_store: EvidenceStore) -> None:
         self.claim_store = claim_store
         self.evidence_store = evidence_store
+        self._context_bindings: dict[str, ClaimContextBinding] = {}
 
     def resolve_claim(
         self,
@@ -75,6 +108,96 @@ class Book5Provenance:
             )
         return claim
 
+    def bind_claim_context(self, binding: ClaimContextBinding) -> None:
+        """Register the context dimensions a canonical claim supports.
+
+        The claim must already be canonical (this refuses bindings for
+        unknown/forged claim ids). Rebinding is refused: bindings are
+        registration-time facts, not mutable state.
+        """
+
+        self.resolve_claim(binding.claim_id)
+        if binding.claim_id in self._context_bindings:
+            raise Book5ProvenanceError(
+                f"claim {binding.claim_id} already has a context binding"
+            )
+        self._context_bindings[binding.claim_id] = binding
+
+    def validate_principal_component(self, component: object) -> None:
+        """Decision-time live-state validation of a principal component.
+
+        Required at every boundary that turns components into economic
+        conclusions (R1-D1/R1-D2). Validates the LIVE object, never a
+        remembered construction: canonical type, canonical attribution state,
+        resolvable current claim refs, attribution basis not exceeding its
+        Book 2 claims, decimal quantity, non-empty unit, timezone-aware valid
+        time, and context-binding agreement for every bound dimension.
+        """
+
+        from .book5_core import AttributionState, PrincipalComponent
+
+        if not isinstance(component, PrincipalComponent):
+            raise Book5ProvenanceError(
+                f"principal component must be a typed PrincipalComponent, got "
+                f"{type(component).__name__}"
+            )
+        state = component.attribution_state
+        if not isinstance(state, AttributionState):
+            raise Book5ProvenanceError(
+                f"component carries non-canonical attribution state {state!r}"
+            )
+        resolved = self.resolve_claim_refs(component.book2_claim_refs)
+        required_qualifier = ATTRIBUTION_BASIS_QUALIFIERS.get(state.value)
+        if required_qualifier is not None:
+            for ref, claim in zip(component.book2_claim_refs, resolved):
+                if claim.proposition.qualifier != required_qualifier:
+                    raise Book5ProvenanceError(
+                        f"component claims attribution {state.value} but claim "
+                        f"{ref} asserts qualifier {claim.proposition.qualifier}; "
+                        "attribution basis exceeds its Book 2 evidence"
+                    )
+        from decimal import Decimal, InvalidOperation
+
+        try:
+            Decimal(component.quantity)
+        except InvalidOperation as exc:
+            raise Book5ProvenanceError(
+                f"component quantity {component.quantity!r} is not a decimal"
+            ) from exc
+        if not component.unit:
+            raise Book5ProvenanceError("component unit must be non-empty")
+        from datetime import datetime as _datetime
+
+        if isinstance(component.valid_time, _datetime) and (
+            component.valid_time.tzinfo is None
+        ):
+            raise Book5ProvenanceError(
+                "component valid_time must be timezone-aware"
+            )
+        for ref in component.book2_claim_refs:
+            binding = self._context_bindings.get(ref)
+            if binding is None:
+                continue  # dimension not verifiable from Book 2: never claimed
+            if binding.asset_ref is not None and binding.asset_ref != component.asset_ref:
+                raise Book5ProvenanceError(
+                    f"component asset_ref {component.asset_ref!r} contradicts "
+                    f"the context bound to claim {ref} ({binding.asset_ref!r})"
+                )
+            if binding.unit is not None and binding.unit != component.unit:
+                raise Book5ProvenanceError(
+                    f"component unit {component.unit!r} contradicts the context "
+                    f"bound to claim {ref} ({binding.unit!r})"
+                )
+            if (
+                binding.realization_ref is not None
+                and binding.realization_ref != component.realization_ref
+            ):
+                raise Book5ProvenanceError(
+                    f"component realization_ref {component.realization_ref!r} "
+                    f"contradicts the context bound to claim {ref} "
+                    f"({binding.realization_ref!r})"
+                )
+
     def resolve_claim_refs(
         self,
         claim_refs: object,
@@ -109,8 +232,10 @@ def ref_text(claim: Claim) -> str:
 
 
 __all__ = [
+    "ATTRIBUTION_BASIS_QUALIFIERS",
     "Book5Provenance",
     "Book5ProvenanceError",
+    "ClaimContextBinding",
     "ref_text",
     "require_str_hashable",
 ]
