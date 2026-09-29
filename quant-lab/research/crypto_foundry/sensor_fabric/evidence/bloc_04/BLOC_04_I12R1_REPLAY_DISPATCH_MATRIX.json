@@ -1,0 +1,74 @@
+{
+  "matrix": "BLOC_04_I12R1_REPLAY_DISPATCH",
+  "mandate": "SENSOR-B4-I12R1",
+  "supersedes_claim": "I12 QUERY_FILTER matrix claim that every RawEvidenceQuery filter is mechanically evaluated — I12R1 measures the revision/representation/limit pipeline END-TO-END through RawEvidenceQueryService.execute() (append-only correction)",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "acquisition_mode_value_semantics",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "enum": "['acq-a', 'acq-b']",
+        "literal": "['acq-a', 'acq-b']",
+        "dynamic": "['acq-a', 'acq-b']",
+        "deserialized": "['acq-a', 'acq-b']"
+      },
+      "result": "OK",
+      "detail": "acquisition: enum member, literal string, dynamically constructed equal string, and deserialized string all dispatch the SAME branch (identical ordering or identical typed refusal)"
+    },
+    {
+      "case": "provider_mode_value_semantics",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "enum": "ReplayOrderUnavailable:PROVIDER_EVENT_TIME requires actual provider-event-time evidence (actual_start/actual_end); none of the 2 acquisitions carries it — ingested_at and response_observed_at are never substituted (§25)",
+        "literal": "ReplayOrderUnavailable:PROVIDER_EVENT_TIME requires actual provider-event-time evidence (actual_start/actual_end); none of the 2 acquisitions carries it — ingested_at and response_observed_at are never substituted (§25)",
+        "dynamic": "ReplayOrderUnavailable:PROVIDER_EVENT_TIME requires actual provider-event-time evidence (actual_start/actual_end); none of the 2 acquisitions carries it — ingested_at and response_observed_at are never substituted (§25)",
+        "deserialized": "ReplayOrderUnavailable:PROVIDER_EVENT_TIME requires actual provider-event-time evidence (actual_start/actual_end); none of the 2 acquisitions carries it — ingested_at and response_observed_at are never substituted (§25)"
+      },
+      "result": "OK",
+      "detail": "provider: enum member, literal string, dynamically constructed equal string, and deserialized string all dispatch the SAME branch (identical ordering or identical typed refusal)"
+    },
+    {
+      "case": "source_mode_value_semantics",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "enum": "ReplayOrderUnavailable:SOURCE_ORDER requires explicit preserved source-order evidence; acquisition acq-a has none of ('provider_sequence', 'source_file_row_order', 'stream_frame_sequence') (§26)",
+        "literal": "ReplayOrderUnavailable:SOURCE_ORDER requires explicit preserved source-order evidence; acquisition acq-a has none of ('provider_sequence', 'source_file_row_order', 'stream_frame_sequence') (§26)",
+        "dynamic": "ReplayOrderUnavailable:SOURCE_ORDER requires explicit preserved source-order evidence; acquisition acq-a has none of ('provider_sequence', 'source_file_row_order', 'stream_frame_sequence') (§26)",
+        "deserialized": "ReplayOrderUnavailable:SOURCE_ORDER requires explicit preserved source-order evidence; acquisition acq-a has none of ('provider_sequence', 'source_file_row_order', 'stream_frame_sequence') (§26)"
+      },
+      "result": "OK",
+      "detail": "source: enum member, literal string, dynamically constructed equal string, and deserialized string all dispatch the SAME branch (identical ordering or identical typed refusal)"
+    },
+    {
+      "case": "unknown_mode_typed_refusal",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "observed": "QueryValidationError:unknown order mode 'MYSTERY_ORDER'; expected one of ('ACQUISITION_ORDER', 'PROVIDER_EVENT_TIME', 'SOURCE_ORDER')"
+      },
+      "result": "OK",
+      "detail": "an unknown order mode is a typed QueryValidationError"
+    },
+    {
+      "case": "no_identity_dispatch_remains",
+      "invariant_source": "STRUCTURAL_INTROSPECTION",
+      "measured": {
+        "identity_dispatch_sites": []
+      },
+      "result": "OK",
+      "detail": "structural scan of replay.py finds zero `order_by is <CONST>` identity comparisons"
+    },
+    {
+      "case": "counterfactual_interned_string_dispatch",
+      "invariant_source": "SYNTHETIC_COUNTERFACTUAL",
+      "measured": {},
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for REPLAY_DISPATCH: deliberately invalid execution path that must evaluate FAIL; not a measured row."
+    }
+  ],
+  "summary": {
+    "rows": 6,
+    "ok": 5,
+    "fail": 1
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "matrix": "BLOC_04_I12R1_INVENTORY_FAIL_CLOSED",
+  "mandate": "SENSOR-B4-I12R1",
+  "supersedes_claim": "I12 QUERY_FILTER matrix claim that every RawEvidenceQuery filter is mechanically evaluated — I12R1 measures the revision/representation/limit pipeline END-TO-END through RawEvidenceQueryService.execute() (append-only correction)",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "manifest_canonical_enumeration",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "partition_keys": [
+          "kraken/futures/BTC-USDT/2026-01-15"
+        ]
+      },
+      "result": "OK",
+      "detail": "canonical pointer enumeration returns the one current manifest; each enumerated pointer path is proven to BE _pointer_path(_partition_hash(pointer.partition_key))"
+    },
+    {
+      "case": "manifest_alias_pointer_fail_closed",
+      "invariant_source": "ADVERSARIAL_MUTATION",
+      "measured": {
+        "exception": "CurrentPointerCorrupt"
+      },
+      "result": "OK",
+      "detail": "an alias .json duplicating a valid canonical pointer payload fails closed — duplicate logical current state can never be silently accepted"
+    },
+    {
+      "case": "manifest_malformed_pointer_fail_closed",
+      "invariant_source": "ADVERSARIAL_MUTATION",
+      "measured": {
+        "exception": "CurrentPointerCorrupt"
+      },
+      "result": "OK",
+      "detail": "an unparseable pointer fragment fails closed"
+    },
+    {
+      "case": "blob_metadata_alias_fail_closed",
+      "invariant_source": "ADVERSARIAL_MUTATION",
+      "measured": {
+        "exception": "CatalogIntegrityError"
+      },
+      "result": "OK",
+      "detail": "a copied blob-metadata fragment under a non-canonical name fails closed: physical locator must equal sha256(storage_key).encoding.parquet (I12R1 §11 repair)"
+    },
+    {
+      "case": "acquisition_alias_fail_closed",
+      "invariant_source": "ADVERSARIAL_MUTATION",
+      "measured": {
+        "exception": "CatalogIntegrityError"
+      },
+      "result": "OK",
+      "detail": "a copied acquisition fragment under a non-canonical name fails closed: canonical fragment name IS sha256(acquisition_id)"
+    },
+    {
+      "case": "I06_alias_guard_existing_law_sufficient",
+      "invariant_source": "ADVERSARIAL_MUTATION",
+      "measured": {
+        "keys_before": [
+          "e7494b581403789b7d387060023fe26905da9a531f35747a1c1e9f24a2811945"
+        ],
+        "keys_after": "SourceRevisionCatalogCorrupt"
+      },
+      "result": "OK",
+      "detail": "I06_ALIAS_GUARD = EXISTING_LAW_SUFFICIENT: the registry binds every durable fragment logical_id to segment_id=(source_revision_key, revision_number) at load; an aliased physical copy fails closed with SourceRevisionCatalogCorrupt (the DurableJsonCatalog binds logical_id to the payload's own id field) — I06 was NOT modified"
+    },
+    {
+      "case": "deterministic_ordering_fresh_instances",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "ordered_acquisition_ids": [
+          "acq-o0",
+          "acq-o1",
+          "acq-o2"
+        ]
+      },
+      "result": "OK",
+      "detail": "two fresh service instances over the same durable lake produce identical selected identities (deterministic inventory + canonical result ordering)"
+    },
+    {
+      "case": "counterfactual_silent_alias_dedupe",
+      "invariant_source": "SYNTHETIC_COUNTERFACTUAL",
+      "measured": {},
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for INVENTORY_FAIL_CLOSED: deliberately invalid execution path that must evaluate FAIL; not a measured row."
+    }
+  ],
+  "summary": {
+    "rows": 8,
+    "ok": 7,
+    "fail": 1
+  }
+}

@@ -2724,3 +2724,61 @@ research                                    = FROZEN
 
 I12 does NOT self-ratify and does NOT earn G4-11 (G4-11 is I13
 export/restore).  I12 is NOT started on any later checkpoint.
+
+---
+
+## SENSOR-B4-I12R1 — END-TO-END QUERY SEMANTICS + REPLAY DISPATCH +
+## INVENTORY FAIL-CLOSED MICROSEAL (PENDING_OPERATOR_REVIEW)
+
+Operator static review of I12 found four acceptance blockers, each
+REPRODUCED failure-first BEFORE repair and each now pinned by regression
+tests (`test_i12r1_query_end_to_end.py`, 35 tests) and measured evidence
+(`test_i12r1_evidence.py` publication of five append-only matrices + the
+correction narrative `BLOC_04_I12R1_EVIDENCE_CORRECTION.md`):
+
+- **DEFECT A** — revision policy was NOT part of the query reduction.  Now
+  wired into `execute()` through the accepted I06 registry (pipeline step
+  6); explicit policies on an unwired service are a typed
+  `QueryValidationError`; `limit=1` provably cannot suppress ambiguity
+  (limit is step 14, LAST).
+- **DEFECT B** — include_t0a/include_t0b/projection_schema_ids were NOT
+  enforced end-to-end.  Now real representation selection over
+  `blob_refs`/`projection_refs`/`lineage_refs`, schema-filtered from durable
+  T0B metadata only (zero payload bytes opened, measured), lineage validated
+  BEFORE publication, and the T0A-fallback for a non-matching schema is the
+  documented frozen behavior (visible absence, never substitution).
+- **DEFECT C** — replay order dispatch used string identity (`is`).  Now a
+  typed `ReplayOrder` enum with backward-compatible strings; zero identity
+  comparisons remain (structurally scanned); enum/literal/dynamic/
+  deserialized inputs dispatch identically; unknown modes are typed.
+- **DEFECT D** — pointer alias could duplicate current inventory.  Now every
+  enumerated pointer must BE the canonical hash locator for the partition
+  key its payload declares, else `CurrentPointerCorrupt`; unique logical
+  keys by construction.
+- **§17 ADDITIONAL (reproduced then repaired)** — physical alias fragments
+  in the blob-metadata and acquisition catalog families duplicated logical
+  inventory; both enumerators now enforce the accepted I04 canonical
+  fragment-locator law, typed `CatalogIntegrityError` on alias.  Writers
+  unchanged, no silent dedupe.  `I06_ALIAS_GUARD = EXISTING_LAW_SUFFICIENT`
+  — I06 was NOT modified.
+
+Five I12R1 matrices (48 rows, 43 OK, exactly 5 explicit synthetic
+counterfactual FAILs) regenerate byte-identically without any override;
+`UPDATE_I12R1_EVIDENCE=1` is required only for publication; normal pytest
+is read-only against committed evidence.  The original I12 evidence
+artifacts remain BYTE-IDENTICAL (historical publication, never rewritten).
+
+### Authorization boundary
+
+```
+PASS_SENSOR_B4_I12_RAW_QUERY_REPLAY_SEALED     = OPERATOR_HOLD
+PASS_SENSOR_B4_I12R1_END_TO_END_QUERY_SEALED   = PENDING_OPERATOR_REVIEW
+G4-10_OPERATIONAL_METADATA_GATE                = IMPLEMENTATION_PASS (unchanged)
+next_checkpoint_authorized                     = FALSE
+recommended_next                               = OPERATOR REVIEW OF COMPLETE I12 -> I12R1 CHAIN
+I13                                            = UNAUTHORIZED
+I13+                                           = UNAUTHORIZED
+research                                       = FROZEN
+```
+
+I12R1 does NOT self-ratify.  I13 is NOT started.

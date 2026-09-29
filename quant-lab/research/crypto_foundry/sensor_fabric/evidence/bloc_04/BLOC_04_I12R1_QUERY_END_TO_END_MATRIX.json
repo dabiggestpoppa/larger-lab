@@ -1,0 +1,154 @@
+{
+  "matrix": "BLOC_04_I12R1_QUERY_END_TO_END",
+  "mandate": "SENSOR-B4-I12R1",
+  "supersedes_claim": "I12 QUERY_FILTER matrix claim that every RawEvidenceQuery filter is mechanically evaluated — I12R1 measures the revision/representation/limit pipeline END-TO-END through RawEvidenceQueryService.execute() (append-only correction)",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "provider_filter_positive_negative",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "positive_selected_acquisition_ids": [
+          "acq-eth"
+        ],
+        "negative_selected_acquisition_ids": []
+      },
+      "result": "OK",
+      "detail": "providers=['gate'] selects only the gate acquisition; an unknown provider is typed NoMatchingEvidence, not []"
+    },
+    {
+      "case": "venue_filter",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "selected_acquisition_ids": [
+          "acq-btc",
+          "acq-eth",
+          "acq-sol"
+        ]
+      },
+      "result": "OK",
+      "detail": "venues=['futures'] matches all three committed manifests"
+    },
+    {
+      "case": "instrument_filter",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "selected_acquisition_ids": [
+          "acq-eth"
+        ]
+      },
+      "result": "OK",
+      "detail": "native_instruments=['ETH-USDT'] selects exactly the ETH chain"
+    },
+    {
+      "case": "logical_range_intersection",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "selected_acquisition_ids": [
+          "acq-btc",
+          "acq-eth"
+        ]
+      },
+      "result": "OK",
+      "detail": "logical window 18..19 intersects the full-day evidence bounds but NOT pm-sol's narrow 08..17 window (evidence-backed intersection, never the requested window echoed back)"
+    },
+    {
+      "case": "acquired_before_ingested_semantics",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "at_h1": [
+          "acq-btc",
+          "acq-eth"
+        ],
+        "before_start": []
+      },
+      "result": "OK",
+      "detail": "acquired_before means ingested_at <= cutoff (default fixture ingested at FIXED); never a PIT-truth claim"
+    },
+    {
+      "case": "observed_before_observed_semantics",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "selected_acquisition_ids": [
+          "acq-btc",
+          "acq-eth",
+          "acq-sol"
+        ]
+      },
+      "result": "OK",
+      "detail": "observed_before means response_observed_at <= cutoff; acq-sol observed at FIXED+1h stays inside FIXED+2h"
+    },
+    {
+      "case": "integrity_minimum_lattice",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "at_local": [
+          "acq-btc",
+          "acq-eth",
+          "acq-sol"
+        ],
+        "at_provider": []
+      },
+      "result": "OK",
+      "detail": "LOCAL_HASH_VERIFIED floor admits all; PROVIDER_HASH_VERIFIED floor (not durably claimed) refuses typed — failure states are never promoted through the lattice"
+    },
+    {
+      "case": "coverage_states",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "complete": [
+          "acq-btc",
+          "acq-eth",
+          "acq-sol"
+        ],
+        "gap": []
+      },
+      "result": "OK",
+      "detail": "coverage filter matches the declared manifest state; missing coverage is never zero/complete (missingness-as-its-own-state)"
+    },
+    {
+      "case": "revision_policy_error_on_ambiguity",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "single_selected_acquisition_ids": [
+          "acq-single"
+        ],
+        "two_revision_exception": "RevisionAmbiguity"
+      },
+      "result": "OK",
+      "detail": "default policy through execute(): single-revision lake selects; TWO revisions under one source key raise typed RevisionAmbiguity BEFORE results"
+    },
+    {
+      "case": "exact_revision_number_end_to_end",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "selected_acquisition_ids": [
+          "acq-r2"
+        ]
+      },
+      "result": "OK",
+      "detail": "EXACT_REVISION=2 through execute() selects only revision 2's acquisition chain"
+    },
+    {
+      "case": "limit_cannot_suppress_refusal",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAmbiguity"
+      },
+      "result": "OK",
+      "detail": "execute(limit=1) on the ambiguous lake raises RevisionAmbiguity — ordering/limit happen AFTER revision resolution (pipeline steps 13-14 are last)"
+    },
+    {
+      "case": "counterfactual_limit_suppresses_ambiguity",
+      "invariant_source": "SYNTHETIC_COUNTERFACTUAL",
+      "measured": {},
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for QUERY_END_TO_END: deliberately invalid execution path that must evaluate FAIL; not a measured row."
+    }
+  ],
+  "summary": {
+    "rows": 12,
+    "ok": 11,
+    "fail": 1
+  }
+}

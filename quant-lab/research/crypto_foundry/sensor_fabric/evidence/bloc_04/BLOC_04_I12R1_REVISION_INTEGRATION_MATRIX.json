@@ -1,0 +1,161 @@
+{
+  "matrix": "BLOC_04_I12R1_REVISION_INTEGRATION",
+  "mandate": "SENSOR-B4-I12R1",
+  "supersedes_claim": "I12 QUERY_FILTER matrix claim that every RawEvidenceQuery filter is mechanically evaluated — I12R1 measures the revision/representation/limit pipeline END-TO-END through RawEvidenceQueryService.execute() (append-only correction)",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "ALL_keeps_both_revisions_visible",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": null,
+        "acquisition_ids": [
+          "acq-r1",
+          "acq-r2"
+        ],
+        "blob_refs": [
+          "096a6aceba5a8f26ae4e773bfd6052b4138d5ced8e830f274ca6ba8478fabfa9",
+          "3a4a1c0711ca76058802be302d6cac7ff0d62e2e519d678035642f818c657f48"
+        ],
+        "revision_state": "SOURCE_MUTATION"
+      },
+      "result": "OK",
+      "detail": "ALL preserves revision multiplicity in ONE result"
+    },
+    {
+      "case": "FIRST_SEEN_selects_registry_truth",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": null,
+        "acquisition_ids": [
+          "acq-r1"
+        ],
+        "blob_refs": [
+          "3a4a1c0711ca76058802be302d6cac7ff0d62e2e519d678035642f818c657f48"
+        ],
+        "revision_state": "STABLE"
+      },
+      "result": "OK",
+      "detail": "FIRST_SEEN returns the I06 registry's first-seen selection only"
+    },
+    {
+      "case": "LATEST_SEEN_selects_registry_truth",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": null,
+        "acquisition_ids": [
+          "acq-r2"
+        ],
+        "blob_refs": [
+          "096a6aceba5a8f26ae4e773bfd6052b4138d5ced8e830f274ca6ba8478fabfa9"
+        ],
+        "revision_state": "SOURCE_MUTATION"
+      },
+      "result": "OK",
+      "detail": "LATEST_SEEN returns the I06 registry's latest-seen selection only"
+    },
+    {
+      "case": "EXACT_hit",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": null,
+        "acquisition_ids": [
+          "acq-r2"
+        ],
+        "blob_refs": [
+          "096a6aceba5a8f26ae4e773bfd6052b4138d5ced8e830f274ca6ba8478fabfa9"
+        ],
+        "revision_state": "SOURCE_MUTATION"
+      },
+      "result": "OK",
+      "detail": "EXACT_REVISION=2 selects exactly revision 2"
+    },
+    {
+      "case": "EXACT_miss_typed_no_match",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "NoMatchingEvidence",
+        "cause": null
+      },
+      "result": "OK",
+      "detail": "a missing exact revision is typed NoMatchingEvidence at the I12 boundary — missing != corruption"
+    },
+    {
+      "case": "canonical_absent_typed_unavailable",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionCanonicalUnavailable",
+        "cause": "RevisionResolutionUnavailable"
+      },
+      "result": "OK",
+      "detail": "PROVIDER_DECLARED_CANONICAL with zero declarations is typed RevisionCanonicalUnavailable — absence is not ambiguity and not a backend failure"
+    },
+    {
+      "case": "canonical_hit",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": null,
+        "acquisition_ids": [
+          "acq-r1"
+        ],
+        "blob_refs": [
+          "3a4a1c0711ca76058802be302d6cac7ff0d62e2e519d678035642f818c657f48"
+        ],
+        "revision_state": "STABLE"
+      },
+      "result": "OK",
+      "detail": "explicit canonical declaration selects revision 1 only"
+    },
+    {
+      "case": "canonical_conflict_typed_ambiguity",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAmbiguity",
+        "cause": "RevisionAmbiguityError"
+      },
+      "result": "OK",
+      "detail": "two distinct canonical declarations are typed RevisionAmbiguity (I06 §60: no latest-wins)"
+    },
+    {
+      "case": "limit1_cannot_reach_truncation",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAmbiguity",
+        "cause": "RevisionAmbiguityError"
+      },
+      "result": "OK",
+      "detail": "ERROR_ON_AMBIGUITY + limit=1 raises RevisionAmbiguity through execute() — limit is pipeline step 14, AFTER resolution"
+    },
+    {
+      "case": "temporal_ambiguity_maps_typed_with_cause",
+      "invariant_source": "ADVERSARIAL_MUTATION",
+      "measured": {
+        "exception": "RevisionAmbiguity",
+        "cause": "RevisionTemporalAmbiguity"
+      },
+      "result": "OK",
+      "detail": "I06 RevisionTemporalAmbiguity crossing the I12 boundary stays epistemic RevisionAmbiguity with __cause__ preserved — never StorageBackendUnavailable"
+    },
+    {
+      "case": "revision_state_from_durable_registry_truth",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "revision_state": "STABLE"
+      },
+      "result": "OK",
+      "detail": "single-revision revision_state comes from the I06 segment classification (STABLE), not the manifest revision_count hint"
+    },
+    {
+      "case": "counterfactual_count_hint_authority",
+      "invariant_source": "SYNTHETIC_COUNTERFACTUAL",
+      "measured": {},
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for REVISION_INTEGRATION: deliberately invalid execution path that must evaluate FAIL; not a measured row."
+    }
+  ],
+  "summary": {
+    "rows": 12,
+    "ok": 11,
+    "fail": 1
+  }
+}
