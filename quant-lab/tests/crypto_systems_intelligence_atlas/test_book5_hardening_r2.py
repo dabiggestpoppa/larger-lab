@@ -232,7 +232,7 @@ def test_b1_position_refs_stripped_synthesis_without_provenance_rejected() -> No
 
     _, claim_id = exact_kernel()
     position = r2_position("pos:b1", claim_ref=claim_id)
-    stripped = position.model_copy(update={"book2_claim_refs": ()})
+    position.model_copy(update={"book2_claim_refs": ()})  # the tamper itself
     with pytest.raises(TypeError):
         _synthesis_without_provenance()
     with pytest.raises(Book5ProvenanceError):

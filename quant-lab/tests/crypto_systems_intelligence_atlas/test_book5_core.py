@@ -16,30 +16,24 @@ from crypto_systems_intelligence_atlas.book5_core import (
     EconomicSite,
     LocationType,
     PrincipalComponent,
-    PrincipalComponentSet,
     SiteType,
 )
 from crypto_systems_intelligence_atlas.book5_lineage import (
     CapitalPrincipalLineageGraph,
     LineageError,
-    PrincipalContribution,
-    PrincipalLineageNode,
     VALUATION_NOT_AUTHORIZED,
     reconcile_projection,
 )
 from crypto_systems_intelligence_atlas.book5_provenance import (
-    Book5Provenance,
     Book5ProvenanceError,
     ClaimContextBinding,
 )
 from crypto_systems_intelligence_atlas.book5_support import (
     NOW,
     add_claim,
-    claim_ref_for,
     component,
     component_set,
     contribution,
-    debt_liability,
     graph,
     kernel,
     lineage_node,
@@ -319,7 +313,6 @@ def test_rehypothecation_chain_preserves_source_set() -> None:
 
 
 def test_liability_projection_reconciles_or_fails() -> None:
-    liability = debt_liability(quantity="800")
     assert (
         reconcile_projection(
             canonical_quantity="800",

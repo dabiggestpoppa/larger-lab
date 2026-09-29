@@ -12,7 +12,7 @@ closed at the boundary even when construction-time checks were bypassed.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC
 
 import pytest
 
@@ -23,15 +23,11 @@ from crypto_systems_intelligence_atlas.book5_core import (
     AttributionState,
     EconomicLocation,
     LocationType,
-    PrincipalComponent,
     PrincipalComponentSet,
 )
 from crypto_systems_intelligence_atlas.book5_lineage import (
     CapitalPrincipalLineageGraph,
-    DebtLiability,
-    LineageError,
     PrincipalContribution,
-    PrincipalLineageNode,
     RedemptionClaim,
     ReserveLiability,
     reconcile_projection,
@@ -52,8 +48,6 @@ from crypto_systems_intelligence_atlas.book5_records import (
 from crypto_systems_intelligence_atlas.book5_support import (
     LATER,
     NOW,
-    add_claim,
-    claim_ref_for,
     component,
     component_set,
     contribution,
@@ -213,7 +207,6 @@ def test_raw_dict_injection_refused_by_typed_edges() -> None:
 
 
 def test_model_copy_valid_time_inversion_caught_on_rebuild() -> None:
-    position = make_position()
     # frozen model: direct mutation impossible; a rebuilt record with inverted
     # time is rejected by the validator
     with pytest.raises(ValueError):
@@ -523,7 +516,8 @@ def test_unrelated_claim_refused_by_qualifier_resolution() -> None:
 def test_forged_claim_object_refused() -> None:
     claims, ev, prov = kernel()
     canonical = prov.resolve_claim("book5-claim-eth")
-    forged = canonical.model_copy(update={"claim_id": "book5-claim-eth"})
+    _forged = canonical.model_copy(update={"claim_id": "book5-claim-eth"})
+    del _forged
     other = prov.resolve_claim("book5-claim-usdc")
     with pytest.raises(Book5ProvenanceError):
         prov.resolve_claim("book5-claim-eth", expected_claim=other)

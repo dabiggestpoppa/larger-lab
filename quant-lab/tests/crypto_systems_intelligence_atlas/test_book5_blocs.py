@@ -7,7 +7,7 @@ by STRESS_ROW_TRACEABILITY at the bottom (plan v0.3; Phase 22).
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC
 
 import pytest
 
@@ -15,21 +15,14 @@ from crypto_systems_intelligence_atlas.book5_core import (
     AttributionState,
     AttributionStateError,
     EconomicLocation,
-    EconomicSite,
     LocationType,
     PrincipalComponent,
     PrincipalComponentSet,
-    SiteType,
 )
 from crypto_systems_intelligence_atlas.book5_lineage import (
     CapitalPrincipalLineageGraph,
-    DebtLiability,
-    LineageError,
-    PrincipalLineageNode,
     RedemptionClaim,
     ReserveLiability,
-    VALUATION_NOT_AUTHORIZED,
-    reconcile_projection,
 )
 from crypto_systems_intelligence_atlas.book5_provenance import (
     Book5Provenance,
@@ -40,22 +33,17 @@ from crypto_systems_intelligence_atlas.book5_records import (
     AppendOnlyFlowLedger,
     CapitalFlow,
     CapitalPosition,
-    CapitalTransformation,
     DerivativeExposure,
-    EconomicClaim,
     Encumbrance,
     EncumbranceState,
     FlowType,
     ObservedCommonValueFact,
     PositionKind,
     SettlementBalance,
-    TransformationKind,
 )
 from crypto_systems_intelligence_atlas.book5_support import (
     LATER,
     NOW,
-    add_claim,
-    claim_ref_for,
     component,
     component_set,
     contribution,
@@ -65,7 +53,6 @@ from crypto_systems_intelligence_atlas.book5_support import (
     lineage_node,
     make_claim,
     make_evidence,
-    site,
 )
 from crypto_systems_intelligence_atlas.book5_synthesis import (
     CapitalFieldSynthesis,
@@ -149,7 +136,7 @@ def test_5a_canonical_plus_wrapped_supply_never_double_counts() -> None:
     canonical_ref = _bound_exact(
         prov, "fxd-exact", asset_ref="csia:stablecoin:fxd", unit="FXD"
     )
-    wrapped_ref = _bound_exact(
+    _bound_exact(
         prov,
         "fxd-wrapped-exact",
         asset_ref="csia:stablecoin:fxd",
