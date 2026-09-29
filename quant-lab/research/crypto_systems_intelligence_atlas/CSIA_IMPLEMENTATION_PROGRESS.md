@@ -995,3 +995,63 @@ LIVE_ACQUISITION_AUTHORITY = FALSE
 BOOK_5_PLANNING_AUTHORITY = TRUE
 BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
 ```
+
+---
+
+# CHECKPOINT — BOOK 5 OFFLINE IMPLEMENTATION (2026-09-29)
+
+Implementation of the deterministic offline Book 5 kernel per the ratified
+Book 5 plan v0.3 (anchor `262625fd063a17cfeb845f610a7de29c89f29b27`,
+ratification commit `b33dc3c76a76228139abb4fe014d3fe404e2cee4`, decision
+`BOOK5-RATIFICATION-v0.3`), built from the Book 4 acceptance base
+`a2526e8220513b34967ab11f227ddbddc14e7e4a` on branch
+`agent/crypto-systems-intelligence-atlas-book5-build`.
+
+```text
+BOOK_5_IMPLEMENTATION = COMPLETE_PENDING_OPERATOR_REVIEW
+BOOK_5_IMPLEMENTATION_ACCEPTED = FALSE (self-acceptance forbidden)
+BOOK_5_TESTS = 78 PASS
+TOTAL_CSIA = 606 PASS (baseline 528 + 78; Book1=107, Book2=108, Book3=83,
+            Book4=230 unchanged)
+CRYPTO_SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED
+SENSOR_FAILURE_SET = byte-identical to accepted Book 4 canonical set
+BOOK5_INTRODUCED_SENSOR_FAILURES = 0
+RUFF = PASS (43 source files)
+MYPY = PASS (43 source files)
+
+PLANNING_ANCHOR = 262625fd063a17cfeb845f610a7de29c89f29b27 (plan v0.3)
+RATIFICATION_COMMIT = b33dc3c76a76228139abb4fe014d3fe404e2cee4
+BOOK_4_BASE = a2526e8220513b34967ab11f227ddbddc14e7e4a
+
+BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_3_ACCEPTED_CONTRACT_MUTATIONS = 0
+BOOK_4_ACCEPTED_CONTRACT_MUTATIONS = 0
+CRYPTO_SENSOR_MUTATIONS = 0
+
+5G_CANONICAL_WRITE_COUNT = 0
+5G_CROSS_ASSET_VALUATION_COUNT = 0
+BOOK5_CROSS_ASSET_VALUATION_AUTHORITY = FALSE
+
+STRESS_ROWS_COVERED = 45/45 (traceability matrix, 0 untested)
+SYNTHESIS_TESTS = T-1..T-14 executed
+
+BLOC_GATES = IMPLEMENTATION_EVIDENCE_PRESENT (5A..5F, 5G)
+PROPOSED_BOOK_GATE = PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL
+GATE_STATUS = PROPOSED ONLY — NOT SELF-ACCEPTED
+
+NEXT = OPERATOR REVIEW OF BOOK 5 IMPLEMENTATION
+```
+
+Modules: book5_provenance, book5_core, book5_lineage, book5_records,
+book5_support, book5_synthesis. Evidence:
+`CSIA_BOOK_5_IMPLEMENTATION_MATRIX.json`,
+`CSIA_BOOK_5_IMPLEMENTATION_EVIDENCE_v0.1.md`,
+`CSIA_BOOK_5_STRESS_TRACEABILITY_MATRIX.json`.
+
+Limitations: offline deterministic kernel only — no live acquisition, RPC,
+CEX feeds, persistent DB, graph DB, production scheduler, Book 6 valuation,
+production pricing, or trading/execution authority.
+
+Implementation authorization was granted by the operator for the offline
+kernel only; implementation acceptance is reserved to the operator.
