@@ -496,3 +496,151 @@ Book 6 seam rule (§8.2, doctrine-consistent); exit boundary predicate (§7).
 
 Bloc contracts 5A–5G follow in §16–§22 (appended as planning sessions
 complete them; see commit history for the assembled sequence).
+
+---
+
+# 16. BLOC 5A — STABLECOIN RAILS (Phase 12 contract)
+
+**Mission:** model stablecoin economic truth — issuance, distribution,
+realization forms, and redemption liabilities — without ever double-counting
+supply across representations.
+
+**Scope:** canonical stablecoin identity (Book 1 STABLECOIN class), issuer
+entities, deployments (§8.4), REALIZATION forms (R-1A-5), mint/burn,
+circulating-supply observation, bridge escrow, wrapped representations,
+redemption claims, chain distribution.
+
+**Non-goals:** price/depeg measurement policy (Book 6), issuer credit analysis,
+market-share ranking (§5.3a), Sensor seam semantics (D8).
+
+**Canonical records:** `StablecoinSupply` observation (typed, per §12 splits
+below); `MINT` / `BURN` flows; `BRIDGE_IN`/`BRIDGE_OUT` flows;
+`ReserveLiability` (issuer/bridge redemption); escrow balance records
+(location-typed ESCROW); `ClaimTokenRepresentation` links for wrapped forms.
+
+**Derived records:** chain-distribution views (`TOPOLOGY_DERIVATION`),
+de-duplicated canonical supply (methodology-carrying only).
+
+**Identity requirements:** canonical stablecoin `object_id`; issuer ENTITY;
+per-chain deployments; realization refs (`REALIZES`/`RECEIVED_VIA`); escrow
+sites; wrapped-token claim links to canonical asset.
+
+**Explicit separations (mandatory record splits — no summed global supply
+without methodology + de-duplication):**
+
+```text
+TOTAL ISSUANCE            = all minted units ever (issuer-side observation)
+CANONICAL-SIDE CIRCULATING = circulating on the canonical/issuing chain
+CHAIN-LOCAL CIRCULATING   = circulating on one specific chain (per realization)
+BRIDGED REALIZATION SUPPLY = supply counted as a realization of the canonical
+                            asset (linked, never additive to canonical supply)
+ESCROW BACKING            = assets locked backing wrapped realizations
+REDEMPTION LIABILITY      = what issuer/bridge owes claim holders
+```
+
+**Book 2 evidence:** supply observations bind claim refs (issuer dashboards,
+E0 on-chain totals where deterministic); mint/burn bind E0 events.
+**Stress cases:** multi-chain USDT/USDC-like; DAI-like decentralized
+(governance-minted); synthetic-dollar systems (derivative-backed — crosses to
+5E semantics); bridged canonical+wrapped (D7 stress 1.6); depegged claim token;
+contested supply figures (F-2/F-5 doctrine).
+**Principles enforced:** B5-P2, P11, P14, P15, P16, P18–P22.
+**Exit gate:** `PASS_CSIA_B5A_STABLECOIN_RAILS` — evidence: the six-way split
+is representable without summation for a 3-chain stablecoin + 1 wrapped
+realization pilot; canonical+wrapped double-count case fails closed.
+
+---
+
+# 17. BLOC 5B — DEX / LIQUIDITY TOPOLOGY (Phase 13 contract)
+
+**Mission:** model pool-level liquidity truth and observed trading flows,
+keeping stocks, claims, and derived volume strictly separate.
+
+**Scope:** AMM pools; CLMM pools; LP positions; vault-managed liquidity;
+aggregators; intent systems; actual routed flow.
+
+**Non-goals:** execution routing, price analytics, MEV strategy (structural MEV
+value capture per §19.2 is modeled descriptively), aggregator scoring.
+
+**Canonical records:** pool `EconomicSite`s (AMM_POOL, CLMM_POOL); reserve
+balances (stocks at sites); `LiquidityPosition` (LP claim incl. CLMM range
+state); `SWAP` / `DEPOSIT` / `WITHDRAWAL` flows; intent-fill events;
+`ClaimTokenRepresentation` for LP tokens; vault positions where vaults manage
+liquidity.
+
+**Derived records:** volume aggregations; depth/active-liquidity views —
+`TOPOLOGY_DERIVATION` only; route-use observations (`ROUTED_THROUGH`-
+referencing flows).
+
+**Mandatory separations:**
+
+```text
+pool reserves      = stock (protocol-controlled balance)
+LP claim           = position/claim (LiquidityPosition)
+liquidity range    = position state (CLMM sub-field, not a separate pool)
+swap               = flow
+volume             = derived aggregation (methodology ID required)
+route              = capability (Book 1/Book 4 edge, referenced)
+routed flow        = observed flow (Book 5 event referencing the capability)
+```
+
+P6 (liquidity support ≠ supplied) and P3/P4 (route ≠ use) are structural: an
+integrated/pool-existing fact is never recorded as reserves; a routed path is
+never inferred from route existence.
+
+**Book 2 evidence:** reserves E0 (contract state); swaps E0 (event logs);
+volume aggregation methodology recorded.
+**Stress cases:** CLMM active-vs-idle capital; vault-over-pool nesting;
+aggregator multi-hop attribution (which hop carries the flow); intent fill vs
+route; zero-liquidity pools; UNKNOWN pool ownership.
+**Principles enforced:** B5-P3, P4, P6, P14, P18–P22.
+**Exit gate:** `PASS_CSIA_B5B_LIQUIDITY_TOPOLOGY` — evidence: reserves/claim/
+range/flow/volume/route/routed-flow seven-way split demonstrated on an AMM +
+CLMM + aggregator pilot; volume never presented without methodology ID.
+
+---
+
+# 18. BLOC 5C — CREDIT / LENDING (Phase 14 contract)
+
+**Mission:** model lending markets as claims and liabilities — never as
+additive pools of capital.
+
+**Scope:** supply positions; collateral positions; debt positions; available
+liquidity; borrow/repay flows; liquidation; bad debt; reserves; encumbrance.
+Aave-like pools, Morpho-like markets, Compound-like markets, isolated
+chain-native money markets.
+
+**Non-goals:** rate/interest-rate modeling policy (rates are protocol
+mechanics; realized yield flows cross to 5D semantics where claimed),
+risk scoring, liquidator strategy.
+
+**Canonical records:** market `EconomicSite`s (LENDING_MARKET, ISOLATED_MARKET);
+`CollateralPosition` (posted stock + encumbrance state);
+`DebtPosition` (liability-side); supply claims; `BORROW`/`REPAY`/`DEPOSIT`/
+`WITHDRAWAL`/`LIQUIDATION` flows; `DebtLiability` records; bad-debt
+socialization events; market reserve stocks; `Encumbrance` links.
+
+**Derived records:** available-liquidity residuals; utilization views —
+marked `TOPOLOGY_DERIVATION`; anything normalized is Book 6 territory (P26).
+
+**Forbidden identifications (structural):**
+
+```text
+collateral-enabled (capability edge ref)  !=  collateral-posted (stock)
+supplied + borrowed                       !=  additive economic principal
+                                            (supplied is principal pledged;
+                                             borrowed is a liability against it)
+```
+
+**Book 2 evidence:** positions/balances E0 (contract state); liquidations E0;
+bad-debt events E0/E1; market-configuration facts E0 (deterministic contract
+reads).
+**Stress cases:** D7 1.1 (deposit), 1.2 (borrowed redeposit — principal
+lineage through market B), 1.5 (LP collateral); liquidation chains; bad debt
+absorption; isolated-market segmentation (one market's collateral must never
+back another market's debt in the model); multi-collateral netting (ALG-6).
+**Principles enforced:** B5-P7, P8, P16, P17, P19–P23.
+**Exit gate:** `PASS_CSIA_B5C_CREDIT_TOPOLOGY` — evidence: supplied/borrowed/
+available/posted/eligibility/liability/socialization split demonstrated;
+supplied+borrowed summation case fails closed; borrowed-redeposit lineage
+de-duplicates.
