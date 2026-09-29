@@ -990,3 +990,89 @@ Integrity: the defect was reproduced before repair; the repair design was
 operator-directed (D5CAP-2 "WITH REQUIRED MULTI-ROOT/CONTRIBUTION REPAIR") and
 recorded only after being written precisely, per directive. v0.1 artifacts are
 preserved unmodified as history. No self-ratification occurred.
+
+---
+
+# PLANNING LEDGER — CROSS-UNIT AGGREGATION REPAIR; BOOK 5 PLAN v0.3 READY FOR OPERATOR RATIFICATION (2026-09-29)
+
+External review found one further concrete boundary defect: cross-asset
+principal aggregation (e.g., a 3 ETH + 5,000 USDC LP rendered as a single
+USD-equivalent "combined total") could silently absorb Book 6 valuation
+authority — the leak was by omission, since no planning text stated that
+principal quantities are unit-aware. The defect was reproduced across six
+multi-asset structure classes (LP, vault, reserve basket, multi-collateral,
+insurance fund, RWA basket) and repaired with doctrine that stays inside
+already-ratified boundaries (Constitution §22; plan v0.2 §8.2; principle P26).
+No new operator decision was required or opened.
+
+```text
+D7 = CLOSED (Option B) — unchanged
+D5CAP-1 = CLOSED / B — unchanged
+D5CAP-2 = CLOSED / A-REVISED — unchanged
+D5CAP-3 = CLOSED / A — unchanged
+
+CROSS_ASSET_AGGREGATION_REVIEW = PASS
+SINGLE_ROOT_PRINCIPAL_DOCTRINE = VOID (repaired, unchanged from prior checkpoint)
+HETEROGENEOUS_UNIT_COLLAPSE_REQUIRES_MEASUREMENT = TRUE
+PRINCIPAL_COMPONENT_MODEL = UNIT_AWARE
+BOOK5_CROSS_ASSET_VALUATION_AUTHORITY = FALSE (binding invariant)
+
+NEW_DOCTRINE =
+  B5-P32 (unit-aware principal; cross-unit quantities not additive in Book 5)
+  PrincipalComponentSet (canonical vector; no common-value field, no hidden numeraire)
+  Book 5/Book 6 valuation seam (Book 6 owns numeraire/valuation methodology/prices)
+  OBSERVED_COMMON_VALUE_FACT vs CSIA_DERIVED_COMMON_VALUE distinction
+  SHARE FRACTION != VALUATION; PROPORTIONAL != COMMON-NUMERAIRE VALUE
+  ALG-14..ALG-18; UNKNOWN vs NOT_AUTHORIZED state law
+  5G three-way collapse split (same-unit / heterogeneous vector / valuation -> Book 6)
+
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_4 = FROZEN_ACCEPTED
+BOOK_4_ACCEPTED_IMPLEMENTATION_ANCHOR = 1650ba7ce30633e2e4ddf141e439a13ed948c51b
+
+BOOK_5_PLAN_VERSION = v0.3
+BOOK_5_PLAN_v0.2 = SUPERSEDED_PENDING_RATIFICATION (preserved unmodified)
+BOOK_5_PLAN_v0.1 = SUPERSEDED_PENDING_RATIFICATION (preserved unmodified)
+BOOK_5_PLANNING = READY_FOR_OPERATOR_RATIFICATION
+BOOK_5_OPERATOR_RATIFIED = FALSE
+BOOK_5_PLAN_HOLD_TRIGGERED = FALSE
+BOOK_5_PLANNING_AUTHORITY = TRUE
+BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+
+PRE_RATIFICATION_REVIEW_v0.3 = 30/30 PASS
+STRUCTURAL_FAILURE_COUNT = 0
+OPEN_OPERATOR_DECISION_COUNT = 0
+STRESS_MATRIX_ROWS_TOTAL = 45 (25 + 10 attribution + 10 unit-domain)
+SYNTHESIS_TESTS = T-1..T-14 PASS; 5G_CANONICAL_WRITE_COUNT = 0;
+                  5G_CROSS_ASSET_VALUATION_COUNT = 0
+PRIMITIVE_MATRIX = v0.3 (canonical 19 classes / derived 4 shapes)
+BOOK_1_AMENDMENT_REQUIRED = FALSE
+BOOK_2_AMENDMENT_REQUIRED = FALSE
+BOOK_3_AMENDMENT_REQUIRED = FALSE
+BOOK_4_AMENDMENT_REQUIRED = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED = FALSE
+
+NEXT = OPERATOR RATIFICATION REVIEW OF BOOK 5 PLAN v0.3
+THEN = BOOK 5 PLAN RATIFICATION (operator decision) -> implementation
+       authorization remains a separate decision; Book 6 measurement
+       authority remains reserved to Book 6
+```
+
+Unit-domain repair artifacts (planning-only; non-canonical until operator
+ratification):
+
+- `CSIA_BOOK_5_CROSS_UNIT_AGGREGATION_REPRODUCTION_v0.1.md`
+- `CSIA_BOOK_5_UNIT_DOMAIN_VALUATION_SEAM_DOCTRINE_v0.1.md`
+- `CSIA_BOOK_5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_PLAN_v0.3.md`
+- `CSIA_BOOK_5_CAPITAL_TOPOLOGY_STRESS_MATRIX_v0.3.md`
+- `CSIA_BOOK_5_CAPITAL_FIELD_SYNTHESIS_MATRIX_v0.3.md`
+- `CSIA_BOOK_5_PRE_RATIFICATION_REVIEW_v0.3.md`
+
+Integrity: the defect was reproduced before repair; the repair implements the
+operator's external-review direction within already-ratified doctrine; all
+prior plan versions and companion artifacts are preserved unmodified as
+history. No Book 5 or Book 6 implementation occurred; no self-ratification
+occurred.
