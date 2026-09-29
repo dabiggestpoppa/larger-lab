@@ -913,3 +913,80 @@ no Sensor mutation, no Books 1–4 mutation, no 5G canonical writes, and no
 trading/execution semantics were created or authorized. The plan is NOT
 self-ratified; bloc exit gates (`PASS_CSIA_B5A..B5_CAPITAL_FIELD_V1`) require
 ratified plans and operator decisions per Constitution §33–35.
+
+---
+
+# PLANNING LEDGER — SINGLE-ROOT LINEAGE REPAIR + D5CAP CLOSED; BOOK 5 PLAN v0.2 READY FOR OPERATOR RATIFICATION (2026-09-29)
+
+External review found one concrete structural defect in plan v0.1 §5:
+"every lineage node traces to exactly one economic principal at its root" is
+invalid for pooled/commingled/multi-asset capital. The defect was reproduced
+with six counterexamples (LP share, multi-asset vault, pooled lending,
+multi-collateral account, insurance fund, reserve basket) plus a secondary
+canonical/derived name collision, then repaired under explicit operator
+direction. The operator simultaneously recorded provisional D5CAP selections,
+now closed canonically.
+
+```text
+D7 = CLOSED (Option B) — unchanged
+D5CAP-1 = CLOSED / B  (separate typed liability objects; single-source-of-truth
+                       canonical obligation rule with reference-projection
+                       consistency, ALG-13)
+D5CAP-2 = CLOSED / A-REVISED  (typed many-to-many principal-lineage graph;
+                       single-root rule VOID; attribution states EXACT/
+                       PROPORTIONAL/COMMINGLED/DERIVED_ALLOCATION/UNRESOLVED/
+                       UNKNOWN; UNKNOWN never upgraded to EXACT; principal_
+                       component_refs on multi-principal claims)
+D5CAP-3 = CLOSED / A  (versioned CapitalFieldSnapshots + views;
+                       CapitalPrincipalLineageView naming seal — zero
+                       canonical/derived name collisions)
+
+SINGLE_ROOT_PRINCIPAL_DOCTRINE = VOID (repaired: CON-1..CON-10)
+COLLATERAL_PRINCIPAL_VS_BORROWED_PRINCIPAL = DISTINCT (new doctrine, plan v0.2 §4.4)
+
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_4 = FROZEN_ACCEPTED
+BOOK_4_ACCEPTED_IMPLEMENTATION_ANCHOR = 1650ba7ce30633e2e4ddf141e439a13ed948c51b
+
+BOOK_5_PLAN_VERSION = v0.2
+BOOK_5_PLAN_v0.1 = SUPERSEDED_PENDING_RATIFICATION (preserved unmodified)
+BOOK_5_PLANNING = READY_FOR_OPERATOR_RATIFICATION
+BOOK_5_OPERATOR_RATIFIED = FALSE
+BOOK_5_PLAN_HOLD_TRIGGERED = FALSE
+BOOK_5_PLANNING_AUTHORITY = TRUE
+BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+
+PRE_RATIFICATION_REVIEW_v0.2 = 25/25 PASS
+STRUCTURAL_FAILURE_COUNT = 0
+OPEN_OPERATOR_DECISION_COUNT = 0
+STRESS_MATRIX_ROWS_TOTAL = 35 (25 + 10 attribution rows)
+PRIMITIVE_MATRIX = v0.3 (canonical 19 classes / derived 4 shapes)
+BOOK_1_AMENDMENT_REQUIRED = FALSE
+BOOK_2_AMENDMENT_REQUIRED = FALSE
+BOOK_3_AMENDMENT_REQUIRED = FALSE
+BOOK_4_AMENDMENT_REQUIRED = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED = FALSE
+
+NEXT = OPERATOR RATIFICATION REVIEW OF BOOK 5 PLAN v0.2
+THEN = BOOK 5 PLAN RATIFICATION (operator decision) -> implementation
+       authorization remains a separate decision
+```
+
+Repair-era artifacts (planning-only; non-canonical until operator
+ratification):
+
+- `CSIA_BOOK_5_PRINCIPAL_LINEAGE_RECONCILIATION_v0.1.md` (defect + repair design)
+- `CSIA_BOOK_5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_PLAN_v0.2.md`
+- `CSIA_BOOK_5_CAPITAL_TOPOLOGY_STRESS_MATRIX_v0.2.md`
+- `CSIA_BOOK_5_ECONOMIC_PRIMITIVE_CANDIDATE_MATRIX_v0.3.md`
+- `CSIA_BOOK_5_CAPITAL_FIELD_SYNTHESIS_MATRIX_v0.2.md`
+- `CSIA_BOOK_5_PRE_RATIFICATION_REVIEW_v0.2.md`
+- D5CAP-1/2/3 entries in `CSIA_OPERATOR_DECISION_LOG.md`
+
+Integrity: the defect was reproduced before repair; the repair design was
+operator-directed (D5CAP-2 "WITH REQUIRED MULTI-ROOT/CONTRIBUTION REPAIR") and
+recorded only after being written precisely, per directive. v0.1 artifacts are
+preserved unmodified as history. No self-ratification occurred.
