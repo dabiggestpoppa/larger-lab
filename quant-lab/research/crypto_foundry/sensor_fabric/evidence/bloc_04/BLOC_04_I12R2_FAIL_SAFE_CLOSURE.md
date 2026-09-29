@@ -142,3 +142,17 @@ registry corruption ≠ no-match; authority absence ≠ evidence content.
 - I12R2 focused suite: 20 tests (authority 9, representation 8, T0A-wiring 2, outcome contract 1) — all passing, 0 skips.
 - I12R2 matrices: AUTHORITY_REQUIRED 9 rows / 8 OK / 1 synthetic FAIL;
   REPRESENTATION_SATISFACTION 11 rows / 10 OK / 1 synthetic FAIL.
+
+---
+
+## 6. EXPLICIT DUAL-TRUTH MARKERS (appended at I12R2R1; nothing above rewritten)
+
+- `schema_mismatch_with_T0A_fallback_documented` (historical I12R1
+  REPRESENTATION_SELECTION artifact)
+  = SUPERSEDED_HISTORICAL_BEHAVIOR — the evidence actually published at the
+  I12R1 checkpoint; preserved at immutable checkpoint identity, never
+  regenerated from current runtime.
+- `both_requested_schema_mismatch_refused` (I12R2
+  REPRESENTATION_SATISFACTION matrix)
+  = CURRENT_BEHAVIOR — include_t0b=True + no eligible T0B projection fails
+  typed (ProjectionSchemaUnsupported), measured live from production.

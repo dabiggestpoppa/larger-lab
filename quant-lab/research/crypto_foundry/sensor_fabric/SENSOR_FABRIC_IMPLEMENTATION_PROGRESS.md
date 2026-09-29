@@ -2852,3 +2852,61 @@ research                                       = FROZEN
 ```
 
 I12R2 does NOT self-ratify.  I13 is NOT started.
+
+---
+
+## SENSOR-B4-I12R2R1 — HISTORICAL EVIDENCE IMMUTABILITY REPAIR +
+## CHECKPOINT-SCOPED EVIDENCE VERIFICATION (PENDING_OPERATOR_REVIEW)
+
+Operator finding: the I12R2 PRODUCTION repair is accepted as technically
+correct pending governance closure; the defect was EVIDENCE GOVERNANCE
+ONLY — the I12R2 publication regenerated the historical I12R1
+REPRESENTATION_SELECTION artifact (superseded fallback row) from current
+production, violating the append-only historical-evidence law.
+
+Repair (no production changes; I12R2_TECHNICAL_BEHAVIOR = UNCHANGED):
+
+- **I12R1_REPRESENTATION_ARTIFACT = RESTORED_TO_HISTORICAL_BYTES** via
+  Git object truth at the accepted I12R1 head `76042ca4c4…` (SHA-256
+  `039580c0…` restored from the violated `14119b51…`); equality with the
+  `76042ca4c4…` blob is the proof.
+- **HISTORICAL_EVIDENCE_VERIFICATION = CHECKPOINT_SCOPED**: that one
+  matrix is no longer regenerated from live runtime; it is verified by
+  SHA-256 pin + Git object truth + structural law (checkpoint/matrix
+  identity, 10 rows, one synthetic FAIL, historical fallback row present
+  with original measured payload).  The other four I12R1 matrices keep
+  regenerate-and-compare; the R1 publication set excludes the historical
+  matrix so a builder regression cannot rewrite history.  Root cause
+  (historical builder coupled to a later runtime whose semantics
+  changed) is recorded in
+  `BLOC_04_I12R2R1_HISTORICAL_EVIDENCE_IMMUTABILITY_REPAIR.md`.
+- Dual truth enforced by test (`test_i12r2r1_evidence_immutability.py`,
+  12 tests): historical I12R1 fallback row = SUPERSEDED_HISTORICAL_
+  BEHAVIOR coexists with current I12R2 fail-closed row = CURRENT_BEHAVIOR
+  (live `ProjectionSchemaUnsupported`), plus the §14 dual-truth test that
+  passes ONLY if both hold simultaneously.  I12R2 matrices still
+  regenerate byte-identically from current production.  The I12R2 closure
+  narrative received an APPENDED dual-truth marker section (nothing
+  rewritten).
+
+Historical evidence diff vs `76042ca4c4…`: all original I12 and I12R1
+evidence byte-identical (including the restored artifact); the only
+expected pre-I12R2 difference is the I11R2 audit's mechanical
+tracked-Python-count evolution; I12R2/I12R2R1 artifacts appear only as
+additions.
+
+### Authorization boundary
+
+```
+PASS_SENSOR_B4_I12_RAW_QUERY_REPLAY_SEALED            = OPERATOR_HOLD
+PASS_SENSOR_B4_I12R1_END_TO_END_QUERY_SEALED          = OPERATOR_HOLD
+PASS_SENSOR_B4_I12R2_FAIL_SAFE_QUERY_CONTRACT_SEALED  = OPERATOR_HOLD
+PASS_SENSOR_B4_I12R2R1_EVIDENCE_IMMUTABILITY_SEALED   = PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                            = FALSE
+recommended_next = OPERATOR REVIEW OF COMPLETE I12 -> I12R1 -> I12R2 -> I12R2R1 CHAIN
+I13                                                   = UNAUTHORIZED
+I13+                                                  = UNAUTHORIZED
+research                                              = FROZEN
+```
+
+I12R2R1 does NOT self-ratify.  I13 is NOT started.

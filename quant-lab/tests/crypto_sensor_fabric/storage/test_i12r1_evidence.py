@@ -989,10 +989,6 @@ _MATRICES = (
         build_revision_integration_matrix,
     ),
     (
-        "BLOC_04_I12R1_REPRESENTATION_SELECTION_MATRIX.json",
-        build_representation_selection_matrix,
-    ),
-    (
         "BLOC_04_I12R1_REPLAY_DISPATCH_MATRIX.json",
         build_replay_dispatch_matrix,
     ),
@@ -1002,8 +998,29 @@ _MATRICES = (
     ),
 )
 
+# I12R2R1 (operator finding §1/§5): the historical I12R1
+# REPRESENTATION_SELECTION artifact was regenerated from CURRENT production
+# by the I12R2 publication, violating the append-only historical-evidence
+# law.  Its semantics were intentionally superseded at I12R2
+# (include_t0b=True + no eligible T0B now fails typed), so live-runtime
+# regeneration is NO LONGER a valid acceptance mechanism for it.  It is
+# verified by CHECKPOINT-SCOPED IMMUTABILITY instead: exact bytes pinned at
+# the accepted I12R1 head, plus structural law — never regenerated.
+HISTORICAL_REPRESENTATION_MATRIX = "BLOC_04_I12R1_REPRESENTATION_SELECTION_MATRIX.json"
+I12R1_ACCEPTED_HEAD = "76042ca4c4abf17884980fca84a7aa1ba2d680c6"
+I12R1_REPRESENTATION_EVIDENCE_SHA256 = (
+    "039580c07b7e6f65a74f892f513dcba7ccdc5f6f5e385e82f13595e6e437a5f3"
+)
+HISTORICAL_FALLBACK_ROW = "schema_mismatch_with_T0A_fallback_documented"
+
 
 def publish_all() -> list[Path]:
+    """Publication covers ONLY the four compatible matrices.
+
+    The historical REPRESENTATION_SELECTION artifact is NEVER rewritten by
+    this module (I12R2R1 checkpoint-scoped immutability, §5): a builder
+    regression against it can no longer silently rewrite history.
+    """
     written: list[Path] = []
     for name, build in _MATRICES:
         path = EVIDENCE_DIR / name
@@ -1017,11 +1034,89 @@ def publish_all() -> list[Path]:
 
 
 def test_i12r1_matrices_regenerate_byte_identically() -> None:
-    """Read-only: committed artifacts regenerate byte-identically."""
+    """Read-only: the four SEMANTICALLY-COMPATIBLE committed artifacts
+    regenerate byte-identically from current production.
+
+    The historical REPRESENTATION_SELECTION matrix is deliberately EXCLUDED
+    (I12R2R1 §7): its semantics were superseded at I12R2, so it is verified
+    by checkpoint-scoped immutability below, not by live regeneration.
+    """
     for name, build in _MATRICES:
         path = EVIDENCE_DIR / name
         assert path.exists(), f"missing committed I12R1 artifact {name}"
         assert path.read_bytes() == _canonical_bytes(build()), name
+        assert name != HISTORICAL_REPRESENTATION_MATRIX
+
+
+def test_historical_representation_matrix_checkpoint_scoped() -> None:
+    """I12R2R1 §5: the historical I12R1 representation artifact is verified
+    by immutable CHECKPOINT IDENTITY, not current runtime behavior.
+
+    A. exact historical bytes pinned at the accepted I12R1 head (SHA-256);
+    B. structural evidence law: checkpoint identity, matrix identity, row
+       count, exactly one synthetic-counterfactual FAIL, the historical
+       fallback row PRESENT, and every row still classified/measured as
+       originally published.
+    """
+    import hashlib
+
+    path = EVIDENCE_DIR / HISTORICAL_REPRESENTATION_MATRIX
+    assert path.exists(), f"missing historical artifact {HISTORICAL_REPRESENTATION_MATRIX}"
+    current = path.read_bytes()
+    # A. immutable checkpoint identity (hash pin + Git object truth).
+    assert (
+        hashlib.sha256(current).hexdigest()
+        == I12R1_REPRESENTATION_EVIDENCE_SHA256
+    ), "historical I12R1 representation artifact bytes changed after seal"
+    import subprocess
+
+    git_bytes = subprocess.run(
+        ["git", "cat-file", "blob", f"{I12R1_ACCEPTED_HEAD}:{_git_relpath(path)}"],
+        check=True,
+        capture_output=True,
+    ).stdout
+    assert current == git_bytes, "artifact diverges from the accepted I12R1 head"
+    # B. structural evidence law on the ORIGINAL publication.
+    payload = json.loads(current.decode("utf-8"))
+    assert payload["matrix"] == "BLOC_04_I12R1_REPRESENTATION_SELECTION"
+    assert payload["mandate"] == "SENSOR-B4-I12R1"
+    rows = payload["rows"]
+    assert len(rows) == 10, len(rows)
+    for r in rows:
+        assert r["invariant_source"] in {
+            "PRODUCTION_BEHAVIOR",
+            "ADVERSARIAL_MUTATION",
+            "STRUCTURAL_INTROSPECTION",
+            "SYNTHETIC_COUNTERFACTUAL",
+        }, r["case"]
+    counterfactuals = [
+        r for r in rows if r["invariant_source"] == "SYNTHETIC_COUNTERFACTUAL"
+    ]
+    assert len(counterfactuals) == 1
+    assert counterfactuals[0]["result"] == "FAIL"
+    measured_rows = [
+        r for r in rows if r["invariant_source"] != "SYNTHETIC_COUNTERFACTUAL"
+    ]
+    assert all(r["result"] == "OK" for r in measured_rows)
+    assert all(r.get("measured") for r in measured_rows)
+    fallback_rows = [r for r in rows if r["case"] == HISTORICAL_FALLBACK_ROW]
+    assert len(fallback_rows) == 1, "historical fallback row missing"
+    hist = fallback_rows[0]
+    assert hist["result"] == "OK"
+    assert hist["measured"]["exception"] is None
+    assert hist["measured"]["projection_refs"] == []
+    assert hist["measured"]["blob_refs"]
+    summary = payload["summary"]
+    assert summary == {"rows": 10, "ok": 9, "fail": 1}
+
+
+def _git_relpath(path: Path) -> str:
+    """Repository-relative path of an evidence artifact (forward slashes).
+
+    REPO (parents[4] of this file) is the worktree/repo root; EVIDENCE_DIR is
+    anchored under it, so the relative path is stable and forward-slashed.
+    """
+    return path.resolve().relative_to(REPO.resolve()).as_posix()
 
 
 def test_i12r1_matrices_measured_and_single_counterfactual() -> None:

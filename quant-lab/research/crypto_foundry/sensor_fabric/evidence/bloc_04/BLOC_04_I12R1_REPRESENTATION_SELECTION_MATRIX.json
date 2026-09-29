@@ -105,17 +105,21 @@
       "detail": "T0B-only query naming a non-matching schema refuses typed — a non-matching projection is never silently substituted"
     },
     {
-      "case": "schema_mismatch_with_both_requested_fails_typed",
+      "case": "schema_mismatch_with_T0A_fallback_documented",
       "invariant_source": "PRODUCTION_BEHAVIOR",
       "measured": {
-        "exception": "ProjectionSchemaUnsupported",
-        "blob_refs": null,
-        "projection_refs": null,
-        "lineage_refs": null,
-        "acquisition_ids": null
+        "exception": null,
+        "blob_refs": [
+          "53cf293323a8981870c83663e4b8818dcf51ae8894d33619e6a43ebc46072e4c"
+        ],
+        "projection_refs": [],
+        "lineage_refs": [],
+        "acquisition_ids": [
+          "acq-1"
+        ]
       },
       "result": "OK",
-      "detail": "SUPERSEDED I12R2 (operator review §12): include_t0b=True is an explicit caller REQUIREMENT — both-representations queries refuse typed (ProjectionSchemaUnsupported) when no eligible T0B projection matches; the I12R1 option-A T0A fallback recorded here before operator review is superseded by the I12R2 representation-satisfaction law"
+      "detail": "FROZEN documented behavior (I12R1 §10 option A): the valid T0A selection is returned and the non-matching T0B projection is left out of projection_refs (visible absence, not substitution)"
     },
     {
       "case": "lineage_corrupt_fails_closed_on_fresh_repository",
