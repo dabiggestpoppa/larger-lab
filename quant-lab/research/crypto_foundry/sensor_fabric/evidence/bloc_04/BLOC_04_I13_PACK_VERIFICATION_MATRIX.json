@@ -1,0 +1,63 @@
+{
+  "cases": [
+    {
+      "case_id": "valid_pack_verifies",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "full-inventory verification succeeds",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "object_count": 13,
+        "total_bytes": 6763
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "one_byte_blob_tamper",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "any blob byte mutation refuses",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exception": "PackChecksumMismatch"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "missing_object",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "deleted object refuses as inventory mismatch",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exception": "PackInventoryMismatch"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "extra_object",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "unlisted object refuses (exact-inventory policy)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exception": "PackInventoryMismatch"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_partial_pack_accepts",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "a partial pack would verify under top-level-digest-only checkers; I13 verifies EVERY referenced object",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "non-verifying checker would pass"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "gate": "G4-11_EXPORT_RESTORE_GATE",
+  "mandate": "SENSOR-B4-I13",
+  "matrix": "PACK_VERIFICATION",
+  "measured_at_checkpoint": "I13",
+  "rows_fail": 1,
+  "rows_ok": 4,
+  "rows_total": 5,
+  "synthetic_counterfactuals": 1
+}

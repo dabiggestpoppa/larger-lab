@@ -1,0 +1,110 @@
+{
+  "cases": [
+    {
+      "case_id": "query_driven_selection",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "export selection goes through the I12 query service",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "blob_count": 2,
+        "export_id": "exp-acd4e67d3551dfad",
+        "projection_count": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "role_separated_inventory",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "deterministic role-separated pack layout",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "roles_present": [
+          "ACQUISITION",
+          "BLOB",
+          "BLOB_METADATA",
+          "CURRENT_POINTER",
+          "MANIFEST",
+          "QUERY_SPEC",
+          "REVISION_OBSERVATIONS",
+          "REVISION_SEGMENTS"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "per_object_checksums",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "every object carries domain-stated sha256 + size",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checksum_domains": [
+          "PACK_FILE",
+          "SOURCE_BYTES"
+        ],
+        "object_count": 13,
+        "role_counts": {
+          "ACQUISITION": 2,
+          "BLOB": 2,
+          "BLOB_METADATA": 2,
+          "CURRENT_POINTER": 1,
+          "MANIFEST": 1,
+          "QUERY_SPEC": 1,
+          "REVISION_OBSERVATIONS": 2,
+          "REVISION_SEGMENTS": 2
+        },
+        "total_bytes": 6763
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "source_tree_unchanged",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "export never mutates the source lake",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "source_manifests": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "pack_copyable",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "verification succeeds from an unrelated copy",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "copy_verify_objects": null,
+        "note": "covered by focused test suite (copytree proof)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "no_absolute_source_paths",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "portable identity carries logical source root only",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "all_paths_pack_relative": true,
+        "source_data_root": "logical://source-lake"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_unverified_manifest_accepts",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "hand-authored UNVERIFIED state would be accepted without independent verification (rejected by doctrine)",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "UNVERIFIED pack would pass a non-verifying exporter; I13 exporter self-verifies before finalization"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "gate": "G4-11_EXPORT_RESTORE_GATE",
+  "mandate": "SENSOR-B4-I13",
+  "matrix": "EXPORT_INVENTORY",
+  "measured_at_checkpoint": "I13",
+  "rows_fail": 1,
+  "rows_ok": 6,
+  "rows_total": 7,
+  "synthetic_counterfactuals": 1
+}

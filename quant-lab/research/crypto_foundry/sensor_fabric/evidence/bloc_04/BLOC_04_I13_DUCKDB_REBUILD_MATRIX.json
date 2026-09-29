@@ -1,0 +1,53 @@
+{
+  "cases": [
+    {
+      "case_id": "empty_catalog_rebuild_succeeds",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "DuckDB discovery rebuilds from the restored slice into an empty catalog (never copied)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "catalog_path_is_new": true,
+        "view_row_counts": {
+          "v_t0_acquisitions": 2,
+          "v_t0_blobs": 2,
+          "v_t0_gaps": 0,
+          "v_t0_partitions": 1,
+          "v_t0_projections": 0,
+          "v_t0_quarantine": 0,
+          "v_t0_revisions": 0,
+          "v_t0_storage_usage": 2
+        }
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "discovery_matches_pack_slice",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "rebuild sees exactly the exported blob slice",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "pack_blob_count": 2,
+        "v_t0_blobs": 2
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_copied_duckdb",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "copying the source DuckDB file would fake discovery; G4-09 rebuildable-discovery doctrine forbids it",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "no DuckDB copy path exists in I13"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "gate": "G4-11_EXPORT_RESTORE_GATE",
+  "mandate": "SENSOR-B4-I13",
+  "matrix": "DUCKDB_REBUILD",
+  "measured_at_checkpoint": "I13",
+  "rows_fail": 1,
+  "rows_ok": 2,
+  "rows_total": 3,
+  "synthetic_counterfactuals": 1
+}

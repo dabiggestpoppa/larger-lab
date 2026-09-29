@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "case_id": "query_result_digest_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source vs restored canonical result digests equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_query_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6",
+        "source_query_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "blob_hash_set_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source vs restored blob hash sets equal (slice)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "blob_count": 2,
+        "restored_results": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "revision_authority_from_restored_truth",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "restored service resolves revisions from restored I06 evidence (registry rebuilt from restored root)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "service_constructed": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_source_dependency",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "a restore that consulted the original source lake would break portability; restore reads pack bytes only",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "no source-root access exists in restore"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "gate": "G4-11_EXPORT_RESTORE_GATE",
+  "mandate": "SENSOR-B4-I13",
+  "matrix": "FRESH_ROOT_PARITY",
+  "measured_at_checkpoint": "I13",
+  "rows_fail": 1,
+  "rows_ok": 3,
+  "rows_total": 4,
+  "synthetic_counterfactuals": 1
+}

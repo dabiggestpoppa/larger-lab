@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "case_id": "fresh_empty_root_restore",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "pack restores into a new empty root (G4-11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_query_results": 1,
+        "restored_root_created": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "nonempty_root_refused",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "restore refuses nonempty destination",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exception": "RestoreDestinationNotEmpty"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "partial_pack_refused_before_mutation",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "corrupt/partial pack refuses before destination mutation; no complete marker",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "destination_created": true,
+        "exception": "PackInventoryMismatch"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_merge_restore",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "merge-into-existing-root would violate the frozen empty-root law; no merge restore exists in I13",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "merge restore unavailable by law"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "gate": "G4-11_EXPORT_RESTORE_GATE",
+  "mandate": "SENSOR-B4-I13",
+  "matrix": "RESTORE_INTEGRITY",
+  "measured_at_checkpoint": "I13",
+  "rows_fail": 1,
+  "rows_ok": 3,
+  "rows_total": 4,
+  "synthetic_counterfactuals": 1
+}

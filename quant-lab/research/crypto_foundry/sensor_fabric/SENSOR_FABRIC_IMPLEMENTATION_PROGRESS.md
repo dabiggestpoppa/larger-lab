@@ -2949,3 +2949,39 @@ recommended_next                                      = SENSOR-B4-I13 IMPLEMENTA
 G4-11 is NOT passed by this ratification; I13 earns it. I13 scope is frozen to LOCAL
 checksum-verified export/backup/restore only (no cloud/network/Bloc-3 integration).
 No I13 implementation occurred in this run. Production diff from `707956cb` = zero.
+
+## SENSOR-B4-I13 — EXPORT / BACKUP / RESTORE PACK (G4-11)
+
+Checksum-verified LOCAL export/backup/restore implemented in
+`storage/export.py` (query-driven selection through the I12R2-canonical
+service; revision authority mandatory; SOURCE_BYTES checksum domain;
+streaming bounded copies; independent full-inventory verifier;
+empty-root atomic restore replayed through accepted writers; DuckDB
+rebuilt from the restored slice; zero network).
+
+Model gap `I13_EXPORT_MANIFEST_MODEL_GAP` reported pre-implementation and
+resolved by OPERATOR-APPROVED additive extension: `pack_schema_version`,
+`object_inventory: list[ExportObjectRecord]`, `pack_root_sha256`,
+`PackObjectRole`, `PackChecksumDomain`. Pre-existing fields/validators
+unchanged. BackupState NOT mutated (verified-pack completion recorded in
+pack + evidence).
+
+G4-11 blocking proof (measured): fresh-empty-root restore = PASS; hash
+parity = PASS; query parity (fresh services, source vs restored) = PASS;
+DuckDB rebuild from restored slice = PASS; security/path containment/
+resource ceilings = PASS.
+
+```
+SENSOR-B4-I13
+PASS_SENSOR_B4_I13_EXPORT_BACKUP_RESTORE_SEALED        = PENDING_OPERATOR_REVIEW
+G4-10_OPERATIONAL_METADATA_GATE                        = IMPLEMENTATION_PASS (unchanged)
+G4-11_EXPORT_RESTORE_GATE                              = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                             = FALSE
+recommended_next                                       = OPERATOR REVIEW OF SENSOR-B4-I13 / G4-11
+I14                                                    = UNAUTHORIZED
+I14+                                                   = UNAUTHORIZED
+research                                               = FROZEN
+```
+
+No self-ratification. Historical I12/I12R1/I12R2/I12R2R1 evidence untouched
+(historical/current evidence doctrine carried forward). I14 not started.

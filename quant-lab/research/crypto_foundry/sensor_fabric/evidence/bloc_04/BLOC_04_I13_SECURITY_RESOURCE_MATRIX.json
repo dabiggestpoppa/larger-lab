@@ -1,0 +1,53 @@
+{
+  "cases": [
+    {
+      "case_id": "resource_ceiling_refused",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "pack exceeding max_objects refuses typed",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exception": "PackResourceLimitExceeded"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "free_space_ceiling_refused",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "restore with zero injectable free space refuses before any destination mutation",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "destination_created": false,
+        "exception": "PackResourceLimitExceeded"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "local_filesystem_only",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "no network imports in the export module",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "network_import_hits": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_network_export",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "a cloud/S3 export path would violate the frozen local-only boundary; none exists",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "no remote transport in export.py"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "gate": "G4-11_EXPORT_RESTORE_GATE",
+  "mandate": "SENSOR-B4-I13",
+  "matrix": "SECURITY_RESOURCE",
+  "measured_at_checkpoint": "I13",
+  "rows_fail": 1,
+  "rows_ok": 3,
+  "rows_total": 4,
+  "synthetic_counterfactuals": 1
+}
