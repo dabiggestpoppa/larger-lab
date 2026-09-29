@@ -230,14 +230,12 @@ class CapitalPrincipalLineageGraph:
             required = ATTRIBUTION_BASIS_QUALIFIERS[state_value]
             for ref in edge.book2_claim_refs:
                 claim = provenance.resolve_claim(ref)
-                if claim.proposition.qualifier not in (
-                    required,
-                    "ECONOMIC_FACT",
-                ):
+                if claim.proposition.qualifier != required:
                     raise AttributionBasisError(
                         f"edge {edge.source_lineage_id}->{edge.target_record_id} "
-                        f"claims {edge.attribution_state.value} but claim {ref} "
-                        f"asserts qualifier {claim.proposition.qualifier}"
+                        f"claims {state_value} but claim {ref} asserts qualifier "
+                        f"{claim.proposition.qualifier}; attribution basis "
+                        f"exceeds its Book 2 evidence"
                     )
 
     def collapse_same_unit(
