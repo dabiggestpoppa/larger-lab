@@ -128,12 +128,28 @@ class CapitalPrincipalLineageGraph:
         self._edges: tuple[PrincipalContribution, ...] = ()
 
     def add_node(self, node: PrincipalLineageNode) -> None:
+        """R1-D4 seal: a raw dict or other non-canonical object at this
+        boundary raises a typed LineageError — never an AttributeError from
+        attribute access on malformed post-construction input."""
+
+        if not isinstance(node, PrincipalLineageNode):
+            raise LineageError(
+                f"lineage node must be a typed PrincipalLineageNode, got "
+                f"{type(node).__name__}"
+            )
         require_str_hashable(node.lineage_id, role="lineage_id")
         if node.lineage_id in self._nodes:
             raise LineageError(f"lineage node {node.lineage_id} already exists")
         self._nodes[node.lineage_id] = node
 
     def add_edge(self, edge: PrincipalContribution) -> None:
+        """R1-D4 seal: typed fail-closed input guard before attribute access."""
+
+        if not isinstance(edge, PrincipalContribution):
+            raise LineageError(
+                f"contribution edge must be a typed PrincipalContribution, "
+                f"got {type(edge).__name__}"
+            )
         require_str_hashable(edge.source_lineage_id, role="source_lineage_id")
         require_str_hashable(edge.target_record_id, role="target_record_id")
         if edge.source_lineage_id not in self._nodes:
