@@ -24,7 +24,6 @@ import os
 import sys
 from pathlib import Path
 
-import pytest
 
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
@@ -36,24 +35,16 @@ if SRC not in sys.path:
 from _sibling_import import load_sibling  # noqa: E402
 
 from crypto_sensor_fabric.storage import (  # noqa: E402
-    EvidencePackExporter,
     EvidencePackRestorer,
     EvidencePackVerifier,
-    PackChecksumMismatch,
-    PackInventoryMismatch,
     PackObjectRole,
-    PackVerificationError,
     RawEvidenceQuery,
-    RestoreDestinationNotEmpty,
 )
 from crypto_sensor_fabric.storage.duckdb_catalog import (  # noqa: E402
     rebuild_duckdb_catalog,
 )
 from crypto_sensor_fabric.storage.export import (  # noqa: E402
     read_pack_manifest,
-)
-from crypto_sensor_fabric.storage.models import (  # noqa: E402
-    canonical_json_bytes,
 )
 
 i13 = load_sibling("test_i13_export_restore", "test_i13_export_restore")
