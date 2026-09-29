@@ -207,7 +207,27 @@ class CapitalFieldSynthesis:
         position = cast(_Position, position)
         self._typed(position, _Position, role="position")
         self.provenance.resolve_claim_refs(position.book2_claim_refs)
+        # R1-D4 typed guard runs FIRST: raw nested payloads fail closed as
+        # typed errors before any attribute access (never AttributeError).
+        nested: list[PrincipalComponent] = []
         for component in position.principal_components.components:
+            self._typed(component, PrincipalComponent, role="nested principal component")
+            nested.append(component)
+        # R2 S4 closure: the position's asserted claim set must COVER the
+        # claim set of every nested component — a position cannot cite an
+        # unrelated canonical claim while its components ride another basis.
+        nested_refs = {
+            ref
+            for component in nested
+            for ref in component.book2_claim_refs
+        }
+        uncovered = sorted(nested_refs.difference(position.book2_claim_refs))
+        if uncovered:
+            raise Book5ProvenanceError(
+                "position claim refs do not cover nested component claim "
+                f"refs: {', '.join(uncovered)}; refusing composition"
+            )
+        for component in nested:
             self.provenance.validate_principal_component(component)
 
     def _validate_flow(self, flow: object) -> None:

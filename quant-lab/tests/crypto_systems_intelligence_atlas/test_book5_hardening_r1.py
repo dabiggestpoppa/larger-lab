@@ -62,12 +62,14 @@ T1 = LATER
 
 
 def make_position(position_id="pos:r1", *, components=None, **overrides):
+    resolved_components = components or component_set(
+        component(claim_ref="book5-claim-eth")
+    )
     base = dict(
         position_id=position_id,
         position_kind=PositionKind.CLAIM_SIDE,
         asset_ref="csia:token:lp",
-        principal_components=components
-        or component_set(component(claim_ref="book5-claim-eth")),
+        principal_components=resolved_components,
         holder_ref=None,
         protocol_ref="csia:protocol:amm",
         site_ref="csia:site:pool-1",
@@ -76,7 +78,15 @@ def make_position(position_id="pos:r1", *, components=None, **overrides):
         unit="LP",
         valid_from=T0,
         observed_at=T0,
-        book2_claim_refs=("book5-claim-eth",),
+        # position refs DERIVE from the nested components: never a separate
+        # assertion that could drift from the component basis (R2 S4 closure)
+        book2_claim_refs=tuple(
+            dict.fromkeys(
+                ref
+                for c in resolved_components.components
+                for ref in c.book2_claim_refs
+            )
+        ),
     )
     base.update(overrides)
     return CapitalPosition(**base)
