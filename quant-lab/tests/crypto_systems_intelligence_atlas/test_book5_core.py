@@ -30,6 +30,7 @@ from crypto_systems_intelligence_atlas.book5_lineage import (
 from crypto_systems_intelligence_atlas.book5_provenance import (
     Book5Provenance,
     Book5ProvenanceError,
+    ClaimContextBinding,
 )
 from crypto_systems_intelligence_atlas.book5_support import (
     NOW,
@@ -42,6 +43,8 @@ from crypto_systems_intelligence_atlas.book5_support import (
     graph,
     kernel,
     lineage_node,
+    make_claim,
+    make_evidence,
     site,
 )
 from crypto_systems_intelligence_atlas.claims import ClaimState
@@ -120,6 +123,27 @@ def test_typed_location_requires_ref() -> None:
         EconomicLocation(location_type=LocationType.CEX)
 
 
+def _exact_bound_kernel(tag: str, *, asset_ref: str = "csia:token:eth", unit: str = "ETH", realization_ref: str | None = None):
+    """R2 helper: kernel + canonical exact-basis claim with a coherent
+    context binding, so authority aggregation exercises the full seal."""
+
+    claims, evidence, provenance = kernel()
+    evidence_ref = make_evidence(evidence, f"{tag}-ev")
+    claim_id = f"book5-claim-{tag}"
+    claims.add_initial(
+        make_claim(claim_id, evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(
+            claim_id=claim_id,
+            asset_ref=asset_ref,
+            realization_ref=realization_ref,
+            unit=unit,
+        )
+    )
+    return provenance, claim_id
+
+
 def test_attribution_arithmetic_law() -> None:
     for state in (AttributionState.EXACT, AttributionState.PROPORTIONAL):
         assert state in ARITHMETIC_STATES
@@ -131,13 +155,16 @@ def test_attribution_arithmetic_law() -> None:
     ):
         c = component(quantity="2", attribution=state, claim_ref="book5-claim-pool")
         assert c.share_fraction is None
-    # same-unit aggregation refuses non-attributed components
+    # same-unit aggregation refuses non-attributed components (the EXACT
+    # participant carries a proper R2 basis + binding so the COMMINGLED
+    # arithmetic refusal is what fires, not a basis rejection)
+    provenance, exact_ref = _exact_bound_kernel("law-exact")
     s = component_set(
-        component(quantity="1", attribution=AttributionState.EXACT),
+        component(quantity="1", attribution=AttributionState.EXACT, claim_ref=exact_ref),
         component(quantity="2", attribution=AttributionState.COMMINGLED, claim_ref="book5-claim-pool"),
     )
     with pytest.raises(AttributionStateError):
-        s.aggregate_same_unit("ETH")
+        s.aggregate_same_unit("ETH", provenance=provenance)
 
 
 def test_derived_allocation_requires_methodology_fraction() -> None:
@@ -158,36 +185,44 @@ def test_share_fraction_illegal_for_exact() -> None:
 
 
 def test_lp_multi_root_vector_is_heterogeneous() -> None:
+    prov_eth, eth_ref = _exact_bound_kernel("lp-eth-exact")
+    prov_usdc, usdc_ref = _exact_bound_kernel(
+        "lp-usdc-exact", asset_ref="csia:token:usdc", unit="USDC"
+    )
     lp = component_set(
-        component(quantity="3", unit="ETH", claim_ref="book5-claim-eth"),
+        component(quantity="3", unit="ETH", claim_ref=eth_ref),
         component(
             asset_ref="csia:token:usdc",
             quantity="5000",
             unit="USDC",
-            claim_ref="book5-claim-usdc",
+            claim_ref=usdc_ref,
         ),
     )
     assert lp.is_heterogeneous()
     assert lp.units() == ("ETH", "USDC")
-    # same-unit aggregation still works per unit
-    assert lp.aggregate_same_unit("ETH") == "3"
-    assert lp.aggregate_same_unit("USDC") == "5000"
+    # same-unit aggregation still works per unit under the R2 authority seal
+    assert lp.aggregate_same_unit("ETH", provenance=prov_eth) == "3"
+    assert lp.aggregate_same_unit("USDC", provenance=prov_usdc) == "5000"
 
 
 def test_no_cross_unit_aggregation_exists() -> None:
+    prov_eth, eth_ref = _exact_bound_kernel("crossunit-eth")
+    _, usdc_ref = _exact_bound_kernel(
+        "crossunit-usdc", asset_ref="csia:token:usdc", unit="USDC"
+    )
     lp = component_set(
-        component(quantity="3", unit="ETH", claim_ref="book5-claim-eth"),
+        component(quantity="3", unit="ETH", claim_ref=eth_ref),
         component(
             asset_ref="csia:token:usdc",
             quantity="5000",
             unit="USDC",
-            claim_ref="book5-claim-usdc",
+            claim_ref=usdc_ref,
         ),
     )
     assert not hasattr(lp, "aggregate_total")
     assert not hasattr(lp, "value")
-    with pytest.raises(Exception):
-        lp.aggregate_same_unit("USD")  # no such unit in the set
+    with pytest.raises(Book5ProvenanceError):
+        lp.aggregate_same_unit("USD", provenance=prov_eth)  # no such unit in the set
 
 
 def test_lineage_many_roots_for_one_record() -> None:
@@ -206,16 +241,17 @@ def test_lineage_many_roots_for_one_record() -> None:
 
 
 def test_lineage_fan_out_one_root_many_records() -> None:
+    prov, ref = _exact_bound_kernel("fanout-exact")
     g = graph(
-        contribution("l:eth", "rec:a"),
-        contribution("l:eth", "rec:b"),
-        nodes=(lineage_node("l:eth"),),
+        contribution("l:eth", "rec:a", claim_ref=ref),
+        contribution("l:eth", "rec:b", claim_ref=ref),
+        nodes=(lineage_node("l:eth", claim_ref=ref),),
     )
     assert len(g.roots_for("rec:a")) == 1
     assert len(g.roots_for("rec:b")) == 1
     # fan-out did not multiply the principal: each record still sees one root
     # with the same unit, and collapse of each is independent
-    assert g.collapse_same_unit("rec:a", unit="ETH") == "3"
+    assert g.collapse_same_unit("rec:a", unit="ETH", provenance=prov) == "3"
 
 
 def test_collapse_refuses_non_attributed_edge() -> None:
@@ -235,16 +271,17 @@ def test_collapse_refuses_non_attributed_edge() -> None:
         ),
     )
     with pytest.raises(AttributionStateError):
-        g.collapse_same_unit("rec:borrow", unit="USDC")
+        g.collapse_same_unit("rec:borrow", unit="USDC", provenance=kernel()[2])
 
 
 def test_collapse_refuses_missing_quantity() -> None:
+    prov, ref = _exact_bound_kernel("missingqty-exact")
     g = graph(
-        contribution("l:eth", "rec:x", quantity=None, unit=None),
-        nodes=(lineage_node("l:eth"),),
+        contribution("l:eth", "rec:x", quantity=None, unit=None, claim_ref=ref),
+        nodes=(lineage_node("l:eth", claim_ref=ref),),
     )
     with pytest.raises(LineageError):
-        g.collapse_same_unit("rec:x", unit="ETH")
+        g.collapse_same_unit("rec:x", unit="ETH", provenance=prov)
 
 
 def test_cycle_detection_and_collapse_refusal() -> None:
@@ -259,22 +296,23 @@ def test_cycle_detection_and_collapse_refusal() -> None:
     )
     assert set(g.detect_cycles()) == {"l:a", "l:b"}
     with pytest.raises(LineageError):
-        g.collapse_same_unit("l:b", unit="USDC")
+        g.collapse_same_unit("l:b", unit="USDC", provenance=kernel()[2])
 
 
 def test_rehypothecation_chain_preserves_source_set() -> None:
+    prov, ref = _exact_bound_kernel("rehyp-exact")
     g = graph(
-        contribution("l:eth", "rec:pledge1"),
-        contribution("l:eth", "rec:pledge2", quantity="3", unit="ETH"),
-        nodes=(lineage_node("l:eth"),),
+        contribution("l:eth", "rec:pledge1", claim_ref=ref),
+        contribution("l:eth", "rec:pledge2", quantity="3", unit="ETH", claim_ref=ref),
+        nodes=(lineage_node("l:eth", claim_ref=ref),),
     )
     # same principal feeds two encumbrance legs (rehypothecation): the source
     # set for each record is preserved and the lineage root is one — the
     # principal was NOT multiplied
     assert len(g.roots_for("rec:pledge1")) == 1
     assert len(g.roots_for("rec:pledge2")) == 1
-    assert g.collapse_same_unit("rec:pledge1", unit="ETH") == "3"
-    assert g.collapse_same_unit("rec:pledge2", unit="ETH") == "3"
+    assert g.collapse_same_unit("rec:pledge1", unit="ETH", provenance=prov) == "3"
+    assert g.collapse_same_unit("rec:pledge2", unit="ETH", provenance=prov) == "3"
 
 
 def test_liability_projection_reconciles_or_fails() -> None:

@@ -36,7 +36,10 @@ from crypto_systems_intelligence_atlas.book5_lineage import (
     ReserveLiability,
     reconcile_projection,
 )
-from crypto_systems_intelligence_atlas.book5_provenance import Book5ProvenanceError
+from crypto_systems_intelligence_atlas.book5_provenance import (
+    Book5ProvenanceError,
+    ClaimContextBinding,
+)
 from crypto_systems_intelligence_atlas.book5_records import (
     AppendOnlyFlowLedger,
     CapitalFlow,
@@ -67,6 +70,35 @@ from crypto_systems_intelligence_atlas.book5_synthesis import (
 UTC = UTC
 T0 = NOW
 T1 = LATER
+
+
+def _bound_exact(
+    provenance,
+    tag: str,
+    *,
+    asset_ref: str,
+    unit: str,
+    realization_ref: str | None = None,
+) -> str:
+    """R2 helper: register a canonical PRINCIPAL_EXACT_FACT claim and bind
+    its asset/unit/realization context on the provenance's stores."""
+
+    from crypto_systems_intelligence_atlas.book5_support import make_claim, make_evidence
+
+    evidence_ref = make_evidence(provenance.evidence_store, f"{tag}-ev")
+    claim_id = f"book5-claim-{tag}"
+    provenance.claim_store.add_initial(
+        make_claim(claim_id, evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(
+            claim_id=claim_id,
+            asset_ref=asset_ref,
+            realization_ref=realization_ref,
+            unit=unit,
+        )
+    )
+    return claim_id
 
 
 def make_position(position_id="pos:adv", *, components=None, **overrides):
@@ -108,7 +140,7 @@ def test_model_copy_stripped_provenance_fails_at_boundary() -> None:
     # the tampered record is structurally present but carries no evidence
     assert len(stripped.book2_claim_refs) == 0
     # the authority boundary refuses evidence-less records
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    synthesis = CapitalFieldSynthesis(prov, SynthesisWriteLedger())
     with pytest.raises(Exception):
         synthesis.compose_snapshot(
             "snap:stripped",
@@ -140,23 +172,27 @@ def test_model_copy_stripped_provenance_fails_at_boundary() -> None:
 
 
 def test_model_copy_changed_unit_crosses_component_vector() -> None:
-    original = component_set(component(claim_ref="book5-claim-eth"))
+    claims, ev, prov = kernel()
+    exact_ref = _bound_exact(prov, "adv-unit-swap-exact", asset_ref="csia:token:eth", unit="ETH")
+    original = component_set(component(claim_ref=exact_ref))
     tampered = original.components[0].model_copy(update={"unit": "USDC"})
     # unit changed under model_copy; the single-tampered-component set still
     # exposes ONE unit key — but it is now the WRONG unit, and the identity
-    # mismatch is detectable: the asset_ref no longer matches a USDC claim
+    # mismatch is detectable: the context binding contradicts the mutation
     tampered_set = PrincipalComponentSet(components=(tampered,))
     assert tampered_set.units() == ("USDC",)
     with pytest.raises(Exception):
-        tampered_set.aggregate_same_unit("ETH")  # original unit no longer present
+        tampered_set.aggregate_same_unit("ETH", provenance=prov)  # original unit no longer present
 
 
 def test_model_copy_changed_attribution_refuses_arithmetic() -> None:
-    original = component(claim_ref="book5-claim-eth")
+    claims, ev, prov = kernel()
+    exact_ref = _bound_exact(prov, "adv-state-down-exact", asset_ref="csia:token:eth", unit="ETH")
+    original = component(claim_ref=exact_ref)
     tampered = original.model_copy(update={"attribution_state": AttributionState.UNKNOWN})
     s = PrincipalComponentSet(components=(tampered,))
     with pytest.raises(Exception):
-        s.aggregate_same_unit("ETH")
+        s.aggregate_same_unit("ETH", provenance=prov)
 
 
 def test_raw_dict_injection_refused_by_typed_edges() -> None:
@@ -187,16 +223,19 @@ def test_eth_plus_usdc_never_scalarizes() -> None:
             claim_ref="book5-claim-usdc",
         ),
     )
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    _, _, prov = kernel()
+    synthesis = CapitalFieldSynthesis(prov, SynthesisWriteLedger())
     # no scalar API exists; the only aggregate APIs are same-unit
     assert not hasattr(lp, "total_value")
+    eth_ref = _bound_exact(prov, "crossunit-adv-eth", asset_ref="csia:token:eth", unit="ETH")
+    usdc_ref = _bound_exact(prov, "crossunit-adv-usdc", asset_ref="csia:token:usdc", unit="USDC")
     kind, total, vector = synthesis.collapse_request(
         graph=graph(
-            contribution("l:eth", "rec:lp"),
-            contribution("l:usdc", "rec:lp", quantity="5000", unit="USDC", claim_ref="book5-claim-usdc"),
+            contribution("l:eth", "rec:lp", claim_ref=eth_ref),
+            contribution("l:usdc", "rec:lp", quantity="5000", unit="USDC", claim_ref=usdc_ref),
             nodes=(
-                lineage_node("l:eth"),
-                lineage_node("l:usdc", asset_ref="csia:token:usdc", unit="USDC", claim_ref="book5-claim-usdc"),
+                lineage_node("l:eth", claim_ref=eth_ref),
+                lineage_node("l:usdc", asset_ref="csia:token:usdc", unit="USDC", claim_ref=usdc_ref),
             ),
         ),
         record_id="rec:lp",
@@ -212,20 +251,29 @@ def test_share_fraction_never_yields_usd() -> None:
 
 
 def test_same_realization_usdc_may_sum() -> None:
+    _, _, prov = kernel()
+    usdc_ref = _bound_exact(
+        prov,
+        "adv-usdc-real-exact",
+        asset_ref="csia:token:usdc",
+        unit="USDC",
+        realization_ref="realization:chain-1",
+    )
     a = component(
         asset_ref="csia:token:usdc", quantity="100", unit="USDC",
-        claim_ref="book5-claim-usdc", realization_ref="realization:chain-1",
+        claim_ref=usdc_ref, realization_ref="realization:chain-1",
     )
     b = component(
         asset_ref="csia:token:usdc", quantity="200", unit="USDC",
-        claim_ref="book5-claim-usdc", realization_ref="realization:chain-1",
+        claim_ref=usdc_ref, realization_ref="realization:chain-1",
     )
     s = PrincipalComponentSet(components=(a, b))
-    assert s.aggregate_same_unit("realization:chain-1") == "300"
+    assert s.aggregate_same_unit("realization:chain-1", provenance=prov) == "300"
 
 
 def test_observed_40b_fact_is_not_a_conversion_authority() -> None:
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    _, _, prov = kernel()
+    synthesis = CapitalFieldSynthesis(prov, SynthesisWriteLedger())
     fact = ObservedCommonValueFact(
         fact_id="fact:reserves", reported_value="40000000000", numeraire="USD",
         reporter_ref="csia:entity:issuer", subject_ref="csia:stablecoin:fxd",
@@ -257,13 +305,15 @@ def test_single_root_forcing_impossible_for_lp() -> None:
 
 
 def test_fan_out_never_multiplies_collapse() -> None:
+    _, _, prov = kernel()
+    eth_ref = _bound_exact(prov, "adv-fanout-exact", asset_ref="csia:token:eth", unit="ETH")
     g = graph(
-        contribution("l:eth", "rec:a"),
-        contribution("l:eth", "rec:b"),
-        nodes=(lineage_node("l:eth"),),
+        contribution("l:eth", "rec:a", claim_ref=eth_ref),
+        contribution("l:eth", "rec:b", claim_ref=eth_ref),
+        nodes=(lineage_node("l:eth", claim_ref=eth_ref),),
     )
-    assert g.collapse_same_unit("rec:a", unit="ETH") == "3"
-    assert g.collapse_same_unit("rec:b", unit="ETH") == "3"  # not 6
+    assert g.collapse_same_unit("rec:a", unit="ETH", provenance=prov) == "3"
+    assert g.collapse_same_unit("rec:b", unit="ETH", provenance=prov) == "3"  # not 6
 
 
 def test_fan_in_preserves_all_sources() -> None:
@@ -281,23 +331,30 @@ def test_fan_in_preserves_all_sources() -> None:
 
 
 def test_unknown_to_exact_mutation_refused_at_boundary() -> None:
+    """R2 replacement: the UNKNOWN→EXACT tamper that pre-R2 aggregated to
+    "3" WITHOUT a resolver must fail closed at the authority boundary — the
+    generic-basis claim cannot support the upgraded state. The UNKNOWN origin
+    remains detectable through the untouched Book 2 refs."""
+
     from crypto_systems_intelligence_atlas.book5_core import PrincipalComponentSet
 
+    _, _, prov = kernel()
     tampered = component(
         quantity="3", attribution=AttributionState.UNKNOWN, claim_ref="book5-claim-eth"
     ).model_copy(update={"attribution_state": AttributionState.EXACT})
-    # model_copy bypassed the constructor, but the arithmetic law re-checks
-    # the LIVE attribution state and now permits... proving why boundaries must
-    # revalidate; the canonical path (collapse/aggregate) always sees live state
     s = PrincipalComponentSet(components=(tampered,))
-    assert s.aggregate_same_unit("ETH") == "3"  # live state is EXACT post-tamper
-    # the defense: the ORIGINAL record's state was UNKNOWN and the tamper is
-    # detectable — Book 2 refs still bind the original observation
+    with pytest.raises(Exception):
+        s.aggregate_same_unit("ETH", provenance=prov)
+    # the ORIGINAL record's state was UNKNOWN and the tamper is detectable —
+    # Book 2 refs still bind the original observation identity
     assert tampered.book2_claim_refs == ("book5-claim-eth",)
 
 
 def test_comingled_to_exact_without_new_evidence_refused() -> None:
     claims, ev, prov = kernel()
+    prov.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-pool", asset_ref="csia:token:usdc", unit="USDC")
+    )
     edge = contribution(
         "l:pool", "rec:x", attribution=AttributionState.COMMINGLED,
         quantity="800", unit="USDC", claim_ref="book5-claim-pool",
@@ -310,13 +367,14 @@ def test_comingled_to_exact_without_new_evidence_refused() -> None:
     # principal continuity is refused
     with pytest.raises(Exception):
         g.collapse_same_unit("rec:x", unit="USDC", provenance=prov)
-    # without a provenance the state law still refuses COMMINGLED arithmetic
+    # the state law still refuses COMMINGLED arithmetic (resolver now always
+    # present at the authority boundary — R2)
     tampered_back = edge.model_copy(update={"attribution_state": AttributionState.COMMINGLED})
     g2 = CapitalPrincipalLineageGraph()
     g2.add_node(lineage_node("l:pool", asset_ref="csia:token:usdc", unit="USDC", claim_ref="book5-claim-pool"))
     g2.add_edge(tampered_back)
     with pytest.raises(AttributionStateError):
-        g2.collapse_same_unit("rec:x", unit="USDC")
+        g2.collapse_same_unit("rec:x", unit="USDC", provenance=prov)
 
 
 def test_raw_contribution_dict_injection_refused() -> None:
@@ -517,8 +575,10 @@ def test_late_observation_enters_transaction_axis_late() -> None:
 
 
 def test_5g_replay_two_valid_times_consistent() -> None:
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
-    position = make_position(components=component_set(component(claim_ref="book5-claim-eth")))
+    _, _, prov = kernel()
+    synthesis = CapitalFieldSynthesis(prov, SynthesisWriteLedger())
+    eth_ref = _bound_exact(prov, "replay-adv-eth", asset_ref="csia:token:eth", unit="ETH")
+    position = make_position(components=component_set(component(claim_ref=eth_ref)))
     s1 = synthesis.compose_snapshot("s:t1", positions=(position,), valid_time=T0, observed_at=T0)
     s2 = synthesis.compose_snapshot("s:t1", positions=(position,), valid_time=T0, observed_at=T0)
     assert s1 == s2

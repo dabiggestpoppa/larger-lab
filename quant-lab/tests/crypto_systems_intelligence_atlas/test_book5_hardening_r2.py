@@ -214,19 +214,21 @@ def test_a5_exact_basis_with_live_provenance_and_context_passes() -> None:
 
 def test_b1_position_refs_stripped_synthesis_without_provenance_rejected() -> None:
     """B1: valid position → model_copy(book2_claim_refs=()) → synthesis built
-    WITHOUT provenance → compose_snapshot must REJECT."""
+    WITHOUT provenance must REJECT: the authority-less engine cannot even be
+    constructed (seal), and explicit None is refused typed (fail-closed)."""
 
     _, claim_id = exact_kernel()
     position = r2_position("pos:b1", claim_ref=claim_id)
     stripped = position.model_copy(update={"book2_claim_refs": ()})
-    synthesis = _synthesis_without_provenance()
-    with pytest.raises(AUTHORITY_REJECTION):
-        synthesis.compose_snapshot("snap:b1", positions=(stripped,), valid_time=T0, observed_at=T0)
+    with pytest.raises(TypeError):
+        _synthesis_without_provenance()
+    with pytest.raises(Book5ProvenanceError):
+        _synthesis_with(None)
 
 
 def test_b2_nested_component_refs_stripped_synthesis_without_provenance_rejected() -> None:
     """B2: nested component refs stripped → synthesis WITHOUT provenance
-    REJECT."""
+    REJECT: no authority-less engine exists to accept it."""
 
     _, claim_id = exact_kernel()
     position = r2_position("pos:b2", claim_ref=claim_id)
@@ -240,33 +242,37 @@ def test_b2_nested_component_refs_stripped_synthesis_without_provenance_rejected
         }
     )
     tampered = position.model_copy(update={"principal_components": stripped_components})
-    synthesis = _synthesis_without_provenance()
-    with pytest.raises(AUTHORITY_REJECTION):
-        synthesis.compose_snapshot("snap:b2", positions=(tampered,), valid_time=T0, observed_at=T0)
+    del tampered
+    with pytest.raises(TypeError):
+        _synthesis_without_provenance()
 
 
 def test_b3_swapped_unrelated_claim_synthesis_without_provenance_rejected() -> None:
     """B3: position claim swapped to an unrelated canonical claim → synthesis
-    WITHOUT provenance REJECT."""
+    WITHOUT provenance REJECT: no authority-less engine exists to accept it."""
 
     _, claim_id = exact_kernel()
     position = r2_position("pos:b3", claim_ref=claim_id)
     swapped = position.model_copy(update={"book2_claim_refs": ("book5-claim-vault",)})
-    synthesis = _synthesis_without_provenance()
-    with pytest.raises(AUTHORITY_REJECTION):
-        synthesis.compose_snapshot("snap:b3", positions=(swapped,), valid_time=T0, observed_at=T0)
+    del swapped
+    with pytest.raises(TypeError):
+        _synthesis_without_provenance()
 
 
 def test_b4_detached_claim_synthesis_without_resolver_rejected() -> None:
     """B4: a valid-looking but detached (evidence-less) current-state claim in
-    a position → synthesis WITHOUT a resolver REJECT."""
+    a position → synthesis WITHOUT a resolver REJECT: construction is refused,
+    and the detached claim is also refused by the bound resolver's path."""
 
     claims, evidence, provenance = kernel()
     claim_id = add_claim(provenance, "b4-detached", with_evidence=False)
     del claims, evidence
     position = r2_position("pos:b4", claim_ref=claim_id)
-    synthesis = _synthesis_without_provenance()
-    with pytest.raises(AUTHORITY_REJECTION):
+    with pytest.raises(TypeError):
+        _synthesis_without_provenance()
+    # the authority-bearing path refuses the detached claim on its own merits
+    synthesis = _synthesis_with(provenance)
+    with pytest.raises(Book5ProvenanceError):
         synthesis.compose_snapshot("snap:b4", positions=(position,), valid_time=T0, observed_at=T0)
 
 
@@ -391,15 +397,18 @@ def test_c8_binding_disagreeing_realization_rejected() -> None:
 
 
 def _synthesis_without_provenance() -> object:
-    """Construct CapitalFieldSynthesis the way the R2 defect does: with no
-    authority context at all. After the R2 seal this call is itself refused."""
+    """Attempt to construct CapitalFieldSynthesis with no authority context.
+
+    After the R2 seal this call is refused at construction (missing required
+    argument) — the authority-less mode of the engine does not exist.
+    """
 
     from crypto_systems_intelligence_atlas.book5_synthesis import CapitalFieldSynthesis
 
     return CapitalFieldSynthesis()  # type: ignore[call-arg]
 
 
-def _synthesis_with(provenance: Book5Provenance) -> object:
+def _synthesis_with(provenance: Book5Provenance | None) -> object:
     from crypto_systems_intelligence_atlas.book5_synthesis import CapitalFieldSynthesis
 
-    return CapitalFieldSynthesis(provenance=provenance)
+    return CapitalFieldSynthesis(provenance)  # type: ignore[arg-type]

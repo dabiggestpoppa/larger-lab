@@ -13,6 +13,7 @@ import pytest
 
 from crypto_systems_intelligence_atlas.book5_core import (
     AttributionState,
+    AttributionStateError,
     EconomicLocation,
     EconomicSite,
     LocationType,
@@ -30,7 +31,11 @@ from crypto_systems_intelligence_atlas.book5_lineage import (
     VALUATION_NOT_AUTHORIZED,
     reconcile_projection,
 )
-from crypto_systems_intelligence_atlas.book5_provenance import Book5ProvenanceError
+from crypto_systems_intelligence_atlas.book5_provenance import (
+    Book5Provenance,
+    Book5ProvenanceError,
+    ClaimContextBinding,
+)
 from crypto_systems_intelligence_atlas.book5_records import (
     AppendOnlyFlowLedger,
     CapitalFlow,
@@ -58,6 +63,8 @@ from crypto_systems_intelligence_atlas.book5_support import (
     graph,
     kernel,
     lineage_node,
+    make_claim,
+    make_evidence,
     site,
 )
 from crypto_systems_intelligence_atlas.book5_synthesis import (
@@ -68,6 +75,34 @@ from crypto_systems_intelligence_atlas.book5_synthesis import (
 UTC = UTC
 T0 = NOW
 T1 = LATER
+
+
+def _bound_exact(
+    provenance: Book5Provenance,
+    tag: str,
+    *,
+    asset_ref: str,
+    unit: str,
+    realization_ref: str | None = None,
+) -> str:
+    """R2 helper: register a canonical PRINCIPAL_EXACT_FACT claim on the
+    provenance's stores AND bind its asset/unit/realization context, so
+    authority aggregation exercises the full mandatory-authority seal."""
+
+    evidence_ref = make_evidence(provenance.evidence_store, f"{tag}-ev")
+    claim_id = f"book5-claim-{tag}"
+    provenance.claim_store.add_initial(
+        make_claim(claim_id, evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(
+            claim_id=claim_id,
+            asset_ref=asset_ref,
+            realization_ref=realization_ref,
+            unit=unit,
+        )
+    )
+    return claim_id
 
 
 def make_position(
@@ -110,6 +145,8 @@ def make_position(
 
 
 def test_5a_canonical_plus_wrapped_supply_never_double_counts() -> None:
+    _, _, prov = kernel()
+    fxd = _bound_exact(prov, "fxd-exact", asset_ref="csia:stablecoin:fxd", unit="FXD")
     canonical = PrincipalComponentSet(
         components=(
             PrincipalComponent(
@@ -117,7 +154,7 @@ def test_5a_canonical_plus_wrapped_supply_never_double_counts() -> None:
                 quantity="1000",
                 unit="FXD",
                 attribution_state=AttributionState.EXACT,
-                book2_claim_refs=("book5-claim-base",),
+                book2_claim_refs=(fxd,),
                 valid_time=T0,
             ),
         )
@@ -130,58 +167,59 @@ def test_5a_canonical_plus_wrapped_supply_never_double_counts() -> None:
                 quantity="1000",
                 unit="FXD",
                 attribution_state=AttributionState.EXACT,
-                book2_claim_refs=("book5-claim-base",),
+                book2_claim_refs=(fxd,),
                 valid_time=T0,
             ),
         )
     )
     # linked, never summed: the wrapped side is a realization with an explicit
     # redemption liability, not additional principal
-    assert canonical.aggregate_same_unit("FXD") == "1000"
-    assert wrapped.aggregate_same_unit("FXD") == "1000"
+    assert canonical.aggregate_same_unit("FXD", provenance=prov) == "1000"
+    assert wrapped.aggregate_same_unit("FXD", provenance=prov) == "1000"
     assert canonical.components[0].realization_ref is None
     assert wrapped.components[0].realization_ref is not None
     with pytest.raises(Exception):
         PrincipalComponentSet(
             components=canonical.components + wrapped.components
-        ).aggregate_same_unit("TOTAL_SUPPLY")  # no such unit: no summed supply
+        ).aggregate_same_unit("TOTAL_SUPPLY", provenance=prov)  # no such unit: no summed supply
 
 
 def test_5a_six_way_supply_separation_representable() -> None:
-    claims, ev, prov = kernel()
+    _, _, prov = kernel()
+    fxd = _bound_exact(prov, "fxd-six-exact", asset_ref="csia:stablecoin:fxd", unit="FXD")
     total_issuance = PrincipalComponent(
         asset_ref="csia:stablecoin:fxd", quantity="10000", unit="FXD",
-        attribution_state=AttributionState.EXACT, book2_claim_refs=("book5-claim-base",),
+        attribution_state=AttributionState.EXACT, book2_claim_refs=(fxd,),
         valid_time=T0,
     )
     canonical_circulating = component(
-        asset_ref="csia:stablecoin:fxd", quantity="4000", unit="FXD", claim_ref="book5-claim-base"
+        asset_ref="csia:stablecoin:fxd", quantity="4000", unit="FXD", claim_ref=fxd
     )
     chain_local = PrincipalComponent(
         asset_ref="csia:stablecoin:fxd", realization_ref="realization:chain-2", quantity="3000",
-        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=("book5-claim-base",),
+        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(fxd,),
         valid_time=T0,
     )
     bridged = PrincipalComponent(
         asset_ref="csia:stablecoin:fxd", realization_ref="realization:chain-2:wrapped", quantity="3000",
-        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=("book5-claim-base",),
+        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(fxd,),
         valid_time=T0,
     )
     escrow = PrincipalComponent(
         asset_ref="csia:stablecoin:fxd", realization_ref="escrow:bridge-1", quantity="3000",
-        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=("book5-claim-base",),
+        unit="FXD", attribution_state=AttributionState.EXACT, book2_claim_refs=(fxd,),
         valid_time=T0,
     )
     redemption_liability = ReserveLiability(
         liability_id="liability:fxd-redemption", issuer_ref="csia:entity:issuer",
         claim_token_ref="csia:stablecoin:fxd",
         backing=component_set(escrow),
-        book2_claim_refs=("book5-claim-base",), valid_time=T0,
+        book2_claim_refs=(fxd,), valid_time=T0,
     )
     assert total_issuance.quantity == "10000"
     assert canonical_circulating.quantity == "4000"
     assert chain_local.realization_ref != bridged.realization_ref
-    assert redemption_liability.backing.aggregate_same_unit("FXD") == "3000"
+    assert redemption_liability.backing.aggregate_same_unit("FXD", provenance=prov) == "3000"
 
 
 # ---------------------------------------------------------------------------
@@ -247,16 +285,18 @@ def test_5b_append_only_flow_ledger() -> None:
 
 
 def test_5c_supplied_plus_borrowed_never_additive() -> None:
+    _, _, prov = kernel()
+    usdc = _bound_exact(prov, "supplied-usdc-exact", asset_ref="csia:token:usdc", unit="USDC")
     supplied = component_set(
         component(
             asset_ref="csia:token:usdc", quantity="1000", unit="USDC",
-            claim_ref="book5-claim-pool",
+            claim_ref=usdc,
         )
     )
     borrowed = debt_liability(quantity="800")
     # 1000 supplied + 800 borrowed != 1800 principal: the debt is a canonical
     # liability record, not capital; there is no cross-record summation API
-    assert supplied.aggregate_same_unit("USDC") == "1000"
+    assert supplied.aggregate_same_unit("USDC", provenance=prov) == "1000"
     assert borrowed.quantity == "800"
     assert not hasattr(supplied, "add_record")
     assert not hasattr(CapitalPrincipalLineageGraph, "sum_all")
@@ -279,6 +319,12 @@ def test_5c_collateral_eligibility_is_not_posted() -> None:
 
 
 def test_5c_borrowed_redeposit_carries_pool_commingled_attribution() -> None:
+    _, _, prov = kernel()
+    prov.bind_claim_context(
+        ClaimContextBinding(
+            claim_id="book5-claim-pool", asset_ref="csia:token:usdc", unit="USDC"
+        )
+    )
     g = graph(
         contribution(
             "l:pool", "rec:borrow",
@@ -290,8 +336,10 @@ def test_5c_borrowed_redeposit_carries_pool_commingled_attribution() -> None:
     # the borrowed USDC's attribution is COMMINGLED: no depositor-unit ancestry
     roots = g.roots_for("rec:borrow")
     assert len(roots) == 1
-    with pytest.raises(Exception):
-        g.collapse_same_unit("rec:borrow", unit="USDC")  # COMMINGLED refuses exact total
+    # COMMINGLED refuses the exact total under the full authority seal: the
+    # arithmetic law fires after basis/context validation, never instead of it
+    with pytest.raises(AttributionStateError):
+        g.collapse_same_unit("rec:borrow", unit="USDC", provenance=prov)
 
 
 def test_5c_debt_position_projection_reconciles_with_liability() -> None:
@@ -343,17 +391,19 @@ def test_5c_collateral_lineage_never_merges_into_borrowed_lineage() -> None:
 
 
 def test_5d_eth_lst_restake_single_lineage_no_multiplication() -> None:
+    _, _, prov = kernel()
+    eth = _bound_exact(prov, "lst-eth-exact", asset_ref="csia:token:eth", unit="ETH")
     g = graph(
-        contribution("l:eth", "rec:staked"),
-        contribution("l:eth", "rec:lst-claim"),
-        contribution("l:eth", "rec:restaked"),
-        nodes=(lineage_node("l:eth"),),
+        contribution("l:eth", "rec:staked", claim_ref=eth),
+        contribution("l:eth", "rec:lst-claim", claim_ref=eth),
+        contribution("l:eth", "rec:restaked", claim_ref=eth),
+        nodes=(lineage_node("l:eth", claim_ref=eth),),
     )
     # three representations, ONE principal root; each record's collapse is the
     # same principal quantity — never 3x TVL
     for record in ("rec:staked", "rec:lst-claim", "rec:restaked"):
         assert [n.lineage_id for n in g.roots_for(record)] == ["l:eth"]
-        assert g.collapse_same_unit(record, unit="ETH") == "3"
+        assert g.collapse_same_unit(record, unit="ETH", provenance=prov) == "3"
 
 
 def test_5d_yield_credit_is_a_flow_not_a_claim() -> None:
@@ -375,6 +425,8 @@ def test_5d_yield_credit_is_a_flow_not_a_claim() -> None:
 
 
 def test_5e_notional_never_enters_principal_sums() -> None:
+    _, _, prov = kernel()
+    usdc = _bound_exact(prov, "margin-usdc-exact", asset_ref="csia:token:usdc", unit="USDC")
     exposure = DerivativeExposure(
         exposure_id="exp:1", instrument_ref="csia:market:perp-eth", site_ref="csia:site:perp-1",
         notional_quantity="1000", notional_unit="USD-NOTIONAL", direction="LONG",
@@ -382,7 +434,7 @@ def test_5e_notional_never_enters_principal_sums() -> None:
     )
     collateral = make_position(
         "pos:margin", components=component_set(
-            component(asset_ref="csia:token:usdc", quantity="100", unit="USDC", claim_ref="book5-claim-usdc")
+            component(asset_ref="csia:token:usdc", quantity="100", unit="USDC", claim_ref=usdc)
         ),
         quantity="100", unit="USDC", encumbrance=EncumbranceState.PLEDGED,
         site_ref="csia:site:perp-1", protocol_ref="csia:protocol:perp",
@@ -390,7 +442,7 @@ def test_5e_notional_never_enters_principal_sums() -> None:
     # exposure quantities live on the exposure record; the position's
     # principal components remain asset-denominated; no API sums them
     assert exposure.notional_unit == "USD-NOTIONAL"
-    assert collateral.principal_components.aggregate_same_unit("USDC") == "100"
+    assert collateral.principal_components.aggregate_same_unit("USDC", provenance=prov) == "100"
     assert not hasattr(exposure, "principal_components")
     assert not hasattr(collateral, "notional")
 
@@ -445,14 +497,17 @@ def test_5f_payment_and_settlement_are_flows() -> None:
 
 
 def test_5g_heterogeneous_vector_preserved_never_scalar() -> None:
+    _, _, prov = kernel()
     ledger = SynthesisWriteLedger()
-    synthesis = CapitalFieldSynthesis(ledger)
+    synthesis = CapitalFieldSynthesis(prov, ledger)
+    eth_ref = _bound_exact(prov, "t1-eth-exact", asset_ref="csia:token:eth", unit="ETH")
+    usdc_ref = _bound_exact(prov, "t1-usdc-exact", asset_ref="csia:token:usdc", unit="USDC")
     g = graph(
-        contribution("l:eth", "rec:lp"),
-        contribution("l:usdc", "rec:lp", quantity="5000", unit="USDC", claim_ref="book5-claim-usdc"),
+        contribution("l:eth", "rec:lp", claim_ref=eth_ref),
+        contribution("l:usdc", "rec:lp", quantity="5000", unit="USDC", claim_ref=usdc_ref),
         nodes=(
-            lineage_node("l:eth"),
-            lineage_node("l:usdc", asset_ref="csia:token:usdc", unit="USDC", claim_ref="book5-claim-usdc"),
+            lineage_node("l:eth", claim_ref=eth_ref),
+            lineage_node("l:usdc", asset_ref="csia:token:usdc", unit="USDC", claim_ref=usdc_ref),
         ),
     )
     kind, total, vector = synthesis.collapse_request(graph=g, record_id="rec:lp", unit="ETH")
@@ -462,11 +517,13 @@ def test_5g_heterogeneous_vector_preserved_never_scalar() -> None:
 
 
 def test_5g_same_unit_collapse_permitted() -> None:
+    _, _, prov = kernel()
     ledger = SynthesisWriteLedger()
-    synthesis = CapitalFieldSynthesis(ledger)
+    synthesis = CapitalFieldSynthesis(prov, ledger)
+    eth_ref = _bound_exact(prov, "t14-eth-exact", asset_ref="csia:token:eth", unit="ETH")
     g = graph(
-        contribution("l:eth", "rec:a"),
-        nodes=(lineage_node("l:eth"),),
+        contribution("l:eth", "rec:a", claim_ref=eth_ref),
+        nodes=(lineage_node("l:eth", claim_ref=eth_ref),),
     )
     kind, total, vector = synthesis.collapse_request(graph=g, record_id="rec:a", unit="ETH")
     assert kind == "SAME_UNIT_COLLAPSE"
@@ -475,13 +532,18 @@ def test_5g_same_unit_collapse_permitted() -> None:
 
 
 def test_5g_valuation_request_not_authorized() -> None:
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    _, _, prov = kernel()
+    synthesis = CapitalFieldSynthesis(prov)
     assert synthesis.valuation_request() == "NOT_AUTHORIZED"
     assert synthesis.valuation_request() != "UNKNOWN"
 
 
 def test_5g_snapshot_propagates_unknown_not_zero_fill() -> None:
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    _, _, prov = kernel()
+    prov.bind_claim_context(
+        ClaimContextBinding(claim_id="book5-claim-usdc", asset_ref="csia:token:usdc", unit="USDC")
+    )
+    synthesis = CapitalFieldSynthesis(prov)
     unknown_position = make_position(
         "pos:unknown",
         components=component_set(
@@ -501,8 +563,10 @@ def test_5g_snapshot_propagates_unknown_not_zero_fill() -> None:
 
 
 def test_5g_snapshot_carries_methodology_inputs_and_derived_mark() -> None:
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
-    position = make_position("pos:x", components=component_set(component(claim_ref="book5-claim-eth")))
+    _, _, prov = kernel()
+    eth_ref = _bound_exact(prov, "meta-eth-exact", asset_ref="csia:token:eth", unit="ETH")
+    synthesis = CapitalFieldSynthesis(prov)
+    position = make_position("pos:x", components=component_set(component(claim_ref=eth_ref)))
     snapshot = synthesis.compose_snapshot("snap:x", positions=(position,), valid_time=T0, observed_at=T0)
     assert snapshot.derived is True
     assert snapshot.methodology_id == "5g-capital-field-composition"
@@ -512,12 +576,14 @@ def test_5g_snapshot_carries_methodology_inputs_and_derived_mark() -> None:
 
 
 def test_5g_canonical_write_count_zero_by_construction() -> None:
+    _, _, prov = kernel()
+    eth_ref = _bound_exact(prov, "w-eth-exact", asset_ref="csia:token:eth", unit="ETH")
     ledger = SynthesisWriteLedger()
-    synthesis = CapitalFieldSynthesis(ledger)
-    position = make_position("pos:w", components=component_set(component(claim_ref="book5-claim-eth")))
+    synthesis = CapitalFieldSynthesis(prov, ledger)
+    position = make_position("pos:w", components=component_set(component(claim_ref=eth_ref)))
     synthesis.compose_snapshot("snap:w", positions=(position,), valid_time=T0, observed_at=T0)
     synthesis.lineage_view(
-        "view:w", graph=graph(contribution("l:eth", "pos:w"), nodes=(lineage_node("l:eth"),)),
+        "view:w", graph=graph(contribution("l:eth", "pos:w", claim_ref=eth_ref), nodes=(lineage_node("l:eth", claim_ref=eth_ref),)),
         target_record_id="pos:w", valid_time=T0, observed_at=T0,
     )
     synthesis.topology_view(
@@ -528,7 +594,8 @@ def test_5g_canonical_write_count_zero_by_construction() -> None:
 
 
 def test_5g_observed_value_fact_display_never_conversion() -> None:
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    _, _, prov = kernel()
+    synthesis = CapitalFieldSynthesis(prov)
     fact = ObservedCommonValueFact(
         fact_id="fact:reserves", reported_value="40000000000", numeraire="USD",
         reporter_ref="csia:entity:issuer", subject_ref="csia:stablecoin:fxd",
@@ -540,9 +607,11 @@ def test_5g_observed_value_fact_display_never_conversion() -> None:
 
 
 def test_5g_snapshot_replay_consistency() -> None:
-    synthesis_a = CapitalFieldSynthesis(SynthesisWriteLedger())
-    synthesis_b = CapitalFieldSynthesis(SynthesisWriteLedger())
-    position = make_position("pos:r", components=component_set(component(claim_ref="book5-claim-eth")))
+    _, _, prov = kernel()
+    eth_ref = _bound_exact(prov, "replay-eth-exact", asset_ref="csia:token:eth", unit="ETH")
+    synthesis_a = CapitalFieldSynthesis(prov)
+    synthesis_b = CapitalFieldSynthesis(prov)
+    position = make_position("pos:r", components=component_set(component(claim_ref=eth_ref)))
     snap_a = synthesis_a.compose_snapshot("snap:r", positions=(position,), valid_time=T0, observed_at=T0)
     snap_b = synthesis_b.compose_snapshot("snap:r", positions=(position,), valid_time=T0, observed_at=T0)
     assert snap_a == snap_b  # same inputs + methodology => identical output
@@ -553,7 +622,8 @@ def test_5g_snapshot_replay_consistency() -> None:
 
 
 def test_5g_composition_requires_canonical_inputs() -> None:
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    _, _, prov = kernel()
+    synthesis = CapitalFieldSynthesis(prov)
     with pytest.raises(Book5ProvenanceError):
         synthesis.compose_snapshot("snap:empty", valid_time=T0, observed_at=T0)
 

@@ -162,21 +162,31 @@ class SynthesisWriteLedger:
 class CapitalFieldSynthesis:
     """The 5G composition engine (derived outputs only).
 
-    R1-D5 seal: when a ``provenance`` is supplied, every canonical input is
-    re-validated against live Book 2 state at compose time — position claim
-    sets, nested component claim sets, attribution bases, and context. A
-    ``model_copy``-mutated record with stripped or swapped provenance cannot
-    enter 5G; 5G cannot gain authority by accepting malformed inputs.
+    R2 mandatory-authority seal: a provenance resolver is REQUIRED at
+    construction. There is no authority-bearing mode of this engine without
+    live Book 2 context — an explicit ``None`` is refused, and no default,
+    global singleton, or second epistemic engine exists (R2-D1B).
+
+    R1-D5 seal: every canonical input is re-validated against live Book 2
+    state at compose time — position claim sets, nested component claim
+    sets, attribution bases, and bound context. A ``model_copy``-mutated
+    record with stripped or swapped provenance cannot enter 5G; 5G cannot
+    gain authority by accepting malformed inputs.
     """
 
     def __init__(
         self,
+        provenance: Book5Provenance,
         ledger: SynthesisWriteLedger | None = None,
-        *,
-        provenance: Book5Provenance | None = None,
     ) -> None:
-        self.ledger = ledger or SynthesisWriteLedger()
+        if provenance is None:  # explicit None fails closed (R2-D1B)
+            raise Book5ProvenanceError(
+                "CapitalFieldSynthesis requires an explicit Book5Provenance "
+                "resolver; authority-bearing composition cannot exist without "
+                "a live Book 2 authority context"
+            )
         self.provenance = provenance
+        self.ledger = ledger or SynthesisWriteLedger()
 
     # -- INV-5G-2/3 helpers ------------------------------------------------
 
@@ -196,8 +206,6 @@ class CapitalFieldSynthesis:
 
         position = cast(_Position, position)
         self._typed(position, _Position, role="position")
-        if self.provenance is None:
-            return
         self.provenance.resolve_claim_refs(position.book2_claim_refs)
         for component in position.principal_components.components:
             self.provenance.validate_principal_component(component)
@@ -207,8 +215,6 @@ class CapitalFieldSynthesis:
 
         flow = cast(_Flow, flow)
         self._typed(flow, _Flow, role="flow")
-        if self.provenance is None:
-            return
         self.provenance.resolve_claim_refs(flow.book2_claim_refs)
 
     def _validate_liability(self, liability: object) -> None:
@@ -216,8 +222,6 @@ class CapitalFieldSynthesis:
 
         liability = cast(_Liability, liability)
         self._typed(liability, _Liability, role="liability")
-        if self.provenance is None:
-            return
         self.provenance.resolve_claim_refs(liability.book2_claim_refs)
 
     def _validate_observed_value_fact(self, fact: object) -> None:
@@ -225,8 +229,6 @@ class CapitalFieldSynthesis:
 
         fact = cast(_Fact, fact)
         self._typed(fact, _Fact, role="observed value fact")
-        if self.provenance is None:
-            return
         self.provenance.resolve_claim_refs(fact.book2_claim_refs)
 
     def _snapshot(
@@ -281,8 +283,9 @@ class CapitalFieldSynthesis:
         R1-D3 seal: a flow-only composition carries ``principal_components
         = None`` plus an explicit ``NO_PRINCIPAL_COMPONENT_OBSERVED`` gap —
         no placeholder token, no fabricated zero, no invented claim ref.
-        R1-D5 seal: when a provenance is bound, every input is re-validated
-        against live Book 2 state before composition.
+        R2 mandatory-authority seal: every input is re-validated against
+        live Book 2 state before composition — the engine cannot be
+        constructed without its authority resolver.
         """
 
         if not positions and not flows and not liabilities:
@@ -406,14 +409,15 @@ class CapitalFieldSynthesis:
 
         Attribution states are copied verbatim from canonical contributions —
         the view cannot be more precise than its sources.
+
+        R2 mandatory-authority seal: every rendered component revalidates
+        against live Book 2 state — a derived lineage view is an authority-
+        bearing artifact and cannot launder mutated records.
         """
 
-        components = graph.components_for(target_record_id)
-        if self.provenance is not None:
-            # R1-D5 closure: a derived view may not launder mutated records —
-            # every rendered component revalidates against live Book 2 state.
-            for component in components.components:
-                self.provenance.validate_principal_component(component)
+        components = graph.components_for(
+            target_record_id, provenance=self.provenance
+        )
         self.ledger.record_composition()
         return CapitalPrincipalLineageView(
             view_id=view_id,
@@ -459,11 +463,14 @@ class CapitalFieldSynthesis:
         """T-14/A: same-unit collapse where permitted; T-9/B: heterogeneous
         sets return the component vector (never a scalar).
 
-        R1: when this synthesis carries a provenance, it is forwarded to the
-        collapse boundary so attribution bases are verified against live Book
-        2 state before any economic total is produced."""
+        R2 mandatory-authority seal: the bound provenance is forwarded to
+        every materialization and collapse boundary — attribution bases and
+        bound context are verified against live Book 2 state before any
+        economic total or component vector is produced."""
 
-        components = graph.components_for(record_id)
+        components = graph.components_for(
+            record_id, provenance=self.provenance
+        )
         units = components.units()
         if len(units) > 1:
             return ("HETEROGENEOUS_VECTOR", None, components)

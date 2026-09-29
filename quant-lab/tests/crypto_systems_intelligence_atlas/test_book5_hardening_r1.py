@@ -272,12 +272,12 @@ def test_b4_coherent_context_with_canonical_claim_passes() -> None:
 
 
 def test_c1_missing_quantity_never_becomes_zero() -> None:
-    """C1: quantity=None edge → components_for() must NOT produce "0"."""
+    """C1: quantity=None edge → materialization must NOT produce "0"."""
 
     g = CapitalPrincipalLineageGraph()
     g.add_node(lineage_node("l:eth"))
     g.add_edge(contribution("l:eth", "rec:x", quantity=None, unit=None))
-    components = g.components_for("rec:x")
+    components = g.inspect_components_for("rec:x")
     for c in components.components:
         assert c.quantity != "0"
 
@@ -289,7 +289,7 @@ def test_c2_missing_quantity_explicit_representation() -> None:
     g = CapitalPrincipalLineageGraph()
     g.add_node(lineage_node("l:eth"))
     g.add_edge(contribution("l:eth", "rec:x", quantity=None, unit=None))
-    components = g.components_for("rec:x")
+    components = g.inspect_components_for("rec:x")
     # either the component carries an explicit missing-quantity marker (None)
     # or the set is empty-with-gap; silently materialized numbers are illegal
     for c in components.components:
@@ -302,7 +302,7 @@ def test_c3_observed_zero_is_representable() -> None:
     g = CapitalPrincipalLineageGraph()
     g.add_node(lineage_node("l:eth"))
     g.add_edge(contribution("l:eth", "rec:x", quantity="0", unit="ETH"))
-    components = g.components_for("rec:x")
+    components = g.inspect_components_for("rec:x")
     assert components.components[0].quantity == "0"
 
 
@@ -313,8 +313,8 @@ def test_c4_missing_and_observed_zero_distinguishable() -> None:
     g.add_node(lineage_node("l:eth"))
     g.add_edge(contribution("l:eth", "rec:missing", quantity=None, unit=None))
     g.add_edge(contribution("l:eth", "rec:zero", quantity="0", unit="ETH"))
-    missing = g.components_for("rec:missing")
-    zero = g.components_for("rec:zero")
+    missing = g.inspect_components_for("rec:missing")
+    zero = g.inspect_components_for("rec:zero")
     assert zero.components[0].quantity == "0"
     for c in missing.components:
         assert c.quantity != "0"
@@ -328,7 +328,7 @@ def test_c4_missing_and_observed_zero_distinguishable() -> None:
 def test_d1_flow_only_snapshot_has_no_fabricated_principal() -> None:
     """D1: flows-only composition must not manufacture principal components."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     snapshot = synthesis.compose_snapshot(
         "snap:flow-only", flows=(make_flow(),), valid_time=T0, observed_at=T0
     )
@@ -341,7 +341,7 @@ def test_d1_flow_only_snapshot_has_no_fabricated_principal() -> None:
 def test_d2_flow_only_snapshot_expresses_incomplete_state() -> None:
     """D2: flow-only snapshot carries an explicit gap/incomplete state."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     snapshot = synthesis.compose_snapshot(
         "snap:flow-only", flows=(make_flow(),), valid_time=T0, observed_at=T0
     )
@@ -351,7 +351,7 @@ def test_d2_flow_only_snapshot_expresses_incomplete_state() -> None:
 def test_d3_no_placeholder_token_none_anywhere() -> None:
     """D3: "csia:token:none" must never appear in any 5G output."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     snapshot = synthesis.compose_snapshot(
         "snap:flow-only", flows=(make_flow(),), valid_time=T0, observed_at=T0
     )
@@ -361,7 +361,7 @@ def test_d3_no_placeholder_token_none_anywhere() -> None:
 def test_d4_no_fabricated_claim_refs() -> None:
     """D4: no claim ref appears that is not among supplied canonical inputs."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     flow = make_flow()
     snapshot = synthesis.compose_snapshot(
         "snap:flow-only", flows=(flow,), valid_time=T0, observed_at=T0
@@ -380,7 +380,7 @@ def test_d5_observed_zero_distinct_from_no_observation() -> None:
     claims.add_initial(
         make_claim("book5-claim-eth-exact", evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
     )
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=provenance)
+    synthesis = CapitalFieldSynthesis(provenance, SynthesisWriteLedger())
     zero_position = make_position(
         "pos:zero",
         components=component_set(
@@ -400,7 +400,7 @@ def test_d5_observed_zero_distinct_from_no_observation() -> None:
 def test_d6_no_fake_component_to_satisfy_pydantic() -> None:
     """D6: empty principal vector must not invent a fake component."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     snapshot = synthesis.compose_snapshot(
         "snap:flow-only", flows=(make_flow(),), valid_time=T0, observed_at=T0
     )
@@ -439,7 +439,7 @@ def test_e2_raw_dict_node_typed_error() -> None:
 def test_e3_raw_position_dict_typed_error() -> None:
     """E3: compose_snapshot(raw position dict) → typed error."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     with pytest.raises(Exception) as exc_info:
         synthesis.compose_snapshot(
             "snap:raw",
@@ -453,7 +453,7 @@ def test_e3_raw_position_dict_typed_error() -> None:
 def test_e4_nested_raw_component_typed_error() -> None:
     """E4: model_copy position with raw nested component → typed error."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     position = make_position()
     raw_components = position.principal_components.model_copy(
         update={"components": ({"asset_ref": "x"},)}  # type: ignore[dict-item]
@@ -469,7 +469,7 @@ def test_e4_nested_raw_component_typed_error() -> None:
 def test_e5_liability_raw_dict_typed_error() -> None:
     """E5: raw liability dict at the synthesis boundary → typed error."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     with pytest.raises(Exception) as exc_info:
         synthesis.compose_snapshot(
             "snap:liab",
@@ -483,7 +483,7 @@ def test_e5_liability_raw_dict_typed_error() -> None:
 def test_e6_observed_value_raw_dict_typed_error() -> None:
     """E6: raw observed-value dict → typed error."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     with pytest.raises(Exception) as exc_info:
         synthesis.compose_snapshot(
             "snap:ovf",
@@ -502,7 +502,7 @@ def test_e6_observed_value_raw_dict_typed_error() -> None:
 def test_f1_stripped_provenance_position_rejected_by_compose() -> None:
     """F1: valid position → model_copy(book2_claim_refs=()) → compose REJECT."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     position = make_position()
     stripped = position.model_copy(update={"book2_claim_refs": ()})
     with pytest.raises(Exception):
@@ -514,7 +514,7 @@ def test_f1_stripped_provenance_position_rejected_by_compose() -> None:
 def test_f2_swapped_unrelated_claim_rejected() -> None:
     """F2: claim refs swapped to an unrelated canonical claim → REJECT."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     position = make_position(
         components=component_set(component(claim_ref="book5-claim-usdc")),
     )
@@ -528,7 +528,7 @@ def test_f2_swapped_unrelated_claim_rejected() -> None:
 def test_f3_nested_component_refs_stripped_rejected() -> None:
     """F3: nested component claim refs stripped while position refs remain."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     position = make_position()
     stripped_components = position.principal_components.model_copy(
         update={
@@ -549,7 +549,7 @@ def test_f3_nested_component_refs_stripped_rejected() -> None:
 def test_f4_position_refs_stripped_nested_remain_rejected() -> None:
     """F4: position refs stripped while nested component refs remain."""
 
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=_live_provenance())
+    synthesis = CapitalFieldSynthesis(_live_provenance(), SynthesisWriteLedger())
     position = make_position()
     tampered = position.model_copy(update={"book2_claim_refs": ()})
     with pytest.raises(Exception):
@@ -566,7 +566,7 @@ def test_f5_coherent_canonical_inputs_pass() -> None:
     claims.add_initial(
         make_claim("book5-claim-eth-exact", evidence_ref=evidence_ref, qualifier="PRINCIPAL_EXACT_FACT")
     )
-    synthesis = CapitalFieldSynthesis(SynthesisWriteLedger(), provenance=provenance)
+    synthesis = CapitalFieldSynthesis(provenance, SynthesisWriteLedger())
     position = make_position(
         components=component_set(
             component(quantity="3", claim_ref="book5-claim-eth-exact")

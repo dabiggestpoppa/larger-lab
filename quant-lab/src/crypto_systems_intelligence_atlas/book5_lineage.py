@@ -23,7 +23,7 @@ from .book5_core import (
     PrincipalComponentSet,
     require_attributed,
 )
-from .book5_provenance import Book5ProvenanceError, require_str_hashable
+from .book5_provenance import Book5Provenance, Book5ProvenanceError, require_str_hashable
 from .temporal import Timestamp, UnknownBound
 
 
@@ -219,14 +219,19 @@ class CapitalPrincipalLineageGraph:
 
     # -- aggregation -------------------------------------------------------
 
-    def verify_edge_basis(self, provenance) -> None:
+    def verify_edge_basis(self, provenance: Book5Provenance) -> None:
         """Verify every attributable edge's attribution basis in Book 2.
 
-        Required at authority boundaries when a provenance is available:
-        an EXACT/PROPORTIONAL edge whose underlying claims do not assert the
-        matching basis qualifier is refused (detects post-construction state
-        upgrades that bypassed validators).
+        Required at authority boundaries: an EXACT/PROPORTIONAL edge whose
+        underlying claims do not assert the matching basis qualifier is
+        refused (detects post-construction state upgrades that bypassed
+        validators). R2: the resolver is mandatory at collapse time.
         """
+
+        if provenance is None:  # defensive: explicit None fails closed
+            raise Book5ProvenanceError(
+                "verify_edge_basis requires an explicit Book5Provenance resolver"
+            )
 
         for edge in self._edges:
             state_value = (
@@ -254,8 +259,48 @@ class CapitalPrincipalLineageGraph:
                         f"exceeds its Book 2 evidence"
                     )
 
+    def _materialize_components(self, record_id: str) -> tuple[PrincipalComponent, ...]:
+        """Materialize the record's components from its contribution edges.
+
+        Shared structural materialization: missing edge quantity stays
+        ``None`` — never fabricated as "0" (R1-D3).
+        """
+
+        components: list[PrincipalComponent] = []
+        for edge in self._edges:
+            if edge.target_record_id != record_id:
+                continue
+            node = self._nodes[edge.source_lineage_id]
+            components.append(
+                PrincipalComponent(
+                    asset_ref=node.asset_ref,
+                    realization_ref=node.realization_ref,
+                    quantity=edge.quantity,  # None = missing, NEVER fabricated "0"
+                    unit=edge.unit or node.unit,
+                    attribution_state=edge.attribution_state,
+                    book2_claim_refs=edge.book2_claim_refs,
+                    valid_time=edge.valid_time,
+                    share_fraction=edge.share_fraction,
+                )
+            )
+        if not components:
+            raise LineageError(f"record {record_id} has no principal components")
+        return tuple(components)
+
+    def inspect_components_for(self, record_id: str) -> PrincipalComponentSet:
+        """STRUCTURAL ONLY: raw component vector without Book 2 validation.
+
+        R2 Phase 8 seal: this method exists so structural inspection never
+        overloads the authoritative API. It performs NO live-state, basis,
+        or context validation and its output MUST NOT back any economic
+        conclusion, snapshot, aggregate, or 5G derived artifact — use
+        :meth:`components_for` (authority context required) for that.
+        """
+
+        return PrincipalComponentSet(components=self._materialize_components(record_id))
+
     def components_for(
-        self, record_id: str, *, provenance=None
+        self, record_id: str, *, provenance: Book5Provenance
     ) -> PrincipalComponentSet:
         """The record's principal components as a unit-aware vector (ALG-18).
 
@@ -264,33 +309,23 @@ class CapitalPrincipalLineageGraph:
         unknown — and remains distinguishable from an explicitly evidenced
         ``"0"`` (UNKNOWN != ZERO; no quantity may be fabricated).
 
-        R1 Phase 10: when a ``provenance`` is supplied, every materialized
-        component revalidates against live Book 2 state (canonical type,
-        attribution basis, context) — ``model_copy`` mutations cannot flow
-        through lineage into conclusions.
+        R2 mandatory-authority seal: ``provenance`` is REQUIRED — every
+        materialized component revalidates against live Book 2 state
+        (canonical type, attribution basis, bound context). ``model_copy``
+        mutations cannot flow through lineage into conclusions, and the
+        resolver cannot be forgotten: an absent context never degrades this
+        boundary into an unverified vector.
         """
 
-        components: list[PrincipalComponent] = []
-        for edge in self._edges:
-            if edge.target_record_id != record_id:
-                continue
-            node = self._nodes[edge.source_lineage_id]
-            component = PrincipalComponent(
-                asset_ref=node.asset_ref,
-                realization_ref=node.realization_ref,
-                quantity=edge.quantity,  # None = missing, NEVER fabricated "0"
-                unit=edge.unit or node.unit,
-                attribution_state=edge.attribution_state,
-                book2_claim_refs=edge.book2_claim_refs,
-                valid_time=edge.valid_time,
-                share_fraction=edge.share_fraction,
+        if provenance is None:  # explicit None fails closed (R2-D1)
+            raise Book5ProvenanceError(
+                "components_for requires an explicit Book5Provenance resolver; "
+                "use inspect_components_for for structural-only access"
             )
-            if provenance is not None:
-                provenance.validate_principal_component(component)
-            components.append(component)
-        if not components:
-            raise LineageError(f"record {record_id} has no principal components")
-        return PrincipalComponentSet(components=tuple(components))
+        components = self._materialize_components(record_id)
+        for component in components:
+            provenance.validate_principal_component(component)
+        return PrincipalComponentSet(components=components)
 
     def collapse_same_unit(
         self,
@@ -298,7 +333,7 @@ class CapitalPrincipalLineageGraph:
         *,
         unit: str,
         realization_ref: str | None = None,
-        provenance=None,
+        provenance: Book5Provenance,
     ) -> str:
         """Collapse one record's principal components to a SAME-UNIT total.
 
@@ -307,15 +342,26 @@ class CapitalPrincipalLineageGraph:
         composition is itself evidenced (their own components carry
         attributable states). CON-9: cycle participation refuses collapse.
         There is deliberately no cross-unit variant (ALG-14/15).
+
+        R2 mandatory-authority seal: ``provenance`` is REQUIRED. Edge bases
+        are verified against live Book 2 state and every participating
+        component's bound context is revalidated before any total is
+        produced — a missing resolver can never produce an unverified
+        economic total.
         """
 
+        if provenance is None:  # explicit None fails closed (R2-D1)
+            raise Book5ProvenanceError(
+                "collapse_same_unit requires an explicit Book5Provenance "
+                "resolver; a missing authority context never degrades into "
+                "an unverified economic total"
+            )
         if self.detect_cycles():
             raise LineageError(
                 "refusing collapse over cyclic lineage; de-duplicate or report "
                 "UNKNOWN (CON-9)"
             )
-        if provenance is not None:
-            self.verify_edge_basis(provenance)
+        self.verify_edge_basis(provenance)
         total = Decimal(0)
         matched = 0
         for edge in self._edges:
@@ -326,6 +372,16 @@ class CapitalPrincipalLineageGraph:
             expected_unit = realization_ref or unit
             if edge_unit != unit and (node.realization_ref or node.unit) != expected_unit:
                 continue
+            component = PrincipalComponent(
+                asset_ref=node.asset_ref,
+                realization_ref=node.realization_ref,
+                quantity=edge.quantity,
+                unit=edge_unit,
+                attribution_state=edge.attribution_state,
+                book2_claim_refs=edge.book2_claim_refs,
+                valid_time=edge.valid_time,
+                share_fraction=edge.share_fraction,
+            )
             require_attributed(
                 edge.attribution_state,
                 operation=f"collapse of lineage {edge.source_lineage_id}",
@@ -335,6 +391,7 @@ class CapitalPrincipalLineageGraph:
                     f"attributable edge {edge.source_lineage_id}->{record_id} "
                     "carries no quantity; refusing to fabricate one"
                 )
+            provenance.validate_principal_component(component)
             if (edge.quantity is None) != (edge.unit is None):
                 raise LineageError(
                     f"attributable edge {edge.source_lineage_id}->{record_id} "

@@ -274,7 +274,7 @@ class PrincipalComponentSet(BaseModel):
         unit: str,
         *,
         realization_ref: str | None = None,
-        provenance: Book5Provenance | None = None,
+        provenance: Book5Provenance,
     ) -> str:
         """Sum quantities of ONE unit under attribution laws (ALG-12).
 
@@ -282,13 +282,22 @@ class PrincipalComponentSet(BaseModel):
         arithmetic (EXACT/PROPORTIONAL). Cross-unit aggregation does not exist
         on this type; heterogeneous sets are returned as-is by design.
 
-        R1 live-state seal: when a ``provenance`` is supplied, every
-        participating component is re-validated against its LIVE Book 2 basis
-        at this decision point — a ``model_copy`` attribution/unit/asset
-        mutation cannot convert into an economic conclusion. Without a
-        provenance, non-canonical (raw-injected) attribution states still fail
-        closed and the attribution arithmetic law still applies.
+        R2 mandatory-authority seal: ``provenance`` is REQUIRED — the keyword
+        must be supplied explicitly, and passing ``None`` raises the typed
+        :class:`Book5ProvenanceError`. Every participating component is
+        re-validated against its LIVE Book 2 basis and bound context at this
+        decision point; a ``model_copy`` attribution/unit/asset mutation can
+        never convert into an economic conclusion, and omitting the resolver
+        can never downgrade this boundary to a bare enum check (R2-D1).
         """
+
+        if provenance is None:  # explicit None fails closed (R2-D1)
+            raise Book5ProvenanceError(
+                "aggregate_same_unit requires an explicit Book5Provenance "
+                "resolver; a missing authority context never degrades into "
+                "an unverified economic total (NO OPTIONAL PROVENANCE AT "
+                "AUTHORITY BOUNDARIES)"
+            )
 
         from decimal import Decimal, InvalidOperation
 
@@ -299,10 +308,7 @@ class PrincipalComponentSet(BaseModel):
             expected = realization_ref or unit
             if key != expected and component.unit != unit:
                 continue
-            if provenance is not None:
-                provenance.validate_principal_component(component)
-            else:
-                require_canonical_state(component)
+            provenance.validate_principal_component(component)
             require_attributed(
                 component.attribution_state,
                 operation=f"same-unit aggregation of {unit}",
