@@ -1055,3 +1055,51 @@ production pricing, or trading/execution authority.
 
 Implementation authorization was granted by the operator for the offline
 kernel only; implementation acceptance is reserved to the operator.
+
+---
+
+# CHECKPOINT — BOOK 5 HARDENING R1 (2026-09-29)
+
+Narrow single-round hardening pass over base
+`38b758c6015aaee3297d7c49f7637fd7f8917abb` on
+`agent/crypto-systems-intelligence-atlas-book5-build`:
+DECISION-POINT LIVE-STATE VALIDATION + NO-FABRICATED-PRINCIPAL SEMANTICS.
+
+Demonstrated defects repaired (failure-first):
+
+- R1-D1: PrincipalComponent attribution model_copy bypass
+  (UNKNOWN→EXACT accepted at aggregation)
+- R1-D2: unit/asset context model_copy bypass (tampered ETH accepted as USDC)
+- R1-D3: missing-quantity → fabricated "0"; flow-only 5G placeholder
+  principal (`csia:token:none` / `NONE` / fabricated claim ref)
+- R1-D4: raw-input AttributeError crash paths at lineage/5G boundaries
+- R1-D5 (+synthesis provenance closure): stripped/swapped claim-ref records
+  accepted by compose_snapshot
+
+Result:
+
+```text
+BOOK_5_HARDENING_R1 = PASS
+BOOK_5_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE =
+  PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL (PROPOSED ONLY)
+BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_6 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+```
+
+Counts: Book 5 = 115 tests (78 pre-R1 preserved; 1 defective assertion
+replaced with documentation); R1 focused = 37; total CSIA = 643
+(Book 1 = 107, Book 2 = 108, Book 3 = 83, Book 4 = 230 — unchanged).
+Sensor = 2325 PASS / 14 FAIL / 4 SKIPPED (accepted baseline, Book5-introduced
+failures = 0). Ruff PASS on R1 scope; mypy clean (43 files).
+Freeze vs `a2526e822…`: Books 1–4 mutations = 0; Sensor mutations = 0.
+
+Evidence: `CSIA_BOOK_5_HARDENING_R1_MATRIX.json`; R1 section appended to
+`CSIA_BOOK_5_IMPLEMENTATION_EVIDENCE_v0.1.md`.
+
+NEXT = OPERATOR ACCEPTANCE REVIEW OF THE HARDENED BOOK 5 KERNEL (proposed
+gate `PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL`); Book 6
+remains NOT STARTED. No further hardening rounds without a newly demonstrated
+concrete correctness defect.

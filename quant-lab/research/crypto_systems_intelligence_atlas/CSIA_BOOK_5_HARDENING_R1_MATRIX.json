@@ -1,0 +1,131 @@
+{
+  "document_id": "CSIA-B5-HARDENING-R1-MATRIX-001",
+  "title": "BOOK 5 HARDENING R1 — DECISION-POINT LIVE-STATE VALIDATION + NO-FABRICATED-PRINCIPAL SEMANTICS",
+  "date": "2026-09-29",
+  "base_head": "38b758c6015aaee3297d7c49f7637fd7f8917abb",
+  "authorization": "BOOK 5 HARDENING R1 (narrow single-round pass; no redesign; Book 6 not started)",
+  "demonstrated_defects": {
+    "R1-D1": "PrincipalComponent attribution upgradeable via model_copy; aggregate_same_unit accepted UNKNOWN->EXACT (violates B5-P29/CON-2/CON-10/ALG-11 and the 'no attribution state may increase epistemic precision beyond its Book 2 basis' directive)",
+    "R1-D2": "unit/asset context mutable via model_copy without basis revalidation; tampered ETH component accepted as USDC on aggregate_same_unit('USDC')",
+    "R1-D3": "components_for() fabricated quantity='0' for missing-quantity edges; compose_snapshot() manufactured a placeholder principal (csia:token:none / quantity 0 / unit NONE / fabricated book5-claim-base) for flow-only compositions",
+    "R1-D4": "raw post-construction dicts at add_edge/add_node/compose_snapshot crashed with AttributeError instead of typed fail-closed errors",
+    "R1-D5": "CapitalFieldSynthesis accepted model_copy-mutated records with stripped/swapped Book 2 claim refs (no provenance closure at 5G)"
+  },
+  "repairs": {
+    "R1-D1": [
+      "Book5Provenance.validate_principal_component: decision-time live-state validation (typed model, canonical attribution enum, resolvable current claim refs, ATTRIBUTION_BASIS_QUALIFIERS match for EXACT/PROPORTIONAL, decimal quantity, non-empty unit, tz-aware valid_time, context-binding agreement)",
+      "aggregate_same_unit(provenance=...) validates every participating component against live Book 2 state before arithmetic; without provenance, non-canonical (raw-injected) states still fail closed (require_canonical_state)",
+      "AttributionBasisError typed vocabulary on component path (book5_core) matching the lineage-edge path"
+    ],
+    "R1-D2": [
+      "ClaimContextBinding: typed Book 5-local binding of claim -> asset_ref/realization_ref/unit dimensions (only dimensions Book 2 can express; never claims what Book 2 cannot)",
+      "context bindings verified at decision time; unit/asset/realization model_copy swaps rejected at aggregate/components_for/compose boundaries"
+    ],
+    "R1-D3": [
+      "components_for() carries quantity=None for missing-quantity edges (explicit unknown); observed zero remains '0'; distinguishable (C4)",
+      "PrincipalComponent.quantity is now str | None (None = missing, never fabricated)",
+      "aggregate refuses attributable components with missing quantity (no fabricated zero in arithmetic)",
+      "CapitalFieldSnapshot.principal_components is PrincipalComponentSet | None; None = NO_PRINCIPAL_COMPONENT_OBSERVED gap; placeholder token/zero/claim-ref fabrication deleted from compose_snapshot"
+    ],
+    "R1-D4": [
+      "typed guards before attribute access: add_node/add_edge (LineageError), compose_snapshot positions/flows/liabilities/observed_value_facts (Book5ProvenanceError); no AttributeError crash path"
+    ],
+    "R1-D5": [
+      "CapitalFieldSynthesis(ledger, provenance=...) revalidates every canonical input (positions incl. nested components, flows, liabilities, observed value facts) against live Book 2 state at compose time",
+      "lineage_view and collapse_request forward the bound provenance to lineage decision points",
+      "components_for(provenance=...) revalidates every materialized component (Phase 10)"
+    ]
+  },
+  "gates": {
+    "COMPONENT_ATTRIBUTION_BASIS_REVALIDATION": {
+      "result": "PASS",
+      "tests": ["test_a1_unknown_component_upgraded_to_exact_rejected", "test_a2_comingled_component_upgraded_to_exact_rejected", "test_a3_proportional_with_generic_claim_rejected", "test_a4_exact_with_non_exact_claim_rejected", "test_a5_exact_with_canonical_exact_basis_passes", "test_a6_proportional_with_canonical_proportional_basis_passes", "test_a7_raw_string_state_normalized_only_after_validation", "test_unknown_to_exact_mutation_refused_at_boundary"]
+    },
+    "COMPONENT_UNIT_CONTEXT_REVALIDATION": {
+      "result": "PASS",
+      "tests": ["test_b1_eth_asset_with_swapped_usdc_unit_rejected_on_aggregate", "test_b2_realization_ref_swapped_to_unrelated_rejected", "test_b3_asset_ref_changed_while_claim_unchanged_rejected", "test_b4_coherent_context_with_canonical_claim_passes"]
+    },
+    "NO_MISSING_QUANTITY_ZERO_FABRICATION": {
+      "result": "PASS",
+      "tests": ["test_c1_missing_quantity_never_becomes_zero", "test_c2_missing_quantity_explicit_representation", "test_c3_observed_zero_is_representable", "test_c4_missing_and_observed_zero_distinguishable"]
+    },
+    "NO_5G_PLACEHOLDER_PRINCIPAL": {
+      "result": "PASS",
+      "tests": ["test_d1_flow_only_snapshot_has_no_fabricated_principal", "test_d3_no_placeholder_token_none_anywhere", "test_d4_no_fabricated_claim_refs", "test_d6_no_fake_component_to_satisfy_pydantic"]
+    },
+    "FLOW_ONLY_SNAPSHOT_INCOMPLETE_SEMANTICS": {
+      "result": "PASS",
+      "tests": ["test_d2_flow_only_snapshot_expresses_incomplete_state", "test_d5_observed_zero_distinct_from_no_observation"]
+    },
+    "RAW_EDGE_FAIL_CLOSED": {
+      "result": "PASS",
+      "tests": ["test_e1_raw_dict_edge_typed_error_not_attribute_error", "test_e2_raw_dict_node_typed_error", "test_collapse_refuses_quantity_unit_pairing_tamper"]
+    },
+    "RAW_SYNTHESIS_INPUT_FAIL_CLOSED": {
+      "result": "PASS",
+      "tests": ["test_e3_raw_position_dict_typed_error", "test_e4_nested_raw_component_typed_error", "test_e5_liability_raw_dict_typed_error", "test_e6_observed_value_raw_dict_typed_error"]
+    },
+    "SYNTHESIS_PROVENANCE_SET_CLOSURE": {
+      "result": "PASS",
+      "tests": ["test_f1_stripped_provenance_position_rejected_by_compose", "test_f2_swapped_unrelated_claim_rejected", "test_f4_position_refs_stripped_nested_remain_rejected", "test_f5_coherent_canonical_inputs_pass"]
+    },
+    "NESTED_COMPONENT_PROVENANCE_CLOSURE": {
+      "result": "PASS",
+      "tests": ["test_f3_nested_component_refs_stripped_rejected", "test_e4_nested_raw_component_typed_error"]
+    },
+    "LINEAGE_DECISION_POINT_REVALIDATION": {
+      "result": "PASS",
+      "tests": ["test_components_for_validates_live_state_with_provenance", "test_lineage_add_edge_tampered_state_rejected_at_collapse_with_provenance", "test_collapse_with_canonical_basis_passes"]
+    },
+    "PRIOR_45_STRESS_ROWS_PRESERVED": {
+      "result": "PASS",
+      "evidence": "test_book5_blocs.py STRESS_ROW_TRACEABILITY complete; 45/45 rows pass post-R1"
+    },
+    "PRIOR_T1_T14_PRESERVED": {
+      "result": "PASS",
+      "evidence": "5G synthesis tests T-1..T-14 pass post-R1 (test_book5_blocs.py)"
+    },
+    "BOOK1_FREEZE": {
+      "result": "PASS",
+      "book1_accepted_contract_mutations": 0
+    },
+    "BOOK2_FREEZE": {
+      "result": "PASS",
+      "book2_accepted_contract_mutations": 0
+    },
+    "BOOK3_FREEZE": {
+      "result": "PASS",
+      "book3_accepted_contract_mutations": 0
+    },
+    "BOOK4_FREEZE": {
+      "result": "PASS",
+      "book4_accepted_contract_mutations": 0
+    },
+    "SENSOR_BASELINE_EQUIVALENCE": {
+      "result": "PASS",
+      "sensor_result": "2325 PASS / 14 FAIL / 4 SKIPPED (identical to accepted Book 4 baseline)",
+      "book5_introduced_sensor_failures": 0
+    }
+  },
+  "test_counts": {
+    "pre_r1_book5": 78,
+    "r1_focused_total": 37,
+    "r1_failing_at_commit_1": 23,
+    "r1_passing_at_commit_1": 12,
+    "post_r1_book5_total": 115,
+    "prior_test_modifications": [
+      "test_unknown_to_exact_mutation_refused_at_boundary (test_book5_adversarial.py): assertion replaced — previously asserted the DEFECT (aggregate succeeded post model_copy EXACT upgrade); now the same boundary with provenance refuses; documented in test docstring"
+    ],
+    "total_csia": 643,
+    "book1": 107,
+    "book2": 108,
+    "book3": 83,
+    "book4": 230,
+    "book5": 115
+  },
+  "quality": {
+    "ruff_r1_scope": "PASS (all R1-touched files clean; 9 pre-existing findings in test_book5_adversarial.py unchanged from baseline, out of R1 scope per no-unrelated-refactor discipline)",
+    "mypy": "PASS: no issues found in 43 source files"
+  },
+  "constraint": "BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED; BOOK_6 = NOT_STARTED; LIVE_ACQUISITION_AUTHORITY = FALSE"
+}

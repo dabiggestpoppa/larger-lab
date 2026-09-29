@@ -93,3 +93,91 @@ All 45 ratified stress rows are mapped row → test → assertion in
 PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL = PROPOSED
 The implementation agent does NOT self-accept. Operator review required.
 ```
+
+---
+
+# HARDENING R1 — LIVE-STATE VALIDATION + NO-FABRICATED-PRINCIPAL SEMANTICS (2026-09-29)
+
+Narrow single-round hardening pass over base `38b758c6015aaee3297d7c49f7637fd7f8917abb`.
+No redesign; no Book 6; no live acquisition.
+
+## Demonstrated defects (all reproduced failure-first, commit `651c988a3`)
+
+- **R1-D1** — `PrincipalComponent` attribution upgradeable via `model_copy`:
+  UNKNOWN→EXACT survived into `aggregate_same_unit`. Violated B5-P29, CON-2,
+  CON-10, ALG-11, and the directive "no attribution state may increase
+  epistemic precision beyond its Book 2 basis". (A1–A7)
+- **R1-D2** — unit/asset context mutated via `model_copy` without basis
+  revalidation: a tampered ETH component was accepted as USDC on
+  `aggregate_same_unit("USDC")`. (B1–B4)
+- **R1-D3** — `components_for()` fabricated `quantity="0"` for edges with no
+  evidenced quantity, and flow-only `compose_snapshot()` manufactured a
+  placeholder principal (`csia:token:none` / `0` / `NONE` / fabricated
+  `book5-claim-base`). UNKNOWN != ZERO; no missing-input fabrication. (C1–C4, D1–D6)
+- **R1-D4** — raw post-construction dicts at `add_edge`/`add_node`/
+  `compose_snapshot` crashed with `AttributeError` — not a fail-closed class. (E1–E6)
+- **R1-D5** — 5G composition accepted `model_copy`-mutated records with
+  stripped or swapped Book 2 claim refs (no provenance closure at 5G). (F1–F5)
+
+## Repairs
+
+- `Book5Provenance.validate_principal_component` — decision-time live-state
+  component validation (typed model, canonical attribution enum, resolvable
+  current claims, `ATTRIBUTION_BASIS_QUALIFIERS` match for EXACT/PROPORTIONAL,
+  decimal quantity, non-empty unit, tz-aware valid time, context bindings).
+- `ClaimContextBinding` — typed Book 5-local claim→(asset_ref, realization_ref,
+  unit) binding; verifies exactly the dimensions Book 2 can express; claims
+  nothing Book 2 cannot.
+- `aggregate_same_unit(provenance=...)` seals arithmetic to live Book 2 basis;
+  raw-injected states fail closed even without provenance
+  (`require_canonical_state`). `AttributionBasisError` on the component path.
+- `components_for()` carries `quantity=None` for missing quantities (explicit
+  unknown, distinguishable from evidenced `"0"`); aggregation refuses
+  attributable components without quantity.
+- `CapitalFieldSnapshot.principal_components: PrincipalComponentSet | None` —
+  `None` carries an explicit `NO_PRINCIPAL_COMPONENT_OBSERVED` gap; the
+  placeholder token/zero/claim-ref fabrication is deleted.
+- Typed fail-closed guards before attribute access on `add_node`, `add_edge`,
+  and all `compose_snapshot` input families (positions, flows, liabilities,
+  observed value facts).
+- `CapitalFieldSynthesis(ledger, provenance=...)` revalidates every input
+  (including nested components) at compose time; `lineage_view` and
+  `collapse_request` forward provenance to lineage decision points;
+  `components_for(provenance=...)` revalidates materialized components (Phase 10).
+
+## Evidence
+
+- R1 focused: 37 tests, 23 failing at the failure-first commit.
+- Prior Book 5 suite: 78 preserved; one defective assertion replaced with
+  documentation (`test_unknown_to_exact_mutation_refused_at_boundary` had
+  asserted the defect itself).
+- Post-R1: Book 5 = 115; total CSIA = 643 (Book 1 = 107, Book 2 = 108,
+  Book 3 = 83, Book 4 = 230 — all unchanged).
+- Sensor: 2325 PASS / 14 FAIL / 4 SKIPPED — identical to the accepted baseline;
+  Book5-introduced Sensor failures = 0.
+- Ruff: PASS on all R1-touched files (9 pre-existing findings in
+  `test_book5_adversarial.py` unchanged from baseline — out of R1 scope).
+- mypy: no issues in 43 source files.
+- Freeze vs `a2526e822…`: only Book 5 modules, Book 5 tests, and append-only
+  CSIA evidence/ledger files differ. Books 1–4 mutations = 0; Sensor mutations = 0.
+
+## Status
+
+```text
+BOOK_5_HARDENING_R1 = PASS
+BOOK_5_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL (unchanged, still PROPOSED)
+BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_6 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+```
+
+Another hardening round (R2) is NOT started: it requires a newly demonstrated
+concrete correctness defect.
+
+## Limitations (unchanged, still explicit)
+
+Offline deterministic kernel only — no live acquisition, RPC, CEX feeds,
+persistent DB, graph DB, production scheduler, Book 6 valuation, production
+pricing, or trading/execution authority.
