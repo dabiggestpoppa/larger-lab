@@ -17,19 +17,15 @@ Mechanical doctrine:
 from __future__ import annotations
 
 from enum import Enum
-from typing import Final
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .book5_core import (
-    AttributionState,
     EconomicLocation,
-    EconomicSite,
-    PrincipalComponent,
     PrincipalComponentSet,
 )
-from .book5_lineage import DebtLiability, RedemptionClaim, ReserveLiability
-from .book5_provenance import Book5ProvenanceError, require_str_hashable
+from .book5_lineage import DebtLiability
+from .book5_provenance import Book5ProvenanceError
 from .temporal import Timestamp, UnknownBound
 
 

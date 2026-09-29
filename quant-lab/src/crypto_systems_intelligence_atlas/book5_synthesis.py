@@ -17,7 +17,6 @@ by construction: this module contains no path that mints canonical records.
 
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -26,7 +25,6 @@ from .book5_core import (
     AttributionState,
     PrincipalComponent,
     PrincipalComponentSet,
-    require_attributed,
 )
 from .book5_lineage import (
     CapitalPrincipalLineageGraph,
@@ -238,7 +236,7 @@ class CapitalFieldSynthesis:
         input_refs = tuple(
             [p.position_id for p in positions]
             + [f.flow_id for f in flows]
-            + [l.liability_id for l in liabilities]
+            + [liab.liability_id for liab in liabilities]
             + [o.fact_id for o in observed_value_facts]
         )
         return self._snapshot(
@@ -263,7 +261,7 @@ class CapitalFieldSynthesis:
             valid_time=valid_time,
             observed_at=observed_at,
             gaps=tuple(gaps),
-            liability_refs=tuple(l.liability_id for l in liabilities),
+            liability_refs=tuple(liab.liability_id for liab in liabilities),
             observed_value_fact_refs=tuple(o.fact_id for o in observed_value_facts),
         )
 

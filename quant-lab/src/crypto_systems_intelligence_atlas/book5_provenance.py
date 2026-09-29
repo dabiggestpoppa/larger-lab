@@ -8,7 +8,6 @@ Constitution v0.2 §6/§13; ratified Book 5 plan v0.3 "Book 2 dependence").
 
 from __future__ import annotations
 
-from typing import Hashable
 
 from .claims import Claim, ClaimStore, can_promote_to_graph
 from .dependency_provenance import require_str_hashable

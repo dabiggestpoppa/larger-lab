@@ -27,6 +27,7 @@ from crypto_systems_intelligence_atlas.book5_lineage import (
 )
 from crypto_systems_intelligence_atlas.book5_provenance import Book5Provenance
 from crypto_systems_intelligence_atlas.claims import (
+    Book2ClaimState,
     Claim,
     ClaimStore,
     Methodology,
@@ -78,7 +79,7 @@ def make_claim(
     *,
     evidence_ref: str,
     qualifier: str | None = ECONOMICS_QUALIFIER,
-    state: object = None,
+    state: "Book2ClaimState | None" = None,
 ) -> Claim:
     from crypto_systems_intelligence_atlas.claims import ClaimState
 
@@ -148,10 +149,9 @@ def add_claim(
     provenance: Book5Provenance,
     tag: str,
     *,
-    state: object = None,
+    state: "Book2ClaimState | None" = None,
     with_evidence: bool = True,
 ) -> str:
-    from crypto_systems_intelligence_atlas.claims import ClaimState
 
     claim_id = f"book5-claim-{tag}"
     evidence_ref = make_evidence(
