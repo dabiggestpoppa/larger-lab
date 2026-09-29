@@ -32,6 +32,7 @@ from .book5_lineage import (
     VALUATION_NOT_AUTHORIZED,
 )
 from .book5_provenance import Book5Provenance, Book5ProvenanceError
+from .book5_registry import Book5CanonicalRecordRegistry
 from .book5_records import (
     CapitalFlow,
     CapitalPosition,
@@ -178,6 +179,7 @@ class CapitalFieldSynthesis:
         self,
         provenance: Book5Provenance,
         ledger: SynthesisWriteLedger | None = None,
+        registry: Book5CanonicalRecordRegistry | None = None,
     ) -> None:
         if provenance is None:  # explicit None fails closed (R2-D1B)
             raise Book5ProvenanceError(
@@ -187,6 +189,10 @@ class CapitalFieldSynthesis:
             )
         self.provenance = provenance
         self.ledger = ledger or SynthesisWriteLedger()
+        # R3 Phase 8: the canonical record registry binds at the DERIVED-VIEW
+        # boundary — compose_path/topology_view REQUIRE it (explicit None is
+        # refused there). NO ARBITRARY STRING -> DERIVED 5G AUTHORITY.
+        self.registry = registry
 
     # -- INV-5G-2/3 helpers ------------------------------------------------
 
@@ -424,9 +430,43 @@ class CapitalFieldSynthesis:
         valid_time: Timestamp | UnknownBound,
         observed_at: Timestamp,
         gaps: tuple[Gap, ...] = (),
+        registry: Book5CanonicalRecordRegistry,
     ) -> CapitalFieldPath:
+        """Compose a derived path over canonical record pointers (R3-D1 seal).
+
+        Phase 8/9 reference closure: EVERY stage ref must resolve through the
+        canonical Book 5 record registry as a position or transformation
+        record. An unknown ref is REJECTED (UNKNOWN), a registered record of
+        another kind is REJECTED (WRONG-KIND), a duplicated ref is REJECTED
+        (no ratified semantics allow repeated stages — a repeat fakes a
+        multi-stage path the canonical records do not assert). Path order is
+        preserved exactly as given; semantic gaps are carried only as
+        explicit ``Gap`` entries — never as a fabricated stage ref, and an
+        unknown stage is never represented as a ref at all
+        (NO PATH WITH UNRESOLVED CANONICAL REF).
+        """
+
+        if registry is None:  # explicit None fails closed (R3 Phase 8)
+            raise Book5ProvenanceError(
+                "compose_path requires an explicit canonical record registry; "
+                "a path whose stages cannot be proven canonical is not a "
+                "derived artifact"
+            )
         if len(stage_record_refs) == 0:
             raise Book5ProvenanceError("path requires stage record refs")
+        if len(set(stage_record_refs)) != len(stage_record_refs):
+            raise Book5ProvenanceError(
+                "path stages must be unique; a repeated stage ref fakes a "
+                "multi-stage path the canonical records do not assert"
+            )
+        for ref in stage_record_refs:
+            resolved = registry.resolve(ref, expected_kind="position")
+            if resolved.record_kind != "position":
+                raise Book5ProvenanceError(
+                    f"path stage {ref!r} is a canonical "
+                    f"{resolved.record_kind} record; path stages must be "
+                    "position records (WRONG-KIND)"
+                )
         self.ledger.record_composition()
         return CapitalFieldPath(
             path_id=path_id,
@@ -478,9 +518,70 @@ class CapitalFieldSynthesis:
         valid_time: Timestamp | UnknownBound,
         observed_at: Timestamp,
         gaps: tuple[Gap, ...] = (),
+        registry: Book5CanonicalRecordRegistry,
     ) -> CapitalTopologyView:
+        """Compose a derived topology view over canonical pointers (R3-D2).
+
+        Phase 8/10 reference closure: EVERY node ref must resolve through the
+        canonical registry (any kind except flow — a flow is an edge, not a
+        node), and EVERY edge_flow_ref must resolve as a canonical flow
+        record. Nodes are unique; edges are unique. For each edge flow whose
+        canonical record asserts position endpoints (from_position/
+        to_position), the endpoint ref must itself resolve in the registry
+        (an unresolved canonical ref is REJECTED); when the endpoint is
+        registered but NOT represented in the node set, the omission is
+        carried as an explicit ``Gap`` — never a fabricated node
+        (NO FAKE TOPOLOGY NODE; incomplete truth stays incomplete).
+        """
+
+        if registry is None:  # explicit None fails closed (R3 Phase 8)
+            raise Book5ProvenanceError(
+                "topology_view requires an explicit canonical record registry; "
+                "a topology whose nodes and edges cannot be proven canonical "
+                "is not a derived artifact"
+            )
         if not node_record_refs:
             raise Book5ProvenanceError("topology view requires node record refs")
+        if len(set(node_record_refs)) != len(node_record_refs):
+            raise Book5ProvenanceError(
+                "topology nodes must be unique; a duplicated node ref fakes "
+                "fan-out the canonical records do not assert"
+            )
+        node_set = set(node_record_refs)
+        for ref in node_record_refs:
+            resolved = registry.resolve(ref)
+            if resolved.record_kind == "flow":
+                raise Book5ProvenanceError(
+                    f"topology node {ref!r} is a canonical flow record; "
+                    "flows are edges, not nodes (WRONG-KIND)"
+                )
+        if len(set(edge_flow_refs)) != len(edge_flow_refs):
+            raise Book5ProvenanceError(
+                "topology edge flow refs must be unique; a repeated edge "
+                "fakes connectivity the canonical records do not assert"
+            )
+        computed_gaps: list[Gap] = list(gaps)
+        for ref in edge_flow_refs:
+            registry.resolve(ref, expected_kind="flow")
+            flow = registry.registered_record(ref)
+            for endpoint_attr in (
+                "from_position",
+                "to_position",
+            ):
+                endpoint_ref = getattr(flow, endpoint_attr, None)
+                if endpoint_ref is None:
+                    continue
+                registry.resolve(endpoint_ref, expected_kind="position")
+                if endpoint_ref not in node_set:
+                    computed_gaps.append(
+                        Gap(
+                            missing_input_ref=endpoint_ref,
+                            reason=(
+                                f"FLOW_ENDPOINT_NOT_IN_TOPOLOGY ({endpoint_attr} "
+                                f"of flow {ref})"
+                            ),
+                        )
+                    )
         self.ledger.record_composition()
         return CapitalTopologyView(
             view_id=view_id,
@@ -489,7 +590,7 @@ class CapitalFieldSynthesis:
             methodology_id="5g-topology-view",
             valid_time=valid_time,
             observed_at=observed_at,
-            gaps=gaps,
+            gaps=tuple(computed_gaps),
         )
 
     # -- collapse / valuation ----------------------------------------------

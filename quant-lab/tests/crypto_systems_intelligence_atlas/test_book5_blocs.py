@@ -603,8 +603,21 @@ def test_5g_canonical_write_count_zero_by_construction() -> None:
         "view:w", graph=graph(contribution("l:eth", "pos:w", claim_ref=eth_ref), nodes=(lineage_node("l:eth", claim_ref=eth_ref),)),
         target_record_id="pos:w", valid_time=T0, observed_at=T0,
     )
+    # R3 Phase 8: the derived-view boundary resolves every node/edge ref
+    # through the canonical record registry — the write-count proof is
+    # unchanged (the registry registers, it never mints).
+    from crypto_systems_intelligence_atlas.book5_registry import (
+        Book5CanonicalRecordRegistry,
+    )
+
+    registry = Book5CanonicalRecordRegistry()
+    registry.register(position, provenance=prov)
     synthesis.topology_view(
-        "topo:w", node_record_refs=("pos:w",), valid_time=T0, observed_at=T0
+        "topo:w",
+        node_record_refs=("pos:w",),
+        valid_time=T0,
+        observed_at=T0,
+        registry=registry,
     )
     assert ledger.canonical_write_count == 0
     assert ledger.composition_count == 3
