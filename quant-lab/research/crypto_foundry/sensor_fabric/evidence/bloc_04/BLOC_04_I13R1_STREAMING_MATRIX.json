@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "case_id": "t0a_export_streamed",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "T0A export streams within chunk bounds",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "blobs": 2,
+        "chunk_size": 65536,
+        "max_read_bytes": 1048576
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_export_streamed",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "T0B payload export streams via public open_payload",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "max_read_bytes": 1048576,
+        "projection_payloads": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0a_restore_streamed",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "T0A restore materializes via streaming copy (no source.read_bytes)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "structural_hits": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_restore_streamed",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "T0B restore materializes via streaming copy",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "structural_hits": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_read_bytes_payload",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "a whole-object read path would violate bounded-memory doctrine (I13 original defect D)",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "physical payload read_bytes removed"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13 operator-review blockers A-E",
+  "mandate": "SENSOR-B4-I13R1",
+  "matrix": "STREAMING",
+  "measured_at_checkpoint": "I13R1",
+  "rows_fail": 1,
+  "rows_ok": 4,
+  "rows_total": 5,
+  "synthetic_counterfactuals": 1
+}

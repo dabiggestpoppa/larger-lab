@@ -2985,3 +2985,41 @@ research                                               = FROZEN
 
 No self-ratification. Historical I12/I12R1/I12R2/I12R2R1 evidence untouched
 (historical/current evidence doctrine carried forward). I14 not started.
+
+## SENSOR-B4-I13R1 — PUBLIC READ AUTHORITY + ATOMIC PUBLICATION + CLOSURE
+
+Operator source review of the PENDING_OPERATOR_REVIEW I13 found five
+blockers (A private I05/I06 internals; B non-atomic export finalization;
+C unsealed manifest/root digest semantics; D whole-object payload reads;
+E overstated parity evidence). All reproduced failure-first, repaired,
+re-measured; no historical evidence modified.
+
+Repairs: operator-authorized minimal PUBLIC read APIs (I06
+`list_segment_records`/`list_declarations`; I05 `open_payload` streaming
+physically-verified reader) with zero private-attribute access remaining
+in export.py (structural greps 0/0/0); sibling-staging + ONE atomic
+directory rename publication (destination must not pre-exist; injected
+failures leave it ABSENT); sealed non-circular MANIFEST_BODY_SHA256 +
+PACK_ROOT_SHA256 domains (persisted non-null, verifier-recomputed,
+receipt==persisted); bounded streaming for T0A/T0B export and restore;
+literal multi-policy parity evidence (blob hash sets, metadata digests,
+per-policy query digests, registry parity, DuckDB slice discovery) plus
+the explicit query-scoped revision closure law.
+
+I13 checkpoint status moves to OPERATOR_HOLD per §35 of the I13R1
+mandate; G4-11 moves to IMPLEMENTATION_HOLD / PENDING_I13R1 pending
+operator review of the I13R1 chain.
+
+```
+SENSOR-B4-I13R1
+PASS_SENSOR_B4_I13_EXPORT_BACKUP_RESTORE_SEALED        = OPERATOR_HOLD
+G4-11_EXPORT_RESTORE_GATE                              = IMPLEMENTATION_HOLD / PENDING_I13R1
+PASS_SENSOR_B4_I13R1_PUBLIC_AUTHORITY_ATOMIC_CLOSURE_SEALED = PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                             = FALSE
+recommended_next                                       = OPERATOR REVIEW OF I13 -> I13R1 CHAIN
+I14                                                    = UNAUTHORIZED
+I14+                                                   = UNAUTHORIZED
+research                                               = FROZEN
+```
+
+No self-ratification. I14 not started.

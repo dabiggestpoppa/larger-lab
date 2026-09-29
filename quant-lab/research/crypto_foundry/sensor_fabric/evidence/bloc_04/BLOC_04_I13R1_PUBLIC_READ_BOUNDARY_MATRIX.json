@@ -1,0 +1,74 @@
+{
+  "cases": [
+    {
+      "case_id": "no_private_segments_access",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "_segments_by_key absent from export.py",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "hits": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "no_private_declarations_access",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "_declarations_by_key absent from export.py",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "hits": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "no_private_projection_root_access",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "_projection_root absent from export.py",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "hits": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "public_listings_work",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "public segment/declaration listing returns durable truth deterministically",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "declarations": 0,
+        "note": "measured live in focused suite (test_public_segment_and_declaration_listing)",
+        "segment_records": 2
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "public_projection_stream_works",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "open_payload streams verified payload bytes",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "note": "digest equality proven live in focused suite"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_private_accessor",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "a private-attribute export path would be accepted by a non-structural review; structural grep now refuses",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "private access forbidden by \u00a75"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13 operator-review blockers A-E",
+  "mandate": "SENSOR-B4-I13R1",
+  "matrix": "PUBLIC_READ_BOUNDARY",
+  "measured_at_checkpoint": "I13R1",
+  "rows_fail": 1,
+  "rows_ok": 5,
+  "rows_total": 6,
+  "synthetic_counterfactuals": 1
+}

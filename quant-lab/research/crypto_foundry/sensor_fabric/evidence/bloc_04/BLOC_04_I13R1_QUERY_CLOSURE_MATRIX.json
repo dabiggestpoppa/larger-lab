@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "case_id": "closure_contains_selected_keys",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "pack revision evidence covers exactly the selected source keys",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exported_segment_keys": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ],
+        "selected_keys": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "closure_excludes_unrelated_keys",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "unselected source evidence does not leak into the bounded pack",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "leaked": [],
+        "unselected_keys": [
+          "3624c02a15ea7e5556b0f7dd9f1718334caa549b442616b42b8d273c860b41e5"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "exact_revision_bounds_future_revisions",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "EXACT_REVISION=1 closure exports no revision > 1",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exported_revision_numbers": [
+          1,
+          1
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_full_registry_dump",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "exporting every revision of every touched key regardless of policy (I13R1 \u00a73 violation) is forbidden",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "policy-scoped closure enforced"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13 operator-review blockers A-E",
+  "mandate": "SENSOR-B4-I13R1",
+  "matrix": "QUERY_CLOSURE",
+  "measured_at_checkpoint": "I13R1",
+  "rows_fail": 1,
+  "rows_ok": 3,
+  "rows_total": 4,
+  "synthetic_counterfactuals": 1
+}

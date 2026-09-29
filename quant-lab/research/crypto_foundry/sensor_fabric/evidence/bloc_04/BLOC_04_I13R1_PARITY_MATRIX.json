@@ -1,0 +1,164 @@
+{
+  "cases": [
+    {
+      "case_id": "blob_hash_set_parity_literal",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "sorted source blob hash set == sorted restored set",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_blob_hashes": [
+          "46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05",
+          "bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0"
+        ],
+        "source_blob_hashes": [
+          "46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05",
+          "bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "metadata_digest_parity_literal",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "canonical metadata digest (blobs+acquisitions) literally equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_metadata_digest": "d246351100fe9c5e48aa619ae8d7a58789f15fb3219577446fee879a864fe33c",
+        "source_metadata_digest": "d246351100fe9c5e48aa619ae8d7a58789f15fb3219577446fee879a864fe33c"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_parity_default_single_revision",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source vs restored canonical result digest literal equality",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6",
+        "source_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_parity_ALL",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source vs restored canonical result digest literal equality",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6",
+        "source_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_parity_FIRST_SEEN",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source vs restored canonical result digest literal equality",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6",
+        "source_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_parity_LATEST_SEEN",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source vs restored canonical result digest literal equality",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6",
+        "source_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_parity_EXACT_REVISION_1",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source vs restored canonical result digest literal equality",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6",
+        "source_result_digest": "48dec7f6e74d199519e0e17d2bfd168cf9c5a3bd2c921ba7332e9981bd3c5cd6"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_parity_EXACT_REVISION_2",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source vs restored canonical result digest literal equality",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_result_digest": "RAISED:NoMatchingEvidence",
+        "source_result_digest": "RAISED:NoMatchingEvidence"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "revision_registry_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "public segment/declaration records and key sets equal between source and restored registries",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_keys": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ],
+        "segment_records_equal": true,
+        "source_keys": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_discovery_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "restored rebuilt discovery sees exactly the pack slice (identity-level row counts per view)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "pack_blob_count": 2,
+        "restored_view_row_counts": {
+          "v_t0_acquisitions": 2,
+          "v_t0_blobs": 2,
+          "v_t0_gaps": 0,
+          "v_t0_partitions": 1,
+          "v_t0_projections": 0,
+          "v_t0_quarantine": 0,
+          "v_t0_revisions": 0,
+          "v_t0_storage_usage": 2
+        },
+        "source_view_row_counts": {
+          "v_t0_acquisitions": 4,
+          "v_t0_blobs": 4,
+          "v_t0_gaps": 0,
+          "v_t0_partitions": 1,
+          "v_t0_projections": 0,
+          "v_t0_quarantine": 0,
+          "v_t0_revisions": 0,
+          "v_t0_storage_usage": 2
+        }
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_count_only_parity",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "count-only parity cannot detect substitution (I13 original defect E)",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "literal digest/set equality required"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13 operator-review blockers A-E",
+  "mandate": "SENSOR-B4-I13R1",
+  "matrix": "PARITY",
+  "measured_at_checkpoint": "I13R1",
+  "rows_fail": 1,
+  "rows_ok": 10,
+  "rows_total": 11,
+  "synthetic_counterfactuals": 1
+}

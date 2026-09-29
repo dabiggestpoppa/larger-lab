@@ -1,0 +1,66 @@
+{
+  "cases": [
+    {
+      "case_id": "persisted_digests_non_null",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "both persisted digest fields non-null (defect C)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "manifest_sha256_present": true,
+        "note": "literal values embed created_at generation metadata; equality is proven by the recomputation row",
+        "pack_root_sha256_present": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "verifier_recomputes_both",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "verifier recomputes both digest domains",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "manifest_domain": "MANIFEST_BODY_SHA256",
+        "root_domain": "PACK_ROOT_SHA256"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "receipt_equals_persisted",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "receipt digest fields literally equal persisted manifest fields",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "manifest_equal": true,
+        "root_equal": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_mutation_detected",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "selection_query mutation changes the manifest body digest and refuses",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exception": "PackChecksumMismatch"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_first_record_digest",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "digest of the FIRST inventory record (I13 original defect C) detects nothing; the sealed domains detect any payload mutation",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "first-record digest removed"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13 operator-review blockers A-E",
+  "mandate": "SENSOR-B4-I13R1",
+  "matrix": "DIGEST_SEMANTICS",
+  "measured_at_checkpoint": "I13R1",
+  "rows_fail": 1,
+  "rows_ok": 4,
+  "rows_total": 5,
+  "synthetic_counterfactuals": 1
+}

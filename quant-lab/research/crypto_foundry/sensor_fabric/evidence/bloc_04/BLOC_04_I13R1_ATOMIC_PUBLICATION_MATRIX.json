@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "case_id": "failure_before_first_object",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "destination stays ABSENT on early failure",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "destination_absent": true,
+        "raised": "injected failure"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "failure_after_verify_before_rename",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "destination stays ABSENT pre-promotion failure",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "destination_absent": true,
+        "raised": "injected failure"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "preexisting_destination_refused",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "final pack root must not pre-exist",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exception": "ExportPackExists"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "successful_single_rename",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "verified staging promotes via ONE atomic rename",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "object_count": 13,
+        "staging_residue": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_child_by_child",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "child-by-child finalization exposes a partial pack on crash (I13 original defect B); single-rename law removes it",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "partial finalization no longer reachable"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13 operator-review blockers A-E",
+  "mandate": "SENSOR-B4-I13R1",
+  "matrix": "ATOMIC_PUBLICATION",
+  "measured_at_checkpoint": "I13R1",
+  "rows_fail": 1,
+  "rows_ok": 4,
+  "rows_total": 5,
+  "synthetic_counterfactuals": 1
+}
