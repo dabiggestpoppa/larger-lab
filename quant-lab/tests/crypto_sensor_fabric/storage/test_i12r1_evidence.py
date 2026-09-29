@@ -32,7 +32,6 @@ import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-import pytest
 
 _HERE = str(Path(__file__).resolve().parent)
 if _HERE not in sys.path:
@@ -49,23 +48,16 @@ FIXED = _harness.FIXED
 wired_service = _harness.wired_service
 two_revisions = _harness.two_revisions
 
-from crypto_sensor_fabric.storage.catalog import CatalogIntegrityError  # noqa: E402
 from crypto_sensor_fabric.storage.enums import (  # noqa: E402
     CoverageState,
     IntegrityState,
     RevisionPolicy,
     RevisionState,
 )
-from crypto_sensor_fabric.storage.manifests import CurrentPointerCorrupt  # noqa: E402
 from crypto_sensor_fabric.storage.models import RawEvidenceQuery  # noqa: E402
 from crypto_sensor_fabric.storage.query import (  # noqa: E402
-    LineageIncomplete,
     NoMatchingEvidence,
-    ProjectionSchemaUnsupported,
-    QueryValidationError,
     RawEvidenceQueryService,
-    RevisionAmbiguity,
-    RevisionCanonicalUnavailable,
 )
 from crypto_sensor_fabric.storage.replay import (  # noqa: E402
     ACQUISITION_ORDER,
