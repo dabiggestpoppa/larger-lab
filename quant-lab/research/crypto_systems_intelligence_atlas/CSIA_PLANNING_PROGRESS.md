@@ -836,3 +836,80 @@ meanings were inventoried from attested sources only (IACER §C2/§R3,
 Constitution v0.1 §4.3, Constitution v0.2 §4.3, roadmap Bloc 5G, frozen
 `book4_boundary.py`, Book 1 review Q15, program ledger guard language);
 no missing doctrine was inferred.
+
+---
+
+# PLANNING LEDGER — D7 CLOSED + BOOK 5 PLAN v0.1 READY FOR OPERATOR REVIEW (2026-09-29)
+
+The operator recorded D7 explicitly (session 2026-09-29): **Option B —
+Capital Field = Book 5 Bloc 5G derived synthesis**; historical Capital Field
+artifacts **ABSORBED**; 5G name **KEEP "Capital Field synthesis"**; exit
+semantics **CONFIRMED descriptive economic-topology only**. D7 was committed
+separately and pushed **before** Book 5 planning began, per directive.
+Book 5 planning then completed: the detailed plan v0.1, seven bloc contracts,
+the 25-row capital topology stress matrix, primitive matrix v0.2, the
+relationship support matrix, the 5G synthesis proof matrix, the pre-ratification
+adversarial review (20/20 PASS), and the D5CAP operator decision packet.
+
+```text
+D7 = CLOSED
+D7_OPTION = B
+D7_CLOSURE_COMMIT = 9653d8d8b3d0f01a7cf89ec0c6a86885de0cf260
+CAPITAL_FIELD = BLOC_5G_DERIVED_SYNTHESIS
+CAPITAL_FIELD_INDEPENDENT_SUBSYSTEM = FALSE
+HISTORICAL_CAPITAL_FIELD_ARTIFACTS = ABSORBED
+5G_BINDING_INVARIANTS = MAY_DERIVE_ONLY / MAY_NOT_CREATE_CANONICAL_FACTS
+5G_EXIT_SEMANTICS = DESCRIPTIVE_ECONOMIC_TOPOLOGY_ONLY
+
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_4 = FROZEN_ACCEPTED
+BOOK_4_ACCEPTED_IMPLEMENTATION_ANCHOR = 1650ba7ce30633e2e4ddf141e439a13ed948c51b
+
+BOOK_5_PLAN_VERSION = v0.1
+BOOK_5_PLANNING = COMPLETE_PENDING_OPERATOR_RATIFICATION
+BOOK_5_OPERATOR_RATIFIED = FALSE
+BOOK_5_PLAN_HOLD_TRIGGERED = FALSE
+BOOK_5_PLANNING_AUTHORITY = TRUE
+BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+
+PRE_RATIFICATION_REVIEW = 20/20 PASS
+STRUCTURAL_FAILURE_COUNT = 0
+STRESS_MATRIX_ROWS = 25 (10 promoted D7 corpus + 15 structural)
+PRIMITIVE_MATRIX_DISPOSITIONS = 20 reconciled -> 16-class planned family
+BOOK_1_RELATIONS_REUSED = 15 (zero new Book 1 relations proposed)
+BOOK_1_AMENDMENT_REQUIRED = FALSE
+BOOK_2_AMENDMENT_REQUIRED = FALSE
+BOOK_3_AMENDMENT_REQUIRED = FALSE
+BOOK_4_AMENDMENT_REQUIRED = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED = FALSE
+BOOK_1_EXTENSION_DISPOSITIONS = 4 x BOOK5_LOCAL_SUFFICIENT
+OPEN_OPERATOR_DECISION_COUNT = 3 (D5CAP-1 liability representation,
+                              D5CAP-2 principal-lineage representation,
+                              D5CAP-3 5G output shape)
+
+NEXT = OPERATOR REVIEW OF BOOK 5 PLAN v0.1
+       + OPERATOR DECISIONS D5CAP-1..D5CAP-3
+THEN = BOOK 5 PLAN RATIFICATION (operator) -> implementation authorization
+       is a separate decision
+```
+
+Book 5 planning artifacts (planning-only; non-canonical until operator
+ratification per §34.1):
+
+- `CSIA_BOOK_5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_PLAN_v0.1.md`
+- `CSIA_BOOK_5_CAPITAL_TOPOLOGY_STRESS_MATRIX_v0.1.md`
+- `CSIA_BOOK_5_ECONOMIC_PRIMITIVE_CANDIDATE_MATRIX_v0.2.md`
+- `CSIA_BOOK_5_RELATIONSHIP_SUPPORT_MATRIX_v0.1.md`
+- `CSIA_BOOK_5_CAPITAL_FIELD_SYNTHESIS_MATRIX_v0.1.md`
+- `CSIA_BOOK_5_PRE_RATIFICATION_REVIEW_v0.1.md`
+- `CSIA_BOOK_5_OPERATOR_DECISIONS_D5CAP_v0.1.md`
+- `CSIA_BOOK_5_CAPITAL_FIELD_D7_DECISION_RECORD_v0.1.md`
+
+No implementation code, no acquisition, no RPC, no database, no graph DB,
+no Sensor mutation, no Books 1–4 mutation, no 5G canonical writes, and no
+trading/execution semantics were created or authorized. The plan is NOT
+self-ratified; bloc exit gates (`PASS_CSIA_B5A..B5_CAPITAL_FIELD_V1`) require
+ratified plans and operator decisions per Constitution §33–35.
