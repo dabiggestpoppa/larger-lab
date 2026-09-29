@@ -1,0 +1,137 @@
+{
+  "matrix": "BLOC_04_I12R2_REPRESENTATION_SATISFACTION",
+  "mandate": "SENSOR-B4-I12R2",
+  "supersedes_claim": "I12R1 claims superseded by operator review: (1) the default ERROR_ON_AMBIGUITY policy executed without the I06 revision authority; (2) a query requesting T0B could silently return only T0A when no requested T0B schema matched (option-A fallback).  I12R2 measures the fail-safe repairs END-TO-END through RawEvidenceQueryService.execute().",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "T0A_only_success",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": null,
+        "blob_refs": [
+          "53cf293323a8981870c83663e4b8818dcf51ae8894d33619e6a43ebc46072e4c"
+        ],
+        "projection_refs": [],
+        "lineage_refs": []
+      },
+      "result": "OK",
+      "detail": "T0A=True/T0B=False: T0A result allowed, projection_refs empty"
+    },
+    {
+      "case": "T0B_only_success",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": null,
+        "blob_refs": [],
+        "projection_refs": [
+          "proj-1"
+        ],
+        "lineage_refs": [
+          "53cf293323a8981870c83663e4b8818dcf51ae8894d33619e6a43ebc46072e4c"
+        ]
+      },
+      "result": "OK",
+      "detail": "T0A=False/T0B=True: at least one eligible T0B projection selected with lineage provenance"
+    },
+    {
+      "case": "both_requested_success",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": null,
+        "blob_refs": [
+          "53cf293323a8981870c83663e4b8818dcf51ae8894d33619e6a43ebc46072e4c"
+        ],
+        "projection_refs": [
+          "proj-1"
+        ],
+        "lineage_refs": [
+          "53cf293323a8981870c83663e4b8818dcf51ae8894d33619e6a43ebc46072e4c"
+        ]
+      },
+      "result": "OK",
+      "detail": "T0A=True/T0B=True: BOTH representations present — no silent T0A-only fallback"
+    },
+    {
+      "case": "neither_requested_refused",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "QueryValidationError"
+      },
+      "result": "OK",
+      "detail": "T0A=False/T0B=False selects nothing — typed refusal"
+    },
+    {
+      "case": "T0B_only_schema_mismatch_refused",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "ProjectionSchemaUnsupported"
+      },
+      "result": "OK",
+      "detail": "T0B-only with a non-matching schema: typed refusal, no unrelated projection substitution"
+    },
+    {
+      "case": "both_requested_schema_mismatch_refused",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "ProjectionSchemaUnsupported"
+      },
+      "result": "OK",
+      "detail": "BLOCKER B repaired: a query requesting BOTH representations refuses typed when no eligible T0B projection matches — the valid T0A selection NEVER silently satisfies the requested T0B (the I12R1 option-A fallback is superseded)"
+    },
+    {
+      "case": "no_projection_T0B_refused",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "ProjectionSchemaUnsupported"
+      },
+      "result": "OK",
+      "detail": "include_t0b=True with a manifest carrying NO projections: typed refusal — T0A availability never substitutes for the requested T0B representation"
+    },
+    {
+      "case": "lineage_broken_refused",
+      "invariant_source": "ADVERSARIAL_MUTATION",
+      "measured": {
+        "exception": "LineageIncomplete"
+      },
+      "result": "OK",
+      "detail": "lineage incompleteness is part of the satisfaction law: a broken T0B chain fails typed BEFORE publication instead of publishing a T0A-only result"
+    },
+    {
+      "case": "T0A_only_deterministic_wired_or_not",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "wired": {
+          "exception": null,
+          "blob_refs": [
+            "53cf293323a8981870c83663e4b8818dcf51ae8894d33619e6a43ebc46072e4c"
+          ],
+          "projection_refs": [],
+          "lineage_refs": []
+        },
+        "unwired": {
+          "exception": null,
+          "blob_refs": [
+            "53cf293323a8981870c83663e4b8818dcf51ae8894d33619e6a43ebc46072e4c"
+          ],
+          "projection_refs": [],
+          "lineage_refs": []
+        }
+      },
+      "result": "OK",
+      "detail": "T0A-only selection is IDENTICAL whether the optional T0B metadata repositories are wired or absent (§14)"
+    },
+    {
+      "case": "counterfactual_T0B_silently_dropped",
+      "invariant_source": "SYNTHETIC_COUNTERFACTUAL",
+      "measured": {},
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for REPRESENTATION_SATISFACTION: deliberately invalid execution path that must evaluate FAIL; not a measured row."
+    }
+  ],
+  "summary": {
+    "rows": 10,
+    "ok": 9,
+    "fail": 1
+  }
+}

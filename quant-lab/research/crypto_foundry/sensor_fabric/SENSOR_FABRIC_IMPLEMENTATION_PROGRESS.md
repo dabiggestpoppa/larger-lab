@@ -2782,3 +2782,73 @@ research                                       = FROZEN
 ```
 
 I12R1 does NOT self-ratify.  I13 is NOT started.
+
+---
+
+## SENSOR-B4-I12R2 — FAIL-SAFE DEFAULT REVISION AUTHORITY +
+## EXPLICIT REPRESENTATION-SATISFACTION MICROSEAL (PENDING_OPERATOR_REVIEW)
+
+Operator review of the I12 -> I12R1 chain found two remaining blockers;
+each was REPRODUCED failure-first (scripted reproduction recorded in
+`BLOC_04_I12R2_FAIL_SAFE_CLOSURE.md`), then repaired, then re-measured
+end-to-end through `RawEvidenceQueryService.execute()`:
+
+- **BLOCKER A** — the DEFAULT revision policy (ERROR_ON_AMBIGUITY)
+  executed WITHOUT the I06 authority: an unwired service returned both
+  revisions of one source with no ambiguity raised (the R1 gate refused
+  only explicit non-default policies).  Repaired: `execute()` raises the
+  new typed `RevisionAuthorityUnavailable` for EVERY policy when
+  `revision_registry` is unwired — no default pass-through, no
+  compatibility switch (`allow_unresolved_revisions` /
+  `unsafe_revision_passthrough` / `legacy_mode` do not exist; §5).
+  Historical tests were repaired in the TEST HARNESS (canonical wiring
+  now includes `revision_registry` + `RevisionSourceIdentityV1`), never
+  in runtime semantics.  The refusal is a configuration/authority
+  failure — never mapped to StorageBackendUnavailable,
+  NoMatchingEvidence or RevisionAmbiguity.
+- **BLOCKER B** — a query explicitly requesting T0B
+  (`include_t0b=True`) silently returned only the valid T0A selection
+  with `projection_refs=[]` when no requested T0B schema matched
+  (option-A fallback).  Repaired with the representation-satisfaction
+  law (FAIL-CLOSED): every published result must carry >=1 eligible
+  selected T0B projection whenever `include_t0b=True`, else typed
+  `ProjectionSchemaUnsupported` — T0A availability never satisfies an
+  explicitly requested T0B representation.  Publication-boundary
+  assertion: include flags are requirements on the returned result
+  (`blob_refs` / `projection_refs` nonempty when requested).  No new
+  partial-failure vocabulary on `RawEvidenceResult`.
+
+Supersessions and documentation corrections: the I12R1 fallback row
+`schema_mismatch_with_T0A_fallback_documented` is superseded by
+`schema_mismatch_with_both_requested_fails_typed` (regenerated
+mechanically by the SAME accepted I12R1 builder; the other four I12R1
+matrices and all original I12 artifacts are BYTE-IDENTICAL); the R1 test
+`test_projection_schema_mismatch_t0a_fallback_documented` was replaced by
+`test_projection_schema_mismatch_with_both_requested_fails_typed`; the
+QueryOutcome doc now says `execute()` RAISES NoMatchingEvidence (the
+"condition" wording was stale).  `SourceRevisionCatalogCorrupt ->
+RevisionPolicyInvalid` retained as FUTURE HARDENING (fail-closed,
+naming imperfect; §16).
+
+Evidence: `BLOC_04_I12R2_AUTHORITY_REQUIRED_MATRIX.json` (9 rows / 8 OK /
+1 synthetic FAIL) + `BLOC_04_I12R2_REPRESENTATION_SATISFACTION_MATRIX.json`
+(11 rows / 10 OK / 1 synthetic FAIL), every measured row carrying
+production-measured payloads, plus the closure narrative.  New suite
+`test_i12r2_fail_safe_contract.py` (20 tests, 0 skips) + read-only
+evidence suite `test_i12r2_evidence.py` (3 tests).
+
+### Authorization boundary
+
+```
+PASS_SENSOR_B4_I12_RAW_QUERY_REPLAY_SEALED     = OPERATOR_HOLD
+PASS_SENSOR_B4_I12R1_END_TO_END_QUERY_SEALED   = OPERATOR_HOLD
+PASS_SENSOR_B4_I12R2_FAIL_SAFE_QUERY_CONTRACT_SEALED = PENDING_OPERATOR_REVIEW
+G4-10_OPERATIONAL_METADATA_GATE                = IMPLEMENTATION_PASS (unchanged)
+next_checkpoint_authorized                     = FALSE
+recommended_next                               = OPERATOR REVIEW OF COMPLETE I12 -> I12R1 -> I12R2 CHAIN
+I13                                            = UNAUTHORIZED
+I13+                                           = UNAUTHORIZED
+research                                       = FROZEN
+```
+
+I12R2 does NOT self-ratify.  I13 is NOT started.

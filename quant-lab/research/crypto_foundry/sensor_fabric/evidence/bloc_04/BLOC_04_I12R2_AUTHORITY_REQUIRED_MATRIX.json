@@ -1,0 +1,116 @@
+{
+  "matrix": "BLOC_04_I12R2_AUTHORITY_REQUIRED",
+  "mandate": "SENSOR-B4-I12R2",
+  "supersedes_claim": "I12R1 claims superseded by operator review: (1) the default ERROR_ON_AMBIGUITY policy executed without the I06 revision authority; (2) a query requesting T0B could silently return only T0A when no requested T0B schema matched (option-A fallback).  I12R2 measures the fail-safe repairs END-TO-END through RawEvidenceQueryService.execute().",
+  "generated_at": "2026-09-06T12:00:00+00:00",
+  "rows": [
+    {
+      "case": "unwired_default_refused",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAuthorityUnavailable"
+      },
+      "result": "OK",
+      "detail": "BLOCKER A repaired: the DEFAULT ERROR_ON_AMBIGUITY policy is a revision-resolution policy; an unwired service executes NO raw evidence query (previously returned both revisions with no authority consulted)"
+    },
+    {
+      "case": "unwired_first_seen_refused",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAuthorityUnavailable"
+      },
+      "result": "OK",
+      "detail": "FIRST_SEEN: the unwired refusal is the SAME typed class as the default policy — no policy bypasses the authority requirement"
+    },
+    {
+      "case": "unwired_exact_refused",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAuthorityUnavailable"
+      },
+      "result": "OK",
+      "detail": "EXACT_REVISION: the unwired refusal is the SAME typed class as the default policy — no policy bypasses the authority requirement"
+    },
+    {
+      "case": "unwired_all_refused",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAuthorityUnavailable"
+      },
+      "result": "OK",
+      "detail": "ALL: the unwired refusal is the SAME typed class as the default policy — no policy bypasses the authority requirement"
+    },
+    {
+      "case": "wired_single_default_success",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "selected_acquisition_ids": [
+          "acq-s1"
+        ],
+        "selected_blob_refs": [
+          "2b2e06d5bc86badd17fabafeffe4c9b4e2e10ce9f9c858a2b5585e433fa2c586"
+        ],
+        "revision_state": "STABLE"
+      },
+      "result": "OK",
+      "detail": "with the accepted I06 authority wired, the default policy executes the reduction through registry resolution"
+    },
+    {
+      "case": "wired_two_revision_default_ambiguity",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAmbiguity"
+      },
+      "result": "OK",
+      "detail": "two revisions under one source key + wired authority + default policy: typed epistemic ambiguity — the authority is actually CONSULTED, not merely accepted at construction"
+    },
+    {
+      "case": "limit_still_last_with_wired_authority",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAmbiguity"
+      },
+      "result": "OK",
+      "detail": "limit=1 cannot suppress the ambiguity: the authority is consulted during reduction, before ordering and truncation"
+    },
+    {
+      "case": "unwired_refusal_not_evidence_semantics",
+      "invariant_source": "PRODUCTION_BEHAVIOR",
+      "measured": {
+        "exception": "RevisionAuthorityUnavailable"
+      },
+      "result": "OK",
+      "detail": "the unwired refusal is a configuration/authority failure — never StorageBackendUnavailable, NoMatchingEvidence or RevisionAmbiguity"
+    },
+    {
+      "case": "no_compatibility_switch_exists",
+      "invariant_source": "STRUCTURAL_INTROSPECTION",
+      "measured": {
+        "constructor_params": [
+          "acquisition_repository",
+          "blob_metadata_repository",
+          "manifest_repository",
+          "projection_artifact_repository",
+          "projection_lineage_repository",
+          "revision_identity_factory",
+          "revision_registry",
+          "self"
+        ]
+      },
+      "result": "OK",
+      "detail": "the public constructor exposes NO allow_unresolved_revisions / unsafe_revision_passthrough / legacy_mode escape hatch (§5)"
+    },
+    {
+      "case": "counterfactual_unwired_default_executes",
+      "invariant_source": "SYNTHETIC_COUNTERFACTUAL",
+      "measured": {},
+      "result": "FAIL",
+      "detail": "Synthetic counterfactual for AUTHORITY_REQUIRED: deliberately invalid execution path that must evaluate FAIL; not a measured row."
+    }
+  ],
+  "summary": {
+    "rows": 10,
+    "ok": 9,
+    "fail": 1
+  }
+}
