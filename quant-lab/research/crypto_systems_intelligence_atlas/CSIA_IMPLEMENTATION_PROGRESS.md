@@ -1103,3 +1103,48 @@ NEXT = OPERATOR ACCEPTANCE REVIEW OF THE HARDENED BOOK 5 KERNEL (proposed
 gate `PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL`); Book 6
 remains NOT STARTED. No further hardening rounds without a newly demonstrated
 concrete correctness defect.
+
+---
+
+# CHECKPOINT — BOOK 5 HARDENING R2 (2026-09-29)
+
+Trigger: two demonstrated defects from external review — R2-D1 (optional
+provenance bypass) and R2-D2 (optional claim-context-binding bypass), with
+R2-D1B (synthesis optional provenance) demonstrated during reproduction.
+R1 made live Book 2 validation AVAILABLE at authority boundaries; R2 makes it
+MANDATORY at every boundary that produces an economic conclusion. That
+distinction — available vs mandatory — is the core defect R2 closes.
+
+Seals landed (failure-first; 12 R2 tests red at commit 1):
+
+1. `6c1e0a50d` — failing R2 authority-omission + context-bypass reproductions
+2. `d292f9304` — mandatory provenance at all authority boundaries
+   (aggregate_same_unit / components_for / collapse_same_unit /
+   CapitalFieldSynthesis.__init__; structural-only inspection split out as
+   `inspect_components_for`; defective adversarial success-assertion replaced)
+3. `8663298db` — evidence-bound context closure: `binding is None: continue`
+   removed; bindings must agree with AND establish asset/unit (and
+   realization) context; `basis_claim_refs` resolved through Book 2; raw
+   dicts / duplicates / detached bases / vacuous bindings refused
+4. `2041689c7` — model_copy matrix D1–D11 + synthesis attacks S1–S10
+   (only S10 passes) with the S4 position-refs-cover-nested-refs closure
+5. `8d1525172` — full Book 5 tree Ruff-clean (31 lint-only fixes incl. the
+   9 pre-existing adversarial findings; behavior unchanged; no coverage removed)
+
+Counts: Book 5 = 159 (115 prior preserved; 1 defective assertion replaced with
+the fail-closed invariant); R2 focused = 44; total CSIA = 687
+(Book 1 = 107, Book 2 = 108, Book 3 = 83, Book 4 = 230 — unchanged).
+Sensor = 2325 PASS / 14 FAIL / 4 SKIPPED (accepted baseline: i05r2 ×3 +
+i05r3 ×2 + i05r4 ×3 + i06 ×3 + i06r1 ×3 storage evidence regen;
+Book5-introduced failures = 0). Ruff PASS — full Book 5 tree clean;
+mypy clean (43 files).
+Freeze vs `a2526e822…`: Books 1–4 mutations = 0; Sensor mutations = 0.
+
+Evidence: `CSIA_BOOK_5_HARDENING_R2_MATRIX.json` (20 gates, all PASS) +
+`CSIA_BOOK_5_HARDENING_R2_MANDATORY_AUTHORITY_CONTEXT.md` + R2 section
+appended to `CSIA_BOOK_5_IMPLEMENTATION_EVIDENCE_v0.1.md`.
+
+NEXT = OPERATOR ACCEPTANCE REVIEW OF THE HARDENED BOOK 5 KERNEL (proposed
+gate `PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL`); Book 6
+remains NOT STARTED; LIVE_ACQUISITION_AUTHORITY = FALSE. No R3 without a new
+demonstrated concrete correctness defect.

@@ -181,3 +181,93 @@ concrete correctness defect.
 Offline deterministic kernel only — no live acquisition, RPC, CEX feeds,
 persistent DB, graph DB, production scheduler, Book 6 valuation, production
 pricing, or trading/execution authority.
+
+---
+
+# BOOK 5 HARDENING R2 — MANDATORY AUTHORITY CONTEXT + QUANTITATIVE CONTEXT CLOSURE (2026-09-29)
+
+## Why R2 Existed
+
+R1 made live Book 2 validation AVAILABLE at Book 5 authority boundaries — but
+only when a provenance resolver happened to be supplied. R2 exists because
+external review demonstrated that the validation was OPTIONAL at the exact
+points that produce economic conclusions:
+
+- **R2-D1** — `aggregate_same_unit(..., provenance=None)` downgraded to a bare
+  enum check: UNKNOWN→`model_copy`(EXACT) aggregated WITHOUT a resolver.
+- **R2-D1B** — `CapitalFieldSynthesis(provenance=None)` composed stripped,
+  swapped, and detached-claim positions with no live-state validation.
+- **R2-D2** — `validate_principal_component` skipped unbound claims
+  (`binding is None: continue`): with a correct exact basis, unit, asset, and
+  realization mutations all PASSED authority aggregation.
+
+That distinction — validation available vs validation mandatory — is the core
+defect. R2 makes validation MANDATORY at authority-producing boundaries and
+closes quantitative context: NO CONTEXT BINDING ≠ CONTEXT VERIFIED.
+
+## Repairs
+
+- Mandatory provenance (no default None; explicit None raises typed
+  `Book5ProvenanceError`) at `aggregate_same_unit`, `components_for`,
+  `collapse_same_unit`, and `CapitalFieldSynthesis.__init__`; structural-only
+  inspection split out as `inspect_components_for` (documented
+  non-authoritative). Phase 8 central invariant: forgetting an optional
+  argument can never change the epistemic strength of an output.
+- Context-binding closure: unbound claims fail closed; bindings must agree
+  with AND establish asset/unit context (realization too when present).
+- Evidence-bound `ClaimContextBinding`: `basis_claim_refs` resolved through
+  Book 2 at registration; raw dicts, duplicate identities, detached basis
+  claims, and vacuous bindings refused. Honest limitation: Book 2 proves the
+  basis claims canonical/current/evidenced; asset/realization/unit FIELDS are
+  a Book 5-local typed contextual interpretation (the Book 2 Proposition
+  schema cannot represent those dimensions).
+- S4 closure (found by the attack matrix): position claim refs must cover
+  nested component claim refs at compose time.
+
+## Attacks Proven
+
+- Phase 9 model_copy matrix D1–D11: every authority-producing operation
+  revalidates live state (D7 documents the quantity-magnitude boundary
+  honestly: magnitude-vs-claim verification lives in the evidence layer, not
+  Book 2's Proposition schema).
+- Phase 10 synthesis attacks S1–S10: only S10 (coherent canonical input) passes.
+
+## Evidence
+
+- R2 focused: 44 tests, 12 failing at the failure-first commit
+  (R2-D1 ×4, R2-D1B ×4, R2-D2 ×4); all red before the corresponding seal.
+- Prior Book 5 suite: 115 preserved; the defective adversarial assertion
+  (`test_unknown_to_exact_mutation_refused_at_boundary`, which asserted the
+  bypass itself) was replaced with the fail-closed invariant.
+- Post-R2: Book 5 = 159 (115 + 44 R2); total CSIA = 687 (Book 1 = 107,
+  Book 2 = 108, Book 3 = 83, Book 4 = 230 — unchanged).
+- Sensor: 2325 PASS / 14 FAIL / 4 SKIPPED — failure set = i05r2 (3) +
+  i05r3 (2) + i05r4 (3) + i06 (3) + i06r1 (3) storage evidence regen,
+  identical to the accepted baseline; Book5-introduced Sensor failures = 0.
+- Ruff: PASS — full Book 5 tree clean (31 findings fixed lint-only including
+  the 9 pre-existing adversarial findings authorized this pass; behavior
+  unchanged; no coverage removed; Books 1–4 untouched).
+- mypy: no issues in 43 source files.
+- Freeze vs `a2526e822…`: only Book 5 modules/tests and append-only CSIA
+  evidence/ledger files differ. Books 1–4 mutations = 0; Sensor mutations = 0.
+
+## Status
+
+```text
+BOOK_5_HARDENING_R2 = PASS
+BOOK_5_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL (unchanged, still PROPOSED)
+BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_6 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+```
+
+No R3 is started: another hardening round requires a newly demonstrated
+concrete correctness defect.
+
+## Limitations (unchanged, still explicit)
+
+Offline deterministic kernel only — no live acquisition, RPC, CEX feeds,
+persistent DB, graph DB, production scheduler, Book 6 valuation, production
+pricing, or trading/execution authority.

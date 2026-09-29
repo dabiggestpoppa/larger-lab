@@ -1,0 +1,138 @@
+{
+  "document_id": "CSIA-B5-HARDENING-R2-MATRIX-001",
+  "title": "BOOK 5 HARDENING R2 — MANDATORY AUTHORITY CONTEXT + QUANTITATIVE CONTEXT CLOSURE",
+  "date": "2026-09-29",
+  "base_head": "fe4e1ba7dc3367387d898c29bc1f9f62242f6669",
+  "authorization": "BOOK 5 HARDENING R2 (narrow single-round pass; triggered by two newly demonstrated defects; no redesign; Book 6 not started)",
+  "demonstrated_defects": {
+    "R2-D1": "OPTIONAL PROVENANCE BYPASS: PrincipalComponentSet.aggregate_same_unit accepted provenance=None; the boundary then ran only require_canonical_state (enum check). UNKNOWN->model_copy(EXACT)->aggregate WITHOUT provenance returned '3'; generic ECONOMIC_FACT basis marked EXACT aggregated without any Book 2 verification; an explicitly supplied None also bypassed.",
+    "R2-D1B": "SYNTHESIS OPTIONAL PROVENANCE BYPASS: CapitalFieldSynthesis was constructible with provenance=None; canonical-input validators early-returned; stripped/swapped/detached-claim positions composed without any live-state validation.",
+    "R2-D2": "OPTIONAL CLAIM-CONTEXT BINDING BYPASS: validate_principal_component skipped unbound claims (binding is None: continue). With a correct PRINCIPAL_EXACT_FACT basis, unit ETH->USDC, asset ETH->WBTC, realization chain-A->chain-B mutations and a fully contextless exact component all PASSED authority aggregation."
+  },
+  "repairs": {
+    "R2-D1": [
+      "aggregate_same_unit: provenance is a REQUIRED keyword (no default); explicit None raises typed Book5ProvenanceError; every participating component revalidated against live basis + bound context before arithmetic",
+      "components_for: provenance REQUIRED; every materialized component revalidated; structural-only access split out as inspect_components_for (documented non-authoritative, no Book 2 validation)",
+      "collapse_same_unit: provenance REQUIRED; verify_edge_basis plus per-component live validation before any total"
+    ],
+    "R2-D1B": [
+      "CapitalFieldSynthesis.__init__(provenance, ledger=None): provenance is the FIRST REQUIRED argument; explicit None raises typed Book5ProvenanceError; no default, no global singleton, no second epistemic engine",
+      "all _typed/_validate_* early-returns removed; lineage_view and collapse_request forward the mandatory resolver",
+      "S4 closure (found by the attack matrix): _validate_position additionally requires the position's claim refs to COVER every nested component's claim refs; typed nested guard runs first (R1-D4 preserved)"
+    ],
+    "R2-D2": [
+      "binding is None: continue bypass REMOVED from validate_principal_component",
+      "every claim ref of a quantitative component must carry an explicit ClaimContextBinding agreeing with the component's asset/unit/realization",
+      "the binding set must ESTABLISH asset and unit context (and realization context when realization_ref is present); an unverifiable dimension is never treated as a verified one (NO CONTEXT BINDING != CONTEXT VERIFIED)",
+      "ClaimContextBinding gains basis_claim_refs resolved through Book 2 at registration; raw dict bindings, duplicate/conflicting binding identity, and detached basis claims are refused; vacuous (dimension-less) bindings are structurally impossible",
+      "honest limitation: Book 2 proves the basis claims canonical/current/evidenced; asset/realization/unit FIELDS remain a Book 5-local typed contextual interpretation because the Book 2 Proposition schema cannot represent them"
+    ]
+  },
+  "gates": {
+    "MANDATORY_AUTHORITY_PROVENANCE": {
+      "result": "PASS",
+      "tests": ["test_a4_exact_basis_without_resolver_rejected", "test_a5_exact_basis_with_live_provenance_and_context_passes", "test_no_cross_unit_aggregation_exists"]
+    },
+    "NO_PROVENANCE_OMISSION_BYPASS": {
+      "result": "PASS",
+      "tests": ["test_a1_unknown_to_exact_without_provenance_rejected", "test_a2_comingled_to_exact_without_provenance_rejected", "test_a3_generic_economic_fact_marked_exact_without_provenance_rejected", "test_a3b_generic_economic_fact_marked_exact_with_provenance_rejected"]
+    },
+    "SYNTHESIS_REQUIRES_PROVENANCE": {
+      "result": "PASS",
+      "tests": ["test_s1_no_provenance_authority_mode_impossible", "test_b1_position_refs_stripped_synthesis_without_provenance_rejected", "test_b2_nested_component_refs_stripped_synthesis_without_provenance_rejected", "test_b3_swapped_unrelated_claim_synthesis_without_provenance_rejected", "test_b4_detached_claim_synthesis_without_resolver_rejected", "test_b5_canonical_input_with_explicit_provenance_passes"]
+    },
+    "EXACT_BASIS_WITHOUT_CONTEXT_REJECTED": {
+      "result": "PASS",
+      "tests": ["test_c4_contextless_exact_component_fails_closed", "test_s5_contextless_exact_component_rejected"]
+    },
+    "COMPONENT_ASSET_CONTEXT_CLOSURE": {
+      "result": "PASS",
+      "tests": ["test_c2_asset_mutated_while_claim_unbound_rejected", "test_c7_binding_disagreeing_asset_rejected", "test_d3_asset_mutation_refused", "test_s7_asset_mutation_rejected"]
+    },
+    "COMPONENT_UNIT_CONTEXT_CLOSURE": {
+      "result": "PASS",
+      "tests": ["test_c1_unit_mutated_while_claim_unbound_rejected", "test_c6_binding_disagreeing_unit_rejected", "test_d2_unit_mutation_refused", "test_s6_unit_mutation_rejected"]
+    },
+    "COMPONENT_REALIZATION_CONTEXT_CLOSURE": {
+      "result": "PASS",
+      "tests": ["test_c3_realization_mutated_while_claim_unbound_rejected", "test_c8_binding_disagreeing_realization_rejected", "test_d4_realization_mutation_refused", "test_s8_realization_mutation_rejected"]
+    },
+    "CONTEXT_BINDING_BOOK2_BASIS": {
+      "result": "PASS",
+      "tests": ["test_binding_basis_claims_resolve_through_book2", "test_binding_raw_dict_refused", "test_binding_vacuous_refused"]
+    },
+    "CONTEXT_BINDING_CONFLICT_REJECTION": {
+      "result": "PASS",
+      "tests": ["test_binding_duplicate_identity_refused", "test_c6_binding_disagreeing_unit_rejected", "test_c7_binding_disagreeing_asset_rejected", "test_c8_binding_disagreeing_realization_rejected", "test_d6_binding_claim_identity_swap_refused"]
+    },
+    "MODEL_COPY_CONTEXT_REVALIDATION": {
+      "result": "PASS",
+      "tests": ["test_d1_attribution_exact_unknown_cycle_refused_at_unknown_stage", "test_d2_unit_mutation_refused", "test_d3_asset_mutation_refused", "test_d4_realization_mutation_refused", "test_d5_claim_refs_stripped_refused", "test_d6_binding_claim_identity_swap_refused", "test_d7_quantity_mutation_documents_design_boundary", "test_d8_naive_valid_time_refused", "test_d9_nested_component_mutation_refused_at_compose", "test_d10_raw_string_attribution_state_refused", "test_d11_raw_binding_dict_refused_at_registration", "test_unknown_to_exact_mutation_refused_at_boundary"]
+    },
+    "R1_NO_ZERO_FABRICATION_PRESERVED": {
+      "result": "PASS",
+      "tests": ["test_c1_missing_quantity_never_becomes_zero (R1)", "test_c2_missing_quantity_explicit_representation (R1)", "test_c3_observed_zero_is_representable (R1)", "test_c4_missing_and_observed_zero_distinguishable (R1)"]
+    },
+    "R1_FLOW_ONLY_GAP_PRESERVED": {
+      "result": "PASS",
+      "tests": ["test_d1_flow_only_snapshot_has_no_fabricated_principal (R1)", "test_d2_flow_only_snapshot_expresses_incomplete_state (R1)", "test_d3_no_placeholder_token_none_anywhere (R1)", "test_d5_observed_zero_distinct_from_no_observation (R1)", "test_d6_no_fake_component_to_satisfy_pydantic (R1)"]
+    },
+    "R1_RAW_INPUT_FAIL_CLOSED_PRESERVED": {
+      "result": "PASS",
+      "tests": ["test_e1_raw_dict_edge_typed_error_not_attribute_error (R1)", "test_e2_raw_dict_node_typed_error (R1)", "test_e3_raw_position_dict_typed_error (R1)", "test_e4_nested_raw_component_typed_error (R1)", "test_e5_liability_raw_dict_typed_error (R1)", "test_e6_observed_value_raw_dict_typed_error (R1)", "test_s9_raw_position_dict_rejected (R2)"]
+    },
+    "PRIOR_45_STRESS_ROWS_PRESERVED": {
+      "result": "PASS",
+      "tests": ["test_stress_traceability_complete (blocs; rows 1-45 all mapped and green)"]
+    },
+    "PRIOR_T1_T14_PRESERVED": {
+      "result": "PASS",
+      "tests": ["test_5g_heterogeneous_vector_preserved_never_scalar", "test_5g_same_unit_collapse_permitted", "test_5g_snapshot_propagates_unknown_not_zero_fill", "test_5g_snapshot_carries_methodology_inputs_and_derived_mark", "test_5g_canonical_write_count_zero_by_construction", "test_5g_observed_value_fact_display_never_conversion", "test_5g_snapshot_replay_consistency", "test_5g_composition_requires_canonical_inputs", "test_5g_valuation_request_not_authorized"]
+    },
+    "BOOK1_FREEZE": {
+      "result": "PASS",
+      "tests": ["git diff a2526e822..HEAD: zero Book 1 file mutations; Book 1 = 107 tests passing"]
+    },
+    "BOOK2_FREEZE": {
+      "result": "PASS",
+      "tests": ["git diff a2526e822..HEAD: zero Book 2 file mutations; Book 2 = 108 tests passing"]
+    },
+    "BOOK3_FREEZE": {
+      "result": "PASS",
+      "tests": ["git diff a2526e822..HEAD: zero Book 3 file mutations; Book 3 = 83 tests passing"]
+    },
+    "BOOK4_FREEZE": {
+      "result": "PASS",
+      "tests": ["git diff a2526e822..HEAD: zero Book 4 file mutations; Book 4 = 230 tests passing"]
+    },
+    "SENSOR_BASELINE_EQUIVALENCE": {
+      "result": "PASS",
+      "tests": ["2325 PASS / 14 FAIL / 4 SKIPPED; failure set = i05r2/i05r3/i05r4/i06/i06r1 storage evidence regen (3+2+3+3+3), identical to accepted baseline; BOOK5_INTRODUCED_SENSOR_FAILURES = 0"]
+    }
+  },
+  "counts": {
+    "book1": 107,
+    "book2": 108,
+    "book3": 83,
+    "book4": 230,
+    "book5_prior": 115,
+    "book5_r2_focused": 44,
+    "book5_total": 159,
+    "csia_total": 687,
+    "sensor_pass": 2325,
+    "sensor_fail": 14,
+    "sensor_skipped": 4,
+    "book5_introduced_sensor_failures": 0
+  },
+  "quality": {
+    "ruff": "PASS — full Book 5 tree (6 source modules + 5 test modules) clean; 31 findings fixed lint-only including the 9 pre-existing adversarial findings; behavior unchanged; Books 1-4 untouched",
+    "mypy": "PASS — no issues in 43 source files"
+  },
+  "commit_chain": [
+    "6c1e0a50d test(book5-r2): failing authority-omission + context-bypass reproductions",
+    "d292f9304 feat(book5-r2): mandatory provenance at all authority boundaries (R2-D1/D1B)",
+    "8663298db feat(book5-r2): evidence-bound context closure — no binding-is-None bypass (R2-D2)",
+    "2041689c7 test(book5-r2): model_copy matrix D1-D11 + synthesis attacks S1-S10 with S4 coverage closure",
+    "8d1525172 style(book5-r2): full Book 5 tree Ruff-clean (lint-only, behavior unchanged)"
+  ]
+}
