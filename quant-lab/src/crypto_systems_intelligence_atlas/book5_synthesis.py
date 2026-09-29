@@ -17,7 +17,7 @@ by construction: this module contains no path that mints canonical records.
 
 from __future__ import annotations
 
-from typing import Final, Literal
+from typing import Final, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -31,7 +31,7 @@ from .book5_lineage import (
     DebtLiability,
     VALUATION_NOT_AUTHORIZED,
 )
-from .book5_provenance import Book5ProvenanceError
+from .book5_provenance import Book5Provenance, Book5ProvenanceError
 from .book5_records import (
     CapitalFlow,
     CapitalPosition,
@@ -173,7 +173,7 @@ class CapitalFieldSynthesis:
         self,
         ledger: SynthesisWriteLedger | None = None,
         *,
-        provenance: object = None,
+        provenance: Book5Provenance | None = None,
     ) -> None:
         self.ledger = ledger or SynthesisWriteLedger()
         self.provenance = provenance
@@ -194,6 +194,7 @@ class CapitalFieldSynthesis:
     def _validate_position(self, position: object) -> None:
         from .book5_records import CapitalPosition as _Position
 
+        position = cast(_Position, position)
         self._typed(position, _Position, role="position")
         if self.provenance is None:
             return
@@ -204,6 +205,7 @@ class CapitalFieldSynthesis:
     def _validate_flow(self, flow: object) -> None:
         from .book5_records import CapitalFlow as _Flow
 
+        flow = cast(_Flow, flow)
         self._typed(flow, _Flow, role="flow")
         if self.provenance is None:
             return
@@ -212,6 +214,7 @@ class CapitalFieldSynthesis:
     def _validate_liability(self, liability: object) -> None:
         from .book5_lineage import DebtLiability as _Liability
 
+        liability = cast(_Liability, liability)
         self._typed(liability, _Liability, role="liability")
         if self.provenance is None:
             return
@@ -220,6 +223,7 @@ class CapitalFieldSynthesis:
     def _validate_observed_value_fact(self, fact: object) -> None:
         from .book5_records import ObservedCommonValueFact as _Fact
 
+        fact = cast(_Fact, fact)
         self._typed(fact, _Fact, role="observed value fact")
         if self.provenance is None:
             return

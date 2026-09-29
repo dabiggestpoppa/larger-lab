@@ -15,7 +15,7 @@ R1-D5  5G composition accepts model_copy-mutated records with stripped or
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC
 
 import pytest
 
@@ -23,14 +23,11 @@ from crypto_systems_intelligence_atlas.book5_core import (
     AttributionState,
     EconomicLocation,
     LocationType,
-    PrincipalComponent,
     PrincipalComponentSet,
 )
 from crypto_systems_intelligence_atlas.book5_lineage import (
     CapitalPrincipalLineageGraph,
     LineageError,
-    PrincipalContribution,
-    PrincipalLineageNode,
     VALUATION_NOT_AUTHORIZED,
 )
 from crypto_systems_intelligence_atlas.book5_provenance import Book5ProvenanceError
@@ -38,14 +35,11 @@ from crypto_systems_intelligence_atlas.book5_records import (
     CapitalFlow,
     CapitalPosition,
     FlowType,
-    ObservedCommonValueFact,
     PositionKind,
 )
 from crypto_systems_intelligence_atlas.book5_support import (
     LATER,
     NOW,
-    add_claim,
-    claim_ref_for,
     component,
     component_set,
     contribution,
@@ -420,8 +414,6 @@ def test_d6_no_fake_component_to_satisfy_pydantic() -> None:
 
 
 def _typed_error(exc: Exception) -> bool:
-    from crypto_systems_intelligence_atlas.book5_lineage import LineageError
-    from crypto_systems_intelligence_atlas.book5_provenance import Book5ProvenanceError
 
     return isinstance(exc, (LineageError, Book5ProvenanceError))
 

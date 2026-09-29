@@ -20,7 +20,7 @@ from typing import Final
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .book5_provenance import (
-    ATTRIBUTION_BASIS_QUALIFIERS,
+    Book5Provenance,
     Book5ProvenanceError,
     require_str_hashable,
 )
@@ -274,7 +274,7 @@ class PrincipalComponentSet(BaseModel):
         unit: str,
         *,
         realization_ref: str | None = None,
-        provenance: object = None,
+        provenance: Book5Provenance | None = None,
     ) -> str:
         """Sum quantities of ONE unit under attribution laws (ALG-12).
 
@@ -307,6 +307,11 @@ class PrincipalComponentSet(BaseModel):
                 component.attribution_state,
                 operation=f"same-unit aggregation of {unit}",
             )
+            if component.quantity is None:
+                raise Book5ProvenanceError(
+                    f"attributable component in {unit} carries no quantity; "
+                    "refusing to fabricate one (UNKNOWN != ZERO)"
+                )
             try:
                 total += Decimal(component.quantity)
             except InvalidOperation as exc:

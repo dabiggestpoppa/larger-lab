@@ -158,6 +158,11 @@ class Book5Provenance:
                     )
         from decimal import Decimal, InvalidOperation
 
+        if component.quantity is None:
+            raise Book5ProvenanceError(
+                "quantitative conclusions refuse a component with missing "
+                "quantity (UNKNOWN != ZERO); supply evidence or an explicit gap"
+            )
         try:
             Decimal(component.quantity)
         except InvalidOperation as exc:
