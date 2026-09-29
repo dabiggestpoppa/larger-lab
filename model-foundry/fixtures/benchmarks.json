@@ -1,0 +1,45 @@
+{
+  "fixture": "benchmarks",
+  "noncanonical": true,
+  "canonical_oce_target": "OCE B6 Evaluation Service / evaluator freeze governance",
+  "replacement_condition": "replace when the canonical evaluator service owns protocol freeze",
+  "notes": "A fixture benchmark, not a quality claim. Six items, two required seeds, four declared dimensions.",
+  "benchmark": {
+    "benchmark_id": "RESEARCH_BENCH_V0",
+    "version": "0.1",
+    "task_class": "reasoning.short_answer",
+    "tier": "PROMOTION",
+    "status": "FROZEN",
+    "exposure_count": 2,
+    "items": [
+      {"item_id": "B-01", "task_class": "reasoning.short_answer", "expected_answer": "deterministic-A", "difficulty": "easy", "source_id": "SRC_BENCH_CORE"},
+      {"item_id": "B-02", "task_class": "reasoning.short_answer", "expected_answer": "deterministic-B", "difficulty": "easy", "source_id": "SRC_BENCH_CORE"},
+      {"item_id": "B-03", "task_class": "reasoning.short_answer", "expected_answer": "deterministic-C", "difficulty": "medium", "source_id": "SRC_BENCH_CORE"},
+      {"item_id": "B-04", "task_class": "reasoning.short_answer", "expected_answer": "deterministic-D", "difficulty": "medium", "source_id": "SRC_BENCH_CORE"},
+      {"item_id": "B-05", "task_class": "reasoning.short_answer", "expected_answer": "deterministic-E", "difficulty": "hard", "source_id": "SRC_BENCH_CORE"},
+      {"item_id": "B-06", "task_class": "reasoning.short_answer", "expected_answer": "deterministic-F", "difficulty": "hard", "source_id": "SRC_BENCH_CORE"}
+    ]
+  },
+  "protocol": {
+    "protocol_id": "PROTO_RESEARCH_BENCH_V0_V1",
+    "version": "1.0",
+    "tier": "PROMOTION",
+    "author": "foundry.evaluation.fixture",
+    "framework_lock": null,
+    "min_items_for_power": 4,
+    "required_seeds": 2,
+    "baseline_reference": "baseline://research-bench-v0/naive-retrieval",
+    "tolerance": 0.02,
+    "metrics": [
+      {"name": "accuracy", "description": "fraction of items answered correctly", "direction": "HIGHER_IS_BETTER", "reported_weight": 0.4},
+      {"name": "calibration_error", "description": "mean absolute deviation between stated confidence and correctness", "direction": "LOWER_IS_BETTER", "reported_weight": 0.2},
+      {"name": "instruction_adherence", "description": "fraction of items respecting the declared answer format", "direction": "HIGHER_IS_BETTER", "reported_weight": 0.2},
+      {"name": "refusal_precision", "description": "fraction of refusals that were appropriate", "direction": "HIGHER_IS_BETTER", "reported_weight": 0.2}
+    ],
+    "decision_rules": [
+      "a dimension may only be reported with its sample size and seed count",
+      "no dimension may be aggregated into a single master score",
+      "an improvement is only claimed when the delta exceeds the declared tolerance and the run is powered"
+    ]
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "attacks": [
+    {
+      "attack": "Foundry fixture attempts to become canonical authority",
+      "attack_id": "MF-B0-A01",
+      "detail": "NONCANONICAL_FLAG_REQUIRED: 'LocalEvidenceRegistry' must declare noncanonical=true",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Model score attempts direct capability promotion",
+      "attack_id": "MF-B0-A02",
+      "detail": "CAPABILITY_SELF_PROMOTION_REFUSED: Foundry capability evidence cannot become institutional capability truth without OCE review",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "Unauthorized",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "System-level result attempts artifact-only capability promotion",
+      "attack_id": "MF-B0-A03",
+      "detail": "SUBJECT_CREDIT_COLLAPSE_REFUSED: COGNITIVE_SYSTEM result cannot be credited as COGNITIVE_ARTIFACT",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Retrieval-only source transformed into synthetic training data",
+      "attack_id": "MF-B0-A04",
+      "detail": "Retrieval-only source transformed into synthetic training data: contained",
+      "expected": "CONTAINED",
+      "held": true,
+      "observed": "QUARANTINED",
+      "verdict": "CONTAINED"
+    },
+    {
+      "attack": "Unknown rights treated as training permission",
+      "attack_id": "MF-B0-A05",
+      "detail": "RIGHTS_BLOCKED: rights state RIGHTS_UNKNOWN does not authorize model training",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Benchmark item leakage (paraphrase) attempts a clean claim",
+      "attack_id": "MF-B0-A06",
+      "detail": "CONTAMINATION_BLOCKED: sealed confirmation result cannot be asserted at contamination grade C3_PARAPHRASE_OR_SOLUTION_OVERLAP",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Widely exposed dev benchmark relabeled SEALED",
+      "attack_id": "MF-B0-A07",
+      "detail": "TIER_SELF_UPGRADE_REFUSED: a builder cannot upgrade its own evaluation tier",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "Unauthorized",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Pretrained model with unknown corpus claims CONTROLLED_INDEPENDENT_REDISCOVERY",
+      "attack_id": "MF-B0-A08",
+      "detail": "CLAIM_CLASS_LAUNDERING_REFUSED: requested CONTROLLED_INDEPENDENT_REDISCOVERY exceeds the supported BLIND_TASK_PERFORMANCE",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Doctrine-shaped leak without CEREBUS vocabulary",
+      "attack_id": "MF-B0-A09",
+      "detail": "Doctrine-shaped leak without CEREBUS vocabulary: contained",
+      "expected": "CONTAINED",
+      "held": true,
+      "observed": "LEAK_DETECTED",
+      "verdict": "CONTAINED"
+    },
+    {
+      "attack": "High PnL attempts scientific validity bypass",
+      "attack_id": "MF-B0-A10",
+      "detail": "PNL_VALIDITY_BYPASS_REFUSED: realized PnL is not scientific validity and cannot substitute for a validity ratio",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Capability gain attempts authority expansion",
+      "attack_id": "MF-B0-A11",
+      "detail": "CAPABILITY_AUTHORITY_CONFUSION: a capability change must not change the grant set",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "Unauthorized",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Provider outage strands artifacts (single-location checkpoint)",
+      "attack_id": "MF-B0-A12",
+      "detail": "PROVIDER_LOSS_CAN_STRAND_ARTIFACTS: a material run needs at least two checkpoint locations",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Rental host attempts durable credential use",
+      "attack_id": "MF-B0-A13",
+      "detail": "RENTAL_DURABLE_AUTHORITY_REFUSED: rental compute credentials must be ephemeral and carry no durable authority",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "Unauthorized",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Recipe reliability reported from six survivors of ten runs",
+      "attack_id": "MF-B0-A14",
+      "detail": "FAILURE_LINEAGE_INCOMPLETE: reliability cannot be reported from survivors only",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Operator preference attempts to change the frozen evaluator",
+      "attack_id": "MF-B0-A15",
+      "detail": "OPERATOR_PREFERENCE_ALTERED_EVALUATOR: operator preference may set priorities and budgets, not evidence grade",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "Unauthorized",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Shared teacher/evaluator lineage presented as independence",
+      "attack_id": "MF-B0-A16",
+      "detail": "Shared teacher/evaluator lineage presented as independence: contained",
+      "expected": "CONTAINED",
+      "held": true,
+      "observed": "SHARED_LINEAGE",
+      "verdict": "CONTAINED"
+    },
+    {
+      "attack": "Underpowered experiment attempts PASS",
+      "attack_id": "MF-B0-A17",
+      "detail": "UNDERPOWERED_PASS_REFUSED: underpowered evidence may only terminate as UNDERPOWERED/INCONCLUSIVE",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Novel capability forced into the nearest taxonomy class",
+      "attack_id": "MF-B0-A18",
+      "detail": "Novel capability forced into the nearest taxonomy class: contained",
+      "expected": "CONTAINED",
+      "held": true,
+      "observed": "UNRESOLVED_CAPABILITY_PATTERN",
+      "verdict": "CONTAINED"
+    },
+    {
+      "attack": "Divergent lifecycle states coerced into one overall status",
+      "attack_id": "MF-B0-A19",
+      "detail": "LIFECYCLE_COLLAPSE_REFUSED: Foundry state machines are separate by constitution and cannot be merged",
+      "expected": "REFUSED",
+      "held": true,
+      "observed": "PolicyBlocked",
+      "verdict": "REFUSED"
+    },
+    {
+      "attack": "Temporary OCE test double without a retirement path",
+      "attack_id": "MF-B0-A20",
+      "detail": "Temporary OCE test double without a retirement path: contained",
+      "expected": "CONTAINED",
+      "held": true,
+      "observed": "ALL_FIXTURES_DECLARED_AND_REPLACEABLE",
+      "verdict": "CONTAINED"
+    }
+  ],
+  "attacks_contained": 5,
+  "attacks_failed_open": 0,
+  "attacks_held": 20,
+  "attacks_refused": 15,
+  "attacks_total": 20,
+  "block": "MF-B0",
+  "constitution_fingerprint": "sha256:0bc713f0d414309aa5095efe3998a9248deec3c902932b21ccf805fab8863420",
+  "lifecycle_machines": {
+    "benchmark": [
+      "DRAFT",
+      "VALIDATED",
+      "FROZEN",
+      "ACTIVE",
+      "DEGRADED",
+      "COMPROMISED",
+      "SATURATED",
+      "STALE",
+      "RETIRED"
+    ],
+    "capability_evidence": [
+      "UNASSESSED",
+      "MEASURED",
+      "REPRODUCED",
+      "READY_FOR_OCE_CAPABILITY_REVIEW"
+    ],
+    "cognitive_artifact": [
+      "REGISTERED",
+      "BASELINED",
+      "EXPERIMENTAL",
+      "DOMAIN_VALIDATED",
+      "DORMANT",
+      "REJECTED",
+      "REOPENED"
+    ],
+    "experiment_run": [
+      "PLANNED",
+      "FROZEN",
+      "RUNNING",
+      "COMPLETED",
+      "FAILED",
+      "CANCELLED",
+      "UNDERPOWERED",
+      "OPERATOR_HOLD"
+    ],
+    "oce_authority": [
+      "NONE"
+    ],
+    "source_role": [
+      "UNASSIGNED",
+      "TRAIN_CPT",
+      "TRAIN_SFT",
+      "TRAIN_PREFERENCE",
+      "DEV",
+      "DEV_EVAL",
+      "PUBLIC_EVAL",
+      "PROMOTION_EVAL",
+      "HIDDEN_EVAL",
+      "SEALED_CONFIRMATION",
+      "BLIND_DISCOVERY",
+      "RETRIEVAL_ONLY",
+      "QUARANTINED",
+      "EXCLUDED"
+    ]
+  },
+  "report_fingerprint": "sha256:60a9694ff3b8541564a14945e87ca6fa486d7f7605abc9a6b5c7894606bd6d0f",
+  "verdict": "PASS"
+}
