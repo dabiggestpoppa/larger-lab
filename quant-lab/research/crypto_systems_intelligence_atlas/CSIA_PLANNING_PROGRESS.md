@@ -1076,3 +1076,59 @@ operator's external-review direction within already-ratified doctrine; all
 prior plan versions and companion artifacts are preserved unmodified as
 history. No Book 5 or Book 6 implementation occurred; no self-ratification
 occurred.
+
+---
+
+# PLANNING LEDGER — BOOK 5 PLAN v0.3 RATIFIED (2026-09-29)
+
+The operator authorized the Book 5 plan v0.3 ratification review (planning
+ratification ONLY). All gates verified — lineage 25/25 commits intact with no
+history rewrite, D7/D5CAP entries canonical, grammar uncollapsed, CON-1..10,
+B5-P1..P32, ALG-1..18, valuation seam FALSE, 45 stress rows with 0 unresolved,
+synthesis T-1..T-14, pre-ratification review 30/30 PASS, upstream freeze
+intact — and the plan was ratified via `BOOK5-RATIFICATION-v0.3` in the
+Operator Decision Log.
+
+```text
+BOOK_1 = FROZEN_ACCEPTED
+BOOK_2 = FROZEN_ACCEPTED
+BOOK_3 = FROZEN_ACCEPTED
+BOOK_4 = FROZEN_ACCEPTED
+BOOK_4_ACCEPTED_IMPLEMENTATION_ANCHOR = 1650ba7ce30633e2e4ddf141e439a13ed948c51b
+
+BOOK = 5
+TITLE = CAPITAL PLUMBING AND ECONOMIC TOPOLOGY
+BOOK_5_PLAN_VERSION = v0.3
+BOOK_5_PLAN = RATIFIED
+BOOK_5_OPERATOR_RATIFIED = TRUE
+BOOK_5_PLANNING = RATIFIED
+BOOK_5_PLAN_v0.1 = SUPERSEDED (preserved unmodified)
+BOOK_5_PLAN_v0.2 = SUPERSEDED (preserved unmodified)
+RATIFICATION_RECORD = CSIA_BOOK_5_PLAN_RATIFICATION_RECORD_v0.1.md
+RATIFIED_PLAN_ANCHOR = 262625fd0 (plan v0.3 commit)
+PLANNING_HEAD_AT_REVIEW = a5930550ed316826409bb7731e3567d407fbc7d0
+D7 = RATIFIED LINEAGE / CLOSED (Option B)
+D5CAP-1 = RATIFIED / B
+D5CAP-2 = RATIFIED / A-REVISED
+D5CAP-3 = RATIFIED / A
+
+STRUCTURAL_FAILURE_COUNT = 0
+OPEN_OPERATOR_DECISION_COUNT = 0
+BOOK5_CROSS_ASSET_VALUATION_AUTHORITY = FALSE
+5G_CANONICAL_WRITE_AUTHORITY = FALSE
+BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+
+NEXT = BOOK 5 OFFLINE IMPLEMENTATION AUTHORIZATION
+       (separate operator decision — NOT granted by this checkpoint)
+```
+
+Ratification artifacts:
+
+- `CSIA_BOOK_5_PLAN_RATIFICATION_RECORD_v0.1.md`
+- `BOOK5-RATIFICATION-v0.3` entry in `CSIA_OPERATOR_DECISION_LOG.md`
+
+Ratification grants NO implementation, live acquisition, RPC, database, graph
+database, or Book 6 authority. Bloc exit gates (`PASS_CSIA_B5A..B5_CAPITAL_FIELD_V1`)
+now reference the ratified plan; their completion requires implementation-
+phase evidence after a separate implementation authorization.

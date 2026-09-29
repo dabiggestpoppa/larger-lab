@@ -931,3 +931,60 @@ DECISION_LOG_ENTRY {
   binding_commit_sha:           (assigned at commit)
 }
 ```
+
+---
+
+# BOOK 5 PLAN RATIFICATION — DECISION SESSION 2026-09-29
+
+**Decision session:** 2026-09-29 (third session). The operator authorized the
+Book 5 plan v0.3 ratification review with explicit scope: planning
+ratification ONLY — no Book 5 implementation, no live acquisition, no RPC,
+no database, no graph database, no Book 6 implementation. Implementation
+authorization remains a separate later decision. All ratification gates were
+verified before this entry was written (verification detail:
+`CSIA_BOOK_5_PLAN_RATIFICATION_RECORD_v0.1.md`).
+
+## BOOK5-RATIFICATION-v0.3 — RATIFY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  BOOK5-RATIFICATION-v0.3
+  operator_selection:           RATIFY
+  operator_wording:             "If the verification below passes, ratify:
+                                 CSIA_BOOK_5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_PLAN_v0.3.md
+                                 ... authorization is for PLANNING RATIFICATION ONLY"
+  source_packet:                operator ratification-review directive (2026-09-29)
+  ratified_plan:                CSIA_BOOK_5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_PLAN_v0.3.md
+                                (plan anchor commit 262625fd0)
+  supersedes:                   BOOK_5_PLAN v0.1 and v0.2 (both preserved
+                                unmodified as history)
+  affected_book:                BOOK 5
+  ratification_record:          CSIA_BOOK_5_PLAN_RATIFICATION_RECORD_v0.1.md
+  verification_gates:           lineage 25/25 commits intact, no history rewrite;
+                                D7 = CLOSED/B; D5CAP-1 = B; D5CAP-2 = A-REVISED;
+                                D5CAP-3 = A; grammar uncollapsed; CON-1..10;
+                                B5-P1..P32; ALG-1..18; valuation seam FALSE;
+                                45 stress rows, 0 unresolved; synthesis T-1..T-14,
+                                5G canonical writes 0, 5G cross-asset valuation 0;
+                                pre-ratification review 30/30 PASS;
+                                upstream freeze intact (Books 1–4, Constitution,
+                                Sensor: zero mutations)
+  immediate_consequence:        BOOK_5_PLAN = v0.3 RATIFIED;
+                                BOOK_5_OPERATOR_RATIFIED = TRUE;
+                                BOOK_5_PLANNING = RATIFIED;
+                                v0.1/v0.2 = SUPERSEDED (history preserved);
+                                D5CAP-1/2/3 = RATIFIED lineage;
+                                D7 = RATIFIED lineage / CLOSED
+  NOT_authorized:               Book 5 implementation; Book 6 implementation;
+                                live acquisition; RPC; database; graph database;
+                                any mutation of Books 1–4 or Sensor
+  binding_invariants:           BOOK5_CROSS_ASSET_VALUATION_AUTHORITY = FALSE;
+                                5G canonical write authority = FALSE;
+                                no self-expanding authority
+  implementation_authority:     FALSE (separate later operator decision required)
+  live_acquisition:             FALSE
+  reversibility:                Later recorded operator decision only (§5.4)
+  effective_timestamp:          2026-09-29
+  binding_commit_sha:           (assigned at ratification commit)
+}
+```
