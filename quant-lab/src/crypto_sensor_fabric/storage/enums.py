@@ -156,6 +156,43 @@ class BackupClass(_StrEnum):
     OFFSITE_VERIFIED = "OFFSITE_VERIFIED"
 
 
+class PackObjectRole(_StrEnum):
+    """SENSOR-B4-I13: role-separated deterministic pack layout (I13 §11).
+
+    Every object in an evidence pack carries exactly one role; the pack
+    directory layout is derived from these roles, never from user data.
+    """
+
+    EXPORT_MANIFEST = "EXPORT_MANIFEST"
+    QUERY_SPEC = "QUERY_SPEC"
+    BLOB = "BLOB"
+    BLOB_METADATA = "BLOB_METADATA"
+    ACQUISITION = "ACQUISITION"
+    MANIFEST = "MANIFEST"
+    CURRENT_POINTER = "CURRENT_POINTER"
+    PROJECTION = "PROJECTION"
+    PROJECTION_PAYLOAD = "PROJECTION_PAYLOAD"
+    PROJECTION_CONTEXT = "PROJECTION_CONTEXT"
+    PROJECTION_LINEAGE = "PROJECTION_LINEAGE"
+    PROJECTION_SCHEMA = "PROJECTION_SCHEMA"
+    REVISION_SEGMENTS = "REVISION_SEGMENTS"
+    REVISION_OBSERVATIONS = "REVISION_OBSERVATIONS"
+    REVISION_DECLARATIONS = "REVISION_DECLARATIONS"
+
+
+class PackChecksumDomain(_StrEnum):
+    """SENSOR-B4-I13: explicit checksum domains (I13 §17 law).
+
+    SOURCE_BYTES = SHA-256 of the exact provider-source bytes BEFORE any
+    optional local wrapper compression (EvidenceBlob.blob_sha256 semantics).
+    PACK_FILE = SHA-256 of the pack file's own stored bytes.  These domains
+    are NEVER compared with each other.
+    """
+
+    SOURCE_BYTES = "SOURCE_BYTES"
+    PACK_FILE = "PACK_FILE"
+
+
 class StorageJobStatus(_StrEnum):
     """Frozen storage-job state machine vocabulary (03 doc §8, freeze §2).
 

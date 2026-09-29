@@ -40,6 +40,8 @@ from .enums import (
     DateBasis,
     DiskPressure,
     IntegrityState,
+    PackChecksumDomain,
+    PackObjectRole,
     ProjectionState,
     RevisionPolicy,
     RevisionState,
@@ -89,6 +91,25 @@ def _validate_unique_sha256_list(values: list[str], field_name: str) -> None:
 def _validate_nonnegative_int(value: int, field_name: str) -> None:
     if value < 0:
         raise ValueError(f"{field_name} must be >= 0, got {value}")
+
+
+def _validate_pack_relative_path(value: str, field_name: str) -> None:
+    """Pack-relative portable path law (I13 §9/§11/§12): no absolute
+    paths, no traversal, no backslashes/scheme/percent-encoding tricks.
+    Format-only enforcement (structure, not user-data interpretation).
+    """
+    if "\\" in value:
+        raise ValueError(f"{field_name} must not contain backslashes: {value!r}")
+    if ":" in value:
+        raise ValueError(f"{field_name} must not contain a scheme separator: {value!r}")
+    if "%" in value:
+        raise ValueError(f"{field_name} must not contain percent-encoding: {value!r}")
+    parts = value.split("/")
+    if any(part in ("", ".", "..") for part in parts):
+        raise ValueError(
+            f"{field_name} must be a nonempty pack-relative path with no "
+            f"empty/dot/traversal components: {value!r}"
+        )
 
 
 def canonical_json_bytes(model: BaseModel) -> bytes:
@@ -803,11 +824,49 @@ class RecoveryAction(StorageModelBase):
     evidence_ref: AdapterEvidenceRef | None = None
 
 
+class ExportObjectRecord(StorageModelBase):
+    """One checksummed object inside an I13 evidence pack (frozen 04-doc
+    §18: exact blobs + projections + manifests + checksums + query spec).
+
+    Portable identity ONLY (I13 §9): ``pack_path`` is pack-relative with
+    canonical safe components; no absolute source paths, ever.
+    """
+
+    role: PackObjectRole
+    object_id: str = Field(min_length=1)
+    pack_path: str = Field(min_length=1)
+    sha256: str = Field(min_length=64, max_length=64)
+    byte_size: int = 0
+    # Which digest domain ``sha256`` measures (I13 §17 checksum-domain law):
+    # SOURCE_BYTES = exact provider-source bytes (EvidenceBlob.blob_sha256
+    # semantics); PACK_FILE = the pack file's own bytes.
+    checksum_domain: PackChecksumDomain = PackChecksumDomain.PACK_FILE
+    # Provenance/reference identity binding this object to accepted logical
+    # truth (e.g. blob_sha256, acquisition_id, partition_manifest_id,
+    # projection_id, lineage_manifest_id, schema_identity, revision key).
+    provenance_ref: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _validate_fields(self) -> ExportObjectRecord:
+        _validate_sha256_field(self.sha256, "sha256")
+        _validate_nonnegative_int(self.byte_size, "byte_size")
+        _validate_pack_relative_path(self.pack_path, "pack_path")
+        return self
+
+
 class ExportManifest(StorageModelBase):
-    """Future export contract (04 doc §15).  No copy/export behavior yet."""
+    """Export contract (04 doc §15 / §18; SENSOR-B4-I13).
+
+    I13A extension (operator-approved I13_EXPORT_MANIFEST_MODEL_GAP
+    resolution): the frozen per-object checksummed pack inventory is
+    carried by ``object_inventory``; every pre-existing field, validator
+    and semantic is UNCHANGED (backward compatible).
+    """
 
     export_id: str = Field(min_length=1)
     created_at: datetime
+    # PORTABLE identity only (I13 §9): a canonical logical identifier such
+    # as ``logical://source-lake`` — NEVER a machine filesystem path.
     source_data_root: str = Field(min_length=1)
     selection_query: RawEvidenceQuery
     blob_count: int = 0
@@ -816,10 +875,20 @@ class ExportManifest(StorageModelBase):
     manifest_sha256: str = Field(min_length=64, max_length=64)
     objects: list[str] = Field(default_factory=list)
     verification_state: IntegrityState = IntegrityState.UNVERIFIED
+    # -- SENSOR-B4-I13 (operator-approved additive extension) ---------------
+    pack_schema_version: str = Field(default="1", min_length=1)
+    # Per-object checksummed inventory (frozen 04-doc §18: exact blobs +
+    # projections + manifests + checksums + query specification).
+    object_inventory: list[ExportObjectRecord] = Field(default_factory=list)
+    # Whole-pack integrity digest over the canonical export manifest bytes
+    # (distinct domain from per-object checksums; None for legacy packs).
+    pack_root_sha256: str | None = Field(default=None, min_length=64, max_length=64)
 
     @model_validator(mode="after")
     def _validate_hash(self) -> ExportManifest:
         _validate_sha256_field(self.manifest_sha256, "manifest_sha256")
+        if self.pack_root_sha256 is not None:
+            _validate_sha256_field(self.pack_root_sha256, "pack_root_sha256")
         return self
 
     @model_validator(mode="after")
