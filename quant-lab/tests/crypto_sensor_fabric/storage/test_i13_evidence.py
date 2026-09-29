@@ -120,7 +120,8 @@ def _matrix(name: str, cases: list[dict]) -> dict:
 def _build_and_export(tmp: Path, query: RawEvidenceQuery | None = None):
     lake = build_fixture_lake(_mkdir(tmp / "src"))
     query = query or RawEvidenceQuery()
-    receipt = _exporter(lake).export_query(query, _mkdir(tmp / "pack"))
+    # I13R1 §7: the final pack root must NOT pre-exist (atomic law).
+    receipt = _exporter(lake).export_query(query, tmp / "pack")
     return lake, receipt
 
 

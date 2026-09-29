@@ -26,7 +26,6 @@ import shutil
 import sys
 from pathlib import Path
 
-import pytest
 
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
@@ -38,11 +37,9 @@ if SRC not in sys.path:
 from _sibling_import import load_sibling  # noqa: E402
 
 from crypto_sensor_fabric.storage import (  # noqa: E402
-    EvidencePackExporter,
     EvidencePackRestorer,
     EvidencePackVerifier,
     ExportPackExists,
-    PackChecksumMismatch,
     PackObjectRole,
     RawEvidenceQuery,
 )
@@ -425,7 +422,6 @@ def _measure_digest_semantics(tmp: Path) -> list[dict]:
 
 def _measure_streaming(tmp: Path) -> list[dict]:
     import builtins
-    import crypto_sensor_fabric.storage.export as exp
 
     tracker: list[int] = []
     real_open = builtins.open
@@ -610,7 +606,6 @@ def _measure_parity(tmp: Path) -> list[dict]:
 
     from crypto_sensor_fabric.storage.blob_store import LocalBlobStore
     from crypto_sensor_fabric.storage.catalog import (
-        AcquisitionRepository,
         BlobMetadataRepository,
     )
 
@@ -811,9 +806,7 @@ def _measure_query_closure(tmp: Path) -> list[dict]:
     lake = build_fixture_lake(root / "src")
     # Query selects ONLY the manifest-bound slice (acq-1/acq-2 blobs);
     # acq-3 (unselected source) must not leak unrelated revision evidence.
-    receipt = _exporter(lake).export_query(
-        RawEvidenceQuery(), root / "pack"
-    )
+    _exporter(lake).export_query(RawEvidenceQuery(), root / "pack")
     manifest = read_pack_manifest(root / "pack")
     segment_keys = {
         rec.provenance_ref
