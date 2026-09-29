@@ -221,6 +221,7 @@ from .replay import (
     RawArtifactReader,
     RawProjectionReader,
     RawReplayCursor,
+    ReplayOrder,
     RevisionResolver,
 )
 
@@ -398,6 +399,7 @@ __all__ = [
     "RawProjectionReader",
     "RawQueryError",
     "RawReplayCursor",
+    "ReplayOrder",
     "ReplayOrderUnavailable",
     "RevisionAmbiguity",
     "RevisionResolver",

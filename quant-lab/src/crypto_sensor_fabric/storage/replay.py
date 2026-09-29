@@ -50,9 +50,30 @@ from .query import (
 
 
 # ---------------------------------------------------------------------------
-# Replay ordering vocabulary (I12 §23)
+# Replay ordering vocabulary (I12 §23 / I12R1 §12-§13)
 # ---------------------------------------------------------------------------
 
+from enum import Enum
+
+
+class ReplayOrder(str, Enum):
+    """Typed replay order modes (I12R1 §12).
+
+    Subclasses ``str`` so the historical public string constants remain
+    valid inputs and comparisons (backwards compatible — no breaking
+    interface change).  Dispatch uses enum identity, so a dynamically
+    constructed equal string (``''.join(...)``), a deserialized string, or
+    the literal constant all select the SAME branch: ``order_by ==``
+    against a str-subclass enum resolves through the enum's value.
+    """
+
+    ACQUISITION_ORDER = "ACQUISITION_ORDER"
+    PROVIDER_EVENT_TIME = "PROVIDER_EVENT_TIME"
+    SOURCE_ORDER = "SOURCE_ORDER"
+
+
+# Historical public string constants (I12 §23) — unchanged, and equal to
+# their enum members for every dispatch comparison.
 ACQUISITION_ORDER = "ACQUISITION_ORDER"
 PROVIDER_EVENT_TIME = "PROVIDER_EVENT_TIME"
 SOURCE_ORDER = "SOURCE_ORDER"
@@ -63,12 +84,27 @@ _ORDER_MODES = (ACQUISITION_ORDER, PROVIDER_EVENT_TIME, SOURCE_ORDER)
 _SOURCE_ORDER_FIELDS = ("provider_sequence", "source_file_row_order", "stream_frame_sequence")
 
 
+def _coerce_order_mode(order_by: Any) -> ReplayOrder:
+    """Accept the enum, the historical string constants, or ANY equal string
+    — including dynamically constructed and deserialized ones (I12R1 §13).
+
+    No interned-string dependency: comparison is ``==``-based against the
+    str-enum values, never ``is``.  Unknown modes fail typed.
+    """
+    if isinstance(order_by, ReplayOrder):
+        return order_by
+    for member in ReplayOrder:
+        # str-subclass enum member == equal plain string (value equality).
+        if order_by == member or order_by == member.value:
+            return member
+    raise QueryValidationError(
+        f"unknown order mode {order_by!r}; expected one of {_ORDER_MODES}"
+    )
+
+
 def _validate_order_mode(order_by: str) -> str:
-    if order_by not in _ORDER_MODES:
-        raise QueryValidationError(
-            f"unknown order mode {order_by!r}; expected one of {_ORDER_MODES}"
-        )
-    return order_by
+    """Validate and normalize any accepted order-mode input (I12R1 §13)."""
+    return _coerce_order_mode(order_by).value
 
 
 # ---------------------------------------------------------------------------
@@ -482,15 +518,15 @@ class RawReplayCursor:
         self,
         result: RawEvidenceResult,
         *,
-        order_by: str = ACQUISITION_ORDER,
+        order_by: str | ReplayOrder = ACQUISITION_ORDER,
     ) -> list[AcquisitionRecord]:
-        _validate_order_mode(order_by)
+        mode = _coerce_order_mode(order_by)  # I12R1 §13: identity-safe dispatch
         records = self.acquisitions_for(result)
         if not records:
             raise ReplayOrderUnavailable(
                 "result carries no durable acquisitions to order"
             )
-        if order_by is ACQUISITION_ORDER:
+        if mode is ReplayOrder.ACQUISITION_ORDER:
             # §24: deterministic existing facts + documented tie-break.
             return sorted(
                 records,
@@ -500,7 +536,7 @@ class RawReplayCursor:
                     r.acquisition_id,
                 ),
             )
-        if order_by is PROVIDER_EVENT_TIME:
+        if mode is ReplayOrder.PROVIDER_EVENT_TIME:
             usable = [
                 r
                 for r in records
@@ -546,7 +582,7 @@ class RawReplayCursor:
         self,
         query: RawEvidenceQuery,
         *,
-        order_by: str = ACQUISITION_ORDER,
+        order_by: str | ReplayOrder = ACQUISITION_ORDER,
     ) -> list[tuple[RawEvidenceResult, list[AcquisitionRecord]]]:
         """Query + deterministic order, streaming-ready (§27).
 
@@ -568,6 +604,7 @@ __all__ = [
     "RawArtifactReader",
     "RawProjectionReader",
     "RawReplayCursor",
+    "ReplayOrder",
     "RevisionResolver",
     "SOURCE_ORDER",
 ]

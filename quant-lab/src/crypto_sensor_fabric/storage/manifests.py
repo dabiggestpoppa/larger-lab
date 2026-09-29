@@ -762,6 +762,16 @@ class PartitionManifestRepository:
         ``list_manifest_versions``.  A pointer whose manifest fragment is
         missing/dangling raises ``CurrentPointerDangling`` — inventory is
         never silently partial.
+
+        SENSOR-B4-I12R1 §14/§15 — canonical-locator proof: the enumerated
+        PHYSICAL pointer path must BE the canonical hash path for the
+        logical ``partition_key`` declared inside the file
+        (``self._pointer_path(_partition_hash(pointer.partition_key))``).
+        An alias file — a digest-shaped or malformed filename carrying a
+        duplicate of a valid canonical pointer payload — fails closed with
+        ``CurrentPointerCorrupt`` instead of enumerating the same logical
+        current manifest twice.  Returned ``partition_key`` values are
+        therefore unique by construction; there is no silent dedupe.
         """
         pointer_dir = self._pointer_dir()
         manifests: list[PartitionManifest] = []
@@ -780,6 +790,19 @@ class PartitionManifestRepository:
                     f"current pointer {path!s} unreadable: {exc}"
                 ) from exc
             pointer = PartitionCurrentPointer.from_canonical_json(text)
+            # I12R1 §15: the enumerated path must be the CANONICAL hash
+            # locator for the logical key the payload declares.  An alias
+            # (or a payload whose declared key hashes elsewhere) is corrupt
+            # inventory state, not a second truth source.
+            expected_path = self._pointer_path(_partition_hash(pointer.partition_key))
+            if path != expected_path:
+                raise CurrentPointerCorrupt(
+                    f"current pointer file {path.name!s} is not the canonical "
+                    f"locator for the partition_key it declares — expected "
+                    f"{expected_path.name!s} (I04R1 §38/§40 canonical hash "
+                    "path; duplicate alias inventory is corruption, not "
+                    "enumeration)"
+                )
             validated = self.read_current_pointer(pointer.partition_key)
             if validated is None:  # pragma: no cover - file just read
                 continue
@@ -788,6 +811,13 @@ class PartitionManifestRepository:
             key=lambda m: (m.partition_key, m.manifest_version,
                            m.partition_manifest_id)
         )
+        keys = [m.partition_key for m in manifests]
+        if len(keys) != len(set(keys)):
+            raise CurrentPointerCorrupt(
+                "current pointer enumeration produced duplicate logical "
+                "partition_keys — duplicate current state can never be "
+                "silently accepted (I12R1 §15)"
+            )
         return manifests
 
     # -- referential integrity (I04 §45/§46/§47/§68) --------------------------

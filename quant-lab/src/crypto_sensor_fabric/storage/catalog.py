@@ -691,7 +691,22 @@ class BlobMetadataRepository:
                     f"blob metadata fragment {path!s} holds "
                     f"{len(rows)} rows, expected exactly 1"
                 )
-            blobs.append(_blob_from_row(rows[0]))
+            blob = _blob_from_row(rows[0])
+            # I12R1 §17: every enumerated physical fragment must BE the
+            # canonical fragment for the logical identity it declares —
+            # an aliased copy ("alias_<sha>.NONE.parquet") duplicates
+            # logical inventory and fails closed instead.
+            if path.name != BlobStorageKey(
+                blob.blob_sha256, blob.storage_encoding
+            ).fragment_name:
+                raise CatalogIntegrityError(
+                    f"blob metadata fragment {path.name!r} is not the "
+                    f"canonical fragment name for logical identity "
+                    f"({blob.blob_sha256[:12]}..., "
+                    f"{blob.storage_encoding.value}); aliased or corrupted "
+                    "catalog family — fail closed"
+                )
+            blobs.append(blob)
         blobs.sort(key=lambda b: (b.blob_sha256, b.storage_encoding.value))
         return blobs
 
@@ -1460,7 +1475,19 @@ class AcquisitionRepository:
                 raise CatalogIntegrityError(
                     f"acquisition fragment {path!s} holds {len(rows)} rows"
                 )
-            records.append(_acquisition_from_row(rows[0]))
+            record = _acquisition_from_row(rows[0])
+            # I12R1 §17: canonical-locator proof, exactly as the blob
+            # family above — the durable fragment name IS the sha256 of
+            # the acquisition_id it declares.
+            expected = f"{hashlib.sha256(record.acquisition_id.encode('utf-8')).hexdigest()}.parquet"
+            if path.name != expected:
+                raise CatalogIntegrityError(
+                    f"acquisition fragment {path.name!r} is not the "
+                    f"canonical fragment name for acquisition_id "
+                    f"{record.acquisition_id!r}; aliased or corrupted "
+                    "catalog family — fail closed"
+                )
+            records.append(record)
         records.sort(key=lambda r: r.acquisition_id)
         return records
 
