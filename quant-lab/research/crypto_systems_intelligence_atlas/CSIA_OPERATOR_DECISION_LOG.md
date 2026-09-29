@@ -731,3 +731,87 @@ operator in the decision session. D3-1 through D3-7 were separately supplied
 explicitly for the Book 3 v0.2 reconciliation. No decision was inferred from
 silence. No default was applied automatically. No decision scope was expanded
 beyond the authorized packet.
+
+---
+
+# BOOK 5 DECISION (D7) — DECISION SESSION 2026-09-29
+
+**Decision session:** 2026-09-29. The operator supplied all four D7 selections
+explicitly — `D7-SELECT-OPTION = B`, `D7-ARTIFACT-DISPOSITION = ABSORBED`,
+`D7-5G-NAMING = KEEP "Capital Field synthesis"`,
+`D7-EXIT-SEMANTICS = CONFIRM` — via the operator D7 directive, against the
+candidate packet `CSIA_BOOK_5_CAPITAL_FIELD_OPERATOR_DECISION_PACKET_v0.1.md`.
+No decision was inferred from silence; no default was applied automatically.
+The earlier "DEFERRED DECISIONS" block above remains historical text of its
+own session; this recorded entry supersedes it for D7 per §5.4.
+
+## D7 — CAPITAL FIELD = BOOK 5 BLOC 5G DERIVED SYNTHESIS
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                    D7
+  decision:                       CAPITAL FIELD = BOOK 5 BLOC 5G DERIVED SYNTHESIS
+  operator_selection:             OPTION B
+  operator_wording:               "D7-SELECT-OPTION = B — CAPITAL FIELD =
+                                   BLOC 5G SYNTHESIS LAYER"
+  source_packet:                  CSIA_BOOK_5_CAPITAL_FIELD_OPERATOR_DECISION_PACKET_v0.1.md
+                                  (supporting recon: CSIA_BOOK_5_CAPITAL_FIELD_RECONCILIATION_v0.1.md,
+                                  CSIA_BOOK_5_ECONOMIC_PRIMITIVE_CANDIDATE_MATRIX_v0.1.md,
+                                  CSIA_BOOK_5_DOUBLE_COUNTING_STRESS_MATRIX_v0.1.md,
+                                  CSIA_BOOK_5_BOUNDARY_REVIEW_v0.1.md,
+                                  CSIA_BOOK_5_PRE_DECISION_REVIEW_v0.1.md)
+  artifact_disposition:           ABSORBED
+  5g_name:                        Capital Field synthesis (unchanged)
+  exit_semantics:                 DESCRIPTIVE ECONOMIC-TOPOLOGY EXIT ONLY
+  affected_book:                  BOOK 5
+  affected_bloc:                  5G
+  canonical_authority:            BOOK 5 BLOCS 5A–5F (CANONICAL ECONOMIC RECORDS)
+  derived_authority:              5G composition only (DERIVED CAPITAL TOPOLOGY SYNTHESIS)
+  independent_truth_authority:    NONE
+  affected_clauses:               Constitution v0.2 §4.3 reconciliation gate CLOSED for D7;
+                                  roadmap Bloc 5G interpretation fixed as derived synthesis
+  immediate_consequence:          Historical Capital Field planning text is ABSORBED into
+                                  Book 5 / Bloc 5G planning (scope incorporated; preserved
+                                  as history; no separate governance object; no separate
+                                  implementation or epistemic authority). The §4.3 gate
+                                  no longer blocks Book 5 planning.
+  binding_invariants:             5G MAY DERIVE FROM CANONICAL CAPITAL FACTS.
+                                  5G MAY NOT CREATE CANONICAL CAPITAL FACTS.
+                                  economic principal != representation !=
+                                  claim/liability != gross exposure != net exposure —
+                                  and none may be summed interchangeably.
+  exit_semantics_limits:          "exit" = a descriptive economic-topology state in
+                                  which capital leaves the modeled system boundary
+                                  (redemption, burn, off-ramp, transfer beyond the
+                                  modeled topology). It is NEVER a trade exit
+                                  recommendation, execution instruction, market-timing
+                                  state, SELL signal, or prescriptive operator guidance.
+  5G_must_not:                    create unsupported capital facts; create a second
+                                  evidence system; overwrite 5A–5F records; hide
+                                  methodology; hide constituent lineage; turn missing
+                                  data into zero; sum claims/representations naively;
+                                  become a trading signal layer.
+  5G_may:                         compose canonical 5A–5F records; build derived
+                                  capital routes/topology; preserve pointer lineage;
+                                  preserve methodology; replay historical topology;
+                                  collapse representations to economic principal only
+                                  through explicit methodology-carrying derivation;
+                                  expose descriptive economic topology.
+  epistemic_authority:            Book 2 remains the epistemic authority for all
+                                  capital facts (claim-evidence pairs; promotion
+                                  doctrine unchanged).
+  book_authority_impact:          BOOK_1_AMENDMENT_REQUIRED = FALSE
+                                  BOOK_2_AMENDMENT_REQUIRED = FALSE
+                                  BOOK_3_AMENDMENT_REQUIRED = FALSE
+                                  BOOK_4_AMENDMENT_REQUIRED = FALSE
+                                  CONSTITUTION_AMENDMENT_REQUIRED = FALSE
+  authority_state:                BOOK_5_PLANNING_AUTHORITY = TRUE
+                                  BOOK_5_IMPLEMENTATION_AUTHORITY = FALSE
+                                  LIVE_ACQUISITION_AUTHORITY = FALSE
+  reversibility:                  Reversible only by a later recorded operator
+                                  decision (§5.4); absorbed historical text remains
+                                  preserved and is never deleted or rewritten.
+  effective_timestamp:            2026-09-29 (operator D7 decision session)
+  binding_commit_sha:             (assigned at commit — see D7 closure record)
+}
+```
