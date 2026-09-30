@@ -281,34 +281,49 @@ def test_x5_withdrawn_total_link_count_law_refuses_the_legal_residue(
 
 @posix_only
 def test_x6_every_denial_leaves_the_governed_tree_byte_identical(tmp_path):
-    """x6: a refused selector is never repaired, deleted or rewritten."""
+    """x6: an admitted read and a REFUSED read both leave the governed tree
+    byte-identical. A selector is never repaired, deleted, rewritten or
+    quietly tidied - not even when the engine itself left a residue name
+    beside it."""
     promote = {"operation_phase": "promote", "exit_status": 0,
                "operation_id": OPID}
     bound = _bytes({**CLAIM, "receipt_sha256": pgrec._receipt_digest(promote)})
-    shapes = ("bound", "foreign_name", "outside_link")
+    shapes = ("residue_admitted", "foreign_name_refused",
+              "outside_link_refused")
     for shape in shapes:
         root = tmp_path / shape
         transitions, _record = _governed(root)
         claim, residue = _publisher_crash_residue(transitions, bound)
         extra = None
-        if shape == "foreign_name":
+        if shape == "foreign_name_refused":
             extra = transitions / f"{OPID}.second"
             os.link(claim, extra)
-        elif shape == "outside_link":
+        elif shape == "outside_link_refused":
             extra = root / "outside"
             os.link(claim, extra)
         before = _census(transitions)
         try:
-            snapshot = pgrec._read_selector_snapshot(OPID, str(transitions))
-            assert snapshot.present is True
-            # the exact branch is decided by ONE admitted snapshot
-            assert pgrec._valid_transition_claim(
-                OPID, "rollback", promote,
-                snapshot=snapshot) is True
-            assert pgrec._valid_transition_claim(
-                OPID, "finalize", promote,
-                snapshot=snapshot) is False
+            if extra is None:
+                snapshot = pgrec._read_selector_snapshot(OPID, str(transitions))
+                assert snapshot.present is True
+                # the exact branch is decided by ONE admitted snapshot
+                assert pgrec._valid_transition_claim(
+                    OPID, "rollback", promote,
+                    snapshot=snapshot) is True
+                assert pgrec._valid_transition_claim(
+                    OPID, "finalize", promote,
+                    snapshot=snapshot) is False
+            else:
+                with pytest.raises(pgrec._ExecutionAuthorityConflict):
+                    pgrec._read_selector_snapshot(OPID, str(transitions))
+                # and the decision law fails closed instead of guessing
+                assert pgrec._valid_transition_claim(
+                    OPID, "rollback", promote,
+                    transition_dir=str(transitions)) is False
+            # the governed tree, the claim bytes, the residue and the foreign
+            # name all survive the decision exactly as they were
             assert _census(transitions) == before
+            assert claim.read_bytes() == bound
             assert residue.is_file()
             if extra is not None:
                 assert extra.is_file()
