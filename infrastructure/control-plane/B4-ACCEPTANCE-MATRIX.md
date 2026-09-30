@@ -552,3 +552,17 @@ operator action (SonarCloud adjudication of the New Code ratings and of the
 three path-traversal hot spots; restoring or skipping the LFS smudge for
 Kilo's checkout; and merge authorization). PR #4 is NOT merged and no merge
 authority is claimed or exercised.
+**Evidence head:** `b9cc9cc5692a7a707decf3e7d044283f6c1224ac` (documentation
+only: no code, test, gate or artifact change). All five workflows SUCCESS at
+that exact head — b1 `36770063990`, b2 `36770064008`, b3 `36770064055`, b4
+`36770064134`, B1-I1R `36770071461` — with b1 again reporting 507/507 passed,
+0 skipped, `mandatory_skipped 0`, independent gate 75 PASS / 0 FAIL, 37
+manifest artifacts, `cloud_mutations 0`, `cloud_cost_state ZERO`. SonarCloud at
+that head is check run `110074790755`, COMPLETED / FAILURE, same two failed
+New Code ratings, and a THIRD distinct 50-annotation window (17 failure-level,
+33 warning-level) — which is the clearest available proof that the annotation
+surface is a sliding window and never an inventory; the gate is not called
+green at any head. Kilo at that head is check run `110073886281`, COMPLETED /
+FAILURE, the identical provider-side LFS-budget smudge failure, still an exact
+operator blocker. PR #4 is OPEN, MERGEABLE, UNSTABLE, unmerged at that head;
+`main` untouched at `7c7816f3`. The exit-gate truth above is unchanged.

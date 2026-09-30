@@ -2803,3 +2803,46 @@ are preserved verbatim and are superseded only where this section says so.
 platform conditions remain, both named exactly above — SonarCloud quality-gate
 FAILURE on New Code (unsuppressed) and Kilo Code Review FAILURE on an
 exhausted Git LFS budget. No self-ratification.**
+### Evidence-head truth (the documentation-only commit the operator reviews)
+
+The five authoritative workflows were re-run on evidence head
+`b9cc9cc5692a7a707decf3e7d044283f6c1224ac` and are SUCCESS: b1
+`36770063990`, b2 `36770064008`, b3 `36770064055`, b4 `36770064134`,
+B1-I1R `36770071461`. b1 evidence at that head: 507 collected, 507 executed,
+507 passed, **0 skipped** (`mandatory_skipped: 0`), independent gate 75 PASS /
+0 FAIL (`AUTHORITATIVE_CI`), 37 manifest artifacts, tree
+`2d302759d27613a4ab80b4c9a9d806a557b74332`, `cloud_mutations 0`,
+`cloud_cost_state ZERO`, stage `LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW`. That
+commit changes no code, no test, no gate and no artifact — only this record
+and the acceptance matrix.
+
+SonarCloud at the evidence head is check run `110074790755`: COMPLETED /
+**FAILURE**, the same two failed conditions (C Reliability and D Security on
+New Code, required ≥ A), and an annotation window of 50 again — 17
+failure-level and 33 warning-level this time — whose contents DIFFER from the
+implementation head's window: the `pg-recovery.py:1405` path-traversal hot
+spot appears again, but in place of the implementation head's two complexity
+entries at `pg-recovery.py:1174` and `:3533` it now reports
+`pg-recovery.py:2649` (complexity 29) and `pg-recovery.py:3678` (a second
+path-traversal hot spot), alongside `http_api` (61), `local_lifecycle` (41),
+`validate_engine:864` (30), `migrate._scan_migrations` (25),
+`schema_validator` (20), `pg-inventory.main` (21), two `bootstrap-local.sh`
+shellcheck entries, and `restore.sh`'s missing default case. Three different
+heads have now produced three different 50-annotation windows for the same
+repository: that is the proof that this surface is a sliding window and never
+a total, and the gate is FAILURE at every head. Nothing was suppressed,
+excluded or re-severed to change it.
+
+Kilo at the evidence head is check run `110073886281`: the same provider-side
+clone (1.89 GiB received, checkout OK up to the LFS filter) then exit 128
+smudging the same 626 MB object
+`quant-lab/.../ALT_DATA_1_ASSET_MULTISCALE_FEATURES.parquet` with the same
+"This repository exceeded its LFS budget" error. No repository-controlled
+configuration can change a provider-side clone, so this remains the exact
+operator blocker described above.
+
+PR #4 at the evidence head: OPEN, MERGEABLE, UNSTABLE, unmerged, head
+`b9cc9cc5692a7a707decf3e7d044283f6c1224ac`; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. No merge was performed or
+authorized, no history was rewritten, no LFS object was migrated or deleted,
+and recurring cost remains $0.
