@@ -1,0 +1,220 @@
+{
+  "document": "CSIA_BOOK_6_IMPLEMENTATION_MATRIX",
+  "version": "0.1",
+  "date": "2026-09-30",
+  "status": "IMPLEMENTATION_COMPLETE_PENDING_OPERATOR_REVIEW",
+  "acceptance": "NOT_SELF_ACCEPTED",
+  "planning_authority": {
+    "planning_branch": "agent/crypto-systems-intelligence-atlas-plan",
+    "book6_ratification_commit": "24659e74b4e6fc94cacdcf45f56f08cb8c958fbb",
+    "ratified_plan": "CSIA_BOOK_6_FUNDAMENTAL_MEASUREMENT_STATE_MODELING_PLAN_v0.2.md",
+    "ratified_plan_anchor": "fea27a5ea7988841dd0e30cacd35295a76a9f372",
+    "ratification_record": "CSIA_BOOK_6_PLAN_RATIFICATION_RECORD_v0.1.md",
+    "decision_basis": "CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.3.md",
+    "d6m_1": "A / BOOK6_LOCAL_DERIVED_RECORD",
+    "d6m_2": "B / SEPARATE_NORMALIZATION_RULE",
+    "d6m_3": "A / CENTRALIZED_OPERATOR_RATIFICATION",
+    "d6m_4": "A / PURPOSE_SPECIFIC_PRICE_AUTHORITY",
+    "d6m_5": "OPEN / DEFERRED_NOT_BLOCKING_PLAN_RATIFICATION"
+  },
+  "implementation_base": {
+    "branch": "agent/crypto-systems-intelligence-atlas-book6-build",
+    "worktree": "C:/Users/wifik/Desktop/larger-lab-csia-book6-build",
+    "base_commit": "5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4",
+    "base_identity": "Book 5 acceptance commit (docs-only over accepted Book 5 source anchor 50695ad4ea07b57105e71d04d4e32758849e55e3)",
+    "planning_branch_used_for_lineage": false,
+    "final_head": "6bf1e8759124e259e3607b4941c1746b6374c25b"
+  },
+  "authority_scope": {
+    "BOOK_6_IMPLEMENTATION_AUTHORITY": "TRUE / OFFLINE_KERNEL_SCOPE_ONLY",
+    "LIVE_ACQUISITION_AUTHORITY": false,
+    "not_granted": [
+      "LIVE_ACQUISITION",
+      "RPC",
+      "NETWORK_CALLS",
+      "CEX_FEEDS",
+      "DATABASE",
+      "GRAPH_DATABASE",
+      "PRODUCTION_SCHEDULER",
+      "DASHBOARD",
+      "BOOK_7",
+      "BOOK_8",
+      "D8",
+      "TRADING",
+      "EXECUTION",
+      "USAGE_HEALTH_EMPIRICAL_RESEARCH",
+      "AUTOMATIC_STATE_RULE_RATIFICATION"
+    ],
+    "D6M_5": "OPEN_DEFERRED",
+    "INDIVIDUAL_STATE_RULES_RATIFIED": 0
+  },
+  "architecture": {
+    "BOOK_2": "only epistemic engine",
+    "BOOK_3": "native architecture truth",
+    "BOOK_4": "dependency truth (read-only seam to Book 6)",
+    "BOOK_5": "economic/capital topology truth (frozen, read-only seam to Book 6)",
+    "BOOK_6": "measurement definitions + descriptive measured state",
+    "measurement_mints_subject_truth": false,
+    "second_epistemic_engine": false
+  },
+  "modules": [
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_grammar.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_frozen.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_provenance.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_definitions.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_records.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_normalization.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_comparability.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_valuation.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_states.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_registry.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_sensitivity.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_traceability.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_core.py",
+    "quant-lab/src/crypto_systems_intelligence_atlas/book6_support.py"
+  ],
+  "test_modules": {
+    "test_book6_core.py": 20,
+    "test_book6_missingness.py": 38,
+    "test_book6_normalization.py": 47,
+    "test_book6_comparability.py": 69,
+    "test_book6_valuation.py": 44,
+    "test_book6_state_rules.py": 82,
+    "test_book6_state_vector.py": 97,
+    "test_book6_sensitivity.py": 21,
+    "test_book6_temporal.py": 40,
+    "test_book6_adversarial.py": 52,
+    "test_book6_families.py": 17,
+    "test_book6_traceability.py": 276
+  },
+  "counts": {
+    "baseline_book1": 107,
+    "baseline_book2": 108,
+    "baseline_book3": 83,
+    "baseline_book4": 230,
+    "baseline_book5": 293,
+    "baseline_total_csia": 821,
+    "book6_tests": 803,
+    "final_total_csia": 1624,
+    "book1_contract_mutations": 0,
+    "book2_contract_mutations": 0,
+    "book3_contract_mutations": 0,
+    "book4_contract_mutations": 0,
+    "book5_contract_mutations": 0,
+    "crypto_sensor_mutations": 0,
+    "freeze_diff_files": 26,
+    "freeze_diff_scope": "book6_* source and test modules only"
+  },
+  "quality": {
+    "ruff": "PASS (0 findings)",
+    "mypy": "PASS (0 issues, 58 source files)",
+    "sensor_regression": {
+      "passed": 2325,
+      "failed": 14,
+      "skipped": 4,
+      "failure_set": "identical to accepted Book 5 canonical 14-failure set, verified over two consecutive full-tree runs",
+      "book6_introduced_sensor_failures": 0,
+      "note": "One earlier full-tree run transiently reported 15 failures (3948 passed) with the same total; the two subsequent runs were byte-identical at 14/3949/4 and the sensor-only canonical run was exactly 14/2325/4. No Book 6 file appears in the failure set."
+    }
+  },
+  "gates": {
+    "BOOK2_SINGLE_EPISTEMIC_ENGINE": "PASS",
+    "MEASUREMENT_LOCAL_DERIVED_RECORD": "PASS",
+    "MISSING_NOT_ZERO": "PASS",
+    "DENOMINATOR_FAIL_CLOSED": "PASS",
+    "WINDOW_EXPLICIT": "PASS",
+    "REVISION_SUPERSESSION": "PASS",
+    "NATIVE_BEFORE_NORMALIZED": "PASS",
+    "NORMALIZATION_NATIVE_LINEAGE": "PASS",
+    "PERCENTILE_REJECTED": "PASS",
+    "COHORT_EXPLICIT": "PASS",
+    "FALSE_COMPARISON_DETECTION": "PASS",
+    "VALUATION_NUMERAIRE_REQUIRED": "PASS",
+    "PURPOSE_SPECIFIC_PRICE_AUTHORITY": "PASS",
+    "NO_GLOBAL_PRICE_SOURCE": "PASS",
+    "BOOK5_READ_ONLY_SEAM": "PASS",
+    "BOOK4_READ_ONLY_SEAM": "PASS",
+    "STATE_RULE_REGISTRY": "PASS",
+    "INDIVIDUAL_STATE_RULES_RATIFIED_ZERO": "PASS",
+    "CLASS_A_AVAILABLE": "PASS",
+    "CLASS_B_RULE_GATED": "PASS",
+    "CLASS_C_RULE_GATED": "PASS",
+    "GENERIC_EXPANDING_CONTRACTING_DEFERRED": "PASS",
+    "COVERAGE_OBSERVATION_NOT_SUFFICIENCY": "PASS",
+    "VECTOR_SCHEMA_COMPLETENESS": "PASS",
+    "VECTOR_DATA_COMPLETENESS_FAIL_CLOSED": "PASS",
+    "ANTI_SCORE_FIREWALL": "PASS",
+    "D2_6_DEFERRED_PRESERVED": "PASS",
+    "NO_USAGE_HEALTH_EXECUTION": "PASS",
+    "MODEL_COPY_FAIL_CLOSED": "PASS",
+    "BOOK2_DECAY_PROPAGATION": "PASS",
+    "TEMPORAL_HISTORY_PRESERVED": "PASS",
+    "METHODOLOGY_SENSITIVITY": "PASS",
+    "CROSS_SOURCE_PARITY": "PASS",
+    "BOOK1_FREEZE": "PASS",
+    "BOOK2_FREEZE": "PASS",
+    "BOOK3_FREEZE": "PASS",
+    "BOOK4_FREEZE": "PASS",
+    "BOOK5_FREEZE": "PASS",
+    "SENSOR_BASELINE_EQUIVALENCE": "PASS"
+  },
+  "gate_count": {
+    "required": 39,
+    "pass": 39,
+    "fail": 0
+  },
+  "defects_found_and_fixed": [
+    {
+      "id": "B6-D1",
+      "severity": "structural",
+      "defect": "model_copy(update=...) wrote unknown keys straight into a pydantic instance __dict__, bypassing extra='forbid'. A caller could forge FundamentalStateVector.score = 0.9 on a schema with no score field.",
+      "fix": "Added Book6FrozenModel, which re-validates the requested update against the model's own fields so an unknown key is a refusal rather than a smuggled attribute. All sixteen Book 6 record types now inherit it.",
+      "discovered_by": "test_book6_state_vector.py"
+    },
+    {
+      "id": "B6-D2",
+      "severity": "structural",
+      "defect": "DATA_COMPLETE was derivable from observation missingness alone, so a vector asserted data completeness with zero ratified coverage-sufficiency rules, violating the Phase 25 fail-closed requirement.",
+      "fix": "data_status now additionally requires named ratified coverage-sufficiency support covering every dimension, and fails closed at bootstrap where no such rule exists to name.",
+      "discovered_by": "test_book6_state_vector.py"
+    },
+    {
+      "id": "B6-D3",
+      "severity": "structural",
+      "defect": "StateRuleRegistry documented supersession in its ratify() docstring but had no path to perform it; re-registering a new version of an existing rule id was impossible.",
+      "fix": "Added supersede(), which retains prior versions in an append-only history and installs the successor as UNRATIFIED, so authority decays on a rule revision instead of riding along with it.",
+      "discovered_by": "test_book6_state_rules.py"
+    },
+    {
+      "id": "B6-D4",
+      "severity": "interface",
+      "defect": "normalize() leaked NormalizationRuleError and Book6RegistryError to callers, so the engine was not a single fail-closed surface.",
+      "fix": "normalize() now re-raises lineage, admissibility and decayed-native-input refusals as Book6EngineError.",
+      "discovered_by": "test_book6_normalization.py, test_book6_temporal.py"
+    },
+    {
+      "id": "B6-D5",
+      "severity": "interface",
+      "defect": "authorize_valuation() checked only price admissibility, so a forged model_copy could strip the numeraire or the price source and still authorize.",
+      "fix": "authorize_valuation() re-reads the numeraire and the cited price source at use.",
+      "discovered_by": "test_book6_valuation.py"
+    },
+    {
+      "id": "B6-D6",
+      "severity": "record",
+      "defect": "DenominatorRef rejected a non-divisible denominator at construction and rejected an observed-zero denominator declared PRESENT.",
+      "fix": "A non-divisible denominator is now a legitimate record whose division fails closed through the engine's typed RatioResult; an observed 0.0 declared PRESENT is refused because that is ZERO, not PRESENT.",
+      "discovered_by": "test_book6_missingness.py"
+    }
+  ],
+  "evidence_artifacts": {
+    "implementation_matrix": "CSIA_BOOK_6_IMPLEMENTATION_MATRIX.json",
+    "implementation_evidence": "CSIA_BOOK_6_IMPLEMENTATION_EVIDENCE_v0.1.md",
+    "validation_traceability_matrix": "CSIA_BOOK_6_VALIDATION_TRACEABILITY_MATRIX.json",
+    "validation_traceability_rows": 127,
+    "validation_traceability_families": 12,
+    "traceability_generator": "quant-lab/scripts/generate_book6_traceability_matrix.py"
+  },
+  "proposed_exit_gate": "PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL",
+  "self_accepted": false
+}

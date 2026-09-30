@@ -1407,3 +1407,80 @@ authorize Book 6 implementation, live acquisition, RPC, database, graph
 database, production pricing, or trading/execution. Book 6 planning content
 starts only if governance explicitly authorizes it. No R6 exists or is
 authorized without a new concrete demonstrated defect.
+
+---
+
+## CHECKPOINT — BOOK 6 OFFLINE IMPLEMENTATION
+
+**Date:** 2026-09-30
+**Status:** `IMPLEMENTATION_COMPLETE_PENDING_OPERATOR_REVIEW`
+**Acceptance:** `NOT_SELF_ACCEPTED`
+
+Lineage: the Book 6 implementation line was branched from the accepted Book 5
+implementation commit `5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4` (itself
+docs-only over accepted Book 5 source anchor
+`50695ad4ea07b57105e71d04d4e32758849e55e3`). The Book 6 *planning* branch
+`agent/crypto-systems-intelligence-atlas-plan` @ `24659e74b4e6fc94cacdcf45f56f08cb8c958fbb`
+was read as the contract source and was **not** used as implementation lineage.
+
+```text
+branch = agent/crypto-systems-intelligence-atlas-book6-build
+worktree = C:/Users/wifik/Desktop/larger-lab-csia-book6-build
+base = 5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4
+planning_ratification = 24659e74b4e6fc94cacdcf45f56f08cb8c958fbb
+D6M_1 = A   D6M_2 = B   D6M_3 = A   D6M_4 = A   D6M_5 = OPEN_DEFERRED
+```
+
+Quality and counts:
+
+```text
+BOOK_1 = 107 PASS   BOOK_2 = 108 PASS   BOOK_3 = 83 PASS
+BOOK_4 = 230 PASS   BOOK_5 = 293 PASS   BOOK_6 = 803 PASS
+TOTAL_CSIA = 1624 PASS   (821 baseline + 803 Book 6)
+SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED   (canonical failure set unchanged)
+BOOK6_INTRODUCED_SENSOR_FAILURES = 0
+RUFF = PASS                   MYPY = PASS (58 source files clean)
+BOOK1/2/3/4/5_MUTATIONS = 0   SENSOR_MUTATIONS = 0
+FREEZE_DIFF = 26 files, book6_* only
+VALIDATION_TRACEABILITY_ROWS = 127 across 12 families (6D.1-6D.5 + 7 structural)
+```
+
+Six structural defects were found by the tests and fixed at the source, not
+adjusted away in the test: the `model_copy` anti-score bypass, the
+`DATA_COMPLETE` non-fail-closed status, the unreachable state-rule supersession
+path, the engine's leaked second error type, the strippable valuation numeraire,
+and the denominator boundary enforced at construction rather than at division.
+Details in `CSIA_BOOK_6_IMPLEMENTATION_EVIDENCE_v0.1.md` §3.
+
+The canonical invariants that matter most at this checkpoint:
+
+```text
+INDIVIDUAL_STATE_RULES_RATIFIED = 0
+RATIFIED_CLASS_B_RULES = 0        RATIFIED_CLASS_C_RULES = 0
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0  -> VECTOR_DATA_COMPLETENESS_FAILS_CLOSED
+MISSING_NEVER_BECOMES_ZERO = TRUE
+NORMALIZED_WITHOUT_NATIVE_LINEAGE_IS_INVALID = TRUE
+PERCENTILE_NORMALIZATION_IS_REJECTED = TRUE
+PRICE_AUTHORITY_IS_PURPOSE_SPECIFIC = TRUE    NO_GLOBAL_PRICE_SOURCE_CLASS = TRUE
+BOOK5_WRITE_BACK_IS_REFUSED = TRUE            BOOK4_GRAPH_IMPORTED_BY_BOOK6 = 0
+D2_6 = OPEN_DEFERRED  /  NO_USAGE_HEALTH_EXECUTION = TRUE
+```
+
+Decision:
+
+```text
+PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL = PROPOSED (NOT ACCEPTED)
+BOOK_6_IMPLEMENTATION = COMPLETE_PROPOSED
+BOOK_6_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE / OFFLINE_KERNEL_SCOPE_ONLY
+LIVE_ACQUISITION_AUTHORITY = FALSE
+D6M_5 = OPEN_DEFERRED
+INDIVIDUAL_STATE_RULES_RATIFIED = 0
+```
+
+NEXT = OPERATOR REVIEW OF BOOK 6 ONLY. This checkpoint does **not** begin live
+acquisition, RPC, network calls, CEX feeds, database, graph database, production
+scheduler, dashboard, Book 7, Book 8, D8, trading or execution. It does not
+execute usage/health empirical research. It does not ratify any state rule,
+coverage-sufficiency rule, or false-comparison methodology. Acceptance remains an
+individual operator act.

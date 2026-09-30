@@ -1,0 +1,250 @@
+# CSIA BOOK 6 — IMPLEMENTATION EVIDENCE v0.1
+
+**Status:** `IMPLEMENTATION_COMPLETE_PENDING_OPERATOR_REVIEW`
+**Acceptance:** `NOT_SELF_ACCEPTED`
+**Date:** 2026-09-30
+**Branch:** `agent/crypto-systems-intelligence-atlas-book6-build`
+**Base:** `5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4` (Book 5 acceptance commit)
+**Proposed exit gate:** `PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL`
+
+---
+
+## 1. What was built
+
+The offline, deterministic Book 6 measurement and descriptive-state kernel.
+Fourteen source modules and twelve test suites, 803 Book 6 tests, 1624 CSIA
+tests total against a 821-test baseline.
+
+Book 6 owns **measurement definitions** and **descriptive measured state**. It
+measures OVER accepted truth; it never mints it. Book 2 remains the only
+epistemic engine, and every authority-bearing read in Book 6 re-resolves its
+cited Book 2 claim live through the accepted `ClaimStateEngine` machinery.
+
+| Module | Responsibility |
+|---|---|
+| `book6_grammar.py` | 21 non-collapsible grammar categories, 10 missingness states, 6 denominator states, 10 window classes, 10 normalization types, architecture families |
+| `book6_frozen.py` | The shared frozen record base that makes `model_copy` schema-safe |
+| `book6_provenance.py` | Narrow Book 2 adapter; live currentness, no claim minting (D6M-1 = A) |
+| `book6_definitions.py` | `MetricDefinition`, `MeasurementMethodology`, `CoverageObservation`, the 6A family map |
+| `book6_records.py` | `MeasurementObservation`, `DenominatorRef`, value/missingness and window and supersession discipline |
+| `book6_normalization.py` | The separate `NormalizationRule` contract (D6M-2 = B), `Cohort`, native-lineage validation |
+| `book6_comparability.py` | The 15-row false-comparison corpus encoded as refusals |
+| `book6_valuation.py` | Purpose-specific price authority (D6M-4 = A), Book 5 write-back refusal |
+| `book6_states.py` | `StateRule`, `StateRuleRegistry`, `FundamentalStateVector`; ships zero ratified rules |
+| `book6_registry.py` | Five separated in-memory stores with live authority resolution |
+| `book6_sensitivity.py` | Methodology sensitivity and cross-source parity, descriptive only |
+| `book6_traceability.py` | The executable validation matrix, 127 rows bound to real test functions |
+| `book6_core.py` | `Book6MeasurementEngine` — the single fail-closed chokepoint |
+| `book6_support.py` | Shared offline fixtures (Book 5 convention: fixtures live in `src/`) |
+
+---
+
+## 2. The five ratified decisions, as implemented
+
+**D6M-1 = A — `BOOK6_LOCAL_DERIVED_RECORD`.** A `MeasurementObservation` is an
+immutable Book 6-local record that *cites* Book 2 authority by ref through
+`source_claim_refs`. It shares no epistemic field with a Book 2 claim: no
+`claim_state`, no `claim_family`, no `claim_bindings`, no `conflicts`. The
+`Book6Provenance` public surface is four read methods and nothing else — there is
+no code path in Book 6 that can mint, promote or transition a Book 2 claim.
+
+**D6M-2 = B — `SEPARATE_NORMALIZATION_RULE`.** Normalization is a separate
+first-class contract binding eleven ratified fields. It is not a flag on a
+`MetricDefinition` and not a field on a `MeasurementObservation`; both absences
+are asserted by test. `NORMALIZED_WITHOUT_NATIVE_LINEAGE = INVALID` holds at
+construction *and* at use, and lineage cannot be stripped or re-pointed after
+construction.
+
+`PERCENTILE_WITHIN_COHORT` is absent from `NormalizationType` by design. It is
+rejected at four levels: absent from the enum, unconstructible from a raw string,
+not injectable via `model_copy`, and not reachable through the engine — which
+re-resolves the *registered* rule rather than trusting the caller's object.
+
+**D6M-3 = A — `CENTRALIZED_OPERATOR_RATIFICATION`.**
+`INDIVIDUAL_STATE_RULES_RATIFIED = 0` at bootstrap, and the registry holds zero
+rules, so there is nothing to ratify by accident. `StateRuleRegistry.authorize`
+is the single chokepoint: a Class B or C state cannot be emitted without naming
+an individually `RATIFIED` rule. There is no delegation register, no bulk
+ratification, no automatic ratification, and no module-level helper that could
+constitute one.
+
+Supersession was the one place the governance model was under-implemented — see
+B6-D3 below. A new rule version now enters as `UNRATIFIED`, so authority decays
+on a revision rather than riding along with it.
+
+**D6M-4 = A — `PURPOSE_SPECIFIC_PRICE_AUTHORITY`.** There is no global
+authoritative price-source class. `PRICE_AUTHORITY_MATRIX` maps each of seven
+valuation purposes to its admissible price classes, and a test asserts that *no*
+price class is admissible for *every* purpose, which is what makes a global
+winner structurally unavailable. Divergent classes are preserved side by side;
+the module exposes no averaging, blending or consensus combinator to call.
+
+**D6M-5 — `OPEN / DEFERRED`.** No usage threshold, health state, adoption band,
+retention threshold, bot/sybil classifier or persistence parameter exists
+anywhere in Book 6. The D2-6 names are recorded in `PROHIBITED_STATE_NAMES` so
+an attempt to inject one is a refusal rather than an unknown, and an AST scan
+asserts that no Book 6 module imports a network, RPC, database or scheduler
+client.
+
+---
+
+## 3. Six defects the implementation surfaced and fixed
+
+These are recorded because the *tests* found them, not the other way round. Each
+is a source fix, not a test adjustment.
+
+**B6-D1 — `model_copy` was a constructor bypass for the anti-score firewall.**
+Pydantic v2's `model_copy(update=...)` does not re-run validators and writes
+unknown keys straight into the instance `__dict__`. A caller could execute
+`vector.model_copy(update={"score": 0.9})` and then read `vector.score`. The
+constructor firewall was real; the copy firewall was not.
+`Book6FrozenModel` now re-validates the requested update against the model's own
+fields, so an unknown key is a refusal. All sixteen Book 6 record types inherit
+it. This is the single most important structural fix in the build: without it
+the anti-score firewall would have been a documentation claim.
+
+**B6-D2 — `DATA_COMPLETE` did not fail closed.** The status was computed from
+observation missingness alone, so a vector of fully observed dimensions
+reported `DATA_COMPLETE` with zero ratified coverage-sufficiency rules. Phase 25
+requires that data completeness also need ratified sufficiency support. It now
+does, and at bootstrap — where no sufficiency rule exists to name — data status
+is `DATA_INCOMPLETE` regardless of how clean the observations are.
+
+**B6-D3 — supersession was documented but unreachable.** `StateRuleRegistry`
+described version supersession in its `ratify()` docstring, yet registering a new
+version of an existing rule id raised `already registered` and there was no
+other path. The registry is now actually able to supersede, retaining prior
+versions in an append-only history.
+
+**B6-D4 — the engine leaked a second error type.** `normalize()` raised
+`NormalizationRuleError` for lineage failures and `Book6RegistryError` for a
+decayed native input, so callers had to know which internal module refused them.
+The engine is now a single fail-closed surface.
+
+**B6-D5 — a forged valuation could strip its numeraire.** `authorize_valuation()`
+checked only price-class admissibility. A `model_copy` that emptied `numeraire`
+or `source_ref` still authorized. Both are now re-read at use.
+
+**B6-D6 — denominator state was enforced at the wrong boundary.** A
+non-divisible denominator (observed zero, unknown, unavailable, unstable) was
+rejected at *construction*, which wrongly declared a legitimate record invalid.
+It is now a valid record whose denominator state is explicit, and it is
+*division* that fails closed — through the engine's typed `RatioResult`, which
+returns `is_undefined=True` with `ratio=None` rather than infinity, zero, or a
+dropped observation. A denominator declared `PRESENT` while carrying an observed
+`0.0` is separately refused, because that is `ZERO`, not `PRESENT`.
+
+---
+
+## 4. Where the design refused to be helpful
+
+Several places could have been made more permissive at no immediate cost. Each
+was kept restrictive because the permissive version is the specific failure the
+ratified plan exists to prevent.
+
+- **No tolerance is invented for float agreement.** Two sources differing by
+  `1e-12` are reported as `SOURCES_DIVERGE`. A tolerance is a Class C
+  `tolerance_ref` requiring an individually ratified rule, and none is ratified;
+  inventing one would smuggle a threshold in through the back door.
+- **No preferred methodology.** `compare_methodology_variants` names no winner,
+  no severity, no confidence. Preferring one methodology is a state derivation
+  and would need a ratified rule.
+- **No consensus number.** Divergent sources keep their own values. The naive
+  mean of the fixtures does not appear anywhere in the finding.
+- **A single source cannot be in parity with itself**, and a single methodology
+  cannot be sensitive to itself. Both comparisons refuse.
+- **An ungoverned metric pair is refused, not defaulted.** There is no wildcard
+  and no implicit "everything numeric is comparable" path.
+- **Generic `EXPANDING` / `CONTRACTING` are unwritable as a rule.** They are
+  representable as enum members for vocabulary, but no `StateRule` may target
+  them, so a label can never inherit its meaning from English.
+- **A superseded observation is a separate record.** Nothing mutates a prior
+  value; supersession is linear and a forked chain is refused.
+- **A reorg is window-bounded.** `CHAIN_REORG` cannot restate measurements
+  outside the reorged interval.
+
+---
+
+## 5. The seams hold structurally, not by convention
+
+Both read-only seams are proven by import-graph analysis rather than by comment:
+
+- **No Book 6 module imports a Book 5 module at all.** There is therefore no
+  reference through which a numeraire, price or common-value scalar could be
+  written back into a frozen Book 5 record. `BOOK5_CROSS_ASSET_VALUATION_AUTHORITY
+  = FALSE` is structural.
+- **No Book 6 module imports the Book 4 dependency graph.** Book 6 may measure
+  degree, betweenness and concentration under a named methodology, but it holds
+  no edge object, so `MEASUREMENT_OF_GRAPH != GRAPH_FACT` and no edge can be
+  created, deleted or re-weighted.
+
+---
+
+## 6. Test counts
+
+| Suite | Tests |
+|---|---|
+| `test_book6_core.py` | 20 |
+| `test_book6_missingness.py` | 38 |
+| `test_book6_normalization.py` | 47 |
+| `test_book6_comparability.py` | 69 |
+| `test_book6_valuation.py` | 44 |
+| `test_book6_state_rules.py` | 82 |
+| `test_book6_state_vector.py` | 97 |
+| `test_book6_sensitivity.py` | 21 |
+| `test_book6_temporal.py` | 40 |
+| `test_book6_adversarial.py` | 52 |
+| `test_book6_families.py` | 17 |
+| `test_book6_traceability.py` | 276 |
+| **Book 6 total** | **803** |
+| **CSIA total** | **1624** (821 baseline + 803) |
+
+The traceability suite is the largest because it is largely parametrized over the
+127 matrix rows, each of which is resolved against the test sources on disk. A row
+naming a function that does not exist, or that lives in a different file than it
+cites, fails — so deleting an assertion breaks the matrix rather than silently
+hollowing it out.
+
+---
+
+## 7. What this implementation does NOT do
+
+- It does not acquire data. No RPC, no network call, no CEX feed, no database, no
+  graph database, no scheduler, no dashboard. An AST scan of all fourteen Book 6
+  modules asserts the absence of every such import.
+- It does not execute any usage, health, bot/sybil, retention, capital-persistence
+  or developer-persistence research. D6M-5 remains `OPEN_DEFERRED`; nothing here
+  estimates a parameter.
+- It does not ratify any state rule. `INDIVIDUAL_STATE_RULES_RATIFIED = 0`. The
+  tests that exercise the Class B/C emission path use *synthetic local* fixtures,
+  and one test explicitly asserts that such a fixture does not become canonical.
+- It does not produce a score, total, rating, grade, rank, weight, buy, sell or
+  health reading, in any field, from any direction.
+- It does not modify Book 1–5 or the sensor. The freeze diff is 26 files, all
+  `book6_*`.
+- It does not accept itself.
+
+---
+
+## 8. Operator decisions still open
+
+1. **Accept or reject `PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL`.**
+   This document proposes it and does not grant it.
+2. **D6M-5.** Usage/health research remains deferred. Opening it would be a
+   separate authorization, and would require live acquisition authority that is
+   currently `FALSE`.
+3. **Coverage sufficiency.** A vector cannot reach `DATA_COMPLETE` until an
+   operator individually ratifies a coverage-sufficiency rule per metric. Whether
+   to ratify any, and under what methodology, is an operator act.
+4. **The fifteen false-comparison `CONDITIONAL` rows** each name a required
+   methodology (`routing-attribution-methodology`, `native-unit-growth-methodology`,
+   `success-semantics-methodology`, and so on). None is ratified, so all fifteen
+   currently refuse. Ratifying any of them is an operator decision.
+5. **Class B/C state rules.** Zero are ratified. The engine is correct and
+   useless for directional state until the operator ratifies specific rules with
+   specific benchmarks, tolerances and volatility measures.
+
+---
+
+**Proposed:** `PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL`
+**Not self-accepted.**
