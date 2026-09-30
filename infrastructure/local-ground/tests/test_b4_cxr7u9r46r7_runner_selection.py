@@ -26,6 +26,8 @@ R46_MODULES = {
         "test_b4_cxr7u9r46r5_selector_replacement_proofs.py",
     "R46R7_RUNNER_SELECTION_TEST":
         "test_b4_cxr7u9r46r7_runner_selection.py",
+    "R46X1_CRASH_RESIDUE_NAMES_TEST":
+        "test_b4_cxr7u9r46x1_crash_residue_names.py",
 }
 
 # every skip site in the R46 modules is a WINDOWS-only gate: on Linux every
@@ -35,6 +37,12 @@ PLATFORM_GATED = {
         3, "symlink creation, POSIX share-mode replacement and hard links "
            "are platform-gated; all three gates are Windows-only"),
     "test_b4_cxr7u9r46r7_runner_selection.py": (0, None),
+    "test_b4_cxr7u9r46x1_crash_residue_names.py": (
+        3, "the publisher crash-residue proofs are POSIX-only (Windows "
+           "publication consumes the temporary name atomically) and the two "
+           "foreign-name proofs need hard-link support: all three are "
+           "Windows-only gates, so the Linux mandatory run executes every "
+           "R46 proof with zero skips"),
 }
 
 

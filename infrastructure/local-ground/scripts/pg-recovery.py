@@ -1022,10 +1022,12 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
             except OSError:
                 pass
             # The winner is read through ONE FD-bound selector snapshot
-            # (B4-CXR7U9R46R1). The winner publisher's temporary second link
-            # may still be retiring, so a transient link-count refusal is
-            # retried with FRESH fully admitted reads — never a reused
-            # descriptor — before the winner is reported unknown.
+            # (B4-CXR7U9R46R1). The winner's own publisher residue is ADMITTED
+            # by the durable-name law (B4-CXR7U9R46X1): it is the engine's own
+            # in-directory temporary, so the retried read must not describe a
+            # legitimately published selector as unknown. A GENUINE admission
+            # conflict is retried with FRESH fully admitted reads —
+            # never a reused descriptor.
             winner = None
             for _ in range(_SELECTOR_READ_ATTEMPTS):
                 try:
@@ -1092,9 +1094,10 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
     return claim
 
 
-# One admission/verification pass, then (for a transient link-count refusal
-# caused by a publisher's retiring temporary second link) fully fresh retries
-# of the ENTIRE FD-bound read (B4-CXR7U9R46R1).
+# One admission/verification pass, then (for a transient admission conflict)
+# fully fresh retries of the ENTIRE FD-bound read (B4-CXR7U9R46R1). The
+# publisher's own crash residue is not a conflict: it is admitted by the
+# durable-name law (B4-CXR7U9R46X1).
 _SELECTOR_READ_ATTEMPTS = 3
 
 
@@ -1168,6 +1171,104 @@ def _selector_conflict(operation_id, reason):
         f"{reason} (B4-CXR7U9R46R1)")
 
 
+def _assert_selector_authority_names(info, dir_fd, canonical_name,
+                                     operation_id):
+    """The admitted claim inode must carry NO durable name that is not the
+    canonical coordinate or this operation's own publisher temporary
+    (B4-CXR7U9R46X1).
+
+    R46R1 stated this law as a bare ``st_nlink == 1``. That is FALSE on POSIX
+    and it was proved false by authoritative Linux CI (b1 run 36759645882):
+    POSIX publication is ``os.link(tmp, "<opid>.claim")`` followed by
+    ``os.unlink(tmp)``, so between those two steps - and forever after, if the
+    publisher dies in that window, which the R44 crash law deliberately
+    simulates - the durably published claim carries TWO names. R44 requires
+    exactly that state to stay resumable, so the two laws contradicted each
+    other and the total-link-count form refused a legitimately published,
+    fully fsynced selector: a recoverable crash became a permanent authority
+    lockout. (Windows never enters that window: ``_publish_no_replace`` uses
+    ``os.rename`` there, which consumes the temporary name atomically, so
+    ``st_nlink == 1`` is the exact truth on Windows.)
+
+    The corrected law is about FOREIGN names, and it is proven, not assumed:
+
+      * every directory entry of the governed directory is stat'ed WITHOUT
+        following symlinks and compared by (device, inode) with the admitted
+        descriptor - all descriptor-relative, so the whole census is pinned to
+        the opened directory inode;
+      * the number of names found inside the governed directory must EQUAL
+        ``st_nlink``. A hard link placed OUTSIDE the governed directory (a
+        name the operator, or anyone who can traverse but not write that
+        directory, owns elsewhere) cannot appear in the census, so the counts
+        diverge and the read fails closed: an out-of-directory name can never
+        hide;
+      * a name inside the governed directory is admitted only when it is the
+        canonical coordinate itself or the publisher's own
+        ``.<opid>.claim.*.tmp`` temporary, which is regular and private. Any
+        other name is a second durable authority path to the selector and is
+        refused.
+
+    A residue temporary shares the inode, so it grants no capability the
+    canonical name does not already grant; what it must never do is hide a
+    payload outside the governed private directory, which is what this law
+    forbids.
+    """
+    if dir_fd is None:
+        # Windows: a directory cannot be held open as a descriptor, so names
+        # cannot be censused relative to the governed directory. Windows
+        # publication consumes the temporary name atomically (os.rename), so
+        # more than one durable name can only be a foreign link: the strict
+        # count is the exact law there and is enforced unchanged.
+        if info.st_nlink != 1:
+            raise _selector_conflict(
+                operation_id,
+                f"the canonical claim has {info.st_nlink} durable links; the "
+                "published selector is one single durable name")
+        return
+    prefix = _claim_temp_prefix(operation_id)
+    census = []
+    try:
+        with os.scandir(dir_fd) as entries:
+            for entry in entries:
+                try:
+                    other = entry.stat(follow_symlinks=False)
+                except OSError:
+                    # The entry vanished between readdir and its census stat.
+                    # It carries no name now; the count cross-check below
+                    # still has to agree, so a vanished name can never make an
+                    # unaccounted name look accounted for.
+                    continue
+                if (other.st_dev, other.st_ino) != (info.st_dev, info.st_ino):
+                    continue
+                census.append((entry.name, other))
+    except OSError as e:
+        raise _selector_conflict(
+            operation_id,
+            f"the governed directory could not be censused for other durable "
+            f"names of the claim: {e}")
+    if len(census) != info.st_nlink:
+        raise _selector_conflict(
+            operation_id,
+            f"the canonical claim reports {info.st_nlink} durable names but "
+            f"{len(census)} of them are inside the governed directory; "
+            "refusing an unaccounted durable name")
+    for name, other in census:
+        if name == canonical_name:
+            continue
+        if not (name.startswith(prefix) and name.endswith(".tmp")):
+            raise _selector_conflict(
+                operation_id,
+                f"the canonical claim is also published as the foreign durable "
+                f"name {name!r}; refusing a second durable authority path to "
+                "the selector")
+        if not stat.S_ISREG(other.st_mode) or (stat.S_IMODE(other.st_mode)
+                                               & 0o077):
+            raise _selector_conflict(
+                operation_id,
+                f"the publisher residue {name!r} is not a private regular "
+                "file; refusing an unaccounted selector name")
+
+
 def _admit_selector_descriptor(fd, dir_fd, name, operation_id):
     """Admit the OPENED selector descriptor and PROVE the canonical pathname
     still names the same object (B4-CXR7U9R46R1).
@@ -1180,9 +1281,9 @@ def _admit_selector_descriptor(fd, dir_fd, name, operation_id):
         reparse-point refusal covers the same defect);
       * privacy: the mode must not be readable/writable by group or other
         (the engine publishes claims 0600); POSIX only;
-      * link-count invariant: the published canonical claim is the single
-        durable name (st_nlink == 1); anything else is a foreign hard link
-        and is refused;
+      * durable-name law: the opened inode must carry NO durable name other
+        than the canonical coordinate and this operation's own publisher
+        temporaries (B4-CXR7U9R46X1);
       * fstat #2: size, mtime and inode identity are unchanged across the
         whole admission, so no replacement or rewrite slipped in;
       * pathname proof: the canonical name is re-stated WITHOUT following
@@ -1202,14 +1303,7 @@ def _admit_selector_descriptor(fd, dir_fd, name, operation_id):
         if mode & 0o077:
             raise _selector_conflict(
                 operation_id, f"the opened object is not private (mode {mode:04o})")
-    if info.st_nlink != 1:
-        # BOTH platforms: the published canonical claim is ONE single durable
-        # name. A foreign hard link (Windows and POSIX both support them)
-        # breaks the published link-count invariant.
-        raise _selector_conflict(
-            operation_id,
-            f"the canonical claim has {info.st_nlink} durable links; the "
-            "published selector is one single durable name")
+    _assert_selector_authority_names(info, dir_fd, name, operation_id)
     recheck = os.fstat(fd)
     if (info.st_ino, info.st_dev, info.st_size, info.st_mtime_ns) != \
             (recheck.st_ino, recheck.st_dev, recheck.st_size,
@@ -1266,7 +1360,8 @@ def _read_selector_snapshot(operation_id, transition_dir=None):
     canonical basename internally -> open the governed directory without
     following redirections -> open the claim once with O_RDONLY|O_CLOEXEC|
     O_NOFOLLOW, descriptor-relative -> fstat it (regular, private,
-    link-count, no mutation across admission) -> read and parse the JSON
+    no foreign durable name, no mutation across admission) -> read and
+    parse the JSON
     from that SAME descriptor -> fstat again (mutation during reading is
     rejected) -> prove the canonical pathname still names the SAME device
     and inode without following symlinks -> close the descriptor and return
