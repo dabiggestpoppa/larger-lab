@@ -26,7 +26,9 @@ from datetime import datetime
 from enum import Enum
 from typing import Final
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from .book6_frozen import Book6FrozenModel
 
 from .book6_grammar import (
     NORMALIZATION_INVALID_FOR,
@@ -71,7 +73,7 @@ DIVIDING_NORMALIZATIONS: Final[frozenset[NormalizationType]] = frozenset(
 )
 
 
-class Cohort(BaseModel):
+class Cohort(Book6FrozenModel):
     """An explicit, versioned set of subjects eligible for comparison.
 
     "All chains" is never an automatic cohort (comparability v0.1 §5 rule 1):
@@ -101,7 +103,7 @@ class Cohort(BaseModel):
         return subject_ref in self.member_refs
 
 
-class NormalizationRule(BaseModel):
+class NormalizationRule(Book6FrozenModel):
     """The ratified separate normalization contract (D6M-2 = B).
 
     Every field the ratification bound is present and required where the
@@ -140,7 +142,7 @@ class NormalizationRule(BaseModel):
         return self
 
 
-class NormalizedMeasurement(BaseModel):
+class NormalizedMeasurement(Book6FrozenModel):
     """The normalized product, carrying its native lineage (D6M-2 = B).
 
     The native input references are REQUIRED here as well: a product that cannot

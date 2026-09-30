@@ -35,7 +35,9 @@ from datetime import datetime
 from enum import Enum
 from typing import Final
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from .book6_frozen import Book6FrozenModel
 
 from .book6_grammar import MissingnessState
 
@@ -130,7 +132,7 @@ class RuleRatificationStatus(str, Enum):
     SUPERSEDED = "SUPERSEDED"
 
 
-class StateRule(BaseModel):
+class StateRule(Book6FrozenModel):
     """A derivation rule for a Class B or Class C state.
 
     The object can represent an UNRATIFIED rule, which is how the accepted
@@ -217,6 +219,12 @@ class StateRuleRegistry:
 
     def __init__(self) -> None:
         self._rules: dict[str, StateRule] = {}
+        self._superseded: dict[str, tuple[StateRule, ...]] = {}
+
+    def superseded_versions(self, rule_ref: str) -> tuple[StateRule, ...]:
+        """Prior versions of a rule, retained so history is never rewritten."""
+
+        return self._superseded.get(rule_ref, ())
 
     def register(self, rule: StateRule) -> StateRule:
         """Register a rule. Registration proves nothing about current authority."""
@@ -268,12 +276,48 @@ class StateRuleRegistry:
             )
         return rule
 
+    def supersede(self, rule: StateRule) -> StateRule:
+        """Install a NEW VERSION of an existing rule id, retaining the prior one.
+
+        Supersession is a version change, never a silent replacement: the earlier
+        version stays queryable through ``superseded_versions``. Critically, a
+        NEW version enters as ``UNRATIFIED`` — it does not inherit the prior
+        version's ratification, because ratification is an individual operator
+        decision about a specific version and may not be carried forward by
+        a registry operation. This is the same
+        ``REGISTERED THEN != AUTHORITATIVE NOW`` discipline the measurement
+        registry applies to Book 2 authority.
+        """
+
+        current = self._rules.get(rule.state_rule_id)
+        if current is None:
+            raise StateError(
+                f"state rule {rule.state_rule_id} is not registered; supersession "
+                f"requires a prior version of the same rule id"
+            )
+        if current.version == rule.version:
+            raise StateError(
+                f"state rule {rule.state_rule_id} is already at version "
+                f"{rule.version}; supersession requires a new version"
+            )
+        if current.target_state is not rule.target_state:
+            raise StateError(
+                f"a superseding rule may not change the target state "
+                f"({current.target_state.value} -> {rule.target_state.value}); a new "
+                f"target is a new rule id"
+            )
+        history = self._superseded.get(rule.state_rule_id, ())
+        self._superseded[rule.state_rule_id] = history + (current,)
+        self._rules[rule.state_rule_id] = rule
+        return rule
+
     def ratify(self, rule_ref: str, *, operator: str, at: datetime) -> StateRule:
         """Record an individual operator ratification of one rule.
 
-        Supersedes any earlier version of the same rule id; the prior version is
-        replaced in the registry but its state emission history is unaffected
-        because historical states are never rewritten.
+        Ratifies exactly the CURRENT version of ``rule_ref``. A later
+        supersession installs a fresh ``UNRATIFIED`` version (see
+        ``supersede``), so authority decays on a rule revision rather than
+        riding along with it.
         """
 
         rule = self._rules.get(rule_ref)
@@ -284,8 +328,9 @@ class StateRuleRegistry:
                 f"state rule {rule_ref} is already ratified; a rule is ratified "
                 f"by an individual decision, not re-ratified implicitly"
             )
-        ratified = rule.model_copy(
-            update={
+        ratified = StateRule.model_validate(
+            {
+                **rule.model_dump(),
                 "status": RuleRatificationStatus.RATIFIED,
                 "ratified_by": operator,
                 "ratified_at": at,
@@ -308,7 +353,7 @@ class VectorStatus(str, Enum):
     DATA_INCOMPLETE = "DATA_INCOMPLETE"
 
 
-class StateDimension(BaseModel):
+class StateDimension(Book6FrozenModel):
     """One descriptive dimension of a subject's state."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -338,7 +383,7 @@ class StateDimension(BaseModel):
         return self
 
 
-class FundamentalStateVector(BaseModel):
+class FundamentalStateVector(Book6FrozenModel):
     """A descriptive vector of state dimensions — never a score.
 
     No ``total``, ``score``, ``rating``, ``grade``, ``rank`` or weighted field
@@ -352,6 +397,11 @@ class FundamentalStateVector(BaseModel):
     schema_ref: str = Field(min_length=1)
     as_of_valid_time: datetime
     dimensions: tuple[StateDimension, ...] = Field(min_length=1)
+    #: Ratified coverage-sufficiency rules backing this vector's data status.
+    #: Empty by default, and no such rule is ratified, so ``DATA_COMPLETE`` is
+    #: unreachable at bootstrap: a numeric coverage fraction can never stand in
+    #: for a ratified sufficiency rule (state-vector v0.2 §5, §6).
+    coverage_sufficiency_rule_refs: tuple[str, ...] = ()
 
     def _resolve_status(self) -> tuple[VectorStatus, VectorStatus]:
         """Compute schema and data status structurally (no score, no judgement)."""
@@ -361,11 +411,19 @@ class FundamentalStateVector(BaseModel):
             and STATE_CLASS_BY_NAME.get(dim.state) is not None
             for dim in self.dimensions
         )
-        data_complete = all(
+        # DATA_COMPLETE is not "every value happened to be observed". It also
+        # requires RATIFIED coverage-sufficiency support, so it fails closed
+        # whenever no sufficiency rule backs the vector — which is the case for
+        # the entire accepted implementation.
+        derived = all(
             dim.missingness in (MissingnessState.OBSERVED, MissingnessState.ZERO_OBSERVED)
             and dim.state_class is not StateClass.DEFERRED_GENERIC
             for dim in self.dimensions
         )
+        sufficiency_backed = bool(self.coverage_sufficiency_rule_refs) and all(
+            dim.coverage_observation_id is not None for dim in self.dimensions
+        )
+        data_complete = derived and sufficiency_backed
         return (
             VectorStatus.SCHEMA_COMPLETE if schema_complete else VectorStatus.SCHEMA_INCOMPLETE,
             VectorStatus.DATA_COMPLETE if data_complete else VectorStatus.DATA_INCOMPLETE,
@@ -379,11 +437,13 @@ class FundamentalStateVector(BaseModel):
 
     @property
     def data_status(self) -> VectorStatus:
-        """Data completeness requires an observed derivation for every dimension.
+        """Data completeness requires an observed derivation AND ratified support.
 
-        Because no coverage-sufficiency rule is ratified, no dimension can assert
-        sufficiency on coverage alone; this status reflects observed derivation
-        only and fails closed when anything is unresolved.
+        Two conditions, both necessary: every dimension must carry an observed
+        derivation, and the vector must name the ratified coverage-sufficiency
+        rules that judged its coverage. Because no sufficiency rule is ratified,
+        this fails closed and ``DATA_COMPLETE`` is unreachable at bootstrap
+        (state-vector v0.2 §5, §6).
         """
 
         return self._resolve_status()[1]
@@ -419,10 +479,12 @@ INDIVIDUAL_STATE_RULES_RATIFIED_AT_BOOTSTRAP: Final[int] = 0
 CLASS_B_AND_C_ARE_RULE_GATED: Final[bool] = True
 GENERIC_EXPANDING_CONTRACTING_DEFERRED: Final[bool] = True
 NO_COMPLETENESS_SCORE: Final[bool] = True
+DATA_COMPLETENESS_FAILS_CLOSED: Final[bool] = True
 
 
 __all__ = [
     "CLASS_B_AND_C_ARE_RULE_GATED",
+    "DATA_COMPLETENESS_FAILS_CLOSED",
     "FundamentalStateVector",
     "GENERIC_EXPANDING_CONTRACTING_DEFERRED",
     "INDIVIDUAL_STATE_RULES_RATIFIED_AT_BOOTSTRAP",

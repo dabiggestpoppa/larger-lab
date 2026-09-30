@@ -24,7 +24,9 @@ from datetime import datetime
 from enum import Enum
 from typing import Final
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from .book6_frozen import Book6FrozenModel
 
 from .book6_grammar import (
     MeasurementCategory,
@@ -83,7 +85,7 @@ class DenominatorRule(str, Enum):
     COHORT_TOTAL = "COHORT_TOTAL"
 
 
-class MeasurementMethodology(BaseModel):
+class MeasurementMethodology(Book6FrozenModel):
     """Versioned HOW of a measurement (grammar v0.1 §7).
 
     A value without methodology identity is incomplete: the same metric name
@@ -109,7 +111,7 @@ class MeasurementMethodology(BaseModel):
         return f"{self.methodology_ref}@{self.version}"
 
 
-class MetricDefinition(BaseModel):
+class MetricDefinition(Book6FrozenModel):
     """A complete, audited metric definition (grammar v0.1 §3)."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -163,7 +165,7 @@ class MetricDefinition(BaseModel):
         return architecture_family in self.applies_to_architectures
 
 
-class CoverageObservation(BaseModel):
+class CoverageObservation(Book6FrozenModel):
     """Observed population coverage plus its basis — never a sufficiency verdict.
 
     ``observed_fraction`` records what was seen. ``sufficiency_rule_ref`` is the
@@ -192,7 +194,7 @@ class CoverageObservation(BaseModel):
         return self.sufficiency_rule_ref is not None and self.sufficiency_rule_ref != ""
 
 
-class CoverageSufficiencyRule(BaseModel):
+class CoverageSufficiencyRule(Book6FrozenModel):
     """A candidate coverage-sufficiency rule. None is ratified.
 
     The object exists so the contract can be represented without smuggling a

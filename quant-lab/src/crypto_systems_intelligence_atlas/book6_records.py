@@ -21,7 +21,9 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Final
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from .book6_frozen import Book6FrozenModel
 
 from .book6_definitions import DenominatorRule, MetricDefinition
 from .book6_grammar import (
@@ -42,7 +44,7 @@ class MeasurementRecordError(ValueError):
     """A measurement record is structurally invalid."""
 
 
-class DenominatorRef(BaseModel):
+class DenominatorRef(Book6FrozenModel):
     """The denominator as a first-class measured subject (grammar v0.1 §4).
 
     ``denominator_measurement_id`` identifies an observation; ``state`` is the
@@ -93,7 +95,7 @@ class DenominatorRef(BaseModel):
         return DenominatorState(self.state) in DIVISIBLE_DENOMINATOR_STATES
 
 
-class MeasurementObservation(BaseModel):
+class MeasurementObservation(Book6FrozenModel):
     """One measured value for one subject under one methodology (grammar v0.1 §2).
 
     Immutable. Revision creates a NEW observation that supersedes the prior one;

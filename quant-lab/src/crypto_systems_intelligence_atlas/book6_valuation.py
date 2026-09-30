@@ -25,7 +25,9 @@ from datetime import datetime
 from enum import Enum
 from typing import Final
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
+
+from .book6_frozen import Book6FrozenModel
 
 from .book6_grammar import ObservationStatus
 
@@ -101,7 +103,7 @@ PRICE_AUTHORITY_MATRIX: Final[dict[ValuationPurpose, frozenset[PriceObservationC
 }
 
 
-class PriceObservation(BaseModel):
+class PriceObservation(Book6FrozenModel):
     """A cited price observation with explicit source class and timestamp."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -115,7 +117,7 @@ class PriceObservation(BaseModel):
     coverage: float = Field(ge=0.0, le=1.0)
 
 
-class ValuationObservation(BaseModel):
+class ValuationObservation(Book6FrozenModel):
     """A Book 6 valuation product over a Book 5 native quantity (D6M-4 = A).
 
     ``numeraire`` is REQUIRED with no default and no implicit USD. There is no
@@ -169,7 +171,7 @@ class ValuationObservation(BaseModel):
         return not self.is_stale
 
 
-class Book5WriteBackRefusal(BaseModel):
+class Book5WriteBackRefusal(Book6FrozenModel):
     """Explicit refusal token for the Book 5 seam (documentation + test surface).
 
     Book 5 is frozen. There is deliberately NO Book 6 API that writes a numeraire,
