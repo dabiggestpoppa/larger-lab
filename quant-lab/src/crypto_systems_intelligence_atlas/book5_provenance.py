@@ -173,6 +173,46 @@ class Book5Provenance:
         self._context_bindings: dict[str, ClaimContextBinding] = {}
         self._quantitative_bindings: dict[str, QuantitativeRecordContextBinding] = {}
 
+    def _validate_binding_basis_live(
+        self,
+        basis_claim_refs: tuple[str, ...],
+        *,
+        binding_family: str,
+    ) -> None:
+        """R5 binding-basis live currentness seal (shared by both binding
+        families; single implementation, reused at every authority
+        boundary).
+
+        BINDING REGISTRATION != PERMANENT BOOK 2 AUTHORITY: registration
+        proved the basis claims current THEN; every authority-producing
+        USE must prove them current NOW. Each basis ref is re-resolved
+        through CURRENT Book 2 state (canonical, current,
+        graph-promotable, evidenced).
+
+        Empty ``basis_claim_refs`` are legal (Phase 5 semantics): the
+        binding's subject claim is the sole epistemic basis and it is
+        already live-revalidated by the calling validator through the
+        record's/component's own claim refs. The invariant is: if basis
+        refs are present, ALL must be current — the binding is only as
+        current as its weakest required basis claim.
+
+        The frozen binding object is never mutated here: its contextual
+        interpretation is immutable; its epistemic authority is decided
+        against live state at every use.
+        """
+
+        for basis_ref in basis_claim_refs:
+            try:
+                self.resolve_claim(basis_ref)
+            except Book5ProvenanceError as exc:
+                raise Book5ProvenanceError(
+                    f"{binding_family} basis claim is no longer canonical "
+                    f"current graph-promotable authority ({exc}); BINDING "
+                    "REGISTRATION != PERMANENT BOOK 2 AUTHORITY — register a "
+                    "new explicit binding over currently-authoritative basis "
+                    "claims before relying on this context"
+                ) from exc
+
     def resolve_claim(
         self,
         claim_ref: object,
@@ -323,6 +363,14 @@ class Book5Provenance:
                 "VERIFIED — bind the claim's quantitative context explicitly "
                 "before relying on it for an authority-bearing conclusion"
             )
+        # R5 binding-basis live currentness (same rule as the component
+        # family): basis refs are re-resolved through CURRENT Book 2 state
+        # at every authority use.
+        for ref in claim_refs:
+            self._validate_binding_basis_live(
+                self._quantitative_bindings[ref].basis_claim_refs,
+                binding_family="QuantitativeRecordContextBinding",
+            )
         # (a) the binding SET must ESTABLISH every required dimension
         established = {
             dimension: any(
@@ -470,6 +518,15 @@ class Book5Provenance:
                 "NO CONTEXT BINDING != CONTEXT VERIFIED — bind the claim's "
                 "asset/unit/realization context explicitly before relying on "
                 "it for a quantitative conclusion"
+            )
+        # R5 binding-basis live currentness: the binding proved its basis
+        # claims current at REGISTRATION; every authority use re-proves it
+        # against CURRENT Book 2 state (BINDING REGISTRATION != PERMANENT
+        # BOOK 2 AUTHORITY).
+        for ref in component.book2_claim_refs:
+            self._validate_binding_basis_live(
+                self._context_bindings[ref].basis_claim_refs,
+                binding_family="ClaimContextBinding",
             )
         for ref in component.book2_claim_refs:
             binding = self._context_bindings[ref]
