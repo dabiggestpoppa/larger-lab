@@ -1171,3 +1171,82 @@ explicitly authorizes it; the Book 5 / Book 6 valuation seam (numeraire,
 valuation methodology, prices, mark-time alignment) remains reserved to Book 6
 per ratified plan v0.3. No R6 exists or is authorized without a new concrete
 demonstrated defect.
+
+---
+
+# PLANNING LEDGER — BOOK 6 GOVERNANCE REVIEW COMPLETE; PLAN v0.1 DRAFT PENDING RATIFICATION (2026-09-30)
+
+Operator-authorized Book 6 planning + governance review ONLY. No
+implementation, no live acquisition, no RPC, no database, no graph database, no
+dashboard, no production metric pipeline, no production valuation, no
+trading/execution authority.
+
+Outcome:
+
+```text
+BOOK_5 = FROZEN_ACCEPTED
+BOOK_5_ACCEPTED_IMPLEMENTATION_ANCHOR = 50695ad4ea07b57105e71d04d4e32758849e55e3
+BOOK_5_ACCEPTANCE_COMMIT = 5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4
+BOOK_6_GOVERNANCE_REVIEW = COMPLETE
+BOOK_6_PLAN = v0.1 DRAFT_PENDING_OPERATOR_RATIFICATION
+BOOK_6_PLAN = NOT HOLD (0 structural failures across the 25 pre-ratification
+  questions; 1 question's enforcement mechanism depends on D6M-2)
+D2_6_RECONCILIATION = COMPLETE — D2-6 remains IN_FORCE, parameters remain
+  DEFERRED, no threshold/band/weight invented; four layers separated
+  (USAGE OBSERVATION / USAGE METRIC / USAGE STATE / HEALTH INTERPRETATION);
+  empirical phase DESIGNED, NOT EXECUTED
+D2_6_SUCCESSOR_DECISION_CLASS = D6M-5
+OPEN_D6M_DECISIONS = 5 (D6M-1 measurement-object authority boundary;
+  D6M-2 normalization contract shape; D6M-3 state-threshold governance;
+  D6M-4 valuation price-source authority; D6M-5 empirical usage-state
+  governance) — surfaced, NOT decided
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+D8_SEAM = DEFERRED (Book 8 gate; no shared-seam decision made)
+```
+
+Book 6 planning artifacts created this session (12, all DRAFT / pending
+ratification, none implementation-authorized):
+
+- `CSIA_BOOK_6_BOUNDARY_REVIEW_v0.1.md` — ownership vs Books 1–8 + Sensor;
+  three anti-bleed rules; amendment audit (Book 2 conditional on D6M-1 only).
+- `CSIA_BOOK_6_MEASUREMENT_GRAMMAR_v0.1.md` — 20 non-collapsible terms;
+  `MeasurementObservation`, `MetricDefinition`, `MeasurementMethodology`;
+  denominator states; window classes; missingness model; supersession-based
+  revision.
+- `CSIA_BOOK_6_NATIVE_METRICS_AND_VALUATION_v0.1.md` — 6A.1–6A.5 families;
+  `ValuationObservation`; provisional price-source ownership.
+- `CSIA_BOOK_6_COMPARABILITY_MATRIX_v0.1.md` — 9 dimensions fully answered;
+  native-before-normalized binding; PERCENTILE rejected; cohort doctrine.
+- `CSIA_BOOK_6_D2_6_USAGE_HEALTH_RECONCILIATION_v0.1.md` — deferral honored.
+- `CSIA_BOOK_6_USAGE_HEALTH_RESEARCH_DESIGN_v0.1.md` — designed, not executed.
+- `CSIA_BOOK_6_STATE_VECTOR_DESIGN_v0.1.md` — vector, not score; closed
+  descriptive vocabulary; replayable derivation; no ratified thresholds.
+- `CSIA_BOOK_6_VALIDATION_STRESS_MATRIX_v0.1.md` — 6D.1–6D.5 + firewall;
+  15-row false-comparison corpus; no test run (no code exists).
+- `CSIA_BOOK_6_METRIC_CANDIDATE_MATRIX_v0.1.md` — every candidate
+  KEEP/REVISE/DEFER/REJECT; no thresholds anywhere.
+- `CSIA_BOOK_6_SEAMS_AND_FIREWALL_v0.1.md` — Book 5 / Book 4 / Sensor seams;
+  structural anti-score firewall.
+- `CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.1.md` — five decisions, none
+  made.
+- `CSIA_BOOK_6_PRE_RATIFICATION_REVIEW_v0.1.md` — 25 questions answered with
+  guards; 0 structural failures.
+
+Canonically prohibited outputs are REJECTed in the candidate matrix, not
+deferred: composite fundamental score, ecosystem ranking, "TVL" as one number,
+token holders as protocol users, "developer health", and any prescriptive state
+name (ATTRACTIVE / HEALTHY / TOP_TIER / BUY / …). PERCENTILE_WITHIN_COHORT
+normalization is rejected as a ranking surface.
+
+Book amendment audit: Book 1 NONE · Book 2 CONDITIONAL on D6M-1 · Book 3 NONE ·
+Book 4 NONE · Book 5 NONE (valuation seam already ratified in Book 5 v0.3 §4) ·
+Constitution NONE (conditional on D6M-1). No accepted book was amended; this
+session added planning documents only.
+
+```text
+NEXT = operator review of the Book 6 plan v0.1 and the D6M-* decision packet
+```
+
+This ledger entry authorizes no implementation. Book 6 planning content is
+complete for v0.1; further planning requires a new operator authorization.
