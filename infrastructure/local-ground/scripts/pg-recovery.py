@@ -1416,13 +1416,16 @@ def _valid_transition_claim(operation_id, transition, promote,
         return False
     expected = _receipt_digest(promote)
     try:
-        state = _claim_state(operation_id, transition_dir,
-                             expected_receipt_sha256=expected)
+        snapshot = _read_selector_snapshot(operation_id, transition_dir)
+        state = _classify_claim_content(operation_id, snapshot,
+                                        expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
         return False
     if state != "bound_complete":
         return False
-    claim = _load_claim(operation_id, transition_dir=transition_dir)
+    # The SAME snapshot that proved the binding selects the branch. There is
+    # no second read of the coordinate in which a replacement could land.
+    claim = snapshot.claim
     return isinstance(claim, dict) and claim.get("transition") == transition
 
 
@@ -1517,6 +1520,36 @@ def _claim_state(operation_id, transition_dir=None,
         return "malformed"
     return _classify_claim_content(operation_id, snapshot,
                                    expected_receipt_sha256=expected_receipt_sha256)
+
+
+def _classify_claim_content(operation_id, snapshot,
+                            expected_receipt_sha256=None):
+    """Classify ONE already-admitted selector snapshot (B4-CXR7U9R46R2).
+
+    Pure decision content: no filesystem access, no second read. Returns the
+    semantic selector state for the snapshot: absent, malformed,
+    unbound_or_mismatched, or bound_complete. A present claim that is not a
+    JSON object is malformed -- there is no re-read of the coordinate.
+    """
+    if not snapshot.present:
+        return "absent"
+    claim = snapshot.claim
+    if not isinstance(claim, dict):
+        return "malformed"
+    if claim.get("format") != _CLAIM_FORMAT \
+            or claim.get("operation_id") != operation_id \
+            or claim.get("transition") not in TRANSITIONS_ALLOWED_FROM_PROMOTED:
+        return "malformed"
+    digest = claim.get("receipt_sha256")
+    if not isinstance(digest, str) or len(digest) != 64 \
+            or any(c not in "0123456789abcdef" for c in digest):
+        return "unbound_or_mismatched"
+    if expected_receipt_sha256 is not None \
+            and digest != expected_receipt_sha256:
+        return "unbound_or_mismatched"
+    if expected_receipt_sha256 is None:
+        return "unbound_or_mismatched"
+    return "bound_complete"
 
 
 def _classify_claim_content(operation_id, snapshot,
