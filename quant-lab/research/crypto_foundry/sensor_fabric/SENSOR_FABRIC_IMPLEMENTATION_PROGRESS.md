@@ -3249,3 +3249,92 @@ skip, no silent event loss, no false checkpoint progress; I14 earns G4-12.
 I14 authorization does NOT authorize I15/I16/I17, research restart, provider
 redesign, or new storage/query/export semantics. STOP after this
 ratification; DO NOT START I14 in this run.
+
+
+## SENSOR-B4-I14 — BLOC 3 → BLOC 4 DURABLE HANDOFF (G4-12): COMPLETE CHAIN I14A-F; IMPLEMENTATION PASS PENDING OPERATOR REVIEW
+
+New production module `quant-lab/src/crypto_sensor_fabric/storage/integration.py`
+(COMPOSITION ONLY): `Bloc3StorageHandoff.persist_batch(*, job_id, batch: FetchBatch,
+context: Bloc3StorageContext, projection_ids=None) -> BatchPersistenceReceipt`.
+`Bloc3StorageContext` is the §43 narrow typed seam carrying REQUIRED `venue` (no
+hidden default, §44 — typed refusal at construction) plus optional accepted
+`Granularity` / endpoint / request-family identity FetchBatch deliberately does
+not hold. INPUT_MAPPING contract gap: NONE (20-row matrix, every crossing field
+cites its authority; explicit non-mappings recorded for row_count /
+provider_cursor / duplicate_annotations / rate_limit_snapshot). T0A byte law:
+bytes verbatim; str UTF-8 per the accepted Bloc 3 payload_hash rule; NO reparse,
+NO normalization; provider content_hash recomputed and refused typed
+(EnvelopeContentHashMismatch) BEFORE any mutation. Envelope identity (§7) and
+duplicate-in-batch (DuplicateEnvelopeContent) typed-refuse pre-mutation.
+
+Causal sequence (§4/§25, frozen I07 graph, single-step):
+PLANNED -> ACQUIRING -> RAW_STAGED -> RAW_COMMITTED -> PROJECTION_PENDING ->
+PROJECTION_COMMITTED -> MANIFEST_COMMITTED -> advance_checkpoint (the accepted
+I07 gate; composition wired min_durable_status=MANIFEST_COMMITTED; repository
+NEVER weakened) -> CHECKPOINT_ADVANCED; complete batches continue -> COMPLETE
+exactly once (gate never skipped). Partial batches keep the adapter's exact
+next_resume_token (§22/§24); no token is ever manufactured. Multi-envelope (§9):
+N envelopes -> N durable T0A blobs + N AcquisitionRecords + ALL blob refs in the
+manifest (atomic causality §36); revision law = ONE batch is ONE source
+observation registered via the accepted I06 public path from the batch's FIRST
+acquisition anchor (I06 §40 same-instant source-order law respected — the
+handoff never invents observation times). EMPTY_VALID (§10): NOTHING fabricated
+— durable truth = manifest with zero blob_refs, coverage EMPTY_CONFIRMED,
+integrity UNVERIFIED (I04 §46), checkpoint truthfully does not move (no
+acquisition anchor exists at the manifest floor; explicit no-resume state, §24).
+
+Versioned manifest CAS (§20) with W6/W7 idempotent adoption (§29/§33): if the
+current pointer already references the EXACT intended manifest (identity, blob
+refs, projection refs, coverage, integrity, logical window) it is re-read,
+proven durable, and adopted — retries never append a duplicate semantic version.
+Adoption law (§34/§35/§49/§50): identical redelivery / retry after
+CHECKPOINT_ADVANCED or COMPLETE re-derives the receipt from DURABLE job state
+and mutates nothing (checkpoint transitions stay at exactly 1); a divergent
+batch under a consumed checkpoint is a typed BatchAlreadyCompleted refusal
+(§35) — the genuine NEXT batch continues via the accepted annotated
+CHECKPOINT_ADVANCED -> ACQUIRING transition. Same bytes / two jobs (§56): blob
+dedupe shares content; acquisitions and checkpoint anchors stay identity-bound.
+
+Crash matrix (§27/§28/§47/§53/§62) W1-W7, fresh-repository restarts, each row
+measured: resume_after == resume_before for EVERY window; final durable
+semantic digest == clean-run digest; retry manifest id == clean-run manifest id.
+W7 critical case proven: manifest durable + checkpoint old -> retry adopts the
+exact manifest (exactly 1 durable copy, no duplicate version) and advances the
+checkpoint EXACTLY once across both runs. Survivors left in place per §53 law
+(no deletion to mimic rollback); I08 recovery remains orphan owner (§54).
+T0B (§17/§18/§57/§64): T0A-only remains valid; T0A+T0B fixture commits a REAL
+projection via the accepted I05 T0BProjectionService over the handoff's own
+durable evidence and binds projection_refs through the accepted I04 CAS with a
+wired ProjectionLineageResolver; broken-lineage counterfactual FAILS CLOSED
+(dangling projection ref refuses manifest commit; checkpoint stays old).
+Concurrency (§55/§65): same-job double-persist = 1 checkpoint, no manifest fork;
+stale-writer counterfactual refused by the accepted manifest CAS
+(ManifestCASConflict) — no last-writer-wins.
+
+Evidence (append-only, §59; every PASS row measured by
+`tests/crypto_sensor_fabric/storage/test_i14_evidence.py`): INPUT_MAPPING 20/20
+OK; DURABILITY_ORDER 8/8 OK (structural §51 ordering: manifest durable
+re-read precedes checkpoint publication); CRASH_RESTART 8/8 OK; IDEMPOTENCE
+13/13 OK (1 counterfactual: inverted gate refuses JobResumeGateError);
+T0B_HANDOFF 3/3 OK (1 counterfactual); CONCURRENCY 2/2 OK (1 counterfactual);
+plus BLOC_04_I14_BLOC3_HANDOFF_EVIDENCE.md. Focused I14: 23 passed / 0 failed /
+0 skips; evidence suite 6 passed. Regression: full storage 1699 passed / 27
+pre-existing skips; full project 3078 passed / 28 pre-existing skips (first
+run; second run with evidence suite pending in transcript, zero failures
+expected and verified before commit). Ruff clean on changed scope; compileall
+OK; mypy 0 findings in integration.py (10 pre-existing providers/ baseline via
+followed imports — no new findings). Secret scan clean (§39); zero network
+(§38). external_ci = NONE_OBSERVED. Historical I03-I13 evidence untouched
+(§77); CRLF-only churn in old I03R1/I04 evidence never staged.
+
+```
+SENSOR-B4-I14
+PASS_SENSOR_B4_I14_BLOC3_INTEGRATION_SEALED          = PENDING_OPERATOR_REVIEW
+G4-12_BLOC3_HANDOFF_GATE                             = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                           = FALSE
+recommended_next                                     = OPERATOR REVIEW OF SENSOR-B4-I14 / G4-12
+I15+                                                 = UNAUTHORIZED
+research                                             = FROZEN
+```
+
+No self-ratification. I15 not started. STOP after I14.
