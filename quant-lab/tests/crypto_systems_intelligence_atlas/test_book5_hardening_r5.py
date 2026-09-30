@@ -38,7 +38,6 @@ auto-follow), S (registry propagation, Phase 10), E (empty basis semantics).
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Any
 
 import pytest
 
