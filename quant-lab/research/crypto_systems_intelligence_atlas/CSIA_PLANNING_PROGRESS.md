@@ -1132,3 +1132,42 @@ Ratification grants NO implementation, live acquisition, RPC, database, graph
 database, or Book 6 authority. Bloc exit gates (`PASS_CSIA_B5A..B5_CAPITAL_FIELD_V1`)
 now reference the ratified plan; their completion requires implementation-
 phase evidence after a separate implementation authorization.
+
+---
+
+# GOVERNANCE BRIDGE — BOOK 5 IMPLEMENTATION ACCEPTED (2026-09-30)
+
+Book 5 implementation completed its full hardening lineage (R1 decision-point
+live-state validation, R2 mandatory authority context, R3 derived-reference
+context closure, R4 registry/derived-ref authority decay seal, and R5
+binding-basis live currentness seal) and passed operator acceptance review on
+the implementation branch `agent/crypto-systems-intelligence-atlas-book5-build`.
+This bridge records the governance transition only; no implementation code is
+merged into the planning branch, and no Book 6 planning content is started here.
+
+```text
+BOOK_5 = FROZEN_ACCEPTED
+BOOK_5_ACCEPTED_IMPLEMENTATION_ANCHOR = 50695ad4ea07b57105e71d04d4e32758849e55e3
+BOOK_5_ACCEPTANCE_COMMIT = 5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4
+BOOK_5_EXIT_GATE = PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL
+BOOK_5_HARDENING_R1..R5 = ACCEPTED_LINEAGE
+TOTAL_CSIA_AT_ACCEPTANCE = 821 PASS (BOOK_5 = 293)
+CRYPTO_SENSOR_AT_ACCEPTANCE = 2325 PASS / 14 FAIL / 4 SKIPPED (canonical baseline)
+BOOK5_INTRODUCED_SENSOR_FAILURES = 0
+BOOK_6_PLANNING_AUTHORITY = per existing governance / roadmap
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+NEXT = BOOK 6 PLANNING / GOVERNANCE REVIEW ONLY
+```
+
+Acceptance record:
+`CSIA_BOOK_5_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md` (on the implementation
+branch at the acceptance commit `5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4`).
+
+This bridge grants no Book 6 implementation authority, no live acquisition, no
+RPC, no database, no graph database, no production pricing, and no
+trading/execution authority. Book 6 planning content begins only if governance
+explicitly authorizes it; the Book 5 / Book 6 valuation seam (numeraire,
+valuation methodology, prices, mark-time alignment) remains reserved to Book 6
+per ratified plan v0.3. No R6 exists or is authorized without a new concrete
+demonstrated defect.
