@@ -1250,3 +1250,74 @@ NEXT = operator review of the Book 6 plan v0.1 and the D6M-* decision packet
 
 This ledger entry authorizes no implementation. Book 6 planning content is
 complete for v0.1; further planning requires a new operator authorization.
+
+---
+
+# PLANNING LEDGER — BOOK 6 STATE-RULE CONTRADICTION REPAIRED; PLAN v0.2 DRAFT PENDING RATIFICATION (2026-09-30)
+
+External review found a concrete structural contradiction in Bloc 6C of Book 6
+plan v0.1. Finding **accepted**; v0.1 is **not ratifiable in its current state**.
+v0.1 artifacts are preserved unmodified as historical drafts (no v0.1 file was
+edited to hide the defect) and are marked superseded-pending-ratification by the
+v0.2 set.
+
+```text
+BOOK_5 = FROZEN_ACCEPTED
+BOOK_6_STATE_RULE_RECONCILIATION = COMPLETE
+STATE_VOCABULARY_CONTAINS_RULE_DEPENDENT_STATES = TRUE (reproduced: 7 sites,
+  5 artifacts — state-vector v0.1 x4, D2-6 recon v0.1, plan v0.1, validation
+  matrix v0.1)
+PLAN_v0.1_THRESHOLD_FREE_CLAIM = TOO_STRONG (withdrawn)
+UNRATIFIED_RULE_DEPENDENT_STATES = STABLE, VOLATILE, EXPANDING, CONTRACTING,
+  HIGHER_THAN_OWN_HISTORY, LOWER_THAN_OWN_HISTORY (Class C —
+  UNAVAILABLE_PENDING_RULE; EXPANDING/CONTRACTING additionally DEFERRED as
+  generic forms); INCREASING/DECREASING/UNCHANGED (Class B —
+  PENDING_RULE_RATIFICATION; UNCHANGED per measurement class)
+BOOK_6_PLAN_VERSION = v0.2
+BOOK_6_PLAN = DRAFT_PENDING_OPERATOR_RATIFICATION
+BOOK_6_PLAN_v0.1 = SUPERSEDED (not ratified)
+D6M_PACKET_VERSION = v0.2
+OPEN_D6M_DECISIONS = 5 (D6M-1 unchanged; D6M-2 unchanged/leaning; D6M-3
+  REFRAMED to state derivation rule governance; D6M-4 REFRAMED to
+  purpose-specific price authority; D6M-5 unchanged/deferred) — 0 recorded
+STRUCTURAL_FAILURE_COUNT = 0 (pre-ratification v0.2: 35/35 pass, NOT HOLD)
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+D2_6 = IN_FORCE / PARAMETERS_DEFERRED (D6M-3 and D6M-5 kept separate)
+D8 = DEFERRED (untouched)
+```
+
+Key repairs carried by v0.2:
+
+- Doctrine corrected: `NO EMPIRICAL THRESHOLD != NO DERIVATION RULE`; every
+  state requires an explicit, versioned, ratified derivation rule (a new planned
+  `StateRule` contract).
+- Three state classes: A availability/observation, B specification-only,
+  C threshold/benchmark.
+- `STABLE`/`VOLATILE` require ratified stability / volatility methodologies;
+  no code-level epsilon.
+- `UNCHANGED` is distinct from `STABLE` and only available where exact equality
+  is semantically valid.
+- `OWN_HISTORY` is a benchmark namespace; own-history states require a
+  `benchmark_methodology_ref` (families: prior-comparable-window, rolling
+  mean/median, historical distribution, baseline epoch — none chosen).
+- Coverage observation separated from coverage sufficiency
+  (`coverage_sufficiency_ref`); no COMPLETE/INCOMPLETE verdict from a
+  percentage.
+- Vector status repaired: `SCHEMA_COMPLETE` / `DATA_COMPLETE` (non-evaluative);
+  `NOT_APPLICABLE` no longer defects an architecture-native vector (fixes a
+  v0.1 error). No completeness score.
+- Price authority repaired: `PRICE_AUTHORITY = PURPOSE x SUBJECT x VALID_TIME x
+  METHODOLOGY`; no universal price-source class; Book 2 remains evidence
+  authority; divergence preserved, not averaged.
+
+New v0.2 artifacts: `CSIA_BOOK_6_STATE_RULE_RECONCILIATION_v0.1.md`,
+`CSIA_BOOK_6_STATE_VECTOR_DESIGN_v0.2.md`,
+`CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.2.md`,
+`CSIA_BOOK_6_FUNDAMENTAL_MEASUREMENT_STATE_MODELING_PLAN_v0.2.md`,
+`CSIA_BOOK_6_PRE_RATIFICATION_REVIEW_v0.2.md`.
+
+```text
+NEXT = operator review of Book 6 plan v0.2 and D6M packet v0.2 (ratify/return;
+  rule on D6M-1..5). Book 6 remains unratified and unimplemented; D2-6 in force.
+```
