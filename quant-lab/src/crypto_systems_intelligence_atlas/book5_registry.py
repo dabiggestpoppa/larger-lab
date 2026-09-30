@@ -266,6 +266,15 @@ class Book5CanonicalRecordRegistry:
             provenance.resolve_claim_refs(claim_refs)
             if kind in {"flow", "liability", "observed_fact"}:
                 provenance.validate_quantitative_record(record)
+            if kind == "position":
+                # R5: a position's authority includes its NESTED principal
+                # components. Registry current resolution validates each
+                # through the SAME provenance validator used at every 5G
+                # boundary (single implementation, no duplicated logic):
+                # registry currentness -> record currentness -> binding
+                # currentness -> binding basis currentness.
+                for component in record.principal_components.components:
+                    provenance.validate_principal_component(component)
         return RegisteredRecord(
             record_ref=ref, record_kind=kind, record_class=type(record).__name__
         )
