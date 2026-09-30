@@ -3097,3 +3097,84 @@ research                                            = FROZEN
 ```
 
 No self-ratification. I14 not started.
+
+## SENSOR-B4-I13R3 — NONVACUOUS DUCKDB/T0B PARITY + FAIL-SAFE SOURCE-BOUNDARY MICROSEAL
+
+Operator review of the I13R2 evidence found three blockers, all reproduced
+failure-first and repaired (full narrative:
+`evidence/bloc_04/BLOC_04_I13R3_EVIDENCE_CORRECTION.md`):
+
+A. Published DUCKDB_IDENTITY_PARITY rows were all EMPTY (0/0). Root causes:
+   rebuild ran against the lake/pack root instead of the accepted T0A
+   storage root; the accepted lake layout splits T0B projection catalogs
+   into the sibling `t0b` tree so single-root rebuilds of T0B-bearing
+   fixtures fail closed; and `v_t0_revisions` read only the I10 canonical
+   revision layout while the accepted I12/I13 registry durably writes
+   `<t0a>/revisions/segments`. Repair: `rebuild_duckdb_catalog` gains a
+   backward-compatible `projection_root` parameter (default None =
+   pre-I13R3 byte-identical unified behavior) and revision discovery reads
+   BOTH durable layouts (divergence fail-closes). Single-root rebuild of a
+   T0B fixture now refuses typed — 0/0 rows are impossible by construction.
+B. Published T0B exact-metadata parity was EMPTY (rows = 0, all sharing the
+   empty-array digest): the fixture query used `include_t0b=False`. Repair:
+   dedicated T0B fixture (projection artifact/context/lineage/schema/
+   payload + T0B-aware manifest) with `include_t0b=True`. Exercising the
+   never-before-run T0B/versioned-manifest paths exposed and fixed THREE
+   latent production defects: (1) pydantic-only canonical serialization
+   crashed on ProjectionCatalogRecord/lineage/schema export — new
+   `_canonical_dict_bytes` (same canonical JSON discipline for plain-dict
+   records); (2) a superseding manifest's PREDECESSOR joins the evidence
+   closure as REQUIRED_SUPPORT (new MANIFEST_PREDECESSOR fixpoint edge) so
+   the CAS replay of version N>1 has version N-1; (3) restore manifest
+   replay now sorts by (partition_key, manifest_version), derives the
+   v>=2 CAS expected_current as (pointer.previous_manifest_id, version-1),
+   emits one CURRENT_POINTER per partition key, wires the restored
+   ProjectionLineageResolver for the I04 §20 gate, and replays T0B before
+   manifests.
+C. `protected_source_roots` defaulted to [] (optional protection). Repair
+   (fail-closed, §14/§15): public READ-ONLY root properties on
+   ProjectionArtifactRepository (+projection_root), Context, Lineage,
+   SchemaRegistry, SourceRevisionRegistry; the exporter DERIVES every wired
+   dependency's boundary at construction and refuses construction with the
+   typed ExportSourceBoundaryUnproven when a dependency cannot prove its
+   root; destination-overlap protection (T0A/T0B/revision families, equal
+   or child, symlink-through) is on BY DEFAULT with no caller override;
+   protected_source_roots remains as an extension only. I13R1 public-
+   boundary seal intact (structural greps 0/0/0 in export.py).
+
+Evidence (append-only, byte-stable, digests verified across two runs):
+DUCKDB_NONVACUOUS_IDENTITY c5af877a…, T0B_PARITY c866fe5c…,
+SOURCE_BOUNDARY e239e0ea…. Measured: v_t0_blobs 2/2, v_t0_acquisitions
+2/2, v_t0_partitions 2/2, v_t0_revisions 2/2, v_t0_projections 1/1 (all
+views positive counts BOTH sides, literal identity-set equality
+SOURCE(filtered)==PACK_EXPECTED==RESTORED); T0B artifact/context/lineage/
+schema nonempty literal parity; three-way projection payload SHA parity
+through public open_payload()/verify_physical() only; restored T0B query
+digest parity with nonempty projection_refs/lineage_refs; 10 destination-
+overlap refusals + symlink guard + external success control + constructor
+fail-closed proof. Each matrix carries exactly one deliberate
+SYNTHETIC_COUNTERFACTUAL FAIL row per convention; all measured rows OK.
+
+Regression: focused I13R3 green; I13/I13R2 focused suites re-run green;
+full project `uv run -m pytest tests/ -q` = 3050 passed, 28 skipped
+(pre-existing), 0 failures (I11R2 governance-binding audit artifact
+mechanically republished 980 -> 981 python files scanned for the new
+I13R3 test module, per the established audit convention). Static: Ruff clean on changed scope,
+compileall OK, mypy 0 new errors in changed production scope. Historical
+I13/I13R1/I13R2 evidence unchanged vs start HEAD ed7b80bc (git-verified).
+I14 not started.
+
+```
+SENSOR-B4-I13R3
+PASS_SENSOR_B4_I13_EXPORT_BACKUP_RESTORE_SEALED      = OPERATOR_HOLD
+PASS_SENSOR_B4_I13R1_PUBLIC_AUTHORITY_ATOMIC_CLOSURE_SEALED = OPERATOR_HOLD
+PASS_SENSOR_B4_I13R2_EVIDENCE_FIDELITY_RESOURCE_SEALED = OPERATOR_HOLD
+PASS_SENSOR_B4_I13R3_NONVACUOUS_PARITY_BOUNDARY_SEALED = PENDING_OPERATOR_REVIEW
+G4-11_EXPORT_RESTORE_GATE                            = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                           = FALSE
+recommended_next                                     = OPERATOR REVIEW OF COMPLETE I13 -> I13R1 -> I13R2 -> I13R3 CHAIN
+I14+                                                 = UNAUTHORIZED
+research                                             = FROZEN
+```
+
+No self-ratification. I14 not started.
