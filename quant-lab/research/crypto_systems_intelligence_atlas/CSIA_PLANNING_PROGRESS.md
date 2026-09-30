@@ -1321,3 +1321,71 @@ New v0.2 artifacts: `CSIA_BOOK_6_STATE_RULE_RECONCILIATION_v0.1.md`,
 NEXT = operator review of Book 6 plan v0.2 and D6M packet v0.2 (ratify/return;
   rule on D6M-1..5). Book 6 remains unratified and unimplemented; D2-6 in force.
 ```
+
+---
+
+# PLANNING LEDGER — BOOK 6 D6M DECISION-CLOSURE / RATIFICATION-PREP (2026-09-30)
+
+Planning/governance pass. Verified start HEAD `1c42b1c72a67a2bef3df2e093266cf49e0f0dd77`
+(clean, == origin, four-commit v0.2 repair ancestry confirmed). All v0.1 and
+v0.2 planning artifacts preserved unmodified as historical planning evidence.
+
+Audit result: D6M-1 (A/B/C), D6M-2 (A/B) and D6M-4 (A/B) were decision-complete
+in v0.2; **D6M-3 offered zero selectable options**, D6M-5 lacked explicit deferral
+mechanics, and **no packet carried an `operator_selection` field**. All three
+gaps are repaired in packet v0.3.
+
+```text
+BOOK_6_PLAN = DRAFT_PENDING_OPERATOR_DECISIONS
+D6M_PACKET_VERSION = v0.3
+OPEN_BLOCKING_D6M_DECISIONS = 4 (D6M-1, D6M-2, D6M-3, D6M-4)
+OPEN_DEFERRED_D6M_DECISIONS = 1 (D6M-5)
+D6M-5 = DEFERRED_NOT_BLOCKING_PLAN_RATIFICATION
+DECISIONS_RECORDED = 0
+OPTIONS_PRESENTED = 10 (D6M-1 x3, D6M-2 x2, D6M-3 x3, D6M-4 x2)
+OPTION_PREFERRED_BY_PLANNING = NONE
+DECISION_READINESS = 4/4 blocking ready; 1/1 deferred ready; 0 terms to invent;
+  0 policy to draft outside the packet
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+D2_6 = IN_FORCE / PARAMETERS_DEFERRED
+D8 = DEFERRED (untouched)
+```
+
+D6M-3 repaired into three operator-selectable governance models, each answering
+all eleven required dimensions: **A** centralized operator ratification;
+**B** delegated two-tier (operator ratifies the model, a delegate approves
+Class B rules within a pre-ratified envelope, Class C stays operator-only —
+selecting B obliges planning to define a new delegation-register governance
+object); **C** deterministic-specification-only (ratifiable only where the
+predicate carries no free numeric parameter, which likely makes STABLE and
+VOLATILE permanently unavailable).
+
+D6M-5 deferral law: open and deferred; does not block plan ratification;
+blocks only health/adoption/usage-sufficiency state implementation; closable
+only by an explicit operator authorization of the empirical phase plus a later
+recorded parameter decision; may not be closed by planning, by 6D validation, or
+by ratifying D6M-3 under any model; indefinite deferral is an acceptable terminal
+state, not a defect.
+
+One guard conflict disclosed: **D6M-4 option B** (single global price-source
+class) invalidates pre-ratification Q34 and therefore requires either a Book 6
+plan amendment plus re-review or an explicit recorded acceptance of a known
+structural defect with narrowed scope. Recorded so the operator selects
+knowingly; planning states no preference.
+
+Amendment consequences by option (for operator reference): D6M-1 A → none,
+B → Book 2 amendment (+ possible Constitution), C → Book 2 amendment;
+D6M-2 A/B → none; D6M-3 A/B/C → none to accepted books (B adds a new governance
+object); D6M-4 A → none, B → Book 6 plan amendment + guard rewrite. Book 1, 3,
+4 and 5 require no amendment under any option.
+
+Artifacts this pass: `CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.3.md`,
+`CSIA_BOOK_6_DECISION_READINESS_REVIEW_v0.1.md`, this ledger entry. No v0.1 or
+v0.2 artifact was modified.
+
+```text
+NEXT = operator fills the four blocking selection fields in packet v0.3
+  (D6M-1, D6M-2, D6M-3, D6M-4) and ratifies or returns Book 6 plan v0.2.
+  Book 6 remains unratified and unimplemented.
+```
